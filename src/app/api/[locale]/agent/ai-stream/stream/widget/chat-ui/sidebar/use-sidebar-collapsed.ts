@@ -11,6 +11,7 @@
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { getScreenWidth } from "next-vibe/ui/lib/screen";
 import { storage } from "next-vibe/ui/lib/storage";
+import { useEffect } from "react";
 import { create } from "zustand";
 
 import { useLogger } from "@/hooks/use-logger";
@@ -69,8 +70,15 @@ export function useSidebarCollapsed(): [boolean, (collapsed: boolean) => void] {
   const initialize = useSidebarStore((s) => s.initialize);
   const logger = useLogger();
 
-  // Initialize on first render (idempotent)
-  initialize(logger);
+  // Initialize client-side only (idempotent). Calling this during render ran
+  // it on the server too: getScreenWidth() warned on every SSR, and the
+  // storage read mutated the module-level zustand store during server
+  // rendering — server-held state that leaks across requests. Storage and
+  // screen size only exist in the browser, so the effect is the correct home;
+  // both sides render the `collapsed: false` default until it lands.
+  useEffect(() => {
+    initialize(logger);
+  }, [initialize, logger]);
 
   return [collapsed, setCollapsed];
 }

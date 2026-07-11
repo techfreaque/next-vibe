@@ -13,14 +13,19 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { createFixtureFetch } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
 import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage/index";
+import {
+  mimeFromUrl,
+  parseStorageUrl,
+} from "@/app/api/[locale]/agent/chat/storage/url-utils";
 import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 import { STANDARD_MARKUP_PERCENTAGE } from "@/app/api/[locale]/products/constants";
 
-import type { ToolExecutionContext } from "../chat/config";
+import { DefaultFolderId, type ToolExecutionContext } from "../chat/config";
 import {
   checkMediaBalance,
   deductMediaCredits,
@@ -43,6 +48,55 @@ import { generateVideoWithUnbottled } from "./providers/unbottled";
 function parseAspectRatio(r: string): number {
   const [w, h] = r.split(":").map(Number);
   return (w ?? 1) / (h ?? 1);
+}
+
+/**
+ * The single image URL that seeds providers taking one input image
+ * (modelslab). Prefer an explicit first frame, else the first reference
+ * (role omitted or "reference"). Ignores role "last".
+ */
+function resolveSeedImageUrl(
+  frameReferences: VideoGenerationPostRequestOutput["frameReferences"],
+): string | undefined {
+  const first = frameReferences?.find((f) => f.role === "first");
+  if (first) {
+    return first.url;
+  }
+  return frameReferences?.find((f) => f.role !== "last")?.url;
+}
+
+/**
+ * External providers cannot fetch OUR generated-media URLs — they point at our
+ * own storage (a localhost dev server, or an access-controlled endpoint). So
+ * for any URL that is one of OUR storage files, read the bytes DIRECTLY from the
+ * storage adapter (ownership verified via the requesting user) and inline them
+ * as a base64 data URI. NO HTTP fetch — the server reads its own storage. URLs
+ * that aren't ours (already-public third-party links) pass through unchanged.
+ */
+async function inlineOwnStorageUrl(
+  url: string,
+  user: JwtPayloadType,
+): Promise<string> {
+  const parsed = parseStorageUrl(url);
+  if (!parsed) {
+    return url; // not our storage → already provider-fetchable
+  }
+  const storage = getStorageAdapter();
+  // Ownership: non-admins may only inline their own files.
+  const isAdmin =
+    !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
+  if (!isAdmin) {
+    const meta = await storage.getFileMetadata(parsed.fileId);
+    const userId = user.isPublic ? undefined : user.id;
+    if (!meta || meta.uploadedBy !== userId) {
+      return url; // not owned — leave as-is, provider will reject if unreachable
+    }
+  }
+  const base64 = await storage.readFileAsBase64(parsed.fileId, parsed.threadId);
+  if (!base64) {
+    return url;
+  }
+  return `data:${mimeFromUrl(url)};base64,${base64}`;
 }
 
 export class VideoGenerationRepository {
@@ -79,10 +133,9 @@ export class VideoGenerationRepository {
     // (hiddenForPlatforms), so nobody upstream can correct a t2v default for
     // an i2v request. Resolve to the cheapest image-capable model instead of
     // letting the provider fail with a misleading init_image error.
-    if (
-      (data.firstFrameUrl ?? data.lastFrameUrl) &&
-      !videoModel.inputs.includes("image")
-    ) {
+    const seedImageUrl = resolveSeedImageUrl(data.frameReferences);
+    const hasFrameImage = (data.frameReferences?.length ?? 0) > 0;
+    if (hasFrameImage && !videoModel.inputs.includes("image")) {
       const { getVideoGenModelsByInputModality } = await import("./models");
       const imageCapable = getVideoGenModelsByInputModality("image");
       const substitute = imageCapable.toSorted(
@@ -103,7 +156,7 @@ export class VideoGenerationRepository {
     if (
       videoModel.inputs.includes("image") &&
       !videoModel.inputs.includes("text") &&
-      !data.firstFrameUrl
+      !seedImageUrl
     ) {
       return fail({
         message: t("post.errors.inputMediaRequired"),
@@ -207,10 +260,27 @@ export class VideoGenerationRepository {
     // poll loops, so it must not be recreated per call.
     const fetchImpl = createFixtureFetch(streamContext, logger);
 
+    // Inline any of OUR storage URLs (localhost/access-controlled) to base64 data
+    // URIs before handing them to an external provider, which cannot fetch them.
+    // Read straight from storage with the user (ownership-checked) — no HTTP.
+    const resolvedFrameReferences = data.frameReferences
+      ? await Promise.all(
+          data.frameReferences.map(async (f) => ({
+            ...f,
+            url: await inlineOwnStorageUrl(f.url, user),
+          })),
+        )
+      : undefined;
+    const resolvedSeedImageUrl = seedImageUrl
+      ? await inlineOwnStorageUrl(seedImageUrl, user)
+      : seedImageUrl;
+
     let generationResult: ResponseType<{
       videoUrl: string;
       creditCost?: number;
       durationSeconds?: number;
+      /** Headers required to download videoUrl (e.g. OpenRouter Bearer auth). */
+      downloadHeaders?: Record<string, string>;
     }>;
     switch (videoModel.apiProvider) {
       case ApiProvider.MODELSLAB:
@@ -220,7 +290,7 @@ export class VideoGenerationRepository {
           durationSeconds,
           aspectRatio: aspectRatio,
           resolution: data.resolution,
-          inputImageUrl: data.firstFrameUrl,
+          inputImageUrl: resolvedSeedImageUrl,
           logger,
           locale,
           fetchImpl,
@@ -245,10 +315,8 @@ export class VideoGenerationRepository {
           durationSeconds: durationSeconds,
           aspectRatio: aspectRatio,
           resolution: data.resolution,
-          firstFrameUrl: data.firstFrameUrl,
-          lastFrameUrl: data.lastFrameUrl,
+          frameReferences: resolvedFrameReferences,
           negativePrompt: data.negativePrompt,
-          cfgScale: data.cfgScale,
 
           generateAudio: videoModel.generateAudio ?? false,
           supportedFrameImages: videoModel.supportedFrameImages,
@@ -284,19 +352,36 @@ export class VideoGenerationRepository {
       generationResult.data.durationSeconds ?? durationSeconds;
     const finalCreditCost = generationResult.data.creditCost ?? creditCost;
 
-    // Upload to our storage so the URL is persistent and access-controlled
+    // Upload to our storage so the URL is persistent and access-controlled.
+    // Incognito threads have no server-side thread row — the file is owned by
+    // the caller's leadId and served only to that lead (browser).
     const scThreadId = streamContext.threadId;
+    const isIncognito =
+      streamContext.rootFolderId === DefaultFolderId.INCOGNITO;
     if (scThreadId) {
       try {
         const storage = getStorageAdapter();
-        const arrayBuf = await fetchImpl(videoUrl).then((r) => r.arrayBuffer());
+        // Some providers (OpenRouter) serve the finished video from an authed
+        // endpoint — download WITH the provider's headers, else it 401s and we
+        // store a tiny error JSON as a broken .mp4.
+        const downloadRes = await fetchImpl(videoUrl, {
+          headers: generationResult.data.downloadHeaders,
+        });
+        if (!downloadRes.ok) {
+          // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- intentional throw to fall through to catch
+          throw new Error(
+            `Video download failed: HTTP ${String(downloadRes.status)}`,
+          );
+        }
+        const arrayBuf = await downloadRes.arrayBuffer();
         const videoBuffer = Buffer.from(new Uint8Array(arrayBuf));
         const ext = videoUrl.includes("webm") ? "webm" : "mp4";
         const uploadResult = await storage.uploadFile(videoBuffer, {
           filename: `generated-video-${Date.now()}.${ext}`,
           mimeType: `video/${ext}`,
           threadId: scThreadId,
-          userId: user.id,
+          userId: isIncognito ? undefined : user.id,
+          leadId: isIncognito ? user.leadId : undefined,
         });
         videoUrl = uploadResult.url;
       } catch (uploadErr) {

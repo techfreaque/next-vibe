@@ -130,23 +130,22 @@ const { POST } = createEndpoint({
         hiddenForPlatforms: [Platform.AI, Platform.MCP],
         schema: z.string().optional(),
       }),
-      firstFrameUrl: requestField(scopedTranslation, {
+      frameReferences: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "post.firstFrameUrl.label",
-        description: "post.firstFrameUrl.description",
+        label: "post.frameReferences.label",
+        description: "post.frameReferences.description",
         columns: 12,
-        placeholder: "post.firstFrameUrl.placeholder",
-        schema: z.string().url().optional(),
-      }),
-      lastFrameUrl: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "post.lastFrameUrl.label",
-        description: "post.lastFrameUrl.description",
-        columns: 12,
-        placeholder: "post.lastFrameUrl.placeholder",
-        schema: z.string().url().optional(),
+        placeholder: "post.frameReferences.placeholder",
+        schema: z
+          .array(
+            z.object({
+              url: z.string().url(),
+              role: z.enum(["first", "last", "reference"]).optional(),
+            }),
+          )
+          .max(8)
+          .optional(),
       }),
       negativePrompt: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -155,7 +154,6 @@ const { POST } = createEndpoint({
         description: "post.negativePrompt.description",
         columns: 12,
         placeholder: "post.negativePrompt.placeholder",
-        hiddenForPlatforms: [Platform.AI, Platform.MCP],
         schema: z.string().max(1000).optional(),
       }),
 

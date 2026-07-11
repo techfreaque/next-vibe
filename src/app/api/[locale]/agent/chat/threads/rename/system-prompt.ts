@@ -8,6 +8,7 @@ import type { SystemPromptFragment } from "@/app/api/[locale]/agent/ai-stream/sy
 import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
 
 import { THREAD_RENAME_ALIAS } from "./constants";
+import { getIncognitoRename } from "./incognito-title-cache";
 
 // ─── Fragment ──────────────────────────────────────────────────────────────────
 //
@@ -37,14 +38,30 @@ export const threadRenameFragment: SystemPromptFragment = {
       return null;
     }
 
-    const [row] = await db
-      .select({
-        title: chatThreads.title,
-        description: chatThreads.description,
-      })
-      .from(chatThreads)
-      .where(eq(chatThreads.id, threadId))
-      .limit(1);
+    let row: { title: string; description: string | null } | undefined;
+    if (params.isIncognito) {
+      // Incognito threads have no DB row. Prefer a rename recorded in this
+      // process THIS turn (so the mid-loop prompt refresh sees the new title
+      // instead of re-demanding a rename), else the client-sent localStorage
+      // title/description carried on the stream request.
+      row =
+        getIncognitoRename(threadId) ??
+        (params.incognitoThreadTitle
+          ? {
+              title: params.incognitoThreadTitle,
+              description: params.incognitoThreadDescription ?? null,
+            }
+          : undefined);
+    } else {
+      [row] = await db
+        .select({
+          title: chatThreads.title,
+          description: chatThreads.description,
+        })
+        .from(chatThreads)
+        .where(eq(chatThreads.id, threadId))
+        .limit(1);
+    }
 
     if (!row?.title) {
       return null;
@@ -52,7 +69,13 @@ export const threadRenameFragment: SystemPromptFragment = {
 
     const isNew = !row.description;
     const desc = row.description ? ` / "${row.description}"` : "";
-    const callShape = `execute-tool toolName="${THREAD_RENAME_ALIAS}" (title ≤8 words no quotes; description one concrete sentence, not a restatement)`;
+    // Relay RECEIVER: this thread is OWNED by the caller — the rename must
+    // round-trip to it (`<caller>__rename-thread`), else the executor renames its
+    // OWN local copy and the owner's title never updates (mirror titles diverge).
+    const renameToolName = params.relayCallerInstanceId
+      ? `${params.relayCallerInstanceId}__${THREAD_RENAME_ALIAS}`
+      : THREAD_RENAME_ALIAS;
+    const callShape = `execute-tool(toolName="${renameToolName}", input={ title: "≤8 words covering the whole conversation, no quotes", description: "2-6 sentences summarizing the full thread — what was discussed, decided, or built" })`;
     // Housekeeping — NEVER pre-empts the user's actual work and NEVER ends the turn.
     // It rides in the SAME parallel batch as the real tool calls. Deliberately no
     // endLoop: granting endLoop here makes the model treat rename as the whole turn

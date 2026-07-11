@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**Assessing Prompt Adherence**\n\nI've evaluated the image against the user's initial request. The generated result depicts a blue triangle with detailed photographic rendering and lighting. It seems that the prompt's elements have been accurately incorporated. The outcome aligns with the specified requirements, so it is ready to be delivered.\n\n\n</think>",
+    "encoding_format": "float"
+  }
+}

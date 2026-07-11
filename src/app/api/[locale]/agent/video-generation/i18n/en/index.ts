@@ -8,7 +8,8 @@ export const translations = {
     title: "Generate Video",
     titleShort: "Generate Video",
     dynamicTitle: "Video: {{prompt}}",
-    description: "Generate a video from a text prompt using AI",
+    description:
+      "Generate a video from a text prompt. Use list-models (modelType=video) to see all video models with their capabilities: supportedDurations (valid clip lengths in seconds), supportedAspectRatios, supportedFrameImages (first_frame/last_frame = image-to-video support). Pass frameReferences to steer the video: role 'first' pins the opening frame and role 'last' pins the closing frame — both MUST be image URLs (only on models with last_frame support); role 'reference' (or no role) feeds a guiding image, audio, or video asset. Pass negativePrompt on models that support it. Returns videoUrl.",
     form: {
       title: "Video Generation",
       description: "Enter a prompt to generate a video",
@@ -21,7 +22,7 @@ export const translations = {
     model: {
       label: "Model",
       description:
-        "Video generation model. Leave blank to use the user's configured default.",
+        "Video model id. Leave blank for user default. Use list-models (modelType=video) to browse models and their capabilities.",
     },
     duration: {
       label: "Duration",
@@ -38,27 +39,17 @@ export const translations = {
       label: "Resolution",
       description: "Output video resolution",
     },
-    firstFrameUrl: {
-      label: "First Frame URL",
+    frameReferences: {
+      label: "Frame References",
       description:
-        "Image to use as the first frame. The model animates forward from this.",
+        "Reference assets that steer the video. Each entry is { url, role }. role 'first' pins the exact opening frame and role 'last' pins the exact closing frame (needs last_frame support) — bookend frames are IMAGES ONLY, so both MUST be image URLs. role 'reference' (or no role) is a guiding asset that can be an image, audio, or video URL; its kind is auto-detected from the URL (.mp4/.webm/.mov as video, audio files as audio, everything else as image). A first or reference image switches the server to the cheapest image-capable model when needed.",
       placeholder: "https://example.com/first-frame.jpg",
-    },
-    lastFrameUrl: {
-      label: "Last Frame URL",
-      description:
-        "Image to use as the last frame. The model animates backward to this.",
-      placeholder: "https://example.com/last-frame.jpg",
     },
     negativePrompt: {
       label: "Negative Prompt",
-      description: "Describe what to exclude from the video.",
-      placeholder: "blurry, low quality, distorted...",
-    },
-    cfgScale: {
-      label: "CFG Scale",
       description:
-        "How strictly the model follows the prompt (0–30). Higher = more literal.",
+        "What to exclude from the video. Only sent to models that accept negative_prompt or negativePrompt — ignored otherwise.",
+      placeholder: "blurry, low quality, distorted...",
     },
 
     download: "Download",

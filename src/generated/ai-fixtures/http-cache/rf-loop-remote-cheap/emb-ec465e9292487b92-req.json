@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "[T8 parallel-tools] In a single response, call BOTH at the same time: (1) the cortex-write tool with path='/memories/t8-parallel-test' and content='T8_PARALLEL_OK' to write a memory node, and (2) the chat-settings tool to read the chat settings. Check that cortex-write returned a responsePath and chat-settings returned a selectedSkill. End your reply with STEP_OK if both tools ran and returned their result shape, or FAILED: <reason> only if a tool errored or did not run.",
+    "encoding_format": "float"
+  }
+}

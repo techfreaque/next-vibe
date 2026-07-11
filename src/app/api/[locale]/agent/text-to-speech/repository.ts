@@ -18,6 +18,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { createFixtureFetch } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
+import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage/index";
 import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 import { ModelSelectionType } from "@/app/api/[locale]/agent/skills/enum";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
@@ -27,7 +28,7 @@ import {
   TTS_COST_PER_CHARACTER,
   TTS_MINIMUM_BALANCE,
 } from "../../products/repository-client";
-import type { ToolExecutionContext } from "../chat/config";
+import { DefaultFolderId, type ToolExecutionContext } from "../chat/config";
 import { agentEnv } from "../env";
 import {
   getInstanceAvailability,
@@ -453,7 +454,51 @@ export class TextToSpeechRepository {
         return audioResult;
       }
 
-      const audioUrl = audioResult.data;
+      let audioUrl = audioResult.data;
+
+      // Upload to storage so message history only ever carries a URL — a data
+      // URI in the tool result blows up the model context on later turns.
+      // Incognito threads have no server-side thread row — the file is owned
+      // by the caller's leadId and served only to that lead (browser).
+      // Without a thread (standalone tool call) keep the data URI for
+      // immediate playback.
+      const scThreadId = streamContext.threadId;
+      if (scThreadId && audioUrl.startsWith("data:")) {
+        try {
+          const commaIdx = audioUrl.indexOf(",");
+          const mimeType =
+            audioUrl.slice(5, commaIdx).split(";")[0] || "audio/mpeg";
+          const audioBuffer = Buffer.from(
+            audioUrl.slice(commaIdx + 1),
+            "base64",
+          );
+          const isIncognito =
+            streamContext.rootFolderId === DefaultFolderId.INCOGNITO;
+          const ext =
+            mimeType === "audio/mpeg"
+              ? "mp3"
+              : (mimeType.split("/")[1] ?? "mp3");
+          const storage = getStorageAdapter();
+          const uploadResult = await storage.uploadFile(audioBuffer, {
+            filename: `generated-speech-${Date.now()}.${ext}`,
+            mimeType,
+            threadId: scThreadId,
+            userId: isIncognito ? undefined : user.id,
+            leadId: isIncognito ? user.leadId : undefined,
+          });
+          audioUrl = uploadResult.url;
+        } catch (uploadErr) {
+          logger.error(
+            "[TTS] Failed to upload audio to storage, using data URI",
+            {
+              error:
+                uploadErr instanceof Error
+                  ? uploadErr.message
+                  : String(uploadErr),
+            },
+          );
+        }
+      }
 
       logger.debug("[TTS] Text-to-speech conversion successful", {
         audioSize: audioUrl.length,

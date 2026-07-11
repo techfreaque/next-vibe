@@ -2599,9 +2599,8 @@ describe("Cortex System Prompt Injection", () => {
   ): Promise<string> => {
     const { threadId: seededThreadId, streamContext: seedCtx } =
       await seedCaseThread(label);
-    const { MessagesRepository } = await import(
-      "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/repository"
-    );
+    const { MessagesRepository } =
+      await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/repository");
     await MessagesRepository.createUserMessage({
       messageId: crypto.randomUUID(),
       threadId: seededThreadId,
@@ -2610,6 +2609,7 @@ describe("Cortex System Prompt Injection", () => {
       content: query,
       parentId: null,
       userId: testUser?.id,
+      user: testUser,
       authorName: null,
       logger: createEndpointLogger(false, defaultLocale),
       streamContext: seedCtx,

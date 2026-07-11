@@ -108,7 +108,7 @@ const { GET } = createEndpoint({
         streamingState: true,
       } as const,
       urlPathParamsFields: ["threadId"] as const,
-      operation: "merge" as const,
+      operation: "upsert" as const,
       onEvent: async (ctx) => {
         const {
           responseData,
@@ -427,9 +427,11 @@ const { GET } = createEndpoint({
         useChatStore.getState().clearThreadPendingCreate(threadId);
         // Clear aborting state - the framework already merged
         // streamingState: "idle" into the cache; clear the cancel spinner.
+        // Also release the keeper's headless incognito subscription.
         const { useAIStreamStore } =
           await import("../../../../ai-stream/stream/hooks/store");
         useAIStreamStore.getState().clearThread(threadId);
+        useAIStreamStore.getState().removeIncognitoStream(threadId);
         // Sweep any dangling optimistic placeholders - normally gone by now
         // (removed when real assistant message-created arrived), but guards
         // against edge cases where the stream ends without emitting a message.

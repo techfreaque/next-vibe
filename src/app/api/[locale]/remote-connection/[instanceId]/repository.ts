@@ -631,6 +631,11 @@ export class RemoteConnectionInstanceRepository {
             localUrl,
             reverseToken,
             reverseLeadId: reverseLeadId ?? user.leadId,
+            // connect-reverse REQUIRES syncScope — the reauth re-register must
+            // carry THIS connection's current scope (from the DB row), not omit
+            // it (omission 400'd every reauth push, so the remote kept the stale
+            // token and cloud→local calls 401'd).
+            syncScope: row.syncScope,
           },
           timeoutMs: 15_000,
         });

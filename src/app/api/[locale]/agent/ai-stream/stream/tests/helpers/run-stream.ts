@@ -567,7 +567,7 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
         const REVIVAL_TIMEOUT_MS = cfg.pulse
           ? 30_000
           : Math.max(120_000, params.settleTimeoutMs ?? 0);
-        const REVIVAL_POLL_INTERVAL_MS = 100;
+        const REVIVAL_POLL_INTERVAL_MS = 25;
         const MAX_PULSE_RETRIES = 3;
         let pulseRetries = 0;
         let lastPulsedAt = Date.now();
@@ -578,6 +578,11 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
         // revival is a SEPARATE later turn) — do NOT additionally require
         // no-pending-work here, or a phase-1 dispatch (which intentionally
         // leaves a pending revival) would never settle.
+        // CHECK-FIRST: read the state before sleeping. A fixture-replay revival
+        // usually settles to 'idle' within a few ms of the dispatch turn ending,
+        // so the leading sleep guaranteed ~100ms of dead wait on EVERY revival
+        // (measured). Check up-front, then only sleep between subsequent polls.
+        revivalState = await getStreamingState(tid);
         while (
           revivalState !== "idle" &&
           Date.now() - revivalStart < REVIVAL_TIMEOUT_MS
@@ -814,9 +819,11 @@ async function assertCasePlacement(
     "regular";
   const { assertThreadPlacement, HERMES_INSTANCE_ID, SELF_INSTANCE_ID } =
     await import("../../../testing/remote-setup");
-  // The ORIGIN's title is the parity anchor: it must derive from the first
-  // user message (test prompts always start with "[T"), and every mirror
-  // must carry it VERBATIM.
+  // The ORIGIN's title is the parity anchor: a new thread starts as the
+  // localized "New Chat" default and the MODEL renames it via the rename-thread
+  // fragment (never the raw user message). Every mirror must carry that same
+  // title verbatim. We read the origin's live title as the anchor and require it
+  // to be a real model rename (not the "New Chat" default) below.
   const [localThreadRow] = await db
     .select({ title: chatThreads.title })
     .from(chatThreads)
@@ -828,15 +835,15 @@ async function assertCasePlacement(
       return; // explicit non-default root (e.g. incognito case) — exempt
     }
     // FOLDER-driven remote suites: the thread is CREATED inside
-    // REMOTE/<instance>/tests/<case> — the folder's instance id stamps
-    // loop_instance_id at creation and routes the loop. The executor's
+    // REMOTE/<instance>/private/tests/<case> — the folder's instance id stamps
+    // loop_instance_id at creation and routes the loop. `private` is the
+    // mirror-subtree segment (own/private threads live under it). The executor's
     // foreign copy nests the origin root: REMOTE/<caller>/private/<chain>.
     await assertThreadPlacement({
       db: "local",
       threadId,
       rootFolderId: DefaultFolderId.REMOTE,
-      nameChain: [HERMES_INSTANCE_ID, "tests", testCaseName],
-      expectedTitlePrefix: "[T",
+      nameChain: [HERMES_INSTANCE_ID, "private", "tests", testCaseName],
     });
     if (cfg.forceLocalLoop) {
       // Loop-LOCAL topology: the "self" sentinel keeps the loop here — no
@@ -844,13 +851,42 @@ async function assertCasePlacement(
       // still execute remotely, but execute-tool creates no threads.
       return;
     }
-    await assertThreadPlacement({
-      db: "hermes",
-      threadId,
-      rootFolderId: DefaultFolderId.REMOTE,
-      nameChain: [SELF_INSTANCE_ID, "private", "tests", testCaseName],
-      expectedTitle: localTitle,
-    });
+    // Title parity CONVERGES: the loop runs on hermes, so a model rename lands
+    // there first and propagates to the origin (atlas) async via thread-updated.
+    // Re-read the origin's live title each tick and require the hermes mirror to
+    // match it — settle on the LAST failure rather than racing the propagation.
+    {
+      const deadline = Date.now() + 30_000;
+      for (;;) {
+        const [liveRow] = await db
+          .select({ title: chatThreads.title })
+          .from(chatThreads)
+          .where(eq(chatThreads.id, threadId))
+          .limit(1);
+        const liveTitle = liveRow?.title ?? localTitle;
+        try {
+          // The EXECUTOR ran the loop → this is hermes's OWN thread, physically
+          // in its real PRIVATE/tests/<case> (root=PRIVATE, origin NULL), NOT a
+          // REMOTE/<caller>/… mirror. The caller (atlas) holds the REMOTE mirror.
+          await assertThreadPlacement({
+            db: "hermes",
+            threadId,
+            rootFolderId: DefaultFolderId.PRIVATE,
+            nameChain: ["tests", testCaseName],
+            expectedTitle: liveTitle,
+          });
+          break;
+        } catch (err) {
+          if (Date.now() > deadline) {
+            // oxlint-disable-next-line restricted-syntax -- rethrow last assertion failure in test helper
+            throw err;
+          }
+          await new Promise<void>((resolve) => {
+            setTimeout(resolve, 250);
+          });
+        }
+      }
+    }
     return;
   }
   if (cfg.rootFolderIdOverride) {

@@ -61,6 +61,38 @@ export function toNextParams<
   return out as T;
 }
 
+/**
+ * Run a generated page/layout loader with partial-namespace retry.
+ *
+ * Loader server-fns dynamic-import their page module, which can race the
+ * routeTree's own static evaluation of the same module during cold boot.
+ * The Vite SSR module runner hands cycle participants a PARTIALLY
+ * initialized namespace; calling tanstackLoader from it then throws
+ * "Cannot access '__vite_ssr_import_N__' before initialization" — which
+ * rendered as a completely silent 500 on the first request of a cold page.
+ * Retrying re-imports the module; once the graph finishes evaluating, the
+ * namespace is complete and the loader succeeds. Dev-only failure mode —
+ * production bundles have no module runner — so the retry never fires there.
+ */
+export async function runPageLoader<T>(run: () => Promise<T>): Promise<T> {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await run();
+    } catch (error) {
+      const isPartialModule =
+        error instanceof ReferenceError &&
+        error.message.includes("__vite_ssr_import_");
+      if (!isPartialModule || attempt >= 20) {
+        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- loader errors must propagate to the router's error handling
+        throw error;
+      }
+      await new Promise((resolve) => {
+        setTimeout(resolve, 150);
+      });
+    }
+  }
+}
+
 // ---------------------------------------------------------------------------
 // API route wrapper
 // ---------------------------------------------------------------------------

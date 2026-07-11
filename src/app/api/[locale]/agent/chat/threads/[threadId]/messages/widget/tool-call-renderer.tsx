@@ -65,7 +65,9 @@ import type { FieldValues } from "react-hook-form";
 import { useForm } from "react-hook-form";
 
 import type { SendMessageParams } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/send-message";
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ToolCall } from "@/app/api/[locale]/agent/chat/db";
+import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import { EndpointRenderer } from "@/app/api/[locale]/system/unified-ui/renderers/react/EndpointRenderer";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-ui/renderers/react/EndpointsPage";
 import { pathToAliasMap } from "@/generated/endpoints/alias-map";
@@ -314,8 +316,8 @@ export function ToolCallRenderer({
       if (result.success) {
         setDefinition(result.data);
         // Apply definition's defaultExpanded once loaded, but only if there's no user override.
-        // For defaultExpanded=true tools, open state follows isLoading: expanded while working,
-        // collapsed when done.
+        // For defaultExpanded=true tools: collapsed while executing/backgrounded, expanded
+        // once done (the completion effect below re-opens when the result arrives).
         if (result.data.defaultExpanded !== undefined) {
           const hasUserOverride =
             collapseState &&
@@ -361,34 +363,129 @@ export function ToolCallRenderer({
   ]);
 
   // When the outer tool is execute-tool, load the inner tool's definition for its display title
-  const innerToolArgs =
-    definition?.aliases?.includes(EXECUTE_TOOL_ALIAS) &&
+  const isExecuteTool = Boolean(
+    definition?.aliases?.includes(EXECUTE_TOOL_ALIAS),
+  );
+  const isAwaitTaskOuter = Boolean(
+    definition?.aliases?.includes(AWAIT_TASK_ALIAS),
+  );
+
+  const executeToolArgs =
+    isExecuteTool &&
     toolCall.args &&
     typeof toolCall.args === "object" &&
     !Array.isArray(toolCall.args)
       ? (toolCall.args as { [key: string]: WidgetData })
       : null;
-  const innerToolNameRaw = innerToolArgs?.toolName;
-
-  // When the outer tool is await-task, the inner tool name comes from the response
-  const awaitTaskResult =
-    definition?.aliases?.includes(AWAIT_TASK_ALIAS) &&
+  const executeToolResult =
+    isExecuteTool &&
     toolCall.result &&
     typeof toolCall.result === "object" &&
     !Array.isArray(toolCall.result)
       ? (toolCall.result as { [key: string]: WidgetData })
       : null;
-  const awaitTaskInnerToolNameRaw = awaitTaskResult?.originalToolName;
 
-  const innerToolName =
-    typeof innerToolNameRaw === "string"
-      ? innerToolNameRaw
-      : typeof awaitTaskInnerToolNameRaw === "string"
-        ? awaitTaskInnerToolNameRaw
+  // When the outer tool is await-task, the inner tool name comes from the response
+  const awaitTaskResult =
+    isAwaitTaskOuter &&
+    toolCall.result &&
+    typeof toolCall.result === "object" &&
+    !Array.isArray(toolCall.result)
+      ? (toolCall.result as { [key: string]: WidgetData })
+      : null;
+
+  // When execute-tool wraps await-task, look through to the real inner tool via result.originalToolName
+  const executeWrapsAwaitTask =
+    typeof executeToolArgs?.toolName === "string" &&
+    executeToolArgs.toolName === AWAIT_TASK_ALIAS &&
+    executeToolResult?.result &&
+    typeof executeToolResult.result === "object" &&
+    !Array.isArray(executeToolResult.result);
+  const executeAwaitTaskInner = executeWrapsAwaitTask
+    ? (executeToolResult?.result as { [key: string]: WidgetData } | null)
+    : null;
+
+  // Resolve final inner tool name, preferring the deepest real tool
+  const innerToolName: string | undefined = (() => {
+    // execute-tool wrapping await-task: use the original tool from await-task's result
+    if (
+      executeWrapsAwaitTask &&
+      typeof executeAwaitTaskInner?.originalToolName === "string"
+    ) {
+      return executeAwaitTaskInner.originalToolName;
+    }
+    // execute-tool directly: use toolName from args (may still be await-task if no result yet)
+    if (typeof executeToolArgs?.toolName === "string") {
+      return executeToolArgs.toolName;
+    }
+    // await-task outer: use originalToolName from response
+    if (typeof awaitTaskResult?.originalToolName === "string") {
+      return awaitTaskResult.originalToolName;
+    }
+    return undefined;
+  })();
+
+  // Compute the request/response to pass to inner tool's dynamicTitle
+  // so it receives the actual tool's args/result, not the wrapper's
+  const innerToolRequest: WidgetData | undefined = (() => {
+    if (executeWrapsAwaitTask) {
+      // execute-tool → await-task → real tool: inner args are in result.originalArgs
+      const inner = executeAwaitTaskInner;
+      return inner?.originalArgs && typeof inner.originalArgs === "object"
+        ? (inner.originalArgs as WidgetData)
         : undefined;
+    }
+    if (isExecuteTool) {
+      // execute-tool directly: inner args are in args.input
+      return executeToolArgs?.input && typeof executeToolArgs.input === "object"
+        ? (executeToolArgs.input as WidgetData)
+        : undefined;
+    }
+    if (isAwaitTaskOuter) {
+      // await-task outer: inner args are in result.originalArgs
+      return awaitTaskResult?.originalArgs &&
+        typeof awaitTaskResult.originalArgs === "object"
+        ? (awaitTaskResult.originalArgs as WidgetData)
+        : undefined;
+    }
+    return undefined;
+  })();
+
+  const innerToolResponse: WidgetData | undefined = (() => {
+    if (executeWrapsAwaitTask) {
+      // execute-tool → await-task → real tool: inner result is in result.result
+      const inner = executeAwaitTaskInner;
+      return inner?.result && typeof inner.result === "object"
+        ? (inner.result as WidgetData)
+        : undefined;
+    }
+    if (isExecuteTool) {
+      // execute-tool directly: inner result is in result.result
+      return executeToolResult?.result &&
+        typeof executeToolResult.result === "object"
+        ? (executeToolResult.result as WidgetData)
+        : undefined;
+    }
+    if (isAwaitTaskOuter) {
+      // await-task outer: inner result is in result.result
+      return awaitTaskResult?.result &&
+        typeof awaitTaskResult.result === "object"
+        ? (awaitTaskResult.result as WidgetData)
+        : undefined;
+    }
+    return undefined;
+  })();
 
   useEffect((): (() => void) => {
     if (!innerToolName) {
+      setInnerToolDefinition(null);
+      return () => undefined;
+    }
+    // If a different tool is loaded, clear it so we reload for the new name
+    if (
+      innerToolDefinition &&
+      !innerToolDefinition.aliases?.includes(innerToolName)
+    ) {
       setInnerToolDefinition(null);
       return () => undefined;
     }
@@ -448,15 +545,29 @@ export function ToolCallRenderer({
     toolCall.callbackMode,
   ]);
 
-  // For wakeUp/detach tools with defaultExpanded: the initial load keeps them collapsed because
-  // isBackground=true. Re-evaluate open state when the result arrives.
-  const isWakeUp = toolCall.callbackMode === CallbackMode.WAKE_UP;
+  // defaultExpanded tools stay collapsed while executing (the definition-load
+  // effects see currentlyLoading/isBackground and set closed) — but those effects
+  // only run once per definition, so re-evaluate here and expand once the call
+  // finishes and the result/error arrives.
+  const expandDefinition = innerToolDefinition ?? definition;
   useEffect(() => {
-    if (!isWakeUp || !innerToolDefinition?.defaultExpanded) {
+    if (!expandDefinition?.defaultExpanded) {
       return;
     }
-    const hasResult = Boolean(toolCall.result);
-    if (!hasResult) {
+    const isTerminal =
+      toolCall.status === "completed" || toolCall.status === "failed";
+    const isDone =
+      Boolean(toolCall.result) || Boolean(toolCall.error) || isTerminal;
+    // Background dispatch acks carry a result ({hint, taskId}) but the call is
+    // still parked — only the injected final result (terminal status or a
+    // deferred backfill) counts as done. detach never backfills, so it only
+    // expands if a deferred result arrives.
+    const isParkedBackground =
+      (toolCall.callbackMode === CallbackMode.WAKE_UP &&
+        !toolCall.isDeferred &&
+        !isTerminal) ||
+      (toolCall.callbackMode === CallbackMode.DETACH && !toolCall.isDeferred);
+    if (!isDone || toolCall.isPartial || isParkedBackground) {
       return;
     }
     const hasUserOverride =
@@ -470,9 +581,13 @@ export function ToolCallRenderer({
       setIsOpen(true);
     }
   }, [
-    isWakeUp,
-    innerToolDefinition,
+    expandDefinition,
     toolCall.result,
+    toolCall.error,
+    toolCall.status,
+    toolCall.isPartial,
+    toolCall.callbackMode,
+    toolCall.isDeferred,
     collapseState,
     messageId,
     toolIndex,
@@ -578,6 +693,12 @@ export function ToolCallRenderer({
   // call the id is pendingCallId; for a LIVE in-flight call it is the toolCallId.
   // detach handles both stages (deliver-signal, else discard-parked+unblock).
   const controlCallId = toolCall.pendingCallId ?? toolCall.toolCallId;
+
+  // Incognito threads live only in localStorage — a backgrounded/revived call has
+  // no server-side thread to inject its result into, so only cancel is offered.
+  const isIncognito =
+    useChatNavigationStore((s) => s.currentRootFolderId) ===
+    DefaultFolderId.INCOGNITO;
 
   const [isDetaching, setIsDetaching] = useState(false);
   const detachMutation = useApiMutation(detachCallEndpoints.POST, logger, user);
@@ -750,14 +871,8 @@ export function ToolCallRenderer({
         | DynamicTitleFn
         | undefined;
       const innerDynamic = innerDynamicFn?.({
-        request:
-          toolCall.args && typeof toolCall.args === "object"
-            ? toolCall.args
-            : undefined,
-        response:
-          toolCall.result && typeof toolCall.result === "object"
-            ? toolCall.result
-            : undefined,
+        request: innerToolRequest,
+        response: innerToolResponse,
       });
       const innerTitle = innerDynamic
         ? (innerScopedT?.t(innerDynamic.message, innerDynamic.messageParams) ??
@@ -957,34 +1072,38 @@ export function ToolCallRenderer({
                   (mirrors the AI-callable call-control tools). */}
               {isLoading && controlCallId && (
                 <>
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="ghost"
-                    className="h-5 px-1.5 text-xs text-muted-foreground hover:text-foreground"
-                    disabled={isDetaching}
-                    onClick={handleDetach}
-                  >
-                    {isDetaching ? (
-                      <Loader2 className="h-3 w-3 animate-spin" />
-                    ) : (
-                      t("widgets.toolCall.actions.runInBackground")
-                    )}
-                  </Button>
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="ghost"
-                    className="h-5 px-1.5 text-xs text-muted-foreground hover:text-foreground"
-                    disabled={isResuming}
-                    onClick={handleResumeWhenDone}
-                  >
-                    {isResuming ? (
-                      <Loader2 className="h-3 w-3 animate-spin" />
-                    ) : (
-                      t("widgets.toolCall.actions.resumeWhenDone")
-                    )}
-                  </Button>
+                  {!isIncognito && (
+                    <>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        className="h-5 px-1.5 text-xs text-muted-foreground hover:text-foreground"
+                        disabled={isDetaching}
+                        onClick={handleDetach}
+                      >
+                        {isDetaching ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          t("widgets.toolCall.actions.runInBackground")
+                        )}
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        className="h-5 px-1.5 text-xs text-muted-foreground hover:text-foreground"
+                        disabled={isResuming}
+                        onClick={handleResumeWhenDone}
+                      >
+                        {isResuming ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          t("widgets.toolCall.actions.resumeWhenDone")
+                        )}
+                      </Button>
+                    </>
+                  )}
                   <Button
                     type="button"
                     size="sm"
@@ -1042,36 +1161,40 @@ export function ToolCallRenderer({
                   </Span>
                   {controlCallId && (
                     <>
-                      {/* detach — run in background, discard result, unblock now */}
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="ghost"
-                        className="h-5 px-1.5 text-xs text-muted-foreground hover:text-foreground"
-                        disabled={isDetaching}
-                        onClick={handleDetach}
-                      >
-                        {isDetaching ? (
-                          <Loader2 className="h-3 w-3 animate-spin" />
-                        ) : (
-                          t("widgets.toolCall.actions.runInBackground")
-                        )}
-                      </Button>
-                      {/* resume-when-done — keep waiting in background, revive with result */}
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="ghost"
-                        className="h-5 px-1.5 text-xs text-muted-foreground hover:text-foreground"
-                        disabled={isResuming}
-                        onClick={handleResumeWhenDone}
-                      >
-                        {isResuming ? (
-                          <Loader2 className="h-3 w-3 animate-spin" />
-                        ) : (
-                          t("widgets.toolCall.actions.resumeWhenDone")
-                        )}
-                      </Button>
+                      {!isIncognito && (
+                        <>
+                          {/* detach — run in background, discard result, unblock now */}
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            className="h-5 px-1.5 text-xs text-muted-foreground hover:text-foreground"
+                            disabled={isDetaching}
+                            onClick={handleDetach}
+                          >
+                            {isDetaching ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              t("widgets.toolCall.actions.runInBackground")
+                            )}
+                          </Button>
+                          {/* resume-when-done — keep waiting in background, revive with result */}
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            className="h-5 px-1.5 text-xs text-muted-foreground hover:text-foreground"
+                            disabled={isResuming}
+                            onClick={handleResumeWhenDone}
+                          >
+                            {isResuming ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              t("widgets.toolCall.actions.resumeWhenDone")
+                            )}
+                          </Button>
+                        </>
+                      )}
                       {/* cancel — interrupt, return an error result */}
                       <Button
                         type="button"

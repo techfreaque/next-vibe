@@ -40,27 +40,16 @@ export const translations: typeof enTranslations = {
       label: "Rozdzielczość",
       description: "Rozdzielczość wyjściowego wideo",
     },
-    firstFrameUrl: {
-      label: "URL pierwszej klatki",
+    frameReferences: {
+      label: "Referencje klatek",
       description:
-        "Obraz dla pierwszej klatki. Model animuje do przodu od tego obrazu.",
+        "Zasoby referencyjne, które sterują wideo. Każdy wpis to { url, role }. role 'first' ustala dokładnie klatkę początkową, role 'last' dokładnie klatkę końcową (tylko przy obsłudze last_frame) — klatki brzegowe to WYŁĄCZNIE obrazy, więc obie MUSZĄ być adresami URL obrazów. role 'reference' (lub brak) to zasób prowadzący, który może być adresem URL obrazu, audio lub wideo; typ jest wykrywany z URL (.mp4/.webm/.mov jako wideo, pliki audio jako audio, reszta jako obraz). Obraz początkowy lub referencyjny przełącza w razie potrzeby na najtańszy model obsługujący obrazy.",
       placeholder: "https://przyklad.pl/pierwsza-klatka.jpg",
-    },
-    lastFrameUrl: {
-      label: "URL ostatniej klatki",
-      description:
-        "Obraz dla ostatniej klatki. Model animuje wstecz do tego obrazu.",
-      placeholder: "https://przyklad.pl/ostatnia-klatka.jpg",
     },
     negativePrompt: {
       label: "Prompt negatywny",
       description: "Opisz, czego nie chcesz w filmie.",
       placeholder: "rozmazane, niska jakość, zniekształcone...",
-    },
-    cfgScale: {
-      label: "Skala CFG",
-      description:
-        "Jak ściśle model stosuje się do promptu (0–30). Wyżej = dosłowniej.",
     },
 
     download: "Pobierz",

@@ -59,6 +59,7 @@ import { platform } from "@/config/env-client";
 
 import type definition from "../definition";
 import type { AiStreamPostResponseOutput } from "../definition";
+import { IncognitoStreamKeeper } from "../hooks/incognito-stream-keeper";
 import { SidebarWrapper } from "./chat-ui/sidebar/sidebar-wrapper";
 import { TopBar } from "./chat-ui/top-area/top-bar";
 import { WelcomeTour } from "./chat-ui/welcome-tour/welcome-tour";
@@ -184,6 +185,9 @@ function AiStreamChatArea(): JSX.Element {
       keyboardVerticalOffset={0}
     >
       <InputHeightProvider height={inputHeight}>
+        {/* Headless: keeps WS subscriptions alive for incognito threads that
+            are still streaming while the user views a different thread. */}
+        <IncognitoStreamKeeper user={user} logger={logger} />
         {platform.isReactNative && (
           <Div style={{ paddingTop: insets.top + 60 }} />
         )}

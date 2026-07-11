@@ -569,6 +569,166 @@ export async function ensureMirrorFolders(
   return leafId;
 }
 
+/**
+ * Push the thread's full ancestor folder chain (root→leaf) as ONE
+ * `folder-created` remoteEvent so the receiver's `applyRemoteFolderCreated`
+ * materializes the SAME-ID chain under its REMOTE/<origin>/<segment> scaffold
+ * BEFORE the thread-updated event references that folderId.
+ *
+ * Why this is load-bearing (not redundant with the live create-time emit):
+ * folder-created fires once, at real creation time. A folder created while the
+ * peer link was down — or before that connection enabled `threads` sync — never
+ * reaches the peer, so a later thread mirror references a folderId the peer has
+ * never seen and the mirrored thread falls to the REMOTE root. Re-shipping the
+ * chain on every thread push is the self-healing mechanism: the appliers are
+ * idempotent SAME-ID upserts, so a re-ship is a no-op when already present and a
+ * repair when not. Chain rows carry their real `rootFolderId` (REMOTE for
+ * Remote-tab creations, PRIVATE/BACKGROUND otherwise) — the applier reads it to
+ * pick the origin-root scaffold.
+ */
+/**
+ * Push a folder's ancestor chain (root→leaf) to a peer as a `folder-created`
+ * remote event so the receiver materializes the SAME-ID chain under its
+ * REMOTE/<origin>/<segment> scaffold. When `targetInstanceId` is given the push
+ * is point-to-point AND awaited on the bridge, so — paired with a relay that
+ * dispatches AFTER this resolves — the folders exist before the receiver creates
+ * the mirror thread (no create-time placement race). With no target it fans out
+ * to every peer (the self-healing thread-push variant).
+ */
+export async function pushFolderChainToPeer(
+  folderId: string,
+  userId: string,
+  targetInstanceId: string | undefined,
+  logger: EndpointLogger,
+): Promise<void> {
+  const chain: SyncedFolderRow[] = [];
+  let currentId: string | null = folderId;
+  let rootFolderId: string = DefaultFolderId.PRIVATE;
+  for (let depth = 0; depth < 32 && currentId; depth++) {
+    const [row]: Array<{
+      id: string;
+      name: string;
+      parentId: string | null;
+      rootFolderId: string;
+      icon: IconKey | null;
+      color: string | null;
+    }> = await db
+      .select({
+        id: chatFolders.id,
+        name: chatFolders.name,
+        parentId: chatFolders.parentId,
+        rootFolderId: chatFolders.rootFolderId,
+        icon: chatFolders.icon,
+        color: chatFolders.color,
+      })
+      .from(chatFolders)
+      .where(and(eq(chatFolders.id, currentId), eq(chatFolders.userId, userId)))
+      .limit(1);
+    if (!row) {
+      break;
+    }
+    rootFolderId = row.rootFolderId;
+    // Boundary of the origin's own subtree. Under REMOTE, the top instance-tab
+    // folder (root REMOTE, parentId null) and the private/background scaffold
+    // segment are the RECEIVER's scaffold — it recreates them itself; shipping
+    // them would upsert spurious content folders named after the instance/
+    // segment. Stop before the instance-tab; the applier name-skips the segment.
+    if (row.rootFolderId === DefaultFolderId.REMOTE && row.parentId === null) {
+      break;
+    }
+    chain.unshift({
+      id: row.id,
+      name: row.name,
+      parentId: row.parentId,
+      icon: row.icon,
+      color: row.color,
+    });
+    currentId = row.parentId;
+  }
+  if (chain.length === 0) {
+    return;
+  }
+  const [{ createFolderContentsEmitter }, folderContentsDefinitions] =
+    await Promise.all([
+      import("@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/emitter"),
+      import("@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition"),
+    ]);
+  const emitUser: JwtPrivatePayloadType = {
+    id: userId,
+    leadId: userId,
+    isPublic: false,
+    roles: [],
+  };
+  const items = chain.map((row) => ({
+    id: row.id,
+    type: "folder" as const,
+    name: row.name,
+    icon: row.icon ?? null,
+    color: row.color ?? null,
+    parentId: row.parentId,
+    sortOrder: 0,
+    rootFolderId: rootFolderId as DefaultFolderId,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    expanded: false,
+    canManage: true,
+    canCreateThread: true,
+    canModerate: true,
+    canDelete: true,
+    canManagePermissions: true,
+    rolesView: [],
+    rolesManage: [],
+    rolesCreateThread: [],
+    rolesPost: [],
+    rolesModerate: [],
+    rolesAdmin: [],
+  }));
+  // Fan-out path (no target): the emitter's own relay reaches every peer. It is
+  // fire-and-forget, which is fine for the self-heal-on-every-turn use.
+  if (!targetInstanceId) {
+    createFolderContentsEmitter(
+      logger,
+      emitUser,
+      rootFolderId as DefaultFolderId,
+      {
+        fanOut: true,
+      },
+    )("folder-created", { responseData: { items } });
+    return;
+  }
+  // Point-to-point AWAITED path (relay pre-flight): push directly through the
+  // bridge to exactly the relay peer and AWAIT it, so the folders are on the
+  // receiver before the relay dispatch creates the mirror thread. The emitter's
+  // built-in relay is fire-and-forget; calling the bridge directly lets us await.
+  const { RemoteEventBridgeRepository } =
+    await import("next-vibe/realtime/remote-event-bridge/repository");
+  const { buildWsChannel } = await import("next-vibe/realtime/channel");
+  const def = folderContentsDefinitions.default.GET;
+  const urlPathParams = { rootFolderId: DefaultFolderId.REMOTE };
+  const channel = buildWsChannel(
+    def,
+    urlPathParams,
+    { subFolderId: undefined, threadIds: undefined },
+    logger,
+  );
+  await RemoteEventBridgeRepository.pushRemoteEvent({
+    userId,
+    logger,
+    syncDomain: "threads",
+    targetInstanceId,
+    envelope: {
+      endpointPath: def.path,
+      endpointMethod: def.method,
+      eventName: "folder-created",
+      responseData: { items },
+      requestData: undefined,
+      urlPathParams,
+      payload: undefined,
+      channel,
+    },
+  });
+}
+
 export async function pushThreadSync(
   threadId: string,
   userId: string,
@@ -579,6 +739,7 @@ export async function pushThreadSync(
       .select({
         rootFolderId: chatThreads.rootFolderId,
         title: chatThreads.title,
+        description: chatThreads.description,
         folderId: chatThreads.folderId,
         status: chatThreads.status,
         originInstanceId: chatThreads.originInstanceId,
@@ -605,6 +766,16 @@ export async function pushThreadSync(
       .set({ updatedAt })
       .where(eq(chatThreads.id, threadId));
 
+    // Self-heal the folder placement FIRST: re-ship the thread's ancestor
+    // folder chain (SAME-ID, idempotent) so the receiver has materialized the
+    // target folder before the thread-updated below references its folderId.
+    // Without this a folder created pre-sync (peer down / threads-sync toggled
+    // on after the folder existed) is unknown to the peer and the mirror lands
+    // at the REMOTE root. No-op for a root-level thread (folderId null).
+    if (thread.folderId) {
+      await pushFolderChainToPeer(thread.folderId, userId, undefined, logger);
+    }
+
     // Relay this thread as the [threadId] PATCH thread-updated remoteEvent —
     // regular fields ONLY. folderId is the SAME id on every instance (folders
     // sync by id via the folder-created/updated/deleted events); ownership is
@@ -627,6 +798,7 @@ export async function pushThreadSync(
     })("thread-updated", {
       requestData: {
         title: thread.title,
+        description: thread.description,
         folderId: thread.folderId,
         status: thread.status,
         rootFolderId: thread.rootFolderId,

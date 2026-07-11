@@ -53,6 +53,7 @@ import {
   FAVORITE_CONFIG_COLUMNS,
   type FavoriteConfig,
 } from "../../../skills/favorites/db";
+import { buildFavoriteConfig } from "../../../skills/favorites/repository";
 import { resolveAgentContext } from "../../../skills/resolve-context";
 import { resolveSkillFavoriteContext } from "../../../skills/resolver";
 import { type ChatModelOption } from "../../models";
@@ -531,6 +532,8 @@ export async function setupAiStream(params: {
   syncEligible?: boolean;
   /** Model-pipe relay receiver: suppress this instance's own identity in the system prompt. */
   suppressSelfIdentity?: boolean;
+  /** Relay receiver: caller instance that owns this thread — rename round-trips to it. */
+  relayCallerInstanceId?: string;
   /** Override the favoriteId stored in streamContext (used by headless runs with explicit favoriteId) */
   favoriteIdOverride: string | undefined;
   /** Override resolved media gen model selections - used by integration tests to force a specific model */
@@ -612,7 +615,12 @@ export async function setupAiStream(params: {
   // ── Load favorite ONCE for all downstream resolution
   const resolvedFavoriteConfig = await loadFavoriteOnce(
     userId,
-    data.favoriteConfig,
+    data.favoriteConfig
+      ? buildFavoriteConfig({
+          ...data.favoriteConfig,
+          ...parseSkillId(data.favoriteConfig.skillId),
+        })
+      : data.favoriteConfig,
     params.favoriteIdOverride,
     logger,
   );
@@ -775,6 +783,7 @@ export async function setupAiStream(params: {
     effectiveContent,
     effectiveParentMessageId,
     userId,
+    user,
     attachments: data.attachments ?? undefined,
     logger,
     t: aiStreamT,
@@ -889,6 +898,7 @@ export async function setupAiStream(params: {
         .join("\n\n") || undefined,
     headless: params.headless,
     suppressSelfIdentity: params.suppressSelfIdentity,
+    relayCallerInstanceId: params.relayCallerInstanceId ?? null,
     subAgentDepth: params.subAgentDepth,
     excludeMemories: params.excludeMemories,
     memoryLimit: resolvedToolConfig.memoryLimit,
@@ -903,8 +913,26 @@ export async function setupAiStream(params: {
         !!effectiveMusicGenModel && modelConfig.outputs.includes("audio"),
       videoGenIsSameAsChatModel:
         !!effectiveVideoGenModel && modelConfig.outputs.includes("video"),
+      videoGenCapabilities: effectiveVideoGenModel
+        ? {
+            supportedDurations: effectiveVideoGenModel.supportedDurations,
+            supportedAspectRatios: effectiveVideoGenModel.supportedAspectRatios,
+            supportedResolutions: effectiveVideoGenModel.supportedResolutions,
+            supportedFrameImages: effectiveVideoGenModel.supportedFrameImages,
+            allowedPassthroughParameters:
+              effectiveVideoGenModel.allowedPassthroughParameters,
+          }
+        : null,
     },
     threadId: threadResult.data.threadId,
+    // Incognito threads have no DB row - the client sends the current
+    // title/description so the rename prompt fragment can read them.
+    incognitoThreadTitle: isIncognito
+      ? (data.incognitoThreadTitle ?? null)
+      : null,
+    incognitoThreadDescription: isIncognito
+      ? (data.incognitoThreadDescription ?? null)
+      : null,
     voiceTranscription: voiceTranscription
       ? {
           wasTranscribed: voiceTranscription.wasTranscribed,

@@ -278,6 +278,15 @@ export const translations = {
       description:
         "Current branch leaf message ID - tracks active branch without relying on URL",
     },
+    incognitoThreadTitle: {
+      label: "Incognito Thread Title",
+      description:
+        "Current title of the incognito thread - sent by the client because incognito threads have no server row",
+    },
+    incognitoThreadDescription: {
+      label: "Incognito Thread Description",
+      description: "Current description of the incognito thread",
+    },
     messageHistory: {
       label: "Message History",
       description: "Optional message history for incognito mode",

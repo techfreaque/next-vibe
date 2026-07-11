@@ -48,6 +48,15 @@ function sanitizeJsonSchemaRefs(value: JSONValue): JSONValue {
   return result;
 }
 
+/**
+ * Legacy incognito results inlined the media as a data: URI. Never let that
+ * string into the model context verbatim — a single image is hundreds of
+ * thousands of tokens and blows the context window.
+ */
+function safeUrl(url: string | undefined): string | undefined {
+  return url?.startsWith("data:") ? "[inline media omitted]" : url;
+}
+
 type ShapedToolResultOutput =
   | {
       type: "json";
@@ -250,6 +259,8 @@ export async function buildToolResultOutput(
       mediaResult.videoUrl ??
       mediaResult.audioUrl;
 
+    const isInlineData = fileUrl?.startsWith("data:") ?? false;
+
     // If neither format has a media URL, fall through to generic JSON passthrough.
     if (!fileUrl && !mediaResult.text) {
       return { type: "json", value: (result ?? null) as JSONValue };
@@ -274,11 +285,9 @@ export async function buildToolResultOutput(
       // let the model see the image). Same pattern as user attachments and assistant
       // generatedMedia handling.
       if (modality === "image") {
-        const base64Data = await fetchStorageFileAsBase64(
-          fileUrl,
-          undefined,
-          fetchImpl,
-        );
+        const base64Data = isInlineData
+          ? (fileUrl?.split(",")[1] ?? null)
+          : await fetchStorageFileAsBase64(fileUrl, undefined, fetchImpl);
         if (base64Data) {
           const mimeType = mediaResult.mediaType ?? "image/png";
           const contentParts: Array<
@@ -289,7 +298,7 @@ export async function buildToolResultOutput(
           // pixels but, asked to report the imageUrl, would otherwise have no
           // URL string to cite and tends to hallucinate one (e.g. a sandbox:
           // path). The real URL must be in the result it reads.
-          const citeUrl = mediaResult.imageUrl ?? mediaResult.file;
+          const citeUrl = safeUrl(mediaResult.imageUrl ?? mediaResult.file);
           if (citeUrl) {
             contentParts.push({ type: "text", text: `imageUrl: ${citeUrl}` });
           }
@@ -308,7 +317,7 @@ export async function buildToolResultOutput(
       return {
         type: "json" as const,
         value: {
-          file: fileUrl,
+          file: safeUrl(fileUrl) ?? null,
           text: mediaResult.text ?? null,
           mediaType: mediaResult.mediaType ?? null,
           creditCost: mediaResult.creditCost ?? null,
@@ -323,18 +332,18 @@ export async function buildToolResultOutput(
       type: "json" as const,
       value: {
         ...(mediaResult.imageUrl !== undefined && {
-          imageUrl: mediaResult.imageUrl,
+          imageUrl: safeUrl(mediaResult.imageUrl),
         }),
         ...(mediaResult.videoUrl !== undefined && {
-          videoUrl: mediaResult.videoUrl,
+          videoUrl: safeUrl(mediaResult.videoUrl),
         }),
         ...(mediaResult.audioUrl !== undefined && {
-          audioUrl: mediaResult.audioUrl,
+          audioUrl: safeUrl(mediaResult.audioUrl),
         }),
         ...(fileUrl &&
           !mediaResult.imageUrl &&
           !mediaResult.videoUrl &&
-          !mediaResult.audioUrl && { file: fileUrl }),
+          !mediaResult.audioUrl && { file: safeUrl(fileUrl) }),
         text: mediaResult.text ?? null,
         mediaType: mediaResult.mediaType ?? null,
         creditCost: mediaResult.creditCost ?? null,

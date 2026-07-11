@@ -347,7 +347,7 @@ const { GET } = createEndpoint({
     },
     "task-created": {
       responseFields: { tasks: ["id"] as const },
-      operation: "merge" as const,
+      operation: "upsert" as const,
     },
     "task-removed": {
       responseFields: { tasks: ["id"] as const },

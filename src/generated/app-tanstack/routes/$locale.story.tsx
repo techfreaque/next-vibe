@@ -5,14 +5,16 @@ import type { JSX } from "react";
 
 import { TanstackPage as Layout } from "@/app/[locale]/story/layout";
 
-import { toNextParams } from "../nextjs-compat-wrapper";
+import { runPageLoader, toNextParams } from "../nextjs-compat-wrapper";
 
 const loadData = createServerFn({ method: "GET" })
   .inputValidator((data: Record<string, string>) => data)
-  .handler(async ({ data }) => {
-    const { tanstackLoader } = await import("@/app/[locale]/story/layout");
-    return tanstackLoader({ params: Promise.resolve(toNextParams(data)) });
-  });
+  .handler(async ({ data }) =>
+    runPageLoader(async () => {
+      const { tanstackLoader } = await import("@/app/[locale]/story/layout");
+      return tanstackLoader({ params: Promise.resolve(toNextParams(data)) });
+    }),
+  );
 
 function LayoutComponent(): JSX.Element {
   return (

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Result verified:\n\n- **videoUrl**: `http://localhost:3000/.../b68ee365-...mp4` — non-empty ✅\n- **creditCost**: `48` — positive ✅\n- **durationSeconds**: `4` — positive ✅\n\nThe video generated with the wojak photo as the first frame and the earlier wakeUp-generated image as the last frame, bridged by \"spinning cube\" motion. All fields present and well-formed.\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

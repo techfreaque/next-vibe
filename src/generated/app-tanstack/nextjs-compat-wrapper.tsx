@@ -12,6 +12,7 @@ export {
   type NextApiRouteContext,
   type NextLayoutProps,
   type NextPageProps,
+  runPageLoader,
   toNextParams,
   wrapNextApiRoute,
 } from "@/app/api/[locale]/system/platforms/tanstack-start/nextjs-compat-wrapper";

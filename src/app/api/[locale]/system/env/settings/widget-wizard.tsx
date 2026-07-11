@@ -7,6 +7,7 @@
 "use client";
 import { cn } from "next-vibe/core/utils/utils";
 import { useApiMutation } from "next-vibe/platforms/react/hooks/use-api-mutation";
+import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { storage } from "next-vibe/ui/lib/storage";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -41,7 +42,12 @@ import React, { useCallback, useEffect, useState } from "react";
 
 import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import instanceEndpoints from "@/app/api/[locale]/remote-connection/[instanceId]/definition";
+import { scopedTranslation as connectScopedTranslation } from "@/app/api/[locale]/remote-connection/connect/i18n";
+import type { SyncScope } from "@/app/api/[locale]/remote-connection/db";
+import { SyncScopeSchema } from "@/app/api/[locale]/remote-connection/db";
 import { useRemoteConnections } from "@/app/api/[locale]/remote-connection/list/hooks";
+import type { SyncProviderInfo } from "@/app/api/[locale]/remote-connection/sync/providers/definition";
+import syncProvidersDefinitions from "@/app/api/[locale]/remote-connection/sync/providers/definition";
 
 import type endpoints from "./definition";
 import type { SystemSettingsGetResponseOutput } from "./definition";
@@ -235,10 +241,25 @@ function UnbottledLoginField({
   const [password, setPassword] = useState("");
   // eslint-disable-next-line i18next/no-literal-string
   const [remoteUrl, setRemoteUrl] = useState("https://unbottled.ai");
+  // Same explicit scope choice as the regular remote-connection connect form:
+  // seeded from the schema defaults, shown as switches, sent as chosen.
+  const [syncScope, setSyncScope] = useState<SyncScope>(() =>
+    SyncScopeSchema.parse({}),
+  );
   const [error, setError] = useState<string | null>(null);
 
   const user = useWidgetUser();
   const logger = useWidgetLogger();
+  const locale = useWidgetLocale();
+  const { t: connectT } = connectScopedTranslation.scopedT(locale);
+  const syncProvidersEndpoint = useEndpoint(
+    syncProvidersDefinitions,
+    undefined,
+    logger,
+    user,
+  );
+  const syncProviders: SyncProviderInfo[] =
+    syncProvidersEndpoint.read?.data?.providers ?? [];
 
   // Connection state is the source of truth — a system inference provider is a
   // remote connection flagged isInferenceProvider, not an env credential.
@@ -264,14 +285,19 @@ function UnbottledLoginField({
     setError(null);
     const normalizedUrl = remoteUrl.replace(/\/+$/, "");
     const result = await connectMutation.mutateAsync({
-      requestData: { email, password, remoteUrl: normalizedUrl },
+      requestData: {
+        email,
+        password,
+        remoteUrl: normalizedUrl,
+        syncScope,
+      },
     });
     if (!result.success || !result.data?.connected) {
       setError(t("wizard.ai.unbottledLoginFailed"));
       return;
     }
     await connections.read?.refetch();
-  }, [email, password, remoteUrl, t, connectMutation, connections]);
+  }, [email, password, remoteUrl, syncScope, t, connectMutation, connections]);
 
   const handleDisconnect = useCallback(async (): Promise<void> => {
     if (!provider) {
@@ -355,6 +381,45 @@ function UnbottledLoginField({
               setRemoteUrl(String(e.target.value ?? ""))
             }
           />
+
+          {syncProviders.length > 0 && (
+            <Div className="flex flex-col gap-1.5">
+              <Span className="text-xs font-medium">
+                {connectT("post.syncScope.label")}
+              </Span>
+              <Span className="text-xs text-muted-foreground">
+                {connectT("post.syncScope.description")}
+              </Span>
+              {syncProviders.map((p) => (
+                <Div
+                  key={p.key}
+                  className="flex items-center justify-between rounded-md border px-3 py-1.5 bg-background"
+                >
+                  <Div className="flex flex-col gap-0.5">
+                    <Span className="text-xs font-medium">{p.label}</Span>
+                    {p.description && (
+                      <Span className="text-xs text-muted-foreground">
+                        {p.description}
+                      </Span>
+                    )}
+                  </Div>
+                  <Switch
+                    checked={
+                      (syncScope as Record<string, boolean | undefined>)[
+                        p.key
+                      ] ?? false
+                    }
+                    onCheckedChange={(checked: boolean): void =>
+                      setSyncScope(
+                        (prev) => ({ ...prev, [p.key]: checked }) as SyncScope,
+                      )
+                    }
+                    aria-label={p.label}
+                  />
+                </Div>
+              ))}
+            </Div>
+          )}
 
           {error && (
             <Div className="flex items-start gap-2 px-3 py-2 rounded-md bg-destructive/10 border border-destructive/30 text-xs text-destructive">

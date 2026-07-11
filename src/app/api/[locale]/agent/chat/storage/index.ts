@@ -17,6 +17,12 @@ export interface FileMetadata {
   size: number;
   uploadedAt: Date;
   uploadedBy?: string;
+  /**
+   * Owning lead for files from incognito threads (no server-side thread row).
+   * File serving authorizes purely by leadId match — never userId — so the
+   * same browser keeps access whether or not the user is logged in.
+   */
+  leadId?: string;
   threadId: string;
   messageId?: string;
 }
@@ -33,6 +39,7 @@ export interface StorageAdapter {
       threadId: string;
       messageId?: string;
       userId?: string;
+      leadId?: string;
     },
   ): Promise<{
     url: string;

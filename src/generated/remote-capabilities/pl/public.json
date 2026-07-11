@@ -7082,6 +7082,39 @@
           },
           "schemaType": "primitive"
         },
+        "description": {
+          "type": "form_field",
+          "fieldType": "textarea",
+          "label": "Tytuł",
+          "description": "Tytuł wątku",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "nullable",
+                  "innerType": {
+                    "def": {
+                      "type": "string",
+                      "checks": [{}]
+                    },
+                    "type": "string",
+                    "format": null,
+                    "minLength": null,
+                    "maxLength": 2000
+                  }
+                },
+                "type": "nullable"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "folderId": {
           "type": "form_field",
           "fieldType": "uuid",
@@ -16307,6 +16340,835 @@
     "category": "ai",
     "tags": ["Obraz", "Generowanie", "AI"],
     "aliases": ["generate_image"],
+    "credits": 0
+  },
+  {
+    "toolName": "models",
+    "title": "Modele",
+    "titleShort": "Modele AI",
+    "description": "Przeglądaj wszystkie modele AI. Filtruj według typu (text/image/video/audio), poziomu treści, inteligencji. Dla modeli wideo: supportedDurations = obsługiwane długości klipu w sekundach, supportedAspectRatios = obsługiwane proporcje, supportedFrameImages = akceptowane ramki (first_frame = obraz-do-wideo, last_frame = animacja do obrazu końcowego), allowedPassthroughParameters = dodatkowe opcje (np. negative_prompt, cfg_scale), generateAudio = model generuje audio w wideo. Przekaż id modelu jako parametr model w generate_video.",
+    "fields": {
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "query": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Szukaj",
+          "description": "Filtruj modele według nazwy, dostawcy lub możliwości (np. 'coding', 'uncensored', 'image').",
+          "placeholder": "np. GPT, Gemini, coding…",
+          "columns": 8,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string",
+                "format": null,
+                "minLength": null,
+                "maxLength": null
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "modelType": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Typ",
+          "description": "Filtruj według typu modelu: text, image, video lub audio. Pozostaw puste dla wszystkich typów.",
+          "placeholder": "Wszystkie typy",
+          "options": [
+            {
+              "value": "text",
+              "label": "enums.modelType.text"
+            },
+            {
+              "value": "image",
+              "label": "enums.modelType.image"
+            },
+            {
+              "value": "video",
+              "label": "enums.modelType.video"
+            },
+            {
+              "value": "audio",
+              "label": "enums.modelType.audio"
+            }
+          ],
+          "columns": 4,
+          "schema": {
+            "def": {
+              "type": "enum",
+              "entries": {
+                "text": "text",
+                "image": "image",
+                "video": "video",
+                "audio": "audio"
+              }
+            },
+            "type": "enum",
+            "enum": {
+              "text": "text",
+              "image": "image",
+              "video": "video",
+              "audio": "audio"
+            },
+            "options": ["text", "image", "video", "audio"]
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "contentLevel": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Poziom treści",
+          "description": "Filtruj według polityki treści. Mainstream = standardowe filtry. Open = mniej ograniczeń. Uncensored = brak filtrów.",
+          "placeholder": "Wszystkie poziomy treści",
+          "options": [
+            {
+              "value": "enums.content.mainstream",
+              "label": "enums.content.mainstream"
+            },
+            {
+              "value": "enums.content.open",
+              "label": "enums.content.open"
+            },
+            {
+              "value": "enums.content.uncensored",
+              "label": "enums.content.uncensored"
+            }
+          ],
+          "columns": 4,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "enums.content.mainstream": "enums.content.mainstream",
+                    "enums.content.open": "enums.content.open",
+                    "enums.content.uncensored": "enums.content.uncensored"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "enums.content.mainstream": "enums.content.mainstream",
+                  "enums.content.open": "enums.content.open",
+                  "enums.content.uncensored": "enums.content.uncensored"
+                },
+                "options": [
+                  "enums.content.mainstream",
+                  "enums.content.open",
+                  "enums.content.uncensored"
+                ]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "intelligence": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Inteligencja",
+          "description": "Minimalny poziom inteligencji. Quick = szybki. Smart = zrównoważony. Brilliant = głębokie rozumowanie.",
+          "placeholder": "Dowolna inteligencja",
+          "options": [
+            {
+              "value": "enums.intelligence.quick",
+              "label": "enums.intelligence.quick"
+            },
+            {
+              "value": "enums.intelligence.smart",
+              "label": "enums.intelligence.smart"
+            },
+            {
+              "value": "enums.intelligence.brilliant",
+              "label": "enums.intelligence.brilliant"
+            }
+          ],
+          "columns": 4,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "enums.intelligence.quick": "enums.intelligence.quick",
+                    "enums.intelligence.smart": "enums.intelligence.smart",
+                    "enums.intelligence.brilliant": "enums.intelligence.brilliant"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "enums.intelligence.quick": "enums.intelligence.quick",
+                  "enums.intelligence.smart": "enums.intelligence.smart",
+                  "enums.intelligence.brilliant": "enums.intelligence.brilliant"
+                },
+                "options": [
+                  "enums.intelligence.quick",
+                  "enums.intelligence.smart",
+                  "enums.intelligence.brilliant"
+                ]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "totalCount": {
+          "type": "text",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "number",
+              "checks": [
+                {
+                  "def": {
+                    "type": "number",
+                    "check": "number_format",
+                    "abort": false,
+                    "format": "safeint"
+                  },
+                  "type": "number",
+                  "minValue": -9007199254740991,
+                  "maxValue": 9007199254740991,
+                  "isInt": true,
+                  "isFinite": true,
+                  "format": "safeint"
+                }
+              ]
+            },
+            "type": "number",
+            "minValue": -9007199254740991,
+            "maxValue": 9007199254740991,
+            "isInt": true,
+            "isFinite": true,
+            "format": "safeint"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "models": {
+          "type": "container",
+          "columns": 12,
+          "child": {
+            "type": "container",
+            "layoutType": "grid",
+            "columns": 12,
+            "usage": {
+              "response": true
+            },
+            "children": {
+              "id": {
+                "type": "text",
+                "label": "ID modelu",
+                "columns": 6,
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string",
+                  "format": null,
+                  "minLength": null,
+                  "maxLength": null
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "name": {
+                "type": "text",
+                "label": "Nazwa",
+                "columns": 6,
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string",
+                  "format": null,
+                  "minLength": null,
+                  "maxLength": null
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "provider": {
+                "type": "badge",
+                "label": "Dostawca",
+                "columns": 4,
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string",
+                  "format": null,
+                  "minLength": null,
+                  "maxLength": null
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "type": {
+                "type": "badge",
+                "label": "Typ",
+                "columns": 3,
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string",
+                  "format": null,
+                  "minLength": null,
+                  "maxLength": null
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "description": {
+                "type": "text",
+                "label": "Opis",
+                "columns": 12,
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string",
+                  "format": null,
+                  "minLength": null,
+                  "maxLength": null
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "contextWindow": {
+                "type": "stat",
+                "label": "Kontekst",
+                "columns": 3,
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "number",
+                        "checks": []
+                      },
+                      "type": "number",
+                      "minValue": null,
+                      "maxValue": null,
+                      "isInt": false,
+                      "isFinite": true,
+                      "format": null
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "parameterCount": {
+                "type": "stat",
+                "label": "Parametry",
+                "columns": 3,
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "number",
+                        "checks": []
+                      },
+                      "type": "number",
+                      "minValue": null,
+                      "maxValue": null,
+                      "isInt": false,
+                      "isFinite": true,
+                      "format": null
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "intelligence": {
+                "type": "badge",
+                "label": "Inteligencja",
+                "columns": 3,
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string",
+                  "format": null,
+                  "minLength": null,
+                  "maxLength": null
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "content": {
+                "type": "badge",
+                "label": "Treść",
+                "columns": 3,
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string",
+                  "format": null,
+                  "minLength": null,
+                  "maxLength": null
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "price": {
+                "type": "stat",
+                "label": "Cena (kredyty)",
+                "columns": 3,
+                "schema": {
+                  "def": {
+                    "type": "number",
+                    "checks": []
+                  },
+                  "type": "number",
+                  "minValue": null,
+                  "maxValue": null,
+                  "isInt": false,
+                  "isFinite": true,
+                  "format": null
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "supportsTools": {
+                "type": "badge",
+                "label": "Narzędzia",
+                "columns": 3,
+                "schema": {
+                  "def": {
+                    "type": "boolean"
+                  },
+                  "type": "boolean"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "utilities": {
+                "type": "text",
+                "label": "Możliwości",
+                "columns": 12,
+                "schema": {
+                  "def": {
+                    "type": "array",
+                    "element": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string",
+                      "format": null,
+                      "minLength": null,
+                      "maxLength": null
+                    }
+                  },
+                  "type": "array",
+                  "element": {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string",
+                    "format": null,
+                    "minLength": null,
+                    "maxLength": null
+                  }
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "inputs": {
+                "type": "text",
+                "label": "Wejścia",
+                "columns": 6,
+                "schema": {
+                  "def": {
+                    "type": "array",
+                    "element": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string",
+                      "format": null,
+                      "minLength": null,
+                      "maxLength": null
+                    }
+                  },
+                  "type": "array",
+                  "element": {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string",
+                    "format": null,
+                    "minLength": null,
+                    "maxLength": null
+                  }
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "outputs": {
+                "type": "text",
+                "label": "Wyjścia",
+                "columns": 6,
+                "schema": {
+                  "def": {
+                    "type": "array",
+                    "element": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string",
+                      "format": null,
+                      "minLength": null,
+                      "maxLength": null
+                    }
+                  },
+                  "type": "array",
+                  "element": {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string",
+                    "format": null,
+                    "minLength": null,
+                    "maxLength": null
+                  }
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "supportedDurations": {
+                "type": "text",
+                "label": "Czasy trwania (s)",
+                "columns": 6,
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string",
+                          "format": null,
+                          "minLength": null,
+                          "maxLength": null
+                        }
+                      },
+                      "type": "array",
+                      "element": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string",
+                        "format": null,
+                        "minLength": null,
+                        "maxLength": null
+                      }
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "supportedAspectRatios": {
+                "type": "text",
+                "label": "Proporcje obrazu",
+                "columns": 6,
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string",
+                          "format": null,
+                          "minLength": null,
+                          "maxLength": null
+                        }
+                      },
+                      "type": "array",
+                      "element": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string",
+                        "format": null,
+                        "minLength": null,
+                        "maxLength": null
+                      }
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "supportedResolutions": {
+                "type": "text",
+                "label": "Rozdzielczości",
+                "columns": 6,
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string",
+                          "format": null,
+                          "minLength": null,
+                          "maxLength": null
+                        }
+                      },
+                      "type": "array",
+                      "element": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string",
+                        "format": null,
+                        "minLength": null,
+                        "maxLength": null
+                      }
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "supportedFrameImages": {
+                "type": "text",
+                "label": "Typy klatek",
+                "columns": 6,
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string",
+                          "format": null,
+                          "minLength": null,
+                          "maxLength": null
+                        }
+                      },
+                      "type": "array",
+                      "element": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string",
+                        "format": null,
+                        "minLength": null,
+                        "maxLength": null
+                      }
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "generateAudio": {
+                "type": "badge",
+                "label": "Generuje audio",
+                "columns": 4,
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "boolean"
+                      },
+                      "type": "boolean"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "supportedSizes": {
+                "type": "text",
+                "label": "Dokładne rozmiary",
+                "columns": 6,
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string",
+                          "format": null,
+                          "minLength": null,
+                          "maxLength": null
+                        }
+                      },
+                      "type": "array",
+                      "element": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string",
+                        "format": null,
+                        "minLength": null,
+                        "maxLength": null
+                      }
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "allowedPassthroughParameters": {
+                "type": "text",
+                "label": "Dodatkowe parametry",
+                "columns": 12,
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string",
+                          "format": null,
+                          "minLength": null,
+                          "maxLength": null
+                        }
+                      },
+                      "type": "array",
+                      "element": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string",
+                        "format": null,
+                        "minLength": null,
+                        "maxLength": null
+                      }
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              }
+            },
+            "schemaType": "object"
+          },
+          "schemaType": "array",
+          "usage": {
+            "response": true
+          }
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "ai",
+    "tags": ["Modele"],
+    "aliases": ["models", "list-models"],
     "credits": 0
   },
   {
@@ -45840,11 +46702,11 @@
           },
           "schemaType": "primitive"
         },
-        "firstFrameUrl": {
+        "frameReferences": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "URL pierwszej klatki",
-          "description": "Obraz dla pierwszej klatki. Model animuje do przodu od tego obrazu.",
+          "label": "Referencje klatek",
+          "description": "Zasoby referencyjne, które sterują wideo. Każdy wpis to { url, role }. role 'first' ustala dokładnie klatkę początkową, role 'last' dokładnie klatkę końcową (tylko przy obsłudze last_frame) — klatki brzegowe to WYŁĄCZNIE obrazy, więc obie MUSZĄ być adresami URL obrazów. role 'reference' (lub brak) to zasób prowadzący, który może być adresem URL obrazu, audio lub wideo; typ jest wykrywany z URL (.mp4/.webm/.mov jako wideo, pliki audio jako audio, reszta jako obraz). Obraz początkowy lub referencyjny przełącza w razie potrzeby na najtańszy model obsługujący obrazy.",
           "columns": 12,
           "placeholder": "https://przyklad.pl/pierwsza-klatka.jpg",
           "schema": {
@@ -45852,67 +46714,118 @@
               "type": "optional",
               "innerType": {
                 "def": {
-                  "type": "string",
-                  "checks": [
-                    {
-                      "def": {
+                  "type": "array",
+                  "element": {
+                    "def": {
+                      "type": "object",
+                      "shape": {
+                        "url": {
+                          "def": {
+                            "type": "string",
+                            "checks": [
+                              {
+                                "def": {
+                                  "type": "string",
+                                  "format": "url",
+                                  "check": "string_format",
+                                  "abort": false
+                                },
+                                "type": "string",
+                                "format": "url",
+                                "minLength": null,
+                                "maxLength": null
+                              }
+                            ]
+                          },
+                          "type": "string",
+                          "format": "url",
+                          "minLength": null,
+                          "maxLength": null
+                        },
+                        "role": {
+                          "def": {
+                            "type": "optional",
+                            "innerType": {
+                              "def": {
+                                "type": "enum",
+                                "entries": {
+                                  "first": "first",
+                                  "last": "last",
+                                  "reference": "reference"
+                                }
+                              },
+                              "type": "enum",
+                              "enum": {
+                                "first": "first",
+                                "last": "last",
+                                "reference": "reference"
+                              },
+                              "options": ["first", "last", "reference"]
+                            }
+                          },
+                          "type": "optional"
+                        }
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "checks": [{}]
+                },
+                "type": "array",
+                "element": {
+                  "def": {
+                    "type": "object",
+                    "shape": {
+                      "url": {
+                        "def": {
+                          "type": "string",
+                          "checks": [
+                            {
+                              "def": {
+                                "type": "string",
+                                "format": "url",
+                                "check": "string_format",
+                                "abort": false
+                              },
+                              "type": "string",
+                              "format": "url",
+                              "minLength": null,
+                              "maxLength": null
+                            }
+                          ]
+                        },
                         "type": "string",
                         "format": "url",
-                        "check": "string_format",
-                        "abort": false
+                        "minLength": null,
+                        "maxLength": null
                       },
-                      "type": "string",
-                      "format": "url",
-                      "minLength": null,
-                      "maxLength": null
+                      "role": {
+                        "def": {
+                          "type": "optional",
+                          "innerType": {
+                            "def": {
+                              "type": "enum",
+                              "entries": {
+                                "first": "first",
+                                "last": "last",
+                                "reference": "reference"
+                              }
+                            },
+                            "type": "enum",
+                            "enum": {
+                              "first": "first",
+                              "last": "last",
+                              "reference": "reference"
+                            },
+                            "options": ["first", "last", "reference"]
+                          }
+                        },
+                        "type": "optional"
+                      }
                     }
-                  ]
-                },
-                "type": "string",
-                "format": "url",
-                "minLength": null,
-                "maxLength": null
-              }
-            },
-            "type": "optional"
-          },
-          "usage": {
-            "request": "data"
-          },
-          "schemaType": "primitive"
-        },
-        "lastFrameUrl": {
-          "type": "form_field",
-          "fieldType": "text",
-          "label": "URL ostatniej klatki",
-          "description": "Obraz dla ostatniej klatki. Model animuje wstecz do tego obrazu.",
-          "columns": 12,
-          "placeholder": "https://przyklad.pl/ostatnia-klatka.jpg",
-          "schema": {
-            "def": {
-              "type": "optional",
-              "innerType": {
-                "def": {
-                  "type": "string",
-                  "checks": [
-                    {
-                      "def": {
-                        "type": "string",
-                        "format": "url",
-                        "check": "string_format",
-                        "abort": false
-                      },
-                      "type": "string",
-                      "format": "url",
-                      "minLength": null,
-                      "maxLength": null
-                    }
-                  ]
-                },
-                "type": "string",
-                "format": "url",
-                "minLength": null,
-                "maxLength": null
+                  },
+                  "type": "object"
+                }
               }
             },
             "type": "optional"
@@ -45929,7 +46842,6 @@
           "description": "Opisz, czego nie chcesz w filmie.",
           "columns": 12,
           "placeholder": "rozmazane, niska jakość, zniekształcone...",
-          "hiddenForPlatforms": ["ai", "mcp"],
           "schema": {
             "def": {
               "type": "optional",
@@ -45942,36 +46854,6 @@
                 "format": null,
                 "minLength": null,
                 "maxLength": 1000
-              }
-            },
-            "type": "optional"
-          },
-          "usage": {
-            "request": "data"
-          },
-          "schemaType": "primitive"
-        },
-        "cfgScale": {
-          "type": "form_field",
-          "fieldType": "number",
-          "label": "Skala CFG",
-          "description": "Jak ściśle model stosuje się do promptu (0–30). Wyżej = dosłowniej.",
-          "columns": 12,
-          "hiddenForPlatforms": ["ai", "mcp"],
-          "schema": {
-            "def": {
-              "type": "optional",
-              "innerType": {
-                "def": {
-                  "type": "number",
-                  "checks": [{}, {}]
-                },
-                "type": "number",
-                "minValue": 0,
-                "maxValue": 30,
-                "isInt": false,
-                "isFinite": true,
-                "format": null
               }
             },
             "type": "optional"

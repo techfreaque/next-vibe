@@ -105,15 +105,17 @@ export class RemoteConnectionSelfRenameRepository {
               input: {
                 instanceId: oldInstanceId,
                 newInstanceId,
-                // Carry the connection's CURRENT scope (unchanged by a rename) so
-                // both sides stay in sync — never a hardcoded default.
-                syncScope: conn.syncScope ?? {
-                  memories: false,
-                  documents: false,
-                  skills: false,
-                  favorites: false,
-                  threads: false,
-                },
+                // NEVER carry syncScope on a rename. syncScope is DIRECTIONAL —
+                // each side owns its OWN outbound scope, mirrored to the peer only
+                // when a real scope PATCH changes it (via [instanceId] PATCH →
+                // connect-reverse/update). A rename is a pure identity change; the
+                // `conn.syncScope` here is OUR view of the peer's connection (our
+                // outbound toward them), which is NOT the peer's outbound scope.
+                // Sending it clobbered the peer's own choice — e.g. the peer had
+                // enabled threads sync toward us and our all-default view reset it
+                // to false, silently dropping every folder/thread mirror event.
+                // Omit it: connect-reverse/update leaves scope untouched.
+                //
                 // The reverse-ws channel key is derived from our instanceId, so
                 // renaming us changes it — the peer must reconnect its connector
                 // (with our new id) or the tunnel goes dead. connect-reverse/

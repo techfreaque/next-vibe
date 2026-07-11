@@ -143,10 +143,19 @@ export function VideoGenerationContainer({
   const currentDuration = form?.watch("duration") ?? 5;
   const currentAspectRatio = form?.watch("aspectRatio");
   const currentResolution = form?.watch("resolution");
-  const currentFirstFrameUrl = form?.watch("firstFrameUrl") ?? "";
-  const currentLastFrameUrl = form?.watch("lastFrameUrl") ?? "";
+  const currentFrameImages = form?.watch("frameReferences") ?? [];
   const currentNegativePrompt = form?.watch("negativePrompt") ?? "";
-  const currentCfgScale = form?.watch("cfgScale");
+
+  const firstFrameEntry = currentFrameImages.find((f) => f.role === "first");
+  const lastFrameEntry = currentFrameImages.find((f) => f.role === "last");
+  const currentFirstFrameUrl = firstFrameEntry?.url ?? "";
+  const currentLastFrameUrl = lastFrameEntry?.url ?? "";
+
+  const setFrameByRole = (role: "first" | "last", url: string): void => {
+    const rest = currentFrameImages.filter((f) => f.role !== role);
+    const next = url ? [...rest, { url, role }] : rest;
+    form?.setValue("frameReferences", next.length > 0 ? next : undefined);
+  };
 
   const modelSelection = useMemo((): VideoGenModelSelection | undefined => {
     if (!currentModelId) {
@@ -194,7 +203,6 @@ export function VideoGenerationContainer({
   const supportsNegativePrompt =
     passthrough.includes("negative_prompt") ||
     passthrough.includes("negativePrompt");
-  const supportsCfgScale = passthrough.includes("cfg_scale");
 
   // Build dynamic duration presets from model capabilities
   const durationPresets = useMemo(
@@ -304,44 +312,30 @@ export function VideoGenerationContainer({
       <Div className="flex flex-col gap-4 px-4 pb-4">
         <FormAlertWidget field={{}} />
 
-        {/* First frame URL - only for I2V models */}
+        {/* Frame images - only for I2V models */}
         {isI2VModel && (
           <Div className="flex flex-col gap-1.5">
             <Span className="text-xs font-medium text-muted-foreground">
-              {t("post.firstFrameUrl.label")}
+              {t("post.frameReferences.label")}
             </Span>
             <Input
               type="url"
-              placeholder={t("post.firstFrameUrl.placeholder")}
+              placeholder={t("post.frameReferences.placeholder")}
               value={currentFirstFrameUrl}
               disabled={isDisabled}
-              onChange={(e) =>
-                form?.setValue("firstFrameUrl", e.target.value || undefined)
-              }
+              onChange={(e) => setFrameByRole("first", e.target.value)}
             />
+            {supportsLastFrame && (
+              <Input
+                type="url"
+                placeholder={t("post.frameReferences.placeholder")}
+                value={currentLastFrameUrl}
+                disabled={isDisabled}
+                onChange={(e) => setFrameByRole("last", e.target.value)}
+              />
+            )}
             <Span className="text-[10px] text-muted-foreground/70">
-              {t("post.firstFrameUrl.description")}
-            </Span>
-          </Div>
-        )}
-
-        {/* Last frame URL - only for models that support last_frame */}
-        {isI2VModel && supportsLastFrame && (
-          <Div className="flex flex-col gap-1.5">
-            <Span className="text-xs font-medium text-muted-foreground">
-              {t("post.lastFrameUrl.label")}
-            </Span>
-            <Input
-              type="url"
-              placeholder={t("post.lastFrameUrl.placeholder")}
-              value={currentLastFrameUrl}
-              disabled={isDisabled}
-              onChange={(e) =>
-                form?.setValue("lastFrameUrl", e.target.value || undefined)
-              }
-            />
-            <Span className="text-[10px] text-muted-foreground/70">
-              {t("post.lastFrameUrl.description")}
+              {t("post.frameReferences.description")}
             </Span>
           </Div>
         )}
@@ -364,26 +358,6 @@ export function VideoGenerationContainer({
             <Span className="text-[10px] text-muted-foreground/70">
               {t("post.negativePrompt.description")}
             </Span>
-          </Div>
-        )}
-
-        {supportsCfgScale && (
-          <Div className="flex flex-col gap-1.5">
-            <Span className="text-xs font-medium text-muted-foreground">
-              {t("post.cfgScale.label")}
-            </Span>
-            <Input
-              type="number"
-              min={0}
-              max={30}
-              step={0.5}
-              value={currentCfgScale}
-              disabled={isDisabled}
-              onChange={(e) => {
-                const v = e.target.value;
-                form?.setValue("cfgScale", isNaN(v) ? undefined : v);
-              }}
-            />
           </Div>
         )}
 

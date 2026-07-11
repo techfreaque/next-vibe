@@ -144,6 +144,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Sprache zu Text",
     titleShort: "Sprache zu Text",
+    dynamicTitle: "Transkript: {{text}}",
     description:
       "Konvertieren Sie Audio in Text mit KI-Transkription (0,013 Credits pro Sekunde, 0,78 Credits pro Minute)",
     form: {

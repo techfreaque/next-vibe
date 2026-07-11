@@ -56,9 +56,13 @@ export class FolderContentsRepository {
    * EXHAUSTIVE over DefaultFolderId (the only type a rootFolderId can be; the
    * endpoint's url param is a `z.enum([DefaultFolderId.*])`). PUBLIC/SHARED are
    * shared resource channels (many identities watch one); PRIVATE / BACKGROUND /
-   * REMOTE are the owner's own channel; INCOGNITO never reaches the server.
-   * Shared by the folder-contents and messages channel resolvers so the same
-   * folder-trust drives subscribe-admission and the emitter's delivery channel.
+   * REMOTE are the owner's own channel; INCOGNITO is owner-only too — nothing
+   * persists server-side, but live WS events are how ALL incognito updates
+   * reach the browser (same trust model as the messages channel): the AI's
+   * rename-thread during a stream emits `thread-updated` here, and the
+   * incognito onEvent handlers persist it to localStorage. Mirrors the
+   * emitter's emitChannelForFolder (INCOGNITO → user) so subscribe-admission
+   * and emit-delivery land on the same channel.
    */
   static folderIdToChannelKind(
     user: JwtPayloadType,
@@ -66,7 +70,9 @@ export class FolderContentsRepository {
   ): ChannelDecision["kind"] {
     switch (rootFolderId) {
       case DefaultFolderId.INCOGNITO:
-        return "deny";
+        // Owner's own channel; guests have no user channel (same as the
+        // messages channel's fresh-thread branch).
+        return !user.isPublic && !!user.id ? "user" : "deny";
       case DefaultFolderId.PUBLIC:
       case DefaultFolderId.SHARED:
         // Many identities watch one channel.
@@ -743,15 +749,26 @@ export class FolderContentsRepository {
     // chain root→leaf (pushThreadSync's self-healing chain push) — either way
     // they form one parent chain and apply in a single mirror pass.
     const item = responseData.items?.[0];
+    // A Remote-tab creation (root REMOTE, e.g. REMOTE/<peer>/private/tests/…) is
+    // semantically a PRIVATE folder from the peer's perspective — it must mirror
+    // to the peer under REMOTE/<origin>/private/<sub-chain> just like a plain
+    // private folder. Treat REMOTE-rooted creations as PRIVATE-origin; only true
+    // background stays background. (Rejecting REMOTE roots left these folders
+    // unsynced, so a relayed thread created in them landed at the REMOTE root.)
     if (
       !userId ||
       !item?.id ||
       typeof item.name !== "string" ||
       (item.rootFolderId !== DefaultFolderId.PRIVATE &&
-        item.rootFolderId !== DefaultFolderId.BACKGROUND)
+        item.rootFolderId !== DefaultFolderId.BACKGROUND &&
+        item.rootFolderId !== DefaultFolderId.REMOTE)
     ) {
       return;
     }
+    const originRootFolderId =
+      item.rootFolderId === DefaultFolderId.BACKGROUND
+        ? DefaultFolderId.BACKGROUND
+        : DefaultFolderId.PRIVATE;
     // Skip if the event originated from this instance — the folder was already
     // created locally; re-applying it would add a spurious REMOTE mirror.
     const { RemoteConnectionRepository } =
@@ -779,7 +796,7 @@ export class FolderContentsRepository {
     const leafId = await ensureMirrorFolders(
       userId,
       originInstanceId,
-      item.rootFolderId,
+      originRootFolderId,
       chainRows,
     );
     if (!leafId) {

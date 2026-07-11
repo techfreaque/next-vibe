@@ -72,6 +72,26 @@ export function ensureGlobals(): void {
 // to fire them all.
 const _lazyWidgetRegistry: Array<() => Promise<void>> = [];
 
+// Single-flight queue for SERVER-side widget factory imports — the same
+// pattern as the generated endpoint/route registries: widget modules pull in
+// large cyclic graphs, and CONCURRENT dynamic imports of two such graphs can
+// deadlock or fail in the Vite SSR module runner during cold evaluation
+// (observed as boot-window 500s with "[SSR onError]" at ResolvedWidget).
+// preloadAllLazyWidgets() fires every factory at once, so without this queue
+// the server races hundreds of imports on a cold graph. Client-side imports
+// are plain chunk fetches with no shared runner — they stay concurrent.
+let _serverWidgetImportQueue: Promise<AnyComponent | undefined> =
+  Promise.resolve(undefined);
+
+function enqueueServerWidgetImport(
+  run: () => Promise<AnyComponent>,
+): Promise<AnyComponent> {
+  const result = _serverWidgetImportQueue.then(run);
+  // Chain regardless of outcome so one failed import never blocks the queue.
+  _serverWidgetImportQueue = result.catch(() => undefined);
+  return result;
+}
+
 /**
  * Fires every registered lazyWidget factory in parallel and awaits resolution.
  * Call this before SSR render (server side) and before hydrateRoot() (client)
@@ -105,10 +125,15 @@ export function lazyWidget(
       return null;
     }
     if (state.modulePromise === null) {
-      state.modulePromise = factory().then((mod) => {
+      const load = async (): Promise<AnyComponent> => {
+        const mod = await factory();
         state.resolved = mod.default;
         return mod.default;
-      });
+      };
+      state.modulePromise =
+        typeof window === "undefined"
+          ? enqueueServerWidgetImport(load)
+          : load();
     }
     return state.modulePromise;
   }

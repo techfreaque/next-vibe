@@ -40,12 +40,7 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["agent", "models", "list"],
-  allowedRoles: [
-    UserRole.CUSTOMER,
-    UserRole.ADMIN,
-    UserRole.PUBLIC,
-    UserRole.WEB_OFF,
-  ] as const,
+  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN, UserRole.PUBLIC] as const,
 
   title: "get.title" as const,
   titleShort: "get.titleShort" as const,

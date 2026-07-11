@@ -66,6 +66,82 @@ interface RemoteEventPayload {
  */
 const BRIDGE_TRANSPORT_EVENT = "remote-event" as const;
 
+/**
+ * Per-connection ORDERED relay queue for content/reasoning DELTAS.
+ *
+ * Deltas are APPENDED on the mirror, so they must arrive in emit order — a
+ * fire-and-forget POST race scrambled the mirror (`hermes`+`ToolExec: her` →
+ * `hermesToolExec: her`). We serialize the DELTA relays of a given (userId,
+ * instanceId) so each POST is applied before the next is sent. Only deltas are
+ * ordered — every other event is id-keyed + idempotent and relays DETACH (a
+ * terminal event whose apply relays BACK must never block this chain). TEST mode
+ * THROTTLE_MS=0 emits a delta per token; consecutive PENDING same-message deltas
+ * MERGE (concat their increments) into one trailing POST so ordering costs a
+ * handful of round-trips, not hundreds — as fast as local, exact text, ordered.
+ * globalThis-backed to survive vite SSR module duplication.
+ */
+interface DeltaRelayState {
+  tail: Promise<void>;
+  /**
+   * The delta currently at the tail END that has not begun draining. A same-key
+   * delta merges into `open.wire`; a different key or a drain SEALS it (→ null),
+   * so a later same-key delta can never merge out of order past an intervening
+   * one. `key` = its coalesceKey.
+   */
+  open: { key: string; wire: RemoteEventWirePayload; drained: boolean } | null;
+}
+function getDeltaRelayQueues(): Map<string, DeltaRelayState> {
+  const g = globalThis as typeof globalThis & {
+    __nvDeltaRelayQ?: Map<string, DeltaRelayState>;
+  };
+  g.__nvDeltaRelayQ ??= new Map<string, DeltaRelayState>();
+  return g.__nvDeltaRelayQ;
+}
+/** Concat a follow-up delta's increment onto a pending merged wire. */
+function mergeDeltaWire(
+  base: RemoteEventWirePayload,
+  next: RemoteEventWirePayload,
+): RemoteEventWirePayload {
+  const b = base.envelope?.responseData?.["messages"]?.[0];
+  const n = next.envelope?.responseData?.["messages"]?.[0];
+  if (
+    !b ||
+    !n ||
+    typeof b.content !== "string" ||
+    typeof n.content !== "string"
+  ) {
+    return next;
+  }
+  return {
+    ...next,
+    envelope: {
+      ...next.envelope,
+      responseData: {
+        ...next.envelope?.responseData,
+        messages: [{ ...n, content: b.content + n.content }],
+      },
+    },
+  };
+}
+/**
+ * Coalesce key for a delta = eventName + messageId — so only consecutive deltas
+ * of the SAME type/message merge (both append to `content`; concatenating their
+ * increments is exact). CROSS-TYPE ordering (content vs reasoning of the same
+ * message, which BOTH append to `content` and interleaved into `hermesBoth
+ * answers…` when raced) is guaranteed separately by the per-connection shared
+ * `tail`: every delta enqueues onto it in emit order, so a content delta and a
+ * reasoning delta are applied in the order they were emitted regardless of key.
+ * Null for non-deltas (they relay DETACH).
+ */
+function deltaCoalesceKey(envelope: AnyEndpointEventEnvelope): string | null {
+  const name = envelope.eventName;
+  if (name !== "content-delta" && name !== "reasoning-delta") {
+    return null;
+  }
+  const id = envelope.responseData?.["messages"]?.[0]?.id;
+  return typeof id === "string" ? `${name}:${id}` : null;
+}
+
 export class RemoteEventBridgeRepository {
   /**
    * Relay a route's remoteEvent to every connected peer that has its domain
@@ -284,42 +360,81 @@ export class RemoteEventBridgeRepository {
         continue;
       }
 
-      // direct-http: relay the remote-event to the peer's bridge via the single
-      // canonical remote-call path. runInProcessTyped({ instanceId }) resolves
-      // the connection (auth handled inside the connection layer), picks the
-      // direct-http leg, and POSTs to the peer's bridge. The peer dispatches it
-      // to the target route's onRemoteEvent. DETACH = fire-and-forget: pure
-      // transport; the relayed event handles its own result on the peer.
-      // Single-shot by design: delivery either works or it doesn't — a failure
-      // is logged, never retried (the appliers are idempotent upserts, so the
-      // mirror converges from the remaining events / the local reconcile).
-      const { RouteExecuteRepository } =
-        await import("next-vibe/execute-tool/repository");
-      const { CallbackMode } = await import("next-vibe/execute-tool/constants");
-      const { default: bridgeDefinition } = await import("./definition");
-      void RouteExecuteRepository.runInProcessTyped({
-        definition: bridgeDefinition.POST,
-        instanceId: conn.instanceId,
-        callbackMode: CallbackMode.DETACH,
-        user: {
-          id: userId,
-          leadId: conn.tokenLeadId,
-          isPublic: false,
-          roles: [],
-        },
-        locale: defaultLocale,
-        logger,
-        input: {
-          eventName: BRIDGE_TRANSPORT_EVENT,
-          payload: wire,
-        },
-      }).catch((err) => {
-        logger.error("[RemoteEventBridge] pushRemoteEvent dispatch failed", {
-          instanceId: conn.instanceId,
-          eventName: envelope.eventName,
-          error: err instanceof Error ? err.message : String(err),
+      // direct-http: POST to the peer's bridge via the canonical remote-call.
+      // DELTAS (content/reasoning) go through the per-connection ORDERED queue
+      // (WAIT — the peer's receive() awaits its applier, so the next delta is
+      // sent only after this one is appended → never scrambled; consecutive
+      // pending same-message deltas coalesce). EVERYTHING ELSE is id-keyed +
+      // idempotent and relays DETACH (fire-and-forget) — a terminal event whose
+      // apply relays BACK must not block, which is why only deltas are ordered.
+      const relayLeadId = conn.tokenLeadId;
+      const relayInstanceId = conn.instanceId;
+      const relayUser: JwtPrivatePayloadType = {
+        id: userId,
+        leadId: relayLeadId,
+        isPublic: false,
+        roles: [],
+      };
+      const doPost = async (
+        w: RemoteEventWirePayload,
+        mode: "WAIT" | "DETACH",
+      ): Promise<void> => {
+        const { RouteExecuteRepository } =
+          await import("next-vibe/execute-tool/repository");
+        const { CallbackMode } =
+          await import("next-vibe/execute-tool/constants");
+        const { default: bridgeDefinition } = await import("./definition");
+        await RouteExecuteRepository.runInProcessTyped({
+          definition: bridgeDefinition.POST,
+          instanceId: relayInstanceId,
+          callbackMode:
+            mode === "WAIT" ? CallbackMode.WAIT : CallbackMode.DETACH,
+          user: relayUser,
+          locale: defaultLocale,
+          logger,
+          input: { eventName: BRIDGE_TRANSPORT_EVENT, payload: w },
+        }).catch((err) => {
+          logger.error("[RemoteEventBridge] pushRemoteEvent dispatch failed", {
+            instanceId: relayInstanceId,
+            eventName: envelope.eventName,
+            error: err instanceof Error ? err.message : String(err),
+          });
         });
-      });
+      };
+      const coalesceKey = deltaCoalesceKey(envelope);
+      if (coalesceKey === null) {
+        // Non-delta: fire-and-forget, no ordering needed.
+        void doPost(wire, "DETACH");
+      } else {
+        // Delta: enqueue onto the per-connection tail (serializes ALL deltas —
+        // content + reasoning, every message — in emit order → no scramble).
+        // COALESCING optimization: the `open` holder is the delta currently at
+        // the END of the tail that has NOT started draining. A new delta with the
+        // SAME coalesceKey merges its increment into `open.wire` instead of
+        // enqueuing another POST. A different key SEALS `open` (nulls it) and
+        // enqueues a fresh task — so cross-type deltas never merge out of order.
+        const queues = getDeltaRelayQueues();
+        const qk = `${userId}:${relayInstanceId}`;
+        const state = queues.get(qk) ?? {
+          tail: Promise.resolve(),
+          open: null,
+        };
+        queues.set(qk, state);
+        if (state.open && state.open.key === coalesceKey) {
+          state.open.wire = mergeDeltaWire(state.open.wire, wire);
+        } else {
+          const open = { key: coalesceKey, wire, drained: false };
+          state.open = open;
+          const drain = async (): Promise<void> => {
+            open.drained = true;
+            if (state.open === open) {
+              state.open = null; // seal — later merges can't reach a drained entry
+            }
+            await doPost(open.wire, "WAIT");
+          };
+          state.tail = state.tail.then(drain).catch(() => undefined);
+        }
+      }
       void RemoteConnectionRepository.recordTransportUse(
         userId,
         conn.instanceId,

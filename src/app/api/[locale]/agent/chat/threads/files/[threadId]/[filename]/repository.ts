@@ -18,6 +18,7 @@ import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import type { FileMetadata } from "@/app/api/[locale]/agent/chat/storage/index";
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 
 import { chatFolders, chatThreads } from "../../../../db";
@@ -27,6 +28,37 @@ import type { ChatFileUrlVariablesOutput } from "./definition";
 import type { ChatFileT } from "./i18n";
 
 export class ChatFileRepository {
+  /**
+   * Read the stored metadata JSON for a file within a thread namespace
+   * (filesystem storage only).
+   */
+  private static async readFileMetadata(
+    threadId: string,
+    filename: string,
+  ): Promise<FileMetadata | null> {
+    const basePath = agentEnv.CHAT_STORAGE_PATH;
+    if (!basePath || typeof basePath !== "string") {
+      return null;
+    }
+    const fileId = filename.split(".")[0];
+    const metadataPath = path.join(
+      basePath,
+      threadId,
+      ".metadata",
+      `${fileId}.json`,
+    );
+    // Security check: ensure the resolved path is within basePath
+    if (!path.resolve(metadataPath).startsWith(path.resolve(basePath))) {
+      return null;
+    }
+    try {
+      const metadataContent = await fs.readFile(metadataPath, "utf-8");
+      return JSON.parse(metadataContent) as FileMetadata;
+    } catch {
+      return null;
+    }
+  }
+
   static async getFile(
     data: ChatFileUrlVariablesOutput,
     user: JwtPayloadType | undefined,
@@ -50,26 +82,6 @@ export class ChatFileRepository {
         .where(eq(chatThreads.id, data.threadId))
         .limit(1);
 
-      if (!thread) {
-        logger.error("Thread not found for file access", {
-          threadId: data.threadId,
-        });
-        return {
-          buffer: Buffer.from(""),
-          contentType: "text/plain",
-        };
-      }
-
-      // Get folder for permission check
-      let folder = null;
-      if (thread.folderId) {
-        [folder] = await db
-          .select()
-          .from(chatFolders)
-          .where(eq(chatFolders.id, thread.folderId))
-          .limit(1);
-      }
-
       // Check if user has permission to view the thread (and therefore its files)
       // Note: user can be a public user (isPublic=true) or authenticated user
       if (!user) {
@@ -80,28 +92,60 @@ export class ChatFileRepository {
         };
       }
 
-      // Check thread access permissions - same logic as thread endpoint
-      const hasAccess = await canViewThread(
-        user,
-        thread,
-        folder,
-        logger,
-        locale,
-      );
+      if (!thread) {
+        // Incognito threads have no server-side thread row — their files carry
+        // the owning leadId. Access is granted purely on leadId match (never
+        // userId), so the same browser keeps access whether logged in or not.
+        const fileMetadata = await ChatFileRepository.readFileMetadata(
+          data.threadId,
+          data.filename,
+        );
+        if (!fileMetadata?.leadId || fileMetadata.leadId !== user.leadId) {
+          logger.error("Lead does not have permission to access file", {
+            leadId: user.leadId,
+            hasFileLeadId: !!fileMetadata?.leadId,
+            threadId: data.threadId,
+            filename: data.filename,
+          });
+          return {
+            buffer: Buffer.from(""),
+            contentType: "text/plain",
+          };
+        }
+      } else {
+        // Get folder for permission check
+        let folder = null;
+        if (thread.folderId) {
+          [folder] = await db
+            .select()
+            .from(chatFolders)
+            .where(eq(chatFolders.id, thread.folderId))
+            .limit(1);
+        }
 
-      if (!hasAccess) {
-        logger.error("User does not have permission to access file", {
-          userId: user.id || "public",
-          isPublic: user.isPublic,
-          threadId: data.threadId,
-          threadUserId: thread.userId,
-          threadRootFolderId: thread.rootFolderId,
-          filename: data.filename,
-        });
-        return {
-          buffer: Buffer.from(""),
-          contentType: "text/plain",
-        };
+        // Check thread access permissions - same logic as thread endpoint
+        const hasAccess = await canViewThread(
+          user,
+          thread,
+          folder,
+          logger,
+          locale,
+        );
+
+        if (!hasAccess) {
+          logger.error("User does not have permission to access file", {
+            userId: user.id || "public",
+            isPublic: user.isPublic,
+            threadId: data.threadId,
+            threadUserId: thread.userId,
+            threadRootFolderId: thread.rootFolderId,
+            filename: data.filename,
+          });
+          return {
+            buffer: Buffer.from(""),
+            contentType: "text/plain",
+          };
+        }
       }
 
       logger.debug("File access granted", {
@@ -152,18 +196,11 @@ export class ChatFileRepository {
       const fileBuffer = await fs.readFile(filePath);
 
       // Get metadata to determine content type
-      const metadataDir = path.join(basePath, data.threadId, ".metadata");
-      const fileId = data.filename.split(".")[0];
-      const metadataPath = path.join(metadataDir, `${fileId}.json`);
-
-      let contentType = "application/octet-stream";
-      try {
-        const metadataContent = await fs.readFile(metadataPath, "utf-8");
-        const metadata = JSON.parse(metadataContent);
-        contentType = metadata.mimeType || contentType;
-      } catch {
-        // Metadata not found, use default content type
-      }
+      const fileMetadata = await ChatFileRepository.readFileMetadata(
+        data.threadId,
+        data.filename,
+      );
+      const contentType = fileMetadata?.mimeType ?? "application/octet-stream";
 
       return {
         buffer: fileBuffer,

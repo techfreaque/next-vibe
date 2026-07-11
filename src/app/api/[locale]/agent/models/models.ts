@@ -205,6 +205,14 @@ export interface ModelProviderConfigVideoBased {
   supportedAspectRatios?: readonly string[];
   /** Override creditCostPerSecond per resolution (e.g. { "1080p": 15 }) */
   pricingByResolution?: Partial<Record<string, number>>;
+  /** Which frame image types are supported: "first_frame", "last_frame" */
+  supportedFrameImages?: readonly string[];
+  /** Whether this provider endpoint generates audio alongside video */
+  generateAudio?: boolean;
+  /** Exact pixel dimensions supported (e.g. ["1280x720", "1920x1080"]) */
+  supportedSizes?: readonly string[];
+  /** Extra parameters this model's provider accepts (e.g. ["negative_prompt", "cfg_scale"]) */
+  allowedPassthroughParameters?: readonly string[];
   creditCost?: never;
   inputTokenCost?: never;
   outputTokenCost?: never;
@@ -451,6 +459,14 @@ export interface ModelOptionVideoBased extends ModelOptionBase {
   supportedAspectRatios?: readonly string[];
   /** Override creditCostPerSecond per resolution */
   pricingByResolution?: Partial<Record<string, number>>;
+  /** Which frame image types are supported: "first_frame", "last_frame" */
+  supportedFrameImages?: readonly string[];
+  /** Whether this provider endpoint generates audio alongside video */
+  generateAudio?: boolean;
+  /** Exact pixel dimensions supported (e.g. ["1280x720", "1920x1080"]) */
+  supportedSizes?: readonly string[];
+  /** Extra parameters this model's provider accepts (e.g. ["negative_prompt", "cfg_scale"]) */
+  allowedPassthroughParameters?: readonly string[];
   creditCost?: never;
   inputTokenCost?: never;
   outputTokenCost?: never;

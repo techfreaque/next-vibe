@@ -439,7 +439,12 @@ function emitLayoutFile(
       `import { TanstackPage as Layout } from "${importPath}";`,
     ];
     if (hasParams || hasSearch) {
-      lines.push(``, `import { toNextParams } from "${WRAPPER_IMPORT}";`);
+      lines.push(
+        ``,
+        `import { runPageLoader, toNextParams } from "${WRAPPER_IMPORT}";`,
+      );
+    } else {
+      lines.push(``, `import { runPageLoader } from "${WRAPPER_IMPORT}";`);
     }
     if (hasParams || hasSearch) {
       lines.push(
@@ -450,18 +455,22 @@ function emitLayoutFile(
             ? "{ params: Record<string, string>; search: Record<string, string> }"
             : "Record<string, string>",
         ),
-        `  .handler(async ({ data }) => {`,
-        fmtAwaitImport(importPath, `    `),
-        `    return tanstackLoader({ params: Promise.resolve(toNextParams(${hasSearch ? "data.params" : "data"}))${hasSearch ? ", searchParams: Promise.resolve(data.search)" : ""} });`,
-        `  });`,
+        `  .handler(async ({ data }) =>`,
+        `    runPageLoader(async () => {`,
+        fmtAwaitImport(importPath, `      `),
+        `      return tanstackLoader({ params: Promise.resolve(toNextParams(${hasSearch ? "data.params" : "data"}))${hasSearch ? ", searchParams: Promise.resolve(data.search)" : ""} });`,
+        `    }),`,
+        `  );`,
       );
     } else {
       lines.push(
         ``,
-        `const loadData = createServerFn({ method: "GET" }).handler(async () => {`,
-        fmtAwaitImport(importPath, `  `),
-        `  return tanstackLoader();`,
-        `});`,
+        `const loadData = createServerFn({ method: "GET" }).handler(async () =>`,
+        `  runPageLoader(async () => {`,
+        fmtAwaitImport(importPath, `    `),
+        `    return tanstackLoader();`,
+        `  }),`,
+        `);`,
       );
     }
     const bodyIndent = routeBodyIndent(routePath);
@@ -554,7 +563,7 @@ function emitPageFile(
     ``,
     `import { TanstackPage as Page } from "${importPath}";`,
     ``,
-    `import { toNextParams } from "${WRAPPER_IMPORT}";`,
+    `import { runPageLoader, toNextParams } from "${WRAPPER_IMPORT}";`,
   );
   if (catchAllName) {
     const inputType = hasSearch
@@ -565,19 +574,21 @@ function emitPageFile(
       ``,
       `const loadData = createServerFn({ method: "GET" })`,
       ...fmtInputValidator(inputType),
-      `  .handler(async ({ data }) => {`,
-      fmtAwaitImport(importPath, `    `),
-      `    const p = toNextParams(${paramsExpr});`,
-      `    return tanstackLoader({`,
-      `      params: Promise.resolve({`,
-      `        ...p,`,
-      `        ${catchAllName}: (p["_splat"] ?? "").split("/").filter(Boolean),`,
-      `      } as { locale: CountryLanguage; ${catchAllName}: string[] }),`,
+      `  .handler(async ({ data }) =>`,
+      `    runPageLoader(async () => {`,
+      fmtAwaitImport(importPath, `      `),
+      `      const p = toNextParams(${paramsExpr});`,
+      `      return tanstackLoader({`,
+      `        params: Promise.resolve({`,
+      `          ...p,`,
+      `          ${catchAllName}: (p["_splat"] ?? "").split("/").filter(Boolean),`,
+      `        } as { locale: CountryLanguage; ${catchAllName}: string[] }),`,
       ...(hasSearch
-        ? [`      searchParams: Promise.resolve(data.search),`]
+        ? [`        searchParams: Promise.resolve(data.search),`]
         : []),
-      `    });`,
-      `  });`,
+      `      });`,
+      `    }),`,
+      `  );`,
     );
   } else {
     const inputType = hasSearch
@@ -587,22 +598,23 @@ function emitPageFile(
       ``,
       `const loadData = createServerFn({ method: "GET" })`,
       ...fmtInputValidator(inputType),
-      `  .handler(async ({ data }) => {`,
-      fmtAwaitImport(importPath, `    `),
+      `  .handler(async ({ data }) =>`,
+      `    runPageLoader(async () => {`,
+      fmtAwaitImport(importPath, `      `),
     );
     if (hasSearch) {
       lines.push(
-        `    return tanstackLoader({`,
-        `      params: Promise.resolve(toNextParams(data.params)),`,
-        `      searchParams: Promise.resolve(data.search),`,
-        `    });`,
+        `      return tanstackLoader({`,
+        `        params: Promise.resolve(toNextParams(data.params)),`,
+        `        searchParams: Promise.resolve(data.search),`,
+        `      });`,
       );
     } else {
       lines.push(
-        `    return tanstackLoader({ params: Promise.resolve(toNextParams(data)) });`,
+        `      return tanstackLoader({ params: Promise.resolve(toNextParams(data)) });`,
       );
     }
-    lines.push(`  });`);
+    lines.push(`    }),`, `  );`);
   }
 
   // Route body lines at zero indent; fmtRouteBlock adds the appropriate indent

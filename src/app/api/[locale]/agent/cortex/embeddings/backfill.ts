@@ -138,7 +138,7 @@ async function materializeVirtualMounts(userId: string): Promise<number> {
         title: chatThreads.title,
         rootFolderId: chatThreads.rootFolderId,
         tags: chatThreads.tags,
-        preview: chatThreads.preview,
+        description: chatThreads.description,
       })
       .from(chatThreads)
       .where(eq(chatThreads.userId, userId))
@@ -251,31 +251,17 @@ export async function materializeAllVirtualMounts(): Promise<number> {
   // rows by older materialization runs (cortex = index, source owns content).
   const reclaimed = await reclaimVirtualMountContent().catch(() => 0);
   if (reclaimed > 0) {
-    // eslint-disable-next-line no-console
-    console.log(
-      `[cortex-backfill] Reclaimed content from ${reclaimed} virtual index rows`,
+    process.stdout.write(
+      `[cortex-backfill] Reclaimed content from ${reclaimed} virtual index rows\n`,
     );
   }
 
   const userIds = await getAllUserIds();
-  // eslint-disable-next-line no-console
-  console.log(
-    `[cortex-backfill] Materializing virtual mounts for ${userIds.length} users...`,
-  );
   let total = 0;
   for (const userId of userIds) {
-    const count = await materializeVirtualMounts(userId).catch((err) => {
-      // eslint-disable-next-line no-console
-      console.error(
-        `[cortex-backfill] Materialization failed for user ${userId}:`,
-        err,
-      );
-      return 0;
-    });
+    const count = await materializeVirtualMounts(userId).catch(() => 0);
     total += count;
   }
-  // eslint-disable-next-line no-console
-  console.log(`[cortex-backfill] Materialized ${total} virtual nodes`);
   return total;
 }
 
@@ -292,9 +278,7 @@ export async function backfillEmbeddings(force = false): Promise<{
 }> {
   // Force mode: clear all existing embeddings so they get regenerated
   if (force) {
-    // eslint-disable-next-line no-console
-    console.log("[cortex-backfill] Force mode: clearing all embeddings...");
-    const cleared = await db
+    await db
       .update(cortexNodes)
       .set({ embedding: null, contentHash: null })
       .where(
@@ -302,10 +286,7 @@ export async function backfillEmbeddings(force = false): Promise<{
           eq(cortexNodes.nodeType, CortexNodeType.FILE),
           isNotNull(cortexNodes.embedding),
         ),
-      )
-      .returning({ id: cortexNodes.id });
-    // eslint-disable-next-line no-console
-    console.log(`[cortex-backfill] Cleared ${cleared.length} embeddings`);
+      );
   }
 
   let processed = 0;
@@ -364,7 +345,8 @@ export async function backfillEmbeddings(force = false): Promise<{
       // context routes embeddings live, never through a fixture.
       const embedding = await generateEmbedding(
         textToEmbed,
-        makeHeadlessContext(undefined, undefined),
+        // no user context — UTC (dates not user-facing here)
+        makeHeadlessContext(undefined, undefined, "UTC"),
       );
 
       if (!embedding) {
@@ -383,28 +365,118 @@ export async function backfillEmbeddings(force = false): Promise<{
       processed++;
     }
 
-    // eslint-disable-next-line no-console
-    console.log(
-      `[cortex-backfill] Batch ${batchCount}: ${processed} embedded, ${failed} failed, ${skipped} skipped`,
-    );
-
     // Rate limit between batches
     if (batch.length === BATCH_SIZE) {
       await sleep(BATCH_DELAY_MS);
     }
   }
 
-  if (batchCount >= MAX_BATCHES) {
-    // eslint-disable-next-line no-console
-    console.warn(
-      `[cortex-backfill] Hit safety limit of ${MAX_BATCHES} batches. Remaining nodes need another run.`,
-    );
+  return { processed, failed, skipped };
+}
+
+/**
+ * Backfill per-message embeddings for all existing chat messages.
+ * One-time migration — after this, syncMessageEmbeddings at stream end keeps them current.
+ * Rate-limited: same BATCH_SIZE / BATCH_DELAY_MS as cortex node backfill.
+ */
+export async function backfillMessageEmbeddings(force = false): Promise<{
+  processed: number;
+  failed: number;
+  skipped: number;
+}> {
+  const { chatMessages } = await import("@/app/api/[locale]/agent/chat/db");
+  const { ChatMessageRole } =
+    await import("@/app/api/[locale]/agent/chat/enum");
+  const { buildMessageEmbedText } = await import("./message-embed");
+  const { createHash } = await import("node:crypto");
+  const { or, notInArray: notInArrayMsg } = await import("drizzle-orm");
+
+  if (force) {
+    await db
+      .update(chatMessages)
+      .set({ embedding: null, embeddingHash: null })
+      .where(isNotNull(chatMessages.embedding));
   }
 
-  // eslint-disable-next-line no-console
-  console.log(
-    `[cortex-backfill] Done: ${processed} embedded, ${failed} failed, ${skipped} skipped`,
-  );
+  let processed = 0;
+  let failed = 0;
+  let skipped = 0;
+  let batchCount = 0;
+  const excludeIds: string[] = [];
+
+  while (batchCount < MAX_BATCHES) {
+    batchCount++;
+
+    const whereConditions = [
+      isNull(chatMessages.embedding),
+      or(
+        eq(chatMessages.role, ChatMessageRole.USER),
+        eq(chatMessages.role, ChatMessageRole.ASSISTANT),
+      ),
+    ];
+
+    if (excludeIds.length > 0) {
+      whereConditions.push(notInArrayMsg(chatMessages.id, excludeIds));
+    }
+
+    const batch = await db
+      .select({
+        id: chatMessages.id,
+        role: chatMessages.role,
+        content: chatMessages.content,
+        metadata: chatMessages.metadata,
+        embeddingHash: chatMessages.embeddingHash,
+      })
+      .from(chatMessages)
+      .where(and(...whereConditions))
+      .limit(BATCH_SIZE);
+
+    if (batch.length === 0) {
+      break;
+    }
+
+    for (const msg of batch) {
+      const text = buildMessageEmbedText(msg);
+      if (!text) {
+        skipped++;
+        excludeIds.push(msg.id);
+        continue;
+      }
+
+      const { EMBEDDING_MODEL } = await import("./service");
+      const hash = createHash("sha256")
+        .update(`${EMBEDDING_MODEL}:msg:${text}`)
+        .digest("hex");
+
+      if (msg.embeddingHash === hash) {
+        skipped++;
+        excludeIds.push(msg.id);
+        continue;
+      }
+
+      const embedding = await generateEmbedding(
+        text,
+        makeHeadlessContext(undefined, undefined, "UTC"),
+      );
+
+      if (!embedding) {
+        failed++;
+        excludeIds.push(msg.id);
+        continue;
+      }
+
+      await db
+        .update(chatMessages)
+        .set({ embedding, embeddingHash: hash })
+        .where(eq(chatMessages.id, msg.id));
+
+      processed++;
+    }
+
+    if (batch.length === BATCH_SIZE) {
+      await sleep(BATCH_DELAY_MS);
+    }
+  }
 
   return { processed, failed, skipped };
 }

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "I found the earlier generated image URL from the wakeUp test (T6a) in this conversation. Now I'll use it as the last frame alongside the wojak photo as the first frame",
+    "encoding_format": "float"
+  }
+}

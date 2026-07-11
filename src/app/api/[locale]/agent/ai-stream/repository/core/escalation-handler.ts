@@ -13,6 +13,7 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
 import type { CallbackModeValue } from "next-vibe/execute-tool/constants";
@@ -53,11 +54,11 @@ export function wireEscalateToTask({
     displayName?: string;
   }): Promise<{
     taskId: string;
-    onComplete: (result: {
-      success: boolean;
-      data?: Record<string, WidgetData>;
-      message?: string;
-    }) => Promise<void>;
+    onComplete: (
+      result:
+        | { success: true; data?: Record<string, WidgetData> }
+        | ErrorResponseType,
+    ) => Promise<void>;
   }> => {
     const { CallbackMode } = await import("next-vibe/execute-tool/constants");
 
@@ -159,11 +160,11 @@ export function wireEscalateToTask({
       }
     };
 
-    const onComplete = async (result: {
-      success: boolean;
-      data?: Record<string, WidgetData>;
-      message?: string;
-    }): Promise<void> => {
+    const onComplete = async (
+      result:
+        | { success: true; data?: Record<string, WidgetData> }
+        | ErrorResponseType,
+    ): Promise<void> => {
       streamContext.onEscalatedTaskCancel = undefined;
       const { CallbackMode: CM } =
         await import("next-vibe/execute-tool/constants");
@@ -171,8 +172,9 @@ export function wireEscalateToTask({
       const finalStatus = result.success
         ? CronTaskStatus.COMPLETED
         : CronTaskStatus.FAILED;
-      const finalOutput: Record<string, WidgetData> | null =
-        result.success && result.data ? result.data : null;
+      const finalOutput: Record<string, WidgetData> | null = result.success
+        ? (result.data ?? null)
+        : TaskCompletion.failedOutput(result);
 
       const effectiveMode =
         callbackMode === CM.WAIT

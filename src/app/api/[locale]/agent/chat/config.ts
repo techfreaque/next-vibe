@@ -3,6 +3,7 @@
  * Default folder definitions and utilities
  */
 
+import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import {
   type CallbackModeValue,
@@ -369,11 +370,11 @@ export interface ToolExecutionContext {
         displayName?: string;
       }) => Promise<{
         taskId: string;
-        onComplete: (result: {
-          success: boolean;
-          data?: Record<string, WidgetData>;
-          message?: string;
-        }) => Promise<void>;
+        onComplete: (
+          result:
+            | { success: true; data?: Record<string, WidgetData> }
+            | ErrorResponseType,
+        ) => Promise<void>;
       }>)
     | undefined;
   /**

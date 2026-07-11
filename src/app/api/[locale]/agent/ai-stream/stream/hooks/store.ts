@@ -13,16 +13,27 @@
 import { create } from "zustand";
 
 /**
- * AI Stream Lifecycle State - aborting only
+ * AI Stream Lifecycle State - aborting + active incognito streams
  */
 interface AIStreamState {
   /** Thread IDs where cancel request was sent but stream-finished hasn't arrived */
   abortingThreads: Set<string>;
 
+  /**
+   * Incognito thread IDs with a stream currently running on the server.
+   * Incognito threads exist ONLY in localStorage — the WS events are the
+   * single carrier of the streamed content. The IncognitoStreamKeeper keeps a
+   * headless subscription alive for these ids so navigating to a different
+   * thread/folder mid-stream doesn't lose the response.
+   */
+  incognitoStreams: Set<string>;
+
   isAborting: (threadId: string) => boolean;
   setAborting: (threadId: string, value: boolean) => void;
   /** Clear aborting state for a thread (called by stream-finished event) */
   clearThread: (threadId: string) => void;
+  addIncognitoStream: (threadId: string) => void;
+  removeIncognitoStream: (threadId: string) => void;
   reset: () => void;
 }
 
@@ -31,6 +42,7 @@ interface AIStreamState {
  */
 export const useAIStreamStore = create<AIStreamState>((set, get) => ({
   abortingThreads: new Set<string>(),
+  incognitoStreams: new Set<string>(),
 
   isAborting: (threadId: string): boolean =>
     get().abortingThreads.has(threadId),
@@ -53,8 +65,29 @@ export const useAIStreamStore = create<AIStreamState>((set, get) => ({
       return { abortingThreads: next };
     }),
 
+  addIncognitoStream: (threadId: string): void =>
+    set((state) => {
+      if (state.incognitoStreams.has(threadId)) {
+        return state;
+      }
+      const next = new Set(state.incognitoStreams);
+      next.add(threadId);
+      return { incognitoStreams: next };
+    }),
+
+  removeIncognitoStream: (threadId: string): void =>
+    set((state) => {
+      if (!state.incognitoStreams.has(threadId)) {
+        return state;
+      }
+      const next = new Set(state.incognitoStreams);
+      next.delete(threadId);
+      return { incognitoStreams: next };
+    }),
+
   reset: (): void =>
     set({
       abortingThreads: new Set<string>(),
+      incognitoStreams: new Set<string>(),
     }),
 }));

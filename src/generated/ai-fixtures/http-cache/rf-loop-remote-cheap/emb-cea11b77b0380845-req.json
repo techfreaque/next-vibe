@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "WAKEUP_FAILED: Phase 2 deferred result contains a non-empty responsePath, but earlier wakeUp handling was off: the dispatch result did not include the expected taskId, and the tool was called a second time despite the instruction not to call it again.",
+    "encoding_format": "float"
+  }
+}

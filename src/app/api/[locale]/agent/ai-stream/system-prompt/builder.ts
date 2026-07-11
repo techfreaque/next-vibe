@@ -112,6 +112,9 @@ export interface SystemPromptParams {
    *  suppress this instance's own identity fragment so the prompt names only
    *  the originator. */
   suppressSelfIdentity?: boolean;
+  /** Relay receiver: caller instance that owns this thread — rename round-trips
+   *  to it (see SystemPromptServerParams.relayCallerInstanceId). */
+  relayCallerInstanceId?: string | null;
   headless?: boolean;
   subAgentDepth: number;
   excludeMemories?: boolean;
@@ -120,6 +123,9 @@ export interface SystemPromptParams {
   /** Fired user-message embed — awaited by the cortex search (see server params). */
   messageEmbedReady?: Promise<void>;
   threadId: string | null;
+  /** Incognito only: client-sent current thread title/description (no DB row). */
+  incognitoThreadTitle?: string | null;
+  incognitoThreadDescription?: string | null;
   voiceTranscription?: {
     wasTranscribed: boolean;
     confidence: number | null;
@@ -172,6 +178,7 @@ export async function buildSystemPrompt(
     excludeMemories,
     headless: headless ?? false,
     suppressSelfIdentity: suppressSelfIdentity ?? false,
+    relayCallerInstanceId: params.relayCallerInstanceId ?? null,
     subAgentDepth,
     callMode: callMode ?? false,
     extraInstructions: extraInstructions ?? "",
@@ -179,6 +186,8 @@ export async function buildSystemPrompt(
     mediaCapabilities,
     messageEmbedReady: params.messageEmbedReady,
     threadId: params.threadId ?? null,
+    incognitoThreadTitle: params.incognitoThreadTitle ?? null,
+    incognitoThreadDescription: params.incognitoThreadDescription ?? null,
   };
 
   const { leading, trailing } = await loadAllPromptFragments(serverParams);

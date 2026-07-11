@@ -6,7 +6,12 @@ import "server-only";
 
 import { env } from "@/config/env";
 
-import { DEV_SEED_DEMO_USER_EMAIL } from "../users/seeds";
+// Defined HERE (not in users/seeds.ts) on purpose: the dev server's
+// exclude-generator-seeds Vite plugin stubs every seeds.ts module to
+// `export default {}` (seeds are CLI-only), so importing this constant from
+// a seeds file yielded undefined at runtime — the dev quick-login rendered a
+// blank user button. users/seeds.ts imports it from here instead.
+export const DEV_SEED_DEMO_USER_EMAIL = "demo@example.com";
 
 export const DEV_SEED_PASSWORD = env.VIBE_ADMIN_USER_PASSWORD;
 

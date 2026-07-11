@@ -439,8 +439,6 @@ export const { POST } = createEndpoint({
         fieldType: FieldDataType.JSON,
         label: "post.fields.syncScope.label" as const,
         description: "post.fields.syncScope.description" as const,
-        // Optional: absent → the connect repository applies the default scope
-        // (SyncScopeSchema field defaults).
         schema: SyncScopeSchema,
       }),
       connected: responseField(scopedTranslation, {
@@ -500,6 +498,13 @@ export const { POST } = createEndpoint({
         email: "you@example.com",
         password: "yourpassword",
         remoteUrl: "https://unbottled.ai",
+        syncScope: {
+          memories: true,
+          documents: true,
+          skills: true,
+          favorites: true,
+          threads: false,
+        },
       },
     },
     responses: {

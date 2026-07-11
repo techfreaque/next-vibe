@@ -22,6 +22,16 @@ export type PubSubMessageHandler<
  */
 export interface PubSubAdapter {
   /**
+   * True when publish() itself already delivers to THIS process's WebSocket
+   * sockets (local adapter). The WS server then must NOT also register its
+   * per-channel relay subscription — publish → broadcast + relay-handler →
+   * broadcast delivered every event TWICE to every socket (streamed-token
+   * duplication "The The"). Remote adapters (Redis) return false: there a
+   * publish only reaches local sockets via the relay subscription.
+   */
+  readonly deliversToLocalSockets: boolean;
+
+  /**
    * Publish an event to all instances subscribed to this channel.
    */
   publish(channel: string, event: string, data: AnyEndpointEventEnvelope): void;

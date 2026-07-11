@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a19241fcdd3ed22b-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 10 Jul 2026 20:18:29 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783714708-aVPKb0X2vXXewimMJAdB"
+  },
+  "body": {
+    "id": "gen-1783714708-aVPKb0X2vXXewimMJAdB",
+    "object": "chat.completion",
+    "created": 1783714708,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The audio clip features a 16-second segment of lo-fi hip-hop music. The sound quality is clear, suggesting a studio recording environment.\n\n**Musical Elements:**\n\n*   **Genre:** Lo-fi Hip-Hop\n*   **Tempo:** Approximately 80-85 BPM (Moderato)\n*   **Time Signature:** 4/4\n*   **Instruments:**\n    *   **Drums:** The most prominent element, featuring a crisp, somewhat compressed drum machine sound. The pattern includes a driving kick drum on beats 1 and 3, a snare on 2 and 4, and a consistent, slightly swung hi-hat pattern filling the eighth-note subdivisions. The hi-hats have a subtle, delayed stereo effect.\n    *   **Bass:** There's a deep, sustained synth bassline, providing a foundation for the rhythm section. It plays a simple, repetitive two-note pattern, contributing to the laid-back, groovy feel.\n    *   **Keyboard/Synth (Melody):** A clean, somewhat ethereal keyboard or synth provides a sparse, melancholic melody. It plays a simple, repeating two-bar phrase. The sound has a slight reverb, giving it a dreamy quality.\n\n*   **Interaction:** The drums and bass lay down a solid, head-nodding groove, over which the keyboard plays a floating, unhurried melody. All elements are well-balanced within the mix.\n\n*   **Production Style:** The production is clean and polished with a characteristic lo-fi aesthetic applied, particularly to the drums, which sound slightly faded or \"vintage.\" There is a gentle amount of reverb on the melodic elements, contributing to a spacious feel.\n\n*   **Mood:** Relaxed, chill, slightly melancholic, and laid-back.\n\n**Song Structure:**\nThis clip appears to be a continuous loop of a verse or instrumental section, showcasing the main groove and melody without any distinct structural changes like an intro or chorus within its short duration.\n\n**Other Audio Events:**\nNo speech, environmental sounds, or other non-musical audio events are present.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 443,
+      "total_tokens": 1515,
+      "cost": 0.0019541,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0019541,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.0011075
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

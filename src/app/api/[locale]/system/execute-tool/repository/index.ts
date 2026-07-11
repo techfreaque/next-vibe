@@ -70,6 +70,32 @@ import { RemoteDispatch } from "./remote";
 import { ResultSignals } from "./result-signals";
 import type { RouteExecuteContext } from "./types";
 
+function logToolLine(
+  logger: EndpointLogger,
+  toolName: string,
+  mode: string | null,
+  durationMs: number,
+  result: { success: boolean; message?: string },
+  platform: Platform,
+): void {
+  if (platform !== Platform.NEXT_API && platform !== Platform.AI) {
+    return;
+  }
+  const ms = maybeColorize(`in ${durationMs}ms`, semantic.muted);
+  const modeTag =
+    mode && mode !== "wait" ? maybeColorize(` ${mode}`, semantic.muted) : "";
+  if (result.success) {
+    logger.vibe(
+      `TOOL ${bold(toolName)}${modeTag} ${maybeColorize("→ ok", semantic.success)} ${ms}`,
+    );
+  } else {
+    const msg = result.message ?? "error";
+    logger.vibe(
+      `TOOL ${bold(toolName)}${modeTag} ${maybeColorize(`→ ${msg}`, semantic.error)} ${ms}`,
+    );
+  }
+}
+
 export class RouteExecuteRepository {
   /**
    * At-least-once delivery guard for inbound tool-execute-requests: callIds
@@ -103,6 +129,8 @@ export class RouteExecuteRepository {
      */
     urlPathParams?: Record<string, WidgetData>,
   ): Promise<ResponseType<RouteExecuteResponseOutput>> {
+    const _execStart = Date.now();
+    let _toolName = data.toolName;
     try {
       // Bail out immediately if the stream was cancelled before tool execution started.
       // The abort signal fires when StreamRegistry.cancel() is called - any DB writes
@@ -130,11 +158,13 @@ export class RouteExecuteRepository {
       // Split prefixed tool ID: "hermes__ssh_exec_POST" → instanceId="hermes", toolName="ssh_exec_POST"
       // Prefixed form takes precedence over explicit instanceId prop
       let toolName = data.toolName;
+      _toolName = toolName;
       let instanceId = data.instanceId;
       const separatorIdx = toolName.indexOf("__");
       if (separatorIdx !== -1) {
         instanceId = toolName.slice(0, separatorIdx);
         toolName = toolName.slice(separatorIdx + 2);
+        _toolName = toolName;
       }
 
       let { input } = data;
@@ -239,6 +269,14 @@ export class RouteExecuteRepository {
           instanceId,
         });
         if (remoteResult.kind === "return") {
+          logToolLine(
+            logger,
+            toolName,
+            callbackMode,
+            Date.now() - _execStart,
+            remoteResult.value,
+            platform,
+          );
           return remoteResult.value;
         }
       }
@@ -253,6 +291,14 @@ export class RouteExecuteRepository {
           "[RouteExecute] APPROVE mode - returning placeholder (stream aborts at finish-step)",
           { toolName },
         );
+        logToolLine(
+          logger,
+          toolName,
+          callbackMode,
+          Date.now() - _execStart,
+          { success: true },
+          platform,
+        );
         return success({
           result: { status: "waiting_for_confirmation", toolName },
         });
@@ -266,19 +312,49 @@ export class RouteExecuteRepository {
         callbackMode === CallbackMode.DETACH ||
         callbackMode === CallbackMode.WAKE_UP
       ) {
-        return LocalExecution.executeAsync({ ctx, input, mode: callbackMode });
+        const asyncResult = await LocalExecution.executeAsync({
+          ctx,
+          input,
+          mode: callbackMode,
+        });
+        logToolLine(
+          logger,
+          toolName,
+          callbackMode,
+          Date.now() - _execStart,
+          asyncResult,
+          platform,
+        );
+        return asyncResult;
       }
 
       // Local WAIT: confirmation gate + inline execution.
-      return LocalExecution.execute({
+      const waitResult = await LocalExecution.execute({
         ctx,
         data,
         input,
         instanceId,
         callbackMode,
       });
+      logToolLine(
+        logger,
+        toolName,
+        callbackMode,
+        Date.now() - _execStart,
+        waitResult,
+        platform,
+      );
+      return waitResult;
     } catch (error) {
       const msg = parseError(error).message;
+      logToolLine(
+        logger,
+        _toolName,
+        data.callbackMode ?? null,
+        Date.now() - _execStart,
+        { success: false, message: msg },
+        platform,
+      );
       logger.error("[RouteExecute] Failed", {
         toolName: data.toolName,
         error: msg,

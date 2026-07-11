@@ -432,6 +432,18 @@ export async function onToolResult(
         // Not JSON, ignore
       }
     }
+    // A tool that signals pending via its OUTPUT SHAPE (execute-tool's remote
+    // queue WAIT / wakeUp — the loop-remote path where the executor's own
+    // execute-tool returns {status:"status.pending"} rather than going through
+    // escalateToTask) must ALSO raise the SHARED streamContext flag. The
+    // finish-step abort (REMOTE_TOOL_WAIT) and the SDK stopWhen predicate both
+    // key off `streamContext.waitingForRemoteResult`; without setting it the loop
+    // starts another model turn with a pending (result-less) tool message and the
+    // AI SDK throws AI_NoOutputGeneratedError → the whole turn surfaces as a
+    // STREAM_ERROR instead of cleanly parking in "waiting" for the revival.
+    if (isWaitingForRemote) {
+      streamContext.waitingForRemoteResult = true;
+    }
   }
 
   // For wait/wakeUp-escalated tools (isWaitingForRemote=true): the tool message
@@ -463,7 +475,27 @@ export async function onToolResult(
             "waiting_for_confirmation")
       );
     })();
-  if (isWaitingForRemote && !effectiveIsError && !isConfirmationPlaceholder) {
+  // A wakeUp DISPATCH result carries a `taskId` — the phase-1 acknowledgement the
+  // model MUST see (its two-phase judgement keys off "the dispatch returned a
+  // taskId and no responsePath yet"). Unlike `wait` (which has no result at all
+  // until revival), wakeUp's `{taskId, status:pending}` IS a real phase-1 result,
+  // exactly like detach. On loop-remote the executor's execute-tool returns this
+  // via the {status:pending} shape, so isWaitingForRemote is set and the write
+  // was SKIPPED — leaving the phase-1 tool message result NULL. The model then
+  // read a taskId-less dispatch and (correctly, given the data) judged phase-2
+  // FAILED. Write the dispatch result when it carries a taskId; the real output
+  // still arrives later as the DEFERRED message via revival.
+  const outputHasTaskId =
+    output !== null &&
+    typeof output === "object" &&
+    !Array.isArray(output) &&
+    typeof (output as Record<string, JSONValue>)["taskId"] === "string";
+  if (
+    isWaitingForRemote &&
+    !effectiveIsError &&
+    !isConfirmationPlaceholder &&
+    !outputHasTaskId
+  ) {
     logger.debug(
       "[AI Stream] Skipping tool result emit - tool is waiting for remote task",
       { toolMessageId, toolName: part.toolName },
@@ -567,6 +599,8 @@ export async function onToolError(
     type: "tool-error";
     toolCallId: string;
     toolName: string;
+    /** Raw input from the AI SDK — present even when validation fails before execute(). */
+    input?: JSONValue;
     error?: JSONValue;
   },
   pendingToolMessage: PendingToolData | undefined,
@@ -588,7 +622,48 @@ export async function onToolError(
   const { sequenceId, dbWriter } = ctx;
 
   if (!pendingToolMessage) {
-    return null;
+    // tool-error arrived without a preceding tool-call (e.g. validation failed
+    // at the AI SDK layer before our execute() ran). Recover using the input the
+    // SDK carries on the error part so the original payload is preserved in DB.
+    if (part.input === undefined) {
+      logger.warn(
+        "[AI Stream] Tool error with no pending message and no input",
+        {
+          toolName: part.toolName,
+          toolCallId: part.toolCallId,
+        },
+      );
+      return null;
+    }
+    const prep = await state.ensureAssistantMessage(ctx.currentParentId);
+    const toolCallId = part.toolCallId;
+    const recoveredToolCall: ToolCall = {
+      toolCallId,
+      toolName: part.toolName,
+      args: part.input as WidgetData,
+      creditsUsed: 0,
+      requiresConfirmation: false,
+      isConfirmed: false,
+      waitingForConfirmation: false,
+      isPartial: false,
+      status: "failed",
+    };
+    const toolMessageId = crypto.randomUUID();
+    const parentId = prep.currentParentId;
+    await dbWriter.emitToolCall({
+      toolMessageId,
+      threadId,
+      parentId,
+      userId,
+      model,
+      skill,
+      sequenceId,
+      toolCall: recoveredToolCall,
+    });
+    return emitOriginalToolError(state, part, toolMessageId, {
+      toolCall: recoveredToolCall,
+      parentId,
+    });
   }
 
   const { messageId: toolMessageId, toolCallData } = pendingToolMessage;

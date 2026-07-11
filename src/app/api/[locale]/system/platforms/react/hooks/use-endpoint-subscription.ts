@@ -43,6 +43,43 @@ import {
 import { toCacheKeyParams } from "./query-key-builder";
 import { queryClient } from "./store";
 
+/**
+ * Active handler registrations per cache key, in mount order. Multiple
+ * subscription instances for the SAME endpoint + params (e.g. the messages
+ * widget and the IncognitoStreamKeeper deliberately overlapping so thread
+ * navigation never has an unsubscribed gap) would otherwise each apply every
+ * event to the shared cache — duplicating appended deltas and re-running
+ * onEvent side effects. Only the FIRST registrant (the owner) applies events;
+ * when it unmounts the next one takes over seamlessly. The wire subscription
+ * itself is ref-counted in realtime/client.ts, so overlapping instances never
+ * drop the channel.
+ */
+const eventApplierRegistry = new Map<string, symbol[]>();
+
+function registerEventApplier(cacheKey: string, token: symbol): void {
+  const tokens = eventApplierRegistry.get(cacheKey) ?? [];
+  tokens.push(token);
+  eventApplierRegistry.set(cacheKey, tokens);
+}
+
+function unregisterEventApplier(cacheKey: string, token: symbol): void {
+  const tokens = eventApplierRegistry.get(cacheKey);
+  if (!tokens) {
+    return;
+  }
+  const idx = tokens.indexOf(token);
+  if (idx !== -1) {
+    tokens.splice(idx, 1);
+  }
+  if (tokens.length === 0) {
+    eventApplierRegistry.delete(cacheKey);
+  }
+}
+
+function isEventApplierOwner(cacheKey: string, token: symbol): boolean {
+  return eventApplierRegistry.get(cacheKey)?.[0] === token;
+}
+
 export function useEndpointSubscription(
   endpoint: CreateApiEndpointAny | null,
   enabled: boolean,
@@ -87,6 +124,13 @@ export function useEndpointSubscription(
   useEffect(() => {
     if (!enabled || !endpoint?.events) {
       return;
+    }
+
+    // Exactly-once application per cache key across overlapping subscription
+    // instances (see eventApplierRegistry above).
+    const applierToken = Symbol("endpoint-subscription");
+    if (cacheKey !== undefined) {
+      registerEventApplier(cacheKey, applierToken);
     }
 
     const resolvedParams = urlPathParamsRef.current ?? {};
@@ -138,6 +182,17 @@ export function useEndpointSubscription(
         return;
       }
 
+      // Exactly-once across overlapping subscription instances: when several
+      // instances share this cacheKey (widget + IncognitoStreamKeeper), only
+      // the registry owner applies the event — otherwise every delta would
+      // append twice and every onEvent side effect would run twice.
+      if (
+        cacheKey !== undefined &&
+        !isEventApplierOwner(cacheKey, applierToken)
+      ) {
+        return;
+      }
+
       if (eventDeclarationHasFields(declaration) && cacheKey !== undefined) {
         queryClient.setQueryData(
           [cacheKey],
@@ -156,7 +211,13 @@ export function useEndpointSubscription(
                 ? appendDeltaToCache(existing.data, wirePayload)
                 : operation === "remove"
                   ? removeFromCache(existing.data, wirePayload)
-                  : applyPartialToCache(existing.data, wirePayload);
+                  : // upsert may insert unknown ids (creation events carrying the
+                    // full item); plain merge only patches items already present.
+                    applyPartialToCache(
+                      existing.data,
+                      wirePayload,
+                      operation === "upsert",
+                    );
 
             if (newData === existing.data) {
               return existing;
@@ -217,6 +278,9 @@ export function useEndpointSubscription(
     }
 
     return (): void => {
+      if (cacheKey !== undefined) {
+        unregisterEventApplier(cacheKey, applierToken);
+      }
       for (const unsub of unsubscribers) {
         unsub();
       }

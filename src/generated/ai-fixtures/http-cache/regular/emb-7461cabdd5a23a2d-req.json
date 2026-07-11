@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "[T11c i2v-url-as-text] Here is a photo URL: https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800 — make a nice foto out of it for my resume and tinder profile. the generate_video tool with prompt='professional portrait, smooth camera pull-back' inputMediaUrl='https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800'. You MUST make this tool call NOW, in this turn — do NOT reuse or re-analyze a video result from an earlier turn. Check that the fresh result has a non-empty videoUrl, a positive creditCost, and a positive durationSeconds. End your reply with STEP_OK if correct, or FAILED: <reason>.",
+    "encoding_format": "float"
+  }
+}

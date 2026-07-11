@@ -407,6 +407,11 @@ export class ThreadsRepository {
 
     // ONE-TIME creation sugar: a thread born inside REMOTE/<instance> runs its
     // loop there. The stamp lands in the column; placement never routes again.
+    // originInstanceId stays whatever the caller passed (NULL for a source
+    // thread) — a non-null origin marks a MIRROR; the loop/relay guards treat
+    // origin-set threads as foreign copies, so we must NOT stamp it here for a
+    // source thread the user created in a REMOTE tab. Placement on the peer is
+    // resolved by the receiver from the folder path, not by an origin stamp.
     const effectiveLoopInstanceId =
       loopInstanceId !== undefined
         ? loopInstanceId

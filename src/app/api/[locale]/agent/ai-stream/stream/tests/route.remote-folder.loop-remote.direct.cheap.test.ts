@@ -31,7 +31,7 @@ const hooks = makeDirectSetup(_remoteUrl, { createRemoteFolder: true });
 if (_remoteUrl && _isFixtureMode) {
   describeStreamSuite({
     label: `Remote Folder — loop on REMOTE (cheap, direct-HTTP, ${_remoteUrl})`,
-    cachePrefix: "rf-loop-remote-direct-cheap-",
+    cachePrefix: "rf-loop-remote-cheap-",
     cheapMode: true,
     systemPromptInstanceId: HERMES_INSTANCE_ID,
     expectRelayTransport: "direct-http",

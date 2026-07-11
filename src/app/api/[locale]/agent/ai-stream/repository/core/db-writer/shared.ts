@@ -74,8 +74,13 @@ export interface DbWriterState {
   readonly streamContext: ToolExecutionContext;
 }
 
-/** Throttle window in ms - coalesces content updates to same message */
-export const THROTTLE_MS = 300;
+/**
+ * Throttle window in ms - coalesces content updates to same message so rapid
+ * token deltas don't hammer the DB in prod. Collapses to 0 under `test` (fixture
+ * replay): there is no DB-hammering concern in a test run, and the 300ms trailing
+ * timer on every intermediate delta added dead wall-clock to every replayed turn.
+ */
+export const THROTTLE_MS = process.env.NODE_ENV === "test" ? 0 : 300;
 
 /** Map a MIME type to an uploads mount type folder */
 export function getMimeTypeFolder(mimeType: string): string {

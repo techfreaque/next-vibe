@@ -85,6 +85,10 @@ export class ChatFavoritesRepositoryClient {
     return {
       id: stored.id,
       skillId: stored.skillId,
+      // Load-bearing for model resolution: local favorites store the merged
+      // "skillSlug__variantId" format, so the variant must be split out for
+      // the skill-variant cascade to pick this favorite's variant.
+      variantId: parseSkillId(stored.skillId).variantId,
       modelSelection: stored.modelSelection ?? null,
       voiceModelSelection: stored.voiceModelSelection ?? null,
       sttModelSelection: null,

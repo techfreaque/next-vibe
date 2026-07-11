@@ -45,6 +45,13 @@ export interface SystemPromptServerParams {
   isExposedFolder: boolean;
   /** Model-pipe relay receiver — blank this instance's own identity fragment. */
   suppressSelfIdentity?: boolean;
+  /**
+   * Relay RECEIVER only: the caller instance id that OWNS this thread. When set,
+   * thread-mutating housekeeping tools (rename-thread) must round-trip to the
+   * caller — the fragment prefixes the tool name `<caller>__rename-thread` so the
+   * rename lands on the OWNER, not this executor's local copy.
+   */
+  relayCallerInstanceId?: string | null;
   excludeMemories?: boolean;
   /** Whether running in headless mode (no human present) */
   headless?: boolean;
@@ -62,6 +69,10 @@ export interface SystemPromptServerParams {
   messageEmbedReady?: Promise<void>;
   /** Active thread ID — passed to fragments that need thread context (e.g. rename) */
   threadId?: string | null;
+  /** Incognito only: client-sent current thread title (no DB row exists to read it from). */
+  incognitoThreadTitle?: string | null;
+  /** Incognito only: client-sent current thread description. */
+  incognitoThreadDescription?: string | null;
   /** Resolved memory token limit from cascade: favorite → skill → settings → null (use default) */
   memoryLimit?: number | null;
   /** Resolved media generation capabilities for the current request */

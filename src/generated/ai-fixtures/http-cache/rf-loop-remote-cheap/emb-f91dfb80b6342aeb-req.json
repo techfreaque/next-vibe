@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Both tools executed in parallel. The tool-help call returned 528 tools across 22 categories successfully. The cortex-write with approve mode returned a confirmed result (the user/system approved it).\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

@@ -486,7 +486,7 @@ export async function clearStreamingState(
 
   // Bubble last-activity up the full ancestor chain so nested folders sort correctly in sidebar
   if (thread?.folderId) {
-    await bubbleFolderActivity(thread.folderId, now);
+    await bubbleFolderActivity(thread.folderId, now, logger, user);
   }
 
   // Fan the terminal transition out on ALL three channels, routed to the
@@ -537,7 +537,7 @@ export async function setStreamingStateWaiting(
 
   // Bubble last-activity up the full ancestor chain so nested folders sort correctly in sidebar
   if (thread?.folderId) {
-    await bubbleFolderActivity(thread.folderId, now);
+    await bubbleFolderActivity(thread.folderId, now, logger, user);
   }
 
   // Fan the WAITING transition out so the sidebar shows the stop button — this

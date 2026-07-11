@@ -131,6 +131,19 @@ export async function createAndSendUserMessage(
       messageHistory.reverse();
     }
 
+    // Incognito threads live only in localStorage - send their current
+    // title/description so the server-side thread-rename prompt fragment can
+    // see them (server threads read this from their DB row instead).
+    let incognitoThreadTitle: string | null = null;
+    let incognitoThreadDescription: string | null = null;
+    if (currentRootFolderId === DefaultFolderId.INCOGNITO && threadId) {
+      const { getIncognitoThread } =
+        await import("@/app/api/[locale]/agent/chat/incognito/storage");
+      const incognitoThread = await getIncognitoThread(threadId);
+      incognitoThreadTitle = incognitoThread?.title ?? null;
+      incognitoThreadDescription = incognitoThread?.description ?? null;
+    }
+
     // Optimistically add user message to store for immediate UI feedback.
     // The server will emit USER MESSAGE_CREATED with the correct parentId/depth,
     // which will update (replace) this optimistic entry in the store.
@@ -278,6 +291,8 @@ export async function createAndSendUserMessage(
       favoriteConfig,
       toolConfirmations: params.toolConfirmations ?? null,
       messageHistory: messageHistory ?? [],
+      incognitoThreadTitle,
+      incognitoThreadDescription,
       attachments: attachments && attachments.length > 0 ? attachments : null,
       voiceMode: effectiveVoiceMode,
       audioInput: audioInput ?? { file: null },

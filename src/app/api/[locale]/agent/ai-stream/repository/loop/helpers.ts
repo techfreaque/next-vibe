@@ -128,15 +128,33 @@ export function buildSyntheticToolCall(
   mediaType: string,
   mediaUrl: string,
   creditCost: number,
+  model: string,
 ): ToolCall {
   const toolCallId = crypto.randomUUID();
   // args.prompt is intentionally empty for natively-generated media (Gemini file parts).
   // An empty prompt signals to gap-fill that the content is unknown - so on the next turn
   // with a model that cannot see the media natively, the vision bridge kicks in to produce
   // a text description before the AI run starts.
-  const args: ToolCall["args"] = { prompt: "" };
+  // args.model IS the resolved chat model — for native gen the chat model AND the
+  // image model are the same (e.g. gemini-3.1-flash-image-preview). The real
+  // generate_image tool records `model` as an input; the synthetic call must match
+  // so the media-gen widget + assertions see the model that actually produced it.
+  const args: ToolCall["args"] = { prompt: "", model };
+  // The synthetic tool call is rendered by the REAL media-gen widget (toolName =
+  // generate_image / generate_video / generate_music). Each of those widgets reads
+  // the URL from its OWN typed field — imageUrl / videoUrl / audioUrl — NOT `file`.
+  // Emitting only `file` left the widget with nothing to render → "no image in
+  // chat". So expose the URL under the tool's canonical field too. `file` stays
+  // for gap-fill's empty-text/native-gen signal (gap-fill reads file ∪ *Url).
+  const urlField: "imageUrl" | "videoUrl" | "audioUrl" =
+    generatedType === "image"
+      ? "imageUrl"
+      : generatedType === "video"
+        ? "videoUrl"
+        : "audioUrl";
   const result: ToolCall["result"] = {
     file: mediaUrl,
+    [urlField]: mediaUrl,
     // text is intentionally empty for natively-generated media (Gemini file parts).
     // Gap-fill Pass 2 (bridgeMediaUrl) uses vision bridge to populate it on the first
     // non-image-capable turn. An empty text here signals that the bridge is needed.

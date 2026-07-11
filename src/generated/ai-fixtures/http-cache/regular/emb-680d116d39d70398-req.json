@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "[T6v video-gen] Generate a 'spinning cube' video that morphs from this photo https://pngimg.com/uploads/wojak/wojak_PNG109612.png (the FIRST frame) into the image YOU generated earlier in this conversation (that earlier generated image is the LAST frame — find its URL in your own prior tool results / conversation history; do NOT reuse the first-frame photo for it). Call the generate_video tool with prompt='spinning cube' and frameReferences=[{url:'https://pngimg.com/uploads/wojak/wojak_PNG109612.png',role:'first'},{url:<your earlier generated image URL>,role:'last'}]. Check that the result has a non-empty videoUrl, a positive creditCost, and a positive durationSeconds. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

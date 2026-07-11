@@ -140,12 +140,12 @@ export const translations = {
   post: {
     title: "Speech to Text",
     titleShort: "Speech to Text",
+    dynamicTitle: "Transcript: {{text}}",
     description:
-      "Convert audio to text using AI transcription (0.013 credits per second, 0.78 credits per minute)",
+      "Transcribe audio to text. Upload an audio file (MP3, WAV, WebM, max 25MB). Cost: ~0.013 credits/second. Returns the transcribed text, provider used, and confidence score.",
     form: {
       title: "Audio Transcription",
-      description:
-        "Upload an audio file to transcribe (0.013 credits per second, 0.78 credits per minute)",
+      description: "Upload an audio file to transcribe",
     },
     fileUpload: {
       title: "Audio File Upload",

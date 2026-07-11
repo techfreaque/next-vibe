@@ -248,6 +248,15 @@ export const translations: typeof enTranslations = {
       label: "Blatt-Nachrichten-ID",
       description: "Aktuelle Zweig-Blatt-Nachrichten-ID",
     },
+    incognitoThreadTitle: {
+      label: "Inkognito-Thread-Titel",
+      description:
+        "Aktueller Titel des Inkognito-Threads - vom Client gesendet, da Inkognito-Threads keine Server-Zeile haben",
+    },
+    incognitoThreadDescription: {
+      label: "Inkognito-Thread-Beschreibung",
+      description: "Aktuelle Beschreibung des Inkognito-Threads",
+    },
     messageHistory: {
       label: "Nachrichtenverlauf",
       description: "Optionaler Nachrichtenverlauf für Inkognito-Modus",

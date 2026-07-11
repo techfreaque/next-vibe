@@ -53,6 +53,17 @@ const { POST } = createEndpoint({
   title: "post.title",
   titleShort: "post.titleShort",
   description: "post.description",
+  dynamicTitle: ({ response }) => {
+    const text = response?.response?.text;
+    if (!text?.trim()) {
+      return undefined;
+    }
+    const short = text.length > 50 ? `${text.slice(0, 50)}...` : text;
+    return {
+      message: "post.dynamicTitle" as const,
+      messageParams: { text: short },
+    };
+  },
   icon: "mic",
   category: "ai",
   subCategory: "Generation",

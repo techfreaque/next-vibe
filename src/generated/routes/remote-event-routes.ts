@@ -71,8 +71,7 @@ export async function getRemoteEventRoutes(): Promise<RemoteEventRouteEntry[]> {
     {
       path: agent_chat_folder_contents_rootFolderId_GETDef.default.GET.path,
       method: "GET",
-      importRoute: () =>
-        import("@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/route"),
+      importRoute: () => import("@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/route"),
     },
     {
       path: agent_chat_threads_GETDef.default.GET.path,
@@ -87,20 +86,17 @@ export async function getRemoteEventRoutes(): Promise<RemoteEventRouteEntry[]> {
     {
       path: agent_chat_threads_threadId_DELETEDef.default.DELETE.path,
       method: "DELETE",
-      importRoute: () =>
-        import("@/app/api/[locale]/agent/chat/threads/[threadId]/route"),
+      importRoute: () => import("@/app/api/[locale]/agent/chat/threads/[threadId]/route"),
     },
     {
       path: agent_chat_threads_threadId_messages_GETDef.default.GET.path,
       method: "GET",
-      importRoute: () =>
-        import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/route"),
+      importRoute: () => import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/route"),
     },
     {
       path: agent_chat_threads_threadId_PATCHDef.default.PATCH.path,
       method: "PATCH",
-      importRoute: () =>
-        import("@/app/api/[locale]/agent/chat/threads/[threadId]/route"),
+      importRoute: () => import("@/app/api/[locale]/agent/chat/threads/[threadId]/route"),
     },
     {
       path: agent_cortex_delete_DELETEDef.default.DELETE.path,
@@ -135,26 +131,22 @@ export async function getRemoteEventRoutes(): Promise<RemoteEventRouteEntry[]> {
     {
       path: agent_skills_favorites_create_POSTDef.default.POST.path,
       method: "POST",
-      importRoute: () =>
-        import("@/app/api/[locale]/agent/skills/favorites/create/route"),
+      importRoute: () => import("@/app/api/[locale]/agent/skills/favorites/create/route"),
     },
     {
       path: agent_skills_favorites_id_DELETEDef.default.DELETE.path,
       method: "DELETE",
-      importRoute: () =>
-        import("@/app/api/[locale]/agent/skills/favorites/[id]/route"),
+      importRoute: () => import("@/app/api/[locale]/agent/skills/favorites/[id]/route"),
     },
     {
       path: agent_skills_favorites_id_PATCHDef.default.PATCH.path,
       method: "PATCH",
-      importRoute: () =>
-        import("@/app/api/[locale]/agent/skills/favorites/[id]/route"),
+      importRoute: () => import("@/app/api/[locale]/agent/skills/favorites/[id]/route"),
     },
     {
       path: agent_skills_favorites_reorder_POSTDef.default.POST.path,
       method: "POST",
-      importRoute: () =>
-        import("@/app/api/[locale]/agent/skills/favorites/reorder/route"),
+      importRoute: () => import("@/app/api/[locale]/agent/skills/favorites/reorder/route"),
     },
     {
       path: agent_skills_id_DELETEDef.default.DELETE.path,
@@ -169,8 +161,7 @@ export async function getRemoteEventRoutes(): Promise<RemoteEventRouteEntry[]> {
     {
       path: agent_skills_id_publish_PATCHDef.default.PATCH.path,
       method: "PATCH",
-      importRoute: () =>
-        import("@/app/api/[locale]/agent/skills/[id]/publish/route"),
+      importRoute: () => import("@/app/api/[locale]/agent/skills/[id]/publish/route"),
     },
     {
       path: system_execute_tool_POSTDef.default.POST.path,

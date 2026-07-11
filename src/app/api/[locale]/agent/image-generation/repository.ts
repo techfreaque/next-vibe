@@ -333,11 +333,15 @@ export class ImageGenerationRepository {
 
     let { imageUrl } = generationResult.data;
 
-    // Upload to our storage so the URL is persistent and access-controlled
+    // Fetch image bytes and upload to storage. Incognito threads have no
+    // server-side thread row — the file is owned by the caller's leadId and
+    // served only to that lead (browser); inlining as a base64 data URI is
+    // forbidden (it blows up the model context on subsequent turns).
     const scThreadId = streamContext.threadId;
+    const isIncognito =
+      streamContext.rootFolderId === DefaultFolderId.INCOGNITO;
     if (scThreadId) {
       try {
-        const storage = getStorageAdapter();
         const imgRes = await fetchImpl(imageUrl);
         if (!imgRes.ok) {
           // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- intentional throw to fall through to catch
@@ -355,23 +359,20 @@ export class ImageGenerationRepository {
               : magic[0] === 0x52 && magic[1] === 0x49
                 ? "webp"
                 : "png";
+        const storage = getStorageAdapter();
         const uploadResult = await storage.uploadFile(imageBuffer, {
           filename: `generated-image-${Date.now()}.${ext}`,
           mimeType: `image/${ext}`,
           threadId: scThreadId,
-          userId: user.id,
+          userId: isIncognito ? undefined : user.id,
+          leadId: isIncognito ? user.leadId : undefined,
         });
         imageUrl = uploadResult.url;
       } catch (uploadErr) {
-        logger.error(
-          "[ImageGen] Failed to upload to storage, using provider URL",
-          {
-            error:
-              uploadErr instanceof Error
-                ? uploadErr.message
-                : String(uploadErr),
-          },
-        );
+        logger.error("[ImageGen] Failed to process image, using provider URL", {
+          error:
+            uploadErr instanceof Error ? uploadErr.message : String(uploadErr),
+        });
       }
     }
 
@@ -531,8 +532,11 @@ export class ImageGenerationRepository {
     }
 
     // Re-upload from ephemeral storage to the real thread's storage so the
-    // file-serving route can find it (it checks thread ownership in DB).
+    // file-serving route can find it. Incognito threads have no server-side
+    // thread row — the file is owned by the caller's leadId instead.
     const scThreadId = streamContext.threadId;
+    const isIncognito =
+      streamContext.rootFolderId === DefaultFolderId.INCOGNITO;
     if (scThreadId) {
       try {
         const storage = getStorageAdapter();
@@ -566,19 +570,15 @@ export class ImageGenerationRepository {
           filename: `generated-image-${Date.now()}.${ext}`,
           mimeType: `image/${ext}`,
           threadId: scThreadId,
-          userId: user.id,
+          userId: isIncognito ? undefined : user.id,
+          leadId: isIncognito ? user.leadId : undefined,
         });
         imageUrl = uploadResult.url;
       } catch (uploadErr) {
-        logger.error(
-          "[ImageGen] Failed to re-upload headless image to thread storage",
-          {
-            error:
-              uploadErr instanceof Error
-                ? uploadErr.message
-                : String(uploadErr),
-          },
-        );
+        logger.error("[ImageGen] Failed to process headless image", {
+          error:
+            uploadErr instanceof Error ? uploadErr.message : String(uploadErr),
+        });
         // Fall through with the ephemeral URL
       }
     }

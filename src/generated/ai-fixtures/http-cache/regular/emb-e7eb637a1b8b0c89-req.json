@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The image is a minimalist graphic of the Japanese national flag — a solid crimson red circle (Hinomaru) perfectly centered on a uniform white background, with clean sharp edges and no other elements.\n\nThe audio is a ~26-second upbeat synth-pop/dream pop track at ~120-130 BPM in 4/4 time, featuring a clean drum machine beat, warm synth bassline, bright plucked lead melody, and soft pad synths — consistently cheerful and optimistic with no speech present.\n\nBoth the image description and audio description were successfully received and processed.\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

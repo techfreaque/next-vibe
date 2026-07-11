@@ -25,7 +25,8 @@ export async function onFilePart(
   state: StreamLoopState,
   file: GeneratedFile,
 ): Promise<void> {
-  const { ctx, threadId, model, skill, userId, logger } = state.p;
+  const { ctx, threadId, model, skill, userId, isIncognito, user, logger } =
+    state.p;
   const prompt = state.p.ctx.mediaPrompt;
   const creditCost = state.p.ctx.mediaCreditCost;
 
@@ -56,11 +57,14 @@ export async function onFilePart(
   let mediaUrl: string | undefined;
   try {
     const storage = getStorageAdapter();
+    // Incognito threads have no server-side thread row — the file is owned by
+    // the caller's leadId and served only to that lead (browser).
     const uploadResult = await storage.uploadFile(buffer, {
       filename,
       mimeType: mediaType,
       threadId,
-      userId,
+      userId: isIncognito ? undefined : userId,
+      leadId: isIncognito ? user.leadId : undefined,
     });
     mediaUrl = uploadResult.url;
     logger.debug("[FilePartHandler] Uploaded generated media", {

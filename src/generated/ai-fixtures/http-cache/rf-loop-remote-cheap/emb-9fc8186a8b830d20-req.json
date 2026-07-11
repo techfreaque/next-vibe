@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/remote/tool-help---category--query--detail-0783984c-f040-417f-879e-14c416270735.md\n\n# Tool Help - Category, Query, Detail\nFolder: remote\nDescription: Testing tool-help across three modes: category filter, keyword search, and single tool schema retrieval.",
+    "encoding_format": "float"
+  }
+}

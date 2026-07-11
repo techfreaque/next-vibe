@@ -48,6 +48,7 @@ export class S3StorageAdapter implements StorageAdapter {
       threadId: string;
       messageId?: string;
       userId?: string;
+      leadId?: string;
     },
   ): Promise<{
     url: string;
@@ -110,6 +111,7 @@ export class S3StorageAdapter implements StorageAdapter {
       size,
       uploadedAt: new Date(),
       uploadedBy: metadata.userId,
+      leadId: metadata.leadId,
       threadId: metadata.threadId,
       messageId: metadata.messageId,
     };

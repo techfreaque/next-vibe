@@ -49,6 +49,20 @@ const FavoritesListContainer = lazyWidget(() =>
  * Get Favorites List Endpoint (GET)
  * Retrieves all favorites for the current user
  */
+/**
+ * `favorite-created` event envelope. Hoisted so onEvent can parse the wire
+ * payload explicitly — the self-referential events-map inference does not
+ * reach a payloadType consumed in the SAME definition's onEvent.
+ */
+const favoriteCreatedPayloadSchema = z.object({
+  id: z.string().optional(),
+  skillId: z.string().optional(),
+  customVariantName: z.string().nullable().optional(),
+  icon: iconSchema.optional(),
+  voiceModelSelection: voiceModelSelectionSchema.nullable().optional(),
+  modelSelection: chatModelSelectionSchema.nullable().optional(),
+});
+
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
@@ -327,20 +341,16 @@ const { GET } = createEndpoint({
     "favorite-created": {
       operation: "merge" as const,
       allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
-      payloadType: z.object({
-        skillId: z.string().optional(),
-        customVariantName: z.string().nullable().optional(),
-        icon: iconSchema.optional(),
-        voiceModelSelection: voiceModelSelectionSchema.nullable().optional(),
-        modelSelection: chatModelSelectionSchema.nullable().optional(),
-      }),
+      payloadType: favoriteCreatedPayloadSchema,
       onEvent: async ({
-        payload,
+        payload: rawPayload,
         logger,
         locale,
         user,
         agentEnvAvailability,
       }) => {
+        // Explicit envelope parse (see favoriteCreatedPayloadSchema above).
+        const payload = favoriteCreatedPayloadSchema.parse(rawPayload);
         const [
           { apiClient },
           favoritesDefinition,

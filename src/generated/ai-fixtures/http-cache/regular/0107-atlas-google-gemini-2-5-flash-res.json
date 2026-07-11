@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a19244a36c251e30-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 10 Jul 2026 20:20:19 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783714817-ZPrP4F7uxA9lqoZtHh0i"
+  },
+  "body": {
+    "id": "gen-1783714817-ZPrP4F7uxA9lqoZtHh0i",
+    "object": "chat.completion",
+    "created": 1783714817,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The audio is a short clip of a relaxed, groovy lounge jazz track, approximately 20 seconds in duration.\n\n**Tempo:** 90-100 BPM (a medium, relaxed pace)\n**Time Signature:** 4/4\n**Key:** E minor (although only two chords are played consistently, suggesting this key)\n\n**Instrumentation and Arrangement:**\n\n*   **Drums:** Play a simple, steady jazz-funk beat. The kick drum is subtle, the snare provides a backbeat, and a closed hi-hat plays a consistent, light rhythm. The hi-hat has a slightly splashy, open sound at times, giving it a cool, understated quality. The drumming is consistent throughout the clip.\n*   **Bass Guitar:** Plays a simple, two-note walking bass line. The bass is prominent and provides the main rhythmic and harmonic foundation, feeling very groovy. It's a clean, slightly muted tone.\n*   **Electric Guitar (Rhythm):** Plays a high, clean, and arpeggiated chord, often a minor ninth chord (E minor 9th, then Aminor 9th), with a very subtle reggae-like skank feel. It's playing on the off-beats, creating a light, airy rhythmic texture. This is a very clean, almost hollow electric guitar sound.\n*   **Electric Guitar (Melody/Lead):** Plays a simple, repeating melody. It has a slightly overdriven, bluesy-jazz tone, yet remains smooth and clean. The melody is fairly straightforward, using classic blues/minor pentatonic phrasing. This guitar is less prominent than the rhythm guitar, blending into the overall mix.\n*   **Piano:** Plays a light, chordal accompaniment, often with extended harmonies like major or minor ninths. The piano feels a bit atmospheric, adding to the lounge feel without being overtly melodic.\n*   **Synthesizer (Pad):** A very subtle, warm pad sound provides background atmosphere, filling out the sonic space.\n\n**Song Structure & Progression:**\nThe clip features a two-chord progression that repeats:\n*   **E minor 9th (or similar extended E minor chord)**\n*   **A minor 9th (or similar extended A minor chord)**\n\nThis simple progression is the backbone of the entire clip, creating a relaxed, slightly melancholic, but ultimately groovy vibe. All instruments maintain their respective roles and patterns without significant changes throughout the clip.\n\n**Production Style:**\nThe production is polished and clean, with a good mix that allows each instrument to be heard clearly. There's a moderate amount of reverb on the melodic guitar and piano, contributing to the lounge atmosphere.\n\n**Mood and Emotional Arc:**\nThe mood is relaxed, chill, and slightly sophisticated. It evokes images of a lounge, a cafe, or background music for a calm activity. The minor harmonies give it a touch of introspection, but the steady groove keeps it from being overtly sad.\n\n**Sound Quality:**\nHigh quality, studio-recorded sound. No discernable background noise or artifacts.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 639,
+      "total_tokens": 1711,
+      "cost": 0.0024441,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0024441,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.0015975
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

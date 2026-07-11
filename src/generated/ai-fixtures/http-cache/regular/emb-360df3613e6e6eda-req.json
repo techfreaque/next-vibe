@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/gens/video/2026-07/professional-portrait-smooth-camera-pull-back-8d5a62ef-b819-48b0-8ef1-1e87bacf1580.md\n\n---\nprompt: \"professional portrait, smooth camera pull-back\"\nmediaType: \"video\"\nmediaUrl: \"http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/199c1a6d-e02c-479f-9e1e-7883608ae664/c572f316-74a5-4674-8058-af41e26edee4.mp4\"\ntool: \"generate_video\"\nthreadId: \"199c1a6d-e02c-479f-9e1e-7883608ae664\"\nthreadTitle: \"Tool Help QA Suite\"\ngeneratedAt: \"2026-07-10T17:25:47.790Z\"\ncreditCost: 48\ndurationSeconds: 4\n---\n\n# professional portrait, smooth camera pull-back\n\n**Video:** [View](http://localhost:3000/api/en-GLOBAL/agent/chat/threads/files/199c1a6d-e02c-479f-9e1e-7883608ae664/c572f316-74a5-4674-8058-af41e26edee4.mp4)\n\n| Field | Value |\n| --- | --- |\n| Type | video |\n| Tool | `generate_video` |\n| Thread | Tool Help QA Suite |\n| Generated | 2026-07-10 |\n| Credits | 48 |\n| Duration | 4s |",
+    "encoding_format": "float"
+  }
+}

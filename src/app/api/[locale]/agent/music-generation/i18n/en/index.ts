@@ -8,7 +8,8 @@ export const translations = {
     title: "Generate Music",
     titleShort: "Generate Music",
     dynamicTitle: "Music: {{prompt}}",
-    description: "Generate music from a text prompt using AI",
+    description:
+      "Generate music from a text prompt. Use list-models with modelType=audio to see available music models. Pass model id to select a specific model, or leave blank for the user's default. Optionally pass inputMediaUrl for audio-to-audio style transfer. Returns audioUrl and durationSeconds.",
     form: {
       title: "Music Generation",
       description: "Enter a prompt to generate music",
@@ -21,7 +22,7 @@ export const translations = {
     model: {
       label: "Model",
       description:
-        "Music generation model. Leave blank to use the user's configured default.",
+        "Music generation model id. Leave blank for user default. Use list-models (modelType=audio) to browse available models.",
     },
     duration: {
       label: "Duration",
@@ -33,7 +34,7 @@ export const translations = {
     inputMediaUrl: {
       label: "Reference Audio URL",
       description:
-        "Source audio for style transfer or remix. The model will use this as a starting point.",
+        "Audio URL for style transfer or remix. The model uses this as a starting point. Only works with models that support audio input.",
       placeholder: "https://example.com/audio.mp3",
     },
     download: "Download",

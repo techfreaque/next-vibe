@@ -143,6 +143,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Mowa na tekst",
     titleShort: "Mowa na tekst",
+    dynamicTitle: "Transkrypt: {{text}}",
     description:
       "Konwertuj audio na tekst za pomocą transkrypcji AI (0,013 kredytów na sekundę, 0,78 kredytów na minutę)",
     form: {

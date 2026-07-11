@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a19241753fd21e30-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 10 Jul 2026 20:18:08 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783714686-0voLG1rkbALv7qxVd0x3"
+  },
+  "body": {
+    "id": "gen-1783714686-0voLG1rkbALv7qxVd0x3",
+    "object": "chat.completion",
+    "created": 1783714686,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The audio is a short clip of a bright, upbeat synth-pop music track, approximately 26 seconds in duration.\n\n**Music Description:**\n*   **Genre:** Synth-Pop / Dream Pop\n*   **Tempo:** Approximately 120-130 BPM (moderately fast).\n*   **Key/Scale:** Difficult to discern definitively, but sounds like a major key.\n*   **Time Signature:** Common time (4/4).\n\n**Instrumentation and Arrangement:**\n\n*   **Drums (0:00-0:26):** A clean, tight drum machine beat. It features a prominent, punchy kick drum on the first beat of each measure, a sharp snare drum on the off-beats (2 and 4), and a consistent closed hi-hat pattern creating a steady, driving rhythm. There's a slight open hi-hat or cymbal accent at the start of every four or eight-measure phrase, providing a subtle lift.\n*   **Bass (0:00-0:26):** A smooth, sustained synth bassline, playing a simple, repeating melodic pattern that provides a foundational groove. It has a slightly rounded, warm tone.\n*   **Lead Synth / Melody (0:00-0:26):** A bright, plucked or mallet-like synth sound plays a catchy, repeating melodic motif. It has a high-pitched, almost bell-like quality, contributing significantly to the track's cheerful mood. This synth is the most prominent melodic element.\n*   **Pad Synth / Harmony (0:00-0:26):** A soft, sustained synth pad provides harmonic backing, filling out the soundscape without being overly prominent. It has a slightly ethereal or dreamy quality.\n\n**Production Style:**\nThe production is clean and polished, characteristic of modern synth-pop. There's a moderate amount of reverb on the synths, especially the lead melody, giving it a sense of space. The mix is balanced, with each instrument clearly audible.\n\n**Mood and Emotional Arc:**\nThe music consistently maintains a cheerful, light, and optimistic mood throughout the clip. It evokes feelings of ease and pleasantness.\n\n**Sound Quality:** Good, clear digital recording quality.\n\n**No speech or other non-musical sounds are present.**",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 486,
+      "total_tokens": 1558,
+      "cost": 0.0020616,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0020616,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.001215
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

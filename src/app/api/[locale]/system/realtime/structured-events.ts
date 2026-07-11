@@ -56,12 +56,21 @@ type NestedFieldSpec<TResponseOutput> = {
 
 /**
  * The mutation/action an event represents — drives cache-update semantics on the
- * client (append → add, merge → patch, remove → delete) plus non-cache signals
- * (listen/status/check/retry/send/tunnel).
+ * client (append → add, merge → patch EXISTING items only, upsert → patch or
+ * insert, remove → delete) plus non-cache signals (listen/status/check/retry/
+ * send/tunnel).
+ *
+ * merge vs upsert: `merge` NEVER inserts unknown array items — an update-ish
+ * event (title changed, streaming state changed) referencing a thread that is
+ * not in this cache must be a no-op, otherwise it materializes a partial
+ * "ghost" stub (no type/title) in lists that never contained the item. Only
+ * creation events (`*-created`) declare `upsert`, and they must carry the
+ * COMPLETE item shape the list renders.
  */
 type EventOperation =
   | "append"
   | "merge"
+  | "upsert"
   | "remove"
   | "check"
   | "listen"

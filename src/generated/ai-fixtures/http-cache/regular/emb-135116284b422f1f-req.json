@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The attached video shows a professional close-up of a person's hands skillfully manipulating a classic 3x3 Rubik's cube. The background is a blurred collection of various puzzle cubes. The fingers perform precise, rhythmic layer rotations with crisp mechanical clicking sounds. No speech or background music — just the satisfying audio of the speed cube being turned. The clip is about 5 seconds long, well-lit with cinematic quality, and demonstrates clear proficiency in cube solving.\n\nVideo content was successfully processed via the injected vision description. Let me update the thread name while I'm at it",
+    "encoding_format": "float"
+  }
+}

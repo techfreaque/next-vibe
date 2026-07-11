@@ -4686,7 +4686,10 @@ const ROUTE_PREWARM_PATHS: string[] = [
   "users-view",
   "users_user_id_roles_DELETE",
 ];
-if (typeof window === "undefined" && process.env.NODE_ENV === "development") {
+if (
+  typeof window === "undefined" &&
+  process.env.NODE_ENV === "development"
+) {
   void (async (): Promise<void> => {
     for (const p of ROUTE_PREWARM_PATHS) {
       await getRouteHandler(p).catch(() => undefined);

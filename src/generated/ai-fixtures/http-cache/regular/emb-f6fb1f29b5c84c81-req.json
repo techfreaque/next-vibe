@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/uploads/video/audio-attachment-test-9963495d-9820-4dc1-9314-97fde3de9b21/test-video.mp4.md\n\n---\nfilename: \"test-video.mp4\"\nembedded: true\nmimeType: \"video/mp4\"\nsize: \"1.1 MB\"\nthreadId: \"9963495d-9820-4dc1-9314-97fde3de9b21\"\nthreadTitle: \"Audio Attachment Test\"\nuploadedAt: \"2026-07-10T20:19:54.726Z\"\n---\n\n# test-video.mp4\n\n**Stored:** base64-embedded (no public URL)\n\n| Field | Value |\n| --- | --- |\n| Type | `video/mp4` |\n| Size | 1.1 MB |\n| Thread | Audio Attachment Test |\n| Uploaded | 2026-07-10 |\n\n## Message Context\n\n[T10d video-attach] A video file is attached. Describe what you see in it. End your reply with STEP_OK if you could process the video, or FAILED: <reason> if you could not.",
+    "encoding_format": "float"
+  }
+}

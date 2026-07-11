@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a19243ba9c7bd262-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 10 Jul 2026 20:19:41 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783714779-RELLy186WM24bLDw8Sbh"
+  },
+  "body": {
+    "id": "gen-1783714779-RELLy186WM24bLDw8Sbh",
+    "object": "chat.completion",
+    "created": 1783714779,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The audio is a short clip, 21 seconds in duration, exhibiting a clean, polished production quality characteristic of a studio recording.\n\n**Music:**\nThe clip features a full musical arrangement, dominated by an upbeat and danceable rhythm.\n- **Tempo:** The tempo is quick, estimated around 125-130 BPM, providing a dynamic and energetic feel.\n- **Time Signature:** It appears to be in a standard 4/4 time signature.\n- **Instruments:**\n    - **Drums:** A drum kit plays a straightforward, driving hip-hop/R&B beat, with prominent snare hits on the backbeats. The kick drum is punchy, and the hi-hats maintain a steady, open groove.\n    - **Electric Guitar:** A clean-toned electric guitar plays a repetitive, rhythmic chord progression. The chords are likely a major or dominant 7th, creating a funky, soulful feel. The guitar acts as a consistent harmonic and rhythmic anchor.\n    - **Bass Guitar:** An electric bass guitar provides a walking bassline with a slightly funky, syncopated rhythm. It underpins the harmony and adds to the groove.\n    - **Percussion:** There are additional percussion elements, possibly a shaker or tambourine, lightly accentuating the beat, adding a bright texture.\n    - **Synthesizer/Keyboard:** A clean, bright-sounding synthesizer or electric piano plays a simple, catchy melody that complements the guitar, often in a call-and-response pattern with slight variations in its rhythm. Towards the end of the clip (around 0:17), this instrument takes on a more melodic role.\n\n**Mood and Emotional Arc:**\nThe overall mood is cheerful, uplifting, and energetic. The music evokes a sense of lightheartedness and movement, suitable for dancing or as background music in a positive setting. There is no discernible emotional arc within this short clip, maintaining a consistent, pleasant energy throughout.\n\n**Sound Effects:**\nThere are no distinct sound effects or non-musical audio events, apart from the musical instruments blending together.\n\n**Other characteristics:**\nThe full arrangement indicates a well-produced track, likely a snippet from a longer composition. The sound quality is excellent, with clear separation of instruments.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 470,
+      "total_tokens": 1542,
+      "cost": 0.0020216,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0020216,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.001175
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

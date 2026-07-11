@@ -193,6 +193,7 @@ export async function createUserMessageWithAttachments(params: {
   effectiveContent: string;
   effectiveParentMessageId: string | null | undefined;
   userId: string | undefined;
+  user: JwtPayloadType;
   attachments?: File[];
   logger: EndpointLogger;
   t: AiStreamT;
@@ -389,6 +390,7 @@ export async function createUserMessageWithAttachments(params: {
         content: effectiveContent,
         parentId: effectiveParentMessageId || null,
         userId,
+        user: params.user,
         authorName,
         logger,
         streamContext: params.streamContext,

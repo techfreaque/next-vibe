@@ -6,21 +6,23 @@ import type { JSX } from "react";
 
 import { TanstackPage as Page } from "@/app/[locale]/[...notFound]/page";
 
-import { toNextParams } from "../nextjs-compat-wrapper";
+import { runPageLoader, toNextParams } from "../nextjs-compat-wrapper";
 
 const loadData = createServerFn({ method: "GET" })
   .inputValidator((data: Record<string, string>) => data)
-  .handler(async ({ data }) => {
-    const { tanstackLoader } =
-      await import("@/app/[locale]/[...notFound]/page");
-    const p = toNextParams(data);
-    return tanstackLoader({
-      params: Promise.resolve({
-        ...p,
-        notFound: (p["_splat"] ?? "").split("/").filter(Boolean),
-      } as { locale: CountryLanguage; notFound: string[] }),
-    });
-  });
+  .handler(async ({ data }) =>
+    runPageLoader(async () => {
+      const { tanstackLoader } =
+        await import("@/app/[locale]/[...notFound]/page");
+      const p = toNextParams(data);
+      return tanstackLoader({
+        params: Promise.resolve({
+          ...p,
+          notFound: (p["_splat"] ?? "").split("/").filter(Boolean),
+        } as { locale: CountryLanguage; notFound: string[] }),
+      });
+    }),
+  );
 
 function PageComponent(): JSX.Element {
   return <Page {...Route.useLoaderData()} />;

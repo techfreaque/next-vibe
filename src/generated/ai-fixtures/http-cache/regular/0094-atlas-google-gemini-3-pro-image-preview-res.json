@@ -1,0 +1,75 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a192417548f9d262-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 10 Jul 2026 20:18:11 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783714686-Lgm4cJPYcrHVwIasN1rx"
+  },
+  "body": {
+    "id": "gen-1783714686-Lgm4cJPYcrHVwIasN1rx",
+    "object": "chat.completion",
+    "created": 1783714686,
+    "model": "google/gemini-3-pro-image-preview-20251120",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "A minimalist graphic illustration showing a perfect, solid crimson red circle centered on a uniformly white background. There are no other elements, text, textures, or gradients present. The edges of the circle are clean and sharp, creating a direct contrast with the surrounding white space. The entire composition is a clean, geometric design.",
+          "refusal": null,
+          "reasoning": "**Defining Geometric Elements**\n\nI'm focusing on capturing the exact geometric properties and placement of the central red circle within the frame. My aim is to provide an unembellished, factual account of its appearance and position for a specialized AI.\n\n**Describing Core Features**\n\nMy current thoughts are centered on accurately relaying the precise geometric and chromatic data. I'm detailing the perfectly centered red circle and the uniform white background, noting their minimalist, digital illustration style, and identifying it as the Japanese flag.\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Defining Geometric Elements**\n\nI'm focusing on capturing the exact geometric properties and placement of the central red circle within the frame. My aim is to provide an unembellished, factual account of its appearance and position for a specialized AI.\n\n**Describing Core Features**\n\nMy current thoughts are centered on accurately relaying the precise geometric and chromatic data. I'm detailing the perfectly centered red circle and the uniform white background, noting their minimalist, digital illustration style, and identifying it as the Japanese flag.\n\n",
+              "format": "google-gemini-v1",
+              "index": 0,
+              "signature": "CvcGAY89a1/cJF4whkxsWhqVAf8yFzOp4h1lP9DKNugIvqv0n0PHWO/ZehTa3fmhEqP45lLJ0vpoTjQpXZ4ekZa7G7pFiAf/KokTEbsbh8YtvBI3cFnS5Aoo+7XlsKAioPwaJzdyo52IO6VPBEP/wAsguMXNKWqfLQMVpb+a2r39uWgoE+gxb603f768FU0R6gb1y/W2pzqREpG+YW/UwVUy+78DIRkF5A0DN44rmILeKMjnkqQY6nXQh+MpX+Ux+2OYFHsFRoILn7mIlRGvZtq2HnEZGBH/0g6DD8OMhd8e62HCdcFDF3YYZt7b7XbDmSZxyAqnl8T13kQq6dRVWT1b34VFeizGR/6dGWPRh9sUF6rmLhphMrWSgDBz7ai+fpcgJJ7YTNSA36VOaWauFCXszMMnHxhkiHabSLz/uBuLnj+Qxq3j6oMw3jHm6RQFfwwJ7TmOkI4qtX7K4ug2i8VN/tKKD72ZoHMdEhHyU5pE+seyU0noWxLL6lxykZSboe1qMQ7MCAgNNvVqphuTDedULeD+cqHmeL5foQs3lg1iycSC09rlYvZDwqZtiz8oFQSrZYxMC0kdP6OXQgJRyLLspC44qrf6jmlT75KBd85gXFY7QtTd4wDDiqZOzKFpWHttTOPjJR5hRRoU7x5rdE1QCiEBmES+HJJKUjNydI2Ab9hbAhHuFQwmdtAJeY13A6BxgxscNOOyoII/WQJHQGsuA3eaTQdKEeDXeM6RmfJ9+zCg9N2xC98rPOJuBhVQvAPefXRDDxypMWuHrhSUsf0gGugTsnbgN1+nFa1Y5mkKge/r4fXyooSSgA9gDy5PljHV3GWfGqlzWpN+Qkfn29uK5FrE05PXLCJpGVlKV5DMmCjDhPm/eW7gm70t2kwY4ShmV7IyfV/H4UQlX0QPhTNWNcDtSIuRKqjFa0EmwNTGsXEWxkbhdC9FovOfwvaPZvvhYX8e3cuGZjy7sR6Ws7o8z63QlCpzf76vjkFg9olvH+4NElpV2mEAK/sXZ0VyjqoOzRlqy37RFk4TyurVRU4b0AI/ReySKrpuoOyslLfE1rzFiKzH2aAzoygbfSl89+GcyeAMuRkO1pyGCY/8EqtvH39utnEyjD/AIo3kjcnNp0CEoNI7QSJN7yy9Fcf5+yYp/0sxbszK9/2BCQD9EjQjB2MEm21PEWI="
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 837,
+      "completion_tokens": 233,
+      "total_tokens": 1070,
+      "cost": 0.00447,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00447,
+        "upstream_inference_prompt_cost": 0.001674,
+        "upstream_inference_completions_cost": 0.002796
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 170,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

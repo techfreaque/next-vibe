@@ -74,6 +74,7 @@ import {
   shouldTriggerCompacting,
   truncateToContextWindow,
 } from "./context/token-budget";
+import { AbortReason } from "./core/constants";
 import { resolveModelSkill } from "./core/modality-resolver";
 import {
   clearStreamingState,
@@ -132,6 +133,9 @@ export interface CreateAiStreamParams {
   /** Model-pipe relay receiver: suppress this instance's own identity in the
    *  system prompt — the caller's relayed context is authoritative. */
   suppressSelfIdentity?: boolean;
+  /** Relay receiver: caller instance that owns this thread — rename-thread
+   *  round-trips to it (see SystemPromptServerParams.relayCallerInstanceId). */
+  relayCallerInstanceId?: string;
   t: AiStreamT;
   extraInstructions?: string;
   excludeMemories?: boolean;
@@ -744,6 +748,7 @@ export class AiStreamRepository {
     awaitResult = false,
     isRevival,
     relayReceiver,
+    relayCallerInstanceId,
     originInstanceId,
     syncEligible,
     suppressSelfIdentity,
@@ -946,6 +951,7 @@ export class AiStreamRepository {
       originInstanceId,
       syncEligible,
       suppressSelfIdentity,
+      relayCallerInstanceId,
       extraInstructions,
       excludeMemories,
       favoriteIdOverride,
@@ -1727,10 +1733,36 @@ export class AiStreamRepository {
         // after the stream has already ended and interfere with the revival.
         streamContext.cancelPendingStreamTimer?.();
 
-        // Skip wakeUp revival if the stream was cancelled by the user; also
-        // filter out payloads intercepted by await-task or already delivered
+        // Skip wakeUp revival ONLY if the stream was genuinely CANCELLED (user
+        // stop / error) — NOT for an intentional wakeUp/wait PARK abort
+        // (REMOTE_TOOL_WAIT / LOOP_STOP / TOOL_CONFIRMATION / STREAM_TIMEOUT).
+        // A fast-completing wakeUp goroutine (e.g. cortex-write, ~3ms) settles
+        // while the dispatching stream is still parking; its result queues into
+        // pendingWakeUpInjections but the parking stream never runs another
+        // prepareStep to drain it inline, so this post-stream batch is the ONLY
+        // path that revives it. Treating the park-abort as "aborted" here skipped
+        // the batch → the wakeUp phase-2 revival never fired (120s test timeout).
+        // Filter out payloads intercepted by await-task or already delivered
         // inline by the prepareStep injection (both mark suppressed).
-        const wasAborted = streamAbortController.signal.aborted;
+        const abortReason = streamAbortController.signal.aborted
+          ? streamAbortController.signal.reason
+          : null;
+        const abortReasonName =
+          abortReason &&
+          typeof abortReason === "object" &&
+          "reason" in abortReason &&
+          typeof abortReason.reason === "string"
+            ? abortReason.reason
+            : null;
+        // Park-aborts are the loop's own "stop this turn, revival continues"
+        // signals — never a cancellation. Anything else aborted (user cancel,
+        // unexpected error) suppresses the revival as before.
+        const isParkAbort =
+          abortReasonName === AbortReason.REMOTE_TOOL_WAIT ||
+          abortReasonName === AbortReason.LOOP_STOP ||
+          abortReasonName === AbortReason.TOOL_CONFIRMATION ||
+          abortReasonName === AbortReason.STREAM_TIMEOUT;
+        const wasAborted = streamAbortController.signal.aborted && !isParkAbort;
         const suppressed = streamContext.suppressedWakeUpToolMessageIds;
         const pendingWakeUps = suppressed
           ? capturedWakeUpPayloads.filter(

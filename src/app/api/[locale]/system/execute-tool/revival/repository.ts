@@ -578,10 +578,64 @@ export class RevivalRepository {
           // (source-1, with skillId as its label); the favorite/skill are NOT
           // competing sources here. Only when NO modelId was stored do we fall
           // back to resolving from favoriteId (the favorite-only original turn).
+          //
+          // LOOP-REMOTE fallback: a wakeUp dispatched inside a relayed executor
+          // loop settles in a goroutine whose streamContext carries no model/
+          // favorite/skill (the executor resolves its OWN identity per turn and
+          // never stamps them onto the async task). Without a source the revival
+          // failed with "No model resolved". The THREAD itself ran the turn, so
+          // its persisted defaultModel/defaultSkill IS the resolved identity —
+          // fall back to it before giving up.
+          let effectiveModelId = modelId;
+          let effectiveSkillId = skillId;
+          if (!effectiveModelId && !favoriteId) {
+            // The async task carried no model (loop-remote wakeUp: the executor
+            // goroutine never stamps model/favorite onto the task). Resolve the
+            // CONVERSATION's model from the thread's assistant messages — the
+            // MOST FREQUENT one, NOT the latest. The latest is unreliable: a
+            // `rename-thread` auto-title runs on a DIFFERENT internal model (e.g.
+            // gpt-55) and its message is newest, so "last assistant model" picked
+            // the wrong model → the revival ran on it and misjudged (observed:
+            // FAILED verdict + a spurious rename). The dominant model is the one
+            // the actual turns used. Fall back to the thread default if none.
+            const lastAsstRows = await db
+              .select({
+                model: chatMessages.model,
+                cnt: sql<number>`count(*)::int`,
+              })
+              .from(chatMessages)
+              .where(
+                and(
+                  eq(chatMessages.threadId, threadId),
+                  eq(chatMessages.role, ChatMessageRole.ASSISTANT),
+                  sql`${chatMessages.model} IS NOT NULL`,
+                ),
+              )
+              .groupBy(chatMessages.model)
+              .orderBy(sql`count(*) DESC`)
+              .limit(1);
+            const lastAsst = lastAsstRows[0];
+            const [threadDefaults] = await db
+              .select({
+                defaultModel: chatThreads.defaultModel,
+                defaultSkill: chatThreads.defaultSkill,
+              })
+              .from(chatThreads)
+              .where(eq(chatThreads.id, threadId))
+              .limit(1);
+            effectiveModelId =
+              ((lastAsst?.model ??
+                threadDefaults?.defaultModel) as ChatModelId | null) ??
+              undefined;
+            effectiveSkillId =
+              effectiveSkillId ?? threadDefaults?.defaultSkill ?? undefined;
+          }
           const resolved = await resolveModelSkill({
-            model: modelId ?? undefined,
-            skill: modelId ? (skillId ?? undefined) : undefined,
-            favoriteId: modelId ? undefined : favoriteId,
+            model: effectiveModelId ?? undefined,
+            skill: effectiveModelId
+              ? (effectiveSkillId ?? undefined)
+              : undefined,
+            favoriteId: effectiveModelId ? undefined : favoriteId,
             favoriteConfig: null,
             user,
             locale,

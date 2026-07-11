@@ -244,6 +244,15 @@ export const translations: typeof enTranslations = {
       label: "ID wiadomości liścia",
       description: "ID wiadomości liścia aktywnej gałęzi",
     },
+    incognitoThreadTitle: {
+      label: "Tytuł wątku incognito",
+      description:
+        "Aktualny tytuł wątku incognito - wysyłany przez klienta, ponieważ wątki incognito nie mają wiersza na serwerze",
+    },
+    incognitoThreadDescription: {
+      label: "Opis wątku incognito",
+      description: "Aktualny opis wątku incognito",
+    },
     messageHistory: {
       label: "Historia wiadomości",
       description: "Opcjonalna historia wiadomości dla trybu incognito",

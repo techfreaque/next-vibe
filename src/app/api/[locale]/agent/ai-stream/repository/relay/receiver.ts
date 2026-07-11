@@ -6,7 +6,7 @@
  */
 import "server-only";
 
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -39,6 +39,87 @@ import type {
   AiStreamPostResponseOutput,
 } from "../../stream/definition";
 import type { AiStreamT } from "../../stream/i18n";
+
+/**
+ * Rebuild the caller's sub-chain (leaf `subFolderId` and its content ancestors)
+ * under THIS instance's OWN PRIVATE root, preserving the SAME folder ids.
+ *
+ * The executor ran the loop, so its copy is a first-class PRIVATE thread here —
+ * not a REMOTE mirror. The caller ships the leaf folder id; that leaf + its
+ * ancestors were pushed to this instance (as a REMOTE-rooted mirror scaffold) by
+ * the relay caller's folder-chain push. We take those SAME ids, drop the
+ * instance-tab and the `private`/`background` scaffold segments (they only exist
+ * to nest a REMOTE mirror), and re-root the remaining content chain (e.g.
+ * tests/<case>) directly under PRIVATE. Returns the leaf folder id (now PRIVATE)
+ * for the thread to land in, or null if nothing resolved.
+ */
+async function materializeOwnPrivateChain(
+  leafFolderId: string,
+  userId: string,
+): Promise<string | null> {
+  // Walk the pushed chain leaf→root, collecting content rows (skip the reserved
+  // scaffold names and the REMOTE instance-tab folder whose parent is null).
+  const chain: Array<{ id: string; name: string }> = [];
+  let currentId: string | null = leafFolderId;
+  for (let depth = 0; depth < 32 && currentId; depth++) {
+    const [row]: Array<{
+      id: string;
+      name: string;
+      parentId: string | null;
+      rootFolderId: string;
+    }> = await db
+      .select({
+        id: chatFolders.id,
+        name: chatFolders.name,
+        parentId: chatFolders.parentId,
+        rootFolderId: chatFolders.rootFolderId,
+      })
+      .from(chatFolders)
+      .where(and(eq(chatFolders.id, currentId), eq(chatFolders.userId, userId)))
+      .limit(1);
+    if (!row) {
+      break;
+    }
+    // Instance-tab boundary (REMOTE root, no parent) — stop, it's scaffold.
+    if (row.rootFolderId === DefaultFolderId.REMOTE && row.parentId === null) {
+      break;
+    }
+    // Reserved scaffold segments are receiver-local — never content.
+    if (row.name !== "private" && row.name !== "background") {
+      chain.unshift({ id: row.id, name: row.name });
+    }
+    currentId = row.parentId;
+  }
+  if (chain.length === 0) {
+    return null;
+  }
+  // Re-root the content chain directly under PRIVATE, SAME ids, root→leaf.
+  let parentId: string | null = null;
+  let leafId: string | null = null;
+  for (const seg of chain) {
+    await db
+      .insert(chatFolders)
+      .values({
+        id: seg.id,
+        userId,
+        rootFolderId: DefaultFolderId.PRIVATE,
+        name: seg.name,
+        parentId,
+      })
+      .onConflictDoUpdate({
+        target: chatFolders.id,
+        set: {
+          rootFolderId: DefaultFolderId.PRIVATE,
+          parentId,
+          updatedAt: new Date(),
+        },
+      })
+      .catch(() => undefined);
+    parentId = seg.id;
+    leafId = seg.id;
+  }
+  return leafId;
+}
 
 /**
  * WS-Provider stream branch — runs when the caller sends `instanceId` + `tools`.
@@ -295,44 +376,38 @@ export async function runWsProviderStream(params: {
     //    Incognito streams have no local thread state to resolve compacting chains against.
     const resolvedParentMessageId: string | null = data.parentMessageId ?? null;
 
-    // 4b. Relay landing folder — the EXECUTOR's copy is a FOREIGN-ORIGIN
-    //     thread and follows the one placement rule for those:
-    //     REMOTE/<originInstanceId>/<...folderPath> — identical to sync
-    //     mirrors, regardless of which side initiated the connection.
+    // 4b. Relay landing folder — the EXECUTOR ran the loop, so this copy is
+    //     HERMES's OWN thread, not a foreign mirror. It lives in the executor's
+    //     REAL PRIVATE folder at the SAME sub-chain the caller used
+    //     (private/tests/<case>), NOT under REMOTE/<caller>/…. The caller's side
+    //     is the mirror (REMOTE/hermes/private/…); on THIS instance it is a
+    //     first-class private thread with origin=NULL and loop=local.
     //     inference-provider stays incognito (no DB thread; caller owns storage).
     let landingRootFolderId: DefaultFolderId = DefaultFolderId.INCOGNITO;
     let landingSubFolderId: string | null = null;
     if (isRelayPersist) {
-      // SAME-ID placement: the caller's folder already exists here (folders
-      // sync as first-class items + connect scaffold + live folder events).
-      // A not-yet-synced folder leaves the landing unplaced; sync heals it.
-      landingRootFolderId = DefaultFolderId.REMOTE;
+      landingRootFolderId = DefaultFolderId.PRIVATE;
+      // Rebuild the caller's sub-chain (tests/<case>) under THIS instance's own
+      // PRIVATE root, preserving the SAME folder ids (folders are same-id synced).
+      // The caller ships its subFolderId (the leaf); we materialize that leaf and
+      // its ancestors under PRIVATE here and land the thread at the leaf.
       if (data.subFolderId) {
-        const [folderRow] = await db
-          .select({ id: chatFolders.id })
-          .from(chatFolders)
-          .where(
-            and(
-              eq(chatFolders.id, data.subFolderId),
-              eq(chatFolders.userId, loopUser.id),
-            ),
-          )
-          .limit(1);
-        landingSubFolderId = folderRow ? data.subFolderId : null;
+        landingSubFolderId = await materializeOwnPrivateChain(
+          data.subFolderId,
+          loopUser.id,
+        );
       }
-      // Belt and suspenders: the landing thread may pre-exist as a live-event
-      // stub — its origin column must NEVER be null (a null-origin REMOTE
-      // thread serializes as if it were OUR OWN and leaks scaffolds).
+      // This is our OWN thread: origin must be NULL (a non-null origin marks a
+      // mirror and would re-place it under REMOTE + block the loop from relaying).
       if (data.threadId) {
         await db
           .update(chatThreads)
-          .set({ originInstanceId: callerInstanceId })
-          .where(
-            and(
-              eq(chatThreads.id, data.threadId),
-              isNull(chatThreads.originInstanceId),
-            ),
-          )
+          .set({
+            originInstanceId: null,
+            rootFolderId: DefaultFolderId.PRIVATE,
+            folderId: landingSubFolderId,
+          })
+          .where(eq(chatThreads.id, data.threadId))
           .catch(() => undefined);
       }
     }
@@ -408,6 +483,9 @@ export async function runWsProviderStream(params: {
       // context is the AUTHORITATIVE identity — this node's own System
       // Context must not name itself as the acting instance.
       suppressSelfIdentity: Boolean(providerTools && providerTools.length > 0),
+      // The caller OWNS this thread — rename-thread must round-trip to it so the
+      // owner's title updates (the mirror titles stay in parity).
+      relayCallerInstanceId: isRelayPersist ? callerInstanceId : undefined,
       subAgentDepth: 0,
       t,
       extraInstructions,

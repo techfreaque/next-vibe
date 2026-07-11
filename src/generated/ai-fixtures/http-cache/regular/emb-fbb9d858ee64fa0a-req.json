@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Both parallel calls completed successfully:\n\n- **tool-help(query='image')** → `tools` array with 6 entries (`agent-view-image`, `describe_image`, `generate_image`, `generate_video`, `models`, `browser-screenshot`) — each with `name` + `description` ✅\n- **generate_image(prompt='green square')** → returned `imageUrl` (not a taskId) ✅\n\n**STEP_OK**",
+    "encoding_format": "float"
+  }
+}

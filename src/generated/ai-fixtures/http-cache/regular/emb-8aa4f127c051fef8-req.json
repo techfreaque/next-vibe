@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The attached audio is a lively 24-second funk instrumental track (~110-120 BPM) with:\n\n- **Wah-wah electric guitar** providing the main rhythmic riff\n- **Grooving bass guitar** laying down the funk foundation\n- **Punchy drums** with prominent snare and kick\n- **Bright synth/keyboard** adding melodic accents\n- **Brass/synth horn stabs** for punctuation\n\nThe production is polished and clean, with each instrument clearly defined. The mood is energetic, danceable, and positive — feels like a loop or segment from a larger funk/disco/soul track",
+    "encoding_format": "float"
+  }
+}

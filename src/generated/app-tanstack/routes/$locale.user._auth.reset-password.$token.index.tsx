@@ -5,15 +5,17 @@ import type { JSX } from "react";
 
 import { TanstackPage as Page } from "@/app/[locale]/user/(auth)/reset-password/[token]/page";
 
-import { toNextParams } from "../nextjs-compat-wrapper";
+import { runPageLoader, toNextParams } from "../nextjs-compat-wrapper";
 
 const loadData = createServerFn({ method: "GET" })
   .inputValidator((data: Record<string, string>) => data)
-  .handler(async ({ data }) => {
-    const { tanstackLoader } =
-      await import("@/app/[locale]/user/(auth)/reset-password/[token]/page");
-    return tanstackLoader({ params: Promise.resolve(toNextParams(data)) });
-  });
+  .handler(async ({ data }) =>
+    runPageLoader(async () => {
+      const { tanstackLoader } =
+        await import("@/app/[locale]/user/(auth)/reset-password/[token]/page");
+      return tanstackLoader({ params: Promise.resolve(toNextParams(data)) });
+    }),
+  );
 
 function PageComponent(): JSX.Element {
   return <Page {...Route.useLoaderData()} />;

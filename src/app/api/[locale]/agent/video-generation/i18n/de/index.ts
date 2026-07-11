@@ -40,27 +40,16 @@ export const translations: typeof enTranslations = {
       label: "Auflösung",
       description: "Auflösung des Ausgabevideos",
     },
-    firstFrameUrl: {
-      label: "Erster Frame URL",
+    frameReferences: {
+      label: "Frame-Referenzen",
       description:
-        "Bild für den ersten Frame. Das Modell animiert von diesem Bild vorwärts.",
+        "Referenz-Assets, die das Video steuern. Jeder Eintrag ist { url, role }. role 'first' legt exakt das Anfangsbild fest, role 'last' exakt das Schlussbild (nur bei last_frame-Unterstützung) — Randbilder sind AUSSCHLIESSLICH Bilder, beide MÜSSEN also Bild-URLs sein. role 'reference' (oder leer) ist ein leitendes Asset und darf eine Bild-, Audio- oder Video-URL sein; der Typ wird aus der URL erkannt (.mp4/.webm/.mov als Video, Audiodateien als Audio, sonst Bild). Ein Anfangs- oder Referenzbild schaltet bei Bedarf auf das günstigste bildfähige Modell um.",
       placeholder: "https://beispiel.de/erster-frame.jpg",
-    },
-    lastFrameUrl: {
-      label: "Letzter Frame URL",
-      description:
-        "Bild für den letzten Frame. Das Modell animiert rückwärts zu diesem Bild.",
-      placeholder: "https://beispiel.de/letzter-frame.jpg",
     },
     negativePrompt: {
       label: "Negativer Prompt",
       description: "Beschreibe, was das Video nicht enthalten soll.",
       placeholder: "unscharf, schlechte Qualität, verzerrt...",
-    },
-    cfgScale: {
-      label: "CFG-Skala",
-      description:
-        "Wie streng das Modell dem Prompt folgt (0–30). Höher = wörtlicher.",
     },
 
     download: "Herunterladen",

@@ -51,6 +51,17 @@ const { POST } = createEndpoint({
   title: "post.title",
   titleShort: "post.titleShort",
   description: "post.description",
+  dynamicTitle: ({ request }) => {
+    const text = request?.text;
+    if (!text?.trim()) {
+      return undefined;
+    }
+    const short = text.length > 50 ? `${text.slice(0, 50)}...` : text;
+    return {
+      message: "post.dynamicTitle" as const,
+      messageParams: { text: short },
+    };
+  },
   aliases: [TEXT_TO_SPEECH_ALIAS],
   icon: "volume-2",
   category: "ai",

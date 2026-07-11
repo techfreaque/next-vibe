@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Result has a `taskId` string (`\"local-bg-call-5890335c36bd439595f42d06\"`) and no `imageUrl` — exactly as expected for a detached task.\n\n**STEP_OK taskId=local-bg-call-5890335c36bd439595f42d06**",
+    "encoding_format": "float"
+  }
+}

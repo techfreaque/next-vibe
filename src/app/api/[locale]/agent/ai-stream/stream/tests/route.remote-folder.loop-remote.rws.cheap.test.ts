@@ -34,7 +34,11 @@ const hooks = makeReverseWsSetup(_remoteUrl, { createRemoteFolder: true });
 if (_remoteUrl && _isFixtureMode) {
   describeStreamSuite({
     label: `Remote Folder — loop on REMOTE (cheap, reverse-WS, ${_remoteUrl})`,
-    cachePrefix: "unbottled-relay-cheap-",
+    // SHARE the direct variant's fixture cache: the loop runs identically on the
+    // remote — only the TRANSPORT (reverse-ws vs direct-http) differs, and the
+    // fixture engine replays the model/media calls the loop makes regardless of
+    // which leg carried the relay. One recording serves both suites.
+    cachePrefix: "rf-loop-remote-cheap-",
     cheapMode: true,
     systemPromptInstanceId: HERMES_INSTANCE_ID,
     expectRelayTransport: "reverse-ws",

@@ -21,6 +21,9 @@ import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { makeHeadlessContext } from "@/app/api/[locale]/agent/chat/config";
+import { scopedTranslation as connectScopedTranslation } from "@/app/api/[locale]/remote-connection/connect/i18n";
+import type { SyncScope } from "@/app/api/[locale]/remote-connection/db";
+import { SyncScopeSchema } from "@/app/api/[locale]/remote-connection/db";
 import { useRemoteConnections } from "@/app/api/[locale]/remote-connection/list/hooks";
 
 import type { SystemSettingsGetResponseOutput } from "./definition";
@@ -513,6 +516,8 @@ function UnbottledCliLoginField({
 }): JSX.Element {
   const user = useWidgetUser();
   const logger = useWidgetLogger();
+  const locale = useWidgetLocale();
+  const { t: connectT } = connectScopedTranslation.scopedT(locale);
   // Connection state is the source of truth — a system inference provider is a
   // remote connection flagged isInferenceProvider, not an env credential.
   const connections = useRemoteConnections(logger, user);
@@ -521,10 +526,19 @@ function UnbottledCliLoginField({
   );
 
   const [phase, setPhase] = useState<
-    "email" | "password" | "url" | "signing-in" | "done" | "error"
+    "email" | "password" | "url" | "scope" | "signing-in" | "done" | "error"
   >(provider ? "done" : "email");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  // Explicit sync-scope choice, same as the regular remote-connection connect
+  // form: prefilled with the schema-default keys, user edits the list before
+  // connecting.
+  const [scopeInput, setScopeInput] = useState(() =>
+    Object.entries(SyncScopeSchema.parse({}))
+      .filter(([, enabled]) => enabled)
+      .map(([key]) => key)
+      .join(","),
+  );
   // eslint-disable-next-line i18next/no-literal-string
   const [remoteUrl, setRemoteUrl] = useState("https://unbottled.ai");
   const [errorMsg, setErrorMsg] = useState("");
@@ -535,8 +549,26 @@ function UnbottledCliLoginField({
   const doLogin = useCallback(async (): Promise<void> => {
     setPhase("signing-in");
     const normalizedUrl = remoteUrl.replace(/\/+$/, "");
+    const enabled = new Set(
+      scopeInput
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean),
+    );
+    const syncScope: SyncScope = {
+      memories: enabled.has("memories"),
+      documents: enabled.has("documents"),
+      skills: enabled.has("skills"),
+      favorites: enabled.has("favorites"),
+      threads: enabled.has("threads"),
+    };
     const result = await connectMutation.mutateAsync({
-      requestData: { email, password, remoteUrl: normalizedUrl },
+      requestData: {
+        email,
+        password,
+        remoteUrl: normalizedUrl,
+        syncScope,
+      },
     });
 
     if (!result.success || !result.data?.connected) {
@@ -547,7 +579,7 @@ function UnbottledCliLoginField({
 
     await connections.read?.refetch();
     setPhase("done");
-  }, [email, password, remoteUrl, t, connectMutation, connections]);
+  }, [email, password, remoteUrl, scopeInput, t, connectMutation, connections]);
 
   return (
     <Box flexDirection="column" gap={1}>
@@ -587,17 +619,30 @@ function UnbottledCliLoginField({
             onSubmit={(): void => setPhase("url")}
           />
         </Box>
-      ) : (
+      ) : phase === "url" ? (
         <Box>
           <Text dimColor>{`${t("wizard.ai.unbottledRemoteUrl")}: `}</Text>
           <TextInput
             value={remoteUrl}
             placeholder="https://unbottled.ai"
             onChange={setRemoteUrl}
-            onSubmit={(): void => {
-              void doLogin();
-            }}
+            onSubmit={(): void => setPhase("scope")}
           />
+        </Box>
+      ) : (
+        <Box flexDirection="column">
+          <Text dimColor>{connectT("post.syncScope.description")}</Text>
+          <Box>
+            <Text dimColor>{`${connectT("post.syncScope.label")}: `}</Text>
+            <TextInput
+              value={scopeInput}
+              placeholder="memories,documents,skills,favorites,threads"
+              onChange={setScopeInput}
+              onSubmit={(): void => {
+                void doLogin();
+              }}
+            />
+          </Box>
         </Box>
       )}
     </Box>

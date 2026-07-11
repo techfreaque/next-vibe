@@ -946,7 +946,12 @@ export async function restoreAtlasIdentity(): Promise<void> {
  */
 async function triggerHermesReconnect(): Promise<void> {
   // PATCH hermes's atlas connection with reconnectNow — routed to hermes via
-  // instanceId through the typed test path.
+  // instanceId through the typed test path. NEVER carry syncScope here: scope is
+  // set symmetrically at connect and mirrored to BOTH sides; a reconnect is a
+  // pure connector-lifecycle nudge. Sending a hardcoded scope (previously an
+  // all-true-except-threads default) round-tripped to atlas via the PATCH's
+  // reverse-mirror and CLOBBERED atlas's just-set threads:true → false, silently
+  // dropping every folder/thread mirror event. reconnectNow only; scope untouched.
   const { sendTestRequest } =
     await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
   const connByIdDef = (
@@ -964,13 +969,6 @@ async function triggerHermesReconnect(): Promise<void> {
     endpoint: connByIdDef.PATCH,
     data: {
       reconnectNow: true,
-      syncScope: {
-        memories: true,
-        documents: true,
-        skills: true,
-        favorites: true,
-        threads: false,
-      },
     },
     urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
     user: adminUser,
@@ -1305,22 +1303,9 @@ export async function assertThreadPlacement(params: {
     threadRows[0]?.["root_folder_id"],
     `[assertThreadPlacement:${params.db}] thread ${threadId} root mismatch`,
   ).toBe(rootFolderId);
-  // Title: mirrors must carry the ORIGIN's title verbatim; origin threads
-  // must be titled from their first user message (never empty, never "New
-  // Chat" defaults for test prompts).
-  const title = threadRows[0]?.["title"] ?? "";
-  if (expectedTitle !== undefined) {
-    expectBun(
-      title,
-      `[assertThreadPlacement:${params.db}] thread ${threadId} title mismatch`,
-    ).toBe(expectedTitle);
-  }
-  if (expectedTitlePrefix !== undefined) {
-    expectBun(
-      title.startsWith(expectedTitlePrefix),
-      `[assertThreadPlacement:${params.db}] thread ${threadId} title must start with '${expectedTitlePrefix}' — got '${title}'`,
-    ).toBe(true);
-  }
+  // PLACEMENT is asserted FIRST (before title): a thread landing in the REMOTE
+  // ROOT instead of its private/tests/<case> subfolder is the structural bug we
+  // care about — the title parity check must not mask it by failing earlier.
   // Walk the chain upward from the thread's folder: names must match the
   // EXPECTED chain root→leaf and every folder row must live under the SAME
   // root as the thread (a mis-rooted parent is placement corruption even
@@ -1343,8 +1328,24 @@ export async function assertThreadPlacement(params: {
   }
   expectBun(
     walked.join("/"),
-    `[assertThreadPlacement:${params.db}] thread ${threadId} folder chain mismatch (root ${rootFolderId})`,
+    `[assertThreadPlacement:${params.db}] thread ${threadId} folder chain mismatch (root ${rootFolderId}) — a REMOTE-root landing means the thread was NOT placed in its expected private/tests subfolder`,
   ).toBe(nameChain.join("/"));
+
+  // Title parity is asserted LAST (placement above is the primary invariant).
+  // Mirrors must carry the ORIGIN's title verbatim.
+  const title = threadRows[0]?.["title"] ?? "";
+  if (expectedTitle !== undefined) {
+    expectBun(
+      title,
+      `[assertThreadPlacement:${params.db}] thread ${threadId} title mismatch`,
+    ).toBe(expectedTitle);
+  }
+  if (expectedTitlePrefix !== undefined) {
+    expectBun(
+      title.startsWith(expectedTitlePrefix),
+      `[assertThreadPlacement:${params.db}] thread ${threadId} title must start with '${expectedTitlePrefix}' — got '${title}'`,
+    ).toBe(true);
+  }
 }
 
 /**

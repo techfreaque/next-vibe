@@ -84,13 +84,17 @@ function makeRemoteSetup(
       // Idempotent: clean up any leftover connection from a previous failed
       // run, then establish the transport-appropriate connection E2E (login
       // on the remote, register this instance, sync capabilities).
-      // Sync scope = EXACTLY what the suite tests: remote-folder suites enable
-      // favorites sync (relevant to placement UX); plain direct/relay suites
-      // enable nothing (thread placement rides remote events, not sync).
+      // Sync scope = EXACTLY what the suite tests. Remote-folder suites mirror a
+      // thread + its ancestor folder chain to the peer, so they MUST enable
+      // `threads` sync: folder-created / thread-updated are `syncDomain:"threads"`
+      // remote events, dropped at the bridge when the connection's syncScope has
+      // threads:false (the default). Without it the mirrored thread lands at the
+      // REMOTE root with an empty folder chain. Favorites stays on (placement UX).
+      // Plain direct/relay suites enable nothing — their threads never mirror.
       const connectOptions = {
         ...(options.loopLocation ? { loopLocation: options.loopLocation } : {}),
         ...(options.createRemoteFolder
-          ? { syncScope: { favorites: true } }
+          ? { syncScope: { favorites: true, threads: true } }
           : {}),
       };
       if (transport === "direct-http") {
@@ -110,11 +114,22 @@ function makeRemoteSetup(
           await import("../../../testing/headless-test-runner");
         const { DefaultFolderId: FolderIds } =
           await import("@/app/api/[locale]/agent/chat/config");
-        localFolderId = await getOrCreateFolder(
+        // Build REMOTE/<instance>/private — the peer's own-thread landing lives
+        // under `private` (mirror subtree segment). The base suite then nests
+        // tests/<case> below this, so a case thread sits at
+        // REMOTE/<instance>/private/tests/<case>. Landing on the peer resolves
+        // to its OWN private/tests/<case> (own-thread restore).
+        const instanceFolderId = await getOrCreateFolder(
           testUser,
           FolderIds.REMOTE,
           remoteSetup.HERMES_INSTANCE_ID,
           null,
+        );
+        localFolderId = await getOrCreateFolder(
+          testUser,
+          FolderIds.REMOTE,
+          "private",
+          instanceFolderId,
         );
       }
 

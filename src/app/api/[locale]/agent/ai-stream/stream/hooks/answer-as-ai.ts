@@ -90,11 +90,20 @@ export async function answerAsAI(
 
     // Build message history (incognito only - server fetches from DB)
     let messageHistory: ChatMessage[] | null = null;
+    let incognitoThreadTitle: string | null = null;
+    let incognitoThreadDescription: string | null = null;
     if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
       const parentIndex = allMessages.findIndex((msg) => msg.id === messageId);
       if (parentIndex !== -1) {
         messageHistory = allMessages.slice(0, parentIndex + 1);
       }
+      // Incognito threads live only in localStorage - send their current
+      // title/description so the server-side rename prompt fragment sees them.
+      const { getIncognitoThread } =
+        await import("@/app/api/[locale]/agent/chat/incognito/storage");
+      const incognitoThread = await getIncognitoThread(activeThreadId);
+      incognitoThreadTitle = incognitoThread?.title ?? null;
+      incognitoThreadDescription = incognitoThread?.description ?? null;
     }
 
     // Get user's timezone from browser
@@ -114,6 +123,8 @@ export async function answerAsAI(
       skill: settings.selectedSkill ?? null,
       favoriteConfig,
       messageHistory: messageHistory ?? [],
+      incognitoThreadTitle,
+      incognitoThreadDescription,
       attachments: attachments && attachments.length > 0 ? attachments : null,
       toolConfirmations: null,
       voiceMode: { enabled: false },

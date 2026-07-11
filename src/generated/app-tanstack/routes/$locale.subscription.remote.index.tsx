@@ -5,7 +5,7 @@ import type { JSX } from "react";
 
 import { TanstackPage as Page } from "@/app/[locale]/subscription/remote/page";
 
-import { toNextParams } from "../nextjs-compat-wrapper";
+import { runPageLoader, toNextParams } from "../nextjs-compat-wrapper";
 
 const loadData = createServerFn({ method: "GET" })
   .inputValidator(
@@ -14,14 +14,16 @@ const loadData = createServerFn({ method: "GET" })
       search: Record<string, string>;
     }) => data,
   )
-  .handler(async ({ data }) => {
-    const { tanstackLoader } =
-      await import("@/app/[locale]/subscription/remote/page");
-    return tanstackLoader({
-      params: Promise.resolve(toNextParams(data.params)),
-      searchParams: Promise.resolve(data.search),
-    });
-  });
+  .handler(async ({ data }) =>
+    runPageLoader(async () => {
+      const { tanstackLoader } =
+        await import("@/app/[locale]/subscription/remote/page");
+      return tanstackLoader({
+        params: Promise.resolve(toNextParams(data.params)),
+        searchParams: Promise.resolve(data.search),
+      });
+    }),
+  );
 
 function PageComponent(): JSX.Element {
   return <Page {...Route.useLoaderData()} />;

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/video-gen-tests-39df62e8-3dd8-4088-a3ec-4b782a9b0984.md\n\n# Video Gen Tests\nFolder: private\nDescription: Testing video generation with first and last frame references.",
+    "encoding_format": "float"
+  }
+}

@@ -31,12 +31,14 @@ function hasId(item: WidgetData): item is WithId & WidgetData {
 
 /**
  * Merge a partial array into an existing array.
- * If items have an `id` field, merge by id (upsert).
+ * If items have an `id` field, merge by id — patching existing items, and
+ * appending unknown ids only when `insertMissing` is set (upsert semantics).
  * Otherwise replace the whole array.
  */
 function mergeArray(
   existing: WidgetData[],
   partial: WidgetData[],
+  insertMissing: boolean,
 ): WidgetData[] {
   if (partial.length === 0) {
     return existing;
@@ -70,7 +72,11 @@ function mergeArray(
 
     if (existingItem !== undefined) {
       // Merge into existing item
-      const merged = applyPartialToCache(existingItem, patchItem);
+      const merged = applyPartialToCache(
+        existingItem,
+        patchItem,
+        insertMissing,
+      );
       if (merged !== existingItem) {
         const idx = result.findIndex((item) => hasId(item) && item.id === id);
         if (idx !== -1) {
@@ -78,8 +84,10 @@ function mergeArray(
           changed = true;
         }
       }
-    } else {
-      // New item - append
+    } else if (insertMissing) {
+      // Unknown id — only creation (upsert) events may materialize new items.
+      // Plain merge events referencing an id this cache never contained must
+      // no-op, or they inject partial "ghost" stubs into unrelated lists.
       result.push(patchItem);
       changed = true;
     }
@@ -91,10 +99,13 @@ function mergeArray(
 /**
  * Recursively merge `partial` into `existing` with structural sharing.
  * Returns the same reference if nothing changed.
+ * `insertMissing` (upsert semantics) allows id-keyed array merges to append
+ * items whose id is not in the existing array; plain merges never insert.
  */
 export function applyPartialToCache(
   existing: WidgetData,
   partial: WidgetData,
+  insertMissing = false,
 ): WidgetData {
   // Null / undefined passthrough
   if (partial === null || partial === undefined) {
@@ -111,7 +122,7 @@ export function applyPartialToCache(
     if (!Array.isArray(existing)) {
       return partial;
     }
-    const merged = mergeArray(existing, partial);
+    const merged = mergeArray(existing, partial, insertMissing);
     return merged === existing ? existing : merged;
   }
 
@@ -147,7 +158,7 @@ export function applyPartialToCache(
       continue;
     }
 
-    const merged = applyPartialToCache(existingVal, partialVal);
+    const merged = applyPartialToCache(existingVal, partialVal, insertMissing);
 
     if (merged !== existingVal) {
       result[key] = merged;

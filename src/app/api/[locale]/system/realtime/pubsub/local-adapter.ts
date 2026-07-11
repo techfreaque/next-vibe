@@ -16,6 +16,10 @@ import type { AnyEndpointEventEnvelope } from "../structured-events";
 import type { PubSubAdapter, PubSubMessageHandler } from "./types";
 
 export class LocalPubSubAdapter implements PubSubAdapter {
+  // publish() below calls broadcastLocalToAll() itself — the WS server must
+  // not add its per-channel relay handler on top (see PubSubAdapter docs).
+  readonly deliversToLocalSockets = true;
+
   private readonly serverHandlers = new Map<
     string,
     PubSubMessageHandler<AnyEndpointEventEnvelope>

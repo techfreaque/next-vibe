@@ -101,6 +101,7 @@ export function emitVoiceTranscribed(
 export function emitFilesUploaded(
   w: DbWriterState,
   params: {
+    threadId: string;
     messageId: string;
     attachments: Array<{
       id: string;
@@ -112,7 +113,7 @@ export function emitFilesUploaded(
   },
 ): void {
   w.deps.wsEmit("files-uploaded", {
-    urlPathParams: { threadId: w.lastThreadId ?? "" },
+    urlPathParams: { threadId: params.threadId },
     responseData: {
       messages: [
         {

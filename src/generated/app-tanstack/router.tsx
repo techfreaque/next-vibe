@@ -17,6 +17,16 @@ export function getRouter(): ReturnType<typeof createRouter> {
     // is ready - React 18 will paint the SSR content then swap in-place.
     defaultPendingMs: 0,
     defaultPendingMinMs: 0,
+    // Route errors are caught by TanStack's CatchBoundary and rendered as an
+    // error page — server-side that produced completely SILENT 500s (nothing
+    // in the dev log). Surface them; on the client React logs them anyway.
+    defaultOnCatch: (error): void => {
+      if (typeof window === "undefined") {
+        process.stderr.write(
+          `[SSR route error] ${error.stack || String(error)}\n`,
+        );
+      }
+    },
   });
 }
 

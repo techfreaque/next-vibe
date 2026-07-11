@@ -21,6 +21,10 @@ interface RedisWireMessage {
 }
 
 export class RedisPubSubAdapter implements PubSubAdapter {
+  // A Redis publish reaches local sockets ONLY via the relay subscription —
+  // the WS server must register its per-channel handler.
+  readonly deliversToLocalSockets = false;
+
   private publisher: Redis | null = null;
   private subscriber: Redis | null = null;
   private handlers = new Map<string, PubSubMessageHandler>();

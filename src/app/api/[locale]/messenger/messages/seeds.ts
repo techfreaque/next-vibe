@@ -12,7 +12,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { translations } from "@/config/i18n/en";
 
 import { contactClientRepository } from "../../contact/repository-client";
-import { DEV_SEED_DEMO_USER_EMAIL } from "../../users/seeds";
+import { DEV_SEED_DEMO_USER_EMAIL } from "../../user/dev-seed-users";
 import type { NewEmail } from "./db";
 import { MessageStatus, MessageType } from "./enum";
 import { EmailsRepository } from "./repository";

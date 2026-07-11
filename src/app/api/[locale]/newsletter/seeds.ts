@@ -9,7 +9,7 @@ import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { DEV_SEED_DEMO_USER_EMAIL } from "../users/seeds";
+import { DEV_SEED_DEMO_USER_EMAIL } from "../user/dev-seed-users";
 import type { NewNewsletterSubscription } from "./db";
 import { NewsletterSubscriptionStatus } from "./enum";
 

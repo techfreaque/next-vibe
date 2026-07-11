@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**Assessing The Output**\n\nI am evaluating the correspondence of the image with the initial request. It appears to successfully stylize the elements of the original photo into a cartoon rendering. The hiker, trail, and mountain are all identifiable and integrated into the image, alongside a bold and flat color palette and clearly defined lines.\n\n\n**Confirming Image Alignment**\n\nI have confirmed that the final image fulfills all aspects of the user's initial instructions, matching the parameters and requested style exactly. The integration of elements and the artistic rendering were considered, and all requirements were met. It accurately reflects the characteristics of a cartoon-like rendering.\n\n\n</think>",
+    "encoding_format": "float"
+  }
+}

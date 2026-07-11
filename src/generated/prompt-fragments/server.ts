@@ -30,12 +30,8 @@ import {
   userNameFragment,
 } from "@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt";
 import type { SystemPromptServerParams } from "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
-import { scopedTranslation as chatScopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
 import { codingAgentSettingFragment } from "@/app/api/[locale]/agent/chat/settings/system-prompt";
 import { threadRenameFragment } from "@/app/api/[locale]/agent/chat/threads/rename/system-prompt";
-import { cortexNodes } from "@/app/api/[locale]/agent/cortex/db";
-import { CortexNodeType } from "@/app/api/[locale]/agent/cortex/enum";
-import { MEMORIES_PREFIX } from "@/app/api/[locale]/agent/cortex/repository";
 import { cortexFragment } from "@/app/api/[locale]/agent/cortex/system-prompt";
 import { favoritesFragment } from "@/app/api/[locale]/agent/skills/favorites/system-prompt";
 import { skillFragment } from "@/app/api/[locale]/agent/skills/system-prompt";
@@ -48,6 +44,11 @@ import {
   sshConnectionsFragment,
   systemContextFragment,
 } from "@/app/api/[locale]/remote-connection/system-prompt";
+
+import { cortexNodes } from "@/app/api/[locale]/agent/cortex/db";
+import { CortexNodeType } from "@/app/api/[locale]/agent/cortex/enum";
+import { MEMORIES_PREFIX } from "@/app/api/[locale]/agent/cortex/repository";
+import { scopedTranslation as chatScopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
 
 /**
  * Combined server loader - pre-fetches shared data, then runs all fragment

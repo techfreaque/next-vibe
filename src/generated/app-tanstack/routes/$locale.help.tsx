@@ -5,10 +5,14 @@ import type { JSX } from "react";
 
 import { TanstackPage as Layout } from "@/app/[locale]/help/layout";
 
-const loadData = createServerFn({ method: "GET" }).handler(async () => {
-  const { tanstackLoader } = await import("@/app/[locale]/help/layout");
-  return tanstackLoader();
-});
+import { runPageLoader } from "../nextjs-compat-wrapper";
+
+const loadData = createServerFn({ method: "GET" }).handler(async () =>
+  runPageLoader(async () => {
+    const { tanstackLoader } = await import("@/app/[locale]/help/layout");
+    return tanstackLoader();
+  }),
+);
 
 function LayoutComponent(): JSX.Element {
   return (

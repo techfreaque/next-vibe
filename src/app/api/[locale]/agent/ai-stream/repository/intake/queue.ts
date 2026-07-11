@@ -105,6 +105,7 @@ export async function runAutoQueueBranch(params: {
     content: data.content,
     parentId: data.parentMessageId || null,
     userId,
+    user,
     authorName,
     logger,
     streamContext: queueEmbedContext,

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "I see there are 2 image attachments that were removed from the conversation history — my current model (DeepSeek V4 Flash) doesn't support vision or file analysis, so I can't process those directly.\n\nIf you meant \"the next one\" as in the next test in the suite, let me know which one you'd like me to run. Or if you were referring to those attachments, I'd suggest switching to a vision-capable model like **Claude Sonnet 4.5**, **GPT-5**, or **Gemini** to analyze the images, then you can switch back to continue.\n\nWhat would you like to do next?",
+    "encoding_format": "float"
+  }
+}

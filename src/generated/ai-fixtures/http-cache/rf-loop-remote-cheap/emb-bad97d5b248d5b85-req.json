@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/callback-mode-quality-tests-98c10468-6ce7-49ae-955b-0b27cc33ff25.md\n\n# Callback Mode Quality Tests\nFolder: private\nDescription: This thread is testing tool execution modes, including parallel, detach, await-task, wait, endLoop, and wakeUp. It also checks quality-gate behavior around tool results, returned fields, and anomalies across turns.",
+    "encoding_format": "float"
+  }
+}

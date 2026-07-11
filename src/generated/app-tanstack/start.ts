@@ -6,6 +6,7 @@
  * run on every server request - matching the Next.js edge middleware behaviour.
  */
 
+import { isNotFound, isRedirect } from "@tanstack/react-router";
 import { createMiddleware, createStart } from "@tanstack/react-start";
 import { setResponseHeader } from "@tanstack/react-start/server";
 import { NextRequest } from "next/server";
@@ -123,7 +124,28 @@ function shouldSkipLog(pathname: string): boolean {
 // Resolves once widgets are preloaded. Reset on HMR to pick up new factories.
 let _widgetPreloadDone = false;
 
+// srvx attaches the underlying Bun server to every request. Bun.serve kills
+// requests idle for 10s by default (its idleTimeout), which killed cold SSR
+// renders mid-stream; per-request timeout(request, 255) lifts that to the
+// uWS max — the same mechanism the WS proxy uses (realtime/server.ts).
+interface BunRuntimeRequest {
+  runtime?: {
+    bun?: {
+      server?: { timeout: (request: Request, seconds: number) => void };
+    };
+  };
+}
+
 const proxyMiddleware = createMiddleware().server(async ({ next, request }) => {
+  try {
+    (request as Request & BunRuntimeRequest).runtime?.bun?.server?.timeout(
+      request,
+      255,
+    );
+  } catch {
+    /* non-Bun runtime or srvx API change — the Bun.serve idleTimeout patch
+       in vite-compiler still provides the server-wide default */
+  }
   // Preload all lazy widgets before the first SSR render. By the time this
   // middleware runs, all route modules that call lazyWidget() have been
   // evaluated and registered their factories. Awaiting here ensures the first
@@ -213,6 +235,31 @@ const proxyMiddleware = createMiddleware().server(async ({ next, request }) => {
   return result;
 });
 
+// Server-function errors (every generated page/layout loader runs through
+// createServerFn) surface only as the route's error boundary — during SSR
+// that meant a failing loader rendered as a completely SILENT 500: no log
+// line at all, and the router's defaultOnCatch only sees RENDER errors.
+// Log and rethrow. notFound()/redirect() are router control flow, not
+// failures — pass them through quietly.
+const fnErrorLogMiddleware = createMiddleware({ type: "function" }).server(
+  async ({ next }) => {
+    try {
+      return await next();
+    } catch (error) {
+      if (!isRedirect(error) && !isNotFound(error)) {
+        const text =
+          error instanceof Error
+            ? (error.stack ?? `${error.name}: ${error.message}`)
+            : JSON.stringify(error);
+        process.stderr.write(`[SSR loader error] ${text}\n`);
+      }
+      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- middleware must rethrow so the router's error handling still runs
+      throw error;
+    }
+  },
+);
+
 export const startInstance = createStart(() => ({
   requestMiddleware: [proxyMiddleware],
+  functionMiddleware: [fnErrorLogMiddleware],
 }));

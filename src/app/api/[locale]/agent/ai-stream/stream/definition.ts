@@ -4,7 +4,6 @@
  */
 
 import type { JSONSchema7 } from "json-schema";
-import { dateSchema } from "next-vibe/core/definition/common.schema";
 import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
@@ -13,7 +12,6 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
-import { WidgetDataSchema } from "next-vibe/core/utils/json";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import {
   customWidgetObject,
@@ -33,8 +31,9 @@ import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-gen
 import { lazyWidget } from "../../../system/unified-ui/_shared/lazy-widget";
 import { DefaultFolderId, rootFolderIdOptions } from "../../chat/config";
 import { AGENT_MESSAGE_LENGTH } from "../../chat/constants";
-import type { ChatMessage, MessageMetadata } from "../../chat/db";
+import type { ChatMessage } from "../../chat/db";
 import { ChatMessageRole } from "../../chat/enum";
+import { parseMessageHistory } from "../../chat/message-schema";
 import {
   ChatModelId,
   ChatModelIdOptions,
@@ -229,6 +228,10 @@ const { POST } = createEndpoint({
           .object({
             id: z.string(),
             skillId: z.string(),
+            // Load-bearing for model resolution: the skill-variant cascade
+            // picks THIS favorite's variant. Defaulted (not optional) so the
+            // parsed output always carries it and older senders stay valid.
+            variantId: z.string().nullable().default(null),
             modelSelection: chatModelSelectionSchema.nullable(),
             voiceModelSelection: voiceModelSelectionSchema.nullable(),
             sttModelSelection: sttModelSelectionSchema.nullable(),
@@ -318,56 +321,35 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.JSON,
         label: "post.messageHistory.label" as const,
         description: "post.messageHistory.description" as const,
+        // Tolerant parse: incognito localStorage carries years of legacy
+        // message shapes. Valid messages parse into typed ChatMessage; the
+        // rest are skipped — a bad message must never fail the request.
         schema: z
-          .array(
-            z.object({
-              id: z.string(),
-              threadId: z.string(),
-              role: z.nativeEnum(ChatMessageRole),
-              parentId: z.string().nullable(),
-              sequenceId: z.string().nullable(),
-              isAI: z.boolean(),
-              model: z.nativeEnum(ChatModelId).nullable(),
-              skill: z.string().nullable(),
-              metadata: z.custom<MessageMetadata>(),
-              upvotes: z.number().nullish(),
-              downvotes: z.number().nullish(),
-              searchVector: z.string().nullish(),
-              embedding: z.array(z.number()).nullish(),
-              embeddingHash: z.string().nullish(),
-              createdAt: dateSchema.nullable(),
-              updatedAt: dateSchema.nullable(),
-              // Tool messages in incognito mode may send content as an array
-              // (AI SDK multi-part content format). Accept and coerce to JSON string.
-              // Plain objects (e.g. {type:"text",text:"..."}) also need coercion.
-              content: z
-                .union([
-                  z.string(),
-                  z.array(WidgetDataSchema),
-                  z.record(z.string(), WidgetDataSchema),
-                  z.null(),
-                ])
-                .transform((v) =>
-                  typeof v === "string" || v === null ? v : JSON.stringify(v),
-                )
-                .optional(),
-              // errorMessage may also be a structured object in some clients
-              errorMessage: z
-                .union([z.string(), WidgetDataSchema])
-                .transform((v) =>
-                  typeof v === "string" || v === null || v === undefined
-                    ? v
-                    : JSON.stringify(v),
-                )
-                .optional(),
-              authorId: z.string().nullish(),
-              authorName: z.string().nullish(),
-              errorType: z.string().nullish(),
-              errorCode: z.string().nullish(),
-            }),
-          )
+          .array(z.unknown())
           .optional()
-          .nullable() as z.ZodType<ChatMessage[]>,
+          .nullable()
+          .transform((items): ChatMessage[] => parseMessageHistory(items)),
+      }),
+
+      // === INCOGNITO THREAD META (for incognito mode) ===
+      // Incognito threads have no DB row, so the server can't read their
+      // current title/description for the thread-rename system prompt. The
+      // client sends the localStorage values; ignored for server threads.
+      incognitoThreadTitle: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.incognitoThreadTitle.label",
+        description: "post.incognitoThreadTitle.description",
+        columns: 6,
+        schema: z.string().max(255).nullable().optional(),
+      }),
+      incognitoThreadDescription: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.incognitoThreadDescription.label",
+        description: "post.incognitoThreadDescription.description",
+        columns: 6,
+        schema: z.string().max(1000).nullable().optional(),
       }),
 
       // === FILE ATTACHMENTS ===

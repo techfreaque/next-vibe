@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The video generation tool returned an error instead of a successful result. No `videoUrl`, `creditCost`, or `durationSeconds` in the output.\n\n**FAILED: Video generation failed with error: \"Video provider error: [object Object]\". Result has no videoUrl, no creditCost, no durationSeconds — the tool returned an error instead of a valid video.**",
+    "encoding_format": "float"
+  }
+}

@@ -22,7 +22,7 @@ import {
   calculateCreditCost,
 } from "@/app/api/[locale]/agent/models/models";
 
-import type { ToolExecutionContext } from "../chat/config";
+import { DefaultFolderId, type ToolExecutionContext } from "../chat/config";
 import {
   checkMediaBalance,
   deductMediaCredits,
@@ -205,8 +205,12 @@ export class MusicGenerationRepository {
       generationResult.data.durationSeconds ?? durationSeconds;
     const finalCreditCost = generationResult.data.creditCost ?? creditCost;
 
-    // Upload to our storage so the URL is persistent and access-controlled
+    // Upload to our storage so the URL is persistent and access-controlled.
+    // Incognito threads have no server-side thread row — the file is owned by
+    // the caller's leadId and served only to that lead (browser).
     const scThreadId = streamContext?.threadId;
+    const isIncognito =
+      streamContext?.rootFolderId === DefaultFolderId.INCOGNITO;
     if (scThreadId) {
       try {
         const storage = getStorageAdapter();
@@ -216,7 +220,8 @@ export class MusicGenerationRepository {
           filename: `generated-audio-${Date.now()}.mp3`,
           mimeType: "audio/mpeg",
           threadId: scThreadId,
-          userId: user.id,
+          userId: isIncognito ? undefined : user.id,
+          leadId: isIncognito ? user.leadId : undefined,
         });
         audioUrl = uploadResult.url;
       } catch (uploadErr) {

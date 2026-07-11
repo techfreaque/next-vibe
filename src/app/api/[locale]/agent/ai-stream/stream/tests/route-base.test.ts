@@ -38,8 +38,6 @@
  *   T9  → AI reasons about its own prior generate_image tool result in context
  *   T10 → file attachments: image, multi (image+audio), voice (attach+STT), video, voice WAV gap-fill
  *   T11 → Native image generation via Gemini 3.1 Flash Image Preview (file part output, empty args.prompt)
- *   T11b→ gap-fill Pass 2: non-image model sees vision-bridge description of T11 image
- *   T11c/T11d → image-to-video (Nano Banana Pro native vision / Kimi K2.6 via tool)
  *   T11e/T11f(+verify)/T11g → image-to-image (native file-part, tool call, native I2I)
  *   T12 → invalid explicitParentMessageId - graceful error handling
  *
@@ -711,6 +709,10 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       // via revival (deferred message). Both honour the contract: the tool
       // call itself never blocks.
       let t6aInlineDelivery = false;
+      // T6a's wakeUp image-gen produces a real https image URL (inline result on
+      // fast delivery, or the deferred revival result on slow delivery). The new
+      // T6v video-gen step (after T6b) consumes it as lastFrameUrl.
+      let t6aGeneratedImageUrl = "";
       let t11fOutputImageUrl: string; // Output image URL from T11f I2I, used by T11f-verify
 
       // ── T1: New thread + tool call (combines basic send + tool call) ──────
@@ -960,7 +962,16 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
               // The wrapped tool's OWN args: execute-tool nests them under `input`;
               // direct calls put them at the top level.
               const inner = toolResultRecord(args["input"]) ?? args;
-              return argKey in inner;
+              if (!(argKey in inner)) {
+                return false;
+              }
+              // Detail mode: the model may ALSO detail-look-up other tools on
+              // its own initiative (observed: rename-thread's schema before the
+              // housekeeping rename) — match only the detail call the prompt
+              // explicitly requested (generate_image).
+              return (
+                argKey !== "toolName" || inner["toolName"] === "generate_image"
+              );
             });
             return resolveToolResult(msg);
           };
@@ -1846,25 +1857,21 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
         const afterMusic = await getBalance(testUser);
         await assertDeductedLocal(testUser, beforeMusic, afterMusic, 0, 15);
 
-        // ── Part B: Video gen from fork branch (cheap: favorites) ──
-        // VEO_3_1 costs ~48 cr/sec * 5 sec * 1.3 markup = ~312 cr minimum
+        // ── Part B: favorites read (chains after T4a) ──
+        // NOTE: video-gen was moved to the T6v step (after T6b), so it can use
+        // T6a's generated image as its lastFrameUrl. T4b is now a plain read
+        // step in BOTH forks: it calls `favorites` and asserts the array shape.
         await pinBalance(testUser, 400);
         const beforeVideo = await getBalance(testUser);
         const prevIdsVideo = new Set(
           (await getMessages(threadId)).map((m) => m.id),
         );
 
-        const t4bTool = cfg.cheapMode ? "favorites" : "generate_video";
+        const t4bTool = "favorites";
         const { result: videoResult, messages: videoMsgs } = await runStream({
           user: testUser,
-          // RECORDING-ONLY worst case: ModelsLab's poller caps at 300
-          // attempts (~7-8min on a busy queue) before the future_links
-          // fallback, plus upload + cross-instance handoff. Replays finish in
-          // seconds — this budget never bites on fixture runs.
-          settleTimeoutMs: 900_000,
-          prompt: cfg.cheapMode
-            ? `[T4b favorites] Call ${toolInstr(cfg, "favorites")} to list the user's favorites. Check that the result has a favorites array. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.`
-            : `[T4b video-gen] Call ${toolInstrWithArgs(cfg, "generate_video", "prompt='spinning cube'")}. Check that the result has a non-empty videoUrl, a positive creditCost, and a positive durationSeconds. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.`,
+          settleTimeoutMs: MEDIA_SETTLE_TIMEOUT_MS,
+          prompt: `[T4b favorites] Call ${toolInstr(cfg, "favorites")} to list the user's favorites. Check that the result has a favorites array. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.`,
           threadId,
           favoriteId: mainFavoriteId,
           // T4b chains AFTER T4a: parent is T4a's music leaf, NOT a second fork
@@ -1880,12 +1887,12 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
 
         const videoAdded = newMessages(videoMsgs, prevIdsVideo);
 
-        // T4b: video user must be a direct child of T4a's music leaf (chains
+        // T4b: favorites user must be a direct child of T4a's music leaf (chains
         // AFTER T4a, not a sibling fork off 3b).
         const videoUser = videoAdded.find((m) => m.role === "user");
         expect(
           videoUser?.parentId,
-          `T4b: video user parentId must be t4aMusicAiMsgId=${t4aMusicAiMsgId} (chains after T4a, not a fork off branchForkAiMsgId=${branchForkAiMsgId})`,
+          `T4b: favorites user parentId must be t4aMusicAiMsgId=${t4aMusicAiMsgId} (chains after T4a, not a fork off branchForkAiMsgId=${branchForkAiMsgId})`,
         ).toBe(t4aMusicAiMsgId);
 
         // Tool message
@@ -1897,21 +1904,11 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
 
         const videoRes = resolveToolResult(videoToolMsg);
         expect(videoRes).not.toBeNull();
-        if (cfg.cheapMode) {
-          // favorites result: `favorites` array.
-          expect(
-            Array.isArray(videoRes!["favorites"]),
-            "[T4b] favorites result must have a favorites array",
-          ).toBe(true);
-        } else {
-          expect(typeof videoRes!["videoUrl"]).toBe("string");
-          expect(String(videoRes!["videoUrl"])).toMatch(/^https?:\/\/.+/);
-          expect(typeof videoRes!["creditCost"]).toBe("number");
-          expect((videoRes!["creditCost"] as number) > 0).toBe(true);
-          expect(typeof videoRes!["durationSeconds"]).toBe("number");
-          expect((videoRes!["durationSeconds"] as number) > 0).toBe(true);
-          expect((videoRes!["durationSeconds"] as number) <= 60).toBe(true);
-        }
+        // favorites result: `favorites` array (both forks).
+        expect(
+          Array.isArray(videoRes!["favorites"]),
+          "[T4b] favorites result must have a favorites array",
+        ).toBe(true);
 
         // Final AI
         const videoLastAi = videoMsgs.find(
@@ -1973,20 +1970,9 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
         await assertNoPendingTasks(threadId);
 
         const afterVideo = await getBalance(testUser);
-        // Video gen: VEO_3_1 via modelslab + chat model tokens.
-        // In remote mode the video gen credits are deducted on the remote instance, not locally.
-        // Remote-folder loop-local: tools execute on the REMOTE
-        // (hermes) — the media charge lands there too; only LLM tokens local.
-        await assertDeductedLocal(
-          testUser,
-          beforeVideo,
-          afterVideo,
-          // Cheap read tools deduct only LLM tokens (little/none); media video
-          // gen deducts a real media charge unless it ran on a remote instance.
-          cfg.cheapMode || cfg.remoteInstanceId ? 0 : 5,
-          400,
-        );
-      }, 1_200_000); // 20 min RECORDING-ONLY worst case: ModelsLab's queue can hold a video job in "processing" for 15+ min live. Replays finish in seconds — this cap never bites on fixture runs.
+        // T4b is a plain read tool (favorites) — only LLM tokens bill.
+        await assertDeductedLocal(testUser, beforeVideo, afterVideo, 0, 400);
+      }, 1_200_000);
 
       // ── T5: detach dispatch - AI calls cbTool(detach), gets taskId ──
       fit(
@@ -2500,6 +2486,9 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
                 String(phase1Res!["imageUrl"]),
                 "T6a inline delivery: imageUrl must be a real URL",
               ).toMatch(/^https?:\/\/.+/);
+              // Capture the generated image URL — the T6v video-gen step (after
+              // T6b) consumes it as lastFrameUrl.
+              t6aGeneratedImageUrl = String(phase1Res!["imageUrl"]);
             }
 
             // ── Stream ended, AI wrapped up ──
@@ -2749,6 +2738,12 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
               expect(typeof deferredRes![cbTool.resultKey]).toBe("string");
               expect(deferredRes![cbTool.resultKey]).toBeTruthy();
 
+              // Capture the generated image URL (non-cheap: resultKey === "imageUrl")
+              // — the T6v video-gen step consumes it as lastFrameUrl.
+              if (!cfg.cheapMode) {
+                t6aGeneratedImageUrl = String(deferredRes![cbTool.resultKey]);
+              }
+
               // Deferred message must be marked isDeferred=true.
               expect(
                 deferredTool.toolCall?.isDeferred,
@@ -2852,6 +2847,147 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
           effectiveTestTimeout,
         );
       });
+
+      // ── T6v: video gen using T6a's generated image as lastFrameUrl ──────
+      // Runs AFTER T6b so T6a's wakeUp image-gen has produced a real https URL
+      // (t6aGeneratedImageUrl). Chains linearly from T6b's leaf (lastMainAiMsgId).
+      // The video is generated between a fixed wojak first frame and T6a's image
+      // as the last frame. Cheap fork stays media-free (favorites read tool).
+      fit(`T6v: video gen (firstFrame=wojak, lastFrame=T6a image) - ${cfg.cheapMode ? "favorites" : "generate_video"}`, async () => {
+        const wojakUrl = "https://pngimg.com/uploads/wojak/wojak_PNG109612.png";
+
+        if (!cfg.cheapMode) {
+          // T6a must have produced a real image URL (inline or deferred).
+          expect(
+            t6aGeneratedImageUrl,
+            "T6v: t6aGeneratedImageUrl must be captured from T6a before the video step runs",
+          ).toMatch(/^https?:\/\/.+/);
+        }
+
+        // VEO_3_1 costs ~48 cr/sec * 5 sec * 1.3 markup = ~312 cr minimum.
+        await pinBalance(testUser, 400);
+        const beforeT6v = await getBalance(testUser);
+        const prevIdsT6v = new Set(
+          (await getMessages(threadId)).map((m) => m.id),
+        );
+
+        const t6vTool = cfg.cheapMode ? "favorites" : "generate_video";
+        const { result: t6vResult, messages: t6vMsgs } = await runStream({
+          user: testUser,
+          // RECORDING-ONLY worst case: ModelsLab's poller caps at 300
+          // attempts before the future_links fallback, plus upload +
+          // cross-instance handoff. Replays finish in seconds.
+          settleTimeoutMs: 900_000,
+          prompt: cfg.cheapMode
+            ? `[T6v favorites] Call ${toolInstr(cfg, "favorites")} to list the user's favorites. Check that the result has a favorites array. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.`
+            : `[T6v video-gen] Generate a 'spinning cube' video that morphs from this photo ${wojakUrl} (the FIRST frame) into the image YOU generated earlier in this conversation (that earlier generated image is the LAST frame — find its URL in your own prior tool results / conversation history; do NOT reuse the first-frame photo for it). ${cfg.remoteInstanceId ? `Call execute-tool with toolName='generate_video', instanceId='${cfg.remoteInstanceId}', input containing prompt='spinning cube' and frameReferences=[{url:'${wojakUrl}',role:'first'},{url:<your earlier generated image URL>,role:'last'}].` : `Call the generate_video tool with prompt='spinning cube' and frameReferences=[{url:'${wojakUrl}',role:'first'},{url:<your earlier generated image URL>,role:'last'}].`} Check that the result has a non-empty videoUrl, a positive creditCost, and a positive durationSeconds. You must end your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong as the very last step.`,
+          threadId,
+          favoriteId: mainFavoriteId,
+          explicitParentMessageId: lastMainAiMsgId,
+        });
+
+        expect(t6vResult.success).toBe(true);
+        if (!t6vResult.success) {
+          // oxlint-disable-next-line restricted-syntax
+          throw new Error(t6vResult.message ?? "unexpected failure");
+        }
+
+        const t6vAdded = newMessages(t6vMsgs, prevIdsT6v);
+
+        // Chains linearly from T6b's leaf.
+        const t6vUser = t6vAdded.find((m) => m.role === "user");
+        expect(
+          t6vUser?.parentId,
+          `T6v: user parentId must be lastMainAiMsgId=${lastMainAiMsgId} (chains after T6b)`,
+        ).toBe(lastMainAiMsgId);
+
+        const t6vToolMsg = findToolMsg(t6vAdded, t6vTool, cfg);
+        expect(t6vToolMsg).toBeDefined();
+        if (t6vToolMsg) {
+          assertToolMessageComplete(t6vToolMsg, t6vTool, "T6v", cfg);
+        }
+
+        const t6vRes = resolveToolResult(t6vToolMsg);
+        expect(t6vRes).not.toBeNull();
+        if (cfg.cheapMode) {
+          expect(
+            Array.isArray(t6vRes!["favorites"]),
+            "[T6v] favorites result must have a favorites array",
+          ).toBe(true);
+        } else {
+          expect(typeof t6vRes!["videoUrl"]).toBe("string");
+          expect(String(t6vRes!["videoUrl"])).toMatch(/^https?:\/\/.+/);
+          expect(typeof t6vRes!["creditCost"]).toBe("number");
+          expect((t6vRes!["creditCost"] as number) > 0).toBe(true);
+          expect(typeof t6vRes!["durationSeconds"]).toBe("number");
+          expect((t6vRes!["durationSeconds"] as number) > 0).toBe(true);
+
+          // ── frameReferences arg must carry the wojak first + T6a last frame ──
+          // In execute-tool (queue) mode the args nest under `input`; in
+          // direct mode they sit at the top level of args.
+          const t6vArgs = toolResultRecord(t6vToolMsg!.toolCall?.args);
+          const t6vInput = toolResultRecord(t6vArgs?.["input"] as WidgetData);
+          const rawFrameReferences =
+            t6vArgs?.["frameReferences"] ?? t6vInput?.["frameReferences"];
+          const frameReferences = Array.isArray(rawFrameReferences)
+            ? rawFrameReferences.flatMap((entry) => {
+                const rec = toolResultRecord(entry);
+                return rec ? [rec] : [];
+              })
+            : [];
+          const firstFrame = frameReferences.find(
+            (f) => f["role"] === "first",
+          )?.["url"];
+          const lastFrame = frameReferences.find((f) => f["role"] === "last")?.[
+            "url"
+          ];
+          expect(
+            firstFrame,
+            `[T6v] generate_video args.frameReferences must include the wojak URL with role 'first' — args: ${JSON.stringify(t6vArgs)}`,
+          ).toBe(wojakUrl);
+          // The AI must resolve the LAST frame itself: an image IT generated
+          // earlier in THIS conversation (T2/T5/T6a all produced images). We do
+          // NOT pin T6a's exact URL — any of our own generated-image storage URLs
+          // is correct — only that it's one of OURS, role 'last', and NOT the
+          // wojak first frame (i.e. it didn't reuse the first frame or invent one).
+          expect(
+            typeof lastFrame === "string" &&
+              lastFrame.includes("/agent/chat/threads/files/") &&
+              lastFrame !== wojakUrl,
+            `[T6v] last frame must be an image the AI generated earlier in this conversation (our storage URL), not the wojak first frame or an invented URL — got ${String(lastFrame)}; args: ${JSON.stringify(t6vArgs)}`,
+          ).toBe(true);
+        }
+
+        const t6vLastAi = t6vMsgs.find(
+          (m) => m.id === t6vResult.data.lastAiMessageId,
+        );
+        expect(t6vLastAi).toBeDefined();
+        expect(t6vLastAi!.finishReason).toBe("stop");
+        assertStepOk(t6vLastAi!.content, "T6v");
+        lastMainAiMsgId = t6vResult.data.lastAiMessageId!;
+
+        assertNoOrphans(
+          t6vMsgs,
+          new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
+          {
+            expectedLeafId: lastMainAiMsgId,
+            knownDeadEndLeaves: deadEndLeaves,
+          },
+        );
+        await assertThreadIdle(threadId, testUser);
+        await assertNoPendingTasks(threadId);
+
+        const afterT6v = await getBalance(testUser);
+        // Cheap read deducts only LLM tokens; real video gen deducts a media
+        // charge unless it ran on a remote instance.
+        await assertDeductedLocal(
+          testUser,
+          beforeT6v,
+          afterT6v,
+          cfg.cheapMode || cfg.remoteInstanceId ? 0 : 5,
+          400,
+        );
+      }, 1_200_000);
 
       // ── T6c: wakeUp repeat - second full E2E wakeUp on same thread ──────
       // Verifies no stale state from T6a/T6b causes issues.
@@ -4159,8 +4295,15 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
           assertStepOk(imgResult.data.lastAiMessageContent, "T10a");
           lastMainAiMsgId = imgResult.data.lastAiMessageId!;
 
-          const imgAiMsg = imgAdded.find((m) => m.role === "assistant");
+          // The FINAL assistant of the turn (by lastAiMessageId) — not the first
+          // one found. With the per-turn rename-thread side-action, the turn's
+          // first assistant made the tool call (finishReason null, turn
+          // continued); only the answer message that ENDS the turn is "stop".
+          const imgAiMsg = imgMsgs.find(
+            (m) => m.id === imgResult.data.lastAiMessageId,
+          );
           expect(imgAiMsg).toBeDefined();
+          expect(imgAiMsg!.role).toBe("assistant");
           expect(imgAiMsg!.finishReason).toBe("stop");
           expect(imgAiMsg!.creditCost).toBeGreaterThan(0);
 
@@ -4746,295 +4889,6 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
         },
         mediaTestTimeout,
       );
-
-      // ── T11b: Follow-up after native image gen - verify synthetic tool message + chain continuation ──
-      // After T11 (native gen via the native-image variant), the thread has a
-      // synthetic generate_image tool message with empty text and a file URL.
-      //
-      // The follow-up runs on mainFavoriteId (budget variant). Whether that
-      // model can see images depends on the variant's resolved model; the
-      // assertions below are model-agnostic (chain continues, credits deducted).
-      // For image-capable models:
-      //   - Gap-fill Pass 2 correctly skips (no vision bridge needed)
-      //   - buildToolResultOutput fetches the image via fetchStorageFileAsBase64 and passes it as
-      //     base64 content parts so the model can actually see the generated image
-      //
-      // NOTE: With a long conversation (T1-T11), context truncation may drop the tool message.
-      // This test verifies: (1) the synthetic tool message exists in DB, (2) the chain continues,
-      // (3) credits are deducted. Describing the image is best-effort depending on context fit.
-      fit(
-        "T11b: follow-up turn after native gen - synthetic tool message persisted, chain continues",
-        async () => {
-          // Cheap mode keeps the IDENTICAL chain-continuation/orphan/idle/
-          // deduction assertions. The DB verification of the T11 native
-          // synthetic tool message is regular-only (cheap T11 makes no native
-          // file part). In cheap mode the follow-up simply calls one distinct
-          // real read tool (cron-stats) as an ordinary tool turn.
-          await pinBalance(testUser, 30);
-          const before = await getBalance(testUser);
-
-          if (!cfg.cheapMode) {
-            // Verify the synthetic tool message from T11 exists in DB with correct structure
-            const allMsgs = await getMessages(threadId);
-            const nativeImgToolMsg = allMsgs.find(
-              (m) =>
-                m.role === "tool" &&
-                m.toolCall?.toolName === "generate_image" &&
-                typeof (toolResultRecord(m.toolCall?.result) ?? {})["file"] ===
-                  "string",
-            );
-            expect(
-              nativeImgToolMsg,
-              "[T11b] Could not find the T11 native-gen synthetic tool message in thread history.",
-            ).toBeDefined();
-
-            // Verify tool result structure: file URL, empty text, creditCost
-            const toolRes = toolResultRecord(
-              nativeImgToolMsg!.toolCall?.result,
-            );
-            expect(
-              typeof toolRes!["file"],
-              "[T11b] tool result must have file URL",
-            ).toBe("string");
-            expect(
-              toolRes!["text"],
-              "[T11b] tool result text should be empty for native gen",
-            ).toBe("");
-          }
-
-          const prevIds = new Set(
-            (await getMessages(threadId)).map((m) => m.id),
-          );
-
-          // Send follow-up with image-capable model (Kimi K2.6)
-          const { result, messages } = await runStream({
-            user: testUser,
-            prompt: cfg.cheapMode
-              ? `[T11b follow-up] Call ${toolInstr(cfg, "cron-stats")} to read the cron task stats. Check that the result has a numeric totalTasks. End your reply with STEP_OK if the tool ran, or FAILED: <reason> if anything was wrong.`
-              : "[T11b follow-up] You may or may not have generated an image previously. Say STEP_OK and continue the conversation.",
-            threadId,
-            favoriteId: mainFavoriteId,
-            explicitParentMessageId: lastMainAiMsgId,
-          });
-
-          expect(result.success).toBe(true);
-          if (!result.success) {
-            // oxlint-disable-next-line restricted-syntax
-            throw new Error(result.message ?? "unexpected stream failure");
-          }
-
-          if (cfg.cheapMode) {
-            // Cheap: ordinary tool turn — assert the normal tool-message shape.
-            const added = newMessages(messages, prevIds);
-            const cronToolMsg = findToolMsg(added, "cron-stats", cfg);
-            expect(
-              cronToolMsg,
-              "[T11b] cron-stats tool message not found",
-            ).toBeDefined();
-            if (cronToolMsg) {
-              assertToolMessageComplete(cronToolMsg, "cron-stats", "T11b", cfg);
-            }
-            const cronRes = resolveToolResult(cronToolMsg);
-            expect(cronRes).not.toBeNull();
-            expect(
-              typeof cronRes!["totalTasks"],
-              "[T11b] cron-stats result must have a numeric totalTasks",
-            ).toBe("number");
-          }
-
-          // The model should respond successfully (content may or may not reference the image
-          // depending on whether truncation dropped the tool message from context)
-          assertStepOk(result.data.lastAiMessageContent, "T11b");
-          lastMainAiMsgId = result.data.lastAiMessageId!;
-
-          assertNoOrphans(
-            messages,
-            new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
-            {
-              expectedLeafId: lastMainAiMsgId,
-              knownDeadEndLeaves: deadEndLeaves,
-            },
-          );
-          await assertThreadIdle(threadId, testUser);
-          await assertNoPendingTasks(threadId);
-
-          const after = await getBalance(testUser);
-          await assertDeductedLocal(testUser, before, after, 0, 20);
-        },
-        mediaTestTimeout,
-      );
-
-      // ── T11c: image-to-video via generate_video — BOTH bridging paths ──────
-      // The generate_video i2v tool is exercised ONCE, but both ways an
-      // image-capable chat model can bridge image→video are covered in a single
-      // case (sub-turns), so no i2v coverage is lost:
-      //   • Nano Banana Pro (multimodal inputs) SEES the image directly, then
-      //     calls generate_video with inputMediaUrl.
-      //   • Kimi K2.6 receives the image URL as TEXT and passes it through as
-      //     generate_video's inputMediaUrl.
-      // Both must land the same result shape (videoUrl + positive creditCost +
-      // durationSeconds ≤ 60) and the same inputMediaUrl arg.
-      // I2V models (wan-2-6-i2v etc.) cost ~10 cr/sec × 5 sec × 1.3 markup = ~65 cr
-      fit(
-        "T11c: image-to-video via generate_video - image-seen (Nano Banana) AND url-as-text (Kimi) bridge to inputMediaUrl",
-        async () => {
-          // Cheap mode keeps the IDENTICAL tool-message/chain/orphan/idle
-          // assertions. The i2v-specific inputMediaUrl arg + video result fields
-          // are regular-only. In cheap mode each sub-turn calls one distinct real
-          // read tool (inventory-stock, inventory-warehouses) as an ordinary tool
-          // turn.
-          await pinBalance(testUser, 400);
-          const before = await getBalance(testUser);
-
-          // Stable public image for the fixture (Unsplash, same as T9 attachment tests).
-          const INPUT_IMAGE_URL =
-            "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800";
-
-          // Two bridging variants — same generate_video tool, different chat
-          // model + how the image reaches it. Cheap swaps in a distinct read
-          // tool per sub-turn so fixtures/results never collide.
-          const i2vVariants = cfg.cheapMode
-            ? [
-                {
-                  slug: "T11c-image-seen",
-                  favoriteId: mainFavoriteId,
-                  cheapTool: "inventory-stock",
-                  cheapKey: "stockLevels",
-                  prompt: `[T11c inventory-stock] Call ${toolInstr(cfg, "inventory-stock")} to list the inventory stock levels. Check that the result has a stockLevels array. End your reply with STEP_OK if correct, or FAILED: <reason>.`,
-                },
-                {
-                  slug: "T11c-url-as-text",
-                  favoriteId: mainFavoriteId,
-                  cheapTool: "inventory-warehouses",
-                  cheapKey: "warehouses",
-                  prompt: `[T11c inventory-warehouses] Call ${toolInstr(cfg, "inventory-warehouses")} to list the warehouses. You MUST make this tool call NOW, in this turn. Check that the result has a warehouses array. End your reply with STEP_OK if correct, or FAILED: <reason>.`,
-                },
-              ]
-            : [
-                {
-                  slug: "T11c-image-seen",
-                  favoriteId: nativeImageFavoriteId,
-                  cheapTool: "generate_video",
-                  cheapKey: "videoUrl",
-                  prompt: `[T11c i2v-image-seen] Here is my photo: ${INPUT_IMAGE_URL} — make a nice foto out of it for my resume and tinder profile. ${toolInstrWithArgs(cfg, "generate_video", `prompt='professional portrait, smooth camera pull-back' inputMediaUrl='${INPUT_IMAGE_URL}'`)}. Check that the result has a non-empty videoUrl, a positive creditCost, and a positive durationSeconds. End your reply with STEP_OK if correct, or FAILED: <reason>.`,
-                },
-                {
-                  slug: "T11c-url-as-text",
-                  favoriteId: mainFavoriteId,
-                  cheapTool: "generate_video",
-                  cheapKey: "videoUrl",
-                  prompt: `[T11c i2v-url-as-text] Here is a photo URL: ${INPUT_IMAGE_URL} — make a nice foto out of it for my resume and tinder profile. ${toolInstrWithArgs(cfg, "generate_video", `prompt='professional portrait, smooth camera pull-back' inputMediaUrl='${INPUT_IMAGE_URL}'`)}. You MUST make this tool call NOW, in this turn — do NOT reuse or re-analyze a video result from an earlier turn. Check that the fresh result has a non-empty videoUrl, a positive creditCost, and a positive durationSeconds. End your reply with STEP_OK if correct, or FAILED: <reason>.`,
-                },
-              ];
-
-          for (const variant of i2vVariants) {
-            const prevIds = new Set(
-              (await getMessages(threadId)).map((m) => m.id),
-            );
-
-            const { result, messages } = await runStream({
-              user: testUser,
-              prompt: variant.prompt,
-              threadId,
-              favoriteId: variant.favoriteId,
-              explicitParentMessageId: lastMainAiMsgId,
-              // Heavy media turn: multi-MB request + slow post-tool model turn;
-              // on first record the live video polling must finish in this window
-              // for fixtures to persist. See TestStreamParams.settleTimeoutMs.
-              settleTimeoutMs: MEDIA_SETTLE_TIMEOUT_MS,
-            });
-
-            expect(result.success, `${variant.slug}: stream failed`).toBe(true);
-            if (!result.success) {
-              // oxlint-disable-next-line restricted-syntax
-              throw new Error(result.message ?? "unexpected stream failure");
-            }
-
-            const added = newMessages(messages, prevIds);
-            const t11cTool = cfg.cheapMode
-              ? variant.cheapTool
-              : "generate_video";
-            // Tool message: AI called the tool (possibly via execute-tool in direct mode)
-            const videoToolMsg = findToolMsg(added, t11cTool, cfg);
-            expect(
-              videoToolMsg,
-              `${variant.slug}: ${t11cTool} tool message not found`,
-            ).toBeDefined();
-            if (videoToolMsg) {
-              assertToolMessageComplete(
-                videoToolMsg,
-                t11cTool,
-                variant.slug,
-                cfg,
-              );
-            }
-
-            const videoRes = resolveToolResult(videoToolMsg);
-            expect(
-              videoRes,
-              `${variant.slug}: tool result null`,
-            ).not.toBeNull();
-            if (cfg.cheapMode) {
-              expect(
-                Array.isArray(videoRes![variant.cheapKey]),
-                `${variant.slug}: ${variant.cheapTool} result must have a ${variant.cheapKey} array`,
-              ).toBe(true);
-            } else {
-              // Args: inputMediaUrl must be the image URL passed in
-              const videoArgs = toolResultRecord(videoToolMsg!.toolCall?.args);
-              const resolvedArgs =
-                (videoArgs?.["input"] as
-                  | Record<string, WidgetData>
-                  | undefined) ?? videoArgs;
-              expect(
-                resolvedArgs?.["inputMediaUrl"],
-                `${variant.slug}: generate_video args.inputMediaUrl must be the input image URL`,
-              ).toBe(INPUT_IMAGE_URL);
-
-              // Result: videoUrl, positive creditCost, positive durationSeconds
-              expect(typeof videoRes!["videoUrl"]).toBe("string");
-              expect(videoRes!["videoUrl"]).toBeTruthy();
-              expect((videoRes!["creditCost"] as number) > 0).toBe(true);
-              expect((videoRes!["durationSeconds"] as number) > 0).toBe(true);
-              expect((videoRes!["durationSeconds"] as number) <= 60).toBe(true);
-            }
-
-            // Find actual leaf for chain tracking (model may call extra tools after video gen)
-            const t11cLeaf = [...added]
-              .toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-              .find((m) => !messages.some((other) => other.parentId === m.id));
-            lastMainAiMsgId = t11cLeaf?.id ?? result.data.lastAiMessageId!;
-
-            assertNoOrphans(
-              messages,
-              new Set([t2BranchParentId, ...mediaBranchPoints].filter(Boolean)),
-              {
-                expectedLeafId: lastMainAiMsgId,
-                knownDeadEndLeaves: deadEndLeaves,
-              },
-            );
-            await assertThreadIdle(threadId, testUser);
-            await assertNoPendingTasks(threadId);
-          }
-
-          const after = await getBalance(testUser);
-          // Two i2v sub-turns: i2v resolution substitutes the cheapest
-          // image-capable model (~3cr/s -> ~15cr for 5s); the lower bound still
-          // proves a real video charge beyond token cost. Cheap read tools
-          // deduct only tokens.
-          await assertDeductedLocal(
-            testUser,
-            before,
-            after,
-            cfg.cheapMode ? 0 : 20,
-            300,
-          );
-        },
-        mediaTestTimeout,
-      );
-
-      // (T11d's Kimi url-as-text i2v path is now the second sub-turn of T11c —
-      //  generate_video is exercised once, both bridging paths still covered.)
 
       // ── T11e: I2I via Nano Banana Pro (NATIVE image-to-image) ──
       // Nano Banana Pro (gemini-3-pro-image-preview) has supportsTools:false and

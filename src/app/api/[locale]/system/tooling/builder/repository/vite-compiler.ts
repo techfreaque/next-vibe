@@ -27,6 +27,7 @@ import {
   type EnvironmentModuleGraph,
   type InlineConfig,
   isRunnableDevEnvironment,
+  type ModuleNode,
   type Plugin,
   type PluginOption,
 } from "vite";
@@ -161,11 +162,15 @@ function serverOnlyTracePlugin(
 }
 
 // Maximum number of modules to invalidate before giving up on surgical eviction.
-// If a changed file is a widely-shared utility (i18n, zod, response.schema),
-// walking the full importer tree could invalidate the entire project, which is
-// worse than a targeted clear. When we exceed this limit we return false so
-// the caller can fall back to a full cache clear instead.
-const SSR_EVICT_LIMIT = 150;
+// Above this we fall back to a full evaluatedModules.clear(). The limit exists
+// only to bound truly project-wide closures (an edit to response.schema or
+// i18n core invalidates nearly everything — at that point a clear is
+// equivalent and cheaper than walking the graph). It must NOT be tight:
+// scoped eviction re-evaluates only the closure on the next request, while a
+// full clear re-evaluates the ENTIRE SSR graph (~2s) — every edit whose
+// closure exceeds the limit turns the next request back into a cold start.
+// Typical definition/repository edits have closures in the hundreds.
+const SSR_EVICT_LIMIT = 2000;
 
 // Walk the importer graph recursively and collect every module that transitively
 // depends on the changed file. Returns false if the visited set exceeds SSR_EVICT_LIMIT
@@ -209,6 +214,40 @@ function evictSsrModules(
       evaluatedModules.invalidateModule(node);
     }
   }
+}
+
+// Mirror Vite's client-side HMR propagation to predict full reloads: walk the
+// importer graph from a changed module until an accept boundary stops the
+// update, or a graph root is reached without one. Returns the escaping import
+// chain (changed file first, root last) or null when every path is accepted.
+// Approximation only — partial accepts (acceptedHmrExports) and circular-import
+// detection are not modeled — so callers should label output as "likely".
+function findFullReloadPath(
+  mod: ModuleNode,
+  visited: Set<string>,
+): string[] | null {
+  const key = mod.id ?? mod.url;
+  if (visited.has(key)) {
+    return null;
+  }
+  visited.add(key);
+  const shortName = key.replace(/^.*\/src\//, "src/");
+  if (mod.isSelfAccepting) {
+    return null;
+  }
+  if (mod.importers.size === 0) {
+    return [shortName];
+  }
+  for (const importer of mod.importers) {
+    if (importer.acceptedHmrDeps.has(mod)) {
+      continue;
+    }
+    const rest = findFullReloadPath(importer, visited);
+    if (rest) {
+      return [shortName, ...rest];
+    }
+  }
+  return null;
 }
 
 class ViteCompiler {
@@ -1068,6 +1107,14 @@ class ViteCompiler {
         Object.assign(process.env, { CI: "true" });
       }
 
+      // NOTE on the internal port's 10s timeout: nitro/srvx serves it via
+      // Bun.serve (Bun's 10s idleTimeout default), and srvx provably does
+      // NOT call through the `Bun.serve` property (a property patch here
+      // never fired), so it cannot be fixed at this layer. The fix lives in
+      // src/generated/app-tanstack/start.ts: the request middleware calls
+      // `request.runtime.bun.server.timeout(request, 255)` per request —
+      // verified with a 15s zero-byte SSR render surviving on both ports.
+
       const { createServer } = await import("vite");
       const tanstackStartPkg = "@tanstack/react-start/plugin/vite";
       const { tanstackStart } = (await import(
@@ -1699,6 +1746,23 @@ class ViteCompiler {
               process.stdout.write(`${hmrMsg}\n`);
               serverFileLog(hmrMsg);
 
+              // Predict client full reloads: if any importer path from a
+              // changed module escapes to a graph root without an accept
+              // boundary, Vite broadcasts full-reload to EVERY open tab —
+              // regardless of what page they show. Log the escaping chain so
+              // "why did my page reload" is answerable from the dev log.
+              for (const mod of nonCssModules) {
+                const escapePath = findFullReloadPath(mod, new Set());
+                if (escapePath) {
+                  const reloadMsg = fmtVite(
+                    `full-reload likely — unaccepted chain: ${escapePath.join(" → ")}`,
+                  );
+                  process.stdout.write(`${reloadMsg}\n`);
+                  serverFileLog(reloadMsg);
+                  break;
+                }
+              }
+
               // SSR: invalidate the changed modules in the module graph (marks
               // them stale for Vite's dependency tracking), then always do a
               // full evaluatedModules.clear().
@@ -1880,8 +1944,17 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
                 return undefined;
               }
               const cleanId = id.replace(/\?.*$/, "");
+              // Generated hub files (routeTree, endpoint/route registries) are
+              // pure lookup tables that import huge subtrees — without an
+              // accept boundary here, edits to any definition/repository/i18n
+              // file bubble through them to the entry and full-reload every
+              // open tab. Re-evaluating them in place is safe: consumers
+              // resolve entries lazily per lookup.
               const isRoute =
                 cleanId.includes("/app-tanstack/routes/") ||
+                cleanId.includes("/app-tanstack/routeTree.gen") ||
+                cleanId.includes("/src/generated/endpoints/") ||
+                cleanId.includes("/src/generated/routes/") ||
                 cleanId.endsWith("/__root.tsx") ||
                 (cleanId.includes("/src/app/") &&
                   (cleanId.endsWith("/layout.tsx") ||
@@ -2127,10 +2200,17 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
       // Tune Node.js HTTP server timeouts on Vite's internal server (port 3100).
       //
       // headersTimeout (default 60s): time allowed to receive the full request headers.
-      // Disable — the Bun proxy sometimes takes a moment to forward headers on first connect.
+      // The Bun proxy sometimes takes a moment to forward headers on first connect.
       //
       // timeout / requestTimeout: time allowed for a complete request-response cycle.
-      // Disable — SSR renders can take >5s on cold start; we want no hard deadline here.
+      // SSR renders can take >10s on cold start; we want no practical deadline here.
+      //
+      // CRITICAL: do NOT use 0 to "disable" any of these. Under Bun, node:http
+      // runs on Bun.serve, and Bun 1.3.x ignores zero timeouts (the same bug
+      // as idleTimeout: 0 in realtime/server.ts) — it silently falls back to
+      // the 10s uWS default. That killed cold-start SSR renders that stream
+      // no bytes for 10s: "[Bun.serve]: request timed out after 10 seconds"
+      // here, surfacing as ECONNRESET at the proxy. Use 255s, the uWS max.
       //
       // keepAliveTimeout (default 5s): idle time before the server closes a keep-alive
       // connection. Do NOT set to 0. keepAliveTimeout=0 causes the server to close
@@ -2141,11 +2221,11 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
       if (server.httpServer) {
         const httpServer = server.httpServer as NodeHttpServer;
         httpServer.keepAliveTimeout = 65_000; // longer than proxy idle gaps
-        httpServer.headersTimeout = 0;
-        httpServer.timeout = 0;
+        httpServer.headersTimeout = 255_000;
+        httpServer.timeout = 255_000;
         (
           httpServer as NodeHttpServer & { requestTimeout?: number }
-        ).requestTimeout = 0;
+        ).requestTimeout = 255_000;
       }
       const resolvedPort = server.config.server.port ?? port ?? 3001;
       const url = `http://localhost:${resolvedPort}`;
@@ -2183,6 +2263,39 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
         .join("\n");
       process.stdout.write(`${formatted}\n`);
       serverFileLog(formatted);
+
+      // Prime the SSR module graph in the background. server.warmup only
+      // pre-TRANSFORMS files — module EVALUATION still happens lazily, so the
+      // first real page request pays ~2s evaluating the shared graph
+      // (providers, layout chain, i18n) that every page needs. One
+      // self-request right after listen absorbs that cost during boot; the
+      // user's first page load then only evaluates its own page chain.
+      void (async (): Promise<void> => {
+        // Sequential: concurrent cold SSR renders race the module runner.
+        // /en-US warms the shared graph (providers, layout, i18n); the
+        // threads page additionally warms the chat/ai-stream widget chain —
+        // the page users open first, whose first render otherwise holds its
+        // SSR stream open for many seconds.
+        for (const path of ["/en-US", "/en-US/threads/incognito/new"]) {
+          try {
+            // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- dev-server self-request to prime SSR page rendering, not an endpoint call
+            const res = await fetch(`${url}${path}`, {
+              headers: { "user-agent": "vibe-ssr-prime" },
+            });
+            // Drain the stream so the full page (not just the shell) evaluates.
+            await res.text();
+            const primeMsg = fmtVite(
+              res.ok
+                ? `SSR graph primed (${path})`
+                : `SSR prime got HTTP ${res.status} (${path}) — first cold render failed, check the request log above`,
+            );
+            process.stdout.write(`${primeMsg}\n`);
+            serverFileLog(primeMsg);
+          } catch {
+            /* priming is best-effort — first request just runs cold */
+          }
+        }
+      })();
 
       const closeFn = (): Promise<void> => {
         // Force-terminate all keep-alive connections before closing so the TCP

@@ -4,14 +4,19 @@ import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-ba
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { UseNavigationStackReturn } from "next-vibe/platforms/react/hooks/use-navigation-stack";
-import { useRouter } from "next-vibe/ui/hooks/use-navigation";
+import { useRouter, useSearchParams } from "next-vibe/ui/hooks/use-navigation";
+import { Alert, AlertDescription, AlertTitle } from "next-vibe/ui/ui/alert";
 import { Container } from "next-vibe/ui/ui/container";
+import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
+import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 import { useMemo } from "react";
 
 import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
 import creditsDefinition from "@/app/api/[locale]/credits/definition";
+
+import { scopedTranslation } from "../i18n";
 
 interface Props {
   locale: CountryLanguage;
@@ -24,6 +29,39 @@ const PATH_TO_TAB: Record<string, string> = {
   "credits/history": "history",
   "remote-connection/list": "remote",
 };
+
+function PaymentResultBanner({
+  locale,
+}: {
+  locale: CountryLanguage;
+}): JSX.Element | null {
+  const searchParams = useSearchParams();
+  const { t } = scopedTranslation.scopedT(locale);
+
+  const paymentStatus = searchParams.get("payment");
+  const paymentType =
+    searchParams.get("type") === "credits" ? "credits" : "subscription";
+
+  if (paymentStatus !== "success" && paymentStatus !== "canceled") {
+    return null;
+  }
+
+  const isSuccess = paymentStatus === "success";
+  return (
+    <Alert
+      variant={isSuccess ? "success" : "warning"}
+      icon={isSuccess ? CheckCircle : XCircle}
+      className="mx-4 mb-2"
+    >
+      <AlertTitle>
+        {t(`subscription.payment.${paymentStatus}.title`)}
+      </AlertTitle>
+      <AlertDescription>
+        {t(`subscription.payment.${paymentStatus}.${paymentType}`)}
+      </AlertDescription>
+    </Alert>
+  );
+}
 
 export function OverviewPageClient({
   locale,
@@ -53,6 +91,7 @@ export function OverviewPageClient({
 
   return (
     <Container className="py-8">
+      <PaymentResultBanner locale={locale} />
       <EndpointsPage
         endpoint={creditsDefinition}
         user={user}

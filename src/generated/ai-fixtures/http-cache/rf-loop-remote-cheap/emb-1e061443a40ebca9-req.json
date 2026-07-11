@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "[CF1] Call the contact-form tool right now with exactly these arguments: name='Test User', subject='subject.generalInquiry', message='Automated integration test. Please ignore.'. Pass the subject value verbatim as 'subject.generalInquiry'. Do NOT call tool-help, do NOT describe the fields in prose, do NOT ask me to confirm — invoke the contact-form tool directly with those exact values. The tool itself will request confirmation.",
+    "encoding_format": "float"
+  }
+}

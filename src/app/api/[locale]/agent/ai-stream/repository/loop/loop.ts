@@ -556,6 +556,7 @@ export class StreamLoop implements StreamLoopState {
             type: "tool-error",
             toolCallId: part.toolCallId,
             toolName: part.toolName,
+            input: "input" in part ? (part.input as JSONValue) : undefined,
             error: "error" in part ? (part.error as JSONValue) : undefined,
           },
           pending,
@@ -809,6 +810,7 @@ export class StreamLoop implements StreamLoopState {
       type: "tool-error";
       toolCallId: string;
       toolName: string;
+      input?: JSONValue;
       error?: JSONValue;
     },
     pendingToolMessage: PendingToolData | undefined,

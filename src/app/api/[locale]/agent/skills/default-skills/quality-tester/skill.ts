@@ -92,7 +92,7 @@ If everything works, respond normally to the user. Only flag issues - don't narr
         selectionType: ModelSelectionType.MANUAL,
         // Gemini 3.1 Flash Image Preview (Nano Banana): the chat model IS the
         // image model — native image generation without a tool round-trip.
-        manualModelId: ChatModelId.GEMINI_3_1_FLASH_IMAGE_PREVIEW,
+        manualModelId: ChatModelId.GEMINI_3_PRO_IMAGE_PREVIEW,
         intelligenceRange: {
           min: IntelligenceLevel.QUICK,
           max: IntelligenceLevel.SMART,
@@ -106,7 +106,7 @@ If everything works, respond normally to the user. Only flag issues - don't narr
       },
       imageGenModelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ImageGenModelId.GEMINI_3_1_FLASH_IMAGE_PREVIEW,
+        manualModelId: ImageGenModelId.GEMINI_3_PRO_IMAGE_PREVIEW,
         sortBy: ModelSortField.PRICE,
         sortDirection: ModelSortDirection.ASC,
       },

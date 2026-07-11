@@ -356,6 +356,18 @@ const { PATCH } = createEndpoint({
         columns: 12,
         schema: z.string().min(1).max(255).optional(),
       }),
+      // The model-authored one-line preview. Rides the cross-instance
+      // thread-updated remoteEvent so a mirror thread gets the same description
+      // the rename tool set on the origin (loop-remote: rename runs on the
+      // executor; the caller's mirror must converge to the same preview).
+      description: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        label: "patch.threadTitle.label" as const,
+        description: "patch.threadTitle.description" as const,
+        columns: 12,
+        schema: z.string().max(2000).nullish(),
+      }),
       folderId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
@@ -496,7 +508,13 @@ const { PATCH } = createEndpoint({
       syncDomain: "threads" as const,
       operation: "merge" as const,
       allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
-      requestFields: ["title", "folderId", "status", "rootFolderId"] as const,
+      requestFields: [
+        "title",
+        "description",
+        "folderId",
+        "status",
+        "rootFolderId",
+      ] as const,
       responseFields: ["updatedAt"] as const,
       urlPathParamsFields: ["threadId"] as const,
       onEvent: async ({ requestData, responseData, urlPathParams, logger }) => {

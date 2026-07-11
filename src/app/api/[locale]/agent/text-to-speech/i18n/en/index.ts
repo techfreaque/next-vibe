@@ -12,21 +12,22 @@ export const translations = {
   post: {
     title: "Text to Speech",
     titleShort: "Text to Speech",
+    dynamicTitle: "Speech: {{text}}",
     description:
-      "Convert text to natural-sounding speech using AI (~0.00052 credits per character)",
+      "Convert text to speech. Pass text and a voice id. Use list-models (modelType=audio) to see available voice models — each has a unique id to pass as the voice parameter. Cost: ~0.00052 credits per character. Returns audioUrl.",
     form: {
       title: "Text to Speech Conversion",
-      description:
-        "Enter text to convert to speech (OpenAI TTS: ~0.00052 credits per character)",
+      description: "Enter text to convert to speech",
     },
     text: {
       label: "Text",
-      description: "Text to convert to speech",
+      description: "Text to convert to speech (max 5000 characters)",
       placeholder: "Enter the text you want to convert to speech...",
     },
     voice: {
       label: "Voice",
-      description: "Voice model for speech synthesis",
+      description:
+        "Voice model id. Use list-models (modelType=audio) to browse available voices and their ids.",
     },
     response: {
       title: "Audio Result",

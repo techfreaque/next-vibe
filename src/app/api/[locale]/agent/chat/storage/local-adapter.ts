@@ -21,6 +21,7 @@ export class LocalStorageAdapter implements StorageAdapter {
       threadId: string;
       messageId?: string;
       userId?: string;
+      leadId?: string;
     },
   ): Promise<{
     url: string;
@@ -83,6 +84,7 @@ export class LocalStorageAdapter implements StorageAdapter {
       size,
       uploadedAt: new Date(),
       uploadedBy: metadata.userId,
+      leadId: metadata.leadId,
       threadId: metadata.threadId,
       messageId: metadata.messageId,
     };

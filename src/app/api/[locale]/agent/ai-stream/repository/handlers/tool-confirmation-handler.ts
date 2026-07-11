@@ -117,6 +117,49 @@ class ToolConfirmationHandler {
       // the message-tree persistence below.
       params.streamContext.currentToolMessageId = toolConfirmation.messageId;
 
+      // Write + emit "executing" state before the tool runs so all devices
+      // transition from "pending confirmation" to the loading spinner immediately.
+      // Without this, DB still has waitingForConfirmation:true and other devices
+      // see no state change until the result arrives (which can take seconds).
+      if (!isIncognito) {
+        const [threadRowEarly] = await db
+          .select({ rootFolderId: chatThreads.rootFolderId })
+          .from(chatThreads)
+          .where(eq(chatThreads.id, toolMessage.threadId))
+          .limit(1);
+        if (threadRowEarly?.rootFolderId) {
+          const executingToolCall: ToolCall = {
+            ...toolCall,
+            waitingForConfirmation: false,
+          };
+          await db
+            .update(chatMessages)
+            .set({
+              metadata: {
+                ...toolMessage.metadata,
+                toolCall: executingToolCall,
+              },
+              updatedAt: new Date(),
+            })
+            .where(eq(chatMessages.id, toolConfirmation.messageId));
+          const earlyEmitter = createMessagesEmitter(logger, user, {
+            threadId: toolMessage.threadId,
+            rootFolderId: threadRowEarly.rootFolderId,
+            resolvedRelayContext,
+          });
+          earlyEmitter("tool-result", {
+            responseData: {
+              messages: [
+                {
+                  id: toolConfirmation.messageId,
+                  metadata: { toolCall: executingToolCall },
+                },
+              ],
+            },
+          });
+        }
+      }
+
       const confirmed = await ConfirmedExecution.run({
         toolCall,
         toolMessage,
@@ -217,6 +260,35 @@ class ToolConfirmationHandler {
               updatedAt: new Date(),
             })
             .where(eq(chatMessages.id, toolConfirmation.messageId));
+          // Broadcast the confirmed result — WS for local viewers AND the
+          // cross-instance `tool-result` remoteEvent (via resolvedRelayContext)
+          // so a MIRROR on the caller updates too. Without this the loop-remote
+          // approve mirror stayed stuck at {status:"waiting_for_confirmation"}:
+          // the executor ran + wrote the result here, but the caller's copy
+          // never learned of it (silent DB update, no event).
+          {
+            const [threadRowEmit] = await db
+              .select({ rootFolderId: chatThreads.rootFolderId })
+              .from(chatThreads)
+              .where(eq(chatThreads.id, toolMessage.threadId))
+              .limit(1);
+            if (threadRowEmit?.rootFolderId) {
+              createMessagesEmitter(logger, user, {
+                threadId: toolMessage.threadId,
+                rootFolderId: threadRowEmit.rootFolderId,
+                resolvedRelayContext,
+              })("tool-result", {
+                responseData: {
+                  messages: [
+                    {
+                      id: toolConfirmation.messageId,
+                      metadata: { toolCall: inPlaceToolCall },
+                    },
+                  ],
+                },
+              });
+            }
+          }
           logger.debug("[Tool Confirmation] Tool executed - updated in-place", {
             messageId: toolConfirmation.messageId,
           });
@@ -578,7 +650,7 @@ export class ToolConfirmationProcessor {
 
       // toolMessageId is either the original (updated in-place) or a new deferred row.
       const toolMessageId = confirmResult.data.toolMessageId;
-      const updatedMessage = await db.query.chatMessages.findFirst({
+      const updatedMessage = await chatDb.query.chatMessages.findFirst({
         where: eq(chatMessages.id, toolMessageId),
       });
 

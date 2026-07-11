@@ -508,6 +508,7 @@ export class MessageDbWriter {
    * Emit FILES_UPLOADED SSE event.
    */
   emitFilesUploaded(params: {
+    threadId: string;
     messageId: string;
     attachments: Array<{
       id: string;

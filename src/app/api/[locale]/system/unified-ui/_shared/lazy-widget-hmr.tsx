@@ -49,13 +49,6 @@ function ResolvedWidget({
   return React.createElement(Component, widgetProps);
 }
 
-// A promise stamped with status="fulfilled" by React's thenable tracking.
-type FulfilledPromise<T> = Promise<T> & { status: "fulfilled"; value: T };
-
-function isFulfilled<T>(p: Promise<T>): p is FulfilledPromise<T> {
-  return (p as FulfilledPromise<T>).status === "fulfilled";
-}
-
 export function HmrWrapper({
   widgetProps,
   state,
@@ -120,41 +113,31 @@ export function HmrWrapper({
     };
   }, [factory, state]);
 
-  // Fast path: component already resolved (prior render, preload(), or HMR update).
-  // Render directly — no Suspense, no async wait. This is the hot path for every
-  // request after the first SSR cold-start and for all hydrated client renders.
-  if (state.resolved !== null) {
-    return React.createElement(state.resolved, widgetProps);
-  }
-
+  // The rendered tree shape must be IDENTICAL on server and client no matter
+  // which side resolved the module first. Suspense boundaries are part of the
+  // hydration structure (the server emits <!--$--> markers), so the old
+  // "skip Suspense when already resolved" fast path produced
+  // server=<Suspense> vs client=<component> whenever one side was warm and
+  // the other cold — the recurring hydration-mismatch error on every widget
+  // page. A Suspense that never suspends adds no DOM and costs nothing, so
+  // every path now renders through the same boundary; only the child differs
+  // (component types are not part of DOM matching).
   const currentPromise = modulePromiseRef.current;
-
-  // If the promise is already fulfilled (React stamps .status on resolved thenables),
-  // extract the value and render synchronously — avoids Suspense entirely.
-  // (state.resolved is set by the .then() in getOrCreateModulePromise, so this
-  // branch is only hit in the same render cycle where the promise just resolved.)
-  if (currentPromise !== null && isFulfilled(currentPromise)) {
-    return React.createElement(currentPromise.value, widgetProps);
+  let child: React.ReactElement;
+  if (state.resolved !== null) {
+    // Warm path: resolved via prior render, preload(), or HMR update.
+    child = React.createElement(state.resolved, widgetProps);
+  } else if (currentPromise !== null) {
+    // Pending path: use() suspends until the module resolves. On the server,
+    // streaming waits inline before flushing this boundary's HTML; on the
+    // client during hydration, React defers hydrating just this boundary.
+    child = React.createElement(ResolvedWidget, {
+      promise: currentPromise,
+      widgetProps,
+    });
+  } else {
+    // No promise available (drizzle-kit or non-Vite context).
+    child = React.createElement(lazyRef.current, widgetProps);
   }
-
-  // Async path: promise is pending (first SSR cold-start or not yet preloaded).
-  // React.use() inside Suspense suspends until the promise resolves.
-  // React streaming waits inline before flushing this boundary's HTML.
-  if (currentPromise !== null) {
-    return React.createElement(
-      React.Suspense,
-      { fallback: null },
-      React.createElement(ResolvedWidget, {
-        promise: currentPromise,
-        widgetProps,
-      }),
-    );
-  }
-
-  // Fallback: no promise (drizzle-kit or non-Vite context).
-  return React.createElement(
-    React.Suspense,
-    { fallback: null },
-    React.createElement(lazyRef.current, widgetProps),
-  );
+  return React.createElement(React.Suspense, { fallback: null }, child);
 }

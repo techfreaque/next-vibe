@@ -2693,7 +2693,8 @@ export const endpointsMeta: EndpointMeta[] = [
     aliases: [],
     title: "Generate Image",
     titleShort: "Generate Image",
-    description: "Generate an image from a text prompt using AI",
+    description:
+      "Generate an image from a text prompt. Use list-models with modelType=image to see available models and their capabilities. Pass model id to select a specific model, or leave blank for the user's default. Optionally pass inputMediaUrl for image-to-image generation (uses the URL as a reference/starting point). Returns imageUrl.",
     icon: "image",
     category: "ai",
     subCategory: "Generation",
@@ -2727,7 +2728,6 @@ export const endpointsMeta: EndpointMeta[] = [
       "enums.userRole.customer",
       "enums.userRole.admin",
       "enums.userRole.public",
-      "enums.userRole.webOff",
     ],
     aliases: ["list-models"],
     title: "Models",
@@ -2875,7 +2875,8 @@ export const endpointsMeta: EndpointMeta[] = [
     aliases: [],
     title: "Generate Music",
     titleShort: "Generate Music",
-    description: "Generate music from a text prompt using AI",
+    description:
+      "Generate music from a text prompt. Use list-models with modelType=audio to see available music models. Pass model id to select a specific model, or leave blank for the user's default. Optionally pass inputMediaUrl for audio-to-audio style transfer. Returns audioUrl and durationSeconds.",
     icon: "music",
     category: "ai",
     subCategory: "Generation",
@@ -3653,7 +3654,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Speech to Text",
     titleShort: "Speech to Text",
     description:
-      "Convert audio to text using AI transcription (0.013 credits per second, 0.78 credits per minute)",
+      "Transcribe audio to text. Upload an audio file (MP3, WAV, WebM, max 25MB). Cost: ~0.013 credits/second. Returns the transcribed text, provider used, and confidence score.",
     icon: "mic",
     category: "ai",
     subCategory: "Generation",
@@ -3730,7 +3731,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Text to Speech",
     titleShort: "Text to Speech",
     description:
-      "Convert text to natural-sounding speech using AI (~0.00052 credits per character)",
+      "Convert text to speech. Pass text and a voice id. Use list-models (modelType=audio) to see available voice models — each has a unique id to pass as the voice parameter. Cost: ~0.00052 credits per character. Returns audioUrl.",
     icon: "volume-2",
     category: "ai",
     subCategory: "Generation",
@@ -3763,7 +3764,8 @@ export const endpointsMeta: EndpointMeta[] = [
     aliases: [],
     title: "Generate Video",
     titleShort: "Generate Video",
-    description: "Generate a video from a text prompt using AI",
+    description:
+      "Generate a video from a text prompt. Use list-models (modelType=video) to see all video models with their capabilities: supportedDurations (valid clip lengths in seconds), supportedAspectRatios, supportedFrameImages (first_frame/last_frame = image-to-video support). Pass frameReferences to steer the video: role 'first' pins the opening frame and role 'last' pins the closing frame — both MUST be image URLs (only on models with last_frame support); role 'reference' (or no role) feeds a guiding image, audio, or video asset. Pass negativePrompt on models that support it. Returns videoUrl.",
     icon: "video",
     category: "ai",
     subCategory: "Generation",
@@ -9482,7 +9484,7 @@ export const endpointsMeta: EndpointMeta[] = [
           id: "00000000-0000-0000-0000-000000000000",
           active: true,
           checkErrors: [],
-          createdAt: "2026-07-10T15:19:15.334Z",
+          createdAt: "2026-07-11T14:29:00.957Z",
         },
       },
     },
@@ -9507,7 +9509,7 @@ export const endpointsMeta: EndpointMeta[] = [
       responses: {
         default: {
           variantKey: "MY_VARIANT",
-          updatedAt: "2026-07-10T15:19:15.334Z",
+          updatedAt: "2026-07-11T14:29:00.957Z",
         },
       },
     },
@@ -17799,6 +17801,13 @@ export const endpointsMeta: EndpointMeta[] = [
           email: "you@example.com",
           password: "yourpassword",
           remoteUrl: "https://unbottled.ai",
+          syncScope: {
+            memories: true,
+            documents: true,
+            skills: true,
+            favorites: true,
+            threads: false,
+          },
         },
       },
       responses: { default: { connected: true } },

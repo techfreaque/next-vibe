@@ -392,13 +392,24 @@ export async function runRelayBranch(
   const skipLocalWrites = threadMirrorMode === "off";
   const localUserMessageId = data.userMessageId ?? crypto.randomUUID();
   if (!skipLocalWrites) {
+    // Localized default title (same as any new chat) — the MODEL renames it
+    // per-turn via the rename-thread fragment. "Remote Stream" was a hardcoded
+    // placeholder that leaked to the UI and broke the new-chat naming.
+    const { scopedTranslation: chatScopedTranslation } =
+      await import("../../../chat/i18n");
+    const defaultTitle = chatScopedTranslation
+      .scopedT(locale)
+      .t("common.newChat");
+    // NB: originInstanceId stays NULL on the CALLER — a non-null origin marks a
+    // MIRROR (the relay guard above returns early for those). This IS the origin
+    // (source) copy; the receiver stamps its own origin on the landing.
     await db
       .insert(chatThreads)
       .values({
         id: localThreadId,
         userId: userId ?? null,
         leadId: userId ? null : leadId,
-        title: "Remote Stream",
+        title: defaultTitle,
         rootFolderId: data.rootFolderId,
         folderId: data.subFolderId ?? null,
         // The loop runs on the resolved instance — persist that on the thread
@@ -437,6 +448,7 @@ export async function runRelayBranch(
         effectiveContent: data.content,
         effectiveParentMessageId: data.parentMessageId ?? null,
         userId,
+        user,
         attachments: data.attachments ?? undefined,
         logger,
         t: aiStreamT,
@@ -474,6 +486,26 @@ export async function runRelayBranch(
         confirmationOverrides: relayConfirmationOverrides,
       };
 
+  // Materialize the caller's folder chain on the RECEIVER before the relay so
+  // that when the receiver creates the mirror thread with `subFolderId`, the
+  // SAME-ID folder already exists and the copy lands in its proper subtree
+  // (REMOTE/<caller>/private/tests/<case>) instead of falling to the REMOTE
+  // root. The chain push is idempotent (same-id upserts) and targets exactly
+  // the relay peer. Best-effort; the post-relay pushThreadSync + pull-sync also
+  // converge, but doing it up-front removes the create-time placement race.
+  if (!user.isPublic && data.subFolderId) {
+    const { pushFolderChainToPeer } =
+      await import("@/app/api/[locale]/agent/chat/threads/sync-provider");
+    await pushFolderChainToPeer(
+      data.subFolderId,
+      user.id,
+      remoteTarget.instanceId,
+      logger,
+    ).catch(() => {
+      // Best-effort: the post-relay pushThreadSync heals placement.
+    });
+  }
+
   const relayResult = await RouteExecuteRepository.runInProcessTyped({
     definition: streamDefinition.POST,
     instanceId: remoteTarget.instanceId,
@@ -499,6 +531,11 @@ export async function runRelayBranch(
       // The caller's REAL root rides the wire for transparency; the receiver
       // decides its own landing (REMOTE/<caller>/<folderPath>) regardless.
       rootFolderId: data.rootFolderId,
+      // The caller's subfolder MUST ride the wire too — SAME-ID placement on the
+      // receiver (receiver.ts) reads data.subFolderId to land the copy under
+      // REMOTE/<originator>/<that folder>. Omitting it dropped the subfolder, so
+      // a thread created under REMOTE/<instance>/private landed at REMOTE root.
+      subFolderId: data.subFolderId ?? null,
       toolConfirmations: relayToolConfirmations,
       attachments: relayAttachments,
       messageHistory: relayMessageHistory,
@@ -550,6 +587,23 @@ export async function runRelayBranch(
     await clearStreamingState(localThreadId, logger, user, undefined).catch(
       () => undefined,
     );
+    // PUSH the caller's OWN placement to the receiver: the source thread lives
+    // under REMOTE/<peer>/private/tests/<case> (folderId set) and the receiver
+    // must land its mirror in the SAME-ID folder, not at the REMOTE root. The
+    // ancestor folder chain rides pushThreadSync (idempotent same-id upserts) so
+    // a folder created before this connection enabled threads-sync — or before
+    // the peer ever saw it — is materialized now, ahead of the thread-updated
+    // that references its folderId. Best-effort; the pull-sync also converges.
+    if (!user.isPublic) {
+      const { pushThreadSync } =
+        await import("@/app/api/[locale]/agent/chat/threads/sync-provider");
+      // AWAITED (not fire-and-forget): the mirror's placement must be settled
+      // before the caller reports the turn done — an observer that reads the
+      // peer right after would otherwise see the mirror at the REMOTE root.
+      await pushThreadSync(localThreadId, user.id, logger).catch(() => {
+        // Best-effort: pull-sync also converges.
+      });
+    }
   }
 
   if (headless) {

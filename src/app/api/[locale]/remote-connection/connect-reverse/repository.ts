@@ -94,7 +94,12 @@ export class RemoteConnectionRegisterRepository {
   > {
     const { instanceId, localUrl, reverseToken, reverseLeadId, selfUserId } =
       data;
-    // Parse to a concrete scope (field defaults filled) for the DB row.
+    // Parse to a concrete scope (field defaults filled) for the DB row. When the
+    // caller sent NO scope, this yields the schema defaults (threads:false) —
+    // treat that as "no scope provided" below and PRESERVE the existing row's
+    // scope rather than resetting it (a re-register / reconnect must never
+    // silently downgrade an enabled domain).
+    const scopeProvided = data.syncScope !== undefined;
     const syncScope = SyncScopeSchema.parse(data.syncScope);
     // The initiator's own transport toward us → our reverse entry's
     // remoteTransportMode (how the peer reaches us). Undefined for older
@@ -162,8 +167,10 @@ export class RemoteConnectionRegisterRepository {
           remoteUserId: selfUserId ?? null,
           token: encryptedReverseToken,
           leadId: reverseLeadId,
-          // Re-register mirrors the initiator's current scope.
-          syncScope,
+          // Re-register mirrors the initiator's current scope ONLY when it sent
+          // one. An absent scope means "no change" — preserve the stored scope
+          // (never reset an enabled domain to the schema default on reconnect).
+          ...(scopeProvided ? { syncScope } : {}),
           // Re-register refreshes how the initiator reaches us.
           ...(remoteTransportMode ? { remoteTransportMode } : {}),
           updatedAt: new Date(),

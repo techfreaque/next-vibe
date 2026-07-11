@@ -1,0 +1,66 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a19243ba9e66d22b-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 10 Jul 2026 20:19:41 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783714779-fafP1OUPnqmkwMd1nMlf"
+  },
+  "body": {
+    "id": "gen-1783714779-fafP1OUPnqmkwMd1nMlf",
+    "object": "chat.completion",
+    "created": 1783714780,
+    "model": "google/gemini-2.5-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "This is a short, upbeat instrumental clip, approximately 23 seconds in duration. The sound quality is clear and polished, suggesting a studio recording environment.\n\n**Music:**\n*   **Genre/Subgenre:** The track has a distinct Neo-Soul/R&B feel, with clear influences from classic Motown and Funk. It evokes artists like Tom Misch, Anderson .Paak, or early D'Angelo.\n*   **Tempo:** The tempo is a relaxed, groovy moderate pace, estimated around 85-90 BPM.\n*   **Time Signature:** 4/4 time.\n*   **Instruments and Interaction:**\n    *   **Drums:** A tight, crisp drum beat with prominent rimshots on the snare (or a very tight snare sound), a clear hi-hat pattern, and a solid kick drum provides the foundation. The drumming feels laid-back but provides a strong, consistent groove.\n    *   **Bass:** A clean, funky bass line plays a melodic and rhythmic role, often moving in sync with the drums or outlining the chord changes with a slightly syncopated feel.\n    *   **Electric Guitar (Rhythm):** A clean electric guitar plays a rhythmic, slightly wah-infused chordal part, providing texture and complementing the bass. It has a very '70s funk feel.\n    *   **Electric Guitar (Lead/Melody):** A second electric guitar (or a treated guitar sound) plays a very distinct, almost whistle-like, high-pitched lead melody. This is the most prominent melodic element and gives the track its distinctive \"whistling\" feel, though it's clearly played on a stringed instrument and not an actual human whistle. It has a slightly compressed and reverbed sound.\n*   **Production Style:** Polished and clean, with a warm, slightly retro feel. There's a good separation of instruments, and the mix sounds professional.\n*   **Mood and Emotional Arc:** The overall mood is cool, laid-back, and positive. It instantly makes you want to nod your head. The melodic lead guitar gives it a playful and slightly catchy quality. The clip maintains a consistent groove and mood throughout.\n\n**Non-musical Audio:**\nThere are no spoken words, sound effects, or ambient sounds other than the music itself.",
+          "refusal": null,
+          "reasoning": null
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 483,
+      "total_tokens": 1555,
+      "cost": 0.0020541,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0020541,
+        "upstream_inference_prompt_cost": 0.0008466,
+        "upstream_inference_completions_cost": 0.0012075
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

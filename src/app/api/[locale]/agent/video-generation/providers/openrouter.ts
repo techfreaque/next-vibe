@@ -30,11 +30,36 @@ interface OpenRouterVideoRequestBody {
   duration?: number;
   aspect_ratio?: string;
   resolution?: string;
-  frame_images?: Array<{ type: string; image_url: string }>;
+  frame_images?: Array<{
+    type: "image_url";
+    frame_type: "first_frame" | "last_frame";
+    image_url: { url: string };
+  }>;
+  input_references?: Array<
+    | { type: "image_url"; image_url: { url: string } }
+    | { type: "audio_url"; audio_url: { url: string } }
+    | { type: "video_url"; video_url: { url: string } }
+  >;
   generate_audio?: boolean;
   negative_prompt?: string;
   negativePrompt?: string;
-  cfg_scale?: number;
+}
+
+type FrameImageRole = "first" | "last" | "reference";
+
+/**
+ * Auto-detect the OpenRouter input-reference kind from the URL file extension.
+ * .mp4/.webm/.mov → video, audio files → audio, everything else → image.
+ */
+function detectMediaKind(url: string): "image_url" | "audio_url" | "video_url" {
+  const clean = url.split("?")[0]?.split("#")[0]?.toLowerCase() ?? "";
+  if (/\.(mp4|webm|mov)$/.test(clean)) {
+    return "video_url";
+  }
+  if (/\.(mp3|wav|m4a|ogg|flac)$/.test(clean)) {
+    return "audio_url";
+  }
+  return "image_url";
 }
 
 interface OpenRouterVideoStatusResponse {
@@ -64,8 +89,7 @@ export async function generateVideoWithOpenRouter(params: {
   durationSeconds?: number;
   aspectRatio?: string;
   resolution?: string;
-  firstFrameUrl?: string;
-  lastFrameUrl?: string;
+  frameReferences?: Array<{ url: string; role?: FrameImageRole }>;
   negativePrompt?: string;
   generateAudio?: boolean;
   supportedFrameImages?: readonly string[];
@@ -73,15 +97,20 @@ export async function generateVideoWithOpenRouter(params: {
   logger: EndpointLogger;
   locale: CountryLanguage;
   fetchImpl: typeof globalThis.fetch;
-}): Promise<ResponseType<{ videoUrl: string; creditCost?: number }>> {
+}): Promise<
+  ResponseType<{
+    videoUrl: string;
+    creditCost?: number;
+    downloadHeaders?: Record<string, string>;
+  }>
+> {
   const {
     providerModel,
     prompt,
     durationSeconds,
     aspectRatio,
     resolution,
-    firstFrameUrl,
-    lastFrameUrl,
+    frameReferences,
     negativePrompt,
     generateAudio,
     supportedFrameImages,
@@ -123,15 +152,53 @@ export async function generateVideoWithOpenRouter(params: {
   if (resolution) {
     body.resolution = resolution;
   }
-  const frameImages: Array<{ type: string; image_url: string }> = [];
-  if (firstFrameUrl) {
-    frameImages.push({ type: "first_frame", image_url: firstFrameUrl });
+  // OpenRouter splits image inputs into two arrays:
+  //  - frame_images: EXACT bookend frames. Schema (all three fields required):
+  //      { type: "image_url", frame_type: "first_frame"|"last_frame",
+  //        image_url: { url } }
+  //    The `type` literal is "image_url" (the part kind), the first/last
+  //    discriminator lives under `frame_type`, image_url is an OBJECT { url }.
+  //  - input_references: guiding assets. Schema:
+  //      { type: <kind>, <kind>: { url } } where kind is auto-detected
+  //      (image_url/audio_url/video_url) from the URL extension.
+  const frameImageParts: NonNullable<
+    OpenRouterVideoRequestBody["frame_images"]
+  > = [];
+  const inputReferenceParts: NonNullable<
+    OpenRouterVideoRequestBody["input_references"]
+  > = [];
+  for (const frame of frameReferences ?? []) {
+    const url = frame.url;
+    if (frame.role === "first") {
+      frameImageParts.push({
+        type: "image_url",
+        frame_type: "first_frame",
+        image_url: { url },
+      });
+    } else if (frame.role === "last") {
+      if (supportedFrameImages?.includes("last_frame")) {
+        frameImageParts.push({
+          type: "image_url",
+          frame_type: "last_frame",
+          image_url: { url },
+        });
+      }
+    } else {
+      const kind = detectMediaKind(url);
+      if (kind === "video_url") {
+        inputReferenceParts.push({ type: "video_url", video_url: { url } });
+      } else if (kind === "audio_url") {
+        inputReferenceParts.push({ type: "audio_url", audio_url: { url } });
+      } else {
+        inputReferenceParts.push({ type: "image_url", image_url: { url } });
+      }
+    }
   }
-  if (lastFrameUrl && supportedFrameImages?.includes("last_frame")) {
-    frameImages.push({ type: "last_frame", image_url: lastFrameUrl });
+  if (frameImageParts.length > 0) {
+    body.frame_images = frameImageParts;
   }
-  if (frameImages.length > 0) {
-    body.frame_images = frameImages;
+  if (inputReferenceParts.length > 0) {
+    body.input_references = inputReferenceParts;
   }
   if (generateAudio) {
     body.generate_audio = true;
@@ -229,7 +296,17 @@ export async function generateVideoWithOpenRouter(params: {
             ? statusData.usage.cost * 100
             : undefined;
         logger.debug("[OpenRouter Video] Generation complete", { videoUrl });
-        return success({ videoUrl, creditCost });
+        // The completed video URL is an OpenRouter /videos/<id>/content endpoint
+        // that STILL requires the Bearer auth header — a bare GET returns 401 and
+        // the "video" downloaded for storage is a tiny error JSON (broken .mp4).
+        // Hand the caller the headers it must use to fetch the bytes.
+        return success({
+          videoUrl,
+          creditCost,
+          downloadHeaders: {
+            Authorization: headers.Authorization,
+          },
+        });
       }
 
       if (

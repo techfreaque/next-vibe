@@ -96,9 +96,10 @@ export async function generateVideoWithModelsLab(params: {
     // redirecting"). CDN-backed sources (Unsplash etc.) routinely 30x to their
     // final asset — resolve redirects here and hand the provider the final
     // direct URL. Resolution failure is non-fatal: submit the original URL
-    // and let the provider report its own error.
+    // and let the provider report its own error. (Our own storage URLs are
+    // already inlined to data URIs by the repository before this call.)
     let resolvedInitImage = inputImageUrl;
-    if (inputImageUrl) {
+    if (inputImageUrl && inputImageUrl.startsWith("http")) {
       try {
         const probe = await fetchImpl(inputImageUrl, {
           method: "HEAD",

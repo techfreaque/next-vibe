@@ -482,6 +482,7 @@ export class LocalExecution {
         });
       } catch (err) {
         errorMessage = err instanceof Error ? err.message : String(err);
+        finalResult = TaskCompletion.failedOutputFromMessage(errorMessage);
         logger.error("[RouteExecute] Async task execution failed", {
           taskId,
           toolName,
@@ -670,14 +671,15 @@ export class LocalExecution {
         finalStatus = result.success
           ? CronTaskStatus.COMPLETED
           : CronTaskStatus.FAILED;
-        finalResult =
-          result.success && result.data !== undefined
-            ? PendingCalls.toOutputObject(result.data)
-            : null;
         errorMessage =
           !result.success && "message" in result
             ? String(result.message)
             : null;
+        finalResult = result.success
+          ? result.data !== undefined
+            ? PendingCalls.toOutputObject(result.data)
+            : null
+          : TaskCompletion.failedOutput(result);
         await LocalExecution.insertExecutionHistory({
           taskId,
           toolName,
@@ -689,6 +691,7 @@ export class LocalExecution {
         });
       } catch (err) {
         errorMessage = err instanceof Error ? err.message : String(err);
+        finalResult = TaskCompletion.failedOutputFromMessage(errorMessage);
         logger.error("[RouteExecute] In-flight conversion execution failed", {
           taskId,
           toolName,
@@ -896,20 +899,23 @@ export class LocalExecution {
         { taskId, toolName, maxMs: GOROUTINE_MAX_DURATION_MS },
       );
       const timedOutAt = new Date();
+      const timeoutMessage = `Background task exceeded ${String(GOROUTINE_MAX_DURATION_MS)}ms`;
+      const timeoutResult =
+        TaskCompletion.failedOutputFromMessage(timeoutMessage);
       await LocalExecution.insertExecutionHistory({
         taskId,
         toolName,
         startedAt,
         completedAt: timedOutAt,
         finalStatus: CronTaskStatus.FAILED,
-        finalResult: null,
+        finalResult: timeoutResult,
         triggeredBy,
         logger,
       });
       return {
         finalStatus: CronTaskStatus.FAILED,
-        finalResult: null,
-        errorMessage: `Background task exceeded ${String(GOROUTINE_MAX_DURATION_MS)}ms`,
+        finalResult: timeoutResult,
+        errorMessage: timeoutMessage,
         completedAt: timedOutAt,
       };
     }
@@ -919,10 +925,11 @@ export class LocalExecution {
     const finalStatus: (typeof CronTaskStatusDB)[number] = result.success
       ? CronTaskStatus.COMPLETED
       : CronTaskStatus.FAILED;
-    const finalResult =
-      result.success && result.data !== undefined ? result.data : null;
     const errorMessage =
       !result.success && "message" in result ? String(result.message) : null;
+    const finalResult = result.success
+      ? (result.data ?? null)
+      : TaskCompletion.failedOutput(result);
 
     await LocalExecution.insertExecutionHistory({
       taskId,

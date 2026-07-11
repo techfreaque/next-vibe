@@ -766,11 +766,9 @@ export class CortexExecRepository {
         t,
         noEscalateContext,
       );
-      await onComplete({
-        success: result.success,
-        data: result.success ? result.data : undefined,
-        message: result.success ? undefined : result.message,
-      });
+      await onComplete(
+        result.success ? { success: true, data: result.data } : result,
+      );
     })();
 
     return success({

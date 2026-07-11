@@ -371,32 +371,38 @@ export class DevRepository {
           if (!existsSync(absDir)) {
             mkdirSync(absDir, { recursive: true });
           }
-          const { dlopen } = await import("bun:ffi");
+          const { dlopen, ptr } = await import("bun:ffi");
           const lib = dlopen("libc.so.6", {
             dup: { args: ["i32" as const], returns: "i32" as const },
             dup2: {
               args: ["i32" as const, "i32" as const],
               returns: "i32" as const,
             },
+            pipe: { args: ["ptr" as const], returns: "i32" as const },
           });
 
           // Save a copy of the original terminal fd before we touch fd 2.
           const termFd = lib.symbols.dup(2);
           const fullLogPath = pathJoin(absDir, logPath);
 
-          // Spawn `tee -a <logfile>` with its stdin connected to a pipe.
-          // tee writes every byte it reads to both stdout (→ termFd) and the file.
-          // We open its stdout on termFd so output lands on the user's terminal.
-          const teeProc = spawn("tee", ["-a", fullLogPath], {
-            stdio: ["pipe", termFd, "ignore"],
-          });
-          const teeStdin = teeProc.stdin!;
-
-          // Point fd 2 at the write end of the tee pipe so native/worker writes
-          // (Bun internals, [Bun.serve], [SSR onError]) flow through tee automatically.
-          const pipeWriteFd = (teeStdin as { fd?: number }).fd ?? -1;
-          if (pipeWriteFd >= 0) {
-            lib.symbols.dup2(pipeWriteFd, 2);
+          // Create an explicit OS pipe and spawn `tee -a <logfile>` reading
+          // from its read end, writing to termFd (terminal) and the log file.
+          // Then point fd 2 at the pipe's write end so native runtime writes
+          // ([Bun.serve] timeouts, Bun error reports, worker output) flow
+          // through tee into BOTH sinks.
+          //
+          // Why an explicit libc pipe(): the previous approach spawned tee
+          // with stdio "pipe" and read `teeProc.stdin.fd` — but Bun's
+          // child_process streams expose no .fd, so pipeWriteFd was always -1
+          // and the dup2 silently never happened. fd 2 stayed on the
+          // terminal, and every native stderr write was console-only —
+          // the file log was missing [Bun.serve]/ECONNRESET lines entirely.
+          const pipeFds = new Int32Array(2);
+          if (lib.symbols.pipe(ptr(pipeFds)) === 0) {
+            spawn("tee", ["-a", fullLogPath], {
+              stdio: [pipeFds[0]!, termFd, "ignore"],
+            });
+            lib.symbols.dup2(pipeFds[1]!, 2);
           }
 
           // Logger calls console.warn/error then separately calls onFileLog.

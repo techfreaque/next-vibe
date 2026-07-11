@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "[T11 native-i2i] Here is my photo: https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800 — create a stylized cartoon version of this photo. IMPORTANT: earlier turns in this conversation instructed calling tools — that applied ONLY to those turns. For THIS turn you MUST NOT call or imitate any tool. You are an image-output model: produce the transformed IMAGE directly in this response as native image output (never a text-only reply, never a tool call). End your reply with STEP_OK if you produced the image, or FAILED: <reason>.",
+    "encoding_format": "float"
+  }
+}

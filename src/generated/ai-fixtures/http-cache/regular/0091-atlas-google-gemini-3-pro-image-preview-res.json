@@ -1,0 +1,75 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,cf-ray",
+    "cf-ray": "a19233dca9e71d86-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 10 Jul 2026 20:08:55 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1783714129-Hhz2WwdZ7LhKg4zJiqKX"
+  },
+  "body": {
+    "id": "gen-1783714129-Hhz2WwdZ7LhKg4zJiqKX",
+    "object": "chat.completion",
+    "created": 1783714129,
+    "model": "google/gemini-3-pro-image-preview-20251120",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "A clean, graphic illustration of the national flag of Japan, consisting of a large, perfectly centered, solid ruby red circle known as the Hinomaru, set against a plain, pure white background. The colors are flat and uniform. The overall shape of the image is square.",
+          "refusal": null,
+          "reasoning": "**Detailing the Japanese Flag**\n\nI am focusing on precisely describing the flag of Japan, noting its centered placement and the specific details of its composition, including its exact colors.\n\n**Describing the Japanese Flag**\n\nI am meticulously detailing the flag's composition. The image features a central, brilliant ruby red circle on a pure white, solid background. It's a clean, two-dimensional graphic with sharp edges and flat, uniform colors, precisely centered within a square aspect ratio.\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Detailing the Japanese Flag**\n\nI am focusing on precisely describing the flag of Japan, noting its centered placement and the specific details of its composition, including its exact colors.\n\n**Describing the Japanese Flag**\n\nI am meticulously detailing the flag's composition. The image features a central, brilliant ruby red circle on a pure white, solid background. It's a clean, two-dimensional graphic with sharp edges and flat, uniform colors, precisely centered within a square aspect ratio.\n\n",
+              "format": "google-gemini-v1",
+              "index": 0,
+              "signature": "CrYHAY89a19onVOxDJOXxNYheXLpeoTCmwNgJSRZB7tX75+XBYnXQawug9eMjZ+HLDddSpf2qm7+ByBCAWOi9VvP3r7CXC1slMBD5Is2g+A+TwBAvrKXtMFq9m6oAbwhtep/3Iytrl5Ty2r0LRbnYn1euHRQZGa037LwrC6pQRSQiPOBJqBGgDw5rxHMClPZOY/8cVZM50LO38qicq8TWhzUiSwS/hypeaJLg20fLvLxlr1hhYWbvV/cTu4FiT79S/a1BvJNvf1B1OkTUPaQrtJXoIO4G+zgl13eFLHPnJRQ5m6Cnevi2McgHT/nTsap4Kwu8M14t6gAsnm6T/Kg1aRNf3EnJ63nFIAPs/gqjF6ekaH4p7bYQf3yWu7oefGo6+DdmZ4HI4AteypXBf4dtG1HIpa0yNx+On21VyTXaqKLqZW99/OrmWeBIrFerrBYhSa38PzqmJJgEJAu+Kp6eXqkau+m5MD7Kz/0n9eIRL4BRBIviMoyjrQBjaEyw9bbV4GNOJ9xj9YL3a8HkVxNhqDZW4eycY0LzDohkPPx2W4wdjVglUtTi6fmivCplwVbTxjUBV2GP16OTnSEiC27G0m/HDLwQCWaY8Nw/XMf4ZoisFTauNb84rU3uqmJZLBq4hW2Gpn7Kpk0R8LxjHBzwTufcquYmWJPEU5gQ+1mCSPqM50G+lLEZEPcQX1vE5cU6OPY7L77hBp6W1GZaxRjXqz/GjX8TEICb7/tTovTMzUHk7miNgiBX8yvR3W+innMb1MsnusaphvOBGkZVavtlIZx0UfOBFoe6hxaOFwVds9M+SAdP2n25tmi+QPA04CDOZ5Mbtror5ijxRh3TMSSJ8MHCxLG3i+lil5x8pqfuax6vmtv+Kz7QpS8FhGm4qj0wL33o5UJGpy+KnS4dSVez1g+BPLwWzyosWudzXBpkgJtzBDCS3biLJSXBQtxVC/FGesbzhHScQGD4iJrtSckSzCwyK5+GXpuOO2xSNS64m6I3gsji8MD0RcYNHhtLOn8FDjnrGn9jaN2ltk8fxyA9wZzXu7rgP3t6pFqyi4t+0rM73rXe5vGP35n4VFqQWFcUIXqOz0DzNYPkwlvZITzeJeruAdep9cqHd2eFeVZDrfuWqmRTB2EYY//PqZW/OLsSLNLVutl558+gUJRZEsfluAxB0fwWP05wXxS+3G9lZXEaFIVN3a+S3rMo2djonJPyE5IARU19OLoJZBDPtib97LG7QojJiLeGP8DBsg7qKyikGpMEwAAJoE="
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 837,
+      "completion_tokens": 236,
+      "total_tokens": 1073,
+      "cost": 0.004506,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.004506,
+        "upstream_inference_prompt_cost": 0.001674,
+        "upstream_inference_completions_cost": 0.002832
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 180,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

@@ -17,6 +17,8 @@ import "server-only";
 
 import { and, eq, gt, ne, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
+import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
 import type {
@@ -55,6 +57,49 @@ import { CallbackMode, type CallbackModeValue } from "../constants";
 import type { WakeUpConfirmRaceResult } from "./types";
 
 export class TaskCompletion {
+  /**
+   * Serialize a handler's fail() response into the stored task output,
+   * preserving the EXACT ErrorResponseType shape ({ success:false, message,
+   * messageParams?, errorType, cause? }). The dispatch tool message backfill,
+   * the execution-history row, the wakeUp deferred result and the relay wire
+   * all read this object — nulling it surfaced failed tasks as a bare
+   * { success:false, status:"failed" } with the real cause (e.g. an
+   * insufficient-credits 403 from a media-gen sub-stream) lost.
+   */
+  static failedOutput(error: ErrorResponseType): Record<string, WidgetData> {
+    return {
+      success: false,
+      message: error.message,
+      ...(error.messageParams ? { messageParams: error.messageParams } : {}),
+      errorType: {
+        errorKey: error.errorType.errorKey,
+        errorCode: error.errorType.errorCode,
+      },
+      ...(error.cause
+        ? { cause: TaskCompletion.failedOutput(error.cause) }
+        : {}),
+    };
+  }
+
+  /**
+   * Same ErrorResponseType shape for failures that never produced a fail()
+   * response (thrown exception, goroutine timeout) — the raw message with an
+   * internal-error type, so consumers see one uniform failed-output contract.
+   */
+  static failedOutputFromMessage(
+    errorMessage: string,
+    errorType: ErrorResponseType["errorType"] = ErrorResponseTypes.INTERNAL_ERROR,
+  ): Record<string, WidgetData> {
+    return {
+      success: false,
+      message: errorMessage,
+      errorType: {
+        errorKey: errorType.errorKey,
+        errorCode: errorType.errorCode,
+      },
+    };
+  }
+
   static async handle(params: {
     /** Typed revival context - read from cron_tasks wakeUp* columns (not from taskInput JSON) */
     toolMessageId: string;

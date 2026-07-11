@@ -23,6 +23,7 @@ import { useCallback, useMemo } from "react";
 
 import { buildWsChannel } from "../../../../system/realtime/channel";
 import { preWarmChannel } from "../../../../system/realtime/client";
+import { DefaultFolderId } from "../../../chat/config";
 import messagesDefinitions from "../../../chat/threads/[threadId]/messages/definition";
 import { addErrorMessageToChat } from "../../../chat/threads/[threadId]/messages/hooks/update-messages";
 import cancelEndpoints from "../../cancel/definition";
@@ -78,6 +79,16 @@ export function useAIStream(): UseAIStreamReturn {
       const audioQueue = getAudioQueue();
       audioQueue.stop();
 
+      // Incognito content exists ONLY in localStorage and arrives ONLY via WS
+      // events — register the stream so the IncognitoStreamKeeper holds a
+      // headless subscription even if the user navigates away mid-stream.
+      // stream-finished (messages definition onEvent) unregisters it.
+      const isIncognitoStream =
+        data.rootFolderId === DefaultFolderId.INCOGNITO && !!threadId;
+      if (isIncognitoStream) {
+        useAIStreamStore.getState().addIncognitoStream(threadId);
+      }
+
       // Pre-warm the WS channel BEFORE the POST so the connection is
       // established by the time the server starts emitting events.
       if (threadId) {
@@ -116,6 +127,9 @@ export function useAIStream(): UseAIStreamReturn {
           requestData: data,
         });
       } catch (err) {
+        if (isIncognitoStream) {
+          useAIStreamStore.getState().removeIncognitoStream(threadId);
+        }
         // mutateAsync throws the full ErrorResponseType on non-success responses
         const failMessage = parseError(err).message;
         logger.error("Stream request failed", { message: failMessage });
@@ -144,6 +158,9 @@ export function useAIStream(): UseAIStreamReturn {
       }
 
       if (!result.success) {
+        if (isIncognitoStream) {
+          useAIStreamStore.getState().removeIncognitoStream(threadId);
+        }
         const resultMessage = result.message;
         logger.error("Stream request failed", {
           message: resultMessage,

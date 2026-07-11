@@ -253,6 +253,7 @@ export class MessagesRepository {
     content: string;
     parentId: string | null;
     userId: string | undefined;
+    user: JwtPayloadType;
     authorName: string | null;
     logger: EndpointLogger;
     attachments?: Array<{
@@ -410,10 +411,12 @@ export class MessagesRepository {
       .returning({ folderId: chatThreads.folderId });
 
     if (updatedThread?.folderId) {
-      await db
-        .update(chatFolders)
-        .set({ updatedAt: now })
-        .where(eq(chatFolders.id, updatedThread.folderId));
+      await bubbleFolderActivity(
+        updatedThread.folderId,
+        now,
+        params.logger,
+        params.user,
+      );
     }
 
     params.logger.debug("Created user message", {
@@ -985,10 +988,7 @@ export class MessagesRepository {
         .returning({ folderId: chatThreads.folderId });
 
       if (updatedThread?.folderId) {
-        await db
-          .update(chatFolders)
-          .set({ updatedAt: now })
-          .where(eq(chatFolders.id, updatedThread.folderId));
+        await bubbleFolderActivity(updatedThread.folderId, now, logger, user);
       }
 
       logger.debug("Message created", {
@@ -1506,10 +1506,10 @@ export class MessagesRemoteRepository {
   }
 
   /**
-   * Cross-instance applier for `content-delta`: append the chunk to the
-   * mirror row and re-emit locally so the peer's viewers see the message
-   * STREAM in live. Out-of-order arrivals can scramble the appended DB text;
-   * content-done later overwrites with the authoritative full content.
+   * Cross-instance applier for `content-delta`: append the chunk to the mirror
+   * row and re-emit locally so the peer's viewers stream in live. Correct
+   * because the bridge delivers a thread's remote events strictly IN ORDER
+   * (per-connection ordered relay in the remote-event bridge).
    */
   static async applyRemoteContentDelta({
     responseData,
@@ -1537,9 +1537,7 @@ export class MessagesRemoteRepository {
       })
       .onConflictDoUpdate({
         target: chatMessages.id,
-        set: {
-          content: sql`${chatMessages.content} || excluded.content`,
-        },
+        set: { content: sql`${chatMessages.content} || excluded.content` },
       })
       .catch(() => undefined);
     (await MessagesRemoteRepository.mirrorEmitter(threadId, logger, user))(
@@ -1549,8 +1547,8 @@ export class MessagesRemoteRepository {
   }
 
   /**
-   * Cross-instance applier for `reasoning-delta`: same live-streaming path as
-   * content-delta (reasoning rides in the content field).
+   * Cross-instance applier for `reasoning-delta`: append the chunk (reasoning
+   * rides in the content field). Ordered bridge delivery keeps appends correct.
    */
   static async applyRemoteReasoningDelta({
     responseData,
@@ -1578,9 +1576,7 @@ export class MessagesRemoteRepository {
       })
       .onConflictDoUpdate({
         target: chatMessages.id,
-        set: {
-          content: sql`${chatMessages.content} || excluded.content`,
-        },
+        set: { content: sql`${chatMessages.content} || excluded.content` },
       })
       .catch(() => undefined);
     (await MessagesRemoteRepository.mirrorEmitter(threadId, logger, user))(

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The attached image depicts the national flag of Japan — a clean, square graphic illustration featuring the Hinomaru: a large, perfectly centered ruby red circle on a plain white background, with flat, uniform colors.\n\nThe image content is present via the injected vision description. Let me also update the thread title since the topic has shifted.",
+    "encoding_format": "float"
+  }
+}

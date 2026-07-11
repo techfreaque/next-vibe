@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/callback-mode---media-qa-a44026b9-71c7-45eb-afea-d352fb515126.md\n\n# Callback Mode & Media QA\nFolder: private\nDescription: Full callback mode test suite across detach, wait, wakeUp, and endLoop modes plus media generation",
+    "encoding_format": "float"
+  }
+}

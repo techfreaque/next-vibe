@@ -461,8 +461,9 @@ const { GET } = createEndpoint({
   },
 
   // PUBLIC/SHARED folders stream on a shared channel; PRIVATE on the owner's own
-  // channel; INCOGNITO never reaches the server. Decided per rootFolderId by the
-  // route's resolveChannel.
+  // channel; INCOGNITO on the owner's own channel too (localStorage persistence,
+  // but live updates like the AI's rename-thread arrive via WS). Decided per
+  // rootFolderId by the route's resolveChannel.
   channel: { scope: "resolved" } as const,
 
   events: {
@@ -565,6 +566,52 @@ const { GET } = createEndpoint({
       operation: "merge" as const,
       onEvent: async (ctx) => {
         const rootFolderId = ctx.urlPathParams.rootFolderId;
+        // A moved thread was PATCHED in the cache of the level it used to live
+        // in (merge matches by id) — its folderId no longer matches that view.
+        // Drop it from caches it no longer belongs to; the target view picks
+        // it up on its next fetch.
+        const items = ctx.responseData.items;
+        if (items) {
+          const subFolderId = ctx.requestData.subFolderId ?? null;
+          const wrongIds = new Set<string>();
+          for (const item of items) {
+            if (!item) {
+              continue;
+            }
+            const normalizedItemFolder = item.folderId ?? null;
+            if (
+              normalizedItemFolder !== subFolderId ||
+              item.rootFolderId !== rootFolderId
+            ) {
+              wrongIds.add(item.id);
+            }
+          }
+          if (wrongIds.size > 0) {
+            apiClient.updateEndpointData(
+              GET,
+              ctx.logger,
+              (old) => {
+                if (!old?.success || !Array.isArray(old.data?.items)) {
+                  return old;
+                }
+                const filtered = old.data.items.filter(
+                  (it) => !wrongIds.has(it.id),
+                );
+                if (filtered.length === old.data.items.length) {
+                  return old;
+                }
+                return { ...old, data: { ...old.data, items: filtered } };
+              },
+              {
+                urlPathParams: ctx.urlPathParams,
+                requestData: {
+                  subFolderId: ctx.requestData.subFolderId,
+                  threadIds: ctx.requestData.threadIds,
+                },
+              },
+            );
+          }
+        }
         if (rootFolderId !== DefaultFolderId.INCOGNITO) {
           return;
         }
@@ -615,15 +662,18 @@ const { GET } = createEndpoint({
           "updatedAt",
         ] as const,
       },
-      operation: "merge" as const,
+      operation: "upsert" as const,
       onEvent(ctx) {
-        // The merge operation (above) runs before onEvent and appends new items
-        // into ALL folder-contents caches for this rootFolderId, regardless of
-        // subFolderId. Remove threads that don't belong in this cache level.
+        // The upsert operation (above) runs before onEvent and appends new items
+        // into the subscribed folder-contents cache regardless of which folder
+        // the thread actually lives in. Remove threads that don't belong in
+        // this cache level (wrong subfolder OR wrong root folder — e.g. a
+        // private thread must never land in the incognito view).
         const items = ctx.responseData.items;
         if (!items) {
           return;
         }
+        const rootFolderId = ctx.urlPathParams.rootFolderId;
         const subFolderId = ctx.requestData.subFolderId ?? null;
         const wrongIds = new Set<string>();
         for (const item of items) {
@@ -631,7 +681,10 @@ const { GET } = createEndpoint({
             continue;
           }
           const normalizedItemFolder = item.folderId ?? null;
-          if (normalizedItemFolder !== subFolderId) {
+          if (
+            normalizedItemFolder !== subFolderId ||
+            item.rootFolderId !== rootFolderId
+          ) {
             wrongIds.add(item.id);
           }
         }
@@ -705,12 +758,13 @@ const { GET } = createEndpoint({
           "rolesAdmin",
         ] as const,
       },
-      operation: "merge" as const,
+      operation: "upsert" as const,
       onEvent(ctx) {
         const items = ctx.responseData.items;
         if (!items || items.length === 0) {
           return;
         }
+        const rootFolderId = ctx.urlPathParams.rootFolderId;
         const subFolderId = ctx.requestData.subFolderId ?? null;
         const wrongIds = new Set<string>();
         for (const item of items) {
@@ -718,7 +772,10 @@ const { GET } = createEndpoint({
             continue;
           }
           const normalizedParent = item.parentId ?? null;
-          if (normalizedParent !== subFolderId) {
+          if (
+            normalizedParent !== subFolderId ||
+            item.rootFolderId !== rootFolderId
+          ) {
             wrongIds.add(item.id);
           }
         }

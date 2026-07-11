@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/video-attachment-test-9963495d-9820-4dc1-9314-97fde3de9b21.md\n\n# Video Attachment Test\nFolder: private\nDescription: Processing a video attachment of Rubik's cube solving for QA test.",
+    "encoding_format": "float"
+  }
+}

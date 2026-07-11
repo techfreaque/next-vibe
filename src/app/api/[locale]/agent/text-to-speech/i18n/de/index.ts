@@ -14,6 +14,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Text zu Sprache",
     titleShort: "Text zu Sprache",
+    dynamicTitle: "Sprache: {{text}}",
     description:
       "Konvertieren Sie Text in natürlich klingende Sprache mit KI (~0,00052 Credits pro Zeichen)",
     form: {

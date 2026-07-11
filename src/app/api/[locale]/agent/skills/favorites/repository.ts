@@ -60,6 +60,7 @@ export function buildFavoriteConfig(
   overrides: Partial<FavoriteConfig> & Pick<FavoriteConfig, "id" | "skillId">,
 ): FavoriteConfig {
   return {
+    variantId: null,
     modelSelection: null,
     voiceModelSelection: null,
     sttModelSelection: null,

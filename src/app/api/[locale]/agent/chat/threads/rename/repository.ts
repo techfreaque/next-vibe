@@ -31,6 +31,7 @@ import type {
   ThreadRenameResponseOutput,
 } from "./definition";
 import { scopedTranslation } from "./i18n";
+import { recordIncognitoRename } from "./incognito-title-cache";
 
 export class ThreadRenameRepository {
   static async renameThread(
@@ -77,6 +78,9 @@ export class ThreadRenameRepository {
       // onEvent handler updates its localStorage-backed list optimistically.
       if (rootFolderId === DefaultFolderId.INCOGNITO) {
         const now = new Date();
+        // Record in-process so the mid-loop system-prompt refresh sees the
+        // new title (there is no DB row it could re-read).
+        recordIncognitoRename(threadId, title, description ?? null);
         emitThreadRenamed({
           logger,
           user,
@@ -126,6 +130,7 @@ export class ThreadRenameRepository {
       // (frontend-only) — if the context lied, honour the DB reality below.
       if (existingThread.rootFolderId === DefaultFolderId.INCOGNITO) {
         const now = new Date();
+        recordIncognitoRename(threadId, title, description ?? null);
         emitThreadRenamed({
           logger,
           user,
@@ -249,6 +254,7 @@ function emitThreadRenamed(args: {
   })("thread-updated", {
     requestData: {
       title,
+      description,
       folderId,
       status: status ?? undefined,
       rootFolderId,

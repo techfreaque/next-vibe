@@ -406,6 +406,19 @@ function parseMessage(message: ChatMessage): ChatMessage {
 }
 
 /**
+ * Get a single incognito thread by ID
+ */
+export async function getIncognitoThread(
+  threadId: string,
+): Promise<ChatThread | null> {
+  const threads = await getItem<Record<string, ChatThread>>(
+    STORAGE_KEYS.THREADS,
+    {},
+  );
+  return threads[threadId] ?? null;
+}
+
+/**
  * Get messages for a specific thread
  */
 export async function getMessagesForThread(

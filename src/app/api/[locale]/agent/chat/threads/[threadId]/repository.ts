@@ -231,26 +231,35 @@ export class ThreadByIdRepository {
         });
       }
       if (updatedThread.rootFolderId) {
-        const emitFolderContents = createFolderContentsEmitter(
-          logger,
-          user,
-          updatedThread.rootFolderId,
-        );
-        emitFolderContents("thread-updated", {
-          responseData: {
-            items: [
-              {
-                id: updatedThread.id,
-                title: updatedThread.title,
-                folderId: updatedThread.folderId,
-                status: updatedThread.status,
-                description: updatedThread.description,
-                rootFolderId: updatedThread.rootFolderId,
-                updatedAt: updatedThread.updatedAt,
-              },
-            ],
-          },
+        const threadUpdatedItem = {
+          id: updatedThread.id,
+          title: updatedThread.title,
+          folderId: updatedThread.folderId,
+          status: updatedThread.status,
+          description: updatedThread.description,
+          rootFolderId: updatedThread.rootFolderId,
+          updatedAt: updatedThread.updatedAt,
+        };
+        // Target the channel of the folder the thread NOW lives in so a viewer
+        // of that (possibly nested) level receives the update live.
+        createFolderContentsEmitter(logger, user, updatedThread.rootFolderId, {
+          subFolderId: updatedThread.folderId,
+        })("thread-updated", {
+          responseData: { items: [threadUpdatedItem] },
         });
+        // A MOVE also notifies the folder the thread LEFT — its viewers' caches
+        // still hold the item; the client onEvent drops it there (folderId no
+        // longer matches that level).
+        if (existingThread.folderId !== updatedThread.folderId) {
+          createFolderContentsEmitter(
+            logger,
+            user,
+            existingThread.rootFolderId,
+            { subFolderId: existingThread.folderId },
+          )("thread-updated", {
+            responseData: { items: [threadUpdatedItem] },
+          });
+        }
       }
 
       return success({

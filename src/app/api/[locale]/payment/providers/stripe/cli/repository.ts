@@ -14,6 +14,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { paymentEnv } from "../../../env";
 import type { StripeT } from "../i18n";
 import type { CliStripeRequestOutput } from "./definition";
 
@@ -90,9 +91,25 @@ export class CliStripeRepository {
   ): Promise<ResponseType<void>> {
     logger.debug("Forwarding webhooks to", { webhookUrl });
 
+    // Listen on the same Stripe account the server uses — the CLI's
+    // logged-in account can differ, in which case no app events would
+    // ever reach the listener.
+    if (!paymentEnv.STRIPE_SECRET_KEY) {
+      return fail({
+        message: t("errors.notConfigured.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+
     const stripeProcess = spawn(
       "stripe",
-      ["listen", "--forward-to", webhookUrl],
+      [
+        "listen",
+        "--forward-to",
+        webhookUrl,
+        "--api-key",
+        paymentEnv.STRIPE_SECRET_KEY,
+      ],
       {
         stdio: ["pipe", "pipe", "pipe"],
       },

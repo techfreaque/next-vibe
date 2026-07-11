@@ -96,3 +96,30 @@ export async function fetchStorageFileAsBase64(
     return null;
   }
 }
+
+/** MIME type from a URL/file extension (for building data URIs). */
+export function mimeFromUrl(url: string): string {
+  const clean = url.split("?")[0]?.split("#")[0]?.toLowerCase() ?? "";
+  const ext = clean.slice(clean.lastIndexOf(".") + 1);
+  switch (ext) {
+    case "jpg":
+    case "jpeg":
+      return "image/jpeg";
+    case "webp":
+      return "image/webp";
+    case "gif":
+      return "image/gif";
+    case "mp4":
+      return "video/mp4";
+    case "webm":
+      return "video/webm";
+    case "mp3":
+      return "audio/mpeg";
+    case "wav":
+      return "audio/wav";
+    case "m4a":
+      return "audio/mp4";
+    default:
+      return "image/png";
+  }
+}

@@ -195,13 +195,15 @@ function subscribeToChannel(
   set.add(ws);
   ws.data.channels.add(channel);
 
-  if (isNewChannel) {
-    getPubSubAdapter().subscribe<AnyEndpointEventEnvelope>(
-      channel,
-      (event, data) => {
-        broadcastLocalToAll(channel, event, data);
-      },
-    );
+  // The relay subscription re-broadcasts events that arrive FROM the pub/sub
+  // layer (another process/instance). The local adapter's publish() already
+  // broadcasts to this process's sockets itself — registering the relay there
+  // would deliver every published event twice to every socket.
+  const adapter = getPubSubAdapter();
+  if (isNewChannel && !adapter.deliversToLocalSockets) {
+    adapter.subscribe<AnyEndpointEventEnvelope>(channel, (event, data) => {
+      broadcastLocalToAll(channel, event, data);
+    });
   }
 }
 
@@ -214,7 +216,13 @@ function unsubscribeFromChannel(
     set.delete(ws);
     if (set.size === 0) {
       channels.delete(channel);
-      getPubSubAdapter().unsubscribe(channel);
+      // Symmetric to subscribeToChannel: no relay subscription was registered
+      // for a locally-delivering adapter, so don't tear one down either (it
+      // could remove an unrelated server-side handler on the same channel).
+      const adapter = getPubSubAdapter();
+      if (!adapter.deliversToLocalSockets) {
+        adapter.unsubscribe(channel);
+      }
     }
   }
   ws.data.channels.delete(channel);
