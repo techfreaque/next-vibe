@@ -145,7 +145,15 @@ export class BuildRepository {
               steps.push({ label: "Package", ok: true, skipped: false });
             } else {
               steps.push({ label: "Package", ok: false, skipped: false });
-              errors.push(t("post.repository.messages.packageBuildFailed"));
+              const builderReason =
+                (builderResult.messageParams?.["error"] as
+                  | string
+                  | undefined) ??
+                builderResult.message ??
+                "unknown error";
+              errors.push(
+                `${t("post.repository.messages.packageBuildFailed")}: ${builderReason}`,
+              );
               if (!data.force) {
                 const response: BuildResponseType = {
                   success: false,
@@ -286,7 +294,15 @@ export class BuildRepository {
               steps.push({ label: "Package", ok: true, skipped: false });
             } else {
               steps.push({ label: "Package", ok: false, skipped: false });
-              errors.push(t("post.repository.messages.packageBuildFailed"));
+              const builderReason =
+                (builderResult.messageParams?.["error"] as
+                  | string
+                  | undefined) ??
+                builderResult.message ??
+                "unknown error";
+              errors.push(
+                `${t("post.repository.messages.packageBuildFailed")}: ${builderReason}`,
+              );
               if (!data.force) {
                 const response: BuildResponseType = {
                   success: false,

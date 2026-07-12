@@ -18,7 +18,25 @@ import {
 } from "@/app/api/[locale]/system/tooling/builder/enum";
 import type { BuildConfig } from "@/app/api/[locale]/system/tooling/builder/repository";
 
+// ssh2's native cpu-features.node binding can never be bundled into JS output -
+// same reason next.config.ts's serverExternalPackages excludes it for webpack.
+// Any Bun.build() target that transitively reaches ssh2 (vibe-runtime.ts for
+// real; the oxlint plugins via their check.config.ts dynamic require, which
+// pulls in a large swath of the codebase) must externalize it too, or the
+// build fails trying to resolve the .node file as a JS module.
+const NATIVE_BINDING_EXTERNALS = ["ssh2", "cpu-features"];
+
 const config: BuildConfig = {
+  // Sequential, not parallel. Evidence: two separate Docker (Linux) builds, same
+  // config, same ssh2/cpu-features externals fix applied - one run failed on
+  // .dist/oxlint-plugins/i18n.js, the next on jsx-capitalization.js instead, with
+  // no error text surviving to the log either time. Different file each run
+  // despite identical inputs is the signature of a genuine race in concurrent
+  // in-process Bun.build() calls, not a per-file config gap - each file builds
+  // reliably alone or as a separate OS process. Sequential compilation removes
+  // the race entirely; the cost is a few extra seconds across 7 small/medium files.
+  parallel: false,
+
   // Folders to clean before building
   foldersToClean: [".dist"],
 
@@ -47,6 +65,7 @@ const config: BuildConfig = {
         "rollup",
         "esbuild",
         "lightningcss",
+        ...NATIVE_BINDING_EXTERNALS,
       ],
       bunOptions: {
         target: BunTargetEnum.BUN,
@@ -59,13 +78,13 @@ const config: BuildConfig = {
         "src/app/api/[locale]/system/tooling/check/oxlint/plugins/restricted-syntax/src/index.ts",
       output: ".dist/oxlint-plugins/restricted-syntax.js",
       type: BunBuildTypeEnum.MODULE,
-      modulesToExternalize: [],
+      modulesToExternalize: NATIVE_BINDING_EXTERNALS,
       bunOptions: {
         target: BunTargetEnum.NODE,
         sourcemap: SourcemapModeEnum.NONE,
         format: OutputFormatEnum.ESM,
         minify: false,
-        external: [],
+        external: NATIVE_BINDING_EXTERNALS,
       },
     },
     {
@@ -73,7 +92,7 @@ const config: BuildConfig = {
         "src/app/api/[locale]/system/tooling/check/oxlint/plugins/jsx-capitalization/src/index.ts",
       output: ".dist/oxlint-plugins/jsx-capitalization.js",
       type: BunBuildTypeEnum.MODULE,
-      modulesToExternalize: [],
+      modulesToExternalize: NATIVE_BINDING_EXTERNALS,
       bunOptions: {
         target: BunTargetEnum.NODE,
         sourcemap: SourcemapModeEnum.NONE,
@@ -86,7 +105,7 @@ const config: BuildConfig = {
         "src/app/api/[locale]/system/tooling/check/oxlint/plugins/i18n/src/index.ts",
       output: ".dist/oxlint-plugins/i18n.js",
       type: BunBuildTypeEnum.MODULE,
-      modulesToExternalize: [],
+      modulesToExternalize: NATIVE_BINDING_EXTERNALS,
       bunOptions: {
         target: BunTargetEnum.NODE,
         sourcemap: SourcemapModeEnum.NONE,

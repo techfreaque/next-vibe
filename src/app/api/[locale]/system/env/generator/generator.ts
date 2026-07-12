@@ -291,7 +291,7 @@ class EnvGeneratorRepository {
           }
           return 0;
         });
-        const { content: envExampleContent, keys: envKeys } =
+        const envExampleContent =
           await EnvGeneratorRepository.generateEnvExampleContent(allModules);
         await writeGeneratedFile(
           join(process.cwd(), envExamplePath),
@@ -299,7 +299,8 @@ class EnvGeneratorRepository {
           false,
         );
 
-        // Update Dockerfile and docker-compose.prod.yml with the same key list
+        // Clear the generated ARG/ENV blocks in Dockerfile and docker-compose.prod.yml -
+        // the prod build needs none of these (see updateDockerfile for rationale).
         // Skip gracefully if files don't exist (e.g. inside Docker build context)
         const { existsSync } = await import("node:fs");
         const dockerfilePath = join(process.cwd(), "Dockerfile");
@@ -308,16 +309,10 @@ class EnvGeneratorRepository {
           "docker-compose.prod.yml",
         );
         if (existsSync(dockerfilePath)) {
-          await EnvGeneratorRepository.updateDockerfile(
-            dockerfilePath,
-            envKeys,
-          );
+          await EnvGeneratorRepository.updateDockerfile(dockerfilePath);
         }
         if (existsSync(dockerComposePath)) {
-          await EnvGeneratorRepository.updateDockerCompose(
-            dockerComposePath,
-            envKeys,
-          );
+          await EnvGeneratorRepository.updateDockerCompose(dockerComposePath);
         }
       }
 
@@ -680,11 +675,10 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
    * Generate .env.example file content
    * Client module definitions take priority over server ones for shared keys
    * (e.g. NEXT_PUBLIC_* vars are owned by the client module).
-   * Returns both the file content and the ordered list of emitted keys.
    */
   private static async generateEnvExampleContent(
     modules: EnvFileInfo[],
-  ): Promise<{ content: string; keys: string[] }> {
+  ): Promise<string> {
     const lines: string[] = [
       "# ============================================================================",
       "# AUTO-GENERATED FILE - DO NOT EDIT MANUALLY",
@@ -695,7 +689,6 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
     ];
 
     // Pass 1: build a map of key -> owning module (client wins over server)
-    // Also collect ALL keys (including example: false) for Docker ARG/ENV generation
     interface KeyOwner {
       example: string;
       comment?: string;
@@ -703,7 +696,6 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
       isClient: boolean;
     }
     const keyOwner = new Map<string, KeyOwner>();
-    const allKeys = new Set<string>();
 
     for (const mod of modules) {
       const moduleImport = await import(mod.filePath);
@@ -718,8 +710,7 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
       }
 
       for (const entry of examples) {
-        allKeys.add(entry.key);
-        // example: false means "exclude from .env.example" but still include in Docker
+        // example: false means "exclude from .env.example"
         if (entry.example === false) {
           continue;
         }
@@ -790,24 +781,24 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
       lines.push("");
     }
 
-    return { content: lines.join("\n"), keys: [...allKeys] };
+    return lines.join("\n");
   }
 
   /**
-   * Update Dockerfile ARG and ENV blocks with current env keys.
-   * Replaces the region between sentinel comments.
+   * Clears the generated ARG/ENV block in the Dockerfile - the prod build needs
+   * none of these at build time. NEXT_PUBLIC_* values are patched into the
+   * compiled bundle at container start (runtime-env-placeholders.ts /
+   * server/server/start/runtime-env-patch.ts), and every other field already
+   * has a working default (env.ts / env-client.ts). Passing build args would
+   * only risk baking secrets into image layers for no benefit - see
+   * `vibe image-push`, which builds with zero --build-arg flags.
    */
-  private static async updateDockerfile(
-    dockerfilePath: string,
-    keys: string[],
-  ): Promise<void> {
+  private static async updateDockerfile(dockerfilePath: string): Promise<void> {
     const { readFileSync } = await import("node:fs");
     const START = "# BEGIN_GENERATED_ENV_ARGS";
     const END = "# END_GENERATED_ENV_ARGS";
 
-    const argLines = keys.map((k) => `ARG ${k}`).join("\n");
-    const envLines = keys.map((k) => `ENV ${k}=$${k}`).join("\n");
-    const generated = `${START}\n${argLines}\n\n${envLines}\n${END}`;
+    const generated = `${START}\n# Intentionally empty - see updateDockerfile in generator.ts for why.\n${END}`;
 
     const original = readFileSync(dockerfilePath, "utf8");
 
@@ -826,20 +817,21 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
   }
 
   /**
-   * Update docker-compose.prod.yml build args block with current env keys.
-   * Replaces the region between sentinel comments.
+   * Clears the generated build-args block in docker-compose.prod.yml - same
+   * rationale as updateDockerfile above, kept in sync so a stray `docker
+   * compose build app` doesn't reintroduce a path for secrets to reach a build.
+   * The markers own the `args:` key itself (not just its contents) - `args:`
+   * followed by only comment lines is invalid YAML for compose (resolves to
+   * null, not a mapping), so the generated block must always include a valid
+   * value: `args: {}`.
    */
-  private static async updateDockerCompose(
-    composePath: string,
-    keys: string[],
-  ): Promise<void> {
+  private static async updateDockerCompose(composePath: string): Promise<void> {
     const { readFileSync } = await import("node:fs");
     const START = "# BEGIN_GENERATED_ENV_ARGS";
     const END = "# END_GENERATED_ENV_ARGS";
-    const INDENT = "        ";
+    const INDENT = "      ";
 
-    const argLines = keys.map((k) => `${INDENT}${k}: \${${k}}`).join("\n");
-    const generated = `${INDENT}${START}\n${argLines}\n${INDENT}${END}`;
+    const generated = `${INDENT}${START}\n${INDENT}args: {}\n${INDENT}${END}`;
 
     const original = readFileSync(composePath, "utf8");
 
@@ -850,8 +842,11 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
         generated,
       );
     } else {
-      // Insert inside args: block - after "args:" line
-      updated = original.replace(/( +args:\n)/, `$1${generated}\n`);
+      // Insert immediately after "dockerfile: Dockerfile" line (owns the args: key itself)
+      updated = original.replace(
+        /( +dockerfile: Dockerfile\n)/,
+        `$1${generated}\n`,
+      );
     }
 
     await writeGeneratedFile(composePath, updated, false);

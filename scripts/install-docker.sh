@@ -17,8 +17,22 @@ until $COMPOSE exec -T postgres pg_isready -U "${POSTGRES_USER:-postgres}" > /de
   sleep 1
 done
 
-# Build app image (old container keeps running while new image builds)
-$COMPOSE build app
+# Pull the app image built + pushed elsewhere (see: vibe image-push) - this box no longer
+# builds the app itself. Old container keeps running while the new image pulls.
+# `vibe image-push --sshTarget=user@this-host` transfers the image directly (docker save |
+# ssh | docker load) instead of a registry, so it's already present locally with no registry
+# entry to pull from - pull failure there is expected, not fatal, as long as the image exists.
+echo "Pulling app image..."
+if ! $COMPOSE pull app; then
+  IMAGE_REF=$($COMPOSE config --images app 2>/dev/null | head -1)
+  if [ -n "$IMAGE_REF" ] && docker image inspect "$IMAGE_REF" > /dev/null 2>&1; then
+    echo "Pull failed, but $IMAGE_REF is already present locally (e.g. via 'vibe image-push --sshTarget=...') - continuing with it."
+  else
+    echo "ERROR: Failed to pull app image, and it's not present locally either."
+    echo "  Run 'vibe image-push' first - push to a registry, or pass --sshTarget=user@$(hostname) to transfer it directly here."
+    exit 1
+  fi
+fi
 
 # Run migrations using the new image (separate one-off container, old app still serving)
 echo "Running migrations..."

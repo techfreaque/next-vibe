@@ -31,7 +31,7 @@ import type {
   SyncScope,
   TransportMode,
 } from "./db";
-import { instanceIdentities, remoteConnections } from "./db";
+import { instanceIdentities, remoteConnections, SyncScopeSchema } from "./db";
 
 interface ConnectToRemoteResult {
   remoteUrl: string;
@@ -222,6 +222,14 @@ export class RemoteConnectionRepository {
     isReverseEntry?: boolean;
     transportMode?: TransportMode;
     isInferenceProvider?: boolean;
+    /**
+     * Only pass this when the caller actually holds a user-decided scope
+     * (e.g. the connect endpoint's request body). System-driven upserts
+     * (CLI login, headless-client start) omit it: on a reconnect the
+     * existing row's scope is carried forward untouched below, and only a
+     * genuinely first-ever row falls back to the schema's own baseline -
+     * never a value fabricated at the call site.
+     */
     syncScope?: SyncScope;
     logger: EndpointLogger;
   }): Promise<ResponseType<ConnectToRemoteResult>> {
@@ -257,6 +265,19 @@ export class RemoteConnectionRepository {
 
     const encryptedToken = RemoteConnectionRepository.encryptToken(token);
 
+    const [existing] = await db
+      .select({ syncScope: remoteConnections.syncScope })
+      .from(remoteConnections)
+      .where(
+        and(
+          eq(remoteConnections.userId, userId),
+          eq(remoteConnections.instanceId, instanceId),
+        ),
+      )
+      .limit(1);
+    const resolvedSyncScope =
+      syncScope ?? existing?.syncScope ?? SyncScopeSchema.parse({});
+
     await db
       .insert(remoteConnections)
       .values({
@@ -268,11 +289,9 @@ export class RemoteConnectionRepository {
         remoteUserId: remoteUserId ?? null,
         isActive: true,
         isReverseEntry,
-        // Mirror threads on both sides by default so local and remote folders
-        // both show conversation history without extra configuration.
+        syncScope: resolvedSyncScope,
         ...(transportMode ? { transportMode } : {}),
         ...(isInferenceProvider !== undefined ? { isInferenceProvider } : {}),
-        ...(syncScope ? { syncScope } : {}),
         updatedAt: new Date(),
       })
       .onConflictDoUpdate({
@@ -286,9 +305,9 @@ export class RemoteConnectionRepository {
           ...(remoteUserId ? { remoteUserId } : {}),
           isActive: true,
           isReverseEntry,
+          syncScope: resolvedSyncScope,
           ...(transportMode ? { transportMode } : {}),
           ...(isInferenceProvider !== undefined ? { isInferenceProvider } : {}),
-          ...(syncScope ? { syncScope } : {}),
           updatedAt: new Date(),
         },
       });

@@ -23,6 +23,8 @@ import {
 import { REBUILD_ALIAS } from "next-vibe/server/server/rebuild/constants";
 import { START_ALIASES } from "next-vibe/server/server/start/constants";
 
+import { runtimeEnvPlaceholder } from "./runtime-env-placeholders";
+
 /** CLI-specific platforms (subset of Platform that applies to CLI environments) */
 type CliPlatform = typeof Platform.CLI | typeof Platform.CLI_PACKAGE;
 
@@ -459,6 +461,22 @@ export function loadEnvironment(): EnvironmentResult {
   };
   for (const [key, value] of Object.entries(agentAvailability)) {
     process.env[key] = value;
+  }
+
+  // Docker prod build only: VIBE_BUILD_PLACEHOLDER_ENV=true is set inline on
+  // the Next.js build command (see Dockerfile), never as a persisted image
+  // ENV. Bake a sentinel into every NEXT_PUBLIC_* value instead of the real
+  // one, so no public config or the secrets behind NEXT_PUBLIC_AGENT_* need
+  // to reach the build. The running container patches the compiled bundle
+  // with its own real values at startup - see
+  // server/server/start/runtime-env-patch.ts. One image works across
+  // instances with different public env, no rebuild.
+  if (process.env["VIBE_BUILD_PLACEHOLDER_ENV"] === "true") {
+    for (const key of Object.keys(process.env)) {
+      if (key.startsWith("NEXT_PUBLIC_")) {
+        process.env[key] = runtimeEnvPlaceholder(key);
+      }
+    }
   }
 
   // Determine platform based on detection

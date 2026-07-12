@@ -279,9 +279,10 @@ export class RouteDelegationHandler {
         const cliUserResult = await (
           await loadGetCliUser()
         )(logger, options.locale);
-        cliUser = cliUserResult.success
-          ? cliUserResult.data
-          : createCliBypassUser();
+        cliUser =
+          cliUserResult.success && !cliUserResult.data.isPublic
+            ? cliUserResult.data
+            : createCliBypassUser();
       } else {
         const cliUserResult = await (
           await loadGetCliUser()
@@ -851,6 +852,11 @@ async function handleRemoteLoginResponse(
 
   const { RemoteConnectionRepository } =
     await import("@/app/api/[locale]/remote-connection/repository");
+  // CLI login flow (vibe --thea/--hermes) has no user-decided sync scope to
+  // carry - unlike the connect endpoint's request body. Omitting it here
+  // makes the repository carry forward the existing row's scope on a
+  // reconnect, only falling back to the schema's baseline for a genuinely
+  // first-ever row - never a value fabricated at this call site.
   const result = await RemoteConnectionRepository.upsertRemoteConnection({
     userId,
     remoteUrl: host,

@@ -32,6 +32,13 @@ export const {
       "Absolute path to the project root. Mainly needed for MCP servers which often run in a different working directory.",
     commented: true,
   },
+  DOCKER_IMAGE_NAME: {
+    schema: z.string().default("ghcr.io/techfreaque/next-vibe-app"),
+    example: "ghcr.io/techfreaque/next-vibe-app",
+    comment:
+      "Registry + image name the prod Docker image is built and pushed to (see: vibe image-push). install-docker.sh pulls this same image on the deploy server instead of building it there.",
+    commented: true,
+  },
   NEXT_PUBLIC_APP_URL: {
     schema: z
       .string()

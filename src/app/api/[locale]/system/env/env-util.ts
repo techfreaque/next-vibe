@@ -2,6 +2,7 @@ import { validateData } from "next-vibe/core/core-utils/validation";
 import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { isRuntimeEnvPlaceholder } from "next-vibe/platforms/cli/runtime/runtime-env-placeholders";
 import type { z } from "zod";
 
 interface EnvHint {
@@ -29,9 +30,30 @@ export function validateEnv<TSchema extends z.ZodType>(
     Object.entries(env).map(([k, v]) => [k, v === "" ? undefined : v]),
   );
 
+  // Docker prod build only (VIBE_BUILD_PLACEHOLDER_ENV=true - see environment.ts):
+  // NEXT_PUBLIC_* values are runtime-patch sentinels at this point (e.g.
+  // "__VIBE_RUNTIME_ENV_NEXT_PUBLIC_APP_URL__"), which fail format-constrained
+  // schemas (.url(), .email()). Treat exactly those sentinel-valued keys as
+  // unset so each schema's own .default()/.optional() produces a valid
+  // stand-in - every other key (including real secrets/config actually
+  // present) validates normally, unaffected. The sentinel gets baked into the
+  // compiled bundle regardless (from the literal process.env.KEY reference
+  // Next.js inlines at compile time, independent of this parsed object) and
+  // patched with the real value at container start (runtime-env-patch.ts).
+  const envForValidation =
+    process.env["VIBE_BUILD_PLACEHOLDER_ENV"] === "true"
+      ? Object.fromEntries(
+          Object.entries(normalizedEnv).map(([k, v]) =>
+            typeof v === "string" && isRuntimeEnvPlaceholder(v)
+              ? [k, undefined]
+              : [k, v],
+          ),
+        )
+      : normalizedEnv;
+
   // When hints are provided, use Zod directly for structured error reporting
   if (hints) {
-    const result = envSchema.safeParse(normalizedEnv);
+    const result = envSchema.safeParse(envForValidation);
     if (!result.success) {
       printEnvErrors(result.error, hints, logger);
       // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
@@ -44,7 +66,7 @@ export function validateEnv<TSchema extends z.ZodType>(
 
   // Fallback for generated env files (no hints)
   const validationResult = validateData<TSchema>(
-    normalizedEnv as z.input<TSchema>,
+    envForValidation as z.input<TSchema>,
     envSchema,
     logger,
     locale,

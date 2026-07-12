@@ -61,7 +61,6 @@ export class BuildExecutor {
     const configObject = data.configObject;
     const profile: BuildProfile =
       (configObject?.profile as BuildProfile) || "development";
-    const useParallel = configObject?.parallel !== false;
     const dryRun = configObject?.dryRun;
     const verbose = configObject?.verbose;
     const analyze = configObject?.analyze;
@@ -111,6 +110,11 @@ export class BuildExecutor {
           minify,
         },
       );
+
+      // Request-level override (e.g. `vibe builder --parallel=false`) wins when set;
+      // otherwise fall back to the loaded build.config.ts's own `parallel` setting.
+      const useParallel =
+        (configObject?.parallel ?? buildConfig.parallel) !== false;
 
       // Validate configuration
       const validation = configValidator.validate(buildConfig, t);

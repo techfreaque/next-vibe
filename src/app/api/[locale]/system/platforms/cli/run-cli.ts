@@ -16,7 +16,6 @@ import {
 } from "next-vibe/core/definition/loader";
 import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -46,6 +45,7 @@ import {
 } from "next-vibe/platforms/definitions-registry";
 
 import { DEFAULT_PROJECT_URL } from "@/config/constants";
+import { env } from "@/config/env";
 import { pathToAliasMap } from "@/generated/endpoints/alias-map";
 
 export const binaryStartTime = Date.now();
@@ -157,8 +157,7 @@ export function runCli({
     ? new DefinitionsRegistry()
     : undefined;
 
-  const cliLocale = (process.env["VIBE_CLI_LOCALE"] ??
-    defaultLocale) as typeof defaultLocale;
+  const cliLocale = env.VIBE_CLI_LOCALE;
   const { t: earlyT } = cliScopedTranslation.scopedT(cliLocale);
 
   const program = new Command();

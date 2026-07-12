@@ -3,6 +3,7 @@
  * Enforces explicit process.env references for Next.js bundler
  */
 
+import { isRuntimeEnvPlaceholder } from "next-vibe/platforms/cli/runtime/runtime-env-placeholders";
 import type { z } from "zod";
 import { z as zod } from "zod";
 
@@ -78,7 +79,30 @@ export function defineEnvClient<T extends Fields>(
     }),
   );
 
-  const envClient = schema.parse(values) as InferEnv<T>;
+  // Treat empty strings as undefined so .default()/.optional() apply - Docker
+  // sets ENV KEY= (empty) for build args that weren't passed, and Zod's
+  // .default() only kicks in for undefined, never "". Also neutralizes
+  // Docker-prod-build runtime-env sentinels (VIBE_BUILD_PLACEHOLDER_ENV=true -
+  // see environment.ts): NEXT_PUBLIC_* values are runtime-patch placeholders
+  // at this point, which fail format-constrained schemas (.url(), .email()) -
+  // treat exactly those sentinel-valued keys as unset too, the same way
+  // env-util.ts's validateEnv does for the server-side equivalent.
+  const valuesForParse = Object.fromEntries(
+    Object.entries(values).map(([k, v]) => {
+      if (v === "") {
+        return [k, undefined];
+      }
+      if (
+        process.env["VIBE_BUILD_PLACEHOLDER_ENV"] === "true" &&
+        typeof v === "string" &&
+        isRuntimeEnvPlaceholder(v)
+      ) {
+        return [k, undefined];
+      }
+      return [k, v];
+    }),
+  );
+  const envClient = schema.parse(valuesForParse) as InferEnv<T>;
 
   const examples: EnvExample[] = Object.entries(fields).map(([key, def]) => ({
     key,

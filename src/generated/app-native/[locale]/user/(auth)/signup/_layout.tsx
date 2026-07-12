@@ -1,4 +1,4 @@
 import { createLayoutWrapperWithImport } from "@/app/api/[locale]/system/platforms/react-native/nextjs-compat-wrapper";
 export default createLayoutWrapperWithImport(
-  () => import("@/app/[locale]/user/(auth)/signup/layout"),
+  () => import("@/app/[locale]/user\(auth)\signup/layout"),
 );

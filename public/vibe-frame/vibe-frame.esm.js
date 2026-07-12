@@ -14131,7 +14131,7 @@ var errorResponseSchema = exports_external.object({
   })
 });
 
-// src/app/api/[locale]/shared/utils/env-util.ts
+// src/app/api/[locale]/system/env/env-util.ts
 var Environment;
 ((Environment2) => {
   Environment2["PRODUCTION"] = "production";
@@ -15483,4 +15483,4 @@ export {
   DEFAULT_SANDBOX
 };
 
-//# debugId=790741B55260B37B64756E2164756E21
+//# debugId=93602EC8F0699EC964756E2164756E21

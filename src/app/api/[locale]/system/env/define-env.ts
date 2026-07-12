@@ -311,9 +311,12 @@ export function defineEnv(
       }
     }
 
-    // Inject default discriminator value if missing so the union can match a variant
+    // Inject default discriminator value if missing so the union can match a variant.
+    // Treat "" as missing too - Docker sets unset build args as an empty string
+    // rather than leaving them unset.
+    const discriminatorRaw = rawEnv[unionInput.discriminator];
     const envWithDiscriminatorDefault =
-      rawEnv[unionInput.discriminator] === undefined
+      discriminatorRaw === undefined || discriminatorRaw === ""
         ? { ...rawEnv, [unionInput.discriminator]: discriminatorValues[0] }
         : rawEnv;
 

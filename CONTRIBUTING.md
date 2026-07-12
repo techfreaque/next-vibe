@@ -41,6 +41,21 @@ vibe dev
 
 **📚 See [Quick Start Guide](docs/guides/quickstart.md) for detailed setup instructions.**
 
+### Windows: hundreds of files showing as "modified" with no real diff
+
+This repo enforces LF line endings via `.gitattributes` (`* text=auto eol=lf`), which overrides
+`core.autocrlf` for every path — fresh clones are unaffected. But if you cloned before this rule
+existed, or your local index still has CRLF-normalized blobs, `git status` can show hundreds of
+files as modified even though `git diff` shows no actual content change. Fix once, locally:
+
+```bash
+git config core.autocrlf false
+git add --renormalize .
+git status   # should now only show files you actually changed
+```
+
+This only touches your local git config and index — no working tree file content changes.
+
 ---
 
 ## 📋 Development Workflow

@@ -50,6 +50,7 @@ import { scopedTranslation as serverStartScopedTranslation } from "next-vibe/ser
 import { env } from "@/config/env";
 
 import { ServerFramework } from "../enum";
+import { patchRuntimeEnvPlaceholders } from "./runtime-env-patch";
 import {
   addPidToFile,
   cleanupPidFile,
@@ -949,6 +950,13 @@ export class ServerStartRepository {
       return await new Promise<never>(() => {
         /* runs forever - only signal handlers exit */
       });
+    }
+
+    // Patch Docker-build runtime-env placeholders with real values before
+    // Next.js starts serving. TanStack inlines NEXT_PUBLIC_APP_URL via
+    // Vite's `define` at build time instead - no sentinel involved there.
+    if (data.framework !== ServerFramework.TANSTACK) {
+      patchRuntimeEnvPlaceholders(logger);
     }
 
     if (data.framework === ServerFramework.TANSTACK) {

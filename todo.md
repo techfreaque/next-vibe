@@ -8,3 +8,4 @@
 - improve cli interactive and fast renderer and make vibe gen more pretty
 - get rid of all in memory shared state either server to server events or redis
 - clean up fav / skill handling across ai stream and stream context / find a cleaner solution for stream context
+- add artifact tool to create pages (tailwind, react?)

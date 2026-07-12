@@ -13,7 +13,6 @@
 
 ## Boundary: What AI-Stream Owns
 
-
 | Concern                                                        | Owner                                   |
 | -------------------------------------------------------------- | --------------------------------------- |
 | Callback mode semantics (what modes mean)                      | `execute-tool/spec.md`                  |
@@ -29,7 +28,6 @@
 | **Confirmation gate UI** (APPROVE mode stream abort/resume)    | **ai-stream**                           |
 | **Tool self-escalation** (stream abort for long-running tools) | **ai-stream**                           |
 | **Branch tracking** (leafMessageId for revival)                | **ai-stream**                           |
-
 
 **The key rule:** ai-stream manages the stream. Execute-tool manages execution.
 Neither crosses into the other's territory.
@@ -51,13 +49,11 @@ transport. The only observable difference is timing.
 
 From the stream's perspective, results are either inline or deferred:
 
-
 | Path                    | Result delivery                                              | Stream pauses? |
 | ----------------------- | ------------------------------------------------------------ | -------------- |
 | local (no `instanceId`) | Inline (synchronous)                                         | No             |
 | `reverse-ws`            | `tool-execute-result` event at WS speed — effectively inline | No             |
 | `direct-http`           | Same event protocol over HTTP leg — effectively inline       | No             |
-
 
 Every AI tool dispatch rides the same `tool-execute-request` / `tool-execute-result`
 event envelope over the remote-event-bridge. The bridge picks the wire leg
@@ -103,13 +99,11 @@ auto-upgrades to `wakeUp`.
 
 **AI sees**: result inline, loop continues — always.
 
-
 | Transport            | Stream behavior                                                                     |
 | -------------------- | ----------------------------------------------------------------------------------- |
 | local                | Inline. Result returned immediately.                                                |
 | remote (event)       | Result event returns inline. Loop continues.                                        |
 | Escalated (>timeout) | Self-escalates via `escalateToTask`. Stream → `waiting`. Revival fires on complete. |
-
 
 **Escalated path — tool message lifecycle:**
 
@@ -175,13 +169,11 @@ Inline on both local and remote. Thread → `idle` after result.
 
 **User sees**: confirmation dialog. Other parallel tools execute normally.
 
-
 | Outcome          | Behavior                                                 |
 | ---------------- | -------------------------------------------------------- |
 | Confirm + wait   | Tool executes inline. Result delivery follows wait path. |
 | Confirm + wakeUp | Tool executes fire-and-forget. Revival fires when done.  |
 | Cancel           | Tool marked cancelled. AI turn resumes.                  |
-
 
 **Confirm + wait result lifecycle** — same as wait escalated path:
 
@@ -341,7 +333,6 @@ while the task ran.
 
 ## Parallel Mixed-Mode Rules
 
-
 | Combination                  | Rule                                                                                             |
 | ---------------------------- | ------------------------------------------------------------------------------------------------ |
 | `wait + wait`                | Both results returned, loop continues.                                                           |
@@ -356,5 +347,3 @@ while the task ran.
 | `wait + endLoop`             | endLoop stops loop. wait result returned before stop.                                            |
 | `detach + endLoop`           | endLoop stops loop. detach fires, no revival.                                                    |
 | `approve + wakeUp + endLoop` | approve blocks. wakeUp fires via queue. endLoop stops loop after batch.                          |
-
-
