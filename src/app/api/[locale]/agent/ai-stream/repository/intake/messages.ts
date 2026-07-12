@@ -102,6 +102,7 @@ export async function processOperation(params: {
         if (!transcriptionResult.success) {
           logger.error("[Setup] Audio transcription failed", {
             error: transcriptionResult.message,
+            errorType: transcriptionResult.errorType?.errorCode,
           });
           return transcriptionResult;
         }

@@ -96,6 +96,7 @@ export async function emitToolCall(
       w.deps.logger.error("[MessageDbWriter] Failed to create tool message", {
         messageId: toolMessageId,
         error: createResult.message,
+        errorType: createResult.errorType?.errorCode,
       });
     }
     // Roll any queued messages forward to this new frontier

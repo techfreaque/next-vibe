@@ -150,9 +150,13 @@ export function useInputHandlers({
       if (!result.success) {
         if (result.createdThreadId) {
           setNavigation(preNavSnapshot);
+          // logger.warn(message, ...metadata) - "Chat" was being passed as the
+          // message with the real description silently dropped (metadata only
+          // keeps plain objects), so this reached the server as a bare
+          // "[client] Chat" with no useful detail.
           logger.warn(
-            "Chat",
             "Stream failed - reverted navigation store to pre-send state",
+            { threadId: result.createdThreadId },
           );
         }
       }

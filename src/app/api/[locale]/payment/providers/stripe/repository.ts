@@ -606,9 +606,16 @@ export class StripeProvider implements PaymentProvider {
 
       return success();
     } catch (error) {
+      // Stripe SDK errors carry .type/.code (e.g. "resource_missing" = bad
+      // subscriptionId on our side vs a transient API/network error) -
+      // surface them so the two causes aren't indistinguishable in logs.
       logger.error("Failed to cancel Stripe subscription", {
         error: parseError(error),
         subscriptionId,
+        stripeErrorType:
+          error instanceof Object ? Reflect.get(error, "type") : undefined,
+        stripeErrorCode:
+          error instanceof Object ? Reflect.get(error, "code") : undefined,
       });
       const { t } = scopedTranslation.scopedT(locale);
       return fail({

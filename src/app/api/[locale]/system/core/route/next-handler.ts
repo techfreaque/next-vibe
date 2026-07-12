@@ -52,21 +52,30 @@ const MUTATING_METHODS = new Set([
  * - Skip if Authorization header present (bearer-token auth - not cookie-based)
  * - Reject if csrf_token cookie present but X-CSRF-Token header is missing or mismatched
  */
-function validateCsrf(request: NextRequest, method: Methods): boolean {
+function validateCsrf(
+  request: NextRequest,
+  method: Methods,
+): { valid: true } | { valid: false; reason: string } {
   if (!MUTATING_METHODS.has(method)) {
-    return true;
+    return { valid: true };
   }
   // Bearer-token auth (React Native, server-to-server) - not vulnerable to CSRF
   if (request.headers.get("authorization")) {
-    return true;
+    return { valid: true };
   }
   const cookieToken = request.cookies.get(CSRF_TOKEN_COOKIE_NAME)?.value;
   if (!cookieToken) {
     // No CSRF cookie - must be a non-browser client (CLI, MCP, server). Allow.
-    return true;
+    return { valid: true };
   }
   const headerToken = request.headers.get(CSRF_TOKEN_HEADER_NAME);
-  return !!headerToken && headerToken === cookieToken;
+  if (!headerToken) {
+    return { valid: false, reason: "csrf_header_missing" };
+  }
+  if (headerToken !== cookieToken) {
+    return { valid: false, reason: "csrf_token_mismatch" };
+  }
+  return { valid: true };
 }
 
 /**
@@ -120,12 +129,14 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
 
     try {
       // CSRF double-submit validation for mutating browser requests
-      if (!validateCsrf(request, endpoint.method as Methods)) {
+      const csrfCheck = validateCsrf(request, endpoint.method as Methods);
+      if (!csrfCheck.valid) {
         const { t: sharedT } = sharedScopedTranslation.scopedT(locale);
         return wrapErrorResponse(
           fail({
             message: sharedT("errorTypes.forbidden"),
             errorType: ErrorResponseTypes.FORBIDDEN,
+            messageParams: { reason: csrfCheck.reason },
           }),
           locale,
           logger,

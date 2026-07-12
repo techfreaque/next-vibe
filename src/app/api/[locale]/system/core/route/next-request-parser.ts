@@ -468,8 +468,13 @@ export async function parseRequestBody(
     return body;
   } catch (error) {
     const contentType = request.headers.get("content-type") || "(none)";
+    // Error.message/.stack are non-enumerable, so `...parseError(error)`
+    // spread nothing useful - every occurrence of this log was missing the
+    // one field that actually explains the failure. Pull them explicitly.
+    const parsed = parseError(error);
     logger.error("Failed to parse request body", {
-      ...parseError(error),
+      error: parsed.message,
+      errorStack: parsed.stack,
       contentType,
       contentLength: request.headers.get("content-length") ?? "(none)",
       url: request.url,

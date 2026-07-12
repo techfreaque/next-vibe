@@ -363,7 +363,11 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
           }
         } catch (error) {
           const formSnapshot = formMethods.getValues();
-          logger.error("[client] Error in submitForm", parseError(error), {
+          // No manual "[client] " prefix - the client-log receiver
+          // (error-monitor/client-log/repository.ts) already prepends it to
+          // every forwarded client log; adding it here doubled up as
+          // "[client] [client] Error in submitForm".
+          logger.error("Error in submitForm", parseError(error), {
             endpoint: endpoint.path.join("/"),
             fieldKeys: Object.keys(formSnapshot).join(", "),
             hasFiles: containsFile(formSnapshot),

@@ -503,19 +503,31 @@ export class ServerStartRepository {
           // is unavailable (non-Linux) - no reliable signal to act on.
         } else if (systemUsedPct >= 90 && lastPressureLevel < 3) {
           lastPressureLevel = 3;
-          logger.error(
-            `[Memory] CRITICAL system=${systemUsedPct}% heapUsed=${heapUsedMb}MB rss=${rssMb}MB uptime=${uptime}s — OOM imminent`,
-          );
+          // Dynamic values go in metadata, not the message text - the error
+          // fingerprint hashes the message, so a static string groups every
+          // occurrence into one actionable row instead of one per exact %/MB.
+          logger.error("[Memory] CRITICAL - OOM imminent", {
+            systemUsedPct,
+            heapUsedMb,
+            rssMb,
+            uptime,
+          });
         } else if (systemUsedPct >= 80 && lastPressureLevel < 2) {
           lastPressureLevel = 2;
-          logger.warn(
-            `[Memory] High pressure system=${systemUsedPct}% heapUsed=${heapUsedMb}MB rss=${rssMb}MB uptime=${uptime}s`,
-          );
+          logger.warn("[Memory] High pressure", {
+            systemUsedPct,
+            heapUsedMb,
+            rssMb,
+            uptime,
+          });
         } else if (systemUsedPct >= 70 && lastPressureLevel < 1) {
           lastPressureLevel = 1;
-          logger.info(
-            `[Memory] Elevated system=${systemUsedPct}% heapUsed=${heapUsedMb}MB rss=${rssMb}MB uptime=${uptime}s`,
-          );
+          logger.info("[Memory] Elevated", {
+            systemUsedPct,
+            heapUsedMb,
+            rssMb,
+            uptime,
+          });
         } else if (systemUsedPct < 60) {
           // Reset so warnings fire again if pressure rises
           lastPressureLevel = 0;
@@ -555,21 +567,32 @@ export class ServerStartRepository {
           const heapMb = Math.round(
             process.memoryUsage().heapUsed / 1024 / 1024,
           );
+          // Dynamic values go in metadata, not the message text - see the
+          // [Memory] logging above for why (fingerprint groups on message).
           if (maxMs >= EL_LAG_CRITICAL_MS && lastLagLevel < 3) {
             lastLagLevel = 3;
             logger.error(
-              `[EventLoop] CRITICAL lag max=${Math.round(maxMs)}ms mean=${Math.round(meanMs)}ms heap=${heapMb}MB uptime=${uptime2}s — server may appear frozen`,
+              "[EventLoop] CRITICAL lag - server may appear frozen",
+              {
+                maxMs: Math.round(maxMs),
+                meanMs: Math.round(meanMs),
+                heapMb,
+                uptime: uptime2,
+              },
             );
           } else if (maxMs >= EL_LAG_ERROR_MS && lastLagLevel < 2) {
             lastLagLevel = 2;
-            logger.error(
-              `[EventLoop] High lag max=${Math.round(maxMs)}ms mean=${Math.round(meanMs)}ms uptime=${uptime2}s — requests may be timing out`,
-            );
+            logger.error("[EventLoop] High lag - requests may be timing out", {
+              maxMs: Math.round(maxMs),
+              meanMs: Math.round(meanMs),
+              uptime: uptime2,
+            });
           } else if (maxMs >= EL_LAG_WARN_MS && lastLagLevel < 1) {
             lastLagLevel = 1;
-            logger.warn(
-              `[EventLoop] Elevated lag max=${Math.round(maxMs)}ms mean=${Math.round(meanMs)}ms`,
-            );
+            logger.warn("[EventLoop] Elevated lag", {
+              maxMs: Math.round(maxMs),
+              meanMs: Math.round(meanMs),
+            });
           } else if (maxMs < EL_LAG_WARN_MS / 2) {
             lastLagLevel = 0;
           }

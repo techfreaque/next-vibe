@@ -81,9 +81,16 @@ const pulseTaskRunner: TaskRunner<TasksTranslationKey> = {
             );
           }
         } else {
+          // pulseResult.message is the generic translated i18n string
+          // ("An internal error occurred") - the real cause lives in
+          // messageParams and was never being logged, making every pulse
+          // failure indistinguishable from every other one.
           logger.error(
             `Pulse #${pulseCount} failed`,
             new Error(pulseResult.message),
+            {
+              messageParams: pulseResult.messageParams,
+            },
           );
         }
       } catch (error) {

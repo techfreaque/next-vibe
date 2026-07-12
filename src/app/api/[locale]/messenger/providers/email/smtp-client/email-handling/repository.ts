@@ -99,6 +99,19 @@ export class EmailHandlingRepository {
                 unsubscribeUrl,
               } = resolved.data;
 
+              // A template can render successfully but still resolve no
+              // recipient (e.g. a lead/user with no email on file) without
+              // going through the "skip" path above. Without this guard an
+              // empty toEmail reached nodemailer, which threw "No recipients
+              // defined" 4-5 layers deep - fail fast here instead, the same
+              // way an explicit template skip is already handled.
+              if (!toEmail) {
+                logger.debug("Email skipped - no recipient address", {
+                  subject,
+                });
+                return;
+              }
+
               // Build comprehensive email data with all template information
               const emailSendResult = await EmailSendingRepository.sendEmail(
                 {

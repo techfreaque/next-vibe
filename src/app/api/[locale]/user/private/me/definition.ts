@@ -774,9 +774,16 @@ const { POST } = createEndpoint({
           email: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "update.response.email" as const,
-            schema: z.email({
-              message: "validationErrors.user.profile.email_invalid",
-            }),
+            // Public users hitting this endpoint (locale-only sync, no real
+            // account) legitimately have no email - repository.ts returns ""
+            // for that branch. A bare z.email() rejected it, so every such
+            // request failed the server's own response-schema validation.
+            schema: z.union([
+              z.email({
+                message: "validationErrors.user.profile.email_invalid",
+              }),
+              z.literal(""),
+            ]),
           }),
           privateName: responseField(scopedTranslation, {
             type: WidgetType.TEXT,

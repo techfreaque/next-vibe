@@ -366,16 +366,20 @@ export function useMessageOperations(
           messageId,
         });
 
+        // Use activeThreadId, not message.threadId - the cached message row
+        // doesn't reliably carry its own threadId, which was reaching the
+        // mutation as undefined and failing "Missing URL path parameter".
+        // activeThreadId is already confirmed non-null above.
         const result = await deleteMutateAsync({
           requestData: { rootFolderId: currentRootFolderId },
-          urlPathParams: { threadId: message.threadId, messageId },
+          urlPathParams: { threadId: activeThreadId, messageId },
         });
 
         if (!result.success) {
           if (result.errorType.errorCode === 404) {
             logger.warn(
               "Message operations: Message not found on server (already deleted?), removing from local cache",
-              { messageId, threadId: message.threadId },
+              { messageId, threadId: activeThreadId },
             );
             removeMessage(
               activeThreadId,
@@ -389,14 +393,14 @@ export function useMessageOperations(
           logger.error("Message operations: Server failed to delete message", {
             message: result.message,
             messageId,
-            threadId: message.threadId,
+            threadId: activeThreadId,
           });
           return;
         }
 
         logger.debug("Message operations: Server deletion successful", {
           messageId,
-          threadId: message.threadId,
+          threadId: activeThreadId,
         });
 
         removeMessage(activeThreadId, currentRootFolderId, logger, messageId);
@@ -441,9 +445,10 @@ export function useMessageOperations(
       const voteString = vote === 1 ? "up" : vote === -1 ? "down" : "remove";
 
       try {
+        // Use activeThreadId, not message.threadId - see deleteMessage above.
         const result = await voteMutateAsync({
           requestData: { vote: voteString, rootFolderId: currentRootFolderId },
-          urlPathParams: { threadId: message.threadId, messageId },
+          urlPathParams: { threadId: activeThreadId, messageId },
         });
 
         if (!result.success) {

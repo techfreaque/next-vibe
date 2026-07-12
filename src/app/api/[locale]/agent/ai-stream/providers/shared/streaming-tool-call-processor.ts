@@ -10,6 +10,8 @@ import "server-only";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { isStreamAbort } from "@/app/api/[locale]/agent/ai-stream/repository/core/constants";
+
 import {
   type OpenAIToolCall,
   parseToolCalls,
@@ -287,8 +289,17 @@ export async function processStreamingResponseWithToolCalls(
           }
         }
       } catch (error) {
-        if (error instanceof Error && error.name === "AbortError") {
-          logger.debug(`[${providerName}] Stream closed by client`);
+        // StreamAbortError (superseded, user_cancelled, loop_stop, ...) is
+        // the app's own graceful-abort signal - it never matches the raw
+        // DOM AbortError check below, so it was falling through to
+        // logger.error for perfectly normal control flow.
+        if (
+          error instanceof Error &&
+          (error.name === "AbortError" || isStreamAbort(error))
+        ) {
+          logger.debug(`[${providerName}] Stream closed by client`, {
+            reason: isStreamAbort(error) ? error.reason : undefined,
+          });
         } else {
           logger.error(
             `[${providerName}] Error processing stream`,

@@ -131,8 +131,18 @@ export function useAIStream(): UseAIStreamReturn {
           useAIStreamStore.getState().removeIncognitoStream(threadId);
         }
         // mutateAsync throws the full ErrorResponseType on non-success responses
-        const failMessage = parseError(err).message;
-        logger.error("Stream request failed", { message: failMessage });
+        const parsedErr = parseError(err);
+        const failMessage = parsedErr.message;
+        // Distinct name from the non-success branch below: this is a thrown
+        // exception (network drop, timeout, abort) with no server response at
+        // all, not a server-returned failure - keep them separately traceable.
+        logger.error("[client] Stream request network error", {
+          message: failMessage,
+          errorType: Reflect.get(parsedErr, "errorType"),
+          operation: data.operation,
+          model: data.model,
+          threadId: data.threadId,
+        });
 
         const activeThreadId = data.threadId;
         if (activeThreadId) {
@@ -162,8 +172,12 @@ export function useAIStream(): UseAIStreamReturn {
           useAIStreamStore.getState().removeIncognitoStream(threadId);
         }
         const resultMessage = result.message;
-        logger.error("Stream request failed", {
+        logger.error("[client] Stream request failed", {
           message: resultMessage,
+          errorType: result.errorType?.errorCode,
+          operation: data.operation,
+          model: data.model,
+          threadId: data.threadId,
         });
 
         const activeThreadId = data.threadId;
