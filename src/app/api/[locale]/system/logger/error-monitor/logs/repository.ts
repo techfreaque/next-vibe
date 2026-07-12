@@ -187,6 +187,16 @@ export class ErrorLogsRepository {
         `Updated ${result.length.toString()} rows for fingerprint ${data.fingerprint}`,
       );
 
+      if (result.length === 0) {
+        // Fingerprint matched no row - report it instead of a false success,
+        // which previously made a typo'd/stale fingerprint indistinguishable
+        // from a real update (both rendered the same "success" response).
+        return fail({
+          message: t("patch.errors.notFound.title"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+
       return success({
         responseFingerprint: data.fingerprint,
         responseResolved: data.resolved,

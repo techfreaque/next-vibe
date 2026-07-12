@@ -37,6 +37,7 @@ import type { JSX, ReactNode } from "react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { AgentAvailabilityProvider } from "@/app/api/[locale]/agent/env-availability-context";
 import { LoggerProvider } from "@/hooks/logger-provider";
 
 import { EndpointsPage } from "../react/EndpointsPage";
@@ -707,12 +708,15 @@ export async function renderInkEndpointPage<
   };
   process.on("SIGINT", sigintHandler);
 
+  const rootAvailability = getEnvAvailability();
   const instance = render(
     <InkErrorBoundary label={LABEL_INK_ROOT}>
-      <LoggerProvider locale={props.locale} availability={getEnvAvailability()}>
-        <QueryProvider>
-          <InkEndpointPage {...props} />
-        </QueryProvider>
+      <LoggerProvider locale={props.locale} availability={rootAvailability}>
+        <AgentAvailabilityProvider availability={rootAvailability}>
+          <QueryProvider>
+            <InkEndpointPage {...props} />
+          </QueryProvider>
+        </AgentAvailabilityProvider>
       </LoggerProvider>
     </InkErrorBoundary>,
     agentCtrl

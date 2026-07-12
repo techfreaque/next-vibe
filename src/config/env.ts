@@ -275,6 +275,21 @@ export const {
       "Enable continuous file watching during development. When false (default), generators run once on startup and again when you press 'r' in the terminal - no CPU overhead. When true, generators re-run automatically on every file change. WARNING: continuous mode requires a high-end workstation (64 GB+ RAM, fast multi-core CPU). On less powerful machines it will cause noticeable slowdowns and may make the dev server unresponsive.",
     fieldType: "boolean",
   },
+  SSH_SERVER: {
+    schema: z.string().optional(),
+    example: "root@203.0.113.5",
+    comment:
+      "Default SSH target for `vibe image-push` when --sshTarget isn't passed explicitly. Format: user@host or user@host:port.",
+    commented: true,
+  },
+  SSH_SERVER_PWD: {
+    schema: z.string().optional(),
+    example: "REPLACE_WITH_your_ssh_password",
+    comment:
+      "Password for SSH_SERVER (or an explicit --sshTarget). If unset, `vibe image-push` falls back to the system ssh client (key/agent auth). Only used for the image transfer - never logged.",
+    commented: true,
+    sensitive: true,
+  },
   VIBE_SECRET_KEY: {
     schema: z.string().min(64).optional(),
     example: false,

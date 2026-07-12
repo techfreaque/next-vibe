@@ -5,6 +5,7 @@ import "server-only";
 import type { FilePart, ImagePart, LanguageModel } from "ai";
 import { generateText as aiGenerateText } from "ai";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
@@ -203,11 +204,11 @@ async function runBridgeCall(params: {
       } catch (attemptErr) {
         // Parent stream cancelled → stop immediately; per-attempt timeout →
         // retry once, then give up (caller substitutes the placeholder text).
-        const attemptMsg =
-          attemptErr instanceof Error ? attemptErr.message : String(attemptErr);
+        const parsedAttemptErr = parseError(attemptErr);
         if (abortSignal.aborted || attempt === 1) {
           logger.warn(`[GapFill] ${errorLabel} bridge call failed`, {
-            error: attemptMsg,
+            error: parsedAttemptErr.message,
+            errorStack: parsedAttemptErr.stack,
             modality,
             bridgeType,
             aborted: abortSignal.aborted,
@@ -216,7 +217,11 @@ async function runBridgeCall(params: {
         }
         logger.warn(
           `[GapFill] ${errorLabel} bridge attempt timed out - retrying once`,
-          { modality, error: attemptMsg },
+          {
+            modality,
+            error: parsedAttemptErr.message,
+            errorStack: parsedAttemptErr.stack,
+          },
         );
       }
     }
@@ -261,8 +266,10 @@ async function runBridgeCall(params: {
 
     return output || null;
   } catch (err) {
+    const parsed = parseError(err);
     logger.warn(`[GapFill] ${errorLabel} bridge call failed`, {
-      error: err instanceof Error ? err.message : String(err),
+      error: parsed.message,
+      errorStack: parsed.stack,
       modality,
       bridgeType,
     });

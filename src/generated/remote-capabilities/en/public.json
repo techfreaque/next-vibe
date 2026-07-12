@@ -55550,16 +55550,55 @@
               "label": "Email Address",
               "schema": {
                 "def": {
-                  "type": "string",
-                  "format": "email",
-                  "check": "string_format",
-                  "abort": false,
-                  "pattern": {}
+                  "type": "union",
+                  "options": [
+                    {
+                      "def": {
+                        "type": "string",
+                        "format": "email",
+                        "check": "string_format",
+                        "abort": false,
+                        "pattern": {}
+                      },
+                      "type": "string",
+                      "format": "email",
+                      "minLength": null,
+                      "maxLength": null
+                    },
+                    {
+                      "def": {
+                        "type": "literal",
+                        "values": [""]
+                      },
+                      "type": "literal",
+                      "values": {}
+                    }
+                  ]
                 },
-                "type": "string",
-                "format": "email",
-                "minLength": null,
-                "maxLength": null
+                "type": "union",
+                "options": [
+                  {
+                    "def": {
+                      "type": "string",
+                      "format": "email",
+                      "check": "string_format",
+                      "abort": false,
+                      "pattern": {}
+                    },
+                    "type": "string",
+                    "format": "email",
+                    "minLength": null,
+                    "maxLength": null
+                  },
+                  {
+                    "def": {
+                      "type": "literal",
+                      "values": [""]
+                    },
+                    "type": "literal",
+                    "values": {}
+                  }
+                ]
               },
               "usage": {
                 "response": true

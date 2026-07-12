@@ -244,6 +244,15 @@ export class LeadTrackingRepository {
       );
 
       if (!result.success || !result.data) {
+        logger.warn(
+          "[LeadTracking] recordEngagementInternal returned no data",
+          {
+            leadId: data.leadId,
+            engagementType: data.engagementType,
+            success: result.success,
+            error: result.success ? undefined : result.message,
+          },
+        );
         return result.success
           ? fail({
               message: t("tracking.errors.default"),

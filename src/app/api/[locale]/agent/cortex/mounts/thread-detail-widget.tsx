@@ -45,7 +45,18 @@ function extractThreadInfo(path: string): ThreadPathInfo | null {
   }
   const rootFolderSegment = segments[1];
   const last = segments[segments.length - 1];
-  const threadId = last.replace(/\.md$/, "");
+  if (!last) {
+    return null;
+  }
+  // Filenames are "<slug>-<threadId>.md" (see mounts/threads.ts's slugify) -
+  // the UUID is the tail, not the whole segment. Anchor to the tail (before
+  // the optional .md) the same way readThreadPath does server-side, so a
+  // slugified title (e.g. "Neuer Chat" -> "neuer-chat") never leaks into the
+  // extracted threadId.
+  const uuidMatch = last.match(
+    /([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})(?:\.md)?$/i,
+  );
+  const threadId = uuidMatch?.[1];
   if (!threadId) {
     return null;
   }

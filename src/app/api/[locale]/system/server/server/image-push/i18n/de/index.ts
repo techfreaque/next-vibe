@@ -40,7 +40,7 @@ export const translations: typeof enTranslations = {
       sshTarget: {
         title: "SSH-Ziel",
         description:
-          "user@host, um das gebaute Image direkt per SSH statt über eine Registry zu übertragen (z.B. root@203.0.113.5) - nutzt deinen eigenen SSH-Schlüssel/-Konfiguration, genau wie ein manuelles ssh. Leer lassen, um stattdessen in die Registry zu pushen.",
+          "user@host, um das gebaute Image direkt per SSH statt über eine Registry zu übertragen (z.B. root@203.0.113.5) - standardmäßig SSH_SERVER, falls gesetzt. Nutzt SSH_SERVER_PWD für Passwort-Auth, sonst deinen eigenen SSH-Schlüssel/-Konfiguration. Leer lassen, um stattdessen in die Registry zu pushen.",
       },
       success: {
         title: "Erfolg",

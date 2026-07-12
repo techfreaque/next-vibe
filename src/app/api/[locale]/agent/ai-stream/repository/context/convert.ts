@@ -167,7 +167,7 @@ export async function toAiSdkMessage(
       const contentParts: Array<
         | { type: "text"; text: string }
         | { type: "image"; image: string | URL }
-        | { type: "file"; data: Uint8Array; mediaType: string }
+        | { type: "file"; data: string; mediaType: string }
       > = [];
 
       // Add text content if present
@@ -246,10 +246,17 @@ export async function toAiSdkMessage(
               attachment.mimeType.startsWith("audio/") ||
               attachment.mimeType.startsWith("video/")
             ) {
-              // Audio/video: pass as FilePart (Uint8Array) so models that support it can process it
+              // Audio/video: pass as FilePart. Keep `data` a base64 STRING,
+              // not a decoded Uint8Array/Buffer - provider SDKs (e.g.
+              // @openrouter/ai-sdk-provider's convertUint8ArrayToBase64)
+              // re-encode a Uint8Array by concatenating one character per
+              // byte in a loop, which builds a deeply-nested cons string that
+              // can throw "Maximum call stack size exceeded" on large audio
+              // files. A string is passed through as-is by that same
+              // provider code, skipping the buggy re-encode entirely.
               contentParts.push({
                 type: "file",
-                data: Buffer.from(base64Data, "base64"),
+                data: base64Data,
                 mediaType: attachment.mimeType,
               });
             } else if (isDocumentMimeType(attachment.mimeType)) {

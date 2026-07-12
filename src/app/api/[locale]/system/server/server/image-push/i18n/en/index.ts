@@ -38,7 +38,7 @@ export const translations = {
       sshTarget: {
         title: "SSH Target",
         description:
-          "user@host to transfer the built image to directly over SSH instead of a registry (e.g. root@203.0.113.5) - uses your own SSH key/config, same as running ssh yourself. Leave empty to push to the registry instead.",
+          "user@host to transfer the built image to directly over SSH instead of a registry (e.g. root@203.0.113.5) - defaults to SSH_SERVER if set. Uses SSH_SERVER_PWD for password auth when set, otherwise your own SSH key/config. Leave empty to push to the registry instead.",
       },
       success: {
         title: "Success",

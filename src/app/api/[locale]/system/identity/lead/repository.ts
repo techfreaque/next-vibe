@@ -1381,6 +1381,10 @@ export class LeadsRepository {
         .limit(1);
 
       if (!lead) {
+        logger.warn("[LeadEngagement] Lead not found - engagement dropped", {
+          leadId: data.leadId,
+          engagementType: data.engagementType,
+        });
         return fail({
           message: t("leadsErrors.leadsEngagement.post.error.validation.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
@@ -1401,6 +1405,14 @@ export class LeadsRepository {
         .returning();
 
       if (!engagement) {
+        logger.error(
+          "[LeadEngagement] Insert returned no row - engagement not recorded",
+          {
+            leadId: data.leadId,
+            engagementType: data.engagementType,
+            campaignId: data.campaignId,
+          },
+        );
         return fail({
           message: t("leadsErrors.leadsEngagement.post.error.server.title"),
           errorType: ErrorResponseTypes.DATABASE_ERROR,

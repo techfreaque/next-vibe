@@ -9,7 +9,7 @@
 
 import "server-only";
 
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -29,14 +29,14 @@ import type {
 } from "./definition";
 
 export class ImagePushRepository {
-  static execute(
+  static async execute(
     data: ImagePushRequestOutput,
     logger: EndpointLogger,
     t: ImagePushT,
-  ): ResponseType<ImagePushResponseOutput> {
+  ): Promise<ResponseType<ImagePushResponseOutput>> {
     const startTime = Date.now();
     const image = data.image ?? env.DOCKER_IMAGE_NAME;
-    const sshTarget = data.sshTarget;
+    const sshTarget = data.sshTarget ?? env.SSH_SERVER;
 
     const shaResult = ImagePushRepository.resolveTag(data.tag, logger, t);
     if (!shaResult.success) {
@@ -101,7 +101,7 @@ export class ImagePushRepository {
     }
 
     if (sshTarget) {
-      const transferResult = ImagePushRepository.transferViaSsh(
+      const transferResult = await ImagePushRepository.transferViaSsh(
         refs,
         sshTarget,
         logger,
@@ -138,22 +138,33 @@ export class ImagePushRepository {
 
   /**
    * Transfers the already-built (docker --load'ed) image directly to a
-   * server over SSH: `docker save <refs> | ssh <target> "docker load"`. Uses
-   * the operator's own SSH key/config - the same trust boundary as running
-   * ssh themselves, no separate credentials to manage.
+   * server over SSH: `docker save <refs> | ssh <target> "docker load"`.
+   * Uses SSH_SERVER_PWD for password auth when set (via ssh2 - no `sshpass`
+   * binary needed, works on Windows dev machines too); otherwise falls back
+   * to the operator's own SSH key/agent via the system `ssh` client.
    */
-  private static transferViaSsh(
+  private static async transferViaSsh(
     refs: string[],
     sshTarget: string,
     logger: EndpointLogger,
     t: ImagePushT,
-  ): ResponseType<void> {
+  ): Promise<ResponseType<void>> {
     logger.info(
       t("post.repository.messages.sshTransferStart", {
         refs: refs.join(", "),
         target: sshTarget,
       }),
     );
+
+    if (env.SSH_SERVER_PWD) {
+      return ImagePushRepository.transferViaSshPassword(
+        refs,
+        sshTarget,
+        env.SSH_SERVER_PWD,
+        logger,
+        t,
+      );
+    }
 
     const refList = refs.map((ref) => `"${ref}"`).join(" ");
     const pipeline = `docker save ${refList} | ssh ${sshTarget} "docker load"`;
@@ -205,6 +216,154 @@ export class ImagePushRepository {
     }
 
     return success(undefined);
+  }
+
+  /** Parses `user@host` or `user@host:port` into its parts (defaults: root, port 22) */
+  private static parseSshTarget(sshTarget: string): {
+    username: string;
+    host: string;
+    port: number;
+  } {
+    const [userHost, portStr] = sshTarget.split(":");
+    const atIndex = userHost.indexOf("@");
+    const username = atIndex >= 0 ? userHost.slice(0, atIndex) : "root";
+    const host = atIndex >= 0 ? userHost.slice(atIndex + 1) : userHost;
+    return { username, host, port: portStr ? parseInt(portStr, 10) : 22 };
+  }
+
+  /**
+   * Same `docker save | ssh | docker load` transfer as transferViaSsh, but
+   * authenticates with a password over ssh2 instead of shelling out to the
+   * system `ssh` client - lets SSH_SERVER_PWD work without `sshpass`
+   * installed (not available by default on Windows dev machines).
+   */
+  private static async transferViaSshPassword(
+    refs: string[],
+    sshTarget: string,
+    password: string,
+    logger: EndpointLogger,
+    t: ImagePushT,
+  ): Promise<ResponseType<void>> {
+    const { username, host, port } =
+      ImagePushRepository.parseSshTarget(sshTarget);
+    // Dynamic import keeps ssh2 out of Turbopack's static NFT trace, same
+    // reason as src/app/api/[locale]/ssh/client.ts's openSshClient.
+    const { Client } = await import(/* turbopackIgnore: true */ "ssh2");
+
+    return new Promise((resolve) => {
+      const client = new Client();
+      let settled = false;
+      const settle = (result: ResponseType<void>): void => {
+        if (settled) {
+          return;
+        }
+        settled = true;
+        client.end();
+        resolve(result);
+      };
+
+      client.on("error", (err) => {
+        logger.error("SSH image transfer connection failed", {
+          error: err.message,
+        });
+        settle(
+          fail({
+            message: t("post.errors.server.title"),
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            messageParams: {
+              error: t("post.repository.messages.sshTransferFailed", {
+                target: sshTarget,
+                error: err.message,
+              }),
+            },
+          }),
+        );
+      });
+
+      client.on("ready", () => {
+        client.exec("docker load", (execErr, stream) => {
+          if (execErr) {
+            settle(
+              fail({
+                message: t("post.errors.server.title"),
+                errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                messageParams: {
+                  error: t("post.repository.messages.sshTransferFailed", {
+                    target: sshTarget,
+                    error: execErr.message,
+                  }),
+                },
+              }),
+            );
+            return;
+          }
+
+          let stderr = "";
+          stream.stderr.on("data", (data: Buffer) => {
+            stderr += data.toString("utf8");
+          });
+          stream.on("data", (data: Buffer) => {
+            process.stdout.write(data);
+          });
+
+          stream.on("close", (code: number | null) => {
+            if (code !== 0) {
+              logger.error("SSH image transfer failed", {
+                exitCode: code,
+                stderr,
+              });
+              settle(
+                fail({
+                  message: t("post.errors.server.title"),
+                  errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  messageParams: {
+                    error: t("post.repository.messages.sshTransferFailed", {
+                      target: sshTarget,
+                      error:
+                        stderr ||
+                        t("post.repository.messages.buildExitCode", {
+                          code: code ?? -1,
+                        }),
+                    }),
+                  },
+                }),
+              );
+              return;
+            }
+            settle(success(undefined));
+          });
+
+          const save = spawn("docker", ["save", ...refs]);
+          save.stdout.pipe(stream);
+          save.stderr.on("data", (data: Buffer) => {
+            process.stderr.write(data);
+          });
+          save.on("error", (err) => {
+            stream.close();
+            settle(
+              fail({
+                message: t("post.errors.server.title"),
+                errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                messageParams: {
+                  error: t("post.repository.messages.sshTransferFailed", {
+                    target: sshTarget,
+                    error: err.message,
+                  }),
+                },
+              }),
+            );
+          });
+        });
+      });
+
+      client.connect({
+        host,
+        port,
+        username,
+        password,
+        readyTimeout: 15000,
+      });
+    });
   }
 
   /** Uses the request tag override, or resolves the current short git commit SHA */
