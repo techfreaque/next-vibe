@@ -3,8 +3,7 @@
  * Compiles files using Vite
  */
 
-import type { ChildProcess } from "node:child_process";
-import { existsSync, mkdirSync, statSync } from "node:fs";
+import { existsSync, mkdirSync, statSync, watch } from "node:fs";
 import type { Server as NodeHttpServer } from "node:http";
 import { networkInterfaces } from "node:os";
 import { basename, dirname, resolve } from "node:path";
@@ -1244,99 +1243,86 @@ class ViteCompiler {
             enforce: "pre",
             configureServer(srv) {
               // widget.tsx files under [locale] are served on-demand via
-              // bracket-path-rewrite and are never in Vite's module graph.
-              // chokidar does not work under Bun (inotify unavailable in Bun's
-              // runtime). Spawn a node subprocess that runs chokidar and pipes
-              // JSON change events back via stdout so we can send a custom
-              // "vibe:widget-update" HMR event to the browser on each save.
+              // bracket-path-rewrite and are never in Vite's module graph, so
+              // Vite's own watcher never sees them until first served (see
+              // srv.watcher.add below). Watch the whole tree directly with
+              // fs.watch's recursive mode - proven to work under Bun on this
+              // OS by dev-watcher/task-runner.ts's generator watcher - so this
+              // has no dependency on a system `node` binary being installed.
               const localeDir = resolve(ROOT_DIR, "src/app/api/[locale]");
-              const chokidarPkg = resolve(
-                ROOT_DIR,
-                "node_modules/chokidar/index.js",
-              );
-              const watcherScript = [
-                `const { watch } = require(${JSON.stringify(chokidarPkg)});`,
-                `const w = watch(${JSON.stringify(localeDir)}, {`,
-                `  disableGlobbing: true, ignoreInitial: true, ignorePermissionErrors: true,`,
-                `});`,
-                `process.stdout.on('error', () => { w.close().then(() => process.exit(0)); });`,
-                `w.on('change', (f) => { process.stdout.write(JSON.stringify({ file: f }) + '\\n'); });`,
-                `process.on('disconnect', () => w.close().then(() => process.exit(0)));`,
-              ].join("\n");
-              // eslint-disable-next-line @typescript-eslint/no-require-imports -- dynamic require: child_process must not be top-level imported in SSR entry module
-              const { spawn } = require("node:child_process") as {
-                spawn: (
-                  cmd: string,
-                  args: string[],
-                  opts: { stdio: ["ignore", "pipe", "inherit"] },
-                ) => ChildProcess;
-              };
-              const watcher = spawn("node", ["-e", watcherScript], {
-                stdio: ["ignore", "pipe", "inherit"],
-              });
-              watcher.stdout?.on("data", (chunk: Buffer) => {
-                const lines = chunk.toString().split("\n").filter(Boolean);
-                for (const line of lines) {
-                  let parsed: { file?: string };
-                  try {
-                    parsed = JSON.parse(line) as { file?: string };
-                  } catch {
-                    continue;
-                  }
-                  const file = parsed.file;
-                  if (!file?.endsWith("/widget.tsx")) {
-                    continue;
-                  }
-                  // Invalidate the changed widget in the SSR module graph, then
-                  // full-clear evaluatedModules (surgical per-module eviction
-                  // causes TDZ errors — see ssr-clear-on-hmr comment).
-                  const ssrEnv = srv.environments?.["ssr"];
-                  if (ssrEnv && isRunnableDevEnvironment(ssrEnv)) {
-                    const ssrVisited = new Set<string>();
-                    const scoped = invalidateWithImporters(
-                      ssrEnv.moduleGraph,
-                      file,
-                      ssrVisited,
-                    );
-                    if (scoped) {
-                      evictSsrModules(
-                        ssrEnv.runner.evaluatedModules,
-                        ssrVisited,
-                      );
-                    } else {
-                      ssrEnv.runner.evaluatedModules.clear();
-                    }
-                  }
-                  // Derive the browser-relative URL (strip absolute prefix up to /src/)
-                  const srcIdx = file.indexOf("/src/");
-                  const browserPath = srcIdx !== -1 ? file.slice(srcIdx) : null;
+              const watcher = existsSync(localeDir)
+                ? watch(
+                    localeDir,
+                    { recursive: true },
+                    // oxlint-disable-next-line no-unused-vars -- eventType unused, filename is the second positional arg
+                    (_eventType, filename) => {
+                      if (!filename) {
+                        return;
+                      }
+                      // recursive fs.watch reports paths relative to localeDir,
+                      // using the OS separator - normalize to match the "/"-joined
+                      // absolute paths the rest of this handler expects.
+                      const file = `${localeDir}/${filename.replaceAll("\\", "/")}`;
+                      if (!file.endsWith("/widget.tsx")) {
+                        return;
+                      }
+                      // Invalidate the changed widget in the SSR module graph, then
+                      // full-clear evaluatedModules (surgical per-module eviction
+                      // causes TDZ errors — see ssr-clear-on-hmr comment).
+                      const ssrEnv = srv.environments?.["ssr"];
+                      if (ssrEnv && isRunnableDevEnvironment(ssrEnv)) {
+                        const ssrVisited = new Set<string>();
+                        const scoped = invalidateWithImporters(
+                          ssrEnv.moduleGraph,
+                          file,
+                          ssrVisited,
+                        );
+                        if (scoped) {
+                          evictSsrModules(
+                            ssrEnv.runner.evaluatedModules,
+                            ssrVisited,
+                          );
+                        } else {
+                          ssrEnv.runner.evaluatedModules.clear();
+                        }
+                      }
+                      // Derive the browser-relative URL (strip absolute prefix up to /src/)
+                      const srcIdx = file.indexOf("/src/");
+                      const browserPath =
+                        srcIdx !== -1 ? file.slice(srcIdx) : null;
 
-                  if (browserPath) {
-                    // Send a standard Vite js-update so the browser re-fetches the
-                    // widget module and triggers its injected hot.accept handler,
-                    // which calls window.__vibeWidgetHmr to swap the component.
-                    const timestamp = Date.now();
-                    srv.ws.send({
-                      type: "update",
-                      updates: [
-                        {
-                          type: "js-update",
-                          path: browserPath,
-                          acceptedPath: browserPath,
-                          timestamp,
-                          explicitImportRequired: false,
-                          isWithinCircularImport: false,
-                        },
-                      ],
-                    });
-                    serverFileLog(
-                      `[widget-hmr] sent js-update for ${browserPath}`,
-                    );
-                  }
-                }
-              });
+                      if (browserPath) {
+                        // Send a standard Vite js-update so the browser re-fetches the
+                        // widget module and triggers its injected hot.accept handler,
+                        // which calls window.__vibeWidgetHmr to swap the component.
+                        const timestamp = Date.now();
+                        srv.ws.send({
+                          type: "update",
+                          updates: [
+                            {
+                              type: "js-update",
+                              path: browserPath,
+                              acceptedPath: browserPath,
+                              timestamp,
+                              explicitImportRequired: false,
+                              isWithinCircularImport: false,
+                            },
+                          ],
+                        });
+                        serverFileLog(
+                          `[widget-hmr] sent js-update for ${browserPath}`,
+                        );
+                      }
+                    },
+                  )
+                : null;
+              if (!watcher) {
+                serverFileLog(
+                  `[widget-hmr] locale dir not found at ${localeDir} - widget hot-reload-on-save disabled (hard refresh still works)`,
+                );
+              }
               srv.httpServer?.on("close", () => {
-                watcher.kill();
+                watcher?.close();
               });
               type ConnectHandle = (
                 req: { url?: string },
@@ -1573,10 +1559,12 @@ class ViteCompiler {
                 return { code: shim + code, map: null };
               }
               // Client: rewrite `require("next-vibe/ui/web/ui/icons/X")` → `__cjsImport_X` and add static imports.
+              // Matches both relative (./de) and bare package-style (next-vibe/ui/i18n/de)
+              // specifiers - the lazy i18n loader pattern uses both forms.
               const imports: string[] = [];
               let counter = 0;
               const rewritten = code.replace(
-                /\brequire\((['"`])(\.\/[^'"` )]+)\1\)/g,
+                /\brequire\((['"`])([^'"`)]+)\1\)/g,
                 (...[, , specifier]) => {
                   const varName = `__cjsImport_${counter++}`;
                   imports.push(

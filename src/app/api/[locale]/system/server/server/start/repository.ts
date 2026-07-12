@@ -48,6 +48,7 @@ import type { ServerStartT } from "next-vibe/server/server/start/i18n";
 import { scopedTranslation as serverStartScopedTranslation } from "next-vibe/server/server/start/i18n";
 
 import { env } from "@/config/env";
+import { readProcMeminfo } from "@/app/api/[locale]/system/database/health/repository";
 
 import { ServerFramework } from "../enum";
 import { patchRuntimeEnvPlaceholders } from "./runtime-env-patch";
@@ -462,8 +463,19 @@ export class ServerStartRepository {
         const heapUsedMb = Math.round(mem.heapUsed / 1024 / 1024);
         const rssMb = Math.round(mem.rss / 1024 / 1024);
         const heapTotalMb = Math.round(mem.heapTotal / 1024 / 1024);
-        const heapPct =
-          heapTotalMb > 0 ? Math.min((heapUsedMb / heapTotalMb) * 100, 100) : 0;
+        // Bun runs on JavaScriptCore, not V8 - heapTotal does not carry V8's
+        // "current heap capacity" meaning there, and heapUsed can legitimately
+        // exceed it (observed: heapUsed=101MB, heapTotal=60MB in production).
+        // A heapUsed/heapTotal ratio is therefore not a reliable OOM predictor
+        // on this runtime. What actually predicts an OOM-kill is RSS against
+        // the container's real memory ceiling, so read /proc/meminfo (same
+        // proven approach as the db-health-check task) instead.
+        const procMem = readProcMeminfo();
+        const systemUsedPct = procMem
+          ? Math.round(
+              ((procMem.totalKb - procMem.availableKb) / procMem.totalKb) * 100,
+            )
+          : null;
 
         mkdirSync(".tmp", { recursive: true });
         writeFileSync(
@@ -472,7 +484,7 @@ export class ServerStartRepository {
             heapUsedMb,
             rssMb,
             heapTotalMb,
-            heapPct: Math.round(heapPct),
+            systemUsedPct,
             timestamp: new Date().toISOString(),
             uptime: Math.floor(process.uptime()),
             nextRestartCount: ServerStartRepository.nextRestartCount,
@@ -484,26 +496,27 @@ export class ServerStartRepository {
         );
 
         // Memory pressure warnings - only log when crossing a new threshold.
-        // Skip the first 30s: Node/Bun reports inflated transient heap values at startup.
+        // Skip the first 30s: memory metrics are unreliable during startup.
         const uptime = Math.floor(process.uptime());
-        if (uptime < 30) {
-          // Suppress pressure warnings during startup - heap metrics are unreliable
-        } else if (heapPct >= 90 && lastPressureLevel < 3) {
+        if (uptime < 30 || systemUsedPct === null) {
+          // Suppress pressure warnings during startup, or when /proc/meminfo
+          // is unavailable (non-Linux) - no reliable signal to act on.
+        } else if (systemUsedPct >= 90 && lastPressureLevel < 3) {
           lastPressureLevel = 3;
           logger.error(
-            `[Memory] CRITICAL heap=${heapUsedMb}/${heapTotalMb}MB (${Math.round(heapPct)}%) rss=${rssMb}MB uptime=${uptime}s — OOM imminent`,
+            `[Memory] CRITICAL system=${systemUsedPct}% heapUsed=${heapUsedMb}MB rss=${rssMb}MB uptime=${uptime}s — OOM imminent`,
           );
-        } else if (heapPct >= 80 && lastPressureLevel < 2) {
+        } else if (systemUsedPct >= 80 && lastPressureLevel < 2) {
           lastPressureLevel = 2;
           logger.warn(
-            `[Memory] High pressure heap=${heapUsedMb}/${heapTotalMb}MB (${Math.round(heapPct)}%) rss=${rssMb}MB uptime=${uptime}s`,
+            `[Memory] High pressure system=${systemUsedPct}% heapUsed=${heapUsedMb}MB rss=${rssMb}MB uptime=${uptime}s`,
           );
-        } else if (heapPct >= 70 && lastPressureLevel < 1) {
+        } else if (systemUsedPct >= 70 && lastPressureLevel < 1) {
           lastPressureLevel = 1;
           logger.info(
-            `[Memory] Elevated heap=${heapUsedMb}/${heapTotalMb}MB (${Math.round(heapPct)}%) rss=${rssMb}MB uptime=${uptime}s`,
+            `[Memory] Elevated system=${systemUsedPct}% heapUsed=${heapUsedMb}MB rss=${rssMb}MB uptime=${uptime}s`,
           );
-        } else if (heapPct < 60) {
+        } else if (systemUsedPct < 60) {
           // Reset so warnings fire again if pressure rises
           lastPressureLevel = 0;
         }

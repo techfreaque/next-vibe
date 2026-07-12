@@ -29,7 +29,10 @@ const THRESHOLDS = {
 } as const;
 
 /** Read /proc/meminfo - works on Linux (Docker). Returns null on other platforms. */
-function readProcMeminfo(): { totalKb: number; availableKb: number } | null {
+export function readProcMeminfo(): {
+  totalKb: number;
+  availableKb: number;
+} | null {
   try {
     const raw = execSync("cat /proc/meminfo", {
       encoding: "utf-8",

@@ -99,11 +99,17 @@ export async function emitMessageCreated(
       createdAt,
     });
     if (!result.success) {
-      w.deps.logger.warn(
-        "[MessageDbWriter] Failed to create ASSISTANT message",
+      // Data loss, not a mere warning: the assistant's reply never lands in
+      // the DB and the client never learns why - createTextMessage already
+      // logged the underlying cause, this is the stream-context companion.
+      w.deps.logger.error(
+        "[MessageDbWriter] Failed to create ASSISTANT message - reply not persisted",
         {
           messageId,
+          threadId,
+          parentId,
           error: result.message,
+          errorType: result.errorType?.errorCode,
         },
       );
     }
@@ -320,11 +326,15 @@ export async function emitPlaceholderAssistantMessage(
       locale: w.deps.locale,
     });
     if (!result.success) {
-      w.deps.logger.warn(
-        "[MessageDbWriter] Failed to create placeholder ASSISTANT message",
+      // Data loss, not a mere warning - see emitMessageCreated above.
+      w.deps.logger.error(
+        "[MessageDbWriter] Failed to create placeholder ASSISTANT message - reply not persisted",
         {
           messageId,
+          threadId,
+          parentId,
           error: result.message,
+          errorType: result.errorType?.errorCode,
         },
       );
     }

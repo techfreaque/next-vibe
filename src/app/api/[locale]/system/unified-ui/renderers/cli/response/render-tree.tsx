@@ -10,6 +10,7 @@ import { NavigationStackProvider } from "next-vibe/platforms/react/hooks/use-nav
 import type { JSX } from "react";
 
 import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { AgentAvailabilityProvider } from "@/app/api/[locale]/agent/env-availability-context";
 import { LoggerProvider } from "@/hooks/logger-provider";
 
 import { EndpointRenderer } from "../../react/EndpointRenderer";
@@ -27,21 +28,24 @@ export function CliRenderTree({
   logger: EndpointLogger;
   user: JwtPayloadType;
 }): JSX.Element {
+  const availability = getEnvAvailability();
   return (
     <QueryClientProvider client={queryClient}>
-      <LoggerProvider locale={locale} availability={getEnvAvailability()}>
-        <NavigationStackProvider>
-          <EndpointRenderer
-            endpoint={endpoint}
-            locale={locale}
-            data={data}
-            logger={logger}
-            user={user}
-            response={{ success: true, data }}
-            responseOnly={true}
-            platform={Platform.CLI}
-          />
-        </NavigationStackProvider>
+      <LoggerProvider locale={locale} availability={availability}>
+        <AgentAvailabilityProvider availability={availability}>
+          <NavigationStackProvider>
+            <EndpointRenderer
+              endpoint={endpoint}
+              locale={locale}
+              data={data}
+              logger={logger}
+              user={user}
+              response={{ success: true, data }}
+              responseOnly={true}
+              platform={Platform.CLI}
+            />
+          </NavigationStackProvider>
+        </AgentAvailabilityProvider>
       </LoggerProvider>
     </QueryClientProvider>
   );

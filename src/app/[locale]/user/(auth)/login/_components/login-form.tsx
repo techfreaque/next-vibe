@@ -14,6 +14,7 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 
+import { SYSTEM_SETTINGS_ALIAS } from "@/app/api/[locale]/system/env/settings/constants";
 import type { DEV_SEED_USERS } from "@/app/api/[locale]/user/dev-seed-users";
 import loginEndpoints from "@/app/api/[locale]/user/public/login/definition";
 import { scopedTranslation } from "@/app/api/[locale]/user/public/login/i18n";
@@ -63,7 +64,7 @@ function DevQuickLogin({
       if (result.success) {
         const target =
           devSeedPassword === DEFAULT_PASSWORD_SENTINEL
-            ? `/${locale}/admin/settings`
+            ? `/${locale}/tools/${SYSTEM_SETTINGS_ALIAS}`
             : (callbackUrl ?? `/${locale}`);
         assignUrl(target);
       } else {
@@ -124,7 +125,7 @@ export function LoginForm({
                   const usedDefaultPassword =
                     requestData.password === DEFAULT_PASSWORD_SENTINEL;
                   const target = usedDefaultPassword
-                    ? `/${locale}/admin/settings`
+                    ? `/${locale}/tools/${SYSTEM_SETTINGS_ALIAS}`
                     : (callbackUrl ?? `/${locale}`);
                   assignUrl(target);
                 },

@@ -63,8 +63,11 @@ export async function generateEmbedding(
   // across chunked requests, so it must not be recreated per chunk.
   const fetchImpl = createFixtureFetch(streamContext);
 
-  // Max tokens per embedding request (~8k tokens ≈ 32k chars)
-  const maxCharsPerChunk = 32000;
+  // Model context is 8192 tokens. Chars-per-token varies by content (code,
+  // non-Latin text, etc. run denser than ~4:1), so this stays well under the
+  // limit rather than assuming a fixed ratio - a chunk landing even 1 token
+  // over gets rejected outright by the API.
+  const maxCharsPerChunk = 20000;
 
   try {
     // Short text - single call
