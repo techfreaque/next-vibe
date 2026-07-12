@@ -442,6 +442,8 @@ export class LocalExecution {
         callerToolCallId: undefined,
         callerCallbackMode: mode,
         pendingToolMessages: undefined,
+        duplicateToolCallKeys: undefined,
+        executeClaimCount: undefined,
         pendingTimeoutMs: undefined,
         waitingForRemoteResult: undefined,
         onEscalatedTaskCancel: undefined,

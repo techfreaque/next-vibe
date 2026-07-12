@@ -1174,12 +1174,19 @@ export class AiStreamRepository {
         // tools-loader can inject the correct currentToolMessageId per toolCallId
         // before calling each tool's execute() - parallel-safe, no polling needed.
         streamContext.pendingToolMessages = ctx.pendingToolMessages;
+        // Same-step provider toolCallId collisions (see duplicateToolCallKeys
+        // on StreamContext) - tools-loader's execute() wrapper needs these to
+        // resolve which pendingToolMessages entry it corresponds to.
+        streamContext.duplicateToolCallKeys = ctx.duplicateToolCallKeys;
+        streamContext.executeClaimCount = ctx.executeClaimCount;
         // toolsOverride closures (relay receiver) hold their OWN pre-stream
         // context — wire the live map onto it too, or wakeUp/detach dispatches
         // from those tools never resolve a tool message id and lose their park
         // anchor (pendingCallId) + revival registration.
         if (toolsContext) {
           toolsContext.pendingToolMessages = ctx.pendingToolMessages;
+          toolsContext.duplicateToolCallKeys = ctx.duplicateToolCallKeys;
+          toolsContext.executeClaimCount = ctx.executeClaimCount;
           // The park/revival anchors also need the live thread identity —
           // registerPendingCall stores threadId for wakeUp revival and the
           // completion handler schedules resume-stream against it. A null

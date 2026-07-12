@@ -570,6 +570,31 @@ export class MessagesRepository {
      *  createToolMessage.createdAt for why wire and DB must agree. */
     createdAt?: Date;
   }): Promise<ResponseType<void>> {
+    // Verify thread exists before attempting the insert - same race
+    // createUserMessage guards against: queued/streamed messages can arrive
+    // after a thread is deleted, which would otherwise surface as an opaque
+    // FK-violation error instead of a clear, expected "thread gone" outcome.
+    const [threadExists] = await db
+      .select({ id: chatThreads.id })
+      .from(chatThreads)
+      .where(eq(chatThreads.id, params.threadId))
+      .limit(1);
+    if (!threadExists) {
+      params.logger.error(
+        "createTextMessage: thread does not exist, dropping ASSISTANT message",
+        {
+          threadId: params.threadId,
+          messageId: params.messageId,
+          parentId: params.parentId,
+        },
+      );
+      const { t } = scopedTranslation.scopedT(params.locale);
+      return fail({
+        message: t("post.errors.createFailed.title"),
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
+    }
+
     try {
       await db.insert(chatMessages).values({
         id: params.messageId,
@@ -596,8 +621,25 @@ export class MessagesRepository {
 
       return success();
     } catch (error) {
-      params.logger.error("Failed to insert chat message", parseError(error), {
+      const parsed = parseError(error);
+      // Postgres driver errors carry code/constraint/detail on the raw
+      // cause - surface them explicitly instead of only the flattened
+      // message, so a NOT NULL vs FK vs unique violation is unambiguous.
+      const pgCause =
+        error instanceof Error && error.cause instanceof Object
+          ? error.cause
+          : undefined;
+      params.logger.error("Failed to insert chat message", {
+        error: parsed.message,
+        errorStack: parsed.stack,
+        pgCode: pgCause ? Reflect.get(pgCause, "code") : undefined,
+        pgDetail: pgCause ? Reflect.get(pgCause, "detail") : undefined,
+        pgConstraint: pgCause
+          ? Reflect.get(pgCause, "constraint_name")
+          : undefined,
         messageId: params.messageId,
+        threadId: params.threadId,
+        parentId: params.parentId,
         skill: params.skill,
         model: params.model,
       });
@@ -657,6 +699,32 @@ export class MessagesRepository {
     > = {
       toolCall: params.toolCall,
     };
+
+    // Verify thread exists before attempting the insert - same race
+    // createUserMessage guards against: a tool result can land after the
+    // thread was deleted, which would otherwise surface as an opaque
+    // FK-violation error instead of a clear, expected "thread gone" outcome.
+    const [threadExists] = await db
+      .select({ id: chatThreads.id })
+      .from(chatThreads)
+      .where(eq(chatThreads.id, params.threadId))
+      .limit(1);
+    if (!threadExists) {
+      params.logger.error(
+        "createToolMessage: thread does not exist, dropping TOOL message",
+        {
+          threadId: params.threadId,
+          messageId: params.messageId,
+          parentId: params.parentId,
+          toolName: params.toolCall.toolName,
+        },
+      );
+      const { t } = scopedTranslation.scopedT(params.locale);
+      return fail({
+        message: t("post.errors.createFailed.title"),
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
+    }
 
     try {
       await db.insert(chatMessages).values({

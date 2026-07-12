@@ -507,24 +507,38 @@ export class AwaitTaskRepository {
     streamContext.suppressedWakeUpToolMessageIds.add(toolMessageId);
   }
 
-  /** Delete the task row and any pending resume-stream cron task (non-fatal). */
+  /**
+   * Grace period before actually deleting a completed task row - see
+   * RevivalRepository.CLEANUP_GRACE_PERIOD_MS (execute-tool/revival/repository.ts)
+   * for why: a retry/duplicate report within this window needs the row to
+   * still exist so the idempotency check catches it instead of a false 404.
+   */
+  private static readonly CLEANUP_GRACE_PERIOD_MS = 60_000;
+
+  /** Delete the task row and any pending resume-stream cron task (non-fatal, deferred). */
   private static async cleanupTask(
     taskId: string,
     logger: EndpointLogger,
   ): Promise<void> {
-    try {
-      await db
-        .delete(cronTasks)
-        .where(
-          sql`${cronTasks.tags} @> ${JSON.stringify([taskId])}::jsonb AND ${cronTasks.routeId} = ${RESUME_STREAM_ALIAS}`,
-        );
-      await db.delete(cronTasks).where(eq(cronTasks.id, taskId));
-    } catch (cleanupErr) {
-      logger.warn("[AwaitTask] Cleanup failed (non-fatal)", {
-        taskId,
-        error:
-          cleanupErr instanceof Error ? cleanupErr.message : String(cleanupErr),
-      });
-    }
+    setTimeout(() => {
+      void (async (): Promise<void> => {
+        try {
+          await db
+            .delete(cronTasks)
+            .where(
+              sql`${cronTasks.tags} @> ${JSON.stringify([taskId])}::jsonb AND ${cronTasks.routeId} = ${RESUME_STREAM_ALIAS}`,
+            );
+          await db.delete(cronTasks).where(eq(cronTasks.id, taskId));
+        } catch (cleanupErr) {
+          logger.warn("[AwaitTask] Cleanup failed (non-fatal)", {
+            taskId,
+            error:
+              cleanupErr instanceof Error
+                ? cleanupErr.message
+                : String(cleanupErr),
+          });
+        }
+      })();
+    }, AwaitTaskRepository.CLEANUP_GRACE_PERIOD_MS);
   }
 }

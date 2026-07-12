@@ -42,7 +42,7 @@ import {
   MAX_TOOL_CALLS,
   StreamAbortError,
 } from "../core/constants";
-import type { PendingToolData } from "../core/stream";
+import { claimResultToolCallId, type PendingToolData } from "../core/stream";
 import {
   abortReasonAsError,
   complete,
@@ -434,25 +434,36 @@ export class StreamLoop implements StreamLoopState {
         typeof part.toolCallId === "string" &&
         typeof part.toolName === "string"
       ) {
-        // Guard against duplicate toolCallIds from the model/provider.
-        // Some providers reuse IDs across steps or retries. A second DB row
-        // with the same toolCallId causes "tool_use ids must be unique" when
-        // the history is later sent to the API (e.g. during compacting).
-        if (ctx.allSeenToolCallIds.has(part.toolCallId)) {
+        // Guard against duplicate toolCallIds within one step. Some providers
+        // (e.g. Gemini's OpenAI-compat shim) synthesize ids positionally per
+        // response ("functions.<tool>:<index>"), which can collide for two
+        // genuinely different parallel calls to the same tool. A second DB
+        // row under the SAME toolCallId would violate "tool_use ids must be
+        // unique" when history is resent - so the repeat occurrence gets its
+        // own de-duplicated key instead of being silently dropped. The AI SDK
+        // still runs this call for real regardless of what we do here, so
+        // dropping it would lose a real result, not just log noise.
+        const isRepeatToolCallId = ctx.allSeenToolCallIds.has(part.toolCallId);
+        let effectiveToolCallId = part.toolCallId;
+        if (isRepeatToolCallId) {
+          const queue = ctx.duplicateToolCallKeys.get(part.toolCallId) ?? [];
+          effectiveToolCallId = `${part.toolCallId}::dup${queue.length + 1}`;
+          queue.push(effectiveToolCallId);
+          ctx.duplicateToolCallKeys.set(part.toolCallId, queue);
           logger.warn(
-            "[AI Stream] Duplicate toolCallId from model - skipping",
+            "[AI Stream] Duplicate toolCallId from model - disambiguating",
             {
               toolCallId: part.toolCallId,
+              effectiveToolCallId,
               toolName: part.toolName,
             },
           );
-          return { shouldAbort: false };
         }
         ctx.allSeenToolCallIds.add(part.toolCallId);
 
         const result = await this.onToolCall({
           type: "tool-call",
-          toolCallId: part.toolCallId,
+          toolCallId: effectiveToolCallId,
           toolName: part.toolName,
           input: "input" in part ? (part.input as JSONValue) : undefined,
         });
@@ -523,7 +534,10 @@ export class StreamLoop implements StreamLoopState {
             result.pendingToolMessage.toolCallData.parentId;
         }
 
-        ctx.pendingToolMessages.set(part.toolCallId, result.pendingToolMessage);
+        ctx.pendingToolMessages.set(
+          effectiveToolCallId,
+          result.pendingToolMessage,
+        );
 
         // APPROVE: mark that this stream has approve tools - abort deferred to finish-step.
         // stepHasToolsAwaitingConfirmation persists across steps so sequential tool calls
@@ -550,11 +564,13 @@ export class StreamLoop implements StreamLoopState {
         typeof part.toolCallId === "string" &&
         typeof part.toolName === "string"
       ) {
-        const pending = ctx.pendingToolMessages.get(part.toolCallId);
+        const { effectiveToolCallId, pending } = this.resolvePendingToolMessage(
+          part.toolCallId,
+        );
         const result = await this.onToolError(
           {
             type: "tool-error",
-            toolCallId: part.toolCallId,
+            toolCallId: effectiveToolCallId,
             toolName: part.toolName,
             input: "input" in part ? (part.input as JSONValue) : undefined,
             error: "error" in part ? (part.error as JSONValue) : undefined,
@@ -569,7 +585,7 @@ export class StreamLoop implements StreamLoopState {
               clearPendingQueueParent: false,
             });
           }
-          ctx.pendingToolMessages.delete(part.toolCallId);
+          ctx.pendingToolMessages.delete(effectiveToolCallId);
         }
       }
 
@@ -590,11 +606,13 @@ export class StreamLoop implements StreamLoopState {
       if (streamContext.stepHasToolsAwaitingConfirmation) {
         ctx.stepHasToolsAwaitingConfirmation = true;
       }
-      const pending = ctx.pendingToolMessages.get(part.toolCallId);
+      const { effectiveToolCallId, pending } = this.resolvePendingToolMessage(
+        part.toolCallId,
+      );
       const result = await this.onToolResult(
         {
           type: "tool-result",
-          toolCallId: part.toolCallId,
+          toolCallId: effectiveToolCallId,
           toolName: part.toolName,
           output: "output" in part ? (part.output as JSONValue) : undefined,
           isError: "isError" in part ? Boolean(part.isError) : false,
@@ -613,7 +631,7 @@ export class StreamLoop implements StreamLoopState {
             clearPendingQueueParent: false,
           });
         }
-        ctx.pendingToolMessages.delete(part.toolCallId);
+        ctx.pendingToolMessages.delete(effectiveToolCallId);
 
         // Finalize and reset assistant message state so the next turn creates
         // a fresh message. This is critical for provider-executed tool loops
@@ -783,6 +801,27 @@ export class StreamLoop implements StreamLoopState {
     input?: WidgetData;
   }): Promise<ToolCallResult> {
     return onToolCall(this, part);
+  }
+
+  /**
+   * Resolve the pendingToolMessages entry for a RAW toolCallId as emitted by
+   * the provider - routing to the correct de-duplicated key when this raw id
+   * collided within the step (see duplicateToolCallKeys on StreamContext).
+   * Best-effort FIFO: the Nth tool-result/tool-error for a raw id is assumed
+   * to correspond to the Nth tool-call for that raw id, which holds whenever
+   * completion order matches call order (true for same-tool same-step calls
+   * in practice, though not guaranteed by the SDK).
+   */
+  private resolvePendingToolMessage(rawToolCallId: string): {
+    effectiveToolCallId: string;
+    pending: PendingToolData | undefined;
+  } {
+    const ctx = this.p.ctx;
+    const effectiveToolCallId = claimResultToolCallId(ctx, rawToolCallId);
+    return {
+      effectiveToolCallId,
+      pending: ctx.pendingToolMessages.get(effectiveToolCallId),
+    };
   }
 
   /**

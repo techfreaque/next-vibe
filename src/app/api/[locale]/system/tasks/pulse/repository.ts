@@ -490,6 +490,8 @@ export class PulseHealthRepository {
                         currentToolMessageId: undefined,
                         callerToolCallId: undefined,
                         pendingToolMessages: undefined,
+                        duplicateToolCallKeys: undefined,
+                        executeClaimCount: undefined,
                         pendingTimeoutMs: undefined,
                         leafMessageId: undefined,
                         skillId: undefined,

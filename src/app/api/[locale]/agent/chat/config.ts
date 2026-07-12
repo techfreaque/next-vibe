@@ -228,6 +228,20 @@ export interface ToolExecutionContext {
       >
     | undefined;
   /**
+   * De-duplicated keys for raw toolCallIds that collided within a step (see
+   * StreamContext.duplicateToolCallKeys). Read by tools-loader's execute()
+   * wrapper to resolve which pendingToolMessages entry a given execute()
+   * invocation corresponds to. Not present in non-streaming contexts.
+   */
+  duplicateToolCallKeys: Map<string, string[]> | undefined;
+  /**
+   * How many times tools-loader's execute() wrapper has claimed a pending
+   * entry for a given raw toolCallId (see StreamContext.executeClaimCount).
+   * Mutated in place by tools-loader - callers share the same Map instance.
+   * Not present in non-streaming contexts.
+   */
+  executeClaimCount: Map<string, number> | undefined;
+  /**
    * When set, finish-step-handler starts a timeout of this many ms using the
    * stream's abort controller. Used for remote queue path and await-task.
    * Direct HTTP wait mode does NOT use this - the HTTP connection is the timeout.
@@ -472,6 +486,8 @@ export function makeHeadlessContext(
     currentToolMessageId: undefined,
     callerToolCallId: undefined,
     pendingToolMessages: undefined,
+    duplicateToolCallKeys: undefined,
+    executeClaimCount: undefined,
     pendingTimeoutMs: undefined,
     leafMessageId: undefined,
     waitingForRemoteResult: undefined,

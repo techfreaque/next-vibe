@@ -73,7 +73,17 @@ export class RevivalRepository {
     });
   }
 
-  /** Delete cron task rows by id — best-effort, non-fatal. */
+  /**
+   * Grace period before actually deleting a completed cron task row. A
+   * client-side retry or duplicate completion report arriving within this
+   * window still finds the row and hits the idempotency check in
+   * TaskReportRepository (execute-tool/complete/repository.ts) instead of a
+   * false "task not found" - deleting synchronously on first completion was
+   * destroying the very state that check needs to detect retries.
+   */
+  private static readonly CLEANUP_GRACE_PERIOD_MS = 60_000;
+
+  /** Delete cron task rows by id — best-effort, non-fatal, deferred (see CLEANUP_GRACE_PERIOD_MS). */
   private static async cleanupCronTasks(
     taskIds: Array<string | null | undefined>,
     logger: EndpointLogger,
@@ -82,15 +92,19 @@ export class RevivalRepository {
     if (ids.length === 0) {
       return;
     }
-    try {
-      await CronTasksRepository.deleteByIds(ids);
-      logger.debug("[Revival] Cleaned up cron tasks", { taskIds: ids });
-    } catch (cleanupErr) {
-      logger.warn("[Revival] Cleanup failed (non-fatal)", {
-        taskIds: ids,
-        error: parseError(cleanupErr).message,
-      });
-    }
+    setTimeout(() => {
+      void (async (): Promise<void> => {
+        try {
+          await CronTasksRepository.deleteByIds(ids);
+          logger.debug("[Revival] Cleaned up cron tasks", { taskIds: ids });
+        } catch (cleanupErr) {
+          logger.warn("[Revival] Cleanup failed (non-fatal)", {
+            taskIds: ids,
+            error: parseError(cleanupErr).message,
+          });
+        }
+      })();
+    }, RevivalRepository.CLEANUP_GRACE_PERIOD_MS);
   }
 
   /**

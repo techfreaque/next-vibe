@@ -74,9 +74,30 @@ export class StreamContext {
 
   // Tool tracking
   pendingToolMessages = new Map<string, PendingToolData>();
-  /** All toolCallIds ever seen in this stream - prevents duplicate DB rows
-   *  when a provider reuses IDs across steps or retries. */
+  /** All toolCallIds seen so far in the CURRENT step - reset every step (see
+   *  onFinishStep) - prevents duplicate DB rows within one step when a
+   *  provider's synthetic id (e.g. Gemini's "functions.<tool>:<index>") is
+   *  positionally scoped and can repeat for two genuinely different calls. */
   allSeenToolCallIds = new Set<string>();
+  /**
+   * When the SAME raw toolCallId appears more than once within a step (a
+   * provider-side id collision, not an actual retry), each repeat occurrence
+   * beyond the first gets its own de-duplicated key here instead of being
+   * dropped - pendingToolMessages/DB rows for occurrence 2+ live under this
+   * key. Consumed in call order by executeClaimCount / resultClaimCount
+   * below. This is a best-effort FIFO match (occurrence N's execute() call
+   * and occurrence N's result are assumed to be the Nth of each kind for
+   * this raw id) - correct whenever completion order matches call order,
+   * which holds for same-tool same-step calls in practice.
+   */
+  duplicateToolCallKeys = new Map<string, string[]>();
+  /** How many times tools-loader's execute() wrapper has resolved a pending
+   *  entry for a given raw toolCallId - 0 = next claim uses the raw id
+   *  (primary), 1+ = next claim uses duplicateToolCallKeys[n-1]. */
+  executeClaimCount = new Map<string, number>();
+  /** Same as executeClaimCount, but for tool-result/tool-error part matching
+   *  in onToolResult - tracked separately since it's a different consumer. */
+  resultClaimCount = new Map<string, number>();
   /** Set when any approve-mode tool is called. Persists across steps so that
    *  sequential approve tool calls all complete before the stream aborts at
    *  the AI-response turn boundary (finish-step with no pending tools). */
@@ -282,6 +303,64 @@ export class StreamContext {
     this.cleanupCallbacks = [];
   }
 }
+
+/**
+ * Resolve the effective (possibly de-duplicated) key for a RAW toolCallId,
+ * consuming one "claim" from the given counter map. Shared by
+ * claimExecuteToolCallId/claimResultToolCallId below - split into two
+ * functions (rather than one taking a StreamContext) so each caller's
+ * minimal structural type only needs the one counter it actually uses:
+ * tools-loader's execute() wrapper only ever sees ToolExecutionContext
+ * (chat/config.ts), which doesn't carry resultClaimCount.
+ */
+function claim(
+  duplicateToolCallKeys: Map<string, string[]> | undefined,
+  claimCount: Map<string, number> | undefined,
+  rawToolCallId: string,
+): string {
+  if (!claimCount) {
+    return rawToolCallId;
+  }
+  const claimIndex = claimCount.get(rawToolCallId) ?? 0;
+  claimCount.set(rawToolCallId, claimIndex + 1);
+  if (claimIndex === 0) {
+    return rawToolCallId;
+  }
+  return (
+    duplicateToolCallKeys?.get(rawToolCallId)?.[claimIndex - 1] ?? rawToolCallId
+  );
+}
+
+/**
+ * Resolve the effective (possibly de-duplicated) toolCallId for THIS
+ * execute() invocation - see StreamContext.duplicateToolCallKeys for why a
+ * provider-side id collision within one step needs this. Used by
+ * tools-loader's execute() wrapper, which only has ToolExecutionContext
+ * (not the full StreamContext) - a no-op (returns rawToolCallId unchanged)
+ * outside a streaming context where these maps aren't wired up.
+ */
+export function claimExecuteToolCallId(
+  ctx: {
+    duplicateToolCallKeys: Map<string, string[]> | undefined;
+    executeClaimCount: Map<string, number> | undefined;
+  },
+  rawToolCallId: string,
+): string {
+  return claim(ctx.duplicateToolCallKeys, ctx.executeClaimCount, rawToolCallId);
+}
+
+/**
+ * Same as claimExecuteToolCallId, but for tool-result/tool-error part
+ * matching in the loop (a separate counter - a different consumer than
+ * execute()). Always called with the full StreamContext.
+ */
+export function claimResultToolCallId(
+  ctx: StreamContext,
+  rawToolCallId: string,
+): string {
+  return claim(ctx.duplicateToolCallKeys, ctx.resultClaimCount, rawToolCallId);
+}
+
 // StreamRegistry (in-memory per-process Map) was REMOVED. Stream cancellation is
 // now a pub/sub `stream-control` signal (StreamControl in stream-control.ts) that
 // reaches the stream in whatever process/instance runs it; "is a stream live?"

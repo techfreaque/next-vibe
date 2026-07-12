@@ -1019,6 +1019,8 @@ export async function setupAiStream(params: {
     callerCallbackMode: undefined,
     // pendingToolMessages is wired after StreamContext is created (see index.ts)
     pendingToolMessages: undefined,
+    duplicateToolCallKeys: undefined,
+    executeClaimCount: undefined,
     pendingTimeoutMs: undefined,
     leafMessageId: undefined,
     // Propagate waitingForRemoteResult from confirmation setup: if a confirmed

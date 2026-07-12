@@ -85,6 +85,8 @@ export async function runConfirmationsPhase(params: {
     callerToolCallId: undefined,
     callerCallbackMode: undefined,
     pendingToolMessages: undefined,
+    duplicateToolCallKeys: undefined,
+    executeClaimCount: undefined,
     pendingTimeoutMs: undefined,
     // Pass leafMessageId from request so deferred confirm inserts use the correct branch tip.
     leafMessageId: data.leafMessageId ?? undefined,

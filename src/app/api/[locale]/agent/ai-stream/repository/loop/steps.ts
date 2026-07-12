@@ -175,6 +175,10 @@ export async function onFinishStep(
   // The duplicate guard is per-step: within one step, duplicate IDs cause DB conflicts.
   // Across steps, the same ID is valid (different tool call in a new step).
   ctx.allSeenToolCallIds.clear();
+  // Same-step scope as allSeenToolCallIds - see stream.ts for what these track.
+  ctx.duplicateToolCallKeys.clear();
+  ctx.executeClaimCount.clear();
+  ctx.resultClaimCount.clear();
 
   // NOTE: do NOT reset stepHasToolsAwaitingConfirmation here —
   // it persists across steps so sequential approve tool calls still abort correctly.

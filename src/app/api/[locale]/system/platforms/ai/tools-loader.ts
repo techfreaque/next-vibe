@@ -31,6 +31,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
 
+import { claimExecuteToolCallId } from "@/app/api/[locale]/agent/ai-stream/repository/core/stream";
 import {
   FOLDER_ALLOWS_REMOTE_TOOLS,
   FOLDER_BLOCKED_CALLBACK_MODES,
@@ -298,7 +299,13 @@ function createToolFromEndpoint(
         }
 
         // Inject the correct toolMessageId for this specific parallel tool call.
-        // pendingToolMessages is keyed by AI SDK toolCallId - populated by stream-part-handler.
+        // pendingToolMessages is keyed by an EFFECTIVE toolCallId - populated
+        // by the loop's tool-call handler under the raw id normally, or under
+        // a de-duplicated key when the provider reused the raw id for two
+        // calls in one step (see duplicateToolCallKeys on StreamContext).
+        // claimExecuteToolCallId resolves which one THIS execute()
+        // invocation corresponds to (executeClaimCount tracks how many times
+        // we've claimed for this raw id so far - shared with no one else).
         // The AI SDK may call execute() before stream-part-handler processes the tool-call event,
         // so spin-wait up to 200ms (20 × 10ms) for the entry to appear.
         // Resolve per-call toolMessageId BEFORE touching shared streamContext.
@@ -308,11 +315,15 @@ function createToolFromEndpoint(
         // Instead, resolve the values locally and pass a per-call context snapshot.
         let perCallToolMessageId: string | undefined;
         let perCallLeafMessageId: string | null = null;
+        let effectiveToolCallId = options?.toolCallId;
 
         if (options?.toolCallId && context.streamContext) {
-          let pending = context.streamContext.pendingToolMessages?.get(
+          effectiveToolCallId = claimExecuteToolCallId(
+            context.streamContext,
             options.toolCallId,
           );
+          let pending =
+            context.streamContext.pendingToolMessages?.get(effectiveToolCallId);
           if (!pending) {
             // Brief spin-wait: stream-part-handler is processing the tool-call event concurrently.
             // In practice this resolves within 1-2 ticks; 200ms cap is a generous safety bound.
@@ -320,9 +331,10 @@ function createToolFromEndpoint(
               await new Promise<void>((resolve) => {
                 setTimeout(resolve, 10);
               });
-              pending = context.streamContext.pendingToolMessages?.get(
-                options.toolCallId,
-              );
+              pending =
+                context.streamContext.pendingToolMessages?.get(
+                  effectiveToolCallId,
+                );
             }
           }
           if (pending) {
@@ -356,7 +368,11 @@ function createToolFromEndpoint(
           ? {
               ...context.streamContext,
               waitingForRemoteResult: false as boolean | undefined,
-              callerToolCallId: options?.toolCallId,
+              // Effective (possibly de-duplicated) id, not the raw SDK id -
+              // nested lookups (local.ts, remote.ts, guards.ts) read this
+              // field back out of pendingToolMessages, so it must match
+              // whatever key the entry actually lives under.
+              callerToolCallId: effectiveToolCallId,
               currentToolMessageId:
                 perCallToolMessageId ??
                 context.streamContext.currentToolMessageId,

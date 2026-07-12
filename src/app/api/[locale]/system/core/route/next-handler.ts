@@ -172,6 +172,8 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
           currentToolMessageId: undefined,
           callerToolCallId: undefined,
           pendingToolMessages: undefined,
+          duplicateToolCallKeys: undefined,
+          executeClaimCount: undefined,
           pendingTimeoutMs: undefined,
           leafMessageId: undefined,
           waitingForRemoteResult: undefined,

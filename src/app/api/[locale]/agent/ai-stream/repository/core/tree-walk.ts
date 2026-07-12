@@ -3,6 +3,7 @@
 import "server-only";
 
 import { and, desc, eq, sql } from "drizzle-orm";
+import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
@@ -125,7 +126,9 @@ export async function fetchAncestorBranch(
     return [];
   }
 
-  const result = await db.execute<ChatMessage>(sql`
+  let result;
+  try {
+    result = await db.execute<ChatMessage>(sql`
     WITH RECURSIVE ancestors AS (
       SELECT
         id,
@@ -186,6 +189,26 @@ export async function fetchAncestorBranch(
     SELECT * FROM ancestors
     ORDER BY "createdAt" ASC
   `);
+  } catch (error) {
+    // Surface threadId/startId so this is diagnosable instead of landing as
+    // a bare "Failed query: WITH RECURSIVE..." dump in the generic Next.js
+    // handler catch-all. Re-throw - callers need to know history failed to
+    // load rather than silently continuing with an empty/wrong branch.
+    // parseError also folds in error.cause (Drizzle wraps the raw Postgres
+    // error there), which is where the actual DB-level failure reason lives.
+    const parsed = parseError(error);
+    logger.error("[TreeWalk] fetchAncestorBranch query failed", {
+      threadId,
+      startId,
+      error: parsed.message,
+      errorStack: parsed.stack,
+    });
+    // oxlint-disable-next-line restricted-syntax -- this function returns
+    // ChatMessage[] (not ResponseType<T>); callers rely on the exception
+    // propagating to the generic handler's catch-all, same as before this
+    // try/catch was added - only the diagnostic logging above is new.
+    throw error;
+  }
 
   // db.execute returns raw pg driver values: timestamps are Date objects or ISO
   // strings. Guard both undefined (column alias mismatch) and NaN (unparseable),
