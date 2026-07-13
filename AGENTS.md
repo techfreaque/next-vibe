@@ -20,22 +20,21 @@
 
 Three instances, three purposes. Never confuse them.
 
-| Instance   | CLI flags         | DB              | MCP server | Role                                |
-| ---------- | ----------------- | --------------- | ---------- | ----------------------------------- |
-| **Atlas**  | _(no flags)_      | Atlas dev DB    | `atlas`    | Dev/coding instance. You live here. |
-| **Hermes** | `--hermes`        | Hermes local DB | `hermes`   | Max's daily driver. Local preview.  |
-| **Thea**   | `--hermes --thea` | Prod DB         | `thea`     | Cloud AI on VPS. Production.        |
+| Instance   | CLI flags          | DB              | MCP server | Role                               |
+| ---------- | ------------------ | --------------- | ---------- | ---------------------------------- |
+| **Atlas**  | _(no flags)_       | Atlas dev DB    | `atlas`    | Dev/coding instance. You live here. |
+| **Hermes** | `--hermes`         | Hermes local DB | `hermes`   | Max's daily driver. Local preview. |
+| **Thea**   | `--hermes --thea`  | Prod DB         | `thea`     | Cloud AI on VPS. Production.       |
 
 Each instance runs **two server modes** — dev (TanStack/Vite, hot reload) and prod (Next.js build). They use different pid/log files and ports.
 
-| Server      | Command                                     | PID file               | Log file               | Port lookup                          |
-| ----------- | ------------------------------------------- | ---------------------- | ---------------------- | ------------------------------------ |
-| Atlas dev   | `vibe dev`                                  | `.tmp/.atlas.pid`      | `.tmp/.atlas.log`      | `grep "^PORT:" .tmp/.atlas.pid`      |
-| Hermes dev  | `vibe --hermes dev`                         | `.tmp/.hermes-dev.pid` | `.tmp/.hermes-dev.log` | `grep "^PORT:" .tmp/.hermes-dev.pid` |
-| Hermes prod | `vibe rebuild` / `vibe build && vibe start` | `.tmp/.hermes.pid`     | `.tmp/.hermes.log`     | `grep "^PORT:" .tmp/.hermes.pid`     |
+| Server      | Command                                     | PID file                | Log file                  | Port lookup                              |
+| ----------- | ------------------------------------------- | ----------------------- | ------------------------- | ---------------------------------------- |
+| Atlas dev   | `vibe dev`                                  | `.tmp/.atlas.pid`       | `.tmp/.atlas.log`         | `grep "^PORT:" .tmp/.atlas.pid`          |
+| Hermes dev  | `vibe --hermes dev`                         | `.tmp/.hermes-dev.pid`  | `.tmp/.hermes-dev.log`    | `grep "^PORT:" .tmp/.hermes-dev.pid`     |
+| Hermes prod | `vibe rebuild` / `vibe build && vibe start` | `.tmp/.hermes.pid`      | `.tmp/.hermes.log`        | `grep "^PORT:" .tmp/.hermes.pid`         |
 
 **Rules:**
-
 - Default work target is **Atlas dev** (`vibe dev`). Safe to run anytime — replaces any existing Atlas dev instance.
 - **Hermes dev** (`vibe --hermes dev`) — dev server on Hermes DB. Useful when tests need two running instances simultaneously.
 - **Hermes prod** (`vibe rebuild`) — zero-downtime update. `vibe build && vibe start` only for a fresh first start. Max's live preview — only touch when explicitly asked.
@@ -67,7 +66,7 @@ One `definition.ts` → web UI, CLI command, MCP tool, Native screen, AI-callabl
 ## Endpoint Pattern (3-file structure)
 
 ```
-src/app/api/[locale]/<category>/<feature>/
+src/<category>/<feature>/
   definition.ts    - createEndpoint() with Zod schemas, field widgets, error types, examples
   repository.ts    - DB operations returning ResponseType<T>, no throw
   route.ts         - endpointsHandler() wiring definition + repository
@@ -139,4 +138,4 @@ Hard gate. Never skip. Never say "should work" — prove it. If something looks 
 
 ## Notes
 
-- **AGENTS.md is auto-generated.** Edit `src/app/api/[locale]/agent/skills/default-skills/vibe-coder/skill.ts` → `vibe gen`
+- **AGENTS.md is auto-generated.** Edit `src/vibe/agent/skills/default-skills/vibe-coder/skill.ts` → `vibe gen`

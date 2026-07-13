@@ -54,10 +54,10 @@ function projectRoot(): string {
   return process.cwd();
 }
 function uiDir(): string {
-  return join(projectRoot(), "src/app/[locale]");
+  return getUiDir();
 }
 function apiDir(): string {
-  return join(projectRoot(), "src");
+  return getApiDir();
 }
 function routesDir(): string {
   return join(projectRoot(), "src/generated/app-tanstack/routes");
@@ -154,6 +154,37 @@ function hasHttpExports(filePath: string): boolean {
   );
 }
 
+const IS_PROD = process.env["NODE_ENV"] === "production";
+
+// Returns true when a route should be excluded from the TanStack generated app.
+// Reads allowedRoles from the evaluated definitionModules map. Unknown key or
+// null (failed import) is treated as not-excluded.
+function isWebExcluded(
+  routeFilePath: string,
+  definitionModules: Map<string, ApiSection | null>,
+): boolean {
+  const defPath = routeFilePath.replace(/\/route\.ts$/, "/definition.ts");
+  const def = definitionModules.get(defPath);
+  if (def === undefined || def === null) {
+    return false;
+  }
+  for (const method of Object.values(def)) {
+    if (!method || typeof method !== "object" || !("allowedRoles" in method)) {
+      continue;
+    }
+    const roles = (method as { allowedRoles: readonly UserRoleValue[] })
+      .allowedRoles;
+    const markers = filterPlatformMarkers(roles);
+    if (markers.includes(PlatformMarker.WEB_OFF)) {
+      return true;
+    }
+    if (IS_PROD && markers.includes(PlatformMarker.PRODUCTION_OFF)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function getCatchAllParamName(dir: string): string | null {
   for (const segment of dir.split("/")) {
     const m = /^\[\.\.\.(.+)\]$/.exec(segment);
@@ -226,11 +257,12 @@ function buildPaths(
   }
   const srcDirFromRoot = relative(projectRoot(), sourceDir)
     .replace(/\\/g, "/")
-    .replace(/^src\//, "");
+    .replace(/^src(\/|$)/, "");
+  const importBase = srcDirFromRoot ? `@/${srcDirFromRoot}` : "@";
   const importPath =
     dir === "."
-      ? `@/${srcDirFromRoot}/${importSuffix}`
-      : `@/${srcDirFromRoot}/${dir}/${importSuffix}`;
+      ? `${importBase}/${importSuffix}`
+      : `${importBase}/${dir}/${importSuffix}`;
   return { flatName, routePath, importPath };
 }
 
@@ -707,7 +739,6 @@ async function regenerateRouteTree(result: GenerationResult): Promise<void> {
 export async function generate(
   ctx: GeneratorContext,
 ): Promise<GeneratorResult> {
-  void ctx;
   const result: GenerationResult = { created: [], skipped: [], errors: [] };
   const ui = uiDir();
   const api = apiDir();
@@ -764,6 +795,10 @@ export async function generate(
         continue;
       }
       if (!hasHttpExports(srcFile)) {
+        result.skipped.push(relPath);
+        continue;
+      }
+      if (isWebExcluded(srcFile, ctx.computed.definitionModules)) {
         result.skipped.push(relPath);
         continue;
       }

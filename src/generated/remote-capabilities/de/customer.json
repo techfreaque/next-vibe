@@ -48188,7 +48188,7 @@
     "credits": 0
   },
   {
-    "toolName": "agent_chat_threads_threadId_share-links_DELETE",
+    "toolName": "vibe_agent_chat_threads_threadId_share-links_DELETE",
     "title": "Teilen-Link widerrufen",
     "titleShort": "Link widerrufen",
     "description": "Aktiven Teilen-Link widerrufen",

@@ -19,6 +19,8 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { getSrcDir } from "@/env/paths";
+
 import { chatModelDefinitions } from "../../ai-stream/models";
 import { imageGenModelDefinitions } from "../../image-generation/models";
 import { musicGenModelDefinitions } from "../../music-generation/models";
@@ -422,7 +424,7 @@ function applyModalityUpdate(
 
 /** Role → model definition file path */
 export function getRoleFilePaths(): Record<string, string> {
-  const agentDir = join(process.cwd(), "src/vibe/agent");
+  const agentDir = join(getSrcDir(), "vibe/agent");
   return {
     chat: join(agentDir, "ai-stream/models.ts"),
     "image-gen": join(agentDir, "image-generation/models.ts"),
@@ -850,7 +852,7 @@ export class ModelPricesRepository {
       );
       const allFailures = providerResults.flatMap((r) => r.failures);
 
-      const agentDir = join(process.cwd(), "src/vibe/agent");
+      const agentDir = join(getSrcDir(), "vibe/agent");
       // Role file paths - model definitions live in modality-specific subdirs
       const roleFilePaths: Record<string, string> = {
         chat: join(agentDir, "ai-stream/models.ts"),

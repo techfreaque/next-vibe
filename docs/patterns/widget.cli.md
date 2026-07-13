@@ -11,7 +11,7 @@ CLI widgets are **Ink-based React components** that override the default definit
 ## File Naming and Location
 
 ```
-src/app/api/[locale]/<category>/<feature>/
+src/<category>/<feature>/
   definition.ts        - endpoint definition (references widget.tsx)
   widget.tsx           - React (web) widget
   widget.cli.tsx       - Ink (CLI/MCP) override  ← this file
@@ -192,7 +192,7 @@ Page 1/3 - vibe skills --page=2
 
 ### Real-world reference
 
-See `src/app/api/[locale]/agent/chat/skills/widget.cli.tsx` - the canonical example of detail/list threshold, full MCP/CLI divergence, and pagination hints.
+See `next-vibe/agent/chat/skills/widget.cli.tsx` - the canonical example of detail/list threshold, full MCP/CLI divergence, and pagination hints.
 
 ---
 
@@ -238,7 +238,7 @@ Always guard `terminalLink` with `process.stdout.isTTY` - non-TTY contexts (pipe
 When multiple endpoints share CLI display logic, create shared components in the **canonical owner's** route folder using the `.cli.tsx` naming convention:
 
 ```
-src/app/api/[locale]/system/check/
+src/system/check/
   _shared/
     widget-components.cli.tsx   ← shared Ink components (owned by check domain)
   lint/

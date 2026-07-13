@@ -47,11 +47,6 @@ export const endpointHotPaths: Record<
       "/home/max/projects/next-vibe-translations/src/vibe/agent/view-image/definition.ts",
     method: "POST",
   },
-  "agent_chat_threads_threadId_share-links_DELETE": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/share-links/definition.ts",
-    method: "DELETE",
-  },
   "ai-run": {
     absPath:
       "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/run/definition.ts",
@@ -4761,6 +4756,11 @@ export const endpointHotPaths: Record<
     absPath:
       "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/permissions/definition.ts",
     method: "PATCH",
+  },
+  "vibe_agent_chat_threads_threadId_share-links_DELETE": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/share-links/definition.ts",
+    method: "DELETE",
   },
   "vibe_agent_chat_threads_threadId_share-links_GET": {
     absPath:

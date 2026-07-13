@@ -21,7 +21,7 @@ A `hooks.ts` file (or `hooks/` folder) is justified when:
 ### Simple: `hooks.ts` (single file)
 
 ```
-src/app/api/[locale]/agent/chat/skills/[id]/
+next-vibe/agent/chat/skills/[id]/
 ├── definition.ts
 ├── repository.ts
 ├── route.ts
@@ -33,7 +33,7 @@ src/app/api/[locale]/agent/chat/skills/[id]/
 ### Complex: `hooks/` folder
 
 ```
-src/app/api/[locale]/agent/chat/threads/[threadId]/messages/
+next-vibe/agent/chat/threads/[threadId]/messages/
 ├── definition.ts
 ├── repository.ts
 ├── route.ts

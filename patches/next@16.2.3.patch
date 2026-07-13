@@ -1,0 +1,49 @@
+--- a/node_modules/next/dist/lib/find-pages-dir.js	2026-07-13 19:16:38.757977273 +0200
++++ b/node_modules/next/dist/lib/find-pages-dir.js	2026-07-13 19:16:45.191280719 +0200
+@@ -28,11 +28,13 @@
+     };
+ }
+ function findDir(dir, name) {
+-    // prioritize ./${name} over ./src/${name}
++    // prioritize ./${name} over ./src/${name} over ./src/generated/${name}
+     let curDir = _path.default.join(dir, name);
+     if (_fs.default.existsSync(curDir)) return curDir;
+     curDir = _path.default.join(dir, 'src', name);
+     if (_fs.default.existsSync(curDir)) return curDir;
++    curDir = _path.default.join(dir, 'src', 'generated', name);
++    if (_fs.default.existsSync(curDir)) return curDir;
+     return null;
+ }
+ function findPagesDir(dir) {
+@@ -62,4 +64,4 @@
+     };
+ }
+
+-//# sourceMappingURL=find-pages-dir.js.map
+\ Kein Zeilenumbruch am Dateiende.
++//# sourceMappingURL=find-pages-dir.js.map
+--- a/node_modules/next/dist/server/dev/hot-reloader-turbopack.js
++++ b/node_modules/next/dist/server/dev/hot-reloader-turbopack.js
+@@ -264,6 +264,11 @@
+     const rootPath = ((_opts_nextConfig_turbopack = opts.nextConfig.turbopack) == null ? void 0 : _opts_nextConfig_turbopack.root) || opts.nextConfig.outputFileTracingRoot || projectPath;
++    // next-vibe: generated app lives in src/generated/app — point Turbopack there
++    const _generatedSrcPath = _path.join(projectPath, 'src', 'generated');
++    const _turbopackProjectPath = require('fs').existsSync(_path.join(_generatedSrcPath, 'app'))
++        ? (0, _normalizepath.normalizePath)((0, _path.relative)(rootPath, _generatedSrcPath))
++        : (0, _normalizepath.normalizePath)((0, _path.relative)(rootPath, projectPath) || '.');
+     const project = await bindings.turbo.createProject({
+         rootPath,
+-        projectPath: (0, _normalizepath.normalizePath)((0, _path.relative)(rootPath, projectPath) || '.'),
++        projectPath: _turbopackProjectPath,
+--- a/node_modules/next/dist/server/dev/turbopack-utils.js
++++ b/node_modules/next/dist/server/dev/turbopack-utils.js
+@@ -417,6 +417,8 @@
+ async function handleEntrypoints({ entrypoints, currentEntrypoints, currentEntryIssues, manifestLoader, devRewrites, logErrors, dev }) {
+     currentEntrypoints.global.app = entrypoints.pagesAppEndpoint;
+     currentEntrypoints.global.document = entrypoints.pagesDocumentEndpoint;
+     currentEntrypoints.global.error = entrypoints.pagesErrorEndpoint;
+     currentEntrypoints.global.instrumentation = entrypoints.instrumentation;
++    // next-vibe: skip clearing when Rust returns 0 routes with no issues — transient no-config rescan
++    if (entrypoints.routes.size === 0 && entrypoints.issues.size === 0 && (currentEntrypoints.app.size > 0 || currentEntrypoints.page.size > 0)) { return; }
+     currentEntrypoints.page.clear();
+     currentEntrypoints.app.clear();

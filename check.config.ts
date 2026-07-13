@@ -54,6 +54,7 @@ const features = {
   jsxCapitalization: true, // Enforce capitalized JSX components
   restrictedSyntax: true, // No throw, unknown, object types
   boilerplate: true, // Enforce route.ts and i18n boilerplate patterns
+  vibeBoundary: true, // Enforce src/vibe/ internal boundary (no cross-boundary imports)
   // TypeScript
   tsgo: true, // Use tsgo instead of tsc for type checking
   strictTypes: true, // Strict type checking rules
@@ -168,6 +169,9 @@ const oxlint: CheckConfig["oxlint"] = {
     ...(features.i18n ? ["@next-vibe/checker/oxlint-plugins/i18n.ts"] : []),
     ...(features.boilerplate
       ? ["@next-vibe/checker/oxlint-plugins/boilerplate.ts"]
+      : []),
+    ...(features.vibeBoundary
+      ? ["@next-vibe/checker/oxlint-plugins/vibe-boundary.ts"]
       : []),
   ],
   categories: {
@@ -621,6 +625,11 @@ const oxlint: CheckConfig["oxlint"] = {
           "oxlint-plugin-boilerplate/i18n-pattern": ["error"],
         }
       : {}),
+    ...(features.vibeBoundary
+      ? {
+          "oxlint-plugin-vibe-boundary/vibe-internal-boundary": ["error"],
+        }
+      : {}),
 
     // ── Next.js (enabled via nextjs flag) ─────────────────────
     ...(features.nextjs
@@ -826,6 +835,9 @@ const config = (): CheckConfig => {
               "route-pattern",
               "i18n-pattern",
             ]),
+            "oxlint-plugin-vibe-boundary": createEslintStub([
+              "vibe-internal-boundary",
+            ]),
             "@typescript-eslint": createEslintStub([
               "no-explicit-any",
               "no-unused-vars",
@@ -899,6 +911,9 @@ const config = (): CheckConfig => {
             "oxlint-plugin-boilerplate": createEslintStub([
               "route-pattern",
               "i18n-pattern",
+            ]),
+            "oxlint-plugin-vibe-boundary": createEslintStub([
+              "vibe-internal-boundary",
             ]),
             "@typescript-eslint": createEslintStub([
               "no-explicit-any",

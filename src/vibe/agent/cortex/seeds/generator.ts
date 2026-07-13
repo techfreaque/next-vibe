@@ -17,6 +17,8 @@ import type {
   GeneratorResult,
 } from "next-vibe/tooling/generators/shared/shared-inputs";
 
+import { getSrcDir } from "@/env/paths";
+
 /** Recursively find all seed .ts files, excluding embedding/index/types. */
 function scanSeedFiles(dir: string): string[] {
   const results: string[] = [];
@@ -107,14 +109,7 @@ export async function generate(
   const { defaultLocale } = await import("next-vibe/core/i18n/core/config");
   const ALL_SEEDS = getAllTemplates(defaultLocale).map((item) => ({ item }));
 
-  const seedsDir = join(
-    process.cwd(),
-    "src",
-    "vibe",
-    "agent",
-    "cortex",
-    "seeds",
-  );
+  const seedsDir = join(getSrcDir(), "vibe", "agent", "cortex", "seeds");
 
   const seedFiles = scanSeedFiles(seedsDir);
 

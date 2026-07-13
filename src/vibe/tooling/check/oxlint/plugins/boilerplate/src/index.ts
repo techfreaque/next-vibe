@@ -281,12 +281,8 @@ function getFilename(context: BoilerplateRuleContext): string {
 
 function isRouteFile(context: BoilerplateRuleContext): boolean {
   const filename = getFilename(context);
-  // Must end with /route.ts and be inside the app directory
-  return (
-    filename.endsWith("/route.ts") &&
-    filename.includes("/app/") &&
-    filename.includes("/[locale]/")
-  );
+  // Must end with /route.ts and be inside src/ (domain-driven flat structure)
+  return filename.endsWith("/route.ts") && filename.includes("/src/");
 }
 
 function isI18nEnFile(context: BoilerplateRuleContext): boolean {

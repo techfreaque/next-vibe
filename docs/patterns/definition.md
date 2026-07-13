@@ -1210,9 +1210,9 @@ When building or auditing a module, verify these in order:
 
 **Clean definition files:**
 
-- `src/app/api/[locale]/agent/chat/skills/create/definition.ts` - POST with `customWidgetObject`
-- `src/app/api/[locale]/agent/chat/folders/definition.ts` - GET with `responseArrayField`
-- `src/app/api/[locale]/agent/chat/threads/[threadId]/permissions/definition.ts` - GET + PATCH with urlPathParams
+- `next-vibe/agent/chat/skills/create/definition.ts` - POST with `customWidgetObject`
+- `next-vibe/agent/chat/folders/definition.ts` - GET with `responseArrayField`
+- `next-vibe/agent/chat/threads/[threadId]/permissions/definition.ts` - GET + PATCH with urlPathParams
 
 ---
 

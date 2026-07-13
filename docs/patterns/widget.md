@@ -195,7 +195,7 @@ function StatCard({ label, value }) {
 ### Single-file widget
 
 ```
-src/app/api/[locale]/agent/chat/skills/create/
+next-vibe/agent/chat/skills/create/
 ├── definition.ts
 ├── repository.ts
 ├── route.ts
@@ -206,7 +206,7 @@ src/app/api/[locale]/agent/chat/skills/create/
 ### Widget folder (complex)
 
 ```
-src/app/api/[locale]/agent/chat/threads/
+next-vibe/agent/chat/threads/
 ├── definition.ts
 ├── repository.ts
 ├── route.ts
@@ -1291,13 +1291,13 @@ const { pickerCallback } = useWidgetNavigation().current ?? {};
 
 ## Violations
 
-### Rule: Never use `_components/` under `src/app/api/[locale]/`
+### Rule: Never use `_components/` under `src/`
 
-All UI sub-components for an endpoint must live inside `widget/` (or `widget.tsx`). The `_components/` folder name is **not allowed** under `src/app/api/[locale]/`. Move any such files to `widget/`, update all import sites, delete the empty folder.
+All UI sub-components for an endpoint must live inside `widget/` (or `widget.tsx`). The `_components/` folder name is **not allowed** under `src/`. Move any such files to `widget/`, update all import sites, delete the empty folder.
 
 ### Rule: Page/layout components do NOT live in `widget/`
 
-`widget/` is only for components registered in `definition.ts` via `customWidgetObject`. A component that accepts `locale`, `user`, or other server-side props and is imported from a `page.tsx` or `layout.tsx` is a **page component**, not a widget. It belongs in `src/app/[locale]/<feature>/_components/`.
+`widget/` is only for components registered in `definition.ts` via `customWidgetObject`. A component that accepts `locale`, `user`, or other server-side props and is imported from a `page.tsx` or `layout.tsx` is a **page component**, not a widget. It belongs in `src/_pages/<feature>/_components/`.
 
 ### Rule: Widget i18n is private to the widget
 

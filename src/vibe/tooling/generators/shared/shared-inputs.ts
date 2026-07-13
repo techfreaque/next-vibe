@@ -189,11 +189,9 @@ interface BuildContextOptions {
 export async function buildGeneratorContext(
   opts: BuildContextOptions,
 ): Promise<GeneratorContext> {
-  const cwd = process.cwd();
-  const apiDir = `${cwd}/src`;
-  const apiRoot = `${cwd}/src`;
+  const apiDir = getApiDir();
 
-  const files = scanFileLists(apiDir, apiRoot, opts.live);
+  const files = scanFileLists(apiDir, apiDir, opts.live);
 
   const definitionModules = new Map<string, DefinitionDefault>();
   if (opts.need?.definitionModules) {

@@ -224,7 +224,7 @@ Endpoint access is controlled by the `allowedRoles` array in `definition.ts`:
 ### Directory Layout
 
 ```
-src/app/api/[locale]/
+src/
   system/
     unified-interface/
       ai/skills/           - Remote skill markdown generation

@@ -22,6 +22,8 @@ import {
   writeGeneratedFile,
 } from "next-vibe/tooling/generators/shared/utils";
 
+import { getApiDir } from "@/env/paths";
+
 import type { PackageManifest } from "./types";
 
 // ============================================================================
@@ -137,25 +139,27 @@ export class PackageEndpointGeneratorRepository {
 
   // Build import path for a definition file - same @/... format
   private static toImportPath(filePath: string): string {
-    const marker = "[locale]/";
-    const idx = filePath.indexOf(marker);
-    if (idx === -1) {
+    const posix = filePath.replaceAll("\\", "/");
+    const srcIdx = posix.indexOf("/src/");
+    if (srcIdx === -1) {
       return filePath;
     }
-    const after = filePath.slice(idx + marker.length);
-    const segment = after.replace(/\/definition\.ts$/, "");
+    const segment = posix
+      .slice(srcIdx + "/src/".length)
+      .replace(/\/definition\.ts$/, "");
     return `@/${segment}/definition`;
   }
 
   // Build route.ts import path from definition file path
   private static toRouteImportPath(defFile: string): string {
-    const marker = "[locale]/";
-    const idx = defFile.indexOf(marker);
-    if (idx === -1) {
+    const posix = defFile.replaceAll("\\", "/");
+    const srcIdx = posix.indexOf("/src/");
+    if (srcIdx === -1) {
       return defFile;
     }
-    const after = defFile.slice(idx + marker.length);
-    const segment = after.replace(/\/definition\.ts$/, "");
+    const segment = posix
+      .slice(srcIdx + "/src/".length)
+      .replace(/\/definition\.ts$/, "");
     return `@/${segment}/route`;
   }
 
@@ -439,13 +443,12 @@ ${routeCases.join("\n")}
     ]);
 
     // Discover all definition files in the codebase
-    const apiCorePath = join(process.cwd(), "src", "app", "api", "[locale]");
     const allDefinitionFiles = findFilesRecursively(
-      apiCorePath,
+      getApiDir(),
       "definition.ts",
     );
     const allRouteFiles = new Set(
-      findFilesRecursively(apiCorePath, "route.ts"),
+      findFilesRecursively(getApiDir(), "route.ts"),
     );
 
     // Filter: must have a route.ts AND match the manifest by alias/tool name

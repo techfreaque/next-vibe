@@ -178,7 +178,7 @@ const DEFAULT_MESSAGES: RestrictedSyntaxMessages = {
   rawFetch:
     "Raw 'fetch()' is not allowed. To read endpoint data, use the endpoint's typed hook (it handles caching, auth, and platform routing). Only genuine external-API calls may use raw fetch — mark those with '// oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external API'.",
   endpointsPageInServerEntry:
-    "'EndpointsPage' cannot be used in a server entry file (page/layout/template without 'use client') — its endpoint props don't survive the server→client boundary. Extract a page-client.tsx with 'use client' that renders EndpointsPage, and render that component from this file (see src/app/[locale]/tools/page.tsx + page-client.tsx).",
+    "'EndpointsPage' cannot be used in a server entry file (page/layout/template without 'use client') — its endpoint props don't survive the server→client boundary. Extract a page-client.tsx with 'use client' that renders EndpointsPage, and render that component from this file (see src/_pages/tools/page.tsx + page-client.tsx).",
 };
 
 // ============================================================

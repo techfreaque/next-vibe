@@ -41,7 +41,7 @@ import {
 } from "./symbols";
 
 const PROJECT_ROOT = process.cwd();
-const SRC_ROOT = join(PROJECT_ROOT, "src");
+const SRC_ROOT = getSrcDir();
 
 // Graph key = posix path relative to PROJECT_ROOT, e.g. "src/config/constants.ts"
 // For files inside src/, next-vibe/* aliases resolve to the same key.

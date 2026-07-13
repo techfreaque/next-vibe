@@ -175,8 +175,8 @@ Let's create a simple endpoint to understand the pattern.
 ### 1. Create Folder Structure
 
 ```bash
-mkdir -p src/app/api/[locale]/hello/world
-cd src/app/api/[locale]/hello/world
+mkdir -p src/hello/world
+cd src/hello/world
 ```
 
 ### 2. Create `definition.ts`

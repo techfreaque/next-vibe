@@ -2,6 +2,7 @@ import "server-only";
 
 import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
+import { join } from "node:path";
 
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -12,6 +13,8 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { InfraT } from "next-vibe/tooling/infra/i18n";
+
+import { getSrcDir } from "@/env/paths";
 
 import type {
   DeployPushRequestOutput,
@@ -45,7 +48,7 @@ export class DeployPushRepository {
 
       const stack = data.stack ?? "prod";
       const statePath = `${process.cwd()}/.pulumi`;
-      const pulumiDir = `${process.cwd()}/src/vibe/tooling/infra/shared/pulumi`;
+      const pulumiDir = join(getSrcDir(), "vibe/tooling/infra/shared/pulumi");
 
       logger.info("deploy-push: running pulumi up", { stack });
 

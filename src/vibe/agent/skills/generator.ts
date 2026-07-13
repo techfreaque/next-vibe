@@ -24,6 +24,8 @@ import {
   writeGeneratedFile,
 } from "next-vibe/tooling/generators/shared/utils";
 
+import { getSrcDir } from "@/env/paths";
+
 const OUTPUT_FILE = "src/generated/skills/index.ts";
 
 /** Skill IDs that go into COMPANION_SKILLS (order matters). */
@@ -280,7 +282,7 @@ async function generateSkillEmbeddings(
           const importPath = importMatch[1];
           let constFile: string;
           if (importPath.startsWith("@/")) {
-            constFile = join(process.cwd(), "src", `${importPath.slice(2)}.ts`);
+            constFile = join(getSrcDir(), `${importPath.slice(2)}.ts`);
           } else {
             constFile = join(dirname(filePath), `${importPath}.ts`);
           }

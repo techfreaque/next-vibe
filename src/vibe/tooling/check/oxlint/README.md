@@ -14,7 +14,7 @@ The oxlint system uses a **TypeScript configuration wrapper** (`lint.config.ts` 
 ```
 /lint.config.ts              # TypeScript config with logic (project root)
 ├── .tmp/.oxlintrc.json      # Auto-generated JSON config (git-ignored)
-└── src/app/api/.../oxlint/
+└── src/vibe/tooling/check/oxlint/
     ├── config-generator.ts  # Converts TS to JSON
     ├── repository.ts        # Parallel execution engine
     ├── definition.ts        # API endpoint definition

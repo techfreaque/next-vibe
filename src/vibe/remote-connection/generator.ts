@@ -42,6 +42,8 @@ import {
   writeGeneratedFile,
 } from "next-vibe/tooling/generators/shared/utils";
 
+import { getApiDir } from "@/env/paths";
+
 const OUTPUT_DIR = "src/generated/remote-capabilities";
 
 // ─── Build version ────────────────────────────────────────────────────────────
@@ -160,8 +162,7 @@ class RemoteCapabilitiesGenerator {
     logger.debug(`Starting remote capabilities generation: ${outputDir}`);
 
     // ── 1. Discover definition files ────────────────────────────────────
-    // Use template string to prevent Turbopack from statically tracing paths
-    const startDir = `${process.cwd()}/src`;
+    const startDir = getApiDir();
 
     const definitionFiles = findFilesRecursively(startDir, "definition.ts");
     const routeFiles = findFilesRecursively(startDir, "route.ts");

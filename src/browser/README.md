@@ -199,6 +199,6 @@ vibe browser take-screenshot --format png --full-page
 
 ## Related Files
 
-- `/src/app/api/[locale]/browser/route.ts` - Legacy monolithic endpoint (deprecated)
+- `/src/browser/route.ts` - Legacy monolithic endpoint (deprecated)
 - `/scripts/generate-browser-tools.ts` - TypeScript tool generator script
-- `/src/app/api/[locale]/browser/shared/tool-specs.ts` - TypeScript tool specifications (source of truth)
+- `/src/browser/shared/tool-specs.ts` - TypeScript tool specifications (source of truth)

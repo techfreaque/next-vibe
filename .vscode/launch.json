@@ -90,7 +90,7 @@
     {
       "id": "vibeCommand",
       "type": "promptString",
-      "description": "Vibe CLI command (e.g., 'check src/app', 'tc src/app/api')",
+      "description": "Vibe CLI command (e.g., 'check src', 'tc src')",
       "default": "check src"
     }
   ]

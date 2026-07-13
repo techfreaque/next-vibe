@@ -6,19 +6,19 @@ Guide to defining AI skills (`skill.ts`) that ship with the platform.
 
 Each skill is a **self-contained module** in its own folder with a `skill.ts` file. Skills define an AI persona or tool configuration - a system prompt, model selection filters, suggested prompts, and optional tool overrides.
 
-Skills are **auto-indexed**: the generator scans all `skill.ts` files anywhere under `src/app/api/[locale]/` and regenerates `system/generated/skills-index.ts`. Never manually edit the index.
+Skills are **auto-indexed**: the generator scans all `skill.ts` files anywhere under `src/` and regenerates `system/generated/skills-index.ts`. Never manually edit the index.
 
 ## Where Skills Live
 
 Skills can live anywhere in the API tree - not just in `default-skills/`:
 
 ```
-src/app/api/[locale]/agent/chat/skills/
+next-vibe/agent/chat/skills/
   default-skills/
     <skill-id>/
       skill.ts                       - Platform-wide built-in skills
 
-src/app/api/[locale]/<module>/
+src/<module>/
   <feature>/
     skill.ts                         - Module-level skill (scoped to a feature)
 ```
@@ -30,7 +30,7 @@ src/app/api/[locale]/<module>/
 ## File Structure
 
 ```
-src/app/api/[locale]/agent/chat/skills/
+next-vibe/agent/chat/skills/
   config.ts                          - Skill interface definition + NO_SKILL constant
   enum.ts                            - SkillCategory, SkillOwnershipType, ModelSelectionType, etc.
   constants.ts                       - NO_SKILL_ID and alias constants
@@ -190,7 +190,7 @@ export const theaSkill: Skill = {
 3. Add translation keys to `skills/i18n/en/index.ts` (and de/, pl/) - same i18n namespace
 4. Run the skills-index generator: `vibe generate-skills-index` (or `vibe generate-all`)
 
-The generator scans all `skill.ts` files under `src/app/api/[locale]/` automatically - no manual registration needed.
+The generator scans all `skill.ts` files under `src/` automatically - no manual registration needed.
 
 ## i18n Keys
 

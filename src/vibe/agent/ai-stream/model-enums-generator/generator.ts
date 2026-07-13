@@ -18,6 +18,8 @@ import type {
   GeneratorResult,
 } from "next-vibe/tooling/generators/shared/shared-inputs";
 
+import { getSrcDir } from "@/env/paths";
+
 import { updateMediaGenInlineEnum } from "./media-gen-enum-generator";
 import { generateVisionEnumFileContent } from "./vision-enum-generator";
 
@@ -25,7 +27,7 @@ export async function generate(
   ctx: GeneratorContext,
 ): Promise<GeneratorResult> {
   const { logger } = ctx;
-  const agentDir = join(process.cwd(), "src", "vibe", "agent");
+  const agentDir = join(getSrcDir(), "vibe", "agent");
 
   const { chatModelDefinitions, ChatModelId } =
     (await import("next-vibe/agent/ai-stream/models")) as {

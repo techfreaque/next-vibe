@@ -122,10 +122,20 @@ export function extractNestedPath(
 ): string[] {
   const pathParts = toPosixPath(filePath).split("/");
 
-  const startIndex = pathParts.findIndex((p) => p === startMarker);
+  let startIndex = pathParts.findIndex((p) => p === startMarker);
   if (startIndex === -1) {
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build-time generator that throws for invalid configuration at startup
-    throw new Error(`Could not find ${startMarker} in path: ${filePath}`);
+    if (startMarker === "[locale]") {
+      // Domain-driven flat structure: src/<domain>/... has no [locale] segment.
+      // Fall back to "src" as the anchor so segments are extracted identically.
+      startIndex = pathParts.findIndex((p) => p === "src");
+      if (startIndex === -1) {
+        // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build-time generator that throws for invalid configuration at startup
+        throw new Error(`Could not find [locale] or src in path: ${filePath}`);
+      }
+    } else {
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build-time generator that throws for invalid configuration at startup
+      throw new Error(`Could not find ${startMarker} in path: ${filePath}`);
+    }
   }
 
   // If no end marker provided, auto-detect definition.ts, route.ts, or route-client.ts
@@ -454,7 +464,7 @@ export function jsonToTs(
 
 /**
  * Generate absolute import path for definition or route file
- * nestedPath extracts segments after [locale], which we then append to the base path
+ * nestedPath extracts segments after src/, which we then append to the base path
  */
 export function generateAbsoluteImportPath(
   filePath: string,

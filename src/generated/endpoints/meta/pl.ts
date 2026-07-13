@@ -5506,7 +5506,7 @@ export const endpointsMeta: EndpointMeta[] = [
           id: "00000000-0000-0000-0000-000000000000",
           active: true,
           checkErrors: [],
-          createdAt: "2026-07-13T17:49:38.211Z",
+          createdAt: "2026-07-13T18:28:03.919Z",
         },
       },
     },
@@ -5531,7 +5531,7 @@ export const endpointsMeta: EndpointMeta[] = [
       responses: {
         default: {
           variantKey: "MY_VARIANT",
-          updatedAt: "2026-07-13T17:49:38.211Z",
+          updatedAt: "2026-07-13T18:28:03.920Z",
         },
       },
     },
@@ -16311,9 +16311,9 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "agent_chat_threads_threadId_share-links_DELETE",
+    toolName: "vibe_agent_chat_threads_threadId_share-links_DELETE",
     method: "DELETE",
-    path: ["agent", "chat", "threads", "[threadId]", "share-links"],
+    path: ["vibe", "agent", "chat", "threads", "[threadId]", "share-links"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Unieważnij link udostępniania",

@@ -220,10 +220,10 @@ feature/
 
 ## Real Examples
 
-- `src/app/api/[locale]/user/repository.native.ts` - `getUserByAuth()` implemented, rest throw
-- `src/app/api/[locale]/subscription/repository.native.ts` - `getSubscription()` implemented, rest throw
-- `src/app/api/[locale]/credits/repository.native.ts` - `getCreditBalanceForUser()` implemented, rest throw
-- `src/app/api/[locale]/agent/chat/folders/[id]/repository.native.ts` - `getFolder()` with `urlPathParams`
+- `src/user/repository.native.ts` - `getUserByAuth()` implemented, rest throw
+- `src/subscription/repository.native.ts` - `getSubscription()` implemented, rest throw
+- `src/credits/repository.native.ts` - `getCreditBalanceForUser()` implemented, rest throw
+- `next-vibe/agent/chat/folders/[id]/repository.native.ts` - `getFolder()` with `urlPathParams`
 
 ## See Also
 

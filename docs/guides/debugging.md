@@ -198,7 +198,7 @@ Works from CLI, MCP, or web.
 
 ### Migrations
 
-Schema changes in `src/app/api/[locale]/system/db/db.ts` require generating and running a migration:
+Schema changes in `src/system/db/db.ts` require generating and running a migration:
 
 ```bash
 npx drizzle-kit generate   # generate migration files from schema changes

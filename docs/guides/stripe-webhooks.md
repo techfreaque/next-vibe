@@ -109,7 +109,7 @@ The endpoint:
 
 **See implementation:**
 
-- `src/app/api/[locale]/payment/providers/stripe/webhooks/route.ts`
+- `src/payment/providers/stripe/webhooks/route.ts`
 
 ---
 

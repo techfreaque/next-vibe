@@ -10,9 +10,10 @@ import type {
   GeneratorResult,
 } from "next-vibe/tooling/generators/shared/shared-inputs";
 
-const PROJECT_ROOT = process.cwd();
-const SOURCE_DIR = join(PROJECT_ROOT, "src/app/[locale]");
-const TARGET_DIR = join(PROJECT_ROOT, "src/generated/app-native/[locale]");
+import { getSrcDir, getUiDir } from "@/env/paths";
+
+const SOURCE_DIR = getUiDir();
+const TARGET_DIR = join(getSrcDir(), "generated/app-native/[locale]");
 
 function hasCustomDirective(filePath: string): boolean {
   if (!existsSync(filePath)) {
@@ -48,7 +49,7 @@ function formatCall(fnName: string, importPath: string): string {
 }
 
 function pageContent(relativePath: string, kind: "page" | "layout"): string {
-  const importPath = `@/app/[locale]${relativePath ? `/${relativePath}` : ""}/${kind}`;
+  const importPath = `@/_pages${relativePath ? `/${relativePath}` : ""}/${kind}`;
   const wrapperPath = `@/vibe/platforms/react-native/nextjs-compat-wrapper`;
   if (kind === "page") {
     return `import { createPageWrapperWithImport } from "${wrapperPath}";\n${formatCall("createPageWrapperWithImport", importPath)}\n`;

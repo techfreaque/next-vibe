@@ -9,8 +9,6 @@ import { dirname, join } from "node:path";
 
 import type { EnvExample, EnvFieldType } from "next-vibe/env/define-env";
 import { formatCount, formatWarning } from "next-vibe/logger/formatters";
-
-import { getApiDir } from "@/env/paths";
 import type {
   GeneratorContext,
   GeneratorResult,
@@ -20,6 +18,8 @@ import {
   jsonToTs,
   stripProjectRoot,
 } from "next-vibe/tooling/generators/shared/utils";
+
+import { getApiDir } from "@/env/paths";
 
 import type { EnvValidationErrorType } from "./generator-validator";
 
@@ -100,7 +100,7 @@ class EnvGeneratorRepository {
       logger.debug(`Starting env generation: ${data.outputDir}`);
 
       const apiDir = getApiDir();
-      const configDir = `${process.cwd()}/src/config`;
+      const configDir = join(getApiDir(), "config");
 
       const excludeDirs = [
         "node_modules",
@@ -267,7 +267,7 @@ class EnvGeneratorRepository {
         // Sort so src/config modules appear first, then pair each directory's
         // env.ts (server) immediately followed by env-client.ts (client).
         // Within a pair, server comes first so client keys win deduplication.
-        const configPath = join(process.cwd(), "src", "config");
+        const configPath = join(getApiDir(), "config");
         const allModules = [
           ...validServerModules,
           ...validClientModules,

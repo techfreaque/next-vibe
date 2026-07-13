@@ -14,8 +14,6 @@
  */
 export const pathToAliasMap = {
   "accounting-dashboard": "accounting-dashboard",
-  "agent_chat_threads_threadId_share-links_DELETE":
-    "agent_chat_threads_threadId_share-links_DELETE",
   "agent-chat-threads": "agent-chat-threads",
   "agent-run": "ai-run",
   "agent-search-messages": "agent-search-messages",
@@ -1034,6 +1032,8 @@ export const pathToAliasMap = {
     "vibe_agent_chat_threads_threadId_permissions_GET",
   vibe_agent_chat_threads_threadId_permissions_PATCH:
     "vibe_agent_chat_threads_threadId_permissions_PATCH",
+  "vibe_agent_chat_threads_threadId_share-links_DELETE":
+    "vibe_agent_chat_threads_threadId_share-links_DELETE",
   "vibe_agent_chat_threads_threadId_share-links_GET": "thread-share-links",
   "vibe_agent_chat_threads_threadId_share-links_PATCH":
     "vibe_agent_chat_threads_threadId_share-links_PATCH",

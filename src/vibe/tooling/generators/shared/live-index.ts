@@ -9,7 +9,8 @@
 import "server-only";
 
 import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+
+import { getApiDir, getUiDir } from "@/env/paths";
 
 import { findFilesRecursively, toPosixPath } from "./utils";
 
@@ -244,22 +245,9 @@ export function classifyFile(filename: string): FileClass | null {
 // Build (initial full scan)
 // ---------------------------------------------------------------------------
 
-/** Base directory for API routes */
-function getApiDir(): string {
-  // eslint-disable-next-line i18next/no-literal-string
-  return join(process.cwd(), "src", "app", "api", "[locale]");
-}
-
-/** Base directory for tasks (broader - includes all api/) */
+/** Base directory for tasks (broader - same as api in flat domain structure) */
 function getApiRootDir(): string {
-  // eslint-disable-next-line i18next/no-literal-string
-  return join(process.cwd(), "src", "app", "api");
-}
-
-/** Base directory for UI pages/layouts (tanstack-start, next-app, native generators) */
-function getUiDir(): string {
-  // eslint-disable-next-line i18next/no-literal-string
-  return join(process.cwd(), "src", "app", "[locale]");
+  return getApiDir();
 }
 
 /**

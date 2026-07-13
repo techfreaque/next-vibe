@@ -285,9 +285,9 @@ All other `route.ts` files MUST use `endpointsHandler()`.
 
 **Clean route files:**
 
-- `src/app/api/[locale]/agent/chat/favorites/route.ts` - GET and POST
-- `src/app/api/[locale]/agent/chat/favorites/[id]/route.ts` - GET, PATCH, DELETE with urlPathParams
-- `src/app/api/[locale]/user/public/login/route.ts` - POST with multiple parameters
+- `next-vibe/agent/chat/favorites/route.ts` - GET and POST
+- `next-vibe/agent/chat/favorites/[id]/route.ts` - GET, PATCH, DELETE with urlPathParams
+- `src/user/public/login/route.ts` - POST with multiple parameters
 
 ---
 

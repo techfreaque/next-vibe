@@ -27,21 +27,71 @@ import type {
 import { getApiDir, getSrcDir, getUiDir } from "@/env/paths";
 
 const PROJECT_ROOT = process.cwd();
-const UI_DIR = join(PROJECT_ROOT, "src", "_pages");
-const API_DIR = join(PROJECT_ROOT, "src");
+const UI_DIR = getUiDir();
+const API_DIR = getApiDir();
 // Directories inside src/ that contain framework/system code — not user API routes.
+const SRC_DIR = getSrcDir();
 const API_EXCLUDE_DIRS = new Set([
-  join(PROJECT_ROOT, "src", "vibe"),
-  join(PROJECT_ROOT, "src", "_pages"),
-  join(PROJECT_ROOT, "src", "_old"),
-  join(PROJECT_ROOT, "src", "generated"),
+  join(SRC_DIR, "vibe"),
+  join(SRC_DIR, "_pages"),
+  join(SRC_DIR, "_old"),
+  join(SRC_DIR, "generated"),
+  join(SRC_DIR, "env"),
+  join(SRC_DIR, "i18n"),
 ]);
-const OUT_ROOT = join(PROJECT_ROOT, "src", "generated", "app");
+const OUT_ROOT = join(SRC_DIR, "generated", "app");
 const OUT_UI = join(OUT_ROOT, "[locale]");
 const OUT_API = join(OUT_ROOT, "api", "[locale]");
 
+// Special Next.js file names (beyond page/layout/route) that get re-export shells.
+// Files that require "use client" are listed in CLIENT_REQUIRED.
+const SPECIAL_FILES = [
+  "error.tsx",
+  "global-error.tsx",
+  "not-found.tsx",
+  "loading.tsx",
+  "template.tsx",
+  "default.tsx",
+] as const;
+const CLIENT_REQUIRED = new Set(["error.tsx", "global-error.tsx"]);
+
+const IS_PROD = process.env["NODE_ENV"] === "production";
+
+// Returns true when a route should be excluded from the Next.js generated app.
+// Reads allowedRoles from the evaluated definitionModules map (populated by the
+// generator context after importing every definition.ts). Null entry (failed
+// import) is treated as not-excluded to avoid silently dropping routes.
+function isWebExcluded(
+  routePath: string,
+  definitionModules: Map<string, ApiSection | null>,
+): boolean {
+  const defPath = routePath.replace(/\/route\.ts$/, "/definition.ts");
+  const def = definitionModules.get(defPath);
+  // Unknown key → not in scan scope → treat as not excluded.
+  if (def === undefined || def === null) {
+    return false;
+  }
+  for (const method of Object.values(def)) {
+    if (!method || typeof method !== "object" || !("allowedRoles" in method)) {
+      continue;
+    }
+    const roles = (method as { allowedRoles: readonly UserRoleValue[] })
+      .allowedRoles;
+    const markers = filterPlatformMarkers(roles);
+    if (markers.includes(PlatformMarker.WEB_OFF)) {
+      return true;
+    }
+    // PRODUCTION_OFF only suppresses shell generation in actual prod builds;
+    // dev/local-web still generates the shell so the endpoint is accessible.
+    if (IS_PROD && markers.includes(PlatformMarker.PRODUCTION_OFF)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function sourceAlias(absSrc: string): string {
-  const rel = relative(join(PROJECT_ROOT, "src"), absSrc)
+  const rel = relative(SRC_DIR, absSrc)
     .replaceAll("\\", "/")
     .replace(/\.tsx?$/, "");
   return `@/${rel}`;
@@ -81,7 +131,7 @@ function hasHttpExports(file: string): boolean {
   } catch {
     return false;
   }
-  return /export\s+(?:const|async\s+function|function)\s+(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\b/.test(
+  return /export\s+(?:const\s+\{[^}]*|\s*(?:async\s+)?function\s+)(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\b/.test(
     src,
   );
 }
@@ -95,26 +145,37 @@ function writeIfNotCustom(outPath: string, content: string): boolean {
   return true;
 }
 
-function shell(srcAbs: string, kind: "page" | "layout" | "route"): string {
+type ShellKind = "page" | "layout" | "route" | "special";
+
+function shell(srcAbs: string, kind: ShellKind, fileName?: string): string {
   const srcRel = relative(PROJECT_ROOT, srcAbs).replaceAll("\\", "/");
   const alias = sourceAlias(srcAbs);
   const header = `// AUTO-GENERATED from ${srcRel}. Add "use custom" to this file to preserve customizations.`;
   if (kind === "route") {
     return [header, `export * from "${alias}";`, ``].join("\n");
   }
-  return [
+  const needsUseClient =
+    kind === "special" &&
+    fileName !== undefined &&
+    CLIENT_REQUIRED.has(fileName);
+  const lines: string[] = [];
+  if (needsUseClient) {
+    lines.push(`"use client";`);
+  }
+  lines.push(
     header,
     `export { default } from "${alias}";`,
     `export * from "${alias}";`,
     ``,
-  ].join("\n");
+  );
+  return lines.join("\n");
 }
 
 function emit(
   srcFiles: string[],
   srcRoot: string,
   outRoot: string,
-  kind: "page" | "layout" | "route",
+  kind: ShellKind,
   created: string[],
   skipped: string[],
   errors: { file: string; error: string }[],
@@ -129,9 +190,10 @@ function emit(
       skipped.push(relative(PROJECT_ROOT, srcFile));
       continue;
     }
+    const fileName = srcFile.split("/").pop();
     const outPath = join(outRoot, relative(srcRoot, srcFile));
     try {
-      if (writeIfNotCustom(outPath, shell(srcFile, kind))) {
+      if (writeIfNotCustom(outPath, shell(srcFile, kind, fileName))) {
         created.push(relative(PROJECT_ROOT, outPath));
       } else {
         skipped.push(relative(PROJECT_ROOT, outPath));
@@ -145,12 +207,120 @@ function emit(
   }
 }
 
+// Remove AUTO-GENERATED shells whose source file no longer exists.
+function cleanupStaleShells(
+  outRoot: string,
+  srcRoot: string,
+  removed: string[],
+): void {
+  if (!existsSync(outRoot)) {
+    return;
+  }
+  for (const entry of readdirSync(outRoot, { withFileTypes: true })) {
+    const fullOut = join(outRoot, entry.name);
+    if (entry.isDirectory()) {
+      cleanupStaleShells(fullOut, join(srcRoot, entry.name), removed);
+      continue;
+    }
+    if (!entry.name.endsWith(".tsx") && !entry.name.endsWith(".ts")) {
+      continue;
+    }
+    let isDir = false;
+    try {
+      isDir = statSync(fullOut).isDirectory();
+    } catch {
+      continue;
+    }
+    if (isDir) {
+      continue;
+    }
+    try {
+      const content = readFileSync(fullOut, "utf8");
+      if (
+        !content.startsWith("// AUTO-GENERATED") ||
+        hasCustomDirective(fullOut)
+      ) {
+        continue;
+      }
+    } catch {
+      continue;
+    }
+    // Derive the source path and check it exists.
+    const srcPath = join(srcRoot, entry.name);
+    if (!existsSync(srcPath)) {
+      try {
+        rmSync(fullOut);
+        removed.push(relative(PROJECT_ROOT, fullOut));
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+}
+
+// Emit the minimal root layout.tsx required by Next.js App Router.
+// The actual document shell lives in src/_pages/layout.tsx under [locale]/;
+// this root layout just passes children through so Next.js has a valid root.
+function emitRootLayout(
+  created: string[],
+  skipped: string[],
+  errors: { file: string; error: string }[],
+): void {
+  const outPath = join(OUT_ROOT, "layout.tsx");
+  const content = [
+    `// AUTO-GENERATED. Add "use custom" to this file to preserve customizations.`,
+    `// Root layout required by Next.js App Router. The document shell is in [locale]/layout.tsx.`,
+    `import type { ReactNode } from "react";`,
+    `export default function RootLayout({ children }: { children: ReactNode }): ReactNode {`,
+    `  return children;`,
+    `}`,
+    ``,
+  ].join("\n");
+  try {
+    if (writeIfNotCustom(outPath, content)) {
+      created.push(relative(PROJECT_ROOT, outPath));
+    } else {
+      skipped.push(relative(PROJECT_ROOT, outPath));
+    }
+  } catch (error) {
+    errors.push({ file: "src/app/layout.tsx", error: parseError(error).message });
+  }
+}
+
+// Emit the proxy.ts re-export at the generated app root.
+function emitProxyShell(
+  created: string[],
+  skipped: string[],
+  errors: { file: string; error: string }[],
+): void {
+  const srcFile = join(SRC_DIR, "proxy.ts");
+  if (!existsSync(srcFile)) {
+    return;
+  }
+  const outPath = join(OUT_ROOT, "proxy.ts");
+  const srcRel = relative(PROJECT_ROOT, srcFile).replaceAll("\\", "/");
+  const content = [
+    `// AUTO-GENERATED from ${srcRel}. Add "use custom" to this file to preserve customizations.`,
+    `export * from "@/proxy";`,
+    ``,
+  ].join("\n");
+  try {
+    if (writeIfNotCustom(outPath, content)) {
+      created.push(relative(PROJECT_ROOT, outPath));
+    } else {
+      skipped.push(relative(PROJECT_ROOT, outPath));
+    }
+  } catch (error) {
+    errors.push({ file: srcRel, error: parseError(error).message });
+  }
+}
+
 export async function generate(
   ctx: GeneratorContext,
 ): Promise<GeneratorResult> {
-  void ctx;
   const created: string[] = [];
   const skipped: string[] = [];
+  const removed: string[] = [];
   const errors: { file: string; error: string }[] = [];
 
   // — UI: page.tsx, layout.tsx, and all special Next.js file types —
@@ -172,6 +342,41 @@ export async function generate(
     skipped,
     errors,
   );
+  for (const specialFile of SPECIAL_FILES) {
+    emit(
+      findFiles(UI_DIR, specialFile),
+      UI_DIR,
+      OUT_UI,
+      "special",
+      created,
+      skipped,
+      errors,
+    );
+  }
+
+  // Root-level special files (error.tsx, not-found.tsx, global-error.tsx live
+  // directly under src/_pages/, not under [locale]).
+  for (const specialFile of SPECIAL_FILES) {
+    const srcFile = join(UI_DIR, specialFile);
+    if (!existsSync(srcFile) || hasCustomDirective(srcFile)) {
+      continue;
+    }
+    const outPath = join(OUT_ROOT, specialFile);
+    try {
+      if (writeIfNotCustom(outPath, shell(srcFile, "special", specialFile))) {
+        created.push(relative(PROJECT_ROOT, outPath));
+      } else {
+        skipped.push(relative(PROJECT_ROOT, outPath));
+      }
+    } catch (error) {
+      errors.push({
+        file: relative(PROJECT_ROOT, srcFile),
+        error: parseError(error).message,
+      });
+    }
+  }
+
+  // — API: route.ts shells, skipping WEB_OFF / PRODUCTION_OFF endpoints —
   emit(
     findFiles(API_DIR, "route.ts", [], API_EXCLUDE_DIRS),
     API_DIR,
@@ -180,17 +385,37 @@ export async function generate(
     created,
     skipped,
     errors,
-    hasHttpExports,
+    (f) => {
+      if (!hasHttpExports(f)) {
+        return false;
+      }
+      return !isWebExcluded(f, ctx.computed.definitionModules);
+    },
   );
+
+  // — root layout.tsx (required by Next.js App Router) —
+  emitRootLayout(created, skipped, errors);
+
+  // — proxy.ts at app root —
+  emitProxyShell(created, skipped, errors);
+
+  // — Stale shell cleanup —
+  cleanupStaleShells(OUT_UI, UI_DIR, removed);
+  // Also clean API stale shells (map generated/app/api/[locale] ↔ src/)
+  cleanupStaleShells(OUT_API, API_DIR, removed);
 
   if (errors.length > 0) {
     return {
-      summary: `next-app shells (${String(created.length)} created, ${String(errors.length)} errors)`,
+      summary: `next-app shells (${String(created.length)} created, ${String(removed.length)} removed, ${String(errors.length)} errors)`,
       failed: errors.map((e) => `${e.file}: ${e.error}`).join("; "),
     };
   }
   return {
-    summary: `next-app shells (${String(created.length)} created, ${String(skipped.length)} skipped)`,
-    counts: { created: created.length, skipped: skipped.length },
+    summary: `next-app shells (${String(created.length)} created, ${String(skipped.length)} skipped, ${String(removed.length)} removed)`,
+    counts: {
+      created: created.length,
+      skipped: skipped.length,
+      removed: removed.length,
+    },
   };
 }

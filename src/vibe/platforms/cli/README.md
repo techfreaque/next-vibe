@@ -223,7 +223,7 @@ vibe setup:uninstall
 vibe check
 
 # Check specific path
-vibe check src/app/api/[locale]/user
+vibe check src/user
 
 # Lint only
 vibe lint
@@ -238,7 +238,7 @@ vibe typecheck
 // config/platform-config.ts
 export const CLI_CONFIG: PlatformConfig = {
   platform: Platform.CLI,
-  rootDir: "src/app/api/[locale]",
+  rootDir: "src",
   excludePaths: [], // CLI can access everything
   cache: {
     enabled: true,

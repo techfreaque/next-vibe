@@ -62,8 +62,8 @@ export function findGeneratorInputs(
   liveIndex?: LiveIndex,
 ): string[] {
   const cwd = process.cwd();
-  const apiDir = join(cwd, "src", "app", "api", "[locale]");
-  const apiRoot = join(cwd, "src", "app", "api");
+  const apiDir = getApiDir();
+  const apiRoot = getApiDir();
   const configDir = join(cwd, "src", "config");
 
   switch (key) {
@@ -151,7 +151,9 @@ export function findGeneratorInputs(
       // CLAUDE.md/AGENTS.md only regenerate under --force.
       return [
         join(
-          apiDir,
+          cwd,
+          "src",
+          "vibe",
           "agent",
           "skills",
           "default-skills",
@@ -179,20 +181,50 @@ export function findGeneratorInputs(
     // Deliberately NOT including src/generated/** — generated output is not an
     // input to these, so regenerating (e.g.) seeds must not dirty the route trees.
     case "tanstack-routes":
-    case "native-indexes":
-    case "next-app": {
-      const uiDir = join(cwd, "src", "app", "[locale]");
+    case "native-indexes": {
+      const pagesDir = getUiDir();
       if (liveIndex) {
         return [
           ...liveIndex.routeFiles,
-          ...findFilesRecursively(uiDir, "page.tsx"),
-          ...findFilesRecursively(uiDir, "layout.tsx"),
+          ...findFilesRecursively(pagesDir, "page.tsx"),
+          ...findFilesRecursively(pagesDir, "layout.tsx"),
         ].toSorted();
       }
       return [
         ...findFilesRecursively(apiDir, "route.ts"),
-        ...findFilesRecursively(uiDir, "page.tsx"),
-        ...findFilesRecursively(uiDir, "layout.tsx"),
+        ...findFilesRecursively(pagesDir, "page.tsx"),
+        ...findFilesRecursively(pagesDir, "layout.tsx"),
+      ].toSorted();
+    }
+
+    case "next-app": {
+      // next-app also watches special Next.js file types (error, not-found,
+      // loading, template, default, global-error) from the _pages source dir.
+      const pagesDir = getUiDir();
+      const specialFiles = [
+        "error.tsx",
+        "global-error.tsx",
+        "not-found.tsx",
+        "loading.tsx",
+        "template.tsx",
+        "default.tsx",
+      ];
+      const specialInputs = specialFiles.flatMap((name) =>
+        findFilesRecursively(pagesDir, name),
+      );
+      if (liveIndex) {
+        return [
+          ...liveIndex.routeFiles,
+          ...findFilesRecursively(pagesDir, "page.tsx"),
+          ...findFilesRecursively(pagesDir, "layout.tsx"),
+          ...specialInputs,
+        ].toSorted();
+      }
+      return [
+        ...findFilesRecursively(apiDir, "route.ts"),
+        ...findFilesRecursively(pagesDir, "page.tsx"),
+        ...findFilesRecursively(pagesDir, "layout.tsx"),
+        ...specialInputs,
       ].toSorted();
     }
   }

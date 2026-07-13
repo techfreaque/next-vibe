@@ -72,10 +72,6 @@ async function importEndpoint(
       ).default.GET;
     case "agent-view-image":
       return (await import("@/vibe/agent/view-image/definition")).default.POST;
-    case "agent_chat_threads_threadId_share-links_DELETE":
-      return (
-        await import("@/vibe/agent/chat/threads/[threadId]/share-links/definition")
-      ).default.DELETE;
     case "ai-run":
       return (await import("@/vibe/agent/ai-stream/run/definition")).default
         .POST;
@@ -2955,6 +2951,10 @@ async function importEndpoint(
       return (
         await import("@/vibe/agent/chat/threads/[threadId]/permissions/definition")
       ).default.PATCH;
+    case "vibe_agent_chat_threads_threadId_share-links_DELETE":
+      return (
+        await import("@/vibe/agent/chat/threads/[threadId]/share-links/definition")
+      ).default.DELETE;
     case "vibe_agent_chat_threads_threadId_share-links_GET":
       return (
         await import("@/vibe/agent/chat/threads/[threadId]/share-links/definition")
@@ -3460,7 +3460,6 @@ const ENDPOINT_PREWARM_PATHS: string[] = [
   "agent-search-messages",
   "agent-search-threads",
   "agent-view-image",
-  "agent_chat_threads_threadId_share-links_DELETE",
   "ai-stream",
   "ai-tools",
   "analytics_evaluators_and_POST",
@@ -3952,6 +3951,7 @@ const ENDPOINT_PREWARM_PATHS: string[] = [
   "text-to-speech",
   "thread-files",
   "thread-messages",
+  "thread-share-links",
   "transcribe_audio",
   "update-model-prices",
   "user-delete",

@@ -41,7 +41,7 @@ Database seeding patterns and best practices for the NextVibe framework.
 
 NextVibe uses an **optional** hierarchical seed system where:
 
-- Seed files are **optionally** located at `src/app/api/[locale]/{domain}/{subdomain}/seeds.ts`
+- Seed files are **optionally** located at `src/{domain}/{subdomain}/seeds.ts`
 - Each file exports `dev`, `test`, and `prod` functions with proper signatures
 - All functions must use `EndpointLogger` only - no other logger types allowed
 - Priority determines execution order (higher numbers run first)
@@ -54,7 +54,7 @@ NextVibe uses an **optional** hierarchical seed system where:
 ### Location Pattern
 
 ```
-src/app/api/[locale]/
+src/
 ├── user/
 │   └── seeds.ts          # User seeds (priority: 100)
 ├── consultation/

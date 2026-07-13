@@ -85,19 +85,29 @@ There is no "API for humans" and "API for AI." There's one contract. Everything 
 
 ## One Folder = One Feature
 
+Domain-driven flat structure. Each feature lives at `src/<domain>/`:
+
 ```
-contact/
-  definition.ts    - The contract (fields, validation, permissions, examples)
-  route.ts         - Wires it to all 13 platforms
-  repository.ts    - Business logic (or inline in route.ts)
-  i18n/            - Translations (en, de, pl - compile-time checked)
-  widget.tsx       - Custom web/native UI
-  widget.cli.tsx   - Custom terminal UI (Ink)
-  email.tsx        - Transactional email template
-  db.ts            - Drizzle schema
+src/
+  contact/
+    definition.ts    - The contract (fields, validation, permissions, examples)
+    route.ts         - Wires it to all 13 platforms
+    repository.ts    - DB operations, no throw, ResponseType<T>
+    i18n/            - Translations (en/, de/, pl/ - compile-time checked)
+    widget.tsx       - One widget, all platforms (web · CLI · MCP · native)
+    email.tsx        - Transactional email template
+    db.ts            - Drizzle schema (co-located)
+  user/
+    definition.ts
+    route.ts
+    private/         - Nested sub-features, same pattern
+    public/
+  _pages/            - UI-only pages (no API contract needed)
+    chat/
+    subscription/
 ```
 
-`definition.ts` and `route.ts` are required. `widget.tsx` is optional but you'll want it for any non-trivial endpoint - it's how users actually experience the feature. Everything else is added when needed. Add a field to the definition - web form, CLI flags, AI tool schema, and mobile screen all update. Delete the folder - gone from every platform. No orphans. No cleanup.
+`definition.ts` and `route.ts` are required. `widget.tsx` handles all platforms in one file - web renders shadcn components, CLI/MCP renders Ink - same props, same types. Everything else is added when needed. Add a field to the definition - web form, CLI flags, AI tool schema, and mobile screen all update. Delete the folder - gone from every platform. No orphans. No cleanup.
 
 > [Definition](docs/patterns/definition.md) · [Route](docs/patterns/route.md) · [Repository](docs/patterns/repository.md) · [Widget](docs/patterns/widget.md) · [All patterns](docs/README.md)
 
@@ -242,7 +252,7 @@ Graph builder canvas is live in admin. Backtest replays any strategy over histor
 - **Schemas flow end-to-end.** One Zod schema validates the API, types the hooks, generates CLI flags, constrains the AI tool schema. Zero drift.
 - **`vibe check` runs everything.** Oxlint + ESLint + TypeScript in parallel. One command. No shortcuts.
 
-**430+ endpoints. 2,100,000+ lines. Zero `any`. Zero `unknown` casts. Zero runtime type errors.**
+**616+ endpoints. 557+ definitions. Zero `any`. Zero `unknown` casts. Zero runtime type errors.**
 
 `@next-vibe/checker` ships as a standalone npm package for any TypeScript project.
 
@@ -262,9 +272,9 @@ Free speech AI. 100+ models. Users choose their own content filtering level.
 
 | Metric                           | Value          |
 | -------------------------------- | -------------- |
-| TypeScript files                 | 7,000+         |
+| TypeScript files                 | 8,300+         |
 | Lines of code                    | 2,100,000+     |
-| Endpoint definitions             | 430+           |
+| Endpoint definitions             | 616+           |
 | Platforms per endpoint           | Up to 13       |
 | Database tables                  | 28+            |
 | Languages (compile-time checked) | 3 (en, de, pl) |

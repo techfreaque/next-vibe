@@ -104,6 +104,7 @@ function runCommandCapture(
 }
 
 const ROUTE_PATTERN = /(?:^|\/)route\.ts$/;
+const DEFINITION_FILE_PATTERN = /(?:^|\/)definition\.ts$/;
 const I18N_LANG_PATTERN = /\/i18n\/(?:en|de|pl)\/index\.ts$/;
 const I18N_INDEX_PATTERN = /\/i18n\/index\.ts$/;
 // All generator output now lives under the single top-level src/generated/
@@ -149,6 +150,16 @@ const ASSIGN_OPENER_PATTERN =
 // Comment-only line — always safe to stage inside an import group (formatters and
 // code-mods move `// ...` banners around with the imports they annotate).
 const COMMENT_LINE_PATTERN = /^\s*(?:\/\/|\/\*|\*)/;
+
+// path: [...] opener — single-line complete or multi-line opener.
+//   path: ["a", "b"],
+//   path: [
+const DEFINITION_PATH_OPENER_PATTERN = /^\s*path\s*:\s*\[/;
+// Closing bracket of a multi-line path array:  ],  or  ]
+const DEFINITION_PATH_CLOSER_PATTERN = /^\s*\]\s*,?\s*$/;
+// A single path segment string inside the array:  "vibe",  or  "agent",
+// Also matches dynamic param segments like  "[rootFolderId]",
+const DEFINITION_PATH_MEMBER_PATTERN = /^\s*"[^"]*"\s*,?\s*$/;
 // Closer of a multi-line dynamic-import destructure: `} = await import(...)`.
 const DYNAMIC_IMPORT_CLOSE_PATTERN =
   /^[\s})\]]*=\s*(?:await\s+)?import\s*\(\s*["'`][^"'`]*["'`]\s*\)\s*[\w.()]*[;,]?\s*$/;
@@ -359,6 +370,92 @@ function isStrictImportMemberLine(line: string): boolean {
   return false;
 }
 
+/**
+ * Returns true if every changed line in the hunk belongs to a `path: [...]`
+ * field inside a createEndpoint() call in a definition.ts file.
+ *
+ * Handles all real diff shapes:
+ *  1. Single-line ↔ multi-line replacement:
+ *       -  path: ["agent", "chat"],
+ *       +  path: [
+ *       +    "vibe",
+ *       +    "agent",
+ *       +    "chat",
+ *       +  ],
+ *  2. Insertion into existing multi-line array (opener/closer unchanged):
+ *       +    "vibe",
+ *  3. Multi-line ↔ multi-line full replacement.
+ *
+ * + and - lines are evaluated independently (same as allLinesAreImports).
+ * Only called when the file is a definition.ts.
+ */
+function allLinesAreDefinitionPath(changedLines: string[]): boolean {
+  if (changedLines.length === 0) {
+    return false;
+  }
+  const removed = changedLines
+    .filter((l) => l.startsWith("-"))
+    .map((l) => l.slice(1));
+  const added = changedLines
+    .filter((l) => l.startsWith("+"))
+    .map((l) => l.slice(1));
+  return isPathLineGroup(removed) && isPathLineGroup(added);
+}
+
+/**
+ * Evaluate one side (all-removed or all-added) of a path hunk.
+ * Returns true if every non-blank line belongs to a path: [...] expression.
+ */
+function isPathLineGroup(lines: string[]): boolean {
+  if (lines.length === 0) {
+    return true;
+  }
+
+  // Case: pure member insertion/deletion — lines are just path segment strings
+  // with no opener/closer, e.g. `    "vibe",`. This happens when the path array
+  // is already multi-line and only a segment is being added/removed.
+  if (
+    lines.every(
+      (l) => l.trim() === "" || DEFINITION_PATH_MEMBER_PATTERN.test(l),
+    ) &&
+    lines.some((l) => l.trim() !== "")
+  ) {
+    return true;
+  }
+
+  // Case: includes opener (path: [...) and optionally closer and members.
+  // Walk through lines tracking bracket state.
+  let inside = false;
+  let hasOpener = false;
+
+  for (const line of lines) {
+    if (line.trim() === "") {
+      continue;
+    }
+    if (!inside && DEFINITION_PATH_OPENER_PATTERN.test(line)) {
+      hasOpener = true;
+      // Single-line complete form: path: ["a", "b"],  — opener and closer on same line
+      if (/^\s*path\s*:\s*\[.*\]\s*,?\s*$/.test(line)) {
+        // stays closed
+      } else {
+        inside = true;
+      }
+      continue;
+    }
+    if (inside && DEFINITION_PATH_CLOSER_PATTERN.test(line)) {
+      inside = false;
+      continue;
+    }
+    if (inside && DEFINITION_PATH_MEMBER_PATTERN.test(line)) {
+      continue;
+    }
+    // Anything else is not a path line
+    return false;
+  }
+
+  return hasOpener;
+}
+
 function isBoilerplateCandidate(filePath: string): boolean {
   return (
     ROUTE_PATTERN.test(filePath) ||
@@ -531,7 +628,10 @@ function rewriteHunkNewStart(hunkHeader: string, newStart: number): string {
  * Using WC-vs-index (not WC-vs-HEAD) for the patch eliminates line-number mismatches
  * when `git apply --cached` is used — the index IS the base, so hunks apply cleanly.
  */
-function analyzeFileDiff(u0Unstaged: string): {
+function analyzeFileDiff(
+  u0Unstaged: string,
+  opts: { isDefinitionFile?: boolean } = {},
+): {
   importOnly: boolean;
   importHunksPatch: string | null;
 } | null {
@@ -549,29 +649,37 @@ function analyzeFileDiff(u0Unstaged: string): {
     return null;
   }
 
-  // Classify each unstaged hunk: import-only vs mixed
-  const importOnlyStarts = new Set<number>();
-  let hasNonImportHunk = false;
+  // Classify each unstaged hunk: import-only, definition path-only, or mixed
+  const safeHunkStarts = new Set<number>();
+  let hasUnsafeHunk = false;
 
   for (const hunk of u0Parsed.hunks) {
     const start = hunkNewStart(hunk[0] ?? "");
     const changedLines = hunk
       .slice(1)
       .filter((l) => l.startsWith("+") || l.startsWith("-"));
-    if (allLinesAreImports(changedLines) && changedLines.length > 0) {
-      importOnlyStarts.add(start);
+    if (changedLines.length === 0) {
+      continue;
+    }
+    if (allLinesAreImports(changedLines)) {
+      safeHunkStarts.add(start);
+    } else if (
+      opts.isDefinitionFile &&
+      allLinesAreDefinitionPath(changedLines)
+    ) {
+      safeHunkStarts.add(start);
     } else {
-      hasNonImportHunk = true;
+      hasUnsafeHunk = true;
     }
   }
 
-  const importOnly = !hasNonImportHunk && importOnlyStarts.size > 0;
+  const importOnly = !hasUnsafeHunk && safeHunkStarts.size > 0;
 
   if (importOnly) {
     return { importOnly: true, importHunksPatch: null };
   }
 
-  if (importOnlyStarts.size === 0) {
+  if (safeHunkStarts.size === 0) {
     return { importOnly: false, importHunksPatch: null };
   }
 
@@ -588,7 +696,7 @@ function analyzeFileDiff(u0Unstaged: string): {
 
   for (const hunk of u0Parsed.hunks) {
     const start = hunkNewStart(hunk[0] ?? "");
-    if (importOnlyStarts.has(start)) {
+    if (safeHunkStarts.has(start)) {
       const adjustedStart = start - skippedDelta;
       const header = rewriteHunkNewStart(hunk[0] ?? "", adjustedStart);
       adjustedHunks.push([header, ...hunk.slice(1)]);
@@ -1267,7 +1375,9 @@ export class VibeStageRepository {
       const diffMap = await batchUnstagedDiffs(cwd, allFiles);
       const diffAnalyses = allFiles.map((f) => ({
         file: f,
-        analysis: analyzeFileDiff(diffMap.get(f) ?? ""),
+        analysis: analyzeFileDiff(diffMap.get(f) ?? "", {
+          isDefinitionFile: DEFINITION_FILE_PATTERN.test(f),
+        }),
       }));
 
       // Separate into: boilerplate candidates, import-only full files, partial import files
