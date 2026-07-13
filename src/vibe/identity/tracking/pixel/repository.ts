@@ -10,7 +10,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type { NextRequest } from "next-vibe/ui/lib/request";
 import { z } from "zod";
 
-import { LeadTrackingRepository } from "@/app/api/[locale]/leads/tracking/repository";
+import { LeadTrackingRepository } from "@/leads/tracking/repository";
 
 /**
  * Repository for handling tracking pixel requests

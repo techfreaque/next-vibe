@@ -10,7 +10,7 @@ import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPag
 import type { JSX } from "react";
 import { useMemo } from "react";
 
-import creditsHistoryDefinition from "@/app/api/[locale]/credits/history/definition";
+import creditsHistoryDefinition from "@/credits/history/definition";
 
 interface Props {
   locale: CountryLanguage;

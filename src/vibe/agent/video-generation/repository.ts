@@ -5,6 +5,13 @@
 
 import "server-only";
 
+import { createFixtureFetch } from "next-vibe/agent/ai-stream/testing/fetch-cache";
+import { getStorageAdapter } from "next-vibe/agent/chat/storage/index";
+import {
+  mimeFromUrl,
+  parseStorageUrl,
+} from "next-vibe/agent/chat/storage/url-utils";
+import { ApiProvider } from "next-vibe/agent/models/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -16,14 +23,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { createFixtureFetch } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
-import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage/index";
-import {
-  mimeFromUrl,
-  parseStorageUrl,
-} from "@/app/api/[locale]/agent/chat/storage/url-utils";
-import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
-import { STANDARD_MARKUP_PERCENTAGE } from "@/app/api/[locale]/products/constants";
+import { STANDARD_MARKUP_PERCENTAGE } from "@/products/constants";
 
 import { DefaultFolderId, type ToolExecutionContext } from "../chat/config";
 import {
@@ -426,8 +426,8 @@ export class VideoGenerationRepository {
         .replace(/^-|-$/g, "")
         .slice(0, 60)}-${toolMessageId}`;
       void Promise.all([
-        import("@/app/api/[locale]/agent/cortex/mounts/gens"),
-        import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual"),
+        import("next-vibe/agent/cortex/mounts/gens"),
+        import("next-vibe/agent/cortex/embeddings/sync-virtual"),
       ])
         .then(([{ readGenPath }, { syncVirtualNodeToEmbedding }]) => {
           const path = `/gens/video/${month}/${slug}.md`;
@@ -467,9 +467,9 @@ export class VideoGenerationRepository {
     let sel: VideoGenModelSelection | undefined;
     if (userId) {
       const { resolveSkillFavoriteContext } =
-        await import("@/app/api/[locale]/agent/skills/resolver");
+        await import("next-vibe/agent/skills/resolver");
       const { ModalityResolver } =
-        await import("@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver");
+        await import("next-vibe/agent/ai-stream/repository/core/modality-resolver");
       const { favorite, skill } = await resolveSkillFavoriteContext({
         favoriteId: ctx.streamContext.favoriteId ?? null,
         skillId: ctx.streamContext.skillId ?? null,

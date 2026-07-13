@@ -6,6 +6,16 @@
  */
 
 "use client";
+import { LocaleSelectorContent } from "next-vibe/agent/ai-stream/stream/widget/chat-ui/top-area/locale-selector-content";
+import {
+  getDefaultToolIdsForUser,
+  getDefaultWebPinnedIdsForUser,
+} from "next-vibe/agent/chat/constants";
+import type { EnabledTool } from "next-vibe/agent/chat/hooks/store";
+import settingsDefinition from "next-vibe/agent/chat/settings/definition";
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
+import favoriteByIdDefinition from "next-vibe/agent/skills/favorites/[id]/definition";
+import favoritesListDefinition from "next-vibe/agent/skills/favorites/definition";
 import { endpointToUrlSegment } from "next-vibe/core/core-utils/path";
 import type { NavigationStackEntry } from "next-vibe/core/definition/endpoint";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
@@ -20,6 +30,7 @@ import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { useUrlNavStack } from "next-vibe/platforms/react/hooks/use-url-nav-stack";
 import { resolveEndpoint } from "next-vibe/platforms/react/utils/resolve-endpoint";
 import { VibeFrameHost } from "next-vibe/platforms/vibe-frame/VibeFrameHost";
+import remoteConnectionListDefinition from "next-vibe/remote-connection/list/definition";
 import {
   useSearchParams,
   useSilentHistory,
@@ -113,25 +124,14 @@ import {
   useState,
 } from "react";
 
-import { Logo } from "@/app/[locale]/_components/logo";
-import { ThemeToggleDropdown } from "@/app/[locale]/_components/theme-toggle";
-import { LocaleSelectorContent } from "@/app/api/[locale]/agent/ai-stream/stream/widget/chat-ui/top-area/locale-selector-content";
-import {
-  getDefaultToolIdsForUser,
-  getDefaultWebPinnedIdsForUser,
-} from "@/app/api/[locale]/agent/chat/constants";
-import type { EnabledTool } from "@/app/api/[locale]/agent/chat/hooks/store";
-import settingsDefinition from "@/app/api/[locale]/agent/chat/settings/definition";
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import favoriteByIdDefinition from "@/app/api/[locale]/agent/skills/favorites/[id]/definition";
-import favoritesListDefinition from "@/app/api/[locale]/agent/skills/favorites/definition";
-import remoteConnectionListDefinition from "@/app/api/[locale]/remote-connection/list/definition";
+import { useLogger } from "@/_old/hooks/use-logger";
+import { Logo } from "@/_pages/_components/logo";
+import { ThemeToggleDropdown } from "@/_pages/_components/theme-toggle";
 import {
   ADMIN_GROUPS,
   CATEGORY_REGISTRY,
   GROUP_LABELS,
 } from "@/generated/categories/registry";
-import { useLogger } from "@/hooks/use-logger";
 
 import type { CategoryDefinitionSerialized } from "./category-types";
 import type definition from "./definition";

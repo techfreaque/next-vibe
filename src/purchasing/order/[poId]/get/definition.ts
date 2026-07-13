@@ -80,8 +80,7 @@ const { GET } = createEndpoint({
         description: "orderGet.get.poId.description" as const,
         schema: z.uuid(),
         listEndpoint: async () =>
-          (await import("@/app/api/[locale]/purchasing/order/list/definition"))
-            .default.GET,
+          (await import("@/purchasing/order/list/definition")).default.GET,
         labelField: "poNumber",
       }),
 

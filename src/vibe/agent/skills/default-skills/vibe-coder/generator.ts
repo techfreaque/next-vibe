@@ -37,7 +37,7 @@ export async function generate(
   ctx: GeneratorContext,
 ): Promise<GeneratorResult> {
   const { PROJECT_INSTRUCTIONS } =
-    await import("@/app/api/[locale]/agent/skills/default-skills/vibe-coder/skill");
+    await import("next-vibe/agent/skills/default-skills/vibe-coder/skill");
 
   const projectRoot = process.cwd();
   let filesWritten = 0;

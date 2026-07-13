@@ -14,7 +14,7 @@ import { storage } from "next-vibe/ui/lib/storage";
 import { useEffect } from "react";
 import { create } from "zustand";
 
-import { useLogger } from "@/hooks/use-logger";
+import { useLogger } from "@/_old/hooks/use-logger";
 
 const STORAGE_KEY = "sidebar-collapsed";
 const MOBILE_BREAKPOINT = 930; // px

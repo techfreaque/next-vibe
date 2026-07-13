@@ -3,6 +3,10 @@
  * Handles upvoting and downvoting messages
  */
 
+import {
+  DefaultFolderId,
+  rootFolderIdOptions,
+} from "next-vibe/agent/chat/config";
 import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
@@ -19,11 +23,6 @@ import {
   responseField,
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
-
-import {
-  DefaultFolderId,
-  rootFolderIdOptions,
-} from "@/app/api/[locale]/agent/chat/config";
 
 import { scopedTranslation } from "./i18n";
 

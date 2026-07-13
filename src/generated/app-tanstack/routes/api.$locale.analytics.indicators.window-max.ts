@@ -8,7 +8,7 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/analytics/indicators/window-max/route"),
+      () => import("@/analytics/indicators/window-max/route"),
     ),
   },
 });

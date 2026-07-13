@@ -11,7 +11,7 @@ import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { env } from "@/config/env";
+import { env } from "@/_old/config/env";
 
 import type { UserCreateRequestOutput } from "./create/definition";
 import { scopedTranslation as createScopedTranslation } from "./create/i18n";

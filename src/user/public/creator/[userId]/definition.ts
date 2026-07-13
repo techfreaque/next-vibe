@@ -21,12 +21,12 @@ import {
 } from "next-vibe/core/definition/enums";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import {
   SkillCategoryDB,
   SkillOwnershipTypeDB,
   SkillTrustLevelDB,
-} from "@/app/api/[locale]/agent/skills/enum";
+} from "next-vibe/agent/skills/enum";
 import { iconSchema } from "next-vibe/core/definition/common.schema";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { scopedTranslation } from "./i18n";

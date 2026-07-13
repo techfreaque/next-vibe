@@ -7,6 +7,12 @@
 import "server-only";
 
 import { jsonSchema, type JSONSchema7, tool } from "ai";
+import { claimExecuteToolCallId } from "next-vibe/agent/ai-stream/repository/core/stream";
+import {
+  FOLDER_ALLOWS_REMOTE_TOOLS,
+  FOLDER_BLOCKED_CALLBACK_MODES,
+  type ToolExecutionContext,
+} from "next-vibe/agent/chat/config";
 import {
   endpointToToolName,
   getPreferredToolName,
@@ -31,12 +37,6 @@ import {
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
 
-import { claimExecuteToolCallId } from "@/app/api/[locale]/agent/ai-stream/repository/core/stream";
-import {
-  FOLDER_ALLOWS_REMOTE_TOOLS,
-  FOLDER_BLOCKED_CALLBACK_MODES,
-  type ToolExecutionContext,
-} from "@/app/api/[locale]/agent/chat/config";
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 /**
@@ -771,7 +771,7 @@ export async function loadTools(params: {
       }
 
       const { RemoteConnectionRepository } =
-        await import("@/app/api/[locale]/remote-connection/repository");
+        await import("next-vibe/remote-connection/repository");
 
       for (const [instanceId, names] of byInstance) {
         const capabilities = await RemoteConnectionRepository.getCapabilities(

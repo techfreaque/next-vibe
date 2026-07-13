@@ -21,7 +21,7 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import creditsDefinition from "@/app/api/[locale]/credits/definition";
+import creditsDefinition from "@/credits/definition";
 
 import { buildUserWsChannel } from "./channel";
 import { createEndpointEmitter } from "./emitter";

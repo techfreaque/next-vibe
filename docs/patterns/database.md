@@ -301,7 +301,7 @@ metadata: jsonb("metadata").$type<ThreadMetadata>().default({});
 
 ```typescript
 // enum.ts
-import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
+import { createEnumOptions } from "@/system/unified-interface/shared/field/enum";
 import { scopedTranslation } from "./i18n";
 
 /**
@@ -430,7 +430,7 @@ Use `db.select().from()` - **NOT** `db.query`:
 
 ```typescript
 // repository.ts
-import { db } from "@/app/api/[locale]/system/db";
+import { db } from "@/system/db";
 import { leads } from "./db";
 import { and, desc, eq, gte, lte } from "drizzle-orm";
 
@@ -460,7 +460,7 @@ const results = await query;
 ### Insert Operations
 
 ```typescript
-import { db } from "@/app/api/[locale]/system/db";
+import { db } from "@/system/db";
 import { leads } from "./db";
 
 // Single insert

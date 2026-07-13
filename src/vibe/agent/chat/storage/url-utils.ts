@@ -1,7 +1,7 @@
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
-import { envClient } from "@/config/env-client";
+import { envClient } from "@/_old/config/env-client";
 
 /**
  * Converts a relative storage URL to an absolute URL by prepending NEXT_PUBLIC_APP_URL.

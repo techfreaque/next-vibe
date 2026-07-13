@@ -19,7 +19,7 @@ import { leads } from "next-vibe/identity/lead/db";
 import { LeadStatus } from "next-vibe/identity/lead/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { campaignSchedulerService } from "@/app/api/[locale]/leads/campaigns/emails/services/scheduler";
+import { campaignSchedulerService } from "@/leads/campaigns/emails/services/scheduler";
 
 import { newsletterSubscriptions } from "../../db";
 import { NewsletterSubscriptionStatus } from "../../enum";

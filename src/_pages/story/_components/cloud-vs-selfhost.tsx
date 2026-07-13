@@ -14,8 +14,8 @@ import { H2, H3, P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 import { useInView } from "react-intersection-observer";
 
-import { FREE_CREDIT_POOL } from "@/app/api/[locale]/credits/constants";
-import { configScopedTranslation } from "@/config/i18n";
+import { configScopedTranslation } from "@/_old/config/i18n";
+import { FREE_CREDIT_POOL } from "@/credits/constants";
 
 import { scopedTranslation } from "./i18n";
 

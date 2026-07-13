@@ -97,7 +97,7 @@ class EnvGeneratorRepository {
     {
       logger.debug(`Starting env generation: ${data.outputDir}`);
 
-      const apiDir = `${process.cwd()}/src/app/api/[locale]`;
+      const apiDir = `${process.cwd()}/src`;
       const configDir = `${process.cwd()}/src/config`;
 
       const excludeDirs = [

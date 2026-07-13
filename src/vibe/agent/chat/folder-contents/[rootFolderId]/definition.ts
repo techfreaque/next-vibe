@@ -23,6 +23,7 @@ import {
 } from "next-vibe/identity/roles/enum";
 import { apiClient } from "next-vibe/platforms/react/hooks/store";
 import type { EmitEventNamed } from "next-vibe/realtime/structured-events";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import {
   backButton,
   customWidgetObject,
@@ -34,8 +35,6 @@ import {
   responseField,
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
-
-import { lazyWidget } from "@/app/api/[locale]/system/unified-ui/_shared/lazy-widget";
 
 import { DefaultFolderId } from "../../config";
 import {
@@ -481,7 +480,7 @@ const { GET } = createEndpoint({
           return;
         }
         const { updateIncognitoThread } =
-          await import("@/app/api/[locale]/agent/chat/incognito/storage");
+          await import("next-vibe/agent/chat/incognito/storage");
         for (const item of ctx.responseData.items ?? []) {
           if (item?.id) {
             await updateIncognitoThread(item.id, {
@@ -510,7 +509,7 @@ const { GET } = createEndpoint({
           return;
         }
         const { updateIncognitoThread } =
-          await import("@/app/api/[locale]/agent/chat/incognito/storage");
+          await import("next-vibe/agent/chat/incognito/storage");
         for (const item of ctx.responseData.items ?? []) {
           if (item?.id) {
             await updateIncognitoThread(item.id, {
@@ -538,7 +537,7 @@ const { GET } = createEndpoint({
           return;
         }
         const { updateIncognitoThread } =
-          await import("@/app/api/[locale]/agent/chat/incognito/storage");
+          await import("next-vibe/agent/chat/incognito/storage");
         for (const item of ctx.responseData.items ?? []) {
           if (item?.id) {
             await updateIncognitoThread(item.id, {
@@ -616,7 +615,7 @@ const { GET } = createEndpoint({
           return;
         }
         const { updateIncognitoThread } =
-          await import("@/app/api/[locale]/agent/chat/incognito/storage");
+          await import("next-vibe/agent/chat/incognito/storage");
         for (const item of ctx.responseData.items ?? []) {
           if (item?.id) {
             await updateIncognitoThread(item.id, {
@@ -637,7 +636,7 @@ const { GET } = createEndpoint({
           return;
         }
         const { deleteThread } =
-          await import("@/app/api/[locale]/agent/chat/incognito/storage");
+          await import("next-vibe/agent/chat/incognito/storage");
         for (const item of ctx.responseData.items ?? []) {
           if (item?.id) {
             await deleteThread(item.id);
@@ -827,7 +826,7 @@ const { GET } = createEndpoint({
           return;
         }
         const { updateIncognitoFolder } =
-          await import("@/app/api/[locale]/agent/chat/incognito/storage");
+          await import("next-vibe/agent/chat/incognito/storage");
         for (const item of ctx.responseData.items ?? []) {
           if (item?.id) {
             await updateIncognitoFolder(item.id, {
@@ -850,7 +849,7 @@ const { GET } = createEndpoint({
           return;
         }
         const { deleteFolder } =
-          await import("@/app/api/[locale]/agent/chat/incognito/storage");
+          await import("next-vibe/agent/chat/incognito/storage");
         for (const item of ctx.responseData.items ?? []) {
           if (item?.id) {
             await deleteFolder(item.id);

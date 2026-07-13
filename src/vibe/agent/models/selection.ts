@@ -1,13 +1,11 @@
-import { z } from "zod";
-
-import type { chatModelSelectionSchema } from "@/app/api/[locale]/agent/ai-stream/models";
+import type { chatModelSelectionSchema } from "next-vibe/agent/ai-stream/models";
 import type {
   audioVisionModelSelectionSchema,
   imageVisionModelSelectionSchema,
   videoVisionModelSelectionSchema,
-} from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import type { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
-import type { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
+} from "next-vibe/agent/ai-stream/vision-models";
+import type { imageGenModelSelectionSchema } from "next-vibe/agent/image-generation/models";
+import type { musicGenModelSelectionSchema } from "next-vibe/agent/music-generation/models";
 import {
   ContentLevel,
   IntelligenceLevel,
@@ -15,10 +13,11 @@ import {
   ModelSortDirection,
   ModelSortField,
   PriceLevel,
-} from "@/app/api/[locale]/agent/skills/enum";
-import type { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
-import type { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
-import type { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
+} from "next-vibe/agent/skills/enum";
+import type { sttModelSelectionSchema } from "next-vibe/agent/speech-to-text/models";
+import type { voiceModelSelectionSchema } from "next-vibe/agent/text-to-speech/models";
+import type { videoGenModelSelectionSchema } from "next-vibe/agent/video-generation/models";
+import { z } from "zod";
 
 export const sharedFilterPropsSchema = z.object({
   intelligenceRange: z

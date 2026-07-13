@@ -6,7 +6,7 @@ import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 export const Route = createFileRoute("/api/$locale/desktop/move-mouse")({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/desktop/move-mouse/route"),
+      () => import("@/desktop/move-mouse/route"),
     ),
   },
 });

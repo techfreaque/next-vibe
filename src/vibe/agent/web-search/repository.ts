@@ -6,6 +6,7 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
+import { chatSettings } from "next-vibe/agent/chat/settings/db";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -16,8 +17,6 @@ import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { chatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
 
 import type { ToolExecutionContext } from "../chat/config";
 import type { WebSearchGetRequestOutput } from "./definition";

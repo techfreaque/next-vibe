@@ -184,17 +184,17 @@ cd src/app/api/[locale]/hello/world
 ```typescript
 // src/app/api/[locale]/hello/world/definition.ts
 import { z } from "zod";
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import { createEndpoint } from "@/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
   requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+} from "@/system/unified-interface/shared/field/utils-new";
 import {
   Methods,
   WidgetType,
   FieldDataType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+} from "@/system/unified-interface/shared/types/enums";
 
 import { scopedTranslation } from "./i18n";
 
@@ -236,8 +236,8 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { success } from "next-vibe/shared/types/response.schema";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { EndpointLogger } from "@/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 export class HelloRepository {
@@ -263,8 +263,8 @@ export class HelloRepository {
 
 ```typescript
 // src/app/api/[locale]/hello/world/route.ts
-import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
-import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { endpointsHandler } from "@/system/unified-interface/shared/endpoints/route/multi";
+import { Methods } from "@/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
 import { HelloRepository } from "./repository";

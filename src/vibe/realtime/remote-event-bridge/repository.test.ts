@@ -31,7 +31,7 @@ vi.mock("./registry", () => ({
   registerRemoteEventHandlers: (): void => undefined,
 }));
 
-vi.mock("@/app/api/[locale]/remote-connection/repository", () => ({
+vi.mock("next-vibe/remote-connection/repository", () => ({
   RemoteConnectionRepository: {
     getLocalInstanceId: (...args: unknown[]): Promise<string> =>
       getLocalInstanceId(...(args as [])),

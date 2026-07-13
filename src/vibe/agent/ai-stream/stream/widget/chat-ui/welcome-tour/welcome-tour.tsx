@@ -1,5 +1,10 @@
 "use client";
 
+import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import { NEW_MESSAGE_ID } from "next-vibe/agent/chat/enum";
+import { useChatNavigationStore } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
+import { scopedTranslation } from "next-vibe/agent/chat/threads/widget/i18n";
+import { useTourState } from "next-vibe/agent/chat/tour-state";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { useSilentHistory } from "next-vibe/ui/hooks/use-navigation";
 import { useWindowSize } from "next-vibe/ui/hooks/use-window-size";
@@ -10,12 +15,7 @@ import { ACTIONS, EVENTS, Joyride, STATUS } from "next-vibe/ui/ui/joyride";
 import { H3, P } from "next-vibe/ui/ui/typography";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
-import { buildFolderUrl } from "@/app/[locale]/chat/lib/utils/navigation";
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
-import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
-import { scopedTranslation } from "@/app/api/[locale]/agent/chat/threads/widget/i18n";
-import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
+import { buildFolderUrl } from "@/_pages/chat/lib/utils/navigation";
 
 import { useSidebarCollapsed } from "../sidebar/use-sidebar-collapsed";
 import { useSidebarFooterStore } from "./sidebar-footer-store";

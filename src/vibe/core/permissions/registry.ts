@@ -24,8 +24,8 @@ import {
 } from "next-vibe/identity/roles/enum";
 import { scopedTranslation as userRolesScopedTranslation } from "next-vibe/identity/roles/i18n";
 
-import { scopedTranslation } from "@/app/[locale]/shared/i18n";
-import { envClient } from "@/config/env-client";
+import { envClient } from "@/_old/config/env-client";
+import { scopedTranslation } from "@/_pages/shared/i18n";
 
 /**
  * Platform access check result

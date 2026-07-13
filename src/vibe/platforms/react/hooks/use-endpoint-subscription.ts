@@ -20,6 +20,7 @@
  * Both carry only THIS endpoint instance's events — no cross-endpoint filtering.
  */
 
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -32,8 +33,6 @@ import type { AnyEndpointEventEnvelope } from "next-vibe/realtime/structured-eve
 import { eventDeclarationHasFields } from "next-vibe/realtime/structured-events";
 import type { WsChannelDescriptor } from "next-vibe/realtime/types";
 import { useEffect, useRef } from "react";
-
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 
 import {
   appendDeltaToCache,

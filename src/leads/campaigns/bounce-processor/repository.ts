@@ -25,12 +25,12 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { cronTasks, type NewCronTask } from "next-vibe/tasks/cron/db";
 import { CronTaskPriority, TaskCategory } from "next-vibe/tasks/enum";
 
-import { messengerAccounts as imapAccounts } from "@/app/api/[locale]/messenger/accounts/db";
+import { messengerAccounts as imapAccounts } from "@/messenger/accounts/db";
 import {
   emails,
   messengerFolders as imapFolders,
-} from "@/app/api/[locale]/messenger/messages/db";
-import { SpecialFolderType as ImapSpecialUseType } from "@/app/api/[locale]/messenger/messages/enum";
+} from "@/messenger/messages/db";
+import { SpecialFolderType as ImapSpecialUseType } from "@/messenger/messages/enum";
 
 import { campaignSchedulerService } from "../emails/services/scheduler";
 import { BOUNCE_PROCESSOR_ALIAS } from "./constants";

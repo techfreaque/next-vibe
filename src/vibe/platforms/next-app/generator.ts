@@ -17,8 +17,16 @@ import type {
 } from "next-vibe/tooling/generators/shared/shared-inputs";
 
 const PROJECT_ROOT = process.cwd();
-const UI_DIR = join(PROJECT_ROOT, "src", "app", "[locale]");
-const API_DIR = join(PROJECT_ROOT, "src", "app", "api", "[locale]");
+const UI_DIR = join(PROJECT_ROOT, "src", "_pages");
+const API_DIR = join(PROJECT_ROOT, "src");
+// Directories inside src/ that contain framework/system code — not user API routes.
+// These are excluded from the generated app/api/[locale] shell generation.
+const API_EXCLUDE_DIRS = new Set([
+  join(PROJECT_ROOT, "src", "vibe"),
+  join(PROJECT_ROOT, "src", "_pages"),
+  join(PROJECT_ROOT, "src", "_old"),
+  join(PROJECT_ROOT, "src", "generated"),
+]);
 const OUT_ROOT = join(PROJECT_ROOT, "src", "generated", "app");
 const OUT_UI = join(OUT_ROOT, "[locale]");
 const OUT_API = join(OUT_ROOT, "api", "[locale]");
@@ -30,17 +38,26 @@ function sourceAlias(absSrc: string): string {
   return `@/${rel}`;
 }
 
-function findFiles(dir: string, target: string, out: string[] = []): string[] {
+function findFiles(
+  dir: string,
+  target: string,
+  out: string[] = [],
+  excludeDirs?: Set<string>,
+): string[] {
   if (!existsSync(dir)) {
     return out;
   }
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const full = join(dir, entry.name);
     if (entry.isDirectory()) {
-      if (entry.name === "node_modules" || entry.name.startsWith(".")) {
+      if (
+        entry.name === "node_modules" ||
+        entry.name.startsWith(".") ||
+        excludeDirs?.has(full)
+      ) {
         continue;
       }
-      findFiles(full, target, out);
+      findFiles(full, target, out, excludeDirs);
     } else if (entry.name === target) {
       out.push(full);
     }
@@ -146,7 +163,7 @@ export async function generate(
     errors,
   );
   emit(
-    findFiles(API_DIR, "route.ts"),
+    findFiles(API_DIR, "route.ts", [], API_EXCLUDE_DIRS),
     API_DIR,
     OUT_API,
     "route",

@@ -168,7 +168,7 @@ const { POST } = createEndpoint({
         watch: false,
       },
       watch: {
-        path: "src/app/api/[locale]/system/tooling/check",
+        path: "src/vibe/tooling/check",
         verbose: true,
         watch: true,
       },

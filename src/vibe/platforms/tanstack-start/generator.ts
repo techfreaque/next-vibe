@@ -1,5 +1,5 @@
 // Flat TanStack Start route generator.
-// Scans src/app/[locale] (pages/layouts) and src/app/api/[locale] (route.ts) and
+// Scans src/app/[locale] (pages/layouts) and src (route.ts) and
 // emits dot-separated flat files into src/generated/app-tanstack/routes/.
 // Flat convention: page.tsx → $locale.path.index.tsx, layout.tsx → $locale.path.tsx,
 // route.ts → api.$locale.path.ts
@@ -49,7 +49,7 @@ function uiDir(): string {
   return join(projectRoot(), "src/app/[locale]");
 }
 function apiDir(): string {
-  return join(projectRoot(), "src/app/api/[locale]");
+  return join(projectRoot(), "src");
 }
 function routesDir(): string {
   return join(projectRoot(), "src/generated/app-tanstack/routes");

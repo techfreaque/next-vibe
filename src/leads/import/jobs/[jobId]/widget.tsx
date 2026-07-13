@@ -30,7 +30,7 @@ import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/wid
 import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
 import React, { useCallback } from "react";
 
-import { CsvImportJobStatus } from "@/app/api/[locale]/leads/import/enum";
+import { CsvImportJobStatus } from "@/leads/import/enum";
 
 import type definition from "./definition";
 import type retryDefinition from "./retry/definition";
@@ -137,7 +137,7 @@ export function ImportJobStatusContainer(_props: {
 
   const handleViewLeads = useCallback((): void => {
     void (async (): Promise<void> => {
-      const def = await import("@/app/api/[locale]/leads/list/definition");
+      const def = await import("@/leads/list/definition");
       navigate(def.default.GET);
     })();
   }, [navigate]);
@@ -343,7 +343,7 @@ export function ImportJobRetryContainer(_props: {
 
   const handleViewLeads = useCallback((): void => {
     void (async (): Promise<void> => {
-      const def = await import("@/app/api/[locale]/leads/list/definition");
+      const def = await import("@/leads/list/definition");
       navigate(def.default.GET);
     })();
   }, [navigate]);
@@ -422,14 +422,14 @@ export function ImportJobStopContainer(_props: {
 
   const handleViewLeads = useCallback((): void => {
     void (async (): Promise<void> => {
-      const def = await import("@/app/api/[locale]/leads/list/definition");
+      const def = await import("@/leads/list/definition");
       navigate(def.default.GET);
     })();
   }, [navigate]);
 
   const handleStartNewImport = useCallback((): void => {
     void (async (): Promise<void> => {
-      const def = await import("@/app/api/[locale]/leads/import/definition");
+      const def = await import("@/leads/import/definition");
       navigate(def.default.POST);
     })();
   }, [navigate]);

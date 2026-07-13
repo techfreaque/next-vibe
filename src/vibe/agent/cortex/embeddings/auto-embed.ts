@@ -8,15 +8,14 @@ import "server-only";
  * Optionally deducts credits for user-triggered operations.
  */
 import { eq } from "drizzle-orm";
+import {
+  rootlessStreamContext,
+  type ToolExecutionContext,
+} from "next-vibe/agent/chat/config";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import {
-  rootlessStreamContext,
-  type ToolExecutionContext,
-} from "@/app/api/[locale]/agent/chat/config";
 
 import { cortexNodes } from "../db";
 import type { CortexCreditFeatureValue } from "../enum";
@@ -155,13 +154,12 @@ async function embedNode(
  */
 async function deductEmbeddingCredits(options: EmbedOptions): Promise<void> {
   try {
-    const { CreditRepository } =
-      await import("@/app/api/[locale]/credits/repository");
+    const { CreditRepository } = await import("@/credits/repository");
     const { scopedTranslation: creditsScopedTranslation } =
-      await import("@/app/api/[locale]/credits/i18n");
+      await import("@/credits/i18n");
     const { t: tCredits } = creditsScopedTranslation.scopedT(options.locale!);
     const { scopedTranslation: cortexScopedTranslation } =
-      await import("@/app/api/[locale]/agent/cortex/i18n");
+      await import("next-vibe/agent/cortex/i18n");
     const { t: tCortex } = cortexScopedTranslation.scopedT(options.locale!);
     const featureKey = options.feature ?? CortexCreditFeature.EMBEDDING;
 

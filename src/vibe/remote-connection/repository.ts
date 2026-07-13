@@ -21,8 +21,8 @@ import {
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { env } from "@/config/env";
-import { envClient } from "@/config/env-client";
+import { env } from "@/_old/config/env";
+import { envClient } from "@/_old/config/env-client";
 
 import type {
   ConnectionHealth,

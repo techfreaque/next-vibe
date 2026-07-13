@@ -18,7 +18,7 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 
-import { InvoiceStatus } from "@/app/api/[locale]/payment/enum";
+import { InvoiceStatus } from "@/payment/enum";
 
 import type definition from "./definition";
 
@@ -42,8 +42,8 @@ export function InvoiceListWidget(_props: {
     e.stopPropagation();
     void (async (): Promise<void> => {
       const [createDef, getDef] = await Promise.all([
-        import("@/app/api/[locale]/payment/invoice/create/definition"),
-        import("@/app/api/[locale]/payment/invoice/[invoiceId]/get/definition"),
+        import("@/payment/invoice/create/definition"),
+        import("@/payment/invoice/[invoiceId]/get/definition"),
       ]);
       navigate(createDef.default.POST, {
         renderInModal: true,
@@ -71,7 +71,7 @@ export function InvoiceListWidget(_props: {
       }
       void (async (): Promise<void> => {
         const def =
-          await import("@/app/api/[locale]/payment/invoice/[invoiceId]/get/definition");
+          await import("@/payment/invoice/[invoiceId]/get/definition");
         navigate(def.default.GET, { urlPathParams: { invoiceId } });
       })();
     };

@@ -7,10 +7,10 @@
 import { EmailCampaignStage } from "next-vibe/identity/lead/enum";
 import React from "react";
 
-import { CampaignEmailLayout } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/campaign_email_layout.email";
-import { HumanCTAButton } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/human_cta_button.email";
-import { HumanText } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/human_text.email";
-import { configScopedTranslation } from "@/config/i18n";
+import { configScopedTranslation } from "@/_old/config/i18n";
+import { CampaignEmailLayout } from "@/messenger/providers/email/smtp-client/components/campaign_email_layout.email";
+import { HumanCTAButton } from "@/messenger/providers/email/smtp-client/components/human_cta_button.email";
+import { HumanText } from "@/messenger/providers/email/smtp-client/components/human_text.email";
 
 import type {
   EmailRenderContext,

@@ -18,7 +18,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { companies } from "@/app/api/[locale]/companies/db";
+import { companies } from "@/companies/db";
 
 import { paymentInvoiceLines, paymentInvoices } from "../../../db";
 import { verifyInvoiceViewToken } from "../../token";

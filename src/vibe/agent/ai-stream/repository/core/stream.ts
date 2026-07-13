@@ -14,7 +14,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { cronTasks } from "next-vibe/tasks/cron/db";
 import { CronTaskStatus } from "next-vibe/tasks/enum";
 
-import type { CreditsT as ModuleT } from "@/app/api/[locale]/credits/i18n";
+import type { CreditsT as ModuleT } from "@/credits/i18n";
 
 import { bubbleFolderActivity } from "../../../chat/bubble-folder-activity";
 import type { ToolExecutionContext } from "../../../chat/config";

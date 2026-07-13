@@ -9,9 +9,8 @@
 
 import "server-only";
 
+import { DefaultFolderId } from "next-vibe/agent/chat/config";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 
 export interface ModeConfig {
   /** Human-readable label used in describe() title */

@@ -17,6 +17,7 @@ import {
   type SQL,
   sql,
 } from "drizzle-orm";
+import { chatThreads } from "next-vibe/agent/chat/db";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -30,20 +31,11 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
-import {
-  creditPacks,
-  creditTransactions,
-  creditWallets,
-} from "@/app/api/[locale]/credits/db";
-import {
-  leadReferrals,
-  referralCodes,
-  userReferrals,
-} from "@/app/api/[locale]/referral/db";
-import { subscriptions } from "@/app/api/[locale]/subscription/db";
-import type { SubscriptionStatusDB } from "@/app/api/[locale]/subscription/enum";
-import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
+import { creditPacks, creditTransactions, creditWallets } from "@/credits/db";
+import { leadReferrals, referralCodes, userReferrals } from "@/referral/db";
+import { subscriptions } from "@/subscription/db";
+import type { SubscriptionStatusDB } from "@/subscription/enum";
+import { SubscriptionStatus } from "@/subscription/enum";
 
 import {
   CreditActivityFilter,

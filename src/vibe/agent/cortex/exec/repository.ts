@@ -10,6 +10,7 @@ import { spawn } from "node:child_process";
 import { randomUUID } from "node:crypto";
 
 import { and, eq, or } from "drizzle-orm";
+import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -22,16 +23,14 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
-
 import {
   getConnectionCredentials,
   openSshClient,
   openSshPty,
   saveFingerprint,
-} from "../../../ssh/client";
-import { sshConnectionMounts, sshConnections } from "../../../ssh/db";
-import { ExecBackend, SshAuthType, SshSessionStatus } from "../../../ssh/enum";
+} from "@/ssh/client";
+import { sshConnectionMounts, sshConnections } from "@/ssh/db";
+import { ExecBackend, SshAuthType, SshSessionStatus } from "@/ssh/enum";
 import {
   CWD_MARKER_PREFIX,
   CWD_MARKER_SUFFIX,
@@ -39,7 +38,8 @@ import {
   getDefaultSession,
   sessionPool,
   updateSessionCwd,
-} from "../../../ssh/session/pool";
+} from "@/ssh/session/pool";
+
 import type {
   CortexExecRequestOutput,
   CortexExecResponseOutput,

@@ -241,7 +241,7 @@ export const translations = {
           reasoning:
             "Checking my task queue. I see email-sync has failed 3 times with IMAP timeouts - that's in my pending tasks. I'll investigate and fix it.",
           codeResult:
-            "Found root cause: IMAP client was ignoring the configured timeout - hardcoded 5s override in src/app/api/[locale]/emails/imap-client/connection.ts:47. Fixed: removed override, now uses env.IMAP_TIMEOUT_MS (30s). Added reconnect backoff. 3 files changed.",
+            "Found root cause: IMAP client was ignoring the configured timeout - hardcoded 5s override in src/messenger/email/imap-client/connection.ts:47. Fixed: removed override, now uses env.IMAP_TIMEOUT_MS (30s). Added reconnect backoff. 3 files changed.",
           reasoning2:
             "Fix looks correct. Rebuilding and restarting so the patch goes live.",
           agentResponse:

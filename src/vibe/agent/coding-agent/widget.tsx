@@ -6,6 +6,20 @@
  */
 
 "use client";
+import { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import { RecordingInputArea } from "next-vibe/agent/ai-stream/stream/hooks/recording-input-area";
+import { useVoiceRecording } from "next-vibe/agent/ai-stream/stream/hooks/use-voice-recording";
+import { WidgetChatInput } from "next-vibe/agent/ai-stream/stream/widget/chat-input";
+import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import type { ChatMessage } from "next-vibe/agent/chat/db";
+import { ChatMessageRole } from "next-vibe/agent/chat/enum";
+import type { ChatBootValue } from "next-vibe/agent/chat/hooks/context";
+import { ChatBootContext } from "next-vibe/agent/chat/hooks/context";
+import { ChatNavigationProvider } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
+import { GroupedAssistantMessage } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
+import type { MessageGroup } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/message-grouping";
+import { StaticUserMessageBubble } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
+import { NO_SKILL_ID } from "next-vibe/agent/skills/constants";
 import { cn } from "next-vibe/core/utils/utils";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -41,21 +55,6 @@ import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-
 import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { RecordingInputArea } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/recording-input-area";
-import { useVoiceRecording } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/use-voice-recording";
-import { WidgetChatInput } from "@/app/api/[locale]/agent/ai-stream/stream/widget/chat-input";
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
-import type { ChatBootValue } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { ChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { ChatNavigationProvider } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
-import { GroupedAssistantMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
-import type { MessageGroup } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/message-grouping";
-import { StaticUserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
-import { NO_SKILL_ID } from "@/app/api/[locale]/agent/skills/constants";
 
 import type definition from "./definition";
 import { scopedTranslation } from "./i18n";

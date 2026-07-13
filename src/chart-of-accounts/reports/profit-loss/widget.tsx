@@ -118,7 +118,7 @@ export function ProfitLossWidget(_props: ProfitLossWidgetProps): JSX.Element {
     return (): void => {
       void (async (): Promise<void> => {
         const def =
-          await import("@/app/api/[locale]/chart-of-accounts/ledger/[accountId]/definition");
+          await import("@/chart-of-accounts/ledger/[accountId]/definition");
         navigation.push(def.default.GET, {
           urlPathParams: { accountId },
         });

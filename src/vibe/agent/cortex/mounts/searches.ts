@@ -6,9 +6,8 @@ import "server-only";
  * Reconstructed from chatMessages where metadata.toolCall.toolName = "web-search"
  */
 import { and, desc, eq, isNotNull, or, sql } from "drizzle-orm";
+import { chatMessages, chatThreads } from "next-vibe/agent/chat/db";
 import { db } from "next-vibe/database";
-
-import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 
 import type { VirtualListEntry, VirtualReadResult } from "./resolver";
 

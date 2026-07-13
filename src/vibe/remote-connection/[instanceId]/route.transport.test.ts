@@ -26,14 +26,14 @@ import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
+import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
 import {
   DefaultFolderId,
   rootlessStreamContext,
-} from "@/app/api/[locale]/agent/chat/config";
-import { chatFolders, chatThreads } from "@/app/api/[locale]/agent/chat/db";
-import { chatFavorites } from "@/app/api/[locale]/agent/skills/favorites/db";
-import { env } from "@/config/env";
+} from "next-vibe/agent/chat/config";
+import { chatFolders, chatThreads } from "next-vibe/agent/chat/db";
+import { chatFavorites } from "next-vibe/agent/skills/favorites/db";
+import { env } from "@/_old/config/env";
 
 import { runTestStream } from "../../agent/ai-stream/testing/headless-test-runner";
 import {

@@ -13,8 +13,8 @@ import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPag
 import type { JSX } from "react";
 import { useMemo } from "react";
 
-import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
-import creditsDefinition from "@/app/api/[locale]/credits/definition";
+import type { CreditsGetResponseOutput } from "@/credits/definition";
+import creditsDefinition from "@/credits/definition";
 
 import { scopedTranslation } from "../i18n";
 

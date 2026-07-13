@@ -40,7 +40,7 @@ All endpoints are definition-driven → automatically become AI tools via the ex
 ## Module structure
 
 ```
-src/app/api/[locale]/ssh/
+src/ssh/
 ├── spec.md                          ← this file
 ├── enum.ts                          ← SshAuthType, SshSessionStatus, SshCommandStatus, ExecBackend
 ├── db.ts                            ← Drizzle: ssh_connections table
@@ -153,7 +153,7 @@ src/app/api/[locale]/ssh/
 ### Admin pages
 
 ```
-src/app/[locale]/admin/ssh/
+src/_pages/admin/ssh/
 ├── layout.tsx                       ← SSH admin section layout with nav tabs
 ├── page.tsx + page-client.tsx       ← redirects to /ssh/terminal (local) or /ssh/connections
 ├── terminal/
@@ -661,7 +661,7 @@ AI:   ssh_connections_list_GET → finds connectionId "abc"
 3. **`exec/widget.tsx`** - command runner UI
 4. **`files/*/widget.tsx`** - file browser, viewer/editor
 5. **`linux/users/*`** - OS user management endpoints + widgets
-6. **Admin pages** - `src/app/[locale]/admin/ssh/` layout + pages
+6. **Admin pages** - `src/_pages/admin/ssh/` layout + pages
 7. **`ssh_connections` table** + encryption - SSH credential storage
 8. **SSH connections CRUD** + widgets
 9. **SSH exec backend** - session pool, keepalive

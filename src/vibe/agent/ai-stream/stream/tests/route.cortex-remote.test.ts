@@ -45,8 +45,8 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   DefaultFolderId,
   makeHeadlessContext,
-} from "@/app/api/[locale]/agent/chat/config";
-import { env } from "@/config/env";
+} from "next-vibe/agent/chat/config";
+import { env } from "@/_old/config/env";
 
 import { seedCaseThread } from "../../testing/fixture-seed";
 import {
@@ -428,7 +428,7 @@ if (!_resolvedRemoteUrl) {
 
           // Verify the thread exists locally (the caller owns its copy)
           const threadDef =
-            await import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition");
+            await import("next-vibe/agent/chat/threads/[threadId]/definition");
           const localThreadResult =
             await RouteExecuteRepository.runInProcessTyped({
               definition: threadDef.default.GET,

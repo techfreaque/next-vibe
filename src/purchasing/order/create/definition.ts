@@ -52,8 +52,7 @@ const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         listEndpoint: async () =>
-          (await import("@/app/api/[locale]/companies/list/definition")).default
-            .GET,
+          (await import("@/companies/list/definition")).default.GET,
         labelField: "name",
         label: "orderCreate.companyId.label" as const,
         description: "orderCreate.companyId.description" as const,
@@ -64,8 +63,7 @@ const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         listEndpoint: async () =>
-          (await import("@/app/api/[locale]/purchasing/vendor/list/definition"))
-            .default.GET,
+          (await import("@/purchasing/vendor/list/definition")).default.GET,
         labelField: "name",
         label: "orderCreate.vendorId.label" as const,
         description: "orderCreate.vendorId.description" as const,

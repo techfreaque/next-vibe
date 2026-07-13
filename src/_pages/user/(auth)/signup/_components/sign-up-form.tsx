@@ -1,13 +1,13 @@
 "use client";
 
+import { ChatFavoritesRepositoryClient } from "next-vibe/agent/skills/favorites/repository-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { useRouter } from "next-vibe/ui/hooks/use-navigation";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import { useEffect, useState } from "react";
 
-import { ChatFavoritesRepositoryClient } from "@/app/api/[locale]/agent/skills/favorites/repository-client";
-import signupEndpoints from "@/app/api/[locale]/user/public/signup/definition";
+import signupEndpoints from "@/user/public/signup/definition";
 
 interface SignUpFormProps {
   locale: CountryLanguage;

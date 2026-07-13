@@ -434,9 +434,9 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { db } from "@/system/db";
+import type { EndpointLogger } from "@/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/user/auth/types";
 import type { MyT } from "./i18n"; // ✅ named type - never `import type { scopedTranslation }`
 import { myTable } from "./db";
 import type {
@@ -499,8 +499,8 @@ my-feature/
 import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { success } from "next-vibe/shared/types/response.schema";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { EndpointLogger } from "@/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/user/auth/types";
 import type {
   OrderGetResponseOutput,
   OrderGetUrlVariablesOutput,
@@ -575,8 +575,8 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
-import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { db } from "@/system/db";
+import type { EndpointLogger } from "@/system/unified-interface/shared/logger/endpoint";
 import { orders, type Order, type NewOrder } from "../db";
 
 export class OrderQueries {
@@ -642,8 +642,8 @@ import {
   fail,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { EndpointLogger } from "@/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/user/auth/types";
 import type { Order } from "../db";
 import type { OrderCreateRequestOutput } from "../definition";
 
@@ -739,7 +739,7 @@ logger.error("Failed to create item", parseError(error));
 ## Cross-Repository Calls
 
 ```typescript
-import { CreditRepository } from "@/app/api/[locale]/credits/repository";
+import { CreditRepository } from "@/credits/repository";
 
 export class OrderRepository {
   static async create(

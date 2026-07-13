@@ -6,7 +6,7 @@ import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 export const Route = createFileRoute("/api/$locale/agent/speech-to-text")({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/agent/speech-to-text/route"),
+      () => import("next-vibe/agent/speech-to-text/route"),
     ),
   },
 });

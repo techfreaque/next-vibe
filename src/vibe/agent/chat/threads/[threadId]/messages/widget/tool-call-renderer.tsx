@@ -17,6 +17,10 @@
  */
 
 "use client";
+import type { SendMessageParams } from "next-vibe/agent/ai-stream/stream/hooks/send-message";
+import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import type { ToolCall } from "next-vibe/agent/chat/db";
+import { useChatNavigationStore } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { definitionLoader } from "next-vibe/core/definition/loader";
 import { Platform } from "next-vibe/core/definition/platform";
@@ -59,17 +63,13 @@ import {
   Icon,
   type IconKey,
 } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import { EndpointRenderer } from "next-vibe/unified-ui/renderers/react/EndpointRenderer";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 import { useCallback, useEffect, useState } from "react";
 import type { FieldValues } from "react-hook-form";
 import { useForm } from "react-hook-form";
 
-import type { SendMessageParams } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/send-message";
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { ToolCall } from "@/app/api/[locale]/agent/chat/db";
-import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
-import { EndpointRenderer } from "@/app/api/[locale]/system/unified-ui/renderers/react/EndpointRenderer";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-ui/renderers/react/EndpointsPage";
 import { pathToAliasMap } from "@/generated/endpoints/alias-map";
 
 type ToolDecision =

@@ -139,11 +139,8 @@ function kindSigil(kind: ViolationKind | undefined, count: number): string {
 }
 
 function shortPath(path: string): string {
-  // Drop the common "src/" prefix and collapse the [locale] segment for density.
-  return path
-    .replace(/^src\//, "")
-    .replace("app/api/[locale]/", "")
-    .replace("packages/next-vibe/ui/", "nvui/");
+  // Drop the common "src/" prefix for density.
+  return path.replace(/^src\//, "").replace("packages/next-vibe/ui/", "nvui/");
 }
 
 // ── Web sub-components ──────────────────────────────────────

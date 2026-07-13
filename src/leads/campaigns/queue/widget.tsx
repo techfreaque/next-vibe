@@ -21,7 +21,7 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import React from "react";
 
-import { scopedTranslation as messengerAccountsI18n } from "@/app/api/[locale]/messenger/accounts/i18n";
+import { scopedTranslation as messengerAccountsI18n } from "@/messenger/accounts/i18n";
 
 import type definition from "./definition";
 

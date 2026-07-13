@@ -8,7 +8,7 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/agent/chat/threads/[threadId]/route"),
+      () => import("next-vibe/agent/chat/threads/[threadId]/route"),
     ),
   },
 });

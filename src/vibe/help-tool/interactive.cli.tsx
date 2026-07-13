@@ -14,6 +14,10 @@
 
 import { Box, render, Text, useApp, useInput } from "ink";
 import SelectInput from "ink-select-input";
+import {
+  DefaultFolderId,
+  makeHeadlessContext,
+} from "next-vibe/agent/chat/config";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type { EndpointMeta } from "next-vibe/core/definition/generator/generator-endpoints-meta";
 import { Platform } from "next-vibe/core/definition/platform";
@@ -29,11 +33,6 @@ import type { CliCompatiblePlatform } from "next-vibe/platforms/cli/runtime/rout
 import type { EndpointRenderer } from "next-vibe/unified-ui/renderers/react/EndpointRenderer";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-
-import {
-  DefaultFolderId,
-  makeHeadlessContext,
-} from "@/app/api/[locale]/agent/chat/config";
 
 type InkEndpointRendererType = typeof EndpointRenderer;
 

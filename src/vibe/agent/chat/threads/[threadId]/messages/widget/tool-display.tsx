@@ -1,5 +1,7 @@
 "use client";
 
+import type { SendMessageParams } from "next-vibe/agent/ai-stream/stream/hooks/send-message";
+import type { ToolCall } from "next-vibe/agent/chat/db";
 import type { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -8,9 +10,6 @@ import { Div } from "next-vibe/ui/ui/div";
 import type { JSX } from "react";
 import { memo } from "react";
 import type { FieldValues } from "react-hook-form";
-
-import type { SendMessageParams } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/send-message";
-import type { ToolCall } from "@/app/api/[locale]/agent/chat/db";
 
 import { ToolCallRenderer } from "./tool-call-renderer";
 

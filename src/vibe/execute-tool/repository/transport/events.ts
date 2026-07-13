@@ -5,10 +5,9 @@
  */
 import "server-only";
 
+import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
 import type { Platform } from "next-vibe/core/definition/platform";
 import type { WidgetData } from "next-vibe/core/utils/json";
-
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 
 import type { CallbackModeValue } from "../../constants";
 import executeDefinition from "../../definition";

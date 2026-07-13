@@ -1,4 +1,4 @@
-// AUTO-GENERATED from src/app/api/[locale]/system/tasks/pulse/status/route.ts. Add "use custom" to this file to preserve customizations.
+// AUTO-GENERATED from src/vibe/tasks/pulse/status/route.ts. Add "use custom" to this file to preserve customizations.
 import { createFileRoute } from "@tanstack/react-router";
 
 import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
@@ -6,7 +6,7 @@ import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 export const Route = createFileRoute("/api/$locale/system/tasks/pulse/status")({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/system/tasks/pulse/status/route"),
+      () => import("next-vibe/tasks/pulse/status/route"),
     ),
   },
 });

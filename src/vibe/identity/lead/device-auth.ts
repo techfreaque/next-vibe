@@ -17,8 +17,8 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
-import { CreditRepository } from "@/app/api/[locale]/credits/repository";
+import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
+import { CreditRepository } from "@/credits/repository";
 
 import { leadLeadLinks, leads, userLeadLinks } from "./db";
 import { LeadSource, LeadStatus } from "./enum";

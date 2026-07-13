@@ -11,7 +11,7 @@ import type {
 } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 
-import { BEARER_LEAD_ID_SEPARATOR } from "@/config/constants";
+import { BEARER_LEAD_ID_SEPARATOR } from "@/_old/config/constants";
 
 import type { RouteExecuteResponseOutput } from "../../definition";
 import executeDefinition from "../../definition";

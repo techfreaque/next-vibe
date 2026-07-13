@@ -15,17 +15,17 @@ import {
   contactClientEnv,
   contactClientEnvExamples,
   contactClientEnvSchema,
-} from "../../app/api/[locale]/contact/env-client";
+} from "../../contact/env-client";
 import {
   paymentClientEnv,
   paymentClientEnvExamples,
   paymentClientEnvSchema,
-} from "../../app/api/[locale]/payment/env-client";
+} from "../../payment/env-client";
 import {
   envClient as env_envClient,
   envClientExamples,
   envClientSchema as env_envClientSchema,
-} from "../../config/env-client";
+} from "../../_old/config/env-client";
 
 // Platform detection (will be set at runtime)
 const isServer = typeof globalThis.document === "undefined";

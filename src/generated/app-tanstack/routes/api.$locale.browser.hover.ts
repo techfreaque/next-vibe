@@ -6,7 +6,7 @@ import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 export const Route = createFileRoute("/api/$locale/browser/hover")({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/browser/hover/route"),
+      () => import("@/browser/hover/route"),
     ),
   },
 });

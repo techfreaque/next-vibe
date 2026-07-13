@@ -33,18 +33,18 @@ import {
   getOrCreateFolder,
   runTestStream,
   toolResultRecord,
-} from "@/app/api/[locale]/agent/ai-stream/testing/headless-test-runner";
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
+} from "next-vibe/agent/ai-stream/testing/headless-test-runner";
+import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
 import {
   DefaultFolderId,
   rootlessStreamContext,
-} from "@/app/api/[locale]/agent/chat/config";
-import { chatFavorites } from "@/app/api/[locale]/agent/skills/favorites/db";
-import { scopedTranslation as favoritesScopedTranslation } from "@/app/api/[locale]/agent/skills/favorites/i18n";
-import { ChatFavoritesRepository } from "@/app/api/[locale]/agent/skills/favorites/repository";
-import { resolveFavorite } from "@/app/api/[locale]/agent/skills/resolver";
-import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
-import { CreditRepository } from "@/app/api/[locale]/credits/repository";
+} from "next-vibe/agent/chat/config";
+import { chatFavorites } from "next-vibe/agent/skills/favorites/db";
+import { scopedTranslation as favoritesScopedTranslation } from "next-vibe/agent/skills/favorites/i18n";
+import { ChatFavoritesRepository } from "next-vibe/agent/skills/favorites/repository";
+import { resolveFavorite } from "next-vibe/agent/skills/resolver";
+import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
+import { CreditRepository } from "@/credits/repository";
 
 import { customSkills } from "./db";
 import { ContentLevel, IntelligenceLevel, SkillCategory } from "./enum";

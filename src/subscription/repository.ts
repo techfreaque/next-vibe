@@ -19,10 +19,8 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type Stripe from "stripe";
 
-import { configScopedTranslation } from "@/config/i18n";
+import { configScopedTranslation } from "@/_old/config/i18n";
 
-import { getEnvAvailability } from "../agent/env-availability";
-import { getAvailableModelCount } from "../agent/models/all-models";
 import { createTrackingContext } from "../messenger/providers/email/smtp-client/components/tracking_context.email";
 import { scopedTranslation as checkoutScopedTranslation } from "../payment/checkout/i18n";
 import { SubscriptionCheckoutRepository } from "../payment/checkout/repository";
@@ -30,6 +28,8 @@ import { PaymentProvider, type PaymentProviderValue } from "../payment/enum";
 import { getPaymentProvider } from "../payment/providers";
 import { StripeProvider } from "../payment/providers/stripe/repository";
 import type { WebhookData } from "../payment/providers/types";
+import { getEnvAvailability } from "../vibe/agent/env-availability";
+import { getAvailableModelCount } from "../vibe/agent/models/all-models";
 import type {
   SubscriptionCancelDeleteRequestOutput,
   SubscriptionCancelDeleteResponseOutput,

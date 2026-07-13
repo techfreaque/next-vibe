@@ -354,10 +354,10 @@ export async function ensureProvidersRegistered(): Promise<void> {
   registrationPromise = (async (): Promise<void> => {
     const [cortexModule, skillsModule, favoritesModule, threadsModule] =
       await Promise.all([
-        import("@/app/api/[locale]/agent/cortex/sync-provider"),
-        import("@/app/api/[locale]/agent/skills/sync-provider"),
-        import("@/app/api/[locale]/agent/skills/favorites/sync-provider"),
-        import("@/app/api/[locale]/agent/chat/threads/sync-provider"),
+        import("next-vibe/agent/cortex/sync-provider"),
+        import("next-vibe/agent/skills/sync-provider"),
+        import("next-vibe/agent/skills/favorites/sync-provider"),
+        import("next-vibe/agent/chat/threads/sync-provider"),
       ]);
 
     registerSyncProvider(cortexModule.documentsSyncProvider);

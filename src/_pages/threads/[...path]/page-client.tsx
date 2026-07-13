@@ -1,12 +1,11 @@
 "use client";
 
+import aiStreamDefinition from "next-vibe/agent/ai-stream/stream/definition";
+import { ChatBootProvider } from "next-vibe/agent/chat/hooks/context";
+import { ChatNavigationProvider } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
-
-import aiStreamDefinition from "@/app/api/[locale]/agent/ai-stream/stream/definition";
-import { ChatBootProvider } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { ChatNavigationProvider } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 
 import type { ThreadsPathPageData } from "./page";
 

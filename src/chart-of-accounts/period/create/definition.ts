@@ -53,8 +53,7 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.string().uuid(),
         listEndpoint: async () =>
-          (await import("@/app/api/[locale]/companies/list/definition")).default
-            .GET,
+          (await import("@/companies/list/definition")).default.GET,
         labelField: "name",
       }),
       name: requestField(scopedTranslation, {

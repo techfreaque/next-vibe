@@ -20,7 +20,7 @@
  *     - VPS_APP_DIR:  App directory on VPS (e.g. "/root/next-vibe")
  */
 
-import type { ReleaseConfig } from "./src/app/api/[locale]/system/tooling/release/definition";
+import type { ReleaseConfig } from "./src/vibe/tooling/release/definition";
 
 const releaseConfig: ReleaseConfig = {
   // Package manager to use for dependency operations
@@ -97,7 +97,7 @@ const releaseConfig: ReleaseConfig = {
         // Version bumper for additional files
         versionBumper: [
           {
-            filePath: "./src/app/api/[locale]/system/platforms/cli/run-cli.ts",
+            filePath: "./src/vibe/platforms/cli/run-cli.ts",
             varName: "CLI_VERSION",
           },
         ],
@@ -136,8 +136,7 @@ const releaseConfig: ReleaseConfig = {
       clean: false,
       lint: false,
       typecheck: false,
-      build:
-        "vibe builder --configPath=src/app/api/[locale]/system/tooling/check/build.config.ts",
+      build: "vibe builder --configPath=src/vibe/tooling/check/build.config.ts",
       test: false,
       snyk: false,
       release: {

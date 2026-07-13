@@ -12,7 +12,7 @@ import { H2, P } from "next-vibe/ui/ui/typography";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 
-import meDefinition from "@/app/api/[locale]/user/private/me/definition";
+import meDefinition from "@/user/private/me/definition";
 
 import { scopedTranslation as pageT } from "./i18n";
 

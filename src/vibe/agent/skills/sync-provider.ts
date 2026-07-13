@@ -9,17 +9,16 @@ import "server-only";
  * Community metrics (voteCount, reportCount) are NOT synced — they are instance-local.
  */
 import { and, asc, eq, inArray, sql } from "drizzle-orm";
+import type { ToolConfigItem } from "next-vibe/agent/chat/settings/definition";
+import type { VideoGenModelId } from "next-vibe/agent/video-generation/models";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
-import { z } from "zod";
-
-import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/definition";
-import type { VideoGenModelId } from "@/app/api/[locale]/agent/video-generation/models";
-import type { StandardSyncCursor } from "@/app/api/[locale]/remote-connection/db";
+import type { StandardSyncCursor } from "next-vibe/remote-connection/db";
 import {
   type SyncProvider,
   toStandardCursor,
-} from "@/app/api/[locale]/remote-connection/sync/provider";
+} from "next-vibe/remote-connection/sync/provider";
+import { z } from "zod";
 
 import { customSkills, type NewCustomSkill } from "./db";
 import { SkillTrustLevel } from "./enum";

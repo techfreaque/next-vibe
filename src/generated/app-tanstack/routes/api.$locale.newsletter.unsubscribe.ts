@@ -6,7 +6,7 @@ import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 export const Route = createFileRoute("/api/$locale/newsletter/unsubscribe")({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/newsletter/unsubscribe/route"),
+      () => import("@/newsletter/unsubscribe/route"),
     ),
   },
 });

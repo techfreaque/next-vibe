@@ -10,15 +10,14 @@
  * A message-history parse never throws; it returns whatever parsed correctly.
  */
 
+import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import type { MessageVariant } from "next-vibe/agent/ai-stream/repository/core/modality-resolver";
+import type { Modality } from "next-vibe/agent/models/enum";
 import { dateSchema } from "next-vibe/core/definition/common.schema";
 import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
 import { WidgetDataSchema } from "next-vibe/core/utils/json";
 import { CallbackModeDB } from "next-vibe/execute-tool/constants";
 import { z } from "zod";
-
-import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { MessageVariant } from "@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver";
-import type { Modality } from "@/app/api/[locale]/agent/models/enum";
 
 import type { FavoriteConfig } from "../skills/favorites/db";
 import type { DefaultFolderId } from "./config";

@@ -5,17 +5,16 @@
 
 import "server-only";
 
+import type {
+  DefaultFolderId,
+  ToolExecutionContext,
+} from "next-vibe/agent/chat/config";
 import { getPreferredName } from "next-vibe/core/core-utils/path";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { AiT } from "next-vibe/platforms/ai/i18n";
-
-import type {
-  DefaultFolderId,
-  ToolExecutionContext,
-} from "@/app/api/[locale]/agent/chat/config";
 
 import { CallbackMode } from "../constants";
 import type {
@@ -76,7 +75,7 @@ export class ExecuteToolGuards {
     const { data, toolName, instanceId, streamContext, logger, t } = params;
 
     const { FOLDER_ALLOWS_REMOTE_TOOLS, FOLDER_BLOCKED_CALLBACK_MODES } =
-      await import("@/app/api/[locale]/agent/chat/config");
+      await import("next-vibe/agent/chat/config");
 
     if (
       instanceId &&
@@ -125,7 +124,7 @@ export class ExecuteToolGuards {
     logger: EndpointLogger;
   }): Promise<ResolvedToolPermissions> {
     const { resolveAgentContext } =
-      await import("@/app/api/[locale]/agent/skills/resolve-context");
+      await import("next-vibe/agent/skills/resolve-context");
     const resolved = await resolveAgentContext({
       favoriteId: params.favoriteId,
       skillId: params.skillId,

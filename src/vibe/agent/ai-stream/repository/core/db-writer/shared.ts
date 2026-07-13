@@ -4,11 +4,11 @@
 
 import "server-only";
 
+import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
-import type { CreditsT } from "@/app/api/[locale]/credits/i18n";
+import type { CreditsT } from "@/credits/i18n";
 
 import type { MessagesWsEmit } from "../../../../chat/threads/[threadId]/messages/emitter";
 

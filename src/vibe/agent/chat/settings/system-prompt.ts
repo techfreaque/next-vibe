@@ -2,10 +2,9 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
+import type { SystemPromptFragment } from "next-vibe/agent/ai-stream/system-prompt/types";
 import { db } from "next-vibe/database";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-
-import type { SystemPromptFragment } from "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
 
 import { chatSettings } from "./db";
 

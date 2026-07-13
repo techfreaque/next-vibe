@@ -11,7 +11,7 @@ import type {
 import type { LeadWithEmailType } from "next-vibe/identity/lead/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { LeadTrackingRepository } from "@/app/api/[locale]/leads/tracking/repository";
+import { LeadTrackingRepository } from "@/leads/tracking/repository";
 
 import { abTestingService } from "./services/ab-testing";
 import { emailRendererService } from "./services/renderer";

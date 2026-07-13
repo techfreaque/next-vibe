@@ -13,10 +13,10 @@ import {
 import type { ReactElement } from "react";
 import { z } from "zod";
 
-import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
-import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
-import { env } from "@/config/env";
-import { configScopedTranslation } from "@/config/i18n";
+import { env } from "@/_old/config/env";
+import { configScopedTranslation } from "@/_old/config/i18n";
+import { contactClientRepository } from "@/contact/repository-client";
+import type { EmailTemplateDefinition } from "@/messenger/registry/template";
 
 import { EmailTemplate } from "../../messenger/providers/email/smtp-client/components/template.email";
 import {

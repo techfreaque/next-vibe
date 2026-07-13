@@ -8,6 +8,28 @@
  */
 
 "use client";
+import {
+  type ChatModelId,
+  type ChatModelSelection,
+  getChatModelById,
+} from "next-vibe/agent/ai-stream/models";
+import { COMPACT_TRIGGER } from "next-vibe/agent/ai-stream/repository/core/constants";
+import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
+import { ModelCreditDisplay } from "next-vibe/agent/models/widget/model-credit-display";
+import { DEFAULT_SKILLS } from "next-vibe/agent/skills/config";
+import { getBestChatModelForFavorite } from "next-vibe/agent/skills/favorites/[id]/definition";
+import { useFavoriteCreate } from "next-vibe/agent/skills/favorites/create/hooks";
+import type { FavoriteCard } from "next-vibe/agent/skills/favorites/definition";
+import favoritesEndpoint from "next-vibe/agent/skills/favorites/definition";
+import { FavoriteSelectProvider } from "next-vibe/agent/skills/favorites/favorite-select-context";
+import { useChatFavorites } from "next-vibe/agent/skills/favorites/hooks/hooks";
+import { scopedTranslation as skillsScopedTranslation } from "next-vibe/agent/skills/i18n";
+import {
+  SearchProvider,
+  SearchProviderOptions,
+} from "next-vibe/agent/web-search/enum";
+import { scopedTranslation as searchScopedTranslation } from "next-vibe/agent/web-search/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getDefaultTimezone } from "next-vibe/core/i18n/core/localization-utils";
 import { cn } from "next-vibe/core/utils/utils";
@@ -67,29 +89,7 @@ import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPag
 import type { JSX, ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
 
-import { buildFolderUrl } from "@/app/[locale]/chat/lib/utils/navigation";
-import {
-  type ChatModelId,
-  type ChatModelSelection,
-  getChatModelById,
-} from "@/app/api/[locale]/agent/ai-stream/models";
-import { COMPACT_TRIGGER } from "@/app/api/[locale]/agent/ai-stream/repository/core/constants";
-import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
-import { DEFAULT_SKILLS } from "@/app/api/[locale]/agent/skills/config";
-import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/skills/favorites/[id]/definition";
-import { useFavoriteCreate } from "@/app/api/[locale]/agent/skills/favorites/create/hooks";
-import type { FavoriteCard } from "@/app/api/[locale]/agent/skills/favorites/definition";
-import favoritesEndpoint from "@/app/api/[locale]/agent/skills/favorites/definition";
-import { FavoriteSelectProvider } from "@/app/api/[locale]/agent/skills/favorites/favorite-select-context";
-import { useChatFavorites } from "@/app/api/[locale]/agent/skills/favorites/hooks/hooks";
-import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/skills/i18n";
-import {
-  SearchProvider,
-  SearchProviderOptions,
-} from "@/app/api/[locale]/agent/web-search/enum";
-import { scopedTranslation as searchScopedTranslation } from "@/app/api/[locale]/agent/web-search/i18n";
+import { buildFolderUrl } from "@/_pages/chat/lib/utils/navigation";
 
 import { DefaultFolderId } from "../config";
 import { parseSkillId } from "../slugify";

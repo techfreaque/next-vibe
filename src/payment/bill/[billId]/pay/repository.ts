@@ -25,16 +25,16 @@ import {
   accountNodes,
   journalEntries,
   journalEntryLines,
-} from "@/app/api/[locale]/chart-of-accounts/db";
+} from "@/chart-of-accounts/db";
 import {
   AccountSubtype,
   JournalEntryStatus,
   JournalSourceType,
   LineType,
   PeriodStatus,
-} from "@/app/api/[locale]/chart-of-accounts/enum";
-import { CompanyMemberRole } from "@/app/api/[locale]/companies/enum";
-import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
+} from "@/chart-of-accounts/enum";
+import { CompanyMemberRole } from "@/companies/enum";
+import { CompanyAuthRepository } from "@/companies/repository";
 
 import { paymentBills } from "../../../db";
 import { BillStatus } from "../../../enum";

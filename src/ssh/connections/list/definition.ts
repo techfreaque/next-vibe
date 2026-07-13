@@ -9,13 +9,12 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { ConnectionHealthSchema } from "next-vibe/remote-connection/db";
 import {
   customWidgetObject,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
-
-import { ConnectionHealthSchema } from "@/app/api/[locale]/remote-connection/db";
 
 import { SshAuthType, SshAuthTypeDB } from "../../enum";
 import { SSH_CONNECTIONS_LIST_ALIAS } from "./constants";

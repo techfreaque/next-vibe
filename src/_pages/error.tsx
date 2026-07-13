@@ -10,8 +10,8 @@ import { Span } from "next-vibe/ui/ui/span";
 import { H2, P } from "next-vibe/ui/ui/typography";
 import type { ReactElement } from "react";
 
-import { envClient } from "@/config/env-client";
-import useErrorHandler from "@/hooks/use-error-handler";
+import { envClient } from "@/_old/config/env-client";
+import useErrorHandler from "@/_old/hooks/use-error-handler";
 
 import { scopedTranslation as pageT } from "./[...notFound]/i18n";
 

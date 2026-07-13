@@ -6,9 +6,8 @@ import {
   type ChannelBinding,
   createEndpointEmitter,
 } from "next-vibe/realtime/emitter";
+import type { ResolvedRelayContext } from "next-vibe/realtime/remote-event-bridge/relay-context";
 import type { EmitEventNamed } from "next-vibe/realtime/structured-events";
-
-import type { ResolvedRelayContext } from "@/app/api/[locale]/system/realtime/remote-event-bridge/relay-context";
 
 import { DefaultFolderId } from "../../../config";
 import messagesDefinitions from "./definition";

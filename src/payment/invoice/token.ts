@@ -9,7 +9,7 @@ import "server-only";
 
 import { createHmac, timingSafeEqual } from "node:crypto";
 
-import { env } from "@/config/env";
+import { env } from "@/_old/config/env";
 
 /**
  * Generate a view token for a given invoiceId.

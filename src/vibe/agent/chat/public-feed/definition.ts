@@ -23,7 +23,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
 
-import { lazyWidget } from "../../../system/unified-ui/_shared/lazy-widget";
+import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
 import { ThreadStreamingStateDB } from "../enum";
 import { scopedTranslation } from "./i18n";
 

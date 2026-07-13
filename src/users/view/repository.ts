@@ -6,6 +6,8 @@
 import "server-only";
 
 import { and, count, desc, eq, inArray, or, sql, sum } from "drizzle-orm";
+import { chatMessages, chatThreads } from "next-vibe/agent/chat/db";
+import { ChatMessageRoleDB, ThreadStatusDB } from "next-vibe/agent/chat/enum";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -24,33 +26,15 @@ import {
 import { userRoles, users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
-import {
-  ChatMessageRoleDB,
-  ThreadStatusDB,
-} from "@/app/api/[locale]/agent/chat/enum";
-import {
-  creditPacks,
-  creditTransactions,
-  creditWallets,
-} from "@/app/api/[locale]/credits/db";
-import {
-  CreditPackType,
-  CreditTransactionTypeDB,
-} from "@/app/api/[locale]/credits/enum";
-import { newsletterSubscriptions } from "@/app/api/[locale]/newsletter/db";
-import { NewsletterSubscriptionStatus } from "@/app/api/[locale]/newsletter/enum";
-import {
-  paymentRefunds,
-  paymentTransactions,
-} from "@/app/api/[locale]/payment/db";
-import { PaymentStatusDB } from "@/app/api/[locale]/payment/enum";
-import {
-  referralCodes,
-  referralEarnings,
-} from "@/app/api/[locale]/referral/db";
-import { subscriptions } from "@/app/api/[locale]/subscription/db";
-import { SubscriptionStatusDB } from "@/app/api/[locale]/subscription/enum";
+import { creditPacks, creditTransactions, creditWallets } from "@/credits/db";
+import { CreditPackType, CreditTransactionTypeDB } from "@/credits/enum";
+import { newsletterSubscriptions } from "@/newsletter/db";
+import { NewsletterSubscriptionStatus } from "@/newsletter/enum";
+import { paymentRefunds, paymentTransactions } from "@/payment/db";
+import { PaymentStatusDB } from "@/payment/enum";
+import { referralCodes, referralEarnings } from "@/referral/db";
+import { subscriptions } from "@/subscription/db";
+import { SubscriptionStatusDB } from "@/subscription/enum";
 
 import type { UserViewResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";

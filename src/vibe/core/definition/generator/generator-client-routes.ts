@@ -196,7 +196,7 @@ class ClientRoutesGenerator {
       const { path: filesystemPath } = extractPathKey(routeFile);
       const nestedPath = extractNestedPath(routeFile);
       const pathStr = nestedPath.join("/");
-      const importPath = `@/app/api/[locale]/${pathStr}/route-client`;
+      const importPath = `@/${pathStr}/route-client`;
 
       // Get methods for this client route
       const methodsResult =

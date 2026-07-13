@@ -47,8 +47,8 @@ Use this when the same authenticated user sometimes hits the server and sometime
 ### `route-client.ts` - mirrors `route.ts`
 
 ```typescript
-import { clientEndpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/client-multi";
-import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { clientEndpointsHandler } from "@/system/unified-interface/shared/endpoints/route/client-multi";
+import { Methods } from "@/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
 import { MyRepositoryClient } from "./repository-client";
@@ -77,7 +77,7 @@ import {
   fail,
   success,
 } from "next-vibe/shared/types/response.schema";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { parseError } from "../../../shared/utils";

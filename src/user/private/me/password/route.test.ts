@@ -5,7 +5,7 @@ import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-su
 import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { env } from "@/config/env";
+import { env } from "@/_old/config/env";
 
 import passwordEndpoints from "./definition";
 

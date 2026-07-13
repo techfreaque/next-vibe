@@ -15,8 +15,8 @@ import {
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JSX, ReactNode } from "react";
 
-import { envClient } from "@/config/env-client";
-import { configScopedTranslation } from "@/config/i18n";
+import { envClient } from "@/_old/config/env-client";
+import { configScopedTranslation } from "@/_old/config/i18n";
 
 import { scopedTranslation } from "../i18n";
 import { TrackedLink } from "./tracked_link.email";

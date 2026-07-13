@@ -25,20 +25,20 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { env } from "@/_old/config/env";
 import {
   accountingPeriods,
   accountNodes,
   journalEntries,
   journalEntryLines,
-} from "@/app/api/[locale]/chart-of-accounts/db";
+} from "@/chart-of-accounts/db";
 import {
   AccountSubtype,
   JournalEntryStatus,
   JournalSourceType,
   LineType,
   PeriodStatus,
-} from "@/app/api/[locale]/chart-of-accounts/enum";
-import { env } from "@/config/env";
+} from "@/chart-of-accounts/enum";
 
 import { paymentInvoiceLines, paymentInvoices } from "../../../db";
 import { InvoiceStatus } from "../../../enum";

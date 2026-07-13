@@ -20,7 +20,8 @@ import {
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
 
-import { ExecBackend, ExecBackendDB } from "../../../ssh/enum";
+import { ExecBackend, ExecBackendDB } from "@/ssh/enum";
+
 import { CORTEX_EXEC_ALIAS, resolveCortexIcon } from "../constants";
 import { scopedTranslation } from "./i18n";
 

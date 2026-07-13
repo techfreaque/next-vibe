@@ -6,6 +6,8 @@
 import "server-only";
 
 import { and, asc, eq, inArray, or, sql } from "drizzle-orm";
+import { getInstanceAvailability } from "next-vibe/agent/env-availability";
+import type { VoiceModelSelection } from "next-vibe/agent/text-to-speech/models";
 import type { Platform } from "next-vibe/core/definition/platform";
 import { isAgentPlatform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
@@ -22,9 +24,6 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { createEndpointEmitter } from "next-vibe/realtime/emitter";
-
-import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
-import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 
 import { chatSettings } from "../../chat/settings/db";
 import { scopedTranslation as settingsScopedTranslation } from "../../chat/settings/i18n";

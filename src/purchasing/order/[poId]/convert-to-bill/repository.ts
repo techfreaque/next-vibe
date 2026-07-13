@@ -24,12 +24,12 @@ import {
   AccountSubtype,
   JournalSourceType,
   LineType,
-} from "@/app/api/[locale]/chart-of-accounts/enum";
-import { autoPostJournalEntry } from "@/app/api/[locale]/chart-of-accounts/shared/auto-post";
-import { CompanyMemberRole } from "@/app/api/[locale]/companies/enum";
-import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
-import { paymentBillLines, paymentBills } from "@/app/api/[locale]/payment/db";
-import { BillStatus } from "@/app/api/[locale]/payment/enum";
+} from "@/chart-of-accounts/enum";
+import { autoPostJournalEntry } from "@/chart-of-accounts/shared/auto-post";
+import { CompanyMemberRole } from "@/companies/enum";
+import { CompanyAuthRepository } from "@/companies/repository";
+import { paymentBillLines, paymentBills } from "@/payment/db";
+import { BillStatus } from "@/payment/enum";
 
 import {
   purchaseOrderLines,

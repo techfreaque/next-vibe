@@ -1,5 +1,6 @@
 "use client";
 
+import { scopedTranslation } from "next-vibe/agent/chat/threads/widget/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -9,8 +10,7 @@ import { User } from "next-vibe/ui/ui/icons/User";
 import { Link } from "next-vibe/ui/ui/link";
 import type { JSX } from "react";
 
-import { scopedTranslation } from "@/app/api/[locale]/agent/chat/threads/widget/i18n";
-import { useLogout } from "@/app/api/[locale]/user/private/logout/hooks";
+import { useLogout } from "@/user/private/logout/hooks";
 
 import { TOUR_DATA_ATTRS } from "../../welcome-tour/tour-config";
 

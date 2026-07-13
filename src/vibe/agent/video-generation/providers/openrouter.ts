@@ -1,5 +1,8 @@
 import "server-only";
 
+import { agentEnv } from "next-vibe/agent/env";
+import { pollDelay } from "next-vibe/agent/shared/poll-delay";
+import { scopedTranslation } from "next-vibe/agent/video-generation/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -9,10 +12,6 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { agentEnv } from "@/app/api/[locale]/agent/env";
-import { pollDelay } from "@/app/api/[locale]/agent/shared/poll-delay";
-import { scopedTranslation } from "@/app/api/[locale]/agent/video-generation/i18n";
 
 interface OpenRouterVideoSubmitResponse {
   id: string;

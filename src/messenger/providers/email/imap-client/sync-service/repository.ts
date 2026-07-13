@@ -25,11 +25,8 @@ import type {
   MessengerFolder,
   NewEmail,
   NewMessengerFolder,
-} from "@/app/api/[locale]/messenger/messages/db";
-import {
-  emails,
-  messengerFolders,
-} from "@/app/api/[locale]/messenger/messages/db";
+} from "@/messenger/messages/db";
+import { emails, messengerFolders } from "@/messenger/messages/db";
 
 import { messengerAccounts } from "../../../../accounts/db";
 import { MessengerAccountStatus } from "../../../../accounts/enum";

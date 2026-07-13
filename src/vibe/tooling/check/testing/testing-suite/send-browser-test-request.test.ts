@@ -14,8 +14,8 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import userCreateDefinitions, {
   type UserCreateResponseOutput,
-} from "@/app/api/[locale]/users/create/definition";
-import userDeleteDefinitions from "@/app/api/[locale]/users/user/[id]/definition";
+} from "@/users/create/definition";
+import userDeleteDefinitions from "@/users/user/[id]/definition";
 
 import { resolveTestAdminUser } from "./resolve-test-user";
 import { sendBrowserTestRequest } from "./send-browser-test-request";

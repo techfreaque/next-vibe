@@ -19,7 +19,7 @@ import { db } from "next-vibe/database";
 import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { env } from "@/config/env";
+import { env } from "@/_old/config/env";
 
 import { paymentTransactions } from "../../db";
 import { InvoiceStatus } from "../../enum";

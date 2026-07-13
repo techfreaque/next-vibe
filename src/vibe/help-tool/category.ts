@@ -6,7 +6,7 @@
 import { SYSTEM_SETTINGS_ALIAS } from "next-vibe/env/settings/constants";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
-import { USER_ME_ALIAS } from "@/app/api/[locale]/user/private/me/constants";
+import { USER_ME_ALIAS } from "@/user/private/me/constants";
 
 import type { CategoryDefinition } from "./category-types";
 

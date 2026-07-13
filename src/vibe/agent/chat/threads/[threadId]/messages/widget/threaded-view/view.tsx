@@ -1,4 +1,11 @@
 "use client";
+import type { ChatMessage } from "next-vibe/agent/chat/db";
+import { useChatNavigationStore } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
+import { getVoteStatus } from "next-vibe/agent/chat/threads/[threadId]/messages/[messageId]/vote/utils";
+import { getDirectReplies } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/flat-view/helpers";
+import { processMessageGroupForTTS } from "next-vibe/agent/text-to-speech/content-processing";
+import { useTTSAudio } from "next-vibe/agent/text-to-speech/hooks";
+import type { TtsModelId } from "next-vibe/agent/text-to-speech/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { cn } from "next-vibe/core/utils/utils";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -14,15 +21,8 @@ import { useWidgetItem } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import React, { useCallback, useState } from "react";
 
-import { LAYOUT } from "@/app/[locale]/chat/lib/config/constants";
-import { chatAnimations } from "@/app/[locale]/chat/lib/design-tokens";
-import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
-import { getVoteStatus } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/utils";
-import { getDirectReplies } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/flat-view/helpers";
-import { processMessageGroupForTTS } from "@/app/api/[locale]/agent/text-to-speech/content-processing";
-import { useTTSAudio } from "@/app/api/[locale]/agent/text-to-speech/hooks";
-import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { LAYOUT } from "@/_pages/chat/lib/config/constants";
+import { chatAnimations } from "@/_pages/chat/lib/design-tokens";
 
 import { useSkill } from "../../../../../../skills/[id]/hooks";
 import type messagesDefinition from "../../definition";

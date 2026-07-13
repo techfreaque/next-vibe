@@ -18,12 +18,12 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { LeadWithEmailType } from "next-vibe/identity/lead/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
-import { CampaignType } from "@/app/api/[locale]/messenger/accounts/enum";
-import { scopedTranslation as smtpScopedTranslation } from "@/app/api/[locale]/messenger/providers/email/smtp-client/i18n";
-import { SmtpSendingRepository } from "@/app/api/[locale]/messenger/providers/email/smtp-client/sending/repository";
-import { env } from "@/config/env";
-import { configScopedTranslation } from "@/config/i18n";
+import { env } from "@/_old/config/env";
+import { configScopedTranslation } from "@/_old/config/i18n";
+import { contactClientRepository } from "@/contact/repository-client";
+import { CampaignType } from "@/messenger/accounts/enum";
+import { scopedTranslation as smtpScopedTranslation } from "@/messenger/providers/email/smtp-client/i18n";
+import { SmtpSendingRepository } from "@/messenger/providers/email/smtp-client/sending/repository";
 
 import { emailService } from "../index";
 import type {

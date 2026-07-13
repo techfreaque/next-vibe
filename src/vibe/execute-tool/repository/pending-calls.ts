@@ -340,7 +340,7 @@ export class PendingCalls {
       return true;
     }
     try {
-      const { chatMessages } = await import("@/app/api/[locale]/agent/chat/db");
+      const { chatMessages } = await import("next-vibe/agent/chat/db");
       const { db } = await import("next-vibe/database");
       const { eq } = await import("drizzle-orm");
 

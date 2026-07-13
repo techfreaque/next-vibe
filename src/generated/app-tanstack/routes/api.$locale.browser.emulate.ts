@@ -6,7 +6,7 @@ import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 export const Route = createFileRoute("/api/$locale/browser/emulate")({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/browser/emulate/route"),
+      () => import("@/browser/emulate/route"),
     ),
   },
 });

@@ -9,7 +9,7 @@ export const Route = createFileRoute(
   server: {
     handlers: wrapNextApiRoute(
       () =>
-        import("@/app/api/[locale]/user/data-sources/users-two-fa-enabled/route"),
+        import("@/user/data-sources/users-two-fa-enabled/route"),
     ),
   },
 });

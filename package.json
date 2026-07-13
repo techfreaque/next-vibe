@@ -61,18 +61,14 @@
     "vibe": "./.dist/bin/vibe-runtime.js"
   },
   "workspaces": [
-    "src/app/api/*/system/guard",
-    "src/app/api/*/system/launchpad",
-    "src/app/api/*/system/release-tool"
+    "src/vibe/tooling/guard",
+    "src/vibe/tooling/launchpad",
+    "src/vibe/tooling/release-tool"
   ],
   "files": [
     "check.config.ts",
     ".dist/**/*",
-    "src/config/**/*",
-    "src/hooks/**/*",
-    "src/i18n/**/*",
-    "src/packages/**/*",
-    "src/app/api/[locale]/**/*"
+    "src/vibe/**/*"
   ],
   "type": "module",
   "main": "./.dist/bin/vibe-runtime.js",
@@ -82,13 +78,13 @@
       "default": "./.dist/bin/vibe-runtime.js"
     },
     "./*": {
-      "types": "./src/app/api/[locale]/*",
-      "import": "./src/app/api/[locale]/*",
-      "default": "./src/app/api/[locale]/*"
+      "types": "./src/vibe/*",
+      "import": "./src/vibe/*",
+      "default": "./src/vibe/*"
     }
   },
   "scripts": {
-    "postinstall": "bun src/app/api/[locale]/system/platforms/cli/vibe-runtime.ts setup || echo 'Vibe setup failed - run manually if needed'",
+    "postinstall": "bun src/vibe/platforms/cli/vibe-runtime.ts setup || echo 'Vibe setup failed - run manually if needed'",
     "vibe": "vibe",
     "dev": "vibe dev",
     "build": "vibe build",
@@ -98,7 +94,7 @@
     "lint": "echo redirecting to check && vibe check",
     "studio": "vibe studio",
     "typecheck": "echo redirecting to check && vibe check",
-    "mcp:test": "bunx @modelcontextprotocol/inspector bun src/app/api/[locale]/system/platforms/cli/vibe-runtime.ts mcp --verbose",
+    "mcp:test": "bunx @modelcontextprotocol/inspector bun src/vibe/platforms/cli/vibe-runtime.ts mcp --verbose",
     "native": "expo start",
     "native:android": "expo run:android",
     "native:ios": "expo run:ios",

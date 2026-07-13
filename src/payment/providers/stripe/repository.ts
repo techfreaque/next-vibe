@@ -18,7 +18,7 @@ import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import Stripe from "stripe";
 
-import { productsRepository } from "@/app/api/[locale]/products/repository-client";
+import { productsRepository } from "@/products/repository-client";
 
 import { paymentInvoices, paymentTransactions } from "../../db";
 import {

@@ -11,15 +11,15 @@ import { useCallback, useRef, useState } from "react";
 const DEFAULT_PASSWORD_SENTINEL = "change-me-now";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { SYSTEM_SETTINGS_ALIAS } from "next-vibe/env/settings/constants";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 
-import { SYSTEM_SETTINGS_ALIAS } from "@/app/api/[locale]/system/env/settings/constants";
-import type { DEV_SEED_USERS } from "@/app/api/[locale]/user/dev-seed-users";
-import loginEndpoints from "@/app/api/[locale]/user/public/login/definition";
-import { scopedTranslation } from "@/app/api/[locale]/user/public/login/i18n";
-import { envClient } from "@/config/env-client";
-import { useLogger } from "@/hooks/use-logger";
+import { envClient } from "@/_old/config/env-client";
+import { useLogger } from "@/_old/hooks/use-logger";
+import type { DEV_SEED_USERS } from "@/user/dev-seed-users";
+import loginEndpoints from "@/user/public/login/definition";
+import { scopedTranslation } from "@/user/public/login/i18n";
 
 interface LoginFormProps {
   locale: CountryLanguage;

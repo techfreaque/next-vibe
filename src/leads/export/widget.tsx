@@ -104,15 +104,14 @@ export function LeadsExportContainer({
 
   const handleViewList = useCallback((): void => {
     void (async (): Promise<void> => {
-      const listDef = await import("@/app/api/[locale]/leads/list/definition");
+      const listDef = await import("@/leads/list/definition");
       navigate(listDef.default.GET);
     })();
   }, [navigate]);
 
   const handleImport = useCallback((): void => {
     void (async (): Promise<void> => {
-      const importDef =
-        await import("@/app/api/[locale]/leads/import/definition");
+      const importDef = await import("@/leads/import/definition");
       navigate(importDef.default.POST);
     })();
   }, [navigate]);

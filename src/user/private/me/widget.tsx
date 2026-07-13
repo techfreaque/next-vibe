@@ -1,5 +1,8 @@
 "use client";
 
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
+import skillsDef from "next-vibe/agent/skills/definition";
+import { SkillOwnershipType } from "next-vibe/agent/skills/enum";
 import { scopedTranslation as userRoleScopedTranslation } from "next-vibe/identity/roles/i18n";
 import { useRouter } from "next-vibe/ui/hooks/use-navigation";
 import { assignUrl } from "next-vibe/ui/lib/location";
@@ -56,28 +59,25 @@ import {
   useState,
 } from "react";
 
-import { buildScopedPaletteStyle } from "@/app/[locale]/creator/[userId]/_shared/palette-generator";
+import { envClient } from "@/_old/config/env-client";
+import { buildScopedPaletteStyle } from "@/_pages/creator/[userId]/_shared/palette-generator";
 import {
   DEFAULT_ACCENT,
   ProfileBio,
   ProfileSocialPills,
-} from "@/app/[locale]/creator/[userId]/_shared/profile-content";
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import skillsDef from "@/app/api/[locale]/agent/skills/definition";
-import { SkillOwnershipType } from "@/app/api/[locale]/agent/skills/enum";
-import creditsDef from "@/app/api/[locale]/credits/definition";
-import configDef from "@/app/api/[locale]/lead-magnet/config/definition";
-import subscriptionDef from "@/app/api/[locale]/subscription/definition";
-import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
-import { scopedTranslation as subscriptionScopedTranslation } from "@/app/api/[locale]/subscription/i18n";
-import logoutDef from "@/app/api/[locale]/user/private/logout/definition";
-import addressesDef from "@/app/api/[locale]/user/private/me/addresses/definition";
-import passwordDef from "@/app/api/[locale]/user/private/me/password/definition";
-import sessionsDef from "@/app/api/[locale]/user/private/sessions/definition";
-import { envClient } from "@/config/env-client";
+} from "@/_pages/creator/[userId]/_shared/profile-content";
+import creditsDef from "@/credits/definition";
+import configDef from "@/lead-magnet/config/definition";
+import subscriptionDef from "@/subscription/definition";
+import { SubscriptionStatus } from "@/subscription/enum";
+import { scopedTranslation as subscriptionScopedTranslation } from "@/subscription/i18n";
+import logoutDef from "@/user/private/logout/definition";
+import addressesDef from "@/user/private/me/addresses/definition";
+import passwordDef from "@/user/private/me/password/definition";
+import sessionsDef from "@/user/private/sessions/definition";
 
-import { apiClient } from "../../../system/platforms/react/hooks/store";
-import { useApiQuery } from "../../../system/platforms/react/hooks/use-api-query";
+import { apiClient } from "../../../vibe/platforms/react/hooks/store";
+import { useApiQuery } from "../../../vibe/platforms/react/hooks/use-api-query";
 import avatarDef from "./avatar/definition";
 import type meDefinition from "./definition";
 import type { MeGetResponseOutput, MePostRequestOutput } from "./definition";

@@ -389,7 +389,7 @@ const oxlint: CheckConfig["oxlint"] = {
           "oxlint-plugin-jsx-capitalization/jsx-capitalization": [
             "error",
             {
-              excludedPaths: ["/system/ui/"],
+              excludedPaths: ["/vibe/ui/"],
               excludedFilePatterns: [
                 "/email.tsx",
                 ".email.tsx",
@@ -682,7 +682,7 @@ const oxlint: CheckConfig["oxlint"] = {
     {
       // vibe ui platform wrappers legitimately use native HTML elements
       // (head, audio, video, html) that Next.js/a11y rules disallow in app code.
-      files: ["**/system/ui/**"],
+      files: ["**/vibe/ui/**"],
       rules: {
         "nextjs/no-head-element": "off",
       },

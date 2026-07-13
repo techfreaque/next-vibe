@@ -4,10 +4,9 @@
  * Import this in all client code: "use client" components, client hooks, etc.
  */
 
+import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-
-import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 
 import { createLogger } from "./create-logger";
 import type { EndpointLogger, LoggerMetadata } from "./types";

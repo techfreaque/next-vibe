@@ -6,6 +6,8 @@
 
 "use client";
 
+import type { FolderContentsItem } from "next-vibe/agent/chat/folder-contents/[rootFolderId]/definition";
+import folderContentsDefinitions from "next-vibe/agent/chat/folder-contents/[rootFolderId]/definition";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -17,9 +19,6 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { apiClient } from "next-vibe/platforms/react/hooks/store";
 import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
-
-import type { FolderContentsItem } from "@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition";
-import folderContentsDefinitions from "@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition";
 
 import type { DefaultFolderId } from "../../config";
 import type { ChatFolder } from "../../db";

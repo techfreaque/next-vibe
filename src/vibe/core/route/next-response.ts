@@ -22,7 +22,7 @@ import {
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { NextResponse } from "next-vibe/ui/lib/request";
 
-import { scopedTranslation as sharedScopedTranslation } from "@/app/[locale]/shared/i18n";
+import { scopedTranslation as sharedScopedTranslation } from "@/_pages/shared/i18n";
 
 /**
  * Wraps a validated success response in NextResponse

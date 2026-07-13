@@ -12,17 +12,17 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { ReactElement } from "react";
 import { z } from "zod";
 
-import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
-import { EmailTemplate } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/template.email";
+import { getEnvAvailability } from "next-vibe/agent/env-availability";
+import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
+import { EmailTemplate } from "@/messenger/providers/email/smtp-client/components/template.email";
 import {
   createTrackingContext,
   type TrackingContext,
-} from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/tracking_context.email";
-import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
-import { RESET_TOKEN_EXPIRY } from "@/config/constants";
-import { env } from "@/config/env";
-import { configScopedTranslation } from "@/config/i18n";
+} from "@/messenger/providers/email/smtp-client/components/tracking_context.email";
+import type { EmailTemplateDefinition } from "@/messenger/registry/template";
+import { RESET_TOKEN_EXPIRY } from "@/_old/config/constants";
+import { env } from "@/_old/config/env";
+import { configScopedTranslation } from "@/_old/config/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";

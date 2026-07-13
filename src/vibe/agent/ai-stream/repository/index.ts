@@ -7,6 +7,7 @@ import "server-only";
 
 import type { JSONValue } from "ai";
 import { and, eq, sql } from "drizzle-orm";
+import { getInstanceAvailability } from "next-vibe/agent/env-availability";
 import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
@@ -23,11 +24,9 @@ import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { CoreTool } from "next-vibe/platforms/ai/tools-loader";
+import type { ResolvedRelayContext } from "next-vibe/realtime/remote-event-bridge/relay-context";
+import { RemoteEventBridgeRepository } from "next-vibe/realtime/remote-event-bridge/repository";
 import type { NextRequest } from "next-vibe/ui/lib/request";
-
-import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
-import type { ResolvedRelayContext } from "@/app/api/[locale]/system/realtime/remote-event-bridge/relay-context";
-import { RemoteEventBridgeRepository } from "@/app/api/[locale]/system/realtime/remote-event-bridge/repository";
 
 import type { ToolExecutionContext } from "../../chat/config";
 import { DefaultFolderId, makeHeadlessContext } from "../../chat/config";

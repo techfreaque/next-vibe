@@ -102,8 +102,8 @@ export function PaymentDashboardWidget(_props: {
     e.stopPropagation();
     void (async (): Promise<void> => {
       const [createDef, getDef] = await Promise.all([
-        import("@/app/api/[locale]/payment/invoice/create/definition"),
-        import("@/app/api/[locale]/payment/invoice/[invoiceId]/get/definition"),
+        import("@/payment/invoice/create/definition"),
+        import("@/payment/invoice/[invoiceId]/get/definition"),
       ]);
       navigate(createDef.default.POST, {
         renderInModal: true,
@@ -120,8 +120,7 @@ export function PaymentDashboardWidget(_props: {
   const handleNavAllInvoices = (e: ButtonMouseEvent): void => {
     e.stopPropagation();
     void (async (): Promise<void> => {
-      const def =
-        await import("@/app/api/[locale]/payment/invoice/list/definition");
+      const def = await import("@/payment/invoice/list/definition");
       navigate(def.default.GET, {});
     })();
   };
@@ -130,8 +129,8 @@ export function PaymentDashboardWidget(_props: {
     e.stopPropagation();
     void (async (): Promise<void> => {
       const [createDef, getDef] = await Promise.all([
-        import("@/app/api/[locale]/payment/estimate/create/definition"),
-        import("@/app/api/[locale]/payment/estimate/[estimateId]/get/definition"),
+        import("@/payment/estimate/create/definition"),
+        import("@/payment/estimate/[estimateId]/get/definition"),
       ]);
       navigate(createDef.default.POST, {
         renderInModal: true,
@@ -148,8 +147,7 @@ export function PaymentDashboardWidget(_props: {
   const handleNavAllEstimates = (e: ButtonMouseEvent): void => {
     e.stopPropagation();
     void (async (): Promise<void> => {
-      const def =
-        await import("@/app/api/[locale]/payment/estimate/list/definition");
+      const def = await import("@/payment/estimate/list/definition");
       navigate(def.default.GET, {});
     })();
   };
@@ -157,8 +155,7 @@ export function PaymentDashboardWidget(_props: {
   const handleNavAllBills = (e: ButtonMouseEvent): void => {
     e.stopPropagation();
     void (async (): Promise<void> => {
-      const def =
-        await import("@/app/api/[locale]/payment/bill/list/definition");
+      const def = await import("@/payment/bill/list/definition");
       navigate(def.default.GET, {});
     })();
   };
@@ -169,7 +166,7 @@ export function PaymentDashboardWidget(_props: {
       e.stopPropagation();
       void (async (): Promise<void> => {
         const def =
-          await import("@/app/api/[locale]/payment/invoice/[invoiceId]/get/definition");
+          await import("@/payment/invoice/[invoiceId]/get/definition");
         navigate(def.default.GET, { urlPathParams: { invoiceId } });
       })();
     };

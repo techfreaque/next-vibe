@@ -117,8 +117,8 @@ handler: ({ data, user, logger }) =>
  * Handles [HTTP methods] requests for [feature]
  */
 
-import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
-import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { endpointsHandler } from "@/system/unified-interface/shared/endpoints/route/multi";
+import { Methods } from "@/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
 import { MyRepository } from "./repository";
@@ -209,7 +209,7 @@ Routes must **never** import scoped translations. The handler already provides `
 
 ```typescript
 // ❌ WRONG - Route importing its own i18n just to get t
-import { scopedTranslation as importScopedTranslation } from "@/app/api/[locale]/leads/import/i18n";
+import { scopedTranslation as importScopedTranslation } from "@/leads/import/i18n";
 
 handler: async ({ user, urlPathParams, logger, locale }) => {
   const { t } = importScopedTranslation.scopedT(locale);
@@ -264,8 +264,8 @@ handler: ({ user, logger }) =>
 import { success, fail } from "next-vibe/shared/types/response.schema";
 
 // ✅ CORRECT - Only import what's needed for routing
-import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
-import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { endpointsHandler } from "@/system/unified-interface/shared/endpoints/route/multi";
+import { Methods } from "@/system/unified-interface/shared/types/enums";
 ```
 
 ## Known Exceptions to `endpointsHandler()`

@@ -25,6 +25,7 @@ import type {
   Time,
   UTCTimestamp,
 } from "lightweight-charts";
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import { cn } from "next-vibe/core/utils/utils";
 import { GraphOwnerType, GraphResolution } from "next-vibe/dataflow/enum";
 import type { GraphNodeConfig } from "next-vibe/dataflow/graph/schema";
@@ -84,8 +85,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 
 import type definition from "./definition";
 import definitions from "./definition";

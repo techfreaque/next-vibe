@@ -8,13 +8,13 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 
-import type { ClientT } from "@/app/api/[locale]/ssh/client";
+import type { ClientT } from "@/ssh/client";
 import {
   getConnectionCredentials,
   openSshClient,
   sshExecCommand,
-} from "@/app/api/[locale]/ssh/client";
-import type { SshConnection } from "@/app/api/[locale]/ssh/db";
+} from "@/ssh/client";
+import type { SshConnection } from "@/ssh/db";
 
 /**
  * Install nginx-ingress-controller + cert-manager + Let's Encrypt ClusterIssuer.

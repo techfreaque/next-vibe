@@ -6,8 +6,8 @@
 import {
   DefaultFolderId,
   isDefaultFolderId,
-} from "@/app/api/[locale]/agent/chat/config";
-import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
+} from "next-vibe/agent/chat/config";
+import { NEW_MESSAGE_ID } from "next-vibe/agent/chat/enum";
 
 /**
  * Parsed URL result

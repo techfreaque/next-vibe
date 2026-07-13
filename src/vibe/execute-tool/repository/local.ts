@@ -25,6 +25,8 @@
 import "server-only";
 
 import { and, eq, sql } from "drizzle-orm";
+import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
+import { makeHeadlessContext } from "next-vibe/agent/chat/config";
 import { formatValidationErrorCompact } from "next-vibe/core/core-utils/format-validation-error";
 import { Platform } from "next-vibe/core/definition/platform";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -45,8 +47,6 @@ import {
   TaskOutputMode,
 } from "next-vibe/tasks/enum";
 
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
-import { makeHeadlessContext } from "@/app/api/[locale]/agent/chat/config";
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import {
@@ -796,7 +796,7 @@ export class LocalExecution {
   }): Promise<void> {
     const { toolMessageId, threadId, mode, taskId, user, logger } = params;
     const { chatMessages, chatThreads } =
-      await import("@/app/api/[locale]/agent/chat/db");
+      await import("next-vibe/agent/chat/db");
     const [msg] = await db
       .select({ metadata: chatMessages.metadata })
       .from(chatMessages)
@@ -827,7 +827,7 @@ export class LocalExecution {
       return;
     }
     const { createMessagesEmitter } =
-      await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/emitter");
+      await import("next-vibe/agent/chat/threads/[threadId]/messages/emitter");
     createMessagesEmitter(logger, user, {
       threadId,
       rootFolderId: threadRow.rootFolderId,
@@ -1031,7 +1031,7 @@ export class LocalExecution {
     threadId: string;
   }): Promise<{ id: string; parentId: string | null } | null> {
     const { callerToolCallId, threadId } = params;
-    const { chatMessages } = await import("@/app/api/[locale]/agent/chat/db");
+    const { chatMessages } = await import("next-vibe/agent/chat/db");
     const [row] = await db
       .select({ id: chatMessages.id, parentId: chatMessages.parentId })
       .from(chatMessages)

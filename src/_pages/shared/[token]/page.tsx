@@ -6,6 +6,8 @@
 
 export const dynamic = "force-dynamic";
 
+import { scopedTranslation as shareLinksScopedTranslation } from "next-vibe/agent/chat/threads/[threadId]/share-links/i18n";
+import { ShareLinksRepository } from "next-vibe/agent/chat/threads/[threadId]/share-links/repository";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
@@ -16,9 +18,7 @@ import { Div } from "next-vibe/ui/ui/div";
 import { P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 
-import { scopedTranslation } from "@/app/[locale]/shared/i18n";
-import { scopedTranslation as shareLinksScopedTranslation } from "@/app/api/[locale]/agent/chat/threads/[threadId]/share-links/i18n";
-import { ShareLinksRepository } from "@/app/api/[locale]/agent/chat/threads/[threadId]/share-links/repository";
+import { scopedTranslation } from "@/_pages/shared/i18n";
 
 interface SharedTokenPageProps {
   params: Promise<{

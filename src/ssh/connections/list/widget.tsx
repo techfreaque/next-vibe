@@ -73,7 +73,7 @@ export function ConnectionsListContainer(_props: {
   const handleConnectRemote = useCallback((): void => {
     void (async (): Promise<void> => {
       const def =
-        await import("@/app/api/[locale]/remote-connection/connect/definition");
+        await import("next-vibe/remote-connection/connect/definition");
       navigate(def.default.POST, { popNavigationOnSuccess: 1 });
     })();
   }, [navigate]);
@@ -90,7 +90,7 @@ export function ConnectionsListContainer(_props: {
         // Navigate to remote connection detail
         void (async (): Promise<void> => {
           const def =
-            await import("@/app/api/[locale]/remote-connection/[instanceId]/definition");
+            await import("next-vibe/remote-connection/[instanceId]/definition");
           navigate(def.default.GET, {
             urlPathParams: { instanceId: conn.instanceId! },
           });
@@ -118,8 +118,7 @@ export function ConnectionsListContainer(_props: {
         e.stopPropagation();
         const slug = conn.label.toLowerCase().replace(/\s+/g, "-");
         void (async (): Promise<void> => {
-          const def =
-            await import("@/app/api/[locale]/agent/cortex/exec/definition");
+          const def = await import("next-vibe/agent/cortex/exec/definition");
           navigate(def.default.POST, {
             data: { path: `/ssh/${slug}` },
           });

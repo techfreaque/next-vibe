@@ -18,9 +18,9 @@ import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
-import { paymentInvoices } from "@/app/api/[locale]/payment/db";
-import { InvoiceStatus } from "@/app/api/[locale]/payment/enum";
+import { CompanyAuthRepository } from "@/companies/repository";
+import { paymentInvoices } from "@/payment/db";
+import { InvoiceStatus } from "@/payment/enum";
 
 import { scopedTranslation } from "../../i18n";
 import type { ReceivablesAgingRequestOutput } from "./definition";

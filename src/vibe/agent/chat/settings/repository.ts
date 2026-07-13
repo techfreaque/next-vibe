@@ -6,6 +6,7 @@
 import "server-only";
 
 import { and, count, eq, isNull, sql } from "drizzle-orm";
+import { getInstanceAvailability } from "next-vibe/agent/env-availability";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -17,8 +18,6 @@ import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { cronTasks } from "next-vibe/tasks/cron/db";
-
-import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
 
 import { DefaultFolderId } from "../config";
 import { chatFolders, chatThreads } from "../db";

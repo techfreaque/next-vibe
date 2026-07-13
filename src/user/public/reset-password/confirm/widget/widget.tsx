@@ -14,7 +14,7 @@ import {
 } from "next-vibe/ui/ui/card";
 import { Div } from "next-vibe/ui/ui/div";
 
-import { PasswordStrengthIndicator } from "@/app/api/[locale]/user/public/signup/widget/password-strength-indicator";
+import { PasswordStrengthIndicator } from "@/user/public/signup/widget/password-strength-indicator";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetNavigation,

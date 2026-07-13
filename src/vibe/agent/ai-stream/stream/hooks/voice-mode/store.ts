@@ -5,10 +5,9 @@
 
 "use client";
 
+import type { ChatMode } from "next-vibe/agent/models/enum";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-
-import type { ChatMode } from "@/app/api/[locale]/agent/models/enum";
 
 // ─── Voice Mode Types ─────────────────────────────────────────────────────────
 

@@ -30,7 +30,7 @@ import { db } from "next-vibe/database";
 import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { creditPacks, creditWallets } from "@/app/api/[locale]/credits/db";
+import { creditPacks, creditWallets } from "@/credits/db";
 
 import {
   CreditPackSourceAdminFilter,

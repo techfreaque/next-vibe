@@ -3,6 +3,68 @@
  */
 
 "use client";
+import {
+  DEFAULT_AUDIO_VISION_MODEL_SELECTION,
+  DEFAULT_CHAT_MODEL_SELECTION,
+  DEFAULT_IMAGE_VISION_MODEL_SELECTION,
+  DEFAULT_VIDEO_VISION_MODEL_SELECTION,
+} from "next-vibe/agent/ai-stream/constants";
+import {
+  type ChatModelSelection,
+  chatModelSelectionSchema,
+  getBestChatModel,
+} from "next-vibe/agent/ai-stream/models";
+import {
+  type AudioVisionModelSelection,
+  audioVisionModelSelectionSchema,
+  getBestAudioVisionModel,
+  getBestImageVisionModel,
+  getBestVideoVisionModel,
+  type ImageVisionModelSelection,
+  imageVisionModelSelectionSchema,
+  type VideoVisionModelSelection,
+  videoVisionModelSelectionSchema,
+} from "next-vibe/agent/ai-stream/vision-models";
+import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
+import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "next-vibe/agent/image-generation/constants";
+import {
+  getBestImageGenModel,
+  type ImageGenModelSelection,
+  imageGenModelSelectionSchema,
+} from "next-vibe/agent/image-generation/models";
+import { type AnyModelOptionWithVision } from "next-vibe/agent/models/all-models";
+import { modelProviders } from "next-vibe/agent/models/models";
+import { ModelCreditDisplay } from "next-vibe/agent/models/widget/model-credit-display";
+import {
+  ModelSelector,
+  ModelSelectorTrigger,
+} from "next-vibe/agent/models/widget/model-selector";
+import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "next-vibe/agent/music-generation/constants";
+import {
+  getBestMusicGenModel,
+  type MusicGenModelSelection,
+  musicGenModelSelectionSchema,
+} from "next-vibe/agent/music-generation/models";
+import { DEFAULT_STT_MODEL_SELECTION } from "next-vibe/agent/speech-to-text/constants";
+import {
+  getBestSttModel,
+  type SttModelSelection,
+  sttModelSelectionSchema,
+} from "next-vibe/agent/speech-to-text/models";
+import { DEFAULT_TTS_MODEL_SELECTION } from "next-vibe/agent/text-to-speech/constants";
+import {
+  getBestTtsModel,
+  ttsModelOptions,
+  type VoiceModelSelection,
+  voiceModelSelectionSchema,
+} from "next-vibe/agent/text-to-speech/models";
+import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "next-vibe/agent/video-generation/constants";
+import {
+  getBestVideoGenModel,
+  type VideoGenModelSelection,
+  videoGenModelSelectionSchema,
+} from "next-vibe/agent/video-generation/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { cn } from "next-vibe/core/utils/utils";
 import { usePathname } from "next-vibe/ui/hooks/use-pathname";
@@ -97,69 +159,7 @@ import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-butt
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-import {
-  DEFAULT_AUDIO_VISION_MODEL_SELECTION,
-  DEFAULT_CHAT_MODEL_SELECTION,
-  DEFAULT_IMAGE_VISION_MODEL_SELECTION,
-  DEFAULT_VIDEO_VISION_MODEL_SELECTION,
-} from "@/app/api/[locale]/agent/ai-stream/constants";
-import {
-  type ChatModelSelection,
-  chatModelSelectionSchema,
-  getBestChatModel,
-} from "@/app/api/[locale]/agent/ai-stream/models";
-import {
-  type AudioVisionModelSelection,
-  audioVisionModelSelectionSchema,
-  getBestAudioVisionModel,
-  getBestImageVisionModel,
-  getBestVideoVisionModel,
-  type ImageVisionModelSelection,
-  imageVisionModelSelectionSchema,
-  type VideoVisionModelSelection,
-  videoVisionModelSelectionSchema,
-} from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
-import {
-  getBestImageGenModel,
-  type ImageGenModelSelection,
-  imageGenModelSelectionSchema,
-} from "@/app/api/[locale]/agent/image-generation/models";
-import { type AnyModelOptionWithVision } from "@/app/api/[locale]/agent/models/all-models";
-import { modelProviders } from "@/app/api/[locale]/agent/models/models";
-import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
-import {
-  ModelSelector,
-  ModelSelectorTrigger,
-} from "@/app/api/[locale]/agent/models/widget/model-selector";
-import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/music-generation/constants";
-import {
-  getBestMusicGenModel,
-  type MusicGenModelSelection,
-  musicGenModelSelectionSchema,
-} from "@/app/api/[locale]/agent/music-generation/models";
-import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
-import {
-  getBestSttModel,
-  type SttModelSelection,
-  sttModelSelectionSchema,
-} from "@/app/api/[locale]/agent/speech-to-text/models";
-import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
-import {
-  getBestTtsModel,
-  ttsModelOptions,
-  type VoiceModelSelection,
-  voiceModelSelectionSchema,
-} from "@/app/api/[locale]/agent/text-to-speech/models";
-import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/video-generation/constants";
-import {
-  getBestVideoGenModel,
-  type VideoGenModelSelection,
-  videoGenModelSelectionSchema,
-} from "@/app/api/[locale]/agent/video-generation/models";
-import { useLogger } from "@/hooks/use-logger";
+import { useLogger } from "@/_old/hooks/use-logger";
 
 import { CompactTriggerEdit } from "../../chat/settings/widget";
 import { formatSkillId, parseSkillId } from "../../chat/slugify";
@@ -2533,7 +2533,7 @@ function LeadCaptureForm({
       try {
         const [{ apiClient }, captureDef] = await Promise.all([
           import("next-vibe/platforms/react/hooks/store"),
-          import("@/app/api/[locale]/lead-magnet/capture/definition"),
+          import("@/lead-magnet/capture/definition"),
         ]);
 
         const result = await apiClient.mutate(
@@ -2679,8 +2679,7 @@ function LandingBottomCTA({
 
   const handleLogin = (): void => {
     void (async (): Promise<void> => {
-      const def =
-        await import("@/app/api/[locale]/user/public/login/definition");
+      const def = await import("@/user/public/login/definition");
       navigation.push(def.default.POST);
     })();
   };
@@ -3167,8 +3166,7 @@ function ShareEarnButton({
   const handleSignup = (): void => {
     setOpen(false);
     void (async (): Promise<void> => {
-      const def =
-        await import("@/app/api/[locale]/user/public/signup/definition");
+      const def = await import("@/user/public/signup/definition");
       navigation.push(def.default.POST);
     })();
   };
@@ -3176,8 +3174,7 @@ function ShareEarnButton({
   const handleLogin = (): void => {
     setOpen(false);
     void (async (): Promise<void> => {
-      const def =
-        await import("@/app/api/[locale]/user/public/login/definition");
+      const def = await import("@/user/public/login/definition");
       navigation.push(def.default.POST);
     })();
   };
@@ -3202,8 +3199,7 @@ function ShareEarnButton({
     try {
       const { apiClient } =
         await import("next-vibe/platforms/react/hooks/store");
-      const codesListDef =
-        await import("@/app/api/[locale]/referral/codes/list/definition");
+      const codesListDef = await import("@/referral/codes/list/definition");
       const result = await apiClient.fetch(
         codesListDef.default.GET,
         logger,
@@ -3238,8 +3234,7 @@ function ShareEarnButton({
     try {
       const { apiClient } =
         await import("next-vibe/platforms/react/hooks/store");
-      const referralDef =
-        await import("@/app/api/[locale]/referral/definition");
+      const referralDef = await import("@/referral/definition");
       const result = await apiClient.fetch(
         referralDef.default.POST,
         logger,

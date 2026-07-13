@@ -40,7 +40,7 @@ export class DeployPreviewRepository {
 
       const stack = data.stack ?? "prod";
       const statePath = `${process.cwd()}/.pulumi`;
-      const pulumiDir = `${process.cwd()}/src/app/api/[locale]/infra/shared/pulumi`;
+      const pulumiDir = `${process.cwd()}/src/vibe/tooling/infra/shared/pulumi`;
 
       logger.info("deploy-preview: running pulumi preview", { stack });
 

@@ -14,10 +14,9 @@ import {
 import { ConfirmedExecution } from "next-vibe/execute-tool/repository/confirmed";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import type { ResolvedRelayContext } from "next-vibe/realtime/remote-event-bridge/relay-context";
 
-import type { ResolvedRelayContext } from "@/app/api/[locale]/system/realtime/remote-event-bridge/relay-context";
-
-import { db } from "../../../../system/database";
+import { db } from "../../../../database";
 import type { ToolExecutionContext } from "../../../chat/config";
 import type { ChatMessage, ToolCall } from "../../../chat/db";
 import {

@@ -5,14 +5,14 @@
 import "server-only";
 
 import type { ModelMessage, ToolResultPart } from "ai";
+import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
+import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
+import type { VoiceModelSelection } from "next-vibe/agent/text-to-speech/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
-import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
+import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 
 import type { ToolCall } from "../../../chat/db";
 import type { MessagesWsEmit } from "../../../chat/threads/[threadId]/messages/emitter";

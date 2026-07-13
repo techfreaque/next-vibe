@@ -9,8 +9,8 @@ import { UserRole } from "next-vibe/identity/roles/enum";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import type { JSX } from "react";
 
-import { scopedTranslation as meScopedTranslation } from "@/app/api/[locale]/user/private/me/i18n";
-import { UserProfileRepository } from "@/app/api/[locale]/user/private/me/repository";
+import { scopedTranslation as meScopedTranslation } from "@/user/private/me/i18n";
+import { UserProfileRepository } from "@/user/private/me/repository";
 
 import { scopedTranslation } from "../i18n";
 import { UnsubscribePageClient } from "./page-client";

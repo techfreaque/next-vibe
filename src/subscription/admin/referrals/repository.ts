@@ -32,15 +32,15 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
+import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import {
   payoutRequests,
   referralCodes,
   referralEarnings,
   userReferrals,
-} from "@/app/api/[locale]/referral/db";
-import { PayoutStatus } from "@/app/api/[locale]/referral/enum";
-import { ReferralRepository } from "@/app/api/[locale]/referral/repository";
+} from "@/referral/db";
+import { PayoutStatus } from "@/referral/enum";
+import { ReferralRepository } from "@/referral/repository";
 
 import {
   PayoutAction,

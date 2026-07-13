@@ -5,6 +5,8 @@
 
 import "server-only";
 
+import { makeHeadlessContext } from "next-vibe/agent/chat/config";
+import { fetchStorageFileAsBase64 } from "next-vibe/agent/chat/storage/url-utils";
 import { formatValidationErrorCompact } from "next-vibe/core/core-utils/format-validation-error";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import {
@@ -28,9 +30,6 @@ import {
 import { scopedTranslation as mcpScopedTranslation } from "next-vibe/platforms/mcp/i18n";
 import { VIBE_CHECK_TOOL_NAMES } from "next-vibe/tooling/check/vibe-check/constants";
 import { McpResultFormatter } from "next-vibe/unified-ui/renderers/mcp/McpResultFormatter";
-
-import { makeHeadlessContext } from "@/app/api/[locale]/agent/chat/config";
-import { fetchStorageFileAsBase64 } from "@/app/api/[locale]/agent/chat/storage/url-utils";
 
 import type { MCPContent } from "./types";
 import type {
@@ -249,7 +248,7 @@ export class MCPRegistry {
         : undefined;
     if (userId) {
       const { ExecuteToolRouting } =
-        await import("@/app/api/[locale]/remote-connection/routing");
+        await import("next-vibe/remote-connection/routing");
       const target = await ExecuteToolRouting.resolveTarget({
         userId,
         locale: context.locale,

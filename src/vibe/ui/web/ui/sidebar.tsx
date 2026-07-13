@@ -3,7 +3,7 @@ import { cn } from "next-vibe/core/utils/utils";
 import type { JSX, ReactNode } from "react";
 import React from "react";
 
-import { platform } from "@/config/env-client";
+import { platform } from "@/_old/config/env-client";
 
 import { useWindowSize } from "../../web/hooks/use-window-size";
 import { Div } from "./div";

@@ -13,6 +13,11 @@
 
 import "server-only";
 
+import { generate as generateAiStreamEnums } from "next-vibe/agent/ai-stream/model-enums-generator/generator";
+import { generate as generatePromptFragments } from "next-vibe/agent/ai-stream/system-prompt/generator";
+import { generate as generateCortex } from "next-vibe/agent/cortex/seeds/generator";
+import { generate as generateAgentDocs } from "next-vibe/agent/skills/default-skills/vibe-coder/generator";
+import { generate as generateSkills } from "next-vibe/agent/skills/generator";
 import { generate as generateEndpointFramework } from "next-vibe/core/definition/generator/generator";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { generate as generateSeeds } from "next-vibe/database/seed/generator";
@@ -22,6 +27,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { generate as generateNextApp } from "next-vibe/platforms/next-app/generator";
 import { generate as generateNativeIndexes } from "next-vibe/platforms/react-native/generator";
 import { generate as generateTanstackRoutes } from "next-vibe/platforms/tanstack-start/generator";
+import { generate as generateRemoteCapabilities } from "next-vibe/remote-connection/generator";
 import { generate as generateTasks } from "next-vibe/tasks/generator";
 import {
   findGeneratorInputs,
@@ -41,13 +47,7 @@ import {
   type GeneratorResult,
 } from "next-vibe/tooling/generators/shared/shared-inputs";
 
-import { generate as generateAiStreamEnums } from "@/app/api/[locale]/agent/ai-stream/model-enums-generator/generator";
-import { generate as generatePromptFragments } from "@/app/api/[locale]/agent/ai-stream/system-prompt/generator";
-import { generate as generateCortex } from "@/app/api/[locale]/agent/cortex/seeds/generator";
-import { generate as generateAgentDocs } from "@/app/api/[locale]/agent/skills/default-skills/vibe-coder/generator";
-import { generate as generateSkills } from "@/app/api/[locale]/agent/skills/generator";
-import { generate as generateEmail } from "@/app/api/[locale]/messenger/registry/generator";
-import { generate as generateRemoteCapabilities } from "@/app/api/[locale]/remote-connection/generator";
+import { generate as generateEmail } from "@/messenger/registry/generator";
 
 // ───────────────────────────────────────────────────────────────────────────
 // Registry: one entry per domain generator (enable/opt-out here)
@@ -201,7 +201,7 @@ export class GeneratorRunner {
       phase: "default",
       needs: {},
       cacheKey: null,
-      output: "src/app/api/[locale]/agent/ai-stream/vision-models.generated.ts",
+      output: "src/vibe/agent/ai-stream/vision-models.generated.ts",
       enabled: true,
     },
     {

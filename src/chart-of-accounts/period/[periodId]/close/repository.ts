@@ -17,8 +17,8 @@ import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { CompanyMemberRole } from "@/app/api/[locale]/companies/enum";
-import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
+import { CompanyMemberRole } from "@/companies/enum";
+import { CompanyAuthRepository } from "@/companies/repository";
 
 import { accountingPeriods, journalEntries } from "../../../db";
 import { JournalEntryStatus, PeriodStatus } from "../../../enum";

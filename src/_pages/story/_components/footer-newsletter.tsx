@@ -12,7 +12,7 @@ import { Input } from "next-vibe/ui/ui/input";
 import { H3, P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 
-import { useNewsletterManager } from "@/app/api/[locale]/newsletter/hooks";
+import { useNewsletterManager } from "@/newsletter/hooks";
 
 import CountrySelector from "../../_components/country-selector";
 import { scopedTranslation } from "./i18n";

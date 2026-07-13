@@ -58,7 +58,7 @@ function detectIsPackage(): boolean {
 
   // Check if we're in the next-vibe project (has src/app/api structure)
   const cwd = process.cwd();
-  const localVibeStructure = join(cwd, "src/app/api/[locale]");
+  const localVibeStructure = join(cwd, "src");
   if (existsSync(localVibeStructure)) {
     return false; // Local development
   }
@@ -68,7 +68,7 @@ function detectIsPackage(): boolean {
     // Could be local dist or package dist - check for src folder
     const scriptDir = dirname(mainScript);
     const projectRoot = resolve(scriptDir, "../..");
-    const srcPath = join(projectRoot, "src/app/api/[locale]");
+    const srcPath = join(projectRoot, "src");
     if (!existsSync(srcPath)) {
       return true; // Running from package
     }

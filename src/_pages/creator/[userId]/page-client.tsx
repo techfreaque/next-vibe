@@ -5,8 +5,8 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 
-import type { CreatorGetResponseOutput } from "@/app/api/[locale]/user/public/creator/[userId]/definition";
-import creatorEndpoints from "@/app/api/[locale]/user/public/creator/[userId]/definition";
+import type { CreatorGetResponseOutput } from "@/user/public/creator/[userId]/definition";
+import creatorEndpoints from "@/user/public/creator/[userId]/definition";
 
 export interface CreatorPageData {
   locale: CountryLanguage;

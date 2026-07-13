@@ -9,7 +9,7 @@ import { describe, expect, it } from "bun:test";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { z } from "zod";
 
-import productUpdateDefinition from "@/app/api/[locale]/products/catalog/[productId]/update/definition";
+import productUpdateDefinition from "@/products/catalog/[productId]/update/definition";
 
 import { extractSchemaDefaults, generateFormSchema } from "./utils";
 

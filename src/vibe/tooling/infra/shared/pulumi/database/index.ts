@@ -8,13 +8,13 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { kubectl } from "next-vibe/tooling/infra/shared/pulumi/k3s/scripts";
 
-import type { ClientT } from "@/app/api/[locale]/ssh/client";
+import type { ClientT } from "@/ssh/client";
 import {
   getConnectionCredentials,
   openSshClient,
   sshExecCommand,
-} from "@/app/api/[locale]/ssh/client";
-import type { SshConnection } from "@/app/api/[locale]/ssh/db";
+} from "@/ssh/client";
+import type { SshConnection } from "@/ssh/db";
 
 const CNPG_OPERATOR_URL =
   "https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/release-1.22/releases/cnpg-1.22.0.yaml";

@@ -1,14 +1,14 @@
+import { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { CRON_STATS_ALIAS } from "next-vibe/tasks/cron/stats/constants";
 
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { LEADS_LIST_ALIAS } from "@/app/api/[locale]/leads/list/constants";
-import { LEADS_STATS_ALIAS } from "@/app/api/[locale]/leads/stats/constants";
-import { EMAIL_STATS_ALIAS } from "@/app/api/[locale]/messenger/messages/stats/constants";
-import { REFERRAL_STATS_ALIAS } from "@/app/api/[locale]/referral/stats/constants";
-import { USERS_LIST_ALIAS } from "@/app/api/[locale]/users/list/constants";
-import { USERS_STATS_ALIAS } from "@/app/api/[locale]/users/stats/constants";
+import { LEADS_LIST_ALIAS } from "@/leads/list/constants";
+import { LEADS_STATS_ALIAS } from "@/leads/stats/constants";
+import { EMAIL_STATS_ALIAS } from "@/messenger/messages/stats/constants";
+import { REFERRAL_STATS_ALIAS } from "@/referral/stats/constants";
+import { USERS_LIST_ALIAS } from "@/users/list/constants";
+import { USERS_STATS_ALIAS } from "@/users/stats/constants";
 
 import {
   CORTEX_LIST_ALIAS,

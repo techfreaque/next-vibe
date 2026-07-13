@@ -58,9 +58,9 @@ import {
   makeHeadlessContext,
   rootlessStreamContext,
   type ToolExecutionContext,
-} from "@/app/api/[locale]/agent/chat/config";
-import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
-import { env } from "@/config/env";
+} from "next-vibe/agent/chat/config";
+import { ChatMessageRole } from "next-vibe/agent/chat/enum";
+import { env } from "@/_old/config/env";
 
 import { seedFixtureThread } from "../../testing/fixture-seed";
 import {
@@ -101,7 +101,7 @@ const wsProviderFlagsPatch = async (
   testUser: JwtPrivatePayloadType,
 ): Promise<void> => {
   const connByIdDef =
-    await import("@/app/api/[locale]/remote-connection/[instanceId]/definition");
+    await import("next-vibe/remote-connection/[instanceId]/definition");
   await sendTestRequest({
     streamContext: unbottledSetupFixture,
     endpoint: connByIdDef.default.PATCH,
@@ -139,7 +139,7 @@ async function cleanupHermesConnections(
   streamContext: ToolExecutionContext,
 ): Promise<void> {
   const connListDef =
-    await import("@/app/api/[locale]/remote-connection/list/definition");
+    await import("next-vibe/remote-connection/list/definition");
   const listResult = await sendTestRequest({
     streamContext,
     endpoint: connListDef.default.GET,
@@ -160,7 +160,7 @@ async function cleanupHermesConnections(
   }
 
   const connByIdDef =
-    await import("@/app/api/[locale]/remote-connection/[instanceId]/definition");
+    await import("next-vibe/remote-connection/[instanceId]/definition");
 
   for (const row of rows) {
     await sendTestRequest({
@@ -182,7 +182,7 @@ async function setupUnbottled(testUser: JwtPrivatePayloadType): Promise<void> {
   await connectToHermes(testUser, LOCAL_DEV_URL);
 
   const connListDefSetup =
-    await import("@/app/api/[locale]/remote-connection/list/definition");
+    await import("next-vibe/remote-connection/list/definition");
   const connListResult = await sendTestRequest({
     endpoint: connListDefSetup.default.GET,
     data: {},
@@ -202,7 +202,7 @@ async function setupUnbottled(testUser: JwtPrivatePayloadType): Promise<void> {
   }
 
   const connByIdDef =
-    await import("@/app/api/[locale]/remote-connection/[instanceId]/definition");
+    await import("next-vibe/remote-connection/[instanceId]/definition");
   await sendTestRequest({
     endpoint: connByIdDef.default.PATCH,
     data: {
@@ -297,7 +297,7 @@ async function runReverseWsPulse(threadId: string): Promise<void> {
   console.log("[runReverseWsPulse] connector restarted — channel reopened");
 
   const threadByIdDef =
-    await import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition");
+    await import("next-vibe/agent/chat/threads/[threadId]/definition");
   const deadline = Date.now() + 60_000;
 
   while (Date.now() < deadline) {
@@ -436,7 +436,7 @@ if (_remoteUrl && _isFixtureMode) {
 
     it("WP3: originator owns the thread → thread + messages exist in atlas DB", async () => {
       const threadDef =
-        await import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition");
+        await import("next-vibe/agent/chat/threads/[threadId]/definition");
       const threadResult = await sendTestRequest({
         streamContext: rootlessStreamContext(),
         endpoint: threadDef.default.GET,

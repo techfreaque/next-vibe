@@ -10,23 +10,19 @@
  * - getFilteredTtsModels(), getFilteredSttModels(), etc.: Role-specific filtered models
  */
 
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
-
-import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
-import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
+import { DEFAULT_CHAT_MODEL_SELECTION } from "next-vibe/agent/ai-stream/constants";
+import type { ChatModelSelection } from "next-vibe/agent/ai-stream/models";
 import {
   type ChatModelOption,
   chatModelOptions,
   getBestChatModel,
   getChatModelById,
-} from "@/app/api/[locale]/agent/ai-stream/models";
+} from "next-vibe/agent/ai-stream/models";
 import type {
   AudioVisionModelSelection,
   ImageVisionModelSelection,
   VideoVisionModelSelection,
-} from "@/app/api/[locale]/agent/ai-stream/vision-models";
+} from "next-vibe/agent/ai-stream/vision-models";
 import {
   type AudioVisionModelOption,
   audioVisionModelOptions,
@@ -34,43 +30,46 @@ import {
   imageVisionModelOptions,
   type VideoVisionModelOption,
   videoVisionModelOptions,
-} from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
+} from "next-vibe/agent/ai-stream/vision-models";
+import type { ImageGenModelSelection } from "next-vibe/agent/image-generation/models";
 import {
   type ImageGenModelOption,
   imageGenModelOptions,
-} from "@/app/api/[locale]/agent/image-generation/models";
-import { getModelDisplayName } from "@/app/api/[locale]/agent/models/all-models";
+} from "next-vibe/agent/image-generation/models";
+import { getModelDisplayName } from "next-vibe/agent/models/all-models";
 import type {
   ModelOptionBase,
   ModelOptionTokenBased,
-} from "@/app/api/[locale]/agent/models/models";
-import { getModelPrice } from "@/app/api/[locale]/agent/models/models";
+} from "next-vibe/agent/models/models";
+import { getModelPrice } from "next-vibe/agent/models/models";
 import {
   isModelProviderAvailable,
   modelProviders,
-} from "@/app/api/[locale]/agent/models/models";
-import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-generation/models";
+} from "next-vibe/agent/models/models";
+import type { MusicGenModelSelection } from "next-vibe/agent/music-generation/models";
 import {
   type MusicGenModelOption,
   musicGenModelOptions,
-} from "@/app/api/[locale]/agent/music-generation/models";
-import type { FavoriteGetModelSelection } from "@/app/api/[locale]/agent/skills/favorites/[id]/definition";
-import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
+} from "next-vibe/agent/music-generation/models";
+import type { FavoriteGetModelSelection } from "next-vibe/agent/skills/favorites/[id]/definition";
+import type { SttModelSelection } from "next-vibe/agent/speech-to-text/models";
 import {
   type SttModelOption,
   sttModelOptions,
-} from "@/app/api/[locale]/agent/speech-to-text/models";
-import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
+} from "next-vibe/agent/speech-to-text/models";
+import type { VoiceModelSelection } from "next-vibe/agent/text-to-speech/models";
 import {
   type TtsModelOption,
   ttsModelOptions,
-} from "@/app/api/[locale]/agent/text-to-speech/models";
-import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/video-generation/models";
+} from "next-vibe/agent/text-to-speech/models";
+import type { VideoGenModelSelection } from "next-vibe/agent/video-generation/models";
 import {
   type VideoGenModelOption,
   videoGenModelOptions,
-} from "@/app/api/[locale]/agent/video-generation/models";
+} from "next-vibe/agent/video-generation/models";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 
 import { formatSkillId } from "../chat/slugify";
 import type { AgentEnvAvailability } from "../env-availability";

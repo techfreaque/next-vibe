@@ -5,7 +5,7 @@ import type { ResponseType } from "next-vibe/core/route/response.schema";
 import { success } from "next-vibe/core/route/response.schema";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
+import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 
 import { ReferralRepository } from "../../repository";
 import type {

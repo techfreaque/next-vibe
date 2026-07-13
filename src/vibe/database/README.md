@@ -96,7 +96,7 @@ This mode:
 
 ### How Seeding Works
 
-1. The script first loads the generated seeds file from `src/app/api/generated/seeds.js`
+1. The script first loads the generated seeds file from `src/generated/seeds.js`
 2. It then executes seeds in order of priority (higher priority seeds run first)
 3. For each module, it runs the appropriate seed function for the specified environment
 4. It tracks statistics about how many seeds were run, skipped, or failed
@@ -156,8 +156,8 @@ export async function prod(): Promise<void> {
 
 The build process automatically discovers and generates imports for all seed files using the `generate-seeds.ts` script. This script:
 
-1. Scans the `src/app/api` directory for files matching the seed naming conventions
-2. Generates a consolidated `seeds.ts` file in `src/app/api/generated/`
+1. Scans the `src` directory for files matching the seed naming conventions
+2. Generates a consolidated `seeds.ts` file in `src/generated/`
 3. This generated file is then imported by the seed scripts
 
 To regenerate the seeds file, run:

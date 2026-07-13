@@ -6,10 +6,9 @@
 import "server-only";
 
 import type { ModelMessage } from "ai";
+import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 
 import type { DefaultFolderId } from "../../../chat/config";
 import type { ChatMessage, ToolCall } from "../../../chat/db";

@@ -7,7 +7,7 @@
  * clock for responses that return instantly. Live runs are untouched.
  */
 
-import { FIXTURE_REPLAY_HEADER } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
+import { FIXTURE_REPLAY_HEADER } from "next-vibe/agent/ai-stream/testing/fetch-cache";
 
 export async function pollDelay(
   ms: number,

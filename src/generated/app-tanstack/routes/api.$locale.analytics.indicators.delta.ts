@@ -7,7 +7,7 @@ export const Route = createFileRoute("/api/$locale/analytics/indicators/delta")(
   {
     server: {
       handlers: wrapNextApiRoute(
-        () => import("@/app/api/[locale]/analytics/indicators/delta/route"),
+        () => import("@/analytics/indicators/delta/route"),
       ),
     },
   },

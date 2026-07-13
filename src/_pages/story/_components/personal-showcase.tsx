@@ -1,4 +1,11 @@
 "use client";
+import { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import type { ChatMessage } from "next-vibe/agent/chat/db";
+import { ChatMessageRole } from "next-vibe/agent/chat/enum";
+import { GroupedAssistantMessage } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
+import type { MessageGroup } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/message-grouping";
+import { StaticUserMessageBubble } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
 import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
@@ -13,15 +20,8 @@ import type { JSX, ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
 import { useInView } from "react-intersection-observer";
 
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
-import { GroupedAssistantMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
-import type { MessageGroup } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/message-grouping";
-import { StaticUserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
+import { useLogger } from "@/_old/hooks/use-logger";
 import type { pathToAliasMap } from "@/generated/endpoints/alias-map";
-import { useLogger } from "@/hooks/use-logger";
 
 import { scopedTranslation } from "./i18n";
 import { MockChatProvider } from "./mock-chat-provider";
@@ -327,7 +327,7 @@ function buildSshGroup(t: ScopedT): MessageGroup {
     },
     {
       stdout:
-        "Already up to date.\nFast-forward\n src/app/api/[locale]/agent/models/models.ts | 3 +--\n 1 file changed\nbun install v1.2.4 - 0 new packages",
+        "Already up to date.\nFast-forward\n next-vibe/agent/models/models.ts | 3 +--\n 1 file changed\nbun install v1.2.4 - 0 new packages",
       stderr: "",
       exitCode: 0,
       status: "SUCCESS",

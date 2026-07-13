@@ -13,7 +13,7 @@ import { provisionK3s } from "next-vibe/tooling/infra/shared/pulumi/k3s/index";
 import { installRedis } from "next-vibe/tooling/infra/shared/pulumi/redis/index";
 import { installStorage } from "next-vibe/tooling/infra/shared/pulumi/storage/index";
 
-import type { ClientT } from "@/app/api/[locale]/ssh/client";
+import type { ClientT } from "@/ssh/client";
 
 import type { InfraConfig } from "./config";
 interface ProvisionAllResult {

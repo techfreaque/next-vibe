@@ -89,7 +89,7 @@ import {
   useInkWidgetResponseOnly, // boolean - response-only mode
   useInkWidgetTranslation, // scoped t() function
   useInkWidgetShowLabels, // false for MCP (suppress labels)
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
+} from "@/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 ```
 
 Never use React `useWidgetForm`, `useWidgetData`, etc. - those are web-only.
@@ -103,8 +103,8 @@ MCP consumers are AI agents reading plain text. CLI consumers are humans reading
 Use `useInkWidgetPlatform()` to branch:
 
 ```tsx
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { useInkWidgetPlatform } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
+import { Platform } from "@/system/unified-interface/shared/types/platform";
+import { useInkWidgetPlatform } from "@/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 export function MyWidget({ field }: CliWidgetProps): React.JSX.Element {
   const platform = useInkWidgetPlatform();

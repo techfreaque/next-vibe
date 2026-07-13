@@ -15,6 +15,7 @@
 
 import "server-only";
 
+import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
 import { getFullPath } from "next-vibe/core/core-utils/path";
 import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
@@ -33,8 +34,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { scopedTranslation as systemScopedTranslation } from "@/app/[locale]/shared/i18n";
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
+import { scopedTranslation as systemScopedTranslation } from "@/_pages/shared/i18n";
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 export class RouteExecutionExecutor {

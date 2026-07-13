@@ -19,9 +19,9 @@ import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { z } from "zod";
 
-import { companyMembers } from "@/app/api/[locale]/companies/db";
-import { CompanyMemberRole } from "@/app/api/[locale]/companies/enum";
-import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
+import { companyMembers } from "@/companies/db";
+import { CompanyMemberRole } from "@/companies/enum";
+import { CompanyAuthRepository } from "@/companies/repository";
 
 import { paymentInvoiceLines, paymentInvoices } from "../../db";
 import { InvoiceStatus } from "../../enum";

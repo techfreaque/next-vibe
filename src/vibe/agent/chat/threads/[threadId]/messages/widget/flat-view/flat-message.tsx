@@ -1,4 +1,8 @@
 "use client";
+import { getChatModelById } from "next-vibe/agent/ai-stream/models";
+import type { ChatMessage } from "next-vibe/agent/chat/db";
+import { useChatNavigationStore } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
+import { getVoteStatus } from "next-vibe/agent/chat/threads/[threadId]/messages/[messageId]/vote/utils";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { cn } from "next-vibe/core/utils/utils";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -14,17 +18,13 @@ import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import type { JSX } from "react";
 import React, { memo, useCallback, useMemo } from "react";
 
-import { Logo } from "@/app/[locale]/_components/logo";
+import { Logo } from "@/_pages/_components/logo";
 import {
   extractReferences,
   format4chanTimestamp,
   getIdColor,
-} from "@/app/[locale]/chat/lib/utils/formatting";
-import { formatPostNumber } from "@/app/[locale]/chat/lib/utils/post-numbers";
-import { getChatModelById } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
-import { getVoteStatus } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/utils";
+} from "@/_pages/chat/lib/utils/formatting";
+import { formatPostNumber } from "@/_pages/chat/lib/utils/post-numbers";
 
 import { useSkill } from "../../../../../../skills/[id]/hooks";
 import { loadMessageAttachments } from "../../hooks/load-message-attachments";
@@ -114,7 +114,7 @@ export const FlatMessage = memo(function FlatMessage({
   const handleDelete = (): void => {
     void (async (): Promise<void> => {
       const messageIdDefs =
-        await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/definition");
+        await import("next-vibe/agent/chat/threads/[threadId]/messages/[messageId]/definition");
       navigate(messageIdDefs.default.DELETE, {
         urlPathParams: { threadId: message.threadId, messageId: message.id },
         data: rootFolderId ? { rootFolderId } : undefined,

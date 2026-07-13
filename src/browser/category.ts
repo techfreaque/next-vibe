@@ -6,8 +6,8 @@
 import type { CategoryDefinition } from "next-vibe/help-tool/category-types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
-import { BROWSER_NEW_PAGE_ALIAS } from "@/app/api/[locale]/browser/new-page/constants";
-import { USER_ME_ALIAS } from "@/app/api/[locale]/user/private/me/constants";
+import { BROWSER_NEW_PAGE_ALIAS } from "@/browser/new-page/constants";
+import { USER_ME_ALIAS } from "@/user/private/me/constants";
 
 export const category: CategoryDefinition = {
   key: "browser",

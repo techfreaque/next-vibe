@@ -10,7 +10,7 @@
 
 ```typescript
 // enum.ts
-import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
+import { createEnumOptions } from "@/system/unified-interface/shared/field/enum";
 import { scopedTranslation } from "./i18n"; // value import (not type-only)
 
 export const {

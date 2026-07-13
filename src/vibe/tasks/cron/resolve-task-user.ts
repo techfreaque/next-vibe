@@ -22,7 +22,7 @@ import { UserRolesRepository } from "next-vibe/identity/roles/repository";
 import { users as usersTable } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { env } from "@/config/env";
+import { env } from "@/_old/config/env";
 
 import type { TaskOwner } from "./db";
 

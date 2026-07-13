@@ -6,7 +6,7 @@ import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 export const Route = createFileRoute("/api/$locale/browser/press-key")({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/browser/press-key/route"),
+      () => import("@/browser/press-key/route"),
     ),
   },
 });

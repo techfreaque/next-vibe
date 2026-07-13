@@ -355,7 +355,7 @@ export class MessageRepository {
         }
         try {
           const { removeVirtualNodesByEntityId } =
-            await import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual");
+            await import("next-vibe/agent/cortex/embeddings/sync-virtual");
           await removeVirtualNodesByEntityId(
             cleanupUserId,
             "/searches",

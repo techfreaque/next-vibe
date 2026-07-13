@@ -37,28 +37,28 @@ import { createEndpointLogger } from "next-vibe/logger/server";
 import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
-import { seedCaseThread } from "@/app/api/[locale]/agent/ai-stream/testing/fixture-seed";
+import { DEFAULT_CHAT_MODEL_SELECTION } from "next-vibe/agent/ai-stream/constants";
+import { seedCaseThread } from "next-vibe/agent/ai-stream/testing/fixture-seed";
 import {
   getOrCreateFolder,
   runTestStream,
   type SlimMessage,
   toolResultRecord,
-} from "@/app/api/[locale]/agent/ai-stream/testing/headless-test-runner";
+} from "next-vibe/agent/ai-stream/testing/headless-test-runner";
 import {
   DefaultFolderId,
   makeHeadlessContext,
   rootlessStreamContext,
-} from "@/app/api/[locale]/agent/chat/config";
-import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
-import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
+} from "next-vibe/agent/chat/config";
+import { chatMessages, chatThreads } from "next-vibe/agent/chat/db";
+import { ChatMessageRole } from "next-vibe/agent/chat/enum";
 import {
   SkillCategory,
   SkillOwnershipType,
-} from "@/app/api/[locale]/agent/skills/enum";
-import { chatFavorites } from "@/app/api/[locale]/agent/skills/favorites/db";
-import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
-import { CreditRepository } from "@/app/api/[locale]/credits/repository";
+} from "next-vibe/agent/skills/enum";
+import { chatFavorites } from "next-vibe/agent/skills/favorites/db";
+import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
+import { CreditRepository } from "@/credits/repository";
 
 import { cortexNodes } from "./db";
 import { CortexNodeType } from "./enum";
@@ -1334,7 +1334,7 @@ describe("Cortex Mount: /skills", () => {
     // Create a test skill so the /skills mount has something to list/read
     // IMPORTANT: slug must be deterministic (not timestamp-based) so fixture replay works
     const { customSkills: customSkillsTable } =
-      await import("@/app/api/[locale]/agent/skills/db");
+      await import("next-vibe/agent/skills/db");
     testSkillSlug = "cortex-test-skill-fixture";
     const [inserted] = await db
       .insert(customSkillsTable)
@@ -1382,7 +1382,7 @@ describe("Cortex Mount: /skills", () => {
       return;
     }
     const { customSkills: customSkillsTable } =
-      await import("@/app/api/[locale]/agent/skills/db");
+      await import("next-vibe/agent/skills/db");
     await db
       .delete(customSkillsTable)
       .where(eq(customSkillsTable.id, testSkillId));
@@ -2600,7 +2600,7 @@ describe("Cortex System Prompt Injection", () => {
     const { threadId: seededThreadId, streamContext: seedCtx } =
       await seedCaseThread(label);
     const { MessagesRepository } =
-      await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/repository");
+      await import("next-vibe/agent/chat/threads/[threadId]/messages/repository");
     await MessagesRepository.createUserMessage({
       messageId: crypto.randomUUID(),
       threadId: seededThreadId,

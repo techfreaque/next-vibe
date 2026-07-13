@@ -8,7 +8,7 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/desktop/get-accessibility-tree/route"),
+      () => import("@/desktop/get-accessibility-tree/route"),
     ),
   },
 });

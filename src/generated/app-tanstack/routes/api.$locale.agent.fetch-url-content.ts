@@ -6,7 +6,7 @@ import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 export const Route = createFileRoute("/api/$locale/agent/fetch-url-content")({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/agent/fetch-url-content/route"),
+      () => import("next-vibe/agent/fetch-url-content/route"),
     ),
   },
 });

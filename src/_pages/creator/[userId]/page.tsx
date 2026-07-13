@@ -15,9 +15,9 @@ import { UserRole } from "next-vibe/identity/roles/enum";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import type { JSX } from "react";
 
-import { scopedTranslation } from "@/app/api/[locale]/user/public/creator/[userId]/i18n";
-import { CreatorProfileRepository } from "@/app/api/[locale]/user/public/creator/[userId]/repository";
-import { configScopedTranslation } from "@/config/i18n";
+import { configScopedTranslation } from "@/_old/config/i18n";
+import { scopedTranslation } from "@/user/public/creator/[userId]/i18n";
+import { CreatorProfileRepository } from "@/user/public/creator/[userId]/repository";
 
 import { type CreatorPageData, CreatorProfilePage } from "./page-client";
 

@@ -20,7 +20,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { z } from "zod";
 
-import { scopedTranslation as sharedScopedTranslation } from "@/app/[locale]/shared/i18n";
+import { scopedTranslation as sharedScopedTranslation } from "@/_pages/shared/i18n";
 
 import {
   ErrorResponseTypes,

@@ -18,7 +18,7 @@ import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/s
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 // ── Definition imports ───────────────────────────────────────────────────────
-import { testEndpoint } from "../../system/tooling/check/testing/testing-suite/test-endpoint";
+import { testEndpoint } from "../../tooling/check/testing/testing-suite/test-endpoint";
 import { isUuid } from "../chat/slugify";
 import { SttModelId } from "../speech-to-text/models";
 import skillSingleEndpoint from "./[id]/definition";

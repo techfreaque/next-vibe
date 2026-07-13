@@ -1,5 +1,11 @@
 import "server-only";
 
+import type { ChatModelOption } from "next-vibe/agent/ai-stream/models";
+import {
+  DEFAULT_INPUT_TOKENS,
+  DEFAULT_OUTPUT_TOKENS,
+} from "next-vibe/agent/models/constants";
+import { calculateCreditCost } from "next-vibe/agent/models/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -9,14 +15,8 @@ import {
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { ChatModelOption } from "@/app/api/[locale]/agent/ai-stream/models";
-import {
-  DEFAULT_INPUT_TOKENS,
-  DEFAULT_OUTPUT_TOKENS,
-} from "@/app/api/[locale]/agent/models/constants";
-import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
-import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
-import { creditValidator } from "@/app/api/[locale]/credits/validator";
+import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
+import { creditValidator } from "@/credits/validator";
 
 import type { AiStreamT } from "../../stream/i18n";
 

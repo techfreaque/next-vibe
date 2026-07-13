@@ -1,6 +1,6 @@
 "use client";
 
-import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
+import { useChatNavigationStore } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
 
 /**
  * When messages are rendered inside another group/message (e.g. as a tool-call

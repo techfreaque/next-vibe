@@ -56,9 +56,7 @@ const { POST } = createEndpoint({
         schema: z.uuid(),
         urlPathParam: true,
         listEndpoint: async () =>
-          (
-            await import("@/app/api/[locale]/inventory/transfer/list/definition")
-          ).default.GET,
+          (await import("@/inventory/transfer/list/definition")).default.GET,
         labelField: "id",
       }),
 

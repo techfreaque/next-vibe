@@ -7,7 +7,7 @@ import { VIBE_SENSE_GRAPHS_ALIAS } from "next-vibe/dataflow/graphs/constants";
 import type { CategoryDefinition } from "next-vibe/help-tool/category-types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
-import { USER_ME_ALIAS } from "@/app/api/[locale]/user/private/me/constants";
+import { USER_ME_ALIAS } from "@/user/private/me/constants";
 
 export const category: CategoryDefinition = {
   key: "analytics",

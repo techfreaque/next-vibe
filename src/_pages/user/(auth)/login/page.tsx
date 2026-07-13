@@ -13,16 +13,13 @@ import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
 import { Link } from "next-vibe/ui/ui/link";
 import type { JSX } from "react";
 
-import {
-  DEV_SEED_PASSWORD,
-  DEV_SEED_USERS,
-} from "@/app/api/[locale]/user/dev-seed-users";
-import { scopedTranslation as loginScopedTranslation } from "@/app/api/[locale]/user/public/login/i18n";
-import type { LoginOptions } from "@/app/api/[locale]/user/public/login/repository";
-import { LoginRepository } from "@/app/api/[locale]/user/public/login/repository";
-import { env } from "@/config/env";
-import { envClient } from "@/config/env-client";
-import { configScopedTranslation } from "@/config/i18n";
+import { env } from "@/_old/config/env";
+import { envClient } from "@/_old/config/env-client";
+import { configScopedTranslation } from "@/_old/config/i18n";
+import { DEV_SEED_PASSWORD, DEV_SEED_USERS } from "@/user/dev-seed-users";
+import { scopedTranslation as loginScopedTranslation } from "@/user/public/login/i18n";
+import type { LoginOptions } from "@/user/public/login/repository";
+import { LoginRepository } from "@/user/public/login/repository";
 
 import { LoginForm } from "./_components/login-form";
 import { scopedTranslation as pageT } from "./i18n";

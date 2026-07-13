@@ -13,13 +13,13 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { nativeEndpoint } from "next-vibe/platforms/react-native/native-endpoint";
 
-import type { ChatModelId } from "../agent/ai-stream/models";
+import type { CreditPackCheckoutSession } from "../payment/providers/types";
+import type { ChatModelId } from "../vibe/agent/ai-stream/models";
 import type {
   AudioVisionModelId,
   ImageVisionModelId,
   VideoVisionModelId,
-} from "../agent/ai-stream/vision-models";
-import type { CreditPackCheckoutSession } from "../payment/providers/types";
+} from "../vibe/agent/ai-stream/vision-models";
 import creditsDefinitions, {
   type CreditsGetResponseOutput,
 } from "./definition";

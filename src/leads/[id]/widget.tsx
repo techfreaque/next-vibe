@@ -95,9 +95,9 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
-import leadsListDefinitions from "@/app/api/[locale]/leads/list/definition";
-import leadsSearchDefinitions from "@/app/api/[locale]/leads/search/definition";
-import { configScopedTranslation } from "@/config/i18n";
+import { configScopedTranslation } from "@/_old/config/i18n";
+import leadsListDefinitions from "@/leads/list/definition";
+import leadsSearchDefinitions from "@/leads/search/definition";
 
 import type { LeadGetResponseOutput } from "./definition";
 import {
@@ -1142,7 +1142,7 @@ export function LeadDetailContainer(): React.JSX.Element {
   const handleSendTestEmail = useCallback((): void => {
     void (async (): Promise<void> => {
       const testMailDef =
-        await import("@/app/api/[locale]/leads/campaigns/emails/test-mail/definition");
+        await import("@/leads/campaigns/emails/test-mail/definition");
       navigation.push(testMailDef.default.POST, {
         renderInModal: true,
         data: undefined,

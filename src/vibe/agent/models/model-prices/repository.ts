@@ -422,7 +422,7 @@ function applyModalityUpdate(
 
 /** Role → model definition file path */
 export function getRoleFilePaths(): Record<string, string> {
-  const agentDir = join(process.cwd(), "src/app/api/[locale]/agent");
+  const agentDir = join(process.cwd(), "src/vibe/agent");
   return {
     chat: join(agentDir, "ai-stream/models.ts"),
     "image-gen": join(agentDir, "image-generation/models.ts"),
@@ -850,7 +850,7 @@ export class ModelPricesRepository {
       );
       const allFailures = providerResults.flatMap((r) => r.failures);
 
-      const agentDir = join(process.cwd(), "src/app/api/[locale]/agent");
+      const agentDir = join(process.cwd(), "src/vibe/agent");
       // Role file paths - model definitions live in modality-specific subdirs
       const roleFilePaths: Record<string, string> = {
         chat: join(agentDir, "ai-stream/models.ts"),

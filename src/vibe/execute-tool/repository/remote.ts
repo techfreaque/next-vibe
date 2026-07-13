@@ -126,7 +126,7 @@ export class RemoteDispatch {
     });
 
     const { RemoteConnectionRepository } =
-      await import("@/app/api/[locale]/remote-connection/repository");
+      await import("next-vibe/remote-connection/repository");
     if (user.isPublic) {
       return { kind: "fallthrough" };
     }
@@ -263,7 +263,7 @@ export class RemoteDispatch {
     logger: RouteExecuteContext["logger"],
     inline = false,
   ): Promise<void> {
-    const { chatMessages } = await import("@/app/api/[locale]/agent/chat/db");
+    const { chatMessages } = await import("next-vibe/agent/chat/db");
     // jsonb_set path-merge: only set toolCall.pendingCallId. A top-level `||` merge
     // would REPLACE the whole toolCall object, wiping toolCallId/toolName/args/status
     // (remote wakeUp never rewrites the row, so the clobber would persist into

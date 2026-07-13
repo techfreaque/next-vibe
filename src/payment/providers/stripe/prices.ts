@@ -19,13 +19,13 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type Stripe from "stripe";
 
-import { getEnvAvailability } from "../../../agent/env-availability";
-import { getAvailableModelCount } from "../../../agent/models/all-models";
 import { scopedTranslation as productsScopedTranslation } from "../../../products/i18n";
 import {
   type ProductIds,
   productsRepository,
 } from "../../../products/repository-client";
+import { getEnvAvailability } from "../../../vibe/agent/env-availability";
+import { getAvailableModelCount } from "../../../vibe/agent/models/all-models";
 import type { PaymentInterval } from "../types";
 import { scopedTranslation } from "./i18n";
 import { StripeProvider } from "./repository";

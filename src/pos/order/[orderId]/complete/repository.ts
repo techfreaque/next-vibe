@@ -21,17 +21,17 @@ import {
   accountNodes,
   journalEntries,
   journalEntryLines,
-} from "@/app/api/[locale]/chart-of-accounts/db";
-import type { LineTypeDB } from "@/app/api/[locale]/chart-of-accounts/enum";
+} from "@/chart-of-accounts/db";
+import type { LineTypeDB } from "@/chart-of-accounts/enum";
 import {
   AccountSubtype,
   JournalEntryStatus,
   JournalSourceType,
   LineType,
   PeriodStatus,
-} from "@/app/api/[locale]/chart-of-accounts/enum";
-import { CompanyMemberRole } from "@/app/api/[locale]/companies/enum";
-import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
+} from "@/chart-of-accounts/enum";
+import { CompanyMemberRole } from "@/companies/enum";
+import { CompanyAuthRepository } from "@/companies/repository";
 
 import { posOrders, posPayments, posSessions, posTerminals } from "../../../db";
 import { PosOrderStatus } from "../../../enum";

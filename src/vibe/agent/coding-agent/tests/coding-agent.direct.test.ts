@@ -24,11 +24,11 @@ import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 
-import { rootlessStreamContext } from "@/app/api/[locale]/agent/chat/config";
-import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
-import favoritesCreateDefinitions from "@/app/api/[locale]/agent/skills/favorites/create/definition";
-import favoritesDefinitions from "@/app/api/[locale]/agent/skills/favorites/definition";
-import remoteConnectionByIdDefinitions from "@/app/api/[locale]/remote-connection/[instanceId]/definition";
+import { rootlessStreamContext } from "next-vibe/agent/chat/config";
+import { chatThreads } from "next-vibe/agent/chat/db";
+import favoritesCreateDefinitions from "next-vibe/agent/skills/favorites/create/definition";
+import favoritesDefinitions from "next-vibe/agent/skills/favorites/definition";
+import remoteConnectionByIdDefinitions from "next-vibe/remote-connection/[instanceId]/definition";
 
 import {
   ATLAS_INSTANCE_ID,

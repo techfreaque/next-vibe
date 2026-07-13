@@ -9,7 +9,7 @@ export const Route = createFileRoute(
   server: {
     handlers: wrapNextApiRoute(
       () =>
-        import("@/app/api/[locale]/payment/data-sources/payments-refund-count/route"),
+        import("@/payment/data-sources/payments-refund-count/route"),
     ),
   },
 });

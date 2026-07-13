@@ -135,7 +135,7 @@ export class PackageEndpointGeneratorRepository {
   // Content generation (mirrors endpoint/repository.ts logic)
   // ============================================================================
 
-  // Build import path for a definition file - same @/app/api/[locale]/... format
+  // Build import path for a definition file - same @/... format
   private static toImportPath(filePath: string): string {
     const marker = "[locale]/";
     const idx = filePath.indexOf(marker);
@@ -144,7 +144,7 @@ export class PackageEndpointGeneratorRepository {
     }
     const after = filePath.slice(idx + marker.length);
     const segment = after.replace(/\/definition\.ts$/, "");
-    return `@/app/api/[locale]/${segment}/definition`;
+    return `@/${segment}/definition`;
   }
 
   // Build route.ts import path from definition file path
@@ -156,7 +156,7 @@ export class PackageEndpointGeneratorRepository {
     }
     const after = defFile.slice(idx + marker.length);
     const segment = after.replace(/\/definition\.ts$/, "");
-    return `@/app/api/[locale]/${segment}/route`;
+    return `@/${segment}/route`;
   }
 
   private static async generateContent(

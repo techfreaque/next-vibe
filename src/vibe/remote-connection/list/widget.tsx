@@ -8,6 +8,7 @@
 
 "use client";
 
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { apiClient } from "next-vibe/platforms/react/hooks/store";
 import { Badge } from "next-vibe/ui/ui/badge";
@@ -51,10 +52,9 @@ import {
 import type { JSX } from "react";
 import { useState } from "react";
 
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import { CreditsTabHeader } from "@/app/api/[locale]/credits/credits-tab-header";
-import { GITHUB_REPO_URL } from "@/config/constants";
-import { envClient } from "@/config/env-client";
+import { GITHUB_REPO_URL } from "@/_old/config/constants";
+import { envClient } from "@/_old/config/env-client";
+import { CreditsTabHeader } from "@/credits/credits-tab-header";
 
 import type endpoints from "./definition";
 import type { RemoteConnection } from "./definition";

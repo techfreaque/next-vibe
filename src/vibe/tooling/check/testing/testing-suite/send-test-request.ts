@@ -1,5 +1,6 @@
 // Testing infrastructure - error messages are for test debugging, not end users
 
+import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { Platform } from "next-vibe/core/definition/platform";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
@@ -14,8 +15,6 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { scopedTranslation } from "next-vibe/tooling/check/i18n";
-
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 
 /**
  * Call the API handler directly via the vibe runtime executor

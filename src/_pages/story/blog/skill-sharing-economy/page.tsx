@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { getEnvAvailability } from "next-vibe/agent/env-availability";
+import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import { Button } from "next-vibe/ui/ui/button";
@@ -16,9 +18,7 @@ import { Span } from "next-vibe/ui/ui/span";
 import { H1, H2, Muted, P } from "next-vibe/ui/ui/typography";
 import type { ComponentType, JSX } from "react";
 
-import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
-import { configScopedTranslation } from "@/config/i18n";
+import { configScopedTranslation } from "@/_old/config/i18n";
 
 import { scopedTranslation } from "./i18n";
 

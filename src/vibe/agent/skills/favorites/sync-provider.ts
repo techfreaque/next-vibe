@@ -9,18 +9,10 @@ import "server-only";
  * Last-writer-wins on updatedAt; tie → remote wins.
  */
 import { and, asc, eq, sql } from "drizzle-orm";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
-import {
-  type IconKey,
-  IconKeyDB,
-} from "next-vibe/unified-ui/form-fields/icon-field/icons";
-import { z } from "zod";
-
 import {
   type ChatModelSelection,
   chatModelSelectionSchema,
-} from "@/app/api/[locale]/agent/ai-stream/models";
+} from "next-vibe/agent/ai-stream/models";
 import {
   type AudioVisionModelSelection,
   audioVisionModelSelectionSchema,
@@ -28,32 +20,39 @@ import {
   imageVisionModelSelectionSchema,
   type VideoVisionModelSelection,
   videoVisionModelSelectionSchema,
-} from "@/app/api/[locale]/agent/ai-stream/vision-models";
+} from "next-vibe/agent/ai-stream/vision-models";
 import {
   type ImageGenModelSelection,
   imageGenModelSelectionSchema,
-} from "@/app/api/[locale]/agent/image-generation/models";
+} from "next-vibe/agent/image-generation/models";
 import {
   type MusicGenModelSelection,
   musicGenModelSelectionSchema,
-} from "@/app/api/[locale]/agent/music-generation/models";
+} from "next-vibe/agent/music-generation/models";
 import {
   type SttModelSelection,
   sttModelSelectionSchema,
-} from "@/app/api/[locale]/agent/speech-to-text/models";
+} from "next-vibe/agent/speech-to-text/models";
 import {
   type VoiceModelSelection,
   voiceModelSelectionSchema,
-} from "@/app/api/[locale]/agent/text-to-speech/models";
+} from "next-vibe/agent/text-to-speech/models";
 import {
   type VideoGenModelSelection,
   videoGenModelSelectionSchema,
-} from "@/app/api/[locale]/agent/video-generation/models";
-import type { StandardSyncCursor } from "@/app/api/[locale]/remote-connection/db";
+} from "next-vibe/agent/video-generation/models";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import type { StandardSyncCursor } from "next-vibe/remote-connection/db";
 import {
   type SyncProvider,
   toStandardCursor,
-} from "@/app/api/[locale]/remote-connection/sync/provider";
+} from "next-vibe/remote-connection/sync/provider";
+import {
+  type IconKey,
+  IconKeyDB,
+} from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import { z } from "zod";
 
 import { chatFavorites } from "./db";
 

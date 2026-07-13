@@ -11,10 +11,9 @@
 import "server-only";
 
 import { OpenAIChatLanguageModel } from "@ai-sdk/openai/internal";
+import { agentEnv } from "next-vibe/agent/env";
 
-import { agentEnv } from "@/app/api/[locale]/agent/env";
-
-import type { EndpointLogger } from "../../../system/logger/types";
+import type { EndpointLogger } from "../../../logger/types";
 import { logProviderRequest } from "./shared/debug-file-logger";
 import { processStreamingResponseWithToolCalls } from "./shared/streaming-tool-call-processor";
 import {

@@ -65,25 +65,25 @@ import { LeadSource, LeadStatus } from "next-vibe/identity/lead/enum";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { paymentInvoices } from "@/app/api/[locale]/payment/db";
-import type { CreditPackCheckoutSession } from "@/app/api/[locale]/payment/providers/types";
-import { subscriptions } from "@/app/api/[locale]/subscription/db";
-import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
+import { paymentInvoices } from "@/payment/db";
+import type { CreditPackCheckoutSession } from "@/payment/providers/types";
+import { subscriptions } from "@/subscription/db";
+import { SubscriptionStatus } from "@/subscription/enum";
 
+import { ProductIds, productsRepository } from "../products/repository-client";
+import { payoutRequests } from "../referral/db";
+import { PayoutStatus } from "../referral/enum";
 import {
   type ChatModelId,
   chatModelOptionsIndex,
-} from "../agent/ai-stream/models";
+} from "../vibe/agent/ai-stream/models";
 import type {
   AudioVisionModelId,
   ImageVisionModelId,
   VideoVisionModelId,
-} from "../agent/ai-stream/vision-models";
-import { ProductIds, productsRepository } from "../products/repository-client";
-import { payoutRequests } from "../referral/db";
-import { PayoutStatus } from "../referral/enum";
-import { withTransaction } from "../system/database/utils/repository-helpers";
-import { createEndpointEmitter } from "../system/realtime/emitter";
+} from "../vibe/agent/ai-stream/vision-models";
+import { withTransaction } from "../vibe/database/utils/repository-helpers";
+import { createEndpointEmitter } from "../vibe/realtime/emitter";
 import { FREE_CREDIT_POOL } from "./constants";
 import {
   creditPacks,
@@ -3501,7 +3501,8 @@ export class CreditRepository {
               await import("../messenger/providers/email/smtp-client/email-sending/repository");
             const { contactClientRepository } =
               await import("../contact/repository-client");
-            const { configScopedTranslation } = await import("@/config/i18n");
+            const { configScopedTranslation } =
+              await import("@/_old/config/i18n");
             const { createTrackingContext } =
               await import("../messenger/providers/email/smtp-client/components/tracking_context.email");
             const { t: configT } = configScopedTranslation.scopedT(userLocale);

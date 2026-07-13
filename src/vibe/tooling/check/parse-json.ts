@@ -3,7 +3,7 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
 
-import { scopedTranslation as sharedScopedTranslation } from "@/app/[locale]/shared/i18n";
+import { scopedTranslation as sharedScopedTranslation } from "@/_pages/shared/i18n";
 
 /**
  * JSON Parser with Comment Support

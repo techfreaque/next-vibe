@@ -18,7 +18,7 @@ import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
+import { CompanyAuthRepository } from "@/companies/repository";
 
 import {
   accountingPeriods,

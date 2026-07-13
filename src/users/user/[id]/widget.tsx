@@ -130,7 +130,7 @@ export function UserDetailContainer({
       return;
     }
     void (async (): Promise<void> => {
-      const leadDef = await import("@/app/api/[locale]/leads/[id]/definition");
+      const leadDef = await import("@/leads/[id]/definition");
       navigate(leadDef.default.GET, { urlPathParams: { id: leadId } });
     })();
   }, [navigate, leadId]);
@@ -489,7 +489,7 @@ export function UserEditContainer({
       return;
     }
     void (async (): Promise<void> => {
-      const leadDef = await import("@/app/api/[locale]/leads/[id]/definition");
+      const leadDef = await import("@/leads/[id]/definition");
       navigate(leadDef.default.GET, { urlPathParams: { id: leadId } });
     })();
   }, [navigate, leadId]);

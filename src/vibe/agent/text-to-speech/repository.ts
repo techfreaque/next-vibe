@@ -5,6 +5,10 @@
 
 import "server-only";
 
+import { createFixtureFetch } from "next-vibe/agent/ai-stream/testing/fetch-cache";
+import { getStorageAdapter } from "next-vibe/agent/chat/storage/index";
+import { ApiProvider } from "next-vibe/agent/models/models";
+import { ModelSelectionType } from "next-vibe/agent/skills/enum";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import {
@@ -17,17 +21,13 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { createFixtureFetch } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
-import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage/index";
-import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
-import { ModelSelectionType } from "@/app/api/[locale]/agent/skills/enum";
-import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
-
-import { CreditRepository } from "../../credits/repository";
+import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
+import { CreditRepository } from "@/credits/repository";
 import {
   TTS_COST_PER_CHARACTER,
   TTS_MINIMUM_BALANCE,
-} from "../../products/repository-client";
+} from "@/products/repository-client";
+
 import { DefaultFolderId, type ToolExecutionContext } from "../chat/config";
 import { agentEnv } from "../env";
 import {

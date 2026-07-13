@@ -1,5 +1,19 @@
 "use client";
 
+import { useChatInputStore } from "next-vibe/agent/ai-stream/stream/hooks/input-store";
+import { useAIStream } from "next-vibe/agent/ai-stream/stream/hooks/use-ai-stream";
+import type { ChatMessage } from "next-vibe/agent/chat/db";
+import { useChatBootContext } from "next-vibe/agent/chat/hooks/context";
+import { useChatNavigationStore } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
+import { useChatSettings } from "next-vibe/agent/chat/settings/hooks";
+import { ChatSettingsRepositoryClient } from "next-vibe/agent/chat/settings/repository-client";
+import { getDirectReplies } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/flat-view/helpers";
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
+import characterDefinitions from "next-vibe/agent/skills/[id]/definition";
+import { ModelSelectionType } from "next-vibe/agent/skills/enum";
+import type { FavoriteConfig } from "next-vibe/agent/skills/favorites/db";
+import { ChatFavoritesRepositoryClient } from "next-vibe/agent/skills/favorites/repository-client";
+import type { TtsModelId } from "next-vibe/agent/text-to-speech/models";
 import { success } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { cn } from "next-vibe/core/utils/utils";
@@ -31,32 +45,18 @@ import {
   useState,
 } from "react";
 
-import { Logo } from "@/app/[locale]/_components/logo";
+import { platform } from "@/_old/config/env-client";
+import { Logo } from "@/_pages/_components/logo";
 import {
   DOM_IDS,
   LAYOUT,
   QUOTE_CHARACTER,
   useInputHeight,
-} from "@/app/[locale]/chat/lib/config/constants";
+} from "@/_pages/chat/lib/config/constants";
 import {
   buildMessagePath,
   getRootMessages,
-} from "@/app/[locale]/chat/lib/utils/thread-builder";
-import { useChatInputStore } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/input-store";
-import { useAIStream } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/use-ai-stream";
-import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
-import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
-import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
-import { getDirectReplies } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/flat-view/helpers";
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import characterDefinitions from "@/app/api/[locale]/agent/skills/[id]/definition";
-import { ModelSelectionType } from "@/app/api/[locale]/agent/skills/enum";
-import type { FavoriteConfig } from "@/app/api/[locale]/agent/skills/favorites/db";
-import { ChatFavoritesRepositoryClient } from "@/app/api/[locale]/agent/skills/favorites/repository-client";
-import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { platform } from "@/config/env-client";
+} from "@/_pages/chat/lib/utils/thread-builder";
 
 import type { MessageMetadata } from "../../../../db";
 import { NEW_MESSAGE_ID, ViewMode } from "../../../../enum";

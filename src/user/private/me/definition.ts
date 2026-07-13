@@ -3,6 +3,12 @@
  * Production-ready endpoints for user profile management
  */
 
+import { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import {
+  SkillCategoryDB,
+  SkillOwnershipTypeDB,
+  SkillTrustLevelDB,
+} from "next-vibe/agent/skills/enum";
 import {
   dateSchema,
   iconSchema,
@@ -27,14 +33,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
 
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import {
-  SkillCategoryDB,
-  SkillOwnershipTypeDB,
-  SkillTrustLevelDB,
-} from "@/app/api/[locale]/agent/skills/enum";
-
-import { lazyWidget } from "../../../system/unified-ui/_shared/lazy-widget";
+import { lazyWidget } from "../../../vibe/unified-ui/_shared/lazy-widget";
 import { USER_ME_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 

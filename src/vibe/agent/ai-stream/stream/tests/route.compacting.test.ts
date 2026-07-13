@@ -36,10 +36,10 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
-import { CreditRepository } from "@/app/api/[locale]/credits/repository";
-import { env } from "@/config/env";
+import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
+import { CreditRepository } from "@/credits/repository";
+import { env } from "@/_old/config/env";
 
 import { seedCaseThread } from "../../testing/fixture-seed";
 import {
@@ -65,9 +65,9 @@ async function withFavCompactTrigger(
 ): Promise<() => Promise<void>> {
   const userId = "id" in user ? String(user.id) : "";
   const { resolveFavoriteConfig } =
-    await import("@/app/api/[locale]/agent/skills/favorites/repository");
+    await import("next-vibe/agent/skills/favorites/repository");
   const patchDef =
-    await import("@/app/api/[locale]/agent/skills/favorites/[id]/definition").then(
+    await import("next-vibe/agent/skills/favorites/[id]/definition").then(
       (m) => m.default.PATCH,
     );
 
@@ -250,10 +250,10 @@ describe("Compacting - context management", () => {
     // ── Resolve quality-tester__budget favorite ──
     // Use existing fav if present (respects user overrides). Create only if absent.
     const [favsDef, favoriteCreateDef] = await Promise.all([
-      import("@/app/api/[locale]/agent/skills/favorites/definition").then(
+      import("next-vibe/agent/skills/favorites/definition").then(
         (m) => m.default.GET,
       ),
-      import("@/app/api/[locale]/agent/skills/favorites/create/definition").then(
+      import("next-vibe/agent/skills/favorites/create/definition").then(
         (m) => m.default.POST,
       ),
     ]);

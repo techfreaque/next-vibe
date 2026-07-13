@@ -21,10 +21,10 @@ import { createRelationalDb } from "next-vibe/database/relational";
 import { users } from "next-vibe/identity/user/db";
 import type { z } from "zod";
 
-import { CampaignType } from "@/app/api/[locale]/messenger/accounts/enum";
-import { CampaignTypeDB } from "@/app/api/[locale]/messenger/accounts/enum";
-import { MessageStatus as EmailStatus } from "@/app/api/[locale]/messenger/messages/enum";
-import { MessageStatusDB as EmailStatusDB } from "@/app/api/[locale]/messenger/messages/enum";
+import { CampaignType } from "@/messenger/accounts/enum";
+import { CampaignTypeDB } from "@/messenger/accounts/enum";
+import { MessageStatus as EmailStatus } from "@/messenger/messages/enum";
+import { MessageStatusDB as EmailStatusDB } from "@/messenger/messages/enum";
 
 import {
   DeviceTypeDB,

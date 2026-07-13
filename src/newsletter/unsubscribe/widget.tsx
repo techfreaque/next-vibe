@@ -27,7 +27,7 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import React from "react";
 
-import { useNewsletterManager } from "@/app/api/[locale]/newsletter/hooks";
+import { useNewsletterManager } from "@/newsletter/hooks";
 
 import type definition from "./definition";
 import type { UnsubscribePostRequestInput } from "./definition";

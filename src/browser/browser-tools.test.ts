@@ -37,22 +37,22 @@ import { createEndpointLogger } from "next-vibe/logger/server";
 import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import closePageEndpoints from "@/app/api/[locale]/browser/close-page/definition";
-import emulateEndpoints from "@/app/api/[locale]/browser/emulate/definition";
-import evaluateScriptEndpoints from "@/app/api/[locale]/browser/evaluate-script/definition";
-import listConsoleMessagesEndpoints from "@/app/api/[locale]/browser/list-console-messages/definition";
-import listNetworkRequestsEndpoints from "@/app/api/[locale]/browser/list-network-requests/definition";
-import listPagesEndpoints from "@/app/api/[locale]/browser/list-pages/definition";
-import navigatePageEndpoints from "@/app/api/[locale]/browser/navigate-page/definition";
-import newPageEndpoints from "@/app/api/[locale]/browser/new-page/definition";
-import performanceStartTraceEndpoints from "@/app/api/[locale]/browser/performance-start-trace/definition";
-import performanceStopTraceEndpoints from "@/app/api/[locale]/browser/performance-stop-trace/definition";
-import resizePageEndpoints from "@/app/api/[locale]/browser/resize-page/definition";
-import selectPageEndpoints from "@/app/api/[locale]/browser/select-page/definition";
-import takeScreenshotEndpoints from "@/app/api/[locale]/browser/take-screenshot/definition";
-import takeSnapshotEndpoints from "@/app/api/[locale]/browser/take-snapshot/definition";
-import waitForEndpoints from "@/app/api/[locale]/browser/wait-for/definition";
-import { env } from "@/config/env";
+import closePageEndpoints from "@/browser/close-page/definition";
+import emulateEndpoints from "@/browser/emulate/definition";
+import evaluateScriptEndpoints from "@/browser/evaluate-script/definition";
+import listConsoleMessagesEndpoints from "@/browser/list-console-messages/definition";
+import listNetworkRequestsEndpoints from "@/browser/list-network-requests/definition";
+import listPagesEndpoints from "@/browser/list-pages/definition";
+import navigatePageEndpoints from "@/browser/navigate-page/definition";
+import newPageEndpoints from "@/browser/new-page/definition";
+import performanceStartTraceEndpoints from "@/browser/performance-start-trace/definition";
+import performanceStopTraceEndpoints from "@/browser/performance-stop-trace/definition";
+import resizePageEndpoints from "@/browser/resize-page/definition";
+import selectPageEndpoints from "@/browser/select-page/definition";
+import takeScreenshotEndpoints from "@/browser/take-screenshot/definition";
+import takeSnapshotEndpoints from "@/browser/take-snapshot/definition";
+import waitForEndpoints from "@/browser/wait-for/definition";
+import { env } from "@/_old/config/env";
 
 // ---------------------------------------------------------------------------
 // Constants

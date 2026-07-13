@@ -1,5 +1,6 @@
 "use client";
 
+import { scopedTranslation } from "next-vibe/agent/chat/threads/[threadId]/permissions/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { type EndpointLogger } from "next-vibe/logger/types";
@@ -12,8 +13,6 @@ import {
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 import { useCallback, useMemo } from "react";
-
-import { scopedTranslation } from "@/app/api/[locale]/agent/chat/threads/[threadId]/permissions/i18n";
 
 import threadPermissionsDefinitions from "./definition";
 

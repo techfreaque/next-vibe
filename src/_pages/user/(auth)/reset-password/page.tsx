@@ -12,8 +12,8 @@ import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
 import { Link } from "next-vibe/ui/ui/link";
 import type { JSX } from "react";
 
-import { envClient } from "@/config/env-client";
-import { configScopedTranslation } from "@/config/i18n";
+import { envClient } from "@/_old/config/env-client";
+import { configScopedTranslation } from "@/_old/config/i18n";
 
 import ResetPasswordForm from "./_components/reset-password-form";
 import { scopedTranslation as pageT } from "./i18n";

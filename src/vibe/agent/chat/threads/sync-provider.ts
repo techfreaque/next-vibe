@@ -26,21 +26,20 @@ import {
   notInArray,
   sql,
 } from "drizzle-orm";
+import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { WidgetDataSchema } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
-import { z } from "zod";
-
-import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { ThreadsSyncCursor } from "@/app/api/[locale]/remote-connection/db";
+import type { ThreadsSyncCursor } from "next-vibe/remote-connection/db";
 import {
   type SyncProvider,
   toThreadsCursor,
-} from "@/app/api/[locale]/remote-connection/sync/provider";
+} from "next-vibe/remote-connection/sync/provider";
+import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import { z } from "zod";
 
 import { DefaultFolderId } from "../config";
 import {
@@ -650,8 +649,8 @@ export async function pushFolderChainToPeer(
   }
   const [{ createFolderContentsEmitter }, folderContentsDefinitions] =
     await Promise.all([
-      import("@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/emitter"),
-      import("@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition"),
+      import("next-vibe/agent/chat/folder-contents/[rootFolderId]/emitter"),
+      import("next-vibe/agent/chat/folder-contents/[rootFolderId]/definition"),
     ]);
   const emitUser: JwtPrivatePayloadType = {
     id: userId,
@@ -784,7 +783,7 @@ export async function pushThreadSync(
     const [{ createEndpointEmitter }, { default: threadsByIdDefinitions }] =
       await Promise.all([
         import("next-vibe/realtime/emitter"),
-        import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition"),
+        import("next-vibe/agent/chat/threads/[threadId]/definition"),
       ]);
     const user: JwtPrivatePayloadType = {
       id: userId,
@@ -963,7 +962,7 @@ export const threadsSyncProvider: SyncProvider = {
       // Resolve each thread's ORIGIN (owning instance + folder name chain) —
       // the receiver places foreign-origin threads by SAME-ID folder lookup.
       const { RemoteConnectionRepository } =
-        await import("@/app/api/[locale]/remote-connection/repository");
+        await import("next-vibe/remote-connection/repository");
       const selfInstanceId =
         await RemoteConnectionRepository.getLocalInstanceId(userId);
 
@@ -1203,7 +1202,7 @@ export const threadsSyncProvider: SyncProvider = {
     // OWN threads (origin === our selfInstanceId) are never re-placed by a
     // peer's echo. Cache resolved chains per origin+path.
     const { RemoteConnectionRepository } =
-      await import("@/app/api/[locale]/remote-connection/repository");
+      await import("next-vibe/remote-connection/repository");
     const selfInstanceId =
       await RemoteConnectionRepository.getLocalInstanceId(userId);
 
@@ -1664,7 +1663,7 @@ export const threadsSyncProvider: SyncProvider = {
           );
         if (staleMirrors.length > 0) {
           const { ThreadByIdRepository } =
-            await import("@/app/api/[locale]/agent/chat/threads/[threadId]/repository");
+            await import("next-vibe/agent/chat/threads/[threadId]/repository");
           const user: JwtPrivatePayloadType = {
             id: userId,
             leadId: userId,

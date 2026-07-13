@@ -31,6 +31,7 @@ import {
   UserPermissionRole,
 } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import type { RemoteToolCapability } from "next-vibe/remote-connection/db";
 import type {
   GeneratorContext,
   GeneratorResult,
@@ -40,8 +41,6 @@ import {
   generateFileHeader,
   writeGeneratedFile,
 } from "next-vibe/tooling/generators/shared/utils";
-
-import type { RemoteToolCapability } from "@/app/api/[locale]/remote-connection/db";
 
 const OUTPUT_DIR = "src/generated/remote-capabilities";
 
@@ -162,7 +161,7 @@ class RemoteCapabilitiesGenerator {
 
     // ── 1. Discover definition files ────────────────────────────────────
     // Use template string to prevent Turbopack from statically tracing paths
-    const startDir = `${process.cwd()}/src/app/api/[locale]`;
+    const startDir = `${process.cwd()}/src`;
 
     const definitionFiles = findFilesRecursively(startDir, "definition.ts");
     const routeFiles = findFilesRecursively(startDir, "route.ts");

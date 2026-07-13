@@ -6,6 +6,10 @@
 import "server-only";
 
 import { and, desc, eq, ne, sql } from "drizzle-orm";
+import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import { fetchAncestorBranch } from "next-vibe/agent/ai-stream/repository/core/tree-walk";
+import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
+import { scopedTranslation as chatScopedTranslation } from "next-vibe/agent/chat/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type {
   ChannelDecision,
@@ -25,11 +29,6 @@ import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { cronTasks } from "next-vibe/tasks/cron/db";
 import { CronTaskStatus } from "next-vibe/tasks/enum";
-
-import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { fetchAncestorBranch } from "@/app/api/[locale]/agent/ai-stream/repository/core/tree-walk";
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
-import { scopedTranslation as chatScopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
 
 import { bubbleFolderActivity } from "../../../bubble-folder-activity";
 import { DefaultFolderId } from "../../../config";
@@ -393,7 +392,7 @@ export class MessagesRepository {
       ? (async (): Promise<void> => {
           try {
             const { embedMessageContent } =
-              await import("@/app/api/[locale]/agent/cortex/embeddings/message-embed");
+              await import("next-vibe/agent/cortex/embeddings/message-embed");
             const fields = await embedMessageContent(
               { role: params.role, content: params.content, metadata: null },
               streamContext,
@@ -1382,7 +1381,7 @@ export class MessagesRemoteRepository {
       // Brand-new mirror thread: surface it in open sidebars immediately —
       // thread-updated later delivers title + folder placement.
       const { createFolderContentsEmitter } =
-        await import("@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/emitter");
+        await import("next-vibe/agent/chat/folder-contents/[rootFolderId]/emitter");
       const now = new Date();
       createFolderContentsEmitter(
         logger,

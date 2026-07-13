@@ -2,22 +2,19 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
+import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import { scopedTranslation as chatScopedTranslation } from "next-vibe/agent/chat/i18n";
+import { chatSettings } from "next-vibe/agent/chat/settings/db";
+import { getEnvAvailability } from "next-vibe/agent/env-availability";
+import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
 import { languageConfig } from "next-vibe/core/i18n";
 import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import { db } from "next-vibe/database";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { users as usersTable } from "next-vibe/identity/user/db";
 
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { scopedTranslation as chatScopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
-import { chatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
-import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
-import {
-  ProductIds,
-  productsRepository,
-} from "@/app/api/[locale]/products/repository-client";
-import { envClient } from "@/config/env-client";
+import { envClient } from "@/_old/config/env-client";
+import { ProductIds, productsRepository } from "@/products/repository-client";
 
 import { DESCRIBE_IMAGE_ALIAS } from "../../describe-image/constants";
 import { DESCRIBE_VIDEO_ALIAS } from "../../describe-video/constants";

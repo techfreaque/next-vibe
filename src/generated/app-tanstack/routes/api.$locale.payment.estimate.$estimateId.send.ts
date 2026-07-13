@@ -9,7 +9,7 @@ export const Route = createFileRoute(
   server: {
     handlers: wrapNextApiRoute(
       () =>
-        import("@/app/api/[locale]/payment/estimate/[estimateId]/send/route"),
+        import("@/payment/estimate/[estimateId]/send/route"),
     ),
   },
 });

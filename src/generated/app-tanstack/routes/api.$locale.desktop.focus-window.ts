@@ -6,7 +6,7 @@ import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 export const Route = createFileRoute("/api/$locale/desktop/focus-window")({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/desktop/focus-window/route"),
+      () => import("@/desktop/focus-window/route"),
     ),
   },
 });

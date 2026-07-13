@@ -3,6 +3,7 @@
  * Defines endpoints for getting and deleting individual subfolders
  */
 
+import { DefaultFolderId } from "next-vibe/agent/chat/config";
 import {
   dateSchema,
   iconSchema,
@@ -26,8 +27,6 @@ import {
   submitButton,
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
-
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 
 import { scopedTranslation } from "./i18n";
 

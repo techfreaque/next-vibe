@@ -20,6 +20,7 @@ import {
   UserRole,
   UserRoleDB,
 } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import {
   customWidgetObject,
   objectField,
@@ -29,8 +30,6 @@ import {
   responseField,
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
-
-import { lazyWidget } from "@/app/api/[locale]/system/unified-ui/_shared/lazy-widget";
 
 import { DefaultFolderId } from "../../config";
 import { scopedTranslation } from "./i18n";

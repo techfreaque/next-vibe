@@ -6,6 +6,10 @@
  * can render without the full chat infrastructure.
  */
 
+import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import type { ChatBootValue } from "next-vibe/agent/chat/hooks/context";
+import { ChatBootContext } from "next-vibe/agent/chat/hooks/context";
+import { ChatNavigationProvider } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type { UseNavigationStackReturn } from "next-vibe/platforms/react/hooks/use-navigation-stack";
 import { NavigationStackProvider } from "next-vibe/platforms/react/hooks/use-navigation-stack";
@@ -15,11 +19,6 @@ import type { WidgetContextStoreType } from "next-vibe/unified-ui/_shared/widget
 import type { JSX, ReactNode } from "react";
 import { useMemo, useRef } from "react";
 import { create } from "zustand";
-
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { ChatBootValue } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { ChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { ChatNavigationProvider } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 
 const MOCK_CREDITS: ChatBootValue["initialCredits"] = {
   total: 0,

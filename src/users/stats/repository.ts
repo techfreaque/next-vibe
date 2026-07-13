@@ -23,13 +23,10 @@ import { userLeadLinks } from "next-vibe/identity/lead/db";
 import { userRoles, users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import {
-  paymentRefunds,
-  paymentTransactions,
-} from "@/app/api/[locale]/payment/db";
-import { PaymentStatus } from "@/app/api/[locale]/payment/enum";
-import { subscriptions } from "@/app/api/[locale]/subscription/db";
-import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
+import { paymentRefunds, paymentTransactions } from "@/payment/db";
+import { PaymentStatus } from "@/payment/enum";
+import { subscriptions } from "@/subscription/db";
+import { SubscriptionStatus } from "@/subscription/enum";
 
 import {
   PaymentMethodFilter,

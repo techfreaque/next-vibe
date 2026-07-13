@@ -8,6 +8,18 @@ import "server-only";
 import type { LanguageModel } from "ai";
 import { generateText as aiGenerateText } from "ai";
 import { eq } from "drizzle-orm";
+import { ProviderFactory } from "next-vibe/agent/ai-stream/repository/core/infra";
+import {
+  type BridgeContext,
+  ModalityResolver,
+} from "next-vibe/agent/ai-stream/repository/core/modality-resolver";
+import { chatSettings } from "next-vibe/agent/chat/settings/db";
+import { calculateCreditCost } from "next-vibe/agent/models/models";
+import {
+  chatFavorites,
+  FAVORITE_CONFIG_COLUMNS,
+} from "next-vibe/agent/skills/favorites/db";
+import { resolveFavoriteConfig } from "next-vibe/agent/skills/favorites/repository";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -20,20 +32,8 @@ import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { ProviderFactory } from "@/app/api/[locale]/agent/ai-stream/repository/core/infra";
-import {
-  type BridgeContext,
-  ModalityResolver,
-} from "@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver";
-import { chatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
-import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
-import {
-  chatFavorites,
-  FAVORITE_CONFIG_COLUMNS,
-} from "@/app/api/[locale]/agent/skills/favorites/db";
-import { resolveFavoriteConfig } from "@/app/api/[locale]/agent/skills/favorites/repository";
-import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
-import { CreditRepository } from "@/app/api/[locale]/credits/repository";
+import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
+import { CreditRepository } from "@/credits/repository";
 
 import type { ToolExecutionContext } from "../chat/config";
 import { getEnvAvailability } from "../env-availability";

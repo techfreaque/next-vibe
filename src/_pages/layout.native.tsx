@@ -9,12 +9,12 @@
 
 import { PortalHost } from "@rn-primitives/portal";
 import { Slot, useLocalSearchParams } from "expo-router";
+import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Body } from "next-vibe/ui/ui/body";
 import type { JSX } from "react";
 
-import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { envClient } from "@/config/env-client";
+import { envClient } from "@/_old/config/env-client";
 
 import { RootProviders } from "./layout-shared";
 

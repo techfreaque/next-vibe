@@ -3,15 +3,14 @@
  * Handles branching/editing messages in both incognito and server modes
  */
 
+import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import messagesDefinition from "next-vibe/agent/chat/threads/[threadId]/messages/definition";
+import type { FavoriteConfig } from "next-vibe/agent/skills/favorites/db";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { apiClient } from "next-vibe/platforms/react/hooks/store";
-
-import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
-import type { FavoriteConfig } from "@/app/api/[locale]/agent/skills/favorites/db";
 
 import type { StartStreamFn } from "./shared";
 import { createAndSendUserMessage } from "./shared";
@@ -60,7 +59,7 @@ export async function branchMessage(
   // Fallback: incognito storage
   if (!message && currentRootFolderId === DefaultFolderId.INCOGNITO) {
     const { getMessagesForThread } =
-      await import("@/app/api/[locale]/agent/chat/incognito/storage");
+      await import("next-vibe/agent/chat/incognito/storage");
     const msgs = await getMessagesForThread(activeThreadId);
     message = msgs.find((m) => m.id === messageId);
   }

@@ -9,7 +9,7 @@ export const Route = createFileRoute(
   server: {
     handlers: wrapNextApiRoute(
       () =>
-        import("@/app/api/[locale]/user/public/reset-password/validate/route"),
+        import("@/user/public/reset-password/validate/route"),
     ),
   },
 });

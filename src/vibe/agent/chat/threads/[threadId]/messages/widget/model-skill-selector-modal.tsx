@@ -1,4 +1,8 @@
 "use client";
+import { Selector } from "next-vibe/agent/ai-stream/stream/widget/selector/index";
+import { useChatSettings } from "next-vibe/agent/chat/settings/hooks";
+import { ChatSettingsRepositoryClient } from "next-vibe/agent/chat/settings/repository-client";
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { cn } from "next-vibe/core/utils/utils";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -11,11 +15,6 @@ import { Textarea } from "next-vibe/ui/ui/textarea";
 import { H3, P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 import { useState } from "react";
-
-import { Selector } from "@/app/api/[locale]/agent/ai-stream/stream/widget/selector/index";
-import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
-import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 
 import type { MessagesTranslationKey } from "../i18n";
 import { scopedTranslation } from "../i18n";

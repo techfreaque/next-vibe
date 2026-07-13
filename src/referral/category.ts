@@ -6,8 +6,8 @@
 import type { CategoryDefinition } from "next-vibe/help-tool/category-types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
-import { REFERRAL_STATS_ALIAS } from "@/app/api/[locale]/referral/stats/constants";
-import { USER_ME_ALIAS } from "@/app/api/[locale]/user/private/me/constants";
+import { REFERRAL_STATS_ALIAS } from "@/referral/stats/constants";
+import { USER_ME_ALIAS } from "@/user/private/me/constants";
 
 export const category: CategoryDefinition = {
   key: "referral",

@@ -55,8 +55,7 @@ const { GET } = createEndpoint({
         description: "invoiceId.description" as const,
         schema: z.uuid(),
         listEndpoint: async () =>
-          (await import("@/app/api/[locale]/payment/invoice/list/definition"))
-            .default.GET,
+          (await import("@/payment/invoice/list/definition")).default.GET,
         labelField: "invoiceSequenceNumber",
       }),
 

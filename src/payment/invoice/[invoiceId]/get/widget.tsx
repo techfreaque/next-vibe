@@ -17,12 +17,12 @@ import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/wid
 import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import { type JSX } from "react";
 
-import { InvoiceStatus } from "@/app/api/[locale]/payment/enum";
-import invoiceRecordPaymentDefinitions from "@/app/api/[locale]/payment/invoice/[invoiceId]/record-payment/definition";
-import invoiceSendDefinitions from "@/app/api/[locale]/payment/invoice/[invoiceId]/send/definition";
-import invoiceSendReminderDefinitions from "@/app/api/[locale]/payment/invoice/[invoiceId]/send-reminder/definition";
-import invoiceVoidDefinitions from "@/app/api/[locale]/payment/invoice/[invoiceId]/void/definition";
-import invoiceLineAddDefinitions from "@/app/api/[locale]/payment/invoice/line/add/definition";
+import { InvoiceStatus } from "@/payment/enum";
+import invoiceRecordPaymentDefinitions from "@/payment/invoice/[invoiceId]/record-payment/definition";
+import invoiceSendDefinitions from "@/payment/invoice/[invoiceId]/send/definition";
+import invoiceSendReminderDefinitions from "@/payment/invoice/[invoiceId]/send-reminder/definition";
+import invoiceVoidDefinitions from "@/payment/invoice/[invoiceId]/void/definition";
+import invoiceLineAddDefinitions from "@/payment/invoice/line/add/definition";
 
 import type definition from "./definition";
 
@@ -146,7 +146,7 @@ export function InvoiceGetWidget({
     }
     void (async (): Promise<void> => {
       const def =
-        await import("@/app/api/[locale]/chart-of-accounts/journal/[entryId]/get/definition");
+        await import("@/chart-of-accounts/journal/[entryId]/get/definition");
       navigate(def.default.GET, {
         urlPathParams: { entryId },
       });

@@ -6,15 +6,11 @@
 
 "use client";
 
+import { ImageQuality, ImageSize } from "next-vibe/agent/image-generation/enum";
+import { MusicDuration } from "next-vibe/agent/music-generation/enum";
 import type { TextareaRefObject } from "next-vibe/ui/ui/textarea";
 import { createRef, type RefObject } from "react";
 import { create } from "zustand";
-
-import {
-  ImageQuality,
-  ImageSize,
-} from "@/app/api/[locale]/agent/image-generation/enum";
-import { MusicDuration } from "@/app/api/[locale]/agent/music-generation/enum";
 
 export { ImageQuality, ImageSize, MusicDuration };
 

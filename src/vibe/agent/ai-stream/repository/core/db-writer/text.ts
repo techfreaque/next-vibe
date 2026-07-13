@@ -6,7 +6,7 @@
 
 import "server-only";
 
-import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
 
 import type { MessageMetadata } from "../../../../chat/db";
 import { ChatMessageRole, ThreadStreamingState } from "../../../../chat/enum";
@@ -186,7 +186,7 @@ export async function emitContentDone(
     // content, so it can carry its own vector like the user message does.
     w.assistantEmbedPromise = (async (): Promise<void> => {
       const { embedAssistantMessageRow } =
-        await import("@/app/api/[locale]/agent/cortex/embeddings/message-embed");
+        await import("next-vibe/agent/cortex/embeddings/message-embed");
       await embedAssistantMessageRow(messageId, content, w.streamContext);
     })();
   }

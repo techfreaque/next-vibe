@@ -12,9 +12,9 @@ import { MotionDiv } from "next-vibe/ui/ui/motion";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 
-import resetConfirmDefinitions from "@/app/api/[locale]/user/public/reset-password/confirm/definition";
-import { scopedTranslation } from "@/app/api/[locale]/user/public/reset-password/confirm/i18n";
-import type { ResetPasswordValidateGetResponseOutput } from "@/app/api/[locale]/user/public/reset-password/validate/definition";
+import resetConfirmDefinitions from "@/user/public/reset-password/confirm/definition";
+import { scopedTranslation } from "@/user/public/reset-password/confirm/i18n";
+import type { ResetPasswordValidateGetResponseOutput } from "@/user/public/reset-password/validate/definition";
 
 interface ResetPasswordConfirmFormProps {
   locale: CountryLanguage;

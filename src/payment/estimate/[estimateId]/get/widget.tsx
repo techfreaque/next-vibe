@@ -15,7 +15,7 @@ import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/wid
 import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import { type JSX } from "react";
 
-import { EstimateStatus } from "@/app/api/[locale]/payment/enum";
+import { EstimateStatus } from "@/payment/enum";
 
 import type definition from "./definition";
 
@@ -98,8 +98,8 @@ export function EstimateGetWidget(_props: {
     e.stopPropagation();
     void (async (): Promise<void> => {
       const [convertDef, invoiceGetDef] = await Promise.all([
-        import("@/app/api/[locale]/payment/estimate/[estimateId]/convert-to-invoice/definition"),
-        import("@/app/api/[locale]/payment/invoice/[invoiceId]/get/definition"),
+        import("@/payment/estimate/[estimateId]/convert-to-invoice/definition"),
+        import("@/payment/invoice/[invoiceId]/get/definition"),
       ]);
       navigate(convertDef.default.POST, {
         urlPathParams: { estimateId: data.id },

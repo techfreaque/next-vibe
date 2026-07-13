@@ -62,8 +62,7 @@ const { POST } = createEndpoint({
         hidden: true,
         schema: z.uuid(),
         listEndpoint: async () =>
-          (await import("@/app/api/[locale]/purchasing/order/list/definition"))
-            .default.GET,
+          (await import("@/purchasing/order/list/definition")).default.GET,
         labelField: "poNumber",
       }),
       warehouseId: requestField(scopedTranslation, {

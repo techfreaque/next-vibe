@@ -5,6 +5,10 @@
 
 "use client";
 
+import {
+  type ChatT,
+  scopedTranslation as chatScopedTranslation,
+} from "next-vibe/agent/chat/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import { parseError } from "next-vibe/core/utils/parse-error";
@@ -14,11 +18,6 @@ import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { downloadBinaryFile } from "next-vibe/ui/lib/download";
 import { getMicrophoneStream, getUserAgent } from "next-vibe/ui/lib/media";
 import { useCallback, useMemo, useRef, useState } from "react";
-
-import {
-  type ChatT,
-  scopedTranslation as chatScopedTranslation,
-} from "@/app/api/[locale]/agent/chat/i18n";
 
 import speechToTextDefinitions from "./definition";
 

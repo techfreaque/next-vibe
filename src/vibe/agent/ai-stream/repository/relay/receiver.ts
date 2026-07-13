@@ -25,9 +25,8 @@ import type {
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { CoreTool } from "next-vibe/platforms/ai/tools-loader";
+import { remoteConnections } from "next-vibe/remote-connection/db";
 import type { NextRequest } from "next-vibe/ui/lib/request";
-
-import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
 
 import type { ToolExecutionContext } from "../../../chat/config";
 import { DefaultFolderId } from "../../../chat/config";
@@ -258,7 +257,7 @@ export async function runWsProviderStream(params: {
       // Register only execute-tool as the single meta-tool.
       const { loadTools } = await import("next-vibe/platforms/ai/tools-loader");
       const { makeHeadlessContext } =
-        await import("@/app/api/[locale]/agent/chat/config");
+        await import("next-vibe/agent/chat/config");
       // Carry the caller's skill/favorite identity into the tool context: the
       // executing side's fieldDefaults (e.g. media-model resolution) cascade
       // from it, and it crosses the wire as callerSkillId/callerFavoriteId on

@@ -31,9 +31,8 @@ import type {
   JwtPrivatePayloadType,
 } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
-import { RemoteConnectionRepository } from "@/app/api/[locale]/remote-connection/repository";
+import { remoteConnections } from "next-vibe/remote-connection/db";
+import { RemoteConnectionRepository } from "next-vibe/remote-connection/repository";
 
 import type {
   RemoteEventRelayPayload,
@@ -243,7 +242,7 @@ export class RemoteEventBridgeRepository {
     // provider — the bridge stays domain-agnostic.
     if (syncDomain) {
       const { ensureProvidersRegistered, getSyncProviders } =
-        await import("@/app/api/[locale]/remote-connection/sync/provider");
+        await import("next-vibe/remote-connection/sync/provider");
       await ensureProvidersRegistered();
       const provider = getSyncProviders().get(syncDomain);
       if (provider?.remoteEventGate) {

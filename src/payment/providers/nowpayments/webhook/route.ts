@@ -14,7 +14,7 @@ import { headers } from "next-vibe/ui/lib/headers";
 import type { NextRequest } from "next-vibe/ui/lib/request";
 import { NextResponse } from "next-vibe/ui/lib/request";
 
-import { env } from "@/config/env";
+import { env } from "@/_old/config/env";
 
 import { PaymentProvider } from "../../../enum";
 import { PaymentRepository } from "../../../repository";

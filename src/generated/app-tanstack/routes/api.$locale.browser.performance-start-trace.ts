@@ -8,7 +8,7 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/browser/performance-start-trace/route"),
+      () => import("@/browser/performance-start-trace/route"),
     ),
   },
 });

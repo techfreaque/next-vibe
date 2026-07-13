@@ -1,3 +1,4 @@
+import { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
@@ -13,8 +14,6 @@ import {
   responseField,
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
-
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
 import { scopedTranslation } from "./i18n";
 

@@ -8,18 +8,17 @@
 import "server-only";
 
 import { and, eq, like, sql } from "drizzle-orm";
+import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
+import {
+  DefaultFolderId,
+  rootlessStreamContext,
+} from "next-vibe/agent/chat/config";
+import { chatThreads } from "next-vibe/agent/chat/db";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { cronTasks } from "next-vibe/tasks/cron/db";
 import { CronTaskStatus } from "next-vibe/tasks/enum";
 import { expect } from "vitest";
-
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
-import {
-  DefaultFolderId,
-  rootlessStreamContext,
-} from "@/app/api/[locale]/agent/chat/config";
-import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
 
 import type { SlimMessage } from "../../../testing/headless-test-runner";
 import {

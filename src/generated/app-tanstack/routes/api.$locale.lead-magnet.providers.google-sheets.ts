@@ -9,7 +9,7 @@ export const Route = createFileRoute(
   server: {
     handlers: wrapNextApiRoute(
       () =>
-        import("@/app/api/[locale]/lead-magnet/providers/google-sheets/route"),
+        import("@/lead-magnet/providers/google-sheets/route"),
     ),
   },
 });

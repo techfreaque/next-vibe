@@ -18,7 +18,7 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
+import { CompanyAuthRepository } from "@/companies/repository";
 
 import { scopedTranslation } from "../i18n";
 import type {

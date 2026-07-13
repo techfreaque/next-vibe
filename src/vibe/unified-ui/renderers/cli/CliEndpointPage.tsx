@@ -25,6 +25,8 @@ import {
   useInput,
   useStdin,
 } from "ink";
+import { getEnvAvailability } from "next-vibe/agent/env-availability";
+import { AgentAvailabilityProvider } from "next-vibe/agent/env-availability-context";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
@@ -36,9 +38,7 @@ import { QueryProvider } from "next-vibe/platforms/react/hooks/query-provider";
 import type { JSX, ReactNode } from "react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { AgentAvailabilityProvider } from "@/app/api/[locale]/agent/env-availability-context";
-import { LoggerProvider } from "@/hooks/logger-provider";
+import { LoggerProvider } from "@/_old/hooks/logger-provider";
 
 import { EndpointsPage } from "../react/EndpointsPage";
 

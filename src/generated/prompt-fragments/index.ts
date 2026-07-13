@@ -6,7 +6,7 @@
  * Fragment IDs: autonomy-status, bootstrap, coding-agent-setting, contact, cortex, desktop, extra-instructions, favorites, folder-context, formatting, guest-context, headless-context, identity, language, media-capabilities, message-metadata, platform-overview, remote-instances, skill, ssh-connections, sub-agent-guard, system-context, thread-rename, tool-execution-control, user-name, web
  */
 
-import type { PromptFragmentModule } from "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
+import type { PromptFragmentModule } from "next-vibe/agent/ai-stream/system-prompt/types";
 
 /**
  * All registered prompt fragment IDs.
@@ -52,7 +52,7 @@ export async function getPromptFragment(
 ): Promise<PromptFragmentModule> {
   switch (id) {
     case "autonomy-status":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
+      return import("next-vibe/agent/ai-stream/system-prompt/system-prompt").then(
         ({
           identityFragment,
           platformOverviewFragment,
@@ -88,7 +88,7 @@ export async function getPromptFragment(
         }),
       );
     case "bootstrap":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
+      return import("next-vibe/agent/ai-stream/system-prompt/system-prompt").then(
         ({
           identityFragment,
           platformOverviewFragment,
@@ -124,31 +124,31 @@ export async function getPromptFragment(
         }),
       );
     case "coding-agent-setting":
-      return import("@/app/api/[locale]/agent/chat/settings/system-prompt").then(
+      return import("next-vibe/agent/chat/settings/system-prompt").then(
         ({ codingAgentSettingFragment }) => ({
           codingAgentSettingFragment,
         }),
       );
     case "contact":
-      return import("@/app/api/[locale]/contact/system-prompt").then(
+      return import("@/contact/system-prompt").then(
         ({ contactFragment }) => ({
           contactFragment,
         }),
       );
     case "cortex":
-      return import("@/app/api/[locale]/agent/cortex/system-prompt").then(
+      return import("next-vibe/agent/cortex/system-prompt").then(
         ({ cortexFragment }) => ({
           cortexFragment,
         }),
       );
     case "desktop":
-      return import("@/app/api/[locale]/desktop/system-prompt").then(
+      return import("@/desktop/system-prompt").then(
         ({ desktopFragment }) => ({
           desktopFragment,
         }),
       );
     case "extra-instructions":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
+      return import("next-vibe/agent/ai-stream/system-prompt/system-prompt").then(
         ({
           identityFragment,
           platformOverviewFragment,
@@ -184,13 +184,13 @@ export async function getPromptFragment(
         }),
       );
     case "favorites":
-      return import("@/app/api/[locale]/agent/skills/favorites/system-prompt").then(
+      return import("next-vibe/agent/skills/favorites/system-prompt").then(
         ({ favoritesFragment }) => ({
           favoritesFragment,
         }),
       );
     case "folder-context":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
+      return import("next-vibe/agent/ai-stream/system-prompt/system-prompt").then(
         ({
           identityFragment,
           platformOverviewFragment,
@@ -226,7 +226,7 @@ export async function getPromptFragment(
         }),
       );
     case "formatting":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
+      return import("next-vibe/agent/ai-stream/system-prompt/system-prompt").then(
         ({
           identityFragment,
           platformOverviewFragment,
@@ -262,7 +262,7 @@ export async function getPromptFragment(
         }),
       );
     case "guest-context":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
+      return import("next-vibe/agent/ai-stream/system-prompt/system-prompt").then(
         ({
           identityFragment,
           platformOverviewFragment,
@@ -298,7 +298,7 @@ export async function getPromptFragment(
         }),
       );
     case "headless-context":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
+      return import("next-vibe/agent/ai-stream/system-prompt/system-prompt").then(
         ({
           identityFragment,
           platformOverviewFragment,
@@ -334,7 +334,7 @@ export async function getPromptFragment(
         }),
       );
     case "identity":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
+      return import("next-vibe/agent/ai-stream/system-prompt/system-prompt").then(
         ({
           identityFragment,
           platformOverviewFragment,
@@ -370,7 +370,7 @@ export async function getPromptFragment(
         }),
       );
     case "language":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
+      return import("next-vibe/agent/ai-stream/system-prompt/system-prompt").then(
         ({
           identityFragment,
           platformOverviewFragment,
@@ -406,7 +406,7 @@ export async function getPromptFragment(
         }),
       );
     case "media-capabilities":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
+      return import("next-vibe/agent/ai-stream/system-prompt/system-prompt").then(
         ({
           identityFragment,
           platformOverviewFragment,
@@ -442,7 +442,7 @@ export async function getPromptFragment(
         }),
       );
     case "message-metadata":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
+      return import("next-vibe/agent/ai-stream/system-prompt/system-prompt").then(
         ({
           identityFragment,
           platformOverviewFragment,
@@ -478,7 +478,7 @@ export async function getPromptFragment(
         }),
       );
     case "platform-overview":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
+      return import("next-vibe/agent/ai-stream/system-prompt/system-prompt").then(
         ({
           identityFragment,
           platformOverviewFragment,
@@ -514,7 +514,7 @@ export async function getPromptFragment(
         }),
       );
     case "remote-instances":
-      return import("@/app/api/[locale]/remote-connection/system-prompt").then(
+      return import("next-vibe/remote-connection/system-prompt").then(
         ({
           systemContextFragment,
           remoteInstancesFragment,
@@ -526,13 +526,13 @@ export async function getPromptFragment(
         }),
       );
     case "skill":
-      return import("@/app/api/[locale]/agent/skills/system-prompt").then(
+      return import("next-vibe/agent/skills/system-prompt").then(
         ({ skillFragment }) => ({
           skillFragment,
         }),
       );
     case "ssh-connections":
-      return import("@/app/api/[locale]/remote-connection/system-prompt").then(
+      return import("next-vibe/remote-connection/system-prompt").then(
         ({
           systemContextFragment,
           remoteInstancesFragment,
@@ -544,7 +544,7 @@ export async function getPromptFragment(
         }),
       );
     case "sub-agent-guard":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
+      return import("next-vibe/agent/ai-stream/system-prompt/system-prompt").then(
         ({
           identityFragment,
           platformOverviewFragment,
@@ -580,7 +580,7 @@ export async function getPromptFragment(
         }),
       );
     case "system-context":
-      return import("@/app/api/[locale]/remote-connection/system-prompt").then(
+      return import("next-vibe/remote-connection/system-prompt").then(
         ({
           systemContextFragment,
           remoteInstancesFragment,
@@ -592,13 +592,13 @@ export async function getPromptFragment(
         }),
       );
     case "thread-rename":
-      return import("@/app/api/[locale]/agent/chat/threads/rename/system-prompt").then(
+      return import("next-vibe/agent/chat/threads/rename/system-prompt").then(
         ({ threadRenameFragment }) => ({
           threadRenameFragment,
         }),
       );
     case "tool-execution-control":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
+      return import("next-vibe/agent/ai-stream/system-prompt/system-prompt").then(
         ({
           identityFragment,
           platformOverviewFragment,
@@ -634,7 +634,7 @@ export async function getPromptFragment(
         }),
       );
     case "user-name":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt").then(
+      return import("next-vibe/agent/ai-stream/system-prompt/system-prompt").then(
         ({
           identityFragment,
           platformOverviewFragment,
@@ -670,7 +670,7 @@ export async function getPromptFragment(
         }),
       );
     case "web":
-      return import("@/app/api/[locale]/agent/web-search/system-prompt").then(
+      return import("next-vibe/agent/web-search/system-prompt").then(
         ({ webFragment }) => ({
           webFragment,
         }),

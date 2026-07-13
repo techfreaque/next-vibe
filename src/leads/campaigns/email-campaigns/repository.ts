@@ -30,12 +30,12 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { cronTasks, type NewCronTask } from "next-vibe/tasks/cron/db";
 import { CronTaskPriority, TaskCategory } from "next-vibe/tasks/enum";
 
-import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
-import { messengerAccounts } from "@/app/api/[locale]/messenger/accounts/db";
-import { scopedTranslation as smtpScopedTranslation } from "@/app/api/[locale]/messenger/providers/email/smtp-client/i18n";
-import { SmtpSendingRepository } from "@/app/api/[locale]/messenger/providers/email/smtp-client/sending/repository";
-import { env } from "@/config/env";
-import { configScopedTranslation } from "@/config/i18n";
+import { env } from "@/_old/config/env";
+import { configScopedTranslation } from "@/_old/config/i18n";
+import { contactClientRepository } from "@/contact/repository-client";
+import { messengerAccounts } from "@/messenger/accounts/db";
+import { scopedTranslation as smtpScopedTranslation } from "@/messenger/providers/email/smtp-client/i18n";
+import { SmtpSendingRepository } from "@/messenger/providers/email/smtp-client/sending/repository";
 
 import { emailRendererService } from "../emails/services/renderer";
 import { campaignSchedulerService } from "../emails/services/scheduler";

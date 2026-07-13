@@ -21,14 +21,14 @@ import { CreditCard } from "next-vibe/ui/ui/icons/CreditCard";
 import { ExternalLink } from "next-vibe/ui/ui/icons/ExternalLink";
 import type { JSX } from "react";
 
-import { scopedTranslation as appScopedTranslation } from "@/app/[locale]/i18n";
-import { scopedTranslation as pageSubscriptionScopedTranslation } from "@/app/[locale]/subscription/i18n";
-import { PaymentProvider } from "@/app/api/[locale]/payment/enum";
-import { scopedTranslation as paymentScopedTranslation } from "@/app/api/[locale]/payment/i18n";
-import { useCustomerPortal } from "@/app/api/[locale]/payment/portal/hooks";
-import { type SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
-import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
-import { scopedTranslation as subscriptionScopedTranslation } from "@/app/api/[locale]/subscription/i18n";
+import { scopedTranslation as appScopedTranslation } from "@/_pages/i18n";
+import { scopedTranslation as pageSubscriptionScopedTranslation } from "@/_pages/subscription/i18n";
+import { PaymentProvider } from "@/payment/enum";
+import { scopedTranslation as paymentScopedTranslation } from "@/payment/i18n";
+import { useCustomerPortal } from "@/payment/portal/hooks";
+import { type SubscriptionGetResponseOutput } from "@/subscription/definition";
+import { SubscriptionStatus } from "@/subscription/enum";
+import { scopedTranslation as subscriptionScopedTranslation } from "@/subscription/i18n";
 
 interface SubscriptionStatusCardProps {
   locale: CountryLanguage;

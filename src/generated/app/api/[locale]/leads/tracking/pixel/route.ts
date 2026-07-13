@@ -1,2 +1,2 @@
 // AUTO-GENERATED from src/app/api/[locale]/leads/tracking/pixel/route.ts. Add "use custom" to this file to preserve customizations.
-export * from "@/app/api/[locale]/leads/tracking/pixel/route";
+export * from "@/leads/tracking/pixel/route";

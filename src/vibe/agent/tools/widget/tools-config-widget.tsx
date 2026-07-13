@@ -12,6 +12,8 @@
 
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
+import { getDefaultToolIdsForUser } from "next-vibe/agent/chat/constants";
+import type { EnabledTool } from "next-vibe/agent/chat/hooks/store";
 import { cn } from "next-vibe/core/utils/utils";
 import type { HelpToolMetadataSerialized } from "next-vibe/help-tool/definition";
 import helpDefinitions from "next-vibe/help-tool/definition";
@@ -43,9 +45,6 @@ import {
 import { P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
-
-import { getDefaultToolIdsForUser } from "@/app/api/[locale]/agent/chat/constants";
-import type { EnabledTool } from "@/app/api/[locale]/agent/chat/hooks/store";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 

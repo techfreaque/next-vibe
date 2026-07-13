@@ -3,6 +3,15 @@
  * Defines endpoint for listing user favorites
  */
 
+import {
+  ChatModelId,
+  chatModelSelectionSchema,
+} from "next-vibe/agent/ai-stream/models";
+import { DEFAULT_TTS_VOICE_ID } from "next-vibe/agent/text-to-speech/constants";
+import {
+  TtsModelId,
+  voiceModelSelectionSchema,
+} from "next-vibe/agent/text-to-speech/models";
 import { iconSchema } from "next-vibe/core/definition/common.schema";
 import { createEndpoint } from "next-vibe/core/definition/create";
 import {
@@ -25,16 +34,6 @@ import {
   widgetField,
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
-
-import {
-  ChatModelId,
-  chatModelSelectionSchema,
-} from "@/app/api/[locale]/agent/ai-stream/models";
-import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
-import {
-  TtsModelId,
-  voiceModelSelectionSchema,
-} from "@/app/api/[locale]/agent/text-to-speech/models";
 
 import { parseSkillId } from "../../chat/slugify";
 import { FAVORITES_LIST_ALIAS } from "./constants";
@@ -92,8 +91,7 @@ const { GET } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         listEndpoint: async () =>
-          (await import("@/app/api/[locale]/users/list/definition")).default
-            .GET,
+          (await import("@/users/list/definition")).default.GET,
         labelField: "email",
         label: "get.userId.label" as const,
         description: "get.userId.description" as const,

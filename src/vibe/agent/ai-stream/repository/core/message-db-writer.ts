@@ -18,6 +18,9 @@
 
 import "server-only";
 
+import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
+import type { Modality } from "next-vibe/agent/models/enum";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
@@ -25,10 +28,7 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
-import type { Modality } from "@/app/api/[locale]/agent/models/enum";
-import type { CreditsT as ModuleT } from "@/app/api/[locale]/credits/i18n";
+import type { CreditsT as ModuleT } from "@/credits/i18n";
 
 import type { MessageMetadata, ToolCall } from "../../../chat/db";
 import type { ThreadStreamingState } from "../../../chat/enum";

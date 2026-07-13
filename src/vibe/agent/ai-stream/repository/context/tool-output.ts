@@ -6,15 +6,14 @@
 import "server-only";
 
 import type { JSONValue } from "ai";
+import { IMAGE_GEN_ALIAS } from "next-vibe/agent/image-generation/constants";
+import type { Modality } from "next-vibe/agent/models/enum";
+import { AUDIO_GEN_TOOL_NAME } from "next-vibe/agent/music-generation/constants";
+import { VIDEO_GEN_TOOL_NAME } from "next-vibe/agent/video-generation/constants";
 import type { ContentBlock } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { EXECUTE_TOOL_ALIAS } from "next-vibe/execute-tool/constants";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { IMAGE_GEN_ALIAS } from "@/app/api/[locale]/agent/image-generation/constants";
-import type { Modality } from "@/app/api/[locale]/agent/models/enum";
-import { AUDIO_GEN_TOOL_NAME } from "@/app/api/[locale]/agent/music-generation/constants";
-import { VIDEO_GEN_TOOL_NAME } from "@/app/api/[locale]/agent/video-generation/constants";
 
 import { fetchStorageFileAsBase64 } from "../../../chat/storage/url-utils";
 import type { ChatModelOption } from "../../models";

@@ -53,9 +53,8 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.string().uuid(),
         listEndpoint: async () =>
-          (
-            await import("@/app/api/[locale]/chart-of-accounts/journal/list/definition")
-          ).default.GET,
+          (await import("@/chart-of-accounts/journal/list/definition")).default
+            .GET,
         labelField: "entryNumber",
       }),
       posted: responseField(scopedTranslation, {

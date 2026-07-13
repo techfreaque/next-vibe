@@ -1,5 +1,6 @@
 "use client";
 
+import { ModelCreditDisplay } from "next-vibe/agent/models/widget/model-credit-display";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -15,8 +16,6 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
-
-import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 
 import type { AnyModelId } from "../models";
 import type definition from "./definition";

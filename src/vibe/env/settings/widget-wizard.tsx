@@ -5,9 +5,17 @@
  */
 
 "use client";
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import { cn } from "next-vibe/core/utils/utils";
 import { useApiMutation } from "next-vibe/platforms/react/hooks/use-api-mutation";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
+import instanceEndpoints from "next-vibe/remote-connection/[instanceId]/definition";
+import { scopedTranslation as connectScopedTranslation } from "next-vibe/remote-connection/connect/i18n";
+import type { SyncScope } from "next-vibe/remote-connection/db";
+import { SyncScopeSchema } from "next-vibe/remote-connection/db";
+import { useRemoteConnections } from "next-vibe/remote-connection/list/hooks";
+import type { SyncProviderInfo } from "next-vibe/remote-connection/sync/providers/definition";
+import syncProvidersDefinitions from "next-vibe/remote-connection/sync/providers/definition";
 import { storage } from "next-vibe/ui/lib/storage";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -39,15 +47,6 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useState } from "react";
-
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import instanceEndpoints from "@/app/api/[locale]/remote-connection/[instanceId]/definition";
-import { scopedTranslation as connectScopedTranslation } from "@/app/api/[locale]/remote-connection/connect/i18n";
-import type { SyncScope } from "@/app/api/[locale]/remote-connection/db";
-import { SyncScopeSchema } from "@/app/api/[locale]/remote-connection/db";
-import { useRemoteConnections } from "@/app/api/[locale]/remote-connection/list/hooks";
-import type { SyncProviderInfo } from "@/app/api/[locale]/remote-connection/sync/providers/definition";
-import syncProvidersDefinitions from "@/app/api/[locale]/remote-connection/sync/providers/definition";
 
 import type endpoints from "./definition";
 import type { SystemSettingsGetResponseOutput } from "./definition";

@@ -22,16 +22,13 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { accountNodes } from "@/app/api/[locale]/chart-of-accounts/db";
-import {
-  AccountSubtype,
-  AccountType,
-} from "@/app/api/[locale]/chart-of-accounts/enum";
-import { CoaSetupRepository } from "@/app/api/[locale]/chart-of-accounts/setup/repository";
-import { CompanyMemberRole } from "@/app/api/[locale]/companies/enum";
-import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
-import { taxRates } from "@/app/api/[locale]/tax/db";
-import { seedDefaultTaxRates } from "@/app/api/[locale]/tax/default-tax-rates";
+import { accountNodes } from "@/chart-of-accounts/db";
+import { AccountSubtype, AccountType } from "@/chart-of-accounts/enum";
+import { CoaSetupRepository } from "@/chart-of-accounts/setup/repository";
+import { CompanyMemberRole } from "@/companies/enum";
+import { CompanyAuthRepository } from "@/companies/repository";
+import { taxRates } from "@/tax/db";
+import { seedDefaultTaxRates } from "@/tax/default-tax-rates";
 
 import type {
   CompanyOnboardRequestOutput,

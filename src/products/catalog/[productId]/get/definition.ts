@@ -52,8 +52,7 @@ const { GET } = createEndpoint({
         description: "get.productId.description" as const,
         schema: z.uuid(),
         listEndpoint: async () =>
-          (await import("@/app/api/[locale]/products/catalog/list/definition"))
-            .default.GET,
+          (await import("@/products/catalog/list/definition")).default.GET,
         labelField: "name",
       }),
 

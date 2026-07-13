@@ -5,6 +5,8 @@
 
 import "server-only";
 
+import { agentEnv } from "next-vibe/agent/env";
+import { PROVIDER_SETUP_INSTRUCTIONS } from "next-vibe/agent/env-availability";
 import {
   ErrorResponseTypes,
   fail,
@@ -13,9 +15,6 @@ import {
 } from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { agentEnv } from "@/app/api/[locale]/agent/env";
-import { PROVIDER_SETUP_INSTRUCTIONS } from "@/app/api/[locale]/agent/env-availability";
 
 import type { ToolExecutionContext } from "../../chat/config";
 import type {
@@ -96,8 +95,8 @@ export class KagiSearchRepository {
         .replace(/^-|-$/g, "")
         .slice(0, 60)}-${toolMessageId}`;
       void Promise.all([
-        import("@/app/api/[locale]/agent/cortex/mounts/searches"),
-        import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual"),
+        import("next-vibe/agent/cortex/mounts/searches"),
+        import("next-vibe/agent/cortex/embeddings/sync-virtual"),
       ])
         .then(([{ readSearchPath }, { syncVirtualNodeToEmbedding }]) => {
           const path = `/searches/${month}/${slug}.md`;

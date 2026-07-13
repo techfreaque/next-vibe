@@ -26,7 +26,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils";
 import type { z } from "zod";
 
-import type imapAccountsListDefinition from "@/app/api/[locale]/messenger/accounts/list/definition";
+import type imapAccountsListDefinition from "@/messenger/accounts/list/definition";
 
 const genericST: { ScopedTranslationKey: string } = { ScopedTranslationKey: "" };
 import type { InferSchemaFromField } from "next-vibe/core/definition/endpoint";

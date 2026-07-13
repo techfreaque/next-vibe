@@ -169,13 +169,13 @@ export function AccountingDashboardWidget(
     () => import("../period/create/definition"),
   );
   const handleNavCompanies = handleNavGet(
-    () => import("@/app/api/[locale]/companies/list/definition"),
+    () => import("@/companies/list/definition"),
   );
   const handleNavInvoices = handleNavGet(
-    () => import("@/app/api/[locale]/payment/invoice/list/definition"),
+    () => import("@/payment/invoice/list/definition"),
   );
   const handleNavBills = handleNavGet(
-    () => import("@/app/api/[locale]/payment/bill/list/definition"),
+    () => import("@/payment/bill/list/definition"),
   );
 
   if (!data) {

@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
 
+import { DefaultFolderId } from "next-vibe/agent/chat/config";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
@@ -7,8 +8,7 @@ import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { redirect } from "next-vibe/ui/lib/redirect";
 
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { env } from "@/config/env";
+import { env } from "@/_old/config/env";
 
 interface ChatPageProps {
   params: Promise<{

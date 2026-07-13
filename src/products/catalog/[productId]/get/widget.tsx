@@ -86,8 +86,7 @@ export function CatalogProductGetWidget({
     }
     const { id, name, basePrice } = data.result;
     void (async (): Promise<void> => {
-      const def =
-        await import("@/app/api/[locale]/payment/invoice/line/add/definition");
+      const def = await import("@/payment/invoice/line/add/definition");
       navigate(def.default.POST, {
         data: {
           productId: id,

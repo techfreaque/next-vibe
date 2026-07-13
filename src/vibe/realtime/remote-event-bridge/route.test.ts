@@ -26,9 +26,9 @@ import {
   disconnectFromHermesLocalAi,
   HERMES_INSTANCE_ID,
   resolveRemoteUrlSync,
-} from "@/app/api/[locale]/agent/ai-stream/testing/remote-setup";
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
-import { rootlessStreamContext } from "@/app/api/[locale]/agent/chat/config";
+} from "next-vibe/agent/ai-stream/testing/remote-setup";
+import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
+import { rootlessStreamContext } from "next-vibe/agent/chat/config";
 
 import type {
   RemoteEventBridgeRequestOutput,
@@ -149,7 +149,7 @@ describe("Remote Event Bridge", () => {
       const fixtureCtx: ToolExecutionContext = rootlessStreamContext();
 
       const { RemoteConnectionRepository } =
-        await import("@/app/api/[locale]/remote-connection/repository");
+        await import("next-vibe/remote-connection/repository");
       const selfInstanceId =
         await RemoteConnectionRepository.getLocalInstanceId(testUser.id);
 

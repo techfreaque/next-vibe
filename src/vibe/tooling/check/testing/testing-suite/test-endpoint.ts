@@ -1,5 +1,6 @@
 // Testing infrastructure - test descriptions are for developers, not end users
 
+import { rootlessStreamContext } from "next-vibe/agent/chat/config";
 import type {
   CreateApiEndpoint,
   InferRequestOutput,
@@ -25,8 +26,6 @@ import type {
 } from "next-vibe/unified-ui/_shared/types";
 import { beforeAll, describe, expect, it } from "vitest";
 import type { z } from "zod";
-
-import { rootlessStreamContext } from "@/app/api/[locale]/agent/chat/config";
 
 import { resolveTestAdminUser } from "./resolve-test-user";
 import { sendTestRequest } from "./send-test-request";

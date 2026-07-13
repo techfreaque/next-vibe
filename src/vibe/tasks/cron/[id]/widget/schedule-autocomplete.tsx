@@ -37,7 +37,7 @@ import { Span } from "next-vibe/ui/ui/span";
 import type { JSX } from "react";
 import { useCallback, useMemo, useRef, useState } from "react";
 
-import { useLogger } from "@/hooks/use-logger";
+import { useLogger } from "@/_old/hooks/use-logger";
 
 // ---------------------------------------------------------------------------
 // Preset definitions

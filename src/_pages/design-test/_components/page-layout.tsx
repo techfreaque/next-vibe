@@ -22,7 +22,7 @@ import { Toaster } from "next-vibe/ui/ui/sonner";
 import { H1, H4, Large, P } from "next-vibe/ui/ui/typography";
 import { useState } from "react";
 
-import { platform } from "@/config/env-client";
+import { platform } from "@/_old/config/env-client";
 
 import { ThemeToggle } from "../../_components/theme-toggle";
 import { AdvancedPreview } from "./advanced";

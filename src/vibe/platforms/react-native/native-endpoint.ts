@@ -23,7 +23,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { scopedTranslation as reactNativeScopedTranslation } from "next-vibe/platforms/react-native/i18n";
 
-import { envClient } from "@/config/env-client";
+import { envClient } from "@/_old/config/env-client";
 
 /**
  * Type helpers to extract input/output types from endpoint definitions

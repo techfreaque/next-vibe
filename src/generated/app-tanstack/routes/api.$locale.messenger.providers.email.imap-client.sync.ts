@@ -9,7 +9,7 @@ export const Route = createFileRoute(
   server: {
     handlers: wrapNextApiRoute(
       () =>
-        import("@/app/api/[locale]/messenger/providers/email/imap-client/sync/route"),
+        import("@/messenger/providers/email/imap-client/sync/route"),
     ),
   },
 });

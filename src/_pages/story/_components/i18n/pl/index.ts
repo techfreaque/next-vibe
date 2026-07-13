@@ -238,7 +238,7 @@ export const translations: typeof enTranslations = {
           reasoning:
             "Sprawdzam kolejkę zadań. Widzę, że email-sync nie powiódł się 3 razy z timeoutami IMAP. Zbadám i naprawię.",
           codeResult:
-            "Znaleziono przyczynę: klient IMAP ignorował skonfigurowany timeout - stałe 5s nadpisujące w src/app/api/[locale]/emails/imap-client/connection.ts:47. Naprawiono: usunięto nadpisanie, teraz używa env.IMAP_TIMEOUT_MS (30s). Dodano backoff reconnect. Zmieniono 3 pliki, dodano test regresji.",
+            "Znaleziono przyczynę: klient IMAP ignorował skonfigurowany timeout - stałe 5s nadpisujące w src/messenger/email/imap-client/connection.ts:47. Naprawiono: usunięto nadpisanie, teraz używa env.IMAP_TIMEOUT_MS (30s). Dodano backoff reconnect. Zmieniono 3 pliki, dodano test regresji.",
           reasoning2:
             "Poprawka wygląda prawidłowo. Przebudowuję i restartuję, żeby łatka weszła na żywo.",
           agentResponse:

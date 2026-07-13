@@ -1,5 +1,5 @@
-import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import { BRANCH_INDEX_KEY } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/use-branch-management";
+import type { ChatMessage } from "next-vibe/agent/chat/db";
+import { BRANCH_INDEX_KEY } from "next-vibe/agent/chat/threads/[threadId]/messages/hooks/use-branch-management";
 
 /**
  * Returns true if the given siblings represent actual user-facing branches.

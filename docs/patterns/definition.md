@@ -48,7 +48,7 @@ import {
   scopedNavigateButtonField,
   scopedEditButton,
   scopedDeleteButton,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/system/unified-interface/shared/field/utils";
 ```
 
 Pass `scopedTranslation` as the first argument to every scoped field function. This is type-inference only - it enables the compiler to validate your translation key strings.
@@ -143,10 +143,10 @@ attachments: responseArrayOptionalField(scopedTranslation, {
 
 ### Specialized Field Functions
 
-For common field types, use specialized field functions from `@/app/api/[locale]/system/unified-interface/shared/field/specialized`:
+For common field types, use specialized field functions from `@/system/unified-interface/shared/field/specialized`:
 
 ```typescript
-import { currencyField, languageField, countryField, timezoneField } from "@/app/api/[locale]/system/unified-interface/shared/field/specialized";
+import { currencyField, languageField, countryField, timezoneField } from "@/system/unified-interface/shared/field/specialized";
 
 // Currency selection - specialized helpers use scoped keys directly
 currency: currencyField(
@@ -191,7 +191,7 @@ When the auto-rendered UI isn't sufficient, use `customWidgetObject` to wire a R
 **CRITICAL: Always use `lazyWidget` - never statically import `widget.tsx`.** Static import breaks `vibe gen` (SSR/bun module resolution fails). `lazyWidget` also automatically routes `import("./widget")` → `widget.cli.tsx` in CLI/MCP context (the Bun plugin intercepts by name).
 
 ```typescript
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "@/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 
 const SkillCreateContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.SkillCreateContainer })),
@@ -776,7 +776,7 @@ These keys must exist in all three language files (`en/`, `de/`, `pl/`) under th
 ```typescript
 import { z } from "zod";
 
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import { createEndpoint } from "@/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
   objectField,
@@ -787,21 +787,21 @@ import {
   responseField,
   scopedSubmitButton,
   scopedBackButton,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+} from "@/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+} from "@/system/unified-interface/shared/types/enums";
+import { UserRole } from "@/user/user-roles/enum";
 
 // Local imports - always use ./i18n (module-local scope)
 import { scopedTranslation } from "./i18n";
 import { MyEnum, MyEnumOptions } from "./enum";
 // if using customWidgetObject - ALWAYS lazy, never static import:
-import { lazyWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "@/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
 const MyWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.MyWidget })),
 );
@@ -813,7 +813,7 @@ const MyWidget = lazyWidget(() =>
 2. Import from `utils-new` not `utils` (scoped API)
 3. Import `scopedTranslation` from `./i18n` - never from a parent scope
 4. Import enums from `./enum` not `./definition` (avoid circular deps)
-5. Import `UserRole` from `@/app/api/[locale]/user/user-roles/enum`
+5. Import `UserRole` from `@/user/user-roles/enum`
 
 ## Enum Integration
 
@@ -821,7 +821,7 @@ const MyWidget = lazyWidget(() =>
 
 ```typescript
 // File: enum.ts
-import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
+import { createEnumOptions } from "@/system/unified-interface/shared/field/enum";
 import { scopedTranslation } from "./i18n";
 
 export const {
@@ -1073,9 +1073,9 @@ Every module has a `category.ts` that controls the sidebar entry and what loads 
 
 ```typescript
 // category.ts
-import { PAYMENT_DASHBOARD_ALIAS } from "@/app/api/[locale]/payment/dashboard/constants";
-import { INVOICE_LIST_ALIAS } from "@/app/api/[locale]/payment/invoice/list/constants";
-import type { CategoryDefinition } from "@/app/api/[locale]/system/help/category-types";
+import { PAYMENT_DASHBOARD_ALIAS } from "@/payment/dashboard/constants";
+import { INVOICE_LIST_ALIAS } from "@/payment/invoice/list/constants";
+import type { CategoryDefinition } from "@/system/help/category-types";
 
 export const category: CategoryDefinition = {
   key: "payments",

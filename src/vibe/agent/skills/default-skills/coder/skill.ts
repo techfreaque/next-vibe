@@ -1,5 +1,5 @@
-import { DEFAULT_CHAT_MODEL_ID } from "@/app/api/[locale]/agent/ai-stream/constants";
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import { DEFAULT_CHAT_MODEL_ID } from "next-vibe/agent/ai-stream/constants";
+import { ChatModelId } from "next-vibe/agent/ai-stream/models";
 
 import type { Skill } from "../../config";
 import {

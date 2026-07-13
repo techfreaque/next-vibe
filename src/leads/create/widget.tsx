@@ -67,7 +67,7 @@ export function LeadCreateContainer({
       return;
     }
     void (async (): Promise<void> => {
-      const leadDef = await import("@/app/api/[locale]/leads/[id]/definition");
+      const leadDef = await import("@/leads/[id]/definition");
       navigate(leadDef.default.GET, { urlPathParams: { id: createdLeadId } });
     })();
   }, [navigate, createdLeadId]);
@@ -77,7 +77,7 @@ export function LeadCreateContainer({
       return;
     }
     void (async (): Promise<void> => {
-      const leadDef = await import("@/app/api/[locale]/leads/[id]/definition");
+      const leadDef = await import("@/leads/[id]/definition");
       navigate(leadDef.default.PATCH, {
         urlPathParams: { id: createdLeadId },
         prefillFromGet: true,
@@ -88,7 +88,7 @@ export function LeadCreateContainer({
 
   const handleBackToList = useCallback((): void => {
     void (async (): Promise<void> => {
-      const listDef = await import("@/app/api/[locale]/leads/list/definition");
+      const listDef = await import("@/leads/list/definition");
       navigate(listDef.default.GET);
     })();
   }, [navigate]);
@@ -106,7 +106,7 @@ export function LeadCreateContainer({
       return;
     }
     void (async (): Promise<void> => {
-      const leadDef = await import("@/app/api/[locale]/leads/[id]/definition");
+      const leadDef = await import("@/leads/[id]/definition");
       navigate(leadDef.default.GET, { urlPathParams: { id: createdLeadId } });
     })();
   }, [createdLeadId, navigate]);

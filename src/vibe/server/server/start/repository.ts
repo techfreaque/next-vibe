@@ -20,6 +20,7 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
+import { readProcMeminfo } from "next-vibe/database/health/repository";
 import { scopedTranslation as dockerOperationsScopedTranslation } from "next-vibe/database/utils/docker-operations/i18n";
 import { scopedTranslation as dbUtilsScopedTranslation } from "next-vibe/database/utils/i18n";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -47,11 +48,9 @@ import type { WebSocketServerHandle } from "next-vibe/realtime/server";
 import type { ServerStartT } from "next-vibe/server/server/start/i18n";
 import { scopedTranslation as serverStartScopedTranslation } from "next-vibe/server/server/start/i18n";
 
-import { env } from "@/config/env";
-import { readProcMeminfo } from "@/app/api/[locale]/system/database/health/repository";
+import { env } from "@/_old/config/env";
 
 import { ServerFramework } from "../enum";
-import { patchRuntimeEnvPlaceholders } from "./runtime-env-patch";
 import {
   addPidToFile,
   cleanupPidFile,
@@ -67,6 +66,7 @@ import type {
   ServerStartRequestOutput,
   ServerStartResponseOutput,
 } from "./definition";
+import { patchRuntimeEnvPlaceholders } from "./runtime-env-patch";
 
 /**
  * Server Start Repository
@@ -756,7 +756,7 @@ export class ServerStartRepository {
   ): Promise<void> {
     try {
       const { RemoteConnectionRepository } =
-        await import("@/app/api/[locale]/remote-connection/repository");
+        await import("next-vibe/remote-connection/repository");
       const { openConnection } = await import("next-vibe/realtime/connector");
       const connections =
         await RemoteConnectionRepository.getAllActiveConnectionsForSync();

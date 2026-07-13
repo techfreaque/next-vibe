@@ -9,10 +9,10 @@
 import { EmailCampaignStage } from "next-vibe/identity/lead/enum";
 import React from "react";
 
-import { FEEDBACK_REWARD_CREDITS } from "@/app/api/[locale]/credits/constants";
-import { CampaignEmailLayout } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/campaign_email_layout.email";
-import { HumanCTAButton } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/human_cta_button.email";
-import { HumanText } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/human_text.email";
+import { FEEDBACK_REWARD_CREDITS } from "@/credits/constants";
+import { CampaignEmailLayout } from "@/messenger/providers/email/smtp-client/components/campaign_email_layout.email";
+import { HumanCTAButton } from "@/messenger/providers/email/smtp-client/components/human_cta_button.email";
+import { HumanText } from "@/messenger/providers/email/smtp-client/components/human_text.email";
 
 import type {
   EmailRenderContext,

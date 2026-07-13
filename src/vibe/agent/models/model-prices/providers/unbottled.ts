@@ -18,7 +18,7 @@ import "server-only";
 
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { STANDARD_MARKUP_PERCENTAGE } from "@/app/api/[locale]/products/constants";
+import { STANDARD_MARKUP_PERCENTAGE } from "@/products/constants";
 
 import { chatModelDefinitions, ChatModelId } from "../../../ai-stream/models";
 import {

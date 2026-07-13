@@ -21,7 +21,7 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { type JSX, useState } from "react";
 
-import { BillStatus } from "@/app/api/[locale]/payment/enum";
+import { BillStatus } from "@/payment/enum";
 
 import type definition from "./definition";
 
@@ -65,7 +65,7 @@ export function BillListWidget(_props: {
   const handleSelectCompany = (e: ButtonMouseEvent): void => {
     e.stopPropagation();
     void (async (): Promise<void> => {
-      const def = await import("@/app/api/[locale]/companies/list/definition");
+      const def = await import("@/companies/list/definition");
       navigate(def.default.GET, {
         renderInModal: true,
         pickerCallback: (value) => {
@@ -82,8 +82,8 @@ export function BillListWidget(_props: {
     e.stopPropagation();
     void (async (): Promise<void> => {
       const [createDef, getDef] = await Promise.all([
-        import("@/app/api/[locale]/payment/bill/create/definition"),
-        import("@/app/api/[locale]/payment/bill/[billId]/get/definition"),
+        import("@/payment/bill/create/definition"),
+        import("@/payment/bill/[billId]/get/definition"),
       ]);
       navigate(createDef.default.POST, {
         renderInModal: true,
@@ -111,8 +111,7 @@ export function BillListWidget(_props: {
         return;
       }
       void (async (): Promise<void> => {
-        const def =
-          await import("@/app/api/[locale]/payment/bill/[billId]/get/definition");
+        const def = await import("@/payment/bill/[billId]/get/definition");
         navigate(def.default.GET, { urlPathParams: { billId } });
       })();
     };

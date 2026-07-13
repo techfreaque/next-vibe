@@ -7,7 +7,7 @@ export const Route = createFileRoute("/api/$locale/lead-magnet/providers/mapp")(
   {
     server: {
       handlers: wrapNextApiRoute(
-        () => import("@/app/api/[locale]/lead-magnet/providers/mapp/route"),
+        () => import("@/lead-magnet/providers/mapp/route"),
       ),
     },
   },

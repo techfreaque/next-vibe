@@ -1,9 +1,8 @@
 /* eslint-disable i18next/no-literal-string */
 import "server-only";
 
+import type { SystemPromptFragment } from "next-vibe/agent/ai-stream/system-prompt/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-
-import type { SystemPromptFragment } from "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
 
 import { listMonitors } from "./shared/repository";
 

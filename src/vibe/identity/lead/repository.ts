@@ -28,18 +28,18 @@ import { scopedTranslation } from "next-vibe/identity/lead/i18n";
 import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { BatchUpdateRequestOutput } from "@/app/api/[locale]/leads/batch/definition";
-import { BatchOperationScope } from "@/app/api/[locale]/leads/batch/definition";
-import type { LeadCreateRequestTypeOutput } from "@/app/api/[locale]/leads/create/definition";
+import type { BatchUpdateRequestOutput } from "@/leads/batch/definition";
+import { BatchOperationScope } from "@/leads/batch/definition";
+import type { LeadCreateRequestTypeOutput } from "@/leads/create/definition";
 import type {
   LeadExportRequestOutput,
   LeadExportResponseOutput,
-} from "@/app/api/[locale]/leads/export/definition";
-import type { LeadListGetRequestTypeOutput } from "@/app/api/[locale]/leads/list/definition";
-import type { LeadEngagementResponseOutput } from "@/app/api/[locale]/leads/tracking/definition";
-import { newsletterSubscriptions } from "@/app/api/[locale]/newsletter/db";
-import { NewsletterSubscriptionStatus } from "@/app/api/[locale]/newsletter/enum";
-import { leadReferrals, referralCodes } from "@/app/api/[locale]/referral/db";
+} from "@/leads/export/definition";
+import type { LeadListGetRequestTypeOutput } from "@/leads/list/definition";
+import type { LeadEngagementResponseOutput } from "@/leads/tracking/definition";
+import { newsletterSubscriptions } from "@/newsletter/db";
+import { NewsletterSubscriptionStatus } from "@/newsletter/enum";
+import { leadReferrals, referralCodes } from "@/referral/db";
 
 import {
   emailCampaigns,
@@ -309,7 +309,7 @@ export class LeadsRepository {
       // After a successful status change, trigger campaign lifecycle transitions
       if (result.success && flattenedData.status) {
         const { campaignSchedulerService } =
-          await import("@/app/api/[locale]/leads/campaigns/emails");
+          await import("@/leads/campaigns/emails");
         await campaignSchedulerService.haltCampaignsForStatusChange(
           id,
           flattenedData.status,
@@ -1332,7 +1332,7 @@ export class LeadsRepository {
         });
         // Halt COLD and NEWSLETTER_NURTURE campaigns on signup
         const { campaignSchedulerService } =
-          await import("@/app/api/[locale]/leads/campaigns/emails");
+          await import("@/leads/campaigns/emails");
         await campaignSchedulerService.haltCampaignsForStatusChange(
           leadId,
           LeadStatus.SIGNED_UP,
@@ -1933,7 +1933,7 @@ export class LeadsRepository {
             // Trigger campaign lifecycle transitions for status changes (fire-and-forget, outside tx)
             if (updates.status && updates.status !== lead.status) {
               const { campaignSchedulerService } =
-                await import("@/app/api/[locale]/leads/campaigns/emails");
+                await import("@/leads/campaigns/emails");
               await campaignSchedulerService.haltCampaignsForStatusChange(
                 lead.id,
                 updates.status,

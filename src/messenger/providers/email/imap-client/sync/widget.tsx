@@ -21,8 +21,8 @@ import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/wid
 import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import React from "react";
 
-import type { MessengerAccountsListGETResponseOutput } from "@/app/api/[locale]/messenger/accounts/list/definition";
-import { useMessengerAccountsList } from "@/app/api/[locale]/messenger/accounts/list/hooks";
+import type { MessengerAccountsListGETResponseOutput } from "@/messenger/accounts/list/definition";
+import { useMessengerAccountsList } from "@/messenger/accounts/list/hooks";
 
 import type definition from "./definition";
 

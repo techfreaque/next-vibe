@@ -14,11 +14,11 @@ import { ErrorBoundary } from "next-vibe/ui/ui/error-boundary";
 import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
 import type { JSX } from "react";
 
-import { scopedTranslation as resetPasswordScopedTranslation } from "@/app/api/[locale]/user/public/reset-password/i18n";
-import { PasswordRepository } from "@/app/api/[locale]/user/public/reset-password/repository";
-import type { ResetPasswordValidateGetResponseOutput } from "@/app/api/[locale]/user/public/reset-password/validate/definition";
-import { envClient } from "@/config/env-client";
-import { configScopedTranslation } from "@/config/i18n";
+import { envClient } from "@/_old/config/env-client";
+import { configScopedTranslation } from "@/_old/config/i18n";
+import { scopedTranslation as resetPasswordScopedTranslation } from "@/user/public/reset-password/i18n";
+import { PasswordRepository } from "@/user/public/reset-password/repository";
+import type { ResetPasswordValidateGetResponseOutput } from "@/user/public/reset-password/validate/definition";
 
 import { scopedTranslation as pageT } from "../i18n";
 import ResetPasswordConfirmForm from "./_components/reset-password-confirm-form";

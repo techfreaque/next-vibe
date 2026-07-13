@@ -6,7 +6,7 @@ import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 export const Route = createFileRoute("/api/$locale/remote-connection/list")({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/remote-connection/list/route"),
+      () => import("next-vibe/remote-connection/list/route"),
     ),
   },
 });

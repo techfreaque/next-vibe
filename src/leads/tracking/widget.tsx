@@ -74,15 +74,14 @@ export function LeadEngagementTrackingContainer({
       return;
     }
     void (async (): Promise<void> => {
-      const leadDef = await import("@/app/api/[locale]/leads/[id]/definition");
+      const leadDef = await import("@/leads/[id]/definition");
       navigate(leadDef.default.GET, { urlPathParams: { id: leadId } });
     })();
   }, [navigate, leadId]);
 
   const handleViewStats = useCallback((): void => {
     void (async (): Promise<void> => {
-      const statsDef =
-        await import("@/app/api/[locale]/leads/stats/definition");
+      const statsDef = await import("@/leads/stats/definition");
       navigate(statsDef.default.GET);
     })();
   }, [navigate]);
@@ -303,15 +302,14 @@ export function LeadClickTrackingContainer({
       return;
     }
     void (async (): Promise<void> => {
-      const leadDef = await import("@/app/api/[locale]/leads/[id]/definition");
+      const leadDef = await import("@/leads/[id]/definition");
       navigate(leadDef.default.GET, { urlPathParams: { id: leadId } });
     })();
   }, [navigate, leadId]);
 
   const handleViewStats = useCallback((): void => {
     void (async (): Promise<void> => {
-      const statsDef =
-        await import("@/app/api/[locale]/leads/stats/definition");
+      const statsDef = await import("@/leads/stats/definition");
       navigate(statsDef.default.GET);
     })();
   }, [navigate]);

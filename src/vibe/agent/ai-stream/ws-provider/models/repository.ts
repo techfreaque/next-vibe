@@ -1,24 +1,23 @@
 import "server-only";
 
-import {
-  type ResponseType,
-  success,
-} from "next-vibe/core/route/response.schema";
-
-import { chatModelOptions } from "@/app/api/[locale]/agent/ai-stream/models";
-import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { imageGenModelOptions } from "@/app/api/[locale]/agent/image-generation/models";
-import { getModelPrice } from "@/app/api/[locale]/agent/models/models";
+import { chatModelOptions } from "next-vibe/agent/ai-stream/models";
+import { getEnvAvailability } from "next-vibe/agent/env-availability";
+import { imageGenModelOptions } from "next-vibe/agent/image-generation/models";
+import { getModelPrice } from "next-vibe/agent/models/models";
 import {
   type AnyModelOption,
   ApiProvider,
   isModelProviderAvailable,
   modelProviders,
-} from "@/app/api/[locale]/agent/models/models";
-import { musicGenModelOptions } from "@/app/api/[locale]/agent/music-generation/models";
-import { sttModelOptions } from "@/app/api/[locale]/agent/speech-to-text/models";
-import { ttsModelOptions } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { videoGenModelOptions } from "@/app/api/[locale]/agent/video-generation/models";
+} from "next-vibe/agent/models/models";
+import { musicGenModelOptions } from "next-vibe/agent/music-generation/models";
+import { sttModelOptions } from "next-vibe/agent/speech-to-text/models";
+import { ttsModelOptions } from "next-vibe/agent/text-to-speech/models";
+import { videoGenModelOptions } from "next-vibe/agent/video-generation/models";
+import {
+  type ResponseType,
+  success,
+} from "next-vibe/core/route/response.schema";
 
 import type {
   WsProviderModelEntry,

@@ -16,12 +16,12 @@ import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-su
 import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
-import { customSkills } from "@/app/api/[locale]/agent/skills/db";
+import { DEFAULT_CHAT_MODEL_SELECTION } from "next-vibe/agent/ai-stream/constants";
+import { customSkills } from "next-vibe/agent/skills/db";
 import {
   SkillCategory,
   SkillOwnershipType,
-} from "@/app/api/[locale]/agent/skills/enum";
+} from "next-vibe/agent/skills/enum";
 
 import { cortexNodes } from "../db";
 import listEndpoint from "../list/definition";

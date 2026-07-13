@@ -11,7 +11,7 @@ import type {
 import type { LeadWithEmailType } from "next-vibe/identity/lead/types";
 import type { JSX } from "react";
 
-import type { CampaignTypeValue } from "@/app/api/[locale]/messenger/accounts/enum";
+import type { CampaignTypeValue } from "@/messenger/accounts/enum";
 
 import type { TrackingContext } from "../../../messenger/providers/email/smtp-client/components/tracking_context.email";
 

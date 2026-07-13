@@ -47,11 +47,11 @@ import {
   resolveProdUserId,
   resolveRemoteUrlSync,
   unregisterDevFromHermes,
-} from "@/app/api/[locale]/agent/ai-stream/testing/remote-setup";
-import { customSkills } from "@/app/api/[locale]/agent/skills/db";
-import type { SyncScope } from "@/app/api/[locale]/remote-connection/db";
-import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
-import { env } from "@/config/env";
+} from "next-vibe/agent/ai-stream/testing/remote-setup";
+import { customSkills } from "next-vibe/agent/skills/db";
+import type { SyncScope } from "next-vibe/remote-connection/db";
+import { remoteConnections } from "next-vibe/remote-connection/db";
+import { env } from "@/_old/config/env";
 
 import type { ConnectionConfig } from "./connector";
 import {
@@ -109,7 +109,7 @@ async function loadConnectionConfig(
   instanceId: string,
 ): Promise<ConnectionConfig | null> {
   const { RemoteConnectionRepository } =
-    await import("@/app/api/[locale]/remote-connection/repository");
+    await import("next-vibe/remote-connection/repository");
   const [row] = await db
     .select()
     .from(remoteConnections)
@@ -161,7 +161,7 @@ async function patchHermesAtlasConnection(
   const { sendTestRequest } =
     await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
   const connByIdDef = (
-    await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
+    await import("next-vibe/remote-connection/[instanceId]/definition")
   ).default;
   const result = await sendTestRequest({
     streamContext: undefined,
@@ -483,9 +483,9 @@ if (_remoteUrl) {
 
         // Write a document node on dev with a unique syncId so we can detect if it appears on prod
         const { cortexNodes } =
-          await import("@/app/api/[locale]/agent/cortex/db");
+          await import("next-vibe/agent/cortex/db");
         const { CortexNodeType } =
-          await import("@/app/api/[locale]/agent/cortex/enum");
+          await import("next-vibe/agent/cortex/enum");
         const docSyncId = randomUUID();
         const docPath = `/documents/connector-cn5-${docSyncId}.md`;
 
@@ -782,7 +782,7 @@ if (_remoteUrl) {
           const { sendTestRequest } =
             await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
           const selfRenameDef = (
-            await import("@/app/api/[locale]/remote-connection/self/rename/definition")
+            await import("next-vibe/remote-connection/self/rename/definition")
           ).default;
           const renameResult = await sendTestRequest({
             streamContext: undefined,
@@ -822,9 +822,9 @@ if (_remoteUrl) {
 
         // REMOTE subfolder must be renamed too
         const { chatFolders } =
-          await import("@/app/api/[locale]/agent/chat/db");
+          await import("next-vibe/agent/chat/db");
         const { DefaultFolderId } =
-          await import("@/app/api/[locale]/agent/chat/config");
+          await import("next-vibe/agent/chat/config");
         const { isNull } = await import("drizzle-orm");
 
         const renamedFolder = await pollUntil(
@@ -858,7 +858,7 @@ if (_remoteUrl) {
           const { sendTestRequest } =
             await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
           const selfRenameDef = (
-            await import("@/app/api/[locale]/remote-connection/self/rename/definition")
+            await import("next-vibe/remote-connection/self/rename/definition")
           ).default;
           const restoreResult = await sendTestRequest({
             streamContext: undefined,
@@ -967,7 +967,7 @@ if (_remoteUrl) {
           const { sendTestRequest } =
             await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
           const connByIdDef = (
-            await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
+            await import("next-vibe/remote-connection/[instanceId]/definition")
           ).default;
           const patchResult = await sendTestRequest({
             streamContext: undefined,

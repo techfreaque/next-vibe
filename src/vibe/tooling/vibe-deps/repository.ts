@@ -42,7 +42,7 @@ const PROJECT_ROOT = process.cwd();
 const SRC_ROOT = join(PROJECT_ROOT, "src");
 
 // Graph key = posix path relative to PROJECT_ROOT, e.g. "src/config/constants.ts"
-// For files inside src/app/api/[locale]/, next-vibe/* aliases resolve to the same key.
+// For files inside src/, next-vibe/* aliases resolve to the same key.
 
 // Canonical src-relative prefix used in graph keys
 const SRC_PREFIX = "src/";
@@ -167,7 +167,7 @@ function isFrameworkEntrypoint(key: string): boolean {
  * mean dead. Each rule maps to one concrete loader; no fuzzy string matching
  * (that would false-negative real dead code). system-relative path (no ext).
  */
-const SYSTEM_PREFIX = "src/app/api/[locale]/system/";
+const SYSTEM_PREFIX = "src/vibe/";
 function isKnownEntrypoint(key: string): boolean {
   const sysRel = key.startsWith(SYSTEM_PREFIX)
     ? key.slice(SYSTEM_PREFIX.length).replace(/\.(tsx?)$/, "")
@@ -511,10 +511,10 @@ const SKIP_FILE_SUFFIXES = [
 // (mirrors tsconfig "next-vibe/*": [system/*, [locale]/*]). The system tree
 // owns ui/, unified-ui/, etc., so the system candidate must be tried first.
 const ALIAS_PREFIXES: ReadonlyArray<{ alias: string; resolved: string }> = [
-  // next-vibe/* → src/app/api/[locale]/system/*  (framework tree, tried first)
-  { alias: "next-vibe/", resolved: "src/app/api/[locale]/system/" },
-  // next-vibe/* → src/app/api/[locale]/*  (locale-root fallback)
-  { alias: "next-vibe/", resolved: "src/app/api/[locale]/" },
+  // next-vibe/* → src/vibe/*  (framework tree, tried first)
+  { alias: "next-vibe/", resolved: "src/vibe/" },
+  // next-vibe/* → src/*  (locale-root fallback)
+  { alias: "next-vibe/", resolved: "src/" },
   // @/* → src/*
   { alias: "@/", resolved: "src/" },
 ];
@@ -591,7 +591,7 @@ function scanTestFiles(dir: string, results: string[] = []): string[] {
  *
  * Handles:
  *   - Alias imports:  "@/foo/bar"  →  "src/foo/bar"
- *                     "next-vibe/foo" → "src/app/api/[locale]/system/foo"
+ *                     "next-vibe/foo" → "src/vibe/foo"
  *                                       (system-first, then [locale]/foo)
  *   - Relative imports: "../bar", "./baz" → resolved against the importer's dir
  *
@@ -690,14 +690,13 @@ function toGraphKey(absPath: string): string {
 
 /** Top-level category: first path segment after src/ for locale files, else first segment. */
 function getCat(key: string): string {
-  // "src/app/api/[locale]/user/auth/..." → "user"
-  const localeKey = "src/app/api/[locale]/";
-  if (key.startsWith(localeKey)) {
-    return key.slice(localeKey.length).split("/")[0] ?? key;
+  // "src/user/auth/..." → "user"
+  if (key.startsWith("src/")) {
+    return key.slice("src/".length).split("/")[0] ?? key;
   }
-  // "src/config/constants.ts" → "src/config"
+  // "config/constants.ts" → "config"
   const parts = key.split("/");
-  return parts.slice(0, 2).join("/");
+  return parts[0] ?? key;
 }
 
 function matchesFocus(key: string, focus: string): boolean {
@@ -715,15 +714,15 @@ const DEFAULT_CONFIG: VibeDepsConfig = {
     {
       name: "vibe-ui",
       roots: [
-        "src/app/api/[locale]/system/ui/web",
-        "src/app/api/[locale]/system/ui/native",
-        "src/app/api/[locale]/system/ui/cli",
-        "src/app/api/[locale]/system/ui/tanstack",
+        "src/vibe/ui/web",
+        "src/vibe/ui/native",
+        "src/vibe/ui/cli",
+        "src/vibe/ui/tanstack",
       ],
     },
     {
       name: "vibe-unified-ui",
-      roots: ["src/app/api/[locale]/system/unified-ui"],
+      roots: ["src/vibe/unified-ui"],
     },
   ],
   allow: {
@@ -1775,12 +1774,7 @@ function buildConsumerCoupling(
 // Anything beyond these is a violation — UI components, enums, db, utils, etc. belong in
 // the repository, widget, or page-client.
 // Graph keys are relative paths like:
-//   "src/app/api/[locale]/user/repository.ts"
-//   "src/app/[locale]/creator/[userId]/page-client.tsx"
-//   "src/config/env.ts"
-// The patterns below match against these resolved keys.
-// Graph keys are relative paths like:
-//   "src/app/api/[locale]/user/repository.ts"
+//   "src/user/repository.ts"
 //   "src/app/[locale]/creator/[userId]/page-client.tsx"
 //   "src/config/env.ts"
 // The patterns below match against these resolved keys.

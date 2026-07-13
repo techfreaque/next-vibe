@@ -21,7 +21,7 @@ export const translations = {
     fileBarLabel: "definition.ts → web · cli · mcp · native · cron · 10 more",
     theaCardTitle: "Who is Thea?",
     allowedRolesLabel: "allowedRoles: [...]",
-    fileTreePath: "~/src/app/api/explain-to-my-boss/",
+    fileTreePath: "~/src/explain-to-my-boss/",
     codeBlockLabel: "allowedRoles: [",
     closingBracket: "]",
     vibeCliCommand:

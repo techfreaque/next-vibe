@@ -1,6 +1,8 @@
 import "server-only";
 
 import { eq, inArray } from "drizzle-orm";
+import { chatFolders, chatThreads } from "next-vibe/agent/chat/db";
+import { canManageFolder } from "next-vibe/agent/chat/permissions/permissions";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -11,9 +13,6 @@ import {
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { chatFolders, chatThreads } from "@/app/api/[locale]/agent/chat/db";
-import { canManageFolder } from "@/app/api/[locale]/agent/chat/permissions/permissions";
 
 import { createFolderContentsEmitter } from "../../../folder-contents/[rootFolderId]/emitter";
 import type {
@@ -281,9 +280,9 @@ export class FolderRepository {
       const { createEndpointEmitter } =
         await import("next-vibe/realtime/emitter");
       const { default: folderContentsDefinitions } =
-        await import("@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition");
+        await import("next-vibe/agent/chat/folder-contents/[rootFolderId]/definition");
       const { FolderContentsRepository } =
-        await import("@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/repository");
+        await import("next-vibe/agent/chat/folder-contents/[rootFolderId]/repository");
       const rootFolderKind = FolderContentsRepository.emitChannelForFolder(
         folder.rootFolderId,
       ).kind;
@@ -311,9 +310,9 @@ export class FolderRepository {
       // root cache) and kick off cortex cleanup for each deleted thread.
       if (affectedThreads.length > 0) {
         const { default: threadsByIdDefinitions } =
-          await import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition");
+          await import("next-vibe/agent/chat/threads/[threadId]/definition");
         const { removeVirtualNodesByEntityId } =
-          await import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual");
+          await import("next-vibe/agent/cortex/embeddings/sync-virtual");
         for (const thread of affectedThreads) {
           if (thread.rootFolderId) {
             createEndpointEmitter(threadsByIdDefinitions.DELETE, logger, user, {

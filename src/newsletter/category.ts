@@ -6,8 +6,8 @@
 import type { CategoryDefinition } from "next-vibe/help-tool/category-types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
-import { CAMPAIGN_STATS_ALIAS } from "@/app/api/[locale]/leads/campaigns/stats/constants";
-import { USER_ME_ALIAS } from "@/app/api/[locale]/user/private/me/constants";
+import { CAMPAIGN_STATS_ALIAS } from "@/leads/campaigns/stats/constants";
+import { USER_ME_ALIAS } from "@/user/private/me/constants";
 
 export const category: CategoryDefinition = {
   key: "newsletter",

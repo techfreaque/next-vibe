@@ -1,3 +1,5 @@
+import { DEFAULT_FOLDER_CONFIGS } from "next-vibe/agent/chat/config";
+import type { ThreadsWidgetT } from "next-vibe/agent/chat/threads/widget/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { formatCurrency } from "next-vibe/core/i18n/core/localization-utils";
 import { getRootCssVar } from "next-vibe/ui/lib/css-vars";
@@ -10,12 +12,7 @@ import { H2, H3, P } from "next-vibe/ui/ui/typography";
 import { Ul } from "next-vibe/ui/ui/ul";
 import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 
-import { DEFAULT_FOLDER_CONFIGS } from "@/app/api/[locale]/agent/chat/config";
-import type { ThreadsWidgetT } from "@/app/api/[locale]/agent/chat/threads/widget/i18n";
-import {
-  ProductIds,
-  productsRepository,
-} from "@/app/api/[locale]/products/repository-client";
+import { ProductIds, productsRepository } from "@/products/repository-client";
 
 import { getTourSelector, TOUR_DATA_ATTRS } from "./tour-attrs";
 export type { TourDataAttr } from "./tour-attrs";

@@ -3,6 +3,7 @@
  * Retrieves messages following a specific conversation path with branch metadata
  */
 
+import { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import { dateSchema } from "next-vibe/core/definition/common.schema";
 import { createEndpoint } from "next-vibe/core/definition/create";
 import {
@@ -21,8 +22,6 @@ import {
   responseField,
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
-
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
 import { DefaultFolderId, rootFolderIdOptions } from "../../../../config";
 import type { MessageMetadata } from "../../../../db";

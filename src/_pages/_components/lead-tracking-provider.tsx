@@ -10,8 +10,8 @@ import { getCurrentUrl } from "next-vibe/ui/lib/location";
 import { getUserAgent } from "next-vibe/ui/lib/media";
 import { useEffect, useRef } from "react";
 
-import trackingEndpoints from "@/app/api/[locale]/leads/tracking/definition";
-import { useLogger } from "@/hooks/use-logger";
+import { useLogger } from "@/_old/hooks/use-logger";
+import trackingEndpoints from "@/leads/tracking/definition";
 
 const TRACKING_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
 

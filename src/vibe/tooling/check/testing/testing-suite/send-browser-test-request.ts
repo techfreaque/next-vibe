@@ -5,6 +5,7 @@
 import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 
+import { rootlessStreamContext } from "next-vibe/agent/chat/config";
 import { endpointToUrlSegment } from "next-vibe/core/core-utils/path";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { Methods } from "next-vibe/core/definition/enums";
@@ -18,12 +19,11 @@ import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { ATLAS_PID_FILE, readPidFilePort } from "next-vibe/server/server/pid";
 import { scopedTranslation } from "next-vibe/tooling/check/i18n";
 
-import { rootlessStreamContext } from "@/app/api/[locale]/agent/chat/config";
 import {
   cdpNavigatePage,
   getSessionCDPTargetId,
   setCookiesViaCDP,
-} from "@/app/api/[locale]/browser/repository";
+} from "@/browser/repository";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -149,9 +149,9 @@ export async function sendBrowserTestRequest<
 
     // ── 4. Lazy-import browser tool definitions ────────────────────────────
     const [newPageDefs, evalDefs, closePageDefs] = await Promise.all([
-      import("@/app/api/[locale]/browser/new-page/definition"),
-      import("@/app/api/[locale]/browser/evaluate-script/definition"),
-      import("@/app/api/[locale]/browser/close-page/definition"),
+      import("@/browser/new-page/definition"),
+      import("@/browser/evaluate-script/definition"),
+      import("@/browser/close-page/definition"),
     ]);
 
     const newPageEndpoint = newPageDefs.default.POST;
@@ -189,7 +189,8 @@ export async function sendBrowserTestRequest<
           await import("next-vibe/identity/auth/repository");
         const { SessionRepository } =
           await import("next-vibe/identity/session/repository");
-        const { AUTH_TOKEN_COOKIE_NAME } = await import("@/config/constants");
+        const { AUTH_TOKEN_COOKIE_NAME } =
+          await import("@/_old/config/constants");
         const { createEndpointLogger } =
           await import("next-vibe/logger/server");
         const logger = createEndpointLogger(false, defaultLocale);
@@ -332,7 +333,7 @@ export async function sendBrowserTestRequest<
       // ── 8. Screenshot (always) ────────────────────────────────────────────
       {
         const screenshotDefs =
-          await import("@/app/api/[locale]/browser/take-screenshot/definition");
+          await import("@/browser/take-screenshot/definition");
         const screenshotPath = join(
           process.cwd(),
           ".tmp",

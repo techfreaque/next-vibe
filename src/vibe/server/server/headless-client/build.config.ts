@@ -5,7 +5,7 @@
  * `bun build --compile`. No Bun runtime required on the target machine.
  *
  * Usage:
- *   vibe builder --configPath="src/app/api/[locale]/system/server/headless-client/build.config.ts"
+ *   vibe builder --configPath="src/vibe/server/headless-client/build.config.ts"
  */
 
 import { spawnSync } from "node:child_process";
@@ -32,7 +32,7 @@ const config: BuildConfig = {
 
   filesToCompile: [
     {
-      input: "src/app/api/[locale]/system/platforms/cli/package-runtime.ts",
+      input: "src/vibe/platforms/cli/package-runtime.ts",
       output: JS_BUNDLE,
       type: BunBuildTypeEnum.EXECUTABLE,
       bunOptions: {

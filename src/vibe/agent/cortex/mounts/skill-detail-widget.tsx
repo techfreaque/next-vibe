@@ -7,14 +7,13 @@
 
 "use client";
 
+import skillDefinitions from "next-vibe/agent/skills/[id]/definition";
 import {
   useWidgetLocale,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import { useMemo } from "react";
-
-import skillDefinitions from "@/app/api/[locale]/agent/skills/[id]/definition";
 
 interface SkillDetailWidgetProps {
   path: string;

@@ -5,6 +5,15 @@
 
 "use client";
 
+import type { FolderListResponseOutput } from "next-vibe/agent/chat/folders/[rootFolderId]/definition";
+import foldersDefinition from "next-vibe/agent/chat/folders/[rootFolderId]/definition";
+import {
+  type ChatT,
+  scopedTranslation as chatScopedTranslation,
+} from "next-vibe/agent/chat/i18n";
+import { ThreadPermissionsDialog } from "next-vibe/agent/chat/threads/[threadId]/permissions/widget";
+import { ThreadShareDialog } from "next-vibe/agent/chat/threads/[threadId]/share-links/widget";
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import { success } from "next-vibe/core/route/response.schema";
 import { cn } from "next-vibe/core/utils/utils";
 import { apiClient } from "next-vibe/platforms/react/hooks/store";
@@ -62,19 +71,7 @@ import {
 import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import React, { useEffect, useMemo, useState } from "react";
 
-import {
-  chatColors,
-  chatTransitions,
-} from "@/app/[locale]/chat/lib/design-tokens";
-import type { FolderListResponseOutput } from "@/app/api/[locale]/agent/chat/folders/[rootFolderId]/definition";
-import foldersDefinition from "@/app/api/[locale]/agent/chat/folders/[rootFolderId]/definition";
-import {
-  type ChatT,
-  scopedTranslation as chatScopedTranslation,
-} from "@/app/api/[locale]/agent/chat/i18n";
-import { ThreadPermissionsDialog } from "@/app/api/[locale]/agent/chat/threads/[threadId]/permissions/widget";
-import { ThreadShareDialog } from "@/app/api/[locale]/agent/chat/threads/[threadId]/share-links/widget";
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import { chatColors, chatTransitions } from "@/_pages/chat/lib/design-tokens";
 
 import { DefaultFolderId } from "../../config";
 import type { ChatThread } from "../../db";
@@ -212,7 +209,7 @@ function ThreadRow({
       );
     } else {
       const threadDef =
-        await import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition");
+        await import("next-vibe/agent/chat/threads/[threadId]/definition");
       await apiClient.mutate(
         threadDef.default.PATCH,
         logger,
@@ -305,7 +302,7 @@ function ThreadRow({
         );
       } else {
         const threadDef =
-          await import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition");
+          await import("next-vibe/agent/chat/threads/[threadId]/definition");
         await apiClient.mutate(
           threadDef.default.DELETE,
           logger,

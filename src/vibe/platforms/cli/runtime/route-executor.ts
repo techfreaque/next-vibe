@@ -4,6 +4,7 @@
  * Handles CLI-specific concerns: argument parsing, interactive forms, output formatting
  */
 
+import { makeHeadlessContext } from "next-vibe/agent/chat/config";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import {
   definitionLoader,
@@ -44,11 +45,10 @@ import {
 } from "next-vibe/platforms/cli/types/cli-target";
 import type { CliResultFormatter as CliResultFormatterType } from "next-vibe/unified-ui/renderers/cli/response/result-formatter";
 
-import { makeHeadlessContext } from "@/app/api/[locale]/agent/chat/config";
 import {
   AUTH_TOKEN_COOKIE_NAME,
   LEAD_ID_COOKIE_NAME,
-} from "@/config/constants";
+} from "@/_old/config/constants";
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import { CliInputParser } from "./parsing";
@@ -625,7 +625,7 @@ async function executeRemoteEndpoint(params: {
   const { getRemoteSession } =
     await import("next-vibe/platforms/cli/auth/remote-session-cache");
   const { Methods } = await import("next-vibe/core/definition/enums");
-  const { BEARER_LEAD_ID_SEPARATOR } = await import("@/config/constants");
+  const { BEARER_LEAD_ID_SEPARATOR } = await import("@/_old/config/constants");
 
   // Resolve session from DB
   let resolvedToken: string | null = null;
@@ -745,7 +745,7 @@ async function executeRemoteEndpoint(params: {
   if (isLogoutEndpoint && response.ok && userId) {
     const { db } = await import("next-vibe/database");
     const { remoteConnections } =
-      await import("@/app/api/[locale]/remote-connection/db");
+      await import("next-vibe/remote-connection/db");
     const { eq, and } = await import("drizzle-orm");
     await db
       .delete(remoteConnections)
@@ -851,7 +851,7 @@ async function handleRemoteLoginResponse(
   }
 
   const { RemoteConnectionRepository } =
-    await import("@/app/api/[locale]/remote-connection/repository");
+    await import("next-vibe/remote-connection/repository");
   // CLI login flow (vibe --thea/--hermes) has no user-decided sync scope to
   // carry - unlike the connect endpoint's request body. Omitting it here
   // makes the repository carry forward the existing row's scope on a

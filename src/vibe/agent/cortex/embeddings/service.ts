@@ -7,10 +7,9 @@ import "server-only";
  */
 import { createHash } from "node:crypto";
 
+import { createFixtureFetch } from "next-vibe/agent/ai-stream/testing/fetch-cache";
+import { agentEnv } from "next-vibe/agent/env";
 import { parseError } from "next-vibe/core/utils/parse-error";
-
-import { createFixtureFetch } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
-import { agentEnv } from "@/app/api/[locale]/agent/env";
 
 import type { ToolExecutionContext } from "../../chat/config";
 
@@ -141,7 +140,7 @@ async function isFixtureContext(
     return false;
   }
   const { readFixturePrefix } =
-    await import("@/app/api/[locale]/agent/ai-stream/testing/fetch-cache");
+    await import("next-vibe/agent/ai-stream/testing/fetch-cache");
   return (await readFixturePrefix(streamContext.threadId)) !== null;
 }
 

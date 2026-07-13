@@ -15,7 +15,7 @@ import {
   useState,
 } from "react";
 
-import { LOCALE_COOKIE_NAME } from "@/config/constants";
+import { LOCALE_COOKIE_NAME } from "@/_old/config/constants";
 
 import { languageConfig } from "..";
 import type { CountryInfo, CountryLanguage, Languages } from "./config";

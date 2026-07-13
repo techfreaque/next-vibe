@@ -1,6 +1,7 @@
 "use client";
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import type { EndpointReadOptions } from "next-vibe/core/definition/create";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
@@ -13,8 +14,6 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { ReactHooksTranslationKey } from "next-vibe/platforms/react/hooks/i18n";
 import { useCallback, useMemo, useRef } from "react";
-
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 
 import { executeQuery } from "./query-executor";
 import { buildKey, type CacheKeyRequestData } from "./query-key-builder";

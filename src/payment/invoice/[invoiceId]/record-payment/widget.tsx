@@ -38,8 +38,7 @@ export function InvoiceRecordPaymentWidget({
       return;
     }
     void (async (): Promise<void> => {
-      const def =
-        await import("@/app/api/[locale]/payment/invoice/[invoiceId]/get/definition");
+      const def = await import("@/payment/invoice/[invoiceId]/get/definition");
       navigation.push(def.default.GET, { urlPathParams: { invoiceId } });
     })();
   };

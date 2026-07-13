@@ -20,7 +20,7 @@
 | Task row lifecycle (RUNNING → COMPLETED)                       | `execute-tool` / `tasks/`               |
 | Task creation for DETACH/WAKE_UP                               | `execute-tool`                          |
 | Revival scheduling (resume-stream task creation)               | `execute-tool/repository/completion.ts` |
-| **Resume-stream endpoint** (revival route + repository)        | `**agent/ai-stream/resume-stream/`**    |
+| **Resume-stream endpoint** (revival route + repository)        | `**agent/ai-stream/resume-stream/`\*\*  |
 | **Stream state machine** (streaming → waiting → idle)          | **ai-stream**                           |
 | **Message queue** (enqueue, drain, order)                      | **ai-stream**                           |
 | **Thread state** (streaming-state-changed WS events)           | **ai-stream**                           |
@@ -75,7 +75,7 @@ the tools. The remote registers `execute-tool` as its only tool and calls back
 
 Threads have four streaming states: `idle | streaming | aborting | waiting`.
 
-`**waiting`** — stream is dead but work is still in flight. Stop button stays
+`**waiting`\*\* — stream is dead but work is still in flight. Stop button stays
 visible. No content arrives until revival.
 
 - Set when: `approve` gate fires, or a tool self-escalates (`escalateToTask`)
@@ -110,11 +110,11 @@ auto-upgrades to `wakeUp`.
 - At call time: `status: "pending"`
 - On completion — result inserted into the queue:
   - **No user messages in queue** (same sequence): backfill original tool message
-  in-place (`status: "completed"`, result set). `TOOL_RESULT` WS event. Revival
-  fires from original as parent.
+    in-place (`status: "completed"`, result set). `TOOL_RESULT` WS event. Revival
+    fires from original as parent.
   - **User messages in queue** (different sequence): insert deferred TOOL message
-  after current leaf. `MESSAGE_CREATED` + `TOOL_RESULT` WS events. Revival from
-  deferred, with queued user messages prepended.
+    after current leaf. `MESSAGE_CREATED` + `TOOL_RESULT` WS events. Revival from
+    deferred, with queued user messages prepended.
 
 ---
 
@@ -136,16 +136,16 @@ task execution history; retrieve via `await-task(taskId)` (upgrades to WAIT).
 
 - At call time: `status: "pending"`, content = `{taskId, status:"pending"}`
 - The original wakeUp tool message is **preserved as-is** — never modified.
-It is an audit record, not a result container.
+  It is an audit record, not a result container.
 - On completion → a **new deferred TOOL message** is inserted:
   - **Stream still running (LIVE)**: `prepareStep` drains the pending payload —
-  inserts the deferred message at the live chain tip, appends a
-  converter-shaped assistant+tool pair to the in-flight context. Model sees the
-  result in the same agent loop — **no separate revival turn**.
+    inserts the deferred message at the live chain tip, appends a
+    converter-shaped assistant+tool pair to the in-flight context. Model sees the
+    result in the same agent loop — **no separate revival turn**.
   - **Stream dead** (`idle` or `waiting`): deferred TOOL message inserted at
-  current leaf. `MESSAGE_CREATED` + `TOOL_RESULT` + `TASK_COMPLETED` WS events.
-  ONE revival fires — a fresh full-tool-access turn with no injected
-  instructions of any kind.
+    current leaf. `MESSAGE_CREATED` + `TOOL_RESULT` + `TASK_COMPLETED` WS events.
+    ONE revival fires — a fresh full-tool-access turn with no injected
+    instructions of any kind.
 
 **Why wakeUp differs from wait/endLoop:** `wait` and `endLoop` backfill the
 original tool message because the stream is paused waiting for exactly that
@@ -204,12 +204,14 @@ it up; direct-fire is also possible when `directResumeLocale` is provided.
 1. Polls `thread.streamingState` (max 3s) — is a live stream running?
 2. Checks await-task intercept (if parked task has `callbackMode=wait`, skip).
 3. Dispatches on stream state + callbackMode:
-  - **aborting**: user cancelled — skip revival.
-  - **wakeUp + live stream**: publish `WakeUpPayload` signal → `prepareStep` injects inline.
-  - **wakeUp + dead stream**: claim revival slot → walk to leaf →
+
+- **aborting**: user cancelled — skip revival.
+- **wakeUp + live stream**: publish `WakeUpPayload` signal → `prepareStep` injects inline.
+- **wakeUp + dead stream**: claim revival slot → walk to leaf →
   `insertDeferredWakeUpMessage` → `fireWakeUpRevival` (headless) → cleanup cron rows.
-  - **wait + live stream**: emit `tool-result` WS — live loop sees the backfilled result.
-  - **wait + dead stream**: claim revival slot → `walkToLeafMessage` → `fireWakeUpRevival` → cleanup.
+- **wait + live stream**: emit `tool-result` WS — live loop sees the backfilled result.
+- **wait + dead stream**: claim revival slot → `walkToLeafMessage` → `fireWakeUpRevival` → cleanup.
+
 4. No `toolMessageId` + dead stream: `clearStreamingState` (waiting → idle).
 
 **Revival claim** is atomic: `idle|waiting → streaming`. A stuck claim (180s
@@ -235,7 +237,7 @@ during an active or waiting stream go through the queue.
 
 1. Thread `streaming`: hand item to the live stream as the next step.
 2. Thread `idle` or `waiting`: drain full queue — fire revival with all items
-  as context (tool results first, then user messages in order).
+   as context (tool results first, then user messages in order).
 3. Thread `aborting`: wait, retry after abort settles.
 
 **Ordering guarantee**: oldest-first. Revival always presents tool result first,
@@ -262,7 +264,7 @@ in-flight remote pending calls.
 
 - **Already complete**: result returned inline. Task cleaned up.
 - **Pending**: upgrades to WAIT — writes revival context into `cronTasks.taskInput`
-(the parked resume-stream task), sets `waitingForRemoteResult=true` → stream pauses.
+  (the parked resume-stream task), sets `waitingForRemoteResult=true` → stream pauses.
 - On timeout: thread → `waiting`. When task completes → queue → revival.
 
 AI sees: `{ taskId, status, result?, waiting }`.
@@ -300,12 +302,12 @@ For tools that may run longer than the configured timeout (SSH, coding-agent):
 **Escalation**: tool calls `context.escalateToTask(options?)` before long-running work:
 
 1. `wireEscalateToTask` (in `repository/core/escalation-handler.ts`) creates a
-  RUNNING `cronTasks` row via `TaskCompletion.createEscalationTask`.
+   RUNNING `cronTasks` row via `TaskCompletion.createEscalationTask`.
 2. Sets `streamContext.waitingForRemoteResult=true`, `pendingTimeoutMs` from
-  endpoint config.
+   endpoint config.
 3. Emits `STREAMING_STATE_CHANGED → waiting` immediately.
 4. After parallel tool batch: stream detects `waitingForRemoteResult=true` →
-  aborts via `REMOTE_TOOL_WAIT`.
+   aborts via `REMOTE_TOOL_WAIT`.
 5. Tool goroutine continues; `onComplete(result)` is the callback when done.
 6. `onComplete` → `TaskCompletion.handle` → queue → revival.
 
@@ -327,7 +329,7 @@ Every wakeUp/wait task stores `leafMessageId` (branch tip at call time):
 
 - Stored on the task row at escalation/dispatch time.
 - Revival appends to the correct branch even if the user switched branches
-while the task ran.
+  while the task ran.
 
 ---
 

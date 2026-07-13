@@ -23,7 +23,7 @@ export const translations: typeof enTranslations = {
     fileBarLabel: "definition.ts → web · cli · mcp · native · cron · 10 więcej",
     theaCardTitle: "Kim jest Thea?",
     allowedRolesLabel: "allowedRoles: [...]",
-    fileTreePath: "~/src/app/api/explain-to-my-boss/",
+    fileTreePath: "~/src/explain-to-my-boss/",
     codeBlockLabel: "allowedRoles: [",
     closingBracket: "]",
     vibeCliCommand:

@@ -14,10 +14,11 @@ import type {
 } from "next-vibe/dataflow/graph/types";
 import { COMPLETE_TASK_ALIAS } from "next-vibe/execute-tool/complete/constants";
 
-import { EVALUATOR_THRESHOLD_ALIAS } from "../../analytics/evaluators/threshold/constants";
-import { EMA_ALIAS } from "../../analytics/indicators/ema/constants";
-import { WINDOW_AVG_ALIAS } from "../../analytics/indicators/window-avg/constants";
-import { TRANSFORMER_RATIO_ALIAS } from "../../analytics/transformers/ratio/constants";
+import { EVALUATOR_THRESHOLD_ALIAS } from "@/analytics/evaluators/threshold/constants";
+import { EMA_ALIAS } from "@/analytics/indicators/ema/constants";
+import { WINDOW_AVG_ALIAS } from "@/analytics/indicators/window-avg/constants";
+import { TRANSFORMER_RATIO_ALIAS } from "@/analytics/transformers/ratio/constants";
+
 import { CHAT_DOWNVOTES_TOTAL_ALIAS } from "./data-sources/chat-downvotes-total/constants";
 import { CHAT_ERRORS_TOTAL_ALIAS } from "./data-sources/chat-errors-total/constants";
 import { CHAT_MEMORIES_CREATED_ALIAS } from "./data-sources/chat-memories-created/constants";

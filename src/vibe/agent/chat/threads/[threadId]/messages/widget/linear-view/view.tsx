@@ -4,6 +4,11 @@
  */
 
 "use client";
+import type { SendMessageParams } from "next-vibe/agent/ai-stream/stream/hooks/send-message";
+import type { DefaultFolderId } from "next-vibe/agent/chat/config";
+import type { ChatMessage } from "next-vibe/agent/chat/db";
+import { getVoteStatus } from "next-vibe/agent/chat/threads/[threadId]/messages/[messageId]/vote/utils";
+import type { TtsModelId } from "next-vibe/agent/text-to-speech/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { cn } from "next-vibe/core/utils/utils";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -14,12 +19,7 @@ import { ErrorBoundary } from "next-vibe/ui/ui/error-boundary";
 import type { JSX } from "react";
 import React, { memo, useMemo } from "react";
 
-import { chatAnimations } from "@/app/[locale]/chat/lib/design-tokens";
-import type { SendMessageParams } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/send-message";
-import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import { getVoteStatus } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/utils";
-import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { chatAnimations } from "@/_pages/chat/lib/design-tokens";
 
 import { BRANCH_INDEX_KEY } from "../../hooks/use-branch-management";
 import type { CollapseStateStore } from "../../hooks/use-collapse-state";

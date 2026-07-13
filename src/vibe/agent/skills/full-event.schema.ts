@@ -9,20 +9,19 @@
  * sync-provider reuses it.
  */
 
-import { iconSchema } from "next-vibe/core/definition/common.schema";
-import { z } from "zod";
-
-import { chatModelSelectionSchema } from "@/app/api/[locale]/agent/ai-stream/models";
+import { chatModelSelectionSchema } from "next-vibe/agent/ai-stream/models";
 import {
   audioVisionModelSelectionSchema,
   imageVisionModelSelectionSchema,
   videoVisionModelSelectionSchema,
-} from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
-import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
-import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
-import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
+} from "next-vibe/agent/ai-stream/vision-models";
+import { imageGenModelSelectionSchema } from "next-vibe/agent/image-generation/models";
+import { musicGenModelSelectionSchema } from "next-vibe/agent/music-generation/models";
+import { sttModelSelectionSchema } from "next-vibe/agent/speech-to-text/models";
+import { voiceModelSelectionSchema } from "next-vibe/agent/text-to-speech/models";
+import { videoGenModelSelectionSchema } from "next-vibe/agent/video-generation/models";
+import { iconSchema } from "next-vibe/core/definition/common.schema";
+import { z } from "zod";
 
 import {
   SkillCategory,

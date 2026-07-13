@@ -1,6 +1,27 @@
 import "server-only";
 
 import { and, count, desc, eq, inArray, isNull, max } from "drizzle-orm";
+import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import {
+  type ChatFolder,
+  chatFolders,
+  chatThreads,
+  threadShareLinks,
+} from "next-vibe/agent/chat/db";
+import {
+  canCreateThreadInFolder,
+  canDeleteFolder,
+  canDeleteThread,
+  canEditThread,
+  canHideFolder,
+  canHideThread,
+  canManageFolder,
+  canManageFolderPermissions,
+  canManageThreadPermissions,
+  canPostInThread,
+  canViewFolder,
+  canViewThread,
+} from "next-vibe/agent/chat/permissions/permissions";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type {
   ChannelDecision,
@@ -17,28 +38,6 @@ import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { EmitChannelDecision } from "next-vibe/realtime/structured-events";
-
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import {
-  type ChatFolder,
-  chatFolders,
-  chatThreads,
-  threadShareLinks,
-} from "@/app/api/[locale]/agent/chat/db";
-import {
-  canCreateThreadInFolder,
-  canDeleteFolder,
-  canDeleteThread,
-  canEditThread,
-  canHideFolder,
-  canHideThread,
-  canManageFolder,
-  canManageFolderPermissions,
-  canManageThreadPermissions,
-  canPostInThread,
-  canViewFolder,
-  canViewThread,
-} from "@/app/api/[locale]/agent/chat/permissions/permissions";
 
 import { ThreadStreamingState } from "../../enum";
 import type {
@@ -772,7 +771,7 @@ export class FolderContentsRepository {
     // Skip if the event originated from this instance — the folder was already
     // created locally; re-applying it would add a spurious REMOTE mirror.
     const { RemoteConnectionRepository } =
-      await import("@/app/api/[locale]/remote-connection/repository");
+      await import("next-vibe/remote-connection/repository");
     const selfInstanceId =
       await RemoteConnectionRepository.getLocalInstanceId(userId);
     if (originInstanceId === selfInstanceId) {
@@ -792,7 +791,7 @@ export class FolderContentsRepository {
         : [],
     );
     const { ensureMirrorFolders } =
-      await import("@/app/api/[locale]/agent/chat/threads/sync-provider");
+      await import("next-vibe/agent/chat/threads/sync-provider");
     const leafId = await ensureMirrorFolders(
       userId,
       originInstanceId,
@@ -1059,9 +1058,9 @@ export class FolderContentsRepository {
     // off cortex cleanup for each deleted remote thread.
     if (affectedThreads.length > 0) {
       const { default: threadsByIdDefinitions } =
-        await import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition");
+        await import("next-vibe/agent/chat/threads/[threadId]/definition");
       const { removeVirtualNodesByEntityId } =
-        await import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual");
+        await import("next-vibe/agent/cortex/embeddings/sync-virtual");
       for (const thread of affectedThreads) {
         if (thread.rootFolderId) {
           createEndpointEmitter(threadsByIdDefinitions.DELETE, logger, user, {

@@ -1,4 +1,16 @@
 "use client";
+import { getChatModelById } from "next-vibe/agent/ai-stream/models";
+import type { SendMessageParams } from "next-vibe/agent/ai-stream/stream/hooks/send-message";
+import type { DefaultFolderId } from "next-vibe/agent/chat/config";
+import type { ChatMessage } from "next-vibe/agent/chat/db";
+import { useChatBootContext } from "next-vibe/agent/chat/hooks/context";
+import { calculateCreditCost } from "next-vibe/agent/models/models";
+import { useSkill } from "next-vibe/agent/skills/[id]/hooks";
+import {
+  processMessageGroupForCopy,
+  processMessageGroupForTTS,
+} from "next-vibe/agent/text-to-speech/content-processing";
+import type { TtsModelId } from "next-vibe/agent/text-to-speech/models";
 import type { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { cn } from "next-vibe/core/utils/utils";
@@ -31,19 +43,7 @@ import {
 } from "react";
 import type { FieldValues } from "react-hook-form";
 
-import { chatProse } from "@/app/[locale]/chat/lib/design-tokens";
-import { getChatModelById } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { SendMessageParams } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/send-message";
-import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
-import { useSkill } from "@/app/api/[locale]/agent/skills/[id]/hooks";
-import {
-  processMessageGroupForCopy,
-  processMessageGroupForTTS,
-} from "@/app/api/[locale]/agent/text-to-speech/content-processing";
-import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { chatProse } from "@/_pages/chat/lib/design-tokens";
 
 import type { CollapseStateStore } from "../hooks/use-collapse-state";
 import { scopedTranslation } from "../i18n";

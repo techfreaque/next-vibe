@@ -1,5 +1,7 @@
 "use client";
 
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
+import { apiClient } from "next-vibe/platforms/react/hooks/store";
 import { Alert, AlertDescription } from "next-vibe/ui/ui/alert";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -22,9 +24,6 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useState } from "react";
-
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import { apiClient } from "@/app/api/[locale]/system/platforms/react/hooks/store";
 
 import revokeEndpoints from "./[id]/definition";
 import type definition from "./definition";

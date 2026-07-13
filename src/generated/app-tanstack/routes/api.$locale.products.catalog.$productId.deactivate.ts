@@ -9,7 +9,7 @@ export const Route = createFileRoute(
   server: {
     handlers: wrapNextApiRoute(
       () =>
-        import("@/app/api/[locale]/products/catalog/[productId]/deactivate/route"),
+        import("@/products/catalog/[productId]/deactivate/route"),
     ),
   },
 });

@@ -4,7 +4,7 @@
  */
 import "server-only";
 
-import { env } from "@/config/env";
+import { env } from "@/_old/config/env";
 
 // Defined HERE (not in users/seeds.ts) on purpose: the dev server's
 // exclude-generator-seeds Vite plugin stubs every seeds.ts module to

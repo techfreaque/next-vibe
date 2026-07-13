@@ -1,5 +1,21 @@
 "use client";
 
+import { chatModelDefinitions } from "next-vibe/agent/ai-stream/models";
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
+import { imageGenModelDefinitions } from "next-vibe/agent/image-generation/models";
+import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
+import { ModelUtility } from "next-vibe/agent/models/enum";
+import {
+  getProviderPrice,
+  isApiProviderAvailable,
+  type ModelDefinition,
+  modelProviders,
+} from "next-vibe/agent/models/models";
+import { ModelCreditDisplay } from "next-vibe/agent/models/widget/model-credit-display";
+import { musicGenModelDefinitions } from "next-vibe/agent/music-generation/models";
+import { sttModelDefinitions } from "next-vibe/agent/speech-to-text/models";
+import { ttsModelDefinitions } from "next-vibe/agent/text-to-speech/models";
+import { videoGenModelDefinitions } from "next-vibe/agent/video-generation/models";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { Button } from "next-vibe/ui/ui/button";
@@ -29,28 +45,12 @@ import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import type { JSX } from "react";
 import { useState } from "react";
 
-import { scopedTranslation as subscriptionT } from "@/app/[locale]/subscription/i18n";
-import { chatModelDefinitions } from "@/app/api/[locale]/agent/ai-stream/models";
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import { imageGenModelDefinitions } from "@/app/api/[locale]/agent/image-generation/models";
-import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
-import { ModelUtility } from "@/app/api/[locale]/agent/models/enum";
-import {
-  getProviderPrice,
-  isApiProviderAvailable,
-  type ModelDefinition,
-  modelProviders,
-} from "@/app/api/[locale]/agent/models/models";
-import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
-import { musicGenModelDefinitions } from "@/app/api/[locale]/agent/music-generation/models";
-import { sttModelDefinitions } from "@/app/api/[locale]/agent/speech-to-text/models";
-import { ttsModelDefinitions } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { videoGenModelDefinitions } from "@/app/api/[locale]/agent/video-generation/models";
+import { scopedTranslation as subscriptionT } from "@/_pages/subscription/i18n";
 import {
   FEATURE_COSTS,
   ProductIds,
   productsRepository,
-} from "@/app/api/[locale]/products/repository-client";
+} from "@/products/repository-client";
 
 import { CreditsTabHeader } from "./credits-tab-header";
 
@@ -109,8 +109,7 @@ export function CreditsBalanceContainer(): JSX.Element {
 
   const handleBuyClick = (): void => {
     void (async (): Promise<void> => {
-      const def =
-        await import("@/app/api/[locale]/subscription/create/definition");
+      const def = await import("@/subscription/create/definition");
       navigation.push(def.default.POST, {});
     })();
   };

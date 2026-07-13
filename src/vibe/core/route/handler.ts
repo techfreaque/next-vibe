@@ -6,6 +6,7 @@
 
 import "server-only";
 
+import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
 import { DEFAULT_ENDPOINT_TIMEOUT_MS } from "next-vibe/core/definition/create";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type { Platform } from "next-vibe/core/definition/platform";
@@ -31,14 +32,13 @@ import {
 } from "next-vibe/unified-ui/_shared/utils";
 import type { z } from "zod";
 
-import { scopedTranslation as sharedScopedTranslation } from "@/app/[locale]/shared/i18n";
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
-import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
+import { scopedTranslation as sharedScopedTranslation } from "@/_pages/shared/i18n";
+import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import type {
   EmailHandler,
   EmailHandleRequestOutput,
-} from "@/app/api/[locale]/messenger/providers/email/smtp-client/email-handling/handler";
-import type { SmsFunctionType } from "@/app/api/[locale]/sms/utils";
+} from "@/messenger/providers/email/smtp-client/email-handling/handler";
+import type { SmsFunctionType } from "@/sms/utils";
 
 import {
   validateHandlerRequestData,
@@ -666,8 +666,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
 
     // 4. Check and deduct credits if endpoint has credit cost
     if (endpoint.credits && endpoint.credits > 0) {
-      const { CreditRepository } =
-        await import("@/app/api/[locale]/credits/repository");
+      const { CreditRepository } = await import("@/credits/repository");
       const hasSufficient = await CreditRepository.hasSufficientCredits(
         user,
         endpoint.credits,
@@ -798,7 +797,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
 
     if (email?.afterHandlerEmails) {
       const { EmailHandlingRepository } =
-        await import("@/app/api/[locale]/messenger/providers/email/smtp-client/email-handling/repository");
+        await import("@/messenger/providers/email/smtp-client/email-handling/repository");
       await EmailHandlingRepository.handleEmails<T>(
         {
           email,
@@ -816,7 +815,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
     }
 
     if (sms?.afterHandlerSms) {
-      const { handleSms } = await import("@/app/api/[locale]/sms/handle-sms");
+      const { handleSms } = await import("@/sms/handle-sms");
       await handleSms<T>({
         sms,
         user,

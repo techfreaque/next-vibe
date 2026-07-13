@@ -15,11 +15,10 @@ import "server-only";
 import { createHash } from "node:crypto";
 
 import { and, eq, ne } from "drizzle-orm";
+import type { MessageMetadata } from "next-vibe/agent/chat/db";
+import { chatMessages } from "next-vibe/agent/chat/db";
+import { ChatMessageRole } from "next-vibe/agent/chat/enum";
 import { db } from "next-vibe/database";
-
-import type { MessageMetadata } from "@/app/api/[locale]/agent/chat/db";
-import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
-import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 
 import type { ToolExecutionContext } from "../../chat/config";
 import { EMBEDDING_MODEL, generateEmbedding } from "./service";

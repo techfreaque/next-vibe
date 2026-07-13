@@ -11,7 +11,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type { ZodError, ZodIssue } from "zod";
 import { z } from "zod";
 
-import { scopedTranslation as sharedScopedTranslation } from "@/app/[locale]/shared/i18n";
+import { scopedTranslation as sharedScopedTranslation } from "@/_pages/shared/i18n";
 
 /**
  * Validate data against a schema

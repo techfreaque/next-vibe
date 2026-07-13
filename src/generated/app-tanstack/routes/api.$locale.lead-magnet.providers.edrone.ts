@@ -8,7 +8,7 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/lead-magnet/providers/edrone/route"),
+      () => import("@/lead-magnet/providers/edrone/route"),
     ),
   },
 });

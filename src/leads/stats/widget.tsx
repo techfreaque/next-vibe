@@ -498,38 +498,35 @@ export function LeadsStatsContainer({
 
   const handleViewAllLeads = useCallback((): void => {
     void (async (): Promise<void> => {
-      const listDef = await import("@/app/api/[locale]/leads/list/definition");
+      const listDef = await import("@/leads/list/definition");
       navigate(listDef.default.GET);
     })();
   }, [navigate]);
 
   const handleSearchLeads = useCallback((): void => {
     void (async (): Promise<void> => {
-      const listDef = await import("@/app/api/[locale]/leads/list/definition");
+      const listDef = await import("@/leads/list/definition");
       navigate(listDef.default.GET);
     })();
   }, [navigate]);
 
   const handleExportLeads = useCallback((): void => {
     void (async (): Promise<void> => {
-      const exportDef =
-        await import("@/app/api/[locale]/leads/export/definition");
+      const exportDef = await import("@/leads/export/definition");
       navigate(exportDef.default.GET);
     })();
   }, [navigate]);
 
   const handleImportLeads = useCallback((): void => {
     void (async (): Promise<void> => {
-      const importDef =
-        await import("@/app/api/[locale]/leads/import/definition");
+      const importDef = await import("@/leads/import/definition");
       navigate(importDef.default.POST);
     })();
   }, [navigate]);
 
   const handleBatchUpdate = useCallback((): void => {
     void (async (): Promise<void> => {
-      const batchDef =
-        await import("@/app/api/[locale]/leads/batch/definition");
+      const batchDef = await import("@/leads/batch/definition");
       navigate(batchDef.default.PATCH);
     })();
   }, [navigate]);
@@ -537,8 +534,7 @@ export function LeadsStatsContainer({
   const handleNavigateToStatus = useCallback(
     (category: LeadStatusValue): void => {
       void (async (): Promise<void> => {
-        const listDef =
-          await import("@/app/api/[locale]/leads/list/definition");
+        const listDef = await import("@/leads/list/definition");
         const filterValue = LEAD_STATUS_TO_FILTER[category];
         if (filterValue) {
           navigate(listDef.default.GET, {
@@ -553,8 +549,7 @@ export function LeadsStatsContainer({
   const handleNavigateToSource = useCallback(
     (category: LeadSourceValue): void => {
       void (async (): Promise<void> => {
-        const listDef =
-          await import("@/app/api/[locale]/leads/list/definition");
+        const listDef = await import("@/leads/list/definition");
         const filterValue = LEAD_SOURCE_TO_FILTER[category];
         if (filterValue) {
           navigate(listDef.default.GET, {

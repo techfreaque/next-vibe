@@ -18,11 +18,11 @@ import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { type Email, emails } from "@/app/api/[locale]/messenger/messages/db";
+import { type Email, emails } from "@/messenger/messages/db";
 import {
   MessageSyncStatus,
   MessageSyncStatusDB,
-} from "@/app/api/[locale]/messenger/messages/enum";
+} from "@/messenger/messages/enum";
 
 import { messengerAccounts } from "../../../../accounts/db";
 import { messengerFolders } from "../../../../messages/db";

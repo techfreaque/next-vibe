@@ -9,8 +9,8 @@ import { Link } from "next-vibe/ui/ui/link";
 import { Span } from "next-vibe/ui/ui/span";
 import type { JSX } from "react";
 
-import { envClient, platform } from "@/config/env-client";
-import { configScopedTranslation } from "@/config/i18n";
+import { envClient, platform } from "@/_old/config/env-client";
+import { configScopedTranslation } from "@/_old/config/i18n";
 
 export function Logo({
   locale,

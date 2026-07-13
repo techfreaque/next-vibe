@@ -6,6 +6,12 @@
 import "server-only";
 
 import { and, eq, sql } from "drizzle-orm";
+import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "next-vibe/agent/image-generation/constants";
+import type { ImageGenModelSelection } from "next-vibe/agent/image-generation/models";
+import { DEFAULT_STT_MODEL_SELECTION } from "next-vibe/agent/speech-to-text/constants";
+import type { SttModelSelection } from "next-vibe/agent/speech-to-text/models";
+import { DEFAULT_TTS_MODEL_SELECTION } from "next-vibe/agent/text-to-speech/constants";
+import type { VoiceModelSelection } from "next-vibe/agent/text-to-speech/models";
 import {
   type CountryLanguage,
   defaultLocale,
@@ -22,13 +28,6 @@ import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { createEndpointEmitter } from "next-vibe/realtime/emitter";
-
-import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
-import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
-import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
-import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
-import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
-import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
 
 import {
   ensureUniqueSlug,

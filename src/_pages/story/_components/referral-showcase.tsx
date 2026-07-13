@@ -11,13 +11,13 @@ import { H2, H3, P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 import { useInView } from "react-intersection-observer";
 
-import { scopedTranslation as referralScopedTranslation } from "@/app/[locale]/user/(account)/referral/i18n";
+import { scopedTranslation as referralScopedTranslation } from "@/_pages/user/(account)/referral/i18n";
 import {
   buildCommissionRows,
   getChainScenarios,
   getChainTotal,
   getReferralParams,
-} from "@/app/[locale]/user/(account)/referral/i18n/utils";
+} from "@/_pages/user/(account)/referral/i18n/utils";
 
 interface ReferralShowcaseProps {
   locale: CountryLanguage;

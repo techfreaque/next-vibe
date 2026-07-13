@@ -62,7 +62,7 @@ subdomain/
 ### EmailFunctionType Signature
 
 ```typescript
-import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
+import type { EmailFunctionType } from "@/emails/smtp-client/email-handling/types";
 
 export const renderCompanyMail: EmailFunctionType<
   RequestType,
@@ -127,7 +127,7 @@ return fail({
 import {
   createTrackingContext,
   EmailTemplate,
-} from "@/app/api/[locale]/emails/smtp-client/components";
+} from "@/emails/smtp-client/components";
 
 function YourEmailContent({
   requestData,
@@ -218,8 +218,8 @@ const styles = {
 ### Standard Pattern
 
 ```typescript
-import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
-import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { endpointsHandler } from "@/system/unified-interface/shared/endpoints/route/multi";
+import { Methods } from "@/system/unified-interface/shared/types/enums";
 
 import endpoints from "./definition";
 import { renderCompanyMail, renderPartnerMail } from "./email";
@@ -530,12 +530,12 @@ export const renderWelcomeMail: EmailFunctionType<
 
 ### Import Paths
 
-| Component                  | Import Path                                                  |
-| -------------------------- | ------------------------------------------------------------ |
-| **EmailFunctionType**      | `@/app/api/[locale]/emails/smtp-client/email-handling/types` |
-| **EmailTemplate**          | `@/app/api/[locale]/emails/smtp-client/components`           |
-| **React Email Components** | `@react-email/components`                                    |
-| **Response Utils**         | `next-vibe/shared/types/response.schema`                     |
+| Component                  | Import Path                                 |
+| -------------------------- | ------------------------------------------- |
+| **EmailFunctionType**      | `@/emails/smtp-client/email-handling/types` |
+| **EmailTemplate**          | `@/emails/smtp-client/components`           |
+| **React Email Components** | `@react-email/components`                   |
+| **Response Utils**         | `next-vibe/shared/types/response.schema`    |
 
 ### Email Config
 

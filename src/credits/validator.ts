@@ -9,7 +9,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { AnyModelId } from "../agent/models/models";
+import type { AnyModelId } from "../vibe/agent/models/models";
 import type { CreditsT } from "./i18n";
 import { CreditRepository } from "./repository";
 

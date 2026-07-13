@@ -24,7 +24,7 @@ import type { PackageManifest } from "next-vibe/tooling/builder/repository/vibe-
 import { CHECK_CONFIG_CREATE_ALIAS } from "next-vibe/tooling/check/config/create/constants";
 import { VIBE_CHECK_ALIAS } from "next-vibe/tooling/check/vibe-check/constants";
 
-import { GITHUB_REPO_URL } from "@/config/constants";
+import { GITHUB_REPO_URL } from "@/_old/config/constants";
 
 const manifest: PackageManifest = {
   name: "@next-vibe/checker",
@@ -38,24 +38,21 @@ const manifest: PackageManifest = {
 
   exports: {
     // Library exports - importable from the package
-    ".": "src/app/api/[locale]/system/tooling/check/vibe-check/repository.ts",
-    "./oxlint":
-      "src/app/api/[locale]/system/tooling/check/oxlint/repository.ts",
-    "./lint": "src/app/api/[locale]/system/tooling/check/lint/repository.ts",
-    "./typecheck":
-      "src/app/api/[locale]/system/tooling/check/typecheck/repository.ts",
+    ".": "src/vibe/tooling/check/vibe-check/repository.ts",
+    "./oxlint": "src/vibe/tooling/check/oxlint/repository.ts",
+    "./lint": "src/vibe/tooling/check/lint/repository.ts",
+    "./typecheck": "src/vibe/tooling/check/typecheck/repository.ts",
     // Types used by check.config.ts (imported as @next-vibe/checker/tooling/check/config/types)
-    "./tooling/check/config/types":
-      "src/app/api/[locale]/system/tooling/check/config/types.ts",
+    "./tooling/check/config/types": "src/vibe/tooling/check/config/types.ts",
     // Custom oxlint JS plugins - referenced in check.config.ts jsPlugins array
     "./oxlint-plugins/restricted-syntax":
-      "src/app/api/[locale]/system/tooling/check/oxlint/plugins/restricted-syntax/src/index.ts",
+      "src/vibe/tooling/check/oxlint/plugins/restricted-syntax/src/index.ts",
     "./oxlint-plugins/jsx-capitalization":
-      "src/app/api/[locale]/system/tooling/check/oxlint/plugins/jsx-capitalization/src/index.ts",
+      "src/vibe/tooling/check/oxlint/plugins/jsx-capitalization/src/index.ts",
     "./oxlint-plugins/i18n":
-      "src/app/api/[locale]/system/tooling/check/oxlint/plugins/i18n/src/index.ts",
+      "src/vibe/tooling/check/oxlint/plugins/i18n/src/index.ts",
     "./oxlint-plugins/boilerplate":
-      "src/app/api/[locale]/system/tooling/check/oxlint/plugins/boilerplate/src/index.ts",
+      "src/vibe/tooling/check/oxlint/plugins/boilerplate/src/index.ts",
   },
 
   platforms: ["cli", "mcp"],

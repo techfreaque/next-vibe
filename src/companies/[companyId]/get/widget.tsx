@@ -233,8 +233,7 @@ export function CompanyGetWidget(_props: {
             label={t("get.widget.modules.accounting.label")}
             description={t("get.widget.modules.accounting.description")}
             onClick={handleModule(
-              () =>
-                import("@/app/api/[locale]/chart-of-accounts/account/list/definition"),
+              () => import("@/chart-of-accounts/account/list/definition"),
             )}
           />
           <ModuleCard
@@ -242,8 +241,7 @@ export function CompanyGetWidget(_props: {
             label={t("get.widget.modules.invoices.label")}
             description={t("get.widget.modules.invoices.description")}
             onClick={handleModule(
-              () =>
-                import("@/app/api/[locale]/payment/invoice/list/definition"),
+              () => import("@/payment/invoice/list/definition"),
             )}
           />
           <ModuleCard
@@ -251,8 +249,7 @@ export function CompanyGetWidget(_props: {
             label={t("get.widget.modules.estimates.label")}
             description={t("get.widget.modules.estimates.description")}
             onClick={handleModule(
-              () =>
-                import("@/app/api/[locale]/payment/estimate/list/definition"),
+              () => import("@/payment/estimate/list/definition"),
             )}
           />
           <ModuleCard
@@ -260,7 +257,7 @@ export function CompanyGetWidget(_props: {
             label={t("get.widget.modules.bills.label")}
             description={t("get.widget.modules.bills.description")}
             onClick={handleModule(
-              () => import("@/app/api/[locale]/payment/bill/list/definition"),
+              () => import("@/payment/bill/list/definition"),
             )}
           />
           <ModuleCard
@@ -268,7 +265,7 @@ export function CompanyGetWidget(_props: {
             label={t("get.widget.modules.pos.label")}
             description={t("get.widget.modules.pos.description")}
             onClick={handleModule(
-              () => import("@/app/api/[locale]/pos/terminal/list/definition"),
+              () => import("@/pos/terminal/list/definition"),
             )}
           />
           <ModuleCard
@@ -276,8 +273,7 @@ export function CompanyGetWidget(_props: {
             label={t("get.widget.modules.purchasing.label")}
             description={t("get.widget.modules.purchasing.description")}
             onClick={handleModule(
-              () =>
-                import("@/app/api/[locale]/purchasing/order/list/definition"),
+              () => import("@/purchasing/order/list/definition"),
             )}
           />
           <ModuleCard
@@ -285,8 +281,7 @@ export function CompanyGetWidget(_props: {
             label={t("get.widget.modules.inventory.label")}
             description={t("get.widget.modules.inventory.description")}
             onClick={handleModule(
-              () =>
-                import("@/app/api/[locale]/inventory/warehouse/list/definition"),
+              () => import("@/inventory/warehouse/list/definition"),
             )}
           />
           <ModuleCard

@@ -310,10 +310,10 @@ function isAllowedPath(context: RestrictedSyntaxRuleContext): boolean {
   const ALLOWED_UI_PRIMITIVES = [
     // The whole web/cli/native/tanstack primitive component library is the
     // platform-abstraction layer — it wraps raw browser/DOM APIs by design.
-    "/system/ui/web/",
-    "/system/ui/cli/",
-    "/system/ui/native/",
-    "/system/ui/tanstack/",
+    "/vibe/ui/web/",
+    "/vibe/ui/cli/",
+    "/vibe/ui/native/",
+    "/vibe/ui/tanstack/",
   ];
   return ALLOWED_UI_PRIMITIVES.some((p) => path.includes(p));
 }

@@ -7,10 +7,10 @@
 import type { NextRequest, NextResponse } from "next-vibe/ui/lib/request";
 import { NextResponse as NextResponseClass } from "next-vibe/ui/lib/request";
 
-import type { languageDefaults } from "./app/api/[locale]/system/core/i18n";
-import type { CountryLanguage } from "./app/api/[locale]/system/core/i18n/core/config";
+import type { languageDefaults } from "./vibe/core/i18n";
+import type { CountryLanguage } from "./vibe/core/i18n/core/config";
 // we have to use relative paths as vercel cant resolve import aliases from here
-import { middleware } from "./app/api/[locale]/system/server/middleware";
+import { middleware } from "./vibe/server/middleware";
 
 const defaultLocale: `${typeof languageDefaults.language}-${typeof languageDefaults.country}` =
   "en-GLOBAL";

@@ -1,5 +1,6 @@
 "use client";
 
+import { FEATURED_MODELS } from "next-vibe/agent/ai-stream/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   Card,
@@ -19,8 +20,6 @@ import { MotionDiv } from "next-vibe/ui/ui/motion";
 import type React from "react";
 import type { JSX } from "react";
 import { useInView } from "react-intersection-observer";
-
-import { FEATURED_MODELS } from "@/app/api/[locale]/agent/ai-stream/models";
 
 import { scopedTranslation } from "./i18n";
 

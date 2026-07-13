@@ -22,6 +22,8 @@ import { execSync, spawn } from "node:child_process";
 import { once } from "node:events";
 
 import { eq } from "drizzle-orm";
+import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
+import { chatSettings } from "next-vibe/agent/chat/settings/db";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -33,9 +35,6 @@ import { db } from "next-vibe/database";
 import { CallbackMode } from "next-vibe/execute-tool/constants";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
-import { chatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
 
 import type { RunRequestOutput, RunResponseOutput } from "./definition";
 import type { CodingAgentT } from "./i18n";
@@ -253,7 +252,7 @@ async function runBatch(
 
 async function getMcpInstanceName(userId: string): Promise<string> {
   const { RemoteConnectionRepository } =
-    await import("@/app/api/[locale]/remote-connection/repository");
+    await import("next-vibe/remote-connection/repository");
   return RemoteConnectionRepository.getLocalInstanceId(userId);
 }
 

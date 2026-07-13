@@ -7,12 +7,11 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
+import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-
-import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
 import { chatMessages, type ToolCall } from "../../../../chat/db";
 import { ChatMessageRole, ThreadStreamingState } from "../../../../chat/enum";

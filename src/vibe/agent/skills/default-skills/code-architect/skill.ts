@@ -1,3 +1,13 @@
+import { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import { AI_RUN_ALIAS } from "next-vibe/agent/ai-stream/run/constants";
+import { CODING_AGENT_ALIAS } from "next-vibe/agent/coding-agent/constants";
+import {
+  CORTEX_EDIT_ALIAS,
+  CORTEX_LIST_ALIAS,
+  CORTEX_READ_ALIAS,
+  CORTEX_SEARCH_ALIAS,
+  CORTEX_WRITE_ALIAS,
+} from "next-vibe/agent/cortex/constants";
 import { SQL_ALIAS } from "next-vibe/database/sql/constants";
 import { AWAIT_TASK_ALIAS } from "next-vibe/execute-tool/await-task/constants";
 import { EXECUTE_TOOL_ALIAS } from "next-vibe/execute-tool/constants";
@@ -5,17 +15,7 @@ import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { REBUILD_ALIAS } from "next-vibe/server/server/rebuild/constants";
 
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { AI_RUN_ALIAS } from "@/app/api/[locale]/agent/ai-stream/run/constants";
-import { CODING_AGENT_ALIAS } from "@/app/api/[locale]/agent/coding-agent/constants";
-import {
-  CORTEX_EDIT_ALIAS,
-  CORTEX_LIST_ALIAS,
-  CORTEX_READ_ALIAS,
-  CORTEX_SEARCH_ALIAS,
-  CORTEX_WRITE_ALIAS,
-} from "@/app/api/[locale]/agent/cortex/constants";
-import { envClient } from "@/config/env-client";
+import { envClient } from "@/_old/config/env-client";
 
 import type { Skill } from "../../config";
 import { tool } from "../../constants";

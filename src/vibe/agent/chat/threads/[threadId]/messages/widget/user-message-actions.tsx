@@ -1,4 +1,7 @@
 "use client";
+import type { DefaultFolderId } from "next-vibe/agent/chat/config";
+import type { ChatMessage } from "next-vibe/agent/chat/db";
+import { useTTSAudio } from "next-vibe/agent/text-to-speech/hooks";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { cn } from "next-vibe/core/utils/utils";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -14,10 +17,7 @@ import { X } from "next-vibe/ui/ui/icons/X";
 import { useWidgetNavigation } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type React from "react";
 
-import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import { useTTSAudio } from "@/app/api/[locale]/agent/text-to-speech/hooks";
-import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
+import { FEATURE_COSTS } from "@/products/repository-client";
 
 import { scopedTranslation } from "../i18n";
 import { CopyButton } from "./copy-button";
@@ -74,7 +74,7 @@ export function UserMessageActions({
   const handleDelete = (): void => {
     void (async (): Promise<void> => {
       const messageIdDefs =
-        await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/definition");
+        await import("next-vibe/agent/chat/threads/[threadId]/messages/[messageId]/definition");
       navigate(messageIdDefs.default.DELETE, {
         urlPathParams: { threadId: message.threadId, messageId: message.id },
         data: rootFolderId ? { rootFolderId } : undefined,

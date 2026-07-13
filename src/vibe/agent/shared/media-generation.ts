@@ -15,9 +15,9 @@ import {
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { CreditsT } from "@/app/api/[locale]/credits/i18n";
-import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
-import { CreditRepository } from "@/app/api/[locale]/credits/repository";
+import type { CreditsT } from "@/credits/i18n";
+import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
+import { CreditRepository } from "@/credits/repository";
 
 /**
  * Check that the user has sufficient credits for a generation request.

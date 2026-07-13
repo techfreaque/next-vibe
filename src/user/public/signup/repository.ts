@@ -14,8 +14,8 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { NextRequest } from "next-vibe/ui/lib/request";
 
-import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
-import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
+import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
+import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/_old/config/constants";
 import type { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { AuthRepository } from "next-vibe/identity/auth/repository";
@@ -175,7 +175,7 @@ export class SignupRepository {
         if (skillId && /^[0-9a-f-]{36}$/i.test(skillId)) {
           // UUID skillId - look up the skill owner in customSkills
           const { customSkills } =
-            await import("@/app/api/[locale]/agent/skills/db");
+            await import("next-vibe/agent/skills/db");
           const [skill] = await dbInstance
             .select({ userId: customSkills.userId })
             .from(customSkills)
@@ -204,7 +204,7 @@ export class SignupRepository {
       // Also include all IP-linked leads so their shared pool collapses into the user.
       const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
       const { CreditRepository } =
-        await import("@/app/api/[locale]/credits/repository");
+        await import("@/credits/repository");
       const linkedLeadIds = await LeadAuthRepository.getLinkedLeadIds(
         user.leadId,
         logger,
@@ -262,9 +262,9 @@ export class SignupRepository {
       if (data.localFavorites && data.localFavorites.length > 0) {
         try {
           const { FavoritesCreateRepository } =
-            await import("@/app/api/[locale]/agent/skills/favorites/create/repository");
+            await import("next-vibe/agent/skills/favorites/create/repository");
           const { scopedTranslation: favoritesCreateScopedTranslation } =
-            await import("@/app/api/[locale]/agent/skills/favorites/create/i18n");
+            await import("next-vibe/agent/skills/favorites/create/i18n");
           const { t: favT } = favoritesCreateScopedTranslation.scopedT(locale);
           const userJwt: JwtPayloadType = {
             id: userData.id,

@@ -1,11 +1,10 @@
 import "server-only";
 
+import type { DefaultFolderId } from "next-vibe/agent/chat/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { createEndpointEmitter } from "next-vibe/realtime/emitter";
-
-import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { ResolvedRelayContext } from "@/app/api/[locale]/system/realtime/remote-event-bridge/relay-context";
+import type { ResolvedRelayContext } from "next-vibe/realtime/remote-event-bridge/relay-context";
 
 import folderContentsDefinitions, {
   type FolderContentsGetWsEmit,

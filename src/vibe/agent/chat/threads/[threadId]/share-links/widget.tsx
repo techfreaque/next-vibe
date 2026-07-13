@@ -1,5 +1,7 @@
 "use client";
 
+import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { success } from "next-vibe/core/route/response.schema";
 import { cn } from "next-vibe/core/utils/utils";
@@ -28,9 +30,6 @@ import { Separator } from "next-vibe/ui/ui/separator";
 import { Span } from "next-vibe/ui/ui/span";
 import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
-
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 
 import { scopedTranslation } from "./i18n";
 
@@ -109,7 +108,7 @@ export function ThreadShareDialog({
     try {
       // Optimistic: update threads sidebar cache
       const threadsDefModule =
-        await import("@/app/api/[locale]/agent/chat/threads/definition");
+        await import("next-vibe/agent/chat/threads/definition");
       apiClient.updateEndpointData(
         threadsDefModule.default.GET,
         logger,
@@ -133,7 +132,7 @@ export function ThreadShareDialog({
 
       // Optimistic: remove from current folder-contents cache
       const folderContentsDefModule =
-        await import("@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition");
+        await import("next-vibe/agent/chat/folder-contents/[rootFolderId]/definition");
       apiClient.updateEndpointData(
         folderContentsDefModule.default.GET,
         logger,

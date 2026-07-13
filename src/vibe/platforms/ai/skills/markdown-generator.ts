@@ -22,7 +22,7 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import { generateSchemaForUsage } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
 
-import { env } from "@/config/env";
+import { env } from "@/_old/config/env";
 
 // ============================================================================
 // SKILL TIER DEFINITIONS
@@ -578,8 +578,7 @@ export async function generateSkillAiRunMarkdown(
     return null;
   }
 
-  const { DEFAULT_SKILLS } =
-    await import("@/app/api/[locale]/agent/skills/config");
+  const { DEFAULT_SKILLS } = await import("next-vibe/agent/skills/config");
   const defaultChar = DEFAULT_SKILLS.find((c) => c.id === skillId);
   const defaultVariant =
     defaultChar?.variants.find((v) => v.isDefault) ?? defaultChar?.variants[0];
@@ -880,8 +879,7 @@ async function getSkillSkillInfo(
   skillId: string,
   locale: CountryLanguage,
 ): Promise<SkillSkillInfo | null> {
-  const { DEFAULT_SKILLS } =
-    await import("@/app/api/[locale]/agent/skills/config");
+  const { DEFAULT_SKILLS } = await import("next-vibe/agent/skills/config");
 
   // Check default/system skills first
   const defaultChar = DEFAULT_SKILLS.find((c) => c.id === skillId);
@@ -903,7 +901,7 @@ async function getSkillSkillInfo(
     }
 
     const { scopedTranslation: charTranslation } =
-      await import("@/app/api/[locale]/agent/skills/i18n");
+      await import("next-vibe/agent/skills/i18n");
     const { t } = charTranslation.scopedT(locale);
 
     return {
@@ -924,9 +922,8 @@ async function getSkillSkillInfo(
 
   // Fall back to DB - only PUBLIC custom skills are accessible without auth
   const { db } = await import("next-vibe/database");
-  const { customSkills } = await import("@/app/api/[locale]/agent/skills/db");
-  const { SkillOwnershipType } =
-    await import("@/app/api/[locale]/agent/skills/enum");
+  const { customSkills } = await import("next-vibe/agent/skills/db");
+  const { SkillOwnershipType } = await import("next-vibe/agent/skills/enum");
   const { eq, and } = await import("drizzle-orm");
 
   const [row] = await db
@@ -1012,8 +1009,7 @@ export async function generateSkillSkillMarkdown(
   }
 
   // Fetch model selection for accurate AI Run example
-  const { DEFAULT_SKILLS } =
-    await import("@/app/api/[locale]/agent/skills/config");
+  const { DEFAULT_SKILLS } = await import("next-vibe/agent/skills/config");
   const defaultChar = DEFAULT_SKILLS.find((c) => c.id === skillId);
   const defaultVariant2 =
     defaultChar?.variants.find((v) => v.isDefault) ?? defaultChar?.variants[0];
@@ -1183,11 +1179,10 @@ export async function getListableSkills(locale: CountryLanguage): Promise<
     requiresAuth: boolean;
   }>
 > {
-  const { DEFAULT_SKILLS } =
-    await import("@/app/api/[locale]/agent/skills/config");
+  const { DEFAULT_SKILLS } = await import("next-vibe/agent/skills/config");
   const { UserPermissionRole } = await import("next-vibe/identity/roles/enum");
   const { scopedTranslation: charTranslation } =
-    await import("@/app/api/[locale]/agent/skills/i18n");
+    await import("next-vibe/agent/skills/i18n");
   const { t } = charTranslation.scopedT(locale);
 
   return DEFAULT_SKILLS.filter((char) => {

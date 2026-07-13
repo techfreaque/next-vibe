@@ -10,6 +10,7 @@
  *     --skill=default --prompt="Summarise these skills"
  */
 
+import { MAX_TOOL_CALLS } from "next-vibe/agent/ai-stream/repository/core/constants";
 import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
@@ -32,8 +33,6 @@ import {
   responseField,
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
-
-import { MAX_TOOL_CALLS } from "@/app/api/[locale]/agent/ai-stream/repository/core/constants";
 
 import { DefaultFolderId } from "../../chat/config";
 import { SKILL_CREATOR_ID } from "../../skills/constants";

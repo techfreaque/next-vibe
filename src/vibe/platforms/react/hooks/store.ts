@@ -1,5 +1,6 @@
 import type { QueryKey } from "@tanstack/react-query";
 import { QueryClient } from "@tanstack/react-query";
+import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
 import { type CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type { Methods } from "next-vibe/core/definition/enums";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
@@ -14,8 +15,6 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { generateStorageKey } from "next-vibe/platforms/react/utils/storage-client";
 import { z } from "zod";
 import { create } from "zustand";
-
-import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 
 import { executeQuery } from "./query-executor";
 import { buildKey, type CacheKeyRequestData } from "./query-key-builder";

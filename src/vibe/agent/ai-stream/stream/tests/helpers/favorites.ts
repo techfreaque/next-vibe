@@ -8,20 +8,19 @@
 
 import "server-only";
 
+import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import { rootlessStreamContext } from "next-vibe/agent/chat/config";
+import { getInstanceAvailability } from "next-vibe/agent/env-availability";
+import type { ImageGenModelId } from "next-vibe/agent/image-generation/models";
+import { getBestImageGenModel } from "next-vibe/agent/image-generation/models";
+import type { MusicGenModelId } from "next-vibe/agent/music-generation/models";
+import { getBestMusicGenModel } from "next-vibe/agent/music-generation/models";
+import { resolveFavorite } from "next-vibe/agent/skills/resolver";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
-
-import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { rootlessStreamContext } from "@/app/api/[locale]/agent/chat/config";
-import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
-import type { ImageGenModelId } from "@/app/api/[locale]/agent/image-generation/models";
-import { getBestImageGenModel } from "@/app/api/[locale]/agent/image-generation/models";
-import type { MusicGenModelId } from "@/app/api/[locale]/agent/music-generation/models";
-import { getBestMusicGenModel } from "@/app/api/[locale]/agent/music-generation/models";
-import { resolveFavorite } from "@/app/api/[locale]/agent/skills/resolver";
 
 /**
  * A resolved test favorite: its DB id plus the CONCRETE models the stream would
@@ -60,10 +59,10 @@ export async function ensureVariantFavorite(
   variantSkillId: string,
 ): Promise<ResolvedVariantFavorite> {
   const [favsDef, favoriteCreateDef] = await Promise.all([
-    import("@/app/api/[locale]/agent/skills/favorites/definition").then(
+    import("next-vibe/agent/skills/favorites/definition").then(
       (m) => m.default.GET,
     ),
-    import("@/app/api/[locale]/agent/skills/favorites/create/definition").then(
+    import("next-vibe/agent/skills/favorites/create/definition").then(
       (m) => m.default.POST,
     ),
   ]);
@@ -164,13 +163,13 @@ export async function createQualityTesterFavorite(
   user: JwtPrivatePayloadType,
 ): Promise<string> {
   const [favsDef, favoriteCreateDef, favoriteDeleteDef] = await Promise.all([
-    import("@/app/api/[locale]/agent/skills/favorites/definition").then(
+    import("next-vibe/agent/skills/favorites/definition").then(
       (m) => m.default.GET,
     ),
-    import("@/app/api/[locale]/agent/skills/favorites/create/definition").then(
+    import("next-vibe/agent/skills/favorites/create/definition").then(
       (m) => m.default.POST,
     ),
-    import("@/app/api/[locale]/agent/skills/favorites/[id]/definition").then(
+    import("next-vibe/agent/skills/favorites/[id]/definition").then(
       (m) => m.default.DELETE,
     ),
   ]);

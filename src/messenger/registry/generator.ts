@@ -21,7 +21,7 @@ import {
 import type {
   EmailTemplateDefinitionAny,
   TemplateCachedMetadata,
-} from "@/app/api/[locale]/messenger/registry/template";
+} from "@/messenger/registry/template";
 
 // Type definitions
 interface TemplateInfo {
@@ -161,7 +161,7 @@ class EmailTemplateGenerator {
           .replace(/^src\/app\/api\/\[locale\]\//, "")
           .replace(/\/email\.tsx$/, "")
           .replace(/\/.+\.email\.tsx$/, "");
-        const importPath = `@/app/api/[locale]/${nestedPath}/email`;
+        const importPath = `@/${nestedPath}/email`;
 
         const allExports = Object.entries(
           templateModule as Record<string, EmailTemplateDefinitionAny | null>,
@@ -408,7 +408,7 @@ import type {
   EmailTemplateDefinitionAny,
   TemplateCachedMetadata,
   TranslatedPreviewFieldConfig,
-} from "@/app/api/[locale]/messenger/registry/template";
+} from "@/messenger/registry/template";
 
 /**
  * Lazy-loaded template registry with dynamic imports
@@ -667,7 +667,7 @@ ${descriptionStr}
 
 "use client";
 
-import type { TemplateCachedMetadata } from "@/app/api/[locale]/messenger/registry/template";
+import type { TemplateCachedMetadata } from "@/messenger/registry/template";
 
 /**
  * Template metadata cache for fast lookups

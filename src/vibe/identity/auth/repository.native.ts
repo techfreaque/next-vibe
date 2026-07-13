@@ -19,7 +19,7 @@ import type { CompleteUserType } from "next-vibe/identity/user/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { storage } from "next-vibe/ui/lib/storage";
 
-import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
+import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/_old/config/constants";
 
 import type { AuthContext } from "./base-auth-handler";
 import type { AuthRepositoryType } from "./repository";

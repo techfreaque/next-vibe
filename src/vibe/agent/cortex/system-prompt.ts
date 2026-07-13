@@ -1,16 +1,15 @@
 /* eslint-disable i18next/no-literal-string */
 import "server-only";
 
+import type { SystemPromptFragment } from "next-vibe/agent/ai-stream/system-prompt/types";
+import type { FavoriteSummaryItem } from "next-vibe/agent/skills/favorites/favorites-formatter";
 import { languageConfig } from "next-vibe/core/i18n";
 import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { CronTaskItem } from "next-vibe/tasks/cron/tasks/definition";
 
-import type { SystemPromptFragment } from "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
-import type { FavoriteSummaryItem } from "@/app/api/[locale]/agent/skills/favorites/favorites-formatter";
-
-import { parseError } from "../../system/core/utils/parse-error";
+import { parseError } from "../../core/utils/parse-error";
 import { stripFrontmatter, truncateContent } from "./_shared/text-utils";
 import {
   CORTEX_EXEC_ALIAS,
@@ -167,7 +166,7 @@ export const cortexFragment: SystemPromptFragment = {
         (n) => n.path.startsWith("/skills") && n.score >= 0.7,
       );
 
-      await import("@/app/api/[locale]/agent/skills/db").catch(() => null);
+      await import("next-vibe/agent/skills/db").catch(() => null);
 
       const [
         counts,
@@ -1070,8 +1069,8 @@ async function loadFavoritesForCortex(
       { db: favDb },
       { asc: favAsc, eq: favEq, inArray: favInArray },
     ] = await Promise.all([
-      import("@/app/api/[locale]/agent/skills/favorites/db"),
-      import("@/app/api/[locale]/agent/chat/settings/db"),
+      import("next-vibe/agent/skills/favorites/db"),
+      import("next-vibe/agent/chat/settings/db"),
       import("next-vibe/database"),
       import("drizzle-orm"),
     ]);
@@ -1105,7 +1104,7 @@ async function loadFavoritesForCortex(
 
     if (customSkillUuids.length > 0) {
       const { customSkills: customSkillsTable } =
-        await import("@/app/api/[locale]/agent/skills/db");
+        await import("next-vibe/agent/skills/db");
       const customSkillsList = await favDb
         .select({
           id: customSkillsTable.id,

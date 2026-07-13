@@ -34,8 +34,7 @@ const instanceIdField = requestUrlPathParamsField(scopedTranslation, {
   type: WidgetType.FORM_FIELD,
   fieldType: FieldDataType.ENTITY_PICKER,
   listEndpoint: async () =>
-    (await import("@/app/api/[locale]/remote-connection/list/definition"))
-      .default.GET,
+    (await import("next-vibe/remote-connection/list/definition")).default.GET,
   labelField: "name",
   label: "get.instanceId.label" as const,
   description: "get.instanceId.description" as const,
@@ -587,7 +586,7 @@ const { DELETE } = createEndpoint({
         const { apiClient } =
           await import("next-vibe/platforms/react/hooks/store");
         const listDefinition =
-          await import("@/app/api/[locale]/remote-connection/list/definition");
+          await import("next-vibe/remote-connection/list/definition");
         const instanceId = data.pathParams.instanceId;
         apiClient.updateEndpointData(
           listDefinition.GET,

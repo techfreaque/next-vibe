@@ -48,8 +48,7 @@ const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         listEndpoint: async () =>
-          (await import("@/app/api/[locale]/users/list/definition")).default
-            .GET,
+          (await import("@/users/list/definition")).default.GET,
         labelField: "email",
         label: "adminAdd.post.targetUserId.label" as const,
         description: "adminAdd.post.targetUserId.description" as const,

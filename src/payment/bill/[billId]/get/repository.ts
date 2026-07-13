@@ -18,7 +18,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
+import { CompanyAuthRepository } from "@/companies/repository";
 
 import { paymentBillLines, paymentBills } from "../../../db";
 import type { BillGetResponseOutput, BillGetUrlPathParams } from "./definition";

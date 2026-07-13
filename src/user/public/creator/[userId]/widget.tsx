@@ -10,18 +10,18 @@ import { Span } from "next-vibe/ui/ui/span";
 import { H2, P } from "next-vibe/ui/ui/typography";
 import { useCallback, useMemo, useState, type JSX } from "react";
 
-import { buildScopedPaletteStyle } from "@/app/[locale]/creator/[userId]/_shared/palette-generator";
+import { buildScopedPaletteStyle } from "@/_pages/creator/[userId]/_shared/palette-generator";
 import {
   DEFAULT_ACCENT,
   ProfileBio,
   ProfileHero,
   ProfileSocialPills,
-} from "@/app/[locale]/creator/[userId]/_shared/profile-content";
-import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
-import skillsDef from "@/app/api/[locale]/agent/skills/definition";
-import { useChatFavorites } from "@/app/api/[locale]/agent/skills/favorites/hooks/hooks";
-import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/skills/i18n";
-import { CollapsibleSkillSection } from "@/app/api/[locale]/agent/skills/widget";
+} from "@/_pages/creator/[userId]/_shared/profile-content";
+import { parseSkillId } from "next-vibe/agent/chat/slugify";
+import skillsDef from "next-vibe/agent/skills/definition";
+import { useChatFavorites } from "next-vibe/agent/skills/favorites/hooks/hooks";
+import { scopedTranslation as skillsScopedTranslation } from "next-vibe/agent/skills/i18n";
+import { CollapsibleSkillSection } from "next-vibe/agent/skills/widget";
 import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import {
   useWidgetLocale,
@@ -31,7 +31,7 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { useWidgetValue } from "next-vibe/unified-ui/_shared/use-widget-value";
 
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 
 import { GET } from "./definition";
 import { scopedTranslation } from "./i18n";
@@ -66,7 +66,7 @@ function CreatorLeadCaptureForm({
       try {
         const [{ apiClient }, captureDef] = await Promise.all([
           import("next-vibe/platforms/react/hooks/store"),
-          import("@/app/api/[locale]/lead-magnet/capture/definition"),
+          import("@/lead-magnet/capture/definition"),
         ]);
         const result = await apiClient.mutate(
           captureDef.POST,

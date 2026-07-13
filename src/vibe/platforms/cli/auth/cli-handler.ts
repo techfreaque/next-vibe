@@ -6,7 +6,7 @@ import {
 } from "next-vibe/identity/auth/base-auth-handler";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
+import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/_old/config/constants";
 
 import {
   deleteSessionFile,

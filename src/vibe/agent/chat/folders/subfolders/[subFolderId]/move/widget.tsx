@@ -1,5 +1,6 @@
 "use client";
 
+import { DEFAULT_FOLDER_CONFIGS } from "next-vibe/agent/chat/config";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -14,8 +15,6 @@ import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-
 import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import type { JSX } from "react";
 import { useMemo } from "react";
-
-import { DEFAULT_FOLDER_CONFIGS } from "@/app/api/[locale]/agent/chat/config";
 
 import { useChatNavigationStore } from "../../../../hooks/use-chat-navigation-store";
 import type { FolderListResponseOutput } from "../../../[rootFolderId]/definition";

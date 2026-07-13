@@ -26,7 +26,7 @@ export interface VibeDepsPackage {
   name: string;
   /**
    * Project-root-relative posix prefixes owned by this package, e.g.
-   * "src/app/api/[locale]/system/ui/web". A file belongs to the package whose
+   * "src/vibe/ui/web". A file belongs to the package whose
    * longest matching root prefixes its graph key.
    */
   roots: ReadonlyArray<string>;

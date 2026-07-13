@@ -7,7 +7,7 @@
  * - "redis": Redis PUBLISH/SUBSCRIBE for multi-instance deployments
  */
 
-import { env } from "@/config/env";
+import { env } from "@/_old/config/env";
 
 import { LocalPubSubAdapter } from "./local-adapter";
 import { RedisPubSubAdapter } from "./redis-adapter";

@@ -22,7 +22,7 @@ import {
   updateLiveIndex,
 } from "next-vibe/tooling/generators/shared/live-index";
 
-import { env } from "@/config/env";
+import { env } from "@/_old/config/env";
 
 import { CronTaskPriority, TaskCategory } from "../enum";
 import { DEV_WATCHER_TASK_NAME } from "./constants";
@@ -208,11 +208,11 @@ const startSmartFileWatcher = async (
   // process.cwd() so the bundler doesn't try to match the path as a file glob.
   // eslint-disable-next-line i18next/no-literal-string
   const cwd = process.env["PWD"] ?? process.cwd();
-  // Use template string + split bracket to prevent Turbopack from statically tracing paths
+  // Use template string to prevent Turbopack from statically tracing paths
+  // eslint-disable-next-line i18next/no-literal-string
+  const apiWatchRoot = `${cwd}/src`;
   // eslint-disable-next-line i18next/no-literal-string, no-useless-concat
-  const apiWatchRoot = `${cwd}/src/app/api/[` + `locale]`;
-  // eslint-disable-next-line i18next/no-literal-string, no-useless-concat
-  const uiWatchRoot = `${cwd}/src/app/[` + `locale]`;
+  const uiWatchRoot = `${cwd}/src/_pages`;
 
   const watchRoots = [apiWatchRoot, uiWatchRoot];
   const watchers: ReturnType<typeof fs.watch>[] = [];

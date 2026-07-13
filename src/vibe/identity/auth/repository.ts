@@ -42,8 +42,8 @@ import {
   AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS,
   BEARER_LEAD_ID_SEPARATOR,
   LEAD_ID_COOKIE_NAME,
-} from "@/config/constants";
-import { env } from "@/config/env";
+} from "@/_old/config/constants";
+import { env } from "@/_old/config/env";
 
 import { type AuthContext } from "./base-auth-handler";
 import { getPlatformAuthHandler } from "./factory";

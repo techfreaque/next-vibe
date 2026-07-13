@@ -35,9 +35,9 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   DefaultFolderId,
   makeHeadlessContext,
-} from "@/app/api/[locale]/agent/chat/config";
-import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
-import { chatFavorites } from "@/app/api/[locale]/agent/skills/favorites/db";
+} from "next-vibe/agent/chat/config";
+import { chatThreads } from "next-vibe/agent/chat/db";
+import { chatFavorites } from "next-vibe/agent/skills/favorites/db";
 
 import { seedCaseThread } from "../../ai-stream/testing/fixture-seed";
 import {

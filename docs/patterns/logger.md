@@ -18,7 +18,7 @@ This document defines strict logger patterns for the codebase. The `EndpointLogg
 
 ```typescript
 // route.ts
-import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
+import { endpointsHandler } from "@/system/unified-interface/shared/endpoints/route/multi";
 
 export const { GET, POST } = endpointsHandler({
   endpoint: definitions,
@@ -48,7 +48,7 @@ export const { GET, POST } = endpointsHandler({
 
 ```typescript
 // repository.ts
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/system/unified-interface/shared/logger/endpoint";
 import type { scopedTranslation } from "./i18n";
 
 type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
@@ -94,7 +94,7 @@ export class MyRepository {
 // features/chat/context.tsx
 'use client';
 
-import { createEndpointLogger } from '@/app/api/[locale]/system/unified-interface/shared/logger/endpoint';
+import { createEndpointLogger } from '@/system/unified-interface/shared/logger/endpoint';
 
 export function ChatProvider({ children }: ChatProviderProps) {
   const { locale } = useTranslation();
@@ -122,7 +122,7 @@ export function ChatProvider({ children }: ChatProviderProps) {
 // components/message-editor.tsx
 'use client';
 
-import type { EndpointLogger } from '@/app/api/[locale]/system/unified-interface/shared/logger/endpoint';
+import type { EndpointLogger } from '@/system/unified-interface/shared/logger/endpoint';
 
 interface MessageEditorProps {
   message: ChatMessage;
@@ -266,10 +266,10 @@ Always use these exact imports:
 
 ```typescript
 // Type import
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/system/unified-interface/shared/logger/endpoint";
 
 // Function import (for creation only at top-level)
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "@/system/unified-interface/shared/logger/endpoint";
 ```
 
 ---

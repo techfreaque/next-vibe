@@ -17,7 +17,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { db } from "../../system/database";
+import { db } from "../../vibe/database";
 import { MessageChannel, MessengerChannelFilter } from "../accounts/enum";
 import type {
   EmailGetGETResponseOutput,

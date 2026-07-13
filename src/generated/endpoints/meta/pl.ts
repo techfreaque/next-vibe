@@ -2112,7 +2112,7 @@ export const endpointsMeta: EndpointMeta[] = [
         },
         batch: {
           prompt:
-            "Read src/app/api/[locale]/agent/coding-agent/route.ts and summarize what it does in 2 sentences.",
+            "Read next-vibe/agent/coding-agent/route.ts and summarize what it does in 2 sentences.",
           provider: "claude-code",
           interactiveMode: false,
         },
@@ -20072,7 +20072,7 @@ export const endpointsMeta: EndpointMeta[] = [
         default: { fix: false, limit: 100, page: 1 },
         verbose: { fix: false, limit: 100, page: 1 },
         fix: {
-          path: "src/app/api/[locale]/system/platforms/cli",
+          path: "src/vibe/platforms/cli",
           fix: true,
           limit: 100,
           page: 1,
@@ -20103,7 +20103,7 @@ export const endpointsMeta: EndpointMeta[] = [
         default: { fix: false, limit: 100, page: 1 },
         verbose: { fix: false, limit: 100, page: 1 },
         fix: {
-          path: "src/app/api/[locale]/system/platforms/cli",
+          path: "src/vibe/platforms/cli",
           fix: true,
           limit: 100,
           page: 1,
@@ -20140,7 +20140,7 @@ export const endpointsMeta: EndpointMeta[] = [
         default: { verbose: false, watch: false },
         verbose: { verbose: true, watch: false },
         watch: {
-          path: "src/app/api/[locale]/system/tooling/check",
+          path: "src/vibe/tooling/check",
           verbose: true,
           watch: true,
         },
@@ -21069,13 +21069,13 @@ export const endpointsMeta: EndpointMeta[] = [
       inputs: { default: {} },
       responses: {
         default: {
-          staged: ["src/app/api/[locale]/products/catalog/list/route.ts"],
+          staged: ["src/products/catalog/list/route.ts"],
           partiallyStaged: [
-            "src/app/api/[locale]/products/catalog/list/definition.ts",
+            "src/products/catalog/list/definition.ts",
           ],
           skipped: [],
           renamed: [
-            "src/app/api/[locale]/products/old/route.ts -> src/app/api/[locale]/products/catalog/route.ts",
+            "src/products/old/route.ts -> src/products/catalog/route.ts",
           ],
           deleted: ["src/generated/tanstack/products/old/route.ts"],
         },

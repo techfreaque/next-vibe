@@ -24,7 +24,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import {
   AUTH_TOKEN_COOKIE_NAME,
   LEAD_ID_COOKIE_NAME,
-} from "@/config/constants";
+} from "@/_old/config/constants";
 
 import { buildWsChannel } from "./channel";
 import type { WsChannelDescriptor } from "./types";

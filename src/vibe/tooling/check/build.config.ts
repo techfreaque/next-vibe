@@ -9,7 +9,7 @@
  *  - Set VIBE_PACKAGE_NAME and VIBE_PACKAGE_DEFAULT_ENDPOINT defines
  *
  * Usage:
- *   vibe builder --configPath="src/app/api/[locale]/system/tooling/check/build.config.ts"
+ *   vibe builder --configPath="src/vibe/tooling/check/build.config.ts"
  */
 
 import { resolve } from "node:path";
@@ -33,7 +33,7 @@ const config: BuildConfig = {
   filesToCompile: [
     // ── Main binary ──────────────────────────────────────────────────────────
     {
-      input: "src/app/api/[locale]/system/platforms/cli/package-runtime.ts",
+      input: "src/vibe/platforms/cli/package-runtime.ts",
       output: ".dist/checker/bin/vibe-check.js",
       type: BunBuildTypeEnum.EXECUTABLE,
       bunOptions: {
@@ -43,7 +43,7 @@ const config: BuildConfig = {
         // Apply web/ui → cli/ui redirects at bundle time (replaces runtime plugin import)
         plugins: [
           createCliWidgetPlugin(
-            // build.config.ts lives in src/app/api/[locale]/system/tooling/check/
+            // build.config.ts lives in src/vibe/tooling/check/
             // 5 levels up → src/   (packages/next-vibe-ui lives under src/)
             resolve(import.meta.dir, "../../../../../"),
           ),
@@ -54,7 +54,7 @@ const config: BuildConfig = {
     // ── Oxlint JS plugins ────────────────────────────────────────────────────
     {
       input:
-        "src/app/api/[locale]/system/tooling/check/oxlint/plugins/restricted-syntax/src/index.ts",
+        "src/vibe/tooling/check/oxlint/plugins/restricted-syntax/src/index.ts",
       output: ".dist/checker/oxlint-plugins/restricted-syntax.js",
       type: BunBuildTypeEnum.MODULE,
       bunOptions: {
@@ -65,7 +65,7 @@ const config: BuildConfig = {
     },
     {
       input:
-        "src/app/api/[locale]/system/tooling/check/oxlint/plugins/jsx-capitalization/src/index.ts",
+        "src/vibe/tooling/check/oxlint/plugins/jsx-capitalization/src/index.ts",
       output: ".dist/checker/oxlint-plugins/jsx-capitalization.js",
       type: BunBuildTypeEnum.MODULE,
       bunOptions: {
@@ -75,8 +75,7 @@ const config: BuildConfig = {
       },
     },
     {
-      input:
-        "src/app/api/[locale]/system/tooling/check/oxlint/plugins/i18n/src/index.ts",
+      input: "src/vibe/tooling/check/oxlint/plugins/i18n/src/index.ts",
       output: ".dist/checker/oxlint-plugins/i18n.js",
       type: BunBuildTypeEnum.MODULE,
       bunOptions: {
@@ -89,36 +88,33 @@ const config: BuildConfig = {
 
   filesOrFoldersToCopy: [
     {
-      input: "src/app/api/[locale]/system/tooling/check/README.md",
+      input: "src/vibe/tooling/check/README.md",
       output: ".dist/checker/README.md",
     },
-    { input: "src/app/api/[locale]/LICENSE", output: ".dist/checker/LICENSE" },
+    { input: "src/LICENSE", output: ".dist/checker/LICENSE" },
     { input: "check.config.ts", output: ".dist/checker/check.config.ts" },
     {
-      input: "src/app/api/[locale]/system/tooling/check/config/types.ts",
+      input: "src/vibe/tooling/check/config/types.ts",
       output: ".dist/checker/system/tooling/check/config/types.ts",
     },
     {
-      input: "src/app/api/[locale]/system/tooling/check/oxlint/types.ts",
+      input: "src/vibe/tooling/check/oxlint/types.ts",
       output: ".dist/checker/system/tooling/check/oxlint/types.ts",
     },
     {
-      input:
-        "src/app/api/[locale]/system/tooling/check/vibe-check/definition.ts",
+      input: "src/vibe/tooling/check/vibe-check/definition.ts",
       output: ".dist/checker/src/vibe-check/definition.ts",
     },
     {
-      input:
-        "src/app/api/[locale]/system/tooling/check/vibe-check/repository.ts",
+      input: "src/vibe/tooling/check/vibe-check/repository.ts",
       output: ".dist/checker/src/vibe-check/repository.ts",
     },
     {
-      input:
-        "src/app/api/[locale]/system/tooling/check/config/create/definition.ts",
+      input: "src/vibe/tooling/check/config/create/definition.ts",
       output: ".dist/checker/src/config/create/definition.ts",
     },
     {
-      input: "src/app/api/[locale]/system/tooling/check/config/types.ts",
+      input: "src/vibe/tooling/check/config/types.ts",
       output: ".dist/checker/src/config/types.ts",
     },
   ],

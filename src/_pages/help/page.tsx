@@ -1,6 +1,8 @@
 export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
+import { getEnvAvailability } from "next-vibe/agent/env-availability";
+import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
 import { Platform } from "next-vibe/core/definition/platform";
 import { languageConfig } from "next-vibe/core/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
@@ -16,13 +18,8 @@ import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
 import { Link } from "next-vibe/ui/ui/link";
 import type { JSX } from "react";
 
-import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
-import {
-  ProductIds,
-  productsRepository,
-} from "@/app/api/[locale]/products/platform-products";
-import { configScopedTranslation } from "@/config/i18n";
+import { configScopedTranslation } from "@/_old/config/i18n";
+import { ProductIds, productsRepository } from "@/products/platform-products";
 
 import { scopedTranslation as pageT } from "./i18n";
 import HelpPageClient from "./page-client";

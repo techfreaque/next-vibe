@@ -21,11 +21,8 @@ import { db } from "next-vibe/database";
 import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import {
-  type Product,
-  productsRepository,
-} from "@/app/api/[locale]/products/repository-client";
-import { env } from "@/config/env";
+import { env } from "@/_old/config/env";
+import { type Product, productsRepository } from "@/products/repository-client";
 
 import { paymentInvoices, paymentTransactions } from "../../db";
 import {

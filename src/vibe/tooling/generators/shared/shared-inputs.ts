@@ -188,8 +188,8 @@ export async function buildGeneratorContext(
   opts: BuildContextOptions,
 ): Promise<GeneratorContext> {
   const cwd = process.cwd();
-  const apiDir = `${cwd}/src/app/api/[locale]`;
-  const apiRoot = `${cwd}/src/app/api`;
+  const apiDir = `${cwd}/src`;
+  const apiRoot = `${cwd}/src`;
 
   const files = scanFileLists(apiDir, apiRoot, opts.live);
 

@@ -1,4 +1,10 @@
 "use client";
+import { ModelCreditDisplay } from "next-vibe/agent/models/widget/model-credit-display";
+import {
+  ModelSelector,
+  ModelSelectorTrigger,
+} from "next-vibe/agent/models/widget/model-selector";
+import { ModelSelectionType } from "next-vibe/agent/skills/enum";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -25,13 +31,6 @@ import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-
 import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
-
-import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
-import {
-  ModelSelector,
-  ModelSelectorTrigger,
-} from "@/app/api/[locale]/agent/models/widget/model-selector";
-import { ModelSelectionType } from "@/app/api/[locale]/agent/skills/enum";
 
 import { useProviderAvailability } from "../env-availability-context";
 import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "./constants";

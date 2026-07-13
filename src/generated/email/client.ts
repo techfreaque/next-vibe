@@ -8,7 +8,7 @@
 
 "use client";
 
-import type { TemplateCachedMetadata } from "@/app/api/[locale]/messenger/registry/template";
+import type { TemplateCachedMetadata } from "@/messenger/registry/template";
 
 /**
  * Template metadata cache for fast lookups
@@ -24,7 +24,7 @@ export const templateMetadataMap: Record<
     name: "emailTemplates.adminContact.meta.name",
     description: "emailTemplates.adminContact.meta.description",
     category: "emailTemplates.adminContact.meta.category",
-    path: "src/app/api/[locale]/contact/email.tsx",
+    path: "src/contact/email.tsx",
     exampleProps: {
       name: "Max Mustermann",
       email: "max@example.com",
@@ -42,7 +42,7 @@ export const templateMetadataMap: Record<
     name: "emailTemplates.adminSignup.name",
     description: "emailTemplates.adminSignup.description",
     category: "emailTemplates.adminSignup.category",
-    path: "src/app/api/[locale]/user/public/signup/email.tsx",
+    path: "src/user/public/signup/email.tsx",
     exampleProps: {
       privateName: "Max",
       publicName: "Max Mustermann",
@@ -57,7 +57,7 @@ export const templateMetadataMap: Record<
     name: "emailTemplates.adminNotification.name",
     description: "emailTemplates.adminNotification.description",
     category: "emailTemplates.adminNotification.category",
-    path: "src/app/api/[locale]/subscription/email.tsx",
+    path: "src/subscription/email.tsx",
     exampleProps: {
       privateName: "Max",
       publicName: "Max Mustermann",
@@ -72,7 +72,7 @@ export const templateMetadataMap: Record<
     name: "emailTemplates.contactForm.meta.name",
     description: "emailTemplates.contactForm.meta.description",
     category: "emailTemplates.contactForm.meta.category",
-    path: "src/app/api/[locale]/contact/email.tsx",
+    path: "src/contact/email.tsx",
     exampleProps: {
       name: "Max Mustermann",
       email: "max@example.com",
@@ -92,7 +92,7 @@ export const templateMetadataMap: Record<
     name: "email.creditPack.admin.title",
     description: "email.creditPack.admin.preview",
     category: "email.creditPack.admin.title",
-    path: "src/app/api/[locale]/credits/email.tsx",
+    path: "src/credits/email.tsx",
     exampleProps: { userEmail: "user@example.com", credits: 5000 },
   },
   "credits-credit-pack-user": {
@@ -101,7 +101,7 @@ export const templateMetadataMap: Record<
     name: "email.creditPack.user.title",
     description: "email.creditPack.user.previewText",
     category: "email.creditPack.user.title",
-    path: "src/app/api/[locale]/credits/email.tsx",
+    path: "src/credits/email.tsx",
     exampleProps: {
       privateName: "Max",
       userId: "example-user-id-123",
@@ -116,7 +116,7 @@ export const templateMetadataMap: Record<
     name: "emailTemplates.welcome.name",
     description: "emailTemplates.welcome.description",
     category: "emailTemplates.welcome.category",
-    path: "src/app/api/[locale]/newsletter/subscribe/email.tsx",
+    path: "src/newsletter/subscribe/email.tsx",
     exampleProps: {
       subscriberEmail: "subscriber@example.com",
       subscriberName: "Max Mustermann",
@@ -128,7 +128,7 @@ export const templateMetadataMap: Record<
     name: "emailTemplates.unsubscribe.name",
     description: "emailTemplates.unsubscribe.description",
     category: "emailTemplates.unsubscribe.category",
-    path: "src/app/api/[locale]/newsletter/unsubscribe/email.tsx",
+    path: "src/newsletter/unsubscribe/email.tsx",
     exampleProps: { email: "max@example.com" },
   },
   "newsletter-unsubscribe-admin": {
@@ -137,7 +137,7 @@ export const templateMetadataMap: Record<
     name: "emailTemplates.unsubscribe.name",
     description: "emailTemplates.unsubscribe.description",
     category: "emailTemplates.unsubscribe.category",
-    path: "src/app/api/[locale]/newsletter/unsubscribe/email.tsx",
+    path: "src/newsletter/unsubscribe/email.tsx",
     exampleProps: { unsubscribedEmail: "unsubscribed@example.com" },
   },
   "newsletter-welcome": {
@@ -146,7 +146,7 @@ export const templateMetadataMap: Record<
     name: "emailTemplates.welcome.name",
     description: "emailTemplates.welcome.description",
     category: "emailTemplates.welcome.category",
-    path: "src/app/api/[locale]/newsletter/subscribe/email.tsx",
+    path: "src/newsletter/subscribe/email.tsx",
     exampleProps: {
       email: "max@example.com",
       name: "Max Mustermann",
@@ -160,7 +160,7 @@ export const templateMetadataMap: Record<
     name: "emailTemplates.confirm.name",
     description: "emailTemplates.confirm.description",
     category: "emailTemplates.confirm.category",
-    path: "src/app/api/[locale]/user/public/reset-password/confirm/email.tsx",
+    path: "src/user/public/reset-password/confirm/email.tsx",
     exampleProps: {
       publicName: "Max Mustermann",
       userId: "example-user-id-123",
@@ -173,7 +173,7 @@ export const templateMetadataMap: Record<
     name: "emailTemplates.request.name",
     description: "emailTemplates.request.description",
     category: "emailTemplates.request.category",
-    path: "src/app/api/[locale]/user/public/reset-password/request/email.tsx",
+    path: "src/user/public/reset-password/request/email.tsx",
     exampleProps: {
       publicName: "Max Mustermann",
       userId: "example-user-id-123",
@@ -187,7 +187,7 @@ export const templateMetadataMap: Record<
     name: "payout.email.admin.title",
     description: "payout.email.admin.preview",
     category: "payout.get.title",
-    path: "src/app/api/[locale]/referral/payout/email.tsx",
+    path: "src/referral/payout/email.tsx",
     exampleProps: {
       amountCents: 5000,
       currency: "CREDITS",
@@ -201,7 +201,7 @@ export const templateMetadataMap: Record<
     name: "payout.email.user.titleCrypto",
     description: "payout.email.user.previewCrypto",
     category: "payout.get.title",
-    path: "src/app/api/[locale]/referral/payout/email.tsx",
+    path: "src/referral/payout/email.tsx",
     exampleProps: { amountCents: 5000, currency: "CREDITS", walletAddress: "" },
   },
   "signup-welcome": {
@@ -210,7 +210,7 @@ export const templateMetadataMap: Record<
     name: "emailTemplates.welcome.name",
     description: "emailTemplates.welcome.description",
     category: "emailTemplates.welcome.category",
-    path: "src/app/api/[locale]/user/public/signup/email.tsx",
+    path: "src/user/public/signup/email.tsx",
     exampleProps: {
       privateName: "Max",
       userId: "example-user-id-123",
@@ -224,7 +224,7 @@ export const templateMetadataMap: Record<
     name: "emailTemplates.success.name",
     description: "emailTemplates.success.description",
     category: "emailTemplates.success.category",
-    path: "src/app/api/[locale]/subscription/email.tsx",
+    path: "src/subscription/email.tsx",
     exampleProps: {
       privateName: "Max",
       userId: "example-user-id-123",
@@ -239,7 +239,7 @@ export const templateMetadataMap: Record<
     name: "emailTemplates.adminSignup.name",
     description: "emailTemplates.adminSignup.description",
     category: "emailTemplates.adminSignup.category",
-    path: "src/app/api/[locale]/user/public/signup/email.tsx",
+    path: "src/user/public/signup/email.tsx",
     exampleProps: {
       privateName: "Max",
       publicName: "Max Mustermann",
@@ -254,7 +254,7 @@ export const templateMetadataMap: Record<
     name: "emailTemplates.welcome.name",
     description: "emailTemplates.welcome.description",
     category: "emailTemplates.welcome.category",
-    path: "src/app/api/[locale]/user/public/signup/email.tsx",
+    path: "src/user/public/signup/email.tsx",
     exampleProps: {
       privateName: "Max",
       userId: "example-user-id-123",

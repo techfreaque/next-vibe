@@ -12,10 +12,9 @@
 import "server-only";
 
 import { and, eq, isNull } from "drizzle-orm";
+import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import { chatFolders } from "next-vibe/agent/chat/db";
 import { db } from "next-vibe/database";
-
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { chatFolders } from "@/app/api/[locale]/agent/chat/db";
 
 function topLevelRemoteFolderByName(
   userId: string,
@@ -40,7 +39,7 @@ export async function ensureInstanceFolder(
   instanceId: string,
 ): Promise<string | null> {
   const { ensureFolderChain } =
-    await import("@/app/api/[locale]/agent/chat/threads/sync-provider");
+    await import("next-vibe/agent/chat/threads/sync-provider");
   return ensureFolderChain(userId, DefaultFolderId.REMOTE, [instanceId]);
 }
 

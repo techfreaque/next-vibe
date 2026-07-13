@@ -19,7 +19,7 @@ import type { SessionT } from "next-vibe/identity/session/i18n";
 import { scopedTranslation } from "next-vibe/identity/session/i18n";
 import { cookies } from "next-vibe/ui/lib/headers";
 
-import { AUTH_TOKEN_COOKIE_NAME } from "@/config/constants";
+import { AUTH_TOKEN_COOKIE_NAME } from "@/_old/config/constants";
 
 import type { NewSession, Session } from "./db";
 import { sessions } from "./db";

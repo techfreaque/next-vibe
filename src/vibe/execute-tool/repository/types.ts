@@ -6,6 +6,8 @@
  * the helper files themselves contain only their class (repository pattern).
  */
 
+import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
 import type { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { GenericHandlerBase } from "next-vibe/core/route/handler";
@@ -14,10 +16,6 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { AiT } from "next-vibe/platforms/ai/i18n";
-import type { CronTaskStatusDB } from "next-vibe/tasks/enum";
-
-import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import type {
   RemoteCallParams,
   RemoteCallResult,
@@ -26,7 +24,8 @@ import type {
   RemoteTarget,
   ResolveInferenceProviderParams,
   ResolveTargetParams,
-} from "@/app/api/[locale]/remote-connection/types";
+} from "next-vibe/remote-connection/types";
+import type { CronTaskStatusDB } from "next-vibe/tasks/enum";
 
 export type {
   RemoteCallParams,

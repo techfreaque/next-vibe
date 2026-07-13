@@ -13,9 +13,9 @@ import { H1, H2, H3, P } from "next-vibe/ui/ui/typography";
 import { Ul } from "next-vibe/ui/ui/ul";
 import type { JSX } from "react";
 
-import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
-import { envClient } from "@/config/env-client";
-import { configScopedTranslation } from "@/config/i18n";
+import { envClient } from "@/_old/config/env-client";
+import { configScopedTranslation } from "@/_old/config/i18n";
+import { contactClientRepository } from "@/contact/repository-client";
 
 import { ImprintClientInteraction } from "./_components/imprint-client-content";
 import { scopedTranslation } from "./i18n";

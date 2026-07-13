@@ -15,9 +15,9 @@ import { useToast } from "next-vibe/ui/hooks/use-toast";
 import { assignUrl } from "next-vibe/ui/lib/location";
 import { useCallback } from "react";
 
-import definitions from "@/app/api/[locale]/credits/definition";
+import definitions from "@/credits/definition";
 
-import { useApiMutation } from "../../../system/platforms/react/hooks/use-api-mutation";
+import { useApiMutation } from "../../../vibe/platforms/react/hooks/use-api-mutation";
 import logoutEndpoints from "./definition";
 import { scopedTranslation } from "./i18n";
 

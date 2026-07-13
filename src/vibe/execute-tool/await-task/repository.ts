@@ -13,6 +13,8 @@
 import "server-only";
 
 import { desc, eq, sql } from "drizzle-orm";
+import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
+import { chatMessages } from "next-vibe/agent/chat/db";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -24,15 +26,12 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { AwaitTaskT } from "next-vibe/execute-tool/await-task/i18n";
+import { REVIVAL_ALIAS as RESUME_STREAM_ALIAS } from "next-vibe/execute-tool/revival/definition";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { cronTaskExecutions, cronTasks } from "next-vibe/tasks/cron/db";
 import { CronTaskStatus, type CronTaskStatusValue } from "next-vibe/tasks/enum";
-
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
-import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
-import { REVIVAL_ALIAS as RESUME_STREAM_ALIAS } from "@/app/api/[locale]/system/execute-tool/revival/definition";
 
 import { CallbackMode } from "../constants";
 import { TaskCompletion } from "../repository/completion";

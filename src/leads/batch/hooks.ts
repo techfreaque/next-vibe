@@ -16,7 +16,7 @@ import type { EndpointReturn } from "next-vibe/platforms/react/hooks/endpoint-ty
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { useCallback, useEffect, useState } from "react";
 
-import { useLogger } from "@/hooks/use-logger";
+import { useLogger } from "@/_old/hooks/use-logger";
 
 import type { LeadListGetRequestTypeOutput } from "../list/definition";
 import definitions, { type BatchOperationScope } from "./definition";

@@ -8,7 +8,7 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/analytics/evaluators/crossover/route"),
+      () => import("@/analytics/evaluators/crossover/route"),
     ),
   },
 });

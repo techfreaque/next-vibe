@@ -22,23 +22,23 @@ import { existsSync, readFileSync } from "node:fs";
 
 import { and, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
+import { rootlessStreamContext } from "next-vibe/agent/chat/config";
+import { ThreadStreamingState } from "next-vibe/agent/chat/enum";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import * as userSchema from "next-vibe/identity/user/db";
 import { createEndpointLogger } from "next-vibe/logger/server";
-import { Pool } from "pg";
-import { describe, expect, it } from "vitest";
-
-import { rootlessStreamContext } from "@/app/api/[locale]/agent/chat/config";
-import { ThreadStreamingState } from "@/app/api/[locale]/agent/chat/enum";
-import * as remoteConnectionSchema from "@/app/api/[locale]/remote-connection/db";
+import * as remoteConnectionSchema from "next-vibe/remote-connection/db";
 import {
   remoteConnections,
   type SyncScope,
-} from "@/app/api/[locale]/remote-connection/db";
-import { RemoteTransport } from "@/app/api/[locale]/remote-connection/transport";
-import { env } from "@/config/env";
+} from "next-vibe/remote-connection/db";
+import { RemoteTransport } from "next-vibe/remote-connection/transport";
+import { Pool } from "pg";
+import { describe, expect, it } from "vitest";
+
+import { env } from "@/_old/config/env";
 
 import * as fixtureSchema from "./fixtures.db";
 
@@ -384,9 +384,8 @@ export async function ensureRemoteUserCredits(
 ): Promise<void> {
   const { sendTestRequest } =
     await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
-  const adminAddDefinitions = (
-    await import("@/app/api/[locale]/credits/admin-add/definition")
-  ).default;
+  const adminAddDefinitions = (await import("@/credits/admin-add/definition"))
+    .default;
   const adminUser = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
   if (!adminUser) {
     // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
@@ -471,7 +470,7 @@ export async function connectToHermes(
   // Connect via the real connect endpoint — exactly the user/UI flow: log into
   // hermes with email+password, register both sides, sync capabilities.
   const connectDef = (
-    await import("@/app/api/[locale]/remote-connection/connect/definition")
+    await import("next-vibe/remote-connection/connect/definition")
   ).default;
   const result = await sendTestRequest({
     streamContext: rootlessStreamContext(),
@@ -503,7 +502,7 @@ export async function connectToHermes(
   // connection PATCH endpoint. Lock in relay settings: local client provides
   // system prompt + tools; remote runs the AI loop; threads mirrored on both sides.
   const connByIdDef = (
-    await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
+    await import("next-vibe/remote-connection/[instanceId]/definition")
   ).default;
   const patchResult = await sendTestRequest({
     streamContext: rootlessStreamContext(),
@@ -630,7 +629,7 @@ export async function connectToHermesLocalAi(
   const { sendTestRequest } =
     await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
   const connByIdDef = (
-    await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
+    await import("next-vibe/remote-connection/[instanceId]/definition")
   ).default;
 
   // Set atlas's send leg to reverse-ws: atlas hub-publishes to hermes, which
@@ -674,7 +673,7 @@ async function waitForHermesConnectorReady(
   const { sendTestRequest } =
     await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
   const connByIdDef = (
-    await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
+    await import("next-vibe/remote-connection/[instanceId]/definition")
   ).default;
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
@@ -727,9 +726,8 @@ export async function disconnectFromHermes(_userId: string): Promise<void> {
   if (!adminUser) {
     return;
   }
-  const listDef = (
-    await import("@/app/api/[locale]/remote-connection/list/definition")
-  ).default;
+  const listDef = (await import("next-vibe/remote-connection/list/definition"))
+    .default;
   const listResult = await sendTestRequest({
     streamContext: rootlessStreamContext(),
     endpoint: listDef.GET,
@@ -740,7 +738,7 @@ export async function disconnectFromHermes(_userId: string): Promise<void> {
     return;
   }
   const connByIdDef = (
-    await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
+    await import("next-vibe/remote-connection/[instanceId]/definition")
   ).default;
   for (const conn of listResult.data.connections) {
     if (conn.instanceId.startsWith("hermes")) {
@@ -768,9 +766,8 @@ export async function normalizeHermesSyncScope(): Promise<void> {
   if (!adminUser) {
     return;
   }
-  const listDef = (
-    await import("@/app/api/[locale]/remote-connection/list/definition")
-  ).default;
+  const listDef = (await import("next-vibe/remote-connection/list/definition"))
+    .default;
   const listResult = await sendTestRequest({
     streamContext: rootlessStreamContext(),
     endpoint: listDef.GET,
@@ -781,7 +778,7 @@ export async function normalizeHermesSyncScope(): Promise<void> {
     return;
   }
   const connByIdDef = (
-    await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
+    await import("next-vibe/remote-connection/[instanceId]/definition")
   ).default;
   for (const conn of listResult.data.connections) {
     if (conn.instanceId.startsWith("hermes")) {
@@ -826,11 +823,10 @@ export async function unregisterDevFromHermes(
   if (!adminUser) {
     return;
   }
-  const listDef = (
-    await import("@/app/api/[locale]/remote-connection/list/definition")
-  ).default;
+  const listDef = (await import("next-vibe/remote-connection/list/definition"))
+    .default;
   const connByIdDef = (
-    await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
+    await import("next-vibe/remote-connection/[instanceId]/definition")
   ).default;
   try {
     const listResult = await sendTestRequest({
@@ -884,7 +880,7 @@ export async function restoreHermesIdentity(
 ): Promise<void> {
   const token = await resolveProdAdminToken(remoteUrl);
   const selfRenameDef = (
-    await import("@/app/api/[locale]/remote-connection/self/rename/definition")
+    await import("next-vibe/remote-connection/self/rename/definition")
   ).default;
   const { response: resp, status: respStatus } =
     await RemoteTransport.callEndpointDirect({
@@ -916,7 +912,7 @@ export async function restoreAtlasIdentity(): Promise<void> {
   const { sendTestRequest } =
     await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
   const selfRenameDef = (
-    await import("@/app/api/[locale]/remote-connection/self/rename/definition")
+    await import("next-vibe/remote-connection/self/rename/definition")
   ).default;
   const adminUser = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
   if (!adminUser) {
@@ -954,7 +950,7 @@ async function triggerHermesReconnect(): Promise<void> {
   const { sendTestRequest } =
     await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
   const connByIdDef = (
-    await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
+    await import("next-vibe/remote-connection/[instanceId]/definition")
   ).default;
   const adminUser = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
   if (!adminUser) {
@@ -1095,9 +1091,7 @@ export async function resolveProdAdminToken(
   // pre-handler {"unhandled":true} 500 before the login handler even runs —
   // side-effect-free, so a short bounded retry rides over the flake instead
   // of failing the whole suite in beforeAll.
-  const loginDef = (
-    await import("@/app/api/[locale]/user/public/login/definition")
-  ).default;
+  const loginDef = (await import("@/user/public/login/definition")).default;
   let lastFailure = "";
   for (let attempt = 1; attempt <= 4; attempt++) {
     if (attempt > 1) {
@@ -1463,7 +1457,7 @@ export async function assertCronTaskCompleted(threadId: string): Promise<void> {
  * Assert that a thread is in idle state (not stuck in streaming/waiting).
  */
 export async function assertThreadIdle(threadId: string): Promise<void> {
-  const { chatThreads } = await import("@/app/api/[locale]/agent/chat/db");
+  const { chatThreads } = await import("next-vibe/agent/chat/db");
 
   const [thread] = await db
     .select({

@@ -10,9 +10,9 @@ import { Div } from "next-vibe/ui/ui/div";
 import { P } from "next-vibe/ui/ui/typography";
 import type React from "react";
 
-import { scopedTranslation } from "@/app/[locale]/track/i18n";
-import trackingEndpoints from "@/app/api/[locale]/leads/tracking/definition";
-import { useLogger } from "@/hooks/use-logger";
+import { useLogger } from "@/_old/hooks/use-logger";
+import { scopedTranslation } from "@/_pages/track/i18n";
+import trackingEndpoints from "@/leads/tracking/definition";
 
 /**
  * Tracking Page - Records click engagement and handles referral codes

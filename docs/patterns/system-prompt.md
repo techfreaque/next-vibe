@@ -44,7 +44,7 @@ interface SystemPromptFragment<TData> {
 ```typescript
 // agent/chat/favorites/system-prompt/prompt.ts
 
-import type { SystemPromptFragment } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
+import type { SystemPromptFragment } from "next-vibe/agent/ai-stream/repository/system-prompt/types";
 
 // 1. Define the data type this fragment needs
 export interface FavoritesData {
@@ -81,7 +81,7 @@ export const favoritesFragment: SystemPromptFragment<FavoritesData> = {
 
 import "server-only";
 
-import type { SystemPromptServerParams } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
+import type { SystemPromptServerParams } from "next-vibe/agent/ai-stream/repository/system-prompt/types";
 import type { FavoritesData } from "./prompt";
 
 export async function loadFavoritesData(
@@ -115,7 +115,7 @@ export async function loadFavoritesData(
 ```typescript
 // agent/chat/favorites/system-prompt/client.ts
 
-import type { SystemPromptClientParams } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
+import type { SystemPromptClientParams } from "next-vibe/agent/ai-stream/repository/system-prompt/types";
 import { useChatFavorites } from "../hooks";
 import type { FavoritesData } from "./prompt";
 

@@ -43,10 +43,10 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
-import { NO_SKILL_ID } from "@/app/api/[locale]/agent/skills/constants";
-import { env } from "@/config/env";
+import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import { ChatMessageRole } from "next-vibe/agent/chat/enum";
+import { NO_SKILL_ID } from "next-vibe/agent/skills/constants";
+import { env } from "@/_old/config/env";
 
 import { DEFAULT_CHAT_MODEL_ID } from "../../constants";
 import { AiStreamRepository } from "../../repository";

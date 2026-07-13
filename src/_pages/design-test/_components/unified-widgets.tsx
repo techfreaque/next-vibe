@@ -60,7 +60,7 @@ import { Code, H2, H3, Muted, P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 import { useState } from "react";
 
-const WIDGET_BASE = "src/app/api/[locale]/system/unified-ui";
+const WIDGET_BASE = "src/vibe/unified-ui";
 
 function WidgetCard({
   name,

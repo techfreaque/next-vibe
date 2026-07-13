@@ -591,9 +591,9 @@ export class SystemSettingsRepository {
     const { email, password, remoteUrl, syncScope } = data;
 
     const { RemoteConnectionConnectRepository } =
-      await import("@/app/api/[locale]/remote-connection/connect/repository");
+      await import("next-vibe/remote-connection/connect/repository");
     const { scopedTranslation: connectScopedTranslation } =
-      await import("@/app/api/[locale]/remote-connection/connect/i18n");
+      await import("next-vibe/remote-connection/connect/i18n");
     const { t: connectT } = connectScopedTranslation.scopedT(locale);
 
     const result = await RemoteConnectionConnectRepository.connectRemote(

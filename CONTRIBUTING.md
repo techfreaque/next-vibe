@@ -223,7 +223,7 @@ Your PR will be reviewed for:
 
 By contributing, you agree that your contributions will be licensed under:
 
-- **GPL-3.0** for framework core (`src/app/api/[locale]/` and `src/packages/`)
+- **GPL-3.0** for framework core (`src/vibe/` and `src/packages/`)
 - **MIT** for everything else
 
 See [LICENSE](LICENSE) for details.

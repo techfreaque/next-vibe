@@ -61,8 +61,7 @@ const { GET } = createEndpoint({
         description: "companyId.description" as const,
         schema: z.string().uuid().optional(),
         listEndpoint: async () =>
-          (await import("@/app/api/[locale]/companies/list/definition")).default
-            .GET,
+          (await import("@/companies/list/definition")).default.GET,
         labelField: "name",
       }),
 
@@ -85,8 +84,7 @@ const { GET } = createEndpoint({
         columns: 6,
         schema: z.string().uuid().optional(),
         listEndpoint: async () =>
-          (await import("@/app/api/[locale]/users/list/definition")).default
-            .GET,
+          (await import("@/users/list/definition")).default.GET,
         labelField: "privateName",
       }),
 

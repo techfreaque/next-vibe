@@ -24,7 +24,7 @@ export const translations: typeof enTranslations = {
       "definition.ts → web · cli · mcp · native · cron · 10 weitere",
     theaCardTitle: "Wer ist Thea?",
     allowedRolesLabel: "allowedRoles: [...]",
-    fileTreePath: "~/src/app/api/explain-to-my-boss/",
+    fileTreePath: "~/src/explain-to-my-boss/",
     codeBlockLabel: "allowedRoles: [",
     closingBracket: "]",
     vibeCliCommand:

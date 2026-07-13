@@ -8,7 +8,7 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/agent/speech-to-text/hotkey/route"),
+      () => import("next-vibe/agent/speech-to-text/hotkey/route"),
     ),
   },
 });

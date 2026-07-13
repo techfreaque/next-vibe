@@ -4,6 +4,8 @@
  * Mirrors server repository structure but runs in browser
  */
 
+import skillSingleDefinition from "next-vibe/agent/skills/[id]/definition";
+import { DEFAULT_TTS_VOICE_ID } from "next-vibe/agent/text-to-speech/constants";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -18,9 +20,6 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { executeQuery } from "next-vibe/platforms/react/hooks/query-executor";
 import { getLocalItem, storage } from "next-vibe/ui/lib/storage";
 import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
-
-import skillSingleDefinition from "@/app/api/[locale]/agent/skills/[id]/definition";
-import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 
 import type { ChatModelSelection } from "../../ai-stream/models";
 import { STORAGE_KEYS } from "../../chat/constants";

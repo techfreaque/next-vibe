@@ -34,7 +34,7 @@ import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field
 import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
 import React, { useCallback, useMemo } from "react";
 
-import { scopedTranslation as messagesScopedTranslation } from "@/app/api/[locale]/messenger/messages/i18n";
+import { scopedTranslation as messagesScopedTranslation } from "@/messenger/messages/i18n";
 
 import type { MessengerChannelFilterValue } from "../../accounts/enum";
 import {

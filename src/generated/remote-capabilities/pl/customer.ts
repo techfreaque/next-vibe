@@ -7,7 +7,7 @@
  * entries: 99
  */
 
-import type { RemoteToolCapability } from "@/app/api/[locale]/remote-connection/db";
+import type { RemoteToolCapability } from "next-vibe/remote-connection/db";
 
 export const remoteCapabilities: RemoteToolCapability[] = [
   {

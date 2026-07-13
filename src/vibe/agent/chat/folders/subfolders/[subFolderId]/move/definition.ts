@@ -7,6 +7,7 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import {
   backButton,
   customWidgetObject,
@@ -16,8 +17,6 @@ import {
   submitButton,
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
-
-import { lazyWidget } from "@/app/api/[locale]/system/unified-ui/_shared/lazy-widget";
 
 import { scopedTranslation } from "./i18n";
 

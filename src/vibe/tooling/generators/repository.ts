@@ -5,7 +5,7 @@
  * skip flags to per-generator enable/opt-out overrides, runs the orchestrator, and
  * shapes the response.
  *
- * BOOTSTRAP FALLBACK: `bun src/app/api/[locale]/system/tooling/generators/repository.ts`
+ * BOOTSTRAP FALLBACK: `bun src/vibe/tooling/generators/repository.ts`
  * runs the full generation from scratch — even with zero generated files or a broken
  * CLI. The `import.meta.main` block below calls `runGenerators` directly (source-only,
  * never importing `src/generated/*`), so it always works to regenerate the codebase.

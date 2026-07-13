@@ -8,6 +8,7 @@
 
 "use client";
 
+import cortexListDefinitions from "next-vibe/agent/cortex/list/definition";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import {
   useSearchParams,
@@ -59,8 +60,7 @@ import {
   useState,
 } from "react";
 
-import cortexListDefinitions from "@/app/api/[locale]/agent/cortex/list/definition";
-import connectionsListDefinitions from "@/app/api/[locale]/ssh/connections/list/definition";
+import connectionsListDefinitions from "@/ssh/connections/list/definition";
 
 import type endpoints from "./definition";
 
@@ -490,8 +490,7 @@ export function CortexExecWidget(_props: {
   const handleNavConnections = (e: ButtonMouseEvent): void => {
     e.stopPropagation();
     void (async (): Promise<void> => {
-      const def =
-        await import("@/app/api/[locale]/ssh/connections/list/definition");
+      const def = await import("@/ssh/connections/list/definition");
       navigate(def.default.GET, {});
     })();
   };
@@ -499,8 +498,7 @@ export function CortexExecWidget(_props: {
   const handleNavTerminals = (e: ButtonMouseEvent): void => {
     e.stopPropagation();
     void (async (): Promise<void> => {
-      const def =
-        await import("@/app/api/[locale]/agent/cortex/terminals/definition");
+      const def = await import("next-vibe/agent/cortex/terminals/definition");
       navigate(def.default.GET, {});
     })();
   };

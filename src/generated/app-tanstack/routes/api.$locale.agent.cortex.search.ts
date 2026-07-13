@@ -6,7 +6,7 @@ import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 export const Route = createFileRoute("/api/$locale/agent/cortex/search")({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/agent/cortex/search/route"),
+      () => import("next-vibe/agent/cortex/search/route"),
     ),
   },
 });

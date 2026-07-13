@@ -25,14 +25,14 @@ export type TranslatedKeyType = "createScopedTranslation-key";
  * @returns A simpleT function that works only with the provided translations
  *
  * @example
- * // In src/app/api/[locale]/sms/i18n/index.ts
+ * // In src/sms/i18n/index.ts
  * import { createScopedTranslation } from "./scoped-translation";
- * import { translations as enTranslations } from "next-vibe/ui/ui/icons/src/app/api/[locale]/system/generated/endpoints/meta/en";
+ * import { translations as enTranslations } from "next-vibe/ui/ui/icons/src/vibe/generated/endpoints/meta/en";
  *
  * export const simpleT = createScopedTranslation({
  *   en: enTranslations,
- *   de: () => require("next-vibe/ui/ui/icons/src/app/api/[locale]/system/generated/endpoints/meta/de").translations,  // lazy - loaded on first DE request
- *   pl: () => require("next-vibe/ui/ui/icons/src/app/api/[locale]/system/generated/endpoints/meta/pl").translations,  // lazy - loaded on first PL request
+ *   de: () => require("next-vibe/ui/ui/icons/src/vibe/generated/endpoints/meta/de").translations,  // lazy - loaded on first DE request
+ *   pl: () => require("next-vibe/ui/ui/icons/src/vibe/generated/endpoints/meta/pl").translations,  // lazy - loaded on first PL request
  * });
  *
  * // Usage:

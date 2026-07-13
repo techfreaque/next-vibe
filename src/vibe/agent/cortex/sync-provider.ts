@@ -4,16 +4,15 @@ import { and, asc, eq, inArray, or, sql } from "drizzle-orm";
 import { WidgetDataSchema } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
-import { z } from "zod";
-
 import type {
   StandardSyncCursor,
   SyncDomain,
-} from "@/app/api/[locale]/remote-connection/db";
+} from "next-vibe/remote-connection/db";
 import {
   type SyncProvider,
   toStandardCursor,
-} from "@/app/api/[locale]/remote-connection/sync/provider";
+} from "next-vibe/remote-connection/sync/provider";
+import { z } from "zod";
 
 import { cortexNodes } from "./db";
 import { CortexNodeType, CortexSyncPolicy } from "./enum";

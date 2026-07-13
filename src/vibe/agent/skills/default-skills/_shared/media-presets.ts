@@ -17,18 +17,18 @@
  *   sttModelSelection: STT.cheap
  */
 
-import type { AudioVisionModelSelection } from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import { AudioVisionModelId } from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
-import { ImageGenModelId } from "@/app/api/[locale]/agent/image-generation/models";
-import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-generation/models";
-import { MusicGenModelId } from "@/app/api/[locale]/agent/music-generation/models";
-import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
-import { SttModelId } from "@/app/api/[locale]/agent/speech-to-text/models";
-import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
-import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/video-generation/models";
-import { VideoGenModelId } from "@/app/api/[locale]/agent/video-generation/models";
+import type { AudioVisionModelSelection } from "next-vibe/agent/ai-stream/vision-models";
+import { AudioVisionModelId } from "next-vibe/agent/ai-stream/vision-models";
+import type { ImageGenModelSelection } from "next-vibe/agent/image-generation/models";
+import { ImageGenModelId } from "next-vibe/agent/image-generation/models";
+import type { MusicGenModelSelection } from "next-vibe/agent/music-generation/models";
+import { MusicGenModelId } from "next-vibe/agent/music-generation/models";
+import type { SttModelSelection } from "next-vibe/agent/speech-to-text/models";
+import { SttModelId } from "next-vibe/agent/speech-to-text/models";
+import type { VoiceModelSelection } from "next-vibe/agent/text-to-speech/models";
+import { TtsModelId } from "next-vibe/agent/text-to-speech/models";
+import type { VideoGenModelSelection } from "next-vibe/agent/video-generation/models";
+import { VideoGenModelId } from "next-vibe/agent/video-generation/models";
 
 import {
   ContentLevel,

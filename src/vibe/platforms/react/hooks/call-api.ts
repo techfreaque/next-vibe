@@ -1,3 +1,4 @@
+import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
 import { validateData } from "next-vibe/core/core-utils/validation";
 import { type CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { Methods } from "next-vibe/core/definition/enums";
@@ -17,13 +18,12 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { scopedTranslation as hooksTranslation } from "next-vibe/platforms/react/hooks/i18n";
 import { getCookie } from "next-vibe/ui/lib/cookies";
 
-import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import {
   BEARER_LEAD_ID_SEPARATOR,
   CSRF_TOKEN_COOKIE_NAME,
   CSRF_TOKEN_HEADER_NAME,
-} from "@/config/constants";
-import { envClient, platform } from "@/config/env-client";
+} from "@/_old/config/constants";
+import { envClient, platform } from "@/_old/config/env-client";
 
 import { containsFile, objectToFormData } from "./api-utils-shared";
 

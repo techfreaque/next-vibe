@@ -28,14 +28,14 @@ import {
 } from "next-vibe/tooling/check/shared/filter-utils";
 import type { TypecheckResponseOutput } from "next-vibe/tooling/check/typecheck/definition";
 import { scopedTranslation as typecheckScopedTranslation } from "next-vibe/tooling/check/typecheck/i18n";
+import { TsgoDaemon } from "next-vibe/tooling/check/typecheck/lsp-daemon";
 import { TypecheckRepository } from "next-vibe/tooling/check/typecheck/repository";
 import type {
   CheckVibeCheckT,
   CheckVibeCheckTranslationKey,
 } from "next-vibe/tooling/check/vibe-check/i18n";
 
-import { TsgoDaemon } from "@/app/api/[locale]/system/tooling/check/typecheck/lsp-daemon";
-import { env } from "@/config/env";
+import { env } from "@/_old/config/env";
 
 import type {
   VibeCheckRequestOutput,

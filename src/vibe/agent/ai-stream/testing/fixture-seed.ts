@@ -13,12 +13,11 @@
 
 import "server-only";
 
-import { db } from "next-vibe/database";
-
 import {
   makeHeadlessContext,
   type ToolExecutionContext,
-} from "@/app/api/[locale]/agent/chat/config";
+} from "next-vibe/agent/chat/config";
+import { db } from "next-vibe/database";
 
 import { fixtures } from "./fixtures.db";
 

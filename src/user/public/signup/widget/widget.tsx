@@ -27,12 +27,12 @@ import { Link } from "next-vibe/ui/ui/link";
 import { Span } from "next-vibe/ui/ui/span";
 import { useEffect, useMemo, useState } from "react";
 
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import skillSingleDefinition from "@/app/api/[locale]/agent/skills/[id]/definition";
-import { ChatFavoritesRepositoryClient } from "@/app/api/[locale]/agent/skills/favorites/repository-client";
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
+import skillSingleDefinition from "next-vibe/agent/skills/[id]/definition";
+import { ChatFavoritesRepositoryClient } from "next-vibe/agent/skills/favorites/repository-client";
 import leadCurrentReferralDefinition, {
   type LeadCurrentReferralGetResponseOutput,
-} from "@/app/api/[locale]/referral/lead/current/definition";
+} from "@/referral/lead/current/definition";
 import { executeQuery } from "next-vibe/platforms/react/hooks/query-executor";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";

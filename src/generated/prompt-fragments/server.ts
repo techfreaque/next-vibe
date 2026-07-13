@@ -28,27 +28,27 @@ import {
   subAgentGuardFragment,
   toolExecutionControlFragment,
   userNameFragment,
-} from "@/app/api/[locale]/agent/ai-stream/system-prompt/system-prompt";
-import type { SystemPromptServerParams } from "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
-import { codingAgentSettingFragment } from "@/app/api/[locale]/agent/chat/settings/system-prompt";
-import { threadRenameFragment } from "@/app/api/[locale]/agent/chat/threads/rename/system-prompt";
-import { cortexFragment } from "@/app/api/[locale]/agent/cortex/system-prompt";
-import { favoritesFragment } from "@/app/api/[locale]/agent/skills/favorites/system-prompt";
-import { skillFragment } from "@/app/api/[locale]/agent/skills/system-prompt";
-import { webFragment } from "@/app/api/[locale]/agent/web-search/system-prompt";
-import { contactFragment } from "@/app/api/[locale]/contact/system-prompt";
-import { desktopFragment } from "@/app/api/[locale]/desktop/system-prompt";
-import { loadRemoteInstancesContext } from "@/app/api/[locale]/remote-connection/system-prompt";
+} from "next-vibe/agent/ai-stream/system-prompt/system-prompt";
+import type { SystemPromptServerParams } from "next-vibe/agent/ai-stream/system-prompt/types";
+import { codingAgentSettingFragment } from "next-vibe/agent/chat/settings/system-prompt";
+import { threadRenameFragment } from "next-vibe/agent/chat/threads/rename/system-prompt";
+import { cortexFragment } from "next-vibe/agent/cortex/system-prompt";
+import { favoritesFragment } from "next-vibe/agent/skills/favorites/system-prompt";
+import { skillFragment } from "next-vibe/agent/skills/system-prompt";
+import { webFragment } from "next-vibe/agent/web-search/system-prompt";
+import { contactFragment } from "@/contact/system-prompt";
+import { desktopFragment } from "@/desktop/system-prompt";
+import { loadRemoteInstancesContext } from "next-vibe/remote-connection/system-prompt";
 import {
   remoteInstancesFragment,
   sshConnectionsFragment,
   systemContextFragment,
-} from "@/app/api/[locale]/remote-connection/system-prompt";
+} from "next-vibe/remote-connection/system-prompt";
 
-import { cortexNodes } from "@/app/api/[locale]/agent/cortex/db";
-import { CortexNodeType } from "@/app/api/[locale]/agent/cortex/enum";
-import { MEMORIES_PREFIX } from "@/app/api/[locale]/agent/cortex/repository";
-import { scopedTranslation as chatScopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
+import { cortexNodes } from "next-vibe/agent/cortex/db";
+import { CortexNodeType } from "next-vibe/agent/cortex/enum";
+import { MEMORIES_PREFIX } from "next-vibe/agent/cortex/repository";
+import { scopedTranslation as chatScopedTranslation } from "next-vibe/agent/chat/i18n";
 
 /**
  * Combined server loader - pre-fetches shared data, then runs all fragment

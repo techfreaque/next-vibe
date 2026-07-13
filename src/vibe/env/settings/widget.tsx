@@ -4,6 +4,7 @@
  */
 
 "use client";
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import { cn } from "next-vibe/core/utils/utils";
 import exportEnvEndpoints from "next-vibe/env/settings/export-env/definition";
 import { ServerFramework } from "next-vibe/server/server/enum";
@@ -43,8 +44,6 @@ import {
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useState } from "react";
-
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 
 import type endpoints from "./definition";
 

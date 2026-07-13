@@ -20,7 +20,7 @@ import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/wid
 import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import { type JSX, useState } from "react";
 
-import productLookupEndpoint from "@/app/api/[locale]/pos/product-lookup/definition";
+import productLookupEndpoint from "@/pos/product-lookup/definition";
 
 import type definition from "./definition";
 

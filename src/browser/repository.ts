@@ -22,6 +22,7 @@ import { spawn } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
+import { getStorageAdapter } from "next-vibe/agent/chat/storage/index";
 import type { Platform } from "next-vibe/core/definition/platform";
 import { isCliPlatform } from "next-vibe/core/definition/platform";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -36,8 +37,7 @@ import {
 import type { WidgetData } from "next-vibe/core/utils/json";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage/index";
-import { env } from "@/config/env";
+import { env } from "@/_old/config/env";
 
 import { CHROME_REMOTE_DEBUG_PORT, getChromeMCPConfig } from "./config";
 import { BrowserTool, BrowserToolStatus } from "./enum";

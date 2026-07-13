@@ -1,6 +1,8 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
+import { chatFolders } from "next-vibe/agent/chat/db";
+import { canManageFolderPermissions } from "next-vibe/agent/chat/permissions/permissions";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -12,9 +14,6 @@ import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { UserRoleDB } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { chatFolders } from "@/app/api/[locale]/agent/chat/db";
-import { canManageFolderPermissions } from "@/app/api/[locale]/agent/chat/permissions/permissions";
 
 import type {
   FolderPermissionsGetResponseOutput,

@@ -21,7 +21,7 @@ import type {
   EmailRenderSkip,
   EmailResolvedData,
   ScopedTResult,
-} from "@/app/api/[locale]/messenger/registry/template";
+} from "@/messenger/registry/template";
 
 export type { EmailRenderProps, EmailRenderSkip, EmailResolvedData };
 

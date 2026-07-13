@@ -11,7 +11,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
 
-import { lazyWidget } from "../../system/unified-ui/_shared/lazy-widget";
+import { lazyWidget } from "../../vibe/unified-ui/_shared/lazy-widget";
 import { scopedTranslation } from "./i18n";
 
 const LeadMagnetCapturesWidget = lazyWidget(() =>

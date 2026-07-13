@@ -40,9 +40,9 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { cortexNodes } from "@/app/api/[locale]/agent/cortex/db";
-import { CortexNodeType } from "@/app/api/[locale]/agent/cortex/enum";
-import { env } from "@/config/env";
+import { cortexNodes } from "next-vibe/agent/cortex/db";
+import { CortexNodeType } from "next-vibe/agent/cortex/enum";
+import { env } from "@/_old/config/env";
 
 import {
   ATLAS_INSTANCE_ID,
@@ -981,7 +981,7 @@ if (_remoteUrl) {
 
         // SP5: the skill must NOT appear on atlas (syncScope.skills=false)
         const { customSkills } =
-          await import("@/app/api/[locale]/agent/skills/db");
+          await import("next-vibe/agent/skills/db");
         const localRows = await db
           .select({ slug: customSkills.slug })
           .from(customSkills)
@@ -1057,7 +1057,7 @@ if (_remoteUrl) {
 
         // Poll atlas DB until the skill arrives (or 15s timeout)
         const { customSkills } =
-          await import("@/app/api/[locale]/agent/skills/db");
+          await import("next-vibe/agent/skills/db");
 
         const arrivedRow = await pollUntil(
           "SP5b: skill must arrive on atlas when syncScope.skills=true",

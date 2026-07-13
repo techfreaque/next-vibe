@@ -12,6 +12,7 @@
 
 "use client";
 
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import { Methods } from "next-vibe/core/definition/enums";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { apiClient } from "next-vibe/platforms/react/hooks/store";
@@ -64,8 +65,6 @@ import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPag
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
-
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 
 import connectDefinitions from "../connect/definition";
 import type { SyncScope } from "../db";
@@ -489,8 +488,7 @@ function ViewWidget({
   const handleOpenCortex = (e: ButtonMouseEvent): void => {
     e.stopPropagation();
     void (async (): Promise<void> => {
-      const defs =
-        await import("@/app/api/[locale]/agent/cortex/list/definition");
+      const defs = await import("next-vibe/agent/cortex/list/definition");
       navigate(defs.default.GET, {});
     })();
   };
@@ -498,8 +496,7 @@ function ViewWidget({
   const handleOpenTerminals = (e: ButtonMouseEvent): void => {
     e.stopPropagation();
     void (async (): Promise<void> => {
-      const defs =
-        await import("@/app/api/[locale]/agent/cortex/terminals/definition");
+      const defs = await import("next-vibe/agent/cortex/terminals/definition");
       navigate(defs.default.GET, {});
     })();
   };

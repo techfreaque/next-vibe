@@ -3,19 +3,18 @@
  * ALL three operations work identically - they create a new user message and stream AI response
  */
 
+import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import type { ChatMessage } from "next-vibe/agent/chat/db";
+import { ChatMessageRole } from "next-vibe/agent/chat/enum";
+import { upsertMessage } from "next-vibe/agent/chat/threads/[threadId]/messages/hooks/update-messages";
+import { ModelSelectionType } from "next-vibe/agent/skills/enum";
+import type { FavoriteConfig } from "next-vibe/agent/skills/favorites/db";
+import { DEFAULT_TTS_VOICE_ID } from "next-vibe/agent/text-to-speech/constants";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
-import { upsertMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/update-messages";
-import { ModelSelectionType } from "@/app/api/[locale]/agent/skills/enum";
-import type { FavoriteConfig } from "@/app/api/[locale]/agent/skills/favorites/db";
-import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 
 import type { UseAIStreamReturn } from "./use-ai-stream";
 
@@ -110,7 +109,7 @@ export async function createAndSendUserMessage(
     ) {
       // Load incognito thread messages and walk up parent chain
       const { getMessagesForThread } =
-        await import("@/app/api/[locale]/agent/chat/incognito/storage");
+        await import("next-vibe/agent/chat/incognito/storage");
       const threadMessages = await getMessagesForThread(threadId);
 
       // Walk up parent chain to get only messages in this branch
@@ -138,7 +137,7 @@ export async function createAndSendUserMessage(
     let incognitoThreadDescription: string | null = null;
     if (currentRootFolderId === DefaultFolderId.INCOGNITO && threadId) {
       const { getIncognitoThread } =
-        await import("@/app/api/[locale]/agent/chat/incognito/storage");
+        await import("next-vibe/agent/chat/incognito/storage");
       const incognitoThread = await getIncognitoThread(threadId);
       incognitoThreadTitle = incognitoThread?.title ?? null;
       incognitoThreadDescription = incognitoThread?.description ?? null;
@@ -156,7 +155,7 @@ export async function createAndSendUserMessage(
           // In incognito mode files are never uploaded to server - convert to base64
           // immediately so the attachment data survives localStorage persistence.
           const { convertFilesToIncognitoAttachments } =
-            await import("@/app/api/[locale]/agent/chat/incognito/file-utils");
+            await import("next-vibe/agent/chat/incognito/file-utils");
           const incognitoAttachments =
             await convertFilesToIncognitoAttachments(attachments);
           messageMetadata = {

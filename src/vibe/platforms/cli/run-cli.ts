@@ -44,8 +44,8 @@ import {
   type IDefinitionsRegistry,
 } from "next-vibe/platforms/definitions-registry";
 
-import { DEFAULT_PROJECT_URL } from "@/config/constants";
-import { env } from "@/config/env";
+import { DEFAULT_PROJECT_URL } from "@/_old/config/constants";
+import { env } from "@/_old/config/env";
 import { pathToAliasMap } from "@/generated/endpoints/alias-map";
 
 export const binaryStartTime = Date.now();
@@ -54,10 +54,10 @@ export const binaryStartTime = Date.now();
  * Attempt to resolve a file-system path to a canonical tool name.
  *
  * Accepts any of:
- *   src/app/api/[locale]/agent/models/openrouter/route.ts
- *   src/app/api/[locale]/agent/models/openrouter/definition.ts
- *   src/app/api/[locale]/agent/models/openrouter/repository.ts
- *   src/app/api/[locale]/agent/models/openrouter
+ *   src/vibe/agent/models/openrouter/route.ts
+ *   src/vibe/agent/models/openrouter/definition.ts
+ *   src/vibe/agent/models/openrouter/repository.ts
+ *   src/vibe/agent/models/openrouter
  *
  * Returns { canonical, alias } on success, null if not a path or not found.
  * Tries GET, POST, PUT, PATCH in that order.

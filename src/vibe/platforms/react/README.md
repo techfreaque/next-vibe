@@ -9,7 +9,7 @@ React integration provides type-safe hooks for calling API endpoints. Uses React
 ## Quick Start
 
 ```typescript
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
+import { useEndpoint } from "@/system/unified-interface/react/hooks/use-endpoint";
 import definitions from "./definition";
 
 function CreateUserForm() {
@@ -170,7 +170,7 @@ Optimistic updates can be implemented at the React Query level by accessing the 
 ```typescript
 // The useEndpoint hook internally uses React Query
 // For advanced use cases, use useApiMutation directly
-import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
+import { useApiMutation } from "@/system/unified-interface/react/hooks/use-api-mutation";
 
 const mutation = useApiMutation(definitions.POST, {
   onMutate: async (newData) => {

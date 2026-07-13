@@ -42,7 +42,7 @@ import { P } from "next-vibe/ui/ui/typography";
 import { PickerProvider } from "next-vibe/unified-ui/_shared/picker-context";
 import { useMemo, useState } from "react";
 
-import { useLogger } from "@/hooks/use-logger";
+import { useLogger } from "@/_old/hooks/use-logger";
 
 import { EndpointRenderer, type SubmitButtonConfig } from "./EndpointRenderer";
 

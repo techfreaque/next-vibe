@@ -27,6 +27,11 @@ import {
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import { TOUR_DATA_ATTRS } from "next-vibe/agent/ai-stream/stream/widget/chat-ui/welcome-tour/tour-attrs";
+import { parseSkillId } from "next-vibe/agent/chat/slugify";
+import { useTourState } from "next-vibe/agent/chat/tour-state";
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
+import { ModelCreditDisplay } from "next-vibe/agent/models/widget/model-credit-display";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { cn } from "next-vibe/core/utils/utils";
 import { apiClient } from "next-vibe/platforms/react/hooks/store";
@@ -68,12 +73,6 @@ import {
   type IconKey,
 } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import React, { useCallback, useMemo, useState } from "react";
-
-import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/ai-stream/stream/widget/chat-ui/welcome-tour/tour-attrs";
-import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
-import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 
 import { ChatSettingsRepositoryClient } from "../../chat/settings/repository-client";
 import { getTtsModelById } from "../../text-to-speech/models";

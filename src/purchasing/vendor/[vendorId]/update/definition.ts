@@ -57,8 +57,7 @@ const { PATCH } = createEndpoint({
         hidden: true,
         schema: z.uuid(),
         listEndpoint: async () =>
-          (await import("@/app/api/[locale]/purchasing/vendor/list/definition"))
-            .default.GET,
+          (await import("@/purchasing/vendor/list/definition")).default.GET,
         labelField: "name",
       }),
       name: requestField(scopedTranslation, {

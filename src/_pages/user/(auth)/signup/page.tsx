@@ -12,9 +12,9 @@ import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
 import { Link } from "next-vibe/ui/ui/link";
 import type { JSX } from "react";
 
-import { ReferralRepository } from "@/app/api/[locale]/referral/repository";
-import { envClient } from "@/config/env-client";
-import { configScopedTranslation } from "@/config/i18n";
+import { envClient } from "@/_old/config/env-client";
+import { configScopedTranslation } from "@/_old/config/i18n";
+import { ReferralRepository } from "@/referral/repository";
 
 import SignUpForm from "./_components/sign-up-form";
 import { scopedTranslation as pageT } from "./i18n";

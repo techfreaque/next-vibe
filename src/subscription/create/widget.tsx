@@ -1,5 +1,7 @@
 "use client";
 
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
+import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
@@ -50,23 +52,15 @@ import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/wid
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
-import adminAddDefinitions from "@/app/api/[locale]/credits/admin-add/definition";
-import { CreditsTabHeader } from "@/app/api/[locale]/credits/credits-tab-header";
-import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
-import publicCapDefinitions from "@/app/api/[locale]/credits/public-cap/definition";
-import { scopedTranslation as publicCapScopedTranslation } from "@/app/api/[locale]/credits/public-cap/i18n";
-import purchaseDefinitions from "@/app/api/[locale]/credits/purchase/definition";
-import { scopedTranslation as purchaseScopedTranslation } from "@/app/api/[locale]/credits/purchase/i18n";
-import {
-  PaymentProvider,
-  type PaymentProviderValue,
-} from "@/app/api/[locale]/payment/enum";
-import {
-  ProductIds,
-  productsRepository,
-} from "@/app/api/[locale]/products/platform-products";
+import adminAddDefinitions from "@/credits/admin-add/definition";
+import { CreditsTabHeader } from "@/credits/credits-tab-header";
+import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
+import publicCapDefinitions from "@/credits/public-cap/definition";
+import { scopedTranslation as publicCapScopedTranslation } from "@/credits/public-cap/i18n";
+import purchaseDefinitions from "@/credits/purchase/definition";
+import { scopedTranslation as purchaseScopedTranslation } from "@/credits/purchase/i18n";
+import { PaymentProvider, type PaymentProviderValue } from "@/payment/enum";
+import { ProductIds, productsRepository } from "@/products/platform-products";
 
 import { BillingInterval, SubscriptionPlan, SubscriptionStatus } from "../enum";
 import { useSubscription } from "../hooks";

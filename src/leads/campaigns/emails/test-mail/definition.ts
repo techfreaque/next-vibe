@@ -39,10 +39,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
 
-import {
-  CampaignType,
-  CampaignTypeOptions,
-} from "@/app/api/[locale]/messenger/accounts/enum";
+import { CampaignType, CampaignTypeOptions } from "@/messenger/accounts/enum";
 
 import { scopedTranslation } from "./i18n";
 

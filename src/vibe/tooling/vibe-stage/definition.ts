@@ -173,14 +173,10 @@ const { POST } = createEndpoint({
     },
     responses: {
       default: {
-        staged: ["src/app/api/[locale]/products/catalog/list/route.ts"],
-        partiallyStaged: [
-          "src/app/api/[locale]/products/catalog/list/definition.ts",
-        ],
+        staged: ["src/products/catalog/list/route.ts"],
+        partiallyStaged: ["src/products/catalog/list/definition.ts"],
         skipped: [],
-        renamed: [
-          "src/app/api/[locale]/products/old/route.ts -> src/app/api/[locale]/products/catalog/route.ts",
-        ],
+        renamed: ["src/products/old/route.ts -> src/products/catalog/route.ts"],
         deleted: ["src/generated/tanstack/products/old/route.ts"],
       },
     },

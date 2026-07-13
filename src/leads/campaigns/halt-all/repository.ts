@@ -18,7 +18,7 @@ import { emailCampaigns, leads } from "next-vibe/identity/lead/db";
 import { LeadStatus } from "next-vibe/identity/lead/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { MessageStatus } from "@/app/api/[locale]/messenger/messages/enum";
+import { MessageStatus } from "@/messenger/messages/enum";
 
 import type {
   HaltAllCampaignsPostRequestOutput,

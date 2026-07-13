@@ -14,7 +14,7 @@ import { useCallback, useMemo } from "react";
 import type {
   EndpointReturn,
   FormAlertState,
-} from "../../system/platforms/react/hooks/endpoint-types";
+} from "../../vibe/platforms/react/hooks/endpoint-types";
 import type { LeadsStatsResponseOutput } from "./definition";
 import definitions from "./definition";
 

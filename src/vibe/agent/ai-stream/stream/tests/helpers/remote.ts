@@ -14,15 +14,14 @@
 import "server-only";
 
 import { sql } from "drizzle-orm";
+import {
+  type DefaultFolderId,
+  rootlessStreamContext,
+} from "next-vibe/agent/chat/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { expect } from "vitest";
-
-import {
-  type DefaultFolderId,
-  rootlessStreamContext,
-} from "@/app/api/[locale]/agent/chat/config";
 
 /** Setup/teardown pair produced by the factories, plus getters for state resolved during setup. */
 export interface RemoteSuiteHooks {
@@ -113,7 +112,7 @@ function makeRemoteSetup(
         const { getOrCreateFolder } =
           await import("../../../testing/headless-test-runner");
         const { DefaultFolderId: FolderIds } =
-          await import("@/app/api/[locale]/agent/chat/config");
+          await import("next-vibe/agent/chat/config");
         // Build REMOTE/<instance>/private — the peer's own-thread landing lives
         // under `private` (mirror subtree segment). The base suite then nests
         // tests/<case> below this, so a case thread sits at
@@ -159,7 +158,7 @@ function makeRemoteSetup(
       // cause of lost message-created events at suite start.
       {
         const { isSyncSlotBusy } =
-          await import("@/app/api/[locale]/remote-connection/sync/repository");
+          await import("next-vibe/remote-connection/sync/repository");
         const syncKey = `${testUser.id}:${remoteSetup.HERMES_INSTANCE_ID}`;
         const settleStart = Date.now();
         let sawBusy = false;
@@ -313,10 +312,10 @@ export async function getOrCreateRemoteFolderChain(params: {
   const { sendTestRequest } =
     await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
   const listDef = (
-    await import("@/app/api/[locale]/agent/chat/folders/[rootFolderId]/definition")
+    await import("next-vibe/agent/chat/folders/[rootFolderId]/definition")
   ).default;
   const createDef = (
-    await import("@/app/api/[locale]/agent/chat/folders/[rootFolderId]/create/definition")
+    await import("next-vibe/agent/chat/folders/[rootFolderId]/create/definition")
   ).default;
   let parentId: string | null = null;
   for (const name of params.names) {

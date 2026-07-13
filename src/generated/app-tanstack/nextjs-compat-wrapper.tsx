@@ -15,4 +15,4 @@ export {
   runPageLoader,
   toNextParams,
   wrapNextApiRoute,
-} from "@/app/api/[locale]/system/platforms/tanstack-start/nextjs-compat-wrapper";
+} from "next-vibe/platforms/tanstack-start/nextjs-compat-wrapper";

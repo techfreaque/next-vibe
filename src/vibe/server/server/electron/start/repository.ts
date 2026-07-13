@@ -27,8 +27,7 @@ import type {
 } from "./definition";
 
 export class ElectronStartRepository {
-  private static readonly ELECTRON_DIR =
-    "src/app/api/[locale]/system/platforms/electron";
+  private static readonly ELECTRON_DIR = "src/vibe/platforms/electron";
   static async electronStartRepository(
     data: ElectronStartRequestOutput,
     logger: EndpointLogger,

@@ -6,6 +6,19 @@
 
 import "server-only";
 
+import type { HeadlessAiStreamResult } from "next-vibe/agent/ai-stream/repository/setup/setup";
+import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
+import {
+  DefaultFolderId,
+  rootlessStreamContext,
+} from "next-vibe/agent/chat/config";
+import type { ChatMessage, MessageMetadata } from "next-vibe/agent/chat/db";
+import {
+  ChatMessageRole,
+  ThreadStreamingState,
+} from "next-vibe/agent/chat/enum";
+import { NO_SKILL_ID } from "next-vibe/agent/skills/constants";
+import type { FavoriteConfig } from "next-vibe/agent/skills/favorites/db";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
@@ -17,23 +30,7 @@ import type {
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 
-import type { HeadlessAiStreamResult } from "@/app/api/[locale]/agent/ai-stream/repository/setup/setup";
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
-import {
-  DefaultFolderId,
-  rootlessStreamContext,
-} from "@/app/api/[locale]/agent/chat/config";
-import type {
-  ChatMessage,
-  MessageMetadata,
-} from "@/app/api/[locale]/agent/chat/db";
-import {
-  ChatMessageRole,
-  ThreadStreamingState,
-} from "@/app/api/[locale]/agent/chat/enum";
-import { NO_SKILL_ID } from "@/app/api/[locale]/agent/skills/constants";
-import type { FavoriteConfig } from "@/app/api/[locale]/agent/skills/favorites/db";
-import { env } from "@/config/env";
+import { env } from "@/_old/config/env";
 
 import type { ChatModelId } from "../models";
 
@@ -58,9 +55,7 @@ export async function resolveUserAndToken(
   password: string = env.VIBE_ADMIN_USER_PASSWORD,
 ): Promise<{ user: JwtPrivatePayloadType; token: string } | null> {
   const logger = createEndpointLogger(false, defaultLocale);
-  const loginDef = (
-    await import("@/app/api/[locale]/user/public/login/definition")
-  ).default;
+  const loginDef = (await import("@/user/public/login/definition")).default;
   // Log in exactly like a web client: POST the public login endpoint.
   // sendTestRequest resolves the public caller (admin leadId) for us — no
   // fabricated lead row, no direct DB write.
@@ -98,7 +93,7 @@ export async function getOrCreateFolder(
   parentId: string | null = null,
 ): Promise<string> {
   const listDef = (
-    await import("@/app/api/[locale]/agent/chat/folders/[rootFolderId]/definition")
+    await import("next-vibe/agent/chat/folders/[rootFolderId]/definition")
   ).default;
   const listResult = await sendTestRequest({
     streamContext: rootlessStreamContext(),
@@ -125,7 +120,7 @@ export async function getOrCreateFolder(
   }
 
   const createDef = (
-    await import("@/app/api/[locale]/agent/chat/folders/[rootFolderId]/create/definition")
+    await import("next-vibe/agent/chat/folders/[rootFolderId]/create/definition")
   ).default;
   const createResult = await sendTestRequest({
     streamContext: rootlessStreamContext(),
@@ -380,7 +375,7 @@ export async function fetchThreadMessages(
   rootFolderId: DefaultFolderId = DefaultFolderId.PRIVATE,
 ): Promise<SlimMessage[]> {
   const msgsDef = (
-    await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition")
+    await import("next-vibe/agent/chat/threads/[threadId]/messages/definition")
   ).default;
   const result = await sendTestRequest({
     streamContext: rootlessStreamContext(),
@@ -413,7 +408,7 @@ export async function fetchThreadStreamingState(
   user: JwtPayloadType,
 ): Promise<string | undefined> {
   const msgsDef = (
-    await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition")
+    await import("next-vibe/agent/chat/threads/[threadId]/messages/definition")
   ).default;
   const result = await sendTestRequest({
     streamContext: rootlessStreamContext(),
@@ -452,7 +447,7 @@ export async function waitForThreadIdle(
   const pollIntervalMs = 25;
   const start = Date.now();
   const msgsDef = (
-    await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition")
+    await import("next-vibe/agent/chat/threads/[threadId]/messages/definition")
   ).default;
   while (Date.now() - start < maxWaitMs) {
     const result = await sendTestRequest({
@@ -496,7 +491,7 @@ export async function waitForThreadSettled(
   const pollIntervalMs = 500;
   const start = Date.now();
   const msgsDef = (
-    await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition")
+    await import("next-vibe/agent/chat/threads/[threadId]/messages/definition")
   ).default;
   while (Date.now() - start < maxWaitMs) {
     const result = await sendTestRequest({
@@ -534,7 +529,7 @@ export async function fetchThreadMeta(
   rootFolderId: DefaultFolderId = DefaultFolderId.PRIVATE,
 ): Promise<{ title: string | null; description: string | null }> {
   const threadDef = (
-    await import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition")
+    await import("next-vibe/agent/chat/threads/[threadId]/definition")
   ).default;
   const result = await sendTestRequest({
     streamContext: rootlessStreamContext(),
@@ -578,7 +573,7 @@ export async function fetchFavoriteConfigAndModel(
   skill: string;
 }> {
   const favByIdDef = (
-    await import("@/app/api/[locale]/agent/skills/favorites/[id]/definition")
+    await import("next-vibe/agent/skills/favorites/[id]/definition")
   ).default;
   const getResult = await sendTestRequest({
     streamContext: rootlessStreamContext(),
@@ -596,7 +591,7 @@ export async function fetchFavoriteConfigAndModel(
   // The favorites GET merges the variant into skillId ("slug__variant"); split
   // it back out so the config carries the same variantId the DB row has.
   const { parseSkillId: parseSkillIdForVariant } =
-    await import("@/app/api/[locale]/agent/chat/slugify");
+    await import("next-vibe/agent/chat/slugify");
   const favoriteConfig: FavoriteConfig = {
     id: favoriteId,
     skillId: data.skillId,
@@ -624,7 +619,7 @@ export async function fetchFavoriteConfigAndModel(
   // favorite modelSelection → skill variant modelSelection.
   const { getBestChatModel } = await import("../models");
   const { getInstanceAvailability } =
-    await import("@/app/api/[locale]/agent/env-availability");
+    await import("next-vibe/agent/env-availability");
   const availability = await getInstanceAvailability();
   let model: ChatModelId | undefined;
   if (favoriteConfig.modelSelection) {
@@ -637,9 +632,8 @@ export async function fetchFavoriteConfigAndModel(
   if (!model && skill !== NO_SKILL_ID) {
     const logger = createEndpointLogger(false, defaultLocale);
     const { SkillsRepository } =
-      await import("@/app/api/[locale]/agent/skills/repository");
-    const { parseSkillId } =
-      await import("@/app/api/[locale]/agent/chat/slugify");
+      await import("next-vibe/agent/skills/repository");
+    const { parseSkillId } = await import("next-vibe/agent/chat/slugify");
     const skillResult = await SkillsRepository.getSkillById(
       { id: skill },
       user,
@@ -725,7 +719,7 @@ export async function runTestStream(
   } else if (favoriteConfig) {
     const { getBestChatModel } = await import("../models");
     const { getInstanceAvailability } =
-      await import("@/app/api/[locale]/agent/env-availability");
+      await import("next-vibe/agent/env-availability");
     if (favoriteConfig.modelSelection) {
       model = getBestChatModel(
         favoriteConfig.modelSelection,
@@ -751,7 +745,7 @@ export async function runTestStream(
   const userMessageId = hasToolConfirmations ? null : crypto.randomUUID();
 
   const streamDef = (
-    await import("@/app/api/[locale]/agent/ai-stream/stream/definition")
+    await import("next-vibe/agent/ai-stream/stream/definition")
   ).default;
 
   // Real clients always pass parentMessageId = current leaf of the thread.

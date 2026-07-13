@@ -6,7 +6,7 @@ import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 export const Route = createFileRoute("/api/$locale/agent/cortex/write")({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/agent/cortex/write/route"),
+      () => import("next-vibe/agent/cortex/write/route"),
     ),
   },
 });

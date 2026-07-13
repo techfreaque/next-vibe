@@ -1,15 +1,15 @@
 "use client";
 
+import { getDefaultFolderConfig } from "next-vibe/agent/chat/config";
+import { useChatNavigationStore } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Div } from "next-vibe/ui/ui/div";
 import { H1, P } from "next-vibe/ui/ui/typography";
 import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import type { JSX } from "react";
 
-import { DOM_IDS, LAYOUT } from "@/app/[locale]/chat/lib/config/constants";
-import { getDefaultFolderConfig } from "@/app/api/[locale]/agent/chat/config";
-import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
-import { platform } from "@/config/env-client";
+import { platform } from "@/_old/config/env-client";
+import { DOM_IDS, LAYOUT } from "@/_pages/chat/lib/config/constants";
 
 import { scopedTranslation } from "../../i18n";
 

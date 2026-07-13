@@ -21,13 +21,13 @@ import "server-only";
  */
 
 /** Top-level src prefix that maps to the vibe framework folder. */
-export const SYSTEM_ROOT = "src/app/api/[locale]/system/";
+export const SYSTEM_ROOT = "src/vibe/";
 
 /** The locale-root that holds domains + system. */
-export const LOCALE_ROOT = "src/app/api/[locale]/";
+export const LOCALE_ROOT = "src/";
 
 /** The tool's own files — the one true skip. */
-export const SELF_ROOT = "src/app/api/[locale]/system/tooling/vibe-deps/";
+export const SELF_ROOT = "src/vibe/tooling/vibe-deps/";
 
 /** The tool's own files — the single legitimate skip. */
 export function isSelf(key: string): boolean {
@@ -51,20 +51,16 @@ export function isGeneratedImporter(key: string): boolean {
 }
 
 /**
- * `src/app` files (Next.js page.tsx / layout.tsx / loading.tsx) are the UI
+ * `src/_pages` files (Next.js page.tsx / layout.tsx / loading.tsx) are the UI
  * *presentation* layer — they naturally consume API domains but are NOT a peer
  * API domain themselves. Counting them as a separate domain inflates promote
- * signals: e.g. `user/repository.ts` imported by `agent/` + `src/app/[locale]/`
- * would appear to span 3 domains and get flagged "promote into system/" even
+ * signals: e.g. `user/repository.ts` imported by `agent/` + `src/_pages/`
+ * would appear to span 3 domains and get flagged "promote into vibe/" even
  * though the page is just rendering the response. Filtered from domain-spread
  * calculations, same reasoning as isGeneratedImporter.
  */
 export function isUiPageImporter(key: string): boolean {
-  return (
-    key.startsWith("src/app/") &&
-    !key.startsWith("src/app/api/") &&
-    !key.startsWith("src/app/packages/")
-  );
+  return key.startsWith("src/_pages/");
 }
 
 /**
@@ -97,9 +93,7 @@ export function isInSystem(key: string): boolean {
  * in-process-call pattern.
  */
 export function isRouteExecuteEntrypoint(key: string): boolean {
-  return key.endsWith(
-    "src/app/api/[locale]/system/execute-tool/repository/index.ts",
-  );
+  return key.endsWith("src/vibe/execute-tool/repository/index.ts");
 }
 
 /**
@@ -465,7 +459,7 @@ export function placementOf(
     const alreadyVibe = isInSystem(key);
     return {
       kind: "promote",
-      suggestedDir: alreadyVibe ? fileDir : "src/app/api/[locale]/system",
+      suggestedDir: alreadyVibe ? fileDir : "src/vibe",
       note: alreadyVibe
         ? `wide coupling across ${String(parentDomainSpread)} domains`
         : `used by ${String(parentDomainSpread)} domains from ${fileParentDomain} — promote into system`,

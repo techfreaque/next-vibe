@@ -21,11 +21,7 @@ import { UserRolesRepository } from "next-vibe/identity/roles/repository";
 import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import {
-  referralCodes,
-  referralEarnings,
-  userReferrals,
-} from "@/app/api/[locale]/referral/db";
+import { referralCodes, referralEarnings, userReferrals } from "@/referral/db";
 
 import type {
   UserDeleteResponseOutput,

@@ -14,13 +14,13 @@ import {
   scaleDeployment,
 } from "next-vibe/tooling/infra/shared/pulumi/k3s/scripts";
 
-import type { ClientT } from "@/app/api/[locale]/ssh/client";
+import type { ClientT } from "@/ssh/client";
 import {
   getConnectionCredentials,
   openSshClient,
   sshExecCommand,
-} from "@/app/api/[locale]/ssh/client";
-import type { SshConnection } from "@/app/api/[locale]/ssh/db";
+} from "@/ssh/client";
+import type { SshConnection } from "@/ssh/db";
 
 const NEXT_VIBE_NAMESPACE = "next-vibe";
 

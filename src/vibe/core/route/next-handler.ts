@@ -4,6 +4,7 @@
  * Handles ONLY Next.js-specific concerns: NextRequest parsing, NextResponse wrapping, streaming
  */
 
+import { DefaultFolderId } from "next-vibe/agent/chat/config";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { Methods } from "next-vibe/core/definition/enums";
 import { Platform } from "next-vibe/core/definition/platform";
@@ -26,12 +27,11 @@ import { createEndpointLogger } from "next-vibe/logger/server";
 import type { NextRequest } from "next-vibe/ui/lib/request";
 import { NextResponse } from "next-vibe/ui/lib/request";
 
-import { scopedTranslation as sharedScopedTranslation } from "@/app/[locale]/shared/i18n";
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import {
   CSRF_TOKEN_COOKIE_NAME,
   CSRF_TOKEN_HEADER_NAME,
-} from "@/config/constants";
+} from "@/_old/config/constants";
+import { scopedTranslation as sharedScopedTranslation } from "@/_pages/shared/i18n";
 
 import { parseRequestBody, parseSearchParams } from "./next-request-parser";
 import { wrapErrorResponse, wrapSuccessResponse } from "./next-response";

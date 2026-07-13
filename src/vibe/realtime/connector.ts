@@ -29,8 +29,6 @@ import { db } from "next-vibe/database";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import bridgeDefinition from "next-vibe/realtime/remote-event-bridge/definition";
-import { z } from "zod";
-
 import {
   remoteConnections,
   StandardSyncCursorSchema,
@@ -38,10 +36,12 @@ import {
   type SyncCursor,
   type SyncScope,
   ThreadsSyncCursorSchema,
-} from "@/app/api/[locale]/remote-connection/db";
-import { RemoteConnectionRepository } from "@/app/api/[locale]/remote-connection/repository";
-import { RemoteTransport } from "@/app/api/[locale]/remote-connection/transport";
-import { env } from "@/config/env";
+} from "next-vibe/remote-connection/db";
+import { RemoteConnectionRepository } from "next-vibe/remote-connection/repository";
+import { RemoteTransport } from "next-vibe/remote-connection/transport";
+import { z } from "zod";
+
+import { env } from "@/_old/config/env";
 
 import { buildUserWsChannel } from "./channel";
 import type { AnyEndpointEventEnvelope } from "./structured-events";
@@ -250,7 +250,7 @@ class WsConnection {
     // Force-release the sync slot so a replacement connection can claim it immediately.
     // The in-flight pull (if any) will try releaseSyncSlot in its finally block — that's a no-op.
     const syncSlotKey = `${this.config.userId}:${this.instanceId}`;
-    void import("@/app/api/[locale]/remote-connection/sync/repository").then(
+    void import("next-vibe/remote-connection/sync/repository").then(
       ({ forceReleaseSyncSlot }) => {
         forceReleaseSyncSlot(syncSlotKey);
         return undefined;
@@ -567,7 +567,7 @@ class WsConnection {
     // One exchange per connection at a time — a concurrent pull (e.g. an
     // explicit trigger during connect) skips instead of duplicating the work.
     const { claimSyncSlot, releaseSyncSlot } =
-      await import("@/app/api/[locale]/remote-connection/sync/repository");
+      await import("next-vibe/remote-connection/sync/repository");
     const syncSlotKey = `${this.config.userId}:${this.instanceId}`;
     if (!claimSyncSlot(syncSlotKey)) {
       this.logger.warn(
@@ -578,14 +578,14 @@ class WsConnection {
     }
     try {
       const { applySyncPayloads, buildSyncPayloads } =
-        await import("@/app/api/[locale]/remote-connection/sync/provider");
+        await import("next-vibe/remote-connection/sync/provider");
       const { endpoints: syncEndpoints } =
-        await import("@/app/api/[locale]/remote-connection/sync/definition");
+        await import("next-vibe/remote-connection/sync/definition");
       const { RemoteConnectionRepository: ConnRepo } =
-        await import("@/app/api/[locale]/remote-connection/repository");
+        await import("next-vibe/remote-connection/repository");
       const { z: zod } = await import("zod");
       const { RemoteToolCapabilitySchema } =
-        await import("@/app/api/[locale]/remote-connection/db");
+        await import("next-vibe/remote-connection/db");
 
       const conn = this.config;
       const { CAPABILITIES_VERSION } =

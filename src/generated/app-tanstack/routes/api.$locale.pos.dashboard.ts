@@ -6,7 +6,7 @@ import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 export const Route = createFileRoute("/api/$locale/pos/dashboard")({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/pos/dashboard/route"),
+      () => import("@/pos/dashboard/route"),
     ),
   },
 });

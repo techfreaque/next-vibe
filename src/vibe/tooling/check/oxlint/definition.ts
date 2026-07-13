@@ -313,7 +313,7 @@ const { POST } = createEndpoint({
         page: 1,
       },
       fix: {
-        path: "src/app/api/[locale]/system/platforms/cli",
+        path: "src/vibe/platforms/cli",
         fix: true,
         limit: 100,
         page: 1,

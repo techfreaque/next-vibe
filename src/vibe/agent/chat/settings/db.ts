@@ -6,11 +6,10 @@
 import { relations } from "drizzle-orm";
 import { jsonb, pgTable, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import type { SearchProviderValue } from "next-vibe/agent/web-search/enum";
 import { users } from "next-vibe/identity/user/db";
 import type { z } from "zod";
-
-import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { SearchProviderValue } from "@/app/api/[locale]/agent/web-search/enum";
 
 import type { ViewModeValue } from "../enum";
 

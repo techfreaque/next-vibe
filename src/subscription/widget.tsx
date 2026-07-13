@@ -31,8 +31,8 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 
-import { PaymentProvider } from "@/app/api/[locale]/payment/enum";
-import { useCustomerPortal } from "@/app/api/[locale]/payment/portal/hooks";
+import { PaymentProvider } from "@/payment/enum";
+import { useCustomerPortal } from "@/payment/portal/hooks";
 
 import type definition from "./definition";
 import { SubscriptionStatus } from "./enum";

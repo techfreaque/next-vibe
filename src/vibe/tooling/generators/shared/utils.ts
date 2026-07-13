@@ -112,7 +112,7 @@ export function getRelativeImportPath(
 
 /**
  * Extract nested path segments from a file path
- * Example: src/app/api/[locale]/agent/skills/definition.ts
+ * Example: src/vibe/agent/skills/definition.ts
  * Returns: ["agent", "chat", "characters"]
  */
 export function extractNestedPath(
@@ -462,5 +462,5 @@ export function generateAbsoluteImportPath(
 ): string {
   const nestedPath = extractNestedPath(filePath);
   const pathStr = nestedPath.join("/");
-  return `@/app/api/[locale]/${pathStr}/${fileType}`;
+  return `@/${pathStr}/${fileType}`;
 }

@@ -280,7 +280,7 @@ export class RemoteConnectionInstanceRepository {
         const { CallbackMode } =
           await import("next-vibe/execute-tool/constants");
         const reverseUpdateDef =
-          await import("@/app/api/[locale]/remote-connection/connect-reverse/update/definition");
+          await import("next-vibe/remote-connection/connect-reverse/update/definition");
         await RouteExecuteRepository.runInProcessTyped({
           definition: reverseUpdateDef.default.PATCH,
           instanceId: targetInstanceId,
@@ -418,7 +418,7 @@ export class RemoteConnectionInstanceRepository {
           error: err.message,
         });
       });
-    void import("@/app/api/[locale]/system/realtime/local-broadcast")
+    void import("next-vibe/realtime/local-broadcast")
       .then(({ closeLocalConnectorSocket }) =>
         closeLocalConnectorSocket(instanceId),
       )
@@ -510,8 +510,7 @@ export class RemoteConnectionInstanceRepository {
     let token: string;
     let newLeadId: string;
     {
-      const loginEndpoints =
-        await import("@/app/api/[locale]/user/public/login/definition");
+      const loginEndpoints = await import("@/user/public/login/definition");
       const {
         response: loginResult,
         status: loginStatus,
@@ -567,11 +566,10 @@ export class RemoteConnectionInstanceRepository {
     // Step 2: Regenerate reverse token via self-login
     let reverseToken: string | undefined;
     let reverseLeadId: string | undefined;
-    const { envClient } = await import("@/config/env-client");
+    const { envClient } = await import("@/_old/config/env-client");
     const localUrl = envClient.NEXT_PUBLIC_APP_URL;
     if (localUrl) {
-      const loginEndpoints =
-        await import("@/app/api/[locale]/user/public/login/definition");
+      const loginEndpoints = await import("@/user/public/login/definition");
       const { response: localLoginResp, networkError: localLoginNetworkError } =
         await RemoteTransport.callEndpointDirect({
           connection: { remoteUrl: localUrl, token: "" },
@@ -621,7 +619,7 @@ export class RemoteConnectionInstanceRepository {
           });
         }
         const registerEndpoints =
-          await import("@/app/api/[locale]/remote-connection/connect-reverse/definition");
+          await import("next-vibe/remote-connection/connect-reverse/definition");
         const {
           response: resp,
           status: respStatus,
@@ -726,10 +724,8 @@ export class RemoteConnectionInstanceRepository {
     // Rename remote subfolder (non-fatal)
     void (async (): Promise<void> => {
       try {
-        const { chatFolders } =
-          await import("@/app/api/[locale]/agent/chat/db");
-        const { DefaultFolderId } =
-          await import("@/app/api/[locale]/agent/chat/config");
+        const { chatFolders } = await import("next-vibe/agent/chat/db");
+        const { DefaultFolderId } = await import("next-vibe/agent/chat/config");
         await db
           .update(chatFolders)
           .set({ name: newInstanceId, updatedAt: new Date() })
@@ -777,7 +773,7 @@ export class RemoteConnectionInstanceRepository {
           const { RouteExecuteRepository } =
             await import("next-vibe/execute-tool/repository");
           const selfRenameDef =
-            await import("@/app/api/[locale]/remote-connection/self/rename/definition");
+            await import("next-vibe/remote-connection/self/rename/definition");
           const result = await RouteExecuteRepository.runInProcessTyped({
             definition: selfRenameDef.default.PATCH,
             input: { newInstanceId, propagate: false },

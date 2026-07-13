@@ -22,7 +22,7 @@ export type TParams = Record<string, string | number>;
  *
  * For best results, use with the full createScopedTranslation result which includes ScopedTranslationKey:
  * @example
- * import { scopedTranslation } from "@/app/api/[locale]/contact/i18n";
+ * import { scopedTranslation } from "@/contact/i18n";
  * type ContactKeys = ExtractScopedKeyType<typeof scopedTranslation>;
  * // ContactKeys = "title" | "description" | "form.label" | "form.fields.name.label" | ...
  *

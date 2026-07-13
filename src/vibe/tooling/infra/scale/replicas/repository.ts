@@ -13,8 +13,8 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type { InfraT } from "next-vibe/tooling/infra/i18n";
 import { scaleDeploymentInCluster } from "next-vibe/tooling/infra/shared/pulumi/app/index";
 
-import { sshConnections } from "@/app/api/[locale]/ssh/db";
-import { ClusterRole } from "@/app/api/[locale]/ssh/enum";
+import { sshConnections } from "@/ssh/db";
+import { ClusterRole } from "@/ssh/enum";
 
 import type {
   ScaleReplicasRequestOutput,

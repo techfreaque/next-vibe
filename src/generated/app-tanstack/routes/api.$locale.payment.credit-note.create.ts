@@ -7,7 +7,7 @@ export const Route = createFileRoute("/api/$locale/payment/credit-note/create")(
   {
     server: {
       handlers: wrapNextApiRoute(
-        () => import("@/app/api/[locale]/payment/credit-note/create/route"),
+        () => import("@/payment/credit-note/create/route"),
       ),
     },
   },

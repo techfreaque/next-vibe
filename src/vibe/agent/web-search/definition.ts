@@ -24,7 +24,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
 
-import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
+import { FEATURE_COSTS } from "@/products/repository-client";
 
 import { WEB_SEARCH_ALIAS } from "./constants";
 import { SearchProvider, SearchProviderDB } from "./enum";

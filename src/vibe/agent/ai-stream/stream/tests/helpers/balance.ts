@@ -7,13 +7,12 @@
 import "server-only";
 
 import { and, eq, sql } from "drizzle-orm";
+import { rootlessStreamContext } from "next-vibe/agent/chat/config";
+import { chatMessages } from "next-vibe/agent/chat/db";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 import { expect } from "vitest";
-
-import { rootlessStreamContext } from "@/app/api/[locale]/agent/chat/config";
-import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
 
 /** Timestamp of the most recent getBalance() call - bounds the charge audit window. */
 let lastBalanceReadAt = new Date(0);
@@ -36,8 +35,7 @@ export async function getBalance(user: JwtPrivatePayloadType): Promise<number> {
   // drain anymore, so settle on the OBSERVABLE instead: poll until the balance
   // is stable across two consecutive reads (fixture replay settles within a
   // tick; live recording within the poll window).
-  const creditsDef = (await import("@/app/api/[locale]/credits/definition"))
-    .default;
+  const creditsDef = (await import("@/credits/definition")).default;
   const readOnce = async (): Promise<number> => {
     const res = await sendTestRequest({
       endpoint: creditsDef.GET,
@@ -85,9 +83,7 @@ export async function pinBalance(
     return;
   }
   const deficit = credits - current;
-  const adminAddDef = (
-    await import("@/app/api/[locale]/credits/admin-add/definition")
-  ).default;
+  const adminAddDef = (await import("@/credits/admin-add/definition")).default;
   const result = await sendTestRequest({
     streamContext: rootlessStreamContext(),
     endpoint: adminAddDef.POST,
@@ -139,8 +135,7 @@ async function fetchWalletTxsSince(
     messageId: string | null;
   }>
 > {
-  const { creditTransactions, creditWallets } =
-    await import("@/app/api/[locale]/credits/db");
+  const { creditTransactions, creditWallets } = await import("@/credits/db");
   const { gte: gteOp, inArray, desc: descOp } = await import("drizzle-orm");
   const wallets = await db
     .select({ id: creditWallets.id })

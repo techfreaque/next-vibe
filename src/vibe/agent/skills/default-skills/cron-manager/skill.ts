@@ -1,3 +1,4 @@
+import { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import {
@@ -13,8 +14,6 @@ import {
 } from "next-vibe/tasks/cron/tasks/constants";
 import { PULSE_EXECUTE_ALIAS } from "next-vibe/tasks/pulse/execute/constants";
 import { PULSE_STATUS_ALIAS } from "next-vibe/tasks/pulse/status/constants";
-
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
 
 import type { Skill } from "../../config";
 import { tool } from "../../constants";

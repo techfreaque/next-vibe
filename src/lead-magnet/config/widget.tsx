@@ -1,5 +1,6 @@
 "use client";
 
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -31,8 +32,6 @@ import {
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 import React, { useCallback, useMemo, useState } from "react";
-
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 
 import { LeadMagnetProviderDB } from "../enum";
 import type endpoints from "./definition";

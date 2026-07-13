@@ -63,14 +63,14 @@ export const translations: typeof enTranslations = {
     paths: {
       label: "Ścieżki Docelowe",
       description:
-        "Ścieżki plików lub katalogi do sprawdzenia (string lub tablica). ZALECANE: Określ ścieżki dla obszaru, nad którym pracujesz (szybkie, skupione). Zostaw puste aby sprawdzić WSZYSTKIE pliki (wolne, używaj tylko do kompleksowych audytów). Przykłady: 'src/app/feature' lub ['src/feature/file.tsx', 'src/feature/other.tsx']. Uwaga: Wzorce Glob (np. '**/*.test.ts') nie są jeszcze obsługiwane.",
-      placeholder: "np. src/app lub src/components/Button.tsx",
+        "Ścieżki plików lub katalogi do sprawdzenia (string lub tablica). ZALECANE: Określ ścieżki dla obszaru, nad którym pracujesz (szybkie, skupione). Zostaw puste aby sprawdzić WSZYSTKIE pliki (wolne, używaj tylko do kompleksowych audytów). Przykłady: 'src/feature' lub ['src/feature/file.tsx', 'src/feature/other.tsx']. Uwaga: Wzorce Glob (np. '**/*.test.ts') nie są jeszcze obsługiwane.",
+      placeholder: "np. src lub src/components/Button.tsx",
       options: {
         src: "Katalog Źródłowy (src/)",
         components: "Komponenty (src/components)",
         utils: "Narzędzia (src/utils)",
         pages: "Strony (src/pages)",
-        app: "Katalog App (src/app)",
+        app: "Katalog App (src)",
       },
     },
     limit: {

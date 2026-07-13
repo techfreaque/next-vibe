@@ -4,6 +4,9 @@
  */
 import "server-only";
 
+import { agentEnv } from "next-vibe/agent/env";
+import { buildMissingKeyMessage } from "next-vibe/agent/env-availability";
+import { ApiProvider } from "next-vibe/agent/models/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -13,10 +16,6 @@ import {
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { agentEnv } from "@/app/api/[locale]/agent/env";
-import { buildMissingKeyMessage } from "@/app/api/[locale]/agent/env-availability";
-import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 
 import { type ChatModelOption, getChatModelById } from "../../models";
 import { type AiStreamPostRequestOutput } from "../../stream/definition";

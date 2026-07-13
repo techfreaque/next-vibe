@@ -45,27 +45,27 @@ export async function getGeneratedWsEndpoints(): Promise<WsChannelEntry[]> {
     system_tasks_cron_queue_GETDef,
     system_tasks_cron_tasks_GETDef,
   ] = await Promise.all([
-    import("@/app/api/[locale]/agent/ai-stream/run/definition"),
-    import("@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition"),
-    import("@/app/api/[locale]/agent/chat/threads/definition"),
-    import("@/app/api/[locale]/agent/chat/threads/definition"),
-    import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition"),
-    import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition"),
-    import("@/app/api/[locale]/agent/chat/threads/[threadId]/definition"),
-    import("@/app/api/[locale]/agent/skills/create/definition"),
-    import("@/app/api/[locale]/agent/skills/favorites/create/definition"),
-    import("@/app/api/[locale]/agent/skills/favorites/definition"),
-    import("@/app/api/[locale]/agent/skills/favorites/[id]/definition"),
-    import("@/app/api/[locale]/agent/skills/favorites/[id]/definition"),
-    import("@/app/api/[locale]/agent/skills/favorites/reorder/definition"),
-    import("@/app/api/[locale]/agent/skills/[id]/definition"),
-    import("@/app/api/[locale]/agent/skills/[id]/definition"),
-    import("@/app/api/[locale]/agent/skills/[id]/publish/definition"),
-    import("@/app/api/[locale]/agent/skills/[id]/vote/definition"),
-    import("@/app/api/[locale]/credits/definition"),
-    import("@/app/api/[locale]/system/realtime/remote-event-bridge/definition"),
-    import("@/app/api/[locale]/system/tasks/cron/queue/definition"),
-    import("@/app/api/[locale]/system/tasks/cron/tasks/definition"),
+    import("next-vibe/agent/ai-stream/run/definition"),
+    import("next-vibe/agent/chat/folder-contents/[rootFolderId]/definition"),
+    import("next-vibe/agent/chat/threads/definition"),
+    import("next-vibe/agent/chat/threads/definition"),
+    import("next-vibe/agent/chat/threads/[threadId]/definition"),
+    import("next-vibe/agent/chat/threads/[threadId]/messages/definition"),
+    import("next-vibe/agent/chat/threads/[threadId]/definition"),
+    import("next-vibe/agent/skills/create/definition"),
+    import("next-vibe/agent/skills/favorites/create/definition"),
+    import("next-vibe/agent/skills/favorites/definition"),
+    import("next-vibe/agent/skills/favorites/[id]/definition"),
+    import("next-vibe/agent/skills/favorites/[id]/definition"),
+    import("next-vibe/agent/skills/favorites/reorder/definition"),
+    import("next-vibe/agent/skills/[id]/definition"),
+    import("next-vibe/agent/skills/[id]/definition"),
+    import("next-vibe/agent/skills/[id]/publish/definition"),
+    import("next-vibe/agent/skills/[id]/vote/definition"),
+    import("@/credits/definition"),
+    import("next-vibe/realtime/remote-event-bridge/definition"),
+    import("next-vibe/tasks/cron/queue/definition"),
+    import("next-vibe/tasks/cron/tasks/definition"),
   ]);
 
   return [
@@ -77,7 +77,7 @@ export async function getGeneratedWsEndpoints(): Promise<WsChannelEntry[]> {
       endpoint: agent_chat_folder_contents_rootFolderId_GETDef.default.GET,
       resolveChannel: lazyResolveChannel(
         () =>
-          import("@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/route"),
+          import("next-vibe/agent/chat/folder-contents/[rootFolderId]/route"),
         "GET",
       ),
     },
@@ -97,7 +97,7 @@ export async function getGeneratedWsEndpoints(): Promise<WsChannelEntry[]> {
       endpoint: agent_chat_threads_threadId_messages_GETDef.default.GET,
       resolveChannel: lazyResolveChannel(
         () =>
-          import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/route"),
+          import("next-vibe/agent/chat/threads/[threadId]/messages/route"),
         "GET",
       ),
     },
@@ -132,28 +132,28 @@ export async function getGeneratedWsEndpoints(): Promise<WsChannelEntry[]> {
     {
       endpoint: agent_skills_id_DELETEDef.default.DELETE,
       resolveChannel: lazyResolveChannel(
-        () => import("@/app/api/[locale]/agent/skills/[id]/route"),
+        () => import("next-vibe/agent/skills/[id]/route"),
         "DELETE",
       ),
     },
     {
       endpoint: agent_skills_id_PATCHDef.default.PATCH,
       resolveChannel: lazyResolveChannel(
-        () => import("@/app/api/[locale]/agent/skills/[id]/route"),
+        () => import("next-vibe/agent/skills/[id]/route"),
         "PATCH",
       ),
     },
     {
       endpoint: agent_skills_id_publish_PATCHDef.default.PATCH,
       resolveChannel: lazyResolveChannel(
-        () => import("@/app/api/[locale]/agent/skills/[id]/publish/route"),
+        () => import("next-vibe/agent/skills/[id]/publish/route"),
         "PATCH",
       ),
     },
     {
       endpoint: agent_skills_id_vote_POSTDef.default.POST,
       resolveChannel: lazyResolveChannel(
-        () => import("@/app/api/[locale]/agent/skills/[id]/vote/route"),
+        () => import("next-vibe/agent/skills/[id]/vote/route"),
         "POST",
       ),
     },

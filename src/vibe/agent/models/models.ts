@@ -2,7 +2,8 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 
-import { STANDARD_MARKUP_PERCENTAGE } from "../../products/constants";
+import { STANDARD_MARKUP_PERCENTAGE } from "@/products/constants";
+
 import type { ChatModelId, ChatModelOption } from "../ai-stream/models";
 import type {
   AudioVisionModelId,

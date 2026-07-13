@@ -30,12 +30,12 @@ import { H1, H2, H3, Muted, P } from "next-vibe/ui/ui/typography";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 
-import referralCodesListDefinition from "@/app/api/[locale]/referral/codes/list/definition";
-import referralDefinition from "@/app/api/[locale]/referral/definition";
-import referralPayoutDefinition from "@/app/api/[locale]/referral/payout/definition";
-import referralStatsDefinition from "@/app/api/[locale]/referral/stats/definition";
-import { configScopedTranslation } from "@/config/i18n";
-import { translations as configTranslations } from "@/config/i18n/en";
+import { configScopedTranslation } from "@/_old/config/i18n";
+import { translations as configTranslations } from "@/_old/config/i18n/en";
+import referralCodesListDefinition from "@/referral/codes/list/definition";
+import referralDefinition from "@/referral/definition";
+import referralPayoutDefinition from "@/referral/payout/definition";
+import referralStatsDefinition from "@/referral/stats/definition";
 
 import type { ReferralPageT } from "./i18n";
 import { scopedTranslation as pageT } from "./i18n";

@@ -7,6 +7,21 @@ import "server-only";
 
 import type { ModelMessage } from "ai";
 import { and, eq, sql } from "drizzle-orm";
+import { getInstanceAvailability } from "next-vibe/agent/env-availability";
+import {
+  getBestImageGenModel,
+  type ImageGenModelSelection,
+} from "next-vibe/agent/image-generation/models";
+import { ApiProvider } from "next-vibe/agent/models/models";
+import {
+  getBestMusicGenModel,
+  type MusicGenModelSelection,
+} from "next-vibe/agent/music-generation/models";
+import type { VoiceModelSelection } from "next-vibe/agent/text-to-speech/models";
+import {
+  getBestVideoGenModel,
+  type VideoGenModelSelection,
+} from "next-vibe/agent/video-generation/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -17,24 +32,8 @@ import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { CoreTool } from "next-vibe/platforms/ai/tools-loader";
+import type { ResolvedRelayContext } from "next-vibe/realtime/remote-event-bridge/relay-context";
 import type { NextRequest } from "next-vibe/ui/lib/request";
-
-import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
-import {
-  getBestImageGenModel,
-  type ImageGenModelSelection,
-} from "@/app/api/[locale]/agent/image-generation/models";
-import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
-import {
-  getBestMusicGenModel,
-  type MusicGenModelSelection,
-} from "@/app/api/[locale]/agent/music-generation/models";
-import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
-import {
-  getBestVideoGenModel,
-  type VideoGenModelSelection,
-} from "@/app/api/[locale]/agent/video-generation/models";
-import type { ResolvedRelayContext } from "@/app/api/[locale]/system/realtime/remote-event-bridge/relay-context";
 
 import {
   DefaultFolderId,
@@ -345,7 +344,7 @@ async function resolveRemoteFolderPrompt(params: {
   }
 
   const { ThreadsRepository: ThreadsRepoForLoop } =
-    await import("@/app/api/[locale]/agent/chat/threads/repository");
+    await import("next-vibe/agent/chat/threads/repository");
   // Pure placement walk — the loop-routing variant returns null for
   // loopLocation:'caller' connections, which is EXACTLY the local-loop case
   // that needs the remote prompt.
@@ -358,7 +357,7 @@ async function resolveRemoteFolderPrompt(params: {
   const { RouteExecuteRepository } =
     await import("next-vibe/execute-tool/repository");
   const promptDef = (
-    await import("@/app/api/[locale]/agent/ai-stream/system-prompt/debug/definition")
+    await import("next-vibe/agent/ai-stream/system-prompt/debug/definition")
   ).default;
   const remotePromptResult = await RouteExecuteRepository.runInProcessTyped({
     definition: promptDef.GET,

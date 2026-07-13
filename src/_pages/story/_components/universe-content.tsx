@@ -1,4 +1,5 @@
 "use client";
+import type { ModelCountsByContentLevel } from "next-vibe/agent/models/all-models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { cn } from "next-vibe/core/utils/utils";
 import { Button } from "next-vibe/ui/ui/button";
@@ -8,8 +9,7 @@ import { Span } from "next-vibe/ui/ui/span";
 import type { JSX } from "react";
 import { useState } from "react";
 
-import type { ModelCountsByContentLevel } from "@/app/api/[locale]/agent/models/all-models";
-import { configScopedTranslation } from "@/config/i18n";
+import { configScopedTranslation } from "@/_old/config/i18n";
 
 import { scopedTranslation } from "./i18n";
 import type { ActiveSide } from "./split-hero";

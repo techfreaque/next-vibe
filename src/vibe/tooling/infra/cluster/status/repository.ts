@@ -16,9 +16,9 @@ import {
   getConnectionCredentials,
   openSshClient,
   sshExecCommand,
-} from "@/app/api/[locale]/ssh/client";
-import { sshConnections } from "@/app/api/[locale]/ssh/db";
-import { ClusterRole } from "@/app/api/[locale]/ssh/enum";
+} from "@/ssh/client";
+import { sshConnections } from "@/ssh/db";
+import { ClusterRole } from "@/ssh/enum";
 
 import type { ClusterStatusResponseOutput } from "./definition";
 

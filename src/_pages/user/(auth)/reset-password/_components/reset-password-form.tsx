@@ -6,7 +6,7 @@ import { MotionDiv } from "next-vibe/ui/ui/motion";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 
-import resetRequestDefinitions from "@/app/api/[locale]/user/public/reset-password/request/definition";
+import resetRequestDefinitions from "@/user/public/reset-password/request/definition";
 
 interface ResetPasswordFormProps {
   locale: CountryLanguage;

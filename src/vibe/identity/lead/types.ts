@@ -4,8 +4,8 @@
  * Repository-first architecture: exports TypeOutput types for repositories and routes
  */
 
-import type { LeadGetResponseOutput } from "@/app/api/[locale]/leads/[id]/definition";
-import type { LeadListGetResponseTypeOutput } from "@/app/api/[locale]/leads/list/definition";
+import type { LeadGetResponseOutput } from "@/leads/[id]/definition";
+import type { LeadListGetResponseTypeOutput } from "@/leads/list/definition";
 
 import type { EmailCampaignStage, LeadSource, LeadStatus } from "./enum";
 

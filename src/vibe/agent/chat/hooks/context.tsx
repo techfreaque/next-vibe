@@ -12,7 +12,7 @@
 import type { JSX, ReactNode } from "react";
 import { createContext, useContext, useMemo } from "react";
 
-import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
+import type { CreditsGetResponseOutput } from "@/credits/definition";
 
 import type { SkillGetResponseOutput } from "../../skills/[id]/definition";
 import { DefaultFolderId } from "../config";

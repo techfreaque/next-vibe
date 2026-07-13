@@ -47,16 +47,10 @@ import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
-import {
-  PaymentProvider,
-  type PaymentProviderValue,
-} from "@/app/api/[locale]/payment/enum";
-import {
-  ProductIds,
-  productsRepository,
-} from "@/app/api/[locale]/products/repository-client";
-import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
-import { useSubscription } from "@/app/api/[locale]/subscription/hooks";
+import { PaymentProvider, type PaymentProviderValue } from "@/payment/enum";
+import { ProductIds, productsRepository } from "@/products/repository-client";
+import { SubscriptionStatus } from "@/subscription/enum";
+import { useSubscription } from "@/subscription/hooks";
 
 import type definition from "./definition";
 

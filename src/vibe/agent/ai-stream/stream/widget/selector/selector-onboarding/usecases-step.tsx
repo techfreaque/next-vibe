@@ -1,5 +1,24 @@
 "use client";
 
+import {
+  type ChatModelSelection,
+  getBestChatModel,
+} from "next-vibe/agent/ai-stream/models";
+import type { AiStreamT } from "next-vibe/agent/ai-stream/stream/i18n";
+import { scopedTranslation } from "next-vibe/agent/ai-stream/stream/i18n";
+import { useChatSettings } from "next-vibe/agent/chat/settings/hooks";
+import { formatSkillId, parseSkillId } from "next-vibe/agent/chat/slugify";
+import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
+import {
+  COMPANION_SKILLS,
+  DEFAULT_SKILLS,
+} from "next-vibe/agent/skills/config";
+import { ModelSelectionType } from "next-vibe/agent/skills/enum";
+import { useFavoriteCreate } from "next-vibe/agent/skills/favorites/create/hooks";
+import favoritesDefinition from "next-vibe/agent/skills/favorites/definition";
+import { ChatFavoritesRepositoryClient } from "next-vibe/agent/skills/favorites/repository-client";
+import { scopedTranslation as skillsScopedTranslation } from "next-vibe/agent/skills/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { success } from "next-vibe/core/route/response.schema";
 import { cn } from "next-vibe/core/utils/utils";
@@ -27,29 +46,6 @@ import {
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { type JSX, useCallback, useState } from "react";
-
-import {
-  type ChatModelSelection,
-  getBestChatModel,
-} from "@/app/api/[locale]/agent/ai-stream/models";
-import type { AiStreamT } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
-import { scopedTranslation } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
-import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
-import {
-  formatSkillId,
-  parseSkillId,
-} from "@/app/api/[locale]/agent/chat/slugify";
-import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import {
-  COMPANION_SKILLS,
-  DEFAULT_SKILLS,
-} from "@/app/api/[locale]/agent/skills/config";
-import { ModelSelectionType } from "@/app/api/[locale]/agent/skills/enum";
-import { useFavoriteCreate } from "@/app/api/[locale]/agent/skills/favorites/create/hooks";
-import favoritesDefinition from "@/app/api/[locale]/agent/skills/favorites/definition";
-import { ChatFavoritesRepositoryClient } from "@/app/api/[locale]/agent/skills/favorites/repository-client";
-import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/skills/i18n";
 
 import {
   DEFAULT_CHAT_MODEL_ID,

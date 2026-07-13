@@ -19,6 +19,7 @@ import helpEndpoints from "next-vibe/help-tool/definition";
 import type { UseEndpointOptions } from "next-vibe/platforms/react/hooks/endpoint-types";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { VibeFrameHost } from "next-vibe/platforms/vibe-frame/VibeFrameHost";
+import remoteConnectionListDefinition from "next-vibe/remote-connection/list/definition";
 import type { AutocompleteOption } from "next-vibe/ui/ui/autocomplete-field";
 import { AutocompleteField } from "next-vibe/ui/ui/autocomplete-field";
 import { Button } from "next-vibe/ui/ui/button";
@@ -50,7 +51,6 @@ import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPag
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 
-import remoteConnectionListDefinition from "@/app/api/[locale]/remote-connection/list/definition";
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import type definition from "./definition";

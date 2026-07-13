@@ -6,8 +6,8 @@
 import type { CategoryDefinition } from "next-vibe/help-tool/category-types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
-import { MESSENGER_ACCOUNTS_ALIAS } from "@/app/api/[locale]/messenger/accounts/list/constants";
-import { USER_ME_ALIAS } from "@/app/api/[locale]/user/private/me/constants";
+import { MESSENGER_ACCOUNTS_ALIAS } from "@/messenger/accounts/list/constants";
+import { USER_ME_ALIAS } from "@/user/private/me/constants";
 
 export const category: CategoryDefinition = {
   key: "messenger",

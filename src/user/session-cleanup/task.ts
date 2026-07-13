@@ -14,7 +14,7 @@ import {
 import {
   AUTH_TOKEN_COOKIE_MAX_AGE_DAYS,
   RESET_TOKEN_EXPIRY,
-} from "@/config/constants";
+} from "@/_old/config/constants";
 
 import definitions from "./definition";
 import { tools } from "./route";

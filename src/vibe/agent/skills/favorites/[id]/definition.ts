@@ -4,6 +4,24 @@
  */
 
 import {
+  type ChatModelSelection,
+  chatModelSelectionSchema,
+  filterChatModels,
+  type getBestChatModel,
+} from "next-vibe/agent/ai-stream/models";
+import {
+  audioVisionModelSelectionSchema,
+  imageVisionModelSelectionSchema,
+  videoVisionModelSelectionSchema,
+} from "next-vibe/agent/ai-stream/vision-models";
+import { parseSkillId } from "next-vibe/agent/chat/slugify";
+import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
+import { imageGenModelSelectionSchema } from "next-vibe/agent/image-generation/models";
+import { musicGenModelSelectionSchema } from "next-vibe/agent/music-generation/models";
+import { sttModelSelectionSchema } from "next-vibe/agent/speech-to-text/models";
+import { voiceModelSelectionSchema } from "next-vibe/agent/text-to-speech/models";
+import { videoGenModelSelectionSchema } from "next-vibe/agent/video-generation/models";
+import {
   dateSchema,
   iconSchema,
   translatedValueSchema,
@@ -20,6 +38,7 @@ import {
 import { EXECUTE_TOOL_ALIAS } from "next-vibe/execute-tool/constants";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import {
   backButton,
   customWidgetObject,
@@ -33,26 +52,6 @@ import {
   widgetField,
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
-
-import {
-  type ChatModelSelection,
-  chatModelSelectionSchema,
-  filterChatModels,
-  type getBestChatModel,
-} from "@/app/api/[locale]/agent/ai-stream/models";
-import {
-  audioVisionModelSelectionSchema,
-  imageVisionModelSelectionSchema,
-  videoVisionModelSelectionSchema,
-} from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
-import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
-import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
-import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
-import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
-import { lazyWidget } from "@/app/api/[locale]/system/unified-ui/_shared/lazy-widget";
 
 import { ChatModelId } from "../../../ai-stream/models";
 import type {

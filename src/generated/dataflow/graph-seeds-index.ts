@@ -11,16 +11,16 @@
 
 import type { GraphSeedEntry } from "next-vibe/dataflow/graph/types";
 
-import { graphSeeds as seedModule0 } from "../../app/api/[locale]/agent/chat/graph-seeds";
-import { graphSeeds as seedModule1 } from "../../app/api/[locale]/credits/graph-seeds";
-import { graphSeeds as seedModule2 } from "../../app/api/[locale]/leads/graph-seeds";
-import { graphSeeds as seedModule3 } from "../../app/api/[locale]/messenger/graph-seeds";
-import { graphSeeds as seedModule4 } from "../../app/api/[locale]/newsletter/graph-seeds";
-import { graphSeeds as seedModule5 } from "../../app/api/[locale]/payment/graph-seeds";
-import { graphSeeds as seedModule6 } from "../../app/api/[locale]/referral/graph-seeds";
-import { graphSeeds as seedModule7 } from "../../app/api/[locale]/subscription/graph-seeds";
-import { graphSeeds as seedModule8 } from "../../app/api/[locale]/system/dataflow/graph-seeds";
-import { graphSeeds as seedModule9 } from "../../app/api/[locale]/user/graph-seeds";
+import { graphSeeds as seedModule0 } from "../../vibe/agent/chat/graph-seeds";
+import { graphSeeds as seedModule1 } from "../../credits/graph-seeds";
+import { graphSeeds as seedModule2 } from "../../leads/graph-seeds";
+import { graphSeeds as seedModule3 } from "../../messenger/graph-seeds";
+import { graphSeeds as seedModule4 } from "../../newsletter/graph-seeds";
+import { graphSeeds as seedModule5 } from "../../payment/graph-seeds";
+import { graphSeeds as seedModule6 } from "../../referral/graph-seeds";
+import { graphSeeds as seedModule7 } from "../../subscription/graph-seeds";
+import { graphSeeds as seedModule8 } from "../../vibe/dataflow/graph-seeds";
+import { graphSeeds as seedModule9 } from "../../user/graph-seeds";
 
 /**
  * All graph seed entries discovered from the codebase.

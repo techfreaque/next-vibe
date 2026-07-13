@@ -3,6 +3,10 @@
  * Admin/dev-only - renders the full system prompt for a given user context.
  */
 
+import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import { imageGenModelSelectionSchema } from "next-vibe/agent/image-generation/models";
+import { musicGenModelSelectionSchema } from "next-vibe/agent/music-generation/models";
+import { videoGenModelSelectionSchema } from "next-vibe/agent/video-generation/models";
 import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
@@ -18,11 +22,6 @@ import {
   responseField,
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
-
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
-import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
-import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
 
 import { scopedTranslation } from "./i18n";
 
@@ -100,8 +99,7 @@ const { GET } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         listEndpoint: async () =>
-          (await import("@/app/api/[locale]/agent/chat/threads/definition"))
-            .default.GET,
+          (await import("next-vibe/agent/chat/threads/definition")).default.GET,
         labelField: "title",
         label: "get.fields.threadId.label" as const,
         description: "get.fields.threadId.description" as const,
@@ -111,8 +109,7 @@ const { GET } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         listEndpoint: async () =>
-          (await import("@/app/api/[locale]/agent/skills/definition")).default
-            .GET,
+          (await import("next-vibe/agent/skills/definition")).default.GET,
         labelField: "name",
         valueField: "skillId",
         label: "get.fields.skillId.label" as const,

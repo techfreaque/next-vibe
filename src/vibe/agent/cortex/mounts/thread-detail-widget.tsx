@@ -8,17 +8,16 @@
 "use client";
 
 import {
+  DefaultFolderId,
+  isDefaultFolderId,
+} from "next-vibe/agent/chat/config";
+import messagesDefinitions from "next-vibe/agent/chat/threads/[threadId]/messages/definition";
+import {
   useWidgetLocale,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import { useMemo } from "react";
-
-import {
-  DefaultFolderId,
-  isDefaultFolderId,
-} from "@/app/api/[locale]/agent/chat/config";
-import messagesDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
 
 interface ThreadDetailWidgetProps {
   path: string;

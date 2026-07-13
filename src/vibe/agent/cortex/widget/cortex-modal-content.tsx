@@ -1,5 +1,6 @@
 "use client";
 
+import cortexListDefinitions from "next-vibe/agent/cortex/list/definition";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import {
@@ -14,8 +15,7 @@ import { Link } from "next-vibe/ui/ui/link";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 
-import { scopedTranslation } from "@/app/[locale]/cortex/i18n";
-import cortexListDefinitions from "@/app/api/[locale]/agent/cortex/list/definition";
+import { scopedTranslation } from "@/_pages/cortex/i18n";
 
 interface CortexModalContentProps {
   locale: CountryLanguage;

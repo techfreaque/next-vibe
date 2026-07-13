@@ -35,7 +35,7 @@ const CONFIG: VibeDepsConfig = {
 const CORE = "src/packages/vibe-core/types.ts";
 const UI = "src/packages/nvui/web/ui/button.tsx";
 const UNIFIED = "src/packages/nvui/unified/form-fields/text/widget.tsx";
-const APP = "src/app/api/[locale]/user/auth/types.ts";
+const APP = "src/user/auth/types.ts";
 
 describe("getPackageOf", () => {
   it("maps files to their owning package", () => {
@@ -73,7 +73,7 @@ describe("classifyEdgeByKey", () => {
 
   it("ignores intra-package and app↔app edges", () => {
     const UI2 = "src/packages/nvui/web/ui/badge.tsx";
-    const APP2 = "src/app/api/[locale]/user/profile/repository.ts";
+    const APP2 = "src/user/profile/repository.ts";
     expect(classifyEdgeByKey(UI, UI2, CONFIG)).toBeNull();
     expect(classifyEdgeByKey(APP, APP2, CONFIG)).toBeNull();
   });

@@ -313,7 +313,7 @@ export async function canCreateFolder(
   if (rootFolderId === "public" && parentId) {
     // Get parent folder to check permissions
     const { chatFolders } = await import("../db");
-    const { db } = await import("../../../system/database");
+    const { db } = await import("../../../database");
     const { eq } = await import("drizzle-orm");
 
     const [parentFolder] = await db

@@ -6,6 +6,8 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
+import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
+import { DefaultFolderId } from "next-vibe/agent/chat/config";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -18,9 +20,6 @@ import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { createEndpointEmitter } from "next-vibe/realtime/emitter";
-
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 
 import { chatFolders, chatThreads } from "../../db";
 import { createFolderContentsEmitter } from "../../folder-contents/[rootFolderId]/emitter";
@@ -195,7 +194,7 @@ export class ThreadRenameRepository {
       });
 
       if (!user.isPublic) {
-        void import("@/app/api/[locale]/agent/ai-stream/repository/core/db-writer/embedding-sync")
+        void import("next-vibe/agent/ai-stream/repository/core/db-writer/embedding-sync")
           .then(({ syncThreadEmbedding }) =>
             syncThreadEmbedding(updatedThread.id, streamContext),
           )

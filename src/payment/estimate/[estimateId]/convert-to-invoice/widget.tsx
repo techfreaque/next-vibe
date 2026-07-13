@@ -26,8 +26,7 @@ export function EstimateConvertToInvoiceWidget(_props: {
 
   const handleViewInvoice = (): void => {
     void (async (): Promise<void> => {
-      const def =
-        await import("@/app/api/[locale]/payment/invoice/[invoiceId]/get/definition");
+      const def = await import("@/payment/invoice/[invoiceId]/get/definition");
       navigation.push(def.default.GET, {
         urlPathParams: { invoiceId: data?.invoiceId ?? "" },
       });

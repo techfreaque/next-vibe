@@ -21,7 +21,7 @@ export async function getRemoteSession(
   userId: string,
 ): Promise<RemoteSession | null> {
   const { RemoteConnectionRepository } =
-    await import("@/app/api/[locale]/remote-connection/repository");
+    await import("next-vibe/remote-connection/repository");
 
   const record =
     await RemoteConnectionRepository.getRemoteConnectionRecord(userId);

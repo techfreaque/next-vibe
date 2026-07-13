@@ -1,5 +1,6 @@
 "use client";
 
+import { scopedTranslation } from "next-vibe/agent/ai-stream/stream/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -7,8 +8,6 @@ import { ArrowRight } from "next-vibe/ui/ui/icons/ArrowRight";
 import { Sparkles } from "next-vibe/ui/ui/icons/Sparkles";
 import { H3, P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
-
-import { scopedTranslation } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
 
 interface WelcomeStepProps {
   onContinue: () => void;

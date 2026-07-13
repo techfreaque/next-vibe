@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getAvailableSkillCount } from "next-vibe/agent/skills/config";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
@@ -12,9 +13,8 @@ import { Span } from "next-vibe/ui/ui/span";
 import { H1, H2, Muted, P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 
-import { getAvailableSkillCount } from "@/app/api/[locale]/agent/skills/config";
-import { FEEDBACK_REWARD_CREDITS } from "@/app/api/[locale]/credits/constants";
-import { configScopedTranslation } from "@/config/i18n";
+import { configScopedTranslation } from "@/_old/config/i18n";
+import { FEEDBACK_REWARD_CREDITS } from "@/credits/constants";
 
 import { scopedTranslation } from "./i18n";
 

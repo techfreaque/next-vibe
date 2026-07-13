@@ -6,7 +6,7 @@ import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 export const Route = createFileRoute("/api/$locale/agent/ai-stream/run")({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/agent/ai-stream/run/route"),
+      () => import("next-vibe/agent/ai-stream/run/route"),
     ),
   },
 });

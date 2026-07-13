@@ -1,10 +1,10 @@
 /* eslint-disable i18next/no-literal-string */
 import "server-only";
 
+import type { SystemPromptFragment } from "next-vibe/agent/ai-stream/system-prompt/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
-import type { SystemPromptFragment } from "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
-import { envClient } from "@/config/env-client";
+import { envClient } from "@/_old/config/env-client";
 
 import { FETCH_URL_SHORT_ALIAS } from "../fetch-url-content/constants";
 import { WEB_SEARCH_ALIAS } from "./constants";
@@ -24,7 +24,7 @@ export const webFragment: SystemPromptFragment = {
     let hasBrowser = false;
     if (isAdmin) {
       try {
-        const { browserEnv } = await import("@/app/api/[locale]/browser/env");
+        const { browserEnv } = await import("@/browser/env");
         hasBrowser =
           isLocalMode || browserEnv.CHROME_EXECUTABLE_PATH !== undefined;
       } catch {

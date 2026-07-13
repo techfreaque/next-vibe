@@ -1,5 +1,6 @@
 "use client";
 
+import type { ModelCountsByContentLevel } from "next-vibe/agent/models/all-models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -12,8 +13,6 @@ import { Span } from "next-vibe/ui/ui/span";
 import { H2, P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 import { useInView } from "react-intersection-observer";
-
-import type { ModelCountsByContentLevel } from "@/app/api/[locale]/agent/models/all-models";
 
 import { CapabilityShowcase } from "./capability-showcase";
 import { scopedTranslation } from "./i18n";

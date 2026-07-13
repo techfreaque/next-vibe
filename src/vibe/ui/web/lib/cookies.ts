@@ -4,9 +4,9 @@
  */
 import { Environment } from "next-vibe/env/env-util";
 
-import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
-import { platform } from "@/config/env-client";
-import { envClient } from "@/config/env-client";
+import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/_old/config/constants";
+import { platform } from "@/_old/config/env-client";
+import { envClient } from "@/_old/config/env-client";
 
 /**
  * Get a cookie value by name (async for platform consistency)

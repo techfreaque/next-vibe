@@ -5,6 +5,7 @@
  */
 
 import { and, desc, eq, inArray, or, sql } from "drizzle-orm";
+import { rootlessStreamContext } from "next-vibe/agent/chat/config";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -30,7 +31,6 @@ import type { TasksT } from "next-vibe/tasks/i18n";
 import { scopedTranslation } from "next-vibe/tasks/i18n";
 import type { z } from "zod";
 
-import { rootlessStreamContext } from "@/app/api/[locale]/agent/chat/config";
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import { calculateNextExecutionTime } from "../cron-formatter";
@@ -326,7 +326,7 @@ export class CronTasksRepository {
       }
 
       if (task.userId) {
-        void import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual")
+        void import("next-vibe/agent/cortex/embeddings/sync-virtual")
           .then(({ syncVirtualNodeToEmbedding }) => {
             const embeddingContent = [
               `# ${task.displayName ?? task.id}`,
@@ -449,7 +449,7 @@ export class CronTasksRepository {
       if (userId) {
         void (async (): Promise<void> => {
           const { removeVirtualNode } =
-            await import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual");
+            await import("next-vibe/agent/cortex/embeddings/sync-virtual");
           await removeVirtualNode(userId, `/tasks/${canonicalId}.md`);
         })().catch(() => {
           // Best-effort cortex cleanup
@@ -547,7 +547,7 @@ export class CronTasksRepository {
     try {
       // Query 1: Task definitions with enriched fields
       const { RemoteConnectionRepository } =
-        await import("@/app/api/[locale]/remote-connection/repository");
+        await import("next-vibe/remote-connection/repository");
       const instanceId =
         await RemoteConnectionRepository.getLocalInstanceId(userId);
 

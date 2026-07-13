@@ -1,18 +1,17 @@
-import { EXECUTE_TOOL_ALIAS } from "next-vibe/execute-tool/constants";
-import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { HEALTH_ALIAS } from "next-vibe/server/server/health/constants";
-
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { CODING_AGENT_ALIAS } from "@/app/api/[locale]/agent/coding-agent/constants";
+import { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import { CODING_AGENT_ALIAS } from "next-vibe/agent/coding-agent/constants";
 import {
   CORTEX_DELETE_ALIAS,
   CORTEX_EDIT_ALIAS,
   CORTEX_LIST_ALIAS,
   CORTEX_WRITE_ALIAS,
-} from "@/app/api/[locale]/agent/cortex/constants";
-import { FETCH_URL_SHORT_ALIAS } from "@/app/api/[locale]/agent/fetch-url-content/constants";
-import { WEB_SEARCH_ALIAS } from "@/app/api/[locale]/agent/web-search/constants";
+} from "next-vibe/agent/cortex/constants";
+import { FETCH_URL_SHORT_ALIAS } from "next-vibe/agent/fetch-url-content/constants";
+import { WEB_SEARCH_ALIAS } from "next-vibe/agent/web-search/constants";
+import { EXECUTE_TOOL_ALIAS } from "next-vibe/execute-tool/constants";
+import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { HEALTH_ALIAS } from "next-vibe/server/server/health/constants";
 
 import type { Skill } from "../../config";
 import { tool } from "../../constants";
@@ -110,7 +109,7 @@ One \`definition.ts\` → web UI, CLI command, MCP tool, Native screen, AI-calla
 ## Endpoint Pattern (3-file structure)
 
 \`\`\`
-src/app/api/[locale]/<category>/<feature>/
+src/<category>/<feature>/
   definition.ts    - createEndpoint() with Zod schemas, field widgets, error types, examples
   repository.ts    - DB operations returning ResponseType<T>, no throw
   route.ts         - endpointsHandler() wiring definition + repository
@@ -182,7 +181,7 @@ Hard gate. Never skip. Never say "should work" — prove it. If something looks 
 
 ## Notes
 
-- **{{AGENT_DOCS_FILE}} is auto-generated.** Edit \`src/app/api/[locale]/agent/skills/default-skills/vibe-coder/skill.ts\` → \`vibe gen\`
+- **{{AGENT_DOCS_FILE}} is auto-generated.** Edit \`src/vibe/agent/skills/default-skills/vibe-coder/skill.ts\` → \`vibe gen\`
 `;
 
 export const vibeCoderSkill: Skill = {

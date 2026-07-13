@@ -9,10 +9,9 @@ import "server-only";
 
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import type { JSONValue } from "ai";
+import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
+import { agentEnv } from "next-vibe/agent/env";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
-import { agentEnv } from "@/app/api/[locale]/agent/env";
 
 import { ApiProvider, type ModelOptionBase } from "../../../models/models";
 import { createClaudeCode } from "../../providers/claude-code";

@@ -2,6 +2,8 @@ import "server-only";
 
 import { and, eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
+import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import { chatThreads, threadShareLinks } from "next-vibe/agent/chat/db";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -13,12 +15,7 @@ import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import {
-  chatThreads,
-  threadShareLinks,
-} from "@/app/api/[locale]/agent/chat/db";
-import { env } from "@/config/env";
+import { env } from "@/_old/config/env";
 
 import type {
   ShareLinkCreateRequestOutput,

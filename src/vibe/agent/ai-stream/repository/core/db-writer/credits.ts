@@ -6,14 +6,13 @@
 
 import "server-only";
 
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-
-import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import type {
   AudioVisionModelId,
   ImageVisionModelId,
   VideoVisionModelId,
-} from "@/app/api/[locale]/agent/ai-stream/vision-models";
+} from "next-vibe/agent/ai-stream/vision-models";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 
 import type { DbWriterState } from "./shared";
 
@@ -50,8 +49,7 @@ export async function deductAndEmitCredits(
     return;
   }
 
-  const { CreditRepository } =
-    await import("@/app/api/[locale]/credits/repository");
+  const { CreditRepository } = await import("@/credits/repository");
   const deductResult =
     params.type === "model"
       ? await CreditRepository.deductCreditsForModelUsage(

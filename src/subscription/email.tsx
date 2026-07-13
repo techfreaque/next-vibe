@@ -11,6 +11,8 @@ import {
   Section,
   Text as Span,
 } from "@react-email/components";
+import { getEnvAvailability } from "next-vibe/agent/env-availability";
+import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -21,12 +23,9 @@ import type { UserRole } from "next-vibe/identity/roles/enum";
 import type { ReactElement } from "react";
 import { z } from "zod";
 
-import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
-import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
-import { configScopedTranslation } from "@/config/i18n";
+import { configScopedTranslation } from "@/_old/config/i18n";
+import type { EmailTemplateDefinition } from "@/messenger/registry/template";
 
-import { FEATURED_MODELS } from "../agent/ai-stream/models";
 import { contactClientRepository } from "../contact/repository-client";
 import { EmailTemplate } from "../messenger/providers/email/smtp-client/components/template.email";
 import {
@@ -34,6 +33,7 @@ import {
   type TrackingContext,
 } from "../messenger/providers/email/smtp-client/components/tracking_context.email";
 import { getPricingParams } from "../products/repository-client";
+import { FEATURED_MODELS } from "../vibe/agent/ai-stream/models";
 import {
   scopedTranslation as subscriptionScopedTranslation,
   type SubscriptionT,

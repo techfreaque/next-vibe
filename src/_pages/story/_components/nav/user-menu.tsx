@@ -24,8 +24,8 @@ import { Span } from "next-vibe/ui/ui/span";
 import { P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 
-import { useLogout } from "@/app/api/[locale]/user/private/logout/hooks";
-import { useLogger } from "@/hooks/use-logger";
+import { useLogger } from "@/_old/hooks/use-logger";
+import { useLogout } from "@/user/private/logout/hooks";
 
 import { scopedTranslation } from "../i18n";
 

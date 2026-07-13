@@ -64,43 +64,42 @@ export function LeadsDashboardWidget(_props: {
 
   const handleNavNewLead = (): void => {
     void (async (): Promise<void> => {
-      const def = await import("@/app/api/[locale]/leads/create/definition");
+      const def = await import("@/leads/create/definition");
       navigate(def.default.POST, { renderInModal: true });
     })();
   };
 
   const handleNavAllLeads = (): void => {
     void (async (): Promise<void> => {
-      const def = await import("@/app/api/[locale]/leads/list/definition");
+      const def = await import("@/leads/list/definition");
       navigate(def.default.GET, {});
     })();
   };
 
   const handleNavCampaignStats = (): void => {
     void (async (): Promise<void> => {
-      const def =
-        await import("@/app/api/[locale]/leads/campaigns/stats/definition");
+      const def = await import("@/leads/campaigns/stats/definition");
       navigate(def.default.GET, {});
     })();
   };
 
   const handleNavSearch = (): void => {
     void (async (): Promise<void> => {
-      const def = await import("@/app/api/[locale]/leads/search/definition");
+      const def = await import("@/leads/search/definition");
       navigate(def.default.GET, {});
     })();
   };
 
   const handleNavImport = (): void => {
     void (async (): Promise<void> => {
-      const def = await import("@/app/api/[locale]/leads/import/definition");
+      const def = await import("@/leads/import/definition");
       navigate(def.default.POST, { renderInModal: true });
     })();
   };
 
   const handleNavLeadDetail = (leadId: string) => (): void => {
     void (async (): Promise<void> => {
-      const def = await import("@/app/api/[locale]/leads/[id]/definition");
+      const def = await import("@/leads/[id]/definition");
       navigate(def.default.GET, { urlPathParams: { id: leadId } });
     })();
   };

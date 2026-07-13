@@ -378,7 +378,7 @@ export class ThreadByIdRepository {
         }
         try {
           const { removeVirtualNodesByEntityId } =
-            await import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual");
+            await import("next-vibe/agent/cortex/embeddings/sync-virtual");
           await removeVirtualNodesByEntityId(ownerId, "/threads", threadId);
           await removeVirtualNodesByEntityId(ownerId, "/uploads", threadId);
           for (const messageId of threadMessageIds) {
@@ -523,7 +523,7 @@ export class ThreadByIdRepository {
         : null;
       if (mirrorFolderId === null && props.originInstanceId) {
         const { resolveScaffoldFolderId } =
-          await import("@/app/api/[locale]/agent/chat/threads/sync-provider");
+          await import("next-vibe/agent/chat/threads/sync-provider");
         const senderRootFolderId =
           parsed.data.rootFolderId ?? DefaultFolderId.PRIVATE;
         mirrorFolderId = await resolveScaffoldFolderId(

@@ -238,7 +238,7 @@ export const translations: typeof enTranslations = {
           reasoning:
             "Prüfe meine Task-Warteschlange. Ich sehe, dass email-sync 3 Mal mit IMAP-Timeouts fehlgeschlagen ist. Ich werde das untersuchen und beheben.",
           codeResult:
-            "Ursache gefunden: IMAP-Client ignorierte den konfigurierten Timeout - 5s-Hardcode-Überschreibung in src/app/api/[locale]/emails/imap-client/connection.ts:47. Behoben: Überschreibung entfernt, nutzt jetzt env.IMAP_TIMEOUT_MS (30s). Reconnect-Backoff hinzugefügt. 3 Dateien geändert, Regressionstest hinzugefügt.",
+            "Ursache gefunden: IMAP-Client ignorierte den konfigurierten Timeout - 5s-Hardcode-Überschreibung in src/messenger/email/imap-client/connection.ts:47. Behoben: Überschreibung entfernt, nutzt jetzt env.IMAP_TIMEOUT_MS (30s). Reconnect-Backoff hinzugefügt. 3 Dateien geändert, Regressionstest hinzugefügt.",
           reasoning2:
             "Fix sieht korrekt aus. Neu bauen und neu starten, damit der Patch live geht.",
           agentResponse:

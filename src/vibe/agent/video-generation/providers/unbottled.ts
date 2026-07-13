@@ -1,17 +1,17 @@
 import "server-only";
 
+import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
+import {
+  checkMediaBalance,
+  deductMediaCredits,
+} from "next-vibe/agent/shared/media-generation";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
-import {
-  checkMediaBalance,
-  deductMediaCredits,
-} from "@/app/api/[locale]/agent/shared/media-generation";
-import { STANDARD_MARKUP_PERCENTAGE } from "@/app/api/[locale]/products/constants";
+import { STANDARD_MARKUP_PERCENTAGE } from "@/products/constants";
 
 import definitions, {
   type VideoGenerationPostRequestOutput,

@@ -20,13 +20,13 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { env } from "@/config/env";
+import { env } from "@/_old/config/env";
 
-import type { ImagePushT } from "./i18n";
 import type {
   ImagePushRequestOutput,
   ImagePushResponseOutput,
 } from "./definition";
+import type { ImagePushT } from "./i18n";
 
 export class ImagePushRepository {
   static async execute(
@@ -247,7 +247,7 @@ export class ImagePushRepository {
     const { username, host, port } =
       ImagePushRepository.parseSshTarget(sshTarget);
     // Dynamic import keeps ssh2 out of Turbopack's static NFT trace, same
-    // reason as src/app/api/[locale]/ssh/client.ts's openSshClient.
+    // reason as src/ssh/client.ts's openSshClient.
     const { Client } = await import(/* turbopackIgnore: true */ "ssh2");
 
     return new Promise((resolve) => {

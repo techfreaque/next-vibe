@@ -49,7 +49,7 @@ function formatCall(fnName: string, importPath: string): string {
 
 function pageContent(relativePath: string, kind: "page" | "layout"): string {
   const importPath = `@/app/[locale]${relativePath ? `/${relativePath}` : ""}/${kind}`;
-  const wrapperPath = `@/app/api/[locale]/system/platforms/react-native/nextjs-compat-wrapper`;
+  const wrapperPath = `@/vibe/platforms/react-native/nextjs-compat-wrapper`;
   if (kind === "page") {
     return `import { createPageWrapperWithImport } from "${wrapperPath}";\n${formatCall("createPageWrapperWithImport", importPath)}\n`;
   }

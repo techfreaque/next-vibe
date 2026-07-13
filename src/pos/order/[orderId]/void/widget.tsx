@@ -29,7 +29,7 @@ export function PosOrderVoidWidget(
 
   const handleBackToList = (): void => {
     void (async (): Promise<void> => {
-      const def = await import("@/app/api/[locale]/pos/order/list/definition");
+      const def = await import("@/pos/order/list/definition");
       navigation.push(def.default.GET, {});
     })();
   };

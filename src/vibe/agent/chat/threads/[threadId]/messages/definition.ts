@@ -3,6 +3,7 @@
  * Defines endpoints for listing and creating messages in a thread
  */
 
+import { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import { dateSchema } from "next-vibe/core/definition/common.schema";
 import { createEndpoint } from "next-vibe/core/definition/create";
 import {
@@ -14,6 +15,7 @@ import {
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { getCurrentUrl, silentReplaceState } from "next-vibe/ui/lib/location";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import {
   customWidgetObject,
   objectField,
@@ -23,9 +25,6 @@ import {
   responseField,
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
-
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { lazyWidget } from "@/app/api/[locale]/system/unified-ui/_shared/lazy-widget";
 
 import { DefaultFolderId, rootFolderIdOptions } from "../../../config";
 import type { MessageMetadata } from "../../../db";
@@ -121,7 +120,7 @@ const { GET } = createEndpoint({
         }
         if (arrived.role === ChatMessageRole.USER) {
           const { useChatInputStore } =
-            await import("@/app/api/[locale]/agent/ai-stream/stream/hooks/input-store");
+            await import("next-vibe/agent/ai-stream/stream/hooks/input-store");
           useChatInputStore.getState().reset();
           // When a queued user message is dequeued and re-confirmed, the optimistic
           // assistant placeholder that was added when the message was first sent
@@ -325,7 +324,7 @@ const { GET } = createEndpoint({
       operation: "merge" as const,
       onEvent: async () => {
         const { useChatInputStore } =
-          await import("@/app/api/[locale]/agent/ai-stream/stream/hooks/input-store");
+          await import("next-vibe/agent/ai-stream/stream/hooks/input-store");
         useChatInputStore.getState().reset();
       },
     },
@@ -349,7 +348,7 @@ const { GET } = createEndpoint({
           return;
         }
         const { getAudioQueue } =
-          await import("@/app/api/[locale]/agent/ai-stream/stream/hooks/audio-queue");
+          await import("next-vibe/agent/ai-stream/stream/hooks/audio-queue");
         getAudioQueue().enqueue(audioData, chunkIndex, logger);
       },
     },
@@ -373,7 +372,7 @@ const { GET } = createEndpoint({
           return;
         }
         const { isDefaultFolderId } =
-          await import("@/app/api/[locale]/agent/chat/config");
+          await import("next-vibe/agent/chat/config");
         if (!isDefaultFolderId(rawFolderId)) {
           return;
         }

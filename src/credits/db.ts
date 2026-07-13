@@ -25,12 +25,12 @@ import { leads } from "next-vibe/identity/lead/db";
 import { users } from "next-vibe/identity/user/db";
 import type { z } from "zod";
 
-import type { ChatModelId } from "../agent/ai-stream/models";
+import type { ChatModelId } from "../vibe/agent/ai-stream/models";
 import type {
   AudioVisionModelId,
   ImageVisionModelId,
   VideoVisionModelId,
-} from "../agent/ai-stream/vision-models";
+} from "../vibe/agent/ai-stream/vision-models";
 import { CreditPackTypeDB, CreditTransactionTypeDB } from "./enum";
 
 /**

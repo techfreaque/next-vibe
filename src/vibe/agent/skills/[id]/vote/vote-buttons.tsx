@@ -9,6 +9,7 @@
  */
 
 "use client";
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import { cn } from "next-vibe/core/utils/utils";
 import { apiClient } from "next-vibe/platforms/react/hooks/store";
 import { Button } from "next-vibe/ui/ui/button";
@@ -20,8 +21,6 @@ import {
   useWidgetLogger,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { type JSX, useCallback, useState } from "react";
-
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 
 import type { SkillVoteDirectionValue } from "../../enum";
 import { SkillVoteDirection } from "../../enum";

@@ -9,7 +9,7 @@ export const Route = createFileRoute(
   server: {
     handlers: wrapNextApiRoute(
       () =>
-        import("@/app/api/[locale]/remote-connection/self/instanceId/route"),
+        import("next-vibe/remote-connection/self/instanceId/route"),
     ),
   },
 });

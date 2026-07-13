@@ -8,7 +8,7 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/agent/fetch-url-content/cleanup/route"),
+      () => import("next-vibe/agent/fetch-url-content/cleanup/route"),
     ),
   },
 });

@@ -6,7 +6,7 @@ import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 export const Route = createFileRoute("/api/$locale/agent/web-search/brave")({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/agent/web-search/brave/route"),
+      () => import("next-vibe/agent/web-search/brave/route"),
     ),
   },
 });

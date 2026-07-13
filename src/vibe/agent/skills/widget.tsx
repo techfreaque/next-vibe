@@ -3,6 +3,9 @@
  */
 
 "use client";
+import { useTourState } from "next-vibe/agent/chat/tour-state";
+import { ModelCreditDisplay } from "next-vibe/agent/models/widget/model-credit-display";
+import { getBestChatModelForFavorite } from "next-vibe/agent/skills/favorites/[id]/definition";
 import { isCliPlatform } from "next-vibe/core/definition/platform";
 import { cn } from "next-vibe/core/utils/utils";
 import { usePathname } from "next-vibe/ui/hooks/use-pathname";
@@ -64,10 +67,6 @@ import TextWidget from "next-vibe/unified-ui/display-only/text/widget";
 import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
 import { useCallback, useEffect, useMemo, useState } from "react";
-
-import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
-import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
-import { getBestChatModelForFavorite } from "@/app/api/[locale]/agent/skills/favorites/[id]/definition";
 
 import { useSelectorOnboardingContext } from "../ai-stream/stream/widget/selector/selector-onboarding/context";
 import { useChatSettings } from "../chat/settings/hooks";

@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { getEnvAvailability } from "next-vibe/agent/env-availability";
+import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import type { JWTPublicPayloadType } from "next-vibe/identity/auth/types";
@@ -15,11 +17,9 @@ import { Span } from "next-vibe/ui/ui/span";
 import { H1, H2, H3, P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 
-import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
-import { GITHUB_REPO_URL } from "@/config/constants";
-import { envClient } from "@/config/env-client";
-import { configScopedTranslation } from "@/config/i18n";
+import { GITHUB_REPO_URL } from "@/_old/config/constants";
+import { envClient } from "@/_old/config/env-client";
+import { configScopedTranslation } from "@/_old/config/i18n";
 
 import { ContactFormSection } from "../_components/contact-form-section";
 import { scopedTranslation } from "./i18n";

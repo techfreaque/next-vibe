@@ -8,7 +8,7 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/analytics/transformers/merge/route"),
+      () => import("@/analytics/transformers/merge/route"),
     ),
   },
 });

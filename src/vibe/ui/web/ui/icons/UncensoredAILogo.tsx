@@ -1,6 +1,6 @@
 import type { JSX } from "react";
 
-import { envClient } from "@/config/env-client";
+import { envClient } from "@/_old/config/env-client";
 
 /**
  * Uncensored AI Logo for Web

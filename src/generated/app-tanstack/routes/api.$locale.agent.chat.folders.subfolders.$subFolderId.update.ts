@@ -9,7 +9,7 @@ export const Route = createFileRoute(
   server: {
     handlers: wrapNextApiRoute(
       () =>
-        import("@/app/api/[locale]/agent/chat/folders/subfolders/[subFolderId]/update/route"),
+        import("next-vibe/agent/chat/folders/subfolders/[subFolderId]/update/route"),
     ),
   },
 });

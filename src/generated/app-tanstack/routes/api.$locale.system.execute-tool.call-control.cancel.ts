@@ -1,4 +1,4 @@
-// AUTO-GENERATED from src/app/api/[locale]/system/execute-tool/call-control/cancel/route.ts. Add "use custom" to this file to preserve customizations.
+// AUTO-GENERATED from src/vibe/execute-tool/call-control/cancel/route.ts. Add "use custom" to this file to preserve customizations.
 import { createFileRoute } from "@tanstack/react-router";
 
 import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
@@ -9,7 +9,7 @@ export const Route = createFileRoute(
   server: {
     handlers: wrapNextApiRoute(
       () =>
-        import("@/app/api/[locale]/system/execute-tool/call-control/cancel/route"),
+        import("next-vibe/execute-tool/call-control/cancel/route"),
     ),
   },
 });

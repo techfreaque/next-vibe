@@ -21,7 +21,7 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import {
   BEARER_LEAD_ID_SEPARATOR,
   LEAD_ID_COOKIE_NAME,
-} from "@/config/constants";
+} from "@/_old/config/constants";
 
 import type { RemoteCallParams, RemoteCallResult } from "./types";
 
@@ -187,7 +187,7 @@ export class RemoteTransport {
       timeoutMs,
     });
     if (raw.networkError) {
-      const { scopedTranslation } = await import("@/app/[locale]/shared/i18n");
+      const { scopedTranslation } = await import("@/_pages/shared/i18n");
       const { t } = scopedTranslation.scopedT(locale);
       return {
         response: fail({
@@ -207,7 +207,7 @@ export class RemoteTransport {
         networkError: false,
       };
     }
-    const { scopedTranslation } = await import("@/app/[locale]/shared/i18n");
+    const { scopedTranslation } = await import("@/_pages/shared/i18n");
     const { t } = scopedTranslation.scopedT(locale);
     return {
       response: fail({

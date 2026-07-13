@@ -223,7 +223,7 @@ const { POST } = createEndpoint({
       },
       batch: {
         prompt:
-          "Read src/app/api/[locale]/agent/coding-agent/route.ts and summarize what it does in 2 sentences.",
+          "Read src/vibe/agent/coding-agent/route.ts and summarize what it does in 2 sentences.",
         provider: "claude-code",
         interactiveMode: false,
       },

@@ -7,7 +7,7 @@ export const Route = createFileRoute("/api/$locale/purchasing/order/$poId/get")(
   {
     server: {
       handlers: wrapNextApiRoute(
-        () => import("@/app/api/[locale]/purchasing/order/[poId]/get/route"),
+        () => import("@/purchasing/order/[poId]/get/route"),
       ),
     },
   },

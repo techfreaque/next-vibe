@@ -18,10 +18,7 @@ import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/wid
 import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import type { JSX } from "react";
 
-import {
-  PosPaymentMethod,
-  PosPaymentMethodOptions,
-} from "@/app/api/[locale]/pos/enum";
+import { PosPaymentMethod, PosPaymentMethodOptions } from "@/pos/enum";
 
 import type definition from "./definition";
 

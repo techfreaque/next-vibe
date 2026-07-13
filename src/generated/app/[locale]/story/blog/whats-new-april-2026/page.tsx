@@ -1,3 +1,3 @@
 // AUTO-GENERATED from src/app/[locale]/story/blog/whats-new-april-2026/page.tsx. Add "use custom" to this file to preserve customizations.
-export { default } from "@/app/[locale]/story/blog/whats-new-april-2026/page";
-export * from "@/app/[locale]/story/blog/whats-new-april-2026/page";
+export { default } from "@/_pages/story/blog/whats-new-april-2026/page";
+export * from "@/_pages/story/blog/whats-new-april-2026/page";

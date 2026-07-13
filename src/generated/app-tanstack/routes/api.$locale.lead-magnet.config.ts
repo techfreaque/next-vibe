@@ -6,7 +6,7 @@ import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 export const Route = createFileRoute("/api/$locale/lead-magnet/config")({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/lead-magnet/config/route"),
+      () => import("@/lead-magnet/config/route"),
     ),
   },
 });

@@ -74,8 +74,7 @@ const { GET } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         listEndpoint: async () =>
-          (await import("@/app/api/[locale]/users/list/definition")).default
-            .GET,
+          (await import("@/users/list/definition")).default.GET,
         labelField: "email",
         label: "id.get.id.label" as const,
         description: "id.get.id.description" as const,
@@ -481,8 +480,7 @@ const { PUT } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         listEndpoint: async () =>
-          (await import("@/app/api/[locale]/users/list/definition")).default
-            .GET,
+          (await import("@/users/list/definition")).default.GET,
         labelField: "email",
         label: "id.put.id.label" as const,
         description: "id.put.id.description" as const,
@@ -553,8 +551,7 @@ const { PUT } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         listEndpoint: async () =>
-          (await import("@/app/api/[locale]/leads/list/definition")).default
-            .GET,
+          (await import("@/leads/list/definition")).default.GET,
         labelField: "email",
         label: "id.put.leadId.label" as const,
         description: "id.put.leadId.description" as const,
@@ -773,8 +770,7 @@ const { DELETE } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         listEndpoint: async () =>
-          (await import("@/app/api/[locale]/users/list/definition")).default
-            .GET,
+          (await import("@/users/list/definition")).default.GET,
         labelField: "email",
         label: "id.delete.id.label" as const,
         description: "id.delete.id.description" as const,

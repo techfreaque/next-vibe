@@ -8,7 +8,7 @@ import { de, enUS, type Locale, pl } from "date-fns/locale";
 import { dateSchema } from "next-vibe/core/definition/common.schema";
 import type z from "zod";
 
-import { configScopedTranslation } from "@/config/i18n";
+import { configScopedTranslation } from "@/_old/config/i18n";
 
 import type { CountryLanguage, Currencies } from "./config";
 import { getCountryFromLocale } from "./language-utils";

@@ -24,7 +24,7 @@ const SpeechToTextContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.SpeechToTextContainer })),
 );
 
-import { lazyWidget } from "../../system/unified-ui/_shared/lazy-widget";
+import { lazyWidget } from "../../unified-ui/_shared/lazy-widget";
 import { DEFAULT_STT_MODEL_ID, TRANSCRIBE_AUDIO_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 import { SttModelId } from "./models";

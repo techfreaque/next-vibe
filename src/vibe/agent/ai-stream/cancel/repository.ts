@@ -6,6 +6,15 @@
 import "server-only";
 
 import { and, eq, sql } from "drizzle-orm";
+import { StreamErrorType } from "next-vibe/agent/ai-stream/repository/core/constants";
+import { buildSseMessageRow } from "next-vibe/agent/ai-stream/repository/core/db-writer/sse-row";
+import { chatMessages, chatThreads } from "next-vibe/agent/chat/db";
+import {
+  ChatMessageRole,
+  ThreadStreamingState,
+} from "next-vibe/agent/chat/enum";
+import { createMessagesEmitter } from "next-vibe/agent/chat/threads/[threadId]/messages/emitter";
+import { MessagesRepository } from "next-vibe/agent/chat/threads/[threadId]/messages/repository";
 import {
   ErrorResponseTypes,
   fail,
@@ -14,22 +23,12 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
+import { REVIVAL_ALIAS as RESUME_STREAM_ALIAS } from "next-vibe/execute-tool/revival/definition";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { cronTasks } from "next-vibe/tasks/cron/db";
 import { CronTaskStatus } from "next-vibe/tasks/enum";
-
-import { StreamErrorType } from "@/app/api/[locale]/agent/ai-stream/repository/core/constants";
-import { buildSseMessageRow } from "@/app/api/[locale]/agent/ai-stream/repository/core/db-writer/sse-row";
-import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
-import {
-  ChatMessageRole,
-  ThreadStreamingState,
-} from "@/app/api/[locale]/agent/chat/enum";
-import { createMessagesEmitter } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/emitter";
-import { MessagesRepository } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/repository";
-import { REVIVAL_ALIAS as RESUME_STREAM_ALIAS } from "@/app/api/[locale]/system/execute-tool/revival/definition";
 
 import {
   clearStreamingState,

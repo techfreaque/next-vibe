@@ -36,7 +36,7 @@ export class AudioQueueManager {
    * Update voice mode store with playback state
    */
   private updateVoiceModeStore(isPlaying: boolean): void {
-    void import("@/app/api/[locale]/agent/ai-stream/stream/hooks/voice-mode/store")
+    void import("next-vibe/agent/ai-stream/stream/hooks/voice-mode/store")
       .then(({ useVoiceModeStore }) => {
         useVoiceModeStore.getState().setSpeaking(isPlaying);
         return undefined;

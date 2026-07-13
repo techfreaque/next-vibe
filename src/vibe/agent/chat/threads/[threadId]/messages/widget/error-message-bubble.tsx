@@ -1,6 +1,9 @@
 "use client";
 
 import { AlertCircle, CheckCircle2, StopCircle } from "lucide-react";
+import { StreamErrorType } from "next-vibe/agent/ai-stream/repository/core/constants";
+import type { DefaultFolderId } from "next-vibe/agent/chat/config";
+import type { ChatMessage } from "next-vibe/agent/chat/db";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
@@ -14,16 +17,13 @@ import {
   useWidgetNavigation,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 import { useState } from "react";
 
-import { scopedTranslation as sharedScopedTranslation } from "@/app/[locale]/shared/i18n";
-import { StreamErrorType } from "@/app/api/[locale]/agent/ai-stream/repository/core/constants";
-import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import type { ContactRequest } from "@/app/api/[locale]/contact/definition";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-ui/renderers/react/EndpointsPage";
-import { useUser } from "@/app/api/[locale]/user/private/me/hooks";
+import { scopedTranslation as sharedScopedTranslation } from "@/_pages/shared/i18n";
+import type { ContactRequest } from "@/contact/definition";
+import { useUser } from "@/user/private/me/hooks";
 
 import { scopedTranslation } from "../i18n";
 import { CopyButton } from "./copy-button";
@@ -93,7 +93,7 @@ export function ErrorMessageBubble({
               onClick={(): void => {
                 void (async (): Promise<void> => {
                   const messageIdDefs =
-                    await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/definition");
+                    await import("next-vibe/agent/chat/threads/[threadId]/messages/[messageId]/definition");
                   navigate(messageIdDefs.default.DELETE, {
                     urlPathParams: {
                       threadId: message.threadId,
@@ -144,7 +144,7 @@ export function ErrorMessageBubble({
   const handleDelete = (): void => {
     void (async (): Promise<void> => {
       const messageIdDefs =
-        await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/definition");
+        await import("next-vibe/agent/chat/threads/[threadId]/messages/[messageId]/definition");
       navigate(messageIdDefs.default.DELETE, {
         urlPathParams: { threadId: message.threadId, messageId: message.id },
         data: { rootFolderId },
@@ -156,9 +156,9 @@ export function ErrorMessageBubble({
 
   const handleReport = (): void => {
     void (async (): Promise<void> => {
-      const contactDefs = await import("@/app/api/[locale]/contact/definition");
+      const contactDefs = await import("@/contact/definition");
       const { ContactSubject, ContactPriority } =
-        await import("@/app/api/[locale]/contact/enum");
+        await import("@/contact/enum");
 
       const errorSummary = displayContent.slice(0, 300);
 

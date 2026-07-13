@@ -54,9 +54,7 @@ const { GET } = createEndpoint({
         description: "warehouseGet.get.warehouseId.description" as const,
         schema: z.uuid(),
         listEndpoint: async () =>
-          (
-            await import("@/app/api/[locale]/inventory/warehouse/list/definition")
-          ).default.GET,
+          (await import("@/inventory/warehouse/list/definition")).default.GET,
         labelField: "name",
       }),
 

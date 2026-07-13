@@ -117,8 +117,7 @@ const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         listEndpoint: async () =>
-          (await import("@/app/api/[locale]/leads/list/definition")).default
-            .GET,
+          (await import("@/leads/list/definition")).default.GET,
         labelField: "email",
         label: "post.leadId.label",
         description: "post.leadId.description",
@@ -162,8 +161,7 @@ const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         listEndpoint: async () =>
-          (await import("@/app/api/[locale]/users/list/definition")).default
-            .GET,
+          (await import("@/users/list/definition")).default.GET,
         labelField: "email",
         label: "post.userId.label",
         description: "post.userId.description",
@@ -375,8 +373,7 @@ const { GET } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         listEndpoint: async () =>
-          (await import("@/app/api/[locale]/leads/list/definition")).default
-            .GET,
+          (await import("@/leads/list/definition")).default.GET,
         labelField: "email",
         label: "get.id.label",
         description: "get.id.description",

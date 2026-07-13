@@ -3,6 +3,8 @@
  * Defines endpoint for listing skills
  */
 
+import { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import { DEFAULT_TTS_VOICE_ID } from "next-vibe/agent/text-to-speech/constants";
 import {
   iconSchema,
   translatedValueSchema,
@@ -28,9 +30,6 @@ import {
   widgetField,
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
-
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { DEFAULT_TTS_VOICE_ID } from "@/app/api/[locale]/agent/text-to-speech/constants";
 
 import { allModelDefinitions } from "../models/all-models";
 import { NO_SKILL_ID, SKILLS_LIST_ALIAS } from "./constants";
@@ -112,8 +111,7 @@ const { GET } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         listEndpoint: async () =>
-          (await import("@/app/api/[locale]/users/list/definition")).default
-            .GET,
+          (await import("@/users/list/definition")).default.GET,
         labelField: "email",
         label: "get.fields.targetUserId.label" as const,
         description: "get.fields.targetUserId.description" as const,

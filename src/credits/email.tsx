@@ -20,14 +20,14 @@ import { users } from "next-vibe/identity/user/db";
 import type { ReactElement } from "react";
 import { z } from "zod";
 
-import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
-import { EmailTemplate } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/template.email";
+import { configScopedTranslation } from "@/_old/config/i18n";
+import { contactClientRepository } from "@/contact/repository-client";
+import { EmailTemplate } from "@/messenger/providers/email/smtp-client/components/template.email";
 import {
   createTrackingContext,
   type TrackingContext,
-} from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/tracking_context.email";
-import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
-import { configScopedTranslation } from "@/config/i18n";
+} from "@/messenger/providers/email/smtp-client/components/tracking_context.email";
+import type { EmailTemplateDefinition } from "@/messenger/registry/template";
 
 import type {
   AdminAddCreditsPostRequestOutput,

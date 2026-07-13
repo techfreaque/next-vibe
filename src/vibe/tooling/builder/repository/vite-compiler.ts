@@ -441,11 +441,8 @@ class ViteCompiler {
       // vite-tsconfig-paths resolves only to the first match.
       // next-vibe/ui/* → tanstack/ first (TanStack-specific overrides),
       // then falls back to web/ (shared UI components).
-      const tanstackUiDir = resolve(
-        ROOT_DIR,
-        "src/app/api/[locale]/system/ui/tanstack",
-      );
-      const webUiDir = resolve(ROOT_DIR, "src/app/api/[locale]/system/ui/web");
+      const tanstackUiDir = resolve(ROOT_DIR, "src/vibe/ui/tanstack");
+      const webUiDir = resolve(ROOT_DIR, "src/vibe/ui/web");
       plugins.push({
         name: "next-vibe-ui-resolver",
         resolveId(id: string): string | null {
@@ -476,10 +473,10 @@ class ViteCompiler {
               find: /^@\//,
               replacement: `${resolve(ROOT_DIR, "src")}/`,
             },
-            // next-vibe/* → src/app/api/[locale]/*
+            // next-vibe/* → src/vibe/*
             {
               find: /^next-vibe\//,
-              replacement: `${resolve(ROOT_DIR, "src/app/api/[locale]/system")}/`,
+              replacement: `${resolve(ROOT_DIR, "src/vibe")}/`,
             },
           ],
         },
@@ -720,13 +717,10 @@ class ViteCompiler {
     const srcDirectory = fileConfig.input;
 
     const srcDir = resolve(ROOT_DIR, "src");
-    const nextVibeDir = resolve(ROOT_DIR, "src/app/api/[locale]/system");
-    const nextVibeSystemDir = resolve(ROOT_DIR, "src/app/api/[locale]/system");
-    const tanstackUiDir = resolve(
-      ROOT_DIR,
-      "src/app/api/[locale]/system/ui/tanstack",
-    );
-    const webUiDir = resolve(ROOT_DIR, "src/app/api/[locale]/system/ui/web");
+    const nextVibeDir = resolve(ROOT_DIR, "src/vibe");
+    const nextVibeSystemDir = resolve(ROOT_DIR, "src/vibe");
+    const tanstackUiDir = resolve(ROOT_DIR, "src/vibe/ui/tanstack");
+    const webUiDir = resolve(ROOT_DIR, "src/vibe/ui/web");
     const moduleAliases = fileConfig.viteOptions?.moduleAliases ?? {};
 
     const exts = [
@@ -1138,12 +1132,9 @@ class ViteCompiler {
       const srcDirectory = fileConfig.input;
 
       const srcDir = resolve(ROOT_DIR, "src");
-      const nextVibeDir = resolve(ROOT_DIR, "src/app/api/[locale]/system");
-      const tanstackUiDir = resolve(
-        ROOT_DIR,
-        "src/app/api/[locale]/system/ui/tanstack",
-      );
-      const webUiDir = resolve(ROOT_DIR, "src/app/api/[locale]/system/ui/web");
+      const nextVibeDir = resolve(ROOT_DIR, "src/vibe");
+      const tanstackUiDir = resolve(ROOT_DIR, "src/vibe/ui/tanstack");
+      const webUiDir = resolve(ROOT_DIR, "src/vibe/ui/web");
       // Module aliases from build.config.ts viteOptions.moduleAliases
       // Keys are import specifiers, values are paths relative to ROOT_DIR.
       const moduleAliases = fileConfig.viteOptions?.moduleAliases ?? {};
@@ -1249,7 +1240,7 @@ class ViteCompiler {
               // fs.watch's recursive mode - proven to work under Bun on this
               // OS by dev-watcher/task-runner.ts's generator watcher - so this
               // has no dependency on a system `node` binary being installed.
-              const localeDir = resolve(ROOT_DIR, "src/app/api/[locale]");
+              const localeDir = resolve(ROOT_DIR, "src");
               const watcher = existsSync(localeDir)
                 ? watch(
                     localeDir,
@@ -1637,10 +1628,7 @@ class ViteCompiler {
               if (id !== "server-only" && id.startsWith("next-vibe/")) {
                 const sub = id.slice("next-vibe/".length);
                 return tryResolve(
-                  [
-                    resolve(ROOT_DIR, "src/app/api/[locale]/system"),
-                    resolve(ROOT_DIR, "src/app/api/[locale]"),
-                  ],
+                  [resolve(ROOT_DIR, "src/vibe"), resolve(ROOT_DIR, "src")],
                   sub,
                 );
               }

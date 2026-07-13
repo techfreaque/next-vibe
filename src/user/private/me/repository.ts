@@ -6,6 +6,14 @@
 import "server-only";
 
 import { and, eq } from "drizzle-orm";
+import { DEFAULT_CHAT_MODEL_SELECTION } from "next-vibe/agent/ai-stream/constants";
+import { getBestChatModel } from "next-vibe/agent/ai-stream/models";
+import { formatSkillId } from "next-vibe/agent/chat/slugify";
+import { getInstanceAvailability } from "next-vibe/agent/env-availability";
+import { getModelDisplayName } from "next-vibe/agent/models/all-models";
+import { modelProviders } from "next-vibe/agent/models/models";
+import { customSkills } from "next-vibe/agent/skills/db";
+import { SkillOwnershipType, SkillStatus } from "next-vibe/agent/skills/enum";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import {
@@ -25,18 +33,6 @@ import { userRoles, users } from "next-vibe/identity/user/db";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
-import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
-import { formatSkillId } from "@/app/api/[locale]/agent/chat/slugify";
-import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { getModelDisplayName } from "@/app/api/[locale]/agent/models/all-models";
-import { modelProviders } from "@/app/api/[locale]/agent/models/models";
-import { customSkills } from "@/app/api/[locale]/agent/skills/db";
-import {
-  SkillOwnershipType,
-  SkillStatus,
-} from "@/app/api/[locale]/agent/skills/enum";
 
 import { creditWallets } from "../../../credits/db";
 import { csvImportJobs, importBatches } from "../../../leads/import/db";

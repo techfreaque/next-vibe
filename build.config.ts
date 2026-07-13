@@ -15,8 +15,8 @@ import {
   OutputFormatEnum,
   SourcemapModeEnum,
   ViteBuildTypeEnum,
-} from "@/app/api/[locale]/system/tooling/builder/enum";
-import type { BuildConfig } from "@/app/api/[locale]/system/tooling/builder/repository";
+} from "next-vibe/tooling/builder/enum";
+import type { BuildConfig } from "next-vibe/tooling/builder/repository";
 
 // ssh2's native cpu-features.node binding can never be bundled into JS output -
 // same reason next.config.ts's serverExternalPackages excludes it for webpack.
@@ -43,7 +43,7 @@ const config: BuildConfig = {
   // Build the CLI as an executable using Bun
   filesToCompile: [
     {
-      input: "src/app/api/[locale]/system/platforms/cli/vibe-runtime.ts",
+      input: "src/vibe/platforms/cli/vibe-runtime.ts",
       output: ".dist/bin/vibe-runtime.js",
       type: BunBuildTypeEnum.EXECUTABLE,
       modulesToExternalize: [
@@ -75,7 +75,7 @@ const config: BuildConfig = {
     },
     {
       input:
-        "src/app/api/[locale]/system/tooling/check/oxlint/plugins/restricted-syntax/src/index.ts",
+        "src/vibe/tooling/check/oxlint/plugins/restricted-syntax/src/index.ts",
       output: ".dist/oxlint-plugins/restricted-syntax.js",
       type: BunBuildTypeEnum.MODULE,
       modulesToExternalize: NATIVE_BINDING_EXTERNALS,
@@ -89,7 +89,7 @@ const config: BuildConfig = {
     },
     {
       input:
-        "src/app/api/[locale]/system/tooling/check/oxlint/plugins/jsx-capitalization/src/index.ts",
+        "src/vibe/tooling/check/oxlint/plugins/jsx-capitalization/src/index.ts",
       output: ".dist/oxlint-plugins/jsx-capitalization.js",
       type: BunBuildTypeEnum.MODULE,
       modulesToExternalize: NATIVE_BINDING_EXTERNALS,
@@ -101,8 +101,7 @@ const config: BuildConfig = {
       },
     },
     {
-      input:
-        "src/app/api/[locale]/system/tooling/check/oxlint/plugins/i18n/src/index.ts",
+      input: "src/vibe/tooling/check/oxlint/plugins/i18n/src/index.ts",
       output: ".dist/oxlint-plugins/i18n.js",
       type: BunBuildTypeEnum.MODULE,
       modulesToExternalize: NATIVE_BINDING_EXTERNALS,
@@ -116,7 +115,7 @@ const config: BuildConfig = {
     // ── Vibe Frame: browser IIFE (script tag) ───────────────────────────────
     // Exposes window.VibeFrame for <script src="/vibe-frame/vibe-frame.js"> usage.
     {
-      input: "src/app/api/[locale]/system/platforms/vibe-frame/embed.ts",
+      input: "src/vibe/platforms/vibe-frame/embed.ts",
       output: "public/vibe-frame/vibe-frame.js",
       type: BunBuildTypeEnum.MODULE,
       modulesToExternalize: [],
@@ -130,8 +129,7 @@ const config: BuildConfig = {
     // ── Vibe Frame: ESM package (npm / bundler import) ───────────────────────
     // Library entry - no auto-init, no window exposure, full type exports.
     {
-      input:
-        "src/app/api/[locale]/system/platforms/vibe-frame/embed-package.ts",
+      input: "src/vibe/platforms/vibe-frame/embed-package.ts",
       output: "public/vibe-frame/vibe-frame.esm.js",
       type: BunBuildTypeEnum.MODULE,
       modulesToExternalize: [],
@@ -145,8 +143,7 @@ const config: BuildConfig = {
     // ── Vibe Frame: inside-bridge (loaded inside iframes) ───────────────────
     // Provides window.bridgeCall for widget code to call privileged parent APIs.
     {
-      input:
-        "src/app/api/[locale]/system/platforms/vibe-frame/inside-bridge.ts",
+      input: "src/vibe/platforms/vibe-frame/inside-bridge.ts",
       output: "public/vibe-frame/vibe-frame-inside-bridge.js",
       type: BunBuildTypeEnum.MODULE,
       modulesToExternalize: [],
@@ -172,8 +169,7 @@ const config: BuildConfig = {
         // Applied as resolve.alias so they work in both client and SSR module runner.
         moduleAliases: {
           // server-only throws in Vite SSR (no Next.js boundaries) - stub it out
-          "server-only":
-            "src/app/api/[locale]/system/ui/tanstack/lib/server-only.ts",
+          "server-only": "src/vibe/ui/tanstack/lib/server-only.ts",
         },
       },
     },
@@ -182,7 +178,7 @@ const config: BuildConfig = {
   // Files or folders to copy after compilation
   filesOrFoldersToCopy: [
     { input: "README.md", output: ".dist/README.md" },
-    { input: "src/app/api/[locale]/LICENSE", output: ".dist/LICENSE" },
+    { input: "src/LICENSE", output: ".dist/LICENSE" },
   ],
 };
 

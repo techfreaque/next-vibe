@@ -7,6 +7,13 @@
 
 import "server-only";
 
+import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
+import { agentEnv } from "next-vibe/agent/env";
+import {
+  type AgentEnvAvailability,
+  buildMissingKeyMessage,
+} from "next-vibe/agent/env-availability";
+import { ApiProvider } from "next-vibe/agent/models/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
@@ -14,16 +21,9 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
-import { agentEnv } from "@/app/api/[locale]/agent/env";
-import {
-  type AgentEnvAvailability,
-  buildMissingKeyMessage,
-} from "@/app/api/[locale]/agent/env-availability";
-import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
-import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
-import { CreditRepository } from "@/app/api/[locale]/credits/repository";
-import { TTS_COST_PER_CHARACTER } from "@/app/api/[locale]/products/repository-client";
+import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
+import { CreditRepository } from "@/credits/repository";
+import { TTS_COST_PER_CHARACTER } from "@/products/repository-client";
 
 import { ChatMessageRole } from "../../../chat/enum";
 import type { MessagesWsEmit } from "../../../chat/threads/[threadId]/messages/emitter";

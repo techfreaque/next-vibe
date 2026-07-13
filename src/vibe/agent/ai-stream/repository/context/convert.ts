@@ -7,12 +7,11 @@ import "server-only";
 
 import type { ToolResultOutput } from "@ai-sdk/provider-utils";
 import type { ModelMessage, ToolCallPart } from "ai";
+import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
 import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 
 import type { DefaultFolderId } from "../../../chat/config";
 import type { ChatMessage, ToolCall } from "../../../chat/db";

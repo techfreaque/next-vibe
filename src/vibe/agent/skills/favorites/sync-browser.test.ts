@@ -42,7 +42,7 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { env } from "@/config/env";
+import { env } from "@/_old/config/env";
 
 import {
   connectToHermes,
@@ -180,7 +180,7 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
 
     async function browserNewPage(session: string, url: string): Promise<void> {
       const def = (
-        await import("@/app/api/[locale]/browser/new-page/definition")
+        await import("@/browser/new-page/definition")
       ).default;
       const r = await browserRun(def.POST, {
         url,
@@ -195,7 +195,7 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
 
     async function browserSnapshot(session: string): Promise<string> {
       const def = (
-        await import("@/app/api/[locale]/browser/take-snapshot/definition")
+        await import("@/browser/take-snapshot/definition")
       ).default;
       const r = await browserRun(def.POST, { instanceId: session });
       expect(r.success, `browser-take-snapshot failed: ${r.message}`).toBe(
@@ -209,7 +209,7 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
       uid: string,
       value: string,
     ): Promise<void> {
-      const def = (await import("@/app/api/[locale]/browser/fill/definition"))
+      const def = (await import("@/browser/fill/definition"))
         .default;
       const r = await browserRun(def.POST, {
         uid,
@@ -220,7 +220,7 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
     }
 
     async function browserClick(session: string, uid: string): Promise<void> {
-      const def = (await import("@/app/api/[locale]/browser/click/definition"))
+      const def = (await import("@/browser/click/definition"))
         .default;
       const r = await browserRun(def.POST, {
         uid,
@@ -238,7 +238,7 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
       timeoutMs = 20_000,
     ): Promise<void> {
       const def = (
-        await import("@/app/api/[locale]/browser/wait-for/definition")
+        await import("@/browser/wait-for/definition")
       ).default;
       const r = await browserRun(def.POST, {
         text: Array.isArray(text) ? text : [text],
@@ -257,7 +257,7 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
       url: string,
     ): Promise<void> {
       const def = (
-        await import("@/app/api/[locale]/browser/navigate-page/definition")
+        await import("@/browser/navigate-page/definition")
       ).default;
       const r = await browserRun(def.POST, {
         type: "url",
@@ -350,10 +350,10 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
      */
     async function cleanCareerCoachOnAtlasApi(): Promise<void> {
       const favListDef = (
-        await import("@/app/api/[locale]/agent/skills/favorites/definition")
+        await import("next-vibe/agent/skills/favorites/definition")
       ).default;
       const favDelDef = (
-        await import("@/app/api/[locale]/agent/skills/favorites/[id]/definition")
+        await import("next-vibe/agent/skills/favorites/[id]/definition")
       ).default;
       const list = await sendTestRequest({
         streamContext: undefined,
@@ -455,7 +455,7 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
       mode: "direct-http" | "reverse-ws",
     ): Promise<void> {
       const connByIdDef = (
-        await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
+        await import("next-vibe/remote-connection/[instanceId]/definition")
       ).default;
       const result = await sendTestRequest({
         streamContext: undefined,
@@ -510,7 +510,7 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
 
       // Enable favorites sync scope and set initial transport to direct-http
       const connByIdDef = (
-        await import("@/app/api/[locale]/remote-connection/[instanceId]/definition")
+        await import("next-vibe/remote-connection/[instanceId]/definition")
       ).default;
       const patchResult = await sendTestRequest({
         streamContext: undefined,

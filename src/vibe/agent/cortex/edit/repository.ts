@@ -6,6 +6,10 @@ import "server-only";
  */
 import { and, eq } from "drizzle-orm";
 import {
+  rootlessStreamContext,
+  type ToolExecutionContext,
+} from "next-vibe/agent/chat/config";
+import {
   type CountryLanguage,
   defaultLocale,
 } from "next-vibe/core/i18n/core/config";
@@ -22,12 +26,7 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { createEndpointEmitter } from "next-vibe/realtime/emitter";
 
-import {
-  rootlessStreamContext,
-  type ToolExecutionContext,
-} from "@/app/api/[locale]/agent/chat/config";
-
-import type { EndpointLogger } from "../../../system/logger/types";
+import type { EndpointLogger } from "../../../logger/types";
 import { applyFindReplace, applyLineReplace } from "../_shared/edit-operations";
 import { cortexNodes } from "../db";
 import { CortexCreditFeature, CortexNodeType } from "../enum";

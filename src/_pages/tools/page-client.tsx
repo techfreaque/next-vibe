@@ -14,7 +14,7 @@ import { Div } from "next-vibe/ui/ui/div";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 
-import { useLogger } from "@/hooks/use-logger";
+import { useLogger } from "@/_old/hooks/use-logger";
 
 function parseInitialState(
   searchParams: ReturnType<typeof useSearchParams>,

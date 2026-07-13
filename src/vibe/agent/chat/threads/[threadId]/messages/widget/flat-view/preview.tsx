@@ -3,6 +3,8 @@
  */
 
 "use client";
+import type { DefaultFolderId } from "next-vibe/agent/chat/config";
+import type { ChatMessage } from "next-vibe/agent/chat/db";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { cn } from "next-vibe/core/utils/utils";
 import { useWindowSize } from "next-vibe/ui/hooks/use-window-size";
@@ -12,9 +14,7 @@ import { Span } from "next-vibe/ui/ui/span";
 import type { JSX } from "react";
 import { useCallback, useLayoutEffect, useState } from "react";
 
-import { getIdColor } from "@/app/[locale]/chat/lib/utils/formatting";
-import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
+import { getIdColor } from "@/_pages/chat/lib/utils/formatting";
 
 import { scopedTranslation } from "../../i18n";
 

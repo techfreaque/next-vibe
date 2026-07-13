@@ -20,7 +20,7 @@ import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { envClient } from "@/config/env-client";
+import { envClient } from "@/_old/config/env-client";
 
 import { getPaymentProvider } from "../../payment/providers";
 import { ProductIds } from "../../products/repository-client";

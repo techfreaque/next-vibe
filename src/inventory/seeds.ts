@@ -9,12 +9,9 @@ import { db } from "next-vibe/database";
 import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { companies, companyMembers } from "@/app/api/[locale]/companies/db";
-import {
-  CompanyMemberRole,
-  CompanyType,
-} from "@/app/api/[locale]/companies/enum";
-import { catalogProducts } from "@/app/api/[locale]/products/db";
+import { companies, companyMembers } from "@/companies/db";
+import { CompanyMemberRole, CompanyType } from "@/companies/enum";
+import { catalogProducts } from "@/products/db";
 
 import { stockLevels, warehouses } from "./db";
 

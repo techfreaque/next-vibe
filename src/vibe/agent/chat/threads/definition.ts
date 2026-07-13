@@ -3,6 +3,7 @@
  * Defines endpoints for listing and creating chat threads
  */
 
+import { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import { dateSchema } from "next-vibe/core/definition/common.schema";
 import { createEndpoint } from "next-vibe/core/definition/create";
 import {
@@ -24,9 +25,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
 
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-
-import { lazyWidget } from "../../../system/unified-ui/_shared/lazy-widget";
+import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
 import { DefaultFolderId } from "../config";
 import {
   ThreadStatus,
@@ -426,7 +425,7 @@ const { GET } = createEndpoint({
           return;
         }
         const { updateIncognitoThread } =
-          await import("@/app/api/[locale]/agent/chat/incognito/storage");
+          await import("next-vibe/agent/chat/incognito/storage");
         await updateIncognitoThread(item.id, { title: item.title });
       },
     },
@@ -442,7 +441,7 @@ const { GET } = createEndpoint({
           return;
         }
         const { updateIncognitoThread } =
-          await import("@/app/api/[locale]/agent/chat/incognito/storage");
+          await import("next-vibe/agent/chat/incognito/storage");
         await updateIncognitoThread(item.id, {
           streamingState: item.streamingState,
         });
@@ -462,7 +461,7 @@ const { GET } = createEndpoint({
           return;
         }
         const { updateIncognitoThread } =
-          await import("@/app/api/[locale]/agent/chat/incognito/storage");
+          await import("next-vibe/agent/chat/incognito/storage");
         await updateIncognitoThread(item.id, {
           streamingState: item.streamingState,
           description: item.description,

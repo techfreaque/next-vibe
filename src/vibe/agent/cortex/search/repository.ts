@@ -228,13 +228,12 @@ async function runVectorSearch(
 
   // Deduct credits for query embedding
   try {
-    const { CreditRepository } =
-      await import("@/app/api/[locale]/credits/repository");
+    const { CreditRepository } = await import("@/credits/repository");
     const { scopedTranslation: creditsScopedTranslation } =
-      await import("@/app/api/[locale]/credits/i18n");
+      await import("@/credits/i18n");
     const { t: tCredits } = creditsScopedTranslation.scopedT(locale);
     const { scopedTranslation: cortexScopedTranslation } =
-      await import("@/app/api/[locale]/agent/cortex/i18n");
+      await import("next-vibe/agent/cortex/i18n");
     const { t: tCortex } = cortexScopedTranslation.scopedT(locale);
     const { EMBEDDING_CREDIT_COST } = await import("../embeddings/service");
     await CreditRepository.deductCreditsForFeature(

@@ -186,8 +186,7 @@ export function TaxRateListWidget(_props: {
 
   const handleBackToCatalog = (): void => {
     void (async (): Promise<void> => {
-      const def =
-        await import("@/app/api/[locale]/products/catalog/list/definition");
+      const def = await import("@/products/catalog/list/definition");
       navigation.push(def.default.GET, {});
     })();
   };

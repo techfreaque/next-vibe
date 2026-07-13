@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { SshConnection } from "@/app/api/[locale]/ssh/db";
+import type { SshConnection } from "@/ssh/db";
 
 /**
  * Typed configuration for infra provisioning.

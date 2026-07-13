@@ -381,8 +381,7 @@ export function LeadsListContainer({
         return;
       }
       void (async (): Promise<void> => {
-        const leadDef =
-          await import("@/app/api/[locale]/leads/[id]/definition");
+        const leadDef = await import("@/leads/[id]/definition");
         navigation.push(leadDef.default.GET, {
           urlPathParams: { id: lead.id },
         });
@@ -394,8 +393,7 @@ export function LeadsListContainer({
   const handleEdit = useCallback(
     (lead: Lead): void => {
       void (async (): Promise<void> => {
-        const leadDef =
-          await import("@/app/api/[locale]/leads/[id]/definition");
+        const leadDef = await import("@/leads/[id]/definition");
         navigation.push(leadDef.default.PATCH, {
           urlPathParams: { id: lead.id },
           prefillFromGet: true,
@@ -421,8 +419,7 @@ export function LeadsListContainer({
   const handleDelete = useCallback(
     (lead: Lead): void => {
       void (async (): Promise<void> => {
-        const leadDef =
-          await import("@/app/api/[locale]/leads/[id]/definition");
+        const leadDef = await import("@/leads/[id]/definition");
         navigation.push(leadDef.default.DELETE, {
           urlPathParams: { id: lead.id },
           renderInModal: true,
@@ -438,8 +435,7 @@ export function LeadsListContainer({
 
   const handleCreate = useCallback((): void => {
     void (async (): Promise<void> => {
-      const createDef =
-        await import("@/app/api/[locale]/leads/create/definition");
+      const createDef = await import("@/leads/create/definition");
       navigation.push(createDef.default.POST);
     })();
   }, [navigation]);
@@ -450,8 +446,7 @@ export function LeadsListContainer({
 
   const handleExport = useCallback((): void => {
     void (async (): Promise<void> => {
-      const exportDef =
-        await import("@/app/api/[locale]/leads/export/definition");
+      const exportDef = await import("@/leads/export/definition");
       const currentSearch = form.getValues("statusFilters.search") ?? "";
       navigation.push(exportDef.default.GET, {
         renderInModal: true,
@@ -464,16 +459,14 @@ export function LeadsListContainer({
 
   const handleImport = useCallback((): void => {
     void (async (): Promise<void> => {
-      const importDef =
-        await import("@/app/api/[locale]/leads/import/definition");
+      const importDef = await import("@/leads/import/definition");
       navigation.push(importDef.default.POST);
     })();
   }, [navigation]);
 
   const handleBatchUpdate = useCallback((): void => {
     void (async (): Promise<void> => {
-      const batchDef =
-        await import("@/app/api/[locale]/leads/batch/definition");
+      const batchDef = await import("@/leads/batch/definition");
       const currentSearch = form.getValues("statusFilters.search") ?? "";
       const currentStatus = form.getValues("statusFilters.status") ?? [];
       const currentSource = form.getValues("statusFilters.source") ?? [];
@@ -493,8 +486,7 @@ export function LeadsListContainer({
 
   const handleStats = useCallback((): void => {
     void (async (): Promise<void> => {
-      const statsDef =
-        await import("@/app/api/[locale]/leads/stats/definition");
+      const statsDef = await import("@/leads/stats/definition");
       navigation.push(statsDef.default.GET);
     })();
   }, [navigation]);
@@ -510,8 +502,7 @@ export function LeadsListContainer({
 
   const handleSearch = useCallback((): void => {
     void (async (): Promise<void> => {
-      const searchDef =
-        await import("@/app/api/[locale]/leads/search/definition");
+      const searchDef = await import("@/leads/search/definition");
       navigation.push(searchDef.default.GET);
     })();
   }, [navigation]);

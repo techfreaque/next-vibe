@@ -3,6 +3,9 @@
 import "next-vibe/ui/global-css";
 
 import type { Metadata, Viewport } from "next";
+import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
+import { getEnvAvailability } from "next-vibe/agent/env-availability";
+import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import { cookies } from "next-vibe/ui/lib/headers";
@@ -15,11 +18,8 @@ import { Script } from "next-vibe/ui/ui/script";
 import { Scripts } from "next-vibe/ui/ui/scripts";
 import type { JSX, ReactNode } from "react";
 
-import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
-import { envClient } from "@/config/env-client";
-import { configScopedTranslation } from "@/config/i18n";
+import { envClient } from "@/_old/config/env-client";
+import { configScopedTranslation } from "@/_old/config/i18n";
 
 import { scopedTranslation } from "./layout-i18n";
 import { RootProviders } from "./layout-shared";
@@ -117,7 +117,7 @@ export async function tanstackLoader({
   const themeCookie = (await cookies()).get("theme_v2")?.value;
   const theme: "light" | "dark" = themeCookie === "light" ? "light" : "dark";
   const { getInstanceAvailability } =
-    await import("@/app/api/[locale]/agent/env-availability");
+    await import("next-vibe/agent/env-availability");
   const availability = await getInstanceAvailability();
 
   return { locale, structuredData, theme, availability };

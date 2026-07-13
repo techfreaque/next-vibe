@@ -525,7 +525,7 @@ export class CronTasksListRepository {
           resolvedTargetInstance = data.targetInstance;
         } else {
           const { RemoteConnectionRepository } =
-            await import("@/app/api/[locale]/remote-connection/repository");
+            await import("next-vibe/remote-connection/repository");
           const conn =
             await RemoteConnectionRepository.getConnectionForInstance(
               userId,

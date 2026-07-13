@@ -7,7 +7,7 @@ export const Route = createFileRoute("/api/$locale/desktop/get-focused-window")(
   {
     server: {
       handlers: wrapNextApiRoute(
-        () => import("@/app/api/[locale]/desktop/get-focused-window/route"),
+        () => import("@/desktop/get-focused-window/route"),
       ),
     },
   },

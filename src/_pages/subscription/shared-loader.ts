@@ -6,10 +6,10 @@ import { createEndpointLogger } from "next-vibe/logger/server";
 import { notFound } from "next-vibe/ui/lib/not-found";
 import { redirect } from "next-vibe/ui/lib/redirect";
 
-import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
-import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
-import { CreditRepository } from "@/app/api/[locale]/credits/repository";
-import { env } from "@/config/env";
+import { env } from "@/_old/config/env";
+import type { CreditsGetResponseOutput } from "@/credits/definition";
+import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
+import { CreditRepository } from "@/credits/repository";
 
 export interface SubscriptionPageData {
   locale: CountryLanguage;
@@ -72,7 +72,7 @@ export async function subscriptionLoader({
       );
     } else {
       const { SubscriptionRepository } =
-        await import("@/app/api/[locale]/subscription/repository");
+        await import("@/subscription/repository");
       await SubscriptionRepository.handleNowPaymentsSuccessRedirect(
         callbackToken,
         user.id,

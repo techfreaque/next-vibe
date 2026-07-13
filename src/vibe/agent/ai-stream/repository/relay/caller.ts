@@ -19,9 +19,9 @@ import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { filterUserPermissionRoles } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { remoteConnections } from "next-vibe/remote-connection/db";
 import { z } from "zod";
 
-import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import { DefaultFolderId } from "../../../chat/config";
@@ -140,8 +140,7 @@ export async function runRelayBranch(
   // The relay branch runs before the rich stream context exists. Bind the
   // relayed turn's prompt build to the thread by id — the fixtures table
   // (keyed by threadId) anchors record/replay for any external call.
-  const { makeHeadlessContext } =
-    await import("@/app/api/[locale]/agent/chat/config");
+  const { makeHeadlessContext } = await import("next-vibe/agent/chat/config");
   const streamContext = makeHeadlessContext(
     undefined,
     data.threadId,
@@ -155,7 +154,7 @@ export async function runRelayBranch(
   const hasToolConfirmations =
     Array.isArray(data.toolConfirmations) && data.toolConfirmations.length > 0;
   const { ExecuteToolRouting } =
-    await import("@/app/api/[locale]/remote-connection/routing");
+    await import("next-vibe/remote-connection/routing");
   const streamDefinition = (await import("../../stream/definition")).default;
 
   // Loop location: the thread's persisted column > a ONE-TIME stamp from
@@ -464,7 +463,7 @@ export async function runRelayBranch(
   //   - UNBOTTLED / inference-provider: send mode='inference-provider' — the
   //     receiver runs incognito (no DB thread), events post back to the caller.
   const { RemoteConnectionRepository } =
-    await import("@/app/api/[locale]/remote-connection/repository");
+    await import("next-vibe/remote-connection/repository");
   const selfInstanceId = userId
     ? await RemoteConnectionRepository.getLocalInstanceId(userId)
     : null;
@@ -495,7 +494,7 @@ export async function runRelayBranch(
   // converge, but doing it up-front removes the create-time placement race.
   if (!user.isPublic && data.subFolderId) {
     const { pushFolderChainToPeer } =
-      await import("@/app/api/[locale]/agent/chat/threads/sync-provider");
+      await import("next-vibe/agent/chat/threads/sync-provider");
     await pushFolderChainToPeer(
       data.subFolderId,
       user.id,
@@ -556,9 +555,9 @@ export async function runRelayBranch(
   //  - remote-folder relay: the thread belongs to the receiver and the loop runs
   //    there — only that instance bills. The originator does NOT deduct.
   if (!isRemoteFolderRelay && originatorModelCost && originatorModelCost > 0) {
-    const { CreditRepository } = await import("../../../../credits/repository");
+    const { CreditRepository } = await import("@/credits/repository");
     const { scopedTranslation: creditsScopedT } =
-      await import("../../../../credits/i18n");
+      await import("@/credits/i18n");
     const { t: creditsT } = creditsScopedT.scopedT(locale);
     await CreditRepository.deductCreditsForModelUsage(
       user,
@@ -596,7 +595,7 @@ export async function runRelayBranch(
     // that references its folderId. Best-effort; the pull-sync also converges.
     if (!user.isPublic) {
       const { pushThreadSync } =
-        await import("@/app/api/[locale]/agent/chat/threads/sync-provider");
+        await import("next-vibe/agent/chat/threads/sync-provider");
       // AWAITED (not fire-and-forget): the mirror's placement must be settled
       // before the caller reports the turn done — an observer that reads the
       // peer right after would otherwise see the mirror at the REMOTE root.

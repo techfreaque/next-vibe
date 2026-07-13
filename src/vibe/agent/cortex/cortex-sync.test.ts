@@ -53,16 +53,16 @@ import {
   resolveProdUserId,
   triggerHermesPull,
   unregisterDevFromHermes,
-} from "@/app/api/[locale]/agent/ai-stream/testing/remote-setup";
-import { skillsSyncProvider } from "@/app/api/[locale]/agent/skills/sync-provider";
-import * as remoteConnectionSchema from "@/app/api/[locale]/remote-connection/db";
+} from "next-vibe/agent/ai-stream/testing/remote-setup";
+import { skillsSyncProvider } from "next-vibe/agent/skills/sync-provider";
+import * as remoteConnectionSchema from "next-vibe/remote-connection/db";
 import {
   buildSyncPayloads,
   collectCursors,
   ensureProvidersRegistered,
   type SyncProvider,
-} from "@/app/api/[locale]/remote-connection/sync/provider";
-import { env } from "@/config/env";
+} from "next-vibe/remote-connection/sync/provider";
+import { env } from "@/_old/config/env";
 
 import { cortexNodes } from "./db";
 import { documentsSyncProvider } from "./sync-provider";

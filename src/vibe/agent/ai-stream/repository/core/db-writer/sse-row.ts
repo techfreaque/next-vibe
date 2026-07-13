@@ -7,9 +7,9 @@
 
 import "server-only";
 
-import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { MessageMetadata } from "@/app/api/[locale]/agent/chat/db";
-import type { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
+import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import type { MessageMetadata } from "next-vibe/agent/chat/db";
+import type { ChatMessageRole } from "next-vibe/agent/chat/enum";
 
 /** The full message row shape expected by the messages WS event payloads. */
 export interface SseMessageRow {

@@ -33,7 +33,7 @@ const ROOT_PATH = resolve(__dirname, "../../../../../../../..");
 const TEST_PROJECT_CONFIG = resolve(TEST_PROJECT_PATH, "check.config.ts");
 const VIBE_RUNTIME = resolve(
   ROOT_PATH,
-  "src/app/api/[locale]/system/platforms/cli/vibe-runtime.ts",
+  "src/vibe/platforms/cli/vibe-runtime.ts",
 );
 
 // ============================================================
@@ -670,7 +670,7 @@ describe("Running From Project Root", () => {
   beforeAll(() => {
     try {
       fromRootOutput = execSync(
-        `cd "${ROOT_PATH}" && bun src/app/api/[locale]/system/platforms/cli/vibe-runtime.ts check --fix=false "src/app/api/[locale]/system/tooling/check/test-project" 2>&1`,
+        `cd "${ROOT_PATH}" && bun src/vibe/platforms/cli/vibe-runtime.ts check --fix=false "src/vibe/tooling/check/test-project" 2>&1`,
         { encoding: "utf-8", timeout: 120000 },
       );
     } catch (error) {

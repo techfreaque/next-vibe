@@ -18,8 +18,8 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { companyMembers } from "@/app/api/[locale]/companies/db";
-import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
+import { companyMembers } from "@/companies/db";
+import { CompanyAuthRepository } from "@/companies/repository";
 
 import { taxRates } from "../../db";
 import { scopedTranslation } from "../../i18n";

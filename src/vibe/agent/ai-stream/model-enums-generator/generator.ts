@@ -35,7 +35,7 @@ export async function generate(
   );
 
   const { chatModelDefinitions, ChatModelId } =
-    (await import("@/app/api/[locale]/agent/ai-stream/models")) as {
+    (await import("next-vibe/agent/ai-stream/models")) as {
       chatModelDefinitions: Parameters<typeof generateVisionEnumFileContent>[0];
       ChatModelId: Record<string, string>;
     };

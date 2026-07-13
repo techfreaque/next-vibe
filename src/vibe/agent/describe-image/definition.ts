@@ -19,7 +19,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
 
-import { lazyWidget } from "../../system/unified-ui/_shared/lazy-widget";
+import { lazyWidget } from "../../unified-ui/_shared/lazy-widget";
 import { DESCRIBE_IMAGE_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 

@@ -12,13 +12,13 @@ import { Span } from "next-vibe/ui/ui/span";
 import type { JSX } from "react";
 import { useCallback, useState } from "react";
 
-import { Logo } from "@/app/[locale]/_components/logo";
+import { Logo } from "@/_pages/_components/logo";
 import {
   chatAnimations,
   chatProse,
   chatShadows,
   chatTransitions,
-} from "@/app/[locale]/chat/lib/design-tokens";
+} from "@/_pages/chat/lib/design-tokens";
 
 export interface DebugSystemPromptParts {
   systemPrompt: string;

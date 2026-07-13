@@ -3,6 +3,21 @@
  * Default folder definitions and utilities
  */
 
+import {
+  CORTEX_DELETE_ALIAS,
+  CORTEX_EDIT_ALIAS,
+  CORTEX_EXEC_ALIAS,
+  CORTEX_LIST_ALIAS,
+  CORTEX_MKDIR_ALIAS,
+  CORTEX_MOVE_ALIAS,
+  CORTEX_READ_ALIAS,
+  CORTEX_SEARCH_ALIAS,
+  CORTEX_TREE_ALIAS,
+  CORTEX_WRITE_ALIAS,
+} from "next-vibe/agent/cortex/constants";
+import type { ImageGenModelSelection } from "next-vibe/agent/image-generation/models";
+import type { MusicGenModelSelection } from "next-vibe/agent/music-generation/models";
+import type { VideoGenModelSelection } from "next-vibe/agent/video-generation/models";
 import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import {
@@ -15,22 +30,7 @@ import {
 } from "next-vibe/identity/roles/enum";
 import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 
-import type { ChatTranslationKey } from "@/app/[locale]/chat/i18n";
-import {
-  CORTEX_DELETE_ALIAS,
-  CORTEX_EDIT_ALIAS,
-  CORTEX_EXEC_ALIAS,
-  CORTEX_LIST_ALIAS,
-  CORTEX_MKDIR_ALIAS,
-  CORTEX_MOVE_ALIAS,
-  CORTEX_READ_ALIAS,
-  CORTEX_SEARCH_ALIAS,
-  CORTEX_TREE_ALIAS,
-  CORTEX_WRITE_ALIAS,
-} from "@/app/api/[locale]/agent/cortex/constants";
-import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
-import type { MusicGenModelSelection } from "@/app/api/[locale]/agent/music-generation/models";
-import type { VideoGenModelSelection } from "@/app/api/[locale]/agent/video-generation/models";
+import type { ChatTranslationKey } from "@/_pages/chat/i18n";
 
 /**
  * Default folder IDs

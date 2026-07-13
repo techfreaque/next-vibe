@@ -1,13 +1,12 @@
+import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { UserRoleValue } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import type { SyncDomain } from "next-vibe/remote-connection/db";
 import type { z } from "zod";
-
-import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import type { SyncDomain } from "@/app/api/[locale]/remote-connection/db";
 
 // ============================================================================
 // DEEP PARTIAL

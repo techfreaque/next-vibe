@@ -932,7 +932,7 @@ function ConnectionsTab({
 }): React.JSX.Element {
   const handleViewLead = useCallback(
     async (leadId: string): Promise<void> => {
-      const leadDefs = await import("@/app/api/[locale]/leads/[id]/definition");
+      const leadDefs = await import("@/leads/[id]/definition");
       navigate(leadDefs.default.GET, {
         urlPathParams: { id: leadId },
       });
@@ -1064,7 +1064,7 @@ function CreditHistoryTab({
   const [def, setDef] = useState<{ GET: CreateApiEndpointAny } | null>(null);
 
   if (!def) {
-    void import("@/app/api/[locale]/credits/history/definition").then((mod) => {
+    void import("@/credits/history/definition").then((mod) => {
       setDef(mod.default);
       return undefined;
     });
@@ -1104,12 +1104,10 @@ function ReferralCodesTab({
   const [def, setDef] = useState<{ GET: CreateApiEndpointAny } | null>(null);
 
   if (!def) {
-    void import("@/app/api/[locale]/referral/codes/list/definition").then(
-      (mod) => {
-        setDef(mod.default);
-        return undefined;
-      },
-    );
+    void import("@/referral/codes/list/definition").then((mod) => {
+      setDef(mod.default);
+      return undefined;
+    });
     return <LoadingBlock />;
   }
 
@@ -1148,12 +1146,10 @@ function ReferralEarningsTab({
   const [def, setDef] = useState<{ GET: CreateApiEndpointAny } | null>(null);
 
   if (!def) {
-    void import("@/app/api/[locale]/referral/earnings/list/definition").then(
-      (mod) => {
-        setDef(mod.default);
-        return undefined;
-      },
-    );
+    void import("@/referral/earnings/list/definition").then((mod) => {
+      setDef(mod.default);
+      return undefined;
+    });
     return <LoadingBlock />;
   }
 
@@ -1190,12 +1186,10 @@ function FavoritesTab({
   const [def, setDef] = useState<{ GET: CreateApiEndpointAny } | null>(null);
 
   if (!def) {
-    void import("@/app/api/[locale]/agent/skills/favorites/definition").then(
-      (mod) => {
-        setDef(mod.default);
-        return undefined;
-      },
-    );
+    void import("next-vibe/agent/skills/favorites/definition").then((mod) => {
+      setDef(mod.default);
+      return undefined;
+    });
     return <LoadingBlock />;
   }
 
@@ -1232,7 +1226,7 @@ function SkillsTab({
   const [def, setDef] = useState<{ GET: CreateApiEndpointAny } | null>(null);
 
   if (!def) {
-    void import("@/app/api/[locale]/agent/skills/definition").then((mod) => {
+    void import("next-vibe/agent/skills/definition").then((mod) => {
       setDef(mod.default);
       return undefined;
     });

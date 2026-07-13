@@ -7,6 +7,7 @@
 
 "use client";
 
+import { useChatSettings } from "next-vibe/agent/chat/settings/hooks";
 import { Button } from "next-vibe/ui/ui/button";
 import { Card, CardContent } from "next-vibe/ui/ui/card";
 import { Div } from "next-vibe/ui/ui/div";
@@ -28,8 +29,6 @@ import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field
 import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
 import { SearchBarWidget } from "next-vibe/unified-ui/interactive/search-bar/widget";
 import type { JSX } from "react";
-
-import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 
 import { SearchProvider } from "../enum";
 import type definition from "./definition";

@@ -21,20 +21,13 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { creditPacks, creditWallets } from "@/app/api/[locale]/credits/db";
-import { paymentTransactions } from "@/app/api/[locale]/payment/db";
-import { PaymentStatus } from "@/app/api/[locale]/payment/enum";
-import {
-  payoutRequests,
-  referralEarnings,
-  userReferrals,
-} from "@/app/api/[locale]/referral/db";
-import { PayoutStatus } from "@/app/api/[locale]/referral/enum";
-import { subscriptions } from "@/app/api/[locale]/subscription/db";
-import {
-  BillingInterval,
-  SubscriptionStatus,
-} from "@/app/api/[locale]/subscription/enum";
+import { creditPacks, creditWallets } from "@/credits/db";
+import { paymentTransactions } from "@/payment/db";
+import { PaymentStatus } from "@/payment/enum";
+import { payoutRequests, referralEarnings, userReferrals } from "@/referral/db";
+import { PayoutStatus } from "@/referral/enum";
+import { subscriptions } from "@/subscription/db";
+import { BillingInterval, SubscriptionStatus } from "@/subscription/enum";
 
 import type {
   SubscriptionStatsRequestOutput,

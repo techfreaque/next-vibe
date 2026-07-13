@@ -1,7 +1,7 @@
 import type { JSX } from "react";
 import { Image } from "react-native";
 
-import { envClient } from "@/config/env-client";
+import { envClient } from "@/_old/config/env-client";
 
 /**
  * Tay Logo for React Native

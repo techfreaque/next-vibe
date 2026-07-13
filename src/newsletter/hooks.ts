@@ -17,7 +17,7 @@ import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import type { InputChangeEvent } from "next-vibe/ui/ui/input";
 import { useCallback, useMemo } from "react";
 
-import { useLogger } from "@/hooks/use-logger";
+import { useLogger } from "@/_old/hooks/use-logger";
 
 import { scopedTranslation } from "./i18n";
 import statusEndpoints from "./status/definition";

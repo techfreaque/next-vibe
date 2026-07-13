@@ -29,7 +29,7 @@ export const translations = {
       path: {
         label: "Path",
         description:
-          "File paths or directories to check (string or array). RECOMMENDED: Specify paths for the area you're working on (fast, focused). Leave empty to check ALL files (slow, use only for comprehensive audits). Examples: 'src/app/feature' or ['src/feature/file.tsx', 'src/feature/other.tsx']",
+          "File paths or directories to check (string or array). RECOMMENDED: Specify paths for the area you're working on (fast, focused). Leave empty to check ALL files (slow, use only for comprehensive audits). Examples: 'src/feature' or ['src/feature/file.tsx', 'src/feature/other.tsx']",
         placeholder: "Enter path to lint",
       },
       verbose: {
@@ -213,7 +213,7 @@ export const translations = {
       path: {
         label: "Path",
         description:
-          "File paths or directories to check (string or array). RECOMMENDED: Specify paths for the area you're working on (fast, focused). Leave empty to check ALL files (slow, use only for comprehensive audits). Examples: 'src/app/feature' or ['src/feature/file.tsx', 'src/feature/other.tsx']",
+          "File paths or directories to check (string or array). RECOMMENDED: Specify paths for the area you're working on (fast, focused). Leave empty to check ALL files (slow, use only for comprehensive audits). Examples: 'src/feature' or ['src/feature/file.tsx', 'src/feature/other.tsx']",
         placeholder: "Enter path to lint",
       },
       verbose: {
@@ -480,7 +480,7 @@ export const translations = {
       path: {
         label: "Path",
         description:
-          "File paths or directories to check (string or array). RECOMMENDED: Specify paths for the area you're working on (fast, focused). Leave empty to check ALL files (slow, use only for comprehensive audits). Examples: 'src/app/feature' or ['src/feature/file.tsx', 'src/feature/other.tsx']",
+          "File paths or directories to check (string or array). RECOMMENDED: Specify paths for the area you're working on (fast, focused). Leave empty to check ALL files (slow, use only for comprehensive audits). Examples: 'src/feature' or ['src/feature/file.tsx', 'src/feature/other.tsx']",
         placeholder: "src/components",
       },
       verbose: {
@@ -676,14 +676,14 @@ export const translations = {
       paths: {
         label: "Target Paths",
         description:
-          "File paths or directories to check (string or array). RECOMMENDED: Specify paths for the area you're working on (fast, focused). Leave empty to check ALL files (slow, use only for comprehensive audits). Examples: 'src/app/feature' or ['src/feature/file.tsx', 'src/feature/other.tsx']. Note: Glob patterns (e.g., '**/*.test.ts') are not supported yet.",
-        placeholder: "e.g., src/app or src/components/Button.tsx",
+          "File paths or directories to check (string or array). RECOMMENDED: Specify paths for the area you're working on (fast, focused). Leave empty to check ALL files (slow, use only for comprehensive audits). Examples: 'src/feature' or ['src/feature/file.tsx', 'src/feature/other.tsx']. Note: Glob patterns (e.g., '**/*.test.ts') are not supported yet.",
+        placeholder: "e.g., src or src/components/Button.tsx",
         options: {
           src: "Source Directory (src/)",
           components: "Components (src/components)",
           utils: "Utilities (src/utils)",
           pages: "Pages (src/pages)",
-          app: "App Directory (src/app)",
+          app: "App Directory (src)",
         },
       },
       limit: {

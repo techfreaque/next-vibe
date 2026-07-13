@@ -1,4 +1,11 @@
 "use client";
+import { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import type { ChatMessage } from "next-vibe/agent/chat/db";
+import { ChatMessageRole } from "next-vibe/agent/chat/enum";
+import { GroupedAssistantMessage } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
+import type { MessageGroup } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/message-grouping";
+import { StaticUserMessageBubble } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
 import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
@@ -15,16 +22,9 @@ import { H1, P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
 
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
-import { GroupedAssistantMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
-import type { MessageGroup } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/message-grouping";
-import { StaticUserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
-import { GITHUB_REPO_URL } from "@/config/constants";
-import { configScopedTranslation } from "@/config/i18n";
-import { useLogger } from "@/hooks/use-logger";
+import { GITHUB_REPO_URL } from "@/_old/config/constants";
+import { configScopedTranslation } from "@/_old/config/i18n";
+import { useLogger } from "@/_old/hooks/use-logger";
 
 import { scopedTranslation } from "./i18n";
 import { MockChatProvider } from "./mock-chat-provider";
@@ -639,7 +639,7 @@ function buildWeeklyReportDemo(t: ScopedT): DemoData {
     "claude-code",
     {
       prompt:
-        "email-sync has failed 3 times with IMAP connection timeouts (from my task queue). Investigate src/app/api/[locale]/emails/imap-client/ and fix the root cause.",
+        "email-sync has failed 3 times with IMAP connection timeouts (from my task queue). Investigate src/messenger/email/imap-client/ and fix the root cause.",
       interactiveMode: false,
     },
     {

@@ -6,6 +6,7 @@
 
 "use client";
 
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -14,8 +15,6 @@ import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import type { ButtonMouseEvent } from "next-vibe/ui/ui/button";
 import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import { useCallback, useState } from "react";
-
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 
 import type {
   ChatModelId,
@@ -243,8 +242,7 @@ export function useAddToFavorites({
         );
 
         void (async (): Promise<void> => {
-          const leadSkillDef =
-            await import("@/app/api/[locale]/leads/skill/definition");
+          const leadSkillDef = await import("@/leads/skill/definition");
           void apiClient.mutate(
             leadSkillDef.default.PATCH,
             logger,

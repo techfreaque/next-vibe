@@ -18,47 +18,47 @@ import {
   agentEnv,
   agentEnvExamples,
   agentEnvSchema,
-} from "../../app/api/[locale]/agent/env";
+} from "../../vibe/agent/env";
 import {
   browserEnv,
   browserEnvExamples,
   browserEnvSchema,
-} from "../../app/api/[locale]/browser/env";
+} from "../../browser/env";
 import {
   leadsCampaignsEnv,
   leadsCampaignsEnvExamples,
   leadsCampaignsEnvSchema,
-} from "../../app/api/[locale]/leads/campaigns/env";
+} from "../../leads/campaigns/env";
 import {
   messengerEnv,
   messengerEnvExamples,
   messengerEnvSchema,
-} from "../../app/api/[locale]/messenger/env";
+} from "../../messenger/env";
 import {
   imapClientEnv,
   imapClientEnvExamples,
   imapClientEnvSchema,
-} from "../../app/api/[locale]/messenger/providers/email/imap-client/env";
+} from "../../messenger/providers/email/imap-client/env";
 import {
   paymentEnv,
   paymentEnvExamples,
   paymentEnvSchema,
-} from "../../app/api/[locale]/payment/env";
+} from "../../payment/env";
 import {
   smsEnv,
   smsEnvExamples,
   smsEnvSchema,
-} from "../../app/api/[locale]/sms/env";
+} from "../../sms/env";
 import {
   serverSystemEnv,
   serverSystemEnvExamples,
   serverSystemEnvSchema,
-} from "../../app/api/[locale]/system/server/server/env";
+} from "../../vibe/server/server/env";
 import {
   env as env_env,
   envExamples,
   envSchema as env_envSchema,
-} from "../../config/env";
+} from "../../_old/config/env";
 
 // Platform detection
 const platform = {

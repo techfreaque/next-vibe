@@ -22,8 +22,8 @@ import {
   AccountSubtype,
   JournalSourceType,
   LineType,
-} from "@/app/api/[locale]/chart-of-accounts/enum";
-import { autoPostJournalEntry } from "@/app/api/[locale]/chart-of-accounts/shared/auto-post";
+} from "@/chart-of-accounts/enum";
+import { autoPostJournalEntry } from "@/chart-of-accounts/shared/auto-post";
 
 import { paymentInvoices } from "../../../db";
 import { InvoiceStatus } from "../../../enum";

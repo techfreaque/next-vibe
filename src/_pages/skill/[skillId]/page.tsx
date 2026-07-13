@@ -7,6 +7,17 @@
 export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
+import { DEFAULT_CHAT_MODEL_SELECTION } from "next-vibe/agent/ai-stream/constants";
+import { getBestChatModel } from "next-vibe/agent/ai-stream/models";
+import { parseSkillId } from "next-vibe/agent/chat/slugify";
+import { getInstanceAvailability } from "next-vibe/agent/env-availability";
+import { getBestImageGenModel } from "next-vibe/agent/image-generation/models";
+import { modelProviders } from "next-vibe/agent/models/models";
+import { getBestMusicGenModel } from "next-vibe/agent/music-generation/models";
+import type { SkillGetResponseOutput } from "next-vibe/agent/skills/[id]/definition";
+import { SkillsRepository } from "next-vibe/agent/skills/repository";
+import { getBestTtsModel } from "next-vibe/agent/text-to-speech/models";
+import { getBestVideoGenModel } from "next-vibe/agent/video-generation/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -17,18 +28,7 @@ import { createEndpointLogger } from "next-vibe/logger/server";
 import { Div } from "next-vibe/ui/ui/div";
 import type { JSX } from "react";
 
-import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
-import { getBestChatModel } from "@/app/api/[locale]/agent/ai-stream/models";
-import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
-import { getInstanceAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { getBestImageGenModel } from "@/app/api/[locale]/agent/image-generation/models";
-import { modelProviders } from "@/app/api/[locale]/agent/models/models";
-import { getBestMusicGenModel } from "@/app/api/[locale]/agent/music-generation/models";
-import type { SkillGetResponseOutput } from "@/app/api/[locale]/agent/skills/[id]/definition";
-import { SkillsRepository } from "@/app/api/[locale]/agent/skills/repository";
-import { getBestTtsModel } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { getBestVideoGenModel } from "@/app/api/[locale]/agent/video-generation/models";
-import { configScopedTranslation } from "@/config/i18n";
+import { configScopedTranslation } from "@/_old/config/i18n";
 
 import { scopedTranslation } from "./i18n";
 import {
@@ -266,9 +266,8 @@ export async function tanstackLoader({
   let leadMagnetConfig: LeadMagnetConfigData | null = null;
   {
     const { db } = await import("next-vibe/database");
-    const { leadMagnetConfigs } =
-      await import("@/app/api/[locale]/lead-magnet/db");
-    const { customSkills } = await import("@/app/api/[locale]/agent/skills/db");
+    const { leadMagnetConfigs } = await import("@/lead-magnet/db");
+    const { customSkills } = await import("next-vibe/agent/skills/db");
     const { eq } = await import("drizzle-orm");
     const uuidRegex =
       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

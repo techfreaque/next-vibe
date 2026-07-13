@@ -1,11 +1,10 @@
+import type { ChatModelOption } from "next-vibe/agent/ai-stream/models";
 import { getFullPath, getPreferredName } from "next-vibe/core/core-utils/path";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { CoreTool } from "next-vibe/platforms/ai/tools-loader";
 import { loadTools } from "next-vibe/platforms/ai/tools-loader";
-
-import type { ChatModelOption } from "@/app/api/[locale]/agent/ai-stream/models";
 
 import type { ToolExecutionContext } from "../../../chat/config";
 import { getDefaultToolIdsForFolder } from "../../../chat/constants";

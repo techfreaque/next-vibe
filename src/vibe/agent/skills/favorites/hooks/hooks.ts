@@ -11,7 +11,7 @@ import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { useWidgetUser } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { useMemo } from "react";
 
-import type { UseEndpointOptions } from "../../../../system/platforms/react/hooks/endpoint-types";
+import type { UseEndpointOptions } from "../../../../platforms/react/hooks/endpoint-types";
 import favoritesDefinition, { type FavoriteCard } from "../definition";
 
 export interface UseChatFavoritesReturn {

@@ -2,18 +2,18 @@
 import "server-only";
 
 import { count, eq } from "drizzle-orm";
-import { db } from "next-vibe/database";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-
 import type {
   RemoteInstancesContext,
   SystemPromptFragment,
   SystemPromptServerParams,
-} from "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
-import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
-import { sshConnections } from "@/app/api/[locale]/ssh/db";
-import { envClient } from "@/config/env-client";
+} from "next-vibe/agent/ai-stream/system-prompt/types";
+import { getEnvAvailability } from "next-vibe/agent/env-availability";
+import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
+import { db } from "next-vibe/database";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+
+import { envClient } from "@/_old/config/env-client";
+import { sshConnections } from "@/ssh/db";
 
 import { remoteConnections } from "./db";
 import { RemoteConnectionRepository } from "./repository";

@@ -16,10 +16,9 @@ export const forwardLead: ForwardLeadFn = async (credentials, lead) => {
   const skillId = lead.listId ?? "unknown";
 
   const { EmailSendingRepository } =
-    await import("@/app/api/[locale]/messenger/providers/email/smtp-client/email-sending/repository");
+    await import("@/messenger/providers/email/smtp-client/email-sending/repository");
   const { LeadNotificationEmail } = await import("./lead-notification.email");
-  const { CampaignType } =
-    await import("@/app/api/[locale]/messenger/accounts/enum");
+  const { CampaignType } = await import("@/messenger/accounts/enum");
 
   const props: LeadNotificationEmailProps = {
     firstName,

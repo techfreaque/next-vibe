@@ -7,7 +7,7 @@ export const Route = createFileRoute("/api/$locale/inventory/warehouse/create")(
   {
     server: {
       handlers: wrapNextApiRoute(
-        () => import("@/app/api/[locale]/inventory/warehouse/create/route"),
+        () => import("@/inventory/warehouse/create/route"),
       ),
     },
   },

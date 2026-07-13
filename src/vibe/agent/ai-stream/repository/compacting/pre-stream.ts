@@ -6,12 +6,11 @@
 import "server-only";
 
 import type { ModelMessage, streamText } from "ai";
+import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
 import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { v4 as uuidv4 } from "uuid";
-
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 
 import type { DefaultFolderId } from "../../../chat/config";
 import type { ChatMessage } from "../../../chat/db";
@@ -179,7 +178,7 @@ export class CompactingHandler {
       // branch. pushThreadSync no-ops for non-mirrored threads.
       if (userId) {
         const { pushThreadSync } =
-          await import("@/app/api/[locale]/agent/chat/threads/sync-provider");
+          await import("next-vibe/agent/chat/threads/sync-provider");
         await pushThreadSync(threadId, userId, logger);
       }
     }

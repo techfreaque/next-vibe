@@ -49,7 +49,7 @@ export function UserAddressesContainer(): JSX.Element {
   const handleEdit = (addressId: string): void => {
     void (async (): Promise<void> => {
       const addressDef =
-        await import("@/app/api/[locale]/user/private/me/addresses/[addressId]/definition");
+        await import("@/user/private/me/addresses/[addressId]/definition");
       navigate(addressDef.default.PATCH, {
         urlPathParams: { addressId },
       });
@@ -59,7 +59,7 @@ export function UserAddressesContainer(): JSX.Element {
   const handleDelete = (addressId: string): void => {
     void (async (): Promise<void> => {
       const addressDef =
-        await import("@/app/api/[locale]/user/private/me/addresses/[addressId]/definition");
+        await import("@/user/private/me/addresses/[addressId]/definition");
       navigate(addressDef.default.DELETE, {
         urlPathParams: { addressId },
         popNavigationOnSuccess: 1,

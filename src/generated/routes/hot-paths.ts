@@ -19,5522 +19,5522 @@ export const routeHotPaths: Record<
 > = {
   "accounting-dashboard": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/dashboard/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/dashboard/route.ts",
     method: "GET",
   },
   "agent-chat-threads": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/threads/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/route.ts",
     method: "GET",
   },
   "agent-run": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/ai-stream/run/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/run/route.ts",
     method: "POST",
   },
   "agent-search-messages": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/threads/search-messages/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/search-messages/route.ts",
     method: "GET",
   },
   "agent-search-threads": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/threads/search-threads/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/search-threads/route.ts",
     method: "GET",
   },
   "agent-view-image": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/view-image/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/view-image/route.ts",
     method: "POST",
   },
   "agent_ai-stream_cancel_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/ai-stream/cancel/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/cancel/route.ts",
     method: "POST",
   },
   "agent_ai-stream_run_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/ai-stream/run/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/run/route.ts",
     method: "POST",
   },
   "agent_ai-stream_stream_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/ai-stream/stream/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/stream/route.ts",
     method: "POST",
   },
   "agent_ai-stream_system-prompt_debug_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/ai-stream/system-prompt/debug/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/system-prompt/debug/route.ts",
     method: "GET",
   },
   "agent_ai-stream_ws-provider_models_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/ai-stream/ws-provider/models/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/ws-provider/models/route.ts",
     method: "GET",
   },
   "agent_chat_data-sources_chat-downvotes-total_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/data-sources/chat-downvotes-total/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-downvotes-total/route.ts",
     method: "POST",
   },
   "agent_chat_data-sources_chat-errors-total_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/data-sources/chat-errors-total/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-errors-total/route.ts",
     method: "POST",
   },
   "agent_chat_data-sources_chat-memories-created_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/data-sources/chat-memories-created/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-memories-created/route.ts",
     method: "POST",
   },
   "agent_chat_data-sources_chat-messages-by-ai_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/data-sources/chat-messages-by-ai/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-messages-by-ai/route.ts",
     method: "POST",
   },
   "agent_chat_data-sources_chat-messages-by-user_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/data-sources/chat-messages-by-user/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-messages-by-user/route.ts",
     method: "POST",
   },
   "agent_chat_data-sources_chat-messages-total_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/data-sources/chat-messages-total/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-messages-total/route.ts",
     method: "POST",
   },
   "agent_chat_data-sources_chat-messages-with-attachments_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/data-sources/chat-messages-with-attachments/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-messages-with-attachments/route.ts",
     method: "POST",
   },
   "agent_chat_data-sources_chat-share-links-created_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/data-sources/chat-share-links-created/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-share-links-created/route.ts",
     method: "POST",
   },
   "agent_chat_data-sources_chat-threads-active-total_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/data-sources/chat-threads-active-total/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-threads-active-total/route.ts",
     method: "POST",
   },
   "agent_chat_data-sources_chat-threads-created_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/data-sources/chat-threads-created/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-threads-created/route.ts",
     method: "POST",
   },
   "agent_chat_data-sources_chat-tool-calls-total_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/data-sources/chat-tool-calls-total/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-tool-calls-total/route.ts",
     method: "POST",
   },
   "agent_chat_data-sources_chat-unique-users_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/data-sources/chat-unique-users/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-unique-users/route.ts",
     method: "POST",
   },
   "agent_chat_data-sources_chat-upvotes-total_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/data-sources/chat-upvotes-total/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-upvotes-total/route.ts",
     method: "POST",
   },
   "agent_chat_folder-contents_rootFolderId_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folder-contents/[rootFolderId]/route.ts",
     method: "GET",
   },
   agent_chat_folders_rootFolderId_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/folders/[rootFolderId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/[rootFolderId]/route.ts",
     method: "GET",
   },
   agent_chat_folders_rootFolderId_create_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/folders/[rootFolderId]/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/[rootFolderId]/create/route.ts",
     method: "POST",
   },
   "agent_chat_folders_rootFolderId_root-permissions_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/folders/[rootFolderId]/root-permissions/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/[rootFolderId]/root-permissions/route.ts",
     method: "GET",
   },
   agent_chat_folders_subfolders_subFolderId_DELETE: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/folders/subfolders/[subFolderId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/route.ts",
     method: "DELETE",
   },
   agent_chat_folders_subfolders_subFolderId_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/folders/subfolders/[subFolderId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/route.ts",
     method: "GET",
   },
   agent_chat_folders_subfolders_subFolderId_move_PATCH: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/folders/subfolders/[subFolderId]/move/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/move/route.ts",
     method: "PATCH",
   },
   agent_chat_folders_subfolders_subFolderId_permissions_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/folders/subfolders/[subFolderId]/permissions/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/permissions/route.ts",
     method: "GET",
   },
   agent_chat_folders_subfolders_subFolderId_permissions_PATCH: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/folders/subfolders/[subFolderId]/permissions/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/permissions/route.ts",
     method: "PATCH",
   },
   agent_chat_folders_subfolders_subFolderId_rename_PATCH: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/folders/subfolders/[subFolderId]/rename/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/rename/route.ts",
     method: "PATCH",
   },
   agent_chat_folders_subfolders_subFolderId_update_PATCH: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/folders/subfolders/[subFolderId]/update/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/update/route.ts",
     method: "PATCH",
   },
   "agent_chat_public-feed_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/public-feed/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/public-feed/route.ts",
     method: "GET",
   },
   agent_chat_settings_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/settings/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/settings/route.ts",
     method: "GET",
   },
   agent_chat_settings_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/settings/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/settings/route.ts",
     method: "POST",
   },
   agent_chat_threads_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/threads/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/route.ts",
     method: "GET",
   },
   agent_chat_threads_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/threads/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/route.ts",
     method: "POST",
   },
   agent_chat_threads_files_threadId_filename_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/threads/files/[threadId]/[filename]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/files/[threadId]/[filename]/route.ts",
     method: "GET",
   },
   agent_chat_threads_rename_PATCH: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/threads/rename/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/rename/route.ts",
     method: "PATCH",
   },
   "agent_chat_threads_search-messages_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/threads/search-messages/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/search-messages/route.ts",
     method: "GET",
   },
   "agent_chat_threads_search-threads_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/threads/search-threads/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/search-threads/route.ts",
     method: "GET",
   },
   agent_chat_threads_threadId_DELETE: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/threads/[threadId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/route.ts",
     method: "DELETE",
   },
   agent_chat_threads_threadId_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/threads/[threadId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/route.ts",
     method: "GET",
   },
   agent_chat_threads_threadId_PATCH: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/threads/[threadId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/route.ts",
     method: "PATCH",
   },
   agent_chat_threads_threadId_messages_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/threads/[threadId]/messages/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/route.ts",
     method: "GET",
   },
   agent_chat_threads_threadId_messages_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/threads/[threadId]/messages/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/route.ts",
     method: "POST",
   },
   agent_chat_threads_threadId_messages_messageId_DELETE: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/[messageId]/route.ts",
     method: "DELETE",
   },
   agent_chat_threads_threadId_messages_messageId_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/[messageId]/route.ts",
     method: "GET",
   },
   agent_chat_threads_threadId_messages_messageId_PATCH: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/[messageId]/route.ts",
     method: "PATCH",
   },
   agent_chat_threads_threadId_messages_messageId_vote_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/[messageId]/vote/route.ts",
     method: "POST",
   },
   agent_chat_threads_threadId_messages_path_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/threads/[threadId]/messages/path/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/path/route.ts",
     method: "GET",
   },
   agent_chat_threads_threadId_messages_search_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/threads/[threadId]/messages/search/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/search/route.ts",
     method: "GET",
   },
   agent_chat_threads_threadId_permissions_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/threads/[threadId]/permissions/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/permissions/route.ts",
     method: "GET",
   },
   agent_chat_threads_threadId_permissions_PATCH: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/threads/[threadId]/permissions/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/permissions/route.ts",
     method: "PATCH",
   },
   "agent_chat_threads_threadId_share-links_DELETE": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/threads/[threadId]/share-links/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/share-links/route.ts",
     method: "DELETE",
   },
   "agent_chat_threads_threadId_share-links_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/threads/[threadId]/share-links/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/share-links/route.ts",
     method: "GET",
   },
   "agent_chat_threads_threadId_share-links_PATCH": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/threads/[threadId]/share-links/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/share-links/route.ts",
     method: "PATCH",
   },
   "agent_chat_threads_threadId_share-links_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/threads/[threadId]/share-links/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/share-links/route.ts",
     method: "POST",
   },
   "agent_coding-agent_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/coding-agent/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/coding-agent/route.ts",
     method: "POST",
   },
   agent_cortex_delete_DELETE: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/cortex/delete/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/delete/route.ts",
     method: "DELETE",
   },
   agent_cortex_edit_PATCH: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/cortex/edit/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/edit/route.ts",
     method: "PATCH",
   },
   agent_cortex_embeddings_backfill_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/cortex/embeddings/backfill/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/embeddings/backfill/route.ts",
     method: "POST",
   },
   agent_cortex_exec_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/cortex/exec/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/exec/route.ts",
     method: "POST",
   },
   agent_cortex_list_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/cortex/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/list/route.ts",
     method: "GET",
   },
   agent_cortex_mkdir_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/cortex/mkdir/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/mkdir/route.ts",
     method: "POST",
   },
   agent_cortex_move_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/cortex/move/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/move/route.ts",
     method: "POST",
   },
   agent_cortex_read_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/cortex/read/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/read/route.ts",
     method: "GET",
   },
   agent_cortex_search_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/cortex/search/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/search/route.ts",
     method: "GET",
   },
   agent_cortex_terminals_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/cortex/terminals/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/terminals/route.ts",
     method: "GET",
   },
   agent_cortex_tree_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/cortex/tree/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/tree/route.ts",
     method: "GET",
   },
   agent_cortex_write_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/cortex/write/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/write/route.ts",
     method: "POST",
   },
   "agent_describe-image_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/describe-image/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/describe-image/route.ts",
     method: "POST",
   },
   "agent_describe-video_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/describe-video/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/describe-video/route.ts",
     method: "POST",
   },
   "agent_fetch-url-content_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/fetch-url-content/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/fetch-url-content/route.ts",
     method: "GET",
   },
   "agent_fetch-url-content_cleanup_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/fetch-url-content/cleanup/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/fetch-url-content/cleanup/route.ts",
     method: "POST",
   },
   "agent_image-generation_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/image-generation/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/image-generation/route.ts",
     method: "POST",
   },
   agent_models_list_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/models/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/models/list/route.ts",
     method: "GET",
   },
   "agent_models_model-prices_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/models/model-prices/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/models/model-prices/route.ts",
     method: "GET",
   },
   "agent_music-generation_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/music-generation/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/music-generation/route.ts",
     method: "POST",
   },
   agent_skills_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/skills/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/route.ts",
     method: "GET",
   },
   agent_skills_create_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/skills/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/create/route.ts",
     method: "POST",
   },
   agent_skills_favorites_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/skills/favorites/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/route.ts",
     method: "GET",
   },
   agent_skills_favorites_create_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/skills/favorites/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/create/route.ts",
     method: "POST",
   },
   agent_skills_favorites_id_DELETE: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/skills/favorites/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/[id]/route.ts",
     method: "DELETE",
   },
   agent_skills_favorites_id_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/skills/favorites/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/[id]/route.ts",
     method: "GET",
   },
   agent_skills_favorites_id_PATCH: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/skills/favorites/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/[id]/route.ts",
     method: "PATCH",
   },
   agent_skills_favorites_reorder_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/skills/favorites/reorder/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/reorder/route.ts",
     method: "POST",
   },
   agent_skills_id_DELETE: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/skills/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/route.ts",
     method: "DELETE",
   },
   agent_skills_id_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/skills/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/route.ts",
     method: "GET",
   },
   agent_skills_id_PATCH: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/skills/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/route.ts",
     method: "PATCH",
   },
   agent_skills_id_publish_PATCH: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/skills/[id]/publish/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/publish/route.ts",
     method: "PATCH",
   },
   agent_skills_id_report_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/skills/[id]/report/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/report/route.ts",
     method: "POST",
   },
   agent_skills_id_vote_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/skills/[id]/vote/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/vote/route.ts",
     method: "POST",
   },
   agent_skills_moderation_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/skills/moderation/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/moderation/route.ts",
     method: "GET",
   },
   agent_skills_moderation_PATCH: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/skills/moderation/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/moderation/route.ts",
     method: "PATCH",
   },
   "agent_speech-to-text_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/speech-to-text/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/speech-to-text/route.ts",
     method: "POST",
   },
   "agent_speech-to-text_hotkey_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/speech-to-text/hotkey/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/speech-to-text/hotkey/route.ts",
     method: "POST",
   },
   "agent_text-to-speech_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/text-to-speech/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/text-to-speech/route.ts",
     method: "POST",
   },
   "agent_video-generation_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/video-generation/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/video-generation/route.ts",
     method: "POST",
   },
   "agent_view-image_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/view-image/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/view-image/route.ts",
     method: "POST",
   },
   "agent_web-search_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/web-search/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/web-search/route.ts",
     method: "GET",
   },
   "agent_web-search_brave_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/web-search/brave/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/web-search/brave/route.ts",
     method: "GET",
   },
   "agent_web-search_kagi_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/web-search/kagi/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/web-search/kagi/route.ts",
     method: "GET",
   },
   "ai-run": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/ai-stream/run/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/run/route.ts",
     method: "POST",
   },
   "ai-stream": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/ai-stream/stream/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/stream/route.ts",
     method: "POST",
   },
   "ai-tools": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/help-tool/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/help-tool/route.ts",
     method: "GET",
   },
   analytics_evaluators_and_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/evaluators/and/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/evaluators/and/route.ts",
     method: "POST",
   },
   analytics_evaluators_crossover_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/evaluators/crossover/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/evaluators/crossover/route.ts",
     method: "POST",
   },
   analytics_evaluators_not_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/evaluators/not/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/evaluators/not/route.ts",
     method: "POST",
   },
   analytics_evaluators_or_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/evaluators/or/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/evaluators/or/route.ts",
     method: "POST",
   },
   analytics_evaluators_script_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/evaluators/script/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/evaluators/script/route.ts",
     method: "POST",
   },
   analytics_evaluators_threshold_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/evaluators/threshold/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/evaluators/threshold/route.ts",
     method: "POST",
   },
   analytics_indicators_bollinger_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/indicators/bollinger/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/indicators/bollinger/route.ts",
     method: "POST",
   },
   analytics_indicators_clamp_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/indicators/clamp/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/indicators/clamp/route.ts",
     method: "POST",
   },
   analytics_indicators_delta_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/indicators/delta/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/indicators/delta/route.ts",
     method: "POST",
   },
   analytics_indicators_ema_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/indicators/ema/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/indicators/ema/route.ts",
     method: "POST",
   },
   analytics_indicators_macd_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/indicators/macd/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/indicators/macd/route.ts",
     method: "POST",
   },
   analytics_indicators_rsi_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/indicators/rsi/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/indicators/rsi/route.ts",
     method: "POST",
   },
   "analytics_indicators_window-avg_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/indicators/window-avg/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/indicators/window-avg/route.ts",
     method: "POST",
   },
   "analytics_indicators_window-max_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/indicators/window-max/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/indicators/window-max/route.ts",
     method: "POST",
   },
   "analytics_indicators_window-min_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/indicators/window-min/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/indicators/window-min/route.ts",
     method: "POST",
   },
   "analytics_indicators_window-sum_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/indicators/window-sum/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/indicators/window-sum/route.ts",
     method: "POST",
   },
   "analytics_transformers_field-pick_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/transformers/field-pick/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/transformers/field-pick/route.ts",
     method: "POST",
   },
   "analytics_transformers_json-path_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/transformers/json-path/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/transformers/json-path/route.ts",
     method: "POST",
   },
   analytics_transformers_merge_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/transformers/merge/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/transformers/merge/route.ts",
     method: "POST",
   },
   analytics_transformers_ratio_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/transformers/ratio/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/transformers/ratio/route.ts",
     method: "POST",
   },
   analytics_transformers_script_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/transformers/script/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/transformers/script/route.ts",
     method: "POST",
   },
   "await-task": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/execute-tool/await-task/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/await-task/route.ts",
     method: "POST",
   },
   b: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/server/server/build/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/build/route.ts",
     method: "POST",
   },
   "bounce-processor": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/campaigns/bounce-processor/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/campaigns/bounce-processor/route.ts",
     method: "POST",
   },
   "brave-search": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/web-search/brave/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/web-search/brave/route.ts",
     method: "GET",
   },
   "browser-click": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/click/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/click/route.ts",
     method: "POST",
   },
   "browser-close-page": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/close-page/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/close-page/route.ts",
     method: "POST",
   },
   "browser-drag": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/drag/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/drag/route.ts",
     method: "POST",
   },
   "browser-emulate": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/emulate/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/emulate/route.ts",
     method: "POST",
   },
   "browser-eval": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/evaluate-script/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/evaluate-script/route.ts",
     method: "POST",
   },
   "browser-fill": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/fill/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/fill/route.ts",
     method: "POST",
   },
   "browser-fill-form": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/fill-form/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/fill-form/route.ts",
     method: "POST",
   },
   "browser-get-console-message": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/get-console-message/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/get-console-message/route.ts",
     method: "POST",
   },
   "browser-get-network-request": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/get-network-request/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/get-network-request/route.ts",
     method: "POST",
   },
   "browser-handle-dialog": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/handle-dialog/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/handle-dialog/route.ts",
     method: "POST",
   },
   "browser-hover": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/hover/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/hover/route.ts",
     method: "POST",
   },
   "browser-list-console-messages": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/list-console-messages/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/list-console-messages/route.ts",
     method: "POST",
   },
   "browser-list-network-requests": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/list-network-requests/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/list-network-requests/route.ts",
     method: "POST",
   },
   "browser-list-pages": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/list-pages/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/list-pages/route.ts",
     method: "POST",
   },
   "browser-navigate-page": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/navigate-page/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/navigate-page/route.ts",
     method: "POST",
   },
   "browser-new-page": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/new-page/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/new-page/route.ts",
     method: "POST",
   },
   "browser-performance-analyze-insight": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/performance-analyze-insight/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/performance-analyze-insight/route.ts",
     method: "POST",
   },
   "browser-performance-start-trace": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/performance-start-trace/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/performance-start-trace/route.ts",
     method: "POST",
   },
   "browser-performance-stop-trace": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/performance-stop-trace/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/performance-stop-trace/route.ts",
     method: "POST",
   },
   "browser-press-key": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/press-key/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/press-key/route.ts",
     method: "POST",
   },
   "browser-resize-page": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/resize-page/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/resize-page/route.ts",
     method: "POST",
   },
   "browser-screenshot": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/take-screenshot/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/take-screenshot/route.ts",
     method: "POST",
   },
   "browser-select-page": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/select-page/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/select-page/route.ts",
     method: "POST",
   },
   "browser-take-snapshot": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/take-snapshot/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/take-snapshot/route.ts",
     method: "POST",
   },
   "browser-upload-file": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/upload-file/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/upload-file/route.ts",
     method: "POST",
   },
   "browser-wait-for": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/wait-for/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/wait-for/route.ts",
     method: "POST",
   },
   browser_click_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/click/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/click/route.ts",
     method: "POST",
   },
   "browser_close-page_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/close-page/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/close-page/route.ts",
     method: "POST",
   },
   browser_drag_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/drag/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/drag/route.ts",
     method: "POST",
   },
   browser_emulate_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/emulate/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/emulate/route.ts",
     method: "POST",
   },
   "browser_evaluate-script_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/evaluate-script/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/evaluate-script/route.ts",
     method: "POST",
   },
   "browser_fill-form_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/fill-form/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/fill-form/route.ts",
     method: "POST",
   },
   browser_fill_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/fill/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/fill/route.ts",
     method: "POST",
   },
   "browser_get-console-message_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/get-console-message/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/get-console-message/route.ts",
     method: "POST",
   },
   "browser_get-network-request_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/get-network-request/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/get-network-request/route.ts",
     method: "POST",
   },
   "browser_handle-dialog_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/handle-dialog/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/handle-dialog/route.ts",
     method: "POST",
   },
   browser_hover_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/hover/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/hover/route.ts",
     method: "POST",
   },
   "browser_list-console-messages_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/list-console-messages/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/list-console-messages/route.ts",
     method: "POST",
   },
   "browser_list-network-requests_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/list-network-requests/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/list-network-requests/route.ts",
     method: "POST",
   },
   "browser_list-pages_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/list-pages/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/list-pages/route.ts",
     method: "POST",
   },
   "browser_navigate-page_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/navigate-page/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/navigate-page/route.ts",
     method: "POST",
   },
   "browser_new-page_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/new-page/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/new-page/route.ts",
     method: "POST",
   },
   "browser_performance-analyze-insight_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/performance-analyze-insight/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/performance-analyze-insight/route.ts",
     method: "POST",
   },
   "browser_performance-start-trace_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/performance-start-trace/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/performance-start-trace/route.ts",
     method: "POST",
   },
   "browser_performance-stop-trace_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/performance-stop-trace/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/performance-stop-trace/route.ts",
     method: "POST",
   },
   "browser_press-key_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/press-key/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/press-key/route.ts",
     method: "POST",
   },
   "browser_resize-page_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/resize-page/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/resize-page/route.ts",
     method: "POST",
   },
   "browser_select-page_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/select-page/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/select-page/route.ts",
     method: "POST",
   },
   "browser_take-screenshot_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/take-screenshot/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/take-screenshot/route.ts",
     method: "POST",
   },
   "browser_take-snapshot_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/take-snapshot/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/take-snapshot/route.ts",
     method: "POST",
   },
   "browser_upload-file_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/upload-file/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/upload-file/route.ts",
     method: "POST",
   },
   "browser_wait-for_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/browser/wait-for/route.ts",
+      "/home/max/projects/next-vibe-translations/src/browser/wait-for/route.ts",
     method: "POST",
   },
   build: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/server/server/build/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/build/route.ts",
     method: "POST",
   },
   builder: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/builder/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/builder/route.ts",
     method: "POST",
   },
   c: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/check/vibe-check/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/vibe-check/route.ts",
     method: "POST",
   },
   "campaign-journey-variants": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/campaigns/journey-variants/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/campaigns/journey-variants/route.ts",
     method: "GET",
   },
   "campaign-queue": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/campaigns/queue/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/campaigns/queue/route.ts",
     method: "GET",
   },
   "campaign-starter": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/campaigns/campaign-starter/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/campaigns/campaign-starter/route.ts",
     method: "POST",
   },
   "campaign-stats": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/campaigns/stats/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/campaigns/stats/route.ts",
     method: "GET",
   },
   cancel: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/execute-tool/call-control/cancel/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/call-control/cancel/route.ts",
     method: "POST",
   },
   "cancel-subscription": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/cancel/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/cancel/route.ts",
     method: "DELETE",
   },
   "catalog-product-get": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/products/catalog/[productId]/get/route.ts",
+      "/home/max/projects/next-vibe-translations/src/products/catalog/[productId]/get/route.ts",
     method: "GET",
   },
   cc: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/check/config/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/config/create/route.ts",
     method: "POST",
   },
   "chart-of-accounts_account_accountId_deactivate_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/account/[accountId]/deactivate/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/account/[accountId]/deactivate/route.ts",
     method: "POST",
   },
   "chart-of-accounts_account_accountId_get_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/account/[accountId]/get/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/account/[accountId]/get/route.ts",
     method: "GET",
   },
   "chart-of-accounts_account_accountId_update_PATCH": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/account/[accountId]/update/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/account/[accountId]/update/route.ts",
     method: "PATCH",
   },
   "chart-of-accounts_account_create_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/account/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/account/create/route.ts",
     method: "POST",
   },
   "chart-of-accounts_account_list_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/account/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/account/list/route.ts",
     method: "GET",
   },
   "chart-of-accounts_dashboard_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/dashboard/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/dashboard/route.ts",
     method: "GET",
   },
   "chart-of-accounts_journal_create_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/journal/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/journal/create/route.ts",
     method: "POST",
   },
   "chart-of-accounts_journal_entryId_get_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/journal/[entryId]/get/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/journal/[entryId]/get/route.ts",
     method: "GET",
   },
   "chart-of-accounts_journal_entryId_post_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/journal/[entryId]/post/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/journal/[entryId]/post/route.ts",
     method: "POST",
   },
   "chart-of-accounts_journal_entryId_reverse_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/journal/[entryId]/reverse/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/journal/[entryId]/reverse/route.ts",
     method: "POST",
   },
   "chart-of-accounts_journal_list_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/journal/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/journal/list/route.ts",
     method: "GET",
   },
   "chart-of-accounts_ledger_accountId_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/ledger/[accountId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/ledger/[accountId]/route.ts",
     method: "GET",
   },
   "chart-of-accounts_period_create_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/period/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/period/create/route.ts",
     method: "POST",
   },
   "chart-of-accounts_period_list_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/period/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/period/list/route.ts",
     method: "GET",
   },
   "chart-of-accounts_period_periodId_close_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/period/[periodId]/close/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/period/[periodId]/close/route.ts",
     method: "POST",
   },
   "chart-of-accounts_period_periodId_get_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/period/[periodId]/get/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/period/[periodId]/get/route.ts",
     method: "GET",
   },
   "chart-of-accounts_reports_balance-sheet_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/reports/balance-sheet/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/reports/balance-sheet/route.ts",
     method: "GET",
   },
   "chart-of-accounts_reports_profit-loss_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/reports/profit-loss/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/reports/profit-loss/route.ts",
     method: "GET",
   },
   "chart-of-accounts_reports_receivables-aging_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/reports/receivables-aging/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/reports/receivables-aging/route.ts",
     method: "GET",
   },
   "chart-of-accounts_reports_tax-report_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/reports/tax-report/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/reports/tax-report/route.ts",
     method: "GET",
   },
   "chart-of-accounts_reports_trial-balance_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/reports/trial-balance/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/reports/trial-balance/route.ts",
     method: "GET",
   },
   "chart-of-accounts_setup_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/setup/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/setup/route.ts",
     method: "POST",
   },
   "chat-downvotes-total": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/data-sources/chat-downvotes-total/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-downvotes-total/route.ts",
     method: "POST",
   },
   "chat-errors-total": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/data-sources/chat-errors-total/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-errors-total/route.ts",
     method: "POST",
   },
   "chat-memories-created": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/data-sources/chat-memories-created/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-memories-created/route.ts",
     method: "POST",
   },
   "chat-messages-by-ai": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/data-sources/chat-messages-by-ai/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-messages-by-ai/route.ts",
     method: "POST",
   },
   "chat-messages-by-user": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/data-sources/chat-messages-by-user/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-messages-by-user/route.ts",
     method: "POST",
   },
   "chat-messages-total": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/data-sources/chat-messages-total/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-messages-total/route.ts",
     method: "POST",
   },
   "chat-messages-with-attachments": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/data-sources/chat-messages-with-attachments/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-messages-with-attachments/route.ts",
     method: "POST",
   },
   "chat-settings": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/settings/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/settings/route.ts",
     method: "GET",
   },
   "chat-settings-update": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/settings/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/settings/route.ts",
     method: "POST",
   },
   "chat-share-links-created": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/data-sources/chat-share-links-created/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-share-links-created/route.ts",
     method: "POST",
   },
   "chat-threads-active-total": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/data-sources/chat-threads-active-total/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-threads-active-total/route.ts",
     method: "POST",
   },
   "chat-threads-created": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/data-sources/chat-threads-created/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-threads-created/route.ts",
     method: "POST",
   },
   "chat-tool-calls-total": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/data-sources/chat-tool-calls-total/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-tool-calls-total/route.ts",
     method: "POST",
   },
   "chat-unique-users": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/data-sources/chat-unique-users/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-unique-users/route.ts",
     method: "POST",
   },
   "chat-upvotes-total": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/data-sources/chat-upvotes-total/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-upvotes-total/route.ts",
     method: "POST",
   },
   check: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/check/vibe-check/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/vibe-check/route.ts",
     method: "POST",
   },
   claude: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/coding-agent/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/coding-agent/route.ts",
     method: "POST",
   },
   "claude-code": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/coding-agent/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/coding-agent/route.ts",
     method: "POST",
   },
   "click-tracking": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/tracking/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/tracking/route.ts",
     method: "GET",
   },
   "cluster-init": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/infra/cluster/init/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/cluster/init/route.ts",
     method: "POST",
   },
   "cluster-status": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/infra/cluster/status/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/cluster/status/route.ts",
     method: "GET",
   },
   "coa-account-create": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/account/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/account/create/route.ts",
     method: "POST",
   },
   "coa-account-deactivate": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/account/[accountId]/deactivate/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/account/[accountId]/deactivate/route.ts",
     method: "POST",
   },
   "coa-account-get": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/account/[accountId]/get/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/account/[accountId]/get/route.ts",
     method: "GET",
   },
   "coa-account-list": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/account/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/account/list/route.ts",
     method: "GET",
   },
   "coa-account-update": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/account/[accountId]/update/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/account/[accountId]/update/route.ts",
     method: "PATCH",
   },
   "coa-balance-sheet": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/reports/balance-sheet/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/reports/balance-sheet/route.ts",
     method: "GET",
   },
   "coa-journal-create": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/journal/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/journal/create/route.ts",
     method: "POST",
   },
   "coa-journal-entry-get": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/journal/[entryId]/get/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/journal/[entryId]/get/route.ts",
     method: "GET",
   },
   "coa-journal-list": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/journal/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/journal/list/route.ts",
     method: "GET",
   },
   "coa-journal-post": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/journal/[entryId]/post/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/journal/[entryId]/post/route.ts",
     method: "POST",
   },
   "coa-journal-reverse": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/journal/[entryId]/reverse/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/journal/[entryId]/reverse/route.ts",
     method: "POST",
   },
   "coa-ledger": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/ledger/[accountId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/ledger/[accountId]/route.ts",
     method: "GET",
   },
   "coa-period-close": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/period/[periodId]/close/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/period/[periodId]/close/route.ts",
     method: "POST",
   },
   "coa-period-create": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/period/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/period/create/route.ts",
     method: "POST",
   },
   "coa-period-get": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/period/[periodId]/get/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/period/[periodId]/get/route.ts",
     method: "GET",
   },
   "coa-period-list": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/period/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/period/list/route.ts",
     method: "GET",
   },
   "coa-profit-loss": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/reports/profit-loss/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/reports/profit-loss/route.ts",
     method: "GET",
   },
   "coa-receivables-aging": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/reports/receivables-aging/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/reports/receivables-aging/route.ts",
     method: "GET",
   },
   "coa-setup": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/setup/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/setup/route.ts",
     method: "POST",
   },
   "coa-tax-report": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/reports/tax-report/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/reports/tax-report/route.ts",
     method: "GET",
   },
   "coa-trial-balance": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/chart-of-accounts/reports/trial-balance/route.ts",
+      "/home/max/projects/next-vibe-translations/src/chart-of-accounts/reports/trial-balance/route.ts",
     method: "GET",
   },
   "coding-agent": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/coding-agent/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/coding-agent/route.ts",
     method: "POST",
   },
   "companies-list": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/companies/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/companies/list/route.ts",
     method: "GET",
   },
   companies_companyId_get_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/companies/[companyId]/get/route.ts",
+      "/home/max/projects/next-vibe-translations/src/companies/[companyId]/get/route.ts",
     method: "GET",
   },
   companies_companyId_members_invite_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/companies/[companyId]/members/invite/route.ts",
+      "/home/max/projects/next-vibe-translations/src/companies/[companyId]/members/invite/route.ts",
     method: "POST",
   },
   companies_companyId_members_list_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/companies/[companyId]/members/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/companies/[companyId]/members/list/route.ts",
     method: "GET",
   },
   companies_companyId_members_memberId_remove_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/companies/[companyId]/members/[memberId]/remove/route.ts",
+      "/home/max/projects/next-vibe-translations/src/companies/[companyId]/members/[memberId]/remove/route.ts",
     method: "POST",
   },
   "companies_companyId_members_memberId_update-role_PATCH": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/companies/[companyId]/members/[memberId]/update-role/route.ts",
+      "/home/max/projects/next-vibe-translations/src/companies/[companyId]/members/[memberId]/update-role/route.ts",
     method: "PATCH",
   },
   companies_companyId_onboard_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/companies/[companyId]/onboard/route.ts",
+      "/home/max/projects/next-vibe-translations/src/companies/[companyId]/onboard/route.ts",
     method: "POST",
   },
   companies_companyId_update_PATCH: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/companies/[companyId]/update/route.ts",
+      "/home/max/projects/next-vibe-translations/src/companies/[companyId]/update/route.ts",
     method: "PATCH",
   },
   companies_create_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/companies/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/companies/create/route.ts",
     method: "POST",
   },
   companies_list_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/companies/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/companies/list/route.ts",
     method: "GET",
   },
   "company-members-list": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/companies/[companyId]/members/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/companies/[companyId]/members/list/route.ts",
     method: "GET",
   },
   "complete-task": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/execute-tool/complete/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/complete/route.ts",
     method: "POST",
   },
   config: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/check/config/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/config/create/route.ts",
     method: "POST",
   },
   "config-create": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/check/config/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/config/create/route.ts",
     method: "POST",
   },
   "connect-remote": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/remote-connection/connect/route.ts",
+      "/home/max/projects/next-vibe-translations/src/remote-connection/connect/route.ts",
     method: "POST",
   },
   "connection-status": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/remote-connection/[instanceId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/remote-connection/[instanceId]/route.ts",
     method: "GET",
   },
   "contact-form": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/contact/route.ts",
+      "/home/max/projects/next-vibe-translations/src/contact/route.ts",
     method: "POST",
   },
   contact_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/contact/route.ts",
+      "/home/max/projects/next-vibe-translations/src/contact/route.ts",
     method: "POST",
   },
   "cortex-delete": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/cortex/delete/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/delete/route.ts",
     method: "DELETE",
   },
   "cortex-edit": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/cortex/edit/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/edit/route.ts",
     method: "PATCH",
   },
   "cortex-embed-backfill": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/cortex/embeddings/backfill/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/embeddings/backfill/route.ts",
     method: "POST",
   },
   "cortex-exec": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/cortex/exec/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/exec/route.ts",
     method: "POST",
   },
   "cortex-list": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/cortex/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/list/route.ts",
     method: "GET",
   },
   "cortex-mkdir": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/cortex/mkdir/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/mkdir/route.ts",
     method: "POST",
   },
   "cortex-move": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/cortex/move/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/move/route.ts",
     method: "POST",
   },
   "cortex-read": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/cortex/read/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/read/route.ts",
     method: "GET",
   },
   "cortex-search": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/cortex/search/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/search/route.ts",
     method: "GET",
   },
   "cortex-terminals": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/cortex/terminals/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/terminals/route.ts",
     method: "GET",
   },
   "cortex-tree": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/cortex/tree/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/tree/route.ts",
     method: "GET",
   },
   "cortex-write": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/cortex/write/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/write/route.ts",
     method: "POST",
   },
   "create-config": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/check/config/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/config/create/route.ts",
     method: "POST",
   },
   "credits-avg-transaction": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-avg-transaction/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-avg-transaction/route.ts",
     method: "POST",
   },
   "credits-balance": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/route.ts",
     method: "GET",
   },
   "credits-balance-total": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-balance-total/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-balance-total/route.ts",
     method: "POST",
   },
   "credits-earned": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-earned/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-earned/route.ts",
     method: "POST",
   },
   "credits-expired": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-expired/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-expired/route.ts",
     method: "POST",
   },
   "credits-free-grants": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-free-grants/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-free-grants/route.ts",
     method: "POST",
   },
   "credits-free-pool-utilization": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-free-pool-utilization/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-free-pool-utilization/route.ts",
     method: "POST",
   },
   "credits-packs-created": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-packs-created/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-packs-created/route.ts",
     method: "POST",
   },
   "credits-public-cap": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/public-cap/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/public-cap/route.ts",
     method: "GET",
   },
   "credits-purchased": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-purchased/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-purchased/route.ts",
     method: "POST",
   },
   "credits-refunded": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-refunded/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-refunded/route.ts",
     method: "POST",
   },
   "credits-spent-by-leads": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-spent-by-leads/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-spent-by-leads/route.ts",
     method: "POST",
   },
   "credits-spent-by-users": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-spent-by-users/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-spent-by-users/route.ts",
     method: "POST",
   },
   "credits-spent-total": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-spent-total/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-spent-total/route.ts",
     method: "POST",
   },
   "credits-subscription-revenue": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-subscription-revenue/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-subscription-revenue/route.ts",
     method: "POST",
   },
   "credits-transactions-count": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-transactions-count/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-transactions-count/route.ts",
     method: "POST",
   },
   "credits-transfer-volume": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-transfer-volume/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-transfer-volume/route.ts",
     method: "POST",
   },
   "credits-usage-with-feature": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-usage-with-feature/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-usage-with-feature/route.ts",
     method: "POST",
   },
   "credits-wallets-total": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-wallets-total/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-wallets-total/route.ts",
     method: "POST",
   },
   credits_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/route.ts",
     method: "GET",
   },
   "credits_admin-add_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/admin-add/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/admin-add/route.ts",
     method: "POST",
   },
   "credits_data-sources_credits-avg-transaction_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-avg-transaction/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-avg-transaction/route.ts",
     method: "POST",
   },
   "credits_data-sources_credits-balance-total_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-balance-total/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-balance-total/route.ts",
     method: "POST",
   },
   "credits_data-sources_credits-earned_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-earned/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-earned/route.ts",
     method: "POST",
   },
   "credits_data-sources_credits-expired_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-expired/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-expired/route.ts",
     method: "POST",
   },
   "credits_data-sources_credits-free-grants_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-free-grants/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-free-grants/route.ts",
     method: "POST",
   },
   "credits_data-sources_credits-free-pool-utilization_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-free-pool-utilization/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-free-pool-utilization/route.ts",
     method: "POST",
   },
   "credits_data-sources_credits-packs-created_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-packs-created/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-packs-created/route.ts",
     method: "POST",
   },
   "credits_data-sources_credits-purchased_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-purchased/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-purchased/route.ts",
     method: "POST",
   },
   "credits_data-sources_credits-refunded_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-refunded/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-refunded/route.ts",
     method: "POST",
   },
   "credits_data-sources_credits-spent-by-leads_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-spent-by-leads/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-spent-by-leads/route.ts",
     method: "POST",
   },
   "credits_data-sources_credits-spent-by-users_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-spent-by-users/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-spent-by-users/route.ts",
     method: "POST",
   },
   "credits_data-sources_credits-spent-total_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-spent-total/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-spent-total/route.ts",
     method: "POST",
   },
   "credits_data-sources_credits-subscription-revenue_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-subscription-revenue/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-subscription-revenue/route.ts",
     method: "POST",
   },
   "credits_data-sources_credits-transactions-count_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-transactions-count/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-transactions-count/route.ts",
     method: "POST",
   },
   "credits_data-sources_credits-transfer-volume_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-transfer-volume/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-transfer-volume/route.ts",
     method: "POST",
   },
   "credits_data-sources_credits-usage-with-feature_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-usage-with-feature/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-usage-with-feature/route.ts",
     method: "POST",
   },
   "credits_data-sources_credits-wallets-total_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/data-sources/credits-wallets-total/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/data-sources/credits-wallets-total/route.ts",
     method: "POST",
   },
   credits_expire_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/expire/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/expire/route.ts",
     method: "POST",
   },
   credits_history_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/history/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/history/route.ts",
     method: "GET",
   },
   "credits_public-cap_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/public-cap/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/public-cap/route.ts",
     method: "GET",
   },
   "credits_public-cap_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/public-cap/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/public-cap/route.ts",
     method: "POST",
   },
   credits_purchase_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/credits/purchase/route.ts",
+      "/home/max/projects/next-vibe-translations/src/credits/purchase/route.ts",
     method: "POST",
   },
   "cron-create": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/cron/tasks/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/tasks/route.ts",
     method: "POST",
   },
   "cron-delete": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/cron/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/[id]/route.ts",
     method: "DELETE",
   },
   "cron-executions-failed": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/data-sources/cron-executions-failed/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/data-sources/cron-executions-failed/route.ts",
     method: "POST",
   },
   "cron-executions-succeeded": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/data-sources/cron-executions-succeeded/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/data-sources/cron-executions-succeeded/route.ts",
     method: "POST",
   },
   "cron-executions-total": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/data-sources/cron-executions-total/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/data-sources/cron-executions-total/route.ts",
     method: "POST",
   },
   "cron-get": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/cron/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/[id]/route.ts",
     method: "GET",
   },
   "cron-history": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/cron/history/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/history/route.ts",
     method: "GET",
   },
   "cron-list": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/cron/tasks/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/tasks/route.ts",
     method: "GET",
   },
   "cron-queue": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/cron/queue/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/queue/route.ts",
     method: "GET",
   },
   "cron-stats": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/cron/stats/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/stats/route.ts",
     method: "GET",
   },
   "cron-tasks": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/cron/tasks/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/tasks/route.ts",
     method: "GET",
   },
   "cron-update": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/cron/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/[id]/route.ts",
     method: "PUT",
   },
   "cron:stats": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/cron/stats/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/stats/route.ts",
     method: "GET",
   },
   d: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/server/server/dev/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/dev/route.ts",
     method: "POST",
   },
   "db-health": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/database/health/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/database/health/route.ts",
     method: "POST",
   },
   "db-ping": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/database/health/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/database/health/route.ts",
     method: "POST",
   },
   "db:migrate": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/database/migrate/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/database/migrate/route.ts",
     method: "POST",
   },
   "db:ping": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/database/ping/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/database/ping/route.ts",
     method: "POST",
   },
   "db:seed": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/database/seed/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/database/seed/route.ts",
     method: "POST",
   },
   "db:studio": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/database/studio/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/database/studio/route.ts",
     method: "POST",
   },
   "db:utils": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/database/utils/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/database/utils/route.ts",
     method: "GET",
   },
   dbutils: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/database/utils/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/database/utils/route.ts",
     method: "GET",
   },
   deploy: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/infra/deploy/push/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/deploy/push/route.ts",
     method: "POST",
   },
   "deploy-preview": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/infra/deploy/preview/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/deploy/preview/route.ts",
     method: "POST",
   },
   deps: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/vibe-deps/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/vibe-deps/route.ts",
     method: "POST",
   },
   describe_image: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/describe-image/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/describe-image/route.ts",
     method: "POST",
   },
   describe_video: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/describe-video/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/describe-video/route.ts",
     method: "POST",
   },
   "desktop-accessibility": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/desktop/get-accessibility-tree/route.ts",
+      "/home/max/projects/next-vibe-translations/src/desktop/get-accessibility-tree/route.ts",
     method: "POST",
   },
   "desktop-click": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/desktop/click/route.ts",
+      "/home/max/projects/next-vibe-translations/src/desktop/click/route.ts",
     method: "POST",
   },
   "desktop-focus-window": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/desktop/focus-window/route.ts",
+      "/home/max/projects/next-vibe-translations/src/desktop/focus-window/route.ts",
     method: "POST",
   },
   "desktop-get-focused-window": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/desktop/get-focused-window/route.ts",
+      "/home/max/projects/next-vibe-translations/src/desktop/get-focused-window/route.ts",
     method: "POST",
   },
   "desktop-list-monitors": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/desktop/list-monitors/route.ts",
+      "/home/max/projects/next-vibe-translations/src/desktop/list-monitors/route.ts",
     method: "POST",
   },
   "desktop-list-windows": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/desktop/list-windows/route.ts",
+      "/home/max/projects/next-vibe-translations/src/desktop/list-windows/route.ts",
     method: "POST",
   },
   "desktop-move-mouse": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/desktop/move-mouse/route.ts",
+      "/home/max/projects/next-vibe-translations/src/desktop/move-mouse/route.ts",
     method: "POST",
   },
   "desktop-move-window-to-monitor": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/desktop/move-window-to-monitor/route.ts",
+      "/home/max/projects/next-vibe-translations/src/desktop/move-window-to-monitor/route.ts",
     method: "POST",
   },
   "desktop-press-key": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/desktop/press-key/route.ts",
+      "/home/max/projects/next-vibe-translations/src/desktop/press-key/route.ts",
     method: "POST",
   },
   "desktop-screenshot": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/desktop/take-screenshot/route.ts",
+      "/home/max/projects/next-vibe-translations/src/desktop/take-screenshot/route.ts",
     method: "POST",
   },
   "desktop-scroll": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/desktop/scroll/route.ts",
+      "/home/max/projects/next-vibe-translations/src/desktop/scroll/route.ts",
     method: "POST",
   },
   "desktop-type-text": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/desktop/type-text/route.ts",
+      "/home/max/projects/next-vibe-translations/src/desktop/type-text/route.ts",
     method: "POST",
   },
   desktop_click_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/desktop/click/route.ts",
+      "/home/max/projects/next-vibe-translations/src/desktop/click/route.ts",
     method: "POST",
   },
   "desktop_focus-window_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/desktop/focus-window/route.ts",
+      "/home/max/projects/next-vibe-translations/src/desktop/focus-window/route.ts",
     method: "POST",
   },
   "desktop_get-accessibility-tree_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/desktop/get-accessibility-tree/route.ts",
+      "/home/max/projects/next-vibe-translations/src/desktop/get-accessibility-tree/route.ts",
     method: "POST",
   },
   "desktop_get-focused-window_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/desktop/get-focused-window/route.ts",
+      "/home/max/projects/next-vibe-translations/src/desktop/get-focused-window/route.ts",
     method: "POST",
   },
   "desktop_list-monitors_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/desktop/list-monitors/route.ts",
+      "/home/max/projects/next-vibe-translations/src/desktop/list-monitors/route.ts",
     method: "POST",
   },
   "desktop_list-windows_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/desktop/list-windows/route.ts",
+      "/home/max/projects/next-vibe-translations/src/desktop/list-windows/route.ts",
     method: "POST",
   },
   "desktop_move-mouse_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/desktop/move-mouse/route.ts",
+      "/home/max/projects/next-vibe-translations/src/desktop/move-mouse/route.ts",
     method: "POST",
   },
   "desktop_move-window-to-monitor_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/desktop/move-window-to-monitor/route.ts",
+      "/home/max/projects/next-vibe-translations/src/desktop/move-window-to-monitor/route.ts",
     method: "POST",
   },
   "desktop_press-key_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/desktop/press-key/route.ts",
+      "/home/max/projects/next-vibe-translations/src/desktop/press-key/route.ts",
     method: "POST",
   },
   desktop_scroll_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/desktop/scroll/route.ts",
+      "/home/max/projects/next-vibe-translations/src/desktop/scroll/route.ts",
     method: "POST",
   },
   "desktop_take-screenshot_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/desktop/take-screenshot/route.ts",
+      "/home/max/projects/next-vibe-translations/src/desktop/take-screenshot/route.ts",
     method: "POST",
   },
   "desktop_type-text_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/desktop/type-text/route.ts",
+      "/home/max/projects/next-vibe-translations/src/desktop/type-text/route.ts",
     method: "POST",
   },
   detach: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/execute-tool/call-control/detach/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/call-control/detach/route.ts",
     method: "POST",
   },
   dev: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/server/server/dev/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/dev/route.ts",
     method: "POST",
   },
   dgen: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/database/generate/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/database/generate/route.ts",
     method: "POST",
   },
   docker: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/database/utils/docker-operations/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/database/utils/docker-operations/route.ts",
     method: "POST",
   },
   "docker-utils": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/database/utils/docker-operations/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/database/utils/docker-operations/route.ts",
     method: "POST",
   },
   el: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/check/lint/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/lint/route.ts",
     method: "POST",
   },
   electron: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/server/server/electron/start/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/electron/start/route.ts",
     method: "POST",
   },
   "electron:build": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/server/server/electron/build/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/electron/build/route.ts",
     method: "POST",
   },
   "electron:dev": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/server/server/electron/start/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/electron/start/route.ts",
     method: "POST",
   },
   "electron:start": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/server/server/electron/start/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/electron/start/route.ts",
     method: "POST",
   },
   elint: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/check/lint/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/lint/route.ts",
     method: "POST",
   },
   "email-campaigns": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/campaigns/email-campaigns/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/campaigns/email-campaigns/route.ts",
     method: "POST",
   },
   "email-stats": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/messages/stats/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/messages/stats/route.ts",
     method: "GET",
   },
   "error-logs": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/logger/error-monitor/logs/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/logs/route.ts",
     method: "GET",
   },
   "error-logs-cleanup": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/logger/error-monitor/cleanup/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/cleanup/route.ts",
     method: "POST",
   },
   "error-logs-errors": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/logger/error-monitor/data-sources/error-logs-errors/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/data-sources/error-logs-errors/route.ts",
     method: "POST",
   },
   "error-logs-total": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/logger/error-monitor/data-sources/error-logs-total/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/data-sources/error-logs-total/route.ts",
     method: "POST",
   },
   "error-logs-warnings": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/logger/error-monitor/data-sources/error-logs-warnings/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/data-sources/error-logs-warnings/route.ts",
     method: "POST",
   },
   eslint: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/check/lint/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/lint/route.ts",
     method: "POST",
   },
   "execute-task": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/execute/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/execute/route.ts",
     method: "POST",
   },
   "execute-tool": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/execute-tool/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/route.ts",
     method: "POST",
   },
   "favorite-create": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/skills/favorites/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/create/route.ts",
     method: "POST",
   },
   "favorite-delete": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/skills/favorites/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/[id]/route.ts",
     method: "DELETE",
   },
   "favorite-get": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/skills/favorites/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/[id]/route.ts",
     method: "GET",
   },
   "favorite-update": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/skills/favorites/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/[id]/route.ts",
     method: "PATCH",
   },
   favorites: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/skills/favorites/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/route.ts",
     method: "GET",
   },
   "favorites-reorder": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/skills/favorites/reorder/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/reorder/route.ts",
     method: "POST",
   },
   fetch: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/fetch-url-content/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/fetch-url-content/route.ts",
     method: "GET",
   },
   "fetch-url": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/fetch-url-content/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/fetch-url-content/route.ts",
     method: "GET",
   },
   "fetch-url-cache-cleanup": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/fetch-url-content/cleanup/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/fetch-url-content/cleanup/route.ts",
     method: "POST",
   },
   "fetch-url-content": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/fetch-url-content/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/fetch-url-content/route.ts",
     method: "GET",
   },
   "folder-contents": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folder-contents/[rootFolderId]/route.ts",
     method: "GET",
   },
   "folder-create": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/folders/[rootFolderId]/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/[rootFolderId]/create/route.ts",
     method: "POST",
   },
   "folder-delete": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/folders/subfolders/[subFolderId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/route.ts",
     method: "DELETE",
   },
   "folder-get": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/folders/subfolders/[subFolderId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/route.ts",
     method: "GET",
   },
   "folder-move": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/folders/subfolders/[subFolderId]/move/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/move/route.ts",
     method: "PATCH",
   },
   "folder-permissions": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/folders/[rootFolderId]/root-permissions/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/[rootFolderId]/root-permissions/route.ts",
     method: "GET",
   },
   "folder-rename": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/folders/subfolders/[subFolderId]/rename/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/rename/route.ts",
     method: "PATCH",
   },
   "folder-update": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/folders/subfolders/[subFolderId]/update/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/update/route.ts",
     method: "PATCH",
   },
   folders: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/folders/[rootFolderId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/[rootFolderId]/route.ts",
     method: "GET",
   },
   "folders-list": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/folders/[rootFolderId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/[rootFolderId]/route.ts",
     method: "GET",
   },
   gen: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/generators/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/generators/route.ts",
     method: "POST",
   },
   "gen-key": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/env/settings/generate-key/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/env/settings/generate-key/route.ts",
     method: "GET",
   },
   generate: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/generators/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/generators/route.ts",
     method: "POST",
   },
   "generate-all": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/generators/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/generators/route.ts",
     method: "POST",
   },
   "generate-key": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/env/settings/generate-key/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/env/settings/generate-key/route.ts",
     method: "GET",
   },
   generate_image: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/image-generation/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/image-generation/route.ts",
     method: "POST",
   },
   generate_music: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/music-generation/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/music-generation/route.ts",
     method: "POST",
   },
   generate_video: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/video-generation/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/video-generation/route.ts",
     method: "POST",
   },
   "get-folder": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folder-contents/[rootFolderId]/route.ts",
     method: "GET",
   },
   guard: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/guard/start/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/guard/start/route.ts",
     method: "POST",
   },
   "guard-destroy": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/guard/destroy/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/guard/destroy/route.ts",
     method: "POST",
   },
   "guard-start": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/guard/start/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/guard/start/route.ts",
     method: "POST",
   },
   "guard-stop": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/guard/stop/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/guard/stop/route.ts",
     method: "POST",
   },
   "guard:destroy": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/guard/destroy/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/guard/destroy/route.ts",
     method: "POST",
   },
   "guard:remove": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/guard/destroy/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/guard/destroy/route.ts",
     method: "POST",
   },
   "guard:start": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/guard/start/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/guard/start/route.ts",
     method: "POST",
   },
   "guard:status": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/guard/status/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/guard/status/route.ts",
     method: "POST",
   },
   "guard:stop": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/guard/stop/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/guard/stop/route.ts",
     method: "POST",
   },
   h: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/help-tool/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/help-tool/route.ts",
     method: "GET",
   },
   "headless-client": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/server/server/headless-client/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/headless-client/route.ts",
     method: "POST",
   },
   health: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/server/server/health/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/health/route.ts",
     method: "GET",
   },
   help: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/help-tool/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/help-tool/route.ts",
     method: "GET",
   },
   "image-push": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/server/server/image-push/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/image-push/route.ts",
     method: "POST",
   },
   "import-leads": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/import/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/import/route.ts",
     method: "POST",
   },
   "infra-deploy": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/infra/deploy/push/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/deploy/push/route.ts",
     method: "POST",
   },
   "infra-init": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/infra/cluster/init/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/cluster/init/route.ts",
     method: "POST",
   },
   "infra-preview": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/infra/deploy/preview/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/deploy/preview/route.ts",
     method: "POST",
   },
   "infra-scale": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/infra/scale/replicas/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/scale/replicas/route.ts",
     method: "POST",
   },
   "infra-status": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/infra/cluster/status/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/cluster/status/route.ts",
     method: "GET",
   },
   init: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/env/settings/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/env/settings/route.ts",
     method: "PATCH",
   },
   "init-cluster": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/infra/cluster/init/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/cluster/init/route.ts",
     method: "POST",
   },
   install: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/platforms/cli/setup/install/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/setup/install/route.ts",
     method: "POST",
   },
   "interactive-capture": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/platforms/cli/interactive/capture/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/interactive/capture/route.ts",
     method: "POST",
   },
   "interactive-send-keys": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/platforms/cli/interactive/send-keys/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/interactive/send-keys/route.ts",
     method: "POST",
   },
   "inventory-dashboard": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/inventory/dashboard/route.ts",
+      "/home/max/projects/next-vibe-translations/src/inventory/dashboard/route.ts",
     method: "GET",
   },
   "inventory-stock": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/inventory/stock/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/inventory/stock/list/route.ts",
     method: "GET",
   },
   "inventory-transfers": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/inventory/transfer/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/inventory/transfer/list/route.ts",
     method: "GET",
   },
   "inventory-warehouses": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/inventory/warehouse/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/inventory/warehouse/list/route.ts",
     method: "GET",
   },
   inventory_dashboard_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/inventory/dashboard/route.ts",
+      "/home/max/projects/next-vibe-translations/src/inventory/dashboard/route.ts",
     method: "GET",
   },
   inventory_stock_adjust_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/inventory/stock/adjust/route.ts",
+      "/home/max/projects/next-vibe-translations/src/inventory/stock/adjust/route.ts",
     method: "POST",
   },
   inventory_stock_issue_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/inventory/stock/issue/route.ts",
+      "/home/max/projects/next-vibe-translations/src/inventory/stock/issue/route.ts",
     method: "POST",
   },
   inventory_stock_list_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/inventory/stock/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/inventory/stock/list/route.ts",
     method: "GET",
   },
   inventory_stock_receive_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/inventory/stock/receive/route.ts",
+      "/home/max/projects/next-vibe-translations/src/inventory/stock/receive/route.ts",
     method: "POST",
   },
   inventory_transfer_create_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/inventory/transfer/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/inventory/transfer/create/route.ts",
     method: "POST",
   },
   inventory_transfer_list_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/inventory/transfer/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/inventory/transfer/list/route.ts",
     method: "GET",
   },
   inventory_transfer_transferId_dispatch_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/inventory/transfer/[transferId]/dispatch/route.ts",
+      "/home/max/projects/next-vibe-translations/src/inventory/transfer/[transferId]/dispatch/route.ts",
     method: "POST",
   },
   inventory_transfer_transferId_get_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/inventory/transfer/[transferId]/get/route.ts",
+      "/home/max/projects/next-vibe-translations/src/inventory/transfer/[transferId]/get/route.ts",
     method: "GET",
   },
   inventory_transfer_transferId_receive_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/inventory/transfer/[transferId]/receive/route.ts",
+      "/home/max/projects/next-vibe-translations/src/inventory/transfer/[transferId]/receive/route.ts",
     method: "POST",
   },
   inventory_warehouse_create_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/inventory/warehouse/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/inventory/warehouse/create/route.ts",
     method: "POST",
   },
   inventory_warehouse_list_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/inventory/warehouse/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/inventory/warehouse/list/route.ts",
     method: "GET",
   },
   inventory_warehouse_warehouseId_get_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/inventory/warehouse/[warehouseId]/get/route.ts",
+      "/home/max/projects/next-vibe-translations/src/inventory/warehouse/[warehouseId]/get/route.ts",
     method: "GET",
   },
   inventory_warehouse_warehouseId_update_PATCH: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/inventory/warehouse/[warehouseId]/update/route.ts",
+      "/home/max/projects/next-vibe-translations/src/inventory/warehouse/[warehouseId]/update/route.ts",
     method: "PATCH",
   },
   "ip-match-linking": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/attribution/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/attribution/route.ts",
     method: "POST",
   },
   "kagi-search": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/web-search/kagi/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/web-search/kagi/route.ts",
     method: "GET",
   },
   l: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/check/oxlint/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/oxlint/route.ts",
     method: "POST",
   },
   "lead-magnet_capture_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/lead-magnet/capture/route.ts",
+      "/home/max/projects/next-vibe-translations/src/lead-magnet/capture/route.ts",
     method: "POST",
   },
   "lead-magnet_captures_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/lead-magnet/captures/route.ts",
+      "/home/max/projects/next-vibe-translations/src/lead-magnet/captures/route.ts",
     method: "GET",
   },
   "lead-magnet_config_DELETE": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/lead-magnet/config/route.ts",
+      "/home/max/projects/next-vibe-translations/src/lead-magnet/config/route.ts",
     method: "DELETE",
   },
   "lead-magnet_config_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/lead-magnet/config/route.ts",
+      "/home/max/projects/next-vibe-translations/src/lead-magnet/config/route.ts",
     method: "GET",
   },
   "lead-magnet_providers_acumbamail_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/lead-magnet/providers/acumbamail/route.ts",
+      "/home/max/projects/next-vibe-translations/src/lead-magnet/providers/acumbamail/route.ts",
     method: "POST",
   },
   "lead-magnet_providers_adobecampaign_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/lead-magnet/providers/adobecampaign/route.ts",
+      "/home/max/projects/next-vibe-translations/src/lead-magnet/providers/adobecampaign/route.ts",
     method: "POST",
   },
   "lead-magnet_providers_cleverreach_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/lead-magnet/providers/cleverreach/route.ts",
+      "/home/max/projects/next-vibe-translations/src/lead-magnet/providers/cleverreach/route.ts",
     method: "POST",
   },
   "lead-magnet_providers_connectif_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/lead-magnet/providers/connectif/route.ts",
+      "/home/max/projects/next-vibe-translations/src/lead-magnet/providers/connectif/route.ts",
     method: "POST",
   },
   "lead-magnet_providers_datanext_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/lead-magnet/providers/datanext/route.ts",
+      "/home/max/projects/next-vibe-translations/src/lead-magnet/providers/datanext/route.ts",
     method: "POST",
   },
   "lead-magnet_providers_edrone_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/lead-magnet/providers/edrone/route.ts",
+      "/home/max/projects/next-vibe-translations/src/lead-magnet/providers/edrone/route.ts",
     method: "POST",
   },
   "lead-magnet_providers_emarsys_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/lead-magnet/providers/emarsys/route.ts",
+      "/home/max/projects/next-vibe-translations/src/lead-magnet/providers/emarsys/route.ts",
     method: "POST",
   },
   "lead-magnet_providers_expertsender_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/lead-magnet/providers/expertsender/route.ts",
+      "/home/max/projects/next-vibe-translations/src/lead-magnet/providers/expertsender/route.ts",
     method: "POST",
   },
   "lead-magnet_providers_freshmail_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/lead-magnet/providers/freshmail/route.ts",
+      "/home/max/projects/next-vibe-translations/src/lead-magnet/providers/freshmail/route.ts",
     method: "POST",
   },
   "lead-magnet_providers_getresponse_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/lead-magnet/providers/getresponse/route.ts",
+      "/home/max/projects/next-vibe-translations/src/lead-magnet/providers/getresponse/route.ts",
     method: "POST",
   },
   "lead-magnet_providers_google-sheets_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/lead-magnet/providers/google-sheets/route.ts",
+      "/home/max/projects/next-vibe-translations/src/lead-magnet/providers/google-sheets/route.ts",
     method: "POST",
   },
   "lead-magnet_providers_google-sheets_sheets-list_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/lead-magnet/providers/google-sheets/sheets-list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/lead-magnet/providers/google-sheets/sheets-list/route.ts",
     method: "GET",
   },
   "lead-magnet_providers_klaviyo_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/lead-magnet/providers/klaviyo/route.ts",
+      "/home/max/projects/next-vibe-translations/src/lead-magnet/providers/klaviyo/route.ts",
     method: "POST",
   },
   "lead-magnet_providers_mailup_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/lead-magnet/providers/mailup/route.ts",
+      "/home/max/projects/next-vibe-translations/src/lead-magnet/providers/mailup/route.ts",
     method: "POST",
   },
   "lead-magnet_providers_mapp_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/lead-magnet/providers/mapp/route.ts",
+      "/home/max/projects/next-vibe-translations/src/lead-magnet/providers/mapp/route.ts",
     method: "POST",
   },
   "lead-magnet_providers_platform-email_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/lead-magnet/providers/platform-email/route.ts",
+      "/home/max/projects/next-vibe-translations/src/lead-magnet/providers/platform-email/route.ts",
     method: "POST",
   },
   "lead-magnet_providers_sailthru_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/lead-magnet/providers/sailthru/route.ts",
+      "/home/max/projects/next-vibe-translations/src/lead-magnet/providers/sailthru/route.ts",
     method: "POST",
   },
   "lead-magnet_providers_salesmanago_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/lead-magnet/providers/salesmanago/route.ts",
+      "/home/max/projects/next-vibe-translations/src/lead-magnet/providers/salesmanago/route.ts",
     method: "POST",
   },
   "lead-magnet_providers_shopify_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/lead-magnet/providers/shopify/route.ts",
+      "/home/max/projects/next-vibe-translations/src/lead-magnet/providers/shopify/route.ts",
     method: "POST",
   },
   "lead-magnet_providers_spotler_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/lead-magnet/providers/spotler/route.ts",
+      "/home/max/projects/next-vibe-translations/src/lead-magnet/providers/spotler/route.ts",
     method: "POST",
   },
   "lead-magnet_providers_youlead_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/lead-magnet/providers/youlead/route.ts",
+      "/home/max/projects/next-vibe-translations/src/lead-magnet/providers/youlead/route.ts",
     method: "POST",
   },
   "leads-active": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/data-sources/leads-active/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/data-sources/leads-active/route.ts",
     method: "POST",
   },
   "leads-bounced": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/data-sources/leads-bounced/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/data-sources/leads-bounced/route.ts",
     method: "POST",
   },
   "leads-campaign-running": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/data-sources/leads-campaign-running/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/data-sources/leads-campaign-running/route.ts",
     method: "POST",
   },
   "leads-converted": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/data-sources/leads-converted/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/data-sources/leads-converted/route.ts",
     method: "POST",
   },
   "leads-created": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/data-sources/leads-created/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/data-sources/leads-created/route.ts",
     method: "POST",
   },
   "leads-dashboard": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/dashboard/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/dashboard/route.ts",
     method: "GET",
   },
   "leads-email-clicks": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/data-sources/leads-email-clicks/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/data-sources/leads-email-clicks/route.ts",
     method: "POST",
   },
   "leads-email-opens": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/data-sources/leads-email-opens/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/data-sources/leads-email-opens/route.ts",
     method: "POST",
   },
   "leads-emails-sent": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/data-sources/leads-emails-sent/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/data-sources/leads-emails-sent/route.ts",
     method: "POST",
   },
   "leads-engagements": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/data-sources/leads-engagements/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/data-sources/leads-engagements/route.ts",
     method: "POST",
   },
   "leads-form-submits": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/data-sources/leads-form-submits/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/data-sources/leads-form-submits/route.ts",
     method: "POST",
   },
   "leads-import": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/import/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/import/route.ts",
     method: "POST",
   },
   "leads-import-status": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/import/status/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/import/status/route.ts",
     method: "GET",
   },
   "leads-in-contact": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/data-sources/leads-in-contact/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/data-sources/leads-in-contact/route.ts",
     method: "POST",
   },
   "leads-list": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/list/route.ts",
     method: "GET",
   },
   "leads-newsletter-subscribers": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/data-sources/leads-newsletter-subscribers/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/data-sources/leads-newsletter-subscribers/route.ts",
     method: "POST",
   },
   "leads-search": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/search/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/search/route.ts",
     method: "GET",
   },
   "leads-stats": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/stats/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/stats/route.ts",
     method: "GET",
   },
   "leads-unsubscribed": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/data-sources/leads-unsubscribed/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/data-sources/leads-unsubscribed/route.ts",
     method: "POST",
   },
   "leads-website-users": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/data-sources/leads-website-users/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/data-sources/leads-website-users/route.ts",
     method: "POST",
   },
   "leads-website-visits": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/data-sources/leads-website-visits/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/data-sources/leads-website-visits/route.ts",
     method: "POST",
   },
   leads_attribution_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/attribution/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/attribution/route.ts",
     method: "POST",
   },
   leads_batch_DELETE: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/batch/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/batch/route.ts",
     method: "DELETE",
   },
   leads_batch_PATCH: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/batch/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/batch/route.ts",
     method: "PATCH",
   },
   "leads_campaigns_bounce-processor_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/campaigns/bounce-processor/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/campaigns/bounce-processor/route.ts",
     method: "GET",
   },
   "leads_campaigns_bounce-processor_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/campaigns/bounce-processor/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/campaigns/bounce-processor/route.ts",
     method: "POST",
   },
   "leads_campaigns_campaign-starter_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/campaigns/campaign-starter/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/campaigns/campaign-starter/route.ts",
     method: "GET",
   },
   "leads_campaigns_campaign-starter_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/campaigns/campaign-starter/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/campaigns/campaign-starter/route.ts",
     method: "POST",
   },
   "leads_campaigns_email-campaigns_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/campaigns/email-campaigns/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/campaigns/email-campaigns/route.ts",
     method: "GET",
   },
   "leads_campaigns_email-campaigns_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/campaigns/email-campaigns/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/campaigns/email-campaigns/route.ts",
     method: "POST",
   },
   "leads_campaigns_emails_test-mail_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/campaigns/emails/test-mail/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/campaigns/emails/test-mail/route.ts",
     method: "POST",
   },
   "leads_campaigns_halt-all_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/campaigns/halt-all/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/campaigns/halt-all/route.ts",
     method: "POST",
   },
   "leads_campaigns_journey-variants_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/campaigns/journey-variants/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/campaigns/journey-variants/route.ts",
     method: "GET",
   },
   "leads_campaigns_journey-variants_PATCH": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/campaigns/journey-variants/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/campaigns/journey-variants/route.ts",
     method: "PATCH",
   },
   "leads_campaigns_journey-variants_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/campaigns/journey-variants/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/campaigns/journey-variants/route.ts",
     method: "POST",
   },
   leads_campaigns_queue_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/campaigns/queue/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/campaigns/queue/route.ts",
     method: "GET",
   },
   leads_campaigns_stats_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/campaigns/stats/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/campaigns/stats/route.ts",
     method: "GET",
   },
   leads_create_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/create/route.ts",
     method: "POST",
   },
   leads_dashboard_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/dashboard/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/dashboard/route.ts",
     method: "GET",
   },
   "leads_data-sources_leads-active_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/data-sources/leads-active/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/data-sources/leads-active/route.ts",
     method: "POST",
   },
   "leads_data-sources_leads-bounced_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/data-sources/leads-bounced/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/data-sources/leads-bounced/route.ts",
     method: "POST",
   },
   "leads_data-sources_leads-campaign-running_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/data-sources/leads-campaign-running/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/data-sources/leads-campaign-running/route.ts",
     method: "POST",
   },
   "leads_data-sources_leads-converted_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/data-sources/leads-converted/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/data-sources/leads-converted/route.ts",
     method: "POST",
   },
   "leads_data-sources_leads-created_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/data-sources/leads-created/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/data-sources/leads-created/route.ts",
     method: "POST",
   },
   "leads_data-sources_leads-email-clicks_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/data-sources/leads-email-clicks/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/data-sources/leads-email-clicks/route.ts",
     method: "POST",
   },
   "leads_data-sources_leads-email-opens_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/data-sources/leads-email-opens/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/data-sources/leads-email-opens/route.ts",
     method: "POST",
   },
   "leads_data-sources_leads-emails-sent_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/data-sources/leads-emails-sent/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/data-sources/leads-emails-sent/route.ts",
     method: "POST",
   },
   "leads_data-sources_leads-engagements_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/data-sources/leads-engagements/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/data-sources/leads-engagements/route.ts",
     method: "POST",
   },
   "leads_data-sources_leads-form-submits_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/data-sources/leads-form-submits/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/data-sources/leads-form-submits/route.ts",
     method: "POST",
   },
   "leads_data-sources_leads-in-contact_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/data-sources/leads-in-contact/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/data-sources/leads-in-contact/route.ts",
     method: "POST",
   },
   "leads_data-sources_leads-newsletter-subscribers_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/data-sources/leads-newsletter-subscribers/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/data-sources/leads-newsletter-subscribers/route.ts",
     method: "POST",
   },
   "leads_data-sources_leads-unsubscribed_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/data-sources/leads-unsubscribed/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/data-sources/leads-unsubscribed/route.ts",
     method: "POST",
   },
   "leads_data-sources_leads-website-users_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/data-sources/leads-website-users/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/data-sources/leads-website-users/route.ts",
     method: "POST",
   },
   "leads_data-sources_leads-website-visits_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/data-sources/leads-website-visits/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/data-sources/leads-website-visits/route.ts",
     method: "POST",
   },
   leads_export_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/export/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/export/route.ts",
     method: "GET",
   },
   leads_id_DELETE: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/[id]/route.ts",
     method: "DELETE",
   },
   leads_id_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/[id]/route.ts",
     method: "GET",
   },
   leads_id_PATCH: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/[id]/route.ts",
     method: "PATCH",
   },
   leads_import_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/import/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/import/route.ts",
     method: "POST",
   },
   leads_import_jobs_jobId_DELETE: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/import/jobs/[jobId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/import/jobs/[jobId]/route.ts",
     method: "DELETE",
   },
   leads_import_jobs_jobId_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/import/jobs/[jobId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/import/jobs/[jobId]/route.ts",
     method: "GET",
   },
   leads_import_jobs_jobId_PATCH: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/import/jobs/[jobId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/import/jobs/[jobId]/route.ts",
     method: "PATCH",
   },
   leads_import_jobs_jobId_retry_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/import/jobs/[jobId]/retry/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/import/jobs/[jobId]/retry/route.ts",
     method: "POST",
   },
   leads_import_jobs_jobId_stop_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/import/jobs/[jobId]/stop/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/import/jobs/[jobId]/stop/route.ts",
     method: "POST",
   },
   leads_import_process_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/import/process/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/import/process/route.ts",
     method: "POST",
   },
   leads_import_status_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/import/status/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/import/status/route.ts",
     method: "GET",
   },
   leads_list_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/list/route.ts",
     method: "GET",
   },
   leads_search_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/search/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/search/route.ts",
     method: "GET",
   },
   leads_skill_PATCH: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/skill/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/skill/route.ts",
     method: "PATCH",
   },
   leads_stats_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/stats/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/stats/route.ts",
     method: "GET",
   },
   leads_tracking_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/tracking/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/tracking/route.ts",
     method: "GET",
   },
   leads_tracking_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/tracking/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/tracking/route.ts",
     method: "POST",
   },
   lint: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/check/oxlint/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/oxlint/route.ts",
     method: "POST",
   },
   list: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/help-tool/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/help-tool/route.ts",
     method: "GET",
   },
   "list-models": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/models/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/models/list/route.ts",
     method: "GET",
   },
   login: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/public/login/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/public/login/route.ts",
     method: "POST",
   },
   logout: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/private/logout/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/private/logout/route.ts",
     method: "POST",
   },
   ls: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/help-tool/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/help-tool/route.ts",
     method: "GET",
   },
   m: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/database/migrate/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/database/migrate/route.ts",
     method: "POST",
   },
   mcp: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/platforms/mcp/serve/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/mcp/serve/route.ts",
     method: "POST",
   },
   "messenger-accounts": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/accounts/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/accounts/list/route.ts",
     method: "GET",
   },
   "messenger-bounced": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/data-sources/messenger-bounced/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/data-sources/messenger-bounced/route.ts",
     method: "POST",
   },
   "messenger-clicked": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/data-sources/messenger-clicked/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/data-sources/messenger-clicked/route.ts",
     method: "POST",
   },
   "messenger-delivered": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/data-sources/messenger-delivered/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/data-sources/messenger-delivered/route.ts",
     method: "POST",
   },
   "messenger-imap-sync": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/providers/email/imap-client/sync/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/providers/email/imap-client/sync/route.ts",
     method: "POST",
   },
   "messenger-inbox": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/inbox/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/inbox/list/route.ts",
     method: "GET",
   },
   "messenger-messages": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/messages/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/messages/list/route.ts",
     method: "GET",
   },
   "messenger-opened": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/data-sources/messenger-opened/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/data-sources/messenger-opened/route.ts",
     method: "POST",
   },
   "messenger-sent": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/data-sources/messenger-sent/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/data-sources/messenger-sent/route.ts",
     method: "POST",
   },
   "messenger-total": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/data-sources/messenger-total/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/data-sources/messenger-total/route.ts",
     method: "POST",
   },
   messenger_accounts_create_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/accounts/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/accounts/create/route.ts",
     method: "POST",
   },
   messenger_accounts_edit_id_DELETE: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/accounts/edit/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/accounts/edit/[id]/route.ts",
     method: "DELETE",
   },
   messenger_accounts_edit_id_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/accounts/edit/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/accounts/edit/[id]/route.ts",
     method: "GET",
   },
   messenger_accounts_edit_id_PUT: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/accounts/edit/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/accounts/edit/[id]/route.ts",
     method: "PUT",
   },
   messenger_accounts_list_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/accounts/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/accounts/list/route.ts",
     method: "GET",
   },
   "messenger_data-sources_messenger-bounced_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/data-sources/messenger-bounced/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/data-sources/messenger-bounced/route.ts",
     method: "POST",
   },
   "messenger_data-sources_messenger-clicked_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/data-sources/messenger-clicked/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/data-sources/messenger-clicked/route.ts",
     method: "POST",
   },
   "messenger_data-sources_messenger-delivered_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/data-sources/messenger-delivered/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/data-sources/messenger-delivered/route.ts",
     method: "POST",
   },
   "messenger_data-sources_messenger-opened_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/data-sources/messenger-opened/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/data-sources/messenger-opened/route.ts",
     method: "POST",
   },
   "messenger_data-sources_messenger-sent_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/data-sources/messenger-sent/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/data-sources/messenger-sent/route.ts",
     method: "POST",
   },
   "messenger_data-sources_messenger-total_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/data-sources/messenger-total/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/data-sources/messenger-total/route.ts",
     method: "POST",
   },
   messenger_inbox_folders_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/inbox/folders/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/inbox/folders/route.ts",
     method: "GET",
   },
   messenger_inbox_list_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/inbox/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/inbox/list/route.ts",
     method: "GET",
   },
   "messenger_inbox_mark-read_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/inbox/mark-read/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/inbox/mark-read/route.ts",
     method: "POST",
   },
   messenger_inbox_move_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/inbox/move/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/inbox/move/route.ts",
     method: "POST",
   },
   messenger_messages_id_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/messages/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/messages/[id]/route.ts",
     method: "GET",
   },
   messenger_messages_list_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/messages/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/messages/list/route.ts",
     method: "GET",
   },
   messenger_messages_stats_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/messages/stats/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/messages/stats/route.ts",
     method: "GET",
   },
   messenger_preview_render_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/preview/render/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/preview/render/route.ts",
     method: "POST",
   },
   "messenger_preview_send-test_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/preview/send-test/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/preview/send-test/route.ts",
     method: "POST",
   },
   "messenger_providers_email_imap-client_sync_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/providers/email/imap-client/sync/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/providers/email/imap-client/sync/route.ts",
     method: "POST",
   },
   messenger_send_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/messenger/send/route.ts",
+      "/home/max/projects/next-vibe-translations/src/messenger/send/route.ts",
     method: "POST",
   },
   migrate: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/database/migrate/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/database/migrate/route.ts",
     method: "POST",
   },
   models: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/models/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/models/list/route.ts",
     method: "GET",
   },
   "my-instance-id": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/remote-connection/self/instanceId/route.ts",
+      "/home/max/projects/next-vibe-translations/src/remote-connection/self/instanceId/route.ts",
     method: "GET",
   },
   "newsletter-campaigns-sent": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/newsletter/data-sources/newsletter-campaigns-sent/route.ts",
+      "/home/max/projects/next-vibe-translations/src/newsletter/data-sources/newsletter-campaigns-sent/route.ts",
     method: "POST",
   },
   "newsletter-events-total": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/newsletter/data-sources/newsletter-events-total/route.ts",
+      "/home/max/projects/next-vibe-translations/src/newsletter/data-sources/newsletter-events-total/route.ts",
     method: "POST",
   },
   "newsletter-status": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/newsletter/status/route.ts",
+      "/home/max/projects/next-vibe-translations/src/newsletter/status/route.ts",
     method: "GET",
   },
   "newsletter-subscribe": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/newsletter/subscribe/route.ts",
+      "/home/max/projects/next-vibe-translations/src/newsletter/subscribe/route.ts",
     method: "POST",
   },
   "newsletter-subscriptions-new": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/newsletter/data-sources/newsletter-subscriptions-new/route.ts",
+      "/home/max/projects/next-vibe-translations/src/newsletter/data-sources/newsletter-subscriptions-new/route.ts",
     method: "POST",
   },
   "newsletter-unsubscribe": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/newsletter/unsubscribe/route.ts",
+      "/home/max/projects/next-vibe-translations/src/newsletter/unsubscribe/route.ts",
     method: "POST",
   },
   "newsletter-unsubscribes": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/newsletter/data-sources/newsletter-unsubscribes/route.ts",
+      "/home/max/projects/next-vibe-translations/src/newsletter/data-sources/newsletter-unsubscribes/route.ts",
     method: "POST",
   },
   "newsletter_data-sources_newsletter-campaigns-sent_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/newsletter/data-sources/newsletter-campaigns-sent/route.ts",
+      "/home/max/projects/next-vibe-translations/src/newsletter/data-sources/newsletter-campaigns-sent/route.ts",
     method: "POST",
   },
   "newsletter_data-sources_newsletter-events-total_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/newsletter/data-sources/newsletter-events-total/route.ts",
+      "/home/max/projects/next-vibe-translations/src/newsletter/data-sources/newsletter-events-total/route.ts",
     method: "POST",
   },
   "newsletter_data-sources_newsletter-subscriptions-new_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/newsletter/data-sources/newsletter-subscriptions-new/route.ts",
+      "/home/max/projects/next-vibe-translations/src/newsletter/data-sources/newsletter-subscriptions-new/route.ts",
     method: "POST",
   },
   "newsletter_data-sources_newsletter-unsubscribes_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/newsletter/data-sources/newsletter-unsubscribes/route.ts",
+      "/home/max/projects/next-vibe-translations/src/newsletter/data-sources/newsletter-unsubscribes/route.ts",
     method: "POST",
   },
   newsletter_status_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/newsletter/status/route.ts",
+      "/home/max/projects/next-vibe-translations/src/newsletter/status/route.ts",
     method: "GET",
   },
   newsletter_subscribe_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/newsletter/subscribe/route.ts",
+      "/home/max/projects/next-vibe-translations/src/newsletter/subscribe/route.ts",
     method: "POST",
   },
   newsletter_unsubscribe_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/newsletter/unsubscribe/route.ts",
+      "/home/max/projects/next-vibe-translations/src/newsletter/unsubscribe/route.ts",
     method: "POST",
   },
   newsletter_unsubscribe_sync_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/newsletter/unsubscribe/sync/route.ts",
+      "/home/max/projects/next-vibe-translations/src/newsletter/unsubscribe/sync/route.ts",
     method: "POST",
   },
   nowpayments: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/providers/nowpayments/cli/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/providers/nowpayments/cli/route.ts",
     method: "POST",
   },
   "open-code": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/coding-agent/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/coding-agent/route.ts",
     method: "POST",
   },
   ox: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/check/oxlint/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/oxlint/route.ts",
     method: "POST",
   },
   oxlint: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/check/oxlint/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/oxlint/route.ts",
     method: "POST",
   },
   "payment-bill-get": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/bill/[billId]/get/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/bill/[billId]/get/route.ts",
     method: "GET",
   },
   "payment-bill-list": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/bill/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/bill/list/route.ts",
     method: "GET",
   },
   "payment-dashboard": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/dashboard/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/dashboard/route.ts",
     method: "GET",
   },
   "payment-estimate-get": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/estimate/[estimateId]/get/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/estimate/[estimateId]/get/route.ts",
     method: "GET",
   },
   "payment-estimate-list": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/estimate/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/estimate/list/route.ts",
     method: "GET",
   },
   "payment-invoice-get": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/invoice/[invoiceId]/get/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/invoice/[invoiceId]/get/route.ts",
     method: "GET",
   },
   "payment-invoice-list": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/invoice/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/invoice/list/route.ts",
     method: "GET",
   },
   payment_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/route.ts",
     method: "GET",
   },
   payment_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/route.ts",
     method: "POST",
   },
   payment_bill_billId_approve_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/bill/[billId]/approve/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/bill/[billId]/approve/route.ts",
     method: "POST",
   },
   payment_bill_billId_get_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/bill/[billId]/get/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/bill/[billId]/get/route.ts",
     method: "GET",
   },
   payment_bill_billId_pay_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/bill/[billId]/pay/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/bill/[billId]/pay/route.ts",
     method: "POST",
   },
   payment_bill_create_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/bill/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/bill/create/route.ts",
     method: "POST",
   },
   payment_bill_line_add_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/bill/line/add/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/bill/line/add/route.ts",
     method: "POST",
   },
   payment_bill_list_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/bill/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/bill/list/route.ts",
     method: "GET",
   },
   payment_checkout_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/checkout/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/checkout/route.ts",
     method: "POST",
   },
   "payment_credit-note_create_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/credit-note/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/credit-note/create/route.ts",
     method: "POST",
   },
   payment_dashboard_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/dashboard/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/dashboard/route.ts",
     method: "GET",
   },
   "payment_data-sources_payments-count_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/data-sources/payments-count/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/data-sources/payments-count/route.ts",
     method: "POST",
   },
   "payment_data-sources_payments-disputes-count_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/data-sources/payments-disputes-count/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/data-sources/payments-disputes-count/route.ts",
     method: "POST",
   },
   "payment_data-sources_payments-failed_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/data-sources/payments-failed/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/data-sources/payments-failed/route.ts",
     method: "POST",
   },
   "payment_data-sources_payments-invoices-paid_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/data-sources/payments-invoices-paid/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/data-sources/payments-invoices-paid/route.ts",
     method: "POST",
   },
   "payment_data-sources_payments-methods-added_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/data-sources/payments-methods-added/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/data-sources/payments-methods-added/route.ts",
     method: "POST",
   },
   "payment_data-sources_payments-refund-count_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/data-sources/payments-refund-count/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/data-sources/payments-refund-count/route.ts",
     method: "POST",
   },
   "payment_data-sources_payments-refund-volume_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/data-sources/payments-refund-volume/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/data-sources/payments-refund-volume/route.ts",
     method: "POST",
   },
   "payment_data-sources_payments-revenue_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/data-sources/payments-revenue/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/data-sources/payments-revenue/route.ts",
     method: "POST",
   },
   payment_estimate_create_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/estimate/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/estimate/create/route.ts",
     method: "POST",
   },
   payment_estimate_estimateId_accept_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/estimate/[estimateId]/accept/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/estimate/[estimateId]/accept/route.ts",
     method: "POST",
   },
   "payment_estimate_estimateId_convert-to-invoice_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/estimate/[estimateId]/convert-to-invoice/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/estimate/[estimateId]/convert-to-invoice/route.ts",
     method: "POST",
   },
   payment_estimate_estimateId_decline_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/estimate/[estimateId]/decline/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/estimate/[estimateId]/decline/route.ts",
     method: "POST",
   },
   payment_estimate_estimateId_duplicate_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/estimate/[estimateId]/duplicate/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/estimate/[estimateId]/duplicate/route.ts",
     method: "POST",
   },
   payment_estimate_estimateId_get_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/estimate/[estimateId]/get/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/estimate/[estimateId]/get/route.ts",
     method: "GET",
   },
   payment_estimate_estimateId_send_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/estimate/[estimateId]/send/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/estimate/[estimateId]/send/route.ts",
     method: "POST",
   },
   payment_estimate_line_add_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/estimate/line/add/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/estimate/line/add/route.ts",
     method: "POST",
   },
   payment_estimate_line_lineId_remove_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/estimate/line/[lineId]/remove/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/estimate/line/[lineId]/remove/route.ts",
     method: "POST",
   },
   payment_estimate_list_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/estimate/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/estimate/list/route.ts",
     method: "GET",
   },
   payment_invoice_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/invoice/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/invoice/route.ts",
     method: "POST",
   },
   payment_invoice_create_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/invoice/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/invoice/create/route.ts",
     method: "POST",
   },
   payment_invoice_invoiceId_duplicate_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/invoice/[invoiceId]/duplicate/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/invoice/[invoiceId]/duplicate/route.ts",
     method: "POST",
   },
   payment_invoice_invoiceId_get_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/invoice/[invoiceId]/get/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/invoice/[invoiceId]/get/route.ts",
     method: "GET",
   },
   "payment_invoice_invoiceId_public-view_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/invoice/[invoiceId]/public-view/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/invoice/[invoiceId]/public-view/route.ts",
     method: "GET",
   },
   "payment_invoice_invoiceId_record-payment_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/invoice/[invoiceId]/record-payment/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/invoice/[invoiceId]/record-payment/route.ts",
     method: "POST",
   },
   "payment_invoice_invoiceId_send-reminder_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/invoice/[invoiceId]/send-reminder/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/invoice/[invoiceId]/send-reminder/route.ts",
     method: "POST",
   },
   payment_invoice_invoiceId_send_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/invoice/[invoiceId]/send/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/invoice/[invoiceId]/send/route.ts",
     method: "POST",
   },
   payment_invoice_invoiceId_void_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/invoice/[invoiceId]/void/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/invoice/[invoiceId]/void/route.ts",
     method: "POST",
   },
   payment_invoice_line_add_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/invoice/line/add/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/invoice/line/add/route.ts",
     method: "POST",
   },
   payment_invoice_line_lineId_remove_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/invoice/line/[lineId]/remove/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/invoice/line/[lineId]/remove/route.ts",
     method: "POST",
   },
   payment_invoice_list_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/invoice/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/invoice/list/route.ts",
     method: "GET",
   },
   payment_portal_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/portal/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/portal/route.ts",
     method: "POST",
   },
   payment_providers_nowpayments_cli_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/providers/nowpayments/cli/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/providers/nowpayments/cli/route.ts",
     method: "POST",
   },
   payment_providers_stripe_cli_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/providers/stripe/cli/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/providers/stripe/cli/route.ts",
     method: "POST",
   },
   payment_refund_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/refund/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/refund/route.ts",
     method: "POST",
   },
   "payments-count": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/data-sources/payments-count/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/data-sources/payments-count/route.ts",
     method: "POST",
   },
   "payments-disputes-count": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/data-sources/payments-disputes-count/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/data-sources/payments-disputes-count/route.ts",
     method: "POST",
   },
   "payments-failed": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/data-sources/payments-failed/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/data-sources/payments-failed/route.ts",
     method: "POST",
   },
   "payments-invoices-paid": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/data-sources/payments-invoices-paid/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/data-sources/payments-invoices-paid/route.ts",
     method: "POST",
   },
   "payments-methods-added": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/data-sources/payments-methods-added/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/data-sources/payments-methods-added/route.ts",
     method: "POST",
   },
   "payments-refund-count": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/data-sources/payments-refund-count/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/data-sources/payments-refund-count/route.ts",
     method: "POST",
   },
   "payments-refund-volume": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/data-sources/payments-refund-volume/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/data-sources/payments-refund-volume/route.ts",
     method: "POST",
   },
   "payments-revenue": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/data-sources/payments-revenue/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/data-sources/payments-revenue/route.ts",
     method: "POST",
   },
   ping: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/database/ping/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/database/ping/route.ts",
     method: "POST",
   },
   "pos-dashboard": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/pos/dashboard/route.ts",
+      "/home/max/projects/next-vibe-translations/src/pos/dashboard/route.ts",
     method: "GET",
   },
   "pos-order-get": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/pos/order/[orderId]/get/route.ts",
+      "/home/max/projects/next-vibe-translations/src/pos/order/[orderId]/get/route.ts",
     method: "GET",
   },
   "pos-order-list": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/pos/order/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/pos/order/list/route.ts",
     method: "GET",
   },
   "pos-product-lookup": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/pos/product-lookup/route.ts",
+      "/home/max/projects/next-vibe-translations/src/pos/product-lookup/route.ts",
     method: "GET",
   },
   "pos-session-open": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/pos/session/open/route.ts",
+      "/home/max/projects/next-vibe-translations/src/pos/session/open/route.ts",
     method: "POST",
   },
   "pos-terminals": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/pos/terminal/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/pos/terminal/list/route.ts",
     method: "GET",
   },
   pos_dashboard_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/pos/dashboard/route.ts",
+      "/home/max/projects/next-vibe-translations/src/pos/dashboard/route.ts",
     method: "GET",
   },
   pos_order_create_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/pos/order/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/pos/order/create/route.ts",
     method: "POST",
   },
   pos_order_list_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/pos/order/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/pos/order/list/route.ts",
     method: "GET",
   },
   "pos_order_orderId_add-item_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/pos/order/[orderId]/add-item/route.ts",
+      "/home/max/projects/next-vibe-translations/src/pos/order/[orderId]/add-item/route.ts",
     method: "POST",
   },
   "pos_order_orderId_add-payment_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/pos/order/[orderId]/add-payment/route.ts",
+      "/home/max/projects/next-vibe-translations/src/pos/order/[orderId]/add-payment/route.ts",
     method: "POST",
   },
   pos_order_orderId_complete_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/pos/order/[orderId]/complete/route.ts",
+      "/home/max/projects/next-vibe-translations/src/pos/order/[orderId]/complete/route.ts",
     method: "POST",
   },
   pos_order_orderId_get_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/pos/order/[orderId]/get/route.ts",
+      "/home/max/projects/next-vibe-translations/src/pos/order/[orderId]/get/route.ts",
     method: "GET",
   },
   "pos_order_orderId_remove-item_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/pos/order/[orderId]/remove-item/route.ts",
+      "/home/max/projects/next-vibe-translations/src/pos/order/[orderId]/remove-item/route.ts",
     method: "POST",
   },
   pos_order_orderId_void_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/pos/order/[orderId]/void/route.ts",
+      "/home/max/projects/next-vibe-translations/src/pos/order/[orderId]/void/route.ts",
     method: "POST",
   },
   "pos_product-lookup_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/pos/product-lookup/route.ts",
+      "/home/max/projects/next-vibe-translations/src/pos/product-lookup/route.ts",
     method: "GET",
   },
   pos_session_close_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/pos/session/close/route.ts",
+      "/home/max/projects/next-vibe-translations/src/pos/session/close/route.ts",
     method: "POST",
   },
   pos_session_open_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/pos/session/open/route.ts",
+      "/home/max/projects/next-vibe-translations/src/pos/session/open/route.ts",
     method: "POST",
   },
   pos_session_sessionId_get_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/pos/session/[sessionId]/get/route.ts",
+      "/home/max/projects/next-vibe-translations/src/pos/session/[sessionId]/get/route.ts",
     method: "GET",
   },
   pos_terminal_create_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/pos/terminal/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/pos/terminal/create/route.ts",
     method: "POST",
   },
   pos_terminal_list_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/pos/terminal/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/pos/terminal/list/route.ts",
     method: "GET",
   },
   "products-catalog-list": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/products/catalog/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/products/catalog/list/route.ts",
     method: "GET",
   },
   "products-category-list": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/products/category/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/products/category/list/route.ts",
     method: "GET",
   },
   products_catalog_create_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/products/catalog/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/products/catalog/create/route.ts",
     method: "POST",
   },
   products_catalog_list_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/products/catalog/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/products/catalog/list/route.ts",
     method: "GET",
   },
   products_catalog_productId_deactivate_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/products/catalog/[productId]/deactivate/route.ts",
+      "/home/max/projects/next-vibe-translations/src/products/catalog/[productId]/deactivate/route.ts",
     method: "POST",
   },
   products_catalog_productId_get_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/products/catalog/[productId]/get/route.ts",
+      "/home/max/projects/next-vibe-translations/src/products/catalog/[productId]/get/route.ts",
     method: "GET",
   },
   products_catalog_productId_update_PATCH: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/products/catalog/[productId]/update/route.ts",
+      "/home/max/projects/next-vibe-translations/src/products/catalog/[productId]/update/route.ts",
     method: "PATCH",
   },
   products_category_create_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/products/category/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/products/category/create/route.ts",
     method: "POST",
   },
   products_category_list_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/products/category/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/products/category/list/route.ts",
     method: "GET",
   },
   pub: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/release/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/release/route.ts",
     method: "POST",
   },
   publish: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/release/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/release/route.ts",
     method: "POST",
   },
   "pulse-execute": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/pulse/execute/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/pulse/execute/route.ts",
     method: "POST",
   },
   "pulse-history": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/pulse/history/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/pulse/history/route.ts",
     method: "GET",
   },
   "pulse-status": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/pulse/status/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/pulse/status/route.ts",
     method: "GET",
   },
   "pulse:execute": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/pulse/execute/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/pulse/execute/route.ts",
     method: "POST",
   },
   "pulse:history": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/pulse/history/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/pulse/history/route.ts",
     method: "GET",
   },
   "pulse:status": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/pulse/status/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/pulse/status/route.ts",
     method: "GET",
   },
   "purchasing-dashboard": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/purchasing/dashboard/route.ts",
+      "/home/max/projects/next-vibe-translations/src/purchasing/dashboard/route.ts",
     method: "GET",
   },
   "purchasing-orders": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/purchasing/order/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/purchasing/order/list/route.ts",
     method: "GET",
   },
   "purchasing-vendor-get": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/purchasing/vendor/[vendorId]/get/route.ts",
+      "/home/max/projects/next-vibe-translations/src/purchasing/vendor/[vendorId]/get/route.ts",
     method: "GET",
   },
   "purchasing-vendors": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/purchasing/vendor/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/purchasing/vendor/list/route.ts",
     method: "GET",
   },
   purchasing_dashboard_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/purchasing/dashboard/route.ts",
+      "/home/max/projects/next-vibe-translations/src/purchasing/dashboard/route.ts",
     method: "GET",
   },
   purchasing_order_create_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/purchasing/order/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/purchasing/order/create/route.ts",
     method: "POST",
   },
   purchasing_order_line_add_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/purchasing/order/line/add/route.ts",
+      "/home/max/projects/next-vibe-translations/src/purchasing/order/line/add/route.ts",
     method: "POST",
   },
   purchasing_order_line_remove_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/purchasing/order/line/remove/route.ts",
+      "/home/max/projects/next-vibe-translations/src/purchasing/order/line/remove/route.ts",
     method: "POST",
   },
   purchasing_order_list_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/purchasing/order/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/purchasing/order/list/route.ts",
     method: "GET",
   },
   purchasing_order_poId_cancel_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/purchasing/order/[poId]/cancel/route.ts",
+      "/home/max/projects/next-vibe-translations/src/purchasing/order/[poId]/cancel/route.ts",
     method: "POST",
   },
   purchasing_order_poId_confirm_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/purchasing/order/[poId]/confirm/route.ts",
+      "/home/max/projects/next-vibe-translations/src/purchasing/order/[poId]/confirm/route.ts",
     method: "POST",
   },
   "purchasing_order_poId_convert-to-bill_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/purchasing/order/[poId]/convert-to-bill/route.ts",
+      "/home/max/projects/next-vibe-translations/src/purchasing/order/[poId]/convert-to-bill/route.ts",
     method: "POST",
   },
   purchasing_order_poId_get_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/purchasing/order/[poId]/get/route.ts",
+      "/home/max/projects/next-vibe-translations/src/purchasing/order/[poId]/get/route.ts",
     method: "GET",
   },
   purchasing_order_poId_receive_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/purchasing/order/[poId]/receive/route.ts",
+      "/home/max/projects/next-vibe-translations/src/purchasing/order/[poId]/receive/route.ts",
     method: "POST",
   },
   purchasing_order_poId_send_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/purchasing/order/[poId]/send/route.ts",
+      "/home/max/projects/next-vibe-translations/src/purchasing/order/[poId]/send/route.ts",
     method: "POST",
   },
   purchasing_order_poId_update_PATCH: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/purchasing/order/[poId]/update/route.ts",
+      "/home/max/projects/next-vibe-translations/src/purchasing/order/[poId]/update/route.ts",
     method: "PATCH",
   },
   purchasing_vendor_create_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/purchasing/vendor/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/purchasing/vendor/create/route.ts",
     method: "POST",
   },
   purchasing_vendor_list_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/purchasing/vendor/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/purchasing/vendor/list/route.ts",
     method: "GET",
   },
   purchasing_vendor_vendorId_deactivate_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/purchasing/vendor/[vendorId]/deactivate/route.ts",
+      "/home/max/projects/next-vibe-translations/src/purchasing/vendor/[vendorId]/deactivate/route.ts",
     method: "POST",
   },
   purchasing_vendor_vendorId_get_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/purchasing/vendor/[vendorId]/get/route.ts",
+      "/home/max/projects/next-vibe-translations/src/purchasing/vendor/[vendorId]/get/route.ts",
     method: "GET",
   },
   purchasing_vendor_vendorId_update_PATCH: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/purchasing/vendor/[vendorId]/update/route.ts",
+      "/home/max/projects/next-vibe-translations/src/purchasing/vendor/[vendorId]/update/route.ts",
     method: "PATCH",
   },
   push: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/infra/deploy/push/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/deploy/push/route.ts",
     method: "POST",
   },
   re: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/server/server/rebuild/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/rebuild/route.ts",
     method: "POST",
   },
   rebuild: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/server/server/rebuild/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/rebuild/route.ts",
     method: "POST",
   },
   "record-engagement": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/tracking/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/tracking/route.ts",
     method: "POST",
   },
   "referral-stats": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/referral/stats/route.ts",
+      "/home/max/projects/next-vibe-translations/src/referral/stats/route.ts",
     method: "GET",
   },
   referral_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/referral/route.ts",
+      "/home/max/projects/next-vibe-translations/src/referral/route.ts",
     method: "POST",
   },
   referral_admin_payouts_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/referral/admin/payouts/route.ts",
+      "/home/max/projects/next-vibe-translations/src/referral/admin/payouts/route.ts",
     method: "GET",
   },
   referral_admin_payouts_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/referral/admin/payouts/route.ts",
+      "/home/max/projects/next-vibe-translations/src/referral/admin/payouts/route.ts",
     method: "POST",
   },
   referral_codes_list_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/referral/codes/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/referral/codes/list/route.ts",
     method: "GET",
   },
   "referral_data-sources_referrals-codes-created_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/referral/data-sources/referrals-codes-created/route.ts",
+      "/home/max/projects/next-vibe-translations/src/referral/data-sources/referrals-codes-created/route.ts",
     method: "POST",
   },
   "referral_data-sources_referrals-conversion-rate_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/referral/data-sources/referrals-conversion-rate/route.ts",
+      "/home/max/projects/next-vibe-translations/src/referral/data-sources/referrals-conversion-rate/route.ts",
     method: "POST",
   },
   "referral_data-sources_referrals-earnings-volume_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/referral/data-sources/referrals-earnings-volume/route.ts",
+      "/home/max/projects/next-vibe-translations/src/referral/data-sources/referrals-earnings-volume/route.ts",
     method: "POST",
   },
   "referral_data-sources_referrals-lead-clicks_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/referral/data-sources/referrals-lead-clicks/route.ts",
+      "/home/max/projects/next-vibe-translations/src/referral/data-sources/referrals-lead-clicks/route.ts",
     method: "POST",
   },
   "referral_data-sources_referrals-payouts_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/referral/data-sources/referrals-payouts/route.ts",
+      "/home/max/projects/next-vibe-translations/src/referral/data-sources/referrals-payouts/route.ts",
     method: "POST",
   },
   "referral_data-sources_referrals-signups_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/referral/data-sources/referrals-signups/route.ts",
+      "/home/max/projects/next-vibe-translations/src/referral/data-sources/referrals-signups/route.ts",
     method: "POST",
   },
   referral_earnings_list_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/referral/earnings/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/referral/earnings/list/route.ts",
     method: "GET",
   },
   referral_lead_current_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/referral/lead/current/route.ts",
+      "/home/max/projects/next-vibe-translations/src/referral/lead/current/route.ts",
     method: "GET",
   },
   referral_payout_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/referral/payout/route.ts",
+      "/home/max/projects/next-vibe-translations/src/referral/payout/route.ts",
     method: "GET",
   },
   referral_payout_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/referral/payout/route.ts",
+      "/home/max/projects/next-vibe-translations/src/referral/payout/route.ts",
     method: "POST",
   },
   referral_stats_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/referral/stats/route.ts",
+      "/home/max/projects/next-vibe-translations/src/referral/stats/route.ts",
     method: "GET",
   },
   "referrals-codes-created": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/referral/data-sources/referrals-codes-created/route.ts",
+      "/home/max/projects/next-vibe-translations/src/referral/data-sources/referrals-codes-created/route.ts",
     method: "POST",
   },
   "referrals-conversion-rate": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/referral/data-sources/referrals-conversion-rate/route.ts",
+      "/home/max/projects/next-vibe-translations/src/referral/data-sources/referrals-conversion-rate/route.ts",
     method: "POST",
   },
   "referrals-earnings-volume": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/referral/data-sources/referrals-earnings-volume/route.ts",
+      "/home/max/projects/next-vibe-translations/src/referral/data-sources/referrals-earnings-volume/route.ts",
     method: "POST",
   },
   "referrals-lead-clicks": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/referral/data-sources/referrals-lead-clicks/route.ts",
+      "/home/max/projects/next-vibe-translations/src/referral/data-sources/referrals-lead-clicks/route.ts",
     method: "POST",
   },
   "referrals-payouts": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/referral/data-sources/referrals-payouts/route.ts",
+      "/home/max/projects/next-vibe-translations/src/referral/data-sources/referrals-payouts/route.ts",
     method: "POST",
   },
   "referrals-signups": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/referral/data-sources/referrals-signups/route.ts",
+      "/home/max/projects/next-vibe-translations/src/referral/data-sources/referrals-signups/route.ts",
     method: "POST",
   },
   release: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/release/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/release/route.ts",
     method: "POST",
   },
   "remote-connect": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/remote-connection/connect/route.ts",
+      "/home/max/projects/next-vibe-translations/src/remote-connection/connect/route.ts",
     method: "POST",
   },
   "remote-connection_connect-reverse_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/remote-connection/connect-reverse/route.ts",
+      "/home/max/projects/next-vibe-translations/src/remote-connection/connect-reverse/route.ts",
     method: "POST",
   },
   "remote-connection_connect-reverse_update_PATCH": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/remote-connection/connect-reverse/update/route.ts",
+      "/home/max/projects/next-vibe-translations/src/remote-connection/connect-reverse/update/route.ts",
     method: "PATCH",
   },
   "remote-connection_connect_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/remote-connection/connect/route.ts",
+      "/home/max/projects/next-vibe-translations/src/remote-connection/connect/route.ts",
     method: "POST",
   },
   "remote-connection_instanceId_DELETE": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/remote-connection/[instanceId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/remote-connection/[instanceId]/route.ts",
     method: "DELETE",
   },
   "remote-connection_instanceId_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/remote-connection/[instanceId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/remote-connection/[instanceId]/route.ts",
     method: "GET",
   },
   "remote-connection_instanceId_PATCH": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/remote-connection/[instanceId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/remote-connection/[instanceId]/route.ts",
     method: "PATCH",
   },
   "remote-connection_list_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/remote-connection/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/remote-connection/list/route.ts",
     method: "GET",
   },
   "remote-connection_self_instanceId_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/remote-connection/self/instanceId/route.ts",
+      "/home/max/projects/next-vibe-translations/src/remote-connection/self/instanceId/route.ts",
     method: "GET",
   },
   "remote-connection_self_rename_PATCH": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/remote-connection/self/rename/route.ts",
+      "/home/max/projects/next-vibe-translations/src/remote-connection/self/rename/route.ts",
     method: "PATCH",
   },
   "remote-connection_sync_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/remote-connection/sync/route.ts",
+      "/home/max/projects/next-vibe-translations/src/remote-connection/sync/route.ts",
     method: "POST",
   },
   "remote-connection_sync_providers_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/remote-connection/sync/providers/route.ts",
+      "/home/max/projects/next-vibe-translations/src/remote-connection/sync/providers/route.ts",
     method: "GET",
   },
   "remote-connections": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/remote-connection/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/remote-connection/list/route.ts",
     method: "GET",
   },
   "remote-event-bridge": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/realtime/remote-event-bridge/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/realtime/remote-event-bridge/route.ts",
     method: "POST",
   },
   "remote-status": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/remote-connection/[instanceId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/remote-connection/[instanceId]/route.ts",
     method: "GET",
   },
   "rename-instance": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/remote-connection/self/rename/route.ts",
+      "/home/max/projects/next-vibe-translations/src/remote-connection/self/rename/route.ts",
     method: "PATCH",
   },
   "rename-self": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/remote-connection/self/rename/route.ts",
+      "/home/max/projects/next-vibe-translations/src/remote-connection/self/rename/route.ts",
     method: "PATCH",
   },
   "rename-thread": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/threads/rename/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/rename/route.ts",
     method: "PATCH",
   },
   "report-client-error": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/logger/error-monitor/client-log/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/client-log/route.ts",
     method: "POST",
   },
   "resume-stream": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/execute-tool/revival/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/revival/route.ts",
     method: "POST",
   },
   "resume-when-done": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/execute-tool/call-control/resume-when-done/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/call-control/resume-when-done/route.ts",
     method: "POST",
   },
   "run-ai": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/ai-stream/run/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/run/route.ts",
     method: "POST",
   },
   runner: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/unified-runner/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/unified-runner/route.ts",
     method: "POST",
   },
   s: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/server/server/start/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/start/route.ts",
     method: "POST",
   },
   scale: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/infra/scale/replicas/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/scale/replicas/route.ts",
     method: "POST",
   },
   "scale-replicas": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/infra/scale/replicas/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/scale/replicas/route.ts",
     method: "POST",
   },
   seed: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/database/seed/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/database/seed/route.ts",
     method: "POST",
   },
   "self-instance-id": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/remote-connection/self/instanceId/route.ts",
+      "/home/max/projects/next-vibe-translations/src/remote-connection/self/instanceId/route.ts",
     method: "GET",
   },
   "set-setting": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/env/settings/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/env/settings/route.ts",
     method: "PATCH",
   },
   setup: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/platforms/cli/setup/install/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/setup/install/route.ts",
     method: "POST",
   },
   "setup:uninstall": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/platforms/cli/setup/uninstall/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/setup/uninstall/route.ts",
     method: "POST",
   },
   "setup:update": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/platforms/cli/setup/install/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/setup/install/route.ts",
     method: "POST",
   },
   "skill-create": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/skills/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/create/route.ts",
     method: "POST",
   },
   "skill-delete": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/skills/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/route.ts",
     method: "DELETE",
   },
   "skill-get": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/skills/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/route.ts",
     method: "GET",
   },
   "skill-moderation": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/skills/moderation/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/moderation/route.ts",
     method: "GET",
   },
   "skill-publish": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/skills/[id]/publish/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/publish/route.ts",
     method: "PATCH",
   },
   "skill-report": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/skills/[id]/report/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/report/route.ts",
     method: "POST",
   },
   "skill-update": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/skills/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/route.ts",
     method: "PATCH",
   },
   "skill-vote": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/skills/[id]/vote/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/vote/route.ts",
     method: "POST",
   },
   skills: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/skills/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/route.ts",
     method: "GET",
   },
   sql: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/database/sql/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/database/sql/route.ts",
     method: "POST",
   },
   "ssh-connections-list": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/ssh/connections/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/ssh/connections/list/route.ts",
     method: "GET",
   },
   "ssh-mount": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/ssh/connections/[id]/mounts/[mountId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/ssh/connections/[id]/mounts/[mountId]/route.ts",
     method: "GET",
   },
   "ssh-mount-create": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/ssh/connections/[id]/mounts/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/ssh/connections/[id]/mounts/create/route.ts",
     method: "POST",
   },
   "ssh-mount-delete": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/ssh/connections/[id]/mounts/[mountId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/ssh/connections/[id]/mounts/[mountId]/route.ts",
     method: "DELETE",
   },
   "ssh-mount-list": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/ssh/connections/[id]/mounts/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/ssh/connections/[id]/mounts/list/route.ts",
     method: "GET",
   },
   "ssh-mount-update": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/ssh/connections/[id]/mounts/[mountId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/ssh/connections/[id]/mounts/[mountId]/route.ts",
     method: "PATCH",
   },
   ssh_connections_create_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/ssh/connections/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/ssh/connections/create/route.ts",
     method: "POST",
   },
   ssh_connections_id_DELETE: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/ssh/connections/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/ssh/connections/[id]/route.ts",
     method: "DELETE",
   },
   ssh_connections_id_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/ssh/connections/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/ssh/connections/[id]/route.ts",
     method: "GET",
   },
   ssh_connections_id_PATCH: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/ssh/connections/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/ssh/connections/[id]/route.ts",
     method: "PATCH",
   },
   ssh_connections_id_mounts_create_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/ssh/connections/[id]/mounts/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/ssh/connections/[id]/mounts/create/route.ts",
     method: "POST",
   },
   ssh_connections_id_mounts_list_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/ssh/connections/[id]/mounts/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/ssh/connections/[id]/mounts/list/route.ts",
     method: "GET",
   },
   ssh_connections_id_mounts_mountId_DELETE: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/ssh/connections/[id]/mounts/[mountId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/ssh/connections/[id]/mounts/[mountId]/route.ts",
     method: "DELETE",
   },
   ssh_connections_id_mounts_mountId_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/ssh/connections/[id]/mounts/[mountId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/ssh/connections/[id]/mounts/[mountId]/route.ts",
     method: "GET",
   },
   ssh_connections_id_mounts_mountId_PATCH: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/ssh/connections/[id]/mounts/[mountId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/ssh/connections/[id]/mounts/[mountId]/route.ts",
     method: "PATCH",
   },
   ssh_connections_list_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/ssh/connections/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/ssh/connections/list/route.ts",
     method: "GET",
   },
   ssh_linux_users_create_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/ssh/linux/users/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/ssh/linux/users/create/route.ts",
     method: "POST",
   },
   ssh_linux_users_list_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/ssh/linux/users/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/ssh/linux/users/list/route.ts",
     method: "GET",
   },
   ssh_linux_users_username_DELETE: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/ssh/linux/users/[username]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/ssh/linux/users/[username]/route.ts",
     method: "DELETE",
   },
   stage: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/vibe-stage/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/vibe-stage/route.ts",
     method: "POST",
   },
   start: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/server/server/start/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/start/route.ts",
     method: "POST",
   },
   status: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/platforms/cli/setup/status/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/setup/status/route.ts",
     method: "POST",
   },
   stripe: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/providers/stripe/cli/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/providers/stripe/cli/route.ts",
     method: "POST",
   },
   "stripe-cli": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/payment/providers/stripe/cli/route.ts",
+      "/home/max/projects/next-vibe-translations/src/payment/providers/stripe/cli/route.ts",
     method: "POST",
   },
   stt: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/speech-to-text/hotkey/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/speech-to-text/hotkey/route.ts",
     method: "POST",
   },
   studio: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/database/studio/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/database/studio/route.ts",
     method: "POST",
   },
   subscribe: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/newsletter/subscribe/route.ts",
+      "/home/max/projects/next-vibe-translations/src/newsletter/subscribe/route.ts",
     method: "POST",
   },
   "subscription-admin-list": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/admin/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/admin/list/route.ts",
     method: "GET",
   },
   "subscription-admin-purchases": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/admin/purchases/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/admin/purchases/route.ts",
     method: "GET",
   },
   "subscription-admin-referrals": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/admin/referrals/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/admin/referrals/route.ts",
     method: "GET",
   },
   "subscription-admin-stats": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/admin/stats/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/admin/stats/route.ts",
     method: "GET",
   },
   "subscription-cancel": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/cancel/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/cancel/route.ts",
     method: "DELETE",
   },
   "subscription-dashboard": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/dashboard/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/dashboard/route.ts",
     method: "GET",
   },
   "subscription-update": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/update/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/update/route.ts",
     method: "PUT",
   },
   subscription_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/route.ts",
     method: "GET",
   },
   subscription_admin_list_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/admin/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/admin/list/route.ts",
     method: "GET",
   },
   subscription_admin_purchases_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/admin/purchases/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/admin/purchases/route.ts",
     method: "GET",
   },
   subscription_admin_referrals_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/admin/referrals/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/admin/referrals/route.ts",
     method: "GET",
   },
   subscription_admin_referrals_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/admin/referrals/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/admin/referrals/route.ts",
     method: "POST",
   },
   subscription_admin_stats_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/admin/stats/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/admin/stats/route.ts",
     method: "GET",
   },
   subscription_cancel_DELETE: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/cancel/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/cancel/route.ts",
     method: "DELETE",
   },
   subscription_company_companyId_get_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/company/[companyId]/get/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/company/[companyId]/get/route.ts",
     method: "GET",
   },
   subscription_company_companyId_list_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/company/[companyId]/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/company/[companyId]/list/route.ts",
     method: "GET",
   },
   subscription_create_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/create/route.ts",
     method: "POST",
   },
   subscription_dashboard_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/dashboard/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/dashboard/route.ts",
     method: "GET",
   },
   "subscription_data-sources_subscriptions-active_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/data-sources/subscriptions-active/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/data-sources/subscriptions-active/route.ts",
     method: "POST",
   },
   "subscription_data-sources_subscriptions-cancelled_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/data-sources/subscriptions-cancelled/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/data-sources/subscriptions-cancelled/route.ts",
     method: "POST",
   },
   "subscription_data-sources_subscriptions-churned_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/data-sources/subscriptions-churned/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/data-sources/subscriptions-churned/route.ts",
     method: "POST",
   },
   "subscription_data-sources_subscriptions-new_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/data-sources/subscriptions-new/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/data-sources/subscriptions-new/route.ts",
     method: "POST",
   },
   "subscription_data-sources_subscriptions-payment-failed_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/data-sources/subscriptions-payment-failed/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/data-sources/subscriptions-payment-failed/route.ts",
     method: "POST",
   },
   "subscription_data-sources_subscriptions-trialing_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/data-sources/subscriptions-trialing/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/data-sources/subscriptions-trialing/route.ts",
     method: "POST",
   },
   subscription_update_PUT: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/update/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/update/route.ts",
     method: "PUT",
   },
   "subscriptions-active": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/data-sources/subscriptions-active/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/data-sources/subscriptions-active/route.ts",
     method: "POST",
   },
   "subscriptions-cancelled": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/data-sources/subscriptions-cancelled/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/data-sources/subscriptions-cancelled/route.ts",
     method: "POST",
   },
   "subscriptions-churned": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/data-sources/subscriptions-churned/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/data-sources/subscriptions-churned/route.ts",
     method: "POST",
   },
   "subscriptions-new": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/data-sources/subscriptions-new/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/data-sources/subscriptions-new/route.ts",
     method: "POST",
   },
   "subscriptions-payment-failed": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/data-sources/subscriptions-payment-failed/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/data-sources/subscriptions-payment-failed/route.ts",
     method: "POST",
   },
   "subscriptions-trialing": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/data-sources/subscriptions-trialing/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/data-sources/subscriptions-trialing/route.ts",
     method: "POST",
   },
   sync: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/remote-connection/sync/route.ts",
+      "/home/max/projects/next-vibe-translations/src/remote-connection/sync/route.ts",
     method: "POST",
   },
   "system-prompt-debug": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/ai-stream/system-prompt/debug/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/system-prompt/debug/route.ts",
     method: "GET",
   },
   "system-settings": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/env/settings/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/env/settings/route.ts",
     method: "GET",
   },
   system_database_generate_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/database/generate/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/database/generate/route.ts",
     method: "POST",
   },
   system_database_health_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/database/health/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/database/health/route.ts",
     method: "POST",
   },
   system_database_migrate_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/database/migrate/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/database/migrate/route.ts",
     method: "POST",
   },
   system_database_ping_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/database/ping/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/database/ping/route.ts",
     method: "POST",
   },
   system_database_seed_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/database/seed/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/database/seed/route.ts",
     method: "POST",
   },
   system_database_sql_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/database/sql/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/database/sql/route.ts",
     method: "POST",
   },
   system_database_studio_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/database/studio/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/database/studio/route.ts",
     method: "POST",
   },
   system_database_utils_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/database/utils/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/database/utils/route.ts",
     method: "GET",
   },
   "system_database_utils_docker-operations_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/database/utils/docker-operations/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/database/utils/docker-operations/route.ts",
     method: "POST",
   },
   system_dataflow_cleanup_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/dataflow/cleanup/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/cleanup/route.ts",
     method: "POST",
   },
   system_dataflow_graphs_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/dataflow/graphs/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/route.ts",
     method: "GET",
   },
   system_dataflow_graphs_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/dataflow/graphs/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/route.ts",
     method: "POST",
   },
   system_dataflow_graphs_id_archive_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/dataflow/graphs/[id]/archive/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/archive/route.ts",
     method: "POST",
   },
   system_dataflow_graphs_id_backtest_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/dataflow/graphs/[id]/backtest/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/backtest/route.ts",
     method: "POST",
   },
   system_dataflow_graphs_id_data_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/dataflow/graphs/[id]/data/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/data/route.ts",
     method: "GET",
   },
   system_dataflow_graphs_id_delete_DELETE: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/dataflow/graphs/[id]/delete/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/delete/route.ts",
     method: "DELETE",
   },
   system_dataflow_graphs_id_edit_PUT: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/dataflow/graphs/[id]/edit/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/edit/route.ts",
     method: "PUT",
   },
   system_dataflow_graphs_id_promote_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/dataflow/graphs/[id]/promote/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/promote/route.ts",
     method: "POST",
   },
   system_dataflow_graphs_id_trigger_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/dataflow/graphs/[id]/trigger/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/trigger/route.ts",
     method: "POST",
   },
   system_dataflow_graphs_id_versions_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/dataflow/graphs/[id]/versions/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/versions/route.ts",
     method: "GET",
   },
   "system_dataflow_run-config_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/dataflow/run-config/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/run-config/route.ts",
     method: "POST",
   },
   system_env_settings_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/env/settings/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/env/settings/route.ts",
     method: "GET",
   },
   system_env_settings_PATCH: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/env/settings/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/env/settings/route.ts",
     method: "PATCH",
   },
   system_env_settings_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/env/settings/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/env/settings/route.ts",
     method: "POST",
   },
   "system_env_settings_export-env_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/env/settings/export-env/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/env/settings/export-env/route.ts",
     method: "GET",
   },
   "system_env_settings_generate-key_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/env/settings/generate-key/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/env/settings/generate-key/route.ts",
     method: "GET",
   },
   "system_execute-tool_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/execute-tool/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/route.ts",
     method: "POST",
   },
   "system_execute-tool_await-task_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/execute-tool/await-task/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/await-task/route.ts",
     method: "POST",
   },
   "system_execute-tool_call-control_cancel_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/execute-tool/call-control/cancel/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/call-control/cancel/route.ts",
     method: "POST",
   },
   "system_execute-tool_call-control_detach_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/execute-tool/call-control/detach/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/call-control/detach/route.ts",
     method: "POST",
   },
   "system_execute-tool_call-control_resume-when-done_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/execute-tool/call-control/resume-when-done/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/call-control/resume-when-done/route.ts",
     method: "POST",
   },
   "system_execute-tool_complete_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/execute-tool/complete/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/complete/route.ts",
     method: "POST",
   },
   "system_execute-tool_revival_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/execute-tool/revival/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/revival/route.ts",
     method: "POST",
   },
   "system_help-tool_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/help-tool/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/help-tool/route.ts",
     method: "GET",
   },
   "system_logger_error-monitor_cleanup_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/logger/error-monitor/cleanup/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/cleanup/route.ts",
     method: "POST",
   },
   "system_logger_error-monitor_client-log_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/logger/error-monitor/client-log/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/client-log/route.ts",
     method: "POST",
   },
   "system_logger_error-monitor_data-sources_error-logs-errors_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/logger/error-monitor/data-sources/error-logs-errors/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/data-sources/error-logs-errors/route.ts",
     method: "POST",
   },
   "system_logger_error-monitor_data-sources_error-logs-total_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/logger/error-monitor/data-sources/error-logs-total/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/data-sources/error-logs-total/route.ts",
     method: "POST",
   },
   "system_logger_error-monitor_data-sources_error-logs-warnings_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/logger/error-monitor/data-sources/error-logs-warnings/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/data-sources/error-logs-warnings/route.ts",
     method: "POST",
   },
   "system_logger_error-monitor_logs_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/logger/error-monitor/logs/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/logs/route.ts",
     method: "GET",
   },
   "system_logger_error-monitor_logs_PATCH": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/logger/error-monitor/logs/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/logs/route.ts",
     method: "PATCH",
   },
   system_platforms_cli_interactive_capture_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/platforms/cli/interactive/capture/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/interactive/capture/route.ts",
     method: "POST",
   },
   "system_platforms_cli_interactive_send-keys_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/platforms/cli/interactive/send-keys/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/interactive/send-keys/route.ts",
     method: "POST",
   },
   system_platforms_cli_setup_install_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/platforms/cli/setup/install/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/setup/install/route.ts",
     method: "POST",
   },
   system_platforms_cli_setup_status_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/platforms/cli/setup/status/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/setup/status/route.ts",
     method: "POST",
   },
   system_platforms_cli_setup_uninstall_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/platforms/cli/setup/uninstall/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/setup/uninstall/route.ts",
     method: "POST",
   },
   system_platforms_mcp_serve_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/platforms/mcp/serve/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/mcp/serve/route.ts",
     method: "POST",
   },
   "system_platforms_vibe-frame_mount_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/platforms/vibe-frame/mount/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/vibe-frame/mount/route.ts",
     method: "POST",
   },
   "system_realtime_remote-event-bridge_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/realtime/remote-event-bridge/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/realtime/remote-event-bridge/route.ts",
     method: "POST",
   },
   system_server_server_build_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/server/server/build/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/build/route.ts",
     method: "POST",
   },
   system_server_server_dev_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/server/server/dev/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/dev/route.ts",
     method: "POST",
   },
   system_server_server_electron_build_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/server/server/electron/build/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/electron/build/route.ts",
     method: "POST",
   },
   system_server_server_electron_start_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/server/server/electron/start/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/electron/start/route.ts",
     method: "POST",
   },
   "system_server_server_headless-client_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/server/server/headless-client/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/headless-client/route.ts",
     method: "POST",
   },
   system_server_server_health_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/server/server/health/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/health/route.ts",
     method: "GET",
   },
   "system_server_server_image-push_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/server/server/image-push/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/image-push/route.ts",
     method: "POST",
   },
   system_server_server_rebuild_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/server/server/rebuild/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/rebuild/route.ts",
     method: "POST",
   },
   system_server_server_start_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/server/server/start/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/start/route.ts",
     method: "POST",
   },
   system_tasks_cron_bulk_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/cron/bulk/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/bulk/route.ts",
     method: "POST",
   },
   system_tasks_cron_history_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/cron/history/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/history/route.ts",
     method: "GET",
   },
   system_tasks_cron_id_DELETE: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/cron/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/[id]/route.ts",
     method: "DELETE",
   },
   system_tasks_cron_id_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/cron/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/[id]/route.ts",
     method: "GET",
   },
   system_tasks_cron_id_PUT: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/cron/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/[id]/route.ts",
     method: "PUT",
   },
   system_tasks_cron_queue_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/cron/queue/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/queue/route.ts",
     method: "GET",
   },
   system_tasks_cron_stats_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/cron/stats/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/stats/route.ts",
     method: "GET",
   },
   system_tasks_cron_tasks_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/cron/tasks/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/tasks/route.ts",
     method: "GET",
   },
   system_tasks_cron_tasks_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/cron/tasks/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/tasks/route.ts",
     method: "POST",
   },
   "system_tasks_data-sources_cron-executions-failed_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/data-sources/cron-executions-failed/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/data-sources/cron-executions-failed/route.ts",
     method: "POST",
   },
   "system_tasks_data-sources_cron-executions-succeeded_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/data-sources/cron-executions-succeeded/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/data-sources/cron-executions-succeeded/route.ts",
     method: "POST",
   },
   "system_tasks_data-sources_cron-executions-total_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/data-sources/cron-executions-total/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/data-sources/cron-executions-total/route.ts",
     method: "POST",
   },
   system_tasks_execute_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/execute/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/execute/route.ts",
     method: "POST",
   },
   system_tasks_pulse_execute_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/pulse/execute/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/pulse/execute/route.ts",
     method: "POST",
   },
   system_tasks_pulse_history_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/pulse/history/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/pulse/history/route.ts",
     method: "GET",
   },
   system_tasks_pulse_status_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/pulse/status/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/pulse/status/route.ts",
     method: "GET",
   },
   "system_tasks_unified-runner_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/unified-runner/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/unified-runner/route.ts",
     method: "POST",
   },
   system_tooling_builder_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/builder/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/builder/route.ts",
     method: "POST",
   },
   system_tooling_check_config_create_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/check/config/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/config/create/route.ts",
     method: "POST",
   },
   system_tooling_check_lint_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/check/lint/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/lint/route.ts",
     method: "POST",
   },
   system_tooling_check_oxlint_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/check/oxlint/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/oxlint/route.ts",
     method: "POST",
   },
   system_tooling_check_testing_test_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/check/testing/test/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/testing/test/route.ts",
     method: "POST",
   },
   system_tooling_check_typecheck_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/check/typecheck/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/typecheck/route.ts",
     method: "POST",
   },
   "system_tooling_check_vibe-check_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/check/vibe-check/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/vibe-check/route.ts",
     method: "POST",
   },
   system_tooling_generators_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/generators/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/generators/route.ts",
     method: "POST",
   },
   system_tooling_guard_destroy_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/guard/destroy/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/guard/destroy/route.ts",
     method: "POST",
   },
   system_tooling_guard_start_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/guard/start/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/guard/start/route.ts",
     method: "POST",
   },
   system_tooling_guard_status_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/guard/status/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/guard/status/route.ts",
     method: "POST",
   },
   system_tooling_guard_stop_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/guard/stop/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/guard/stop/route.ts",
     method: "POST",
   },
   system_tooling_infra_cluster_init_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/infra/cluster/init/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/cluster/init/route.ts",
     method: "POST",
   },
   system_tooling_infra_cluster_status_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/infra/cluster/status/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/cluster/status/route.ts",
     method: "GET",
   },
   system_tooling_infra_deploy_preview_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/infra/deploy/preview/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/deploy/preview/route.ts",
     method: "POST",
   },
   system_tooling_infra_deploy_push_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/infra/deploy/push/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/deploy/push/route.ts",
     method: "POST",
   },
   system_tooling_infra_scale_replicas_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/infra/scale/replicas/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/scale/replicas/route.ts",
     method: "POST",
   },
   system_tooling_release_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/release/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/release/route.ts",
     method: "POST",
   },
   "system_tooling_vibe-deps_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/vibe-deps/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/vibe-deps/route.ts",
     method: "POST",
   },
   "system_tooling_vibe-stage_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/vibe-stage/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/vibe-stage/route.ts",
     method: "POST",
   },
   t: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/check/testing/test/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/testing/test/route.ts",
     method: "POST",
   },
   "task-execute": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/execute/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/execute/route.ts",
     method: "POST",
   },
   "task-list": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/cron/tasks/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/tasks/route.ts",
     method: "GET",
   },
   "task-queue": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/cron/queue/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/queue/route.ts",
     method: "GET",
   },
   "task-runner": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/unified-runner/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/unified-runner/route.ts",
     method: "POST",
   },
   tasks: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/cron/tasks/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/tasks/route.ts",
     method: "GET",
   },
   "tasks:cron:stats": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/cron/stats/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/stats/route.ts",
     method: "GET",
   },
   "tax-rate-list": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/tax/rate/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/tax/rate/list/route.ts",
     method: "GET",
   },
   tax_rate_create_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/tax/rate/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/tax/rate/create/route.ts",
     method: "POST",
   },
   tax_rate_list_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/tax/rate/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/tax/rate/list/route.ts",
     method: "GET",
   },
   tax_rate_rateId_delete_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/tax/rate/[rateId]/delete/route.ts",
+      "/home/max/projects/next-vibe-translations/src/tax/rate/[rateId]/delete/route.ts",
     method: "POST",
   },
   tax_rate_rateId_update_PATCH: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/tax/rate/[rateId]/update/route.ts",
+      "/home/max/projects/next-vibe-translations/src/tax/rate/[rateId]/update/route.ts",
     method: "PATCH",
   },
   tax_report_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/tax/report/route.ts",
+      "/home/max/projects/next-vibe-translations/src/tax/report/route.ts",
     method: "GET",
   },
   tc: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/check/typecheck/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/typecheck/route.ts",
     method: "POST",
   },
   test: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/check/testing/test/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/testing/test/route.ts",
     method: "POST",
   },
   "text-to-speech": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/text-to-speech/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/text-to-speech/route.ts",
     method: "POST",
   },
   "thread-files": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/threads/files/[threadId]/[filename]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/files/[threadId]/[filename]/route.ts",
     method: "GET",
   },
   "thread-messages": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/threads/[threadId]/messages/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/route.ts",
     method: "GET",
   },
   "thread-share-links": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/chat/threads/[threadId]/share-links/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/share-links/route.ts",
     method: "GET",
   },
   "tool-help": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/help-tool/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/help-tool/route.ts",
     method: "GET",
   },
   "tools:list": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/help-tool/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/help-tool/route.ts",
     method: "GET",
   },
   "track-click": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/tracking/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/tracking/route.ts",
     method: "GET",
   },
   "track-engagement": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/leads/tracking/route.ts",
+      "/home/max/projects/next-vibe-translations/src/leads/tracking/route.ts",
     method: "POST",
   },
   transcribe_audio: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/speech-to-text/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/speech-to-text/route.ts",
     method: "POST",
   },
   typecheck: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tooling/check/typecheck/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/typecheck/route.ts",
     method: "POST",
   },
   "unbottled-login": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/env/settings/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/env/settings/route.ts",
     method: "POST",
   },
   "unified-runner": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/tasks/unified-runner/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/unified-runner/route.ts",
     method: "POST",
   },
   uninstall: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/platforms/cli/setup/uninstall/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/setup/uninstall/route.ts",
     method: "POST",
   },
   unsubscribe: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/newsletter/unsubscribe/route.ts",
+      "/home/max/projects/next-vibe-translations/src/newsletter/unsubscribe/route.ts",
     method: "POST",
   },
   update: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/platforms/cli/setup/install/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/setup/install/route.ts",
     method: "POST",
   },
   "update-error-log": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/logger/error-monitor/logs/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/logs/route.ts",
     method: "PATCH",
   },
   "update-model-prices": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/models/model-prices/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/models/model-prices/route.ts",
     method: "GET",
   },
   "update-subscription": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/subscription/update/route.ts",
+      "/home/max/projects/next-vibe-translations/src/subscription/update/route.ts",
     method: "PUT",
   },
   "user-delete": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/users/user/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/users/user/[id]/route.ts",
     method: "DELETE",
   },
   "user-me": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/private/me/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/private/me/route.ts",
     method: "GET",
   },
   "user-sessions": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/private/sessions/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/private/sessions/route.ts",
     method: "GET",
   },
   "user-update": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/users/user/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/users/user/[id]/route.ts",
     method: "PUT",
   },
   "user-view": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/users/user/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/users/user/[id]/route.ts",
     method: "GET",
   },
   "user_data-sources_users-active-total_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/data-sources/users-active-total/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/data-sources/users-active-total/route.ts",
     method: "POST",
   },
   "user_data-sources_users-banned_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/data-sources/users-banned/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/data-sources/users-banned/route.ts",
     method: "POST",
   },
   "user_data-sources_users-email-verified_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/data-sources/users-email-verified/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/data-sources/users-email-verified/route.ts",
     method: "POST",
   },
   "user_data-sources_users-login-attempts-failed_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/data-sources/users-login-attempts-failed/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/data-sources/users-login-attempts-failed/route.ts",
     method: "POST",
   },
   "user_data-sources_users-login-attempts-total_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/data-sources/users-login-attempts-total/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/data-sources/users-login-attempts-total/route.ts",
     method: "POST",
   },
   "user_data-sources_users-marketing-consent_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/data-sources/users-marketing-consent/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/data-sources/users-marketing-consent/route.ts",
     method: "POST",
   },
   "user_data-sources_users-registered_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/data-sources/users-registered/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/data-sources/users-registered/route.ts",
     method: "POST",
   },
   "user_data-sources_users-two-fa-enabled_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/data-sources/users-two-fa-enabled/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/data-sources/users-two-fa-enabled/route.ts",
     method: "POST",
   },
   "user_data-sources_users-with-stripe_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/data-sources/users-with-stripe/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/data-sources/users-with-stripe/route.ts",
     method: "POST",
   },
   user_private_logout_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/private/logout/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/private/logout/route.ts",
     method: "POST",
   },
   user_private_me_DELETE: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/private/me/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/private/me/route.ts",
     method: "DELETE",
   },
   user_private_me_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/private/me/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/private/me/route.ts",
     method: "GET",
   },
   user_private_me_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/private/me/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/private/me/route.ts",
     method: "POST",
   },
   user_private_me_addresses_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/private/me/addresses/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/private/me/addresses/route.ts",
     method: "GET",
   },
   user_private_me_addresses_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/private/me/addresses/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/private/me/addresses/route.ts",
     method: "POST",
   },
   user_private_me_addresses_addressId_DELETE: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/private/me/addresses/[addressId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/private/me/addresses/[addressId]/route.ts",
     method: "DELETE",
   },
   user_private_me_addresses_addressId_PATCH: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/private/me/addresses/[addressId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/private/me/addresses/[addressId]/route.ts",
     method: "PATCH",
   },
   user_private_me_avatar_DELETE: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/private/me/avatar/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/private/me/avatar/route.ts",
     method: "DELETE",
   },
   user_private_me_avatar_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/private/me/avatar/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/private/me/avatar/route.ts",
     method: "POST",
   },
   user_private_me_password_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/private/me/password/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/private/me/password/route.ts",
     method: "POST",
   },
   user_private_sessions_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/private/sessions/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/private/sessions/route.ts",
     method: "GET",
   },
   user_private_sessions_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/private/sessions/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/private/sessions/route.ts",
     method: "POST",
   },
   user_private_sessions_id_DELETE: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/private/sessions/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/private/sessions/[id]/route.ts",
     method: "DELETE",
   },
   user_public_creator_userId_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/public/creator/[userId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/public/creator/[userId]/route.ts",
     method: "GET",
   },
   user_public_login_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/public/login/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/public/login/route.ts",
     method: "POST",
   },
   user_public_login_options_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/public/login/options/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/public/login/options/route.ts",
     method: "GET",
   },
   "user_public_reset-password_confirm_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/public/reset-password/confirm/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/public/reset-password/confirm/route.ts",
     method: "POST",
   },
   "user_public_reset-password_request_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/public/reset-password/request/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/public/reset-password/request/route.ts",
     method: "POST",
   },
   "user_public_reset-password_validate_GET": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/public/reset-password/validate/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/public/reset-password/validate/route.ts",
     method: "GET",
   },
   user_public_signup_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/public/signup/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/public/signup/route.ts",
     method: "POST",
   },
   "user_session-cleanup_POST": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/session-cleanup/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/session-cleanup/route.ts",
     method: "POST",
   },
   "users-active-total": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/data-sources/users-active-total/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/data-sources/users-active-total/route.ts",
     method: "POST",
   },
   "users-banned": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/data-sources/users-banned/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/data-sources/users-banned/route.ts",
     method: "POST",
   },
   "users-create": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/users/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/users/create/route.ts",
     method: "POST",
   },
   "users-email-verified": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/data-sources/users-email-verified/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/data-sources/users-email-verified/route.ts",
     method: "POST",
   },
   "users-list": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/users/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/users/list/route.ts",
     method: "GET",
   },
   "users-login-attempts-failed": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/data-sources/users-login-attempts-failed/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/data-sources/users-login-attempts-failed/route.ts",
     method: "POST",
   },
   "users-login-attempts-total": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/data-sources/users-login-attempts-total/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/data-sources/users-login-attempts-total/route.ts",
     method: "POST",
   },
   "users-marketing-consent": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/data-sources/users-marketing-consent/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/data-sources/users-marketing-consent/route.ts",
     method: "POST",
   },
   "users-registered": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/data-sources/users-registered/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/data-sources/users-registered/route.ts",
     method: "POST",
   },
   "users-stats": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/users/stats/route.ts",
+      "/home/max/projects/next-vibe-translations/src/users/stats/route.ts",
     method: "GET",
   },
   "users-two-fa-enabled": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/data-sources/users-two-fa-enabled/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/data-sources/users-two-fa-enabled/route.ts",
     method: "POST",
   },
   "users-view": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/users/view/route.ts",
+      "/home/max/projects/next-vibe-translations/src/users/view/route.ts",
     method: "GET",
   },
   "users-with-stripe": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/user/data-sources/users-with-stripe/route.ts",
+      "/home/max/projects/next-vibe-translations/src/user/data-sources/users-with-stripe/route.ts",
     method: "POST",
   },
   users_create_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/users/create/route.ts",
+      "/home/max/projects/next-vibe-translations/src/users/create/route.ts",
     method: "POST",
   },
   users_list_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/users/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/users/list/route.ts",
     method: "GET",
   },
   users_stats_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/users/stats/route.ts",
+      "/home/max/projects/next-vibe-translations/src/users/stats/route.ts",
     method: "GET",
   },
   users_user_id_DELETE: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/users/user/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/users/user/[id]/route.ts",
     method: "DELETE",
   },
   users_user_id_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/users/user/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/users/user/[id]/route.ts",
     method: "GET",
   },
   users_user_id_PUT: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/users/user/[id]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/users/user/[id]/route.ts",
     method: "PUT",
   },
   users_user_id_roles_DELETE: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/users/user/[id]/roles/route.ts",
+      "/home/max/projects/next-vibe-translations/src/users/user/[id]/roles/route.ts",
     method: "DELETE",
   },
   users_user_id_roles_POST: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/users/user/[id]/roles/route.ts",
+      "/home/max/projects/next-vibe-translations/src/users/user/[id]/roles/route.ts",
     method: "POST",
   },
   users_view_GET: {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/users/view/route.ts",
+      "/home/max/projects/next-vibe-translations/src/users/view/route.ts",
     method: "GET",
   },
   "vibe-frame-mount": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/platforms/vibe-frame/mount/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/vibe-frame/mount/route.ts",
     method: "POST",
   },
   "vibe-sense-bollinger": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/indicators/bollinger/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/indicators/bollinger/route.ts",
     method: "POST",
   },
   "vibe-sense-clamp": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/indicators/clamp/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/indicators/clamp/route.ts",
     method: "POST",
   },
   "vibe-sense-delta": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/indicators/delta/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/indicators/delta/route.ts",
     method: "POST",
   },
   "vibe-sense-ema": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/indicators/ema/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/indicators/ema/route.ts",
     method: "POST",
   },
   "vibe-sense-evaluator-and": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/evaluators/and/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/evaluators/and/route.ts",
     method: "POST",
   },
   "vibe-sense-evaluator-crossover": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/evaluators/crossover/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/evaluators/crossover/route.ts",
     method: "POST",
   },
   "vibe-sense-evaluator-not": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/evaluators/not/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/evaluators/not/route.ts",
     method: "POST",
   },
   "vibe-sense-evaluator-or": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/evaluators/or/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/evaluators/or/route.ts",
     method: "POST",
   },
   "vibe-sense-evaluator-script": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/evaluators/script/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/evaluators/script/route.ts",
     method: "POST",
   },
   "vibe-sense-evaluator-threshold": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/evaluators/threshold/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/evaluators/threshold/route.ts",
     method: "POST",
   },
   "vibe-sense-graphs": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/dataflow/graphs/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/route.ts",
     method: "GET",
   },
   "vibe-sense-macd": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/indicators/macd/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/indicators/macd/route.ts",
     method: "POST",
   },
   "vibe-sense-rsi": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/indicators/rsi/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/indicators/rsi/route.ts",
     method: "POST",
   },
   "vibe-sense-run-config": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/dataflow/run-config/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/run-config/route.ts",
     method: "POST",
   },
   "vibe-sense-transformer-field-pick": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/transformers/field-pick/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/transformers/field-pick/route.ts",
     method: "POST",
   },
   "vibe-sense-transformer-json-path": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/transformers/json-path/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/transformers/json-path/route.ts",
     method: "POST",
   },
   "vibe-sense-transformer-merge": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/transformers/merge/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/transformers/merge/route.ts",
     method: "POST",
   },
   "vibe-sense-transformer-ratio": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/transformers/ratio/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/transformers/ratio/route.ts",
     method: "POST",
   },
   "vibe-sense-transformer-script": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/transformers/script/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/transformers/script/route.ts",
     method: "POST",
   },
   "vibe-sense-window-avg": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/indicators/window-avg/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/indicators/window-avg/route.ts",
     method: "POST",
   },
   "vibe-sense-window-max": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/indicators/window-max/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/indicators/window-max/route.ts",
     method: "POST",
   },
   "vibe-sense-window-min": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/indicators/window-min/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/indicators/window-min/route.ts",
     method: "POST",
   },
   "vibe-sense-window-sum": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/analytics/indicators/window-sum/route.ts",
+      "/home/max/projects/next-vibe-translations/src/analytics/indicators/window-sum/route.ts",
     method: "POST",
   },
   "wait-for-task": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/system/execute-tool/await-task/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/await-task/route.ts",
     method: "POST",
   },
   "web-search": {
     absPath:
-      "C:/Users/Max/Desktop/next-vibe/src/app/api/[locale]/agent/web-search/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/web-search/route.ts",
     method: "GET",
   },
 };

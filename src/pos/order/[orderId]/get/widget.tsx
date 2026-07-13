@@ -81,7 +81,7 @@ export function PosOrderGetWidget({
   const handleAddPayment = (orderId: string): void => {
     void (async (): Promise<void> => {
       const def = await import("../add-payment/definition");
-      const { PosPaymentMethod } = await import("@/app/api/[locale]/pos/enum");
+      const { PosPaymentMethod } = await import("@/pos/enum");
       navigation.push(def.default.POST, {
         data: {
           details: {
@@ -118,7 +118,7 @@ export function PosOrderGetWidget({
   const handleViewJournalEntry = (journalEntryId: string): void => {
     void (async (): Promise<void> => {
       const def =
-        await import("@/app/api/[locale]/chart-of-accounts/journal/[entryId]/get/definition");
+        await import("@/chart-of-accounts/journal/[entryId]/get/definition");
       navigation.push(def.default.GET, {
         urlPathParams: { entryId: journalEntryId },
       });

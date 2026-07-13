@@ -20,13 +20,13 @@ import "server-only";
  */
 import { and, asc, count as drizzleCount, desc, eq } from "drizzle-orm";
 import { db } from "next-vibe/database";
+import { remoteConnections } from "next-vibe/remote-connection/db";
+import { RemoteConnectionRepository } from "next-vibe/remote-connection/repository";
 
-import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
-import { RemoteConnectionRepository } from "@/app/api/[locale]/remote-connection/repository";
-import type { ClientT } from "@/app/api/[locale]/ssh/client";
-import { sshConnectionMounts, sshConnections } from "@/app/api/[locale]/ssh/db";
-import { ClusterRole, SshAuthType } from "@/app/api/[locale]/ssh/enum";
-import { getSessionsForConnection } from "@/app/api/[locale]/ssh/session/pool";
+import type { ClientT } from "@/ssh/client";
+import { sshConnectionMounts, sshConnections } from "@/ssh/db";
+import { ClusterRole, SshAuthType } from "@/ssh/enum";
+import { getSessionsForConnection } from "@/ssh/session/pool";
 
 import type {
   VirtualDeleteResult,
@@ -280,7 +280,7 @@ export async function ensureLocalConnection(
   if (localRow) {
     // Backfill default mount for existing local connections that have none
     const { ensureDefaultMount } =
-      await import("@/app/api/[locale]/ssh/connections/mounts-bootstrap");
+      await import("@/ssh/connections/mounts-bootstrap");
     await ensureDefaultMount(localRow.id, userId);
     return;
   }
@@ -303,7 +303,7 @@ export async function ensureLocalConnection(
 
   if (newConn) {
     const { ensureDefaultMount } =
-      await import("@/app/api/[locale]/ssh/connections/mounts-bootstrap");
+      await import("@/ssh/connections/mounts-bootstrap");
     await ensureDefaultMount(newConn.id, userId);
   }
 }
@@ -620,7 +620,7 @@ async function readRemoteFile(
   remotePath: string,
 ): Promise<VirtualReadResult | null> {
   const { getConnectionCredentials, openSshClient, sftpReadFile } =
-    await import("@/app/api/[locale]/ssh/client");
+    await import("@/ssh/client");
 
   const credsResult = await getConnectionCredentials(conn.id, userId, stubT);
   if (!credsResult.success) {
@@ -666,7 +666,7 @@ export async function mkdirSshPath(
     return true;
   }
   const { getConnectionCredentials, openSshClient } =
-    await import("@/app/api/[locale]/ssh/client");
+    await import("@/ssh/client");
   const credsResult = await getConnectionCredentials(conn.id, userId, stubT);
   if (!credsResult.success) {
     return false;
@@ -739,7 +739,7 @@ export async function writeSshPath(
     return { path, created: !existed };
   }
   const { getConnectionCredentials, openSshClient, sftpWriteFile } =
-    await import("@/app/api/[locale]/ssh/client");
+    await import("@/ssh/client");
   const credsResult = await getConnectionCredentials(conn.id, userId, stubT);
   if (!credsResult.success) {
     return null;
@@ -780,7 +780,7 @@ export async function deleteSshPath(
     }
   }
   const { getConnectionCredentials, openSshClient, sftpDeleteFile } =
-    await import("@/app/api/[locale]/ssh/client");
+    await import("@/ssh/client");
   const credsResult = await getConnectionCredentials(conn.id, userId, stubT);
   if (!credsResult.success) {
     return null;
@@ -824,7 +824,7 @@ export async function moveSshPath(
     }
   }
   const { getConnectionCredentials, openSshClient, sftpRenameFile } =
-    await import("@/app/api/[locale]/ssh/client");
+    await import("@/ssh/client");
   const credsResult = await getConnectionCredentials(conn.id, userId, stubT);
   if (!credsResult.success) {
     return null;
@@ -850,7 +850,7 @@ async function listRemoteDir(
   remotePath: string,
 ): Promise<VirtualListEntry[]> {
   const { getConnectionCredentials, openSshClient, sftpListDir } =
-    await import("@/app/api/[locale]/ssh/client");
+    await import("@/ssh/client");
 
   const credsResult = await getConnectionCredentials(conn.id, userId, stubT);
   if (!credsResult.success) {

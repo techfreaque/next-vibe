@@ -3,8 +3,7 @@ import "server-only";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { createEndpointEmitter } from "next-vibe/realtime/emitter";
-
-import type { ResolvedRelayContext } from "@/app/api/[locale]/system/realtime/remote-event-bridge/relay-context";
+import type { ResolvedRelayContext } from "next-vibe/realtime/remote-event-bridge/relay-context";
 
 import type { DefaultFolderId } from "../config";
 import threadsDefinitions, {

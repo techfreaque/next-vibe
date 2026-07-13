@@ -64,8 +64,8 @@ Use a folder when the file would exceed ~200 lines or when there are clearly sep
 `useEndpoint()` is the foundation. All endpoint hooks wrap it.
 
 ```typescript
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
+import { useEndpoint } from "@/system/unified-interface/react/hooks/use-endpoint";
+import type { EndpointReturn } from "@/system/unified-interface/react/hooks/endpoint-types";
 ```
 
 ### Minimal hook
@@ -184,7 +184,7 @@ When a hook returns more than just `useEndpoint` output (computed values, auth c
 "use client";
 
 import { useMemo } from "react";
-import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
+import { useChatBootContext } from "next-vibe/agent/chat/hooks/context";
 import { useEndpoint } from "@/app/api/.../react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/.../shared/logger/endpoint";
 import type { UseEndpointOptions } from "@/app/api/.../react/hooks/endpoint-types";

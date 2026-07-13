@@ -34,7 +34,7 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { envClient } from "@/config/env-client";
+import { envClient } from "@/_old/config/env-client";
 
 import { buildUserWsChannel } from "./channel";
 import { getLocalBroadcast } from "./local-broadcast";

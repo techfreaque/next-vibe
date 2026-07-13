@@ -61,8 +61,8 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
-import { env } from "@/config/env";
+import { env } from "@/_old/config/env";
+import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 
 import { subscriptions } from "../subscription/db";
 import { paymentMethods, paymentTransactions, paymentWebhooks } from "./db";
@@ -842,7 +842,7 @@ export class PaymentRepository {
       } = await import("../credits/db");
       const { CreditTransactionType } = await import("../credits/enum");
       const { withTransaction } =
-        await import("../system/database/utils/repository-helpers");
+        await import("../vibe/database/utils/repository-helpers");
 
       const periodEndMs = subResult.data.currentPeriodEnd;
       const renewalKey = `renewal_${subscriptionId}_${periodEndMs}`;

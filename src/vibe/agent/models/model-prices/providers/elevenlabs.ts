@@ -21,10 +21,9 @@
 
 import "server-only";
 
+import { agentEnv } from "next-vibe/agent/env";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { agentEnv } from "@/app/api/[locale]/agent/env";
 
 import { ttsModelDefinitions } from "../../../text-to-speech/models";
 import { ApiProvider } from "../../models";

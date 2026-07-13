@@ -1,4 +1,7 @@
 "use client";
+import { scopedTranslation } from "next-vibe/agent/ai-stream/stream/i18n";
+import { COMPANION_SKILLS, type Skill } from "next-vibe/agent/skills/config";
+import { scopedTranslation as skillsScopedTranslation } from "next-vibe/agent/skills/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { cn } from "next-vibe/core/utils/utils";
 import { Button } from "next-vibe/ui/ui/button";
@@ -10,13 +13,6 @@ import { Span } from "next-vibe/ui/ui/span";
 import { H3, P } from "next-vibe/ui/ui/typography";
 import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import { type JSX } from "react";
-
-import { scopedTranslation } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
-import {
-  COMPANION_SKILLS,
-  type Skill,
-} from "@/app/api/[locale]/agent/skills/config";
-import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/skills/i18n";
 
 interface CompanionStepProps {
   selectedId: string | null;

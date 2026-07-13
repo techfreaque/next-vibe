@@ -11,15 +11,15 @@ import { users } from "next-vibe/identity/user/db";
 import { formatDatabase } from "next-vibe/logger/formatters";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { messengerAccounts } from "@/app/api/[locale]/messenger/accounts/db";
+import { env } from "@/_old/config/env";
+import { messengerAccounts } from "@/messenger/accounts/db";
 import {
   CampaignType,
   MessageChannel,
   MessengerAccountStatus,
-} from "@/app/api/[locale]/messenger/accounts/enum";
-import { MessengerProvider } from "@/app/api/[locale]/messenger/accounts/enum";
-import { EmailSecurityType } from "@/app/api/[locale]/messenger/providers/email/enum";
-import { env } from "@/config/env";
+} from "@/messenger/accounts/enum";
+import { MessengerProvider } from "@/messenger/accounts/enum";
+import { EmailSecurityType } from "@/messenger/providers/email/enum";
 
 import { leadMagnetConfigs } from "./db";
 

@@ -1,4 +1,11 @@
 "use client";
+import type { DefaultFolderId } from "next-vibe/agent/chat/config";
+import {
+  prepareTextForTTS,
+  stripThinkTags,
+} from "next-vibe/agent/text-to-speech/content-processing";
+import { useTTSAudio } from "next-vibe/agent/text-to-speech/hooks";
+import type { TtsModelId } from "next-vibe/agent/text-to-speech/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { cn } from "next-vibe/core/utils/utils";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -25,14 +32,7 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import React, { useState } from "react";
 
-import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import {
-  prepareTextForTTS,
-  stripThinkTags,
-} from "@/app/api/[locale]/agent/text-to-speech/content-processing";
-import { useTTSAudio } from "@/app/api/[locale]/agent/text-to-speech/hooks";
-import type { TtsModelId } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
+import { FEATURE_COSTS } from "@/products/repository-client";
 
 import type messagesDefinition from "../definition";
 import { scopedTranslation } from "../i18n";
@@ -118,7 +118,7 @@ export function AssistantMessageActions({
   const handleDelete = (): void => {
     void (async (): Promise<void> => {
       const messageIdDefs =
-        await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/definition");
+        await import("next-vibe/agent/chat/threads/[threadId]/messages/[messageId]/definition");
       navigate(messageIdDefs.default.DELETE, {
         urlPathParams: { threadId, messageId },
         data: rootFolderId ? { rootFolderId } : undefined,

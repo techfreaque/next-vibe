@@ -169,7 +169,7 @@ export class CortexTreeRepository {
           const {
             sshConnectionMounts: mountsTable,
             sshConnections: connsTable,
-          } = await import("@/app/api/[locale]/ssh/db");
+          } = await import("@/ssh/db");
           const allMounts = await db
             .select({
               connectionId: mountsTable.connectionId,
@@ -244,7 +244,7 @@ export class CortexTreeRepository {
           const {
             sshConnectionMounts: mountsTable,
             sshConnections: connsTable,
-          } = await import("@/app/api/[locale]/ssh/db");
+          } = await import("@/ssh/db");
           const isAdmin =
             !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
 
@@ -326,7 +326,7 @@ export class CortexTreeRepository {
           const {
             sshConnectionMounts: mountsTable,
             sshConnections: connsTable,
-          } = await import("@/app/api/[locale]/ssh/db");
+          } = await import("@/ssh/db");
           const isAdmin =
             !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
           const sshConnEntries = await listSshPath(userId, "/ssh", isAdmin);

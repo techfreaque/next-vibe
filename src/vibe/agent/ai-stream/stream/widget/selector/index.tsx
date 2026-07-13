@@ -22,20 +22,19 @@ function useIsClient(): boolean {
   );
 }
 
+import {
+  type ChatModelId,
+  getChatModelById,
+} from "next-vibe/agent/ai-stream/models";
+import { TOUR_DATA_ATTRS } from "next-vibe/agent/ai-stream/stream/widget/chat-ui/welcome-tour/tour-attrs";
+import { useTourState } from "next-vibe/agent/chat/tour-state";
+import { NO_SKILL_ID } from "next-vibe/agent/skills/constants";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   useWidgetLogger,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
-
-import {
-  type ChatModelId,
-  getChatModelById,
-} from "@/app/api/[locale]/agent/ai-stream/models";
-import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/ai-stream/stream/widget/chat-ui/welcome-tour/tour-attrs";
-import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
-import { NO_SKILL_ID } from "@/app/api/[locale]/agent/skills/constants";
 
 import type { SkillGetResponseOutput } from "../../../../skills/[id]/definition";
 import { useSkill } from "../../../../skills/[id]/hooks";

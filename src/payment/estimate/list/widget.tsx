@@ -18,7 +18,7 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { type JSX } from "react";
 
-import { EstimateStatus } from "@/app/api/[locale]/payment/enum";
+import { EstimateStatus } from "@/payment/enum";
 
 import type definition from "./definition";
 
@@ -58,8 +58,8 @@ export function EstimateListWidget(_props: {
     e.stopPropagation();
     void (async (): Promise<void> => {
       const [createDef, getDef] = await Promise.all([
-        import("@/app/api/[locale]/payment/estimate/create/definition"),
-        import("@/app/api/[locale]/payment/estimate/[estimateId]/get/definition"),
+        import("@/payment/estimate/create/definition"),
+        import("@/payment/estimate/[estimateId]/get/definition"),
       ]);
       navigate(createDef.default.POST, {
         renderInModal: true,
@@ -89,7 +89,7 @@ export function EstimateListWidget(_props: {
       }
       void (async (): Promise<void> => {
         const def =
-          await import("@/app/api/[locale]/payment/estimate/[estimateId]/get/definition");
+          await import("@/payment/estimate/[estimateId]/get/definition");
         navigate(def.default.GET, { urlPathParams: { estimateId } });
       })();
     };

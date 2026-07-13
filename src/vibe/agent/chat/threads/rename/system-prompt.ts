@@ -2,10 +2,9 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
+import type { SystemPromptFragment } from "next-vibe/agent/ai-stream/system-prompt/types";
+import { chatThreads } from "next-vibe/agent/chat/db";
 import { db } from "next-vibe/database";
-
-import type { SystemPromptFragment } from "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
-import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
 
 import { THREAD_RENAME_ALIAS } from "./constants";
 import { getIncognitoRename } from "./incognito-title-cache";

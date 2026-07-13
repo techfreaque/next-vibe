@@ -56,8 +56,7 @@ const { POST } = createEndpoint({
             description: "orderRemoveItem.post.orderId.description",
             schema: z.uuid(),
             listEndpoint: async () =>
-              (await import("@/app/api/[locale]/pos/order/list/definition"))
-                .default.GET,
+              (await import("@/pos/order/list/definition")).default.GET,
             labelField: "id",
           }),
           itemId: requestField(scopedTranslation, {

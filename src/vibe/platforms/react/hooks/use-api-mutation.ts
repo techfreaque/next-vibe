@@ -2,6 +2,7 @@
 
 import type { UseMutationResult } from "@tanstack/react-query";
 import { useMutation } from "@tanstack/react-query";
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import { type CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import type {
@@ -11,8 +12,6 @@ import type {
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { useCallback, useMemo, useState } from "react";
-
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 
 import { executeMutation } from "./mutation-executor";
 import type { ApiMutationOptions } from "./types";

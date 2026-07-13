@@ -76,7 +76,7 @@ vibe olint
 
 # Lint specific file/directory
 vibe olint path/to/file.ts
-vibe olint src/app
+vibe olint src
 
 # Auto-fix issues
 vibe olint --fix=true

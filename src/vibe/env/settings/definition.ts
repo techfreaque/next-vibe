@@ -16,6 +16,7 @@ import {
 import { type EnvKeyMeta } from "next-vibe/env/generator/generator";
 import { scopedTranslation } from "next-vibe/env/settings/i18n";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { SyncScopeSchema } from "next-vibe/remote-connection/db";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import {
   customWidgetObject,
@@ -28,7 +29,6 @@ import { z } from "zod";
 import { ENV_KEYS, type EnvKeyName } from "@/generated/env/keys";
 import { type EnvFieldType } from "@/generated/env/keys";
 
-import { SyncScopeSchema } from "../../../remote-connection/db";
 import { SYSTEM_SETTINGS_ALIAS } from "./constants";
 
 const SystemSettingsWidget = lazyWidget(() =>

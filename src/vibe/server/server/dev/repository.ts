@@ -47,7 +47,7 @@ import { DEV_WATCHER_TASK_NAME } from "next-vibe/tasks/dev-watcher/constants";
 import { UnifiedTaskRunnerRepository } from "next-vibe/tasks/unified-runner/repository";
 import type { Task } from "next-vibe/tasks/unified-runner/types";
 
-import { env } from "@/config/env";
+import { env } from "@/_old/config/env";
 
 import { ServerFramework } from "../enum";
 import {
@@ -602,7 +602,7 @@ export class DevRepository {
     );
     DevRepository.log("");
     DevRepository.log(
-      `  ${formatHint("💡 Edit src/app/api/[locale]/system/server/dev/definition.ts to change defaults")}`,
+      `  ${formatHint("💡 Edit src/vibe/server/dev/definition.ts to change defaults")}`,
     );
     DevRepository.log("");
   }
@@ -671,7 +671,7 @@ export class DevRepository {
   ): Promise<void> {
     try {
       const { RemoteConnectionRepository } =
-        await import("@/app/api/[locale]/remote-connection/repository");
+        await import("next-vibe/remote-connection/repository");
       const { openConnection } = await import("next-vibe/realtime/connector");
       const connections =
         await RemoteConnectionRepository.getAllActiveConnectionsForSync();
@@ -964,7 +964,7 @@ export class DevRepository {
       }
     }
 
-    const { env: serverEnv } = await import("@/config/env");
+    const { env: serverEnv } = await import("@/_old/config/env");
     const disableProxy = serverEnv.VIBE_DISABLE_PROXY;
 
     // Import WS module to get NEXT_PORT_OFFSET

@@ -32,7 +32,7 @@ import { z } from "zod";
 import {
   type ContactTranslationKey,
   scopedTranslation,
-} from "@/app/api/[locale]/contact/i18n";
+} from "@/contact/i18n";
 
 // ============================================================================
 // PROGRESSIVE TYPE TESTS - Isolating where property-level errors break

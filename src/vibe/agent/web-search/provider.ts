@@ -13,7 +13,7 @@ import {
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
+import { FEATURE_COSTS } from "@/products/repository-client";
 
 import type { ToolExecutionContext } from "../chat/config";
 import { getEnvAvailability } from "../env-availability";

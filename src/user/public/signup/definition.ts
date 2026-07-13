@@ -18,8 +18,8 @@ import {
   responseField,
   widgetField,
 } from "next-vibe/unified-ui/_shared/utils";
-import { chatModelSelectionSchema } from "@/app/api/[locale]/agent/ai-stream/models";
-import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
+import { chatModelSelectionSchema } from "next-vibe/agent/ai-stream/models";
+import { voiceModelSelectionSchema } from "next-vibe/agent/text-to-speech/models";
 
 import { scopedTranslation } from "./i18n";
 import { UserRole } from "next-vibe/identity/roles/enum";

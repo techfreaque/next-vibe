@@ -101,11 +101,11 @@ async function ensurePlv8Extension(logger: EndpointLogger): Promise<void> {
 }
 
 /**
- * Recursively scan for db-functions.ts files under src/app/api/.
+ * Recursively scan for db-functions.ts files under src/.
  */
 function discoverDbFunctionFiles(): string[] {
   const projectRoot = process.cwd();
-  const apiDir = join(projectRoot, "src", "app", "api");
+  const apiDir = join(projectRoot, "src");
   const files: string[] = [];
 
   function scan(dir: string): void {

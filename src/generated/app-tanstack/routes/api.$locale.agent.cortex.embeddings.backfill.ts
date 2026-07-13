@@ -8,7 +8,7 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/agent/cortex/embeddings/backfill/route"),
+      () => import("next-vibe/agent/cortex/embeddings/backfill/route"),
     ),
   },
 });

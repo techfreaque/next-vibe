@@ -6,12 +6,12 @@
 import { Link } from "@react-email/components";
 import type { CSSProperties, JSX, ReactNode } from "react";
 
+import { envClient } from "@/_old/config/env-client";
 import {
   ensureFullUrl,
   generateTrackingLinkUrl,
   isTrackingUrl,
-} from "@/app/api/[locale]/leads/tracking/utils";
-import { envClient } from "@/config/env-client";
+} from "@/leads/tracking/utils";
 
 import { type TrackingContext } from "./tracking_context.email";
 

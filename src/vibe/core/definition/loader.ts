@@ -11,7 +11,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { reloadPage } from "next-vibe/ui/lib/location";
 
-import { scopedTranslation } from "@/app/[locale]/shared/i18n";
+import { scopedTranslation } from "@/_pages/shared/i18n";
 import { getEndpoint as globalGetEndpoint } from "@/generated/endpoints/endpoint";
 
 import type { CreateApiEndpointAny } from "./endpoint-base";

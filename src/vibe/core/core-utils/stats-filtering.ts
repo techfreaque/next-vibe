@@ -8,7 +8,7 @@ import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translat
 import { createEnumOptions } from "next-vibe/unified-ui/_shared/enum";
 import { z } from "zod";
 
-import { scopedTranslation } from "@/app/[locale]/shared/i18n";
+import { scopedTranslation } from "@/_pages/shared/i18n";
 
 /**
  * Time Period Enum

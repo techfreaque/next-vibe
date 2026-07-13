@@ -7,7 +7,7 @@ import "server-only";
 
 import { Environment } from "next-vibe/env/env-util";
 
-import { env } from "@/config/env";
+import { env } from "@/_old/config/env";
 
 import { serverSystemEnv } from "./env";
 

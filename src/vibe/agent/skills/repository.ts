@@ -6,6 +6,14 @@
 import "server-only";
 
 import { and, count, eq, inArray, ne, or, sql } from "drizzle-orm";
+import { DEFAULT_CHAT_MODEL_SELECTION } from "next-vibe/agent/ai-stream/constants";
+import type { ChatModelSelection } from "next-vibe/agent/ai-stream/models";
+import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "next-vibe/agent/image-generation/constants";
+import type { ImageGenModelSelection } from "next-vibe/agent/image-generation/models";
+import { DEFAULT_STT_MODEL_SELECTION } from "next-vibe/agent/speech-to-text/constants";
+import type { SttModelSelection } from "next-vibe/agent/speech-to-text/models";
+import { DEFAULT_TTS_MODEL_SELECTION } from "next-vibe/agent/text-to-speech/constants";
+import type { VoiceModelSelection } from "next-vibe/agent/text-to-speech/models";
 import type { Platform } from "next-vibe/core/definition/platform";
 import { isAgentPlatform } from "next-vibe/core/definition/platform";
 import {
@@ -37,16 +45,8 @@ import type { EmitChannelDecision } from "next-vibe/realtime/structured-events";
 import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import type { z } from "zod";
 
-import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
-import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
-import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "@/app/api/[locale]/agent/image-generation/constants";
-import type { ImageGenModelSelection } from "@/app/api/[locale]/agent/image-generation/models";
-import { DEFAULT_STT_MODEL_SELECTION } from "@/app/api/[locale]/agent/speech-to-text/constants";
-import type { SttModelSelection } from "@/app/api/[locale]/agent/speech-to-text/models";
-import { DEFAULT_TTS_MODEL_SELECTION } from "@/app/api/[locale]/agent/text-to-speech/constants";
-import type { VoiceModelSelection } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { leadMagnetConfigs } from "@/app/api/[locale]/lead-magnet/db";
-import { referralCodes } from "@/app/api/[locale]/referral/db";
+import { leadMagnetConfigs } from "@/lead-magnet/db";
+import { referralCodes } from "@/referral/db";
 
 import type { ToolExecutionContext } from "../chat/config";
 import { rootlessStreamContext } from "../chat/config";
@@ -1248,7 +1248,7 @@ export class SkillsRepository {
       if (skill) {
         void (async (): Promise<void> => {
           const { syncVirtualNodeToEmbedding } =
-            await import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual");
+            await import("next-vibe/agent/cortex/embeddings/sync-virtual");
           const embeddingContent = [
             `# ${skill.name}`,
             skill.tagline ? `> ${skill.tagline}` : "",
@@ -1557,7 +1557,7 @@ export class SkillsRepository {
       // Fire-and-forget: sync embedding for vector search
       void (async (): Promise<void> => {
         const { syncVirtualNodeToEmbedding } =
-          await import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual");
+          await import("next-vibe/agent/cortex/embeddings/sync-virtual");
         const embeddingContent = [
           `# ${updated.name}`,
           updated.tagline ? `> ${updated.tagline}` : "",
@@ -1702,7 +1702,7 @@ export class SkillsRepository {
       // Fire-and-forget: remove embedding from cortex_nodes
       void (async (): Promise<void> => {
         const { removeVirtualNode } =
-          await import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual");
+          await import("next-vibe/agent/cortex/embeddings/sync-virtual");
         await removeVirtualNode(userId, `/skills/${deleted.id}.md`);
       })().catch(() => {
         // Best-effort embedding removal

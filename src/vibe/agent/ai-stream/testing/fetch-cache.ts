@@ -53,13 +53,12 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
 
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
-
-import { createEndpointLogger } from "../../../system/logger/server";
-import type { EndpointLogger } from "../../../system/logger/types";
+import { createEndpointLogger } from "../../../logger/server";
+import type { EndpointLogger } from "../../../logger/types";
 
 export const HTTP_CACHE_DIR = join(
   dirname(fileURLToPath(import.meta.url)),
@@ -297,7 +296,7 @@ export function fileStem(
 export async function resolveInstanceName(): Promise<string> {
   try {
     const { RemoteConnectionRepository } =
-      await import("@/app/api/[locale]/remote-connection/repository");
+      await import("next-vibe/remote-connection/repository");
     return slugify(RemoteConnectionRepository.deriveDefaultSelfInstanceId());
   } catch {
     return "atlas";
@@ -328,7 +327,7 @@ async function resolveFixtureRootThreadId(
 ): Promise<string | null> {
   const { db } = await import("next-vibe/database");
   const { fixtures } = await import("./fixtures.db");
-  const { chatThreads } = await import("@/app/api/[locale]/agent/chat/db");
+  const { chatThreads } = await import("next-vibe/agent/chat/db");
   const { eq } = await import("drizzle-orm");
   let current: string | null = threadId;
   const seen = new Set<string>();

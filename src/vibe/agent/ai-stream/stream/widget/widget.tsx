@@ -8,6 +8,22 @@
 
 "use client";
 
+import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import {
+  NEW_MESSAGE_ID,
+  ThreadStreamingState,
+} from "next-vibe/agent/chat/enum";
+import { useChatBootContext } from "next-vibe/agent/chat/hooks/context";
+import { useChatNavigationStore } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
+import publicFeedDefinition from "next-vibe/agent/chat/public-feed/definition";
+import messagesDefinition from "next-vibe/agent/chat/threads/[threadId]/messages/definition";
+import { useDeleteDialogStore } from "next-vibe/agent/chat/threads/[threadId]/messages/hooks/use-delete-dialog-store";
+import { scopedTranslation } from "next-vibe/agent/chat/threads/widget/i18n";
+import { ChatEmptyState } from "next-vibe/agent/chat/threads/widget/new-thread/empty-state";
+import { CortexModal } from "next-vibe/agent/cortex/widget/cortex-modal";
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
+import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
+import { AIToolsModal } from "next-vibe/agent/tools/widget/ai-tools-modal";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import type { UseEndpointOptions } from "next-vibe/platforms/react/hooks/endpoint-types";
@@ -38,24 +54,8 @@ import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPag
 import type { JSX } from "react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-import { InputHeightProvider } from "@/app/[locale]/chat/lib/config/constants";
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import {
-  NEW_MESSAGE_ID,
-  ThreadStreamingState,
-} from "@/app/api/[locale]/agent/chat/enum";
-import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
-import publicFeedDefinition from "@/app/api/[locale]/agent/chat/public-feed/definition";
-import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
-import { useDeleteDialogStore } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/use-delete-dialog-store";
-import { scopedTranslation } from "@/app/api/[locale]/agent/chat/threads/widget/i18n";
-import { ChatEmptyState } from "@/app/api/[locale]/agent/chat/threads/widget/new-thread/empty-state";
-import { CortexModal } from "@/app/api/[locale]/agent/cortex/widget/cortex-modal";
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
-import { AIToolsModal } from "@/app/api/[locale]/agent/tools/widget/ai-tools-modal";
-import { platform } from "@/config/env-client";
+import { platform } from "@/_old/config/env-client";
+import { InputHeightProvider } from "@/_pages/chat/lib/config/constants";
 
 import type definition from "../definition";
 import type { AiStreamPostResponseOutput } from "../definition";

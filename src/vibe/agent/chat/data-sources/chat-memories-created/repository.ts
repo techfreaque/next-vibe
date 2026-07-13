@@ -7,6 +7,9 @@
 import "server-only";
 
 import { and, count, gte, lte, sql } from "drizzle-orm";
+import { cortexNodes } from "next-vibe/agent/cortex/db";
+import { CortexNodeType } from "next-vibe/agent/cortex/enum";
+import { MEMORIES_PREFIX } from "next-vibe/agent/cortex/repository";
 import {
   type ResponseType,
   success,
@@ -19,10 +22,6 @@ import type {
 } from "next-vibe/dataflow/shared/fields";
 import { resolutionBucketExpr } from "next-vibe/dataflow/shared/query-utils";
 import { fillGaps } from "next-vibe/dataflow/shared/range";
-
-import { cortexNodes } from "@/app/api/[locale]/agent/cortex/db";
-import { CortexNodeType } from "@/app/api/[locale]/agent/cortex/enum";
-import { MEMORIES_PREFIX } from "@/app/api/[locale]/agent/cortex/repository";
 
 export class QueryChatMemoriesCreatedRepository {
   static async queryChatMemoriesCreated(data: {

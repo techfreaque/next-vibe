@@ -26,9 +26,9 @@ import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { chatFolders } from "@/app/api/[locale]/agent/chat/db";
-import { env } from "@/config/env";
+import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import { chatFolders } from "next-vibe/agent/chat/db";
+import { env } from "@/_old/config/env";
 
 import {
   ATLAS_INSTANCE_ID,
@@ -161,7 +161,7 @@ if (_remoteUrl) {
       // gets its loop location STAMPED ONCE at creation (loop_instance_id);
       // routing then resolves purely from that explicit value.
       const { ThreadsRepository } =
-        await import("@/app/api/[locale]/agent/chat/threads/repository");
+        await import("next-vibe/agent/chat/threads/repository");
       const stampedLoop = await ThreadsRepository.deriveLoopInstanceFromFolder(
         folder.id,
       );
@@ -171,7 +171,7 @@ if (_remoteUrl) {
       ).toBe(HERMES_INSTANCE_ID);
 
       const { ExecuteToolRouting } = await import(
-        "@/app/api/[locale]/remote-connection/routing"
+        "next-vibe/remote-connection/routing"
       );
       const { createEndpointLogger } = await import("next-vibe/logger/server");
       const target = await ExecuteToolRouting.resolveTarget({

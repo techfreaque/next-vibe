@@ -11,7 +11,7 @@ import { db } from "next-vibe/database";
 import { formatDatabase } from "next-vibe/logger/formatters";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { companies, companyMembers } from "@/app/api/[locale]/companies/db";
+import { companies, companyMembers } from "@/companies/db";
 
 import { accountNodes, coaTemplateNodes, coaTemplates } from "./db";
 import { AccountSubtype, AccountType } from "./enum";

@@ -21,8 +21,8 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { useCallback, useMemo } from "react";
 
-import { buildWsChannel } from "../../../../system/realtime/channel";
-import { preWarmChannel } from "../../../../system/realtime/client";
+import { buildWsChannel } from "../../../../realtime/channel";
+import { preWarmChannel } from "../../../../realtime/client";
 import { DefaultFolderId } from "../../../chat/config";
 import messagesDefinitions from "../../../chat/threads/[threadId]/messages/definition";
 import { addErrorMessageToChat } from "../../../chat/threads/[threadId]/messages/hooks/update-messages";

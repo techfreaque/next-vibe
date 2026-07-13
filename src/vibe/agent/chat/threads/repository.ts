@@ -177,7 +177,7 @@ export class ThreadsRepository {
     // 'target' (default) stamps the connected instance.
     if (userId) {
       const { remoteConnections } =
-        await import("@/app/api/[locale]/remote-connection/db");
+        await import("next-vibe/remote-connection/db");
       const [conn] = await db
         .select({ loopLocation: remoteConnections.loopLocation })
         .from(remoteConnections)
@@ -1085,7 +1085,7 @@ export class ThreadsRepository {
     }
     if (mirrorFolderId === null && originInstanceId) {
       const { resolveScaffoldFolderId } =
-        await import("@/app/api/[locale]/agent/chat/threads/sync-provider");
+        await import("next-vibe/agent/chat/threads/sync-provider");
       const senderRootFolderId =
         requestData.rootFolderId ?? DefaultFolderId.PRIVATE;
       mirrorFolderId = await resolveScaffoldFolderId(
@@ -1127,7 +1127,7 @@ export class ThreadsRepository {
     // Surface the mirror in open sidebars (REMOTE root) — local WS
     // subscribers insert it into the folder-contents list cache.
     const { createFolderContentsEmitter } =
-      await import("@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/emitter");
+      await import("next-vibe/agent/chat/folder-contents/[rootFolderId]/emitter");
     const now = new Date();
     createFolderContentsEmitter(
       logger,

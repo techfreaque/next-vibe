@@ -686,14 +686,14 @@ export const translations: typeof enTranslations = {
       paths: {
         label: "Zielpfade",
         description:
-          "Dateipfade oder Verzeichnisse zum Prüfen (String oder Array). EMPFOHLEN: Geben Sie Pfade für den Bereich an, an dem Sie arbeiten (schnell, fokussiert). Leer lassen um ALLE Dateien zu prüfen (langsam, nur für umfassende Audits verwenden). Beispiele: 'src/app/feature' oder ['src/feature/file.tsx', 'src/feature/other.tsx']. Hinweis: Glob-Muster (z.B. '**/*.test.ts') werden noch nicht unterstützt.",
-        placeholder: "z.B. src/app oder src/components/Button.tsx",
+          "Dateipfade oder Verzeichnisse zum Prüfen (String oder Array). EMPFOHLEN: Geben Sie Pfade für den Bereich an, an dem Sie arbeiten (schnell, fokussiert). Leer lassen um ALLE Dateien zu prüfen (langsam, nur für umfassende Audits verwenden). Beispiele: 'src/feature' oder ['src/feature/file.tsx', 'src/feature/other.tsx']. Hinweis: Glob-Muster (z.B. '**/*.test.ts') werden noch nicht unterstützt.",
+        placeholder: "z.B. src oder src/components/Button.tsx",
         options: {
           src: "Quellverzeichnis (src/)",
           components: "Komponenten (src/components)",
           utils: "Utilities (src/utils)",
           pages: "Seiten (src/pages)",
-          app: "App-Verzeichnis (src/app)",
+          app: "App-Verzeichnis (src)",
         },
       },
       limit: {

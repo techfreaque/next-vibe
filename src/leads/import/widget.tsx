@@ -148,8 +148,7 @@ export function LeadsImportContainer({
 
   const handleCheckJobStatus = (jobId: string): void => {
     void (async (): Promise<void> => {
-      const jobDef =
-        await import("@/app/api/[locale]/leads/import/jobs/[jobId]/definition");
+      const jobDef = await import("@/leads/import/jobs/[jobId]/definition");
       navigate(jobDef.default.GET, { urlPathParams: { jobId } });
     })();
   };
@@ -157,7 +156,7 @@ export function LeadsImportContainer({
   const handleStopJob = (jobId: string): void => {
     void (async (): Promise<void> => {
       const stopDef =
-        await import("@/app/api/[locale]/leads/import/jobs/[jobId]/stop/definition");
+        await import("@/leads/import/jobs/[jobId]/stop/definition");
       navigate(stopDef.default.POST, { urlPathParams: { jobId } });
     })();
   };
@@ -165,21 +164,21 @@ export function LeadsImportContainer({
   const handleRetryFailed = (jobId: string): void => {
     void (async (): Promise<void> => {
       const retryDef =
-        await import("@/app/api/[locale]/leads/import/jobs/[jobId]/retry/definition");
+        await import("@/leads/import/jobs/[jobId]/retry/definition");
       navigate(retryDef.default.POST, { urlPathParams: { jobId } });
     })();
   };
 
   const handleViewList = (): void => {
     void (async (): Promise<void> => {
-      const listDef = await import("@/app/api/[locale]/leads/list/definition");
+      const listDef = await import("@/leads/list/definition");
       navigate(listDef.default.GET);
     })();
   };
 
   const handleFindLead = (): void => {
     void (async (): Promise<void> => {
-      const listDef = await import("@/app/api/[locale]/leads/list/definition");
+      const listDef = await import("@/leads/list/definition");
       navigate(listDef.default.GET);
     })();
   };

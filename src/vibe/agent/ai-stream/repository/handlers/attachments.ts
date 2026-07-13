@@ -15,7 +15,7 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { db } from "../../../../system/database";
+import { db } from "../../../../database";
 import { chatMessages } from "../../../chat/db";
 import type { AiStreamT } from "../../stream/i18n";
 import type { MessageDbWriter } from "../core/message-db-writer";

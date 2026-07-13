@@ -4,8 +4,6 @@
  * deploy server (install-docker.sh) only pulls it instead of building it.
  */
 
-import { z } from "zod";
-
 import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   EndpointErrorTypes,
@@ -14,14 +12,15 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { scopedTranslation } from "next-vibe/server/server/image-push/i18n";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import {
   customWidgetObject,
   requestField,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils";
+import { z } from "zod";
 
-import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
-import { scopedTranslation } from "next-vibe/server/server/image-push/i18n";
 import { IMAGE_PUSH_ALIAS } from "./constants";
 
 const ImagePushResultWidget = lazyWidget(() =>

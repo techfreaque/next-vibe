@@ -6,7 +6,7 @@ import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 export const Route = createFileRoute("/api/$locale/ssh/connections/create")({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/ssh/connections/create/route"),
+      () => import("@/ssh/connections/create/route"),
     ),
   },
 });

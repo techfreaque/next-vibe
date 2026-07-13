@@ -10,7 +10,7 @@ import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPag
 import type { JSX } from "react";
 import { useMemo } from "react";
 
-import subscriptionCreateDefinition from "@/app/api/[locale]/subscription/create/definition";
+import subscriptionCreateDefinition from "@/subscription/create/definition";
 
 interface Props {
   locale: CountryLanguage;

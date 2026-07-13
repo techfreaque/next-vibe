@@ -21,7 +21,7 @@ import { createCliWidgetPlugin } from "./cli-widget-plugin-factory";
 
 plugin(
   createCliWidgetPlugin(
-    // import.meta.dir = src/app/api/[locale]/system/unified-interface/cli
+    // import.meta.dir = src/vibe/unified-interface/cli
     // 6 levels up → src/   (packages/next-vibe-ui lives under src/)
     // Use resolve(import.meta.dir) instead of URL.pathname — on Windows,
     // URL.pathname returns /C:/... which path.resolve doubles to C:\C:\...

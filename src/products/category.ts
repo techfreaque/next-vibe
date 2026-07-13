@@ -6,8 +6,8 @@
 import type { CategoryDefinition } from "next-vibe/help-tool/category-types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
-import { PRODUCTS_CATALOG_LIST_ALIAS } from "@/app/api/[locale]/products/catalog/list/constants";
-import { USER_ME_ALIAS } from "@/app/api/[locale]/user/private/me/constants";
+import { PRODUCTS_CATALOG_LIST_ALIAS } from "@/products/catalog/list/constants";
+import { USER_ME_ALIAS } from "@/user/private/me/constants";
 
 export const category: CategoryDefinition = {
   key: "products",

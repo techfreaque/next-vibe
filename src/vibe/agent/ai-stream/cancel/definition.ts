@@ -92,8 +92,7 @@ const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         listEndpoint: async () =>
-          (await import("@/app/api/[locale]/agent/chat/threads/definition"))
-            .default.GET,
+          (await import("next-vibe/agent/chat/threads/definition")).default.GET,
         labelField: "title",
         label: "post.threadId.label",
         description: "post.threadId.description",

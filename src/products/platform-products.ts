@@ -11,8 +11,8 @@ import type {
 import { getCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import type { JSX } from "react";
 
-import type { SubscriptionPlanValue } from "@/app/api/[locale]/subscription/enum";
-import { SubscriptionPlan } from "@/app/api/[locale]/subscription/enum";
+import type { SubscriptionPlanValue } from "@/subscription/enum";
+import { SubscriptionPlan } from "@/subscription/enum";
 
 import type { PaymentInterval } from "../payment/providers/types";
 import type { ProductsTranslationKey } from "./i18n";

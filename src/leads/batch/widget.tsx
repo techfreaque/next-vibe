@@ -83,8 +83,7 @@ export function LeadsBatchUpdateContainer({
         return;
       }
       void (async (): Promise<void> => {
-        const leadDef =
-          await import("@/app/api/[locale]/leads/[id]/definition");
+        const leadDef = await import("@/leads/[id]/definition");
         navigate(leadDef.default.GET, { urlPathParams: { id: lead.id! } });
       })();
     },
@@ -93,7 +92,7 @@ export function LeadsBatchUpdateContainer({
 
   const handleViewAllAffected = useCallback((): void => {
     void (async (): Promise<void> => {
-      const listDef = await import("@/app/api/[locale]/leads/list/definition");
+      const listDef = await import("@/leads/list/definition");
       navigate(listDef.default.GET);
     })();
   }, [navigate]);
@@ -410,8 +409,7 @@ export function LeadsBatchDeleteContainer({
         return;
       }
       void (async (): Promise<void> => {
-        const leadDef =
-          await import("@/app/api/[locale]/leads/[id]/definition");
+        const leadDef = await import("@/leads/[id]/definition");
         navigate(leadDef.default.GET, { urlPathParams: { id: lead.id! } });
       })();
     },
@@ -420,7 +418,7 @@ export function LeadsBatchDeleteContainer({
 
   const handleViewRemainingLeads = useCallback((): void => {
     void (async (): Promise<void> => {
-      const listDef = await import("@/app/api/[locale]/leads/list/definition");
+      const listDef = await import("@/leads/list/definition");
       navigate(listDef.default.GET);
     })();
   }, [navigate]);

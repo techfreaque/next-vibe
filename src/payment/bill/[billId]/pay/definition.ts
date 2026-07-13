@@ -50,8 +50,7 @@ const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         listEndpoint: async () =>
-          (await import("@/app/api/[locale]/payment/bill/list/definition"))
-            .default.GET,
+          (await import("@/payment/bill/list/definition")).default.GET,
         labelField: "billNumber",
         label: "post.billId.label" as const,
         description: "post.billId.description" as const,
@@ -68,9 +67,8 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.string().uuid().optional(),
         listEndpoint: async () =>
-          (
-            await import("@/app/api/[locale]/chart-of-accounts/account/list/definition")
-          ).default.GET,
+          (await import("@/chart-of-accounts/account/list/definition")).default
+            .GET,
         labelField: "name",
       }),
 

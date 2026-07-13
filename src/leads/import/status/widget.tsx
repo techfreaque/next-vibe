@@ -280,8 +280,7 @@ export function ImportStatusContainer({
 
   const handleViewJob = (jobId: string): void => {
     void (async (): Promise<void> => {
-      const jobDef =
-        await import("@/app/api/[locale]/leads/import/jobs/[jobId]/definition");
+      const jobDef = await import("@/leads/import/jobs/[jobId]/definition");
       navigate(jobDef.default.GET, { urlPathParams: { jobId } });
     })();
   };

@@ -206,8 +206,8 @@ class PromptFragmentsGenerator {
 
   /**
    * Convert an absolute filesystem path to an @/ import path.
-   * e.g. /home/.../src/app/api/[locale]/agent/chat/memories/system-prompt/prompt.ts
-   *   → @/app/api/[locale]/agent/chat/memories/system-prompt/prompt
+   * e.g. /home/.../src/vibe/agent/chat/memories/system-prompt/prompt.ts
+   *   → next-vibe/agent/chat/memories/system-prompt/prompt
    */
   private static toAbsoluteImportPath(absPath: string): string {
     const srcIndex = absPath.indexOf("/src/");
@@ -263,7 +263,7 @@ class PromptFragmentsGenerator {
 
     return `${header}
 
-import type { PromptFragmentModule } from "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
+import type { PromptFragmentModule } from "next-vibe/agent/ai-stream/system-prompt/types";
 
 /**
  * All registered prompt fragment IDs.
@@ -370,9 +370,8 @@ ${allPromptCases.join("\n")}
     }
 
     // Build a unified sorted import list
-    const typesPath = "@/app/api/[locale]/agent/ai-stream/system-prompt/types";
-    const remoteImportPath =
-      "@/app/api/[locale]/remote-connection/system-prompt";
+    const typesPath = "next-vibe/agent/ai-stream/system-prompt/types";
+    const remoteImportPath = "next-vibe/remote-connection/system-prompt";
     const allImports: Array<{ path: string; line: string }> = [];
     allImports.push({
       path: typesPath,
@@ -443,10 +442,10 @@ import { cronTasks as cronTasksTable } from "next-vibe/tasks/cron/db";
 
 ${allImports.map((i) => i.line).join("\n")}
 
-import { cortexNodes } from "@/app/api/[locale]/agent/cortex/db";
-import { CortexNodeType } from "@/app/api/[locale]/agent/cortex/enum";
-import { MEMORIES_PREFIX } from "@/app/api/[locale]/agent/cortex/repository";
-import { scopedTranslation as chatScopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
+import { cortexNodes } from "next-vibe/agent/cortex/db";
+import { CortexNodeType } from "next-vibe/agent/cortex/enum";
+import { MEMORIES_PREFIX } from "next-vibe/agent/cortex/repository";
+import { scopedTranslation as chatScopedTranslation } from "next-vibe/agent/chat/i18n";
 
 /**
  * Combined server loader - pre-fetches shared data, then runs all fragment

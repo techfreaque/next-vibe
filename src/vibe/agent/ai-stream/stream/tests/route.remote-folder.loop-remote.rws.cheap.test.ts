@@ -15,7 +15,7 @@
 
 import "server-only";
 
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { DefaultFolderId } from "next-vibe/agent/chat/config";
 
 import {
   failSuitePrerequisites,

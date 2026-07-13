@@ -66,16 +66,14 @@ const { PATCH } = createEndpoint({
         hidden: true,
         schema: z.uuid(),
         listEndpoint: async () =>
-          (await import("@/app/api/[locale]/purchasing/order/list/definition"))
-            .default.GET,
+          (await import("@/purchasing/order/list/definition")).default.GET,
         labelField: "poNumber",
       }),
       vendorId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         listEndpoint: async () =>
-          (await import("@/app/api/[locale]/purchasing/vendor/list/definition"))
-            .default.GET,
+          (await import("@/purchasing/vendor/list/definition")).default.GET,
         labelField: "name",
         label: "orderUpdate.patch.vendorId.label" as const,
         description: "orderUpdate.patch.vendorId.description" as const,

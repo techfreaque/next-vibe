@@ -78,7 +78,7 @@ export class BuildRepository {
         try {
           const generateResult = await GenerateAllRepository.generateAll(
             {
-              outputDir: "src/app/api/[locale]/v1",
+              outputDir: "src/generated",
               verbose: false,
               skipEndpoints: !data.generateEndpoints,
               skipSeeds: !data.generateSeeds,

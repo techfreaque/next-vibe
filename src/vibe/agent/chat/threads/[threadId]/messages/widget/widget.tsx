@@ -8,6 +8,11 @@
 
 "use client";
 
+import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import type { ChatMessage } from "next-vibe/agent/chat/db";
+import { ChatBootContext } from "next-vibe/agent/chat/hooks/context";
+import { useChatNavigationStore } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import { Div } from "next-vibe/ui/ui/div";
 import {
   useWidgetLocale,
@@ -23,17 +28,9 @@ import React, {
   useState,
 } from "react";
 
-import {
-  LAYOUT,
-  useInputHeight,
-} from "@/app/[locale]/chat/lib/config/constants";
-import { buildMessagePath } from "@/app/[locale]/chat/lib/utils/thread-builder";
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import { ChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import { platform } from "@/config/env-client";
+import { platform } from "@/_old/config/env-client";
+import { LAYOUT, useInputHeight } from "@/_pages/chat/lib/config/constants";
+import { buildMessagePath } from "@/_pages/chat/lib/utils/thread-builder";
 
 import type definition from "../definition";
 import messagesDefinition from "../definition";

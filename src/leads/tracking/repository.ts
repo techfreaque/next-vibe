@@ -37,8 +37,8 @@ import { LeadsRepository } from "next-vibe/identity/lead/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { NextRequest } from "next-vibe/ui/lib/request";
 
-import { emails } from "@/app/api/[locale]/messenger/messages/db";
-import { ReferralRepository } from "@/app/api/[locale]/referral/repository";
+import { emails } from "@/messenger/messages/db";
+import { ReferralRepository } from "@/referral/repository";
 
 import type {
   ClickTrackingRequestOutput,

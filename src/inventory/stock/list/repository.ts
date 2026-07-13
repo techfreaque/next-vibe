@@ -15,10 +15,10 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { companyMembers } from "@/app/api/[locale]/companies/db";
-import { CompanyMemberRole } from "@/app/api/[locale]/companies/enum";
-import { CompanyAuthRepository } from "@/app/api/[locale]/companies/repository";
-import { catalogProducts } from "@/app/api/[locale]/products/db";
+import { companyMembers } from "@/companies/db";
+import { CompanyMemberRole } from "@/companies/enum";
+import { CompanyAuthRepository } from "@/companies/repository";
+import { catalogProducts } from "@/products/db";
 
 import { stockLevels, warehouses } from "../../db";
 import { scopedTranslation } from "../../i18n";

@@ -113,7 +113,7 @@ When writing `widget.tsx` components that render on native:
 import {
   isNative,
   platformSelect,
-} from "@/app/api/[locale]/system/unified-interface/react-native/platform-helpers";
+} from "@/system/unified-interface/react-native/platform-helpers";
 
 const fontSize = platformSelect({ native: 16, web: 14 });
 ```

@@ -4,6 +4,42 @@
  * Chat Input Component
  * Main input area for sending messages with voice support
  */
+import {
+  DEFAULT_AUDIO_VISION_MODEL_SELECTION,
+  DEFAULT_IMAGE_VISION_MODEL_SELECTION,
+  DEFAULT_VIDEO_VISION_MODEL_SELECTION,
+} from "next-vibe/agent/ai-stream/constants";
+import { getChatModelById } from "next-vibe/agent/ai-stream/models";
+import {
+  ImageQuality,
+  ImageSize,
+  MusicDuration,
+  useChatInputStore,
+} from "next-vibe/agent/ai-stream/stream/hooks/input-store";
+import { useAIStreamStore } from "next-vibe/agent/ai-stream/stream/hooks/store";
+import { useAIStream } from "next-vibe/agent/ai-stream/stream/hooks/use-ai-stream";
+import { TOUR_DATA_ATTRS } from "next-vibe/agent/ai-stream/stream/widget/chat-ui/welcome-tour/tour-attrs";
+import {
+  getBestAudioVisionModel,
+  getBestImageVisionModel,
+  getBestVideoVisionModel,
+} from "next-vibe/agent/ai-stream/vision-models";
+import { AGENT_MESSAGE_LENGTH } from "next-vibe/agent/chat/constants";
+import { NEW_MESSAGE_ID } from "next-vibe/agent/chat/enum";
+import { useChatBootContext } from "next-vibe/agent/chat/hooks/context";
+import { useChatStore } from "next-vibe/agent/chat/hooks/store";
+import { useChatNavigationStore } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
+import { useChatSettings } from "next-vibe/agent/chat/settings/hooks";
+import { ChatSettingsRepositoryClient } from "next-vibe/agent/chat/settings/repository-client";
+import messagesDefinition from "next-vibe/agent/chat/threads/[threadId]/messages/definition";
+import {
+  type MessageOperationsDeps,
+  useMessageOperations,
+} from "next-vibe/agent/chat/threads/[threadId]/messages/hooks/use-operations";
+import { CortexButton } from "next-vibe/agent/cortex/widget/cortex-button";
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
+import type { FavoriteConfig } from "next-vibe/agent/skills/favorites/db";
+import { ChatFavoritesRepositoryClient } from "next-vibe/agent/skills/favorites/repository-client";
 import { cn } from "next-vibe/core/utils/utils";
 import { apiClient } from "next-vibe/platforms/react/hooks/store";
 import { useApiMutation } from "next-vibe/platforms/react/hooks/use-api-mutation";
@@ -42,43 +78,6 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-
-import {
-  DEFAULT_AUDIO_VISION_MODEL_SELECTION,
-  DEFAULT_IMAGE_VISION_MODEL_SELECTION,
-  DEFAULT_VIDEO_VISION_MODEL_SELECTION,
-} from "@/app/api/[locale]/agent/ai-stream/constants";
-import { getChatModelById } from "@/app/api/[locale]/agent/ai-stream/models";
-import {
-  ImageQuality,
-  ImageSize,
-  MusicDuration,
-  useChatInputStore,
-} from "@/app/api/[locale]/agent/ai-stream/stream/hooks/input-store";
-import { useAIStreamStore } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/store";
-import { useAIStream } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/use-ai-stream";
-import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/ai-stream/stream/widget/chat-ui/welcome-tour/tour-attrs";
-import {
-  getBestAudioVisionModel,
-  getBestImageVisionModel,
-  getBestVideoVisionModel,
-} from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import { AGENT_MESSAGE_LENGTH } from "@/app/api/[locale]/agent/chat/constants";
-import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
-import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { useChatStore } from "@/app/api/[locale]/agent/chat/hooks/store";
-import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
-import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
-import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
-import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
-import {
-  type MessageOperationsDeps,
-  useMessageOperations,
-} from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/use-operations";
-import { CortexButton } from "@/app/api/[locale]/agent/cortex/widget/cortex-button";
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import type { FavoriteConfig } from "@/app/api/[locale]/agent/skills/favorites/db";
-import { ChatFavoritesRepositoryClient } from "@/app/api/[locale]/agent/skills/favorites/repository-client";
 
 import { CallModeIndicator } from "../hooks/call-mode-indicator";
 import { FileUploadButton } from "../hooks/file-upload-button";

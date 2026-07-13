@@ -1,5 +1,7 @@
 import "server-only";
 
+import { agentEnv } from "next-vibe/agent/env";
+import { scopedTranslation } from "next-vibe/agent/image-generation/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -9,9 +11,6 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { agentEnv } from "@/app/api/[locale]/agent/env";
-import { scopedTranslation } from "@/app/api/[locale]/agent/image-generation/i18n";
 
 interface OpenAIImageResponse {
   data?: Array<{ url?: string; b64_json?: string }>;

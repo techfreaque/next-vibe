@@ -6,14 +6,13 @@
 
 "use client";
 
+import favoriteDefinitions from "next-vibe/agent/skills/favorites/[id]/definition";
 import {
   useWidgetLocale,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import { useMemo } from "react";
-
-import favoriteDefinitions from "@/app/api/[locale]/agent/skills/favorites/[id]/definition";
 
 interface FavoriteDetailWidgetProps {
   path: string;

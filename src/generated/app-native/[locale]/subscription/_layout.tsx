@@ -1,4 +1,4 @@
-import { createLayoutWrapperWithImport } from "@/app/api/[locale]/system/platforms/react-native/nextjs-compat-wrapper";
+import { createLayoutWrapperWithImport } from "next-vibe/platforms/react-native/nextjs-compat-wrapper";
 export default createLayoutWrapperWithImport(
   () => import("@/app/[locale]/subscription/layout"),
 );

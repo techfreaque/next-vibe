@@ -33,7 +33,7 @@ NOWPayments is a crypto payment gateway that supports Bitcoin, Ethereum, and 150
 ### File Structure
 
 ```
-src/app/api/[locale]/payment/providers/nowpayments/
+src/payment/providers/nowpayments/
 ├── repository.ts           # Main provider implementation
 ├── webhook/
 │   └── route.ts           # Webhook endpoint handler
@@ -101,7 +101,7 @@ Development: http://localhost:3000/api/en-GLOBAL/payment/providers/nowpayments/w
 ### Creating a One-Time Payment
 
 ```typescript
-import { getPaymentProvider } from "@/app/api/[locale]/payment/providers";
+import { getPaymentProvider } from "@/payment/providers";
 
 // Get NOWPayments provider
 const provider = getPaymentProvider("nowpayments");

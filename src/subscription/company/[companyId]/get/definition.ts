@@ -20,8 +20,8 @@ import {
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
 
-import { PaymentProviderDB } from "@/app/api/[locale]/payment/enum";
-import { PaymentProvider } from "@/app/api/[locale]/payment/enum";
+import { PaymentProviderDB } from "@/payment/enum";
+import { PaymentProvider } from "@/payment/enum";
 
 import {
   BillingInterval,
@@ -53,8 +53,7 @@ const { GET } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         listEndpoint: async () =>
-          (await import("@/app/api/[locale]/companies/list/definition")).default
-            .GET,
+          (await import("@/companies/list/definition")).default.GET,
         labelField: "name",
         label: "get.companyId.label",
         description: "get.companyId.description",

@@ -24,7 +24,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
 
-import { envClient } from "@/config/env-client";
+import { envClient } from "@/_old/config/env-client";
 
 import { VIBE_CHECK_ALIAS, VIBE_CHECK_ALIAS_SHORT } from "./constants";
 
@@ -94,7 +94,7 @@ const { POST } = createEndpoint({
           { value: "src/components", label: "fields.paths.options.components" },
           { value: "src/utils", label: "fields.paths.options.utils" },
           { value: "src/pages", label: "fields.paths.options.pages" },
-          { value: "src/app", label: "fields.paths.options.app" },
+          { value: "src", label: "fields.paths.options.app" },
         ],
         schema: z.union([z.string(), z.array(z.string())]).optional(),
       }),

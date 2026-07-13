@@ -18,8 +18,8 @@ import { db } from "next-vibe/database";
 import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { CreditsT } from "@/app/api/[locale]/credits/i18n";
-import { CreditRepository } from "@/app/api/[locale]/credits/repository";
+import type { CreditsT } from "@/credits/i18n";
+import { CreditRepository } from "@/credits/repository";
 
 import type {
   CodesListGetResponseOutput,

@@ -12,12 +12,11 @@ import "server-only";
 import { createHash } from "node:crypto";
 
 import { tool } from "ai";
+import { getStorageAdapter } from "next-vibe/agent/chat/storage/index";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import TurndownService from "turndown";
 import { z } from "zod";
-
-import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage/index";
 
 import { agentEnv } from "../env";
 import type { FetchUrlContentGetResponseOutput } from "./definition";

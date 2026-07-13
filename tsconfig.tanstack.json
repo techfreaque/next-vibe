@@ -3,15 +3,10 @@
   "compilerOptions": {
     "paths": {
       "@/*": ["./src/*"],
-      "next-vibe/*": ["./src/app/api/[locale]/system/*"],
-      "next-vibe-ui/*": [
-        "./src/app/api/[locale]/system/ui/tanstack/*",
-        "./src/app/api/[locale]/system/ui/web/*"
-      ],
-      "server-only": [
-        "./src/app/api/[locale]/system/ui/tanstack/lib/server-only.ts"
-      ]
+      "next-vibe/*": ["./src/vibe/*"],
+      "next-vibe-ui/*": ["./src/vibe/ui/tanstack/*", "./src/vibe/ui/web/*"],
+      "server-only": ["./src/vibe/ui/tanstack/lib/server-only.ts"]
     }
   },
-  "include": ["src/generated/app-tanstack/**/*", "src/app/**/*"]
+  "include": ["src/generated/app-tanstack/**/*", "src/_pages/**/*"]
 }

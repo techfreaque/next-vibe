@@ -26,7 +26,7 @@ import { EntityPickerFieldWidget } from "next-vibe/unified-ui/form-fields/entity
 import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import { type JSX, useState } from "react";
 
-import { BillStatus } from "@/app/api/[locale]/payment/enum";
+import { BillStatus } from "@/payment/enum";
 
 import type definition from "./definition";
 
@@ -106,8 +106,7 @@ export function BillGetWidget({
   const handleConfirmApprove = (): void => {
     setPendingApprove(false);
     void (async (): Promise<void> => {
-      const def =
-        await import("@/app/api/[locale]/payment/bill/[billId]/approve/definition");
+      const def = await import("@/payment/bill/[billId]/approve/definition");
       navigate(def.default.POST, {
         urlPathParams: { billId: data.id },
         popNavigationOnSuccess: 1,
@@ -118,8 +117,7 @@ export function BillGetWidget({
   const handlePayBill = (e: ButtonMouseEvent): void => {
     e.stopPropagation();
     void (async (): Promise<void> => {
-      const def =
-        await import("@/app/api/[locale]/payment/bill/[billId]/pay/definition");
+      const def = await import("@/payment/bill/[billId]/pay/definition");
       navigate(def.default.POST, {
         urlPathParams: { billId: data.id },
         popNavigationOnSuccess: 1,
@@ -130,8 +128,7 @@ export function BillGetWidget({
   const handleAddLine = (e: ButtonMouseEvent): void => {
     e.stopPropagation();
     void (async (): Promise<void> => {
-      const def =
-        await import("@/app/api/[locale]/payment/bill/line/add/definition");
+      const def = await import("@/payment/bill/line/add/definition");
       navigate(def.default.POST, {
         renderInModal: true,
         data: { billId: data.id },
@@ -147,7 +144,7 @@ export function BillGetWidget({
     }
     void (async (): Promise<void> => {
       const def =
-        await import("@/app/api/[locale]/chart-of-accounts/journal/[entryId]/get/definition");
+        await import("@/chart-of-accounts/journal/[entryId]/get/definition");
       navigate(def.default.GET, { urlPathParams: { entryId } });
     })();
   };

@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { create } from "zustand";
 
-import { platform } from "@/config/env-client";
+import { platform } from "@/_old/config/env-client";
 
 interface TouchDeviceStore {
   isTouch: boolean;

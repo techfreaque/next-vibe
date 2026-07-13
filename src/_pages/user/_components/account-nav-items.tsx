@@ -4,7 +4,7 @@ import { ShoppingCart } from "next-vibe/ui/ui/icons/ShoppingCart";
 import { Sparkles } from "next-vibe/ui/ui/icons/Sparkles";
 import { TrendingUp } from "next-vibe/ui/ui/icons/TrendingUp";
 
-import type { NavItemType } from "@/app/[locale]/story/_components/nav/nav-constants";
+import type { NavItemType } from "@/_pages/story/_components/nav/nav-constants";
 
 export const accountNavItems: NavItemType[] = [
   {

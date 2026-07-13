@@ -59,20 +59,20 @@ const nextConfig: NextConfig = {
   turbopack: {
     resolveAlias: {
       "react-native": "react-native-web",
-      // system IS vibe: next-vibe/<area> → src/app/api/[locale]/system/<area>.
-      // Every real next-vibe/* import now lives under system/ (shared moved there too),
+      // system IS vibe: next-vibe/<area> → src/vibe/<area>.
+      // Every real next-vibe/* import now lives under src/vibe/ (shared moved there too),
       // so a single prefix alias resolves them all for the Next/Turbopack prod build.
       // next-vibe/ui/* is the platform-agnostic UI prefix — on Next.js it resolves to
-      // the web platform (system/ui/web/*). Must come before the general next-vibe alias.
-      "next-vibe/ui": "./src/app/api/[locale]/system/ui/web",
-      "next-vibe": "./src/app/api/[locale]/system",
+      // the web platform (src/vibe/ui/web/*). Must come before the general next-vibe alias.
+      "next-vibe/ui": "./src/vibe/ui/web",
+      "next-vibe": "./src/vibe",
       "@": "./src",
       "next-vibe/ui/renderers/mcp/McpResultFormatter":
-        "./src/app/api/[locale]/system/ui/renderers/mcp/McpResultFormatter.stub.ts",
+        "./src/vibe/ui/renderers/mcp/McpResultFormatter.stub.ts",
       "next-vibe/ui/renderers/cli/CliEndpointRenderer":
-        "./src/app/api/[locale]/system/ui/renderers/cli/CliEndpointRenderer.stub.tsx",
+        "./src/vibe/ui/renderers/cli/CliEndpointRenderer.stub.tsx",
       "next-vibe/ui/renderers/cli/CliEndpointPage":
-        "./src/app/api/[locale]/system/ui/renderers/cli/CliEndpointPage.stub.tsx",
+        "./src/vibe/ui/renderers/cli/CliEndpointPage.stub.tsx",
     },
     rules: {
       "*.native.tsx": {
@@ -92,43 +92,43 @@ const nextConfig: NextConfig = {
       },
       // Ignore standalone package source files and routes in API routes
       // These are CLI tools that use dynamic imports with process.cwd() which Turbopack can't resolve
-      "src/app/api/**/builder/**": {
+      "src/vibe/**/builder/**": {
         loaders: ["ignore-loader"],
       },
-      "src/app/api/**/launchpad/**": {
+      "src/vibe/**/launchpad/**": {
         loaders: ["ignore-loader"],
       },
-      "src/app/api/**/release-tool/**": {
+      "src/vibe/**/release-tool/**": {
         loaders: ["ignore-loader"],
       },
-      "src/app/api/**/guard/**": {
+      "src/vibe/**/guard/**": {
         loaders: ["ignore-loader"],
       },
-      "src/app/api/**/check/**": {
+      "src/vibe/**/check/**": {
         loaders: ["ignore-loader"],
       },
-      "src/app/api/**/translations/reorganize/**": {
+      "src/vibe/**/translations/reorganize/**": {
         loaders: ["ignore-loader"],
       },
-      "src/app/api/**/electron/build/**": {
+      "src/vibe/**/electron/build/**": {
         loaders: ["ignore-loader"],
       },
       // Generators use dynamic import(variable) for definition scanning - not bundler-safe
-      "src/app/api/**/generators/**": {
+      "src/vibe/**/generators/**": {
         loaders: ["ignore-loader"],
       },
-      "src/app/api/**/generator.ts": {
+      "src/vibe/**/generator.ts": {
         loaders: ["ignore-loader"],
       },
-      "src/app/api/**/seeds.ts": {
+      "src/**/seeds.ts": {
         loaders: ["ignore-loader"],
       },
       // CLI install uses process.cwd() + path.join() which causes full project trace
-      "src/app/api/**/cli/setup/install/**": {
+      "src/vibe/**/cli/setup/install/**": {
         loaders: ["ignore-loader"],
       },
       // TanStack route generator scans the filesystem - causes full project NFT trace
-      "src/app/api/**/tanstack-start/generate/**": {
+      "src/vibe/**/tanstack-start/generate/**": {
         loaders: ["ignore-loader"],
       },
       "src/generated/app-native/**": {

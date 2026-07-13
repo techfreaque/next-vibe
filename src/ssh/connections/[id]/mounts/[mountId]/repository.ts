@@ -12,7 +12,7 @@ import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { sshConnectionMounts } from "@/app/api/[locale]/ssh/db";
+import { sshConnectionMounts } from "@/ssh/db";
 
 import type { SshMountsT } from "../i18n";
 import type {

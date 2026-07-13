@@ -5,6 +5,12 @@
 
 import "server-only";
 
+import { createFixtureFetch } from "next-vibe/agent/ai-stream/testing/fetch-cache";
+import { getStorageAdapter } from "next-vibe/agent/chat/storage/index";
+import {
+  ApiProvider,
+  calculateCreditCost,
+} from "next-vibe/agent/models/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -14,13 +20,6 @@ import {
 } from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { createFixtureFetch } from "@/app/api/[locale]/agent/ai-stream/testing/fetch-cache";
-import { getStorageAdapter } from "@/app/api/[locale]/agent/chat/storage/index";
-import {
-  ApiProvider,
-  calculateCreditCost,
-} from "@/app/api/[locale]/agent/models/models";
 
 import { DefaultFolderId, type ToolExecutionContext } from "../chat/config";
 import {
@@ -266,8 +265,8 @@ export class MusicGenerationRepository {
         .replace(/^-|-$/g, "")
         .slice(0, 60)}-${toolMessageId}`;
       void Promise.all([
-        import("@/app/api/[locale]/agent/cortex/mounts/gens"),
-        import("@/app/api/[locale]/agent/cortex/embeddings/sync-virtual"),
+        import("next-vibe/agent/cortex/mounts/gens"),
+        import("next-vibe/agent/cortex/embeddings/sync-virtual"),
       ])
         .then(([{ readGenPath }, { syncVirtualNodeToEmbedding }]) => {
           const path = `/gens/audio/${month}/${slug}.md`;
@@ -307,9 +306,9 @@ export class MusicGenerationRepository {
     let sel: MusicGenModelSelection | undefined;
     if (userId) {
       const { resolveSkillFavoriteContext } =
-        await import("@/app/api/[locale]/agent/skills/resolver");
+        await import("next-vibe/agent/skills/resolver");
       const { ModalityResolver } =
-        await import("@/app/api/[locale]/agent/ai-stream/repository/core/modality-resolver");
+        await import("next-vibe/agent/ai-stream/repository/core/modality-resolver");
       const { favorite, skill } = await resolveSkillFavoriteContext({
         favoriteId: ctx.streamContext.favoriteId ?? null,
         skillId: ctx.streamContext.skillId ?? null,

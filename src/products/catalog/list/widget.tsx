@@ -212,15 +212,14 @@ export function CatalogListWidget(_props: {
 
   const handleCategories = (): void => {
     void (async (): Promise<void> => {
-      const def =
-        await import("@/app/api/[locale]/products/category/list/definition");
+      const def = await import("@/products/category/list/definition");
       navigate(def.default.GET, {});
     })();
   };
 
   const handleTaxRates = (): void => {
     void (async (): Promise<void> => {
-      const def = await import("@/app/api/[locale]/tax/rate/list/definition");
+      const def = await import("@/tax/rate/list/definition");
       navigate(def.default.GET, {});
     })();
   };

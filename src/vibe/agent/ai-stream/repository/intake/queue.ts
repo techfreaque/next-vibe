@@ -89,8 +89,7 @@ export async function runAutoQueueBranch(params: {
   // the queue processor picks it up (only re-parented), so this is its one write
   // — the row must land with its search vector here. The threadId anchors the
   // fixture chain so replay is deterministic.
-  const { makeHeadlessContext } =
-    await import("@/app/api/[locale]/agent/chat/config");
+  const { makeHeadlessContext } = await import("next-vibe/agent/chat/config");
   const queueEmbedContext = makeHeadlessContext(
     undefined,
     data.threadId,

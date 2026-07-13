@@ -19,10 +19,10 @@ import { CRON_EXECUTIONS_FAILED_ALIAS } from "next-vibe/tasks/data-sources/cron-
 import { CRON_EXECUTIONS_SUCCEEDED_ALIAS } from "next-vibe/tasks/data-sources/cron-executions-succeeded/constants";
 import { CRON_EXECUTIONS_TOTAL_ALIAS } from "next-vibe/tasks/data-sources/cron-executions-total/constants";
 
-import { EVALUATOR_THRESHOLD_ALIAS } from "@/app/api/[locale]/analytics/evaluators/threshold/constants";
-import { EMA_ALIAS } from "@/app/api/[locale]/analytics/indicators/ema/constants";
-import { WINDOW_AVG_ALIAS } from "@/app/api/[locale]/analytics/indicators/window-avg/constants";
-import { TRANSFORMER_RATIO_ALIAS } from "@/app/api/[locale]/analytics/transformers/ratio/constants";
+import { EVALUATOR_THRESHOLD_ALIAS } from "@/analytics/evaluators/threshold/constants";
+import { EMA_ALIAS } from "@/analytics/indicators/ema/constants";
+import { WINDOW_AVG_ALIAS } from "@/analytics/indicators/window-avg/constants";
+import { TRANSFORMER_RATIO_ALIAS } from "@/analytics/transformers/ratio/constants";
 
 import { GraphResolution } from "./enum";
 

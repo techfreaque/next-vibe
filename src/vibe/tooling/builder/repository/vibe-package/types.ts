@@ -75,8 +75,8 @@ export interface PackageManifest {
    *
    * Example:
    *   exports: {
-   *     ".":       "src/app/api/[locale]/system/tooling/check/vibe-check/repository.ts",
-   *     "./lint":  "src/app/api/[locale]/system/tooling/check/lint/repository.ts",
+   *     ".":       "src/vibe/tooling/check/vibe-check/repository.ts",
+   *     "./lint":  "src/vibe/tooling/check/lint/repository.ts",
    *   }
    */
   exports?: PackageExports;

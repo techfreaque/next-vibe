@@ -8,8 +8,8 @@ import { Container } from "next-vibe/ui/ui/container";
 import { Div } from "next-vibe/ui/ui/div";
 import type { JSX } from "react";
 
-import { envClient } from "@/config/env-client";
-import { configScopedTranslation } from "@/config/i18n";
+import { envClient } from "@/_old/config/env-client";
+import { configScopedTranslation } from "@/_old/config/i18n";
 
 import { FrameworkContent } from "../framework/_components/framework-content";
 import { scopedTranslation } from "./i18n";

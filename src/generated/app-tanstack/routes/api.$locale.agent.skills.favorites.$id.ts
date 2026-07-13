@@ -7,7 +7,7 @@ export const Route = createFileRoute("/api/$locale/agent/skills/favorites/$id")(
   {
     server: {
       handlers: wrapNextApiRoute(
-        () => import("@/app/api/[locale]/agent/skills/favorites/[id]/route"),
+        () => import("next-vibe/agent/skills/favorites/[id]/route"),
       ),
     },
   },

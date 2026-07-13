@@ -118,7 +118,7 @@ export class TaskReportRepository {
 
     try {
       const { RemoteConnectionRepository } =
-        await import("@/app/api/[locale]/remote-connection/repository");
+        await import("next-vibe/remote-connection/repository");
       const selfInstanceId =
         owner.type === "user"
           ? await RemoteConnectionRepository.getLocalInstanceId(owner.userId)

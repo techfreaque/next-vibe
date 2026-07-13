@@ -2,7 +2,7 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Environment } from "next-vibe/env/env-util";
 import type { JSX } from "react";
 
-import { envClient } from "@/config/env-client";
+import { envClient } from "@/_old/config/env-client";
 
 import { DesignTestPageLayout } from "./_components/page-layout";
 

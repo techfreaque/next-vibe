@@ -6,6 +6,7 @@
 import "server-only";
 
 import { and, eq, isNull, ne, or, sql } from "drizzle-orm";
+import { makeHeadlessContext } from "next-vibe/agent/chat/config";
 import { getFullPath } from "next-vibe/core/core-utils/path";
 import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
@@ -28,8 +29,6 @@ import { CronTasksRepository } from "next-vibe/tasks/cron/repository";
 import { resolveTaskOwnerUser } from "next-vibe/tasks/cron/resolve-task-user";
 import type { TaskExecuteT } from "next-vibe/tasks/execute/i18n";
 import { scopedTranslation as tasksScopedTranslation } from "next-vibe/tasks/i18n";
-
-import { makeHeadlessContext } from "@/app/api/[locale]/agent/chat/config";
 
 import { CronTaskStatus, type CronTaskStatusValue } from "../enum";
 import type {

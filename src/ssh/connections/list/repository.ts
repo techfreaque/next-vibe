@@ -19,9 +19,8 @@ import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { remoteConnections } from "@/app/api/[locale]/remote-connection/db";
-import { RemoteConnectionRepository } from "@/app/api/[locale]/remote-connection/repository";
+import { remoteConnections } from "next-vibe/remote-connection/db";
+import { RemoteConnectionRepository } from "next-vibe/remote-connection/repository";
 
 import { sshConnections } from "../../db";
 import { SshAuthType } from "../../enum";

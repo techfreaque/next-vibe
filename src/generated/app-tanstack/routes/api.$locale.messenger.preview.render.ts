@@ -6,7 +6,7 @@ import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 export const Route = createFileRoute("/api/$locale/messenger/preview/render")({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/messenger/preview/render/route"),
+      () => import("@/messenger/preview/render/route"),
     ),
   },
 });

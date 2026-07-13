@@ -53,9 +53,7 @@ const { POST } = createEndpoint({
         description: "stockIssue.post.warehouseId.description" as const,
         schema: z.uuid(),
         listEndpoint: async () =>
-          (
-            await import("@/app/api/[locale]/inventory/warehouse/list/definition")
-          ).default.GET,
+          (await import("@/inventory/warehouse/list/definition")).default.GET,
         labelField: "name",
       }),
       productId: requestField(scopedTranslation, {
@@ -65,8 +63,7 @@ const { POST } = createEndpoint({
         description: "stockIssue.post.productId.description" as const,
         schema: z.uuid(),
         listEndpoint: async () =>
-          (await import("@/app/api/[locale]/products/catalog/list/definition"))
-            .default.GET,
+          (await import("@/products/catalog/list/definition")).default.GET,
         labelField: "name",
       }),
       quantity: requestField(scopedTranslation, {

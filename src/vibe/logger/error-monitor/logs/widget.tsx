@@ -5,6 +5,7 @@
  */
 
 "use client";
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import { cn } from "next-vibe/core/utils/utils";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -34,8 +35,6 @@ import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field
 import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
 import React, { useCallback, useState } from "react";
-
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 
 import type endpoints from "./definition";
 import type { ErrorLogsResponseOutput } from "./definition";

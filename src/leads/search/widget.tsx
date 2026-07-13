@@ -246,8 +246,7 @@ export function LeadsSearchContainer({
         return;
       }
       void (async (): Promise<void> => {
-        const leadDef =
-          await import("@/app/api/[locale]/leads/[id]/definition");
+        const leadDef = await import("@/leads/[id]/definition");
         navigate(leadDef.default.GET, { urlPathParams: { id: lead.id } });
       })();
     },
@@ -257,8 +256,7 @@ export function LeadsSearchContainer({
   const handleEditLead = useCallback(
     (lead: Lead): void => {
       void (async (): Promise<void> => {
-        const leadDef =
-          await import("@/app/api/[locale]/leads/[id]/definition");
+        const leadDef = await import("@/leads/[id]/definition");
         navigate(leadDef.default.PATCH, {
           urlPathParams: { id: lead.id },
           prefillFromGet: true,
@@ -272,8 +270,7 @@ export function LeadsSearchContainer({
   const handleDeleteLead = useCallback(
     (lead: Lead): void => {
       void (async (): Promise<void> => {
-        const leadDef =
-          await import("@/app/api/[locale]/leads/[id]/definition");
+        const leadDef = await import("@/leads/[id]/definition");
         navigate(leadDef.default.DELETE, { urlPathParams: { id: lead.id } });
       })();
     },
@@ -282,8 +279,7 @@ export function LeadsSearchContainer({
 
   const handleCreateLead = useCallback((): void => {
     void (async (): Promise<void> => {
-      const createDef =
-        await import("@/app/api/[locale]/leads/create/definition");
+      const createDef = await import("@/leads/create/definition");
       navigate(createDef.default.POST);
     })();
   }, [navigate]);

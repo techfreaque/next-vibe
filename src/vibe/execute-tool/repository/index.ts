@@ -19,6 +19,11 @@
 import "server-only";
 
 import { desc, lt, sql as sqlFn } from "drizzle-orm";
+import {
+  makeHeadlessContext,
+  type ToolExecutionContext,
+} from "next-vibe/agent/chat/config";
+import { chatMessages } from "next-vibe/agent/chat/db";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
@@ -37,22 +42,12 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { bold, maybeColorize, semantic } from "next-vibe/logger/colors";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { AiT } from "next-vibe/platforms/ai/i18n";
 import { dbUserIdToOwner } from "next-vibe/tasks/cron/db";
 import { resolveTaskOwnerUser } from "next-vibe/tasks/cron/resolve-task-user";
-
-import {
-  makeHeadlessContext,
-  type ToolExecutionContext,
-} from "@/app/api/[locale]/agent/chat/config";
-import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
-import {
-  bold,
-  maybeColorize,
-  semantic,
-} from "@/app/api/[locale]/system/logger/colors";
 
 import type { CallbackModeValue } from "../constants";
 import { CallbackMode, CallbackModeDB } from "../constants";
@@ -585,7 +580,7 @@ export class RouteExecuteRepository {
     }
 
     const { ExecuteToolRouting } =
-      await import("@/app/api/[locale]/remote-connection/routing");
+      await import("next-vibe/remote-connection/routing");
     const inferenceTarget = await ExecuteToolRouting.resolveInferenceProvider({
       userId: user.id,
       logger,

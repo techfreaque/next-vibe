@@ -7,10 +7,9 @@
 import "server-only";
 
 import { eq, sql } from "drizzle-orm";
+import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import type { Modality } from "next-vibe/agent/models/enum";
 import { db } from "next-vibe/database";
-
-import type { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
-import type { Modality } from "@/app/api/[locale]/agent/models/enum";
 
 import { chatMessages, type MessageMetadata } from "../../../../chat/db";
 import { ChatMessageRole, ThreadStreamingState } from "../../../../chat/enum";

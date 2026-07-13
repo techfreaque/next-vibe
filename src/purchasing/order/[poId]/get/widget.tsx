@@ -182,8 +182,7 @@ export function OrderGetWidget({
       return;
     }
     void (async (): Promise<void> => {
-      const def =
-        await import("@/app/api/[locale]/payment/bill/[billId]/get/definition");
+      const def = await import("@/payment/bill/[billId]/get/definition");
       navigation.push(def.default.GET, {
         urlPathParams: { billId },
       });

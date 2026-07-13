@@ -15,8 +15,8 @@ import { buildInfraConfig } from "next-vibe/tooling/infra/shared/pulumi/config";
 import { provisionAll } from "next-vibe/tooling/infra/shared/pulumi/index";
 import { ensureGitignore } from "next-vibe/tooling/infra/shared/pulumi/state";
 
-import { sshConnections } from "@/app/api/[locale]/ssh/db";
-import { ClusterRole } from "@/app/api/[locale]/ssh/enum";
+import { sshConnections } from "@/ssh/db";
+import { ClusterRole } from "@/ssh/enum";
 
 import type {
   ClusterInitRequestOutput,

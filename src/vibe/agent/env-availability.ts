@@ -1,4 +1,4 @@
-import { envClient } from "@/config/env-client";
+import { envClient } from "@/_old/config/env-client";
 
 export interface AgentEnvAvailability {
   openRouter: boolean;
@@ -181,7 +181,7 @@ export function getEnvAvailability(): AgentEnvAvailability {
  */
 export async function getInstanceAvailability(): Promise<AgentEnvAvailability> {
   const { ExecuteToolRouting } =
-    await import("@/app/api/[locale]/remote-connection/routing");
+    await import("next-vibe/remote-connection/routing");
   const { hasSystem, forceSystem } =
     await ExecuteToolRouting.getInstanceInferenceState();
   return {

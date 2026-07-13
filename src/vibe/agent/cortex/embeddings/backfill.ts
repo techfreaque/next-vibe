@@ -73,13 +73,13 @@ async function getAllUserIds(): Promise<string[]> {
     .from(cortexNodes);
 
   // Users with chat threads (for thread/search/gen/upload mounts)
-  const { chatThreads } = await import("@/app/api/[locale]/agent/chat/db");
+  const { chatThreads } = await import("next-vibe/agent/chat/db");
   const threadUsers = await db
     .selectDistinct({ userId: chatThreads.userId })
     .from(chatThreads);
 
   // Users with custom skills
-  const { customSkills } = await import("@/app/api/[locale]/agent/skills/db");
+  const { customSkills } = await import("next-vibe/agent/skills/db");
   const skillUsers = await db
     .selectDistinct({ userId: customSkills.userId })
     .from(customSkills)
@@ -126,10 +126,10 @@ async function materializeVirtualMounts(userId: string): Promise<number> {
 
   // --- Threads (thin references - title + tags + preview only) ---
   {
-    const { chatThreads } = await import("@/app/api/[locale]/agent/chat/db");
+    const { chatThreads } = await import("next-vibe/agent/chat/db");
     const { desc } = await import("drizzle-orm");
     const { buildThinThreadContent } =
-      await import("@/app/api/[locale]/agent/ai-stream/repository/core/message-db-writer");
+      await import("next-vibe/agent/ai-stream/repository/core/message-db-writer");
 
     const recentThreads = await db
       .select({
@@ -384,9 +384,8 @@ export async function backfillMessageEmbeddings(force = false): Promise<{
   failed: number;
   skipped: number;
 }> {
-  const { chatMessages } = await import("@/app/api/[locale]/agent/chat/db");
-  const { ChatMessageRole } =
-    await import("@/app/api/[locale]/agent/chat/enum");
+  const { chatMessages } = await import("next-vibe/agent/chat/db");
+  const { ChatMessageRole } = await import("next-vibe/agent/chat/enum");
   const { buildMessageEmbedText } = await import("./message-embed");
   const { createHash } = await import("node:crypto");
   const { or, notInArray: notInArrayMsg } = await import("drizzle-orm");

@@ -1,4 +1,8 @@
 "use client";
+import { useChatInputStore } from "next-vibe/agent/ai-stream/stream/hooks/input-store";
+import debugDefinition from "next-vibe/agent/ai-stream/system-prompt/debug/definition";
+import type { ChatMessage } from "next-vibe/agent/chat/db";
+import { ChatMessageRole } from "next-vibe/agent/chat/enum";
 import { cn } from "next-vibe/core/utils/utils";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { Div } from "next-vibe/ui/ui/div";
@@ -13,14 +17,7 @@ import React, {
   useState,
 } from "react";
 
-import {
-  chatAnimations,
-  chatShadows,
-} from "@/app/[locale]/chat/lib/design-tokens";
-import { useChatInputStore } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/input-store";
-import debugDefinition from "@/app/api/[locale]/agent/ai-stream/system-prompt/debug/definition";
-import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
+import { chatAnimations, chatShadows } from "@/_pages/chat/lib/design-tokens";
 
 import { scopedTranslation } from "../../i18n";
 import type { DebugSystemPromptParts } from "../debug-component";

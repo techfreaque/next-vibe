@@ -11,7 +11,7 @@ import {
 import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import type { JSX } from "react";
 
-import invoiceGetDefinitions from "@/app/api/[locale]/payment/invoice/[invoiceId]/get/definition";
+import invoiceGetDefinitions from "@/payment/invoice/[invoiceId]/get/definition";
 
 import type definition from "./definition";
 import type { ReceivablesAgingResponseOutput } from "./definition";

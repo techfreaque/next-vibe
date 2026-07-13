@@ -6,9 +6,8 @@
 import "server-only";
 
 import type { JSONValue, streamText as aiStreamText } from "ai";
+import { calculateCreditCost } from "next-vibe/agent/models/models";
 import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
-
-import { calculateCreditCost } from "@/app/api/[locale]/agent/models/models";
 
 import { StreamErrorType } from "../core/constants";
 import { clearStreamingState } from "../core/stream";
@@ -349,7 +348,7 @@ export async function complete(
   // REMOTE/<origin>/<path>.
   if (!user.isPublic) {
     const mirrorUserId = user.id;
-    void import("@/app/api/[locale]/agent/chat/threads/sync-provider")
+    void import("next-vibe/agent/chat/threads/sync-provider")
       .then(({ pushThreadSync }) =>
         pushThreadSync(threadId, mirrorUserId, logger),
       )

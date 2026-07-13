@@ -43,7 +43,7 @@ import { generateSchemaForUsage } from "next-vibe/unified-ui/_shared/utils";
 import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import { z } from "zod";
 
-import { envClient } from "@/config/env-client";
+import { envClient } from "@/_old/config/env-client";
 
 import type {
   HelpGetRequestOutput,
@@ -688,7 +688,7 @@ export class HelpRepository {
     const currentPage = data.page ?? 1;
     const { t } = scopedTranslation.scopedT(locale);
     const { RemoteConnectionRepository } =
-      await import("@/app/api/[locale]/remote-connection/repository");
+      await import("next-vibe/remote-connection/repository");
 
     // Try user-scoped lookup first, fall back to any-user lookup for CLI/system users
     // whose userId doesn't own the connection.
@@ -862,7 +862,7 @@ export class HelpRepository {
       // The local instance's own name resolves to the local listing — callers
       // (and models) may address the instance explicitly.
       const { RemoteConnectionRepository: SelfRepo } =
-        await import("@/app/api/[locale]/remote-connection/repository");
+        await import("next-vibe/remote-connection/repository");
       const selfInstanceId = SelfRepo.deriveDefaultSelfInstanceId();
       if (data.instanceId !== selfInstanceId) {
         return HelpRepository.getToolsFromRemoteInstance(
@@ -1008,15 +1008,14 @@ export class HelpRepository {
     if (!isCompact && !user.isPublic) {
       try {
         const { getDefaultToolIdsForUser, getDefaultWebPinnedIdsForUser } =
-          await import("@/app/api/[locale]/agent/chat/constants");
+          await import("next-vibe/agent/chat/constants");
 
         logger.debug("[HelpTool] PROBE chat constants imported", {});
         const { db } = await import("next-vibe/database");
         logger.debug("[HelpTool] PROBE db imported", {});
         const { chatSettings } =
-          await import("@/app/api/[locale]/agent/chat/settings/db");
-        const { DefaultFolderId } =
-          await import("@/app/api/[locale]/agent/chat/config");
+          await import("next-vibe/agent/chat/settings/db");
+        const { DefaultFolderId } = await import("next-vibe/agent/chat/config");
         const { eq } = await import("drizzle-orm");
 
         // webPinnedTools: per-user sidebar bookmarks (independent of AI pinnedTools)
@@ -1041,7 +1040,7 @@ export class HelpRepository {
 
         if (settingsRow?.activeFavoriteId) {
           const { resolveAgentContext } =
-            await import("@/app/api/[locale]/agent/skills/resolve-context");
+            await import("next-vibe/agent/skills/resolve-context");
           // Central cascade (favorite → skill → NO_SKILL/role defaults). The
           // help tool only needs the effective PINNED list + the pre-union
           // skill bases (cascadeBase/pinnedBase) for its toggle-off materialize.

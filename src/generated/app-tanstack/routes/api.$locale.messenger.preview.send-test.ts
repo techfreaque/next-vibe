@@ -8,7 +8,7 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/messenger/preview/send-test/route"),
+      () => import("@/messenger/preview/send-test/route"),
     ),
   },
 });

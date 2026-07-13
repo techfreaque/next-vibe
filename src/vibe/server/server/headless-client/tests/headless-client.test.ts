@@ -28,26 +28,26 @@ import { createEndpointLogger } from "next-vibe/logger/server";
 import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import {
   getOrCreateFolder,
   resolveUserAndToken,
   runTestStream,
-} from "@/app/api/[locale]/agent/ai-stream/testing/headless-test-runner";
+} from "next-vibe/agent/ai-stream/testing/headless-test-runner";
 import {
   DefaultFolderId,
   rootlessStreamContext,
-} from "@/app/api/[locale]/agent/chat/config";
-import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
-import { NO_SKILL_ID } from "@/app/api/[locale]/agent/skills/constants";
-import { ModelSelectionType } from "@/app/api/[locale]/agent/skills/enum";
-import type { FavoriteConfig } from "@/app/api/[locale]/agent/skills/favorites/db";
+} from "next-vibe/agent/chat/config";
+import { chatThreads } from "next-vibe/agent/chat/db";
+import { NO_SKILL_ID } from "next-vibe/agent/skills/constants";
+import { ModelSelectionType } from "next-vibe/agent/skills/enum";
+import type { FavoriteConfig } from "next-vibe/agent/skills/favorites/db";
 import {
   instanceIdentities,
   remoteConnections,
-} from "@/app/api/[locale]/remote-connection/db";
-import { RemoteConnectionRepository } from "@/app/api/[locale]/remote-connection/repository";
-import { env } from "@/config/env";
+} from "next-vibe/remote-connection/db";
+import { RemoteConnectionRepository } from "next-vibe/remote-connection/repository";
+import { env } from "@/_old/config/env";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -116,7 +116,7 @@ beforeAll(async () => {
 
   // Ensure sufficient credits for AI stream calls during this test suite
   const creditsDefinition = (
-    await import("@/app/api/[locale]/credits/admin-add/definition")
+    await import("@/credits/admin-add/definition")
   ).default;
   await sendTestRequest({
     streamContext: undefined,
@@ -243,7 +243,7 @@ describe("headless-client connection registration", () => {
 
   it("selfInstanceId reported by remote-connection/list is headless-client", async () => {
     const listDef = (
-      await import("@/app/api/[locale]/remote-connection/list/definition")
+      await import("next-vibe/remote-connection/list/definition")
     ).default;
     const result = await sendTestRequest({
       streamContext: undefined,

@@ -15,7 +15,7 @@ import { Link } from "next-vibe/ui/ui/link";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 
-import { scopedTranslation } from "@/app/[locale]/tools/i18n";
+import { scopedTranslation } from "@/_pages/tools/i18n";
 
 interface AIToolsModalContentProps {
   locale: CountryLanguage;

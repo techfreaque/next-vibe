@@ -8,8 +8,13 @@
 import chalk from "chalk";
 import { Box, Text, useApp, useInput, useStdin } from "ink";
 import TextInput from "ink-text-input";
+import { makeHeadlessContext } from "next-vibe/agent/chat/config";
 import { Platform } from "next-vibe/core/definition/platform";
 import { useApiMutation } from "next-vibe/platforms/react/hooks/use-api-mutation";
+import { scopedTranslation as connectScopedTranslation } from "next-vibe/remote-connection/connect/i18n";
+import type { SyncScope } from "next-vibe/remote-connection/db";
+import { SyncScopeSchema } from "next-vibe/remote-connection/db";
+import { useRemoteConnections } from "next-vibe/remote-connection/list/hooks";
 import {
   useWidgetLocale,
   useWidgetLogger,
@@ -19,12 +24,6 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-
-import { makeHeadlessContext } from "@/app/api/[locale]/agent/chat/config";
-import { scopedTranslation as connectScopedTranslation } from "@/app/api/[locale]/remote-connection/connect/i18n";
-import type { SyncScope } from "@/app/api/[locale]/remote-connection/db";
-import { SyncScopeSchema } from "@/app/api/[locale]/remote-connection/db";
-import { useRemoteConnections } from "@/app/api/[locale]/remote-connection/list/hooks";
 
 import type { SystemSettingsGetResponseOutput } from "./definition";
 import endpoints from "./definition";

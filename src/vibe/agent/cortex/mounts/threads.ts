@@ -5,19 +5,18 @@ import "server-only";
  * Renders chat threads as markdown files at /threads/<rootFolder>/<folder>/<thread>.md
  */
 import { and, count as drizzleCount, desc, eq, isNull } from "drizzle-orm";
-import { db } from "next-vibe/database";
-
 import {
   DefaultFolderId,
   isDefaultFolderId,
-} from "@/app/api/[locale]/agent/chat/config";
+} from "next-vibe/agent/chat/config";
 import {
   CHAT_MESSAGE_COLUMNS,
   chatFolders,
   chatMessages,
   chatThreads,
-} from "@/app/api/[locale]/agent/chat/db";
-import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
+} from "next-vibe/agent/chat/db";
+import { ChatMessageRole } from "next-vibe/agent/chat/enum";
+import { db } from "next-vibe/database";
 
 import type { VirtualListEntry, VirtualReadResult } from "./resolver";
 

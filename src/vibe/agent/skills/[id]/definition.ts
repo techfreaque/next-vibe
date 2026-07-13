@@ -3,6 +3,8 @@
  * Defines endpoints for GET, PATCH (update), and DELETE operations on a single skill
  */
 
+import { parseSkillId } from "next-vibe/agent/chat/slugify";
+import { getModelDisplayName } from "next-vibe/agent/models/all-models";
 import {
   dateSchema,
   iconSchema,
@@ -31,9 +33,6 @@ import {
   widgetField,
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
-
-import { parseSkillId } from "@/app/api/[locale]/agent/chat/slugify";
-import { getModelDisplayName } from "@/app/api/[locale]/agent/models/all-models";
 
 import { getBestChatModel } from "../../ai-stream/models";
 import {

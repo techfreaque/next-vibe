@@ -45,7 +45,7 @@ export class DeployPushRepository {
 
       const stack = data.stack ?? "prod";
       const statePath = `${process.cwd()}/.pulumi`;
-      const pulumiDir = `${process.cwd()}/src/app/api/[locale]/infra/shared/pulumi`;
+      const pulumiDir = `${process.cwd()}/src/vibe/tooling/infra/shared/pulumi`;
 
       logger.info("deploy-push: running pulumi up", { stack });
 

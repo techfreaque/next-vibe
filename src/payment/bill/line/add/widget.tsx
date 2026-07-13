@@ -21,7 +21,7 @@ import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-butt
 import type { JSX } from "react";
 import { useState } from "react";
 
-import productLookupEndpoint from "@/app/api/[locale]/pos/product-lookup/definition";
+import productLookupEndpoint from "@/pos/product-lookup/definition";
 
 import type definition from "./definition";
 
@@ -143,8 +143,7 @@ export function BillLineAddWidget({
       return;
     }
     void (async (): Promise<void> => {
-      const def =
-        await import("@/app/api/[locale]/payment/bill/[billId]/get/definition");
+      const def = await import("@/payment/bill/[billId]/get/definition");
       navigation.push(def.default.GET, {
         urlPathParams: { billId },
       });

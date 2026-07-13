@@ -17,87 +17,87 @@ export async function getClientRouteHandler(path: string): Promise<any | null> {
   switch (path) {
     case "agent_chat_folder-contents_rootFolderId_GET":
       return (
-        await import("@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/route-client")
+        await import("next-vibe/agent/chat/folder-contents/[rootFolderId]/route-client")
       ).GET;
     case "agent_chat_folders_rootFolderId_GET":
       return (
-        await import("@/app/api/[locale]/agent/chat/folders/[rootFolderId]/route-client")
+        await import("next-vibe/agent/chat/folders/[rootFolderId]/route-client")
       ).GET;
     case "agent_chat_settings_GET":
       return (
-        await import("@/app/api/[locale]/agent/chat/settings/route-client")
+        await import("next-vibe/agent/chat/settings/route-client")
       ).GET;
     case "agent_chat_settings_POST":
       return (
-        await import("@/app/api/[locale]/agent/chat/settings/route-client")
+        await import("next-vibe/agent/chat/settings/route-client")
       ).POST;
     case "agent_chat_threads_GET":
       return (
-        await import("@/app/api/[locale]/agent/chat/threads/route-client")
+        await import("next-vibe/agent/chat/threads/route-client")
       ).GET;
     case "agent_chat_threads_threadId_DELETE":
       return (
-        await import("@/app/api/[locale]/agent/chat/threads/[threadId]/route-client")
+        await import("next-vibe/agent/chat/threads/[threadId]/route-client")
       ).DELETE;
     case "agent_chat_threads_threadId_GET":
       return (
-        await import("@/app/api/[locale]/agent/chat/threads/[threadId]/route-client")
+        await import("next-vibe/agent/chat/threads/[threadId]/route-client")
       ).GET;
     case "agent_chat_threads_threadId_PATCH":
       return (
-        await import("@/app/api/[locale]/agent/chat/threads/[threadId]/route-client")
+        await import("next-vibe/agent/chat/threads/[threadId]/route-client")
       ).PATCH;
     case "agent_chat_threads_threadId_messages_GET":
       return (
-        await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/route-client")
+        await import("next-vibe/agent/chat/threads/[threadId]/messages/route-client")
       ).GET;
     case "agent_chat_threads_threadId_messages_POST":
       return (
-        await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/route-client")
+        await import("next-vibe/agent/chat/threads/[threadId]/messages/route-client")
       ).POST;
     case "agent_chat_threads_threadId_messages_messageId_DELETE":
       return (
-        await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/route-client")
+        await import("next-vibe/agent/chat/threads/[threadId]/messages/[messageId]/route-client")
       ).DELETE;
     case "agent_chat_threads_threadId_messages_messageId_GET":
       return (
-        await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/route-client")
+        await import("next-vibe/agent/chat/threads/[threadId]/messages/[messageId]/route-client")
       ).GET;
     case "agent_chat_threads_threadId_messages_messageId_PATCH":
       return (
-        await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/route-client")
+        await import("next-vibe/agent/chat/threads/[threadId]/messages/[messageId]/route-client")
       ).PATCH;
     case "agent_chat_threads_threadId_messages_messageId_vote_POST":
       return (
-        await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/route-client")
+        await import("next-vibe/agent/chat/threads/[threadId]/messages/[messageId]/vote/route-client")
       ).POST;
     case "agent_chat_threads_threadId_messages_path_GET":
       return (
-        await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/path/route-client")
+        await import("next-vibe/agent/chat/threads/[threadId]/messages/path/route-client")
       ).GET;
     case "agent_skills_favorites_GET":
       return (
-        await import("@/app/api/[locale]/agent/skills/favorites/route-client")
+        await import("next-vibe/agent/skills/favorites/route-client")
       ).GET;
     case "agent_skills_favorites_create_POST":
       return (
-        await import("@/app/api/[locale]/agent/skills/favorites/create/route-client")
+        await import("next-vibe/agent/skills/favorites/create/route-client")
       ).POST;
     case "agent_skills_favorites_id_DELETE":
       return (
-        await import("@/app/api/[locale]/agent/skills/favorites/[id]/route-client")
+        await import("next-vibe/agent/skills/favorites/[id]/route-client")
       ).DELETE;
     case "agent_skills_favorites_id_GET":
       return (
-        await import("@/app/api/[locale]/agent/skills/favorites/[id]/route-client")
+        await import("next-vibe/agent/skills/favorites/[id]/route-client")
       ).GET;
     case "agent_skills_favorites_id_PATCH":
       return (
-        await import("@/app/api/[locale]/agent/skills/favorites/[id]/route-client")
+        await import("next-vibe/agent/skills/favorites/[id]/route-client")
       ).PATCH;
     case "agent_skills_favorites_reorder_POST":
       return (
-        await import("@/app/api/[locale]/agent/skills/favorites/reorder/route-client")
+        await import("next-vibe/agent/skills/favorites/reorder/route-client")
       ).POST;
     default:
       return null;

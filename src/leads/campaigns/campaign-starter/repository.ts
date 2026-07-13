@@ -31,7 +31,7 @@ import { cronTasks, type NewCronTask } from "next-vibe/tasks/cron/db";
 import { getCronFrequencyMinutes } from "next-vibe/tasks/cron-formatter";
 import { CronTaskPriority, TaskCategory } from "next-vibe/tasks/enum";
 
-import { env } from "@/config/env";
+import { env } from "@/_old/config/env";
 
 import { scopedTranslation as smtpScopedTranslation } from "../../../messenger/providers/email/smtp-client/i18n";
 import { SmtpRepository } from "../../../messenger/providers/email/smtp-client/repository";

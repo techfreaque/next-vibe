@@ -55,8 +55,7 @@ const { PATCH } = createEndpoint({
         hidden: true,
         schema: z.uuid(),
         listEndpoint: async () =>
-          (await import("@/app/api/[locale]/products/catalog/list/definition"))
-            .default.GET,
+          (await import("@/products/catalog/list/definition")).default.GET,
         labelField: "name",
       }),
 
@@ -135,9 +134,7 @@ const { PATCH } = createEndpoint({
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.ENTITY_PICKER,
             listEndpoint: async () =>
-              (
-                await import("@/app/api/[locale]/products/category/list/definition")
-              ).default.GET,
+              (await import("@/products/category/list/definition")).default.GET,
             labelField: "name",
             label: "patch.categoryId.label",
             description: "patch.categoryId.description",

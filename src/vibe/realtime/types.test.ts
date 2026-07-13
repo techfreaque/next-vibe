@@ -25,10 +25,10 @@ import type {
 } from "next-vibe/core/route/handler";
 import type executeDefinition from "next-vibe/execute-tool/definition";
 
-import type messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
-import type skillIdDefinitions from "@/app/api/[locale]/agent/skills/[id]/definition";
-import type favoritesDefinition from "@/app/api/[locale]/agent/skills/favorites/definition";
-import type creditsDefinition from "@/app/api/[locale]/credits/definition";
+import type messagesDefinition from "next-vibe/agent/chat/threads/[threadId]/messages/definition";
+import type skillIdDefinitions from "next-vibe/agent/skills/[id]/definition";
+import type favoritesDefinition from "next-vibe/agent/skills/favorites/definition";
+import type creditsDefinition from "@/credits/definition";
 
 import type { ChannelBinding } from "./emitter";
 import type { EmitData, EmitEventNamed } from "./structured-events";

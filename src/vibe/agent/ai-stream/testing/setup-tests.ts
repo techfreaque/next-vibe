@@ -9,7 +9,7 @@
  *
  * Usage (bunfig.toml in project root):
  *   [test]
- *   preload = ["./src/app/api/[locale]/agent/ai-stream/testing/setup-tests.ts"]
+ *   preload = ["./src/vibe/agent/ai-stream/testing/setup-tests.ts"]
  */
 
 // server-only guard: mark this as a server context

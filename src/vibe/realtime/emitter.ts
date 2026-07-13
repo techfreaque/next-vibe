@@ -25,8 +25,7 @@ import type {
   CacheKeyRequestData,
   CacheKeyRequestInput,
 } from "next-vibe/platforms/react/hooks/query-key-builder";
-
-import type { SyncDomain } from "@/app/api/[locale]/remote-connection/db";
+import type { SyncDomain } from "next-vibe/remote-connection/db";
 
 import { buildUserWsChannel, buildWsChannel } from "./channel";
 import { getLocalBroadcast } from "./local-broadcast";

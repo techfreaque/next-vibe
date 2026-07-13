@@ -6,7 +6,7 @@ import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 export const Route = createFileRoute("/api/$locale/analytics/indicators/macd")({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/analytics/indicators/macd/route"),
+      () => import("@/analytics/indicators/macd/route"),
     ),
   },
 });

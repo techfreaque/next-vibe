@@ -28,12 +28,9 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 
-import { scopedTranslation as subscriptionScopedT } from "@/app/[locale]/subscription/i18n";
-import {
-  ProductIds,
-  productsRepository,
-} from "@/app/api/[locale]/products/repository-client";
-import { useSubscription } from "@/app/api/[locale]/subscription/hooks";
+import { scopedTranslation as subscriptionScopedT } from "@/_pages/subscription/i18n";
+import { ProductIds, productsRepository } from "@/products/repository-client";
+import { useSubscription } from "@/subscription/hooks";
 
 import creditsDefinition from "./definition";
 import { scopedTranslation } from "./i18n";
@@ -142,16 +139,13 @@ export function CreditsTabHeader({
       if (tab === "overview") {
         navigation.pop();
       } else if (tab === "buy") {
-        const def =
-          await import("@/app/api/[locale]/subscription/create/definition");
+        const def = await import("@/subscription/create/definition");
         navigation.push(def.default.POST, {});
       } else if (tab === "history") {
-        const def =
-          await import("@/app/api/[locale]/credits/history/definition");
+        const def = await import("@/credits/history/definition");
         navigation.push(def.default.GET, {});
       } else if (tab === "remote") {
-        const def =
-          await import("@/app/api/[locale]/remote-connection/list/definition");
+        const def = await import("next-vibe/remote-connection/list/definition");
         navigation.push(def.default.GET, {});
       }
     })();

@@ -6,6 +6,64 @@
  */
 
 "use client";
+import {
+  ChatModelId,
+  chatModelOptions,
+  filterChatModels,
+  getBestChatModel,
+} from "next-vibe/agent/ai-stream/models";
+import {
+  AudioVisionModelId,
+  filterAudioVisionModels,
+  filterImageVisionModels,
+  filterVideoVisionModels,
+  getBestAudioVisionModel,
+  getBestImageVisionModel,
+  getBestVideoVisionModel,
+  ImageVisionModelId,
+  VideoVisionModelId,
+} from "next-vibe/agent/ai-stream/vision-models";
+import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
+import {
+  filterImageGenModels,
+  getBestImageGenModel,
+  ImageGenModelId,
+  imageGenModelOptions,
+} from "next-vibe/agent/image-generation/models";
+import {
+  filterMusicGenModels,
+  getBestMusicGenModel,
+  MusicGenModelId,
+  musicGenModelOptions,
+} from "next-vibe/agent/music-generation/models";
+import {
+  CONTENT_DISPLAY,
+  INTELLIGENCE_DISPLAY,
+  ModelSelectionType,
+  ModelSortDirection,
+  ModelSortField,
+  ModelSortFieldOptions,
+  PRICE_DISPLAY,
+} from "next-vibe/agent/skills/enum";
+import {
+  filterSttModels,
+  getBestSttModel,
+  SttModelId,
+  sttModelOptions,
+} from "next-vibe/agent/speech-to-text/models";
+import {
+  filterTtsModels,
+  getBestTtsModel,
+  TtsModelId,
+  ttsModelOptions,
+} from "next-vibe/agent/text-to-speech/models";
+import {
+  filterVideoGenModels,
+  getBestVideoGenModel,
+  VideoGenModelId,
+  videoGenModelOptions,
+} from "next-vibe/agent/video-generation/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { cn } from "next-vibe/core/utils/utils";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -39,65 +97,6 @@ import { P } from "next-vibe/ui/ui/typography";
 import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
-
-import {
-  ChatModelId,
-  chatModelOptions,
-  filterChatModels,
-  getBestChatModel,
-} from "@/app/api/[locale]/agent/ai-stream/models";
-import {
-  AudioVisionModelId,
-  filterAudioVisionModels,
-  filterImageVisionModels,
-  filterVideoVisionModels,
-  getBestAudioVisionModel,
-  getBestImageVisionModel,
-  getBestVideoVisionModel,
-  ImageVisionModelId,
-  VideoVisionModelId,
-} from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import {
-  filterImageGenModels,
-  getBestImageGenModel,
-  ImageGenModelId,
-  imageGenModelOptions,
-} from "@/app/api/[locale]/agent/image-generation/models";
-import {
-  filterMusicGenModels,
-  getBestMusicGenModel,
-  MusicGenModelId,
-  musicGenModelOptions,
-} from "@/app/api/[locale]/agent/music-generation/models";
-import {
-  CONTENT_DISPLAY,
-  INTELLIGENCE_DISPLAY,
-  ModelSelectionType,
-  ModelSortDirection,
-  ModelSortField,
-  ModelSortFieldOptions,
-  PRICE_DISPLAY,
-} from "@/app/api/[locale]/agent/skills/enum";
-import {
-  filterSttModels,
-  getBestSttModel,
-  SttModelId,
-  sttModelOptions,
-} from "@/app/api/[locale]/agent/speech-to-text/models";
-import {
-  filterTtsModels,
-  getBestTtsModel,
-  TtsModelId,
-  ttsModelOptions,
-} from "@/app/api/[locale]/agent/text-to-speech/models";
-import {
-  filterVideoGenModels,
-  getBestVideoGenModel,
-  VideoGenModelId,
-  videoGenModelOptions,
-} from "@/app/api/[locale]/agent/video-generation/models";
 
 import { type AnyModelOptionWithVision } from "../all-models";
 import type { Modality, ModelRole } from "../enum";

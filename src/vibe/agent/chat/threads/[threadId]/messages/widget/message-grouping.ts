@@ -3,7 +3,7 @@
  * Groups messages that are part of the same AI response sequence
  */
 
-import type { ChatMessage, ToolCall } from "@/app/api/[locale]/agent/chat/db";
+import type { ChatMessage, ToolCall } from "next-vibe/agent/chat/db";
 
 /**
  * Grouped message sequence

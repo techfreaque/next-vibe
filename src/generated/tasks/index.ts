@@ -12,18 +12,18 @@
 
 import type { Task, TaskRegistry } from "next-vibe/tasks/unified-runner/types";
 
-import { tasks as taskModule0 } from "../../app/api/[locale]/agent/fetch-url-content/cleanup/task";
-import { tasks as taskModule1 } from "../../app/api/[locale]/agent/models/model-prices/task";
-import { tasks as taskModule2 } from "../../app/api/[locale]/credits/expire/task";
-import { tasks as taskModule3 } from "../../app/api/[locale]/leads/attribution/task";
-import { tasks as taskModule4 } from "../../app/api/[locale]/messenger/providers/email/imap-client/sync/task";
-import { tasks as taskModule5 } from "../../app/api/[locale]/newsletter/unsubscribe/task";
-import { tasks as taskModule6 } from "../../app/api/[locale]/system/database/health/task";
-import { tasks as taskModule7 } from "../../app/api/[locale]/system/dataflow/task";
-import { tasks as taskModule8 } from "../../app/api/[locale]/system/logger/error-monitor/cleanup/task";
-import { tasks as taskModule9 } from "../../app/api/[locale]/user/session-cleanup/task";
-import { taskRunners as runnerModule10 } from "../../app/api/[locale]/system/tasks/dev-watcher/task-runner";
-import { taskRunners as runnerModule11 } from "../../app/api/[locale]/system/tasks/pulse/task-runner";
+import { tasks as taskModule0 } from "../../vibe/agent/fetch-url-content/cleanup/task";
+import { tasks as taskModule1 } from "../../vibe/agent/models/model-prices/task";
+import { tasks as taskModule2 } from "../../credits/expire/task";
+import { tasks as taskModule3 } from "../../leads/attribution/task";
+import { tasks as taskModule4 } from "../../messenger/providers/email/imap-client/sync/task";
+import { tasks as taskModule5 } from "../../newsletter/unsubscribe/task";
+import { tasks as taskModule6 } from "../../vibe/database/health/task";
+import { tasks as taskModule7 } from "../../vibe/dataflow/task";
+import { tasks as taskModule8 } from "../../vibe/logger/error-monitor/cleanup/task";
+import { tasks as taskModule9 } from "../../user/session-cleanup/task";
+import { taskRunners as runnerModule10 } from "../../vibe/tasks/dev-watcher/task-runner";
+import { taskRunners as runnerModule11 } from "../../vibe/tasks/pulse/task-runner";
 
 const allTasks: Task[] = [
   ...taskModule0,

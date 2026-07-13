@@ -3,6 +3,17 @@
  * Defines endpoint for creating a new custom skill
  */
 
+import type { ChatModelSelection } from "next-vibe/agent/ai-stream/models";
+import {
+  audioVisionModelSelectionSchema,
+  imageVisionModelSelectionSchema,
+  videoVisionModelSelectionSchema,
+} from "next-vibe/agent/ai-stream/vision-models";
+import { imageGenModelSelectionSchema } from "next-vibe/agent/image-generation/models";
+import { musicGenModelSelectionSchema } from "next-vibe/agent/music-generation/models";
+import { sttModelSelectionSchema } from "next-vibe/agent/speech-to-text/models";
+import { voiceModelSelectionSchema } from "next-vibe/agent/text-to-speech/models";
+import { videoGenModelSelectionSchema } from "next-vibe/agent/video-generation/models";
 import {
   iconSchema,
   translatedValueSchema,
@@ -25,19 +36,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
 
-import type { ChatModelSelection } from "@/app/api/[locale]/agent/ai-stream/models";
-import {
-  audioVisionModelSelectionSchema,
-  imageVisionModelSelectionSchema,
-  videoVisionModelSelectionSchema,
-} from "@/app/api/[locale]/agent/ai-stream/vision-models";
-import { imageGenModelSelectionSchema } from "@/app/api/[locale]/agent/image-generation/models";
-import { musicGenModelSelectionSchema } from "@/app/api/[locale]/agent/music-generation/models";
-import { sttModelSelectionSchema } from "@/app/api/[locale]/agent/speech-to-text/models";
-import { voiceModelSelectionSchema } from "@/app/api/[locale]/agent/text-to-speech/models";
-import { videoGenModelSelectionSchema } from "@/app/api/[locale]/agent/video-generation/models";
-
-import { lazyWidget } from "../../../system/unified-ui/_shared/lazy-widget";
+import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
 import { ChatModelId, getBestChatModel } from "../../ai-stream/models";
 import { SKILL_CREATE_ALIAS } from "../constants";
 import { skillVariantsSchema } from "../db";

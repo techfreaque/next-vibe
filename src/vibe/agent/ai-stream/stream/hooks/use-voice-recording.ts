@@ -4,12 +4,11 @@
  * Used by both ChatInput and MessageEditor
  */
 
+import { useEdenAISpeech } from "next-vibe/agent/speech-to-text/hooks";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { useCallback, useMemo, useRef } from "react";
-
-import { useEdenAISpeech } from "@/app/api/[locale]/agent/speech-to-text/hooks";
 
 /** Recording submit mode - determines what happens after recording stops */
 type RecordingSubmitMode = "toInput" | "directSubmit" | "transcribeAndSubmit";

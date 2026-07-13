@@ -909,7 +909,7 @@ const { POST } = createEndpoint({
 
                     // Module aliases: maps import specifier → resolved file path.
                     // Applied as resolve.alias in Vite (works for both client and SSR runner).
-                    // Example: { "next/navigation": "src/app/api/[locale]/system/ui/tanstack/hooks/use-navigation.tsx" }
+                    // Example: { "next/navigation": "src/vibe/ui/tanstack/hooks/use-navigation.tsx" }
                     moduleAliases: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.JSON,

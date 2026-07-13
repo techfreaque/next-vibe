@@ -14,7 +14,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { nativeEndpoint } from "next-vibe/platforms/react-native/native-endpoint";
 
-import type { WebhookData } from "@/app/api/[locale]/payment/providers/types";
+import type { WebhookData } from "@/payment/providers/types";
 
 import type { SubscriptionCancelDeleteRequestOutput } from "./cancel/definition";
 import type {

@@ -134,16 +134,14 @@ export function PosOrderListWidget(
       return;
     }
     void (async (): Promise<void> => {
-      const def =
-        await import("@/app/api/[locale]/pos/order/[orderId]/get/definition");
+      const def = await import("@/pos/order/[orderId]/get/definition");
       navigation.push(def.default.GET, { urlPathParams: { orderId } });
     })();
   };
 
   const handleNewOrder = (): void => {
     void (async (): Promise<void> => {
-      const def =
-        await import("@/app/api/[locale]/pos/order/create/definition");
+      const def = await import("@/pos/order/create/definition");
       const sessionId = form?.getValues("input.sessionId") ?? "";
       navigation.push(def.default.POST, {
         data: {

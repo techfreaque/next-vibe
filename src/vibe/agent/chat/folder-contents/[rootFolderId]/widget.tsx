@@ -12,6 +12,15 @@
  * root-folder tabs, new-chat button, search, and the top-level EndpointsPage call.
  */
 
+import {
+  DefaultFolderId,
+  isDefaultFolderId,
+} from "next-vibe/agent/chat/config";
+import {
+  NEW_MESSAGE_ID,
+  ThreadStreamingState,
+} from "next-vibe/agent/chat/enum";
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import { success } from "next-vibe/core/route/response.schema";
 import { cn } from "next-vibe/core/utils/utils";
 import { apiClient } from "next-vibe/platforms/react/hooks/store";
@@ -73,26 +82,14 @@ import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import { useMemo, useState } from "react";
 
-import {
-  chatColors,
-  chatTransitions,
-} from "@/app/[locale]/chat/lib/design-tokens";
+import { chatColors, chatTransitions } from "@/_pages/chat/lib/design-tokens";
 import {
   getFolderColor,
   getFolderDisplayName,
   getFolderIcon,
   isDefaultFolder,
-} from "@/app/[locale]/chat/lib/utils/folder-utils";
-import { buildFolderUrl } from "@/app/[locale]/chat/lib/utils/navigation";
-import {
-  DefaultFolderId,
-  isDefaultFolderId,
-} from "@/app/api/[locale]/agent/chat/config";
-import {
-  NEW_MESSAGE_ID,
-  ThreadStreamingState,
-} from "@/app/api/[locale]/agent/chat/enum";
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+} from "@/_pages/chat/lib/utils/folder-utils";
+import { buildFolderUrl } from "@/_pages/chat/lib/utils/navigation";
 
 import createFolderDefinition from "../../folders/[rootFolderId]/create/definition";
 import type { FolderListResponseOutput } from "../../folders/[rootFolderId]/definition";

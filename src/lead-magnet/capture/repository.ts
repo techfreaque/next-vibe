@@ -6,6 +6,7 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
+import { customSkills } from "next-vibe/agent/skills/db";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -15,8 +16,7 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
 
-import { customSkills } from "@/app/api/[locale]/agent/skills/db";
-import { referralCodes } from "@/app/api/[locale]/referral/db";
+import { referralCodes } from "@/referral/db";
 
 import { leadMagnetCaptures, leadMagnetConfigs } from "../db";
 import type { LeadMagnetCaptureStatusValue } from "../enum";

@@ -29,7 +29,7 @@ import { Span } from "next-vibe/ui/ui/span";
 import { H1, H2, H3, P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 
-import { GITHUB_REPO_URL } from "@/config/constants";
+import { GITHUB_REPO_URL } from "@/_old/config/constants";
 
 import { scopedTranslation } from "./i18n";
 

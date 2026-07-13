@@ -24,18 +24,18 @@ import type { ReactElement } from "react";
 import React from "react";
 import { z } from "zod";
 
-import { getEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { getAvailableModelCount } from "@/app/api/[locale]/agent/models/all-models";
-import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
-import { CreditRepository } from "@/app/api/[locale]/credits/repository";
+import { getEnvAvailability } from "next-vibe/agent/env-availability";
+import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
+import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
+import { CreditRepository } from "@/credits/repository";
 import type {
   EmailResolvedData,
   EmailTemplateDefinition,
-} from "@/app/api/[locale]/messenger/registry/template";
-import { env } from "@/config/env";
-import { configScopedTranslation } from "@/config/i18n";
+} from "@/messenger/registry/template";
+import { env } from "@/_old/config/env";
+import { configScopedTranslation } from "@/_old/config/i18n";
 
-import { FEATURED_MODELS } from "../../../agent/ai-stream/models";
+import { FEATURED_MODELS } from "../../../vibe/agent/ai-stream/models";
 import { contactClientRepository } from "../../../contact/repository-client";
 import { EmailTemplate } from "../../../messenger/providers/email/smtp-client/components/template.email";
 import {

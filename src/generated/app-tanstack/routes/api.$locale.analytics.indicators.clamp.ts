@@ -7,7 +7,7 @@ export const Route = createFileRoute("/api/$locale/analytics/indicators/clamp")(
   {
     server: {
       handlers: wrapNextApiRoute(
-        () => import("@/app/api/[locale]/analytics/indicators/clamp/route"),
+        () => import("@/analytics/indicators/clamp/route"),
       ),
     },
   },

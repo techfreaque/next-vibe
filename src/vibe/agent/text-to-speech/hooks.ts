@@ -5,14 +5,13 @@
 
 "use client";
 
+import { scopedTranslation as chatScopedTranslation } from "next-vibe/agent/chat/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { useEndpointCreate } from "next-vibe/platforms/react/hooks/use-endpoint-create";
 import { useCallback } from "react";
-
-import { scopedTranslation as chatScopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
 
 import { chunkTextForTTS } from "./chunking";
 import { DEFAULT_TTS_VOICE_ID } from "./constants";

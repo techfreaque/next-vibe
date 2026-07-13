@@ -15,9 +15,8 @@ import { db } from "next-vibe/database";
 import { isPglite } from "next-vibe/database/index";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { RemoteConnectionRepository } from "next-vibe/remote-connection/repository";
 import { scopedTranslation } from "next-vibe/server/server/headless-client/i18n";
-
-import { RemoteConnectionRepository } from "@/app/api/[locale]/remote-connection/repository";
 
 import type {
   HeadlessClientRequestOutput,
@@ -81,7 +80,7 @@ export class HeadlessClientRepository {
       const [{ openConnection }, { remoteConnections }, { eq, and }] =
         await Promise.all([
           import("next-vibe/realtime/connector"),
-          import("@/app/api/[locale]/remote-connection/db"),
+          import("next-vibe/remote-connection/db"),
           import("drizzle-orm"),
         ]);
 

@@ -3,6 +3,7 @@ import type {
   QueryKey,
   UseQueryOptions,
 } from "@tanstack/react-query";
+import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import type {
@@ -12,8 +13,6 @@ import type {
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { FieldValues, UseFormProps, UseFormReturn } from "react-hook-form";
-
-import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 
 /**
  * Utility types to extract types from CreateApiEndpoint definitions

@@ -5,7 +5,7 @@ import type { DivRefObject } from "next-vibe/ui/ui/div";
 import { Div } from "next-vibe/ui/ui/div";
 import type { JSX } from "react";
 
-import { platform } from "@/config/env-client";
+import { platform } from "@/_old/config/env-client";
 
 import { ChatInput } from "./input";
 

@@ -1,11 +1,10 @@
+import { AI_RUN_ALIAS } from "next-vibe/agent/ai-stream/run/constants";
+import { FETCH_URL_SHORT_ALIAS } from "next-vibe/agent/fetch-url-content/constants";
+import { WEB_SEARCH_ALIAS } from "next-vibe/agent/web-search/constants";
 import { EXECUTE_TOOL_ALIAS } from "next-vibe/execute-tool/constants";
 import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { HEALTH_ALIAS } from "next-vibe/server/server/health/constants";
-
-import { AI_RUN_ALIAS } from "@/app/api/[locale]/agent/ai-stream/run/constants";
-import { FETCH_URL_SHORT_ALIAS } from "@/app/api/[locale]/agent/fetch-url-content/constants";
-import { WEB_SEARCH_ALIAS } from "@/app/api/[locale]/agent/web-search/constants";
 
 import {
   CORTEX_DELETE_ALIAS,

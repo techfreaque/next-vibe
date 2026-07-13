@@ -17,9 +17,9 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { CampaignType } from "@/app/api/[locale]/messenger/accounts/enum";
-import { EmailSendingRepository } from "@/app/api/[locale]/messenger/providers/email/smtp-client/email-sending/repository";
 import { getTemplate } from "@/generated/email/index";
+import { CampaignType } from "@/messenger/accounts/enum";
+import { EmailSendingRepository } from "@/messenger/providers/email/smtp-client/email-sending/repository";
 
 import type { EmailsT } from "../../i18n";
 import { createTrackingContext } from "../../providers/email/smtp-client/components/tracking_context.email";

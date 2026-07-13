@@ -15,7 +15,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { verifyPassword } from "next-vibe/identity/auth/password";
 import type { NextRequest } from "next-vibe/ui/lib/request";
 
-import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
+import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/_old/config/constants";
 import { type CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";

@@ -8,7 +8,7 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/desktop/move-window-to-monitor/route"),
+      () => import("@/desktop/move-window-to-monitor/route"),
     ),
   },
 });

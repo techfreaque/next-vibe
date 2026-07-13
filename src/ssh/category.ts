@@ -7,8 +7,8 @@
 import type { CategoryDefinition } from "next-vibe/help-tool/category-types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
-import { SSH_CONNECTIONS_LIST_ALIAS } from "@/app/api/[locale]/ssh/connections/list/constants";
-import { USER_ME_ALIAS } from "@/app/api/[locale]/user/private/me/constants";
+import { SSH_CONNECTIONS_LIST_ALIAS } from "@/ssh/connections/list/constants";
+import { USER_ME_ALIAS } from "@/user/private/me/constants";
 
 export const category: CategoryDefinition = {
   key: "ssh",

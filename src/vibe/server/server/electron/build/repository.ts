@@ -31,7 +31,7 @@ import type { ElectronBuildT } from "next-vibe/server/server/electron/build/i18n
 
 export class ElectronBuildRepository {
   private static readonly ELECTRON_DIR =
-    "src/app/api/[locale]/system/platforms/electron";
+    "src/vibe/platforms/electron";
   private static readonly STAGE_DIR = "dist/electron-stage";
   // Defer cwd resolution to runtime - prevents Turbopack from statically
   // resolving path.join(cwd, STAGE_DIR) to project root and globbing 12k files

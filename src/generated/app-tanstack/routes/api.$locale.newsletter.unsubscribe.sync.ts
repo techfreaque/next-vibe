@@ -8,7 +8,7 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/newsletter/unsubscribe/sync/route"),
+      () => import("@/newsletter/unsubscribe/sync/route"),
     ),
   },
 });

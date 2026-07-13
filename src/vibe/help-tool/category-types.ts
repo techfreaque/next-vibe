@@ -1,7 +1,7 @@
 /**
  * Category system types for the admin sidebar.
  *
- * Each module in src/app/api/[locale]/<module>/category.ts exports a
+ * Each module in src/<module>/category.ts exports a
  * CategoryDefinition that describes how that module appears in the admin UI.
  *
  * vibe gen scans for category.ts files and generates

@@ -7,6 +7,8 @@
 
 import "server-only";
 
+import { rootlessStreamContext } from "next-vibe/agent/chat/config";
+import type { SpeechToTextT } from "next-vibe/agent/speech-to-text/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -18,13 +20,11 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { rootlessStreamContext } from "@/app/api/[locale]/agent/chat/config";
-import type { SpeechToTextT } from "@/app/api/[locale]/agent/speech-to-text/i18n";
-import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
-import { STT_COST_PER_SECOND } from "@/app/api/[locale]/products/repository-client";
+import type { CreditsT as CreditModuleT } from "@/credits/i18n";
+import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
+import { CreditRepository } from "@/credits/repository";
+import { STT_COST_PER_SECOND } from "@/products/repository-client";
 
-import type { CreditsT as CreditModuleT } from "../../../credits/i18n";
-import { CreditRepository } from "../../../credits/repository";
 import { SpeechToTextRepository } from "../repository";
 import { createAdapters } from "./adapters/factory";
 import type {

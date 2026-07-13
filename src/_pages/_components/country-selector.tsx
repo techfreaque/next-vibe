@@ -1,4 +1,5 @@
 "use client";
+import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import type {
   Countries,
@@ -22,10 +23,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe/ui/ui/tabs";
 import type { FC } from "react";
 import { useCallback, useState } from "react";
 
-import { useProviderAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import meEndpoints from "@/app/api/[locale]/user/private/me/definition";
-import { configScopedTranslation } from "@/config/i18n";
-import { useLogger } from "@/hooks/use-logger";
+import { configScopedTranslation } from "@/_old/config/i18n";
+import { useLogger } from "@/_old/hooks/use-logger";
+import meEndpoints from "@/user/private/me/definition";
 
 interface CountrySelectorProps {
   isNavBar?: boolean;

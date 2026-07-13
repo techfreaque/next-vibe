@@ -19,15 +19,14 @@
 
 import "server-only";
 
+import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
+import type { ChatMessage, ToolCall } from "next-vibe/agent/chat/db";
 import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
-import type { ChatMessage, ToolCall } from "@/app/api/[locale]/agent/chat/db";
 
 import { CallbackMode, EXECUTE_TOOL_ALIAS } from "../constants";
 import { TaskCompletion } from "./completion";

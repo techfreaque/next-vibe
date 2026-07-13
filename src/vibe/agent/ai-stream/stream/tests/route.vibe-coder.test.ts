@@ -29,16 +29,16 @@ import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { chatSettings } from "@/app/api/[locale]/agent/chat/settings/db";
+import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import { chatSettings } from "next-vibe/agent/chat/settings/db";
 import {
   ContentLevel,
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
-} from "@/app/api/[locale]/agent/skills/enum";
-import { chatFavorites } from "@/app/api/[locale]/agent/skills/favorites/db";
-import { env } from "@/config/env";
+} from "next-vibe/agent/skills/enum";
+import { chatFavorites } from "next-vibe/agent/skills/favorites/db";
+import { env } from "@/_old/config/env";
 
 import { ChatModelId } from "../../models";
 import { seedCaseThread } from "../../testing/fixture-seed";

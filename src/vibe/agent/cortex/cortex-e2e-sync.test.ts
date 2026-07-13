@@ -32,8 +32,8 @@ import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-su
 import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { DEFAULT_CHAT_MODEL_SELECTION } from "@/app/api/[locale]/agent/ai-stream/constants";
-import { ChatModelId } from "@/app/api/[locale]/agent/ai-stream/models";
+import { DEFAULT_CHAT_MODEL_SELECTION } from "next-vibe/agent/ai-stream/constants";
+import { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import {
   ATLAS_INSTANCE_ID,
   closeProdDb,
@@ -43,25 +43,25 @@ import {
   resolveProdUserId,
   resolveRemoteUrl,
   triggerHermesPull,
-} from "@/app/api/[locale]/agent/ai-stream/testing/remote-setup";
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+} from "next-vibe/agent/ai-stream/testing/remote-setup";
+import { DefaultFolderId } from "next-vibe/agent/chat/config";
 import {
   ChatMessageRole,
   ThreadStatus,
-} from "@/app/api/[locale]/agent/chat/enum";
-import { SkillCategory } from "@/app/api/[locale]/agent/skills/enum";
-import remoteConnectionDefinitions from "@/app/api/[locale]/remote-connection/[instanceId]/definition";
-import remoteConnectDefinitions from "@/app/api/[locale]/remote-connection/connect/definition";
+} from "next-vibe/agent/chat/enum";
+import { SkillCategory } from "next-vibe/agent/skills/enum";
+import remoteConnectionDefinitions from "next-vibe/remote-connection/[instanceId]/definition";
+import remoteConnectDefinitions from "next-vibe/remote-connection/connect/definition";
 import {
   remoteConnections,
   type SyncScope,
-} from "@/app/api/[locale]/remote-connection/db";
+} from "next-vibe/remote-connection/db";
 import {
   buildSyncPayloads,
   collectCursors,
   ensureProvidersRegistered,
-} from "@/app/api/[locale]/remote-connection/sync/provider";
-import { env } from "@/config/env";
+} from "next-vibe/remote-connection/sync/provider";
+import { env } from "@/_old/config/env";
 
 import { cortexNodes } from "./db";
 import { CortexNodeType } from "./enum";
@@ -1731,7 +1731,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
     // Clean dev custom skills
     if (devUser) {
       const { customSkills } =
-        await import("@/app/api/[locale]/agent/skills/db");
+        await import("next-vibe/agent/skills/db");
       await db
         .delete(customSkills)
         .where(
@@ -1784,7 +1784,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
       }
 
       const { default: skillCreateDef } =
-        await import("@/app/api/[locale]/agent/skills/create/definition");
+        await import("next-vibe/agent/skills/create/definition");
       const result = await sendTestRequest({
         streamContext: undefined,
         endpoint: skillCreateDef.POST,
@@ -1838,7 +1838,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
       }
 
       const { default: skillDef } =
-        await import("@/app/api/[locale]/agent/skills/[id]/definition");
+        await import("next-vibe/agent/skills/[id]/definition");
       const result = await sendTestRequest({
         streamContext: undefined,
         endpoint: skillDef.PATCH,
@@ -1890,7 +1890,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
       }
 
       const { default: skillDef } =
-        await import("@/app/api/[locale]/agent/skills/[id]/definition");
+        await import("next-vibe/agent/skills/[id]/definition");
       const result = await sendTestRequest({
         streamContext: undefined,
         endpoint: skillDef.DELETE,
@@ -1944,7 +1944,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
 
       // Create skill on hermes via runInProcessTyped — hermes writes and WS-pushes to atlas
       const { default: skillCreateDef } =
-        await import("@/app/api/[locale]/agent/skills/create/definition");
+        await import("next-vibe/agent/skills/create/definition");
       const result = await sendTestRequest({
         streamContext: undefined,
         endpoint: skillCreateDef.POST,
@@ -1970,7 +1970,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
       await triggerHermesPull(prodAdminToken, remoteUrl!);
 
       const { customSkills } =
-        await import("@/app/api/[locale]/agent/skills/db");
+        await import("next-vibe/agent/skills/db");
       const s4Skill = await pollUntil(
         "S4: reverse-synced skill must appear on dev",
         async () => {
@@ -2006,7 +2006,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
       const cursorsBefore = await collectCursors(devUser.id);
 
       const { customSkills } =
-        await import("@/app/api/[locale]/agent/skills/db");
+        await import("next-vibe/agent/skills/db");
       const isoSlug = `${TEST_SKILL_SLUG}-isolation`;
       await db.insert(customSkills).values({
         id: randomUUID(),
@@ -2166,7 +2166,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD, reverse-ws)", () => {
     // Clean dev custom skills
     if (devUser) {
       const { customSkills } =
-        await import("@/app/api/[locale]/agent/skills/db");
+        await import("next-vibe/agent/skills/db");
       await db
         .delete(customSkills)
         .where(
@@ -2219,7 +2219,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD, reverse-ws)", () => {
       }
 
       const { default: skillCreateDef } =
-        await import("@/app/api/[locale]/agent/skills/create/definition");
+        await import("next-vibe/agent/skills/create/definition");
       const result = await sendTestRequest({
         streamContext: undefined,
         endpoint: skillCreateDef.POST,
@@ -2273,7 +2273,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD, reverse-ws)", () => {
       }
 
       const { default: skillDef } =
-        await import("@/app/api/[locale]/agent/skills/[id]/definition");
+        await import("next-vibe/agent/skills/[id]/definition");
       const result = await sendTestRequest({
         streamContext: undefined,
         endpoint: skillDef.PATCH,
@@ -2328,7 +2328,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD, reverse-ws)", () => {
       }
 
       const { default: skillDef } =
-        await import("@/app/api/[locale]/agent/skills/[id]/definition");
+        await import("next-vibe/agent/skills/[id]/definition");
       const result = await sendTestRequest({
         streamContext: undefined,
         endpoint: skillDef.DELETE,
@@ -2470,7 +2470,7 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
     // Clean dev threads + messages
     if (devUser) {
       const { chatThreads: ct, chatMessages: cm } =
-        await import("@/app/api/[locale]/agent/chat/db");
+        await import("next-vibe/agent/chat/db");
       await db.delete(cm).where(eq(cm.threadId, TH_THREAD_ID));
       await db
         .delete(ct)
@@ -2527,7 +2527,7 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
       }
 
       const { default: threadsDef } =
-        await import("@/app/api/[locale]/agent/chat/threads/definition");
+        await import("next-vibe/agent/chat/threads/definition");
       const result = await sendTestRequest({
         streamContext: undefined,
         endpoint: threadsDef.POST,
@@ -2582,7 +2582,7 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
       }
 
       const { default: messagesDef } =
-        await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition");
+        await import("next-vibe/agent/chat/threads/[threadId]/messages/definition");
       const result = await sendTestRequest({
         streamContext: undefined,
         endpoint: messagesDef.POST,
@@ -2631,7 +2631,7 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
 
       const updatedTitle = `E2E Thread Sync ${RUN_ID} UPDATED`;
       const { default: renameDef } =
-        await import("@/app/api/[locale]/agent/chat/threads/rename/definition");
+        await import("next-vibe/agent/chat/threads/rename/definition");
       const result = await sendTestRequest({
         streamContext: undefined,
         endpoint: renameDef.PATCH,
@@ -2680,7 +2680,7 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
 
       // Create thread on hermes via runInProcessTyped — hermes writes and WS-pushes to atlas
       const { default: threadsDef } =
-        await import("@/app/api/[locale]/agent/chat/threads/definition");
+        await import("next-vibe/agent/chat/threads/definition");
       const result = await sendTestRequest({
         streamContext: undefined,
         endpoint: threadsDef.POST,
@@ -2701,7 +2701,7 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
       await triggerHermesPull(prodAdminToken, remoteUrl!);
 
       const { chatThreads: ct } =
-        await import("@/app/api/[locale]/agent/chat/db");
+        await import("next-vibe/agent/chat/db");
       const devThread = await pollUntil(
         "TH4: reverse-synced thread must appear on dev",
         async () => {
@@ -2743,7 +2743,7 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
       const olderTime = new Date(now.getTime() - 3_600_000); // 1h older
 
       const { chatThreads: ct } =
-        await import("@/app/api/[locale]/agent/chat/db");
+        await import("next-vibe/agent/chat/db");
 
       // Write newer version on dev
       await db.insert(ct).values({
@@ -2845,7 +2845,7 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
 
         // 5. Assert the thread does NOT appear on atlas
         const { chatThreads: ct } =
-          await import("@/app/api/[locale]/agent/chat/db");
+          await import("next-vibe/agent/chat/db");
         const rows = await db
           .select({ id: ct.id })
           .from(ct)
@@ -2917,7 +2917,7 @@ describe("Mount hierarchy: /threads", () => {
     }
 
     const { chatThreads: ct, chatFolders: cf } =
-      await import("@/app/api/[locale]/agent/chat/db");
+      await import("next-vibe/agent/chat/db");
 
     // Root-level thread in /threads/private (no folder) → surfaces as a file at
     // the private root, giving T3 a real thread to read.
@@ -2972,7 +2972,7 @@ describe("Mount hierarchy: /threads", () => {
       return;
     }
     const { chatThreads: ct, chatFolders: cf } =
-      await import("@/app/api/[locale]/agent/chat/db");
+      await import("next-vibe/agent/chat/db");
     await db
       .delete(ct)
       .where(
@@ -3149,7 +3149,7 @@ describe("Mount hierarchy: /threads", () => {
     "T5: buildThinThreadContent produces title+preview without message dumps",
     async () => {
       const { buildThinThreadContent } =
-        await import("@/app/api/[locale]/agent/ai-stream/repository/core/message-db-writer");
+        await import("next-vibe/agent/ai-stream/repository/core/message-db-writer");
 
       const thin = buildThinThreadContent({
         title: "Test Thread",
@@ -3189,7 +3189,7 @@ describe("Mount hierarchy: /favorites", () => {
     }
 
     const { chatFavorites } =
-      await import("@/app/api/[locale]/agent/skills/favorites/db");
+      await import("next-vibe/agent/skills/favorites/db");
     await db
       .insert(chatFavorites)
       .values({
@@ -3208,7 +3208,7 @@ describe("Mount hierarchy: /favorites", () => {
       return;
     }
     const { chatFavorites } =
-      await import("@/app/api/[locale]/agent/skills/favorites/db");
+      await import("next-vibe/agent/skills/favorites/db");
     await db
       .delete(chatFavorites)
       .where(
@@ -3421,7 +3421,7 @@ describe("Mount hierarchy: /uploads", () => {
     }
 
     const { chatThreads: ct, chatMessages: cm } =
-      await import("@/app/api/[locale]/agent/chat/db");
+      await import("next-vibe/agent/chat/db");
     await db
       .insert(ct)
       .values({
@@ -3462,7 +3462,7 @@ describe("Mount hierarchy: /uploads", () => {
       return;
     }
     const { chatThreads: ct, chatMessages: cm } =
-      await import("@/app/api/[locale]/agent/chat/db");
+      await import("next-vibe/agent/chat/db");
     await db.delete(cm).where(eq(cm.threadId, UP_THREAD_ID));
     await db
       .delete(ct)
@@ -3648,7 +3648,7 @@ describe("Mount hierarchy: /searches", () => {
     }
 
     const { chatThreads: ct, chatMessages: cm } =
-      await import("@/app/api/[locale]/agent/chat/db");
+      await import("next-vibe/agent/chat/db");
     await db
       .insert(ct)
       .values({
@@ -3696,7 +3696,7 @@ describe("Mount hierarchy: /searches", () => {
       return;
     }
     const { chatThreads: ct, chatMessages: cm } =
-      await import("@/app/api/[locale]/agent/chat/db");
+      await import("next-vibe/agent/chat/db");
     await db.delete(cm).where(eq(cm.threadId, SR_THREAD_ID));
     await db
       .delete(ct)
@@ -3859,7 +3859,7 @@ describe("Mount hierarchy: /gens", () => {
     }
 
     const { chatThreads: ct, chatMessages: cm } =
-      await import("@/app/api/[locale]/agent/chat/db");
+      await import("next-vibe/agent/chat/db");
     await db
       .insert(ct)
       .values({
@@ -3901,7 +3901,7 @@ describe("Mount hierarchy: /gens", () => {
       return;
     }
     const { chatThreads: ct, chatMessages: cm } =
-      await import("@/app/api/[locale]/agent/chat/db");
+      await import("next-vibe/agent/chat/db");
     await db.delete(cm).where(eq(cm.threadId, GEN_THREAD_ID));
     await db
       .delete(ct)
@@ -4489,7 +4489,7 @@ describe("E2E Sync: WS push (live sync on mutation)", () => {
       }
 
       const { default: skillCreateDef } =
-        await import("@/app/api/[locale]/agent/skills/create/definition");
+        await import("next-vibe/agent/skills/create/definition");
       const result = await sendTestRequest({
         streamContext: undefined,
         endpoint: skillCreateDef.POST,

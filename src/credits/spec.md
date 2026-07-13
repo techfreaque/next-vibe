@@ -1,6 +1,6 @@
 # Credits System
 
-> **Part of NextVibe Framework** (GPL-3.0) - Located in `src/app/api/[locale]/credits/`
+> **Part of NextVibe Framework** (GPL-3.0) - Located in `src/credits/`
 
 **Pay-Per-Use Credit Management**
 
@@ -165,7 +165,7 @@ response fields are `total, expiring, permanent, earned, free, expiresAt, capaci
 spendable balance, `free` the remaining free-tier credits).
 
 ```typescript
-import { useCredits } from '@/app/api/[locale]/credits/hooks';
+import { useCredits } from '@/credits/hooks';
 
 function MyComponent({ user, logger, initialData }) {
   const credits = useCredits(user, logger, initialData);

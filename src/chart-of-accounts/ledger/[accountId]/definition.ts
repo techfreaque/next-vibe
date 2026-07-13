@@ -59,9 +59,8 @@ const { GET } = createEndpoint({
         columns: 12,
         schema: z.string().uuid(),
         listEndpoint: async () =>
-          (
-            await import("@/app/api/[locale]/chart-of-accounts/account/list/definition")
-          ).default.GET,
+          (await import("@/chart-of-accounts/account/list/definition")).default
+            .GET,
         labelField: "name",
       }),
       dateFrom: requestField(scopedTranslation, {

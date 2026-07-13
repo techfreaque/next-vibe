@@ -17,47 +17,47 @@ export async function getSeedModule(
 ): Promise<EnvironmentSeeds | null> {
   switch (moduleName) {
     case "[rootFolderId]":
-      return (await import("../../app/api/[locale]/agent/chat/folders/[rootFolderId]/seeds")) as EnvironmentSeeds;
+      return (await import("../../vibe/agent/chat/folders/[rootFolderId]/seeds")) as EnvironmentSeeds;
     case "embeddings":
-      return (await import("../../app/api/[locale]/agent/cortex/embeddings/seeds")) as EnvironmentSeeds;
+      return (await import("../../vibe/agent/cortex/embeddings/seeds")) as EnvironmentSeeds;
     case "skills":
-      return (await import("../../app/api/[locale]/agent/skills/seeds")) as EnvironmentSeeds;
+      return (await import("../../vibe/agent/skills/seeds")) as EnvironmentSeeds;
     case "chart-of-accounts":
-      return (await import("../../app/api/[locale]/chart-of-accounts/seeds")) as EnvironmentSeeds;
+      return (await import("../../chart-of-accounts/seeds")) as EnvironmentSeeds;
     case "companies":
-      return (await import("../../app/api/[locale]/companies/seeds")) as EnvironmentSeeds;
+      return (await import("../../companies/seeds")) as EnvironmentSeeds;
     case "inventory":
-      return (await import("../../app/api/[locale]/inventory/seeds")) as EnvironmentSeeds;
+      return (await import("../../inventory/seeds")) as EnvironmentSeeds;
     case "lead-magnet":
-      return (await import("../../app/api/[locale]/lead-magnet/seeds")) as EnvironmentSeeds;
+      return (await import("../../lead-magnet/seeds")) as EnvironmentSeeds;
     case "leads":
-      return (await import("../../app/api/[locale]/leads/seeds")) as EnvironmentSeeds;
+      return (await import("../../leads/seeds")) as EnvironmentSeeds;
     case "messages":
-      return (await import("../../app/api/[locale]/messenger/messages/seeds")) as EnvironmentSeeds;
+      return (await import("../../messenger/messages/seeds")) as EnvironmentSeeds;
     case "smtp-client":
-      return (await import("../../app/api/[locale]/messenger/providers/email/smtp-client/seeds")) as EnvironmentSeeds;
+      return (await import("../../messenger/providers/email/smtp-client/seeds")) as EnvironmentSeeds;
     case "newsletter":
-      return (await import("../../app/api/[locale]/newsletter/seeds")) as EnvironmentSeeds;
+      return (await import("../../newsletter/seeds")) as EnvironmentSeeds;
     case "pos":
-      return (await import("../../app/api/[locale]/pos/seeds")) as EnvironmentSeeds;
+      return (await import("../../pos/seeds")) as EnvironmentSeeds;
     case "catalog":
-      return (await import("../../app/api/[locale]/products/catalog/seeds")) as EnvironmentSeeds;
+      return (await import("../../products/catalog/seeds")) as EnvironmentSeeds;
     case "purchasing":
-      return (await import("../../app/api/[locale]/purchasing/seeds")) as EnvironmentSeeds;
+      return (await import("../../purchasing/seeds")) as EnvironmentSeeds;
     case "subscription":
-      return (await import("../../app/api/[locale]/subscription/seeds")) as EnvironmentSeeds;
+      return (await import("../../subscription/seeds")) as EnvironmentSeeds;
     case "dataflow":
-      return (await import("../../app/api/[locale]/system/dataflow/seeds")) as EnvironmentSeeds;
+      return (await import("../../vibe/dataflow/seeds")) as EnvironmentSeeds;
     case "pulse":
-      return (await import("../../app/api/[locale]/system/tasks/pulse/seeds")) as EnvironmentSeeds;
+      return (await import("../../vibe/tasks/pulse/seeds")) as EnvironmentSeeds;
     case "tasks":
-      return (await import("../../app/api/[locale]/system/tasks/seeds")) as EnvironmentSeeds;
+      return (await import("../../vibe/tasks/seeds")) as EnvironmentSeeds;
     case "tax":
-      return (await import("../../app/api/[locale]/tax/seeds")) as EnvironmentSeeds;
+      return (await import("../../tax/seeds")) as EnvironmentSeeds;
     case "user":
-      return (await import("../../app/api/[locale]/user/seeds")) as EnvironmentSeeds;
+      return (await import("../../user/seeds")) as EnvironmentSeeds;
     case "users":
-      return (await import("../../app/api/[locale]/users/seeds")) as EnvironmentSeeds;
+      return (await import("../../users/seeds")) as EnvironmentSeeds;
     default:
       return null;
   }

@@ -56,9 +56,7 @@ const { PATCH } = createEndpoint({
         schema: z.uuid(),
         urlPathParam: true,
         listEndpoint: async () =>
-          (
-            await import("@/app/api/[locale]/inventory/warehouse/list/definition")
-          ).default.GET,
+          (await import("@/inventory/warehouse/list/definition")).default.GET,
         labelField: "name",
       }),
       name: requestField(scopedTranslation, {

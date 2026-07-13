@@ -6,7 +6,7 @@ import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
 export const Route = createFileRoute("/api/$locale/agent/chat/threads/rename")({
   server: {
     handlers: wrapNextApiRoute(
-      () => import("@/app/api/[locale]/agent/chat/threads/rename/route"),
+      () => import("next-vibe/agent/chat/threads/rename/route"),
     ),
   },
 });

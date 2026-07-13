@@ -5,6 +5,7 @@
  */
 
 import { and, desc, eq, gt, inArray, isNull, ne, or, sql } from "drizzle-orm";
+import { DefaultFolderId } from "next-vibe/agent/chat/config";
 import { getFullPath } from "next-vibe/core/core-utils/path";
 import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
@@ -35,8 +36,7 @@ import {
 } from "next-vibe/tasks/i18n";
 import type { PulseStatusResponseOutput } from "next-vibe/tasks/pulse/status/definition";
 
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { env } from "@/config/env";
+import { env } from "@/_old/config/env";
 
 import { isCronTaskDue } from "../cron-formatter";
 import {
@@ -194,7 +194,7 @@ export class PulseHealthRepository {
       const now = new Date();
 
       const { RemoteConnectionRepository } =
-        await import("@/app/api/[locale]/remote-connection/repository");
+        await import("next-vibe/remote-connection/repository");
       const instanceId =
         RemoteConnectionRepository.deriveDefaultSelfInstanceId();
 

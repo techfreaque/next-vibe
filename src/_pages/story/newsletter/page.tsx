@@ -9,9 +9,9 @@ import { UserRole } from "next-vibe/identity/roles/enum";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import type { JSX } from "react";
 
-import { scopedTranslation as meScopedTranslation } from "@/app/api/[locale]/user/private/me/i18n";
-import { UserProfileRepository } from "@/app/api/[locale]/user/private/me/repository";
-import { configScopedTranslation } from "@/config/i18n";
+import { configScopedTranslation } from "@/_old/config/i18n";
+import { scopedTranslation as meScopedTranslation } from "@/user/private/me/i18n";
+import { UserProfileRepository } from "@/user/private/me/repository";
 
 import { NewsletterPage } from "./_components/newsletter-page";
 import { scopedTranslation } from "./i18n";

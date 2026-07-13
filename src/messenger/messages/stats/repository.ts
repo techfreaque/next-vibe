@@ -28,7 +28,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { ActivityType, UserAssociation } from "next-vibe/identity/lead/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { EngagementLevel } from "@/app/api/[locale]/leads/tracking/enum";
+import { EngagementLevel } from "@/leads/tracking/enum";
 
 import { emails } from "../db";
 import {

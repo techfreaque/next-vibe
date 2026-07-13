@@ -3,10 +3,9 @@
  * Covers AI filesystem: read, write, edit, list, search, exec, and more.
  */
 
+import { AI_STREAM_ALIAS } from "next-vibe/agent/ai-stream/stream/constants";
 import type { CategoryDefinition } from "next-vibe/help-tool/category-types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-
-import { AI_STREAM_ALIAS } from "@/app/api/[locale]/agent/ai-stream/stream/constants";
 
 import { CORTEX_LIST_ALIAS } from "./constants";
 

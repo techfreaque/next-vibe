@@ -5,7 +5,7 @@ import type { JWTPublicPayloadType } from "next-vibe/identity/auth/types";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 
-import contactDefinitions from "@/app/api/[locale]/contact/definition";
+import contactDefinitions from "@/contact/definition";
 
 interface ContactFormSectionProps {
   locale: CountryLanguage;

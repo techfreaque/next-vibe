@@ -26,13 +26,13 @@ import {
   accountingPeriods,
   journalEntries,
   journalEntryLines,
-} from "@/app/api/[locale]/chart-of-accounts/db";
+} from "@/chart-of-accounts/db";
 import {
   JournalEntryStatus,
   JournalSourceType,
   LineType,
   PeriodStatus,
-} from "@/app/api/[locale]/chart-of-accounts/enum";
+} from "@/chart-of-accounts/enum";
 
 import { paymentInvoices } from "../../../db";
 import { InvoiceStatus } from "../../../enum";
