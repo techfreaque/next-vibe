@@ -1,2 +1,0 @@
-// AUTO-GENERATED from src/inventory/stock/issue/route.ts. Add "use custom" to this file to preserve customizations.
-export * from "@/inventory/stock/issue/route";

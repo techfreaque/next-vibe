@@ -19,7 +19,7 @@ import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { useToast } from "next-vibe/ui/hooks/use-toast";
 import { useCallback } from "react";
 
-import { configScopedTranslation } from "@/i18n";
+import { configScopedTranslation } from "@/env/i18n";
 
 import type {
   BillingIntervalValue,

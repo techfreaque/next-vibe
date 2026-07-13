@@ -31,6 +31,12 @@ import {
 } from "@/ssh/client";
 import { sshConnectionMounts, sshConnections } from "@/ssh/db";
 import { ExecBackend, SshAuthType, SshSessionStatus } from "@/ssh/enum";
+
+import type {
+  CortexExecRequestOutput,
+  CortexExecResponseOutput,
+} from "./definition";
+import type { CortexExecT } from "./i18n";
 import {
   CWD_MARKER_PREFIX,
   CWD_MARKER_SUFFIX,
@@ -38,13 +44,7 @@ import {
   getDefaultSession,
   sessionPool,
   updateSessionCwd,
-} from "@/ssh/session/pool";
-
-import type {
-  CortexExecRequestOutput,
-  CortexExecResponseOutput,
-} from "./definition";
-import type { CortexExecT } from "./i18n";
+} from "./pool";
 
 export class CortexExecRepository {
   private static readonly MAX_OUTPUT_BYTES = Number(

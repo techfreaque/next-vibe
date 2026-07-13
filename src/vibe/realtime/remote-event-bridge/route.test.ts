@@ -13,12 +13,6 @@
 
 import "server-only";
 
-import type { ResponseType } from "next-vibe/core/route/response.schema";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
 import {
   connectToHermes,
   connectToHermesLocalAi,
@@ -29,6 +23,11 @@ import {
 } from "next-vibe/agent/ai-stream/testing/remote-setup";
 import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
 import { rootlessStreamContext } from "next-vibe/agent/chat/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
+import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import type {
   RemoteEventBridgeRequestOutput,

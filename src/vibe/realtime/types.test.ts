@@ -19,15 +19,15 @@
  * DO NOT DELETE — prevents regressions in the definition-driven type system.
  */
 
+import type messagesDefinition from "next-vibe/agent/chat/threads/[threadId]/messages/definition";
+import type skillIdDefinitions from "next-vibe/agent/skills/[id]/definition";
+import type favoritesDefinition from "next-vibe/agent/skills/favorites/definition";
 import type {
   OnRemoteEventMap,
   RemoteEventHandlerProps,
 } from "next-vibe/core/route/handler";
 import type executeDefinition from "next-vibe/execute-tool/definition";
 
-import type messagesDefinition from "next-vibe/agent/chat/threads/[threadId]/messages/definition";
-import type skillIdDefinitions from "next-vibe/agent/skills/[id]/definition";
-import type favoritesDefinition from "next-vibe/agent/skills/favorites/definition";
 import type creditsDefinition from "@/credits/definition";
 
 import type { ChannelBinding } from "./emitter";

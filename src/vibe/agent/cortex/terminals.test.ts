@@ -14,7 +14,7 @@ import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-su
 import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { drainSessionPool } from "../../ssh/session/pool";
+import { drainSessionPool } from "./exec/pool";
 import terminalsEndpoint from "./terminals/definition";
 
 let user: JwtPrivatePayloadType;

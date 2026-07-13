@@ -33,7 +33,7 @@ import type {
   EmailTemplateDefinition,
 } from "@/messenger/registry/template";
 import { env } from "@/env/env";
-import { configScopedTranslation } from "@/i18n";
+import { configScopedTranslation } from "@/env/i18n";
 
 import { FEATURED_MODELS } from "../../../vibe/agent/ai-stream/models";
 import { contactClientRepository } from "../../../contact/repository-client";

@@ -30,11 +30,6 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 
 import { and, eq, sql } from "drizzle-orm";
-import { db } from "next-vibe/database";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
 import {
   ATLAS_INSTANCE_ID,
   closeProdDb,
@@ -49,8 +44,13 @@ import {
   unregisterDevFromHermes,
 } from "next-vibe/agent/ai-stream/testing/remote-setup";
 import { customSkills } from "next-vibe/agent/skills/db";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { SyncScope } from "next-vibe/remote-connection/db";
 import { remoteConnections } from "next-vibe/remote-connection/db";
+import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+
 import { env } from "@/env/env";
 
 import type { ConnectionConfig } from "./connector";

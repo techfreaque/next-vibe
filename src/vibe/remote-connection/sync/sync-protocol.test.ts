@@ -34,14 +34,14 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 
 import { and, eq, sql } from "drizzle-orm";
+import { cortexNodes } from "next-vibe/agent/cortex/db";
+import { CortexNodeType } from "next-vibe/agent/cortex/enum";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { cortexNodes } from "next-vibe/agent/cortex/db";
-import { CortexNodeType } from "next-vibe/agent/cortex/enum";
 import { env } from "@/env/env";
 
 import {

@@ -21,13 +21,13 @@
 import "server-only";
 
 import { and, eq, isNull, sql } from "drizzle-orm";
+import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import { chatFolders } from "next-vibe/agent/chat/db";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
-import { chatFolders } from "next-vibe/agent/chat/db";
 import { env } from "@/env/env";
 
 import {

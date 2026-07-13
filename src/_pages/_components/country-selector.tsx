@@ -24,7 +24,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe/ui/ui/tabs";
 import type { FC } from "react";
 import { useCallback, useState } from "react";
 
-import { configScopedTranslation } from "@/i18n";
+import { configScopedTranslation } from "@/env/i18n";
 import meEndpoints from "@/user/private/me/definition";
 
 interface CountrySelectorProps {

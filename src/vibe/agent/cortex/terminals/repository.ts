@@ -8,8 +8,7 @@ import "server-only";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import { success } from "next-vibe/core/route/response.schema";
 
-import { getSessionsForConnection, sessionPool } from "@/ssh/session/pool";
-
+import { getSessionsForConnection, sessionPool } from "../exec/pool";
 import type { CortexTerminalsResponseOutput } from "./definition";
 
 export class CortexTerminalsRepository {

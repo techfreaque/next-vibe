@@ -4,9 +4,9 @@
 import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import globalsUrl from "next-vibe/ui/globals.css?url";
 
 import { TanstackPage as RootLayout } from "@/_pages/layout";
-import globalsUrl from "next-vibe/ui/globals.css?url";
 
 const loadLayout = createServerFn({ method: "GET" })
   .inputValidator((data: { locale: string }) => data)

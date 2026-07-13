@@ -26,8 +26,8 @@ import { RemoteConnectionRepository } from "next-vibe/remote-connection/reposito
 import type { ClientT } from "@/ssh/client";
 import { sshConnectionMounts, sshConnections } from "@/ssh/db";
 import { ClusterRole, SshAuthType } from "@/ssh/enum";
-import { getSessionsForConnection } from "@/ssh/session/pool";
 
+import { getSessionsForConnection } from "../exec/pool";
 import type {
   VirtualDeleteResult,
   VirtualListEntry,

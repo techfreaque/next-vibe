@@ -35,6 +35,10 @@
 
 import "server-only";
 
+import {
+  DefaultFolderId,
+  makeHeadlessContext,
+} from "next-vibe/agent/chat/config";
 import { Platform } from "next-vibe/core/definition/platform";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
@@ -42,10 +46,6 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import {
-  DefaultFolderId,
-  makeHeadlessContext,
-} from "next-vibe/agent/chat/config";
 import { env } from "@/env/env";
 
 import { seedCaseThread } from "../../testing/fixture-seed";

@@ -13,7 +13,7 @@ import { Link } from "next-vibe/ui/ui/link";
 import type { JSX } from "react";
 
 import { envClient } from "@/env/env-client";
-import { configScopedTranslation } from "@/i18n";
+import { configScopedTranslation } from "@/env/i18n";
 import { ReferralRepository } from "@/referral/repository";
 
 import SignUpForm from "./_components/sign-up-form";

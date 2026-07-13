@@ -15,7 +15,7 @@ import type { JSX } from "react";
 
 import { env } from "@/env/env";
 import { envClient } from "@/env/env-client";
-import { configScopedTranslation } from "@/i18n";
+import { configScopedTranslation } from "@/env/i18n";
 import { DEV_SEED_PASSWORD, DEV_SEED_USERS } from "@/user/dev-seed-users";
 import { scopedTranslation as loginScopedTranslation } from "@/user/public/login/i18n";
 import type { LoginOptions } from "@/user/public/login/repository";

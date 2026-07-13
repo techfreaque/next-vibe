@@ -33,15 +33,6 @@ import { randomUUID } from "node:crypto";
 
 import { and, eq, like, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import { db } from "next-vibe/database";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import * as userSchema from "next-vibe/identity/user/db";
-import { createEndpointLogger } from "next-vibe/logger/server";
-import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
-import { Pool } from "pg";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
 import {
   closeProdDb,
   connectToHermes,
@@ -55,6 +46,11 @@ import {
   unregisterDevFromHermes,
 } from "next-vibe/agent/ai-stream/testing/remote-setup";
 import { skillsSyncProvider } from "next-vibe/agent/skills/sync-provider";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import * as userSchema from "next-vibe/identity/user/db";
+import { createEndpointLogger } from "next-vibe/logger/server";
 import * as remoteConnectionSchema from "next-vibe/remote-connection/db";
 import {
   buildSyncPayloads,
@@ -62,6 +58,10 @@ import {
   ensureProvidersRegistered,
   type SyncProvider,
 } from "next-vibe/remote-connection/sync/provider";
+import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
+import { Pool } from "pg";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+
 import { env } from "@/env/env";
 
 import { cortexNodes } from "./db";

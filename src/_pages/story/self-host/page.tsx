@@ -19,7 +19,7 @@ import type { JSX } from "react";
 
 import { GITHUB_REPO_URL } from "@/env/constants";
 import { envClient } from "@/env/env-client";
-import { configScopedTranslation } from "@/i18n";
+import { configScopedTranslation } from "@/env/i18n";
 
 import { ContactFormSection } from "../_components/contact-form-section";
 import { scopedTranslation } from "./i18n";

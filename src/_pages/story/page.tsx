@@ -18,7 +18,7 @@ import { P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 
 import { envClient } from "@/env/env-client";
-import { configScopedTranslation } from "@/i18n";
+import { configScopedTranslation } from "@/env/i18n";
 
 import { HomeClient } from "./_components/home-client";
 import { scopedTranslation } from "./i18n";

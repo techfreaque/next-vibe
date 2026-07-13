@@ -24,14 +24,6 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 
 import { and, eq, like, sql } from "drizzle-orm";
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import { db } from "next-vibe/database";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { createEndpointLogger } from "next-vibe/logger/server";
-import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
 import { DEFAULT_CHAT_MODEL_SELECTION } from "next-vibe/agent/ai-stream/constants";
 import { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import {
@@ -50,6 +42,10 @@ import {
   ThreadStatus,
 } from "next-vibe/agent/chat/enum";
 import { SkillCategory } from "next-vibe/agent/skills/enum";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { createEndpointLogger } from "next-vibe/logger/server";
 import remoteConnectionDefinitions from "next-vibe/remote-connection/[instanceId]/definition";
 import remoteConnectDefinitions from "next-vibe/remote-connection/connect/definition";
 import {
@@ -61,6 +57,10 @@ import {
   collectCursors,
   ensureProvidersRegistered,
 } from "next-vibe/remote-connection/sync/provider";
+import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
+import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+
 import { env } from "@/env/env";
 
 import { cortexNodes } from "./db";

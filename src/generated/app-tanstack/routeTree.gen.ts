@@ -97,18 +97,6 @@ import { Route as ApiLocaleLeadMagnetConfigRouteImport } from './routes/api.$loc
 import { Route as ApiLocaleLeadMagnetCapturesRouteImport } from './routes/api.$locale.lead-magnet.captures'
 import { Route as ApiLocaleLeadMagnetCaptureRouteImport } from './routes/api.$locale.lead-magnet.capture'
 import { Route as ApiLocaleInventoryDashboardRouteImport } from './routes/api.$locale.inventory.dashboard'
-import { Route as ApiLocaleDesktopTypeTextRouteImport } from './routes/api.$locale.desktop.type-text'
-import { Route as ApiLocaleDesktopTakeScreenshotRouteImport } from './routes/api.$locale.desktop.take-screenshot'
-import { Route as ApiLocaleDesktopScrollRouteImport } from './routes/api.$locale.desktop.scroll'
-import { Route as ApiLocaleDesktopPressKeyRouteImport } from './routes/api.$locale.desktop.press-key'
-import { Route as ApiLocaleDesktopMoveWindowToMonitorRouteImport } from './routes/api.$locale.desktop.move-window-to-monitor'
-import { Route as ApiLocaleDesktopMoveMouseRouteImport } from './routes/api.$locale.desktop.move-mouse'
-import { Route as ApiLocaleDesktopListWindowsRouteImport } from './routes/api.$locale.desktop.list-windows'
-import { Route as ApiLocaleDesktopListMonitorsRouteImport } from './routes/api.$locale.desktop.list-monitors'
-import { Route as ApiLocaleDesktopGetFocusedWindowRouteImport } from './routes/api.$locale.desktop.get-focused-window'
-import { Route as ApiLocaleDesktopGetAccessibilityTreeRouteImport } from './routes/api.$locale.desktop.get-accessibility-tree'
-import { Route as ApiLocaleDesktopFocusWindowRouteImport } from './routes/api.$locale.desktop.focus-window'
-import { Route as ApiLocaleDesktopClickRouteImport } from './routes/api.$locale.desktop.click'
 import { Route as ApiLocaleCreditsPurchaseRouteImport } from './routes/api.$locale.credits.purchase'
 import { Route as ApiLocaleCreditsPublicCapRouteImport } from './routes/api.$locale.credits.public-cap'
 import { Route as ApiLocaleCreditsHistoryRouteImport } from './routes/api.$locale.credits.history'
@@ -118,32 +106,6 @@ import { Route as ApiLocaleCompaniesListRouteImport } from './routes/api.$locale
 import { Route as ApiLocaleCompaniesCreateRouteImport } from './routes/api.$locale.companies.create'
 import { Route as ApiLocaleChartOfAccountsSetupRouteImport } from './routes/api.$locale.chart-of-accounts.setup'
 import { Route as ApiLocaleChartOfAccountsDashboardRouteImport } from './routes/api.$locale.chart-of-accounts.dashboard'
-import { Route as ApiLocaleBrowserWaitForRouteImport } from './routes/api.$locale.browser.wait-for'
-import { Route as ApiLocaleBrowserUploadFileRouteImport } from './routes/api.$locale.browser.upload-file'
-import { Route as ApiLocaleBrowserTakeSnapshotRouteImport } from './routes/api.$locale.browser.take-snapshot'
-import { Route as ApiLocaleBrowserTakeScreenshotRouteImport } from './routes/api.$locale.browser.take-screenshot'
-import { Route as ApiLocaleBrowserSelectPageRouteImport } from './routes/api.$locale.browser.select-page'
-import { Route as ApiLocaleBrowserResizePageRouteImport } from './routes/api.$locale.browser.resize-page'
-import { Route as ApiLocaleBrowserPressKeyRouteImport } from './routes/api.$locale.browser.press-key'
-import { Route as ApiLocaleBrowserPerformanceStopTraceRouteImport } from './routes/api.$locale.browser.performance-stop-trace'
-import { Route as ApiLocaleBrowserPerformanceStartTraceRouteImport } from './routes/api.$locale.browser.performance-start-trace'
-import { Route as ApiLocaleBrowserPerformanceAnalyzeInsightRouteImport } from './routes/api.$locale.browser.performance-analyze-insight'
-import { Route as ApiLocaleBrowserNewPageRouteImport } from './routes/api.$locale.browser.new-page'
-import { Route as ApiLocaleBrowserNavigatePageRouteImport } from './routes/api.$locale.browser.navigate-page'
-import { Route as ApiLocaleBrowserListPagesRouteImport } from './routes/api.$locale.browser.list-pages'
-import { Route as ApiLocaleBrowserListNetworkRequestsRouteImport } from './routes/api.$locale.browser.list-network-requests'
-import { Route as ApiLocaleBrowserListConsoleMessagesRouteImport } from './routes/api.$locale.browser.list-console-messages'
-import { Route as ApiLocaleBrowserHoverRouteImport } from './routes/api.$locale.browser.hover'
-import { Route as ApiLocaleBrowserHandleDialogRouteImport } from './routes/api.$locale.browser.handle-dialog'
-import { Route as ApiLocaleBrowserGetNetworkRequestRouteImport } from './routes/api.$locale.browser.get-network-request'
-import { Route as ApiLocaleBrowserGetConsoleMessageRouteImport } from './routes/api.$locale.browser.get-console-message'
-import { Route as ApiLocaleBrowserFillFormRouteImport } from './routes/api.$locale.browser.fill-form'
-import { Route as ApiLocaleBrowserFillRouteImport } from './routes/api.$locale.browser.fill'
-import { Route as ApiLocaleBrowserEvaluateScriptRouteImport } from './routes/api.$locale.browser.evaluate-script'
-import { Route as ApiLocaleBrowserEmulateRouteImport } from './routes/api.$locale.browser.emulate'
-import { Route as ApiLocaleBrowserDragRouteImport } from './routes/api.$locale.browser.drag'
-import { Route as ApiLocaleBrowserClosePageRouteImport } from './routes/api.$locale.browser.close-page'
-import { Route as ApiLocaleBrowserClickRouteImport } from './routes/api.$locale.browser.click'
 import { Route as LocaleUserAuthSignupRouteImport } from './routes/$locale.user._auth.signup'
 import { Route as LocaleUserAuthSignupIndexRouteImport } from './routes/$locale.user._auth.signup.index'
 import { Route as LocaleUserAuthResetPasswordIndexRouteImport } from './routes/$locale.user._auth.reset-password.index'
@@ -413,7 +375,6 @@ import { Route as ApiLocaleVibeExecuteToolCallControlResumeWhenDoneRouteImport }
 import { Route as ApiLocaleVibeExecuteToolCallControlDetachRouteImport } from './routes/api.$locale.vibe.execute-tool.call-control.detach'
 import { Route as ApiLocaleVibeExecuteToolCallControlCancelRouteImport } from './routes/api.$locale.vibe.execute-tool.call-control.cancel'
 import { Route as ApiLocaleVibeEnvSettingsGenerateKeyRouteImport } from './routes/api.$locale.vibe.env.settings.generate-key'
-import { Route as ApiLocaleVibeEnvSettingsExportEnvRouteImport } from './routes/api.$locale.vibe.env.settings.export-env'
 import { Route as ApiLocaleVibeAgentWebSearchKagiRouteImport } from './routes/api.$locale.vibe.agent.web-search.kagi'
 import { Route as ApiLocaleVibeAgentWebSearchBraveRouteImport } from './routes/api.$locale.vibe.agent.web-search.brave'
 import { Route as ApiLocaleVibeAgentSkillsModerationRouteImport } from './routes/api.$locale.vibe.agent.skills.moderation'
@@ -1061,76 +1022,6 @@ const ApiLocaleInventoryDashboardRoute =
     path: '/api/$locale/inventory/dashboard',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiLocaleDesktopTypeTextRoute =
-  ApiLocaleDesktopTypeTextRouteImport.update({
-    id: '/api/$locale/desktop/type-text',
-    path: '/api/$locale/desktop/type-text',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleDesktopTakeScreenshotRoute =
-  ApiLocaleDesktopTakeScreenshotRouteImport.update({
-    id: '/api/$locale/desktop/take-screenshot',
-    path: '/api/$locale/desktop/take-screenshot',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleDesktopScrollRoute = ApiLocaleDesktopScrollRouteImport.update({
-  id: '/api/$locale/desktop/scroll',
-  path: '/api/$locale/desktop/scroll',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiLocaleDesktopPressKeyRoute =
-  ApiLocaleDesktopPressKeyRouteImport.update({
-    id: '/api/$locale/desktop/press-key',
-    path: '/api/$locale/desktop/press-key',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleDesktopMoveWindowToMonitorRoute =
-  ApiLocaleDesktopMoveWindowToMonitorRouteImport.update({
-    id: '/api/$locale/desktop/move-window-to-monitor',
-    path: '/api/$locale/desktop/move-window-to-monitor',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleDesktopMoveMouseRoute =
-  ApiLocaleDesktopMoveMouseRouteImport.update({
-    id: '/api/$locale/desktop/move-mouse',
-    path: '/api/$locale/desktop/move-mouse',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleDesktopListWindowsRoute =
-  ApiLocaleDesktopListWindowsRouteImport.update({
-    id: '/api/$locale/desktop/list-windows',
-    path: '/api/$locale/desktop/list-windows',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleDesktopListMonitorsRoute =
-  ApiLocaleDesktopListMonitorsRouteImport.update({
-    id: '/api/$locale/desktop/list-monitors',
-    path: '/api/$locale/desktop/list-monitors',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleDesktopGetFocusedWindowRoute =
-  ApiLocaleDesktopGetFocusedWindowRouteImport.update({
-    id: '/api/$locale/desktop/get-focused-window',
-    path: '/api/$locale/desktop/get-focused-window',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleDesktopGetAccessibilityTreeRoute =
-  ApiLocaleDesktopGetAccessibilityTreeRouteImport.update({
-    id: '/api/$locale/desktop/get-accessibility-tree',
-    path: '/api/$locale/desktop/get-accessibility-tree',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleDesktopFocusWindowRoute =
-  ApiLocaleDesktopFocusWindowRouteImport.update({
-    id: '/api/$locale/desktop/focus-window',
-    path: '/api/$locale/desktop/focus-window',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleDesktopClickRoute = ApiLocaleDesktopClickRouteImport.update({
-  id: '/api/$locale/desktop/click',
-  path: '/api/$locale/desktop/click',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiLocaleCreditsPurchaseRoute =
   ApiLocaleCreditsPurchaseRouteImport.update({
     id: '/purchase',
@@ -1182,155 +1073,6 @@ const ApiLocaleChartOfAccountsDashboardRoute =
     path: '/api/$locale/chart-of-accounts/dashboard',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiLocaleBrowserWaitForRoute = ApiLocaleBrowserWaitForRouteImport.update({
-  id: '/api/$locale/browser/wait-for',
-  path: '/api/$locale/browser/wait-for',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiLocaleBrowserUploadFileRoute =
-  ApiLocaleBrowserUploadFileRouteImport.update({
-    id: '/api/$locale/browser/upload-file',
-    path: '/api/$locale/browser/upload-file',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleBrowserTakeSnapshotRoute =
-  ApiLocaleBrowserTakeSnapshotRouteImport.update({
-    id: '/api/$locale/browser/take-snapshot',
-    path: '/api/$locale/browser/take-snapshot',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleBrowserTakeScreenshotRoute =
-  ApiLocaleBrowserTakeScreenshotRouteImport.update({
-    id: '/api/$locale/browser/take-screenshot',
-    path: '/api/$locale/browser/take-screenshot',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleBrowserSelectPageRoute =
-  ApiLocaleBrowserSelectPageRouteImport.update({
-    id: '/api/$locale/browser/select-page',
-    path: '/api/$locale/browser/select-page',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleBrowserResizePageRoute =
-  ApiLocaleBrowserResizePageRouteImport.update({
-    id: '/api/$locale/browser/resize-page',
-    path: '/api/$locale/browser/resize-page',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleBrowserPressKeyRoute =
-  ApiLocaleBrowserPressKeyRouteImport.update({
-    id: '/api/$locale/browser/press-key',
-    path: '/api/$locale/browser/press-key',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleBrowserPerformanceStopTraceRoute =
-  ApiLocaleBrowserPerformanceStopTraceRouteImport.update({
-    id: '/api/$locale/browser/performance-stop-trace',
-    path: '/api/$locale/browser/performance-stop-trace',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleBrowserPerformanceStartTraceRoute =
-  ApiLocaleBrowserPerformanceStartTraceRouteImport.update({
-    id: '/api/$locale/browser/performance-start-trace',
-    path: '/api/$locale/browser/performance-start-trace',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleBrowserPerformanceAnalyzeInsightRoute =
-  ApiLocaleBrowserPerformanceAnalyzeInsightRouteImport.update({
-    id: '/api/$locale/browser/performance-analyze-insight',
-    path: '/api/$locale/browser/performance-analyze-insight',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleBrowserNewPageRoute = ApiLocaleBrowserNewPageRouteImport.update({
-  id: '/api/$locale/browser/new-page',
-  path: '/api/$locale/browser/new-page',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiLocaleBrowserNavigatePageRoute =
-  ApiLocaleBrowserNavigatePageRouteImport.update({
-    id: '/api/$locale/browser/navigate-page',
-    path: '/api/$locale/browser/navigate-page',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleBrowserListPagesRoute =
-  ApiLocaleBrowserListPagesRouteImport.update({
-    id: '/api/$locale/browser/list-pages',
-    path: '/api/$locale/browser/list-pages',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleBrowserListNetworkRequestsRoute =
-  ApiLocaleBrowserListNetworkRequestsRouteImport.update({
-    id: '/api/$locale/browser/list-network-requests',
-    path: '/api/$locale/browser/list-network-requests',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleBrowserListConsoleMessagesRoute =
-  ApiLocaleBrowserListConsoleMessagesRouteImport.update({
-    id: '/api/$locale/browser/list-console-messages',
-    path: '/api/$locale/browser/list-console-messages',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleBrowserHoverRoute = ApiLocaleBrowserHoverRouteImport.update({
-  id: '/api/$locale/browser/hover',
-  path: '/api/$locale/browser/hover',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiLocaleBrowserHandleDialogRoute =
-  ApiLocaleBrowserHandleDialogRouteImport.update({
-    id: '/api/$locale/browser/handle-dialog',
-    path: '/api/$locale/browser/handle-dialog',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleBrowserGetNetworkRequestRoute =
-  ApiLocaleBrowserGetNetworkRequestRouteImport.update({
-    id: '/api/$locale/browser/get-network-request',
-    path: '/api/$locale/browser/get-network-request',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleBrowserGetConsoleMessageRoute =
-  ApiLocaleBrowserGetConsoleMessageRouteImport.update({
-    id: '/api/$locale/browser/get-console-message',
-    path: '/api/$locale/browser/get-console-message',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleBrowserFillFormRoute =
-  ApiLocaleBrowserFillFormRouteImport.update({
-    id: '/api/$locale/browser/fill-form',
-    path: '/api/$locale/browser/fill-form',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleBrowserFillRoute = ApiLocaleBrowserFillRouteImport.update({
-  id: '/api/$locale/browser/fill',
-  path: '/api/$locale/browser/fill',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiLocaleBrowserEvaluateScriptRoute =
-  ApiLocaleBrowserEvaluateScriptRouteImport.update({
-    id: '/api/$locale/browser/evaluate-script',
-    path: '/api/$locale/browser/evaluate-script',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleBrowserEmulateRoute = ApiLocaleBrowserEmulateRouteImport.update({
-  id: '/api/$locale/browser/emulate',
-  path: '/api/$locale/browser/emulate',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiLocaleBrowserDragRoute = ApiLocaleBrowserDragRouteImport.update({
-  id: '/api/$locale/browser/drag',
-  path: '/api/$locale/browser/drag',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiLocaleBrowserClosePageRoute =
-  ApiLocaleBrowserClosePageRouteImport.update({
-    id: '/api/$locale/browser/close-page',
-    path: '/api/$locale/browser/close-page',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleBrowserClickRoute = ApiLocaleBrowserClickRouteImport.update({
-  id: '/api/$locale/browser/click',
-  path: '/api/$locale/browser/click',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LocaleUserAuthSignupRoute = LocaleUserAuthSignupRouteImport.update({
   id: '/signup',
   path: '/signup',
@@ -2937,12 +2679,6 @@ const ApiLocaleVibeEnvSettingsGenerateKeyRoute =
     path: '/generate-key',
     getParentRoute: () => ApiLocaleVibeEnvSettingsRoute,
   } as any)
-const ApiLocaleVibeEnvSettingsExportEnvRoute =
-  ApiLocaleVibeEnvSettingsExportEnvRouteImport.update({
-    id: '/export-env',
-    path: '/export-env',
-    getParentRoute: () => ApiLocaleVibeEnvSettingsRoute,
-  } as any)
 const ApiLocaleVibeAgentWebSearchKagiRoute =
   ApiLocaleVibeAgentWebSearchKagiRouteImport.update({
     id: '/kagi',
@@ -4046,32 +3782,6 @@ export interface FileRoutesByFullPath {
   '/$locale/tools/': typeof LocaleToolsIndexRoute
   '/$locale/track/': typeof LocaleTrackIndexRoute
   '/$locale/user/signup': typeof LocaleUserAuthSignupRouteWithChildren
-  '/api/$locale/browser/click': typeof ApiLocaleBrowserClickRoute
-  '/api/$locale/browser/close-page': typeof ApiLocaleBrowserClosePageRoute
-  '/api/$locale/browser/drag': typeof ApiLocaleBrowserDragRoute
-  '/api/$locale/browser/emulate': typeof ApiLocaleBrowserEmulateRoute
-  '/api/$locale/browser/evaluate-script': typeof ApiLocaleBrowserEvaluateScriptRoute
-  '/api/$locale/browser/fill': typeof ApiLocaleBrowserFillRoute
-  '/api/$locale/browser/fill-form': typeof ApiLocaleBrowserFillFormRoute
-  '/api/$locale/browser/get-console-message': typeof ApiLocaleBrowserGetConsoleMessageRoute
-  '/api/$locale/browser/get-network-request': typeof ApiLocaleBrowserGetNetworkRequestRoute
-  '/api/$locale/browser/handle-dialog': typeof ApiLocaleBrowserHandleDialogRoute
-  '/api/$locale/browser/hover': typeof ApiLocaleBrowserHoverRoute
-  '/api/$locale/browser/list-console-messages': typeof ApiLocaleBrowserListConsoleMessagesRoute
-  '/api/$locale/browser/list-network-requests': typeof ApiLocaleBrowserListNetworkRequestsRoute
-  '/api/$locale/browser/list-pages': typeof ApiLocaleBrowserListPagesRoute
-  '/api/$locale/browser/navigate-page': typeof ApiLocaleBrowserNavigatePageRoute
-  '/api/$locale/browser/new-page': typeof ApiLocaleBrowserNewPageRoute
-  '/api/$locale/browser/performance-analyze-insight': typeof ApiLocaleBrowserPerformanceAnalyzeInsightRoute
-  '/api/$locale/browser/performance-start-trace': typeof ApiLocaleBrowserPerformanceStartTraceRoute
-  '/api/$locale/browser/performance-stop-trace': typeof ApiLocaleBrowserPerformanceStopTraceRoute
-  '/api/$locale/browser/press-key': typeof ApiLocaleBrowserPressKeyRoute
-  '/api/$locale/browser/resize-page': typeof ApiLocaleBrowserResizePageRoute
-  '/api/$locale/browser/select-page': typeof ApiLocaleBrowserSelectPageRoute
-  '/api/$locale/browser/take-screenshot': typeof ApiLocaleBrowserTakeScreenshotRoute
-  '/api/$locale/browser/take-snapshot': typeof ApiLocaleBrowserTakeSnapshotRoute
-  '/api/$locale/browser/upload-file': typeof ApiLocaleBrowserUploadFileRoute
-  '/api/$locale/browser/wait-for': typeof ApiLocaleBrowserWaitForRoute
   '/api/$locale/chart-of-accounts/dashboard': typeof ApiLocaleChartOfAccountsDashboardRoute
   '/api/$locale/chart-of-accounts/setup': typeof ApiLocaleChartOfAccountsSetupRoute
   '/api/$locale/companies/create': typeof ApiLocaleCompaniesCreateRoute
@@ -4081,18 +3791,6 @@ export interface FileRoutesByFullPath {
   '/api/$locale/credits/history': typeof ApiLocaleCreditsHistoryRoute
   '/api/$locale/credits/public-cap': typeof ApiLocaleCreditsPublicCapRoute
   '/api/$locale/credits/purchase': typeof ApiLocaleCreditsPurchaseRoute
-  '/api/$locale/desktop/click': typeof ApiLocaleDesktopClickRoute
-  '/api/$locale/desktop/focus-window': typeof ApiLocaleDesktopFocusWindowRoute
-  '/api/$locale/desktop/get-accessibility-tree': typeof ApiLocaleDesktopGetAccessibilityTreeRoute
-  '/api/$locale/desktop/get-focused-window': typeof ApiLocaleDesktopGetFocusedWindowRoute
-  '/api/$locale/desktop/list-monitors': typeof ApiLocaleDesktopListMonitorsRoute
-  '/api/$locale/desktop/list-windows': typeof ApiLocaleDesktopListWindowsRoute
-  '/api/$locale/desktop/move-mouse': typeof ApiLocaleDesktopMoveMouseRoute
-  '/api/$locale/desktop/move-window-to-monitor': typeof ApiLocaleDesktopMoveWindowToMonitorRoute
-  '/api/$locale/desktop/press-key': typeof ApiLocaleDesktopPressKeyRoute
-  '/api/$locale/desktop/scroll': typeof ApiLocaleDesktopScrollRoute
-  '/api/$locale/desktop/take-screenshot': typeof ApiLocaleDesktopTakeScreenshotRoute
-  '/api/$locale/desktop/type-text': typeof ApiLocaleDesktopTypeTextRoute
   '/api/$locale/inventory/dashboard': typeof ApiLocaleInventoryDashboardRoute
   '/api/$locale/lead-magnet/capture': typeof ApiLocaleLeadMagnetCaptureRoute
   '/api/$locale/lead-magnet/captures': typeof ApiLocaleLeadMagnetCapturesRoute
@@ -4498,7 +4196,6 @@ export interface FileRoutesByFullPath {
   '/api/$locale/vibe/agent/skills/moderation': typeof ApiLocaleVibeAgentSkillsModerationRoute
   '/api/$locale/vibe/agent/web-search/brave': typeof ApiLocaleVibeAgentWebSearchBraveRoute
   '/api/$locale/vibe/agent/web-search/kagi': typeof ApiLocaleVibeAgentWebSearchKagiRoute
-  '/api/$locale/vibe/env/settings/export-env': typeof ApiLocaleVibeEnvSettingsExportEnvRoute
   '/api/$locale/vibe/env/settings/generate-key': typeof ApiLocaleVibeEnvSettingsGenerateKeyRoute
   '/api/$locale/vibe/execute-tool/call-control/cancel': typeof ApiLocaleVibeExecuteToolCallControlCancelRoute
   '/api/$locale/vibe/execute-tool/call-control/detach': typeof ApiLocaleVibeExecuteToolCallControlDetachRoute
@@ -4624,32 +4321,6 @@ export interface FileRoutesByTo {
   '/$locale/threads': typeof LocaleThreadsIndexRoute
   '/$locale/tools': typeof LocaleToolsIndexRoute
   '/$locale/track': typeof LocaleTrackIndexRoute
-  '/api/$locale/browser/click': typeof ApiLocaleBrowserClickRoute
-  '/api/$locale/browser/close-page': typeof ApiLocaleBrowserClosePageRoute
-  '/api/$locale/browser/drag': typeof ApiLocaleBrowserDragRoute
-  '/api/$locale/browser/emulate': typeof ApiLocaleBrowserEmulateRoute
-  '/api/$locale/browser/evaluate-script': typeof ApiLocaleBrowserEvaluateScriptRoute
-  '/api/$locale/browser/fill': typeof ApiLocaleBrowserFillRoute
-  '/api/$locale/browser/fill-form': typeof ApiLocaleBrowserFillFormRoute
-  '/api/$locale/browser/get-console-message': typeof ApiLocaleBrowserGetConsoleMessageRoute
-  '/api/$locale/browser/get-network-request': typeof ApiLocaleBrowserGetNetworkRequestRoute
-  '/api/$locale/browser/handle-dialog': typeof ApiLocaleBrowserHandleDialogRoute
-  '/api/$locale/browser/hover': typeof ApiLocaleBrowserHoverRoute
-  '/api/$locale/browser/list-console-messages': typeof ApiLocaleBrowserListConsoleMessagesRoute
-  '/api/$locale/browser/list-network-requests': typeof ApiLocaleBrowserListNetworkRequestsRoute
-  '/api/$locale/browser/list-pages': typeof ApiLocaleBrowserListPagesRoute
-  '/api/$locale/browser/navigate-page': typeof ApiLocaleBrowserNavigatePageRoute
-  '/api/$locale/browser/new-page': typeof ApiLocaleBrowserNewPageRoute
-  '/api/$locale/browser/performance-analyze-insight': typeof ApiLocaleBrowserPerformanceAnalyzeInsightRoute
-  '/api/$locale/browser/performance-start-trace': typeof ApiLocaleBrowserPerformanceStartTraceRoute
-  '/api/$locale/browser/performance-stop-trace': typeof ApiLocaleBrowserPerformanceStopTraceRoute
-  '/api/$locale/browser/press-key': typeof ApiLocaleBrowserPressKeyRoute
-  '/api/$locale/browser/resize-page': typeof ApiLocaleBrowserResizePageRoute
-  '/api/$locale/browser/select-page': typeof ApiLocaleBrowserSelectPageRoute
-  '/api/$locale/browser/take-screenshot': typeof ApiLocaleBrowserTakeScreenshotRoute
-  '/api/$locale/browser/take-snapshot': typeof ApiLocaleBrowserTakeSnapshotRoute
-  '/api/$locale/browser/upload-file': typeof ApiLocaleBrowserUploadFileRoute
-  '/api/$locale/browser/wait-for': typeof ApiLocaleBrowserWaitForRoute
   '/api/$locale/chart-of-accounts/dashboard': typeof ApiLocaleChartOfAccountsDashboardRoute
   '/api/$locale/chart-of-accounts/setup': typeof ApiLocaleChartOfAccountsSetupRoute
   '/api/$locale/companies/create': typeof ApiLocaleCompaniesCreateRoute
@@ -4659,18 +4330,6 @@ export interface FileRoutesByTo {
   '/api/$locale/credits/history': typeof ApiLocaleCreditsHistoryRoute
   '/api/$locale/credits/public-cap': typeof ApiLocaleCreditsPublicCapRoute
   '/api/$locale/credits/purchase': typeof ApiLocaleCreditsPurchaseRoute
-  '/api/$locale/desktop/click': typeof ApiLocaleDesktopClickRoute
-  '/api/$locale/desktop/focus-window': typeof ApiLocaleDesktopFocusWindowRoute
-  '/api/$locale/desktop/get-accessibility-tree': typeof ApiLocaleDesktopGetAccessibilityTreeRoute
-  '/api/$locale/desktop/get-focused-window': typeof ApiLocaleDesktopGetFocusedWindowRoute
-  '/api/$locale/desktop/list-monitors': typeof ApiLocaleDesktopListMonitorsRoute
-  '/api/$locale/desktop/list-windows': typeof ApiLocaleDesktopListWindowsRoute
-  '/api/$locale/desktop/move-mouse': typeof ApiLocaleDesktopMoveMouseRoute
-  '/api/$locale/desktop/move-window-to-monitor': typeof ApiLocaleDesktopMoveWindowToMonitorRoute
-  '/api/$locale/desktop/press-key': typeof ApiLocaleDesktopPressKeyRoute
-  '/api/$locale/desktop/scroll': typeof ApiLocaleDesktopScrollRoute
-  '/api/$locale/desktop/take-screenshot': typeof ApiLocaleDesktopTakeScreenshotRoute
-  '/api/$locale/desktop/type-text': typeof ApiLocaleDesktopTypeTextRoute
   '/api/$locale/inventory/dashboard': typeof ApiLocaleInventoryDashboardRoute
   '/api/$locale/lead-magnet/capture': typeof ApiLocaleLeadMagnetCaptureRoute
   '/api/$locale/lead-magnet/captures': typeof ApiLocaleLeadMagnetCapturesRoute
@@ -5076,7 +4735,6 @@ export interface FileRoutesByTo {
   '/api/$locale/vibe/agent/skills/moderation': typeof ApiLocaleVibeAgentSkillsModerationRoute
   '/api/$locale/vibe/agent/web-search/brave': typeof ApiLocaleVibeAgentWebSearchBraveRoute
   '/api/$locale/vibe/agent/web-search/kagi': typeof ApiLocaleVibeAgentWebSearchKagiRoute
-  '/api/$locale/vibe/env/settings/export-env': typeof ApiLocaleVibeEnvSettingsExportEnvRoute
   '/api/$locale/vibe/env/settings/generate-key': typeof ApiLocaleVibeEnvSettingsGenerateKeyRoute
   '/api/$locale/vibe/execute-tool/call-control/cancel': typeof ApiLocaleVibeExecuteToolCallControlCancelRoute
   '/api/$locale/vibe/execute-tool/call-control/detach': typeof ApiLocaleVibeExecuteToolCallControlDetachRoute
@@ -5209,32 +4867,6 @@ export interface FileRoutesById {
   '/$locale/tools/': typeof LocaleToolsIndexRoute
   '/$locale/track/': typeof LocaleTrackIndexRoute
   '/$locale/user/_auth/signup': typeof LocaleUserAuthSignupRouteWithChildren
-  '/api/$locale/browser/click': typeof ApiLocaleBrowserClickRoute
-  '/api/$locale/browser/close-page': typeof ApiLocaleBrowserClosePageRoute
-  '/api/$locale/browser/drag': typeof ApiLocaleBrowserDragRoute
-  '/api/$locale/browser/emulate': typeof ApiLocaleBrowserEmulateRoute
-  '/api/$locale/browser/evaluate-script': typeof ApiLocaleBrowserEvaluateScriptRoute
-  '/api/$locale/browser/fill': typeof ApiLocaleBrowserFillRoute
-  '/api/$locale/browser/fill-form': typeof ApiLocaleBrowserFillFormRoute
-  '/api/$locale/browser/get-console-message': typeof ApiLocaleBrowserGetConsoleMessageRoute
-  '/api/$locale/browser/get-network-request': typeof ApiLocaleBrowserGetNetworkRequestRoute
-  '/api/$locale/browser/handle-dialog': typeof ApiLocaleBrowserHandleDialogRoute
-  '/api/$locale/browser/hover': typeof ApiLocaleBrowserHoverRoute
-  '/api/$locale/browser/list-console-messages': typeof ApiLocaleBrowserListConsoleMessagesRoute
-  '/api/$locale/browser/list-network-requests': typeof ApiLocaleBrowserListNetworkRequestsRoute
-  '/api/$locale/browser/list-pages': typeof ApiLocaleBrowserListPagesRoute
-  '/api/$locale/browser/navigate-page': typeof ApiLocaleBrowserNavigatePageRoute
-  '/api/$locale/browser/new-page': typeof ApiLocaleBrowserNewPageRoute
-  '/api/$locale/browser/performance-analyze-insight': typeof ApiLocaleBrowserPerformanceAnalyzeInsightRoute
-  '/api/$locale/browser/performance-start-trace': typeof ApiLocaleBrowserPerformanceStartTraceRoute
-  '/api/$locale/browser/performance-stop-trace': typeof ApiLocaleBrowserPerformanceStopTraceRoute
-  '/api/$locale/browser/press-key': typeof ApiLocaleBrowserPressKeyRoute
-  '/api/$locale/browser/resize-page': typeof ApiLocaleBrowserResizePageRoute
-  '/api/$locale/browser/select-page': typeof ApiLocaleBrowserSelectPageRoute
-  '/api/$locale/browser/take-screenshot': typeof ApiLocaleBrowserTakeScreenshotRoute
-  '/api/$locale/browser/take-snapshot': typeof ApiLocaleBrowserTakeSnapshotRoute
-  '/api/$locale/browser/upload-file': typeof ApiLocaleBrowserUploadFileRoute
-  '/api/$locale/browser/wait-for': typeof ApiLocaleBrowserWaitForRoute
   '/api/$locale/chart-of-accounts/dashboard': typeof ApiLocaleChartOfAccountsDashboardRoute
   '/api/$locale/chart-of-accounts/setup': typeof ApiLocaleChartOfAccountsSetupRoute
   '/api/$locale/companies/create': typeof ApiLocaleCompaniesCreateRoute
@@ -5244,18 +4876,6 @@ export interface FileRoutesById {
   '/api/$locale/credits/history': typeof ApiLocaleCreditsHistoryRoute
   '/api/$locale/credits/public-cap': typeof ApiLocaleCreditsPublicCapRoute
   '/api/$locale/credits/purchase': typeof ApiLocaleCreditsPurchaseRoute
-  '/api/$locale/desktop/click': typeof ApiLocaleDesktopClickRoute
-  '/api/$locale/desktop/focus-window': typeof ApiLocaleDesktopFocusWindowRoute
-  '/api/$locale/desktop/get-accessibility-tree': typeof ApiLocaleDesktopGetAccessibilityTreeRoute
-  '/api/$locale/desktop/get-focused-window': typeof ApiLocaleDesktopGetFocusedWindowRoute
-  '/api/$locale/desktop/list-monitors': typeof ApiLocaleDesktopListMonitorsRoute
-  '/api/$locale/desktop/list-windows': typeof ApiLocaleDesktopListWindowsRoute
-  '/api/$locale/desktop/move-mouse': typeof ApiLocaleDesktopMoveMouseRoute
-  '/api/$locale/desktop/move-window-to-monitor': typeof ApiLocaleDesktopMoveWindowToMonitorRoute
-  '/api/$locale/desktop/press-key': typeof ApiLocaleDesktopPressKeyRoute
-  '/api/$locale/desktop/scroll': typeof ApiLocaleDesktopScrollRoute
-  '/api/$locale/desktop/take-screenshot': typeof ApiLocaleDesktopTakeScreenshotRoute
-  '/api/$locale/desktop/type-text': typeof ApiLocaleDesktopTypeTextRoute
   '/api/$locale/inventory/dashboard': typeof ApiLocaleInventoryDashboardRoute
   '/api/$locale/lead-magnet/capture': typeof ApiLocaleLeadMagnetCaptureRoute
   '/api/$locale/lead-magnet/captures': typeof ApiLocaleLeadMagnetCapturesRoute
@@ -5661,7 +5281,6 @@ export interface FileRoutesById {
   '/api/$locale/vibe/agent/skills/moderation': typeof ApiLocaleVibeAgentSkillsModerationRoute
   '/api/$locale/vibe/agent/web-search/brave': typeof ApiLocaleVibeAgentWebSearchBraveRoute
   '/api/$locale/vibe/agent/web-search/kagi': typeof ApiLocaleVibeAgentWebSearchKagiRoute
-  '/api/$locale/vibe/env/settings/export-env': typeof ApiLocaleVibeEnvSettingsExportEnvRoute
   '/api/$locale/vibe/env/settings/generate-key': typeof ApiLocaleVibeEnvSettingsGenerateKeyRoute
   '/api/$locale/vibe/execute-tool/call-control/cancel': typeof ApiLocaleVibeExecuteToolCallControlCancelRoute
   '/api/$locale/vibe/execute-tool/call-control/detach': typeof ApiLocaleVibeExecuteToolCallControlDetachRoute
@@ -5794,32 +5413,6 @@ export interface FileRouteTypes {
     | '/$locale/tools/'
     | '/$locale/track/'
     | '/$locale/user/signup'
-    | '/api/$locale/browser/click'
-    | '/api/$locale/browser/close-page'
-    | '/api/$locale/browser/drag'
-    | '/api/$locale/browser/emulate'
-    | '/api/$locale/browser/evaluate-script'
-    | '/api/$locale/browser/fill'
-    | '/api/$locale/browser/fill-form'
-    | '/api/$locale/browser/get-console-message'
-    | '/api/$locale/browser/get-network-request'
-    | '/api/$locale/browser/handle-dialog'
-    | '/api/$locale/browser/hover'
-    | '/api/$locale/browser/list-console-messages'
-    | '/api/$locale/browser/list-network-requests'
-    | '/api/$locale/browser/list-pages'
-    | '/api/$locale/browser/navigate-page'
-    | '/api/$locale/browser/new-page'
-    | '/api/$locale/browser/performance-analyze-insight'
-    | '/api/$locale/browser/performance-start-trace'
-    | '/api/$locale/browser/performance-stop-trace'
-    | '/api/$locale/browser/press-key'
-    | '/api/$locale/browser/resize-page'
-    | '/api/$locale/browser/select-page'
-    | '/api/$locale/browser/take-screenshot'
-    | '/api/$locale/browser/take-snapshot'
-    | '/api/$locale/browser/upload-file'
-    | '/api/$locale/browser/wait-for'
     | '/api/$locale/chart-of-accounts/dashboard'
     | '/api/$locale/chart-of-accounts/setup'
     | '/api/$locale/companies/create'
@@ -5829,18 +5422,6 @@ export interface FileRouteTypes {
     | '/api/$locale/credits/history'
     | '/api/$locale/credits/public-cap'
     | '/api/$locale/credits/purchase'
-    | '/api/$locale/desktop/click'
-    | '/api/$locale/desktop/focus-window'
-    | '/api/$locale/desktop/get-accessibility-tree'
-    | '/api/$locale/desktop/get-focused-window'
-    | '/api/$locale/desktop/list-monitors'
-    | '/api/$locale/desktop/list-windows'
-    | '/api/$locale/desktop/move-mouse'
-    | '/api/$locale/desktop/move-window-to-monitor'
-    | '/api/$locale/desktop/press-key'
-    | '/api/$locale/desktop/scroll'
-    | '/api/$locale/desktop/take-screenshot'
-    | '/api/$locale/desktop/type-text'
     | '/api/$locale/inventory/dashboard'
     | '/api/$locale/lead-magnet/capture'
     | '/api/$locale/lead-magnet/captures'
@@ -6246,7 +5827,6 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/skills/moderation'
     | '/api/$locale/vibe/agent/web-search/brave'
     | '/api/$locale/vibe/agent/web-search/kagi'
-    | '/api/$locale/vibe/env/settings/export-env'
     | '/api/$locale/vibe/env/settings/generate-key'
     | '/api/$locale/vibe/execute-tool/call-control/cancel'
     | '/api/$locale/vibe/execute-tool/call-control/detach'
@@ -6372,32 +5952,6 @@ export interface FileRouteTypes {
     | '/$locale/threads'
     | '/$locale/tools'
     | '/$locale/track'
-    | '/api/$locale/browser/click'
-    | '/api/$locale/browser/close-page'
-    | '/api/$locale/browser/drag'
-    | '/api/$locale/browser/emulate'
-    | '/api/$locale/browser/evaluate-script'
-    | '/api/$locale/browser/fill'
-    | '/api/$locale/browser/fill-form'
-    | '/api/$locale/browser/get-console-message'
-    | '/api/$locale/browser/get-network-request'
-    | '/api/$locale/browser/handle-dialog'
-    | '/api/$locale/browser/hover'
-    | '/api/$locale/browser/list-console-messages'
-    | '/api/$locale/browser/list-network-requests'
-    | '/api/$locale/browser/list-pages'
-    | '/api/$locale/browser/navigate-page'
-    | '/api/$locale/browser/new-page'
-    | '/api/$locale/browser/performance-analyze-insight'
-    | '/api/$locale/browser/performance-start-trace'
-    | '/api/$locale/browser/performance-stop-trace'
-    | '/api/$locale/browser/press-key'
-    | '/api/$locale/browser/resize-page'
-    | '/api/$locale/browser/select-page'
-    | '/api/$locale/browser/take-screenshot'
-    | '/api/$locale/browser/take-snapshot'
-    | '/api/$locale/browser/upload-file'
-    | '/api/$locale/browser/wait-for'
     | '/api/$locale/chart-of-accounts/dashboard'
     | '/api/$locale/chart-of-accounts/setup'
     | '/api/$locale/companies/create'
@@ -6407,18 +5961,6 @@ export interface FileRouteTypes {
     | '/api/$locale/credits/history'
     | '/api/$locale/credits/public-cap'
     | '/api/$locale/credits/purchase'
-    | '/api/$locale/desktop/click'
-    | '/api/$locale/desktop/focus-window'
-    | '/api/$locale/desktop/get-accessibility-tree'
-    | '/api/$locale/desktop/get-focused-window'
-    | '/api/$locale/desktop/list-monitors'
-    | '/api/$locale/desktop/list-windows'
-    | '/api/$locale/desktop/move-mouse'
-    | '/api/$locale/desktop/move-window-to-monitor'
-    | '/api/$locale/desktop/press-key'
-    | '/api/$locale/desktop/scroll'
-    | '/api/$locale/desktop/take-screenshot'
-    | '/api/$locale/desktop/type-text'
     | '/api/$locale/inventory/dashboard'
     | '/api/$locale/lead-magnet/capture'
     | '/api/$locale/lead-magnet/captures'
@@ -6824,7 +6366,6 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/skills/moderation'
     | '/api/$locale/vibe/agent/web-search/brave'
     | '/api/$locale/vibe/agent/web-search/kagi'
-    | '/api/$locale/vibe/env/settings/export-env'
     | '/api/$locale/vibe/env/settings/generate-key'
     | '/api/$locale/vibe/execute-tool/call-control/cancel'
     | '/api/$locale/vibe/execute-tool/call-control/detach'
@@ -6956,32 +6497,6 @@ export interface FileRouteTypes {
     | '/$locale/tools/'
     | '/$locale/track/'
     | '/$locale/user/_auth/signup'
-    | '/api/$locale/browser/click'
-    | '/api/$locale/browser/close-page'
-    | '/api/$locale/browser/drag'
-    | '/api/$locale/browser/emulate'
-    | '/api/$locale/browser/evaluate-script'
-    | '/api/$locale/browser/fill'
-    | '/api/$locale/browser/fill-form'
-    | '/api/$locale/browser/get-console-message'
-    | '/api/$locale/browser/get-network-request'
-    | '/api/$locale/browser/handle-dialog'
-    | '/api/$locale/browser/hover'
-    | '/api/$locale/browser/list-console-messages'
-    | '/api/$locale/browser/list-network-requests'
-    | '/api/$locale/browser/list-pages'
-    | '/api/$locale/browser/navigate-page'
-    | '/api/$locale/browser/new-page'
-    | '/api/$locale/browser/performance-analyze-insight'
-    | '/api/$locale/browser/performance-start-trace'
-    | '/api/$locale/browser/performance-stop-trace'
-    | '/api/$locale/browser/press-key'
-    | '/api/$locale/browser/resize-page'
-    | '/api/$locale/browser/select-page'
-    | '/api/$locale/browser/take-screenshot'
-    | '/api/$locale/browser/take-snapshot'
-    | '/api/$locale/browser/upload-file'
-    | '/api/$locale/browser/wait-for'
     | '/api/$locale/chart-of-accounts/dashboard'
     | '/api/$locale/chart-of-accounts/setup'
     | '/api/$locale/companies/create'
@@ -6991,18 +6506,6 @@ export interface FileRouteTypes {
     | '/api/$locale/credits/history'
     | '/api/$locale/credits/public-cap'
     | '/api/$locale/credits/purchase'
-    | '/api/$locale/desktop/click'
-    | '/api/$locale/desktop/focus-window'
-    | '/api/$locale/desktop/get-accessibility-tree'
-    | '/api/$locale/desktop/get-focused-window'
-    | '/api/$locale/desktop/list-monitors'
-    | '/api/$locale/desktop/list-windows'
-    | '/api/$locale/desktop/move-mouse'
-    | '/api/$locale/desktop/move-window-to-monitor'
-    | '/api/$locale/desktop/press-key'
-    | '/api/$locale/desktop/scroll'
-    | '/api/$locale/desktop/take-screenshot'
-    | '/api/$locale/desktop/type-text'
     | '/api/$locale/inventory/dashboard'
     | '/api/$locale/lead-magnet/capture'
     | '/api/$locale/lead-magnet/captures'
@@ -7408,7 +6911,6 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/skills/moderation'
     | '/api/$locale/vibe/agent/web-search/brave'
     | '/api/$locale/vibe/agent/web-search/kagi'
-    | '/api/$locale/vibe/env/settings/export-env'
     | '/api/$locale/vibe/env/settings/generate-key'
     | '/api/$locale/vibe/execute-tool/call-control/cancel'
     | '/api/$locale/vibe/execute-tool/call-control/detach'
@@ -7535,48 +7037,10 @@ export interface RootRouteChildren {
   LocaleSkillsIndexRoute: typeof LocaleSkillsIndexRoute
   LocaleToolsIndexRoute: typeof LocaleToolsIndexRoute
   LocaleTrackIndexRoute: typeof LocaleTrackIndexRoute
-  ApiLocaleBrowserClickRoute: typeof ApiLocaleBrowserClickRoute
-  ApiLocaleBrowserClosePageRoute: typeof ApiLocaleBrowserClosePageRoute
-  ApiLocaleBrowserDragRoute: typeof ApiLocaleBrowserDragRoute
-  ApiLocaleBrowserEmulateRoute: typeof ApiLocaleBrowserEmulateRoute
-  ApiLocaleBrowserEvaluateScriptRoute: typeof ApiLocaleBrowserEvaluateScriptRoute
-  ApiLocaleBrowserFillRoute: typeof ApiLocaleBrowserFillRoute
-  ApiLocaleBrowserFillFormRoute: typeof ApiLocaleBrowserFillFormRoute
-  ApiLocaleBrowserGetConsoleMessageRoute: typeof ApiLocaleBrowserGetConsoleMessageRoute
-  ApiLocaleBrowserGetNetworkRequestRoute: typeof ApiLocaleBrowserGetNetworkRequestRoute
-  ApiLocaleBrowserHandleDialogRoute: typeof ApiLocaleBrowserHandleDialogRoute
-  ApiLocaleBrowserHoverRoute: typeof ApiLocaleBrowserHoverRoute
-  ApiLocaleBrowserListConsoleMessagesRoute: typeof ApiLocaleBrowserListConsoleMessagesRoute
-  ApiLocaleBrowserListNetworkRequestsRoute: typeof ApiLocaleBrowserListNetworkRequestsRoute
-  ApiLocaleBrowserListPagesRoute: typeof ApiLocaleBrowserListPagesRoute
-  ApiLocaleBrowserNavigatePageRoute: typeof ApiLocaleBrowserNavigatePageRoute
-  ApiLocaleBrowserNewPageRoute: typeof ApiLocaleBrowserNewPageRoute
-  ApiLocaleBrowserPerformanceAnalyzeInsightRoute: typeof ApiLocaleBrowserPerformanceAnalyzeInsightRoute
-  ApiLocaleBrowserPerformanceStartTraceRoute: typeof ApiLocaleBrowserPerformanceStartTraceRoute
-  ApiLocaleBrowserPerformanceStopTraceRoute: typeof ApiLocaleBrowserPerformanceStopTraceRoute
-  ApiLocaleBrowserPressKeyRoute: typeof ApiLocaleBrowserPressKeyRoute
-  ApiLocaleBrowserResizePageRoute: typeof ApiLocaleBrowserResizePageRoute
-  ApiLocaleBrowserSelectPageRoute: typeof ApiLocaleBrowserSelectPageRoute
-  ApiLocaleBrowserTakeScreenshotRoute: typeof ApiLocaleBrowserTakeScreenshotRoute
-  ApiLocaleBrowserTakeSnapshotRoute: typeof ApiLocaleBrowserTakeSnapshotRoute
-  ApiLocaleBrowserUploadFileRoute: typeof ApiLocaleBrowserUploadFileRoute
-  ApiLocaleBrowserWaitForRoute: typeof ApiLocaleBrowserWaitForRoute
   ApiLocaleChartOfAccountsDashboardRoute: typeof ApiLocaleChartOfAccountsDashboardRoute
   ApiLocaleChartOfAccountsSetupRoute: typeof ApiLocaleChartOfAccountsSetupRoute
   ApiLocaleCompaniesCreateRoute: typeof ApiLocaleCompaniesCreateRoute
   ApiLocaleCompaniesListRoute: typeof ApiLocaleCompaniesListRoute
-  ApiLocaleDesktopClickRoute: typeof ApiLocaleDesktopClickRoute
-  ApiLocaleDesktopFocusWindowRoute: typeof ApiLocaleDesktopFocusWindowRoute
-  ApiLocaleDesktopGetAccessibilityTreeRoute: typeof ApiLocaleDesktopGetAccessibilityTreeRoute
-  ApiLocaleDesktopGetFocusedWindowRoute: typeof ApiLocaleDesktopGetFocusedWindowRoute
-  ApiLocaleDesktopListMonitorsRoute: typeof ApiLocaleDesktopListMonitorsRoute
-  ApiLocaleDesktopListWindowsRoute: typeof ApiLocaleDesktopListWindowsRoute
-  ApiLocaleDesktopMoveMouseRoute: typeof ApiLocaleDesktopMoveMouseRoute
-  ApiLocaleDesktopMoveWindowToMonitorRoute: typeof ApiLocaleDesktopMoveWindowToMonitorRoute
-  ApiLocaleDesktopPressKeyRoute: typeof ApiLocaleDesktopPressKeyRoute
-  ApiLocaleDesktopScrollRoute: typeof ApiLocaleDesktopScrollRoute
-  ApiLocaleDesktopTakeScreenshotRoute: typeof ApiLocaleDesktopTakeScreenshotRoute
-  ApiLocaleDesktopTypeTextRoute: typeof ApiLocaleDesktopTypeTextRoute
   ApiLocaleInventoryDashboardRoute: typeof ApiLocaleInventoryDashboardRoute
   ApiLocaleLeadMagnetCaptureRoute: typeof ApiLocaleLeadMagnetCaptureRoute
   ApiLocaleLeadMagnetCapturesRoute: typeof ApiLocaleLeadMagnetCapturesRoute
@@ -8512,90 +7976,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleInventoryDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/$locale/desktop/type-text': {
-      id: '/api/$locale/desktop/type-text'
-      path: '/api/$locale/desktop/type-text'
-      fullPath: '/api/$locale/desktop/type-text'
-      preLoaderRoute: typeof ApiLocaleDesktopTypeTextRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/desktop/take-screenshot': {
-      id: '/api/$locale/desktop/take-screenshot'
-      path: '/api/$locale/desktop/take-screenshot'
-      fullPath: '/api/$locale/desktop/take-screenshot'
-      preLoaderRoute: typeof ApiLocaleDesktopTakeScreenshotRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/desktop/scroll': {
-      id: '/api/$locale/desktop/scroll'
-      path: '/api/$locale/desktop/scroll'
-      fullPath: '/api/$locale/desktop/scroll'
-      preLoaderRoute: typeof ApiLocaleDesktopScrollRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/desktop/press-key': {
-      id: '/api/$locale/desktop/press-key'
-      path: '/api/$locale/desktop/press-key'
-      fullPath: '/api/$locale/desktop/press-key'
-      preLoaderRoute: typeof ApiLocaleDesktopPressKeyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/desktop/move-window-to-monitor': {
-      id: '/api/$locale/desktop/move-window-to-monitor'
-      path: '/api/$locale/desktop/move-window-to-monitor'
-      fullPath: '/api/$locale/desktop/move-window-to-monitor'
-      preLoaderRoute: typeof ApiLocaleDesktopMoveWindowToMonitorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/desktop/move-mouse': {
-      id: '/api/$locale/desktop/move-mouse'
-      path: '/api/$locale/desktop/move-mouse'
-      fullPath: '/api/$locale/desktop/move-mouse'
-      preLoaderRoute: typeof ApiLocaleDesktopMoveMouseRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/desktop/list-windows': {
-      id: '/api/$locale/desktop/list-windows'
-      path: '/api/$locale/desktop/list-windows'
-      fullPath: '/api/$locale/desktop/list-windows'
-      preLoaderRoute: typeof ApiLocaleDesktopListWindowsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/desktop/list-monitors': {
-      id: '/api/$locale/desktop/list-monitors'
-      path: '/api/$locale/desktop/list-monitors'
-      fullPath: '/api/$locale/desktop/list-monitors'
-      preLoaderRoute: typeof ApiLocaleDesktopListMonitorsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/desktop/get-focused-window': {
-      id: '/api/$locale/desktop/get-focused-window'
-      path: '/api/$locale/desktop/get-focused-window'
-      fullPath: '/api/$locale/desktop/get-focused-window'
-      preLoaderRoute: typeof ApiLocaleDesktopGetFocusedWindowRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/desktop/get-accessibility-tree': {
-      id: '/api/$locale/desktop/get-accessibility-tree'
-      path: '/api/$locale/desktop/get-accessibility-tree'
-      fullPath: '/api/$locale/desktop/get-accessibility-tree'
-      preLoaderRoute: typeof ApiLocaleDesktopGetAccessibilityTreeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/desktop/focus-window': {
-      id: '/api/$locale/desktop/focus-window'
-      path: '/api/$locale/desktop/focus-window'
-      fullPath: '/api/$locale/desktop/focus-window'
-      preLoaderRoute: typeof ApiLocaleDesktopFocusWindowRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/desktop/click': {
-      id: '/api/$locale/desktop/click'
-      path: '/api/$locale/desktop/click'
-      fullPath: '/api/$locale/desktop/click'
-      preLoaderRoute: typeof ApiLocaleDesktopClickRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/$locale/credits/purchase': {
       id: '/api/$locale/credits/purchase'
       path: '/purchase'
@@ -8657,188 +8037,6 @@ declare module '@tanstack/react-router' {
       path: '/api/$locale/chart-of-accounts/dashboard'
       fullPath: '/api/$locale/chart-of-accounts/dashboard'
       preLoaderRoute: typeof ApiLocaleChartOfAccountsDashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/browser/wait-for': {
-      id: '/api/$locale/browser/wait-for'
-      path: '/api/$locale/browser/wait-for'
-      fullPath: '/api/$locale/browser/wait-for'
-      preLoaderRoute: typeof ApiLocaleBrowserWaitForRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/browser/upload-file': {
-      id: '/api/$locale/browser/upload-file'
-      path: '/api/$locale/browser/upload-file'
-      fullPath: '/api/$locale/browser/upload-file'
-      preLoaderRoute: typeof ApiLocaleBrowserUploadFileRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/browser/take-snapshot': {
-      id: '/api/$locale/browser/take-snapshot'
-      path: '/api/$locale/browser/take-snapshot'
-      fullPath: '/api/$locale/browser/take-snapshot'
-      preLoaderRoute: typeof ApiLocaleBrowserTakeSnapshotRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/browser/take-screenshot': {
-      id: '/api/$locale/browser/take-screenshot'
-      path: '/api/$locale/browser/take-screenshot'
-      fullPath: '/api/$locale/browser/take-screenshot'
-      preLoaderRoute: typeof ApiLocaleBrowserTakeScreenshotRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/browser/select-page': {
-      id: '/api/$locale/browser/select-page'
-      path: '/api/$locale/browser/select-page'
-      fullPath: '/api/$locale/browser/select-page'
-      preLoaderRoute: typeof ApiLocaleBrowserSelectPageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/browser/resize-page': {
-      id: '/api/$locale/browser/resize-page'
-      path: '/api/$locale/browser/resize-page'
-      fullPath: '/api/$locale/browser/resize-page'
-      preLoaderRoute: typeof ApiLocaleBrowserResizePageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/browser/press-key': {
-      id: '/api/$locale/browser/press-key'
-      path: '/api/$locale/browser/press-key'
-      fullPath: '/api/$locale/browser/press-key'
-      preLoaderRoute: typeof ApiLocaleBrowserPressKeyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/browser/performance-stop-trace': {
-      id: '/api/$locale/browser/performance-stop-trace'
-      path: '/api/$locale/browser/performance-stop-trace'
-      fullPath: '/api/$locale/browser/performance-stop-trace'
-      preLoaderRoute: typeof ApiLocaleBrowserPerformanceStopTraceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/browser/performance-start-trace': {
-      id: '/api/$locale/browser/performance-start-trace'
-      path: '/api/$locale/browser/performance-start-trace'
-      fullPath: '/api/$locale/browser/performance-start-trace'
-      preLoaderRoute: typeof ApiLocaleBrowserPerformanceStartTraceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/browser/performance-analyze-insight': {
-      id: '/api/$locale/browser/performance-analyze-insight'
-      path: '/api/$locale/browser/performance-analyze-insight'
-      fullPath: '/api/$locale/browser/performance-analyze-insight'
-      preLoaderRoute: typeof ApiLocaleBrowserPerformanceAnalyzeInsightRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/browser/new-page': {
-      id: '/api/$locale/browser/new-page'
-      path: '/api/$locale/browser/new-page'
-      fullPath: '/api/$locale/browser/new-page'
-      preLoaderRoute: typeof ApiLocaleBrowserNewPageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/browser/navigate-page': {
-      id: '/api/$locale/browser/navigate-page'
-      path: '/api/$locale/browser/navigate-page'
-      fullPath: '/api/$locale/browser/navigate-page'
-      preLoaderRoute: typeof ApiLocaleBrowserNavigatePageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/browser/list-pages': {
-      id: '/api/$locale/browser/list-pages'
-      path: '/api/$locale/browser/list-pages'
-      fullPath: '/api/$locale/browser/list-pages'
-      preLoaderRoute: typeof ApiLocaleBrowserListPagesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/browser/list-network-requests': {
-      id: '/api/$locale/browser/list-network-requests'
-      path: '/api/$locale/browser/list-network-requests'
-      fullPath: '/api/$locale/browser/list-network-requests'
-      preLoaderRoute: typeof ApiLocaleBrowserListNetworkRequestsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/browser/list-console-messages': {
-      id: '/api/$locale/browser/list-console-messages'
-      path: '/api/$locale/browser/list-console-messages'
-      fullPath: '/api/$locale/browser/list-console-messages'
-      preLoaderRoute: typeof ApiLocaleBrowserListConsoleMessagesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/browser/hover': {
-      id: '/api/$locale/browser/hover'
-      path: '/api/$locale/browser/hover'
-      fullPath: '/api/$locale/browser/hover'
-      preLoaderRoute: typeof ApiLocaleBrowserHoverRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/browser/handle-dialog': {
-      id: '/api/$locale/browser/handle-dialog'
-      path: '/api/$locale/browser/handle-dialog'
-      fullPath: '/api/$locale/browser/handle-dialog'
-      preLoaderRoute: typeof ApiLocaleBrowserHandleDialogRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/browser/get-network-request': {
-      id: '/api/$locale/browser/get-network-request'
-      path: '/api/$locale/browser/get-network-request'
-      fullPath: '/api/$locale/browser/get-network-request'
-      preLoaderRoute: typeof ApiLocaleBrowserGetNetworkRequestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/browser/get-console-message': {
-      id: '/api/$locale/browser/get-console-message'
-      path: '/api/$locale/browser/get-console-message'
-      fullPath: '/api/$locale/browser/get-console-message'
-      preLoaderRoute: typeof ApiLocaleBrowserGetConsoleMessageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/browser/fill-form': {
-      id: '/api/$locale/browser/fill-form'
-      path: '/api/$locale/browser/fill-form'
-      fullPath: '/api/$locale/browser/fill-form'
-      preLoaderRoute: typeof ApiLocaleBrowserFillFormRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/browser/fill': {
-      id: '/api/$locale/browser/fill'
-      path: '/api/$locale/browser/fill'
-      fullPath: '/api/$locale/browser/fill'
-      preLoaderRoute: typeof ApiLocaleBrowserFillRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/browser/evaluate-script': {
-      id: '/api/$locale/browser/evaluate-script'
-      path: '/api/$locale/browser/evaluate-script'
-      fullPath: '/api/$locale/browser/evaluate-script'
-      preLoaderRoute: typeof ApiLocaleBrowserEvaluateScriptRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/browser/emulate': {
-      id: '/api/$locale/browser/emulate'
-      path: '/api/$locale/browser/emulate'
-      fullPath: '/api/$locale/browser/emulate'
-      preLoaderRoute: typeof ApiLocaleBrowserEmulateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/browser/drag': {
-      id: '/api/$locale/browser/drag'
-      path: '/api/$locale/browser/drag'
-      fullPath: '/api/$locale/browser/drag'
-      preLoaderRoute: typeof ApiLocaleBrowserDragRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/browser/close-page': {
-      id: '/api/$locale/browser/close-page'
-      path: '/api/$locale/browser/close-page'
-      fullPath: '/api/$locale/browser/close-page'
-      preLoaderRoute: typeof ApiLocaleBrowserClosePageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/browser/click': {
-      id: '/api/$locale/browser/click'
-      path: '/api/$locale/browser/click'
-      fullPath: '/api/$locale/browser/click'
-      preLoaderRoute: typeof ApiLocaleBrowserClickRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$locale/user/_auth/signup': {
@@ -10722,13 +9920,6 @@ declare module '@tanstack/react-router' {
       path: '/generate-key'
       fullPath: '/api/$locale/vibe/env/settings/generate-key'
       preLoaderRoute: typeof ApiLocaleVibeEnvSettingsGenerateKeyRouteImport
-      parentRoute: typeof ApiLocaleVibeEnvSettingsRoute
-    }
-    '/api/$locale/vibe/env/settings/export-env': {
-      id: '/api/$locale/vibe/env/settings/export-env'
-      path: '/export-env'
-      fullPath: '/api/$locale/vibe/env/settings/export-env'
-      preLoaderRoute: typeof ApiLocaleVibeEnvSettingsExportEnvRouteImport
       parentRoute: typeof ApiLocaleVibeEnvSettingsRoute
     }
     '/api/$locale/vibe/agent/web-search/kagi': {
@@ -12768,14 +11959,11 @@ const ApiLocaleVibeDataflowGraphsRouteWithChildren =
   )
 
 interface ApiLocaleVibeEnvSettingsRouteChildren {
-  ApiLocaleVibeEnvSettingsExportEnvRoute: typeof ApiLocaleVibeEnvSettingsExportEnvRoute
   ApiLocaleVibeEnvSettingsGenerateKeyRoute: typeof ApiLocaleVibeEnvSettingsGenerateKeyRoute
 }
 
 const ApiLocaleVibeEnvSettingsRouteChildren: ApiLocaleVibeEnvSettingsRouteChildren =
   {
-    ApiLocaleVibeEnvSettingsExportEnvRoute:
-      ApiLocaleVibeEnvSettingsExportEnvRoute,
     ApiLocaleVibeEnvSettingsGenerateKeyRoute:
       ApiLocaleVibeEnvSettingsGenerateKeyRoute,
   }
@@ -12965,58 +12153,11 @@ const rootRouteChildren: RootRouteChildren = {
   LocaleSkillsIndexRoute: LocaleSkillsIndexRoute,
   LocaleToolsIndexRoute: LocaleToolsIndexRoute,
   LocaleTrackIndexRoute: LocaleTrackIndexRoute,
-  ApiLocaleBrowserClickRoute: ApiLocaleBrowserClickRoute,
-  ApiLocaleBrowserClosePageRoute: ApiLocaleBrowserClosePageRoute,
-  ApiLocaleBrowserDragRoute: ApiLocaleBrowserDragRoute,
-  ApiLocaleBrowserEmulateRoute: ApiLocaleBrowserEmulateRoute,
-  ApiLocaleBrowserEvaluateScriptRoute: ApiLocaleBrowserEvaluateScriptRoute,
-  ApiLocaleBrowserFillRoute: ApiLocaleBrowserFillRoute,
-  ApiLocaleBrowserFillFormRoute: ApiLocaleBrowserFillFormRoute,
-  ApiLocaleBrowserGetConsoleMessageRoute:
-    ApiLocaleBrowserGetConsoleMessageRoute,
-  ApiLocaleBrowserGetNetworkRequestRoute:
-    ApiLocaleBrowserGetNetworkRequestRoute,
-  ApiLocaleBrowserHandleDialogRoute: ApiLocaleBrowserHandleDialogRoute,
-  ApiLocaleBrowserHoverRoute: ApiLocaleBrowserHoverRoute,
-  ApiLocaleBrowserListConsoleMessagesRoute:
-    ApiLocaleBrowserListConsoleMessagesRoute,
-  ApiLocaleBrowserListNetworkRequestsRoute:
-    ApiLocaleBrowserListNetworkRequestsRoute,
-  ApiLocaleBrowserListPagesRoute: ApiLocaleBrowserListPagesRoute,
-  ApiLocaleBrowserNavigatePageRoute: ApiLocaleBrowserNavigatePageRoute,
-  ApiLocaleBrowserNewPageRoute: ApiLocaleBrowserNewPageRoute,
-  ApiLocaleBrowserPerformanceAnalyzeInsightRoute:
-    ApiLocaleBrowserPerformanceAnalyzeInsightRoute,
-  ApiLocaleBrowserPerformanceStartTraceRoute:
-    ApiLocaleBrowserPerformanceStartTraceRoute,
-  ApiLocaleBrowserPerformanceStopTraceRoute:
-    ApiLocaleBrowserPerformanceStopTraceRoute,
-  ApiLocaleBrowserPressKeyRoute: ApiLocaleBrowserPressKeyRoute,
-  ApiLocaleBrowserResizePageRoute: ApiLocaleBrowserResizePageRoute,
-  ApiLocaleBrowserSelectPageRoute: ApiLocaleBrowserSelectPageRoute,
-  ApiLocaleBrowserTakeScreenshotRoute: ApiLocaleBrowserTakeScreenshotRoute,
-  ApiLocaleBrowserTakeSnapshotRoute: ApiLocaleBrowserTakeSnapshotRoute,
-  ApiLocaleBrowserUploadFileRoute: ApiLocaleBrowserUploadFileRoute,
-  ApiLocaleBrowserWaitForRoute: ApiLocaleBrowserWaitForRoute,
   ApiLocaleChartOfAccountsDashboardRoute:
     ApiLocaleChartOfAccountsDashboardRoute,
   ApiLocaleChartOfAccountsSetupRoute: ApiLocaleChartOfAccountsSetupRoute,
   ApiLocaleCompaniesCreateRoute: ApiLocaleCompaniesCreateRoute,
   ApiLocaleCompaniesListRoute: ApiLocaleCompaniesListRoute,
-  ApiLocaleDesktopClickRoute: ApiLocaleDesktopClickRoute,
-  ApiLocaleDesktopFocusWindowRoute: ApiLocaleDesktopFocusWindowRoute,
-  ApiLocaleDesktopGetAccessibilityTreeRoute:
-    ApiLocaleDesktopGetAccessibilityTreeRoute,
-  ApiLocaleDesktopGetFocusedWindowRoute: ApiLocaleDesktopGetFocusedWindowRoute,
-  ApiLocaleDesktopListMonitorsRoute: ApiLocaleDesktopListMonitorsRoute,
-  ApiLocaleDesktopListWindowsRoute: ApiLocaleDesktopListWindowsRoute,
-  ApiLocaleDesktopMoveMouseRoute: ApiLocaleDesktopMoveMouseRoute,
-  ApiLocaleDesktopMoveWindowToMonitorRoute:
-    ApiLocaleDesktopMoveWindowToMonitorRoute,
-  ApiLocaleDesktopPressKeyRoute: ApiLocaleDesktopPressKeyRoute,
-  ApiLocaleDesktopScrollRoute: ApiLocaleDesktopScrollRoute,
-  ApiLocaleDesktopTakeScreenshotRoute: ApiLocaleDesktopTakeScreenshotRoute,
-  ApiLocaleDesktopTypeTextRoute: ApiLocaleDesktopTypeTextRoute,
   ApiLocaleInventoryDashboardRoute: ApiLocaleInventoryDashboardRoute,
   ApiLocaleLeadMagnetCaptureRoute: ApiLocaleLeadMagnetCaptureRoute,
   ApiLocaleLeadMagnetCapturesRoute: ApiLocaleLeadMagnetCapturesRoute,

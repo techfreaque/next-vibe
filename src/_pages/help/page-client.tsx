@@ -14,7 +14,7 @@ import type { JSX } from "react";
 
 import contactDefinitions from "@/contact/definition";
 import { contactClientRepository } from "@/contact/repository-client";
-import { configScopedTranslation } from "@/i18n";
+import { configScopedTranslation } from "@/env/i18n";
 
 import { scopedTranslation as pageT } from "./i18n";
 

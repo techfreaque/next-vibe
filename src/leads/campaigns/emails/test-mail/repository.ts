@@ -20,7 +20,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { contactClientRepository } from "@/contact/repository-client";
 import { env } from "@/env/env";
-import { configScopedTranslation } from "@/i18n";
+import { configScopedTranslation } from "@/env/i18n";
 import { CampaignType } from "@/messenger/accounts/enum";
 import { scopedTranslation as smtpScopedTranslation } from "@/messenger/providers/email/smtp-client/i18n";
 import { SmtpSendingRepository } from "@/messenger/providers/email/smtp-client/sending/repository";

@@ -9,7 +9,13 @@
 import "server-only";
 
 import { and, count, eq, like } from "drizzle-orm";
+import type { SystemPromptServerParams } from "next-vibe/agent/ai-stream/system-prompt/types";
+import { scopedTranslation as chatScopedTranslation } from "next-vibe/agent/chat/i18n";
+import { cortexNodes } from "next-vibe/agent/cortex/db";
+import { CortexNodeType } from "next-vibe/agent/cortex/enum";
+import { MEMORIES_PREFIX } from "next-vibe/agent/cortex/repository";
 import { db } from "next-vibe/database";
+import { loadRemoteInstancesContext } from "next-vibe/remote-connection/system-prompt";
 import { cronTasks as cronTasksTable } from "next-vibe/tasks/cron/db";
 
 import { contactFragment } from "@/contact/system-prompt";
@@ -42,13 +48,6 @@ import {
   sshConnectionsFragment,
   systemContextFragment,
 } from "@/vibe/remote-connection/system-prompt";
-import type { SystemPromptServerParams } from "next-vibe/agent/ai-stream/system-prompt/types";
-import { loadRemoteInstancesContext } from "next-vibe/remote-connection/system-prompt";
-
-import { cortexNodes } from "next-vibe/agent/cortex/db";
-import { CortexNodeType } from "next-vibe/agent/cortex/enum";
-import { MEMORIES_PREFIX } from "next-vibe/agent/cortex/repository";
-import { scopedTranslation as chatScopedTranslation } from "next-vibe/agent/chat/i18n";
 
 /**
  * Combined server loader - pre-fetches shared data, then runs all fragment

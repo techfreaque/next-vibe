@@ -12,7 +12,7 @@ import type { JSX } from "react";
 
 import { contactClientRepository } from "@/contact/repository-client";
 import { envClient } from "@/env/env-client";
-import { configScopedTranslation } from "@/i18n";
+import { configScopedTranslation } from "@/env/i18n";
 
 import { TermsClientInteraction } from "./_components/terms-client-content";
 import { TermsContactButton } from "./_components/terms-contact-button";

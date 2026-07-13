@@ -37,3 +37,4 @@ mcp.json
 
 # admin user cortex
 ./data
+./tsconfig.tsbuildinfo

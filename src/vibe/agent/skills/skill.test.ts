@@ -20,14 +20,6 @@
 import "server-only";
 
 import { and, eq, ilike } from "drizzle-orm";
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { db } from "next-vibe/database";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { createEndpointLogger } from "next-vibe/logger/server";
-import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
-import { beforeAll, describe, expect, it } from "vitest";
-
 import {
   fetchThreadMessages,
   getOrCreateFolder,
@@ -43,6 +35,14 @@ import { chatFavorites } from "next-vibe/agent/skills/favorites/db";
 import { scopedTranslation as favoritesScopedTranslation } from "next-vibe/agent/skills/favorites/i18n";
 import { ChatFavoritesRepository } from "next-vibe/agent/skills/favorites/repository";
 import { resolveFavorite } from "next-vibe/agent/skills/resolver";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { createEndpointLogger } from "next-vibe/logger/server";
+import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
+import { beforeAll, describe, expect, it } from "vitest";
+
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
 

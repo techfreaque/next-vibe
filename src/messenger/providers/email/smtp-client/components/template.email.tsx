@@ -11,7 +11,7 @@ import type { JSX, ReactNode } from "react";
 import { contactClientRepository } from "@/contact/repository-client";
 import { FEEDBACK_REWARD_CREDITS } from "@/credits/constants";
 import { envClient } from "@/env/env-client";
-import { configScopedTranslation } from "@/i18n";
+import { configScopedTranslation } from "@/env/i18n";
 
 import { scopedTranslation } from "../i18n";
 import { EmailImage } from "./email-image.email";

@@ -22,7 +22,7 @@ import {
 import type { EmailTemplateDefinition } from "@/messenger/registry/template";
 import { RESET_TOKEN_EXPIRY } from "@/env/constants";
 import { env } from "@/env/env";
-import { configScopedTranslation } from "@/i18n";
+import { configScopedTranslation } from "@/env/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";

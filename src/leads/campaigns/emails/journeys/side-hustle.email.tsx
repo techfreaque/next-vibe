@@ -7,7 +7,7 @@
 import { EmailCampaignStage } from "next-vibe/identity/lead/enum";
 import React from "react";
 
-import { configScopedTranslation } from "@/i18n";
+import { configScopedTranslation } from "@/env/i18n";
 import { CampaignEmailLayout } from "@/messenger/providers/email/smtp-client/components/campaign_email_layout.email";
 import { HumanCTAButton } from "@/messenger/providers/email/smtp-client/components/human_cta_button.email";
 import { HumanText } from "@/messenger/providers/email/smtp-client/components/human_text.email";

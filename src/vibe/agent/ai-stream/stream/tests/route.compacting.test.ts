@@ -29,6 +29,7 @@ import "server-only";
 // eslint-disable-next-line i18next/no-literal-string
 globalThis.AI_SDK_LOG_WARNINGS = false;
 
+import { DefaultFolderId } from "next-vibe/agent/chat/config";
 import { Platform } from "next-vibe/core/definition/platform";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
@@ -36,7 +37,6 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
 import { env } from "@/env/env";

@@ -15,7 +15,7 @@ import { z } from "zod";
 
 import { contactClientRepository } from "@/contact/repository-client";
 import { env } from "@/env/env";
-import { configScopedTranslation } from "@/i18n";
+import { configScopedTranslation } from "@/env/i18n";
 import type { EmailTemplateDefinition } from "@/messenger/registry/template";
 
 import { EmailTemplate } from "../../messenger/providers/email/smtp-client/components/template.email";

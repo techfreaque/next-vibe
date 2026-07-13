@@ -19,7 +19,7 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type Stripe from "stripe";
 
-import { configScopedTranslation } from "@/i18n";
+import { configScopedTranslation } from "@/env/i18n";
 
 import { createTrackingContext } from "../messenger/providers/email/smtp-client/components/tracking_context.email";
 import { scopedTranslation as checkoutScopedTranslation } from "../payment/checkout/i18n";

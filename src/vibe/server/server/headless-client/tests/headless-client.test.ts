@@ -21,13 +21,6 @@ import "server-only";
 import { readFileSync } from "node:fs";
 
 import { and, eq } from "drizzle-orm";
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import { db } from "next-vibe/database";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { createEndpointLogger } from "next-vibe/logger/server";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
 import { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import {
   getOrCreateFolder,
@@ -42,11 +35,18 @@ import { chatThreads } from "next-vibe/agent/chat/db";
 import { NO_SKILL_ID } from "next-vibe/agent/skills/constants";
 import { ModelSelectionType } from "next-vibe/agent/skills/enum";
 import type { FavoriteConfig } from "next-vibe/agent/skills/favorites/db";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { createEndpointLogger } from "next-vibe/logger/server";
 import {
   instanceIdentities,
   remoteConnections,
 } from "next-vibe/remote-connection/db";
 import { RemoteConnectionRepository } from "next-vibe/remote-connection/repository";
+import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+
 import { env } from "@/env/env";
 
 // ─── Constants ───────────────────────────────────────────────────────────────

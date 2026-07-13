@@ -25,7 +25,7 @@ import type {
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { JSX } from "react";
 
-import { configScopedTranslation } from "@/i18n";
+import { configScopedTranslation } from "@/env/i18n";
 
 import type { CampaignTypeValue } from "../../../../accounts/enum";
 import { CampaignType } from "../../../../accounts/enum";

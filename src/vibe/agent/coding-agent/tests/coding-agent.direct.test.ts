@@ -20,15 +20,14 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-import { db } from "next-vibe/database";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
-
 import { rootlessStreamContext } from "next-vibe/agent/chat/config";
 import { chatThreads } from "next-vibe/agent/chat/db";
 import favoritesCreateDefinitions from "next-vibe/agent/skills/favorites/create/definition";
 import favoritesDefinitions from "next-vibe/agent/skills/favorites/definition";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import remoteConnectionByIdDefinitions from "next-vibe/remote-connection/[instanceId]/definition";
+import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 
 import {
   ATLAS_INSTANCE_ID,

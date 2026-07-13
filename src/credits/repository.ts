@@ -3501,7 +3501,7 @@ export class CreditRepository {
               await import("../messenger/providers/email/smtp-client/email-sending/repository");
             const { contactClientRepository } =
               await import("../contact/repository-client");
-            const { configScopedTranslation } = await import("@/i18n");
+            const { configScopedTranslation } = await import("@/env/i18n");
             const { createTrackingContext } =
               await import("../messenger/providers/email/smtp-client/components/tracking_context.email");
             const { t: configT } = configScopedTranslation.scopedT(userLocale);

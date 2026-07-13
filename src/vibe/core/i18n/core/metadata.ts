@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { configScopedTranslation } from "@/i18n";
+import { configScopedTranslation } from "@/env/i18n";
 
 import type { CountryLanguage } from "./config";
 import { Countries, Languages as LanguagesEnum } from "./config";

@@ -15,7 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe/ui/ui/tabs";
 import type { FC } from "react";
 import { useCallback, useState } from "react";
 
-import { configScopedTranslation } from "@/i18n";
+import { configScopedTranslation } from "@/env/i18n";
 
 export const LocaleSelectorContent: FC = () => {
   const translationContext = useTranslation();

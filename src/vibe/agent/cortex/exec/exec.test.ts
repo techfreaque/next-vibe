@@ -23,10 +23,10 @@ import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-su
 import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { drainSessionPool } from "../../../ssh/session/pool";
 import execEndpoint from "../exec/definition";
 import listEndpoint from "../list/definition";
 import { ensureLocalConnection } from "../mounts/ssh";
+import { drainSessionPool } from "./pool";
 
 let user: JwtPrivatePayloadType;
 

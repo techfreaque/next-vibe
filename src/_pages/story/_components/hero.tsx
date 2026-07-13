@@ -24,7 +24,7 @@ import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
 
 import { GITHUB_REPO_URL } from "@/env/constants";
-import { configScopedTranslation } from "@/i18n";
+import { configScopedTranslation } from "@/env/i18n";
 
 import { scopedTranslation } from "./i18n";
 import { MockChatProvider } from "./mock-chat-provider";

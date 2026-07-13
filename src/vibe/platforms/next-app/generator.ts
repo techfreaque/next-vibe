@@ -36,10 +36,11 @@ const API_EXCLUDE_DIRS = new Set([
   join(SRC_DIR, "_pages"),
   join(SRC_DIR, "_old"),
   join(SRC_DIR, "generated"),
+  join(PROJECT_ROOT, "src", "app"),
   join(SRC_DIR, "env"),
   join(SRC_DIR, "i18n"),
 ]);
-const OUT_ROOT = join(SRC_DIR, "generated", "app");
+const OUT_ROOT = join(PROJECT_ROOT, "src", "app");
 const OUT_UI = join(OUT_ROOT, "[locale]");
 const OUT_API = join(OUT_ROOT, "api", "[locale]");
 
@@ -90,11 +91,12 @@ function isWebExcluded(
   return false;
 }
 
-function sourceAlias(absSrc: string): string {
-  const rel = relative(SRC_DIR, absSrc)
-    .replaceAll("\\", "/")
-    .replace(/\.tsx?$/, "");
-  return `@/${rel}`;
+function sourceAlias(absSrc: string, outPath: string): string {
+  const rel = relative(
+    dirname(outPath),
+    absSrc.replace(/\.tsx?$/, ""),
+  ).replaceAll("\\", "/");
+  return rel.startsWith(".") ? rel : `./${rel}`;
 }
 
 function findFiles(
@@ -147,9 +149,14 @@ function writeIfNotCustom(outPath: string, content: string): boolean {
 
 type ShellKind = "page" | "layout" | "route" | "special";
 
-function shell(srcAbs: string, kind: ShellKind, fileName?: string): string {
+function shell(
+  srcAbs: string,
+  outPath: string,
+  kind: ShellKind,
+  fileName?: string,
+): string {
   const srcRel = relative(PROJECT_ROOT, srcAbs).replaceAll("\\", "/");
-  const alias = sourceAlias(srcAbs);
+  const alias = sourceAlias(srcAbs, outPath);
   const header = `// AUTO-GENERATED from ${srcRel}. Add "use custom" to this file to preserve customizations.`;
   if (kind === "route") {
     return [header, `export * from "${alias}";`, ``].join("\n");
@@ -193,7 +200,7 @@ function emit(
     const fileName = srcFile.split("/").pop();
     const outPath = join(outRoot, relative(srcRoot, srcFile));
     try {
-      if (writeIfNotCustom(outPath, shell(srcFile, kind, fileName))) {
+      if (writeIfNotCustom(outPath, shell(srcFile, outPath, kind, fileName))) {
         created.push(relative(PROJECT_ROOT, outPath));
       } else {
         skipped.push(relative(PROJECT_ROOT, outPath));
@@ -258,35 +265,6 @@ function cleanupStaleShells(
   }
 }
 
-// Emit the minimal root layout.tsx required by Next.js App Router.
-// The actual document shell lives in src/_pages/layout.tsx under [locale]/;
-// this root layout just passes children through so Next.js has a valid root.
-function emitRootLayout(
-  created: string[],
-  skipped: string[],
-  errors: { file: string; error: string }[],
-): void {
-  const outPath = join(OUT_ROOT, "layout.tsx");
-  const content = [
-    `// AUTO-GENERATED. Add "use custom" to this file to preserve customizations.`,
-    `// Root layout required by Next.js App Router. The document shell is in [locale]/layout.tsx.`,
-    `import type { ReactNode } from "react";`,
-    `export default function RootLayout({ children }: { children: ReactNode }): ReactNode {`,
-    `  return children;`,
-    `}`,
-    ``,
-  ].join("\n");
-  try {
-    if (writeIfNotCustom(outPath, content)) {
-      created.push(relative(PROJECT_ROOT, outPath));
-    } else {
-      skipped.push(relative(PROJECT_ROOT, outPath));
-    }
-  } catch (error) {
-    errors.push({ file: "src/app/layout.tsx", error: parseError(error).message });
-  }
-}
-
 // Emit the proxy.ts re-export at the generated app root.
 function emitProxyShell(
   created: string[],
@@ -299,9 +277,10 @@ function emitProxyShell(
   }
   const outPath = join(OUT_ROOT, "proxy.ts");
   const srcRel = relative(PROJECT_ROOT, srcFile).replaceAll("\\", "/");
+  const alias = sourceAlias(srcFile, outPath);
   const content = [
     `// AUTO-GENERATED from ${srcRel}. Add "use custom" to this file to preserve customizations.`,
-    `export * from "@/proxy";`,
+    `export * from "${alias}";`,
     ``,
   ].join("\n");
   try {
@@ -354,28 +333,6 @@ export async function generate(
     );
   }
 
-  // Root-level special files (error.tsx, not-found.tsx, global-error.tsx live
-  // directly under src/_pages/, not under [locale]).
-  for (const specialFile of SPECIAL_FILES) {
-    const srcFile = join(UI_DIR, specialFile);
-    if (!existsSync(srcFile) || hasCustomDirective(srcFile)) {
-      continue;
-    }
-    const outPath = join(OUT_ROOT, specialFile);
-    try {
-      if (writeIfNotCustom(outPath, shell(srcFile, "special", specialFile))) {
-        created.push(relative(PROJECT_ROOT, outPath));
-      } else {
-        skipped.push(relative(PROJECT_ROOT, outPath));
-      }
-    } catch (error) {
-      errors.push({
-        file: relative(PROJECT_ROOT, srcFile),
-        error: parseError(error).message,
-      });
-    }
-  }
-
   // — API: route.ts shells, skipping WEB_OFF / PRODUCTION_OFF endpoints —
   emit(
     findFiles(API_DIR, "route.ts", [], API_EXCLUDE_DIRS),
@@ -392,9 +349,6 @@ export async function generate(
       return !isWebExcluded(f, ctx.computed.definitionModules);
     },
   );
-
-  // — root layout.tsx (required by Next.js App Router) —
-  emitRootLayout(created, skipped, errors);
 
   // — proxy.ts at app root —
   emitProxyShell(created, skipped, errors);

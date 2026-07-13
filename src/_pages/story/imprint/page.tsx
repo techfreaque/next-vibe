@@ -15,7 +15,7 @@ import type { JSX } from "react";
 
 import { contactClientRepository } from "@/contact/repository-client";
 import { envClient } from "@/env/env-client";
-import { configScopedTranslation } from "@/i18n";
+import { configScopedTranslation } from "@/env/i18n";
 
 import { ImprintClientInteraction } from "./_components/imprint-client-content";
 import { scopedTranslation } from "./i18n";

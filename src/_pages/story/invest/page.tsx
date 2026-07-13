@@ -9,7 +9,7 @@ import { Div } from "next-vibe/ui/ui/div";
 import type { JSX } from "react";
 
 import { envClient } from "@/env/env-client";
-import { configScopedTranslation } from "@/i18n";
+import { configScopedTranslation } from "@/env/i18n";
 
 import { FrameworkContent } from "../framework/_components/framework-content";
 import { scopedTranslation } from "./i18n";

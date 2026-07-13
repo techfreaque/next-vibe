@@ -23,7 +23,7 @@ import type { StandardUserType } from "next-vibe/identity/user/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { env } from "@/env/env";
-import { translations } from "@/i18n/en";
+import { translations } from "@/env/i18n/en";
 
 import { contactClientRepository } from "../contact/repository-client";
 import { DEV_SEED_PASSWORD, DEV_SEED_USERS } from "./dev-seed-users";

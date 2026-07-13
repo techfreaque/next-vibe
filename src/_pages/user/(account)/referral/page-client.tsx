@@ -30,8 +30,8 @@ import { H1, H2, H3, Muted, P } from "next-vibe/ui/ui/typography";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 
-import { configScopedTranslation } from "@/i18n";
-import { translations as configTranslations } from "@/i18n/en";
+import { configScopedTranslation } from "@/env/i18n";
+import { translations as configTranslations } from "@/env/i18n/en";
 import referralCodesListDefinition from "@/referral/codes/list/definition";
 import referralDefinition from "@/referral/definition";
 import referralPayoutDefinition from "@/referral/payout/definition";

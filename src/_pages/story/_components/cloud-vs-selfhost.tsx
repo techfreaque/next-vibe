@@ -15,7 +15,7 @@ import type { JSX } from "react";
 import { useInView } from "react-intersection-observer";
 
 import { FREE_CREDIT_POOL } from "@/credits/constants";
-import { configScopedTranslation } from "@/i18n";
+import { configScopedTranslation } from "@/env/i18n";
 
 import { scopedTranslation } from "./i18n";
 

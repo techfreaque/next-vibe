@@ -10,7 +10,7 @@ import { Span } from "next-vibe/ui/ui/span";
 import type { JSX } from "react";
 
 import { envClient, platform } from "@/env/env-client";
-import { configScopedTranslation } from "@/i18n";
+import { configScopedTranslation } from "@/env/i18n";
 
 export function Logo({
   locale,

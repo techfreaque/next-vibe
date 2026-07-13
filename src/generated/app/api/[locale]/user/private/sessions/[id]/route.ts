@@ -1,2 +1,0 @@
-// AUTO-GENERATED from src/user/private/sessions/[id]/route.ts. Add "use custom" to this file to preserve customizations.
-export * from "@/user/private/sessions/[id]/route";

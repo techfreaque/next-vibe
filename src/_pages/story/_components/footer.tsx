@@ -22,7 +22,7 @@ import type React from "react";
 
 import { GITHUB_REPO_URL } from "@/env/constants";
 import { envClient } from "@/env/env-client";
-import { configScopedTranslation } from "@/i18n";
+import { configScopedTranslation } from "@/env/i18n";
 
 import { Logo } from "../../_components/logo";
 import { scopedTranslation } from "./i18n";

@@ -1,3 +1,5 @@
+import path from "node:path";
+
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -59,20 +61,23 @@ const nextConfig: NextConfig = {
   turbopack: {
     resolveAlias: {
       "react-native": "react-native-web",
-      // system IS vibe: next-vibe/<area> → src/vibe/<area>.
-      // Every real next-vibe/* import now lives under src/vibe/ (shared moved there too),
-      // so a single prefix alias resolves them all for the Next/Turbopack prod build.
-      // next-vibe/ui/* is the platform-agnostic UI prefix — on Next.js it resolves to
-      // the web platform (src/vibe/ui/web/*). Must come before the general next-vibe alias.
-      "next-vibe/ui": "./src/vibe/ui/web",
-      "next-vibe": "./src/vibe",
-      "@": "./src",
-      "next-vibe/ui/renderers/mcp/McpResultFormatter":
-        "./src/vibe/ui/renderers/mcp/McpResultFormatter.stub.ts",
-      "next-vibe/ui/renderers/cli/CliEndpointRenderer":
-        "./src/vibe/ui/renderers/cli/CliEndpointRenderer.stub.tsx",
-      "next-vibe/ui/renderers/cli/CliEndpointPage":
-        "./src/vibe/ui/renderers/cli/CliEndpointPage.stub.tsx",
+      // Absolute paths so they resolve correctly regardless of Turbopack's projectPath override.
+      // next-vibe/ui/* must come before next-vibe/* (more-specific alias wins).
+      "next-vibe/ui/renderers/mcp/McpResultFormatter": path.join(
+        __dirname,
+        "src/vibe/ui/renderers/mcp/McpResultFormatter.stub.ts",
+      ),
+      "next-vibe/ui/renderers/cli/CliEndpointRenderer": path.join(
+        __dirname,
+        "src/vibe/ui/renderers/cli/CliEndpointRenderer.stub.tsx",
+      ),
+      "next-vibe/ui/renderers/cli/CliEndpointPage": path.join(
+        __dirname,
+        "src/vibe/ui/renderers/cli/CliEndpointPage.stub.tsx",
+      ),
+      "next-vibe/ui": path.join(__dirname, "src/vibe/ui/web"),
+      "next-vibe": path.join(__dirname, "src/vibe"),
+      "@": path.join(__dirname, "src"),
     },
     rules: {
       "*.native.tsx": {
@@ -118,6 +123,9 @@ const nextConfig: NextConfig = {
         loaders: ["ignore-loader"],
       },
       "src/vibe/**/generator.ts": {
+        loaders: ["ignore-loader"],
+      },
+      "src/vibe/server/server/rebuild/**": {
         loaders: ["ignore-loader"],
       },
       "src/**/seeds.ts": {
@@ -195,6 +203,10 @@ const nextConfig: NextConfig = {
       config.module.rules.push(
         {
           test: /[\\/]src[\\/]app[\\/]api[\\/].*[\\/](builder|launchpad|release-tool|guard|check|generators|electron[\\/]build|translations[\\/]reorganize|cli[\\/]setup[\\/]install|tanstack-start[\\/]generate)[\\/]|[\\/]src[\\/]app[\\/]api[\\/].*[\\/](generator|seeds)\.ts$/,
+          loader: "null-loader",
+        },
+        {
+          test: /[\\/]src[\\/]vibe[\\/]tooling[\\/]generators[\\/]|[\\/]src[\\/]vibe[\\/]server[\\/]server[\\/]rebuild[\\/]/,
           loader: "null-loader",
         },
         // CLI/MCP renderers use React hooks - stub them out for server builds

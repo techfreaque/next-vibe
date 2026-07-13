@@ -15,7 +15,7 @@ import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
 import type { JSX } from "react";
 
 import { envClient } from "@/env/env-client";
-import { configScopedTranslation } from "@/i18n";
+import { configScopedTranslation } from "@/env/i18n";
 import { scopedTranslation as resetPasswordScopedTranslation } from "@/user/public/reset-password/i18n";
 import { PasswordRepository } from "@/user/public/reset-password/repository";
 import type { ResetPasswordValidateGetResponseOutput } from "@/user/public/reset-password/validate/definition";

@@ -32,7 +32,7 @@ import { CronTaskPriority, TaskCategory } from "next-vibe/tasks/enum";
 
 import { contactClientRepository } from "@/contact/repository-client";
 import { env } from "@/env/env";
-import { configScopedTranslation } from "@/i18n";
+import { configScopedTranslation } from "@/env/i18n";
 import { messengerAccounts } from "@/messenger/accounts/db";
 import { scopedTranslation as smtpScopedTranslation } from "@/messenger/providers/email/smtp-client/i18n";
 import { SmtpSendingRepository } from "@/messenger/providers/email/smtp-client/sending/repository";
