@@ -10,9 +10,9 @@ import { H1, H2, H3, P } from "next-vibe/ui/ui/typography";
 import { Ul } from "next-vibe/ui/ui/ul";
 import type { JSX } from "react";
 
-import { envClient } from "@/_old/config/env-client";
-import { configScopedTranslation } from "@/_old/config/i18n";
 import { contactClientRepository } from "@/contact/repository-client";
+import { envClient } from "@/env/env-client";
+import { configScopedTranslation } from "@/i18n";
 
 import { TermsClientInteraction } from "./_components/terms-client-content";
 import { TermsContactButton } from "./_components/terms-contact-button";

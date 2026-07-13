@@ -25,7 +25,7 @@ import {
   envClient as env_envClient,
   envClientExamples,
   envClientSchema as env_envClientSchema,
-} from "../../_old/config/env-client";
+} from "../../env/env-client";
 
 // Platform detection (will be set at runtime)
 const isServer = typeof globalThis.document === "undefined";

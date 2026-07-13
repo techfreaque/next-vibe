@@ -52,7 +52,7 @@ import selectPageEndpoints from "@/browser/select-page/definition";
 import takeScreenshotEndpoints from "@/browser/take-screenshot/definition";
 import takeSnapshotEndpoints from "@/browser/take-snapshot/definition";
 import waitForEndpoints from "@/browser/wait-for/definition";
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 // ---------------------------------------------------------------------------
 // Constants

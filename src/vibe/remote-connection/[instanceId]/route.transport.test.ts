@@ -33,7 +33,7 @@ import {
 } from "next-vibe/agent/chat/config";
 import { chatFolders, chatThreads } from "next-vibe/agent/chat/db";
 import { chatFavorites } from "next-vibe/agent/skills/favorites/db";
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 import { runTestStream } from "../../agent/ai-stream/testing/headless-test-runner";
 import {

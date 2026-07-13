@@ -47,7 +47,7 @@ import { DEV_WATCHER_TASK_NAME } from "next-vibe/tasks/dev-watcher/constants";
 import { UnifiedTaskRunnerRepository } from "next-vibe/tasks/unified-runner/repository";
 import type { Task } from "next-vibe/tasks/unified-runner/types";
 
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 import { ServerFramework } from "../enum";
 import {
@@ -964,7 +964,7 @@ export class DevRepository {
       }
     }
 
-    const { env: serverEnv } = await import("@/_old/config/env");
+    const { env: serverEnv } = await import("@/env/env");
     const disableProxy = serverEnv.VIBE_DISABLE_PROXY;
 
     // Import WS module to get NEXT_PORT_OFFSET

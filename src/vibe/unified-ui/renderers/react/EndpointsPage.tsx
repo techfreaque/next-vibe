@@ -29,6 +29,7 @@ import {
   useNavigationStack,
 } from "next-vibe/platforms/react/hooks/use-navigation-stack";
 import { scopedTranslation } from "next-vibe/platforms/react/i18n";
+import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { Dialog, DialogContent } from "next-vibe/ui/ui/dialog";
 import { Div } from "next-vibe/ui/ui/div";
 import {
@@ -41,8 +42,6 @@ import {
 import { P } from "next-vibe/ui/ui/typography";
 import { PickerProvider } from "next-vibe/unified-ui/_shared/picker-context";
 import { useMemo, useState } from "react";
-
-import { useLogger } from "@/_old/hooks/use-logger";
 
 import { EndpointRenderer, type SubmitButtonConfig } from "./EndpointRenderer";
 

@@ -1,6 +1,6 @@
 import type { JSX } from "react";
 
-import { envClient } from "@/_old/config/env-client";
+import { envClient } from "@/env/env-client";
 
 /**
  * Tay Logo for Web

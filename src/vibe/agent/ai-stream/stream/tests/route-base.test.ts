@@ -76,7 +76,7 @@ import {
 } from "next-vibe/agent/skills/enum";
 import { contacts } from "@/contact/db";
 import { ContactSubject } from "@/contact/enum";
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 import type { ImageGenModelId } from "../../../image-generation/models";
 import type { MusicGenModelId } from "../../../music-generation/models";

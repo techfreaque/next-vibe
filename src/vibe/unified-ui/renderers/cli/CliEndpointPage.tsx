@@ -35,10 +35,9 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { scopedTranslation as cliScopedTranslation } from "next-vibe/platforms/cli/i18n";
 import { QueryProvider } from "next-vibe/platforms/react/hooks/query-provider";
+import { LoggerProvider } from "next-vibe/ui/hooks/logger-provider";
 import type { JSX, ReactNode } from "react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-
-import { LoggerProvider } from "@/_old/hooks/logger-provider";
 
 import { EndpointsPage } from "../react/EndpointsPage";
 

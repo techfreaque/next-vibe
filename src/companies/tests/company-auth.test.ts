@@ -20,7 +20,7 @@ import { createEndpointLogger } from "next-vibe/logger/server";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 import { companies, companyMembers } from "../db";
 import { CompanyMemberRole } from "../enum";

@@ -13,7 +13,7 @@ import { P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 import { useCallback, useState } from "react";
 
-import { platform } from "@/_old/config/env-client";
+import { platform } from "@/env/env-client";
 
 interface PaletteColors {
   // Light mode

@@ -18,7 +18,7 @@ import {
   type Task,
 } from "next-vibe/tasks/unified-runner/types";
 
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 import definitions from "./definition";
 import { tools } from "./route";

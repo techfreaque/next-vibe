@@ -62,7 +62,7 @@ import {
   ensureProvidersRegistered,
   type SyncProvider,
 } from "next-vibe/remote-connection/sync/provider";
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 import { cortexNodes } from "./db";
 import { documentsSyncProvider } from "./sync-provider";

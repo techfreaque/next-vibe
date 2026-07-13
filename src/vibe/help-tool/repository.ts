@@ -43,7 +43,7 @@ import { generateSchemaForUsage } from "next-vibe/unified-ui/_shared/utils";
 import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import { z } from "zod";
 
-import { envClient } from "@/_old/config/env-client";
+import { envClient } from "@/env/env-client";
 
 import type {
   HelpGetRequestOutput,

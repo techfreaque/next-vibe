@@ -9,12 +9,11 @@
 "use client";
 
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { getScreenWidth } from "next-vibe/ui/lib/screen";
 import { storage } from "next-vibe/ui/lib/storage";
 import { useEffect } from "react";
 import { create } from "zustand";
-
-import { useLogger } from "@/_old/hooks/use-logger";
 
 const STORAGE_KEY = "sidebar-collapsed";
 const MOBILE_BREAKPOINT = 930; // px

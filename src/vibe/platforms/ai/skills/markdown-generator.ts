@@ -22,7 +22,7 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import { generateSchemaForUsage } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
 
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 // ============================================================================
 // SKILL TIER DEFINITIONS

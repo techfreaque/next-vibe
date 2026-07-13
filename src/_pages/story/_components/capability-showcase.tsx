@@ -13,6 +13,7 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { cn } from "next-vibe/core/utils/utils";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { Globe } from "next-vibe/ui/ui/icons/Globe";
@@ -28,8 +29,7 @@ import type { JSX, ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
 import { useInView } from "react-intersection-observer";
 
-import { configScopedTranslation } from "@/_old/config/i18n";
-import { useLogger } from "@/_old/hooks/use-logger";
+import { configScopedTranslation } from "@/i18n";
 
 import { scopedTranslation } from "./i18n";
 import { MockChatProvider } from "./mock-chat-provider";

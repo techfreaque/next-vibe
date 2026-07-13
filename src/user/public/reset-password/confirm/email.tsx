@@ -21,8 +21,8 @@ import {
   createTrackingContext,
   type TrackingContext,
 } from "@/messenger/providers/email/smtp-client/components/tracking_context.email";
-import { env } from "@/_old/config/env";
-import { configScopedTranslation } from "@/_old/config/i18n";
+import { env } from "@/env/env";
+import { configScopedTranslation } from "@/i18n";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import type {

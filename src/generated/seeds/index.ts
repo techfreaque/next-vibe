@@ -16,12 +16,6 @@ export async function getSeedModule(
   moduleName: string,
 ): Promise<EnvironmentSeeds | null> {
   switch (moduleName) {
-    case "[rootFolderId]":
-      return (await import("../../vibe/agent/chat/folders/[rootFolderId]/seeds")) as EnvironmentSeeds;
-    case "embeddings":
-      return (await import("../../vibe/agent/cortex/embeddings/seeds")) as EnvironmentSeeds;
-    case "skills":
-      return (await import("../../vibe/agent/skills/seeds")) as EnvironmentSeeds;
     case "chart-of-accounts":
       return (await import("../../chart-of-accounts/seeds")) as EnvironmentSeeds;
     case "companies":
@@ -46,18 +40,24 @@ export async function getSeedModule(
       return (await import("../../purchasing/seeds")) as EnvironmentSeeds;
     case "subscription":
       return (await import("../../subscription/seeds")) as EnvironmentSeeds;
-    case "dataflow":
-      return (await import("../../vibe/dataflow/seeds")) as EnvironmentSeeds;
-    case "pulse":
-      return (await import("../../vibe/tasks/pulse/seeds")) as EnvironmentSeeds;
-    case "tasks":
-      return (await import("../../vibe/tasks/seeds")) as EnvironmentSeeds;
     case "tax":
       return (await import("../../tax/seeds")) as EnvironmentSeeds;
     case "user":
       return (await import("../../user/seeds")) as EnvironmentSeeds;
     case "users":
       return (await import("../../users/seeds")) as EnvironmentSeeds;
+    case "[rootFolderId]":
+      return (await import("../../vibe/agent/chat/folders/[rootFolderId]/seeds")) as EnvironmentSeeds;
+    case "embeddings":
+      return (await import("../../vibe/agent/cortex/embeddings/seeds")) as EnvironmentSeeds;
+    case "skills":
+      return (await import("../../vibe/agent/skills/seeds")) as EnvironmentSeeds;
+    case "dataflow":
+      return (await import("../../vibe/dataflow/seeds")) as EnvironmentSeeds;
+    case "pulse":
+      return (await import("../../vibe/tasks/pulse/seeds")) as EnvironmentSeeds;
+    case "tasks":
+      return (await import("../../vibe/tasks/seeds")) as EnvironmentSeeds;
     default:
       return null;
   }
@@ -68,9 +68,6 @@ export async function getSeedModule(
  */
 export function getAllSeedModuleNames(): string[] {
   return [
-    "[rootFolderId]",
-    "embeddings",
-    "skills",
     "chart-of-accounts",
     "companies",
     "inventory",
@@ -83,12 +80,15 @@ export function getAllSeedModuleNames(): string[] {
     "catalog",
     "purchasing",
     "subscription",
-    "dataflow",
-    "pulse",
-    "tasks",
     "tax",
     "user",
     "users",
+    "[rootFolderId]",
+    "embeddings",
+    "skills",
+    "dataflow",
+    "pulse",
+    "tasks",
   ];
 }
 

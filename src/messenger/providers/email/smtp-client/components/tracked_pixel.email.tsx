@@ -6,7 +6,7 @@
 import { Img } from "@react-email/components";
 import type { JSX } from "react";
 
-import { envClient } from "@/_old/config/env-client";
+import { envClient } from "@/env/env-client";
 import { generateTrackingPixelUrl } from "@/leads/tracking/utils";
 
 import { type TrackingContext } from "./tracking_context.email";

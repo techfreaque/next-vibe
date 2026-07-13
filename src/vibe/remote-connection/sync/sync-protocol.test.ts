@@ -42,7 +42,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { cortexNodes } from "next-vibe/agent/cortex/db";
 import { CortexNodeType } from "next-vibe/agent/cortex/enum";
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 import {
   ATLAS_INSTANCE_ID,

@@ -21,7 +21,7 @@ import {
 } from "next-vibe/logger/formatters";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 import type { GenerateResponseOutput } from "./definition";
 

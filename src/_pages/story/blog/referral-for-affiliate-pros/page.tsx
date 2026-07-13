@@ -15,7 +15,7 @@ import { Span } from "next-vibe/ui/ui/span";
 import { H1, H2, Muted, P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 
-import { configScopedTranslation } from "@/_old/config/i18n";
+import { configScopedTranslation } from "@/i18n";
 
 import { scopedTranslation } from "./i18n";
 

@@ -37,7 +37,7 @@ import type { JSX, ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 
-import { envClient } from "@/_old/config/env-client";
+import { envClient } from "@/env/env-client";
 
 /**
  * Next.js 15 async component props format

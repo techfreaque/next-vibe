@@ -5,6 +5,8 @@ import {
   mkdirSync,
   readdirSync,
   readFileSync,
+  rmSync,
+  statSync,
   writeFileSync,
 } from "node:fs";
 import { dirname, join, relative } from "node:path";
@@ -20,7 +22,6 @@ const PROJECT_ROOT = process.cwd();
 const UI_DIR = join(PROJECT_ROOT, "src", "_pages");
 const API_DIR = join(PROJECT_ROOT, "src");
 // Directories inside src/ that contain framework/system code — not user API routes.
-// These are excluded from the generated app/api/[locale] shell generation.
 const API_EXCLUDE_DIRS = new Set([
   join(PROJECT_ROOT, "src", "vibe"),
   join(PROJECT_ROOT, "src", "_pages"),
@@ -144,6 +145,7 @@ export async function generate(
   const skipped: string[] = [];
   const errors: { file: string; error: string }[] = [];
 
+  // — UI: page.tsx, layout.tsx, and all special Next.js file types —
   emit(
     findFiles(UI_DIR, "page.tsx"),
     UI_DIR,

@@ -22,8 +22,8 @@ import { UserRepository } from "next-vibe/identity/user/repository";
 import type { StandardUserType } from "next-vibe/identity/user/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { env } from "@/_old/config/env";
-import { translations } from "@/_old/config/i18n/en";
+import { env } from "@/env/env";
+import { translations } from "@/i18n/en";
 
 import { contactClientRepository } from "../contact/repository-client";
 import { DEV_SEED_PASSWORD, DEV_SEED_USERS } from "./dev-seed-users";

@@ -18,9 +18,9 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { LeadWithEmailType } from "next-vibe/identity/lead/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { env } from "@/_old/config/env";
-import { configScopedTranslation } from "@/_old/config/i18n";
 import { contactClientRepository } from "@/contact/repository-client";
+import { env } from "@/env/env";
+import { configScopedTranslation } from "@/i18n";
 import { CampaignType } from "@/messenger/accounts/enum";
 import { scopedTranslation as smtpScopedTranslation } from "@/messenger/providers/email/smtp-client/i18n";
 import { SmtpSendingRepository } from "@/messenger/providers/email/smtp-client/sending/repository";

@@ -189,8 +189,7 @@ export async function sendBrowserTestRequest<
           await import("next-vibe/identity/auth/repository");
         const { SessionRepository } =
           await import("next-vibe/identity/session/repository");
-        const { AUTH_TOKEN_COOKIE_NAME } =
-          await import("@/_old/config/constants");
+        const { AUTH_TOKEN_COOKIE_NAME } = await import("@/env/constants");
         const { createEndpointLogger } =
           await import("next-vibe/logger/server");
         const logger = createEndpointLogger(false, defaultLocale);

@@ -8,7 +8,7 @@ import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { redirect } from "next-vibe/ui/lib/redirect";
 
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 interface ChatPageProps {
   params: Promise<{

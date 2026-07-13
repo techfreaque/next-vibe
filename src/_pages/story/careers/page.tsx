@@ -12,8 +12,8 @@ import { Span } from "next-vibe/ui/ui/span";
 import { H1, H2, H3, P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 
-import { envClient } from "@/_old/config/env-client";
-import { configScopedTranslation } from "@/_old/config/i18n";
+import { envClient } from "@/env/env-client";
+import { configScopedTranslation } from "@/i18n";
 
 import { scopedTranslation } from "./i18n";
 

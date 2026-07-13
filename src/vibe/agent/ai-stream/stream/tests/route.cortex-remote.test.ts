@@ -46,7 +46,7 @@ import {
   DefaultFolderId,
   makeHeadlessContext,
 } from "next-vibe/agent/chat/config";
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 import { seedCaseThread } from "../../testing/fixture-seed";
 import {

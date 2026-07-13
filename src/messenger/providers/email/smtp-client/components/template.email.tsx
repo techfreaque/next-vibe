@@ -8,10 +8,10 @@ import {
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JSX, ReactNode } from "react";
 
-import { envClient } from "@/_old/config/env-client";
-import { configScopedTranslation } from "@/_old/config/i18n";
 import { contactClientRepository } from "@/contact/repository-client";
 import { FEEDBACK_REWARD_CREDITS } from "@/credits/constants";
+import { envClient } from "@/env/env-client";
+import { configScopedTranslation } from "@/i18n";
 
 import { scopedTranslation } from "../i18n";
 import { EmailImage } from "./email-image.email";

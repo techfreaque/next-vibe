@@ -13,7 +13,7 @@ import { db } from "next-vibe/database";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { users as usersTable } from "next-vibe/identity/user/db";
 
-import { envClient } from "@/_old/config/env-client";
+import { envClient } from "@/env/env-client";
 import { ProductIds, productsRepository } from "@/products/repository-client";
 
 import { DESCRIBE_IMAGE_ALIAS } from "../../describe-image/constants";

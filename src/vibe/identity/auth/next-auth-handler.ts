@@ -22,8 +22,8 @@ import {
   AUTH_TOKEN_COOKIE_NAME,
   BEARER_LEAD_ID_SEPARATOR,
   LEAD_ID_COOKIE_NAME,
-} from "@/_old/config/constants";
-import { env } from "@/_old/config/env";
+} from "@/env/constants";
+import { env } from "@/env/env";
 
 /**
  * Web Authentication Handler

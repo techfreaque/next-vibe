@@ -48,7 +48,7 @@ import type { WebSocketServerHandle } from "next-vibe/realtime/server";
 import type { ServerStartT } from "next-vibe/server/server/start/i18n";
 import { scopedTranslation as serverStartScopedTranslation } from "next-vibe/server/server/start/i18n";
 
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 import { ServerFramework } from "../enum";
 import {

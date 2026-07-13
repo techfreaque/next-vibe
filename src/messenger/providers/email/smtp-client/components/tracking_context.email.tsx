@@ -5,7 +5,7 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 
-import { envClient } from "@/_old/config/env-client";
+import { envClient } from "@/env/env-client";
 
 /**
  * Tracking context for email components

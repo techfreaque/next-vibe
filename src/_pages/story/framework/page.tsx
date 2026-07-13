@@ -29,9 +29,9 @@ import {
   ENDPOINT_PLATFORMS,
   GITHUB_REPO_URL,
   PLATFORM_COUNT,
-} from "@/_old/config/constants";
-import { envClient } from "@/_old/config/env-client";
-import { configScopedTranslation } from "@/_old/config/i18n";
+} from "@/env/constants";
+import { envClient } from "@/env/env-client";
+import { configScopedTranslation } from "@/i18n";
 
 import { ContactFormSection } from "../_components/contact-form-section";
 import { scopedTranslation } from "./i18n";

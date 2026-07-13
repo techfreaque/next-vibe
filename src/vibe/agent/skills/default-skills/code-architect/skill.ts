@@ -15,7 +15,7 @@ import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { REBUILD_ALIAS } from "next-vibe/server/server/rebuild/constants";
 
-import { envClient } from "@/_old/config/env-client";
+import { envClient } from "@/env/env-client";
 
 import type { Skill } from "../../config";
 import { tool } from "../../constants";

@@ -31,7 +31,7 @@ import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { users } from "next-vibe/identity/user/db";
-import { configScopedTranslation } from "@/_old/config/i18n";
+import { configScopedTranslation } from "@/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 
 import type { CreatorGetResponseOutput } from "./definition";

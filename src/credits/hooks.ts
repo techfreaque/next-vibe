@@ -15,7 +15,7 @@ import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { useToast } from "next-vibe/ui/hooks/use-toast";
 import { useCallback, useMemo } from "react";
 
-import { configScopedTranslation } from "@/_old/config/i18n";
+import { configScopedTranslation } from "@/i18n";
 import { handleCheckoutRedirect } from "@/payment/utils/redirect";
 
 import definitions, { type CreditsGetResponseOutput } from "./definition";

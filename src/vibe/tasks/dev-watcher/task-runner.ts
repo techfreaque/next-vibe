@@ -22,7 +22,7 @@ import {
   updateLiveIndex,
 } from "next-vibe/tooling/generators/shared/live-index";
 
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 import { CronTaskPriority, TaskCategory } from "../enum";
 import { DEV_WATCHER_TASK_NAME } from "./constants";

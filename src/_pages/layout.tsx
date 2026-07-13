@@ -18,8 +18,8 @@ import { Script } from "next-vibe/ui/ui/script";
 import { Scripts } from "next-vibe/ui/ui/scripts";
 import type { JSX, ReactNode } from "react";
 
-import { envClient } from "@/_old/config/env-client";
-import { configScopedTranslation } from "@/_old/config/i18n";
+import { envClient } from "@/env/env-client";
+import { configScopedTranslation } from "@/i18n";
 
 import { scopedTranslation } from "./layout-i18n";
 import { RootProviders } from "./layout-shared";

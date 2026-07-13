@@ -20,7 +20,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 import { sshConnections } from "../../db";
 import { SshAuthType } from "../../enum";

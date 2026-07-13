@@ -67,6 +67,7 @@ import {
 } from "next-vibe/agent/video-generation/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { cn } from "next-vibe/core/utils/utils";
+import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { usePathname } from "next-vibe/ui/hooks/use-pathname";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { getDocumentBody } from "next-vibe/ui/lib/dom";
@@ -158,8 +159,6 @@ import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-
 import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-
-import { useLogger } from "@/_old/hooks/use-logger";
 
 import { CompactTriggerEdit } from "../../chat/settings/widget";
 import { formatSkillId, parseSkillId } from "../../chat/slugify";

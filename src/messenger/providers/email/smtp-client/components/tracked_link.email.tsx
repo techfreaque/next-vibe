@@ -6,7 +6,7 @@
 import { Link } from "@react-email/components";
 import type { CSSProperties, JSX, ReactNode } from "react";
 
-import { envClient } from "@/_old/config/env-client";
+import { envClient } from "@/env/env-client";
 import {
   ensureFullUrl,
   generateTrackingLinkUrl,

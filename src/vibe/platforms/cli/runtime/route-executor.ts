@@ -45,10 +45,7 @@ import {
 } from "next-vibe/platforms/cli/types/cli-target";
 import type { CliResultFormatter as CliResultFormatterType } from "next-vibe/unified-ui/renderers/cli/response/result-formatter";
 
-import {
-  AUTH_TOKEN_COOKIE_NAME,
-  LEAD_ID_COOKIE_NAME,
-} from "@/_old/config/constants";
+import { AUTH_TOKEN_COOKIE_NAME, LEAD_ID_COOKIE_NAME } from "@/env/constants";
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import { CliInputParser } from "./parsing";
@@ -625,7 +622,7 @@ async function executeRemoteEndpoint(params: {
   const { getRemoteSession } =
     await import("next-vibe/platforms/cli/auth/remote-session-cache");
   const { Methods } = await import("next-vibe/core/definition/enums");
-  const { BEARER_LEAD_ID_SEPARATOR } = await import("@/_old/config/constants");
+  const { BEARER_LEAD_ID_SEPARATOR } = await import("@/env/constants");
 
   // Resolve session from DB
   let resolvedToken: string | null = null;

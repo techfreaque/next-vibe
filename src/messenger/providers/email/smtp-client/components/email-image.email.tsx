@@ -9,7 +9,7 @@ import path from "node:path";
 import { Img } from "@react-email/components";
 import type { JSX } from "react";
 
-import { envClient } from "@/_old/config/env-client";
+import { envClient } from "@/env/env-client";
 
 interface EmailImageProps {
   src: string; // Relative path like "/images/unbottled-icon.png"

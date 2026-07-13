@@ -68,8 +68,8 @@ import React, {
   useState,
 } from "react";
 
-import { platform } from "@/_old/config/env-client";
 import { InputHeightProvider } from "@/_pages/chat/lib/config/constants";
+import { platform } from "@/env/env-client";
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import { CortexModal } from "../../../agent/cortex/widget/cortex-modal";

@@ -6,7 +6,7 @@ import { Button } from "next-vibe/ui/ui/button";
 import { P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 
-import { configScopedTranslation } from "@/_old/config/i18n";
+import { configScopedTranslation } from "@/i18n";
 
 export function TermsContactButton({
   supportEmail,

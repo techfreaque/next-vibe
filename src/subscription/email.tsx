@@ -23,7 +23,7 @@ import type { UserRole } from "next-vibe/identity/roles/enum";
 import type { ReactElement } from "react";
 import { z } from "zod";
 
-import { configScopedTranslation } from "@/_old/config/i18n";
+import { configScopedTranslation } from "@/i18n";
 import type { EmailTemplateDefinition } from "@/messenger/registry/template";
 
 import { contactClientRepository } from "../contact/repository-client";

@@ -25,7 +25,7 @@ import type { AuthT } from "next-vibe/identity/auth/i18n";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { storage } from "next-vibe/ui/lib/storage";
 
-import { platform } from "@/_old/config/env-client";
+import { platform } from "@/env/env-client";
 
 // Storage key for auth token
 const AUTH_TOKEN_STORAGE_KEY = "auth_token";

@@ -52,11 +52,11 @@ import { redirect } from "next-vibe/ui/lib/redirect";
 import { Div } from "next-vibe/ui/ui/div";
 import type { JSX } from "react";
 
-import { env } from "@/_old/config/env";
 import { isUUID, parseChatUrl } from "@/_pages/chat/lib/url-parser";
 import type { CreditsGetResponseOutput } from "@/credits/definition";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
+import { env } from "@/env/env";
 
 import { ThreadsPageClient } from "./page-client";
 

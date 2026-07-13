@@ -59,7 +59,6 @@ import {
   useState,
 } from "react";
 
-import { envClient } from "@/_old/config/env-client";
 import { buildScopedPaletteStyle } from "@/_pages/creator/[userId]/_shared/palette-generator";
 import {
   DEFAULT_ACCENT,
@@ -67,6 +66,7 @@ import {
   ProfileSocialPills,
 } from "@/_pages/creator/[userId]/_shared/profile-content";
 import creditsDef from "@/credits/definition";
+import { envClient } from "@/env/env-client";
 import configDef from "@/lead-magnet/config/definition";
 import subscriptionDef from "@/subscription/definition";
 import { SubscriptionStatus } from "@/subscription/enum";

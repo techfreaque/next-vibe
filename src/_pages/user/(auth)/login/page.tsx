@@ -13,9 +13,9 @@ import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
 import { Link } from "next-vibe/ui/ui/link";
 import type { JSX } from "react";
 
-import { env } from "@/_old/config/env";
-import { envClient } from "@/_old/config/env-client";
-import { configScopedTranslation } from "@/_old/config/i18n";
+import { env } from "@/env/env";
+import { envClient } from "@/env/env-client";
+import { configScopedTranslation } from "@/i18n";
 import { DEV_SEED_PASSWORD, DEV_SEED_USERS } from "@/user/dev-seed-users";
 import { scopedTranslation as loginScopedTranslation } from "@/user/public/login/i18n";
 import type { LoginOptions } from "@/user/public/login/repository";

@@ -15,7 +15,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { NextRequest } from "next-vibe/ui/lib/request";
 
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
-import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/_old/config/constants";
+import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/env/constants";
 import type { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { AuthRepository } from "next-vibe/identity/auth/repository";

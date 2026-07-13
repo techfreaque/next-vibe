@@ -12,8 +12,8 @@ import { Separator } from "next-vibe/ui/ui/separator";
 import { H1, H2, Muted, P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 
-import { GITHUB_REPO_URL } from "@/_old/config/constants";
-import { configScopedTranslation } from "@/_old/config/i18n";
+import { GITHUB_REPO_URL } from "@/env/constants";
+import { configScopedTranslation } from "@/i18n";
 
 import { scopedTranslation } from "./i18n";
 

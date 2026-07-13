@@ -21,7 +21,7 @@ import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { sessions } from "next-vibe/identity/session/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/_old/config/constants";
+import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/env/constants";
 
 import type { SessionDeleteResponseOutput } from "./[id]/definition";
 import type {
@@ -180,8 +180,7 @@ export class SessionManagementRepository {
       }
     }
     if (!currentToken) {
-      const { AUTH_TOKEN_COOKIE_NAME } =
-        await import("@/_old/config/constants");
+      const { AUTH_TOKEN_COOKIE_NAME } = await import("@/env/constants");
       const cookieStore = await cookies();
       currentToken = cookieStore.get(AUTH_TOKEN_COOKIE_NAME)?.value;
     }

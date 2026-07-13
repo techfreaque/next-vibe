@@ -21,10 +21,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import {
-  AUTH_TOKEN_COOKIE_NAME,
-  LEAD_ID_COOKIE_NAME,
-} from "@/_old/config/constants";
+import { AUTH_TOKEN_COOKIE_NAME, LEAD_ID_COOKIE_NAME } from "@/env/constants";
 
 import { buildWsChannel } from "./channel";
 import type { WsChannelDescriptor } from "./types";

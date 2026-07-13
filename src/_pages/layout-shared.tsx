@@ -8,12 +8,11 @@ import { AgentAvailabilityProvider } from "next-vibe/agent/env-availability-cont
 import { TranslationProvider } from "next-vibe/core/i18n/core/client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { QueryProvider } from "next-vibe/platforms/react/hooks/query-provider";
+import { LoggerProvider } from "next-vibe/ui/hooks/logger-provider";
 import { ErrorBoundary } from "next-vibe/ui/ui/error-boundary";
 import { ThemeProvider } from "next-vibe/ui/ui/theme-provider";
 import { Toaster } from "next-vibe/ui/ui/toaster";
 import type { JSX, ReactNode } from "react";
-
-import { LoggerProvider } from "@/_old/hooks/logger-provider";
 
 import { LeadTrackingProvider } from "./_components/lead-tracking-provider";
 

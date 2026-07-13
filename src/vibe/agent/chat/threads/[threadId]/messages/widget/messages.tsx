@@ -45,7 +45,6 @@ import {
   useState,
 } from "react";
 
-import { platform } from "@/_old/config/env-client";
 import { Logo } from "@/_pages/_components/logo";
 import {
   DOM_IDS,
@@ -57,6 +56,7 @@ import {
   buildMessagePath,
   getRootMessages,
 } from "@/_pages/chat/lib/utils/thread-builder";
+import { platform } from "@/env/env-client";
 
 import type { MessageMetadata } from "../../../../db";
 import { NEW_MESSAGE_ID, ViewMode } from "../../../../enum";

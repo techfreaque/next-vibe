@@ -30,7 +30,7 @@ import type {
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 import type { ChatModelId } from "../models";
 

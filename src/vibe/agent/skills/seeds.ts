@@ -9,7 +9,7 @@ import { users } from "next-vibe/identity/user/db";
 import { formatDatabase } from "next-vibe/logger/formatters";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 import { ensureUniqueSlug, generateSlug } from "../chat/slugify";
 import type { SkillVariantData } from "./db";

@@ -18,7 +18,7 @@ import { H1, H2, P } from "next-vibe/ui/ui/typography";
 import type { CSSProperties, JSX } from "react";
 import { useState } from "react";
 
-import { configScopedTranslation } from "@/_old/config/i18n";
+import { configScopedTranslation } from "@/i18n";
 
 import { scopedTranslation } from "./i18n";
 

@@ -20,7 +20,7 @@ import {
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { scopedTranslation as cliScopedTranslation } from "next-vibe/platforms/cli/i18n";
 
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 /**
  * Default CLI user configuration

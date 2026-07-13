@@ -14,7 +14,7 @@ import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
 
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 let cached: JwtPrivatePayloadType | null = null;
 

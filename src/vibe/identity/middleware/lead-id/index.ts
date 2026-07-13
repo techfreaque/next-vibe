@@ -20,8 +20,8 @@ import { shouldSkipPath } from "next-vibe/server/middleware/utils";
 import type { NextRequest, NextResponse } from "next-vibe/ui/lib/request";
 import { NextResponse as NextResponseClass } from "next-vibe/ui/lib/request";
 
-import { LEAD_ID_COOKIE_NAME } from "@/_old/config/constants";
-import { env } from "@/_old/config/env";
+import { LEAD_ID_COOKIE_NAME } from "@/env/constants";
+import { env } from "@/env/env";
 
 export const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

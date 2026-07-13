@@ -16,8 +16,8 @@ import {
   fail,
 } from "next-vibe/core/route/response.schema";
 
-import { RESET_TOKEN_EXPIRY } from "@/_old/config/constants";
-import { env } from "@/_old/config/env";
+import { RESET_TOKEN_EXPIRY } from "@/env/constants";
+import { env } from "@/env/env";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";

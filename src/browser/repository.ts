@@ -37,7 +37,7 @@ import {
 import type { WidgetData } from "next-vibe/core/utils/json";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 import { CHROME_REMOTE_DEBUG_PORT, getChromeMCPConfig } from "./config";
 import { BrowserTool, BrowserToolStatus } from "./enum";

@@ -20,9 +20,9 @@ import { Span } from "next-vibe/ui/ui/span";
 import { H3, P } from "next-vibe/ui/ui/typography";
 import type React from "react";
 
-import { GITHUB_REPO_URL } from "@/_old/config/constants";
-import { envClient } from "@/_old/config/env-client";
-import { configScopedTranslation } from "@/_old/config/i18n";
+import { GITHUB_REPO_URL } from "@/env/constants";
+import { envClient } from "@/env/env-client";
+import { configScopedTranslation } from "@/i18n";
 
 import { Logo } from "../../_components/logo";
 import { scopedTranslation } from "./i18n";

@@ -4,7 +4,7 @@
  * Used by both global and scoped translation systems
  */
 
-import { translationsKeyMode } from "@/_old/config/debug";
+import { translationsKeyMode } from "@/env/debug";
 
 import type { TParams, TranslationElement } from "./static-types";
 

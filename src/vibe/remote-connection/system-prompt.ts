@@ -12,7 +12,7 @@ import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
 import { db } from "next-vibe/database";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
-import { envClient } from "@/_old/config/env-client";
+import { envClient } from "@/env/env-client";
 import { sshConnections } from "@/ssh/db";
 
 import { remoteConnections } from "./db";

@@ -36,7 +36,7 @@ import {
 } from "next-vibe/tasks/i18n";
 import type { PulseStatusResponseOutput } from "next-vibe/tasks/pulse/status/definition";
 
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 import { isCronTaskDue } from "../cron-formatter";
 import {

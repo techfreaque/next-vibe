@@ -24,8 +24,8 @@ import {
   AUTH_TOKEN_COOKIE_NAME,
   CSRF_TOKEN_COOKIE_NAME,
   LEAD_ID_COOKIE_NAME,
-} from "@/_old/config/constants";
-import { env } from "@/_old/config/env";
+} from "@/env/constants";
+import { env } from "@/env/env";
 
 import { extractLocaleFromPath, shouldSkipPath } from "./utils";
 

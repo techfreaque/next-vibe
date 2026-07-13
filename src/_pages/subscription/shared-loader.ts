@@ -6,10 +6,10 @@ import { createEndpointLogger } from "next-vibe/logger/server";
 import { notFound } from "next-vibe/ui/lib/not-found";
 import { redirect } from "next-vibe/ui/lib/redirect";
 
-import { env } from "@/_old/config/env";
 import type { CreditsGetResponseOutput } from "@/credits/definition";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
+import { env } from "@/env/env";
 
 export interface SubscriptionPageData {
   locale: CountryLanguage;

@@ -1,4 +1,4 @@
-import { envClient } from "@/_old/config/env-client";
+import { envClient } from "@/env/env-client";
 
 export interface AgentEnvAvailability {
   openRouter: boolean;

@@ -13,7 +13,7 @@ import { createEndpointLogger } from "next-vibe/logger/server";
  */
 import type { NextRequest } from "next-vibe/ui/lib/request";
 
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 import { PixelTrackingRepository } from "./repository";
 

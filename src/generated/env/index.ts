@@ -15,10 +15,10 @@ import type { z } from "zod";
 
 // Import env modules
 import {
-  agentEnv,
-  agentEnvExamples,
-  agentEnvSchema,
-} from "../../vibe/agent/env";
+  env as env_env,
+  envExamples as env_envExamples,
+  envSchema as env_envSchema,
+} from "../../env/env";
 import {
   browserEnv,
   browserEnvExamples,
@@ -44,21 +44,17 @@ import {
   paymentEnvExamples,
   paymentEnvSchema,
 } from "../../payment/env";
+import { smsEnv, smsEnvExamples, smsEnvSchema } from "../../sms/env";
 import {
-  smsEnv,
-  smsEnvExamples,
-  smsEnvSchema,
-} from "../../sms/env";
+  agentEnv,
+  agentEnvExamples,
+  agentEnvSchema,
+} from "../../vibe/agent/env";
 import {
   serverSystemEnv,
   serverSystemEnvExamples,
   serverSystemEnvSchema,
 } from "../../vibe/server/server/env";
-import {
-  env as env_env,
-  envExamples,
-  envSchema as env_envSchema,
-} from "../../_old/config/env";
 
 // Platform detection
 const platform = {
@@ -76,7 +72,7 @@ export const envModules: Record<
     examples: EnvExample[];
   }
 > = {
-  agent: { env: agentEnv, schema: agentEnvSchema, examples: agentEnvExamples },
+  env: { env: env_env, schema: env_envSchema, examples: env_envExamples },
   browser: {
     env: browserEnv,
     schema: browserEnvSchema,
@@ -103,24 +99,25 @@ export const envModules: Record<
     examples: paymentEnvExamples,
   },
   sms: { env: smsEnv, schema: smsEnvSchema, examples: smsEnvExamples },
+  agent: { env: agentEnv, schema: agentEnvSchema, examples: agentEnvExamples },
   serverSystem: {
     env: serverSystemEnv,
     schema: serverSystemEnvSchema,
     examples: serverSystemEnvExamples,
   },
-  env: { env: env_env, schema: env_envSchema, examples: envExamples },
 };
 
 // Combined schema using merge
-export const envSchema = agentEnvSchema
+export const envSchema = env_envSchema
+  .merge(env_envSchema)
   .merge(browserEnvSchema)
   .merge(leadsCampaignsEnvSchema)
   .merge(messengerEnvSchema)
   .merge(imapClientEnvSchema)
   .merge(paymentEnvSchema)
   .merge(smsEnvSchema)
-  .merge(serverSystemEnvSchema)
-  .merge(env_envSchema);
+  .merge(agentEnvSchema)
+  .merge(serverSystemEnvSchema);
 
 export type Env = z.infer<typeof envSchema>;
 

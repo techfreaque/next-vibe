@@ -44,8 +44,8 @@ import {
   type IDefinitionsRegistry,
 } from "next-vibe/platforms/definitions-registry";
 
-import { DEFAULT_PROJECT_URL } from "@/_old/config/constants";
-import { env } from "@/_old/config/env";
+import { DEFAULT_PROJECT_URL } from "@/env/constants";
+import { env } from "@/env/env";
 import { pathToAliasMap } from "@/generated/endpoints/alias-map";
 
 export const binaryStartTime = Date.now();

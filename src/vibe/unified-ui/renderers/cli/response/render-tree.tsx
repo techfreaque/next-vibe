@@ -9,9 +9,8 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { queryClient } from "next-vibe/platforms/react/hooks/store";
 import { NavigationStackProvider } from "next-vibe/platforms/react/hooks/use-navigation-stack";
+import { LoggerProvider } from "next-vibe/ui/hooks/logger-provider";
 import type { JSX } from "react";
-
-import { LoggerProvider } from "@/_old/hooks/logger-provider";
 
 import { EndpointRenderer } from "../../react/EndpointRenderer";
 

@@ -54,8 +54,8 @@ import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPag
 import type { JSX } from "react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-import { platform } from "@/_old/config/env-client";
 import { InputHeightProvider } from "@/_pages/chat/lib/config/constants";
+import { platform } from "@/env/env-client";
 
 import type definition from "../definition";
 import type { AiStreamPostResponseOutput } from "../definition";

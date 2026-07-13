@@ -46,7 +46,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { DefaultFolderId } from "next-vibe/agent/chat/config";
 import { ChatMessageRole } from "next-vibe/agent/chat/enum";
 import { NO_SKILL_ID } from "next-vibe/agent/skills/constants";
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 import { DEFAULT_CHAT_MODEL_ID } from "../../constants";
 import { AiStreamRepository } from "../../repository";

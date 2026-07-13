@@ -28,9 +28,9 @@ import React, {
   useState,
 } from "react";
 
-import { platform } from "@/_old/config/env-client";
 import { LAYOUT, useInputHeight } from "@/_pages/chat/lib/config/constants";
 import { buildMessagePath } from "@/_pages/chat/lib/utils/thread-builder";
+import { platform } from "@/env/env-client";
 
 import type definition from "../definition";
 import messagesDefinition from "../definition";

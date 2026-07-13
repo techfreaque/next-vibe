@@ -95,7 +95,7 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
-import { configScopedTranslation } from "@/_old/config/i18n";
+import { configScopedTranslation } from "@/i18n";
 import leadsListDefinitions from "@/leads/list/definition";
 import leadsSearchDefinitions from "@/leads/search/definition";
 

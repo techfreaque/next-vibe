@@ -18,7 +18,7 @@ import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
 import { Link } from "next-vibe/ui/ui/link";
 import type { JSX } from "react";
 
-import { configScopedTranslation } from "@/_old/config/i18n";
+import { configScopedTranslation } from "@/i18n";
 import { ProductIds, productsRepository } from "@/products/platform-products";
 
 import { scopedTranslation as pageT } from "./i18n";

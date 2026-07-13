@@ -36,7 +36,7 @@ import { getCronFrequencyMinutes } from "next-vibe/tasks/cron-formatter";
 import { CronTaskStatus } from "next-vibe/tasks/enum";
 import { isValidEnumValue } from "next-vibe/unified-ui/_shared/enum";
 
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 import { MessageStatus } from "@/messenger/messages/enum";
 
 import { campaignStarterConfigs } from "../campaign-starter/db";

@@ -41,7 +41,7 @@ import {
   instanceIdentities,
   remoteConnections,
 } from "next-vibe/remote-connection/db";
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 import { runTestStream } from "../../../agent/ai-stream/testing/headless-test-runner";
 import {

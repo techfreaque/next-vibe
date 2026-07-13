@@ -35,7 +35,7 @@ import type {
   CheckVibeCheckTranslationKey,
 } from "next-vibe/tooling/check/vibe-check/i18n";
 
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 import type {
   VibeCheckRequestOutput,

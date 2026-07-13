@@ -14,7 +14,7 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Body } from "next-vibe/ui/ui/body";
 import type { JSX } from "react";
 
-import { envClient } from "@/_old/config/env-client";
+import { envClient } from "@/env/env-client";
 
 import { RootProviders } from "./layout-shared";
 

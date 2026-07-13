@@ -21,7 +21,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
 
-import { envClient } from "@/_old/config/env-client";
+import { envClient } from "@/env/env-client";
 
 import { SyncScopeSchema } from "../db";
 import type { RemoteConnectionsListResponseOutput } from "../list/definition";

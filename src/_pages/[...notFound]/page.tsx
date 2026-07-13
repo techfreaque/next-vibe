@@ -3,7 +3,7 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import type { JSX } from "react";
 
-import { envClient } from "@/_old/config/env-client";
+import { envClient } from "@/env/env-client";
 
 import { scopedTranslation } from "./i18n";
 import { NotFoundBackButton } from "./not-found-client";

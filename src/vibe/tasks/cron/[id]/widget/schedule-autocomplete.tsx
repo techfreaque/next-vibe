@@ -15,6 +15,7 @@ import {
   formatCronScheduleShort,
   validateCronSchedule,
 } from "next-vibe/tasks/cron-formatter";
+import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { Calendar } from "next-vibe/ui/ui/icons/Calendar";
@@ -36,8 +37,6 @@ import {
 import { Span } from "next-vibe/ui/ui/span";
 import type { JSX } from "react";
 import { useCallback, useMemo, useRef, useState } from "react";
-
-import { useLogger } from "@/_old/hooks/use-logger";
 
 // ---------------------------------------------------------------------------
 // Preset definitions

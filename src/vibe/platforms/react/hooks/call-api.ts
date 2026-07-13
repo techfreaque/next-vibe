@@ -22,8 +22,8 @@ import {
   BEARER_LEAD_ID_SEPARATOR,
   CSRF_TOKEN_COOKIE_NAME,
   CSRF_TOKEN_HEADER_NAME,
-} from "@/_old/config/constants";
-import { envClient, platform } from "@/_old/config/env-client";
+} from "@/env/constants";
+import { envClient, platform } from "@/env/env-client";
 
 import { containsFile, objectToFormData } from "./api-utils-shared";
 

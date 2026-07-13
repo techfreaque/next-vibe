@@ -47,7 +47,7 @@ import {
   remoteConnections,
 } from "next-vibe/remote-connection/db";
 import { RemoteConnectionRepository } from "next-vibe/remote-connection/repository";
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 

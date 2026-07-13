@@ -60,7 +60,7 @@ import {
   type ToolExecutionContext,
 } from "next-vibe/agent/chat/config";
 import { ChatMessageRole } from "next-vibe/agent/chat/enum";
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 import { seedFixtureThread } from "../../testing/fixture-seed";
 import {

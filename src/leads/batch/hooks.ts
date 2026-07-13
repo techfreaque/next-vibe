@@ -14,9 +14,8 @@ import type {
 } from "next-vibe/identity/lead/enum";
 import type { EndpointReturn } from "next-vibe/platforms/react/hooks/endpoint-types";
 import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
+import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { useCallback, useEffect, useState } from "react";
-
-import { useLogger } from "@/_old/hooks/use-logger";
 
 import type { LeadListGetRequestTypeOutput } from "../list/definition";
 import definitions, { type BatchOperationScope } from "./definition";

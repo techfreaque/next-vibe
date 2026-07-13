@@ -15,7 +15,7 @@ import { UserRole } from "next-vibe/identity/roles/enum";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import type { JSX } from "react";
 
-import { configScopedTranslation } from "@/_old/config/i18n";
+import { configScopedTranslation } from "@/i18n";
 import { scopedTranslation } from "@/user/public/creator/[userId]/i18n";
 import { CreatorProfileRepository } from "@/user/public/creator/[userId]/repository";
 

@@ -39,7 +39,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { DefaultFolderId } from "next-vibe/agent/chat/config";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 import { seedCaseThread } from "../../testing/fixture-seed";
 import {

@@ -11,7 +11,7 @@ import { H2, P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 import { useInView } from "react-intersection-observer";
 
-import { GITHUB_REPO_URL } from "@/_old/config/constants";
+import { GITHUB_REPO_URL } from "@/env/constants";
 
 import { scopedTranslation } from "./i18n";
 import { PersonalShowcase } from "./personal-showcase";

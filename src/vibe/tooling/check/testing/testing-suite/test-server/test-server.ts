@@ -9,7 +9,7 @@ import next from "next";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 // Server state (singleton)
 let app: ReturnType<typeof next> | undefined;

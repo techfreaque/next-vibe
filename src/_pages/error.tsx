@@ -2,6 +2,7 @@
 // error page has to stay a client component
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Environment } from "next-vibe/env/env-util";
+import useErrorHandler from "next-vibe/ui/hooks/use-error-handler";
 import { useParams } from "next-vibe/ui/hooks/use-navigation";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -10,8 +11,7 @@ import { Span } from "next-vibe/ui/ui/span";
 import { H2, P } from "next-vibe/ui/ui/typography";
 import type { ReactElement } from "react";
 
-import { envClient } from "@/_old/config/env-client";
-import useErrorHandler from "@/_old/hooks/use-error-handler";
+import { envClient } from "@/env/env-client";
 
 import { scopedTranslation as pageT } from "./[...notFound]/i18n";
 

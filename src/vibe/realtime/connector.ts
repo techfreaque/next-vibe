@@ -41,7 +41,7 @@ import { RemoteConnectionRepository } from "next-vibe/remote-connection/reposito
 import { RemoteTransport } from "next-vibe/remote-connection/transport";
 import { z } from "zod";
 
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 import { buildUserWsChannel } from "./channel";
 import type { AnyEndpointEventEnvelope } from "./structured-events";

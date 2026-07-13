@@ -61,8 +61,8 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { env } from "@/_old/config/env";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
+import { env } from "@/env/env";
 
 import { subscriptions } from "../subscription/db";
 import { paymentMethods, paymentTransactions, paymentWebhooks } from "./db";

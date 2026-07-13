@@ -12,6 +12,8 @@ import { and, count, eq, like } from "drizzle-orm";
 import { db } from "next-vibe/database";
 import { cronTasks as cronTasksTable } from "next-vibe/tasks/cron/db";
 
+import { contactFragment } from "@/contact/system-prompt";
+import { desktopFragment } from "@/desktop/system-prompt";
 import {
   autonomyStatusFragment,
   bootstrapFragment,
@@ -28,22 +30,20 @@ import {
   subAgentGuardFragment,
   toolExecutionControlFragment,
   userNameFragment,
-} from "next-vibe/agent/ai-stream/system-prompt/system-prompt";
-import type { SystemPromptServerParams } from "next-vibe/agent/ai-stream/system-prompt/types";
-import { codingAgentSettingFragment } from "next-vibe/agent/chat/settings/system-prompt";
-import { threadRenameFragment } from "next-vibe/agent/chat/threads/rename/system-prompt";
-import { cortexFragment } from "next-vibe/agent/cortex/system-prompt";
-import { favoritesFragment } from "next-vibe/agent/skills/favorites/system-prompt";
-import { skillFragment } from "next-vibe/agent/skills/system-prompt";
-import { webFragment } from "next-vibe/agent/web-search/system-prompt";
-import { contactFragment } from "@/contact/system-prompt";
-import { desktopFragment } from "@/desktop/system-prompt";
-import { loadRemoteInstancesContext } from "next-vibe/remote-connection/system-prompt";
+} from "@/vibe/agent/ai-stream/system-prompt/system-prompt";
+import { codingAgentSettingFragment } from "@/vibe/agent/chat/settings/system-prompt";
+import { threadRenameFragment } from "@/vibe/agent/chat/threads/rename/system-prompt";
+import { cortexFragment } from "@/vibe/agent/cortex/system-prompt";
+import { favoritesFragment } from "@/vibe/agent/skills/favorites/system-prompt";
+import { skillFragment } from "@/vibe/agent/skills/system-prompt";
+import { webFragment } from "@/vibe/agent/web-search/system-prompt";
 import {
   remoteInstancesFragment,
   sshConnectionsFragment,
   systemContextFragment,
-} from "next-vibe/remote-connection/system-prompt";
+} from "@/vibe/remote-connection/system-prompt";
+import type { SystemPromptServerParams } from "next-vibe/agent/ai-stream/system-prompt/types";
+import { loadRemoteInstancesContext } from "next-vibe/remote-connection/system-prompt";
 
 import { cortexNodes } from "next-vibe/agent/cortex/db";
 import { CortexNodeType } from "next-vibe/agent/cortex/enum";

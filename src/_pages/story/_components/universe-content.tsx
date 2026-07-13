@@ -9,7 +9,7 @@ import { Span } from "next-vibe/ui/ui/span";
 import type { JSX } from "react";
 import { useState } from "react";
 
-import { configScopedTranslation } from "@/_old/config/i18n";
+import { configScopedTranslation } from "@/i18n";
 
 import { scopedTranslation } from "./i18n";
 import type { ActiveSide } from "./split-hero";

@@ -38,7 +38,7 @@ import {
   ModelSortField,
 } from "next-vibe/agent/skills/enum";
 import { chatFavorites } from "next-vibe/agent/skills/favorites/db";
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 import { ChatModelId } from "../../models";
 import { seedCaseThread } from "../../testing/fixture-seed";

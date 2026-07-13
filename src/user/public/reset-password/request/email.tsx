@@ -20,9 +20,9 @@ import {
   type TrackingContext,
 } from "@/messenger/providers/email/smtp-client/components/tracking_context.email";
 import type { EmailTemplateDefinition } from "@/messenger/registry/template";
-import { RESET_TOKEN_EXPIRY } from "@/_old/config/constants";
-import { env } from "@/_old/config/env";
-import { configScopedTranslation } from "@/_old/config/i18n";
+import { RESET_TOKEN_EXPIRY } from "@/env/constants";
+import { env } from "@/env/env";
+import { configScopedTranslation } from "@/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";

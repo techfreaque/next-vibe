@@ -5,7 +5,7 @@ import { type NodePgDatabase } from "drizzle-orm/node-postgres";
 import { type PgliteDatabase } from "drizzle-orm/pglite";
 import { Pool } from "pg";
 
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 /**
  * Shared database connection primitives.

@@ -27,11 +27,11 @@ import { createEndpointLogger } from "next-vibe/logger/server";
 import type { NextRequest } from "next-vibe/ui/lib/request";
 import { NextResponse } from "next-vibe/ui/lib/request";
 
+import { scopedTranslation as sharedScopedTranslation } from "@/_pages/shared/i18n";
 import {
   CSRF_TOKEN_COOKIE_NAME,
   CSRF_TOKEN_HEADER_NAME,
-} from "@/_old/config/constants";
-import { scopedTranslation as sharedScopedTranslation } from "@/_pages/shared/i18n";
+} from "@/env/constants";
 
 import { parseRequestBody, parseSearchParams } from "./next-request-parser";
 import { wrapErrorResponse, wrapSuccessResponse } from "./next-response";

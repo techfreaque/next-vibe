@@ -20,7 +20,7 @@ import {
 import type { LeadWithEmailType } from "next-vibe/identity/lead/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 import { createTrackingContext } from "../../../../messenger/providers/email/smtp-client/components/tracking_context.email";
 import { scopedTranslation } from "../journeys/i18n";

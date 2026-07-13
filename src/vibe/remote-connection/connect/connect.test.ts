@@ -28,7 +28,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { DefaultFolderId } from "next-vibe/agent/chat/config";
 import { chatFolders } from "next-vibe/agent/chat/db";
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 import {
   ATLAS_INSTANCE_ID,

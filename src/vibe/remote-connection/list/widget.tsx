@@ -52,9 +52,9 @@ import {
 import type { JSX } from "react";
 import { useState } from "react";
 
-import { GITHUB_REPO_URL } from "@/_old/config/constants";
-import { envClient } from "@/_old/config/env-client";
 import { CreditsTabHeader } from "@/credits/credits-tab-header";
+import { GITHUB_REPO_URL } from "@/env/constants";
+import { envClient } from "@/env/env-client";
 
 import type endpoints from "./definition";
 import type { RemoteConnection } from "./definition";

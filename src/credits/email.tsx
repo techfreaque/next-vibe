@@ -20,8 +20,8 @@ import { users } from "next-vibe/identity/user/db";
 import type { ReactElement } from "react";
 import { z } from "zod";
 
-import { configScopedTranslation } from "@/_old/config/i18n";
 import { contactClientRepository } from "@/contact/repository-client";
+import { configScopedTranslation } from "@/i18n";
 import { EmailTemplate } from "@/messenger/providers/email/smtp-client/components/template.email";
 import {
   createTrackingContext,

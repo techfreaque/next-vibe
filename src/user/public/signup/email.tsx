@@ -32,8 +32,8 @@ import type {
   EmailResolvedData,
   EmailTemplateDefinition,
 } from "@/messenger/registry/template";
-import { env } from "@/_old/config/env";
-import { configScopedTranslation } from "@/_old/config/i18n";
+import { env } from "@/env/env";
+import { configScopedTranslation } from "@/i18n";
 
 import { FEATURED_MODELS } from "../../../vibe/agent/ai-stream/models";
 import { contactClientRepository } from "../../../contact/repository-client";

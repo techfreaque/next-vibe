@@ -51,7 +51,7 @@ import {
 import { customSkills } from "next-vibe/agent/skills/db";
 import type { SyncScope } from "next-vibe/remote-connection/db";
 import { remoteConnections } from "next-vibe/remote-connection/db";
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 import type { ConnectionConfig } from "./connector";
 import {

@@ -42,7 +42,7 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 import {
   connectToHermes,

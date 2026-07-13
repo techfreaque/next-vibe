@@ -61,7 +61,7 @@ import {
   collectCursors,
   ensureProvidersRegistered,
 } from "next-vibe/remote-connection/sync/provider";
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 import { cortexNodes } from "./db";
 import { CortexNodeType } from "./enum";

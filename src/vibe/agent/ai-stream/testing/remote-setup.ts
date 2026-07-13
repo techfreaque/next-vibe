@@ -38,7 +38,7 @@ import { RemoteTransport } from "next-vibe/remote-connection/transport";
 import { Pool } from "pg";
 import { describe, expect, it } from "vitest";
 
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 import * as fixtureSchema from "./fixtures.db";
 

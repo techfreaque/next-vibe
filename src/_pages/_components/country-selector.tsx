@@ -10,6 +10,7 @@ import { getUniqueLanguages } from "next-vibe/core/i18n/core/language-utils";
 import { cn } from "next-vibe/core/utils/utils";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { executeMutation } from "next-vibe/platforms/react/hooks/mutation-executor";
+import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import {
@@ -23,8 +24,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe/ui/ui/tabs";
 import type { FC } from "react";
 import { useCallback, useState } from "react";
 
-import { configScopedTranslation } from "@/_old/config/i18n";
-import { useLogger } from "@/_old/hooks/use-logger";
+import { configScopedTranslation } from "@/i18n";
 import meEndpoints from "@/user/private/me/definition";
 
 interface CountrySelectorProps {

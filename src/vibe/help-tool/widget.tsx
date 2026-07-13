@@ -31,6 +31,7 @@ import { useUrlNavStack } from "next-vibe/platforms/react/hooks/use-url-nav-stac
 import { resolveEndpoint } from "next-vibe/platforms/react/utils/resolve-endpoint";
 import { VibeFrameHost } from "next-vibe/platforms/vibe-frame/VibeFrameHost";
 import remoteConnectionListDefinition from "next-vibe/remote-connection/list/definition";
+import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import {
   useSearchParams,
   useSilentHistory,
@@ -124,7 +125,6 @@ import {
   useState,
 } from "react";
 
-import { useLogger } from "@/_old/hooks/use-logger";
 import { Logo } from "@/_pages/_components/logo";
 import { ThemeToggleDropdown } from "@/_pages/_components/theme-toggle";
 import {

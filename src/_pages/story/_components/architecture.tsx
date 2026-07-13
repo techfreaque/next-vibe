@@ -15,7 +15,7 @@ import {
   ENDPOINT_PLATFORMS,
   type EndpointPlatformKey,
   PLATFORM_COUNT,
-} from "@/_old/config/constants";
+} from "@/env/constants";
 
 import { scopedTranslation } from "./i18n";
 

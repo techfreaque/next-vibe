@@ -13,10 +13,10 @@ const DEFAULT_PASSWORD_SENTINEL = "change-me-now";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { SYSTEM_SETTINGS_ALIAS } from "next-vibe/env/settings/constants";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 
-import { envClient } from "@/_old/config/env-client";
-import { useLogger } from "@/_old/hooks/use-logger";
+import { envClient } from "@/env/env-client";
 import type { DEV_SEED_USERS } from "@/user/dev-seed-users";
 import loginEndpoints from "@/user/public/login/definition";
 import { scopedTranslation } from "@/user/public/login/i18n";

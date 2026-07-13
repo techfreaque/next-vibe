@@ -18,10 +18,7 @@ import type { ResponseType } from "next-vibe/core/route/response.schema";
 import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 
-import {
-  BEARER_LEAD_ID_SEPARATOR,
-  LEAD_ID_COOKIE_NAME,
-} from "@/_old/config/constants";
+import { BEARER_LEAD_ID_SEPARATOR, LEAD_ID_COOKIE_NAME } from "@/env/constants";
 
 import type { RemoteCallParams, RemoteCallResult } from "./types";
 

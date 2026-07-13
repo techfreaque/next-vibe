@@ -12,9 +12,9 @@ import { H2, H3, P } from "next-vibe/ui/ui/typography";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
 import type { JSX } from "react";
 
-import { configScopedTranslation } from "@/_old/config/i18n";
 import contactDefinitions from "@/contact/definition";
 import { contactClientRepository } from "@/contact/repository-client";
+import { configScopedTranslation } from "@/i18n";
 
 import { scopedTranslation as pageT } from "./i18n";
 

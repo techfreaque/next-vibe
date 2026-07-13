@@ -24,7 +24,7 @@ import type { PackageManifest } from "next-vibe/tooling/builder/repository/vibe-
 import { CHECK_CONFIG_CREATE_ALIAS } from "next-vibe/tooling/check/config/create/constants";
 import { VIBE_CHECK_ALIAS } from "next-vibe/tooling/check/vibe-check/constants";
 
-import { GITHUB_REPO_URL } from "@/_old/config/constants";
+import { GITHUB_REPO_URL } from "@/env/constants";
 
 const manifest: PackageManifest = {
   name: "@next-vibe/checker",

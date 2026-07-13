@@ -13,7 +13,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type { TasksTranslationKey } from "next-vibe/tasks/i18n";
 import type { TaskRunner } from "next-vibe/tasks/unified-runner/types";
 
-import { env } from "@/_old/config/env";
+import { env } from "@/env/env";
 
 import { CronTaskPriority, TaskCategory } from "../enum";
 

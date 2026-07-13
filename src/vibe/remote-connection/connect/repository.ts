@@ -27,8 +27,8 @@ import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { env } from "@/_old/config/env";
-import { envClient } from "@/_old/config/env-client";
+import { env } from "@/env/env";
+import { envClient } from "@/env/env-client";
 import loginEndpoints, {
   type LoginPostResponseOutput,
 } from "@/user/public/login/definition";

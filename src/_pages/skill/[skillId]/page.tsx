@@ -28,7 +28,7 @@ import { createEndpointLogger } from "next-vibe/logger/server";
 import { Div } from "next-vibe/ui/ui/div";
 import type { JSX } from "react";
 
-import { configScopedTranslation } from "@/_old/config/i18n";
+import { configScopedTranslation } from "@/i18n";
 
 import { scopedTranslation } from "./i18n";
 import {
