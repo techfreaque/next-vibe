@@ -20,7 +20,7 @@ import { DB_HEALTH_ALIAS } from "./constants";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "database", "health"],
+  path: ["vibe", "database", "health"],
   aliases: [DB_HEALTH_ALIAS, "db-ping"],
   title: "dbHealth.post.title",
   titleShort: "dbHealth.post.titleShort",

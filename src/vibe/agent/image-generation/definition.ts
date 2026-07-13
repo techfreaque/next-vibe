@@ -43,7 +43,7 @@ const ImageGenerationContainer = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["agent", "image-generation"],
+  path: ["vibe", "agent", "image-generation"],
   aliases: [IMAGE_GEN_ALIAS],
   allowedRoles: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.PUBLIC],
   defaultWebPinned: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.PUBLIC],

@@ -22,8 +22,9 @@ const MAX_SHOW = 30;
 /** Strip common path prefix so output is scannable */
 function shortenPath(p: string): string {
   return p
-    .replace(/^src\/app\/api\/\[locale\]\//, "api/")
-    .replace(/^src\/app\/\[locale\]\//, "app/");
+    .replace(/^src\/vibe\//, "vibe/")
+    .replace(/^src\/_pages\//, "pages/")
+    .replace(/^src\//, "");
 }
 
 // ── Props ─────────────────────────────────────────────────────

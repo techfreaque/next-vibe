@@ -33,7 +33,7 @@ const CodingAgentWidget = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["agent", "coding-agent"],
+  path: ["vibe", "agent", "coding-agent"],
   title: "codingAgent.run.post.title",
   titleShort: "codingAgent.run.post.titleShort",
   description: "codingAgent.run.post.description",

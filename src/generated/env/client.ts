@@ -17,15 +17,15 @@ import {
   contactClientEnvSchema,
 } from "../../contact/env-client";
 import {
-  paymentClientEnv,
-  paymentClientEnvExamples,
-  paymentClientEnvSchema,
-} from "../../payment/env-client";
-import {
   envClient as env_envClient,
   envClientExamples,
   envClientSchema as env_envClientSchema,
 } from "../../env/env-client";
+import {
+  paymentClientEnv,
+  paymentClientEnvExamples,
+  paymentClientEnvSchema,
+} from "../../payment/env-client";
 
 // Platform detection (will be set at runtime)
 const isServer = typeof globalThis.document === "undefined";
@@ -45,15 +45,15 @@ export const envClientModules = {
     schema: contactClientEnvSchema,
     examples: contactClientEnvExamples,
   },
-  payment: {
-    env: paymentClientEnv,
-    schema: paymentClientEnvSchema,
-    examples: paymentClientEnvExamples,
-  },
   env: {
     env: env_envClient,
     schema: env_envClientSchema,
     examples: envClientExamples,
+  },
+  payment: {
+    env: paymentClientEnv,
+    schema: paymentClientEnvSchema,
+    examples: paymentClientEnvExamples,
   },
 } as const;
 
@@ -62,8 +62,8 @@ export { platform };
 
 // Combined client schema
 export const envClientSchema = contactClientEnvSchema
-  .merge(paymentClientEnvSchema)
-  .merge(env_envClientSchema);
+  .merge(env_envClientSchema)
+  .merge(paymentClientEnvSchema);
 
 export type EnvClient = z.infer<typeof envClientSchema>;
 

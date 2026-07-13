@@ -31,7 +31,7 @@ import { Route as ApiLocalePaymentRouteImport } from './routes/api.$locale.payme
 import { Route as ApiLocaleManifestRouteImport } from './routes/api.$locale.manifest'
 import { Route as ApiLocaleCreditsRouteImport } from './routes/api.$locale.credits'
 import { Route as ApiLocaleContactRouteImport } from './routes/api.$locale.contact'
-import { Route as ApiLocaleSlugRouteImport } from './routes/api.$locale.$slug'
+import { Route as ApiLocaleNotFoundRouteImport } from './routes/api.$locale.$notFound'
 import { Route as LocaleUserAuthRouteImport } from './routes/$locale.user._auth'
 import { Route as LocaleUserAccountRouteImport } from './routes/$locale.user._account'
 import { Route as LocaleToolsSplatRouteImport } from './routes/$locale.tools.$'
@@ -55,23 +55,18 @@ import { Route as LocaleStoryAboutUsIndexRouteImport } from './routes/$locale.st
 import { Route as LocaleSkillSkillIdIndexRouteImport } from './routes/$locale.skill.$skillId.index'
 import { Route as LocaleSharedTokenIndexRouteImport } from './routes/$locale.shared.$token.index'
 import { Route as LocaleCreatorUserIdIndexRouteImport } from './routes/$locale.creator.$userId.index'
+import { Route as ApiLocaleVibeHelpToolRouteImport } from './routes/api.$locale.vibe.help-tool'
+import { Route as ApiLocaleVibeExecuteToolRouteImport } from './routes/api.$locale.vibe.execute-tool'
 import { Route as ApiLocaleUsersViewRouteImport } from './routes/api.$locale.users.view'
 import { Route as ApiLocaleUsersStatsRouteImport } from './routes/api.$locale.users.stats'
 import { Route as ApiLocaleUsersListRouteImport } from './routes/api.$locale.users.list'
 import { Route as ApiLocaleUsersCreateRouteImport } from './routes/api.$locale.users.create'
 import { Route as ApiLocaleUserSessionCleanupRouteImport } from './routes/api.$locale.user.session-cleanup'
 import { Route as ApiLocaleTaxReportRouteImport } from './routes/api.$locale.tax.report'
-import { Route as ApiLocaleSystemHelpToolRouteImport } from './routes/api.$locale.system.help-tool'
-import { Route as ApiLocaleSystemExecuteToolRouteImport } from './routes/api.$locale.system.execute-tool'
 import { Route as ApiLocaleSubscriptionUpdateRouteImport } from './routes/api.$locale.subscription.update'
 import { Route as ApiLocaleSubscriptionDashboardRouteImport } from './routes/api.$locale.subscription.dashboard'
 import { Route as ApiLocaleSubscriptionCreateRouteImport } from './routes/api.$locale.subscription.create'
 import { Route as ApiLocaleSubscriptionCancelRouteImport } from './routes/api.$locale.subscription.cancel'
-import { Route as ApiLocaleRemoteConnectionSyncRouteImport } from './routes/api.$locale.remote-connection.sync'
-import { Route as ApiLocaleRemoteConnectionListRouteImport } from './routes/api.$locale.remote-connection.list'
-import { Route as ApiLocaleRemoteConnectionConnectReverseRouteImport } from './routes/api.$locale.remote-connection.connect-reverse'
-import { Route as ApiLocaleRemoteConnectionConnectRouteImport } from './routes/api.$locale.remote-connection.connect'
-import { Route as ApiLocaleRemoteConnectionInstanceIdRouteImport } from './routes/api.$locale.remote-connection.$instanceId'
 import { Route as ApiLocaleReferralStatsRouteImport } from './routes/api.$locale.referral.stats'
 import { Route as ApiLocaleReferralPayoutRouteImport } from './routes/api.$locale.referral.payout'
 import { Route as ApiLocalePurchasingDashboardRouteImport } from './routes/api.$locale.purchasing.dashboard'
@@ -149,18 +144,6 @@ import { Route as ApiLocaleBrowserEmulateRouteImport } from './routes/api.$local
 import { Route as ApiLocaleBrowserDragRouteImport } from './routes/api.$locale.browser.drag'
 import { Route as ApiLocaleBrowserClosePageRouteImport } from './routes/api.$locale.browser.close-page'
 import { Route as ApiLocaleBrowserClickRouteImport } from './routes/api.$locale.browser.click'
-import { Route as ApiLocaleAgentWebSearchRouteImport } from './routes/api.$locale.agent.web-search'
-import { Route as ApiLocaleAgentViewImageRouteImport } from './routes/api.$locale.agent.view-image'
-import { Route as ApiLocaleAgentVideoGenerationRouteImport } from './routes/api.$locale.agent.video-generation'
-import { Route as ApiLocaleAgentTextToSpeechRouteImport } from './routes/api.$locale.agent.text-to-speech'
-import { Route as ApiLocaleAgentSpeechToTextRouteImport } from './routes/api.$locale.agent.speech-to-text'
-import { Route as ApiLocaleAgentSkillsRouteImport } from './routes/api.$locale.agent.skills'
-import { Route as ApiLocaleAgentMusicGenerationRouteImport } from './routes/api.$locale.agent.music-generation'
-import { Route as ApiLocaleAgentImageGenerationRouteImport } from './routes/api.$locale.agent.image-generation'
-import { Route as ApiLocaleAgentFetchUrlContentRouteImport } from './routes/api.$locale.agent.fetch-url-content'
-import { Route as ApiLocaleAgentDescribeVideoRouteImport } from './routes/api.$locale.agent.describe-video'
-import { Route as ApiLocaleAgentDescribeImageRouteImport } from './routes/api.$locale.agent.describe-image'
-import { Route as ApiLocaleAgentCodingAgentRouteImport } from './routes/api.$locale.agent.coding-agent'
 import { Route as LocaleUserAuthSignupRouteImport } from './routes/$locale.user._auth.signup'
 import { Route as LocaleUserAuthSignupIndexRouteImport } from './routes/$locale.user._auth.signup.index'
 import { Route as LocaleUserAuthResetPasswordIndexRouteImport } from './routes/$locale.user._auth.reset-password.index'
@@ -179,6 +162,33 @@ import { Route as LocaleStoryBlogReferralForAffiliateProsIndexRouteImport } from
 import { Route as LocaleStoryBlogOneEndpointEverySurfaceIndexRouteImport } from './routes/$locale.story.blog.one-endpoint-every-surface.index'
 import { Route as LocaleStoryBlogOneCodebase13PlatformsIndexRouteImport } from './routes/$locale.story.blog.one-codebase-13-platforms.index'
 import { Route as LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRouteImport } from './routes/$locale.story.blog.dead-trading-bot-to-monitoring-engine.index'
+import { Route as ApiLocaleVibeTasksExecuteRouteImport } from './routes/api.$locale.vibe.tasks.execute'
+import { Route as ApiLocaleVibeRemoteConnectionSyncRouteImport } from './routes/api.$locale.vibe.remote-connection.sync'
+import { Route as ApiLocaleVibeRemoteConnectionListRouteImport } from './routes/api.$locale.vibe.remote-connection.list'
+import { Route as ApiLocaleVibeRemoteConnectionConnectReverseRouteImport } from './routes/api.$locale.vibe.remote-connection.connect-reverse'
+import { Route as ApiLocaleVibeRemoteConnectionConnectRouteImport } from './routes/api.$locale.vibe.remote-connection.connect'
+import { Route as ApiLocaleVibeRemoteConnectionInstanceIdRouteImport } from './routes/api.$locale.vibe.remote-connection.$instanceId'
+import { Route as ApiLocaleVibeRealtimeRemoteEventBridgeRouteImport } from './routes/api.$locale.vibe.realtime.remote-event-bridge'
+import { Route as ApiLocaleVibeExecuteToolRevivalRouteImport } from './routes/api.$locale.vibe.execute-tool.revival'
+import { Route as ApiLocaleVibeExecuteToolCompleteRouteImport } from './routes/api.$locale.vibe.execute-tool.complete'
+import { Route as ApiLocaleVibeExecuteToolAwaitTaskRouteImport } from './routes/api.$locale.vibe.execute-tool.await-task'
+import { Route as ApiLocaleVibeEnvSettingsRouteImport } from './routes/api.$locale.vibe.env.settings'
+import { Route as ApiLocaleVibeDataflowRunConfigRouteImport } from './routes/api.$locale.vibe.dataflow.run-config'
+import { Route as ApiLocaleVibeDataflowGraphsRouteImport } from './routes/api.$locale.vibe.dataflow.graphs'
+import { Route as ApiLocaleVibeDataflowCleanupRouteImport } from './routes/api.$locale.vibe.dataflow.cleanup'
+import { Route as ApiLocaleVibeDatabaseHealthRouteImport } from './routes/api.$locale.vibe.database.health'
+import { Route as ApiLocaleVibeAgentWebSearchRouteImport } from './routes/api.$locale.vibe.agent.web-search'
+import { Route as ApiLocaleVibeAgentViewImageRouteImport } from './routes/api.$locale.vibe.agent.view-image'
+import { Route as ApiLocaleVibeAgentVideoGenerationRouteImport } from './routes/api.$locale.vibe.agent.video-generation'
+import { Route as ApiLocaleVibeAgentTextToSpeechRouteImport } from './routes/api.$locale.vibe.agent.text-to-speech'
+import { Route as ApiLocaleVibeAgentSpeechToTextRouteImport } from './routes/api.$locale.vibe.agent.speech-to-text'
+import { Route as ApiLocaleVibeAgentSkillsRouteImport } from './routes/api.$locale.vibe.agent.skills'
+import { Route as ApiLocaleVibeAgentMusicGenerationRouteImport } from './routes/api.$locale.vibe.agent.music-generation'
+import { Route as ApiLocaleVibeAgentImageGenerationRouteImport } from './routes/api.$locale.vibe.agent.image-generation'
+import { Route as ApiLocaleVibeAgentFetchUrlContentRouteImport } from './routes/api.$locale.vibe.agent.fetch-url-content'
+import { Route as ApiLocaleVibeAgentDescribeVideoRouteImport } from './routes/api.$locale.vibe.agent.describe-video'
+import { Route as ApiLocaleVibeAgentDescribeImageRouteImport } from './routes/api.$locale.vibe.agent.describe-image'
+import { Route as ApiLocaleVibeAgentCodingAgentRouteImport } from './routes/api.$locale.vibe.agent.coding-agent'
 import { Route as ApiLocaleUsersUserIdRouteImport } from './routes/api.$locale.users.user.$id'
 import { Route as ApiLocaleUserPublicSignupRouteImport } from './routes/api.$locale.user.public.signup'
 import { Route as ApiLocaleUserPublicLoginRouteImport } from './routes/api.$locale.user.public.login'
@@ -196,20 +206,6 @@ import { Route as ApiLocaleUserDataSourcesUsersBannedRouteImport } from './route
 import { Route as ApiLocaleUserDataSourcesUsersActiveTotalRouteImport } from './routes/api.$locale.user.data-sources.users-active-total'
 import { Route as ApiLocaleTaxRateListRouteImport } from './routes/api.$locale.tax.rate.list'
 import { Route as ApiLocaleTaxRateCreateRouteImport } from './routes/api.$locale.tax.rate.create'
-import { Route as ApiLocaleSystemToolingVibeStageRouteImport } from './routes/api.$locale.system.tooling.vibe-stage'
-import { Route as ApiLocaleSystemToolingVibeDepsRouteImport } from './routes/api.$locale.system.tooling.vibe-deps'
-import { Route as ApiLocaleSystemTasksUnifiedRunnerRouteImport } from './routes/api.$locale.system.tasks.unified-runner'
-import { Route as ApiLocaleSystemTasksExecuteRouteImport } from './routes/api.$locale.system.tasks.execute'
-import { Route as ApiLocaleSystemRealtimeRemoteEventBridgeRouteImport } from './routes/api.$locale.system.realtime.remote-event-bridge'
-import { Route as ApiLocaleSystemExecuteToolRevivalRouteImport } from './routes/api.$locale.system.execute-tool.revival'
-import { Route as ApiLocaleSystemExecuteToolCompleteRouteImport } from './routes/api.$locale.system.execute-tool.complete'
-import { Route as ApiLocaleSystemExecuteToolAwaitTaskRouteImport } from './routes/api.$locale.system.execute-tool.await-task'
-import { Route as ApiLocaleSystemEnvSettingsRouteImport } from './routes/api.$locale.system.env.settings'
-import { Route as ApiLocaleSystemDataflowRunConfigRouteImport } from './routes/api.$locale.system.dataflow.run-config'
-import { Route as ApiLocaleSystemDataflowGraphsRouteImport } from './routes/api.$locale.system.dataflow.graphs'
-import { Route as ApiLocaleSystemDataflowCleanupRouteImport } from './routes/api.$locale.system.dataflow.cleanup'
-import { Route as ApiLocaleSystemDatabaseSqlRouteImport } from './routes/api.$locale.system.database.sql'
-import { Route as ApiLocaleSystemDatabaseHealthRouteImport } from './routes/api.$locale.system.database.health'
 import { Route as ApiLocaleSubscriptionDataSourcesSubscriptionsTrialingRouteImport } from './routes/api.$locale.subscription.data-sources.subscriptions-trialing'
 import { Route as ApiLocaleSubscriptionDataSourcesSubscriptionsPaymentFailedRouteImport } from './routes/api.$locale.subscription.data-sources.subscriptions-payment-failed'
 import { Route as ApiLocaleSubscriptionDataSourcesSubscriptionsNewRouteImport } from './routes/api.$locale.subscription.data-sources.subscriptions-new'
@@ -223,10 +219,6 @@ import { Route as ApiLocaleSubscriptionAdminListRouteImport } from './routes/api
 import { Route as ApiLocaleSshConnectionsListRouteImport } from './routes/api.$locale.ssh.connections.list'
 import { Route as ApiLocaleSshConnectionsCreateRouteImport } from './routes/api.$locale.ssh.connections.create'
 import { Route as ApiLocaleSshConnectionsIdRouteImport } from './routes/api.$locale.ssh.connections.$id'
-import { Route as ApiLocaleRemoteConnectionSyncProvidersRouteImport } from './routes/api.$locale.remote-connection.sync.providers'
-import { Route as ApiLocaleRemoteConnectionSelfRenameRouteImport } from './routes/api.$locale.remote-connection.self.rename'
-import { Route as ApiLocaleRemoteConnectionSelfInstanceIdRouteImport } from './routes/api.$locale.remote-connection.self.instanceId'
-import { Route as ApiLocaleRemoteConnectionConnectReverseUpdateRouteImport } from './routes/api.$locale.remote-connection.connect-reverse.update'
 import { Route as ApiLocaleReferralLeadCurrentRouteImport } from './routes/api.$locale.referral.lead.current'
 import { Route as ApiLocaleReferralEarningsListRouteImport } from './routes/api.$locale.referral.earnings.list'
 import { Route as ApiLocaleReferralDataSourcesReferralsSignupsRouteImport } from './routes/api.$locale.referral.data-sources.referrals-signups'
@@ -394,35 +386,59 @@ import { Route as ApiLocaleAnalyticsEvaluatorsOrRouteImport } from './routes/api
 import { Route as ApiLocaleAnalyticsEvaluatorsNotRouteImport } from './routes/api.$locale.analytics.evaluators.not'
 import { Route as ApiLocaleAnalyticsEvaluatorsCrossoverRouteImport } from './routes/api.$locale.analytics.evaluators.crossover'
 import { Route as ApiLocaleAnalyticsEvaluatorsAndRouteImport } from './routes/api.$locale.analytics.evaluators.and'
-import { Route as ApiLocaleAgentWebSearchKagiRouteImport } from './routes/api.$locale.agent.web-search.kagi'
-import { Route as ApiLocaleAgentWebSearchBraveRouteImport } from './routes/api.$locale.agent.web-search.brave'
-import { Route as ApiLocaleAgentSpeechToTextHotkeyRouteImport } from './routes/api.$locale.agent.speech-to-text.hotkey'
-import { Route as ApiLocaleAgentSkillsModerationRouteImport } from './routes/api.$locale.agent.skills.moderation'
-import { Route as ApiLocaleAgentSkillsFavoritesRouteImport } from './routes/api.$locale.agent.skills.favorites'
-import { Route as ApiLocaleAgentSkillsCreateRouteImport } from './routes/api.$locale.agent.skills.create'
-import { Route as ApiLocaleAgentSkillsIdRouteImport } from './routes/api.$locale.agent.skills.$id'
-import { Route as ApiLocaleAgentModelsModelPricesRouteImport } from './routes/api.$locale.agent.models.model-prices'
-import { Route as ApiLocaleAgentModelsListRouteImport } from './routes/api.$locale.agent.models.list'
-import { Route as ApiLocaleAgentFetchUrlContentCleanupRouteImport } from './routes/api.$locale.agent.fetch-url-content.cleanup'
-import { Route as ApiLocaleAgentCortexWriteRouteImport } from './routes/api.$locale.agent.cortex.write'
-import { Route as ApiLocaleAgentCortexTreeRouteImport } from './routes/api.$locale.agent.cortex.tree'
-import { Route as ApiLocaleAgentCortexTerminalsRouteImport } from './routes/api.$locale.agent.cortex.terminals'
-import { Route as ApiLocaleAgentCortexSearchRouteImport } from './routes/api.$locale.agent.cortex.search'
-import { Route as ApiLocaleAgentCortexReadRouteImport } from './routes/api.$locale.agent.cortex.read'
-import { Route as ApiLocaleAgentCortexMoveRouteImport } from './routes/api.$locale.agent.cortex.move'
-import { Route as ApiLocaleAgentCortexMkdirRouteImport } from './routes/api.$locale.agent.cortex.mkdir'
-import { Route as ApiLocaleAgentCortexListRouteImport } from './routes/api.$locale.agent.cortex.list'
-import { Route as ApiLocaleAgentCortexExecRouteImport } from './routes/api.$locale.agent.cortex.exec'
-import { Route as ApiLocaleAgentCortexEditRouteImport } from './routes/api.$locale.agent.cortex.edit'
-import { Route as ApiLocaleAgentCortexDeleteRouteImport } from './routes/api.$locale.agent.cortex.delete'
-import { Route as ApiLocaleAgentChatThreadsRouteImport } from './routes/api.$locale.agent.chat.threads'
-import { Route as ApiLocaleAgentChatSettingsRouteImport } from './routes/api.$locale.agent.chat.settings'
-import { Route as ApiLocaleAgentChatPublicFeedRouteImport } from './routes/api.$locale.agent.chat.public-feed'
-import { Route as ApiLocaleAgentAiStreamStreamRouteImport } from './routes/api.$locale.agent.ai-stream.stream'
-import { Route as ApiLocaleAgentAiStreamRunRouteImport } from './routes/api.$locale.agent.ai-stream.run'
-import { Route as ApiLocaleAgentAiStreamCancelRouteImport } from './routes/api.$locale.agent.ai-stream.cancel'
 import { Route as LocaleUserAuthResetPasswordTokenIndexRouteImport } from './routes/$locale.user._auth.reset-password.$token.index'
 import { Route as LocaleStoryNewsletterUnsubscribeEmailIndexRouteImport } from './routes/$locale.story.newsletter.unsubscribe.$email.index'
+import { Route as ApiLocaleVibeTasksPulseStatusRouteImport } from './routes/api.$locale.vibe.tasks.pulse.status'
+import { Route as ApiLocaleVibeTasksPulseHistoryRouteImport } from './routes/api.$locale.vibe.tasks.pulse.history'
+import { Route as ApiLocaleVibeTasksPulseExecuteRouteImport } from './routes/api.$locale.vibe.tasks.pulse.execute'
+import { Route as ApiLocaleVibeTasksDataSourcesCronExecutionsTotalRouteImport } from './routes/api.$locale.vibe.tasks.data-sources.cron-executions-total'
+import { Route as ApiLocaleVibeTasksDataSourcesCronExecutionsSucceededRouteImport } from './routes/api.$locale.vibe.tasks.data-sources.cron-executions-succeeded'
+import { Route as ApiLocaleVibeTasksDataSourcesCronExecutionsFailedRouteImport } from './routes/api.$locale.vibe.tasks.data-sources.cron-executions-failed'
+import { Route as ApiLocaleVibeTasksCronTasksRouteImport } from './routes/api.$locale.vibe.tasks.cron.tasks'
+import { Route as ApiLocaleVibeTasksCronStatsRouteImport } from './routes/api.$locale.vibe.tasks.cron.stats'
+import { Route as ApiLocaleVibeTasksCronQueueRouteImport } from './routes/api.$locale.vibe.tasks.cron.queue'
+import { Route as ApiLocaleVibeTasksCronHistoryRouteImport } from './routes/api.$locale.vibe.tasks.cron.history'
+import { Route as ApiLocaleVibeTasksCronBulkRouteImport } from './routes/api.$locale.vibe.tasks.cron.bulk'
+import { Route as ApiLocaleVibeTasksCronIdRouteImport } from './routes/api.$locale.vibe.tasks.cron.$id'
+import { Route as ApiLocaleVibeServerServerHealthRouteImport } from './routes/api.$locale.vibe.server.server.health'
+import { Route as ApiLocaleVibeRemoteConnectionSyncProvidersRouteImport } from './routes/api.$locale.vibe.remote-connection.sync.providers'
+import { Route as ApiLocaleVibeRemoteConnectionSelfRenameRouteImport } from './routes/api.$locale.vibe.remote-connection.self.rename'
+import { Route as ApiLocaleVibeRemoteConnectionSelfInstanceIdRouteImport } from './routes/api.$locale.vibe.remote-connection.self.instanceId'
+import { Route as ApiLocaleVibeRemoteConnectionConnectReverseUpdateRouteImport } from './routes/api.$locale.vibe.remote-connection.connect-reverse.update'
+import { Route as ApiLocaleVibePlatformsVibeFrameMountRouteImport } from './routes/api.$locale.vibe.platforms.vibe-frame.mount'
+import { Route as ApiLocaleVibeLoggerErrorMonitorLogsRouteImport } from './routes/api.$locale.vibe.logger.error-monitor.logs'
+import { Route as ApiLocaleVibeLoggerErrorMonitorClientLogRouteImport } from './routes/api.$locale.vibe.logger.error-monitor.client-log'
+import { Route as ApiLocaleVibeLoggerErrorMonitorCleanupRouteImport } from './routes/api.$locale.vibe.logger.error-monitor.cleanup'
+import { Route as ApiLocaleVibeExecuteToolCallControlResumeWhenDoneRouteImport } from './routes/api.$locale.vibe.execute-tool.call-control.resume-when-done'
+import { Route as ApiLocaleVibeExecuteToolCallControlDetachRouteImport } from './routes/api.$locale.vibe.execute-tool.call-control.detach'
+import { Route as ApiLocaleVibeExecuteToolCallControlCancelRouteImport } from './routes/api.$locale.vibe.execute-tool.call-control.cancel'
+import { Route as ApiLocaleVibeEnvSettingsGenerateKeyRouteImport } from './routes/api.$locale.vibe.env.settings.generate-key'
+import { Route as ApiLocaleVibeEnvSettingsExportEnvRouteImport } from './routes/api.$locale.vibe.env.settings.export-env'
+import { Route as ApiLocaleVibeAgentWebSearchKagiRouteImport } from './routes/api.$locale.vibe.agent.web-search.kagi'
+import { Route as ApiLocaleVibeAgentWebSearchBraveRouteImport } from './routes/api.$locale.vibe.agent.web-search.brave'
+import { Route as ApiLocaleVibeAgentSkillsModerationRouteImport } from './routes/api.$locale.vibe.agent.skills.moderation'
+import { Route as ApiLocaleVibeAgentSkillsFavoritesRouteImport } from './routes/api.$locale.vibe.agent.skills.favorites'
+import { Route as ApiLocaleVibeAgentSkillsCreateRouteImport } from './routes/api.$locale.vibe.agent.skills.create'
+import { Route as ApiLocaleVibeAgentSkillsIdRouteImport } from './routes/api.$locale.vibe.agent.skills.$id'
+import { Route as ApiLocaleVibeAgentModelsListRouteImport } from './routes/api.$locale.vibe.agent.models.list'
+import { Route as ApiLocaleVibeAgentFetchUrlContentCleanupRouteImport } from './routes/api.$locale.vibe.agent.fetch-url-content.cleanup'
+import { Route as ApiLocaleVibeAgentCortexWriteRouteImport } from './routes/api.$locale.vibe.agent.cortex.write'
+import { Route as ApiLocaleVibeAgentCortexTreeRouteImport } from './routes/api.$locale.vibe.agent.cortex.tree'
+import { Route as ApiLocaleVibeAgentCortexTerminalsRouteImport } from './routes/api.$locale.vibe.agent.cortex.terminals'
+import { Route as ApiLocaleVibeAgentCortexSearchRouteImport } from './routes/api.$locale.vibe.agent.cortex.search'
+import { Route as ApiLocaleVibeAgentCortexReadRouteImport } from './routes/api.$locale.vibe.agent.cortex.read'
+import { Route as ApiLocaleVibeAgentCortexMoveRouteImport } from './routes/api.$locale.vibe.agent.cortex.move'
+import { Route as ApiLocaleVibeAgentCortexMkdirRouteImport } from './routes/api.$locale.vibe.agent.cortex.mkdir'
+import { Route as ApiLocaleVibeAgentCortexListRouteImport } from './routes/api.$locale.vibe.agent.cortex.list'
+import { Route as ApiLocaleVibeAgentCortexExecRouteImport } from './routes/api.$locale.vibe.agent.cortex.exec'
+import { Route as ApiLocaleVibeAgentCortexEditRouteImport } from './routes/api.$locale.vibe.agent.cortex.edit'
+import { Route as ApiLocaleVibeAgentCortexDeleteRouteImport } from './routes/api.$locale.vibe.agent.cortex.delete'
+import { Route as ApiLocaleVibeAgentChatThreadsRouteImport } from './routes/api.$locale.vibe.agent.chat.threads'
+import { Route as ApiLocaleVibeAgentChatSettingsRouteImport } from './routes/api.$locale.vibe.agent.chat.settings'
+import { Route as ApiLocaleVibeAgentChatPublicFeedRouteImport } from './routes/api.$locale.vibe.agent.chat.public-feed'
+import { Route as ApiLocaleVibeAgentAiStreamStreamRouteImport } from './routes/api.$locale.vibe.agent.ai-stream.stream'
+import { Route as ApiLocaleVibeAgentAiStreamRunRouteImport } from './routes/api.$locale.vibe.agent.ai-stream.run'
+import { Route as ApiLocaleVibeAgentAiStreamCancelRouteImport } from './routes/api.$locale.vibe.agent.ai-stream.cancel'
 import { Route as ApiLocaleUsersUserIdRolesRouteImport } from './routes/api.$locale.users.user.$id.roles'
 import { Route as ApiLocaleUserPublicResetPasswordValidateRouteImport } from './routes/api.$locale.user.public.reset-password.validate'
 import { Route as ApiLocaleUserPublicResetPasswordRequestRouteImport } from './routes/api.$locale.user.public.reset-password.request'
@@ -435,30 +451,6 @@ import { Route as ApiLocaleUserPrivateMeAvatarRouteImport } from './routes/api.$
 import { Route as ApiLocaleUserPrivateMeAddressesRouteImport } from './routes/api.$locale.user.private.me.addresses'
 import { Route as ApiLocaleTaxRateRateIdUpdateRouteImport } from './routes/api.$locale.tax.rate.$rateId.update'
 import { Route as ApiLocaleTaxRateRateIdDeleteRouteImport } from './routes/api.$locale.tax.rate.$rateId.delete'
-import { Route as ApiLocaleSystemToolingCheckVibeCheckRouteImport } from './routes/api.$locale.system.tooling.check.vibe-check'
-import { Route as ApiLocaleSystemTasksPulseStatusRouteImport } from './routes/api.$locale.system.tasks.pulse.status'
-import { Route as ApiLocaleSystemTasksPulseHistoryRouteImport } from './routes/api.$locale.system.tasks.pulse.history'
-import { Route as ApiLocaleSystemTasksPulseExecuteRouteImport } from './routes/api.$locale.system.tasks.pulse.execute'
-import { Route as ApiLocaleSystemTasksDataSourcesCronExecutionsTotalRouteImport } from './routes/api.$locale.system.tasks.data-sources.cron-executions-total'
-import { Route as ApiLocaleSystemTasksDataSourcesCronExecutionsSucceededRouteImport } from './routes/api.$locale.system.tasks.data-sources.cron-executions-succeeded'
-import { Route as ApiLocaleSystemTasksDataSourcesCronExecutionsFailedRouteImport } from './routes/api.$locale.system.tasks.data-sources.cron-executions-failed'
-import { Route as ApiLocaleSystemTasksCronTasksRouteImport } from './routes/api.$locale.system.tasks.cron.tasks'
-import { Route as ApiLocaleSystemTasksCronStatsRouteImport } from './routes/api.$locale.system.tasks.cron.stats'
-import { Route as ApiLocaleSystemTasksCronQueueRouteImport } from './routes/api.$locale.system.tasks.cron.queue'
-import { Route as ApiLocaleSystemTasksCronHistoryRouteImport } from './routes/api.$locale.system.tasks.cron.history'
-import { Route as ApiLocaleSystemTasksCronBulkRouteImport } from './routes/api.$locale.system.tasks.cron.bulk'
-import { Route as ApiLocaleSystemTasksCronIdRouteImport } from './routes/api.$locale.system.tasks.cron.$id'
-import { Route as ApiLocaleSystemServerServerRebuildRouteImport } from './routes/api.$locale.system.server.server.rebuild'
-import { Route as ApiLocaleSystemServerServerHealthRouteImport } from './routes/api.$locale.system.server.server.health'
-import { Route as ApiLocaleSystemPlatformsVibeFrameMountRouteImport } from './routes/api.$locale.system.platforms.vibe-frame.mount'
-import { Route as ApiLocaleSystemLoggerErrorMonitorLogsRouteImport } from './routes/api.$locale.system.logger.error-monitor.logs'
-import { Route as ApiLocaleSystemLoggerErrorMonitorClientLogRouteImport } from './routes/api.$locale.system.logger.error-monitor.client-log'
-import { Route as ApiLocaleSystemLoggerErrorMonitorCleanupRouteImport } from './routes/api.$locale.system.logger.error-monitor.cleanup'
-import { Route as ApiLocaleSystemExecuteToolCallControlResumeWhenDoneRouteImport } from './routes/api.$locale.system.execute-tool.call-control.resume-when-done'
-import { Route as ApiLocaleSystemExecuteToolCallControlDetachRouteImport } from './routes/api.$locale.system.execute-tool.call-control.detach'
-import { Route as ApiLocaleSystemExecuteToolCallControlCancelRouteImport } from './routes/api.$locale.system.execute-tool.call-control.cancel'
-import { Route as ApiLocaleSystemEnvSettingsGenerateKeyRouteImport } from './routes/api.$locale.system.env.settings.generate-key'
-import { Route as ApiLocaleSystemEnvSettingsExportEnvRouteImport } from './routes/api.$locale.system.env.settings.export-env'
 import { Route as ApiLocaleSubscriptionCompanyCompanyIdListRouteImport } from './routes/api.$locale.subscription.company.$companyId.list'
 import { Route as ApiLocaleSubscriptionCompanyCompanyIdGetRouteImport } from './routes/api.$locale.subscription.company.$companyId.get'
 import { Route as ApiLocaleSshLinuxUsersListRouteImport } from './routes/api.$locale.ssh.linux.users.list'
@@ -487,9 +479,7 @@ import { Route as ApiLocalePosOrderOrderIdCompleteRouteImport } from './routes/a
 import { Route as ApiLocalePosOrderOrderIdAddPaymentRouteImport } from './routes/api.$locale.pos.order.$orderId.add-payment'
 import { Route as ApiLocalePosOrderOrderIdAddItemRouteImport } from './routes/api.$locale.pos.order.$orderId.add-item'
 import { Route as ApiLocalePaymentProvidersStripeWebhookRouteImport } from './routes/api.$locale.payment.providers.stripe.webhook'
-import { Route as ApiLocalePaymentProvidersStripeCliRouteImport } from './routes/api.$locale.payment.providers.stripe.cli'
 import { Route as ApiLocalePaymentProvidersNowpaymentsWebhookRouteImport } from './routes/api.$locale.payment.providers.nowpayments.webhook'
-import { Route as ApiLocalePaymentProvidersNowpaymentsCliRouteImport } from './routes/api.$locale.payment.providers.nowpayments.cli'
 import { Route as ApiLocalePaymentInvoiceLineAddRouteImport } from './routes/api.$locale.payment.invoice.line.add'
 import { Route as ApiLocalePaymentInvoiceInvoiceIdVoidRouteImport } from './routes/api.$locale.payment.invoice.$invoiceId.void'
 import { Route as ApiLocalePaymentInvoiceInvoiceIdSendReminderRouteImport } from './routes/api.$locale.payment.invoice.$invoiceId.send-reminder'
@@ -528,51 +518,47 @@ import { Route as ApiLocaleChartOfAccountsJournalEntryIdGetRouteImport } from '.
 import { Route as ApiLocaleChartOfAccountsAccountAccountIdUpdateRouteImport } from './routes/api.$locale.chart-of-accounts.account.$accountId.update'
 import { Route as ApiLocaleChartOfAccountsAccountAccountIdGetRouteImport } from './routes/api.$locale.chart-of-accounts.account.$accountId.get'
 import { Route as ApiLocaleChartOfAccountsAccountAccountIdDeactivateRouteImport } from './routes/api.$locale.chart-of-accounts.account.$accountId.deactivate'
-import { Route as ApiLocaleAgentSkillsFavoritesReorderRouteImport } from './routes/api.$locale.agent.skills.favorites.reorder'
-import { Route as ApiLocaleAgentSkillsFavoritesCreateRouteImport } from './routes/api.$locale.agent.skills.favorites.create'
-import { Route as ApiLocaleAgentSkillsFavoritesIdRouteImport } from './routes/api.$locale.agent.skills.favorites.$id'
-import { Route as ApiLocaleAgentSkillsIdVoteRouteImport } from './routes/api.$locale.agent.skills.$id.vote'
-import { Route as ApiLocaleAgentSkillsIdReportRouteImport } from './routes/api.$locale.agent.skills.$id.report'
-import { Route as ApiLocaleAgentSkillsIdPublishRouteImport } from './routes/api.$locale.agent.skills.$id.publish'
-import { Route as ApiLocaleAgentCortexEmbeddingsBackfillRouteImport } from './routes/api.$locale.agent.cortex.embeddings.backfill'
-import { Route as ApiLocaleAgentChatThreadsSearchThreadsRouteImport } from './routes/api.$locale.agent.chat.threads.search-threads'
-import { Route as ApiLocaleAgentChatThreadsSearchMessagesRouteImport } from './routes/api.$locale.agent.chat.threads.search-messages'
-import { Route as ApiLocaleAgentChatThreadsRenameRouteImport } from './routes/api.$locale.agent.chat.threads.rename'
-import { Route as ApiLocaleAgentChatThreadsThreadIdRouteImport } from './routes/api.$locale.agent.chat.threads.$threadId'
-import { Route as ApiLocaleAgentChatFoldersRootFolderIdRouteImport } from './routes/api.$locale.agent.chat.folders.$rootFolderId'
-import { Route as ApiLocaleAgentChatFolderContentsRootFolderIdRouteImport } from './routes/api.$locale.agent.chat.folder-contents.$rootFolderId'
-import { Route as ApiLocaleAgentChatDataSourcesChatUpvotesTotalRouteImport } from './routes/api.$locale.agent.chat.data-sources.chat-upvotes-total'
-import { Route as ApiLocaleAgentChatDataSourcesChatUniqueUsersRouteImport } from './routes/api.$locale.agent.chat.data-sources.chat-unique-users'
-import { Route as ApiLocaleAgentChatDataSourcesChatToolCallsTotalRouteImport } from './routes/api.$locale.agent.chat.data-sources.chat-tool-calls-total'
-import { Route as ApiLocaleAgentChatDataSourcesChatThreadsCreatedRouteImport } from './routes/api.$locale.agent.chat.data-sources.chat-threads-created'
-import { Route as ApiLocaleAgentChatDataSourcesChatThreadsActiveTotalRouteImport } from './routes/api.$locale.agent.chat.data-sources.chat-threads-active-total'
-import { Route as ApiLocaleAgentChatDataSourcesChatShareLinksCreatedRouteImport } from './routes/api.$locale.agent.chat.data-sources.chat-share-links-created'
-import { Route as ApiLocaleAgentChatDataSourcesChatMessagesWithAttachmentsRouteImport } from './routes/api.$locale.agent.chat.data-sources.chat-messages-with-attachments'
-import { Route as ApiLocaleAgentChatDataSourcesChatMessagesTotalRouteImport } from './routes/api.$locale.agent.chat.data-sources.chat-messages-total'
-import { Route as ApiLocaleAgentChatDataSourcesChatMessagesByUserRouteImport } from './routes/api.$locale.agent.chat.data-sources.chat-messages-by-user'
-import { Route as ApiLocaleAgentChatDataSourcesChatMessagesByAiRouteImport } from './routes/api.$locale.agent.chat.data-sources.chat-messages-by-ai'
-import { Route as ApiLocaleAgentChatDataSourcesChatMemoriesCreatedRouteImport } from './routes/api.$locale.agent.chat.data-sources.chat-memories-created'
-import { Route as ApiLocaleAgentChatDataSourcesChatErrorsTotalRouteImport } from './routes/api.$locale.agent.chat.data-sources.chat-errors-total'
-import { Route as ApiLocaleAgentChatDataSourcesChatDownvotesTotalRouteImport } from './routes/api.$locale.agent.chat.data-sources.chat-downvotes-total'
-import { Route as ApiLocaleAgentAiStreamWsProviderModelsRouteImport } from './routes/api.$locale.agent.ai-stream.ws-provider.models'
-import { Route as ApiLocaleAgentAiStreamSystemPromptDebugRouteImport } from './routes/api.$locale.agent.ai-stream.system-prompt.debug'
+import { Route as ApiLocaleVibePlatformsAiSkillsCharacterSkillRouteImport } from './routes/api.$locale.vibe.platforms.ai.skills.$characterSkill'
+import { Route as ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRouteImport } from './routes/api.$locale.vibe.logger.error-monitor.data-sources.error-logs-warnings'
+import { Route as ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsTotalRouteImport } from './routes/api.$locale.vibe.logger.error-monitor.data-sources.error-logs-total'
+import { Route as ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsErrorsRouteImport } from './routes/api.$locale.vibe.logger.error-monitor.data-sources.error-logs-errors'
+import { Route as ApiLocaleVibeDataflowGraphsIdVersionsRouteImport } from './routes/api.$locale.vibe.dataflow.graphs.$id.versions'
+import { Route as ApiLocaleVibeDataflowGraphsIdTriggerRouteImport } from './routes/api.$locale.vibe.dataflow.graphs.$id.trigger'
+import { Route as ApiLocaleVibeDataflowGraphsIdPromoteRouteImport } from './routes/api.$locale.vibe.dataflow.graphs.$id.promote'
+import { Route as ApiLocaleVibeDataflowGraphsIdEditRouteImport } from './routes/api.$locale.vibe.dataflow.graphs.$id.edit'
+import { Route as ApiLocaleVibeDataflowGraphsIdDeleteRouteImport } from './routes/api.$locale.vibe.dataflow.graphs.$id.delete'
+import { Route as ApiLocaleVibeDataflowGraphsIdDataRouteImport } from './routes/api.$locale.vibe.dataflow.graphs.$id.data'
+import { Route as ApiLocaleVibeDataflowGraphsIdBacktestRouteImport } from './routes/api.$locale.vibe.dataflow.graphs.$id.backtest'
+import { Route as ApiLocaleVibeDataflowGraphsIdArchiveRouteImport } from './routes/api.$locale.vibe.dataflow.graphs.$id.archive'
+import { Route as ApiLocaleVibeAgentSkillsFavoritesReorderRouteImport } from './routes/api.$locale.vibe.agent.skills.favorites.reorder'
+import { Route as ApiLocaleVibeAgentSkillsFavoritesCreateRouteImport } from './routes/api.$locale.vibe.agent.skills.favorites.create'
+import { Route as ApiLocaleVibeAgentSkillsFavoritesIdRouteImport } from './routes/api.$locale.vibe.agent.skills.favorites.$id'
+import { Route as ApiLocaleVibeAgentSkillsIdVoteRouteImport } from './routes/api.$locale.vibe.agent.skills.$id.vote'
+import { Route as ApiLocaleVibeAgentSkillsIdReportRouteImport } from './routes/api.$locale.vibe.agent.skills.$id.report'
+import { Route as ApiLocaleVibeAgentSkillsIdPublishRouteImport } from './routes/api.$locale.vibe.agent.skills.$id.publish'
+import { Route as ApiLocaleVibeAgentCortexEmbeddingsBackfillRouteImport } from './routes/api.$locale.vibe.agent.cortex.embeddings.backfill'
+import { Route as ApiLocaleVibeAgentChatThreadsSearchThreadsRouteImport } from './routes/api.$locale.vibe.agent.chat.threads.search-threads'
+import { Route as ApiLocaleVibeAgentChatThreadsSearchMessagesRouteImport } from './routes/api.$locale.vibe.agent.chat.threads.search-messages'
+import { Route as ApiLocaleVibeAgentChatThreadsRenameRouteImport } from './routes/api.$locale.vibe.agent.chat.threads.rename'
+import { Route as ApiLocaleVibeAgentChatThreadsThreadIdRouteImport } from './routes/api.$locale.vibe.agent.chat.threads.$threadId'
+import { Route as ApiLocaleVibeAgentChatFoldersRootFolderIdRouteImport } from './routes/api.$locale.vibe.agent.chat.folders.$rootFolderId'
+import { Route as ApiLocaleVibeAgentChatFolderContentsRootFolderIdRouteImport } from './routes/api.$locale.vibe.agent.chat.folder-contents.$rootFolderId'
+import { Route as ApiLocaleVibeAgentChatDataSourcesChatUpvotesTotalRouteImport } from './routes/api.$locale.vibe.agent.chat.data-sources.chat-upvotes-total'
+import { Route as ApiLocaleVibeAgentChatDataSourcesChatUniqueUsersRouteImport } from './routes/api.$locale.vibe.agent.chat.data-sources.chat-unique-users'
+import { Route as ApiLocaleVibeAgentChatDataSourcesChatToolCallsTotalRouteImport } from './routes/api.$locale.vibe.agent.chat.data-sources.chat-tool-calls-total'
+import { Route as ApiLocaleVibeAgentChatDataSourcesChatThreadsCreatedRouteImport } from './routes/api.$locale.vibe.agent.chat.data-sources.chat-threads-created'
+import { Route as ApiLocaleVibeAgentChatDataSourcesChatThreadsActiveTotalRouteImport } from './routes/api.$locale.vibe.agent.chat.data-sources.chat-threads-active-total'
+import { Route as ApiLocaleVibeAgentChatDataSourcesChatShareLinksCreatedRouteImport } from './routes/api.$locale.vibe.agent.chat.data-sources.chat-share-links-created'
+import { Route as ApiLocaleVibeAgentChatDataSourcesChatMessagesWithAttachmentsRouteImport } from './routes/api.$locale.vibe.agent.chat.data-sources.chat-messages-with-attachments'
+import { Route as ApiLocaleVibeAgentChatDataSourcesChatMessagesTotalRouteImport } from './routes/api.$locale.vibe.agent.chat.data-sources.chat-messages-total'
+import { Route as ApiLocaleVibeAgentChatDataSourcesChatMessagesByUserRouteImport } from './routes/api.$locale.vibe.agent.chat.data-sources.chat-messages-by-user'
+import { Route as ApiLocaleVibeAgentChatDataSourcesChatMessagesByAiRouteImport } from './routes/api.$locale.vibe.agent.chat.data-sources.chat-messages-by-ai'
+import { Route as ApiLocaleVibeAgentChatDataSourcesChatMemoriesCreatedRouteImport } from './routes/api.$locale.vibe.agent.chat.data-sources.chat-memories-created'
+import { Route as ApiLocaleVibeAgentChatDataSourcesChatErrorsTotalRouteImport } from './routes/api.$locale.vibe.agent.chat.data-sources.chat-errors-total'
+import { Route as ApiLocaleVibeAgentChatDataSourcesChatDownvotesTotalRouteImport } from './routes/api.$locale.vibe.agent.chat.data-sources.chat-downvotes-total'
+import { Route as ApiLocaleVibeAgentAiStreamWsProviderModelsRouteImport } from './routes/api.$locale.vibe.agent.ai-stream.ws-provider.models'
+import { Route as ApiLocaleVibeAgentAiStreamSystemPromptDebugRouteImport } from './routes/api.$locale.vibe.agent.ai-stream.system-prompt.debug'
 import { Route as ApiLocaleUserPrivateMeAddressesAddressIdRouteImport } from './routes/api.$locale.user.private.me.addresses.$addressId'
-import { Route as ApiLocaleSystemPlatformsCliSetupUninstallRouteImport } from './routes/api.$locale.system.platforms.cli.setup.uninstall'
-import { Route as ApiLocaleSystemPlatformsCliSetupStatusRouteImport } from './routes/api.$locale.system.platforms.cli.setup.status'
-import { Route as ApiLocaleSystemPlatformsCliInteractiveSendKeysRouteImport } from './routes/api.$locale.system.platforms.cli.interactive.send-keys'
-import { Route as ApiLocaleSystemPlatformsCliInteractiveCaptureRouteImport } from './routes/api.$locale.system.platforms.cli.interactive.capture'
-import { Route as ApiLocaleSystemPlatformsAiSkillsCharacterSkillRouteImport } from './routes/api.$locale.system.platforms.ai.skills.$characterSkill'
-import { Route as ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsWarningsRouteImport } from './routes/api.$locale.system.logger.error-monitor.data-sources.error-logs-warnings'
-import { Route as ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsTotalRouteImport } from './routes/api.$locale.system.logger.error-monitor.data-sources.error-logs-total'
-import { Route as ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsErrorsRouteImport } from './routes/api.$locale.system.logger.error-monitor.data-sources.error-logs-errors'
-import { Route as ApiLocaleSystemDataflowGraphsIdVersionsRouteImport } from './routes/api.$locale.system.dataflow.graphs.$id.versions'
-import { Route as ApiLocaleSystemDataflowGraphsIdTriggerRouteImport } from './routes/api.$locale.system.dataflow.graphs.$id.trigger'
-import { Route as ApiLocaleSystemDataflowGraphsIdPromoteRouteImport } from './routes/api.$locale.system.dataflow.graphs.$id.promote'
-import { Route as ApiLocaleSystemDataflowGraphsIdEditRouteImport } from './routes/api.$locale.system.dataflow.graphs.$id.edit'
-import { Route as ApiLocaleSystemDataflowGraphsIdDeleteRouteImport } from './routes/api.$locale.system.dataflow.graphs.$id.delete'
-import { Route as ApiLocaleSystemDataflowGraphsIdDataRouteImport } from './routes/api.$locale.system.dataflow.graphs.$id.data'
-import { Route as ApiLocaleSystemDataflowGraphsIdBacktestRouteImport } from './routes/api.$locale.system.dataflow.graphs.$id.backtest'
-import { Route as ApiLocaleSystemDataflowGraphsIdArchiveRouteImport } from './routes/api.$locale.system.dataflow.graphs.$id.archive'
 import { Route as ApiLocaleSshConnectionsIdMountsListRouteImport } from './routes/api.$locale.ssh.connections.$id.mounts.list'
 import { Route as ApiLocaleSshConnectionsIdMountsCreateRouteImport } from './routes/api.$locale.ssh.connections.$id.mounts.create'
 import { Route as ApiLocaleSshConnectionsIdMountsMountIdRouteImport } from './routes/api.$locale.ssh.connections.$id.mounts.$mountId'
@@ -585,26 +571,26 @@ import { Route as ApiLocaleLeadMagnetProvidersGoogleSheetsOauthStartRouteImport 
 import { Route as ApiLocaleLeadMagnetProvidersGoogleSheetsOauthCallbackRouteImport } from './routes/api.$locale.lead-magnet.providers.google-sheets.oauth.callback'
 import { Route as ApiLocaleCompaniesCompanyIdMembersMemberIdUpdateRoleRouteImport } from './routes/api.$locale.companies.$companyId.members.$memberId.update-role'
 import { Route as ApiLocaleCompaniesCompanyIdMembersMemberIdRemoveRouteImport } from './routes/api.$locale.companies.$companyId.members.$memberId.remove'
-import { Route as ApiLocaleAgentChatThreadsThreadIdShareLinksRouteImport } from './routes/api.$locale.agent.chat.threads.$threadId.share-links'
-import { Route as ApiLocaleAgentChatThreadsThreadIdPermissionsRouteImport } from './routes/api.$locale.agent.chat.threads.$threadId.permissions'
-import { Route as ApiLocaleAgentChatThreadsThreadIdMessagesRouteImport } from './routes/api.$locale.agent.chat.threads.$threadId.messages'
-import { Route as ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRouteImport } from './routes/api.$locale.agent.chat.folders.subfolders.$subFolderId'
-import { Route as ApiLocaleAgentChatFoldersRootFolderIdRootPermissionsRouteImport } from './routes/api.$locale.agent.chat.folders.$rootFolderId.root-permissions'
-import { Route as ApiLocaleAgentChatFoldersRootFolderIdCreateRouteImport } from './routes/api.$locale.agent.chat.folders.$rootFolderId.create'
-import { Route as ApiLocaleSystemPlatformsAiSkillsUSER_WITH_ACCOUNT_SKILLMdRouteImport } from './routes/api.$locale.system.platforms.ai.skills.USER_WITH_ACCOUNT_SKILL.md'
-import { Route as ApiLocaleSystemPlatformsAiSkillsUSER_WITH_ACCOUNT_AI_RUNMdRouteImport } from './routes/api.$locale.system.platforms.ai.skills.USER_WITH_ACCOUNT_AI_RUN.md'
-import { Route as ApiLocaleSystemPlatformsAiSkillsPUBLIC_USER_SKILLMdRouteImport } from './routes/api.$locale.system.platforms.ai.skills.PUBLIC_USER_SKILL.md'
-import { Route as ApiLocaleSystemPlatformsAiSkillsPUBLIC_USER_AI_RUNMdRouteImport } from './routes/api.$locale.system.platforms.ai.skills.PUBLIC_USER_AI_RUN.md'
-import { Route as ApiLocaleSystemPlatformsAiSkillsAGENTMdRouteImport } from './routes/api.$locale.system.platforms.ai.skills.AGENT.md'
-import { Route as ApiLocaleAgentChatThreadsFilesThreadIdFilenameRouteImport } from './routes/api.$locale.agent.chat.threads.files.$threadId.$filename'
-import { Route as ApiLocaleAgentChatThreadsThreadIdMessagesSearchRouteImport } from './routes/api.$locale.agent.chat.threads.$threadId.messages.search'
-import { Route as ApiLocaleAgentChatThreadsThreadIdMessagesPathRouteImport } from './routes/api.$locale.agent.chat.threads.$threadId.messages.path'
-import { Route as ApiLocaleAgentChatThreadsThreadIdMessagesMessageIdRouteImport } from './routes/api.$locale.agent.chat.threads.$threadId.messages.$messageId'
-import { Route as ApiLocaleAgentChatFoldersSubfoldersSubFolderIdUpdateRouteImport } from './routes/api.$locale.agent.chat.folders.subfolders.$subFolderId.update'
-import { Route as ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRenameRouteImport } from './routes/api.$locale.agent.chat.folders.subfolders.$subFolderId.rename'
-import { Route as ApiLocaleAgentChatFoldersSubfoldersSubFolderIdPermissionsRouteImport } from './routes/api.$locale.agent.chat.folders.subfolders.$subFolderId.permissions'
-import { Route as ApiLocaleAgentChatFoldersSubfoldersSubFolderIdMoveRouteImport } from './routes/api.$locale.agent.chat.folders.subfolders.$subFolderId.move'
-import { Route as ApiLocaleAgentChatThreadsThreadIdMessagesMessageIdVoteRouteImport } from './routes/api.$locale.agent.chat.threads.$threadId.messages.$messageId.vote'
+import { Route as ApiLocaleVibePlatformsAiSkillsUSER_WITH_ACCOUNT_SKILLMdRouteImport } from './routes/api.$locale.vibe.platforms.ai.skills.USER_WITH_ACCOUNT_SKILL.md'
+import { Route as ApiLocaleVibePlatformsAiSkillsUSER_WITH_ACCOUNT_AI_RUNMdRouteImport } from './routes/api.$locale.vibe.platforms.ai.skills.USER_WITH_ACCOUNT_AI_RUN.md'
+import { Route as ApiLocaleVibePlatformsAiSkillsPUBLIC_USER_SKILLMdRouteImport } from './routes/api.$locale.vibe.platforms.ai.skills.PUBLIC_USER_SKILL.md'
+import { Route as ApiLocaleVibePlatformsAiSkillsPUBLIC_USER_AI_RUNMdRouteImport } from './routes/api.$locale.vibe.platforms.ai.skills.PUBLIC_USER_AI_RUN.md'
+import { Route as ApiLocaleVibePlatformsAiSkillsAGENTMdRouteImport } from './routes/api.$locale.vibe.platforms.ai.skills.AGENT.md'
+import { Route as ApiLocaleVibeAgentChatThreadsThreadIdShareLinksRouteImport } from './routes/api.$locale.vibe.agent.chat.threads.$threadId.share-links'
+import { Route as ApiLocaleVibeAgentChatThreadsThreadIdPermissionsRouteImport } from './routes/api.$locale.vibe.agent.chat.threads.$threadId.permissions'
+import { Route as ApiLocaleVibeAgentChatThreadsThreadIdMessagesRouteImport } from './routes/api.$locale.vibe.agent.chat.threads.$threadId.messages'
+import { Route as ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteImport } from './routes/api.$locale.vibe.agent.chat.folders.subfolders.$subFolderId'
+import { Route as ApiLocaleVibeAgentChatFoldersRootFolderIdRootPermissionsRouteImport } from './routes/api.$locale.vibe.agent.chat.folders.$rootFolderId.root-permissions'
+import { Route as ApiLocaleVibeAgentChatFoldersRootFolderIdCreateRouteImport } from './routes/api.$locale.vibe.agent.chat.folders.$rootFolderId.create'
+import { Route as ApiLocaleVibeAgentChatThreadsFilesThreadIdFilenameRouteImport } from './routes/api.$locale.vibe.agent.chat.threads.files.$threadId.$filename'
+import { Route as ApiLocaleVibeAgentChatThreadsThreadIdMessagesSearchRouteImport } from './routes/api.$locale.vibe.agent.chat.threads.$threadId.messages.search'
+import { Route as ApiLocaleVibeAgentChatThreadsThreadIdMessagesPathRouteImport } from './routes/api.$locale.vibe.agent.chat.threads.$threadId.messages.path'
+import { Route as ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdRouteImport } from './routes/api.$locale.vibe.agent.chat.threads.$threadId.messages.$messageId'
+import { Route as ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdUpdateRouteImport } from './routes/api.$locale.vibe.agent.chat.folders.subfolders.$subFolderId.update'
+import { Route as ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRenameRouteImport } from './routes/api.$locale.vibe.agent.chat.folders.subfolders.$subFolderId.rename'
+import { Route as ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdPermissionsRouteImport } from './routes/api.$locale.vibe.agent.chat.folders.subfolders.$subFolderId.permissions'
+import { Route as ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdMoveRouteImport } from './routes/api.$locale.vibe.agent.chat.folders.subfolders.$subFolderId.move'
+import { Route as ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdVoteRouteImport } from './routes/api.$locale.vibe.agent.chat.threads.$threadId.messages.$messageId.vote'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -716,9 +702,9 @@ const ApiLocaleContactRoute = ApiLocaleContactRouteImport.update({
   path: '/api/$locale/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiLocaleSlugRoute = ApiLocaleSlugRouteImport.update({
-  id: '/api/$locale/$slug',
-  path: '/api/$locale/$slug',
+const ApiLocaleNotFoundRoute = ApiLocaleNotFoundRouteImport.update({
+  id: '/api/$locale/$notFound',
+  path: '/api/$locale/$notFound',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LocaleUserAuthRoute = LocaleUserAuthRouteImport.update({
@@ -847,6 +833,17 @@ const LocaleCreatorUserIdIndexRoute =
     path: '/$locale/creator/$userId/',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiLocaleVibeHelpToolRoute = ApiLocaleVibeHelpToolRouteImport.update({
+  id: '/api/$locale/vibe/help-tool',
+  path: '/api/$locale/vibe/help-tool',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiLocaleVibeExecuteToolRoute =
+  ApiLocaleVibeExecuteToolRouteImport.update({
+    id: '/api/$locale/vibe/execute-tool',
+    path: '/api/$locale/vibe/execute-tool',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiLocaleUsersViewRoute = ApiLocaleUsersViewRouteImport.update({
   id: '/api/$locale/users/view',
   path: '/api/$locale/users/view',
@@ -878,17 +875,6 @@ const ApiLocaleTaxReportRoute = ApiLocaleTaxReportRouteImport.update({
   path: '/api/$locale/tax/report',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiLocaleSystemHelpToolRoute = ApiLocaleSystemHelpToolRouteImport.update({
-  id: '/api/$locale/system/help-tool',
-  path: '/api/$locale/system/help-tool',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiLocaleSystemExecuteToolRoute =
-  ApiLocaleSystemExecuteToolRouteImport.update({
-    id: '/api/$locale/system/execute-tool',
-    path: '/api/$locale/system/execute-tool',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const ApiLocaleSubscriptionUpdateRoute =
   ApiLocaleSubscriptionUpdateRouteImport.update({
     id: '/update',
@@ -912,36 +898,6 @@ const ApiLocaleSubscriptionCancelRoute =
     id: '/cancel',
     path: '/cancel',
     getParentRoute: () => ApiLocaleSubscriptionRoute,
-  } as any)
-const ApiLocaleRemoteConnectionSyncRoute =
-  ApiLocaleRemoteConnectionSyncRouteImport.update({
-    id: '/api/$locale/remote-connection/sync',
-    path: '/api/$locale/remote-connection/sync',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleRemoteConnectionListRoute =
-  ApiLocaleRemoteConnectionListRouteImport.update({
-    id: '/api/$locale/remote-connection/list',
-    path: '/api/$locale/remote-connection/list',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleRemoteConnectionConnectReverseRoute =
-  ApiLocaleRemoteConnectionConnectReverseRouteImport.update({
-    id: '/api/$locale/remote-connection/connect-reverse',
-    path: '/api/$locale/remote-connection/connect-reverse',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleRemoteConnectionConnectRoute =
-  ApiLocaleRemoteConnectionConnectRouteImport.update({
-    id: '/api/$locale/remote-connection/connect',
-    path: '/api/$locale/remote-connection/connect',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleRemoteConnectionInstanceIdRoute =
-  ApiLocaleRemoteConnectionInstanceIdRouteImport.update({
-    id: '/api/$locale/remote-connection/$instanceId',
-    path: '/api/$locale/remote-connection/$instanceId',
-    getParentRoute: () => rootRouteImport,
   } as any)
 const ApiLocaleReferralStatsRoute = ApiLocaleReferralStatsRouteImport.update({
   id: '/stats',
@@ -1375,75 +1331,6 @@ const ApiLocaleBrowserClickRoute = ApiLocaleBrowserClickRouteImport.update({
   path: '/api/$locale/browser/click',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiLocaleAgentWebSearchRoute = ApiLocaleAgentWebSearchRouteImport.update({
-  id: '/api/$locale/agent/web-search',
-  path: '/api/$locale/agent/web-search',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiLocaleAgentViewImageRoute = ApiLocaleAgentViewImageRouteImport.update({
-  id: '/api/$locale/agent/view-image',
-  path: '/api/$locale/agent/view-image',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiLocaleAgentVideoGenerationRoute =
-  ApiLocaleAgentVideoGenerationRouteImport.update({
-    id: '/api/$locale/agent/video-generation',
-    path: '/api/$locale/agent/video-generation',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleAgentTextToSpeechRoute =
-  ApiLocaleAgentTextToSpeechRouteImport.update({
-    id: '/api/$locale/agent/text-to-speech',
-    path: '/api/$locale/agent/text-to-speech',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleAgentSpeechToTextRoute =
-  ApiLocaleAgentSpeechToTextRouteImport.update({
-    id: '/api/$locale/agent/speech-to-text',
-    path: '/api/$locale/agent/speech-to-text',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleAgentSkillsRoute = ApiLocaleAgentSkillsRouteImport.update({
-  id: '/api/$locale/agent/skills',
-  path: '/api/$locale/agent/skills',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiLocaleAgentMusicGenerationRoute =
-  ApiLocaleAgentMusicGenerationRouteImport.update({
-    id: '/api/$locale/agent/music-generation',
-    path: '/api/$locale/agent/music-generation',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleAgentImageGenerationRoute =
-  ApiLocaleAgentImageGenerationRouteImport.update({
-    id: '/api/$locale/agent/image-generation',
-    path: '/api/$locale/agent/image-generation',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleAgentFetchUrlContentRoute =
-  ApiLocaleAgentFetchUrlContentRouteImport.update({
-    id: '/api/$locale/agent/fetch-url-content',
-    path: '/api/$locale/agent/fetch-url-content',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleAgentDescribeVideoRoute =
-  ApiLocaleAgentDescribeVideoRouteImport.update({
-    id: '/api/$locale/agent/describe-video',
-    path: '/api/$locale/agent/describe-video',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleAgentDescribeImageRoute =
-  ApiLocaleAgentDescribeImageRouteImport.update({
-    id: '/api/$locale/agent/describe-image',
-    path: '/api/$locale/agent/describe-image',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleAgentCodingAgentRoute =
-  ApiLocaleAgentCodingAgentRouteImport.update({
-    id: '/api/$locale/agent/coding-agent',
-    path: '/api/$locale/agent/coding-agent',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const LocaleUserAuthSignupRoute = LocaleUserAuthSignupRouteImport.update({
   id: '/signup',
   path: '/signup',
@@ -1551,6 +1438,168 @@ const LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute =
     path: '/blog/dead-trading-bot-to-monitoring-engine/',
     getParentRoute: () => LocaleStoryRoute,
   } as any)
+const ApiLocaleVibeTasksExecuteRoute =
+  ApiLocaleVibeTasksExecuteRouteImport.update({
+    id: '/api/$locale/vibe/tasks/execute',
+    path: '/api/$locale/vibe/tasks/execute',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeRemoteConnectionSyncRoute =
+  ApiLocaleVibeRemoteConnectionSyncRouteImport.update({
+    id: '/api/$locale/vibe/remote-connection/sync',
+    path: '/api/$locale/vibe/remote-connection/sync',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeRemoteConnectionListRoute =
+  ApiLocaleVibeRemoteConnectionListRouteImport.update({
+    id: '/api/$locale/vibe/remote-connection/list',
+    path: '/api/$locale/vibe/remote-connection/list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeRemoteConnectionConnectReverseRoute =
+  ApiLocaleVibeRemoteConnectionConnectReverseRouteImport.update({
+    id: '/api/$locale/vibe/remote-connection/connect-reverse',
+    path: '/api/$locale/vibe/remote-connection/connect-reverse',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeRemoteConnectionConnectRoute =
+  ApiLocaleVibeRemoteConnectionConnectRouteImport.update({
+    id: '/api/$locale/vibe/remote-connection/connect',
+    path: '/api/$locale/vibe/remote-connection/connect',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeRemoteConnectionInstanceIdRoute =
+  ApiLocaleVibeRemoteConnectionInstanceIdRouteImport.update({
+    id: '/api/$locale/vibe/remote-connection/$instanceId',
+    path: '/api/$locale/vibe/remote-connection/$instanceId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeRealtimeRemoteEventBridgeRoute =
+  ApiLocaleVibeRealtimeRemoteEventBridgeRouteImport.update({
+    id: '/api/$locale/vibe/realtime/remote-event-bridge',
+    path: '/api/$locale/vibe/realtime/remote-event-bridge',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeExecuteToolRevivalRoute =
+  ApiLocaleVibeExecuteToolRevivalRouteImport.update({
+    id: '/revival',
+    path: '/revival',
+    getParentRoute: () => ApiLocaleVibeExecuteToolRoute,
+  } as any)
+const ApiLocaleVibeExecuteToolCompleteRoute =
+  ApiLocaleVibeExecuteToolCompleteRouteImport.update({
+    id: '/complete',
+    path: '/complete',
+    getParentRoute: () => ApiLocaleVibeExecuteToolRoute,
+  } as any)
+const ApiLocaleVibeExecuteToolAwaitTaskRoute =
+  ApiLocaleVibeExecuteToolAwaitTaskRouteImport.update({
+    id: '/await-task',
+    path: '/await-task',
+    getParentRoute: () => ApiLocaleVibeExecuteToolRoute,
+  } as any)
+const ApiLocaleVibeEnvSettingsRoute =
+  ApiLocaleVibeEnvSettingsRouteImport.update({
+    id: '/api/$locale/vibe/env/settings',
+    path: '/api/$locale/vibe/env/settings',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeDataflowRunConfigRoute =
+  ApiLocaleVibeDataflowRunConfigRouteImport.update({
+    id: '/api/$locale/vibe/dataflow/run-config',
+    path: '/api/$locale/vibe/dataflow/run-config',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeDataflowGraphsRoute =
+  ApiLocaleVibeDataflowGraphsRouteImport.update({
+    id: '/api/$locale/vibe/dataflow/graphs',
+    path: '/api/$locale/vibe/dataflow/graphs',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeDataflowCleanupRoute =
+  ApiLocaleVibeDataflowCleanupRouteImport.update({
+    id: '/api/$locale/vibe/dataflow/cleanup',
+    path: '/api/$locale/vibe/dataflow/cleanup',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeDatabaseHealthRoute =
+  ApiLocaleVibeDatabaseHealthRouteImport.update({
+    id: '/api/$locale/vibe/database/health',
+    path: '/api/$locale/vibe/database/health',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentWebSearchRoute =
+  ApiLocaleVibeAgentWebSearchRouteImport.update({
+    id: '/api/$locale/vibe/agent/web-search',
+    path: '/api/$locale/vibe/agent/web-search',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentViewImageRoute =
+  ApiLocaleVibeAgentViewImageRouteImport.update({
+    id: '/api/$locale/vibe/agent/view-image',
+    path: '/api/$locale/vibe/agent/view-image',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentVideoGenerationRoute =
+  ApiLocaleVibeAgentVideoGenerationRouteImport.update({
+    id: '/api/$locale/vibe/agent/video-generation',
+    path: '/api/$locale/vibe/agent/video-generation',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentTextToSpeechRoute =
+  ApiLocaleVibeAgentTextToSpeechRouteImport.update({
+    id: '/api/$locale/vibe/agent/text-to-speech',
+    path: '/api/$locale/vibe/agent/text-to-speech',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentSpeechToTextRoute =
+  ApiLocaleVibeAgentSpeechToTextRouteImport.update({
+    id: '/api/$locale/vibe/agent/speech-to-text',
+    path: '/api/$locale/vibe/agent/speech-to-text',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentSkillsRoute =
+  ApiLocaleVibeAgentSkillsRouteImport.update({
+    id: '/api/$locale/vibe/agent/skills',
+    path: '/api/$locale/vibe/agent/skills',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentMusicGenerationRoute =
+  ApiLocaleVibeAgentMusicGenerationRouteImport.update({
+    id: '/api/$locale/vibe/agent/music-generation',
+    path: '/api/$locale/vibe/agent/music-generation',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentImageGenerationRoute =
+  ApiLocaleVibeAgentImageGenerationRouteImport.update({
+    id: '/api/$locale/vibe/agent/image-generation',
+    path: '/api/$locale/vibe/agent/image-generation',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentFetchUrlContentRoute =
+  ApiLocaleVibeAgentFetchUrlContentRouteImport.update({
+    id: '/api/$locale/vibe/agent/fetch-url-content',
+    path: '/api/$locale/vibe/agent/fetch-url-content',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentDescribeVideoRoute =
+  ApiLocaleVibeAgentDescribeVideoRouteImport.update({
+    id: '/api/$locale/vibe/agent/describe-video',
+    path: '/api/$locale/vibe/agent/describe-video',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentDescribeImageRoute =
+  ApiLocaleVibeAgentDescribeImageRouteImport.update({
+    id: '/api/$locale/vibe/agent/describe-image',
+    path: '/api/$locale/vibe/agent/describe-image',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentCodingAgentRoute =
+  ApiLocaleVibeAgentCodingAgentRouteImport.update({
+    id: '/api/$locale/vibe/agent/coding-agent',
+    path: '/api/$locale/vibe/agent/coding-agent',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiLocaleUsersUserIdRoute = ApiLocaleUsersUserIdRouteImport.update({
   id: '/api/$locale/users/user/$id',
   path: '/api/$locale/users/user/$id',
@@ -1649,90 +1698,6 @@ const ApiLocaleTaxRateCreateRoute = ApiLocaleTaxRateCreateRouteImport.update({
   path: '/api/$locale/tax/rate/create',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiLocaleSystemToolingVibeStageRoute =
-  ApiLocaleSystemToolingVibeStageRouteImport.update({
-    id: '/api/$locale/system/tooling/vibe-stage',
-    path: '/api/$locale/system/tooling/vibe-stage',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemToolingVibeDepsRoute =
-  ApiLocaleSystemToolingVibeDepsRouteImport.update({
-    id: '/api/$locale/system/tooling/vibe-deps',
-    path: '/api/$locale/system/tooling/vibe-deps',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemTasksUnifiedRunnerRoute =
-  ApiLocaleSystemTasksUnifiedRunnerRouteImport.update({
-    id: '/api/$locale/system/tasks/unified-runner',
-    path: '/api/$locale/system/tasks/unified-runner',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemTasksExecuteRoute =
-  ApiLocaleSystemTasksExecuteRouteImport.update({
-    id: '/api/$locale/system/tasks/execute',
-    path: '/api/$locale/system/tasks/execute',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemRealtimeRemoteEventBridgeRoute =
-  ApiLocaleSystemRealtimeRemoteEventBridgeRouteImport.update({
-    id: '/api/$locale/system/realtime/remote-event-bridge',
-    path: '/api/$locale/system/realtime/remote-event-bridge',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemExecuteToolRevivalRoute =
-  ApiLocaleSystemExecuteToolRevivalRouteImport.update({
-    id: '/revival',
-    path: '/revival',
-    getParentRoute: () => ApiLocaleSystemExecuteToolRoute,
-  } as any)
-const ApiLocaleSystemExecuteToolCompleteRoute =
-  ApiLocaleSystemExecuteToolCompleteRouteImport.update({
-    id: '/complete',
-    path: '/complete',
-    getParentRoute: () => ApiLocaleSystemExecuteToolRoute,
-  } as any)
-const ApiLocaleSystemExecuteToolAwaitTaskRoute =
-  ApiLocaleSystemExecuteToolAwaitTaskRouteImport.update({
-    id: '/await-task',
-    path: '/await-task',
-    getParentRoute: () => ApiLocaleSystemExecuteToolRoute,
-  } as any)
-const ApiLocaleSystemEnvSettingsRoute =
-  ApiLocaleSystemEnvSettingsRouteImport.update({
-    id: '/api/$locale/system/env/settings',
-    path: '/api/$locale/system/env/settings',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemDataflowRunConfigRoute =
-  ApiLocaleSystemDataflowRunConfigRouteImport.update({
-    id: '/api/$locale/system/dataflow/run-config',
-    path: '/api/$locale/system/dataflow/run-config',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemDataflowGraphsRoute =
-  ApiLocaleSystemDataflowGraphsRouteImport.update({
-    id: '/api/$locale/system/dataflow/graphs',
-    path: '/api/$locale/system/dataflow/graphs',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemDataflowCleanupRoute =
-  ApiLocaleSystemDataflowCleanupRouteImport.update({
-    id: '/api/$locale/system/dataflow/cleanup',
-    path: '/api/$locale/system/dataflow/cleanup',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemDatabaseSqlRoute =
-  ApiLocaleSystemDatabaseSqlRouteImport.update({
-    id: '/api/$locale/system/database/sql',
-    path: '/api/$locale/system/database/sql',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemDatabaseHealthRoute =
-  ApiLocaleSystemDatabaseHealthRouteImport.update({
-    id: '/api/$locale/system/database/health',
-    path: '/api/$locale/system/database/health',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const ApiLocaleSubscriptionDataSourcesSubscriptionsTrialingRoute =
   ApiLocaleSubscriptionDataSourcesSubscriptionsTrialingRouteImport.update({
     id: '/data-sources/subscriptions-trialing',
@@ -1810,30 +1775,6 @@ const ApiLocaleSshConnectionsIdRoute =
     id: '/api/$locale/ssh/connections/$id',
     path: '/api/$locale/ssh/connections/$id',
     getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleRemoteConnectionSyncProvidersRoute =
-  ApiLocaleRemoteConnectionSyncProvidersRouteImport.update({
-    id: '/providers',
-    path: '/providers',
-    getParentRoute: () => ApiLocaleRemoteConnectionSyncRoute,
-  } as any)
-const ApiLocaleRemoteConnectionSelfRenameRoute =
-  ApiLocaleRemoteConnectionSelfRenameRouteImport.update({
-    id: '/api/$locale/remote-connection/self/rename',
-    path: '/api/$locale/remote-connection/self/rename',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleRemoteConnectionSelfInstanceIdRoute =
-  ApiLocaleRemoteConnectionSelfInstanceIdRouteImport.update({
-    id: '/api/$locale/remote-connection/self/instanceId',
-    path: '/api/$locale/remote-connection/self/instanceId',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleRemoteConnectionConnectReverseUpdateRoute =
-  ApiLocaleRemoteConnectionConnectReverseUpdateRouteImport.update({
-    id: '/update',
-    path: '/update',
-    getParentRoute: () => ApiLocaleRemoteConnectionConnectReverseRoute,
   } as any)
 const ApiLocaleReferralLeadCurrentRoute =
   ApiLocaleReferralLeadCurrentRouteImport.update({
@@ -2834,167 +2775,6 @@ const ApiLocaleAnalyticsEvaluatorsAndRoute =
     path: '/api/$locale/analytics/evaluators/and',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiLocaleAgentWebSearchKagiRoute =
-  ApiLocaleAgentWebSearchKagiRouteImport.update({
-    id: '/kagi',
-    path: '/kagi',
-    getParentRoute: () => ApiLocaleAgentWebSearchRoute,
-  } as any)
-const ApiLocaleAgentWebSearchBraveRoute =
-  ApiLocaleAgentWebSearchBraveRouteImport.update({
-    id: '/brave',
-    path: '/brave',
-    getParentRoute: () => ApiLocaleAgentWebSearchRoute,
-  } as any)
-const ApiLocaleAgentSpeechToTextHotkeyRoute =
-  ApiLocaleAgentSpeechToTextHotkeyRouteImport.update({
-    id: '/hotkey',
-    path: '/hotkey',
-    getParentRoute: () => ApiLocaleAgentSpeechToTextRoute,
-  } as any)
-const ApiLocaleAgentSkillsModerationRoute =
-  ApiLocaleAgentSkillsModerationRouteImport.update({
-    id: '/moderation',
-    path: '/moderation',
-    getParentRoute: () => ApiLocaleAgentSkillsRoute,
-  } as any)
-const ApiLocaleAgentSkillsFavoritesRoute =
-  ApiLocaleAgentSkillsFavoritesRouteImport.update({
-    id: '/favorites',
-    path: '/favorites',
-    getParentRoute: () => ApiLocaleAgentSkillsRoute,
-  } as any)
-const ApiLocaleAgentSkillsCreateRoute =
-  ApiLocaleAgentSkillsCreateRouteImport.update({
-    id: '/create',
-    path: '/create',
-    getParentRoute: () => ApiLocaleAgentSkillsRoute,
-  } as any)
-const ApiLocaleAgentSkillsIdRoute = ApiLocaleAgentSkillsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => ApiLocaleAgentSkillsRoute,
-} as any)
-const ApiLocaleAgentModelsModelPricesRoute =
-  ApiLocaleAgentModelsModelPricesRouteImport.update({
-    id: '/api/$locale/agent/models/model-prices',
-    path: '/api/$locale/agent/models/model-prices',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleAgentModelsListRoute =
-  ApiLocaleAgentModelsListRouteImport.update({
-    id: '/api/$locale/agent/models/list',
-    path: '/api/$locale/agent/models/list',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleAgentFetchUrlContentCleanupRoute =
-  ApiLocaleAgentFetchUrlContentCleanupRouteImport.update({
-    id: '/cleanup',
-    path: '/cleanup',
-    getParentRoute: () => ApiLocaleAgentFetchUrlContentRoute,
-  } as any)
-const ApiLocaleAgentCortexWriteRoute =
-  ApiLocaleAgentCortexWriteRouteImport.update({
-    id: '/api/$locale/agent/cortex/write',
-    path: '/api/$locale/agent/cortex/write',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleAgentCortexTreeRoute =
-  ApiLocaleAgentCortexTreeRouteImport.update({
-    id: '/api/$locale/agent/cortex/tree',
-    path: '/api/$locale/agent/cortex/tree',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleAgentCortexTerminalsRoute =
-  ApiLocaleAgentCortexTerminalsRouteImport.update({
-    id: '/api/$locale/agent/cortex/terminals',
-    path: '/api/$locale/agent/cortex/terminals',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleAgentCortexSearchRoute =
-  ApiLocaleAgentCortexSearchRouteImport.update({
-    id: '/api/$locale/agent/cortex/search',
-    path: '/api/$locale/agent/cortex/search',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleAgentCortexReadRoute =
-  ApiLocaleAgentCortexReadRouteImport.update({
-    id: '/api/$locale/agent/cortex/read',
-    path: '/api/$locale/agent/cortex/read',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleAgentCortexMoveRoute =
-  ApiLocaleAgentCortexMoveRouteImport.update({
-    id: '/api/$locale/agent/cortex/move',
-    path: '/api/$locale/agent/cortex/move',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleAgentCortexMkdirRoute =
-  ApiLocaleAgentCortexMkdirRouteImport.update({
-    id: '/api/$locale/agent/cortex/mkdir',
-    path: '/api/$locale/agent/cortex/mkdir',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleAgentCortexListRoute =
-  ApiLocaleAgentCortexListRouteImport.update({
-    id: '/api/$locale/agent/cortex/list',
-    path: '/api/$locale/agent/cortex/list',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleAgentCortexExecRoute =
-  ApiLocaleAgentCortexExecRouteImport.update({
-    id: '/api/$locale/agent/cortex/exec',
-    path: '/api/$locale/agent/cortex/exec',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleAgentCortexEditRoute =
-  ApiLocaleAgentCortexEditRouteImport.update({
-    id: '/api/$locale/agent/cortex/edit',
-    path: '/api/$locale/agent/cortex/edit',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleAgentCortexDeleteRoute =
-  ApiLocaleAgentCortexDeleteRouteImport.update({
-    id: '/api/$locale/agent/cortex/delete',
-    path: '/api/$locale/agent/cortex/delete',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleAgentChatThreadsRoute =
-  ApiLocaleAgentChatThreadsRouteImport.update({
-    id: '/api/$locale/agent/chat/threads',
-    path: '/api/$locale/agent/chat/threads',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleAgentChatSettingsRoute =
-  ApiLocaleAgentChatSettingsRouteImport.update({
-    id: '/api/$locale/agent/chat/settings',
-    path: '/api/$locale/agent/chat/settings',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleAgentChatPublicFeedRoute =
-  ApiLocaleAgentChatPublicFeedRouteImport.update({
-    id: '/api/$locale/agent/chat/public-feed',
-    path: '/api/$locale/agent/chat/public-feed',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleAgentAiStreamStreamRoute =
-  ApiLocaleAgentAiStreamStreamRouteImport.update({
-    id: '/api/$locale/agent/ai-stream/stream',
-    path: '/api/$locale/agent/ai-stream/stream',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleAgentAiStreamRunRoute =
-  ApiLocaleAgentAiStreamRunRouteImport.update({
-    id: '/api/$locale/agent/ai-stream/run',
-    path: '/api/$locale/agent/ai-stream/run',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleAgentAiStreamCancelRoute =
-  ApiLocaleAgentAiStreamCancelRouteImport.update({
-    id: '/api/$locale/agent/ai-stream/cancel',
-    path: '/api/$locale/agent/ai-stream/cancel',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const LocaleUserAuthResetPasswordTokenIndexRoute =
   LocaleUserAuthResetPasswordTokenIndexRouteImport.update({
     id: '/reset-password/$token/',
@@ -3006,6 +2786,312 @@ const LocaleStoryNewsletterUnsubscribeEmailIndexRoute =
     id: '/newsletter/unsubscribe/$email/',
     path: '/newsletter/unsubscribe/$email/',
     getParentRoute: () => LocaleStoryRoute,
+  } as any)
+const ApiLocaleVibeTasksPulseStatusRoute =
+  ApiLocaleVibeTasksPulseStatusRouteImport.update({
+    id: '/api/$locale/vibe/tasks/pulse/status',
+    path: '/api/$locale/vibe/tasks/pulse/status',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeTasksPulseHistoryRoute =
+  ApiLocaleVibeTasksPulseHistoryRouteImport.update({
+    id: '/api/$locale/vibe/tasks/pulse/history',
+    path: '/api/$locale/vibe/tasks/pulse/history',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeTasksPulseExecuteRoute =
+  ApiLocaleVibeTasksPulseExecuteRouteImport.update({
+    id: '/api/$locale/vibe/tasks/pulse/execute',
+    path: '/api/$locale/vibe/tasks/pulse/execute',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeTasksDataSourcesCronExecutionsTotalRoute =
+  ApiLocaleVibeTasksDataSourcesCronExecutionsTotalRouteImport.update({
+    id: '/api/$locale/vibe/tasks/data-sources/cron-executions-total',
+    path: '/api/$locale/vibe/tasks/data-sources/cron-executions-total',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeTasksDataSourcesCronExecutionsSucceededRoute =
+  ApiLocaleVibeTasksDataSourcesCronExecutionsSucceededRouteImport.update({
+    id: '/api/$locale/vibe/tasks/data-sources/cron-executions-succeeded',
+    path: '/api/$locale/vibe/tasks/data-sources/cron-executions-succeeded',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeTasksDataSourcesCronExecutionsFailedRoute =
+  ApiLocaleVibeTasksDataSourcesCronExecutionsFailedRouteImport.update({
+    id: '/api/$locale/vibe/tasks/data-sources/cron-executions-failed',
+    path: '/api/$locale/vibe/tasks/data-sources/cron-executions-failed',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeTasksCronTasksRoute =
+  ApiLocaleVibeTasksCronTasksRouteImport.update({
+    id: '/api/$locale/vibe/tasks/cron/tasks',
+    path: '/api/$locale/vibe/tasks/cron/tasks',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeTasksCronStatsRoute =
+  ApiLocaleVibeTasksCronStatsRouteImport.update({
+    id: '/api/$locale/vibe/tasks/cron/stats',
+    path: '/api/$locale/vibe/tasks/cron/stats',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeTasksCronQueueRoute =
+  ApiLocaleVibeTasksCronQueueRouteImport.update({
+    id: '/api/$locale/vibe/tasks/cron/queue',
+    path: '/api/$locale/vibe/tasks/cron/queue',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeTasksCronHistoryRoute =
+  ApiLocaleVibeTasksCronHistoryRouteImport.update({
+    id: '/api/$locale/vibe/tasks/cron/history',
+    path: '/api/$locale/vibe/tasks/cron/history',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeTasksCronBulkRoute =
+  ApiLocaleVibeTasksCronBulkRouteImport.update({
+    id: '/api/$locale/vibe/tasks/cron/bulk',
+    path: '/api/$locale/vibe/tasks/cron/bulk',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeTasksCronIdRoute =
+  ApiLocaleVibeTasksCronIdRouteImport.update({
+    id: '/api/$locale/vibe/tasks/cron/$id',
+    path: '/api/$locale/vibe/tasks/cron/$id',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeServerServerHealthRoute =
+  ApiLocaleVibeServerServerHealthRouteImport.update({
+    id: '/api/$locale/vibe/server/server/health',
+    path: '/api/$locale/vibe/server/server/health',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeRemoteConnectionSyncProvidersRoute =
+  ApiLocaleVibeRemoteConnectionSyncProvidersRouteImport.update({
+    id: '/providers',
+    path: '/providers',
+    getParentRoute: () => ApiLocaleVibeRemoteConnectionSyncRoute,
+  } as any)
+const ApiLocaleVibeRemoteConnectionSelfRenameRoute =
+  ApiLocaleVibeRemoteConnectionSelfRenameRouteImport.update({
+    id: '/api/$locale/vibe/remote-connection/self/rename',
+    path: '/api/$locale/vibe/remote-connection/self/rename',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeRemoteConnectionSelfInstanceIdRoute =
+  ApiLocaleVibeRemoteConnectionSelfInstanceIdRouteImport.update({
+    id: '/api/$locale/vibe/remote-connection/self/instanceId',
+    path: '/api/$locale/vibe/remote-connection/self/instanceId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeRemoteConnectionConnectReverseUpdateRoute =
+  ApiLocaleVibeRemoteConnectionConnectReverseUpdateRouteImport.update({
+    id: '/update',
+    path: '/update',
+    getParentRoute: () => ApiLocaleVibeRemoteConnectionConnectReverseRoute,
+  } as any)
+const ApiLocaleVibePlatformsVibeFrameMountRoute =
+  ApiLocaleVibePlatformsVibeFrameMountRouteImport.update({
+    id: '/api/$locale/vibe/platforms/vibe-frame/mount',
+    path: '/api/$locale/vibe/platforms/vibe-frame/mount',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeLoggerErrorMonitorLogsRoute =
+  ApiLocaleVibeLoggerErrorMonitorLogsRouteImport.update({
+    id: '/api/$locale/vibe/logger/error-monitor/logs',
+    path: '/api/$locale/vibe/logger/error-monitor/logs',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeLoggerErrorMonitorClientLogRoute =
+  ApiLocaleVibeLoggerErrorMonitorClientLogRouteImport.update({
+    id: '/api/$locale/vibe/logger/error-monitor/client-log',
+    path: '/api/$locale/vibe/logger/error-monitor/client-log',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeLoggerErrorMonitorCleanupRoute =
+  ApiLocaleVibeLoggerErrorMonitorCleanupRouteImport.update({
+    id: '/api/$locale/vibe/logger/error-monitor/cleanup',
+    path: '/api/$locale/vibe/logger/error-monitor/cleanup',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeExecuteToolCallControlResumeWhenDoneRoute =
+  ApiLocaleVibeExecuteToolCallControlResumeWhenDoneRouteImport.update({
+    id: '/call-control/resume-when-done',
+    path: '/call-control/resume-when-done',
+    getParentRoute: () => ApiLocaleVibeExecuteToolRoute,
+  } as any)
+const ApiLocaleVibeExecuteToolCallControlDetachRoute =
+  ApiLocaleVibeExecuteToolCallControlDetachRouteImport.update({
+    id: '/call-control/detach',
+    path: '/call-control/detach',
+    getParentRoute: () => ApiLocaleVibeExecuteToolRoute,
+  } as any)
+const ApiLocaleVibeExecuteToolCallControlCancelRoute =
+  ApiLocaleVibeExecuteToolCallControlCancelRouteImport.update({
+    id: '/call-control/cancel',
+    path: '/call-control/cancel',
+    getParentRoute: () => ApiLocaleVibeExecuteToolRoute,
+  } as any)
+const ApiLocaleVibeEnvSettingsGenerateKeyRoute =
+  ApiLocaleVibeEnvSettingsGenerateKeyRouteImport.update({
+    id: '/generate-key',
+    path: '/generate-key',
+    getParentRoute: () => ApiLocaleVibeEnvSettingsRoute,
+  } as any)
+const ApiLocaleVibeEnvSettingsExportEnvRoute =
+  ApiLocaleVibeEnvSettingsExportEnvRouteImport.update({
+    id: '/export-env',
+    path: '/export-env',
+    getParentRoute: () => ApiLocaleVibeEnvSettingsRoute,
+  } as any)
+const ApiLocaleVibeAgentWebSearchKagiRoute =
+  ApiLocaleVibeAgentWebSearchKagiRouteImport.update({
+    id: '/kagi',
+    path: '/kagi',
+    getParentRoute: () => ApiLocaleVibeAgentWebSearchRoute,
+  } as any)
+const ApiLocaleVibeAgentWebSearchBraveRoute =
+  ApiLocaleVibeAgentWebSearchBraveRouteImport.update({
+    id: '/brave',
+    path: '/brave',
+    getParentRoute: () => ApiLocaleVibeAgentWebSearchRoute,
+  } as any)
+const ApiLocaleVibeAgentSkillsModerationRoute =
+  ApiLocaleVibeAgentSkillsModerationRouteImport.update({
+    id: '/moderation',
+    path: '/moderation',
+    getParentRoute: () => ApiLocaleVibeAgentSkillsRoute,
+  } as any)
+const ApiLocaleVibeAgentSkillsFavoritesRoute =
+  ApiLocaleVibeAgentSkillsFavoritesRouteImport.update({
+    id: '/favorites',
+    path: '/favorites',
+    getParentRoute: () => ApiLocaleVibeAgentSkillsRoute,
+  } as any)
+const ApiLocaleVibeAgentSkillsCreateRoute =
+  ApiLocaleVibeAgentSkillsCreateRouteImport.update({
+    id: '/create',
+    path: '/create',
+    getParentRoute: () => ApiLocaleVibeAgentSkillsRoute,
+  } as any)
+const ApiLocaleVibeAgentSkillsIdRoute =
+  ApiLocaleVibeAgentSkillsIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => ApiLocaleVibeAgentSkillsRoute,
+  } as any)
+const ApiLocaleVibeAgentModelsListRoute =
+  ApiLocaleVibeAgentModelsListRouteImport.update({
+    id: '/api/$locale/vibe/agent/models/list',
+    path: '/api/$locale/vibe/agent/models/list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentFetchUrlContentCleanupRoute =
+  ApiLocaleVibeAgentFetchUrlContentCleanupRouteImport.update({
+    id: '/cleanup',
+    path: '/cleanup',
+    getParentRoute: () => ApiLocaleVibeAgentFetchUrlContentRoute,
+  } as any)
+const ApiLocaleVibeAgentCortexWriteRoute =
+  ApiLocaleVibeAgentCortexWriteRouteImport.update({
+    id: '/api/$locale/vibe/agent/cortex/write',
+    path: '/api/$locale/vibe/agent/cortex/write',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentCortexTreeRoute =
+  ApiLocaleVibeAgentCortexTreeRouteImport.update({
+    id: '/api/$locale/vibe/agent/cortex/tree',
+    path: '/api/$locale/vibe/agent/cortex/tree',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentCortexTerminalsRoute =
+  ApiLocaleVibeAgentCortexTerminalsRouteImport.update({
+    id: '/api/$locale/vibe/agent/cortex/terminals',
+    path: '/api/$locale/vibe/agent/cortex/terminals',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentCortexSearchRoute =
+  ApiLocaleVibeAgentCortexSearchRouteImport.update({
+    id: '/api/$locale/vibe/agent/cortex/search',
+    path: '/api/$locale/vibe/agent/cortex/search',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentCortexReadRoute =
+  ApiLocaleVibeAgentCortexReadRouteImport.update({
+    id: '/api/$locale/vibe/agent/cortex/read',
+    path: '/api/$locale/vibe/agent/cortex/read',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentCortexMoveRoute =
+  ApiLocaleVibeAgentCortexMoveRouteImport.update({
+    id: '/api/$locale/vibe/agent/cortex/move',
+    path: '/api/$locale/vibe/agent/cortex/move',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentCortexMkdirRoute =
+  ApiLocaleVibeAgentCortexMkdirRouteImport.update({
+    id: '/api/$locale/vibe/agent/cortex/mkdir',
+    path: '/api/$locale/vibe/agent/cortex/mkdir',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentCortexListRoute =
+  ApiLocaleVibeAgentCortexListRouteImport.update({
+    id: '/api/$locale/vibe/agent/cortex/list',
+    path: '/api/$locale/vibe/agent/cortex/list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentCortexExecRoute =
+  ApiLocaleVibeAgentCortexExecRouteImport.update({
+    id: '/api/$locale/vibe/agent/cortex/exec',
+    path: '/api/$locale/vibe/agent/cortex/exec',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentCortexEditRoute =
+  ApiLocaleVibeAgentCortexEditRouteImport.update({
+    id: '/api/$locale/vibe/agent/cortex/edit',
+    path: '/api/$locale/vibe/agent/cortex/edit',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentCortexDeleteRoute =
+  ApiLocaleVibeAgentCortexDeleteRouteImport.update({
+    id: '/api/$locale/vibe/agent/cortex/delete',
+    path: '/api/$locale/vibe/agent/cortex/delete',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentChatThreadsRoute =
+  ApiLocaleVibeAgentChatThreadsRouteImport.update({
+    id: '/api/$locale/vibe/agent/chat/threads',
+    path: '/api/$locale/vibe/agent/chat/threads',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentChatSettingsRoute =
+  ApiLocaleVibeAgentChatSettingsRouteImport.update({
+    id: '/api/$locale/vibe/agent/chat/settings',
+    path: '/api/$locale/vibe/agent/chat/settings',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentChatPublicFeedRoute =
+  ApiLocaleVibeAgentChatPublicFeedRouteImport.update({
+    id: '/api/$locale/vibe/agent/chat/public-feed',
+    path: '/api/$locale/vibe/agent/chat/public-feed',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentAiStreamStreamRoute =
+  ApiLocaleVibeAgentAiStreamStreamRouteImport.update({
+    id: '/api/$locale/vibe/agent/ai-stream/stream',
+    path: '/api/$locale/vibe/agent/ai-stream/stream',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentAiStreamRunRoute =
+  ApiLocaleVibeAgentAiStreamRunRouteImport.update({
+    id: '/api/$locale/vibe/agent/ai-stream/run',
+    path: '/api/$locale/vibe/agent/ai-stream/run',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentAiStreamCancelRoute =
+  ApiLocaleVibeAgentAiStreamCancelRouteImport.update({
+    id: '/api/$locale/vibe/agent/ai-stream/cancel',
+    path: '/api/$locale/vibe/agent/ai-stream/cancel',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const ApiLocaleUsersUserIdRolesRoute =
   ApiLocaleUsersUserIdRolesRouteImport.update({
@@ -3078,150 +3164,6 @@ const ApiLocaleTaxRateRateIdDeleteRoute =
     id: '/api/$locale/tax/rate/$rateId/delete',
     path: '/api/$locale/tax/rate/$rateId/delete',
     getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemToolingCheckVibeCheckRoute =
-  ApiLocaleSystemToolingCheckVibeCheckRouteImport.update({
-    id: '/api/$locale/system/tooling/check/vibe-check',
-    path: '/api/$locale/system/tooling/check/vibe-check',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemTasksPulseStatusRoute =
-  ApiLocaleSystemTasksPulseStatusRouteImport.update({
-    id: '/api/$locale/system/tasks/pulse/status',
-    path: '/api/$locale/system/tasks/pulse/status',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemTasksPulseHistoryRoute =
-  ApiLocaleSystemTasksPulseHistoryRouteImport.update({
-    id: '/api/$locale/system/tasks/pulse/history',
-    path: '/api/$locale/system/tasks/pulse/history',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemTasksPulseExecuteRoute =
-  ApiLocaleSystemTasksPulseExecuteRouteImport.update({
-    id: '/api/$locale/system/tasks/pulse/execute',
-    path: '/api/$locale/system/tasks/pulse/execute',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemTasksDataSourcesCronExecutionsTotalRoute =
-  ApiLocaleSystemTasksDataSourcesCronExecutionsTotalRouteImport.update({
-    id: '/api/$locale/system/tasks/data-sources/cron-executions-total',
-    path: '/api/$locale/system/tasks/data-sources/cron-executions-total',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemTasksDataSourcesCronExecutionsSucceededRoute =
-  ApiLocaleSystemTasksDataSourcesCronExecutionsSucceededRouteImport.update({
-    id: '/api/$locale/system/tasks/data-sources/cron-executions-succeeded',
-    path: '/api/$locale/system/tasks/data-sources/cron-executions-succeeded',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemTasksDataSourcesCronExecutionsFailedRoute =
-  ApiLocaleSystemTasksDataSourcesCronExecutionsFailedRouteImport.update({
-    id: '/api/$locale/system/tasks/data-sources/cron-executions-failed',
-    path: '/api/$locale/system/tasks/data-sources/cron-executions-failed',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemTasksCronTasksRoute =
-  ApiLocaleSystemTasksCronTasksRouteImport.update({
-    id: '/api/$locale/system/tasks/cron/tasks',
-    path: '/api/$locale/system/tasks/cron/tasks',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemTasksCronStatsRoute =
-  ApiLocaleSystemTasksCronStatsRouteImport.update({
-    id: '/api/$locale/system/tasks/cron/stats',
-    path: '/api/$locale/system/tasks/cron/stats',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemTasksCronQueueRoute =
-  ApiLocaleSystemTasksCronQueueRouteImport.update({
-    id: '/api/$locale/system/tasks/cron/queue',
-    path: '/api/$locale/system/tasks/cron/queue',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemTasksCronHistoryRoute =
-  ApiLocaleSystemTasksCronHistoryRouteImport.update({
-    id: '/api/$locale/system/tasks/cron/history',
-    path: '/api/$locale/system/tasks/cron/history',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemTasksCronBulkRoute =
-  ApiLocaleSystemTasksCronBulkRouteImport.update({
-    id: '/api/$locale/system/tasks/cron/bulk',
-    path: '/api/$locale/system/tasks/cron/bulk',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemTasksCronIdRoute =
-  ApiLocaleSystemTasksCronIdRouteImport.update({
-    id: '/api/$locale/system/tasks/cron/$id',
-    path: '/api/$locale/system/tasks/cron/$id',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemServerServerRebuildRoute =
-  ApiLocaleSystemServerServerRebuildRouteImport.update({
-    id: '/api/$locale/system/server/server/rebuild',
-    path: '/api/$locale/system/server/server/rebuild',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemServerServerHealthRoute =
-  ApiLocaleSystemServerServerHealthRouteImport.update({
-    id: '/api/$locale/system/server/server/health',
-    path: '/api/$locale/system/server/server/health',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemPlatformsVibeFrameMountRoute =
-  ApiLocaleSystemPlatformsVibeFrameMountRouteImport.update({
-    id: '/api/$locale/system/platforms/vibe-frame/mount',
-    path: '/api/$locale/system/platforms/vibe-frame/mount',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemLoggerErrorMonitorLogsRoute =
-  ApiLocaleSystemLoggerErrorMonitorLogsRouteImport.update({
-    id: '/api/$locale/system/logger/error-monitor/logs',
-    path: '/api/$locale/system/logger/error-monitor/logs',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemLoggerErrorMonitorClientLogRoute =
-  ApiLocaleSystemLoggerErrorMonitorClientLogRouteImport.update({
-    id: '/api/$locale/system/logger/error-monitor/client-log',
-    path: '/api/$locale/system/logger/error-monitor/client-log',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemLoggerErrorMonitorCleanupRoute =
-  ApiLocaleSystemLoggerErrorMonitorCleanupRouteImport.update({
-    id: '/api/$locale/system/logger/error-monitor/cleanup',
-    path: '/api/$locale/system/logger/error-monitor/cleanup',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemExecuteToolCallControlResumeWhenDoneRoute =
-  ApiLocaleSystemExecuteToolCallControlResumeWhenDoneRouteImport.update({
-    id: '/call-control/resume-when-done',
-    path: '/call-control/resume-when-done',
-    getParentRoute: () => ApiLocaleSystemExecuteToolRoute,
-  } as any)
-const ApiLocaleSystemExecuteToolCallControlDetachRoute =
-  ApiLocaleSystemExecuteToolCallControlDetachRouteImport.update({
-    id: '/call-control/detach',
-    path: '/call-control/detach',
-    getParentRoute: () => ApiLocaleSystemExecuteToolRoute,
-  } as any)
-const ApiLocaleSystemExecuteToolCallControlCancelRoute =
-  ApiLocaleSystemExecuteToolCallControlCancelRouteImport.update({
-    id: '/call-control/cancel',
-    path: '/call-control/cancel',
-    getParentRoute: () => ApiLocaleSystemExecuteToolRoute,
-  } as any)
-const ApiLocaleSystemEnvSettingsGenerateKeyRoute =
-  ApiLocaleSystemEnvSettingsGenerateKeyRouteImport.update({
-    id: '/generate-key',
-    path: '/generate-key',
-    getParentRoute: () => ApiLocaleSystemEnvSettingsRoute,
-  } as any)
-const ApiLocaleSystemEnvSettingsExportEnvRoute =
-  ApiLocaleSystemEnvSettingsExportEnvRouteImport.update({
-    id: '/export-env',
-    path: '/export-env',
-    getParentRoute: () => ApiLocaleSystemEnvSettingsRoute,
   } as any)
 const ApiLocaleSubscriptionCompanyCompanyIdListRoute =
   ApiLocaleSubscriptionCompanyCompanyIdListRouteImport.update({
@@ -3391,22 +3333,10 @@ const ApiLocalePaymentProvidersStripeWebhookRoute =
     path: '/providers/stripe/webhook',
     getParentRoute: () => ApiLocalePaymentRoute,
   } as any)
-const ApiLocalePaymentProvidersStripeCliRoute =
-  ApiLocalePaymentProvidersStripeCliRouteImport.update({
-    id: '/providers/stripe/cli',
-    path: '/providers/stripe/cli',
-    getParentRoute: () => ApiLocalePaymentRoute,
-  } as any)
 const ApiLocalePaymentProvidersNowpaymentsWebhookRoute =
   ApiLocalePaymentProvidersNowpaymentsWebhookRouteImport.update({
     id: '/providers/nowpayments/webhook',
     path: '/providers/nowpayments/webhook',
-    getParentRoute: () => ApiLocalePaymentRoute,
-  } as any)
-const ApiLocalePaymentProvidersNowpaymentsCliRoute =
-  ApiLocalePaymentProvidersNowpaymentsCliRouteImport.update({
-    id: '/providers/nowpayments/cli',
-    path: '/providers/nowpayments/cli',
     getParentRoute: () => ApiLocalePaymentRoute,
   } as any)
 const ApiLocalePaymentInvoiceLineAddRoute =
@@ -3637,172 +3567,248 @@ const ApiLocaleChartOfAccountsAccountAccountIdDeactivateRoute =
     path: '/api/$locale/chart-of-accounts/account/$accountId/deactivate',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiLocaleAgentSkillsFavoritesReorderRoute =
-  ApiLocaleAgentSkillsFavoritesReorderRouteImport.update({
+const ApiLocaleVibePlatformsAiSkillsCharacterSkillRoute =
+  ApiLocaleVibePlatformsAiSkillsCharacterSkillRouteImport.update({
+    id: '/api/$locale/vibe/platforms/ai/skills/$characterSkill',
+    path: '/api/$locale/vibe/platforms/ai/skills/$characterSkill',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute =
+  ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRouteImport.update(
+    {
+      id: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings',
+      path: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings',
+      getParentRoute: () => rootRouteImport,
+    } as any,
+  )
+const ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsTotalRoute =
+  ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsTotalRouteImport.update({
+    id: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-total',
+    path: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-total',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsErrorsRoute =
+  ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsErrorsRouteImport.update({
+    id: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-errors',
+    path: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-errors',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeDataflowGraphsIdVersionsRoute =
+  ApiLocaleVibeDataflowGraphsIdVersionsRouteImport.update({
+    id: '/$id/versions',
+    path: '/$id/versions',
+    getParentRoute: () => ApiLocaleVibeDataflowGraphsRoute,
+  } as any)
+const ApiLocaleVibeDataflowGraphsIdTriggerRoute =
+  ApiLocaleVibeDataflowGraphsIdTriggerRouteImport.update({
+    id: '/$id/trigger',
+    path: '/$id/trigger',
+    getParentRoute: () => ApiLocaleVibeDataflowGraphsRoute,
+  } as any)
+const ApiLocaleVibeDataflowGraphsIdPromoteRoute =
+  ApiLocaleVibeDataflowGraphsIdPromoteRouteImport.update({
+    id: '/$id/promote',
+    path: '/$id/promote',
+    getParentRoute: () => ApiLocaleVibeDataflowGraphsRoute,
+  } as any)
+const ApiLocaleVibeDataflowGraphsIdEditRoute =
+  ApiLocaleVibeDataflowGraphsIdEditRouteImport.update({
+    id: '/$id/edit',
+    path: '/$id/edit',
+    getParentRoute: () => ApiLocaleVibeDataflowGraphsRoute,
+  } as any)
+const ApiLocaleVibeDataflowGraphsIdDeleteRoute =
+  ApiLocaleVibeDataflowGraphsIdDeleteRouteImport.update({
+    id: '/$id/delete',
+    path: '/$id/delete',
+    getParentRoute: () => ApiLocaleVibeDataflowGraphsRoute,
+  } as any)
+const ApiLocaleVibeDataflowGraphsIdDataRoute =
+  ApiLocaleVibeDataflowGraphsIdDataRouteImport.update({
+    id: '/$id/data',
+    path: '/$id/data',
+    getParentRoute: () => ApiLocaleVibeDataflowGraphsRoute,
+  } as any)
+const ApiLocaleVibeDataflowGraphsIdBacktestRoute =
+  ApiLocaleVibeDataflowGraphsIdBacktestRouteImport.update({
+    id: '/$id/backtest',
+    path: '/$id/backtest',
+    getParentRoute: () => ApiLocaleVibeDataflowGraphsRoute,
+  } as any)
+const ApiLocaleVibeDataflowGraphsIdArchiveRoute =
+  ApiLocaleVibeDataflowGraphsIdArchiveRouteImport.update({
+    id: '/$id/archive',
+    path: '/$id/archive',
+    getParentRoute: () => ApiLocaleVibeDataflowGraphsRoute,
+  } as any)
+const ApiLocaleVibeAgentSkillsFavoritesReorderRoute =
+  ApiLocaleVibeAgentSkillsFavoritesReorderRouteImport.update({
     id: '/reorder',
     path: '/reorder',
-    getParentRoute: () => ApiLocaleAgentSkillsFavoritesRoute,
+    getParentRoute: () => ApiLocaleVibeAgentSkillsFavoritesRoute,
   } as any)
-const ApiLocaleAgentSkillsFavoritesCreateRoute =
-  ApiLocaleAgentSkillsFavoritesCreateRouteImport.update({
+const ApiLocaleVibeAgentSkillsFavoritesCreateRoute =
+  ApiLocaleVibeAgentSkillsFavoritesCreateRouteImport.update({
     id: '/create',
     path: '/create',
-    getParentRoute: () => ApiLocaleAgentSkillsFavoritesRoute,
+    getParentRoute: () => ApiLocaleVibeAgentSkillsFavoritesRoute,
   } as any)
-const ApiLocaleAgentSkillsFavoritesIdRoute =
-  ApiLocaleAgentSkillsFavoritesIdRouteImport.update({
+const ApiLocaleVibeAgentSkillsFavoritesIdRoute =
+  ApiLocaleVibeAgentSkillsFavoritesIdRouteImport.update({
     id: '/$id',
     path: '/$id',
-    getParentRoute: () => ApiLocaleAgentSkillsFavoritesRoute,
+    getParentRoute: () => ApiLocaleVibeAgentSkillsFavoritesRoute,
   } as any)
-const ApiLocaleAgentSkillsIdVoteRoute =
-  ApiLocaleAgentSkillsIdVoteRouteImport.update({
+const ApiLocaleVibeAgentSkillsIdVoteRoute =
+  ApiLocaleVibeAgentSkillsIdVoteRouteImport.update({
     id: '/vote',
     path: '/vote',
-    getParentRoute: () => ApiLocaleAgentSkillsIdRoute,
+    getParentRoute: () => ApiLocaleVibeAgentSkillsIdRoute,
   } as any)
-const ApiLocaleAgentSkillsIdReportRoute =
-  ApiLocaleAgentSkillsIdReportRouteImport.update({
+const ApiLocaleVibeAgentSkillsIdReportRoute =
+  ApiLocaleVibeAgentSkillsIdReportRouteImport.update({
     id: '/report',
     path: '/report',
-    getParentRoute: () => ApiLocaleAgentSkillsIdRoute,
+    getParentRoute: () => ApiLocaleVibeAgentSkillsIdRoute,
   } as any)
-const ApiLocaleAgentSkillsIdPublishRoute =
-  ApiLocaleAgentSkillsIdPublishRouteImport.update({
+const ApiLocaleVibeAgentSkillsIdPublishRoute =
+  ApiLocaleVibeAgentSkillsIdPublishRouteImport.update({
     id: '/publish',
     path: '/publish',
-    getParentRoute: () => ApiLocaleAgentSkillsIdRoute,
+    getParentRoute: () => ApiLocaleVibeAgentSkillsIdRoute,
   } as any)
-const ApiLocaleAgentCortexEmbeddingsBackfillRoute =
-  ApiLocaleAgentCortexEmbeddingsBackfillRouteImport.update({
-    id: '/api/$locale/agent/cortex/embeddings/backfill',
-    path: '/api/$locale/agent/cortex/embeddings/backfill',
+const ApiLocaleVibeAgentCortexEmbeddingsBackfillRoute =
+  ApiLocaleVibeAgentCortexEmbeddingsBackfillRouteImport.update({
+    id: '/api/$locale/vibe/agent/cortex/embeddings/backfill',
+    path: '/api/$locale/vibe/agent/cortex/embeddings/backfill',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiLocaleAgentChatThreadsSearchThreadsRoute =
-  ApiLocaleAgentChatThreadsSearchThreadsRouteImport.update({
+const ApiLocaleVibeAgentChatThreadsSearchThreadsRoute =
+  ApiLocaleVibeAgentChatThreadsSearchThreadsRouteImport.update({
     id: '/search-threads',
     path: '/search-threads',
-    getParentRoute: () => ApiLocaleAgentChatThreadsRoute,
+    getParentRoute: () => ApiLocaleVibeAgentChatThreadsRoute,
   } as any)
-const ApiLocaleAgentChatThreadsSearchMessagesRoute =
-  ApiLocaleAgentChatThreadsSearchMessagesRouteImport.update({
+const ApiLocaleVibeAgentChatThreadsSearchMessagesRoute =
+  ApiLocaleVibeAgentChatThreadsSearchMessagesRouteImport.update({
     id: '/search-messages',
     path: '/search-messages',
-    getParentRoute: () => ApiLocaleAgentChatThreadsRoute,
+    getParentRoute: () => ApiLocaleVibeAgentChatThreadsRoute,
   } as any)
-const ApiLocaleAgentChatThreadsRenameRoute =
-  ApiLocaleAgentChatThreadsRenameRouteImport.update({
+const ApiLocaleVibeAgentChatThreadsRenameRoute =
+  ApiLocaleVibeAgentChatThreadsRenameRouteImport.update({
     id: '/rename',
     path: '/rename',
-    getParentRoute: () => ApiLocaleAgentChatThreadsRoute,
+    getParentRoute: () => ApiLocaleVibeAgentChatThreadsRoute,
   } as any)
-const ApiLocaleAgentChatThreadsThreadIdRoute =
-  ApiLocaleAgentChatThreadsThreadIdRouteImport.update({
+const ApiLocaleVibeAgentChatThreadsThreadIdRoute =
+  ApiLocaleVibeAgentChatThreadsThreadIdRouteImport.update({
     id: '/$threadId',
     path: '/$threadId',
-    getParentRoute: () => ApiLocaleAgentChatThreadsRoute,
+    getParentRoute: () => ApiLocaleVibeAgentChatThreadsRoute,
   } as any)
-const ApiLocaleAgentChatFoldersRootFolderIdRoute =
-  ApiLocaleAgentChatFoldersRootFolderIdRouteImport.update({
-    id: '/api/$locale/agent/chat/folders/$rootFolderId',
-    path: '/api/$locale/agent/chat/folders/$rootFolderId',
+const ApiLocaleVibeAgentChatFoldersRootFolderIdRoute =
+  ApiLocaleVibeAgentChatFoldersRootFolderIdRouteImport.update({
+    id: '/api/$locale/vibe/agent/chat/folders/$rootFolderId',
+    path: '/api/$locale/vibe/agent/chat/folders/$rootFolderId',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiLocaleAgentChatFolderContentsRootFolderIdRoute =
-  ApiLocaleAgentChatFolderContentsRootFolderIdRouteImport.update({
-    id: '/api/$locale/agent/chat/folder-contents/$rootFolderId',
-    path: '/api/$locale/agent/chat/folder-contents/$rootFolderId',
+const ApiLocaleVibeAgentChatFolderContentsRootFolderIdRoute =
+  ApiLocaleVibeAgentChatFolderContentsRootFolderIdRouteImport.update({
+    id: '/api/$locale/vibe/agent/chat/folder-contents/$rootFolderId',
+    path: '/api/$locale/vibe/agent/chat/folder-contents/$rootFolderId',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiLocaleAgentChatDataSourcesChatUpvotesTotalRoute =
-  ApiLocaleAgentChatDataSourcesChatUpvotesTotalRouteImport.update({
-    id: '/api/$locale/agent/chat/data-sources/chat-upvotes-total',
-    path: '/api/$locale/agent/chat/data-sources/chat-upvotes-total',
+const ApiLocaleVibeAgentChatDataSourcesChatUpvotesTotalRoute =
+  ApiLocaleVibeAgentChatDataSourcesChatUpvotesTotalRouteImport.update({
+    id: '/api/$locale/vibe/agent/chat/data-sources/chat-upvotes-total',
+    path: '/api/$locale/vibe/agent/chat/data-sources/chat-upvotes-total',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiLocaleAgentChatDataSourcesChatUniqueUsersRoute =
-  ApiLocaleAgentChatDataSourcesChatUniqueUsersRouteImport.update({
-    id: '/api/$locale/agent/chat/data-sources/chat-unique-users',
-    path: '/api/$locale/agent/chat/data-sources/chat-unique-users',
+const ApiLocaleVibeAgentChatDataSourcesChatUniqueUsersRoute =
+  ApiLocaleVibeAgentChatDataSourcesChatUniqueUsersRouteImport.update({
+    id: '/api/$locale/vibe/agent/chat/data-sources/chat-unique-users',
+    path: '/api/$locale/vibe/agent/chat/data-sources/chat-unique-users',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiLocaleAgentChatDataSourcesChatToolCallsTotalRoute =
-  ApiLocaleAgentChatDataSourcesChatToolCallsTotalRouteImport.update({
-    id: '/api/$locale/agent/chat/data-sources/chat-tool-calls-total',
-    path: '/api/$locale/agent/chat/data-sources/chat-tool-calls-total',
+const ApiLocaleVibeAgentChatDataSourcesChatToolCallsTotalRoute =
+  ApiLocaleVibeAgentChatDataSourcesChatToolCallsTotalRouteImport.update({
+    id: '/api/$locale/vibe/agent/chat/data-sources/chat-tool-calls-total',
+    path: '/api/$locale/vibe/agent/chat/data-sources/chat-tool-calls-total',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiLocaleAgentChatDataSourcesChatThreadsCreatedRoute =
-  ApiLocaleAgentChatDataSourcesChatThreadsCreatedRouteImport.update({
-    id: '/api/$locale/agent/chat/data-sources/chat-threads-created',
-    path: '/api/$locale/agent/chat/data-sources/chat-threads-created',
+const ApiLocaleVibeAgentChatDataSourcesChatThreadsCreatedRoute =
+  ApiLocaleVibeAgentChatDataSourcesChatThreadsCreatedRouteImport.update({
+    id: '/api/$locale/vibe/agent/chat/data-sources/chat-threads-created',
+    path: '/api/$locale/vibe/agent/chat/data-sources/chat-threads-created',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiLocaleAgentChatDataSourcesChatThreadsActiveTotalRoute =
-  ApiLocaleAgentChatDataSourcesChatThreadsActiveTotalRouteImport.update({
-    id: '/api/$locale/agent/chat/data-sources/chat-threads-active-total',
-    path: '/api/$locale/agent/chat/data-sources/chat-threads-active-total',
+const ApiLocaleVibeAgentChatDataSourcesChatThreadsActiveTotalRoute =
+  ApiLocaleVibeAgentChatDataSourcesChatThreadsActiveTotalRouteImport.update({
+    id: '/api/$locale/vibe/agent/chat/data-sources/chat-threads-active-total',
+    path: '/api/$locale/vibe/agent/chat/data-sources/chat-threads-active-total',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiLocaleAgentChatDataSourcesChatShareLinksCreatedRoute =
-  ApiLocaleAgentChatDataSourcesChatShareLinksCreatedRouteImport.update({
-    id: '/api/$locale/agent/chat/data-sources/chat-share-links-created',
-    path: '/api/$locale/agent/chat/data-sources/chat-share-links-created',
+const ApiLocaleVibeAgentChatDataSourcesChatShareLinksCreatedRoute =
+  ApiLocaleVibeAgentChatDataSourcesChatShareLinksCreatedRouteImport.update({
+    id: '/api/$locale/vibe/agent/chat/data-sources/chat-share-links-created',
+    path: '/api/$locale/vibe/agent/chat/data-sources/chat-share-links-created',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiLocaleAgentChatDataSourcesChatMessagesWithAttachmentsRoute =
-  ApiLocaleAgentChatDataSourcesChatMessagesWithAttachmentsRouteImport.update({
-    id: '/api/$locale/agent/chat/data-sources/chat-messages-with-attachments',
-    path: '/api/$locale/agent/chat/data-sources/chat-messages-with-attachments',
+const ApiLocaleVibeAgentChatDataSourcesChatMessagesWithAttachmentsRoute =
+  ApiLocaleVibeAgentChatDataSourcesChatMessagesWithAttachmentsRouteImport.update(
+    {
+      id: '/api/$locale/vibe/agent/chat/data-sources/chat-messages-with-attachments',
+      path: '/api/$locale/vibe/agent/chat/data-sources/chat-messages-with-attachments',
+      getParentRoute: () => rootRouteImport,
+    } as any,
+  )
+const ApiLocaleVibeAgentChatDataSourcesChatMessagesTotalRoute =
+  ApiLocaleVibeAgentChatDataSourcesChatMessagesTotalRouteImport.update({
+    id: '/api/$locale/vibe/agent/chat/data-sources/chat-messages-total',
+    path: '/api/$locale/vibe/agent/chat/data-sources/chat-messages-total',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiLocaleAgentChatDataSourcesChatMessagesTotalRoute =
-  ApiLocaleAgentChatDataSourcesChatMessagesTotalRouteImport.update({
-    id: '/api/$locale/agent/chat/data-sources/chat-messages-total',
-    path: '/api/$locale/agent/chat/data-sources/chat-messages-total',
+const ApiLocaleVibeAgentChatDataSourcesChatMessagesByUserRoute =
+  ApiLocaleVibeAgentChatDataSourcesChatMessagesByUserRouteImport.update({
+    id: '/api/$locale/vibe/agent/chat/data-sources/chat-messages-by-user',
+    path: '/api/$locale/vibe/agent/chat/data-sources/chat-messages-by-user',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiLocaleAgentChatDataSourcesChatMessagesByUserRoute =
-  ApiLocaleAgentChatDataSourcesChatMessagesByUserRouteImport.update({
-    id: '/api/$locale/agent/chat/data-sources/chat-messages-by-user',
-    path: '/api/$locale/agent/chat/data-sources/chat-messages-by-user',
+const ApiLocaleVibeAgentChatDataSourcesChatMessagesByAiRoute =
+  ApiLocaleVibeAgentChatDataSourcesChatMessagesByAiRouteImport.update({
+    id: '/api/$locale/vibe/agent/chat/data-sources/chat-messages-by-ai',
+    path: '/api/$locale/vibe/agent/chat/data-sources/chat-messages-by-ai',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiLocaleAgentChatDataSourcesChatMessagesByAiRoute =
-  ApiLocaleAgentChatDataSourcesChatMessagesByAiRouteImport.update({
-    id: '/api/$locale/agent/chat/data-sources/chat-messages-by-ai',
-    path: '/api/$locale/agent/chat/data-sources/chat-messages-by-ai',
+const ApiLocaleVibeAgentChatDataSourcesChatMemoriesCreatedRoute =
+  ApiLocaleVibeAgentChatDataSourcesChatMemoriesCreatedRouteImport.update({
+    id: '/api/$locale/vibe/agent/chat/data-sources/chat-memories-created',
+    path: '/api/$locale/vibe/agent/chat/data-sources/chat-memories-created',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiLocaleAgentChatDataSourcesChatMemoriesCreatedRoute =
-  ApiLocaleAgentChatDataSourcesChatMemoriesCreatedRouteImport.update({
-    id: '/api/$locale/agent/chat/data-sources/chat-memories-created',
-    path: '/api/$locale/agent/chat/data-sources/chat-memories-created',
+const ApiLocaleVibeAgentChatDataSourcesChatErrorsTotalRoute =
+  ApiLocaleVibeAgentChatDataSourcesChatErrorsTotalRouteImport.update({
+    id: '/api/$locale/vibe/agent/chat/data-sources/chat-errors-total',
+    path: '/api/$locale/vibe/agent/chat/data-sources/chat-errors-total',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiLocaleAgentChatDataSourcesChatErrorsTotalRoute =
-  ApiLocaleAgentChatDataSourcesChatErrorsTotalRouteImport.update({
-    id: '/api/$locale/agent/chat/data-sources/chat-errors-total',
-    path: '/api/$locale/agent/chat/data-sources/chat-errors-total',
+const ApiLocaleVibeAgentChatDataSourcesChatDownvotesTotalRoute =
+  ApiLocaleVibeAgentChatDataSourcesChatDownvotesTotalRouteImport.update({
+    id: '/api/$locale/vibe/agent/chat/data-sources/chat-downvotes-total',
+    path: '/api/$locale/vibe/agent/chat/data-sources/chat-downvotes-total',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiLocaleAgentChatDataSourcesChatDownvotesTotalRoute =
-  ApiLocaleAgentChatDataSourcesChatDownvotesTotalRouteImport.update({
-    id: '/api/$locale/agent/chat/data-sources/chat-downvotes-total',
-    path: '/api/$locale/agent/chat/data-sources/chat-downvotes-total',
+const ApiLocaleVibeAgentAiStreamWsProviderModelsRoute =
+  ApiLocaleVibeAgentAiStreamWsProviderModelsRouteImport.update({
+    id: '/api/$locale/vibe/agent/ai-stream/ws-provider/models',
+    path: '/api/$locale/vibe/agent/ai-stream/ws-provider/models',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiLocaleAgentAiStreamWsProviderModelsRoute =
-  ApiLocaleAgentAiStreamWsProviderModelsRouteImport.update({
-    id: '/api/$locale/agent/ai-stream/ws-provider/models',
-    path: '/api/$locale/agent/ai-stream/ws-provider/models',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleAgentAiStreamSystemPromptDebugRoute =
-  ApiLocaleAgentAiStreamSystemPromptDebugRouteImport.update({
-    id: '/api/$locale/agent/ai-stream/system-prompt/debug',
-    path: '/api/$locale/agent/ai-stream/system-prompt/debug',
+const ApiLocaleVibeAgentAiStreamSystemPromptDebugRoute =
+  ApiLocaleVibeAgentAiStreamSystemPromptDebugRouteImport.update({
+    id: '/api/$locale/vibe/agent/ai-stream/system-prompt/debug',
+    path: '/api/$locale/vibe/agent/ai-stream/system-prompt/debug',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiLocaleUserPrivateMeAddressesAddressIdRoute =
@@ -3810,106 +3816,6 @@ const ApiLocaleUserPrivateMeAddressesAddressIdRoute =
     id: '/$addressId',
     path: '/$addressId',
     getParentRoute: () => ApiLocaleUserPrivateMeAddressesRoute,
-  } as any)
-const ApiLocaleSystemPlatformsCliSetupUninstallRoute =
-  ApiLocaleSystemPlatformsCliSetupUninstallRouteImport.update({
-    id: '/api/$locale/system/platforms/cli/setup/uninstall',
-    path: '/api/$locale/system/platforms/cli/setup/uninstall',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemPlatformsCliSetupStatusRoute =
-  ApiLocaleSystemPlatformsCliSetupStatusRouteImport.update({
-    id: '/api/$locale/system/platforms/cli/setup/status',
-    path: '/api/$locale/system/platforms/cli/setup/status',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemPlatformsCliInteractiveSendKeysRoute =
-  ApiLocaleSystemPlatformsCliInteractiveSendKeysRouteImport.update({
-    id: '/api/$locale/system/platforms/cli/interactive/send-keys',
-    path: '/api/$locale/system/platforms/cli/interactive/send-keys',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemPlatformsCliInteractiveCaptureRoute =
-  ApiLocaleSystemPlatformsCliInteractiveCaptureRouteImport.update({
-    id: '/api/$locale/system/platforms/cli/interactive/capture',
-    path: '/api/$locale/system/platforms/cli/interactive/capture',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemPlatformsAiSkillsCharacterSkillRoute =
-  ApiLocaleSystemPlatformsAiSkillsCharacterSkillRouteImport.update({
-    id: '/api/$locale/system/platforms/ai/skills/$characterSkill',
-    path: '/api/$locale/system/platforms/ai/skills/$characterSkill',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute =
-  ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsWarningsRouteImport.update(
-    {
-      id: '/api/$locale/system/logger/error-monitor/data-sources/error-logs-warnings',
-      path: '/api/$locale/system/logger/error-monitor/data-sources/error-logs-warnings',
-      getParentRoute: () => rootRouteImport,
-    } as any,
-  )
-const ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsTotalRoute =
-  ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsTotalRouteImport.update({
-    id: '/api/$locale/system/logger/error-monitor/data-sources/error-logs-total',
-    path: '/api/$locale/system/logger/error-monitor/data-sources/error-logs-total',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsErrorsRoute =
-  ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsErrorsRouteImport.update(
-    {
-      id: '/api/$locale/system/logger/error-monitor/data-sources/error-logs-errors',
-      path: '/api/$locale/system/logger/error-monitor/data-sources/error-logs-errors',
-      getParentRoute: () => rootRouteImport,
-    } as any,
-  )
-const ApiLocaleSystemDataflowGraphsIdVersionsRoute =
-  ApiLocaleSystemDataflowGraphsIdVersionsRouteImport.update({
-    id: '/$id/versions',
-    path: '/$id/versions',
-    getParentRoute: () => ApiLocaleSystemDataflowGraphsRoute,
-  } as any)
-const ApiLocaleSystemDataflowGraphsIdTriggerRoute =
-  ApiLocaleSystemDataflowGraphsIdTriggerRouteImport.update({
-    id: '/$id/trigger',
-    path: '/$id/trigger',
-    getParentRoute: () => ApiLocaleSystemDataflowGraphsRoute,
-  } as any)
-const ApiLocaleSystemDataflowGraphsIdPromoteRoute =
-  ApiLocaleSystemDataflowGraphsIdPromoteRouteImport.update({
-    id: '/$id/promote',
-    path: '/$id/promote',
-    getParentRoute: () => ApiLocaleSystemDataflowGraphsRoute,
-  } as any)
-const ApiLocaleSystemDataflowGraphsIdEditRoute =
-  ApiLocaleSystemDataflowGraphsIdEditRouteImport.update({
-    id: '/$id/edit',
-    path: '/$id/edit',
-    getParentRoute: () => ApiLocaleSystemDataflowGraphsRoute,
-  } as any)
-const ApiLocaleSystemDataflowGraphsIdDeleteRoute =
-  ApiLocaleSystemDataflowGraphsIdDeleteRouteImport.update({
-    id: '/$id/delete',
-    path: '/$id/delete',
-    getParentRoute: () => ApiLocaleSystemDataflowGraphsRoute,
-  } as any)
-const ApiLocaleSystemDataflowGraphsIdDataRoute =
-  ApiLocaleSystemDataflowGraphsIdDataRouteImport.update({
-    id: '/$id/data',
-    path: '/$id/data',
-    getParentRoute: () => ApiLocaleSystemDataflowGraphsRoute,
-  } as any)
-const ApiLocaleSystemDataflowGraphsIdBacktestRoute =
-  ApiLocaleSystemDataflowGraphsIdBacktestRouteImport.update({
-    id: '/$id/backtest',
-    path: '/$id/backtest',
-    getParentRoute: () => ApiLocaleSystemDataflowGraphsRoute,
-  } as any)
-const ApiLocaleSystemDataflowGraphsIdArchiveRoute =
-  ApiLocaleSystemDataflowGraphsIdArchiveRouteImport.update({
-    id: '/$id/archive',
-    path: '/$id/archive',
-    getParentRoute: () => ApiLocaleSystemDataflowGraphsRoute,
   } as any)
 const ApiLocaleSshConnectionsIdMountsListRoute =
   ApiLocaleSshConnectionsIdMountsListRouteImport.update({
@@ -3983,126 +3889,132 @@ const ApiLocaleCompaniesCompanyIdMembersMemberIdRemoveRoute =
     path: '/api/$locale/companies/$companyId/members/$memberId/remove',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiLocaleAgentChatThreadsThreadIdShareLinksRoute =
-  ApiLocaleAgentChatThreadsThreadIdShareLinksRouteImport.update({
+const ApiLocaleVibePlatformsAiSkillsUSER_WITH_ACCOUNT_SKILLMdRoute =
+  ApiLocaleVibePlatformsAiSkillsUSER_WITH_ACCOUNT_SKILLMdRouteImport.update({
+    id: '/api/$locale/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL/md',
+    path: '/api/$locale/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL/md',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibePlatformsAiSkillsUSER_WITH_ACCOUNT_AI_RUNMdRoute =
+  ApiLocaleVibePlatformsAiSkillsUSER_WITH_ACCOUNT_AI_RUNMdRouteImport.update({
+    id: '/api/$locale/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_AI_RUN/md',
+    path: '/api/$locale/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_AI_RUN/md',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibePlatformsAiSkillsPUBLIC_USER_SKILLMdRoute =
+  ApiLocaleVibePlatformsAiSkillsPUBLIC_USER_SKILLMdRouteImport.update({
+    id: '/api/$locale/vibe/platforms/ai/skills/PUBLIC_USER_SKILL/md',
+    path: '/api/$locale/vibe/platforms/ai/skills/PUBLIC_USER_SKILL/md',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibePlatformsAiSkillsPUBLIC_USER_AI_RUNMdRoute =
+  ApiLocaleVibePlatformsAiSkillsPUBLIC_USER_AI_RUNMdRouteImport.update({
+    id: '/api/$locale/vibe/platforms/ai/skills/PUBLIC_USER_AI_RUN/md',
+    path: '/api/$locale/vibe/platforms/ai/skills/PUBLIC_USER_AI_RUN/md',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibePlatformsAiSkillsAGENTMdRoute =
+  ApiLocaleVibePlatformsAiSkillsAGENTMdRouteImport.update({
+    id: '/api/$locale/vibe/platforms/ai/skills/AGENT/md',
+    path: '/api/$locale/vibe/platforms/ai/skills/AGENT/md',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentChatThreadsThreadIdShareLinksRoute =
+  ApiLocaleVibeAgentChatThreadsThreadIdShareLinksRouteImport.update({
     id: '/share-links',
     path: '/share-links',
-    getParentRoute: () => ApiLocaleAgentChatThreadsThreadIdRoute,
+    getParentRoute: () => ApiLocaleVibeAgentChatThreadsThreadIdRoute,
   } as any)
-const ApiLocaleAgentChatThreadsThreadIdPermissionsRoute =
-  ApiLocaleAgentChatThreadsThreadIdPermissionsRouteImport.update({
+const ApiLocaleVibeAgentChatThreadsThreadIdPermissionsRoute =
+  ApiLocaleVibeAgentChatThreadsThreadIdPermissionsRouteImport.update({
     id: '/permissions',
     path: '/permissions',
-    getParentRoute: () => ApiLocaleAgentChatThreadsThreadIdRoute,
+    getParentRoute: () => ApiLocaleVibeAgentChatThreadsThreadIdRoute,
   } as any)
-const ApiLocaleAgentChatThreadsThreadIdMessagesRoute =
-  ApiLocaleAgentChatThreadsThreadIdMessagesRouteImport.update({
+const ApiLocaleVibeAgentChatThreadsThreadIdMessagesRoute =
+  ApiLocaleVibeAgentChatThreadsThreadIdMessagesRouteImport.update({
     id: '/messages',
     path: '/messages',
-    getParentRoute: () => ApiLocaleAgentChatThreadsThreadIdRoute,
+    getParentRoute: () => ApiLocaleVibeAgentChatThreadsThreadIdRoute,
   } as any)
-const ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRoute =
-  ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRouteImport.update({
-    id: '/api/$locale/agent/chat/folders/subfolders/$subFolderId',
-    path: '/api/$locale/agent/chat/folders/subfolders/$subFolderId',
+const ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRoute =
+  ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteImport.update({
+    id: '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId',
+    path: '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiLocaleAgentChatFoldersRootFolderIdRootPermissionsRoute =
-  ApiLocaleAgentChatFoldersRootFolderIdRootPermissionsRouteImport.update({
+const ApiLocaleVibeAgentChatFoldersRootFolderIdRootPermissionsRoute =
+  ApiLocaleVibeAgentChatFoldersRootFolderIdRootPermissionsRouteImport.update({
     id: '/root-permissions',
     path: '/root-permissions',
-    getParentRoute: () => ApiLocaleAgentChatFoldersRootFolderIdRoute,
+    getParentRoute: () => ApiLocaleVibeAgentChatFoldersRootFolderIdRoute,
   } as any)
-const ApiLocaleAgentChatFoldersRootFolderIdCreateRoute =
-  ApiLocaleAgentChatFoldersRootFolderIdCreateRouteImport.update({
+const ApiLocaleVibeAgentChatFoldersRootFolderIdCreateRoute =
+  ApiLocaleVibeAgentChatFoldersRootFolderIdCreateRouteImport.update({
     id: '/create',
     path: '/create',
-    getParentRoute: () => ApiLocaleAgentChatFoldersRootFolderIdRoute,
+    getParentRoute: () => ApiLocaleVibeAgentChatFoldersRootFolderIdRoute,
   } as any)
-const ApiLocaleSystemPlatformsAiSkillsUSER_WITH_ACCOUNT_SKILLMdRoute =
-  ApiLocaleSystemPlatformsAiSkillsUSER_WITH_ACCOUNT_SKILLMdRouteImport.update({
-    id: '/api/$locale/system/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL/md',
-    path: '/api/$locale/system/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL/md',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemPlatformsAiSkillsUSER_WITH_ACCOUNT_AI_RUNMdRoute =
-  ApiLocaleSystemPlatformsAiSkillsUSER_WITH_ACCOUNT_AI_RUNMdRouteImport.update({
-    id: '/api/$locale/system/platforms/ai/skills/USER_WITH_ACCOUNT_AI_RUN/md',
-    path: '/api/$locale/system/platforms/ai/skills/USER_WITH_ACCOUNT_AI_RUN/md',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemPlatformsAiSkillsPUBLIC_USER_SKILLMdRoute =
-  ApiLocaleSystemPlatformsAiSkillsPUBLIC_USER_SKILLMdRouteImport.update({
-    id: '/api/$locale/system/platforms/ai/skills/PUBLIC_USER_SKILL/md',
-    path: '/api/$locale/system/platforms/ai/skills/PUBLIC_USER_SKILL/md',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemPlatformsAiSkillsPUBLIC_USER_AI_RUNMdRoute =
-  ApiLocaleSystemPlatformsAiSkillsPUBLIC_USER_AI_RUNMdRouteImport.update({
-    id: '/api/$locale/system/platforms/ai/skills/PUBLIC_USER_AI_RUN/md',
-    path: '/api/$locale/system/platforms/ai/skills/PUBLIC_USER_AI_RUN/md',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleSystemPlatformsAiSkillsAGENTMdRoute =
-  ApiLocaleSystemPlatformsAiSkillsAGENTMdRouteImport.update({
-    id: '/api/$locale/system/platforms/ai/skills/AGENT/md',
-    path: '/api/$locale/system/platforms/ai/skills/AGENT/md',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleAgentChatThreadsFilesThreadIdFilenameRoute =
-  ApiLocaleAgentChatThreadsFilesThreadIdFilenameRouteImport.update({
+const ApiLocaleVibeAgentChatThreadsFilesThreadIdFilenameRoute =
+  ApiLocaleVibeAgentChatThreadsFilesThreadIdFilenameRouteImport.update({
     id: '/files/$threadId/$filename',
     path: '/files/$threadId/$filename',
-    getParentRoute: () => ApiLocaleAgentChatThreadsRoute,
+    getParentRoute: () => ApiLocaleVibeAgentChatThreadsRoute,
   } as any)
-const ApiLocaleAgentChatThreadsThreadIdMessagesSearchRoute =
-  ApiLocaleAgentChatThreadsThreadIdMessagesSearchRouteImport.update({
+const ApiLocaleVibeAgentChatThreadsThreadIdMessagesSearchRoute =
+  ApiLocaleVibeAgentChatThreadsThreadIdMessagesSearchRouteImport.update({
     id: '/search',
     path: '/search',
-    getParentRoute: () => ApiLocaleAgentChatThreadsThreadIdMessagesRoute,
+    getParentRoute: () => ApiLocaleVibeAgentChatThreadsThreadIdMessagesRoute,
   } as any)
-const ApiLocaleAgentChatThreadsThreadIdMessagesPathRoute =
-  ApiLocaleAgentChatThreadsThreadIdMessagesPathRouteImport.update({
+const ApiLocaleVibeAgentChatThreadsThreadIdMessagesPathRoute =
+  ApiLocaleVibeAgentChatThreadsThreadIdMessagesPathRouteImport.update({
     id: '/path',
     path: '/path',
-    getParentRoute: () => ApiLocaleAgentChatThreadsThreadIdMessagesRoute,
+    getParentRoute: () => ApiLocaleVibeAgentChatThreadsThreadIdMessagesRoute,
   } as any)
-const ApiLocaleAgentChatThreadsThreadIdMessagesMessageIdRoute =
-  ApiLocaleAgentChatThreadsThreadIdMessagesMessageIdRouteImport.update({
+const ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdRoute =
+  ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdRouteImport.update({
     id: '/$messageId',
     path: '/$messageId',
-    getParentRoute: () => ApiLocaleAgentChatThreadsThreadIdMessagesRoute,
+    getParentRoute: () => ApiLocaleVibeAgentChatThreadsThreadIdMessagesRoute,
   } as any)
-const ApiLocaleAgentChatFoldersSubfoldersSubFolderIdUpdateRoute =
-  ApiLocaleAgentChatFoldersSubfoldersSubFolderIdUpdateRouteImport.update({
+const ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdUpdateRoute =
+  ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdUpdateRouteImport.update({
     id: '/update',
     path: '/update',
-    getParentRoute: () => ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRoute,
+    getParentRoute: () =>
+      ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRoute,
   } as any)
-const ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRenameRoute =
-  ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRenameRouteImport.update({
+const ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRenameRoute =
+  ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRenameRouteImport.update({
     id: '/rename',
     path: '/rename',
-    getParentRoute: () => ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRoute,
+    getParentRoute: () =>
+      ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRoute,
   } as any)
-const ApiLocaleAgentChatFoldersSubfoldersSubFolderIdPermissionsRoute =
-  ApiLocaleAgentChatFoldersSubfoldersSubFolderIdPermissionsRouteImport.update({
-    id: '/permissions',
-    path: '/permissions',
-    getParentRoute: () => ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRoute,
-  } as any)
-const ApiLocaleAgentChatFoldersSubfoldersSubFolderIdMoveRoute =
-  ApiLocaleAgentChatFoldersSubfoldersSubFolderIdMoveRouteImport.update({
+const ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdPermissionsRoute =
+  ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdPermissionsRouteImport.update(
+    {
+      id: '/permissions',
+      path: '/permissions',
+      getParentRoute: () =>
+        ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRoute,
+    } as any,
+  )
+const ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdMoveRoute =
+  ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdMoveRouteImport.update({
     id: '/move',
     path: '/move',
-    getParentRoute: () => ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRoute,
+    getParentRoute: () =>
+      ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRoute,
   } as any)
-const ApiLocaleAgentChatThreadsThreadIdMessagesMessageIdVoteRoute =
-  ApiLocaleAgentChatThreadsThreadIdMessagesMessageIdVoteRouteImport.update({
+const ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdVoteRoute =
+  ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdVoteRouteImport.update({
     id: '/vote',
     path: '/vote',
     getParentRoute: () =>
-      ApiLocaleAgentChatThreadsThreadIdMessagesMessageIdRoute,
+      ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -4117,7 +4029,7 @@ export interface FileRoutesByFullPath {
   '/$locale/threads/$': typeof LocaleThreadsSplatRoute
   '/$locale/tools/$': typeof LocaleToolsSplatRoute
   '/$locale/user': typeof LocaleUserAuthRouteWithChildren
-  '/api/$locale/$slug': typeof ApiLocaleSlugRoute
+  '/api/$locale/$notFound': typeof ApiLocaleNotFoundRoute
   '/api/$locale/contact': typeof ApiLocaleContactRoute
   '/api/$locale/credits': typeof ApiLocaleCreditsRouteWithChildren
   '/api/$locale/manifest': typeof ApiLocaleManifestRoute
@@ -4134,18 +4046,6 @@ export interface FileRoutesByFullPath {
   '/$locale/tools/': typeof LocaleToolsIndexRoute
   '/$locale/track/': typeof LocaleTrackIndexRoute
   '/$locale/user/signup': typeof LocaleUserAuthSignupRouteWithChildren
-  '/api/$locale/agent/coding-agent': typeof ApiLocaleAgentCodingAgentRoute
-  '/api/$locale/agent/describe-image': typeof ApiLocaleAgentDescribeImageRoute
-  '/api/$locale/agent/describe-video': typeof ApiLocaleAgentDescribeVideoRoute
-  '/api/$locale/agent/fetch-url-content': typeof ApiLocaleAgentFetchUrlContentRouteWithChildren
-  '/api/$locale/agent/image-generation': typeof ApiLocaleAgentImageGenerationRoute
-  '/api/$locale/agent/music-generation': typeof ApiLocaleAgentMusicGenerationRoute
-  '/api/$locale/agent/skills': typeof ApiLocaleAgentSkillsRouteWithChildren
-  '/api/$locale/agent/speech-to-text': typeof ApiLocaleAgentSpeechToTextRouteWithChildren
-  '/api/$locale/agent/text-to-speech': typeof ApiLocaleAgentTextToSpeechRoute
-  '/api/$locale/agent/video-generation': typeof ApiLocaleAgentVideoGenerationRoute
-  '/api/$locale/agent/view-image': typeof ApiLocaleAgentViewImageRoute
-  '/api/$locale/agent/web-search': typeof ApiLocaleAgentWebSearchRouteWithChildren
   '/api/$locale/browser/click': typeof ApiLocaleBrowserClickRoute
   '/api/$locale/browser/close-page': typeof ApiLocaleBrowserClosePageRoute
   '/api/$locale/browser/drag': typeof ApiLocaleBrowserDragRoute
@@ -4223,23 +4123,18 @@ export interface FileRoutesByFullPath {
   '/api/$locale/purchasing/dashboard': typeof ApiLocalePurchasingDashboardRoute
   '/api/$locale/referral/payout': typeof ApiLocaleReferralPayoutRoute
   '/api/$locale/referral/stats': typeof ApiLocaleReferralStatsRoute
-  '/api/$locale/remote-connection/$instanceId': typeof ApiLocaleRemoteConnectionInstanceIdRoute
-  '/api/$locale/remote-connection/connect': typeof ApiLocaleRemoteConnectionConnectRoute
-  '/api/$locale/remote-connection/connect-reverse': typeof ApiLocaleRemoteConnectionConnectReverseRouteWithChildren
-  '/api/$locale/remote-connection/list': typeof ApiLocaleRemoteConnectionListRoute
-  '/api/$locale/remote-connection/sync': typeof ApiLocaleRemoteConnectionSyncRouteWithChildren
   '/api/$locale/subscription/cancel': typeof ApiLocaleSubscriptionCancelRoute
   '/api/$locale/subscription/create': typeof ApiLocaleSubscriptionCreateRoute
   '/api/$locale/subscription/dashboard': typeof ApiLocaleSubscriptionDashboardRoute
   '/api/$locale/subscription/update': typeof ApiLocaleSubscriptionUpdateRoute
-  '/api/$locale/system/execute-tool': typeof ApiLocaleSystemExecuteToolRouteWithChildren
-  '/api/$locale/system/help-tool': typeof ApiLocaleSystemHelpToolRoute
   '/api/$locale/tax/report': typeof ApiLocaleTaxReportRoute
   '/api/$locale/user/session-cleanup': typeof ApiLocaleUserSessionCleanupRoute
   '/api/$locale/users/create': typeof ApiLocaleUsersCreateRoute
   '/api/$locale/users/list': typeof ApiLocaleUsersListRoute
   '/api/$locale/users/stats': typeof ApiLocaleUsersStatsRoute
   '/api/$locale/users/view': typeof ApiLocaleUsersViewRoute
+  '/api/$locale/vibe/execute-tool': typeof ApiLocaleVibeExecuteToolRouteWithChildren
+  '/api/$locale/vibe/help-tool': typeof ApiLocaleVibeHelpToolRoute
   '/$locale/creator/$userId/': typeof LocaleCreatorUserIdIndexRoute
   '/$locale/shared/$token/': typeof LocaleSharedTokenIndexRoute
   '/$locale/skill/$skillId/': typeof LocaleSkillSkillIdIndexRoute
@@ -4258,33 +4153,6 @@ export interface FileRoutesByFullPath {
   '/$locale/subscription/history/': typeof LocaleSubscriptionHistoryIndexRoute
   '/$locale/subscription/overview/': typeof LocaleSubscriptionOverviewIndexRoute
   '/$locale/subscription/remote/': typeof LocaleSubscriptionRemoteIndexRoute
-  '/api/$locale/agent/ai-stream/cancel': typeof ApiLocaleAgentAiStreamCancelRoute
-  '/api/$locale/agent/ai-stream/run': typeof ApiLocaleAgentAiStreamRunRoute
-  '/api/$locale/agent/ai-stream/stream': typeof ApiLocaleAgentAiStreamStreamRoute
-  '/api/$locale/agent/chat/public-feed': typeof ApiLocaleAgentChatPublicFeedRoute
-  '/api/$locale/agent/chat/settings': typeof ApiLocaleAgentChatSettingsRoute
-  '/api/$locale/agent/chat/threads': typeof ApiLocaleAgentChatThreadsRouteWithChildren
-  '/api/$locale/agent/cortex/delete': typeof ApiLocaleAgentCortexDeleteRoute
-  '/api/$locale/agent/cortex/edit': typeof ApiLocaleAgentCortexEditRoute
-  '/api/$locale/agent/cortex/exec': typeof ApiLocaleAgentCortexExecRoute
-  '/api/$locale/agent/cortex/list': typeof ApiLocaleAgentCortexListRoute
-  '/api/$locale/agent/cortex/mkdir': typeof ApiLocaleAgentCortexMkdirRoute
-  '/api/$locale/agent/cortex/move': typeof ApiLocaleAgentCortexMoveRoute
-  '/api/$locale/agent/cortex/read': typeof ApiLocaleAgentCortexReadRoute
-  '/api/$locale/agent/cortex/search': typeof ApiLocaleAgentCortexSearchRoute
-  '/api/$locale/agent/cortex/terminals': typeof ApiLocaleAgentCortexTerminalsRoute
-  '/api/$locale/agent/cortex/tree': typeof ApiLocaleAgentCortexTreeRoute
-  '/api/$locale/agent/cortex/write': typeof ApiLocaleAgentCortexWriteRoute
-  '/api/$locale/agent/fetch-url-content/cleanup': typeof ApiLocaleAgentFetchUrlContentCleanupRoute
-  '/api/$locale/agent/models/list': typeof ApiLocaleAgentModelsListRoute
-  '/api/$locale/agent/models/model-prices': typeof ApiLocaleAgentModelsModelPricesRoute
-  '/api/$locale/agent/skills/$id': typeof ApiLocaleAgentSkillsIdRouteWithChildren
-  '/api/$locale/agent/skills/create': typeof ApiLocaleAgentSkillsCreateRoute
-  '/api/$locale/agent/skills/favorites': typeof ApiLocaleAgentSkillsFavoritesRouteWithChildren
-  '/api/$locale/agent/skills/moderation': typeof ApiLocaleAgentSkillsModerationRoute
-  '/api/$locale/agent/speech-to-text/hotkey': typeof ApiLocaleAgentSpeechToTextHotkeyRoute
-  '/api/$locale/agent/web-search/brave': typeof ApiLocaleAgentWebSearchBraveRoute
-  '/api/$locale/agent/web-search/kagi': typeof ApiLocaleAgentWebSearchKagiRoute
   '/api/$locale/analytics/evaluators/and': typeof ApiLocaleAnalyticsEvaluatorsAndRoute
   '/api/$locale/analytics/evaluators/crossover': typeof ApiLocaleAnalyticsEvaluatorsCrossoverRoute
   '/api/$locale/analytics/evaluators/not': typeof ApiLocaleAnalyticsEvaluatorsNotRoute
@@ -4452,10 +4320,6 @@ export interface FileRoutesByFullPath {
   '/api/$locale/referral/data-sources/referrals-signups': typeof ApiLocaleReferralDataSourcesReferralsSignupsRoute
   '/api/$locale/referral/earnings/list': typeof ApiLocaleReferralEarningsListRoute
   '/api/$locale/referral/lead/current': typeof ApiLocaleReferralLeadCurrentRoute
-  '/api/$locale/remote-connection/connect-reverse/update': typeof ApiLocaleRemoteConnectionConnectReverseUpdateRoute
-  '/api/$locale/remote-connection/self/instanceId': typeof ApiLocaleRemoteConnectionSelfInstanceIdRoute
-  '/api/$locale/remote-connection/self/rename': typeof ApiLocaleRemoteConnectionSelfRenameRoute
-  '/api/$locale/remote-connection/sync/providers': typeof ApiLocaleRemoteConnectionSyncProvidersRoute
   '/api/$locale/ssh/connections/$id': typeof ApiLocaleSshConnectionsIdRouteWithChildren
   '/api/$locale/ssh/connections/create': typeof ApiLocaleSshConnectionsCreateRoute
   '/api/$locale/ssh/connections/list': typeof ApiLocaleSshConnectionsListRoute
@@ -4469,20 +4333,6 @@ export interface FileRoutesByFullPath {
   '/api/$locale/subscription/data-sources/subscriptions-new': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsNewRoute
   '/api/$locale/subscription/data-sources/subscriptions-payment-failed': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsPaymentFailedRoute
   '/api/$locale/subscription/data-sources/subscriptions-trialing': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsTrialingRoute
-  '/api/$locale/system/database/health': typeof ApiLocaleSystemDatabaseHealthRoute
-  '/api/$locale/system/database/sql': typeof ApiLocaleSystemDatabaseSqlRoute
-  '/api/$locale/system/dataflow/cleanup': typeof ApiLocaleSystemDataflowCleanupRoute
-  '/api/$locale/system/dataflow/graphs': typeof ApiLocaleSystemDataflowGraphsRouteWithChildren
-  '/api/$locale/system/dataflow/run-config': typeof ApiLocaleSystemDataflowRunConfigRoute
-  '/api/$locale/system/env/settings': typeof ApiLocaleSystemEnvSettingsRouteWithChildren
-  '/api/$locale/system/execute-tool/await-task': typeof ApiLocaleSystemExecuteToolAwaitTaskRoute
-  '/api/$locale/system/execute-tool/complete': typeof ApiLocaleSystemExecuteToolCompleteRoute
-  '/api/$locale/system/execute-tool/revival': typeof ApiLocaleSystemExecuteToolRevivalRoute
-  '/api/$locale/system/realtime/remote-event-bridge': typeof ApiLocaleSystemRealtimeRemoteEventBridgeRoute
-  '/api/$locale/system/tasks/execute': typeof ApiLocaleSystemTasksExecuteRoute
-  '/api/$locale/system/tasks/unified-runner': typeof ApiLocaleSystemTasksUnifiedRunnerRoute
-  '/api/$locale/system/tooling/vibe-deps': typeof ApiLocaleSystemToolingVibeDepsRoute
-  '/api/$locale/system/tooling/vibe-stage': typeof ApiLocaleSystemToolingVibeStageRoute
   '/api/$locale/tax/rate/create': typeof ApiLocaleTaxRateCreateRoute
   '/api/$locale/tax/rate/list': typeof ApiLocaleTaxRateListRoute
   '/api/$locale/user/data-sources/users-active-total': typeof ApiLocaleUserDataSourcesUsersActiveTotalRoute
@@ -4500,6 +4350,33 @@ export interface FileRoutesByFullPath {
   '/api/$locale/user/public/login': typeof ApiLocaleUserPublicLoginRouteWithChildren
   '/api/$locale/user/public/signup': typeof ApiLocaleUserPublicSignupRoute
   '/api/$locale/users/user/$id': typeof ApiLocaleUsersUserIdRouteWithChildren
+  '/api/$locale/vibe/agent/coding-agent': typeof ApiLocaleVibeAgentCodingAgentRoute
+  '/api/$locale/vibe/agent/describe-image': typeof ApiLocaleVibeAgentDescribeImageRoute
+  '/api/$locale/vibe/agent/describe-video': typeof ApiLocaleVibeAgentDescribeVideoRoute
+  '/api/$locale/vibe/agent/fetch-url-content': typeof ApiLocaleVibeAgentFetchUrlContentRouteWithChildren
+  '/api/$locale/vibe/agent/image-generation': typeof ApiLocaleVibeAgentImageGenerationRoute
+  '/api/$locale/vibe/agent/music-generation': typeof ApiLocaleVibeAgentMusicGenerationRoute
+  '/api/$locale/vibe/agent/skills': typeof ApiLocaleVibeAgentSkillsRouteWithChildren
+  '/api/$locale/vibe/agent/speech-to-text': typeof ApiLocaleVibeAgentSpeechToTextRoute
+  '/api/$locale/vibe/agent/text-to-speech': typeof ApiLocaleVibeAgentTextToSpeechRoute
+  '/api/$locale/vibe/agent/video-generation': typeof ApiLocaleVibeAgentVideoGenerationRoute
+  '/api/$locale/vibe/agent/view-image': typeof ApiLocaleVibeAgentViewImageRoute
+  '/api/$locale/vibe/agent/web-search': typeof ApiLocaleVibeAgentWebSearchRouteWithChildren
+  '/api/$locale/vibe/database/health': typeof ApiLocaleVibeDatabaseHealthRoute
+  '/api/$locale/vibe/dataflow/cleanup': typeof ApiLocaleVibeDataflowCleanupRoute
+  '/api/$locale/vibe/dataflow/graphs': typeof ApiLocaleVibeDataflowGraphsRouteWithChildren
+  '/api/$locale/vibe/dataflow/run-config': typeof ApiLocaleVibeDataflowRunConfigRoute
+  '/api/$locale/vibe/env/settings': typeof ApiLocaleVibeEnvSettingsRouteWithChildren
+  '/api/$locale/vibe/execute-tool/await-task': typeof ApiLocaleVibeExecuteToolAwaitTaskRoute
+  '/api/$locale/vibe/execute-tool/complete': typeof ApiLocaleVibeExecuteToolCompleteRoute
+  '/api/$locale/vibe/execute-tool/revival': typeof ApiLocaleVibeExecuteToolRevivalRoute
+  '/api/$locale/vibe/realtime/remote-event-bridge': typeof ApiLocaleVibeRealtimeRemoteEventBridgeRoute
+  '/api/$locale/vibe/remote-connection/$instanceId': typeof ApiLocaleVibeRemoteConnectionInstanceIdRoute
+  '/api/$locale/vibe/remote-connection/connect': typeof ApiLocaleVibeRemoteConnectionConnectRoute
+  '/api/$locale/vibe/remote-connection/connect-reverse': typeof ApiLocaleVibeRemoteConnectionConnectReverseRouteWithChildren
+  '/api/$locale/vibe/remote-connection/list': typeof ApiLocaleVibeRemoteConnectionListRoute
+  '/api/$locale/vibe/remote-connection/sync': typeof ApiLocaleVibeRemoteConnectionSyncRouteWithChildren
+  '/api/$locale/vibe/tasks/execute': typeof ApiLocaleVibeTasksExecuteRoute
   '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/': typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
   '/$locale/story/blog/one-codebase-13-platforms/': typeof LocaleStoryBlogOneCodebase13PlatformsIndexRoute
   '/$locale/story/blog/one-endpoint-every-surface/': typeof LocaleStoryBlogOneEndpointEverySurfaceIndexRoute
@@ -4517,34 +4394,6 @@ export interface FileRoutesByFullPath {
   '/$locale/user/login/': typeof LocaleUserAuthLoginIndexRoute
   '/$locale/user/reset-password/': typeof LocaleUserAuthResetPasswordIndexRoute
   '/$locale/user/signup/': typeof LocaleUserAuthSignupIndexRoute
-  '/api/$locale/agent/ai-stream/system-prompt/debug': typeof ApiLocaleAgentAiStreamSystemPromptDebugRoute
-  '/api/$locale/agent/ai-stream/ws-provider/models': typeof ApiLocaleAgentAiStreamWsProviderModelsRoute
-  '/api/$locale/agent/chat/data-sources/chat-downvotes-total': typeof ApiLocaleAgentChatDataSourcesChatDownvotesTotalRoute
-  '/api/$locale/agent/chat/data-sources/chat-errors-total': typeof ApiLocaleAgentChatDataSourcesChatErrorsTotalRoute
-  '/api/$locale/agent/chat/data-sources/chat-memories-created': typeof ApiLocaleAgentChatDataSourcesChatMemoriesCreatedRoute
-  '/api/$locale/agent/chat/data-sources/chat-messages-by-ai': typeof ApiLocaleAgentChatDataSourcesChatMessagesByAiRoute
-  '/api/$locale/agent/chat/data-sources/chat-messages-by-user': typeof ApiLocaleAgentChatDataSourcesChatMessagesByUserRoute
-  '/api/$locale/agent/chat/data-sources/chat-messages-total': typeof ApiLocaleAgentChatDataSourcesChatMessagesTotalRoute
-  '/api/$locale/agent/chat/data-sources/chat-messages-with-attachments': typeof ApiLocaleAgentChatDataSourcesChatMessagesWithAttachmentsRoute
-  '/api/$locale/agent/chat/data-sources/chat-share-links-created': typeof ApiLocaleAgentChatDataSourcesChatShareLinksCreatedRoute
-  '/api/$locale/agent/chat/data-sources/chat-threads-active-total': typeof ApiLocaleAgentChatDataSourcesChatThreadsActiveTotalRoute
-  '/api/$locale/agent/chat/data-sources/chat-threads-created': typeof ApiLocaleAgentChatDataSourcesChatThreadsCreatedRoute
-  '/api/$locale/agent/chat/data-sources/chat-tool-calls-total': typeof ApiLocaleAgentChatDataSourcesChatToolCallsTotalRoute
-  '/api/$locale/agent/chat/data-sources/chat-unique-users': typeof ApiLocaleAgentChatDataSourcesChatUniqueUsersRoute
-  '/api/$locale/agent/chat/data-sources/chat-upvotes-total': typeof ApiLocaleAgentChatDataSourcesChatUpvotesTotalRoute
-  '/api/$locale/agent/chat/folder-contents/$rootFolderId': typeof ApiLocaleAgentChatFolderContentsRootFolderIdRoute
-  '/api/$locale/agent/chat/folders/$rootFolderId': typeof ApiLocaleAgentChatFoldersRootFolderIdRouteWithChildren
-  '/api/$locale/agent/chat/threads/$threadId': typeof ApiLocaleAgentChatThreadsThreadIdRouteWithChildren
-  '/api/$locale/agent/chat/threads/rename': typeof ApiLocaleAgentChatThreadsRenameRoute
-  '/api/$locale/agent/chat/threads/search-messages': typeof ApiLocaleAgentChatThreadsSearchMessagesRoute
-  '/api/$locale/agent/chat/threads/search-threads': typeof ApiLocaleAgentChatThreadsSearchThreadsRoute
-  '/api/$locale/agent/cortex/embeddings/backfill': typeof ApiLocaleAgentCortexEmbeddingsBackfillRoute
-  '/api/$locale/agent/skills/$id/publish': typeof ApiLocaleAgentSkillsIdPublishRoute
-  '/api/$locale/agent/skills/$id/report': typeof ApiLocaleAgentSkillsIdReportRoute
-  '/api/$locale/agent/skills/$id/vote': typeof ApiLocaleAgentSkillsIdVoteRoute
-  '/api/$locale/agent/skills/favorites/$id': typeof ApiLocaleAgentSkillsFavoritesIdRoute
-  '/api/$locale/agent/skills/favorites/create': typeof ApiLocaleAgentSkillsFavoritesCreateRoute
-  '/api/$locale/agent/skills/favorites/reorder': typeof ApiLocaleAgentSkillsFavoritesReorderRoute
   '/api/$locale/chart-of-accounts/account/$accountId/deactivate': typeof ApiLocaleChartOfAccountsAccountAccountIdDeactivateRoute
   '/api/$locale/chart-of-accounts/account/$accountId/get': typeof ApiLocaleChartOfAccountsAccountAccountIdGetRoute
   '/api/$locale/chart-of-accounts/account/$accountId/update': typeof ApiLocaleChartOfAccountsAccountAccountIdUpdateRoute
@@ -4583,9 +4432,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/payment/invoice/$invoiceId/send-reminder': typeof ApiLocalePaymentInvoiceInvoiceIdSendReminderRoute
   '/api/$locale/payment/invoice/$invoiceId/void': typeof ApiLocalePaymentInvoiceInvoiceIdVoidRoute
   '/api/$locale/payment/invoice/line/add': typeof ApiLocalePaymentInvoiceLineAddRoute
-  '/api/$locale/payment/providers/nowpayments/cli': typeof ApiLocalePaymentProvidersNowpaymentsCliRoute
   '/api/$locale/payment/providers/nowpayments/webhook': typeof ApiLocalePaymentProvidersNowpaymentsWebhookRoute
-  '/api/$locale/payment/providers/stripe/cli': typeof ApiLocalePaymentProvidersStripeCliRoute
   '/api/$locale/payment/providers/stripe/webhook': typeof ApiLocalePaymentProvidersStripeWebhookRoute
   '/api/$locale/pos/order/$orderId/add-item': typeof ApiLocalePosOrderOrderIdAddItemRoute
   '/api/$locale/pos/order/$orderId/add-payment': typeof ApiLocalePosOrderOrderIdAddPaymentRoute
@@ -4614,30 +4461,6 @@ export interface FileRoutesByFullPath {
   '/api/$locale/ssh/linux/users/list': typeof ApiLocaleSshLinuxUsersListRoute
   '/api/$locale/subscription/company/$companyId/get': typeof ApiLocaleSubscriptionCompanyCompanyIdGetRoute
   '/api/$locale/subscription/company/$companyId/list': typeof ApiLocaleSubscriptionCompanyCompanyIdListRoute
-  '/api/$locale/system/env/settings/export-env': typeof ApiLocaleSystemEnvSettingsExportEnvRoute
-  '/api/$locale/system/env/settings/generate-key': typeof ApiLocaleSystemEnvSettingsGenerateKeyRoute
-  '/api/$locale/system/execute-tool/call-control/cancel': typeof ApiLocaleSystemExecuteToolCallControlCancelRoute
-  '/api/$locale/system/execute-tool/call-control/detach': typeof ApiLocaleSystemExecuteToolCallControlDetachRoute
-  '/api/$locale/system/execute-tool/call-control/resume-when-done': typeof ApiLocaleSystemExecuteToolCallControlResumeWhenDoneRoute
-  '/api/$locale/system/logger/error-monitor/cleanup': typeof ApiLocaleSystemLoggerErrorMonitorCleanupRoute
-  '/api/$locale/system/logger/error-monitor/client-log': typeof ApiLocaleSystemLoggerErrorMonitorClientLogRoute
-  '/api/$locale/system/logger/error-monitor/logs': typeof ApiLocaleSystemLoggerErrorMonitorLogsRoute
-  '/api/$locale/system/platforms/vibe-frame/mount': typeof ApiLocaleSystemPlatformsVibeFrameMountRoute
-  '/api/$locale/system/server/server/health': typeof ApiLocaleSystemServerServerHealthRoute
-  '/api/$locale/system/server/server/rebuild': typeof ApiLocaleSystemServerServerRebuildRoute
-  '/api/$locale/system/tasks/cron/$id': typeof ApiLocaleSystemTasksCronIdRoute
-  '/api/$locale/system/tasks/cron/bulk': typeof ApiLocaleSystemTasksCronBulkRoute
-  '/api/$locale/system/tasks/cron/history': typeof ApiLocaleSystemTasksCronHistoryRoute
-  '/api/$locale/system/tasks/cron/queue': typeof ApiLocaleSystemTasksCronQueueRoute
-  '/api/$locale/system/tasks/cron/stats': typeof ApiLocaleSystemTasksCronStatsRoute
-  '/api/$locale/system/tasks/cron/tasks': typeof ApiLocaleSystemTasksCronTasksRoute
-  '/api/$locale/system/tasks/data-sources/cron-executions-failed': typeof ApiLocaleSystemTasksDataSourcesCronExecutionsFailedRoute
-  '/api/$locale/system/tasks/data-sources/cron-executions-succeeded': typeof ApiLocaleSystemTasksDataSourcesCronExecutionsSucceededRoute
-  '/api/$locale/system/tasks/data-sources/cron-executions-total': typeof ApiLocaleSystemTasksDataSourcesCronExecutionsTotalRoute
-  '/api/$locale/system/tasks/pulse/execute': typeof ApiLocaleSystemTasksPulseExecuteRoute
-  '/api/$locale/system/tasks/pulse/history': typeof ApiLocaleSystemTasksPulseHistoryRoute
-  '/api/$locale/system/tasks/pulse/status': typeof ApiLocaleSystemTasksPulseStatusRoute
-  '/api/$locale/system/tooling/check/vibe-check': typeof ApiLocaleSystemToolingCheckVibeCheckRoute
   '/api/$locale/tax/rate/$rateId/delete': typeof ApiLocaleTaxRateRateIdDeleteRoute
   '/api/$locale/tax/rate/$rateId/update': typeof ApiLocaleTaxRateRateIdUpdateRoute
   '/api/$locale/user/private/me/addresses': typeof ApiLocaleUserPrivateMeAddressesRouteWithChildren
@@ -4650,14 +4473,59 @@ export interface FileRoutesByFullPath {
   '/api/$locale/user/public/reset-password/request': typeof ApiLocaleUserPublicResetPasswordRequestRoute
   '/api/$locale/user/public/reset-password/validate': typeof ApiLocaleUserPublicResetPasswordValidateRoute
   '/api/$locale/users/user/$id/roles': typeof ApiLocaleUsersUserIdRolesRoute
+  '/api/$locale/vibe/agent/ai-stream/cancel': typeof ApiLocaleVibeAgentAiStreamCancelRoute
+  '/api/$locale/vibe/agent/ai-stream/run': typeof ApiLocaleVibeAgentAiStreamRunRoute
+  '/api/$locale/vibe/agent/ai-stream/stream': typeof ApiLocaleVibeAgentAiStreamStreamRoute
+  '/api/$locale/vibe/agent/chat/public-feed': typeof ApiLocaleVibeAgentChatPublicFeedRoute
+  '/api/$locale/vibe/agent/chat/settings': typeof ApiLocaleVibeAgentChatSettingsRoute
+  '/api/$locale/vibe/agent/chat/threads': typeof ApiLocaleVibeAgentChatThreadsRouteWithChildren
+  '/api/$locale/vibe/agent/cortex/delete': typeof ApiLocaleVibeAgentCortexDeleteRoute
+  '/api/$locale/vibe/agent/cortex/edit': typeof ApiLocaleVibeAgentCortexEditRoute
+  '/api/$locale/vibe/agent/cortex/exec': typeof ApiLocaleVibeAgentCortexExecRoute
+  '/api/$locale/vibe/agent/cortex/list': typeof ApiLocaleVibeAgentCortexListRoute
+  '/api/$locale/vibe/agent/cortex/mkdir': typeof ApiLocaleVibeAgentCortexMkdirRoute
+  '/api/$locale/vibe/agent/cortex/move': typeof ApiLocaleVibeAgentCortexMoveRoute
+  '/api/$locale/vibe/agent/cortex/read': typeof ApiLocaleVibeAgentCortexReadRoute
+  '/api/$locale/vibe/agent/cortex/search': typeof ApiLocaleVibeAgentCortexSearchRoute
+  '/api/$locale/vibe/agent/cortex/terminals': typeof ApiLocaleVibeAgentCortexTerminalsRoute
+  '/api/$locale/vibe/agent/cortex/tree': typeof ApiLocaleVibeAgentCortexTreeRoute
+  '/api/$locale/vibe/agent/cortex/write': typeof ApiLocaleVibeAgentCortexWriteRoute
+  '/api/$locale/vibe/agent/fetch-url-content/cleanup': typeof ApiLocaleVibeAgentFetchUrlContentCleanupRoute
+  '/api/$locale/vibe/agent/models/list': typeof ApiLocaleVibeAgentModelsListRoute
+  '/api/$locale/vibe/agent/skills/$id': typeof ApiLocaleVibeAgentSkillsIdRouteWithChildren
+  '/api/$locale/vibe/agent/skills/create': typeof ApiLocaleVibeAgentSkillsCreateRoute
+  '/api/$locale/vibe/agent/skills/favorites': typeof ApiLocaleVibeAgentSkillsFavoritesRouteWithChildren
+  '/api/$locale/vibe/agent/skills/moderation': typeof ApiLocaleVibeAgentSkillsModerationRoute
+  '/api/$locale/vibe/agent/web-search/brave': typeof ApiLocaleVibeAgentWebSearchBraveRoute
+  '/api/$locale/vibe/agent/web-search/kagi': typeof ApiLocaleVibeAgentWebSearchKagiRoute
+  '/api/$locale/vibe/env/settings/export-env': typeof ApiLocaleVibeEnvSettingsExportEnvRoute
+  '/api/$locale/vibe/env/settings/generate-key': typeof ApiLocaleVibeEnvSettingsGenerateKeyRoute
+  '/api/$locale/vibe/execute-tool/call-control/cancel': typeof ApiLocaleVibeExecuteToolCallControlCancelRoute
+  '/api/$locale/vibe/execute-tool/call-control/detach': typeof ApiLocaleVibeExecuteToolCallControlDetachRoute
+  '/api/$locale/vibe/execute-tool/call-control/resume-when-done': typeof ApiLocaleVibeExecuteToolCallControlResumeWhenDoneRoute
+  '/api/$locale/vibe/logger/error-monitor/cleanup': typeof ApiLocaleVibeLoggerErrorMonitorCleanupRoute
+  '/api/$locale/vibe/logger/error-monitor/client-log': typeof ApiLocaleVibeLoggerErrorMonitorClientLogRoute
+  '/api/$locale/vibe/logger/error-monitor/logs': typeof ApiLocaleVibeLoggerErrorMonitorLogsRoute
+  '/api/$locale/vibe/platforms/vibe-frame/mount': typeof ApiLocaleVibePlatformsVibeFrameMountRoute
+  '/api/$locale/vibe/remote-connection/connect-reverse/update': typeof ApiLocaleVibeRemoteConnectionConnectReverseUpdateRoute
+  '/api/$locale/vibe/remote-connection/self/instanceId': typeof ApiLocaleVibeRemoteConnectionSelfInstanceIdRoute
+  '/api/$locale/vibe/remote-connection/self/rename': typeof ApiLocaleVibeRemoteConnectionSelfRenameRoute
+  '/api/$locale/vibe/remote-connection/sync/providers': typeof ApiLocaleVibeRemoteConnectionSyncProvidersRoute
+  '/api/$locale/vibe/server/server/health': typeof ApiLocaleVibeServerServerHealthRoute
+  '/api/$locale/vibe/tasks/cron/$id': typeof ApiLocaleVibeTasksCronIdRoute
+  '/api/$locale/vibe/tasks/cron/bulk': typeof ApiLocaleVibeTasksCronBulkRoute
+  '/api/$locale/vibe/tasks/cron/history': typeof ApiLocaleVibeTasksCronHistoryRoute
+  '/api/$locale/vibe/tasks/cron/queue': typeof ApiLocaleVibeTasksCronQueueRoute
+  '/api/$locale/vibe/tasks/cron/stats': typeof ApiLocaleVibeTasksCronStatsRoute
+  '/api/$locale/vibe/tasks/cron/tasks': typeof ApiLocaleVibeTasksCronTasksRoute
+  '/api/$locale/vibe/tasks/data-sources/cron-executions-failed': typeof ApiLocaleVibeTasksDataSourcesCronExecutionsFailedRoute
+  '/api/$locale/vibe/tasks/data-sources/cron-executions-succeeded': typeof ApiLocaleVibeTasksDataSourcesCronExecutionsSucceededRoute
+  '/api/$locale/vibe/tasks/data-sources/cron-executions-total': typeof ApiLocaleVibeTasksDataSourcesCronExecutionsTotalRoute
+  '/api/$locale/vibe/tasks/pulse/execute': typeof ApiLocaleVibeTasksPulseExecuteRoute
+  '/api/$locale/vibe/tasks/pulse/history': typeof ApiLocaleVibeTasksPulseHistoryRoute
+  '/api/$locale/vibe/tasks/pulse/status': typeof ApiLocaleVibeTasksPulseStatusRoute
   '/$locale/story/newsletter/unsubscribe/$email/': typeof LocaleStoryNewsletterUnsubscribeEmailIndexRoute
   '/$locale/user/reset-password/$token/': typeof LocaleUserAuthResetPasswordTokenIndexRoute
-  '/api/$locale/agent/chat/folders/$rootFolderId/create': typeof ApiLocaleAgentChatFoldersRootFolderIdCreateRoute
-  '/api/$locale/agent/chat/folders/$rootFolderId/root-permissions': typeof ApiLocaleAgentChatFoldersRootFolderIdRootPermissionsRoute
-  '/api/$locale/agent/chat/folders/subfolders/$subFolderId': typeof ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRouteWithChildren
-  '/api/$locale/agent/chat/threads/$threadId/messages': typeof ApiLocaleAgentChatThreadsThreadIdMessagesRouteWithChildren
-  '/api/$locale/agent/chat/threads/$threadId/permissions': typeof ApiLocaleAgentChatThreadsThreadIdPermissionsRoute
-  '/api/$locale/agent/chat/threads/$threadId/share-links': typeof ApiLocaleAgentChatThreadsThreadIdShareLinksRoute
   '/api/$locale/companies/$companyId/members/$memberId/remove': typeof ApiLocaleCompaniesCompanyIdMembersMemberIdRemoveRoute
   '/api/$locale/companies/$companyId/members/$memberId/update-role': typeof ApiLocaleCompaniesCompanyIdMembersMemberIdUpdateRoleRoute
   '/api/$locale/lead-magnet/providers/google-sheets/oauth/callback': typeof ApiLocaleLeadMagnetProvidersGoogleSheetsOauthCallbackRoute
@@ -4670,37 +4538,67 @@ export interface FileRoutesByFullPath {
   '/api/$locale/ssh/connections/$id/mounts/$mountId': typeof ApiLocaleSshConnectionsIdMountsMountIdRoute
   '/api/$locale/ssh/connections/$id/mounts/create': typeof ApiLocaleSshConnectionsIdMountsCreateRoute
   '/api/$locale/ssh/connections/$id/mounts/list': typeof ApiLocaleSshConnectionsIdMountsListRoute
-  '/api/$locale/system/dataflow/graphs/$id/archive': typeof ApiLocaleSystemDataflowGraphsIdArchiveRoute
-  '/api/$locale/system/dataflow/graphs/$id/backtest': typeof ApiLocaleSystemDataflowGraphsIdBacktestRoute
-  '/api/$locale/system/dataflow/graphs/$id/data': typeof ApiLocaleSystemDataflowGraphsIdDataRoute
-  '/api/$locale/system/dataflow/graphs/$id/delete': typeof ApiLocaleSystemDataflowGraphsIdDeleteRoute
-  '/api/$locale/system/dataflow/graphs/$id/edit': typeof ApiLocaleSystemDataflowGraphsIdEditRoute
-  '/api/$locale/system/dataflow/graphs/$id/promote': typeof ApiLocaleSystemDataflowGraphsIdPromoteRoute
-  '/api/$locale/system/dataflow/graphs/$id/trigger': typeof ApiLocaleSystemDataflowGraphsIdTriggerRoute
-  '/api/$locale/system/dataflow/graphs/$id/versions': typeof ApiLocaleSystemDataflowGraphsIdVersionsRoute
-  '/api/$locale/system/logger/error-monitor/data-sources/error-logs-errors': typeof ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsErrorsRoute
-  '/api/$locale/system/logger/error-monitor/data-sources/error-logs-total': typeof ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsTotalRoute
-  '/api/$locale/system/logger/error-monitor/data-sources/error-logs-warnings': typeof ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute
-  '/api/$locale/system/platforms/ai/skills/$characterSkill': typeof ApiLocaleSystemPlatformsAiSkillsCharacterSkillRoute
-  '/api/$locale/system/platforms/cli/interactive/capture': typeof ApiLocaleSystemPlatformsCliInteractiveCaptureRoute
-  '/api/$locale/system/platforms/cli/interactive/send-keys': typeof ApiLocaleSystemPlatformsCliInteractiveSendKeysRoute
-  '/api/$locale/system/platforms/cli/setup/status': typeof ApiLocaleSystemPlatformsCliSetupStatusRoute
-  '/api/$locale/system/platforms/cli/setup/uninstall': typeof ApiLocaleSystemPlatformsCliSetupUninstallRoute
   '/api/$locale/user/private/me/addresses/$addressId': typeof ApiLocaleUserPrivateMeAddressesAddressIdRoute
-  '/api/$locale/agent/chat/folders/subfolders/$subFolderId/move': typeof ApiLocaleAgentChatFoldersSubfoldersSubFolderIdMoveRoute
-  '/api/$locale/agent/chat/folders/subfolders/$subFolderId/permissions': typeof ApiLocaleAgentChatFoldersSubfoldersSubFolderIdPermissionsRoute
-  '/api/$locale/agent/chat/folders/subfolders/$subFolderId/rename': typeof ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRenameRoute
-  '/api/$locale/agent/chat/folders/subfolders/$subFolderId/update': typeof ApiLocaleAgentChatFoldersSubfoldersSubFolderIdUpdateRoute
-  '/api/$locale/agent/chat/threads/$threadId/messages/$messageId': typeof ApiLocaleAgentChatThreadsThreadIdMessagesMessageIdRouteWithChildren
-  '/api/$locale/agent/chat/threads/$threadId/messages/path': typeof ApiLocaleAgentChatThreadsThreadIdMessagesPathRoute
-  '/api/$locale/agent/chat/threads/$threadId/messages/search': typeof ApiLocaleAgentChatThreadsThreadIdMessagesSearchRoute
-  '/api/$locale/agent/chat/threads/files/$threadId/$filename': typeof ApiLocaleAgentChatThreadsFilesThreadIdFilenameRoute
-  '/api/$locale/system/platforms/ai/skills/AGENT/md': typeof ApiLocaleSystemPlatformsAiSkillsAGENTMdRoute
-  '/api/$locale/system/platforms/ai/skills/PUBLIC_USER_AI_RUN/md': typeof ApiLocaleSystemPlatformsAiSkillsPUBLIC_USER_AI_RUNMdRoute
-  '/api/$locale/system/platforms/ai/skills/PUBLIC_USER_SKILL/md': typeof ApiLocaleSystemPlatformsAiSkillsPUBLIC_USER_SKILLMdRoute
-  '/api/$locale/system/platforms/ai/skills/USER_WITH_ACCOUNT_AI_RUN/md': typeof ApiLocaleSystemPlatformsAiSkillsUSER_WITH_ACCOUNT_AI_RUNMdRoute
-  '/api/$locale/system/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL/md': typeof ApiLocaleSystemPlatformsAiSkillsUSER_WITH_ACCOUNT_SKILLMdRoute
-  '/api/$locale/agent/chat/threads/$threadId/messages/$messageId/vote': typeof ApiLocaleAgentChatThreadsThreadIdMessagesMessageIdVoteRoute
+  '/api/$locale/vibe/agent/ai-stream/system-prompt/debug': typeof ApiLocaleVibeAgentAiStreamSystemPromptDebugRoute
+  '/api/$locale/vibe/agent/ai-stream/ws-provider/models': typeof ApiLocaleVibeAgentAiStreamWsProviderModelsRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-downvotes-total': typeof ApiLocaleVibeAgentChatDataSourcesChatDownvotesTotalRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-errors-total': typeof ApiLocaleVibeAgentChatDataSourcesChatErrorsTotalRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-memories-created': typeof ApiLocaleVibeAgentChatDataSourcesChatMemoriesCreatedRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-messages-by-ai': typeof ApiLocaleVibeAgentChatDataSourcesChatMessagesByAiRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-messages-by-user': typeof ApiLocaleVibeAgentChatDataSourcesChatMessagesByUserRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-messages-total': typeof ApiLocaleVibeAgentChatDataSourcesChatMessagesTotalRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-messages-with-attachments': typeof ApiLocaleVibeAgentChatDataSourcesChatMessagesWithAttachmentsRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-share-links-created': typeof ApiLocaleVibeAgentChatDataSourcesChatShareLinksCreatedRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-threads-active-total': typeof ApiLocaleVibeAgentChatDataSourcesChatThreadsActiveTotalRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-threads-created': typeof ApiLocaleVibeAgentChatDataSourcesChatThreadsCreatedRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-tool-calls-total': typeof ApiLocaleVibeAgentChatDataSourcesChatToolCallsTotalRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-unique-users': typeof ApiLocaleVibeAgentChatDataSourcesChatUniqueUsersRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-upvotes-total': typeof ApiLocaleVibeAgentChatDataSourcesChatUpvotesTotalRoute
+  '/api/$locale/vibe/agent/chat/folder-contents/$rootFolderId': typeof ApiLocaleVibeAgentChatFolderContentsRootFolderIdRoute
+  '/api/$locale/vibe/agent/chat/folders/$rootFolderId': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRouteWithChildren
+  '/api/$locale/vibe/agent/chat/threads/$threadId': typeof ApiLocaleVibeAgentChatThreadsThreadIdRouteWithChildren
+  '/api/$locale/vibe/agent/chat/threads/rename': typeof ApiLocaleVibeAgentChatThreadsRenameRoute
+  '/api/$locale/vibe/agent/chat/threads/search-messages': typeof ApiLocaleVibeAgentChatThreadsSearchMessagesRoute
+  '/api/$locale/vibe/agent/chat/threads/search-threads': typeof ApiLocaleVibeAgentChatThreadsSearchThreadsRoute
+  '/api/$locale/vibe/agent/cortex/embeddings/backfill': typeof ApiLocaleVibeAgentCortexEmbeddingsBackfillRoute
+  '/api/$locale/vibe/agent/skills/$id/publish': typeof ApiLocaleVibeAgentSkillsIdPublishRoute
+  '/api/$locale/vibe/agent/skills/$id/report': typeof ApiLocaleVibeAgentSkillsIdReportRoute
+  '/api/$locale/vibe/agent/skills/$id/vote': typeof ApiLocaleVibeAgentSkillsIdVoteRoute
+  '/api/$locale/vibe/agent/skills/favorites/$id': typeof ApiLocaleVibeAgentSkillsFavoritesIdRoute
+  '/api/$locale/vibe/agent/skills/favorites/create': typeof ApiLocaleVibeAgentSkillsFavoritesCreateRoute
+  '/api/$locale/vibe/agent/skills/favorites/reorder': typeof ApiLocaleVibeAgentSkillsFavoritesReorderRoute
+  '/api/$locale/vibe/dataflow/graphs/$id/archive': typeof ApiLocaleVibeDataflowGraphsIdArchiveRoute
+  '/api/$locale/vibe/dataflow/graphs/$id/backtest': typeof ApiLocaleVibeDataflowGraphsIdBacktestRoute
+  '/api/$locale/vibe/dataflow/graphs/$id/data': typeof ApiLocaleVibeDataflowGraphsIdDataRoute
+  '/api/$locale/vibe/dataflow/graphs/$id/delete': typeof ApiLocaleVibeDataflowGraphsIdDeleteRoute
+  '/api/$locale/vibe/dataflow/graphs/$id/edit': typeof ApiLocaleVibeDataflowGraphsIdEditRoute
+  '/api/$locale/vibe/dataflow/graphs/$id/promote': typeof ApiLocaleVibeDataflowGraphsIdPromoteRoute
+  '/api/$locale/vibe/dataflow/graphs/$id/trigger': typeof ApiLocaleVibeDataflowGraphsIdTriggerRoute
+  '/api/$locale/vibe/dataflow/graphs/$id/versions': typeof ApiLocaleVibeDataflowGraphsIdVersionsRoute
+  '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-errors': typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsErrorsRoute
+  '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-total': typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsTotalRoute
+  '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings': typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute
+  '/api/$locale/vibe/platforms/ai/skills/$characterSkill': typeof ApiLocaleVibePlatformsAiSkillsCharacterSkillRoute
+  '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdCreateRoute
+  '/api/$locale/vibe/agent/chat/folders/$rootFolderId/root-permissions': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRootPermissionsRoute
+  '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteWithChildren
+  '/api/$locale/vibe/agent/chat/threads/$threadId/messages': typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesRouteWithChildren
+  '/api/$locale/vibe/agent/chat/threads/$threadId/permissions': typeof ApiLocaleVibeAgentChatThreadsThreadIdPermissionsRoute
+  '/api/$locale/vibe/agent/chat/threads/$threadId/share-links': typeof ApiLocaleVibeAgentChatThreadsThreadIdShareLinksRoute
+  '/api/$locale/vibe/platforms/ai/skills/AGENT/md': typeof ApiLocaleVibePlatformsAiSkillsAGENTMdRoute
+  '/api/$locale/vibe/platforms/ai/skills/PUBLIC_USER_AI_RUN/md': typeof ApiLocaleVibePlatformsAiSkillsPUBLIC_USER_AI_RUNMdRoute
+  '/api/$locale/vibe/platforms/ai/skills/PUBLIC_USER_SKILL/md': typeof ApiLocaleVibePlatformsAiSkillsPUBLIC_USER_SKILLMdRoute
+  '/api/$locale/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_AI_RUN/md': typeof ApiLocaleVibePlatformsAiSkillsUSER_WITH_ACCOUNT_AI_RUNMdRoute
+  '/api/$locale/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL/md': typeof ApiLocaleVibePlatformsAiSkillsUSER_WITH_ACCOUNT_SKILLMdRoute
+  '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/move': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdMoveRoute
+  '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/permissions': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdPermissionsRoute
+  '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/rename': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRenameRoute
+  '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/update': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdUpdateRoute
+  '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId': typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdRouteWithChildren
+  '/api/$locale/vibe/agent/chat/threads/$threadId/messages/path': typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesPathRoute
+  '/api/$locale/vibe/agent/chat/threads/$threadId/messages/search': typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesSearchRoute
+  '/api/$locale/vibe/agent/chat/threads/files/$threadId/$filename': typeof ApiLocaleVibeAgentChatThreadsFilesThreadIdFilenameRoute
+  '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId/vote': typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdVoteRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -4710,7 +4608,7 @@ export interface FileRoutesByTo {
   '/$locale/threads/$': typeof LocaleThreadsSplatRoute
   '/$locale/tools/$': typeof LocaleToolsSplatRoute
   '/$locale/user': typeof LocaleUserAuthRouteWithChildren
-  '/api/$locale/$slug': typeof ApiLocaleSlugRoute
+  '/api/$locale/$notFound': typeof ApiLocaleNotFoundRoute
   '/api/$locale/contact': typeof ApiLocaleContactRoute
   '/api/$locale/credits': typeof ApiLocaleCreditsRouteWithChildren
   '/api/$locale/manifest': typeof ApiLocaleManifestRoute
@@ -4726,18 +4624,6 @@ export interface FileRoutesByTo {
   '/$locale/threads': typeof LocaleThreadsIndexRoute
   '/$locale/tools': typeof LocaleToolsIndexRoute
   '/$locale/track': typeof LocaleTrackIndexRoute
-  '/api/$locale/agent/coding-agent': typeof ApiLocaleAgentCodingAgentRoute
-  '/api/$locale/agent/describe-image': typeof ApiLocaleAgentDescribeImageRoute
-  '/api/$locale/agent/describe-video': typeof ApiLocaleAgentDescribeVideoRoute
-  '/api/$locale/agent/fetch-url-content': typeof ApiLocaleAgentFetchUrlContentRouteWithChildren
-  '/api/$locale/agent/image-generation': typeof ApiLocaleAgentImageGenerationRoute
-  '/api/$locale/agent/music-generation': typeof ApiLocaleAgentMusicGenerationRoute
-  '/api/$locale/agent/skills': typeof ApiLocaleAgentSkillsRouteWithChildren
-  '/api/$locale/agent/speech-to-text': typeof ApiLocaleAgentSpeechToTextRouteWithChildren
-  '/api/$locale/agent/text-to-speech': typeof ApiLocaleAgentTextToSpeechRoute
-  '/api/$locale/agent/video-generation': typeof ApiLocaleAgentVideoGenerationRoute
-  '/api/$locale/agent/view-image': typeof ApiLocaleAgentViewImageRoute
-  '/api/$locale/agent/web-search': typeof ApiLocaleAgentWebSearchRouteWithChildren
   '/api/$locale/browser/click': typeof ApiLocaleBrowserClickRoute
   '/api/$locale/browser/close-page': typeof ApiLocaleBrowserClosePageRoute
   '/api/$locale/browser/drag': typeof ApiLocaleBrowserDragRoute
@@ -4815,23 +4701,18 @@ export interface FileRoutesByTo {
   '/api/$locale/purchasing/dashboard': typeof ApiLocalePurchasingDashboardRoute
   '/api/$locale/referral/payout': typeof ApiLocaleReferralPayoutRoute
   '/api/$locale/referral/stats': typeof ApiLocaleReferralStatsRoute
-  '/api/$locale/remote-connection/$instanceId': typeof ApiLocaleRemoteConnectionInstanceIdRoute
-  '/api/$locale/remote-connection/connect': typeof ApiLocaleRemoteConnectionConnectRoute
-  '/api/$locale/remote-connection/connect-reverse': typeof ApiLocaleRemoteConnectionConnectReverseRouteWithChildren
-  '/api/$locale/remote-connection/list': typeof ApiLocaleRemoteConnectionListRoute
-  '/api/$locale/remote-connection/sync': typeof ApiLocaleRemoteConnectionSyncRouteWithChildren
   '/api/$locale/subscription/cancel': typeof ApiLocaleSubscriptionCancelRoute
   '/api/$locale/subscription/create': typeof ApiLocaleSubscriptionCreateRoute
   '/api/$locale/subscription/dashboard': typeof ApiLocaleSubscriptionDashboardRoute
   '/api/$locale/subscription/update': typeof ApiLocaleSubscriptionUpdateRoute
-  '/api/$locale/system/execute-tool': typeof ApiLocaleSystemExecuteToolRouteWithChildren
-  '/api/$locale/system/help-tool': typeof ApiLocaleSystemHelpToolRoute
   '/api/$locale/tax/report': typeof ApiLocaleTaxReportRoute
   '/api/$locale/user/session-cleanup': typeof ApiLocaleUserSessionCleanupRoute
   '/api/$locale/users/create': typeof ApiLocaleUsersCreateRoute
   '/api/$locale/users/list': typeof ApiLocaleUsersListRoute
   '/api/$locale/users/stats': typeof ApiLocaleUsersStatsRoute
   '/api/$locale/users/view': typeof ApiLocaleUsersViewRoute
+  '/api/$locale/vibe/execute-tool': typeof ApiLocaleVibeExecuteToolRouteWithChildren
+  '/api/$locale/vibe/help-tool': typeof ApiLocaleVibeHelpToolRoute
   '/$locale/creator/$userId': typeof LocaleCreatorUserIdIndexRoute
   '/$locale/shared/$token': typeof LocaleSharedTokenIndexRoute
   '/$locale/skill/$skillId': typeof LocaleSkillSkillIdIndexRoute
@@ -4850,33 +4731,6 @@ export interface FileRoutesByTo {
   '/$locale/subscription/history': typeof LocaleSubscriptionHistoryIndexRoute
   '/$locale/subscription/overview': typeof LocaleSubscriptionOverviewIndexRoute
   '/$locale/subscription/remote': typeof LocaleSubscriptionRemoteIndexRoute
-  '/api/$locale/agent/ai-stream/cancel': typeof ApiLocaleAgentAiStreamCancelRoute
-  '/api/$locale/agent/ai-stream/run': typeof ApiLocaleAgentAiStreamRunRoute
-  '/api/$locale/agent/ai-stream/stream': typeof ApiLocaleAgentAiStreamStreamRoute
-  '/api/$locale/agent/chat/public-feed': typeof ApiLocaleAgentChatPublicFeedRoute
-  '/api/$locale/agent/chat/settings': typeof ApiLocaleAgentChatSettingsRoute
-  '/api/$locale/agent/chat/threads': typeof ApiLocaleAgentChatThreadsRouteWithChildren
-  '/api/$locale/agent/cortex/delete': typeof ApiLocaleAgentCortexDeleteRoute
-  '/api/$locale/agent/cortex/edit': typeof ApiLocaleAgentCortexEditRoute
-  '/api/$locale/agent/cortex/exec': typeof ApiLocaleAgentCortexExecRoute
-  '/api/$locale/agent/cortex/list': typeof ApiLocaleAgentCortexListRoute
-  '/api/$locale/agent/cortex/mkdir': typeof ApiLocaleAgentCortexMkdirRoute
-  '/api/$locale/agent/cortex/move': typeof ApiLocaleAgentCortexMoveRoute
-  '/api/$locale/agent/cortex/read': typeof ApiLocaleAgentCortexReadRoute
-  '/api/$locale/agent/cortex/search': typeof ApiLocaleAgentCortexSearchRoute
-  '/api/$locale/agent/cortex/terminals': typeof ApiLocaleAgentCortexTerminalsRoute
-  '/api/$locale/agent/cortex/tree': typeof ApiLocaleAgentCortexTreeRoute
-  '/api/$locale/agent/cortex/write': typeof ApiLocaleAgentCortexWriteRoute
-  '/api/$locale/agent/fetch-url-content/cleanup': typeof ApiLocaleAgentFetchUrlContentCleanupRoute
-  '/api/$locale/agent/models/list': typeof ApiLocaleAgentModelsListRoute
-  '/api/$locale/agent/models/model-prices': typeof ApiLocaleAgentModelsModelPricesRoute
-  '/api/$locale/agent/skills/$id': typeof ApiLocaleAgentSkillsIdRouteWithChildren
-  '/api/$locale/agent/skills/create': typeof ApiLocaleAgentSkillsCreateRoute
-  '/api/$locale/agent/skills/favorites': typeof ApiLocaleAgentSkillsFavoritesRouteWithChildren
-  '/api/$locale/agent/skills/moderation': typeof ApiLocaleAgentSkillsModerationRoute
-  '/api/$locale/agent/speech-to-text/hotkey': typeof ApiLocaleAgentSpeechToTextHotkeyRoute
-  '/api/$locale/agent/web-search/brave': typeof ApiLocaleAgentWebSearchBraveRoute
-  '/api/$locale/agent/web-search/kagi': typeof ApiLocaleAgentWebSearchKagiRoute
   '/api/$locale/analytics/evaluators/and': typeof ApiLocaleAnalyticsEvaluatorsAndRoute
   '/api/$locale/analytics/evaluators/crossover': typeof ApiLocaleAnalyticsEvaluatorsCrossoverRoute
   '/api/$locale/analytics/evaluators/not': typeof ApiLocaleAnalyticsEvaluatorsNotRoute
@@ -5044,10 +4898,6 @@ export interface FileRoutesByTo {
   '/api/$locale/referral/data-sources/referrals-signups': typeof ApiLocaleReferralDataSourcesReferralsSignupsRoute
   '/api/$locale/referral/earnings/list': typeof ApiLocaleReferralEarningsListRoute
   '/api/$locale/referral/lead/current': typeof ApiLocaleReferralLeadCurrentRoute
-  '/api/$locale/remote-connection/connect-reverse/update': typeof ApiLocaleRemoteConnectionConnectReverseUpdateRoute
-  '/api/$locale/remote-connection/self/instanceId': typeof ApiLocaleRemoteConnectionSelfInstanceIdRoute
-  '/api/$locale/remote-connection/self/rename': typeof ApiLocaleRemoteConnectionSelfRenameRoute
-  '/api/$locale/remote-connection/sync/providers': typeof ApiLocaleRemoteConnectionSyncProvidersRoute
   '/api/$locale/ssh/connections/$id': typeof ApiLocaleSshConnectionsIdRouteWithChildren
   '/api/$locale/ssh/connections/create': typeof ApiLocaleSshConnectionsCreateRoute
   '/api/$locale/ssh/connections/list': typeof ApiLocaleSshConnectionsListRoute
@@ -5061,20 +4911,6 @@ export interface FileRoutesByTo {
   '/api/$locale/subscription/data-sources/subscriptions-new': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsNewRoute
   '/api/$locale/subscription/data-sources/subscriptions-payment-failed': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsPaymentFailedRoute
   '/api/$locale/subscription/data-sources/subscriptions-trialing': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsTrialingRoute
-  '/api/$locale/system/database/health': typeof ApiLocaleSystemDatabaseHealthRoute
-  '/api/$locale/system/database/sql': typeof ApiLocaleSystemDatabaseSqlRoute
-  '/api/$locale/system/dataflow/cleanup': typeof ApiLocaleSystemDataflowCleanupRoute
-  '/api/$locale/system/dataflow/graphs': typeof ApiLocaleSystemDataflowGraphsRouteWithChildren
-  '/api/$locale/system/dataflow/run-config': typeof ApiLocaleSystemDataflowRunConfigRoute
-  '/api/$locale/system/env/settings': typeof ApiLocaleSystemEnvSettingsRouteWithChildren
-  '/api/$locale/system/execute-tool/await-task': typeof ApiLocaleSystemExecuteToolAwaitTaskRoute
-  '/api/$locale/system/execute-tool/complete': typeof ApiLocaleSystemExecuteToolCompleteRoute
-  '/api/$locale/system/execute-tool/revival': typeof ApiLocaleSystemExecuteToolRevivalRoute
-  '/api/$locale/system/realtime/remote-event-bridge': typeof ApiLocaleSystemRealtimeRemoteEventBridgeRoute
-  '/api/$locale/system/tasks/execute': typeof ApiLocaleSystemTasksExecuteRoute
-  '/api/$locale/system/tasks/unified-runner': typeof ApiLocaleSystemTasksUnifiedRunnerRoute
-  '/api/$locale/system/tooling/vibe-deps': typeof ApiLocaleSystemToolingVibeDepsRoute
-  '/api/$locale/system/tooling/vibe-stage': typeof ApiLocaleSystemToolingVibeStageRoute
   '/api/$locale/tax/rate/create': typeof ApiLocaleTaxRateCreateRoute
   '/api/$locale/tax/rate/list': typeof ApiLocaleTaxRateListRoute
   '/api/$locale/user/data-sources/users-active-total': typeof ApiLocaleUserDataSourcesUsersActiveTotalRoute
@@ -5092,6 +4928,33 @@ export interface FileRoutesByTo {
   '/api/$locale/user/public/login': typeof ApiLocaleUserPublicLoginRouteWithChildren
   '/api/$locale/user/public/signup': typeof ApiLocaleUserPublicSignupRoute
   '/api/$locale/users/user/$id': typeof ApiLocaleUsersUserIdRouteWithChildren
+  '/api/$locale/vibe/agent/coding-agent': typeof ApiLocaleVibeAgentCodingAgentRoute
+  '/api/$locale/vibe/agent/describe-image': typeof ApiLocaleVibeAgentDescribeImageRoute
+  '/api/$locale/vibe/agent/describe-video': typeof ApiLocaleVibeAgentDescribeVideoRoute
+  '/api/$locale/vibe/agent/fetch-url-content': typeof ApiLocaleVibeAgentFetchUrlContentRouteWithChildren
+  '/api/$locale/vibe/agent/image-generation': typeof ApiLocaleVibeAgentImageGenerationRoute
+  '/api/$locale/vibe/agent/music-generation': typeof ApiLocaleVibeAgentMusicGenerationRoute
+  '/api/$locale/vibe/agent/skills': typeof ApiLocaleVibeAgentSkillsRouteWithChildren
+  '/api/$locale/vibe/agent/speech-to-text': typeof ApiLocaleVibeAgentSpeechToTextRoute
+  '/api/$locale/vibe/agent/text-to-speech': typeof ApiLocaleVibeAgentTextToSpeechRoute
+  '/api/$locale/vibe/agent/video-generation': typeof ApiLocaleVibeAgentVideoGenerationRoute
+  '/api/$locale/vibe/agent/view-image': typeof ApiLocaleVibeAgentViewImageRoute
+  '/api/$locale/vibe/agent/web-search': typeof ApiLocaleVibeAgentWebSearchRouteWithChildren
+  '/api/$locale/vibe/database/health': typeof ApiLocaleVibeDatabaseHealthRoute
+  '/api/$locale/vibe/dataflow/cleanup': typeof ApiLocaleVibeDataflowCleanupRoute
+  '/api/$locale/vibe/dataflow/graphs': typeof ApiLocaleVibeDataflowGraphsRouteWithChildren
+  '/api/$locale/vibe/dataflow/run-config': typeof ApiLocaleVibeDataflowRunConfigRoute
+  '/api/$locale/vibe/env/settings': typeof ApiLocaleVibeEnvSettingsRouteWithChildren
+  '/api/$locale/vibe/execute-tool/await-task': typeof ApiLocaleVibeExecuteToolAwaitTaskRoute
+  '/api/$locale/vibe/execute-tool/complete': typeof ApiLocaleVibeExecuteToolCompleteRoute
+  '/api/$locale/vibe/execute-tool/revival': typeof ApiLocaleVibeExecuteToolRevivalRoute
+  '/api/$locale/vibe/realtime/remote-event-bridge': typeof ApiLocaleVibeRealtimeRemoteEventBridgeRoute
+  '/api/$locale/vibe/remote-connection/$instanceId': typeof ApiLocaleVibeRemoteConnectionInstanceIdRoute
+  '/api/$locale/vibe/remote-connection/connect': typeof ApiLocaleVibeRemoteConnectionConnectRoute
+  '/api/$locale/vibe/remote-connection/connect-reverse': typeof ApiLocaleVibeRemoteConnectionConnectReverseRouteWithChildren
+  '/api/$locale/vibe/remote-connection/list': typeof ApiLocaleVibeRemoteConnectionListRoute
+  '/api/$locale/vibe/remote-connection/sync': typeof ApiLocaleVibeRemoteConnectionSyncRouteWithChildren
+  '/api/$locale/vibe/tasks/execute': typeof ApiLocaleVibeTasksExecuteRoute
   '/$locale/story/blog/dead-trading-bot-to-monitoring-engine': typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
   '/$locale/story/blog/one-codebase-13-platforms': typeof LocaleStoryBlogOneCodebase13PlatformsIndexRoute
   '/$locale/story/blog/one-endpoint-every-surface': typeof LocaleStoryBlogOneEndpointEverySurfaceIndexRoute
@@ -5109,34 +4972,6 @@ export interface FileRoutesByTo {
   '/$locale/user/login': typeof LocaleUserAuthLoginIndexRoute
   '/$locale/user/reset-password': typeof LocaleUserAuthResetPasswordIndexRoute
   '/$locale/user/signup': typeof LocaleUserAuthSignupIndexRoute
-  '/api/$locale/agent/ai-stream/system-prompt/debug': typeof ApiLocaleAgentAiStreamSystemPromptDebugRoute
-  '/api/$locale/agent/ai-stream/ws-provider/models': typeof ApiLocaleAgentAiStreamWsProviderModelsRoute
-  '/api/$locale/agent/chat/data-sources/chat-downvotes-total': typeof ApiLocaleAgentChatDataSourcesChatDownvotesTotalRoute
-  '/api/$locale/agent/chat/data-sources/chat-errors-total': typeof ApiLocaleAgentChatDataSourcesChatErrorsTotalRoute
-  '/api/$locale/agent/chat/data-sources/chat-memories-created': typeof ApiLocaleAgentChatDataSourcesChatMemoriesCreatedRoute
-  '/api/$locale/agent/chat/data-sources/chat-messages-by-ai': typeof ApiLocaleAgentChatDataSourcesChatMessagesByAiRoute
-  '/api/$locale/agent/chat/data-sources/chat-messages-by-user': typeof ApiLocaleAgentChatDataSourcesChatMessagesByUserRoute
-  '/api/$locale/agent/chat/data-sources/chat-messages-total': typeof ApiLocaleAgentChatDataSourcesChatMessagesTotalRoute
-  '/api/$locale/agent/chat/data-sources/chat-messages-with-attachments': typeof ApiLocaleAgentChatDataSourcesChatMessagesWithAttachmentsRoute
-  '/api/$locale/agent/chat/data-sources/chat-share-links-created': typeof ApiLocaleAgentChatDataSourcesChatShareLinksCreatedRoute
-  '/api/$locale/agent/chat/data-sources/chat-threads-active-total': typeof ApiLocaleAgentChatDataSourcesChatThreadsActiveTotalRoute
-  '/api/$locale/agent/chat/data-sources/chat-threads-created': typeof ApiLocaleAgentChatDataSourcesChatThreadsCreatedRoute
-  '/api/$locale/agent/chat/data-sources/chat-tool-calls-total': typeof ApiLocaleAgentChatDataSourcesChatToolCallsTotalRoute
-  '/api/$locale/agent/chat/data-sources/chat-unique-users': typeof ApiLocaleAgentChatDataSourcesChatUniqueUsersRoute
-  '/api/$locale/agent/chat/data-sources/chat-upvotes-total': typeof ApiLocaleAgentChatDataSourcesChatUpvotesTotalRoute
-  '/api/$locale/agent/chat/folder-contents/$rootFolderId': typeof ApiLocaleAgentChatFolderContentsRootFolderIdRoute
-  '/api/$locale/agent/chat/folders/$rootFolderId': typeof ApiLocaleAgentChatFoldersRootFolderIdRouteWithChildren
-  '/api/$locale/agent/chat/threads/$threadId': typeof ApiLocaleAgentChatThreadsThreadIdRouteWithChildren
-  '/api/$locale/agent/chat/threads/rename': typeof ApiLocaleAgentChatThreadsRenameRoute
-  '/api/$locale/agent/chat/threads/search-messages': typeof ApiLocaleAgentChatThreadsSearchMessagesRoute
-  '/api/$locale/agent/chat/threads/search-threads': typeof ApiLocaleAgentChatThreadsSearchThreadsRoute
-  '/api/$locale/agent/cortex/embeddings/backfill': typeof ApiLocaleAgentCortexEmbeddingsBackfillRoute
-  '/api/$locale/agent/skills/$id/publish': typeof ApiLocaleAgentSkillsIdPublishRoute
-  '/api/$locale/agent/skills/$id/report': typeof ApiLocaleAgentSkillsIdReportRoute
-  '/api/$locale/agent/skills/$id/vote': typeof ApiLocaleAgentSkillsIdVoteRoute
-  '/api/$locale/agent/skills/favorites/$id': typeof ApiLocaleAgentSkillsFavoritesIdRoute
-  '/api/$locale/agent/skills/favorites/create': typeof ApiLocaleAgentSkillsFavoritesCreateRoute
-  '/api/$locale/agent/skills/favorites/reorder': typeof ApiLocaleAgentSkillsFavoritesReorderRoute
   '/api/$locale/chart-of-accounts/account/$accountId/deactivate': typeof ApiLocaleChartOfAccountsAccountAccountIdDeactivateRoute
   '/api/$locale/chart-of-accounts/account/$accountId/get': typeof ApiLocaleChartOfAccountsAccountAccountIdGetRoute
   '/api/$locale/chart-of-accounts/account/$accountId/update': typeof ApiLocaleChartOfAccountsAccountAccountIdUpdateRoute
@@ -5175,9 +5010,7 @@ export interface FileRoutesByTo {
   '/api/$locale/payment/invoice/$invoiceId/send-reminder': typeof ApiLocalePaymentInvoiceInvoiceIdSendReminderRoute
   '/api/$locale/payment/invoice/$invoiceId/void': typeof ApiLocalePaymentInvoiceInvoiceIdVoidRoute
   '/api/$locale/payment/invoice/line/add': typeof ApiLocalePaymentInvoiceLineAddRoute
-  '/api/$locale/payment/providers/nowpayments/cli': typeof ApiLocalePaymentProvidersNowpaymentsCliRoute
   '/api/$locale/payment/providers/nowpayments/webhook': typeof ApiLocalePaymentProvidersNowpaymentsWebhookRoute
-  '/api/$locale/payment/providers/stripe/cli': typeof ApiLocalePaymentProvidersStripeCliRoute
   '/api/$locale/payment/providers/stripe/webhook': typeof ApiLocalePaymentProvidersStripeWebhookRoute
   '/api/$locale/pos/order/$orderId/add-item': typeof ApiLocalePosOrderOrderIdAddItemRoute
   '/api/$locale/pos/order/$orderId/add-payment': typeof ApiLocalePosOrderOrderIdAddPaymentRoute
@@ -5206,30 +5039,6 @@ export interface FileRoutesByTo {
   '/api/$locale/ssh/linux/users/list': typeof ApiLocaleSshLinuxUsersListRoute
   '/api/$locale/subscription/company/$companyId/get': typeof ApiLocaleSubscriptionCompanyCompanyIdGetRoute
   '/api/$locale/subscription/company/$companyId/list': typeof ApiLocaleSubscriptionCompanyCompanyIdListRoute
-  '/api/$locale/system/env/settings/export-env': typeof ApiLocaleSystemEnvSettingsExportEnvRoute
-  '/api/$locale/system/env/settings/generate-key': typeof ApiLocaleSystemEnvSettingsGenerateKeyRoute
-  '/api/$locale/system/execute-tool/call-control/cancel': typeof ApiLocaleSystemExecuteToolCallControlCancelRoute
-  '/api/$locale/system/execute-tool/call-control/detach': typeof ApiLocaleSystemExecuteToolCallControlDetachRoute
-  '/api/$locale/system/execute-tool/call-control/resume-when-done': typeof ApiLocaleSystemExecuteToolCallControlResumeWhenDoneRoute
-  '/api/$locale/system/logger/error-monitor/cleanup': typeof ApiLocaleSystemLoggerErrorMonitorCleanupRoute
-  '/api/$locale/system/logger/error-monitor/client-log': typeof ApiLocaleSystemLoggerErrorMonitorClientLogRoute
-  '/api/$locale/system/logger/error-monitor/logs': typeof ApiLocaleSystemLoggerErrorMonitorLogsRoute
-  '/api/$locale/system/platforms/vibe-frame/mount': typeof ApiLocaleSystemPlatformsVibeFrameMountRoute
-  '/api/$locale/system/server/server/health': typeof ApiLocaleSystemServerServerHealthRoute
-  '/api/$locale/system/server/server/rebuild': typeof ApiLocaleSystemServerServerRebuildRoute
-  '/api/$locale/system/tasks/cron/$id': typeof ApiLocaleSystemTasksCronIdRoute
-  '/api/$locale/system/tasks/cron/bulk': typeof ApiLocaleSystemTasksCronBulkRoute
-  '/api/$locale/system/tasks/cron/history': typeof ApiLocaleSystemTasksCronHistoryRoute
-  '/api/$locale/system/tasks/cron/queue': typeof ApiLocaleSystemTasksCronQueueRoute
-  '/api/$locale/system/tasks/cron/stats': typeof ApiLocaleSystemTasksCronStatsRoute
-  '/api/$locale/system/tasks/cron/tasks': typeof ApiLocaleSystemTasksCronTasksRoute
-  '/api/$locale/system/tasks/data-sources/cron-executions-failed': typeof ApiLocaleSystemTasksDataSourcesCronExecutionsFailedRoute
-  '/api/$locale/system/tasks/data-sources/cron-executions-succeeded': typeof ApiLocaleSystemTasksDataSourcesCronExecutionsSucceededRoute
-  '/api/$locale/system/tasks/data-sources/cron-executions-total': typeof ApiLocaleSystemTasksDataSourcesCronExecutionsTotalRoute
-  '/api/$locale/system/tasks/pulse/execute': typeof ApiLocaleSystemTasksPulseExecuteRoute
-  '/api/$locale/system/tasks/pulse/history': typeof ApiLocaleSystemTasksPulseHistoryRoute
-  '/api/$locale/system/tasks/pulse/status': typeof ApiLocaleSystemTasksPulseStatusRoute
-  '/api/$locale/system/tooling/check/vibe-check': typeof ApiLocaleSystemToolingCheckVibeCheckRoute
   '/api/$locale/tax/rate/$rateId/delete': typeof ApiLocaleTaxRateRateIdDeleteRoute
   '/api/$locale/tax/rate/$rateId/update': typeof ApiLocaleTaxRateRateIdUpdateRoute
   '/api/$locale/user/private/me/addresses': typeof ApiLocaleUserPrivateMeAddressesRouteWithChildren
@@ -5242,14 +5051,59 @@ export interface FileRoutesByTo {
   '/api/$locale/user/public/reset-password/request': typeof ApiLocaleUserPublicResetPasswordRequestRoute
   '/api/$locale/user/public/reset-password/validate': typeof ApiLocaleUserPublicResetPasswordValidateRoute
   '/api/$locale/users/user/$id/roles': typeof ApiLocaleUsersUserIdRolesRoute
+  '/api/$locale/vibe/agent/ai-stream/cancel': typeof ApiLocaleVibeAgentAiStreamCancelRoute
+  '/api/$locale/vibe/agent/ai-stream/run': typeof ApiLocaleVibeAgentAiStreamRunRoute
+  '/api/$locale/vibe/agent/ai-stream/stream': typeof ApiLocaleVibeAgentAiStreamStreamRoute
+  '/api/$locale/vibe/agent/chat/public-feed': typeof ApiLocaleVibeAgentChatPublicFeedRoute
+  '/api/$locale/vibe/agent/chat/settings': typeof ApiLocaleVibeAgentChatSettingsRoute
+  '/api/$locale/vibe/agent/chat/threads': typeof ApiLocaleVibeAgentChatThreadsRouteWithChildren
+  '/api/$locale/vibe/agent/cortex/delete': typeof ApiLocaleVibeAgentCortexDeleteRoute
+  '/api/$locale/vibe/agent/cortex/edit': typeof ApiLocaleVibeAgentCortexEditRoute
+  '/api/$locale/vibe/agent/cortex/exec': typeof ApiLocaleVibeAgentCortexExecRoute
+  '/api/$locale/vibe/agent/cortex/list': typeof ApiLocaleVibeAgentCortexListRoute
+  '/api/$locale/vibe/agent/cortex/mkdir': typeof ApiLocaleVibeAgentCortexMkdirRoute
+  '/api/$locale/vibe/agent/cortex/move': typeof ApiLocaleVibeAgentCortexMoveRoute
+  '/api/$locale/vibe/agent/cortex/read': typeof ApiLocaleVibeAgentCortexReadRoute
+  '/api/$locale/vibe/agent/cortex/search': typeof ApiLocaleVibeAgentCortexSearchRoute
+  '/api/$locale/vibe/agent/cortex/terminals': typeof ApiLocaleVibeAgentCortexTerminalsRoute
+  '/api/$locale/vibe/agent/cortex/tree': typeof ApiLocaleVibeAgentCortexTreeRoute
+  '/api/$locale/vibe/agent/cortex/write': typeof ApiLocaleVibeAgentCortexWriteRoute
+  '/api/$locale/vibe/agent/fetch-url-content/cleanup': typeof ApiLocaleVibeAgentFetchUrlContentCleanupRoute
+  '/api/$locale/vibe/agent/models/list': typeof ApiLocaleVibeAgentModelsListRoute
+  '/api/$locale/vibe/agent/skills/$id': typeof ApiLocaleVibeAgentSkillsIdRouteWithChildren
+  '/api/$locale/vibe/agent/skills/create': typeof ApiLocaleVibeAgentSkillsCreateRoute
+  '/api/$locale/vibe/agent/skills/favorites': typeof ApiLocaleVibeAgentSkillsFavoritesRouteWithChildren
+  '/api/$locale/vibe/agent/skills/moderation': typeof ApiLocaleVibeAgentSkillsModerationRoute
+  '/api/$locale/vibe/agent/web-search/brave': typeof ApiLocaleVibeAgentWebSearchBraveRoute
+  '/api/$locale/vibe/agent/web-search/kagi': typeof ApiLocaleVibeAgentWebSearchKagiRoute
+  '/api/$locale/vibe/env/settings/export-env': typeof ApiLocaleVibeEnvSettingsExportEnvRoute
+  '/api/$locale/vibe/env/settings/generate-key': typeof ApiLocaleVibeEnvSettingsGenerateKeyRoute
+  '/api/$locale/vibe/execute-tool/call-control/cancel': typeof ApiLocaleVibeExecuteToolCallControlCancelRoute
+  '/api/$locale/vibe/execute-tool/call-control/detach': typeof ApiLocaleVibeExecuteToolCallControlDetachRoute
+  '/api/$locale/vibe/execute-tool/call-control/resume-when-done': typeof ApiLocaleVibeExecuteToolCallControlResumeWhenDoneRoute
+  '/api/$locale/vibe/logger/error-monitor/cleanup': typeof ApiLocaleVibeLoggerErrorMonitorCleanupRoute
+  '/api/$locale/vibe/logger/error-monitor/client-log': typeof ApiLocaleVibeLoggerErrorMonitorClientLogRoute
+  '/api/$locale/vibe/logger/error-monitor/logs': typeof ApiLocaleVibeLoggerErrorMonitorLogsRoute
+  '/api/$locale/vibe/platforms/vibe-frame/mount': typeof ApiLocaleVibePlatformsVibeFrameMountRoute
+  '/api/$locale/vibe/remote-connection/connect-reverse/update': typeof ApiLocaleVibeRemoteConnectionConnectReverseUpdateRoute
+  '/api/$locale/vibe/remote-connection/self/instanceId': typeof ApiLocaleVibeRemoteConnectionSelfInstanceIdRoute
+  '/api/$locale/vibe/remote-connection/self/rename': typeof ApiLocaleVibeRemoteConnectionSelfRenameRoute
+  '/api/$locale/vibe/remote-connection/sync/providers': typeof ApiLocaleVibeRemoteConnectionSyncProvidersRoute
+  '/api/$locale/vibe/server/server/health': typeof ApiLocaleVibeServerServerHealthRoute
+  '/api/$locale/vibe/tasks/cron/$id': typeof ApiLocaleVibeTasksCronIdRoute
+  '/api/$locale/vibe/tasks/cron/bulk': typeof ApiLocaleVibeTasksCronBulkRoute
+  '/api/$locale/vibe/tasks/cron/history': typeof ApiLocaleVibeTasksCronHistoryRoute
+  '/api/$locale/vibe/tasks/cron/queue': typeof ApiLocaleVibeTasksCronQueueRoute
+  '/api/$locale/vibe/tasks/cron/stats': typeof ApiLocaleVibeTasksCronStatsRoute
+  '/api/$locale/vibe/tasks/cron/tasks': typeof ApiLocaleVibeTasksCronTasksRoute
+  '/api/$locale/vibe/tasks/data-sources/cron-executions-failed': typeof ApiLocaleVibeTasksDataSourcesCronExecutionsFailedRoute
+  '/api/$locale/vibe/tasks/data-sources/cron-executions-succeeded': typeof ApiLocaleVibeTasksDataSourcesCronExecutionsSucceededRoute
+  '/api/$locale/vibe/tasks/data-sources/cron-executions-total': typeof ApiLocaleVibeTasksDataSourcesCronExecutionsTotalRoute
+  '/api/$locale/vibe/tasks/pulse/execute': typeof ApiLocaleVibeTasksPulseExecuteRoute
+  '/api/$locale/vibe/tasks/pulse/history': typeof ApiLocaleVibeTasksPulseHistoryRoute
+  '/api/$locale/vibe/tasks/pulse/status': typeof ApiLocaleVibeTasksPulseStatusRoute
   '/$locale/story/newsletter/unsubscribe/$email': typeof LocaleStoryNewsletterUnsubscribeEmailIndexRoute
   '/$locale/user/reset-password/$token': typeof LocaleUserAuthResetPasswordTokenIndexRoute
-  '/api/$locale/agent/chat/folders/$rootFolderId/create': typeof ApiLocaleAgentChatFoldersRootFolderIdCreateRoute
-  '/api/$locale/agent/chat/folders/$rootFolderId/root-permissions': typeof ApiLocaleAgentChatFoldersRootFolderIdRootPermissionsRoute
-  '/api/$locale/agent/chat/folders/subfolders/$subFolderId': typeof ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRouteWithChildren
-  '/api/$locale/agent/chat/threads/$threadId/messages': typeof ApiLocaleAgentChatThreadsThreadIdMessagesRouteWithChildren
-  '/api/$locale/agent/chat/threads/$threadId/permissions': typeof ApiLocaleAgentChatThreadsThreadIdPermissionsRoute
-  '/api/$locale/agent/chat/threads/$threadId/share-links': typeof ApiLocaleAgentChatThreadsThreadIdShareLinksRoute
   '/api/$locale/companies/$companyId/members/$memberId/remove': typeof ApiLocaleCompaniesCompanyIdMembersMemberIdRemoveRoute
   '/api/$locale/companies/$companyId/members/$memberId/update-role': typeof ApiLocaleCompaniesCompanyIdMembersMemberIdUpdateRoleRoute
   '/api/$locale/lead-magnet/providers/google-sheets/oauth/callback': typeof ApiLocaleLeadMagnetProvidersGoogleSheetsOauthCallbackRoute
@@ -5262,37 +5116,67 @@ export interface FileRoutesByTo {
   '/api/$locale/ssh/connections/$id/mounts/$mountId': typeof ApiLocaleSshConnectionsIdMountsMountIdRoute
   '/api/$locale/ssh/connections/$id/mounts/create': typeof ApiLocaleSshConnectionsIdMountsCreateRoute
   '/api/$locale/ssh/connections/$id/mounts/list': typeof ApiLocaleSshConnectionsIdMountsListRoute
-  '/api/$locale/system/dataflow/graphs/$id/archive': typeof ApiLocaleSystemDataflowGraphsIdArchiveRoute
-  '/api/$locale/system/dataflow/graphs/$id/backtest': typeof ApiLocaleSystemDataflowGraphsIdBacktestRoute
-  '/api/$locale/system/dataflow/graphs/$id/data': typeof ApiLocaleSystemDataflowGraphsIdDataRoute
-  '/api/$locale/system/dataflow/graphs/$id/delete': typeof ApiLocaleSystemDataflowGraphsIdDeleteRoute
-  '/api/$locale/system/dataflow/graphs/$id/edit': typeof ApiLocaleSystemDataflowGraphsIdEditRoute
-  '/api/$locale/system/dataflow/graphs/$id/promote': typeof ApiLocaleSystemDataflowGraphsIdPromoteRoute
-  '/api/$locale/system/dataflow/graphs/$id/trigger': typeof ApiLocaleSystemDataflowGraphsIdTriggerRoute
-  '/api/$locale/system/dataflow/graphs/$id/versions': typeof ApiLocaleSystemDataflowGraphsIdVersionsRoute
-  '/api/$locale/system/logger/error-monitor/data-sources/error-logs-errors': typeof ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsErrorsRoute
-  '/api/$locale/system/logger/error-monitor/data-sources/error-logs-total': typeof ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsTotalRoute
-  '/api/$locale/system/logger/error-monitor/data-sources/error-logs-warnings': typeof ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute
-  '/api/$locale/system/platforms/ai/skills/$characterSkill': typeof ApiLocaleSystemPlatformsAiSkillsCharacterSkillRoute
-  '/api/$locale/system/platforms/cli/interactive/capture': typeof ApiLocaleSystemPlatformsCliInteractiveCaptureRoute
-  '/api/$locale/system/platforms/cli/interactive/send-keys': typeof ApiLocaleSystemPlatformsCliInteractiveSendKeysRoute
-  '/api/$locale/system/platforms/cli/setup/status': typeof ApiLocaleSystemPlatformsCliSetupStatusRoute
-  '/api/$locale/system/platforms/cli/setup/uninstall': typeof ApiLocaleSystemPlatformsCliSetupUninstallRoute
   '/api/$locale/user/private/me/addresses/$addressId': typeof ApiLocaleUserPrivateMeAddressesAddressIdRoute
-  '/api/$locale/agent/chat/folders/subfolders/$subFolderId/move': typeof ApiLocaleAgentChatFoldersSubfoldersSubFolderIdMoveRoute
-  '/api/$locale/agent/chat/folders/subfolders/$subFolderId/permissions': typeof ApiLocaleAgentChatFoldersSubfoldersSubFolderIdPermissionsRoute
-  '/api/$locale/agent/chat/folders/subfolders/$subFolderId/rename': typeof ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRenameRoute
-  '/api/$locale/agent/chat/folders/subfolders/$subFolderId/update': typeof ApiLocaleAgentChatFoldersSubfoldersSubFolderIdUpdateRoute
-  '/api/$locale/agent/chat/threads/$threadId/messages/$messageId': typeof ApiLocaleAgentChatThreadsThreadIdMessagesMessageIdRouteWithChildren
-  '/api/$locale/agent/chat/threads/$threadId/messages/path': typeof ApiLocaleAgentChatThreadsThreadIdMessagesPathRoute
-  '/api/$locale/agent/chat/threads/$threadId/messages/search': typeof ApiLocaleAgentChatThreadsThreadIdMessagesSearchRoute
-  '/api/$locale/agent/chat/threads/files/$threadId/$filename': typeof ApiLocaleAgentChatThreadsFilesThreadIdFilenameRoute
-  '/api/$locale/system/platforms/ai/skills/AGENT/md': typeof ApiLocaleSystemPlatformsAiSkillsAGENTMdRoute
-  '/api/$locale/system/platforms/ai/skills/PUBLIC_USER_AI_RUN/md': typeof ApiLocaleSystemPlatformsAiSkillsPUBLIC_USER_AI_RUNMdRoute
-  '/api/$locale/system/platforms/ai/skills/PUBLIC_USER_SKILL/md': typeof ApiLocaleSystemPlatformsAiSkillsPUBLIC_USER_SKILLMdRoute
-  '/api/$locale/system/platforms/ai/skills/USER_WITH_ACCOUNT_AI_RUN/md': typeof ApiLocaleSystemPlatformsAiSkillsUSER_WITH_ACCOUNT_AI_RUNMdRoute
-  '/api/$locale/system/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL/md': typeof ApiLocaleSystemPlatformsAiSkillsUSER_WITH_ACCOUNT_SKILLMdRoute
-  '/api/$locale/agent/chat/threads/$threadId/messages/$messageId/vote': typeof ApiLocaleAgentChatThreadsThreadIdMessagesMessageIdVoteRoute
+  '/api/$locale/vibe/agent/ai-stream/system-prompt/debug': typeof ApiLocaleVibeAgentAiStreamSystemPromptDebugRoute
+  '/api/$locale/vibe/agent/ai-stream/ws-provider/models': typeof ApiLocaleVibeAgentAiStreamWsProviderModelsRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-downvotes-total': typeof ApiLocaleVibeAgentChatDataSourcesChatDownvotesTotalRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-errors-total': typeof ApiLocaleVibeAgentChatDataSourcesChatErrorsTotalRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-memories-created': typeof ApiLocaleVibeAgentChatDataSourcesChatMemoriesCreatedRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-messages-by-ai': typeof ApiLocaleVibeAgentChatDataSourcesChatMessagesByAiRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-messages-by-user': typeof ApiLocaleVibeAgentChatDataSourcesChatMessagesByUserRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-messages-total': typeof ApiLocaleVibeAgentChatDataSourcesChatMessagesTotalRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-messages-with-attachments': typeof ApiLocaleVibeAgentChatDataSourcesChatMessagesWithAttachmentsRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-share-links-created': typeof ApiLocaleVibeAgentChatDataSourcesChatShareLinksCreatedRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-threads-active-total': typeof ApiLocaleVibeAgentChatDataSourcesChatThreadsActiveTotalRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-threads-created': typeof ApiLocaleVibeAgentChatDataSourcesChatThreadsCreatedRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-tool-calls-total': typeof ApiLocaleVibeAgentChatDataSourcesChatToolCallsTotalRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-unique-users': typeof ApiLocaleVibeAgentChatDataSourcesChatUniqueUsersRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-upvotes-total': typeof ApiLocaleVibeAgentChatDataSourcesChatUpvotesTotalRoute
+  '/api/$locale/vibe/agent/chat/folder-contents/$rootFolderId': typeof ApiLocaleVibeAgentChatFolderContentsRootFolderIdRoute
+  '/api/$locale/vibe/agent/chat/folders/$rootFolderId': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRouteWithChildren
+  '/api/$locale/vibe/agent/chat/threads/$threadId': typeof ApiLocaleVibeAgentChatThreadsThreadIdRouteWithChildren
+  '/api/$locale/vibe/agent/chat/threads/rename': typeof ApiLocaleVibeAgentChatThreadsRenameRoute
+  '/api/$locale/vibe/agent/chat/threads/search-messages': typeof ApiLocaleVibeAgentChatThreadsSearchMessagesRoute
+  '/api/$locale/vibe/agent/chat/threads/search-threads': typeof ApiLocaleVibeAgentChatThreadsSearchThreadsRoute
+  '/api/$locale/vibe/agent/cortex/embeddings/backfill': typeof ApiLocaleVibeAgentCortexEmbeddingsBackfillRoute
+  '/api/$locale/vibe/agent/skills/$id/publish': typeof ApiLocaleVibeAgentSkillsIdPublishRoute
+  '/api/$locale/vibe/agent/skills/$id/report': typeof ApiLocaleVibeAgentSkillsIdReportRoute
+  '/api/$locale/vibe/agent/skills/$id/vote': typeof ApiLocaleVibeAgentSkillsIdVoteRoute
+  '/api/$locale/vibe/agent/skills/favorites/$id': typeof ApiLocaleVibeAgentSkillsFavoritesIdRoute
+  '/api/$locale/vibe/agent/skills/favorites/create': typeof ApiLocaleVibeAgentSkillsFavoritesCreateRoute
+  '/api/$locale/vibe/agent/skills/favorites/reorder': typeof ApiLocaleVibeAgentSkillsFavoritesReorderRoute
+  '/api/$locale/vibe/dataflow/graphs/$id/archive': typeof ApiLocaleVibeDataflowGraphsIdArchiveRoute
+  '/api/$locale/vibe/dataflow/graphs/$id/backtest': typeof ApiLocaleVibeDataflowGraphsIdBacktestRoute
+  '/api/$locale/vibe/dataflow/graphs/$id/data': typeof ApiLocaleVibeDataflowGraphsIdDataRoute
+  '/api/$locale/vibe/dataflow/graphs/$id/delete': typeof ApiLocaleVibeDataflowGraphsIdDeleteRoute
+  '/api/$locale/vibe/dataflow/graphs/$id/edit': typeof ApiLocaleVibeDataflowGraphsIdEditRoute
+  '/api/$locale/vibe/dataflow/graphs/$id/promote': typeof ApiLocaleVibeDataflowGraphsIdPromoteRoute
+  '/api/$locale/vibe/dataflow/graphs/$id/trigger': typeof ApiLocaleVibeDataflowGraphsIdTriggerRoute
+  '/api/$locale/vibe/dataflow/graphs/$id/versions': typeof ApiLocaleVibeDataflowGraphsIdVersionsRoute
+  '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-errors': typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsErrorsRoute
+  '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-total': typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsTotalRoute
+  '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings': typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute
+  '/api/$locale/vibe/platforms/ai/skills/$characterSkill': typeof ApiLocaleVibePlatformsAiSkillsCharacterSkillRoute
+  '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdCreateRoute
+  '/api/$locale/vibe/agent/chat/folders/$rootFolderId/root-permissions': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRootPermissionsRoute
+  '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteWithChildren
+  '/api/$locale/vibe/agent/chat/threads/$threadId/messages': typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesRouteWithChildren
+  '/api/$locale/vibe/agent/chat/threads/$threadId/permissions': typeof ApiLocaleVibeAgentChatThreadsThreadIdPermissionsRoute
+  '/api/$locale/vibe/agent/chat/threads/$threadId/share-links': typeof ApiLocaleVibeAgentChatThreadsThreadIdShareLinksRoute
+  '/api/$locale/vibe/platforms/ai/skills/AGENT/md': typeof ApiLocaleVibePlatformsAiSkillsAGENTMdRoute
+  '/api/$locale/vibe/platforms/ai/skills/PUBLIC_USER_AI_RUN/md': typeof ApiLocaleVibePlatformsAiSkillsPUBLIC_USER_AI_RUNMdRoute
+  '/api/$locale/vibe/platforms/ai/skills/PUBLIC_USER_SKILL/md': typeof ApiLocaleVibePlatformsAiSkillsPUBLIC_USER_SKILLMdRoute
+  '/api/$locale/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_AI_RUN/md': typeof ApiLocaleVibePlatformsAiSkillsUSER_WITH_ACCOUNT_AI_RUNMdRoute
+  '/api/$locale/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL/md': typeof ApiLocaleVibePlatformsAiSkillsUSER_WITH_ACCOUNT_SKILLMdRoute
+  '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/move': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdMoveRoute
+  '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/permissions': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdPermissionsRoute
+  '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/rename': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRenameRoute
+  '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/update': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdUpdateRoute
+  '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId': typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdRouteWithChildren
+  '/api/$locale/vibe/agent/chat/threads/$threadId/messages/path': typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesPathRoute
+  '/api/$locale/vibe/agent/chat/threads/$threadId/messages/search': typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesSearchRoute
+  '/api/$locale/vibe/agent/chat/threads/files/$threadId/$filename': typeof ApiLocaleVibeAgentChatThreadsFilesThreadIdFilenameRoute
+  '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId/vote': typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdVoteRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -5308,7 +5192,7 @@ export interface FileRoutesById {
   '/$locale/tools/$': typeof LocaleToolsSplatRoute
   '/$locale/user/_account': typeof LocaleUserAccountRouteWithChildren
   '/$locale/user/_auth': typeof LocaleUserAuthRouteWithChildren
-  '/api/$locale/$slug': typeof ApiLocaleSlugRoute
+  '/api/$locale/$notFound': typeof ApiLocaleNotFoundRoute
   '/api/$locale/contact': typeof ApiLocaleContactRoute
   '/api/$locale/credits': typeof ApiLocaleCreditsRouteWithChildren
   '/api/$locale/manifest': typeof ApiLocaleManifestRoute
@@ -5325,18 +5209,6 @@ export interface FileRoutesById {
   '/$locale/tools/': typeof LocaleToolsIndexRoute
   '/$locale/track/': typeof LocaleTrackIndexRoute
   '/$locale/user/_auth/signup': typeof LocaleUserAuthSignupRouteWithChildren
-  '/api/$locale/agent/coding-agent': typeof ApiLocaleAgentCodingAgentRoute
-  '/api/$locale/agent/describe-image': typeof ApiLocaleAgentDescribeImageRoute
-  '/api/$locale/agent/describe-video': typeof ApiLocaleAgentDescribeVideoRoute
-  '/api/$locale/agent/fetch-url-content': typeof ApiLocaleAgentFetchUrlContentRouteWithChildren
-  '/api/$locale/agent/image-generation': typeof ApiLocaleAgentImageGenerationRoute
-  '/api/$locale/agent/music-generation': typeof ApiLocaleAgentMusicGenerationRoute
-  '/api/$locale/agent/skills': typeof ApiLocaleAgentSkillsRouteWithChildren
-  '/api/$locale/agent/speech-to-text': typeof ApiLocaleAgentSpeechToTextRouteWithChildren
-  '/api/$locale/agent/text-to-speech': typeof ApiLocaleAgentTextToSpeechRoute
-  '/api/$locale/agent/video-generation': typeof ApiLocaleAgentVideoGenerationRoute
-  '/api/$locale/agent/view-image': typeof ApiLocaleAgentViewImageRoute
-  '/api/$locale/agent/web-search': typeof ApiLocaleAgentWebSearchRouteWithChildren
   '/api/$locale/browser/click': typeof ApiLocaleBrowserClickRoute
   '/api/$locale/browser/close-page': typeof ApiLocaleBrowserClosePageRoute
   '/api/$locale/browser/drag': typeof ApiLocaleBrowserDragRoute
@@ -5414,23 +5286,18 @@ export interface FileRoutesById {
   '/api/$locale/purchasing/dashboard': typeof ApiLocalePurchasingDashboardRoute
   '/api/$locale/referral/payout': typeof ApiLocaleReferralPayoutRoute
   '/api/$locale/referral/stats': typeof ApiLocaleReferralStatsRoute
-  '/api/$locale/remote-connection/$instanceId': typeof ApiLocaleRemoteConnectionInstanceIdRoute
-  '/api/$locale/remote-connection/connect': typeof ApiLocaleRemoteConnectionConnectRoute
-  '/api/$locale/remote-connection/connect-reverse': typeof ApiLocaleRemoteConnectionConnectReverseRouteWithChildren
-  '/api/$locale/remote-connection/list': typeof ApiLocaleRemoteConnectionListRoute
-  '/api/$locale/remote-connection/sync': typeof ApiLocaleRemoteConnectionSyncRouteWithChildren
   '/api/$locale/subscription/cancel': typeof ApiLocaleSubscriptionCancelRoute
   '/api/$locale/subscription/create': typeof ApiLocaleSubscriptionCreateRoute
   '/api/$locale/subscription/dashboard': typeof ApiLocaleSubscriptionDashboardRoute
   '/api/$locale/subscription/update': typeof ApiLocaleSubscriptionUpdateRoute
-  '/api/$locale/system/execute-tool': typeof ApiLocaleSystemExecuteToolRouteWithChildren
-  '/api/$locale/system/help-tool': typeof ApiLocaleSystemHelpToolRoute
   '/api/$locale/tax/report': typeof ApiLocaleTaxReportRoute
   '/api/$locale/user/session-cleanup': typeof ApiLocaleUserSessionCleanupRoute
   '/api/$locale/users/create': typeof ApiLocaleUsersCreateRoute
   '/api/$locale/users/list': typeof ApiLocaleUsersListRoute
   '/api/$locale/users/stats': typeof ApiLocaleUsersStatsRoute
   '/api/$locale/users/view': typeof ApiLocaleUsersViewRoute
+  '/api/$locale/vibe/execute-tool': typeof ApiLocaleVibeExecuteToolRouteWithChildren
+  '/api/$locale/vibe/help-tool': typeof ApiLocaleVibeHelpToolRoute
   '/$locale/creator/$userId/': typeof LocaleCreatorUserIdIndexRoute
   '/$locale/shared/$token/': typeof LocaleSharedTokenIndexRoute
   '/$locale/skill/$skillId/': typeof LocaleSkillSkillIdIndexRoute
@@ -5449,33 +5316,6 @@ export interface FileRoutesById {
   '/$locale/subscription/history/': typeof LocaleSubscriptionHistoryIndexRoute
   '/$locale/subscription/overview/': typeof LocaleSubscriptionOverviewIndexRoute
   '/$locale/subscription/remote/': typeof LocaleSubscriptionRemoteIndexRoute
-  '/api/$locale/agent/ai-stream/cancel': typeof ApiLocaleAgentAiStreamCancelRoute
-  '/api/$locale/agent/ai-stream/run': typeof ApiLocaleAgentAiStreamRunRoute
-  '/api/$locale/agent/ai-stream/stream': typeof ApiLocaleAgentAiStreamStreamRoute
-  '/api/$locale/agent/chat/public-feed': typeof ApiLocaleAgentChatPublicFeedRoute
-  '/api/$locale/agent/chat/settings': typeof ApiLocaleAgentChatSettingsRoute
-  '/api/$locale/agent/chat/threads': typeof ApiLocaleAgentChatThreadsRouteWithChildren
-  '/api/$locale/agent/cortex/delete': typeof ApiLocaleAgentCortexDeleteRoute
-  '/api/$locale/agent/cortex/edit': typeof ApiLocaleAgentCortexEditRoute
-  '/api/$locale/agent/cortex/exec': typeof ApiLocaleAgentCortexExecRoute
-  '/api/$locale/agent/cortex/list': typeof ApiLocaleAgentCortexListRoute
-  '/api/$locale/agent/cortex/mkdir': typeof ApiLocaleAgentCortexMkdirRoute
-  '/api/$locale/agent/cortex/move': typeof ApiLocaleAgentCortexMoveRoute
-  '/api/$locale/agent/cortex/read': typeof ApiLocaleAgentCortexReadRoute
-  '/api/$locale/agent/cortex/search': typeof ApiLocaleAgentCortexSearchRoute
-  '/api/$locale/agent/cortex/terminals': typeof ApiLocaleAgentCortexTerminalsRoute
-  '/api/$locale/agent/cortex/tree': typeof ApiLocaleAgentCortexTreeRoute
-  '/api/$locale/agent/cortex/write': typeof ApiLocaleAgentCortexWriteRoute
-  '/api/$locale/agent/fetch-url-content/cleanup': typeof ApiLocaleAgentFetchUrlContentCleanupRoute
-  '/api/$locale/agent/models/list': typeof ApiLocaleAgentModelsListRoute
-  '/api/$locale/agent/models/model-prices': typeof ApiLocaleAgentModelsModelPricesRoute
-  '/api/$locale/agent/skills/$id': typeof ApiLocaleAgentSkillsIdRouteWithChildren
-  '/api/$locale/agent/skills/create': typeof ApiLocaleAgentSkillsCreateRoute
-  '/api/$locale/agent/skills/favorites': typeof ApiLocaleAgentSkillsFavoritesRouteWithChildren
-  '/api/$locale/agent/skills/moderation': typeof ApiLocaleAgentSkillsModerationRoute
-  '/api/$locale/agent/speech-to-text/hotkey': typeof ApiLocaleAgentSpeechToTextHotkeyRoute
-  '/api/$locale/agent/web-search/brave': typeof ApiLocaleAgentWebSearchBraveRoute
-  '/api/$locale/agent/web-search/kagi': typeof ApiLocaleAgentWebSearchKagiRoute
   '/api/$locale/analytics/evaluators/and': typeof ApiLocaleAnalyticsEvaluatorsAndRoute
   '/api/$locale/analytics/evaluators/crossover': typeof ApiLocaleAnalyticsEvaluatorsCrossoverRoute
   '/api/$locale/analytics/evaluators/not': typeof ApiLocaleAnalyticsEvaluatorsNotRoute
@@ -5643,10 +5483,6 @@ export interface FileRoutesById {
   '/api/$locale/referral/data-sources/referrals-signups': typeof ApiLocaleReferralDataSourcesReferralsSignupsRoute
   '/api/$locale/referral/earnings/list': typeof ApiLocaleReferralEarningsListRoute
   '/api/$locale/referral/lead/current': typeof ApiLocaleReferralLeadCurrentRoute
-  '/api/$locale/remote-connection/connect-reverse/update': typeof ApiLocaleRemoteConnectionConnectReverseUpdateRoute
-  '/api/$locale/remote-connection/self/instanceId': typeof ApiLocaleRemoteConnectionSelfInstanceIdRoute
-  '/api/$locale/remote-connection/self/rename': typeof ApiLocaleRemoteConnectionSelfRenameRoute
-  '/api/$locale/remote-connection/sync/providers': typeof ApiLocaleRemoteConnectionSyncProvidersRoute
   '/api/$locale/ssh/connections/$id': typeof ApiLocaleSshConnectionsIdRouteWithChildren
   '/api/$locale/ssh/connections/create': typeof ApiLocaleSshConnectionsCreateRoute
   '/api/$locale/ssh/connections/list': typeof ApiLocaleSshConnectionsListRoute
@@ -5660,20 +5496,6 @@ export interface FileRoutesById {
   '/api/$locale/subscription/data-sources/subscriptions-new': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsNewRoute
   '/api/$locale/subscription/data-sources/subscriptions-payment-failed': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsPaymentFailedRoute
   '/api/$locale/subscription/data-sources/subscriptions-trialing': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsTrialingRoute
-  '/api/$locale/system/database/health': typeof ApiLocaleSystemDatabaseHealthRoute
-  '/api/$locale/system/database/sql': typeof ApiLocaleSystemDatabaseSqlRoute
-  '/api/$locale/system/dataflow/cleanup': typeof ApiLocaleSystemDataflowCleanupRoute
-  '/api/$locale/system/dataflow/graphs': typeof ApiLocaleSystemDataflowGraphsRouteWithChildren
-  '/api/$locale/system/dataflow/run-config': typeof ApiLocaleSystemDataflowRunConfigRoute
-  '/api/$locale/system/env/settings': typeof ApiLocaleSystemEnvSettingsRouteWithChildren
-  '/api/$locale/system/execute-tool/await-task': typeof ApiLocaleSystemExecuteToolAwaitTaskRoute
-  '/api/$locale/system/execute-tool/complete': typeof ApiLocaleSystemExecuteToolCompleteRoute
-  '/api/$locale/system/execute-tool/revival': typeof ApiLocaleSystemExecuteToolRevivalRoute
-  '/api/$locale/system/realtime/remote-event-bridge': typeof ApiLocaleSystemRealtimeRemoteEventBridgeRoute
-  '/api/$locale/system/tasks/execute': typeof ApiLocaleSystemTasksExecuteRoute
-  '/api/$locale/system/tasks/unified-runner': typeof ApiLocaleSystemTasksUnifiedRunnerRoute
-  '/api/$locale/system/tooling/vibe-deps': typeof ApiLocaleSystemToolingVibeDepsRoute
-  '/api/$locale/system/tooling/vibe-stage': typeof ApiLocaleSystemToolingVibeStageRoute
   '/api/$locale/tax/rate/create': typeof ApiLocaleTaxRateCreateRoute
   '/api/$locale/tax/rate/list': typeof ApiLocaleTaxRateListRoute
   '/api/$locale/user/data-sources/users-active-total': typeof ApiLocaleUserDataSourcesUsersActiveTotalRoute
@@ -5691,6 +5513,33 @@ export interface FileRoutesById {
   '/api/$locale/user/public/login': typeof ApiLocaleUserPublicLoginRouteWithChildren
   '/api/$locale/user/public/signup': typeof ApiLocaleUserPublicSignupRoute
   '/api/$locale/users/user/$id': typeof ApiLocaleUsersUserIdRouteWithChildren
+  '/api/$locale/vibe/agent/coding-agent': typeof ApiLocaleVibeAgentCodingAgentRoute
+  '/api/$locale/vibe/agent/describe-image': typeof ApiLocaleVibeAgentDescribeImageRoute
+  '/api/$locale/vibe/agent/describe-video': typeof ApiLocaleVibeAgentDescribeVideoRoute
+  '/api/$locale/vibe/agent/fetch-url-content': typeof ApiLocaleVibeAgentFetchUrlContentRouteWithChildren
+  '/api/$locale/vibe/agent/image-generation': typeof ApiLocaleVibeAgentImageGenerationRoute
+  '/api/$locale/vibe/agent/music-generation': typeof ApiLocaleVibeAgentMusicGenerationRoute
+  '/api/$locale/vibe/agent/skills': typeof ApiLocaleVibeAgentSkillsRouteWithChildren
+  '/api/$locale/vibe/agent/speech-to-text': typeof ApiLocaleVibeAgentSpeechToTextRoute
+  '/api/$locale/vibe/agent/text-to-speech': typeof ApiLocaleVibeAgentTextToSpeechRoute
+  '/api/$locale/vibe/agent/video-generation': typeof ApiLocaleVibeAgentVideoGenerationRoute
+  '/api/$locale/vibe/agent/view-image': typeof ApiLocaleVibeAgentViewImageRoute
+  '/api/$locale/vibe/agent/web-search': typeof ApiLocaleVibeAgentWebSearchRouteWithChildren
+  '/api/$locale/vibe/database/health': typeof ApiLocaleVibeDatabaseHealthRoute
+  '/api/$locale/vibe/dataflow/cleanup': typeof ApiLocaleVibeDataflowCleanupRoute
+  '/api/$locale/vibe/dataflow/graphs': typeof ApiLocaleVibeDataflowGraphsRouteWithChildren
+  '/api/$locale/vibe/dataflow/run-config': typeof ApiLocaleVibeDataflowRunConfigRoute
+  '/api/$locale/vibe/env/settings': typeof ApiLocaleVibeEnvSettingsRouteWithChildren
+  '/api/$locale/vibe/execute-tool/await-task': typeof ApiLocaleVibeExecuteToolAwaitTaskRoute
+  '/api/$locale/vibe/execute-tool/complete': typeof ApiLocaleVibeExecuteToolCompleteRoute
+  '/api/$locale/vibe/execute-tool/revival': typeof ApiLocaleVibeExecuteToolRevivalRoute
+  '/api/$locale/vibe/realtime/remote-event-bridge': typeof ApiLocaleVibeRealtimeRemoteEventBridgeRoute
+  '/api/$locale/vibe/remote-connection/$instanceId': typeof ApiLocaleVibeRemoteConnectionInstanceIdRoute
+  '/api/$locale/vibe/remote-connection/connect': typeof ApiLocaleVibeRemoteConnectionConnectRoute
+  '/api/$locale/vibe/remote-connection/connect-reverse': typeof ApiLocaleVibeRemoteConnectionConnectReverseRouteWithChildren
+  '/api/$locale/vibe/remote-connection/list': typeof ApiLocaleVibeRemoteConnectionListRoute
+  '/api/$locale/vibe/remote-connection/sync': typeof ApiLocaleVibeRemoteConnectionSyncRouteWithChildren
+  '/api/$locale/vibe/tasks/execute': typeof ApiLocaleVibeTasksExecuteRoute
   '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/': typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
   '/$locale/story/blog/one-codebase-13-platforms/': typeof LocaleStoryBlogOneCodebase13PlatformsIndexRoute
   '/$locale/story/blog/one-endpoint-every-surface/': typeof LocaleStoryBlogOneEndpointEverySurfaceIndexRoute
@@ -5708,34 +5557,6 @@ export interface FileRoutesById {
   '/$locale/user/_auth/login/': typeof LocaleUserAuthLoginIndexRoute
   '/$locale/user/_auth/reset-password/': typeof LocaleUserAuthResetPasswordIndexRoute
   '/$locale/user/_auth/signup/': typeof LocaleUserAuthSignupIndexRoute
-  '/api/$locale/agent/ai-stream/system-prompt/debug': typeof ApiLocaleAgentAiStreamSystemPromptDebugRoute
-  '/api/$locale/agent/ai-stream/ws-provider/models': typeof ApiLocaleAgentAiStreamWsProviderModelsRoute
-  '/api/$locale/agent/chat/data-sources/chat-downvotes-total': typeof ApiLocaleAgentChatDataSourcesChatDownvotesTotalRoute
-  '/api/$locale/agent/chat/data-sources/chat-errors-total': typeof ApiLocaleAgentChatDataSourcesChatErrorsTotalRoute
-  '/api/$locale/agent/chat/data-sources/chat-memories-created': typeof ApiLocaleAgentChatDataSourcesChatMemoriesCreatedRoute
-  '/api/$locale/agent/chat/data-sources/chat-messages-by-ai': typeof ApiLocaleAgentChatDataSourcesChatMessagesByAiRoute
-  '/api/$locale/agent/chat/data-sources/chat-messages-by-user': typeof ApiLocaleAgentChatDataSourcesChatMessagesByUserRoute
-  '/api/$locale/agent/chat/data-sources/chat-messages-total': typeof ApiLocaleAgentChatDataSourcesChatMessagesTotalRoute
-  '/api/$locale/agent/chat/data-sources/chat-messages-with-attachments': typeof ApiLocaleAgentChatDataSourcesChatMessagesWithAttachmentsRoute
-  '/api/$locale/agent/chat/data-sources/chat-share-links-created': typeof ApiLocaleAgentChatDataSourcesChatShareLinksCreatedRoute
-  '/api/$locale/agent/chat/data-sources/chat-threads-active-total': typeof ApiLocaleAgentChatDataSourcesChatThreadsActiveTotalRoute
-  '/api/$locale/agent/chat/data-sources/chat-threads-created': typeof ApiLocaleAgentChatDataSourcesChatThreadsCreatedRoute
-  '/api/$locale/agent/chat/data-sources/chat-tool-calls-total': typeof ApiLocaleAgentChatDataSourcesChatToolCallsTotalRoute
-  '/api/$locale/agent/chat/data-sources/chat-unique-users': typeof ApiLocaleAgentChatDataSourcesChatUniqueUsersRoute
-  '/api/$locale/agent/chat/data-sources/chat-upvotes-total': typeof ApiLocaleAgentChatDataSourcesChatUpvotesTotalRoute
-  '/api/$locale/agent/chat/folder-contents/$rootFolderId': typeof ApiLocaleAgentChatFolderContentsRootFolderIdRoute
-  '/api/$locale/agent/chat/folders/$rootFolderId': typeof ApiLocaleAgentChatFoldersRootFolderIdRouteWithChildren
-  '/api/$locale/agent/chat/threads/$threadId': typeof ApiLocaleAgentChatThreadsThreadIdRouteWithChildren
-  '/api/$locale/agent/chat/threads/rename': typeof ApiLocaleAgentChatThreadsRenameRoute
-  '/api/$locale/agent/chat/threads/search-messages': typeof ApiLocaleAgentChatThreadsSearchMessagesRoute
-  '/api/$locale/agent/chat/threads/search-threads': typeof ApiLocaleAgentChatThreadsSearchThreadsRoute
-  '/api/$locale/agent/cortex/embeddings/backfill': typeof ApiLocaleAgentCortexEmbeddingsBackfillRoute
-  '/api/$locale/agent/skills/$id/publish': typeof ApiLocaleAgentSkillsIdPublishRoute
-  '/api/$locale/agent/skills/$id/report': typeof ApiLocaleAgentSkillsIdReportRoute
-  '/api/$locale/agent/skills/$id/vote': typeof ApiLocaleAgentSkillsIdVoteRoute
-  '/api/$locale/agent/skills/favorites/$id': typeof ApiLocaleAgentSkillsFavoritesIdRoute
-  '/api/$locale/agent/skills/favorites/create': typeof ApiLocaleAgentSkillsFavoritesCreateRoute
-  '/api/$locale/agent/skills/favorites/reorder': typeof ApiLocaleAgentSkillsFavoritesReorderRoute
   '/api/$locale/chart-of-accounts/account/$accountId/deactivate': typeof ApiLocaleChartOfAccountsAccountAccountIdDeactivateRoute
   '/api/$locale/chart-of-accounts/account/$accountId/get': typeof ApiLocaleChartOfAccountsAccountAccountIdGetRoute
   '/api/$locale/chart-of-accounts/account/$accountId/update': typeof ApiLocaleChartOfAccountsAccountAccountIdUpdateRoute
@@ -5774,9 +5595,7 @@ export interface FileRoutesById {
   '/api/$locale/payment/invoice/$invoiceId/send-reminder': typeof ApiLocalePaymentInvoiceInvoiceIdSendReminderRoute
   '/api/$locale/payment/invoice/$invoiceId/void': typeof ApiLocalePaymentInvoiceInvoiceIdVoidRoute
   '/api/$locale/payment/invoice/line/add': typeof ApiLocalePaymentInvoiceLineAddRoute
-  '/api/$locale/payment/providers/nowpayments/cli': typeof ApiLocalePaymentProvidersNowpaymentsCliRoute
   '/api/$locale/payment/providers/nowpayments/webhook': typeof ApiLocalePaymentProvidersNowpaymentsWebhookRoute
-  '/api/$locale/payment/providers/stripe/cli': typeof ApiLocalePaymentProvidersStripeCliRoute
   '/api/$locale/payment/providers/stripe/webhook': typeof ApiLocalePaymentProvidersStripeWebhookRoute
   '/api/$locale/pos/order/$orderId/add-item': typeof ApiLocalePosOrderOrderIdAddItemRoute
   '/api/$locale/pos/order/$orderId/add-payment': typeof ApiLocalePosOrderOrderIdAddPaymentRoute
@@ -5805,30 +5624,6 @@ export interface FileRoutesById {
   '/api/$locale/ssh/linux/users/list': typeof ApiLocaleSshLinuxUsersListRoute
   '/api/$locale/subscription/company/$companyId/get': typeof ApiLocaleSubscriptionCompanyCompanyIdGetRoute
   '/api/$locale/subscription/company/$companyId/list': typeof ApiLocaleSubscriptionCompanyCompanyIdListRoute
-  '/api/$locale/system/env/settings/export-env': typeof ApiLocaleSystemEnvSettingsExportEnvRoute
-  '/api/$locale/system/env/settings/generate-key': typeof ApiLocaleSystemEnvSettingsGenerateKeyRoute
-  '/api/$locale/system/execute-tool/call-control/cancel': typeof ApiLocaleSystemExecuteToolCallControlCancelRoute
-  '/api/$locale/system/execute-tool/call-control/detach': typeof ApiLocaleSystemExecuteToolCallControlDetachRoute
-  '/api/$locale/system/execute-tool/call-control/resume-when-done': typeof ApiLocaleSystemExecuteToolCallControlResumeWhenDoneRoute
-  '/api/$locale/system/logger/error-monitor/cleanup': typeof ApiLocaleSystemLoggerErrorMonitorCleanupRoute
-  '/api/$locale/system/logger/error-monitor/client-log': typeof ApiLocaleSystemLoggerErrorMonitorClientLogRoute
-  '/api/$locale/system/logger/error-monitor/logs': typeof ApiLocaleSystemLoggerErrorMonitorLogsRoute
-  '/api/$locale/system/platforms/vibe-frame/mount': typeof ApiLocaleSystemPlatformsVibeFrameMountRoute
-  '/api/$locale/system/server/server/health': typeof ApiLocaleSystemServerServerHealthRoute
-  '/api/$locale/system/server/server/rebuild': typeof ApiLocaleSystemServerServerRebuildRoute
-  '/api/$locale/system/tasks/cron/$id': typeof ApiLocaleSystemTasksCronIdRoute
-  '/api/$locale/system/tasks/cron/bulk': typeof ApiLocaleSystemTasksCronBulkRoute
-  '/api/$locale/system/tasks/cron/history': typeof ApiLocaleSystemTasksCronHistoryRoute
-  '/api/$locale/system/tasks/cron/queue': typeof ApiLocaleSystemTasksCronQueueRoute
-  '/api/$locale/system/tasks/cron/stats': typeof ApiLocaleSystemTasksCronStatsRoute
-  '/api/$locale/system/tasks/cron/tasks': typeof ApiLocaleSystemTasksCronTasksRoute
-  '/api/$locale/system/tasks/data-sources/cron-executions-failed': typeof ApiLocaleSystemTasksDataSourcesCronExecutionsFailedRoute
-  '/api/$locale/system/tasks/data-sources/cron-executions-succeeded': typeof ApiLocaleSystemTasksDataSourcesCronExecutionsSucceededRoute
-  '/api/$locale/system/tasks/data-sources/cron-executions-total': typeof ApiLocaleSystemTasksDataSourcesCronExecutionsTotalRoute
-  '/api/$locale/system/tasks/pulse/execute': typeof ApiLocaleSystemTasksPulseExecuteRoute
-  '/api/$locale/system/tasks/pulse/history': typeof ApiLocaleSystemTasksPulseHistoryRoute
-  '/api/$locale/system/tasks/pulse/status': typeof ApiLocaleSystemTasksPulseStatusRoute
-  '/api/$locale/system/tooling/check/vibe-check': typeof ApiLocaleSystemToolingCheckVibeCheckRoute
   '/api/$locale/tax/rate/$rateId/delete': typeof ApiLocaleTaxRateRateIdDeleteRoute
   '/api/$locale/tax/rate/$rateId/update': typeof ApiLocaleTaxRateRateIdUpdateRoute
   '/api/$locale/user/private/me/addresses': typeof ApiLocaleUserPrivateMeAddressesRouteWithChildren
@@ -5841,14 +5636,59 @@ export interface FileRoutesById {
   '/api/$locale/user/public/reset-password/request': typeof ApiLocaleUserPublicResetPasswordRequestRoute
   '/api/$locale/user/public/reset-password/validate': typeof ApiLocaleUserPublicResetPasswordValidateRoute
   '/api/$locale/users/user/$id/roles': typeof ApiLocaleUsersUserIdRolesRoute
+  '/api/$locale/vibe/agent/ai-stream/cancel': typeof ApiLocaleVibeAgentAiStreamCancelRoute
+  '/api/$locale/vibe/agent/ai-stream/run': typeof ApiLocaleVibeAgentAiStreamRunRoute
+  '/api/$locale/vibe/agent/ai-stream/stream': typeof ApiLocaleVibeAgentAiStreamStreamRoute
+  '/api/$locale/vibe/agent/chat/public-feed': typeof ApiLocaleVibeAgentChatPublicFeedRoute
+  '/api/$locale/vibe/agent/chat/settings': typeof ApiLocaleVibeAgentChatSettingsRoute
+  '/api/$locale/vibe/agent/chat/threads': typeof ApiLocaleVibeAgentChatThreadsRouteWithChildren
+  '/api/$locale/vibe/agent/cortex/delete': typeof ApiLocaleVibeAgentCortexDeleteRoute
+  '/api/$locale/vibe/agent/cortex/edit': typeof ApiLocaleVibeAgentCortexEditRoute
+  '/api/$locale/vibe/agent/cortex/exec': typeof ApiLocaleVibeAgentCortexExecRoute
+  '/api/$locale/vibe/agent/cortex/list': typeof ApiLocaleVibeAgentCortexListRoute
+  '/api/$locale/vibe/agent/cortex/mkdir': typeof ApiLocaleVibeAgentCortexMkdirRoute
+  '/api/$locale/vibe/agent/cortex/move': typeof ApiLocaleVibeAgentCortexMoveRoute
+  '/api/$locale/vibe/agent/cortex/read': typeof ApiLocaleVibeAgentCortexReadRoute
+  '/api/$locale/vibe/agent/cortex/search': typeof ApiLocaleVibeAgentCortexSearchRoute
+  '/api/$locale/vibe/agent/cortex/terminals': typeof ApiLocaleVibeAgentCortexTerminalsRoute
+  '/api/$locale/vibe/agent/cortex/tree': typeof ApiLocaleVibeAgentCortexTreeRoute
+  '/api/$locale/vibe/agent/cortex/write': typeof ApiLocaleVibeAgentCortexWriteRoute
+  '/api/$locale/vibe/agent/fetch-url-content/cleanup': typeof ApiLocaleVibeAgentFetchUrlContentCleanupRoute
+  '/api/$locale/vibe/agent/models/list': typeof ApiLocaleVibeAgentModelsListRoute
+  '/api/$locale/vibe/agent/skills/$id': typeof ApiLocaleVibeAgentSkillsIdRouteWithChildren
+  '/api/$locale/vibe/agent/skills/create': typeof ApiLocaleVibeAgentSkillsCreateRoute
+  '/api/$locale/vibe/agent/skills/favorites': typeof ApiLocaleVibeAgentSkillsFavoritesRouteWithChildren
+  '/api/$locale/vibe/agent/skills/moderation': typeof ApiLocaleVibeAgentSkillsModerationRoute
+  '/api/$locale/vibe/agent/web-search/brave': typeof ApiLocaleVibeAgentWebSearchBraveRoute
+  '/api/$locale/vibe/agent/web-search/kagi': typeof ApiLocaleVibeAgentWebSearchKagiRoute
+  '/api/$locale/vibe/env/settings/export-env': typeof ApiLocaleVibeEnvSettingsExportEnvRoute
+  '/api/$locale/vibe/env/settings/generate-key': typeof ApiLocaleVibeEnvSettingsGenerateKeyRoute
+  '/api/$locale/vibe/execute-tool/call-control/cancel': typeof ApiLocaleVibeExecuteToolCallControlCancelRoute
+  '/api/$locale/vibe/execute-tool/call-control/detach': typeof ApiLocaleVibeExecuteToolCallControlDetachRoute
+  '/api/$locale/vibe/execute-tool/call-control/resume-when-done': typeof ApiLocaleVibeExecuteToolCallControlResumeWhenDoneRoute
+  '/api/$locale/vibe/logger/error-monitor/cleanup': typeof ApiLocaleVibeLoggerErrorMonitorCleanupRoute
+  '/api/$locale/vibe/logger/error-monitor/client-log': typeof ApiLocaleVibeLoggerErrorMonitorClientLogRoute
+  '/api/$locale/vibe/logger/error-monitor/logs': typeof ApiLocaleVibeLoggerErrorMonitorLogsRoute
+  '/api/$locale/vibe/platforms/vibe-frame/mount': typeof ApiLocaleVibePlatformsVibeFrameMountRoute
+  '/api/$locale/vibe/remote-connection/connect-reverse/update': typeof ApiLocaleVibeRemoteConnectionConnectReverseUpdateRoute
+  '/api/$locale/vibe/remote-connection/self/instanceId': typeof ApiLocaleVibeRemoteConnectionSelfInstanceIdRoute
+  '/api/$locale/vibe/remote-connection/self/rename': typeof ApiLocaleVibeRemoteConnectionSelfRenameRoute
+  '/api/$locale/vibe/remote-connection/sync/providers': typeof ApiLocaleVibeRemoteConnectionSyncProvidersRoute
+  '/api/$locale/vibe/server/server/health': typeof ApiLocaleVibeServerServerHealthRoute
+  '/api/$locale/vibe/tasks/cron/$id': typeof ApiLocaleVibeTasksCronIdRoute
+  '/api/$locale/vibe/tasks/cron/bulk': typeof ApiLocaleVibeTasksCronBulkRoute
+  '/api/$locale/vibe/tasks/cron/history': typeof ApiLocaleVibeTasksCronHistoryRoute
+  '/api/$locale/vibe/tasks/cron/queue': typeof ApiLocaleVibeTasksCronQueueRoute
+  '/api/$locale/vibe/tasks/cron/stats': typeof ApiLocaleVibeTasksCronStatsRoute
+  '/api/$locale/vibe/tasks/cron/tasks': typeof ApiLocaleVibeTasksCronTasksRoute
+  '/api/$locale/vibe/tasks/data-sources/cron-executions-failed': typeof ApiLocaleVibeTasksDataSourcesCronExecutionsFailedRoute
+  '/api/$locale/vibe/tasks/data-sources/cron-executions-succeeded': typeof ApiLocaleVibeTasksDataSourcesCronExecutionsSucceededRoute
+  '/api/$locale/vibe/tasks/data-sources/cron-executions-total': typeof ApiLocaleVibeTasksDataSourcesCronExecutionsTotalRoute
+  '/api/$locale/vibe/tasks/pulse/execute': typeof ApiLocaleVibeTasksPulseExecuteRoute
+  '/api/$locale/vibe/tasks/pulse/history': typeof ApiLocaleVibeTasksPulseHistoryRoute
+  '/api/$locale/vibe/tasks/pulse/status': typeof ApiLocaleVibeTasksPulseStatusRoute
   '/$locale/story/newsletter/unsubscribe/$email/': typeof LocaleStoryNewsletterUnsubscribeEmailIndexRoute
   '/$locale/user/_auth/reset-password/$token/': typeof LocaleUserAuthResetPasswordTokenIndexRoute
-  '/api/$locale/agent/chat/folders/$rootFolderId/create': typeof ApiLocaleAgentChatFoldersRootFolderIdCreateRoute
-  '/api/$locale/agent/chat/folders/$rootFolderId/root-permissions': typeof ApiLocaleAgentChatFoldersRootFolderIdRootPermissionsRoute
-  '/api/$locale/agent/chat/folders/subfolders/$subFolderId': typeof ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRouteWithChildren
-  '/api/$locale/agent/chat/threads/$threadId/messages': typeof ApiLocaleAgentChatThreadsThreadIdMessagesRouteWithChildren
-  '/api/$locale/agent/chat/threads/$threadId/permissions': typeof ApiLocaleAgentChatThreadsThreadIdPermissionsRoute
-  '/api/$locale/agent/chat/threads/$threadId/share-links': typeof ApiLocaleAgentChatThreadsThreadIdShareLinksRoute
   '/api/$locale/companies/$companyId/members/$memberId/remove': typeof ApiLocaleCompaniesCompanyIdMembersMemberIdRemoveRoute
   '/api/$locale/companies/$companyId/members/$memberId/update-role': typeof ApiLocaleCompaniesCompanyIdMembersMemberIdUpdateRoleRoute
   '/api/$locale/lead-magnet/providers/google-sheets/oauth/callback': typeof ApiLocaleLeadMagnetProvidersGoogleSheetsOauthCallbackRoute
@@ -5861,37 +5701,67 @@ export interface FileRoutesById {
   '/api/$locale/ssh/connections/$id/mounts/$mountId': typeof ApiLocaleSshConnectionsIdMountsMountIdRoute
   '/api/$locale/ssh/connections/$id/mounts/create': typeof ApiLocaleSshConnectionsIdMountsCreateRoute
   '/api/$locale/ssh/connections/$id/mounts/list': typeof ApiLocaleSshConnectionsIdMountsListRoute
-  '/api/$locale/system/dataflow/graphs/$id/archive': typeof ApiLocaleSystemDataflowGraphsIdArchiveRoute
-  '/api/$locale/system/dataflow/graphs/$id/backtest': typeof ApiLocaleSystemDataflowGraphsIdBacktestRoute
-  '/api/$locale/system/dataflow/graphs/$id/data': typeof ApiLocaleSystemDataflowGraphsIdDataRoute
-  '/api/$locale/system/dataflow/graphs/$id/delete': typeof ApiLocaleSystemDataflowGraphsIdDeleteRoute
-  '/api/$locale/system/dataflow/graphs/$id/edit': typeof ApiLocaleSystemDataflowGraphsIdEditRoute
-  '/api/$locale/system/dataflow/graphs/$id/promote': typeof ApiLocaleSystemDataflowGraphsIdPromoteRoute
-  '/api/$locale/system/dataflow/graphs/$id/trigger': typeof ApiLocaleSystemDataflowGraphsIdTriggerRoute
-  '/api/$locale/system/dataflow/graphs/$id/versions': typeof ApiLocaleSystemDataflowGraphsIdVersionsRoute
-  '/api/$locale/system/logger/error-monitor/data-sources/error-logs-errors': typeof ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsErrorsRoute
-  '/api/$locale/system/logger/error-monitor/data-sources/error-logs-total': typeof ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsTotalRoute
-  '/api/$locale/system/logger/error-monitor/data-sources/error-logs-warnings': typeof ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute
-  '/api/$locale/system/platforms/ai/skills/$characterSkill': typeof ApiLocaleSystemPlatformsAiSkillsCharacterSkillRoute
-  '/api/$locale/system/platforms/cli/interactive/capture': typeof ApiLocaleSystemPlatformsCliInteractiveCaptureRoute
-  '/api/$locale/system/platforms/cli/interactive/send-keys': typeof ApiLocaleSystemPlatformsCliInteractiveSendKeysRoute
-  '/api/$locale/system/platforms/cli/setup/status': typeof ApiLocaleSystemPlatformsCliSetupStatusRoute
-  '/api/$locale/system/platforms/cli/setup/uninstall': typeof ApiLocaleSystemPlatformsCliSetupUninstallRoute
   '/api/$locale/user/private/me/addresses/$addressId': typeof ApiLocaleUserPrivateMeAddressesAddressIdRoute
-  '/api/$locale/agent/chat/folders/subfolders/$subFolderId/move': typeof ApiLocaleAgentChatFoldersSubfoldersSubFolderIdMoveRoute
-  '/api/$locale/agent/chat/folders/subfolders/$subFolderId/permissions': typeof ApiLocaleAgentChatFoldersSubfoldersSubFolderIdPermissionsRoute
-  '/api/$locale/agent/chat/folders/subfolders/$subFolderId/rename': typeof ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRenameRoute
-  '/api/$locale/agent/chat/folders/subfolders/$subFolderId/update': typeof ApiLocaleAgentChatFoldersSubfoldersSubFolderIdUpdateRoute
-  '/api/$locale/agent/chat/threads/$threadId/messages/$messageId': typeof ApiLocaleAgentChatThreadsThreadIdMessagesMessageIdRouteWithChildren
-  '/api/$locale/agent/chat/threads/$threadId/messages/path': typeof ApiLocaleAgentChatThreadsThreadIdMessagesPathRoute
-  '/api/$locale/agent/chat/threads/$threadId/messages/search': typeof ApiLocaleAgentChatThreadsThreadIdMessagesSearchRoute
-  '/api/$locale/agent/chat/threads/files/$threadId/$filename': typeof ApiLocaleAgentChatThreadsFilesThreadIdFilenameRoute
-  '/api/$locale/system/platforms/ai/skills/AGENT/md': typeof ApiLocaleSystemPlatformsAiSkillsAGENTMdRoute
-  '/api/$locale/system/platforms/ai/skills/PUBLIC_USER_AI_RUN/md': typeof ApiLocaleSystemPlatformsAiSkillsPUBLIC_USER_AI_RUNMdRoute
-  '/api/$locale/system/platforms/ai/skills/PUBLIC_USER_SKILL/md': typeof ApiLocaleSystemPlatformsAiSkillsPUBLIC_USER_SKILLMdRoute
-  '/api/$locale/system/platforms/ai/skills/USER_WITH_ACCOUNT_AI_RUN/md': typeof ApiLocaleSystemPlatformsAiSkillsUSER_WITH_ACCOUNT_AI_RUNMdRoute
-  '/api/$locale/system/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL/md': typeof ApiLocaleSystemPlatformsAiSkillsUSER_WITH_ACCOUNT_SKILLMdRoute
-  '/api/$locale/agent/chat/threads/$threadId/messages/$messageId/vote': typeof ApiLocaleAgentChatThreadsThreadIdMessagesMessageIdVoteRoute
+  '/api/$locale/vibe/agent/ai-stream/system-prompt/debug': typeof ApiLocaleVibeAgentAiStreamSystemPromptDebugRoute
+  '/api/$locale/vibe/agent/ai-stream/ws-provider/models': typeof ApiLocaleVibeAgentAiStreamWsProviderModelsRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-downvotes-total': typeof ApiLocaleVibeAgentChatDataSourcesChatDownvotesTotalRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-errors-total': typeof ApiLocaleVibeAgentChatDataSourcesChatErrorsTotalRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-memories-created': typeof ApiLocaleVibeAgentChatDataSourcesChatMemoriesCreatedRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-messages-by-ai': typeof ApiLocaleVibeAgentChatDataSourcesChatMessagesByAiRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-messages-by-user': typeof ApiLocaleVibeAgentChatDataSourcesChatMessagesByUserRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-messages-total': typeof ApiLocaleVibeAgentChatDataSourcesChatMessagesTotalRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-messages-with-attachments': typeof ApiLocaleVibeAgentChatDataSourcesChatMessagesWithAttachmentsRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-share-links-created': typeof ApiLocaleVibeAgentChatDataSourcesChatShareLinksCreatedRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-threads-active-total': typeof ApiLocaleVibeAgentChatDataSourcesChatThreadsActiveTotalRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-threads-created': typeof ApiLocaleVibeAgentChatDataSourcesChatThreadsCreatedRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-tool-calls-total': typeof ApiLocaleVibeAgentChatDataSourcesChatToolCallsTotalRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-unique-users': typeof ApiLocaleVibeAgentChatDataSourcesChatUniqueUsersRoute
+  '/api/$locale/vibe/agent/chat/data-sources/chat-upvotes-total': typeof ApiLocaleVibeAgentChatDataSourcesChatUpvotesTotalRoute
+  '/api/$locale/vibe/agent/chat/folder-contents/$rootFolderId': typeof ApiLocaleVibeAgentChatFolderContentsRootFolderIdRoute
+  '/api/$locale/vibe/agent/chat/folders/$rootFolderId': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRouteWithChildren
+  '/api/$locale/vibe/agent/chat/threads/$threadId': typeof ApiLocaleVibeAgentChatThreadsThreadIdRouteWithChildren
+  '/api/$locale/vibe/agent/chat/threads/rename': typeof ApiLocaleVibeAgentChatThreadsRenameRoute
+  '/api/$locale/vibe/agent/chat/threads/search-messages': typeof ApiLocaleVibeAgentChatThreadsSearchMessagesRoute
+  '/api/$locale/vibe/agent/chat/threads/search-threads': typeof ApiLocaleVibeAgentChatThreadsSearchThreadsRoute
+  '/api/$locale/vibe/agent/cortex/embeddings/backfill': typeof ApiLocaleVibeAgentCortexEmbeddingsBackfillRoute
+  '/api/$locale/vibe/agent/skills/$id/publish': typeof ApiLocaleVibeAgentSkillsIdPublishRoute
+  '/api/$locale/vibe/agent/skills/$id/report': typeof ApiLocaleVibeAgentSkillsIdReportRoute
+  '/api/$locale/vibe/agent/skills/$id/vote': typeof ApiLocaleVibeAgentSkillsIdVoteRoute
+  '/api/$locale/vibe/agent/skills/favorites/$id': typeof ApiLocaleVibeAgentSkillsFavoritesIdRoute
+  '/api/$locale/vibe/agent/skills/favorites/create': typeof ApiLocaleVibeAgentSkillsFavoritesCreateRoute
+  '/api/$locale/vibe/agent/skills/favorites/reorder': typeof ApiLocaleVibeAgentSkillsFavoritesReorderRoute
+  '/api/$locale/vibe/dataflow/graphs/$id/archive': typeof ApiLocaleVibeDataflowGraphsIdArchiveRoute
+  '/api/$locale/vibe/dataflow/graphs/$id/backtest': typeof ApiLocaleVibeDataflowGraphsIdBacktestRoute
+  '/api/$locale/vibe/dataflow/graphs/$id/data': typeof ApiLocaleVibeDataflowGraphsIdDataRoute
+  '/api/$locale/vibe/dataflow/graphs/$id/delete': typeof ApiLocaleVibeDataflowGraphsIdDeleteRoute
+  '/api/$locale/vibe/dataflow/graphs/$id/edit': typeof ApiLocaleVibeDataflowGraphsIdEditRoute
+  '/api/$locale/vibe/dataflow/graphs/$id/promote': typeof ApiLocaleVibeDataflowGraphsIdPromoteRoute
+  '/api/$locale/vibe/dataflow/graphs/$id/trigger': typeof ApiLocaleVibeDataflowGraphsIdTriggerRoute
+  '/api/$locale/vibe/dataflow/graphs/$id/versions': typeof ApiLocaleVibeDataflowGraphsIdVersionsRoute
+  '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-errors': typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsErrorsRoute
+  '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-total': typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsTotalRoute
+  '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings': typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute
+  '/api/$locale/vibe/platforms/ai/skills/$characterSkill': typeof ApiLocaleVibePlatformsAiSkillsCharacterSkillRoute
+  '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdCreateRoute
+  '/api/$locale/vibe/agent/chat/folders/$rootFolderId/root-permissions': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRootPermissionsRoute
+  '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteWithChildren
+  '/api/$locale/vibe/agent/chat/threads/$threadId/messages': typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesRouteWithChildren
+  '/api/$locale/vibe/agent/chat/threads/$threadId/permissions': typeof ApiLocaleVibeAgentChatThreadsThreadIdPermissionsRoute
+  '/api/$locale/vibe/agent/chat/threads/$threadId/share-links': typeof ApiLocaleVibeAgentChatThreadsThreadIdShareLinksRoute
+  '/api/$locale/vibe/platforms/ai/skills/AGENT/md': typeof ApiLocaleVibePlatformsAiSkillsAGENTMdRoute
+  '/api/$locale/vibe/platforms/ai/skills/PUBLIC_USER_AI_RUN/md': typeof ApiLocaleVibePlatformsAiSkillsPUBLIC_USER_AI_RUNMdRoute
+  '/api/$locale/vibe/platforms/ai/skills/PUBLIC_USER_SKILL/md': typeof ApiLocaleVibePlatformsAiSkillsPUBLIC_USER_SKILLMdRoute
+  '/api/$locale/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_AI_RUN/md': typeof ApiLocaleVibePlatformsAiSkillsUSER_WITH_ACCOUNT_AI_RUNMdRoute
+  '/api/$locale/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL/md': typeof ApiLocaleVibePlatformsAiSkillsUSER_WITH_ACCOUNT_SKILLMdRoute
+  '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/move': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdMoveRoute
+  '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/permissions': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdPermissionsRoute
+  '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/rename': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRenameRoute
+  '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/update': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdUpdateRoute
+  '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId': typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdRouteWithChildren
+  '/api/$locale/vibe/agent/chat/threads/$threadId/messages/path': typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesPathRoute
+  '/api/$locale/vibe/agent/chat/threads/$threadId/messages/search': typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesSearchRoute
+  '/api/$locale/vibe/agent/chat/threads/files/$threadId/$filename': typeof ApiLocaleVibeAgentChatThreadsFilesThreadIdFilenameRoute
+  '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId/vote': typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdVoteRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -5907,7 +5777,7 @@ export interface FileRouteTypes {
     | '/$locale/threads/$'
     | '/$locale/tools/$'
     | '/$locale/user'
-    | '/api/$locale/$slug'
+    | '/api/$locale/$notFound'
     | '/api/$locale/contact'
     | '/api/$locale/credits'
     | '/api/$locale/manifest'
@@ -5924,18 +5794,6 @@ export interface FileRouteTypes {
     | '/$locale/tools/'
     | '/$locale/track/'
     | '/$locale/user/signup'
-    | '/api/$locale/agent/coding-agent'
-    | '/api/$locale/agent/describe-image'
-    | '/api/$locale/agent/describe-video'
-    | '/api/$locale/agent/fetch-url-content'
-    | '/api/$locale/agent/image-generation'
-    | '/api/$locale/agent/music-generation'
-    | '/api/$locale/agent/skills'
-    | '/api/$locale/agent/speech-to-text'
-    | '/api/$locale/agent/text-to-speech'
-    | '/api/$locale/agent/video-generation'
-    | '/api/$locale/agent/view-image'
-    | '/api/$locale/agent/web-search'
     | '/api/$locale/browser/click'
     | '/api/$locale/browser/close-page'
     | '/api/$locale/browser/drag'
@@ -6013,23 +5871,18 @@ export interface FileRouteTypes {
     | '/api/$locale/purchasing/dashboard'
     | '/api/$locale/referral/payout'
     | '/api/$locale/referral/stats'
-    | '/api/$locale/remote-connection/$instanceId'
-    | '/api/$locale/remote-connection/connect'
-    | '/api/$locale/remote-connection/connect-reverse'
-    | '/api/$locale/remote-connection/list'
-    | '/api/$locale/remote-connection/sync'
     | '/api/$locale/subscription/cancel'
     | '/api/$locale/subscription/create'
     | '/api/$locale/subscription/dashboard'
     | '/api/$locale/subscription/update'
-    | '/api/$locale/system/execute-tool'
-    | '/api/$locale/system/help-tool'
     | '/api/$locale/tax/report'
     | '/api/$locale/user/session-cleanup'
     | '/api/$locale/users/create'
     | '/api/$locale/users/list'
     | '/api/$locale/users/stats'
     | '/api/$locale/users/view'
+    | '/api/$locale/vibe/execute-tool'
+    | '/api/$locale/vibe/help-tool'
     | '/$locale/creator/$userId/'
     | '/$locale/shared/$token/'
     | '/$locale/skill/$skillId/'
@@ -6048,33 +5901,6 @@ export interface FileRouteTypes {
     | '/$locale/subscription/history/'
     | '/$locale/subscription/overview/'
     | '/$locale/subscription/remote/'
-    | '/api/$locale/agent/ai-stream/cancel'
-    | '/api/$locale/agent/ai-stream/run'
-    | '/api/$locale/agent/ai-stream/stream'
-    | '/api/$locale/agent/chat/public-feed'
-    | '/api/$locale/agent/chat/settings'
-    | '/api/$locale/agent/chat/threads'
-    | '/api/$locale/agent/cortex/delete'
-    | '/api/$locale/agent/cortex/edit'
-    | '/api/$locale/agent/cortex/exec'
-    | '/api/$locale/agent/cortex/list'
-    | '/api/$locale/agent/cortex/mkdir'
-    | '/api/$locale/agent/cortex/move'
-    | '/api/$locale/agent/cortex/read'
-    | '/api/$locale/agent/cortex/search'
-    | '/api/$locale/agent/cortex/terminals'
-    | '/api/$locale/agent/cortex/tree'
-    | '/api/$locale/agent/cortex/write'
-    | '/api/$locale/agent/fetch-url-content/cleanup'
-    | '/api/$locale/agent/models/list'
-    | '/api/$locale/agent/models/model-prices'
-    | '/api/$locale/agent/skills/$id'
-    | '/api/$locale/agent/skills/create'
-    | '/api/$locale/agent/skills/favorites'
-    | '/api/$locale/agent/skills/moderation'
-    | '/api/$locale/agent/speech-to-text/hotkey'
-    | '/api/$locale/agent/web-search/brave'
-    | '/api/$locale/agent/web-search/kagi'
     | '/api/$locale/analytics/evaluators/and'
     | '/api/$locale/analytics/evaluators/crossover'
     | '/api/$locale/analytics/evaluators/not'
@@ -6242,10 +6068,6 @@ export interface FileRouteTypes {
     | '/api/$locale/referral/data-sources/referrals-signups'
     | '/api/$locale/referral/earnings/list'
     | '/api/$locale/referral/lead/current'
-    | '/api/$locale/remote-connection/connect-reverse/update'
-    | '/api/$locale/remote-connection/self/instanceId'
-    | '/api/$locale/remote-connection/self/rename'
-    | '/api/$locale/remote-connection/sync/providers'
     | '/api/$locale/ssh/connections/$id'
     | '/api/$locale/ssh/connections/create'
     | '/api/$locale/ssh/connections/list'
@@ -6259,20 +6081,6 @@ export interface FileRouteTypes {
     | '/api/$locale/subscription/data-sources/subscriptions-new'
     | '/api/$locale/subscription/data-sources/subscriptions-payment-failed'
     | '/api/$locale/subscription/data-sources/subscriptions-trialing'
-    | '/api/$locale/system/database/health'
-    | '/api/$locale/system/database/sql'
-    | '/api/$locale/system/dataflow/cleanup'
-    | '/api/$locale/system/dataflow/graphs'
-    | '/api/$locale/system/dataflow/run-config'
-    | '/api/$locale/system/env/settings'
-    | '/api/$locale/system/execute-tool/await-task'
-    | '/api/$locale/system/execute-tool/complete'
-    | '/api/$locale/system/execute-tool/revival'
-    | '/api/$locale/system/realtime/remote-event-bridge'
-    | '/api/$locale/system/tasks/execute'
-    | '/api/$locale/system/tasks/unified-runner'
-    | '/api/$locale/system/tooling/vibe-deps'
-    | '/api/$locale/system/tooling/vibe-stage'
     | '/api/$locale/tax/rate/create'
     | '/api/$locale/tax/rate/list'
     | '/api/$locale/user/data-sources/users-active-total'
@@ -6290,6 +6098,33 @@ export interface FileRouteTypes {
     | '/api/$locale/user/public/login'
     | '/api/$locale/user/public/signup'
     | '/api/$locale/users/user/$id'
+    | '/api/$locale/vibe/agent/coding-agent'
+    | '/api/$locale/vibe/agent/describe-image'
+    | '/api/$locale/vibe/agent/describe-video'
+    | '/api/$locale/vibe/agent/fetch-url-content'
+    | '/api/$locale/vibe/agent/image-generation'
+    | '/api/$locale/vibe/agent/music-generation'
+    | '/api/$locale/vibe/agent/skills'
+    | '/api/$locale/vibe/agent/speech-to-text'
+    | '/api/$locale/vibe/agent/text-to-speech'
+    | '/api/$locale/vibe/agent/video-generation'
+    | '/api/$locale/vibe/agent/view-image'
+    | '/api/$locale/vibe/agent/web-search'
+    | '/api/$locale/vibe/database/health'
+    | '/api/$locale/vibe/dataflow/cleanup'
+    | '/api/$locale/vibe/dataflow/graphs'
+    | '/api/$locale/vibe/dataflow/run-config'
+    | '/api/$locale/vibe/env/settings'
+    | '/api/$locale/vibe/execute-tool/await-task'
+    | '/api/$locale/vibe/execute-tool/complete'
+    | '/api/$locale/vibe/execute-tool/revival'
+    | '/api/$locale/vibe/realtime/remote-event-bridge'
+    | '/api/$locale/vibe/remote-connection/$instanceId'
+    | '/api/$locale/vibe/remote-connection/connect'
+    | '/api/$locale/vibe/remote-connection/connect-reverse'
+    | '/api/$locale/vibe/remote-connection/list'
+    | '/api/$locale/vibe/remote-connection/sync'
+    | '/api/$locale/vibe/tasks/execute'
     | '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/'
     | '/$locale/story/blog/one-codebase-13-platforms/'
     | '/$locale/story/blog/one-endpoint-every-surface/'
@@ -6307,34 +6142,6 @@ export interface FileRouteTypes {
     | '/$locale/user/login/'
     | '/$locale/user/reset-password/'
     | '/$locale/user/signup/'
-    | '/api/$locale/agent/ai-stream/system-prompt/debug'
-    | '/api/$locale/agent/ai-stream/ws-provider/models'
-    | '/api/$locale/agent/chat/data-sources/chat-downvotes-total'
-    | '/api/$locale/agent/chat/data-sources/chat-errors-total'
-    | '/api/$locale/agent/chat/data-sources/chat-memories-created'
-    | '/api/$locale/agent/chat/data-sources/chat-messages-by-ai'
-    | '/api/$locale/agent/chat/data-sources/chat-messages-by-user'
-    | '/api/$locale/agent/chat/data-sources/chat-messages-total'
-    | '/api/$locale/agent/chat/data-sources/chat-messages-with-attachments'
-    | '/api/$locale/agent/chat/data-sources/chat-share-links-created'
-    | '/api/$locale/agent/chat/data-sources/chat-threads-active-total'
-    | '/api/$locale/agent/chat/data-sources/chat-threads-created'
-    | '/api/$locale/agent/chat/data-sources/chat-tool-calls-total'
-    | '/api/$locale/agent/chat/data-sources/chat-unique-users'
-    | '/api/$locale/agent/chat/data-sources/chat-upvotes-total'
-    | '/api/$locale/agent/chat/folder-contents/$rootFolderId'
-    | '/api/$locale/agent/chat/folders/$rootFolderId'
-    | '/api/$locale/agent/chat/threads/$threadId'
-    | '/api/$locale/agent/chat/threads/rename'
-    | '/api/$locale/agent/chat/threads/search-messages'
-    | '/api/$locale/agent/chat/threads/search-threads'
-    | '/api/$locale/agent/cortex/embeddings/backfill'
-    | '/api/$locale/agent/skills/$id/publish'
-    | '/api/$locale/agent/skills/$id/report'
-    | '/api/$locale/agent/skills/$id/vote'
-    | '/api/$locale/agent/skills/favorites/$id'
-    | '/api/$locale/agent/skills/favorites/create'
-    | '/api/$locale/agent/skills/favorites/reorder'
     | '/api/$locale/chart-of-accounts/account/$accountId/deactivate'
     | '/api/$locale/chart-of-accounts/account/$accountId/get'
     | '/api/$locale/chart-of-accounts/account/$accountId/update'
@@ -6373,9 +6180,7 @@ export interface FileRouteTypes {
     | '/api/$locale/payment/invoice/$invoiceId/send-reminder'
     | '/api/$locale/payment/invoice/$invoiceId/void'
     | '/api/$locale/payment/invoice/line/add'
-    | '/api/$locale/payment/providers/nowpayments/cli'
     | '/api/$locale/payment/providers/nowpayments/webhook'
-    | '/api/$locale/payment/providers/stripe/cli'
     | '/api/$locale/payment/providers/stripe/webhook'
     | '/api/$locale/pos/order/$orderId/add-item'
     | '/api/$locale/pos/order/$orderId/add-payment'
@@ -6404,30 +6209,6 @@ export interface FileRouteTypes {
     | '/api/$locale/ssh/linux/users/list'
     | '/api/$locale/subscription/company/$companyId/get'
     | '/api/$locale/subscription/company/$companyId/list'
-    | '/api/$locale/system/env/settings/export-env'
-    | '/api/$locale/system/env/settings/generate-key'
-    | '/api/$locale/system/execute-tool/call-control/cancel'
-    | '/api/$locale/system/execute-tool/call-control/detach'
-    | '/api/$locale/system/execute-tool/call-control/resume-when-done'
-    | '/api/$locale/system/logger/error-monitor/cleanup'
-    | '/api/$locale/system/logger/error-monitor/client-log'
-    | '/api/$locale/system/logger/error-monitor/logs'
-    | '/api/$locale/system/platforms/vibe-frame/mount'
-    | '/api/$locale/system/server/server/health'
-    | '/api/$locale/system/server/server/rebuild'
-    | '/api/$locale/system/tasks/cron/$id'
-    | '/api/$locale/system/tasks/cron/bulk'
-    | '/api/$locale/system/tasks/cron/history'
-    | '/api/$locale/system/tasks/cron/queue'
-    | '/api/$locale/system/tasks/cron/stats'
-    | '/api/$locale/system/tasks/cron/tasks'
-    | '/api/$locale/system/tasks/data-sources/cron-executions-failed'
-    | '/api/$locale/system/tasks/data-sources/cron-executions-succeeded'
-    | '/api/$locale/system/tasks/data-sources/cron-executions-total'
-    | '/api/$locale/system/tasks/pulse/execute'
-    | '/api/$locale/system/tasks/pulse/history'
-    | '/api/$locale/system/tasks/pulse/status'
-    | '/api/$locale/system/tooling/check/vibe-check'
     | '/api/$locale/tax/rate/$rateId/delete'
     | '/api/$locale/tax/rate/$rateId/update'
     | '/api/$locale/user/private/me/addresses'
@@ -6440,14 +6221,59 @@ export interface FileRouteTypes {
     | '/api/$locale/user/public/reset-password/request'
     | '/api/$locale/user/public/reset-password/validate'
     | '/api/$locale/users/user/$id/roles'
+    | '/api/$locale/vibe/agent/ai-stream/cancel'
+    | '/api/$locale/vibe/agent/ai-stream/run'
+    | '/api/$locale/vibe/agent/ai-stream/stream'
+    | '/api/$locale/vibe/agent/chat/public-feed'
+    | '/api/$locale/vibe/agent/chat/settings'
+    | '/api/$locale/vibe/agent/chat/threads'
+    | '/api/$locale/vibe/agent/cortex/delete'
+    | '/api/$locale/vibe/agent/cortex/edit'
+    | '/api/$locale/vibe/agent/cortex/exec'
+    | '/api/$locale/vibe/agent/cortex/list'
+    | '/api/$locale/vibe/agent/cortex/mkdir'
+    | '/api/$locale/vibe/agent/cortex/move'
+    | '/api/$locale/vibe/agent/cortex/read'
+    | '/api/$locale/vibe/agent/cortex/search'
+    | '/api/$locale/vibe/agent/cortex/terminals'
+    | '/api/$locale/vibe/agent/cortex/tree'
+    | '/api/$locale/vibe/agent/cortex/write'
+    | '/api/$locale/vibe/agent/fetch-url-content/cleanup'
+    | '/api/$locale/vibe/agent/models/list'
+    | '/api/$locale/vibe/agent/skills/$id'
+    | '/api/$locale/vibe/agent/skills/create'
+    | '/api/$locale/vibe/agent/skills/favorites'
+    | '/api/$locale/vibe/agent/skills/moderation'
+    | '/api/$locale/vibe/agent/web-search/brave'
+    | '/api/$locale/vibe/agent/web-search/kagi'
+    | '/api/$locale/vibe/env/settings/export-env'
+    | '/api/$locale/vibe/env/settings/generate-key'
+    | '/api/$locale/vibe/execute-tool/call-control/cancel'
+    | '/api/$locale/vibe/execute-tool/call-control/detach'
+    | '/api/$locale/vibe/execute-tool/call-control/resume-when-done'
+    | '/api/$locale/vibe/logger/error-monitor/cleanup'
+    | '/api/$locale/vibe/logger/error-monitor/client-log'
+    | '/api/$locale/vibe/logger/error-monitor/logs'
+    | '/api/$locale/vibe/platforms/vibe-frame/mount'
+    | '/api/$locale/vibe/remote-connection/connect-reverse/update'
+    | '/api/$locale/vibe/remote-connection/self/instanceId'
+    | '/api/$locale/vibe/remote-connection/self/rename'
+    | '/api/$locale/vibe/remote-connection/sync/providers'
+    | '/api/$locale/vibe/server/server/health'
+    | '/api/$locale/vibe/tasks/cron/$id'
+    | '/api/$locale/vibe/tasks/cron/bulk'
+    | '/api/$locale/vibe/tasks/cron/history'
+    | '/api/$locale/vibe/tasks/cron/queue'
+    | '/api/$locale/vibe/tasks/cron/stats'
+    | '/api/$locale/vibe/tasks/cron/tasks'
+    | '/api/$locale/vibe/tasks/data-sources/cron-executions-failed'
+    | '/api/$locale/vibe/tasks/data-sources/cron-executions-succeeded'
+    | '/api/$locale/vibe/tasks/data-sources/cron-executions-total'
+    | '/api/$locale/vibe/tasks/pulse/execute'
+    | '/api/$locale/vibe/tasks/pulse/history'
+    | '/api/$locale/vibe/tasks/pulse/status'
     | '/$locale/story/newsletter/unsubscribe/$email/'
     | '/$locale/user/reset-password/$token/'
-    | '/api/$locale/agent/chat/folders/$rootFolderId/create'
-    | '/api/$locale/agent/chat/folders/$rootFolderId/root-permissions'
-    | '/api/$locale/agent/chat/folders/subfolders/$subFolderId'
-    | '/api/$locale/agent/chat/threads/$threadId/messages'
-    | '/api/$locale/agent/chat/threads/$threadId/permissions'
-    | '/api/$locale/agent/chat/threads/$threadId/share-links'
     | '/api/$locale/companies/$companyId/members/$memberId/remove'
     | '/api/$locale/companies/$companyId/members/$memberId/update-role'
     | '/api/$locale/lead-magnet/providers/google-sheets/oauth/callback'
@@ -6460,37 +6286,67 @@ export interface FileRouteTypes {
     | '/api/$locale/ssh/connections/$id/mounts/$mountId'
     | '/api/$locale/ssh/connections/$id/mounts/create'
     | '/api/$locale/ssh/connections/$id/mounts/list'
-    | '/api/$locale/system/dataflow/graphs/$id/archive'
-    | '/api/$locale/system/dataflow/graphs/$id/backtest'
-    | '/api/$locale/system/dataflow/graphs/$id/data'
-    | '/api/$locale/system/dataflow/graphs/$id/delete'
-    | '/api/$locale/system/dataflow/graphs/$id/edit'
-    | '/api/$locale/system/dataflow/graphs/$id/promote'
-    | '/api/$locale/system/dataflow/graphs/$id/trigger'
-    | '/api/$locale/system/dataflow/graphs/$id/versions'
-    | '/api/$locale/system/logger/error-monitor/data-sources/error-logs-errors'
-    | '/api/$locale/system/logger/error-monitor/data-sources/error-logs-total'
-    | '/api/$locale/system/logger/error-monitor/data-sources/error-logs-warnings'
-    | '/api/$locale/system/platforms/ai/skills/$characterSkill'
-    | '/api/$locale/system/platforms/cli/interactive/capture'
-    | '/api/$locale/system/platforms/cli/interactive/send-keys'
-    | '/api/$locale/system/platforms/cli/setup/status'
-    | '/api/$locale/system/platforms/cli/setup/uninstall'
     | '/api/$locale/user/private/me/addresses/$addressId'
-    | '/api/$locale/agent/chat/folders/subfolders/$subFolderId/move'
-    | '/api/$locale/agent/chat/folders/subfolders/$subFolderId/permissions'
-    | '/api/$locale/agent/chat/folders/subfolders/$subFolderId/rename'
-    | '/api/$locale/agent/chat/folders/subfolders/$subFolderId/update'
-    | '/api/$locale/agent/chat/threads/$threadId/messages/$messageId'
-    | '/api/$locale/agent/chat/threads/$threadId/messages/path'
-    | '/api/$locale/agent/chat/threads/$threadId/messages/search'
-    | '/api/$locale/agent/chat/threads/files/$threadId/$filename'
-    | '/api/$locale/system/platforms/ai/skills/AGENT/md'
-    | '/api/$locale/system/platforms/ai/skills/PUBLIC_USER_AI_RUN/md'
-    | '/api/$locale/system/platforms/ai/skills/PUBLIC_USER_SKILL/md'
-    | '/api/$locale/system/platforms/ai/skills/USER_WITH_ACCOUNT_AI_RUN/md'
-    | '/api/$locale/system/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL/md'
-    | '/api/$locale/agent/chat/threads/$threadId/messages/$messageId/vote'
+    | '/api/$locale/vibe/agent/ai-stream/system-prompt/debug'
+    | '/api/$locale/vibe/agent/ai-stream/ws-provider/models'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-downvotes-total'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-errors-total'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-memories-created'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-messages-by-ai'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-messages-by-user'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-messages-total'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-messages-with-attachments'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-share-links-created'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-threads-active-total'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-threads-created'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-tool-calls-total'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-unique-users'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-upvotes-total'
+    | '/api/$locale/vibe/agent/chat/folder-contents/$rootFolderId'
+    | '/api/$locale/vibe/agent/chat/folders/$rootFolderId'
+    | '/api/$locale/vibe/agent/chat/threads/$threadId'
+    | '/api/$locale/vibe/agent/chat/threads/rename'
+    | '/api/$locale/vibe/agent/chat/threads/search-messages'
+    | '/api/$locale/vibe/agent/chat/threads/search-threads'
+    | '/api/$locale/vibe/agent/cortex/embeddings/backfill'
+    | '/api/$locale/vibe/agent/skills/$id/publish'
+    | '/api/$locale/vibe/agent/skills/$id/report'
+    | '/api/$locale/vibe/agent/skills/$id/vote'
+    | '/api/$locale/vibe/agent/skills/favorites/$id'
+    | '/api/$locale/vibe/agent/skills/favorites/create'
+    | '/api/$locale/vibe/agent/skills/favorites/reorder'
+    | '/api/$locale/vibe/dataflow/graphs/$id/archive'
+    | '/api/$locale/vibe/dataflow/graphs/$id/backtest'
+    | '/api/$locale/vibe/dataflow/graphs/$id/data'
+    | '/api/$locale/vibe/dataflow/graphs/$id/delete'
+    | '/api/$locale/vibe/dataflow/graphs/$id/edit'
+    | '/api/$locale/vibe/dataflow/graphs/$id/promote'
+    | '/api/$locale/vibe/dataflow/graphs/$id/trigger'
+    | '/api/$locale/vibe/dataflow/graphs/$id/versions'
+    | '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-errors'
+    | '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-total'
+    | '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings'
+    | '/api/$locale/vibe/platforms/ai/skills/$characterSkill'
+    | '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create'
+    | '/api/$locale/vibe/agent/chat/folders/$rootFolderId/root-permissions'
+    | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId'
+    | '/api/$locale/vibe/agent/chat/threads/$threadId/messages'
+    | '/api/$locale/vibe/agent/chat/threads/$threadId/permissions'
+    | '/api/$locale/vibe/agent/chat/threads/$threadId/share-links'
+    | '/api/$locale/vibe/platforms/ai/skills/AGENT/md'
+    | '/api/$locale/vibe/platforms/ai/skills/PUBLIC_USER_AI_RUN/md'
+    | '/api/$locale/vibe/platforms/ai/skills/PUBLIC_USER_SKILL/md'
+    | '/api/$locale/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_AI_RUN/md'
+    | '/api/$locale/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL/md'
+    | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/move'
+    | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/permissions'
+    | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/rename'
+    | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/update'
+    | '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId'
+    | '/api/$locale/vibe/agent/chat/threads/$threadId/messages/path'
+    | '/api/$locale/vibe/agent/chat/threads/$threadId/messages/search'
+    | '/api/$locale/vibe/agent/chat/threads/files/$threadId/$filename'
+    | '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId/vote'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -6500,7 +6356,7 @@ export interface FileRouteTypes {
     | '/$locale/threads/$'
     | '/$locale/tools/$'
     | '/$locale/user'
-    | '/api/$locale/$slug'
+    | '/api/$locale/$notFound'
     | '/api/$locale/contact'
     | '/api/$locale/credits'
     | '/api/$locale/manifest'
@@ -6516,18 +6372,6 @@ export interface FileRouteTypes {
     | '/$locale/threads'
     | '/$locale/tools'
     | '/$locale/track'
-    | '/api/$locale/agent/coding-agent'
-    | '/api/$locale/agent/describe-image'
-    | '/api/$locale/agent/describe-video'
-    | '/api/$locale/agent/fetch-url-content'
-    | '/api/$locale/agent/image-generation'
-    | '/api/$locale/agent/music-generation'
-    | '/api/$locale/agent/skills'
-    | '/api/$locale/agent/speech-to-text'
-    | '/api/$locale/agent/text-to-speech'
-    | '/api/$locale/agent/video-generation'
-    | '/api/$locale/agent/view-image'
-    | '/api/$locale/agent/web-search'
     | '/api/$locale/browser/click'
     | '/api/$locale/browser/close-page'
     | '/api/$locale/browser/drag'
@@ -6605,23 +6449,18 @@ export interface FileRouteTypes {
     | '/api/$locale/purchasing/dashboard'
     | '/api/$locale/referral/payout'
     | '/api/$locale/referral/stats'
-    | '/api/$locale/remote-connection/$instanceId'
-    | '/api/$locale/remote-connection/connect'
-    | '/api/$locale/remote-connection/connect-reverse'
-    | '/api/$locale/remote-connection/list'
-    | '/api/$locale/remote-connection/sync'
     | '/api/$locale/subscription/cancel'
     | '/api/$locale/subscription/create'
     | '/api/$locale/subscription/dashboard'
     | '/api/$locale/subscription/update'
-    | '/api/$locale/system/execute-tool'
-    | '/api/$locale/system/help-tool'
     | '/api/$locale/tax/report'
     | '/api/$locale/user/session-cleanup'
     | '/api/$locale/users/create'
     | '/api/$locale/users/list'
     | '/api/$locale/users/stats'
     | '/api/$locale/users/view'
+    | '/api/$locale/vibe/execute-tool'
+    | '/api/$locale/vibe/help-tool'
     | '/$locale/creator/$userId'
     | '/$locale/shared/$token'
     | '/$locale/skill/$skillId'
@@ -6640,33 +6479,6 @@ export interface FileRouteTypes {
     | '/$locale/subscription/history'
     | '/$locale/subscription/overview'
     | '/$locale/subscription/remote'
-    | '/api/$locale/agent/ai-stream/cancel'
-    | '/api/$locale/agent/ai-stream/run'
-    | '/api/$locale/agent/ai-stream/stream'
-    | '/api/$locale/agent/chat/public-feed'
-    | '/api/$locale/agent/chat/settings'
-    | '/api/$locale/agent/chat/threads'
-    | '/api/$locale/agent/cortex/delete'
-    | '/api/$locale/agent/cortex/edit'
-    | '/api/$locale/agent/cortex/exec'
-    | '/api/$locale/agent/cortex/list'
-    | '/api/$locale/agent/cortex/mkdir'
-    | '/api/$locale/agent/cortex/move'
-    | '/api/$locale/agent/cortex/read'
-    | '/api/$locale/agent/cortex/search'
-    | '/api/$locale/agent/cortex/terminals'
-    | '/api/$locale/agent/cortex/tree'
-    | '/api/$locale/agent/cortex/write'
-    | '/api/$locale/agent/fetch-url-content/cleanup'
-    | '/api/$locale/agent/models/list'
-    | '/api/$locale/agent/models/model-prices'
-    | '/api/$locale/agent/skills/$id'
-    | '/api/$locale/agent/skills/create'
-    | '/api/$locale/agent/skills/favorites'
-    | '/api/$locale/agent/skills/moderation'
-    | '/api/$locale/agent/speech-to-text/hotkey'
-    | '/api/$locale/agent/web-search/brave'
-    | '/api/$locale/agent/web-search/kagi'
     | '/api/$locale/analytics/evaluators/and'
     | '/api/$locale/analytics/evaluators/crossover'
     | '/api/$locale/analytics/evaluators/not'
@@ -6834,10 +6646,6 @@ export interface FileRouteTypes {
     | '/api/$locale/referral/data-sources/referrals-signups'
     | '/api/$locale/referral/earnings/list'
     | '/api/$locale/referral/lead/current'
-    | '/api/$locale/remote-connection/connect-reverse/update'
-    | '/api/$locale/remote-connection/self/instanceId'
-    | '/api/$locale/remote-connection/self/rename'
-    | '/api/$locale/remote-connection/sync/providers'
     | '/api/$locale/ssh/connections/$id'
     | '/api/$locale/ssh/connections/create'
     | '/api/$locale/ssh/connections/list'
@@ -6851,20 +6659,6 @@ export interface FileRouteTypes {
     | '/api/$locale/subscription/data-sources/subscriptions-new'
     | '/api/$locale/subscription/data-sources/subscriptions-payment-failed'
     | '/api/$locale/subscription/data-sources/subscriptions-trialing'
-    | '/api/$locale/system/database/health'
-    | '/api/$locale/system/database/sql'
-    | '/api/$locale/system/dataflow/cleanup'
-    | '/api/$locale/system/dataflow/graphs'
-    | '/api/$locale/system/dataflow/run-config'
-    | '/api/$locale/system/env/settings'
-    | '/api/$locale/system/execute-tool/await-task'
-    | '/api/$locale/system/execute-tool/complete'
-    | '/api/$locale/system/execute-tool/revival'
-    | '/api/$locale/system/realtime/remote-event-bridge'
-    | '/api/$locale/system/tasks/execute'
-    | '/api/$locale/system/tasks/unified-runner'
-    | '/api/$locale/system/tooling/vibe-deps'
-    | '/api/$locale/system/tooling/vibe-stage'
     | '/api/$locale/tax/rate/create'
     | '/api/$locale/tax/rate/list'
     | '/api/$locale/user/data-sources/users-active-total'
@@ -6882,6 +6676,33 @@ export interface FileRouteTypes {
     | '/api/$locale/user/public/login'
     | '/api/$locale/user/public/signup'
     | '/api/$locale/users/user/$id'
+    | '/api/$locale/vibe/agent/coding-agent'
+    | '/api/$locale/vibe/agent/describe-image'
+    | '/api/$locale/vibe/agent/describe-video'
+    | '/api/$locale/vibe/agent/fetch-url-content'
+    | '/api/$locale/vibe/agent/image-generation'
+    | '/api/$locale/vibe/agent/music-generation'
+    | '/api/$locale/vibe/agent/skills'
+    | '/api/$locale/vibe/agent/speech-to-text'
+    | '/api/$locale/vibe/agent/text-to-speech'
+    | '/api/$locale/vibe/agent/video-generation'
+    | '/api/$locale/vibe/agent/view-image'
+    | '/api/$locale/vibe/agent/web-search'
+    | '/api/$locale/vibe/database/health'
+    | '/api/$locale/vibe/dataflow/cleanup'
+    | '/api/$locale/vibe/dataflow/graphs'
+    | '/api/$locale/vibe/dataflow/run-config'
+    | '/api/$locale/vibe/env/settings'
+    | '/api/$locale/vibe/execute-tool/await-task'
+    | '/api/$locale/vibe/execute-tool/complete'
+    | '/api/$locale/vibe/execute-tool/revival'
+    | '/api/$locale/vibe/realtime/remote-event-bridge'
+    | '/api/$locale/vibe/remote-connection/$instanceId'
+    | '/api/$locale/vibe/remote-connection/connect'
+    | '/api/$locale/vibe/remote-connection/connect-reverse'
+    | '/api/$locale/vibe/remote-connection/list'
+    | '/api/$locale/vibe/remote-connection/sync'
+    | '/api/$locale/vibe/tasks/execute'
     | '/$locale/story/blog/dead-trading-bot-to-monitoring-engine'
     | '/$locale/story/blog/one-codebase-13-platforms'
     | '/$locale/story/blog/one-endpoint-every-surface'
@@ -6899,34 +6720,6 @@ export interface FileRouteTypes {
     | '/$locale/user/login'
     | '/$locale/user/reset-password'
     | '/$locale/user/signup'
-    | '/api/$locale/agent/ai-stream/system-prompt/debug'
-    | '/api/$locale/agent/ai-stream/ws-provider/models'
-    | '/api/$locale/agent/chat/data-sources/chat-downvotes-total'
-    | '/api/$locale/agent/chat/data-sources/chat-errors-total'
-    | '/api/$locale/agent/chat/data-sources/chat-memories-created'
-    | '/api/$locale/agent/chat/data-sources/chat-messages-by-ai'
-    | '/api/$locale/agent/chat/data-sources/chat-messages-by-user'
-    | '/api/$locale/agent/chat/data-sources/chat-messages-total'
-    | '/api/$locale/agent/chat/data-sources/chat-messages-with-attachments'
-    | '/api/$locale/agent/chat/data-sources/chat-share-links-created'
-    | '/api/$locale/agent/chat/data-sources/chat-threads-active-total'
-    | '/api/$locale/agent/chat/data-sources/chat-threads-created'
-    | '/api/$locale/agent/chat/data-sources/chat-tool-calls-total'
-    | '/api/$locale/agent/chat/data-sources/chat-unique-users'
-    | '/api/$locale/agent/chat/data-sources/chat-upvotes-total'
-    | '/api/$locale/agent/chat/folder-contents/$rootFolderId'
-    | '/api/$locale/agent/chat/folders/$rootFolderId'
-    | '/api/$locale/agent/chat/threads/$threadId'
-    | '/api/$locale/agent/chat/threads/rename'
-    | '/api/$locale/agent/chat/threads/search-messages'
-    | '/api/$locale/agent/chat/threads/search-threads'
-    | '/api/$locale/agent/cortex/embeddings/backfill'
-    | '/api/$locale/agent/skills/$id/publish'
-    | '/api/$locale/agent/skills/$id/report'
-    | '/api/$locale/agent/skills/$id/vote'
-    | '/api/$locale/agent/skills/favorites/$id'
-    | '/api/$locale/agent/skills/favorites/create'
-    | '/api/$locale/agent/skills/favorites/reorder'
     | '/api/$locale/chart-of-accounts/account/$accountId/deactivate'
     | '/api/$locale/chart-of-accounts/account/$accountId/get'
     | '/api/$locale/chart-of-accounts/account/$accountId/update'
@@ -6965,9 +6758,7 @@ export interface FileRouteTypes {
     | '/api/$locale/payment/invoice/$invoiceId/send-reminder'
     | '/api/$locale/payment/invoice/$invoiceId/void'
     | '/api/$locale/payment/invoice/line/add'
-    | '/api/$locale/payment/providers/nowpayments/cli'
     | '/api/$locale/payment/providers/nowpayments/webhook'
-    | '/api/$locale/payment/providers/stripe/cli'
     | '/api/$locale/payment/providers/stripe/webhook'
     | '/api/$locale/pos/order/$orderId/add-item'
     | '/api/$locale/pos/order/$orderId/add-payment'
@@ -6996,30 +6787,6 @@ export interface FileRouteTypes {
     | '/api/$locale/ssh/linux/users/list'
     | '/api/$locale/subscription/company/$companyId/get'
     | '/api/$locale/subscription/company/$companyId/list'
-    | '/api/$locale/system/env/settings/export-env'
-    | '/api/$locale/system/env/settings/generate-key'
-    | '/api/$locale/system/execute-tool/call-control/cancel'
-    | '/api/$locale/system/execute-tool/call-control/detach'
-    | '/api/$locale/system/execute-tool/call-control/resume-when-done'
-    | '/api/$locale/system/logger/error-monitor/cleanup'
-    | '/api/$locale/system/logger/error-monitor/client-log'
-    | '/api/$locale/system/logger/error-monitor/logs'
-    | '/api/$locale/system/platforms/vibe-frame/mount'
-    | '/api/$locale/system/server/server/health'
-    | '/api/$locale/system/server/server/rebuild'
-    | '/api/$locale/system/tasks/cron/$id'
-    | '/api/$locale/system/tasks/cron/bulk'
-    | '/api/$locale/system/tasks/cron/history'
-    | '/api/$locale/system/tasks/cron/queue'
-    | '/api/$locale/system/tasks/cron/stats'
-    | '/api/$locale/system/tasks/cron/tasks'
-    | '/api/$locale/system/tasks/data-sources/cron-executions-failed'
-    | '/api/$locale/system/tasks/data-sources/cron-executions-succeeded'
-    | '/api/$locale/system/tasks/data-sources/cron-executions-total'
-    | '/api/$locale/system/tasks/pulse/execute'
-    | '/api/$locale/system/tasks/pulse/history'
-    | '/api/$locale/system/tasks/pulse/status'
-    | '/api/$locale/system/tooling/check/vibe-check'
     | '/api/$locale/tax/rate/$rateId/delete'
     | '/api/$locale/tax/rate/$rateId/update'
     | '/api/$locale/user/private/me/addresses'
@@ -7032,14 +6799,59 @@ export interface FileRouteTypes {
     | '/api/$locale/user/public/reset-password/request'
     | '/api/$locale/user/public/reset-password/validate'
     | '/api/$locale/users/user/$id/roles'
+    | '/api/$locale/vibe/agent/ai-stream/cancel'
+    | '/api/$locale/vibe/agent/ai-stream/run'
+    | '/api/$locale/vibe/agent/ai-stream/stream'
+    | '/api/$locale/vibe/agent/chat/public-feed'
+    | '/api/$locale/vibe/agent/chat/settings'
+    | '/api/$locale/vibe/agent/chat/threads'
+    | '/api/$locale/vibe/agent/cortex/delete'
+    | '/api/$locale/vibe/agent/cortex/edit'
+    | '/api/$locale/vibe/agent/cortex/exec'
+    | '/api/$locale/vibe/agent/cortex/list'
+    | '/api/$locale/vibe/agent/cortex/mkdir'
+    | '/api/$locale/vibe/agent/cortex/move'
+    | '/api/$locale/vibe/agent/cortex/read'
+    | '/api/$locale/vibe/agent/cortex/search'
+    | '/api/$locale/vibe/agent/cortex/terminals'
+    | '/api/$locale/vibe/agent/cortex/tree'
+    | '/api/$locale/vibe/agent/cortex/write'
+    | '/api/$locale/vibe/agent/fetch-url-content/cleanup'
+    | '/api/$locale/vibe/agent/models/list'
+    | '/api/$locale/vibe/agent/skills/$id'
+    | '/api/$locale/vibe/agent/skills/create'
+    | '/api/$locale/vibe/agent/skills/favorites'
+    | '/api/$locale/vibe/agent/skills/moderation'
+    | '/api/$locale/vibe/agent/web-search/brave'
+    | '/api/$locale/vibe/agent/web-search/kagi'
+    | '/api/$locale/vibe/env/settings/export-env'
+    | '/api/$locale/vibe/env/settings/generate-key'
+    | '/api/$locale/vibe/execute-tool/call-control/cancel'
+    | '/api/$locale/vibe/execute-tool/call-control/detach'
+    | '/api/$locale/vibe/execute-tool/call-control/resume-when-done'
+    | '/api/$locale/vibe/logger/error-monitor/cleanup'
+    | '/api/$locale/vibe/logger/error-monitor/client-log'
+    | '/api/$locale/vibe/logger/error-monitor/logs'
+    | '/api/$locale/vibe/platforms/vibe-frame/mount'
+    | '/api/$locale/vibe/remote-connection/connect-reverse/update'
+    | '/api/$locale/vibe/remote-connection/self/instanceId'
+    | '/api/$locale/vibe/remote-connection/self/rename'
+    | '/api/$locale/vibe/remote-connection/sync/providers'
+    | '/api/$locale/vibe/server/server/health'
+    | '/api/$locale/vibe/tasks/cron/$id'
+    | '/api/$locale/vibe/tasks/cron/bulk'
+    | '/api/$locale/vibe/tasks/cron/history'
+    | '/api/$locale/vibe/tasks/cron/queue'
+    | '/api/$locale/vibe/tasks/cron/stats'
+    | '/api/$locale/vibe/tasks/cron/tasks'
+    | '/api/$locale/vibe/tasks/data-sources/cron-executions-failed'
+    | '/api/$locale/vibe/tasks/data-sources/cron-executions-succeeded'
+    | '/api/$locale/vibe/tasks/data-sources/cron-executions-total'
+    | '/api/$locale/vibe/tasks/pulse/execute'
+    | '/api/$locale/vibe/tasks/pulse/history'
+    | '/api/$locale/vibe/tasks/pulse/status'
     | '/$locale/story/newsletter/unsubscribe/$email'
     | '/$locale/user/reset-password/$token'
-    | '/api/$locale/agent/chat/folders/$rootFolderId/create'
-    | '/api/$locale/agent/chat/folders/$rootFolderId/root-permissions'
-    | '/api/$locale/agent/chat/folders/subfolders/$subFolderId'
-    | '/api/$locale/agent/chat/threads/$threadId/messages'
-    | '/api/$locale/agent/chat/threads/$threadId/permissions'
-    | '/api/$locale/agent/chat/threads/$threadId/share-links'
     | '/api/$locale/companies/$companyId/members/$memberId/remove'
     | '/api/$locale/companies/$companyId/members/$memberId/update-role'
     | '/api/$locale/lead-magnet/providers/google-sheets/oauth/callback'
@@ -7052,37 +6864,67 @@ export interface FileRouteTypes {
     | '/api/$locale/ssh/connections/$id/mounts/$mountId'
     | '/api/$locale/ssh/connections/$id/mounts/create'
     | '/api/$locale/ssh/connections/$id/mounts/list'
-    | '/api/$locale/system/dataflow/graphs/$id/archive'
-    | '/api/$locale/system/dataflow/graphs/$id/backtest'
-    | '/api/$locale/system/dataflow/graphs/$id/data'
-    | '/api/$locale/system/dataflow/graphs/$id/delete'
-    | '/api/$locale/system/dataflow/graphs/$id/edit'
-    | '/api/$locale/system/dataflow/graphs/$id/promote'
-    | '/api/$locale/system/dataflow/graphs/$id/trigger'
-    | '/api/$locale/system/dataflow/graphs/$id/versions'
-    | '/api/$locale/system/logger/error-monitor/data-sources/error-logs-errors'
-    | '/api/$locale/system/logger/error-monitor/data-sources/error-logs-total'
-    | '/api/$locale/system/logger/error-monitor/data-sources/error-logs-warnings'
-    | '/api/$locale/system/platforms/ai/skills/$characterSkill'
-    | '/api/$locale/system/platforms/cli/interactive/capture'
-    | '/api/$locale/system/platforms/cli/interactive/send-keys'
-    | '/api/$locale/system/platforms/cli/setup/status'
-    | '/api/$locale/system/platforms/cli/setup/uninstall'
     | '/api/$locale/user/private/me/addresses/$addressId'
-    | '/api/$locale/agent/chat/folders/subfolders/$subFolderId/move'
-    | '/api/$locale/agent/chat/folders/subfolders/$subFolderId/permissions'
-    | '/api/$locale/agent/chat/folders/subfolders/$subFolderId/rename'
-    | '/api/$locale/agent/chat/folders/subfolders/$subFolderId/update'
-    | '/api/$locale/agent/chat/threads/$threadId/messages/$messageId'
-    | '/api/$locale/agent/chat/threads/$threadId/messages/path'
-    | '/api/$locale/agent/chat/threads/$threadId/messages/search'
-    | '/api/$locale/agent/chat/threads/files/$threadId/$filename'
-    | '/api/$locale/system/platforms/ai/skills/AGENT/md'
-    | '/api/$locale/system/platforms/ai/skills/PUBLIC_USER_AI_RUN/md'
-    | '/api/$locale/system/platforms/ai/skills/PUBLIC_USER_SKILL/md'
-    | '/api/$locale/system/platforms/ai/skills/USER_WITH_ACCOUNT_AI_RUN/md'
-    | '/api/$locale/system/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL/md'
-    | '/api/$locale/agent/chat/threads/$threadId/messages/$messageId/vote'
+    | '/api/$locale/vibe/agent/ai-stream/system-prompt/debug'
+    | '/api/$locale/vibe/agent/ai-stream/ws-provider/models'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-downvotes-total'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-errors-total'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-memories-created'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-messages-by-ai'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-messages-by-user'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-messages-total'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-messages-with-attachments'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-share-links-created'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-threads-active-total'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-threads-created'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-tool-calls-total'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-unique-users'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-upvotes-total'
+    | '/api/$locale/vibe/agent/chat/folder-contents/$rootFolderId'
+    | '/api/$locale/vibe/agent/chat/folders/$rootFolderId'
+    | '/api/$locale/vibe/agent/chat/threads/$threadId'
+    | '/api/$locale/vibe/agent/chat/threads/rename'
+    | '/api/$locale/vibe/agent/chat/threads/search-messages'
+    | '/api/$locale/vibe/agent/chat/threads/search-threads'
+    | '/api/$locale/vibe/agent/cortex/embeddings/backfill'
+    | '/api/$locale/vibe/agent/skills/$id/publish'
+    | '/api/$locale/vibe/agent/skills/$id/report'
+    | '/api/$locale/vibe/agent/skills/$id/vote'
+    | '/api/$locale/vibe/agent/skills/favorites/$id'
+    | '/api/$locale/vibe/agent/skills/favorites/create'
+    | '/api/$locale/vibe/agent/skills/favorites/reorder'
+    | '/api/$locale/vibe/dataflow/graphs/$id/archive'
+    | '/api/$locale/vibe/dataflow/graphs/$id/backtest'
+    | '/api/$locale/vibe/dataflow/graphs/$id/data'
+    | '/api/$locale/vibe/dataflow/graphs/$id/delete'
+    | '/api/$locale/vibe/dataflow/graphs/$id/edit'
+    | '/api/$locale/vibe/dataflow/graphs/$id/promote'
+    | '/api/$locale/vibe/dataflow/graphs/$id/trigger'
+    | '/api/$locale/vibe/dataflow/graphs/$id/versions'
+    | '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-errors'
+    | '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-total'
+    | '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings'
+    | '/api/$locale/vibe/platforms/ai/skills/$characterSkill'
+    | '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create'
+    | '/api/$locale/vibe/agent/chat/folders/$rootFolderId/root-permissions'
+    | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId'
+    | '/api/$locale/vibe/agent/chat/threads/$threadId/messages'
+    | '/api/$locale/vibe/agent/chat/threads/$threadId/permissions'
+    | '/api/$locale/vibe/agent/chat/threads/$threadId/share-links'
+    | '/api/$locale/vibe/platforms/ai/skills/AGENT/md'
+    | '/api/$locale/vibe/platforms/ai/skills/PUBLIC_USER_AI_RUN/md'
+    | '/api/$locale/vibe/platforms/ai/skills/PUBLIC_USER_SKILL/md'
+    | '/api/$locale/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_AI_RUN/md'
+    | '/api/$locale/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL/md'
+    | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/move'
+    | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/permissions'
+    | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/rename'
+    | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/update'
+    | '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId'
+    | '/api/$locale/vibe/agent/chat/threads/$threadId/messages/path'
+    | '/api/$locale/vibe/agent/chat/threads/$threadId/messages/search'
+    | '/api/$locale/vibe/agent/chat/threads/files/$threadId/$filename'
+    | '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId/vote'
   id:
     | '__root__'
     | '/'
@@ -7097,7 +6939,7 @@ export interface FileRouteTypes {
     | '/$locale/tools/$'
     | '/$locale/user/_account'
     | '/$locale/user/_auth'
-    | '/api/$locale/$slug'
+    | '/api/$locale/$notFound'
     | '/api/$locale/contact'
     | '/api/$locale/credits'
     | '/api/$locale/manifest'
@@ -7114,18 +6956,6 @@ export interface FileRouteTypes {
     | '/$locale/tools/'
     | '/$locale/track/'
     | '/$locale/user/_auth/signup'
-    | '/api/$locale/agent/coding-agent'
-    | '/api/$locale/agent/describe-image'
-    | '/api/$locale/agent/describe-video'
-    | '/api/$locale/agent/fetch-url-content'
-    | '/api/$locale/agent/image-generation'
-    | '/api/$locale/agent/music-generation'
-    | '/api/$locale/agent/skills'
-    | '/api/$locale/agent/speech-to-text'
-    | '/api/$locale/agent/text-to-speech'
-    | '/api/$locale/agent/video-generation'
-    | '/api/$locale/agent/view-image'
-    | '/api/$locale/agent/web-search'
     | '/api/$locale/browser/click'
     | '/api/$locale/browser/close-page'
     | '/api/$locale/browser/drag'
@@ -7203,23 +7033,18 @@ export interface FileRouteTypes {
     | '/api/$locale/purchasing/dashboard'
     | '/api/$locale/referral/payout'
     | '/api/$locale/referral/stats'
-    | '/api/$locale/remote-connection/$instanceId'
-    | '/api/$locale/remote-connection/connect'
-    | '/api/$locale/remote-connection/connect-reverse'
-    | '/api/$locale/remote-connection/list'
-    | '/api/$locale/remote-connection/sync'
     | '/api/$locale/subscription/cancel'
     | '/api/$locale/subscription/create'
     | '/api/$locale/subscription/dashboard'
     | '/api/$locale/subscription/update'
-    | '/api/$locale/system/execute-tool'
-    | '/api/$locale/system/help-tool'
     | '/api/$locale/tax/report'
     | '/api/$locale/user/session-cleanup'
     | '/api/$locale/users/create'
     | '/api/$locale/users/list'
     | '/api/$locale/users/stats'
     | '/api/$locale/users/view'
+    | '/api/$locale/vibe/execute-tool'
+    | '/api/$locale/vibe/help-tool'
     | '/$locale/creator/$userId/'
     | '/$locale/shared/$token/'
     | '/$locale/skill/$skillId/'
@@ -7238,33 +7063,6 @@ export interface FileRouteTypes {
     | '/$locale/subscription/history/'
     | '/$locale/subscription/overview/'
     | '/$locale/subscription/remote/'
-    | '/api/$locale/agent/ai-stream/cancel'
-    | '/api/$locale/agent/ai-stream/run'
-    | '/api/$locale/agent/ai-stream/stream'
-    | '/api/$locale/agent/chat/public-feed'
-    | '/api/$locale/agent/chat/settings'
-    | '/api/$locale/agent/chat/threads'
-    | '/api/$locale/agent/cortex/delete'
-    | '/api/$locale/agent/cortex/edit'
-    | '/api/$locale/agent/cortex/exec'
-    | '/api/$locale/agent/cortex/list'
-    | '/api/$locale/agent/cortex/mkdir'
-    | '/api/$locale/agent/cortex/move'
-    | '/api/$locale/agent/cortex/read'
-    | '/api/$locale/agent/cortex/search'
-    | '/api/$locale/agent/cortex/terminals'
-    | '/api/$locale/agent/cortex/tree'
-    | '/api/$locale/agent/cortex/write'
-    | '/api/$locale/agent/fetch-url-content/cleanup'
-    | '/api/$locale/agent/models/list'
-    | '/api/$locale/agent/models/model-prices'
-    | '/api/$locale/agent/skills/$id'
-    | '/api/$locale/agent/skills/create'
-    | '/api/$locale/agent/skills/favorites'
-    | '/api/$locale/agent/skills/moderation'
-    | '/api/$locale/agent/speech-to-text/hotkey'
-    | '/api/$locale/agent/web-search/brave'
-    | '/api/$locale/agent/web-search/kagi'
     | '/api/$locale/analytics/evaluators/and'
     | '/api/$locale/analytics/evaluators/crossover'
     | '/api/$locale/analytics/evaluators/not'
@@ -7432,10 +7230,6 @@ export interface FileRouteTypes {
     | '/api/$locale/referral/data-sources/referrals-signups'
     | '/api/$locale/referral/earnings/list'
     | '/api/$locale/referral/lead/current'
-    | '/api/$locale/remote-connection/connect-reverse/update'
-    | '/api/$locale/remote-connection/self/instanceId'
-    | '/api/$locale/remote-connection/self/rename'
-    | '/api/$locale/remote-connection/sync/providers'
     | '/api/$locale/ssh/connections/$id'
     | '/api/$locale/ssh/connections/create'
     | '/api/$locale/ssh/connections/list'
@@ -7449,20 +7243,6 @@ export interface FileRouteTypes {
     | '/api/$locale/subscription/data-sources/subscriptions-new'
     | '/api/$locale/subscription/data-sources/subscriptions-payment-failed'
     | '/api/$locale/subscription/data-sources/subscriptions-trialing'
-    | '/api/$locale/system/database/health'
-    | '/api/$locale/system/database/sql'
-    | '/api/$locale/system/dataflow/cleanup'
-    | '/api/$locale/system/dataflow/graphs'
-    | '/api/$locale/system/dataflow/run-config'
-    | '/api/$locale/system/env/settings'
-    | '/api/$locale/system/execute-tool/await-task'
-    | '/api/$locale/system/execute-tool/complete'
-    | '/api/$locale/system/execute-tool/revival'
-    | '/api/$locale/system/realtime/remote-event-bridge'
-    | '/api/$locale/system/tasks/execute'
-    | '/api/$locale/system/tasks/unified-runner'
-    | '/api/$locale/system/tooling/vibe-deps'
-    | '/api/$locale/system/tooling/vibe-stage'
     | '/api/$locale/tax/rate/create'
     | '/api/$locale/tax/rate/list'
     | '/api/$locale/user/data-sources/users-active-total'
@@ -7480,6 +7260,33 @@ export interface FileRouteTypes {
     | '/api/$locale/user/public/login'
     | '/api/$locale/user/public/signup'
     | '/api/$locale/users/user/$id'
+    | '/api/$locale/vibe/agent/coding-agent'
+    | '/api/$locale/vibe/agent/describe-image'
+    | '/api/$locale/vibe/agent/describe-video'
+    | '/api/$locale/vibe/agent/fetch-url-content'
+    | '/api/$locale/vibe/agent/image-generation'
+    | '/api/$locale/vibe/agent/music-generation'
+    | '/api/$locale/vibe/agent/skills'
+    | '/api/$locale/vibe/agent/speech-to-text'
+    | '/api/$locale/vibe/agent/text-to-speech'
+    | '/api/$locale/vibe/agent/video-generation'
+    | '/api/$locale/vibe/agent/view-image'
+    | '/api/$locale/vibe/agent/web-search'
+    | '/api/$locale/vibe/database/health'
+    | '/api/$locale/vibe/dataflow/cleanup'
+    | '/api/$locale/vibe/dataflow/graphs'
+    | '/api/$locale/vibe/dataflow/run-config'
+    | '/api/$locale/vibe/env/settings'
+    | '/api/$locale/vibe/execute-tool/await-task'
+    | '/api/$locale/vibe/execute-tool/complete'
+    | '/api/$locale/vibe/execute-tool/revival'
+    | '/api/$locale/vibe/realtime/remote-event-bridge'
+    | '/api/$locale/vibe/remote-connection/$instanceId'
+    | '/api/$locale/vibe/remote-connection/connect'
+    | '/api/$locale/vibe/remote-connection/connect-reverse'
+    | '/api/$locale/vibe/remote-connection/list'
+    | '/api/$locale/vibe/remote-connection/sync'
+    | '/api/$locale/vibe/tasks/execute'
     | '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/'
     | '/$locale/story/blog/one-codebase-13-platforms/'
     | '/$locale/story/blog/one-endpoint-every-surface/'
@@ -7497,34 +7304,6 @@ export interface FileRouteTypes {
     | '/$locale/user/_auth/login/'
     | '/$locale/user/_auth/reset-password/'
     | '/$locale/user/_auth/signup/'
-    | '/api/$locale/agent/ai-stream/system-prompt/debug'
-    | '/api/$locale/agent/ai-stream/ws-provider/models'
-    | '/api/$locale/agent/chat/data-sources/chat-downvotes-total'
-    | '/api/$locale/agent/chat/data-sources/chat-errors-total'
-    | '/api/$locale/agent/chat/data-sources/chat-memories-created'
-    | '/api/$locale/agent/chat/data-sources/chat-messages-by-ai'
-    | '/api/$locale/agent/chat/data-sources/chat-messages-by-user'
-    | '/api/$locale/agent/chat/data-sources/chat-messages-total'
-    | '/api/$locale/agent/chat/data-sources/chat-messages-with-attachments'
-    | '/api/$locale/agent/chat/data-sources/chat-share-links-created'
-    | '/api/$locale/agent/chat/data-sources/chat-threads-active-total'
-    | '/api/$locale/agent/chat/data-sources/chat-threads-created'
-    | '/api/$locale/agent/chat/data-sources/chat-tool-calls-total'
-    | '/api/$locale/agent/chat/data-sources/chat-unique-users'
-    | '/api/$locale/agent/chat/data-sources/chat-upvotes-total'
-    | '/api/$locale/agent/chat/folder-contents/$rootFolderId'
-    | '/api/$locale/agent/chat/folders/$rootFolderId'
-    | '/api/$locale/agent/chat/threads/$threadId'
-    | '/api/$locale/agent/chat/threads/rename'
-    | '/api/$locale/agent/chat/threads/search-messages'
-    | '/api/$locale/agent/chat/threads/search-threads'
-    | '/api/$locale/agent/cortex/embeddings/backfill'
-    | '/api/$locale/agent/skills/$id/publish'
-    | '/api/$locale/agent/skills/$id/report'
-    | '/api/$locale/agent/skills/$id/vote'
-    | '/api/$locale/agent/skills/favorites/$id'
-    | '/api/$locale/agent/skills/favorites/create'
-    | '/api/$locale/agent/skills/favorites/reorder'
     | '/api/$locale/chart-of-accounts/account/$accountId/deactivate'
     | '/api/$locale/chart-of-accounts/account/$accountId/get'
     | '/api/$locale/chart-of-accounts/account/$accountId/update'
@@ -7563,9 +7342,7 @@ export interface FileRouteTypes {
     | '/api/$locale/payment/invoice/$invoiceId/send-reminder'
     | '/api/$locale/payment/invoice/$invoiceId/void'
     | '/api/$locale/payment/invoice/line/add'
-    | '/api/$locale/payment/providers/nowpayments/cli'
     | '/api/$locale/payment/providers/nowpayments/webhook'
-    | '/api/$locale/payment/providers/stripe/cli'
     | '/api/$locale/payment/providers/stripe/webhook'
     | '/api/$locale/pos/order/$orderId/add-item'
     | '/api/$locale/pos/order/$orderId/add-payment'
@@ -7594,30 +7371,6 @@ export interface FileRouteTypes {
     | '/api/$locale/ssh/linux/users/list'
     | '/api/$locale/subscription/company/$companyId/get'
     | '/api/$locale/subscription/company/$companyId/list'
-    | '/api/$locale/system/env/settings/export-env'
-    | '/api/$locale/system/env/settings/generate-key'
-    | '/api/$locale/system/execute-tool/call-control/cancel'
-    | '/api/$locale/system/execute-tool/call-control/detach'
-    | '/api/$locale/system/execute-tool/call-control/resume-when-done'
-    | '/api/$locale/system/logger/error-monitor/cleanup'
-    | '/api/$locale/system/logger/error-monitor/client-log'
-    | '/api/$locale/system/logger/error-monitor/logs'
-    | '/api/$locale/system/platforms/vibe-frame/mount'
-    | '/api/$locale/system/server/server/health'
-    | '/api/$locale/system/server/server/rebuild'
-    | '/api/$locale/system/tasks/cron/$id'
-    | '/api/$locale/system/tasks/cron/bulk'
-    | '/api/$locale/system/tasks/cron/history'
-    | '/api/$locale/system/tasks/cron/queue'
-    | '/api/$locale/system/tasks/cron/stats'
-    | '/api/$locale/system/tasks/cron/tasks'
-    | '/api/$locale/system/tasks/data-sources/cron-executions-failed'
-    | '/api/$locale/system/tasks/data-sources/cron-executions-succeeded'
-    | '/api/$locale/system/tasks/data-sources/cron-executions-total'
-    | '/api/$locale/system/tasks/pulse/execute'
-    | '/api/$locale/system/tasks/pulse/history'
-    | '/api/$locale/system/tasks/pulse/status'
-    | '/api/$locale/system/tooling/check/vibe-check'
     | '/api/$locale/tax/rate/$rateId/delete'
     | '/api/$locale/tax/rate/$rateId/update'
     | '/api/$locale/user/private/me/addresses'
@@ -7630,14 +7383,59 @@ export interface FileRouteTypes {
     | '/api/$locale/user/public/reset-password/request'
     | '/api/$locale/user/public/reset-password/validate'
     | '/api/$locale/users/user/$id/roles'
+    | '/api/$locale/vibe/agent/ai-stream/cancel'
+    | '/api/$locale/vibe/agent/ai-stream/run'
+    | '/api/$locale/vibe/agent/ai-stream/stream'
+    | '/api/$locale/vibe/agent/chat/public-feed'
+    | '/api/$locale/vibe/agent/chat/settings'
+    | '/api/$locale/vibe/agent/chat/threads'
+    | '/api/$locale/vibe/agent/cortex/delete'
+    | '/api/$locale/vibe/agent/cortex/edit'
+    | '/api/$locale/vibe/agent/cortex/exec'
+    | '/api/$locale/vibe/agent/cortex/list'
+    | '/api/$locale/vibe/agent/cortex/mkdir'
+    | '/api/$locale/vibe/agent/cortex/move'
+    | '/api/$locale/vibe/agent/cortex/read'
+    | '/api/$locale/vibe/agent/cortex/search'
+    | '/api/$locale/vibe/agent/cortex/terminals'
+    | '/api/$locale/vibe/agent/cortex/tree'
+    | '/api/$locale/vibe/agent/cortex/write'
+    | '/api/$locale/vibe/agent/fetch-url-content/cleanup'
+    | '/api/$locale/vibe/agent/models/list'
+    | '/api/$locale/vibe/agent/skills/$id'
+    | '/api/$locale/vibe/agent/skills/create'
+    | '/api/$locale/vibe/agent/skills/favorites'
+    | '/api/$locale/vibe/agent/skills/moderation'
+    | '/api/$locale/vibe/agent/web-search/brave'
+    | '/api/$locale/vibe/agent/web-search/kagi'
+    | '/api/$locale/vibe/env/settings/export-env'
+    | '/api/$locale/vibe/env/settings/generate-key'
+    | '/api/$locale/vibe/execute-tool/call-control/cancel'
+    | '/api/$locale/vibe/execute-tool/call-control/detach'
+    | '/api/$locale/vibe/execute-tool/call-control/resume-when-done'
+    | '/api/$locale/vibe/logger/error-monitor/cleanup'
+    | '/api/$locale/vibe/logger/error-monitor/client-log'
+    | '/api/$locale/vibe/logger/error-monitor/logs'
+    | '/api/$locale/vibe/platforms/vibe-frame/mount'
+    | '/api/$locale/vibe/remote-connection/connect-reverse/update'
+    | '/api/$locale/vibe/remote-connection/self/instanceId'
+    | '/api/$locale/vibe/remote-connection/self/rename'
+    | '/api/$locale/vibe/remote-connection/sync/providers'
+    | '/api/$locale/vibe/server/server/health'
+    | '/api/$locale/vibe/tasks/cron/$id'
+    | '/api/$locale/vibe/tasks/cron/bulk'
+    | '/api/$locale/vibe/tasks/cron/history'
+    | '/api/$locale/vibe/tasks/cron/queue'
+    | '/api/$locale/vibe/tasks/cron/stats'
+    | '/api/$locale/vibe/tasks/cron/tasks'
+    | '/api/$locale/vibe/tasks/data-sources/cron-executions-failed'
+    | '/api/$locale/vibe/tasks/data-sources/cron-executions-succeeded'
+    | '/api/$locale/vibe/tasks/data-sources/cron-executions-total'
+    | '/api/$locale/vibe/tasks/pulse/execute'
+    | '/api/$locale/vibe/tasks/pulse/history'
+    | '/api/$locale/vibe/tasks/pulse/status'
     | '/$locale/story/newsletter/unsubscribe/$email/'
     | '/$locale/user/_auth/reset-password/$token/'
-    | '/api/$locale/agent/chat/folders/$rootFolderId/create'
-    | '/api/$locale/agent/chat/folders/$rootFolderId/root-permissions'
-    | '/api/$locale/agent/chat/folders/subfolders/$subFolderId'
-    | '/api/$locale/agent/chat/threads/$threadId/messages'
-    | '/api/$locale/agent/chat/threads/$threadId/permissions'
-    | '/api/$locale/agent/chat/threads/$threadId/share-links'
     | '/api/$locale/companies/$companyId/members/$memberId/remove'
     | '/api/$locale/companies/$companyId/members/$memberId/update-role'
     | '/api/$locale/lead-magnet/providers/google-sheets/oauth/callback'
@@ -7650,37 +7448,67 @@ export interface FileRouteTypes {
     | '/api/$locale/ssh/connections/$id/mounts/$mountId'
     | '/api/$locale/ssh/connections/$id/mounts/create'
     | '/api/$locale/ssh/connections/$id/mounts/list'
-    | '/api/$locale/system/dataflow/graphs/$id/archive'
-    | '/api/$locale/system/dataflow/graphs/$id/backtest'
-    | '/api/$locale/system/dataflow/graphs/$id/data'
-    | '/api/$locale/system/dataflow/graphs/$id/delete'
-    | '/api/$locale/system/dataflow/graphs/$id/edit'
-    | '/api/$locale/system/dataflow/graphs/$id/promote'
-    | '/api/$locale/system/dataflow/graphs/$id/trigger'
-    | '/api/$locale/system/dataflow/graphs/$id/versions'
-    | '/api/$locale/system/logger/error-monitor/data-sources/error-logs-errors'
-    | '/api/$locale/system/logger/error-monitor/data-sources/error-logs-total'
-    | '/api/$locale/system/logger/error-monitor/data-sources/error-logs-warnings'
-    | '/api/$locale/system/platforms/ai/skills/$characterSkill'
-    | '/api/$locale/system/platforms/cli/interactive/capture'
-    | '/api/$locale/system/platforms/cli/interactive/send-keys'
-    | '/api/$locale/system/platforms/cli/setup/status'
-    | '/api/$locale/system/platforms/cli/setup/uninstall'
     | '/api/$locale/user/private/me/addresses/$addressId'
-    | '/api/$locale/agent/chat/folders/subfolders/$subFolderId/move'
-    | '/api/$locale/agent/chat/folders/subfolders/$subFolderId/permissions'
-    | '/api/$locale/agent/chat/folders/subfolders/$subFolderId/rename'
-    | '/api/$locale/agent/chat/folders/subfolders/$subFolderId/update'
-    | '/api/$locale/agent/chat/threads/$threadId/messages/$messageId'
-    | '/api/$locale/agent/chat/threads/$threadId/messages/path'
-    | '/api/$locale/agent/chat/threads/$threadId/messages/search'
-    | '/api/$locale/agent/chat/threads/files/$threadId/$filename'
-    | '/api/$locale/system/platforms/ai/skills/AGENT/md'
-    | '/api/$locale/system/platforms/ai/skills/PUBLIC_USER_AI_RUN/md'
-    | '/api/$locale/system/platforms/ai/skills/PUBLIC_USER_SKILL/md'
-    | '/api/$locale/system/platforms/ai/skills/USER_WITH_ACCOUNT_AI_RUN/md'
-    | '/api/$locale/system/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL/md'
-    | '/api/$locale/agent/chat/threads/$threadId/messages/$messageId/vote'
+    | '/api/$locale/vibe/agent/ai-stream/system-prompt/debug'
+    | '/api/$locale/vibe/agent/ai-stream/ws-provider/models'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-downvotes-total'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-errors-total'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-memories-created'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-messages-by-ai'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-messages-by-user'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-messages-total'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-messages-with-attachments'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-share-links-created'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-threads-active-total'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-threads-created'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-tool-calls-total'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-unique-users'
+    | '/api/$locale/vibe/agent/chat/data-sources/chat-upvotes-total'
+    | '/api/$locale/vibe/agent/chat/folder-contents/$rootFolderId'
+    | '/api/$locale/vibe/agent/chat/folders/$rootFolderId'
+    | '/api/$locale/vibe/agent/chat/threads/$threadId'
+    | '/api/$locale/vibe/agent/chat/threads/rename'
+    | '/api/$locale/vibe/agent/chat/threads/search-messages'
+    | '/api/$locale/vibe/agent/chat/threads/search-threads'
+    | '/api/$locale/vibe/agent/cortex/embeddings/backfill'
+    | '/api/$locale/vibe/agent/skills/$id/publish'
+    | '/api/$locale/vibe/agent/skills/$id/report'
+    | '/api/$locale/vibe/agent/skills/$id/vote'
+    | '/api/$locale/vibe/agent/skills/favorites/$id'
+    | '/api/$locale/vibe/agent/skills/favorites/create'
+    | '/api/$locale/vibe/agent/skills/favorites/reorder'
+    | '/api/$locale/vibe/dataflow/graphs/$id/archive'
+    | '/api/$locale/vibe/dataflow/graphs/$id/backtest'
+    | '/api/$locale/vibe/dataflow/graphs/$id/data'
+    | '/api/$locale/vibe/dataflow/graphs/$id/delete'
+    | '/api/$locale/vibe/dataflow/graphs/$id/edit'
+    | '/api/$locale/vibe/dataflow/graphs/$id/promote'
+    | '/api/$locale/vibe/dataflow/graphs/$id/trigger'
+    | '/api/$locale/vibe/dataflow/graphs/$id/versions'
+    | '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-errors'
+    | '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-total'
+    | '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings'
+    | '/api/$locale/vibe/platforms/ai/skills/$characterSkill'
+    | '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create'
+    | '/api/$locale/vibe/agent/chat/folders/$rootFolderId/root-permissions'
+    | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId'
+    | '/api/$locale/vibe/agent/chat/threads/$threadId/messages'
+    | '/api/$locale/vibe/agent/chat/threads/$threadId/permissions'
+    | '/api/$locale/vibe/agent/chat/threads/$threadId/share-links'
+    | '/api/$locale/vibe/platforms/ai/skills/AGENT/md'
+    | '/api/$locale/vibe/platforms/ai/skills/PUBLIC_USER_AI_RUN/md'
+    | '/api/$locale/vibe/platforms/ai/skills/PUBLIC_USER_SKILL/md'
+    | '/api/$locale/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_AI_RUN/md'
+    | '/api/$locale/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL/md'
+    | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/move'
+    | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/permissions'
+    | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/rename'
+    | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/update'
+    | '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId'
+    | '/api/$locale/vibe/agent/chat/threads/$threadId/messages/path'
+    | '/api/$locale/vibe/agent/chat/threads/$threadId/messages/search'
+    | '/api/$locale/vibe/agent/chat/threads/files/$threadId/$filename'
+    | '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId/vote'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -7695,7 +7523,7 @@ export interface RootRouteChildren {
   LocaleToolsSplatRoute: typeof LocaleToolsSplatRoute
   LocaleUserAccountRoute: typeof LocaleUserAccountRouteWithChildren
   LocaleUserAuthRoute: typeof LocaleUserAuthRouteWithChildren
-  ApiLocaleSlugRoute: typeof ApiLocaleSlugRoute
+  ApiLocaleNotFoundRoute: typeof ApiLocaleNotFoundRoute
   ApiLocaleContactRoute: typeof ApiLocaleContactRoute
   ApiLocaleCreditsRoute: typeof ApiLocaleCreditsRouteWithChildren
   ApiLocaleManifestRoute: typeof ApiLocaleManifestRoute
@@ -7707,18 +7535,6 @@ export interface RootRouteChildren {
   LocaleSkillsIndexRoute: typeof LocaleSkillsIndexRoute
   LocaleToolsIndexRoute: typeof LocaleToolsIndexRoute
   LocaleTrackIndexRoute: typeof LocaleTrackIndexRoute
-  ApiLocaleAgentCodingAgentRoute: typeof ApiLocaleAgentCodingAgentRoute
-  ApiLocaleAgentDescribeImageRoute: typeof ApiLocaleAgentDescribeImageRoute
-  ApiLocaleAgentDescribeVideoRoute: typeof ApiLocaleAgentDescribeVideoRoute
-  ApiLocaleAgentFetchUrlContentRoute: typeof ApiLocaleAgentFetchUrlContentRouteWithChildren
-  ApiLocaleAgentImageGenerationRoute: typeof ApiLocaleAgentImageGenerationRoute
-  ApiLocaleAgentMusicGenerationRoute: typeof ApiLocaleAgentMusicGenerationRoute
-  ApiLocaleAgentSkillsRoute: typeof ApiLocaleAgentSkillsRouteWithChildren
-  ApiLocaleAgentSpeechToTextRoute: typeof ApiLocaleAgentSpeechToTextRouteWithChildren
-  ApiLocaleAgentTextToSpeechRoute: typeof ApiLocaleAgentTextToSpeechRoute
-  ApiLocaleAgentVideoGenerationRoute: typeof ApiLocaleAgentVideoGenerationRoute
-  ApiLocaleAgentViewImageRoute: typeof ApiLocaleAgentViewImageRoute
-  ApiLocaleAgentWebSearchRoute: typeof ApiLocaleAgentWebSearchRouteWithChildren
   ApiLocaleBrowserClickRoute: typeof ApiLocaleBrowserClickRoute
   ApiLocaleBrowserClosePageRoute: typeof ApiLocaleBrowserClosePageRoute
   ApiLocaleBrowserDragRoute: typeof ApiLocaleBrowserDragRoute
@@ -7784,41 +7600,17 @@ export interface RootRouteChildren {
   ApiLocalePosDashboardRoute: typeof ApiLocalePosDashboardRoute
   ApiLocalePosProductLookupRoute: typeof ApiLocalePosProductLookupRoute
   ApiLocalePurchasingDashboardRoute: typeof ApiLocalePurchasingDashboardRoute
-  ApiLocaleRemoteConnectionInstanceIdRoute: typeof ApiLocaleRemoteConnectionInstanceIdRoute
-  ApiLocaleRemoteConnectionConnectRoute: typeof ApiLocaleRemoteConnectionConnectRoute
-  ApiLocaleRemoteConnectionConnectReverseRoute: typeof ApiLocaleRemoteConnectionConnectReverseRouteWithChildren
-  ApiLocaleRemoteConnectionListRoute: typeof ApiLocaleRemoteConnectionListRoute
-  ApiLocaleRemoteConnectionSyncRoute: typeof ApiLocaleRemoteConnectionSyncRouteWithChildren
-  ApiLocaleSystemExecuteToolRoute: typeof ApiLocaleSystemExecuteToolRouteWithChildren
-  ApiLocaleSystemHelpToolRoute: typeof ApiLocaleSystemHelpToolRoute
   ApiLocaleTaxReportRoute: typeof ApiLocaleTaxReportRoute
   ApiLocaleUserSessionCleanupRoute: typeof ApiLocaleUserSessionCleanupRoute
   ApiLocaleUsersCreateRoute: typeof ApiLocaleUsersCreateRoute
   ApiLocaleUsersListRoute: typeof ApiLocaleUsersListRoute
   ApiLocaleUsersStatsRoute: typeof ApiLocaleUsersStatsRoute
   ApiLocaleUsersViewRoute: typeof ApiLocaleUsersViewRoute
+  ApiLocaleVibeExecuteToolRoute: typeof ApiLocaleVibeExecuteToolRouteWithChildren
+  ApiLocaleVibeHelpToolRoute: typeof ApiLocaleVibeHelpToolRoute
   LocaleCreatorUserIdIndexRoute: typeof LocaleCreatorUserIdIndexRoute
   LocaleSharedTokenIndexRoute: typeof LocaleSharedTokenIndexRoute
   LocaleSkillSkillIdIndexRoute: typeof LocaleSkillSkillIdIndexRoute
-  ApiLocaleAgentAiStreamCancelRoute: typeof ApiLocaleAgentAiStreamCancelRoute
-  ApiLocaleAgentAiStreamRunRoute: typeof ApiLocaleAgentAiStreamRunRoute
-  ApiLocaleAgentAiStreamStreamRoute: typeof ApiLocaleAgentAiStreamStreamRoute
-  ApiLocaleAgentChatPublicFeedRoute: typeof ApiLocaleAgentChatPublicFeedRoute
-  ApiLocaleAgentChatSettingsRoute: typeof ApiLocaleAgentChatSettingsRoute
-  ApiLocaleAgentChatThreadsRoute: typeof ApiLocaleAgentChatThreadsRouteWithChildren
-  ApiLocaleAgentCortexDeleteRoute: typeof ApiLocaleAgentCortexDeleteRoute
-  ApiLocaleAgentCortexEditRoute: typeof ApiLocaleAgentCortexEditRoute
-  ApiLocaleAgentCortexExecRoute: typeof ApiLocaleAgentCortexExecRoute
-  ApiLocaleAgentCortexListRoute: typeof ApiLocaleAgentCortexListRoute
-  ApiLocaleAgentCortexMkdirRoute: typeof ApiLocaleAgentCortexMkdirRoute
-  ApiLocaleAgentCortexMoveRoute: typeof ApiLocaleAgentCortexMoveRoute
-  ApiLocaleAgentCortexReadRoute: typeof ApiLocaleAgentCortexReadRoute
-  ApiLocaleAgentCortexSearchRoute: typeof ApiLocaleAgentCortexSearchRoute
-  ApiLocaleAgentCortexTerminalsRoute: typeof ApiLocaleAgentCortexTerminalsRoute
-  ApiLocaleAgentCortexTreeRoute: typeof ApiLocaleAgentCortexTreeRoute
-  ApiLocaleAgentCortexWriteRoute: typeof ApiLocaleAgentCortexWriteRoute
-  ApiLocaleAgentModelsListRoute: typeof ApiLocaleAgentModelsListRoute
-  ApiLocaleAgentModelsModelPricesRoute: typeof ApiLocaleAgentModelsModelPricesRoute
   ApiLocaleAnalyticsEvaluatorsAndRoute: typeof ApiLocaleAnalyticsEvaluatorsAndRoute
   ApiLocaleAnalyticsEvaluatorsCrossoverRoute: typeof ApiLocaleAnalyticsEvaluatorsCrossoverRoute
   ApiLocaleAnalyticsEvaluatorsNotRoute: typeof ApiLocaleAnalyticsEvaluatorsNotRoute
@@ -7940,22 +7732,9 @@ export interface RootRouteChildren {
   ApiLocalePurchasingOrderListRoute: typeof ApiLocalePurchasingOrderListRoute
   ApiLocalePurchasingVendorCreateRoute: typeof ApiLocalePurchasingVendorCreateRoute
   ApiLocalePurchasingVendorListRoute: typeof ApiLocalePurchasingVendorListRoute
-  ApiLocaleRemoteConnectionSelfInstanceIdRoute: typeof ApiLocaleRemoteConnectionSelfInstanceIdRoute
-  ApiLocaleRemoteConnectionSelfRenameRoute: typeof ApiLocaleRemoteConnectionSelfRenameRoute
   ApiLocaleSshConnectionsIdRoute: typeof ApiLocaleSshConnectionsIdRouteWithChildren
   ApiLocaleSshConnectionsCreateRoute: typeof ApiLocaleSshConnectionsCreateRoute
   ApiLocaleSshConnectionsListRoute: typeof ApiLocaleSshConnectionsListRoute
-  ApiLocaleSystemDatabaseHealthRoute: typeof ApiLocaleSystemDatabaseHealthRoute
-  ApiLocaleSystemDatabaseSqlRoute: typeof ApiLocaleSystemDatabaseSqlRoute
-  ApiLocaleSystemDataflowCleanupRoute: typeof ApiLocaleSystemDataflowCleanupRoute
-  ApiLocaleSystemDataflowGraphsRoute: typeof ApiLocaleSystemDataflowGraphsRouteWithChildren
-  ApiLocaleSystemDataflowRunConfigRoute: typeof ApiLocaleSystemDataflowRunConfigRoute
-  ApiLocaleSystemEnvSettingsRoute: typeof ApiLocaleSystemEnvSettingsRouteWithChildren
-  ApiLocaleSystemRealtimeRemoteEventBridgeRoute: typeof ApiLocaleSystemRealtimeRemoteEventBridgeRoute
-  ApiLocaleSystemTasksExecuteRoute: typeof ApiLocaleSystemTasksExecuteRoute
-  ApiLocaleSystemTasksUnifiedRunnerRoute: typeof ApiLocaleSystemTasksUnifiedRunnerRoute
-  ApiLocaleSystemToolingVibeDepsRoute: typeof ApiLocaleSystemToolingVibeDepsRoute
-  ApiLocaleSystemToolingVibeStageRoute: typeof ApiLocaleSystemToolingVibeStageRoute
   ApiLocaleTaxRateCreateRoute: typeof ApiLocaleTaxRateCreateRoute
   ApiLocaleTaxRateListRoute: typeof ApiLocaleTaxRateListRoute
   ApiLocaleUserDataSourcesUsersActiveTotalRoute: typeof ApiLocaleUserDataSourcesUsersActiveTotalRoute
@@ -7973,24 +7752,30 @@ export interface RootRouteChildren {
   ApiLocaleUserPublicLoginRoute: typeof ApiLocaleUserPublicLoginRouteWithChildren
   ApiLocaleUserPublicSignupRoute: typeof ApiLocaleUserPublicSignupRoute
   ApiLocaleUsersUserIdRoute: typeof ApiLocaleUsersUserIdRouteWithChildren
-  ApiLocaleAgentAiStreamSystemPromptDebugRoute: typeof ApiLocaleAgentAiStreamSystemPromptDebugRoute
-  ApiLocaleAgentAiStreamWsProviderModelsRoute: typeof ApiLocaleAgentAiStreamWsProviderModelsRoute
-  ApiLocaleAgentChatDataSourcesChatDownvotesTotalRoute: typeof ApiLocaleAgentChatDataSourcesChatDownvotesTotalRoute
-  ApiLocaleAgentChatDataSourcesChatErrorsTotalRoute: typeof ApiLocaleAgentChatDataSourcesChatErrorsTotalRoute
-  ApiLocaleAgentChatDataSourcesChatMemoriesCreatedRoute: typeof ApiLocaleAgentChatDataSourcesChatMemoriesCreatedRoute
-  ApiLocaleAgentChatDataSourcesChatMessagesByAiRoute: typeof ApiLocaleAgentChatDataSourcesChatMessagesByAiRoute
-  ApiLocaleAgentChatDataSourcesChatMessagesByUserRoute: typeof ApiLocaleAgentChatDataSourcesChatMessagesByUserRoute
-  ApiLocaleAgentChatDataSourcesChatMessagesTotalRoute: typeof ApiLocaleAgentChatDataSourcesChatMessagesTotalRoute
-  ApiLocaleAgentChatDataSourcesChatMessagesWithAttachmentsRoute: typeof ApiLocaleAgentChatDataSourcesChatMessagesWithAttachmentsRoute
-  ApiLocaleAgentChatDataSourcesChatShareLinksCreatedRoute: typeof ApiLocaleAgentChatDataSourcesChatShareLinksCreatedRoute
-  ApiLocaleAgentChatDataSourcesChatThreadsActiveTotalRoute: typeof ApiLocaleAgentChatDataSourcesChatThreadsActiveTotalRoute
-  ApiLocaleAgentChatDataSourcesChatThreadsCreatedRoute: typeof ApiLocaleAgentChatDataSourcesChatThreadsCreatedRoute
-  ApiLocaleAgentChatDataSourcesChatToolCallsTotalRoute: typeof ApiLocaleAgentChatDataSourcesChatToolCallsTotalRoute
-  ApiLocaleAgentChatDataSourcesChatUniqueUsersRoute: typeof ApiLocaleAgentChatDataSourcesChatUniqueUsersRoute
-  ApiLocaleAgentChatDataSourcesChatUpvotesTotalRoute: typeof ApiLocaleAgentChatDataSourcesChatUpvotesTotalRoute
-  ApiLocaleAgentChatFolderContentsRootFolderIdRoute: typeof ApiLocaleAgentChatFolderContentsRootFolderIdRoute
-  ApiLocaleAgentChatFoldersRootFolderIdRoute: typeof ApiLocaleAgentChatFoldersRootFolderIdRouteWithChildren
-  ApiLocaleAgentCortexEmbeddingsBackfillRoute: typeof ApiLocaleAgentCortexEmbeddingsBackfillRoute
+  ApiLocaleVibeAgentCodingAgentRoute: typeof ApiLocaleVibeAgentCodingAgentRoute
+  ApiLocaleVibeAgentDescribeImageRoute: typeof ApiLocaleVibeAgentDescribeImageRoute
+  ApiLocaleVibeAgentDescribeVideoRoute: typeof ApiLocaleVibeAgentDescribeVideoRoute
+  ApiLocaleVibeAgentFetchUrlContentRoute: typeof ApiLocaleVibeAgentFetchUrlContentRouteWithChildren
+  ApiLocaleVibeAgentImageGenerationRoute: typeof ApiLocaleVibeAgentImageGenerationRoute
+  ApiLocaleVibeAgentMusicGenerationRoute: typeof ApiLocaleVibeAgentMusicGenerationRoute
+  ApiLocaleVibeAgentSkillsRoute: typeof ApiLocaleVibeAgentSkillsRouteWithChildren
+  ApiLocaleVibeAgentSpeechToTextRoute: typeof ApiLocaleVibeAgentSpeechToTextRoute
+  ApiLocaleVibeAgentTextToSpeechRoute: typeof ApiLocaleVibeAgentTextToSpeechRoute
+  ApiLocaleVibeAgentVideoGenerationRoute: typeof ApiLocaleVibeAgentVideoGenerationRoute
+  ApiLocaleVibeAgentViewImageRoute: typeof ApiLocaleVibeAgentViewImageRoute
+  ApiLocaleVibeAgentWebSearchRoute: typeof ApiLocaleVibeAgentWebSearchRouteWithChildren
+  ApiLocaleVibeDatabaseHealthRoute: typeof ApiLocaleVibeDatabaseHealthRoute
+  ApiLocaleVibeDataflowCleanupRoute: typeof ApiLocaleVibeDataflowCleanupRoute
+  ApiLocaleVibeDataflowGraphsRoute: typeof ApiLocaleVibeDataflowGraphsRouteWithChildren
+  ApiLocaleVibeDataflowRunConfigRoute: typeof ApiLocaleVibeDataflowRunConfigRoute
+  ApiLocaleVibeEnvSettingsRoute: typeof ApiLocaleVibeEnvSettingsRouteWithChildren
+  ApiLocaleVibeRealtimeRemoteEventBridgeRoute: typeof ApiLocaleVibeRealtimeRemoteEventBridgeRoute
+  ApiLocaleVibeRemoteConnectionInstanceIdRoute: typeof ApiLocaleVibeRemoteConnectionInstanceIdRoute
+  ApiLocaleVibeRemoteConnectionConnectRoute: typeof ApiLocaleVibeRemoteConnectionConnectRoute
+  ApiLocaleVibeRemoteConnectionConnectReverseRoute: typeof ApiLocaleVibeRemoteConnectionConnectReverseRouteWithChildren
+  ApiLocaleVibeRemoteConnectionListRoute: typeof ApiLocaleVibeRemoteConnectionListRoute
+  ApiLocaleVibeRemoteConnectionSyncRoute: typeof ApiLocaleVibeRemoteConnectionSyncRouteWithChildren
+  ApiLocaleVibeTasksExecuteRoute: typeof ApiLocaleVibeTasksExecuteRoute
   ApiLocaleChartOfAccountsAccountAccountIdDeactivateRoute: typeof ApiLocaleChartOfAccountsAccountAccountIdDeactivateRoute
   ApiLocaleChartOfAccountsAccountAccountIdGetRoute: typeof ApiLocaleChartOfAccountsAccountAccountIdGetRoute
   ApiLocaleChartOfAccountsAccountAccountIdUpdateRoute: typeof ApiLocaleChartOfAccountsAccountAccountIdUpdateRoute
@@ -8033,48 +7818,80 @@ export interface RootRouteChildren {
   ApiLocaleSshLinuxUsersUsernameRoute: typeof ApiLocaleSshLinuxUsersUsernameRoute
   ApiLocaleSshLinuxUsersCreateRoute: typeof ApiLocaleSshLinuxUsersCreateRoute
   ApiLocaleSshLinuxUsersListRoute: typeof ApiLocaleSshLinuxUsersListRoute
-  ApiLocaleSystemLoggerErrorMonitorCleanupRoute: typeof ApiLocaleSystemLoggerErrorMonitorCleanupRoute
-  ApiLocaleSystemLoggerErrorMonitorClientLogRoute: typeof ApiLocaleSystemLoggerErrorMonitorClientLogRoute
-  ApiLocaleSystemLoggerErrorMonitorLogsRoute: typeof ApiLocaleSystemLoggerErrorMonitorLogsRoute
-  ApiLocaleSystemPlatformsVibeFrameMountRoute: typeof ApiLocaleSystemPlatformsVibeFrameMountRoute
-  ApiLocaleSystemServerServerHealthRoute: typeof ApiLocaleSystemServerServerHealthRoute
-  ApiLocaleSystemServerServerRebuildRoute: typeof ApiLocaleSystemServerServerRebuildRoute
-  ApiLocaleSystemTasksCronIdRoute: typeof ApiLocaleSystemTasksCronIdRoute
-  ApiLocaleSystemTasksCronBulkRoute: typeof ApiLocaleSystemTasksCronBulkRoute
-  ApiLocaleSystemTasksCronHistoryRoute: typeof ApiLocaleSystemTasksCronHistoryRoute
-  ApiLocaleSystemTasksCronQueueRoute: typeof ApiLocaleSystemTasksCronQueueRoute
-  ApiLocaleSystemTasksCronStatsRoute: typeof ApiLocaleSystemTasksCronStatsRoute
-  ApiLocaleSystemTasksCronTasksRoute: typeof ApiLocaleSystemTasksCronTasksRoute
-  ApiLocaleSystemTasksDataSourcesCronExecutionsFailedRoute: typeof ApiLocaleSystemTasksDataSourcesCronExecutionsFailedRoute
-  ApiLocaleSystemTasksDataSourcesCronExecutionsSucceededRoute: typeof ApiLocaleSystemTasksDataSourcesCronExecutionsSucceededRoute
-  ApiLocaleSystemTasksDataSourcesCronExecutionsTotalRoute: typeof ApiLocaleSystemTasksDataSourcesCronExecutionsTotalRoute
-  ApiLocaleSystemTasksPulseExecuteRoute: typeof ApiLocaleSystemTasksPulseExecuteRoute
-  ApiLocaleSystemTasksPulseHistoryRoute: typeof ApiLocaleSystemTasksPulseHistoryRoute
-  ApiLocaleSystemTasksPulseStatusRoute: typeof ApiLocaleSystemTasksPulseStatusRoute
-  ApiLocaleSystemToolingCheckVibeCheckRoute: typeof ApiLocaleSystemToolingCheckVibeCheckRoute
   ApiLocaleTaxRateRateIdDeleteRoute: typeof ApiLocaleTaxRateRateIdDeleteRoute
   ApiLocaleTaxRateRateIdUpdateRoute: typeof ApiLocaleTaxRateRateIdUpdateRoute
   ApiLocaleUserPublicCreatorUserIdRoute: typeof ApiLocaleUserPublicCreatorUserIdRoute
   ApiLocaleUserPublicResetPasswordConfirmRoute: typeof ApiLocaleUserPublicResetPasswordConfirmRoute
   ApiLocaleUserPublicResetPasswordRequestRoute: typeof ApiLocaleUserPublicResetPasswordRequestRoute
   ApiLocaleUserPublicResetPasswordValidateRoute: typeof ApiLocaleUserPublicResetPasswordValidateRoute
-  ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRoute: typeof ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRouteWithChildren
+  ApiLocaleVibeAgentAiStreamCancelRoute: typeof ApiLocaleVibeAgentAiStreamCancelRoute
+  ApiLocaleVibeAgentAiStreamRunRoute: typeof ApiLocaleVibeAgentAiStreamRunRoute
+  ApiLocaleVibeAgentAiStreamStreamRoute: typeof ApiLocaleVibeAgentAiStreamStreamRoute
+  ApiLocaleVibeAgentChatPublicFeedRoute: typeof ApiLocaleVibeAgentChatPublicFeedRoute
+  ApiLocaleVibeAgentChatSettingsRoute: typeof ApiLocaleVibeAgentChatSettingsRoute
+  ApiLocaleVibeAgentChatThreadsRoute: typeof ApiLocaleVibeAgentChatThreadsRouteWithChildren
+  ApiLocaleVibeAgentCortexDeleteRoute: typeof ApiLocaleVibeAgentCortexDeleteRoute
+  ApiLocaleVibeAgentCortexEditRoute: typeof ApiLocaleVibeAgentCortexEditRoute
+  ApiLocaleVibeAgentCortexExecRoute: typeof ApiLocaleVibeAgentCortexExecRoute
+  ApiLocaleVibeAgentCortexListRoute: typeof ApiLocaleVibeAgentCortexListRoute
+  ApiLocaleVibeAgentCortexMkdirRoute: typeof ApiLocaleVibeAgentCortexMkdirRoute
+  ApiLocaleVibeAgentCortexMoveRoute: typeof ApiLocaleVibeAgentCortexMoveRoute
+  ApiLocaleVibeAgentCortexReadRoute: typeof ApiLocaleVibeAgentCortexReadRoute
+  ApiLocaleVibeAgentCortexSearchRoute: typeof ApiLocaleVibeAgentCortexSearchRoute
+  ApiLocaleVibeAgentCortexTerminalsRoute: typeof ApiLocaleVibeAgentCortexTerminalsRoute
+  ApiLocaleVibeAgentCortexTreeRoute: typeof ApiLocaleVibeAgentCortexTreeRoute
+  ApiLocaleVibeAgentCortexWriteRoute: typeof ApiLocaleVibeAgentCortexWriteRoute
+  ApiLocaleVibeAgentModelsListRoute: typeof ApiLocaleVibeAgentModelsListRoute
+  ApiLocaleVibeLoggerErrorMonitorCleanupRoute: typeof ApiLocaleVibeLoggerErrorMonitorCleanupRoute
+  ApiLocaleVibeLoggerErrorMonitorClientLogRoute: typeof ApiLocaleVibeLoggerErrorMonitorClientLogRoute
+  ApiLocaleVibeLoggerErrorMonitorLogsRoute: typeof ApiLocaleVibeLoggerErrorMonitorLogsRoute
+  ApiLocaleVibePlatformsVibeFrameMountRoute: typeof ApiLocaleVibePlatformsVibeFrameMountRoute
+  ApiLocaleVibeRemoteConnectionSelfInstanceIdRoute: typeof ApiLocaleVibeRemoteConnectionSelfInstanceIdRoute
+  ApiLocaleVibeRemoteConnectionSelfRenameRoute: typeof ApiLocaleVibeRemoteConnectionSelfRenameRoute
+  ApiLocaleVibeServerServerHealthRoute: typeof ApiLocaleVibeServerServerHealthRoute
+  ApiLocaleVibeTasksCronIdRoute: typeof ApiLocaleVibeTasksCronIdRoute
+  ApiLocaleVibeTasksCronBulkRoute: typeof ApiLocaleVibeTasksCronBulkRoute
+  ApiLocaleVibeTasksCronHistoryRoute: typeof ApiLocaleVibeTasksCronHistoryRoute
+  ApiLocaleVibeTasksCronQueueRoute: typeof ApiLocaleVibeTasksCronQueueRoute
+  ApiLocaleVibeTasksCronStatsRoute: typeof ApiLocaleVibeTasksCronStatsRoute
+  ApiLocaleVibeTasksCronTasksRoute: typeof ApiLocaleVibeTasksCronTasksRoute
+  ApiLocaleVibeTasksDataSourcesCronExecutionsFailedRoute: typeof ApiLocaleVibeTasksDataSourcesCronExecutionsFailedRoute
+  ApiLocaleVibeTasksDataSourcesCronExecutionsSucceededRoute: typeof ApiLocaleVibeTasksDataSourcesCronExecutionsSucceededRoute
+  ApiLocaleVibeTasksDataSourcesCronExecutionsTotalRoute: typeof ApiLocaleVibeTasksDataSourcesCronExecutionsTotalRoute
+  ApiLocaleVibeTasksPulseExecuteRoute: typeof ApiLocaleVibeTasksPulseExecuteRoute
+  ApiLocaleVibeTasksPulseHistoryRoute: typeof ApiLocaleVibeTasksPulseHistoryRoute
+  ApiLocaleVibeTasksPulseStatusRoute: typeof ApiLocaleVibeTasksPulseStatusRoute
   ApiLocaleCompaniesCompanyIdMembersMemberIdRemoveRoute: typeof ApiLocaleCompaniesCompanyIdMembersMemberIdRemoveRoute
   ApiLocaleCompaniesCompanyIdMembersMemberIdUpdateRoleRoute: typeof ApiLocaleCompaniesCompanyIdMembersMemberIdUpdateRoleRoute
   ApiLocaleMessengerProvidersEmailImapClientSyncRoute: typeof ApiLocaleMessengerProvidersEmailImapClientSyncRoute
-  ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsErrorsRoute: typeof ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsErrorsRoute
-  ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsTotalRoute: typeof ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsTotalRoute
-  ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute: typeof ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute
-  ApiLocaleSystemPlatformsAiSkillsCharacterSkillRoute: typeof ApiLocaleSystemPlatformsAiSkillsCharacterSkillRoute
-  ApiLocaleSystemPlatformsCliInteractiveCaptureRoute: typeof ApiLocaleSystemPlatformsCliInteractiveCaptureRoute
-  ApiLocaleSystemPlatformsCliInteractiveSendKeysRoute: typeof ApiLocaleSystemPlatformsCliInteractiveSendKeysRoute
-  ApiLocaleSystemPlatformsCliSetupStatusRoute: typeof ApiLocaleSystemPlatformsCliSetupStatusRoute
-  ApiLocaleSystemPlatformsCliSetupUninstallRoute: typeof ApiLocaleSystemPlatformsCliSetupUninstallRoute
-  ApiLocaleSystemPlatformsAiSkillsAGENTMdRoute: typeof ApiLocaleSystemPlatformsAiSkillsAGENTMdRoute
-  ApiLocaleSystemPlatformsAiSkillsPUBLIC_USER_AI_RUNMdRoute: typeof ApiLocaleSystemPlatformsAiSkillsPUBLIC_USER_AI_RUNMdRoute
-  ApiLocaleSystemPlatformsAiSkillsPUBLIC_USER_SKILLMdRoute: typeof ApiLocaleSystemPlatformsAiSkillsPUBLIC_USER_SKILLMdRoute
-  ApiLocaleSystemPlatformsAiSkillsUSER_WITH_ACCOUNT_AI_RUNMdRoute: typeof ApiLocaleSystemPlatformsAiSkillsUSER_WITH_ACCOUNT_AI_RUNMdRoute
-  ApiLocaleSystemPlatformsAiSkillsUSER_WITH_ACCOUNT_SKILLMdRoute: typeof ApiLocaleSystemPlatformsAiSkillsUSER_WITH_ACCOUNT_SKILLMdRoute
+  ApiLocaleVibeAgentAiStreamSystemPromptDebugRoute: typeof ApiLocaleVibeAgentAiStreamSystemPromptDebugRoute
+  ApiLocaleVibeAgentAiStreamWsProviderModelsRoute: typeof ApiLocaleVibeAgentAiStreamWsProviderModelsRoute
+  ApiLocaleVibeAgentChatDataSourcesChatDownvotesTotalRoute: typeof ApiLocaleVibeAgentChatDataSourcesChatDownvotesTotalRoute
+  ApiLocaleVibeAgentChatDataSourcesChatErrorsTotalRoute: typeof ApiLocaleVibeAgentChatDataSourcesChatErrorsTotalRoute
+  ApiLocaleVibeAgentChatDataSourcesChatMemoriesCreatedRoute: typeof ApiLocaleVibeAgentChatDataSourcesChatMemoriesCreatedRoute
+  ApiLocaleVibeAgentChatDataSourcesChatMessagesByAiRoute: typeof ApiLocaleVibeAgentChatDataSourcesChatMessagesByAiRoute
+  ApiLocaleVibeAgentChatDataSourcesChatMessagesByUserRoute: typeof ApiLocaleVibeAgentChatDataSourcesChatMessagesByUserRoute
+  ApiLocaleVibeAgentChatDataSourcesChatMessagesTotalRoute: typeof ApiLocaleVibeAgentChatDataSourcesChatMessagesTotalRoute
+  ApiLocaleVibeAgentChatDataSourcesChatMessagesWithAttachmentsRoute: typeof ApiLocaleVibeAgentChatDataSourcesChatMessagesWithAttachmentsRoute
+  ApiLocaleVibeAgentChatDataSourcesChatShareLinksCreatedRoute: typeof ApiLocaleVibeAgentChatDataSourcesChatShareLinksCreatedRoute
+  ApiLocaleVibeAgentChatDataSourcesChatThreadsActiveTotalRoute: typeof ApiLocaleVibeAgentChatDataSourcesChatThreadsActiveTotalRoute
+  ApiLocaleVibeAgentChatDataSourcesChatThreadsCreatedRoute: typeof ApiLocaleVibeAgentChatDataSourcesChatThreadsCreatedRoute
+  ApiLocaleVibeAgentChatDataSourcesChatToolCallsTotalRoute: typeof ApiLocaleVibeAgentChatDataSourcesChatToolCallsTotalRoute
+  ApiLocaleVibeAgentChatDataSourcesChatUniqueUsersRoute: typeof ApiLocaleVibeAgentChatDataSourcesChatUniqueUsersRoute
+  ApiLocaleVibeAgentChatDataSourcesChatUpvotesTotalRoute: typeof ApiLocaleVibeAgentChatDataSourcesChatUpvotesTotalRoute
+  ApiLocaleVibeAgentChatFolderContentsRootFolderIdRoute: typeof ApiLocaleVibeAgentChatFolderContentsRootFolderIdRoute
+  ApiLocaleVibeAgentChatFoldersRootFolderIdRoute: typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRouteWithChildren
+  ApiLocaleVibeAgentCortexEmbeddingsBackfillRoute: typeof ApiLocaleVibeAgentCortexEmbeddingsBackfillRoute
+  ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsErrorsRoute: typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsErrorsRoute
+  ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsTotalRoute: typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsTotalRoute
+  ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute: typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute
+  ApiLocaleVibePlatformsAiSkillsCharacterSkillRoute: typeof ApiLocaleVibePlatformsAiSkillsCharacterSkillRoute
+  ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRoute: typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteWithChildren
+  ApiLocaleVibePlatformsAiSkillsAGENTMdRoute: typeof ApiLocaleVibePlatformsAiSkillsAGENTMdRoute
+  ApiLocaleVibePlatformsAiSkillsPUBLIC_USER_AI_RUNMdRoute: typeof ApiLocaleVibePlatformsAiSkillsPUBLIC_USER_AI_RUNMdRoute
+  ApiLocaleVibePlatformsAiSkillsPUBLIC_USER_SKILLMdRoute: typeof ApiLocaleVibePlatformsAiSkillsPUBLIC_USER_SKILLMdRoute
+  ApiLocaleVibePlatformsAiSkillsUSER_WITH_ACCOUNT_AI_RUNMdRoute: typeof ApiLocaleVibePlatformsAiSkillsUSER_WITH_ACCOUNT_AI_RUNMdRoute
+  ApiLocaleVibePlatformsAiSkillsUSER_WITH_ACCOUNT_SKILLMdRoute: typeof ApiLocaleVibePlatformsAiSkillsUSER_WITH_ACCOUNT_SKILLMdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -8233,11 +8050,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleContactRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/$locale/$slug': {
-      id: '/api/$locale/$slug'
-      path: '/api/$locale/$slug'
-      fullPath: '/api/$locale/$slug'
-      preLoaderRoute: typeof ApiLocaleSlugRouteImport
+    '/api/$locale/$notFound': {
+      id: '/api/$locale/$notFound'
+      path: '/api/$locale/$notFound'
+      fullPath: '/api/$locale/$notFound'
+      preLoaderRoute: typeof ApiLocaleNotFoundRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$locale/user/_auth': {
@@ -8401,6 +8218,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleCreatorUserIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/vibe/help-tool': {
+      id: '/api/$locale/vibe/help-tool'
+      path: '/api/$locale/vibe/help-tool'
+      fullPath: '/api/$locale/vibe/help-tool'
+      preLoaderRoute: typeof ApiLocaleVibeHelpToolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/execute-tool': {
+      id: '/api/$locale/vibe/execute-tool'
+      path: '/api/$locale/vibe/execute-tool'
+      fullPath: '/api/$locale/vibe/execute-tool'
+      preLoaderRoute: typeof ApiLocaleVibeExecuteToolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/$locale/users/view': {
       id: '/api/$locale/users/view'
       path: '/api/$locale/users/view'
@@ -8443,20 +8274,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleTaxReportRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/$locale/system/help-tool': {
-      id: '/api/$locale/system/help-tool'
-      path: '/api/$locale/system/help-tool'
-      fullPath: '/api/$locale/system/help-tool'
-      preLoaderRoute: typeof ApiLocaleSystemHelpToolRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/execute-tool': {
-      id: '/api/$locale/system/execute-tool'
-      path: '/api/$locale/system/execute-tool'
-      fullPath: '/api/$locale/system/execute-tool'
-      preLoaderRoute: typeof ApiLocaleSystemExecuteToolRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/$locale/subscription/update': {
       id: '/api/$locale/subscription/update'
       path: '/update'
@@ -8484,41 +8301,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/$locale/subscription/cancel'
       preLoaderRoute: typeof ApiLocaleSubscriptionCancelRouteImport
       parentRoute: typeof ApiLocaleSubscriptionRoute
-    }
-    '/api/$locale/remote-connection/sync': {
-      id: '/api/$locale/remote-connection/sync'
-      path: '/api/$locale/remote-connection/sync'
-      fullPath: '/api/$locale/remote-connection/sync'
-      preLoaderRoute: typeof ApiLocaleRemoteConnectionSyncRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/remote-connection/list': {
-      id: '/api/$locale/remote-connection/list'
-      path: '/api/$locale/remote-connection/list'
-      fullPath: '/api/$locale/remote-connection/list'
-      preLoaderRoute: typeof ApiLocaleRemoteConnectionListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/remote-connection/connect-reverse': {
-      id: '/api/$locale/remote-connection/connect-reverse'
-      path: '/api/$locale/remote-connection/connect-reverse'
-      fullPath: '/api/$locale/remote-connection/connect-reverse'
-      preLoaderRoute: typeof ApiLocaleRemoteConnectionConnectReverseRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/remote-connection/connect': {
-      id: '/api/$locale/remote-connection/connect'
-      path: '/api/$locale/remote-connection/connect'
-      fullPath: '/api/$locale/remote-connection/connect'
-      preLoaderRoute: typeof ApiLocaleRemoteConnectionConnectRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/remote-connection/$instanceId': {
-      id: '/api/$locale/remote-connection/$instanceId'
-      path: '/api/$locale/remote-connection/$instanceId'
-      fullPath: '/api/$locale/remote-connection/$instanceId'
-      preLoaderRoute: typeof ApiLocaleRemoteConnectionInstanceIdRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/api/$locale/referral/stats': {
       id: '/api/$locale/referral/stats'
@@ -9059,90 +8841,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleBrowserClickRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/$locale/agent/web-search': {
-      id: '/api/$locale/agent/web-search'
-      path: '/api/$locale/agent/web-search'
-      fullPath: '/api/$locale/agent/web-search'
-      preLoaderRoute: typeof ApiLocaleAgentWebSearchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/agent/view-image': {
-      id: '/api/$locale/agent/view-image'
-      path: '/api/$locale/agent/view-image'
-      fullPath: '/api/$locale/agent/view-image'
-      preLoaderRoute: typeof ApiLocaleAgentViewImageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/agent/video-generation': {
-      id: '/api/$locale/agent/video-generation'
-      path: '/api/$locale/agent/video-generation'
-      fullPath: '/api/$locale/agent/video-generation'
-      preLoaderRoute: typeof ApiLocaleAgentVideoGenerationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/agent/text-to-speech': {
-      id: '/api/$locale/agent/text-to-speech'
-      path: '/api/$locale/agent/text-to-speech'
-      fullPath: '/api/$locale/agent/text-to-speech'
-      preLoaderRoute: typeof ApiLocaleAgentTextToSpeechRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/agent/speech-to-text': {
-      id: '/api/$locale/agent/speech-to-text'
-      path: '/api/$locale/agent/speech-to-text'
-      fullPath: '/api/$locale/agent/speech-to-text'
-      preLoaderRoute: typeof ApiLocaleAgentSpeechToTextRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/agent/skills': {
-      id: '/api/$locale/agent/skills'
-      path: '/api/$locale/agent/skills'
-      fullPath: '/api/$locale/agent/skills'
-      preLoaderRoute: typeof ApiLocaleAgentSkillsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/agent/music-generation': {
-      id: '/api/$locale/agent/music-generation'
-      path: '/api/$locale/agent/music-generation'
-      fullPath: '/api/$locale/agent/music-generation'
-      preLoaderRoute: typeof ApiLocaleAgentMusicGenerationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/agent/image-generation': {
-      id: '/api/$locale/agent/image-generation'
-      path: '/api/$locale/agent/image-generation'
-      fullPath: '/api/$locale/agent/image-generation'
-      preLoaderRoute: typeof ApiLocaleAgentImageGenerationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/agent/fetch-url-content': {
-      id: '/api/$locale/agent/fetch-url-content'
-      path: '/api/$locale/agent/fetch-url-content'
-      fullPath: '/api/$locale/agent/fetch-url-content'
-      preLoaderRoute: typeof ApiLocaleAgentFetchUrlContentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/agent/describe-video': {
-      id: '/api/$locale/agent/describe-video'
-      path: '/api/$locale/agent/describe-video'
-      fullPath: '/api/$locale/agent/describe-video'
-      preLoaderRoute: typeof ApiLocaleAgentDescribeVideoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/agent/describe-image': {
-      id: '/api/$locale/agent/describe-image'
-      path: '/api/$locale/agent/describe-image'
-      fullPath: '/api/$locale/agent/describe-image'
-      preLoaderRoute: typeof ApiLocaleAgentDescribeImageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/agent/coding-agent': {
-      id: '/api/$locale/agent/coding-agent'
-      path: '/api/$locale/agent/coding-agent'
-      fullPath: '/api/$locale/agent/coding-agent'
-      preLoaderRoute: typeof ApiLocaleAgentCodingAgentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/$locale/user/_auth/signup': {
       id: '/$locale/user/_auth/signup'
       path: '/signup'
@@ -9269,6 +8967,195 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
+    '/api/$locale/vibe/tasks/execute': {
+      id: '/api/$locale/vibe/tasks/execute'
+      path: '/api/$locale/vibe/tasks/execute'
+      fullPath: '/api/$locale/vibe/tasks/execute'
+      preLoaderRoute: typeof ApiLocaleVibeTasksExecuteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/remote-connection/sync': {
+      id: '/api/$locale/vibe/remote-connection/sync'
+      path: '/api/$locale/vibe/remote-connection/sync'
+      fullPath: '/api/$locale/vibe/remote-connection/sync'
+      preLoaderRoute: typeof ApiLocaleVibeRemoteConnectionSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/remote-connection/list': {
+      id: '/api/$locale/vibe/remote-connection/list'
+      path: '/api/$locale/vibe/remote-connection/list'
+      fullPath: '/api/$locale/vibe/remote-connection/list'
+      preLoaderRoute: typeof ApiLocaleVibeRemoteConnectionListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/remote-connection/connect-reverse': {
+      id: '/api/$locale/vibe/remote-connection/connect-reverse'
+      path: '/api/$locale/vibe/remote-connection/connect-reverse'
+      fullPath: '/api/$locale/vibe/remote-connection/connect-reverse'
+      preLoaderRoute: typeof ApiLocaleVibeRemoteConnectionConnectReverseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/remote-connection/connect': {
+      id: '/api/$locale/vibe/remote-connection/connect'
+      path: '/api/$locale/vibe/remote-connection/connect'
+      fullPath: '/api/$locale/vibe/remote-connection/connect'
+      preLoaderRoute: typeof ApiLocaleVibeRemoteConnectionConnectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/remote-connection/$instanceId': {
+      id: '/api/$locale/vibe/remote-connection/$instanceId'
+      path: '/api/$locale/vibe/remote-connection/$instanceId'
+      fullPath: '/api/$locale/vibe/remote-connection/$instanceId'
+      preLoaderRoute: typeof ApiLocaleVibeRemoteConnectionInstanceIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/realtime/remote-event-bridge': {
+      id: '/api/$locale/vibe/realtime/remote-event-bridge'
+      path: '/api/$locale/vibe/realtime/remote-event-bridge'
+      fullPath: '/api/$locale/vibe/realtime/remote-event-bridge'
+      preLoaderRoute: typeof ApiLocaleVibeRealtimeRemoteEventBridgeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/execute-tool/revival': {
+      id: '/api/$locale/vibe/execute-tool/revival'
+      path: '/revival'
+      fullPath: '/api/$locale/vibe/execute-tool/revival'
+      preLoaderRoute: typeof ApiLocaleVibeExecuteToolRevivalRouteImport
+      parentRoute: typeof ApiLocaleVibeExecuteToolRoute
+    }
+    '/api/$locale/vibe/execute-tool/complete': {
+      id: '/api/$locale/vibe/execute-tool/complete'
+      path: '/complete'
+      fullPath: '/api/$locale/vibe/execute-tool/complete'
+      preLoaderRoute: typeof ApiLocaleVibeExecuteToolCompleteRouteImport
+      parentRoute: typeof ApiLocaleVibeExecuteToolRoute
+    }
+    '/api/$locale/vibe/execute-tool/await-task': {
+      id: '/api/$locale/vibe/execute-tool/await-task'
+      path: '/await-task'
+      fullPath: '/api/$locale/vibe/execute-tool/await-task'
+      preLoaderRoute: typeof ApiLocaleVibeExecuteToolAwaitTaskRouteImport
+      parentRoute: typeof ApiLocaleVibeExecuteToolRoute
+    }
+    '/api/$locale/vibe/env/settings': {
+      id: '/api/$locale/vibe/env/settings'
+      path: '/api/$locale/vibe/env/settings'
+      fullPath: '/api/$locale/vibe/env/settings'
+      preLoaderRoute: typeof ApiLocaleVibeEnvSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/dataflow/run-config': {
+      id: '/api/$locale/vibe/dataflow/run-config'
+      path: '/api/$locale/vibe/dataflow/run-config'
+      fullPath: '/api/$locale/vibe/dataflow/run-config'
+      preLoaderRoute: typeof ApiLocaleVibeDataflowRunConfigRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/dataflow/graphs': {
+      id: '/api/$locale/vibe/dataflow/graphs'
+      path: '/api/$locale/vibe/dataflow/graphs'
+      fullPath: '/api/$locale/vibe/dataflow/graphs'
+      preLoaderRoute: typeof ApiLocaleVibeDataflowGraphsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/dataflow/cleanup': {
+      id: '/api/$locale/vibe/dataflow/cleanup'
+      path: '/api/$locale/vibe/dataflow/cleanup'
+      fullPath: '/api/$locale/vibe/dataflow/cleanup'
+      preLoaderRoute: typeof ApiLocaleVibeDataflowCleanupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/database/health': {
+      id: '/api/$locale/vibe/database/health'
+      path: '/api/$locale/vibe/database/health'
+      fullPath: '/api/$locale/vibe/database/health'
+      preLoaderRoute: typeof ApiLocaleVibeDatabaseHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/web-search': {
+      id: '/api/$locale/vibe/agent/web-search'
+      path: '/api/$locale/vibe/agent/web-search'
+      fullPath: '/api/$locale/vibe/agent/web-search'
+      preLoaderRoute: typeof ApiLocaleVibeAgentWebSearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/view-image': {
+      id: '/api/$locale/vibe/agent/view-image'
+      path: '/api/$locale/vibe/agent/view-image'
+      fullPath: '/api/$locale/vibe/agent/view-image'
+      preLoaderRoute: typeof ApiLocaleVibeAgentViewImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/video-generation': {
+      id: '/api/$locale/vibe/agent/video-generation'
+      path: '/api/$locale/vibe/agent/video-generation'
+      fullPath: '/api/$locale/vibe/agent/video-generation'
+      preLoaderRoute: typeof ApiLocaleVibeAgentVideoGenerationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/text-to-speech': {
+      id: '/api/$locale/vibe/agent/text-to-speech'
+      path: '/api/$locale/vibe/agent/text-to-speech'
+      fullPath: '/api/$locale/vibe/agent/text-to-speech'
+      preLoaderRoute: typeof ApiLocaleVibeAgentTextToSpeechRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/speech-to-text': {
+      id: '/api/$locale/vibe/agent/speech-to-text'
+      path: '/api/$locale/vibe/agent/speech-to-text'
+      fullPath: '/api/$locale/vibe/agent/speech-to-text'
+      preLoaderRoute: typeof ApiLocaleVibeAgentSpeechToTextRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/skills': {
+      id: '/api/$locale/vibe/agent/skills'
+      path: '/api/$locale/vibe/agent/skills'
+      fullPath: '/api/$locale/vibe/agent/skills'
+      preLoaderRoute: typeof ApiLocaleVibeAgentSkillsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/music-generation': {
+      id: '/api/$locale/vibe/agent/music-generation'
+      path: '/api/$locale/vibe/agent/music-generation'
+      fullPath: '/api/$locale/vibe/agent/music-generation'
+      preLoaderRoute: typeof ApiLocaleVibeAgentMusicGenerationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/image-generation': {
+      id: '/api/$locale/vibe/agent/image-generation'
+      path: '/api/$locale/vibe/agent/image-generation'
+      fullPath: '/api/$locale/vibe/agent/image-generation'
+      preLoaderRoute: typeof ApiLocaleVibeAgentImageGenerationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/fetch-url-content': {
+      id: '/api/$locale/vibe/agent/fetch-url-content'
+      path: '/api/$locale/vibe/agent/fetch-url-content'
+      fullPath: '/api/$locale/vibe/agent/fetch-url-content'
+      preLoaderRoute: typeof ApiLocaleVibeAgentFetchUrlContentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/describe-video': {
+      id: '/api/$locale/vibe/agent/describe-video'
+      path: '/api/$locale/vibe/agent/describe-video'
+      fullPath: '/api/$locale/vibe/agent/describe-video'
+      preLoaderRoute: typeof ApiLocaleVibeAgentDescribeVideoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/describe-image': {
+      id: '/api/$locale/vibe/agent/describe-image'
+      path: '/api/$locale/vibe/agent/describe-image'
+      fullPath: '/api/$locale/vibe/agent/describe-image'
+      preLoaderRoute: typeof ApiLocaleVibeAgentDescribeImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/coding-agent': {
+      id: '/api/$locale/vibe/agent/coding-agent'
+      path: '/api/$locale/vibe/agent/coding-agent'
+      fullPath: '/api/$locale/vibe/agent/coding-agent'
+      preLoaderRoute: typeof ApiLocaleVibeAgentCodingAgentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/$locale/users/user/$id': {
       id: '/api/$locale/users/user/$id'
       path: '/api/$locale/users/user/$id'
@@ -9388,104 +9275,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleTaxRateCreateRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/$locale/system/tooling/vibe-stage': {
-      id: '/api/$locale/system/tooling/vibe-stage'
-      path: '/api/$locale/system/tooling/vibe-stage'
-      fullPath: '/api/$locale/system/tooling/vibe-stage'
-      preLoaderRoute: typeof ApiLocaleSystemToolingVibeStageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/tooling/vibe-deps': {
-      id: '/api/$locale/system/tooling/vibe-deps'
-      path: '/api/$locale/system/tooling/vibe-deps'
-      fullPath: '/api/$locale/system/tooling/vibe-deps'
-      preLoaderRoute: typeof ApiLocaleSystemToolingVibeDepsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/tasks/unified-runner': {
-      id: '/api/$locale/system/tasks/unified-runner'
-      path: '/api/$locale/system/tasks/unified-runner'
-      fullPath: '/api/$locale/system/tasks/unified-runner'
-      preLoaderRoute: typeof ApiLocaleSystemTasksUnifiedRunnerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/tasks/execute': {
-      id: '/api/$locale/system/tasks/execute'
-      path: '/api/$locale/system/tasks/execute'
-      fullPath: '/api/$locale/system/tasks/execute'
-      preLoaderRoute: typeof ApiLocaleSystemTasksExecuteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/realtime/remote-event-bridge': {
-      id: '/api/$locale/system/realtime/remote-event-bridge'
-      path: '/api/$locale/system/realtime/remote-event-bridge'
-      fullPath: '/api/$locale/system/realtime/remote-event-bridge'
-      preLoaderRoute: typeof ApiLocaleSystemRealtimeRemoteEventBridgeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/execute-tool/revival': {
-      id: '/api/$locale/system/execute-tool/revival'
-      path: '/revival'
-      fullPath: '/api/$locale/system/execute-tool/revival'
-      preLoaderRoute: typeof ApiLocaleSystemExecuteToolRevivalRouteImport
-      parentRoute: typeof ApiLocaleSystemExecuteToolRoute
-    }
-    '/api/$locale/system/execute-tool/complete': {
-      id: '/api/$locale/system/execute-tool/complete'
-      path: '/complete'
-      fullPath: '/api/$locale/system/execute-tool/complete'
-      preLoaderRoute: typeof ApiLocaleSystemExecuteToolCompleteRouteImport
-      parentRoute: typeof ApiLocaleSystemExecuteToolRoute
-    }
-    '/api/$locale/system/execute-tool/await-task': {
-      id: '/api/$locale/system/execute-tool/await-task'
-      path: '/await-task'
-      fullPath: '/api/$locale/system/execute-tool/await-task'
-      preLoaderRoute: typeof ApiLocaleSystemExecuteToolAwaitTaskRouteImport
-      parentRoute: typeof ApiLocaleSystemExecuteToolRoute
-    }
-    '/api/$locale/system/env/settings': {
-      id: '/api/$locale/system/env/settings'
-      path: '/api/$locale/system/env/settings'
-      fullPath: '/api/$locale/system/env/settings'
-      preLoaderRoute: typeof ApiLocaleSystemEnvSettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/dataflow/run-config': {
-      id: '/api/$locale/system/dataflow/run-config'
-      path: '/api/$locale/system/dataflow/run-config'
-      fullPath: '/api/$locale/system/dataflow/run-config'
-      preLoaderRoute: typeof ApiLocaleSystemDataflowRunConfigRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/dataflow/graphs': {
-      id: '/api/$locale/system/dataflow/graphs'
-      path: '/api/$locale/system/dataflow/graphs'
-      fullPath: '/api/$locale/system/dataflow/graphs'
-      preLoaderRoute: typeof ApiLocaleSystemDataflowGraphsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/dataflow/cleanup': {
-      id: '/api/$locale/system/dataflow/cleanup'
-      path: '/api/$locale/system/dataflow/cleanup'
-      fullPath: '/api/$locale/system/dataflow/cleanup'
-      preLoaderRoute: typeof ApiLocaleSystemDataflowCleanupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/database/sql': {
-      id: '/api/$locale/system/database/sql'
-      path: '/api/$locale/system/database/sql'
-      fullPath: '/api/$locale/system/database/sql'
-      preLoaderRoute: typeof ApiLocaleSystemDatabaseSqlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/database/health': {
-      id: '/api/$locale/system/database/health'
-      path: '/api/$locale/system/database/health'
-      fullPath: '/api/$locale/system/database/health'
-      preLoaderRoute: typeof ApiLocaleSystemDatabaseHealthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/$locale/subscription/data-sources/subscriptions-trialing': {
       id: '/api/$locale/subscription/data-sources/subscriptions-trialing'
       path: '/data-sources/subscriptions-trialing'
@@ -9576,34 +9365,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/$locale/ssh/connections/$id'
       preLoaderRoute: typeof ApiLocaleSshConnectionsIdRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/remote-connection/sync/providers': {
-      id: '/api/$locale/remote-connection/sync/providers'
-      path: '/providers'
-      fullPath: '/api/$locale/remote-connection/sync/providers'
-      preLoaderRoute: typeof ApiLocaleRemoteConnectionSyncProvidersRouteImport
-      parentRoute: typeof ApiLocaleRemoteConnectionSyncRoute
-    }
-    '/api/$locale/remote-connection/self/rename': {
-      id: '/api/$locale/remote-connection/self/rename'
-      path: '/api/$locale/remote-connection/self/rename'
-      fullPath: '/api/$locale/remote-connection/self/rename'
-      preLoaderRoute: typeof ApiLocaleRemoteConnectionSelfRenameRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/remote-connection/self/instanceId': {
-      id: '/api/$locale/remote-connection/self/instanceId'
-      path: '/api/$locale/remote-connection/self/instanceId'
-      fullPath: '/api/$locale/remote-connection/self/instanceId'
-      preLoaderRoute: typeof ApiLocaleRemoteConnectionSelfInstanceIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/remote-connection/connect-reverse/update': {
-      id: '/api/$locale/remote-connection/connect-reverse/update'
-      path: '/update'
-      fullPath: '/api/$locale/remote-connection/connect-reverse/update'
-      preLoaderRoute: typeof ApiLocaleRemoteConnectionConnectReverseUpdateRouteImport
-      parentRoute: typeof ApiLocaleRemoteConnectionConnectReverseRoute
     }
     '/api/$locale/referral/lead/current': {
       id: '/api/$locale/referral/lead/current'
@@ -10774,195 +10535,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleAnalyticsEvaluatorsAndRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/$locale/agent/web-search/kagi': {
-      id: '/api/$locale/agent/web-search/kagi'
-      path: '/kagi'
-      fullPath: '/api/$locale/agent/web-search/kagi'
-      preLoaderRoute: typeof ApiLocaleAgentWebSearchKagiRouteImport
-      parentRoute: typeof ApiLocaleAgentWebSearchRoute
-    }
-    '/api/$locale/agent/web-search/brave': {
-      id: '/api/$locale/agent/web-search/brave'
-      path: '/brave'
-      fullPath: '/api/$locale/agent/web-search/brave'
-      preLoaderRoute: typeof ApiLocaleAgentWebSearchBraveRouteImport
-      parentRoute: typeof ApiLocaleAgentWebSearchRoute
-    }
-    '/api/$locale/agent/speech-to-text/hotkey': {
-      id: '/api/$locale/agent/speech-to-text/hotkey'
-      path: '/hotkey'
-      fullPath: '/api/$locale/agent/speech-to-text/hotkey'
-      preLoaderRoute: typeof ApiLocaleAgentSpeechToTextHotkeyRouteImport
-      parentRoute: typeof ApiLocaleAgentSpeechToTextRoute
-    }
-    '/api/$locale/agent/skills/moderation': {
-      id: '/api/$locale/agent/skills/moderation'
-      path: '/moderation'
-      fullPath: '/api/$locale/agent/skills/moderation'
-      preLoaderRoute: typeof ApiLocaleAgentSkillsModerationRouteImport
-      parentRoute: typeof ApiLocaleAgentSkillsRoute
-    }
-    '/api/$locale/agent/skills/favorites': {
-      id: '/api/$locale/agent/skills/favorites'
-      path: '/favorites'
-      fullPath: '/api/$locale/agent/skills/favorites'
-      preLoaderRoute: typeof ApiLocaleAgentSkillsFavoritesRouteImport
-      parentRoute: typeof ApiLocaleAgentSkillsRoute
-    }
-    '/api/$locale/agent/skills/create': {
-      id: '/api/$locale/agent/skills/create'
-      path: '/create'
-      fullPath: '/api/$locale/agent/skills/create'
-      preLoaderRoute: typeof ApiLocaleAgentSkillsCreateRouteImport
-      parentRoute: typeof ApiLocaleAgentSkillsRoute
-    }
-    '/api/$locale/agent/skills/$id': {
-      id: '/api/$locale/agent/skills/$id'
-      path: '/$id'
-      fullPath: '/api/$locale/agent/skills/$id'
-      preLoaderRoute: typeof ApiLocaleAgentSkillsIdRouteImport
-      parentRoute: typeof ApiLocaleAgentSkillsRoute
-    }
-    '/api/$locale/agent/models/model-prices': {
-      id: '/api/$locale/agent/models/model-prices'
-      path: '/api/$locale/agent/models/model-prices'
-      fullPath: '/api/$locale/agent/models/model-prices'
-      preLoaderRoute: typeof ApiLocaleAgentModelsModelPricesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/agent/models/list': {
-      id: '/api/$locale/agent/models/list'
-      path: '/api/$locale/agent/models/list'
-      fullPath: '/api/$locale/agent/models/list'
-      preLoaderRoute: typeof ApiLocaleAgentModelsListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/agent/fetch-url-content/cleanup': {
-      id: '/api/$locale/agent/fetch-url-content/cleanup'
-      path: '/cleanup'
-      fullPath: '/api/$locale/agent/fetch-url-content/cleanup'
-      preLoaderRoute: typeof ApiLocaleAgentFetchUrlContentCleanupRouteImport
-      parentRoute: typeof ApiLocaleAgentFetchUrlContentRoute
-    }
-    '/api/$locale/agent/cortex/write': {
-      id: '/api/$locale/agent/cortex/write'
-      path: '/api/$locale/agent/cortex/write'
-      fullPath: '/api/$locale/agent/cortex/write'
-      preLoaderRoute: typeof ApiLocaleAgentCortexWriteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/agent/cortex/tree': {
-      id: '/api/$locale/agent/cortex/tree'
-      path: '/api/$locale/agent/cortex/tree'
-      fullPath: '/api/$locale/agent/cortex/tree'
-      preLoaderRoute: typeof ApiLocaleAgentCortexTreeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/agent/cortex/terminals': {
-      id: '/api/$locale/agent/cortex/terminals'
-      path: '/api/$locale/agent/cortex/terminals'
-      fullPath: '/api/$locale/agent/cortex/terminals'
-      preLoaderRoute: typeof ApiLocaleAgentCortexTerminalsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/agent/cortex/search': {
-      id: '/api/$locale/agent/cortex/search'
-      path: '/api/$locale/agent/cortex/search'
-      fullPath: '/api/$locale/agent/cortex/search'
-      preLoaderRoute: typeof ApiLocaleAgentCortexSearchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/agent/cortex/read': {
-      id: '/api/$locale/agent/cortex/read'
-      path: '/api/$locale/agent/cortex/read'
-      fullPath: '/api/$locale/agent/cortex/read'
-      preLoaderRoute: typeof ApiLocaleAgentCortexReadRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/agent/cortex/move': {
-      id: '/api/$locale/agent/cortex/move'
-      path: '/api/$locale/agent/cortex/move'
-      fullPath: '/api/$locale/agent/cortex/move'
-      preLoaderRoute: typeof ApiLocaleAgentCortexMoveRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/agent/cortex/mkdir': {
-      id: '/api/$locale/agent/cortex/mkdir'
-      path: '/api/$locale/agent/cortex/mkdir'
-      fullPath: '/api/$locale/agent/cortex/mkdir'
-      preLoaderRoute: typeof ApiLocaleAgentCortexMkdirRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/agent/cortex/list': {
-      id: '/api/$locale/agent/cortex/list'
-      path: '/api/$locale/agent/cortex/list'
-      fullPath: '/api/$locale/agent/cortex/list'
-      preLoaderRoute: typeof ApiLocaleAgentCortexListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/agent/cortex/exec': {
-      id: '/api/$locale/agent/cortex/exec'
-      path: '/api/$locale/agent/cortex/exec'
-      fullPath: '/api/$locale/agent/cortex/exec'
-      preLoaderRoute: typeof ApiLocaleAgentCortexExecRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/agent/cortex/edit': {
-      id: '/api/$locale/agent/cortex/edit'
-      path: '/api/$locale/agent/cortex/edit'
-      fullPath: '/api/$locale/agent/cortex/edit'
-      preLoaderRoute: typeof ApiLocaleAgentCortexEditRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/agent/cortex/delete': {
-      id: '/api/$locale/agent/cortex/delete'
-      path: '/api/$locale/agent/cortex/delete'
-      fullPath: '/api/$locale/agent/cortex/delete'
-      preLoaderRoute: typeof ApiLocaleAgentCortexDeleteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/agent/chat/threads': {
-      id: '/api/$locale/agent/chat/threads'
-      path: '/api/$locale/agent/chat/threads'
-      fullPath: '/api/$locale/agent/chat/threads'
-      preLoaderRoute: typeof ApiLocaleAgentChatThreadsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/agent/chat/settings': {
-      id: '/api/$locale/agent/chat/settings'
-      path: '/api/$locale/agent/chat/settings'
-      fullPath: '/api/$locale/agent/chat/settings'
-      preLoaderRoute: typeof ApiLocaleAgentChatSettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/agent/chat/public-feed': {
-      id: '/api/$locale/agent/chat/public-feed'
-      path: '/api/$locale/agent/chat/public-feed'
-      fullPath: '/api/$locale/agent/chat/public-feed'
-      preLoaderRoute: typeof ApiLocaleAgentChatPublicFeedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/agent/ai-stream/stream': {
-      id: '/api/$locale/agent/ai-stream/stream'
-      path: '/api/$locale/agent/ai-stream/stream'
-      fullPath: '/api/$locale/agent/ai-stream/stream'
-      preLoaderRoute: typeof ApiLocaleAgentAiStreamStreamRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/agent/ai-stream/run': {
-      id: '/api/$locale/agent/ai-stream/run'
-      path: '/api/$locale/agent/ai-stream/run'
-      fullPath: '/api/$locale/agent/ai-stream/run'
-      preLoaderRoute: typeof ApiLocaleAgentAiStreamRunRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/agent/ai-stream/cancel': {
-      id: '/api/$locale/agent/ai-stream/cancel'
-      path: '/api/$locale/agent/ai-stream/cancel'
-      fullPath: '/api/$locale/agent/ai-stream/cancel'
-      preLoaderRoute: typeof ApiLocaleAgentAiStreamCancelRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/$locale/user/_auth/reset-password/$token/': {
       id: '/$locale/user/_auth/reset-password/$token/'
       path: '/reset-password/$token'
@@ -10976,6 +10548,363 @@ declare module '@tanstack/react-router' {
       fullPath: '/$locale/story/newsletter/unsubscribe/$email/'
       preLoaderRoute: typeof LocaleStoryNewsletterUnsubscribeEmailIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
+    }
+    '/api/$locale/vibe/tasks/pulse/status': {
+      id: '/api/$locale/vibe/tasks/pulse/status'
+      path: '/api/$locale/vibe/tasks/pulse/status'
+      fullPath: '/api/$locale/vibe/tasks/pulse/status'
+      preLoaderRoute: typeof ApiLocaleVibeTasksPulseStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/tasks/pulse/history': {
+      id: '/api/$locale/vibe/tasks/pulse/history'
+      path: '/api/$locale/vibe/tasks/pulse/history'
+      fullPath: '/api/$locale/vibe/tasks/pulse/history'
+      preLoaderRoute: typeof ApiLocaleVibeTasksPulseHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/tasks/pulse/execute': {
+      id: '/api/$locale/vibe/tasks/pulse/execute'
+      path: '/api/$locale/vibe/tasks/pulse/execute'
+      fullPath: '/api/$locale/vibe/tasks/pulse/execute'
+      preLoaderRoute: typeof ApiLocaleVibeTasksPulseExecuteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/tasks/data-sources/cron-executions-total': {
+      id: '/api/$locale/vibe/tasks/data-sources/cron-executions-total'
+      path: '/api/$locale/vibe/tasks/data-sources/cron-executions-total'
+      fullPath: '/api/$locale/vibe/tasks/data-sources/cron-executions-total'
+      preLoaderRoute: typeof ApiLocaleVibeTasksDataSourcesCronExecutionsTotalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/tasks/data-sources/cron-executions-succeeded': {
+      id: '/api/$locale/vibe/tasks/data-sources/cron-executions-succeeded'
+      path: '/api/$locale/vibe/tasks/data-sources/cron-executions-succeeded'
+      fullPath: '/api/$locale/vibe/tasks/data-sources/cron-executions-succeeded'
+      preLoaderRoute: typeof ApiLocaleVibeTasksDataSourcesCronExecutionsSucceededRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/tasks/data-sources/cron-executions-failed': {
+      id: '/api/$locale/vibe/tasks/data-sources/cron-executions-failed'
+      path: '/api/$locale/vibe/tasks/data-sources/cron-executions-failed'
+      fullPath: '/api/$locale/vibe/tasks/data-sources/cron-executions-failed'
+      preLoaderRoute: typeof ApiLocaleVibeTasksDataSourcesCronExecutionsFailedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/tasks/cron/tasks': {
+      id: '/api/$locale/vibe/tasks/cron/tasks'
+      path: '/api/$locale/vibe/tasks/cron/tasks'
+      fullPath: '/api/$locale/vibe/tasks/cron/tasks'
+      preLoaderRoute: typeof ApiLocaleVibeTasksCronTasksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/tasks/cron/stats': {
+      id: '/api/$locale/vibe/tasks/cron/stats'
+      path: '/api/$locale/vibe/tasks/cron/stats'
+      fullPath: '/api/$locale/vibe/tasks/cron/stats'
+      preLoaderRoute: typeof ApiLocaleVibeTasksCronStatsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/tasks/cron/queue': {
+      id: '/api/$locale/vibe/tasks/cron/queue'
+      path: '/api/$locale/vibe/tasks/cron/queue'
+      fullPath: '/api/$locale/vibe/tasks/cron/queue'
+      preLoaderRoute: typeof ApiLocaleVibeTasksCronQueueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/tasks/cron/history': {
+      id: '/api/$locale/vibe/tasks/cron/history'
+      path: '/api/$locale/vibe/tasks/cron/history'
+      fullPath: '/api/$locale/vibe/tasks/cron/history'
+      preLoaderRoute: typeof ApiLocaleVibeTasksCronHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/tasks/cron/bulk': {
+      id: '/api/$locale/vibe/tasks/cron/bulk'
+      path: '/api/$locale/vibe/tasks/cron/bulk'
+      fullPath: '/api/$locale/vibe/tasks/cron/bulk'
+      preLoaderRoute: typeof ApiLocaleVibeTasksCronBulkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/tasks/cron/$id': {
+      id: '/api/$locale/vibe/tasks/cron/$id'
+      path: '/api/$locale/vibe/tasks/cron/$id'
+      fullPath: '/api/$locale/vibe/tasks/cron/$id'
+      preLoaderRoute: typeof ApiLocaleVibeTasksCronIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/server/server/health': {
+      id: '/api/$locale/vibe/server/server/health'
+      path: '/api/$locale/vibe/server/server/health'
+      fullPath: '/api/$locale/vibe/server/server/health'
+      preLoaderRoute: typeof ApiLocaleVibeServerServerHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/remote-connection/sync/providers': {
+      id: '/api/$locale/vibe/remote-connection/sync/providers'
+      path: '/providers'
+      fullPath: '/api/$locale/vibe/remote-connection/sync/providers'
+      preLoaderRoute: typeof ApiLocaleVibeRemoteConnectionSyncProvidersRouteImport
+      parentRoute: typeof ApiLocaleVibeRemoteConnectionSyncRoute
+    }
+    '/api/$locale/vibe/remote-connection/self/rename': {
+      id: '/api/$locale/vibe/remote-connection/self/rename'
+      path: '/api/$locale/vibe/remote-connection/self/rename'
+      fullPath: '/api/$locale/vibe/remote-connection/self/rename'
+      preLoaderRoute: typeof ApiLocaleVibeRemoteConnectionSelfRenameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/remote-connection/self/instanceId': {
+      id: '/api/$locale/vibe/remote-connection/self/instanceId'
+      path: '/api/$locale/vibe/remote-connection/self/instanceId'
+      fullPath: '/api/$locale/vibe/remote-connection/self/instanceId'
+      preLoaderRoute: typeof ApiLocaleVibeRemoteConnectionSelfInstanceIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/remote-connection/connect-reverse/update': {
+      id: '/api/$locale/vibe/remote-connection/connect-reverse/update'
+      path: '/update'
+      fullPath: '/api/$locale/vibe/remote-connection/connect-reverse/update'
+      preLoaderRoute: typeof ApiLocaleVibeRemoteConnectionConnectReverseUpdateRouteImport
+      parentRoute: typeof ApiLocaleVibeRemoteConnectionConnectReverseRoute
+    }
+    '/api/$locale/vibe/platforms/vibe-frame/mount': {
+      id: '/api/$locale/vibe/platforms/vibe-frame/mount'
+      path: '/api/$locale/vibe/platforms/vibe-frame/mount'
+      fullPath: '/api/$locale/vibe/platforms/vibe-frame/mount'
+      preLoaderRoute: typeof ApiLocaleVibePlatformsVibeFrameMountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/logger/error-monitor/logs': {
+      id: '/api/$locale/vibe/logger/error-monitor/logs'
+      path: '/api/$locale/vibe/logger/error-monitor/logs'
+      fullPath: '/api/$locale/vibe/logger/error-monitor/logs'
+      preLoaderRoute: typeof ApiLocaleVibeLoggerErrorMonitorLogsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/logger/error-monitor/client-log': {
+      id: '/api/$locale/vibe/logger/error-monitor/client-log'
+      path: '/api/$locale/vibe/logger/error-monitor/client-log'
+      fullPath: '/api/$locale/vibe/logger/error-monitor/client-log'
+      preLoaderRoute: typeof ApiLocaleVibeLoggerErrorMonitorClientLogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/logger/error-monitor/cleanup': {
+      id: '/api/$locale/vibe/logger/error-monitor/cleanup'
+      path: '/api/$locale/vibe/logger/error-monitor/cleanup'
+      fullPath: '/api/$locale/vibe/logger/error-monitor/cleanup'
+      preLoaderRoute: typeof ApiLocaleVibeLoggerErrorMonitorCleanupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/execute-tool/call-control/resume-when-done': {
+      id: '/api/$locale/vibe/execute-tool/call-control/resume-when-done'
+      path: '/call-control/resume-when-done'
+      fullPath: '/api/$locale/vibe/execute-tool/call-control/resume-when-done'
+      preLoaderRoute: typeof ApiLocaleVibeExecuteToolCallControlResumeWhenDoneRouteImport
+      parentRoute: typeof ApiLocaleVibeExecuteToolRoute
+    }
+    '/api/$locale/vibe/execute-tool/call-control/detach': {
+      id: '/api/$locale/vibe/execute-tool/call-control/detach'
+      path: '/call-control/detach'
+      fullPath: '/api/$locale/vibe/execute-tool/call-control/detach'
+      preLoaderRoute: typeof ApiLocaleVibeExecuteToolCallControlDetachRouteImport
+      parentRoute: typeof ApiLocaleVibeExecuteToolRoute
+    }
+    '/api/$locale/vibe/execute-tool/call-control/cancel': {
+      id: '/api/$locale/vibe/execute-tool/call-control/cancel'
+      path: '/call-control/cancel'
+      fullPath: '/api/$locale/vibe/execute-tool/call-control/cancel'
+      preLoaderRoute: typeof ApiLocaleVibeExecuteToolCallControlCancelRouteImport
+      parentRoute: typeof ApiLocaleVibeExecuteToolRoute
+    }
+    '/api/$locale/vibe/env/settings/generate-key': {
+      id: '/api/$locale/vibe/env/settings/generate-key'
+      path: '/generate-key'
+      fullPath: '/api/$locale/vibe/env/settings/generate-key'
+      preLoaderRoute: typeof ApiLocaleVibeEnvSettingsGenerateKeyRouteImport
+      parentRoute: typeof ApiLocaleVibeEnvSettingsRoute
+    }
+    '/api/$locale/vibe/env/settings/export-env': {
+      id: '/api/$locale/vibe/env/settings/export-env'
+      path: '/export-env'
+      fullPath: '/api/$locale/vibe/env/settings/export-env'
+      preLoaderRoute: typeof ApiLocaleVibeEnvSettingsExportEnvRouteImport
+      parentRoute: typeof ApiLocaleVibeEnvSettingsRoute
+    }
+    '/api/$locale/vibe/agent/web-search/kagi': {
+      id: '/api/$locale/vibe/agent/web-search/kagi'
+      path: '/kagi'
+      fullPath: '/api/$locale/vibe/agent/web-search/kagi'
+      preLoaderRoute: typeof ApiLocaleVibeAgentWebSearchKagiRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentWebSearchRoute
+    }
+    '/api/$locale/vibe/agent/web-search/brave': {
+      id: '/api/$locale/vibe/agent/web-search/brave'
+      path: '/brave'
+      fullPath: '/api/$locale/vibe/agent/web-search/brave'
+      preLoaderRoute: typeof ApiLocaleVibeAgentWebSearchBraveRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentWebSearchRoute
+    }
+    '/api/$locale/vibe/agent/skills/moderation': {
+      id: '/api/$locale/vibe/agent/skills/moderation'
+      path: '/moderation'
+      fullPath: '/api/$locale/vibe/agent/skills/moderation'
+      preLoaderRoute: typeof ApiLocaleVibeAgentSkillsModerationRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentSkillsRoute
+    }
+    '/api/$locale/vibe/agent/skills/favorites': {
+      id: '/api/$locale/vibe/agent/skills/favorites'
+      path: '/favorites'
+      fullPath: '/api/$locale/vibe/agent/skills/favorites'
+      preLoaderRoute: typeof ApiLocaleVibeAgentSkillsFavoritesRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentSkillsRoute
+    }
+    '/api/$locale/vibe/agent/skills/create': {
+      id: '/api/$locale/vibe/agent/skills/create'
+      path: '/create'
+      fullPath: '/api/$locale/vibe/agent/skills/create'
+      preLoaderRoute: typeof ApiLocaleVibeAgentSkillsCreateRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentSkillsRoute
+    }
+    '/api/$locale/vibe/agent/skills/$id': {
+      id: '/api/$locale/vibe/agent/skills/$id'
+      path: '/$id'
+      fullPath: '/api/$locale/vibe/agent/skills/$id'
+      preLoaderRoute: typeof ApiLocaleVibeAgentSkillsIdRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentSkillsRoute
+    }
+    '/api/$locale/vibe/agent/models/list': {
+      id: '/api/$locale/vibe/agent/models/list'
+      path: '/api/$locale/vibe/agent/models/list'
+      fullPath: '/api/$locale/vibe/agent/models/list'
+      preLoaderRoute: typeof ApiLocaleVibeAgentModelsListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/fetch-url-content/cleanup': {
+      id: '/api/$locale/vibe/agent/fetch-url-content/cleanup'
+      path: '/cleanup'
+      fullPath: '/api/$locale/vibe/agent/fetch-url-content/cleanup'
+      preLoaderRoute: typeof ApiLocaleVibeAgentFetchUrlContentCleanupRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentFetchUrlContentRoute
+    }
+    '/api/$locale/vibe/agent/cortex/write': {
+      id: '/api/$locale/vibe/agent/cortex/write'
+      path: '/api/$locale/vibe/agent/cortex/write'
+      fullPath: '/api/$locale/vibe/agent/cortex/write'
+      preLoaderRoute: typeof ApiLocaleVibeAgentCortexWriteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/cortex/tree': {
+      id: '/api/$locale/vibe/agent/cortex/tree'
+      path: '/api/$locale/vibe/agent/cortex/tree'
+      fullPath: '/api/$locale/vibe/agent/cortex/tree'
+      preLoaderRoute: typeof ApiLocaleVibeAgentCortexTreeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/cortex/terminals': {
+      id: '/api/$locale/vibe/agent/cortex/terminals'
+      path: '/api/$locale/vibe/agent/cortex/terminals'
+      fullPath: '/api/$locale/vibe/agent/cortex/terminals'
+      preLoaderRoute: typeof ApiLocaleVibeAgentCortexTerminalsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/cortex/search': {
+      id: '/api/$locale/vibe/agent/cortex/search'
+      path: '/api/$locale/vibe/agent/cortex/search'
+      fullPath: '/api/$locale/vibe/agent/cortex/search'
+      preLoaderRoute: typeof ApiLocaleVibeAgentCortexSearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/cortex/read': {
+      id: '/api/$locale/vibe/agent/cortex/read'
+      path: '/api/$locale/vibe/agent/cortex/read'
+      fullPath: '/api/$locale/vibe/agent/cortex/read'
+      preLoaderRoute: typeof ApiLocaleVibeAgentCortexReadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/cortex/move': {
+      id: '/api/$locale/vibe/agent/cortex/move'
+      path: '/api/$locale/vibe/agent/cortex/move'
+      fullPath: '/api/$locale/vibe/agent/cortex/move'
+      preLoaderRoute: typeof ApiLocaleVibeAgentCortexMoveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/cortex/mkdir': {
+      id: '/api/$locale/vibe/agent/cortex/mkdir'
+      path: '/api/$locale/vibe/agent/cortex/mkdir'
+      fullPath: '/api/$locale/vibe/agent/cortex/mkdir'
+      preLoaderRoute: typeof ApiLocaleVibeAgentCortexMkdirRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/cortex/list': {
+      id: '/api/$locale/vibe/agent/cortex/list'
+      path: '/api/$locale/vibe/agent/cortex/list'
+      fullPath: '/api/$locale/vibe/agent/cortex/list'
+      preLoaderRoute: typeof ApiLocaleVibeAgentCortexListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/cortex/exec': {
+      id: '/api/$locale/vibe/agent/cortex/exec'
+      path: '/api/$locale/vibe/agent/cortex/exec'
+      fullPath: '/api/$locale/vibe/agent/cortex/exec'
+      preLoaderRoute: typeof ApiLocaleVibeAgentCortexExecRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/cortex/edit': {
+      id: '/api/$locale/vibe/agent/cortex/edit'
+      path: '/api/$locale/vibe/agent/cortex/edit'
+      fullPath: '/api/$locale/vibe/agent/cortex/edit'
+      preLoaderRoute: typeof ApiLocaleVibeAgentCortexEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/cortex/delete': {
+      id: '/api/$locale/vibe/agent/cortex/delete'
+      path: '/api/$locale/vibe/agent/cortex/delete'
+      fullPath: '/api/$locale/vibe/agent/cortex/delete'
+      preLoaderRoute: typeof ApiLocaleVibeAgentCortexDeleteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/chat/threads': {
+      id: '/api/$locale/vibe/agent/chat/threads'
+      path: '/api/$locale/vibe/agent/chat/threads'
+      fullPath: '/api/$locale/vibe/agent/chat/threads'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatThreadsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/chat/settings': {
+      id: '/api/$locale/vibe/agent/chat/settings'
+      path: '/api/$locale/vibe/agent/chat/settings'
+      fullPath: '/api/$locale/vibe/agent/chat/settings'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/chat/public-feed': {
+      id: '/api/$locale/vibe/agent/chat/public-feed'
+      path: '/api/$locale/vibe/agent/chat/public-feed'
+      fullPath: '/api/$locale/vibe/agent/chat/public-feed'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatPublicFeedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/ai-stream/stream': {
+      id: '/api/$locale/vibe/agent/ai-stream/stream'
+      path: '/api/$locale/vibe/agent/ai-stream/stream'
+      fullPath: '/api/$locale/vibe/agent/ai-stream/stream'
+      preLoaderRoute: typeof ApiLocaleVibeAgentAiStreamStreamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/ai-stream/run': {
+      id: '/api/$locale/vibe/agent/ai-stream/run'
+      path: '/api/$locale/vibe/agent/ai-stream/run'
+      fullPath: '/api/$locale/vibe/agent/ai-stream/run'
+      preLoaderRoute: typeof ApiLocaleVibeAgentAiStreamRunRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/ai-stream/cancel': {
+      id: '/api/$locale/vibe/agent/ai-stream/cancel'
+      path: '/api/$locale/vibe/agent/ai-stream/cancel'
+      fullPath: '/api/$locale/vibe/agent/ai-stream/cancel'
+      preLoaderRoute: typeof ApiLocaleVibeAgentAiStreamCancelRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/$locale/users/user/$id/roles': {
       id: '/api/$locale/users/user/$id/roles'
@@ -11060,174 +10989,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/$locale/tax/rate/$rateId/delete'
       preLoaderRoute: typeof ApiLocaleTaxRateRateIdDeleteRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/tooling/check/vibe-check': {
-      id: '/api/$locale/system/tooling/check/vibe-check'
-      path: '/api/$locale/system/tooling/check/vibe-check'
-      fullPath: '/api/$locale/system/tooling/check/vibe-check'
-      preLoaderRoute: typeof ApiLocaleSystemToolingCheckVibeCheckRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/tasks/pulse/status': {
-      id: '/api/$locale/system/tasks/pulse/status'
-      path: '/api/$locale/system/tasks/pulse/status'
-      fullPath: '/api/$locale/system/tasks/pulse/status'
-      preLoaderRoute: typeof ApiLocaleSystemTasksPulseStatusRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/tasks/pulse/history': {
-      id: '/api/$locale/system/tasks/pulse/history'
-      path: '/api/$locale/system/tasks/pulse/history'
-      fullPath: '/api/$locale/system/tasks/pulse/history'
-      preLoaderRoute: typeof ApiLocaleSystemTasksPulseHistoryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/tasks/pulse/execute': {
-      id: '/api/$locale/system/tasks/pulse/execute'
-      path: '/api/$locale/system/tasks/pulse/execute'
-      fullPath: '/api/$locale/system/tasks/pulse/execute'
-      preLoaderRoute: typeof ApiLocaleSystemTasksPulseExecuteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/tasks/data-sources/cron-executions-total': {
-      id: '/api/$locale/system/tasks/data-sources/cron-executions-total'
-      path: '/api/$locale/system/tasks/data-sources/cron-executions-total'
-      fullPath: '/api/$locale/system/tasks/data-sources/cron-executions-total'
-      preLoaderRoute: typeof ApiLocaleSystemTasksDataSourcesCronExecutionsTotalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/tasks/data-sources/cron-executions-succeeded': {
-      id: '/api/$locale/system/tasks/data-sources/cron-executions-succeeded'
-      path: '/api/$locale/system/tasks/data-sources/cron-executions-succeeded'
-      fullPath: '/api/$locale/system/tasks/data-sources/cron-executions-succeeded'
-      preLoaderRoute: typeof ApiLocaleSystemTasksDataSourcesCronExecutionsSucceededRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/tasks/data-sources/cron-executions-failed': {
-      id: '/api/$locale/system/tasks/data-sources/cron-executions-failed'
-      path: '/api/$locale/system/tasks/data-sources/cron-executions-failed'
-      fullPath: '/api/$locale/system/tasks/data-sources/cron-executions-failed'
-      preLoaderRoute: typeof ApiLocaleSystemTasksDataSourcesCronExecutionsFailedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/tasks/cron/tasks': {
-      id: '/api/$locale/system/tasks/cron/tasks'
-      path: '/api/$locale/system/tasks/cron/tasks'
-      fullPath: '/api/$locale/system/tasks/cron/tasks'
-      preLoaderRoute: typeof ApiLocaleSystemTasksCronTasksRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/tasks/cron/stats': {
-      id: '/api/$locale/system/tasks/cron/stats'
-      path: '/api/$locale/system/tasks/cron/stats'
-      fullPath: '/api/$locale/system/tasks/cron/stats'
-      preLoaderRoute: typeof ApiLocaleSystemTasksCronStatsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/tasks/cron/queue': {
-      id: '/api/$locale/system/tasks/cron/queue'
-      path: '/api/$locale/system/tasks/cron/queue'
-      fullPath: '/api/$locale/system/tasks/cron/queue'
-      preLoaderRoute: typeof ApiLocaleSystemTasksCronQueueRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/tasks/cron/history': {
-      id: '/api/$locale/system/tasks/cron/history'
-      path: '/api/$locale/system/tasks/cron/history'
-      fullPath: '/api/$locale/system/tasks/cron/history'
-      preLoaderRoute: typeof ApiLocaleSystemTasksCronHistoryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/tasks/cron/bulk': {
-      id: '/api/$locale/system/tasks/cron/bulk'
-      path: '/api/$locale/system/tasks/cron/bulk'
-      fullPath: '/api/$locale/system/tasks/cron/bulk'
-      preLoaderRoute: typeof ApiLocaleSystemTasksCronBulkRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/tasks/cron/$id': {
-      id: '/api/$locale/system/tasks/cron/$id'
-      path: '/api/$locale/system/tasks/cron/$id'
-      fullPath: '/api/$locale/system/tasks/cron/$id'
-      preLoaderRoute: typeof ApiLocaleSystemTasksCronIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/server/server/rebuild': {
-      id: '/api/$locale/system/server/server/rebuild'
-      path: '/api/$locale/system/server/server/rebuild'
-      fullPath: '/api/$locale/system/server/server/rebuild'
-      preLoaderRoute: typeof ApiLocaleSystemServerServerRebuildRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/server/server/health': {
-      id: '/api/$locale/system/server/server/health'
-      path: '/api/$locale/system/server/server/health'
-      fullPath: '/api/$locale/system/server/server/health'
-      preLoaderRoute: typeof ApiLocaleSystemServerServerHealthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/platforms/vibe-frame/mount': {
-      id: '/api/$locale/system/platforms/vibe-frame/mount'
-      path: '/api/$locale/system/platforms/vibe-frame/mount'
-      fullPath: '/api/$locale/system/platforms/vibe-frame/mount'
-      preLoaderRoute: typeof ApiLocaleSystemPlatformsVibeFrameMountRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/logger/error-monitor/logs': {
-      id: '/api/$locale/system/logger/error-monitor/logs'
-      path: '/api/$locale/system/logger/error-monitor/logs'
-      fullPath: '/api/$locale/system/logger/error-monitor/logs'
-      preLoaderRoute: typeof ApiLocaleSystemLoggerErrorMonitorLogsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/logger/error-monitor/client-log': {
-      id: '/api/$locale/system/logger/error-monitor/client-log'
-      path: '/api/$locale/system/logger/error-monitor/client-log'
-      fullPath: '/api/$locale/system/logger/error-monitor/client-log'
-      preLoaderRoute: typeof ApiLocaleSystemLoggerErrorMonitorClientLogRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/logger/error-monitor/cleanup': {
-      id: '/api/$locale/system/logger/error-monitor/cleanup'
-      path: '/api/$locale/system/logger/error-monitor/cleanup'
-      fullPath: '/api/$locale/system/logger/error-monitor/cleanup'
-      preLoaderRoute: typeof ApiLocaleSystemLoggerErrorMonitorCleanupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/execute-tool/call-control/resume-when-done': {
-      id: '/api/$locale/system/execute-tool/call-control/resume-when-done'
-      path: '/call-control/resume-when-done'
-      fullPath: '/api/$locale/system/execute-tool/call-control/resume-when-done'
-      preLoaderRoute: typeof ApiLocaleSystemExecuteToolCallControlResumeWhenDoneRouteImport
-      parentRoute: typeof ApiLocaleSystemExecuteToolRoute
-    }
-    '/api/$locale/system/execute-tool/call-control/detach': {
-      id: '/api/$locale/system/execute-tool/call-control/detach'
-      path: '/call-control/detach'
-      fullPath: '/api/$locale/system/execute-tool/call-control/detach'
-      preLoaderRoute: typeof ApiLocaleSystemExecuteToolCallControlDetachRouteImport
-      parentRoute: typeof ApiLocaleSystemExecuteToolRoute
-    }
-    '/api/$locale/system/execute-tool/call-control/cancel': {
-      id: '/api/$locale/system/execute-tool/call-control/cancel'
-      path: '/call-control/cancel'
-      fullPath: '/api/$locale/system/execute-tool/call-control/cancel'
-      preLoaderRoute: typeof ApiLocaleSystemExecuteToolCallControlCancelRouteImport
-      parentRoute: typeof ApiLocaleSystemExecuteToolRoute
-    }
-    '/api/$locale/system/env/settings/generate-key': {
-      id: '/api/$locale/system/env/settings/generate-key'
-      path: '/generate-key'
-      fullPath: '/api/$locale/system/env/settings/generate-key'
-      preLoaderRoute: typeof ApiLocaleSystemEnvSettingsGenerateKeyRouteImport
-      parentRoute: typeof ApiLocaleSystemEnvSettingsRoute
-    }
-    '/api/$locale/system/env/settings/export-env': {
-      id: '/api/$locale/system/env/settings/export-env'
-      path: '/export-env'
-      fullPath: '/api/$locale/system/env/settings/export-env'
-      preLoaderRoute: typeof ApiLocaleSystemEnvSettingsExportEnvRouteImport
-      parentRoute: typeof ApiLocaleSystemEnvSettingsRoute
     }
     '/api/$locale/subscription/company/$companyId/list': {
       id: '/api/$locale/subscription/company/$companyId/list'
@@ -11425,25 +11186,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocalePaymentProvidersStripeWebhookRouteImport
       parentRoute: typeof ApiLocalePaymentRoute
     }
-    '/api/$locale/payment/providers/stripe/cli': {
-      id: '/api/$locale/payment/providers/stripe/cli'
-      path: '/providers/stripe/cli'
-      fullPath: '/api/$locale/payment/providers/stripe/cli'
-      preLoaderRoute: typeof ApiLocalePaymentProvidersStripeCliRouteImport
-      parentRoute: typeof ApiLocalePaymentRoute
-    }
     '/api/$locale/payment/providers/nowpayments/webhook': {
       id: '/api/$locale/payment/providers/nowpayments/webhook'
       path: '/providers/nowpayments/webhook'
       fullPath: '/api/$locale/payment/providers/nowpayments/webhook'
       preLoaderRoute: typeof ApiLocalePaymentProvidersNowpaymentsWebhookRouteImport
-      parentRoute: typeof ApiLocalePaymentRoute
-    }
-    '/api/$locale/payment/providers/nowpayments/cli': {
-      id: '/api/$locale/payment/providers/nowpayments/cli'
-      path: '/providers/nowpayments/cli'
-      fullPath: '/api/$locale/payment/providers/nowpayments/cli'
-      preLoaderRoute: typeof ApiLocalePaymentProvidersNowpaymentsCliRouteImport
       parentRoute: typeof ApiLocalePaymentRoute
     }
     '/api/$locale/payment/invoice/line/add': {
@@ -11712,200 +11459,284 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleChartOfAccountsAccountAccountIdDeactivateRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/$locale/agent/skills/favorites/reorder': {
-      id: '/api/$locale/agent/skills/favorites/reorder'
+    '/api/$locale/vibe/platforms/ai/skills/$characterSkill': {
+      id: '/api/$locale/vibe/platforms/ai/skills/$characterSkill'
+      path: '/api/$locale/vibe/platforms/ai/skills/$characterSkill'
+      fullPath: '/api/$locale/vibe/platforms/ai/skills/$characterSkill'
+      preLoaderRoute: typeof ApiLocaleVibePlatformsAiSkillsCharacterSkillRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings': {
+      id: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings'
+      path: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings'
+      fullPath: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings'
+      preLoaderRoute: typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-total': {
+      id: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-total'
+      path: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-total'
+      fullPath: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-total'
+      preLoaderRoute: typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsTotalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-errors': {
+      id: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-errors'
+      path: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-errors'
+      fullPath: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-errors'
+      preLoaderRoute: typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsErrorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/dataflow/graphs/$id/versions': {
+      id: '/api/$locale/vibe/dataflow/graphs/$id/versions'
+      path: '/$id/versions'
+      fullPath: '/api/$locale/vibe/dataflow/graphs/$id/versions'
+      preLoaderRoute: typeof ApiLocaleVibeDataflowGraphsIdVersionsRouteImport
+      parentRoute: typeof ApiLocaleVibeDataflowGraphsRoute
+    }
+    '/api/$locale/vibe/dataflow/graphs/$id/trigger': {
+      id: '/api/$locale/vibe/dataflow/graphs/$id/trigger'
+      path: '/$id/trigger'
+      fullPath: '/api/$locale/vibe/dataflow/graphs/$id/trigger'
+      preLoaderRoute: typeof ApiLocaleVibeDataflowGraphsIdTriggerRouteImport
+      parentRoute: typeof ApiLocaleVibeDataflowGraphsRoute
+    }
+    '/api/$locale/vibe/dataflow/graphs/$id/promote': {
+      id: '/api/$locale/vibe/dataflow/graphs/$id/promote'
+      path: '/$id/promote'
+      fullPath: '/api/$locale/vibe/dataflow/graphs/$id/promote'
+      preLoaderRoute: typeof ApiLocaleVibeDataflowGraphsIdPromoteRouteImport
+      parentRoute: typeof ApiLocaleVibeDataflowGraphsRoute
+    }
+    '/api/$locale/vibe/dataflow/graphs/$id/edit': {
+      id: '/api/$locale/vibe/dataflow/graphs/$id/edit'
+      path: '/$id/edit'
+      fullPath: '/api/$locale/vibe/dataflow/graphs/$id/edit'
+      preLoaderRoute: typeof ApiLocaleVibeDataflowGraphsIdEditRouteImport
+      parentRoute: typeof ApiLocaleVibeDataflowGraphsRoute
+    }
+    '/api/$locale/vibe/dataflow/graphs/$id/delete': {
+      id: '/api/$locale/vibe/dataflow/graphs/$id/delete'
+      path: '/$id/delete'
+      fullPath: '/api/$locale/vibe/dataflow/graphs/$id/delete'
+      preLoaderRoute: typeof ApiLocaleVibeDataflowGraphsIdDeleteRouteImport
+      parentRoute: typeof ApiLocaleVibeDataflowGraphsRoute
+    }
+    '/api/$locale/vibe/dataflow/graphs/$id/data': {
+      id: '/api/$locale/vibe/dataflow/graphs/$id/data'
+      path: '/$id/data'
+      fullPath: '/api/$locale/vibe/dataflow/graphs/$id/data'
+      preLoaderRoute: typeof ApiLocaleVibeDataflowGraphsIdDataRouteImport
+      parentRoute: typeof ApiLocaleVibeDataflowGraphsRoute
+    }
+    '/api/$locale/vibe/dataflow/graphs/$id/backtest': {
+      id: '/api/$locale/vibe/dataflow/graphs/$id/backtest'
+      path: '/$id/backtest'
+      fullPath: '/api/$locale/vibe/dataflow/graphs/$id/backtest'
+      preLoaderRoute: typeof ApiLocaleVibeDataflowGraphsIdBacktestRouteImport
+      parentRoute: typeof ApiLocaleVibeDataflowGraphsRoute
+    }
+    '/api/$locale/vibe/dataflow/graphs/$id/archive': {
+      id: '/api/$locale/vibe/dataflow/graphs/$id/archive'
+      path: '/$id/archive'
+      fullPath: '/api/$locale/vibe/dataflow/graphs/$id/archive'
+      preLoaderRoute: typeof ApiLocaleVibeDataflowGraphsIdArchiveRouteImport
+      parentRoute: typeof ApiLocaleVibeDataflowGraphsRoute
+    }
+    '/api/$locale/vibe/agent/skills/favorites/reorder': {
+      id: '/api/$locale/vibe/agent/skills/favorites/reorder'
       path: '/reorder'
-      fullPath: '/api/$locale/agent/skills/favorites/reorder'
-      preLoaderRoute: typeof ApiLocaleAgentSkillsFavoritesReorderRouteImport
-      parentRoute: typeof ApiLocaleAgentSkillsFavoritesRoute
+      fullPath: '/api/$locale/vibe/agent/skills/favorites/reorder'
+      preLoaderRoute: typeof ApiLocaleVibeAgentSkillsFavoritesReorderRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentSkillsFavoritesRoute
     }
-    '/api/$locale/agent/skills/favorites/create': {
-      id: '/api/$locale/agent/skills/favorites/create'
+    '/api/$locale/vibe/agent/skills/favorites/create': {
+      id: '/api/$locale/vibe/agent/skills/favorites/create'
       path: '/create'
-      fullPath: '/api/$locale/agent/skills/favorites/create'
-      preLoaderRoute: typeof ApiLocaleAgentSkillsFavoritesCreateRouteImport
-      parentRoute: typeof ApiLocaleAgentSkillsFavoritesRoute
+      fullPath: '/api/$locale/vibe/agent/skills/favorites/create'
+      preLoaderRoute: typeof ApiLocaleVibeAgentSkillsFavoritesCreateRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentSkillsFavoritesRoute
     }
-    '/api/$locale/agent/skills/favorites/$id': {
-      id: '/api/$locale/agent/skills/favorites/$id'
+    '/api/$locale/vibe/agent/skills/favorites/$id': {
+      id: '/api/$locale/vibe/agent/skills/favorites/$id'
       path: '/$id'
-      fullPath: '/api/$locale/agent/skills/favorites/$id'
-      preLoaderRoute: typeof ApiLocaleAgentSkillsFavoritesIdRouteImport
-      parentRoute: typeof ApiLocaleAgentSkillsFavoritesRoute
+      fullPath: '/api/$locale/vibe/agent/skills/favorites/$id'
+      preLoaderRoute: typeof ApiLocaleVibeAgentSkillsFavoritesIdRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentSkillsFavoritesRoute
     }
-    '/api/$locale/agent/skills/$id/vote': {
-      id: '/api/$locale/agent/skills/$id/vote'
+    '/api/$locale/vibe/agent/skills/$id/vote': {
+      id: '/api/$locale/vibe/agent/skills/$id/vote'
       path: '/vote'
-      fullPath: '/api/$locale/agent/skills/$id/vote'
-      preLoaderRoute: typeof ApiLocaleAgentSkillsIdVoteRouteImport
-      parentRoute: typeof ApiLocaleAgentSkillsIdRoute
+      fullPath: '/api/$locale/vibe/agent/skills/$id/vote'
+      preLoaderRoute: typeof ApiLocaleVibeAgentSkillsIdVoteRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentSkillsIdRoute
     }
-    '/api/$locale/agent/skills/$id/report': {
-      id: '/api/$locale/agent/skills/$id/report'
+    '/api/$locale/vibe/agent/skills/$id/report': {
+      id: '/api/$locale/vibe/agent/skills/$id/report'
       path: '/report'
-      fullPath: '/api/$locale/agent/skills/$id/report'
-      preLoaderRoute: typeof ApiLocaleAgentSkillsIdReportRouteImport
-      parentRoute: typeof ApiLocaleAgentSkillsIdRoute
+      fullPath: '/api/$locale/vibe/agent/skills/$id/report'
+      preLoaderRoute: typeof ApiLocaleVibeAgentSkillsIdReportRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentSkillsIdRoute
     }
-    '/api/$locale/agent/skills/$id/publish': {
-      id: '/api/$locale/agent/skills/$id/publish'
+    '/api/$locale/vibe/agent/skills/$id/publish': {
+      id: '/api/$locale/vibe/agent/skills/$id/publish'
       path: '/publish'
-      fullPath: '/api/$locale/agent/skills/$id/publish'
-      preLoaderRoute: typeof ApiLocaleAgentSkillsIdPublishRouteImport
-      parentRoute: typeof ApiLocaleAgentSkillsIdRoute
+      fullPath: '/api/$locale/vibe/agent/skills/$id/publish'
+      preLoaderRoute: typeof ApiLocaleVibeAgentSkillsIdPublishRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentSkillsIdRoute
     }
-    '/api/$locale/agent/cortex/embeddings/backfill': {
-      id: '/api/$locale/agent/cortex/embeddings/backfill'
-      path: '/api/$locale/agent/cortex/embeddings/backfill'
-      fullPath: '/api/$locale/agent/cortex/embeddings/backfill'
-      preLoaderRoute: typeof ApiLocaleAgentCortexEmbeddingsBackfillRouteImport
+    '/api/$locale/vibe/agent/cortex/embeddings/backfill': {
+      id: '/api/$locale/vibe/agent/cortex/embeddings/backfill'
+      path: '/api/$locale/vibe/agent/cortex/embeddings/backfill'
+      fullPath: '/api/$locale/vibe/agent/cortex/embeddings/backfill'
+      preLoaderRoute: typeof ApiLocaleVibeAgentCortexEmbeddingsBackfillRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/$locale/agent/chat/threads/search-threads': {
-      id: '/api/$locale/agent/chat/threads/search-threads'
+    '/api/$locale/vibe/agent/chat/threads/search-threads': {
+      id: '/api/$locale/vibe/agent/chat/threads/search-threads'
       path: '/search-threads'
-      fullPath: '/api/$locale/agent/chat/threads/search-threads'
-      preLoaderRoute: typeof ApiLocaleAgentChatThreadsSearchThreadsRouteImport
-      parentRoute: typeof ApiLocaleAgentChatThreadsRoute
+      fullPath: '/api/$locale/vibe/agent/chat/threads/search-threads'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatThreadsSearchThreadsRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentChatThreadsRoute
     }
-    '/api/$locale/agent/chat/threads/search-messages': {
-      id: '/api/$locale/agent/chat/threads/search-messages'
+    '/api/$locale/vibe/agent/chat/threads/search-messages': {
+      id: '/api/$locale/vibe/agent/chat/threads/search-messages'
       path: '/search-messages'
-      fullPath: '/api/$locale/agent/chat/threads/search-messages'
-      preLoaderRoute: typeof ApiLocaleAgentChatThreadsSearchMessagesRouteImport
-      parentRoute: typeof ApiLocaleAgentChatThreadsRoute
+      fullPath: '/api/$locale/vibe/agent/chat/threads/search-messages'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatThreadsSearchMessagesRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentChatThreadsRoute
     }
-    '/api/$locale/agent/chat/threads/rename': {
-      id: '/api/$locale/agent/chat/threads/rename'
+    '/api/$locale/vibe/agent/chat/threads/rename': {
+      id: '/api/$locale/vibe/agent/chat/threads/rename'
       path: '/rename'
-      fullPath: '/api/$locale/agent/chat/threads/rename'
-      preLoaderRoute: typeof ApiLocaleAgentChatThreadsRenameRouteImport
-      parentRoute: typeof ApiLocaleAgentChatThreadsRoute
+      fullPath: '/api/$locale/vibe/agent/chat/threads/rename'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatThreadsRenameRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentChatThreadsRoute
     }
-    '/api/$locale/agent/chat/threads/$threadId': {
-      id: '/api/$locale/agent/chat/threads/$threadId'
+    '/api/$locale/vibe/agent/chat/threads/$threadId': {
+      id: '/api/$locale/vibe/agent/chat/threads/$threadId'
       path: '/$threadId'
-      fullPath: '/api/$locale/agent/chat/threads/$threadId'
-      preLoaderRoute: typeof ApiLocaleAgentChatThreadsThreadIdRouteImport
-      parentRoute: typeof ApiLocaleAgentChatThreadsRoute
+      fullPath: '/api/$locale/vibe/agent/chat/threads/$threadId'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentChatThreadsRoute
     }
-    '/api/$locale/agent/chat/folders/$rootFolderId': {
-      id: '/api/$locale/agent/chat/folders/$rootFolderId'
-      path: '/api/$locale/agent/chat/folders/$rootFolderId'
-      fullPath: '/api/$locale/agent/chat/folders/$rootFolderId'
-      preLoaderRoute: typeof ApiLocaleAgentChatFoldersRootFolderIdRouteImport
+    '/api/$locale/vibe/agent/chat/folders/$rootFolderId': {
+      id: '/api/$locale/vibe/agent/chat/folders/$rootFolderId'
+      path: '/api/$locale/vibe/agent/chat/folders/$rootFolderId'
+      fullPath: '/api/$locale/vibe/agent/chat/folders/$rootFolderId'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/$locale/agent/chat/folder-contents/$rootFolderId': {
-      id: '/api/$locale/agent/chat/folder-contents/$rootFolderId'
-      path: '/api/$locale/agent/chat/folder-contents/$rootFolderId'
-      fullPath: '/api/$locale/agent/chat/folder-contents/$rootFolderId'
-      preLoaderRoute: typeof ApiLocaleAgentChatFolderContentsRootFolderIdRouteImport
+    '/api/$locale/vibe/agent/chat/folder-contents/$rootFolderId': {
+      id: '/api/$locale/vibe/agent/chat/folder-contents/$rootFolderId'
+      path: '/api/$locale/vibe/agent/chat/folder-contents/$rootFolderId'
+      fullPath: '/api/$locale/vibe/agent/chat/folder-contents/$rootFolderId'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatFolderContentsRootFolderIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/$locale/agent/chat/data-sources/chat-upvotes-total': {
-      id: '/api/$locale/agent/chat/data-sources/chat-upvotes-total'
-      path: '/api/$locale/agent/chat/data-sources/chat-upvotes-total'
-      fullPath: '/api/$locale/agent/chat/data-sources/chat-upvotes-total'
-      preLoaderRoute: typeof ApiLocaleAgentChatDataSourcesChatUpvotesTotalRouteImport
+    '/api/$locale/vibe/agent/chat/data-sources/chat-upvotes-total': {
+      id: '/api/$locale/vibe/agent/chat/data-sources/chat-upvotes-total'
+      path: '/api/$locale/vibe/agent/chat/data-sources/chat-upvotes-total'
+      fullPath: '/api/$locale/vibe/agent/chat/data-sources/chat-upvotes-total'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatDataSourcesChatUpvotesTotalRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/$locale/agent/chat/data-sources/chat-unique-users': {
-      id: '/api/$locale/agent/chat/data-sources/chat-unique-users'
-      path: '/api/$locale/agent/chat/data-sources/chat-unique-users'
-      fullPath: '/api/$locale/agent/chat/data-sources/chat-unique-users'
-      preLoaderRoute: typeof ApiLocaleAgentChatDataSourcesChatUniqueUsersRouteImport
+    '/api/$locale/vibe/agent/chat/data-sources/chat-unique-users': {
+      id: '/api/$locale/vibe/agent/chat/data-sources/chat-unique-users'
+      path: '/api/$locale/vibe/agent/chat/data-sources/chat-unique-users'
+      fullPath: '/api/$locale/vibe/agent/chat/data-sources/chat-unique-users'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatDataSourcesChatUniqueUsersRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/$locale/agent/chat/data-sources/chat-tool-calls-total': {
-      id: '/api/$locale/agent/chat/data-sources/chat-tool-calls-total'
-      path: '/api/$locale/agent/chat/data-sources/chat-tool-calls-total'
-      fullPath: '/api/$locale/agent/chat/data-sources/chat-tool-calls-total'
-      preLoaderRoute: typeof ApiLocaleAgentChatDataSourcesChatToolCallsTotalRouteImport
+    '/api/$locale/vibe/agent/chat/data-sources/chat-tool-calls-total': {
+      id: '/api/$locale/vibe/agent/chat/data-sources/chat-tool-calls-total'
+      path: '/api/$locale/vibe/agent/chat/data-sources/chat-tool-calls-total'
+      fullPath: '/api/$locale/vibe/agent/chat/data-sources/chat-tool-calls-total'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatDataSourcesChatToolCallsTotalRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/$locale/agent/chat/data-sources/chat-threads-created': {
-      id: '/api/$locale/agent/chat/data-sources/chat-threads-created'
-      path: '/api/$locale/agent/chat/data-sources/chat-threads-created'
-      fullPath: '/api/$locale/agent/chat/data-sources/chat-threads-created'
-      preLoaderRoute: typeof ApiLocaleAgentChatDataSourcesChatThreadsCreatedRouteImport
+    '/api/$locale/vibe/agent/chat/data-sources/chat-threads-created': {
+      id: '/api/$locale/vibe/agent/chat/data-sources/chat-threads-created'
+      path: '/api/$locale/vibe/agent/chat/data-sources/chat-threads-created'
+      fullPath: '/api/$locale/vibe/agent/chat/data-sources/chat-threads-created'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatDataSourcesChatThreadsCreatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/$locale/agent/chat/data-sources/chat-threads-active-total': {
-      id: '/api/$locale/agent/chat/data-sources/chat-threads-active-total'
-      path: '/api/$locale/agent/chat/data-sources/chat-threads-active-total'
-      fullPath: '/api/$locale/agent/chat/data-sources/chat-threads-active-total'
-      preLoaderRoute: typeof ApiLocaleAgentChatDataSourcesChatThreadsActiveTotalRouteImport
+    '/api/$locale/vibe/agent/chat/data-sources/chat-threads-active-total': {
+      id: '/api/$locale/vibe/agent/chat/data-sources/chat-threads-active-total'
+      path: '/api/$locale/vibe/agent/chat/data-sources/chat-threads-active-total'
+      fullPath: '/api/$locale/vibe/agent/chat/data-sources/chat-threads-active-total'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatDataSourcesChatThreadsActiveTotalRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/$locale/agent/chat/data-sources/chat-share-links-created': {
-      id: '/api/$locale/agent/chat/data-sources/chat-share-links-created'
-      path: '/api/$locale/agent/chat/data-sources/chat-share-links-created'
-      fullPath: '/api/$locale/agent/chat/data-sources/chat-share-links-created'
-      preLoaderRoute: typeof ApiLocaleAgentChatDataSourcesChatShareLinksCreatedRouteImport
+    '/api/$locale/vibe/agent/chat/data-sources/chat-share-links-created': {
+      id: '/api/$locale/vibe/agent/chat/data-sources/chat-share-links-created'
+      path: '/api/$locale/vibe/agent/chat/data-sources/chat-share-links-created'
+      fullPath: '/api/$locale/vibe/agent/chat/data-sources/chat-share-links-created'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatDataSourcesChatShareLinksCreatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/$locale/agent/chat/data-sources/chat-messages-with-attachments': {
-      id: '/api/$locale/agent/chat/data-sources/chat-messages-with-attachments'
-      path: '/api/$locale/agent/chat/data-sources/chat-messages-with-attachments'
-      fullPath: '/api/$locale/agent/chat/data-sources/chat-messages-with-attachments'
-      preLoaderRoute: typeof ApiLocaleAgentChatDataSourcesChatMessagesWithAttachmentsRouteImport
+    '/api/$locale/vibe/agent/chat/data-sources/chat-messages-with-attachments': {
+      id: '/api/$locale/vibe/agent/chat/data-sources/chat-messages-with-attachments'
+      path: '/api/$locale/vibe/agent/chat/data-sources/chat-messages-with-attachments'
+      fullPath: '/api/$locale/vibe/agent/chat/data-sources/chat-messages-with-attachments'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatDataSourcesChatMessagesWithAttachmentsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/$locale/agent/chat/data-sources/chat-messages-total': {
-      id: '/api/$locale/agent/chat/data-sources/chat-messages-total'
-      path: '/api/$locale/agent/chat/data-sources/chat-messages-total'
-      fullPath: '/api/$locale/agent/chat/data-sources/chat-messages-total'
-      preLoaderRoute: typeof ApiLocaleAgentChatDataSourcesChatMessagesTotalRouteImport
+    '/api/$locale/vibe/agent/chat/data-sources/chat-messages-total': {
+      id: '/api/$locale/vibe/agent/chat/data-sources/chat-messages-total'
+      path: '/api/$locale/vibe/agent/chat/data-sources/chat-messages-total'
+      fullPath: '/api/$locale/vibe/agent/chat/data-sources/chat-messages-total'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatDataSourcesChatMessagesTotalRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/$locale/agent/chat/data-sources/chat-messages-by-user': {
-      id: '/api/$locale/agent/chat/data-sources/chat-messages-by-user'
-      path: '/api/$locale/agent/chat/data-sources/chat-messages-by-user'
-      fullPath: '/api/$locale/agent/chat/data-sources/chat-messages-by-user'
-      preLoaderRoute: typeof ApiLocaleAgentChatDataSourcesChatMessagesByUserRouteImport
+    '/api/$locale/vibe/agent/chat/data-sources/chat-messages-by-user': {
+      id: '/api/$locale/vibe/agent/chat/data-sources/chat-messages-by-user'
+      path: '/api/$locale/vibe/agent/chat/data-sources/chat-messages-by-user'
+      fullPath: '/api/$locale/vibe/agent/chat/data-sources/chat-messages-by-user'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatDataSourcesChatMessagesByUserRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/$locale/agent/chat/data-sources/chat-messages-by-ai': {
-      id: '/api/$locale/agent/chat/data-sources/chat-messages-by-ai'
-      path: '/api/$locale/agent/chat/data-sources/chat-messages-by-ai'
-      fullPath: '/api/$locale/agent/chat/data-sources/chat-messages-by-ai'
-      preLoaderRoute: typeof ApiLocaleAgentChatDataSourcesChatMessagesByAiRouteImport
+    '/api/$locale/vibe/agent/chat/data-sources/chat-messages-by-ai': {
+      id: '/api/$locale/vibe/agent/chat/data-sources/chat-messages-by-ai'
+      path: '/api/$locale/vibe/agent/chat/data-sources/chat-messages-by-ai'
+      fullPath: '/api/$locale/vibe/agent/chat/data-sources/chat-messages-by-ai'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatDataSourcesChatMessagesByAiRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/$locale/agent/chat/data-sources/chat-memories-created': {
-      id: '/api/$locale/agent/chat/data-sources/chat-memories-created'
-      path: '/api/$locale/agent/chat/data-sources/chat-memories-created'
-      fullPath: '/api/$locale/agent/chat/data-sources/chat-memories-created'
-      preLoaderRoute: typeof ApiLocaleAgentChatDataSourcesChatMemoriesCreatedRouteImport
+    '/api/$locale/vibe/agent/chat/data-sources/chat-memories-created': {
+      id: '/api/$locale/vibe/agent/chat/data-sources/chat-memories-created'
+      path: '/api/$locale/vibe/agent/chat/data-sources/chat-memories-created'
+      fullPath: '/api/$locale/vibe/agent/chat/data-sources/chat-memories-created'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatDataSourcesChatMemoriesCreatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/$locale/agent/chat/data-sources/chat-errors-total': {
-      id: '/api/$locale/agent/chat/data-sources/chat-errors-total'
-      path: '/api/$locale/agent/chat/data-sources/chat-errors-total'
-      fullPath: '/api/$locale/agent/chat/data-sources/chat-errors-total'
-      preLoaderRoute: typeof ApiLocaleAgentChatDataSourcesChatErrorsTotalRouteImport
+    '/api/$locale/vibe/agent/chat/data-sources/chat-errors-total': {
+      id: '/api/$locale/vibe/agent/chat/data-sources/chat-errors-total'
+      path: '/api/$locale/vibe/agent/chat/data-sources/chat-errors-total'
+      fullPath: '/api/$locale/vibe/agent/chat/data-sources/chat-errors-total'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatDataSourcesChatErrorsTotalRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/$locale/agent/chat/data-sources/chat-downvotes-total': {
-      id: '/api/$locale/agent/chat/data-sources/chat-downvotes-total'
-      path: '/api/$locale/agent/chat/data-sources/chat-downvotes-total'
-      fullPath: '/api/$locale/agent/chat/data-sources/chat-downvotes-total'
-      preLoaderRoute: typeof ApiLocaleAgentChatDataSourcesChatDownvotesTotalRouteImport
+    '/api/$locale/vibe/agent/chat/data-sources/chat-downvotes-total': {
+      id: '/api/$locale/vibe/agent/chat/data-sources/chat-downvotes-total'
+      path: '/api/$locale/vibe/agent/chat/data-sources/chat-downvotes-total'
+      fullPath: '/api/$locale/vibe/agent/chat/data-sources/chat-downvotes-total'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatDataSourcesChatDownvotesTotalRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/$locale/agent/ai-stream/ws-provider/models': {
-      id: '/api/$locale/agent/ai-stream/ws-provider/models'
-      path: '/api/$locale/agent/ai-stream/ws-provider/models'
-      fullPath: '/api/$locale/agent/ai-stream/ws-provider/models'
-      preLoaderRoute: typeof ApiLocaleAgentAiStreamWsProviderModelsRouteImport
+    '/api/$locale/vibe/agent/ai-stream/ws-provider/models': {
+      id: '/api/$locale/vibe/agent/ai-stream/ws-provider/models'
+      path: '/api/$locale/vibe/agent/ai-stream/ws-provider/models'
+      fullPath: '/api/$locale/vibe/agent/ai-stream/ws-provider/models'
+      preLoaderRoute: typeof ApiLocaleVibeAgentAiStreamWsProviderModelsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/$locale/agent/ai-stream/system-prompt/debug': {
-      id: '/api/$locale/agent/ai-stream/system-prompt/debug'
-      path: '/api/$locale/agent/ai-stream/system-prompt/debug'
-      fullPath: '/api/$locale/agent/ai-stream/system-prompt/debug'
-      preLoaderRoute: typeof ApiLocaleAgentAiStreamSystemPromptDebugRouteImport
+    '/api/$locale/vibe/agent/ai-stream/system-prompt/debug': {
+      id: '/api/$locale/vibe/agent/ai-stream/system-prompt/debug'
+      path: '/api/$locale/vibe/agent/ai-stream/system-prompt/debug'
+      fullPath: '/api/$locale/vibe/agent/ai-stream/system-prompt/debug'
+      preLoaderRoute: typeof ApiLocaleVibeAgentAiStreamSystemPromptDebugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/$locale/user/private/me/addresses/$addressId': {
@@ -11914,118 +11745,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/$locale/user/private/me/addresses/$addressId'
       preLoaderRoute: typeof ApiLocaleUserPrivateMeAddressesAddressIdRouteImport
       parentRoute: typeof ApiLocaleUserPrivateMeAddressesRoute
-    }
-    '/api/$locale/system/platforms/cli/setup/uninstall': {
-      id: '/api/$locale/system/platforms/cli/setup/uninstall'
-      path: '/api/$locale/system/platforms/cli/setup/uninstall'
-      fullPath: '/api/$locale/system/platforms/cli/setup/uninstall'
-      preLoaderRoute: typeof ApiLocaleSystemPlatformsCliSetupUninstallRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/platforms/cli/setup/status': {
-      id: '/api/$locale/system/platforms/cli/setup/status'
-      path: '/api/$locale/system/platforms/cli/setup/status'
-      fullPath: '/api/$locale/system/platforms/cli/setup/status'
-      preLoaderRoute: typeof ApiLocaleSystemPlatformsCliSetupStatusRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/platforms/cli/interactive/send-keys': {
-      id: '/api/$locale/system/platforms/cli/interactive/send-keys'
-      path: '/api/$locale/system/platforms/cli/interactive/send-keys'
-      fullPath: '/api/$locale/system/platforms/cli/interactive/send-keys'
-      preLoaderRoute: typeof ApiLocaleSystemPlatformsCliInteractiveSendKeysRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/platforms/cli/interactive/capture': {
-      id: '/api/$locale/system/platforms/cli/interactive/capture'
-      path: '/api/$locale/system/platforms/cli/interactive/capture'
-      fullPath: '/api/$locale/system/platforms/cli/interactive/capture'
-      preLoaderRoute: typeof ApiLocaleSystemPlatformsCliInteractiveCaptureRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/platforms/ai/skills/$characterSkill': {
-      id: '/api/$locale/system/platforms/ai/skills/$characterSkill'
-      path: '/api/$locale/system/platforms/ai/skills/$characterSkill'
-      fullPath: '/api/$locale/system/platforms/ai/skills/$characterSkill'
-      preLoaderRoute: typeof ApiLocaleSystemPlatformsAiSkillsCharacterSkillRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/logger/error-monitor/data-sources/error-logs-warnings': {
-      id: '/api/$locale/system/logger/error-monitor/data-sources/error-logs-warnings'
-      path: '/api/$locale/system/logger/error-monitor/data-sources/error-logs-warnings'
-      fullPath: '/api/$locale/system/logger/error-monitor/data-sources/error-logs-warnings'
-      preLoaderRoute: typeof ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsWarningsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/logger/error-monitor/data-sources/error-logs-total': {
-      id: '/api/$locale/system/logger/error-monitor/data-sources/error-logs-total'
-      path: '/api/$locale/system/logger/error-monitor/data-sources/error-logs-total'
-      fullPath: '/api/$locale/system/logger/error-monitor/data-sources/error-logs-total'
-      preLoaderRoute: typeof ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsTotalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/logger/error-monitor/data-sources/error-logs-errors': {
-      id: '/api/$locale/system/logger/error-monitor/data-sources/error-logs-errors'
-      path: '/api/$locale/system/logger/error-monitor/data-sources/error-logs-errors'
-      fullPath: '/api/$locale/system/logger/error-monitor/data-sources/error-logs-errors'
-      preLoaderRoute: typeof ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsErrorsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/dataflow/graphs/$id/versions': {
-      id: '/api/$locale/system/dataflow/graphs/$id/versions'
-      path: '/$id/versions'
-      fullPath: '/api/$locale/system/dataflow/graphs/$id/versions'
-      preLoaderRoute: typeof ApiLocaleSystemDataflowGraphsIdVersionsRouteImport
-      parentRoute: typeof ApiLocaleSystemDataflowGraphsRoute
-    }
-    '/api/$locale/system/dataflow/graphs/$id/trigger': {
-      id: '/api/$locale/system/dataflow/graphs/$id/trigger'
-      path: '/$id/trigger'
-      fullPath: '/api/$locale/system/dataflow/graphs/$id/trigger'
-      preLoaderRoute: typeof ApiLocaleSystemDataflowGraphsIdTriggerRouteImport
-      parentRoute: typeof ApiLocaleSystemDataflowGraphsRoute
-    }
-    '/api/$locale/system/dataflow/graphs/$id/promote': {
-      id: '/api/$locale/system/dataflow/graphs/$id/promote'
-      path: '/$id/promote'
-      fullPath: '/api/$locale/system/dataflow/graphs/$id/promote'
-      preLoaderRoute: typeof ApiLocaleSystemDataflowGraphsIdPromoteRouteImport
-      parentRoute: typeof ApiLocaleSystemDataflowGraphsRoute
-    }
-    '/api/$locale/system/dataflow/graphs/$id/edit': {
-      id: '/api/$locale/system/dataflow/graphs/$id/edit'
-      path: '/$id/edit'
-      fullPath: '/api/$locale/system/dataflow/graphs/$id/edit'
-      preLoaderRoute: typeof ApiLocaleSystemDataflowGraphsIdEditRouteImport
-      parentRoute: typeof ApiLocaleSystemDataflowGraphsRoute
-    }
-    '/api/$locale/system/dataflow/graphs/$id/delete': {
-      id: '/api/$locale/system/dataflow/graphs/$id/delete'
-      path: '/$id/delete'
-      fullPath: '/api/$locale/system/dataflow/graphs/$id/delete'
-      preLoaderRoute: typeof ApiLocaleSystemDataflowGraphsIdDeleteRouteImport
-      parentRoute: typeof ApiLocaleSystemDataflowGraphsRoute
-    }
-    '/api/$locale/system/dataflow/graphs/$id/data': {
-      id: '/api/$locale/system/dataflow/graphs/$id/data'
-      path: '/$id/data'
-      fullPath: '/api/$locale/system/dataflow/graphs/$id/data'
-      preLoaderRoute: typeof ApiLocaleSystemDataflowGraphsIdDataRouteImport
-      parentRoute: typeof ApiLocaleSystemDataflowGraphsRoute
-    }
-    '/api/$locale/system/dataflow/graphs/$id/backtest': {
-      id: '/api/$locale/system/dataflow/graphs/$id/backtest'
-      path: '/$id/backtest'
-      fullPath: '/api/$locale/system/dataflow/graphs/$id/backtest'
-      preLoaderRoute: typeof ApiLocaleSystemDataflowGraphsIdBacktestRouteImport
-      parentRoute: typeof ApiLocaleSystemDataflowGraphsRoute
-    }
-    '/api/$locale/system/dataflow/graphs/$id/archive': {
-      id: '/api/$locale/system/dataflow/graphs/$id/archive'
-      path: '/$id/archive'
-      fullPath: '/api/$locale/system/dataflow/graphs/$id/archive'
-      preLoaderRoute: typeof ApiLocaleSystemDataflowGraphsIdArchiveRouteImport
-      parentRoute: typeof ApiLocaleSystemDataflowGraphsRoute
     }
     '/api/$locale/ssh/connections/$id/mounts/list': {
       id: '/api/$locale/ssh/connections/$id/mounts/list'
@@ -12111,145 +11830,145 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleCompaniesCompanyIdMembersMemberIdRemoveRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/$locale/agent/chat/threads/$threadId/share-links': {
-      id: '/api/$locale/agent/chat/threads/$threadId/share-links'
+    '/api/$locale/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL/md': {
+      id: '/api/$locale/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL/md'
+      path: '/api/$locale/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL/md'
+      fullPath: '/api/$locale/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL/md'
+      preLoaderRoute: typeof ApiLocaleVibePlatformsAiSkillsUSER_WITH_ACCOUNT_SKILLMdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_AI_RUN/md': {
+      id: '/api/$locale/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_AI_RUN/md'
+      path: '/api/$locale/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_AI_RUN/md'
+      fullPath: '/api/$locale/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_AI_RUN/md'
+      preLoaderRoute: typeof ApiLocaleVibePlatformsAiSkillsUSER_WITH_ACCOUNT_AI_RUNMdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/platforms/ai/skills/PUBLIC_USER_SKILL/md': {
+      id: '/api/$locale/vibe/platforms/ai/skills/PUBLIC_USER_SKILL/md'
+      path: '/api/$locale/vibe/platforms/ai/skills/PUBLIC_USER_SKILL/md'
+      fullPath: '/api/$locale/vibe/platforms/ai/skills/PUBLIC_USER_SKILL/md'
+      preLoaderRoute: typeof ApiLocaleVibePlatformsAiSkillsPUBLIC_USER_SKILLMdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/platforms/ai/skills/PUBLIC_USER_AI_RUN/md': {
+      id: '/api/$locale/vibe/platforms/ai/skills/PUBLIC_USER_AI_RUN/md'
+      path: '/api/$locale/vibe/platforms/ai/skills/PUBLIC_USER_AI_RUN/md'
+      fullPath: '/api/$locale/vibe/platforms/ai/skills/PUBLIC_USER_AI_RUN/md'
+      preLoaderRoute: typeof ApiLocaleVibePlatformsAiSkillsPUBLIC_USER_AI_RUNMdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/platforms/ai/skills/AGENT/md': {
+      id: '/api/$locale/vibe/platforms/ai/skills/AGENT/md'
+      path: '/api/$locale/vibe/platforms/ai/skills/AGENT/md'
+      fullPath: '/api/$locale/vibe/platforms/ai/skills/AGENT/md'
+      preLoaderRoute: typeof ApiLocaleVibePlatformsAiSkillsAGENTMdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/chat/threads/$threadId/share-links': {
+      id: '/api/$locale/vibe/agent/chat/threads/$threadId/share-links'
       path: '/share-links'
-      fullPath: '/api/$locale/agent/chat/threads/$threadId/share-links'
-      preLoaderRoute: typeof ApiLocaleAgentChatThreadsThreadIdShareLinksRouteImport
-      parentRoute: typeof ApiLocaleAgentChatThreadsThreadIdRoute
+      fullPath: '/api/$locale/vibe/agent/chat/threads/$threadId/share-links'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdShareLinksRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdRoute
     }
-    '/api/$locale/agent/chat/threads/$threadId/permissions': {
-      id: '/api/$locale/agent/chat/threads/$threadId/permissions'
+    '/api/$locale/vibe/agent/chat/threads/$threadId/permissions': {
+      id: '/api/$locale/vibe/agent/chat/threads/$threadId/permissions'
       path: '/permissions'
-      fullPath: '/api/$locale/agent/chat/threads/$threadId/permissions'
-      preLoaderRoute: typeof ApiLocaleAgentChatThreadsThreadIdPermissionsRouteImport
-      parentRoute: typeof ApiLocaleAgentChatThreadsThreadIdRoute
+      fullPath: '/api/$locale/vibe/agent/chat/threads/$threadId/permissions'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdPermissionsRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdRoute
     }
-    '/api/$locale/agent/chat/threads/$threadId/messages': {
-      id: '/api/$locale/agent/chat/threads/$threadId/messages'
+    '/api/$locale/vibe/agent/chat/threads/$threadId/messages': {
+      id: '/api/$locale/vibe/agent/chat/threads/$threadId/messages'
       path: '/messages'
-      fullPath: '/api/$locale/agent/chat/threads/$threadId/messages'
-      preLoaderRoute: typeof ApiLocaleAgentChatThreadsThreadIdMessagesRouteImport
-      parentRoute: typeof ApiLocaleAgentChatThreadsThreadIdRoute
+      fullPath: '/api/$locale/vibe/agent/chat/threads/$threadId/messages'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdRoute
     }
-    '/api/$locale/agent/chat/folders/subfolders/$subFolderId': {
-      id: '/api/$locale/agent/chat/folders/subfolders/$subFolderId'
-      path: '/api/$locale/agent/chat/folders/subfolders/$subFolderId'
-      fullPath: '/api/$locale/agent/chat/folders/subfolders/$subFolderId'
-      preLoaderRoute: typeof ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRouteImport
+    '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId': {
+      id: '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId'
+      path: '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId'
+      fullPath: '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/$locale/agent/chat/folders/$rootFolderId/root-permissions': {
-      id: '/api/$locale/agent/chat/folders/$rootFolderId/root-permissions'
+    '/api/$locale/vibe/agent/chat/folders/$rootFolderId/root-permissions': {
+      id: '/api/$locale/vibe/agent/chat/folders/$rootFolderId/root-permissions'
       path: '/root-permissions'
-      fullPath: '/api/$locale/agent/chat/folders/$rootFolderId/root-permissions'
-      preLoaderRoute: typeof ApiLocaleAgentChatFoldersRootFolderIdRootPermissionsRouteImport
-      parentRoute: typeof ApiLocaleAgentChatFoldersRootFolderIdRoute
+      fullPath: '/api/$locale/vibe/agent/chat/folders/$rootFolderId/root-permissions'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRootPermissionsRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRoute
     }
-    '/api/$locale/agent/chat/folders/$rootFolderId/create': {
-      id: '/api/$locale/agent/chat/folders/$rootFolderId/create'
+    '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create': {
+      id: '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create'
       path: '/create'
-      fullPath: '/api/$locale/agent/chat/folders/$rootFolderId/create'
-      preLoaderRoute: typeof ApiLocaleAgentChatFoldersRootFolderIdCreateRouteImport
-      parentRoute: typeof ApiLocaleAgentChatFoldersRootFolderIdRoute
+      fullPath: '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatFoldersRootFolderIdCreateRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRoute
     }
-    '/api/$locale/system/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL/md': {
-      id: '/api/$locale/system/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL/md'
-      path: '/api/$locale/system/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL/md'
-      fullPath: '/api/$locale/system/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL/md'
-      preLoaderRoute: typeof ApiLocaleSystemPlatformsAiSkillsUSER_WITH_ACCOUNT_SKILLMdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/platforms/ai/skills/USER_WITH_ACCOUNT_AI_RUN/md': {
-      id: '/api/$locale/system/platforms/ai/skills/USER_WITH_ACCOUNT_AI_RUN/md'
-      path: '/api/$locale/system/platforms/ai/skills/USER_WITH_ACCOUNT_AI_RUN/md'
-      fullPath: '/api/$locale/system/platforms/ai/skills/USER_WITH_ACCOUNT_AI_RUN/md'
-      preLoaderRoute: typeof ApiLocaleSystemPlatformsAiSkillsUSER_WITH_ACCOUNT_AI_RUNMdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/platforms/ai/skills/PUBLIC_USER_SKILL/md': {
-      id: '/api/$locale/system/platforms/ai/skills/PUBLIC_USER_SKILL/md'
-      path: '/api/$locale/system/platforms/ai/skills/PUBLIC_USER_SKILL/md'
-      fullPath: '/api/$locale/system/platforms/ai/skills/PUBLIC_USER_SKILL/md'
-      preLoaderRoute: typeof ApiLocaleSystemPlatformsAiSkillsPUBLIC_USER_SKILLMdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/platforms/ai/skills/PUBLIC_USER_AI_RUN/md': {
-      id: '/api/$locale/system/platforms/ai/skills/PUBLIC_USER_AI_RUN/md'
-      path: '/api/$locale/system/platforms/ai/skills/PUBLIC_USER_AI_RUN/md'
-      fullPath: '/api/$locale/system/platforms/ai/skills/PUBLIC_USER_AI_RUN/md'
-      preLoaderRoute: typeof ApiLocaleSystemPlatformsAiSkillsPUBLIC_USER_AI_RUNMdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/system/platforms/ai/skills/AGENT/md': {
-      id: '/api/$locale/system/platforms/ai/skills/AGENT/md'
-      path: '/api/$locale/system/platforms/ai/skills/AGENT/md'
-      fullPath: '/api/$locale/system/platforms/ai/skills/AGENT/md'
-      preLoaderRoute: typeof ApiLocaleSystemPlatformsAiSkillsAGENTMdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/agent/chat/threads/files/$threadId/$filename': {
-      id: '/api/$locale/agent/chat/threads/files/$threadId/$filename'
+    '/api/$locale/vibe/agent/chat/threads/files/$threadId/$filename': {
+      id: '/api/$locale/vibe/agent/chat/threads/files/$threadId/$filename'
       path: '/files/$threadId/$filename'
-      fullPath: '/api/$locale/agent/chat/threads/files/$threadId/$filename'
-      preLoaderRoute: typeof ApiLocaleAgentChatThreadsFilesThreadIdFilenameRouteImport
-      parentRoute: typeof ApiLocaleAgentChatThreadsRoute
+      fullPath: '/api/$locale/vibe/agent/chat/threads/files/$threadId/$filename'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatThreadsFilesThreadIdFilenameRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentChatThreadsRoute
     }
-    '/api/$locale/agent/chat/threads/$threadId/messages/search': {
-      id: '/api/$locale/agent/chat/threads/$threadId/messages/search'
+    '/api/$locale/vibe/agent/chat/threads/$threadId/messages/search': {
+      id: '/api/$locale/vibe/agent/chat/threads/$threadId/messages/search'
       path: '/search'
-      fullPath: '/api/$locale/agent/chat/threads/$threadId/messages/search'
-      preLoaderRoute: typeof ApiLocaleAgentChatThreadsThreadIdMessagesSearchRouteImport
-      parentRoute: typeof ApiLocaleAgentChatThreadsThreadIdMessagesRoute
+      fullPath: '/api/$locale/vibe/agent/chat/threads/$threadId/messages/search'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesSearchRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesRoute
     }
-    '/api/$locale/agent/chat/threads/$threadId/messages/path': {
-      id: '/api/$locale/agent/chat/threads/$threadId/messages/path'
+    '/api/$locale/vibe/agent/chat/threads/$threadId/messages/path': {
+      id: '/api/$locale/vibe/agent/chat/threads/$threadId/messages/path'
       path: '/path'
-      fullPath: '/api/$locale/agent/chat/threads/$threadId/messages/path'
-      preLoaderRoute: typeof ApiLocaleAgentChatThreadsThreadIdMessagesPathRouteImport
-      parentRoute: typeof ApiLocaleAgentChatThreadsThreadIdMessagesRoute
+      fullPath: '/api/$locale/vibe/agent/chat/threads/$threadId/messages/path'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesPathRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesRoute
     }
-    '/api/$locale/agent/chat/threads/$threadId/messages/$messageId': {
-      id: '/api/$locale/agent/chat/threads/$threadId/messages/$messageId'
+    '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId': {
+      id: '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId'
       path: '/$messageId'
-      fullPath: '/api/$locale/agent/chat/threads/$threadId/messages/$messageId'
-      preLoaderRoute: typeof ApiLocaleAgentChatThreadsThreadIdMessagesMessageIdRouteImport
-      parentRoute: typeof ApiLocaleAgentChatThreadsThreadIdMessagesRoute
+      fullPath: '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesRoute
     }
-    '/api/$locale/agent/chat/folders/subfolders/$subFolderId/update': {
-      id: '/api/$locale/agent/chat/folders/subfolders/$subFolderId/update'
+    '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/update': {
+      id: '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/update'
       path: '/update'
-      fullPath: '/api/$locale/agent/chat/folders/subfolders/$subFolderId/update'
-      preLoaderRoute: typeof ApiLocaleAgentChatFoldersSubfoldersSubFolderIdUpdateRouteImport
-      parentRoute: typeof ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRoute
+      fullPath: '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/update'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdUpdateRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRoute
     }
-    '/api/$locale/agent/chat/folders/subfolders/$subFolderId/rename': {
-      id: '/api/$locale/agent/chat/folders/subfolders/$subFolderId/rename'
+    '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/rename': {
+      id: '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/rename'
       path: '/rename'
-      fullPath: '/api/$locale/agent/chat/folders/subfolders/$subFolderId/rename'
-      preLoaderRoute: typeof ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRenameRouteImport
-      parentRoute: typeof ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRoute
+      fullPath: '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/rename'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRenameRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRoute
     }
-    '/api/$locale/agent/chat/folders/subfolders/$subFolderId/permissions': {
-      id: '/api/$locale/agent/chat/folders/subfolders/$subFolderId/permissions'
+    '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/permissions': {
+      id: '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/permissions'
       path: '/permissions'
-      fullPath: '/api/$locale/agent/chat/folders/subfolders/$subFolderId/permissions'
-      preLoaderRoute: typeof ApiLocaleAgentChatFoldersSubfoldersSubFolderIdPermissionsRouteImport
-      parentRoute: typeof ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRoute
+      fullPath: '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/permissions'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdPermissionsRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRoute
     }
-    '/api/$locale/agent/chat/folders/subfolders/$subFolderId/move': {
-      id: '/api/$locale/agent/chat/folders/subfolders/$subFolderId/move'
+    '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/move': {
+      id: '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/move'
       path: '/move'
-      fullPath: '/api/$locale/agent/chat/folders/subfolders/$subFolderId/move'
-      preLoaderRoute: typeof ApiLocaleAgentChatFoldersSubfoldersSubFolderIdMoveRouteImport
-      parentRoute: typeof ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRoute
+      fullPath: '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/move'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdMoveRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRoute
     }
-    '/api/$locale/agent/chat/threads/$threadId/messages/$messageId/vote': {
-      id: '/api/$locale/agent/chat/threads/$threadId/messages/$messageId/vote'
+    '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId/vote': {
+      id: '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId/vote'
       path: '/vote'
-      fullPath: '/api/$locale/agent/chat/threads/$threadId/messages/$messageId/vote'
-      preLoaderRoute: typeof ApiLocaleAgentChatThreadsThreadIdMessagesMessageIdVoteRouteImport
-      parentRoute: typeof ApiLocaleAgentChatThreadsThreadIdMessagesMessageIdRoute
+      fullPath: '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId/vote'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdVoteRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdRoute
     }
   }
 }
@@ -12556,9 +12275,7 @@ interface ApiLocalePaymentRouteChildren {
   ApiLocalePaymentEstimateEstimateIdGetRoute: typeof ApiLocalePaymentEstimateEstimateIdGetRoute
   ApiLocalePaymentEstimateEstimateIdSendRoute: typeof ApiLocalePaymentEstimateEstimateIdSendRoute
   ApiLocalePaymentEstimateLineAddRoute: typeof ApiLocalePaymentEstimateLineAddRoute
-  ApiLocalePaymentProvidersNowpaymentsCliRoute: typeof ApiLocalePaymentProvidersNowpaymentsCliRoute
   ApiLocalePaymentProvidersNowpaymentsWebhookRoute: typeof ApiLocalePaymentProvidersNowpaymentsWebhookRoute
-  ApiLocalePaymentProvidersStripeCliRoute: typeof ApiLocalePaymentProvidersStripeCliRoute
   ApiLocalePaymentProvidersStripeWebhookRoute: typeof ApiLocalePaymentProvidersStripeWebhookRoute
   ApiLocalePaymentEstimateLineLineIdRemoveRoute: typeof ApiLocalePaymentEstimateLineLineIdRemoveRoute
 }
@@ -12608,12 +12325,8 @@ const ApiLocalePaymentRouteChildren: ApiLocalePaymentRouteChildren = {
   ApiLocalePaymentEstimateEstimateIdSendRoute:
     ApiLocalePaymentEstimateEstimateIdSendRoute,
   ApiLocalePaymentEstimateLineAddRoute: ApiLocalePaymentEstimateLineAddRoute,
-  ApiLocalePaymentProvidersNowpaymentsCliRoute:
-    ApiLocalePaymentProvidersNowpaymentsCliRoute,
   ApiLocalePaymentProvidersNowpaymentsWebhookRoute:
     ApiLocalePaymentProvidersNowpaymentsWebhookRoute,
-  ApiLocalePaymentProvidersStripeCliRoute:
-    ApiLocalePaymentProvidersStripeCliRoute,
   ApiLocalePaymentProvidersStripeWebhookRoute:
     ApiLocalePaymentProvidersStripeWebhookRoute,
   ApiLocalePaymentEstimateLineLineIdRemoveRoute:
@@ -12715,108 +12428,6 @@ const ApiLocaleSubscriptionRouteWithChildren =
     ApiLocaleSubscriptionRouteChildren,
   )
 
-interface ApiLocaleAgentFetchUrlContentRouteChildren {
-  ApiLocaleAgentFetchUrlContentCleanupRoute: typeof ApiLocaleAgentFetchUrlContentCleanupRoute
-}
-
-const ApiLocaleAgentFetchUrlContentRouteChildren: ApiLocaleAgentFetchUrlContentRouteChildren =
-  {
-    ApiLocaleAgentFetchUrlContentCleanupRoute:
-      ApiLocaleAgentFetchUrlContentCleanupRoute,
-  }
-
-const ApiLocaleAgentFetchUrlContentRouteWithChildren =
-  ApiLocaleAgentFetchUrlContentRoute._addFileChildren(
-    ApiLocaleAgentFetchUrlContentRouteChildren,
-  )
-
-interface ApiLocaleAgentSkillsIdRouteChildren {
-  ApiLocaleAgentSkillsIdPublishRoute: typeof ApiLocaleAgentSkillsIdPublishRoute
-  ApiLocaleAgentSkillsIdReportRoute: typeof ApiLocaleAgentSkillsIdReportRoute
-  ApiLocaleAgentSkillsIdVoteRoute: typeof ApiLocaleAgentSkillsIdVoteRoute
-}
-
-const ApiLocaleAgentSkillsIdRouteChildren: ApiLocaleAgentSkillsIdRouteChildren =
-  {
-    ApiLocaleAgentSkillsIdPublishRoute: ApiLocaleAgentSkillsIdPublishRoute,
-    ApiLocaleAgentSkillsIdReportRoute: ApiLocaleAgentSkillsIdReportRoute,
-    ApiLocaleAgentSkillsIdVoteRoute: ApiLocaleAgentSkillsIdVoteRoute,
-  }
-
-const ApiLocaleAgentSkillsIdRouteWithChildren =
-  ApiLocaleAgentSkillsIdRoute._addFileChildren(
-    ApiLocaleAgentSkillsIdRouteChildren,
-  )
-
-interface ApiLocaleAgentSkillsFavoritesRouteChildren {
-  ApiLocaleAgentSkillsFavoritesIdRoute: typeof ApiLocaleAgentSkillsFavoritesIdRoute
-  ApiLocaleAgentSkillsFavoritesCreateRoute: typeof ApiLocaleAgentSkillsFavoritesCreateRoute
-  ApiLocaleAgentSkillsFavoritesReorderRoute: typeof ApiLocaleAgentSkillsFavoritesReorderRoute
-}
-
-const ApiLocaleAgentSkillsFavoritesRouteChildren: ApiLocaleAgentSkillsFavoritesRouteChildren =
-  {
-    ApiLocaleAgentSkillsFavoritesIdRoute: ApiLocaleAgentSkillsFavoritesIdRoute,
-    ApiLocaleAgentSkillsFavoritesCreateRoute:
-      ApiLocaleAgentSkillsFavoritesCreateRoute,
-    ApiLocaleAgentSkillsFavoritesReorderRoute:
-      ApiLocaleAgentSkillsFavoritesReorderRoute,
-  }
-
-const ApiLocaleAgentSkillsFavoritesRouteWithChildren =
-  ApiLocaleAgentSkillsFavoritesRoute._addFileChildren(
-    ApiLocaleAgentSkillsFavoritesRouteChildren,
-  )
-
-interface ApiLocaleAgentSkillsRouteChildren {
-  ApiLocaleAgentSkillsIdRoute: typeof ApiLocaleAgentSkillsIdRouteWithChildren
-  ApiLocaleAgentSkillsCreateRoute: typeof ApiLocaleAgentSkillsCreateRoute
-  ApiLocaleAgentSkillsFavoritesRoute: typeof ApiLocaleAgentSkillsFavoritesRouteWithChildren
-  ApiLocaleAgentSkillsModerationRoute: typeof ApiLocaleAgentSkillsModerationRoute
-}
-
-const ApiLocaleAgentSkillsRouteChildren: ApiLocaleAgentSkillsRouteChildren = {
-  ApiLocaleAgentSkillsIdRoute: ApiLocaleAgentSkillsIdRouteWithChildren,
-  ApiLocaleAgentSkillsCreateRoute: ApiLocaleAgentSkillsCreateRoute,
-  ApiLocaleAgentSkillsFavoritesRoute:
-    ApiLocaleAgentSkillsFavoritesRouteWithChildren,
-  ApiLocaleAgentSkillsModerationRoute: ApiLocaleAgentSkillsModerationRoute,
-}
-
-const ApiLocaleAgentSkillsRouteWithChildren =
-  ApiLocaleAgentSkillsRoute._addFileChildren(ApiLocaleAgentSkillsRouteChildren)
-
-interface ApiLocaleAgentSpeechToTextRouteChildren {
-  ApiLocaleAgentSpeechToTextHotkeyRoute: typeof ApiLocaleAgentSpeechToTextHotkeyRoute
-}
-
-const ApiLocaleAgentSpeechToTextRouteChildren: ApiLocaleAgentSpeechToTextRouteChildren =
-  {
-    ApiLocaleAgentSpeechToTextHotkeyRoute:
-      ApiLocaleAgentSpeechToTextHotkeyRoute,
-  }
-
-const ApiLocaleAgentSpeechToTextRouteWithChildren =
-  ApiLocaleAgentSpeechToTextRoute._addFileChildren(
-    ApiLocaleAgentSpeechToTextRouteChildren,
-  )
-
-interface ApiLocaleAgentWebSearchRouteChildren {
-  ApiLocaleAgentWebSearchBraveRoute: typeof ApiLocaleAgentWebSearchBraveRoute
-  ApiLocaleAgentWebSearchKagiRoute: typeof ApiLocaleAgentWebSearchKagiRoute
-}
-
-const ApiLocaleAgentWebSearchRouteChildren: ApiLocaleAgentWebSearchRouteChildren =
-  {
-    ApiLocaleAgentWebSearchBraveRoute: ApiLocaleAgentWebSearchBraveRoute,
-    ApiLocaleAgentWebSearchKagiRoute: ApiLocaleAgentWebSearchKagiRoute,
-  }
-
-const ApiLocaleAgentWebSearchRouteWithChildren =
-  ApiLocaleAgentWebSearchRoute._addFileChildren(
-    ApiLocaleAgentWebSearchRouteChildren,
-  )
-
 interface ApiLocaleLeadsImportJobsJobIdRouteChildren {
   ApiLocaleLeadsImportJobsJobIdRetryRoute: typeof ApiLocaleLeadsImportJobsJobIdRetryRoute
   ApiLocaleLeadsImportJobsJobIdStopRoute: typeof ApiLocaleLeadsImportJobsJobIdStopRoute
@@ -12880,147 +12491,33 @@ const ApiLocaleNewsletterUnsubscribeRouteWithChildren =
     ApiLocaleNewsletterUnsubscribeRouteChildren,
   )
 
-interface ApiLocaleRemoteConnectionConnectReverseRouteChildren {
-  ApiLocaleRemoteConnectionConnectReverseUpdateRoute: typeof ApiLocaleRemoteConnectionConnectReverseUpdateRoute
+interface ApiLocaleVibeExecuteToolRouteChildren {
+  ApiLocaleVibeExecuteToolAwaitTaskRoute: typeof ApiLocaleVibeExecuteToolAwaitTaskRoute
+  ApiLocaleVibeExecuteToolCompleteRoute: typeof ApiLocaleVibeExecuteToolCompleteRoute
+  ApiLocaleVibeExecuteToolRevivalRoute: typeof ApiLocaleVibeExecuteToolRevivalRoute
+  ApiLocaleVibeExecuteToolCallControlCancelRoute: typeof ApiLocaleVibeExecuteToolCallControlCancelRoute
+  ApiLocaleVibeExecuteToolCallControlDetachRoute: typeof ApiLocaleVibeExecuteToolCallControlDetachRoute
+  ApiLocaleVibeExecuteToolCallControlResumeWhenDoneRoute: typeof ApiLocaleVibeExecuteToolCallControlResumeWhenDoneRoute
 }
 
-const ApiLocaleRemoteConnectionConnectReverseRouteChildren: ApiLocaleRemoteConnectionConnectReverseRouteChildren =
+const ApiLocaleVibeExecuteToolRouteChildren: ApiLocaleVibeExecuteToolRouteChildren =
   {
-    ApiLocaleRemoteConnectionConnectReverseUpdateRoute:
-      ApiLocaleRemoteConnectionConnectReverseUpdateRoute,
+    ApiLocaleVibeExecuteToolAwaitTaskRoute:
+      ApiLocaleVibeExecuteToolAwaitTaskRoute,
+    ApiLocaleVibeExecuteToolCompleteRoute:
+      ApiLocaleVibeExecuteToolCompleteRoute,
+    ApiLocaleVibeExecuteToolRevivalRoute: ApiLocaleVibeExecuteToolRevivalRoute,
+    ApiLocaleVibeExecuteToolCallControlCancelRoute:
+      ApiLocaleVibeExecuteToolCallControlCancelRoute,
+    ApiLocaleVibeExecuteToolCallControlDetachRoute:
+      ApiLocaleVibeExecuteToolCallControlDetachRoute,
+    ApiLocaleVibeExecuteToolCallControlResumeWhenDoneRoute:
+      ApiLocaleVibeExecuteToolCallControlResumeWhenDoneRoute,
   }
 
-const ApiLocaleRemoteConnectionConnectReverseRouteWithChildren =
-  ApiLocaleRemoteConnectionConnectReverseRoute._addFileChildren(
-    ApiLocaleRemoteConnectionConnectReverseRouteChildren,
-  )
-
-interface ApiLocaleRemoteConnectionSyncRouteChildren {
-  ApiLocaleRemoteConnectionSyncProvidersRoute: typeof ApiLocaleRemoteConnectionSyncProvidersRoute
-}
-
-const ApiLocaleRemoteConnectionSyncRouteChildren: ApiLocaleRemoteConnectionSyncRouteChildren =
-  {
-    ApiLocaleRemoteConnectionSyncProvidersRoute:
-      ApiLocaleRemoteConnectionSyncProvidersRoute,
-  }
-
-const ApiLocaleRemoteConnectionSyncRouteWithChildren =
-  ApiLocaleRemoteConnectionSyncRoute._addFileChildren(
-    ApiLocaleRemoteConnectionSyncRouteChildren,
-  )
-
-interface ApiLocaleSystemExecuteToolRouteChildren {
-  ApiLocaleSystemExecuteToolAwaitTaskRoute: typeof ApiLocaleSystemExecuteToolAwaitTaskRoute
-  ApiLocaleSystemExecuteToolCompleteRoute: typeof ApiLocaleSystemExecuteToolCompleteRoute
-  ApiLocaleSystemExecuteToolRevivalRoute: typeof ApiLocaleSystemExecuteToolRevivalRoute
-  ApiLocaleSystemExecuteToolCallControlCancelRoute: typeof ApiLocaleSystemExecuteToolCallControlCancelRoute
-  ApiLocaleSystemExecuteToolCallControlDetachRoute: typeof ApiLocaleSystemExecuteToolCallControlDetachRoute
-  ApiLocaleSystemExecuteToolCallControlResumeWhenDoneRoute: typeof ApiLocaleSystemExecuteToolCallControlResumeWhenDoneRoute
-}
-
-const ApiLocaleSystemExecuteToolRouteChildren: ApiLocaleSystemExecuteToolRouteChildren =
-  {
-    ApiLocaleSystemExecuteToolAwaitTaskRoute:
-      ApiLocaleSystemExecuteToolAwaitTaskRoute,
-    ApiLocaleSystemExecuteToolCompleteRoute:
-      ApiLocaleSystemExecuteToolCompleteRoute,
-    ApiLocaleSystemExecuteToolRevivalRoute:
-      ApiLocaleSystemExecuteToolRevivalRoute,
-    ApiLocaleSystemExecuteToolCallControlCancelRoute:
-      ApiLocaleSystemExecuteToolCallControlCancelRoute,
-    ApiLocaleSystemExecuteToolCallControlDetachRoute:
-      ApiLocaleSystemExecuteToolCallControlDetachRoute,
-    ApiLocaleSystemExecuteToolCallControlResumeWhenDoneRoute:
-      ApiLocaleSystemExecuteToolCallControlResumeWhenDoneRoute,
-  }
-
-const ApiLocaleSystemExecuteToolRouteWithChildren =
-  ApiLocaleSystemExecuteToolRoute._addFileChildren(
-    ApiLocaleSystemExecuteToolRouteChildren,
-  )
-
-interface ApiLocaleAgentChatThreadsThreadIdMessagesMessageIdRouteChildren {
-  ApiLocaleAgentChatThreadsThreadIdMessagesMessageIdVoteRoute: typeof ApiLocaleAgentChatThreadsThreadIdMessagesMessageIdVoteRoute
-}
-
-const ApiLocaleAgentChatThreadsThreadIdMessagesMessageIdRouteChildren: ApiLocaleAgentChatThreadsThreadIdMessagesMessageIdRouteChildren =
-  {
-    ApiLocaleAgentChatThreadsThreadIdMessagesMessageIdVoteRoute:
-      ApiLocaleAgentChatThreadsThreadIdMessagesMessageIdVoteRoute,
-  }
-
-const ApiLocaleAgentChatThreadsThreadIdMessagesMessageIdRouteWithChildren =
-  ApiLocaleAgentChatThreadsThreadIdMessagesMessageIdRoute._addFileChildren(
-    ApiLocaleAgentChatThreadsThreadIdMessagesMessageIdRouteChildren,
-  )
-
-interface ApiLocaleAgentChatThreadsThreadIdMessagesRouteChildren {
-  ApiLocaleAgentChatThreadsThreadIdMessagesMessageIdRoute: typeof ApiLocaleAgentChatThreadsThreadIdMessagesMessageIdRouteWithChildren
-  ApiLocaleAgentChatThreadsThreadIdMessagesPathRoute: typeof ApiLocaleAgentChatThreadsThreadIdMessagesPathRoute
-  ApiLocaleAgentChatThreadsThreadIdMessagesSearchRoute: typeof ApiLocaleAgentChatThreadsThreadIdMessagesSearchRoute
-}
-
-const ApiLocaleAgentChatThreadsThreadIdMessagesRouteChildren: ApiLocaleAgentChatThreadsThreadIdMessagesRouteChildren =
-  {
-    ApiLocaleAgentChatThreadsThreadIdMessagesMessageIdRoute:
-      ApiLocaleAgentChatThreadsThreadIdMessagesMessageIdRouteWithChildren,
-    ApiLocaleAgentChatThreadsThreadIdMessagesPathRoute:
-      ApiLocaleAgentChatThreadsThreadIdMessagesPathRoute,
-    ApiLocaleAgentChatThreadsThreadIdMessagesSearchRoute:
-      ApiLocaleAgentChatThreadsThreadIdMessagesSearchRoute,
-  }
-
-const ApiLocaleAgentChatThreadsThreadIdMessagesRouteWithChildren =
-  ApiLocaleAgentChatThreadsThreadIdMessagesRoute._addFileChildren(
-    ApiLocaleAgentChatThreadsThreadIdMessagesRouteChildren,
-  )
-
-interface ApiLocaleAgentChatThreadsThreadIdRouteChildren {
-  ApiLocaleAgentChatThreadsThreadIdMessagesRoute: typeof ApiLocaleAgentChatThreadsThreadIdMessagesRouteWithChildren
-  ApiLocaleAgentChatThreadsThreadIdPermissionsRoute: typeof ApiLocaleAgentChatThreadsThreadIdPermissionsRoute
-  ApiLocaleAgentChatThreadsThreadIdShareLinksRoute: typeof ApiLocaleAgentChatThreadsThreadIdShareLinksRoute
-}
-
-const ApiLocaleAgentChatThreadsThreadIdRouteChildren: ApiLocaleAgentChatThreadsThreadIdRouteChildren =
-  {
-    ApiLocaleAgentChatThreadsThreadIdMessagesRoute:
-      ApiLocaleAgentChatThreadsThreadIdMessagesRouteWithChildren,
-    ApiLocaleAgentChatThreadsThreadIdPermissionsRoute:
-      ApiLocaleAgentChatThreadsThreadIdPermissionsRoute,
-    ApiLocaleAgentChatThreadsThreadIdShareLinksRoute:
-      ApiLocaleAgentChatThreadsThreadIdShareLinksRoute,
-  }
-
-const ApiLocaleAgentChatThreadsThreadIdRouteWithChildren =
-  ApiLocaleAgentChatThreadsThreadIdRoute._addFileChildren(
-    ApiLocaleAgentChatThreadsThreadIdRouteChildren,
-  )
-
-interface ApiLocaleAgentChatThreadsRouteChildren {
-  ApiLocaleAgentChatThreadsThreadIdRoute: typeof ApiLocaleAgentChatThreadsThreadIdRouteWithChildren
-  ApiLocaleAgentChatThreadsRenameRoute: typeof ApiLocaleAgentChatThreadsRenameRoute
-  ApiLocaleAgentChatThreadsSearchMessagesRoute: typeof ApiLocaleAgentChatThreadsSearchMessagesRoute
-  ApiLocaleAgentChatThreadsSearchThreadsRoute: typeof ApiLocaleAgentChatThreadsSearchThreadsRoute
-  ApiLocaleAgentChatThreadsFilesThreadIdFilenameRoute: typeof ApiLocaleAgentChatThreadsFilesThreadIdFilenameRoute
-}
-
-const ApiLocaleAgentChatThreadsRouteChildren: ApiLocaleAgentChatThreadsRouteChildren =
-  {
-    ApiLocaleAgentChatThreadsThreadIdRoute:
-      ApiLocaleAgentChatThreadsThreadIdRouteWithChildren,
-    ApiLocaleAgentChatThreadsRenameRoute: ApiLocaleAgentChatThreadsRenameRoute,
-    ApiLocaleAgentChatThreadsSearchMessagesRoute:
-      ApiLocaleAgentChatThreadsSearchMessagesRoute,
-    ApiLocaleAgentChatThreadsSearchThreadsRoute:
-      ApiLocaleAgentChatThreadsSearchThreadsRoute,
-    ApiLocaleAgentChatThreadsFilesThreadIdFilenameRoute:
-      ApiLocaleAgentChatThreadsFilesThreadIdFilenameRoute,
-  }
-
-const ApiLocaleAgentChatThreadsRouteWithChildren =
-  ApiLocaleAgentChatThreadsRoute._addFileChildren(
-    ApiLocaleAgentChatThreadsRouteChildren,
+const ApiLocaleVibeExecuteToolRouteWithChildren =
+  ApiLocaleVibeExecuteToolRoute._addFileChildren(
+    ApiLocaleVibeExecuteToolRouteChildren,
   )
 
 interface ApiLocaleLeadMagnetProvidersGoogleSheetsRouteChildren {
@@ -13063,60 +12560,6 @@ const ApiLocaleSshConnectionsIdRouteChildren: ApiLocaleSshConnectionsIdRouteChil
 const ApiLocaleSshConnectionsIdRouteWithChildren =
   ApiLocaleSshConnectionsIdRoute._addFileChildren(
     ApiLocaleSshConnectionsIdRouteChildren,
-  )
-
-interface ApiLocaleSystemDataflowGraphsRouteChildren {
-  ApiLocaleSystemDataflowGraphsIdArchiveRoute: typeof ApiLocaleSystemDataflowGraphsIdArchiveRoute
-  ApiLocaleSystemDataflowGraphsIdBacktestRoute: typeof ApiLocaleSystemDataflowGraphsIdBacktestRoute
-  ApiLocaleSystemDataflowGraphsIdDataRoute: typeof ApiLocaleSystemDataflowGraphsIdDataRoute
-  ApiLocaleSystemDataflowGraphsIdDeleteRoute: typeof ApiLocaleSystemDataflowGraphsIdDeleteRoute
-  ApiLocaleSystemDataflowGraphsIdEditRoute: typeof ApiLocaleSystemDataflowGraphsIdEditRoute
-  ApiLocaleSystemDataflowGraphsIdPromoteRoute: typeof ApiLocaleSystemDataflowGraphsIdPromoteRoute
-  ApiLocaleSystemDataflowGraphsIdTriggerRoute: typeof ApiLocaleSystemDataflowGraphsIdTriggerRoute
-  ApiLocaleSystemDataflowGraphsIdVersionsRoute: typeof ApiLocaleSystemDataflowGraphsIdVersionsRoute
-}
-
-const ApiLocaleSystemDataflowGraphsRouteChildren: ApiLocaleSystemDataflowGraphsRouteChildren =
-  {
-    ApiLocaleSystemDataflowGraphsIdArchiveRoute:
-      ApiLocaleSystemDataflowGraphsIdArchiveRoute,
-    ApiLocaleSystemDataflowGraphsIdBacktestRoute:
-      ApiLocaleSystemDataflowGraphsIdBacktestRoute,
-    ApiLocaleSystemDataflowGraphsIdDataRoute:
-      ApiLocaleSystemDataflowGraphsIdDataRoute,
-    ApiLocaleSystemDataflowGraphsIdDeleteRoute:
-      ApiLocaleSystemDataflowGraphsIdDeleteRoute,
-    ApiLocaleSystemDataflowGraphsIdEditRoute:
-      ApiLocaleSystemDataflowGraphsIdEditRoute,
-    ApiLocaleSystemDataflowGraphsIdPromoteRoute:
-      ApiLocaleSystemDataflowGraphsIdPromoteRoute,
-    ApiLocaleSystemDataflowGraphsIdTriggerRoute:
-      ApiLocaleSystemDataflowGraphsIdTriggerRoute,
-    ApiLocaleSystemDataflowGraphsIdVersionsRoute:
-      ApiLocaleSystemDataflowGraphsIdVersionsRoute,
-  }
-
-const ApiLocaleSystemDataflowGraphsRouteWithChildren =
-  ApiLocaleSystemDataflowGraphsRoute._addFileChildren(
-    ApiLocaleSystemDataflowGraphsRouteChildren,
-  )
-
-interface ApiLocaleSystemEnvSettingsRouteChildren {
-  ApiLocaleSystemEnvSettingsExportEnvRoute: typeof ApiLocaleSystemEnvSettingsExportEnvRoute
-  ApiLocaleSystemEnvSettingsGenerateKeyRoute: typeof ApiLocaleSystemEnvSettingsGenerateKeyRoute
-}
-
-const ApiLocaleSystemEnvSettingsRouteChildren: ApiLocaleSystemEnvSettingsRouteChildren =
-  {
-    ApiLocaleSystemEnvSettingsExportEnvRoute:
-      ApiLocaleSystemEnvSettingsExportEnvRoute,
-    ApiLocaleSystemEnvSettingsGenerateKeyRoute:
-      ApiLocaleSystemEnvSettingsGenerateKeyRoute,
-  }
-
-const ApiLocaleSystemEnvSettingsRouteWithChildren =
-  ApiLocaleSystemEnvSettingsRoute._addFileChildren(
-    ApiLocaleSystemEnvSettingsRouteChildren,
   )
 
 interface ApiLocaleUserPrivateMeAddressesRouteChildren {
@@ -13192,46 +12635,310 @@ const ApiLocaleUsersUserIdRouteChildren: ApiLocaleUsersUserIdRouteChildren = {
 const ApiLocaleUsersUserIdRouteWithChildren =
   ApiLocaleUsersUserIdRoute._addFileChildren(ApiLocaleUsersUserIdRouteChildren)
 
-interface ApiLocaleAgentChatFoldersRootFolderIdRouteChildren {
-  ApiLocaleAgentChatFoldersRootFolderIdCreateRoute: typeof ApiLocaleAgentChatFoldersRootFolderIdCreateRoute
-  ApiLocaleAgentChatFoldersRootFolderIdRootPermissionsRoute: typeof ApiLocaleAgentChatFoldersRootFolderIdRootPermissionsRoute
+interface ApiLocaleVibeAgentFetchUrlContentRouteChildren {
+  ApiLocaleVibeAgentFetchUrlContentCleanupRoute: typeof ApiLocaleVibeAgentFetchUrlContentCleanupRoute
 }
 
-const ApiLocaleAgentChatFoldersRootFolderIdRouteChildren: ApiLocaleAgentChatFoldersRootFolderIdRouteChildren =
+const ApiLocaleVibeAgentFetchUrlContentRouteChildren: ApiLocaleVibeAgentFetchUrlContentRouteChildren =
   {
-    ApiLocaleAgentChatFoldersRootFolderIdCreateRoute:
-      ApiLocaleAgentChatFoldersRootFolderIdCreateRoute,
-    ApiLocaleAgentChatFoldersRootFolderIdRootPermissionsRoute:
-      ApiLocaleAgentChatFoldersRootFolderIdRootPermissionsRoute,
+    ApiLocaleVibeAgentFetchUrlContentCleanupRoute:
+      ApiLocaleVibeAgentFetchUrlContentCleanupRoute,
   }
 
-const ApiLocaleAgentChatFoldersRootFolderIdRouteWithChildren =
-  ApiLocaleAgentChatFoldersRootFolderIdRoute._addFileChildren(
-    ApiLocaleAgentChatFoldersRootFolderIdRouteChildren,
+const ApiLocaleVibeAgentFetchUrlContentRouteWithChildren =
+  ApiLocaleVibeAgentFetchUrlContentRoute._addFileChildren(
+    ApiLocaleVibeAgentFetchUrlContentRouteChildren,
   )
 
-interface ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRouteChildren {
-  ApiLocaleAgentChatFoldersSubfoldersSubFolderIdMoveRoute: typeof ApiLocaleAgentChatFoldersSubfoldersSubFolderIdMoveRoute
-  ApiLocaleAgentChatFoldersSubfoldersSubFolderIdPermissionsRoute: typeof ApiLocaleAgentChatFoldersSubfoldersSubFolderIdPermissionsRoute
-  ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRenameRoute: typeof ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRenameRoute
-  ApiLocaleAgentChatFoldersSubfoldersSubFolderIdUpdateRoute: typeof ApiLocaleAgentChatFoldersSubfoldersSubFolderIdUpdateRoute
+interface ApiLocaleVibeAgentSkillsIdRouteChildren {
+  ApiLocaleVibeAgentSkillsIdPublishRoute: typeof ApiLocaleVibeAgentSkillsIdPublishRoute
+  ApiLocaleVibeAgentSkillsIdReportRoute: typeof ApiLocaleVibeAgentSkillsIdReportRoute
+  ApiLocaleVibeAgentSkillsIdVoteRoute: typeof ApiLocaleVibeAgentSkillsIdVoteRoute
 }
 
-const ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRouteChildren: ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRouteChildren =
+const ApiLocaleVibeAgentSkillsIdRouteChildren: ApiLocaleVibeAgentSkillsIdRouteChildren =
   {
-    ApiLocaleAgentChatFoldersSubfoldersSubFolderIdMoveRoute:
-      ApiLocaleAgentChatFoldersSubfoldersSubFolderIdMoveRoute,
-    ApiLocaleAgentChatFoldersSubfoldersSubFolderIdPermissionsRoute:
-      ApiLocaleAgentChatFoldersSubfoldersSubFolderIdPermissionsRoute,
-    ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRenameRoute:
-      ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRenameRoute,
-    ApiLocaleAgentChatFoldersSubfoldersSubFolderIdUpdateRoute:
-      ApiLocaleAgentChatFoldersSubfoldersSubFolderIdUpdateRoute,
+    ApiLocaleVibeAgentSkillsIdPublishRoute:
+      ApiLocaleVibeAgentSkillsIdPublishRoute,
+    ApiLocaleVibeAgentSkillsIdReportRoute:
+      ApiLocaleVibeAgentSkillsIdReportRoute,
+    ApiLocaleVibeAgentSkillsIdVoteRoute: ApiLocaleVibeAgentSkillsIdVoteRoute,
   }
 
-const ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRouteWithChildren =
-  ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRoute._addFileChildren(
-    ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRouteChildren,
+const ApiLocaleVibeAgentSkillsIdRouteWithChildren =
+  ApiLocaleVibeAgentSkillsIdRoute._addFileChildren(
+    ApiLocaleVibeAgentSkillsIdRouteChildren,
+  )
+
+interface ApiLocaleVibeAgentSkillsFavoritesRouteChildren {
+  ApiLocaleVibeAgentSkillsFavoritesIdRoute: typeof ApiLocaleVibeAgentSkillsFavoritesIdRoute
+  ApiLocaleVibeAgentSkillsFavoritesCreateRoute: typeof ApiLocaleVibeAgentSkillsFavoritesCreateRoute
+  ApiLocaleVibeAgentSkillsFavoritesReorderRoute: typeof ApiLocaleVibeAgentSkillsFavoritesReorderRoute
+}
+
+const ApiLocaleVibeAgentSkillsFavoritesRouteChildren: ApiLocaleVibeAgentSkillsFavoritesRouteChildren =
+  {
+    ApiLocaleVibeAgentSkillsFavoritesIdRoute:
+      ApiLocaleVibeAgentSkillsFavoritesIdRoute,
+    ApiLocaleVibeAgentSkillsFavoritesCreateRoute:
+      ApiLocaleVibeAgentSkillsFavoritesCreateRoute,
+    ApiLocaleVibeAgentSkillsFavoritesReorderRoute:
+      ApiLocaleVibeAgentSkillsFavoritesReorderRoute,
+  }
+
+const ApiLocaleVibeAgentSkillsFavoritesRouteWithChildren =
+  ApiLocaleVibeAgentSkillsFavoritesRoute._addFileChildren(
+    ApiLocaleVibeAgentSkillsFavoritesRouteChildren,
+  )
+
+interface ApiLocaleVibeAgentSkillsRouteChildren {
+  ApiLocaleVibeAgentSkillsIdRoute: typeof ApiLocaleVibeAgentSkillsIdRouteWithChildren
+  ApiLocaleVibeAgentSkillsCreateRoute: typeof ApiLocaleVibeAgentSkillsCreateRoute
+  ApiLocaleVibeAgentSkillsFavoritesRoute: typeof ApiLocaleVibeAgentSkillsFavoritesRouteWithChildren
+  ApiLocaleVibeAgentSkillsModerationRoute: typeof ApiLocaleVibeAgentSkillsModerationRoute
+}
+
+const ApiLocaleVibeAgentSkillsRouteChildren: ApiLocaleVibeAgentSkillsRouteChildren =
+  {
+    ApiLocaleVibeAgentSkillsIdRoute:
+      ApiLocaleVibeAgentSkillsIdRouteWithChildren,
+    ApiLocaleVibeAgentSkillsCreateRoute: ApiLocaleVibeAgentSkillsCreateRoute,
+    ApiLocaleVibeAgentSkillsFavoritesRoute:
+      ApiLocaleVibeAgentSkillsFavoritesRouteWithChildren,
+    ApiLocaleVibeAgentSkillsModerationRoute:
+      ApiLocaleVibeAgentSkillsModerationRoute,
+  }
+
+const ApiLocaleVibeAgentSkillsRouteWithChildren =
+  ApiLocaleVibeAgentSkillsRoute._addFileChildren(
+    ApiLocaleVibeAgentSkillsRouteChildren,
+  )
+
+interface ApiLocaleVibeAgentWebSearchRouteChildren {
+  ApiLocaleVibeAgentWebSearchBraveRoute: typeof ApiLocaleVibeAgentWebSearchBraveRoute
+  ApiLocaleVibeAgentWebSearchKagiRoute: typeof ApiLocaleVibeAgentWebSearchKagiRoute
+}
+
+const ApiLocaleVibeAgentWebSearchRouteChildren: ApiLocaleVibeAgentWebSearchRouteChildren =
+  {
+    ApiLocaleVibeAgentWebSearchBraveRoute:
+      ApiLocaleVibeAgentWebSearchBraveRoute,
+    ApiLocaleVibeAgentWebSearchKagiRoute: ApiLocaleVibeAgentWebSearchKagiRoute,
+  }
+
+const ApiLocaleVibeAgentWebSearchRouteWithChildren =
+  ApiLocaleVibeAgentWebSearchRoute._addFileChildren(
+    ApiLocaleVibeAgentWebSearchRouteChildren,
+  )
+
+interface ApiLocaleVibeDataflowGraphsRouteChildren {
+  ApiLocaleVibeDataflowGraphsIdArchiveRoute: typeof ApiLocaleVibeDataflowGraphsIdArchiveRoute
+  ApiLocaleVibeDataflowGraphsIdBacktestRoute: typeof ApiLocaleVibeDataflowGraphsIdBacktestRoute
+  ApiLocaleVibeDataflowGraphsIdDataRoute: typeof ApiLocaleVibeDataflowGraphsIdDataRoute
+  ApiLocaleVibeDataflowGraphsIdDeleteRoute: typeof ApiLocaleVibeDataflowGraphsIdDeleteRoute
+  ApiLocaleVibeDataflowGraphsIdEditRoute: typeof ApiLocaleVibeDataflowGraphsIdEditRoute
+  ApiLocaleVibeDataflowGraphsIdPromoteRoute: typeof ApiLocaleVibeDataflowGraphsIdPromoteRoute
+  ApiLocaleVibeDataflowGraphsIdTriggerRoute: typeof ApiLocaleVibeDataflowGraphsIdTriggerRoute
+  ApiLocaleVibeDataflowGraphsIdVersionsRoute: typeof ApiLocaleVibeDataflowGraphsIdVersionsRoute
+}
+
+const ApiLocaleVibeDataflowGraphsRouteChildren: ApiLocaleVibeDataflowGraphsRouteChildren =
+  {
+    ApiLocaleVibeDataflowGraphsIdArchiveRoute:
+      ApiLocaleVibeDataflowGraphsIdArchiveRoute,
+    ApiLocaleVibeDataflowGraphsIdBacktestRoute:
+      ApiLocaleVibeDataflowGraphsIdBacktestRoute,
+    ApiLocaleVibeDataflowGraphsIdDataRoute:
+      ApiLocaleVibeDataflowGraphsIdDataRoute,
+    ApiLocaleVibeDataflowGraphsIdDeleteRoute:
+      ApiLocaleVibeDataflowGraphsIdDeleteRoute,
+    ApiLocaleVibeDataflowGraphsIdEditRoute:
+      ApiLocaleVibeDataflowGraphsIdEditRoute,
+    ApiLocaleVibeDataflowGraphsIdPromoteRoute:
+      ApiLocaleVibeDataflowGraphsIdPromoteRoute,
+    ApiLocaleVibeDataflowGraphsIdTriggerRoute:
+      ApiLocaleVibeDataflowGraphsIdTriggerRoute,
+    ApiLocaleVibeDataflowGraphsIdVersionsRoute:
+      ApiLocaleVibeDataflowGraphsIdVersionsRoute,
+  }
+
+const ApiLocaleVibeDataflowGraphsRouteWithChildren =
+  ApiLocaleVibeDataflowGraphsRoute._addFileChildren(
+    ApiLocaleVibeDataflowGraphsRouteChildren,
+  )
+
+interface ApiLocaleVibeEnvSettingsRouteChildren {
+  ApiLocaleVibeEnvSettingsExportEnvRoute: typeof ApiLocaleVibeEnvSettingsExportEnvRoute
+  ApiLocaleVibeEnvSettingsGenerateKeyRoute: typeof ApiLocaleVibeEnvSettingsGenerateKeyRoute
+}
+
+const ApiLocaleVibeEnvSettingsRouteChildren: ApiLocaleVibeEnvSettingsRouteChildren =
+  {
+    ApiLocaleVibeEnvSettingsExportEnvRoute:
+      ApiLocaleVibeEnvSettingsExportEnvRoute,
+    ApiLocaleVibeEnvSettingsGenerateKeyRoute:
+      ApiLocaleVibeEnvSettingsGenerateKeyRoute,
+  }
+
+const ApiLocaleVibeEnvSettingsRouteWithChildren =
+  ApiLocaleVibeEnvSettingsRoute._addFileChildren(
+    ApiLocaleVibeEnvSettingsRouteChildren,
+  )
+
+interface ApiLocaleVibeRemoteConnectionConnectReverseRouteChildren {
+  ApiLocaleVibeRemoteConnectionConnectReverseUpdateRoute: typeof ApiLocaleVibeRemoteConnectionConnectReverseUpdateRoute
+}
+
+const ApiLocaleVibeRemoteConnectionConnectReverseRouteChildren: ApiLocaleVibeRemoteConnectionConnectReverseRouteChildren =
+  {
+    ApiLocaleVibeRemoteConnectionConnectReverseUpdateRoute:
+      ApiLocaleVibeRemoteConnectionConnectReverseUpdateRoute,
+  }
+
+const ApiLocaleVibeRemoteConnectionConnectReverseRouteWithChildren =
+  ApiLocaleVibeRemoteConnectionConnectReverseRoute._addFileChildren(
+    ApiLocaleVibeRemoteConnectionConnectReverseRouteChildren,
+  )
+
+interface ApiLocaleVibeRemoteConnectionSyncRouteChildren {
+  ApiLocaleVibeRemoteConnectionSyncProvidersRoute: typeof ApiLocaleVibeRemoteConnectionSyncProvidersRoute
+}
+
+const ApiLocaleVibeRemoteConnectionSyncRouteChildren: ApiLocaleVibeRemoteConnectionSyncRouteChildren =
+  {
+    ApiLocaleVibeRemoteConnectionSyncProvidersRoute:
+      ApiLocaleVibeRemoteConnectionSyncProvidersRoute,
+  }
+
+const ApiLocaleVibeRemoteConnectionSyncRouteWithChildren =
+  ApiLocaleVibeRemoteConnectionSyncRoute._addFileChildren(
+    ApiLocaleVibeRemoteConnectionSyncRouteChildren,
+  )
+
+interface ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdRouteChildren {
+  ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdVoteRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdVoteRoute
+}
+
+const ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdRouteChildren: ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdRouteChildren =
+  {
+    ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdVoteRoute:
+      ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdVoteRoute,
+  }
+
+const ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdRouteWithChildren =
+  ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdRoute._addFileChildren(
+    ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdRouteChildren,
+  )
+
+interface ApiLocaleVibeAgentChatThreadsThreadIdMessagesRouteChildren {
+  ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdRouteWithChildren
+  ApiLocaleVibeAgentChatThreadsThreadIdMessagesPathRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesPathRoute
+  ApiLocaleVibeAgentChatThreadsThreadIdMessagesSearchRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesSearchRoute
+}
+
+const ApiLocaleVibeAgentChatThreadsThreadIdMessagesRouteChildren: ApiLocaleVibeAgentChatThreadsThreadIdMessagesRouteChildren =
+  {
+    ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdRoute:
+      ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdRouteWithChildren,
+    ApiLocaleVibeAgentChatThreadsThreadIdMessagesPathRoute:
+      ApiLocaleVibeAgentChatThreadsThreadIdMessagesPathRoute,
+    ApiLocaleVibeAgentChatThreadsThreadIdMessagesSearchRoute:
+      ApiLocaleVibeAgentChatThreadsThreadIdMessagesSearchRoute,
+  }
+
+const ApiLocaleVibeAgentChatThreadsThreadIdMessagesRouteWithChildren =
+  ApiLocaleVibeAgentChatThreadsThreadIdMessagesRoute._addFileChildren(
+    ApiLocaleVibeAgentChatThreadsThreadIdMessagesRouteChildren,
+  )
+
+interface ApiLocaleVibeAgentChatThreadsThreadIdRouteChildren {
+  ApiLocaleVibeAgentChatThreadsThreadIdMessagesRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesRouteWithChildren
+  ApiLocaleVibeAgentChatThreadsThreadIdPermissionsRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdPermissionsRoute
+  ApiLocaleVibeAgentChatThreadsThreadIdShareLinksRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdShareLinksRoute
+}
+
+const ApiLocaleVibeAgentChatThreadsThreadIdRouteChildren: ApiLocaleVibeAgentChatThreadsThreadIdRouteChildren =
+  {
+    ApiLocaleVibeAgentChatThreadsThreadIdMessagesRoute:
+      ApiLocaleVibeAgentChatThreadsThreadIdMessagesRouteWithChildren,
+    ApiLocaleVibeAgentChatThreadsThreadIdPermissionsRoute:
+      ApiLocaleVibeAgentChatThreadsThreadIdPermissionsRoute,
+    ApiLocaleVibeAgentChatThreadsThreadIdShareLinksRoute:
+      ApiLocaleVibeAgentChatThreadsThreadIdShareLinksRoute,
+  }
+
+const ApiLocaleVibeAgentChatThreadsThreadIdRouteWithChildren =
+  ApiLocaleVibeAgentChatThreadsThreadIdRoute._addFileChildren(
+    ApiLocaleVibeAgentChatThreadsThreadIdRouteChildren,
+  )
+
+interface ApiLocaleVibeAgentChatThreadsRouteChildren {
+  ApiLocaleVibeAgentChatThreadsThreadIdRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdRouteWithChildren
+  ApiLocaleVibeAgentChatThreadsRenameRoute: typeof ApiLocaleVibeAgentChatThreadsRenameRoute
+  ApiLocaleVibeAgentChatThreadsSearchMessagesRoute: typeof ApiLocaleVibeAgentChatThreadsSearchMessagesRoute
+  ApiLocaleVibeAgentChatThreadsSearchThreadsRoute: typeof ApiLocaleVibeAgentChatThreadsSearchThreadsRoute
+  ApiLocaleVibeAgentChatThreadsFilesThreadIdFilenameRoute: typeof ApiLocaleVibeAgentChatThreadsFilesThreadIdFilenameRoute
+}
+
+const ApiLocaleVibeAgentChatThreadsRouteChildren: ApiLocaleVibeAgentChatThreadsRouteChildren =
+  {
+    ApiLocaleVibeAgentChatThreadsThreadIdRoute:
+      ApiLocaleVibeAgentChatThreadsThreadIdRouteWithChildren,
+    ApiLocaleVibeAgentChatThreadsRenameRoute:
+      ApiLocaleVibeAgentChatThreadsRenameRoute,
+    ApiLocaleVibeAgentChatThreadsSearchMessagesRoute:
+      ApiLocaleVibeAgentChatThreadsSearchMessagesRoute,
+    ApiLocaleVibeAgentChatThreadsSearchThreadsRoute:
+      ApiLocaleVibeAgentChatThreadsSearchThreadsRoute,
+    ApiLocaleVibeAgentChatThreadsFilesThreadIdFilenameRoute:
+      ApiLocaleVibeAgentChatThreadsFilesThreadIdFilenameRoute,
+  }
+
+const ApiLocaleVibeAgentChatThreadsRouteWithChildren =
+  ApiLocaleVibeAgentChatThreadsRoute._addFileChildren(
+    ApiLocaleVibeAgentChatThreadsRouteChildren,
+  )
+
+interface ApiLocaleVibeAgentChatFoldersRootFolderIdRouteChildren {
+  ApiLocaleVibeAgentChatFoldersRootFolderIdCreateRoute: typeof ApiLocaleVibeAgentChatFoldersRootFolderIdCreateRoute
+  ApiLocaleVibeAgentChatFoldersRootFolderIdRootPermissionsRoute: typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRootPermissionsRoute
+}
+
+const ApiLocaleVibeAgentChatFoldersRootFolderIdRouteChildren: ApiLocaleVibeAgentChatFoldersRootFolderIdRouteChildren =
+  {
+    ApiLocaleVibeAgentChatFoldersRootFolderIdCreateRoute:
+      ApiLocaleVibeAgentChatFoldersRootFolderIdCreateRoute,
+    ApiLocaleVibeAgentChatFoldersRootFolderIdRootPermissionsRoute:
+      ApiLocaleVibeAgentChatFoldersRootFolderIdRootPermissionsRoute,
+  }
+
+const ApiLocaleVibeAgentChatFoldersRootFolderIdRouteWithChildren =
+  ApiLocaleVibeAgentChatFoldersRootFolderIdRoute._addFileChildren(
+    ApiLocaleVibeAgentChatFoldersRootFolderIdRouteChildren,
+  )
+
+interface ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteChildren {
+  ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdMoveRoute: typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdMoveRoute
+  ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdPermissionsRoute: typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdPermissionsRoute
+  ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRenameRoute: typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRenameRoute
+  ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdUpdateRoute: typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdUpdateRoute
+}
+
+const ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteChildren: ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteChildren =
+  {
+    ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdMoveRoute:
+      ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdMoveRoute,
+    ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdPermissionsRoute:
+      ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdPermissionsRoute,
+    ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRenameRoute:
+      ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRenameRoute,
+    ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdUpdateRoute:
+      ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdUpdateRoute,
+  }
+
+const ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteWithChildren =
+  ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRoute._addFileChildren(
+    ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteChildren,
   )
 
 const rootRouteChildren: RootRouteChildren = {
@@ -13246,7 +12953,7 @@ const rootRouteChildren: RootRouteChildren = {
   LocaleToolsSplatRoute: LocaleToolsSplatRoute,
   LocaleUserAccountRoute: LocaleUserAccountRouteWithChildren,
   LocaleUserAuthRoute: LocaleUserAuthRouteWithChildren,
-  ApiLocaleSlugRoute: ApiLocaleSlugRoute,
+  ApiLocaleNotFoundRoute: ApiLocaleNotFoundRoute,
   ApiLocaleContactRoute: ApiLocaleContactRoute,
   ApiLocaleCreditsRoute: ApiLocaleCreditsRouteWithChildren,
   ApiLocaleManifestRoute: ApiLocaleManifestRoute,
@@ -13258,19 +12965,6 @@ const rootRouteChildren: RootRouteChildren = {
   LocaleSkillsIndexRoute: LocaleSkillsIndexRoute,
   LocaleToolsIndexRoute: LocaleToolsIndexRoute,
   LocaleTrackIndexRoute: LocaleTrackIndexRoute,
-  ApiLocaleAgentCodingAgentRoute: ApiLocaleAgentCodingAgentRoute,
-  ApiLocaleAgentDescribeImageRoute: ApiLocaleAgentDescribeImageRoute,
-  ApiLocaleAgentDescribeVideoRoute: ApiLocaleAgentDescribeVideoRoute,
-  ApiLocaleAgentFetchUrlContentRoute:
-    ApiLocaleAgentFetchUrlContentRouteWithChildren,
-  ApiLocaleAgentImageGenerationRoute: ApiLocaleAgentImageGenerationRoute,
-  ApiLocaleAgentMusicGenerationRoute: ApiLocaleAgentMusicGenerationRoute,
-  ApiLocaleAgentSkillsRoute: ApiLocaleAgentSkillsRouteWithChildren,
-  ApiLocaleAgentSpeechToTextRoute: ApiLocaleAgentSpeechToTextRouteWithChildren,
-  ApiLocaleAgentTextToSpeechRoute: ApiLocaleAgentTextToSpeechRoute,
-  ApiLocaleAgentVideoGenerationRoute: ApiLocaleAgentVideoGenerationRoute,
-  ApiLocaleAgentViewImageRoute: ApiLocaleAgentViewImageRoute,
-  ApiLocaleAgentWebSearchRoute: ApiLocaleAgentWebSearchRouteWithChildren,
   ApiLocaleBrowserClickRoute: ApiLocaleBrowserClickRoute,
   ApiLocaleBrowserClosePageRoute: ApiLocaleBrowserClosePageRoute,
   ApiLocaleBrowserDragRoute: ApiLocaleBrowserDragRoute,
@@ -13347,44 +13041,17 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocalePosDashboardRoute: ApiLocalePosDashboardRoute,
   ApiLocalePosProductLookupRoute: ApiLocalePosProductLookupRoute,
   ApiLocalePurchasingDashboardRoute: ApiLocalePurchasingDashboardRoute,
-  ApiLocaleRemoteConnectionInstanceIdRoute:
-    ApiLocaleRemoteConnectionInstanceIdRoute,
-  ApiLocaleRemoteConnectionConnectRoute: ApiLocaleRemoteConnectionConnectRoute,
-  ApiLocaleRemoteConnectionConnectReverseRoute:
-    ApiLocaleRemoteConnectionConnectReverseRouteWithChildren,
-  ApiLocaleRemoteConnectionListRoute: ApiLocaleRemoteConnectionListRoute,
-  ApiLocaleRemoteConnectionSyncRoute:
-    ApiLocaleRemoteConnectionSyncRouteWithChildren,
-  ApiLocaleSystemExecuteToolRoute: ApiLocaleSystemExecuteToolRouteWithChildren,
-  ApiLocaleSystemHelpToolRoute: ApiLocaleSystemHelpToolRoute,
   ApiLocaleTaxReportRoute: ApiLocaleTaxReportRoute,
   ApiLocaleUserSessionCleanupRoute: ApiLocaleUserSessionCleanupRoute,
   ApiLocaleUsersCreateRoute: ApiLocaleUsersCreateRoute,
   ApiLocaleUsersListRoute: ApiLocaleUsersListRoute,
   ApiLocaleUsersStatsRoute: ApiLocaleUsersStatsRoute,
   ApiLocaleUsersViewRoute: ApiLocaleUsersViewRoute,
+  ApiLocaleVibeExecuteToolRoute: ApiLocaleVibeExecuteToolRouteWithChildren,
+  ApiLocaleVibeHelpToolRoute: ApiLocaleVibeHelpToolRoute,
   LocaleCreatorUserIdIndexRoute: LocaleCreatorUserIdIndexRoute,
   LocaleSharedTokenIndexRoute: LocaleSharedTokenIndexRoute,
   LocaleSkillSkillIdIndexRoute: LocaleSkillSkillIdIndexRoute,
-  ApiLocaleAgentAiStreamCancelRoute: ApiLocaleAgentAiStreamCancelRoute,
-  ApiLocaleAgentAiStreamRunRoute: ApiLocaleAgentAiStreamRunRoute,
-  ApiLocaleAgentAiStreamStreamRoute: ApiLocaleAgentAiStreamStreamRoute,
-  ApiLocaleAgentChatPublicFeedRoute: ApiLocaleAgentChatPublicFeedRoute,
-  ApiLocaleAgentChatSettingsRoute: ApiLocaleAgentChatSettingsRoute,
-  ApiLocaleAgentChatThreadsRoute: ApiLocaleAgentChatThreadsRouteWithChildren,
-  ApiLocaleAgentCortexDeleteRoute: ApiLocaleAgentCortexDeleteRoute,
-  ApiLocaleAgentCortexEditRoute: ApiLocaleAgentCortexEditRoute,
-  ApiLocaleAgentCortexExecRoute: ApiLocaleAgentCortexExecRoute,
-  ApiLocaleAgentCortexListRoute: ApiLocaleAgentCortexListRoute,
-  ApiLocaleAgentCortexMkdirRoute: ApiLocaleAgentCortexMkdirRoute,
-  ApiLocaleAgentCortexMoveRoute: ApiLocaleAgentCortexMoveRoute,
-  ApiLocaleAgentCortexReadRoute: ApiLocaleAgentCortexReadRoute,
-  ApiLocaleAgentCortexSearchRoute: ApiLocaleAgentCortexSearchRoute,
-  ApiLocaleAgentCortexTerminalsRoute: ApiLocaleAgentCortexTerminalsRoute,
-  ApiLocaleAgentCortexTreeRoute: ApiLocaleAgentCortexTreeRoute,
-  ApiLocaleAgentCortexWriteRoute: ApiLocaleAgentCortexWriteRoute,
-  ApiLocaleAgentModelsListRoute: ApiLocaleAgentModelsListRoute,
-  ApiLocaleAgentModelsModelPricesRoute: ApiLocaleAgentModelsModelPricesRoute,
   ApiLocaleAnalyticsEvaluatorsAndRoute: ApiLocaleAnalyticsEvaluatorsAndRoute,
   ApiLocaleAnalyticsEvaluatorsCrossoverRoute:
     ApiLocaleAnalyticsEvaluatorsCrossoverRoute,
@@ -13585,27 +13252,9 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocalePurchasingOrderListRoute: ApiLocalePurchasingOrderListRoute,
   ApiLocalePurchasingVendorCreateRoute: ApiLocalePurchasingVendorCreateRoute,
   ApiLocalePurchasingVendorListRoute: ApiLocalePurchasingVendorListRoute,
-  ApiLocaleRemoteConnectionSelfInstanceIdRoute:
-    ApiLocaleRemoteConnectionSelfInstanceIdRoute,
-  ApiLocaleRemoteConnectionSelfRenameRoute:
-    ApiLocaleRemoteConnectionSelfRenameRoute,
   ApiLocaleSshConnectionsIdRoute: ApiLocaleSshConnectionsIdRouteWithChildren,
   ApiLocaleSshConnectionsCreateRoute: ApiLocaleSshConnectionsCreateRoute,
   ApiLocaleSshConnectionsListRoute: ApiLocaleSshConnectionsListRoute,
-  ApiLocaleSystemDatabaseHealthRoute: ApiLocaleSystemDatabaseHealthRoute,
-  ApiLocaleSystemDatabaseSqlRoute: ApiLocaleSystemDatabaseSqlRoute,
-  ApiLocaleSystemDataflowCleanupRoute: ApiLocaleSystemDataflowCleanupRoute,
-  ApiLocaleSystemDataflowGraphsRoute:
-    ApiLocaleSystemDataflowGraphsRouteWithChildren,
-  ApiLocaleSystemDataflowRunConfigRoute: ApiLocaleSystemDataflowRunConfigRoute,
-  ApiLocaleSystemEnvSettingsRoute: ApiLocaleSystemEnvSettingsRouteWithChildren,
-  ApiLocaleSystemRealtimeRemoteEventBridgeRoute:
-    ApiLocaleSystemRealtimeRemoteEventBridgeRoute,
-  ApiLocaleSystemTasksExecuteRoute: ApiLocaleSystemTasksExecuteRoute,
-  ApiLocaleSystemTasksUnifiedRunnerRoute:
-    ApiLocaleSystemTasksUnifiedRunnerRoute,
-  ApiLocaleSystemToolingVibeDepsRoute: ApiLocaleSystemToolingVibeDepsRoute,
-  ApiLocaleSystemToolingVibeStageRoute: ApiLocaleSystemToolingVibeStageRoute,
   ApiLocaleTaxRateCreateRoute: ApiLocaleTaxRateCreateRoute,
   ApiLocaleTaxRateListRoute: ApiLocaleTaxRateListRoute,
   ApiLocaleUserDataSourcesUsersActiveTotalRoute:
@@ -13633,42 +13282,42 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocaleUserPublicLoginRoute: ApiLocaleUserPublicLoginRouteWithChildren,
   ApiLocaleUserPublicSignupRoute: ApiLocaleUserPublicSignupRoute,
   ApiLocaleUsersUserIdRoute: ApiLocaleUsersUserIdRouteWithChildren,
-  ApiLocaleAgentAiStreamSystemPromptDebugRoute:
-    ApiLocaleAgentAiStreamSystemPromptDebugRoute,
-  ApiLocaleAgentAiStreamWsProviderModelsRoute:
-    ApiLocaleAgentAiStreamWsProviderModelsRoute,
-  ApiLocaleAgentChatDataSourcesChatDownvotesTotalRoute:
-    ApiLocaleAgentChatDataSourcesChatDownvotesTotalRoute,
-  ApiLocaleAgentChatDataSourcesChatErrorsTotalRoute:
-    ApiLocaleAgentChatDataSourcesChatErrorsTotalRoute,
-  ApiLocaleAgentChatDataSourcesChatMemoriesCreatedRoute:
-    ApiLocaleAgentChatDataSourcesChatMemoriesCreatedRoute,
-  ApiLocaleAgentChatDataSourcesChatMessagesByAiRoute:
-    ApiLocaleAgentChatDataSourcesChatMessagesByAiRoute,
-  ApiLocaleAgentChatDataSourcesChatMessagesByUserRoute:
-    ApiLocaleAgentChatDataSourcesChatMessagesByUserRoute,
-  ApiLocaleAgentChatDataSourcesChatMessagesTotalRoute:
-    ApiLocaleAgentChatDataSourcesChatMessagesTotalRoute,
-  ApiLocaleAgentChatDataSourcesChatMessagesWithAttachmentsRoute:
-    ApiLocaleAgentChatDataSourcesChatMessagesWithAttachmentsRoute,
-  ApiLocaleAgentChatDataSourcesChatShareLinksCreatedRoute:
-    ApiLocaleAgentChatDataSourcesChatShareLinksCreatedRoute,
-  ApiLocaleAgentChatDataSourcesChatThreadsActiveTotalRoute:
-    ApiLocaleAgentChatDataSourcesChatThreadsActiveTotalRoute,
-  ApiLocaleAgentChatDataSourcesChatThreadsCreatedRoute:
-    ApiLocaleAgentChatDataSourcesChatThreadsCreatedRoute,
-  ApiLocaleAgentChatDataSourcesChatToolCallsTotalRoute:
-    ApiLocaleAgentChatDataSourcesChatToolCallsTotalRoute,
-  ApiLocaleAgentChatDataSourcesChatUniqueUsersRoute:
-    ApiLocaleAgentChatDataSourcesChatUniqueUsersRoute,
-  ApiLocaleAgentChatDataSourcesChatUpvotesTotalRoute:
-    ApiLocaleAgentChatDataSourcesChatUpvotesTotalRoute,
-  ApiLocaleAgentChatFolderContentsRootFolderIdRoute:
-    ApiLocaleAgentChatFolderContentsRootFolderIdRoute,
-  ApiLocaleAgentChatFoldersRootFolderIdRoute:
-    ApiLocaleAgentChatFoldersRootFolderIdRouteWithChildren,
-  ApiLocaleAgentCortexEmbeddingsBackfillRoute:
-    ApiLocaleAgentCortexEmbeddingsBackfillRoute,
+  ApiLocaleVibeAgentCodingAgentRoute: ApiLocaleVibeAgentCodingAgentRoute,
+  ApiLocaleVibeAgentDescribeImageRoute: ApiLocaleVibeAgentDescribeImageRoute,
+  ApiLocaleVibeAgentDescribeVideoRoute: ApiLocaleVibeAgentDescribeVideoRoute,
+  ApiLocaleVibeAgentFetchUrlContentRoute:
+    ApiLocaleVibeAgentFetchUrlContentRouteWithChildren,
+  ApiLocaleVibeAgentImageGenerationRoute:
+    ApiLocaleVibeAgentImageGenerationRoute,
+  ApiLocaleVibeAgentMusicGenerationRoute:
+    ApiLocaleVibeAgentMusicGenerationRoute,
+  ApiLocaleVibeAgentSkillsRoute: ApiLocaleVibeAgentSkillsRouteWithChildren,
+  ApiLocaleVibeAgentSpeechToTextRoute: ApiLocaleVibeAgentSpeechToTextRoute,
+  ApiLocaleVibeAgentTextToSpeechRoute: ApiLocaleVibeAgentTextToSpeechRoute,
+  ApiLocaleVibeAgentVideoGenerationRoute:
+    ApiLocaleVibeAgentVideoGenerationRoute,
+  ApiLocaleVibeAgentViewImageRoute: ApiLocaleVibeAgentViewImageRoute,
+  ApiLocaleVibeAgentWebSearchRoute:
+    ApiLocaleVibeAgentWebSearchRouteWithChildren,
+  ApiLocaleVibeDatabaseHealthRoute: ApiLocaleVibeDatabaseHealthRoute,
+  ApiLocaleVibeDataflowCleanupRoute: ApiLocaleVibeDataflowCleanupRoute,
+  ApiLocaleVibeDataflowGraphsRoute:
+    ApiLocaleVibeDataflowGraphsRouteWithChildren,
+  ApiLocaleVibeDataflowRunConfigRoute: ApiLocaleVibeDataflowRunConfigRoute,
+  ApiLocaleVibeEnvSettingsRoute: ApiLocaleVibeEnvSettingsRouteWithChildren,
+  ApiLocaleVibeRealtimeRemoteEventBridgeRoute:
+    ApiLocaleVibeRealtimeRemoteEventBridgeRoute,
+  ApiLocaleVibeRemoteConnectionInstanceIdRoute:
+    ApiLocaleVibeRemoteConnectionInstanceIdRoute,
+  ApiLocaleVibeRemoteConnectionConnectRoute:
+    ApiLocaleVibeRemoteConnectionConnectRoute,
+  ApiLocaleVibeRemoteConnectionConnectReverseRoute:
+    ApiLocaleVibeRemoteConnectionConnectReverseRouteWithChildren,
+  ApiLocaleVibeRemoteConnectionListRoute:
+    ApiLocaleVibeRemoteConnectionListRoute,
+  ApiLocaleVibeRemoteConnectionSyncRoute:
+    ApiLocaleVibeRemoteConnectionSyncRouteWithChildren,
+  ApiLocaleVibeTasksExecuteRoute: ApiLocaleVibeTasksExecuteRoute,
   ApiLocaleChartOfAccountsAccountAccountIdDeactivateRoute:
     ApiLocaleChartOfAccountsAccountAccountIdDeactivateRoute,
   ApiLocaleChartOfAccountsAccountAccountIdGetRoute:
@@ -13741,35 +13390,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocaleSshLinuxUsersUsernameRoute: ApiLocaleSshLinuxUsersUsernameRoute,
   ApiLocaleSshLinuxUsersCreateRoute: ApiLocaleSshLinuxUsersCreateRoute,
   ApiLocaleSshLinuxUsersListRoute: ApiLocaleSshLinuxUsersListRoute,
-  ApiLocaleSystemLoggerErrorMonitorCleanupRoute:
-    ApiLocaleSystemLoggerErrorMonitorCleanupRoute,
-  ApiLocaleSystemLoggerErrorMonitorClientLogRoute:
-    ApiLocaleSystemLoggerErrorMonitorClientLogRoute,
-  ApiLocaleSystemLoggerErrorMonitorLogsRoute:
-    ApiLocaleSystemLoggerErrorMonitorLogsRoute,
-  ApiLocaleSystemPlatformsVibeFrameMountRoute:
-    ApiLocaleSystemPlatformsVibeFrameMountRoute,
-  ApiLocaleSystemServerServerHealthRoute:
-    ApiLocaleSystemServerServerHealthRoute,
-  ApiLocaleSystemServerServerRebuildRoute:
-    ApiLocaleSystemServerServerRebuildRoute,
-  ApiLocaleSystemTasksCronIdRoute: ApiLocaleSystemTasksCronIdRoute,
-  ApiLocaleSystemTasksCronBulkRoute: ApiLocaleSystemTasksCronBulkRoute,
-  ApiLocaleSystemTasksCronHistoryRoute: ApiLocaleSystemTasksCronHistoryRoute,
-  ApiLocaleSystemTasksCronQueueRoute: ApiLocaleSystemTasksCronQueueRoute,
-  ApiLocaleSystemTasksCronStatsRoute: ApiLocaleSystemTasksCronStatsRoute,
-  ApiLocaleSystemTasksCronTasksRoute: ApiLocaleSystemTasksCronTasksRoute,
-  ApiLocaleSystemTasksDataSourcesCronExecutionsFailedRoute:
-    ApiLocaleSystemTasksDataSourcesCronExecutionsFailedRoute,
-  ApiLocaleSystemTasksDataSourcesCronExecutionsSucceededRoute:
-    ApiLocaleSystemTasksDataSourcesCronExecutionsSucceededRoute,
-  ApiLocaleSystemTasksDataSourcesCronExecutionsTotalRoute:
-    ApiLocaleSystemTasksDataSourcesCronExecutionsTotalRoute,
-  ApiLocaleSystemTasksPulseExecuteRoute: ApiLocaleSystemTasksPulseExecuteRoute,
-  ApiLocaleSystemTasksPulseHistoryRoute: ApiLocaleSystemTasksPulseHistoryRoute,
-  ApiLocaleSystemTasksPulseStatusRoute: ApiLocaleSystemTasksPulseStatusRoute,
-  ApiLocaleSystemToolingCheckVibeCheckRoute:
-    ApiLocaleSystemToolingCheckVibeCheckRoute,
   ApiLocaleTaxRateRateIdDeleteRoute: ApiLocaleTaxRateRateIdDeleteRoute,
   ApiLocaleTaxRateRateIdUpdateRoute: ApiLocaleTaxRateRateIdUpdateRoute,
   ApiLocaleUserPublicCreatorUserIdRoute: ApiLocaleUserPublicCreatorUserIdRoute,
@@ -13779,41 +13399,127 @@ const rootRouteChildren: RootRouteChildren = {
     ApiLocaleUserPublicResetPasswordRequestRoute,
   ApiLocaleUserPublicResetPasswordValidateRoute:
     ApiLocaleUserPublicResetPasswordValidateRoute,
-  ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRoute:
-    ApiLocaleAgentChatFoldersSubfoldersSubFolderIdRouteWithChildren,
+  ApiLocaleVibeAgentAiStreamCancelRoute: ApiLocaleVibeAgentAiStreamCancelRoute,
+  ApiLocaleVibeAgentAiStreamRunRoute: ApiLocaleVibeAgentAiStreamRunRoute,
+  ApiLocaleVibeAgentAiStreamStreamRoute: ApiLocaleVibeAgentAiStreamStreamRoute,
+  ApiLocaleVibeAgentChatPublicFeedRoute: ApiLocaleVibeAgentChatPublicFeedRoute,
+  ApiLocaleVibeAgentChatSettingsRoute: ApiLocaleVibeAgentChatSettingsRoute,
+  ApiLocaleVibeAgentChatThreadsRoute:
+    ApiLocaleVibeAgentChatThreadsRouteWithChildren,
+  ApiLocaleVibeAgentCortexDeleteRoute: ApiLocaleVibeAgentCortexDeleteRoute,
+  ApiLocaleVibeAgentCortexEditRoute: ApiLocaleVibeAgentCortexEditRoute,
+  ApiLocaleVibeAgentCortexExecRoute: ApiLocaleVibeAgentCortexExecRoute,
+  ApiLocaleVibeAgentCortexListRoute: ApiLocaleVibeAgentCortexListRoute,
+  ApiLocaleVibeAgentCortexMkdirRoute: ApiLocaleVibeAgentCortexMkdirRoute,
+  ApiLocaleVibeAgentCortexMoveRoute: ApiLocaleVibeAgentCortexMoveRoute,
+  ApiLocaleVibeAgentCortexReadRoute: ApiLocaleVibeAgentCortexReadRoute,
+  ApiLocaleVibeAgentCortexSearchRoute: ApiLocaleVibeAgentCortexSearchRoute,
+  ApiLocaleVibeAgentCortexTerminalsRoute:
+    ApiLocaleVibeAgentCortexTerminalsRoute,
+  ApiLocaleVibeAgentCortexTreeRoute: ApiLocaleVibeAgentCortexTreeRoute,
+  ApiLocaleVibeAgentCortexWriteRoute: ApiLocaleVibeAgentCortexWriteRoute,
+  ApiLocaleVibeAgentModelsListRoute: ApiLocaleVibeAgentModelsListRoute,
+  ApiLocaleVibeLoggerErrorMonitorCleanupRoute:
+    ApiLocaleVibeLoggerErrorMonitorCleanupRoute,
+  ApiLocaleVibeLoggerErrorMonitorClientLogRoute:
+    ApiLocaleVibeLoggerErrorMonitorClientLogRoute,
+  ApiLocaleVibeLoggerErrorMonitorLogsRoute:
+    ApiLocaleVibeLoggerErrorMonitorLogsRoute,
+  ApiLocaleVibePlatformsVibeFrameMountRoute:
+    ApiLocaleVibePlatformsVibeFrameMountRoute,
+  ApiLocaleVibeRemoteConnectionSelfInstanceIdRoute:
+    ApiLocaleVibeRemoteConnectionSelfInstanceIdRoute,
+  ApiLocaleVibeRemoteConnectionSelfRenameRoute:
+    ApiLocaleVibeRemoteConnectionSelfRenameRoute,
+  ApiLocaleVibeServerServerHealthRoute: ApiLocaleVibeServerServerHealthRoute,
+  ApiLocaleVibeTasksCronIdRoute: ApiLocaleVibeTasksCronIdRoute,
+  ApiLocaleVibeTasksCronBulkRoute: ApiLocaleVibeTasksCronBulkRoute,
+  ApiLocaleVibeTasksCronHistoryRoute: ApiLocaleVibeTasksCronHistoryRoute,
+  ApiLocaleVibeTasksCronQueueRoute: ApiLocaleVibeTasksCronQueueRoute,
+  ApiLocaleVibeTasksCronStatsRoute: ApiLocaleVibeTasksCronStatsRoute,
+  ApiLocaleVibeTasksCronTasksRoute: ApiLocaleVibeTasksCronTasksRoute,
+  ApiLocaleVibeTasksDataSourcesCronExecutionsFailedRoute:
+    ApiLocaleVibeTasksDataSourcesCronExecutionsFailedRoute,
+  ApiLocaleVibeTasksDataSourcesCronExecutionsSucceededRoute:
+    ApiLocaleVibeTasksDataSourcesCronExecutionsSucceededRoute,
+  ApiLocaleVibeTasksDataSourcesCronExecutionsTotalRoute:
+    ApiLocaleVibeTasksDataSourcesCronExecutionsTotalRoute,
+  ApiLocaleVibeTasksPulseExecuteRoute: ApiLocaleVibeTasksPulseExecuteRoute,
+  ApiLocaleVibeTasksPulseHistoryRoute: ApiLocaleVibeTasksPulseHistoryRoute,
+  ApiLocaleVibeTasksPulseStatusRoute: ApiLocaleVibeTasksPulseStatusRoute,
   ApiLocaleCompaniesCompanyIdMembersMemberIdRemoveRoute:
     ApiLocaleCompaniesCompanyIdMembersMemberIdRemoveRoute,
   ApiLocaleCompaniesCompanyIdMembersMemberIdUpdateRoleRoute:
     ApiLocaleCompaniesCompanyIdMembersMemberIdUpdateRoleRoute,
   ApiLocaleMessengerProvidersEmailImapClientSyncRoute:
     ApiLocaleMessengerProvidersEmailImapClientSyncRoute,
-  ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsErrorsRoute:
-    ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsErrorsRoute,
-  ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsTotalRoute:
-    ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsTotalRoute,
-  ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute:
-    ApiLocaleSystemLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute,
-  ApiLocaleSystemPlatformsAiSkillsCharacterSkillRoute:
-    ApiLocaleSystemPlatformsAiSkillsCharacterSkillRoute,
-  ApiLocaleSystemPlatformsCliInteractiveCaptureRoute:
-    ApiLocaleSystemPlatformsCliInteractiveCaptureRoute,
-  ApiLocaleSystemPlatformsCliInteractiveSendKeysRoute:
-    ApiLocaleSystemPlatformsCliInteractiveSendKeysRoute,
-  ApiLocaleSystemPlatformsCliSetupStatusRoute:
-    ApiLocaleSystemPlatformsCliSetupStatusRoute,
-  ApiLocaleSystemPlatformsCliSetupUninstallRoute:
-    ApiLocaleSystemPlatformsCliSetupUninstallRoute,
-  ApiLocaleSystemPlatformsAiSkillsAGENTMdRoute:
-    ApiLocaleSystemPlatformsAiSkillsAGENTMdRoute,
-  ApiLocaleSystemPlatformsAiSkillsPUBLIC_USER_AI_RUNMdRoute:
-    ApiLocaleSystemPlatformsAiSkillsPUBLIC_USER_AI_RUNMdRoute,
-  ApiLocaleSystemPlatformsAiSkillsPUBLIC_USER_SKILLMdRoute:
-    ApiLocaleSystemPlatformsAiSkillsPUBLIC_USER_SKILLMdRoute,
-  ApiLocaleSystemPlatformsAiSkillsUSER_WITH_ACCOUNT_AI_RUNMdRoute:
-    ApiLocaleSystemPlatformsAiSkillsUSER_WITH_ACCOUNT_AI_RUNMdRoute,
-  ApiLocaleSystemPlatformsAiSkillsUSER_WITH_ACCOUNT_SKILLMdRoute:
-    ApiLocaleSystemPlatformsAiSkillsUSER_WITH_ACCOUNT_SKILLMdRoute,
+  ApiLocaleVibeAgentAiStreamSystemPromptDebugRoute:
+    ApiLocaleVibeAgentAiStreamSystemPromptDebugRoute,
+  ApiLocaleVibeAgentAiStreamWsProviderModelsRoute:
+    ApiLocaleVibeAgentAiStreamWsProviderModelsRoute,
+  ApiLocaleVibeAgentChatDataSourcesChatDownvotesTotalRoute:
+    ApiLocaleVibeAgentChatDataSourcesChatDownvotesTotalRoute,
+  ApiLocaleVibeAgentChatDataSourcesChatErrorsTotalRoute:
+    ApiLocaleVibeAgentChatDataSourcesChatErrorsTotalRoute,
+  ApiLocaleVibeAgentChatDataSourcesChatMemoriesCreatedRoute:
+    ApiLocaleVibeAgentChatDataSourcesChatMemoriesCreatedRoute,
+  ApiLocaleVibeAgentChatDataSourcesChatMessagesByAiRoute:
+    ApiLocaleVibeAgentChatDataSourcesChatMessagesByAiRoute,
+  ApiLocaleVibeAgentChatDataSourcesChatMessagesByUserRoute:
+    ApiLocaleVibeAgentChatDataSourcesChatMessagesByUserRoute,
+  ApiLocaleVibeAgentChatDataSourcesChatMessagesTotalRoute:
+    ApiLocaleVibeAgentChatDataSourcesChatMessagesTotalRoute,
+  ApiLocaleVibeAgentChatDataSourcesChatMessagesWithAttachmentsRoute:
+    ApiLocaleVibeAgentChatDataSourcesChatMessagesWithAttachmentsRoute,
+  ApiLocaleVibeAgentChatDataSourcesChatShareLinksCreatedRoute:
+    ApiLocaleVibeAgentChatDataSourcesChatShareLinksCreatedRoute,
+  ApiLocaleVibeAgentChatDataSourcesChatThreadsActiveTotalRoute:
+    ApiLocaleVibeAgentChatDataSourcesChatThreadsActiveTotalRoute,
+  ApiLocaleVibeAgentChatDataSourcesChatThreadsCreatedRoute:
+    ApiLocaleVibeAgentChatDataSourcesChatThreadsCreatedRoute,
+  ApiLocaleVibeAgentChatDataSourcesChatToolCallsTotalRoute:
+    ApiLocaleVibeAgentChatDataSourcesChatToolCallsTotalRoute,
+  ApiLocaleVibeAgentChatDataSourcesChatUniqueUsersRoute:
+    ApiLocaleVibeAgentChatDataSourcesChatUniqueUsersRoute,
+  ApiLocaleVibeAgentChatDataSourcesChatUpvotesTotalRoute:
+    ApiLocaleVibeAgentChatDataSourcesChatUpvotesTotalRoute,
+  ApiLocaleVibeAgentChatFolderContentsRootFolderIdRoute:
+    ApiLocaleVibeAgentChatFolderContentsRootFolderIdRoute,
+  ApiLocaleVibeAgentChatFoldersRootFolderIdRoute:
+    ApiLocaleVibeAgentChatFoldersRootFolderIdRouteWithChildren,
+  ApiLocaleVibeAgentCortexEmbeddingsBackfillRoute:
+    ApiLocaleVibeAgentCortexEmbeddingsBackfillRoute,
+  ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsErrorsRoute:
+    ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsErrorsRoute,
+  ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsTotalRoute:
+    ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsTotalRoute,
+  ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute:
+    ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute,
+  ApiLocaleVibePlatformsAiSkillsCharacterSkillRoute:
+    ApiLocaleVibePlatformsAiSkillsCharacterSkillRoute,
+  ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRoute:
+    ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteWithChildren,
+  ApiLocaleVibePlatformsAiSkillsAGENTMdRoute:
+    ApiLocaleVibePlatformsAiSkillsAGENTMdRoute,
+  ApiLocaleVibePlatformsAiSkillsPUBLIC_USER_AI_RUNMdRoute:
+    ApiLocaleVibePlatformsAiSkillsPUBLIC_USER_AI_RUNMdRoute,
+  ApiLocaleVibePlatformsAiSkillsPUBLIC_USER_SKILLMdRoute:
+    ApiLocaleVibePlatformsAiSkillsPUBLIC_USER_SKILLMdRoute,
+  ApiLocaleVibePlatformsAiSkillsUSER_WITH_ACCOUNT_AI_RUNMdRoute:
+    ApiLocaleVibePlatformsAiSkillsUSER_WITH_ACCOUNT_AI_RUNMdRoute,
+  ApiLocaleVibePlatformsAiSkillsUSER_WITH_ACCOUNT_SKILLMdRoute:
+    ApiLocaleVibePlatformsAiSkillsUSER_WITH_ACCOUNT_SKILLMdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

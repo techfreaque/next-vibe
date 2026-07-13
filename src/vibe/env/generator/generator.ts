@@ -9,6 +9,8 @@ import { dirname, join } from "node:path";
 
 import type { EnvExample, EnvFieldType } from "next-vibe/env/define-env";
 import { formatCount, formatWarning } from "next-vibe/logger/formatters";
+
+import { getApiDir } from "@/env/paths";
 import type {
   GeneratorContext,
   GeneratorResult,
@@ -97,7 +99,7 @@ class EnvGeneratorRepository {
     {
       logger.debug(`Starting env generation: ${data.outputDir}`);
 
-      const apiDir = `${process.cwd()}/src`;
+      const apiDir = getApiDir();
       const configDir = `${process.cwd()}/src/config`;
 
       const excludeDirs = [

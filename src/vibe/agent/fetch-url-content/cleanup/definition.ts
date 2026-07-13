@@ -19,7 +19,7 @@ import { scopedTranslation } from "../i18n";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["agent", "fetch-url-content", "cleanup"],
+  path: ["vibe", "agent", "fetch-url-content", "cleanup"],
   aliases: ["fetch-url-cache-cleanup"],
   title: "cleanup.post.title" as const,
   titleShort: "cleanup.post.titleShort" as const,

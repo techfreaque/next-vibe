@@ -39,7 +39,7 @@ const ModelsListContainer = lazyWidget(() =>
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["agent", "models", "list"],
+  path: ["vibe", "agent", "models", "list"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN, UserRole.PUBLIC] as const,
 
   title: "get.title" as const,

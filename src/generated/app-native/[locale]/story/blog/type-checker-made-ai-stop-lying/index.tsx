@@ -1,5 +1,4 @@
-import { createPageWrapperWithImport } from "next-vibe/platforms/react-native/nextjs-compat-wrapper";
+import { createPageWrapperWithImport } from "@/vibe/platforms/react-native/nextjs-compat-wrapper";
 export default createPageWrapperWithImport(
-  () =>
-    import("@/app/[locale]/story/blog/type-checker-made-ai-stop-lying/page"),
+  () => import("@/_pages/story/blog/type-checker-made-ai-stop-lying/page"),
 );

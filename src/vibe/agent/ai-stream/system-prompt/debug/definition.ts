@@ -32,7 +32,7 @@ const SystemPromptDebugWidget = lazyWidget(() =>
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["agent", "ai-stream", "system-prompt", "debug"],
+  path: ["vibe", "agent", "ai-stream", "system-prompt", "debug"],
   aliases: ["system-prompt-debug"] as const,
   allowedRoles: [UserRole.ADMIN] as const,
 

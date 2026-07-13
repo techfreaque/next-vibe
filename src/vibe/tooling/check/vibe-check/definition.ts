@@ -37,7 +37,7 @@ const CheckResultWidget = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "tooling", "check", "vibe-check"],
+  path: ["vibe", "tooling", "check", "vibe-check"],
   title: "title",
   titleShort: "title",
   description: "description",

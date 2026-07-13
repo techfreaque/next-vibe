@@ -45,7 +45,7 @@ contact/
 └── i18n/              # Translations
 ```
 
-**Real Example:** `src/app/api/[locale]/contact/`
+**Real Example:** `src/contact/`
 
 ### Pattern 2: Hierarchical Structure
 
@@ -74,7 +74,7 @@ leads/
             └── ...
 ```
 
-**Real Example:** `src/app/api/[locale]/leads/`
+**Real Example:** `src/leads/`
 
 ### Pattern 3: Nested Schemas
 
@@ -104,7 +104,7 @@ chat/
             └── ...
 ```
 
-**Real Example:** `src/app/api/[locale]/agent/chat/`
+**Real Example:** `next-vibe/agent/chat/`
 
 **Decision Guide:**
 

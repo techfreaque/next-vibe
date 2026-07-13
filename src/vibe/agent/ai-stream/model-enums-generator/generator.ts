@@ -25,14 +25,7 @@ export async function generate(
   ctx: GeneratorContext,
 ): Promise<GeneratorResult> {
   const { logger } = ctx;
-  const agentDir = join(
-    process.cwd(),
-    "src",
-    "app",
-    "api",
-    "[locale]",
-    "agent",
-  );
+  const agentDir = join(process.cwd(), "src", "vibe", "agent");
 
   const { chatModelDefinitions, ChatModelId } =
     (await import("next-vibe/agent/ai-stream/models")) as {

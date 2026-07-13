@@ -37,7 +37,7 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF],
   aliases: ["uninstall", "setup:uninstall"],
   method: Methods.POST,
-  path: ["system", "platforms", "cli", "setup", "uninstall"],
+  path: ["vibe", "platforms", "cli", "setup", "uninstall"],
   examples: {
     requests: {
       default: {

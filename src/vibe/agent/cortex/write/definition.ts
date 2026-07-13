@@ -30,7 +30,7 @@ const CortexWriteWidget = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["agent", "cortex", "write"],
+  path: ["vibe", "agent", "cortex", "write"],
   aliases: [CORTEX_WRITE_ALIAS] as const,
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   defaultAiPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,

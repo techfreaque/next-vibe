@@ -26,7 +26,7 @@ import { SQL_ALIAS } from "./constants";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "database", "sql"],
+  path: ["vibe", "database", "sql"],
   title: "post.title",
   titleShort: "post.titleShort",
   description: "post.description",

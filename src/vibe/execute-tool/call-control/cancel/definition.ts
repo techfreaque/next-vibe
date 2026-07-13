@@ -28,7 +28,7 @@ import { z } from "zod";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "execute-tool", "call-control", "cancel"],
+  path: ["vibe", "execute-tool", "call-control", "cancel"],
   aliases: ["cancel"],
   title: "cancelTool.post.title" as const,
   titleShort: "cancelTool.post.titleShort" as const,

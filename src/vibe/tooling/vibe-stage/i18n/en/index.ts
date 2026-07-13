@@ -14,7 +14,7 @@ export const translations = {
       label: "Limit to paths",
       description:
         "Only consider candidates under these paths. Leave empty to scan all unstaged changes.",
-      placeholder: "e.g. src/app/api",
+      placeholder: "e.g. src",
     },
   },
 

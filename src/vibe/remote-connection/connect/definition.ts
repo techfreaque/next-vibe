@@ -33,7 +33,7 @@ const RemoteConnectWidget = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["remote-connection", "connect"],
+  path: ["vibe", "remote-connection", "connect"],
   allowedRoles: envClient.NEXT_PUBLIC_VIBE_IS_CLOUD
     ? ([] as const) // Cloud instances don't initiate connections; local side does
     : ([UserRole.ADMIN] as const),

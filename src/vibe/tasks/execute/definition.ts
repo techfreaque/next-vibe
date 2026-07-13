@@ -41,7 +41,7 @@ const TaskExecuteContainer = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "tasks", "execute"],
+  path: ["vibe", "tasks", "execute"],
   aliases: [TASK_EXECUTE_ALIAS, "task-execute"],
   allowedRoles: [UserRole.ADMIN],
 

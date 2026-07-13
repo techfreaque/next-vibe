@@ -1,9 +1,9 @@
-// AUTO-GENERATED from src/app/[locale]/story/blog/skill-sharing-economy/page.tsx. Add "use custom" to this file to preserve customizations.
+// AUTO-GENERATED from src/_pages/story/blog/skill-sharing-economy/page.tsx. Add "use custom" to this file to preserve customizations.
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import type { JSX } from "react";
 
-import { TanstackPage as Page } from "@/app/[locale]/story/blog/skill-sharing-economy/page";
+import { TanstackPage as Page } from "@/_pages/story/blog/skill-sharing-economy/page";
 
 import { runPageLoader, toNextParams } from "../nextjs-compat-wrapper";
 
@@ -12,7 +12,7 @@ const loadData = createServerFn({ method: "GET" })
   .handler(async ({ data }) =>
     runPageLoader(async () => {
       const { tanstackLoader } =
-        await import("@/app/[locale]/story/blog/skill-sharing-economy/page");
+        await import("@/_pages/story/blog/skill-sharing-economy/page");
       return tanstackLoader({ params: Promise.resolve(toNextParams(data)) });
     }),
   );

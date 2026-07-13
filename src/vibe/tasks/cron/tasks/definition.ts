@@ -60,7 +60,7 @@ const CronTasksContainer = lazyWidget(() =>
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["system", "tasks", "cron", "tasks"],
+  path: ["vibe", "tasks", "cron", "tasks"],
   aliases: [CRON_LIST_ALIAS, "tasks", "cron-list", "cron-tasks"],
   title: "get.title",
   titleShort: "get.titleShort",
@@ -498,7 +498,7 @@ const { GET } = createEndpoint({
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "tasks", "cron", "tasks"],
+  path: ["vibe", "tasks", "cron", "tasks"],
   aliases: [CRON_CREATE_ALIAS],
   title: "post.title",
   titleShort: "post.titleShort",

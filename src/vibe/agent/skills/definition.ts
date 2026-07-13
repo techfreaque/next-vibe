@@ -57,7 +57,7 @@ const SkillsListContainer = lazyWidget(() =>
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["agent", "skills"],
+  path: ["vibe", "agent", "skills"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN, UserRole.PUBLIC] as const,
   defaultWebPinned: [
     UserRole.CUSTOMER,

@@ -25,7 +25,7 @@ import { scopedTranslation } from "./i18n";
 const { PATCH } = createEndpoint({
   scopedTranslation,
   method: Methods.PATCH,
-  path: ["remote-connection", "self", "rename"],
+  path: ["vibe", "remote-connection", "self", "rename"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "patch.title" as const,

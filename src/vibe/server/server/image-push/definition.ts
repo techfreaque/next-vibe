@@ -30,7 +30,7 @@ const ImagePushResultWidget = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "server", "server", "image-push"],
+  path: ["vibe", "server", "server", "image-push"],
   title: "post.title",
   titleShort: "post.titleShort",
   description: "post.description",

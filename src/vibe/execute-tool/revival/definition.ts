@@ -22,7 +22,7 @@ export const REVIVAL_ALIAS = "resume-stream";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "execute-tool", "revival"],
+  path: ["vibe", "execute-tool", "revival"],
   aliases: [REVIVAL_ALIAS],
   allowedRoles: [
     UserRole.ADMIN,

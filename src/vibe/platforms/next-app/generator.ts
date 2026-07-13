@@ -11,12 +11,20 @@ import {
 } from "node:fs";
 import { dirname, join, relative } from "node:path";
 
+import type { ApiSection } from "next-vibe/core/definition/endpoint-base";
 import { parseError } from "next-vibe/core/utils/parse-error";
+import {
+  filterPlatformMarkers,
+  PlatformMarker,
+  type UserRoleValue,
+} from "next-vibe/identity/roles/enum";
 import { hasCustomDirective } from "next-vibe/tooling/generators/shared/custom-directive";
 import type {
   GeneratorContext,
   GeneratorResult,
 } from "next-vibe/tooling/generators/shared/shared-inputs";
+
+import { getApiDir, getSrcDir, getUiDir } from "@/env/paths";
 
 const PROJECT_ROOT = process.cwd();
 const UI_DIR = join(PROJECT_ROOT, "src", "_pages");

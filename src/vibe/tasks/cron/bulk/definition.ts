@@ -26,7 +26,7 @@ const BULK_ACTIONS = ["delete", "enable", "disable", "run"] as const;
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "tasks", "cron", "bulk"],
+  path: ["vibe", "tasks", "cron", "bulk"],
   title: "post.title",
   titleShort: "post.titleShort",
   description: "post.description",

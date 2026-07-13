@@ -72,7 +72,7 @@ const PackageExportConditionSchema: z.ZodType<PackageExportCondition> = z.lazy(
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "tooling", "builder"],
+  path: ["vibe", "tooling", "builder"],
   title: "post.title",
   titleShort: "post.titleShort",
   description: "post.description",

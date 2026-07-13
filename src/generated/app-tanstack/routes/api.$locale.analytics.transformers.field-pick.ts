@@ -1,4 +1,4 @@
-// AUTO-GENERATED from src/app/api/[locale]/analytics/transformers/field-pick/route.ts. Add "use custom" to this file to preserve customizations.
+// AUTO-GENERATED from src/analytics/transformers/field-pick/route.ts. Add "use custom" to this file to preserve customizations.
 import { createFileRoute } from "@tanstack/react-router";
 
 import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
@@ -8,8 +8,7 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: wrapNextApiRoute(
-      () =>
-        import("@/analytics/transformers/field-pick/route"),
+      () => import("@/analytics/transformers/field-pick/route"),
     ),
   },
 });

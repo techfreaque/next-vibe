@@ -29,7 +29,14 @@ import { scopedTranslation } from "./i18n";
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["agent", "chat", "folders", "[rootFolderId]", "root-permissions"],
+  path: [
+    "vibe",
+    "agent",
+    "chat",
+    "folders",
+    "[rootFolderId]",
+    "root-permissions",
+  ],
   aliases: ["folder-permissions"] as const,
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 

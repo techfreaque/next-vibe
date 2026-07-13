@@ -1,9 +1,9 @@
-// AUTO-GENERATED from src/app/[locale]/page.tsx. Add "use custom" to this file to preserve customizations.
+// AUTO-GENERATED from src/_pages/page.tsx. Add "use custom" to this file to preserve customizations.
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import type { JSX } from "react";
 
-import { TanstackPage as Page } from "@/app/[locale]/page";
+import { TanstackPage as Page } from "@/_pages/page";
 
 import { runPageLoader, toNextParams } from "../nextjs-compat-wrapper";
 
@@ -11,7 +11,7 @@ const loadData = createServerFn({ method: "GET" })
   .inputValidator((data: Record<string, string>) => data)
   .handler(async ({ data }) =>
     runPageLoader(async () => {
-      const { tanstackLoader } = await import("@/app/[locale]/page");
+      const { tanstackLoader } = await import("@/_pages/page");
       return tanstackLoader({ params: Promise.resolve(toNextParams(data)) });
     }),
   );

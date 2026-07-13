@@ -47,506 +47,6 @@ export const routeHotPaths: Record<
       "/home/max/projects/next-vibe-translations/src/vibe/agent/view-image/route.ts",
     method: "POST",
   },
-  "agent_ai-stream_cancel_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/cancel/route.ts",
-    method: "POST",
-  },
-  "agent_ai-stream_run_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/run/route.ts",
-    method: "POST",
-  },
-  "agent_ai-stream_stream_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/stream/route.ts",
-    method: "POST",
-  },
-  "agent_ai-stream_system-prompt_debug_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/system-prompt/debug/route.ts",
-    method: "GET",
-  },
-  "agent_ai-stream_ws-provider_models_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/ws-provider/models/route.ts",
-    method: "GET",
-  },
-  "agent_chat_data-sources_chat-downvotes-total_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-downvotes-total/route.ts",
-    method: "POST",
-  },
-  "agent_chat_data-sources_chat-errors-total_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-errors-total/route.ts",
-    method: "POST",
-  },
-  "agent_chat_data-sources_chat-memories-created_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-memories-created/route.ts",
-    method: "POST",
-  },
-  "agent_chat_data-sources_chat-messages-by-ai_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-messages-by-ai/route.ts",
-    method: "POST",
-  },
-  "agent_chat_data-sources_chat-messages-by-user_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-messages-by-user/route.ts",
-    method: "POST",
-  },
-  "agent_chat_data-sources_chat-messages-total_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-messages-total/route.ts",
-    method: "POST",
-  },
-  "agent_chat_data-sources_chat-messages-with-attachments_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-messages-with-attachments/route.ts",
-    method: "POST",
-  },
-  "agent_chat_data-sources_chat-share-links-created_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-share-links-created/route.ts",
-    method: "POST",
-  },
-  "agent_chat_data-sources_chat-threads-active-total_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-threads-active-total/route.ts",
-    method: "POST",
-  },
-  "agent_chat_data-sources_chat-threads-created_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-threads-created/route.ts",
-    method: "POST",
-  },
-  "agent_chat_data-sources_chat-tool-calls-total_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-tool-calls-total/route.ts",
-    method: "POST",
-  },
-  "agent_chat_data-sources_chat-unique-users_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-unique-users/route.ts",
-    method: "POST",
-  },
-  "agent_chat_data-sources_chat-upvotes-total_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-upvotes-total/route.ts",
-    method: "POST",
-  },
-  "agent_chat_folder-contents_rootFolderId_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folder-contents/[rootFolderId]/route.ts",
-    method: "GET",
-  },
-  agent_chat_folders_rootFolderId_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/[rootFolderId]/route.ts",
-    method: "GET",
-  },
-  agent_chat_folders_rootFolderId_create_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/[rootFolderId]/create/route.ts",
-    method: "POST",
-  },
-  "agent_chat_folders_rootFolderId_root-permissions_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/[rootFolderId]/root-permissions/route.ts",
-    method: "GET",
-  },
-  agent_chat_folders_subfolders_subFolderId_DELETE: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/route.ts",
-    method: "DELETE",
-  },
-  agent_chat_folders_subfolders_subFolderId_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/route.ts",
-    method: "GET",
-  },
-  agent_chat_folders_subfolders_subFolderId_move_PATCH: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/move/route.ts",
-    method: "PATCH",
-  },
-  agent_chat_folders_subfolders_subFolderId_permissions_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/permissions/route.ts",
-    method: "GET",
-  },
-  agent_chat_folders_subfolders_subFolderId_permissions_PATCH: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/permissions/route.ts",
-    method: "PATCH",
-  },
-  agent_chat_folders_subfolders_subFolderId_rename_PATCH: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/rename/route.ts",
-    method: "PATCH",
-  },
-  agent_chat_folders_subfolders_subFolderId_update_PATCH: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/update/route.ts",
-    method: "PATCH",
-  },
-  "agent_chat_public-feed_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/public-feed/route.ts",
-    method: "GET",
-  },
-  agent_chat_settings_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/settings/route.ts",
-    method: "GET",
-  },
-  agent_chat_settings_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/settings/route.ts",
-    method: "POST",
-  },
-  agent_chat_threads_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/route.ts",
-    method: "GET",
-  },
-  agent_chat_threads_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/route.ts",
-    method: "POST",
-  },
-  agent_chat_threads_files_threadId_filename_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/files/[threadId]/[filename]/route.ts",
-    method: "GET",
-  },
-  agent_chat_threads_rename_PATCH: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/rename/route.ts",
-    method: "PATCH",
-  },
-  "agent_chat_threads_search-messages_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/search-messages/route.ts",
-    method: "GET",
-  },
-  "agent_chat_threads_search-threads_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/search-threads/route.ts",
-    method: "GET",
-  },
-  agent_chat_threads_threadId_DELETE: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/route.ts",
-    method: "DELETE",
-  },
-  agent_chat_threads_threadId_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/route.ts",
-    method: "GET",
-  },
-  agent_chat_threads_threadId_PATCH: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/route.ts",
-    method: "PATCH",
-  },
-  agent_chat_threads_threadId_messages_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/route.ts",
-    method: "GET",
-  },
-  agent_chat_threads_threadId_messages_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/route.ts",
-    method: "POST",
-  },
-  agent_chat_threads_threadId_messages_messageId_DELETE: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/[messageId]/route.ts",
-    method: "DELETE",
-  },
-  agent_chat_threads_threadId_messages_messageId_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/[messageId]/route.ts",
-    method: "GET",
-  },
-  agent_chat_threads_threadId_messages_messageId_PATCH: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/[messageId]/route.ts",
-    method: "PATCH",
-  },
-  agent_chat_threads_threadId_messages_messageId_vote_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/[messageId]/vote/route.ts",
-    method: "POST",
-  },
-  agent_chat_threads_threadId_messages_path_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/path/route.ts",
-    method: "GET",
-  },
-  agent_chat_threads_threadId_messages_search_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/search/route.ts",
-    method: "GET",
-  },
-  agent_chat_threads_threadId_permissions_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/permissions/route.ts",
-    method: "GET",
-  },
-  agent_chat_threads_threadId_permissions_PATCH: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/permissions/route.ts",
-    method: "PATCH",
-  },
-  "agent_chat_threads_threadId_share-links_DELETE": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/share-links/route.ts",
-    method: "DELETE",
-  },
-  "agent_chat_threads_threadId_share-links_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/share-links/route.ts",
-    method: "GET",
-  },
-  "agent_chat_threads_threadId_share-links_PATCH": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/share-links/route.ts",
-    method: "PATCH",
-  },
-  "agent_chat_threads_threadId_share-links_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/share-links/route.ts",
-    method: "POST",
-  },
-  "agent_coding-agent_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/coding-agent/route.ts",
-    method: "POST",
-  },
-  agent_cortex_delete_DELETE: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/delete/route.ts",
-    method: "DELETE",
-  },
-  agent_cortex_edit_PATCH: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/edit/route.ts",
-    method: "PATCH",
-  },
-  agent_cortex_embeddings_backfill_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/embeddings/backfill/route.ts",
-    method: "POST",
-  },
-  agent_cortex_exec_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/exec/route.ts",
-    method: "POST",
-  },
-  agent_cortex_list_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/list/route.ts",
-    method: "GET",
-  },
-  agent_cortex_mkdir_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/mkdir/route.ts",
-    method: "POST",
-  },
-  agent_cortex_move_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/move/route.ts",
-    method: "POST",
-  },
-  agent_cortex_read_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/read/route.ts",
-    method: "GET",
-  },
-  agent_cortex_search_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/search/route.ts",
-    method: "GET",
-  },
-  agent_cortex_terminals_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/terminals/route.ts",
-    method: "GET",
-  },
-  agent_cortex_tree_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/tree/route.ts",
-    method: "GET",
-  },
-  agent_cortex_write_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/write/route.ts",
-    method: "POST",
-  },
-  "agent_describe-image_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/describe-image/route.ts",
-    method: "POST",
-  },
-  "agent_describe-video_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/describe-video/route.ts",
-    method: "POST",
-  },
-  "agent_fetch-url-content_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/fetch-url-content/route.ts",
-    method: "GET",
-  },
-  "agent_fetch-url-content_cleanup_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/fetch-url-content/cleanup/route.ts",
-    method: "POST",
-  },
-  "agent_image-generation_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/image-generation/route.ts",
-    method: "POST",
-  },
-  agent_models_list_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/models/list/route.ts",
-    method: "GET",
-  },
-  "agent_models_model-prices_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/models/model-prices/route.ts",
-    method: "GET",
-  },
-  "agent_music-generation_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/music-generation/route.ts",
-    method: "POST",
-  },
-  agent_skills_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/route.ts",
-    method: "GET",
-  },
-  agent_skills_create_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/create/route.ts",
-    method: "POST",
-  },
-  agent_skills_favorites_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/route.ts",
-    method: "GET",
-  },
-  agent_skills_favorites_create_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/create/route.ts",
-    method: "POST",
-  },
-  agent_skills_favorites_id_DELETE: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/[id]/route.ts",
-    method: "DELETE",
-  },
-  agent_skills_favorites_id_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/[id]/route.ts",
-    method: "GET",
-  },
-  agent_skills_favorites_id_PATCH: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/[id]/route.ts",
-    method: "PATCH",
-  },
-  agent_skills_favorites_reorder_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/reorder/route.ts",
-    method: "POST",
-  },
-  agent_skills_id_DELETE: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/route.ts",
-    method: "DELETE",
-  },
-  agent_skills_id_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/route.ts",
-    method: "GET",
-  },
-  agent_skills_id_PATCH: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/route.ts",
-    method: "PATCH",
-  },
-  agent_skills_id_publish_PATCH: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/publish/route.ts",
-    method: "PATCH",
-  },
-  agent_skills_id_report_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/report/route.ts",
-    method: "POST",
-  },
-  agent_skills_id_vote_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/vote/route.ts",
-    method: "POST",
-  },
-  agent_skills_moderation_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/moderation/route.ts",
-    method: "GET",
-  },
-  agent_skills_moderation_PATCH: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/moderation/route.ts",
-    method: "PATCH",
-  },
-  "agent_speech-to-text_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/speech-to-text/route.ts",
-    method: "POST",
-  },
-  "agent_speech-to-text_hotkey_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/speech-to-text/hotkey/route.ts",
-    method: "POST",
-  },
-  "agent_text-to-speech_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/text-to-speech/route.ts",
-    method: "POST",
-  },
-  "agent_video-generation_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/video-generation/route.ts",
-    method: "POST",
-  },
-  "agent_view-image_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/view-image/route.ts",
-    method: "POST",
-  },
-  "agent_web-search_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/web-search/route.ts",
-    method: "GET",
-  },
-  "agent_web-search_brave_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/web-search/brave/route.ts",
-    method: "GET",
-  },
-  "agent_web-search_kagi_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/web-search/kagi/route.ts",
-    method: "GET",
-  },
   "ai-run": {
     absPath:
       "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/run/route.ts",
@@ -1399,22 +899,20 @@ export const routeHotPaths: Record<
   },
   "connect-remote": {
     absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/connect/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/connect/route.ts",
     method: "POST",
   },
   "connection-status": {
     absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/[instanceId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/[instanceId]/route.ts",
     method: "GET",
   },
   "contact-form": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/contact/route.ts",
+    absPath: "/home/max/projects/next-vibe-translations/src/contact/route.ts",
     method: "POST",
   },
   contact_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/contact/route.ts",
+    absPath: "/home/max/projects/next-vibe-translations/src/contact/route.ts",
     method: "POST",
   },
   "cortex-delete": {
@@ -1488,8 +986,7 @@ export const routeHotPaths: Record<
     method: "POST",
   },
   "credits-balance": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/credits/route.ts",
+    absPath: "/home/max/projects/next-vibe-translations/src/credits/route.ts",
     method: "GET",
   },
   "credits-balance-total": {
@@ -1578,8 +1075,7 @@ export const routeHotPaths: Record<
     method: "POST",
   },
   credits_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/credits/route.ts",
+    absPath: "/home/max/projects/next-vibe-translations/src/credits/route.ts",
     method: "GET",
   },
   "credits_admin-add_POST": {
@@ -3129,7 +2625,7 @@ export const routeHotPaths: Record<
   },
   "my-instance-id": {
     absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/self/instanceId/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/self/instanceId/route.ts",
     method: "GET",
   },
   "newsletter-campaigns-sent": {
@@ -3263,13 +2759,11 @@ export const routeHotPaths: Record<
     method: "GET",
   },
   payment_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/payment/route.ts",
+    absPath: "/home/max/projects/next-vibe-translations/src/payment/route.ts",
     method: "GET",
   },
   payment_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/payment/route.ts",
+    absPath: "/home/max/projects/next-vibe-translations/src/payment/route.ts",
     method: "POST",
   },
   payment_bill_billId_approve_POST: {
@@ -3853,8 +3347,7 @@ export const routeHotPaths: Record<
     method: "GET",
   },
   referral_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/referral/route.ts",
+    absPath: "/home/max/projects/next-vibe-translations/src/referral/route.ts",
     method: "POST",
   },
   referral_admin_payouts_GET: {
@@ -3964,67 +3457,12 @@ export const routeHotPaths: Record<
   },
   "remote-connect": {
     absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/connect/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/connect/route.ts",
     method: "POST",
-  },
-  "remote-connection_connect-reverse_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/connect-reverse/route.ts",
-    method: "POST",
-  },
-  "remote-connection_connect-reverse_update_PATCH": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/connect-reverse/update/route.ts",
-    method: "PATCH",
-  },
-  "remote-connection_connect_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/connect/route.ts",
-    method: "POST",
-  },
-  "remote-connection_instanceId_DELETE": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/[instanceId]/route.ts",
-    method: "DELETE",
-  },
-  "remote-connection_instanceId_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/[instanceId]/route.ts",
-    method: "GET",
-  },
-  "remote-connection_instanceId_PATCH": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/[instanceId]/route.ts",
-    method: "PATCH",
-  },
-  "remote-connection_list_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/list/route.ts",
-    method: "GET",
-  },
-  "remote-connection_self_instanceId_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/self/instanceId/route.ts",
-    method: "GET",
-  },
-  "remote-connection_self_rename_PATCH": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/self/rename/route.ts",
-    method: "PATCH",
-  },
-  "remote-connection_sync_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/sync/route.ts",
-    method: "POST",
-  },
-  "remote-connection_sync_providers_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/sync/providers/route.ts",
-    method: "GET",
   },
   "remote-connections": {
     absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/list/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/list/route.ts",
     method: "GET",
   },
   "remote-event-bridge": {
@@ -4034,17 +3472,17 @@ export const routeHotPaths: Record<
   },
   "remote-status": {
     absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/[instanceId]/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/[instanceId]/route.ts",
     method: "GET",
   },
   "rename-instance": {
     absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/self/rename/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/self/rename/route.ts",
     method: "PATCH",
   },
   "rename-self": {
     absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/self/rename/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/self/rename/route.ts",
     method: "PATCH",
   },
   "rename-thread": {
@@ -4099,7 +3537,7 @@ export const routeHotPaths: Record<
   },
   "self-instance-id": {
     absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/self/instanceId/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/self/instanceId/route.ts",
     method: "GET",
   },
   "set-setting": {
@@ -4464,7 +3902,7 @@ export const routeHotPaths: Record<
   },
   sync: {
     absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/sync/route.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/sync/route.ts",
     method: "POST",
   },
   "system-prompt-debug": {
@@ -4476,481 +3914,6 @@ export const routeHotPaths: Record<
     absPath:
       "/home/max/projects/next-vibe-translations/src/vibe/env/settings/route.ts",
     method: "GET",
-  },
-  system_database_generate_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/database/generate/route.ts",
-    method: "POST",
-  },
-  system_database_health_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/database/health/route.ts",
-    method: "POST",
-  },
-  system_database_migrate_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/database/migrate/route.ts",
-    method: "POST",
-  },
-  system_database_ping_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/database/ping/route.ts",
-    method: "POST",
-  },
-  system_database_seed_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/database/seed/route.ts",
-    method: "POST",
-  },
-  system_database_sql_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/database/sql/route.ts",
-    method: "POST",
-  },
-  system_database_studio_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/database/studio/route.ts",
-    method: "POST",
-  },
-  system_database_utils_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/database/utils/route.ts",
-    method: "GET",
-  },
-  "system_database_utils_docker-operations_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/database/utils/docker-operations/route.ts",
-    method: "POST",
-  },
-  system_dataflow_cleanup_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/cleanup/route.ts",
-    method: "POST",
-  },
-  system_dataflow_graphs_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/route.ts",
-    method: "GET",
-  },
-  system_dataflow_graphs_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/route.ts",
-    method: "POST",
-  },
-  system_dataflow_graphs_id_archive_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/archive/route.ts",
-    method: "POST",
-  },
-  system_dataflow_graphs_id_backtest_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/backtest/route.ts",
-    method: "POST",
-  },
-  system_dataflow_graphs_id_data_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/data/route.ts",
-    method: "GET",
-  },
-  system_dataflow_graphs_id_delete_DELETE: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/delete/route.ts",
-    method: "DELETE",
-  },
-  system_dataflow_graphs_id_edit_PUT: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/edit/route.ts",
-    method: "PUT",
-  },
-  system_dataflow_graphs_id_promote_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/promote/route.ts",
-    method: "POST",
-  },
-  system_dataflow_graphs_id_trigger_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/trigger/route.ts",
-    method: "POST",
-  },
-  system_dataflow_graphs_id_versions_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/versions/route.ts",
-    method: "GET",
-  },
-  "system_dataflow_run-config_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/run-config/route.ts",
-    method: "POST",
-  },
-  system_env_settings_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/env/settings/route.ts",
-    method: "GET",
-  },
-  system_env_settings_PATCH: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/env/settings/route.ts",
-    method: "PATCH",
-  },
-  system_env_settings_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/env/settings/route.ts",
-    method: "POST",
-  },
-  "system_env_settings_export-env_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/env/settings/export-env/route.ts",
-    method: "GET",
-  },
-  "system_env_settings_generate-key_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/env/settings/generate-key/route.ts",
-    method: "GET",
-  },
-  "system_execute-tool_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/route.ts",
-    method: "POST",
-  },
-  "system_execute-tool_await-task_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/await-task/route.ts",
-    method: "POST",
-  },
-  "system_execute-tool_call-control_cancel_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/call-control/cancel/route.ts",
-    method: "POST",
-  },
-  "system_execute-tool_call-control_detach_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/call-control/detach/route.ts",
-    method: "POST",
-  },
-  "system_execute-tool_call-control_resume-when-done_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/call-control/resume-when-done/route.ts",
-    method: "POST",
-  },
-  "system_execute-tool_complete_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/complete/route.ts",
-    method: "POST",
-  },
-  "system_execute-tool_revival_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/revival/route.ts",
-    method: "POST",
-  },
-  "system_help-tool_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/help-tool/route.ts",
-    method: "GET",
-  },
-  "system_logger_error-monitor_cleanup_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/cleanup/route.ts",
-    method: "POST",
-  },
-  "system_logger_error-monitor_client-log_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/client-log/route.ts",
-    method: "POST",
-  },
-  "system_logger_error-monitor_data-sources_error-logs-errors_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/data-sources/error-logs-errors/route.ts",
-    method: "POST",
-  },
-  "system_logger_error-monitor_data-sources_error-logs-total_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/data-sources/error-logs-total/route.ts",
-    method: "POST",
-  },
-  "system_logger_error-monitor_data-sources_error-logs-warnings_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/data-sources/error-logs-warnings/route.ts",
-    method: "POST",
-  },
-  "system_logger_error-monitor_logs_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/logs/route.ts",
-    method: "GET",
-  },
-  "system_logger_error-monitor_logs_PATCH": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/logs/route.ts",
-    method: "PATCH",
-  },
-  system_platforms_cli_interactive_capture_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/interactive/capture/route.ts",
-    method: "POST",
-  },
-  "system_platforms_cli_interactive_send-keys_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/interactive/send-keys/route.ts",
-    method: "POST",
-  },
-  system_platforms_cli_setup_install_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/setup/install/route.ts",
-    method: "POST",
-  },
-  system_platforms_cli_setup_status_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/setup/status/route.ts",
-    method: "POST",
-  },
-  system_platforms_cli_setup_uninstall_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/setup/uninstall/route.ts",
-    method: "POST",
-  },
-  system_platforms_mcp_serve_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/platforms/mcp/serve/route.ts",
-    method: "POST",
-  },
-  "system_platforms_vibe-frame_mount_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/platforms/vibe-frame/mount/route.ts",
-    method: "POST",
-  },
-  "system_realtime_remote-event-bridge_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/realtime/remote-event-bridge/route.ts",
-    method: "POST",
-  },
-  system_server_server_build_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/server/server/build/route.ts",
-    method: "POST",
-  },
-  system_server_server_dev_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/server/server/dev/route.ts",
-    method: "POST",
-  },
-  system_server_server_electron_build_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/server/server/electron/build/route.ts",
-    method: "POST",
-  },
-  system_server_server_electron_start_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/server/server/electron/start/route.ts",
-    method: "POST",
-  },
-  "system_server_server_headless-client_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/server/server/headless-client/route.ts",
-    method: "POST",
-  },
-  system_server_server_health_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/server/server/health/route.ts",
-    method: "GET",
-  },
-  "system_server_server_image-push_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/server/server/image-push/route.ts",
-    method: "POST",
-  },
-  system_server_server_rebuild_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/server/server/rebuild/route.ts",
-    method: "POST",
-  },
-  system_server_server_start_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/server/server/start/route.ts",
-    method: "POST",
-  },
-  system_tasks_cron_bulk_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/bulk/route.ts",
-    method: "POST",
-  },
-  system_tasks_cron_history_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/history/route.ts",
-    method: "GET",
-  },
-  system_tasks_cron_id_DELETE: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/[id]/route.ts",
-    method: "DELETE",
-  },
-  system_tasks_cron_id_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/[id]/route.ts",
-    method: "GET",
-  },
-  system_tasks_cron_id_PUT: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/[id]/route.ts",
-    method: "PUT",
-  },
-  system_tasks_cron_queue_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/queue/route.ts",
-    method: "GET",
-  },
-  system_tasks_cron_stats_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/stats/route.ts",
-    method: "GET",
-  },
-  system_tasks_cron_tasks_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/tasks/route.ts",
-    method: "GET",
-  },
-  system_tasks_cron_tasks_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/tasks/route.ts",
-    method: "POST",
-  },
-  "system_tasks_data-sources_cron-executions-failed_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/data-sources/cron-executions-failed/route.ts",
-    method: "POST",
-  },
-  "system_tasks_data-sources_cron-executions-succeeded_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/data-sources/cron-executions-succeeded/route.ts",
-    method: "POST",
-  },
-  "system_tasks_data-sources_cron-executions-total_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/data-sources/cron-executions-total/route.ts",
-    method: "POST",
-  },
-  system_tasks_execute_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/execute/route.ts",
-    method: "POST",
-  },
-  system_tasks_pulse_execute_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/pulse/execute/route.ts",
-    method: "POST",
-  },
-  system_tasks_pulse_history_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/pulse/history/route.ts",
-    method: "GET",
-  },
-  system_tasks_pulse_status_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/pulse/status/route.ts",
-    method: "GET",
-  },
-  "system_tasks_unified-runner_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/unified-runner/route.ts",
-    method: "POST",
-  },
-  system_tooling_builder_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/builder/route.ts",
-    method: "POST",
-  },
-  system_tooling_check_config_create_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/config/create/route.ts",
-    method: "POST",
-  },
-  system_tooling_check_lint_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/lint/route.ts",
-    method: "POST",
-  },
-  system_tooling_check_oxlint_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/oxlint/route.ts",
-    method: "POST",
-  },
-  system_tooling_check_testing_test_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/testing/test/route.ts",
-    method: "POST",
-  },
-  system_tooling_check_typecheck_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/typecheck/route.ts",
-    method: "POST",
-  },
-  "system_tooling_check_vibe-check_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/vibe-check/route.ts",
-    method: "POST",
-  },
-  system_tooling_generators_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/generators/route.ts",
-    method: "POST",
-  },
-  system_tooling_guard_destroy_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/guard/destroy/route.ts",
-    method: "POST",
-  },
-  system_tooling_guard_start_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/guard/start/route.ts",
-    method: "POST",
-  },
-  system_tooling_guard_status_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/guard/status/route.ts",
-    method: "POST",
-  },
-  system_tooling_guard_stop_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/guard/stop/route.ts",
-    method: "POST",
-  },
-  system_tooling_infra_cluster_init_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/cluster/init/route.ts",
-    method: "POST",
-  },
-  system_tooling_infra_cluster_status_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/cluster/status/route.ts",
-    method: "GET",
-  },
-  system_tooling_infra_deploy_preview_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/deploy/preview/route.ts",
-    method: "POST",
-  },
-  system_tooling_infra_deploy_push_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/deploy/push/route.ts",
-    method: "POST",
-  },
-  system_tooling_infra_scale_replicas_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/scale/replicas/route.ts",
-    method: "POST",
-  },
-  system_tooling_release_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/release/route.ts",
-    method: "POST",
-  },
-  "system_tooling_vibe-deps_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/vibe-deps/route.ts",
-    method: "POST",
-  },
-  "system_tooling_vibe-stage_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/vibe-stage/route.ts",
-    method: "POST",
   },
   t: {
     absPath:
@@ -5525,6 +4488,1036 @@ export const routeHotPaths: Record<
   "vibe-sense-window-sum": {
     absPath:
       "/home/max/projects/next-vibe-translations/src/analytics/indicators/window-sum/route.ts",
+    method: "POST",
+  },
+  "vibe_agent_ai-stream_cancel_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/cancel/route.ts",
+    method: "POST",
+  },
+  "vibe_agent_ai-stream_run_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/run/route.ts",
+    method: "POST",
+  },
+  "vibe_agent_ai-stream_stream_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/stream/route.ts",
+    method: "POST",
+  },
+  "vibe_agent_ai-stream_system-prompt_debug_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/system-prompt/debug/route.ts",
+    method: "GET",
+  },
+  "vibe_agent_ai-stream_ws-provider_models_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/ws-provider/models/route.ts",
+    method: "GET",
+  },
+  "vibe_agent_chat_data-sources_chat-downvotes-total_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-downvotes-total/route.ts",
+    method: "POST",
+  },
+  "vibe_agent_chat_data-sources_chat-errors-total_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-errors-total/route.ts",
+    method: "POST",
+  },
+  "vibe_agent_chat_data-sources_chat-memories-created_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-memories-created/route.ts",
+    method: "POST",
+  },
+  "vibe_agent_chat_data-sources_chat-messages-by-ai_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-messages-by-ai/route.ts",
+    method: "POST",
+  },
+  "vibe_agent_chat_data-sources_chat-messages-by-user_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-messages-by-user/route.ts",
+    method: "POST",
+  },
+  "vibe_agent_chat_data-sources_chat-messages-total_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-messages-total/route.ts",
+    method: "POST",
+  },
+  "vibe_agent_chat_data-sources_chat-messages-with-attachments_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-messages-with-attachments/route.ts",
+    method: "POST",
+  },
+  "vibe_agent_chat_data-sources_chat-share-links-created_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-share-links-created/route.ts",
+    method: "POST",
+  },
+  "vibe_agent_chat_data-sources_chat-threads-active-total_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-threads-active-total/route.ts",
+    method: "POST",
+  },
+  "vibe_agent_chat_data-sources_chat-threads-created_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-threads-created/route.ts",
+    method: "POST",
+  },
+  "vibe_agent_chat_data-sources_chat-tool-calls-total_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-tool-calls-total/route.ts",
+    method: "POST",
+  },
+  "vibe_agent_chat_data-sources_chat-unique-users_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-unique-users/route.ts",
+    method: "POST",
+  },
+  "vibe_agent_chat_data-sources_chat-upvotes-total_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-upvotes-total/route.ts",
+    method: "POST",
+  },
+  "vibe_agent_chat_folder-contents_rootFolderId_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folder-contents/[rootFolderId]/route.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_folders_rootFolderId_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/[rootFolderId]/route.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_folders_rootFolderId_create_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/[rootFolderId]/create/route.ts",
+    method: "POST",
+  },
+  "vibe_agent_chat_folders_rootFolderId_root-permissions_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/[rootFolderId]/root-permissions/route.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_folders_subfolders_subFolderId_DELETE: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/route.ts",
+    method: "DELETE",
+  },
+  vibe_agent_chat_folders_subfolders_subFolderId_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/route.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_folders_subfolders_subFolderId_move_PATCH: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/move/route.ts",
+    method: "PATCH",
+  },
+  vibe_agent_chat_folders_subfolders_subFolderId_permissions_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/permissions/route.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_folders_subfolders_subFolderId_permissions_PATCH: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/permissions/route.ts",
+    method: "PATCH",
+  },
+  vibe_agent_chat_folders_subfolders_subFolderId_rename_PATCH: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/rename/route.ts",
+    method: "PATCH",
+  },
+  vibe_agent_chat_folders_subfolders_subFolderId_update_PATCH: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/update/route.ts",
+    method: "PATCH",
+  },
+  "vibe_agent_chat_public-feed_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/public-feed/route.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_settings_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/settings/route.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_settings_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/settings/route.ts",
+    method: "POST",
+  },
+  vibe_agent_chat_threads_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/route.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_threads_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/route.ts",
+    method: "POST",
+  },
+  vibe_agent_chat_threads_files_threadId_filename_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/files/[threadId]/[filename]/route.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_threads_rename_PATCH: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/rename/route.ts",
+    method: "PATCH",
+  },
+  "vibe_agent_chat_threads_search-messages_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/search-messages/route.ts",
+    method: "GET",
+  },
+  "vibe_agent_chat_threads_search-threads_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/search-threads/route.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_threads_threadId_DELETE: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/route.ts",
+    method: "DELETE",
+  },
+  vibe_agent_chat_threads_threadId_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/route.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_threads_threadId_PATCH: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/route.ts",
+    method: "PATCH",
+  },
+  vibe_agent_chat_threads_threadId_messages_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/route.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_threads_threadId_messages_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/route.ts",
+    method: "POST",
+  },
+  vibe_agent_chat_threads_threadId_messages_messageId_DELETE: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/[messageId]/route.ts",
+    method: "DELETE",
+  },
+  vibe_agent_chat_threads_threadId_messages_messageId_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/[messageId]/route.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_threads_threadId_messages_messageId_PATCH: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/[messageId]/route.ts",
+    method: "PATCH",
+  },
+  vibe_agent_chat_threads_threadId_messages_messageId_vote_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/[messageId]/vote/route.ts",
+    method: "POST",
+  },
+  vibe_agent_chat_threads_threadId_messages_path_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/path/route.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_threads_threadId_messages_search_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/search/route.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_threads_threadId_permissions_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/permissions/route.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_threads_threadId_permissions_PATCH: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/permissions/route.ts",
+    method: "PATCH",
+  },
+  "vibe_agent_chat_threads_threadId_share-links_DELETE": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/share-links/route.ts",
+    method: "DELETE",
+  },
+  "vibe_agent_chat_threads_threadId_share-links_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/share-links/route.ts",
+    method: "GET",
+  },
+  "vibe_agent_chat_threads_threadId_share-links_PATCH": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/share-links/route.ts",
+    method: "PATCH",
+  },
+  "vibe_agent_chat_threads_threadId_share-links_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/share-links/route.ts",
+    method: "POST",
+  },
+  "vibe_agent_coding-agent_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/coding-agent/route.ts",
+    method: "POST",
+  },
+  vibe_agent_cortex_delete_DELETE: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/delete/route.ts",
+    method: "DELETE",
+  },
+  vibe_agent_cortex_edit_PATCH: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/edit/route.ts",
+    method: "PATCH",
+  },
+  vibe_agent_cortex_embeddings_backfill_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/embeddings/backfill/route.ts",
+    method: "POST",
+  },
+  vibe_agent_cortex_exec_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/exec/route.ts",
+    method: "POST",
+  },
+  vibe_agent_cortex_list_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/list/route.ts",
+    method: "GET",
+  },
+  vibe_agent_cortex_mkdir_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/mkdir/route.ts",
+    method: "POST",
+  },
+  vibe_agent_cortex_move_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/move/route.ts",
+    method: "POST",
+  },
+  vibe_agent_cortex_read_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/read/route.ts",
+    method: "GET",
+  },
+  vibe_agent_cortex_search_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/search/route.ts",
+    method: "GET",
+  },
+  vibe_agent_cortex_terminals_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/terminals/route.ts",
+    method: "GET",
+  },
+  vibe_agent_cortex_tree_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/tree/route.ts",
+    method: "GET",
+  },
+  vibe_agent_cortex_write_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/write/route.ts",
+    method: "POST",
+  },
+  "vibe_agent_describe-image_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/describe-image/route.ts",
+    method: "POST",
+  },
+  "vibe_agent_describe-video_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/describe-video/route.ts",
+    method: "POST",
+  },
+  "vibe_agent_fetch-url-content_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/fetch-url-content/route.ts",
+    method: "GET",
+  },
+  "vibe_agent_fetch-url-content_cleanup_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/fetch-url-content/cleanup/route.ts",
+    method: "POST",
+  },
+  "vibe_agent_image-generation_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/image-generation/route.ts",
+    method: "POST",
+  },
+  vibe_agent_models_list_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/models/list/route.ts",
+    method: "GET",
+  },
+  "vibe_agent_models_model-prices_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/models/model-prices/route.ts",
+    method: "GET",
+  },
+  "vibe_agent_music-generation_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/music-generation/route.ts",
+    method: "POST",
+  },
+  vibe_agent_skills_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/route.ts",
+    method: "GET",
+  },
+  vibe_agent_skills_create_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/create/route.ts",
+    method: "POST",
+  },
+  vibe_agent_skills_favorites_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/route.ts",
+    method: "GET",
+  },
+  vibe_agent_skills_favorites_create_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/create/route.ts",
+    method: "POST",
+  },
+  vibe_agent_skills_favorites_id_DELETE: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/[id]/route.ts",
+    method: "DELETE",
+  },
+  vibe_agent_skills_favorites_id_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/[id]/route.ts",
+    method: "GET",
+  },
+  vibe_agent_skills_favorites_id_PATCH: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/[id]/route.ts",
+    method: "PATCH",
+  },
+  vibe_agent_skills_favorites_reorder_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/reorder/route.ts",
+    method: "POST",
+  },
+  vibe_agent_skills_id_DELETE: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/route.ts",
+    method: "DELETE",
+  },
+  vibe_agent_skills_id_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/route.ts",
+    method: "GET",
+  },
+  vibe_agent_skills_id_PATCH: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/route.ts",
+    method: "PATCH",
+  },
+  vibe_agent_skills_id_publish_PATCH: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/publish/route.ts",
+    method: "PATCH",
+  },
+  vibe_agent_skills_id_report_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/report/route.ts",
+    method: "POST",
+  },
+  vibe_agent_skills_id_vote_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/vote/route.ts",
+    method: "POST",
+  },
+  vibe_agent_skills_moderation_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/moderation/route.ts",
+    method: "GET",
+  },
+  vibe_agent_skills_moderation_PATCH: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/moderation/route.ts",
+    method: "PATCH",
+  },
+  "vibe_agent_speech-to-text_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/speech-to-text/route.ts",
+    method: "POST",
+  },
+  "vibe_agent_speech-to-text_hotkey_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/speech-to-text/hotkey/route.ts",
+    method: "POST",
+  },
+  "vibe_agent_text-to-speech_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/text-to-speech/route.ts",
+    method: "POST",
+  },
+  "vibe_agent_video-generation_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/video-generation/route.ts",
+    method: "POST",
+  },
+  "vibe_agent_view-image_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/view-image/route.ts",
+    method: "POST",
+  },
+  "vibe_agent_web-search_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/web-search/route.ts",
+    method: "GET",
+  },
+  "vibe_agent_web-search_brave_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/web-search/brave/route.ts",
+    method: "GET",
+  },
+  "vibe_agent_web-search_kagi_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/web-search/kagi/route.ts",
+    method: "GET",
+  },
+  vibe_database_generate_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/database/generate/route.ts",
+    method: "POST",
+  },
+  vibe_database_health_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/database/health/route.ts",
+    method: "POST",
+  },
+  vibe_database_migrate_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/database/migrate/route.ts",
+    method: "POST",
+  },
+  vibe_database_ping_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/database/ping/route.ts",
+    method: "POST",
+  },
+  vibe_database_seed_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/database/seed/route.ts",
+    method: "POST",
+  },
+  vibe_database_sql_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/database/sql/route.ts",
+    method: "POST",
+  },
+  vibe_database_studio_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/database/studio/route.ts",
+    method: "POST",
+  },
+  vibe_database_utils_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/database/utils/route.ts",
+    method: "GET",
+  },
+  "vibe_database_utils_docker-operations_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/database/utils/docker-operations/route.ts",
+    method: "POST",
+  },
+  vibe_dataflow_cleanup_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/cleanup/route.ts",
+    method: "POST",
+  },
+  vibe_dataflow_graphs_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/route.ts",
+    method: "GET",
+  },
+  vibe_dataflow_graphs_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/route.ts",
+    method: "POST",
+  },
+  vibe_dataflow_graphs_id_archive_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/archive/route.ts",
+    method: "POST",
+  },
+  vibe_dataflow_graphs_id_backtest_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/backtest/route.ts",
+    method: "POST",
+  },
+  vibe_dataflow_graphs_id_data_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/data/route.ts",
+    method: "GET",
+  },
+  vibe_dataflow_graphs_id_delete_DELETE: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/delete/route.ts",
+    method: "DELETE",
+  },
+  vibe_dataflow_graphs_id_edit_PUT: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/edit/route.ts",
+    method: "PUT",
+  },
+  vibe_dataflow_graphs_id_promote_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/promote/route.ts",
+    method: "POST",
+  },
+  vibe_dataflow_graphs_id_trigger_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/trigger/route.ts",
+    method: "POST",
+  },
+  vibe_dataflow_graphs_id_versions_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/versions/route.ts",
+    method: "GET",
+  },
+  "vibe_dataflow_run-config_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/run-config/route.ts",
+    method: "POST",
+  },
+  vibe_env_settings_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/env/settings/route.ts",
+    method: "GET",
+  },
+  vibe_env_settings_PATCH: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/env/settings/route.ts",
+    method: "PATCH",
+  },
+  vibe_env_settings_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/env/settings/route.ts",
+    method: "POST",
+  },
+  "vibe_env_settings_export-env_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/env/settings/export-env/route.ts",
+    method: "GET",
+  },
+  "vibe_env_settings_generate-key_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/env/settings/generate-key/route.ts",
+    method: "GET",
+  },
+  "vibe_execute-tool_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/route.ts",
+    method: "POST",
+  },
+  "vibe_execute-tool_await-task_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/await-task/route.ts",
+    method: "POST",
+  },
+  "vibe_execute-tool_call-control_cancel_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/call-control/cancel/route.ts",
+    method: "POST",
+  },
+  "vibe_execute-tool_call-control_detach_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/call-control/detach/route.ts",
+    method: "POST",
+  },
+  "vibe_execute-tool_call-control_resume-when-done_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/call-control/resume-when-done/route.ts",
+    method: "POST",
+  },
+  "vibe_execute-tool_complete_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/complete/route.ts",
+    method: "POST",
+  },
+  "vibe_execute-tool_revival_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/revival/route.ts",
+    method: "POST",
+  },
+  "vibe_help-tool_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/help-tool/route.ts",
+    method: "GET",
+  },
+  "vibe_logger_error-monitor_cleanup_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/cleanup/route.ts",
+    method: "POST",
+  },
+  "vibe_logger_error-monitor_client-log_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/client-log/route.ts",
+    method: "POST",
+  },
+  "vibe_logger_error-monitor_data-sources_error-logs-errors_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/data-sources/error-logs-errors/route.ts",
+    method: "POST",
+  },
+  "vibe_logger_error-monitor_data-sources_error-logs-total_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/data-sources/error-logs-total/route.ts",
+    method: "POST",
+  },
+  "vibe_logger_error-monitor_data-sources_error-logs-warnings_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/data-sources/error-logs-warnings/route.ts",
+    method: "POST",
+  },
+  "vibe_logger_error-monitor_logs_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/logs/route.ts",
+    method: "GET",
+  },
+  "vibe_logger_error-monitor_logs_PATCH": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/logs/route.ts",
+    method: "PATCH",
+  },
+  vibe_platforms_cli_interactive_capture_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/interactive/capture/route.ts",
+    method: "POST",
+  },
+  "vibe_platforms_cli_interactive_send-keys_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/interactive/send-keys/route.ts",
+    method: "POST",
+  },
+  vibe_platforms_cli_setup_install_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/setup/install/route.ts",
+    method: "POST",
+  },
+  vibe_platforms_cli_setup_status_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/setup/status/route.ts",
+    method: "POST",
+  },
+  vibe_platforms_cli_setup_uninstall_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/setup/uninstall/route.ts",
+    method: "POST",
+  },
+  vibe_platforms_mcp_serve_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/mcp/serve/route.ts",
+    method: "POST",
+  },
+  "vibe_platforms_vibe-frame_mount_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/vibe-frame/mount/route.ts",
+    method: "POST",
+  },
+  "vibe_realtime_remote-event-bridge_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/realtime/remote-event-bridge/route.ts",
+    method: "POST",
+  },
+  "vibe_remote-connection_connect-reverse_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/connect-reverse/route.ts",
+    method: "POST",
+  },
+  "vibe_remote-connection_connect-reverse_update_PATCH": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/connect-reverse/update/route.ts",
+    method: "PATCH",
+  },
+  "vibe_remote-connection_connect_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/connect/route.ts",
+    method: "POST",
+  },
+  "vibe_remote-connection_instanceId_DELETE": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/[instanceId]/route.ts",
+    method: "DELETE",
+  },
+  "vibe_remote-connection_instanceId_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/[instanceId]/route.ts",
+    method: "GET",
+  },
+  "vibe_remote-connection_instanceId_PATCH": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/[instanceId]/route.ts",
+    method: "PATCH",
+  },
+  "vibe_remote-connection_list_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/list/route.ts",
+    method: "GET",
+  },
+  "vibe_remote-connection_self_instanceId_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/self/instanceId/route.ts",
+    method: "GET",
+  },
+  "vibe_remote-connection_self_rename_PATCH": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/self/rename/route.ts",
+    method: "PATCH",
+  },
+  "vibe_remote-connection_sync_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/sync/route.ts",
+    method: "POST",
+  },
+  "vibe_remote-connection_sync_providers_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/sync/providers/route.ts",
+    method: "GET",
+  },
+  vibe_server_server_build_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/build/route.ts",
+    method: "POST",
+  },
+  vibe_server_server_dev_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/dev/route.ts",
+    method: "POST",
+  },
+  vibe_server_server_electron_build_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/electron/build/route.ts",
+    method: "POST",
+  },
+  vibe_server_server_electron_start_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/electron/start/route.ts",
+    method: "POST",
+  },
+  "vibe_server_server_headless-client_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/headless-client/route.ts",
+    method: "POST",
+  },
+  vibe_server_server_health_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/health/route.ts",
+    method: "GET",
+  },
+  "vibe_server_server_image-push_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/image-push/route.ts",
+    method: "POST",
+  },
+  vibe_server_server_rebuild_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/rebuild/route.ts",
+    method: "POST",
+  },
+  vibe_server_server_start_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/start/route.ts",
+    method: "POST",
+  },
+  vibe_tasks_cron_bulk_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/bulk/route.ts",
+    method: "POST",
+  },
+  vibe_tasks_cron_history_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/history/route.ts",
+    method: "GET",
+  },
+  vibe_tasks_cron_id_DELETE: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/[id]/route.ts",
+    method: "DELETE",
+  },
+  vibe_tasks_cron_id_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/[id]/route.ts",
+    method: "GET",
+  },
+  vibe_tasks_cron_id_PUT: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/[id]/route.ts",
+    method: "PUT",
+  },
+  vibe_tasks_cron_queue_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/queue/route.ts",
+    method: "GET",
+  },
+  vibe_tasks_cron_stats_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/stats/route.ts",
+    method: "GET",
+  },
+  vibe_tasks_cron_tasks_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/tasks/route.ts",
+    method: "GET",
+  },
+  vibe_tasks_cron_tasks_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/tasks/route.ts",
+    method: "POST",
+  },
+  "vibe_tasks_data-sources_cron-executions-failed_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/data-sources/cron-executions-failed/route.ts",
+    method: "POST",
+  },
+  "vibe_tasks_data-sources_cron-executions-succeeded_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/data-sources/cron-executions-succeeded/route.ts",
+    method: "POST",
+  },
+  "vibe_tasks_data-sources_cron-executions-total_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/data-sources/cron-executions-total/route.ts",
+    method: "POST",
+  },
+  vibe_tasks_execute_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/execute/route.ts",
+    method: "POST",
+  },
+  vibe_tasks_pulse_execute_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/pulse/execute/route.ts",
+    method: "POST",
+  },
+  vibe_tasks_pulse_history_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/pulse/history/route.ts",
+    method: "GET",
+  },
+  vibe_tasks_pulse_status_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/pulse/status/route.ts",
+    method: "GET",
+  },
+  "vibe_tasks_unified-runner_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/unified-runner/route.ts",
+    method: "POST",
+  },
+  vibe_tooling_builder_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/builder/route.ts",
+    method: "POST",
+  },
+  vibe_tooling_check_config_create_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/config/create/route.ts",
+    method: "POST",
+  },
+  vibe_tooling_check_lint_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/lint/route.ts",
+    method: "POST",
+  },
+  vibe_tooling_check_oxlint_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/oxlint/route.ts",
+    method: "POST",
+  },
+  vibe_tooling_check_testing_test_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/testing/test/route.ts",
+    method: "POST",
+  },
+  vibe_tooling_check_typecheck_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/typecheck/route.ts",
+    method: "POST",
+  },
+  "vibe_tooling_check_vibe-check_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/vibe-check/route.ts",
+    method: "POST",
+  },
+  vibe_tooling_generators_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/generators/route.ts",
+    method: "POST",
+  },
+  vibe_tooling_guard_destroy_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/guard/destroy/route.ts",
+    method: "POST",
+  },
+  vibe_tooling_guard_start_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/guard/start/route.ts",
+    method: "POST",
+  },
+  vibe_tooling_guard_status_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/guard/status/route.ts",
+    method: "POST",
+  },
+  vibe_tooling_guard_stop_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/guard/stop/route.ts",
+    method: "POST",
+  },
+  vibe_tooling_infra_cluster_init_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/cluster/init/route.ts",
+    method: "POST",
+  },
+  vibe_tooling_infra_cluster_status_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/cluster/status/route.ts",
+    method: "GET",
+  },
+  vibe_tooling_infra_deploy_preview_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/deploy/preview/route.ts",
+    method: "POST",
+  },
+  vibe_tooling_infra_deploy_push_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/deploy/push/route.ts",
+    method: "POST",
+  },
+  vibe_tooling_infra_scale_replicas_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/scale/replicas/route.ts",
+    method: "POST",
+  },
+  vibe_tooling_release_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/release/route.ts",
+    method: "POST",
+  },
+  "vibe_tooling_vibe-deps_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/vibe-deps/route.ts",
+    method: "POST",
+  },
+  "vibe_tooling_vibe-stage_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/vibe-stage/route.ts",
     method: "POST",
   },
   "wait-for-task": {

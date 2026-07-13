@@ -26,7 +26,7 @@ const PromoteWidget = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "dataflow", "graphs", "[id]", "promote"],
+  path: ["vibe", "dataflow", "graphs", "[id]", "promote"],
   title: "post.title",
   titleShort: "post.titleShort",
   description: "post.description",

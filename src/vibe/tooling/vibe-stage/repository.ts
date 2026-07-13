@@ -11,6 +11,8 @@
  *     boilerplate oxlint plugin with 0 violations, and generated output.
  *  4. Import-only changes — static AND dynamic `import(...)` edits — staged in
  *     full, or partially (import hunks only) for files that also carry real code.
+ *  5. definition.ts `path: [...]` line changes inside `createEndpoint()` — the
+ *     path array is purely declarative metadata; changes here are always safe.
  *
  * Diffs that add/remove suppression comments are never auto-staged.
  */
@@ -522,9 +524,9 @@ function rewriteHunkNewStart(hunkHeader: string, newStart: number): string {
  * Strategy:
  *  1. u0Unstaged = `git diff --unified=0 -- file` (WC vs index) — the true unstaged
  *     hunks with line numbers relative to the current index. This is what we apply.
- *  2. Classify each unstaged hunk: import-only or mixed.
- *  3. If all hunks are import-only → importOnly=true, full-file stage.
- *  4. If some are import-only → build patch from u0Unstaged import hunks for partial stage.
+ *  2. Classify each unstaged hunk: import-only, path-only, or mixed.
+ *  3. If all hunks are safe (imports or definition path lines) → importOnly=true, full-file stage.
+ *  4. If some are safe → build patch from safe hunks for partial stage.
  *
  * Using WC-vs-index (not WC-vs-HEAD) for the patch eliminates line-number mismatches
  * when `git apply --cached` is used — the index IS the base, so hunks apply cleanly.
@@ -573,11 +575,11 @@ function analyzeFileDiff(u0Unstaged: string): {
     return { importOnly: false, importHunksPatch: null };
   }
 
-  // Build patch from import-only unstaged hunks.
+  // Build patch from safe (import-only or definition path) unstaged hunks.
   // Applied with --unidiff-zero (zero-context hunks ok) and without --3way
   // since the patch base IS the index — no drift to resolve.
   //
-  // Line-number adjustment: skipped (non-import) hunks shift subsequent hunk
+  // Line-number adjustment: skipped (unsafe) hunks shift subsequent hunk
   // positions. For each excluded hunk that precedes an included hunk, subtract
   // its net delta from the included hunk's target start so the patch applies
   // cleanly against the unmodified index.

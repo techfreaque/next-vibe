@@ -43,7 +43,7 @@ const GraphChartView = React.lazy(() =>
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["system", "dataflow", "graphs", "[id]", "data"],
+  path: ["vibe", "dataflow", "graphs", "[id]", "data"],
   title: "get.title",
   titleShort: "get.titleShort",
   description: "get.description",

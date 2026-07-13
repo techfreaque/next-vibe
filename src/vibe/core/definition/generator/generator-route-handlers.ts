@@ -344,7 +344,7 @@ class RouteHandlersGenerator {
 
     for (const routeFile of routeFiles) {
       const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
-      // Filesystem segments between [locale] and the definition file — truth.
+      // Filesystem segments between src/ and the definition file — truth.
       const fsSegments = extractNestedPath(definitionPath);
 
       let defaultExport: ApiSection | undefined;

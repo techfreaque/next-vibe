@@ -27,7 +27,7 @@ import { GUARD_STATUS_ALIAS } from "./constants";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "tooling", "guard", "status"],
+  path: ["vibe", "tooling", "guard", "status"],
   title: "post.title",
   titleShort: "post.titleShort",
   description: "post.description",

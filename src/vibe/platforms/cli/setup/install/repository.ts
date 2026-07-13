@@ -279,10 +279,7 @@ exit 1
       /* eslint-disable i18next/no-literal-string */
       const vibeRelativePath = path.join(
         "src",
-        "app",
-        "api",
-        "[locale]",
-        "system",
+        "vibe",
         "platforms",
         "cli",
         "vibe-runtime.ts",

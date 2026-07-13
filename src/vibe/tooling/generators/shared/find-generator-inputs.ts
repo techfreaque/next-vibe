@@ -14,6 +14,8 @@ import "server-only";
 
 import { join } from "node:path";
 
+import { getApiDir, getUiDir } from "@/env/paths";
+
 import type { LiveIndex } from "./live-index";
 import { findFilesRecursively } from "./utils";
 

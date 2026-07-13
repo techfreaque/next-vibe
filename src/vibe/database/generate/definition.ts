@@ -19,7 +19,7 @@ import { DB_GENERATE_ALIAS } from "./constants";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "database", "generate"],
+  path: ["vibe", "database", "generate"],
   title: "post.title",
   titleShort: "post.titleShort",
   description: "post.description",

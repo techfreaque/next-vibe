@@ -28,7 +28,7 @@ import { HotkeyAction, HotkeyActionOptions } from "./enum";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["agent", "speech-to-text", "hotkey"],
+  path: ["vibe", "agent", "speech-to-text", "hotkey"],
   title: "hotkey.post.title" as const,
   titleShort: "hotkey.post.titleShort" as const,
   description: "hotkey.post.description" as const,

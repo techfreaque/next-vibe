@@ -1,4 +1,4 @@
-// AUTO-GENERATED from src/app/api/[locale]/lead-magnet/providers/youlead/route.ts. Add "use custom" to this file to preserve customizations.
+// AUTO-GENERATED from src/lead-magnet/providers/youlead/route.ts. Add "use custom" to this file to preserve customizations.
 import { createFileRoute } from "@tanstack/react-router";
 
 import { wrapNextApiRoute } from "../nextjs-compat-wrapper";

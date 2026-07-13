@@ -108,7 +108,7 @@ const PackageStatusSchema = z.enum(["success", "skipped", "failed"]);
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "tooling", "release"],
+  path: ["vibe", "tooling", "release"],
   title: "title",
   titleShort: "title",
   description: "description",

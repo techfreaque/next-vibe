@@ -39,7 +39,7 @@ const ErrorLogsContainer = lazyWidget(() =>
 export const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["system", "logger", "error-monitor", "logs"],
+  path: ["vibe", "logger", "error-monitor", "logs"],
   aliases: [ERROR_LOGS_ALIAS],
   title: "get.title",
   titleShort: "get.titleShort",
@@ -220,7 +220,7 @@ export const { GET } = createEndpoint({
 export const { PATCH } = createEndpoint({
   scopedTranslation,
   method: Methods.PATCH,
-  path: ["system", "logger", "error-monitor", "logs"],
+  path: ["vibe", "logger", "error-monitor", "logs"],
   aliases: ["update-error-log"],
   title: "patch.title",
   titleShort: "patch.titleShort",

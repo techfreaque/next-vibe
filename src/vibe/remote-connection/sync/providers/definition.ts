@@ -24,7 +24,7 @@ import { scopedTranslation } from "./i18n";
 export const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["remote-connection", "sync", "providers"],
+  path: ["vibe", "remote-connection", "sync", "providers"],
   allowedRoles: [UserRole.ADMIN] as const,
 
   title: "get.title" as const,

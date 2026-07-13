@@ -61,13 +61,13 @@ const templateLoaders: Record<
       "newsletterWelcomeEmailTemplate"
     ] as EmailTemplateDefinitionAny,
   "password-reset-confirm": async () =>
-    (
-      await import("@/user/public/reset-password/confirm/email")
-    )["passwordResetConfirmEmailTemplate"] as EmailTemplateDefinitionAny,
+    (await import("@/user/public/reset-password/confirm/email"))[
+      "passwordResetConfirmEmailTemplate"
+    ] as EmailTemplateDefinitionAny,
   "password-reset-request": async () =>
-    (
-      await import("@/user/public/reset-password/request/email")
-    )["passwordResetRequestEmailTemplate"] as EmailTemplateDefinitionAny,
+    (await import("@/user/public/reset-password/request/email"))[
+      "passwordResetRequestEmailTemplate"
+    ] as EmailTemplateDefinitionAny,
   "referral-payout-admin": async () =>
     (await import("@/referral/payout/email"))[
       "payoutAdminEmailTemplate"

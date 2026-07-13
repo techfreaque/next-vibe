@@ -37,7 +37,7 @@ const VideoGenerationContainer = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["agent", "video-generation"],
+  path: ["vibe", "agent", "video-generation"],
   aliases: [VIDEO_GEN_ALIAS],
   allowedRoles: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.PUBLIC],
   defaultWebPinned: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.PUBLIC],

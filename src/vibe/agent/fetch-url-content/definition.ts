@@ -30,7 +30,7 @@ import { scopedTranslation } from "./i18n";
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["agent", "fetch-url-content"],
+  path: ["vibe", "agent", "fetch-url-content"],
   title: "get.title" as const,
   titleShort: "get.titleShort" as const,
   description: "get.description" as const,

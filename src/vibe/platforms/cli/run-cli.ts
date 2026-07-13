@@ -81,7 +81,7 @@ function resolveCommandFromPath(
   if (localeIdx !== -1) {
     normalized = normalized.slice(localeIdx + localeMarker.length);
   } else {
-    // Fallback: strip common prefix patterns like src/app/api/en/
+    // Fallback: strip common prefix patterns like src/en/
     normalized = normalized.replace(/^.*\/api\/[^/]+\//, "");
   }
 

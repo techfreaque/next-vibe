@@ -1,9 +1,9 @@
-// AUTO-GENERATED from src/app/[locale]/story/layout.tsx. Add "use custom" to this file to preserve customizations.
+// AUTO-GENERATED from src/_pages/story/layout.tsx. Add "use custom" to this file to preserve customizations.
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import type { JSX } from "react";
 
-import { TanstackPage as Layout } from "@/app/[locale]/story/layout";
+import { TanstackPage as Layout } from "@/_pages/story/layout";
 
 import { runPageLoader, toNextParams } from "../nextjs-compat-wrapper";
 
@@ -11,7 +11,7 @@ const loadData = createServerFn({ method: "GET" })
   .inputValidator((data: Record<string, string>) => data)
   .handler(async ({ data }) =>
     runPageLoader(async () => {
-      const { tanstackLoader } = await import("@/app/[locale]/story/layout");
+      const { tanstackLoader } = await import("@/_pages/story/layout");
       return tanstackLoader({ params: Promise.resolve(toNextParams(data)) });
     }),
   );

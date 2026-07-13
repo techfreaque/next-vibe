@@ -34,7 +34,7 @@ const ThreadRenameContainer = lazyWidget(() =>
 const { PATCH } = createEndpoint({
   scopedTranslation,
   method: Methods.PATCH,
-  path: ["agent", "chat", "threads", "rename"],
+  path: ["vibe", "agent", "chat", "threads", "rename"],
   aliases: [THREAD_RENAME_ALIAS] as const,
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 

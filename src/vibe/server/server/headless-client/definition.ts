@@ -21,7 +21,7 @@ import { HEADLESS_CLIENT_ALIASES } from "./constants";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "server", "server", "headless-client"],
+  path: ["vibe", "server", "server", "headless-client"],
   aliases: HEADLESS_CLIENT_ALIASES,
   title: "post.title",
   titleShort: "post.titleShort",

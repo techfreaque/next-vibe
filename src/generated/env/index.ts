@@ -15,15 +15,15 @@ import type { z } from "zod";
 
 // Import env modules
 import {
-  env as env_env,
-  envExamples as env_envExamples,
-  envSchema as env_envSchema,
-} from "../../env/env";
-import {
   browserEnv,
   browserEnvExamples,
   browserEnvSchema,
 } from "../../browser/env";
+import {
+  env as env_env,
+  envExamples,
+  envSchema as env_envSchema,
+} from "../../env/env";
 import {
   leadsCampaignsEnv,
   leadsCampaignsEnvExamples,
@@ -72,12 +72,12 @@ export const envModules: Record<
     examples: EnvExample[];
   }
 > = {
-  env: { env: env_env, schema: env_envSchema, examples: env_envExamples },
   browser: {
     env: browserEnv,
     schema: browserEnvSchema,
     examples: browserEnvExamples,
   },
+  env: { env: env_env, schema: env_envSchema, examples: envExamples },
   leadsCampaigns: {
     env: leadsCampaignsEnv,
     schema: leadsCampaignsEnvSchema,
@@ -108,9 +108,8 @@ export const envModules: Record<
 };
 
 // Combined schema using merge
-export const envSchema = env_envSchema
+export const envSchema = browserEnvSchema
   .merge(env_envSchema)
-  .merge(browserEnvSchema)
   .merge(leadsCampaignsEnvSchema)
   .merge(messengerEnvSchema)
   .merge(imapClientEnvSchema)

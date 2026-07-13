@@ -29,7 +29,7 @@ const CortexMoveWidget = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["agent", "cortex", "move"],
+  path: ["vibe", "agent", "cortex", "move"],
   aliases: [CORTEX_MOVE_ALIAS] as const,
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   defaultAiPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,

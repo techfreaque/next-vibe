@@ -50,7 +50,7 @@ export const FeedSortModeDB = [
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["agent", "chat", "public-feed"],
+  path: ["vibe", "agent", "chat", "public-feed"],
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
   defaultWebPinned: [
     UserRole.PUBLIC,

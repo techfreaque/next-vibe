@@ -28,7 +28,7 @@ const CortexBackfillWidget = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["agent", "cortex", "embeddings", "backfill"],
+  path: ["vibe", "agent", "cortex", "embeddings", "backfill"],
   aliases: ["cortex-embed-backfill"] as const,
   allowedRoles: [UserRole.ADMIN] as const,
 

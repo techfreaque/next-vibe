@@ -29,7 +29,7 @@ const AwaitTaskWidget = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "execute-tool", "await-task"],
+  path: ["vibe", "execute-tool", "await-task"],
   title: "post.title",
   titleShort: "post.titleShort",
   description: "post.description",

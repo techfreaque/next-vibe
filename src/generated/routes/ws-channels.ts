@@ -23,154 +23,152 @@ import {
  */
 export async function getGeneratedWsEndpoints(): Promise<WsChannelEntry[]> {
   const [
-    agent_ai_stream_run_POSTDef,
-    agent_chat_folder_contents_rootFolderId_GETDef,
-    agent_chat_threads_GETDef,
-    agent_chat_threads_POSTDef,
-    agent_chat_threads_threadId_DELETEDef,
-    agent_chat_threads_threadId_messages_GETDef,
-    agent_chat_threads_threadId_PATCHDef,
-    agent_skills_create_POSTDef,
-    agent_skills_favorites_create_POSTDef,
-    agent_skills_favorites_GETDef,
-    agent_skills_favorites_id_DELETEDef,
-    agent_skills_favorites_id_PATCHDef,
-    agent_skills_favorites_reorder_POSTDef,
-    agent_skills_id_DELETEDef,
-    agent_skills_id_PATCHDef,
-    agent_skills_id_publish_PATCHDef,
-    agent_skills_id_vote_POSTDef,
     credits_GETDef,
-    system_realtime_remote_event_bridge_POSTDef,
-    system_tasks_cron_queue_GETDef,
-    system_tasks_cron_tasks_GETDef,
+    vibe_agent_ai_stream_run_POSTDef,
+    vibe_agent_chat_folder_contents_rootFolderId_GETDef,
+    vibe_agent_chat_threads_GETDef,
+    vibe_agent_chat_threads_POSTDef,
+    vibe_agent_chat_threads_threadId_DELETEDef,
+    vibe_agent_chat_threads_threadId_messages_GETDef,
+    vibe_agent_chat_threads_threadId_PATCHDef,
+    vibe_agent_skills_create_POSTDef,
+    vibe_agent_skills_favorites_create_POSTDef,
+    vibe_agent_skills_favorites_GETDef,
+    vibe_agent_skills_favorites_id_DELETEDef,
+    vibe_agent_skills_favorites_id_PATCHDef,
+    vibe_agent_skills_favorites_reorder_POSTDef,
+    vibe_agent_skills_id_DELETEDef,
+    vibe_agent_skills_id_PATCHDef,
+    vibe_agent_skills_id_publish_PATCHDef,
+    vibe_agent_skills_id_vote_POSTDef,
+    vibe_realtime_remote_event_bridge_POSTDef,
+    vibe_tasks_cron_queue_GETDef,
+    vibe_tasks_cron_tasks_GETDef,
   ] = await Promise.all([
-    import("next-vibe/agent/ai-stream/run/definition"),
-    import("next-vibe/agent/chat/folder-contents/[rootFolderId]/definition"),
-    import("next-vibe/agent/chat/threads/definition"),
-    import("next-vibe/agent/chat/threads/definition"),
-    import("next-vibe/agent/chat/threads/[threadId]/definition"),
-    import("next-vibe/agent/chat/threads/[threadId]/messages/definition"),
-    import("next-vibe/agent/chat/threads/[threadId]/definition"),
-    import("next-vibe/agent/skills/create/definition"),
-    import("next-vibe/agent/skills/favorites/create/definition"),
-    import("next-vibe/agent/skills/favorites/definition"),
-    import("next-vibe/agent/skills/favorites/[id]/definition"),
-    import("next-vibe/agent/skills/favorites/[id]/definition"),
-    import("next-vibe/agent/skills/favorites/reorder/definition"),
-    import("next-vibe/agent/skills/[id]/definition"),
-    import("next-vibe/agent/skills/[id]/definition"),
-    import("next-vibe/agent/skills/[id]/publish/definition"),
-    import("next-vibe/agent/skills/[id]/vote/definition"),
     import("@/credits/definition"),
-    import("next-vibe/realtime/remote-event-bridge/definition"),
-    import("next-vibe/tasks/cron/queue/definition"),
-    import("next-vibe/tasks/cron/tasks/definition"),
+    import("@/vibe/agent/ai-stream/run/definition"),
+    import("@/vibe/agent/chat/folder-contents/[rootFolderId]/definition"),
+    import("@/vibe/agent/chat/threads/definition"),
+    import("@/vibe/agent/chat/threads/definition"),
+    import("@/vibe/agent/chat/threads/[threadId]/definition"),
+    import("@/vibe/agent/chat/threads/[threadId]/messages/definition"),
+    import("@/vibe/agent/chat/threads/[threadId]/definition"),
+    import("@/vibe/agent/skills/create/definition"),
+    import("@/vibe/agent/skills/favorites/create/definition"),
+    import("@/vibe/agent/skills/favorites/definition"),
+    import("@/vibe/agent/skills/favorites/[id]/definition"),
+    import("@/vibe/agent/skills/favorites/[id]/definition"),
+    import("@/vibe/agent/skills/favorites/reorder/definition"),
+    import("@/vibe/agent/skills/[id]/definition"),
+    import("@/vibe/agent/skills/[id]/definition"),
+    import("@/vibe/agent/skills/[id]/publish/definition"),
+    import("@/vibe/agent/skills/[id]/vote/definition"),
+    import("@/vibe/realtime/remote-event-bridge/definition"),
+    import("@/vibe/tasks/cron/queue/definition"),
+    import("@/vibe/tasks/cron/tasks/definition"),
   ]);
 
   return [
-    {
-      endpoint: agent_ai_stream_run_POSTDef.default.POST,
-      resolveChannel: userChannelResolver,
-    },
-    {
-      endpoint: agent_chat_folder_contents_rootFolderId_GETDef.default.GET,
-      resolveChannel: lazyResolveChannel(
-        () =>
-          import("next-vibe/agent/chat/folder-contents/[rootFolderId]/route"),
-        "GET",
-      ),
-    },
-    {
-      endpoint: agent_chat_threads_GETDef.default.GET,
-      resolveChannel: userChannelResolver,
-    },
-    {
-      endpoint: agent_chat_threads_POSTDef.default.POST,
-      resolveChannel: userChannelResolver,
-    },
-    {
-      endpoint: agent_chat_threads_threadId_DELETEDef.default.DELETE,
-      resolveChannel: userChannelResolver,
-    },
-    {
-      endpoint: agent_chat_threads_threadId_messages_GETDef.default.GET,
-      resolveChannel: lazyResolveChannel(
-        () =>
-          import("next-vibe/agent/chat/threads/[threadId]/messages/route"),
-        "GET",
-      ),
-    },
-    {
-      endpoint: agent_chat_threads_threadId_PATCHDef.default.PATCH,
-      resolveChannel: userChannelResolver,
-    },
-    {
-      endpoint: agent_skills_create_POSTDef.default.POST,
-      resolveChannel: userChannelResolver,
-    },
-    {
-      endpoint: agent_skills_favorites_create_POSTDef.default.POST,
-      resolveChannel: userChannelResolver,
-    },
-    {
-      endpoint: agent_skills_favorites_GETDef.default.GET,
-      resolveChannel: userChannelResolver,
-    },
-    {
-      endpoint: agent_skills_favorites_id_DELETEDef.default.DELETE,
-      resolveChannel: userChannelResolver,
-    },
-    {
-      endpoint: agent_skills_favorites_id_PATCHDef.default.PATCH,
-      resolveChannel: userChannelResolver,
-    },
-    {
-      endpoint: agent_skills_favorites_reorder_POSTDef.default.POST,
-      resolveChannel: userChannelResolver,
-    },
-    {
-      endpoint: agent_skills_id_DELETEDef.default.DELETE,
-      resolveChannel: lazyResolveChannel(
-        () => import("next-vibe/agent/skills/[id]/route"),
-        "DELETE",
-      ),
-    },
-    {
-      endpoint: agent_skills_id_PATCHDef.default.PATCH,
-      resolveChannel: lazyResolveChannel(
-        () => import("next-vibe/agent/skills/[id]/route"),
-        "PATCH",
-      ),
-    },
-    {
-      endpoint: agent_skills_id_publish_PATCHDef.default.PATCH,
-      resolveChannel: lazyResolveChannel(
-        () => import("next-vibe/agent/skills/[id]/publish/route"),
-        "PATCH",
-      ),
-    },
-    {
-      endpoint: agent_skills_id_vote_POSTDef.default.POST,
-      resolveChannel: lazyResolveChannel(
-        () => import("next-vibe/agent/skills/[id]/vote/route"),
-        "POST",
-      ),
-    },
     {
       endpoint: credits_GETDef.default.GET,
       resolveChannel: userChannelResolver,
     },
     {
-      endpoint: system_realtime_remote_event_bridge_POSTDef.default.POST,
+      endpoint: vibe_agent_ai_stream_run_POSTDef.default.POST,
       resolveChannel: userChannelResolver,
     },
     {
-      endpoint: system_tasks_cron_queue_GETDef.default.GET,
+      endpoint: vibe_agent_chat_folder_contents_rootFolderId_GETDef.default.GET,
+      resolveChannel: lazyResolveChannel(
+        () => import("@/vibe/agent/chat/folder-contents/[rootFolderId]/route"),
+        "GET",
+      ),
+    },
+    {
+      endpoint: vibe_agent_chat_threads_GETDef.default.GET,
       resolveChannel: userChannelResolver,
     },
     {
-      endpoint: system_tasks_cron_tasks_GETDef.default.GET,
+      endpoint: vibe_agent_chat_threads_POSTDef.default.POST,
+      resolveChannel: userChannelResolver,
+    },
+    {
+      endpoint: vibe_agent_chat_threads_threadId_DELETEDef.default.DELETE,
+      resolveChannel: userChannelResolver,
+    },
+    {
+      endpoint: vibe_agent_chat_threads_threadId_messages_GETDef.default.GET,
+      resolveChannel: lazyResolveChannel(
+        () => import("@/vibe/agent/chat/threads/[threadId]/messages/route"),
+        "GET",
+      ),
+    },
+    {
+      endpoint: vibe_agent_chat_threads_threadId_PATCHDef.default.PATCH,
+      resolveChannel: userChannelResolver,
+    },
+    {
+      endpoint: vibe_agent_skills_create_POSTDef.default.POST,
+      resolveChannel: userChannelResolver,
+    },
+    {
+      endpoint: vibe_agent_skills_favorites_create_POSTDef.default.POST,
+      resolveChannel: userChannelResolver,
+    },
+    {
+      endpoint: vibe_agent_skills_favorites_GETDef.default.GET,
+      resolveChannel: userChannelResolver,
+    },
+    {
+      endpoint: vibe_agent_skills_favorites_id_DELETEDef.default.DELETE,
+      resolveChannel: userChannelResolver,
+    },
+    {
+      endpoint: vibe_agent_skills_favorites_id_PATCHDef.default.PATCH,
+      resolveChannel: userChannelResolver,
+    },
+    {
+      endpoint: vibe_agent_skills_favorites_reorder_POSTDef.default.POST,
+      resolveChannel: userChannelResolver,
+    },
+    {
+      endpoint: vibe_agent_skills_id_DELETEDef.default.DELETE,
+      resolveChannel: lazyResolveChannel(
+        () => import("@/vibe/agent/skills/[id]/route"),
+        "DELETE",
+      ),
+    },
+    {
+      endpoint: vibe_agent_skills_id_PATCHDef.default.PATCH,
+      resolveChannel: lazyResolveChannel(
+        () => import("@/vibe/agent/skills/[id]/route"),
+        "PATCH",
+      ),
+    },
+    {
+      endpoint: vibe_agent_skills_id_publish_PATCHDef.default.PATCH,
+      resolveChannel: lazyResolveChannel(
+        () => import("@/vibe/agent/skills/[id]/publish/route"),
+        "PATCH",
+      ),
+    },
+    {
+      endpoint: vibe_agent_skills_id_vote_POSTDef.default.POST,
+      resolveChannel: lazyResolveChannel(
+        () => import("@/vibe/agent/skills/[id]/vote/route"),
+        "POST",
+      ),
+    },
+    {
+      endpoint: vibe_realtime_remote_event_bridge_POSTDef.default.POST,
+      resolveChannel: userChannelResolver,
+    },
+    {
+      endpoint: vibe_tasks_cron_queue_GETDef.default.GET,
+      resolveChannel: userChannelResolver,
+    },
+    {
+      endpoint: vibe_tasks_cron_tasks_GETDef.default.GET,
       resolveChannel: userChannelResolver,
     },
   ];

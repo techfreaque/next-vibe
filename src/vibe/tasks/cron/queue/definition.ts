@@ -53,7 +53,7 @@ const CronQueueContainer = lazyWidget(() =>
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["system", "tasks", "cron", "queue"],
+  path: ["vibe", "tasks", "cron", "queue"],
   aliases: [CRON_QUEUE_ALIAS, "task-queue"],
   title: "get.title",
   titleShort: "get.titleShort",

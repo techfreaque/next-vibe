@@ -46,7 +46,7 @@ const AiRunWidget = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["agent", "ai-stream", "run"],
+  path: ["vibe", "agent", "ai-stream", "run"],
   aliases: [AI_RUN_ALIAS, "run-ai", "agent-run"],
   allowedRoles: [
     UserRole.ADMIN,

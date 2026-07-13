@@ -30,7 +30,7 @@ const DescribeVideoContainer = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["agent", "describe-video"],
+  path: ["vibe", "agent", "describe-video"],
   aliases: [DESCRIBE_VIDEO_ALIAS],
   allowedRoles: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.PUBLIC],
 

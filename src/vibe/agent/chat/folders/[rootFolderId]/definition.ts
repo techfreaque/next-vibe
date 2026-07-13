@@ -48,7 +48,7 @@ const FoldersListContainer = lazyWidget(() =>
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["agent", "chat", "folders", "[rootFolderId]"],
+  path: ["vibe", "agent", "chat", "folders", "[rootFolderId]"],
   aliases: ["folders-list", "folders"] as const,
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 

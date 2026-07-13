@@ -31,7 +31,7 @@ import { PULSE_EXECUTE_ALIAS } from "./constants";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "tasks", "pulse", "execute"],
+  path: ["vibe", "tasks", "pulse", "execute"],
   aliases: [PULSE_EXECUTE_ALIAS, "pulse:execute"],
   allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF],
 

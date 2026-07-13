@@ -27,7 +27,7 @@ const { POST } = createEndpoint({
   aliases: [ERROR_LOGS_ERRORS_ALIAS],
   method: Methods.POST,
   path: [
-    "system",
+    "vibe",
     "logger",
     "error-monitor",
     "data-sources",

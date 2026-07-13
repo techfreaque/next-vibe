@@ -15,7 +15,7 @@ const { POST } = createEndpoint({
   scopedTranslation,
   aliases: [CHAT_THREADS_CREATED_ALIAS],
   method: Methods.POST,
-  path: ["agent", "chat", "data-sources", "chat-threads-created"],
+  path: ["vibe", "agent", "chat", "data-sources", "chat-threads-created"],
   title: "post.title",
   titleShort: "post.titleShort",
   description: "post.description",

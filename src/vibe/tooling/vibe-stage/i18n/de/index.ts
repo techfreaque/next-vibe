@@ -16,7 +16,7 @@ export const translations: typeof enTranslations = {
       label: "Pfade einschränken",
       description:
         "Nur Kandidaten unter diesen Pfaden berücksichtigen. Leer lassen, um alle nicht-gestagten Änderungen zu scannen.",
-      placeholder: "z.B. src/app/api",
+      placeholder: "z.B. src",
     },
   },
 

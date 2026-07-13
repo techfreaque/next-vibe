@@ -56,486 +56,107 @@ async function importRouteHandler(
 ): Promise<GenericHandlerBase | null> {
   switch (path) {
     case "accounting-dashboard":
-      return (
-        await import("@/chart-of-accounts/dashboard/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/dashboard/route")).tools
+        .GET as GenericHandlerBase;
     case "agent-chat-threads":
-      return (await import("next-vibe/agent/chat/threads/route")).tools
+      return (await import("@/vibe/agent/chat/threads/route")).tools
         .GET as GenericHandlerBase;
     case "agent-run":
-      return (await import("next-vibe/agent/ai-stream/run/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/agent/ai-stream/run/route")).tools
+        .POST as GenericHandlerBase;
     case "agent-search-messages":
-      return (
-        await import("next-vibe/agent/chat/threads/search-messages/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/agent/chat/threads/search-messages/route"))
+        .tools.GET as GenericHandlerBase;
     case "agent-search-threads":
-      return (
-        await import("next-vibe/agent/chat/threads/search-threads/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/agent/chat/threads/search-threads/route"))
+        .tools.GET as GenericHandlerBase;
     case "agent-view-image":
-      return (await import("next-vibe/agent/view-image/route")).tools
+      return (await import("@/vibe/agent/view-image/route")).tools
         .POST as GenericHandlerBase;
-    case "agent_ai-stream_cancel_POST":
-      return (await import("next-vibe/agent/ai-stream/cancel/route"))
-        .tools.POST as GenericHandlerBase;
-    case "agent_ai-stream_run_POST":
-      return (await import("next-vibe/agent/ai-stream/run/route"))
-        .tools.POST as GenericHandlerBase;
-    case "agent_ai-stream_stream_POST":
-      return (await import("next-vibe/agent/ai-stream/stream/route"))
-        .tools.POST as GenericHandlerBase;
-    case "agent_ai-stream_system-prompt_debug_GET":
-      return (
-        await import("next-vibe/agent/ai-stream/system-prompt/debug/route")
-      ).tools.GET as GenericHandlerBase;
-    case "agent_ai-stream_ws-provider_models_GET":
-      return (
-        await import("next-vibe/agent/ai-stream/ws-provider/models/route")
-      ).tools.GET as GenericHandlerBase;
-    case "agent_chat_data-sources_chat-downvotes-total_POST":
-      return (
-        await import("next-vibe/agent/chat/data-sources/chat-downvotes-total/route")
-      ).tools.POST as GenericHandlerBase;
-    case "agent_chat_data-sources_chat-errors-total_POST":
-      return (
-        await import("next-vibe/agent/chat/data-sources/chat-errors-total/route")
-      ).tools.POST as GenericHandlerBase;
-    case "agent_chat_data-sources_chat-memories-created_POST":
-      return (
-        await import("next-vibe/agent/chat/data-sources/chat-memories-created/route")
-      ).tools.POST as GenericHandlerBase;
-    case "agent_chat_data-sources_chat-messages-by-ai_POST":
-      return (
-        await import("next-vibe/agent/chat/data-sources/chat-messages-by-ai/route")
-      ).tools.POST as GenericHandlerBase;
-    case "agent_chat_data-sources_chat-messages-by-user_POST":
-      return (
-        await import("next-vibe/agent/chat/data-sources/chat-messages-by-user/route")
-      ).tools.POST as GenericHandlerBase;
-    case "agent_chat_data-sources_chat-messages-total_POST":
-      return (
-        await import("next-vibe/agent/chat/data-sources/chat-messages-total/route")
-      ).tools.POST as GenericHandlerBase;
-    case "agent_chat_data-sources_chat-messages-with-attachments_POST":
-      return (
-        await import("next-vibe/agent/chat/data-sources/chat-messages-with-attachments/route")
-      ).tools.POST as GenericHandlerBase;
-    case "agent_chat_data-sources_chat-share-links-created_POST":
-      return (
-        await import("next-vibe/agent/chat/data-sources/chat-share-links-created/route")
-      ).tools.POST as GenericHandlerBase;
-    case "agent_chat_data-sources_chat-threads-active-total_POST":
-      return (
-        await import("next-vibe/agent/chat/data-sources/chat-threads-active-total/route")
-      ).tools.POST as GenericHandlerBase;
-    case "agent_chat_data-sources_chat-threads-created_POST":
-      return (
-        await import("next-vibe/agent/chat/data-sources/chat-threads-created/route")
-      ).tools.POST as GenericHandlerBase;
-    case "agent_chat_data-sources_chat-tool-calls-total_POST":
-      return (
-        await import("next-vibe/agent/chat/data-sources/chat-tool-calls-total/route")
-      ).tools.POST as GenericHandlerBase;
-    case "agent_chat_data-sources_chat-unique-users_POST":
-      return (
-        await import("next-vibe/agent/chat/data-sources/chat-unique-users/route")
-      ).tools.POST as GenericHandlerBase;
-    case "agent_chat_data-sources_chat-upvotes-total_POST":
-      return (
-        await import("next-vibe/agent/chat/data-sources/chat-upvotes-total/route")
-      ).tools.POST as GenericHandlerBase;
-    case "agent_chat_folder-contents_rootFolderId_GET":
-      return (
-        await import("next-vibe/agent/chat/folder-contents/[rootFolderId]/route")
-      ).tools.GET as GenericHandlerBase;
-    case "agent_chat_folders_rootFolderId_GET":
-      return (
-        await import("next-vibe/agent/chat/folders/[rootFolderId]/route")
-      ).tools.GET as GenericHandlerBase;
-    case "agent_chat_folders_rootFolderId_create_POST":
-      return (
-        await import("next-vibe/agent/chat/folders/[rootFolderId]/create/route")
-      ).tools.POST as GenericHandlerBase;
-    case "agent_chat_folders_rootFolderId_root-permissions_GET":
-      return (
-        await import("next-vibe/agent/chat/folders/[rootFolderId]/root-permissions/route")
-      ).tools.GET as GenericHandlerBase;
-    case "agent_chat_folders_subfolders_subFolderId_DELETE":
-      return (
-        await import("next-vibe/agent/chat/folders/subfolders/[subFolderId]/route")
-      ).tools.DELETE as GenericHandlerBase;
-    case "agent_chat_folders_subfolders_subFolderId_GET":
-      return (
-        await import("next-vibe/agent/chat/folders/subfolders/[subFolderId]/route")
-      ).tools.GET as GenericHandlerBase;
-    case "agent_chat_folders_subfolders_subFolderId_move_PATCH":
-      return (
-        await import("next-vibe/agent/chat/folders/subfolders/[subFolderId]/move/route")
-      ).tools.PATCH as GenericHandlerBase;
-    case "agent_chat_folders_subfolders_subFolderId_permissions_GET":
-      return (
-        await import("next-vibe/agent/chat/folders/subfolders/[subFolderId]/permissions/route")
-      ).tools.GET as GenericHandlerBase;
-    case "agent_chat_folders_subfolders_subFolderId_permissions_PATCH":
-      return (
-        await import("next-vibe/agent/chat/folders/subfolders/[subFolderId]/permissions/route")
-      ).tools.PATCH as GenericHandlerBase;
-    case "agent_chat_folders_subfolders_subFolderId_rename_PATCH":
-      return (
-        await import("next-vibe/agent/chat/folders/subfolders/[subFolderId]/rename/route")
-      ).tools.PATCH as GenericHandlerBase;
-    case "agent_chat_folders_subfolders_subFolderId_update_PATCH":
-      return (
-        await import("next-vibe/agent/chat/folders/subfolders/[subFolderId]/update/route")
-      ).tools.PATCH as GenericHandlerBase;
-    case "agent_chat_public-feed_GET":
-      return (await import("next-vibe/agent/chat/public-feed/route"))
-        .tools.GET as GenericHandlerBase;
-    case "agent_chat_settings_GET":
-      return (await import("next-vibe/agent/chat/settings/route"))
-        .tools.GET as GenericHandlerBase;
-    case "agent_chat_settings_POST":
-      return (await import("next-vibe/agent/chat/settings/route"))
-        .tools.POST as GenericHandlerBase;
-    case "agent_chat_threads_GET":
-      return (await import("next-vibe/agent/chat/threads/route")).tools
-        .GET as GenericHandlerBase;
-    case "agent_chat_threads_POST":
-      return (await import("next-vibe/agent/chat/threads/route")).tools
-        .POST as GenericHandlerBase;
-    case "agent_chat_threads_files_threadId_filename_GET":
-      return (
-        await import("next-vibe/agent/chat/threads/files/[threadId]/[filename]/route")
-      ).tools.GET as GenericHandlerBase;
-    case "agent_chat_threads_rename_PATCH":
-      return (
-        await import("next-vibe/agent/chat/threads/rename/route")
-      ).tools.PATCH as GenericHandlerBase;
-    case "agent_chat_threads_search-messages_GET":
-      return (
-        await import("next-vibe/agent/chat/threads/search-messages/route")
-      ).tools.GET as GenericHandlerBase;
-    case "agent_chat_threads_search-threads_GET":
-      return (
-        await import("next-vibe/agent/chat/threads/search-threads/route")
-      ).tools.GET as GenericHandlerBase;
-    case "agent_chat_threads_threadId_DELETE":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/route")
-      ).tools.DELETE as GenericHandlerBase;
-    case "agent_chat_threads_threadId_GET":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/route")
-      ).tools.GET as GenericHandlerBase;
-    case "agent_chat_threads_threadId_PATCH":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/route")
-      ).tools.PATCH as GenericHandlerBase;
-    case "agent_chat_threads_threadId_messages_GET":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/messages/route")
-      ).tools.GET as GenericHandlerBase;
-    case "agent_chat_threads_threadId_messages_POST":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/messages/route")
-      ).tools.POST as GenericHandlerBase;
-    case "agent_chat_threads_threadId_messages_messageId_DELETE":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/messages/[messageId]/route")
-      ).tools.DELETE as GenericHandlerBase;
-    case "agent_chat_threads_threadId_messages_messageId_GET":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/messages/[messageId]/route")
-      ).tools.GET as GenericHandlerBase;
-    case "agent_chat_threads_threadId_messages_messageId_PATCH":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/messages/[messageId]/route")
-      ).tools.PATCH as GenericHandlerBase;
-    case "agent_chat_threads_threadId_messages_messageId_vote_POST":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/messages/[messageId]/vote/route")
-      ).tools.POST as GenericHandlerBase;
-    case "agent_chat_threads_threadId_messages_path_GET":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/messages/path/route")
-      ).tools.GET as GenericHandlerBase;
-    case "agent_chat_threads_threadId_messages_search_GET":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/messages/search/route")
-      ).tools.GET as GenericHandlerBase;
-    case "agent_chat_threads_threadId_permissions_GET":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/permissions/route")
-      ).tools.GET as GenericHandlerBase;
-    case "agent_chat_threads_threadId_permissions_PATCH":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/permissions/route")
-      ).tools.PATCH as GenericHandlerBase;
-    case "agent_chat_threads_threadId_share-links_DELETE":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/share-links/route")
-      ).tools.DELETE as GenericHandlerBase;
-    case "agent_chat_threads_threadId_share-links_GET":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/share-links/route")
-      ).tools.GET as GenericHandlerBase;
-    case "agent_chat_threads_threadId_share-links_PATCH":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/share-links/route")
-      ).tools.PATCH as GenericHandlerBase;
-    case "agent_chat_threads_threadId_share-links_POST":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/share-links/route")
-      ).tools.POST as GenericHandlerBase;
-    case "agent_coding-agent_POST":
-      return (await import("next-vibe/agent/coding-agent/route")).tools
-        .POST as GenericHandlerBase;
-    case "agent_cortex_delete_DELETE":
-      return (await import("next-vibe/agent/cortex/delete/route"))
-        .tools.DELETE as GenericHandlerBase;
-    case "agent_cortex_edit_PATCH":
-      return (await import("next-vibe/agent/cortex/edit/route")).tools
-        .PATCH as GenericHandlerBase;
-    case "agent_cortex_embeddings_backfill_POST":
-      return (
-        await import("next-vibe/agent/cortex/embeddings/backfill/route")
-      ).tools.POST as GenericHandlerBase;
-    case "agent_cortex_exec_POST":
-      return (await import("next-vibe/agent/cortex/exec/route")).tools
-        .POST as GenericHandlerBase;
-    case "agent_cortex_list_GET":
-      return (await import("next-vibe/agent/cortex/list/route")).tools
-        .GET as GenericHandlerBase;
-    case "agent_cortex_mkdir_POST":
-      return (await import("next-vibe/agent/cortex/mkdir/route")).tools
-        .POST as GenericHandlerBase;
-    case "agent_cortex_move_POST":
-      return (await import("next-vibe/agent/cortex/move/route")).tools
-        .POST as GenericHandlerBase;
-    case "agent_cortex_read_GET":
-      return (await import("next-vibe/agent/cortex/read/route")).tools
-        .GET as GenericHandlerBase;
-    case "agent_cortex_search_GET":
-      return (await import("next-vibe/agent/cortex/search/route"))
-        .tools.GET as GenericHandlerBase;
-    case "agent_cortex_terminals_GET":
-      return (await import("next-vibe/agent/cortex/terminals/route"))
-        .tools.GET as GenericHandlerBase;
-    case "agent_cortex_tree_GET":
-      return (await import("next-vibe/agent/cortex/tree/route")).tools
-        .GET as GenericHandlerBase;
-    case "agent_cortex_write_POST":
-      return (await import("next-vibe/agent/cortex/write/route")).tools
-        .POST as GenericHandlerBase;
-    case "agent_describe-image_POST":
-      return (await import("next-vibe/agent/describe-image/route"))
-        .tools.POST as GenericHandlerBase;
-    case "agent_describe-video_POST":
-      return (await import("next-vibe/agent/describe-video/route"))
-        .tools.POST as GenericHandlerBase;
-    case "agent_fetch-url-content_GET":
-      return (await import("next-vibe/agent/fetch-url-content/route"))
-        .tools.GET as GenericHandlerBase;
-    case "agent_fetch-url-content_cleanup_POST":
-      return (
-        await import("next-vibe/agent/fetch-url-content/cleanup/route")
-      ).tools.POST as GenericHandlerBase;
-    case "agent_image-generation_POST":
-      return (await import("next-vibe/agent/image-generation/route"))
-        .tools.POST as GenericHandlerBase;
-    case "agent_models_list_GET":
-      return (await import("next-vibe/agent/models/list/route")).tools
-        .GET as GenericHandlerBase;
-    case "agent_models_model-prices_GET":
-      return (
-        await import("next-vibe/agent/models/model-prices/route")
-      ).tools.GET as GenericHandlerBase;
-    case "agent_music-generation_POST":
-      return (await import("next-vibe/agent/music-generation/route"))
-        .tools.POST as GenericHandlerBase;
-    case "agent_skills_GET":
-      return (await import("next-vibe/agent/skills/route")).tools
-        .GET as GenericHandlerBase;
-    case "agent_skills_create_POST":
-      return (await import("next-vibe/agent/skills/create/route"))
-        .tools.POST as GenericHandlerBase;
-    case "agent_skills_favorites_GET":
-      return (await import("next-vibe/agent/skills/favorites/route"))
-        .tools.GET as GenericHandlerBase;
-    case "agent_skills_favorites_create_POST":
-      return (
-        await import("next-vibe/agent/skills/favorites/create/route")
-      ).tools.POST as GenericHandlerBase;
-    case "agent_skills_favorites_id_DELETE":
-      return (
-        await import("next-vibe/agent/skills/favorites/[id]/route")
-      ).tools.DELETE as GenericHandlerBase;
-    case "agent_skills_favorites_id_GET":
-      return (
-        await import("next-vibe/agent/skills/favorites/[id]/route")
-      ).tools.GET as GenericHandlerBase;
-    case "agent_skills_favorites_id_PATCH":
-      return (
-        await import("next-vibe/agent/skills/favorites/[id]/route")
-      ).tools.PATCH as GenericHandlerBase;
-    case "agent_skills_favorites_reorder_POST":
-      return (
-        await import("next-vibe/agent/skills/favorites/reorder/route")
-      ).tools.POST as GenericHandlerBase;
-    case "agent_skills_id_DELETE":
-      return (await import("next-vibe/agent/skills/[id]/route")).tools
-        .DELETE as GenericHandlerBase;
-    case "agent_skills_id_GET":
-      return (await import("next-vibe/agent/skills/[id]/route")).tools
-        .GET as GenericHandlerBase;
-    case "agent_skills_id_PATCH":
-      return (await import("next-vibe/agent/skills/[id]/route")).tools
-        .PATCH as GenericHandlerBase;
-    case "agent_skills_id_publish_PATCH":
-      return (
-        await import("next-vibe/agent/skills/[id]/publish/route")
-      ).tools.PATCH as GenericHandlerBase;
-    case "agent_skills_id_report_POST":
-      return (await import("next-vibe/agent/skills/[id]/report/route"))
-        .tools.POST as GenericHandlerBase;
-    case "agent_skills_id_vote_POST":
-      return (await import("next-vibe/agent/skills/[id]/vote/route"))
-        .tools.POST as GenericHandlerBase;
-    case "agent_skills_moderation_GET":
-      return (await import("next-vibe/agent/skills/moderation/route"))
-        .tools.GET as GenericHandlerBase;
-    case "agent_skills_moderation_PATCH":
-      return (await import("next-vibe/agent/skills/moderation/route"))
-        .tools.PATCH as GenericHandlerBase;
-    case "agent_speech-to-text_POST":
-      return (await import("next-vibe/agent/speech-to-text/route"))
-        .tools.POST as GenericHandlerBase;
-    case "agent_speech-to-text_hotkey_POST":
-      return (
-        await import("next-vibe/agent/speech-to-text/hotkey/route")
-      ).tools.POST as GenericHandlerBase;
-    case "agent_text-to-speech_POST":
-      return (await import("next-vibe/agent/text-to-speech/route"))
-        .tools.POST as GenericHandlerBase;
-    case "agent_video-generation_POST":
-      return (await import("next-vibe/agent/video-generation/route"))
-        .tools.POST as GenericHandlerBase;
-    case "agent_view-image_POST":
-      return (await import("next-vibe/agent/view-image/route")).tools
-        .POST as GenericHandlerBase;
-    case "agent_web-search_GET":
-      return (await import("next-vibe/agent/web-search/route")).tools
-        .GET as GenericHandlerBase;
-    case "agent_web-search_brave_GET":
-      return (await import("next-vibe/agent/web-search/brave/route"))
-        .tools.GET as GenericHandlerBase;
-    case "agent_web-search_kagi_GET":
-      return (await import("next-vibe/agent/web-search/kagi/route"))
-        .tools.GET as GenericHandlerBase;
     case "ai-run":
-      return (await import("next-vibe/agent/ai-stream/run/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/agent/ai-stream/run/route")).tools
+        .POST as GenericHandlerBase;
     case "ai-stream":
-      return (await import("next-vibe/agent/ai-stream/stream/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/agent/ai-stream/stream/route")).tools
+        .POST as GenericHandlerBase;
     case "ai-tools":
-      return (await import("next-vibe/help-tool/route")).tools
+      return (await import("@/vibe/help-tool/route")).tools
         .GET as GenericHandlerBase;
     case "analytics_evaluators_and_POST":
-      return (await import("@/analytics/evaluators/and/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/evaluators/and/route")).tools
+        .POST as GenericHandlerBase;
     case "analytics_evaluators_crossover_POST":
-      return (
-        await import("@/analytics/evaluators/crossover/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/evaluators/crossover/route")).tools
+        .POST as GenericHandlerBase;
     case "analytics_evaluators_not_POST":
-      return (await import("@/analytics/evaluators/not/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/evaluators/not/route")).tools
+        .POST as GenericHandlerBase;
     case "analytics_evaluators_or_POST":
-      return (await import("@/analytics/evaluators/or/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/evaluators/or/route")).tools
+        .POST as GenericHandlerBase;
     case "analytics_evaluators_script_POST":
-      return (
-        await import("@/analytics/evaluators/script/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/evaluators/script/route")).tools
+        .POST as GenericHandlerBase;
     case "analytics_evaluators_threshold_POST":
-      return (
-        await import("@/analytics/evaluators/threshold/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/evaluators/threshold/route")).tools
+        .POST as GenericHandlerBase;
     case "analytics_indicators_bollinger_POST":
-      return (
-        await import("@/analytics/indicators/bollinger/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/indicators/bollinger/route")).tools
+        .POST as GenericHandlerBase;
     case "analytics_indicators_clamp_POST":
-      return (
-        await import("@/analytics/indicators/clamp/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/indicators/clamp/route")).tools
+        .POST as GenericHandlerBase;
     case "analytics_indicators_delta_POST":
-      return (
-        await import("@/analytics/indicators/delta/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/indicators/delta/route")).tools
+        .POST as GenericHandlerBase;
     case "analytics_indicators_ema_POST":
-      return (await import("@/analytics/indicators/ema/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/indicators/ema/route")).tools
+        .POST as GenericHandlerBase;
     case "analytics_indicators_macd_POST":
-      return (
-        await import("@/analytics/indicators/macd/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/indicators/macd/route")).tools
+        .POST as GenericHandlerBase;
     case "analytics_indicators_rsi_POST":
-      return (await import("@/analytics/indicators/rsi/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/indicators/rsi/route")).tools
+        .POST as GenericHandlerBase;
     case "analytics_indicators_window-avg_POST":
-      return (
-        await import("@/analytics/indicators/window-avg/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/indicators/window-avg/route")).tools
+        .POST as GenericHandlerBase;
     case "analytics_indicators_window-max_POST":
-      return (
-        await import("@/analytics/indicators/window-max/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/indicators/window-max/route")).tools
+        .POST as GenericHandlerBase;
     case "analytics_indicators_window-min_POST":
-      return (
-        await import("@/analytics/indicators/window-min/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/indicators/window-min/route")).tools
+        .POST as GenericHandlerBase;
     case "analytics_indicators_window-sum_POST":
-      return (
-        await import("@/analytics/indicators/window-sum/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/indicators/window-sum/route")).tools
+        .POST as GenericHandlerBase;
     case "analytics_transformers_field-pick_POST":
-      return (
-        await import("@/analytics/transformers/field-pick/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/transformers/field-pick/route")).tools
+        .POST as GenericHandlerBase;
     case "analytics_transformers_json-path_POST":
-      return (
-        await import("@/analytics/transformers/json-path/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/transformers/json-path/route")).tools
+        .POST as GenericHandlerBase;
     case "analytics_transformers_merge_POST":
-      return (
-        await import("@/analytics/transformers/merge/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/transformers/merge/route")).tools
+        .POST as GenericHandlerBase;
     case "analytics_transformers_ratio_POST":
-      return (
-        await import("@/analytics/transformers/ratio/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/transformers/ratio/route")).tools
+        .POST as GenericHandlerBase;
     case "analytics_transformers_script_POST":
-      return (
-        await import("@/analytics/transformers/script/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/transformers/script/route")).tools
+        .POST as GenericHandlerBase;
     case "await-task":
-      return (
-        await import("next-vibe/execute-tool/await-task/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/execute-tool/await-task/route")).tools
+        .POST as GenericHandlerBase;
     case "b":
-      return (
-        await import("next-vibe/server/server/build/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/server/server/build/route")).tools
+        .POST as GenericHandlerBase;
     case "bounce-processor":
-      return (
-        await import("@/leads/campaigns/bounce-processor/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/campaigns/bounce-processor/route")).tools
+        .POST as GenericHandlerBase;
     case "brave-search":
-      return (await import("next-vibe/agent/web-search/brave/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/agent/web-search/brave/route")).tools
+        .GET as GenericHandlerBase;
     case "browser-click":
       return (await import("@/browser/click/route")).tools
         .POST as GenericHandlerBase;
@@ -549,8 +170,8 @@ async function importRouteHandler(
       return (await import("@/browser/emulate/route")).tools
         .POST as GenericHandlerBase;
     case "browser-eval":
-      return (await import("@/browser/evaluate-script/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/browser/evaluate-script/route")).tools
+        .POST as GenericHandlerBase;
     case "browser-fill":
       return (await import("@/browser/fill/route")).tools
         .POST as GenericHandlerBase;
@@ -558,66 +179,59 @@ async function importRouteHandler(
       return (await import("@/browser/fill-form/route")).tools
         .POST as GenericHandlerBase;
     case "browser-get-console-message":
-      return (
-        await import("@/browser/get-console-message/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/browser/get-console-message/route")).tools
+        .POST as GenericHandlerBase;
     case "browser-get-network-request":
-      return (
-        await import("@/browser/get-network-request/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/browser/get-network-request/route")).tools
+        .POST as GenericHandlerBase;
     case "browser-handle-dialog":
-      return (await import("@/browser/handle-dialog/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/browser/handle-dialog/route")).tools
+        .POST as GenericHandlerBase;
     case "browser-hover":
       return (await import("@/browser/hover/route")).tools
         .POST as GenericHandlerBase;
     case "browser-list-console-messages":
-      return (
-        await import("@/browser/list-console-messages/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/browser/list-console-messages/route")).tools
+        .POST as GenericHandlerBase;
     case "browser-list-network-requests":
-      return (
-        await import("@/browser/list-network-requests/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/browser/list-network-requests/route")).tools
+        .POST as GenericHandlerBase;
     case "browser-list-pages":
       return (await import("@/browser/list-pages/route")).tools
         .POST as GenericHandlerBase;
     case "browser-navigate-page":
-      return (await import("@/browser/navigate-page/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/browser/navigate-page/route")).tools
+        .POST as GenericHandlerBase;
     case "browser-new-page":
       return (await import("@/browser/new-page/route")).tools
         .POST as GenericHandlerBase;
     case "browser-performance-analyze-insight":
-      return (
-        await import("@/browser/performance-analyze-insight/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/browser/performance-analyze-insight/route")).tools
+        .POST as GenericHandlerBase;
     case "browser-performance-start-trace":
-      return (
-        await import("@/browser/performance-start-trace/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/browser/performance-start-trace/route")).tools
+        .POST as GenericHandlerBase;
     case "browser-performance-stop-trace":
-      return (
-        await import("@/browser/performance-stop-trace/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/browser/performance-stop-trace/route")).tools
+        .POST as GenericHandlerBase;
     case "browser-press-key":
       return (await import("@/browser/press-key/route")).tools
         .POST as GenericHandlerBase;
     case "browser-resize-page":
-      return (await import("@/browser/resize-page/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/browser/resize-page/route")).tools
+        .POST as GenericHandlerBase;
     case "browser-screenshot":
-      return (await import("@/browser/take-screenshot/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/browser/take-screenshot/route")).tools
+        .POST as GenericHandlerBase;
     case "browser-select-page":
-      return (await import("@/browser/select-page/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/browser/select-page/route")).tools
+        .POST as GenericHandlerBase;
     case "browser-take-snapshot":
-      return (await import("@/browser/take-snapshot/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/browser/take-snapshot/route")).tools
+        .POST as GenericHandlerBase;
     case "browser-upload-file":
-      return (await import("@/browser/upload-file/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/browser/upload-file/route")).tools
+        .POST as GenericHandlerBase;
     case "browser-wait-for":
       return (await import("@/browser/wait-for/route")).tools
         .POST as GenericHandlerBase;
@@ -634,8 +248,8 @@ async function importRouteHandler(
       return (await import("@/browser/emulate/route")).tools
         .POST as GenericHandlerBase;
     case "browser_evaluate-script_POST":
-      return (await import("@/browser/evaluate-script/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/browser/evaluate-script/route")).tools
+        .POST as GenericHandlerBase;
     case "browser_fill-form_POST":
       return (await import("@/browser/fill-form/route")).tools
         .POST as GenericHandlerBase;
@@ -643,114 +257,102 @@ async function importRouteHandler(
       return (await import("@/browser/fill/route")).tools
         .POST as GenericHandlerBase;
     case "browser_get-console-message_POST":
-      return (
-        await import("@/browser/get-console-message/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/browser/get-console-message/route")).tools
+        .POST as GenericHandlerBase;
     case "browser_get-network-request_POST":
-      return (
-        await import("@/browser/get-network-request/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/browser/get-network-request/route")).tools
+        .POST as GenericHandlerBase;
     case "browser_handle-dialog_POST":
-      return (await import("@/browser/handle-dialog/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/browser/handle-dialog/route")).tools
+        .POST as GenericHandlerBase;
     case "browser_hover_POST":
       return (await import("@/browser/hover/route")).tools
         .POST as GenericHandlerBase;
     case "browser_list-console-messages_POST":
-      return (
-        await import("@/browser/list-console-messages/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/browser/list-console-messages/route")).tools
+        .POST as GenericHandlerBase;
     case "browser_list-network-requests_POST":
-      return (
-        await import("@/browser/list-network-requests/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/browser/list-network-requests/route")).tools
+        .POST as GenericHandlerBase;
     case "browser_list-pages_POST":
       return (await import("@/browser/list-pages/route")).tools
         .POST as GenericHandlerBase;
     case "browser_navigate-page_POST":
-      return (await import("@/browser/navigate-page/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/browser/navigate-page/route")).tools
+        .POST as GenericHandlerBase;
     case "browser_new-page_POST":
       return (await import("@/browser/new-page/route")).tools
         .POST as GenericHandlerBase;
     case "browser_performance-analyze-insight_POST":
-      return (
-        await import("@/browser/performance-analyze-insight/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/browser/performance-analyze-insight/route")).tools
+        .POST as GenericHandlerBase;
     case "browser_performance-start-trace_POST":
-      return (
-        await import("@/browser/performance-start-trace/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/browser/performance-start-trace/route")).tools
+        .POST as GenericHandlerBase;
     case "browser_performance-stop-trace_POST":
-      return (
-        await import("@/browser/performance-stop-trace/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/browser/performance-stop-trace/route")).tools
+        .POST as GenericHandlerBase;
     case "browser_press-key_POST":
       return (await import("@/browser/press-key/route")).tools
         .POST as GenericHandlerBase;
     case "browser_resize-page_POST":
-      return (await import("@/browser/resize-page/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/browser/resize-page/route")).tools
+        .POST as GenericHandlerBase;
     case "browser_select-page_POST":
-      return (await import("@/browser/select-page/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/browser/select-page/route")).tools
+        .POST as GenericHandlerBase;
     case "browser_take-screenshot_POST":
-      return (await import("@/browser/take-screenshot/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/browser/take-screenshot/route")).tools
+        .POST as GenericHandlerBase;
     case "browser_take-snapshot_POST":
-      return (await import("@/browser/take-snapshot/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/browser/take-snapshot/route")).tools
+        .POST as GenericHandlerBase;
     case "browser_upload-file_POST":
-      return (await import("@/browser/upload-file/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/browser/upload-file/route")).tools
+        .POST as GenericHandlerBase;
     case "browser_wait-for_POST":
       return (await import("@/browser/wait-for/route")).tools
         .POST as GenericHandlerBase;
     case "build":
-      return (
-        await import("next-vibe/server/server/build/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/server/server/build/route")).tools
+        .POST as GenericHandlerBase;
     case "builder":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/builder/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/builder/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "c":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/vibe-check/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/vibe-check/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "campaign-journey-variants":
-      return (
-        await import("@/leads/campaigns/journey-variants/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/leads/campaigns/journey-variants/route")).tools
+        .GET as GenericHandlerBase;
     case "campaign-queue":
-      return (await import("@/leads/campaigns/queue/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/leads/campaigns/queue/route")).tools
+        .GET as GenericHandlerBase;
     case "campaign-starter":
-      return (
-        await import("@/leads/campaigns/campaign-starter/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/campaigns/campaign-starter/route")).tools
+        .POST as GenericHandlerBase;
     case "campaign-stats":
-      return (await import("@/leads/campaigns/stats/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/leads/campaigns/stats/route")).tools
+        .GET as GenericHandlerBase;
     case "cancel":
-      return (
-        await import("next-vibe/execute-tool/call-control/cancel/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/execute-tool/call-control/cancel/route"))
+        .tools.POST as GenericHandlerBase;
     case "cancel-subscription":
-      return (await import("@/subscription/cancel/route"))
-        .tools.DELETE as GenericHandlerBase;
+      return (await import("@/subscription/cancel/route")).tools
+        .DELETE as GenericHandlerBase;
     case "catalog-product-get":
-      return (
-        await import("@/products/catalog/[productId]/get/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/products/catalog/[productId]/get/route")).tools
+        .GET as GenericHandlerBase;
     case "cc":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/config/create/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/config/create/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "chart-of-accounts_account_accountId_deactivate_POST":
@@ -758,270 +360,232 @@ async function importRouteHandler(
         await import("@/chart-of-accounts/account/[accountId]/deactivate/route")
       ).tools.POST as GenericHandlerBase;
     case "chart-of-accounts_account_accountId_get_GET":
-      return (
-        await import("@/chart-of-accounts/account/[accountId]/get/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/account/[accountId]/get/route"))
+        .tools.GET as GenericHandlerBase;
     case "chart-of-accounts_account_accountId_update_PATCH":
       return (
         await import("@/chart-of-accounts/account/[accountId]/update/route")
       ).tools.PATCH as GenericHandlerBase;
     case "chart-of-accounts_account_create_POST":
-      return (
-        await import("@/chart-of-accounts/account/create/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/account/create/route")).tools
+        .POST as GenericHandlerBase;
     case "chart-of-accounts_account_list_GET":
-      return (
-        await import("@/chart-of-accounts/account/list/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/account/list/route")).tools
+        .GET as GenericHandlerBase;
     case "chart-of-accounts_dashboard_GET":
-      return (
-        await import("@/chart-of-accounts/dashboard/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/dashboard/route")).tools
+        .GET as GenericHandlerBase;
     case "chart-of-accounts_journal_create_POST":
-      return (
-        await import("@/chart-of-accounts/journal/create/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/journal/create/route")).tools
+        .POST as GenericHandlerBase;
     case "chart-of-accounts_journal_entryId_get_GET":
-      return (
-        await import("@/chart-of-accounts/journal/[entryId]/get/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/journal/[entryId]/get/route"))
+        .tools.GET as GenericHandlerBase;
     case "chart-of-accounts_journal_entryId_post_POST":
-      return (
-        await import("@/chart-of-accounts/journal/[entryId]/post/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/journal/[entryId]/post/route"))
+        .tools.POST as GenericHandlerBase;
     case "chart-of-accounts_journal_entryId_reverse_POST":
       return (
         await import("@/chart-of-accounts/journal/[entryId]/reverse/route")
       ).tools.POST as GenericHandlerBase;
     case "chart-of-accounts_journal_list_GET":
-      return (
-        await import("@/chart-of-accounts/journal/list/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/journal/list/route")).tools
+        .GET as GenericHandlerBase;
     case "chart-of-accounts_ledger_accountId_GET":
-      return (
-        await import("@/chart-of-accounts/ledger/[accountId]/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/ledger/[accountId]/route"))
+        .tools.GET as GenericHandlerBase;
     case "chart-of-accounts_period_create_POST":
-      return (
-        await import("@/chart-of-accounts/period/create/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/period/create/route")).tools
+        .POST as GenericHandlerBase;
     case "chart-of-accounts_period_list_GET":
-      return (
-        await import("@/chart-of-accounts/period/list/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/period/list/route")).tools
+        .GET as GenericHandlerBase;
     case "chart-of-accounts_period_periodId_close_POST":
-      return (
-        await import("@/chart-of-accounts/period/[periodId]/close/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/period/[periodId]/close/route"))
+        .tools.POST as GenericHandlerBase;
     case "chart-of-accounts_period_periodId_get_GET":
-      return (
-        await import("@/chart-of-accounts/period/[periodId]/get/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/period/[periodId]/get/route"))
+        .tools.GET as GenericHandlerBase;
     case "chart-of-accounts_reports_balance-sheet_GET":
-      return (
-        await import("@/chart-of-accounts/reports/balance-sheet/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/reports/balance-sheet/route"))
+        .tools.GET as GenericHandlerBase;
     case "chart-of-accounts_reports_profit-loss_GET":
-      return (
-        await import("@/chart-of-accounts/reports/profit-loss/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/reports/profit-loss/route"))
+        .tools.GET as GenericHandlerBase;
     case "chart-of-accounts_reports_receivables-aging_GET":
       return (
         await import("@/chart-of-accounts/reports/receivables-aging/route")
       ).tools.GET as GenericHandlerBase;
     case "chart-of-accounts_reports_tax-report_GET":
-      return (
-        await import("@/chart-of-accounts/reports/tax-report/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/reports/tax-report/route"))
+        .tools.GET as GenericHandlerBase;
     case "chart-of-accounts_reports_trial-balance_GET":
-      return (
-        await import("@/chart-of-accounts/reports/trial-balance/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/reports/trial-balance/route"))
+        .tools.GET as GenericHandlerBase;
     case "chart-of-accounts_setup_POST":
-      return (await import("@/chart-of-accounts/setup/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/setup/route")).tools
+        .POST as GenericHandlerBase;
     case "chat-downvotes-total":
       return (
-        await import("next-vibe/agent/chat/data-sources/chat-downvotes-total/route")
+        await import("@/vibe/agent/chat/data-sources/chat-downvotes-total/route")
       ).tools.POST as GenericHandlerBase;
     case "chat-errors-total":
       return (
-        await import("next-vibe/agent/chat/data-sources/chat-errors-total/route")
+        await import("@/vibe/agent/chat/data-sources/chat-errors-total/route")
       ).tools.POST as GenericHandlerBase;
     case "chat-memories-created":
       return (
-        await import("next-vibe/agent/chat/data-sources/chat-memories-created/route")
+        await import("@/vibe/agent/chat/data-sources/chat-memories-created/route")
       ).tools.POST as GenericHandlerBase;
     case "chat-messages-by-ai":
       return (
-        await import("next-vibe/agent/chat/data-sources/chat-messages-by-ai/route")
+        await import("@/vibe/agent/chat/data-sources/chat-messages-by-ai/route")
       ).tools.POST as GenericHandlerBase;
     case "chat-messages-by-user":
       return (
-        await import("next-vibe/agent/chat/data-sources/chat-messages-by-user/route")
+        await import("@/vibe/agent/chat/data-sources/chat-messages-by-user/route")
       ).tools.POST as GenericHandlerBase;
     case "chat-messages-total":
       return (
-        await import("next-vibe/agent/chat/data-sources/chat-messages-total/route")
+        await import("@/vibe/agent/chat/data-sources/chat-messages-total/route")
       ).tools.POST as GenericHandlerBase;
     case "chat-messages-with-attachments":
       return (
-        await import("next-vibe/agent/chat/data-sources/chat-messages-with-attachments/route")
+        await import("@/vibe/agent/chat/data-sources/chat-messages-with-attachments/route")
       ).tools.POST as GenericHandlerBase;
     case "chat-settings":
-      return (await import("next-vibe/agent/chat/settings/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/agent/chat/settings/route")).tools
+        .GET as GenericHandlerBase;
     case "chat-settings-update":
-      return (await import("next-vibe/agent/chat/settings/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/agent/chat/settings/route")).tools
+        .POST as GenericHandlerBase;
     case "chat-share-links-created":
       return (
-        await import("next-vibe/agent/chat/data-sources/chat-share-links-created/route")
+        await import("@/vibe/agent/chat/data-sources/chat-share-links-created/route")
       ).tools.POST as GenericHandlerBase;
     case "chat-threads-active-total":
       return (
-        await import("next-vibe/agent/chat/data-sources/chat-threads-active-total/route")
+        await import("@/vibe/agent/chat/data-sources/chat-threads-active-total/route")
       ).tools.POST as GenericHandlerBase;
     case "chat-threads-created":
       return (
-        await import("next-vibe/agent/chat/data-sources/chat-threads-created/route")
+        await import("@/vibe/agent/chat/data-sources/chat-threads-created/route")
       ).tools.POST as GenericHandlerBase;
     case "chat-tool-calls-total":
       return (
-        await import("next-vibe/agent/chat/data-sources/chat-tool-calls-total/route")
+        await import("@/vibe/agent/chat/data-sources/chat-tool-calls-total/route")
       ).tools.POST as GenericHandlerBase;
     case "chat-unique-users":
       return (
-        await import("next-vibe/agent/chat/data-sources/chat-unique-users/route")
+        await import("@/vibe/agent/chat/data-sources/chat-unique-users/route")
       ).tools.POST as GenericHandlerBase;
     case "chat-upvotes-total":
       return (
-        await import("next-vibe/agent/chat/data-sources/chat-upvotes-total/route")
+        await import("@/vibe/agent/chat/data-sources/chat-upvotes-total/route")
       ).tools.POST as GenericHandlerBase;
     case "check":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/vibe-check/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/vibe-check/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "claude":
-      return (await import("next-vibe/agent/coding-agent/route")).tools
+      return (await import("@/vibe/agent/coding-agent/route")).tools
         .POST as GenericHandlerBase;
     case "claude-code":
-      return (await import("next-vibe/agent/coding-agent/route")).tools
+      return (await import("@/vibe/agent/coding-agent/route")).tools
         .POST as GenericHandlerBase;
     case "click-tracking":
       return (await import("@/leads/tracking/route")).tools
         .GET as GenericHandlerBase;
     case "cluster-init":
-      return (
-        await import("next-vibe/tooling/infra/cluster/init/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/tooling/infra/cluster/init/route")).tools
+        .POST as GenericHandlerBase;
     case "cluster-status":
-      return (
-        await import("next-vibe/tooling/infra/cluster/status/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/tooling/infra/cluster/status/route")).tools
+        .GET as GenericHandlerBase;
     case "coa-account-create":
-      return (
-        await import("@/chart-of-accounts/account/create/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/account/create/route")).tools
+        .POST as GenericHandlerBase;
     case "coa-account-deactivate":
       return (
         await import("@/chart-of-accounts/account/[accountId]/deactivate/route")
       ).tools.POST as GenericHandlerBase;
     case "coa-account-get":
-      return (
-        await import("@/chart-of-accounts/account/[accountId]/get/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/account/[accountId]/get/route"))
+        .tools.GET as GenericHandlerBase;
     case "coa-account-list":
-      return (
-        await import("@/chart-of-accounts/account/list/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/account/list/route")).tools
+        .GET as GenericHandlerBase;
     case "coa-account-update":
       return (
         await import("@/chart-of-accounts/account/[accountId]/update/route")
       ).tools.PATCH as GenericHandlerBase;
     case "coa-balance-sheet":
-      return (
-        await import("@/chart-of-accounts/reports/balance-sheet/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/reports/balance-sheet/route"))
+        .tools.GET as GenericHandlerBase;
     case "coa-journal-create":
-      return (
-        await import("@/chart-of-accounts/journal/create/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/journal/create/route")).tools
+        .POST as GenericHandlerBase;
     case "coa-journal-entry-get":
-      return (
-        await import("@/chart-of-accounts/journal/[entryId]/get/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/journal/[entryId]/get/route"))
+        .tools.GET as GenericHandlerBase;
     case "coa-journal-list":
-      return (
-        await import("@/chart-of-accounts/journal/list/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/journal/list/route")).tools
+        .GET as GenericHandlerBase;
     case "coa-journal-post":
-      return (
-        await import("@/chart-of-accounts/journal/[entryId]/post/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/journal/[entryId]/post/route"))
+        .tools.POST as GenericHandlerBase;
     case "coa-journal-reverse":
       return (
         await import("@/chart-of-accounts/journal/[entryId]/reverse/route")
       ).tools.POST as GenericHandlerBase;
     case "coa-ledger":
-      return (
-        await import("@/chart-of-accounts/ledger/[accountId]/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/ledger/[accountId]/route"))
+        .tools.GET as GenericHandlerBase;
     case "coa-period-close":
-      return (
-        await import("@/chart-of-accounts/period/[periodId]/close/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/period/[periodId]/close/route"))
+        .tools.POST as GenericHandlerBase;
     case "coa-period-create":
-      return (
-        await import("@/chart-of-accounts/period/create/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/period/create/route")).tools
+        .POST as GenericHandlerBase;
     case "coa-period-get":
-      return (
-        await import("@/chart-of-accounts/period/[periodId]/get/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/period/[periodId]/get/route"))
+        .tools.GET as GenericHandlerBase;
     case "coa-period-list":
-      return (
-        await import("@/chart-of-accounts/period/list/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/period/list/route")).tools
+        .GET as GenericHandlerBase;
     case "coa-profit-loss":
-      return (
-        await import("@/chart-of-accounts/reports/profit-loss/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/reports/profit-loss/route"))
+        .tools.GET as GenericHandlerBase;
     case "coa-receivables-aging":
       return (
         await import("@/chart-of-accounts/reports/receivables-aging/route")
       ).tools.GET as GenericHandlerBase;
     case "coa-setup":
-      return (await import("@/chart-of-accounts/setup/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/setup/route")).tools
+        .POST as GenericHandlerBase;
     case "coa-tax-report":
-      return (
-        await import("@/chart-of-accounts/reports/tax-report/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/reports/tax-report/route"))
+        .tools.GET as GenericHandlerBase;
     case "coa-trial-balance":
-      return (
-        await import("@/chart-of-accounts/reports/trial-balance/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/chart-of-accounts/reports/trial-balance/route"))
+        .tools.GET as GenericHandlerBase;
     case "coding-agent":
-      return (await import("next-vibe/agent/coding-agent/route")).tools
+      return (await import("@/vibe/agent/coding-agent/route")).tools
         .POST as GenericHandlerBase;
     case "companies-list":
       return (await import("@/companies/list/route")).tools
         .GET as GenericHandlerBase;
     case "companies_companyId_get_GET":
-      return (
-        await import("@/companies/[companyId]/get/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/companies/[companyId]/get/route")).tools
+        .GET as GenericHandlerBase;
     case "companies_companyId_members_invite_POST":
-      return (
-        await import("@/companies/[companyId]/members/invite/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/companies/[companyId]/members/invite/route"))
+        .tools.POST as GenericHandlerBase;
     case "companies_companyId_members_list_GET":
-      return (
-        await import("@/companies/[companyId]/members/list/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/companies/[companyId]/members/list/route")).tools
+        .GET as GenericHandlerBase;
     case "companies_companyId_members_memberId_remove_POST":
       return (
         await import("@/companies/[companyId]/members/[memberId]/remove/route")
@@ -1031,13 +595,11 @@ async function importRouteHandler(
         await import("@/companies/[companyId]/members/[memberId]/update-role/route")
       ).tools.PATCH as GenericHandlerBase;
     case "companies_companyId_onboard_POST":
-      return (
-        await import("@/companies/[companyId]/onboard/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/companies/[companyId]/onboard/route")).tools
+        .POST as GenericHandlerBase;
     case "companies_companyId_update_PATCH":
-      return (
-        await import("@/companies/[companyId]/update/route")
-      ).tools.PATCH as GenericHandlerBase;
+      return (await import("@/companies/[companyId]/update/route")).tools
+        .PATCH as GenericHandlerBase;
     case "companies_create_POST":
       return (await import("@/companies/create/route")).tools
         .POST as GenericHandlerBase;
@@ -1045,80 +607,73 @@ async function importRouteHandler(
       return (await import("@/companies/list/route")).tools
         .GET as GenericHandlerBase;
     case "company-members-list":
-      return (
-        await import("@/companies/[companyId]/members/list/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/companies/[companyId]/members/list/route")).tools
+        .GET as GenericHandlerBase;
     case "complete-task":
-      return (
-        await import("next-vibe/execute-tool/complete/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/execute-tool/complete/route")).tools
+        .POST as GenericHandlerBase;
     case "config":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/config/create/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/config/create/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "config-create":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/config/create/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/config/create/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "connect-remote":
-      return (
-        await import("next-vibe/remote-connection/connect/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/remote-connection/connect/route")).tools
+        .POST as GenericHandlerBase;
     case "connection-status":
-      return (
-        await import("next-vibe/remote-connection/[instanceId]/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/remote-connection/[instanceId]/route")).tools
+        .GET as GenericHandlerBase;
     case "contact-form":
-      return (await import("@/contact/route")).tools
-        .POST as GenericHandlerBase;
+      return (await import("@/contact/route")).tools.POST as GenericHandlerBase;
     case "contact_POST":
-      return (await import("@/contact/route")).tools
-        .POST as GenericHandlerBase;
+      return (await import("@/contact/route")).tools.POST as GenericHandlerBase;
     case "cortex-delete":
-      return (await import("next-vibe/agent/cortex/delete/route"))
-        .tools.DELETE as GenericHandlerBase;
+      return (await import("@/vibe/agent/cortex/delete/route")).tools
+        .DELETE as GenericHandlerBase;
     case "cortex-edit":
-      return (await import("next-vibe/agent/cortex/edit/route")).tools
+      return (await import("@/vibe/agent/cortex/edit/route")).tools
         .PATCH as GenericHandlerBase;
     case "cortex-embed-backfill":
-      return (
-        await import("next-vibe/agent/cortex/embeddings/backfill/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/agent/cortex/embeddings/backfill/route"))
+        .tools.POST as GenericHandlerBase;
     case "cortex-exec":
-      return (await import("next-vibe/agent/cortex/exec/route")).tools
+      return (await import("@/vibe/agent/cortex/exec/route")).tools
         .POST as GenericHandlerBase;
     case "cortex-list":
-      return (await import("next-vibe/agent/cortex/list/route")).tools
+      return (await import("@/vibe/agent/cortex/list/route")).tools
         .GET as GenericHandlerBase;
     case "cortex-mkdir":
-      return (await import("next-vibe/agent/cortex/mkdir/route")).tools
+      return (await import("@/vibe/agent/cortex/mkdir/route")).tools
         .POST as GenericHandlerBase;
     case "cortex-move":
-      return (await import("next-vibe/agent/cortex/move/route")).tools
+      return (await import("@/vibe/agent/cortex/move/route")).tools
         .POST as GenericHandlerBase;
     case "cortex-read":
-      return (await import("next-vibe/agent/cortex/read/route")).tools
+      return (await import("@/vibe/agent/cortex/read/route")).tools
         .GET as GenericHandlerBase;
     case "cortex-search":
-      return (await import("next-vibe/agent/cortex/search/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/agent/cortex/search/route")).tools
+        .GET as GenericHandlerBase;
     case "cortex-terminals":
-      return (await import("next-vibe/agent/cortex/terminals/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/agent/cortex/terminals/route")).tools
+        .GET as GenericHandlerBase;
     case "cortex-tree":
-      return (await import("next-vibe/agent/cortex/tree/route")).tools
+      return (await import("@/vibe/agent/cortex/tree/route")).tools
         .GET as GenericHandlerBase;
     case "cortex-write":
-      return (await import("next-vibe/agent/cortex/write/route")).tools
+      return (await import("@/vibe/agent/cortex/write/route")).tools
         .POST as GenericHandlerBase;
     case "create-config":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/config/create/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/config/create/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "credits-avg-transaction":
@@ -1126,24 +681,20 @@ async function importRouteHandler(
         await import("@/credits/data-sources/credits-avg-transaction/route")
       ).tools.POST as GenericHandlerBase;
     case "credits-balance":
-      return (await import("@/credits/route")).tools
-        .GET as GenericHandlerBase;
+      return (await import("@/credits/route")).tools.GET as GenericHandlerBase;
     case "credits-balance-total":
       return (
         await import("@/credits/data-sources/credits-balance-total/route")
       ).tools.POST as GenericHandlerBase;
     case "credits-earned":
-      return (
-        await import("@/credits/data-sources/credits-earned/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/credits/data-sources/credits-earned/route")).tools
+        .POST as GenericHandlerBase;
     case "credits-expired":
-      return (
-        await import("@/credits/data-sources/credits-expired/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/credits/data-sources/credits-expired/route"))
+        .tools.POST as GenericHandlerBase;
     case "credits-free-grants":
-      return (
-        await import("@/credits/data-sources/credits-free-grants/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/credits/data-sources/credits-free-grants/route"))
+        .tools.POST as GenericHandlerBase;
     case "credits-free-pool-utilization":
       return (
         await import("@/credits/data-sources/credits-free-pool-utilization/route")
@@ -1156,13 +707,11 @@ async function importRouteHandler(
       return (await import("@/credits/public-cap/route")).tools
         .GET as GenericHandlerBase;
     case "credits-purchased":
-      return (
-        await import("@/credits/data-sources/credits-purchased/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/credits/data-sources/credits-purchased/route"))
+        .tools.POST as GenericHandlerBase;
     case "credits-refunded":
-      return (
-        await import("@/credits/data-sources/credits-refunded/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/credits/data-sources/credits-refunded/route"))
+        .tools.POST as GenericHandlerBase;
     case "credits-spent-by-leads":
       return (
         await import("@/credits/data-sources/credits-spent-by-leads/route")
@@ -1172,9 +721,8 @@ async function importRouteHandler(
         await import("@/credits/data-sources/credits-spent-by-users/route")
       ).tools.POST as GenericHandlerBase;
     case "credits-spent-total":
-      return (
-        await import("@/credits/data-sources/credits-spent-total/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/credits/data-sources/credits-spent-total/route"))
+        .tools.POST as GenericHandlerBase;
     case "credits-subscription-revenue":
       return (
         await import("@/credits/data-sources/credits-subscription-revenue/route")
@@ -1196,8 +744,7 @@ async function importRouteHandler(
         await import("@/credits/data-sources/credits-wallets-total/route")
       ).tools.POST as GenericHandlerBase;
     case "credits_GET":
-      return (await import("@/credits/route")).tools
-        .GET as GenericHandlerBase;
+      return (await import("@/credits/route")).tools.GET as GenericHandlerBase;
     case "credits_admin-add_POST":
       return (await import("@/credits/admin-add/route")).tools
         .POST as GenericHandlerBase;
@@ -1210,17 +757,14 @@ async function importRouteHandler(
         await import("@/credits/data-sources/credits-balance-total/route")
       ).tools.POST as GenericHandlerBase;
     case "credits_data-sources_credits-earned_POST":
-      return (
-        await import("@/credits/data-sources/credits-earned/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/credits/data-sources/credits-earned/route")).tools
+        .POST as GenericHandlerBase;
     case "credits_data-sources_credits-expired_POST":
-      return (
-        await import("@/credits/data-sources/credits-expired/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/credits/data-sources/credits-expired/route"))
+        .tools.POST as GenericHandlerBase;
     case "credits_data-sources_credits-free-grants_POST":
-      return (
-        await import("@/credits/data-sources/credits-free-grants/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/credits/data-sources/credits-free-grants/route"))
+        .tools.POST as GenericHandlerBase;
     case "credits_data-sources_credits-free-pool-utilization_POST":
       return (
         await import("@/credits/data-sources/credits-free-pool-utilization/route")
@@ -1230,13 +774,11 @@ async function importRouteHandler(
         await import("@/credits/data-sources/credits-packs-created/route")
       ).tools.POST as GenericHandlerBase;
     case "credits_data-sources_credits-purchased_POST":
-      return (
-        await import("@/credits/data-sources/credits-purchased/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/credits/data-sources/credits-purchased/route"))
+        .tools.POST as GenericHandlerBase;
     case "credits_data-sources_credits-refunded_POST":
-      return (
-        await import("@/credits/data-sources/credits-refunded/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/credits/data-sources/credits-refunded/route"))
+        .tools.POST as GenericHandlerBase;
     case "credits_data-sources_credits-spent-by-leads_POST":
       return (
         await import("@/credits/data-sources/credits-spent-by-leads/route")
@@ -1246,9 +788,8 @@ async function importRouteHandler(
         await import("@/credits/data-sources/credits-spent-by-users/route")
       ).tools.POST as GenericHandlerBase;
     case "credits_data-sources_credits-spent-total_POST":
-      return (
-        await import("@/credits/data-sources/credits-spent-total/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/credits/data-sources/credits-spent-total/route"))
+        .tools.POST as GenericHandlerBase;
     case "credits_data-sources_credits-subscription-revenue_POST":
       return (
         await import("@/credits/data-sources/credits-subscription-revenue/route")
@@ -1285,125 +826,119 @@ async function importRouteHandler(
       return (await import("@/credits/purchase/route")).tools
         .POST as GenericHandlerBase;
     case "cron-create":
-      return (await import("next-vibe/tasks/cron/tasks/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/tasks/cron/tasks/route")).tools
+        .POST as GenericHandlerBase;
     case "cron-delete":
-      return (await import("next-vibe/tasks/cron/[id]/route"))
-        .tools.DELETE as GenericHandlerBase;
+      return (await import("@/vibe/tasks/cron/[id]/route")).tools
+        .DELETE as GenericHandlerBase;
     case "cron-executions-failed":
       return (
-        await import("next-vibe/tasks/data-sources/cron-executions-failed/route")
+        await import("@/vibe/tasks/data-sources/cron-executions-failed/route")
       ).tools.POST as GenericHandlerBase;
     case "cron-executions-succeeded":
       return (
-        await import("next-vibe/tasks/data-sources/cron-executions-succeeded/route")
+        await import("@/vibe/tasks/data-sources/cron-executions-succeeded/route")
       ).tools.POST as GenericHandlerBase;
     case "cron-executions-total":
       return (
-        await import("next-vibe/tasks/data-sources/cron-executions-total/route")
+        await import("@/vibe/tasks/data-sources/cron-executions-total/route")
       ).tools.POST as GenericHandlerBase;
     case "cron-get":
-      return (await import("next-vibe/tasks/cron/[id]/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/tasks/cron/[id]/route")).tools
+        .GET as GenericHandlerBase;
     case "cron-history":
-      return (
-        await import("next-vibe/tasks/cron/history/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/tasks/cron/history/route")).tools
+        .GET as GenericHandlerBase;
     case "cron-list":
-      return (await import("next-vibe/tasks/cron/tasks/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/tasks/cron/tasks/route")).tools
+        .GET as GenericHandlerBase;
     case "cron-queue":
-      return (await import("next-vibe/tasks/cron/queue/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/tasks/cron/queue/route")).tools
+        .GET as GenericHandlerBase;
     case "cron-stats":
-      return (await import("next-vibe/tasks/cron/stats/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/tasks/cron/stats/route")).tools
+        .GET as GenericHandlerBase;
     case "cron-tasks":
-      return (await import("next-vibe/tasks/cron/tasks/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/tasks/cron/tasks/route")).tools
+        .GET as GenericHandlerBase;
     case "cron-update":
-      return (await import("next-vibe/tasks/cron/[id]/route"))
-        .tools.PUT as GenericHandlerBase;
+      return (await import("@/vibe/tasks/cron/[id]/route")).tools
+        .PUT as GenericHandlerBase;
     case "cron:stats":
-      return (await import("next-vibe/tasks/cron/stats/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/tasks/cron/stats/route")).tools
+        .GET as GenericHandlerBase;
     case "d":
-      return (await import("next-vibe/server/server/dev/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/server/server/dev/route")).tools
+        .POST as GenericHandlerBase;
     case "db-health":
-      return (await import("next-vibe/database/health/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/database/health/route")).tools
+        .POST as GenericHandlerBase;
     case "db-ping":
-      return (await import("next-vibe/database/health/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/database/health/route")).tools
+        .POST as GenericHandlerBase;
     case "db:migrate":
-      return (await import("next-vibe/database/migrate/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/database/migrate/route")).tools
+        .POST as GenericHandlerBase;
     case "db:ping":
-      return (await import("next-vibe/database/ping/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/database/ping/route")).tools
+        .POST as GenericHandlerBase;
     case "db:seed":
-      return (await import("next-vibe/database/seed/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/database/seed/route")).tools
+        .POST as GenericHandlerBase;
     case "db:studio":
-      return (await import("next-vibe/database/studio/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/database/studio/route")).tools
+        .POST as GenericHandlerBase;
     case "db:utils":
-      return (await import("next-vibe/database/utils/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/database/utils/route")).tools
+        .GET as GenericHandlerBase;
     case "dbutils":
-      return (await import("next-vibe/database/utils/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/database/utils/route")).tools
+        .GET as GenericHandlerBase;
     case "deploy":
-      return (
-        await import("next-vibe/tooling/infra/deploy/push/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/tooling/infra/deploy/push/route")).tools
+        .POST as GenericHandlerBase;
     case "deploy-preview":
-      return (
-        await import("next-vibe/tooling/infra/deploy/preview/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/tooling/infra/deploy/preview/route")).tools
+        .POST as GenericHandlerBase;
     case "deps":
-      return (await import("next-vibe/tooling/vibe-deps/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/tooling/vibe-deps/route")).tools
+        .POST as GenericHandlerBase;
     case "describe_image":
-      return (await import("next-vibe/agent/describe-image/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/agent/describe-image/route")).tools
+        .POST as GenericHandlerBase;
     case "describe_video":
-      return (await import("next-vibe/agent/describe-video/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/agent/describe-video/route")).tools
+        .POST as GenericHandlerBase;
     case "desktop-accessibility":
-      return (
-        await import("@/desktop/get-accessibility-tree/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/desktop/get-accessibility-tree/route")).tools
+        .POST as GenericHandlerBase;
     case "desktop-click":
       return (await import("@/desktop/click/route")).tools
         .POST as GenericHandlerBase;
     case "desktop-focus-window":
-      return (await import("@/desktop/focus-window/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/desktop/focus-window/route")).tools
+        .POST as GenericHandlerBase;
     case "desktop-get-focused-window":
-      return (
-        await import("@/desktop/get-focused-window/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/desktop/get-focused-window/route")).tools
+        .POST as GenericHandlerBase;
     case "desktop-list-monitors":
-      return (await import("@/desktop/list-monitors/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/desktop/list-monitors/route")).tools
+        .POST as GenericHandlerBase;
     case "desktop-list-windows":
-      return (await import("@/desktop/list-windows/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/desktop/list-windows/route")).tools
+        .POST as GenericHandlerBase;
     case "desktop-move-mouse":
       return (await import("@/desktop/move-mouse/route")).tools
         .POST as GenericHandlerBase;
     case "desktop-move-window-to-monitor":
-      return (
-        await import("@/desktop/move-window-to-monitor/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/desktop/move-window-to-monitor/route")).tools
+        .POST as GenericHandlerBase;
     case "desktop-press-key":
       return (await import("@/desktop/press-key/route")).tools
         .POST as GenericHandlerBase;
     case "desktop-screenshot":
-      return (await import("@/desktop/take-screenshot/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/desktop/take-screenshot/route")).tools
+        .POST as GenericHandlerBase;
     case "desktop-scroll":
       return (await import("@/desktop/scroll/route")).tools
         .POST as GenericHandlerBase;
@@ -1414,29 +949,26 @@ async function importRouteHandler(
       return (await import("@/desktop/click/route")).tools
         .POST as GenericHandlerBase;
     case "desktop_focus-window_POST":
-      return (await import("@/desktop/focus-window/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/desktop/focus-window/route")).tools
+        .POST as GenericHandlerBase;
     case "desktop_get-accessibility-tree_POST":
-      return (
-        await import("@/desktop/get-accessibility-tree/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/desktop/get-accessibility-tree/route")).tools
+        .POST as GenericHandlerBase;
     case "desktop_get-focused-window_POST":
-      return (
-        await import("@/desktop/get-focused-window/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/desktop/get-focused-window/route")).tools
+        .POST as GenericHandlerBase;
     case "desktop_list-monitors_POST":
-      return (await import("@/desktop/list-monitors/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/desktop/list-monitors/route")).tools
+        .POST as GenericHandlerBase;
     case "desktop_list-windows_POST":
-      return (await import("@/desktop/list-windows/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/desktop/list-windows/route")).tools
+        .POST as GenericHandlerBase;
     case "desktop_move-mouse_POST":
       return (await import("@/desktop/move-mouse/route")).tools
         .POST as GenericHandlerBase;
     case "desktop_move-window-to-monitor_POST":
-      return (
-        await import("@/desktop/move-window-to-monitor/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/desktop/move-window-to-monitor/route")).tools
+        .POST as GenericHandlerBase;
     case "desktop_press-key_POST":
       return (await import("@/desktop/press-key/route")).tools
         .POST as GenericHandlerBase;
@@ -1444,406 +976,368 @@ async function importRouteHandler(
       return (await import("@/desktop/scroll/route")).tools
         .POST as GenericHandlerBase;
     case "desktop_take-screenshot_POST":
-      return (await import("@/desktop/take-screenshot/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/desktop/take-screenshot/route")).tools
+        .POST as GenericHandlerBase;
     case "desktop_type-text_POST":
       return (await import("@/desktop/type-text/route")).tools
         .POST as GenericHandlerBase;
     case "detach":
-      return (
-        await import("next-vibe/execute-tool/call-control/detach/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/execute-tool/call-control/detach/route"))
+        .tools.POST as GenericHandlerBase;
     case "dev":
-      return (await import("next-vibe/server/server/dev/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/server/server/dev/route")).tools
+        .POST as GenericHandlerBase;
     case "dgen":
-      return (await import("next-vibe/database/generate/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/database/generate/route")).tools
+        .POST as GenericHandlerBase;
     case "docker":
-      return (
-        await import("next-vibe/database/utils/docker-operations/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/database/utils/docker-operations/route"))
+        .tools.POST as GenericHandlerBase;
     case "docker-utils":
-      return (
-        await import("next-vibe/database/utils/docker-operations/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/database/utils/docker-operations/route"))
+        .tools.POST as GenericHandlerBase;
     case "el":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/lint/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/lint/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "electron":
-      return (
-        await import("next-vibe/server/server/electron/start/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/server/server/electron/start/route")).tools
+        .POST as GenericHandlerBase;
     case "electron:build":
-      return (
-        await import("next-vibe/server/server/electron/build/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/server/server/electron/build/route")).tools
+        .POST as GenericHandlerBase;
     case "electron:dev":
-      return (
-        await import("next-vibe/server/server/electron/start/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/server/server/electron/start/route")).tools
+        .POST as GenericHandlerBase;
     case "electron:start":
-      return (
-        await import("next-vibe/server/server/electron/start/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/server/server/electron/start/route")).tools
+        .POST as GenericHandlerBase;
     case "elint":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/lint/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/lint/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "email-campaigns":
-      return (
-        await import("@/leads/campaigns/email-campaigns/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/campaigns/email-campaigns/route")).tools
+        .POST as GenericHandlerBase;
     case "email-stats":
-      return (await import("@/messenger/messages/stats/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/messenger/messages/stats/route")).tools
+        .GET as GenericHandlerBase;
     case "error-logs":
-      return (
-        await import("next-vibe/logger/error-monitor/logs/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/logger/error-monitor/logs/route")).tools
+        .GET as GenericHandlerBase;
     case "error-logs-cleanup":
-      return (
-        await import("next-vibe/logger/error-monitor/cleanup/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/logger/error-monitor/cleanup/route")).tools
+        .POST as GenericHandlerBase;
     case "error-logs-errors":
       return (
-        await import("next-vibe/logger/error-monitor/data-sources/error-logs-errors/route")
+        await import("@/vibe/logger/error-monitor/data-sources/error-logs-errors/route")
       ).tools.POST as GenericHandlerBase;
     case "error-logs-total":
       return (
-        await import("next-vibe/logger/error-monitor/data-sources/error-logs-total/route")
+        await import("@/vibe/logger/error-monitor/data-sources/error-logs-total/route")
       ).tools.POST as GenericHandlerBase;
     case "error-logs-warnings":
       return (
-        await import("next-vibe/logger/error-monitor/data-sources/error-logs-warnings/route")
+        await import("@/vibe/logger/error-monitor/data-sources/error-logs-warnings/route")
       ).tools.POST as GenericHandlerBase;
     case "eslint":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/lint/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/lint/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "execute-task":
-      return (await import("next-vibe/tasks/execute/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/tasks/execute/route")).tools
+        .POST as GenericHandlerBase;
     case "execute-tool":
-      return (await import("next-vibe/execute-tool/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/execute-tool/route")).tools
+        .POST as GenericHandlerBase;
     case "favorite-create":
-      return (
-        await import("next-vibe/agent/skills/favorites/create/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/agent/skills/favorites/create/route")).tools
+        .POST as GenericHandlerBase;
     case "favorite-delete":
-      return (
-        await import("next-vibe/agent/skills/favorites/[id]/route")
-      ).tools.DELETE as GenericHandlerBase;
+      return (await import("@/vibe/agent/skills/favorites/[id]/route")).tools
+        .DELETE as GenericHandlerBase;
     case "favorite-get":
-      return (
-        await import("next-vibe/agent/skills/favorites/[id]/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/agent/skills/favorites/[id]/route")).tools
+        .GET as GenericHandlerBase;
     case "favorite-update":
-      return (
-        await import("next-vibe/agent/skills/favorites/[id]/route")
-      ).tools.PATCH as GenericHandlerBase;
+      return (await import("@/vibe/agent/skills/favorites/[id]/route")).tools
+        .PATCH as GenericHandlerBase;
     case "favorites":
-      return (await import("next-vibe/agent/skills/favorites/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/agent/skills/favorites/route")).tools
+        .GET as GenericHandlerBase;
     case "favorites-reorder":
-      return (
-        await import("next-vibe/agent/skills/favorites/reorder/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/agent/skills/favorites/reorder/route")).tools
+        .POST as GenericHandlerBase;
     case "fetch":
-      return (await import("next-vibe/agent/fetch-url-content/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/agent/fetch-url-content/route")).tools
+        .GET as GenericHandlerBase;
     case "fetch-url":
-      return (await import("next-vibe/agent/fetch-url-content/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/agent/fetch-url-content/route")).tools
+        .GET as GenericHandlerBase;
     case "fetch-url-cache-cleanup":
-      return (
-        await import("next-vibe/agent/fetch-url-content/cleanup/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/agent/fetch-url-content/cleanup/route"))
+        .tools.POST as GenericHandlerBase;
     case "fetch-url-content":
-      return (await import("next-vibe/agent/fetch-url-content/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/agent/fetch-url-content/route")).tools
+        .GET as GenericHandlerBase;
     case "folder-contents":
       return (
-        await import("next-vibe/agent/chat/folder-contents/[rootFolderId]/route")
+        await import("@/vibe/agent/chat/folder-contents/[rootFolderId]/route")
       ).tools.GET as GenericHandlerBase;
     case "folder-create":
       return (
-        await import("next-vibe/agent/chat/folders/[rootFolderId]/create/route")
+        await import("@/vibe/agent/chat/folders/[rootFolderId]/create/route")
       ).tools.POST as GenericHandlerBase;
     case "folder-delete":
       return (
-        await import("next-vibe/agent/chat/folders/subfolders/[subFolderId]/route")
+        await import("@/vibe/agent/chat/folders/subfolders/[subFolderId]/route")
       ).tools.DELETE as GenericHandlerBase;
     case "folder-get":
       return (
-        await import("next-vibe/agent/chat/folders/subfolders/[subFolderId]/route")
+        await import("@/vibe/agent/chat/folders/subfolders/[subFolderId]/route")
       ).tools.GET as GenericHandlerBase;
     case "folder-move":
       return (
-        await import("next-vibe/agent/chat/folders/subfolders/[subFolderId]/move/route")
+        await import("@/vibe/agent/chat/folders/subfolders/[subFolderId]/move/route")
       ).tools.PATCH as GenericHandlerBase;
     case "folder-permissions":
       return (
-        await import("next-vibe/agent/chat/folders/[rootFolderId]/root-permissions/route")
+        await import("@/vibe/agent/chat/folders/[rootFolderId]/root-permissions/route")
       ).tools.GET as GenericHandlerBase;
     case "folder-rename":
       return (
-        await import("next-vibe/agent/chat/folders/subfolders/[subFolderId]/rename/route")
+        await import("@/vibe/agent/chat/folders/subfolders/[subFolderId]/rename/route")
       ).tools.PATCH as GenericHandlerBase;
     case "folder-update":
       return (
-        await import("next-vibe/agent/chat/folders/subfolders/[subFolderId]/update/route")
+        await import("@/vibe/agent/chat/folders/subfolders/[subFolderId]/update/route")
       ).tools.PATCH as GenericHandlerBase;
     case "folders":
-      return (
-        await import("next-vibe/agent/chat/folders/[rootFolderId]/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/agent/chat/folders/[rootFolderId]/route"))
+        .tools.GET as GenericHandlerBase;
     case "folders-list":
-      return (
-        await import("next-vibe/agent/chat/folders/[rootFolderId]/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/agent/chat/folders/[rootFolderId]/route"))
+        .tools.GET as GenericHandlerBase;
     case "gen":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/generators/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/generators/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "gen-key":
-      return (
-        await import("next-vibe/env/settings/generate-key/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/env/settings/generate-key/route")).tools
+        .GET as GenericHandlerBase;
     case "generate":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/generators/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/generators/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "generate-all":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/generators/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/generators/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "generate-key":
-      return (
-        await import("next-vibe/env/settings/generate-key/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/env/settings/generate-key/route")).tools
+        .GET as GenericHandlerBase;
     case "generate_image":
-      return (await import("next-vibe/agent/image-generation/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/agent/image-generation/route")).tools
+        .POST as GenericHandlerBase;
     case "generate_music":
-      return (await import("next-vibe/agent/music-generation/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/agent/music-generation/route")).tools
+        .POST as GenericHandlerBase;
     case "generate_video":
-      return (await import("next-vibe/agent/video-generation/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/agent/video-generation/route")).tools
+        .POST as GenericHandlerBase;
     case "get-folder":
       return (
-        await import("next-vibe/agent/chat/folder-contents/[rootFolderId]/route")
+        await import("@/vibe/agent/chat/folder-contents/[rootFolderId]/route")
       ).tools.GET as GenericHandlerBase;
     case "guard":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/guard/start/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/guard/start/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "guard-destroy":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/guard/destroy/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/guard/destroy/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "guard-start":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/guard/start/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/guard/start/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "guard-stop":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/guard/stop/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/guard/stop/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "guard:destroy":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/guard/destroy/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/guard/destroy/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "guard:remove":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/guard/destroy/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/guard/destroy/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "guard:start":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/guard/start/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/guard/start/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "guard:status":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/guard/status/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/guard/status/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "guard:stop":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/guard/stop/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/guard/stop/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "h":
-      return (await import("next-vibe/help-tool/route")).tools
+      return (await import("@/vibe/help-tool/route")).tools
         .GET as GenericHandlerBase;
     case "headless-client":
-      return (
-        await import("next-vibe/server/server/headless-client/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/server/server/headless-client/route")).tools
+        .POST as GenericHandlerBase;
     case "health":
-      return (
-        await import("next-vibe/server/server/health/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/server/server/health/route")).tools
+        .GET as GenericHandlerBase;
     case "help":
-      return (await import("next-vibe/help-tool/route")).tools
+      return (await import("@/vibe/help-tool/route")).tools
         .GET as GenericHandlerBase;
     case "image-push":
-      return (
-        await import("next-vibe/server/server/image-push/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/server/server/image-push/route")).tools
+        .POST as GenericHandlerBase;
     case "import-leads":
       return (await import("@/leads/import/route")).tools
         .POST as GenericHandlerBase;
     case "infra-deploy":
-      return (
-        await import("next-vibe/tooling/infra/deploy/push/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/tooling/infra/deploy/push/route")).tools
+        .POST as GenericHandlerBase;
     case "infra-init":
-      return (
-        await import("next-vibe/tooling/infra/cluster/init/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/tooling/infra/cluster/init/route")).tools
+        .POST as GenericHandlerBase;
     case "infra-preview":
-      return (
-        await import("next-vibe/tooling/infra/deploy/preview/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/tooling/infra/deploy/preview/route")).tools
+        .POST as GenericHandlerBase;
     case "infra-scale":
-      return (
-        await import("next-vibe/tooling/infra/scale/replicas/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/tooling/infra/scale/replicas/route")).tools
+        .POST as GenericHandlerBase;
     case "infra-status":
-      return (
-        await import("next-vibe/tooling/infra/cluster/status/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/tooling/infra/cluster/status/route")).tools
+        .GET as GenericHandlerBase;
     case "init":
-      return (await import("next-vibe/env/settings/route"))
-        .tools.PATCH as GenericHandlerBase;
+      return (await import("@/vibe/env/settings/route")).tools
+        .PATCH as GenericHandlerBase;
     case "init-cluster":
-      return (
-        await import("next-vibe/tooling/infra/cluster/init/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/tooling/infra/cluster/init/route")).tools
+        .POST as GenericHandlerBase;
     case "install":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/platforms/cli/setup/install/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/platforms/cli/setup/install/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "interactive-capture":
-      return (
-        await import("next-vibe/platforms/cli/interactive/capture/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/platforms/cli/interactive/capture/route"))
+        .tools.POST as GenericHandlerBase;
     case "interactive-send-keys":
-      return (
-        await import("next-vibe/platforms/cli/interactive/send-keys/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/platforms/cli/interactive/send-keys/route"))
+        .tools.POST as GenericHandlerBase;
     case "inventory-dashboard":
-      return (await import("@/inventory/dashboard/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/inventory/dashboard/route")).tools
+        .GET as GenericHandlerBase;
     case "inventory-stock":
-      return (await import("@/inventory/stock/list/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/inventory/stock/list/route")).tools
+        .GET as GenericHandlerBase;
     case "inventory-transfers":
-      return (await import("@/inventory/transfer/list/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/inventory/transfer/list/route")).tools
+        .GET as GenericHandlerBase;
     case "inventory-warehouses":
-      return (await import("@/inventory/warehouse/list/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/inventory/warehouse/list/route")).tools
+        .GET as GenericHandlerBase;
     case "inventory_dashboard_GET":
-      return (await import("@/inventory/dashboard/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/inventory/dashboard/route")).tools
+        .GET as GenericHandlerBase;
     case "inventory_stock_adjust_POST":
-      return (await import("@/inventory/stock/adjust/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/inventory/stock/adjust/route")).tools
+        .POST as GenericHandlerBase;
     case "inventory_stock_issue_POST":
-      return (await import("@/inventory/stock/issue/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/inventory/stock/issue/route")).tools
+        .POST as GenericHandlerBase;
     case "inventory_stock_list_GET":
-      return (await import("@/inventory/stock/list/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/inventory/stock/list/route")).tools
+        .GET as GenericHandlerBase;
     case "inventory_stock_receive_POST":
-      return (await import("@/inventory/stock/receive/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/inventory/stock/receive/route")).tools
+        .POST as GenericHandlerBase;
     case "inventory_transfer_create_POST":
-      return (
-        await import("@/inventory/transfer/create/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/inventory/transfer/create/route")).tools
+        .POST as GenericHandlerBase;
     case "inventory_transfer_list_GET":
-      return (await import("@/inventory/transfer/list/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/inventory/transfer/list/route")).tools
+        .GET as GenericHandlerBase;
     case "inventory_transfer_transferId_dispatch_POST":
-      return (
-        await import("@/inventory/transfer/[transferId]/dispatch/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/inventory/transfer/[transferId]/dispatch/route"))
+        .tools.POST as GenericHandlerBase;
     case "inventory_transfer_transferId_get_GET":
-      return (
-        await import("@/inventory/transfer/[transferId]/get/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/inventory/transfer/[transferId]/get/route")).tools
+        .GET as GenericHandlerBase;
     case "inventory_transfer_transferId_receive_POST":
-      return (
-        await import("@/inventory/transfer/[transferId]/receive/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/inventory/transfer/[transferId]/receive/route"))
+        .tools.POST as GenericHandlerBase;
     case "inventory_warehouse_create_POST":
-      return (
-        await import("@/inventory/warehouse/create/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/inventory/warehouse/create/route")).tools
+        .POST as GenericHandlerBase;
     case "inventory_warehouse_list_GET":
-      return (await import("@/inventory/warehouse/list/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/inventory/warehouse/list/route")).tools
+        .GET as GenericHandlerBase;
     case "inventory_warehouse_warehouseId_get_GET":
-      return (
-        await import("@/inventory/warehouse/[warehouseId]/get/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/inventory/warehouse/[warehouseId]/get/route"))
+        .tools.GET as GenericHandlerBase;
     case "inventory_warehouse_warehouseId_update_PATCH":
-      return (
-        await import("@/inventory/warehouse/[warehouseId]/update/route")
-      ).tools.PATCH as GenericHandlerBase;
+      return (await import("@/inventory/warehouse/[warehouseId]/update/route"))
+        .tools.PATCH as GenericHandlerBase;
     case "ip-match-linking":
       return (await import("@/leads/attribution/route")).tools
         .POST as GenericHandlerBase;
     case "kagi-search":
-      return (await import("next-vibe/agent/web-search/kagi/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/agent/web-search/kagi/route")).tools
+        .GET as GenericHandlerBase;
     case "l":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/oxlint/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/oxlint/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "lead-magnet_capture_POST":
-      return (await import("@/lead-magnet/capture/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/lead-magnet/capture/route")).tools
+        .POST as GenericHandlerBase;
     case "lead-magnet_captures_GET":
-      return (await import("@/lead-magnet/captures/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/lead-magnet/captures/route")).tools
+        .GET as GenericHandlerBase;
     case "lead-magnet_config_DELETE":
       return (await import("@/lead-magnet/config/route")).tools
         .DELETE as GenericHandlerBase;
@@ -1851,142 +1345,111 @@ async function importRouteHandler(
       return (await import("@/lead-magnet/config/route")).tools
         .GET as GenericHandlerBase;
     case "lead-magnet_providers_acumbamail_POST":
-      return (
-        await import("@/lead-magnet/providers/acumbamail/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/lead-magnet/providers/acumbamail/route")).tools
+        .POST as GenericHandlerBase;
     case "lead-magnet_providers_adobecampaign_POST":
-      return (
-        await import("@/lead-magnet/providers/adobecampaign/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/lead-magnet/providers/adobecampaign/route")).tools
+        .POST as GenericHandlerBase;
     case "lead-magnet_providers_cleverreach_POST":
-      return (
-        await import("@/lead-magnet/providers/cleverreach/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/lead-magnet/providers/cleverreach/route")).tools
+        .POST as GenericHandlerBase;
     case "lead-magnet_providers_connectif_POST":
-      return (
-        await import("@/lead-magnet/providers/connectif/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/lead-magnet/providers/connectif/route")).tools
+        .POST as GenericHandlerBase;
     case "lead-magnet_providers_datanext_POST":
-      return (
-        await import("@/lead-magnet/providers/datanext/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/lead-magnet/providers/datanext/route")).tools
+        .POST as GenericHandlerBase;
     case "lead-magnet_providers_edrone_POST":
-      return (
-        await import("@/lead-magnet/providers/edrone/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/lead-magnet/providers/edrone/route")).tools
+        .POST as GenericHandlerBase;
     case "lead-magnet_providers_emarsys_POST":
-      return (
-        await import("@/lead-magnet/providers/emarsys/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/lead-magnet/providers/emarsys/route")).tools
+        .POST as GenericHandlerBase;
     case "lead-magnet_providers_expertsender_POST":
-      return (
-        await import("@/lead-magnet/providers/expertsender/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/lead-magnet/providers/expertsender/route")).tools
+        .POST as GenericHandlerBase;
     case "lead-magnet_providers_freshmail_POST":
-      return (
-        await import("@/lead-magnet/providers/freshmail/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/lead-magnet/providers/freshmail/route")).tools
+        .POST as GenericHandlerBase;
     case "lead-magnet_providers_getresponse_POST":
-      return (
-        await import("@/lead-magnet/providers/getresponse/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/lead-magnet/providers/getresponse/route")).tools
+        .POST as GenericHandlerBase;
     case "lead-magnet_providers_google-sheets_POST":
-      return (
-        await import("@/lead-magnet/providers/google-sheets/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/lead-magnet/providers/google-sheets/route")).tools
+        .POST as GenericHandlerBase;
     case "lead-magnet_providers_google-sheets_sheets-list_GET":
       return (
         await import("@/lead-magnet/providers/google-sheets/sheets-list/route")
       ).tools.GET as GenericHandlerBase;
     case "lead-magnet_providers_klaviyo_POST":
-      return (
-        await import("@/lead-magnet/providers/klaviyo/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/lead-magnet/providers/klaviyo/route")).tools
+        .POST as GenericHandlerBase;
     case "lead-magnet_providers_mailup_POST":
-      return (
-        await import("@/lead-magnet/providers/mailup/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/lead-magnet/providers/mailup/route")).tools
+        .POST as GenericHandlerBase;
     case "lead-magnet_providers_mapp_POST":
-      return (
-        await import("@/lead-magnet/providers/mapp/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/lead-magnet/providers/mapp/route")).tools
+        .POST as GenericHandlerBase;
     case "lead-magnet_providers_platform-email_POST":
-      return (
-        await import("@/lead-magnet/providers/platform-email/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/lead-magnet/providers/platform-email/route"))
+        .tools.POST as GenericHandlerBase;
     case "lead-magnet_providers_sailthru_POST":
-      return (
-        await import("@/lead-magnet/providers/sailthru/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/lead-magnet/providers/sailthru/route")).tools
+        .POST as GenericHandlerBase;
     case "lead-magnet_providers_salesmanago_POST":
-      return (
-        await import("@/lead-magnet/providers/salesmanago/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/lead-magnet/providers/salesmanago/route")).tools
+        .POST as GenericHandlerBase;
     case "lead-magnet_providers_shopify_POST":
-      return (
-        await import("@/lead-magnet/providers/shopify/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/lead-magnet/providers/shopify/route")).tools
+        .POST as GenericHandlerBase;
     case "lead-magnet_providers_spotler_POST":
-      return (
-        await import("@/lead-magnet/providers/spotler/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/lead-magnet/providers/spotler/route")).tools
+        .POST as GenericHandlerBase;
     case "lead-magnet_providers_youlead_POST":
-      return (
-        await import("@/lead-magnet/providers/youlead/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/lead-magnet/providers/youlead/route")).tools
+        .POST as GenericHandlerBase;
     case "leads-active":
-      return (
-        await import("@/leads/data-sources/leads-active/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/data-sources/leads-active/route")).tools
+        .POST as GenericHandlerBase;
     case "leads-bounced":
-      return (
-        await import("@/leads/data-sources/leads-bounced/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/data-sources/leads-bounced/route")).tools
+        .POST as GenericHandlerBase;
     case "leads-campaign-running":
-      return (
-        await import("@/leads/data-sources/leads-campaign-running/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/data-sources/leads-campaign-running/route"))
+        .tools.POST as GenericHandlerBase;
     case "leads-converted":
-      return (
-        await import("@/leads/data-sources/leads-converted/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/data-sources/leads-converted/route")).tools
+        .POST as GenericHandlerBase;
     case "leads-created":
-      return (
-        await import("@/leads/data-sources/leads-created/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/data-sources/leads-created/route")).tools
+        .POST as GenericHandlerBase;
     case "leads-dashboard":
       return (await import("@/leads/dashboard/route")).tools
         .GET as GenericHandlerBase;
     case "leads-email-clicks":
-      return (
-        await import("@/leads/data-sources/leads-email-clicks/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/data-sources/leads-email-clicks/route"))
+        .tools.POST as GenericHandlerBase;
     case "leads-email-opens":
-      return (
-        await import("@/leads/data-sources/leads-email-opens/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/data-sources/leads-email-opens/route"))
+        .tools.POST as GenericHandlerBase;
     case "leads-emails-sent":
-      return (
-        await import("@/leads/data-sources/leads-emails-sent/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/data-sources/leads-emails-sent/route"))
+        .tools.POST as GenericHandlerBase;
     case "leads-engagements":
-      return (
-        await import("@/leads/data-sources/leads-engagements/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/data-sources/leads-engagements/route"))
+        .tools.POST as GenericHandlerBase;
     case "leads-form-submits":
-      return (
-        await import("@/leads/data-sources/leads-form-submits/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/data-sources/leads-form-submits/route"))
+        .tools.POST as GenericHandlerBase;
     case "leads-import":
       return (await import("@/leads/import/route")).tools
         .POST as GenericHandlerBase;
     case "leads-import-status":
-      return (await import("@/leads/import/status/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/leads/import/status/route")).tools
+        .GET as GenericHandlerBase;
     case "leads-in-contact":
-      return (
-        await import("@/leads/data-sources/leads-in-contact/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/data-sources/leads-in-contact/route")).tools
+        .POST as GenericHandlerBase;
     case "leads-list":
       return (await import("@/leads/list/route")).tools
         .GET as GenericHandlerBase;
@@ -2001,17 +1464,14 @@ async function importRouteHandler(
       return (await import("@/leads/stats/route")).tools
         .GET as GenericHandlerBase;
     case "leads-unsubscribed":
-      return (
-        await import("@/leads/data-sources/leads-unsubscribed/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/data-sources/leads-unsubscribed/route"))
+        .tools.POST as GenericHandlerBase;
     case "leads-website-users":
-      return (
-        await import("@/leads/data-sources/leads-website-users/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/data-sources/leads-website-users/route"))
+        .tools.POST as GenericHandlerBase;
     case "leads-website-visits":
-      return (
-        await import("@/leads/data-sources/leads-website-visits/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/data-sources/leads-website-visits/route"))
+        .tools.POST as GenericHandlerBase;
     case "leads_attribution_POST":
       return (await import("@/leads/attribution/route")).tools
         .POST as GenericHandlerBase;
@@ -2022,54 +1482,44 @@ async function importRouteHandler(
       return (await import("@/leads/batch/route")).tools
         .PATCH as GenericHandlerBase;
     case "leads_campaigns_bounce-processor_GET":
-      return (
-        await import("@/leads/campaigns/bounce-processor/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/leads/campaigns/bounce-processor/route")).tools
+        .GET as GenericHandlerBase;
     case "leads_campaigns_bounce-processor_POST":
-      return (
-        await import("@/leads/campaigns/bounce-processor/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/campaigns/bounce-processor/route")).tools
+        .POST as GenericHandlerBase;
     case "leads_campaigns_campaign-starter_GET":
-      return (
-        await import("@/leads/campaigns/campaign-starter/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/leads/campaigns/campaign-starter/route")).tools
+        .GET as GenericHandlerBase;
     case "leads_campaigns_campaign-starter_POST":
-      return (
-        await import("@/leads/campaigns/campaign-starter/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/campaigns/campaign-starter/route")).tools
+        .POST as GenericHandlerBase;
     case "leads_campaigns_email-campaigns_GET":
-      return (
-        await import("@/leads/campaigns/email-campaigns/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/leads/campaigns/email-campaigns/route")).tools
+        .GET as GenericHandlerBase;
     case "leads_campaigns_email-campaigns_POST":
-      return (
-        await import("@/leads/campaigns/email-campaigns/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/campaigns/email-campaigns/route")).tools
+        .POST as GenericHandlerBase;
     case "leads_campaigns_emails_test-mail_POST":
-      return (
-        await import("@/leads/campaigns/emails/test-mail/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/campaigns/emails/test-mail/route")).tools
+        .POST as GenericHandlerBase;
     case "leads_campaigns_halt-all_POST":
-      return (await import("@/leads/campaigns/halt-all/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/leads/campaigns/halt-all/route")).tools
+        .POST as GenericHandlerBase;
     case "leads_campaigns_journey-variants_GET":
-      return (
-        await import("@/leads/campaigns/journey-variants/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/leads/campaigns/journey-variants/route")).tools
+        .GET as GenericHandlerBase;
     case "leads_campaigns_journey-variants_PATCH":
-      return (
-        await import("@/leads/campaigns/journey-variants/route")
-      ).tools.PATCH as GenericHandlerBase;
+      return (await import("@/leads/campaigns/journey-variants/route")).tools
+        .PATCH as GenericHandlerBase;
     case "leads_campaigns_journey-variants_POST":
-      return (
-        await import("@/leads/campaigns/journey-variants/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/campaigns/journey-variants/route")).tools
+        .POST as GenericHandlerBase;
     case "leads_campaigns_queue_GET":
-      return (await import("@/leads/campaigns/queue/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/leads/campaigns/queue/route")).tools
+        .GET as GenericHandlerBase;
     case "leads_campaigns_stats_GET":
-      return (await import("@/leads/campaigns/stats/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/leads/campaigns/stats/route")).tools
+        .GET as GenericHandlerBase;
     case "leads_create_POST":
       return (await import("@/leads/create/route")).tools
         .POST as GenericHandlerBase;
@@ -2077,65 +1527,51 @@ async function importRouteHandler(
       return (await import("@/leads/dashboard/route")).tools
         .GET as GenericHandlerBase;
     case "leads_data-sources_leads-active_POST":
-      return (
-        await import("@/leads/data-sources/leads-active/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/data-sources/leads-active/route")).tools
+        .POST as GenericHandlerBase;
     case "leads_data-sources_leads-bounced_POST":
-      return (
-        await import("@/leads/data-sources/leads-bounced/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/data-sources/leads-bounced/route")).tools
+        .POST as GenericHandlerBase;
     case "leads_data-sources_leads-campaign-running_POST":
-      return (
-        await import("@/leads/data-sources/leads-campaign-running/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/data-sources/leads-campaign-running/route"))
+        .tools.POST as GenericHandlerBase;
     case "leads_data-sources_leads-converted_POST":
-      return (
-        await import("@/leads/data-sources/leads-converted/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/data-sources/leads-converted/route")).tools
+        .POST as GenericHandlerBase;
     case "leads_data-sources_leads-created_POST":
-      return (
-        await import("@/leads/data-sources/leads-created/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/data-sources/leads-created/route")).tools
+        .POST as GenericHandlerBase;
     case "leads_data-sources_leads-email-clicks_POST":
-      return (
-        await import("@/leads/data-sources/leads-email-clicks/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/data-sources/leads-email-clicks/route"))
+        .tools.POST as GenericHandlerBase;
     case "leads_data-sources_leads-email-opens_POST":
-      return (
-        await import("@/leads/data-sources/leads-email-opens/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/data-sources/leads-email-opens/route"))
+        .tools.POST as GenericHandlerBase;
     case "leads_data-sources_leads-emails-sent_POST":
-      return (
-        await import("@/leads/data-sources/leads-emails-sent/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/data-sources/leads-emails-sent/route"))
+        .tools.POST as GenericHandlerBase;
     case "leads_data-sources_leads-engagements_POST":
-      return (
-        await import("@/leads/data-sources/leads-engagements/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/data-sources/leads-engagements/route"))
+        .tools.POST as GenericHandlerBase;
     case "leads_data-sources_leads-form-submits_POST":
-      return (
-        await import("@/leads/data-sources/leads-form-submits/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/data-sources/leads-form-submits/route"))
+        .tools.POST as GenericHandlerBase;
     case "leads_data-sources_leads-in-contact_POST":
-      return (
-        await import("@/leads/data-sources/leads-in-contact/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/data-sources/leads-in-contact/route")).tools
+        .POST as GenericHandlerBase;
     case "leads_data-sources_leads-newsletter-subscribers_POST":
       return (
         await import("@/leads/data-sources/leads-newsletter-subscribers/route")
       ).tools.POST as GenericHandlerBase;
     case "leads_data-sources_leads-unsubscribed_POST":
-      return (
-        await import("@/leads/data-sources/leads-unsubscribed/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/data-sources/leads-unsubscribed/route"))
+        .tools.POST as GenericHandlerBase;
     case "leads_data-sources_leads-website-users_POST":
-      return (
-        await import("@/leads/data-sources/leads-website-users/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/data-sources/leads-website-users/route"))
+        .tools.POST as GenericHandlerBase;
     case "leads_data-sources_leads-website-visits_POST":
-      return (
-        await import("@/leads/data-sources/leads-website-visits/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/data-sources/leads-website-visits/route"))
+        .tools.POST as GenericHandlerBase;
     case "leads_export_GET":
       return (await import("@/leads/export/route")).tools
         .GET as GenericHandlerBase;
@@ -2152,31 +1588,26 @@ async function importRouteHandler(
       return (await import("@/leads/import/route")).tools
         .POST as GenericHandlerBase;
     case "leads_import_jobs_jobId_DELETE":
-      return (
-        await import("@/leads/import/jobs/[jobId]/route")
-      ).tools.DELETE as GenericHandlerBase;
+      return (await import("@/leads/import/jobs/[jobId]/route")).tools
+        .DELETE as GenericHandlerBase;
     case "leads_import_jobs_jobId_GET":
-      return (
-        await import("@/leads/import/jobs/[jobId]/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/leads/import/jobs/[jobId]/route")).tools
+        .GET as GenericHandlerBase;
     case "leads_import_jobs_jobId_PATCH":
-      return (
-        await import("@/leads/import/jobs/[jobId]/route")
-      ).tools.PATCH as GenericHandlerBase;
+      return (await import("@/leads/import/jobs/[jobId]/route")).tools
+        .PATCH as GenericHandlerBase;
     case "leads_import_jobs_jobId_retry_POST":
-      return (
-        await import("@/leads/import/jobs/[jobId]/retry/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/import/jobs/[jobId]/retry/route")).tools
+        .POST as GenericHandlerBase;
     case "leads_import_jobs_jobId_stop_POST":
-      return (
-        await import("@/leads/import/jobs/[jobId]/stop/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/leads/import/jobs/[jobId]/stop/route")).tools
+        .POST as GenericHandlerBase;
     case "leads_import_process_POST":
-      return (await import("@/leads/import/process/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/leads/import/process/route")).tools
+        .POST as GenericHandlerBase;
     case "leads_import_status_GET":
-      return (await import("@/leads/import/status/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/leads/import/status/route")).tools
+        .GET as GenericHandlerBase;
     case "leads_list_GET":
       return (await import("@/leads/list/route")).tools
         .GET as GenericHandlerBase;
@@ -2198,42 +1629,39 @@ async function importRouteHandler(
     case "lint":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/oxlint/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/oxlint/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "list":
-      return (await import("next-vibe/help-tool/route")).tools
+      return (await import("@/vibe/help-tool/route")).tools
         .GET as GenericHandlerBase;
     case "list-models":
-      return (await import("next-vibe/agent/models/list/route")).tools
+      return (await import("@/vibe/agent/models/list/route")).tools
         .GET as GenericHandlerBase;
     case "login":
       return (await import("@/user/public/login/route")).tools
         .POST as GenericHandlerBase;
     case "logout":
-      return (await import("@/user/private/logout/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/user/private/logout/route")).tools
+        .POST as GenericHandlerBase;
     case "ls":
-      return (await import("next-vibe/help-tool/route")).tools
+      return (await import("@/vibe/help-tool/route")).tools
         .GET as GenericHandlerBase;
     case "m":
-      return (await import("next-vibe/database/migrate/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/database/migrate/route")).tools
+        .POST as GenericHandlerBase;
     case "mcp":
-      return (
-        await import("next-vibe/platforms/mcp/serve/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/platforms/mcp/serve/route")).tools
+        .POST as GenericHandlerBase;
     case "messenger-accounts":
-      return (await import("@/messenger/accounts/list/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/messenger/accounts/list/route")).tools
+        .GET as GenericHandlerBase;
     case "messenger-bounced":
-      return (
-        await import("@/messenger/data-sources/messenger-bounced/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/messenger/data-sources/messenger-bounced/route"))
+        .tools.POST as GenericHandlerBase;
     case "messenger-clicked":
-      return (
-        await import("@/messenger/data-sources/messenger-clicked/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/messenger/data-sources/messenger-clicked/route"))
+        .tools.POST as GenericHandlerBase;
     case "messenger-delivered":
       return (
         await import("@/messenger/data-sources/messenger-delivered/route")
@@ -2243,95 +1671,81 @@ async function importRouteHandler(
         await import("@/messenger/providers/email/imap-client/sync/route")
       ).tools.POST as GenericHandlerBase;
     case "messenger-inbox":
-      return (await import("@/messenger/inbox/list/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/messenger/inbox/list/route")).tools
+        .GET as GenericHandlerBase;
     case "messenger-messages":
-      return (await import("@/messenger/messages/list/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/messenger/messages/list/route")).tools
+        .GET as GenericHandlerBase;
     case "messenger-opened":
-      return (
-        await import("@/messenger/data-sources/messenger-opened/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/messenger/data-sources/messenger-opened/route"))
+        .tools.POST as GenericHandlerBase;
     case "messenger-sent":
-      return (
-        await import("@/messenger/data-sources/messenger-sent/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/messenger/data-sources/messenger-sent/route"))
+        .tools.POST as GenericHandlerBase;
     case "messenger-total":
-      return (
-        await import("@/messenger/data-sources/messenger-total/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/messenger/data-sources/messenger-total/route"))
+        .tools.POST as GenericHandlerBase;
     case "messenger_accounts_create_POST":
-      return (
-        await import("@/messenger/accounts/create/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/messenger/accounts/create/route")).tools
+        .POST as GenericHandlerBase;
     case "messenger_accounts_edit_id_DELETE":
-      return (
-        await import("@/messenger/accounts/edit/[id]/route")
-      ).tools.DELETE as GenericHandlerBase;
+      return (await import("@/messenger/accounts/edit/[id]/route")).tools
+        .DELETE as GenericHandlerBase;
     case "messenger_accounts_edit_id_GET":
-      return (
-        await import("@/messenger/accounts/edit/[id]/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/messenger/accounts/edit/[id]/route")).tools
+        .GET as GenericHandlerBase;
     case "messenger_accounts_edit_id_PUT":
-      return (
-        await import("@/messenger/accounts/edit/[id]/route")
-      ).tools.PUT as GenericHandlerBase;
+      return (await import("@/messenger/accounts/edit/[id]/route")).tools
+        .PUT as GenericHandlerBase;
     case "messenger_accounts_list_GET":
-      return (await import("@/messenger/accounts/list/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/messenger/accounts/list/route")).tools
+        .GET as GenericHandlerBase;
     case "messenger_data-sources_messenger-bounced_POST":
-      return (
-        await import("@/messenger/data-sources/messenger-bounced/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/messenger/data-sources/messenger-bounced/route"))
+        .tools.POST as GenericHandlerBase;
     case "messenger_data-sources_messenger-clicked_POST":
-      return (
-        await import("@/messenger/data-sources/messenger-clicked/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/messenger/data-sources/messenger-clicked/route"))
+        .tools.POST as GenericHandlerBase;
     case "messenger_data-sources_messenger-delivered_POST":
       return (
         await import("@/messenger/data-sources/messenger-delivered/route")
       ).tools.POST as GenericHandlerBase;
     case "messenger_data-sources_messenger-opened_POST":
-      return (
-        await import("@/messenger/data-sources/messenger-opened/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/messenger/data-sources/messenger-opened/route"))
+        .tools.POST as GenericHandlerBase;
     case "messenger_data-sources_messenger-sent_POST":
-      return (
-        await import("@/messenger/data-sources/messenger-sent/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/messenger/data-sources/messenger-sent/route"))
+        .tools.POST as GenericHandlerBase;
     case "messenger_data-sources_messenger-total_POST":
-      return (
-        await import("@/messenger/data-sources/messenger-total/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/messenger/data-sources/messenger-total/route"))
+        .tools.POST as GenericHandlerBase;
     case "messenger_inbox_folders_GET":
-      return (await import("@/messenger/inbox/folders/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/messenger/inbox/folders/route")).tools
+        .GET as GenericHandlerBase;
     case "messenger_inbox_list_GET":
-      return (await import("@/messenger/inbox/list/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/messenger/inbox/list/route")).tools
+        .GET as GenericHandlerBase;
     case "messenger_inbox_mark-read_POST":
-      return (
-        await import("@/messenger/inbox/mark-read/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/messenger/inbox/mark-read/route")).tools
+        .POST as GenericHandlerBase;
     case "messenger_inbox_move_POST":
-      return (await import("@/messenger/inbox/move/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/messenger/inbox/move/route")).tools
+        .POST as GenericHandlerBase;
     case "messenger_messages_id_GET":
-      return (await import("@/messenger/messages/[id]/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/messenger/messages/[id]/route")).tools
+        .GET as GenericHandlerBase;
     case "messenger_messages_list_GET":
-      return (await import("@/messenger/messages/list/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/messenger/messages/list/route")).tools
+        .GET as GenericHandlerBase;
     case "messenger_messages_stats_GET":
-      return (await import("@/messenger/messages/stats/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/messenger/messages/stats/route")).tools
+        .GET as GenericHandlerBase;
     case "messenger_preview_render_POST":
-      return (await import("@/messenger/preview/render/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/messenger/preview/render/route")).tools
+        .POST as GenericHandlerBase;
     case "messenger_preview_send-test_POST":
-      return (
-        await import("@/messenger/preview/send-test/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/messenger/preview/send-test/route")).tools
+        .POST as GenericHandlerBase;
     case "messenger_providers_email_imap-client_sync_POST":
       return (
         await import("@/messenger/providers/email/imap-client/sync/route")
@@ -2340,15 +1754,14 @@ async function importRouteHandler(
       return (await import("@/messenger/send/route")).tools
         .POST as GenericHandlerBase;
     case "migrate":
-      return (await import("next-vibe/database/migrate/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/database/migrate/route")).tools
+        .POST as GenericHandlerBase;
     case "models":
-      return (await import("next-vibe/agent/models/list/route")).tools
+      return (await import("@/vibe/agent/models/list/route")).tools
         .GET as GenericHandlerBase;
     case "my-instance-id":
-      return (
-        await import("next-vibe/remote-connection/self/instanceId/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/remote-connection/self/instanceId/route"))
+        .tools.GET as GenericHandlerBase;
     case "newsletter-campaigns-sent":
       return (
         await import("@/newsletter/data-sources/newsletter-campaigns-sent/route")
@@ -2361,15 +1774,15 @@ async function importRouteHandler(
       return (await import("@/newsletter/status/route")).tools
         .GET as GenericHandlerBase;
     case "newsletter-subscribe":
-      return (await import("@/newsletter/subscribe/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/newsletter/subscribe/route")).tools
+        .POST as GenericHandlerBase;
     case "newsletter-subscriptions-new":
       return (
         await import("@/newsletter/data-sources/newsletter-subscriptions-new/route")
       ).tools.POST as GenericHandlerBase;
     case "newsletter-unsubscribe":
-      return (await import("@/newsletter/unsubscribe/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/newsletter/unsubscribe/route")).tools
+        .POST as GenericHandlerBase;
     case "newsletter-unsubscribes":
       return (
         await import("@/newsletter/data-sources/newsletter-unsubscribes/route")
@@ -2394,38 +1807,35 @@ async function importRouteHandler(
       return (await import("@/newsletter/status/route")).tools
         .GET as GenericHandlerBase;
     case "newsletter_subscribe_POST":
-      return (await import("@/newsletter/subscribe/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/newsletter/subscribe/route")).tools
+        .POST as GenericHandlerBase;
     case "newsletter_unsubscribe_POST":
-      return (await import("@/newsletter/unsubscribe/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/newsletter/unsubscribe/route")).tools
+        .POST as GenericHandlerBase;
     case "newsletter_unsubscribe_sync_POST":
-      return (
-        await import("@/newsletter/unsubscribe/sync/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/newsletter/unsubscribe/sync/route")).tools
+        .POST as GenericHandlerBase;
     case "nowpayments":
-      return (
-        await import("@/payment/providers/nowpayments/cli/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/payment/providers/nowpayments/cli/route")).tools
+        .POST as GenericHandlerBase;
     case "open-code":
-      return (await import("next-vibe/agent/coding-agent/route")).tools
+      return (await import("@/vibe/agent/coding-agent/route")).tools
         .POST as GenericHandlerBase;
     case "ox":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/oxlint/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/oxlint/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "oxlint":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/oxlint/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/oxlint/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "payment-bill-get":
-      return (
-        await import("@/payment/bill/[billId]/get/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/payment/bill/[billId]/get/route")).tools
+        .GET as GenericHandlerBase;
     case "payment-bill-list":
       return (await import("@/payment/bill/list/route")).tools
         .GET as GenericHandlerBase;
@@ -2433,43 +1843,36 @@ async function importRouteHandler(
       return (await import("@/payment/dashboard/route")).tools
         .GET as GenericHandlerBase;
     case "payment-estimate-get":
-      return (
-        await import("@/payment/estimate/[estimateId]/get/route")
-      ).tools.GET as GenericHandlerBase;
-    case "payment-estimate-list":
-      return (await import("@/payment/estimate/list/route"))
-        .tools.GET as GenericHandlerBase;
-    case "payment-invoice-get":
-      return (
-        await import("@/payment/invoice/[invoiceId]/get/route")
-      ).tools.GET as GenericHandlerBase;
-    case "payment-invoice-list":
-      return (await import("@/payment/invoice/list/route"))
-        .tools.GET as GenericHandlerBase;
-    case "payment_GET":
-      return (await import("@/payment/route")).tools
+      return (await import("@/payment/estimate/[estimateId]/get/route")).tools
         .GET as GenericHandlerBase;
+    case "payment-estimate-list":
+      return (await import("@/payment/estimate/list/route")).tools
+        .GET as GenericHandlerBase;
+    case "payment-invoice-get":
+      return (await import("@/payment/invoice/[invoiceId]/get/route")).tools
+        .GET as GenericHandlerBase;
+    case "payment-invoice-list":
+      return (await import("@/payment/invoice/list/route")).tools
+        .GET as GenericHandlerBase;
+    case "payment_GET":
+      return (await import("@/payment/route")).tools.GET as GenericHandlerBase;
     case "payment_POST":
-      return (await import("@/payment/route")).tools
-        .POST as GenericHandlerBase;
+      return (await import("@/payment/route")).tools.POST as GenericHandlerBase;
     case "payment_bill_billId_approve_POST":
-      return (
-        await import("@/payment/bill/[billId]/approve/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/payment/bill/[billId]/approve/route")).tools
+        .POST as GenericHandlerBase;
     case "payment_bill_billId_get_GET":
-      return (
-        await import("@/payment/bill/[billId]/get/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/payment/bill/[billId]/get/route")).tools
+        .GET as GenericHandlerBase;
     case "payment_bill_billId_pay_POST":
-      return (
-        await import("@/payment/bill/[billId]/pay/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/payment/bill/[billId]/pay/route")).tools
+        .POST as GenericHandlerBase;
     case "payment_bill_create_POST":
-      return (await import("@/payment/bill/create/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/payment/bill/create/route")).tools
+        .POST as GenericHandlerBase;
     case "payment_bill_line_add_POST":
-      return (await import("@/payment/bill/line/add/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/payment/bill/line/add/route")).tools
+        .POST as GenericHandlerBase;
     case "payment_bill_list_GET":
       return (await import("@/payment/bill/list/route")).tools
         .GET as GenericHandlerBase;
@@ -2477,24 +1880,21 @@ async function importRouteHandler(
       return (await import("@/payment/checkout/route")).tools
         .POST as GenericHandlerBase;
     case "payment_credit-note_create_POST":
-      return (
-        await import("@/payment/credit-note/create/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/payment/credit-note/create/route")).tools
+        .POST as GenericHandlerBase;
     case "payment_dashboard_GET":
       return (await import("@/payment/dashboard/route")).tools
         .GET as GenericHandlerBase;
     case "payment_data-sources_payments-count_POST":
-      return (
-        await import("@/payment/data-sources/payments-count/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/payment/data-sources/payments-count/route")).tools
+        .POST as GenericHandlerBase;
     case "payment_data-sources_payments-disputes-count_POST":
       return (
         await import("@/payment/data-sources/payments-disputes-count/route")
       ).tools.POST as GenericHandlerBase;
     case "payment_data-sources_payments-failed_POST":
-      return (
-        await import("@/payment/data-sources/payments-failed/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/payment/data-sources/payments-failed/route"))
+        .tools.POST as GenericHandlerBase;
     case "payment_data-sources_payments-invoices-paid_POST":
       return (
         await import("@/payment/data-sources/payments-invoices-paid/route")
@@ -2512,117 +1912,98 @@ async function importRouteHandler(
         await import("@/payment/data-sources/payments-refund-volume/route")
       ).tools.POST as GenericHandlerBase;
     case "payment_data-sources_payments-revenue_POST":
-      return (
-        await import("@/payment/data-sources/payments-revenue/route")
-      ).tools.POST as GenericHandlerBase;
-    case "payment_estimate_create_POST":
-      return (await import("@/payment/estimate/create/route"))
+      return (await import("@/payment/data-sources/payments-revenue/route"))
         .tools.POST as GenericHandlerBase;
+    case "payment_estimate_create_POST":
+      return (await import("@/payment/estimate/create/route")).tools
+        .POST as GenericHandlerBase;
     case "payment_estimate_estimateId_accept_POST":
-      return (
-        await import("@/payment/estimate/[estimateId]/accept/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/payment/estimate/[estimateId]/accept/route"))
+        .tools.POST as GenericHandlerBase;
     case "payment_estimate_estimateId_convert-to-invoice_POST":
       return (
         await import("@/payment/estimate/[estimateId]/convert-to-invoice/route")
       ).tools.POST as GenericHandlerBase;
     case "payment_estimate_estimateId_decline_POST":
-      return (
-        await import("@/payment/estimate/[estimateId]/decline/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/payment/estimate/[estimateId]/decline/route"))
+        .tools.POST as GenericHandlerBase;
     case "payment_estimate_estimateId_duplicate_POST":
-      return (
-        await import("@/payment/estimate/[estimateId]/duplicate/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/payment/estimate/[estimateId]/duplicate/route"))
+        .tools.POST as GenericHandlerBase;
     case "payment_estimate_estimateId_get_GET":
-      return (
-        await import("@/payment/estimate/[estimateId]/get/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/payment/estimate/[estimateId]/get/route")).tools
+        .GET as GenericHandlerBase;
     case "payment_estimate_estimateId_send_POST":
-      return (
-        await import("@/payment/estimate/[estimateId]/send/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/payment/estimate/[estimateId]/send/route")).tools
+        .POST as GenericHandlerBase;
     case "payment_estimate_line_add_POST":
-      return (
-        await import("@/payment/estimate/line/add/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/payment/estimate/line/add/route")).tools
+        .POST as GenericHandlerBase;
     case "payment_estimate_line_lineId_remove_POST":
-      return (
-        await import("@/payment/estimate/line/[lineId]/remove/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/payment/estimate/line/[lineId]/remove/route"))
+        .tools.POST as GenericHandlerBase;
     case "payment_estimate_list_GET":
-      return (await import("@/payment/estimate/list/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/payment/estimate/list/route")).tools
+        .GET as GenericHandlerBase;
     case "payment_invoice_POST":
       return (await import("@/payment/invoice/route")).tools
         .POST as GenericHandlerBase;
     case "payment_invoice_create_POST":
-      return (await import("@/payment/invoice/create/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/payment/invoice/create/route")).tools
+        .POST as GenericHandlerBase;
     case "payment_invoice_invoiceId_duplicate_POST":
-      return (
-        await import("@/payment/invoice/[invoiceId]/duplicate/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/payment/invoice/[invoiceId]/duplicate/route"))
+        .tools.POST as GenericHandlerBase;
     case "payment_invoice_invoiceId_get_GET":
-      return (
-        await import("@/payment/invoice/[invoiceId]/get/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/payment/invoice/[invoiceId]/get/route")).tools
+        .GET as GenericHandlerBase;
     case "payment_invoice_invoiceId_public-view_GET":
-      return (
-        await import("@/payment/invoice/[invoiceId]/public-view/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/payment/invoice/[invoiceId]/public-view/route"))
+        .tools.GET as GenericHandlerBase;
     case "payment_invoice_invoiceId_record-payment_POST":
       return (
         await import("@/payment/invoice/[invoiceId]/record-payment/route")
       ).tools.POST as GenericHandlerBase;
     case "payment_invoice_invoiceId_send-reminder_POST":
-      return (
-        await import("@/payment/invoice/[invoiceId]/send-reminder/route")
-      ).tools.POST as GenericHandlerBase;
-    case "payment_invoice_invoiceId_send_POST":
-      return (
-        await import("@/payment/invoice/[invoiceId]/send/route")
-      ).tools.POST as GenericHandlerBase;
-    case "payment_invoice_invoiceId_void_POST":
-      return (
-        await import("@/payment/invoice/[invoiceId]/void/route")
-      ).tools.POST as GenericHandlerBase;
-    case "payment_invoice_line_add_POST":
-      return (await import("@/payment/invoice/line/add/route"))
+      return (await import("@/payment/invoice/[invoiceId]/send-reminder/route"))
         .tools.POST as GenericHandlerBase;
+    case "payment_invoice_invoiceId_send_POST":
+      return (await import("@/payment/invoice/[invoiceId]/send/route")).tools
+        .POST as GenericHandlerBase;
+    case "payment_invoice_invoiceId_void_POST":
+      return (await import("@/payment/invoice/[invoiceId]/void/route")).tools
+        .POST as GenericHandlerBase;
+    case "payment_invoice_line_add_POST":
+      return (await import("@/payment/invoice/line/add/route")).tools
+        .POST as GenericHandlerBase;
     case "payment_invoice_line_lineId_remove_POST":
-      return (
-        await import("@/payment/invoice/line/[lineId]/remove/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/payment/invoice/line/[lineId]/remove/route"))
+        .tools.POST as GenericHandlerBase;
     case "payment_invoice_list_GET":
-      return (await import("@/payment/invoice/list/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/payment/invoice/list/route")).tools
+        .GET as GenericHandlerBase;
     case "payment_portal_POST":
       return (await import("@/payment/portal/route")).tools
         .POST as GenericHandlerBase;
     case "payment_providers_nowpayments_cli_POST":
-      return (
-        await import("@/payment/providers/nowpayments/cli/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/payment/providers/nowpayments/cli/route")).tools
+        .POST as GenericHandlerBase;
     case "payment_providers_stripe_cli_POST":
-      return (
-        await import("@/payment/providers/stripe/cli/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/payment/providers/stripe/cli/route")).tools
+        .POST as GenericHandlerBase;
     case "payment_refund_POST":
       return (await import("@/payment/refund/route")).tools
         .POST as GenericHandlerBase;
     case "payments-count":
-      return (
-        await import("@/payment/data-sources/payments-count/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/payment/data-sources/payments-count/route")).tools
+        .POST as GenericHandlerBase;
     case "payments-disputes-count":
       return (
         await import("@/payment/data-sources/payments-disputes-count/route")
       ).tools.POST as GenericHandlerBase;
     case "payments-failed":
-      return (
-        await import("@/payment/data-sources/payments-failed/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/payment/data-sources/payments-failed/route"))
+        .tools.POST as GenericHandlerBase;
     case "payments-invoices-paid":
       return (
         await import("@/payment/data-sources/payments-invoices-paid/route")
@@ -2640,18 +2021,17 @@ async function importRouteHandler(
         await import("@/payment/data-sources/payments-refund-volume/route")
       ).tools.POST as GenericHandlerBase;
     case "payments-revenue":
-      return (
-        await import("@/payment/data-sources/payments-revenue/route")
-      ).tools.POST as GenericHandlerBase;
-    case "ping":
-      return (await import("next-vibe/database/ping/route"))
+      return (await import("@/payment/data-sources/payments-revenue/route"))
         .tools.POST as GenericHandlerBase;
+    case "ping":
+      return (await import("@/vibe/database/ping/route")).tools
+        .POST as GenericHandlerBase;
     case "pos-dashboard":
       return (await import("@/pos/dashboard/route")).tools
         .GET as GenericHandlerBase;
     case "pos-order-get":
-      return (await import("@/pos/order/[orderId]/get/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/pos/order/[orderId]/get/route")).tools
+        .GET as GenericHandlerBase;
     case "pos-order-list":
       return (await import("@/pos/order/list/route")).tools
         .GET as GenericHandlerBase;
@@ -2674,27 +2054,23 @@ async function importRouteHandler(
       return (await import("@/pos/order/list/route")).tools
         .GET as GenericHandlerBase;
     case "pos_order_orderId_add-item_POST":
-      return (
-        await import("@/pos/order/[orderId]/add-item/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/pos/order/[orderId]/add-item/route")).tools
+        .POST as GenericHandlerBase;
     case "pos_order_orderId_add-payment_POST":
-      return (
-        await import("@/pos/order/[orderId]/add-payment/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/pos/order/[orderId]/add-payment/route")).tools
+        .POST as GenericHandlerBase;
     case "pos_order_orderId_complete_POST":
-      return (
-        await import("@/pos/order/[orderId]/complete/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/pos/order/[orderId]/complete/route")).tools
+        .POST as GenericHandlerBase;
     case "pos_order_orderId_get_GET":
-      return (await import("@/pos/order/[orderId]/get/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/pos/order/[orderId]/get/route")).tools
+        .GET as GenericHandlerBase;
     case "pos_order_orderId_remove-item_POST":
-      return (
-        await import("@/pos/order/[orderId]/remove-item/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/pos/order/[orderId]/remove-item/route")).tools
+        .POST as GenericHandlerBase;
     case "pos_order_orderId_void_POST":
-      return (await import("@/pos/order/[orderId]/void/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/pos/order/[orderId]/void/route")).tools
+        .POST as GenericHandlerBase;
     case "pos_product-lookup_GET":
       return (await import("@/pos/product-lookup/route")).tools
         .GET as GenericHandlerBase;
@@ -2705,163 +2081,137 @@ async function importRouteHandler(
       return (await import("@/pos/session/open/route")).tools
         .POST as GenericHandlerBase;
     case "pos_session_sessionId_get_GET":
-      return (
-        await import("@/pos/session/[sessionId]/get/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/pos/session/[sessionId]/get/route")).tools
+        .GET as GenericHandlerBase;
     case "pos_terminal_create_POST":
-      return (await import("@/pos/terminal/create/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/pos/terminal/create/route")).tools
+        .POST as GenericHandlerBase;
     case "pos_terminal_list_GET":
       return (await import("@/pos/terminal/list/route")).tools
         .GET as GenericHandlerBase;
     case "products-catalog-list":
-      return (await import("@/products/catalog/list/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/products/catalog/list/route")).tools
+        .GET as GenericHandlerBase;
     case "products-category-list":
-      return (await import("@/products/category/list/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/products/category/list/route")).tools
+        .GET as GenericHandlerBase;
     case "products_catalog_create_POST":
-      return (await import("@/products/catalog/create/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/products/catalog/create/route")).tools
+        .POST as GenericHandlerBase;
     case "products_catalog_list_GET":
-      return (await import("@/products/catalog/list/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/products/catalog/list/route")).tools
+        .GET as GenericHandlerBase;
     case "products_catalog_productId_deactivate_POST":
-      return (
-        await import("@/products/catalog/[productId]/deactivate/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/products/catalog/[productId]/deactivate/route"))
+        .tools.POST as GenericHandlerBase;
     case "products_catalog_productId_get_GET":
-      return (
-        await import("@/products/catalog/[productId]/get/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/products/catalog/[productId]/get/route")).tools
+        .GET as GenericHandlerBase;
     case "products_catalog_productId_update_PATCH":
-      return (
-        await import("@/products/catalog/[productId]/update/route")
-      ).tools.PATCH as GenericHandlerBase;
+      return (await import("@/products/catalog/[productId]/update/route")).tools
+        .PATCH as GenericHandlerBase;
     case "products_category_create_POST":
-      return (await import("@/products/category/create/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/products/category/create/route")).tools
+        .POST as GenericHandlerBase;
     case "products_category_list_GET":
-      return (await import("@/products/category/list/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/products/category/list/route")).tools
+        .GET as GenericHandlerBase;
     case "pub":
-      return (await import("next-vibe/tooling/release/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/tooling/release/route")).tools
+        .POST as GenericHandlerBase;
     case "publish":
-      return (await import("next-vibe/tooling/release/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/tooling/release/route")).tools
+        .POST as GenericHandlerBase;
     case "pulse-execute":
-      return (
-        await import("next-vibe/tasks/pulse/execute/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/tasks/pulse/execute/route")).tools
+        .POST as GenericHandlerBase;
     case "pulse-history":
-      return (
-        await import("next-vibe/tasks/pulse/history/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/tasks/pulse/history/route")).tools
+        .GET as GenericHandlerBase;
     case "pulse-status":
-      return (
-        await import("next-vibe/tasks/pulse/status/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/tasks/pulse/status/route")).tools
+        .GET as GenericHandlerBase;
     case "pulse:execute":
-      return (
-        await import("next-vibe/tasks/pulse/execute/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/tasks/pulse/execute/route")).tools
+        .POST as GenericHandlerBase;
     case "pulse:history":
-      return (
-        await import("next-vibe/tasks/pulse/history/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/tasks/pulse/history/route")).tools
+        .GET as GenericHandlerBase;
     case "pulse:status":
-      return (
-        await import("next-vibe/tasks/pulse/status/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/tasks/pulse/status/route")).tools
+        .GET as GenericHandlerBase;
     case "purchasing-dashboard":
-      return (await import("@/purchasing/dashboard/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/purchasing/dashboard/route")).tools
+        .GET as GenericHandlerBase;
     case "purchasing-orders":
-      return (await import("@/purchasing/order/list/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/purchasing/order/list/route")).tools
+        .GET as GenericHandlerBase;
     case "purchasing-vendor-get":
-      return (
-        await import("@/purchasing/vendor/[vendorId]/get/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/purchasing/vendor/[vendorId]/get/route")).tools
+        .GET as GenericHandlerBase;
     case "purchasing-vendors":
-      return (await import("@/purchasing/vendor/list/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/purchasing/vendor/list/route")).tools
+        .GET as GenericHandlerBase;
     case "purchasing_dashboard_GET":
-      return (await import("@/purchasing/dashboard/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/purchasing/dashboard/route")).tools
+        .GET as GenericHandlerBase;
     case "purchasing_order_create_POST":
-      return (await import("@/purchasing/order/create/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/purchasing/order/create/route")).tools
+        .POST as GenericHandlerBase;
     case "purchasing_order_line_add_POST":
-      return (
-        await import("@/purchasing/order/line/add/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/purchasing/order/line/add/route")).tools
+        .POST as GenericHandlerBase;
     case "purchasing_order_line_remove_POST":
-      return (
-        await import("@/purchasing/order/line/remove/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/purchasing/order/line/remove/route")).tools
+        .POST as GenericHandlerBase;
     case "purchasing_order_list_GET":
-      return (await import("@/purchasing/order/list/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/purchasing/order/list/route")).tools
+        .GET as GenericHandlerBase;
     case "purchasing_order_poId_cancel_POST":
-      return (
-        await import("@/purchasing/order/[poId]/cancel/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/purchasing/order/[poId]/cancel/route")).tools
+        .POST as GenericHandlerBase;
     case "purchasing_order_poId_confirm_POST":
-      return (
-        await import("@/purchasing/order/[poId]/confirm/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/purchasing/order/[poId]/confirm/route")).tools
+        .POST as GenericHandlerBase;
     case "purchasing_order_poId_convert-to-bill_POST":
-      return (
-        await import("@/purchasing/order/[poId]/convert-to-bill/route")
-      ).tools.POST as GenericHandlerBase;
-    case "purchasing_order_poId_get_GET":
-      return (
-        await import("@/purchasing/order/[poId]/get/route")
-      ).tools.GET as GenericHandlerBase;
-    case "purchasing_order_poId_receive_POST":
-      return (
-        await import("@/purchasing/order/[poId]/receive/route")
-      ).tools.POST as GenericHandlerBase;
-    case "purchasing_order_poId_send_POST":
-      return (
-        await import("@/purchasing/order/[poId]/send/route")
-      ).tools.POST as GenericHandlerBase;
-    case "purchasing_order_poId_update_PATCH":
-      return (
-        await import("@/purchasing/order/[poId]/update/route")
-      ).tools.PATCH as GenericHandlerBase;
-    case "purchasing_vendor_create_POST":
-      return (await import("@/purchasing/vendor/create/route"))
+      return (await import("@/purchasing/order/[poId]/convert-to-bill/route"))
         .tools.POST as GenericHandlerBase;
+    case "purchasing_order_poId_get_GET":
+      return (await import("@/purchasing/order/[poId]/get/route")).tools
+        .GET as GenericHandlerBase;
+    case "purchasing_order_poId_receive_POST":
+      return (await import("@/purchasing/order/[poId]/receive/route")).tools
+        .POST as GenericHandlerBase;
+    case "purchasing_order_poId_send_POST":
+      return (await import("@/purchasing/order/[poId]/send/route")).tools
+        .POST as GenericHandlerBase;
+    case "purchasing_order_poId_update_PATCH":
+      return (await import("@/purchasing/order/[poId]/update/route")).tools
+        .PATCH as GenericHandlerBase;
+    case "purchasing_vendor_create_POST":
+      return (await import("@/purchasing/vendor/create/route")).tools
+        .POST as GenericHandlerBase;
     case "purchasing_vendor_list_GET":
-      return (await import("@/purchasing/vendor/list/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/purchasing/vendor/list/route")).tools
+        .GET as GenericHandlerBase;
     case "purchasing_vendor_vendorId_deactivate_POST":
-      return (
-        await import("@/purchasing/vendor/[vendorId]/deactivate/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/purchasing/vendor/[vendorId]/deactivate/route"))
+        .tools.POST as GenericHandlerBase;
     case "purchasing_vendor_vendorId_get_GET":
-      return (
-        await import("@/purchasing/vendor/[vendorId]/get/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/purchasing/vendor/[vendorId]/get/route")).tools
+        .GET as GenericHandlerBase;
     case "purchasing_vendor_vendorId_update_PATCH":
-      return (
-        await import("@/purchasing/vendor/[vendorId]/update/route")
-      ).tools.PATCH as GenericHandlerBase;
+      return (await import("@/purchasing/vendor/[vendorId]/update/route")).tools
+        .PATCH as GenericHandlerBase;
     case "push":
-      return (
-        await import("next-vibe/tooling/infra/deploy/push/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/tooling/infra/deploy/push/route")).tools
+        .POST as GenericHandlerBase;
     case "re":
-      return (
-        await import("next-vibe/server/server/rebuild/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/server/server/rebuild/route")).tools
+        .POST as GenericHandlerBase;
     case "rebuild":
-      return (
-        await import("next-vibe/server/server/rebuild/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/server/server/rebuild/route")).tools
+        .POST as GenericHandlerBase;
     case "record-engagement":
       return (await import("@/leads/tracking/route")).tools
         .POST as GenericHandlerBase;
@@ -2872,14 +2222,14 @@ async function importRouteHandler(
       return (await import("@/referral/route")).tools
         .POST as GenericHandlerBase;
     case "referral_admin_payouts_GET":
-      return (await import("@/referral/admin/payouts/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/referral/admin/payouts/route")).tools
+        .GET as GenericHandlerBase;
     case "referral_admin_payouts_POST":
-      return (await import("@/referral/admin/payouts/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/referral/admin/payouts/route")).tools
+        .POST as GenericHandlerBase;
     case "referral_codes_list_GET":
-      return (await import("@/referral/codes/list/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/referral/codes/list/route")).tools
+        .GET as GenericHandlerBase;
     case "referral_data-sources_referrals-codes-created_POST":
       return (
         await import("@/referral/data-sources/referrals-codes-created/route")
@@ -2897,19 +2247,17 @@ async function importRouteHandler(
         await import("@/referral/data-sources/referrals-lead-clicks/route")
       ).tools.POST as GenericHandlerBase;
     case "referral_data-sources_referrals-payouts_POST":
-      return (
-        await import("@/referral/data-sources/referrals-payouts/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/referral/data-sources/referrals-payouts/route"))
+        .tools.POST as GenericHandlerBase;
     case "referral_data-sources_referrals-signups_POST":
-      return (
-        await import("@/referral/data-sources/referrals-signups/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/referral/data-sources/referrals-signups/route"))
+        .tools.POST as GenericHandlerBase;
     case "referral_earnings_list_GET":
-      return (await import("@/referral/earnings/list/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/referral/earnings/list/route")).tools
+        .GET as GenericHandlerBase;
     case "referral_lead_current_GET":
-      return (await import("@/referral/lead/current/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/referral/lead/current/route")).tools
+        .GET as GenericHandlerBase;
     case "referral_payout_GET":
       return (await import("@/referral/payout/route")).tools
         .GET as GenericHandlerBase;
@@ -2936,332 +2284,249 @@ async function importRouteHandler(
         await import("@/referral/data-sources/referrals-lead-clicks/route")
       ).tools.POST as GenericHandlerBase;
     case "referrals-payouts":
-      return (
-        await import("@/referral/data-sources/referrals-payouts/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/referral/data-sources/referrals-payouts/route"))
+        .tools.POST as GenericHandlerBase;
     case "referrals-signups":
-      return (
-        await import("@/referral/data-sources/referrals-signups/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/referral/data-sources/referrals-signups/route"))
+        .tools.POST as GenericHandlerBase;
     case "release":
-      return (await import("next-vibe/tooling/release/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/tooling/release/route")).tools
+        .POST as GenericHandlerBase;
     case "remote-connect":
-      return (
-        await import("next-vibe/remote-connection/connect/route")
-      ).tools.POST as GenericHandlerBase;
-    case "remote-connection_connect-reverse_POST":
-      return (
-        await import("next-vibe/remote-connection/connect-reverse/route")
-      ).tools.POST as GenericHandlerBase;
-    case "remote-connection_connect-reverse_update_PATCH":
-      return (
-        await import("next-vibe/remote-connection/connect-reverse/update/route")
-      ).tools.PATCH as GenericHandlerBase;
-    case "remote-connection_connect_POST":
-      return (
-        await import("next-vibe/remote-connection/connect/route")
-      ).tools.POST as GenericHandlerBase;
-    case "remote-connection_instanceId_DELETE":
-      return (
-        await import("next-vibe/remote-connection/[instanceId]/route")
-      ).tools.DELETE as GenericHandlerBase;
-    case "remote-connection_instanceId_GET":
-      return (
-        await import("next-vibe/remote-connection/[instanceId]/route")
-      ).tools.GET as GenericHandlerBase;
-    case "remote-connection_instanceId_PATCH":
-      return (
-        await import("next-vibe/remote-connection/[instanceId]/route")
-      ).tools.PATCH as GenericHandlerBase;
-    case "remote-connection_list_GET":
-      return (await import("next-vibe/remote-connection/list/route"))
-        .tools.GET as GenericHandlerBase;
-    case "remote-connection_self_instanceId_GET":
-      return (
-        await import("next-vibe/remote-connection/self/instanceId/route")
-      ).tools.GET as GenericHandlerBase;
-    case "remote-connection_self_rename_PATCH":
-      return (
-        await import("next-vibe/remote-connection/self/rename/route")
-      ).tools.PATCH as GenericHandlerBase;
-    case "remote-connection_sync_POST":
-      return (await import("next-vibe/remote-connection/sync/route"))
-        .tools.POST as GenericHandlerBase;
-    case "remote-connection_sync_providers_GET":
-      return (
-        await import("next-vibe/remote-connection/sync/providers/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/remote-connection/connect/route")).tools
+        .POST as GenericHandlerBase;
     case "remote-connections":
-      return (await import("next-vibe/remote-connection/list/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/remote-connection/list/route")).tools
+        .GET as GenericHandlerBase;
     case "remote-event-bridge":
-      return (
-        await import("next-vibe/realtime/remote-event-bridge/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/realtime/remote-event-bridge/route")).tools
+        .POST as GenericHandlerBase;
     case "remote-status":
-      return (
-        await import("next-vibe/remote-connection/[instanceId]/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/remote-connection/[instanceId]/route")).tools
+        .GET as GenericHandlerBase;
     case "rename-instance":
-      return (
-        await import("next-vibe/remote-connection/self/rename/route")
-      ).tools.PATCH as GenericHandlerBase;
+      return (await import("@/vibe/remote-connection/self/rename/route")).tools
+        .PATCH as GenericHandlerBase;
     case "rename-self":
-      return (
-        await import("next-vibe/remote-connection/self/rename/route")
-      ).tools.PATCH as GenericHandlerBase;
+      return (await import("@/vibe/remote-connection/self/rename/route")).tools
+        .PATCH as GenericHandlerBase;
     case "rename-thread":
-      return (
-        await import("next-vibe/agent/chat/threads/rename/route")
-      ).tools.PATCH as GenericHandlerBase;
+      return (await import("@/vibe/agent/chat/threads/rename/route")).tools
+        .PATCH as GenericHandlerBase;
     case "report-client-error":
-      return (
-        await import("next-vibe/logger/error-monitor/client-log/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/logger/error-monitor/client-log/route"))
+        .tools.POST as GenericHandlerBase;
     case "resume-stream":
-      return (
-        await import("next-vibe/execute-tool/revival/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/execute-tool/revival/route")).tools
+        .POST as GenericHandlerBase;
     case "resume-when-done":
       return (
-        await import("next-vibe/execute-tool/call-control/resume-when-done/route")
+        await import("@/vibe/execute-tool/call-control/resume-when-done/route")
       ).tools.POST as GenericHandlerBase;
     case "run-ai":
-      return (await import("next-vibe/agent/ai-stream/run/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/agent/ai-stream/run/route")).tools
+        .POST as GenericHandlerBase;
     case "runner":
-      return (
-        await import("next-vibe/tasks/unified-runner/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/tasks/unified-runner/route")).tools
+        .POST as GenericHandlerBase;
     case "s":
-      return (
-        await import("next-vibe/server/server/start/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/server/server/start/route")).tools
+        .POST as GenericHandlerBase;
     case "scale":
-      return (
-        await import("next-vibe/tooling/infra/scale/replicas/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/tooling/infra/scale/replicas/route")).tools
+        .POST as GenericHandlerBase;
     case "scale-replicas":
-      return (
-        await import("next-vibe/tooling/infra/scale/replicas/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/tooling/infra/scale/replicas/route")).tools
+        .POST as GenericHandlerBase;
     case "seed":
-      return (await import("next-vibe/database/seed/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/database/seed/route")).tools
+        .POST as GenericHandlerBase;
     case "self-instance-id":
-      return (
-        await import("next-vibe/remote-connection/self/instanceId/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/remote-connection/self/instanceId/route"))
+        .tools.GET as GenericHandlerBase;
     case "set-setting":
-      return (await import("next-vibe/env/settings/route"))
-        .tools.PATCH as GenericHandlerBase;
+      return (await import("@/vibe/env/settings/route")).tools
+        .PATCH as GenericHandlerBase;
     case "setup":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/platforms/cli/setup/install/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/platforms/cli/setup/install/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "setup:uninstall":
-      return (
-        await import("next-vibe/platforms/cli/setup/uninstall/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/platforms/cli/setup/uninstall/route")).tools
+        .POST as GenericHandlerBase;
     case "setup:update":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/platforms/cli/setup/install/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/platforms/cli/setup/install/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "skill-create":
-      return (await import("next-vibe/agent/skills/create/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/agent/skills/create/route")).tools
+        .POST as GenericHandlerBase;
     case "skill-delete":
-      return (await import("next-vibe/agent/skills/[id]/route")).tools
+      return (await import("@/vibe/agent/skills/[id]/route")).tools
         .DELETE as GenericHandlerBase;
     case "skill-get":
-      return (await import("next-vibe/agent/skills/[id]/route")).tools
+      return (await import("@/vibe/agent/skills/[id]/route")).tools
         .GET as GenericHandlerBase;
     case "skill-moderation":
-      return (await import("next-vibe/agent/skills/moderation/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/agent/skills/moderation/route")).tools
+        .GET as GenericHandlerBase;
     case "skill-publish":
-      return (
-        await import("next-vibe/agent/skills/[id]/publish/route")
-      ).tools.PATCH as GenericHandlerBase;
+      return (await import("@/vibe/agent/skills/[id]/publish/route")).tools
+        .PATCH as GenericHandlerBase;
     case "skill-report":
-      return (await import("next-vibe/agent/skills/[id]/report/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/agent/skills/[id]/report/route")).tools
+        .POST as GenericHandlerBase;
     case "skill-update":
-      return (await import("next-vibe/agent/skills/[id]/route")).tools
+      return (await import("@/vibe/agent/skills/[id]/route")).tools
         .PATCH as GenericHandlerBase;
     case "skill-vote":
-      return (await import("next-vibe/agent/skills/[id]/vote/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/agent/skills/[id]/vote/route")).tools
+        .POST as GenericHandlerBase;
     case "skills":
-      return (await import("next-vibe/agent/skills/route")).tools
+      return (await import("@/vibe/agent/skills/route")).tools
         .GET as GenericHandlerBase;
     case "sql":
-      return (await import("next-vibe/database/sql/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/database/sql/route")).tools
+        .POST as GenericHandlerBase;
     case "ssh-connections-list":
-      return (await import("@/ssh/connections/list/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/ssh/connections/list/route")).tools
+        .GET as GenericHandlerBase;
     case "ssh-mount":
-      return (
-        await import("@/ssh/connections/[id]/mounts/[mountId]/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/ssh/connections/[id]/mounts/[mountId]/route"))
+        .tools.GET as GenericHandlerBase;
     case "ssh-mount-create":
-      return (
-        await import("@/ssh/connections/[id]/mounts/create/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/ssh/connections/[id]/mounts/create/route")).tools
+        .POST as GenericHandlerBase;
     case "ssh-mount-delete":
-      return (
-        await import("@/ssh/connections/[id]/mounts/[mountId]/route")
-      ).tools.DELETE as GenericHandlerBase;
+      return (await import("@/ssh/connections/[id]/mounts/[mountId]/route"))
+        .tools.DELETE as GenericHandlerBase;
     case "ssh-mount-list":
-      return (
-        await import("@/ssh/connections/[id]/mounts/list/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/ssh/connections/[id]/mounts/list/route")).tools
+        .GET as GenericHandlerBase;
     case "ssh-mount-update":
-      return (
-        await import("@/ssh/connections/[id]/mounts/[mountId]/route")
-      ).tools.PATCH as GenericHandlerBase;
-    case "ssh_connections_create_POST":
-      return (await import("@/ssh/connections/create/route"))
-        .tools.POST as GenericHandlerBase;
-    case "ssh_connections_id_DELETE":
-      return (await import("@/ssh/connections/[id]/route"))
-        .tools.DELETE as GenericHandlerBase;
-    case "ssh_connections_id_GET":
-      return (await import("@/ssh/connections/[id]/route"))
-        .tools.GET as GenericHandlerBase;
-    case "ssh_connections_id_PATCH":
-      return (await import("@/ssh/connections/[id]/route"))
+      return (await import("@/ssh/connections/[id]/mounts/[mountId]/route"))
         .tools.PATCH as GenericHandlerBase;
+    case "ssh_connections_create_POST":
+      return (await import("@/ssh/connections/create/route")).tools
+        .POST as GenericHandlerBase;
+    case "ssh_connections_id_DELETE":
+      return (await import("@/ssh/connections/[id]/route")).tools
+        .DELETE as GenericHandlerBase;
+    case "ssh_connections_id_GET":
+      return (await import("@/ssh/connections/[id]/route")).tools
+        .GET as GenericHandlerBase;
+    case "ssh_connections_id_PATCH":
+      return (await import("@/ssh/connections/[id]/route")).tools
+        .PATCH as GenericHandlerBase;
     case "ssh_connections_id_mounts_create_POST":
-      return (
-        await import("@/ssh/connections/[id]/mounts/create/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/ssh/connections/[id]/mounts/create/route")).tools
+        .POST as GenericHandlerBase;
     case "ssh_connections_id_mounts_list_GET":
-      return (
-        await import("@/ssh/connections/[id]/mounts/list/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/ssh/connections/[id]/mounts/list/route")).tools
+        .GET as GenericHandlerBase;
     case "ssh_connections_id_mounts_mountId_DELETE":
-      return (
-        await import("@/ssh/connections/[id]/mounts/[mountId]/route")
-      ).tools.DELETE as GenericHandlerBase;
-    case "ssh_connections_id_mounts_mountId_GET":
-      return (
-        await import("@/ssh/connections/[id]/mounts/[mountId]/route")
-      ).tools.GET as GenericHandlerBase;
-    case "ssh_connections_id_mounts_mountId_PATCH":
-      return (
-        await import("@/ssh/connections/[id]/mounts/[mountId]/route")
-      ).tools.PATCH as GenericHandlerBase;
-    case "ssh_connections_list_GET":
-      return (await import("@/ssh/connections/list/route"))
-        .tools.GET as GenericHandlerBase;
-    case "ssh_linux_users_create_POST":
-      return (await import("@/ssh/linux/users/create/route"))
-        .tools.POST as GenericHandlerBase;
-    case "ssh_linux_users_list_GET":
-      return (await import("@/ssh/linux/users/list/route"))
-        .tools.GET as GenericHandlerBase;
-    case "ssh_linux_users_username_DELETE":
-      return (
-        await import("@/ssh/linux/users/[username]/route")
-      ).tools.DELETE as GenericHandlerBase;
-    case "stage":
-      return (
-        await import("next-vibe/tooling/vibe-stage/route")
-      ).tools.POST as GenericHandlerBase;
-    case "start":
-      return (
-        await import("next-vibe/server/server/start/route")
-      ).tools.POST as GenericHandlerBase;
-    case "status":
-      return (
-        await import("next-vibe/platforms/cli/setup/status/route")
-      ).tools.POST as GenericHandlerBase;
-    case "stripe":
-      return (
-        await import("@/payment/providers/stripe/cli/route")
-      ).tools.POST as GenericHandlerBase;
-    case "stripe-cli":
-      return (
-        await import("@/payment/providers/stripe/cli/route")
-      ).tools.POST as GenericHandlerBase;
-    case "stt":
-      return (
-        await import("next-vibe/agent/speech-to-text/hotkey/route")
-      ).tools.POST as GenericHandlerBase;
-    case "studio":
-      return (await import("next-vibe/database/studio/route"))
-        .tools.POST as GenericHandlerBase;
-    case "subscribe":
-      return (await import("@/newsletter/subscribe/route"))
-        .tools.POST as GenericHandlerBase;
-    case "subscription-admin-list":
-      return (await import("@/subscription/admin/list/route"))
-        .tools.GET as GenericHandlerBase;
-    case "subscription-admin-purchases":
-      return (
-        await import("@/subscription/admin/purchases/route")
-      ).tools.GET as GenericHandlerBase;
-    case "subscription-admin-referrals":
-      return (
-        await import("@/subscription/admin/referrals/route")
-      ).tools.GET as GenericHandlerBase;
-    case "subscription-admin-stats":
-      return (await import("@/subscription/admin/stats/route"))
-        .tools.GET as GenericHandlerBase;
-    case "subscription-cancel":
-      return (await import("@/subscription/cancel/route"))
+      return (await import("@/ssh/connections/[id]/mounts/[mountId]/route"))
         .tools.DELETE as GenericHandlerBase;
-    case "subscription-dashboard":
-      return (await import("@/subscription/dashboard/route"))
+    case "ssh_connections_id_mounts_mountId_GET":
+      return (await import("@/ssh/connections/[id]/mounts/[mountId]/route"))
         .tools.GET as GenericHandlerBase;
+    case "ssh_connections_id_mounts_mountId_PATCH":
+      return (await import("@/ssh/connections/[id]/mounts/[mountId]/route"))
+        .tools.PATCH as GenericHandlerBase;
+    case "ssh_connections_list_GET":
+      return (await import("@/ssh/connections/list/route")).tools
+        .GET as GenericHandlerBase;
+    case "ssh_linux_users_create_POST":
+      return (await import("@/ssh/linux/users/create/route")).tools
+        .POST as GenericHandlerBase;
+    case "ssh_linux_users_list_GET":
+      return (await import("@/ssh/linux/users/list/route")).tools
+        .GET as GenericHandlerBase;
+    case "ssh_linux_users_username_DELETE":
+      return (await import("@/ssh/linux/users/[username]/route")).tools
+        .DELETE as GenericHandlerBase;
+    case "stage":
+      return (await import("@/vibe/tooling/vibe-stage/route")).tools
+        .POST as GenericHandlerBase;
+    case "start":
+      return (await import("@/vibe/server/server/start/route")).tools
+        .POST as GenericHandlerBase;
+    case "status":
+      return (await import("@/vibe/platforms/cli/setup/status/route")).tools
+        .POST as GenericHandlerBase;
+    case "stripe":
+      return (await import("@/payment/providers/stripe/cli/route")).tools
+        .POST as GenericHandlerBase;
+    case "stripe-cli":
+      return (await import("@/payment/providers/stripe/cli/route")).tools
+        .POST as GenericHandlerBase;
+    case "stt":
+      return (await import("@/vibe/agent/speech-to-text/hotkey/route")).tools
+        .POST as GenericHandlerBase;
+    case "studio":
+      return (await import("@/vibe/database/studio/route")).tools
+        .POST as GenericHandlerBase;
+    case "subscribe":
+      return (await import("@/newsletter/subscribe/route")).tools
+        .POST as GenericHandlerBase;
+    case "subscription-admin-list":
+      return (await import("@/subscription/admin/list/route")).tools
+        .GET as GenericHandlerBase;
+    case "subscription-admin-purchases":
+      return (await import("@/subscription/admin/purchases/route")).tools
+        .GET as GenericHandlerBase;
+    case "subscription-admin-referrals":
+      return (await import("@/subscription/admin/referrals/route")).tools
+        .GET as GenericHandlerBase;
+    case "subscription-admin-stats":
+      return (await import("@/subscription/admin/stats/route")).tools
+        .GET as GenericHandlerBase;
+    case "subscription-cancel":
+      return (await import("@/subscription/cancel/route")).tools
+        .DELETE as GenericHandlerBase;
+    case "subscription-dashboard":
+      return (await import("@/subscription/dashboard/route")).tools
+        .GET as GenericHandlerBase;
     case "subscription-update":
-      return (await import("@/subscription/update/route"))
-        .tools.PUT as GenericHandlerBase;
+      return (await import("@/subscription/update/route")).tools
+        .PUT as GenericHandlerBase;
     case "subscription_GET":
       return (await import("@/subscription/route")).tools
         .GET as GenericHandlerBase;
     case "subscription_admin_list_GET":
-      return (await import("@/subscription/admin/list/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/subscription/admin/list/route")).tools
+        .GET as GenericHandlerBase;
     case "subscription_admin_purchases_GET":
-      return (
-        await import("@/subscription/admin/purchases/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/subscription/admin/purchases/route")).tools
+        .GET as GenericHandlerBase;
     case "subscription_admin_referrals_GET":
-      return (
-        await import("@/subscription/admin/referrals/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/subscription/admin/referrals/route")).tools
+        .GET as GenericHandlerBase;
     case "subscription_admin_referrals_POST":
-      return (
-        await import("@/subscription/admin/referrals/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/subscription/admin/referrals/route")).tools
+        .POST as GenericHandlerBase;
     case "subscription_admin_stats_GET":
-      return (await import("@/subscription/admin/stats/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/subscription/admin/stats/route")).tools
+        .GET as GenericHandlerBase;
     case "subscription_cancel_DELETE":
-      return (await import("@/subscription/cancel/route"))
-        .tools.DELETE as GenericHandlerBase;
+      return (await import("@/subscription/cancel/route")).tools
+        .DELETE as GenericHandlerBase;
     case "subscription_company_companyId_get_GET":
-      return (
-        await import("@/subscription/company/[companyId]/get/route")
-      ).tools.GET as GenericHandlerBase;
-    case "subscription_company_companyId_list_GET":
-      return (
-        await import("@/subscription/company/[companyId]/list/route")
-      ).tools.GET as GenericHandlerBase;
-    case "subscription_create_POST":
-      return (await import("@/subscription/create/route"))
-        .tools.POST as GenericHandlerBase;
-    case "subscription_dashboard_GET":
-      return (await import("@/subscription/dashboard/route"))
+      return (await import("@/subscription/company/[companyId]/get/route"))
         .tools.GET as GenericHandlerBase;
+    case "subscription_company_companyId_list_GET":
+      return (await import("@/subscription/company/[companyId]/list/route"))
+        .tools.GET as GenericHandlerBase;
+    case "subscription_create_POST":
+      return (await import("@/subscription/create/route")).tools
+        .POST as GenericHandlerBase;
+    case "subscription_dashboard_GET":
+      return (await import("@/subscription/dashboard/route")).tools
+        .GET as GenericHandlerBase;
     case "subscription_data-sources_subscriptions-active_POST":
       return (
         await import("@/subscription/data-sources/subscriptions-active/route")
@@ -3287,8 +2552,8 @@ async function importRouteHandler(
         await import("@/subscription/data-sources/subscriptions-trialing/route")
       ).tools.POST as GenericHandlerBase;
     case "subscription_update_PUT":
-      return (await import("@/subscription/update/route"))
-        .tools.PUT as GenericHandlerBase;
+      return (await import("@/subscription/update/route")).tools
+        .PUT as GenericHandlerBase;
     case "subscriptions-active":
       return (
         await import("@/subscription/data-sources/subscriptions-active/route")
@@ -3314,418 +2579,38 @@ async function importRouteHandler(
         await import("@/subscription/data-sources/subscriptions-trialing/route")
       ).tools.POST as GenericHandlerBase;
     case "sync":
-      return (await import("next-vibe/remote-connection/sync/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/remote-connection/sync/route")).tools
+        .POST as GenericHandlerBase;
     case "system-prompt-debug":
-      return (
-        await import("next-vibe/agent/ai-stream/system-prompt/debug/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/agent/ai-stream/system-prompt/debug/route"))
+        .tools.GET as GenericHandlerBase;
     case "system-settings":
-      return (await import("next-vibe/env/settings/route"))
-        .tools.GET as GenericHandlerBase;
-    case "system_database_generate_POST":
-      return (await import("next-vibe/database/generate/route"))
-        .tools.POST as GenericHandlerBase;
-    case "system_database_health_POST":
-      return (await import("next-vibe/database/health/route"))
-        .tools.POST as GenericHandlerBase;
-    case "system_database_migrate_POST":
-      return (await import("next-vibe/database/migrate/route"))
-        .tools.POST as GenericHandlerBase;
-    case "system_database_ping_POST":
-      return (await import("next-vibe/database/ping/route"))
-        .tools.POST as GenericHandlerBase;
-    case "system_database_seed_POST":
-      return (await import("next-vibe/database/seed/route"))
-        .tools.POST as GenericHandlerBase;
-    case "system_database_sql_POST":
-      return (await import("next-vibe/database/sql/route"))
-        .tools.POST as GenericHandlerBase;
-    case "system_database_studio_POST":
-      return (await import("next-vibe/database/studio/route"))
-        .tools.POST as GenericHandlerBase;
-    case "system_database_utils_GET":
-      return (await import("next-vibe/database/utils/route"))
-        .tools.GET as GenericHandlerBase;
-    case "system_database_utils_docker-operations_POST":
-      return (
-        await import("next-vibe/database/utils/docker-operations/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_dataflow_cleanup_POST":
-      return (await import("next-vibe/dataflow/cleanup/route"))
-        .tools.POST as GenericHandlerBase;
-    case "system_dataflow_graphs_GET":
-      return (await import("next-vibe/dataflow/graphs/route"))
-        .tools.GET as GenericHandlerBase;
-    case "system_dataflow_graphs_POST":
-      return (await import("next-vibe/dataflow/graphs/route"))
-        .tools.POST as GenericHandlerBase;
-    case "system_dataflow_graphs_id_archive_POST":
-      return (
-        await import("next-vibe/dataflow/graphs/[id]/archive/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_dataflow_graphs_id_backtest_POST":
-      return (
-        await import("next-vibe/dataflow/graphs/[id]/backtest/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_dataflow_graphs_id_data_GET":
-      return (
-        await import("next-vibe/dataflow/graphs/[id]/data/route")
-      ).tools.GET as GenericHandlerBase;
-    case "system_dataflow_graphs_id_delete_DELETE":
-      return (
-        await import("next-vibe/dataflow/graphs/[id]/delete/route")
-      ).tools.DELETE as GenericHandlerBase;
-    case "system_dataflow_graphs_id_edit_PUT":
-      return (
-        await import("next-vibe/dataflow/graphs/[id]/edit/route")
-      ).tools.PUT as GenericHandlerBase;
-    case "system_dataflow_graphs_id_promote_POST":
-      return (
-        await import("next-vibe/dataflow/graphs/[id]/promote/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_dataflow_graphs_id_trigger_POST":
-      return (
-        await import("next-vibe/dataflow/graphs/[id]/trigger/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_dataflow_graphs_id_versions_GET":
-      return (
-        await import("next-vibe/dataflow/graphs/[id]/versions/route")
-      ).tools.GET as GenericHandlerBase;
-    case "system_dataflow_run-config_POST":
-      return (
-        await import("next-vibe/dataflow/run-config/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_env_settings_GET":
-      return (await import("next-vibe/env/settings/route"))
-        .tools.GET as GenericHandlerBase;
-    case "system_env_settings_PATCH":
-      return (await import("next-vibe/env/settings/route"))
-        .tools.PATCH as GenericHandlerBase;
-    case "system_env_settings_POST":
-      return (await import("next-vibe/env/settings/route"))
-        .tools.POST as GenericHandlerBase;
-    case "system_env_settings_export-env_GET":
-      return (
-        await import("next-vibe/env/settings/export-env/route")
-      ).tools.GET as GenericHandlerBase;
-    case "system_env_settings_generate-key_GET":
-      return (
-        await import("next-vibe/env/settings/generate-key/route")
-      ).tools.GET as GenericHandlerBase;
-    case "system_execute-tool_POST":
-      return (await import("next-vibe/execute-tool/route"))
-        .tools.POST as GenericHandlerBase;
-    case "system_execute-tool_await-task_POST":
-      return (
-        await import("next-vibe/execute-tool/await-task/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_execute-tool_call-control_cancel_POST":
-      return (
-        await import("next-vibe/execute-tool/call-control/cancel/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_execute-tool_call-control_detach_POST":
-      return (
-        await import("next-vibe/execute-tool/call-control/detach/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_execute-tool_call-control_resume-when-done_POST":
-      return (
-        await import("next-vibe/execute-tool/call-control/resume-when-done/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_execute-tool_complete_POST":
-      return (
-        await import("next-vibe/execute-tool/complete/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_execute-tool_revival_POST":
-      return (
-        await import("next-vibe/execute-tool/revival/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_help-tool_GET":
-      return (await import("next-vibe/help-tool/route")).tools
+      return (await import("@/vibe/env/settings/route")).tools
         .GET as GenericHandlerBase;
-    case "system_logger_error-monitor_cleanup_POST":
-      return (
-        await import("next-vibe/logger/error-monitor/cleanup/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_logger_error-monitor_client-log_POST":
-      return (
-        await import("next-vibe/logger/error-monitor/client-log/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_logger_error-monitor_data-sources_error-logs-errors_POST":
-      return (
-        await import("next-vibe/logger/error-monitor/data-sources/error-logs-errors/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_logger_error-monitor_data-sources_error-logs-total_POST":
-      return (
-        await import("next-vibe/logger/error-monitor/data-sources/error-logs-total/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_logger_error-monitor_data-sources_error-logs-warnings_POST":
-      return (
-        await import("next-vibe/logger/error-monitor/data-sources/error-logs-warnings/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_logger_error-monitor_logs_GET":
-      return (
-        await import("next-vibe/logger/error-monitor/logs/route")
-      ).tools.GET as GenericHandlerBase;
-    case "system_logger_error-monitor_logs_PATCH":
-      return (
-        await import("next-vibe/logger/error-monitor/logs/route")
-      ).tools.PATCH as GenericHandlerBase;
-    case "system_platforms_cli_interactive_capture_POST":
-      return (
-        await import("next-vibe/platforms/cli/interactive/capture/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_platforms_cli_interactive_send-keys_POST":
-      return (
-        await import("next-vibe/platforms/cli/interactive/send-keys/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_platforms_cli_setup_install_POST":
-      return (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/platforms/cli/setup/install/route"
-        )
-      ).tools.POST as GenericHandlerBase;
-    case "system_platforms_cli_setup_status_POST":
-      return (
-        await import("next-vibe/platforms/cli/setup/status/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_platforms_cli_setup_uninstall_POST":
-      return (
-        await import("next-vibe/platforms/cli/setup/uninstall/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_platforms_mcp_serve_POST":
-      return (
-        await import("next-vibe/platforms/mcp/serve/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_platforms_vibe-frame_mount_POST":
-      return (
-        await import("next-vibe/platforms/vibe-frame/mount/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_realtime_remote-event-bridge_POST":
-      return (
-        await import("next-vibe/realtime/remote-event-bridge/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_server_server_build_POST":
-      return (
-        await import("next-vibe/server/server/build/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_server_server_dev_POST":
-      return (await import("next-vibe/server/server/dev/route"))
-        .tools.POST as GenericHandlerBase;
-    case "system_server_server_electron_build_POST":
-      return (
-        await import("next-vibe/server/server/electron/build/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_server_server_electron_start_POST":
-      return (
-        await import("next-vibe/server/server/electron/start/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_server_server_headless-client_POST":
-      return (
-        await import("next-vibe/server/server/headless-client/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_server_server_health_GET":
-      return (
-        await import("next-vibe/server/server/health/route")
-      ).tools.GET as GenericHandlerBase;
-    case "system_server_server_image-push_POST":
-      return (
-        await import("next-vibe/server/server/image-push/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_server_server_rebuild_POST":
-      return (
-        await import("next-vibe/server/server/rebuild/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_server_server_start_POST":
-      return (
-        await import("next-vibe/server/server/start/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_tasks_cron_bulk_POST":
-      return (await import("next-vibe/tasks/cron/bulk/route"))
-        .tools.POST as GenericHandlerBase;
-    case "system_tasks_cron_history_GET":
-      return (
-        await import("next-vibe/tasks/cron/history/route")
-      ).tools.GET as GenericHandlerBase;
-    case "system_tasks_cron_id_DELETE":
-      return (await import("next-vibe/tasks/cron/[id]/route"))
-        .tools.DELETE as GenericHandlerBase;
-    case "system_tasks_cron_id_GET":
-      return (await import("next-vibe/tasks/cron/[id]/route"))
-        .tools.GET as GenericHandlerBase;
-    case "system_tasks_cron_id_PUT":
-      return (await import("next-vibe/tasks/cron/[id]/route"))
-        .tools.PUT as GenericHandlerBase;
-    case "system_tasks_cron_queue_GET":
-      return (await import("next-vibe/tasks/cron/queue/route"))
-        .tools.GET as GenericHandlerBase;
-    case "system_tasks_cron_stats_GET":
-      return (await import("next-vibe/tasks/cron/stats/route"))
-        .tools.GET as GenericHandlerBase;
-    case "system_tasks_cron_tasks_GET":
-      return (await import("next-vibe/tasks/cron/tasks/route"))
-        .tools.GET as GenericHandlerBase;
-    case "system_tasks_cron_tasks_POST":
-      return (await import("next-vibe/tasks/cron/tasks/route"))
-        .tools.POST as GenericHandlerBase;
-    case "system_tasks_data-sources_cron-executions-failed_POST":
-      return (
-        await import("next-vibe/tasks/data-sources/cron-executions-failed/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_tasks_data-sources_cron-executions-succeeded_POST":
-      return (
-        await import("next-vibe/tasks/data-sources/cron-executions-succeeded/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_tasks_data-sources_cron-executions-total_POST":
-      return (
-        await import("next-vibe/tasks/data-sources/cron-executions-total/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_tasks_execute_POST":
-      return (await import("next-vibe/tasks/execute/route"))
-        .tools.POST as GenericHandlerBase;
-    case "system_tasks_pulse_execute_POST":
-      return (
-        await import("next-vibe/tasks/pulse/execute/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_tasks_pulse_history_GET":
-      return (
-        await import("next-vibe/tasks/pulse/history/route")
-      ).tools.GET as GenericHandlerBase;
-    case "system_tasks_pulse_status_GET":
-      return (
-        await import("next-vibe/tasks/pulse/status/route")
-      ).tools.GET as GenericHandlerBase;
-    case "system_tasks_unified-runner_POST":
-      return (
-        await import("next-vibe/tasks/unified-runner/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_tooling_builder_POST":
-      return (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/builder/route"
-        )
-      ).tools.POST as GenericHandlerBase;
-    case "system_tooling_check_config_create_POST":
-      return (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/config/create/route"
-        )
-      ).tools.POST as GenericHandlerBase;
-    case "system_tooling_check_lint_POST":
-      return (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/lint/route"
-        )
-      ).tools.POST as GenericHandlerBase;
-    case "system_tooling_check_oxlint_POST":
-      return (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/oxlint/route"
-        )
-      ).tools.POST as GenericHandlerBase;
-    case "system_tooling_check_testing_test_POST":
-      return (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/testing/test/route"
-        )
-      ).tools.POST as GenericHandlerBase;
-    case "system_tooling_check_typecheck_POST":
-      return (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/typecheck/route"
-        )
-      ).tools.POST as GenericHandlerBase;
-    case "system_tooling_check_vibe-check_POST":
-      return (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/vibe-check/route"
-        )
-      ).tools.POST as GenericHandlerBase;
-    case "system_tooling_generators_POST":
-      return (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/generators/route"
-        )
-      ).tools.POST as GenericHandlerBase;
-    case "system_tooling_guard_destroy_POST":
-      return (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/guard/destroy/route"
-        )
-      ).tools.POST as GenericHandlerBase;
-    case "system_tooling_guard_start_POST":
-      return (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/guard/start/route"
-        )
-      ).tools.POST as GenericHandlerBase;
-    case "system_tooling_guard_status_POST":
-      return (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/guard/status/route"
-        )
-      ).tools.POST as GenericHandlerBase;
-    case "system_tooling_guard_stop_POST":
-      return (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/guard/stop/route"
-        )
-      ).tools.POST as GenericHandlerBase;
-    case "system_tooling_infra_cluster_init_POST":
-      return (
-        await import("next-vibe/tooling/infra/cluster/init/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_tooling_infra_cluster_status_GET":
-      return (
-        await import("next-vibe/tooling/infra/cluster/status/route")
-      ).tools.GET as GenericHandlerBase;
-    case "system_tooling_infra_deploy_preview_POST":
-      return (
-        await import("next-vibe/tooling/infra/deploy/preview/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_tooling_infra_deploy_push_POST":
-      return (
-        await import("next-vibe/tooling/infra/deploy/push/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_tooling_infra_scale_replicas_POST":
-      return (
-        await import("next-vibe/tooling/infra/scale/replicas/route")
-      ).tools.POST as GenericHandlerBase;
-    case "system_tooling_release_POST":
-      return (await import("next-vibe/tooling/release/route"))
-        .tools.POST as GenericHandlerBase;
-    case "system_tooling_vibe-deps_POST":
-      return (await import("next-vibe/tooling/vibe-deps/route"))
-        .tools.POST as GenericHandlerBase;
-    case "system_tooling_vibe-stage_POST":
-      return (
-        await import("next-vibe/tooling/vibe-stage/route")
-      ).tools.POST as GenericHandlerBase;
     case "t":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/testing/test/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/testing/test/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "task-execute":
-      return (await import("next-vibe/tasks/execute/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/tasks/execute/route")).tools
+        .POST as GenericHandlerBase;
     case "task-list":
-      return (await import("next-vibe/tasks/cron/tasks/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/tasks/cron/tasks/route")).tools
+        .GET as GenericHandlerBase;
     case "task-queue":
-      return (await import("next-vibe/tasks/cron/queue/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/tasks/cron/queue/route")).tools
+        .GET as GenericHandlerBase;
     case "task-runner":
-      return (
-        await import("next-vibe/tasks/unified-runner/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/tasks/unified-runner/route")).tools
+        .POST as GenericHandlerBase;
     case "tasks":
-      return (await import("next-vibe/tasks/cron/tasks/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/tasks/cron/tasks/route")).tools
+        .GET as GenericHandlerBase;
     case "tasks:cron:stats":
-      return (await import("next-vibe/tasks/cron/stats/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/tasks/cron/stats/route")).tools
+        .GET as GenericHandlerBase;
     case "tax-rate-list":
       return (await import("@/tax/rate/list/route")).tools
         .GET as GenericHandlerBase;
@@ -3736,46 +2621,46 @@ async function importRouteHandler(
       return (await import("@/tax/rate/list/route")).tools
         .GET as GenericHandlerBase;
     case "tax_rate_rateId_delete_POST":
-      return (await import("@/tax/rate/[rateId]/delete/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/tax/rate/[rateId]/delete/route")).tools
+        .POST as GenericHandlerBase;
     case "tax_rate_rateId_update_PATCH":
-      return (await import("@/tax/rate/[rateId]/update/route"))
-        .tools.PATCH as GenericHandlerBase;
+      return (await import("@/tax/rate/[rateId]/update/route")).tools
+        .PATCH as GenericHandlerBase;
     case "tax_report_GET":
       return (await import("@/tax/report/route")).tools
         .GET as GenericHandlerBase;
     case "tc":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/typecheck/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/typecheck/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "test":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/testing/test/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/testing/test/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "text-to-speech":
-      return (await import("next-vibe/agent/text-to-speech/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/agent/text-to-speech/route")).tools
+        .POST as GenericHandlerBase;
     case "thread-files":
       return (
-        await import("next-vibe/agent/chat/threads/files/[threadId]/[filename]/route")
+        await import("@/vibe/agent/chat/threads/files/[threadId]/[filename]/route")
       ).tools.GET as GenericHandlerBase;
     case "thread-messages":
       return (
-        await import("next-vibe/agent/chat/threads/[threadId]/messages/route")
+        await import("@/vibe/agent/chat/threads/[threadId]/messages/route")
       ).tools.GET as GenericHandlerBase;
     case "thread-share-links":
       return (
-        await import("next-vibe/agent/chat/threads/[threadId]/share-links/route")
+        await import("@/vibe/agent/chat/threads/[threadId]/share-links/route")
       ).tools.GET as GenericHandlerBase;
     case "tool-help":
-      return (await import("next-vibe/help-tool/route")).tools
+      return (await import("@/vibe/help-tool/route")).tools
         .GET as GenericHandlerBase;
     case "tools:list":
-      return (await import("next-vibe/help-tool/route")).tools
+      return (await import("@/vibe/help-tool/route")).tools
         .GET as GenericHandlerBase;
     case "track-click":
       return (await import("@/leads/tracking/route")).tools
@@ -3784,45 +2669,41 @@ async function importRouteHandler(
       return (await import("@/leads/tracking/route")).tools
         .POST as GenericHandlerBase;
     case "transcribe_audio":
-      return (await import("next-vibe/agent/speech-to-text/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/agent/speech-to-text/route")).tools
+        .POST as GenericHandlerBase;
     case "typecheck":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/typecheck/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/typecheck/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "unbottled-login":
-      return (await import("next-vibe/env/settings/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/env/settings/route")).tools
+        .POST as GenericHandlerBase;
     case "unified-runner":
-      return (
-        await import("next-vibe/tasks/unified-runner/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/tasks/unified-runner/route")).tools
+        .POST as GenericHandlerBase;
     case "uninstall":
-      return (
-        await import("next-vibe/platforms/cli/setup/uninstall/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/platforms/cli/setup/uninstall/route")).tools
+        .POST as GenericHandlerBase;
     case "unsubscribe":
-      return (await import("@/newsletter/unsubscribe/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/newsletter/unsubscribe/route")).tools
+        .POST as GenericHandlerBase;
     case "update":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/platforms/cli/setup/install/route"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/platforms/cli/setup/install/route"
         )
       ).tools.POST as GenericHandlerBase;
     case "update-error-log":
-      return (
-        await import("next-vibe/logger/error-monitor/logs/route")
-      ).tools.PATCH as GenericHandlerBase;
+      return (await import("@/vibe/logger/error-monitor/logs/route")).tools
+        .PATCH as GenericHandlerBase;
     case "update-model-prices":
-      return (
-        await import("next-vibe/agent/models/model-prices/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/agent/models/model-prices/route")).tools
+        .GET as GenericHandlerBase;
     case "update-subscription":
-      return (await import("@/subscription/update/route"))
-        .tools.PUT as GenericHandlerBase;
+      return (await import("@/subscription/update/route")).tools
+        .PUT as GenericHandlerBase;
     case "user-delete":
       return (await import("@/users/user/[id]/route")).tools
         .DELETE as GenericHandlerBase;
@@ -3830,8 +2711,8 @@ async function importRouteHandler(
       return (await import("@/user/private/me/route")).tools
         .GET as GenericHandlerBase;
     case "user-sessions":
-      return (await import("@/user/private/sessions/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/user/private/sessions/route")).tools
+        .GET as GenericHandlerBase;
     case "user-update":
       return (await import("@/users/user/[id]/route")).tools
         .PUT as GenericHandlerBase;
@@ -3839,17 +2720,14 @@ async function importRouteHandler(
       return (await import("@/users/user/[id]/route")).tools
         .GET as GenericHandlerBase;
     case "user_data-sources_users-active-total_POST":
-      return (
-        await import("@/user/data-sources/users-active-total/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/user/data-sources/users-active-total/route"))
+        .tools.POST as GenericHandlerBase;
     case "user_data-sources_users-banned_POST":
-      return (
-        await import("@/user/data-sources/users-banned/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/user/data-sources/users-banned/route")).tools
+        .POST as GenericHandlerBase;
     case "user_data-sources_users-email-verified_POST":
-      return (
-        await import("@/user/data-sources/users-email-verified/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/user/data-sources/users-email-verified/route"))
+        .tools.POST as GenericHandlerBase;
     case "user_data-sources_users-login-attempts-failed_POST":
       return (
         await import("@/user/data-sources/users-login-attempts-failed/route")
@@ -3859,24 +2737,20 @@ async function importRouteHandler(
         await import("@/user/data-sources/users-login-attempts-total/route")
       ).tools.POST as GenericHandlerBase;
     case "user_data-sources_users-marketing-consent_POST":
-      return (
-        await import("@/user/data-sources/users-marketing-consent/route")
-      ).tools.POST as GenericHandlerBase;
-    case "user_data-sources_users-registered_POST":
-      return (
-        await import("@/user/data-sources/users-registered/route")
-      ).tools.POST as GenericHandlerBase;
-    case "user_data-sources_users-two-fa-enabled_POST":
-      return (
-        await import("@/user/data-sources/users-two-fa-enabled/route")
-      ).tools.POST as GenericHandlerBase;
-    case "user_data-sources_users-with-stripe_POST":
-      return (
-        await import("@/user/data-sources/users-with-stripe/route")
-      ).tools.POST as GenericHandlerBase;
-    case "user_private_logout_POST":
-      return (await import("@/user/private/logout/route"))
+      return (await import("@/user/data-sources/users-marketing-consent/route"))
         .tools.POST as GenericHandlerBase;
+    case "user_data-sources_users-registered_POST":
+      return (await import("@/user/data-sources/users-registered/route")).tools
+        .POST as GenericHandlerBase;
+    case "user_data-sources_users-two-fa-enabled_POST":
+      return (await import("@/user/data-sources/users-two-fa-enabled/route"))
+        .tools.POST as GenericHandlerBase;
+    case "user_data-sources_users-with-stripe_POST":
+      return (await import("@/user/data-sources/users-with-stripe/route")).tools
+        .POST as GenericHandlerBase;
+    case "user_private_logout_POST":
+      return (await import("@/user/private/logout/route")).tools
+        .POST as GenericHandlerBase;
     case "user_private_me_DELETE":
       return (await import("@/user/private/me/route")).tools
         .DELETE as GenericHandlerBase;
@@ -3887,84 +2761,71 @@ async function importRouteHandler(
       return (await import("@/user/private/me/route")).tools
         .POST as GenericHandlerBase;
     case "user_private_me_addresses_GET":
-      return (
-        await import("@/user/private/me/addresses/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/user/private/me/addresses/route")).tools
+        .GET as GenericHandlerBase;
     case "user_private_me_addresses_POST":
-      return (
-        await import("@/user/private/me/addresses/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/user/private/me/addresses/route")).tools
+        .POST as GenericHandlerBase;
     case "user_private_me_addresses_addressId_DELETE":
-      return (
-        await import("@/user/private/me/addresses/[addressId]/route")
-      ).tools.DELETE as GenericHandlerBase;
-    case "user_private_me_addresses_addressId_PATCH":
-      return (
-        await import("@/user/private/me/addresses/[addressId]/route")
-      ).tools.PATCH as GenericHandlerBase;
-    case "user_private_me_avatar_DELETE":
-      return (await import("@/user/private/me/avatar/route"))
+      return (await import("@/user/private/me/addresses/[addressId]/route"))
         .tools.DELETE as GenericHandlerBase;
+    case "user_private_me_addresses_addressId_PATCH":
+      return (await import("@/user/private/me/addresses/[addressId]/route"))
+        .tools.PATCH as GenericHandlerBase;
+    case "user_private_me_avatar_DELETE":
+      return (await import("@/user/private/me/avatar/route")).tools
+        .DELETE as GenericHandlerBase;
     case "user_private_me_avatar_POST":
-      return (await import("@/user/private/me/avatar/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/user/private/me/avatar/route")).tools
+        .POST as GenericHandlerBase;
     case "user_private_me_password_POST":
-      return (await import("@/user/private/me/password/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/user/private/me/password/route")).tools
+        .POST as GenericHandlerBase;
     case "user_private_sessions_GET":
-      return (await import("@/user/private/sessions/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/user/private/sessions/route")).tools
+        .GET as GenericHandlerBase;
     case "user_private_sessions_POST":
-      return (await import("@/user/private/sessions/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/user/private/sessions/route")).tools
+        .POST as GenericHandlerBase;
     case "user_private_sessions_id_DELETE":
-      return (
-        await import("@/user/private/sessions/[id]/route")
-      ).tools.DELETE as GenericHandlerBase;
+      return (await import("@/user/private/sessions/[id]/route")).tools
+        .DELETE as GenericHandlerBase;
     case "user_public_creator_userId_GET":
-      return (
-        await import("@/user/public/creator/[userId]/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/user/public/creator/[userId]/route")).tools
+        .GET as GenericHandlerBase;
     case "user_public_login_POST":
       return (await import("@/user/public/login/route")).tools
         .POST as GenericHandlerBase;
     case "user_public_login_options_GET":
-      return (
-        await import("@/user/public/login/options/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/user/public/login/options/route")).tools
+        .GET as GenericHandlerBase;
     case "user_public_reset-password_confirm_POST":
-      return (
-        await import("@/user/public/reset-password/confirm/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/user/public/reset-password/confirm/route")).tools
+        .POST as GenericHandlerBase;
     case "user_public_reset-password_request_POST":
-      return (
-        await import("@/user/public/reset-password/request/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/user/public/reset-password/request/route")).tools
+        .POST as GenericHandlerBase;
     case "user_public_reset-password_validate_GET":
-      return (
-        await import("@/user/public/reset-password/validate/route")
-      ).tools.GET as GenericHandlerBase;
+      return (await import("@/user/public/reset-password/validate/route")).tools
+        .GET as GenericHandlerBase;
     case "user_public_signup_POST":
       return (await import("@/user/public/signup/route")).tools
         .POST as GenericHandlerBase;
     case "user_session-cleanup_POST":
-      return (await import("@/user/session-cleanup/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/user/session-cleanup/route")).tools
+        .POST as GenericHandlerBase;
     case "users-active-total":
-      return (
-        await import("@/user/data-sources/users-active-total/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/user/data-sources/users-active-total/route"))
+        .tools.POST as GenericHandlerBase;
     case "users-banned":
-      return (
-        await import("@/user/data-sources/users-banned/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/user/data-sources/users-banned/route")).tools
+        .POST as GenericHandlerBase;
     case "users-create":
       return (await import("@/users/create/route")).tools
         .POST as GenericHandlerBase;
     case "users-email-verified":
-      return (
-        await import("@/user/data-sources/users-email-verified/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/user/data-sources/users-email-verified/route"))
+        .tools.POST as GenericHandlerBase;
     case "users-list":
       return (await import("@/users/list/route")).tools
         .GET as GenericHandlerBase;
@@ -3977,27 +2838,23 @@ async function importRouteHandler(
         await import("@/user/data-sources/users-login-attempts-total/route")
       ).tools.POST as GenericHandlerBase;
     case "users-marketing-consent":
-      return (
-        await import("@/user/data-sources/users-marketing-consent/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/user/data-sources/users-marketing-consent/route"))
+        .tools.POST as GenericHandlerBase;
     case "users-registered":
-      return (
-        await import("@/user/data-sources/users-registered/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/user/data-sources/users-registered/route")).tools
+        .POST as GenericHandlerBase;
     case "users-stats":
       return (await import("@/users/stats/route")).tools
         .GET as GenericHandlerBase;
     case "users-two-fa-enabled":
-      return (
-        await import("@/user/data-sources/users-two-fa-enabled/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/user/data-sources/users-two-fa-enabled/route"))
+        .tools.POST as GenericHandlerBase;
     case "users-view":
       return (await import("@/users/view/route")).tools
         .GET as GenericHandlerBase;
     case "users-with-stripe":
-      return (
-        await import("@/user/data-sources/users-with-stripe/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/user/data-sources/users-with-stripe/route")).tools
+        .POST as GenericHandlerBase;
     case "users_create_POST":
       return (await import("@/users/create/route")).tools
         .POST as GenericHandlerBase;
@@ -4017,110 +2874,794 @@ async function importRouteHandler(
       return (await import("@/users/user/[id]/route")).tools
         .PUT as GenericHandlerBase;
     case "users_user_id_roles_DELETE":
-      return (await import("@/users/user/[id]/roles/route"))
-        .tools.DELETE as GenericHandlerBase;
+      return (await import("@/users/user/[id]/roles/route")).tools
+        .DELETE as GenericHandlerBase;
     case "users_user_id_roles_POST":
-      return (await import("@/users/user/[id]/roles/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/users/user/[id]/roles/route")).tools
+        .POST as GenericHandlerBase;
     case "users_view_GET":
       return (await import("@/users/view/route")).tools
         .GET as GenericHandlerBase;
     case "vibe-frame-mount":
-      return (
-        await import("next-vibe/platforms/vibe-frame/mount/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/platforms/vibe-frame/mount/route")).tools
+        .POST as GenericHandlerBase;
     case "vibe-sense-bollinger":
-      return (
-        await import("@/analytics/indicators/bollinger/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/indicators/bollinger/route")).tools
+        .POST as GenericHandlerBase;
     case "vibe-sense-clamp":
-      return (
-        await import("@/analytics/indicators/clamp/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/indicators/clamp/route")).tools
+        .POST as GenericHandlerBase;
     case "vibe-sense-delta":
-      return (
-        await import("@/analytics/indicators/delta/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/indicators/delta/route")).tools
+        .POST as GenericHandlerBase;
     case "vibe-sense-ema":
-      return (await import("@/analytics/indicators/ema/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/indicators/ema/route")).tools
+        .POST as GenericHandlerBase;
     case "vibe-sense-evaluator-and":
-      return (await import("@/analytics/evaluators/and/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/evaluators/and/route")).tools
+        .POST as GenericHandlerBase;
     case "vibe-sense-evaluator-crossover":
-      return (
-        await import("@/analytics/evaluators/crossover/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/evaluators/crossover/route")).tools
+        .POST as GenericHandlerBase;
     case "vibe-sense-evaluator-not":
-      return (await import("@/analytics/evaluators/not/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/evaluators/not/route")).tools
+        .POST as GenericHandlerBase;
     case "vibe-sense-evaluator-or":
-      return (await import("@/analytics/evaluators/or/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/evaluators/or/route")).tools
+        .POST as GenericHandlerBase;
     case "vibe-sense-evaluator-script":
-      return (
-        await import("@/analytics/evaluators/script/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/evaluators/script/route")).tools
+        .POST as GenericHandlerBase;
     case "vibe-sense-evaluator-threshold":
-      return (
-        await import("@/analytics/evaluators/threshold/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/evaluators/threshold/route")).tools
+        .POST as GenericHandlerBase;
     case "vibe-sense-graphs":
-      return (await import("next-vibe/dataflow/graphs/route"))
-        .tools.GET as GenericHandlerBase;
+      return (await import("@/vibe/dataflow/graphs/route")).tools
+        .GET as GenericHandlerBase;
     case "vibe-sense-macd":
-      return (
-        await import("@/analytics/indicators/macd/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/indicators/macd/route")).tools
+        .POST as GenericHandlerBase;
     case "vibe-sense-rsi":
-      return (await import("@/analytics/indicators/rsi/route"))
-        .tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/indicators/rsi/route")).tools
+        .POST as GenericHandlerBase;
     case "vibe-sense-run-config":
-      return (
-        await import("next-vibe/dataflow/run-config/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/dataflow/run-config/route")).tools
+        .POST as GenericHandlerBase;
     case "vibe-sense-transformer-field-pick":
-      return (
-        await import("@/analytics/transformers/field-pick/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/transformers/field-pick/route")).tools
+        .POST as GenericHandlerBase;
     case "vibe-sense-transformer-json-path":
-      return (
-        await import("@/analytics/transformers/json-path/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/transformers/json-path/route")).tools
+        .POST as GenericHandlerBase;
     case "vibe-sense-transformer-merge":
-      return (
-        await import("@/analytics/transformers/merge/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/transformers/merge/route")).tools
+        .POST as GenericHandlerBase;
     case "vibe-sense-transformer-ratio":
-      return (
-        await import("@/analytics/transformers/ratio/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/transformers/ratio/route")).tools
+        .POST as GenericHandlerBase;
     case "vibe-sense-transformer-script":
-      return (
-        await import("@/analytics/transformers/script/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/transformers/script/route")).tools
+        .POST as GenericHandlerBase;
     case "vibe-sense-window-avg":
-      return (
-        await import("@/analytics/indicators/window-avg/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/indicators/window-avg/route")).tools
+        .POST as GenericHandlerBase;
     case "vibe-sense-window-max":
-      return (
-        await import("@/analytics/indicators/window-max/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/indicators/window-max/route")).tools
+        .POST as GenericHandlerBase;
     case "vibe-sense-window-min":
-      return (
-        await import("@/analytics/indicators/window-min/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/analytics/indicators/window-min/route")).tools
+        .POST as GenericHandlerBase;
     case "vibe-sense-window-sum":
+      return (await import("@/analytics/indicators/window-sum/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_agent_ai-stream_cancel_POST":
+      return (await import("@/vibe/agent/ai-stream/cancel/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_agent_ai-stream_run_POST":
+      return (await import("@/vibe/agent/ai-stream/run/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_agent_ai-stream_stream_POST":
+      return (await import("@/vibe/agent/ai-stream/stream/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_agent_ai-stream_system-prompt_debug_GET":
+      return (await import("@/vibe/agent/ai-stream/system-prompt/debug/route"))
+        .tools.GET as GenericHandlerBase;
+    case "vibe_agent_ai-stream_ws-provider_models_GET":
+      return (await import("@/vibe/agent/ai-stream/ws-provider/models/route"))
+        .tools.GET as GenericHandlerBase;
+    case "vibe_agent_chat_data-sources_chat-downvotes-total_POST":
       return (
-        await import("@/analytics/indicators/window-sum/route")
+        await import("@/vibe/agent/chat/data-sources/chat-downvotes-total/route")
       ).tools.POST as GenericHandlerBase;
+    case "vibe_agent_chat_data-sources_chat-errors-total_POST":
+      return (
+        await import("@/vibe/agent/chat/data-sources/chat-errors-total/route")
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_agent_chat_data-sources_chat-memories-created_POST":
+      return (
+        await import("@/vibe/agent/chat/data-sources/chat-memories-created/route")
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_agent_chat_data-sources_chat-messages-by-ai_POST":
+      return (
+        await import("@/vibe/agent/chat/data-sources/chat-messages-by-ai/route")
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_agent_chat_data-sources_chat-messages-by-user_POST":
+      return (
+        await import("@/vibe/agent/chat/data-sources/chat-messages-by-user/route")
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_agent_chat_data-sources_chat-messages-total_POST":
+      return (
+        await import("@/vibe/agent/chat/data-sources/chat-messages-total/route")
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_agent_chat_data-sources_chat-messages-with-attachments_POST":
+      return (
+        await import("@/vibe/agent/chat/data-sources/chat-messages-with-attachments/route")
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_agent_chat_data-sources_chat-share-links-created_POST":
+      return (
+        await import("@/vibe/agent/chat/data-sources/chat-share-links-created/route")
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_agent_chat_data-sources_chat-threads-active-total_POST":
+      return (
+        await import("@/vibe/agent/chat/data-sources/chat-threads-active-total/route")
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_agent_chat_data-sources_chat-threads-created_POST":
+      return (
+        await import("@/vibe/agent/chat/data-sources/chat-threads-created/route")
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_agent_chat_data-sources_chat-tool-calls-total_POST":
+      return (
+        await import("@/vibe/agent/chat/data-sources/chat-tool-calls-total/route")
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_agent_chat_data-sources_chat-unique-users_POST":
+      return (
+        await import("@/vibe/agent/chat/data-sources/chat-unique-users/route")
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_agent_chat_data-sources_chat-upvotes-total_POST":
+      return (
+        await import("@/vibe/agent/chat/data-sources/chat-upvotes-total/route")
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_agent_chat_folder-contents_rootFolderId_GET":
+      return (
+        await import("@/vibe/agent/chat/folder-contents/[rootFolderId]/route")
+      ).tools.GET as GenericHandlerBase;
+    case "vibe_agent_chat_folders_rootFolderId_GET":
+      return (await import("@/vibe/agent/chat/folders/[rootFolderId]/route"))
+        .tools.GET as GenericHandlerBase;
+    case "vibe_agent_chat_folders_rootFolderId_create_POST":
+      return (
+        await import("@/vibe/agent/chat/folders/[rootFolderId]/create/route")
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_agent_chat_folders_rootFolderId_root-permissions_GET":
+      return (
+        await import("@/vibe/agent/chat/folders/[rootFolderId]/root-permissions/route")
+      ).tools.GET as GenericHandlerBase;
+    case "vibe_agent_chat_folders_subfolders_subFolderId_DELETE":
+      return (
+        await import("@/vibe/agent/chat/folders/subfolders/[subFolderId]/route")
+      ).tools.DELETE as GenericHandlerBase;
+    case "vibe_agent_chat_folders_subfolders_subFolderId_GET":
+      return (
+        await import("@/vibe/agent/chat/folders/subfolders/[subFolderId]/route")
+      ).tools.GET as GenericHandlerBase;
+    case "vibe_agent_chat_folders_subfolders_subFolderId_move_PATCH":
+      return (
+        await import("@/vibe/agent/chat/folders/subfolders/[subFolderId]/move/route")
+      ).tools.PATCH as GenericHandlerBase;
+    case "vibe_agent_chat_folders_subfolders_subFolderId_permissions_GET":
+      return (
+        await import("@/vibe/agent/chat/folders/subfolders/[subFolderId]/permissions/route")
+      ).tools.GET as GenericHandlerBase;
+    case "vibe_agent_chat_folders_subfolders_subFolderId_permissions_PATCH":
+      return (
+        await import("@/vibe/agent/chat/folders/subfolders/[subFolderId]/permissions/route")
+      ).tools.PATCH as GenericHandlerBase;
+    case "vibe_agent_chat_folders_subfolders_subFolderId_rename_PATCH":
+      return (
+        await import("@/vibe/agent/chat/folders/subfolders/[subFolderId]/rename/route")
+      ).tools.PATCH as GenericHandlerBase;
+    case "vibe_agent_chat_folders_subfolders_subFolderId_update_PATCH":
+      return (
+        await import("@/vibe/agent/chat/folders/subfolders/[subFolderId]/update/route")
+      ).tools.PATCH as GenericHandlerBase;
+    case "vibe_agent_chat_public-feed_GET":
+      return (await import("@/vibe/agent/chat/public-feed/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_agent_chat_settings_GET":
+      return (await import("@/vibe/agent/chat/settings/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_agent_chat_settings_POST":
+      return (await import("@/vibe/agent/chat/settings/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_agent_chat_threads_GET":
+      return (await import("@/vibe/agent/chat/threads/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_agent_chat_threads_POST":
+      return (await import("@/vibe/agent/chat/threads/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_agent_chat_threads_files_threadId_filename_GET":
+      return (
+        await import("@/vibe/agent/chat/threads/files/[threadId]/[filename]/route")
+      ).tools.GET as GenericHandlerBase;
+    case "vibe_agent_chat_threads_rename_PATCH":
+      return (await import("@/vibe/agent/chat/threads/rename/route")).tools
+        .PATCH as GenericHandlerBase;
+    case "vibe_agent_chat_threads_search-messages_GET":
+      return (await import("@/vibe/agent/chat/threads/search-messages/route"))
+        .tools.GET as GenericHandlerBase;
+    case "vibe_agent_chat_threads_search-threads_GET":
+      return (await import("@/vibe/agent/chat/threads/search-threads/route"))
+        .tools.GET as GenericHandlerBase;
+    case "vibe_agent_chat_threads_threadId_DELETE":
+      return (await import("@/vibe/agent/chat/threads/[threadId]/route")).tools
+        .DELETE as GenericHandlerBase;
+    case "vibe_agent_chat_threads_threadId_GET":
+      return (await import("@/vibe/agent/chat/threads/[threadId]/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_agent_chat_threads_threadId_PATCH":
+      return (await import("@/vibe/agent/chat/threads/[threadId]/route")).tools
+        .PATCH as GenericHandlerBase;
+    case "vibe_agent_chat_threads_threadId_messages_GET":
+      return (
+        await import("@/vibe/agent/chat/threads/[threadId]/messages/route")
+      ).tools.GET as GenericHandlerBase;
+    case "vibe_agent_chat_threads_threadId_messages_POST":
+      return (
+        await import("@/vibe/agent/chat/threads/[threadId]/messages/route")
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_agent_chat_threads_threadId_messages_messageId_DELETE":
+      return (
+        await import("@/vibe/agent/chat/threads/[threadId]/messages/[messageId]/route")
+      ).tools.DELETE as GenericHandlerBase;
+    case "vibe_agent_chat_threads_threadId_messages_messageId_GET":
+      return (
+        await import("@/vibe/agent/chat/threads/[threadId]/messages/[messageId]/route")
+      ).tools.GET as GenericHandlerBase;
+    case "vibe_agent_chat_threads_threadId_messages_messageId_PATCH":
+      return (
+        await import("@/vibe/agent/chat/threads/[threadId]/messages/[messageId]/route")
+      ).tools.PATCH as GenericHandlerBase;
+    case "vibe_agent_chat_threads_threadId_messages_messageId_vote_POST":
+      return (
+        await import("@/vibe/agent/chat/threads/[threadId]/messages/[messageId]/vote/route")
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_agent_chat_threads_threadId_messages_path_GET":
+      return (
+        await import("@/vibe/agent/chat/threads/[threadId]/messages/path/route")
+      ).tools.GET as GenericHandlerBase;
+    case "vibe_agent_chat_threads_threadId_messages_search_GET":
+      return (
+        await import("@/vibe/agent/chat/threads/[threadId]/messages/search/route")
+      ).tools.GET as GenericHandlerBase;
+    case "vibe_agent_chat_threads_threadId_permissions_GET":
+      return (
+        await import("@/vibe/agent/chat/threads/[threadId]/permissions/route")
+      ).tools.GET as GenericHandlerBase;
+    case "vibe_agent_chat_threads_threadId_permissions_PATCH":
+      return (
+        await import("@/vibe/agent/chat/threads/[threadId]/permissions/route")
+      ).tools.PATCH as GenericHandlerBase;
+    case "vibe_agent_chat_threads_threadId_share-links_DELETE":
+      return (
+        await import("@/vibe/agent/chat/threads/[threadId]/share-links/route")
+      ).tools.DELETE as GenericHandlerBase;
+    case "vibe_agent_chat_threads_threadId_share-links_GET":
+      return (
+        await import("@/vibe/agent/chat/threads/[threadId]/share-links/route")
+      ).tools.GET as GenericHandlerBase;
+    case "vibe_agent_chat_threads_threadId_share-links_PATCH":
+      return (
+        await import("@/vibe/agent/chat/threads/[threadId]/share-links/route")
+      ).tools.PATCH as GenericHandlerBase;
+    case "vibe_agent_chat_threads_threadId_share-links_POST":
+      return (
+        await import("@/vibe/agent/chat/threads/[threadId]/share-links/route")
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_agent_coding-agent_POST":
+      return (await import("@/vibe/agent/coding-agent/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_agent_cortex_delete_DELETE":
+      return (await import("@/vibe/agent/cortex/delete/route")).tools
+        .DELETE as GenericHandlerBase;
+    case "vibe_agent_cortex_edit_PATCH":
+      return (await import("@/vibe/agent/cortex/edit/route")).tools
+        .PATCH as GenericHandlerBase;
+    case "vibe_agent_cortex_embeddings_backfill_POST":
+      return (await import("@/vibe/agent/cortex/embeddings/backfill/route"))
+        .tools.POST as GenericHandlerBase;
+    case "vibe_agent_cortex_exec_POST":
+      return (await import("@/vibe/agent/cortex/exec/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_agent_cortex_list_GET":
+      return (await import("@/vibe/agent/cortex/list/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_agent_cortex_mkdir_POST":
+      return (await import("@/vibe/agent/cortex/mkdir/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_agent_cortex_move_POST":
+      return (await import("@/vibe/agent/cortex/move/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_agent_cortex_read_GET":
+      return (await import("@/vibe/agent/cortex/read/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_agent_cortex_search_GET":
+      return (await import("@/vibe/agent/cortex/search/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_agent_cortex_terminals_GET":
+      return (await import("@/vibe/agent/cortex/terminals/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_agent_cortex_tree_GET":
+      return (await import("@/vibe/agent/cortex/tree/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_agent_cortex_write_POST":
+      return (await import("@/vibe/agent/cortex/write/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_agent_describe-image_POST":
+      return (await import("@/vibe/agent/describe-image/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_agent_describe-video_POST":
+      return (await import("@/vibe/agent/describe-video/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_agent_fetch-url-content_GET":
+      return (await import("@/vibe/agent/fetch-url-content/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_agent_fetch-url-content_cleanup_POST":
+      return (await import("@/vibe/agent/fetch-url-content/cleanup/route"))
+        .tools.POST as GenericHandlerBase;
+    case "vibe_agent_image-generation_POST":
+      return (await import("@/vibe/agent/image-generation/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_agent_models_list_GET":
+      return (await import("@/vibe/agent/models/list/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_agent_models_model-prices_GET":
+      return (await import("@/vibe/agent/models/model-prices/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_agent_music-generation_POST":
+      return (await import("@/vibe/agent/music-generation/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_agent_skills_GET":
+      return (await import("@/vibe/agent/skills/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_agent_skills_create_POST":
+      return (await import("@/vibe/agent/skills/create/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_agent_skills_favorites_GET":
+      return (await import("@/vibe/agent/skills/favorites/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_agent_skills_favorites_create_POST":
+      return (await import("@/vibe/agent/skills/favorites/create/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_agent_skills_favorites_id_DELETE":
+      return (await import("@/vibe/agent/skills/favorites/[id]/route")).tools
+        .DELETE as GenericHandlerBase;
+    case "vibe_agent_skills_favorites_id_GET":
+      return (await import("@/vibe/agent/skills/favorites/[id]/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_agent_skills_favorites_id_PATCH":
+      return (await import("@/vibe/agent/skills/favorites/[id]/route")).tools
+        .PATCH as GenericHandlerBase;
+    case "vibe_agent_skills_favorites_reorder_POST":
+      return (await import("@/vibe/agent/skills/favorites/reorder/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_agent_skills_id_DELETE":
+      return (await import("@/vibe/agent/skills/[id]/route")).tools
+        .DELETE as GenericHandlerBase;
+    case "vibe_agent_skills_id_GET":
+      return (await import("@/vibe/agent/skills/[id]/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_agent_skills_id_PATCH":
+      return (await import("@/vibe/agent/skills/[id]/route")).tools
+        .PATCH as GenericHandlerBase;
+    case "vibe_agent_skills_id_publish_PATCH":
+      return (await import("@/vibe/agent/skills/[id]/publish/route")).tools
+        .PATCH as GenericHandlerBase;
+    case "vibe_agent_skills_id_report_POST":
+      return (await import("@/vibe/agent/skills/[id]/report/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_agent_skills_id_vote_POST":
+      return (await import("@/vibe/agent/skills/[id]/vote/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_agent_skills_moderation_GET":
+      return (await import("@/vibe/agent/skills/moderation/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_agent_skills_moderation_PATCH":
+      return (await import("@/vibe/agent/skills/moderation/route")).tools
+        .PATCH as GenericHandlerBase;
+    case "vibe_agent_speech-to-text_POST":
+      return (await import("@/vibe/agent/speech-to-text/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_agent_speech-to-text_hotkey_POST":
+      return (await import("@/vibe/agent/speech-to-text/hotkey/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_agent_text-to-speech_POST":
+      return (await import("@/vibe/agent/text-to-speech/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_agent_video-generation_POST":
+      return (await import("@/vibe/agent/video-generation/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_agent_view-image_POST":
+      return (await import("@/vibe/agent/view-image/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_agent_web-search_GET":
+      return (await import("@/vibe/agent/web-search/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_agent_web-search_brave_GET":
+      return (await import("@/vibe/agent/web-search/brave/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_agent_web-search_kagi_GET":
+      return (await import("@/vibe/agent/web-search/kagi/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_database_generate_POST":
+      return (await import("@/vibe/database/generate/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_database_health_POST":
+      return (await import("@/vibe/database/health/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_database_migrate_POST":
+      return (await import("@/vibe/database/migrate/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_database_ping_POST":
+      return (await import("@/vibe/database/ping/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_database_seed_POST":
+      return (await import("@/vibe/database/seed/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_database_sql_POST":
+      return (await import("@/vibe/database/sql/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_database_studio_POST":
+      return (await import("@/vibe/database/studio/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_database_utils_GET":
+      return (await import("@/vibe/database/utils/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_database_utils_docker-operations_POST":
+      return (await import("@/vibe/database/utils/docker-operations/route"))
+        .tools.POST as GenericHandlerBase;
+    case "vibe_dataflow_cleanup_POST":
+      return (await import("@/vibe/dataflow/cleanup/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_dataflow_graphs_GET":
+      return (await import("@/vibe/dataflow/graphs/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_dataflow_graphs_POST":
+      return (await import("@/vibe/dataflow/graphs/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_dataflow_graphs_id_archive_POST":
+      return (await import("@/vibe/dataflow/graphs/[id]/archive/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_dataflow_graphs_id_backtest_POST":
+      return (await import("@/vibe/dataflow/graphs/[id]/backtest/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_dataflow_graphs_id_data_GET":
+      return (await import("@/vibe/dataflow/graphs/[id]/data/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_dataflow_graphs_id_delete_DELETE":
+      return (await import("@/vibe/dataflow/graphs/[id]/delete/route")).tools
+        .DELETE as GenericHandlerBase;
+    case "vibe_dataflow_graphs_id_edit_PUT":
+      return (await import("@/vibe/dataflow/graphs/[id]/edit/route")).tools
+        .PUT as GenericHandlerBase;
+    case "vibe_dataflow_graphs_id_promote_POST":
+      return (await import("@/vibe/dataflow/graphs/[id]/promote/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_dataflow_graphs_id_trigger_POST":
+      return (await import("@/vibe/dataflow/graphs/[id]/trigger/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_dataflow_graphs_id_versions_GET":
+      return (await import("@/vibe/dataflow/graphs/[id]/versions/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_dataflow_run-config_POST":
+      return (await import("@/vibe/dataflow/run-config/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_env_settings_GET":
+      return (await import("@/vibe/env/settings/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_env_settings_PATCH":
+      return (await import("@/vibe/env/settings/route")).tools
+        .PATCH as GenericHandlerBase;
+    case "vibe_env_settings_POST":
+      return (await import("@/vibe/env/settings/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_env_settings_export-env_GET":
+      return (await import("@/vibe/env/settings/export-env/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_env_settings_generate-key_GET":
+      return (await import("@/vibe/env/settings/generate-key/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_execute-tool_POST":
+      return (await import("@/vibe/execute-tool/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_execute-tool_await-task_POST":
+      return (await import("@/vibe/execute-tool/await-task/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_execute-tool_call-control_cancel_POST":
+      return (await import("@/vibe/execute-tool/call-control/cancel/route"))
+        .tools.POST as GenericHandlerBase;
+    case "vibe_execute-tool_call-control_detach_POST":
+      return (await import("@/vibe/execute-tool/call-control/detach/route"))
+        .tools.POST as GenericHandlerBase;
+    case "vibe_execute-tool_call-control_resume-when-done_POST":
+      return (
+        await import("@/vibe/execute-tool/call-control/resume-when-done/route")
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_execute-tool_complete_POST":
+      return (await import("@/vibe/execute-tool/complete/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_execute-tool_revival_POST":
+      return (await import("@/vibe/execute-tool/revival/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_help-tool_GET":
+      return (await import("@/vibe/help-tool/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_logger_error-monitor_cleanup_POST":
+      return (await import("@/vibe/logger/error-monitor/cleanup/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_logger_error-monitor_client-log_POST":
+      return (await import("@/vibe/logger/error-monitor/client-log/route"))
+        .tools.POST as GenericHandlerBase;
+    case "vibe_logger_error-monitor_data-sources_error-logs-errors_POST":
+      return (
+        await import("@/vibe/logger/error-monitor/data-sources/error-logs-errors/route")
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_logger_error-monitor_data-sources_error-logs-total_POST":
+      return (
+        await import("@/vibe/logger/error-monitor/data-sources/error-logs-total/route")
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_logger_error-monitor_data-sources_error-logs-warnings_POST":
+      return (
+        await import("@/vibe/logger/error-monitor/data-sources/error-logs-warnings/route")
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_logger_error-monitor_logs_GET":
+      return (await import("@/vibe/logger/error-monitor/logs/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_logger_error-monitor_logs_PATCH":
+      return (await import("@/vibe/logger/error-monitor/logs/route")).tools
+        .PATCH as GenericHandlerBase;
+    case "vibe_platforms_cli_interactive_capture_POST":
+      return (await import("@/vibe/platforms/cli/interactive/capture/route"))
+        .tools.POST as GenericHandlerBase;
+    case "vibe_platforms_cli_interactive_send-keys_POST":
+      return (await import("@/vibe/platforms/cli/interactive/send-keys/route"))
+        .tools.POST as GenericHandlerBase;
+    case "vibe_platforms_cli_setup_install_POST":
+      return (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/platforms/cli/setup/install/route"
+        )
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_platforms_cli_setup_status_POST":
+      return (await import("@/vibe/platforms/cli/setup/status/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_platforms_cli_setup_uninstall_POST":
+      return (await import("@/vibe/platforms/cli/setup/uninstall/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_platforms_mcp_serve_POST":
+      return (await import("@/vibe/platforms/mcp/serve/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_platforms_vibe-frame_mount_POST":
+      return (await import("@/vibe/platforms/vibe-frame/mount/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_realtime_remote-event-bridge_POST":
+      return (await import("@/vibe/realtime/remote-event-bridge/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_remote-connection_connect-reverse_POST":
+      return (await import("@/vibe/remote-connection/connect-reverse/route"))
+        .tools.POST as GenericHandlerBase;
+    case "vibe_remote-connection_connect-reverse_update_PATCH":
+      return (
+        await import("@/vibe/remote-connection/connect-reverse/update/route")
+      ).tools.PATCH as GenericHandlerBase;
+    case "vibe_remote-connection_connect_POST":
+      return (await import("@/vibe/remote-connection/connect/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_remote-connection_instanceId_DELETE":
+      return (await import("@/vibe/remote-connection/[instanceId]/route")).tools
+        .DELETE as GenericHandlerBase;
+    case "vibe_remote-connection_instanceId_GET":
+      return (await import("@/vibe/remote-connection/[instanceId]/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_remote-connection_instanceId_PATCH":
+      return (await import("@/vibe/remote-connection/[instanceId]/route")).tools
+        .PATCH as GenericHandlerBase;
+    case "vibe_remote-connection_list_GET":
+      return (await import("@/vibe/remote-connection/list/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_remote-connection_self_instanceId_GET":
+      return (await import("@/vibe/remote-connection/self/instanceId/route"))
+        .tools.GET as GenericHandlerBase;
+    case "vibe_remote-connection_self_rename_PATCH":
+      return (await import("@/vibe/remote-connection/self/rename/route")).tools
+        .PATCH as GenericHandlerBase;
+    case "vibe_remote-connection_sync_POST":
+      return (await import("@/vibe/remote-connection/sync/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_remote-connection_sync_providers_GET":
+      return (await import("@/vibe/remote-connection/sync/providers/route"))
+        .tools.GET as GenericHandlerBase;
+    case "vibe_server_server_build_POST":
+      return (await import("@/vibe/server/server/build/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_server_server_dev_POST":
+      return (await import("@/vibe/server/server/dev/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_server_server_electron_build_POST":
+      return (await import("@/vibe/server/server/electron/build/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_server_server_electron_start_POST":
+      return (await import("@/vibe/server/server/electron/start/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_server_server_headless-client_POST":
+      return (await import("@/vibe/server/server/headless-client/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_server_server_health_GET":
+      return (await import("@/vibe/server/server/health/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_server_server_image-push_POST":
+      return (await import("@/vibe/server/server/image-push/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_server_server_rebuild_POST":
+      return (await import("@/vibe/server/server/rebuild/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_server_server_start_POST":
+      return (await import("@/vibe/server/server/start/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_tasks_cron_bulk_POST":
+      return (await import("@/vibe/tasks/cron/bulk/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_tasks_cron_history_GET":
+      return (await import("@/vibe/tasks/cron/history/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_tasks_cron_id_DELETE":
+      return (await import("@/vibe/tasks/cron/[id]/route")).tools
+        .DELETE as GenericHandlerBase;
+    case "vibe_tasks_cron_id_GET":
+      return (await import("@/vibe/tasks/cron/[id]/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_tasks_cron_id_PUT":
+      return (await import("@/vibe/tasks/cron/[id]/route")).tools
+        .PUT as GenericHandlerBase;
+    case "vibe_tasks_cron_queue_GET":
+      return (await import("@/vibe/tasks/cron/queue/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_tasks_cron_stats_GET":
+      return (await import("@/vibe/tasks/cron/stats/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_tasks_cron_tasks_GET":
+      return (await import("@/vibe/tasks/cron/tasks/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_tasks_cron_tasks_POST":
+      return (await import("@/vibe/tasks/cron/tasks/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_tasks_data-sources_cron-executions-failed_POST":
+      return (
+        await import("@/vibe/tasks/data-sources/cron-executions-failed/route")
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_tasks_data-sources_cron-executions-succeeded_POST":
+      return (
+        await import("@/vibe/tasks/data-sources/cron-executions-succeeded/route")
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_tasks_data-sources_cron-executions-total_POST":
+      return (
+        await import("@/vibe/tasks/data-sources/cron-executions-total/route")
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_tasks_execute_POST":
+      return (await import("@/vibe/tasks/execute/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_tasks_pulse_execute_POST":
+      return (await import("@/vibe/tasks/pulse/execute/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_tasks_pulse_history_GET":
+      return (await import("@/vibe/tasks/pulse/history/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_tasks_pulse_status_GET":
+      return (await import("@/vibe/tasks/pulse/status/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_tasks_unified-runner_POST":
+      return (await import("@/vibe/tasks/unified-runner/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_tooling_builder_POST":
+      return (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/builder/route"
+        )
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_tooling_check_config_create_POST":
+      return (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/config/create/route"
+        )
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_tooling_check_lint_POST":
+      return (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/lint/route"
+        )
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_tooling_check_oxlint_POST":
+      return (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/oxlint/route"
+        )
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_tooling_check_testing_test_POST":
+      return (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/testing/test/route"
+        )
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_tooling_check_typecheck_POST":
+      return (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/typecheck/route"
+        )
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_tooling_check_vibe-check_POST":
+      return (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/vibe-check/route"
+        )
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_tooling_generators_POST":
+      return (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/generators/route"
+        )
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_tooling_guard_destroy_POST":
+      return (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/guard/destroy/route"
+        )
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_tooling_guard_start_POST":
+      return (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/guard/start/route"
+        )
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_tooling_guard_status_POST":
+      return (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/guard/status/route"
+        )
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_tooling_guard_stop_POST":
+      return (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/guard/stop/route"
+        )
+      ).tools.POST as GenericHandlerBase;
+    case "vibe_tooling_infra_cluster_init_POST":
+      return (await import("@/vibe/tooling/infra/cluster/init/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_tooling_infra_cluster_status_GET":
+      return (await import("@/vibe/tooling/infra/cluster/status/route")).tools
+        .GET as GenericHandlerBase;
+    case "vibe_tooling_infra_deploy_preview_POST":
+      return (await import("@/vibe/tooling/infra/deploy/preview/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_tooling_infra_deploy_push_POST":
+      return (await import("@/vibe/tooling/infra/deploy/push/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_tooling_infra_scale_replicas_POST":
+      return (await import("@/vibe/tooling/infra/scale/replicas/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_tooling_release_POST":
+      return (await import("@/vibe/tooling/release/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_tooling_vibe-deps_POST":
+      return (await import("@/vibe/tooling/vibe-deps/route")).tools
+        .POST as GenericHandlerBase;
+    case "vibe_tooling_vibe-stage_POST":
+      return (await import("@/vibe/tooling/vibe-stage/route")).tools
+        .POST as GenericHandlerBase;
     case "wait-for-task":
-      return (
-        await import("next-vibe/execute-tool/await-task/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/vibe/execute-tool/await-task/route")).tools
+        .POST as GenericHandlerBase;
     case "web-search":
-      return (await import("next-vibe/agent/web-search/route")).tools
+      return (await import("@/vibe/agent/web-search/route")).tools
         .GET as GenericHandlerBase;
     default:
       return null;
@@ -4143,83 +3684,7 @@ const ROUTE_PREWARM_PATHS: string[] = [
   "agent-search-messages",
   "agent-search-threads",
   "agent-view-image",
-  "agent_ai-stream_cancel_POST",
-  "agent_ai-stream_stream_POST",
-  "agent_ai-stream_system-prompt_debug_GET",
-  "agent_ai-stream_ws-provider_models_GET",
-  "agent_chat_data-sources_chat-downvotes-total_POST",
-  "agent_chat_data-sources_chat-errors-total_POST",
-  "agent_chat_data-sources_chat-memories-created_POST",
-  "agent_chat_data-sources_chat-messages-by-ai_POST",
-  "agent_chat_data-sources_chat-messages-by-user_POST",
-  "agent_chat_data-sources_chat-messages-total_POST",
-  "agent_chat_data-sources_chat-messages-with-attachments_POST",
-  "agent_chat_data-sources_chat-share-links-created_POST",
-  "agent_chat_data-sources_chat-threads-active-total_POST",
-  "agent_chat_data-sources_chat-threads-created_POST",
-  "agent_chat_data-sources_chat-tool-calls-total_POST",
-  "agent_chat_data-sources_chat-unique-users_POST",
-  "agent_chat_data-sources_chat-upvotes-total_POST",
-  "agent_chat_folder-contents_rootFolderId_GET",
-  "agent_chat_folders_rootFolderId_GET",
-  "agent_chat_folders_rootFolderId_create_POST",
-  "agent_chat_folders_rootFolderId_root-permissions_GET",
-  "agent_chat_folders_subfolders_subFolderId_DELETE",
-  "agent_chat_folders_subfolders_subFolderId_move_PATCH",
-  "agent_chat_folders_subfolders_subFolderId_permissions_GET",
-  "agent_chat_folders_subfolders_subFolderId_rename_PATCH",
-  "agent_chat_folders_subfolders_subFolderId_update_PATCH",
-  "agent_chat_public-feed_GET",
-  "agent_chat_settings_GET",
-  "agent_chat_threads_files_threadId_filename_GET",
-  "agent_chat_threads_rename_PATCH",
-  "agent_chat_threads_threadId_DELETE",
-  "agent_chat_threads_threadId_messages_GET",
-  "agent_chat_threads_threadId_messages_messageId_DELETE",
-  "agent_chat_threads_threadId_messages_messageId_vote_POST",
-  "agent_chat_threads_threadId_messages_path_GET",
-  "agent_chat_threads_threadId_messages_search_GET",
-  "agent_chat_threads_threadId_permissions_GET",
-  "agent_chat_threads_threadId_share-links_DELETE",
-  "agent_coding-agent_POST",
-  "agent_cortex_delete_DELETE",
-  "agent_cortex_edit_PATCH",
-  "agent_cortex_embeddings_backfill_POST",
-  "agent_cortex_exec_POST",
-  "agent_cortex_list_GET",
-  "agent_cortex_mkdir_POST",
-  "agent_cortex_move_POST",
-  "agent_cortex_read_GET",
-  "agent_cortex_search_GET",
-  "agent_cortex_terminals_GET",
-  "agent_cortex_tree_GET",
-  "agent_cortex_write_POST",
-  "agent_describe-image_POST",
-  "agent_describe-video_POST",
-  "agent_fetch-url-content_GET",
-  "agent_fetch-url-content_cleanup_POST",
-  "agent_image-generation_POST",
-  "agent_models_list_GET",
-  "agent_models_model-prices_GET",
-  "agent_music-generation_POST",
-  "agent_skills_GET",
-  "agent_skills_create_POST",
-  "agent_skills_favorites_GET",
-  "agent_skills_favorites_create_POST",
-  "agent_skills_favorites_id_DELETE",
-  "agent_skills_favorites_reorder_POST",
-  "agent_skills_id_DELETE",
-  "agent_skills_id_publish_PATCH",
-  "agent_skills_id_report_POST",
-  "agent_skills_id_vote_POST",
-  "agent_skills_moderation_GET",
-  "agent_speech-to-text_POST",
-  "agent_speech-to-text_hotkey_POST",
-  "agent_text-to-speech_POST",
-  "agent_video-generation_POST",
-  "agent_web-search_GET",
-  "agent_web-search_brave_GET",
-  "agent_web-search_kagi_GET",
+  "ai-stream",
   "ai-tools",
   "analytics_evaluators_and_POST",
   "analytics_evaluators_crossover_POST",
@@ -4245,6 +3710,7 @@ const ROUTE_PREWARM_PATHS: string[] = [
   "await-task",
   "b",
   "bounce-processor",
+  "brave-search",
   "browser-click",
   "browser-close-page",
   "browser-drag",
@@ -4302,6 +3768,21 @@ const ROUTE_PREWARM_PATHS: string[] = [
   "chart-of-accounts_reports_tax-report_GET",
   "chart-of-accounts_reports_trial-balance_GET",
   "chart-of-accounts_setup_POST",
+  "chat-downvotes-total",
+  "chat-errors-total",
+  "chat-memories-created",
+  "chat-messages-by-ai",
+  "chat-messages-by-user",
+  "chat-messages-total",
+  "chat-messages-with-attachments",
+  "chat-settings",
+  "chat-share-links-created",
+  "chat-threads-active-total",
+  "chat-threads-created",
+  "chat-tool-calls-total",
+  "chat-unique-users",
+  "chat-upvotes-total",
+  "claude",
   "click-tracking",
   "cluster-init",
   "cluster-status",
@@ -4318,6 +3799,18 @@ const ROUTE_PREWARM_PATHS: string[] = [
   "connect-remote",
   "connection-status",
   "contact-form",
+  "cortex-delete",
+  "cortex-edit",
+  "cortex-embed-backfill",
+  "cortex-exec",
+  "cortex-list",
+  "cortex-mkdir",
+  "cortex-move",
+  "cortex-read",
+  "cortex-search",
+  "cortex-terminals",
+  "cortex-tree",
+  "cortex-write",
   "credits-avg-transaction",
   "credits-balance",
   "credits-balance-total",
@@ -4359,6 +3852,8 @@ const ROUTE_PREWARM_PATHS: string[] = [
   "deploy",
   "deploy-preview",
   "deps",
+  "describe_image",
+  "describe_video",
   "desktop-accessibility",
   "desktop-click",
   "desktop-focus-window",
@@ -4386,8 +3881,25 @@ const ROUTE_PREWARM_PATHS: string[] = [
   "error-logs-warnings",
   "execute-task",
   "execute-tool",
+  "favorite-create",
+  "favorite-delete",
+  "favorites",
+  "favorites-reorder",
+  "fetch",
+  "fetch-url-cache-cleanup",
+  "folder-contents",
+  "folder-create",
+  "folder-delete",
+  "folder-move",
+  "folder-permissions",
+  "folder-rename",
+  "folder-update",
+  "folders",
   "gen",
   "gen-key",
+  "generate_image",
+  "generate_music",
+  "generate_video",
   "guard",
   "guard-destroy",
   "guard-stop",
@@ -4416,6 +3928,7 @@ const ROUTE_PREWARM_PATHS: string[] = [
   "inventory_warehouse_warehouseId_get_GET",
   "inventory_warehouse_warehouseId_update_PATCH",
   "ip-match-linking",
+  "kagi-search",
   "l",
   "lead-magnet_capture_POST",
   "lead-magnet_captures_GET",
@@ -4472,6 +3985,7 @@ const ROUTE_PREWARM_PATHS: string[] = [
   "leads_import_jobs_jobId_stop_POST",
   "leads_import_process_POST",
   "leads_skill_PATCH",
+  "list-models",
   "login",
   "logout",
   "mcp",
@@ -4603,19 +4117,23 @@ const ROUTE_PREWARM_PATHS: string[] = [
   "referral_earnings_list_GET",
   "referral_lead_current_GET",
   "referral_payout_GET",
-  "remote-connection_connect-reverse_POST",
-  "remote-connection_connect-reverse_update_PATCH",
-  "remote-connection_list_GET",
-  "remote-connection_self_rename_PATCH",
-  "remote-connection_sync_POST",
-  "remote-connection_sync_providers_GET",
+  "remote-connections",
   "remote-event-bridge",
+  "rename-instance",
+  "rename-thread",
   "report-client-error",
   "resume-stream",
   "resume-when-done",
   "runner",
   "s",
   "setup:uninstall",
+  "skill-create",
+  "skill-delete",
+  "skill-moderation",
+  "skill-publish",
+  "skill-report",
+  "skill-vote",
+  "skills",
   "sql",
   "ssh-connections-list",
   "ssh-mount",
@@ -4628,6 +4146,7 @@ const ROUTE_PREWARM_PATHS: string[] = [
   "ssh_linux_users_username_DELETE",
   "stage",
   "status",
+  "stt",
   "subscription-admin-list",
   "subscription-admin-purchases",
   "subscription-admin-referrals",
@@ -4644,27 +4163,21 @@ const ROUTE_PREWARM_PATHS: string[] = [
   "subscription_data-sources_subscriptions-new_POST",
   "subscription_data-sources_subscriptions-payment-failed_POST",
   "subscription_data-sources_subscriptions-trialing_POST",
-  "system_dataflow_cleanup_POST",
-  "system_dataflow_graphs_GET",
-  "system_dataflow_graphs_id_archive_POST",
-  "system_dataflow_graphs_id_backtest_POST",
-  "system_dataflow_graphs_id_data_GET",
-  "system_dataflow_graphs_id_delete_DELETE",
-  "system_dataflow_graphs_id_edit_PUT",
-  "system_dataflow_graphs_id_promote_POST",
-  "system_dataflow_graphs_id_trigger_POST",
-  "system_dataflow_graphs_id_versions_GET",
-  "system_dataflow_run-config_POST",
-  "system_env_settings_export-env_GET",
-  "system_platforms_vibe-frame_mount_POST",
-  "system_tasks_cron_bulk_POST",
-  "system_tooling_check_testing_test_POST",
-  "system_tooling_check_typecheck_POST",
+  "sync",
+  "system-prompt-debug",
+  "t",
   "tax-rate-list",
   "tax_rate_create_POST",
   "tax_rate_rateId_delete_POST",
   "tax_rate_rateId_update_PATCH",
   "tax_report_GET",
+  "tc",
+  "text-to-speech",
+  "thread-files",
+  "thread-messages",
+  "thread-share-links",
+  "transcribe_audio",
+  "update-model-prices",
   "user-delete",
   "user-me",
   "user-sessions",
@@ -4694,6 +4207,34 @@ const ROUTE_PREWARM_PATHS: string[] = [
   "users-stats",
   "users-view",
   "users_user_id_roles_DELETE",
+  "vibe-frame-mount",
+  "vibe-sense-graphs",
+  "vibe-sense-run-config",
+  "vibe_agent_ai-stream_cancel_POST",
+  "vibe_agent_ai-stream_ws-provider_models_GET",
+  "vibe_agent_chat_folders_subfolders_subFolderId_permissions_GET",
+  "vibe_agent_chat_public-feed_GET",
+  "vibe_agent_chat_threads_threadId_DELETE",
+  "vibe_agent_chat_threads_threadId_messages_messageId_DELETE",
+  "vibe_agent_chat_threads_threadId_messages_messageId_vote_POST",
+  "vibe_agent_chat_threads_threadId_messages_path_GET",
+  "vibe_agent_chat_threads_threadId_messages_search_GET",
+  "vibe_agent_chat_threads_threadId_permissions_GET",
+  "vibe_agent_web-search_GET",
+  "vibe_dataflow_cleanup_POST",
+  "vibe_dataflow_graphs_id_archive_POST",
+  "vibe_dataflow_graphs_id_backtest_POST",
+  "vibe_dataflow_graphs_id_data_GET",
+  "vibe_dataflow_graphs_id_delete_DELETE",
+  "vibe_dataflow_graphs_id_edit_PUT",
+  "vibe_dataflow_graphs_id_promote_POST",
+  "vibe_dataflow_graphs_id_trigger_POST",
+  "vibe_dataflow_graphs_id_versions_GET",
+  "vibe_env_settings_export-env_GET",
+  "vibe_remote-connection_connect-reverse_POST",
+  "vibe_remote-connection_connect-reverse_update_PATCH",
+  "vibe_remote-connection_sync_providers_GET",
+  "vibe_tasks_cron_bulk_POST",
 ];
 if (
   typeof window === "undefined" &&

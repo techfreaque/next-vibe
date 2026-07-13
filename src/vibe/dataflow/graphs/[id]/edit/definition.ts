@@ -33,7 +33,7 @@ const EditGraphWidget = lazyWidget(() =>
 const { PUT } = createEndpoint({
   scopedTranslation,
   method: Methods.PUT,
-  path: ["system", "dataflow", "graphs", "[id]", "edit"],
+  path: ["vibe", "dataflow", "graphs", "[id]", "edit"],
   title: "put.title",
   titleShort: "put.titleShort",
   description: "put.description",

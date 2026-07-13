@@ -30,7 +30,7 @@ const CortexMkdirWidget = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["agent", "cortex", "mkdir"],
+  path: ["vibe", "agent", "cortex", "mkdir"],
   aliases: [CORTEX_MKDIR_ALIAS] as const,
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   defaultAiPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,

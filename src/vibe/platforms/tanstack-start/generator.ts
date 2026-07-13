@@ -1,5 +1,5 @@
 // Flat TanStack Start route generator.
-// Scans src/app/[locale] (pages/layouts) and src (route.ts) and
+// Scans src/_pages (pages/layouts) and src (route.ts) and
 // emits dot-separated flat files into src/generated/app-tanstack/routes/.
 // Flat convention: page.tsx → $locale.path.index.tsx, layout.tsx → $locale.path.tsx,
 // route.ts → api.$locale.path.ts
@@ -17,13 +17,21 @@ import {
 } from "node:fs";
 import path, { join, relative, resolve } from "node:path";
 
+import type { ApiSection } from "next-vibe/core/definition/endpoint-base";
 import { parseError } from "next-vibe/core/utils/parse-error";
+import {
+  filterPlatformMarkers,
+  PlatformMarker,
+  type UserRoleValue,
+} from "next-vibe/identity/roles/enum";
 import { hasCustomDirective } from "next-vibe/tooling/generators/shared/custom-directive";
 import { findFilesByName } from "next-vibe/tooling/generators/shared/scanner";
 import type {
   GeneratorContext,
   GeneratorResult,
 } from "next-vibe/tooling/generators/shared/shared-inputs";
+
+import { getApiDir, getUiDir } from "@/env/paths";
 
 // Use POSIX dirname so segment splitting on "/" works on Windows too
 const posixDirname = path.posix.dirname;

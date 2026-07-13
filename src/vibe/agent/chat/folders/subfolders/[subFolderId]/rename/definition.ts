@@ -34,7 +34,15 @@ const FolderRenameContainer = lazyWidget(() =>
 const { PATCH } = createEndpoint({
   scopedTranslation,
   method: Methods.PATCH,
-  path: ["agent", "chat", "folders", "subfolders", "[subFolderId]", "rename"],
+  path: [
+    "vibe",
+    "agent",
+    "chat",
+    "folders",
+    "subfolders",
+    "[subFolderId]",
+    "rename",
+  ],
   aliases: ["folder-rename"] as const,
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 

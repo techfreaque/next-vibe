@@ -140,7 +140,7 @@ const DOMAIN_ALIASES: Record<string, string> = {
  *   system/realtime  ≠  system/database  ≠  system/platforms  etc.
  *
  *   - system/ files:      `system/<area>`  (first segment inside system/)
- *   - other locale files: `<domain>`       (first segment after [locale]/)
+ *   - domain files: `<domain>`             (first segment under src/)
  *   - non-locale files:   first two path segments (e.g. `src/config`)
  */
 export function domainOf(key: string): string {

@@ -34,7 +34,7 @@ import { scopedTranslation } from "./i18n";
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["agent", "chat", "threads", "[threadId]", "share-links"],
+  path: ["vibe", "agent", "chat", "threads", "[threadId]", "share-links"],
   aliases: [THREAD_SHARE_LINKS_ALIAS] as const,
   title: "get.title" as const,
   titleShort: "get.titleShort" as const,
@@ -210,7 +210,7 @@ const { GET } = createEndpoint({
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["agent", "chat", "threads", "[threadId]", "share-links"],
+  path: ["vibe", "agent", "chat", "threads", "[threadId]", "share-links"],
   title: "post.title" as const,
   titleShort: "post.titleShort" as const,
   description: "post.description" as const,
@@ -361,7 +361,7 @@ const { POST } = createEndpoint({
 const { PATCH } = createEndpoint({
   scopedTranslation,
   method: Methods.PATCH,
-  path: ["agent", "chat", "threads", "[threadId]", "share-links"],
+  path: ["vibe", "agent", "chat", "threads", "[threadId]", "share-links"],
   title: "patch.title" as const,
   titleShort: "patch.titleShort" as const,
   description: "patch.description" as const,
@@ -513,7 +513,7 @@ const { PATCH } = createEndpoint({
 const { DELETE } = createEndpoint({
   scopedTranslation,
   method: Methods.DELETE,
-  path: ["agent", "chat", "threads", "[threadId]", "share-links"],
+  path: ["vibe", "agent", "chat", "threads", "[threadId]", "share-links"],
   title: "delete.title" as const,
   titleShort: "delete.titleShort" as const,
   description: "delete.description" as const,

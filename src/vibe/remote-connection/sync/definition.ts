@@ -28,7 +28,7 @@ import { scopedTranslation } from "./i18n";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["remote-connection", "sync"],
+  path: ["vibe", "remote-connection", "sync"],
   title: "taskSync.post.title",
   titleShort: "taskSync.post.titleShort",
   description: "taskSync.post.description",

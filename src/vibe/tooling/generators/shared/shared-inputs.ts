@@ -18,6 +18,8 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type { LiveIndex } from "next-vibe/tooling/generators/shared/live-index";
 import { findFilesRecursively } from "next-vibe/tooling/generators/shared/utils";
 
+import { getApiDir } from "@/env/paths";
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------

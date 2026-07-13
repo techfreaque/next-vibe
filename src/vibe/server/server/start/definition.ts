@@ -27,7 +27,7 @@ import { START_ALIASES } from "./constants";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "server", "server", "start"],
+  path: ["vibe", "server", "server", "start"],
   aliases: START_ALIASES,
   title: "post.title",
   titleShort: "post.titleShort",

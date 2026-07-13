@@ -1,10 +1,10 @@
-// AUTO-GENERATED from src/app/[locale]/tools/[...toolPath]/page.tsx. Add "use custom" to this file to preserve customizations.
+// AUTO-GENERATED from src/_pages/tools/[...toolPath]/page.tsx. Add "use custom" to this file to preserve customizations.
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JSX } from "react";
 
-import { TanstackPage as Page } from "@/app/[locale]/tools/[...toolPath]/page";
+import { TanstackPage as Page } from "@/_pages/tools/[...toolPath]/page";
 
 import { runPageLoader, toNextParams } from "../nextjs-compat-wrapper";
 
@@ -13,7 +13,7 @@ const loadData = createServerFn({ method: "GET" })
   .handler(async ({ data }) =>
     runPageLoader(async () => {
       const { tanstackLoader } =
-        await import("@/app/[locale]/tools/[...toolPath]/page");
+        await import("@/_pages/tools/[...toolPath]/page");
       const p = toNextParams(data);
       return tanstackLoader({
         params: Promise.resolve({

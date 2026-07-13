@@ -20,7 +20,7 @@ import { ERROR_LOGS_CLEANUP_ALIAS } from "./constants";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "logger", "error-monitor", "cleanup"],
+  path: ["vibe", "logger", "error-monitor", "cleanup"],
   aliases: [ERROR_LOGS_CLEANUP_ALIAS],
   title: "errorMonitor.cleanup.post.title",
   titleShort: "errorMonitor.cleanup.post.titleShort",

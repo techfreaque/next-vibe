@@ -1,9 +1,9 @@
-// AUTO-GENERATED from src/app/[locale]/subscription/history/page.tsx. Add "use custom" to this file to preserve customizations.
+// AUTO-GENERATED from src/_pages/subscription/history/page.tsx. Add "use custom" to this file to preserve customizations.
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import type { JSX } from "react";
 
-import { TanstackPage as Page } from "@/app/[locale]/subscription/history/page";
+import { TanstackPage as Page } from "@/_pages/subscription/history/page";
 
 import { runPageLoader, toNextParams } from "../nextjs-compat-wrapper";
 
@@ -17,7 +17,7 @@ const loadData = createServerFn({ method: "GET" })
   .handler(async ({ data }) =>
     runPageLoader(async () => {
       const { tanstackLoader } =
-        await import("@/app/[locale]/subscription/history/page");
+        await import("@/_pages/subscription/history/page");
       return tanstackLoader({
         params: Promise.resolve(toNextParams(data.params)),
         searchParams: Promise.resolve(data.search),

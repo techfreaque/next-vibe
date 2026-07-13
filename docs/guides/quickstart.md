@@ -182,7 +182,7 @@ cd src/app/api/[locale]/hello/world
 ### 2. Create `definition.ts`
 
 ```typescript
-// src/app/api/[locale]/hello/world/definition.ts
+// src/hello/world/definition.ts
 import { z } from "zod";
 import { createEndpoint } from "@/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -231,7 +231,7 @@ export default { POST };
 ### 3. Create `repository.ts`
 
 ```typescript
-// src/app/api/[locale]/hello/world/repository.ts
+// src/hello/world/repository.ts
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
@@ -262,7 +262,7 @@ export class HelloRepository {
 ### 4. Create `route.ts`
 
 ```typescript
-// src/app/api/[locale]/hello/world/route.ts
+// src/hello/world/route.ts
 import { endpointsHandler } from "@/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/system/unified-interface/shared/types/enums";
 
@@ -283,7 +283,7 @@ export const { POST, tools } = endpointsHandler({
 Create `i18n/en/index.ts` in the same folder:
 
 ```typescript
-// src/app/api/[locale]/hello/world/i18n/en/index.ts
+// src/hello/world/i18n/en/index.ts
 export const translations = {
   post: {
     title: "Say Hello",

@@ -47,505 +47,10 @@ export const endpointHotPaths: Record<
       "/home/max/projects/next-vibe-translations/src/vibe/agent/view-image/definition.ts",
     method: "POST",
   },
-  "agent_ai-stream_cancel_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/cancel/definition.ts",
-    method: "POST",
-  },
-  "agent_ai-stream_run_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/run/definition.ts",
-    method: "POST",
-  },
-  "agent_ai-stream_stream_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/stream/definition.ts",
-    method: "POST",
-  },
-  "agent_ai-stream_system-prompt_debug_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/system-prompt/debug/definition.ts",
-    method: "GET",
-  },
-  "agent_ai-stream_ws-provider_models_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/ws-provider/models/definition.ts",
-    method: "GET",
-  },
-  "agent_chat_data-sources_chat-downvotes-total_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-downvotes-total/definition.ts",
-    method: "POST",
-  },
-  "agent_chat_data-sources_chat-errors-total_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-errors-total/definition.ts",
-    method: "POST",
-  },
-  "agent_chat_data-sources_chat-memories-created_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-memories-created/definition.ts",
-    method: "POST",
-  },
-  "agent_chat_data-sources_chat-messages-by-ai_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-messages-by-ai/definition.ts",
-    method: "POST",
-  },
-  "agent_chat_data-sources_chat-messages-by-user_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-messages-by-user/definition.ts",
-    method: "POST",
-  },
-  "agent_chat_data-sources_chat-messages-total_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-messages-total/definition.ts",
-    method: "POST",
-  },
-  "agent_chat_data-sources_chat-messages-with-attachments_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-messages-with-attachments/definition.ts",
-    method: "POST",
-  },
-  "agent_chat_data-sources_chat-share-links-created_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-share-links-created/definition.ts",
-    method: "POST",
-  },
-  "agent_chat_data-sources_chat-threads-active-total_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-threads-active-total/definition.ts",
-    method: "POST",
-  },
-  "agent_chat_data-sources_chat-threads-created_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-threads-created/definition.ts",
-    method: "POST",
-  },
-  "agent_chat_data-sources_chat-tool-calls-total_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-tool-calls-total/definition.ts",
-    method: "POST",
-  },
-  "agent_chat_data-sources_chat-unique-users_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-unique-users/definition.ts",
-    method: "POST",
-  },
-  "agent_chat_data-sources_chat-upvotes-total_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-upvotes-total/definition.ts",
-    method: "POST",
-  },
-  "agent_chat_folder-contents_rootFolderId_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folder-contents/[rootFolderId]/definition.ts",
-    method: "GET",
-  },
-  agent_chat_folders_rootFolderId_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/[rootFolderId]/definition.ts",
-    method: "GET",
-  },
-  agent_chat_folders_rootFolderId_create_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/[rootFolderId]/create/definition.ts",
-    method: "POST",
-  },
-  "agent_chat_folders_rootFolderId_root-permissions_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/[rootFolderId]/root-permissions/definition.ts",
-    method: "GET",
-  },
-  agent_chat_folders_subfolders_subFolderId_DELETE: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/definition.ts",
-    method: "DELETE",
-  },
-  agent_chat_folders_subfolders_subFolderId_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/definition.ts",
-    method: "GET",
-  },
-  agent_chat_folders_subfolders_subFolderId_move_PATCH: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/move/definition.ts",
-    method: "PATCH",
-  },
-  agent_chat_folders_subfolders_subFolderId_permissions_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/permissions/definition.ts",
-    method: "GET",
-  },
-  agent_chat_folders_subfolders_subFolderId_permissions_PATCH: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/permissions/definition.ts",
-    method: "PATCH",
-  },
-  agent_chat_folders_subfolders_subFolderId_rename_PATCH: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/rename/definition.ts",
-    method: "PATCH",
-  },
-  agent_chat_folders_subfolders_subFolderId_update_PATCH: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/update/definition.ts",
-    method: "PATCH",
-  },
-  "agent_chat_public-feed_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/public-feed/definition.ts",
-    method: "GET",
-  },
-  agent_chat_settings_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/settings/definition.ts",
-    method: "GET",
-  },
-  agent_chat_settings_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/settings/definition.ts",
-    method: "POST",
-  },
-  agent_chat_threads_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/definition.ts",
-    method: "GET",
-  },
-  agent_chat_threads_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/definition.ts",
-    method: "POST",
-  },
-  agent_chat_threads_files_threadId_filename_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/files/[threadId]/[filename]/definition.ts",
-    method: "GET",
-  },
-  agent_chat_threads_rename_PATCH: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/rename/definition.ts",
-    method: "PATCH",
-  },
-  "agent_chat_threads_search-messages_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/search-messages/definition.ts",
-    method: "GET",
-  },
-  "agent_chat_threads_search-threads_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/search-threads/definition.ts",
-    method: "GET",
-  },
-  agent_chat_threads_threadId_DELETE: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/definition.ts",
-    method: "DELETE",
-  },
-  agent_chat_threads_threadId_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/definition.ts",
-    method: "GET",
-  },
-  agent_chat_threads_threadId_PATCH: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/definition.ts",
-    method: "PATCH",
-  },
-  agent_chat_threads_threadId_messages_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/definition.ts",
-    method: "GET",
-  },
-  agent_chat_threads_threadId_messages_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/definition.ts",
-    method: "POST",
-  },
-  agent_chat_threads_threadId_messages_messageId_DELETE: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/[messageId]/definition.ts",
-    method: "DELETE",
-  },
-  agent_chat_threads_threadId_messages_messageId_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/[messageId]/definition.ts",
-    method: "GET",
-  },
-  agent_chat_threads_threadId_messages_messageId_PATCH: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/[messageId]/definition.ts",
-    method: "PATCH",
-  },
-  agent_chat_threads_threadId_messages_messageId_vote_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/[messageId]/vote/definition.ts",
-    method: "POST",
-  },
-  agent_chat_threads_threadId_messages_path_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/path/definition.ts",
-    method: "GET",
-  },
-  agent_chat_threads_threadId_messages_search_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/search/definition.ts",
-    method: "GET",
-  },
-  agent_chat_threads_threadId_permissions_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/permissions/definition.ts",
-    method: "GET",
-  },
-  agent_chat_threads_threadId_permissions_PATCH: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/permissions/definition.ts",
-    method: "PATCH",
-  },
   "agent_chat_threads_threadId_share-links_DELETE": {
     absPath:
       "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/share-links/definition.ts",
     method: "DELETE",
-  },
-  "agent_chat_threads_threadId_share-links_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/share-links/definition.ts",
-    method: "GET",
-  },
-  "agent_chat_threads_threadId_share-links_PATCH": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/share-links/definition.ts",
-    method: "PATCH",
-  },
-  "agent_chat_threads_threadId_share-links_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/share-links/definition.ts",
-    method: "POST",
-  },
-  "agent_coding-agent_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/coding-agent/definition.ts",
-    method: "POST",
-  },
-  agent_cortex_delete_DELETE: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/delete/definition.ts",
-    method: "DELETE",
-  },
-  agent_cortex_edit_PATCH: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/edit/definition.ts",
-    method: "PATCH",
-  },
-  agent_cortex_embeddings_backfill_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/embeddings/backfill/definition.ts",
-    method: "POST",
-  },
-  agent_cortex_exec_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/exec/definition.ts",
-    method: "POST",
-  },
-  agent_cortex_list_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/list/definition.ts",
-    method: "GET",
-  },
-  agent_cortex_mkdir_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/mkdir/definition.ts",
-    method: "POST",
-  },
-  agent_cortex_move_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/move/definition.ts",
-    method: "POST",
-  },
-  agent_cortex_read_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/read/definition.ts",
-    method: "GET",
-  },
-  agent_cortex_search_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/search/definition.ts",
-    method: "GET",
-  },
-  agent_cortex_terminals_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/terminals/definition.ts",
-    method: "GET",
-  },
-  agent_cortex_tree_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/tree/definition.ts",
-    method: "GET",
-  },
-  agent_cortex_write_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/write/definition.ts",
-    method: "POST",
-  },
-  "agent_describe-image_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/describe-image/definition.ts",
-    method: "POST",
-  },
-  "agent_describe-video_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/describe-video/definition.ts",
-    method: "POST",
-  },
-  "agent_fetch-url-content_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/fetch-url-content/definition.ts",
-    method: "GET",
-  },
-  "agent_fetch-url-content_cleanup_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/fetch-url-content/cleanup/definition.ts",
-    method: "POST",
-  },
-  "agent_image-generation_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/image-generation/definition.ts",
-    method: "POST",
-  },
-  agent_models_list_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/models/list/definition.ts",
-    method: "GET",
-  },
-  "agent_models_model-prices_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/models/model-prices/definition.ts",
-    method: "GET",
-  },
-  "agent_music-generation_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/music-generation/definition.ts",
-    method: "POST",
-  },
-  agent_skills_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/definition.ts",
-    method: "GET",
-  },
-  agent_skills_create_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/create/definition.ts",
-    method: "POST",
-  },
-  agent_skills_favorites_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/definition.ts",
-    method: "GET",
-  },
-  agent_skills_favorites_create_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/create/definition.ts",
-    method: "POST",
-  },
-  agent_skills_favorites_id_DELETE: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/[id]/definition.ts",
-    method: "DELETE",
-  },
-  agent_skills_favorites_id_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/[id]/definition.ts",
-    method: "GET",
-  },
-  agent_skills_favorites_id_PATCH: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/[id]/definition.ts",
-    method: "PATCH",
-  },
-  agent_skills_favorites_reorder_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/reorder/definition.ts",
-    method: "POST",
-  },
-  agent_skills_id_DELETE: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/definition.ts",
-    method: "DELETE",
-  },
-  agent_skills_id_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/definition.ts",
-    method: "GET",
-  },
-  agent_skills_id_PATCH: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/definition.ts",
-    method: "PATCH",
-  },
-  agent_skills_id_publish_PATCH: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/publish/definition.ts",
-    method: "PATCH",
-  },
-  agent_skills_id_report_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/report/definition.ts",
-    method: "POST",
-  },
-  agent_skills_id_vote_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/vote/definition.ts",
-    method: "POST",
-  },
-  agent_skills_moderation_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/moderation/definition.ts",
-    method: "GET",
-  },
-  agent_skills_moderation_PATCH: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/moderation/definition.ts",
-    method: "PATCH",
-  },
-  "agent_speech-to-text_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/speech-to-text/definition.ts",
-    method: "POST",
-  },
-  "agent_speech-to-text_hotkey_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/speech-to-text/hotkey/definition.ts",
-    method: "POST",
-  },
-  "agent_text-to-speech_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/text-to-speech/definition.ts",
-    method: "POST",
-  },
-  "agent_video-generation_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/video-generation/definition.ts",
-    method: "POST",
-  },
-  "agent_view-image_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/view-image/definition.ts",
-    method: "POST",
-  },
-  "agent_web-search_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/web-search/definition.ts",
-    method: "GET",
-  },
-  "agent_web-search_brave_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/web-search/brave/definition.ts",
-    method: "GET",
-  },
-  "agent_web-search_kagi_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/agent/web-search/kagi/definition.ts",
-    method: "GET",
   },
   "ai-run": {
     absPath:
@@ -1399,12 +904,12 @@ export const endpointHotPaths: Record<
   },
   "connect-remote": {
     absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/connect/definition.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/connect/definition.ts",
     method: "POST",
   },
   "connection-status": {
     absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/[instanceId]/definition.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/[instanceId]/definition.ts",
     method: "GET",
   },
   "contact-form": {
@@ -3129,7 +2634,7 @@ export const endpointHotPaths: Record<
   },
   "my-instance-id": {
     absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/self/instanceId/definition.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/self/instanceId/definition.ts",
     method: "GET",
   },
   "newsletter-campaigns-sent": {
@@ -3964,67 +3469,12 @@ export const endpointHotPaths: Record<
   },
   "remote-connect": {
     absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/connect/definition.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/connect/definition.ts",
     method: "POST",
-  },
-  "remote-connection_connect-reverse_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/connect-reverse/definition.ts",
-    method: "POST",
-  },
-  "remote-connection_connect-reverse_update_PATCH": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/connect-reverse/update/definition.ts",
-    method: "PATCH",
-  },
-  "remote-connection_connect_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/connect/definition.ts",
-    method: "POST",
-  },
-  "remote-connection_instanceId_DELETE": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/[instanceId]/definition.ts",
-    method: "DELETE",
-  },
-  "remote-connection_instanceId_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/[instanceId]/definition.ts",
-    method: "GET",
-  },
-  "remote-connection_instanceId_PATCH": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/[instanceId]/definition.ts",
-    method: "PATCH",
-  },
-  "remote-connection_list_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/list/definition.ts",
-    method: "GET",
-  },
-  "remote-connection_self_instanceId_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/self/instanceId/definition.ts",
-    method: "GET",
-  },
-  "remote-connection_self_rename_PATCH": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/self/rename/definition.ts",
-    method: "PATCH",
-  },
-  "remote-connection_sync_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/sync/definition.ts",
-    method: "POST",
-  },
-  "remote-connection_sync_providers_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/sync/providers/definition.ts",
-    method: "GET",
   },
   "remote-connections": {
     absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/list/definition.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/list/definition.ts",
     method: "GET",
   },
   "remote-event-bridge": {
@@ -4034,17 +3484,17 @@ export const endpointHotPaths: Record<
   },
   "remote-status": {
     absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/[instanceId]/definition.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/[instanceId]/definition.ts",
     method: "GET",
   },
   "rename-instance": {
     absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/self/rename/definition.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/self/rename/definition.ts",
     method: "PATCH",
   },
   "rename-self": {
     absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/self/rename/definition.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/self/rename/definition.ts",
     method: "PATCH",
   },
   "rename-thread": {
@@ -4099,7 +3549,7 @@ export const endpointHotPaths: Record<
   },
   "self-instance-id": {
     absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/self/instanceId/definition.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/self/instanceId/definition.ts",
     method: "GET",
   },
   "set-setting": {
@@ -4464,7 +3914,7 @@ export const endpointHotPaths: Record<
   },
   sync: {
     absPath:
-      "/home/max/projects/next-vibe-translations/src/remote-connection/sync/definition.ts",
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/sync/definition.ts",
     method: "POST",
   },
   "system-prompt-debug": {
@@ -4477,479 +3927,9 @@ export const endpointHotPaths: Record<
       "/home/max/projects/next-vibe-translations/src/vibe/env/settings/definition.ts",
     method: "GET",
   },
-  system_database_generate_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/database/generate/definition.ts",
-    method: "POST",
-  },
-  system_database_health_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/database/health/definition.ts",
-    method: "POST",
-  },
-  system_database_migrate_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/database/migrate/definition.ts",
-    method: "POST",
-  },
-  system_database_ping_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/database/ping/definition.ts",
-    method: "POST",
-  },
-  system_database_seed_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/database/seed/definition.ts",
-    method: "POST",
-  },
-  system_database_sql_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/database/sql/definition.ts",
-    method: "POST",
-  },
-  system_database_studio_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/database/studio/definition.ts",
-    method: "POST",
-  },
-  system_database_utils_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/database/utils/definition.ts",
-    method: "GET",
-  },
-  "system_database_utils_docker-operations_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/database/utils/docker-operations/definition.ts",
-    method: "POST",
-  },
-  system_dataflow_cleanup_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/cleanup/definition.ts",
-    method: "POST",
-  },
-  system_dataflow_graphs_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/definition.ts",
-    method: "GET",
-  },
-  system_dataflow_graphs_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/definition.ts",
-    method: "POST",
-  },
-  system_dataflow_graphs_id_archive_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/archive/definition.ts",
-    method: "POST",
-  },
-  system_dataflow_graphs_id_backtest_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/backtest/definition.ts",
-    method: "POST",
-  },
-  system_dataflow_graphs_id_data_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/data/definition.ts",
-    method: "GET",
-  },
-  system_dataflow_graphs_id_delete_DELETE: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/delete/definition.ts",
-    method: "DELETE",
-  },
-  system_dataflow_graphs_id_edit_PUT: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/edit/definition.ts",
-    method: "PUT",
-  },
-  system_dataflow_graphs_id_promote_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/promote/definition.ts",
-    method: "POST",
-  },
-  system_dataflow_graphs_id_trigger_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/trigger/definition.ts",
-    method: "POST",
-  },
-  system_dataflow_graphs_id_versions_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/versions/definition.ts",
-    method: "GET",
-  },
-  "system_dataflow_run-config_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/run-config/definition.ts",
-    method: "POST",
-  },
-  system_env_settings_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/env/settings/definition.ts",
-    method: "GET",
-  },
-  system_env_settings_PATCH: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/env/settings/definition.ts",
-    method: "PATCH",
-  },
-  system_env_settings_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/env/settings/definition.ts",
-    method: "POST",
-  },
-  "system_env_settings_export-env_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/env/settings/export-env/definition.ts",
-    method: "GET",
-  },
-  "system_env_settings_generate-key_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/env/settings/generate-key/definition.ts",
-    method: "GET",
-  },
-  "system_execute-tool_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/definition.ts",
-    method: "POST",
-  },
-  "system_execute-tool_await-task_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/await-task/definition.ts",
-    method: "POST",
-  },
-  "system_execute-tool_call-control_cancel_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/call-control/cancel/definition.ts",
-    method: "POST",
-  },
-  "system_execute-tool_call-control_detach_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/call-control/detach/definition.ts",
-    method: "POST",
-  },
-  "system_execute-tool_call-control_resume-when-done_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/call-control/resume-when-done/definition.ts",
-    method: "POST",
-  },
-  "system_execute-tool_complete_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/complete/definition.ts",
-    method: "POST",
-  },
-  "system_execute-tool_revival_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/revival/definition.ts",
-    method: "POST",
-  },
-  "system_help-tool_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/help-tool/definition.ts",
-    method: "GET",
-  },
-  "system_logger_error-monitor_cleanup_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/cleanup/definition.ts",
-    method: "POST",
-  },
   "system_logger_error-monitor_client-log_POST": {
     absPath:
       "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/client-log/definition.ts",
-    method: "POST",
-  },
-  "system_logger_error-monitor_data-sources_error-logs-errors_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/data-sources/error-logs-errors/definition.ts",
-    method: "POST",
-  },
-  "system_logger_error-monitor_data-sources_error-logs-total_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/data-sources/error-logs-total/definition.ts",
-    method: "POST",
-  },
-  "system_logger_error-monitor_data-sources_error-logs-warnings_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/data-sources/error-logs-warnings/definition.ts",
-    method: "POST",
-  },
-  "system_logger_error-monitor_logs_GET": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/logs/definition.ts",
-    method: "GET",
-  },
-  "system_logger_error-monitor_logs_PATCH": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/logs/definition.ts",
-    method: "PATCH",
-  },
-  system_platforms_cli_interactive_capture_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/interactive/capture/definition.ts",
-    method: "POST",
-  },
-  "system_platforms_cli_interactive_send-keys_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/interactive/send-keys/definition.ts",
-    method: "POST",
-  },
-  system_platforms_cli_setup_install_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/setup/install/definition.ts",
-    method: "POST",
-  },
-  system_platforms_cli_setup_status_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/setup/status/definition.ts",
-    method: "POST",
-  },
-  system_platforms_cli_setup_uninstall_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/setup/uninstall/definition.ts",
-    method: "POST",
-  },
-  system_platforms_mcp_serve_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/platforms/mcp/serve/definition.ts",
-    method: "POST",
-  },
-  "system_platforms_vibe-frame_mount_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/platforms/vibe-frame/mount/definition.ts",
-    method: "POST",
-  },
-  "system_realtime_remote-event-bridge_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/realtime/remote-event-bridge/definition.ts",
-    method: "POST",
-  },
-  system_server_server_build_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/server/server/build/definition.ts",
-    method: "POST",
-  },
-  system_server_server_dev_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/server/server/dev/definition.ts",
-    method: "POST",
-  },
-  system_server_server_electron_build_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/server/server/electron/build/definition.ts",
-    method: "POST",
-  },
-  system_server_server_electron_start_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/server/server/electron/start/definition.ts",
-    method: "POST",
-  },
-  "system_server_server_headless-client_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/server/server/headless-client/definition.ts",
-    method: "POST",
-  },
-  system_server_server_health_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/server/server/health/definition.ts",
-    method: "GET",
-  },
-  "system_server_server_image-push_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/server/server/image-push/definition.ts",
-    method: "POST",
-  },
-  system_server_server_rebuild_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/server/server/rebuild/definition.ts",
-    method: "POST",
-  },
-  system_server_server_start_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/server/server/start/definition.ts",
-    method: "POST",
-  },
-  system_tasks_cron_bulk_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/bulk/definition.ts",
-    method: "POST",
-  },
-  system_tasks_cron_history_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/history/definition.ts",
-    method: "GET",
-  },
-  system_tasks_cron_id_DELETE: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/[id]/definition.ts",
-    method: "DELETE",
-  },
-  system_tasks_cron_id_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/[id]/definition.ts",
-    method: "GET",
-  },
-  system_tasks_cron_id_PUT: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/[id]/definition.ts",
-    method: "PUT",
-  },
-  system_tasks_cron_queue_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/queue/definition.ts",
-    method: "GET",
-  },
-  system_tasks_cron_stats_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/stats/definition.ts",
-    method: "GET",
-  },
-  system_tasks_cron_tasks_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/tasks/definition.ts",
-    method: "GET",
-  },
-  system_tasks_cron_tasks_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/tasks/definition.ts",
-    method: "POST",
-  },
-  "system_tasks_data-sources_cron-executions-failed_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/data-sources/cron-executions-failed/definition.ts",
-    method: "POST",
-  },
-  "system_tasks_data-sources_cron-executions-succeeded_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/data-sources/cron-executions-succeeded/definition.ts",
-    method: "POST",
-  },
-  "system_tasks_data-sources_cron-executions-total_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/data-sources/cron-executions-total/definition.ts",
-    method: "POST",
-  },
-  system_tasks_execute_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/execute/definition.ts",
-    method: "POST",
-  },
-  system_tasks_pulse_execute_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/pulse/execute/definition.ts",
-    method: "POST",
-  },
-  system_tasks_pulse_history_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/pulse/history/definition.ts",
-    method: "GET",
-  },
-  system_tasks_pulse_status_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/pulse/status/definition.ts",
-    method: "GET",
-  },
-  "system_tasks_unified-runner_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tasks/unified-runner/definition.ts",
-    method: "POST",
-  },
-  system_tooling_builder_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/builder/definition.ts",
-    method: "POST",
-  },
-  system_tooling_check_config_create_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/config/create/definition.ts",
-    method: "POST",
-  },
-  system_tooling_check_lint_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/lint/definition.ts",
-    method: "POST",
-  },
-  system_tooling_check_oxlint_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/oxlint/definition.ts",
-    method: "POST",
-  },
-  system_tooling_check_testing_test_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/testing/test/definition.ts",
-    method: "POST",
-  },
-  system_tooling_check_typecheck_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/typecheck/definition.ts",
-    method: "POST",
-  },
-  "system_tooling_check_vibe-check_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/vibe-check/definition.ts",
-    method: "POST",
-  },
-  system_tooling_generators_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/generators/definition.ts",
-    method: "POST",
-  },
-  system_tooling_guard_destroy_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/guard/destroy/definition.ts",
-    method: "POST",
-  },
-  system_tooling_guard_start_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/guard/start/definition.ts",
-    method: "POST",
-  },
-  system_tooling_guard_status_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/guard/status/definition.ts",
-    method: "POST",
-  },
-  system_tooling_guard_stop_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/guard/stop/definition.ts",
-    method: "POST",
-  },
-  system_tooling_infra_cluster_init_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/cluster/init/definition.ts",
-    method: "POST",
-  },
-  system_tooling_infra_cluster_status_GET: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/cluster/status/definition.ts",
-    method: "GET",
-  },
-  system_tooling_infra_deploy_preview_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/deploy/preview/definition.ts",
-    method: "POST",
-  },
-  system_tooling_infra_deploy_push_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/deploy/push/definition.ts",
-    method: "POST",
-  },
-  system_tooling_infra_scale_replicas_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/scale/replicas/definition.ts",
-    method: "POST",
-  },
-  system_tooling_release_POST: {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/release/definition.ts",
-    method: "POST",
-  },
-  "system_tooling_vibe-deps_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/vibe-deps/definition.ts",
-    method: "POST",
-  },
-  "system_tooling_vibe-stage_POST": {
-    absPath:
-      "/home/max/projects/next-vibe-translations/src/vibe/tooling/vibe-stage/definition.ts",
     method: "POST",
   },
   t: {
@@ -5525,6 +4505,1026 @@ export const endpointHotPaths: Record<
   "vibe-sense-window-sum": {
     absPath:
       "/home/max/projects/next-vibe-translations/src/analytics/indicators/window-sum/definition.ts",
+    method: "POST",
+  },
+  "vibe_agent_ai-stream_cancel_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/cancel/definition.ts",
+    method: "POST",
+  },
+  "vibe_agent_ai-stream_run_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/run/definition.ts",
+    method: "POST",
+  },
+  "vibe_agent_ai-stream_stream_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/stream/definition.ts",
+    method: "POST",
+  },
+  "vibe_agent_ai-stream_system-prompt_debug_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/system-prompt/debug/definition.ts",
+    method: "GET",
+  },
+  "vibe_agent_ai-stream_ws-provider_models_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/ai-stream/ws-provider/models/definition.ts",
+    method: "GET",
+  },
+  "vibe_agent_chat_data-sources_chat-downvotes-total_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-downvotes-total/definition.ts",
+    method: "POST",
+  },
+  "vibe_agent_chat_data-sources_chat-errors-total_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-errors-total/definition.ts",
+    method: "POST",
+  },
+  "vibe_agent_chat_data-sources_chat-memories-created_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-memories-created/definition.ts",
+    method: "POST",
+  },
+  "vibe_agent_chat_data-sources_chat-messages-by-ai_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-messages-by-ai/definition.ts",
+    method: "POST",
+  },
+  "vibe_agent_chat_data-sources_chat-messages-by-user_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-messages-by-user/definition.ts",
+    method: "POST",
+  },
+  "vibe_agent_chat_data-sources_chat-messages-total_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-messages-total/definition.ts",
+    method: "POST",
+  },
+  "vibe_agent_chat_data-sources_chat-messages-with-attachments_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-messages-with-attachments/definition.ts",
+    method: "POST",
+  },
+  "vibe_agent_chat_data-sources_chat-share-links-created_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-share-links-created/definition.ts",
+    method: "POST",
+  },
+  "vibe_agent_chat_data-sources_chat-threads-active-total_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-threads-active-total/definition.ts",
+    method: "POST",
+  },
+  "vibe_agent_chat_data-sources_chat-threads-created_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-threads-created/definition.ts",
+    method: "POST",
+  },
+  "vibe_agent_chat_data-sources_chat-tool-calls-total_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-tool-calls-total/definition.ts",
+    method: "POST",
+  },
+  "vibe_agent_chat_data-sources_chat-unique-users_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-unique-users/definition.ts",
+    method: "POST",
+  },
+  "vibe_agent_chat_data-sources_chat-upvotes-total_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/data-sources/chat-upvotes-total/definition.ts",
+    method: "POST",
+  },
+  "vibe_agent_chat_folder-contents_rootFolderId_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folder-contents/[rootFolderId]/definition.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_folders_rootFolderId_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/[rootFolderId]/definition.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_folders_rootFolderId_create_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/[rootFolderId]/create/definition.ts",
+    method: "POST",
+  },
+  "vibe_agent_chat_folders_rootFolderId_root-permissions_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/[rootFolderId]/root-permissions/definition.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_folders_subfolders_subFolderId_DELETE: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/definition.ts",
+    method: "DELETE",
+  },
+  vibe_agent_chat_folders_subfolders_subFolderId_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/definition.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_folders_subfolders_subFolderId_move_PATCH: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/move/definition.ts",
+    method: "PATCH",
+  },
+  vibe_agent_chat_folders_subfolders_subFolderId_permissions_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/permissions/definition.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_folders_subfolders_subFolderId_permissions_PATCH: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/permissions/definition.ts",
+    method: "PATCH",
+  },
+  vibe_agent_chat_folders_subfolders_subFolderId_rename_PATCH: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/rename/definition.ts",
+    method: "PATCH",
+  },
+  vibe_agent_chat_folders_subfolders_subFolderId_update_PATCH: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/folders/subfolders/[subFolderId]/update/definition.ts",
+    method: "PATCH",
+  },
+  "vibe_agent_chat_public-feed_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/public-feed/definition.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_settings_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/settings/definition.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_settings_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/settings/definition.ts",
+    method: "POST",
+  },
+  vibe_agent_chat_threads_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/definition.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_threads_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/definition.ts",
+    method: "POST",
+  },
+  vibe_agent_chat_threads_files_threadId_filename_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/files/[threadId]/[filename]/definition.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_threads_rename_PATCH: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/rename/definition.ts",
+    method: "PATCH",
+  },
+  "vibe_agent_chat_threads_search-messages_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/search-messages/definition.ts",
+    method: "GET",
+  },
+  "vibe_agent_chat_threads_search-threads_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/search-threads/definition.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_threads_threadId_DELETE: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/definition.ts",
+    method: "DELETE",
+  },
+  vibe_agent_chat_threads_threadId_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/definition.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_threads_threadId_PATCH: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/definition.ts",
+    method: "PATCH",
+  },
+  vibe_agent_chat_threads_threadId_messages_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/definition.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_threads_threadId_messages_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/definition.ts",
+    method: "POST",
+  },
+  vibe_agent_chat_threads_threadId_messages_messageId_DELETE: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/[messageId]/definition.ts",
+    method: "DELETE",
+  },
+  vibe_agent_chat_threads_threadId_messages_messageId_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/[messageId]/definition.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_threads_threadId_messages_messageId_PATCH: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/[messageId]/definition.ts",
+    method: "PATCH",
+  },
+  vibe_agent_chat_threads_threadId_messages_messageId_vote_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/[messageId]/vote/definition.ts",
+    method: "POST",
+  },
+  vibe_agent_chat_threads_threadId_messages_path_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/path/definition.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_threads_threadId_messages_search_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/messages/search/definition.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_threads_threadId_permissions_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/permissions/definition.ts",
+    method: "GET",
+  },
+  vibe_agent_chat_threads_threadId_permissions_PATCH: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/permissions/definition.ts",
+    method: "PATCH",
+  },
+  "vibe_agent_chat_threads_threadId_share-links_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/share-links/definition.ts",
+    method: "GET",
+  },
+  "vibe_agent_chat_threads_threadId_share-links_PATCH": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/share-links/definition.ts",
+    method: "PATCH",
+  },
+  "vibe_agent_chat_threads_threadId_share-links_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/chat/threads/[threadId]/share-links/definition.ts",
+    method: "POST",
+  },
+  "vibe_agent_coding-agent_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/coding-agent/definition.ts",
+    method: "POST",
+  },
+  vibe_agent_cortex_delete_DELETE: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/delete/definition.ts",
+    method: "DELETE",
+  },
+  vibe_agent_cortex_edit_PATCH: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/edit/definition.ts",
+    method: "PATCH",
+  },
+  vibe_agent_cortex_embeddings_backfill_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/embeddings/backfill/definition.ts",
+    method: "POST",
+  },
+  vibe_agent_cortex_exec_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/exec/definition.ts",
+    method: "POST",
+  },
+  vibe_agent_cortex_list_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/list/definition.ts",
+    method: "GET",
+  },
+  vibe_agent_cortex_mkdir_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/mkdir/definition.ts",
+    method: "POST",
+  },
+  vibe_agent_cortex_move_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/move/definition.ts",
+    method: "POST",
+  },
+  vibe_agent_cortex_read_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/read/definition.ts",
+    method: "GET",
+  },
+  vibe_agent_cortex_search_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/search/definition.ts",
+    method: "GET",
+  },
+  vibe_agent_cortex_terminals_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/terminals/definition.ts",
+    method: "GET",
+  },
+  vibe_agent_cortex_tree_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/tree/definition.ts",
+    method: "GET",
+  },
+  vibe_agent_cortex_write_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/cortex/write/definition.ts",
+    method: "POST",
+  },
+  "vibe_agent_describe-image_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/describe-image/definition.ts",
+    method: "POST",
+  },
+  "vibe_agent_describe-video_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/describe-video/definition.ts",
+    method: "POST",
+  },
+  "vibe_agent_fetch-url-content_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/fetch-url-content/definition.ts",
+    method: "GET",
+  },
+  "vibe_agent_fetch-url-content_cleanup_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/fetch-url-content/cleanup/definition.ts",
+    method: "POST",
+  },
+  "vibe_agent_image-generation_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/image-generation/definition.ts",
+    method: "POST",
+  },
+  vibe_agent_models_list_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/models/list/definition.ts",
+    method: "GET",
+  },
+  "vibe_agent_models_model-prices_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/models/model-prices/definition.ts",
+    method: "GET",
+  },
+  "vibe_agent_music-generation_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/music-generation/definition.ts",
+    method: "POST",
+  },
+  vibe_agent_skills_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/definition.ts",
+    method: "GET",
+  },
+  vibe_agent_skills_create_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/create/definition.ts",
+    method: "POST",
+  },
+  vibe_agent_skills_favorites_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/definition.ts",
+    method: "GET",
+  },
+  vibe_agent_skills_favorites_create_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/create/definition.ts",
+    method: "POST",
+  },
+  vibe_agent_skills_favorites_id_DELETE: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/[id]/definition.ts",
+    method: "DELETE",
+  },
+  vibe_agent_skills_favorites_id_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/[id]/definition.ts",
+    method: "GET",
+  },
+  vibe_agent_skills_favorites_id_PATCH: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/[id]/definition.ts",
+    method: "PATCH",
+  },
+  vibe_agent_skills_favorites_reorder_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/favorites/reorder/definition.ts",
+    method: "POST",
+  },
+  vibe_agent_skills_id_DELETE: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/definition.ts",
+    method: "DELETE",
+  },
+  vibe_agent_skills_id_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/definition.ts",
+    method: "GET",
+  },
+  vibe_agent_skills_id_PATCH: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/definition.ts",
+    method: "PATCH",
+  },
+  vibe_agent_skills_id_publish_PATCH: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/publish/definition.ts",
+    method: "PATCH",
+  },
+  vibe_agent_skills_id_report_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/report/definition.ts",
+    method: "POST",
+  },
+  vibe_agent_skills_id_vote_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/[id]/vote/definition.ts",
+    method: "POST",
+  },
+  vibe_agent_skills_moderation_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/moderation/definition.ts",
+    method: "GET",
+  },
+  vibe_agent_skills_moderation_PATCH: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/skills/moderation/definition.ts",
+    method: "PATCH",
+  },
+  "vibe_agent_speech-to-text_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/speech-to-text/definition.ts",
+    method: "POST",
+  },
+  "vibe_agent_speech-to-text_hotkey_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/speech-to-text/hotkey/definition.ts",
+    method: "POST",
+  },
+  "vibe_agent_text-to-speech_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/text-to-speech/definition.ts",
+    method: "POST",
+  },
+  "vibe_agent_video-generation_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/video-generation/definition.ts",
+    method: "POST",
+  },
+  "vibe_agent_view-image_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/view-image/definition.ts",
+    method: "POST",
+  },
+  "vibe_agent_web-search_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/web-search/definition.ts",
+    method: "GET",
+  },
+  "vibe_agent_web-search_brave_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/web-search/brave/definition.ts",
+    method: "GET",
+  },
+  "vibe_agent_web-search_kagi_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/agent/web-search/kagi/definition.ts",
+    method: "GET",
+  },
+  vibe_database_generate_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/database/generate/definition.ts",
+    method: "POST",
+  },
+  vibe_database_health_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/database/health/definition.ts",
+    method: "POST",
+  },
+  vibe_database_migrate_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/database/migrate/definition.ts",
+    method: "POST",
+  },
+  vibe_database_ping_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/database/ping/definition.ts",
+    method: "POST",
+  },
+  vibe_database_seed_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/database/seed/definition.ts",
+    method: "POST",
+  },
+  vibe_database_sql_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/database/sql/definition.ts",
+    method: "POST",
+  },
+  vibe_database_studio_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/database/studio/definition.ts",
+    method: "POST",
+  },
+  vibe_database_utils_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/database/utils/definition.ts",
+    method: "GET",
+  },
+  "vibe_database_utils_docker-operations_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/database/utils/docker-operations/definition.ts",
+    method: "POST",
+  },
+  vibe_dataflow_cleanup_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/cleanup/definition.ts",
+    method: "POST",
+  },
+  vibe_dataflow_graphs_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/definition.ts",
+    method: "GET",
+  },
+  vibe_dataflow_graphs_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/definition.ts",
+    method: "POST",
+  },
+  vibe_dataflow_graphs_id_archive_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/archive/definition.ts",
+    method: "POST",
+  },
+  vibe_dataflow_graphs_id_backtest_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/backtest/definition.ts",
+    method: "POST",
+  },
+  vibe_dataflow_graphs_id_data_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/data/definition.ts",
+    method: "GET",
+  },
+  vibe_dataflow_graphs_id_delete_DELETE: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/delete/definition.ts",
+    method: "DELETE",
+  },
+  vibe_dataflow_graphs_id_edit_PUT: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/edit/definition.ts",
+    method: "PUT",
+  },
+  vibe_dataflow_graphs_id_promote_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/promote/definition.ts",
+    method: "POST",
+  },
+  vibe_dataflow_graphs_id_trigger_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/trigger/definition.ts",
+    method: "POST",
+  },
+  vibe_dataflow_graphs_id_versions_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/graphs/[id]/versions/definition.ts",
+    method: "GET",
+  },
+  "vibe_dataflow_run-config_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/dataflow/run-config/definition.ts",
+    method: "POST",
+  },
+  vibe_env_settings_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/env/settings/definition.ts",
+    method: "GET",
+  },
+  vibe_env_settings_PATCH: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/env/settings/definition.ts",
+    method: "PATCH",
+  },
+  vibe_env_settings_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/env/settings/definition.ts",
+    method: "POST",
+  },
+  "vibe_env_settings_export-env_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/env/settings/export-env/definition.ts",
+    method: "GET",
+  },
+  "vibe_env_settings_generate-key_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/env/settings/generate-key/definition.ts",
+    method: "GET",
+  },
+  "vibe_execute-tool_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/definition.ts",
+    method: "POST",
+  },
+  "vibe_execute-tool_await-task_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/await-task/definition.ts",
+    method: "POST",
+  },
+  "vibe_execute-tool_call-control_cancel_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/call-control/cancel/definition.ts",
+    method: "POST",
+  },
+  "vibe_execute-tool_call-control_detach_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/call-control/detach/definition.ts",
+    method: "POST",
+  },
+  "vibe_execute-tool_call-control_resume-when-done_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/call-control/resume-when-done/definition.ts",
+    method: "POST",
+  },
+  "vibe_execute-tool_complete_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/complete/definition.ts",
+    method: "POST",
+  },
+  "vibe_execute-tool_revival_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/execute-tool/revival/definition.ts",
+    method: "POST",
+  },
+  "vibe_help-tool_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/help-tool/definition.ts",
+    method: "GET",
+  },
+  "vibe_logger_error-monitor_cleanup_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/cleanup/definition.ts",
+    method: "POST",
+  },
+  "vibe_logger_error-monitor_data-sources_error-logs-errors_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/data-sources/error-logs-errors/definition.ts",
+    method: "POST",
+  },
+  "vibe_logger_error-monitor_data-sources_error-logs-total_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/data-sources/error-logs-total/definition.ts",
+    method: "POST",
+  },
+  "vibe_logger_error-monitor_data-sources_error-logs-warnings_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/data-sources/error-logs-warnings/definition.ts",
+    method: "POST",
+  },
+  "vibe_logger_error-monitor_logs_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/logs/definition.ts",
+    method: "GET",
+  },
+  "vibe_logger_error-monitor_logs_PATCH": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/logger/error-monitor/logs/definition.ts",
+    method: "PATCH",
+  },
+  vibe_platforms_cli_interactive_capture_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/interactive/capture/definition.ts",
+    method: "POST",
+  },
+  "vibe_platforms_cli_interactive_send-keys_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/interactive/send-keys/definition.ts",
+    method: "POST",
+  },
+  vibe_platforms_cli_setup_install_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/setup/install/definition.ts",
+    method: "POST",
+  },
+  vibe_platforms_cli_setup_status_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/setup/status/definition.ts",
+    method: "POST",
+  },
+  vibe_platforms_cli_setup_uninstall_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/cli/setup/uninstall/definition.ts",
+    method: "POST",
+  },
+  vibe_platforms_mcp_serve_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/mcp/serve/definition.ts",
+    method: "POST",
+  },
+  "vibe_platforms_vibe-frame_mount_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/platforms/vibe-frame/mount/definition.ts",
+    method: "POST",
+  },
+  "vibe_realtime_remote-event-bridge_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/realtime/remote-event-bridge/definition.ts",
+    method: "POST",
+  },
+  "vibe_remote-connection_connect-reverse_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/connect-reverse/definition.ts",
+    method: "POST",
+  },
+  "vibe_remote-connection_connect-reverse_update_PATCH": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/connect-reverse/update/definition.ts",
+    method: "PATCH",
+  },
+  "vibe_remote-connection_connect_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/connect/definition.ts",
+    method: "POST",
+  },
+  "vibe_remote-connection_instanceId_DELETE": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/[instanceId]/definition.ts",
+    method: "DELETE",
+  },
+  "vibe_remote-connection_instanceId_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/[instanceId]/definition.ts",
+    method: "GET",
+  },
+  "vibe_remote-connection_instanceId_PATCH": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/[instanceId]/definition.ts",
+    method: "PATCH",
+  },
+  "vibe_remote-connection_list_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/list/definition.ts",
+    method: "GET",
+  },
+  "vibe_remote-connection_self_instanceId_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/self/instanceId/definition.ts",
+    method: "GET",
+  },
+  "vibe_remote-connection_self_rename_PATCH": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/self/rename/definition.ts",
+    method: "PATCH",
+  },
+  "vibe_remote-connection_sync_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/sync/definition.ts",
+    method: "POST",
+  },
+  "vibe_remote-connection_sync_providers_GET": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/remote-connection/sync/providers/definition.ts",
+    method: "GET",
+  },
+  vibe_server_server_build_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/build/definition.ts",
+    method: "POST",
+  },
+  vibe_server_server_dev_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/dev/definition.ts",
+    method: "POST",
+  },
+  vibe_server_server_electron_build_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/electron/build/definition.ts",
+    method: "POST",
+  },
+  vibe_server_server_electron_start_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/electron/start/definition.ts",
+    method: "POST",
+  },
+  "vibe_server_server_headless-client_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/headless-client/definition.ts",
+    method: "POST",
+  },
+  vibe_server_server_health_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/health/definition.ts",
+    method: "GET",
+  },
+  "vibe_server_server_image-push_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/image-push/definition.ts",
+    method: "POST",
+  },
+  vibe_server_server_rebuild_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/rebuild/definition.ts",
+    method: "POST",
+  },
+  vibe_server_server_start_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/server/server/start/definition.ts",
+    method: "POST",
+  },
+  vibe_tasks_cron_bulk_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/bulk/definition.ts",
+    method: "POST",
+  },
+  vibe_tasks_cron_history_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/history/definition.ts",
+    method: "GET",
+  },
+  vibe_tasks_cron_id_DELETE: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/[id]/definition.ts",
+    method: "DELETE",
+  },
+  vibe_tasks_cron_id_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/[id]/definition.ts",
+    method: "GET",
+  },
+  vibe_tasks_cron_id_PUT: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/[id]/definition.ts",
+    method: "PUT",
+  },
+  vibe_tasks_cron_queue_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/queue/definition.ts",
+    method: "GET",
+  },
+  vibe_tasks_cron_stats_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/stats/definition.ts",
+    method: "GET",
+  },
+  vibe_tasks_cron_tasks_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/tasks/definition.ts",
+    method: "GET",
+  },
+  vibe_tasks_cron_tasks_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/cron/tasks/definition.ts",
+    method: "POST",
+  },
+  "vibe_tasks_data-sources_cron-executions-failed_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/data-sources/cron-executions-failed/definition.ts",
+    method: "POST",
+  },
+  "vibe_tasks_data-sources_cron-executions-succeeded_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/data-sources/cron-executions-succeeded/definition.ts",
+    method: "POST",
+  },
+  "vibe_tasks_data-sources_cron-executions-total_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/data-sources/cron-executions-total/definition.ts",
+    method: "POST",
+  },
+  vibe_tasks_execute_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/execute/definition.ts",
+    method: "POST",
+  },
+  vibe_tasks_pulse_execute_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/pulse/execute/definition.ts",
+    method: "POST",
+  },
+  vibe_tasks_pulse_history_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/pulse/history/definition.ts",
+    method: "GET",
+  },
+  vibe_tasks_pulse_status_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/pulse/status/definition.ts",
+    method: "GET",
+  },
+  "vibe_tasks_unified-runner_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tasks/unified-runner/definition.ts",
+    method: "POST",
+  },
+  vibe_tooling_builder_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/builder/definition.ts",
+    method: "POST",
+  },
+  vibe_tooling_check_config_create_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/config/create/definition.ts",
+    method: "POST",
+  },
+  vibe_tooling_check_lint_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/lint/definition.ts",
+    method: "POST",
+  },
+  vibe_tooling_check_oxlint_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/oxlint/definition.ts",
+    method: "POST",
+  },
+  vibe_tooling_check_testing_test_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/testing/test/definition.ts",
+    method: "POST",
+  },
+  vibe_tooling_check_typecheck_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/typecheck/definition.ts",
+    method: "POST",
+  },
+  "vibe_tooling_check_vibe-check_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/check/vibe-check/definition.ts",
+    method: "POST",
+  },
+  vibe_tooling_generators_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/generators/definition.ts",
+    method: "POST",
+  },
+  vibe_tooling_guard_destroy_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/guard/destroy/definition.ts",
+    method: "POST",
+  },
+  vibe_tooling_guard_start_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/guard/start/definition.ts",
+    method: "POST",
+  },
+  vibe_tooling_guard_status_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/guard/status/definition.ts",
+    method: "POST",
+  },
+  vibe_tooling_guard_stop_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/guard/stop/definition.ts",
+    method: "POST",
+  },
+  vibe_tooling_infra_cluster_init_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/cluster/init/definition.ts",
+    method: "POST",
+  },
+  vibe_tooling_infra_cluster_status_GET: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/cluster/status/definition.ts",
+    method: "GET",
+  },
+  vibe_tooling_infra_deploy_preview_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/deploy/preview/definition.ts",
+    method: "POST",
+  },
+  vibe_tooling_infra_deploy_push_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/deploy/push/definition.ts",
+    method: "POST",
+  },
+  vibe_tooling_infra_scale_replicas_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/infra/scale/replicas/definition.ts",
+    method: "POST",
+  },
+  vibe_tooling_release_POST: {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/release/definition.ts",
+    method: "POST",
+  },
+  "vibe_tooling_vibe-deps_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/vibe-deps/definition.ts",
+    method: "POST",
+  },
+  "vibe_tooling_vibe-stage_POST": {
+    absPath:
+      "/home/max/projects/next-vibe-translations/src/vibe/tooling/vibe-stage/definition.ts",
     method: "POST",
   },
   "wait-for-task": {

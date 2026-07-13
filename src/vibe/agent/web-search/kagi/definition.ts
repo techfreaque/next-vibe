@@ -37,7 +37,7 @@ const KagiSearchResultsContainer = lazyWidget(() =>
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["agent", "web-search", "kagi"],
+  path: ["vibe", "agent", "web-search", "kagi"],
   title: "get.title" as const,
   titleShort: "get.titleShort" as const,
   description: "get.description" as const,

@@ -1,4 +1,4 @@
-import { createLayoutWrapperWithImport } from "next-vibe/platforms/react-native/nextjs-compat-wrapper";
+import { createLayoutWrapperWithImport } from "@/vibe/platforms/react-native/nextjs-compat-wrapper";
 export default createLayoutWrapperWithImport(
-  () => import("@/app/[locale]/threads/layout"),
+  () => import("@/_pages/threads/layout"),
 );

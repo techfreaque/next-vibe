@@ -35,7 +35,7 @@ const SkillModerationContainer = lazyWidget(() =>
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["agent", "skills", "moderation"],
+  path: ["vibe", "agent", "skills", "moderation"],
   aliases: [SKILL_MODERATION_ALIAS],
   allowedRoles: [UserRole.ADMIN] as const,
 
@@ -217,7 +217,7 @@ const { GET } = createEndpoint({
 const { PATCH } = createEndpoint({
   scopedTranslation,
   method: Methods.PATCH,
-  path: ["agent", "skills", "moderation"],
+  path: ["vibe", "agent", "skills", "moderation"],
   allowedRoles: [UserRole.ADMIN] as const,
 
   title: "patch.title" as const,

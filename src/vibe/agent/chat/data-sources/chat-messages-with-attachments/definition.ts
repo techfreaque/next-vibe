@@ -14,7 +14,13 @@ import { scopedTranslation } from "./i18n";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["agent", "chat", "data-sources", "chat-messages-with-attachments"],
+  path: [
+    "vibe",
+    "agent",
+    "chat",
+    "data-sources",
+    "chat-messages-with-attachments",
+  ],
   title: "post.title",
   titleShort: "post.titleShort",
   description: "post.description",

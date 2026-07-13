@@ -23,6 +23,8 @@ import {
 } from "next-vibe/logger/formatters";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { getApiDir } from "@/env/paths";
+
 import { db } from "..";
 import type { DbFunction } from "./define";
 import type { PgType } from "./types";
@@ -104,8 +106,7 @@ async function ensurePlv8Extension(logger: EndpointLogger): Promise<void> {
  * Recursively scan for db-functions.ts files under src/.
  */
 function discoverDbFunctionFiles(): string[] {
-  const projectRoot = process.cwd();
-  const apiDir = join(projectRoot, "src");
+  const apiDir = getApiDir();
   const files: string[] = [];
 
   function scan(dir: string): void {

@@ -30,7 +30,7 @@ const DescribeImageContainer = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["agent", "describe-image"],
+  path: ["vibe", "agent", "describe-image"],
   aliases: [DESCRIBE_IMAGE_ALIAS],
   allowedRoles: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.PUBLIC],
 

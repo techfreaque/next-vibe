@@ -65,7 +65,7 @@ const CronTaskEditContainer = lazyWidget(() =>
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["system", "tasks", "cron", "[id]"],
+  path: ["vibe", "tasks", "cron", "[id]"],
   aliases: [CRON_GET_ALIAS],
   title: "get.title",
   titleShort: "get.titleShort",
@@ -384,7 +384,7 @@ const { GET } = createEndpoint({
 const { PUT } = createEndpoint({
   scopedTranslation,
   method: Methods.PUT,
-  path: ["system", "tasks", "cron", "[id]"],
+  path: ["vibe", "tasks", "cron", "[id]"],
   aliases: [CRON_UPDATE_ALIAS],
   title: "put.title",
   titleShort: "put.titleShort",
@@ -944,7 +944,7 @@ const { PUT } = createEndpoint({
 const { DELETE } = createEndpoint({
   scopedTranslation,
   method: Methods.DELETE,
-  path: ["system", "tasks", "cron", "[id]"],
+  path: ["vibe", "tasks", "cron", "[id]"],
   aliases: [CRON_DELETE_ALIAS],
   title: "delete.title",
   titleShort: "delete.titleShort",

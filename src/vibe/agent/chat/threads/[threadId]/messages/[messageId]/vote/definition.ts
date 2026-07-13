@@ -34,6 +34,7 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: [
+    "vibe",
     "agent",
     "chat",
     "threads",

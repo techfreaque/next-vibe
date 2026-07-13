@@ -45,7 +45,7 @@ const instanceIdField = requestUrlPathParamsField(scopedTranslation, {
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["remote-connection", "[instanceId]"],
+  path: ["vibe", "remote-connection", "[instanceId]"],
   allowedRoles: [UserRole.ADMIN] as const,
 
   title: "get.title" as const,
@@ -215,7 +215,7 @@ const { GET } = createEndpoint({
 const { PATCH } = createEndpoint({
   scopedTranslation,
   method: Methods.PATCH,
-  path: ["remote-connection", "[instanceId]"],
+  path: ["vibe", "remote-connection", "[instanceId]"],
   allowedRoles: [UserRole.ADMIN] as const,
 
   title: "patch.title" as const,
@@ -512,7 +512,7 @@ const { PATCH } = createEndpoint({
 const { DELETE } = createEndpoint({
   scopedTranslation,
   method: Methods.DELETE,
-  path: ["remote-connection", "[instanceId]"],
+  path: ["vibe", "remote-connection", "[instanceId]"],
   allowedRoles: [UserRole.ADMIN] as const,
 
   title: "delete.title" as const,

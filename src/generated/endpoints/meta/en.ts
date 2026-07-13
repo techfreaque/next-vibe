@@ -5511,7 +5511,7 @@ export const endpointsMeta: EndpointMeta[] = [
           id: "00000000-0000-0000-0000-000000000000",
           active: true,
           checkErrors: [],
-          createdAt: "2026-07-13T17:15:44.950Z",
+          createdAt: "2026-07-13T17:49:38.211Z",
         },
       },
     },
@@ -5536,7 +5536,7 @@ export const endpointsMeta: EndpointMeta[] = [
       responses: {
         default: {
           variantKey: "MY_VARIANT",
-          updatedAt: "2026-07-13T17:15:44.950Z",
+          updatedAt: "2026-07-13T17:49:38.211Z",
         },
       },
     },
@@ -14431,9 +14431,9 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "agent_ai-stream_cancel_POST",
+    toolName: "vibe_agent_ai-stream_cancel_POST",
     method: "POST",
-    path: ["agent", "ai-stream", "cancel"],
+    path: ["vibe", "agent", "ai-stream", "cancel"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.customer",
@@ -14457,7 +14457,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "ai-run",
     method: "POST",
-    path: ["agent", "ai-stream", "run"],
+    path: ["vibe", "agent", "ai-stream", "run"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.public",
@@ -14557,7 +14557,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "ai-stream",
     method: "POST",
-    path: ["agent", "ai-stream", "stream"],
+    path: ["vibe", "agent", "ai-stream", "stream"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.customer",
@@ -14672,7 +14672,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "system-prompt-debug",
     method: "GET",
-    path: ["agent", "ai-stream", "system-prompt", "debug"],
+    path: ["vibe", "agent", "ai-stream", "system-prompt", "debug"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "System Prompt Debug",
@@ -14703,9 +14703,9 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "agent_ai-stream_ws-provider_models_GET",
+    toolName: "vibe_agent_ai-stream_ws-provider_models_GET",
     method: "GET",
-    path: ["agent", "ai-stream", "ws-provider", "models"],
+    path: ["vibe", "agent", "ai-stream", "ws-provider", "models"],
     allowedRoles: [
       "enums.userRole.customer",
       "enums.userRole.admin",
@@ -14752,7 +14752,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "chat-downvotes-total",
     method: "POST",
-    path: ["agent", "chat", "data-sources", "chat-downvotes-total"],
+    path: ["vibe", "agent", "chat", "data-sources", "chat-downvotes-total"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Chat Downvotes Total",
@@ -14775,7 +14775,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "chat-errors-total",
     method: "POST",
-    path: ["agent", "chat", "data-sources", "chat-errors-total"],
+    path: ["vibe", "agent", "chat", "data-sources", "chat-errors-total"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Chat Errors Total",
@@ -14798,7 +14798,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "chat-memories-created",
     method: "POST",
-    path: ["agent", "chat", "data-sources", "chat-memories-created"],
+    path: ["vibe", "agent", "chat", "data-sources", "chat-memories-created"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Chat Memories Created",
@@ -14821,7 +14821,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "chat-messages-by-ai",
     method: "POST",
-    path: ["agent", "chat", "data-sources", "chat-messages-by-ai"],
+    path: ["vibe", "agent", "chat", "data-sources", "chat-messages-by-ai"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Chat Messages By AI",
@@ -14844,7 +14844,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "chat-messages-by-user",
     method: "POST",
-    path: ["agent", "chat", "data-sources", "chat-messages-by-user"],
+    path: ["vibe", "agent", "chat", "data-sources", "chat-messages-by-user"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Chat Messages By User",
@@ -14867,7 +14867,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "chat-messages-total",
     method: "POST",
-    path: ["agent", "chat", "data-sources", "chat-messages-total"],
+    path: ["vibe", "agent", "chat", "data-sources", "chat-messages-total"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Chat Messages Total",
@@ -14890,7 +14890,13 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "chat-messages-with-attachments",
     method: "POST",
-    path: ["agent", "chat", "data-sources", "chat-messages-with-attachments"],
+    path: [
+      "vibe",
+      "agent",
+      "chat",
+      "data-sources",
+      "chat-messages-with-attachments",
+    ],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Chat Messages With Attachments",
@@ -14913,7 +14919,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "chat-share-links-created",
     method: "POST",
-    path: ["agent", "chat", "data-sources", "chat-share-links-created"],
+    path: ["vibe", "agent", "chat", "data-sources", "chat-share-links-created"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Chat Share Links Created",
@@ -14936,7 +14942,13 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "chat-threads-active-total",
     method: "POST",
-    path: ["agent", "chat", "data-sources", "chat-threads-active-total"],
+    path: [
+      "vibe",
+      "agent",
+      "chat",
+      "data-sources",
+      "chat-threads-active-total",
+    ],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Chat Threads Active Total",
@@ -14959,7 +14971,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "chat-threads-created",
     method: "POST",
-    path: ["agent", "chat", "data-sources", "chat-threads-created"],
+    path: ["vibe", "agent", "chat", "data-sources", "chat-threads-created"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Chat Threads Created",
@@ -14982,7 +14994,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "chat-tool-calls-total",
     method: "POST",
-    path: ["agent", "chat", "data-sources", "chat-tool-calls-total"],
+    path: ["vibe", "agent", "chat", "data-sources", "chat-tool-calls-total"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Chat Tool Calls Total",
@@ -15005,7 +15017,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "chat-unique-users",
     method: "POST",
-    path: ["agent", "chat", "data-sources", "chat-unique-users"],
+    path: ["vibe", "agent", "chat", "data-sources", "chat-unique-users"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Chat Unique Users",
@@ -15028,7 +15040,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "chat-upvotes-total",
     method: "POST",
-    path: ["agent", "chat", "data-sources", "chat-upvotes-total"],
+    path: ["vibe", "agent", "chat", "data-sources", "chat-upvotes-total"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Chat Upvotes Total",
@@ -15051,7 +15063,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "folder-contents",
     method: "GET",
-    path: ["agent", "chat", "folder-contents", "[rootFolderId]"],
+    path: ["vibe", "agent", "chat", "folder-contents", "[rootFolderId]"],
     allowedRoles: [
       "enums.userRole.public",
       "enums.userRole.customer",
@@ -15088,7 +15100,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "folder-create",
     method: "POST",
-    path: ["agent", "chat", "folders", "[rootFolderId]", "create"],
+    path: ["vibe", "agent", "chat", "folders", "[rootFolderId]", "create"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Create Folder",
@@ -15119,7 +15131,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "folders-list",
     method: "GET",
-    path: ["agent", "chat", "folders", "[rootFolderId]"],
+    path: ["vibe", "agent", "chat", "folders", "[rootFolderId]"],
     allowedRoles: [
       "enums.userRole.public",
       "enums.userRole.customer",
@@ -15149,7 +15161,14 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "folder-permissions",
     method: "GET",
-    path: ["agent", "chat", "folders", "[rootFolderId]", "root-permissions"],
+    path: [
+      "vibe",
+      "agent",
+      "chat",
+      "folders",
+      "[rootFolderId]",
+      "root-permissions",
+    ],
     allowedRoles: [
       "enums.userRole.public",
       "enums.userRole.customer",
@@ -15171,7 +15190,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "folder-get",
     method: "GET",
-    path: ["agent", "chat", "folders", "subfolders", "[subFolderId]"],
+    path: ["vibe", "agent", "chat", "folders", "subfolders", "[subFolderId]"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Get Folder",
@@ -15203,7 +15222,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "folder-delete",
     method: "DELETE",
-    path: ["agent", "chat", "folders", "subfolders", "[subFolderId]"],
+    path: ["vibe", "agent", "chat", "folders", "subfolders", "[subFolderId]"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Delete Folder",
@@ -15225,7 +15244,15 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "folder-move",
     method: "PATCH",
-    path: ["agent", "chat", "folders", "subfolders", "[subFolderId]", "move"],
+    path: [
+      "vibe",
+      "agent",
+      "chat",
+      "folders",
+      "subfolders",
+      "[subFolderId]",
+      "move",
+    ],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Move Folder",
@@ -15251,9 +15278,10 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "agent_chat_folders_subfolders_subFolderId_permissions_GET",
+    toolName: "vibe_agent_chat_folders_subfolders_subFolderId_permissions_GET",
     method: "GET",
     path: [
+      "vibe",
       "agent",
       "chat",
       "folders",
@@ -15301,9 +15329,11 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "agent_chat_folders_subfolders_subFolderId_permissions_PATCH",
+    toolName:
+      "vibe_agent_chat_folders_subfolders_subFolderId_permissions_PATCH",
     method: "PATCH",
     path: [
+      "vibe",
       "agent",
       "chat",
       "folders",
@@ -15378,7 +15408,15 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "folder-rename",
     method: "PATCH",
-    path: ["agent", "chat", "folders", "subfolders", "[subFolderId]", "rename"],
+    path: [
+      "vibe",
+      "agent",
+      "chat",
+      "folders",
+      "subfolders",
+      "[subFolderId]",
+      "rename",
+    ],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Rename Folder",
@@ -15407,7 +15445,15 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "folder-update",
     method: "PATCH",
-    path: ["agent", "chat", "folders", "subfolders", "[subFolderId]", "update"],
+    path: [
+      "vibe",
+      "agent",
+      "chat",
+      "folders",
+      "subfolders",
+      "[subFolderId]",
+      "update",
+    ],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Update Folder",
@@ -15435,9 +15481,9 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "agent_chat_public-feed_GET",
+    toolName: "vibe_agent_chat_public-feed_GET",
     method: "GET",
-    path: ["agent", "chat", "public-feed"],
+    path: ["vibe", "agent", "chat", "public-feed"],
     allowedRoles: [
       "enums.userRole.public",
       "enums.userRole.customer",
@@ -15472,7 +15518,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "chat-settings",
     method: "GET",
-    path: ["agent", "chat", "settings"],
+    path: ["vibe", "agent", "chat", "settings"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Settings",
@@ -15518,7 +15564,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "chat-settings-update",
     method: "POST",
-    path: ["agent", "chat", "settings"],
+    path: ["vibe", "agent", "chat", "settings"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Save Settings",
@@ -15535,9 +15581,9 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "agent_chat_threads_threadId_GET",
+    toolName: "vibe_agent_chat_threads_threadId_GET",
     method: "GET",
-    path: ["agent", "chat", "threads", "[threadId]"],
+    path: ["vibe", "agent", "chat", "threads", "[threadId]"],
     allowedRoles: [
       "enums.userRole.public",
       "enums.userRole.customer",
@@ -15588,9 +15634,9 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "agent_chat_threads_threadId_PATCH",
+    toolName: "vibe_agent_chat_threads_threadId_PATCH",
     method: "PATCH",
-    path: ["agent", "chat", "threads", "[threadId]"],
+    path: ["vibe", "agent", "chat", "threads", "[threadId]"],
     allowedRoles: [
       "enums.userRole.public",
       "enums.userRole.customer",
@@ -15617,9 +15663,9 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "agent_chat_threads_threadId_DELETE",
+    toolName: "vibe_agent_chat_threads_threadId_DELETE",
     method: "DELETE",
-    path: ["agent", "chat", "threads", "[threadId]"],
+    path: ["vibe", "agent", "chat", "threads", "[threadId]"],
     allowedRoles: [
       "enums.userRole.public",
       "enums.userRole.customer",
@@ -15655,9 +15701,17 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "agent_chat_threads_threadId_messages_messageId_GET",
+    toolName: "vibe_agent_chat_threads_threadId_messages_messageId_GET",
     method: "GET",
-    path: ["agent", "chat", "threads", "[threadId]", "messages", "[messageId]"],
+    path: [
+      "vibe",
+      "agent",
+      "chat",
+      "threads",
+      "[threadId]",
+      "messages",
+      "[messageId]",
+    ],
     allowedRoles: [
       "enums.userRole.public",
       "enums.userRole.customer",
@@ -15694,9 +15748,17 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "agent_chat_threads_threadId_messages_messageId_PATCH",
+    toolName: "vibe_agent_chat_threads_threadId_messages_messageId_PATCH",
     method: "PATCH",
-    path: ["agent", "chat", "threads", "[threadId]", "messages", "[messageId]"],
+    path: [
+      "vibe",
+      "agent",
+      "chat",
+      "threads",
+      "[threadId]",
+      "messages",
+      "[messageId]",
+    ],
     allowedRoles: [
       "enums.userRole.public",
       "enums.userRole.customer",
@@ -15730,9 +15792,17 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "agent_chat_threads_threadId_messages_messageId_DELETE",
+    toolName: "vibe_agent_chat_threads_threadId_messages_messageId_DELETE",
     method: "DELETE",
-    path: ["agent", "chat", "threads", "[threadId]", "messages", "[messageId]"],
+    path: [
+      "vibe",
+      "agent",
+      "chat",
+      "threads",
+      "[threadId]",
+      "messages",
+      "[messageId]",
+    ],
     allowedRoles: [
       "enums.userRole.public",
       "enums.userRole.customer",
@@ -15769,9 +15839,10 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "agent_chat_threads_threadId_messages_messageId_vote_POST",
+    toolName: "vibe_agent_chat_threads_threadId_messages_messageId_vote_POST",
     method: "POST",
     path: [
+      "vibe",
       "agent",
       "chat",
       "threads",
@@ -15827,7 +15898,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "thread-messages",
     method: "GET",
-    path: ["agent", "chat", "threads", "[threadId]", "messages"],
+    path: ["vibe", "agent", "chat", "threads", "[threadId]", "messages"],
     allowedRoles: [
       "enums.userRole.public",
       "enums.userRole.customer",
@@ -15901,9 +15972,9 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "agent_chat_threads_threadId_messages_POST",
+    toolName: "vibe_agent_chat_threads_threadId_messages_POST",
     method: "POST",
-    path: ["agent", "chat", "threads", "[threadId]", "messages"],
+    path: ["vibe", "agent", "chat", "threads", "[threadId]", "messages"],
     allowedRoles: [
       "enums.userRole.public",
       "enums.userRole.customer",
@@ -15936,9 +16007,17 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "agent_chat_threads_threadId_messages_path_GET",
+    toolName: "vibe_agent_chat_threads_threadId_messages_path_GET",
     method: "GET",
-    path: ["agent", "chat", "threads", "[threadId]", "messages", "path"],
+    path: [
+      "vibe",
+      "agent",
+      "chat",
+      "threads",
+      "[threadId]",
+      "messages",
+      "path",
+    ],
     allowedRoles: [
       "enums.userRole.public",
       "enums.userRole.customer",
@@ -15996,9 +16075,17 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "agent_chat_threads_threadId_messages_search_GET",
+    toolName: "vibe_agent_chat_threads_threadId_messages_search_GET",
     method: "GET",
-    path: ["agent", "chat", "threads", "[threadId]", "messages", "search"],
+    path: [
+      "vibe",
+      "agent",
+      "chat",
+      "threads",
+      "[threadId]",
+      "messages",
+      "search",
+    ],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Search Messages",
@@ -16035,9 +16122,9 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "agent_chat_threads_threadId_permissions_GET",
+    toolName: "vibe_agent_chat_threads_threadId_permissions_GET",
     method: "GET",
-    path: ["agent", "chat", "threads", "[threadId]", "permissions"],
+    path: ["vibe", "agent", "chat", "threads", "[threadId]", "permissions"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Get Thread Permissions",
@@ -16072,9 +16159,9 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "agent_chat_threads_threadId_permissions_PATCH",
+    toolName: "vibe_agent_chat_threads_threadId_permissions_PATCH",
     method: "PATCH",
-    path: ["agent", "chat", "threads", "[threadId]", "permissions"],
+    path: ["vibe", "agent", "chat", "threads", "[threadId]", "permissions"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Update Thread Permissions",
@@ -16131,7 +16218,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "thread-share-links",
     method: "GET",
-    path: ["agent", "chat", "threads", "[threadId]", "share-links"],
+    path: ["vibe", "agent", "chat", "threads", "[threadId]", "share-links"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Get Share Links",
@@ -16147,9 +16234,9 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "agent_chat_threads_threadId_share-links_POST",
+    toolName: "vibe_agent_chat_threads_threadId_share-links_POST",
     method: "POST",
-    path: ["agent", "chat", "threads", "[threadId]", "share-links"],
+    path: ["vibe", "agent", "chat", "threads", "[threadId]", "share-links"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Create Share Link",
@@ -16180,9 +16267,9 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "agent_chat_threads_threadId_share-links_PATCH",
+    toolName: "vibe_agent_chat_threads_threadId_share-links_PATCH",
     method: "PATCH",
-    path: ["agent", "chat", "threads", "[threadId]", "share-links"],
+    path: ["vibe", "agent", "chat", "threads", "[threadId]", "share-links"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Update Share Link",
@@ -16247,7 +16334,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "agent-chat-threads",
     method: "GET",
-    path: ["agent", "chat", "threads"],
+    path: ["vibe", "agent", "chat", "threads"],
     allowedRoles: [
       "enums.userRole.public",
       "enums.userRole.customer",
@@ -16276,9 +16363,9 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "agent_chat_threads_POST",
+    toolName: "vibe_agent_chat_threads_POST",
     method: "POST",
-    path: ["agent", "chat", "threads"],
+    path: ["vibe", "agent", "chat", "threads"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "New Thread",
@@ -16312,7 +16399,15 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "thread-files",
     method: "GET",
-    path: ["agent", "chat", "threads", "files", "[threadId]", "[filename]"],
+    path: [
+      "vibe",
+      "agent",
+      "chat",
+      "threads",
+      "files",
+      "[threadId]",
+      "[filename]",
+    ],
     allowedRoles: [
       "enums.userRole.public",
       "enums.userRole.customer",
@@ -16339,7 +16434,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "rename-thread",
     method: "PATCH",
-    path: ["agent", "chat", "threads", "rename"],
+    path: ["vibe", "agent", "chat", "threads", "rename"],
     allowedRoles: [
       "enums.userRole.public",
       "enums.userRole.customer",
@@ -16374,7 +16469,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "agent-search-messages",
     method: "GET",
-    path: ["agent", "chat", "threads", "search-messages"],
+    path: ["vibe", "agent", "chat", "threads", "search-messages"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Global Message Search",
@@ -16415,7 +16510,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "agent-search-threads",
     method: "GET",
-    path: ["agent", "chat", "threads", "search-threads"],
+    path: ["vibe", "agent", "chat", "threads", "search-threads"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Search Threads",
@@ -16480,7 +16575,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "coding-agent",
     method: "POST",
-    path: ["agent", "coding-agent"],
+    path: ["vibe", "agent", "coding-agent"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: ["claude-code", "claude", "open-code"],
     title: "Run Coding Agent",
@@ -16539,7 +16634,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "cortex-delete",
     method: "DELETE",
-    path: ["agent", "cortex", "delete"],
+    path: ["vibe", "agent", "cortex", "delete"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Delete",
@@ -16564,7 +16659,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "cortex-edit",
     method: "PATCH",
-    path: ["agent", "cortex", "edit"],
+    path: ["vibe", "agent", "cortex", "edit"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Edit File",
@@ -16603,7 +16698,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "cortex-embed-backfill",
     method: "POST",
-    path: ["agent", "cortex", "embeddings", "backfill"],
+    path: ["vibe", "agent", "cortex", "embeddings", "backfill"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Backfill Embeddings",
@@ -16623,7 +16718,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "cortex-exec",
     method: "POST",
-    path: ["agent", "cortex", "exec"],
+    path: ["vibe", "agent", "cortex", "exec"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Execute Command",
@@ -16669,7 +16764,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "cortex-list",
     method: "GET",
-    path: ["agent", "cortex", "list"],
+    path: ["vibe", "agent", "cortex", "list"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "List Folder",
@@ -16721,7 +16816,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "cortex-mkdir",
     method: "POST",
-    path: ["agent", "cortex", "mkdir"],
+    path: ["vibe", "agent", "cortex", "mkdir"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "New Folder",
@@ -16749,7 +16844,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "cortex-move",
     method: "POST",
-    path: ["agent", "cortex", "move"],
+    path: ["vibe", "agent", "cortex", "move"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Move",
@@ -16783,7 +16878,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "cortex-read",
     method: "GET",
-    path: ["agent", "cortex", "read"],
+    path: ["vibe", "agent", "cortex", "read"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Read File",
@@ -16817,7 +16912,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "cortex-search",
     method: "GET",
-    path: ["agent", "cortex", "search"],
+    path: ["vibe", "agent", "cortex", "search"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Search",
@@ -16854,7 +16949,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "cortex-terminals",
     method: "GET",
-    path: ["agent", "cortex", "terminals"],
+    path: ["vibe", "agent", "cortex", "terminals"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "List Terminals",
@@ -16889,7 +16984,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "cortex-tree",
     method: "GET",
-    path: ["agent", "cortex", "tree"],
+    path: ["vibe", "agent", "cortex", "tree"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Show Tree",
@@ -16919,7 +17014,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "cortex-write",
     method: "POST",
-    path: ["agent", "cortex", "write"],
+    path: ["vibe", "agent", "cortex", "write"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Write File",
@@ -16963,7 +17058,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "describe_image",
     method: "POST",
-    path: ["agent", "describe-image"],
+    path: ["vibe", "agent", "describe-image"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.customer",
@@ -16991,7 +17086,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "describe_video",
     method: "POST",
-    path: ["agent", "describe-video"],
+    path: ["vibe", "agent", "describe-video"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.customer",
@@ -17019,7 +17114,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "fetch-url-cache-cleanup",
     method: "POST",
-    path: ["agent", "fetch-url-content", "cleanup"],
+    path: ["vibe", "agent", "fetch-url-content", "cleanup"],
     allowedRoles: ["enums.userRole.admin", "enums.userRole.aiToolOff"],
     aliases: [],
     title: "URL Cache Cleanup",
@@ -17038,7 +17133,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "fetch-url-content",
     method: "GET",
-    path: ["agent", "fetch-url-content"],
+    path: ["vibe", "agent", "fetch-url-content"],
     allowedRoles: [
       "enums.userRole.public",
       "enums.userRole.customer",
@@ -17082,7 +17177,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "generate_image",
     method: "POST",
-    path: ["agent", "image-generation"],
+    path: ["vibe", "agent", "image-generation"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.customer",
@@ -17121,7 +17216,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "models",
     method: "GET",
-    path: ["agent", "models", "list"],
+    path: ["vibe", "agent", "models", "list"],
     allowedRoles: [
       "enums.userRole.customer",
       "enums.userRole.admin",
@@ -17229,7 +17324,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "update-model-prices",
     method: "GET",
-    path: ["agent", "models", "model-prices"],
+    path: ["vibe", "agent", "models", "model-prices"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.productionOff",
@@ -17264,7 +17359,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "generate_music",
     method: "POST",
-    path: ["agent", "music-generation"],
+    path: ["vibe", "agent", "music-generation"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.customer",
@@ -17303,7 +17398,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "skill-get",
     method: "GET",
-    path: ["agent", "skills", "[id]"],
+    path: ["vibe", "agent", "skills", "[id]"],
     allowedRoles: [
       "enums.userRole.customer",
       "enums.userRole.admin",
@@ -17401,7 +17496,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "skill-update",
     method: "PATCH",
-    path: ["agent", "skills", "[id]"],
+    path: ["vibe", "agent", "skills", "[id]"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Update skill",
@@ -17436,7 +17531,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "skill-delete",
     method: "DELETE",
-    path: ["agent", "skills", "[id]"],
+    path: ["vibe", "agent", "skills", "[id]"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Delete skill",
@@ -17465,7 +17560,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "skill-publish",
     method: "PATCH",
-    path: ["agent", "skills", "[id]", "publish"],
+    path: ["vibe", "agent", "skills", "[id]", "publish"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Publish Skill",
@@ -17495,7 +17590,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "skill-report",
     method: "POST",
-    path: ["agent", "skills", "[id]", "report"],
+    path: ["vibe", "agent", "skills", "[id]", "report"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Report Skill",
@@ -17514,7 +17609,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "skill-vote",
     method: "POST",
-    path: ["agent", "skills", "[id]", "vote"],
+    path: ["vibe", "agent", "skills", "[id]", "vote"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Vote for Skill",
@@ -17543,7 +17638,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "skill-create",
     method: "POST",
-    path: ["agent", "skills", "create"],
+    path: ["vibe", "agent", "skills", "create"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Create Skill",
@@ -17621,7 +17716,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "skills",
     method: "GET",
-    path: ["agent", "skills"],
+    path: ["vibe", "agent", "skills"],
     allowedRoles: [
       "enums.userRole.customer",
       "enums.userRole.admin",
@@ -17712,7 +17807,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "favorite-get",
     method: "GET",
-    path: ["agent", "skills", "favorites", "[id]"],
+    path: ["vibe", "agent", "skills", "favorites", "[id]"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Get Favorite",
@@ -17783,7 +17878,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "favorite-update",
     method: "PATCH",
-    path: ["agent", "skills", "favorites", "[id]"],
+    path: ["vibe", "agent", "skills", "favorites", "[id]"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Update Favorite",
@@ -17835,7 +17930,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "favorite-delete",
     method: "DELETE",
-    path: ["agent", "skills", "favorites", "[id]"],
+    path: ["vibe", "agent", "skills", "favorites", "[id]"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Delete Favorite",
@@ -17860,7 +17955,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "favorite-create",
     method: "POST",
-    path: ["agent", "skills", "favorites", "create"],
+    path: ["vibe", "agent", "skills", "favorites", "create"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Create Favorite",
@@ -17907,7 +18002,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "favorites",
     method: "GET",
-    path: ["agent", "skills", "favorites"],
+    path: ["vibe", "agent", "skills", "favorites"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Get Favorites",
@@ -17955,7 +18050,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "favorites-reorder",
     method: "POST",
-    path: ["agent", "skills", "favorites", "reorder"],
+    path: ["vibe", "agent", "skills", "favorites", "reorder"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: [],
     title: "Reorder Favorites",
@@ -17980,7 +18075,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "skill-moderation",
     method: "GET",
-    path: ["agent", "skills", "moderation"],
+    path: ["vibe", "agent", "skills", "moderation"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Reported Skills",
@@ -18013,9 +18108,9 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "agent_skills_moderation_PATCH",
+    toolName: "vibe_agent_skills_moderation_PATCH",
     method: "PATCH",
-    path: ["agent", "skills", "moderation"],
+    path: ["vibe", "agent", "skills", "moderation"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Moderate Skill",
@@ -18041,7 +18136,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "transcribe_audio",
     method: "POST",
-    path: ["agent", "speech-to-text"],
+    path: ["vibe", "agent", "speech-to-text"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.customer",
@@ -18080,7 +18175,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "stt",
     method: "POST",
-    path: ["agent", "speech-to-text", "hotkey"],
+    path: ["vibe", "agent", "speech-to-text", "hotkey"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.aiToolOff",
@@ -18118,7 +18213,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "text-to-speech",
     method: "POST",
-    path: ["agent", "text-to-speech"],
+    path: ["vibe", "agent", "text-to-speech"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.customer",
@@ -18153,7 +18248,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "generate_video",
     method: "POST",
-    path: ["agent", "video-generation"],
+    path: ["vibe", "agent", "video-generation"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.customer",
@@ -18192,7 +18287,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "agent-view-image",
     method: "POST",
-    path: ["agent", "view-image"],
+    path: ["vibe", "agent", "view-image"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.customer",
@@ -18218,7 +18313,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "brave-search",
     method: "GET",
-    path: ["agent", "web-search", "brave"],
+    path: ["vibe", "agent", "web-search", "brave"],
     allowedRoles: [
       "enums.userRole.public",
       "enums.userRole.customer",
@@ -18285,7 +18380,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "web-search",
     method: "GET",
-    path: ["agent", "web-search"],
+    path: ["vibe", "agent", "web-search"],
     allowedRoles: [
       "enums.userRole.public",
       "enums.userRole.customer",
@@ -18356,7 +18451,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "kagi-search",
     method: "GET",
-    path: ["agent", "web-search", "kagi"],
+    path: ["vibe", "agent", "web-search", "kagi"],
     allowedRoles: [
       "enums.userRole.public",
       "enums.userRole.customer",
@@ -18406,7 +18501,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "dgen",
     method: "POST",
-    path: ["system", "database", "generate"],
+    path: ["vibe", "database", "generate"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.cliAuthBypass",
@@ -18434,7 +18529,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "db-health",
     method: "POST",
-    path: ["system", "database", "health"],
+    path: ["vibe", "database", "health"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: ["db-ping"],
     title: "System Health Check",
@@ -18463,7 +18558,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "migrate",
     method: "POST",
-    path: ["system", "database", "migrate"],
+    path: ["vibe", "database", "migrate"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.cliAuthBypass",
@@ -18492,7 +18587,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "ping",
     method: "POST",
-    path: ["system", "database", "ping"],
+    path: ["vibe", "database", "ping"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.webOff",
@@ -18561,7 +18656,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "seed",
     method: "POST",
-    path: ["system", "database", "seed"],
+    path: ["vibe", "database", "seed"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.webOff",
@@ -18599,7 +18694,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "sql",
     method: "POST",
-    path: ["system", "database", "sql"],
+    path: ["vibe", "database", "sql"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.webOff",
@@ -18686,7 +18781,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "studio",
     method: "POST",
-    path: ["system", "database", "studio"],
+    path: ["vibe", "database", "studio"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.cliAuthBypass",
@@ -18739,7 +18834,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "db:utils",
     method: "GET",
-    path: ["system", "database", "utils"],
+    path: ["vibe", "database", "utils"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.webOff",
@@ -18776,7 +18871,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "docker",
     method: "POST",
-    path: ["system", "database", "utils", "docker-operations"],
+    path: ["vibe", "database", "utils", "docker-operations"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.webOff",
@@ -18834,9 +18929,9 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "system_dataflow_cleanup_POST",
+    toolName: "vibe_dataflow_cleanup_POST",
     method: "POST",
-    path: ["system", "dataflow", "cleanup"],
+    path: ["vibe", "dataflow", "cleanup"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Vibe Sense Cleanup",
@@ -18859,9 +18954,9 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "system_dataflow_graphs_id_archive_POST",
+    toolName: "vibe_dataflow_graphs_id_archive_POST",
     method: "POST",
-    path: ["system", "dataflow", "graphs", "[id]", "archive"],
+    path: ["vibe", "dataflow", "graphs", "[id]", "archive"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Archive Graph",
@@ -18879,9 +18974,9 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "system_dataflow_graphs_id_backtest_POST",
+    toolName: "vibe_dataflow_graphs_id_backtest_POST",
     method: "POST",
-    path: ["system", "dataflow", "graphs", "[id]", "backtest"],
+    path: ["vibe", "dataflow", "graphs", "[id]", "backtest"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Run Backtest",
@@ -18910,9 +19005,9 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "system_dataflow_graphs_id_data_GET",
+    toolName: "vibe_dataflow_graphs_id_data_GET",
     method: "GET",
-    path: ["system", "dataflow", "graphs", "[id]", "data"],
+    path: ["vibe", "dataflow", "graphs", "[id]", "data"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Graph Detail",
@@ -18948,9 +19043,9 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "system_dataflow_graphs_id_delete_DELETE",
+    toolName: "vibe_dataflow_graphs_id_delete_DELETE",
     method: "DELETE",
-    path: ["system", "dataflow", "graphs", "[id]", "delete"],
+    path: ["vibe", "dataflow", "graphs", "[id]", "delete"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Delete Graph",
@@ -18968,9 +19063,9 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "system_dataflow_graphs_id_edit_PUT",
+    toolName: "vibe_dataflow_graphs_id_edit_PUT",
     method: "PUT",
-    path: ["system", "dataflow", "graphs", "[id]", "edit"],
+    path: ["vibe", "dataflow", "graphs", "[id]", "edit"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Edit Graph",
@@ -18996,9 +19091,9 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "system_dataflow_graphs_id_promote_POST",
+    toolName: "vibe_dataflow_graphs_id_promote_POST",
     method: "POST",
-    path: ["system", "dataflow", "graphs", "[id]", "promote"],
+    path: ["vibe", "dataflow", "graphs", "[id]", "promote"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Promote to System",
@@ -19016,9 +19111,9 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "system_dataflow_graphs_id_trigger_POST",
+    toolName: "vibe_dataflow_graphs_id_trigger_POST",
     method: "POST",
-    path: ["system", "dataflow", "graphs", "[id]", "trigger"],
+    path: ["vibe", "dataflow", "graphs", "[id]", "trigger"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Trigger Graph",
@@ -19040,9 +19135,9 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "system_dataflow_graphs_id_versions_GET",
+    toolName: "vibe_dataflow_graphs_id_versions_GET",
     method: "GET",
-    path: ["system", "dataflow", "graphs", "[id]", "versions"],
+    path: ["vibe", "dataflow", "graphs", "[id]", "versions"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Graph Version History",
@@ -19078,7 +19173,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "vibe-sense-graphs",
     method: "GET",
-    path: ["system", "dataflow", "graphs"],
+    path: ["vibe", "dataflow", "graphs"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Pipeline Graphs",
@@ -19095,9 +19190,9 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "system_dataflow_graphs_POST",
+    toolName: "vibe_dataflow_graphs_POST",
     method: "POST",
-    path: ["system", "dataflow", "graphs"],
+    path: ["vibe", "dataflow", "graphs"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Create Graph",
@@ -19125,7 +19220,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "vibe-sense-run-config",
     method: "POST",
-    path: ["system", "dataflow", "run-config"],
+    path: ["vibe", "dataflow", "run-config"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Run Graph Config",
@@ -19150,7 +19245,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "system-settings",
     method: "GET",
-    path: ["system", "env", "settings"],
+    path: ["vibe", "env", "settings"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "System Settings",
@@ -19216,7 +19311,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "unbottled-login",
     method: "POST",
-    path: ["system", "env", "settings"],
+    path: ["vibe", "env", "settings"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Sign In to unbottled.ai",
@@ -19248,7 +19343,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "init",
     method: "PATCH",
-    path: ["system", "env", "settings"],
+    path: ["vibe", "env", "settings"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: ["set-setting"],
     title: "Update Settings",
@@ -19276,9 +19371,9 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "system_env_settings_export-env_GET",
+    toolName: "vibe_env_settings_export-env_GET",
     method: "GET",
-    path: ["system", "env", "settings", "export-env"],
+    path: ["vibe", "env", "settings", "export-env"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.cliOff",
@@ -19302,7 +19397,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "generate-key",
     method: "GET",
-    path: ["system", "env", "settings", "generate-key"],
+    path: ["vibe", "env", "settings", "generate-key"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: ["gen-key"],
     title: "Generate Secret Key",
@@ -19324,7 +19419,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "await-task",
     method: "POST",
-    path: ["system", "execute-tool", "await-task"],
+    path: ["vibe", "execute-tool", "await-task"],
     allowedRoles: [
       "enums.userRole.customer",
       "enums.userRole.partnerAdmin",
@@ -19355,7 +19450,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "cancel",
     method: "POST",
-    path: ["system", "execute-tool", "call-control", "cancel"],
+    path: ["vibe", "execute-tool", "call-control", "cancel"],
     allowedRoles: [
       "enums.userRole.customer",
       "enums.userRole.partnerAdmin",
@@ -19379,7 +19474,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "detach",
     method: "POST",
-    path: ["system", "execute-tool", "call-control", "detach"],
+    path: ["vibe", "execute-tool", "call-control", "detach"],
     allowedRoles: [
       "enums.userRole.customer",
       "enums.userRole.partnerAdmin",
@@ -19403,7 +19498,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "resume-when-done",
     method: "POST",
-    path: ["system", "execute-tool", "call-control", "resume-when-done"],
+    path: ["vibe", "execute-tool", "call-control", "resume-when-done"],
     allowedRoles: [
       "enums.userRole.customer",
       "enums.userRole.partnerAdmin",
@@ -19427,7 +19522,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "complete-task",
     method: "POST",
-    path: ["system", "execute-tool", "complete"],
+    path: ["vibe", "execute-tool", "complete"],
     allowedRoles: ["enums.userRole.admin", "enums.userRole.mcpVisible"],
     aliases: [],
     title: "Task Report",
@@ -19451,7 +19546,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "execute-tool",
     method: "POST",
-    path: ["system", "execute-tool"],
+    path: ["vibe", "execute-tool"],
     allowedRoles: [
       "enums.userRole.public",
       "enums.userRole.customer",
@@ -19502,7 +19597,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "resume-stream",
     method: "POST",
-    path: ["system", "execute-tool", "revival"],
+    path: ["vibe", "execute-tool", "revival"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.customer",
@@ -19537,7 +19632,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "tool-help",
     method: "GET",
-    path: ["system", "help-tool"],
+    path: ["vibe", "help-tool"],
     allowedRoles: [
       "enums.userRole.public",
       "enums.userRole.customer",
@@ -19607,7 +19702,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "error-logs-cleanup",
     method: "POST",
-    path: ["system", "logger", "error-monitor", "cleanup"],
+    path: ["vibe", "logger", "error-monitor", "cleanup"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.aiToolOff",
@@ -19666,7 +19761,7 @@ export const endpointsMeta: EndpointMeta[] = [
     toolName: "error-logs-errors",
     method: "POST",
     path: [
-      "system",
+      "vibe",
       "logger",
       "error-monitor",
       "data-sources",
@@ -19695,7 +19790,7 @@ export const endpointsMeta: EndpointMeta[] = [
     toolName: "error-logs-total",
     method: "POST",
     path: [
-      "system",
+      "vibe",
       "logger",
       "error-monitor",
       "data-sources",
@@ -19724,7 +19819,7 @@ export const endpointsMeta: EndpointMeta[] = [
     toolName: "error-logs-warnings",
     method: "POST",
     path: [
-      "system",
+      "vibe",
       "logger",
       "error-monitor",
       "data-sources",
@@ -19752,7 +19847,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "error-logs",
     method: "GET",
-    path: ["system", "logger", "error-monitor", "logs"],
+    path: ["vibe", "logger", "error-monitor", "logs"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Error Logs",
@@ -19781,7 +19876,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "update-error-log",
     method: "PATCH",
-    path: ["system", "logger", "error-monitor", "logs"],
+    path: ["vibe", "logger", "error-monitor", "logs"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Update Error Log",
@@ -19805,7 +19900,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "interactive-capture",
     method: "POST",
-    path: ["system", "platforms", "cli", "interactive", "capture"],
+    path: ["vibe", "platforms", "cli", "interactive", "capture"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.webOff",
@@ -19836,7 +19931,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "interactive-send-keys",
     method: "POST",
-    path: ["system", "platforms", "cli", "interactive", "send-keys"],
+    path: ["vibe", "platforms", "cli", "interactive", "send-keys"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.webOff",
@@ -19871,7 +19966,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "install",
     method: "POST",
-    path: ["system", "platforms", "cli", "setup", "install"],
+    path: ["vibe", "platforms", "cli", "setup", "install"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.cliAuthBypass",
@@ -19911,7 +20006,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "status",
     method: "POST",
-    path: ["system", "platforms", "cli", "setup", "status"],
+    path: ["vibe", "platforms", "cli", "setup", "status"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.webOff",
@@ -19940,7 +20035,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "uninstall",
     method: "POST",
-    path: ["system", "platforms", "cli", "setup", "uninstall"],
+    path: ["vibe", "platforms", "cli", "setup", "uninstall"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.webOff",
@@ -19975,7 +20070,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "mcp",
     method: "POST",
-    path: ["system", "platforms", "mcp", "serve"],
+    path: ["vibe", "platforms", "mcp", "serve"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.cliAuthBypass",
@@ -19995,7 +20090,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "vibe-frame-mount",
     method: "POST",
-    path: ["system", "platforms", "vibe-frame", "mount"],
+    path: ["vibe", "platforms", "vibe-frame", "mount"],
     allowedRoles: [
       "enums.userRole.public",
       "enums.userRole.customer",
@@ -20042,7 +20137,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "remote-event-bridge",
     method: "POST",
-    path: ["system", "realtime", "remote-event-bridge"],
+    path: ["vibe", "realtime", "remote-event-bridge"],
     allowedRoles: [
       "enums.userRole.customer",
       "enums.userRole.partnerAdmin",
@@ -20065,7 +20160,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "remote-status",
     method: "GET",
-    path: ["remote-connection", "[instanceId]"],
+    path: ["vibe", "remote-connection", "[instanceId]"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: ["connection-status"],
     title: "Remote Connection Status",
@@ -20114,9 +20209,9 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "remote-connection_instanceId_PATCH",
+    toolName: "vibe_remote-connection_instanceId_PATCH",
     method: "PATCH",
-    path: ["remote-connection", "[instanceId]"],
+    path: ["vibe", "remote-connection", "[instanceId]"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Update Remote Connection",
@@ -20205,9 +20300,9 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "remote-connection_instanceId_DELETE",
+    toolName: "vibe_remote-connection_instanceId_DELETE",
     method: "DELETE",
-    path: ["remote-connection", "[instanceId]"],
+    path: ["vibe", "remote-connection", "[instanceId]"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Disconnect",
@@ -20224,9 +20319,9 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "remote-connection_connect-reverse_POST",
+    toolName: "vibe_remote-connection_connect-reverse_POST",
     method: "POST",
-    path: ["remote-connection", "connect-reverse"],
+    path: ["vibe", "remote-connection", "connect-reverse"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Register Local Instance",
@@ -20261,9 +20356,9 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "remote-connection_connect-reverse_update_PATCH",
+    toolName: "vibe_remote-connection_connect-reverse_update_PATCH",
     method: "PATCH",
-    path: ["remote-connection", "connect-reverse", "update"],
+    path: ["vibe", "remote-connection", "connect-reverse", "update"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Update Reverse Connection",
@@ -20293,7 +20388,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "remote-connect",
     method: "POST",
-    path: ["remote-connection", "connect"],
+    path: ["vibe", "remote-connection", "connect"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: ["connect-remote"],
     title: "Connect to Remote Account",
@@ -20331,7 +20426,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "remote-connections",
     method: "GET",
-    path: ["remote-connection", "list"],
+    path: ["vibe", "remote-connection", "list"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Remote Connections",
@@ -20371,7 +20466,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "self-instance-id",
     method: "GET",
-    path: ["remote-connection", "self", "instanceId"],
+    path: ["vibe", "remote-connection", "self", "instanceId"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: ["my-instance-id"],
     title: "This Instance's ID",
@@ -20386,7 +20481,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "rename-self",
     method: "PATCH",
-    path: ["remote-connection", "self", "rename"],
+    path: ["vibe", "remote-connection", "self", "rename"],
     allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: ["rename-instance"],
     title: "Rename This Instance",
@@ -20404,7 +20499,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "sync",
     method: "POST",
-    path: ["remote-connection", "sync"],
+    path: ["vibe", "remote-connection", "sync"],
     allowedRoles: [
       "enums.userRole.customer",
       "enums.userRole.admin",
@@ -20448,9 +20543,9 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "remote-connection_sync_providers_GET",
+    toolName: "vibe_remote-connection_sync_providers_GET",
     method: "GET",
-    path: ["remote-connection", "sync", "providers"],
+    path: ["vibe", "remote-connection", "sync", "providers"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Sync Providers",
@@ -20497,7 +20592,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "build",
     method: "POST",
-    path: ["system", "server", "server", "build"],
+    path: ["vibe", "server", "server", "build"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.cliAuthBypass",
@@ -20546,7 +20641,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "dev",
     method: "POST",
-    path: ["system", "server", "server", "dev"],
+    path: ["vibe", "server", "server", "dev"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.cliAuthBypass",
@@ -20602,7 +20697,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "electron:build",
     method: "POST",
-    path: ["system", "server", "server", "electron", "build"],
+    path: ["vibe", "server", "server", "electron", "build"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.cliAuthBypass",
@@ -20647,7 +20742,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "electron",
     method: "POST",
-    path: ["system", "server", "server", "electron", "start"],
+    path: ["vibe", "server", "server", "electron", "start"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.cliAuthBypass",
@@ -20686,7 +20781,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "headless-client",
     method: "POST",
-    path: ["system", "server", "server", "headless-client"],
+    path: ["vibe", "server", "server", "headless-client"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.cliAuthBypass",
@@ -20716,7 +20811,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "health",
     method: "GET",
-    path: ["system", "server", "server", "health"],
+    path: ["vibe", "server", "server", "health"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Health Check",
@@ -20867,7 +20962,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "image-push",
     method: "POST",
-    path: ["system", "server", "server", "image-push"],
+    path: ["vibe", "server", "server", "image-push"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.cliAuthBypass",
@@ -20925,7 +21020,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "rebuild",
     method: "POST",
-    path: ["system", "server", "server", "rebuild"],
+    path: ["vibe", "server", "server", "rebuild"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.cliAuthBypass",
@@ -20982,7 +21077,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "start",
     method: "POST",
-    path: ["system", "server", "server", "start"],
+    path: ["vibe", "server", "server", "start"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.cliAuthBypass",
@@ -21058,7 +21153,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "cron-get",
     method: "GET",
-    path: ["system", "tasks", "cron", "[id]"],
+    path: ["vibe", "tasks", "cron", "[id]"],
     allowedRoles: [
       "enums.userRole.partnerAdmin",
       "enums.userRole.partnerEmployee",
@@ -21119,7 +21214,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "cron-update",
     method: "PUT",
-    path: ["system", "tasks", "cron", "[id]"],
+    path: ["vibe", "tasks", "cron", "[id]"],
     allowedRoles: [
       "enums.userRole.partnerAdmin",
       "enums.userRole.partnerEmployee",
@@ -21193,7 +21288,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "cron-delete",
     method: "DELETE",
-    path: ["system", "tasks", "cron", "[id]"],
+    path: ["vibe", "tasks", "cron", "[id]"],
     allowedRoles: [
       "enums.userRole.partnerAdmin",
       "enums.userRole.partnerEmployee",
@@ -21213,9 +21308,9 @@ export const endpointsMeta: EndpointMeta[] = [
     },
   },
   {
-    toolName: "system_tasks_cron_bulk_POST",
+    toolName: "vibe_tasks_cron_bulk_POST",
     method: "POST",
-    path: ["system", "tasks", "cron", "bulk"],
+    path: ["vibe", "tasks", "cron", "bulk"],
     allowedRoles: [
       "enums.userRole.partnerAdmin",
       "enums.userRole.partnerEmployee",
@@ -21248,7 +21343,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "cron-history",
     method: "GET",
-    path: ["system", "tasks", "cron", "history"],
+    path: ["vibe", "tasks", "cron", "history"],
     allowedRoles: [
       "enums.userRole.partnerAdmin",
       "enums.userRole.partnerEmployee",
@@ -21325,7 +21420,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "cron-queue",
     method: "GET",
-    path: ["system", "tasks", "cron", "queue"],
+    path: ["vibe", "tasks", "cron", "queue"],
     allowedRoles: [
       "enums.userRole.partnerAdmin",
       "enums.userRole.partnerEmployee",
@@ -21348,7 +21443,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "cron-stats",
     method: "GET",
-    path: ["system", "tasks", "cron", "stats"],
+    path: ["vibe", "tasks", "cron", "stats"],
     allowedRoles: [
       "enums.userRole.partnerAdmin",
       "enums.userRole.partnerEmployee",
@@ -21393,7 +21488,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "task-list",
     method: "GET",
-    path: ["system", "tasks", "cron", "tasks"],
+    path: ["vibe", "tasks", "cron", "tasks"],
     allowedRoles: [
       "enums.userRole.partnerAdmin",
       "enums.userRole.partnerEmployee",
@@ -21434,7 +21529,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "cron-create",
     method: "POST",
-    path: ["system", "tasks", "cron", "tasks"],
+    path: ["vibe", "tasks", "cron", "tasks"],
     allowedRoles: [
       "enums.userRole.partnerAdmin",
       "enums.userRole.partnerEmployee",
@@ -21511,7 +21606,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "cron-executions-failed",
     method: "POST",
-    path: ["system", "tasks", "data-sources", "cron-executions-failed"],
+    path: ["vibe", "tasks", "data-sources", "cron-executions-failed"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Cron Executions Failed",
@@ -21534,7 +21629,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "cron-executions-succeeded",
     method: "POST",
-    path: ["system", "tasks", "data-sources", "cron-executions-succeeded"],
+    path: ["vibe", "tasks", "data-sources", "cron-executions-succeeded"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Cron Executions Succeeded",
@@ -21557,7 +21652,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "cron-executions-total",
     method: "POST",
-    path: ["system", "tasks", "data-sources", "cron-executions-total"],
+    path: ["vibe", "tasks", "data-sources", "cron-executions-total"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Cron Executions Total",
@@ -21580,7 +21675,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "execute-task",
     method: "POST",
-    path: ["system", "tasks", "execute"],
+    path: ["vibe", "tasks", "execute"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: ["task-execute"],
     title: "Execute Task",
@@ -21608,7 +21703,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "pulse-execute",
     method: "POST",
-    path: ["system", "tasks", "pulse", "execute"],
+    path: ["vibe", "tasks", "pulse", "execute"],
     allowedRoles: ["enums.userRole.admin", "enums.userRole.aiToolOff"],
     aliases: ["pulse:execute"],
     title: "Execute Pulse",
@@ -21677,7 +21772,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "pulse-history",
     method: "GET",
-    path: ["system", "tasks", "pulse", "history"],
+    path: ["vibe", "tasks", "pulse", "history"],
     allowedRoles: ["enums.userRole.admin", "enums.userRole.aiToolOff"],
     aliases: ["pulse:history"],
     title: "Pulse Execution History",
@@ -21708,7 +21803,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "pulse-status",
     method: "GET",
-    path: ["system", "tasks", "pulse", "status"],
+    path: ["vibe", "tasks", "pulse", "status"],
     allowedRoles: ["enums.userRole.admin", "enums.userRole.aiToolOff"],
     aliases: ["pulse:status"],
     title: "Pulse Status",
@@ -21739,7 +21834,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "unified-runner",
     method: "POST",
-    path: ["system", "tasks", "unified-runner"],
+    path: ["vibe", "tasks", "unified-runner"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.mcpOff",
@@ -21786,7 +21881,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "builder",
     method: "POST",
-    path: ["system", "tooling", "builder"],
+    path: ["vibe", "tooling", "builder"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.cliAuthBypass",
@@ -21856,7 +21951,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "config",
     method: "POST",
-    path: ["system", "tooling", "check", "config", "create"],
+    path: ["vibe", "tooling", "check", "config", "create"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.cliAuthBypass",
@@ -21900,7 +21995,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "eslint",
     method: "POST",
-    path: ["system", "tooling", "check", "lint"],
+    path: ["vibe", "tooling", "check", "lint"],
     allowedRoles: [],
     aliases: ["elint", "el"],
     title: "Lint",
@@ -21927,7 +22022,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "oxlint",
     method: "POST",
-    path: ["system", "tooling", "check", "oxlint"],
+    path: ["vibe", "tooling", "check", "oxlint"],
     allowedRoles: [],
     aliases: ["l", "ox", "lint"],
     title: "Oxlint",
@@ -21954,7 +22049,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "test",
     method: "POST",
-    path: ["system", "tooling", "check", "testing", "test"],
+    path: ["vibe", "tooling", "check", "testing", "test"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.cliAuthBypass",
@@ -21998,7 +22093,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "typecheck",
     method: "POST",
-    path: ["system", "tooling", "check", "typecheck"],
+    path: ["vibe", "tooling", "check", "typecheck"],
     allowedRoles: [],
     aliases: ["tc"],
     title: "TypeScript Type Check",
@@ -22019,7 +22114,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "check",
     method: "POST",
-    path: ["system", "tooling", "check", "vibe-check"],
+    path: ["vibe", "tooling", "check", "vibe-check"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.cliAuthBypass",
@@ -22053,7 +22148,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "generate-all",
     method: "POST",
-    path: ["system", "tooling", "generators"],
+    path: ["vibe", "tooling", "generators"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.cliAuthBypass",
@@ -22167,7 +22262,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "guard:destroy",
     method: "POST",
-    path: ["system", "tooling", "guard", "destroy"],
+    path: ["vibe", "tooling", "guard", "destroy"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.webOff",
@@ -22278,7 +22373,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "guard",
     method: "POST",
-    path: ["system", "tooling", "guard", "start"],
+    path: ["vibe", "tooling", "guard", "start"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.webOff",
@@ -22342,7 +22437,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "guard:status",
     method: "POST",
-    path: ["system", "tooling", "guard", "status"],
+    path: ["vibe", "tooling", "guard", "status"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.webOff",
@@ -22442,7 +22537,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "guard:stop",
     method: "POST",
-    path: ["system", "tooling", "guard", "stop"],
+    path: ["vibe", "tooling", "guard", "stop"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.aiToolOff",
@@ -22544,7 +22639,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "cluster-init",
     method: "POST",
-    path: ["system", "tooling", "infra", "cluster", "init"],
+    path: ["vibe", "tooling", "infra", "cluster", "init"],
     allowedRoles: ["enums.userRole.admin", "enums.userRole.productionOff"],
     aliases: ["init-cluster", "infra-init"],
     title: "Initialize Cluster",
@@ -22601,7 +22696,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "cluster-status",
     method: "GET",
-    path: ["system", "tooling", "infra", "cluster", "status"],
+    path: ["vibe", "tooling", "infra", "cluster", "status"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: ["infra-status"],
     title: "Cluster Status",
@@ -22643,7 +22738,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "deploy-preview",
     method: "POST",
-    path: ["system", "tooling", "infra", "deploy", "preview"],
+    path: ["vibe", "tooling", "infra", "deploy", "preview"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: ["infra-preview"],
     title: "Deploy Preview",
@@ -22671,7 +22766,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "deploy",
     method: "POST",
-    path: ["system", "tooling", "infra", "deploy", "push"],
+    path: ["vibe", "tooling", "infra", "deploy", "push"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: ["infra-deploy", "push"],
     title: "Deploy",
@@ -22702,7 +22797,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "scale",
     method: "POST",
-    path: ["system", "tooling", "infra", "scale", "replicas"],
+    path: ["vibe", "tooling", "infra", "scale", "replicas"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: ["scale-replicas", "infra-scale"],
     title: "Scale",
@@ -22730,7 +22825,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "release",
     method: "POST",
-    path: ["system", "tooling", "release"],
+    path: ["vibe", "tooling", "release"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.cliAuthBypass",
@@ -22831,7 +22926,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "deps",
     method: "POST",
-    path: ["system", "tooling", "vibe-deps"],
+    path: ["vibe", "tooling", "vibe-deps"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.cliAuthBypass",
@@ -22879,7 +22974,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "stage",
     method: "POST",
-    path: ["system", "tooling", "vibe-stage"],
+    path: ["vibe", "tooling", "vibe-stage"],
     allowedRoles: [
       "enums.userRole.admin",
       "enums.userRole.cliAuthBypass",

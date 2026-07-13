@@ -51,7 +51,7 @@ const { POST } = createEndpoint({
   ],
   aliases: ["install", "setup", "update", "setup:update"],
   method: Methods.POST,
-  path: ["system", "platforms", "cli", "setup", "install"],
+  path: ["vibe", "platforms", "cli", "setup", "install"],
   examples: {
     requests: {
       default: {

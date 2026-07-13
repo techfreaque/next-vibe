@@ -32,7 +32,7 @@ const CortexExecWidget = lazyWidget(() =>
 export const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["agent", "cortex", "exec"],
+  path: ["vibe", "agent", "cortex", "exec"],
   aliases: [CORTEX_EXEC_ALIAS] as const,
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   defaultAiPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,

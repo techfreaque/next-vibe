@@ -24,7 +24,7 @@ import { scopedTranslation } from "./i18n";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["agent", "ai-stream", "cancel"],
+  path: ["vibe", "agent", "ai-stream", "cancel"],
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.CUSTOMER,

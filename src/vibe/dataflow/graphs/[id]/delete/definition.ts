@@ -29,7 +29,7 @@ const DeleteWidget = lazyWidget(() =>
 const { DELETE } = createEndpoint({
   scopedTranslation,
   method: Methods.DELETE,
-  path: ["system", "dataflow", "graphs", "[id]", "delete"],
+  path: ["vibe", "dataflow", "graphs", "[id]", "delete"],
   title: "delete.title",
   titleShort: "delete.titleShort",
   description: "delete.description",

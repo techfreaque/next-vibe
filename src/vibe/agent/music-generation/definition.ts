@@ -41,7 +41,7 @@ const MusicGenerationContainer = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["agent", "music-generation"],
+  path: ["vibe", "agent", "music-generation"],
   aliases: [MUSIC_GEN_ALIAS],
   allowedRoles: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.PUBLIC],
   defaultWebPinned: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.PUBLIC],

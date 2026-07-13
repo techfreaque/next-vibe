@@ -31,7 +31,7 @@ const RemoteRegisterWidget = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["remote-connection", "connect-reverse"],
+  path: ["vibe", "remote-connection", "connect-reverse"],
   allowedRoles: [UserRole.ADMIN] as const,
 
   title: "post.title" as const,

@@ -13,6 +13,8 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { toPosixPath } from "next-vibe/tooling/generators/shared/utils";
 
+import { getSrcDir } from "@/env/paths";
+
 import type { VibeDepsConfig, VibeDepsViolationKind } from "./config-types";
 import type {
   VibeDepsRequestOutput,
@@ -113,9 +115,9 @@ function isGenerated(key: string): boolean {
 /** Exported for consumers OUTSIDE this codebase — skip all dead-symbol checks. */
 function isVibeFrameExternalFile(key: string): boolean {
   return (
-    key.endsWith("/system/platforms/vibe-frame/VibeFrameHost.tsx") ||
-    key.endsWith("/system/platforms/vibe-frame/types.ts") ||
-    key.endsWith("/system/platforms/vibe-frame/triggers.ts")
+    key.endsWith("src/vibe/platforms/vibe-frame/VibeFrameHost.tsx") ||
+    key.endsWith("src/vibe/platforms/vibe-frame/types.ts") ||
+    key.endsWith("src/vibe/platforms/vibe-frame/triggers.ts")
   );
 }
 
@@ -124,7 +126,7 @@ function isVibeFrameExternalFile(key: string): boolean {
  * intentional contract even when not yet consumed by a static importer).
  */
 function isPublicApiSurface(key: string): boolean {
-  return key.includes("/system/unified-ui/") || isVibeFrameExternalFile(key);
+  return key.startsWith("src/vibe/unified-ui/") || isVibeFrameExternalFile(key);
 }
 
 /**
@@ -224,8 +226,7 @@ function isKnownEntrypoint(key: string): boolean {
  * plugin swaps). A mirror with NO web base is genuinely dead / native-only and
  * stays flagged (not hidden). Precise, not a blanket ignore.
  */
-const UI_MIRROR_RE =
-  /(src\/app\/api\/\[locale\]\/system\/ui\/)(cli|native|tanstack)\/(.+)$/;
+const UI_MIRROR_RE = /(src\/vibe\/ui\/)(cli|native|tanstack)\/(.+)$/;
 function isUiMirrorWithWebBase(key: string): boolean {
   const m = UI_MIRROR_RE.exec(key);
   if (!m) {
@@ -508,7 +509,7 @@ const SKIP_FILE_SUFFIXES = [
 // tsconfig alias prefixes → resolved src-relative prefix
 // Order matters: more specific first.
 // next-vibe/* is a 2-candidate alias: system-first, then locale-root
-// (mirrors tsconfig "next-vibe/*": [system/*, [locale]/*]). The system tree
+// (mirrors tsconfig "next-vibe/*": ["src/vibe/*", "src/*"]). The system tree
 // owns ui/, unified-ui/, etc., so the system candidate must be tried first.
 const ALIAS_PREFIXES: ReadonlyArray<{ alias: string; resolved: string }> = [
   // next-vibe/* → src/vibe/*  (framework tree, tried first)
@@ -592,7 +593,7 @@ function scanTestFiles(dir: string, results: string[] = []): string[] {
  * Handles:
  *   - Alias imports:  "@/foo/bar"  →  "src/foo/bar"
  *                     "next-vibe/foo" → "src/vibe/foo"
- *                                       (system-first, then [locale]/foo)
+ *                                       (vibe-first, then src/ domain root fallback)
  *   - Relative imports: "../bar", "./baz" → resolved against the importer's dir
  *
  * The returned path has no extension — callers try .ts / .tsx / /index.ts etc.
@@ -1775,7 +1776,7 @@ function buildConsumerCoupling(
 // the repository, widget, or page-client.
 // Graph keys are relative paths like:
 //   "src/user/repository.ts"
-//   "src/app/[locale]/creator/[userId]/page-client.tsx"
+//   "src/_pages/creator/[userId]/page-client.tsx"
 //   "src/config/env.ts"
 // The patterns below match against these resolved keys.
 const PAGE_ALLOWED_PATTERNS: ReadonlyArray<RegExp> = [
@@ -1786,14 +1787,14 @@ const PAGE_ALLOWED_PATTERNS: ReadonlyArray<RegExp> = [
   /\/i18n(\/|\/index(\.(ts|tsx))?$|$)/,
   // Sibling _components/ — UI fragments co-located with the page
   /\/_components\//,
-  // Framework auth + logger + platform boilerplate (graph key format: system/...)
-  /system\/identity\/auth\/(repository|types)/,
-  /system\/identity\/roles\/enum/,
-  /system\/logger\/server/,
-  /system\/core\/definition\/platform/,
-  /system\/core\/i18n/,
+  // Framework auth + logger + platform boilerplate (graph key format: src/vibe/...)
+  /vibe\/identity\/auth\/(repository|types)/,
+  /vibe\/identity\/roles\/enum/,
+  /vibe\/logger\/server/,
+  /vibe\/core\/definition\/platform/,
+  /vibe\/core\/i18n/,
   // Endpoint repository + definition (the only api imports a page may make directly)
-  /src\/app\/api\/\[locale\]\/.*\/(repository|definition)(\.(ts|tsx))?$/,
+  /src\/.*\/(repository|definition)(\.(ts|tsx))?$/,
   // Project-level config
   /src\/config\//,
 ];
@@ -1849,11 +1850,7 @@ function buildPageViolations(graph: Graph, scope: string): DepsEntry[] {
       importCount: violations.length,
       importedByCount: 0,
       isUnused: false,
-      moveNote: violations
-        .map((v) =>
-          v.replace(/^src\/app\/api\/\[locale\]\//, "").replace(/^src\//, ""),
-        )
-        .join(", "),
+      moveNote: violations.map((v) => v.replace(/^src\//, "")).join(", "),
     });
   }
 

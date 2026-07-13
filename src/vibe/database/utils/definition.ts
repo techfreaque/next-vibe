@@ -43,7 +43,7 @@ const { GET } = createEndpoint({
   ],
   aliases: ["db:utils", "dbutils"],
   method: Methods.GET,
-  path: ["system", "database", "utils"],
+  path: ["vibe", "database", "utils"],
   examples: {
     requests: {
       default: {

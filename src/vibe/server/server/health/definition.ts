@@ -30,7 +30,7 @@ import { HEALTH_ALIAS } from "./constants";
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["system", "server", "server", "health"],
+  path: ["vibe", "server", "server", "health"],
   aliases: [HEALTH_ALIAS],
   title: "get.title",
   titleShort: "get.titleShort",

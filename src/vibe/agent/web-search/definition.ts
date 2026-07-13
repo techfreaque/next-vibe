@@ -50,7 +50,7 @@ const FRESHNESS_OPTIONS = [
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["agent", "web-search"],
+  path: ["vibe", "agent", "web-search"],
   title: "get.title" as const,
   titleShort: "get.titleShort" as const,
   description: "get.description" as const,

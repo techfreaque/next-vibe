@@ -40,7 +40,7 @@ const CronHistoryContainer = lazyWidget(() =>
 export const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["system", "tasks", "cron", "history"],
+  path: ["vibe", "tasks", "cron", "history"],
   aliases: [CRON_HISTORY_ALIAS],
   title: "get.title",
   titleShort: "get.titleShort",

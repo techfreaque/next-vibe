@@ -33,7 +33,7 @@ const CortexSearchWidget = lazyWidget(() =>
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["agent", "cortex", "search"],
+  path: ["vibe", "agent", "cortex", "search"],
   aliases: [CORTEX_SEARCH_ALIAS] as const,
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   defaultAiPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,

@@ -29,7 +29,7 @@ const CortexDeleteWidget = lazyWidget(() =>
 const { DELETE } = createEndpoint({
   scopedTranslation,
   method: Methods.DELETE,
-  path: ["agent", "cortex", "delete"],
+  path: ["vibe", "agent", "cortex", "delete"],
   aliases: [CORTEX_DELETE_ALIAS] as const,
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   defaultAiPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,

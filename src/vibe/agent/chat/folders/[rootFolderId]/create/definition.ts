@@ -41,7 +41,7 @@ const FolderCreateContainer = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["agent", "chat", "folders", "[rootFolderId]", "create"],
+  path: ["vibe", "agent", "chat", "folders", "[rootFolderId]", "create"],
   aliases: ["folder-create"] as const,
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 

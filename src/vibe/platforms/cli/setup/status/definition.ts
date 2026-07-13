@@ -34,7 +34,7 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF],
   aliases: [CLI_STATUS_ALIAS] as const,
   method: Methods.POST,
-  path: ["system", "platforms", "cli", "setup", "status"],
+  path: ["vibe", "platforms", "cli", "setup", "status"],
   examples: {
     responses: {
       default: {

@@ -33,7 +33,7 @@ const RemoteConnectionsListContainer = lazyWidget(() =>
 export const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["remote-connection", "list"],
+  path: ["vibe", "remote-connection", "list"],
   title: "get.title" as const,
   titleShort: "get.titleShort" as const,
   description: "get.description" as const,

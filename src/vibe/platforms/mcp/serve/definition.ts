@@ -20,7 +20,7 @@ import { MCP_ALIAS } from "./constants";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "platforms", "mcp", "serve"],
+  path: ["vibe", "platforms", "mcp", "serve"],
   aliases: [MCP_ALIAS] as const,
   title: "serve.post.title" as const,
   titleShort: "serve.post.titleShort" as const,

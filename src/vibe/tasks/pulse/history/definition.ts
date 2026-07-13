@@ -36,7 +36,7 @@ const PulseHistoryContainer = lazyWidget(() =>
 export const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["system", "tasks", "pulse", "history"],
+  path: ["vibe", "tasks", "pulse", "history"],
   aliases: [PULSE_HISTORY_ALIAS, "pulse:history"],
   title: "get.title",
   titleShort: "get.titleShort",

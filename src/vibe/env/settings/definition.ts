@@ -133,7 +133,7 @@ const settingModuleSchema = z.object({
 export const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["system", "env", "settings"] as const,
+  path: ["vibe", "env", "settings"] as const,
   allowedRoles: [UserRole.ADMIN] as const,
   defaultWebPinned: [UserRole.ADMIN] as const,
   title: "get.title" as const,
@@ -284,7 +284,7 @@ export const { GET } = createEndpoint({
 export const { PATCH } = createEndpoint({
   scopedTranslation,
   method: Methods.PATCH,
-  path: ["system", "env", "settings"] as const,
+  path: ["vibe", "env", "settings"] as const,
   allowedRoles: [UserRole.ADMIN] as const,
   title: "patch.title" as const,
   titleShort: "patch.titleShort" as const,
@@ -389,7 +389,7 @@ export const { PATCH } = createEndpoint({
 export const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "env", "settings"] as const,
+  path: ["vibe", "env", "settings"] as const,
   allowedRoles: [UserRole.ADMIN] as const,
   title: "post.title" as const,
   titleShort: "post.titleShort" as const,

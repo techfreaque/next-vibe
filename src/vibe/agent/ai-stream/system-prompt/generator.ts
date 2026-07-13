@@ -512,12 +512,11 @@ export async function loadAllPromptFragments(
   };
 
   // Run all fragment builds in parallel
-  const settled = await Promise.allSettled([
-${fragmentCallsStr}
-  ]);
-  const results = settled.map((r) =>
-    r.status === "fulfilled" ? r.value : null,
-  );
+${
+  fragmentCallsStr
+    ? `  const settled = await Promise.allSettled([\n${fragmentCallsStr}\n  ]);\n  const results = settled.map((r) =>\n    r.status === "fulfilled" ? r.value : null,\n  );`
+    : `  const results: Array<string | null> = [];`
+}
 
   const byId: Record<string, string | null> = {
 ${builtEntries.join("\n")}

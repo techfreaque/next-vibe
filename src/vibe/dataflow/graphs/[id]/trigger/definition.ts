@@ -27,7 +27,7 @@ const TriggerWidget = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "dataflow", "graphs", "[id]", "trigger"],
+  path: ["vibe", "dataflow", "graphs", "[id]", "trigger"],
   title: "post.title",
   titleShort: "post.titleShort",
   description: "post.description",

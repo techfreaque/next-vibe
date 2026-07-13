@@ -60,7 +60,7 @@ const FavoriteCreateContainer = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["agent", "skills", "favorites", "create"],
+  path: ["vibe", "agent", "skills", "favorites", "create"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   allowedClientRoles: [UserRole.PUBLIC] as const, // Allow public users to use client route
 

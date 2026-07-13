@@ -30,7 +30,7 @@ const CortexEditWidget = lazyWidget(() =>
 const { PATCH } = createEndpoint({
   scopedTranslation,
   method: Methods.PATCH,
-  path: ["agent", "cortex", "edit"],
+  path: ["vibe", "agent", "cortex", "edit"],
   aliases: [CORTEX_EDIT_ALIAS] as const,
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   defaultAiPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,

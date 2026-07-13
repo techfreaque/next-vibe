@@ -33,7 +33,7 @@ const CortexTerminalsWidget = lazyWidget(() =>
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["agent", "cortex", "terminals"],
+  path: ["vibe", "agent", "cortex", "terminals"],
   aliases: [CORTEX_TERMINALS_ALIAS] as const,
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   defaultAiPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,

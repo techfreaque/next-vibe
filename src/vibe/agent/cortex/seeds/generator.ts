@@ -110,9 +110,7 @@ export async function generate(
   const seedsDir = join(
     process.cwd(),
     "src",
-    "app",
-    "api",
-    "[locale]",
+    "vibe",
     "agent",
     "cortex",
     "seeds",

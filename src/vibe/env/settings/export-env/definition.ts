@@ -27,7 +27,7 @@ const ExportEnvWidget = lazyWidget(() =>
 export const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["system", "env", "settings", "export-env"] as const,
+  path: ["vibe", "env", "settings", "export-env"] as const,
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.CLI_OFF,

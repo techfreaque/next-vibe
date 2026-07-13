@@ -29,7 +29,7 @@ export const translations = {
     path: {
       label: "Path",
       description:
-        "File paths or directories to check (string or array). RECOMMENDED: Specify paths for the area you're working on (fast, focused). Leave empty to check ALL files (slow, use only for comprehensive audits). Examples: 'src/app/feature' or ['src/feature/file.tsx', 'src/feature/other.tsx']",
+        "File paths or directories to check (string or array). RECOMMENDED: Specify paths for the area you're working on (fast, focused). Leave empty to check ALL files (slow, use only for comprehensive audits). Examples: 'src/feature' or ['src/feature/file.tsx', 'src/feature/other.tsx']",
       placeholder: "Enter path to lint",
     },
     verbose: {

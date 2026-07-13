@@ -50,7 +50,7 @@ import { BRAVE_SEARCH_ALIAS } from "./constants";
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["agent", "web-search", "brave"],
+  path: ["vibe", "agent", "web-search", "brave"],
   title: "get.title" as const,
   titleShort: "get.titleShort" as const,
   description: "get.description" as const,

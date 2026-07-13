@@ -25,7 +25,7 @@ import { z } from "zod";
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["system", "dataflow", "graphs", "[id]", "versions"],
+  path: ["vibe", "dataflow", "graphs", "[id]", "versions"],
   title: "get.title",
   titleShort: "get.titleShort",
   description: "get.description",

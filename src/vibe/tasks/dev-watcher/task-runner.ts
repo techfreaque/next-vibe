@@ -236,7 +236,7 @@ const startSmartFileWatcher = async (
 
             // Resolve to absolute path.
             // Use string concat instead of join() - Turbopack's static analysis
-            // treats join(watchRoot, ...) as a broad glob over src/app/[locale]/.
+            // treats join(watchRoot, ...) as a broad glob over src/_pages/.
             const sep = watchRoot.endsWith("/") ? "" : "/";
             const absPath = watchRoot + sep + filename;
 

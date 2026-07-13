@@ -31,7 +31,7 @@ import { DEV_ALIASES } from "./constants";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "server", "server", "dev"],
+  path: ["vibe", "server", "server", "dev"],
   aliases: DEV_ALIASES,
   title: "post.title",
   titleShort: "post.titleShort",

@@ -12080,7 +12080,7 @@
     "credits": 0
   },
   {
-    "toolName": "agent_chat_public-feed_GET",
+    "toolName": "vibe_agent_chat_public-feed_GET",
     "title": "Community Feed",
     "titleShort": "Community Feed",
     "description": "Public threads shared with the community",
@@ -13155,7 +13155,7 @@
     "credits": 0
   },
   {
-    "toolName": "agent_chat_threads_threadId_GET",
+    "toolName": "vibe_agent_chat_threads_threadId_GET",
     "title": "Get Chat Thread",
     "titleShort": "Thread",
     "description": "Retrieve a specific chat thread by ID",
@@ -14175,7 +14175,7 @@
     "credits": 0
   },
   {
-    "toolName": "agent_chat_threads_threadId_PATCH",
+    "toolName": "vibe_agent_chat_threads_threadId_PATCH",
     "title": "Update Chat Thread",
     "titleShort": "Update Thread",
     "description": "Update an existing chat thread",
@@ -15030,7 +15030,7 @@
     "credits": 0
   },
   {
-    "toolName": "agent_chat_threads_threadId_DELETE",
+    "toolName": "vibe_agent_chat_threads_threadId_DELETE",
     "title": "Delete Chat Thread",
     "titleShort": "Delete Thread",
     "description": "Delete a chat thread",
@@ -15603,7 +15603,7 @@
     "credits": 0
   },
   {
-    "toolName": "agent_chat_threads_threadId_messages_messageId_GET",
+    "toolName": "vibe_agent_chat_threads_threadId_messages_messageId_GET",
     "title": "Get Message",
     "titleShort": "Message",
     "description": "Retrieve a specific message by ID",
@@ -16225,7 +16225,7 @@
     "credits": 0
   },
   {
-    "toolName": "agent_chat_threads_threadId_messages_messageId_PATCH",
+    "toolName": "vibe_agent_chat_threads_threadId_messages_messageId_PATCH",
     "title": "Update Message",
     "titleShort": "Update Message",
     "description": "Update a message's content",
@@ -16686,7 +16686,7 @@
     "credits": 0
   },
   {
-    "toolName": "agent_chat_threads_threadId_messages_messageId_DELETE",
+    "toolName": "vibe_agent_chat_threads_threadId_messages_messageId_DELETE",
     "title": "Delete Message",
     "titleShort": "Delete Message",
     "description": "Delete a message from the thread",
@@ -18527,7 +18527,7 @@
     "credits": 0
   },
   {
-    "toolName": "agent_chat_threads_threadId_messages_POST",
+    "toolName": "vibe_agent_chat_threads_threadId_messages_POST",
     "title": "Create Message",
     "titleShort": "Create Message",
     "description": "Create a new message in a chat thread",
@@ -19264,7 +19264,7 @@
     "credits": 0
   },
   {
-    "toolName": "agent_chat_threads_threadId_messages_path_GET",
+    "toolName": "vibe_agent_chat_threads_threadId_messages_path_GET",
     "title": "Get Conversation Path",
     "titleShort": "Message Path",
     "description": "Retrieve messages following a specific conversation path",

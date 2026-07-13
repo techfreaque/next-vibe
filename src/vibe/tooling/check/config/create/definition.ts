@@ -32,7 +32,7 @@ const ConfigCreateWidget = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "tooling", "check", "config", "create"],
+  path: ["vibe", "tooling", "check", "config", "create"],
   title: "title",
   titleShort: "title",
   description: "description",

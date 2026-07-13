@@ -26,7 +26,7 @@ import { RUN_CONFIG_ALIAS } from "./constants";
 export const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "dataflow", "run-config"],
+  path: ["vibe", "dataflow", "run-config"],
   aliases: [RUN_CONFIG_ALIAS],
   title: "post.title",
   titleShort: "post.titleShort",

@@ -26,7 +26,7 @@ const { POST } = createEndpoint({
   scopedTranslation,
   aliases: [CRON_EXECUTIONS_FAILED_ALIAS],
   method: Methods.POST,
-  path: ["system", "tasks", "data-sources", "cron-executions-failed"],
+  path: ["vibe", "tasks", "data-sources", "cron-executions-failed"],
   title: "post.title",
   titleShort: "post.titleShort",
   description: "post.description",

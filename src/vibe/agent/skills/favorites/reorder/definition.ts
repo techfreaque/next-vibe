@@ -29,7 +29,7 @@ import { scopedTranslation } from "./i18n";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["agent", "skills", "favorites", "reorder"],
+  path: ["vibe", "agent", "skills", "favorites", "reorder"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   allowedClientRoles: [UserRole.PUBLIC] as const, // Allow public users to use client route
 

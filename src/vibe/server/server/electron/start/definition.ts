@@ -29,7 +29,7 @@ import {
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "server", "server", "electron", "start"],
+  path: ["vibe", "server", "server", "electron", "start"],
   aliases: [ELECTRON_ALIAS, ELECTRON_START_ALIAS, ELECTRON_START_DEV_ALIAS],
   title: "post.title",
   titleShort: "post.titleShort",

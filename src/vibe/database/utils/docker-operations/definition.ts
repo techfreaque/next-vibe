@@ -41,7 +41,7 @@ const { POST } = createEndpoint({
   ],
   aliases: ["docker", "docker-utils"],
   method: Methods.POST,
-  path: ["system", "database", "utils", "docker-operations"],
+  path: ["vibe", "database", "utils", "docker-operations"],
   examples: {
     requests: {
       composeUp: {

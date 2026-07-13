@@ -43,7 +43,7 @@ const statsTypeSchema = z.enum(["overview", "performance", "errors", "trends"]);
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["system", "tasks", "cron", "stats"],
+  path: ["vibe", "tasks", "cron", "stats"],
   aliases: [CRON_STATS_ALIAS, "cron:stats", "tasks:cron:stats"],
   title: "get.title",
   titleShort: "get.titleShort",

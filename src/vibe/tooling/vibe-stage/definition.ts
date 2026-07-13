@@ -31,7 +31,7 @@ const VibeStageWidget = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "tooling", "vibe-stage"],
+  path: ["vibe", "tooling", "vibe-stage"],
   title: "title",
   titleShort: "title",
   description: "description",

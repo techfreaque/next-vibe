@@ -40,7 +40,7 @@ const DeleteFolderContainer = lazyWidget(() =>
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["agent", "chat", "folders", "subfolders", "[subFolderId]"],
+  path: ["vibe", "agent", "chat", "folders", "subfolders", "[subFolderId]"],
   aliases: ["folder-get"] as const,
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
@@ -186,7 +186,7 @@ const { GET } = createEndpoint({
 const { DELETE } = createEndpoint({
   scopedTranslation,
   method: Methods.DELETE,
-  path: ["agent", "chat", "folders", "subfolders", "[subFolderId]"],
+  path: ["vibe", "agent", "chat", "folders", "subfolders", "[subFolderId]"],
   aliases: ["folder-delete"] as const,
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 

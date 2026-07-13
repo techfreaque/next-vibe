@@ -55,739 +55,270 @@ async function importEndpoint(
 ): Promise<CreateApiEndpointAny | null> {
   switch (path) {
     case "accounting-dashboard":
-      return (
-        await import("@/chart-of-accounts/dashboard/definition")
-      ).default.GET;
+      return (await import("@/chart-of-accounts/dashboard/definition")).default
+        .GET;
     case "agent-chat-threads":
-      return (await import("next-vibe/agent/chat/threads/definition"))
-        .default.GET;
+      return (await import("@/vibe/agent/chat/threads/definition")).default.GET;
     case "agent-run":
-      return (await import("next-vibe/agent/ai-stream/run/definition"))
-        .default.POST;
+      return (await import("@/vibe/agent/ai-stream/run/definition")).default
+        .POST;
     case "agent-search-messages":
       return (
-        await import("next-vibe/agent/chat/threads/search-messages/definition")
+        await import("@/vibe/agent/chat/threads/search-messages/definition")
       ).default.GET;
     case "agent-search-threads":
       return (
-        await import("next-vibe/agent/chat/threads/search-threads/definition")
+        await import("@/vibe/agent/chat/threads/search-threads/definition")
       ).default.GET;
     case "agent-view-image":
-      return (await import("next-vibe/agent/view-image/definition"))
-        .default.POST;
-    case "agent_ai-stream_cancel_POST":
-      return (
-        await import("next-vibe/agent/ai-stream/cancel/definition")
-      ).default.POST;
-    case "agent_ai-stream_run_POST":
-      return (await import("next-vibe/agent/ai-stream/run/definition"))
-        .default.POST;
-    case "agent_ai-stream_stream_POST":
-      return (
-        await import("next-vibe/agent/ai-stream/stream/definition")
-      ).default.POST;
-    case "agent_ai-stream_system-prompt_debug_GET":
-      return (
-        await import("next-vibe/agent/ai-stream/system-prompt/debug/definition")
-      ).default.GET;
-    case "agent_ai-stream_ws-provider_models_GET":
-      return (
-        await import("next-vibe/agent/ai-stream/ws-provider/models/definition")
-      ).default.GET;
-    case "agent_chat_data-sources_chat-downvotes-total_POST":
-      return (
-        await import("next-vibe/agent/chat/data-sources/chat-downvotes-total/definition")
-      ).default.POST;
-    case "agent_chat_data-sources_chat-errors-total_POST":
-      return (
-        await import("next-vibe/agent/chat/data-sources/chat-errors-total/definition")
-      ).default.POST;
-    case "agent_chat_data-sources_chat-memories-created_POST":
-      return (
-        await import("next-vibe/agent/chat/data-sources/chat-memories-created/definition")
-      ).default.POST;
-    case "agent_chat_data-sources_chat-messages-by-ai_POST":
-      return (
-        await import("next-vibe/agent/chat/data-sources/chat-messages-by-ai/definition")
-      ).default.POST;
-    case "agent_chat_data-sources_chat-messages-by-user_POST":
-      return (
-        await import("next-vibe/agent/chat/data-sources/chat-messages-by-user/definition")
-      ).default.POST;
-    case "agent_chat_data-sources_chat-messages-total_POST":
-      return (
-        await import("next-vibe/agent/chat/data-sources/chat-messages-total/definition")
-      ).default.POST;
-    case "agent_chat_data-sources_chat-messages-with-attachments_POST":
-      return (
-        await import("next-vibe/agent/chat/data-sources/chat-messages-with-attachments/definition")
-      ).default.POST;
-    case "agent_chat_data-sources_chat-share-links-created_POST":
-      return (
-        await import("next-vibe/agent/chat/data-sources/chat-share-links-created/definition")
-      ).default.POST;
-    case "agent_chat_data-sources_chat-threads-active-total_POST":
-      return (
-        await import("next-vibe/agent/chat/data-sources/chat-threads-active-total/definition")
-      ).default.POST;
-    case "agent_chat_data-sources_chat-threads-created_POST":
-      return (
-        await import("next-vibe/agent/chat/data-sources/chat-threads-created/definition")
-      ).default.POST;
-    case "agent_chat_data-sources_chat-tool-calls-total_POST":
-      return (
-        await import("next-vibe/agent/chat/data-sources/chat-tool-calls-total/definition")
-      ).default.POST;
-    case "agent_chat_data-sources_chat-unique-users_POST":
-      return (
-        await import("next-vibe/agent/chat/data-sources/chat-unique-users/definition")
-      ).default.POST;
-    case "agent_chat_data-sources_chat-upvotes-total_POST":
-      return (
-        await import("next-vibe/agent/chat/data-sources/chat-upvotes-total/definition")
-      ).default.POST;
-    case "agent_chat_folder-contents_rootFolderId_GET":
-      return (
-        await import("next-vibe/agent/chat/folder-contents/[rootFolderId]/definition")
-      ).default.GET;
-    case "agent_chat_folders_rootFolderId_GET":
-      return (
-        await import("next-vibe/agent/chat/folders/[rootFolderId]/definition")
-      ).default.GET;
-    case "agent_chat_folders_rootFolderId_create_POST":
-      return (
-        await import("next-vibe/agent/chat/folders/[rootFolderId]/create/definition")
-      ).default.POST;
-    case "agent_chat_folders_rootFolderId_root-permissions_GET":
-      return (
-        await import("next-vibe/agent/chat/folders/[rootFolderId]/root-permissions/definition")
-      ).default.GET;
-    case "agent_chat_folders_subfolders_subFolderId_DELETE":
-      return (
-        await import("next-vibe/agent/chat/folders/subfolders/[subFolderId]/definition")
-      ).default.DELETE;
-    case "agent_chat_folders_subfolders_subFolderId_GET":
-      return (
-        await import("next-vibe/agent/chat/folders/subfolders/[subFolderId]/definition")
-      ).default.GET;
-    case "agent_chat_folders_subfolders_subFolderId_move_PATCH":
-      return (
-        await import("next-vibe/agent/chat/folders/subfolders/[subFolderId]/move/definition")
-      ).default.PATCH;
-    case "agent_chat_folders_subfolders_subFolderId_permissions_GET":
-      return (
-        await import("next-vibe/agent/chat/folders/subfolders/[subFolderId]/permissions/definition")
-      ).default.GET;
-    case "agent_chat_folders_subfolders_subFolderId_permissions_PATCH":
-      return (
-        await import("next-vibe/agent/chat/folders/subfolders/[subFolderId]/permissions/definition")
-      ).default.PATCH;
-    case "agent_chat_folders_subfolders_subFolderId_rename_PATCH":
-      return (
-        await import("next-vibe/agent/chat/folders/subfolders/[subFolderId]/rename/definition")
-      ).default.PATCH;
-    case "agent_chat_folders_subfolders_subFolderId_update_PATCH":
-      return (
-        await import("next-vibe/agent/chat/folders/subfolders/[subFolderId]/update/definition")
-      ).default.PATCH;
-    case "agent_chat_public-feed_GET":
-      return (
-        await import("next-vibe/agent/chat/public-feed/definition")
-      ).default.GET;
-    case "agent_chat_settings_GET":
-      return (await import("next-vibe/agent/chat/settings/definition"))
-        .default.GET;
-    case "agent_chat_settings_POST":
-      return (await import("next-vibe/agent/chat/settings/definition"))
-        .default.POST;
-    case "agent_chat_threads_GET":
-      return (await import("next-vibe/agent/chat/threads/definition"))
-        .default.GET;
-    case "agent_chat_threads_POST":
-      return (await import("next-vibe/agent/chat/threads/definition"))
-        .default.POST;
-    case "agent_chat_threads_files_threadId_filename_GET":
-      return (
-        await import("next-vibe/agent/chat/threads/files/[threadId]/[filename]/definition")
-      ).default.GET;
-    case "agent_chat_threads_rename_PATCH":
-      return (
-        await import("next-vibe/agent/chat/threads/rename/definition")
-      ).default.PATCH;
-    case "agent_chat_threads_search-messages_GET":
-      return (
-        await import("next-vibe/agent/chat/threads/search-messages/definition")
-      ).default.GET;
-    case "agent_chat_threads_search-threads_GET":
-      return (
-        await import("next-vibe/agent/chat/threads/search-threads/definition")
-      ).default.GET;
-    case "agent_chat_threads_threadId_DELETE":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/definition")
-      ).default.DELETE;
-    case "agent_chat_threads_threadId_GET":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/definition")
-      ).default.GET;
-    case "agent_chat_threads_threadId_PATCH":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/definition")
-      ).default.PATCH;
-    case "agent_chat_threads_threadId_messages_GET":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/messages/definition")
-      ).default.GET;
-    case "agent_chat_threads_threadId_messages_POST":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/messages/definition")
-      ).default.POST;
-    case "agent_chat_threads_threadId_messages_messageId_DELETE":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/messages/[messageId]/definition")
-      ).default.DELETE;
-    case "agent_chat_threads_threadId_messages_messageId_GET":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/messages/[messageId]/definition")
-      ).default.GET;
-    case "agent_chat_threads_threadId_messages_messageId_PATCH":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/messages/[messageId]/definition")
-      ).default.PATCH;
-    case "agent_chat_threads_threadId_messages_messageId_vote_POST":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/messages/[messageId]/vote/definition")
-      ).default.POST;
-    case "agent_chat_threads_threadId_messages_path_GET":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/messages/path/definition")
-      ).default.GET;
-    case "agent_chat_threads_threadId_messages_search_GET":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/messages/search/definition")
-      ).default.GET;
-    case "agent_chat_threads_threadId_permissions_GET":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/permissions/definition")
-      ).default.GET;
-    case "agent_chat_threads_threadId_permissions_PATCH":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/permissions/definition")
-      ).default.PATCH;
+      return (await import("@/vibe/agent/view-image/definition")).default.POST;
     case "agent_chat_threads_threadId_share-links_DELETE":
       return (
-        await import("next-vibe/agent/chat/threads/[threadId]/share-links/definition")
+        await import("@/vibe/agent/chat/threads/[threadId]/share-links/definition")
       ).default.DELETE;
-    case "agent_chat_threads_threadId_share-links_GET":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/share-links/definition")
-      ).default.GET;
-    case "agent_chat_threads_threadId_share-links_PATCH":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/share-links/definition")
-      ).default.PATCH;
-    case "agent_chat_threads_threadId_share-links_POST":
-      return (
-        await import("next-vibe/agent/chat/threads/[threadId]/share-links/definition")
-      ).default.POST;
-    case "agent_coding-agent_POST":
-      return (await import("next-vibe/agent/coding-agent/definition"))
-        .default.POST;
-    case "agent_cortex_delete_DELETE":
-      return (await import("next-vibe/agent/cortex/delete/definition"))
-        .default.DELETE;
-    case "agent_cortex_edit_PATCH":
-      return (await import("next-vibe/agent/cortex/edit/definition"))
-        .default.PATCH;
-    case "agent_cortex_embeddings_backfill_POST":
-      return (
-        await import("next-vibe/agent/cortex/embeddings/backfill/definition")
-      ).default.POST;
-    case "agent_cortex_exec_POST":
-      return (await import("next-vibe/agent/cortex/exec/definition"))
-        .default.POST;
-    case "agent_cortex_list_GET":
-      return (await import("next-vibe/agent/cortex/list/definition"))
-        .default.GET;
-    case "agent_cortex_mkdir_POST":
-      return (await import("next-vibe/agent/cortex/mkdir/definition"))
-        .default.POST;
-    case "agent_cortex_move_POST":
-      return (await import("next-vibe/agent/cortex/move/definition"))
-        .default.POST;
-    case "agent_cortex_read_GET":
-      return (await import("next-vibe/agent/cortex/read/definition"))
-        .default.GET;
-    case "agent_cortex_search_GET":
-      return (await import("next-vibe/agent/cortex/search/definition"))
-        .default.GET;
-    case "agent_cortex_terminals_GET":
-      return (
-        await import("next-vibe/agent/cortex/terminals/definition")
-      ).default.GET;
-    case "agent_cortex_tree_GET":
-      return (await import("next-vibe/agent/cortex/tree/definition"))
-        .default.GET;
-    case "agent_cortex_write_POST":
-      return (await import("next-vibe/agent/cortex/write/definition"))
-        .default.POST;
-    case "agent_describe-image_POST":
-      return (
-        await import("next-vibe/agent/describe-image/definition")
-      ).default.POST;
-    case "agent_describe-video_POST":
-      return (
-        await import("next-vibe/agent/describe-video/definition")
-      ).default.POST;
-    case "agent_fetch-url-content_GET":
-      return (
-        await import("next-vibe/agent/fetch-url-content/definition")
-      ).default.GET;
-    case "agent_fetch-url-content_cleanup_POST":
-      return (
-        await import("next-vibe/agent/fetch-url-content/cleanup/definition")
-      ).default.POST;
-    case "agent_image-generation_POST":
-      return (
-        await import("next-vibe/agent/image-generation/definition")
-      ).default.POST;
-    case "agent_models_list_GET":
-      return (await import("next-vibe/agent/models/list/definition"))
-        .default.GET;
-    case "agent_models_model-prices_GET":
-      return (
-        await import("next-vibe/agent/models/model-prices/definition")
-      ).default.GET;
-    case "agent_music-generation_POST":
-      return (
-        await import("next-vibe/agent/music-generation/definition")
-      ).default.POST;
-    case "agent_skills_GET":
-      return (await import("next-vibe/agent/skills/definition"))
-        .default.GET;
-    case "agent_skills_create_POST":
-      return (await import("next-vibe/agent/skills/create/definition"))
-        .default.POST;
-    case "agent_skills_favorites_GET":
-      return (
-        await import("next-vibe/agent/skills/favorites/definition")
-      ).default.GET;
-    case "agent_skills_favorites_create_POST":
-      return (
-        await import("next-vibe/agent/skills/favorites/create/definition")
-      ).default.POST;
-    case "agent_skills_favorites_id_DELETE":
-      return (
-        await import("next-vibe/agent/skills/favorites/[id]/definition")
-      ).default.DELETE;
-    case "agent_skills_favorites_id_GET":
-      return (
-        await import("next-vibe/agent/skills/favorites/[id]/definition")
-      ).default.GET;
-    case "agent_skills_favorites_id_PATCH":
-      return (
-        await import("next-vibe/agent/skills/favorites/[id]/definition")
-      ).default.PATCH;
-    case "agent_skills_favorites_reorder_POST":
-      return (
-        await import("next-vibe/agent/skills/favorites/reorder/definition")
-      ).default.POST;
-    case "agent_skills_id_DELETE":
-      return (await import("next-vibe/agent/skills/[id]/definition"))
-        .default.DELETE;
-    case "agent_skills_id_GET":
-      return (await import("next-vibe/agent/skills/[id]/definition"))
-        .default.GET;
-    case "agent_skills_id_PATCH":
-      return (await import("next-vibe/agent/skills/[id]/definition"))
-        .default.PATCH;
-    case "agent_skills_id_publish_PATCH":
-      return (
-        await import("next-vibe/agent/skills/[id]/publish/definition")
-      ).default.PATCH;
-    case "agent_skills_id_report_POST":
-      return (
-        await import("next-vibe/agent/skills/[id]/report/definition")
-      ).default.POST;
-    case "agent_skills_id_vote_POST":
-      return (
-        await import("next-vibe/agent/skills/[id]/vote/definition")
-      ).default.POST;
-    case "agent_skills_moderation_GET":
-      return (
-        await import("next-vibe/agent/skills/moderation/definition")
-      ).default.GET;
-    case "agent_skills_moderation_PATCH":
-      return (
-        await import("next-vibe/agent/skills/moderation/definition")
-      ).default.PATCH;
-    case "agent_speech-to-text_POST":
-      return (
-        await import("next-vibe/agent/speech-to-text/definition")
-      ).default.POST;
-    case "agent_speech-to-text_hotkey_POST":
-      return (
-        await import("next-vibe/agent/speech-to-text/hotkey/definition")
-      ).default.POST;
-    case "agent_text-to-speech_POST":
-      return (
-        await import("next-vibe/agent/text-to-speech/definition")
-      ).default.POST;
-    case "agent_video-generation_POST":
-      return (
-        await import("next-vibe/agent/video-generation/definition")
-      ).default.POST;
-    case "agent_view-image_POST":
-      return (await import("next-vibe/agent/view-image/definition"))
-        .default.POST;
-    case "agent_web-search_GET":
-      return (await import("next-vibe/agent/web-search/definition"))
-        .default.GET;
-    case "agent_web-search_brave_GET":
-      return (
-        await import("next-vibe/agent/web-search/brave/definition")
-      ).default.GET;
-    case "agent_web-search_kagi_GET":
-      return (
-        await import("next-vibe/agent/web-search/kagi/definition")
-      ).default.GET;
     case "ai-run":
-      return (await import("next-vibe/agent/ai-stream/run/definition"))
-        .default.POST;
+      return (await import("@/vibe/agent/ai-stream/run/definition")).default
+        .POST;
     case "ai-stream":
-      return (
-        await import("next-vibe/agent/ai-stream/stream/definition")
-      ).default.POST;
+      return (await import("@/vibe/agent/ai-stream/stream/definition")).default
+        .POST;
     case "ai-tools":
-      return (await import("next-vibe/help-tool/definition"))
-        .default.GET;
+      return (await import("@/vibe/help-tool/definition")).default.GET;
     case "analytics_evaluators_and_POST":
-      return (
-        await import("@/analytics/evaluators/and/definition")
-      ).default.POST;
+      return (await import("@/analytics/evaluators/and/definition")).default
+        .POST;
     case "analytics_evaluators_crossover_POST":
-      return (
-        await import("@/analytics/evaluators/crossover/definition")
-      ).default.POST;
+      return (await import("@/analytics/evaluators/crossover/definition"))
+        .default.POST;
     case "analytics_evaluators_not_POST":
-      return (
-        await import("@/analytics/evaluators/not/definition")
-      ).default.POST;
+      return (await import("@/analytics/evaluators/not/definition")).default
+        .POST;
     case "analytics_evaluators_or_POST":
-      return (
-        await import("@/analytics/evaluators/or/definition")
-      ).default.POST;
+      return (await import("@/analytics/evaluators/or/definition")).default
+        .POST;
     case "analytics_evaluators_script_POST":
-      return (
-        await import("@/analytics/evaluators/script/definition")
-      ).default.POST;
+      return (await import("@/analytics/evaluators/script/definition")).default
+        .POST;
     case "analytics_evaluators_threshold_POST":
-      return (
-        await import("@/analytics/evaluators/threshold/definition")
-      ).default.POST;
+      return (await import("@/analytics/evaluators/threshold/definition"))
+        .default.POST;
     case "analytics_indicators_bollinger_POST":
-      return (
-        await import("@/analytics/indicators/bollinger/definition")
-      ).default.POST;
+      return (await import("@/analytics/indicators/bollinger/definition"))
+        .default.POST;
     case "analytics_indicators_clamp_POST":
-      return (
-        await import("@/analytics/indicators/clamp/definition")
-      ).default.POST;
+      return (await import("@/analytics/indicators/clamp/definition")).default
+        .POST;
     case "analytics_indicators_delta_POST":
-      return (
-        await import("@/analytics/indicators/delta/definition")
-      ).default.POST;
+      return (await import("@/analytics/indicators/delta/definition")).default
+        .POST;
     case "analytics_indicators_ema_POST":
-      return (
-        await import("@/analytics/indicators/ema/definition")
-      ).default.POST;
+      return (await import("@/analytics/indicators/ema/definition")).default
+        .POST;
     case "analytics_indicators_macd_POST":
-      return (
-        await import("@/analytics/indicators/macd/definition")
-      ).default.POST;
+      return (await import("@/analytics/indicators/macd/definition")).default
+        .POST;
     case "analytics_indicators_rsi_POST":
-      return (
-        await import("@/analytics/indicators/rsi/definition")
-      ).default.POST;
+      return (await import("@/analytics/indicators/rsi/definition")).default
+        .POST;
     case "analytics_indicators_window-avg_POST":
-      return (
-        await import("@/analytics/indicators/window-avg/definition")
-      ).default.POST;
+      return (await import("@/analytics/indicators/window-avg/definition"))
+        .default.POST;
     case "analytics_indicators_window-max_POST":
-      return (
-        await import("@/analytics/indicators/window-max/definition")
-      ).default.POST;
+      return (await import("@/analytics/indicators/window-max/definition"))
+        .default.POST;
     case "analytics_indicators_window-min_POST":
-      return (
-        await import("@/analytics/indicators/window-min/definition")
-      ).default.POST;
+      return (await import("@/analytics/indicators/window-min/definition"))
+        .default.POST;
     case "analytics_indicators_window-sum_POST":
-      return (
-        await import("@/analytics/indicators/window-sum/definition")
-      ).default.POST;
+      return (await import("@/analytics/indicators/window-sum/definition"))
+        .default.POST;
     case "analytics_transformers_field-pick_POST":
-      return (
-        await import("@/analytics/transformers/field-pick/definition")
-      ).default.POST;
+      return (await import("@/analytics/transformers/field-pick/definition"))
+        .default.POST;
     case "analytics_transformers_json-path_POST":
-      return (
-        await import("@/analytics/transformers/json-path/definition")
-      ).default.POST;
+      return (await import("@/analytics/transformers/json-path/definition"))
+        .default.POST;
     case "analytics_transformers_merge_POST":
-      return (
-        await import("@/analytics/transformers/merge/definition")
-      ).default.POST;
+      return (await import("@/analytics/transformers/merge/definition")).default
+        .POST;
     case "analytics_transformers_ratio_POST":
-      return (
-        await import("@/analytics/transformers/ratio/definition")
-      ).default.POST;
+      return (await import("@/analytics/transformers/ratio/definition")).default
+        .POST;
     case "analytics_transformers_script_POST":
-      return (
-        await import("@/analytics/transformers/script/definition")
-      ).default.POST;
+      return (await import("@/analytics/transformers/script/definition"))
+        .default.POST;
     case "await-task":
-      return (
-        await import("next-vibe/execute-tool/await-task/definition")
-      ).default.POST;
+      return (await import("@/vibe/execute-tool/await-task/definition")).default
+        .POST;
     case "b":
-      return (
-        await import("next-vibe/server/server/build/definition")
-      ).default.POST;
+      return (await import("@/vibe/server/server/build/definition")).default
+        .POST;
     case "bounce-processor":
-      return (
-        await import("@/leads/campaigns/bounce-processor/definition")
-      ).default.POST;
+      return (await import("@/leads/campaigns/bounce-processor/definition"))
+        .default.POST;
     case "brave-search":
-      return (
-        await import("next-vibe/agent/web-search/brave/definition")
-      ).default.GET;
+      return (await import("@/vibe/agent/web-search/brave/definition")).default
+        .GET;
     case "browser-click":
-      return (await import("@/browser/click/definition"))
-        .default.POST;
+      return (await import("@/browser/click/definition")).default.POST;
     case "browser-close-page":
-      return (await import("@/browser/close-page/definition"))
-        .default.POST;
+      return (await import("@/browser/close-page/definition")).default.POST;
     case "browser-drag":
-      return (await import("@/browser/drag/definition"))
-        .default.POST;
+      return (await import("@/browser/drag/definition")).default.POST;
     case "browser-emulate":
-      return (await import("@/browser/emulate/definition"))
-        .default.POST;
+      return (await import("@/browser/emulate/definition")).default.POST;
     case "browser-eval":
-      return (
-        await import("@/browser/evaluate-script/definition")
-      ).default.POST;
+      return (await import("@/browser/evaluate-script/definition")).default
+        .POST;
     case "browser-fill":
-      return (await import("@/browser/fill/definition"))
-        .default.POST;
+      return (await import("@/browser/fill/definition")).default.POST;
     case "browser-fill-form":
-      return (await import("@/browser/fill-form/definition"))
-        .default.POST;
+      return (await import("@/browser/fill-form/definition")).default.POST;
     case "browser-get-console-message":
-      return (
-        await import("@/browser/get-console-message/definition")
-      ).default.POST;
+      return (await import("@/browser/get-console-message/definition")).default
+        .POST;
     case "browser-get-network-request":
-      return (
-        await import("@/browser/get-network-request/definition")
-      ).default.POST;
+      return (await import("@/browser/get-network-request/definition")).default
+        .POST;
     case "browser-handle-dialog":
-      return (
-        await import("@/browser/handle-dialog/definition")
-      ).default.POST;
+      return (await import("@/browser/handle-dialog/definition")).default.POST;
     case "browser-hover":
-      return (await import("@/browser/hover/definition"))
-        .default.POST;
+      return (await import("@/browser/hover/definition")).default.POST;
     case "browser-list-console-messages":
-      return (
-        await import("@/browser/list-console-messages/definition")
-      ).default.POST;
+      return (await import("@/browser/list-console-messages/definition"))
+        .default.POST;
     case "browser-list-network-requests":
-      return (
-        await import("@/browser/list-network-requests/definition")
-      ).default.POST;
+      return (await import("@/browser/list-network-requests/definition"))
+        .default.POST;
     case "browser-list-pages":
-      return (await import("@/browser/list-pages/definition"))
-        .default.POST;
+      return (await import("@/browser/list-pages/definition")).default.POST;
     case "browser-navigate-page":
-      return (
-        await import("@/browser/navigate-page/definition")
-      ).default.POST;
+      return (await import("@/browser/navigate-page/definition")).default.POST;
     case "browser-new-page":
-      return (await import("@/browser/new-page/definition"))
-        .default.POST;
+      return (await import("@/browser/new-page/definition")).default.POST;
     case "browser-performance-analyze-insight":
-      return (
-        await import("@/browser/performance-analyze-insight/definition")
-      ).default.POST;
+      return (await import("@/browser/performance-analyze-insight/definition"))
+        .default.POST;
     case "browser-performance-start-trace":
-      return (
-        await import("@/browser/performance-start-trace/definition")
-      ).default.POST;
+      return (await import("@/browser/performance-start-trace/definition"))
+        .default.POST;
     case "browser-performance-stop-trace":
-      return (
-        await import("@/browser/performance-stop-trace/definition")
-      ).default.POST;
+      return (await import("@/browser/performance-stop-trace/definition"))
+        .default.POST;
     case "browser-press-key":
-      return (await import("@/browser/press-key/definition"))
-        .default.POST;
+      return (await import("@/browser/press-key/definition")).default.POST;
     case "browser-resize-page":
-      return (await import("@/browser/resize-page/definition"))
-        .default.POST;
+      return (await import("@/browser/resize-page/definition")).default.POST;
     case "browser-screenshot":
-      return (
-        await import("@/browser/take-screenshot/definition")
-      ).default.POST;
+      return (await import("@/browser/take-screenshot/definition")).default
+        .POST;
     case "browser-select-page":
-      return (await import("@/browser/select-page/definition"))
-        .default.POST;
+      return (await import("@/browser/select-page/definition")).default.POST;
     case "browser-take-snapshot":
-      return (
-        await import("@/browser/take-snapshot/definition")
-      ).default.POST;
+      return (await import("@/browser/take-snapshot/definition")).default.POST;
     case "browser-upload-file":
-      return (await import("@/browser/upload-file/definition"))
-        .default.POST;
+      return (await import("@/browser/upload-file/definition")).default.POST;
     case "browser-wait-for":
-      return (await import("@/browser/wait-for/definition"))
-        .default.POST;
+      return (await import("@/browser/wait-for/definition")).default.POST;
     case "browser_click_POST":
-      return (await import("@/browser/click/definition"))
-        .default.POST;
+      return (await import("@/browser/click/definition")).default.POST;
     case "browser_close-page_POST":
-      return (await import("@/browser/close-page/definition"))
-        .default.POST;
+      return (await import("@/browser/close-page/definition")).default.POST;
     case "browser_drag_POST":
-      return (await import("@/browser/drag/definition"))
-        .default.POST;
+      return (await import("@/browser/drag/definition")).default.POST;
     case "browser_emulate_POST":
-      return (await import("@/browser/emulate/definition"))
-        .default.POST;
+      return (await import("@/browser/emulate/definition")).default.POST;
     case "browser_evaluate-script_POST":
-      return (
-        await import("@/browser/evaluate-script/definition")
-      ).default.POST;
+      return (await import("@/browser/evaluate-script/definition")).default
+        .POST;
     case "browser_fill-form_POST":
-      return (await import("@/browser/fill-form/definition"))
-        .default.POST;
+      return (await import("@/browser/fill-form/definition")).default.POST;
     case "browser_fill_POST":
-      return (await import("@/browser/fill/definition"))
-        .default.POST;
+      return (await import("@/browser/fill/definition")).default.POST;
     case "browser_get-console-message_POST":
-      return (
-        await import("@/browser/get-console-message/definition")
-      ).default.POST;
+      return (await import("@/browser/get-console-message/definition")).default
+        .POST;
     case "browser_get-network-request_POST":
-      return (
-        await import("@/browser/get-network-request/definition")
-      ).default.POST;
+      return (await import("@/browser/get-network-request/definition")).default
+        .POST;
     case "browser_handle-dialog_POST":
-      return (
-        await import("@/browser/handle-dialog/definition")
-      ).default.POST;
+      return (await import("@/browser/handle-dialog/definition")).default.POST;
     case "browser_hover_POST":
-      return (await import("@/browser/hover/definition"))
-        .default.POST;
+      return (await import("@/browser/hover/definition")).default.POST;
     case "browser_list-console-messages_POST":
-      return (
-        await import("@/browser/list-console-messages/definition")
-      ).default.POST;
+      return (await import("@/browser/list-console-messages/definition"))
+        .default.POST;
     case "browser_list-network-requests_POST":
-      return (
-        await import("@/browser/list-network-requests/definition")
-      ).default.POST;
+      return (await import("@/browser/list-network-requests/definition"))
+        .default.POST;
     case "browser_list-pages_POST":
-      return (await import("@/browser/list-pages/definition"))
-        .default.POST;
+      return (await import("@/browser/list-pages/definition")).default.POST;
     case "browser_navigate-page_POST":
-      return (
-        await import("@/browser/navigate-page/definition")
-      ).default.POST;
+      return (await import("@/browser/navigate-page/definition")).default.POST;
     case "browser_new-page_POST":
-      return (await import("@/browser/new-page/definition"))
-        .default.POST;
+      return (await import("@/browser/new-page/definition")).default.POST;
     case "browser_performance-analyze-insight_POST":
-      return (
-        await import("@/browser/performance-analyze-insight/definition")
-      ).default.POST;
+      return (await import("@/browser/performance-analyze-insight/definition"))
+        .default.POST;
     case "browser_performance-start-trace_POST":
-      return (
-        await import("@/browser/performance-start-trace/definition")
-      ).default.POST;
+      return (await import("@/browser/performance-start-trace/definition"))
+        .default.POST;
     case "browser_performance-stop-trace_POST":
-      return (
-        await import("@/browser/performance-stop-trace/definition")
-      ).default.POST;
+      return (await import("@/browser/performance-stop-trace/definition"))
+        .default.POST;
     case "browser_press-key_POST":
-      return (await import("@/browser/press-key/definition"))
-        .default.POST;
+      return (await import("@/browser/press-key/definition")).default.POST;
     case "browser_resize-page_POST":
-      return (await import("@/browser/resize-page/definition"))
-        .default.POST;
+      return (await import("@/browser/resize-page/definition")).default.POST;
     case "browser_select-page_POST":
-      return (await import("@/browser/select-page/definition"))
-        .default.POST;
+      return (await import("@/browser/select-page/definition")).default.POST;
     case "browser_take-screenshot_POST":
-      return (
-        await import("@/browser/take-screenshot/definition")
-      ).default.POST;
+      return (await import("@/browser/take-screenshot/definition")).default
+        .POST;
     case "browser_take-snapshot_POST":
-      return (
-        await import("@/browser/take-snapshot/definition")
-      ).default.POST;
+      return (await import("@/browser/take-snapshot/definition")).default.POST;
     case "browser_upload-file_POST":
-      return (await import("@/browser/upload-file/definition"))
-        .default.POST;
+      return (await import("@/browser/upload-file/definition")).default.POST;
     case "browser_wait-for_POST":
-      return (await import("@/browser/wait-for/definition"))
-        .default.POST;
+      return (await import("@/browser/wait-for/definition")).default.POST;
     case "build":
-      return (
-        await import("next-vibe/server/server/build/definition")
-      ).default.POST;
+      return (await import("@/vibe/server/server/build/definition")).default
+        .POST;
     case "builder":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/builder/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/builder/definition"
         )
       ).default.POST;
     case "c":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/vibe-check/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/vibe-check/definition"
         )
       ).default.POST;
     case "campaign-journey-variants":
-      return (
-        await import("@/leads/campaigns/journey-variants/definition")
-      ).default.GET;
+      return (await import("@/leads/campaigns/journey-variants/definition"))
+        .default.GET;
     case "campaign-queue":
-      return (
-        await import("@/leads/campaigns/queue/definition")
-      ).default.GET;
+      return (await import("@/leads/campaigns/queue/definition")).default.GET;
     case "campaign-starter":
-      return (
-        await import("@/leads/campaigns/campaign-starter/definition")
-      ).default.POST;
+      return (await import("@/leads/campaigns/campaign-starter/definition"))
+        .default.POST;
     case "campaign-stats":
-      return (
-        await import("@/leads/campaigns/stats/definition")
-      ).default.GET;
+      return (await import("@/leads/campaigns/stats/definition")).default.GET;
     case "cancel":
       return (
-        await import("next-vibe/execute-tool/call-control/cancel/definition")
+        await import("@/vibe/execute-tool/call-control/cancel/definition")
       ).default.POST;
     case "cancel-subscription":
-      return (await import("@/subscription/cancel/definition"))
-        .default.DELETE;
+      return (await import("@/subscription/cancel/definition")).default.DELETE;
     case "catalog-product-get":
-      return (
-        await import("@/products/catalog/[productId]/get/definition")
-      ).default.GET;
+      return (await import("@/products/catalog/[productId]/get/definition"))
+        .default.GET;
     case "cc":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/config/create/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/config/create/definition"
         )
       ).default.POST;
     case "chart-of-accounts_account_accountId_deactivate_POST":
@@ -803,21 +334,17 @@ async function importEndpoint(
         await import("@/chart-of-accounts/account/[accountId]/update/definition")
       ).default.PATCH;
     case "chart-of-accounts_account_create_POST":
-      return (
-        await import("@/chart-of-accounts/account/create/definition")
-      ).default.POST;
+      return (await import("@/chart-of-accounts/account/create/definition"))
+        .default.POST;
     case "chart-of-accounts_account_list_GET":
-      return (
-        await import("@/chart-of-accounts/account/list/definition")
-      ).default.GET;
+      return (await import("@/chart-of-accounts/account/list/definition"))
+        .default.GET;
     case "chart-of-accounts_dashboard_GET":
-      return (
-        await import("@/chart-of-accounts/dashboard/definition")
-      ).default.GET;
+      return (await import("@/chart-of-accounts/dashboard/definition")).default
+        .GET;
     case "chart-of-accounts_journal_create_POST":
-      return (
-        await import("@/chart-of-accounts/journal/create/definition")
-      ).default.POST;
+      return (await import("@/chart-of-accounts/journal/create/definition"))
+        .default.POST;
     case "chart-of-accounts_journal_entryId_get_GET":
       return (
         await import("@/chart-of-accounts/journal/[entryId]/get/definition")
@@ -831,21 +358,17 @@ async function importEndpoint(
         await import("@/chart-of-accounts/journal/[entryId]/reverse/definition")
       ).default.POST;
     case "chart-of-accounts_journal_list_GET":
-      return (
-        await import("@/chart-of-accounts/journal/list/definition")
-      ).default.GET;
+      return (await import("@/chart-of-accounts/journal/list/definition"))
+        .default.GET;
     case "chart-of-accounts_ledger_accountId_GET":
-      return (
-        await import("@/chart-of-accounts/ledger/[accountId]/definition")
-      ).default.GET;
+      return (await import("@/chart-of-accounts/ledger/[accountId]/definition"))
+        .default.GET;
     case "chart-of-accounts_period_create_POST":
-      return (
-        await import("@/chart-of-accounts/period/create/definition")
-      ).default.POST;
+      return (await import("@/chart-of-accounts/period/create/definition"))
+        .default.POST;
     case "chart-of-accounts_period_list_GET":
-      return (
-        await import("@/chart-of-accounts/period/list/definition")
-      ).default.GET;
+      return (await import("@/chart-of-accounts/period/list/definition"))
+        .default.GET;
     case "chart-of-accounts_period_periodId_close_POST":
       return (
         await import("@/chart-of-accounts/period/[periodId]/close/definition")
@@ -867,102 +390,96 @@ async function importEndpoint(
         await import("@/chart-of-accounts/reports/receivables-aging/definition")
       ).default.GET;
     case "chart-of-accounts_reports_tax-report_GET":
-      return (
-        await import("@/chart-of-accounts/reports/tax-report/definition")
-      ).default.GET;
+      return (await import("@/chart-of-accounts/reports/tax-report/definition"))
+        .default.GET;
     case "chart-of-accounts_reports_trial-balance_GET":
       return (
         await import("@/chart-of-accounts/reports/trial-balance/definition")
       ).default.GET;
     case "chart-of-accounts_setup_POST":
-      return (
-        await import("@/chart-of-accounts/setup/definition")
-      ).default.POST;
+      return (await import("@/chart-of-accounts/setup/definition")).default
+        .POST;
     case "chat-downvotes-total":
       return (
-        await import("next-vibe/agent/chat/data-sources/chat-downvotes-total/definition")
+        await import("@/vibe/agent/chat/data-sources/chat-downvotes-total/definition")
       ).default.POST;
     case "chat-errors-total":
       return (
-        await import("next-vibe/agent/chat/data-sources/chat-errors-total/definition")
+        await import("@/vibe/agent/chat/data-sources/chat-errors-total/definition")
       ).default.POST;
     case "chat-memories-created":
       return (
-        await import("next-vibe/agent/chat/data-sources/chat-memories-created/definition")
+        await import("@/vibe/agent/chat/data-sources/chat-memories-created/definition")
       ).default.POST;
     case "chat-messages-by-ai":
       return (
-        await import("next-vibe/agent/chat/data-sources/chat-messages-by-ai/definition")
+        await import("@/vibe/agent/chat/data-sources/chat-messages-by-ai/definition")
       ).default.POST;
     case "chat-messages-by-user":
       return (
-        await import("next-vibe/agent/chat/data-sources/chat-messages-by-user/definition")
+        await import("@/vibe/agent/chat/data-sources/chat-messages-by-user/definition")
       ).default.POST;
     case "chat-messages-total":
       return (
-        await import("next-vibe/agent/chat/data-sources/chat-messages-total/definition")
+        await import("@/vibe/agent/chat/data-sources/chat-messages-total/definition")
       ).default.POST;
     case "chat-messages-with-attachments":
       return (
-        await import("next-vibe/agent/chat/data-sources/chat-messages-with-attachments/definition")
+        await import("@/vibe/agent/chat/data-sources/chat-messages-with-attachments/definition")
       ).default.POST;
     case "chat-settings":
-      return (await import("next-vibe/agent/chat/settings/definition"))
-        .default.GET;
+      return (await import("@/vibe/agent/chat/settings/definition")).default
+        .GET;
     case "chat-settings-update":
-      return (await import("next-vibe/agent/chat/settings/definition"))
-        .default.POST;
+      return (await import("@/vibe/agent/chat/settings/definition")).default
+        .POST;
     case "chat-share-links-created":
       return (
-        await import("next-vibe/agent/chat/data-sources/chat-share-links-created/definition")
+        await import("@/vibe/agent/chat/data-sources/chat-share-links-created/definition")
       ).default.POST;
     case "chat-threads-active-total":
       return (
-        await import("next-vibe/agent/chat/data-sources/chat-threads-active-total/definition")
+        await import("@/vibe/agent/chat/data-sources/chat-threads-active-total/definition")
       ).default.POST;
     case "chat-threads-created":
       return (
-        await import("next-vibe/agent/chat/data-sources/chat-threads-created/definition")
+        await import("@/vibe/agent/chat/data-sources/chat-threads-created/definition")
       ).default.POST;
     case "chat-tool-calls-total":
       return (
-        await import("next-vibe/agent/chat/data-sources/chat-tool-calls-total/definition")
+        await import("@/vibe/agent/chat/data-sources/chat-tool-calls-total/definition")
       ).default.POST;
     case "chat-unique-users":
       return (
-        await import("next-vibe/agent/chat/data-sources/chat-unique-users/definition")
+        await import("@/vibe/agent/chat/data-sources/chat-unique-users/definition")
       ).default.POST;
     case "chat-upvotes-total":
       return (
-        await import("next-vibe/agent/chat/data-sources/chat-upvotes-total/definition")
+        await import("@/vibe/agent/chat/data-sources/chat-upvotes-total/definition")
       ).default.POST;
     case "check":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/vibe-check/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/vibe-check/definition"
         )
       ).default.POST;
     case "claude":
-      return (await import("next-vibe/agent/coding-agent/definition"))
-        .default.POST;
+      return (await import("@/vibe/agent/coding-agent/definition")).default
+        .POST;
     case "claude-code":
-      return (await import("next-vibe/agent/coding-agent/definition"))
-        .default.POST;
+      return (await import("@/vibe/agent/coding-agent/definition")).default
+        .POST;
     case "click-tracking":
-      return (await import("@/leads/tracking/definition"))
-        .default.GET;
+      return (await import("@/leads/tracking/definition")).default.GET;
     case "cluster-init":
-      return (
-        await import("next-vibe/tooling/infra/cluster/init/definition")
-      ).default.POST;
+      return (await import("@/vibe/tooling/infra/cluster/init/definition"))
+        .default.POST;
     case "cluster-status":
-      return (
-        await import("next-vibe/tooling/infra/cluster/status/definition")
-      ).default.GET;
+      return (await import("@/vibe/tooling/infra/cluster/status/definition"))
+        .default.GET;
     case "coa-account-create":
-      return (
-        await import("@/chart-of-accounts/account/create/definition")
-      ).default.POST;
+      return (await import("@/chart-of-accounts/account/create/definition"))
+        .default.POST;
     case "coa-account-deactivate":
       return (
         await import("@/chart-of-accounts/account/[accountId]/deactivate/definition")
@@ -972,9 +489,8 @@ async function importEndpoint(
         await import("@/chart-of-accounts/account/[accountId]/get/definition")
       ).default.GET;
     case "coa-account-list":
-      return (
-        await import("@/chart-of-accounts/account/list/definition")
-      ).default.GET;
+      return (await import("@/chart-of-accounts/account/list/definition"))
+        .default.GET;
     case "coa-account-update":
       return (
         await import("@/chart-of-accounts/account/[accountId]/update/definition")
@@ -984,17 +500,15 @@ async function importEndpoint(
         await import("@/chart-of-accounts/reports/balance-sheet/definition")
       ).default.GET;
     case "coa-journal-create":
-      return (
-        await import("@/chart-of-accounts/journal/create/definition")
-      ).default.POST;
+      return (await import("@/chart-of-accounts/journal/create/definition"))
+        .default.POST;
     case "coa-journal-entry-get":
       return (
         await import("@/chart-of-accounts/journal/[entryId]/get/definition")
       ).default.GET;
     case "coa-journal-list":
-      return (
-        await import("@/chart-of-accounts/journal/list/definition")
-      ).default.GET;
+      return (await import("@/chart-of-accounts/journal/list/definition"))
+        .default.GET;
     case "coa-journal-post":
       return (
         await import("@/chart-of-accounts/journal/[entryId]/post/definition")
@@ -1004,25 +518,22 @@ async function importEndpoint(
         await import("@/chart-of-accounts/journal/[entryId]/reverse/definition")
       ).default.POST;
     case "coa-ledger":
-      return (
-        await import("@/chart-of-accounts/ledger/[accountId]/definition")
-      ).default.GET;
+      return (await import("@/chart-of-accounts/ledger/[accountId]/definition"))
+        .default.GET;
     case "coa-period-close":
       return (
         await import("@/chart-of-accounts/period/[periodId]/close/definition")
       ).default.POST;
     case "coa-period-create":
-      return (
-        await import("@/chart-of-accounts/period/create/definition")
-      ).default.POST;
+      return (await import("@/chart-of-accounts/period/create/definition"))
+        .default.POST;
     case "coa-period-get":
       return (
         await import("@/chart-of-accounts/period/[periodId]/get/definition")
       ).default.GET;
     case "coa-period-list":
-      return (
-        await import("@/chart-of-accounts/period/list/definition")
-      ).default.GET;
+      return (await import("@/chart-of-accounts/period/list/definition"))
+        .default.GET;
     case "coa-profit-loss":
       return (
         await import("@/chart-of-accounts/reports/profit-loss/definition")
@@ -1032,35 +543,29 @@ async function importEndpoint(
         await import("@/chart-of-accounts/reports/receivables-aging/definition")
       ).default.GET;
     case "coa-setup":
-      return (
-        await import("@/chart-of-accounts/setup/definition")
-      ).default.POST;
+      return (await import("@/chart-of-accounts/setup/definition")).default
+        .POST;
     case "coa-tax-report":
-      return (
-        await import("@/chart-of-accounts/reports/tax-report/definition")
-      ).default.GET;
+      return (await import("@/chart-of-accounts/reports/tax-report/definition"))
+        .default.GET;
     case "coa-trial-balance":
       return (
         await import("@/chart-of-accounts/reports/trial-balance/definition")
       ).default.GET;
     case "coding-agent":
-      return (await import("next-vibe/agent/coding-agent/definition"))
-        .default.POST;
+      return (await import("@/vibe/agent/coding-agent/definition")).default
+        .POST;
     case "companies-list":
-      return (await import("@/companies/list/definition"))
-        .default.GET;
+      return (await import("@/companies/list/definition")).default.GET;
     case "companies_companyId_get_GET":
-      return (
-        await import("@/companies/[companyId]/get/definition")
-      ).default.GET;
+      return (await import("@/companies/[companyId]/get/definition")).default
+        .GET;
     case "companies_companyId_members_invite_POST":
-      return (
-        await import("@/companies/[companyId]/members/invite/definition")
-      ).default.POST;
+      return (await import("@/companies/[companyId]/members/invite/definition"))
+        .default.POST;
     case "companies_companyId_members_list_GET":
-      return (
-        await import("@/companies/[companyId]/members/list/definition")
-      ).default.GET;
+      return (await import("@/companies/[companyId]/members/list/definition"))
+        .default.GET;
     case "companies_companyId_members_memberId_remove_POST":
       return (
         await import("@/companies/[companyId]/members/[memberId]/remove/definition")
@@ -1070,95 +575,79 @@ async function importEndpoint(
         await import("@/companies/[companyId]/members/[memberId]/update-role/definition")
       ).default.PATCH;
     case "companies_companyId_onboard_POST":
-      return (
-        await import("@/companies/[companyId]/onboard/definition")
-      ).default.POST;
-    case "companies_companyId_update_PATCH":
-      return (
-        await import("@/companies/[companyId]/update/definition")
-      ).default.PATCH;
-    case "companies_create_POST":
-      return (await import("@/companies/create/definition"))
+      return (await import("@/companies/[companyId]/onboard/definition"))
         .default.POST;
+    case "companies_companyId_update_PATCH":
+      return (await import("@/companies/[companyId]/update/definition")).default
+        .PATCH;
+    case "companies_create_POST":
+      return (await import("@/companies/create/definition")).default.POST;
     case "companies_list_GET":
-      return (await import("@/companies/list/definition"))
-        .default.GET;
+      return (await import("@/companies/list/definition")).default.GET;
     case "company-members-list":
-      return (
-        await import("@/companies/[companyId]/members/list/definition")
-      ).default.GET;
+      return (await import("@/companies/[companyId]/members/list/definition"))
+        .default.GET;
     case "complete-task":
-      return (
-        await import("next-vibe/execute-tool/complete/definition")
-      ).default.POST;
+      return (await import("@/vibe/execute-tool/complete/definition")).default
+        .POST;
     case "config":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/config/create/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/config/create/definition"
         )
       ).default.POST;
     case "config-create":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/config/create/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/config/create/definition"
         )
       ).default.POST;
     case "connect-remote":
-      return (
-        await import("next-vibe/remote-connection/connect/definition")
-      ).default.POST;
+      return (await import("@/vibe/remote-connection/connect/definition"))
+        .default.POST;
     case "connection-status":
-      return (
-        await import("next-vibe/remote-connection/[instanceId]/definition")
-      ).default.GET;
+      return (await import("@/vibe/remote-connection/[instanceId]/definition"))
+        .default.GET;
     case "contact-form":
-      return (await import("@/contact/definition")).default
-        .POST;
+      return (await import("@/contact/definition")).default.POST;
     case "contact_POST":
-      return (await import("@/contact/definition")).default
-        .POST;
+      return (await import("@/contact/definition")).default.POST;
     case "cortex-delete":
-      return (await import("next-vibe/agent/cortex/delete/definition"))
-        .default.DELETE;
+      return (await import("@/vibe/agent/cortex/delete/definition")).default
+        .DELETE;
     case "cortex-edit":
-      return (await import("next-vibe/agent/cortex/edit/definition"))
-        .default.PATCH;
+      return (await import("@/vibe/agent/cortex/edit/definition")).default
+        .PATCH;
     case "cortex-embed-backfill":
       return (
-        await import("next-vibe/agent/cortex/embeddings/backfill/definition")
+        await import("@/vibe/agent/cortex/embeddings/backfill/definition")
       ).default.POST;
     case "cortex-exec":
-      return (await import("next-vibe/agent/cortex/exec/definition"))
-        .default.POST;
+      return (await import("@/vibe/agent/cortex/exec/definition")).default.POST;
     case "cortex-list":
-      return (await import("next-vibe/agent/cortex/list/definition"))
-        .default.GET;
+      return (await import("@/vibe/agent/cortex/list/definition")).default.GET;
     case "cortex-mkdir":
-      return (await import("next-vibe/agent/cortex/mkdir/definition"))
-        .default.POST;
+      return (await import("@/vibe/agent/cortex/mkdir/definition")).default
+        .POST;
     case "cortex-move":
-      return (await import("next-vibe/agent/cortex/move/definition"))
-        .default.POST;
+      return (await import("@/vibe/agent/cortex/move/definition")).default.POST;
     case "cortex-read":
-      return (await import("next-vibe/agent/cortex/read/definition"))
-        .default.GET;
+      return (await import("@/vibe/agent/cortex/read/definition")).default.GET;
     case "cortex-search":
-      return (await import("next-vibe/agent/cortex/search/definition"))
-        .default.GET;
+      return (await import("@/vibe/agent/cortex/search/definition")).default
+        .GET;
     case "cortex-terminals":
-      return (
-        await import("next-vibe/agent/cortex/terminals/definition")
-      ).default.GET;
+      return (await import("@/vibe/agent/cortex/terminals/definition")).default
+        .GET;
     case "cortex-tree":
-      return (await import("next-vibe/agent/cortex/tree/definition"))
-        .default.GET;
+      return (await import("@/vibe/agent/cortex/tree/definition")).default.GET;
     case "cortex-write":
-      return (await import("next-vibe/agent/cortex/write/definition"))
-        .default.POST;
+      return (await import("@/vibe/agent/cortex/write/definition")).default
+        .POST;
     case "create-config":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/config/create/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/config/create/definition"
         )
       ).default.POST;
     case "credits-avg-transaction":
@@ -1166,20 +655,17 @@ async function importEndpoint(
         await import("@/credits/data-sources/credits-avg-transaction/definition")
       ).default.POST;
     case "credits-balance":
-      return (await import("@/credits/definition")).default
-        .GET;
+      return (await import("@/credits/definition")).default.GET;
     case "credits-balance-total":
       return (
         await import("@/credits/data-sources/credits-balance-total/definition")
       ).default.POST;
     case "credits-earned":
-      return (
-        await import("@/credits/data-sources/credits-earned/definition")
-      ).default.POST;
+      return (await import("@/credits/data-sources/credits-earned/definition"))
+        .default.POST;
     case "credits-expired":
-      return (
-        await import("@/credits/data-sources/credits-expired/definition")
-      ).default.POST;
+      return (await import("@/credits/data-sources/credits-expired/definition"))
+        .default.POST;
     case "credits-free-grants":
       return (
         await import("@/credits/data-sources/credits-free-grants/definition")
@@ -1193,8 +679,7 @@ async function importEndpoint(
         await import("@/credits/data-sources/credits-packs-created/definition")
       ).default.POST;
     case "credits-public-cap":
-      return (await import("@/credits/public-cap/definition"))
-        .default.GET;
+      return (await import("@/credits/public-cap/definition")).default.GET;
     case "credits-purchased":
       return (
         await import("@/credits/data-sources/credits-purchased/definition")
@@ -1236,11 +721,9 @@ async function importEndpoint(
         await import("@/credits/data-sources/credits-wallets-total/definition")
       ).default.POST;
     case "credits_GET":
-      return (await import("@/credits/definition")).default
-        .GET;
+      return (await import("@/credits/definition")).default.GET;
     case "credits_admin-add_POST":
-      return (await import("@/credits/admin-add/definition"))
-        .default.POST;
+      return (await import("@/credits/admin-add/definition")).default.POST;
     case "credits_data-sources_credits-avg-transaction_POST":
       return (
         await import("@/credits/data-sources/credits-avg-transaction/definition")
@@ -1250,13 +733,11 @@ async function importEndpoint(
         await import("@/credits/data-sources/credits-balance-total/definition")
       ).default.POST;
     case "credits_data-sources_credits-earned_POST":
-      return (
-        await import("@/credits/data-sources/credits-earned/definition")
-      ).default.POST;
+      return (await import("@/credits/data-sources/credits-earned/definition"))
+        .default.POST;
     case "credits_data-sources_credits-expired_POST":
-      return (
-        await import("@/credits/data-sources/credits-expired/definition")
-      ).default.POST;
+      return (await import("@/credits/data-sources/credits-expired/definition"))
+        .default.POST;
     case "credits_data-sources_credits-free-grants_POST":
       return (
         await import("@/credits/data-sources/credits-free-grants/definition")
@@ -1310,603 +791,461 @@ async function importEndpoint(
         await import("@/credits/data-sources/credits-wallets-total/definition")
       ).default.POST;
     case "credits_expire_POST":
-      return (await import("@/credits/expire/definition"))
-        .default.POST;
+      return (await import("@/credits/expire/definition")).default.POST;
     case "credits_history_GET":
-      return (await import("@/credits/history/definition"))
-        .default.GET;
+      return (await import("@/credits/history/definition")).default.GET;
     case "credits_public-cap_GET":
-      return (await import("@/credits/public-cap/definition"))
-        .default.GET;
+      return (await import("@/credits/public-cap/definition")).default.GET;
     case "credits_public-cap_POST":
-      return (await import("@/credits/public-cap/definition"))
-        .default.POST;
+      return (await import("@/credits/public-cap/definition")).default.POST;
     case "credits_purchase_POST":
-      return (await import("@/credits/purchase/definition"))
-        .default.POST;
+      return (await import("@/credits/purchase/definition")).default.POST;
     case "cron-create":
-      return (
-        await import("next-vibe/tasks/cron/tasks/definition")
-      ).default.POST;
+      return (await import("@/vibe/tasks/cron/tasks/definition")).default.POST;
     case "cron-delete":
-      return (
-        await import("next-vibe/tasks/cron/[id]/definition")
-      ).default.DELETE;
+      return (await import("@/vibe/tasks/cron/[id]/definition")).default.DELETE;
     case "cron-executions-failed":
       return (
-        await import("next-vibe/tasks/data-sources/cron-executions-failed/definition")
+        await import("@/vibe/tasks/data-sources/cron-executions-failed/definition")
       ).default.POST;
     case "cron-executions-succeeded":
       return (
-        await import("next-vibe/tasks/data-sources/cron-executions-succeeded/definition")
+        await import("@/vibe/tasks/data-sources/cron-executions-succeeded/definition")
       ).default.POST;
     case "cron-executions-total":
       return (
-        await import("next-vibe/tasks/data-sources/cron-executions-total/definition")
+        await import("@/vibe/tasks/data-sources/cron-executions-total/definition")
       ).default.POST;
     case "cron-get":
-      return (
-        await import("next-vibe/tasks/cron/[id]/definition")
-      ).default.GET;
+      return (await import("@/vibe/tasks/cron/[id]/definition")).default.GET;
     case "cron-history":
-      return (
-        await import("next-vibe/tasks/cron/history/definition")
-      ).default.GET;
+      return (await import("@/vibe/tasks/cron/history/definition")).default.GET;
     case "cron-list":
-      return (
-        await import("next-vibe/tasks/cron/tasks/definition")
-      ).default.GET;
+      return (await import("@/vibe/tasks/cron/tasks/definition")).default.GET;
     case "cron-queue":
-      return (
-        await import("next-vibe/tasks/cron/queue/definition")
-      ).default.GET;
+      return (await import("@/vibe/tasks/cron/queue/definition")).default.GET;
     case "cron-stats":
-      return (
-        await import("next-vibe/tasks/cron/stats/definition")
-      ).default.GET;
+      return (await import("@/vibe/tasks/cron/stats/definition")).default.GET;
     case "cron-tasks":
-      return (
-        await import("next-vibe/tasks/cron/tasks/definition")
-      ).default.GET;
+      return (await import("@/vibe/tasks/cron/tasks/definition")).default.GET;
     case "cron-update":
-      return (
-        await import("next-vibe/tasks/cron/[id]/definition")
-      ).default.PUT;
+      return (await import("@/vibe/tasks/cron/[id]/definition")).default.PUT;
     case "cron:stats":
-      return (
-        await import("next-vibe/tasks/cron/stats/definition")
-      ).default.GET;
+      return (await import("@/vibe/tasks/cron/stats/definition")).default.GET;
     case "d":
-      return (
-        await import("next-vibe/server/server/dev/definition")
-      ).default.POST;
+      return (await import("@/vibe/server/server/dev/definition")).default.POST;
     case "db-health":
-      return (
-        await import("next-vibe/database/health/definition")
-      ).default.POST;
+      return (await import("@/vibe/database/health/definition")).default.POST;
     case "db-ping":
-      return (
-        await import("next-vibe/database/health/definition")
-      ).default.POST;
+      return (await import("@/vibe/database/health/definition")).default.POST;
     case "db:migrate":
-      return (
-        await import("next-vibe/database/migrate/definition")
-      ).default.POST;
+      return (await import("@/vibe/database/migrate/definition")).default.POST;
     case "db:ping":
-      return (
-        await import("next-vibe/database/ping/definition")
-      ).default.POST;
+      return (await import("@/vibe/database/ping/definition")).default.POST;
     case "db:seed":
-      return (
-        await import("next-vibe/database/seed/definition")
-      ).default.POST;
+      return (await import("@/vibe/database/seed/definition")).default.POST;
     case "db:studio":
-      return (
-        await import("next-vibe/database/studio/definition")
-      ).default.POST;
+      return (await import("@/vibe/database/studio/definition")).default.POST;
     case "db:utils":
-      return (
-        await import("next-vibe/database/utils/definition")
-      ).default.GET;
+      return (await import("@/vibe/database/utils/definition")).default.GET;
     case "dbutils":
-      return (
-        await import("next-vibe/database/utils/definition")
-      ).default.GET;
+      return (await import("@/vibe/database/utils/definition")).default.GET;
     case "deploy":
-      return (
-        await import("next-vibe/tooling/infra/deploy/push/definition")
-      ).default.POST;
+      return (await import("@/vibe/tooling/infra/deploy/push/definition"))
+        .default.POST;
     case "deploy-preview":
-      return (
-        await import("next-vibe/tooling/infra/deploy/preview/definition")
-      ).default.POST;
+      return (await import("@/vibe/tooling/infra/deploy/preview/definition"))
+        .default.POST;
     case "deps":
-      return (
-        await import("next-vibe/tooling/vibe-deps/definition")
-      ).default.POST;
+      return (await import("@/vibe/tooling/vibe-deps/definition")).default.POST;
     case "describe_image":
-      return (
-        await import("next-vibe/agent/describe-image/definition")
-      ).default.POST;
+      return (await import("@/vibe/agent/describe-image/definition")).default
+        .POST;
     case "describe_video":
-      return (
-        await import("next-vibe/agent/describe-video/definition")
-      ).default.POST;
+      return (await import("@/vibe/agent/describe-video/definition")).default
+        .POST;
     case "desktop-accessibility":
-      return (
-        await import("@/desktop/get-accessibility-tree/definition")
-      ).default.POST;
+      return (await import("@/desktop/get-accessibility-tree/definition"))
+        .default.POST;
     case "desktop-click":
-      return (await import("@/desktop/click/definition"))
-        .default.POST;
+      return (await import("@/desktop/click/definition")).default.POST;
     case "desktop-focus-window":
-      return (
-        await import("@/desktop/focus-window/definition")
-      ).default.POST;
+      return (await import("@/desktop/focus-window/definition")).default.POST;
     case "desktop-get-focused-window":
-      return (
-        await import("@/desktop/get-focused-window/definition")
-      ).default.POST;
+      return (await import("@/desktop/get-focused-window/definition")).default
+        .POST;
     case "desktop-list-monitors":
-      return (
-        await import("@/desktop/list-monitors/definition")
-      ).default.POST;
+      return (await import("@/desktop/list-monitors/definition")).default.POST;
     case "desktop-list-windows":
-      return (
-        await import("@/desktop/list-windows/definition")
-      ).default.POST;
+      return (await import("@/desktop/list-windows/definition")).default.POST;
     case "desktop-move-mouse":
-      return (await import("@/desktop/move-mouse/definition"))
-        .default.POST;
+      return (await import("@/desktop/move-mouse/definition")).default.POST;
     case "desktop-move-window-to-monitor":
-      return (
-        await import("@/desktop/move-window-to-monitor/definition")
-      ).default.POST;
+      return (await import("@/desktop/move-window-to-monitor/definition"))
+        .default.POST;
     case "desktop-press-key":
-      return (await import("@/desktop/press-key/definition"))
-        .default.POST;
+      return (await import("@/desktop/press-key/definition")).default.POST;
     case "desktop-screenshot":
-      return (
-        await import("@/desktop/take-screenshot/definition")
-      ).default.POST;
+      return (await import("@/desktop/take-screenshot/definition")).default
+        .POST;
     case "desktop-scroll":
-      return (await import("@/desktop/scroll/definition"))
-        .default.POST;
+      return (await import("@/desktop/scroll/definition")).default.POST;
     case "desktop-type-text":
-      return (await import("@/desktop/type-text/definition"))
-        .default.POST;
+      return (await import("@/desktop/type-text/definition")).default.POST;
     case "desktop_click_POST":
-      return (await import("@/desktop/click/definition"))
-        .default.POST;
+      return (await import("@/desktop/click/definition")).default.POST;
     case "desktop_focus-window_POST":
-      return (
-        await import("@/desktop/focus-window/definition")
-      ).default.POST;
+      return (await import("@/desktop/focus-window/definition")).default.POST;
     case "desktop_get-accessibility-tree_POST":
-      return (
-        await import("@/desktop/get-accessibility-tree/definition")
-      ).default.POST;
+      return (await import("@/desktop/get-accessibility-tree/definition"))
+        .default.POST;
     case "desktop_get-focused-window_POST":
-      return (
-        await import("@/desktop/get-focused-window/definition")
-      ).default.POST;
+      return (await import("@/desktop/get-focused-window/definition")).default
+        .POST;
     case "desktop_list-monitors_POST":
-      return (
-        await import("@/desktop/list-monitors/definition")
-      ).default.POST;
+      return (await import("@/desktop/list-monitors/definition")).default.POST;
     case "desktop_list-windows_POST":
-      return (
-        await import("@/desktop/list-windows/definition")
-      ).default.POST;
+      return (await import("@/desktop/list-windows/definition")).default.POST;
     case "desktop_move-mouse_POST":
-      return (await import("@/desktop/move-mouse/definition"))
-        .default.POST;
+      return (await import("@/desktop/move-mouse/definition")).default.POST;
     case "desktop_move-window-to-monitor_POST":
-      return (
-        await import("@/desktop/move-window-to-monitor/definition")
-      ).default.POST;
+      return (await import("@/desktop/move-window-to-monitor/definition"))
+        .default.POST;
     case "desktop_press-key_POST":
-      return (await import("@/desktop/press-key/definition"))
-        .default.POST;
+      return (await import("@/desktop/press-key/definition")).default.POST;
     case "desktop_scroll_POST":
-      return (await import("@/desktop/scroll/definition"))
-        .default.POST;
+      return (await import("@/desktop/scroll/definition")).default.POST;
     case "desktop_take-screenshot_POST":
-      return (
-        await import("@/desktop/take-screenshot/definition")
-      ).default.POST;
+      return (await import("@/desktop/take-screenshot/definition")).default
+        .POST;
     case "desktop_type-text_POST":
-      return (await import("@/desktop/type-text/definition"))
-        .default.POST;
+      return (await import("@/desktop/type-text/definition")).default.POST;
     case "detach":
       return (
-        await import("next-vibe/execute-tool/call-control/detach/definition")
+        await import("@/vibe/execute-tool/call-control/detach/definition")
       ).default.POST;
     case "dev":
-      return (
-        await import("next-vibe/server/server/dev/definition")
-      ).default.POST;
+      return (await import("@/vibe/server/server/dev/definition")).default.POST;
     case "dgen":
-      return (
-        await import("next-vibe/database/generate/definition")
-      ).default.POST;
+      return (await import("@/vibe/database/generate/definition")).default.POST;
     case "docker":
       return (
-        await import("next-vibe/database/utils/docker-operations/definition")
+        await import("@/vibe/database/utils/docker-operations/definition")
       ).default.POST;
     case "docker-utils":
       return (
-        await import("next-vibe/database/utils/docker-operations/definition")
+        await import("@/vibe/database/utils/docker-operations/definition")
       ).default.POST;
     case "el":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/lint/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/lint/definition"
         )
       ).default.POST;
     case "electron":
-      return (
-        await import("next-vibe/server/server/electron/start/definition")
-      ).default.POST;
+      return (await import("@/vibe/server/server/electron/start/definition"))
+        .default.POST;
     case "electron:build":
-      return (
-        await import("next-vibe/server/server/electron/build/definition")
-      ).default.POST;
+      return (await import("@/vibe/server/server/electron/build/definition"))
+        .default.POST;
     case "electron:dev":
-      return (
-        await import("next-vibe/server/server/electron/start/definition")
-      ).default.POST;
+      return (await import("@/vibe/server/server/electron/start/definition"))
+        .default.POST;
     case "electron:start":
-      return (
-        await import("next-vibe/server/server/electron/start/definition")
-      ).default.POST;
+      return (await import("@/vibe/server/server/electron/start/definition"))
+        .default.POST;
     case "elint":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/lint/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/lint/definition"
         )
       ).default.POST;
     case "email-campaigns":
-      return (
-        await import("@/leads/campaigns/email-campaigns/definition")
-      ).default.POST;
+      return (await import("@/leads/campaigns/email-campaigns/definition"))
+        .default.POST;
     case "email-stats":
-      return (
-        await import("@/messenger/messages/stats/definition")
-      ).default.GET;
+      return (await import("@/messenger/messages/stats/definition")).default
+        .GET;
     case "error-logs":
-      return (
-        await import("next-vibe/logger/error-monitor/logs/definition")
-      ).default.GET;
+      return (await import("@/vibe/logger/error-monitor/logs/definition"))
+        .default.GET;
     case "error-logs-cleanup":
-      return (
-        await import("next-vibe/logger/error-monitor/cleanup/definition")
-      ).default.POST;
+      return (await import("@/vibe/logger/error-monitor/cleanup/definition"))
+        .default.POST;
     case "error-logs-errors":
       return (
-        await import("next-vibe/logger/error-monitor/data-sources/error-logs-errors/definition")
+        await import("@/vibe/logger/error-monitor/data-sources/error-logs-errors/definition")
       ).default.POST;
     case "error-logs-total":
       return (
-        await import("next-vibe/logger/error-monitor/data-sources/error-logs-total/definition")
+        await import("@/vibe/logger/error-monitor/data-sources/error-logs-total/definition")
       ).default.POST;
     case "error-logs-warnings":
       return (
-        await import("next-vibe/logger/error-monitor/data-sources/error-logs-warnings/definition")
+        await import("@/vibe/logger/error-monitor/data-sources/error-logs-warnings/definition")
       ).default.POST;
     case "eslint":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/lint/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/lint/definition"
         )
       ).default.POST;
     case "execute-task":
-      return (
-        await import("next-vibe/tasks/execute/definition")
-      ).default.POST;
+      return (await import("@/vibe/tasks/execute/definition")).default.POST;
     case "execute-tool":
-      return (await import("next-vibe/execute-tool/definition"))
-        .default.POST;
+      return (await import("@/vibe/execute-tool/definition")).default.POST;
     case "favorite-create":
-      return (
-        await import("next-vibe/agent/skills/favorites/create/definition")
-      ).default.POST;
+      return (await import("@/vibe/agent/skills/favorites/create/definition"))
+        .default.POST;
     case "favorite-delete":
-      return (
-        await import("next-vibe/agent/skills/favorites/[id]/definition")
-      ).default.DELETE;
+      return (await import("@/vibe/agent/skills/favorites/[id]/definition"))
+        .default.DELETE;
     case "favorite-get":
-      return (
-        await import("next-vibe/agent/skills/favorites/[id]/definition")
-      ).default.GET;
+      return (await import("@/vibe/agent/skills/favorites/[id]/definition"))
+        .default.GET;
     case "favorite-update":
-      return (
-        await import("next-vibe/agent/skills/favorites/[id]/definition")
-      ).default.PATCH;
+      return (await import("@/vibe/agent/skills/favorites/[id]/definition"))
+        .default.PATCH;
     case "favorites":
-      return (
-        await import("next-vibe/agent/skills/favorites/definition")
-      ).default.GET;
+      return (await import("@/vibe/agent/skills/favorites/definition")).default
+        .GET;
     case "favorites-reorder":
-      return (
-        await import("next-vibe/agent/skills/favorites/reorder/definition")
-      ).default.POST;
+      return (await import("@/vibe/agent/skills/favorites/reorder/definition"))
+        .default.POST;
     case "fetch":
-      return (
-        await import("next-vibe/agent/fetch-url-content/definition")
-      ).default.GET;
+      return (await import("@/vibe/agent/fetch-url-content/definition")).default
+        .GET;
     case "fetch-url":
-      return (
-        await import("next-vibe/agent/fetch-url-content/definition")
-      ).default.GET;
+      return (await import("@/vibe/agent/fetch-url-content/definition")).default
+        .GET;
     case "fetch-url-cache-cleanup":
-      return (
-        await import("next-vibe/agent/fetch-url-content/cleanup/definition")
-      ).default.POST;
+      return (await import("@/vibe/agent/fetch-url-content/cleanup/definition"))
+        .default.POST;
     case "fetch-url-content":
-      return (
-        await import("next-vibe/agent/fetch-url-content/definition")
-      ).default.GET;
+      return (await import("@/vibe/agent/fetch-url-content/definition")).default
+        .GET;
     case "folder-contents":
       return (
-        await import("next-vibe/agent/chat/folder-contents/[rootFolderId]/definition")
+        await import("@/vibe/agent/chat/folder-contents/[rootFolderId]/definition")
       ).default.GET;
     case "folder-create":
       return (
-        await import("next-vibe/agent/chat/folders/[rootFolderId]/create/definition")
+        await import("@/vibe/agent/chat/folders/[rootFolderId]/create/definition")
       ).default.POST;
     case "folder-delete":
       return (
-        await import("next-vibe/agent/chat/folders/subfolders/[subFolderId]/definition")
+        await import("@/vibe/agent/chat/folders/subfolders/[subFolderId]/definition")
       ).default.DELETE;
     case "folder-get":
       return (
-        await import("next-vibe/agent/chat/folders/subfolders/[subFolderId]/definition")
+        await import("@/vibe/agent/chat/folders/subfolders/[subFolderId]/definition")
       ).default.GET;
     case "folder-move":
       return (
-        await import("next-vibe/agent/chat/folders/subfolders/[subFolderId]/move/definition")
+        await import("@/vibe/agent/chat/folders/subfolders/[subFolderId]/move/definition")
       ).default.PATCH;
     case "folder-permissions":
       return (
-        await import("next-vibe/agent/chat/folders/[rootFolderId]/root-permissions/definition")
+        await import("@/vibe/agent/chat/folders/[rootFolderId]/root-permissions/definition")
       ).default.GET;
     case "folder-rename":
       return (
-        await import("next-vibe/agent/chat/folders/subfolders/[subFolderId]/rename/definition")
+        await import("@/vibe/agent/chat/folders/subfolders/[subFolderId]/rename/definition")
       ).default.PATCH;
     case "folder-update":
       return (
-        await import("next-vibe/agent/chat/folders/subfolders/[subFolderId]/update/definition")
+        await import("@/vibe/agent/chat/folders/subfolders/[subFolderId]/update/definition")
       ).default.PATCH;
     case "folders":
       return (
-        await import("next-vibe/agent/chat/folders/[rootFolderId]/definition")
+        await import("@/vibe/agent/chat/folders/[rootFolderId]/definition")
       ).default.GET;
     case "folders-list":
       return (
-        await import("next-vibe/agent/chat/folders/[rootFolderId]/definition")
+        await import("@/vibe/agent/chat/folders/[rootFolderId]/definition")
       ).default.GET;
     case "gen":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/generators/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/generators/definition"
         )
       ).default.POST;
     case "gen-key":
-      return (
-        await import("next-vibe/env/settings/generate-key/definition")
-      ).default.GET;
+      return (await import("@/vibe/env/settings/generate-key/definition"))
+        .default.GET;
     case "generate":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/generators/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/generators/definition"
         )
       ).default.POST;
     case "generate-all":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/generators/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/generators/definition"
         )
       ).default.POST;
     case "generate-key":
-      return (
-        await import("next-vibe/env/settings/generate-key/definition")
-      ).default.GET;
+      return (await import("@/vibe/env/settings/generate-key/definition"))
+        .default.GET;
     case "generate_image":
-      return (
-        await import("next-vibe/agent/image-generation/definition")
-      ).default.POST;
+      return (await import("@/vibe/agent/image-generation/definition")).default
+        .POST;
     case "generate_music":
-      return (
-        await import("next-vibe/agent/music-generation/definition")
-      ).default.POST;
+      return (await import("@/vibe/agent/music-generation/definition")).default
+        .POST;
     case "generate_video":
-      return (
-        await import("next-vibe/agent/video-generation/definition")
-      ).default.POST;
+      return (await import("@/vibe/agent/video-generation/definition")).default
+        .POST;
     case "get-folder":
       return (
-        await import("next-vibe/agent/chat/folder-contents/[rootFolderId]/definition")
+        await import("@/vibe/agent/chat/folder-contents/[rootFolderId]/definition")
       ).default.GET;
     case "guard":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/guard/start/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/guard/start/definition"
         )
       ).default.POST;
     case "guard-destroy":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/guard/destroy/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/guard/destroy/definition"
         )
       ).default.POST;
     case "guard-start":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/guard/start/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/guard/start/definition"
         )
       ).default.POST;
     case "guard-stop":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/guard/stop/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/guard/stop/definition"
         )
       ).default.POST;
     case "guard:destroy":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/guard/destroy/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/guard/destroy/definition"
         )
       ).default.POST;
     case "guard:remove":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/guard/destroy/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/guard/destroy/definition"
         )
       ).default.POST;
     case "guard:start":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/guard/start/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/guard/start/definition"
         )
       ).default.POST;
     case "guard:status":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/guard/status/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/guard/status/definition"
         )
       ).default.POST;
     case "guard:stop":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/guard/stop/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/guard/stop/definition"
         )
       ).default.POST;
     case "h":
-      return (await import("next-vibe/help-tool/definition"))
-        .default.GET;
+      return (await import("@/vibe/help-tool/definition")).default.GET;
     case "headless-client":
-      return (
-        await import("next-vibe/server/server/headless-client/definition")
-      ).default.POST;
-    case "health":
-      return (
-        await import("next-vibe/server/server/health/definition")
-      ).default.GET;
-    case "help":
-      return (await import("next-vibe/help-tool/definition"))
-        .default.GET;
-    case "image-push":
-      return (
-        await import("next-vibe/server/server/image-push/definition")
-      ).default.POST;
-    case "import-leads":
-      return (await import("@/leads/import/definition"))
+      return (await import("@/vibe/server/server/headless-client/definition"))
         .default.POST;
+    case "health":
+      return (await import("@/vibe/server/server/health/definition")).default
+        .GET;
+    case "help":
+      return (await import("@/vibe/help-tool/definition")).default.GET;
+    case "image-push":
+      return (await import("@/vibe/server/server/image-push/definition"))
+        .default.POST;
+    case "import-leads":
+      return (await import("@/leads/import/definition")).default.POST;
     case "infra-deploy":
-      return (
-        await import("next-vibe/tooling/infra/deploy/push/definition")
-      ).default.POST;
+      return (await import("@/vibe/tooling/infra/deploy/push/definition"))
+        .default.POST;
     case "infra-init":
-      return (
-        await import("next-vibe/tooling/infra/cluster/init/definition")
-      ).default.POST;
+      return (await import("@/vibe/tooling/infra/cluster/init/definition"))
+        .default.POST;
     case "infra-preview":
-      return (
-        await import("next-vibe/tooling/infra/deploy/preview/definition")
-      ).default.POST;
+      return (await import("@/vibe/tooling/infra/deploy/preview/definition"))
+        .default.POST;
     case "infra-scale":
-      return (
-        await import("next-vibe/tooling/infra/scale/replicas/definition")
-      ).default.POST;
+      return (await import("@/vibe/tooling/infra/scale/replicas/definition"))
+        .default.POST;
     case "infra-status":
-      return (
-        await import("next-vibe/tooling/infra/cluster/status/definition")
-      ).default.GET;
+      return (await import("@/vibe/tooling/infra/cluster/status/definition"))
+        .default.GET;
     case "init":
-      return (await import("next-vibe/env/settings/definition"))
-        .default.PATCH;
+      return (await import("@/vibe/env/settings/definition")).default.PATCH;
     case "init-cluster":
-      return (
-        await import("next-vibe/tooling/infra/cluster/init/definition")
-      ).default.POST;
+      return (await import("@/vibe/tooling/infra/cluster/init/definition"))
+        .default.POST;
     case "install":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/platforms/cli/setup/install/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/platforms/cli/setup/install/definition"
         )
       ).default.POST;
     case "interactive-capture":
       return (
-        await import("next-vibe/platforms/cli/interactive/capture/definition")
+        await import("@/vibe/platforms/cli/interactive/capture/definition")
       ).default.POST;
     case "interactive-send-keys":
       return (
-        await import("next-vibe/platforms/cli/interactive/send-keys/definition")
+        await import("@/vibe/platforms/cli/interactive/send-keys/definition")
       ).default.POST;
     case "inventory-dashboard":
-      return (await import("@/inventory/dashboard/definition"))
-        .default.GET;
+      return (await import("@/inventory/dashboard/definition")).default.GET;
     case "inventory-stock":
-      return (
-        await import("@/inventory/stock/list/definition")
-      ).default.GET;
+      return (await import("@/inventory/stock/list/definition")).default.GET;
     case "inventory-transfers":
-      return (
-        await import("@/inventory/transfer/list/definition")
-      ).default.GET;
+      return (await import("@/inventory/transfer/list/definition")).default.GET;
     case "inventory-warehouses":
-      return (
-        await import("@/inventory/warehouse/list/definition")
-      ).default.GET;
+      return (await import("@/inventory/warehouse/list/definition")).default
+        .GET;
     case "inventory_dashboard_GET":
-      return (await import("@/inventory/dashboard/definition"))
-        .default.GET;
+      return (await import("@/inventory/dashboard/definition")).default.GET;
     case "inventory_stock_adjust_POST":
-      return (
-        await import("@/inventory/stock/adjust/definition")
-      ).default.POST;
+      return (await import("@/inventory/stock/adjust/definition")).default.POST;
     case "inventory_stock_issue_POST":
-      return (
-        await import("@/inventory/stock/issue/definition")
-      ).default.POST;
+      return (await import("@/inventory/stock/issue/definition")).default.POST;
     case "inventory_stock_list_GET":
-      return (
-        await import("@/inventory/stock/list/definition")
-      ).default.GET;
+      return (await import("@/inventory/stock/list/definition")).default.GET;
     case "inventory_stock_receive_POST":
-      return (
-        await import("@/inventory/stock/receive/definition")
-      ).default.POST;
+      return (await import("@/inventory/stock/receive/definition")).default
+        .POST;
     case "inventory_transfer_create_POST":
-      return (
-        await import("@/inventory/transfer/create/definition")
-      ).default.POST;
+      return (await import("@/inventory/transfer/create/definition")).default
+        .POST;
     case "inventory_transfer_list_GET":
-      return (
-        await import("@/inventory/transfer/list/definition")
-      ).default.GET;
+      return (await import("@/inventory/transfer/list/definition")).default.GET;
     case "inventory_transfer_transferId_dispatch_POST":
       return (
         await import("@/inventory/transfer/[transferId]/dispatch/definition")
       ).default.POST;
     case "inventory_transfer_transferId_get_GET":
-      return (
-        await import("@/inventory/transfer/[transferId]/get/definition")
-      ).default.GET;
+      return (await import("@/inventory/transfer/[transferId]/get/definition"))
+        .default.GET;
     case "inventory_transfer_transferId_receive_POST":
       return (
         await import("@/inventory/transfer/[transferId]/receive/definition")
       ).default.POST;
     case "inventory_warehouse_create_POST":
-      return (
-        await import("@/inventory/warehouse/create/definition")
-      ).default.POST;
+      return (await import("@/inventory/warehouse/create/definition")).default
+        .POST;
     case "inventory_warehouse_list_GET":
-      return (
-        await import("@/inventory/warehouse/list/definition")
-      ).default.GET;
+      return (await import("@/inventory/warehouse/list/definition")).default
+        .GET;
     case "inventory_warehouse_warehouseId_get_GET":
       return (
         await import("@/inventory/warehouse/[warehouseId]/get/definition")
@@ -1916,181 +1255,140 @@ async function importEndpoint(
         await import("@/inventory/warehouse/[warehouseId]/update/definition")
       ).default.PATCH;
     case "ip-match-linking":
-      return (await import("@/leads/attribution/definition"))
-        .default.POST;
+      return (await import("@/leads/attribution/definition")).default.POST;
     case "kagi-search":
-      return (
-        await import("next-vibe/agent/web-search/kagi/definition")
-      ).default.GET;
+      return (await import("@/vibe/agent/web-search/kagi/definition")).default
+        .GET;
     case "l":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/oxlint/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/oxlint/definition"
         )
       ).default.POST;
     case "lead-magnet_capture_POST":
-      return (await import("@/lead-magnet/capture/definition"))
-        .default.POST;
+      return (await import("@/lead-magnet/capture/definition")).default.POST;
     case "lead-magnet_captures_GET":
-      return (
-        await import("@/lead-magnet/captures/definition")
-      ).default.GET;
+      return (await import("@/lead-magnet/captures/definition")).default.GET;
     case "lead-magnet_config_DELETE":
-      return (await import("@/lead-magnet/config/definition"))
-        .default.DELETE;
+      return (await import("@/lead-magnet/config/definition")).default.DELETE;
     case "lead-magnet_config_GET":
-      return (await import("@/lead-magnet/config/definition"))
-        .default.GET;
+      return (await import("@/lead-magnet/config/definition")).default.GET;
     case "lead-magnet_providers_acumbamail_POST":
-      return (
-        await import("@/lead-magnet/providers/acumbamail/definition")
-      ).default.POST;
+      return (await import("@/lead-magnet/providers/acumbamail/definition"))
+        .default.POST;
     case "lead-magnet_providers_adobecampaign_POST":
-      return (
-        await import("@/lead-magnet/providers/adobecampaign/definition")
-      ).default.POST;
+      return (await import("@/lead-magnet/providers/adobecampaign/definition"))
+        .default.POST;
     case "lead-magnet_providers_cleverreach_POST":
-      return (
-        await import("@/lead-magnet/providers/cleverreach/definition")
-      ).default.POST;
+      return (await import("@/lead-magnet/providers/cleverreach/definition"))
+        .default.POST;
     case "lead-magnet_providers_connectif_POST":
-      return (
-        await import("@/lead-magnet/providers/connectif/definition")
-      ).default.POST;
+      return (await import("@/lead-magnet/providers/connectif/definition"))
+        .default.POST;
     case "lead-magnet_providers_datanext_POST":
-      return (
-        await import("@/lead-magnet/providers/datanext/definition")
-      ).default.POST;
+      return (await import("@/lead-magnet/providers/datanext/definition"))
+        .default.POST;
     case "lead-magnet_providers_edrone_POST":
-      return (
-        await import("@/lead-magnet/providers/edrone/definition")
-      ).default.POST;
+      return (await import("@/lead-magnet/providers/edrone/definition")).default
+        .POST;
     case "lead-magnet_providers_emarsys_POST":
-      return (
-        await import("@/lead-magnet/providers/emarsys/definition")
-      ).default.POST;
+      return (await import("@/lead-magnet/providers/emarsys/definition"))
+        .default.POST;
     case "lead-magnet_providers_expertsender_POST":
-      return (
-        await import("@/lead-magnet/providers/expertsender/definition")
-      ).default.POST;
+      return (await import("@/lead-magnet/providers/expertsender/definition"))
+        .default.POST;
     case "lead-magnet_providers_freshmail_POST":
-      return (
-        await import("@/lead-magnet/providers/freshmail/definition")
-      ).default.POST;
+      return (await import("@/lead-magnet/providers/freshmail/definition"))
+        .default.POST;
     case "lead-magnet_providers_getresponse_POST":
-      return (
-        await import("@/lead-magnet/providers/getresponse/definition")
-      ).default.POST;
+      return (await import("@/lead-magnet/providers/getresponse/definition"))
+        .default.POST;
     case "lead-magnet_providers_google-sheets_POST":
-      return (
-        await import("@/lead-magnet/providers/google-sheets/definition")
-      ).default.POST;
+      return (await import("@/lead-magnet/providers/google-sheets/definition"))
+        .default.POST;
     case "lead-magnet_providers_google-sheets_sheets-list_GET":
       return (
         await import("@/lead-magnet/providers/google-sheets/sheets-list/definition")
       ).default.GET;
     case "lead-magnet_providers_klaviyo_POST":
-      return (
-        await import("@/lead-magnet/providers/klaviyo/definition")
-      ).default.POST;
+      return (await import("@/lead-magnet/providers/klaviyo/definition"))
+        .default.POST;
     case "lead-magnet_providers_mailup_POST":
-      return (
-        await import("@/lead-magnet/providers/mailup/definition")
-      ).default.POST;
+      return (await import("@/lead-magnet/providers/mailup/definition")).default
+        .POST;
     case "lead-magnet_providers_mapp_POST":
-      return (
-        await import("@/lead-magnet/providers/mapp/definition")
-      ).default.POST;
+      return (await import("@/lead-magnet/providers/mapp/definition")).default
+        .POST;
     case "lead-magnet_providers_platform-email_POST":
-      return (
-        await import("@/lead-magnet/providers/platform-email/definition")
-      ).default.POST;
+      return (await import("@/lead-magnet/providers/platform-email/definition"))
+        .default.POST;
     case "lead-magnet_providers_sailthru_POST":
-      return (
-        await import("@/lead-magnet/providers/sailthru/definition")
-      ).default.POST;
+      return (await import("@/lead-magnet/providers/sailthru/definition"))
+        .default.POST;
     case "lead-magnet_providers_salesmanago_POST":
-      return (
-        await import("@/lead-magnet/providers/salesmanago/definition")
-      ).default.POST;
+      return (await import("@/lead-magnet/providers/salesmanago/definition"))
+        .default.POST;
     case "lead-magnet_providers_shopify_POST":
-      return (
-        await import("@/lead-magnet/providers/shopify/definition")
-      ).default.POST;
+      return (await import("@/lead-magnet/providers/shopify/definition"))
+        .default.POST;
     case "lead-magnet_providers_spotler_POST":
-      return (
-        await import("@/lead-magnet/providers/spotler/definition")
-      ).default.POST;
+      return (await import("@/lead-magnet/providers/spotler/definition"))
+        .default.POST;
     case "lead-magnet_providers_youlead_POST":
-      return (
-        await import("@/lead-magnet/providers/youlead/definition")
-      ).default.POST;
+      return (await import("@/lead-magnet/providers/youlead/definition"))
+        .default.POST;
     case "leads-active":
-      return (
-        await import("@/leads/data-sources/leads-active/definition")
-      ).default.POST;
+      return (await import("@/leads/data-sources/leads-active/definition"))
+        .default.POST;
     case "leads-bounced":
-      return (
-        await import("@/leads/data-sources/leads-bounced/definition")
-      ).default.POST;
+      return (await import("@/leads/data-sources/leads-bounced/definition"))
+        .default.POST;
     case "leads-campaign-running":
       return (
         await import("@/leads/data-sources/leads-campaign-running/definition")
       ).default.POST;
     case "leads-converted":
-      return (
-        await import("@/leads/data-sources/leads-converted/definition")
-      ).default.POST;
+      return (await import("@/leads/data-sources/leads-converted/definition"))
+        .default.POST;
     case "leads-created":
-      return (
-        await import("@/leads/data-sources/leads-created/definition")
-      ).default.POST;
+      return (await import("@/leads/data-sources/leads-created/definition"))
+        .default.POST;
     case "leads-dashboard":
-      return (await import("@/leads/dashboard/definition"))
-        .default.GET;
+      return (await import("@/leads/dashboard/definition")).default.GET;
     case "leads-email-clicks":
       return (
         await import("@/leads/data-sources/leads-email-clicks/definition")
       ).default.POST;
     case "leads-email-opens":
-      return (
-        await import("@/leads/data-sources/leads-email-opens/definition")
-      ).default.POST;
+      return (await import("@/leads/data-sources/leads-email-opens/definition"))
+        .default.POST;
     case "leads-emails-sent":
-      return (
-        await import("@/leads/data-sources/leads-emails-sent/definition")
-      ).default.POST;
+      return (await import("@/leads/data-sources/leads-emails-sent/definition"))
+        .default.POST;
     case "leads-engagements":
-      return (
-        await import("@/leads/data-sources/leads-engagements/definition")
-      ).default.POST;
+      return (await import("@/leads/data-sources/leads-engagements/definition"))
+        .default.POST;
     case "leads-form-submits":
       return (
         await import("@/leads/data-sources/leads-form-submits/definition")
       ).default.POST;
     case "leads-import":
-      return (await import("@/leads/import/definition"))
-        .default.POST;
+      return (await import("@/leads/import/definition")).default.POST;
     case "leads-import-status":
-      return (await import("@/leads/import/status/definition"))
-        .default.GET;
+      return (await import("@/leads/import/status/definition")).default.GET;
     case "leads-in-contact":
-      return (
-        await import("@/leads/data-sources/leads-in-contact/definition")
-      ).default.POST;
+      return (await import("@/leads/data-sources/leads-in-contact/definition"))
+        .default.POST;
     case "leads-list":
-      return (await import("@/leads/list/definition")).default
-        .GET;
+      return (await import("@/leads/list/definition")).default.GET;
     case "leads-newsletter-subscribers":
       return (
         await import("@/leads/data-sources/leads-newsletter-subscribers/definition")
       ).default.POST;
     case "leads-search":
-      return (await import("@/leads/search/definition"))
-        .default.GET;
+      return (await import("@/leads/search/definition")).default.GET;
     case "leads-stats":
-      return (await import("@/leads/stats/definition")).default
-        .GET;
+      return (await import("@/leads/stats/definition")).default.GET;
     case "leads-unsubscribed":
       return (
         await import("@/leads/data-sources/leads-unsubscribed/definition")
@@ -2104,116 +1402,88 @@ async function importEndpoint(
         await import("@/leads/data-sources/leads-website-visits/definition")
       ).default.POST;
     case "leads_attribution_POST":
-      return (await import("@/leads/attribution/definition"))
-        .default.POST;
+      return (await import("@/leads/attribution/definition")).default.POST;
     case "leads_batch_DELETE":
-      return (await import("@/leads/batch/definition")).default
-        .DELETE;
+      return (await import("@/leads/batch/definition")).default.DELETE;
     case "leads_batch_PATCH":
-      return (await import("@/leads/batch/definition")).default
-        .PATCH;
+      return (await import("@/leads/batch/definition")).default.PATCH;
     case "leads_campaigns_bounce-processor_GET":
-      return (
-        await import("@/leads/campaigns/bounce-processor/definition")
-      ).default.GET;
-    case "leads_campaigns_bounce-processor_POST":
-      return (
-        await import("@/leads/campaigns/bounce-processor/definition")
-      ).default.POST;
-    case "leads_campaigns_campaign-starter_GET":
-      return (
-        await import("@/leads/campaigns/campaign-starter/definition")
-      ).default.GET;
-    case "leads_campaigns_campaign-starter_POST":
-      return (
-        await import("@/leads/campaigns/campaign-starter/definition")
-      ).default.POST;
-    case "leads_campaigns_email-campaigns_GET":
-      return (
-        await import("@/leads/campaigns/email-campaigns/definition")
-      ).default.GET;
-    case "leads_campaigns_email-campaigns_POST":
-      return (
-        await import("@/leads/campaigns/email-campaigns/definition")
-      ).default.POST;
-    case "leads_campaigns_emails_test-mail_POST":
-      return (
-        await import("@/leads/campaigns/emails/test-mail/definition")
-      ).default.POST;
-    case "leads_campaigns_halt-all_POST":
-      return (
-        await import("@/leads/campaigns/halt-all/definition")
-      ).default.POST;
-    case "leads_campaigns_journey-variants_GET":
-      return (
-        await import("@/leads/campaigns/journey-variants/definition")
-      ).default.GET;
-    case "leads_campaigns_journey-variants_PATCH":
-      return (
-        await import("@/leads/campaigns/journey-variants/definition")
-      ).default.PATCH;
-    case "leads_campaigns_journey-variants_POST":
-      return (
-        await import("@/leads/campaigns/journey-variants/definition")
-      ).default.POST;
-    case "leads_campaigns_queue_GET":
-      return (
-        await import("@/leads/campaigns/queue/definition")
-      ).default.GET;
-    case "leads_campaigns_stats_GET":
-      return (
-        await import("@/leads/campaigns/stats/definition")
-      ).default.GET;
-    case "leads_create_POST":
-      return (await import("@/leads/create/definition"))
-        .default.POST;
-    case "leads_dashboard_GET":
-      return (await import("@/leads/dashboard/definition"))
+      return (await import("@/leads/campaigns/bounce-processor/definition"))
         .default.GET;
+    case "leads_campaigns_bounce-processor_POST":
+      return (await import("@/leads/campaigns/bounce-processor/definition"))
+        .default.POST;
+    case "leads_campaigns_campaign-starter_GET":
+      return (await import("@/leads/campaigns/campaign-starter/definition"))
+        .default.GET;
+    case "leads_campaigns_campaign-starter_POST":
+      return (await import("@/leads/campaigns/campaign-starter/definition"))
+        .default.POST;
+    case "leads_campaigns_email-campaigns_GET":
+      return (await import("@/leads/campaigns/email-campaigns/definition"))
+        .default.GET;
+    case "leads_campaigns_email-campaigns_POST":
+      return (await import("@/leads/campaigns/email-campaigns/definition"))
+        .default.POST;
+    case "leads_campaigns_emails_test-mail_POST":
+      return (await import("@/leads/campaigns/emails/test-mail/definition"))
+        .default.POST;
+    case "leads_campaigns_halt-all_POST":
+      return (await import("@/leads/campaigns/halt-all/definition")).default
+        .POST;
+    case "leads_campaigns_journey-variants_GET":
+      return (await import("@/leads/campaigns/journey-variants/definition"))
+        .default.GET;
+    case "leads_campaigns_journey-variants_PATCH":
+      return (await import("@/leads/campaigns/journey-variants/definition"))
+        .default.PATCH;
+    case "leads_campaigns_journey-variants_POST":
+      return (await import("@/leads/campaigns/journey-variants/definition"))
+        .default.POST;
+    case "leads_campaigns_queue_GET":
+      return (await import("@/leads/campaigns/queue/definition")).default.GET;
+    case "leads_campaigns_stats_GET":
+      return (await import("@/leads/campaigns/stats/definition")).default.GET;
+    case "leads_create_POST":
+      return (await import("@/leads/create/definition")).default.POST;
+    case "leads_dashboard_GET":
+      return (await import("@/leads/dashboard/definition")).default.GET;
     case "leads_data-sources_leads-active_POST":
-      return (
-        await import("@/leads/data-sources/leads-active/definition")
-      ).default.POST;
+      return (await import("@/leads/data-sources/leads-active/definition"))
+        .default.POST;
     case "leads_data-sources_leads-bounced_POST":
-      return (
-        await import("@/leads/data-sources/leads-bounced/definition")
-      ).default.POST;
+      return (await import("@/leads/data-sources/leads-bounced/definition"))
+        .default.POST;
     case "leads_data-sources_leads-campaign-running_POST":
       return (
         await import("@/leads/data-sources/leads-campaign-running/definition")
       ).default.POST;
     case "leads_data-sources_leads-converted_POST":
-      return (
-        await import("@/leads/data-sources/leads-converted/definition")
-      ).default.POST;
+      return (await import("@/leads/data-sources/leads-converted/definition"))
+        .default.POST;
     case "leads_data-sources_leads-created_POST":
-      return (
-        await import("@/leads/data-sources/leads-created/definition")
-      ).default.POST;
+      return (await import("@/leads/data-sources/leads-created/definition"))
+        .default.POST;
     case "leads_data-sources_leads-email-clicks_POST":
       return (
         await import("@/leads/data-sources/leads-email-clicks/definition")
       ).default.POST;
     case "leads_data-sources_leads-email-opens_POST":
-      return (
-        await import("@/leads/data-sources/leads-email-opens/definition")
-      ).default.POST;
+      return (await import("@/leads/data-sources/leads-email-opens/definition"))
+        .default.POST;
     case "leads_data-sources_leads-emails-sent_POST":
-      return (
-        await import("@/leads/data-sources/leads-emails-sent/definition")
-      ).default.POST;
+      return (await import("@/leads/data-sources/leads-emails-sent/definition"))
+        .default.POST;
     case "leads_data-sources_leads-engagements_POST":
-      return (
-        await import("@/leads/data-sources/leads-engagements/definition")
-      ).default.POST;
+      return (await import("@/leads/data-sources/leads-engagements/definition"))
+        .default.POST;
     case "leads_data-sources_leads-form-submits_POST":
       return (
         await import("@/leads/data-sources/leads-form-submits/definition")
       ).default.POST;
     case "leads_data-sources_leads-in-contact_POST":
-      return (
-        await import("@/leads/data-sources/leads-in-contact/definition")
-      ).default.POST;
+      return (await import("@/leads/data-sources/leads-in-contact/definition"))
+        .default.POST;
     case "leads_data-sources_leads-newsletter-subscribers_POST":
       return (
         await import("@/leads/data-sources/leads-newsletter-subscribers/definition")
@@ -2231,98 +1501,69 @@ async function importEndpoint(
         await import("@/leads/data-sources/leads-website-visits/definition")
       ).default.POST;
     case "leads_export_GET":
-      return (await import("@/leads/export/definition"))
-        .default.GET;
+      return (await import("@/leads/export/definition")).default.GET;
     case "leads_id_DELETE":
-      return (await import("@/leads/[id]/definition")).default
-        .DELETE;
+      return (await import("@/leads/[id]/definition")).default.DELETE;
     case "leads_id_GET":
-      return (await import("@/leads/[id]/definition")).default
-        .GET;
+      return (await import("@/leads/[id]/definition")).default.GET;
     case "leads_id_PATCH":
-      return (await import("@/leads/[id]/definition")).default
-        .PATCH;
+      return (await import("@/leads/[id]/definition")).default.PATCH;
     case "leads_import_POST":
-      return (await import("@/leads/import/definition"))
-        .default.POST;
+      return (await import("@/leads/import/definition")).default.POST;
     case "leads_import_jobs_jobId_DELETE":
-      return (
-        await import("@/leads/import/jobs/[jobId]/definition")
-      ).default.DELETE;
+      return (await import("@/leads/import/jobs/[jobId]/definition")).default
+        .DELETE;
     case "leads_import_jobs_jobId_GET":
-      return (
-        await import("@/leads/import/jobs/[jobId]/definition")
-      ).default.GET;
+      return (await import("@/leads/import/jobs/[jobId]/definition")).default
+        .GET;
     case "leads_import_jobs_jobId_PATCH":
-      return (
-        await import("@/leads/import/jobs/[jobId]/definition")
-      ).default.PATCH;
-    case "leads_import_jobs_jobId_retry_POST":
-      return (
-        await import("@/leads/import/jobs/[jobId]/retry/definition")
-      ).default.POST;
-    case "leads_import_jobs_jobId_stop_POST":
-      return (
-        await import("@/leads/import/jobs/[jobId]/stop/definition")
-      ).default.POST;
-    case "leads_import_process_POST":
-      return (
-        await import("@/leads/import/process/definition")
-      ).default.POST;
-    case "leads_import_status_GET":
-      return (await import("@/leads/import/status/definition"))
-        .default.GET;
-    case "leads_list_GET":
-      return (await import("@/leads/list/definition")).default
-        .GET;
-    case "leads_search_GET":
-      return (await import("@/leads/search/definition"))
-        .default.GET;
-    case "leads_skill_PATCH":
-      return (await import("@/leads/skill/definition")).default
+      return (await import("@/leads/import/jobs/[jobId]/definition")).default
         .PATCH;
-    case "leads_stats_GET":
-      return (await import("@/leads/stats/definition")).default
-        .GET;
-    case "leads_tracking_GET":
-      return (await import("@/leads/tracking/definition"))
-        .default.GET;
-    case "leads_tracking_POST":
-      return (await import("@/leads/tracking/definition"))
+    case "leads_import_jobs_jobId_retry_POST":
+      return (await import("@/leads/import/jobs/[jobId]/retry/definition"))
         .default.POST;
+    case "leads_import_jobs_jobId_stop_POST":
+      return (await import("@/leads/import/jobs/[jobId]/stop/definition"))
+        .default.POST;
+    case "leads_import_process_POST":
+      return (await import("@/leads/import/process/definition")).default.POST;
+    case "leads_import_status_GET":
+      return (await import("@/leads/import/status/definition")).default.GET;
+    case "leads_list_GET":
+      return (await import("@/leads/list/definition")).default.GET;
+    case "leads_search_GET":
+      return (await import("@/leads/search/definition")).default.GET;
+    case "leads_skill_PATCH":
+      return (await import("@/leads/skill/definition")).default.PATCH;
+    case "leads_stats_GET":
+      return (await import("@/leads/stats/definition")).default.GET;
+    case "leads_tracking_GET":
+      return (await import("@/leads/tracking/definition")).default.GET;
+    case "leads_tracking_POST":
+      return (await import("@/leads/tracking/definition")).default.POST;
     case "lint":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/oxlint/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/oxlint/definition"
         )
       ).default.POST;
     case "list":
-      return (await import("next-vibe/help-tool/definition"))
-        .default.GET;
+      return (await import("@/vibe/help-tool/definition")).default.GET;
     case "list-models":
-      return (await import("next-vibe/agent/models/list/definition"))
-        .default.GET;
+      return (await import("@/vibe/agent/models/list/definition")).default.GET;
     case "login":
-      return (await import("@/user/public/login/definition"))
-        .default.POST;
+      return (await import("@/user/public/login/definition")).default.POST;
     case "logout":
-      return (await import("@/user/private/logout/definition"))
-        .default.POST;
+      return (await import("@/user/private/logout/definition")).default.POST;
     case "ls":
-      return (await import("next-vibe/help-tool/definition"))
-        .default.GET;
+      return (await import("@/vibe/help-tool/definition")).default.GET;
     case "m":
-      return (
-        await import("next-vibe/database/migrate/definition")
-      ).default.POST;
+      return (await import("@/vibe/database/migrate/definition")).default.POST;
     case "mcp":
-      return (
-        await import("next-vibe/platforms/mcp/serve/definition")
-      ).default.POST;
+      return (await import("@/vibe/platforms/mcp/serve/definition")).default
+        .POST;
     case "messenger-accounts":
-      return (
-        await import("@/messenger/accounts/list/definition")
-      ).default.GET;
+      return (await import("@/messenger/accounts/list/definition")).default.GET;
     case "messenger-bounced":
       return (
         await import("@/messenger/data-sources/messenger-bounced/definition")
@@ -2340,13 +1581,9 @@ async function importEndpoint(
         await import("@/messenger/providers/email/imap-client/sync/definition")
       ).default.POST;
     case "messenger-inbox":
-      return (
-        await import("@/messenger/inbox/list/definition")
-      ).default.GET;
+      return (await import("@/messenger/inbox/list/definition")).default.GET;
     case "messenger-messages":
-      return (
-        await import("@/messenger/messages/list/definition")
-      ).default.GET;
+      return (await import("@/messenger/messages/list/definition")).default.GET;
     case "messenger-opened":
       return (
         await import("@/messenger/data-sources/messenger-opened/definition")
@@ -2360,25 +1597,19 @@ async function importEndpoint(
         await import("@/messenger/data-sources/messenger-total/definition")
       ).default.POST;
     case "messenger_accounts_create_POST":
-      return (
-        await import("@/messenger/accounts/create/definition")
-      ).default.POST;
+      return (await import("@/messenger/accounts/create/definition")).default
+        .POST;
     case "messenger_accounts_edit_id_DELETE":
-      return (
-        await import("@/messenger/accounts/edit/[id]/definition")
-      ).default.DELETE;
+      return (await import("@/messenger/accounts/edit/[id]/definition")).default
+        .DELETE;
     case "messenger_accounts_edit_id_GET":
-      return (
-        await import("@/messenger/accounts/edit/[id]/definition")
-      ).default.GET;
+      return (await import("@/messenger/accounts/edit/[id]/definition")).default
+        .GET;
     case "messenger_accounts_edit_id_PUT":
-      return (
-        await import("@/messenger/accounts/edit/[id]/definition")
-      ).default.PUT;
+      return (await import("@/messenger/accounts/edit/[id]/definition")).default
+        .PUT;
     case "messenger_accounts_list_GET":
-      return (
-        await import("@/messenger/accounts/list/definition")
-      ).default.GET;
+      return (await import("@/messenger/accounts/list/definition")).default.GET;
     case "messenger_data-sources_messenger-bounced_POST":
       return (
         await import("@/messenger/data-sources/messenger-bounced/definition")
@@ -2404,58 +1635,40 @@ async function importEndpoint(
         await import("@/messenger/data-sources/messenger-total/definition")
       ).default.POST;
     case "messenger_inbox_folders_GET":
-      return (
-        await import("@/messenger/inbox/folders/definition")
-      ).default.GET;
+      return (await import("@/messenger/inbox/folders/definition")).default.GET;
     case "messenger_inbox_list_GET":
-      return (
-        await import("@/messenger/inbox/list/definition")
-      ).default.GET;
+      return (await import("@/messenger/inbox/list/definition")).default.GET;
     case "messenger_inbox_mark-read_POST":
-      return (
-        await import("@/messenger/inbox/mark-read/definition")
-      ).default.POST;
+      return (await import("@/messenger/inbox/mark-read/definition")).default
+        .POST;
     case "messenger_inbox_move_POST":
-      return (
-        await import("@/messenger/inbox/move/definition")
-      ).default.POST;
+      return (await import("@/messenger/inbox/move/definition")).default.POST;
     case "messenger_messages_id_GET":
-      return (
-        await import("@/messenger/messages/[id]/definition")
-      ).default.GET;
+      return (await import("@/messenger/messages/[id]/definition")).default.GET;
     case "messenger_messages_list_GET":
-      return (
-        await import("@/messenger/messages/list/definition")
-      ).default.GET;
+      return (await import("@/messenger/messages/list/definition")).default.GET;
     case "messenger_messages_stats_GET":
-      return (
-        await import("@/messenger/messages/stats/definition")
-      ).default.GET;
+      return (await import("@/messenger/messages/stats/definition")).default
+        .GET;
     case "messenger_preview_render_POST":
-      return (
-        await import("@/messenger/preview/render/definition")
-      ).default.POST;
+      return (await import("@/messenger/preview/render/definition")).default
+        .POST;
     case "messenger_preview_send-test_POST":
-      return (
-        await import("@/messenger/preview/send-test/definition")
-      ).default.POST;
+      return (await import("@/messenger/preview/send-test/definition")).default
+        .POST;
     case "messenger_providers_email_imap-client_sync_POST":
       return (
         await import("@/messenger/providers/email/imap-client/sync/definition")
       ).default.POST;
     case "messenger_send_POST":
-      return (await import("@/messenger/send/definition"))
-        .default.POST;
+      return (await import("@/messenger/send/definition")).default.POST;
     case "migrate":
-      return (
-        await import("next-vibe/database/migrate/definition")
-      ).default.POST;
+      return (await import("@/vibe/database/migrate/definition")).default.POST;
     case "models":
-      return (await import("next-vibe/agent/models/list/definition"))
-        .default.GET;
+      return (await import("@/vibe/agent/models/list/definition")).default.GET;
     case "my-instance-id":
       return (
-        await import("next-vibe/remote-connection/self/instanceId/definition")
+        await import("@/vibe/remote-connection/self/instanceId/definition")
       ).default.GET;
     case "newsletter-campaigns-sent":
       return (
@@ -2466,20 +1679,15 @@ async function importEndpoint(
         await import("@/newsletter/data-sources/newsletter-events-total/definition")
       ).default.POST;
     case "newsletter-status":
-      return (await import("@/newsletter/status/definition"))
-        .default.GET;
+      return (await import("@/newsletter/status/definition")).default.GET;
     case "newsletter-subscribe":
-      return (
-        await import("@/newsletter/subscribe/definition")
-      ).default.POST;
+      return (await import("@/newsletter/subscribe/definition")).default.POST;
     case "newsletter-subscriptions-new":
       return (
         await import("@/newsletter/data-sources/newsletter-subscriptions-new/definition")
       ).default.POST;
     case "newsletter-unsubscribe":
-      return (
-        await import("@/newsletter/unsubscribe/definition")
-      ).default.POST;
+      return (await import("@/newsletter/unsubscribe/definition")).default.POST;
     case "newsletter-unsubscribes":
       return (
         await import("@/newsletter/data-sources/newsletter-unsubscribes/definition")
@@ -2501,115 +1709,85 @@ async function importEndpoint(
         await import("@/newsletter/data-sources/newsletter-unsubscribes/definition")
       ).default.POST;
     case "newsletter_status_GET":
-      return (await import("@/newsletter/status/definition"))
-        .default.GET;
+      return (await import("@/newsletter/status/definition")).default.GET;
     case "newsletter_subscribe_POST":
-      return (
-        await import("@/newsletter/subscribe/definition")
-      ).default.POST;
+      return (await import("@/newsletter/subscribe/definition")).default.POST;
     case "newsletter_unsubscribe_POST":
-      return (
-        await import("@/newsletter/unsubscribe/definition")
-      ).default.POST;
+      return (await import("@/newsletter/unsubscribe/definition")).default.POST;
     case "newsletter_unsubscribe_sync_POST":
-      return (
-        await import("@/newsletter/unsubscribe/sync/definition")
-      ).default.POST;
+      return (await import("@/newsletter/unsubscribe/sync/definition")).default
+        .POST;
     case "nowpayments":
-      return (
-        await import("@/payment/providers/nowpayments/cli/definition")
-      ).default.POST;
-    case "open-code":
-      return (await import("next-vibe/agent/coding-agent/definition"))
+      return (await import("@/payment/providers/nowpayments/cli/definition"))
         .default.POST;
+    case "open-code":
+      return (await import("@/vibe/agent/coding-agent/definition")).default
+        .POST;
     case "ox":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/oxlint/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/oxlint/definition"
         )
       ).default.POST;
     case "oxlint":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/oxlint/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/oxlint/definition"
         )
       ).default.POST;
     case "payment-bill-get":
-      return (
-        await import("@/payment/bill/[billId]/get/definition")
-      ).default.GET;
-    case "payment-bill-list":
-      return (await import("@/payment/bill/list/definition"))
-        .default.GET;
-    case "payment-dashboard":
-      return (await import("@/payment/dashboard/definition"))
-        .default.GET;
-    case "payment-estimate-get":
-      return (
-        await import("@/payment/estimate/[estimateId]/get/definition")
-      ).default.GET;
-    case "payment-estimate-list":
-      return (
-        await import("@/payment/estimate/list/definition")
-      ).default.GET;
-    case "payment-invoice-get":
-      return (
-        await import("@/payment/invoice/[invoiceId]/get/definition")
-      ).default.GET;
-    case "payment-invoice-list":
-      return (
-        await import("@/payment/invoice/list/definition")
-      ).default.GET;
-    case "payment_GET":
-      return (await import("@/payment/definition")).default
+      return (await import("@/payment/bill/[billId]/get/definition")).default
         .GET;
+    case "payment-bill-list":
+      return (await import("@/payment/bill/list/definition")).default.GET;
+    case "payment-dashboard":
+      return (await import("@/payment/dashboard/definition")).default.GET;
+    case "payment-estimate-get":
+      return (await import("@/payment/estimate/[estimateId]/get/definition"))
+        .default.GET;
+    case "payment-estimate-list":
+      return (await import("@/payment/estimate/list/definition")).default.GET;
+    case "payment-invoice-get":
+      return (await import("@/payment/invoice/[invoiceId]/get/definition"))
+        .default.GET;
+    case "payment-invoice-list":
+      return (await import("@/payment/invoice/list/definition")).default.GET;
+    case "payment_GET":
+      return (await import("@/payment/definition")).default.GET;
     case "payment_POST":
-      return (await import("@/payment/definition")).default
-        .POST;
+      return (await import("@/payment/definition")).default.POST;
     case "payment_bill_billId_approve_POST":
-      return (
-        await import("@/payment/bill/[billId]/approve/definition")
-      ).default.POST;
+      return (await import("@/payment/bill/[billId]/approve/definition"))
+        .default.POST;
     case "payment_bill_billId_get_GET":
-      return (
-        await import("@/payment/bill/[billId]/get/definition")
-      ).default.GET;
+      return (await import("@/payment/bill/[billId]/get/definition")).default
+        .GET;
     case "payment_bill_billId_pay_POST":
-      return (
-        await import("@/payment/bill/[billId]/pay/definition")
-      ).default.POST;
+      return (await import("@/payment/bill/[billId]/pay/definition")).default
+        .POST;
     case "payment_bill_create_POST":
-      return (await import("@/payment/bill/create/definition"))
-        .default.POST;
+      return (await import("@/payment/bill/create/definition")).default.POST;
     case "payment_bill_line_add_POST":
-      return (
-        await import("@/payment/bill/line/add/definition")
-      ).default.POST;
+      return (await import("@/payment/bill/line/add/definition")).default.POST;
     case "payment_bill_list_GET":
-      return (await import("@/payment/bill/list/definition"))
-        .default.GET;
+      return (await import("@/payment/bill/list/definition")).default.GET;
     case "payment_checkout_POST":
-      return (await import("@/payment/checkout/definition"))
-        .default.POST;
+      return (await import("@/payment/checkout/definition")).default.POST;
     case "payment_credit-note_create_POST":
-      return (
-        await import("@/payment/credit-note/create/definition")
-      ).default.POST;
+      return (await import("@/payment/credit-note/create/definition")).default
+        .POST;
     case "payment_dashboard_GET":
-      return (await import("@/payment/dashboard/definition"))
-        .default.GET;
+      return (await import("@/payment/dashboard/definition")).default.GET;
     case "payment_data-sources_payments-count_POST":
-      return (
-        await import("@/payment/data-sources/payments-count/definition")
-      ).default.POST;
+      return (await import("@/payment/data-sources/payments-count/definition"))
+        .default.POST;
     case "payment_data-sources_payments-disputes-count_POST":
       return (
         await import("@/payment/data-sources/payments-disputes-count/definition")
       ).default.POST;
     case "payment_data-sources_payments-failed_POST":
-      return (
-        await import("@/payment/data-sources/payments-failed/definition")
-      ).default.POST;
+      return (await import("@/payment/data-sources/payments-failed/definition"))
+        .default.POST;
     case "payment_data-sources_payments-invoices-paid_POST":
       return (
         await import("@/payment/data-sources/payments-invoices-paid/definition")
@@ -2631,13 +1809,11 @@ async function importEndpoint(
         await import("@/payment/data-sources/payments-revenue/definition")
       ).default.POST;
     case "payment_estimate_create_POST":
-      return (
-        await import("@/payment/estimate/create/definition")
-      ).default.POST;
+      return (await import("@/payment/estimate/create/definition")).default
+        .POST;
     case "payment_estimate_estimateId_accept_POST":
-      return (
-        await import("@/payment/estimate/[estimateId]/accept/definition")
-      ).default.POST;
+      return (await import("@/payment/estimate/[estimateId]/accept/definition"))
+        .default.POST;
     case "payment_estimate_estimateId_convert-to-invoice_POST":
       return (
         await import("@/payment/estimate/[estimateId]/convert-to-invoice/definition")
@@ -2651,40 +1827,31 @@ async function importEndpoint(
         await import("@/payment/estimate/[estimateId]/duplicate/definition")
       ).default.POST;
     case "payment_estimate_estimateId_get_GET":
-      return (
-        await import("@/payment/estimate/[estimateId]/get/definition")
-      ).default.GET;
+      return (await import("@/payment/estimate/[estimateId]/get/definition"))
+        .default.GET;
     case "payment_estimate_estimateId_send_POST":
-      return (
-        await import("@/payment/estimate/[estimateId]/send/definition")
-      ).default.POST;
+      return (await import("@/payment/estimate/[estimateId]/send/definition"))
+        .default.POST;
     case "payment_estimate_line_add_POST":
-      return (
-        await import("@/payment/estimate/line/add/definition")
-      ).default.POST;
+      return (await import("@/payment/estimate/line/add/definition")).default
+        .POST;
     case "payment_estimate_line_lineId_remove_POST":
       return (
         await import("@/payment/estimate/line/[lineId]/remove/definition")
       ).default.POST;
     case "payment_estimate_list_GET":
-      return (
-        await import("@/payment/estimate/list/definition")
-      ).default.GET;
+      return (await import("@/payment/estimate/list/definition")).default.GET;
     case "payment_invoice_POST":
-      return (await import("@/payment/invoice/definition"))
-        .default.POST;
+      return (await import("@/payment/invoice/definition")).default.POST;
     case "payment_invoice_create_POST":
-      return (
-        await import("@/payment/invoice/create/definition")
-      ).default.POST;
+      return (await import("@/payment/invoice/create/definition")).default.POST;
     case "payment_invoice_invoiceId_duplicate_POST":
       return (
         await import("@/payment/invoice/[invoiceId]/duplicate/definition")
       ).default.POST;
     case "payment_invoice_invoiceId_get_GET":
-      return (
-        await import("@/payment/invoice/[invoiceId]/get/definition")
-      ).default.GET;
+      return (await import("@/payment/invoice/[invoiceId]/get/definition"))
+        .default.GET;
     case "payment_invoice_invoiceId_public-view_GET":
       return (
         await import("@/payment/invoice/[invoiceId]/public-view/definition")
@@ -2698,51 +1865,39 @@ async function importEndpoint(
         await import("@/payment/invoice/[invoiceId]/send-reminder/definition")
       ).default.POST;
     case "payment_invoice_invoiceId_send_POST":
-      return (
-        await import("@/payment/invoice/[invoiceId]/send/definition")
-      ).default.POST;
+      return (await import("@/payment/invoice/[invoiceId]/send/definition"))
+        .default.POST;
     case "payment_invoice_invoiceId_void_POST":
-      return (
-        await import("@/payment/invoice/[invoiceId]/void/definition")
-      ).default.POST;
+      return (await import("@/payment/invoice/[invoiceId]/void/definition"))
+        .default.POST;
     case "payment_invoice_line_add_POST":
-      return (
-        await import("@/payment/invoice/line/add/definition")
-      ).default.POST;
+      return (await import("@/payment/invoice/line/add/definition")).default
+        .POST;
     case "payment_invoice_line_lineId_remove_POST":
-      return (
-        await import("@/payment/invoice/line/[lineId]/remove/definition")
-      ).default.POST;
+      return (await import("@/payment/invoice/line/[lineId]/remove/definition"))
+        .default.POST;
     case "payment_invoice_list_GET":
-      return (
-        await import("@/payment/invoice/list/definition")
-      ).default.GET;
+      return (await import("@/payment/invoice/list/definition")).default.GET;
     case "payment_portal_POST":
-      return (await import("@/payment/portal/definition"))
-        .default.POST;
+      return (await import("@/payment/portal/definition")).default.POST;
     case "payment_providers_nowpayments_cli_POST":
-      return (
-        await import("@/payment/providers/nowpayments/cli/definition")
-      ).default.POST;
-    case "payment_providers_stripe_cli_POST":
-      return (
-        await import("@/payment/providers/stripe/cli/definition")
-      ).default.POST;
-    case "payment_refund_POST":
-      return (await import("@/payment/refund/definition"))
+      return (await import("@/payment/providers/nowpayments/cli/definition"))
         .default.POST;
+    case "payment_providers_stripe_cli_POST":
+      return (await import("@/payment/providers/stripe/cli/definition")).default
+        .POST;
+    case "payment_refund_POST":
+      return (await import("@/payment/refund/definition")).default.POST;
     case "payments-count":
-      return (
-        await import("@/payment/data-sources/payments-count/definition")
-      ).default.POST;
+      return (await import("@/payment/data-sources/payments-count/definition"))
+        .default.POST;
     case "payments-disputes-count":
       return (
         await import("@/payment/data-sources/payments-disputes-count/definition")
       ).default.POST;
     case "payments-failed":
-      return (
-        await import("@/payment/data-sources/payments-failed/definition")
-      ).default.POST;
+      return (await import("@/payment/data-sources/payments-failed/definition"))
+        .default.POST;
     case "payments-invoices-paid":
       return (
         await import("@/payment/data-sources/payments-invoices-paid/definition")
@@ -2764,264 +1919,179 @@ async function importEndpoint(
         await import("@/payment/data-sources/payments-revenue/definition")
       ).default.POST;
     case "ping":
-      return (
-        await import("next-vibe/database/ping/definition")
-      ).default.POST;
+      return (await import("@/vibe/database/ping/definition")).default.POST;
     case "pos-dashboard":
-      return (await import("@/pos/dashboard/definition"))
-        .default.GET;
+      return (await import("@/pos/dashboard/definition")).default.GET;
     case "pos-order-get":
-      return (
-        await import("@/pos/order/[orderId]/get/definition")
-      ).default.GET;
+      return (await import("@/pos/order/[orderId]/get/definition")).default.GET;
     case "pos-order-list":
-      return (await import("@/pos/order/list/definition"))
-        .default.GET;
+      return (await import("@/pos/order/list/definition")).default.GET;
     case "pos-product-lookup":
-      return (await import("@/pos/product-lookup/definition"))
-        .default.GET;
+      return (await import("@/pos/product-lookup/definition")).default.GET;
     case "pos-session-open":
-      return (await import("@/pos/session/open/definition"))
-        .default.POST;
+      return (await import("@/pos/session/open/definition")).default.POST;
     case "pos-terminals":
-      return (await import("@/pos/terminal/list/definition"))
-        .default.GET;
+      return (await import("@/pos/terminal/list/definition")).default.GET;
     case "pos_dashboard_GET":
-      return (await import("@/pos/dashboard/definition"))
-        .default.GET;
+      return (await import("@/pos/dashboard/definition")).default.GET;
     case "pos_order_create_POST":
-      return (await import("@/pos/order/create/definition"))
-        .default.POST;
+      return (await import("@/pos/order/create/definition")).default.POST;
     case "pos_order_list_GET":
-      return (await import("@/pos/order/list/definition"))
-        .default.GET;
+      return (await import("@/pos/order/list/definition")).default.GET;
     case "pos_order_orderId_add-item_POST":
-      return (
-        await import("@/pos/order/[orderId]/add-item/definition")
-      ).default.POST;
+      return (await import("@/pos/order/[orderId]/add-item/definition")).default
+        .POST;
     case "pos_order_orderId_add-payment_POST":
-      return (
-        await import("@/pos/order/[orderId]/add-payment/definition")
-      ).default.POST;
+      return (await import("@/pos/order/[orderId]/add-payment/definition"))
+        .default.POST;
     case "pos_order_orderId_complete_POST":
-      return (
-        await import("@/pos/order/[orderId]/complete/definition")
-      ).default.POST;
+      return (await import("@/pos/order/[orderId]/complete/definition")).default
+        .POST;
     case "pos_order_orderId_get_GET":
-      return (
-        await import("@/pos/order/[orderId]/get/definition")
-      ).default.GET;
+      return (await import("@/pos/order/[orderId]/get/definition")).default.GET;
     case "pos_order_orderId_remove-item_POST":
-      return (
-        await import("@/pos/order/[orderId]/remove-item/definition")
-      ).default.POST;
+      return (await import("@/pos/order/[orderId]/remove-item/definition"))
+        .default.POST;
     case "pos_order_orderId_void_POST":
-      return (
-        await import("@/pos/order/[orderId]/void/definition")
-      ).default.POST;
+      return (await import("@/pos/order/[orderId]/void/definition")).default
+        .POST;
     case "pos_product-lookup_GET":
-      return (await import("@/pos/product-lookup/definition"))
-        .default.GET;
+      return (await import("@/pos/product-lookup/definition")).default.GET;
     case "pos_session_close_POST":
-      return (await import("@/pos/session/close/definition"))
-        .default.POST;
+      return (await import("@/pos/session/close/definition")).default.POST;
     case "pos_session_open_POST":
-      return (await import("@/pos/session/open/definition"))
-        .default.POST;
+      return (await import("@/pos/session/open/definition")).default.POST;
     case "pos_session_sessionId_get_GET":
-      return (
-        await import("@/pos/session/[sessionId]/get/definition")
-      ).default.GET;
+      return (await import("@/pos/session/[sessionId]/get/definition")).default
+        .GET;
     case "pos_terminal_create_POST":
-      return (await import("@/pos/terminal/create/definition"))
-        .default.POST;
+      return (await import("@/pos/terminal/create/definition")).default.POST;
     case "pos_terminal_list_GET":
-      return (await import("@/pos/terminal/list/definition"))
-        .default.GET;
+      return (await import("@/pos/terminal/list/definition")).default.GET;
     case "products-catalog-list":
-      return (
-        await import("@/products/catalog/list/definition")
-      ).default.GET;
+      return (await import("@/products/catalog/list/definition")).default.GET;
     case "products-category-list":
-      return (
-        await import("@/products/category/list/definition")
-      ).default.GET;
+      return (await import("@/products/category/list/definition")).default.GET;
     case "products_catalog_create_POST":
-      return (
-        await import("@/products/catalog/create/definition")
-      ).default.POST;
+      return (await import("@/products/catalog/create/definition")).default
+        .POST;
     case "products_catalog_list_GET":
-      return (
-        await import("@/products/catalog/list/definition")
-      ).default.GET;
+      return (await import("@/products/catalog/list/definition")).default.GET;
     case "products_catalog_productId_deactivate_POST":
       return (
         await import("@/products/catalog/[productId]/deactivate/definition")
       ).default.POST;
     case "products_catalog_productId_get_GET":
-      return (
-        await import("@/products/catalog/[productId]/get/definition")
-      ).default.GET;
+      return (await import("@/products/catalog/[productId]/get/definition"))
+        .default.GET;
     case "products_catalog_productId_update_PATCH":
-      return (
-        await import("@/products/catalog/[productId]/update/definition")
-      ).default.PATCH;
+      return (await import("@/products/catalog/[productId]/update/definition"))
+        .default.PATCH;
     case "products_category_create_POST":
-      return (
-        await import("@/products/category/create/definition")
-      ).default.POST;
+      return (await import("@/products/category/create/definition")).default
+        .POST;
     case "products_category_list_GET":
-      return (
-        await import("@/products/category/list/definition")
-      ).default.GET;
+      return (await import("@/products/category/list/definition")).default.GET;
     case "pub":
-      return (
-        await import("next-vibe/tooling/release/definition")
-      ).default.POST;
+      return (await import("@/vibe/tooling/release/definition")).default.POST;
     case "publish":
-      return (
-        await import("next-vibe/tooling/release/definition")
-      ).default.POST;
+      return (await import("@/vibe/tooling/release/definition")).default.POST;
     case "pulse-execute":
-      return (
-        await import("next-vibe/tasks/pulse/execute/definition")
-      ).default.POST;
+      return (await import("@/vibe/tasks/pulse/execute/definition")).default
+        .POST;
     case "pulse-history":
-      return (
-        await import("next-vibe/tasks/pulse/history/definition")
-      ).default.GET;
+      return (await import("@/vibe/tasks/pulse/history/definition")).default
+        .GET;
     case "pulse-status":
-      return (
-        await import("next-vibe/tasks/pulse/status/definition")
-      ).default.GET;
+      return (await import("@/vibe/tasks/pulse/status/definition")).default.GET;
     case "pulse:execute":
-      return (
-        await import("next-vibe/tasks/pulse/execute/definition")
-      ).default.POST;
+      return (await import("@/vibe/tasks/pulse/execute/definition")).default
+        .POST;
     case "pulse:history":
-      return (
-        await import("next-vibe/tasks/pulse/history/definition")
-      ).default.GET;
+      return (await import("@/vibe/tasks/pulse/history/definition")).default
+        .GET;
     case "pulse:status":
-      return (
-        await import("next-vibe/tasks/pulse/status/definition")
-      ).default.GET;
+      return (await import("@/vibe/tasks/pulse/status/definition")).default.GET;
     case "purchasing-dashboard":
-      return (
-        await import("@/purchasing/dashboard/definition")
-      ).default.GET;
+      return (await import("@/purchasing/dashboard/definition")).default.GET;
     case "purchasing-orders":
-      return (
-        await import("@/purchasing/order/list/definition")
-      ).default.GET;
+      return (await import("@/purchasing/order/list/definition")).default.GET;
     case "purchasing-vendor-get":
-      return (
-        await import("@/purchasing/vendor/[vendorId]/get/definition")
-      ).default.GET;
+      return (await import("@/purchasing/vendor/[vendorId]/get/definition"))
+        .default.GET;
     case "purchasing-vendors":
-      return (
-        await import("@/purchasing/vendor/list/definition")
-      ).default.GET;
+      return (await import("@/purchasing/vendor/list/definition")).default.GET;
     case "purchasing_dashboard_GET":
-      return (
-        await import("@/purchasing/dashboard/definition")
-      ).default.GET;
+      return (await import("@/purchasing/dashboard/definition")).default.GET;
     case "purchasing_order_create_POST":
-      return (
-        await import("@/purchasing/order/create/definition")
-      ).default.POST;
+      return (await import("@/purchasing/order/create/definition")).default
+        .POST;
     case "purchasing_order_line_add_POST":
-      return (
-        await import("@/purchasing/order/line/add/definition")
-      ).default.POST;
+      return (await import("@/purchasing/order/line/add/definition")).default
+        .POST;
     case "purchasing_order_line_remove_POST":
-      return (
-        await import("@/purchasing/order/line/remove/definition")
-      ).default.POST;
+      return (await import("@/purchasing/order/line/remove/definition")).default
+        .POST;
     case "purchasing_order_list_GET":
-      return (
-        await import("@/purchasing/order/list/definition")
-      ).default.GET;
+      return (await import("@/purchasing/order/list/definition")).default.GET;
     case "purchasing_order_poId_cancel_POST":
-      return (
-        await import("@/purchasing/order/[poId]/cancel/definition")
-      ).default.POST;
+      return (await import("@/purchasing/order/[poId]/cancel/definition"))
+        .default.POST;
     case "purchasing_order_poId_confirm_POST":
-      return (
-        await import("@/purchasing/order/[poId]/confirm/definition")
-      ).default.POST;
+      return (await import("@/purchasing/order/[poId]/confirm/definition"))
+        .default.POST;
     case "purchasing_order_poId_convert-to-bill_POST":
       return (
         await import("@/purchasing/order/[poId]/convert-to-bill/definition")
       ).default.POST;
     case "purchasing_order_poId_get_GET":
-      return (
-        await import("@/purchasing/order/[poId]/get/definition")
-      ).default.GET;
+      return (await import("@/purchasing/order/[poId]/get/definition")).default
+        .GET;
     case "purchasing_order_poId_receive_POST":
-      return (
-        await import("@/purchasing/order/[poId]/receive/definition")
-      ).default.POST;
+      return (await import("@/purchasing/order/[poId]/receive/definition"))
+        .default.POST;
     case "purchasing_order_poId_send_POST":
-      return (
-        await import("@/purchasing/order/[poId]/send/definition")
-      ).default.POST;
+      return (await import("@/purchasing/order/[poId]/send/definition")).default
+        .POST;
     case "purchasing_order_poId_update_PATCH":
-      return (
-        await import("@/purchasing/order/[poId]/update/definition")
-      ).default.PATCH;
+      return (await import("@/purchasing/order/[poId]/update/definition"))
+        .default.PATCH;
     case "purchasing_vendor_create_POST":
-      return (
-        await import("@/purchasing/vendor/create/definition")
-      ).default.POST;
+      return (await import("@/purchasing/vendor/create/definition")).default
+        .POST;
     case "purchasing_vendor_list_GET":
-      return (
-        await import("@/purchasing/vendor/list/definition")
-      ).default.GET;
+      return (await import("@/purchasing/vendor/list/definition")).default.GET;
     case "purchasing_vendor_vendorId_deactivate_POST":
       return (
         await import("@/purchasing/vendor/[vendorId]/deactivate/definition")
       ).default.POST;
     case "purchasing_vendor_vendorId_get_GET":
-      return (
-        await import("@/purchasing/vendor/[vendorId]/get/definition")
-      ).default.GET;
+      return (await import("@/purchasing/vendor/[vendorId]/get/definition"))
+        .default.GET;
     case "purchasing_vendor_vendorId_update_PATCH":
-      return (
-        await import("@/purchasing/vendor/[vendorId]/update/definition")
-      ).default.PATCH;
+      return (await import("@/purchasing/vendor/[vendorId]/update/definition"))
+        .default.PATCH;
     case "push":
-      return (
-        await import("next-vibe/tooling/infra/deploy/push/definition")
-      ).default.POST;
-    case "re":
-      return (
-        await import("next-vibe/server/server/rebuild/definition")
-      ).default.POST;
-    case "rebuild":
-      return (
-        await import("next-vibe/server/server/rebuild/definition")
-      ).default.POST;
-    case "record-engagement":
-      return (await import("@/leads/tracking/definition"))
+      return (await import("@/vibe/tooling/infra/deploy/push/definition"))
         .default.POST;
-    case "referral-stats":
-      return (await import("@/referral/stats/definition"))
-        .default.GET;
-    case "referral_POST":
-      return (await import("@/referral/definition")).default
+    case "re":
+      return (await import("@/vibe/server/server/rebuild/definition")).default
         .POST;
+    case "rebuild":
+      return (await import("@/vibe/server/server/rebuild/definition")).default
+        .POST;
+    case "record-engagement":
+      return (await import("@/leads/tracking/definition")).default.POST;
+    case "referral-stats":
+      return (await import("@/referral/stats/definition")).default.GET;
+    case "referral_POST":
+      return (await import("@/referral/definition")).default.POST;
     case "referral_admin_payouts_GET":
-      return (
-        await import("@/referral/admin/payouts/definition")
-      ).default.GET;
+      return (await import("@/referral/admin/payouts/definition")).default.GET;
     case "referral_admin_payouts_POST":
-      return (
-        await import("@/referral/admin/payouts/definition")
-      ).default.POST;
+      return (await import("@/referral/admin/payouts/definition")).default.POST;
     case "referral_codes_list_GET":
-      return (await import("@/referral/codes/list/definition"))
-        .default.GET;
+      return (await import("@/referral/codes/list/definition")).default.GET;
     case "referral_data-sources_referrals-codes-created_POST":
       return (
         await import("@/referral/data-sources/referrals-codes-created/definition")
@@ -3047,22 +2117,15 @@ async function importEndpoint(
         await import("@/referral/data-sources/referrals-signups/definition")
       ).default.POST;
     case "referral_earnings_list_GET":
-      return (
-        await import("@/referral/earnings/list/definition")
-      ).default.GET;
+      return (await import("@/referral/earnings/list/definition")).default.GET;
     case "referral_lead_current_GET":
-      return (
-        await import("@/referral/lead/current/definition")
-      ).default.GET;
+      return (await import("@/referral/lead/current/definition")).default.GET;
     case "referral_payout_GET":
-      return (await import("@/referral/payout/definition"))
-        .default.GET;
+      return (await import("@/referral/payout/definition")).default.GET;
     case "referral_payout_POST":
-      return (await import("@/referral/payout/definition"))
-        .default.POST;
+      return (await import("@/referral/payout/definition")).default.POST;
     case "referral_stats_GET":
-      return (await import("@/referral/stats/definition"))
-        .default.GET;
+      return (await import("@/referral/stats/definition")).default.GET;
     case "referrals-codes-created":
       return (
         await import("@/referral/data-sources/referrals-codes-created/definition")
@@ -3088,221 +2151,137 @@ async function importEndpoint(
         await import("@/referral/data-sources/referrals-signups/definition")
       ).default.POST;
     case "release":
-      return (
-        await import("next-vibe/tooling/release/definition")
-      ).default.POST;
+      return (await import("@/vibe/tooling/release/definition")).default.POST;
     case "remote-connect":
-      return (
-        await import("next-vibe/remote-connection/connect/definition")
-      ).default.POST;
-    case "remote-connection_connect-reverse_POST":
-      return (
-        await import("next-vibe/remote-connection/connect-reverse/definition")
-      ).default.POST;
-    case "remote-connection_connect-reverse_update_PATCH":
-      return (
-        await import("next-vibe/remote-connection/connect-reverse/update/definition")
-      ).default.PATCH;
-    case "remote-connection_connect_POST":
-      return (
-        await import("next-vibe/remote-connection/connect/definition")
-      ).default.POST;
-    case "remote-connection_instanceId_DELETE":
-      return (
-        await import("next-vibe/remote-connection/[instanceId]/definition")
-      ).default.DELETE;
-    case "remote-connection_instanceId_GET":
-      return (
-        await import("next-vibe/remote-connection/[instanceId]/definition")
-      ).default.GET;
-    case "remote-connection_instanceId_PATCH":
-      return (
-        await import("next-vibe/remote-connection/[instanceId]/definition")
-      ).default.PATCH;
-    case "remote-connection_list_GET":
-      return (
-        await import("next-vibe/remote-connection/list/definition")
-      ).default.GET;
-    case "remote-connection_self_instanceId_GET":
-      return (
-        await import("next-vibe/remote-connection/self/instanceId/definition")
-      ).default.GET;
-    case "remote-connection_self_rename_PATCH":
-      return (
-        await import("next-vibe/remote-connection/self/rename/definition")
-      ).default.PATCH;
-    case "remote-connection_sync_POST":
-      return (
-        await import("next-vibe/remote-connection/sync/definition")
-      ).default.POST;
-    case "remote-connection_sync_providers_GET":
-      return (
-        await import("next-vibe/remote-connection/sync/providers/definition")
-      ).default.GET;
+      return (await import("@/vibe/remote-connection/connect/definition"))
+        .default.POST;
     case "remote-connections":
-      return (
-        await import("next-vibe/remote-connection/list/definition")
-      ).default.GET;
+      return (await import("@/vibe/remote-connection/list/definition")).default
+        .GET;
     case "remote-event-bridge":
-      return (
-        await import("next-vibe/realtime/remote-event-bridge/definition")
-      ).default.POST;
+      return (await import("@/vibe/realtime/remote-event-bridge/definition"))
+        .default.POST;
     case "remote-status":
-      return (
-        await import("next-vibe/remote-connection/[instanceId]/definition")
-      ).default.GET;
+      return (await import("@/vibe/remote-connection/[instanceId]/definition"))
+        .default.GET;
     case "rename-instance":
-      return (
-        await import("next-vibe/remote-connection/self/rename/definition")
-      ).default.PATCH;
+      return (await import("@/vibe/remote-connection/self/rename/definition"))
+        .default.PATCH;
     case "rename-self":
-      return (
-        await import("next-vibe/remote-connection/self/rename/definition")
-      ).default.PATCH;
+      return (await import("@/vibe/remote-connection/self/rename/definition"))
+        .default.PATCH;
     case "rename-thread":
-      return (
-        await import("next-vibe/agent/chat/threads/rename/definition")
-      ).default.PATCH;
+      return (await import("@/vibe/agent/chat/threads/rename/definition"))
+        .default.PATCH;
     case "report-client-error":
-      return (
-        await import("next-vibe/logger/error-monitor/client-log/definition")
-      ).default.POST;
+      return (await import("@/vibe/logger/error-monitor/client-log/definition"))
+        .default.POST;
     case "resume-stream":
-      return (
-        await import("next-vibe/execute-tool/revival/definition")
-      ).default.POST;
+      return (await import("@/vibe/execute-tool/revival/definition")).default
+        .POST;
     case "resume-when-done":
       return (
-        await import("next-vibe/execute-tool/call-control/resume-when-done/definition")
+        await import("@/vibe/execute-tool/call-control/resume-when-done/definition")
       ).default.POST;
     case "run-ai":
-      return (await import("next-vibe/agent/ai-stream/run/definition"))
-        .default.POST;
+      return (await import("@/vibe/agent/ai-stream/run/definition")).default
+        .POST;
     case "runner":
-      return (
-        await import("next-vibe/tasks/unified-runner/definition")
-      ).default.POST;
+      return (await import("@/vibe/tasks/unified-runner/definition")).default
+        .POST;
     case "s":
-      return (
-        await import("next-vibe/server/server/start/definition")
-      ).default.POST;
+      return (await import("@/vibe/server/server/start/definition")).default
+        .POST;
     case "scale":
-      return (
-        await import("next-vibe/tooling/infra/scale/replicas/definition")
-      ).default.POST;
+      return (await import("@/vibe/tooling/infra/scale/replicas/definition"))
+        .default.POST;
     case "scale-replicas":
-      return (
-        await import("next-vibe/tooling/infra/scale/replicas/definition")
-      ).default.POST;
+      return (await import("@/vibe/tooling/infra/scale/replicas/definition"))
+        .default.POST;
     case "seed":
-      return (
-        await import("next-vibe/database/seed/definition")
-      ).default.POST;
+      return (await import("@/vibe/database/seed/definition")).default.POST;
     case "self-instance-id":
       return (
-        await import("next-vibe/remote-connection/self/instanceId/definition")
+        await import("@/vibe/remote-connection/self/instanceId/definition")
       ).default.GET;
     case "set-setting":
-      return (await import("next-vibe/env/settings/definition"))
-        .default.PATCH;
+      return (await import("@/vibe/env/settings/definition")).default.PATCH;
     case "setup":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/platforms/cli/setup/install/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/platforms/cli/setup/install/definition"
         )
       ).default.POST;
     case "setup:uninstall":
-      return (
-        await import("next-vibe/platforms/cli/setup/uninstall/definition")
-      ).default.POST;
+      return (await import("@/vibe/platforms/cli/setup/uninstall/definition"))
+        .default.POST;
     case "setup:update":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/platforms/cli/setup/install/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/platforms/cli/setup/install/definition"
         )
       ).default.POST;
     case "skill-create":
-      return (await import("next-vibe/agent/skills/create/definition"))
-        .default.POST;
+      return (await import("@/vibe/agent/skills/create/definition")).default
+        .POST;
     case "skill-delete":
-      return (await import("next-vibe/agent/skills/[id]/definition"))
-        .default.DELETE;
+      return (await import("@/vibe/agent/skills/[id]/definition")).default
+        .DELETE;
     case "skill-get":
-      return (await import("next-vibe/agent/skills/[id]/definition"))
-        .default.GET;
+      return (await import("@/vibe/agent/skills/[id]/definition")).default.GET;
     case "skill-moderation":
-      return (
-        await import("next-vibe/agent/skills/moderation/definition")
-      ).default.GET;
+      return (await import("@/vibe/agent/skills/moderation/definition")).default
+        .GET;
     case "skill-publish":
-      return (
-        await import("next-vibe/agent/skills/[id]/publish/definition")
-      ).default.PATCH;
-    case "skill-report":
-      return (
-        await import("next-vibe/agent/skills/[id]/report/definition")
-      ).default.POST;
-    case "skill-update":
-      return (await import("next-vibe/agent/skills/[id]/definition"))
+      return (await import("@/vibe/agent/skills/[id]/publish/definition"))
         .default.PATCH;
-    case "skill-vote":
-      return (
-        await import("next-vibe/agent/skills/[id]/vote/definition")
-      ).default.POST;
-    case "skills":
-      return (await import("next-vibe/agent/skills/definition"))
-        .default.GET;
-    case "sql":
-      return (await import("next-vibe/database/sql/definition"))
+    case "skill-report":
+      return (await import("@/vibe/agent/skills/[id]/report/definition"))
         .default.POST;
+    case "skill-update":
+      return (await import("@/vibe/agent/skills/[id]/definition")).default
+        .PATCH;
+    case "skill-vote":
+      return (await import("@/vibe/agent/skills/[id]/vote/definition")).default
+        .POST;
+    case "skills":
+      return (await import("@/vibe/agent/skills/definition")).default.GET;
+    case "sql":
+      return (await import("@/vibe/database/sql/definition")).default.POST;
     case "ssh-connections-list":
-      return (
-        await import("@/ssh/connections/list/definition")
-      ).default.GET;
+      return (await import("@/ssh/connections/list/definition")).default.GET;
     case "ssh-mount":
       return (
         await import("@/ssh/connections/[id]/mounts/[mountId]/definition")
       ).default.GET;
     case "ssh-mount-create":
-      return (
-        await import("@/ssh/connections/[id]/mounts/create/definition")
-      ).default.POST;
+      return (await import("@/ssh/connections/[id]/mounts/create/definition"))
+        .default.POST;
     case "ssh-mount-delete":
       return (
         await import("@/ssh/connections/[id]/mounts/[mountId]/definition")
       ).default.DELETE;
     case "ssh-mount-list":
-      return (
-        await import("@/ssh/connections/[id]/mounts/list/definition")
-      ).default.GET;
+      return (await import("@/ssh/connections/[id]/mounts/list/definition"))
+        .default.GET;
     case "ssh-mount-update":
       return (
         await import("@/ssh/connections/[id]/mounts/[mountId]/definition")
       ).default.PATCH;
     case "ssh_connections_create_POST":
-      return (
-        await import("@/ssh/connections/create/definition")
-      ).default.POST;
+      return (await import("@/ssh/connections/create/definition")).default.POST;
     case "ssh_connections_id_DELETE":
-      return (
-        await import("@/ssh/connections/[id]/definition")
-      ).default.DELETE;
+      return (await import("@/ssh/connections/[id]/definition")).default.DELETE;
     case "ssh_connections_id_GET":
-      return (
-        await import("@/ssh/connections/[id]/definition")
-      ).default.GET;
+      return (await import("@/ssh/connections/[id]/definition")).default.GET;
     case "ssh_connections_id_PATCH":
-      return (
-        await import("@/ssh/connections/[id]/definition")
-      ).default.PATCH;
+      return (await import("@/ssh/connections/[id]/definition")).default.PATCH;
     case "ssh_connections_id_mounts_create_POST":
-      return (
-        await import("@/ssh/connections/[id]/mounts/create/definition")
-      ).default.POST;
+      return (await import("@/ssh/connections/[id]/mounts/create/definition"))
+        .default.POST;
     case "ssh_connections_id_mounts_list_GET":
-      return (
-        await import("@/ssh/connections/[id]/mounts/list/definition")
-      ).default.GET;
+      return (await import("@/ssh/connections/[id]/mounts/list/definition"))
+        .default.GET;
     case "ssh_connections_id_mounts_mountId_DELETE":
       return (
         await import("@/ssh/connections/[id]/mounts/[mountId]/definition")
@@ -3316,120 +2295,82 @@ async function importEndpoint(
         await import("@/ssh/connections/[id]/mounts/[mountId]/definition")
       ).default.PATCH;
     case "ssh_connections_list_GET":
-      return (
-        await import("@/ssh/connections/list/definition")
-      ).default.GET;
+      return (await import("@/ssh/connections/list/definition")).default.GET;
     case "ssh_linux_users_create_POST":
-      return (
-        await import("@/ssh/linux/users/create/definition")
-      ).default.POST;
+      return (await import("@/ssh/linux/users/create/definition")).default.POST;
     case "ssh_linux_users_list_GET":
-      return (
-        await import("@/ssh/linux/users/list/definition")
-      ).default.GET;
+      return (await import("@/ssh/linux/users/list/definition")).default.GET;
     case "ssh_linux_users_username_DELETE":
-      return (
-        await import("@/ssh/linux/users/[username]/definition")
-      ).default.DELETE;
+      return (await import("@/ssh/linux/users/[username]/definition")).default
+        .DELETE;
     case "stage":
-      return (
-        await import("next-vibe/tooling/vibe-stage/definition")
-      ).default.POST;
+      return (await import("@/vibe/tooling/vibe-stage/definition")).default
+        .POST;
     case "start":
-      return (
-        await import("next-vibe/server/server/start/definition")
-      ).default.POST;
+      return (await import("@/vibe/server/server/start/definition")).default
+        .POST;
     case "status":
-      return (
-        await import("next-vibe/platforms/cli/setup/status/definition")
-      ).default.POST;
+      return (await import("@/vibe/platforms/cli/setup/status/definition"))
+        .default.POST;
     case "stripe":
-      return (
-        await import("@/payment/providers/stripe/cli/definition")
-      ).default.POST;
+      return (await import("@/payment/providers/stripe/cli/definition")).default
+        .POST;
     case "stripe-cli":
-      return (
-        await import("@/payment/providers/stripe/cli/definition")
-      ).default.POST;
+      return (await import("@/payment/providers/stripe/cli/definition")).default
+        .POST;
     case "stt":
-      return (
-        await import("next-vibe/agent/speech-to-text/hotkey/definition")
-      ).default.POST;
+      return (await import("@/vibe/agent/speech-to-text/hotkey/definition"))
+        .default.POST;
     case "studio":
-      return (
-        await import("next-vibe/database/studio/definition")
-      ).default.POST;
+      return (await import("@/vibe/database/studio/definition")).default.POST;
     case "subscribe":
-      return (
-        await import("@/newsletter/subscribe/definition")
-      ).default.POST;
+      return (await import("@/newsletter/subscribe/definition")).default.POST;
     case "subscription-admin-list":
-      return (
-        await import("@/subscription/admin/list/definition")
-      ).default.GET;
+      return (await import("@/subscription/admin/list/definition")).default.GET;
     case "subscription-admin-purchases":
-      return (
-        await import("@/subscription/admin/purchases/definition")
-      ).default.GET;
+      return (await import("@/subscription/admin/purchases/definition")).default
+        .GET;
     case "subscription-admin-referrals":
-      return (
-        await import("@/subscription/admin/referrals/definition")
-      ).default.GET;
+      return (await import("@/subscription/admin/referrals/definition")).default
+        .GET;
     case "subscription-admin-stats":
-      return (
-        await import("@/subscription/admin/stats/definition")
-      ).default.GET;
+      return (await import("@/subscription/admin/stats/definition")).default
+        .GET;
     case "subscription-cancel":
-      return (await import("@/subscription/cancel/definition"))
-        .default.DELETE;
+      return (await import("@/subscription/cancel/definition")).default.DELETE;
     case "subscription-dashboard":
-      return (
-        await import("@/subscription/dashboard/definition")
-      ).default.GET;
+      return (await import("@/subscription/dashboard/definition")).default.GET;
     case "subscription-update":
-      return (await import("@/subscription/update/definition"))
-        .default.PUT;
+      return (await import("@/subscription/update/definition")).default.PUT;
     case "subscription_GET":
-      return (await import("@/subscription/definition"))
-        .default.GET;
+      return (await import("@/subscription/definition")).default.GET;
     case "subscription_admin_list_GET":
-      return (
-        await import("@/subscription/admin/list/definition")
-      ).default.GET;
+      return (await import("@/subscription/admin/list/definition")).default.GET;
     case "subscription_admin_purchases_GET":
-      return (
-        await import("@/subscription/admin/purchases/definition")
-      ).default.GET;
+      return (await import("@/subscription/admin/purchases/definition")).default
+        .GET;
     case "subscription_admin_referrals_GET":
-      return (
-        await import("@/subscription/admin/referrals/definition")
-      ).default.GET;
+      return (await import("@/subscription/admin/referrals/definition")).default
+        .GET;
     case "subscription_admin_referrals_POST":
-      return (
-        await import("@/subscription/admin/referrals/definition")
-      ).default.POST;
+      return (await import("@/subscription/admin/referrals/definition")).default
+        .POST;
     case "subscription_admin_stats_GET":
-      return (
-        await import("@/subscription/admin/stats/definition")
-      ).default.GET;
+      return (await import("@/subscription/admin/stats/definition")).default
+        .GET;
     case "subscription_cancel_DELETE":
-      return (await import("@/subscription/cancel/definition"))
-        .default.DELETE;
+      return (await import("@/subscription/cancel/definition")).default.DELETE;
     case "subscription_company_companyId_get_GET":
-      return (
-        await import("@/subscription/company/[companyId]/get/definition")
-      ).default.GET;
+      return (await import("@/subscription/company/[companyId]/get/definition"))
+        .default.GET;
     case "subscription_company_companyId_list_GET":
       return (
         await import("@/subscription/company/[companyId]/list/definition")
       ).default.GET;
     case "subscription_create_POST":
-      return (await import("@/subscription/create/definition"))
-        .default.POST;
+      return (await import("@/subscription/create/definition")).default.POST;
     case "subscription_dashboard_GET":
-      return (
-        await import("@/subscription/dashboard/definition")
-      ).default.GET;
+      return (await import("@/subscription/dashboard/definition")).default.GET;
     case "subscription_data-sources_subscriptions-active_POST":
       return (
         await import("@/subscription/data-sources/subscriptions-active/definition")
@@ -3455,8 +2396,7 @@ async function importEndpoint(
         await import("@/subscription/data-sources/subscriptions-trialing/definition")
       ).default.POST;
     case "subscription_update_PUT":
-      return (await import("@/subscription/update/definition"))
-        .default.PUT;
+      return (await import("@/subscription/update/definition")).default.PUT;
     case "subscriptions-active":
       return (
         await import("@/subscription/data-sources/subscriptions-active/definition")
@@ -3482,572 +2422,134 @@ async function importEndpoint(
         await import("@/subscription/data-sources/subscriptions-trialing/definition")
       ).default.POST;
     case "sync":
-      return (
-        await import("next-vibe/remote-connection/sync/definition")
-      ).default.POST;
+      return (await import("@/vibe/remote-connection/sync/definition")).default
+        .POST;
     case "system-prompt-debug":
       return (
-        await import("next-vibe/agent/ai-stream/system-prompt/debug/definition")
+        await import("@/vibe/agent/ai-stream/system-prompt/debug/definition")
       ).default.GET;
     case "system-settings":
-      return (await import("next-vibe/env/settings/definition"))
-        .default.GET;
-    case "system_database_generate_POST":
-      return (
-        await import("next-vibe/database/generate/definition")
-      ).default.POST;
-    case "system_database_health_POST":
-      return (
-        await import("next-vibe/database/health/definition")
-      ).default.POST;
-    case "system_database_migrate_POST":
-      return (
-        await import("next-vibe/database/migrate/definition")
-      ).default.POST;
-    case "system_database_ping_POST":
-      return (
-        await import("next-vibe/database/ping/definition")
-      ).default.POST;
-    case "system_database_seed_POST":
-      return (
-        await import("next-vibe/database/seed/definition")
-      ).default.POST;
-    case "system_database_sql_POST":
-      return (await import("next-vibe/database/sql/definition"))
-        .default.POST;
-    case "system_database_studio_POST":
-      return (
-        await import("next-vibe/database/studio/definition")
-      ).default.POST;
-    case "system_database_utils_GET":
-      return (
-        await import("next-vibe/database/utils/definition")
-      ).default.GET;
-    case "system_database_utils_docker-operations_POST":
-      return (
-        await import("next-vibe/database/utils/docker-operations/definition")
-      ).default.POST;
-    case "system_dataflow_cleanup_POST":
-      return (
-        await import("next-vibe/dataflow/cleanup/definition")
-      ).default.POST;
-    case "system_dataflow_graphs_GET":
-      return (
-        await import("next-vibe/dataflow/graphs/definition")
-      ).default.GET;
-    case "system_dataflow_graphs_POST":
-      return (
-        await import("next-vibe/dataflow/graphs/definition")
-      ).default.POST;
-    case "system_dataflow_graphs_id_archive_POST":
-      return (
-        await import("next-vibe/dataflow/graphs/[id]/archive/definition")
-      ).default.POST;
-    case "system_dataflow_graphs_id_backtest_POST":
-      return (
-        await import("next-vibe/dataflow/graphs/[id]/backtest/definition")
-      ).default.POST;
-    case "system_dataflow_graphs_id_data_GET":
-      return (
-        await import("next-vibe/dataflow/graphs/[id]/data/definition")
-      ).default.GET;
-    case "system_dataflow_graphs_id_delete_DELETE":
-      return (
-        await import("next-vibe/dataflow/graphs/[id]/delete/definition")
-      ).default.DELETE;
-    case "system_dataflow_graphs_id_edit_PUT":
-      return (
-        await import("next-vibe/dataflow/graphs/[id]/edit/definition")
-      ).default.PUT;
-    case "system_dataflow_graphs_id_promote_POST":
-      return (
-        await import("next-vibe/dataflow/graphs/[id]/promote/definition")
-      ).default.POST;
-    case "system_dataflow_graphs_id_trigger_POST":
-      return (
-        await import("next-vibe/dataflow/graphs/[id]/trigger/definition")
-      ).default.POST;
-    case "system_dataflow_graphs_id_versions_GET":
-      return (
-        await import("next-vibe/dataflow/graphs/[id]/versions/definition")
-      ).default.GET;
-    case "system_dataflow_run-config_POST":
-      return (
-        await import("next-vibe/dataflow/run-config/definition")
-      ).default.POST;
-    case "system_env_settings_GET":
-      return (await import("next-vibe/env/settings/definition"))
-        .default.GET;
-    case "system_env_settings_PATCH":
-      return (await import("next-vibe/env/settings/definition"))
-        .default.PATCH;
-    case "system_env_settings_POST":
-      return (await import("next-vibe/env/settings/definition"))
-        .default.POST;
-    case "system_env_settings_export-env_GET":
-      return (
-        await import("next-vibe/env/settings/export-env/definition")
-      ).default.GET;
-    case "system_env_settings_generate-key_GET":
-      return (
-        await import("next-vibe/env/settings/generate-key/definition")
-      ).default.GET;
-    case "system_execute-tool_POST":
-      return (await import("next-vibe/execute-tool/definition"))
-        .default.POST;
-    case "system_execute-tool_await-task_POST":
-      return (
-        await import("next-vibe/execute-tool/await-task/definition")
-      ).default.POST;
-    case "system_execute-tool_call-control_cancel_POST":
-      return (
-        await import("next-vibe/execute-tool/call-control/cancel/definition")
-      ).default.POST;
-    case "system_execute-tool_call-control_detach_POST":
-      return (
-        await import("next-vibe/execute-tool/call-control/detach/definition")
-      ).default.POST;
-    case "system_execute-tool_call-control_resume-when-done_POST":
-      return (
-        await import("next-vibe/execute-tool/call-control/resume-when-done/definition")
-      ).default.POST;
-    case "system_execute-tool_complete_POST":
-      return (
-        await import("next-vibe/execute-tool/complete/definition")
-      ).default.POST;
-    case "system_execute-tool_revival_POST":
-      return (
-        await import("next-vibe/execute-tool/revival/definition")
-      ).default.POST;
-    case "system_help-tool_GET":
-      return (await import("next-vibe/help-tool/definition"))
-        .default.GET;
-    case "system_logger_error-monitor_cleanup_POST":
-      return (
-        await import("next-vibe/logger/error-monitor/cleanup/definition")
-      ).default.POST;
+      return (await import("@/vibe/env/settings/definition")).default.GET;
     case "system_logger_error-monitor_client-log_POST":
-      return (
-        await import("next-vibe/logger/error-monitor/client-log/definition")
-      ).default.POST;
-    case "system_logger_error-monitor_data-sources_error-logs-errors_POST":
-      return (
-        await import("next-vibe/logger/error-monitor/data-sources/error-logs-errors/definition")
-      ).default.POST;
-    case "system_logger_error-monitor_data-sources_error-logs-total_POST":
-      return (
-        await import("next-vibe/logger/error-monitor/data-sources/error-logs-total/definition")
-      ).default.POST;
-    case "system_logger_error-monitor_data-sources_error-logs-warnings_POST":
-      return (
-        await import("next-vibe/logger/error-monitor/data-sources/error-logs-warnings/definition")
-      ).default.POST;
-    case "system_logger_error-monitor_logs_GET":
-      return (
-        await import("next-vibe/logger/error-monitor/logs/definition")
-      ).default.GET;
-    case "system_logger_error-monitor_logs_PATCH":
-      return (
-        await import("next-vibe/logger/error-monitor/logs/definition")
-      ).default.PATCH;
-    case "system_platforms_cli_interactive_capture_POST":
-      return (
-        await import("next-vibe/platforms/cli/interactive/capture/definition")
-      ).default.POST;
-    case "system_platforms_cli_interactive_send-keys_POST":
-      return (
-        await import("next-vibe/platforms/cli/interactive/send-keys/definition")
-      ).default.POST;
-    case "system_platforms_cli_setup_install_POST":
-      return (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/platforms/cli/setup/install/definition"
-        )
-      ).default.POST;
-    case "system_platforms_cli_setup_status_POST":
-      return (
-        await import("next-vibe/platforms/cli/setup/status/definition")
-      ).default.POST;
-    case "system_platforms_cli_setup_uninstall_POST":
-      return (
-        await import("next-vibe/platforms/cli/setup/uninstall/definition")
-      ).default.POST;
-    case "system_platforms_mcp_serve_POST":
-      return (
-        await import("next-vibe/platforms/mcp/serve/definition")
-      ).default.POST;
-    case "system_platforms_vibe-frame_mount_POST":
-      return (
-        await import("next-vibe/platforms/vibe-frame/mount/definition")
-      ).default.POST;
-    case "system_realtime_remote-event-bridge_POST":
-      return (
-        await import("next-vibe/realtime/remote-event-bridge/definition")
-      ).default.POST;
-    case "system_server_server_build_POST":
-      return (
-        await import("next-vibe/server/server/build/definition")
-      ).default.POST;
-    case "system_server_server_dev_POST":
-      return (
-        await import("next-vibe/server/server/dev/definition")
-      ).default.POST;
-    case "system_server_server_electron_build_POST":
-      return (
-        await import("next-vibe/server/server/electron/build/definition")
-      ).default.POST;
-    case "system_server_server_electron_start_POST":
-      return (
-        await import("next-vibe/server/server/electron/start/definition")
-      ).default.POST;
-    case "system_server_server_headless-client_POST":
-      return (
-        await import("next-vibe/server/server/headless-client/definition")
-      ).default.POST;
-    case "system_server_server_health_GET":
-      return (
-        await import("next-vibe/server/server/health/definition")
-      ).default.GET;
-    case "system_server_server_image-push_POST":
-      return (
-        await import("next-vibe/server/server/image-push/definition")
-      ).default.POST;
-    case "system_server_server_rebuild_POST":
-      return (
-        await import("next-vibe/server/server/rebuild/definition")
-      ).default.POST;
-    case "system_server_server_start_POST":
-      return (
-        await import("next-vibe/server/server/start/definition")
-      ).default.POST;
-    case "system_tasks_cron_bulk_POST":
-      return (
-        await import("next-vibe/tasks/cron/bulk/definition")
-      ).default.POST;
-    case "system_tasks_cron_history_GET":
-      return (
-        await import("next-vibe/tasks/cron/history/definition")
-      ).default.GET;
-    case "system_tasks_cron_id_DELETE":
-      return (
-        await import("next-vibe/tasks/cron/[id]/definition")
-      ).default.DELETE;
-    case "system_tasks_cron_id_GET":
-      return (
-        await import("next-vibe/tasks/cron/[id]/definition")
-      ).default.GET;
-    case "system_tasks_cron_id_PUT":
-      return (
-        await import("next-vibe/tasks/cron/[id]/definition")
-      ).default.PUT;
-    case "system_tasks_cron_queue_GET":
-      return (
-        await import("next-vibe/tasks/cron/queue/definition")
-      ).default.GET;
-    case "system_tasks_cron_stats_GET":
-      return (
-        await import("next-vibe/tasks/cron/stats/definition")
-      ).default.GET;
-    case "system_tasks_cron_tasks_GET":
-      return (
-        await import("next-vibe/tasks/cron/tasks/definition")
-      ).default.GET;
-    case "system_tasks_cron_tasks_POST":
-      return (
-        await import("next-vibe/tasks/cron/tasks/definition")
-      ).default.POST;
-    case "system_tasks_data-sources_cron-executions-failed_POST":
-      return (
-        await import("next-vibe/tasks/data-sources/cron-executions-failed/definition")
-      ).default.POST;
-    case "system_tasks_data-sources_cron-executions-succeeded_POST":
-      return (
-        await import("next-vibe/tasks/data-sources/cron-executions-succeeded/definition")
-      ).default.POST;
-    case "system_tasks_data-sources_cron-executions-total_POST":
-      return (
-        await import("next-vibe/tasks/data-sources/cron-executions-total/definition")
-      ).default.POST;
-    case "system_tasks_execute_POST":
-      return (
-        await import("next-vibe/tasks/execute/definition")
-      ).default.POST;
-    case "system_tasks_pulse_execute_POST":
-      return (
-        await import("next-vibe/tasks/pulse/execute/definition")
-      ).default.POST;
-    case "system_tasks_pulse_history_GET":
-      return (
-        await import("next-vibe/tasks/pulse/history/definition")
-      ).default.GET;
-    case "system_tasks_pulse_status_GET":
-      return (
-        await import("next-vibe/tasks/pulse/status/definition")
-      ).default.GET;
-    case "system_tasks_unified-runner_POST":
-      return (
-        await import("next-vibe/tasks/unified-runner/definition")
-      ).default.POST;
-    case "system_tooling_builder_POST":
-      return (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/builder/definition"
-        )
-      ).default.POST;
-    case "system_tooling_check_config_create_POST":
-      return (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/config/create/definition"
-        )
-      ).default.POST;
-    case "system_tooling_check_lint_POST":
-      return (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/lint/definition"
-        )
-      ).default.POST;
-    case "system_tooling_check_oxlint_POST":
-      return (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/oxlint/definition"
-        )
-      ).default.POST;
-    case "system_tooling_check_testing_test_POST":
-      return (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/testing/test/definition"
-        )
-      ).default.POST;
-    case "system_tooling_check_typecheck_POST":
-      return (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/typecheck/definition"
-        )
-      ).default.POST;
-    case "system_tooling_check_vibe-check_POST":
-      return (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/vibe-check/definition"
-        )
-      ).default.POST;
-    case "system_tooling_generators_POST":
-      return (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/generators/definition"
-        )
-      ).default.POST;
-    case "system_tooling_guard_destroy_POST":
-      return (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/guard/destroy/definition"
-        )
-      ).default.POST;
-    case "system_tooling_guard_start_POST":
-      return (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/guard/start/definition"
-        )
-      ).default.POST;
-    case "system_tooling_guard_status_POST":
-      return (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/guard/status/definition"
-        )
-      ).default.POST;
-    case "system_tooling_guard_stop_POST":
-      return (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/guard/stop/definition"
-        )
-      ).default.POST;
-    case "system_tooling_infra_cluster_init_POST":
-      return (
-        await import("next-vibe/tooling/infra/cluster/init/definition")
-      ).default.POST;
-    case "system_tooling_infra_cluster_status_GET":
-      return (
-        await import("next-vibe/tooling/infra/cluster/status/definition")
-      ).default.GET;
-    case "system_tooling_infra_deploy_preview_POST":
-      return (
-        await import("next-vibe/tooling/infra/deploy/preview/definition")
-      ).default.POST;
-    case "system_tooling_infra_deploy_push_POST":
-      return (
-        await import("next-vibe/tooling/infra/deploy/push/definition")
-      ).default.POST;
-    case "system_tooling_infra_scale_replicas_POST":
-      return (
-        await import("next-vibe/tooling/infra/scale/replicas/definition")
-      ).default.POST;
-    case "system_tooling_release_POST":
-      return (
-        await import("next-vibe/tooling/release/definition")
-      ).default.POST;
-    case "system_tooling_vibe-deps_POST":
-      return (
-        await import("next-vibe/tooling/vibe-deps/definition")
-      ).default.POST;
-    case "system_tooling_vibe-stage_POST":
-      return (
-        await import("next-vibe/tooling/vibe-stage/definition")
-      ).default.POST;
+      return (await import("@/vibe/logger/error-monitor/client-log/definition"))
+        .default.POST;
     case "t":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/testing/test/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/testing/test/definition"
         )
       ).default.POST;
     case "task-execute":
-      return (
-        await import("next-vibe/tasks/execute/definition")
-      ).default.POST;
+      return (await import("@/vibe/tasks/execute/definition")).default.POST;
     case "task-list":
-      return (
-        await import("next-vibe/tasks/cron/tasks/definition")
-      ).default.GET;
+      return (await import("@/vibe/tasks/cron/tasks/definition")).default.GET;
     case "task-queue":
-      return (
-        await import("next-vibe/tasks/cron/queue/definition")
-      ).default.GET;
+      return (await import("@/vibe/tasks/cron/queue/definition")).default.GET;
     case "task-runner":
-      return (
-        await import("next-vibe/tasks/unified-runner/definition")
-      ).default.POST;
+      return (await import("@/vibe/tasks/unified-runner/definition")).default
+        .POST;
     case "tasks":
-      return (
-        await import("next-vibe/tasks/cron/tasks/definition")
-      ).default.GET;
+      return (await import("@/vibe/tasks/cron/tasks/definition")).default.GET;
     case "tasks:cron:stats":
-      return (
-        await import("next-vibe/tasks/cron/stats/definition")
-      ).default.GET;
+      return (await import("@/vibe/tasks/cron/stats/definition")).default.GET;
     case "tax-rate-list":
-      return (await import("@/tax/rate/list/definition"))
-        .default.GET;
+      return (await import("@/tax/rate/list/definition")).default.GET;
     case "tax_rate_create_POST":
-      return (await import("@/tax/rate/create/definition"))
-        .default.POST;
+      return (await import("@/tax/rate/create/definition")).default.POST;
     case "tax_rate_list_GET":
-      return (await import("@/tax/rate/list/definition"))
-        .default.GET;
+      return (await import("@/tax/rate/list/definition")).default.GET;
     case "tax_rate_rateId_delete_POST":
-      return (
-        await import("@/tax/rate/[rateId]/delete/definition")
-      ).default.POST;
+      return (await import("@/tax/rate/[rateId]/delete/definition")).default
+        .POST;
     case "tax_rate_rateId_update_PATCH":
-      return (
-        await import("@/tax/rate/[rateId]/update/definition")
-      ).default.PATCH;
+      return (await import("@/tax/rate/[rateId]/update/definition")).default
+        .PATCH;
     case "tax_report_GET":
-      return (await import("@/tax/report/definition")).default
-        .GET;
+      return (await import("@/tax/report/definition")).default.GET;
     case "tc":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/typecheck/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/typecheck/definition"
         )
       ).default.POST;
     case "test":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/testing/test/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/testing/test/definition"
         )
       ).default.POST;
     case "text-to-speech":
-      return (
-        await import("next-vibe/agent/text-to-speech/definition")
-      ).default.POST;
+      return (await import("@/vibe/agent/text-to-speech/definition")).default
+        .POST;
     case "thread-files":
       return (
-        await import("next-vibe/agent/chat/threads/files/[threadId]/[filename]/definition")
+        await import("@/vibe/agent/chat/threads/files/[threadId]/[filename]/definition")
       ).default.GET;
     case "thread-messages":
       return (
-        await import("next-vibe/agent/chat/threads/[threadId]/messages/definition")
+        await import("@/vibe/agent/chat/threads/[threadId]/messages/definition")
       ).default.GET;
     case "thread-share-links":
       return (
-        await import("next-vibe/agent/chat/threads/[threadId]/share-links/definition")
+        await import("@/vibe/agent/chat/threads/[threadId]/share-links/definition")
       ).default.GET;
     case "tool-help":
-      return (await import("next-vibe/help-tool/definition"))
-        .default.GET;
+      return (await import("@/vibe/help-tool/definition")).default.GET;
     case "tools:list":
-      return (await import("next-vibe/help-tool/definition"))
-        .default.GET;
+      return (await import("@/vibe/help-tool/definition")).default.GET;
     case "track-click":
-      return (await import("@/leads/tracking/definition"))
-        .default.GET;
+      return (await import("@/leads/tracking/definition")).default.GET;
     case "track-engagement":
-      return (await import("@/leads/tracking/definition"))
-        .default.POST;
+      return (await import("@/leads/tracking/definition")).default.POST;
     case "transcribe_audio":
-      return (
-        await import("next-vibe/agent/speech-to-text/definition")
-      ).default.POST;
+      return (await import("@/vibe/agent/speech-to-text/definition")).default
+        .POST;
     case "typecheck":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/tooling/check/typecheck/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/typecheck/definition"
         )
       ).default.POST;
     case "unbottled-login":
-      return (await import("next-vibe/env/settings/definition"))
-        .default.POST;
+      return (await import("@/vibe/env/settings/definition")).default.POST;
     case "unified-runner":
-      return (
-        await import("next-vibe/tasks/unified-runner/definition")
-      ).default.POST;
+      return (await import("@/vibe/tasks/unified-runner/definition")).default
+        .POST;
     case "uninstall":
-      return (
-        await import("next-vibe/platforms/cli/setup/uninstall/definition")
-      ).default.POST;
+      return (await import("@/vibe/platforms/cli/setup/uninstall/definition"))
+        .default.POST;
     case "unsubscribe":
-      return (
-        await import("@/newsletter/unsubscribe/definition")
-      ).default.POST;
+      return (await import("@/newsletter/unsubscribe/definition")).default.POST;
     case "update":
       return (
         await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "next-vibe/platforms/cli/setup/install/definition"
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/platforms/cli/setup/install/definition"
         )
       ).default.POST;
     case "update-error-log":
-      return (
-        await import("next-vibe/logger/error-monitor/logs/definition")
-      ).default.PATCH;
+      return (await import("@/vibe/logger/error-monitor/logs/definition"))
+        .default.PATCH;
     case "update-model-prices":
-      return (
-        await import("next-vibe/agent/models/model-prices/definition")
-      ).default.GET;
+      return (await import("@/vibe/agent/models/model-prices/definition"))
+        .default.GET;
     case "update-subscription":
-      return (await import("@/subscription/update/definition"))
-        .default.PUT;
+      return (await import("@/subscription/update/definition")).default.PUT;
     case "user-delete":
-      return (await import("@/users/user/[id]/definition"))
-        .default.DELETE;
+      return (await import("@/users/user/[id]/definition")).default.DELETE;
     case "user-me":
-      return (await import("@/user/private/me/definition"))
-        .default.GET;
+      return (await import("@/user/private/me/definition")).default.GET;
     case "user-sessions":
-      return (
-        await import("@/user/private/sessions/definition")
-      ).default.GET;
+      return (await import("@/user/private/sessions/definition")).default.GET;
     case "user-update":
-      return (await import("@/users/user/[id]/definition"))
-        .default.PUT;
+      return (await import("@/users/user/[id]/definition")).default.PUT;
     case "user-view":
-      return (await import("@/users/user/[id]/definition"))
-        .default.GET;
+      return (await import("@/users/user/[id]/definition")).default.GET;
     case "user_data-sources_users-active-total_POST":
-      return (
-        await import("@/user/data-sources/users-active-total/definition")
-      ).default.POST;
+      return (await import("@/user/data-sources/users-active-total/definition"))
+        .default.POST;
     case "user_data-sources_users-banned_POST":
-      return (
-        await import("@/user/data-sources/users-banned/definition")
-      ).default.POST;
+      return (await import("@/user/data-sources/users-banned/definition"))
+        .default.POST;
     case "user_data-sources_users-email-verified_POST":
       return (
         await import("@/user/data-sources/users-email-verified/definition")
@@ -4065,37 +2567,29 @@ async function importEndpoint(
         await import("@/user/data-sources/users-marketing-consent/definition")
       ).default.POST;
     case "user_data-sources_users-registered_POST":
-      return (
-        await import("@/user/data-sources/users-registered/definition")
-      ).default.POST;
+      return (await import("@/user/data-sources/users-registered/definition"))
+        .default.POST;
     case "user_data-sources_users-two-fa-enabled_POST":
       return (
         await import("@/user/data-sources/users-two-fa-enabled/definition")
       ).default.POST;
     case "user_data-sources_users-with-stripe_POST":
-      return (
-        await import("@/user/data-sources/users-with-stripe/definition")
-      ).default.POST;
+      return (await import("@/user/data-sources/users-with-stripe/definition"))
+        .default.POST;
     case "user_private_logout_POST":
-      return (await import("@/user/private/logout/definition"))
-        .default.POST;
+      return (await import("@/user/private/logout/definition")).default.POST;
     case "user_private_me_DELETE":
-      return (await import("@/user/private/me/definition"))
-        .default.DELETE;
+      return (await import("@/user/private/me/definition")).default.DELETE;
     case "user_private_me_GET":
-      return (await import("@/user/private/me/definition"))
-        .default.GET;
+      return (await import("@/user/private/me/definition")).default.GET;
     case "user_private_me_POST":
-      return (await import("@/user/private/me/definition"))
-        .default.POST;
+      return (await import("@/user/private/me/definition")).default.POST;
     case "user_private_me_addresses_GET":
-      return (
-        await import("@/user/private/me/addresses/definition")
-      ).default.GET;
+      return (await import("@/user/private/me/addresses/definition")).default
+        .GET;
     case "user_private_me_addresses_POST":
-      return (
-        await import("@/user/private/me/addresses/definition")
-      ).default.POST;
+      return (await import("@/user/private/me/addresses/definition")).default
+        .POST;
     case "user_private_me_addresses_addressId_DELETE":
       return (
         await import("@/user/private/me/addresses/[addressId]/definition")
@@ -4105,77 +2599,55 @@ async function importEndpoint(
         await import("@/user/private/me/addresses/[addressId]/definition")
       ).default.PATCH;
     case "user_private_me_avatar_DELETE":
-      return (
-        await import("@/user/private/me/avatar/definition")
-      ).default.DELETE;
+      return (await import("@/user/private/me/avatar/definition")).default
+        .DELETE;
     case "user_private_me_avatar_POST":
-      return (
-        await import("@/user/private/me/avatar/definition")
-      ).default.POST;
+      return (await import("@/user/private/me/avatar/definition")).default.POST;
     case "user_private_me_password_POST":
-      return (
-        await import("@/user/private/me/password/definition")
-      ).default.POST;
+      return (await import("@/user/private/me/password/definition")).default
+        .POST;
     case "user_private_sessions_GET":
-      return (
-        await import("@/user/private/sessions/definition")
-      ).default.GET;
+      return (await import("@/user/private/sessions/definition")).default.GET;
     case "user_private_sessions_POST":
-      return (
-        await import("@/user/private/sessions/definition")
-      ).default.POST;
+      return (await import("@/user/private/sessions/definition")).default.POST;
     case "user_private_sessions_id_DELETE":
-      return (
-        await import("@/user/private/sessions/[id]/definition")
-      ).default.DELETE;
+      return (await import("@/user/private/sessions/[id]/definition")).default
+        .DELETE;
     case "user_public_creator_userId_GET":
-      return (
-        await import("@/user/public/creator/[userId]/definition")
-      ).default.GET;
+      return (await import("@/user/public/creator/[userId]/definition")).default
+        .GET;
     case "user_public_login_POST":
-      return (await import("@/user/public/login/definition"))
-        .default.POST;
+      return (await import("@/user/public/login/definition")).default.POST;
     case "user_public_login_options_GET":
-      return (
-        await import("@/user/public/login/options/definition")
-      ).default.GET;
+      return (await import("@/user/public/login/options/definition")).default
+        .GET;
     case "user_public_reset-password_confirm_POST":
-      return (
-        await import("@/user/public/reset-password/confirm/definition")
-      ).default.POST;
+      return (await import("@/user/public/reset-password/confirm/definition"))
+        .default.POST;
     case "user_public_reset-password_request_POST":
-      return (
-        await import("@/user/public/reset-password/request/definition")
-      ).default.POST;
+      return (await import("@/user/public/reset-password/request/definition"))
+        .default.POST;
     case "user_public_reset-password_validate_GET":
-      return (
-        await import("@/user/public/reset-password/validate/definition")
-      ).default.GET;
+      return (await import("@/user/public/reset-password/validate/definition"))
+        .default.GET;
     case "user_public_signup_POST":
-      return (await import("@/user/public/signup/definition"))
-        .default.POST;
+      return (await import("@/user/public/signup/definition")).default.POST;
     case "user_session-cleanup_POST":
-      return (
-        await import("@/user/session-cleanup/definition")
-      ).default.POST;
+      return (await import("@/user/session-cleanup/definition")).default.POST;
     case "users-active-total":
-      return (
-        await import("@/user/data-sources/users-active-total/definition")
-      ).default.POST;
-    case "users-banned":
-      return (
-        await import("@/user/data-sources/users-banned/definition")
-      ).default.POST;
-    case "users-create":
-      return (await import("@/users/create/definition"))
+      return (await import("@/user/data-sources/users-active-total/definition"))
         .default.POST;
+    case "users-banned":
+      return (await import("@/user/data-sources/users-banned/definition"))
+        .default.POST;
+    case "users-create":
+      return (await import("@/users/create/definition")).default.POST;
     case "users-email-verified":
       return (
         await import("@/user/data-sources/users-email-verified/definition")
       ).default.POST;
     case "users-list":
-      return (await import("@/users/list/definition")).default
-        .GET;
+      return (await import("@/users/list/definition")).default.GET;
     case "users-login-attempts-failed":
       return (
         await import("@/user/data-sources/users-login-attempts-failed/definition")
@@ -4189,155 +2661,783 @@ async function importEndpoint(
         await import("@/user/data-sources/users-marketing-consent/definition")
       ).default.POST;
     case "users-registered":
-      return (
-        await import("@/user/data-sources/users-registered/definition")
-      ).default.POST;
+      return (await import("@/user/data-sources/users-registered/definition"))
+        .default.POST;
     case "users-stats":
-      return (await import("@/users/stats/definition")).default
-        .GET;
+      return (await import("@/users/stats/definition")).default.GET;
     case "users-two-fa-enabled":
       return (
         await import("@/user/data-sources/users-two-fa-enabled/definition")
       ).default.POST;
     case "users-view":
-      return (await import("@/users/view/definition")).default
-        .GET;
+      return (await import("@/users/view/definition")).default.GET;
     case "users-with-stripe":
-      return (
-        await import("@/user/data-sources/users-with-stripe/definition")
-      ).default.POST;
-    case "users_create_POST":
-      return (await import("@/users/create/definition"))
+      return (await import("@/user/data-sources/users-with-stripe/definition"))
         .default.POST;
+    case "users_create_POST":
+      return (await import("@/users/create/definition")).default.POST;
     case "users_list_GET":
-      return (await import("@/users/list/definition")).default
-        .GET;
+      return (await import("@/users/list/definition")).default.GET;
     case "users_stats_GET":
-      return (await import("@/users/stats/definition")).default
-        .GET;
+      return (await import("@/users/stats/definition")).default.GET;
     case "users_user_id_DELETE":
-      return (await import("@/users/user/[id]/definition"))
-        .default.DELETE;
+      return (await import("@/users/user/[id]/definition")).default.DELETE;
     case "users_user_id_GET":
-      return (await import("@/users/user/[id]/definition"))
-        .default.GET;
+      return (await import("@/users/user/[id]/definition")).default.GET;
     case "users_user_id_PUT":
-      return (await import("@/users/user/[id]/definition"))
-        .default.PUT;
+      return (await import("@/users/user/[id]/definition")).default.PUT;
     case "users_user_id_roles_DELETE":
-      return (
-        await import("@/users/user/[id]/roles/definition")
-      ).default.DELETE;
+      return (await import("@/users/user/[id]/roles/definition")).default
+        .DELETE;
     case "users_user_id_roles_POST":
-      return (
-        await import("@/users/user/[id]/roles/definition")
-      ).default.POST;
+      return (await import("@/users/user/[id]/roles/definition")).default.POST;
     case "users_view_GET":
-      return (await import("@/users/view/definition")).default
-        .GET;
+      return (await import("@/users/view/definition")).default.GET;
     case "vibe-frame-mount":
-      return (
-        await import("next-vibe/platforms/vibe-frame/mount/definition")
-      ).default.POST;
+      return (await import("@/vibe/platforms/vibe-frame/mount/definition"))
+        .default.POST;
     case "vibe-sense-bollinger":
-      return (
-        await import("@/analytics/indicators/bollinger/definition")
-      ).default.POST;
+      return (await import("@/analytics/indicators/bollinger/definition"))
+        .default.POST;
     case "vibe-sense-clamp":
-      return (
-        await import("@/analytics/indicators/clamp/definition")
-      ).default.POST;
+      return (await import("@/analytics/indicators/clamp/definition")).default
+        .POST;
     case "vibe-sense-delta":
-      return (
-        await import("@/analytics/indicators/delta/definition")
-      ).default.POST;
+      return (await import("@/analytics/indicators/delta/definition")).default
+        .POST;
     case "vibe-sense-ema":
-      return (
-        await import("@/analytics/indicators/ema/definition")
-      ).default.POST;
+      return (await import("@/analytics/indicators/ema/definition")).default
+        .POST;
     case "vibe-sense-evaluator-and":
-      return (
-        await import("@/analytics/evaluators/and/definition")
-      ).default.POST;
+      return (await import("@/analytics/evaluators/and/definition")).default
+        .POST;
     case "vibe-sense-evaluator-crossover":
-      return (
-        await import("@/analytics/evaluators/crossover/definition")
-      ).default.POST;
+      return (await import("@/analytics/evaluators/crossover/definition"))
+        .default.POST;
     case "vibe-sense-evaluator-not":
-      return (
-        await import("@/analytics/evaluators/not/definition")
-      ).default.POST;
+      return (await import("@/analytics/evaluators/not/definition")).default
+        .POST;
     case "vibe-sense-evaluator-or":
-      return (
-        await import("@/analytics/evaluators/or/definition")
-      ).default.POST;
+      return (await import("@/analytics/evaluators/or/definition")).default
+        .POST;
     case "vibe-sense-evaluator-script":
-      return (
-        await import("@/analytics/evaluators/script/definition")
-      ).default.POST;
+      return (await import("@/analytics/evaluators/script/definition")).default
+        .POST;
     case "vibe-sense-evaluator-threshold":
-      return (
-        await import("@/analytics/evaluators/threshold/definition")
-      ).default.POST;
+      return (await import("@/analytics/evaluators/threshold/definition"))
+        .default.POST;
     case "vibe-sense-graphs":
-      return (
-        await import("next-vibe/dataflow/graphs/definition")
-      ).default.GET;
+      return (await import("@/vibe/dataflow/graphs/definition")).default.GET;
     case "vibe-sense-macd":
-      return (
-        await import("@/analytics/indicators/macd/definition")
-      ).default.POST;
+      return (await import("@/analytics/indicators/macd/definition")).default
+        .POST;
     case "vibe-sense-rsi":
-      return (
-        await import("@/analytics/indicators/rsi/definition")
-      ).default.POST;
+      return (await import("@/analytics/indicators/rsi/definition")).default
+        .POST;
     case "vibe-sense-run-config":
-      return (
-        await import("next-vibe/dataflow/run-config/definition")
-      ).default.POST;
+      return (await import("@/vibe/dataflow/run-config/definition")).default
+        .POST;
     case "vibe-sense-transformer-field-pick":
-      return (
-        await import("@/analytics/transformers/field-pick/definition")
-      ).default.POST;
+      return (await import("@/analytics/transformers/field-pick/definition"))
+        .default.POST;
     case "vibe-sense-transformer-json-path":
-      return (
-        await import("@/analytics/transformers/json-path/definition")
-      ).default.POST;
+      return (await import("@/analytics/transformers/json-path/definition"))
+        .default.POST;
     case "vibe-sense-transformer-merge":
-      return (
-        await import("@/analytics/transformers/merge/definition")
-      ).default.POST;
+      return (await import("@/analytics/transformers/merge/definition")).default
+        .POST;
     case "vibe-sense-transformer-ratio":
-      return (
-        await import("@/analytics/transformers/ratio/definition")
-      ).default.POST;
+      return (await import("@/analytics/transformers/ratio/definition")).default
+        .POST;
     case "vibe-sense-transformer-script":
-      return (
-        await import("@/analytics/transformers/script/definition")
-      ).default.POST;
+      return (await import("@/analytics/transformers/script/definition"))
+        .default.POST;
     case "vibe-sense-window-avg":
-      return (
-        await import("@/analytics/indicators/window-avg/definition")
-      ).default.POST;
+      return (await import("@/analytics/indicators/window-avg/definition"))
+        .default.POST;
     case "vibe-sense-window-max":
-      return (
-        await import("@/analytics/indicators/window-max/definition")
-      ).default.POST;
+      return (await import("@/analytics/indicators/window-max/definition"))
+        .default.POST;
     case "vibe-sense-window-min":
-      return (
-        await import("@/analytics/indicators/window-min/definition")
-      ).default.POST;
+      return (await import("@/analytics/indicators/window-min/definition"))
+        .default.POST;
     case "vibe-sense-window-sum":
+      return (await import("@/analytics/indicators/window-sum/definition"))
+        .default.POST;
+    case "vibe_agent_ai-stream_cancel_POST":
+      return (await import("@/vibe/agent/ai-stream/cancel/definition")).default
+        .POST;
+    case "vibe_agent_ai-stream_run_POST":
+      return (await import("@/vibe/agent/ai-stream/run/definition")).default
+        .POST;
+    case "vibe_agent_ai-stream_stream_POST":
+      return (await import("@/vibe/agent/ai-stream/stream/definition")).default
+        .POST;
+    case "vibe_agent_ai-stream_system-prompt_debug_GET":
       return (
-        await import("@/analytics/indicators/window-sum/definition")
-      ).default.POST;
-    case "wait-for-task":
+        await import("@/vibe/agent/ai-stream/system-prompt/debug/definition")
+      ).default.GET;
+    case "vibe_agent_ai-stream_ws-provider_models_GET":
       return (
-        await import("next-vibe/execute-tool/await-task/definition")
+        await import("@/vibe/agent/ai-stream/ws-provider/models/definition")
+      ).default.GET;
+    case "vibe_agent_chat_data-sources_chat-downvotes-total_POST":
+      return (
+        await import("@/vibe/agent/chat/data-sources/chat-downvotes-total/definition")
       ).default.POST;
-    case "web-search":
-      return (await import("next-vibe/agent/web-search/definition"))
+    case "vibe_agent_chat_data-sources_chat-errors-total_POST":
+      return (
+        await import("@/vibe/agent/chat/data-sources/chat-errors-total/definition")
+      ).default.POST;
+    case "vibe_agent_chat_data-sources_chat-memories-created_POST":
+      return (
+        await import("@/vibe/agent/chat/data-sources/chat-memories-created/definition")
+      ).default.POST;
+    case "vibe_agent_chat_data-sources_chat-messages-by-ai_POST":
+      return (
+        await import("@/vibe/agent/chat/data-sources/chat-messages-by-ai/definition")
+      ).default.POST;
+    case "vibe_agent_chat_data-sources_chat-messages-by-user_POST":
+      return (
+        await import("@/vibe/agent/chat/data-sources/chat-messages-by-user/definition")
+      ).default.POST;
+    case "vibe_agent_chat_data-sources_chat-messages-total_POST":
+      return (
+        await import("@/vibe/agent/chat/data-sources/chat-messages-total/definition")
+      ).default.POST;
+    case "vibe_agent_chat_data-sources_chat-messages-with-attachments_POST":
+      return (
+        await import("@/vibe/agent/chat/data-sources/chat-messages-with-attachments/definition")
+      ).default.POST;
+    case "vibe_agent_chat_data-sources_chat-share-links-created_POST":
+      return (
+        await import("@/vibe/agent/chat/data-sources/chat-share-links-created/definition")
+      ).default.POST;
+    case "vibe_agent_chat_data-sources_chat-threads-active-total_POST":
+      return (
+        await import("@/vibe/agent/chat/data-sources/chat-threads-active-total/definition")
+      ).default.POST;
+    case "vibe_agent_chat_data-sources_chat-threads-created_POST":
+      return (
+        await import("@/vibe/agent/chat/data-sources/chat-threads-created/definition")
+      ).default.POST;
+    case "vibe_agent_chat_data-sources_chat-tool-calls-total_POST":
+      return (
+        await import("@/vibe/agent/chat/data-sources/chat-tool-calls-total/definition")
+      ).default.POST;
+    case "vibe_agent_chat_data-sources_chat-unique-users_POST":
+      return (
+        await import("@/vibe/agent/chat/data-sources/chat-unique-users/definition")
+      ).default.POST;
+    case "vibe_agent_chat_data-sources_chat-upvotes-total_POST":
+      return (
+        await import("@/vibe/agent/chat/data-sources/chat-upvotes-total/definition")
+      ).default.POST;
+    case "vibe_agent_chat_folder-contents_rootFolderId_GET":
+      return (
+        await import("@/vibe/agent/chat/folder-contents/[rootFolderId]/definition")
+      ).default.GET;
+    case "vibe_agent_chat_folders_rootFolderId_GET":
+      return (
+        await import("@/vibe/agent/chat/folders/[rootFolderId]/definition")
+      ).default.GET;
+    case "vibe_agent_chat_folders_rootFolderId_create_POST":
+      return (
+        await import("@/vibe/agent/chat/folders/[rootFolderId]/create/definition")
+      ).default.POST;
+    case "vibe_agent_chat_folders_rootFolderId_root-permissions_GET":
+      return (
+        await import("@/vibe/agent/chat/folders/[rootFolderId]/root-permissions/definition")
+      ).default.GET;
+    case "vibe_agent_chat_folders_subfolders_subFolderId_DELETE":
+      return (
+        await import("@/vibe/agent/chat/folders/subfolders/[subFolderId]/definition")
+      ).default.DELETE;
+    case "vibe_agent_chat_folders_subfolders_subFolderId_GET":
+      return (
+        await import("@/vibe/agent/chat/folders/subfolders/[subFolderId]/definition")
+      ).default.GET;
+    case "vibe_agent_chat_folders_subfolders_subFolderId_move_PATCH":
+      return (
+        await import("@/vibe/agent/chat/folders/subfolders/[subFolderId]/move/definition")
+      ).default.PATCH;
+    case "vibe_agent_chat_folders_subfolders_subFolderId_permissions_GET":
+      return (
+        await import("@/vibe/agent/chat/folders/subfolders/[subFolderId]/permissions/definition")
+      ).default.GET;
+    case "vibe_agent_chat_folders_subfolders_subFolderId_permissions_PATCH":
+      return (
+        await import("@/vibe/agent/chat/folders/subfolders/[subFolderId]/permissions/definition")
+      ).default.PATCH;
+    case "vibe_agent_chat_folders_subfolders_subFolderId_rename_PATCH":
+      return (
+        await import("@/vibe/agent/chat/folders/subfolders/[subFolderId]/rename/definition")
+      ).default.PATCH;
+    case "vibe_agent_chat_folders_subfolders_subFolderId_update_PATCH":
+      return (
+        await import("@/vibe/agent/chat/folders/subfolders/[subFolderId]/update/definition")
+      ).default.PATCH;
+    case "vibe_agent_chat_public-feed_GET":
+      return (await import("@/vibe/agent/chat/public-feed/definition")).default
+        .GET;
+    case "vibe_agent_chat_settings_GET":
+      return (await import("@/vibe/agent/chat/settings/definition")).default
+        .GET;
+    case "vibe_agent_chat_settings_POST":
+      return (await import("@/vibe/agent/chat/settings/definition")).default
+        .POST;
+    case "vibe_agent_chat_threads_GET":
+      return (await import("@/vibe/agent/chat/threads/definition")).default.GET;
+    case "vibe_agent_chat_threads_POST":
+      return (await import("@/vibe/agent/chat/threads/definition")).default
+        .POST;
+    case "vibe_agent_chat_threads_files_threadId_filename_GET":
+      return (
+        await import("@/vibe/agent/chat/threads/files/[threadId]/[filename]/definition")
+      ).default.GET;
+    case "vibe_agent_chat_threads_rename_PATCH":
+      return (await import("@/vibe/agent/chat/threads/rename/definition"))
+        .default.PATCH;
+    case "vibe_agent_chat_threads_search-messages_GET":
+      return (
+        await import("@/vibe/agent/chat/threads/search-messages/definition")
+      ).default.GET;
+    case "vibe_agent_chat_threads_search-threads_GET":
+      return (
+        await import("@/vibe/agent/chat/threads/search-threads/definition")
+      ).default.GET;
+    case "vibe_agent_chat_threads_threadId_DELETE":
+      return (await import("@/vibe/agent/chat/threads/[threadId]/definition"))
+        .default.DELETE;
+    case "vibe_agent_chat_threads_threadId_GET":
+      return (await import("@/vibe/agent/chat/threads/[threadId]/definition"))
         .default.GET;
+    case "vibe_agent_chat_threads_threadId_PATCH":
+      return (await import("@/vibe/agent/chat/threads/[threadId]/definition"))
+        .default.PATCH;
+    case "vibe_agent_chat_threads_threadId_messages_GET":
+      return (
+        await import("@/vibe/agent/chat/threads/[threadId]/messages/definition")
+      ).default.GET;
+    case "vibe_agent_chat_threads_threadId_messages_POST":
+      return (
+        await import("@/vibe/agent/chat/threads/[threadId]/messages/definition")
+      ).default.POST;
+    case "vibe_agent_chat_threads_threadId_messages_messageId_DELETE":
+      return (
+        await import("@/vibe/agent/chat/threads/[threadId]/messages/[messageId]/definition")
+      ).default.DELETE;
+    case "vibe_agent_chat_threads_threadId_messages_messageId_GET":
+      return (
+        await import("@/vibe/agent/chat/threads/[threadId]/messages/[messageId]/definition")
+      ).default.GET;
+    case "vibe_agent_chat_threads_threadId_messages_messageId_PATCH":
+      return (
+        await import("@/vibe/agent/chat/threads/[threadId]/messages/[messageId]/definition")
+      ).default.PATCH;
+    case "vibe_agent_chat_threads_threadId_messages_messageId_vote_POST":
+      return (
+        await import("@/vibe/agent/chat/threads/[threadId]/messages/[messageId]/vote/definition")
+      ).default.POST;
+    case "vibe_agent_chat_threads_threadId_messages_path_GET":
+      return (
+        await import("@/vibe/agent/chat/threads/[threadId]/messages/path/definition")
+      ).default.GET;
+    case "vibe_agent_chat_threads_threadId_messages_search_GET":
+      return (
+        await import("@/vibe/agent/chat/threads/[threadId]/messages/search/definition")
+      ).default.GET;
+    case "vibe_agent_chat_threads_threadId_permissions_GET":
+      return (
+        await import("@/vibe/agent/chat/threads/[threadId]/permissions/definition")
+      ).default.GET;
+    case "vibe_agent_chat_threads_threadId_permissions_PATCH":
+      return (
+        await import("@/vibe/agent/chat/threads/[threadId]/permissions/definition")
+      ).default.PATCH;
+    case "vibe_agent_chat_threads_threadId_share-links_GET":
+      return (
+        await import("@/vibe/agent/chat/threads/[threadId]/share-links/definition")
+      ).default.GET;
+    case "vibe_agent_chat_threads_threadId_share-links_PATCH":
+      return (
+        await import("@/vibe/agent/chat/threads/[threadId]/share-links/definition")
+      ).default.PATCH;
+    case "vibe_agent_chat_threads_threadId_share-links_POST":
+      return (
+        await import("@/vibe/agent/chat/threads/[threadId]/share-links/definition")
+      ).default.POST;
+    case "vibe_agent_coding-agent_POST":
+      return (await import("@/vibe/agent/coding-agent/definition")).default
+        .POST;
+    case "vibe_agent_cortex_delete_DELETE":
+      return (await import("@/vibe/agent/cortex/delete/definition")).default
+        .DELETE;
+    case "vibe_agent_cortex_edit_PATCH":
+      return (await import("@/vibe/agent/cortex/edit/definition")).default
+        .PATCH;
+    case "vibe_agent_cortex_embeddings_backfill_POST":
+      return (
+        await import("@/vibe/agent/cortex/embeddings/backfill/definition")
+      ).default.POST;
+    case "vibe_agent_cortex_exec_POST":
+      return (await import("@/vibe/agent/cortex/exec/definition")).default.POST;
+    case "vibe_agent_cortex_list_GET":
+      return (await import("@/vibe/agent/cortex/list/definition")).default.GET;
+    case "vibe_agent_cortex_mkdir_POST":
+      return (await import("@/vibe/agent/cortex/mkdir/definition")).default
+        .POST;
+    case "vibe_agent_cortex_move_POST":
+      return (await import("@/vibe/agent/cortex/move/definition")).default.POST;
+    case "vibe_agent_cortex_read_GET":
+      return (await import("@/vibe/agent/cortex/read/definition")).default.GET;
+    case "vibe_agent_cortex_search_GET":
+      return (await import("@/vibe/agent/cortex/search/definition")).default
+        .GET;
+    case "vibe_agent_cortex_terminals_GET":
+      return (await import("@/vibe/agent/cortex/terminals/definition")).default
+        .GET;
+    case "vibe_agent_cortex_tree_GET":
+      return (await import("@/vibe/agent/cortex/tree/definition")).default.GET;
+    case "vibe_agent_cortex_write_POST":
+      return (await import("@/vibe/agent/cortex/write/definition")).default
+        .POST;
+    case "vibe_agent_describe-image_POST":
+      return (await import("@/vibe/agent/describe-image/definition")).default
+        .POST;
+    case "vibe_agent_describe-video_POST":
+      return (await import("@/vibe/agent/describe-video/definition")).default
+        .POST;
+    case "vibe_agent_fetch-url-content_GET":
+      return (await import("@/vibe/agent/fetch-url-content/definition")).default
+        .GET;
+    case "vibe_agent_fetch-url-content_cleanup_POST":
+      return (await import("@/vibe/agent/fetch-url-content/cleanup/definition"))
+        .default.POST;
+    case "vibe_agent_image-generation_POST":
+      return (await import("@/vibe/agent/image-generation/definition")).default
+        .POST;
+    case "vibe_agent_models_list_GET":
+      return (await import("@/vibe/agent/models/list/definition")).default.GET;
+    case "vibe_agent_models_model-prices_GET":
+      return (await import("@/vibe/agent/models/model-prices/definition"))
+        .default.GET;
+    case "vibe_agent_music-generation_POST":
+      return (await import("@/vibe/agent/music-generation/definition")).default
+        .POST;
+    case "vibe_agent_skills_GET":
+      return (await import("@/vibe/agent/skills/definition")).default.GET;
+    case "vibe_agent_skills_create_POST":
+      return (await import("@/vibe/agent/skills/create/definition")).default
+        .POST;
+    case "vibe_agent_skills_favorites_GET":
+      return (await import("@/vibe/agent/skills/favorites/definition")).default
+        .GET;
+    case "vibe_agent_skills_favorites_create_POST":
+      return (await import("@/vibe/agent/skills/favorites/create/definition"))
+        .default.POST;
+    case "vibe_agent_skills_favorites_id_DELETE":
+      return (await import("@/vibe/agent/skills/favorites/[id]/definition"))
+        .default.DELETE;
+    case "vibe_agent_skills_favorites_id_GET":
+      return (await import("@/vibe/agent/skills/favorites/[id]/definition"))
+        .default.GET;
+    case "vibe_agent_skills_favorites_id_PATCH":
+      return (await import("@/vibe/agent/skills/favorites/[id]/definition"))
+        .default.PATCH;
+    case "vibe_agent_skills_favorites_reorder_POST":
+      return (await import("@/vibe/agent/skills/favorites/reorder/definition"))
+        .default.POST;
+    case "vibe_agent_skills_id_DELETE":
+      return (await import("@/vibe/agent/skills/[id]/definition")).default
+        .DELETE;
+    case "vibe_agent_skills_id_GET":
+      return (await import("@/vibe/agent/skills/[id]/definition")).default.GET;
+    case "vibe_agent_skills_id_PATCH":
+      return (await import("@/vibe/agent/skills/[id]/definition")).default
+        .PATCH;
+    case "vibe_agent_skills_id_publish_PATCH":
+      return (await import("@/vibe/agent/skills/[id]/publish/definition"))
+        .default.PATCH;
+    case "vibe_agent_skills_id_report_POST":
+      return (await import("@/vibe/agent/skills/[id]/report/definition"))
+        .default.POST;
+    case "vibe_agent_skills_id_vote_POST":
+      return (await import("@/vibe/agent/skills/[id]/vote/definition")).default
+        .POST;
+    case "vibe_agent_skills_moderation_GET":
+      return (await import("@/vibe/agent/skills/moderation/definition")).default
+        .GET;
+    case "vibe_agent_skills_moderation_PATCH":
+      return (await import("@/vibe/agent/skills/moderation/definition")).default
+        .PATCH;
+    case "vibe_agent_speech-to-text_POST":
+      return (await import("@/vibe/agent/speech-to-text/definition")).default
+        .POST;
+    case "vibe_agent_speech-to-text_hotkey_POST":
+      return (await import("@/vibe/agent/speech-to-text/hotkey/definition"))
+        .default.POST;
+    case "vibe_agent_text-to-speech_POST":
+      return (await import("@/vibe/agent/text-to-speech/definition")).default
+        .POST;
+    case "vibe_agent_video-generation_POST":
+      return (await import("@/vibe/agent/video-generation/definition")).default
+        .POST;
+    case "vibe_agent_view-image_POST":
+      return (await import("@/vibe/agent/view-image/definition")).default.POST;
+    case "vibe_agent_web-search_GET":
+      return (await import("@/vibe/agent/web-search/definition")).default.GET;
+    case "vibe_agent_web-search_brave_GET":
+      return (await import("@/vibe/agent/web-search/brave/definition")).default
+        .GET;
+    case "vibe_agent_web-search_kagi_GET":
+      return (await import("@/vibe/agent/web-search/kagi/definition")).default
+        .GET;
+    case "vibe_database_generate_POST":
+      return (await import("@/vibe/database/generate/definition")).default.POST;
+    case "vibe_database_health_POST":
+      return (await import("@/vibe/database/health/definition")).default.POST;
+    case "vibe_database_migrate_POST":
+      return (await import("@/vibe/database/migrate/definition")).default.POST;
+    case "vibe_database_ping_POST":
+      return (await import("@/vibe/database/ping/definition")).default.POST;
+    case "vibe_database_seed_POST":
+      return (await import("@/vibe/database/seed/definition")).default.POST;
+    case "vibe_database_sql_POST":
+      return (await import("@/vibe/database/sql/definition")).default.POST;
+    case "vibe_database_studio_POST":
+      return (await import("@/vibe/database/studio/definition")).default.POST;
+    case "vibe_database_utils_GET":
+      return (await import("@/vibe/database/utils/definition")).default.GET;
+    case "vibe_database_utils_docker-operations_POST":
+      return (
+        await import("@/vibe/database/utils/docker-operations/definition")
+      ).default.POST;
+    case "vibe_dataflow_cleanup_POST":
+      return (await import("@/vibe/dataflow/cleanup/definition")).default.POST;
+    case "vibe_dataflow_graphs_GET":
+      return (await import("@/vibe/dataflow/graphs/definition")).default.GET;
+    case "vibe_dataflow_graphs_POST":
+      return (await import("@/vibe/dataflow/graphs/definition")).default.POST;
+    case "vibe_dataflow_graphs_id_archive_POST":
+      return (await import("@/vibe/dataflow/graphs/[id]/archive/definition"))
+        .default.POST;
+    case "vibe_dataflow_graphs_id_backtest_POST":
+      return (await import("@/vibe/dataflow/graphs/[id]/backtest/definition"))
+        .default.POST;
+    case "vibe_dataflow_graphs_id_data_GET":
+      return (await import("@/vibe/dataflow/graphs/[id]/data/definition"))
+        .default.GET;
+    case "vibe_dataflow_graphs_id_delete_DELETE":
+      return (await import("@/vibe/dataflow/graphs/[id]/delete/definition"))
+        .default.DELETE;
+    case "vibe_dataflow_graphs_id_edit_PUT":
+      return (await import("@/vibe/dataflow/graphs/[id]/edit/definition"))
+        .default.PUT;
+    case "vibe_dataflow_graphs_id_promote_POST":
+      return (await import("@/vibe/dataflow/graphs/[id]/promote/definition"))
+        .default.POST;
+    case "vibe_dataflow_graphs_id_trigger_POST":
+      return (await import("@/vibe/dataflow/graphs/[id]/trigger/definition"))
+        .default.POST;
+    case "vibe_dataflow_graphs_id_versions_GET":
+      return (await import("@/vibe/dataflow/graphs/[id]/versions/definition"))
+        .default.GET;
+    case "vibe_dataflow_run-config_POST":
+      return (await import("@/vibe/dataflow/run-config/definition")).default
+        .POST;
+    case "vibe_env_settings_GET":
+      return (await import("@/vibe/env/settings/definition")).default.GET;
+    case "vibe_env_settings_PATCH":
+      return (await import("@/vibe/env/settings/definition")).default.PATCH;
+    case "vibe_env_settings_POST":
+      return (await import("@/vibe/env/settings/definition")).default.POST;
+    case "vibe_env_settings_export-env_GET":
+      return (await import("@/vibe/env/settings/export-env/definition")).default
+        .GET;
+    case "vibe_env_settings_generate-key_GET":
+      return (await import("@/vibe/env/settings/generate-key/definition"))
+        .default.GET;
+    case "vibe_execute-tool_POST":
+      return (await import("@/vibe/execute-tool/definition")).default.POST;
+    case "vibe_execute-tool_await-task_POST":
+      return (await import("@/vibe/execute-tool/await-task/definition")).default
+        .POST;
+    case "vibe_execute-tool_call-control_cancel_POST":
+      return (
+        await import("@/vibe/execute-tool/call-control/cancel/definition")
+      ).default.POST;
+    case "vibe_execute-tool_call-control_detach_POST":
+      return (
+        await import("@/vibe/execute-tool/call-control/detach/definition")
+      ).default.POST;
+    case "vibe_execute-tool_call-control_resume-when-done_POST":
+      return (
+        await import("@/vibe/execute-tool/call-control/resume-when-done/definition")
+      ).default.POST;
+    case "vibe_execute-tool_complete_POST":
+      return (await import("@/vibe/execute-tool/complete/definition")).default
+        .POST;
+    case "vibe_execute-tool_revival_POST":
+      return (await import("@/vibe/execute-tool/revival/definition")).default
+        .POST;
+    case "vibe_help-tool_GET":
+      return (await import("@/vibe/help-tool/definition")).default.GET;
+    case "vibe_logger_error-monitor_cleanup_POST":
+      return (await import("@/vibe/logger/error-monitor/cleanup/definition"))
+        .default.POST;
+    case "vibe_logger_error-monitor_data-sources_error-logs-errors_POST":
+      return (
+        await import("@/vibe/logger/error-monitor/data-sources/error-logs-errors/definition")
+      ).default.POST;
+    case "vibe_logger_error-monitor_data-sources_error-logs-total_POST":
+      return (
+        await import("@/vibe/logger/error-monitor/data-sources/error-logs-total/definition")
+      ).default.POST;
+    case "vibe_logger_error-monitor_data-sources_error-logs-warnings_POST":
+      return (
+        await import("@/vibe/logger/error-monitor/data-sources/error-logs-warnings/definition")
+      ).default.POST;
+    case "vibe_logger_error-monitor_logs_GET":
+      return (await import("@/vibe/logger/error-monitor/logs/definition"))
+        .default.GET;
+    case "vibe_logger_error-monitor_logs_PATCH":
+      return (await import("@/vibe/logger/error-monitor/logs/definition"))
+        .default.PATCH;
+    case "vibe_platforms_cli_interactive_capture_POST":
+      return (
+        await import("@/vibe/platforms/cli/interactive/capture/definition")
+      ).default.POST;
+    case "vibe_platforms_cli_interactive_send-keys_POST":
+      return (
+        await import("@/vibe/platforms/cli/interactive/send-keys/definition")
+      ).default.POST;
+    case "vibe_platforms_cli_setup_install_POST":
+      return (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/platforms/cli/setup/install/definition"
+        )
+      ).default.POST;
+    case "vibe_platforms_cli_setup_status_POST":
+      return (await import("@/vibe/platforms/cli/setup/status/definition"))
+        .default.POST;
+    case "vibe_platforms_cli_setup_uninstall_POST":
+      return (await import("@/vibe/platforms/cli/setup/uninstall/definition"))
+        .default.POST;
+    case "vibe_platforms_mcp_serve_POST":
+      return (await import("@/vibe/platforms/mcp/serve/definition")).default
+        .POST;
+    case "vibe_platforms_vibe-frame_mount_POST":
+      return (await import("@/vibe/platforms/vibe-frame/mount/definition"))
+        .default.POST;
+    case "vibe_realtime_remote-event-bridge_POST":
+      return (await import("@/vibe/realtime/remote-event-bridge/definition"))
+        .default.POST;
+    case "vibe_remote-connection_connect-reverse_POST":
+      return (
+        await import("@/vibe/remote-connection/connect-reverse/definition")
+      ).default.POST;
+    case "vibe_remote-connection_connect-reverse_update_PATCH":
+      return (
+        await import("@/vibe/remote-connection/connect-reverse/update/definition")
+      ).default.PATCH;
+    case "vibe_remote-connection_connect_POST":
+      return (await import("@/vibe/remote-connection/connect/definition"))
+        .default.POST;
+    case "vibe_remote-connection_instanceId_DELETE":
+      return (await import("@/vibe/remote-connection/[instanceId]/definition"))
+        .default.DELETE;
+    case "vibe_remote-connection_instanceId_GET":
+      return (await import("@/vibe/remote-connection/[instanceId]/definition"))
+        .default.GET;
+    case "vibe_remote-connection_instanceId_PATCH":
+      return (await import("@/vibe/remote-connection/[instanceId]/definition"))
+        .default.PATCH;
+    case "vibe_remote-connection_list_GET":
+      return (await import("@/vibe/remote-connection/list/definition")).default
+        .GET;
+    case "vibe_remote-connection_self_instanceId_GET":
+      return (
+        await import("@/vibe/remote-connection/self/instanceId/definition")
+      ).default.GET;
+    case "vibe_remote-connection_self_rename_PATCH":
+      return (await import("@/vibe/remote-connection/self/rename/definition"))
+        .default.PATCH;
+    case "vibe_remote-connection_sync_POST":
+      return (await import("@/vibe/remote-connection/sync/definition")).default
+        .POST;
+    case "vibe_remote-connection_sync_providers_GET":
+      return (
+        await import("@/vibe/remote-connection/sync/providers/definition")
+      ).default.GET;
+    case "vibe_server_server_build_POST":
+      return (await import("@/vibe/server/server/build/definition")).default
+        .POST;
+    case "vibe_server_server_dev_POST":
+      return (await import("@/vibe/server/server/dev/definition")).default.POST;
+    case "vibe_server_server_electron_build_POST":
+      return (await import("@/vibe/server/server/electron/build/definition"))
+        .default.POST;
+    case "vibe_server_server_electron_start_POST":
+      return (await import("@/vibe/server/server/electron/start/definition"))
+        .default.POST;
+    case "vibe_server_server_headless-client_POST":
+      return (await import("@/vibe/server/server/headless-client/definition"))
+        .default.POST;
+    case "vibe_server_server_health_GET":
+      return (await import("@/vibe/server/server/health/definition")).default
+        .GET;
+    case "vibe_server_server_image-push_POST":
+      return (await import("@/vibe/server/server/image-push/definition"))
+        .default.POST;
+    case "vibe_server_server_rebuild_POST":
+      return (await import("@/vibe/server/server/rebuild/definition")).default
+        .POST;
+    case "vibe_server_server_start_POST":
+      return (await import("@/vibe/server/server/start/definition")).default
+        .POST;
+    case "vibe_tasks_cron_bulk_POST":
+      return (await import("@/vibe/tasks/cron/bulk/definition")).default.POST;
+    case "vibe_tasks_cron_history_GET":
+      return (await import("@/vibe/tasks/cron/history/definition")).default.GET;
+    case "vibe_tasks_cron_id_DELETE":
+      return (await import("@/vibe/tasks/cron/[id]/definition")).default.DELETE;
+    case "vibe_tasks_cron_id_GET":
+      return (await import("@/vibe/tasks/cron/[id]/definition")).default.GET;
+    case "vibe_tasks_cron_id_PUT":
+      return (await import("@/vibe/tasks/cron/[id]/definition")).default.PUT;
+    case "vibe_tasks_cron_queue_GET":
+      return (await import("@/vibe/tasks/cron/queue/definition")).default.GET;
+    case "vibe_tasks_cron_stats_GET":
+      return (await import("@/vibe/tasks/cron/stats/definition")).default.GET;
+    case "vibe_tasks_cron_tasks_GET":
+      return (await import("@/vibe/tasks/cron/tasks/definition")).default.GET;
+    case "vibe_tasks_cron_tasks_POST":
+      return (await import("@/vibe/tasks/cron/tasks/definition")).default.POST;
+    case "vibe_tasks_data-sources_cron-executions-failed_POST":
+      return (
+        await import("@/vibe/tasks/data-sources/cron-executions-failed/definition")
+      ).default.POST;
+    case "vibe_tasks_data-sources_cron-executions-succeeded_POST":
+      return (
+        await import("@/vibe/tasks/data-sources/cron-executions-succeeded/definition")
+      ).default.POST;
+    case "vibe_tasks_data-sources_cron-executions-total_POST":
+      return (
+        await import("@/vibe/tasks/data-sources/cron-executions-total/definition")
+      ).default.POST;
+    case "vibe_tasks_execute_POST":
+      return (await import("@/vibe/tasks/execute/definition")).default.POST;
+    case "vibe_tasks_pulse_execute_POST":
+      return (await import("@/vibe/tasks/pulse/execute/definition")).default
+        .POST;
+    case "vibe_tasks_pulse_history_GET":
+      return (await import("@/vibe/tasks/pulse/history/definition")).default
+        .GET;
+    case "vibe_tasks_pulse_status_GET":
+      return (await import("@/vibe/tasks/pulse/status/definition")).default.GET;
+    case "vibe_tasks_unified-runner_POST":
+      return (await import("@/vibe/tasks/unified-runner/definition")).default
+        .POST;
+    case "vibe_tooling_builder_POST":
+      return (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/builder/definition"
+        )
+      ).default.POST;
+    case "vibe_tooling_check_config_create_POST":
+      return (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/config/create/definition"
+        )
+      ).default.POST;
+    case "vibe_tooling_check_lint_POST":
+      return (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/lint/definition"
+        )
+      ).default.POST;
+    case "vibe_tooling_check_oxlint_POST":
+      return (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/oxlint/definition"
+        )
+      ).default.POST;
+    case "vibe_tooling_check_testing_test_POST":
+      return (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/testing/test/definition"
+        )
+      ).default.POST;
+    case "vibe_tooling_check_typecheck_POST":
+      return (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/typecheck/definition"
+        )
+      ).default.POST;
+    case "vibe_tooling_check_vibe-check_POST":
+      return (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/check/vibe-check/definition"
+        )
+      ).default.POST;
+    case "vibe_tooling_generators_POST":
+      return (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/generators/definition"
+        )
+      ).default.POST;
+    case "vibe_tooling_guard_destroy_POST":
+      return (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/guard/destroy/definition"
+        )
+      ).default.POST;
+    case "vibe_tooling_guard_start_POST":
+      return (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/guard/start/definition"
+        )
+      ).default.POST;
+    case "vibe_tooling_guard_status_POST":
+      return (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/guard/status/definition"
+        )
+      ).default.POST;
+    case "vibe_tooling_guard_stop_POST":
+      return (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */ "@/vibe/tooling/guard/stop/definition"
+        )
+      ).default.POST;
+    case "vibe_tooling_infra_cluster_init_POST":
+      return (await import("@/vibe/tooling/infra/cluster/init/definition"))
+        .default.POST;
+    case "vibe_tooling_infra_cluster_status_GET":
+      return (await import("@/vibe/tooling/infra/cluster/status/definition"))
+        .default.GET;
+    case "vibe_tooling_infra_deploy_preview_POST":
+      return (await import("@/vibe/tooling/infra/deploy/preview/definition"))
+        .default.POST;
+    case "vibe_tooling_infra_deploy_push_POST":
+      return (await import("@/vibe/tooling/infra/deploy/push/definition"))
+        .default.POST;
+    case "vibe_tooling_infra_scale_replicas_POST":
+      return (await import("@/vibe/tooling/infra/scale/replicas/definition"))
+        .default.POST;
+    case "vibe_tooling_release_POST":
+      return (await import("@/vibe/tooling/release/definition")).default.POST;
+    case "vibe_tooling_vibe-deps_POST":
+      return (await import("@/vibe/tooling/vibe-deps/definition")).default.POST;
+    case "vibe_tooling_vibe-stage_POST":
+      return (await import("@/vibe/tooling/vibe-stage/definition")).default
+        .POST;
+    case "wait-for-task":
+      return (await import("@/vibe/execute-tool/await-task/definition")).default
+        .POST;
+    case "web-search":
+      return (await import("@/vibe/agent/web-search/definition")).default.GET;
     default:
       return null;
   }
@@ -4360,83 +3460,8 @@ const ENDPOINT_PREWARM_PATHS: string[] = [
   "agent-search-messages",
   "agent-search-threads",
   "agent-view-image",
-  "agent_ai-stream_cancel_POST",
-  "agent_ai-stream_stream_POST",
-  "agent_ai-stream_system-prompt_debug_GET",
-  "agent_ai-stream_ws-provider_models_GET",
-  "agent_chat_data-sources_chat-downvotes-total_POST",
-  "agent_chat_data-sources_chat-errors-total_POST",
-  "agent_chat_data-sources_chat-memories-created_POST",
-  "agent_chat_data-sources_chat-messages-by-ai_POST",
-  "agent_chat_data-sources_chat-messages-by-user_POST",
-  "agent_chat_data-sources_chat-messages-total_POST",
-  "agent_chat_data-sources_chat-messages-with-attachments_POST",
-  "agent_chat_data-sources_chat-share-links-created_POST",
-  "agent_chat_data-sources_chat-threads-active-total_POST",
-  "agent_chat_data-sources_chat-threads-created_POST",
-  "agent_chat_data-sources_chat-tool-calls-total_POST",
-  "agent_chat_data-sources_chat-unique-users_POST",
-  "agent_chat_data-sources_chat-upvotes-total_POST",
-  "agent_chat_folder-contents_rootFolderId_GET",
-  "agent_chat_folders_rootFolderId_GET",
-  "agent_chat_folders_rootFolderId_create_POST",
-  "agent_chat_folders_rootFolderId_root-permissions_GET",
-  "agent_chat_folders_subfolders_subFolderId_DELETE",
-  "agent_chat_folders_subfolders_subFolderId_move_PATCH",
-  "agent_chat_folders_subfolders_subFolderId_permissions_GET",
-  "agent_chat_folders_subfolders_subFolderId_rename_PATCH",
-  "agent_chat_folders_subfolders_subFolderId_update_PATCH",
-  "agent_chat_public-feed_GET",
-  "agent_chat_settings_GET",
-  "agent_chat_threads_files_threadId_filename_GET",
-  "agent_chat_threads_rename_PATCH",
-  "agent_chat_threads_threadId_DELETE",
-  "agent_chat_threads_threadId_messages_GET",
-  "agent_chat_threads_threadId_messages_messageId_DELETE",
-  "agent_chat_threads_threadId_messages_messageId_vote_POST",
-  "agent_chat_threads_threadId_messages_path_GET",
-  "agent_chat_threads_threadId_messages_search_GET",
-  "agent_chat_threads_threadId_permissions_GET",
   "agent_chat_threads_threadId_share-links_DELETE",
-  "agent_coding-agent_POST",
-  "agent_cortex_delete_DELETE",
-  "agent_cortex_edit_PATCH",
-  "agent_cortex_embeddings_backfill_POST",
-  "agent_cortex_exec_POST",
-  "agent_cortex_list_GET",
-  "agent_cortex_mkdir_POST",
-  "agent_cortex_move_POST",
-  "agent_cortex_read_GET",
-  "agent_cortex_search_GET",
-  "agent_cortex_terminals_GET",
-  "agent_cortex_tree_GET",
-  "agent_cortex_write_POST",
-  "agent_describe-image_POST",
-  "agent_describe-video_POST",
-  "agent_fetch-url-content_GET",
-  "agent_fetch-url-content_cleanup_POST",
-  "agent_image-generation_POST",
-  "agent_models_list_GET",
-  "agent_models_model-prices_GET",
-  "agent_music-generation_POST",
-  "agent_skills_GET",
-  "agent_skills_create_POST",
-  "agent_skills_favorites_GET",
-  "agent_skills_favorites_create_POST",
-  "agent_skills_favorites_id_DELETE",
-  "agent_skills_favorites_reorder_POST",
-  "agent_skills_id_DELETE",
-  "agent_skills_id_publish_PATCH",
-  "agent_skills_id_report_POST",
-  "agent_skills_id_vote_POST",
-  "agent_skills_moderation_GET",
-  "agent_speech-to-text_POST",
-  "agent_speech-to-text_hotkey_POST",
-  "agent_text-to-speech_POST",
-  "agent_video-generation_POST",
-  "agent_web-search_GET",
-  "agent_web-search_brave_GET",
-  "agent_web-search_kagi_GET",
+  "ai-stream",
   "ai-tools",
   "analytics_evaluators_and_POST",
   "analytics_evaluators_crossover_POST",
@@ -4462,6 +3487,7 @@ const ENDPOINT_PREWARM_PATHS: string[] = [
   "await-task",
   "b",
   "bounce-processor",
+  "brave-search",
   "browser-click",
   "browser-close-page",
   "browser-drag",
@@ -4519,6 +3545,21 @@ const ENDPOINT_PREWARM_PATHS: string[] = [
   "chart-of-accounts_reports_tax-report_GET",
   "chart-of-accounts_reports_trial-balance_GET",
   "chart-of-accounts_setup_POST",
+  "chat-downvotes-total",
+  "chat-errors-total",
+  "chat-memories-created",
+  "chat-messages-by-ai",
+  "chat-messages-by-user",
+  "chat-messages-total",
+  "chat-messages-with-attachments",
+  "chat-settings",
+  "chat-share-links-created",
+  "chat-threads-active-total",
+  "chat-threads-created",
+  "chat-tool-calls-total",
+  "chat-unique-users",
+  "chat-upvotes-total",
+  "claude",
   "click-tracking",
   "cluster-init",
   "cluster-status",
@@ -4535,6 +3576,18 @@ const ENDPOINT_PREWARM_PATHS: string[] = [
   "connect-remote",
   "connection-status",
   "contact-form",
+  "cortex-delete",
+  "cortex-edit",
+  "cortex-embed-backfill",
+  "cortex-exec",
+  "cortex-list",
+  "cortex-mkdir",
+  "cortex-move",
+  "cortex-read",
+  "cortex-search",
+  "cortex-terminals",
+  "cortex-tree",
+  "cortex-write",
   "credits-avg-transaction",
   "credits-balance",
   "credits-balance-total",
@@ -4576,6 +3629,8 @@ const ENDPOINT_PREWARM_PATHS: string[] = [
   "deploy",
   "deploy-preview",
   "deps",
+  "describe_image",
+  "describe_video",
   "desktop-accessibility",
   "desktop-click",
   "desktop-focus-window",
@@ -4603,8 +3658,25 @@ const ENDPOINT_PREWARM_PATHS: string[] = [
   "error-logs-warnings",
   "execute-task",
   "execute-tool",
+  "favorite-create",
+  "favorite-delete",
+  "favorites",
+  "favorites-reorder",
+  "fetch",
+  "fetch-url-cache-cleanup",
+  "folder-contents",
+  "folder-create",
+  "folder-delete",
+  "folder-move",
+  "folder-permissions",
+  "folder-rename",
+  "folder-update",
+  "folders",
   "gen",
   "gen-key",
+  "generate_image",
+  "generate_music",
+  "generate_video",
   "guard",
   "guard-destroy",
   "guard-stop",
@@ -4633,6 +3705,7 @@ const ENDPOINT_PREWARM_PATHS: string[] = [
   "inventory_warehouse_warehouseId_get_GET",
   "inventory_warehouse_warehouseId_update_PATCH",
   "ip-match-linking",
+  "kagi-search",
   "l",
   "lead-magnet_capture_POST",
   "lead-magnet_captures_GET",
@@ -4689,6 +3762,7 @@ const ENDPOINT_PREWARM_PATHS: string[] = [
   "leads_import_jobs_jobId_stop_POST",
   "leads_import_process_POST",
   "leads_skill_PATCH",
+  "list-models",
   "login",
   "logout",
   "mcp",
@@ -4820,19 +3894,23 @@ const ENDPOINT_PREWARM_PATHS: string[] = [
   "referral_earnings_list_GET",
   "referral_lead_current_GET",
   "referral_payout_GET",
-  "remote-connection_connect-reverse_POST",
-  "remote-connection_connect-reverse_update_PATCH",
-  "remote-connection_list_GET",
-  "remote-connection_self_rename_PATCH",
-  "remote-connection_sync_POST",
-  "remote-connection_sync_providers_GET",
+  "remote-connections",
   "remote-event-bridge",
+  "rename-instance",
+  "rename-thread",
   "report-client-error",
   "resume-stream",
   "resume-when-done",
   "runner",
   "s",
   "setup:uninstall",
+  "skill-create",
+  "skill-delete",
+  "skill-moderation",
+  "skill-publish",
+  "skill-report",
+  "skill-vote",
+  "skills",
   "sql",
   "ssh-connections-list",
   "ssh-mount",
@@ -4845,6 +3923,7 @@ const ENDPOINT_PREWARM_PATHS: string[] = [
   "ssh_linux_users_username_DELETE",
   "stage",
   "status",
+  "stt",
   "subscription-admin-list",
   "subscription-admin-purchases",
   "subscription-admin-referrals",
@@ -4861,27 +3940,20 @@ const ENDPOINT_PREWARM_PATHS: string[] = [
   "subscription_data-sources_subscriptions-new_POST",
   "subscription_data-sources_subscriptions-payment-failed_POST",
   "subscription_data-sources_subscriptions-trialing_POST",
-  "system_dataflow_cleanup_POST",
-  "system_dataflow_graphs_GET",
-  "system_dataflow_graphs_id_archive_POST",
-  "system_dataflow_graphs_id_backtest_POST",
-  "system_dataflow_graphs_id_data_GET",
-  "system_dataflow_graphs_id_delete_DELETE",
-  "system_dataflow_graphs_id_edit_PUT",
-  "system_dataflow_graphs_id_promote_POST",
-  "system_dataflow_graphs_id_trigger_POST",
-  "system_dataflow_graphs_id_versions_GET",
-  "system_dataflow_run-config_POST",
-  "system_env_settings_export-env_GET",
-  "system_platforms_vibe-frame_mount_POST",
-  "system_tasks_cron_bulk_POST",
-  "system_tooling_check_testing_test_POST",
-  "system_tooling_check_typecheck_POST",
+  "sync",
+  "system-prompt-debug",
+  "t",
   "tax-rate-list",
   "tax_rate_create_POST",
   "tax_rate_rateId_delete_POST",
   "tax_rate_rateId_update_PATCH",
   "tax_report_GET",
+  "tc",
+  "text-to-speech",
+  "thread-files",
+  "thread-messages",
+  "transcribe_audio",
+  "update-model-prices",
   "user-delete",
   "user-me",
   "user-sessions",
@@ -4911,6 +3983,34 @@ const ENDPOINT_PREWARM_PATHS: string[] = [
   "users-stats",
   "users-view",
   "users_user_id_roles_DELETE",
+  "vibe-frame-mount",
+  "vibe-sense-graphs",
+  "vibe-sense-run-config",
+  "vibe_agent_ai-stream_cancel_POST",
+  "vibe_agent_ai-stream_ws-provider_models_GET",
+  "vibe_agent_chat_folders_subfolders_subFolderId_permissions_GET",
+  "vibe_agent_chat_public-feed_GET",
+  "vibe_agent_chat_threads_threadId_DELETE",
+  "vibe_agent_chat_threads_threadId_messages_messageId_DELETE",
+  "vibe_agent_chat_threads_threadId_messages_messageId_vote_POST",
+  "vibe_agent_chat_threads_threadId_messages_path_GET",
+  "vibe_agent_chat_threads_threadId_messages_search_GET",
+  "vibe_agent_chat_threads_threadId_permissions_GET",
+  "vibe_agent_web-search_GET",
+  "vibe_dataflow_cleanup_POST",
+  "vibe_dataflow_graphs_id_archive_POST",
+  "vibe_dataflow_graphs_id_backtest_POST",
+  "vibe_dataflow_graphs_id_data_GET",
+  "vibe_dataflow_graphs_id_delete_DELETE",
+  "vibe_dataflow_graphs_id_edit_PUT",
+  "vibe_dataflow_graphs_id_promote_POST",
+  "vibe_dataflow_graphs_id_trigger_POST",
+  "vibe_dataflow_graphs_id_versions_GET",
+  "vibe_env_settings_export-env_GET",
+  "vibe_remote-connection_connect-reverse_POST",
+  "vibe_remote-connection_connect-reverse_update_PATCH",
+  "vibe_remote-connection_sync_providers_GET",
+  "vibe_tasks_cron_bulk_POST",
 ];
 if (
   typeof window === "undefined" &&

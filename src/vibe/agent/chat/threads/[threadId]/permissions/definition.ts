@@ -26,7 +26,7 @@ import { scopedTranslation } from "./i18n";
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["agent", "chat", "threads", "[threadId]", "permissions"],
+  path: ["vibe", "agent", "chat", "threads", "[threadId]", "permissions"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "get.title" as const,
@@ -175,7 +175,7 @@ const { GET } = createEndpoint({
 const { PATCH } = createEndpoint({
   scopedTranslation,
   method: Methods.PATCH,
-  path: ["agent", "chat", "threads", "[threadId]", "permissions"],
+  path: ["vibe", "agent", "chat", "threads", "[threadId]", "permissions"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "patch.title" as const,

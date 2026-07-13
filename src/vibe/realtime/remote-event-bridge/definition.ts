@@ -30,7 +30,7 @@ import type { AnyEndpointEventEnvelope } from "../structured-events";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "realtime", "remote-event-bridge"],
+  path: ["vibe", "realtime", "remote-event-bridge"],
   aliases: ["remote-event-bridge"],
   title: "remoteEventBridge.post.title" as const,
   titleShort: "remoteEventBridge.post.titleShort" as const,

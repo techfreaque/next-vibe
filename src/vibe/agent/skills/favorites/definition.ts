@@ -65,7 +65,7 @@ const favoriteCreatedPayloadSchema = z.object({
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["agent", "skills", "favorites"],
+  path: ["vibe", "agent", "skills", "favorites"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   allowedClientRoles: [UserRole.PUBLIC] as const, // Allow public users to use client route
   defaultWebPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,

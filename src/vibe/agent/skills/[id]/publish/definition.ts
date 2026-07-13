@@ -44,7 +44,7 @@ const SkillPublishContainer = lazyWidget(() =>
 const { PATCH } = createEndpoint({
   scopedTranslation,
   method: Methods.PATCH,
-  path: ["agent", "skills", "[id]", "publish"],
+  path: ["vibe", "agent", "skills", "[id]", "publish"],
   aliases: [SKILL_PUBLISH_ALIAS],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 

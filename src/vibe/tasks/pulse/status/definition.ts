@@ -25,7 +25,7 @@ import { PULSE_STATUS_ALIAS } from "./constants";
 const pulseStatusEndpoint = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["system", "tasks", "pulse", "status"],
+  path: ["vibe", "tasks", "pulse", "status"],
   title: "get.title",
   titleShort: "get.titleShort",
   description: "get.description",

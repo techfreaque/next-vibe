@@ -40,7 +40,7 @@ const ChatSettingsWidget = lazyWidget(() =>
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["agent", "chat", "settings"],
+  path: ["vibe", "agent", "chat", "settings"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   defaultWebPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   allowedClientRoles: [UserRole.PUBLIC] as const,
@@ -293,7 +293,7 @@ const { GET } = createEndpoint({
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["agent", "chat", "settings"],
+  path: ["vibe", "agent", "chat", "settings"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   allowedClientRoles: [UserRole.PUBLIC] as const,
 

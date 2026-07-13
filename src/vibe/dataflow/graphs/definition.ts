@@ -37,7 +37,7 @@ const GraphListContainer = lazyWidget(() =>
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["system", "dataflow", "graphs"],
+  path: ["vibe", "dataflow", "graphs"],
   aliases: [VIBE_SENSE_GRAPHS_ALIAS] as const,
   title: "list.title",
   titleShort: "list.titleShort",
@@ -167,7 +167,7 @@ const { GET } = createEndpoint({
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "dataflow", "graphs"],
+  path: ["vibe", "dataflow", "graphs"],
   title: "create.title",
   titleShort: "create.title",
   description: "create.description",

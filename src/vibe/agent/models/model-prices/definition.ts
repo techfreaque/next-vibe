@@ -30,7 +30,7 @@ const ModelPricesWidget = lazyWidget(() =>
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["agent", "models", "model-prices"],
+  path: ["vibe", "agent", "models", "model-prices"],
   title: "get.title" as const,
   titleShort: "get.titleShort" as const,
   description: "get.description" as const,

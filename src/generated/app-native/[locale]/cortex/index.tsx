@@ -1,4 +1,4 @@
-import { createPageWrapperWithImport } from "next-vibe/platforms/react-native/nextjs-compat-wrapper";
+import { createPageWrapperWithImport } from "@/vibe/platforms/react-native/nextjs-compat-wrapper";
 export default createPageWrapperWithImport(
-  () => import("@/app/[locale]/cortex/page"),
+  () => import("@/_pages/cortex/page"),
 );

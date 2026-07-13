@@ -1,4 +1,4 @@
-// AUTO-GENERATED from src/app/api/[locale]/user/data-sources/users-with-stripe/route.ts. Add "use custom" to this file to preserve customizations.
+// AUTO-GENERATED from src/user/data-sources/users-with-stripe/route.ts. Add "use custom" to this file to preserve customizations.
 import { createFileRoute } from "@tanstack/react-router";
 
 import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
@@ -8,8 +8,7 @@ export const Route = createFileRoute(
 )({
   server: {
     handlers: wrapNextApiRoute(
-      () =>
-        import("@/user/data-sources/users-with-stripe/route"),
+      () => import("@/user/data-sources/users-with-stripe/route"),
     ),
   },
 });

@@ -37,7 +37,7 @@ const SkillReportContainer = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["agent", "skills", "[id]", "report"],
+  path: ["vibe", "agent", "skills", "[id]", "report"],
   aliases: [SKILL_REPORT_ALIAS],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 

@@ -28,7 +28,7 @@ import { ELECTRON_BUILD_ALIAS } from "./constants";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "server", "server", "electron", "build"],
+  path: ["vibe", "server", "server", "electron", "build"],
   aliases: [ELECTRON_BUILD_ALIAS],
   title: "post.title",
   titleShort: "post.titleShort",

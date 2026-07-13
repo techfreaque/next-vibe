@@ -77,7 +77,7 @@ const aiToolMetadataSchema = z.object({
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["system", "help-tool"],
+  path: ["vibe", "help-tool"],
   aliases: [
     TOOL_HELP_ALIAS,
     "help",

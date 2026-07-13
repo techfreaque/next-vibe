@@ -1,4 +1,2 @@
-import { createPageWrapperWithImport } from "next-vibe/platforms/react-native/nextjs-compat-wrapper";
-export default createPageWrapperWithImport(
-  () => import("@/app/[locale]/help/page"),
-);
+import { createPageWrapperWithImport } from "@/vibe/platforms/react-native/nextjs-compat-wrapper";
+export default createPageWrapperWithImport(() => import("@/_pages/help/page"));

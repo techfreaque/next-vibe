@@ -35,7 +35,7 @@ import { VIBE_FRAME_MOUNT_ALIAS } from "./constants";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "platforms", "vibe-frame", "mount"],
+  path: ["vibe", "platforms", "vibe-frame", "mount"],
   aliases: [VIBE_FRAME_MOUNT_ALIAS] as const,
   title: "post.title" as const,
   titleShort: "post.titleShort" as const,

@@ -158,7 +158,7 @@ class EmailTemplateGenerator {
         const templateModule = await import(file);
 
         const nestedPath = stripProjectRoot(file)
-          .replace(/^src\/app\/api\/\[locale\]\//, "")
+          .replace(/^src\//, "")
           .replace(/\/email\.tsx$/, "")
           .replace(/\/.+\.email\.tsx$/, "");
         const importPath = `@/${nestedPath}/email`;

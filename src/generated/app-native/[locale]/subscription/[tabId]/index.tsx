@@ -20,5 +20,5 @@ import { createPageWrapperWithImport } from "next-vibe/platforms/react-native/ne
  * to Next.js 15's async params format
  */
 export default createPageWrapperWithImport(
-  () => import("@/app/[locale]/subscription/page"),
+  () => import("@/_pages/subscription/page"),
 );

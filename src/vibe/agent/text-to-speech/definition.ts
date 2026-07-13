@@ -34,7 +34,7 @@ const TextToSpeechContainer = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["agent", "text-to-speech"],
+  path: ["vibe", "agent", "text-to-speech"],
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.CUSTOMER,

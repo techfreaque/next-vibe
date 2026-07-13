@@ -56,7 +56,7 @@ function detectIsPackage(): boolean {
     return true;
   }
 
-  // Check if we're in the next-vibe project (has src/app/api structure)
+  // Check if we're in the next-vibe project (has src/ structure)
   const cwd = process.cwd();
   const localVibeStructure = join(cwd, "src");
   if (existsSync(localVibeStructure)) {

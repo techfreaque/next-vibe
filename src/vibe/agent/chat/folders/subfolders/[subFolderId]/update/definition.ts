@@ -34,7 +34,15 @@ import { scopedTranslation } from "./i18n";
 const { PATCH } = createEndpoint({
   scopedTranslation,
   method: Methods.PATCH,
-  path: ["agent", "chat", "folders", "subfolders", "[subFolderId]", "update"],
+  path: [
+    "vibe",
+    "agent",
+    "chat",
+    "folders",
+    "subfolders",
+    "[subFolderId]",
+    "update",
+  ],
   aliases: ["folder-update"] as const,
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 

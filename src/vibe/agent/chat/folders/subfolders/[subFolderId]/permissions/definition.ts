@@ -38,6 +38,7 @@ const { PATCH } = createEndpoint({
   scopedTranslation,
   method: Methods.PATCH,
   path: [
+    "vibe",
     "agent",
     "chat",
     "folders",
@@ -275,6 +276,7 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: [
+    "vibe",
     "agent",
     "chat",
     "folders",

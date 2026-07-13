@@ -81,7 +81,7 @@ const FavoriteEditContainer = lazyWidget(() =>
 const { DELETE } = createEndpoint({
   scopedTranslation,
   method: Methods.DELETE,
-  path: ["agent", "skills", "favorites", "[id]"],
+  path: ["vibe", "agent", "skills", "favorites", "[id]"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   allowedClientRoles: [UserRole.PUBLIC] as const, // Allow public users to use client route
 
@@ -393,7 +393,7 @@ const { DELETE } = createEndpoint({
 const { PATCH } = createEndpoint({
   scopedTranslation,
   method: Methods.PATCH,
-  path: ["agent", "skills", "favorites", "[id]"],
+  path: ["vibe", "agent", "skills", "favorites", "[id]"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   allowedClientRoles: [UserRole.PUBLIC] as const, // Allow public users to use client route
 
@@ -1083,7 +1083,7 @@ const { PATCH } = createEndpoint({
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["agent", "skills", "favorites", "[id]"],
+  path: ["vibe", "agent", "skills", "favorites", "[id]"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   allowedClientRoles: [UserRole.PUBLIC] as const, // Allow public users to use client route
 

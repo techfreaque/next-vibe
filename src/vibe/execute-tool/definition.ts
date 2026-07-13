@@ -43,7 +43,7 @@ const ExecuteToolWidget = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "execute-tool"],
+  path: ["vibe", "execute-tool"],
   aliases: [EXECUTE_TOOL_ALIAS],
   title: "executeTool.post.title" as const,
   titleShort: "executeTool.post.titleShort" as const,

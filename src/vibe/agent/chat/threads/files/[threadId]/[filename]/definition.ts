@@ -26,7 +26,15 @@ import { scopedTranslation } from "./i18n";
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["agent", "chat", "threads", "files", "[threadId]", "[filename]"],
+  path: [
+    "vibe",
+    "agent",
+    "chat",
+    "threads",
+    "files",
+    "[threadId]",
+    "[filename]",
+  ],
   aliases: [THREAD_FILES_ALIAS] as const,
   title: "get.title" as const,
   titleShort: "get.titleShort" as const,

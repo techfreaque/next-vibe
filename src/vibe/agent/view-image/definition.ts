@@ -21,7 +21,7 @@ import { scopedTranslation } from "./i18n";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["agent", "view-image"],
+  path: ["vibe", "agent", "view-image"],
   aliases: [AGENT_VIEW_IMAGE_ALIAS] as const,
   title: "post.title",
   titleShort: "post.titleShort",

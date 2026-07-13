@@ -32,7 +32,15 @@ import { scopedTranslation } from "./i18n";
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["agent", "chat", "threads", "[threadId]", "messages", "search"],
+  path: [
+    "vibe",
+    "agent",
+    "chat",
+    "threads",
+    "[threadId]",
+    "messages",
+    "search",
+  ],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "search.get.title" as const,

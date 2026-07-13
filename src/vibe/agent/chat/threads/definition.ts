@@ -51,7 +51,7 @@ const ThreadsListContainer = lazyWidget(() =>
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["agent", "chat", "threads"],
+  path: ["vibe", "agent", "chat", "threads"],
   aliases: [CHAT_THREADS_ALIAS] as const,
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
@@ -498,7 +498,7 @@ const { GET } = createEndpoint({
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["agent", "chat", "threads"],
+  path: ["vibe", "agent", "chat", "threads"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "post.title" as const,

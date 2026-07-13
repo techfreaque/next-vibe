@@ -24,7 +24,7 @@ import { z } from "zod";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "database", "seed"],
+  path: ["vibe", "database", "seed"],
   title: "post.title",
   titleShort: "post.titleShort",
   description: "post.description",

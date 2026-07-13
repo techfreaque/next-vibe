@@ -786,8 +786,8 @@ class ViteCompiler {
                 return resolve(ROOT_DIR, rel);
               }
             }
-            // General `next-vibe/*` → system/* FIRST, then the locale root
-            // (mirrors tsconfig `"next-vibe/*": ["system/*", "[locale]/*"]`). The
+            // General `next-vibe/*` → vibe/* FIRST, then the domain root
+            // (mirrors tsconfig `"next-vibe/*": ["./src/vibe/*", "./src/*"]`). The
             // single-string `resolve.alias` below can only map to ONE base, so
             // framework files that were moved under system/ (e.g.
             // next-vibe/logger/file → system/logger/file) fail there; this
@@ -1226,14 +1226,14 @@ class ViteCompiler {
           } as Plugin,
           // Vite's HTTP server can't serve files with `[...]` in the URL path
           // because the client-side dynamic import URL contains literal brackets
-          // (e.g. /src/app/[locale]/page.tsx) and connect returns 404.
+          // (e.g. /src/_pages/page.tsx) and connect returns 404.
           // Fix: intercept HTTP requests with brackets in the URL and serve them
           // directly via vite.transformRequest so Vite's pipeline handles them.
           {
             name: "bracket-path-rewrite",
             enforce: "pre",
             configureServer(srv) {
-              // widget.tsx files under [locale] are served on-demand via
+              // widget.tsx files under src/ domains are served on-demand via
               // bracket-path-rewrite and are never in Vite's module graph, so
               // Vite's own watcher never sees them until first served (see
               // srv.watcher.add below). Watch the whole tree directly with
@@ -1340,7 +1340,7 @@ class ViteCompiler {
                       next();
                       return;
                     }
-                    // Watch the file so Vite's HMR detects changes to [locale] paths.
+                    // Watch the file so Vite's HMR detects changes to dynamic widget paths.
                     // The bracket-path-rewrite serves files that were never statically
                     // imported, so chokidar doesn't watch them by default. Explicitly
                     // add to the watcher after first serve so subsequent saves trigger HMR.
@@ -1401,7 +1401,7 @@ class ViteCompiler {
               if (opts?.ssr || this.environment?.name === "ssr") {
                 return undefined;
               }
-              // Only target layout.tsx and page.tsx in src/app/[locale]
+              // Only target layout.tsx and page.tsx in src/_pages
               if (
                 !id.replace(/\?.*$/, "").includes("/src/app/") ||
                 (!id.replace(/\?.*$/, "").endsWith("/layout.tsx") &&
@@ -1619,8 +1619,8 @@ class ViteCompiler {
                 }
               }
 
-              // General `next-vibe/*` → system/* FIRST, then the locale root
-              // (mirrors tsconfig `"next-vibe/*": ["system/*", "[locale]/*"]`). The
+              // General `next-vibe/*` → vibe/* FIRST, then the domain root
+              // (mirrors tsconfig `"next-vibe/*": ["./src/vibe/*", "./src/*"]`). The
               // single-string `resolve.alias` maps `next-vibe/` to the locale root
               // only, so framework files moved under system/ (e.g.
               // next-vibe/logger/file → system/logger/file) fail to resolve in the
@@ -2014,7 +2014,7 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
                 filePath.endsWith(".spec.tsx")
               );
             },
-            // disableGlobbing tells chokidar to treat [locale] as a literal path,
+            // disableGlobbing tells chokidar to treat bracket paths as literal paths,
             // not a glob pattern. This allows native inotify (Linux) / FSEvents (macOS)
             // instead of polling - faster detection, less CPU, no false mtime positives.
             // ignored must be a function (not glob strings) for this to work correctly.
@@ -2059,7 +2059,7 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
           sourcemapIgnoreList: (relativeSourcePath: string) =>
             relativeSourcePath.includes("drizzle-zod"),
         } as InlineConfig["build"],
-        // Disable auto-discovery: scanning src/app/** pulls in server-only deps
+        // Disable auto-discovery: scanning src/_pages/** pulls in server-only deps
         // (ssh2, react-native, lightningcss, .node binaries) into the client
         // optimizeDeps scan and causes esbuild errors. Instead, list only the
         // CJS packages that are actually needed client-side.

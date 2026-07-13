@@ -68,7 +68,7 @@ const SkillViewContainer = lazyWidget(() =>
 const { DELETE } = createEndpoint({
   scopedTranslation,
   method: Methods.DELETE,
-  path: ["agent", "skills", "[id]"],
+  path: ["vibe", "agent", "skills", "[id]"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "delete.title" as const,
@@ -349,7 +349,7 @@ const { DELETE } = createEndpoint({
 const { PATCH } = createEndpoint({
   scopedTranslation,
   method: Methods.PATCH,
-  path: ["agent", "skills", "[id]"],
+  path: ["vibe", "agent", "skills", "[id]"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "patch.title" as const,
@@ -897,7 +897,7 @@ const { PATCH } = createEndpoint({
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
-  path: ["agent", "skills", "[id]"],
+  path: ["vibe", "agent", "skills", "[id]"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN, UserRole.PUBLIC] as const,
 
   title: "get.title" as const,

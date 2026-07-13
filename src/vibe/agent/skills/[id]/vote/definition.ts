@@ -42,7 +42,7 @@ const SkillVoteContainer = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["agent", "skills", "[id]", "vote"],
+  path: ["vibe", "agent", "skills", "[id]", "vote"],
   aliases: [SKILL_VOTE_ALIAS],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 

@@ -16,7 +16,7 @@ export const translations: typeof enTranslations = {
       label: "Ogranicz do ścieżek",
       description:
         "Uwzględniaj tylko kandydatów pod tymi ścieżkami. Pozostaw puste, aby skanować wszystkie niestageowane zmiany.",
-      placeholder: "np. src/app/api",
+      placeholder: "np. src",
     },
   },
 

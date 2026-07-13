@@ -36,7 +36,7 @@ import { SttModelId } from "./models";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["agent", "speech-to-text"],
+  path: ["vibe", "agent", "speech-to-text"],
   aliases: [TRANSCRIBE_AUDIO_ALIAS],
   allowedRoles: [
     UserRole.ADMIN,

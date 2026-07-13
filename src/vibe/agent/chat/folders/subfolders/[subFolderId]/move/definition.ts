@@ -31,7 +31,15 @@ const FolderMoveContainer = lazyWidget(() =>
 const { PATCH } = createEndpoint({
   scopedTranslation,
   method: Methods.PATCH,
-  path: ["agent", "chat", "folders", "subfolders", "[subFolderId]", "move"],
+  path: [
+    "vibe",
+    "agent",
+    "chat",
+    "folders",
+    "subfolders",
+    "[subFolderId]",
+    "move",
+  ],
   aliases: ["folder-move"] as const,
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 

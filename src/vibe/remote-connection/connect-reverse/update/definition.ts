@@ -33,7 +33,7 @@ const ReverseUpdateWidget = lazyWidget(() =>
 const { PATCH } = createEndpoint({
   scopedTranslation,
   method: Methods.PATCH,
-  path: ["remote-connection", "connect-reverse", "update"],
+  path: ["vibe", "remote-connection", "connect-reverse", "update"],
   allowedRoles: [UserRole.ADMIN] as const,
 
   title: "patch.title" as const,
