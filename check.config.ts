@@ -32,7 +32,7 @@ const vibeCheck: CheckConfig["vibeCheck"] = {
   editorUriScheme: "cursor://file/", // URI scheme for clickable file links
   // Extensive mode: when false (default), test and generated files are excluded.
   // use "vibe check --extensive" for release validation to catch issues in all files.
-  extensive: false,
+  extensive: true,
 };
 
 // ============================================================
@@ -745,7 +745,7 @@ const vscode: CheckConfig["vscode"] = {
   settings: {
     oxc: {
       enable: true,
-      lintRun: "onSave",
+      lintRun: "onType",
       configPath: ".tmp/.oxlintrc.json",
       fmtConfigPath: ".tmp/.oxfmtrc.json",
       fmtExperimental: true,
@@ -764,7 +764,7 @@ const vscode: CheckConfig["vscode"] = {
       validateEnable: true,
       suggestAutoImports: true,
       preferTypeOnlyAutoImports: true,
-      experimentalUseTsgo: typecheck.enabled && typecheck.useTsgo,
+      useTsgo: typecheck.enabled && typecheck.useTsgo,
     },
     files: { eol: "\n" },
     search: {

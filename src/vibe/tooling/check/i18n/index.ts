@@ -4,11 +4,11 @@ import { translations as enTranslations } from "./en";
 
 export const scopedTranslation = createScopedTranslation({
   en: enTranslations,
-  de: () => require("next-vibe/tooling/check/i18n/de").translations,
-  pl: () => require("next-vibe/tooling/check/i18n/pl").translations,
+  de: () => require("next-vibe/tooling/check/vibe-check/i18n/de").translations,
+  pl: () => require("next-vibe/tooling/check/vibe-check/i18n/pl").translations,
 });
 
-export type CheckTranslationKey =
+export type CheckVibeCheckTranslationKey =
   (typeof scopedTranslation)["ScopedTranslationKey"];
 
-export type CheckT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+export type CheckVibeCheckT = ReturnType<typeof scopedTranslation.scopedT>["t"];

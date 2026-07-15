@@ -135,6 +135,19 @@ export class ConfigRepositoryImpl {
         }
       }
 
+      const checkerSourcePath = resolve(
+        dirname(fileURLToPath(import.meta.url)),
+        "..",
+        "oxlint",
+        "plugins",
+        baseName,
+        "src",
+        "index.ts",
+      );
+      if (existsSync(checkerSourcePath)) {
+        return checkerSourcePath;
+      }
+
       // Fallback: return expected path from cwd
       return resolve(
         process.cwd(),
@@ -332,8 +345,10 @@ export default checkConfig.eslint?.buildFlatConfig?.(
       settings["typescript.preferences.preferTypeOnlyAutoImports"] =
         ts.preferTypeOnlyAutoImports;
     }
-    if (ts.experimentalUseTsgo !== undefined) {
-      settings["typescript.experimental.useTsgo"] = ts.experimentalUseTsgo;
+    const useTsgo = ts.useTsgo ?? ts.experimentalUseTsgo;
+    if (useTsgo !== undefined) {
+      delete settings["typescript.experimental.useTsgo"];
+      settings["js/ts.experimental.useTsgo"] = useTsgo;
     }
   }
 
@@ -498,6 +513,17 @@ export default checkConfig.eslint?.buildFlatConfig?.(
       logger.debug("Config files are up-to-date");
     }
 
+    const vscodeResult = await ConfigRepositoryImpl.generateVSCodeSettings(
+      logger,
+      config,
+      locale,
+    );
+    if (!vscodeResult.success) {
+      logger.warn("Failed to generate VSCode settings", {
+        error: vscodeResult.message,
+      });
+    }
+
     return { ready: true, config, regenerated };
   }
 
@@ -581,22 +607,29 @@ export default checkConfig.eslint?.buildFlatConfig?.(
     locale: CountryLanguage,
   ): Promise<ResponseType<GenerateVSCodeSettingsResult>> {
     const { t } = scopedTranslation.scopedT(locale);
-    const settingsPath = `${process.cwd()}/.vscode/settings.json`;
+    const defaultSettingsPath = resolve(process.cwd(), ".vscode/settings.json");
 
     try {
       // Check if VSCode integration is enabled
       if (!config.vscode.enabled) {
         logger.debug("VSCode settings generation disabled");
-        return success({ settingsPath });
+        return success({ settingsPath: defaultSettingsPath });
       }
 
       const vscodeConfig = config.vscode;
+      const settingsPath = resolve(
+        process.cwd(),
+        vscodeConfig.settingsPath ?? ".vscode/settings.json",
+      );
       if (!vscodeConfig.autoGenerateSettings) {
         logger.debug("VSCode settings auto-generation disabled");
         return success({ settingsPath });
       }
 
-      await fs.mkdir(dirname(settingsPath), { recursive: true });
+      const settingsDirectory = dirname(settingsPath);
+      if (!existsSync(settingsDirectory)) {
+        await fs.mkdir(settingsDirectory, { recursive: true });
+      }
 
       const existingSettings = await ConfigRepositoryImpl.loadExistingSettings(
         settingsPath,
@@ -638,6 +671,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
         JSON.stringify(newSettings, null, 2),
         "utf8",
       );
+
       logger.debug("Generated VSCode settings", { path: settingsPath });
 
       return success({ settingsPath });
@@ -788,7 +822,10 @@ export default checkConfig.eslint?.buildFlatConfig?.(
         );
       }
 
-      await fs.mkdir(dirname(mcpConfigPath), { recursive: true });
+      const mcpConfigDirectory = dirname(mcpConfigPath);
+      if (!existsSync(mcpConfigDirectory)) {
+        await fs.mkdir(mcpConfigDirectory, { recursive: true });
+      }
       await fs.writeFile(mcpConfigPath, mcpContent, "utf8");
 
       return success({ mcpConfigPath });

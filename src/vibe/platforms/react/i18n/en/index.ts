@@ -124,6 +124,7 @@ export const translations = {
     },
     codeQualityFiles: {
       affectedFiles: "Affected files",
+      andMoreFiles: "… and {{count}} more files",
     },
     codeQualitySummary: {
       summary: "Summary",

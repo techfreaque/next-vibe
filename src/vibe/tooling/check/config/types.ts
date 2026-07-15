@@ -50,6 +50,12 @@ export interface I18nPluginConfig {
 export interface RestrictedSyntaxPluginConfig {
   /** Properties that commonly accept JSX/React nodes as values */
   jsxAllowedProperties?: readonly string[] | string[];
+  /** Disallow throw statements (default: true) */
+  noThrow?: boolean;
+  /** Disallow unknown type (default: true) */
+  noUnknown?: boolean;
+  /** Disallow object type (default: true) */
+  noObjectType?: boolean;
 }
 
 export interface JsxCapitalizationPluginConfig {
@@ -530,6 +536,8 @@ interface VSCodeConfigOptions {
       validateEnable?: boolean;
       suggestAutoImports?: boolean;
       preferTypeOnlyAutoImports?: boolean;
+      useTsgo?: boolean;
+      /** @deprecated Use useTsgo. */
       experimentalUseTsgo?: boolean;
     };
     /** File settings */

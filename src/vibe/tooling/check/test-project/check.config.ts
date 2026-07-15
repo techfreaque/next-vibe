@@ -32,7 +32,7 @@ const vibeCheck: CheckConfig["vibeCheck"] = {
   editorUriScheme: "cursor://file/", // URI scheme for clickable file links
   // Extensive mode: when false (default), test and generated files are excluded.
   // use "vibe check --extensive" for release validation to catch issues in all files.
-  extensive: true,
+  extensive: false,
 };
 
 // ============================================================
@@ -54,6 +54,7 @@ const features = {
   jsxCapitalization: true, // Enforce capitalized JSX components
   restrictedSyntax: true, // No throw, unknown, object types
   boilerplate: true, // Enforce route.ts and i18n boilerplate patterns
+  vibeBoundary: true, // Enforce src/vibe/ internal boundary (no cross-boundary imports)
   // TypeScript
   tsgo: true, // Use tsgo instead of tsc for type checking
   strictTypes: true, // Strict type checking rules
@@ -65,11 +66,9 @@ const features = {
 // ============================================================
 
 const nonExtensivePatterns = [
-  "**/generated/**",
+  "src/generated/**",
   "**/*.test.ts",
   "**/*.test.tsx",
-  "src/generated/app-tanstack/routes/**",
-  "src/generated/app-tanstack/routeTree.gen.ts",
   "**/registry/generated.ts",
   "**/registry/generated.client.ts",
 ];
@@ -120,6 +119,7 @@ const { oxlintIgnores, eslintIgnores } = formatIgnorePatterns([
   "next-env.d.ts",
   "nativewind-env.d.ts",
   "**/fixtures/**",
+  "src/generated/ai-fixtures/**",
   // Glob patterns
   "**/test-files/**",
 ]);
@@ -135,7 +135,7 @@ const typecheck = {
   // Keep a warm tsgo LSP daemon instead of cold-spawning tsgo on every check.
   // First run pays the cold-start cost; subsequent runs return in ~1-3s.
   // Requires useTsgo: true. Daemon socket at .tmp/tsgo-lsp.sock.
-  useLspDaemon: true,
+  useLspDaemon: false,
 };
 
 // --------------------------------------------------------
@@ -169,6 +169,9 @@ const oxlint: CheckConfig["oxlint"] = {
     ...(features.i18n ? ["@next-vibe/checker/oxlint-plugins/i18n.js"] : []),
     ...(features.boilerplate
       ? ["@next-vibe/checker/oxlint-plugins/boilerplate.js"]
+      : []),
+    ...(features.vibeBoundary
+      ? ["@next-vibe/checker/oxlint-plugins/vibe-boundary.js"]
       : []),
   ],
   categories: {
@@ -622,6 +625,11 @@ const oxlint: CheckConfig["oxlint"] = {
           "oxlint-plugin-boilerplate/i18n-pattern": ["error"],
         }
       : {}),
+    ...(features.vibeBoundary
+      ? {
+          "oxlint-plugin-vibe-boundary/vibe-internal-boundary": ["error"],
+        }
+      : {}),
 
     // ── Next.js (enabled via nextjs flag) ─────────────────────
     ...(features.nextjs
@@ -827,6 +835,9 @@ const config = (): CheckConfig => {
               "route-pattern",
               "i18n-pattern",
             ]),
+            "oxlint-plugin-vibe-boundary": createEslintStub([
+              "vibe-internal-boundary",
+            ]),
             "@typescript-eslint": createEslintStub([
               "no-explicit-any",
               "no-unused-vars",
@@ -900,6 +911,9 @@ const config = (): CheckConfig => {
             "oxlint-plugin-boilerplate": createEslintStub([
               "route-pattern",
               "i18n-pattern",
+            ]),
+            "oxlint-plugin-vibe-boundary": createEslintStub([
+              "vibe-internal-boundary",
             ]),
             "@typescript-eslint": createEslintStub([
               "no-explicit-any",

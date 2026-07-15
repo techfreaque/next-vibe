@@ -60,7 +60,7 @@ const { POST } = createEndpoint({
         label: "fields.createMcpConfig.label",
         description: "fields.createMcpConfig.description",
         columns: 6,
-        schema: z.boolean().optional(),
+        schema: z.boolean().optional().default(true),
       }),
 
       updateVscodeSettings: requestField(scopedTranslation, {
@@ -69,7 +69,7 @@ const { POST } = createEndpoint({
         label: "fields.updateVscodeSettings.label",
         description: "fields.updateVscodeSettings.description",
         columns: 6,
-        schema: z.boolean().optional(),
+        schema: z.boolean().optional().default(true),
       }),
 
       updatePackageJson: requestField(scopedTranslation, {

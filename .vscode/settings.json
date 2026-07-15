@@ -1,23 +1,19 @@
 {
-  "typescript.experimental.useTsgo": true,
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "oxc.oxc-vscode",
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit",
     "source.organizeImports": "explicit"
   },
-  // Oxlint configuration
   "oxc.trace.server": "verbose",
   "oxc.enable": true,
-  "oxc.lint.run": "onSave",
+  "oxc.lint.run": "onType",
   "oxc.configPath": ".tmp/.oxlintrc.json",
   "oxc.fmt.configPath": ".tmp/.oxfmtrc.json",
   "oxc.typeAware": true,
   "oxc.fixKind": "safe_fix",
-  // Prettier configuration
   "prettier.enable": true,
   "prettier.requireConfig": true,
-  // TypeScript configuration
   "typescript.validate.enable": true,
   "typescript.suggest.autoImports": true,
   "typescript.preferences.preferTypeOnlyAutoImports": true,
@@ -56,14 +52,11 @@
     ".tanstack/**": true,
     "**/testing/fixtures/**": true
   },
-  // "terminal.integrated.profiles.linux": {
-  //   "Vibe Guard": {
-  //     "path": "${workspaceFolder}/.vibe-guard-instance/.guard.sh"
-  //   }
-  // },
   "terminal.integrated.defaultProfile.linux": "Vibe Guard",
   "[markdown]": {
     "editor.defaultFormatter": "yzhang.markdown-all-in-one"
   },
-  "typescript.native-preview.tsdk": "node_modules\\@typescript\\native-preview"
+  "typescript.native-preview.tsdk": "node_modules\\@typescript\\native-preview",
+  "oxc.fmt.experimental": true,
+  "js/ts.experimental.useTsgo": true
 }

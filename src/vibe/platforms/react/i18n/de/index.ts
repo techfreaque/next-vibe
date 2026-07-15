@@ -133,6 +133,7 @@ export const translations: typeof enTranslations = {
     },
     codeQualityFiles: {
       affectedFiles: "Betroffene Dateien",
+      andMoreFiles: "… und {{count}} weitere Dateien",
     },
     codeQualitySummary: {
       summary: "Zusammenfassung",

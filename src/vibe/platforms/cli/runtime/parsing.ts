@@ -270,8 +270,13 @@ export class CliInputParser {
     // Find the command token (first non-flag positional) within rawArgs.
     // Skip flag-like entries so unknown flags (e.g. --fix) in args[] don't
     // accidentally match before the actual command name.
+    // Normalize path separators for cross-platform compatibility (Windows vs Unix)
+    const normalizedArgs = args.map((a) => a.replaceAll("\\", "/"));
     const commandIndex = rawArgs.findIndex(
-      (arg) => arg && !arg.startsWith("-") && args.includes(arg),
+      (arg) =>
+        arg &&
+        !arg.startsWith("-") &&
+        normalizedArgs.includes(arg.replaceAll("\\", "/")),
     );
     const relevantArgs =
       commandIndex >= 0 ? rawArgs.slice(commandIndex + 1) : [];
