@@ -24,66 +24,33 @@ import type {
   ApiSection,
   CreateApiEndpointAny,
 } from "next-vibe/core/definition/endpoint-base";
+import type { EndpointMeta } from "next-vibe/core/definition/endpoints-meta";
 import type { Methods } from "next-vibe/core/definition/enums";
+import type {
+  GeneratorContext,
+  GeneratorResult,
+} from "next-vibe/core/generators/shared/shared-inputs";
+import {
+  generateFileHeader,
+  jsonToTs,
+  toImportUrl,
+  toPosixPath,
+  writeGeneratedFile,
+} from "next-vibe/core/generators/shared/utils";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { formatCount, formatWarning } from "next-vibe/logger/formatters";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type {
-  GeneratorContext,
-  GeneratorResult,
-} from "next-vibe/tooling/generators/shared/shared-inputs";
-import {
-  generateFileHeader,
-  jsonToTs,
-  toPosixPath,
-  writeGeneratedFile,
-} from "next-vibe/tooling/generators/shared/utils";
 
-const OUTPUT_DIR = "src/generated/endpoints/meta";
+import { GENERATED_DIR } from "@/env/paths";
+
+const OUTPUT_DIR = `${GENERATED_DIR}/endpoints/meta`;
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-/**
- * The shape of each entry in the generated metadata array.
- * Kept as a plain interface (no Zod) - this lives in generated files only.
- */
-export interface EndpointMeta {
-  /** Full tool name: path segments joined by "_" + "_" + METHOD */
-  toolName: string;
-  method: string;
-  /** Original path segments array from the definition */
-  path: string[];
-  allowedRoles: string[];
-  aliases: string[];
-  /** Pre-translated at generation time */
-  title: string;
-  /** Pre-translated short title at generation time */
-  titleShort: string;
-  /** Pre-translated at generation time */
-  description: string;
-  icon: string;
-  /** Pre-translated category label at generation time */
-  category: string;
-  /** Pre-translated sub-category label at generation time (optional) */
-  subCategory: string;
-  /** Pre-translated tags at generation time */
-  tags: string[];
-  /** Credit cost (only present when > 0) */
-  credits?: number;
-  /** Whether the tool requires user confirmation before execution */
-  requiresConfirmation?: boolean;
-  /** Roles for which this tool is AI-pinned by default (overridable per-favorite) */
-  defaultAiPinned?: string[];
-  /** Roles for which this tool is web-sidebar-pinned by default (overridable per-user) */
-  defaultWebPinned?: string[];
-  /** Example inputs/responses from the definition */
-  examples?: {
-    inputs?: Record<string, Record<string, WidgetData>>;
-    responses?: Record<string, Record<string, WidgetData>>;
-  };
-}
+/** Entry shape while building: carries canonicalName, stripped before emit. */
+type EndpointMetaDraft = EndpointMeta & { canonicalName: string };
 
 // ─── Repository ──────────────────────────────────────────────────────────────
 
@@ -223,7 +190,7 @@ class EndpointsMetaGenerator {
   ): Promise<ApiSection | null> {
     const tryImport = async (): Promise<{ default?: ApiSection } | null> => {
       try {
-        return (await import(defFile)) as { default?: ApiSection };
+        return (await import(toImportUrl(defFile))) as { default?: ApiSection };
       } catch (error) {
         const msg = parseError(error).message;
         if (msg.includes("before initialization")) {
@@ -231,7 +198,9 @@ class EndpointsMetaGenerator {
             setTimeout(resolve, 10);
           });
           try {
-            return (await import(defFile)) as { default?: ApiSection };
+            return (await import(toImportUrl(defFile))) as {
+              default?: ApiSection;
+            };
           } catch (retryError) {
             logger.warn(
               `Could not load definition: ${defFile} - ${parseError(retryError).message}`,
@@ -322,7 +291,7 @@ class EndpointsMetaGenerator {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): EndpointMeta[] {
-    const entries = loaded.map(({ definition }) => {
+    const entries: EndpointMetaDraft[] = loaded.map(({ definition }) => {
       const { t } = definition.scopedTranslation.scopedT(locale);
 
       // Translate title & description via the endpoint's own scoped i18n
@@ -389,8 +358,11 @@ class EndpointsMetaGenerator {
         canonicalName,
         method: definition.method as string,
         path: [...(definition.path as string[])],
+        // Copy verbatim. The previous `.map(String)` was a runtime no-op (these are
+        // already the role enum's string values) that only widened the type to
+        // string[], which made permissionsRegistry's typed API uncallable from meta.
         allowedRoles: definition.allowedRoles
-          ? [...definition.allowedRoles].map(String)
+          ? [...definition.allowedRoles]
           : [],
         aliases,
         title,
@@ -507,30 +479,7 @@ class EndpointsMetaGenerator {
     // eslint-disable-next-line i18next/no-literal-string
     return `${header}
 
-import type { WidgetData } from "next-vibe/core/utils/json";
-
-export interface EndpointMeta {
-  toolName: string;
-  method: string;
-  path: string[];
-  allowedRoles: string[];
-  aliases: string[];
-  title: string;
-  titleShort: string;
-  description: string;
-  icon: string;
-  category: string;
-  subCategory: string;
-  tags: string[];
-  credits?: number;
-  requiresConfirmation?: boolean;
-  defaultAiPinned?: string[];
-  defaultWebPinned?: string[];
-  examples?: {
-    inputs?: Record<string, Record<string, WidgetData>>;
-    responses?: Record<string, Record<string, WidgetData>>;
-  };
-}
+import type { EndpointMeta } from "next-vibe/core/definition/endpoints-meta";
 
 export const endpointsMeta: EndpointMeta[] = ${entriesTs};
 `;

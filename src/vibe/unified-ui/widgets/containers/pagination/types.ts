@@ -1,0 +1,123 @@
+/**
+ * Pagination Widget Type Definitions
+ */
+
+import type { SpacingSize } from "next-vibe/core/definition/enums";
+import { FieldDataType, WidgetType } from "next-vibe/core/definition/enums";
+import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
+import type {
+  BaseObjectWidgetConfig,
+  FieldUsageConfig,
+} from "next-vibe/unified-ui/_shared/types";
+import type { TextWidgetConfig } from "next-vibe/unified-ui/widgets/display-only/text/types";
+import type { NumberFieldWidgetConfig } from "next-vibe/unified-ui/widgets/form-fields/number-field/types";
+import z from "zod";
+
+export function paginationField(config?: {
+  order?: number;
+}): PaginationWidgetConfig {
+  return {
+    type: WidgetType.PAGINATION,
+    schemaType: "object" as const,
+    order: config?.order,
+    usage: { request: "data", response: true },
+    children: {
+      page: {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        schema: pageSchema,
+        usage: { request: "data" },
+        schemaType: "primitive" as const,
+      },
+      limit: {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        schema: limitSchema,
+        usage: { request: "data" },
+        schemaType: "primitive" as const,
+      },
+      totalCount: {
+        type: WidgetType.TEXT,
+        schema: totalCountSchema,
+        usage: { response: true },
+        schemaType: "primitive" as const,
+      },
+      pageCount: {
+        type: WidgetType.TEXT,
+        schema: pageCountSchema,
+        usage: { response: true },
+        schemaType: "primitive" as const,
+      },
+    },
+  };
+}
+
+const pageSchema = z.coerce.number().optional().default(1);
+const limitSchema = z.coerce.number().optional().default(50);
+const totalCountSchema = z.coerce.number();
+const pageCountSchema = z.coerce.number();
+
+/**
+ * Pagination Widget Config
+ *
+ * Enforces that pagination must have specific fields with correct types.
+ * This enables full type safety from config -> children -> field.value.
+ *
+ * Required children:
+ * - page: Current page number
+ * - limit: Items per page
+ * - totalCount: Total number of items
+ *
+ * Optional children:
+ * - pageCount: Total number of pages
+ * - offset: Current offset
+ */
+export interface PaginationWidgetConfig<
+  TUsage extends FieldUsageConfig = { request: "data"; response: true },
+> extends BaseObjectWidgetConfig<
+  TranslatedKeyType,
+  TUsage,
+  "object",
+  {
+    page: NumberFieldWidgetConfig<
+      TranslatedKeyType,
+      typeof pageSchema,
+      { request: "data"; response?: never }
+    >;
+    limit: NumberFieldWidgetConfig<
+      TranslatedKeyType,
+      typeof limitSchema,
+      { request: "data"; response?: never }
+    >;
+    totalCount: TextWidgetConfig<
+      TranslatedKeyType,
+      typeof totalCountSchema,
+      { request?: undefined; response: true },
+      "primitive"
+    >;
+    pageCount: TextWidgetConfig<
+      TranslatedKeyType,
+      typeof pageCountSchema,
+      { request?: undefined; response: true },
+      "primitive"
+    >;
+  }
+> {
+  type: WidgetType.PAGINATION;
+  /** Top border */
+  showBorder?: boolean;
+  /** Container padding */
+  padding?: SpacingSize;
+  /** Container margin */
+  margin?: SpacingSize;
+  /** Gap between info and controls */
+  controlsGap?: SpacingSize;
+  /** Gap between elements */
+  elementGap?: SpacingSize;
+  /** Text size */
+  textSize?: "xs" | "sm" | "base";
+  /** Select width */
+  selectWidth?: "sm" | "base" | "lg";
+  /** Icon size */
+  iconSize?: "xs" | "sm" | "base" | "lg";
+}

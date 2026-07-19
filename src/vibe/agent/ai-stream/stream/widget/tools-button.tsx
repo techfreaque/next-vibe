@@ -2,17 +2,17 @@
 import type { EnabledTool } from "next-vibe/agent/chat/hooks/store";
 import { useToolsModalStore } from "next-vibe/agent/tools/store";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { cn } from "next-vibe/core/utils/utils";
 import helpDefinitions from "next-vibe/help-tool/definition";
-import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Button } from "next-vibe/ui/ui/button";
 import { Wrench } from "next-vibe/ui/ui/icons/Wrench";
 import { Span } from "next-vibe/ui/ui/span";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetLogger,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import type { JSX } from "react";
 import { useMemo } from "react";
 

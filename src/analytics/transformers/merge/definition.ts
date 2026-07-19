@@ -21,7 +21,7 @@ import {
   timeSeriesResponseField,
 } from "next-vibe/dataflow/shared/fields";
 import { UserRole } from "next-vibe/identity/roles/enum";
-import { objectField } from "next-vibe/unified-ui/_shared/utils";
+import { objectField } from "next-vibe/unified-ui/_shared/utils-i18n";
 
 import { TRANSFORMER_MERGE_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";

@@ -1,7 +1,6 @@
 import type { InferResponseOutput } from "next-vibe/core/definition/create";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type { WidgetType } from "next-vibe/core/definition/enums";
-import type { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import type { TParams } from "next-vibe/core/i18n/core/static-types";
@@ -11,7 +10,8 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { UserPermissionRoleValue } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type { UseNavigationStackReturn } from "next-vibe/platforms/react/hooks/use-navigation-stack";
+import type { Platform } from "next-vibe/platforms/platforms";
+import type { UseNavigationStackReturn } from "next-vibe/unified-ui/hooks/use-navigation-stack";
 import type { Path } from "react-hook-form";
 import type z from "zod";
 

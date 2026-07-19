@@ -1,5 +1,5 @@
 import { useTranslation } from "next-vibe/core/i18n/core/client";
-import { cn } from "next-vibe/core/utils/utils";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import React from "react";
 import type { ScrollView as RNScrollView } from "react-native";
 import { Pressable, ScrollView, Text as RNText, View } from "react-native";

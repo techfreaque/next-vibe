@@ -1,7 +1,7 @@
 "use client";
 
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
-import { cn } from "next-vibe/core/utils/utils";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { ReactNode } from "react";
 import * as React from "react";
 import {

@@ -40,7 +40,7 @@ function normalizeLocaleFormat(locale: string): string {
     return "";
   }
 
-  const normalized = locale.trim().replace(/_/g, "-");
+  const normalized = locale.trim().replaceAll("_", "-");
   const parts = normalized.split("-");
   const lang = parts[0]?.toLowerCase();
   const country = parts[1]?.toUpperCase();

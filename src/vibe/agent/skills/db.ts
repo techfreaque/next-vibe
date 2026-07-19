@@ -40,7 +40,7 @@ import type { VideoGenModelSelection } from "next-vibe/agent/video-generation/mo
 import { videoGenModelSelectionSchema } from "next-vibe/agent/video-generation/models";
 import { iconSchema } from "next-vibe/core/definition/common.schema";
 import { users } from "next-vibe/identity/user/db";
-import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import { z } from "zod";
 
 import type { ToolConfigItem } from "../chat/settings/definition";
@@ -308,14 +308,22 @@ export type NewCustomSkill = typeof customSkills.$inferInsert;
 /**
  * One skill variant: a name + the full set of per-modality model selections.
  *
- * Declared as an EXPLICIT interface (not `z.infer`) and the schema is annotated
+ * Declared EXPLICITLY (not `z.infer`) and the schema is annotated
  * `z.ZodType<SkillVariantData>`. This pins `z.output<skillVariantSchema>` to this
  * named type so consumers (e.g. `InferRequestOutput` when this field is part of a
  * request) resolve it as `SkillVariantData[]` shallowly instead of re-deriving the
  * nine nested discriminated-union model-selection types every time — which exceeds
  * TS's instantiation-depth limit and collapses event-payload Picks to `never`.
+ *
+ * A type alias, NOT an interface: this rides an endpoint payload, so it must be
+ * assignable to `WidgetData`, whose record arm is `{ [key: string]: WidgetData }`.
+ * TypeScript grants an implicit index signature to object type aliases but never
+ * to interfaces, so an interface here is unassignable at every erased payload
+ * boundary (e.g. a route's onRemoteEvent vs OnRemoteEventDispatchMap). The alias
+ * pins the type exactly as an interface did — same depth guarantee.
  */
-export interface SkillVariantData {
+// eslint-disable-next-line typescript/consistent-type-definitions -- Must be a type alias, not an interface: only aliases get the implicit index signature that makes this assignable to WidgetData on an endpoint payload. See above.
+export type SkillVariantData = {
   id: string;
   displayName?: string;
   modelSelection: ChatModelSelection;
@@ -328,7 +336,7 @@ export interface SkillVariantData {
   videoVisionModelSelection?: VideoVisionModelSelection | null;
   audioVisionModelSelection?: AudioVisionModelSelection | null;
   isDefault?: boolean;
-}
+};
 
 export const skillVariantSchema: z.ZodType<SkillVariantData> = z.object({
   id: z

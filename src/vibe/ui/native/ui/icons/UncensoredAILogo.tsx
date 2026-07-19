@@ -1,7 +1,6 @@
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { JSX } from "react";
 import { Image } from "react-native";
-
-import { envClient } from "@/env/env-client";
 
 /**
  * Uncensored AI Logo for React Native

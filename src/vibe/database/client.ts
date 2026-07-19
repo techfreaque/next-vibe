@@ -3,9 +3,8 @@ import "server-only";
 import { PGlite } from "@electric-sql/pglite";
 import { type NodePgDatabase } from "drizzle-orm/node-postgres";
 import { type PgliteDatabase } from "drizzle-orm/pglite";
+import { databaseEnv } from "next-vibe/database/env";
 import { Pool } from "pg";
-
-import { env } from "@/env/env";
 
 /**
  * Shared database connection primitives.
@@ -22,7 +21,7 @@ import { env } from "@/env/env";
  * If the URL starts with "file:" it selects the PGlite embedded driver;
  * everything else uses the standard pg connection pool.
  */
-const DATABASE_URL = process.env["DATABASE_URL"] ?? env.DATABASE_URL;
+const DATABASE_URL = process.env["DATABASE_URL"] ?? databaseEnv.DATABASE_URL;
 
 /**
  * True when running against a local PGlite file database (headless-client mode).

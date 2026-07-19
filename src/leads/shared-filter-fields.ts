@@ -35,7 +35,7 @@ import { scopedTranslation } from "next-vibe/identity/lead/i18n";
 import {
   objectOptionalField,
   requestField,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 /**

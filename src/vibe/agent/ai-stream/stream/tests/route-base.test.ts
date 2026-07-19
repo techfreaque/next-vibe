@@ -55,7 +55,7 @@ import { and, eq, sql } from "drizzle-orm";
 import {
   DefaultFolderId,
   makeHeadlessContext,
-  rootlessStreamContext,
+  rootlessToolExecutionContext,
   type ToolExecutionContext,
 } from "next-vibe/agent/chat/config";
 import { scopedTranslation as chatScopedTranslation } from "next-vibe/agent/chat/i18n";
@@ -69,14 +69,14 @@ import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { identityEnv } from "next-vibe/identity/env";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { cronTasks } from "next-vibe/tasks/cron/db";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { contacts } from "@/contact/db";
 import { ContactSubject } from "@/contact/enum";
-import { env } from "@/env/env";
 
 import type { ImageGenModelId } from "../../../image-generation/models";
 import type { MusicGenModelId } from "../../../music-generation/models";
@@ -182,7 +182,7 @@ function assertWakeUpPhase1Ok(
  */
 function stripReasoning(content: string | null | undefined): string {
   let c = content ?? "";
-  c = c.replace(/<think>[\s\S]*?<\/think>/g, "");
+  c = c.replaceAll(/<think>[\s\S]*?<\/think>/g, "");
   // Any remaining (unclosed) <think> means the rest is unfinished reasoning.
   const openIdx = c.indexOf("<think>");
   if (openIdx !== -1) {
@@ -225,7 +225,7 @@ function byRole(messages: SlimMessage[], role: string): SlimMessage[] {
 /** Strip surrounding quotes/backticks/trailing punctuation from a parsed value
  *  so a fixed-shape reply field compares by exact equality. */
 function cleanInstanceId(raw: string): string {
-  return raw.trim().replace(/^["'`]+|["'`.]+$/g, "");
+  return raw.trim().replaceAll(/^["'`]+|["'`.]+$/g, "");
 }
 
 /** Get messages added since prevIds snapshot (sorted by createdAt, excludes known IDs) */
@@ -374,7 +374,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         await import("next-vibe/agent/chat/threads/[threadId]/messages/definition")
       ).default;
       const result = await sendTestRequest({
-        streamContext: rootlessStreamContext(),
+        toolExecutionContext: rootlessToolExecutionContext(),
         endpoint: msgsDef.GET,
         data: { rootFolderId: suiteRootFolderId },
         urlPathParams: { threadId: tid },
@@ -388,15 +388,15 @@ export function describeStreamSuite(cfg: ModeConfig): void {
     }
 
     beforeAll(async () => {
-      const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
+      const resolved = await resolveUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
       expect(
         resolved,
-        `${env.VIBE_ADMIN_USER_EMAIL} not found - run: vibe dev`,
+        `${identityEnv.VIBE_ADMIN_USER_EMAIL} not found - run: vibe dev`,
       ).toBeTruthy();
       if (!resolved) {
         // oxlint-disable-next-line restricted-syntax
         throw new Error(
-          `${env.VIBE_ADMIN_USER_EMAIL} not found - run: vibe dev`,
+          `${identityEnv.VIBE_ADMIN_USER_EMAIL} not found - run: vibe dev`,
         );
       }
       testUser = resolved;
@@ -446,13 +446,13 @@ export function describeStreamSuite(cfg: ModeConfig): void {
           await import("next-vibe/agent/skills/favorites/[id]/definition")
         ).default;
         const favResetGet = await sendTestRequest({
-          streamContext: rootlessStreamContext(),
+          toolExecutionContext: rootlessToolExecutionContext(),
           endpoint: favByIdResetDef.GET,
           urlPathParams: { id: mainFavoriteId },
           user: testUser,
         });
         await sendTestRequest({
-          streamContext: rootlessStreamContext(),
+          toolExecutionContext: rootlessToolExecutionContext(),
           endpoint: favByIdResetDef.PATCH,
           data: {
             modelSelection: favResetGet.success
@@ -494,7 +494,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       // its OWN folder via threadCasePrefix. Defaults to cachePrefix.
       const threadCasePrefix = cfg.threadCasePrefix ?? cfg.cachePrefix;
       const testCaseName =
-        threadCasePrefix.replace(/[^a-z0-9-]/gi, "").replace(/-+$/, "") ||
+        threadCasePrefix.replaceAll(/[^a-z0-9-]/gi, "").replace(/-+$/, "") ||
         "regular";
 
       // Per-mode setup (remote connections, credential patching, etc.)
@@ -1299,7 +1299,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
               await import("next-vibe/agent/cortex/read/definition")
             ).default;
             const readRes = await sendTestRequest({
-              streamContext: rootlessStreamContext(),
+              toolExecutionContext: rootlessToolExecutionContext(),
               endpoint: cortexReadDef.GET,
               data: { path: cheapNodePath },
               user: testUser,
@@ -3129,7 +3129,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
               // (after stripping reasoning) is non-empty AND the thread is idle.
               if (deferredTool && revivalAi) {
                 const visible = (revivalAi.content ?? "")
-                  .replace(/<think>[\s\S]*?<\/think>/g, "")
+                  .replaceAll(/<think>[\s\S]*?<\/think>/g, "")
                   .trim();
                 if (
                   visible.length > 0 &&
@@ -3262,13 +3262,13 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
             await import("next-vibe/agent/skills/favorites/[id]/definition")
           ).default;
           const favGet = await sendTestRequest({
-            streamContext: rootlessStreamContext(),
+            toolExecutionContext: rootlessToolExecutionContext(),
             endpoint: favByIdDef.GET,
             urlPathParams: { id: mainFavoriteId },
             user: testUser,
           });
           await sendTestRequest({
-            streamContext: rootlessStreamContext(),
+            toolExecutionContext: rootlessToolExecutionContext(),
             endpoint: favByIdDef.PATCH,
             data: {
               modelSelection: favGet.success
@@ -3303,7 +3303,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
             // paths), so every cell gates the approve tool itself.
             const confirmToolId = approveTool.name;
             const t7FavGet = await sendTestRequest({
-              streamContext: rootlessStreamContext(),
+              toolExecutionContext: rootlessToolExecutionContext(),
               endpoint: favByIdDefT7.GET,
               urlPathParams: { id: mainFavoriteId },
               user: testUser,
@@ -3336,7 +3336,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
               });
             }
             await sendTestRequest({
-              streamContext: rootlessStreamContext(),
+              toolExecutionContext: rootlessToolExecutionContext(),
               endpoint: favByIdDefT7.PATCH,
               data: {
                 modelSelection: t7ModelSelection,
@@ -3509,13 +3509,13 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
               await import("next-vibe/agent/skills/favorites/[id]/definition")
             ).default;
             const t7bFavGet = await sendTestRequest({
-              streamContext: rootlessStreamContext(),
+              toolExecutionContext: rootlessToolExecutionContext(),
               endpoint: favByIdDefT7b.GET,
               urlPathParams: { id: mainFavoriteId },
               user: testUser,
             });
             await sendTestRequest({
-              streamContext: rootlessStreamContext(),
+              toolExecutionContext: rootlessToolExecutionContext(),
               endpoint: favByIdDefT7b.PATCH,
               data: {
                 modelSelection: t7bFavGet.success
@@ -5786,7 +5786,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
           ),
         ]);
         const favsResult = await sendTestRequest({
-          streamContext: rootlessStreamContext(),
+          toolExecutionContext: rootlessToolExecutionContext(),
           endpoint: favsDef,
           data: { pageSize: 500 },
           user: testUser,
@@ -5804,7 +5804,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
           favoriteId = String(existingKimi["id"]);
         } else {
           const r = await sendTestRequest({
-            streamContext: rootlessStreamContext(),
+            toolExecutionContext: rootlessToolExecutionContext(),
             endpoint: favoriteCreateDef,
             data: { skillId: "quality-tester__budget" },
             user: testUser,
@@ -5823,7 +5823,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
           secondVariantFavoriteId = String(existingNative["id"]);
         } else {
           const r = await sendTestRequest({
-            streamContext: rootlessStreamContext(),
+            toolExecutionContext: rootlessToolExecutionContext(),
             endpoint: favoriteCreateDef,
             data: { skillId: "quality-tester__native-image" },
             user: testUser,
@@ -5850,8 +5850,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
             await import("next-vibe/agent/env-availability");
           const { SkillsRepository } =
             await import("next-vibe/agent/skills/repository");
-          const { parseSkillId } =
-            await import("next-vibe/agent/chat/slugify");
+          const { parseSkillId } = await import("next-vibe/agent/chat/slugify");
           const logger = createEndpointLogger(false, defaultLocale);
 
           // Resolve a favorite's model exactly like the web client: GET the
@@ -5861,7 +5860,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
             favId: string,
           ): Promise<{ model: string | undefined; skill: string }> => {
             const getRes = await sendTestRequest({
-              streamContext: rootlessStreamContext(),
+              toolExecutionContext: rootlessToolExecutionContext(),
               endpoint: favByIdDef.GET,
               urlPathParams: { id: favId },
               user: testUser,
@@ -5909,7 +5908,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
             modelSelection: PatchModelSelection,
           ): Promise<void> => {
             const r = await sendTestRequest({
-              streamContext: rootlessStreamContext(),
+              toolExecutionContext: rootlessToolExecutionContext(),
               endpoint: favByIdDef.PATCH,
               data: { modelSelection },
               urlPathParams: { id: favId },
@@ -5974,7 +5973,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
 
           // ── Part C: Media model selections persisted (via favorites GET) ──
           const favGetResult = await sendTestRequest({
-            streamContext: rootlessStreamContext(),
+            toolExecutionContext: rootlessToolExecutionContext(),
             endpoint: favByIdDef.GET,
             urlPathParams: { id: favoriteId },
             user: testUser,

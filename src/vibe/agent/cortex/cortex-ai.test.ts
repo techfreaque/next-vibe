@@ -40,21 +40,18 @@ import {
 import {
   DefaultFolderId,
   makeHeadlessContext,
-  rootlessStreamContext,
+  rootlessToolExecutionContext,
 } from "next-vibe/agent/chat/config";
 import { chatMessages, chatThreads } from "next-vibe/agent/chat/db";
 import { ChatMessageRole } from "next-vibe/agent/chat/enum";
-import {
-  SkillCategory,
-  SkillOwnershipType,
-} from "next-vibe/agent/skills/enum";
+import { SkillCategory, SkillOwnershipType } from "next-vibe/agent/skills/enum";
 import { chatFavorites } from "next-vibe/agent/skills/favorites/db";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { createEndpointLogger } from "next-vibe/logger/server";
-import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
+import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
@@ -410,7 +407,7 @@ describe("Cortex AI Integration", () => {
 
   // ── C1: Write via AI ───────────────────────────────────────────────────────
   fit("C1: AI writes a file via cortex-write", async () => {
-    const { threadId: seededThreadId, streamContext } =
+    const { threadId: seededThreadId, toolExecutionContext } =
       await seedCaseThread("cortex-ai-write");
     threadId = seededThreadId;
     const { result, messages } = await runTestStream({
@@ -418,7 +415,7 @@ describe("Cortex AI Integration", () => {
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId: seededThreadId,
-      streamContext,
+      toolExecutionContext,
       prompt: `Use the cortex-write tool to create a file at /documents/ai-test/notes.md with this exact content:\n\n${INITIAL_CONTENT}\n\nAfter writing, confirm what you did.${VERDICT_INSTRUCTION}`,
     });
 
@@ -490,7 +487,7 @@ describe("Cortex AI Integration", () => {
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: makeHeadlessContext(
+      toolExecutionContext: makeHeadlessContext(
         undefined,
         threadId,
         /* no user context — UTC (dates not user-facing here) */ "UTC",
@@ -551,7 +548,7 @@ describe("Cortex AI Integration", () => {
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: makeHeadlessContext(
+      toolExecutionContext: makeHeadlessContext(
         undefined,
         threadId,
         /* no user context — UTC (dates not user-facing here) */ "UTC",
@@ -609,7 +606,7 @@ describe("Cortex AI Integration", () => {
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: makeHeadlessContext(
+      toolExecutionContext: makeHeadlessContext(
         undefined,
         threadId,
         /* no user context — UTC (dates not user-facing here) */ "UTC",
@@ -663,7 +660,7 @@ describe("Cortex AI Integration", () => {
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: makeHeadlessContext(
+      toolExecutionContext: makeHeadlessContext(
         undefined,
         threadId,
         /* no user context — UTC (dates not user-facing here) */ "UTC",
@@ -718,7 +715,7 @@ describe("Cortex AI Integration", () => {
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: makeHeadlessContext(
+      toolExecutionContext: makeHeadlessContext(
         undefined,
         threadId,
         /* no user context — UTC (dates not user-facing here) */ "UTC",
@@ -787,7 +784,7 @@ Answer each question concisely and precisely.${VERDICT_INSTRUCTION}`,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: makeHeadlessContext(
+      toolExecutionContext: makeHeadlessContext(
         undefined,
         threadId,
         /* no user context — UTC (dates not user-facing here) */ "UTC",
@@ -847,7 +844,7 @@ Answer each question concisely and precisely.${VERDICT_INSTRUCTION}`,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: makeHeadlessContext(
+      toolExecutionContext: makeHeadlessContext(
         undefined,
         threadId,
         /* no user context — UTC (dates not user-facing here) */ "UTC",
@@ -908,7 +905,7 @@ Answer each question concisely and precisely.${VERDICT_INSTRUCTION}`,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: makeHeadlessContext(
+      toolExecutionContext: makeHeadlessContext(
         undefined,
         threadId,
         /* no user context — UTC (dates not user-facing here) */ "UTC",
@@ -1107,16 +1104,15 @@ describe("Cortex Mount: /threads", () => {
 
   // ── M1: List /threads root ──────────────────────────────────────────────────
   fit("M1: AI lists /threads root via cortex-list", async () => {
-    const { threadId: seededThreadId, streamContext } = await seedCaseThread(
-      "cortex-mount-threads-list",
-    );
+    const { threadId: seededThreadId, toolExecutionContext } =
+      await seedCaseThread("cortex-mount-threads-list");
     threadId = seededThreadId;
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId: seededThreadId,
-      streamContext,
+      toolExecutionContext,
       prompt: `Use cortex-list to list the directory at /threads. Tell me what root folders you see (private, cron, shared, public, or similar). List every entry name you receive.${VERDICT_INSTRUCTION}`,
     });
 
@@ -1168,7 +1164,7 @@ describe("Cortex Mount: /threads", () => {
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: makeHeadlessContext(
+      toolExecutionContext: makeHeadlessContext(
         undefined,
         threadId,
         /* no user context — UTC (dates not user-facing here) */ "UTC",
@@ -1219,7 +1215,7 @@ describe("Cortex Mount: /threads", () => {
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: makeHeadlessContext(
+      toolExecutionContext: makeHeadlessContext(
         undefined,
         threadId,
         /* no user context — UTC (dates not user-facing here) */ "UTC",
@@ -1416,16 +1412,15 @@ describe("Cortex Mount: /skills", () => {
 
   // ── S1: List /skills ─────────────────────────────────────────────────────
   fit("S1: AI lists /skills and finds the test skill", async () => {
-    const { threadId: seededThreadId, streamContext } = await seedCaseThread(
-      "cortex-mount-skills-list",
-    );
+    const { threadId: seededThreadId, toolExecutionContext } =
+      await seedCaseThread("cortex-mount-skills-list");
     threadId = seededThreadId;
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId: seededThreadId,
-      streamContext,
+      toolExecutionContext,
       prompt: `Use cortex-list to list /skills. Tell me how many skills you see and confirm one is named "${testSkillSlug}.md".${VERDICT_INSTRUCTION}`,
     });
 
@@ -1482,7 +1477,7 @@ describe("Cortex Mount: /skills", () => {
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: makeHeadlessContext(
+      toolExecutionContext: makeHeadlessContext(
         undefined,
         threadId,
         /* no user context — UTC (dates not user-facing here) */ "UTC",
@@ -1527,15 +1522,14 @@ describe("Cortex Mount: /skills", () => {
   // ── S3: /skills tree via cortex-tree ────────────────────────────────────
   fit("S3: AI gets /skills tree and finds .md files", async () => {
     // Fresh thread - force the AI to actually call cortex-tree rather than reuse S1 context
-    const { threadId: seededThreadId, streamContext } = await seedCaseThread(
-      "cortex-mount-skills-tree",
-    );
+    const { threadId: seededThreadId, toolExecutionContext } =
+      await seedCaseThread("cortex-mount-skills-tree");
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId: seededThreadId,
-      streamContext,
+      toolExecutionContext,
       prompt: `Call cortex-tree with path=/skills and depth=2. You MUST call the tool - do not rely on any prior context. Report the exact tree output and count how many .md files are listed.${VERDICT_INSTRUCTION}`,
     });
 
@@ -1620,15 +1614,14 @@ describe("Cortex Mount: /tasks", () => {
   it(
     "T1: AI lists /tasks and reads a task file",
     async () => {
-      const { threadId: seededThreadId, streamContext } = await seedCaseThread(
-        "cortex-mount-tasks-list",
-      );
+      const { threadId: seededThreadId, toolExecutionContext } =
+        await seedCaseThread("cortex-mount-tasks-list");
       const { result, messages } = await runTestStream({
         user: testUser,
         favoriteId: mainFavoriteId,
         subFolderId: testSubFolderId,
         threadId: seededThreadId,
-        streamContext,
+        toolExecutionContext,
         prompt: `Use cortex-list to list /tasks. If there are any task files, use cortex-read on the first one and confirm it has frontmatter with taskId and a status field. If /tasks is empty, just confirm it's an empty directory.${VERDICT_INSTRUCTION}`,
       });
 
@@ -1775,16 +1768,15 @@ describe("Cortex Mount: /searches and cortex-search", () => {
 
   // ── SR1: Write a searchable document ────────────────────────────────────
   fit("SR1: AI writes a uniquely searchable document", async () => {
-    const { threadId: seededThreadId, streamContext } = await seedCaseThread(
-      "cortex-mount-search-write",
-    );
+    const { threadId: seededThreadId, toolExecutionContext } =
+      await seedCaseThread("cortex-mount-search-write");
     threadId = seededThreadId;
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId: seededThreadId,
-      streamContext,
+      toolExecutionContext,
       prompt: `Use cortex-write to create /documents/search-test/quantum-flux.md with this content:\n\n# Quantum Flux Resonance\n\nThis document discusses quantum flux resonance in subatomic particle decay chains.\nKey concepts: quark entanglement, decoherence boundaries, Planck-scale interference.\n\nConfirm the file was created.${VERDICT_INSTRUCTION}`,
     });
 
@@ -1829,7 +1821,7 @@ describe("Cortex Mount: /searches and cortex-search", () => {
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: makeHeadlessContext(
+      toolExecutionContext: makeHeadlessContext(
         undefined,
         threadId,
         /* no user context — UTC (dates not user-facing here) */ "UTC",
@@ -1919,7 +1911,7 @@ describe("Cortex Mount: /searches and cortex-search", () => {
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: makeHeadlessContext(
+      toolExecutionContext: makeHeadlessContext(
         undefined,
         threadId,
         /* no user context — UTC (dates not user-facing here) */ "UTC",
@@ -1975,7 +1967,7 @@ describe("Cortex Mount: /searches and cortex-search", () => {
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: makeHeadlessContext(
+      toolExecutionContext: makeHeadlessContext(
         undefined,
         threadId,
         /* no user context — UTC (dates not user-facing here) */ "UTC",
@@ -2108,16 +2100,15 @@ describe("Cortex: /documents path operations and edge cases", () => {
 
   // ── E1: List root / ──────────────────────────────────────────────────────
   fit("E1: AI lists root / and sees all mount points", async () => {
-    const { threadId: seededThreadId, streamContext } = await seedCaseThread(
-      "cortex-edge-root-list",
-    );
+    const { threadId: seededThreadId, toolExecutionContext } =
+      await seedCaseThread("cortex-edge-root-list");
     threadId = seededThreadId;
     const { result, messages } = await runTestStream({
       user: testUser,
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId: seededThreadId,
-      streamContext,
+      toolExecutionContext,
       prompt: `Use cortex-list on the root path "/" to see all available mounts and directories. List every entry you see and identify which are virtual mounts vs native storage.${VERDICT_INSTRUCTION}`,
     });
 
@@ -2164,7 +2155,7 @@ describe("Cortex: /documents path operations and edge cases", () => {
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: makeHeadlessContext(
+      toolExecutionContext: makeHeadlessContext(
         undefined,
         threadId,
         /* no user context — UTC (dates not user-facing here) */ "UTC",
@@ -2210,7 +2201,7 @@ describe("Cortex: /documents path operations and edge cases", () => {
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: makeHeadlessContext(
+      toolExecutionContext: makeHeadlessContext(
         undefined,
         threadId,
         /* no user context — UTC (dates not user-facing here) */ "UTC",
@@ -2260,7 +2251,7 @@ describe("Cortex: /documents path operations and edge cases", () => {
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: makeHeadlessContext(
+      toolExecutionContext: makeHeadlessContext(
         undefined,
         threadId,
         /* no user context — UTC (dates not user-facing here) */ "UTC",
@@ -2308,7 +2299,7 @@ describe("Cortex: /documents path operations and edge cases", () => {
       favoriteId: mainFavoriteId,
       subFolderId: testSubFolderId,
       threadId,
-      streamContext: makeHeadlessContext(
+      toolExecutionContext: makeHeadlessContext(
         undefined,
         threadId,
         /* no user context — UTC (dates not user-facing here) */ "UTC",
@@ -2439,7 +2430,7 @@ describe("Cortex System Prompt Injection", () => {
       const logger = createEndpointLogger(false, defaultLocale);
 
       const prompt = await cortexFragment.build({
-        streamContext: rootlessStreamContext(),
+        toolExecutionContext: rootlessToolExecutionContext(),
         user: testUser,
         logger,
         locale: defaultLocale,
@@ -2497,7 +2488,7 @@ describe("Cortex System Prompt Injection", () => {
       const logger = createEndpointLogger(false, defaultLocale);
 
       const prompt = await cortexFragment.build({
-        streamContext: rootlessStreamContext(),
+        toolExecutionContext: rootlessToolExecutionContext(),
         user: testUser,
         logger,
         locale: defaultLocale,
@@ -2561,7 +2552,7 @@ describe("Cortex System Prompt Injection", () => {
       const logger = createEndpointLogger(false, defaultLocale);
 
       const prompt = await cortexFragment.build({
-        streamContext: rootlessStreamContext(),
+        toolExecutionContext: rootlessToolExecutionContext(),
         user: testUser,
         logger,
         locale: defaultLocale,
@@ -2597,7 +2588,7 @@ describe("Cortex System Prompt Injection", () => {
     query: string,
     label: string,
   ): Promise<string> => {
-    const { threadId: seededThreadId, streamContext: seedCtx } =
+    const { threadId: seededThreadId, toolExecutionContext: seedCtx } =
       await seedCaseThread(label);
     const { MessagesRepository } =
       await import("next-vibe/agent/chat/threads/[threadId]/messages/repository");
@@ -2612,7 +2603,7 @@ describe("Cortex System Prompt Injection", () => {
       user: testUser,
       authorName: null,
       logger: createEndpointLogger(false, defaultLocale),
-      streamContext: seedCtx,
+      toolExecutionContext: seedCtx,
     });
     return seededThreadId;
   };
@@ -2635,7 +2626,7 @@ describe("Cortex System Prompt Injection", () => {
 
       // Query something that should match our test-inserted skills.md
       const prompt = await cortexFragment.build({
-        streamContext: rootlessStreamContext(),
+        toolExecutionContext: rootlessToolExecutionContext(),
         user: testUser,
         logger,
         locale: defaultLocale,
@@ -2681,7 +2672,7 @@ describe("Cortex System Prompt Injection", () => {
       const logger = createEndpointLogger(false, defaultLocale);
 
       const prompt = await cortexFragment.build({
-        streamContext: rootlessStreamContext(),
+        toolExecutionContext: rootlessToolExecutionContext(),
         user: testUser,
         logger,
         locale: defaultLocale,
@@ -2724,7 +2715,7 @@ describe("Cortex System Prompt Injection", () => {
 
       const prompt =
         (await cortexFragment.build({
-          streamContext: rootlessStreamContext(),
+          toolExecutionContext: rootlessToolExecutionContext(),
           user: testUser,
           logger,
           locale: defaultLocale,

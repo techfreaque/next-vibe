@@ -8,6 +8,8 @@ import { endpointsHandler } from "next-vibe/core/route/multi";
 
 import executeDefinition from "./definition";
 import { RouteExecuteRepository } from "./repository";
+import { handleIncomingToolRequest } from "./repository/incoming";
+import { handleToolResult } from "./repository/result-handler";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: executeDefinition,
@@ -18,7 +20,7 @@ export const { POST, tools } = endpointsHandler({
       locale,
       logger,
       t,
-      streamContext,
+      toolExecutionContext,
       platform,
     }) =>
       RouteExecuteRepository.execute(
@@ -27,14 +29,12 @@ export const { POST, tools } = endpointsHandler({
         locale,
         logger,
         t,
-        streamContext,
+        toolExecutionContext,
         platform,
       ),
     onRemoteEvent: {
-      "tool-execute-request": (props) =>
-        RouteExecuteRepository.handleIncomingToolRequest(props),
-      "tool-execute-result": (props) =>
-        RouteExecuteRepository.handleToolResult(props),
+      "tool-execute-request": (props) => handleIncomingToolRequest(props),
+      "tool-execute-result": (props) => handleToolResult(props),
     },
   },
 });

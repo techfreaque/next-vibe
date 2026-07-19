@@ -12,12 +12,12 @@ import {
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   backButton,
-  customWidgetObject,
   requestField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { ChatModelId, ChatModelIdOptions } from "../../ai-stream/models";
@@ -551,9 +551,17 @@ export type ChatSettingsGetResponseOutput = typeof GET.types.ResponseOutput;
 export type ChatSettingsUpdateRequestInput = typeof POST.types.RequestInput;
 export type ChatSettingsUpdateRequestOutput = typeof POST.types.RequestOutput;
 export type ChatSettingsUpdateResponseOutput = typeof POST.types.ResponseOutput;
-export interface ToolConfigItem {
+/**
+ * A type alias, NOT an interface: this rides endpoint payloads (a favorite's /
+ * skill's tool lists), so it must be assignable to `WidgetData`, whose record arm
+ * is `{ [key: string]: WidgetData }`. TypeScript grants an implicit index
+ * signature to object type aliases but never to interfaces, so an interface here
+ * is unassignable at every erased payload boundary.
+ */
+// eslint-disable-next-line typescript/consistent-type-definitions -- Must be a type alias, not an interface: only aliases get the implicit index signature that makes this assignable to WidgetData on an endpoint payload. See above.
+export type ToolConfigItem = {
   toolId: string;
   requiresConfirmation: boolean;
-}
+};
 const definitions = { GET, POST };
 export default definitions;

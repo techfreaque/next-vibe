@@ -580,6 +580,6 @@ export async function loadIconModule(name: string): Promise<IconModule> {
     case "Zap":
       return import("./Zap") as Promise<IconModule>;
     default:
-      return Promise.resolve({});
+      return {};
   }
 }

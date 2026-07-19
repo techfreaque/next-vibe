@@ -38,7 +38,7 @@ export class ThreadRenameRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    streamContext: ToolExecutionContext,
+    toolExecutionContext: ToolExecutionContext,
   ): Promise<ResponseType<ThreadRenameResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
@@ -46,8 +46,8 @@ export class ThreadRenameRepository {
 
       // The thread comes from the active conversation's stream context (AI
       // turns) or explicit caller input (CLI/MCP/web — the definition's
-      // serverDefault copies streamContext.threadId into data). Required.
-      const threadId = data.threadId ?? streamContext.threadId;
+      // serverDefault copies toolExecutionContext.threadId into data). Required.
+      const threadId = data.threadId ?? toolExecutionContext.threadId;
       if (!threadId) {
         return fail({
           message: t("patch.errors.validation.title"),
@@ -60,7 +60,7 @@ export class ThreadRenameRepository {
       // recover it for a NON-PUBLIC user by reading the thread's own row (the
       // folder is derivable from the threadId). Public users have no DB thread
       // to fall back to, so a missing folder there is a hard error.
-      let rootFolderId = streamContext.rootFolderId;
+      let rootFolderId = toolExecutionContext.rootFolderId;
 
       logger.debug("Renaming thread", {
         threadId,
@@ -196,7 +196,7 @@ export class ThreadRenameRepository {
       if (!user.isPublic) {
         void import("next-vibe/agent/ai-stream/repository/core/db-writer/embedding-sync")
           .then(({ syncThreadEmbedding }) =>
-            syncThreadEmbedding(updatedThread.id, streamContext),
+            syncThreadEmbedding(updatedThread.id, toolExecutionContext),
           )
           .catch(() => undefined);
       }

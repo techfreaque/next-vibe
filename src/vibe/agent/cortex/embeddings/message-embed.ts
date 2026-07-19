@@ -28,7 +28,7 @@ const MAX_CONTENT_CHARS = 2000;
 
 /** Strip <think>...</think> reasoning blocks — internal scratchpad, not retrieval signal */
 function stripThinkTags(text: string): string {
-  return text.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+  return text.replaceAll(/<think>[\s\S]*?<\/think>/gi, "").trim();
 }
 
 /**
@@ -82,13 +82,13 @@ export async function embedMessageContent(
     content: string | null;
     metadata: MessageMetadata | null;
   },
-  streamContext: ToolExecutionContext,
+  toolExecutionContext: ToolExecutionContext,
 ): Promise<{ embedding: number[]; embeddingHash: string } | null> {
   const text = buildMessageEmbedText(msg);
   if (!text) {
     return null;
   }
-  const embedding = await generateEmbedding(text, streamContext);
+  const embedding = await generateEmbedding(text, toolExecutionContext);
   if (!embedding) {
     return null;
   }
@@ -106,7 +106,7 @@ export async function embedMessageContent(
 export async function embedAssistantMessageRow(
   messageId: string,
   content: string,
-  streamContext: ToolExecutionContext,
+  toolExecutionContext: ToolExecutionContext,
 ): Promise<void> {
   const text = buildMessageEmbedText({
     role: ChatMessageRole.ASSISTANT,
@@ -118,7 +118,7 @@ export async function embedAssistantMessageRow(
   }
   const hash = computeMessageEmbedHash(text);
   try {
-    const embedding = await generateEmbedding(text, streamContext);
+    const embedding = await generateEmbedding(text, toolExecutionContext);
     if (!embedding) {
       return;
     }

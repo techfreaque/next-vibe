@@ -179,7 +179,7 @@ const proxyMiddleware = createMiddleware().server(async ({ next, request }) => {
     // Patterns like "/((?!_next/static|...).*)" are valid URL patterns
     try {
       const regex = new RegExp(
-        `^${pattern.replace(/\(\?!/g, "(?!").replace(/\*/g, ".*")}$`,
+        `^${pattern.replaceAll(/\(\?!/g, "(?!").replaceAll(/\*/g, ".*")}$`,
       );
       return regex.test(url.pathname);
     } catch {

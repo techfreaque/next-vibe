@@ -8,8 +8,10 @@
  * Built-ins use multiples of 100. Module fragments use gaps (e.g. 150, 250).
  */
 
-import type { DefaultFolderId } from "next-vibe/agent/chat/config";
-import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
+import type {
+  DefaultFolderId,
+  ToolExecutionContext,
+} from "next-vibe/agent/chat/config";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -77,7 +79,7 @@ export interface SystemPromptServerParams {
   /** Resolved media generation capabilities for the current request */
   mediaCapabilities?: MediaCapabilitiesParams;
   /** Fixture thread id — cortex vector-search embeddings bind it. */
-  streamContext: ToolExecutionContext;
+  toolExecutionContext: ToolExecutionContext;
   /** Pre-fetched: whether user has no memories and no tasks (used by bootstrap + guest fragments). */
   isFreshUser?: boolean;
   /** Pre-computed app name from i18n config (used by identity, platform, bootstrap, guest fragments). */

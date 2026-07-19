@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "next-vibe/core/utils/utils";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 import * as React from "react";
 

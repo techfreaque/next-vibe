@@ -9,10 +9,10 @@ export const { tools } = endpointsHandler({
   endpoint: deployPreviewEndpoints,
   [Methods.POST]: {
     handler: async ({ data, logger, t }) =>
-      (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-        )
-      ).DeployPreviewRepository.preview(data, logger, t),
+      (await import("./repository")).DeployPreviewRepository.preview(
+        data,
+        logger,
+        t,
+      ),
   },
 });

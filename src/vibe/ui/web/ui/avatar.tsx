@@ -1,7 +1,7 @@
 "use client";
 
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
-import { cn } from "next-vibe/core/utils/utils";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import * as React from "react";
 
 // Cross-platform types

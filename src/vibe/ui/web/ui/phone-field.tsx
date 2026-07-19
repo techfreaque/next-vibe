@@ -5,9 +5,10 @@
 
 "use client";
 
-import { ChevronDown, Phone } from "lucide-react";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
-import { cn } from "next-vibe/core/utils/utils";
+import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
+import { Phone } from "next-vibe/ui/ui/icons/Phone";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 

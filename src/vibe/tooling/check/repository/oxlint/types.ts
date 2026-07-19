@@ -2,7 +2,7 @@
  * Oxlint Configuration Types
  */
 
-import type { Severity } from "next-vibe/tooling/check/config/types";
+import type { Severity } from "../../config/types";
 
 /**
  * Oxlint AST Node Types

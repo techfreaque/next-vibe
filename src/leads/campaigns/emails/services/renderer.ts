@@ -5,6 +5,7 @@
 
 import "server-only";
 
+import { coreEnv } from "next-vibe/core/env";
 import type {
   Countries,
   CountryLanguage,
@@ -19,8 +20,6 @@ import {
 } from "next-vibe/identity/lead/enum";
 import type { LeadWithEmailType } from "next-vibe/identity/lead/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { env } from "@/env/env";
 
 import { createTrackingContext } from "../../../../messenger/providers/email/smtp-client/components/tracking_context.email";
 import { scopedTranslation } from "../journeys/i18n";
@@ -460,7 +459,7 @@ export class EmailRendererService {
       businessName: t("emailJourneys.components.defaults.previewBusinessName"),
       contactName: t("emailJourneys.components.defaults.previewContactName"),
       phone: t("emailJourneys.components.defaults.previewPhone"),
-      website: env.NEXT_PUBLIC_APP_URL,
+      website: coreEnv.NEXT_PUBLIC_APP_URL,
       country: country,
       language: language,
       status: LeadStatus.NEW,
@@ -502,9 +501,9 @@ export class EmailRendererService {
       {
         ...context,
         campaignId: t("emailJourneys.components.defaults.previewCampaignId"),
-        unsubscribeUrl: `${env.NEXT_PUBLIC_APP_URL}/unsubscribe?preview=true`,
-        trackingUrl: `${env.NEXT_PUBLIC_APP_URL}/track?preview=true`,
-        baseUrl: env.NEXT_PUBLIC_APP_URL,
+        unsubscribeUrl: `${coreEnv.NEXT_PUBLIC_APP_URL}/unsubscribe?preview=true`,
+        trackingUrl: `${coreEnv.NEXT_PUBLIC_APP_URL}/track?preview=true`,
+        baseUrl: coreEnv.NEXT_PUBLIC_APP_URL,
       },
       createNoOpLogger(),
     );

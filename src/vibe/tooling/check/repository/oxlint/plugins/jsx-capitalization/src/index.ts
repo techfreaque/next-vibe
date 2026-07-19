@@ -13,17 +13,17 @@
  * - Local development
  */
 
-import type { JsxCapitalizationPluginConfig } from "next-vibe/tooling/check/config/types";
-import type {
-  createPluginMessages,
-  loadPluginConfig,
-} from "next-vibe/tooling/check/oxlint/plugins/shared/config-loader";
+import type { JsxCapitalizationPluginConfig } from "../../../../../config/types";
 import type {
   JSXIdentifier,
   OxlintASTNode,
   OxlintComment,
   OxlintRuleContext,
-} from "next-vibe/tooling/check/oxlint/types";
+} from "../../../types";
+import type {
+  createPluginMessages,
+  loadPluginConfig,
+} from "../../shared/config-loader";
 
 /** JSXOpeningElement AST node */
 interface JSXOpeningElement extends OxlintASTNode {
@@ -170,8 +170,7 @@ function getConfigLoader(): typeof configLoader {
 
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports -- Plugin context requires sync loading
-    configLoader =
-      require("next-vibe/tooling/check/oxlint/plugins/shared/config-loader") as typeof configLoader;
+    configLoader = require("../../shared/config-loader") as typeof configLoader;
     return configLoader;
   } catch {
     // Shared loader not available, will use fallback

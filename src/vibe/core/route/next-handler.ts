@@ -7,8 +7,8 @@
 import { DefaultFolderId } from "next-vibe/agent/chat/config";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { Methods } from "next-vibe/core/definition/enums";
-import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { scopedTranslation as sharedScopedTranslation } from "next-vibe/core/i18n/shared";
 import {
   type ApiHandlerOptions,
   createGenericHandler,
@@ -24,10 +24,10 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { createEndpointLogger } from "next-vibe/logger/server";
+import { Platform } from "next-vibe/platforms/platforms";
 import type { NextRequest } from "next-vibe/ui/lib/request";
 import { NextResponse } from "next-vibe/ui/lib/request";
 
-import { scopedTranslation as sharedScopedTranslation } from "@/_pages/shared/i18n";
 import {
   CSRF_TOKEN_COOKIE_NAME,
   CSRF_TOKEN_HEADER_NAME,
@@ -158,7 +158,7 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
         logger,
         platform: Platform.NEXT_API,
         request, // Pass NextRequest for auth context
-        streamContext: {
+        toolExecutionContext: {
           // Live web request — never under fixtures.
           rootFolderId: DefaultFolderId.PRIVATE,
           threadId: undefined,

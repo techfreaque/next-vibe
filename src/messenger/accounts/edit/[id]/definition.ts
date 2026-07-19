@@ -24,9 +24,9 @@ import {
 } from "next-vibe/identity/lead/enum";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   backButton,
-  customWidgetObject,
   objectField,
   requestField,
   requestResponseField,
@@ -34,7 +34,7 @@ import {
   requestUrlPathParamsResponseField,
   responseField,
   submitButton,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { CampaignType, CampaignTypeOptions } from "@/messenger/accounts/enum";
@@ -1018,8 +1018,7 @@ const { DELETE } = createEndpoint({
   options: {
     mutationOptions: {
       onSuccess: async (data) => {
-        const { apiClient } =
-          await import("next-vibe/platforms/react/hooks/store");
+        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
         const listDefinition = await import("../../list/definition");
         apiClient.updateEndpointData(
           listDefinition.default.GET,

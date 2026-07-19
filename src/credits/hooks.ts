@@ -10,9 +10,9 @@ import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type { EndpointReturn } from "next-vibe/platforms/react/hooks/endpoint-types";
-import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { useToast } from "next-vibe/ui/hooks/use-toast";
+import type { EndpointReturn } from "next-vibe/unified-ui/hooks/endpoint-types";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { useCallback, useMemo } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";

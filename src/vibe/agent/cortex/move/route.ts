@@ -8,9 +8,9 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, user, locale, logger, t, streamContext }) =>
+    handler: ({ data, user, locale, logger, t, toolExecutionContext }) =>
       CortexMoveRepository.moveNode({
-        streamContext: streamContext,
+        toolExecutionContext: toolExecutionContext,
         userId: user.id,
         user,
         locale,

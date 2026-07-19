@@ -11,14 +11,15 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
-import { scopedTranslation } from "next-vibe/tooling/check/testing/test/i18n";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
-  customWidgetObject,
   requestField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
+
+import { scopedTranslation } from "./i18n";
 
 const TestResultWidget = lazyWidget(() =>
   import("./widget").then((m) => ({
@@ -29,7 +30,7 @@ const TestResultWidget = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["vibe", "tooling", "check", "testing", "test"],
+  path: ["vibe", "tooling", "testing", "test"],
   title: "title",
   titleShort: "title",
   description: "description",

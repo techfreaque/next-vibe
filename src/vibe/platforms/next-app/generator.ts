@@ -12,19 +12,25 @@ import {
 import { dirname, join, relative } from "node:path";
 
 import type { ApiSection } from "next-vibe/core/definition/endpoint-base";
+import { hasCustomDirective } from "next-vibe/core/generators/shared/custom-directive";
+import type {
+  GeneratorContext,
+  GeneratorResult,
+} from "next-vibe/core/generators/shared/shared-inputs";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import {
   filterPlatformMarkers,
   PlatformMarker,
   type UserRoleValue,
 } from "next-vibe/identity/roles/enum";
-import { hasCustomDirective } from "next-vibe/tooling/generators/shared/custom-directive";
-import type {
-  GeneratorContext,
-  GeneratorResult,
-} from "next-vibe/tooling/generators/shared/shared-inputs";
 
-import { getApiDir, getSrcDir, getUiDir } from "@/env/paths";
+import {
+  getApiDir,
+  getGeneratedDir,
+  getNextAppDir,
+  getSrcDir,
+  getUiDir,
+} from "@/env/paths";
 
 const PROJECT_ROOT = process.cwd();
 const UI_DIR = getUiDir();
@@ -35,12 +41,12 @@ const API_EXCLUDE_DIRS = new Set([
   join(SRC_DIR, "vibe"),
   join(SRC_DIR, "_pages"),
   join(SRC_DIR, "_old"),
-  join(SRC_DIR, "generated"),
-  join(PROJECT_ROOT, "src", "app"),
+  getGeneratedDir(),
+  getNextAppDir(),
   join(SRC_DIR, "env"),
   join(SRC_DIR, "i18n"),
 ]);
-const OUT_ROOT = join(PROJECT_ROOT, "src", "app");
+const OUT_ROOT = getNextAppDir();
 const OUT_UI = join(OUT_ROOT, "[locale]");
 const OUT_API = join(OUT_ROOT, "api", "[locale]");
 

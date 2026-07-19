@@ -235,7 +235,7 @@ export const translations: typeof enTranslations = {
         "Kostenloses Konto. Keine Kreditkarte. In 30 Sekunden startklar.",
       startFree: "Kostenlos starten",
       alreadyHaveAccount: "Schon ein Konto?",
-      copyright: "\u00a9",
+      copyright: "\u00A9",
       allSkills: "Alle Skills",
       featuredSkill: "Vorgestellter Skill",
       aboutSkill: "Über dieses Skill",

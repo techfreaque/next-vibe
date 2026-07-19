@@ -1,20 +1,51 @@
 /**
  * Help Tools Widget (CLI/MCP)
- * Renders tool discovery results with platform-aware formatting.
- * CLI: colored output with category grouping, borders, icons
- * MCP: compact plain text, one-line-per-tool
+ *
+ * ONE widget, both modes — there is no separate interactive file.
+ *
+ *   responseOnly  → format the endpoint's response to text.
+ *                   CLI: colored output with category grouping, borders, icons.
+ *                   MCP: compact plain text, one-line-per-tool.
+ *   otherwise     → the live Ink tool browser (categories → sub-categories →
+ *                   tools → detail → execute → result).
+ *
+ * Both are just Ink React. The only thing that differs is whether the host render
+ * is a single synchronous pass (responseOnly, via the CLI/MCP result formatters)
+ * or a live Ink tree that can take keystrokes (`vibe help -i`, via CliEndpointPage).
+ *
+ * The browser used to live in repository/interactive.cli.tsx, which called Ink's
+ * render() itself and exported startInteractiveHelp(). Nothing ever imported that
+ * export, and the widget-stub plugin only rewrites widget.tsx (see
+ * tooling/builder/repository/vibe-package/package-plugins.ts), so the file was
+ * never reachable from any surface. It lives here now: one widget per endpoint.
  */
 
 import chalk from "chalk";
-import { Box, Text } from "ink";
-import { Platform } from "next-vibe/core/definition/platform";
-import type { WidgetData } from "next-vibe/core/utils/json";
+import { Box, Text, useApp, useInput } from "ink";
+import SelectInput from "ink-select-input";
 import {
+  DefaultFolderId,
+  makeHeadlessContext,
+} from "next-vibe/agent/chat/config";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { scopedTranslation as cliScopedTranslation } from "next-vibe/platforms/cli/i18n";
+import type { CliCompatiblePlatform } from "next-vibe/platforms/cli/runtime/route-executor";
+import { Platform } from "next-vibe/platforms/platforms";
+import {
+  useWidgetContext,
+  useWidgetDisabled,
   useWidgetLocale,
+  useWidgetLogger,
   useWidgetPlatform,
+  useWidgetResponseOnly,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { EndpointRenderer } from "next-vibe/unified-ui/renderers/web/EndpointRenderer";
 import type { JSX } from "react";
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { CATEGORY_REGISTRY } from "@/generated/categories/registry";
 
@@ -749,11 +780,10 @@ function renderToolListMcp(
   return lines.join("\n");
 }
 
-// ── Main Widget ──────────────────────────────────────────────────────────
+// ── Response Mode (responseOnly) ─────────────────────────────────────────
 
-export function HelpToolsWidget({ field }: CliWidgetProps): JSX.Element {
+function HelpToolsResponse({ field }: CliWidgetProps): JSX.Element {
   const platform = useWidgetPlatform();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const locale = useWidgetLocale();
   const isMcp = platform === Platform.MCP;
 
@@ -823,6 +853,829 @@ export function HelpToolsWidget({ field }: CliWidgetProps): JSX.Element {
       <Text wrap="truncate-end">{output}</Text>
     </Box>
   );
+}
+
+// ── Interactive Mode: the tool browser ───────────────────────────────────
+//
+// Views: categories → sub-categories → tools → detail → execute → result.
+//
+// This half never runs under the synchronous CLI/MCP result formatters — they
+// render with responseOnly, and useInput/useApp need a live Ink tree. The
+// dispatcher at the bottom of this file is what keeps the two apart.
+
+interface SelectItem<V> {
+  key?: string;
+  label: string;
+  value: V;
+}
+
+interface CategoryInfo {
+  name: string;
+  subCategories: SubCategoryInfo[];
+  totalCount: number;
+}
+
+interface SubCategoryInfo {
+  name: string;
+  category: string;
+  count: number;
+}
+
+interface ToolInfo {
+  name: string;
+  description: string;
+  category: string;
+  subCategory: string;
+  method: string;
+  toolName: string;
+  credits?: number;
+  aliases: string[];
+  endpoint?: CreateApiEndpointAny;
+}
+
+type View =
+  | { type: "categories" }
+  | { type: "subcategories"; category: string }
+  | { type: "tools"; category: string | null; subCategory: string | null }
+  | { type: "detail"; tool: ToolInfo }
+  | { type: "result"; tool: ToolInfo; response: ResponseType<WidgetData> };
+
+// ── Data loading ──────────────────────────────────────────────────────────
+
+/**
+ * The browser reads the generated endpoint meta directly rather than this
+ * endpoint's own response: the CLI seeds parsed argv as the GET's react-query
+ * initialData, so in interactive mode field.value holds request args, not a help
+ * response. Meta is also what the detail view needs — it resolves full definitions
+ * from it via getEndpoint().
+ *
+ * Both imports stay deferred: definitions-registry is server-only, and neither
+ * belongs on the response path's module graph.
+ */
+async function getToolsForUser(
+  platform: CliCompatiblePlatform,
+  user: JwtPayloadType,
+): Promise<{ tools: ToolInfo[]; categories: CategoryInfo[] }> {
+  const [{ endpointsMeta }, { permissionsRegistry }] = await Promise.all([
+    import("@/generated/endpoints/meta/en"),
+    import("next-vibe/core/route/definitions-registry"),
+  ]);
+
+  const tools: ToolInfo[] = [];
+  // category → subCategory → count
+  const catMap = new Map<string, Map<string, number>>();
+
+  for (const ep of endpointsMeta) {
+    const allowedRoles = ep.allowedRoles;
+    if (
+      !permissionsRegistry.checkPlatformAccess(allowedRoles, platform).allowed
+    ) {
+      continue;
+    }
+    if (user.isPublic) {
+      if (!allowedRoles.includes(UserRole.PUBLIC)) {
+        continue;
+      }
+    } else if (!user.roles.some((role) => allowedRoles.includes(role))) {
+      continue;
+    }
+
+    const cat = ep.category || "Other";
+    const sub = ep.subCategory || cat;
+
+    tools.push({
+      name: ep.toolName,
+      description: ep.description,
+      category: cat,
+      subCategory: sub,
+      method: ep.method,
+      toolName: ep.toolName,
+      credits: ep.credits,
+      aliases: ep.aliases,
+    });
+
+    const subMap = catMap.get(cat) ?? new Map<string, number>();
+    subMap.set(sub, (subMap.get(sub) ?? 0) + 1);
+    catMap.set(cat, subMap);
+  }
+
+  tools.sort((a, b) => a.name.localeCompare(b.name));
+
+  const categories: CategoryInfo[] = [...catMap.entries()]
+    .toSorted(([a], [b]) => a.localeCompare(b))
+    .map(([name, subMap]) => {
+      const subCategories: SubCategoryInfo[] = [...subMap.entries()]
+        .toSorted(([a], [b]) => a.localeCompare(b))
+        .map(([subName, count]) => ({ name: subName, category: name, count }));
+      return {
+        name,
+        subCategories,
+        totalCount: subCategories.reduce((n, s) => n + s.count, 0),
+      };
+    });
+
+  return { tools, categories };
+}
+
+/**
+ * runInProcess wraps a successful payload as `{ result: <data> }` for MCP/AI
+ * display. ResultView hands the payload to the TARGET endpoint's own renderer,
+ * which expects its response flat — the envelope makes every field read as
+ * undefined (help-tool's own widget crashes on `tools.length`). The CLI route
+ * executor strips the same envelope for the same reason; see
+ * unwrapExecuteToolResult in platforms/cli/runtime/route-executor.ts.
+ */
+function unwrapToolResult(
+  raw: ResponseType<WidgetData>,
+): ResponseType<WidgetData> {
+  if (!raw.success) {
+    return raw;
+  }
+  const data = raw.data;
+  if (
+    data === null ||
+    typeof data !== "object" ||
+    Array.isArray(data) ||
+    data instanceof Date ||
+    !("result" in data)
+  ) {
+    return raw;
+  }
+  return { ...raw, data: data["result"] };
+}
+
+// ── Shared chrome ─────────────────────────────────────────────────────────
+
+function Header({
+  title,
+  subtitle,
+}: {
+  title: string;
+  subtitle?: string;
+}): JSX.Element {
+  return (
+    <Box flexDirection="column" marginBottom={1}>
+      <Text bold color="cyan">
+        {title}
+      </Text>
+      {subtitle && <Text dimColor>{subtitle}</Text>}
+    </Box>
+  );
+}
+
+function Breadcrumb({ parts }: { parts: string[] }): JSX.Element {
+  return (
+    <Box marginBottom={1}>
+      {parts.map((part, i) => (
+        <Text key={`${i}-${part}`} dimColor={i < parts.length - 1}>
+          {i > 0 ? " > " : ""}
+          {part}
+        </Text>
+      ))}
+    </Box>
+  );
+}
+
+function Footer({ hints }: { hints: string }): JSX.Element {
+  return (
+    <Box marginTop={1}>
+      <Text dimColor>{hints}</Text>
+    </Box>
+  );
+}
+
+// ── Category View ─────────────────────────────────────────────────────────
+
+function CategoryView({
+  categories,
+  totalTools,
+  onSelect,
+  onSelectAll,
+}: {
+  categories: CategoryInfo[];
+  totalTools: number;
+  onSelect: (category: string) => void;
+  onSelectAll: () => void;
+}): JSX.Element {
+  const locale = useWidgetLocale();
+  const { t: cliT } = cliScopedTranslation.scopedT(locale);
+
+  const items: SelectItem<string | null>[] = useMemo(
+    () => [
+      { label: `All Tools (${totalTools})`, value: null, key: "__all__" },
+      ...categories.map((cat) => ({
+        label: `${cat.name.padEnd(28)} ${cat.subCategories.length} groups · ${cat.totalCount} tools`,
+        value: cat.name,
+        key: cat.name,
+      })),
+    ],
+    [categories, totalTools],
+  );
+
+  const handleSelect = useCallback(
+    (item: SelectItem<string | null>): void => {
+      if (item.value === null) {
+        onSelectAll();
+      } else {
+        onSelect(item.value);
+      }
+    },
+    [onSelect, onSelectAll],
+  );
+
+  return (
+    <Box flexDirection="column">
+      <Header
+        title={`Tool Categories (${totalTools} tools)`}
+        subtitle={cliT("vibe.interactive.help.selectCategory")}
+      />
+      <SelectInput<string | null>
+        items={items}
+        onSelect={handleSelect}
+        limit={20}
+      />
+      <Footer hints={cliT("vibe.interactive.help.hintsNavSelect")} />
+    </Box>
+  );
+}
+
+// ── SubCategory View ──────────────────────────────────────────────────────
+
+function SubCategoryView({
+  category,
+  subCategories,
+  onSelect,
+  onSelectAll,
+  onBack,
+}: {
+  category: string;
+  subCategories: SubCategoryInfo[];
+  onSelect: (subCategory: string) => void;
+  onSelectAll: () => void;
+  onBack: () => void;
+}): JSX.Element {
+  const locale = useWidgetLocale();
+  const { t: cliT } = cliScopedTranslation.scopedT(locale);
+  const total = subCategories.reduce((n, s) => n + s.count, 0);
+
+  const items: SelectItem<string | null>[] = useMemo(
+    () => [
+      { label: "< Back to categories", value: "__back__", key: "__back__" },
+      { label: `All in ${category} (${total})`, value: null, key: "__all__" },
+      ...subCategories.map((sub) => ({
+        label: `${sub.name.padEnd(28)} ${sub.count} tools`,
+        value: sub.name,
+        key: sub.name,
+      })),
+    ],
+    [subCategories, category, total],
+  );
+
+  // eslint-disable-next-line no-unused-vars -- useInput requires (input, key) signature
+  useInput((_, key) => {
+    if (key.escape) {
+      onBack();
+    }
+  });
+
+  const handleSelect = useCallback(
+    (item: SelectItem<string | null>): void => {
+      if (item.value === "__back__") {
+        onBack();
+      } else if (item.value === null) {
+        onSelectAll();
+      } else {
+        onSelect(item.value);
+      }
+    },
+    [onSelect, onSelectAll, onBack],
+  );
+
+  return (
+    <Box flexDirection="column">
+      <Breadcrumb parts={["Help", category]} />
+      <Header
+        title={`${category} - ${subCategories.length} groups · ${total} tools`}
+        subtitle={cliT("vibe.interactive.help.selectCategory")}
+      />
+      <SelectInput<string | null>
+        items={items}
+        onSelect={handleSelect}
+        limit={20}
+      />
+      <Footer hints={cliT("vibe.interactive.help.hintsNavSelectBack")} />
+    </Box>
+  );
+}
+
+// ── Tool List View ────────────────────────────────────────────────────────
+
+function ToolListView({
+  tools,
+  category,
+  subCategory,
+  onSelect,
+  onBack,
+}: {
+  tools: ToolInfo[];
+  category: string | null;
+  subCategory: string | null;
+  onSelect: (tool: ToolInfo) => void;
+  onBack: () => void;
+}): JSX.Element {
+  const locale = useWidgetLocale();
+  const { t: cliT } = cliScopedTranslation.scopedT(locale);
+  const filtered = useMemo(() => {
+    let result = tools;
+    if (category) {
+      result = result.filter((t) => t.category === category);
+    }
+    if (subCategory) {
+      result = result.filter((t) => t.subCategory === subCategory);
+    }
+    return result;
+  }, [tools, category, subCategory]);
+
+  const items: SelectItem<ToolInfo | null>[] = useMemo(
+    () => [
+      { label: "< Back", value: null, key: "__back__" },
+      ...filtered.map((tool) => {
+        const credits =
+          tool.credits && tool.credits > 0 ? ` (${tool.credits}cr)` : "";
+        const desc =
+          tool.description.length > 50
+            ? `${tool.description.slice(0, 47)}...`
+            : tool.description;
+        return {
+          label: `${tool.name.padEnd(25)} ${desc}${credits}`,
+          value: tool,
+          key: `${tool.name}_${tool.method}`,
+        };
+      }),
+    ],
+    [filtered],
+  );
+
+  // eslint-disable-next-line no-unused-vars -- useInput requires (input, key) signature
+  useInput((_, key) => {
+    if (key.escape) {
+      onBack();
+    }
+  });
+
+  const handleSelect = useCallback(
+    (item: SelectItem<ToolInfo | null>): void => {
+      if (item.value === null) {
+        onBack();
+      } else {
+        onSelect(item.value);
+      }
+    },
+    [onBack, onSelect],
+  );
+
+  const breadcrumb = [
+    "Help",
+    ...(category ? [category] : []),
+    ...(subCategory ? [subCategory] : []),
+  ];
+  const title = subCategory ?? category ?? "All Tools";
+
+  return (
+    <Box flexDirection="column">
+      <Breadcrumb parts={breadcrumb} />
+      <Header
+        title={`${title} (${filtered.length} tools)`}
+        subtitle={cliT("vibe.interactive.help.selectTool")}
+      />
+      <SelectInput<ToolInfo | null>
+        items={items}
+        onSelect={handleSelect}
+        limit={20}
+      />
+      <Footer hints={cliT("vibe.interactive.help.hintsNavSelectBack")} />
+    </Box>
+  );
+}
+
+// ── Tool Detail View ──────────────────────────────────────────────────────
+
+function ToolDetailView({
+  tool,
+  onBack,
+  onExecute,
+}: {
+  tool: ToolInfo;
+  onBack: () => void;
+  onExecute: () => void;
+}): JSX.Element {
+  const locale = useWidgetLocale();
+  const { t: cliT } = cliScopedTranslation.scopedT(locale);
+  const logger = useWidgetLogger();
+  const user = useWidgetContext().user;
+  const platform = useCliBrowserPlatform();
+
+  // eslint-disable-next-line no-unused-vars -- useInput requires (input, key) signature
+  useInput((_, key) => {
+    if (key.escape) {
+      onBack();
+    }
+    if (key.return) {
+      onExecute();
+    }
+  });
+
+  return (
+    <Box flexDirection="column">
+      <Breadcrumb
+        parts={["Help", tool.category, tool.subCategory, tool.name]}
+      />
+
+      <Box
+        borderStyle="round"
+        borderColor="cyan"
+        paddingX={1}
+        paddingY={1}
+        flexDirection="column"
+      >
+        <Text bold color="cyan">
+          {tool.name}
+          {tool.aliases.length > 0 && (
+            <Text dimColor>{` (${tool.aliases.join(", ")})`}</Text>
+          )}
+        </Text>
+        <Text>{tool.description}</Text>
+        <Text />
+        <Box gap={4}>
+          <Text>
+            <Text dimColor>{cliT("vibe.interactive.help.category")}</Text>
+            {tool.category}
+            {tool.subCategory !== tool.category ? ` › ${tool.subCategory}` : ""}
+          </Text>
+          <Text>
+            <Text dimColor>{cliT("vibe.interactive.help.method")}</Text>
+            <Text color="yellow">{tool.method}</Text>
+          </Text>
+          {tool.credits !== undefined && tool.credits > 0 && (
+            <Text>
+              <Text dimColor>{cliT("vibe.interactive.help.credits")}</Text>
+              <Text color="yellow">{String(tool.credits)}</Text>
+            </Text>
+          )}
+        </Box>
+        <Text>
+          <Text dimColor>{"Call as   "}</Text>
+          <Text color="green">{`vibe ${tool.name}`}</Text>
+        </Text>
+      </Box>
+
+      {tool.endpoint && (
+        <Box
+          marginTop={1}
+          borderStyle="round"
+          borderColor="blue"
+          paddingX={1}
+          paddingY={1}
+          flexDirection="column"
+        >
+          <Text bold color="blue">
+            {cliT("vibe.interactive.help.fields")}
+          </Text>
+          {/*
+            `disabled` marks this a preview of the target's schema, not a live form
+            — and it is load-bearing, not cosmetic. The target may be help-tool
+            itself, and a widget is free to render a session when it is neither
+            disabled nor responseOnly. Without this, browsing to tool-help mounts a
+            SECOND browser inside this box, whose useInput handlers then race this
+            one for every keystroke. The old standalone interactive.cli.tsx could
+            leave it live only because it sat outside the widget and could not recurse.
+          */}
+          <EndpointRenderer
+            endpoint={tool.endpoint}
+            locale={locale}
+            data={undefined}
+            isSubmitting={false}
+            disabled
+            logger={logger}
+            user={user}
+            platform={platform}
+            response={undefined}
+          />
+        </Box>
+      )}
+
+      <Footer hints={cliT("vibe.interactive.help.hintsExecuteBack")} />
+    </Box>
+  );
+}
+
+// ── Result View ───────────────────────────────────────────────────────────
+
+function ResultView({
+  tool,
+  response,
+  onBack,
+}: {
+  tool: ToolInfo;
+  response: ResponseType<WidgetData>;
+  onBack: () => void;
+}): JSX.Element {
+  const locale = useWidgetLocale();
+  const { t: cliT } = cliScopedTranslation.scopedT(locale);
+  const logger = useWidgetLogger();
+  const user = useWidgetContext().user;
+  const platform = useCliBrowserPlatform();
+
+  // eslint-disable-next-line no-unused-vars -- useInput requires (input, key) signature
+  useInput((_, key) => {
+    if (key.escape || key.return) {
+      onBack();
+    }
+  });
+
+  const isSuccess = response.success;
+
+  return (
+    <Box flexDirection="column">
+      <Breadcrumb
+        parts={[
+          "Help",
+          tool.category,
+          tool.subCategory,
+          tool.name,
+          cliT("vibe.interactive.help.result"),
+        ]}
+      />
+
+      <Box
+        borderStyle="round"
+        borderColor={isSuccess ? "green" : "red"}
+        paddingX={1}
+        paddingY={1}
+        flexDirection="column"
+      >
+        <Text bold color={isSuccess ? "green" : "red"}>
+          {isSuccess
+            ? cliT("vibe.interactive.help.success")
+            : cliT("vibe.interactive.help.error")}
+        </Text>
+
+        {response.success && tool.endpoint && (
+          <EndpointRenderer
+            endpoint={tool.endpoint}
+            locale={locale}
+            data={response.data}
+            isSubmitting={false}
+            logger={logger}
+            user={user}
+            platform={platform}
+            response={response}
+            responseOnly
+          />
+        )}
+
+        {!response.success && <Text color="red">{response.message}</Text>}
+      </Box>
+
+      <Footer hints={cliT("vibe.interactive.help.hintsBack")} />
+    </Box>
+  );
+}
+
+// ── Browser root ──────────────────────────────────────────────────────────
+
+/** The browser only ever runs on a terminal surface; MCP is always responseOnly. */
+function useCliBrowserPlatform(): CliCompatiblePlatform {
+  const platform = useWidgetPlatform();
+  return platform === Platform.MCP ? Platform.MCP : Platform.CLI;
+}
+
+function HelpToolsBrowser(): JSX.Element {
+  const { exit } = useApp();
+  const locale = useWidgetLocale();
+  const { t: cliT } = cliScopedTranslation.scopedT(locale);
+  const logger = useWidgetLogger();
+  const user = useWidgetContext().user;
+  const platform = useCliBrowserPlatform();
+
+  const [view, setView] = useState<View>({ type: "categories" });
+  const [isExecuting, setIsExecuting] = useState(false);
+  const [tools, setTools] = useState<ToolInfo[]>([]);
+  const [categories, setCategories] = useState<CategoryInfo[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    void getToolsForUser(platform, user).then(({ tools: t, categories: c }) => {
+      if (!cancelled) {
+        setTools(t);
+        setCategories(c);
+      }
+      return undefined;
+    });
+    return (): void => {
+      cancelled = true;
+    };
+  }, [platform, user]);
+
+  // Global quit
+  useInput((input) => {
+    if (input === "q" && view.type !== "result") {
+      exit();
+    }
+  });
+
+  const handleCategorySelect = useCallback((category: string): void => {
+    setView({ type: "subcategories", category });
+  }, []);
+
+  const handleSelectAllTools = useCallback((): void => {
+    setView({ type: "tools", category: null, subCategory: null });
+  }, []);
+
+  const handleSubCategorySelect = useCallback(
+    (category: string, subCategory: string): void => {
+      setView({ type: "tools", category, subCategory });
+    },
+    [],
+  );
+
+  const handleSelectAllInCategory = useCallback((category: string): void => {
+    setView({ type: "tools", category, subCategory: null });
+  }, []);
+
+  const handleToolSelect = useCallback((tool: ToolInfo): void => {
+    void import("@/generated/endpoints/endpoint")
+      .then(({ getEndpoint }) => getEndpoint(tool.toolName))
+      .then((endpointDef) => {
+        setView({
+          type: "detail",
+          tool: endpointDef ? { ...tool, endpoint: endpointDef } : tool,
+        });
+        return undefined;
+      });
+  }, []);
+
+  const handleBack = useCallback((): void => {
+    setView((current) => {
+      switch (current.type) {
+        case "subcategories":
+          return { type: "categories" };
+        case "tools":
+          if (current.subCategory && current.category) {
+            return { type: "subcategories", category: current.category };
+          }
+          return { type: "categories" };
+        case "detail":
+          return {
+            type: "tools",
+            category: current.tool.category,
+            subCategory: current.tool.subCategory,
+          };
+        case "result":
+          return { type: "detail", tool: current.tool };
+        default:
+          return current;
+      }
+    });
+  }, []);
+
+  const handleExecute = useCallback((): void => {
+    if (view.type !== "detail") {
+      return;
+    }
+    const { tool } = view;
+    setIsExecuting(true);
+
+    // Deferred: the execution stack is the heaviest graph in the build and the
+    // response path must never pay for it.
+    void import("next-vibe/execute-tool/repository")
+      .then(({ RouteExecuteRepository }) =>
+        RouteExecuteRepository.runInProcess({
+          toolName: tool.toolName,
+          input: {},
+          user,
+          locale,
+          logger,
+          platform,
+          toolExecutionContext: {
+            // no user context — UTC (dates not user-facing here)
+            ...makeHeadlessContext(undefined, undefined, "UTC"),
+            rootFolderId: DefaultFolderId.PRIVATE,
+          },
+        }),
+      )
+      .then(
+        (result) => {
+          setIsExecuting(false);
+          setView({ type: "result", tool, response: unwrapToolResult(result) });
+          return undefined;
+        },
+        () => {
+          setIsExecuting(false);
+        },
+      );
+  }, [view, user, locale, logger, platform]);
+
+  // Derive current category's sub-categories
+  const currentCategoryInfo = useMemo(() => {
+    if (view.type !== "subcategories") {
+      return null;
+    }
+    return categories.find((c) => c.name === view.category) ?? null;
+  }, [view, categories]);
+
+  if (isExecuting) {
+    return (
+      <Box flexDirection="column" paddingX={2} paddingY={1}>
+        <Text color="yellow">
+          {cliT(
+            "vibe.endpoints.renderers.cliUi.widgets.common.hints.executing",
+          )}
+        </Text>
+      </Box>
+    );
+  }
+
+  return (
+    <Box flexDirection="column" paddingX={2} paddingY={1}>
+      {view.type === "categories" && (
+        <CategoryView
+          categories={categories}
+          totalTools={tools.length}
+          onSelect={handleCategorySelect}
+          onSelectAll={handleSelectAllTools}
+        />
+      )}
+
+      {view.type === "subcategories" && currentCategoryInfo && (
+        <SubCategoryView
+          category={currentCategoryInfo.name}
+          subCategories={currentCategoryInfo.subCategories}
+          onSelect={(sub) =>
+            handleSubCategorySelect(currentCategoryInfo.name, sub)
+          }
+          onSelectAll={() =>
+            handleSelectAllInCategory(currentCategoryInfo.name)
+          }
+          onBack={handleBack}
+        />
+      )}
+
+      {view.type === "tools" && (
+        <ToolListView
+          tools={tools}
+          category={view.category}
+          subCategory={view.subCategory}
+          onSelect={handleToolSelect}
+          onBack={handleBack}
+        />
+      )}
+
+      {view.type === "detail" && (
+        <ToolDetailView
+          tool={view.tool}
+          onBack={handleBack}
+          onExecute={handleExecute}
+        />
+      )}
+
+      {view.type === "result" && (
+        <ResultView
+          tool={view.tool}
+          response={view.response}
+          onBack={handleBack}
+        />
+      )}
+    </Box>
+  );
+}
+
+// ── Main Widget ──────────────────────────────────────────────────────────
+
+/**
+ * The `interactive` request field is endpoint contract — it is what a caller SAYS,
+ * and `-i` on the CLI is what makes the host mount a live Ink tree. The widget
+ * branches on `responseOnly` instead, because that is what the host REPORTS: it is
+ * set by every surface that renders in one synchronous pass (CLI result formatter,
+ * MCP render tree), and those passes cannot host useInput/useApp or a re-render.
+ * Keying off `interactive` alone would draw a browser into a dead frame for
+ * `vibe help --interactive` (a bare arg, no `-i`), and requiring both would leave a
+ * third state — !responseOnly && !interactive — with nothing to render, since
+ * noFormElement means this widget IS the layout. `disabled` joins it for the same
+ * reason it does in execute-tool's widget: a disabled render is a transcript,
+ * not a session.
+ */
+export function HelpToolsWidget({
+  field,
+  fieldName,
+}: CliWidgetProps): JSX.Element {
+  const responseOnly = useWidgetResponseOnly();
+  const disabled = useWidgetDisabled();
+
+  if (!responseOnly && !disabled) {
+    return <HelpToolsBrowser />;
+  }
+  return <HelpToolsResponse field={field} fieldName={fieldName} />;
 }
 
 HelpToolsWidget.cliWidget = true as const;

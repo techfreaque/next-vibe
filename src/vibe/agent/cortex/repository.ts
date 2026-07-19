@@ -189,7 +189,7 @@ export function normalizePath(raw: string): string {
   let path = raw.startsWith("/") ? raw : `/${raw}`;
 
   // Collapse multiple slashes
-  path = path.replace(/\/+/g, "/");
+  path = path.replaceAll(/\/+/g, "/");
 
   // Remove trailing slash (except for root)
   if (path.length > 1 && path.endsWith("/")) {
@@ -239,7 +239,7 @@ export function isValidPath(path: string): boolean {
     }
     // No control characters - intentional use of control char regex
     // eslint-disable-next-line no-control-regex
-    if (/[\x00-\x1f\x7f]/.test(seg)) {
+    if (/[\u0000-\u001F\u007F]/.test(seg)) {
       return false;
     }
     // No SQL LIKE wildcards in path segments

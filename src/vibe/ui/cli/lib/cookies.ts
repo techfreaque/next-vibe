@@ -18,7 +18,7 @@ function cookiesDir(): string {
 }
 
 function keyPath(key: string): string {
-  const safe = key.replace(/[^a-zA-Z0-9_\-.]/g, "_"); // eslint-disable-line i18next/no-literal-string
+  const safe = key.replaceAll(/[^a-zA-Z0-9_\-.]/g, "_"); // eslint-disable-line i18next/no-literal-string
   return join(cookiesDir(), `${safe}.json`);
 }
 

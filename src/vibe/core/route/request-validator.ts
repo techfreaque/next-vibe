@@ -8,19 +8,18 @@ import "server-only";
 
 import { validateData } from "next-vibe/core/core-utils/validation";
 import type { Methods } from "next-vibe/core/definition/enums";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { CountryLanguageValues } from "next-vibe/core/i18n/core/config";
+import { scopedTranslation as sharedScopedTranslation } from "next-vibe/core/i18n/shared";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import {
   isAgentPlatform,
   isCliPlatform,
   Platform,
-} from "next-vibe/core/definition/platform";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { CountryLanguageValues } from "next-vibe/core/i18n/core/config";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "next-vibe/platforms/platforms";
 import { z } from "zod";
-
-import { scopedTranslation as sharedScopedTranslation } from "@/_pages/shared/i18n";
 
 import {
   ErrorResponseTypes,

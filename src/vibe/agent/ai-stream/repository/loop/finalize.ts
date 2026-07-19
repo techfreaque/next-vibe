@@ -337,7 +337,7 @@ export async function complete(
     threadId,
     logger,
     user,
-    state.p.streamContext.streamRunId,
+    state.p.toolExecutionContext.streamRunId,
   );
 
   // Fire-and-forget: mirror the finished thread to connected peers via the

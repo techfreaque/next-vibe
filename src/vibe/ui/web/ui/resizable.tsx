@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { cn } from "next-vibe/core/utils/utils";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX, ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 

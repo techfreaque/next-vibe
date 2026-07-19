@@ -8,7 +8,6 @@
 import "server-only";
 
 import { makeHeadlessContext } from "next-vibe/agent/chat/config";
-import { Platform } from "next-vibe/core/definition/platform";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import type { GraphNodeConfig } from "next-vibe/dataflow/graph/schema";
@@ -30,6 +29,7 @@ import { RouteExecutionExecutor } from "next-vibe/execute-tool/repository/core";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { createEndpointLogger } from "next-vibe/logger/server";
+import { Platform } from "next-vibe/platforms/platforms";
 
 import { GraphResolution } from "../enum";
 
@@ -346,7 +346,7 @@ async function callEndpoint(
     locale: defaultLocale,
     logger,
     platform: Platform.MCP,
-    streamContext: VIBE_SENSE_STREAM_CONTEXT,
+    toolExecutionContext: VIBE_SENSE_STREAM_CONTEXT,
   });
 
   if (result.success) {

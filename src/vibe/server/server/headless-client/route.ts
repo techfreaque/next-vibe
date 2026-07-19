@@ -9,10 +9,11 @@ export const { tools } = endpointsHandler({
   endpoint: headlessClientDefinition,
   [Methods.POST]: {
     handler: async ({ data, user, locale, logger }) =>
-      (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-        )
-      ).HeadlessClientRepository.start(data, user, locale, logger),
+      (await import("./repository")).HeadlessClientRepository.start(
+        data,
+        user,
+        locale,
+        logger,
+      ),
   },
 });

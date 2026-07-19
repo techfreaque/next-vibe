@@ -20,7 +20,6 @@ import { type CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { Platform } from "next-vibe/core/definition/platform";
 import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type {
   JWTPublicPayloadType,
@@ -34,6 +33,7 @@ import { SessionRepository } from "next-vibe/identity/session/repository";
 import { loginAttempts, users } from "next-vibe/identity/user/db";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
+import type { Platform } from "next-vibe/platforms/platforms";
 import { scopedTranslation as creditsScopedTranslation } from "../../../credits/i18n";
 import type {
   LoginPostRequestOutput,

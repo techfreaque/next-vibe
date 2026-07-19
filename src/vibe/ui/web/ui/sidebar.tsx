@@ -1,9 +1,7 @@
 "use client";
-import { cn } from "next-vibe/core/utils/utils";
+import { platform } from "next-vibe/core/env-client";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX, ReactNode } from "react";
-import React from "react";
-
-import { platform } from "@/env/env-client";
 
 import { useWindowSize } from "../../web/hooks/use-window-size";
 import { Div } from "./div";

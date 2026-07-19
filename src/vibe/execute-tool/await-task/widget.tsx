@@ -12,7 +12,7 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 

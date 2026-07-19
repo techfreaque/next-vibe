@@ -31,6 +31,8 @@ Core patterns for building with NextVibe. **Read the relevant doc before touchin
 | `widget.tsx` / `widget/` | [Widget (Web)](patterns/widget.md)            |
 | `widget.cli.tsx`         | [Widget (CLI/MCP)](patterns/widget.cli.md)    |
 | `hooks.ts` / `hooks/`    | [Hooks Patterns](patterns/hooks.md)           |
+| `generator.ts`           | [Generator Patterns](patterns/generator.md)   |
+| `setup.ts`               | [Setup Patterns](patterns/setup.md)           |
 | `repository.native.ts`   | [React Native](patterns/repository.native.md) |
 | `repository-client.ts`   | [Client Route](patterns/repository.client.md) |
 | `route-client.ts`        | [Client Route](patterns/repository.client.md) |

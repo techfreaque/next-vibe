@@ -6,9 +6,6 @@
 
 "use client";
 import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
-import { cn } from "next-vibe/core/utils/utils";
-import { useApiMutation } from "next-vibe/platforms/react/hooks/use-api-mutation";
-import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import instanceEndpoints from "next-vibe/remote-connection/[instanceId]/definition";
 import { scopedTranslation as connectScopedTranslation } from "next-vibe/remote-connection/connect/i18n";
 import type { SyncScope } from "next-vibe/remote-connection/db";
@@ -38,6 +35,7 @@ import {
 } from "next-vibe/ui/ui/select";
 import { Span } from "next-vibe/ui/ui/span";
 import { Switch } from "next-vibe/ui/ui/switch";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetContext,
   useWidgetLocale,
@@ -45,6 +43,8 @@ import {
   useWidgetTranslation,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useState } from "react";
 
@@ -624,8 +624,7 @@ export function SettingsWizard({ data, onDone }: WizardProps): JSX.Element {
         return;
       }
       try {
-        const { apiClient } =
-          await import("next-vibe/platforms/react/hooks/store");
+        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
         const generateKeyDef =
           await import("next-vibe/env/settings/generate-key/definition");
         const result = await apiClient.fetch(
@@ -664,8 +663,7 @@ export function SettingsWizard({ data, onDone }: WizardProps): JSX.Element {
 
     setSaving(true);
     try {
-      const { apiClient } =
-        await import("next-vibe/platforms/react/hooks/store");
+      const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
       const endpointsDef = await import("./definition");
       await apiClient.mutate(
         endpointsDef.PATCH,

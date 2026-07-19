@@ -7,7 +7,7 @@
 
 import "server-only";
 
-import { rootlessStreamContext } from "next-vibe/agent/chat/config";
+import { rootlessToolExecutionContext } from "next-vibe/agent/chat/config";
 import type { SpeechToTextT } from "next-vibe/agent/speech-to-text/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -205,7 +205,7 @@ export class SttHotkeyRepository {
         locale,
         logger,
         null,
-        rootlessStreamContext(),
+        rootlessToolExecutionContext(),
       );
 
       if (!result.success) {
@@ -219,16 +219,14 @@ export class SttHotkeyRepository {
     };
 
     // Create session
-    return Promise.resolve(
-      createSession({
-        recorder,
-        typer,
-        stt: sttFunction,
-        insertPrefix: data.insertPrefix,
-        insertSuffix: data.insertSuffix,
-        autoCleanup: true,
-      }),
-    );
+    return createSession({
+      recorder,
+      typer,
+      stt: sttFunction,
+      insertPrefix: data.insertPrefix,
+      insertSuffix: data.insertSuffix,
+      autoCleanup: true,
+    });
   }
 
   /**

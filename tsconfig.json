@@ -32,7 +32,9 @@
         "./src/vibe/tooling/check/oxlint/plugins/*/src/index"
       ],
       "@next-vibe/checker/*": ["./src/vibe/*"],
-      "server-only": ["./src/vibe/core/utils/server-only.ts"]
+      "server-only": ["./src/vibe/core/utils/server-only.ts"],
+      "vibe-core/ui/*": ["./src/vibe/ui/web/*"],
+      "vibe-core/*": ["./vibe-minimal-env/vibe/*"]
     }
   },
   "include": [
@@ -59,6 +61,7 @@
     "**/node_modules",
     ".tmp",
     ".next",
+    "vibe-minimal-env",
     ".next-prod",
     "to_migrate/**/*.ts",
     "to_migrate/**/*.tsx",

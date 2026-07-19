@@ -10,8 +10,9 @@
 
 import { existsSync, promises as fs } from "node:fs";
 import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
+import { coreEnv, getPackageDlxRunner } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -22,9 +23,14 @@ import {
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { scopedTranslation } from "next-vibe/tooling/check/config/i18n";
+import type { Platform } from "next-vibe/platforms/platforms";
 
-import { parseJsonWithComments } from "../parse-json";
+import { parseJsonWithComments } from "../repository/parse-json";
+import type {
+  ConfigCreateRequestOutput,
+  ConfigCreateResponseOutput,
+} from "./definition";
+import { type ConfigCreateT, scopedTranslation } from "./i18n";
 import type {
   CheckConfig,
   CreateDefaultCheckConfigResult,
@@ -33,6 +39,17 @@ import type {
   GenerateVSCodeSettingsResult,
   OxlintJsPlugin,
 } from "./types";
+
+/**
+ * The command a user runs to create check.config.ts. Uses the dlx runner
+ * because @next-vibe/checker is fetched from the registry, not installed.
+ */
+function configCreateCommand(): string {
+  const dlx = getPackageDlxRunner(coreEnv.PACKAGE_MANAGER);
+  return [dlx.command, ...dlx.args, "@next-vibe/checker", "config-create"].join(
+    " ",
+  );
+}
 
 // ============================================================
 // Repository Implementation
@@ -44,6 +61,18 @@ export class ConfigRepositoryImpl {
   // --------------------------------------------------------
 
   private static getConfigFilePath(): string {
+    let dir = process.cwd();
+    for (let i = 0; i < 10; i++) {
+      const candidate = resolve(dir, "check.config.ts");
+      if (existsSync(candidate)) {
+        return candidate;
+      }
+      const parent = dirname(dir);
+      if (parent === dir) {
+        break;
+      }
+      dir = parent;
+    }
     return resolve(process.cwd(), "check.config.ts");
   }
 
@@ -67,6 +96,7 @@ export class ConfigRepositoryImpl {
             "vibe",
             "tooling",
             "check",
+            "repository",
             "oxlint",
             "plugins",
             baseName,
@@ -118,6 +148,7 @@ export class ConfigRepositoryImpl {
             "vibe",
             "tooling",
             "check",
+            "repository",
             "oxlint",
             "plugins",
             baseName,
@@ -138,6 +169,7 @@ export class ConfigRepositoryImpl {
       const checkerSourcePath = resolve(
         dirname(fileURLToPath(import.meta.url)),
         "..",
+        "repository",
         "oxlint",
         "plugins",
         baseName,
@@ -155,6 +187,67 @@ export class ConfigRepositoryImpl {
         "vibe",
         "tooling",
         "check",
+        "repository",
+        "oxlint",
+        "plugins",
+        baseName,
+        "src",
+        "index.ts",
+      );
+    }
+
+    // Pattern: next-vibe/tooling/checker/oxlint/oxlint-plugins/<name>.ts (internal monorepo path)
+    const internalPrefix = "next-vibe/tooling/checker/oxlint/oxlint-plugins/";
+    if (pluginPath.startsWith(internalPrefix)) {
+      const fileName = pluginPath.slice(internalPrefix.length);
+      const baseName = fileName.replace(/\.(ts|js)$/, "");
+
+      const checkerSourcePath = resolve(
+        dirname(fileURLToPath(import.meta.url)),
+        "..",
+        "repository",
+        "oxlint",
+        "plugins",
+        baseName,
+        "src",
+        "index.ts",
+      );
+      if (existsSync(checkerSourcePath)) {
+        return checkerSourcePath;
+      }
+
+      let searchDir = process.cwd();
+      for (let i = 0; i < 10; i++) {
+        const sourcePath = resolve(
+          searchDir,
+          "src",
+          "vibe",
+          "tooling",
+          "check",
+          "repository",
+          "oxlint",
+          "plugins",
+          baseName,
+          "src",
+          "index.ts",
+        );
+        if (existsSync(sourcePath)) {
+          return sourcePath;
+        }
+        const parent = dirname(searchDir);
+        if (parent === searchDir) {
+          break;
+        }
+        searchDir = parent;
+      }
+
+      return resolve(
+        process.cwd(),
+        "src",
+        "vibe",
+        "tooling",
+        "check",
+        "repository",
         "oxlint",
         "plugins",
         baseName,
@@ -443,8 +536,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
       return {
         ready: false,
         error: "exists",
-        message:
-          "check.config.ts already exists. To restore the default configuration, delete the existing file first and run 'npx @next-vibe/checker config-create' to create a new one.",
+        message: `check.config.ts already exists. To restore the default configuration, delete the existing file first and run '${configCreateCommand()}' to create a new one.`,
         configPath,
       };
     }
@@ -468,8 +560,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
         return {
           ready: false,
           error: "missing",
-          message:
-            "check.config.ts not found. Run 'npx @next-vibe/checker config-create' to create a default configuration.",
+          message: `check.config.ts not found. Run '${configCreateCommand()}' to create a default configuration.`,
           configPath,
         };
       }
@@ -480,8 +571,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
       return {
         ready: false,
         error: "load_failed",
-        message:
-          "check.config.ts could not be loaded. Run 'npx @next-vibe/checker config-create' to create a default configuration.",
+        message: `check.config.ts could not be loaded. Run '${configCreateCommand()}' to create a default configuration.`,
         configPath,
       };
     }
@@ -720,19 +810,19 @@ export default checkConfig.eslint?.buildFlatConfig?.(
       let templateContent = await fs.readFile(templatePath, "utf8");
 
       // Replace .ts extensions with .js for installed package usage
-      templateContent = templateContent.replace(
+      templateContent = templateContent.replaceAll(
         /@next-vibe\/checker\/oxlint-plugins\/([^"']+)\.ts/g,
         "@next-vibe/checker/oxlint-plugins/$1.js",
       );
 
       // New projects default to cold-tsgo; LSP daemon is opt-in per project
-      templateContent = templateContent.replace(
+      templateContent = templateContent.replaceAll(
         /useLspDaemon:\s*true/g,
         "useLspDaemon: false",
       );
 
       // Test-project configs must not auto-fix — corpus files are intentional violations
-      templateContent = templateContent.replace(
+      templateContent = templateContent.replaceAll(
         /\bfix:\s*true\b/g,
         "fix: false",
       );
@@ -803,14 +893,15 @@ export default checkConfig.eslint?.buildFlatConfig?.(
         const template = await fs.readFile(examplePath, "utf8");
         mcpContent = template.replaceAll("{{PROJECT_PATH}}", projectPath);
       } else {
-        // Fallback: minimal config using npx for external @next-vibe/checker package
+        // Fallback: minimal config fetching the external @next-vibe/checker package
+        const dlx = getPackageDlxRunner(coreEnv.PACKAGE_MANAGER);
         mcpContent = JSON.stringify(
           {
             mcpServers: {
               vibe: {
-                command: "npx",
+                command: dlx.command,
                 // eslint-disable-next-line i18next/no-literal-string
-                args: ["--yes", "@next-vibe/checker@latest", "mcp"],
+                args: [...dlx.args, "@next-vibe/checker@latest", "mcp"],
                 env: {
                   PROJECT_ROOT: projectPath,
                 },
@@ -864,9 +955,11 @@ export default checkConfig.eslint?.buildFlatConfig?.(
         default?: CheckConfig | (() => CheckConfig);
         config?: CheckConfig | (() => CheckConfig);
       }>;
+      // A file:// URL is the only specifier form both Node and Bun accept here;
+      // Node's ESM loader rejects bare absolute paths (notably Windows "C:\...").
       const [configStats, configModule] = await Promise.all([
         fs.stat(configPath),
-        dynamicImport(configPath),
+        dynamicImport(pathToFileURL(configPath).href),
       ]);
 
       const exportedValue = configModule.default ?? configModule.config;
@@ -1094,5 +1187,189 @@ export default checkConfig.eslint?.buildFlatConfig?.(
     logger.debug("Generated eslint.config.mjs", { path: configPath });
 
     return configPath;
+  }
+}
+
+// ============================================================
+// Config Create Repository
+// ============================================================
+
+export class ConfigCreateRepository {
+  static async execute(
+    data: ConfigCreateRequestOutput,
+    logger: EndpointLogger,
+    t: ConfigCreateT,
+    platform: Platform,
+    locale: CountryLanguage,
+  ): Promise<ResponseType<ConfigCreateResponseOutput>> {
+    logger.debug("[Config Create] Repository received data", {
+      data,
+      platform,
+    });
+
+    try {
+      const configPath = resolve(process.cwd(), "check.config.ts");
+      if (existsSync(configPath)) {
+        return fail({
+          message: t("errors.conflict.title"),
+          messageParams: { path: configPath },
+          errorType: ErrorResponseTypes.CONFLICT,
+        });
+      }
+
+      const configResult = await ConfigRepositoryImpl.createDefaultCheckConfig(
+        logger,
+        locale,
+      );
+
+      if (!configResult.success) {
+        return fail({
+          message: t("errors.configCreation"),
+          messageParams: { error: configResult.message || "Unknown error" },
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
+      }
+
+      const createdConfigPath = configResult.data.configPath;
+      const { readFileSync, writeFileSync } = await import("node:fs");
+      let configContent = readFileSync(createdConfigPath, "utf-8");
+
+      if (data.enableReactRules !== undefined) {
+        configContent = configContent.replaceAll(
+          "react: true,",
+          `react: ${data.enableReactRules},`,
+        );
+        configContent = configContent.replaceAll(
+          "reactCompiler: true,",
+          `reactCompiler: ${data.enableReactRules},`,
+        );
+        configContent = configContent.replaceAll(
+          "accessibility: true,",
+          `accessibility: ${data.enableReactRules},`,
+        );
+      }
+      if (data.enableNextjsRules !== undefined) {
+        configContent = configContent.replaceAll(
+          "nextjs: true,",
+          `nextjs: ${data.enableNextjsRules},`,
+        );
+      }
+      if (data.enableI18nRules !== undefined) {
+        configContent = configContent.replaceAll(
+          "i18n: true,",
+          `i18n: ${data.enableI18nRules},`,
+        );
+      }
+      if (data.jsxCapitalization !== undefined) {
+        configContent = configContent.replaceAll(
+          "jsxCapitalization: true,",
+          `jsxCapitalization: ${data.jsxCapitalization},`,
+        );
+      }
+      if (data.enablePedanticRules !== undefined) {
+        configContent = configContent.replaceAll(
+          "pedantic: false,",
+          `pedantic: ${data.enablePedanticRules},`,
+        );
+      }
+      if (data.enableRestrictedSyntax !== undefined) {
+        configContent = configContent.replaceAll(
+          "restrictedSyntax: true,",
+          `restrictedSyntax: ${data.enableRestrictedSyntax},`,
+        );
+      }
+      writeFileSync(createdConfigPath, configContent, "utf-8");
+
+      let mcpConfigPath: string | undefined;
+      let vscodeSettingsPath: string | undefined;
+
+      if (data.createMcpConfig) {
+        for (const mcpDest of [
+          ".mcp.json",
+          ".cursor/mcp.json",
+          ".vscode/mcp.json",
+        ]) {
+          const mcpResult = await ConfigRepositoryImpl.createDefaultMcpConfig(
+            logger,
+            mcpDest,
+            locale,
+          );
+          if (mcpResult.success) {
+            mcpConfigPath = mcpResult.data.mcpConfigPath;
+          } else {
+            logger.warn(t("warnings.mcpConfigFailed"), {
+              error: mcpResult.message,
+            });
+          }
+        }
+      }
+
+      if (data.updateVscodeSettings) {
+        const configReadResult = await ConfigRepositoryImpl.ensureConfigReady(
+          logger,
+          locale,
+          false,
+        );
+        if (configReadResult.ready) {
+          const vscodeResult =
+            await ConfigRepositoryImpl.generateVSCodeSettings(
+              logger,
+              configReadResult.config,
+              locale,
+            );
+          if (vscodeResult.success) {
+            vscodeSettingsPath = vscodeResult.data.settingsPath;
+          } else {
+            logger.warn(t("warnings.vscodeFailed"), {
+              error: vscodeResult.message,
+            });
+          }
+        }
+      }
+
+      let packageJsonPath: string | undefined;
+      if (data.updatePackageJson) {
+        const pkgPath = resolve(process.cwd(), "package.json");
+        if (existsSync(pkgPath)) {
+          try {
+            const packageJson = JSON.parse(readFileSync(pkgPath, "utf-8"));
+            packageJson.scripts = {
+              ...packageJson.scripts,
+              check: "v c",
+              lint: "v c",
+              typecheck: "v c",
+            };
+            writeFileSync(pkgPath, `${JSON.stringify(packageJson, null, 2)}\n`);
+            packageJsonPath = pkgPath;
+          } catch (error) {
+            logger.warn(t("warnings.packageJsonFailed"), {
+              error: parseError(error).message,
+            });
+          }
+        } else {
+          logger.warn(t("warnings.packageJsonNotFound"));
+        }
+      }
+
+      const messages: string[] = [`✓ Created ${configResult.data.configPath}`];
+      if (mcpConfigPath) {
+        messages.push(`✓ Created ${mcpConfigPath}`);
+      }
+      if (vscodeSettingsPath) {
+        messages.push(`✓ Updated ${vscodeSettingsPath}`);
+      }
+      if (packageJsonPath) {
+        messages.push(`✓ Updated ${packageJsonPath}`);
+      }
+
+      return success({ message: messages.join("\n") });
+    } catch (error) {
+      logger.error(t("errors.unexpected"), parseError(error));
+      return fail({
+        message: t("errors.unexpected"),
+        messageParams: { error: parseError(error).message },
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
   }
 }

@@ -6,9 +6,7 @@
 "use client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getDefaultTimezone } from "next-vibe/core/i18n/core/localization-utils";
-import { cn } from "next-vibe/core/utils/utils";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { useApiMutation } from "next-vibe/platforms/react/hooks/use-api-mutation";
 import bulkEndpoints from "next-vibe/tasks/cron/bulk/definition";
 import type { CronTasksTranslationKey } from "next-vibe/tasks/cron/tasks/i18n";
 import { formatCronScheduleShort } from "next-vibe/tasks/cron-formatter";
@@ -67,6 +65,7 @@ import {
   SelectValue,
 } from "next-vibe/ui/ui/select";
 import { Span } from "next-vibe/ui/ui/span";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -77,7 +76,8 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import React, { useCallback, useMemo, useState } from "react";
 
 import type endpoints from "./definition";
@@ -757,7 +757,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
           handleClearSelection();
           // Update caches optimistically - no refetch needed
           const { apiClient } =
-            await import("next-vibe/platforms/react/hooks/store");
+            await import("next-vibe/unified-ui/hooks/store");
           const tasksDef = await import("./definition");
           const queueDef =
             await import("next-vibe/tasks/cron/queue/definition");

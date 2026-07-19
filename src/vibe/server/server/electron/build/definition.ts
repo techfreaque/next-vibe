@@ -7,11 +7,7 @@
 import { z } from "zod";
 
 import { createEndpoint } from "next-vibe/core/definition/create";
-import {
-  objectField,
-  requestField,
-  responseField,
-} from "next-vibe/unified-ui/_shared/utils";
+import { objectField, requestField, responseField } from "next-vibe/unified-ui/_shared/utils-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,

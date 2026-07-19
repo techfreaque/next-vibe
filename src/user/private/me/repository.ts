@@ -349,9 +349,9 @@ export class UserProfileRepository {
             // Validate: lowercase alphanumeric + hyphens only
             const normalized = p.creatorSlug
               .toLowerCase()
-              .replace(/[^a-z0-9-]/g, "-")
-              .replace(/-{2,}/g, "-")
-              .replace(/^-|-$/g, "")
+              .replaceAll(/[^a-z0-9-]/g, "-")
+              .replaceAll(/-{2,}/g, "-")
+              .replaceAll(/^-|-$/g, "")
               .slice(0, 60);
             // Check uniqueness
             const existing = await db

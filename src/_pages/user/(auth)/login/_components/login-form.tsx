@@ -1,22 +1,22 @@
 "use client";
 
-import { useApiMutation } from "next-vibe/platforms/react/hooks/use-api-mutation";
 import { assignUrl } from "next-vibe/ui/lib/location";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { Span } from "next-vibe/ui/ui/span";
 import { P } from "next-vibe/ui/ui/typography";
+import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
 import { useCallback, useRef, useState } from "react";
 
 const DEFAULT_PASSWORD_SENTINEL = "change-me-now";
 
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { SYSTEM_SETTINGS_ALIAS } from "next-vibe/env/settings/constants";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
-import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 
-import { envClient } from "@/env/env-client";
 import type { DEV_SEED_USERS } from "@/user/dev-seed-users";
 import loginEndpoints from "@/user/public/login/definition";
 import { scopedTranslation } from "@/user/public/login/i18n";

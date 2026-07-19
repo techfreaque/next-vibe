@@ -14,13 +14,13 @@ import {
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   backButton,
-  customWidgetObject,
   requestField,
   requestUrlPathParamsField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { SyncScopeSchema, TransportModeSchema } from "../db";
@@ -583,8 +583,7 @@ const { DELETE } = createEndpoint({
   options: {
     mutationOptions: {
       onSuccess: async (data) => {
-        const { apiClient } =
-          await import("next-vibe/platforms/react/hooks/store");
+        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
         const listDefinition =
           await import("next-vibe/remote-connection/list/definition");
         const instanceId = data.pathParams.instanceId;

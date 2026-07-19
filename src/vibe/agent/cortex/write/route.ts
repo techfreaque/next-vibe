@@ -8,7 +8,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, user, locale, logger, t, streamContext }) =>
+    handler: ({ data, user, locale, logger, t, toolExecutionContext }) =>
       CortexWriteRepository.writeFile({
         userId: user.id,
         user,
@@ -18,7 +18,7 @@ export const { POST, tools } = endpointsHandler({
         createParents: data.createParents,
         logger,
         t,
-        streamContext: streamContext,
+        toolExecutionContext: toolExecutionContext,
       }),
     onRemoteEvent: {
       "node-written": (props) => CortexWriteRepository.applyRemoteWrite(props),

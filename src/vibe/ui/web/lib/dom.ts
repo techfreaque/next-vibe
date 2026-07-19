@@ -79,7 +79,7 @@ export function createElement<K extends keyof HTMLElementTagNameMap>(
 }
 
 export function appendToBody(el: HTMLElement): void {
-  document.body.appendChild(el);
+  document.body.append(el);
 }
 
 export function observeRootMutations(

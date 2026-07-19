@@ -20,14 +20,14 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-import { rootlessStreamContext } from "next-vibe/agent/chat/config";
+import { rootlessToolExecutionContext } from "next-vibe/agent/chat/config";
 import { chatThreads } from "next-vibe/agent/chat/db";
 import favoritesCreateDefinitions from "next-vibe/agent/skills/favorites/create/definition";
 import favoritesDefinitions from "next-vibe/agent/skills/favorites/definition";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import remoteConnectionByIdDefinitions from "next-vibe/remote-connection/[instanceId]/definition";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 
 import {
   ATLAS_INSTANCE_ID,
@@ -60,7 +60,7 @@ async function setupDirectConnection(
   // Ensure the test favorite exists on hermes — hermes's AI loop resolves favorites
   // from its own DB (not atlas's). Only create if none exists yet.
   const hermesListResp = await sendTestRequest({
-    streamContext: rootlessStreamContext(),
+    toolExecutionContext: rootlessToolExecutionContext(),
     endpoint: favoritesDefinitions.GET,
     data: {},
     user: testUser,
@@ -72,7 +72,7 @@ async function setupDirectConnection(
   const alreadyHas = hermesFavs?.some((f) => f.skillId === "quality-tester");
   if (!alreadyHas) {
     await sendTestRequest({
-      streamContext: rootlessStreamContext(),
+      toolExecutionContext: rootlessToolExecutionContext(),
       endpoint: favoritesCreateDefinitions.POST,
       data: { skillId: "quality-tester" },
       user: testUser,
@@ -90,7 +90,7 @@ async function teardownDirectConnection(
   // Disable forceSystemProvider on hermes before disconnecting (best-effort)
   try {
     await sendTestRequest({
-      streamContext: rootlessStreamContext(),
+      toolExecutionContext: rootlessToolExecutionContext(),
       endpoint: remoteConnectionByIdDefinitions.PATCH,
       urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
       data: {

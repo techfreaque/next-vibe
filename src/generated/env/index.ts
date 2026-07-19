@@ -20,11 +20,6 @@ import {
   browserEnvSchema,
 } from "../../browser/env";
 import {
-  env as env_env,
-  envExamples,
-  envSchema as env_envSchema,
-} from "../../env/env";
-import {
   leadsCampaignsEnv,
   leadsCampaignsEnvExamples,
   leadsCampaignsEnvSchema,
@@ -50,11 +45,57 @@ import {
   agentEnvExamples,
   agentEnvSchema,
 } from "../../vibe/agent/env";
+import { coreEnv, coreEnvExamples, coreEnvSchema } from "../../vibe/core/env";
+import {
+  databaseEnv,
+  databaseEnvExamples,
+  databaseEnvSchema,
+} from "../../vibe/database/env";
+import {
+  identityEnv,
+  identityEnvExamples,
+  identityEnvSchema,
+} from "../../vibe/identity/env";
+import {
+  loggerEnv,
+  loggerEnvExamples,
+  loggerEnvSchema,
+} from "../../vibe/logger/env";
+import {
+  cliEnv,
+  cliEnvExamples,
+  cliEnvSchema,
+} from "../../vibe/platforms/cli/env";
+import {
+  realtimeEnv,
+  realtimeEnvExamples,
+  realtimeEnvSchema,
+} from "../../vibe/realtime/env";
 import {
   serverSystemEnv,
   serverSystemEnvExamples,
   serverSystemEnvSchema,
 } from "../../vibe/server/server/env";
+import {
+  imagePushEnv,
+  imagePushEnvExamples,
+  imagePushEnvSchema,
+} from "../../vibe/server/server/image-push/env";
+import {
+  devWatcherEnv,
+  devWatcherEnvExamples,
+  devWatcherEnvSchema,
+} from "../../vibe/tasks/dev-watcher/env";
+import {
+  tasksEnv,
+  tasksEnvExamples,
+  tasksEnvSchema,
+} from "../../vibe/tasks/env";
+import {
+  pulseEnv,
+  pulseEnvExamples,
+  pulseEnvSchema,
+} from "../../vibe/tasks/pulse/env";
 
 // Platform detection
 const platform = {
@@ -77,7 +118,6 @@ export const envModules: Record<
     schema: browserEnvSchema,
     examples: browserEnvExamples,
   },
-  env: { env: env_env, schema: env_envSchema, examples: envExamples },
   leadsCampaigns: {
     env: leadsCampaignsEnv,
     schema: leadsCampaignsEnvSchema,
@@ -100,23 +140,66 @@ export const envModules: Record<
   },
   sms: { env: smsEnv, schema: smsEnvSchema, examples: smsEnvExamples },
   agent: { env: agentEnv, schema: agentEnvSchema, examples: agentEnvExamples },
+  core: { env: coreEnv, schema: coreEnvSchema, examples: coreEnvExamples },
+  database: {
+    env: databaseEnv,
+    schema: databaseEnvSchema,
+    examples: databaseEnvExamples,
+  },
+  identity: {
+    env: identityEnv,
+    schema: identityEnvSchema,
+    examples: identityEnvExamples,
+  },
+  logger: {
+    env: loggerEnv,
+    schema: loggerEnvSchema,
+    examples: loggerEnvExamples,
+  },
+  cli: { env: cliEnv, schema: cliEnvSchema, examples: cliEnvExamples },
+  realtime: {
+    env: realtimeEnv,
+    schema: realtimeEnvSchema,
+    examples: realtimeEnvExamples,
+  },
   serverSystem: {
     env: serverSystemEnv,
     schema: serverSystemEnvSchema,
     examples: serverSystemEnvExamples,
   },
+  imagePush: {
+    env: imagePushEnv,
+    schema: imagePushEnvSchema,
+    examples: imagePushEnvExamples,
+  },
+  devWatcher: {
+    env: devWatcherEnv,
+    schema: devWatcherEnvSchema,
+    examples: devWatcherEnvExamples,
+  },
+  tasks: { env: tasksEnv, schema: tasksEnvSchema, examples: tasksEnvExamples },
+  pulse: { env: pulseEnv, schema: pulseEnvSchema, examples: pulseEnvExamples },
 };
 
 // Combined schema using merge
 export const envSchema = browserEnvSchema
-  .merge(env_envSchema)
   .merge(leadsCampaignsEnvSchema)
   .merge(messengerEnvSchema)
   .merge(imapClientEnvSchema)
   .merge(paymentEnvSchema)
   .merge(smsEnvSchema)
   .merge(agentEnvSchema)
-  .merge(serverSystemEnvSchema);
+  .merge(coreEnvSchema)
+  .merge(databaseEnvSchema)
+  .merge(identityEnvSchema)
+  .merge(loggerEnvSchema)
+  .merge(cliEnvSchema)
+  .merge(realtimeEnvSchema)
+  .merge(serverSystemEnvSchema)
+  .merge(imagePushEnvSchema)
+  .merge(devWatcherEnvSchema)
+  .merge(tasksEnvSchema)
+  .merge(pulseEnvSchema);
 
 export type Env = z.infer<typeof envSchema>;
 

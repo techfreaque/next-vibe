@@ -27,9 +27,9 @@ export async function syncUploadEmbedding(
   userId: string,
   threadId: string,
   attachments: Array<{ filename: string; mimeType: string }>,
-  streamContext: ToolExecutionContext,
+  toolExecutionContext: ToolExecutionContext,
 ): Promise<void> {
-  if (!attachments.length) {
+  if (attachments.length === 0) {
     return;
   }
 
@@ -48,8 +48,8 @@ export async function syncUploadEmbedding(
   const threadTitle = thread?.title ?? "Untitled";
   const threadSlug = `${threadTitle
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "")
+    .replaceAll(/[^a-z0-9]+/g, "-")
+    .replaceAll(/^-|-$/g, "")
     .slice(0, 50)}-${threadId}`;
 
   for (const att of attachments) {
@@ -59,8 +59,8 @@ export async function syncUploadEmbedding(
     const typeFolder = getMimeTypeFolder(att.mimeType);
     const safeFilename = att.filename
       .toLowerCase()
-      .replace(/[^a-z0-9.]+/g, "-")
-      .replace(/^-|-$/g, "")
+      .replaceAll(/[^a-z0-9.]+/g, "-")
+      .replaceAll(/^-|-$/g, "")
       .slice(0, 50);
     const path = `/uploads/${typeFolder}/${threadSlug}/${safeFilename}.md`;
     const result = await readUploadPath(userId, path).catch(() => null);
@@ -69,7 +69,7 @@ export async function syncUploadEmbedding(
         userId,
         path,
         result.content,
-        streamContext,
+        toolExecutionContext,
       ).catch(() => undefined);
     }
   }
@@ -83,7 +83,7 @@ export async function syncUploadEmbedding(
  */
 export async function syncThreadEmbedding(
   lastThreadId: string | null,
-  streamContext: ToolExecutionContext,
+  toolExecutionContext: ToolExecutionContext,
 ): Promise<void> {
   if (!lastThreadId) {
     return;
@@ -119,13 +119,13 @@ export async function syncThreadEmbedding(
 
   const slug = (thread.title ?? "thread")
     .toLowerCase()
-    .replace(/[^a-z0-9-]/g, "-")
+    .replaceAll(/[^a-z0-9-]/g, "-")
     .slice(0, 50);
 
   await syncVirtualNodeToEmbedding(
     thread.userId,
     `/threads/${thread.rootFolderId}/${slug}-${thread.id}.md`,
     content,
-    streamContext,
+    toolExecutionContext,
   );
 }

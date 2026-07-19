@@ -8,10 +8,10 @@
 
 import { spawn } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, isAbsolute, join, relative } from "node:path";
+import { dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { Platform } from "next-vibe/core/definition/platform";
+import { coreEnv, getPackageRunner } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType as ApiResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -21,30 +21,67 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { ConfigRepositoryImpl } from "next-vibe/tooling/check/config/repository";
-import type { CheckConfig } from "next-vibe/tooling/check/config/types";
+import { Platform } from "next-vibe/platforms/platforms";
+import { z } from "zod";
+
+import { ConfigRepositoryImpl } from "../../config/repository";
+import type { CheckConfig } from "../../config/types";
+import type { CheckVibeCheckT } from "../../i18n";
 import {
   calculateFilteredSummary,
   filterIssues,
-} from "next-vibe/tooling/check/shared/filter-utils";
-import type { CheckTypecheckT } from "next-vibe/tooling/check/typecheck/i18n";
-import { z } from "zod";
-
+  parseFilters,
+} from "../filter-utils";
 import { parseJsonWithComments } from "../parse-json";
-import type {
-  TypecheckIssue,
-  TypecheckRequestOutput,
-  TypecheckResponseOutput,
-} from "./definition";
 import { TsgoDaemon } from "./lsp-daemon";
-import { type TypecheckConfig } from "./utils";
 import {
   createTypecheckConfig,
   getDisplayPath,
   PathType,
   resolvePathsToIncludes,
   shouldIncludeFile,
+  type TypecheckConfig,
 } from "./utils";
+// ── Inline types (definition removed) ───────────────────────
+
+export interface TypecheckIssue {
+  file: string;
+  line?: number;
+  column?: number;
+  rule?: string;
+  severity: "error" | "warning" | "info";
+  message: string;
+}
+
+export interface TypecheckRequestOutput {
+  path?: string | string[];
+  timeout: number;
+  skipSorting?: boolean;
+  disableFilter?: boolean;
+  limit: number;
+  page: number;
+  summaryOnly: boolean;
+  extensive?: boolean;
+  filter?: string | string[];
+}
+
+export interface TypecheckResponseOutput {
+  editorUriSchema?: string;
+  items?: TypecheckIssue[] | null;
+  files?:
+    | { file: string; errors: number; warnings: number; total: number }[]
+    | null;
+  totalIssues: number;
+  totalFiles: number;
+  totalErrors?: number;
+  filteredIssues?: number;
+  filteredFiles?: number;
+  displayedIssues?: number;
+  displayedFiles?: number;
+  truncatedMessage?: string;
+  currentPage?: number;
+  totalPages?: number;
+}
 // ============================================================
 // Internal Types
 // ============================================================
@@ -120,6 +157,21 @@ function findTsgo(startDir: string): string {
   return join(startDir, "node_modules/.bin", binaryName);
 }
 
+function findProjectRoot(): string {
+  let dir = process.cwd();
+  for (let i = 0; i < 10; i++) {
+    if (existsSync(resolve(dir, "tsconfig.json"))) {
+      return dir;
+    }
+    const parent = dirname(dir);
+    if (parent === dir) {
+      break;
+    }
+    dir = parent;
+  }
+  return process.cwd();
+}
+
 /**
  * Run TypeScript type checking Repository
  */
@@ -133,6 +185,7 @@ export class TypecheckRepository {
     "dist",
     "lib",
     "node_modules",
+    "vibe-minimal-env",
   ]);
 
   /** Discover independent nested TypeScript projects in a workspace. */
@@ -184,7 +237,7 @@ export class TypecheckRepository {
    *       and exact .d.ts filenames that are NOT in the heavy list.
    */
   private static isSweepingSourcePattern(pattern: string): boolean {
-    const normalized = pattern.replace(/\\/g, "/");
+    const normalized = pattern.replaceAll("\\", "/");
     const basename = normalized.split("/").at(-1) ?? normalized;
 
     // Known heavy declaration files that expand to the whole project
@@ -252,7 +305,7 @@ export class TypecheckRepository {
     code: number | null;
     timedOut: boolean;
   }> {
-    return new Promise((resolve, reject) => {
+    return new Promise((_resolve, reject) => {
       const child = spawn(command, {
         cwd: options.cwd,
         shell: true,
@@ -278,7 +331,7 @@ export class TypecheckRepository {
 
       child.on("close", (code) => {
         clearTimeout(timer);
-        resolve({
+        _resolve({
           stdout: Buffer.concat(stdoutChunks).toString("utf8"),
           stderr: Buffer.concat(stderrChunks).toString("utf8"),
           code,
@@ -300,8 +353,10 @@ export class TypecheckRepository {
     if (useTsgo) {
       return JSON.stringify(findTsgo(process.cwd()));
     }
+    const runner = getPackageRunner(coreEnv.PACKAGE_MANAGER);
+    const invocation = [runner.command, ...runner.args, "tsc"].join(" ");
     // tsc needs increased memory for large projects
-    return 'NODE_OPTIONS="--max-old-space-size=32768" bunx tsc';
+    return `NODE_OPTIONS="--max-old-space-size=32768" ${invocation}`;
   }
 
   /**
@@ -600,14 +655,18 @@ export class TypecheckRepository {
     tempConfigPath: string,
     cachePath: string,
     locale: CountryLanguage,
-    t: CheckTypecheckT,
+    t: CheckVibeCheckT,
     extraExcludePatterns?: string[],
   ): ApiResponseType<void> {
     // Calculate the relative prefix based on cache directory depth
     const prefix = TypecheckRepository.getRelativePrefix(cachePath);
 
     // Read and validate the main tsconfig.json
-    const tsConfigContent = readFileSync("tsconfig.json", "utf8");
+    const projectRoot = findProjectRoot();
+    const tsConfigContent = readFileSync(
+      resolve(projectRoot, "tsconfig.json"),
+      "utf8",
+    );
     const parsedJsonResult = parseJsonWithComments(tsConfigContent, locale);
     if (!parsedJsonResult.success) {
       return fail({
@@ -741,7 +800,7 @@ export class TypecheckRepository {
     data: TypecheckRequestOutput,
     logger: EndpointLogger,
     platform: Platform,
-    t: CheckTypecheckT,
+    t: CheckVibeCheckT,
     locale: CountryLanguage,
     providedConfig: CheckConfig | undefined,
     signal: AbortSignal,
@@ -781,6 +840,7 @@ export class TypecheckRepository {
               },
             ],
             totalIssues: 1,
+            totalFiles: 1,
           });
         }
         checkConfig = configResult.config;
@@ -795,13 +855,23 @@ export class TypecheckRepository {
       const effectiveData = {
         ...data,
         limit: data.limit ?? defaultLimit,
+        disableFilter: data.disableFilter ?? false,
       };
 
-      // Compute active ignore patterns from extensive flag
+      // Compute active ignore patterns:
+      // - ignorePatterns: always applied (e.g. test-project, generated dirs)
+      // - nonExtensiveIgnorePatterns: only in non-extensive mode (e.g. *.test.ts)
       const isExtensive = data.extensive ?? defaults.extensive ?? false;
-      const activeIgnorePatterns =
+      const alwaysIgnore = checkConfig.typecheck.enabled
+        ? (checkConfig.typecheck.ignorePatterns ?? [])
+        : [];
+      const conditionalIgnore =
         !isExtensive && checkConfig.typecheck.enabled
-          ? checkConfig.typecheck.nonExtensiveIgnorePatterns
+          ? (checkConfig.typecheck.nonExtensiveIgnorePatterns ?? [])
+          : [];
+      const activeIgnorePatterns =
+        alwaysIgnore.length > 0 || conditionalIgnore.length > 0
+          ? [...alwaysIgnore, ...conditionalIgnore]
           : undefined;
 
       // Check if typecheck is enabled
@@ -811,6 +881,7 @@ export class TypecheckRepository {
           items: [],
           files: [],
           totalIssues: 0,
+          totalFiles: 0,
         });
       }
 
@@ -820,9 +891,10 @@ export class TypecheckRepository {
 
       // ── LSP daemon fast-path ─────────────────────────────────────────
       if (useLspDaemon) {
-        const tsgoPath = findTsgo(process.cwd());
-        const pidPath = `${process.cwd()}/.tmp/tsgo-lsp.pid`;
-        const daemon = TsgoDaemon.get(pidPath, tsgoPath, process.cwd());
+        const projectRoot = findProjectRoot();
+        const tsgoPath = findTsgo(projectRoot);
+        const pidPath = `${projectRoot}/.tmp/tsgo-lsp.pid`;
+        const daemon = TsgoDaemon.get(pidPath, tsgoPath, projectRoot);
 
         logger.debug("[TYPESCRIPT] Using LSP daemon for diagnostics");
 
@@ -1168,7 +1240,7 @@ export class TypecheckRepository {
     cachePath: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
-    t: CheckTypecheckT,
+    t: CheckVibeCheckT,
     extraIgnorePatterns?: string[],
   ): ApiResponseType<string | null> {
     if (config.pathType === PathType.NO_PATH) {
@@ -1216,7 +1288,7 @@ export class TypecheckRepository {
         TypecheckRepository.buildTypecheckCommand(
           baseCommand,
           config.buildInfoFile,
-          "tsconfig.json",
+          resolve(findProjectRoot(), "tsconfig.json"),
         ),
       );
     }
@@ -1284,16 +1356,58 @@ export class TypecheckRepository {
     cachePath: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
-    t: CheckTypecheckT,
+    t: CheckVibeCheckT,
     extraIgnorePatterns?: string[],
   ): ApiResponseType<string[] | null> {
     if (config.pathType !== PathType.NO_PATH) {
       return success(null);
     }
 
-    const projects = TypecheckRepository.discoverNestedProjects(process.cwd());
+    const allProjects =
+      TypecheckRepository.discoverNestedProjects(findProjectRoot());
+    // Filter out nested projects that match any of the active ignore patterns
+    // (e.g. "**/test-project/**" from the shared ignore list).
+    const ignoreRegexes = parseFilters(extraIgnorePatterns);
+    const projects =
+      ignoreRegexes.length === 0
+        ? allProjects
+        : allProjects.filter((p) => !ignoreRegexes.some((rx) => rx.test(p)));
+
+    // ALL discovered project dirs must be excluded from the root tsconfig —
+    // even projects filtered from independent runs must not be picked up by root.
+    const allProjectDirectories = allProjects.map((project) =>
+      dirname(project).replaceAll("\\", "/"),
+    );
+
+    // If no projects remain after filtering (e.g. only test-projects exist),
+    // still create a root tsconfig that excludes those directories, then stop.
     if (projects.length === 0) {
-      return success(null);
+      if (allProjectDirectories.length === 0) {
+        return success(null);
+      }
+      const rootTempConfig = join(cachePath, "tsconfig.workspace-root.json");
+      const rootBuildInfo = join(
+        cachePath,
+        "tsconfig.workspace-root.tsbuildinfo",
+      );
+      const createRootResult = TypecheckRepository.createTempTsConfig(
+        [],
+        rootTempConfig,
+        cachePath,
+        locale,
+        t,
+        [...allProjectDirectories, ...(extraIgnorePatterns ?? [])],
+      );
+      if (!createRootResult.success) {
+        return createRootResult;
+      }
+      return success([
+        TypecheckRepository.buildTypecheckCommand(
+          baseCommand,
+          rootBuildInfo,
+          rootTempConfig,
+        ),
+      ]);
     }
 
     const rootTempConfig = join(cachePath, "tsconfig.workspace-root.json");
@@ -1301,16 +1415,13 @@ export class TypecheckRepository {
       cachePath,
       "tsconfig.workspace-root.tsbuildinfo",
     );
-    const nestedProjectDirectories = projects.map((project) =>
-      dirname(project).replaceAll("\\", "/"),
-    );
     const createRootResult = TypecheckRepository.createTempTsConfig(
       [],
       rootTempConfig,
       cachePath,
       locale,
       t,
-      [...nestedProjectDirectories, ...(extraIgnorePatterns ?? [])],
+      [...allProjectDirectories, ...(extraIgnorePatterns ?? [])],
     );
     if (!createRootResult.success) {
       return createRootResult;
@@ -1343,7 +1454,7 @@ export class TypecheckRepository {
     command: string,
     timeout: number | undefined,
     logger: EndpointLogger,
-    t: CheckTypecheckT,
+    t: CheckVibeCheckT,
     signal?: AbortSignal,
   ): Promise<ApiResponseType<{ output: string; exitCode: number | null }>> {
     try {
@@ -1357,7 +1468,7 @@ export class TypecheckRepository {
       // Stream output instead of buffering it (see runStreaming): tsc/tsgo can
       // emit far more than any fixed maxBuffer on a large error cascade.
       const result = await TypecheckRepository.runStreaming(command, {
-        cwd: process.cwd(),
+        cwd: findProjectRoot(),
         timeoutMs: (timeout ?? 900) * 1000,
         signal,
       });
@@ -1406,7 +1517,7 @@ export class TypecheckRepository {
     startTime: number,
     logger: EndpointLogger,
     skipFiles = false,
-    t: CheckTypecheckT,
+    t: CheckVibeCheckT,
   ): ApiResponseType<TypecheckResponseOutput> {
     const duration = Date.now() - startTime;
     const parsedError = parseError(error);
@@ -1447,7 +1558,7 @@ export class TypecheckRepository {
         error.stdout,
         false, // Try both patterns
         targetPath,
-        data.disableFilter,
+        data.disableFilter ?? false,
       );
 
       for (const err of errors) {

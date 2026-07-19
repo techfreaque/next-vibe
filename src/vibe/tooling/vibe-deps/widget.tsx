@@ -1,9 +1,11 @@
 "use client";
 
-import { GitBranch, Loader2, PackageSearch } from "lucide-react";
-import { Platform } from "next-vibe/core/definition/platform";
+import { Platform } from "next-vibe/platforms/platforms";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Div } from "next-vibe/ui/ui/div";
+import { GitBranch } from "next-vibe/ui/ui/icons/GitBranch";
+import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
+import { PackageSearch } from "next-vibe/ui/ui/icons/PackageSearch";
 import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetEndpointMutations,
@@ -11,8 +13,8 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
-import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 
 import type definition from "./definition";
 

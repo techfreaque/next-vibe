@@ -12,7 +12,7 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { EmailJourneyVariant } from "next-vibe/identity/lead/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 
 import {
   type JourneysTranslationKey,

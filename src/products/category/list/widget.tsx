@@ -200,7 +200,7 @@ export function ProductCategoryListWidget(_props: {
               (c) =>
                 c.parentId !== null &&
                 c.parentId !== undefined &&
-                !parents.find((p) => p.id === c.parentId),
+                !parents.some((p) => p.id === c.parentId),
             )
             .map((c) => (
               <CategoryRow

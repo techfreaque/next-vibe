@@ -10,23 +10,22 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import { Environment } from "next-vibe/env/env-util";
 import { UserRole } from "next-vibe/identity/roles/enum";
-import { scopedTranslation } from "next-vibe/tooling/check/vibe-check/i18n";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
-  customWidgetObject,
   objectField,
   requestField,
   responseArrayOptionalField,
   responseField,
   widgetField,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
-import { envClient } from "@/env/env-client";
-
 import { VIBE_CHECK_ALIAS, VIBE_CHECK_ALIAS_SHORT } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const CheckResultWidget = lazyWidget(() =>
   import("./widget").then((m) => ({
@@ -37,7 +36,7 @@ const CheckResultWidget = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["vibe", "tooling", "check", "vibe-check"],
+  path: ["vibe", "tooling", "check"],
   title: "title",
   titleShort: "title",
   description: "description",
@@ -145,11 +144,11 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional(),
       }),
 
-      restartLsp: requestField(scopedTranslation, {
+      strict: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "fields.restartLsp.label",
-        description: "fields.restartLsp.description",
+        label: "fields.strict.label",
+        description: "fields.strict.description",
         columns: 4,
         schema: z.boolean().optional(),
       }),
@@ -317,10 +316,9 @@ const { POST } = createEndpoint({
   // === EXAMPLES ===
   examples: {
     requests: {
-      default: { restartLsp: false },
+      default: {},
       specificPaths: {
         paths: ["src/components", "src/utils"],
-        restartLsp: false,
       },
     },
     responses: {

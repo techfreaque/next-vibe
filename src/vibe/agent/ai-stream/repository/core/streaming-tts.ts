@@ -104,7 +104,7 @@ export class StreamingTTSHandler {
     user: JwtPayloadType;
     enabled: boolean;
     availability: AgentEnvAvailability;
-    streamContext: ToolExecutionContext;
+    toolExecutionContext: ToolExecutionContext;
   }) {
     this.wsEmit = params.wsEmit;
     this.logger = params.logger;
@@ -112,7 +112,10 @@ export class StreamingTTSHandler {
     this.voiceModelSelection = params.voiceModelSelection;
     this.user = params.user;
     this.availability = params.availability;
-    this.fetchImpl = createFixtureFetch(params.streamContext, params.logger);
+    this.fetchImpl = createFixtureFetch(
+      params.toolExecutionContext,
+      params.logger,
+    );
     this.isEnabled = params.enabled;
   }
 
@@ -198,7 +201,7 @@ export class StreamingTTSHandler {
     this.buffer += delta;
     this.logger.debug("[Streaming TTS] Buffer updated", {
       newBufferLength: this.buffer.length,
-      bufferPreview: this.buffer.substring(0, 100),
+      bufferPreview: this.buffer.slice(0, 100),
     });
 
     // Check if we should emit a chunk (non-blocking - generation runs in background)
@@ -281,7 +284,7 @@ export class StreamingTTSHandler {
     this.logger.debug("[Streaming TTS] Generating TTS for chunk", {
       chunkIndex: chunkIdx,
       textLength: cleanText.length,
-      textPreview: cleanText.substring(0, 100),
+      textPreview: cleanText.slice(0, 100),
     });
 
     try {
@@ -336,7 +339,7 @@ export class StreamingTTSHandler {
         }
       } else {
         this.logger.warn("[Streaming TTS] TTS conversion returned null", {
-          text: cleanText.substring(0, 100),
+          text: cleanText.slice(0, 100),
           textLength: cleanText.length,
           chunkIndex: chunkIdx,
           locale: this.locale,
@@ -447,7 +450,7 @@ export class StreamingTTSHandler {
     } catch (error) {
       this.logger.error("[Streaming TTS] TTS generation exception", {
         error: parseError(error).message,
-        stack: (error as Error)?.stack?.substring(0, 500),
+        stack: (error as Error)?.stack?.slice(0, 500),
         textLength: text.length,
       });
       return null;
@@ -569,7 +572,7 @@ export class StreamingTTSHandler {
     if (!audioResponse.ok) {
       this.logger.error("[Streaming TTS] Failed to fetch audio from URL", {
         status: audioResponse.status,
-        url: audioResourceUrl.substring(0, 100),
+        url: audioResourceUrl.slice(0, 100),
       });
       return null;
     }
@@ -648,7 +651,7 @@ export class StreamingTTSHandler {
       hasMessageId: !!this.messageId,
       messageId: this.messageId,
       bufferLength: this.buffer.length,
-      bufferPreview: this.buffer.substring(0, 100),
+      bufferPreview: this.buffer.slice(0, 100),
     });
 
     if (!this.isEnabled || !this.messageId || this.isCancelled) {
@@ -662,7 +665,7 @@ export class StreamingTTSHandler {
     const cleanBuffer = this.stripSpecialTags(this.buffer).trim();
     this.logger.debug("[Streaming TTS] flush() cleanBuffer", {
       cleanBufferLength: cleanBuffer.length,
-      cleanBufferPreview: cleanBuffer.substring(0, 100),
+      cleanBufferPreview: cleanBuffer.slice(0, 100),
     });
 
     if (cleanBuffer.length > 0) {
@@ -733,16 +736,16 @@ export class StreamingTTSHandler {
     let result = text;
 
     // Remove closed think tags
-    result = result.replace(/<think>[\s\S]*?<\/think>/gi, "");
+    result = result.replaceAll(/<think>[\s\S]*?<\/think>/gi, "");
     // Remove unclosed think tags
-    result = result.replace(/<think>[\s\S]*/gi, "");
+    result = result.replaceAll(/<think>[\s\S]*/gi, "");
     // Remove orphaned closing tags
-    result = result.replace(/<\/think>/gi, "");
+    result = result.replaceAll("</think>", "");
 
     // Remove closed Chat tags
-    result = result.replace(/<Chat>[\s\S]*?<\/Chat>/gi, "");
+    result = result.replaceAll(/<Chat>[\s\S]*?<\/Chat>/gi, "");
     // Remove unclosed Chat tags
-    result = result.replace(/<Chat>[\s\S]*/gi, "");
+    result = result.replaceAll(/<Chat>[\s\S]*/gi, "");
 
     return result;
   }
@@ -754,30 +757,30 @@ export class StreamingTTSHandler {
     let result = text;
 
     // Remove code blocks
-    result = result.replace(/```[\s\S]*?```/g, "");
+    result = result.replaceAll(/```[\s\S]*?```/g, "");
 
     // Remove inline code
-    result = result.replace(/`([^`]+)`/g, "$1");
+    result = result.replaceAll(/`([^`]+)`/g, "$1");
 
     // Remove bold/italic markers
-    result = result.replace(/(\*\*|__)(.*?)\1/g, "$2");
-    result = result.replace(/(\*|_)(.*?)\1/g, "$2");
+    result = result.replaceAll(/(\*\*|__)(.*?)\1/g, "$2");
+    result = result.replaceAll(/(\*|_)(.*?)\1/g, "$2");
 
     // Remove heading markers
-    result = result.replace(/^#{1,6}\s+/gm, "");
+    result = result.replaceAll(/^#{1,6}\s+/gm, "");
 
     // Remove blockquote markers
-    result = result.replace(/^>\s+/gm, "");
+    result = result.replaceAll(/^>\s+/gm, "");
 
     // Remove list markers
-    result = result.replace(/^[\s]*[-*+]\s+/gm, "");
-    result = result.replace(/^[\s]*\d+\.\s+/gm, "");
+    result = result.replaceAll(/^[\s]*[-*+]\s+/gm, "");
+    result = result.replaceAll(/^[\s]*\d+\.\s+/gm, "");
 
     // Remove links - keep text
-    result = result.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
+    result = result.replaceAll(/\[([^\]]+)\]\([^)]+\)/g, "$1");
 
     // Clean up extra whitespace
-    result = result.replace(/\s+/g, " ").trim();
+    result = result.replaceAll(/\s+/g, " ").trim();
 
     return result;
   }
@@ -795,7 +798,7 @@ export function createStreamingTTSHandler(params: {
   enabled: boolean;
   availability: AgentEnvAvailability;
   /** The stream's fixture chain — binds record/replay for the TTS provider calls. */
-  streamContext: ToolExecutionContext;
+  toolExecutionContext: ToolExecutionContext;
 }): StreamingTTSHandler {
   return new StreamingTTSHandler(params);
 }

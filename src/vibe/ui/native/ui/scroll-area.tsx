@@ -2,7 +2,7 @@
  * ScrollArea Component for React Native
  * Cross-platform wrapper around ScrollView with full web API compatibility
  */
-import { cn } from "next-vibe/core/utils/utils";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import * as React from "react";
 import { ScrollView } from "react-native";
 

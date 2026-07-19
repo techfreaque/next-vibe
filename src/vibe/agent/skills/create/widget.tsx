@@ -15,15 +15,15 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { AlertWidget } from "next-vibe/unified-ui/display-only/alert/widget";
-import { BooleanFieldWidget } from "next-vibe/unified-ui/form-fields/boolean-field/widget";
-import { IconFieldWidget } from "next-vibe/unified-ui/form-fields/icon-field/widget";
-import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field/widget";
-import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
-import { TextareaFieldWidget } from "next-vibe/unified-ui/form-fields/textarea-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
+import { AlertWidget } from "next-vibe/unified-ui/widgets/display-only/alert/widget";
+import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
+import { IconFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/icon-field/widget";
+import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
+import { TextareaFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/textarea-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import { type JSX, useCallback, useMemo, useState } from "react";
 
 import { scopedTranslation as skillIdTranslation } from "../[id]/i18n";

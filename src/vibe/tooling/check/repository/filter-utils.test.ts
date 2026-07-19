@@ -84,6 +84,53 @@ describe("parseFilters", () => {
     expect(patterns[0].test("foo.test.ts")).toBe(true);
     expect(patterns[1].test("foo.spec.ts")).toBe(true);
   });
+
+  it("should expand a trailing ** (e.g. **/test-project/**)", () => {
+    const patterns = parseFilters("**/test-project/**");
+    expect(patterns.length).toBe(1);
+    expect(patterns[0].test("src/vibe/check/test-project/tsconfig.json")).toBe(
+      true,
+    );
+    expect(patterns[0].test("src/vibe/check/test-project/src/errors.ts")).toBe(
+      true,
+    );
+    expect(patterns[0].test("test-project/src/errors.ts")).toBe(true);
+    expect(patterns[0].test("src/vibe/check/repository.ts")).toBe(false);
+    // A sibling directory sharing the prefix must not be swallowed
+    expect(patterns[0].test("src/test-project-other/file.ts")).toBe(false);
+  });
+
+  it("should anchor patterns to a full path, not match mid-segment", () => {
+    const patterns = parseFilters("**/fixtures/**");
+    expect(patterns[0].test("src/foo/fixtures/x.ts")).toBe(true);
+    expect(patterns[0].test("fixtures/x.ts")).toBe(true);
+    // "ai-fixtures" is a different directory and must not match
+    expect(patterns[0].test("src/generated/ai-fixtures/x.ts")).toBe(false);
+  });
+
+  it("should match Windows-style separators against globs written with /", () => {
+    const patterns = parseFilters("**/test-project/**");
+    expect(patterns[0].test(String.raw`src\vibe\check\test-project\src\a.ts`)).toBe(
+      true,
+    );
+
+    const generated = parseFilters("src/generated/**");
+    expect(generated[0].test(String.raw`src\generated\app-native\index.tsx`)).toBe(
+      true,
+    );
+    expect(generated[0].test(String.raw`src\other\index.tsx`)).toBe(false);
+
+    const tests = parseFilters("**/*.test.ts");
+    expect(tests[0].test(String.raw`src\a\b.test.ts`)).toBe(true);
+    expect(tests[0].test(String.raw`src\a\b.ts`)).toBe(false);
+  });
+
+  it("should not let * cross a path separator", () => {
+    const patterns = parseFilters("src/*.ts");
+    expect(patterns[0].test("src/a.ts")).toBe(true);
+    expect(patterns[0].test("src/a/b.ts")).toBe(false);
+    expect(patterns[0].test(String.raw`src\a\b.ts`)).toBe(false);
+  });
 });
 
 describe("matchesFilter", () => {

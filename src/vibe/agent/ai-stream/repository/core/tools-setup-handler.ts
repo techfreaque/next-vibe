@@ -48,7 +48,7 @@ export class ToolsSetupHandler {
       sequenceId: string;
       toolCall: ToolCall;
     }>;
-    streamContext: ToolExecutionContext;
+    toolExecutionContext: ToolExecutionContext;
   }): Promise<{
     tools: Record<string, CoreTool> | undefined;
     toolsConfig: Map<
@@ -146,7 +146,7 @@ export class ToolsSetupHandler {
       logger: params.logger,
       systemPrompt: params.systemPrompt,
       toolConfirmationConfig,
-      streamContext: params.streamContext,
+      toolExecutionContext: params.toolExecutionContext,
     });
 
     // Build toolsConfig from toolsMeta (which has credits + requiresConfirmation from the loaded endpoints)

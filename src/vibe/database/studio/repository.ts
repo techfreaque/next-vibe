@@ -5,6 +5,7 @@
 
 import { spawn } from "node:child_process";
 
+import { buildPackageRunnerCommand, coreEnv } from "next-vibe/core/env";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -35,15 +36,16 @@ export class StudioRepository {
       logger.info(`Starting Drizzle Studio on port ${port}...`);
 
       // Launch drizzle-kit studio
-      const studioProcess = spawn(
-        "bunx",
-        ["drizzle-kit", "studio", "--port", port.toString()],
-        {
-          stdio: "inherit",
-          env: { ...process.env },
-          shell: true,
-        },
+      const runner = buildPackageRunnerCommand(
+        coreEnv.PACKAGE_MANAGER,
+        "drizzle-kit",
+        ["studio", "--port", port.toString()],
       );
+      const studioProcess = spawn(runner.command, runner.args, {
+        stdio: "inherit",
+        env: { ...process.env },
+        shell: runner.shell,
+      });
 
       // Wait a bit to ensure the process started successfully
       await new Promise((resolve) => {

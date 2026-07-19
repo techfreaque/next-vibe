@@ -3,10 +3,10 @@
  * Centralized constants for chat system including storage keys, limits, and defaults
  */
 
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole, UserRole } from "next-vibe/identity/roles/enum";
 
-import { envClient } from "@/env/env-client";
 import {
   DEFAULT_AI_PINNED_IDS,
   DEFAULT_WEB_PINNED_IDS,

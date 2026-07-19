@@ -1,9 +1,13 @@
 "use client";
 
-import { Brain, Check, ChevronDown, Copy, ExternalLink } from "lucide-react";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
-import { cn } from "next-vibe/core/utils/utils";
+import { Brain } from "next-vibe/ui/ui/icons/Brain";
+import { Check } from "next-vibe/ui/ui/icons/Check";
+import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
+import { Copy } from "next-vibe/ui/ui/icons/Copy";
+import { ExternalLink } from "next-vibe/ui/ui/icons/ExternalLink";
 import { ExternalLink as ExternalLinkComponent } from "next-vibe/ui/ui/link";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 import React, { memo, useEffect, useMemo, useState } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
@@ -65,7 +69,7 @@ function extractThinkingSections(content: string): {
   // Extract all complete thinking sections
   while ((match = completeThinkRegex.exec(content)) !== null) {
     // Strip any nested <think> tags that leaked into the captured content
-    thinkingSections.push(match[1].replace(/<\/?think>/gi, "").trim());
+    thinkingSections.push(match[1].replaceAll(/<\/?think>/gi, "").trim());
   }
 
   // Remove all complete <think>...</think> tags from content
@@ -78,7 +82,7 @@ function extractThinkingSections(content: string): {
     // Strip any nested/repeated <think> tags from the captured content
     // (can occur when model emits <think> as literal text inside reasoning)
     incompleteThinking = incompleteThinkMatch[1]
-      .replace(/<\/?think>/gi, "")
+      .replaceAll(/<\/?think>/gi, "")
       .trim();
     // Remove the incomplete <think> tag and its content from processedContent
     processedContent = processedContent.replace(/<think>[\s\S]*$/i, "");
@@ -86,7 +90,7 @@ function extractThinkingSections(content: string): {
 
   // Strip any orphaned </think> closing tags that leaked through as text-deltas
   // (e.g. when a model emits reasoning content without a proper opening <think> tag)
-  processedContent = processedContent.replace(/<\/think>/gi, "");
+  processedContent = processedContent.replaceAll("</think>", "");
 
   processedContent = processedContent.trim();
 
@@ -109,7 +113,7 @@ function processChatTags(content: string): string {
   let processedContent = content;
 
   // Replace complete <Chat>...</Chat> tags with just their content
-  processedContent = processedContent.replace(
+  processedContent = processedContent.replaceAll(
     /<Chat>([\s\S]*?)<\/Chat>/gi,
     "$1",
   );

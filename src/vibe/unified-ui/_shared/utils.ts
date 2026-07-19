@@ -15,16 +15,16 @@ import {
   type SpacingSize,
   WidgetType,
 } from "next-vibe/core/definition/enums";
-import type { Platform } from "next-vibe/core/definition/platform";
 import type { ServerDefaultContext } from "next-vibe/core/route/server-default";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import type { UserPermissionRoleValue } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type { CustomWidgetObjectConfig } from "next-vibe/unified-ui/containers/custom/types";
-import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
-import type { NavigateButtonWidgetConfig } from "next-vibe/unified-ui/interactive/navigate-button/types";
-import type { SearchBarWidgetConfig } from "next-vibe/unified-ui/interactive/search-bar/types";
-import type { SubmitButtonWidgetConfig } from "next-vibe/unified-ui/interactive/submit-button/types";
+import type { Platform } from "next-vibe/platforms/platforms";
+import type { CustomWidgetObjectConfig } from "next-vibe/unified-ui/widgets/containers/custom/types";
+import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+import type { NavigateButtonWidgetConfig } from "next-vibe/unified-ui/widgets/interactive/navigate-button/types";
+import type { SearchBarWidgetConfig } from "next-vibe/unified-ui/widgets/interactive/search-bar/types";
+import type { SubmitButtonWidgetConfig } from "next-vibe/unified-ui/widgets/interactive/submit-button/types";
 import { z } from "zod";
 
 import type { UnifiedField } from "./configs";
@@ -1185,25 +1185,36 @@ export function generateFormSchema<F>(field: F): InferFormSchema<F> {
   return formSchema as InferFormSchema<F>;
 }
 
+// ============================================================================
+// FIELD CREATORS (literal-string labels)
+// ============================================================================
+//
+// These take their labels/descriptions as plain strings. The scoped-translation
+// counterparts — same runtime shape, but with labels constrained to a scope's
+// translation keys — live in `./utils-i18n`.
+
 /**
- * Create a widget-only field for scoped translations
+ * Distributive Omit — distributes over union members rather than collapsing the union.
+ * Required for preserving label-type constraints through Omit<FormFieldWidgetConfig, ...>.
+ * Regular Omit<UnionType, Keys> merges all union members into an intersection, losing
+ * the per-member NoInfer<TKey> constraints on label/placeholder/description/helpText.
+ *
+ * Exported for `./utils-i18n`, which builds the scoped-translation creators on it.
+ */
+export type DistributiveOmit<T, K extends PropertyKey> = T extends T
+  ? Omit<T, K>
+  : never;
+
+/**
+ * Create a widget-only field
  */
 export function widgetField<
-  TScopedTranslation extends ScopedTranslationType,
   TUsage extends FieldUsageConfig,
   const TUIConfig extends DistributiveOmit<
-    DisplayOnlyWidgetConfig<
-      NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
-      TUsage,
-      "widget"
-    >,
+    DisplayOnlyWidgetConfig<string, TUsage, "widget">,
     "schemaType" | "schema"
   >,
->(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
-  _scopedTranslation: TScopedTranslation,
-  ui: TUIConfig,
-): TUIConfig & { schemaType: "widget"; schema: never } {
+>(ui: TUIConfig): TUIConfig & { schemaType: "widget"; schema: never } {
   return {
     schemaType: "widget" as const,
     schema: undefined as never,
@@ -1212,31 +1223,13 @@ export function widgetField<
 }
 
 /**
- * Scoped translation object type for type inference
- */
-interface ScopedTranslationType<TKey extends string = string> {
-  ScopedTranslationKey: TKey;
-}
-
-/**
- * Create an array field for scoped translations
+ * Create an array field
  */
 export function arrayField<
-  TScopedTranslation extends ScopedTranslationType,
-  TChild extends AnyChildrenConstrain<
-    NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
-    ConstrainedChildUsage<TUsage>
-  >,
+  TChild extends AnyChildrenConstrain<string, ConstrainedChildUsage<TUsage>>,
   TUsage extends FieldUsageConfig,
-  const TUIConfig extends ArrayWidgetConfig<
-    NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
-    TUsage,
-    "array",
-    TChild
-  >,
+  const TUIConfig extends ArrayWidgetConfig<string, TUsage, "array", TChild>,
 >(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
-  _scopedTranslation: TScopedTranslation,
   usage: TUsage,
   ui: TUIConfig,
   child: TChild,
@@ -1254,27 +1247,19 @@ export function arrayField<
 }
 
 /**
- * Create an optional object field for scoped translations
+ * Create an optional object field
  */
 export function objectOptionalField<
-  TScopedTranslation extends ScopedTranslationType,
   TFieldUsageConfig extends FieldUsageConfig,
   TChildren extends ObjectChildrenConstraint<
-    NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
+    string,
     ConstrainedChildUsage<TFieldUsageConfig>
   >,
   const TUIConfig extends DistributiveOmit<
-    ObjectWidgetConfig<
-      NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
-      TFieldUsageConfig,
-      "object-optional",
-      TChildren
-    >,
+    ObjectWidgetConfig<string, TFieldUsageConfig, "object-optional", TChildren>,
     "schemaType"
   >,
 >(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
-  _scopedTranslation: TScopedTranslation,
   config: TUIConfig,
 ): TUIConfig & {
   schemaType: "object-optional";
@@ -1286,27 +1271,20 @@ export function objectOptionalField<
 }
 
 /**
- * Create a discriminated union object field for scoped translations
+ * Create a discriminated union object field
  */
 export function objectUnionField<
-  TScopedTranslation extends ScopedTranslationType,
   TUsage extends FieldUsageConfig,
   TDiscriminator extends string,
   const TVariants extends UnionObjectWidgetConfigConstrain<
-    NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
+    string,
     ConstrainedChildUsage<TUsage>
   >,
   const TUIConfig extends DistributiveOmit<
-    ObjectUnionWidgetConfig<
-      NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
-      TUsage,
-      TVariants
-    >,
+    ObjectUnionWidgetConfig<string, TUsage, TVariants>,
     "usage" | "discriminator" | "variants" | "schemaType"
   >,
 >(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
-  _scopedTranslation: TScopedTranslation,
   ui: TUIConfig,
   usage: TUsage,
   discriminator: TDiscriminator,
@@ -1327,17 +1305,16 @@ export function objectUnionField<
 }
 
 /**
- * Create an optional request array field for scoped translations
+ * Create an optional request array field
  */
 export function requestDataArrayOptionalField<
-  TScopedTranslation extends ScopedTranslationType,
   TChild extends ArrayChildConstraint<
-    NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
+    string,
     ConstrainedChildUsage<{ request: "data"; response?: never }>
   >,
   const TUIConfig extends DistributiveOmit<
     ArrayWidgetConfig<
-      NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
+      string,
       { request: "data"; response?: never },
       "array-optional",
       TChild
@@ -1345,8 +1322,6 @@ export function requestDataArrayOptionalField<
     "child" | "schemaType" | "usage"
   >,
 >(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
-  _scopedTranslation: TScopedTranslation,
   ui: TUIConfig,
   child: TChild,
 ): TUIConfig & {
@@ -1362,45 +1337,26 @@ export function requestDataArrayOptionalField<
   };
 }
 
-// ============================================================================
-// SCOPED FIELD FUNCTIONS (For scoped translations)
-// ============================================================================
-
 /**
- * Distributive Omit — distributes over union members rather than collapsing the union.
- * Required for preserving translation key constraints through Omit<FormFieldWidgetConfig, ...>.
- * Regular Omit<UnionType, Keys> merges all union members into an intersection, losing
- * the per-member NoInfer<TKey> constraints on label/placeholder/description/helpText.
- */
-type DistributiveOmit<T, K extends PropertyKey> = T extends T
-  ? Omit<T, K>
-  : never;
-
-/**
- * Scoped request field creator
- * Used with scoped translations for type-safe translation keys
+ * Request field creator
  * Accepts all form field widgets - type safety is enforced by individual widget configs
  */
 export function requestField<
-  TScopedTranslation extends ScopedTranslationType,
   TSchema extends z.ZodTypeAny,
   const TConfig extends DistributiveOmit<
     FormFieldWidgetConfig<
-      NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
+      string,
       TSchema,
       { request: "data"; response?: never }
     >,
     "usage" | "schemaType"
   >,
 >(
-  scopedTranslation: TScopedTranslation,
   config: TConfig,
 ): TConfig & {
   usage: { request: "data"; response?: never };
   schemaType: "primitive";
 } {
-  // scopedTranslation is only used for type inference
-  void scopedTranslation;
   return {
     ...config,
     usage: { request: "data" },
@@ -1409,16 +1365,15 @@ export function requestField<
 }
 
 /**
- * Scoped search bar field creator
+ * Search bar field creator
  * Creates a SEARCH_BAR widget field with schema validation.
  * Use size "xl" for hero/start-page search, "default" for results-page compact bar.
  */
 export function searchBarField<
-  TScopedTranslation extends ScopedTranslationType,
   TSchema extends z.ZodTypeAny,
   const TConfig extends DistributiveOmit<
     SearchBarWidgetConfig<
-      NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
+      string,
       TSchema,
       { request: "data"; response?: never },
       "primitive"
@@ -1426,14 +1381,11 @@ export function searchBarField<
     "usage" | "schemaType"
   >,
 >(
-  scopedTranslation: TScopedTranslation,
   config: TConfig,
 ): TConfig & {
   usage: { request: "data"; response?: never };
   schemaType: "primitive";
 } {
-  // scopedTranslation is only used for type inference
-  void scopedTranslation;
   return {
     ...config,
     usage: { request: "data" },
@@ -1442,16 +1394,14 @@ export function searchBarField<
 }
 
 /**
- * Scoped response field creator
- * Used with scoped translations for type-safe translation keys
+ * Response field creator
  * Accepts all widgets - type safety is enforced by individual widget configs
  */
 export function responseField<
-  TScopedTranslation extends ScopedTranslationType<string>,
   TSchema extends z.ZodTypeAny,
   const TConfig extends DistributiveOmit<
     RequestResponseWidgetConfig<
-      NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
+      string,
       TSchema,
       { request?: never; response: true },
       "primitive"
@@ -1459,14 +1409,11 @@ export function responseField<
     "usage" | "schemaType"
   >,
 >(
-  scopedTranslation: TScopedTranslation,
   config: TConfig,
 ): TConfig & {
   usage: { request?: never; response: true };
   schemaType: "primitive";
 } {
-  // scopedTranslation is only used for type inference
-  void scopedTranslation;
   return {
     ...config,
     usage: { response: true },
@@ -1475,28 +1422,20 @@ export function responseField<
 }
 
 /**
- * Scoped request+response field creator for scoped translations
+ * Request+response field creator
  */
 export function requestResponseField<
-  TScopedTranslation extends ScopedTranslationType<string>,
   TSchema extends z.ZodTypeAny,
   const TConfig extends DistributiveOmit<
-    FormFieldWidgetConfig<
-      NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
-      TSchema,
-      { request: "data" }
-    >,
+    FormFieldWidgetConfig<string, TSchema, { request: "data" }>,
     "usage" | "schemaType"
   >,
 >(
-  scopedTranslation: TScopedTranslation,
   config: TConfig,
 ): TConfig & {
   usage: { request: "data"; response: true };
   schemaType: "primitive";
 } {
-  // scopedTranslation is only used for type inference
-  void scopedTranslation;
   return {
     ...config,
     usage: { request: "data", response: true },
@@ -1505,28 +1444,24 @@ export function requestResponseField<
 }
 
 /**
- * Scoped request URL path params field creator for scoped translations
+ * Request URL path params field creator
  */
 export function requestUrlPathParamsField<
-  TScopedTranslation extends ScopedTranslationType<string>,
   TSchema extends z.ZodTypeAny,
   const TConfig extends DistributiveOmit<
     FormFieldWidgetConfig<
-      NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
+      string,
       TSchema,
       { request: "urlPathParams"; response?: never }
     >,
     "usage" | "schemaType"
   >,
 >(
-  scopedTranslation: TScopedTranslation,
   config: TConfig,
 ): TConfig & {
   usage: { request: "urlPathParams"; response?: never };
   schemaType: "primitive";
 } {
-  // scopedTranslation is only used for type inference
-  void scopedTranslation;
   return {
     ...config,
     usage: { request: "urlPathParams" },
@@ -1535,28 +1470,20 @@ export function requestUrlPathParamsField<
 }
 
 /**
- * Scoped request URL path params + response field creator for scoped translations
+ * Request URL path params + response field creator
  */
 export function requestUrlPathParamsResponseField<
-  TScopedTranslation extends ScopedTranslationType<string>,
   TSchema extends z.ZodTypeAny,
   const TConfig extends DistributiveOmit<
-    FormFieldWidgetConfig<
-      NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
-      TSchema,
-      { request: "urlPathParams" }
-    >,
+    FormFieldWidgetConfig<string, TSchema, { request: "urlPathParams" }>,
     "usage" | "schemaType"
   >,
 >(
-  scopedTranslation: TScopedTranslation,
   config: TConfig,
 ): TConfig & {
   usage: { request: "urlPathParams"; response: true };
   schemaType: "primitive";
 } {
-  // scopedTranslation is only used for type inference
-  void scopedTranslation;
   return {
     ...config,
     usage: { request: "urlPathParams", response: true },
@@ -1565,19 +1492,17 @@ export function requestUrlPathParamsResponseField<
 }
 
 /**
- * Scoped response array optional field creator (NEW FLAT API)
- * Creates optional array fields with scoped translation keys
+ * Response array optional field creator (NEW FLAT API)
  * Config includes usage and child directly
  */
 export function responseArrayOptionalField<
-  TScopedTranslation extends ScopedTranslationType<string>,
   TChild extends ArrayChildConstraint<
-    NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
+    string,
     ConstrainedChildUsage<{ request?: never; response: true }>
   >,
   const TConfig extends DistributiveOmit<
     ArrayWidgetConfig<
-      NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
+      string,
       { request?: never; response: true },
       "array-optional",
       TChild
@@ -1585,14 +1510,11 @@ export function responseArrayOptionalField<
     "schemaType" | "usage"
   >,
 >(
-  scopedTranslation: TScopedTranslation,
   config: TConfig,
 ): TConfig & {
   usage: { request?: never; response: true };
   schemaType: "array-optional";
 } {
-  // scopedTranslation is only used for type inference
-  void scopedTranslation;
   return {
     ...config,
     usage: { response: true },
@@ -1605,29 +1527,21 @@ export function responseArrayOptionalField<
 // ============================================================================
 
 /**
- * Scoped object field creator (NEW FLAT API)
- * Single config param includes usage + children. First param is scopedTranslation for type inference.
+ * Object field creator (NEW FLAT API)
+ * Single config param includes usage + children.
  */
 export function objectField<
-  TScopedTranslation extends ScopedTranslationType<string>,
   TUsage extends FieldUsageConfig,
   const TConfig extends DistributiveOmit<
     ObjectWidgetConfig<
-      NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
+      string,
       TUsage,
       "object",
-      ObjectChildrenConstraint<
-        NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
-        FieldUsageConfig
-      >
+      ObjectChildrenConstraint<string, FieldUsageConfig>
     >,
     "schemaType"
   >,
->(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
-  _scopedTranslation: TScopedTranslation,
-  config: TConfig,
-): TConfig & { schemaType: "object" } {
+>(config: TConfig): TConfig & { schemaType: "object" } {
   return {
     ...config,
     schemaType: "object" as const,
@@ -1635,17 +1549,16 @@ export function objectField<
 }
 
 /**
- * Scoped response array field (NEW FLAT API)
+ * Response array field (NEW FLAT API)
  */
 export function responseArrayField<
-  TScopedTranslation extends ScopedTranslationType<string>,
   TChild extends ArrayChildConstraint<
-    NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
+    string,
     ConstrainedChildUsage<{ request?: never; response: true }>
   >,
   const TConfig extends DistributiveOmit<
     ArrayWidgetConfig<
-      NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
+      string,
       { request?: never; response: true },
       "array",
       TChild
@@ -1653,8 +1566,6 @@ export function responseArrayField<
     "schemaType" | "usage"
   >,
 >(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
-  _scopedTranslation: TScopedTranslation,
   config: TConfig,
 ): TConfig & {
   schemaType: "array";
@@ -1668,17 +1579,16 @@ export function responseArrayField<
 }
 
 /**
- * Scoped request data array field (NEW FLAT API)
+ * Request data array field (NEW FLAT API)
  */
 export function requestDataArrayField<
-  TScopedTranslation extends ScopedTranslationType<string>,
   TChild extends ArrayChildConstraint<
-    NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
+    string,
     ConstrainedChildUsage<{ request: "data"; response?: never }>
   >,
   const TConfig extends DistributiveOmit<
     ArrayWidgetConfig<
-      NoInfer<TScopedTranslation["ScopedTranslationKey"]>,
+      string,
       { request: "data"; response?: never },
       "array",
       TChild
@@ -1686,8 +1596,6 @@ export function requestDataArrayField<
     "schemaType" | "usage"
   >,
 >(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
-  _scopedTranslation: TScopedTranslation,
   config: TConfig,
 ): TConfig & {
   schemaType: "array";
@@ -1702,6 +1610,9 @@ export function requestDataArrayField<
 
 /**
  * Custom widget field creator - wraps children with custom render component
+ *
+ * Infers its key type from the config, so it serves both literal-string callers
+ * and the scoped-translation creators in `./utils-i18n` (which re-exports it).
  */
 export function customWidgetObject<
   TKey extends string,
@@ -1733,19 +1644,16 @@ export function customWidgetObject<
 // ============================================================================
 
 /**
- * Scoped navigate button field for cross-definition navigation with scoped translations
+ * Navigate button field for cross-definition navigation
  */
 export function navigateButtonField<
-  TScopedTranslation extends ScopedTranslationType,
   TUsage extends FieldUsageConfig,
   TTargetEndpoint extends CreateApiEndpointAny,
   TGetEndpoint extends CreateApiEndpointAny | undefined = undefined,
 >(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
-  _scopedTranslation: TScopedTranslation,
   config: Omit<
     NavigateButtonWidgetConfig<
-      TScopedTranslation["ScopedTranslationKey"],
+      string,
       TUsage,
       "widget",
       TTargetEndpoint,
@@ -1754,7 +1662,7 @@ export function navigateButtonField<
     "schemaType" | "type"
   >,
 ): NavigateButtonWidgetConfig<
-  TScopedTranslation["ScopedTranslationKey"],
+  string,
   TUsage,
   "widget",
   TTargetEndpoint,
@@ -1783,17 +1691,15 @@ export function navigateButtonField<
 }
 
 /**
- * Scoped delete button for scoped translations
+ * Delete button
  */
 export function deleteButton<
-  TScopedTranslation extends ScopedTranslationType,
   TTargetEndpoint extends CreateApiEndpointAny,
   TUsage extends FieldUsageConfig,
 >(
-  _scopedTranslation: TScopedTranslation,
   config: Omit<
     NavigateButtonWidgetConfig<
-      TScopedTranslation["ScopedTranslationKey"],
+      string,
       TUsage,
       "widget",
       TTargetEndpoint,
@@ -1802,18 +1708,13 @@ export function deleteButton<
     "schemaType" | "type" | "getEndpoint" | "prefillFromGet"
   >,
 ): NavigateButtonWidgetConfig<
-  TScopedTranslation["ScopedTranslationKey"],
+  string,
   TUsage,
   "widget",
   TTargetEndpoint,
   undefined
 > {
-  return navigateButtonField<
-    TScopedTranslation,
-    TUsage,
-    TTargetEndpoint,
-    undefined
-  >(_scopedTranslation, {
+  return navigateButtonField<TUsage, TTargetEndpoint, undefined>({
     ...config,
     renderInModal: true,
     icon: config.icon ?? "trash",
@@ -1823,24 +1724,15 @@ export function deleteButton<
 }
 
 /**
- * Scoped back button for scoped translations
+ * Back button
  */
 export function backButton<
-  TScopedTranslation extends ScopedTranslationType,
   TUsage extends FieldUsageConfig,
   const TConfig extends Omit<
-    NavigateButtonWidgetConfig<
-      TScopedTranslation["ScopedTranslationKey"],
-      TUsage,
-      "widget",
-      undefined,
-      undefined
-    >,
+    NavigateButtonWidgetConfig<string, TUsage, "widget", undefined, undefined>,
     "schemaType" | "type" | "targetEndpoint" | "getEndpoint" | "prefillFromGet"
   >,
 >(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
-  _scopedTranslation: TScopedTranslation,
   config: TConfig,
 ): TConfig & {
   schemaType: "widget";
@@ -1878,38 +1770,27 @@ export function backButton<
 }
 
 /**
- * Scoped submit button for scoped translations
+ * Submit button
  */
-export function submitButton<
-  TScopedTranslation extends ScopedTranslationType,
-  TUsage extends FieldUsageConfig,
->(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
-  _scopedTranslation: TScopedTranslation,
-  config: {
-    label?: TScopedTranslation["ScopedTranslationKey"];
-    loadingText?: TScopedTranslation["ScopedTranslationKey"];
-    icon?: IconKey;
-    variant?:
-      | "default"
-      | "primary"
-      | "secondary"
-      | "destructive"
-      | "ghost"
-      | "outline"
-      | "link";
-    size?: "default" | "sm" | "lg" | "icon";
-    iconSize?: "xs" | "sm" | "base" | "lg";
-    iconSpacing?: SpacingSize;
-    usage: TUsage;
-    className?: string;
-    inline?: boolean;
-  },
-): SubmitButtonWidgetConfig<
-  TScopedTranslation["ScopedTranslationKey"],
-  TUsage,
-  "widget"
-> {
+export function submitButton<TUsage extends FieldUsageConfig>(config: {
+  label?: string;
+  loadingText?: string;
+  icon?: IconKey;
+  variant?:
+    | "default"
+    | "primary"
+    | "secondary"
+    | "destructive"
+    | "ghost"
+    | "outline"
+    | "link";
+  size?: "default" | "sm" | "lg" | "icon";
+  iconSize?: "xs" | "sm" | "base" | "lg";
+  iconSpacing?: SpacingSize;
+  usage: TUsage;
+  className?: string;
+  inline?: boolean;
+}): SubmitButtonWidgetConfig<string, TUsage, "widget"> {
   return {
     schemaType: "widget" as const,
     usage: config.usage,

@@ -28,20 +28,19 @@ import { and, eq, isNull, sql } from "drizzle-orm";
 import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
 import {
   DefaultFolderId,
-  rootlessStreamContext,
+  rootlessToolExecutionContext,
 } from "next-vibe/agent/chat/config";
 import { chatFolders } from "next-vibe/agent/chat/db";
 import { chatFavorites } from "next-vibe/agent/skills/favorites/db";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { identityEnv } from "next-vibe/identity/env";
 import {
   instanceIdentities,
   remoteConnections,
 } from "next-vibe/remote-connection/db";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
-import { env } from "@/env/env";
 
 import { runTestStream } from "../../../agent/ai-stream/testing/headless-test-runner";
 import {
@@ -112,15 +111,15 @@ if (_remoteUrl) {
     let appliedNewHermesName: string | null = null;
 
     beforeAll(async () => {
-      const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+      const resolved = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
       expect(
         resolved,
-        `Admin user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe dev`,
+        `Admin user ${identityEnv.VIBE_ADMIN_USER_EMAIL} not found — run: vibe dev`,
       ).toBeTruthy();
       if (!resolved) {
         // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
         throw new Error(
-          `RN setup failed: admin user ${env.VIBE_ADMIN_USER_EMAIL} not found — cannot continue suite (run: vibe dev)`,
+          `RN setup failed: admin user ${identityEnv.VIBE_ADMIN_USER_EMAIL} not found — cannot continue suite (run: vibe dev)`,
         );
       }
       testUser = resolved;
@@ -272,7 +271,7 @@ if (_remoteUrl) {
 
       // Call the local self-rename endpoint via the typed executor (propagate=false: local only)
       const rn1Resp = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: selfRenameDefinitions.PATCH,
         data: { newInstanceId: newName, propagate: false },
         user: testUser,
@@ -311,7 +310,7 @@ if (_remoteUrl) {
 
       // Call the local self-rename endpoint via the typed executor (propagate=true: fires PATCH to hermes)
       const rn2Resp = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: selfRenameDefinitions.PATCH,
         data: { newInstanceId: newName, propagate: true },
         user: testUser,
@@ -401,7 +400,7 @@ if (_remoteUrl) {
     // ── RN4: stream from remote/hermes folder routes to hermes after rename ───
 
     it("RN4: stream from remote/hermes subfolder routes AI to hermes — prod DB receives messages", async () => {
-      const fixtureCtx: ToolExecutionContext = rootlessStreamContext();
+      const fixtureCtx: ToolExecutionContext = rootlessToolExecutionContext();
 
       // Run a stream from the localFolderId (remote/hermes subfolder).
       // REMOTE-folder routing is deterministic — folder ancestry resolves to hermes.
@@ -411,7 +410,7 @@ if (_remoteUrl) {
         rootFolderId: DefaultFolderId.REMOTE,
         subFolderId: localFolderId,
         favoriteId,
-        streamContext: fixtureCtx,
+        toolExecutionContext: fixtureCtx,
       });
 
       expect(
@@ -467,7 +466,7 @@ if (_remoteUrl) {
       //
       // We call hermes's rename endpoint via sendTestRequest with instanceId routing.
       const rn5Resp = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: selfRenameDefinitions.PATCH,
         data: { newInstanceId: newHermesName, propagate: true },
         user: testUser,

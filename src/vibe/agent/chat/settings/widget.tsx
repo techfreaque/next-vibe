@@ -32,10 +32,8 @@ import {
 import { scopedTranslation as searchScopedTranslation } from "next-vibe/agent/web-search/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getDefaultTimezone } from "next-vibe/core/i18n/core/localization-utils";
-import { cn } from "next-vibe/core/utils/utils";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
-import { apiClient } from "next-vibe/platforms/react/hooks/store";
 import { ScheduleAutocomplete } from "next-vibe/tasks/cron/[id]/widget/schedule-autocomplete";
 import taskExecuteEndpoints from "next-vibe/tasks/execute/definition";
 import { useRouter } from "next-vibe/ui/hooks/use-navigation";
@@ -78,14 +76,16 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe/ui/ui/tooltip";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetLocale,
   useWidgetLogger,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
-import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
+import { apiClient } from "next-vibe/unified-ui/hooks/store";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
+import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import type { JSX, ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
 

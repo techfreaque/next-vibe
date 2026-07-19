@@ -3,7 +3,6 @@
  */
 
 "use client";
-import { cn } from "next-vibe/core/utils/utils";
 import { LeadStatus } from "next-vibe/identity/lead/enum";
 import { scopedTranslation as leadsScopedTranslation } from "next-vibe/identity/lead/i18n";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
@@ -15,6 +14,7 @@ import { Mail } from "next-vibe/ui/ui/icons/Mail";
 import { Plus } from "next-vibe/ui/ui/icons/Plus";
 import { Tag } from "next-vibe/ui/ui/icons/Tag";
 import { Span } from "next-vibe/ui/ui/span";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetLocale,
@@ -22,12 +22,12 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field/widget";
-import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
-import { TextareaFieldWidget } from "next-vibe/unified-ui/form-fields/textarea-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
+import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
+import { TextareaFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/textarea-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import React, { useCallback, useEffect } from "react";
 
 import type definition from "./definition";

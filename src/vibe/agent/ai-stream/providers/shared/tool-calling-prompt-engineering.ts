@@ -165,7 +165,7 @@ function tryParseToolCallsJson(
 ): ParsedToolCall[] | null {
   // First attempt: minimal cleanup
   let jsonStr = raw.trim();
-  jsonStr = jsonStr.replace(/,(\s*[}\]])/g, "$1");
+  jsonStr = jsonStr.replaceAll(/,(\s*[}\]])/g, "$1");
 
   try {
     const parsed = JSON.parse(jsonStr) as ParsedToolCall[];
@@ -178,8 +178,8 @@ function tryParseToolCallsJson(
 
   // Second attempt: aggressive cleanup
   try {
-    jsonStr = raw.trim().replace(/\s+/g, " ");
-    jsonStr = jsonStr.replace(/,(\s*[}\]])/g, "$1");
+    jsonStr = raw.trim().replaceAll(/\s+/g, " ");
+    jsonStr = jsonStr.replaceAll(/,(\s*[}\]])/g, "$1");
 
     // Fix missing closing braces
     const openBraces = (jsonStr.match(/{/g) || []).length;
@@ -196,7 +196,7 @@ function tryParseToolCallsJson(
     }
   } catch (error) {
     logger.error("Failed to parse tool calls JSON", parseError(error), {
-      rawSnippet: raw.substring(0, 200),
+      rawSnippet: raw.slice(0, 200),
     });
   }
 

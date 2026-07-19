@@ -10,7 +10,7 @@ import type {
   Countries,
   CountryLanguage,
 } from "next-vibe/core/i18n/core/config";
-import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import type { Control, FieldPath, FieldValues } from "react-hook-form";
 
 export interface EndpointFormFieldProps<

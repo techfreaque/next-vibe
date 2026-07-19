@@ -6,10 +6,9 @@ import { cwd } from "node:process";
 import { parse } from "node:url";
 
 import next from "next";
+import { coreEnv } from "next-vibe/core/env";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { env } from "@/env/env";
 
 // Server state (singleton)
 let app: ReturnType<typeof next> | undefined;
@@ -25,9 +24,7 @@ export async function startServer(logger: EndpointLogger): Promise<void> {
   }
 
   try {
-    logger.debug(
-      `Starting test server on ${env.NEXT_PUBLIC_TEST_SERVER_URL}:4000`,
-    );
+    logger.debug(`Starting test server on ${coreEnv.TEST_SERVER_URL}:4000`);
 
     app = next({
       dev: true,
@@ -52,7 +49,7 @@ export async function startServer(logger: EndpointLogger): Promise<void> {
         // If the port is in use, try again with a random port
         if (err.code === "EADDRINUSE") {
           logger.debug(
-            `Port ${env.NEXT_PUBLIC_TEST_SERVER_URL} is in use, not starting again...`,
+            `Port ${coreEnv.TEST_SERVER_URL} is in use, not starting again...`,
           );
           return;
         }
@@ -60,11 +57,9 @@ export async function startServer(logger: EndpointLogger): Promise<void> {
         // eslint-disable-next-line i18next/no-literal-string
         reject(new Error(`Failed to start server: ${err.message}`));
       });
-      const port = env.NEXT_PUBLIC_TEST_SERVER_URL.split(":")[1];
+      const port = coreEnv.TEST_SERVER_URL.split(":")[1];
       server.listen(port, () => {
-        logger.debug(
-          `> E2E test server started on ${env.NEXT_PUBLIC_TEST_SERVER_URL}`,
-        );
+        logger.debug(`> E2E test server started on ${coreEnv.TEST_SERVER_URL}`);
         resolve();
       });
     });

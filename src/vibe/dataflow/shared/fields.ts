@@ -11,11 +11,11 @@
 import { dateSchema } from "next-vibe/core/definition/common.schema";
 import { FieldDataType, WidgetType } from "next-vibe/core/definition/enums";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
-  customWidgetObject,
   requestField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { GraphResolution, GraphResolutionDB } from "../enum";

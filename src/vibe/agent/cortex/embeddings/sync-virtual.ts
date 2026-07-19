@@ -43,7 +43,7 @@ export async function syncVirtualNodeToEmbedding(
   content: string,
   /** Fixture chain of the triggering execution — binds the embedding call so
    *  it records/replays like every other AI/media call. Required explicit. */
-  streamContext: ToolExecutionContext,
+  toolExecutionContext: ToolExecutionContext,
 ): Promise<void> {
   // /ssh and /favorites are never embedded (live/volatile/sensitive).
   if (!isEmbeddableMount(path) && !isNativePath(path)) {
@@ -84,7 +84,7 @@ export async function syncVirtualNodeToEmbedding(
   }
 
   // queueEmbedding takes content directly — no need for the column.
-  queueEmbedding(row.id, path, content, { streamContext });
+  queueEmbedding(row.id, path, content, { toolExecutionContext });
 }
 
 /**
@@ -219,7 +219,7 @@ export async function removeVirtualNodesByEntityId(
 ): Promise<number> {
   const { and, eq, like } = await import("drizzle-orm");
   // Escape LIKE wildcards in the id (uuids contain none, but be safe).
-  const safeId = entityId.replace(/([%_\\])/g, "\\$1");
+  const safeId = entityId.replaceAll(/([%_\\])/g, "\\$1");
   const rows = await db
     .delete(cortexNodes)
     .where(

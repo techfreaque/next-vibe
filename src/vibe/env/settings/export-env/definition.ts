@@ -12,10 +12,8 @@ import {
 import { scopedTranslation } from "next-vibe/env/settings/export-env/i18n";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
-import {
-  customWidgetObject,
-  responseField,
-} from "next-vibe/unified-ui/_shared/utils";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
+import { responseField } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 const ExportEnvWidget = lazyWidget(() =>

@@ -12,7 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: uploadFileEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger, platform, streamContext }) =>
+    handler: ({ data, t, logger, platform, toolExecutionContext }) =>
       BrowserSharedRepository.executeUploadFile(
         {
           toolName: BrowserTool.UPLOAD_FILE,
@@ -25,7 +25,7 @@ export const { POST, tools } = endpointsHandler({
         t,
         logger,
         platform,
-        streamContext.threadId,
+        toolExecutionContext.threadId,
       ),
   },
 });

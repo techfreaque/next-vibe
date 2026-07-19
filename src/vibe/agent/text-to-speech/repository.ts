@@ -324,7 +324,7 @@ export class TextToSpeechRepository {
     logger: EndpointLogger,
     t: TextToSpeechT,
     /** Fixture chain of the calling stream — provider calls bind it. */
-    streamContext: ToolExecutionContext,
+    toolExecutionContext: ToolExecutionContext,
   ): Promise<ResponseType<TextToSpeechPostResponseOutput>> {
     // voiceId is resolved via fieldDefaults in route.ts (from favorites/skill config)
     if (!data.voiceId) {
@@ -399,7 +399,7 @@ export class TextToSpeechRepository {
 
     // One fixture-aware fetch per conversion - carries the repeat counter, so
     // it must not be recreated per call.
-    const fetchImpl = createFixtureFetch(streamContext, logger);
+    const fetchImpl = createFixtureFetch(toolExecutionContext, logger);
 
     try {
       let audioResult: ResponseType<string>;
@@ -462,7 +462,7 @@ export class TextToSpeechRepository {
       // by the caller's leadId and served only to that lead (browser).
       // Without a thread (standalone tool call) keep the data URI for
       // immediate playback.
-      const scThreadId = streamContext.threadId;
+      const scThreadId = toolExecutionContext.threadId;
       if (scThreadId && audioUrl.startsWith("data:")) {
         try {
           const commaIdx = audioUrl.indexOf(",");
@@ -473,7 +473,7 @@ export class TextToSpeechRepository {
             "base64",
           );
           const isIncognito =
-            streamContext.rootFolderId === DefaultFolderId.INCOGNITO;
+            toolExecutionContext.rootFolderId === DefaultFolderId.INCOGNITO;
           const ext =
             mimeType === "audio/mpeg"
               ? "mp3"

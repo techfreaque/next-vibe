@@ -40,7 +40,7 @@ export class CortexSearchRepository {
     logger,
     t,
     locale,
-    streamContext,
+    toolExecutionContext,
   }: {
     userId: string;
     user: JwtPrivatePayloadType;
@@ -51,7 +51,7 @@ export class CortexSearchRepository {
     t: CortexSearchT;
     locale: CountryLanguage;
     /** Fixture chain of the calling stream — the embedding call binds it. */
-    streamContext: ToolExecutionContext;
+    toolExecutionContext: ToolExecutionContext;
   }): Promise<ResponseType<CortexSearchResponseOutput>> {
     const path = normalizePath(rawPath);
 
@@ -79,7 +79,7 @@ export class CortexSearchRepository {
                 logger,
                 user,
                 locale,
-                streamContext,
+                toolExecutionContext,
               )
             : Promise.resolve([]),
           // Tasks virtual mount (not in cortexNodes)
@@ -207,7 +207,7 @@ async function runVectorSearch(
   logger: EndpointLogger,
   user: JwtPrivatePayloadType,
   locale: CountryLanguage,
-  streamContext: ToolExecutionContext,
+  toolExecutionContext: ToolExecutionContext,
 ): Promise<
   {
     path: string;
@@ -219,7 +219,7 @@ async function runVectorSearch(
 > {
   // Generate embedding for the query
   const { generateEmbedding } = await import("../embeddings/service");
-  const queryEmbedding = await generateEmbedding(query, streamContext);
+  const queryEmbedding = await generateEmbedding(query, toolExecutionContext);
 
   if (!queryEmbedding) {
     logger.info("Vector search skipped - embedding generation failed");
@@ -415,7 +415,7 @@ async function runTemplateSearch(
       const raw = tpl.content.slice(start, start + 150);
       results.push({
         path: tpl.path,
-        excerpt: raw.replace(/\s+/g, " ").trim(),
+        excerpt: raw.replaceAll(/\s+/g, " ").trim(),
         score: 0.5,
         updatedAt: now,
         source: "fts",

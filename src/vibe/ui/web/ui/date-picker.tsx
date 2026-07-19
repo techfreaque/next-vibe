@@ -5,8 +5,8 @@
 
 "use client";
 
-import { CalendarIcon } from "lucide-react";
-import { cn } from "next-vibe/core/utils/utils";
+import { CalendarIcon } from "next-vibe/ui/ui/icons/CalendarIcon";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 import { useState } from "react";
 

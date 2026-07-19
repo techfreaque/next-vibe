@@ -290,6 +290,7 @@ export const translations: typeof enTranslations = {
         "Nie zalogowano na zdalnym hoście. Uruchom: vibe login --target remote",
       remoteNoLeadId: "Nie udało się uzyskać tożsamości ze zdalnego hosta",
       remoteServerError: "Błąd zdalnego serwera",
+      remoteNotAvailable: "Ta wersja nie obsługuje zdalnego wykonywania",
     },
     endpoints: {
       endpointHandler: {

@@ -21,14 +21,14 @@ import {
 import { graphConfigSchema } from "next-vibe/dataflow/graph/schema";
 import { scopedTranslation } from "next-vibe/dataflow/graphs/[id]/data/i18n";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
-  customWidgetObject,
   objectField,
   requestField,
   requestUrlPathParamsField,
   responseArrayField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import React from "react";
 import { z } from "zod";
 

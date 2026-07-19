@@ -61,7 +61,7 @@ function persistGeneratedEnvVar(key: string, value: string): void {
         .split("=")
         .slice(1)
         .join("=")
-        .replace(/^["']|["']$/g, "");
+        .replaceAll(/^["']|["']$/g, "");
       return isPlaceholder(val);
     });
     if (placeholderIdx !== -1) {
@@ -139,6 +139,21 @@ import { envValidationLogger } from "./env-logger";
 
 /** Concrete env var value type — all env vars resolve to one of these primitives. */
 type EnvValue = string | number | boolean | undefined;
+
+/**
+ * Write validated env values back to process.env so child processes and the
+ * Next.js / Vite bundler see the final computed state. Booleans and numbers
+ * are serialized to strings; undefined values are skipped.
+ */
+function writeEnvToProcess(env: Record<string, EnvValue>): void {
+  for (const [key, value] of Object.entries(env)) {
+    if (value === undefined) {
+      delete process.env[key];
+      continue;
+    }
+    (process.env as Record<string, string>)[key] = String(value);
+  }
+}
 
 /** A record of environment variable values keyed by name. */
 export type EnvRecord = Record<string, EnvValue>;
@@ -372,6 +387,7 @@ export function defineEnv(
     }
     const examples = [...examplesMap.values()];
 
+    writeEnvToProcess(env as Record<string, EnvValue>);
     return { env, schema: mergeableSchema, fields: unionInput, examples };
   }
 
@@ -421,6 +437,7 @@ export function defineEnv(
     defaultLocale,
     hints,
   );
+  writeEnvToProcess(env as Record<string, EnvValue>);
   return { env, schema, examples };
 }
 

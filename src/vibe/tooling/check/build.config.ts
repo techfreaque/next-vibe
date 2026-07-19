@@ -4,7 +4,7 @@
  * Produces a standalone `vibe-check` binary + npm package.
  *
  * The `manifest` field tells the builder to automatically:
- *  - Generate a scoped endpoint registry (only check + config/create + help)
+ *  - Generate a scoped endpoint registry (only check + config create + help)
  *  - Inject package plugins (scoped-generated, widget-stub, native-stub, etc.)
  *  - Set VIBE_PACKAGE_NAME and VIBE_PACKAGE_DEFAULT_ENDPOINT defines
  *
@@ -14,7 +14,7 @@
 
 import { resolve } from "node:path";
 
-import { createCliWidgetPlugin } from "next-vibe/platforms/cli/cli-widget-plugin-factory";
+import { createCliWidgetPlugin } from "next-vibe/platforms/cli/runtime/cli-widget-plugin-factory";
 import type { BuildConfig } from "next-vibe/tooling/builder/definition";
 import {
   BunBuildTypeEnum,
@@ -110,8 +110,8 @@ const config: BuildConfig = {
       output: ".dist/checker/src/vibe-check/repository.ts",
     },
     {
-      input: "src/vibe/tooling/check/config/create/definition.ts",
-      output: ".dist/checker/src/config/create/definition.ts",
+      input: "src/vibe/tooling/check/config/definition.ts",
+      output: ".dist/checker/src/config/definition.ts",
     },
     {
       input: "src/vibe/tooling/check/config/types.ts",

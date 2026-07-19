@@ -1,6 +1,6 @@
 import { Link as ExpoLink } from "expo-router";
 import { styled } from "nativewind";
-import { cn } from "next-vibe/core/utils/utils";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { Children, isValidElement, type JSX, type ReactNode } from "react";
 import { Text as RNText, View } from "react-native";
 

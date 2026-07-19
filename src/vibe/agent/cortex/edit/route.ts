@@ -8,9 +8,9 @@ export const { PATCH, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.PATCH]: {
     email: undefined,
-    handler: ({ data, user, locale, logger, t, streamContext }) =>
+    handler: ({ data, user, locale, logger, t, toolExecutionContext }) =>
       CortexEditRepository.editFile({
-        streamContext: streamContext,
+        toolExecutionContext: toolExecutionContext,
         userId: user.id,
         user,
         locale,

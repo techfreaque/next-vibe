@@ -4,7 +4,6 @@ import { useProviderAvailability } from "next-vibe/agent/env-availability-contex
 import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { UserRole } from "next-vibe/identity/roles/enum";
-import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { assignUrl } from "next-vibe/ui/lib/location";
 import { Button } from "next-vibe/ui/ui/button";
 import {
@@ -48,7 +47,8 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 

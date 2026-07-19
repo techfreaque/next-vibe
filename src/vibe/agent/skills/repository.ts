@@ -14,8 +14,6 @@ import { DEFAULT_STT_MODEL_SELECTION } from "next-vibe/agent/speech-to-text/cons
 import type { SttModelSelection } from "next-vibe/agent/speech-to-text/models";
 import { DEFAULT_TTS_MODEL_SELECTION } from "next-vibe/agent/text-to-speech/constants";
 import type { VoiceModelSelection } from "next-vibe/agent/text-to-speech/models";
-import type { Platform } from "next-vibe/core/definition/platform";
-import { isAgentPlatform } from "next-vibe/core/definition/platform";
 import {
   type CountryLanguage,
   defaultLocale,
@@ -40,16 +38,18 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import type { Platform } from "next-vibe/platforms/platforms";
+import { isAgentPlatform } from "next-vibe/platforms/platforms";
 import { createEndpointEmitter } from "next-vibe/realtime/emitter";
 import type { EmitChannelDecision } from "next-vibe/realtime/structured-events";
-import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import type { z } from "zod";
 
 import { leadMagnetConfigs } from "@/lead-magnet/db";
 import { referralCodes } from "@/referral/db";
 
 import type { ToolExecutionContext } from "../chat/config";
-import { rootlessStreamContext } from "../chat/config";
+import { rootlessToolExecutionContext } from "../chat/config";
 import {
   ensureUniqueSlug,
   generateSlug,
@@ -1034,7 +1034,7 @@ export class SkillsRepository {
 
           const resolvedCreatorSlug =
             creatorUser.creatorSlug ??
-            creatorUser.publicName.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+            creatorUser.publicName.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-");
           creatorProfile = {
             // Use creatorSlug as public identifier (never expose raw UUID)
             userId: resolvedCreatorSlug,
@@ -1139,7 +1139,7 @@ export class SkillsRepository {
     t: SkillsT,
     /** Caller's stream/fixture context — threaded to the embedding sync so it
      *  records/replays under the run's fixture prefix instead of hitting live. */
-    streamContext: ToolExecutionContext,
+    toolExecutionContext: ToolExecutionContext,
     relayed = false,
     forcedSlug?: string,
   ): Promise<ResponseType<SkillCreateResponseOutput>> {
@@ -1263,7 +1263,7 @@ export class SkillsRepository {
             `/skills/${skill.id}.md`,
             embeddingContent,
             // Caller's stream/fixture context — records/replays in fixture runs.
-            streamContext,
+            toolExecutionContext,
           );
         })().catch(() => {
           // Best-effort embedding sync
@@ -1310,7 +1310,7 @@ export class SkillsRepository {
     locale: CountryLanguage,
     /** Caller's stream/fixture context — threaded to the embedding sync so it
      *  records/replays under the run's fixture prefix instead of hitting live. */
-    streamContext: ToolExecutionContext,
+    toolExecutionContext: ToolExecutionContext,
   ): Promise<ResponseType<SkillUpdateResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
@@ -1572,7 +1572,7 @@ export class SkillsRepository {
           `/skills/${updated.id}.md`,
           embeddingContent,
           // Caller's stream/fixture context — records/replays in fixture runs.
-          streamContext,
+          toolExecutionContext,
         );
       })().catch(() => {
         // Best-effort embedding sync
@@ -1830,7 +1830,7 @@ export class SkillsRepository {
       logger,
       t,
       // Relayed apply — no originating stream; thread-less root routes live.
-      rootlessStreamContext(),
+      rootlessToolExecutionContext(),
       true,
       remoteSlug,
     );

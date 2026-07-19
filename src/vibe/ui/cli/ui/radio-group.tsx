@@ -12,7 +12,7 @@ export type {
 } from "../../web/ui/radio-group";
 
 // Radio button marker - non-translatable terminal symbol
-const RADIO_MARKER = "(\u00a0)";
+const RADIO_MARKER = "(\u00A0)";
 
 // CLI: show selected value as plain text
 export function RadioGroup({

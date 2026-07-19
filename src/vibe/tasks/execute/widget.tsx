@@ -8,8 +8,6 @@
 
 import { getFullPath } from "next-vibe/core/core-utils/path";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { type UseEndpointOptions } from "next-vibe/platforms/react/hooks/endpoint-types";
-import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { endpoints as cronTaskEndpoints } from "next-vibe/tasks/cron/[id]/definition";
 import { Div } from "next-vibe/ui/ui/div";
 import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
@@ -27,10 +25,12 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
-import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
+import { type UseEndpointOptions } from "next-vibe/unified-ui/hooks/endpoint-types";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
+import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 

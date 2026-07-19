@@ -25,7 +25,7 @@ import {
   requestField,
   responseArrayField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { VIBE_FRAME_MOUNT_ALIAS } from "./constants";

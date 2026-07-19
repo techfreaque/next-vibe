@@ -16,11 +16,11 @@ import { WidgetDataSchema } from "next-vibe/core/utils/json";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { scopedTranslation } from "next-vibe/logger/error-monitor/logs/i18n";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
-  customWidgetObject,
   requestField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { ERROR_LOGS_ALIAS } from "./constants";

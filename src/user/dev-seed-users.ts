@@ -4,7 +4,7 @@
  */
 import "server-only";
 
-import { env } from "@/env/env";
+import { identityEnv } from "next-vibe/identity/env";
 
 // Defined HERE (not in users/seeds.ts) on purpose: the dev server's
 // exclude-generator-seeds Vite plugin stubs every seeds.ts module to
@@ -13,11 +13,11 @@ import { env } from "@/env/env";
 // blank user button. users/seeds.ts imports it from here instead.
 export const DEV_SEED_DEMO_USER_EMAIL = "demo@example.com";
 
-export const DEV_SEED_PASSWORD = env.VIBE_ADMIN_USER_PASSWORD;
+export const DEV_SEED_PASSWORD = identityEnv.VIBE_ADMIN_USER_PASSWORD;
 
 export const DEV_SEED_USERS = [
   {
-    email: env.VIBE_ADMIN_USER_EMAIL,
+    email: identityEnv.VIBE_ADMIN_USER_EMAIL,
     privateName: "Admin User",
     publicName: "Admin Corp",
     role: "ADMIN",

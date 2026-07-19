@@ -9,6 +9,7 @@ import "server-only";
 import { createHmac } from "node:crypto";
 
 import { eq } from "drizzle-orm";
+import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -21,7 +22,6 @@ import { db } from "next-vibe/database";
 import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { env } from "@/env/env";
 import { type Product, productsRepository } from "@/products/repository-client";
 
 import { paymentInvoices, paymentTransactions } from "../../db";
@@ -314,7 +314,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
     const callbackDomain = process.env["NOWPAYMENTS_CALLBACK_DOMAIN"];
     const webhookBase = callbackDomain
       ? callbackDomain.replace(/\/$/, "")
-      : env.NEXT_PUBLIC_APP_URL;
+      : coreEnv.NEXT_PUBLIC_APP_URL;
 
     const invoiceData = {
       price_amount: totalAmount,

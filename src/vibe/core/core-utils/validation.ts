@@ -1,17 +1,13 @@
-import type { Platform } from "next-vibe/core/definition/platform";
-import {
-  isAgentPlatform,
-  isCliPlatform,
-} from "next-vibe/core/definition/platform";
 import { type CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { scopedTranslation as sharedScopedTranslation } from "next-vibe/core/i18n/shared";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import type { Platform } from "next-vibe/platforms/platforms";
+import { isAgentPlatform, isCliPlatform } from "next-vibe/platforms/platforms";
 import type { ZodError, ZodIssue } from "zod";
 import { z } from "zod";
-
-import { scopedTranslation as sharedScopedTranslation } from "@/_pages/shared/i18n";
 
 /**
  * Validate data against a schema

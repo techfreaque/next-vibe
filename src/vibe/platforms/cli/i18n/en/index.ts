@@ -287,6 +287,7 @@ export const translations = {
         "Not logged in to remote host. Run: vibe login --target remote",
       remoteNoLeadId: "Could not obtain identity from remote host",
       remoteServerError: "Remote server error",
+      remoteNotAvailable: "Remote execution is not available in this build",
     },
     endpoints: {
       endpointHandler: {

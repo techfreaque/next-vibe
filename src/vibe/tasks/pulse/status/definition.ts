@@ -13,7 +13,10 @@ import {
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { scopedTranslation } from "next-vibe/tasks/pulse/status/i18n";
-import { objectField, responseField } from "next-vibe/unified-ui/_shared/utils";
+import {
+  objectField,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { PULSE_STATUS_ALIAS } from "./constants";

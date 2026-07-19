@@ -32,7 +32,7 @@ export interface MountWriteContext {
   logger: EndpointLogger;
   /** Fixture chain of the triggering execution — binds embedding-sync calls
    *  so they record/replay. Required explicit (undefined outside tests). */
-  streamContext: ToolExecutionContext;
+  toolExecutionContext: ToolExecutionContext;
 }
 
 export interface VirtualWriteResult {

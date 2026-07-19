@@ -84,12 +84,9 @@ import {
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 
-import type { EndpointLogger } from "@/system/unified-interface/shared/logger/endpoint";
-import {
-  CRON_SCHEDULES,
-  TASK_TIMEOUTS,
-} from "@/system/unified-interface/tasks/constants";
-import type { Task } from "@/system/unified-interface/tasks/unified-runner/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { CRON_SCHEDULES, TASK_TIMEOUTS } from "next-vibe/tasks/constants";
+import type { Task } from "next-vibe/tasks/unified-runner/types";
 
 import { taskRepository } from "./repository";
 import type { TaskResponseOutput } from "./types";
@@ -163,7 +160,7 @@ export default tasks;
 // ✅ CORRECT - Side task pattern
 import "server-only";
 
-import type { EndpointLogger } from "@/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 
 import { sideTaskRepository } from "./repository";
@@ -206,7 +203,7 @@ Follow [Repository Patterns](repository.md) with task-specific considerations:
 // ✅ CORRECT - Task repository pattern
 import "server-only";
 
-import type { EndpointLogger } from "@/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   fail,

@@ -15,14 +15,14 @@ import {
 } from "next-vibe/core/definition/enums";
 import { UserRole, UserRoleDB } from "next-vibe/identity/roles/enum";
 import type { EmitEventNamed } from "next-vibe/realtime/structured-events";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
-  customWidgetObject,
   objectField,
   requestField,
   responseArrayField,
   responseArrayOptionalField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
@@ -683,8 +683,7 @@ const { POST } = createEndpoint({
         // not the root. Was hardcoded null, so subfolder views never saw it.
         const subFolderId = requestData.subFolderId ?? null;
         const threadId = requestData.id;
-        const { apiClient } =
-          await import("next-vibe/platforms/react/hooks/store");
+        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
         if (!threadId) {
           return;
         }

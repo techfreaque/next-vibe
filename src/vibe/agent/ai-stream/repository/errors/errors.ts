@@ -34,7 +34,7 @@ import {
 } from "../core/constants";
 import { buildSseMessageRow } from "../core/db-writer/sse-row";
 import type { MessageDbWriter } from "../core/message-db-writer";
-import type { StreamContext } from "../core/stream";
+import type { ToolExecutionContextImpl } from "../core/stream";
 import { clearStreamingState } from "../core/stream";
 import { estimateTokensFromContext } from "../core/token-estimator";
 import { serializeError } from "./error-utils";
@@ -43,7 +43,7 @@ import { serializeError } from "./error-utils";
  * ErrorRouter — the one no-dbWriter error-emit path.
  *
  * Pre- and post-stream error surfaces (setup failures, outer-catch stream
- * creation failures) have no StreamContext / dbWriter yet, so they persist via
+ * creation failures) have no ToolExecutionContextImpl / dbWriter yet, so they persist via
  * MessagesRepository + emit one `message-created` ERROR directly. This collapses
  * that duplicated persist+emit into a single routine with one decision tree:
  *   - never persist for incognito threads (WS-only — client stores it),
@@ -230,7 +230,7 @@ export class StreamErrorCatchHandler {
    */
   static async handleError(params: {
     error: Error | JSONValue;
-    ctx: StreamContext;
+    ctx: ToolExecutionContextImpl;
     maxDuration: number;
     model: ChatModelId;
     threadId: string;
@@ -300,7 +300,7 @@ export class AbortErrorHandler {
    */
   static async handleAbortError(params: {
     error: Error;
-    ctx: StreamContext;
+    ctx: ToolExecutionContextImpl;
     logger: EndpointLogger;
     threadId: string;
     isIncognito: boolean;

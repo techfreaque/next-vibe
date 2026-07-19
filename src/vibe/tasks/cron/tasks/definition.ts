@@ -35,14 +35,14 @@ import {
   TaskOutputModeOptions,
 } from "next-vibe/tasks/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   backButton,
-  customWidgetObject,
   objectField,
   requestField,
   responseArrayField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { taskInputSchema, taskOwnerSchema } from "../db";
@@ -891,8 +891,7 @@ const { POST } = createEndpoint({
   options: {
     mutationOptions: {
       onSuccess: async ({ responseData, logger }) => {
-        const { apiClient } =
-          await import("next-vibe/platforms/react/hooks/store");
+        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
         const newTask = responseData.task;
         apiClient.updateEndpointData(GET, logger, (old) => {
           if (!old?.success) {

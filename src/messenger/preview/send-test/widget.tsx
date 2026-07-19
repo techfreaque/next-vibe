@@ -10,12 +10,12 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { EmailFieldWidget } from "next-vibe/unified-ui/form-fields/email-field/widget";
-import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field/widget";
-import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
+import { EmailFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/email-field/widget";
+import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import React from "react";
 
 import type definition from "./definition";

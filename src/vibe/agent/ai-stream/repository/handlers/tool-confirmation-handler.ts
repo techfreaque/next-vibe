@@ -47,7 +47,7 @@ class ToolConfirmationHandler {
     logger: EndpointLogger;
     user: JwtPayloadType;
     t: AiStreamT;
-    streamContext: ToolExecutionContext;
+    toolExecutionContext: ToolExecutionContext;
     resolvedRelayContext?: ResolvedRelayContext;
   }): Promise<
     ResponseType<{
@@ -114,7 +114,8 @@ class ToolConfirmationHandler {
       // (unwrap EXECUTE_TOOL_ALIAS, callbackMode override, { result: ... } strip,
       // wakeUp confirm-race) lives in ConfirmedExecution — this handler keeps only
       // the message-tree persistence below.
-      params.streamContext.currentToolMessageId = toolConfirmation.messageId;
+      params.toolExecutionContext.currentToolMessageId =
+        toolConfirmation.messageId;
 
       // Write + emit "executing" state before the tool runs so all devices
       // transition from "pending confirmation" to the loading spinner immediately.
@@ -168,7 +169,7 @@ class ToolConfirmationHandler {
         user,
         locale,
         logger,
-        streamContext: params.streamContext,
+        toolExecutionContext: params.toolExecutionContext,
       });
       const { toolResult, toolError, baseArgs } = confirmed;
 
@@ -581,7 +582,7 @@ export class ToolConfirmationProcessor {
     logger: EndpointLogger;
     user: JwtPayloadType;
     t: AiStreamT;
-    streamContext: ToolExecutionContext;
+    toolExecutionContext: ToolExecutionContext;
     resolvedRelayContext?: ResolvedRelayContext;
   }): Promise<
     ResponseType<
@@ -624,7 +625,7 @@ export class ToolConfirmationProcessor {
           logger,
           user,
           t,
-          streamContext: params.streamContext,
+          toolExecutionContext: params.toolExecutionContext,
           resolvedRelayContext: params.resolvedRelayContext,
         });
 

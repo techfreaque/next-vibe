@@ -65,7 +65,6 @@ import {
   videoGenModelOptions,
 } from "next-vibe/agent/video-generation/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { cn } from "next-vibe/core/utils/utils";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { Badge } from "next-vibe/ui/ui/badge";
@@ -94,7 +93,8 @@ import {
   TooltipTrigger,
 } from "next-vibe/ui/ui/tooltip";
 import { P } from "next-vibe/ui/ui/typography";
-import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -1414,9 +1414,8 @@ export function ModelSelector({
         );
       }
       return null;
-    } else {
-      return bestFilteredModel;
     }
+    return bestFilteredModel;
   }, [
     mode,
     manualModelId,
@@ -1845,26 +1844,26 @@ export function ModelSelector({
                   <Button
                     type="button"
                     variant={
-                      activeFilterChips.filter(
+                      activeFilterChips.some(
                         (c) => c.key !== "sort" && c.key !== "sort2",
-                      ).length > 0
+                      )
                         ? "secondary"
                         : "outline"
                     }
                     size="sm"
                     className={cn(
                       "h-8 gap-1.5 text-xs shrink-0",
-                      activeFilterChips.filter(
+                      activeFilterChips.some(
                         (c) => c.key !== "sort" && c.key !== "sort2",
-                      ).length > 0 &&
+                      ) &&
                         "bg-primary/10 text-primary border-primary/30 hover:bg-primary/20",
                     )}
                     disabled={readOnly}
                   >
                     <Filter className="h-3 w-3" />
-                    {activeFilterChips.filter(
+                    {activeFilterChips.some(
                       (c) => c.key !== "sort" && c.key !== "sort2",
-                    ).length > 0
+                    )
                       ? t("selector.filtersActive", {
                           count: activeFilterChips.filter(
                             (c) => c.key !== "sort" && c.key !== "sort2",

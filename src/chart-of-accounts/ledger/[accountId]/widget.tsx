@@ -11,7 +11,7 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { DateFieldWidget } from "next-vibe/unified-ui/form-fields/date-field/widget";
+import { DateFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/date-field/widget";
 import type { JSX } from "react";
 
 import { LineType } from "../../enum";

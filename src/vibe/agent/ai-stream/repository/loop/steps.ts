@@ -29,7 +29,7 @@ import { TokenAccumulator } from "./token-accumulator";
 export async function onFinishStep(
   state: StreamLoopState,
 ): Promise<{ shouldAbort: boolean }> {
-  const { ctx, streamAbortController, streamContext, logger } = state.p;
+  const { ctx, streamAbortController, toolExecutionContext, logger } = state.p;
 
   // Finalize current ASSISTANT message before resetting for next step.
   // For tool-loop steps the usage/finishReason promises may not resolve yet,
@@ -53,10 +53,10 @@ export async function onFinishStep(
   // inserts a deferred message and clears the waiting state without firing revival.
   if (
     ctx.shouldStopLoop &&
-    streamContext.waitingForRemoteResult &&
+    toolExecutionContext.waitingForRemoteResult &&
     ctx.pendingToolMessages.size === 0
   ) {
-    streamContext.waitingForRemoteResult = false;
+    toolExecutionContext.waitingForRemoteResult = false;
     logger.debug(
       "[AI Stream] endLoop + remote queue - using REMOTE_TOOL_WAIT so pulse can backfill",
     );
@@ -88,7 +88,7 @@ export async function onFinishStep(
   if (
     ctx.stepHasToolsAwaitingConfirmation &&
     ctx.pendingToolMessages.size === 0 &&
-    !streamContext.waitingForRemoteResult
+    !toolExecutionContext.waitingForRemoteResult
   ) {
     logger.debug(
       "[AI Stream] APPROVE - all tool steps complete, aborting before AI response turn",
@@ -103,10 +103,10 @@ export async function onFinishStep(
   // another API call (call 2) with the pending tool result. Deferring from tool-result
   // to here guarantees no race between the abort signal and the next HTTP request.
   if (
-    streamContext.waitingForRemoteResult &&
+    toolExecutionContext.waitingForRemoteResult &&
     ctx.pendingToolMessages.size === 0
   ) {
-    streamContext.waitingForRemoteResult = false;
+    toolExecutionContext.waitingForRemoteResult = false;
     logger.debug(
       "[AI Stream] WAIT mode - all tool steps complete, aborting before AI response turn",
     );
@@ -119,9 +119,9 @@ export async function onFinishStep(
   // Remote queue / await-task: if a tool set pendingTimeoutMs, start the timeout timer.
   // The timer fires AbortReason.STREAM_TIMEOUT so the stream dies cleanly - revival handles
   // continuation when /report delivers the result. Clears itself if stream aborts first.
-  if (streamContext.pendingTimeoutMs) {
-    const timeoutMs = streamContext.pendingTimeoutMs;
-    streamContext.pendingTimeoutMs = undefined; // consume - only fire once
+  if (toolExecutionContext.pendingTimeoutMs) {
+    const timeoutMs = toolExecutionContext.pendingTimeoutMs;
+    toolExecutionContext.pendingTimeoutMs = undefined; // consume - only fire once
     logger.debug(
       "[AI Stream] Starting stream timeout timer (remote result pending)",
       { timeoutMs },
@@ -145,9 +145,9 @@ export async function onFinishStep(
     // Expose a cancel function so the stream's finally block can cancel
     // the timer when the stream ends naturally (e.g. wakeUp mode where the
     // AI writes a response and the loop exits without hitting the timeout).
-    streamContext.cancelPendingStreamTimer = (): void => {
+    toolExecutionContext.cancelPendingStreamTimer = (): void => {
       clearTimeout(timer);
-      streamContext.cancelPendingStreamTimer = undefined;
+      toolExecutionContext.cancelPendingStreamTimer = undefined;
     };
   }
 
@@ -236,12 +236,9 @@ export async function prepareStep(
     ctx.pendingWakeUpInjections.length > 0
       ? await injectPendingWakeUpResults({
           messages: compacted,
-          payloads: ctx.pendingWakeUpInjections.splice(
-            0,
-            ctx.pendingWakeUpInjections.length,
-          ),
+          payloads: ctx.pendingWakeUpInjections.splice(0),
           ctx,
-          streamContext: state.p.streamContext,
+          toolExecutionContext: state.p.toolExecutionContext,
           threadId: state.p.threadId,
           modelConfig: state.p.modelConfig,
           user: state.p.user,

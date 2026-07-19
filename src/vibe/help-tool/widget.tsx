@@ -19,16 +19,11 @@ import favoritesListDefinition from "next-vibe/agent/skills/favorites/definition
 import { endpointToUrlSegment } from "next-vibe/core/core-utils/path";
 import type { NavigationStackEntry } from "next-vibe/core/definition/endpoint";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { Platform } from "next-vibe/core/definition/platform";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
-import { cn } from "next-vibe/core/utils/utils";
 import { EXECUTE_TOOL_ALIAS } from "next-vibe/execute-tool/constants";
 import { scopedTranslation } from "next-vibe/help-tool/i18n";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { apiClient } from "next-vibe/platforms/react/hooks/store";
-import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
-import { useUrlNavStack } from "next-vibe/platforms/react/hooks/use-url-nav-stack";
-import { resolveEndpoint } from "next-vibe/platforms/react/utils/resolve-endpoint";
+import { Platform } from "next-vibe/platforms/platforms";
 import { VibeFrameHost } from "next-vibe/platforms/vibe-frame/VibeFrameHost";
 import remoteConnectionListDefinition from "next-vibe/remote-connection/list/definition";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
@@ -100,6 +95,7 @@ import {
   TooltipTrigger,
 } from "next-vibe/ui/ui/tooltip";
 import { P } from "next-vibe/ui/ui/typography";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetDisabled,
   useWidgetEndpointMutations,
@@ -111,9 +107,13 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
-import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
-import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
+import { resolveEndpoint } from "next-vibe/unified-ui/hooks/resolve-endpoint";
+import { apiClient } from "next-vibe/unified-ui/hooks/store";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
+import { useUrlNavStack } from "next-vibe/unified-ui/hooks/use-url-nav-stack";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
+import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JSX } from "react";
 import {
   createContext,
@@ -298,8 +298,8 @@ function getSubcategory(toolName: string): string {
   return resources
     .map((s) =>
       s
-        .replace(/([A-Z])/g, " $1")
-        .replace(/[-]/g, " ")
+        .replaceAll(/([A-Z])/g, " $1")
+        .replaceAll(/[-]/g, " ")
         .trim()
         .replace(/^\w/, (c) => c.toUpperCase()),
     )

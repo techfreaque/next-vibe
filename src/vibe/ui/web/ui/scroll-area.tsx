@@ -1,7 +1,7 @@
 "use client";
 
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
-import { cn } from "next-vibe/core/utils/utils";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import * as React from "react";
 
 import type { StyleType } from "../../web/utils/style-type";

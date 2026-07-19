@@ -16,7 +16,7 @@ import {
   objectField,
   requestField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { FAVORITES_REORDER_ALIAS } from "../constants";
@@ -127,8 +127,7 @@ const { POST } = createEndpoint({
         const positionById = new Map<string, number>(
           requestData.positions.map((p) => [p.id, p.position] as const),
         );
-        const { apiClient } =
-          await import("next-vibe/platforms/react/hooks/store");
+        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
         const favoritesDefinition = await import("../definition");
         apiClient.updateEndpointData(
           favoritesDefinition.default.GET,

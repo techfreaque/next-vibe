@@ -280,13 +280,13 @@ export class MessagesRepository {
      * WRITE TIME (the row lands with its search vector). Optional so non-stream
      * callers (rare) can skip embedding; those messages simply carry no vector.
      */
-    streamContext: ToolExecutionContext | undefined;
+    toolExecutionContext: ToolExecutionContext | undefined;
   }): Promise<{
     resolvedParentId: string | null;
     /**
      * In-flight embed of the just-written user message (fired, not awaited). The
      * caller awaits it only where the vector is needed (cortex search). Resolved
-     * (no-op) for incognito / no-streamContext writes.
+     * (no-op) for incognito / no-toolExecutionContext writes.
      */
     embedPromise: Promise<void>;
   }> {
@@ -387,15 +387,15 @@ export class MessagesRepository {
     // caller holds the returned `embedPromise` and awaits it only where the
     // vector is needed (the cortex search in the system prompt), overlapping the
     // embed with all the setup work in between. Best-effort + non-fatal.
-    const streamContext = params.streamContext;
-    const embedPromise: Promise<void> = streamContext
+    const toolExecutionContext = params.toolExecutionContext;
+    const embedPromise: Promise<void> = toolExecutionContext
       ? (async (): Promise<void> => {
           try {
             const { embedMessageContent } =
               await import("next-vibe/agent/cortex/embeddings/message-embed");
             const fields = await embedMessageContent(
               { role: params.role, content: params.content, metadata: null },
-              streamContext,
+              toolExecutionContext,
             );
             if (fields) {
               await db

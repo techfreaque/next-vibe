@@ -414,7 +414,7 @@ export class UnifiedTaskRunnerRepository {
     });
 
     // Process exits after stop() completes above; this line never actually runs
-    return Promise.reject<never>(new Error("unreachable"));
+    throw new Error("unreachable");
   }
 
   private static async stop(

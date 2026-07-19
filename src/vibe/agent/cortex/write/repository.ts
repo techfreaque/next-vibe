@@ -51,7 +51,7 @@ export class CortexWriteRepository {
     logger,
     t,
     relayed = false,
-    streamContext,
+    toolExecutionContext,
   }: {
     userId: string;
     user: JwtPrivatePayloadType;
@@ -62,7 +62,7 @@ export class CortexWriteRepository {
     logger: EndpointLogger;
     t: CortexWriteT;
     /** Fixture chain of the calling execution — the embedding call binds it. */
-    streamContext: ToolExecutionContext;
+    toolExecutionContext: ToolExecutionContext;
     /**
      * True when invoked from a cross-instance applier (the write was already
      * performed on the origin and relayed here). Suppresses the `node-written`
@@ -101,7 +101,7 @@ export class CortexWriteRepository {
       try {
         const { resolveVirtualWrite } = await import("../mounts/resolver");
         const result = await resolveVirtualWrite(
-          { userId, user, locale, logger, streamContext },
+          { userId, user, locale, logger, toolExecutionContext },
           path,
           content,
           mountPrefix,
@@ -200,7 +200,7 @@ export class CortexWriteRepository {
           locale,
           logger,
           feature: CortexCreditFeature.WRITE,
-          streamContext,
+          toolExecutionContext,
         });
       }
 
@@ -259,7 +259,7 @@ export class CortexWriteRepository {
       // Relayed applier — no fixture chain crosses instances; an explicit
       // thread-less context routes embeddings live.
       // no user context — UTC (dates not user-facing here)
-      streamContext: makeHeadlessContext(undefined, undefined, "UTC"),
+      toolExecutionContext: makeHeadlessContext(undefined, undefined, "UTC"),
     });
     if (!result.success) {
       logger.error("Failed to apply remote cortex write", {

@@ -3,8 +3,8 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import signupEndpoints from "./definition";
 
 const endpoint = signupEndpoints.POST;
@@ -27,7 +27,7 @@ describe("POST /user/public/signup", () => {
 
   it("creates a new account successfully and returns a message", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint,
       data: {
         privateName: "Test User",
@@ -54,7 +54,7 @@ describe("POST /user/public/signup", () => {
     const email = uniqueEmail();
 
     const first = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint,
       data: {
         privateName: "First User",
@@ -74,7 +74,7 @@ describe("POST /user/public/signup", () => {
     ).toBe(true);
 
     const second = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint,
       data: {
         privateName: "Duplicate User",
@@ -98,7 +98,7 @@ describe("POST /user/public/signup", () => {
 
   it("rejects weak password (too short) with VALIDATION_ERROR", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint,
       data: {
         privateName: "Test User",
@@ -121,7 +121,7 @@ describe("POST /user/public/signup", () => {
 
   it("rejects password without uppercase with VALIDATION_ERROR", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint,
       data: {
         privateName: "Test User",
@@ -144,7 +144,7 @@ describe("POST /user/public/signup", () => {
 
   it("rejects invalid email format with VALIDATION_ERROR", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint,
       data: {
         privateName: "Test User",
@@ -167,7 +167,7 @@ describe("POST /user/public/signup", () => {
 
   it("rejects if acceptTerms is false with VALIDATION_ERROR", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint,
       data: {
         privateName: "Test User",
@@ -190,7 +190,7 @@ describe("POST /user/public/signup", () => {
 
   it("rejects privateName shorter than 2 chars with VALIDATION_ERROR", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint,
       data: {
         privateName: "A",
@@ -216,7 +216,7 @@ describe("POST /user/public/signup", () => {
     const upperEmail = base.toUpperCase();
 
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint,
       data: {
         privateName: "Case Test",

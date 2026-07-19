@@ -87,11 +87,11 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { AlertWidget } from "next-vibe/unified-ui/display-only/alert/widget";
-import { IconFieldWidget } from "next-vibe/unified-ui/form-fields/icon-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
+import { AlertWidget } from "next-vibe/unified-ui/widgets/display-only/alert/widget";
+import { IconFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/icon-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import { useMemo, useState } from "react";
 
 import { useChatSettings } from "../../../chat/settings/hooks";

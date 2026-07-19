@@ -71,7 +71,7 @@ export interface DbWriterState {
    */
   assistantEmbedPromise: Promise<void> | null;
   /** Stream context (its threadId) — binds the write-time embed to the fixture chain. */
-  readonly streamContext: ToolExecutionContext;
+  readonly toolExecutionContext: ToolExecutionContext;
 }
 
 /**

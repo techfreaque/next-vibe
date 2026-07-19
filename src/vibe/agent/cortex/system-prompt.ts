@@ -335,8 +335,8 @@ ${treeStr}
 export function cleanExcerpt(text: string): string {
   return stripFrontmatter(text)
     .replace(/^#+\s+[^\n]*\n?/, "") // strip leading heading
-    .replace(/\n+/g, " · ")
-    .replace(/\s+/g, " ")
+    .replaceAll(/\n+/g, " · ")
+    .replaceAll(/\s+/g, " ")
     .trim();
 }
 
@@ -823,7 +823,10 @@ async function buildTrimmedDocTree(
   const { sql } = await import("drizzle-orm");
 
   // Escape documentsPath for regex (e.g. /documents → \/documents)
-  const escapedDocsPath = documentsPath.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const escapedDocsPath = documentsPath.replaceAll(
+    /[.*+?^${}()|[\]\\]/g,
+    "\\$&",
+  );
 
   // Single query: get top-level dirs + their file counts + recent files via window function
   const rows = await db.execute<{

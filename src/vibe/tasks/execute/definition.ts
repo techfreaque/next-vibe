@@ -14,13 +14,13 @@ import {
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { scopedTranslation } from "next-vibe/tasks/execute/i18n";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   backButton,
-  customWidgetObject,
   requestResponseField,
   responseField,
   submitButton,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { CronTaskStatus } from "../enum";

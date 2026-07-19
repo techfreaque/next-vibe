@@ -91,7 +91,7 @@ export async function installRedis(
     const values = buildRedisSentinelValues();
     const helmInstall = `
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
-echo '${values.replace(/'/g, "'\\''")}' > /tmp/redis-values.yaml
+echo '${values.replaceAll("'", "'\\''")}' > /tmp/redis-values.yaml
 helm upgrade --install redis bitnami/redis \
   --namespace next-vibe \
   --create-namespace \

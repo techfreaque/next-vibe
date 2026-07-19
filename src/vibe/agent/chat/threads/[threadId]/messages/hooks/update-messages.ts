@@ -14,7 +14,7 @@ import { DefaultFolderId } from "next-vibe/agent/chat/config";
 import type { ChatMessage } from "next-vibe/agent/chat/db";
 import { success } from "next-vibe/core/route/response.schema";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { apiClient } from "next-vibe/platforms/react/hooks/store";
+import { apiClient } from "next-vibe/unified-ui/hooks/store";
 
 import { ChatMessageRole, ThreadStreamingState } from "../../../../enum";
 import messagesDefinition from "../definition";

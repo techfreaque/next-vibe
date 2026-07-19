@@ -23,7 +23,7 @@ import {
   requestUrlPathParamsField,
   responseArrayOptionalField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { DefaultFolderId, rootFolderIdOptions } from "../../config";
@@ -520,8 +520,7 @@ const { PATCH } = createEndpoint({
         const threadId = urlPathParams.threadId;
 
         const rootFolderId = requestData.rootFolderId;
-        const { apiClient } =
-          await import("next-vibe/platforms/react/hooks/store");
+        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
         apiClient.updateEndpointData(
           (await import("../definition")).default.GET,
           logger,
@@ -725,8 +724,7 @@ const { DELETE } = createEndpoint({
         const threadId = urlPathParams.threadId;
 
         const rootFolderId = responseData.rootFolderId;
-        const { apiClient } =
-          await import("next-vibe/platforms/react/hooks/store");
+        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
         apiClient.updateEndpointData(
           (await import("../definition")).default.GET,
           logger,

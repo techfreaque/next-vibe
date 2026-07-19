@@ -1,3 +1,4 @@
+import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
@@ -9,7 +10,6 @@ import { redirect } from "next-vibe/ui/lib/redirect";
 import type { CreditsGetResponseOutput } from "@/credits/definition";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
-import { env } from "@/env/env";
 
 export interface SubscriptionPageData {
   locale: CountryLanguage;
@@ -48,7 +48,7 @@ export async function subscriptionLoader({
     notFound();
   }
 
-  if (env.NEXT_PUBLIC_LOCAL_MODE && !isAuthenticated) {
+  if (coreEnv.NEXT_PUBLIC_LOCAL_MODE && !isAuthenticated) {
     redirect(`/${locale}/user/login`);
   }
 

@@ -90,7 +90,7 @@ export function toolInstrWithArgs(
  * instead of its actual final verdict.
  */
 export function stripReasoning(content: string): string {
-  let c = content.replace(/<think>[\s\S]*?<\/think>/g, "");
+  let c = content.replaceAll(/<think>[\s\S]*?<\/think>/g, "");
   // An unclosed <think> means everything after it is unfinished reasoning —
   // drop it so a marker the model was still contemplating never counts.
   const openIdx = c.indexOf("<think>");

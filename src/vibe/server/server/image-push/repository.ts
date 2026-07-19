@@ -20,12 +20,11 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { env } from "@/env/env";
-
 import type {
   ImagePushRequestOutput,
   ImagePushResponseOutput,
 } from "./definition";
+import { imagePushEnv } from "./env";
 import type { ImagePushT } from "./i18n";
 
 export class ImagePushRepository {
@@ -35,8 +34,8 @@ export class ImagePushRepository {
     t: ImagePushT,
   ): Promise<ResponseType<ImagePushResponseOutput>> {
     const startTime = Date.now();
-    const image = data.image ?? env.DOCKER_IMAGE_NAME;
-    const sshTarget = data.sshTarget ?? env.SSH_SERVER;
+    const image = data.image ?? imagePushEnv.DOCKER_IMAGE_NAME;
+    const sshTarget = data.sshTarget ?? imagePushEnv.SSH_SERVER;
 
     const shaResult = ImagePushRepository.resolveTag(data.tag, logger, t);
     if (!shaResult.success) {
@@ -156,11 +155,11 @@ export class ImagePushRepository {
       }),
     );
 
-    if (env.SSH_SERVER_PWD) {
+    if (imagePushEnv.SSH_SERVER_PWD) {
       return ImagePushRepository.transferViaSshPassword(
         refs,
         sshTarget,
-        env.SSH_SERVER_PWD,
+        imagePushEnv.SSH_SERVER_PWD,
         logger,
         t,
       );

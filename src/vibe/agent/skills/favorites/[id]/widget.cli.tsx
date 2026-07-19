@@ -10,7 +10,7 @@
 
 import chalk from "chalk";
 import { Box, Text } from "ink";
-import { Platform } from "next-vibe/core/definition/platform";
+import { Platform } from "next-vibe/platforms/platforms";
 import { useWidgetPlatform } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useMemo } from "react";
@@ -86,7 +86,7 @@ function renderGetMcp(value: FavoriteGetResponseOutput): string {
   return lines.join("\n");
 }
 
-export function FavoriteGetCliWidget({
+export function FavoriteViewContainer({
   field,
 }: GetCliWidgetProps): JSX.Element {
   const platform = useWidgetPlatform();
@@ -111,7 +111,7 @@ export function FavoriteGetCliWidget({
   );
 }
 
-FavoriteGetCliWidget.cliWidget = true as const;
+FavoriteViewContainer.cliWidget = true as const;
 
 // ── PATCH Widget ──────────────────────────────────────────────────────────────
 
@@ -132,7 +132,7 @@ function renderPatchMcp(_value: FavoriteUpdateResponseOutput): string {
   return "Favorite updated successfully.";
 }
 
-export function FavoriteEditCliWidget({
+export function FavoriteEditContainer({
   field,
 }: PatchCliWidgetProps): JSX.Element {
   const platform = useWidgetPlatform();
@@ -157,8 +157,4 @@ export function FavoriteEditCliWidget({
   );
 }
 
-FavoriteEditCliWidget.cliWidget = true as const;
-
-// Aliases for lazy widget factory
-export { FavoriteGetCliWidget as FavoriteViewContainer };
-export { FavoriteEditCliWidget as FavoriteEditContainer };
+FavoriteEditContainer.cliWidget = true as const;

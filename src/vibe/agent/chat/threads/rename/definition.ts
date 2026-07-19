@@ -12,16 +12,16 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
-import { Platform } from "next-vibe/core/definition/platform";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { Platform } from "next-vibe/platforms/platforms";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   backButton,
-  customWidgetObject,
   requestField,
   responseField,
   submitButton,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { THREAD_RENAME_ALIAS } from "./constants";
@@ -62,7 +62,7 @@ const { PATCH } = createEndpoint({
     children: {
       // === REQUEST FIELDS ===
       // threadId is provided by CLI/MCP/web callers.
-      // For the AI platform it is hidden and auto-filled from streamContext.
+      // For the AI platform it is hidden and auto-filled from toolExecutionContext.
       threadId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
@@ -73,7 +73,7 @@ const { PATCH } = createEndpoint({
         columns: 12,
         schema: z.uuid().optional(),
         hiddenForPlatforms: [Platform.AI],
-        serverDefault: (ctx) => ctx.streamContext.threadId,
+        serverDefault: (ctx) => ctx.toolExecutionContext.threadId,
       }),
 
       title: requestField(scopedTranslation, {

@@ -17,10 +17,9 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { identityEnv } from "next-vibe/identity/env";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { env } from "@/env/env";
 
 import { sshConnections } from "../../db";
 import { SshAuthType } from "../../enum";
@@ -32,7 +31,7 @@ import type { ConnectionsCreateT } from "./i18n";
 
 export class ConnectionCreateRepository {
   private static getSecretKey(): Buffer | null {
-    const raw = env.JWT_SECRET_KEY;
+    const raw = identityEnv.JWT_SECRET_KEY;
     if (!raw || raw.length < 64) {
       return null;
     }

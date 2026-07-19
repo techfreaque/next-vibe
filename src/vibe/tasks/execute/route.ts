@@ -12,14 +12,14 @@ import { TaskExecuteRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: taskExecuteEndpoints,
   [Methods.POST]: {
-    handler: ({ data, user, locale, logger, t, streamContext }) =>
+    handler: ({ data, user, locale, logger, t, toolExecutionContext }) =>
       TaskExecuteRepository.executeTask(
         data,
         user,
         locale,
         logger,
         t,
-        streamContext.abortSignal,
+        toolExecutionContext.abortSignal,
       ),
   },
 });

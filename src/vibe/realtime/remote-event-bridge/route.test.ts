@@ -22,11 +22,11 @@ import {
   resolveRemoteUrlSync,
 } from "next-vibe/agent/ai-stream/testing/remote-setup";
 import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
-import { rootlessStreamContext } from "next-vibe/agent/chat/config";
+import { rootlessToolExecutionContext } from "next-vibe/agent/chat/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import type {
@@ -46,7 +46,7 @@ async function routeBridgeToHermes(
   testUser: JwtPrivatePayloadType,
   eventName: string,
   payload: RemoteEventBridgeRequestOutput["payload"],
-  streamContext: ToolExecutionContext,
+  toolExecutionContext: ToolExecutionContext,
 ): Promise<ResponseType<RemoteEventBridgeResponseOutput>> {
   const { RouteExecuteRepository } =
     await import("next-vibe/execute-tool/repository");
@@ -61,7 +61,7 @@ async function routeBridgeToHermes(
     user: testUser,
     locale: defaultLocale,
     logger: createEndpointLogger(false, defaultLocale),
-    streamContext,
+    toolExecutionContext,
     input: {
       eventName,
       payload,
@@ -89,11 +89,11 @@ describe("Remote Event Bridge", () => {
     // dispatches it to the target route's onRemoteEvent and returns success.
 
     it("REB-LOCAL-REMOTE-EVENT: local remote-event returns success", async () => {
-      const fixtureCtx: ToolExecutionContext = rootlessStreamContext();
+      const fixtureCtx: ToolExecutionContext = rootlessToolExecutionContext();
 
       const result = await sendTestRequest({
         endpoint: endpoints.POST,
-        streamContext: fixtureCtx,
+        toolExecutionContext: fixtureCtx,
         data: {
           eventName: "remote-event",
           payload: {
@@ -123,11 +123,11 @@ describe("Remote Event Bridge", () => {
     // Unknown eventName must still succeed (graceful ignore).
 
     it("REB-LOCAL-UNKNOWN: unknown eventName is ignored gracefully", async () => {
-      const fixtureCtx: ToolExecutionContext = rootlessStreamContext();
+      const fixtureCtx: ToolExecutionContext = rootlessToolExecutionContext();
 
       const result = await sendTestRequest({
         endpoint: endpoints.POST,
-        streamContext: fixtureCtx,
+        toolExecutionContext: fixtureCtx,
         data: {
           eventName: "totally-unknown-event",
           payload: {},
@@ -145,7 +145,7 @@ describe("Remote Event Bridge", () => {
     // Echo prevention: self-originating events silently dropped, still returns success.
 
     it("REB-LOCAL-ECHO-DROP: self-origin remote-event is silently dropped", async () => {
-      const fixtureCtx: ToolExecutionContext = rootlessStreamContext();
+      const fixtureCtx: ToolExecutionContext = rootlessToolExecutionContext();
 
       const { RemoteConnectionRepository } =
         await import("next-vibe/remote-connection/repository");
@@ -154,7 +154,7 @@ describe("Remote Event Bridge", () => {
 
       const result = await sendTestRequest({
         endpoint: endpoints.POST,
-        streamContext: fixtureCtx,
+        toolExecutionContext: fixtureCtx,
         data: {
           eventName: "remote-event",
           payload: {
@@ -237,7 +237,7 @@ describe("Remote Event Bridge", () => {
 
       it("REB-DIRECT-REMOTE-EVENT: remote-event routed to hermes via direct-http returns received: true", async () => {
         requireDirectHttp();
-        const fixtureCtx: ToolExecutionContext = rootlessStreamContext();
+        const fixtureCtx: ToolExecutionContext = rootlessToolExecutionContext();
 
         const result = await routeBridgeToHermes(
           testUser,
@@ -316,7 +316,7 @@ describe("Remote Event Bridge", () => {
 
       it("REB-WS-REMOTE-EVENT: remote-event routed to hermes via reverse-WS returns received: true", async () => {
         requireReverseWs();
-        const fixtureCtx: ToolExecutionContext = rootlessStreamContext();
+        const fixtureCtx: ToolExecutionContext = rootlessToolExecutionContext();
 
         const result = await routeBridgeToHermes(
           testUser,
@@ -348,7 +348,7 @@ describe("Remote Event Bridge", () => {
 
       it("REB-WS-UNKNOWN-EVENT: unknown eventName routed to hermes via reverse-WS returns received: true", async () => {
         requireReverseWs();
-        const fixtureCtx: ToolExecutionContext = rootlessStreamContext();
+        const fixtureCtx: ToolExecutionContext = rootlessToolExecutionContext();
 
         const result = await routeBridgeToHermes(
           testUser,

@@ -105,7 +105,7 @@ export class ImageGenerationRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: ImageGenerationT,
-    streamContext: ToolExecutionContext,
+    toolExecutionContext: ToolExecutionContext,
   ): Promise<ResponseType<ImageGenerationPostResponseOutput>> {
     // model is resolved via fieldDefaults in route.ts (from favorites/skill config)
     if (!data.model) {
@@ -133,7 +133,7 @@ export class ImageGenerationRepository {
         locale,
         logger,
         t,
-        streamContext,
+        toolExecutionContext,
       );
     }
 
@@ -226,7 +226,7 @@ export class ImageGenerationRepository {
 
     // One fixture-aware fetch per generation - carries the repeat counter for
     // poll loops, so it must not be recreated per call.
-    const fetchImpl = createFixtureFetch(streamContext, logger);
+    const fetchImpl = createFixtureFetch(toolExecutionContext, logger);
 
     let generationResult: ResponseType<{
       imageUrl: string;
@@ -303,10 +303,10 @@ export class ImageGenerationRepository {
           featureLabel: t("post.title"),
           // The media-gen context is a narrowed shape — rebuild a headless
           // context carrying its abort wiring + fixture chain for dispatch.
-          streamContext: makeHeadlessContext(
-            streamContext.abortSignal,
-            streamContext.threadId,
-            streamContext.timezone,
+          toolExecutionContext: makeHeadlessContext(
+            toolExecutionContext.abortSignal,
+            toolExecutionContext.threadId,
+            toolExecutionContext.timezone,
           ),
         });
         break;
@@ -337,9 +337,9 @@ export class ImageGenerationRepository {
     // server-side thread row — the file is owned by the caller's leadId and
     // served only to that lead (browser); inlining as a base64 data URI is
     // forbidden (it blows up the model context on subsequent turns).
-    const scThreadId = streamContext.threadId;
+    const scThreadId = toolExecutionContext.threadId;
     const isIncognito =
-      streamContext.rootFolderId === DefaultFolderId.INCOGNITO;
+      toolExecutionContext.rootFolderId === DefaultFolderId.INCOGNITO;
     if (scThreadId) {
       try {
         const imgRes = await fetchImpl(imageUrl);
@@ -397,13 +397,13 @@ export class ImageGenerationRepository {
       creditCost: finalCreditCost,
     });
 
-    const toolMessageId = streamContext.currentToolMessageId;
+    const toolMessageId = toolExecutionContext.currentToolMessageId;
     if (toolMessageId && !user.isPublic) {
       const month = new Date().toISOString().slice(0, 7);
       const slug = `${data.prompt
         .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "")
+        .replaceAll(/[^a-z0-9]+/g, "-")
+        .replaceAll(/^-|-$/g, "")
         .slice(0, 60)}-${toolMessageId}`;
       void Promise.all([
         import("next-vibe/agent/cortex/mounts/gens"),
@@ -419,7 +419,7 @@ export class ImageGenerationRepository {
                   user.id,
                   path,
                   result.content,
-                  streamContext,
+                  toolExecutionContext,
                 ),
             )
             .catch(() => undefined);
@@ -445,7 +445,7 @@ export class ImageGenerationRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: ImageGenerationT,
-    streamContext: ToolExecutionContext,
+    toolExecutionContext: ToolExecutionContext,
   ): Promise<ResponseType<ImageGenerationPostResponseOutput>> {
     logger.debug("[ImageGen] Using headless AI runner for token-based model", {
       model: data.model,
@@ -454,7 +454,7 @@ export class ImageGenerationRepository {
 
     const { t: aiStreamT } = aiStreamScopedTranslation.scopedT(locale);
 
-    const sizeHint = data.size ? ` Output size: ${data.size}.` : "";
+    const sizeHint = data.size > 0 ? ` Output size: ${data.size}.` : "";
     const qualityHint = data.quality ? ` Quality: ${data.quality}.` : "";
     const refHint = data.inputMediaUrl
       ? ` Use this image as reference: ${data.inputMediaUrl}`
@@ -503,15 +503,15 @@ export class ImageGenerationRepository {
       request: undefined,
       t: aiStreamT,
       awaitResult: true,
-      subAgentDepth: streamContext.subAgentDepth,
+      subAgentDepth: toolExecutionContext.subAgentDepth,
       extraInstructions:
         "You are an image generator. Output exactly one image based on the user's prompt. Do not output any text - only the image.",
       maxToolCalls: 1,
-      parentAbortSignal: streamContext.abortSignal,
+      parentAbortSignal: toolExecutionContext.abortSignal,
       // Link the sub-stream to the caller thread: provenance + the fixture
       // engine walks child → parent → root to record/replay in the run's folder
       // instead of going live under this fresh incognito id.
-      parentThreadId: streamContext.threadId,
+      parentThreadId: toolExecutionContext.threadId,
     });
 
     if (!result.success) {
@@ -534,9 +534,9 @@ export class ImageGenerationRepository {
     // Re-upload from ephemeral storage to the real thread's storage so the
     // file-serving route can find it. Incognito threads have no server-side
     // thread row — the file is owned by the caller's leadId instead.
-    const scThreadId = streamContext.threadId;
+    const scThreadId = toolExecutionContext.threadId;
     const isIncognito =
-      streamContext.rootFolderId === DefaultFolderId.INCOGNITO;
+      toolExecutionContext.rootFolderId === DefaultFolderId.INCOGNITO;
     if (scThreadId) {
       try {
         const storage = getStorageAdapter();
@@ -555,7 +555,7 @@ export class ImageGenerationRepository {
         }
         if (!imageBuffer) {
           // Fallback to HTTP fetch for external URLs
-          const fetchImpl = createFixtureFetch(streamContext, logger);
+          const fetchImpl = createFixtureFetch(toolExecutionContext, logger);
           const arrayBuf = await fetchImpl(imageUrl).then((r) =>
             r.arrayBuffer(),
           );
@@ -591,7 +591,7 @@ export class ImageGenerationRepository {
 
   static async getRequestDefaults(ctx: {
     user: JwtPayloadType;
-    streamContext: ToolExecutionContext;
+    toolExecutionContext: ToolExecutionContext;
   }): Promise<Partial<ImageGenerationPostRequestInput>> {
     const { getInstanceAvailability } = await import("../env-availability");
     const availability = await getInstanceAvailability();
@@ -606,13 +606,14 @@ export class ImageGenerationRepository {
       const { ModalityResolver } =
         await import("next-vibe/agent/ai-stream/repository/core/modality-resolver");
       const { favorite, skill } = await resolveSkillFavoriteContext({
-        favoriteId: ctx.streamContext.favoriteId ?? null,
-        skillId: ctx.streamContext.skillId ?? null,
+        favoriteId: ctx.toolExecutionContext.favoriteId ?? null,
+        skillId: ctx.toolExecutionContext.skillId ?? null,
         userId,
       });
       sel = ModalityResolver.resolveImageGenSelection({ favorite, skill });
     }
-    sel ??= ctx.streamContext.resolvedMediaSelections?.imageGenModelSelection;
+    sel ??=
+      ctx.toolExecutionContext.resolvedMediaSelections?.imageGenModelSelection;
     const model = filterImageGenModels(sel, ctx.user, availability)[0]?.id;
     if (!model) {
       return {};

@@ -83,7 +83,7 @@ async function renderSkillVariant(
   if (variant) {
     fm.push(`variantId: "${variant.id}"`);
     if (variant.displayName) {
-      fm.push(`variantName: "${variant.displayName.replace(/"/g, '\\"')}"`);
+      fm.push(`variantName: "${variant.displayName.replaceAll('"', '\\"')}"`);
     }
     if (variant.isDefault) {
       fm.push(`isDefault: true`);
@@ -101,7 +101,7 @@ async function renderSkillVariant(
   }
 
   if (skill.name) {
-    fm.push(`name: "${skill.name.replace(/"/g, '\\"')}"`);
+    fm.push(`name: "${skill.name.replaceAll('"', '\\"')}"`);
   }
   if (skill.ownershipType) {
     fm.push(
@@ -426,7 +426,7 @@ export async function writeSkillPath(
       ctx.userId,
       path,
       content,
-      ctx.streamContext,
+      ctx.toolExecutionContext,
     );
   })().catch(() => {
     // Best-effort embedding sync
@@ -567,7 +567,7 @@ export async function moveSkillPath(
         ctx.userId,
         toPath,
         readResult.content,
-        ctx.streamContext,
+        ctx.toolExecutionContext,
       );
     }
   })().catch(() => {

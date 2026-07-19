@@ -13,12 +13,12 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { DateFieldWidget } from "next-vibe/unified-ui/form-fields/date-field/widget";
-import { EntityPickerFieldWidget } from "next-vibe/unified-ui/form-fields/entity-picker-field/widget";
-import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
-import { TextareaFieldWidget } from "next-vibe/unified-ui/form-fields/textarea-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
-import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
+import { DateFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/date-field/widget";
+import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
+import { TextareaFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/textarea-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import { type JSX } from "react";
 
 import type definition from "./definition";

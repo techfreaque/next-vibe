@@ -30,11 +30,10 @@ Definition files (`definition.ts`) are the single source of truth that automatic
 
 All field functions come in **scoped** and non-scoped variants. Always use the scoped versions - they validate translation key strings against the module's i18n schema at compile time.
 
-Import from `utils-new` (not `utils`):
+Import from `utils-i18n` (not `utils`) - the `utils-i18n` variants take `scopedTranslation` as their first argument and validate label keys at compile time:
 
 ```typescript
 import {
-  customWidgetObject,
   requestField,
   responseField,
   requestResponseField,
@@ -43,15 +42,19 @@ import {
   responseArrayField,
   requestDataArrayField,
   responseArrayOptionalField,
-  scopedBackButton,
-  scopedSubmitButton,
-  scopedNavigateButtonField,
-  scopedEditButton,
-  scopedDeleteButton,
-} from "@/system/unified-interface/shared/field/utils";
+  backButton,
+  submitButton,
+  deleteButton,
+  navigateButtonField,
+} from "next-vibe/unified-ui/_shared/utils-i18n";
+
+// customWidgetObject takes no scopedTranslation - it lives in `utils`
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 ```
 
-Pass `scopedTranslation` as the first argument to every scoped field function. This is type-inference only - it enables the compiler to validate your translation key strings.
+**The scoped variants are not separately named.** `utils` and `utils-i18n` export the _same_ function names; the `utils-i18n` copies take `scopedTranslation` as their first argument. "Scoped" is the module you import from, not a `scoped*` prefix on the identifier - there is no `scopedTextField`, `scopedSubmitButton`, or `scopedEditButton`.
+
+Pass `scopedTranslation` as the first argument to every field function from `utils-i18n`. This is type-inference only - it enables the compiler to validate your translation key strings.
 
 ### Core Principle: No naked z.object()
 
@@ -141,33 +144,34 @@ attachments: responseArrayOptionalField(scopedTranslation, {
 }),
 ```
 
-### Specialized Field Functions
+### Specialized Field Types
 
-For common field types, use specialized field functions from `@/system/unified-interface/shared/field/specialized`:
+Currency, language, country and timezone pickers are **not** separate helper functions - there is no `currencyField()`. They are ordinary `requestField` calls that select a specialized `FieldDataType`; the matching widget lives under `next-vibe/unified-ui/widgets/form-fields/`.
 
 ```typescript
-import { currencyField, languageField, countryField, timezoneField } from "@/system/unified-interface/shared/field/specialized";
+import { FieldDataType, WidgetType } from "next-vibe/core/definition/enums";
+import { requestField } from "next-vibe/unified-ui/_shared/utils-i18n";
 
-// Currency selection - specialized helpers use scoped keys directly
-currency: currencyField(
-  "post.currency.label",        // scoped key
-  "post.currency.description",
-  "post.currency.placeholder",
-  true, // required
-  false // multiple selection
-)
-
-// Language selection
-language: languageField(...)
-
-// Country selection
-country: countryField(...)
-
-// Timezone selection
-timezone: timezoneField(...)
+// Currency selection
+currency: requestField(scopedTranslation, {
+  type: WidgetType.FORM_FIELD,
+  fieldType: FieldDataType.CURRENCY_SELECT,
+  label: "post.currency.label",
+  description: "post.currency.description",
+  schema: z.string(),
+}),
 ```
 
-These functions automatically provide proper options, validation, and widget configuration.
+The same shape applies to the other specialized pickers - only `fieldType` changes:
+
+| `fieldType`                     | Widget                              |
+| ------------------------------- | ----------------------------------- |
+| `FieldDataType.CURRENCY_SELECT` | `form-fields/currency-select-field` |
+| `FieldDataType.LANGUAGE_SELECT` | `form-fields/language-select-field` |
+| `FieldDataType.COUNTRY_SELECT`  | `form-fields/country-select-field`  |
+| `FieldDataType.TIMEZONE`        | `form-fields/timezone-field`        |
+
+Each widget supplies its own options list, validation and rendering - the definition only names the `fieldType`.
 
 ### Context Examples
 
@@ -191,7 +195,7 @@ When the auto-rendered UI isn't sufficient, use `customWidgetObject` to wire a R
 **CRITICAL: Always use `lazyWidget` - never statically import `widget.tsx`.** Static import breaks `vibe gen` (SSR/bun module resolution fails). `lazyWidget` also automatically routes `import("./widget")` → `widget.cli.tsx` in CLI/MCP context (the Bun plugin intercepts by name).
 
 ```typescript
-import { lazyWidget } from "@/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 
 const SkillCreateContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.SkillCreateContainer })),
@@ -776,7 +780,7 @@ These keys must exist in all three language files (`en/`, `de/`, `pl/`) under th
 ```typescript
 import { z } from "zod";
 
-import { createEndpoint } from "@/system/unified-interface/shared/endpoints/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create";
 import {
   customWidgetObject,
   objectField,
@@ -785,23 +789,23 @@ import {
   requestUrlPathParamsField,
   responseArrayField,
   responseField,
-  scopedSubmitButton,
-  scopedBackButton,
-} from "@/system/unified-interface/shared/field/utils-new";
+  submitButton,
+  backButton,
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/user/user-roles/enum";
+} from "next-vibe/core/definition/enums";
+import { UserRole } from "next-vibe/identity/roles/enum";
 
 // Local imports - always use ./i18n (module-local scope)
 import { scopedTranslation } from "./i18n";
 import { MyEnum, MyEnumOptions } from "./enum";
 // if using customWidgetObject - ALWAYS lazy, never static import:
-import { lazyWidget } from "@/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 const MyWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.MyWidget })),
 );
@@ -810,10 +814,10 @@ const MyWidget = lazyWidget(() =>
 **Rules:**
 
 1. Use `@/` for absolute imports from project root
-2. Import from `utils-new` not `utils` (scoped API)
+2. Import from `utils-i18n` not `utils` (scoped API)
 3. Import `scopedTranslation` from `./i18n` - never from a parent scope
 4. Import enums from `./enum` not `./definition` (avoid circular deps)
-5. Import `UserRole` from `@/user/user-roles/enum`
+5. Import `UserRole` from `next-vibe/identity/roles/enum`
 
 ## Enum Integration
 
@@ -821,7 +825,7 @@ const MyWidget = lazyWidget(() =>
 
 ```typescript
 // File: enum.ts
-import { createEnumOptions } from "@/system/unified-interface/shared/field/enum";
+import { createEnumOptions } from "next-vibe/unified-ui/_shared/enum";
 import { scopedTranslation } from "./i18n";
 
 export const {
@@ -1075,7 +1079,7 @@ Every module has a `category.ts` that controls the sidebar entry and what loads 
 // category.ts
 import { PAYMENT_DASHBOARD_ALIAS } from "@/payment/dashboard/constants";
 import { INVOICE_LIST_ALIAS } from "@/payment/invoice/list/constants";
-import type { CategoryDefinition } from "@/system/help/category-types";
+import type { CategoryDefinition } from "next-vibe/help-tool/category-types";
 
 export const category: CategoryDefinition = {
   key: "payments",
@@ -1185,7 +1189,7 @@ When building or auditing a module, verify these in order:
 
 ## Quick Checklist
 
-- [ ] Imports from `utils-new` (not `utils`)
+- [ ] Imports from `utils-i18n` (not `utils`)
 - [ ] All field functions use `scoped*` variants with `scopedTranslation` as first arg
 - [ ] `scopedTranslation` imported from `./i18n` (never parent scope)
 - [ ] No `z.object()` or `z.array()` directly in field functions

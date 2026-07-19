@@ -8,7 +8,6 @@ import "server-only";
 import type { JSONValue } from "ai";
 import { and, eq, sql } from "drizzle-orm";
 import { getInstanceAvailability } from "next-vibe/agent/env-availability";
-import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -24,6 +23,7 @@ import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { CoreTool } from "next-vibe/platforms/ai/tools-loader";
+import { Platform } from "next-vibe/platforms/platforms";
 import type { ResolvedRelayContext } from "next-vibe/realtime/remote-event-bridge/relay-context";
 import { RemoteEventBridgeRepository } from "next-vibe/realtime/remote-event-bridge/repository";
 import type { NextRequest } from "next-vibe/ui/lib/request";
@@ -322,7 +322,7 @@ export class AiStreamRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    streamContext: ToolExecutionContext,
+    toolExecutionContext: ToolExecutionContext,
   ): Promise<
     ResponseType<{
       routeId: string;
@@ -339,7 +339,7 @@ export class AiStreamRepository {
       user,
       locale,
       logger,
-      streamContext,
+      toolExecutionContext,
       platform: Platform.AI,
     });
 
@@ -384,31 +384,33 @@ export class AiStreamRepository {
     logger,
     user,
     t: aiStreamT,
-    streamContext,
+    toolExecutionContext,
   }: {
     data: AiStreamRunPostRequestOutput;
     locale: CountryLanguage;
     logger: EndpointLogger;
     user: JwtPayloadType;
     t: AiStreamT;
-    streamContext: ToolExecutionContext;
+    toolExecutionContext: ToolExecutionContext;
   }): Promise<ResponseType<AiStreamRunPostResponseOutput>> {
     const prompt = data.prompt;
-    const subAgentDepth = streamContext.subAgentDepth ?? 0;
+    const subAgentDepth = toolExecutionContext.subAgentDepth ?? 0;
     const runPreCalls = data.preCalls;
     const extraInstructions = data.instructions;
     const excludeMemories = data.excludeMemories ?? false;
     const favoriteIdOverride = data.favoriteId;
     const maxToolCalls = data.maxTurns;
-    const parentAbortSignal = streamContext.abortSignal;
-    const onThreadCreated = streamContext.emitPartialToolResult
+    const parentAbortSignal = toolExecutionContext.abortSignal;
+    const onThreadCreated = toolExecutionContext.emitPartialToolResult
       ? async (subThreadId: string): Promise<void> => {
-          await streamContext.emitPartialToolResult!({ threadId: subThreadId });
+          await toolExecutionContext.emitPartialToolResult!({
+            threadId: subThreadId,
+          });
         }
       : undefined;
     // The calling companion's skill (for companion-soul inheritance) rides the
     // stream context of the invoking turn.
-    const callerSkillId = streamContext.skillId;
+    const callerSkillId = toolExecutionContext.skillId;
     try {
       const rootFolderId = data.rootFolderId ?? DefaultFolderId.BACKGROUND;
 
@@ -437,7 +439,7 @@ export class AiStreamRepository {
           ...makeHeadlessContext(
             preCallAbortController.signal,
             undefined,
-            streamContext.timezone,
+            toolExecutionContext.timezone,
           ),
           rootFolderId,
           headless: undefined,
@@ -530,7 +532,7 @@ export class AiStreamRepository {
       }
 
       // ── Companion soul injection ─────────────────────────────────────────
-      // When the calling companion (streamContext.skillId) has a companionPrompt
+      // When the calling companion (toolExecutionContext.skillId) has a companionPrompt
       // set, prepend it to instructions so the sub-agent inherits the soul.
       let effectiveInstructions = extraInstructions;
       if (callerSkillId) {
@@ -587,7 +589,7 @@ export class AiStreamRepository {
         audioInput: { file: null },
         resumeToken: null,
         // Inherited from the calling stream's context (originally the frontend).
-        timezone: streamContext.timezone,
+        timezone: toolExecutionContext.timezone,
         attachments: null,
         executionContext: { mode: "local" as const },
       };
@@ -615,7 +617,7 @@ export class AiStreamRepository {
         // Sub-agent child: link to the spawning thread for provenance + fixture
         // root walk. The `data.appendThreadId ?? random` id above stays the
         // child's own identity.
-        parentThreadId: streamContext.threadId,
+        parentThreadId: toolExecutionContext.threadId,
       });
 
       if (!streamResult.success) {
@@ -997,7 +999,7 @@ export class AiStreamRepository {
       streamAbortController,
       cancelStreamControlSub,
       effectiveCompactTrigger,
-      streamContext,
+      toolExecutionContext,
       skipAiTurn,
       bridgeContext,
       systemPromptParams,
@@ -1012,14 +1014,14 @@ export class AiStreamRepository {
       confirmationOverridesOverride &&
       confirmationOverridesOverride.length > 0
     ) {
-      const existing = streamContext.confirmationOverrides ?? [];
+      const existing = toolExecutionContext.confirmationOverrides ?? [];
       const merged = [...existing];
       for (const o of confirmationOverridesOverride) {
         if (!merged.some((e) => e.toolId === o.toolId)) {
           merged.push(o);
         }
       }
-      streamContext.confirmationOverrides = merged;
+      toolExecutionContext.confirmationOverrides = merged;
     }
 
     // All confirmations were wakeUp-pending OR a confirmed execute-tool (queue WAIT) already
@@ -1027,7 +1029,8 @@ export class AiStreamRepository {
     // wakeUp-pending: resume-stream will handle revival when each goroutine completes.
     // queue WAIT: handleTaskCompletion fires the revival after the remote task finishes.
     if (skipAiTurn) {
-      const isWaitPending = streamContext.waitingForRemoteResult === true;
+      const isWaitPending =
+        toolExecutionContext.waitingForRemoteResult === true;
       logger.debug(
         isWaitPending
           ? "[AiStream] Confirmed execute-tool (queue WAIT) created remote task - skipping AI turn, waiting for revival"
@@ -1159,8 +1162,8 @@ export class AiStreamRepository {
             emitTitle,
             sequenceIdOverride,
             availability: streamAvailability,
-            streamContext: streamContext,
-            streamRunId: streamContext.streamRunId,
+            toolExecutionContext: toolExecutionContext,
+            streamRunId: toolExecutionContext.streamRunId,
             confirmationParentLeafId,
           });
 
@@ -1169,15 +1172,15 @@ export class AiStreamRepository {
         // covers the no-cancel path so the bus handler is never left dangling.
         ctx.onCleanup(cancelStreamControlSub);
 
-        // Wire StreamContext.pendingToolMessages into ToolExecutionContext so
+        // Wire toolExecutionContext.pendingToolMessages into ToolExecutionContext so
         // tools-loader can inject the correct currentToolMessageId per toolCallId
         // before calling each tool's execute() - parallel-safe, no polling needed.
-        streamContext.pendingToolMessages = ctx.pendingToolMessages;
+        toolExecutionContext.pendingToolMessages = ctx.pendingToolMessages;
         // Same-step provider toolCallId collisions (see duplicateToolCallKeys
-        // on StreamContext) - tools-loader's execute() wrapper needs these to
+        // on toolExecutionContext) - tools-loader's execute() wrapper needs these to
         // resolve which pendingToolMessages entry it corresponds to.
-        streamContext.duplicateToolCallKeys = ctx.duplicateToolCallKeys;
-        streamContext.executeClaimCount = ctx.executeClaimCount;
+        toolExecutionContext.duplicateToolCallKeys = ctx.duplicateToolCallKeys;
+        toolExecutionContext.executeClaimCount = ctx.executeClaimCount;
         // toolsOverride closures (relay receiver) hold their OWN pre-stream
         // context — wire the live map onto it too, or wakeUp/detach dispatches
         // from those tools never resolve a tool message id and lose their park
@@ -1190,19 +1193,19 @@ export class AiStreamRepository {
           // registerPendingCall stores threadId for wakeUp revival and the
           // completion handler schedules resume-stream against it. A null
           // threadId silently skips the resume-stream scheduling.
-          toolsContext.threadId = streamContext.threadId;
+          toolsContext.threadId = toolExecutionContext.threadId;
           // Confirmation gating: applyConfirmationGate skips pure-headless
           // contexts (headless && !relayReceiver) and reads the caller's
           // confirmationOverrides — without these the receiver executes
           // requiresConfirmation tools WITHOUT approval.
-          toolsContext.relayReceiver = streamContext.relayReceiver;
+          toolsContext.relayReceiver = toolExecutionContext.relayReceiver;
           toolsContext.confirmationOverrides =
-            streamContext.confirmationOverrides;
+            toolExecutionContext.confirmationOverrides;
           // MUTABLE coordination state must be SHARED, not copied: tools set
           // flags mid-stream (await-task → waitingForRemoteResult +
           // pendingTimeoutMs, confirmation gate → stepHasToolsAwaitingConfirmation,
           // wakeUp suppression → suppressedWakeUpToolMessageIds) and the LOOP
-          // reads them from ITS streamContext (stop conditions, park logic) —
+          // reads them from ITS toolExecutionContext (stop conditions, park logic) —
           // and vice versa (currentToolMessageId/leafMessageId are written by
           // the loop and read by tools). A one-way field copy silently drops
           // every flag set after this point (observed: relay-receiver
@@ -1226,9 +1229,10 @@ export class AiStreamRepository {
             Object.defineProperty(toolsContext, field, {
               configurable: true,
               enumerable: true,
-              get: (): (typeof streamContext)[K] => streamContext[field],
-              set: (value: (typeof streamContext)[K]): void => {
-                streamContext[field] = value;
+              get: (): (typeof toolExecutionContext)[K] =>
+                toolExecutionContext[field],
+              set: (value: (typeof toolExecutionContext)[K]): void => {
+                toolExecutionContext[field] = value;
               },
             });
           };
@@ -1244,10 +1248,10 @@ export class AiStreamRepository {
 
         // Wire emitPartialToolResult so long-running tools (e.g. ai-run) can
         // stream intermediate state (like a sub-thread ID) before completion.
-        streamContext.emitPartialToolResult = async (
+        toolExecutionContext.emitPartialToolResult = async (
           partialResult,
         ): Promise<void> => {
-          const toolMessageId = streamContext.currentToolMessageId;
+          const toolMessageId = toolExecutionContext.currentToolMessageId;
           if (!toolMessageId) {
             return;
           }
@@ -1328,7 +1332,7 @@ export class AiStreamRepository {
             compactTrigger: isRevival
               ? Number.MAX_SAFE_INTEGER
               : effectiveCompactTrigger,
-            streamContext: streamContext,
+            toolExecutionContext: toolExecutionContext,
           });
 
           logger.debug("[Compacting] Check result", {
@@ -1402,7 +1406,7 @@ export class AiStreamRepository {
                   data.rootFolderId,
                   undefined,
                   undefined,
-                  streamContext,
+                  toolExecutionContext,
                 );
                 const gapFilledForCompacting = await GapFillExecutor.runGapFill(
                   {
@@ -1416,7 +1420,7 @@ export class AiStreamRepository {
                     logger,
                     user,
                     locale,
-                    streamContext: streamContext,
+                    toolExecutionContext: toolExecutionContext,
                   },
                 );
                 preFilledHistoryMessages = gapFilledForCompacting as Parameters<
@@ -1464,7 +1468,7 @@ export class AiStreamRepository {
               compactingMessageCreatedAt,
               preFilledHistoryMessages,
               t: aiStreamT,
-              streamContext: streamContext,
+              toolExecutionContext: toolExecutionContext,
             });
 
             // Check if compacting failed
@@ -1522,7 +1526,7 @@ export class AiStreamRepository {
               rootFolderId: data.rootFolderId,
               trailingSystemMessage,
               locale,
-              streamContext: streamContext,
+              toolExecutionContext: toolExecutionContext,
             });
 
             // Check if rebuilding failed
@@ -1610,7 +1614,7 @@ export class AiStreamRepository {
               logger,
               user,
               locale,
-              streamContext: streamContext,
+              toolExecutionContext: toolExecutionContext,
             });
             messages.length = 0;
             messages.push(...gapFilledMessages);
@@ -1644,7 +1648,7 @@ export class AiStreamRepository {
             locale,
             logger,
             t: aiStreamT,
-            streamContext,
+            toolExecutionContext,
             maxToolCalls,
             imageSize: data.imageSize ?? undefined,
             imageQuality: data.imageQuality ?? undefined,
@@ -1737,7 +1741,7 @@ export class AiStreamRepository {
         // writes a "task fired" response and the loop ends naturally before the
         // 90s escalation timeout fires). Without this, the timer would fire
         // after the stream has already ended and interfere with the revival.
-        streamContext.cancelPendingStreamTimer?.();
+        toolExecutionContext.cancelPendingStreamTimer?.();
 
         // Skip wakeUp revival ONLY if the stream was genuinely CANCELLED (user
         // stop / error) — NOT for an intentional wakeUp/wait PARK abort
@@ -1769,7 +1773,7 @@ export class AiStreamRepository {
           abortReasonName === AbortReason.TOOL_CONFIRMATION ||
           abortReasonName === AbortReason.STREAM_TIMEOUT;
         const wasAborted = streamAbortController.signal.aborted && !isParkAbort;
-        const suppressed = streamContext.suppressedWakeUpToolMessageIds;
+        const suppressed = toolExecutionContext.suppressedWakeUpToolMessageIds;
         const pendingWakeUps = suppressed
           ? capturedWakeUpPayloads.filter(
               (p) => !suppressed.has(p.toolMessageId),
@@ -1780,7 +1784,7 @@ export class AiStreamRepository {
           threadResultThreadId,
           logger,
           user,
-          streamContext.streamRunId,
+          toolExecutionContext.streamRunId,
         );
         // Emit STREAM_FINISHED with finalState so the client knows whether to
         // show the stop button (waiting) or go idle after the stream ends.
@@ -1943,7 +1947,7 @@ export class AiStreamRepository {
           threadResultThreadId,
           logger,
           user,
-          streamContext.streamRunId,
+          toolExecutionContext.streamRunId,
         ).catch((err) => {
           logger.error(
             "[AI Stream] Failed to clear streaming state in outer catch",

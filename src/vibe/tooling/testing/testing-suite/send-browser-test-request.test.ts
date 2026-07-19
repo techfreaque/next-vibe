@@ -81,7 +81,7 @@ describe("sendBrowserTestRequest", () => {
           endpoint: userDeleteDefinitions.DELETE,
           urlPathParams: { id: data.responseId },
           user,
-          streamContext: undefined,
+          toolExecutionContext: undefined,
         } as SendArgs);
       }
     },
@@ -163,7 +163,7 @@ describe("sendBrowserTestRequest", () => {
           endpoint: userDeleteDefinitions.DELETE,
           urlPathParams: { id: created.responseId },
           user,
-          streamContext: undefined,
+          toolExecutionContext: undefined,
         } as SendArgs);
       }
     },
@@ -216,7 +216,7 @@ describe("sendBrowserTestRequest", () => {
           endpoint: userDeleteDefinitions.DELETE,
           urlPathParams: { id: data.responseId },
           user,
-          streamContext: undefined,
+          toolExecutionContext: undefined,
         } as SendArgs);
       }
     },

@@ -3,7 +3,6 @@
  * Shared utilities for browser tool route handlers
  */
 
-import type { Platform } from "next-vibe/core/definition/platform";
 import type {
   ContentResponse,
   ResponseType,
@@ -14,6 +13,7 @@ import {
   isContentResponse,
 } from "next-vibe/core/route/response.schema";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import type { Platform } from "next-vibe/platforms/platforms";
 
 import type { BrowserTool } from "../enum";
 import type { BrowserT } from "../i18n";

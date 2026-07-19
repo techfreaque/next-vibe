@@ -29,7 +29,7 @@ export function logProviderRequest(provider: string, payload: string): void {
   try {
     ensureDir();
     const seq = ++requestSeq;
-    const ts = new Date().toISOString().replace(/[:.]/g, "-");
+    const ts = new Date().toISOString().replaceAll(/[:.]/g, "-");
     const id = `${ts}_${provider}_${seq}`;
     const filePath = join(DEBUG_DIR, `${id}_request.json`);
     writeFileSync(filePath, payload, "utf-8");

@@ -21,7 +21,7 @@ import type {
   OxlintASTNode,
   OxlintComment,
   OxlintRuleContext,
-} from "next-vibe/tooling/check/oxlint/types";
+} from "../../../types";
 
 // ============================================================
 // Types
@@ -92,7 +92,7 @@ function isOutsideVibe(specifier: string, importingFile: string): boolean {
     return false;
   }
 
-  const normalized = importingFile.replace(/\\/g, "/");
+  const normalized = importingFile.replaceAll("\\", "/");
   const lastSlash = normalized.lastIndexOf("/");
   const dir = lastSlash >= 0 ? normalized.slice(0, lastSlash) : normalized;
 
@@ -176,7 +176,7 @@ const vibeBoundaryRule = {
 
   create(context: RuleContext): Record<string, (node: OxlintASTNode) => void> {
     const filename = getFilename(context);
-    if (!filename.replace(/\\/g, "/").includes(VIBE_PATH_FRAGMENT)) {
+    if (!filename.replaceAll("\\", "/").includes(VIBE_PATH_FRAGMENT)) {
       return {};
     }
 

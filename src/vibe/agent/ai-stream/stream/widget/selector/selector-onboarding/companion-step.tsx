@@ -3,7 +3,6 @@ import { scopedTranslation } from "next-vibe/agent/ai-stream/stream/i18n";
 import { COMPANION_SKILLS, type Skill } from "next-vibe/agent/skills/config";
 import { scopedTranslation as skillsScopedTranslation } from "next-vibe/agent/skills/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { cn } from "next-vibe/core/utils/utils";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
@@ -11,7 +10,8 @@ import { ArrowRight } from "next-vibe/ui/ui/icons/ArrowRight";
 import { Check } from "next-vibe/ui/ui/icons/Check";
 import { Span } from "next-vibe/ui/ui/span";
 import { H3, P } from "next-vibe/ui/ui/typography";
-import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import { type JSX } from "react";
 
 interface CompanionStepProps {

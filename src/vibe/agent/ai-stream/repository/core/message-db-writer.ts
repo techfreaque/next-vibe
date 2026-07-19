@@ -66,7 +66,7 @@ export class MessageDbWriter {
   assistantEmbedPromise: Promise<void> | null = null;
   /** Stream context of the owning stream (its threadId) - binds embedding-sync
    *  API calls so they record/replay. Passed at construction. */
-  streamContext: ToolExecutionContext;
+  toolExecutionContext: ToolExecutionContext;
 
   readonly deps: WriterDeps;
   readonly engine: ThrottleEngine;
@@ -78,9 +78,9 @@ export class MessageDbWriter {
     locale: CountryLanguage,
     readonly wsEmit: MessagesWsEmit,
     emitTitle: EmitThreadTitleFn,
-    streamContext: ToolExecutionContext,
+    toolExecutionContext: ToolExecutionContext,
   ) {
-    this.streamContext = streamContext;
+    this.toolExecutionContext = toolExecutionContext;
     this.deps = {
       isIncognito,
       logger,
@@ -561,7 +561,7 @@ export class MessageDbWriter {
       userId,
       threadId,
       attachments,
-      this.streamContext,
+      this.toolExecutionContext,
     );
   }
 

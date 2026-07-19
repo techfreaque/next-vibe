@@ -9,20 +9,23 @@ import {
   endpointToToolName,
   getPreferredToolName,
 } from "next-vibe/core/core-utils/path";
-import { formatWarning } from "next-vibe/logger/formatters";
-import type { EndpointLogger } from "next-vibe/logger/types";
 import type {
   GeneratorContext,
   GeneratorResult,
-} from "next-vibe/tooling/generators/shared/shared-inputs";
+} from "next-vibe/core/generators/shared/shared-inputs";
 import {
   generateAbsoluteImportPath,
   generateFileHeader,
   stripProjectRoot,
+  toImportUrl,
   writeGeneratedFile,
-} from "next-vibe/tooling/generators/shared/utils";
+} from "next-vibe/core/generators/shared/utils";
+import { formatWarning } from "next-vibe/logger/formatters";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
-const OUTPUT_FILE = "src/generated/endpoints/endpoint.ts";
+import { GENERATED_DIR } from "@/env/paths";
+
+const OUTPUT_FILE = `${GENERATED_DIR}/endpoints/endpoint.ts`;
 
 /**
  * Generate endpoint.ts + alias-map.ts + endpoint-hot-paths.ts. Consumes shared
@@ -96,7 +99,7 @@ class EndpointGenerator {
       // Load the actual definition - let TypeScript infer the concrete type
       let definition;
       try {
-        definition = await import(defFile);
+        definition = await import(toImportUrl(defFile));
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : String(error);
         // Bun TDZ race: "Cannot access 'X' before initialization" - yield and retry once
@@ -105,7 +108,7 @@ class EndpointGenerator {
             setTimeout(resolve, 10);
           });
           try {
-            definition = await import(defFile);
+            definition = await import(toImportUrl(defFile));
           } catch (retryError) {
             const retryMsg =
               retryError instanceof Error
@@ -207,7 +210,7 @@ class EndpointGenerator {
       // Load the actual definition - let TypeScript infer the concrete type
       let definition;
       try {
-        definition = await import(defFile);
+        definition = await import(toImportUrl(defFile));
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : String(error);
         // Bun TDZ race: yield and retry once
@@ -216,7 +219,7 @@ class EndpointGenerator {
             setTimeout(resolve, 10);
           });
           try {
-            definition = await import(defFile);
+            definition = await import(toImportUrl(defFile));
           } catch {
             continue;
           }
@@ -288,9 +291,7 @@ class EndpointGenerator {
         prewarmPaths.push(path);
       }
       // Add turbopack/webpack ignore hints for routes that scan the filesystem
-      const ignoreComment = needsTurbopackIgnore(importPath)
-        ? "/* turbopackIgnore: true */ /* webpackIgnore: true */ "
-        : "";
+      const ignoreComment = needsTurbopackIgnore(importPath) ? "" : "";
       // Static import strings for bundler tracing
       const returnWithDefault = `      return (await import(${ignoreComment}"${importPath}")).default`;
       const returnWithParen = `      return (await import(${ignoreComment}"${importPath}"))`;

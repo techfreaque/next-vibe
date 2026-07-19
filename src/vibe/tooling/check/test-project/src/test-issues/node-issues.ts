@@ -4,9 +4,9 @@
  */
 
 // unicorn/prefer-node-protocol — should use node: prefix (fixable)
-import { readFileSync } from "fs";
-import { join } from "path";
-import { EventEmitter } from "events";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { EventEmitter } from "node:events";
 
 // unicorn/no-new-array — use Array.from instead (fixable by ESLint, not by oxlint)
 export function badArray(n: number): string[] {

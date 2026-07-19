@@ -3,6 +3,7 @@
  * Handles build the application operations
  */
 
+import { buildPackageRunnerCommand, coreEnv } from "next-vibe/core/env";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -15,12 +16,15 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { SeedRepository } from "next-vibe/database/seed/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { GenerateAllRepository } from "next-vibe/core/generators/repository";
 import { DatabaseMigrationRepository } from "next-vibe/database/migrate/repository";
 import { scopedTranslation as dockerOperationsScopedTranslation } from "next-vibe/database/utils/docker-operations/i18n";
 import { scopedTranslation as dbUtilsScopedTranslation } from "next-vibe/database/utils/i18n";
 import type { ServerBuildT } from "next-vibe/server/server/build/i18n";
 import { scopedTranslation as builderScopedTranslation } from "next-vibe/tooling/builder/i18n";
-import { GenerateAllRepository } from "next-vibe/tooling/generators/repository";
+
+import { GENERATED_DIR } from "@/env/paths";
+
 import { ServerFramework } from "../enum";
 import { readPidFilePort, VIBE_START_PID_FILE } from "../pid";
 import type { BuildRequestOutput, BuildResponseOutput } from "./definition";
@@ -67,9 +71,11 @@ export class BuildRepository {
     try {
       output.push(t("post.repository.messages.buildStart"));
 
-      // Generate API endpoints first - package build (vibe-runtime) bundles
-      // interactive.cli.tsx which statically imports generated/endpoints/meta/en,
-      // so generated files must exist before the package build runs.
+      // Generate API endpoints first - the package build (vibe-runtime) resolves
+      // generated/endpoints/{meta/en,endpoint} out of help-tool's widget and the
+      // generated registries, so generated files must exist before it runs.
+      // (Stale until the interactive help browser moved into help-tool/widget.cli.tsx:
+      // this used to name repository/interactive.cli.tsx, a file nothing imported.)
       if (!data.generate) {
         output.push(t("post.repository.messages.skipGeneration"));
         steps.push({ label: "Generate", ok: true, skipped: true });
@@ -78,7 +84,7 @@ export class BuildRepository {
         try {
           const generateResult = await GenerateAllRepository.generateAll(
             {
-              outputDir: "src/generated",
+              outputDir: GENERATED_DIR,
               verbose: false,
               skipEndpoints: !data.generateEndpoints,
               skipSeeds: !data.generateSeeds,
@@ -229,15 +235,19 @@ export class BuildRepository {
         // Build Next.js application with proper NODE_ENV
         output.push(t("post.repository.messages.buildingNextjs"));
 
-        // Run Next.js build command using bun (works in both dev and Docker)
+        // Run Next.js build command (works in both dev and Docker)
         const { spawnSync } = await import("node:child_process");
         const buildArgs =
-          data.webpack === true
-            ? ["next", "build", "--webpack"]
-            : ["next", "build"];
-        const buildResult = spawnSync("bunx", buildArgs, {
+          data.webpack === true ? ["build", "--webpack"] : ["build"];
+        const runner = buildPackageRunnerCommand(
+          coreEnv.PACKAGE_MANAGER,
+          "next",
+          buildArgs,
+        );
+        const buildResult = spawnSync(runner.command, runner.args, {
           stdio: "inherit",
           cwd: process.cwd(),
+          shell: runner.shell,
           env: {
             ...process.env,
             NODE_ENV: "production",

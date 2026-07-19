@@ -9,8 +9,8 @@
 "use client";
 
 import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { apiClient } from "next-vibe/platforms/react/hooks/store";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
 import {
@@ -49,12 +49,12 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { apiClient } from "next-vibe/unified-ui/hooks/store";
 import type { JSX } from "react";
 import { useState } from "react";
 
 import { CreditsTabHeader } from "@/credits/credits-tab-header";
 import { GITHUB_REPO_URL } from "@/env/constants";
-import { envClient } from "@/env/env-client";
 
 import type endpoints from "./definition";
 import type { RemoteConnection } from "./definition";

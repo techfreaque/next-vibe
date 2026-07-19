@@ -71,7 +71,7 @@ export function DefaultErrorFallback({
     .split("\n")
     .map((l) => l.trim())
     .filter(Boolean)
-    .map((l) => l.replace(/\s*\(https?:\/\/[^)]+\)/g, "").trim())
+    .map((l) => l.replaceAll(/\s*\(https?:\/\/[^)]+\)/g, "").trim())
     .filter(Boolean);
   // First line is the failing component, next few are its ancestors
   const topComponents = componentStackLines.slice(0, 8).join("\n");

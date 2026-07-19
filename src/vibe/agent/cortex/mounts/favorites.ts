@@ -95,7 +95,7 @@ export async function readFavoritePath(
     fm.push(`variantId: "${fav.variantId}"`);
   }
   if (fav.customVariantName) {
-    fm.push(`variantName: "${fav.customVariantName.replace(/"/g, '\\"')}"`);
+    fm.push(`variantName: "${fav.customVariantName.replaceAll('"', '\\"')}"`);
   }
 
   if (fav.modelSelection) {

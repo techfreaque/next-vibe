@@ -1,7 +1,7 @@
 import "server-only";
 
-import { Platform } from "next-vibe/core/definition/platform";
 import { cliAuthHandler } from "next-vibe/platforms/cli/auth/cli-handler";
+import { Platform } from "next-vibe/platforms/platforms";
 
 import type { BaseAuthHandler } from "./base-auth-handler";
 import { webAuthHandler } from "./next-auth-handler";

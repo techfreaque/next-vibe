@@ -1,6 +1,7 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
 
+import { platform } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { querySelector } from "next-vibe/ui/lib/dom";
 import { Button } from "next-vibe/ui/ui/button";
@@ -21,8 +22,6 @@ import { SidebarLayout } from "next-vibe/ui/ui/sidebar";
 import { Toaster } from "next-vibe/ui/ui/sonner";
 import { H1, H4, Large, P } from "next-vibe/ui/ui/typography";
 import { useState } from "react";
-
-import { platform } from "@/env/env-client";
 
 import { ThemeToggle } from "../../_components/theme-toggle";
 import { AdvancedPreview } from "./advanced";

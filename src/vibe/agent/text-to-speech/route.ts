@@ -17,14 +17,14 @@ import { TextToSpeechRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, user, locale, logger, t, streamContext }) =>
+    handler: ({ data, user, locale, logger, t, toolExecutionContext }) =>
       TextToSpeechRepository.convertTextToSpeech(
         data,
         user,
         locale,
         logger,
         t,
-        streamContext,
+        toolExecutionContext,
       ),
   },
 });

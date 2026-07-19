@@ -12,7 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: getConsoleMessageEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger, platform, streamContext }) =>
+    handler: ({ data, t, logger, platform, toolExecutionContext }) =>
       BrowserSharedRepository.executeGetConsoleMessage(
         {
           toolName: BrowserTool.GET_CONSOLE_MESSAGE,
@@ -24,7 +24,7 @@ export const { POST, tools } = endpointsHandler({
         t,
         logger,
         platform,
-        streamContext.threadId,
+        toolExecutionContext.threadId,
       ),
   },
 });

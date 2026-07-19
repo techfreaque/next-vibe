@@ -5,7 +5,6 @@
 
 "use client";
 import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
-import { cn } from "next-vibe/core/utils/utils";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -24,19 +23,20 @@ import { User } from "next-vibe/ui/ui/icons/User";
 import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
 import { Span } from "next-vibe/ui/ui/span";
 import { P } from "next-vibe/ui/ui/typography";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { BooleanFieldWidget } from "next-vibe/unified-ui/form-fields/boolean-field/widget";
-import { EmailFieldWidget } from "next-vibe/unified-ui/form-fields/email-field/widget";
-import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
-import { UuidFieldWidget } from "next-vibe/unified-ui/form-fields/uuid-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
+import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
+import { EmailFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/email-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
+import { UuidFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/uuid-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import React, { useCallback, useState } from "react";
 
 import type definition from "./definition";
@@ -310,7 +310,7 @@ export function UserDetailContainer({
                     "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300",
                 )}
               >
-                {String(r.role).replace(/_/g, " ")}
+                {String(r.role).replaceAll("_", " ")}
               </Span>
             ))}
           </Div>
@@ -582,7 +582,7 @@ export function UserEditContainer({
                       "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300",
                   )}
                 >
-                  {String(r.role).replace(/_/g, " ")}
+                  {String(r.role).replaceAll("_", " ")}
                 </Span>
               ))}
             </Div>

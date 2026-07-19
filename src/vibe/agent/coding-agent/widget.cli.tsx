@@ -5,7 +5,7 @@
 
 import chalk from "chalk";
 import { Box, Text } from "ink";
-import { Platform } from "next-vibe/core/definition/platform";
+import { Platform } from "next-vibe/platforms/platforms";
 import {
   useWidgetLocale,
   useWidgetPlatform,

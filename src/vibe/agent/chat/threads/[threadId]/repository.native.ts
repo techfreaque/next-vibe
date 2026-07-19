@@ -110,7 +110,7 @@ export class ThreadByIdRepository {
       "thread-updated"
     >,
   ): Promise<void> {
-    return Promise.resolve();
+    return;
   }
 
   // oxlint-disable-next-line no-unused-vars
@@ -121,7 +121,7 @@ export class ThreadByIdRepository {
       "thread-deleted"
     >,
   ): Promise<void> {
-    return Promise.resolve();
+    return;
   }
 }
 

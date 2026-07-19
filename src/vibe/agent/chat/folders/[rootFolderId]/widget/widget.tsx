@@ -17,9 +17,7 @@ import {
 import { NEW_MESSAGE_ID } from "next-vibe/agent/chat/enum";
 import folderContentsDefinition from "next-vibe/agent/chat/folder-contents/[rootFolderId]/definition";
 import cortexSearchDefinitions from "next-vibe/agent/cortex/search/definition";
-import { cn } from "next-vibe/core/utils/utils";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { useSilentHistory } from "next-vibe/ui/hooks/use-navigation";
 import { Button } from "next-vibe/ui/ui/button";
 import {
@@ -43,12 +41,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe/ui/ui/tooltip";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetContext,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
-import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
+import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useChatBootContext } from "../../../hooks/context";

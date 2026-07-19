@@ -1,0 +1,30 @@
+{
+  "mcpServers": {
+    "hermes": {
+      "command": "{{PACKAGE_MANAGER_EXECUTABLE}}",
+      "args": [
+        "{{PRELOAD_FLAG}}",
+        "{{PROJECT_PATH}}/src/vibe/platforms/cli/runtime/env-preload.ts",
+        "{{PROJECT_PATH}}/src/vibe/platforms/cli/vibe-runtime.ts",
+        "mcp",
+        "--hermes"
+      ],
+      "env": {
+        "NODE_ENV": "production",
+        "PROJECT_ROOT": "{{PROJECT_PATH}}"
+      }
+    },
+    "atlas": {
+      "command": "{{PACKAGE_MANAGER_EXECUTABLE}}",
+      "args": [
+        "{{PRELOAD_FLAG}}",
+        "{{PROJECT_PATH}}/src/vibe/platforms/cli/runtime/env-preload.ts",
+        "{{PROJECT_PATH}}/src/vibe/platforms/cli/vibe-runtime.ts",
+        "mcp"
+      ],
+      "env": {
+        "PROJECT_ROOT": "{{PROJECT_PATH}}"
+      }
+    }
+  }
+}

@@ -18,16 +18,16 @@
  * - Local development
  */
 
-import type { RestrictedSyntaxPluginConfig } from "next-vibe/tooling/check/config/types";
+import type { RestrictedSyntaxPluginConfig } from "../../../../../config/types";
 import type {
-    createPluginMessages,
-    loadPluginConfig,
-} from "next-vibe/tooling/check/oxlint/plugins/shared/config-loader";
+  OxlintASTNode,
+  OxlintComment,
+  OxlintRuleContext,
+} from "../../../types";
 import type {
-    OxlintASTNode,
-    OxlintComment,
-    OxlintRuleContext,
-} from "next-vibe/tooling/check/oxlint/types";
+  createPluginMessages,
+  loadPluginConfig,
+} from "../../shared/config-loader";
 
 // ============================================================
 // Types
@@ -208,8 +208,7 @@ function getConfigLoader(): typeof configLoader {
 
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports -- Plugin context requires sync loading
-    configLoader =
-      require("next-vibe/tooling/check/oxlint/plugins/shared/config-loader") as typeof configLoader;
+    configLoader = require("../../shared/config-loader") as typeof configLoader;
     return configLoader;
   } catch {
     // Shared loader not available, will use fallback
@@ -609,7 +608,7 @@ function isBrowserImplFile(context: RestrictedSyntaxRuleContext): boolean {
   if (!filename) {
     return false;
   }
-  const normalized = filename.replace(/\\/g, "/");
+  const normalized = filename.replaceAll("\\", "/");
   return BROWSER_IMPL_PATH_FRAGMENTS.some((fragment) =>
     normalized.includes(fragment),
   );

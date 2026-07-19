@@ -14,16 +14,13 @@ import type {
   ResponseType,
   SuccessResponseType,
 } from "next-vibe/core/route/response.schema";
-import type { EndpointReturn } from "next-vibe/platforms/react/hooks/endpoint-types";
 import type {
   ConstrainedChildUsage,
   FieldUsageConfig,
   ObjectChildrenConstraint,
 } from "next-vibe/unified-ui/_shared/types";
-import {
-  objectField,
-  responseField,
-} from "next-vibe/unified-ui/_shared/utils";
+import { objectField, responseField } from "next-vibe/unified-ui/_shared/utils-i18n";
+import type { EndpointReturn } from "next-vibe/unified-ui/hooks/endpoint-types";
 import type { z } from "zod";
 
 import type imapAccountsListDefinition from "@/messenger/accounts/list/definition";

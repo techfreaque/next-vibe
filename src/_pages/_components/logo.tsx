@@ -1,15 +1,18 @@
 "use client";
 
 import type { Route } from "next";
+import {
+  coreClientEnv as envClient,
+  platform,
+} from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { cn } from "next-vibe/core/utils/utils";
 import { Div } from "next-vibe/ui/ui/div";
 import { Image } from "next-vibe/ui/ui/image";
 import { Link } from "next-vibe/ui/ui/link";
 import { Span } from "next-vibe/ui/ui/span";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 
-import { envClient, platform } from "@/env/env-client";
 import { configScopedTranslation } from "@/env/i18n";
 
 export function Logo({

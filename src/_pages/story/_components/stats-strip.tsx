@@ -1,7 +1,7 @@
 "use client";
 
-import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { Platform } from "next-vibe/platforms/platforms";
 import { Div } from "next-vibe/ui/ui/div";
 import { MotionDiv } from "next-vibe/ui/ui/motion";
 import { P } from "next-vibe/ui/ui/typography";

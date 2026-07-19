@@ -43,8 +43,8 @@ function slugify(value: string): string {
   return (
     value
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "")
+      .replaceAll(/[^a-z0-9]+/g, "-")
+      .replaceAll(/^-|-$/g, "")
       .slice(0, 60) || "search"
   );
 }
@@ -177,10 +177,10 @@ export async function readSearchPath(
 
   const frontmatterLines = [
     "---",
-    `query: "${search.query.replace(/"/g, '\\"')}"`,
+    `query: "${search.query.replaceAll('"', '\\"')}"`,
     `provider: "${search.provider}"`,
     `threadId: "${search.threadId}"`,
-    `threadTitle: "${search.threadTitle.replace(/"/g, '\\"')}"`,
+    `threadTitle: "${search.threadTitle.replaceAll('"', '\\"')}"`,
     `searchedAt: "${search.searchedAt.toISOString()}"`,
     `resultCount: ${search.results.length}`,
     "---",

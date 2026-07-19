@@ -229,7 +229,7 @@ export const translations = {
       tryCtaSub: "Free account. No credit card. Ready in 30 seconds.",
       startFree: "Start free",
       alreadyHaveAccount: "Already have an account?",
-      copyright: "\u00a9",
+      copyright: "\u00A9",
       allSkills: "All skills",
       featuredSkill: "Featured Skill",
       aboutSkill: "About this skill",

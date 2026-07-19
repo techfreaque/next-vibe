@@ -6,7 +6,7 @@ import "server-only";
  */
 import { and, eq } from "drizzle-orm";
 import {
-  rootlessStreamContext,
+  rootlessToolExecutionContext,
   type ToolExecutionContext,
 } from "next-vibe/agent/chat/config";
 import {
@@ -57,7 +57,7 @@ export class CortexEditRepository {
     logger,
     t,
     relayed = false,
-    streamContext,
+    toolExecutionContext,
   }: {
     userId: string;
     user: JwtPrivatePayloadType;
@@ -77,7 +77,7 @@ export class CortexEditRepository {
      */
     relayed?: boolean;
     /** Fixture chain of the calling execution — the embedding call binds it. */
-    streamContext: ToolExecutionContext;
+    toolExecutionContext: ToolExecutionContext;
   }): Promise<
     ResponseType<{
       responsePath: string;
@@ -109,7 +109,7 @@ export class CortexEditRepository {
         newContent,
         logger,
         t,
-        streamContext,
+        toolExecutionContext,
       });
     }
 
@@ -206,7 +206,7 @@ export class CortexEditRepository {
         locale,
         logger,
         feature: CortexCreditFeature.EDIT,
-        streamContext,
+        toolExecutionContext,
       });
     }
 
@@ -246,7 +246,7 @@ export class CortexEditRepository {
     newContent,
     logger,
     t,
-    streamContext,
+    toolExecutionContext,
   }: {
     userId: string;
     user: JwtPrivatePayloadType;
@@ -259,7 +259,7 @@ export class CortexEditRepository {
     newContent?: string;
     logger: EndpointLogger;
     t: CortexEditT;
-    streamContext: ToolExecutionContext;
+    toolExecutionContext: ToolExecutionContext;
   }): Promise<
     ResponseType<{
       responsePath: string;
@@ -338,7 +338,7 @@ export class CortexEditRepository {
 
     // Write back via virtual mount
     const writeResult = await resolveVirtualWrite(
-      { userId, user, locale, logger, streamContext },
+      { userId, user, locale, logger, toolExecutionContext },
       path,
       content,
       mountPrefix,
@@ -390,7 +390,7 @@ export class CortexEditRepository {
       relayed: true,
       // Relayed applier — no fixture chain crosses instances; an explicit
       // thread-less context routes embeddings live.
-      streamContext: rootlessStreamContext(),
+      toolExecutionContext: rootlessToolExecutionContext(),
     });
     if (!result.success) {
       logger.error("Failed to apply remote cortex edit", {

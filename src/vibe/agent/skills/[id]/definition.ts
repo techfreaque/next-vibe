@@ -22,16 +22,16 @@ import {
 import { success } from "next-vibe/core/route/response.schema";
 import { UserPermissionRole, UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   backButton,
-  customWidgetObject,
   objectField,
   requestField,
   requestUrlPathParamsField,
   responseField,
   submitButton,
   widgetField,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { getBestChatModel } from "../../ai-stream/models";
@@ -94,8 +94,7 @@ const { DELETE } = createEndpoint({
     mutationOptions: {
       onSuccess: async (data) => {
         // Import apiClient, navigation store, and skills list GET endpoint
-        const { apiClient } =
-          await import("next-vibe/platforms/react/hooks/store");
+        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
         const skillsDefinition = await import("../definition");
         const removedSkillIds = [data.pathParams.id];
 
@@ -289,8 +288,7 @@ const { DELETE } = createEndpoint({
       urlPathParamsFields: ["id"] as const,
       onEvent: async ({ urlPathParams, logger }) => {
         const deletedId = urlPathParams.id;
-        const { apiClient } =
-          await import("next-vibe/platforms/react/hooks/store");
+        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
         apiClient.updateEndpointData(
           (await import("../definition")).default.GET,
           logger,
@@ -375,8 +373,7 @@ const { PATCH } = createEndpoint({
     mutationOptions: {
       onSuccess: async (data) => {
         // Import apiClient, skills list GET endpoint, and repository client
-        const { apiClient } =
-          await import("next-vibe/platforms/react/hooks/store");
+        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
         const skillsDefinition = await import("../definition");
         const skillSingleDefinitions = await import("./definition");
         const updatedSkillIds = [data.pathParams.id];
@@ -811,7 +808,7 @@ const { PATCH } = createEndpoint({
           { SkillsRepositoryClient },
           { scopedTranslation: skillsScopedTranslation },
         ] = await Promise.all([
-          import("next-vibe/platforms/react/hooks/store"),
+          import("next-vibe/unified-ui/hooks/store"),
           import("../repository-client"),
           import("../i18n"),
         ]);

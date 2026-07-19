@@ -7,14 +7,13 @@ import { eq } from "drizzle-orm";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { identityEnv } from "next-vibe/identity/env";
 import { leadDb } from "next-vibe/identity/lead/db";
 import { UserRoleDB } from "next-vibe/identity/roles/enum";
 import { userRoles } from "next-vibe/identity/user/db";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
-
-import { env } from "@/env/env";
 
 let cached: JwtPrivatePayloadType | null = null;
 
@@ -25,7 +24,7 @@ export async function resolveTestAdminUser(): Promise<JwtPrivatePayloadType> {
 
   const logger = createEndpointLogger(false, defaultLocale);
   const result = await UserRepository.getUserByEmail(
-    env.VIBE_ADMIN_USER_EMAIL,
+    identityEnv.VIBE_ADMIN_USER_EMAIL,
     UserDetailLevel.STANDARD,
     defaultLocale,
     logger,
@@ -34,7 +33,7 @@ export async function resolveTestAdminUser(): Promise<JwtPrivatePayloadType> {
   if (!result.success || !result.data) {
     // oxlint-disable-next-line restricted-syntax
     throw new Error(
-      `Test admin user ${env.VIBE_ADMIN_USER_EMAIL} not found - run: vibe seed`,
+      `Test admin user ${identityEnv.VIBE_ADMIN_USER_EMAIL} not found - run: vibe seed`,
     );
   }
 
@@ -50,7 +49,7 @@ export async function resolveTestAdminUser(): Promise<JwtPrivatePayloadType> {
   if (!link) {
     // oxlint-disable-next-line restricted-syntax
     throw new Error(
-      `Test admin user ${env.VIBE_ADMIN_USER_EMAIL} has no lead link - run: vibe seed`,
+      `Test admin user ${identityEnv.VIBE_ADMIN_USER_EMAIL} has no lead link - run: vibe seed`,
     );
   }
 

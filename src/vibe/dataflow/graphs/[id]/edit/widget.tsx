@@ -41,7 +41,6 @@ import {
   useReactFlow,
 } from "@xyflow/react";
 import { FieldDataType } from "next-vibe/core/definition/enums";
-import { cn } from "next-vibe/core/utils/utils";
 import { GraphResolution } from "next-vibe/dataflow/enum";
 import type { GraphNodeConfig } from "next-vibe/dataflow/graph/schema";
 import type {
@@ -54,7 +53,6 @@ import parentDefinitions from "next-vibe/dataflow/graphs/[id]/data/definition";
 import versionsDefinitions from "next-vibe/dataflow/graphs/[id]/versions/definition";
 import type { Resolution } from "next-vibe/dataflow/shared/fields";
 import { ResolutionValues } from "next-vibe/dataflow/shared/fields";
-import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { addWindowListener } from "next-vibe/ui/lib/dom";
 import { Badge } from "next-vibe/ui/ui/badge";
@@ -100,6 +98,7 @@ import {
 } from "next-vibe/ui/ui/select";
 import { Span } from "next-vibe/ui/ui/span";
 import { P } from "next-vibe/ui/ui/typography";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetForm,
   useWidgetIsSubmitting,
@@ -110,6 +109,7 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import React, {
   useCallback,
   useEffect,
@@ -177,9 +177,9 @@ const DEFAULT_INFO: EndpointNodeInfo = {
  */
 function humanizeFieldKey(key: string): string {
   return key
-    .replace(/([A-Z])/g, " $1")
-    .replace(/[-_]/g, " ")
-    .replace(/\s+/g, " ")
+    .replaceAll(/([A-Z])/g, " $1")
+    .replaceAll(/[-_]/g, " ")
+    .replaceAll(/\s+/g, " ")
     .trim()
     .replace(/^\w/, (c) => c.toUpperCase());
 }
@@ -583,9 +583,9 @@ function generateNodeId(
         "",
       )
       .replace(/^.*\//, "") // take last path segment
-      .replace(/[^a-zA-Z0-9]/g, "_")
-      .replace(/_+/g, "_")
-      .replace(/^_|_$/g, "")
+      .replaceAll(/[^a-zA-Z0-9]/g, "_")
+      .replaceAll(/_+/g, "_")
+      .replaceAll(/^_|_$/g, "")
       .toLowerCase()
       .slice(0, 20) || "node";
 
@@ -600,8 +600,8 @@ function generateNodeId(
 function nameToSlug(name: string): string {
   return name
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "")
+    .replaceAll(/[^a-z0-9]+/g, "-")
+    .replaceAll(/^-|-$/g, "")
     .slice(0, 64);
 }
 
@@ -2102,14 +2102,14 @@ function toolNameToLabel(toolName: string): string {
   //      "vibe-sense-transformer-window-avg" → "Window Avg"
   const stripped = toolName
     .replace(/^vibe-sense-(indicator|evaluator|transformer|data-source)-?/, "")
-    .replace(/-/g, " ")
+    .replaceAll("-", " ")
     .trim();
   if (!stripped) {
     return toolName;
   }
   return stripped.toUpperCase().length <= 5
     ? stripped.toUpperCase()
-    : stripped.replace(/\b\w/g, (c) => c.toUpperCase());
+    : stripped.replaceAll(/\b\w/g, (c) => c.toUpperCase());
 }
 
 // Vibe-sense graph management endpoints to exclude from the palette

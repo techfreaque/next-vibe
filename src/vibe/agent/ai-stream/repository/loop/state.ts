@@ -10,8 +10,7 @@
 
 import "server-only";
 
-import type { ModelMessage } from "ai";
-import type { streamText as aiStreamText } from "ai";
+import type { ModelMessage, streamText as aiStreamText } from "ai";
 import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -22,7 +21,7 @@ import type { ChatModelId, ChatModelOption } from "../../models";
 import type { AiStreamT } from "../../stream/i18n";
 import type { SystemPromptParams } from "../../system-prompt/builder";
 import type { ProviderFactory } from "../core/infra";
-import type { StreamContext } from "../core/stream";
+import type { ToolExecutionContextImpl } from "../core/stream";
 import type { StreamingTTSHandler } from "../core/streaming-tts";
 
 /** Everything a StreamLoop needs, assembled by setup + the orchestrator. */
@@ -40,7 +39,7 @@ export interface StreamLoopParams {
   >;
   /** Set of tool names the model is allowed to execute. null = all allowed. */
   activeToolNames: Set<string> | null;
-  ctx: StreamContext;
+  ctx: ToolExecutionContextImpl;
   threadId: string;
   model: ChatModelId;
   skill: string;
@@ -52,7 +51,7 @@ export interface StreamLoopParams {
   locale: CountryLanguage;
   logger: EndpointLogger;
   t: AiStreamT;
-  streamContext: ToolExecutionContext;
+  toolExecutionContext: ToolExecutionContext;
   /** Cap on tool-call rounds for this stream (ai-run maxTurns). Defaults to MAX_TOOL_CALLS. */
   maxToolCalls?: number;
   imageSize?: string;

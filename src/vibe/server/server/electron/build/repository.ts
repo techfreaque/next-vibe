@@ -13,6 +13,7 @@ import { execSync } from "node:child_process";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
+import { coreEnv, getPackageRunner } from "next-vibe/core/env";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -201,8 +202,14 @@ export class ElectronBuildRepository {
       output.push(
         `4️⃣  Packaging with electron-builder (platform: ${data.platform})...`,
       );
+      const runner = getPackageRunner(coreEnv.PACKAGE_MANAGER);
+      const invocation = [
+        runner.command,
+        ...runner.args,
+        "electron-builder",
+      ].join(" ");
       const builderCmd = [
-        "bunx electron-builder",
+        invocation,
         `--config ${configPath}`,
         `--projectDir ${stageDir}`,
         platformFlags,

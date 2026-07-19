@@ -117,8 +117,8 @@ handler: ({ data, user, logger }) =>
  * Handles [HTTP methods] requests for [feature]
  */
 
-import { endpointsHandler } from "@/system/unified-interface/shared/endpoints/route/multi";
-import { Methods } from "@/system/unified-interface/shared/types/enums";
+import { endpointsHandler } from "next-vibe/core/route/multi";
+import { Methods } from "next-vibe/core/definition/enums";
 
 import definitions from "./definition";
 import { MyRepository } from "./repository";
@@ -264,8 +264,8 @@ handler: ({ user, logger }) =>
 import { success, fail } from "next-vibe/shared/types/response.schema";
 
 // ✅ CORRECT - Only import what's needed for routing
-import { endpointsHandler } from "@/system/unified-interface/shared/endpoints/route/multi";
-import { Methods } from "@/system/unified-interface/shared/types/enums";
+import { endpointsHandler } from "next-vibe/core/route/multi";
+import { Methods } from "next-vibe/core/definition/enums";
 ```
 
 ## Known Exceptions to `endpointsHandler()`

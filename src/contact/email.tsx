@@ -10,6 +10,7 @@ import {
   Section,
   Text as Span,
 } from "@react-email/components";
+import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -19,7 +20,6 @@ import {
 import type { ReactElement } from "react";
 import { z } from "zod";
 
-import { env } from "@/env/env";
 import { configScopedTranslation } from "@/env/i18n";
 import type { EmailTemplateDefinition } from "@/messenger/registry/template";
 
@@ -256,7 +256,7 @@ function ContactFormEmail({
       {props.isForCompany && (
         <Section style={{ textAlign: "center", marginTop: "24px" }}>
           <Button
-            href={`${env.NEXT_PUBLIC_APP_URL}/admin/contacts`}
+            href={`${coreEnv.NEXT_PUBLIC_APP_URL}/admin/contacts`}
             style={{
               backgroundColor: "#4f46e5",
               borderRadius: "6px",

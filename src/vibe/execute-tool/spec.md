@@ -119,7 +119,7 @@ mechanics — not the semantics.
 5. Return `{taskId, hint}` immediately.
 
 **Task IDs are deterministic under fixtures.** `generateTaskId` derives the id
-from `toolCallId` when a `streamContext` is present (no env flag needed) so
+from `toolCallId` when a `toolExecutionContext` is present (no env flag needed) so
 recorded fixtures replay with stable ids, cross-instance included. A random tail
 is appended in production.
 
@@ -154,7 +154,7 @@ The bridge picks the wire leg from the connection's `transportMode`.
   relays the outcome as a `tool-execute-result` event.
 
 **Caller context:** `callerSkillId`, `callerFavoriteId`, `callerPlatform`, and
-`streamContext` travel in the event payload side-channel — never in headers.
+`toolExecutionContext` travel in the event payload side-channel — never in headers.
 Caller-context `fieldDefaults` are resolved caller-side before dispatch
 (`transport/wire.ts → resolveCallerFieldDefaults`).
 
@@ -184,10 +184,10 @@ caller gets an explicit `fail`, never a hang.
 
 ## Wire Events (server-only)
 
-| Event                  | Direction       | Key payload fields                                                                                          |
-| ---------------------- | --------------- | ----------------------------------------------------------------------------------------------------------- |
-| `tool-execute-request` | caller → remote | `{callId, userId, locale, callerSkillId?, callerFavoriteId?, callerPlatform, streamContext?}` + requestData |
-| `tool-execute-result`  | remote → caller | `{callId, status, output?, error?, durationMs, startedAt, executedByInstance?}`                             |
+| Event                  | Direction       | Key payload fields                                                                                                 |
+| ---------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `tool-execute-request` | caller → remote | `{callId, userId, locale, callerSkillId?, callerFavoriteId?, callerPlatform, toolExecutionContext?}` + requestData |
+| `tool-execute-result`  | remote → caller | `{callId, status, output?, error?, durationMs, startedAt, executedByInstance?}`                                    |
 
 Declared on the definition with `serverEvent: true, clientDelivery: false`.
 They relay through the remote-event-bridge — channel, wire leg, and envelope
@@ -217,7 +217,7 @@ Intercepts a pending DETACH or WAKE_UP task and delivers the result.
   - Source: `chatMessages.metadata.toolCall.result` (via `wakeUpToolMessageId`)
   - Fallback: `cronTaskExecutions.result`
 - **Still running**: writes WAIT revival context into `cronTasks.taskInput` (the
-  parked resume-stream task), sets `streamContext.waitingForRemoteResult=true`
+  parked resume-stream task), sets `toolExecutionContext.waitingForRemoteResult=true`
   → stream pauses.
 - **Remote pending call**: checks pending-calls registry first; attaches revival
   via `PendingCalls.setRevival`.
@@ -266,7 +266,7 @@ For tools that may run longer than the stream timeout (SSH, coding-agent):
 1. Tool calls `context.escalateToTask(options?)` during execution.
 2. `escalation-handler.ts` (ai-stream) creates a RUNNING `cronTasks` row with
    revival context via `TaskCompletion.createEscalationTask`, sets
-   `streamContext.waitingForRemoteResult=true`.
+   `toolExecutionContext.waitingForRemoteResult=true`.
 3. Stream aborts via `REMOTE_TOOL_WAIT` → thread → `waiting`.
 4. Tool goroutine continues; calls `onComplete(result)` when done.
 5. `onComplete` → `TaskCompletion.handle` → revival fires.
@@ -302,7 +302,7 @@ All converge on `RouteExecutionExecutor.executeGenericHandler`.
 
 ### `execute()` — HTTP/AI/MCP door
 
-`RouteExecuteRepository.execute(data, user, locale, logger, t, streamContext, platform)`.
+`RouteExecuteRepository.execute(data, user, locale, logger, t, toolExecutionContext, platform)`.
 
 Full orchestrator: parse `instanceId__toolName` → revival guard → folder check →
 permission cascade → dispatch by transport.
@@ -315,7 +315,7 @@ RouteExecuteRepository.runInProcessTyped({
   input,             // typed from definition.types.RequestOutput
   urlPathParams?,    // typed from definition.types.UrlVariablesOutput
   user, locale,
-  logger?, streamContext?, platform?,
+  logger?, toolExecutionContext?, platform?,
   instanceId?, callbackMode?,
 })
 ```

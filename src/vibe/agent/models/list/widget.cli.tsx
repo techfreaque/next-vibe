@@ -12,7 +12,7 @@
 
 import chalk from "chalk";
 import { Box, Text } from "ink";
-import { Platform } from "next-vibe/core/definition/platform";
+import { Platform } from "next-vibe/platforms/platforms";
 import { useWidgetPlatform } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useMemo } from "react";
@@ -173,8 +173,8 @@ function renderListCli(data: ModelListGetResponseOutput): string {
     for (const m of typeModels) {
       const name = chalk.green(m.name.padEnd(maxNameLen + 1));
       const provider = chalk.dim(m.provider.padEnd(maxProviderLen + 1));
-      const intel = intelligenceLabel(m.intelligence.substring(0, 4));
-      const content = contentLabel(m.content.substring(0, 4));
+      const intel = intelligenceLabel(m.intelligence.slice(0, 4));
+      const content = contentLabel(m.content.slice(0, 4));
       const price = priceLabel(m.price);
       const ctx = m.contextWindow
         ? chalk.dim(formatContext(m.contextWindow).padEnd(8))

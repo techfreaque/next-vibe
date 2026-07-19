@@ -21,7 +21,10 @@ import {
   timeSeriesResponseField,
 } from "next-vibe/dataflow/shared/fields";
 import { UserRole } from "next-vibe/identity/roles/enum";
-import { objectField, requestField } from "next-vibe/unified-ui/_shared/utils";
+import {
+  objectField,
+  requestField,
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { WINDOW_MIN_ALIAS } from "./constants";

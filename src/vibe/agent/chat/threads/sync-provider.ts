@@ -38,7 +38,7 @@ import {
   type SyncProvider,
   toThreadsCursor,
 } from "next-vibe/remote-connection/sync/provider";
-import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import { z } from "zod";
 
 import { DefaultFolderId } from "../config";

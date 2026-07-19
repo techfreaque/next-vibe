@@ -9,19 +9,25 @@ import { Methods } from "next-vibe/core/definition/enums";
 import { endpointsHandler } from "next-vibe/core/route/multi";
 
 import vibeCheckEndpoints from "./definition";
-import { VibeCheckRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: vibeCheckEndpoints,
   [Methods.POST]: {
-    handler: ({ data, logger, platform, t, locale, streamContext }) =>
-      VibeCheckRepository.execute(
+    handler: async ({
+      data,
+      logger,
+      platform,
+      t,
+      locale,
+      toolExecutionContext,
+    }) =>
+      (await import("./repository/repository")).VibeCheckRepository.execute(
         data,
         logger,
         platform,
         t,
         locale,
-        streamContext.abortSignal,
+        toolExecutionContext.abortSignal,
       ),
   },
 });

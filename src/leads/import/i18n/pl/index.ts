@@ -143,7 +143,7 @@ export const translations: typeof enTranslations = {
         "Dla plików większych niż ~5 000 wierszy włącz {{chunkedProcessing}}, aby uniknąć limitów czasowych",
       chunkedProcessingLabel: "Przetwarzanie fragmentami",
       downloadTemplateLink: "Pobierz szablon CSV",
-      loadingText: "Importowanie lead\u00f3w\u2026",
+      loadingText: "Importowanie lead\u00F3w\u2026",
       backgroundProcessingTitle: "Przetwarzanie w tle",
       backgroundProcessingNote:
         "Duży import umieszczony w kolejce jako zadanie: {{jobId}}. Przetwarzanie {{totalRows}} wierszy w tle.",
@@ -244,9 +244,9 @@ export const translations: typeof enTranslations = {
     loading: "Wczytywanie zada\u0144 importu\u2026",
     empty: {
       title: "Nie znaleziono zada\u0144 importu",
-      withFilter: "Spr\u00f3buj innego filtru lub rozpocznij nowy import.",
+      withFilter: "Spr\u00F3buj innego filtru lub rozpocznij nowy import.",
       withoutFilter:
-        "Rozpocznij sw\u00f3j pierwszy import, aby zobaczy\u0107 go tutaj.",
+        "Rozpocznij sw\u00F3j pierwszy import, aby zobaczy\u0107 go tutaj.",
       newImport: "Nowy import",
     },
   },

@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import type { JWTPublicPayloadType } from "next-vibe/identity/auth/types";
@@ -12,7 +13,6 @@ import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
 import { Link } from "next-vibe/ui/ui/link";
 import type { JSX } from "react";
 
-import { envClient } from "@/env/env-client";
 import { configScopedTranslation } from "@/env/i18n";
 
 import ResetPasswordForm from "./_components/reset-password-form";

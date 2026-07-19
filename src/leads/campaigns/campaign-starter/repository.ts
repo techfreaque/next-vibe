@@ -7,7 +7,7 @@
 import "server-only";
 
 import { and, eq, gte, inArray, isNotNull, isNull, lt, sql } from "drizzle-orm";
-import { Platform } from "next-vibe/core/definition/platform";
+import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { CountryLanguageValues } from "next-vibe/core/i18n/core/config";
 import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
@@ -27,11 +27,10 @@ import {
   LeadStatus,
 } from "next-vibe/identity/lead/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { Platform } from "next-vibe/platforms/platforms";
 import { cronTasks, type NewCronTask } from "next-vibe/tasks/cron/db";
 import { getCronFrequencyMinutes } from "next-vibe/tasks/cron-formatter";
 import { CronTaskPriority, TaskCategory } from "next-vibe/tasks/enum";
-
-import { env } from "@/env/env";
 
 import { scopedTranslation as smtpScopedTranslation } from "../../../messenger/providers/email/smtp-client/i18n";
 import { SmtpRepository } from "../../../messenger/providers/email/smtp-client/repository";
@@ -134,7 +133,7 @@ function getDefaultLocaleEntry(): {
 }
 
 function getDefaultCampaignConfig(): CampaignStarterConfigGetResponseOutput {
-  const isProduction = env.NODE_ENV === Environment.PRODUCTION;
+  const isProduction = coreEnv.NODE_ENV === Environment.PRODUCTION;
   return {
     dryRun: false,
     minAgeHours: 0,
@@ -157,7 +156,7 @@ function getDefaultCampaignConfig(): CampaignStarterConfigGetResponseOutput {
 
 export class CampaignStarterRepository {
   private static getCurrentEnvironment(): Environment {
-    return env.NODE_ENV === Environment.PRODUCTION
+    return coreEnv.NODE_ENV === Environment.PRODUCTION
       ? Environment.PRODUCTION
       : Environment.DEVELOPMENT;
   }

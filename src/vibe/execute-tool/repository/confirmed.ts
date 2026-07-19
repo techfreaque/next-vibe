@@ -21,12 +21,12 @@ import "server-only";
 
 import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
 import type { ChatMessage, ToolCall } from "next-vibe/agent/chat/db";
-import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { Platform } from "next-vibe/platforms/platforms";
 
 import { CallbackMode, EXECUTE_TOOL_ALIAS } from "../constants";
 import { TaskCompletion } from "./completion";
@@ -61,7 +61,7 @@ export class ConfirmedExecution {
     user: JwtPayloadType;
     locale: CountryLanguage;
     logger: EndpointLogger;
-    streamContext: ToolExecutionContext;
+    toolExecutionContext: ToolExecutionContext;
   }): Promise<ConfirmedExecutionResult> {
     const {
       toolCall,
@@ -72,7 +72,7 @@ export class ConfirmedExecution {
       user,
       locale,
       logger,
-      streamContext,
+      toolExecutionContext,
     } = params;
 
     const baseArgs = updatedArgs
@@ -120,10 +120,10 @@ export class ConfirmedExecution {
 
     // Set currentToolMessageId so the wakeUp path calls handleTaskCompletion with
     // the correct toolMessageId for revival backfill.
-    streamContext.currentToolMessageId = toolMessageId;
+    toolExecutionContext.currentToolMessageId = toolMessageId;
     // Signal a confirmed re-execution so execute-tool's requiresConfirmation gate
     // is bypassed — the user already confirmed, we must not halt again.
-    streamContext.isConfirmedReExecution = true;
+    toolExecutionContext.isConfirmedReExecution = true;
 
     logger.debug("[ConfirmedExecution] Executing tool", {
       toolName: execToolName,
@@ -140,7 +140,7 @@ export class ConfirmedExecution {
       user,
       locale,
       logger,
-      streamContext,
+      toolExecutionContext,
       platform: Platform.AI,
     });
 

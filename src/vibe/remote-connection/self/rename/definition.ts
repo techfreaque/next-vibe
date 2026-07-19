@@ -17,7 +17,7 @@ import {
   requestField,
   responseField,
   widgetField,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { scopedTranslation } from "./i18n";
@@ -124,8 +124,7 @@ const { PATCH } = createEndpoint({
   options: {
     mutationOptions: {
       onSuccess: async (data) => {
-        const { apiClient } =
-          await import("next-vibe/platforms/react/hooks/store");
+        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
         const listDefinition = await import("../../list/definition");
         apiClient.updateEndpointData(
           listDefinition.GET,

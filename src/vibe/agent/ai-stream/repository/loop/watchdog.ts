@@ -1,13 +1,13 @@
 /**
  * Provider first-part watchdog for the StreamLoop.
  *
- * Stateless: the live timer handle lives on the StreamContext (core state);
+ * Stateless: the live timer handle lives on the ToolExecutionContextImpl (core state);
  * these static ops arm/clear it so a per-loop instance isn't needed.
  */
 
 import "server-only";
 
-import type { StreamContext } from "../core/stream";
+import type { ToolExecutionContextImpl } from "../core/stream";
 
 /**
  * Provider first-part watchdog: a dead provider connection (request sent, then
@@ -20,7 +20,7 @@ import type { StreamContext } from "../core/stream";
 export class FirstPartWatchdog {
   static readonly TIMEOUT_MS = 180_000;
 
-  static arm(ctx: StreamContext, onTimeout: () => void): void {
+  static arm(ctx: ToolExecutionContextImpl, onTimeout: () => void): void {
     FirstPartWatchdog.clear(ctx);
     ctx.firstPartWatchdogTimer = setTimeout(
       onTimeout,
@@ -28,7 +28,7 @@ export class FirstPartWatchdog {
     );
   }
 
-  static clear(ctx: StreamContext): void {
+  static clear(ctx: ToolExecutionContextImpl): void {
     if (ctx.firstPartWatchdogTimer) {
       clearTimeout(ctx.firstPartWatchdogTimer);
       ctx.firstPartWatchdogTimer = null;

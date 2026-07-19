@@ -5,8 +5,8 @@
  */
 
 import { FieldDataType, WidgetType } from "next-vibe/core/definition/enums";
-import { Platform } from "next-vibe/core/definition/platform";
-import { requestField } from "next-vibe/unified-ui/_shared/utils";
+import { Platform } from "next-vibe/platforms/platforms";
+import { requestField } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { scopedTranslation } from "../i18n";

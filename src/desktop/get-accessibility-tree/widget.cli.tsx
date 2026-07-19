@@ -6,7 +6,7 @@
 
 import chalk from "chalk";
 import { Box, Text } from "ink";
-import { Platform } from "next-vibe/core/definition/platform";
+import { Platform } from "next-vibe/platforms/platforms";
 import { useWidgetPlatform } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useMemo } from "react";
@@ -25,7 +25,7 @@ const MAX_CLI_LINES = 200;
 /** Color roles in tree lines: `[role]` patterns → dim cyan */
 function colorizeTreeLine(line: string): string {
   // Match [role] or [role 'name'] patterns
-  return line.replace(/\[([^\]]+)\]/g, (match) => {
+  return line.replaceAll(/\[([^\]]+)\]/g, (match) => {
     const role = match.slice(1, -1);
     return chalk.dim.cyan(`[${role}]`);
   });
@@ -57,7 +57,7 @@ export function GetAccessibilityTreeCliWidget({
       if (v.truncated) {
         stats.push("truncated: true");
       }
-      return stats.length ? `${stats.join("  ")}\n${v.tree}` : v.tree;
+      return stats.length > 0 ? `${stats.join("  ")}\n${v.tree}` : v.tree;
     }
 
     // CLI: color-enhanced tree, truncated if too long

@@ -2,7 +2,6 @@
 
 import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { Platform } from "next-vibe/core/definition/platform";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -14,7 +13,8 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { createEndpointLogger } from "next-vibe/logger/server";
-import { scopedTranslation } from "next-vibe/tooling/check/i18n";
+import { Platform } from "next-vibe/platforms/platforms";
+import { scopedTranslation } from "next-vibe/tooling/testing/test/i18n";
 
 /**
  * Call the API handler directly via the vibe runtime executor
@@ -26,7 +26,7 @@ export async function sendTestRequest<TEndpoint extends CreateApiEndpointAny>({
   urlPathParams,
   user,
   instanceId,
-  streamContext,
+  toolExecutionContext,
 }: {
   endpoint: TEndpoint;
   user?: JwtPayloadType;
@@ -38,7 +38,7 @@ export async function sendTestRequest<TEndpoint extends CreateApiEndpointAny>({
    * setup callers pass an explicit thread-less makeHeadlessContext(u, u).
    * Pass undefined for pure validation/auth tests that don't touch AI infra.
    */
-  streamContext: ToolExecutionContext | undefined;
+  toolExecutionContext: ToolExecutionContext | undefined;
 } & (TEndpoint["types"]["RequestOutput"] extends never
   ? { data?: never }
   : { data: TEndpoint["types"]["RequestOutput"] }) &
@@ -73,7 +73,7 @@ export async function sendTestRequest<TEndpoint extends CreateApiEndpointAny>({
       await import("next-vibe/execute-tool/repository");
 
     // Execute using the shared route execution infrastructure. The caller's
-    // streamContext (fixture chain, threadId) rides straight through — the
+    // toolExecutionContext (fixture chain, threadId) rides straight through — the
     // whole AI/media/remote chain records and replays under it. Non-AI setup
     // callers pass an explicit thread-less root (makeHeadlessContext(u,u)),
     // which routes any incidental external call live.
@@ -86,14 +86,14 @@ export async function sendTestRequest<TEndpoint extends CreateApiEndpointAny>({
       locale: defaultLocale,
       logger,
       platform: Platform.NEXT_API,
-      streamContext,
+      toolExecutionContext,
     });
 
     const { t } = scopedTranslation.scopedT(defaultLocale);
     // Handle streaming responses (convert to error for tests)
     if (isStreamingResponse(result)) {
       return fail({
-        message: t("testing.test.errors.internal.title"),
+        message: t("errors.internal.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: "Streaming responses are not supported in tests",
@@ -110,7 +110,7 @@ export async function sendTestRequest<TEndpoint extends CreateApiEndpointAny>({
       const parseResult = endpoint.responseSchema.safeParse(result.data);
       if (!parseResult.success) {
         return fail({
-          message: t("testing.test.errors.internal.title"),
+          message: t("errors.internal.title"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
             endpoint: endpoint.path.join("/"),
@@ -126,7 +126,7 @@ export async function sendTestRequest<TEndpoint extends CreateApiEndpointAny>({
   } catch (error) {
     const { t } = scopedTranslation.scopedT(defaultLocale);
     return fail({
-      message: t("testing.test.errors.internal.title"),
+      message: t("errors.internal.title"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
       messageParams: { error: parseError(error).message },
     });

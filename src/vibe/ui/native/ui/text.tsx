@@ -1,5 +1,5 @@
 import * as Slot from "@rn-primitives/slot";
-import { cn } from "next-vibe/core/utils/utils";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import * as React from "react";
 import { Text as RNText } from "react-native";
 

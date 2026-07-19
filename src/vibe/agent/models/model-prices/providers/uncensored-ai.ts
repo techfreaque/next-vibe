@@ -99,7 +99,7 @@ export class UncensoredAiPriceFetcher extends PriceFetcher {
       // Extract context length: "32,768 tokens" or "32768 tokens"
       const contextMatch = js.match(/([\d,]+)\s*tokens/);
       if (contextMatch) {
-        contextLength = parseInt(contextMatch[1].replace(/,/g, ""), 10);
+        contextLength = parseInt(contextMatch[1].replaceAll(",", ""), 10);
         // Filter out obviously wrong matches (React internals have small numbers)
         if (contextLength < 1000) {
           contextLength = undefined;

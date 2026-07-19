@@ -15,6 +15,8 @@
 import "server-only";
 
 import { and, eq } from "drizzle-orm";
+import { coreEnv } from "next-vibe/core/env";
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -27,8 +29,6 @@ import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { env } from "@/env/env";
-import { envClient } from "@/env/env-client";
 import loginEndpoints, {
   type LoginPostResponseOutput,
 } from "@/user/public/login/definition";
@@ -88,9 +88,9 @@ export class RemoteConnectionConnectRepository {
     const isDev =
       envClient.NODE_ENV === "development" ||
       envClient.NODE_ENV === "test" ||
-      env.NODE_ENV === "development" ||
-      env.NODE_ENV === "test" ||
-      env.IS_PREVIEW_MODE === true;
+      coreEnv.NODE_ENV === "development" ||
+      coreEnv.NODE_ENV === "test" ||
+      coreEnv.IS_PREVIEW_MODE === true;
     if (!isDev) {
       if (
         RemoteConnectionConnectRepository.PRIVATE_IP_PATTERNS.some((re) =>

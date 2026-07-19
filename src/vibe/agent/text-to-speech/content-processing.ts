@@ -5,12 +5,12 @@
 
 import type { ChatMessage } from "next-vibe/agent/chat/db";
 import { definitionLoader } from "next-vibe/core/definition/loader";
-import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { Platform } from "next-vibe/platforms/platforms";
 import { getTranslatorFromEndpoint } from "next-vibe/unified-ui/_shared/field-helpers";
 
 /**
@@ -25,7 +25,7 @@ export function stripThinkTags(content: string): string {
   processed = processed.replaceAll(/<think>[\s\S]*$/gi, "");
 
   // Remove orphaned closing tags left when opening tag was in a prior chunk
-  processed = processed.replaceAll(/<\/think>/gi, "");
+  processed = processed.replaceAll("</think>", "");
 
   // Trim whitespace
   const result = processed.trim();

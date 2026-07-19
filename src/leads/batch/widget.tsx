@@ -4,7 +4,6 @@
  */
 
 "use client";
-import { cn } from "next-vibe/core/utils/utils";
 import { scopedTranslation as leadsScopedTranslation } from "next-vibe/identity/lead/i18n";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -15,6 +14,7 @@ import { List } from "next-vibe/ui/ui/icons/List";
 import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
 import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
 import { Span } from "next-vibe/ui/ui/span";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -23,13 +23,13 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { BooleanFieldWidget } from "next-vibe/unified-ui/form-fields/boolean-field/widget";
-import { NumberFieldWidget } from "next-vibe/unified-ui/form-fields/number-field/widget";
-import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field/widget";
-import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
+import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
+import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/number-field/widget";
+import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import React, { useCallback } from "react";
 
 import type definition from "./definition";

@@ -4,7 +4,6 @@
  */
 
 "use client";
-import { cn } from "next-vibe/core/utils/utils";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { Activity } from "next-vibe/ui/ui/icons/Activity";
@@ -16,6 +15,7 @@ import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
 import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
 import { Span } from "next-vibe/ui/ui/span";
 import { Strong } from "next-vibe/ui/ui/strong";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -24,7 +24,7 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import React from "react";
 
 import { CsvImportJobStatus, type CsvImportJobStatusValue } from "../enum";

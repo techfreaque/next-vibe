@@ -29,7 +29,7 @@ import {
 import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
 import {
   DefaultFolderId,
-  rootlessStreamContext,
+  rootlessToolExecutionContext,
 } from "next-vibe/agent/chat/config";
 import { chatFavorites } from "next-vibe/agent/skills/favorites/db";
 import { scopedTranslation as favoritesScopedTranslation } from "next-vibe/agent/skills/favorites/i18n";
@@ -40,7 +40,7 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { createEndpointLogger } from "next-vibe/logger/server";
-import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
+import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
@@ -256,7 +256,7 @@ describe("Skill Creator E2E", () => {
   it(
     "SC1: Thea delegates to skill-creator via ai-run → tool-help → skill-create → favorite-create (no retries)",
     async () => {
-      const fixtureCtx: ToolExecutionContext = rootlessStreamContext();
+      const fixtureCtx: ToolExecutionContext = rootlessToolExecutionContext();
 
       /**
        * Prompt is sent to Thea (default skill). Thea should delegate to
@@ -285,7 +285,7 @@ When BOTH are done, end with [TEST:PASS] on success or [TEST:FAIL: <reason>] on 
         user: testUser,
         favoriteId: mainFavoriteId,
         subFolderId: testSubFolderId,
-        streamContext: fixtureCtx,
+        toolExecutionContext: fixtureCtx,
       });
 
       // eslint-disable-next-line no-console

@@ -5,6 +5,7 @@
 
 import "server-only";
 
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -17,8 +18,6 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { envClient } from "@/env/env-client";
 
 import { ProductIds } from "../../products/repository-client";
 import { BillingInterval } from "../../subscription/enum";

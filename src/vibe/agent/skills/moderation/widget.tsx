@@ -18,8 +18,8 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import BadgeWidget from "next-vibe/unified-ui/display-only/badge/widget";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import BadgeWidget from "next-vibe/unified-ui/widgets/display-only/badge/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import { type JSX, useState } from "react";
 
 import type definition from "./definition";

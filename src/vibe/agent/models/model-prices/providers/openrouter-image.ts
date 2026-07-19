@@ -227,7 +227,10 @@ export class OpenRouterImagePriceFetcher extends PriceFetcher {
           for (const [label, usd] of Object.entries(parsed.resolutionTiers)) {
             creditsMap[label] = this.usdToCredits(usd);
           }
-          const pricingLiteral = JSON.stringify(creditsMap).replace(/,/g, ", ");
+          const pricingLiteral = JSON.stringify(creditsMap).replaceAll(
+            ",",
+            ", ",
+          );
           settingsUpdates.push({
             providerModel: providerConfig.providerModel,
             field: "pricingByResolution",

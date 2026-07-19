@@ -1,4 +1,4 @@
-import { envClient } from "@/env/env-client";
+import { agentClientEnv } from "./env-client";
 
 export interface AgentEnvAvailability {
   openRouter: boolean;
@@ -29,31 +29,31 @@ export interface AgentEnvAvailability {
 }
 
 const agentEnvAvailability: AgentEnvAvailability = (() => {
-  const braveSearch = envClient.NEXT_PUBLIC_AGENT_BRAVE_SEARCH;
-  const kagiSearch = envClient.NEXT_PUBLIC_AGENT_KAGI_SEARCH;
+  const braveSearch = agentClientEnv.NEXT_PUBLIC_AGENT_BRAVE_SEARCH;
+  const kagiSearch = agentClientEnv.NEXT_PUBLIC_AGENT_KAGI_SEARCH;
 
   return {
-    openRouter: envClient.NEXT_PUBLIC_AGENT_OPEN_ROUTER,
-    claudeCode: envClient.NEXT_PUBLIC_AGENT_CLAUDE_CODE,
-    voice: envClient.NEXT_PUBLIC_AGENT_VOICE,
+    openRouter: agentClientEnv.NEXT_PUBLIC_AGENT_OPEN_ROUTER,
+    claudeCode: agentClientEnv.NEXT_PUBLIC_AGENT_CLAUDE_CODE,
+    voice: agentClientEnv.NEXT_PUBLIC_AGENT_VOICE,
     braveSearch,
     kagiSearch,
     anySearch: braveSearch || kagiSearch,
-    uncensoredAI: envClient.NEXT_PUBLIC_AGENT_UNCENSORED_AI,
-    freedomGPT: envClient.NEXT_PUBLIC_AGENT_FREEDOM_GPT,
-    gabAI: envClient.NEXT_PUBLIC_AGENT_GAB_AI,
-    veniceAI: envClient.NEXT_PUBLIC_AGENT_VENICE_AI,
-    scrappey: envClient.NEXT_PUBLIC_AGENT_SCRAPPEY,
-    openAiImages: envClient.NEXT_PUBLIC_AGENT_OPEN_AI_IMAGES,
-    openAiStt: envClient.NEXT_PUBLIC_AGENT_OPEN_AI_STT,
-    replicate: envClient.NEXT_PUBLIC_AGENT_REPLICATE,
-    falAi: envClient.NEXT_PUBLIC_AGENT_FAL_AI,
-    modelsLab: envClient.NEXT_PUBLIC_AGENT_MODELS_LAB,
-    edenAiStt: envClient.NEXT_PUBLIC_AGENT_EDEN_AI_STT,
-    deepgram: envClient.NEXT_PUBLIC_AGENT_DEEPGRAM,
-    openAiTts: envClient.NEXT_PUBLIC_AGENT_OPEN_AI_TTS,
-    edenAiTts: envClient.NEXT_PUBLIC_AGENT_EDEN_AI_TTS,
-    elevenlabs: envClient.NEXT_PUBLIC_AGENT_ELEVENLABS,
+    uncensoredAI: agentClientEnv.NEXT_PUBLIC_AGENT_UNCENSORED_AI,
+    freedomGPT: agentClientEnv.NEXT_PUBLIC_AGENT_FREEDOM_GPT,
+    gabAI: agentClientEnv.NEXT_PUBLIC_AGENT_GAB_AI,
+    veniceAI: agentClientEnv.NEXT_PUBLIC_AGENT_VENICE_AI,
+    scrappey: agentClientEnv.NEXT_PUBLIC_AGENT_SCRAPPEY,
+    openAiImages: agentClientEnv.NEXT_PUBLIC_AGENT_OPEN_AI_IMAGES,
+    openAiStt: agentClientEnv.NEXT_PUBLIC_AGENT_OPEN_AI_STT,
+    replicate: agentClientEnv.NEXT_PUBLIC_AGENT_REPLICATE,
+    falAi: agentClientEnv.NEXT_PUBLIC_AGENT_FAL_AI,
+    modelsLab: agentClientEnv.NEXT_PUBLIC_AGENT_MODELS_LAB,
+    edenAiStt: agentClientEnv.NEXT_PUBLIC_AGENT_EDEN_AI_STT,
+    deepgram: agentClientEnv.NEXT_PUBLIC_AGENT_DEEPGRAM,
+    openAiTts: agentClientEnv.NEXT_PUBLIC_AGENT_OPEN_AI_TTS,
+    edenAiTts: agentClientEnv.NEXT_PUBLIC_AGENT_EDEN_AI_TTS,
+    elevenlabs: agentClientEnv.NEXT_PUBLIC_AGENT_ELEVENLABS,
     unbottledSystem: false,
     unbottledForce: false,
   };

@@ -5,11 +5,12 @@
 
 "use client";
 
-import { Plus, X } from "lucide-react";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import type { TParams } from "next-vibe/core/i18n/core/static-types";
-import { cn } from "next-vibe/core/utils/utils";
+import { Plus } from "next-vibe/ui/ui/icons/Plus";
+import { X } from "next-vibe/ui/ui/icons/X";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 import { useRef, useState } from "react";
 

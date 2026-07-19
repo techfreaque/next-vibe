@@ -17,12 +17,11 @@ import "server-only";
 import { pathSegmentsToToolName } from "next-vibe/core/core-utils/path";
 import { zodSchemaToJsonSchema } from "next-vibe/core/definition/endpoint-to-metadata";
 import { FieldUsage } from "next-vibe/core/definition/enums";
+import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { generateSchemaForUsage } from "next-vibe/unified-ui/_shared/utils";
 import { z } from "zod";
-
-import { env } from "@/env/env";
 
 // ============================================================================
 // SKILL TIER DEFINITIONS
@@ -477,7 +476,7 @@ export async function generateTierAiRunMarkdown(
 ): Promise<string> {
   const config = SKILL_TIERS[tier];
   const now = new Date().toISOString();
-  const baseUrl = env.NEXT_PUBLIC_APP_URL ?? "https://your-app.com";
+  const baseUrl = coreEnv.NEXT_PUBLIC_APP_URL ?? "https://your-app.com";
   const apiBase = `${baseUrl}/api/${locale}`;
   const runUrl = `${apiBase}/agent/ai-stream/run`;
   const skillUrl = `${baseUrl}/api/${locale}/system/platforms/ai/skills/${config.filename}`;
@@ -585,7 +584,7 @@ export async function generateSkillAiRunMarkdown(
   const modelSelection = defaultVariant?.modelSelection ?? null;
 
   const now = new Date().toISOString();
-  const baseUrl = env.NEXT_PUBLIC_APP_URL ?? "https://your-app.com";
+  const baseUrl = coreEnv.NEXT_PUBLIC_APP_URL ?? "https://your-app.com";
   const apiBase = `${baseUrl}/api/${locale}`;
   const runUrl = `${apiBase}/agent/ai-stream/run`;
   const skillUrl = `${baseUrl}/api/${locale}/system/platforms/ai/skills/${skillId}-skill.md`;
@@ -686,7 +685,7 @@ export async function generateSkillMarkdown(
   const grouped = groupByCategory(tierEndpoints);
 
   const now = new Date().toISOString();
-  const baseUrl = env.NEXT_PUBLIC_APP_URL ?? "https://your-app.com";
+  const baseUrl = coreEnv.NEXT_PUBLIC_APP_URL ?? "https://your-app.com";
   const apiBase = `${baseUrl}/api/${locale}`;
   const lines: string[] = [];
 
@@ -1016,7 +1015,7 @@ export async function generateSkillSkillMarkdown(
   const modelSelection = defaultVariant2?.modelSelection ?? null;
 
   const now = new Date().toISOString();
-  const baseUrl = env.NEXT_PUBLIC_APP_URL ?? "https://your-app.com";
+  const baseUrl = coreEnv.NEXT_PUBLIC_APP_URL ?? "https://your-app.com";
   const apiBase = `${baseUrl}/api/${locale}`;
   const hasTools =
     charInfo.availableTools !== null && charInfo.availableTools.length > 0;

@@ -8,7 +8,7 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ data, user, logger, t, locale, streamContext }) =>
+    handler: async ({ data, user, logger, t, locale, toolExecutionContext }) =>
       CortexSearchRepository.search({
         userId: user.id,
         user,
@@ -18,7 +18,7 @@ export const { GET, tools } = endpointsHandler({
         logger,
         t,
         locale,
-        streamContext: streamContext,
+        toolExecutionContext: toolExecutionContext,
       }),
   },
 });

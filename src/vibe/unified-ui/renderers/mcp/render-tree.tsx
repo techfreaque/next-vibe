@@ -1,17 +1,17 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { queryClient } from "next-vibe/platforms/react/hooks/store";
-import { NavigationStackProvider } from "next-vibe/platforms/react/hooks/use-navigation-stack";
+import { Platform } from "next-vibe/platforms/platforms";
 import { LoggerProvider } from "next-vibe/ui/hooks/logger-provider";
+import { queryClient } from "next-vibe/unified-ui/hooks/store";
+import { NavigationStackProvider } from "next-vibe/unified-ui/hooks/use-navigation-stack";
 import type { JSX } from "react";
 
-import { EndpointRenderer } from "../react/EndpointRenderer";
+import { EndpointRenderer } from "../web/EndpointRenderer";
 
 export function McpRenderTree({
   endpoint,

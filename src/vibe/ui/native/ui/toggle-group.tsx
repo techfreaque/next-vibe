@@ -1,7 +1,7 @@
 import * as ToggleGroupPrimitive from "@rn-primitives/toggle-group";
 import type { LucideIcon } from "lucide-react-native";
 import { styled } from "nativewind";
-import { cn } from "next-vibe/core/utils/utils";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import * as React from "react";
 import { View } from "react-native";
 

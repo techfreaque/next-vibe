@@ -5,7 +5,7 @@ import type { DefaultFolderId } from "next-vibe/agent/chat/config";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 
 /**
  * Bumps updatedAt on a folder and ALL of its ancestors in one recursive CTE,

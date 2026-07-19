@@ -434,8 +434,8 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
-import { db } from "@/system/db";
-import type { EndpointLogger } from "@/system/unified-interface/shared/logger/endpoint";
+import { db } from "next-vibe/database";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import type { JwtPayloadType } from "@/user/auth/types";
 import type { MyT } from "./i18n"; // ✅ named type - never `import type { scopedTranslation }`
 import { myTable } from "./db";
@@ -499,7 +499,7 @@ my-feature/
 import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { success } from "next-vibe/shared/types/response.schema";
-import type { EndpointLogger } from "@/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import type { JwtPayloadType } from "@/user/auth/types";
 import type {
   OrderGetResponseOutput,
@@ -575,8 +575,8 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
-import { db } from "@/system/db";
-import type { EndpointLogger } from "@/system/unified-interface/shared/logger/endpoint";
+import { db } from "next-vibe/database";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import { orders, type Order, type NewOrder } from "../db";
 
 export class OrderQueries {
@@ -642,7 +642,7 @@ import {
   fail,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
-import type { EndpointLogger } from "@/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import type { JwtPayloadType } from "@/user/auth/types";
 import type { Order } from "../db";
 import type { OrderCreateRequestOutput } from "../definition";

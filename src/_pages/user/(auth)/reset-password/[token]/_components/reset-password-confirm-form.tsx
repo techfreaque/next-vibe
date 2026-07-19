@@ -9,7 +9,7 @@ import { Card, CardContent } from "next-vibe/ui/ui/card";
 import { Div } from "next-vibe/ui/ui/div";
 import { Link } from "next-vibe/ui/ui/link";
 import { MotionDiv } from "next-vibe/ui/ui/motion";
-import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 
 import resetConfirmDefinitions from "@/user/public/reset-password/confirm/definition";

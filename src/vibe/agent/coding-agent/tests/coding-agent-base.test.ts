@@ -35,7 +35,7 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { cronTasks } from "next-vibe/tasks/cron/db";
-import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
+import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { seedCaseThread } from "../../ai-stream/testing/fixture-seed";
@@ -331,7 +331,7 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
       // All suite threads land in PRIVATE -> tests -> <testCaseName>.
       const suiteRootFolderId = DefaultFolderId.PRIVATE;
       const testCaseName =
-        cfg.cachePrefix.replace(/[^a-z0-9-]/gi, "").replace(/-+$/, "") ||
+        cfg.cachePrefix.replaceAll(/[^a-z0-9-]/gi, "").replace(/-+$/, "") ||
         "coding-agent";
       const testsParentId = await getOrCreateFolder(
         testUser,
@@ -480,13 +480,13 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
       fit(
         "CA1: batch WAIT - coding-agent output backfilled in original tool message",
         async () => {
-          const { threadId: seededThreadId, streamContext } =
+          const { threadId: seededThreadId, toolExecutionContext } =
             await seedCaseThread(`${cfg.cachePrefix}ca1-batch-wait`, true);
 
           const { result, messages } = await runStream({
             user: testUser,
             threadId: seededThreadId,
-            streamContext,
+            toolExecutionContext,
             favoriteId: mainFavoriteId,
             prompt: `[CA1] Call ${agentInstr(cfg, "echo hello-ca1", false, "wait")}. After the tool returns, verify the result has an 'output' string containing "hello-ca1". Reply with STEP_OK and quote the exact output value.`,
           });
@@ -603,7 +603,7 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
         async () => {
           const { result, messages } = await runStream({
             user: testUser,
-            streamContext: makeHeadlessContext(
+            toolExecutionContext: makeHeadlessContext(
               undefined,
               threadId,
               /* no user context — UTC (dates not user-facing here) */ "UTC",
@@ -686,7 +686,7 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
         async () => {
           const { result, messages } = await runStream({
             user: testUser,
-            streamContext: makeHeadlessContext(
+            toolExecutionContext: makeHeadlessContext(
               undefined,
               threadId,
               /* no user context — UTC (dates not user-facing here) */ "UTC",
@@ -784,7 +784,7 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
         async () => {
           const { result } = await runStream({
             user: testUser,
-            streamContext: makeHeadlessContext(
+            toolExecutionContext: makeHeadlessContext(
               undefined,
               threadId,
               /* no user context — UTC (dates not user-facing here) */ "UTC",
@@ -962,7 +962,7 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
       fit(
         "CA5: interactive WAIT - escalates, stream waits, complete-task → backfill + revival",
         async () => {
-          const { threadId: seededThreadId, streamContext } =
+          const { threadId: seededThreadId, toolExecutionContext } =
             await seedCaseThread(
               `${cfg.cachePrefix}ca5-interactive-wait`,
               true,
@@ -971,7 +971,7 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
           const { result } = await runStream({
             user: testUser,
             threadId: seededThreadId,
-            streamContext,
+            toolExecutionContext,
             favoriteId: mainFavoriteId,
             prompt: `[CA5] Call ${agentInstr(cfg, "echo hello-ca5-wait", true, "wait")}. The tool escalates to a background task. After revival verify the result output contains "hello-ca5-wait". Reply with STEP_OK and quote the exact output.`,
           });
@@ -1065,7 +1065,7 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
         async () => {
           const { result, messages } = await runStream({
             user: testUser,
-            streamContext: makeHeadlessContext(
+            toolExecutionContext: makeHeadlessContext(
               undefined,
               threadId,
               /* no user context — UTC (dates not user-facing here) */ "UTC",
@@ -1155,7 +1155,7 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
         async () => {
           const { result, messages } = await runStream({
             user: testUser,
-            streamContext: makeHeadlessContext(
+            toolExecutionContext: makeHeadlessContext(
               undefined,
               threadId,
               /* no user context — UTC (dates not user-facing here) */ "UTC",
@@ -1257,7 +1257,7 @@ export function describeCodingAgentSuite(cfg: CodingAgentModeConfig): void {
         async () => {
           const { result } = await runStream({
             user: testUser,
-            streamContext: makeHeadlessContext(
+            toolExecutionContext: makeHeadlessContext(
               undefined,
               threadId,
               /* no user context — UTC (dates not user-facing here) */ "UTC",

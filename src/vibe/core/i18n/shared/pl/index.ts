@@ -1,0 +1,97 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  errorTypes: {
+    auth_error: "Błąd uwierzytelniania",
+    bad_request: "Nieprawidłowe żądanie",
+    database_error: "Błąd bazy danych",
+    email_error: "Błąd e-mail",
+    external_service_error: "Błąd usługi zewnętrznej",
+    forbidden: "Zabronione",
+    http_error: "Błąd HTTP",
+    internal_error: "Błąd wewnętrzny",
+    invalid_credentials_error: "Nieprawidłowe dane logowania",
+    invalid_data_error: "Nieprawidłowe dane",
+    invalid_format_error: "Nieprawidłowy format",
+    invalid_input_error: "Nieprawidłowe dane wejściowe",
+    invalid_method_error: "Nieprawidłowa metoda",
+    invalid_parameter_error: "Nieprawidłowy parametr",
+    invalid_path_error: "Nieprawidłowa ścieżka",
+    invalid_payload_error: "Nieprawidłowy ładunek",
+    invalid_query_error: "Nieprawidłowe zapytanie",
+    invalid_request_error: "Nieprawidłowe żądanie",
+    invalid_response_error: "Nieprawidłowa odpowiedź",
+    invalid_status_error: "Nieprawidłowy status",
+    invalid_token_error: "Nieprawidłowy token",
+    invalid_url_error: "Nieprawidłowy adres URL",
+    no_response_data: "Brak danych odpowiedzi",
+    not_found: "Nie znaleziono",
+    partial_failure: "Częściowe niepowodzenie",
+    payment_failed: "Płatność nie powiodła się",
+    payment_required: "Wymagana płatność",
+    permission_denied: "Odmowa dostępu",
+    permission_error: "Błąd uprawnień",
+    sms_error: "Błąd SMS",
+    token_expired_error: "Token wygasł",
+    two_factor_required: "Wymagane uwierzytelnianie dwuskładnikowe",
+    unauthorized: "Nieautoryzowany",
+    unknown_error: "Nieznany błąd",
+    validation_error: "Błąd walidacji",
+  },
+  stats: {
+    chartType: {
+      area: "Obszar",
+      bar: "Słupkowy",
+      donut: "Pierścieniowy",
+      line: "Liniowy",
+      pie: "Kołowy",
+    },
+    dateRange: {
+      custom: "Niestandardowy",
+      last30Days: "Ostatnie 30 dni",
+      last7Days: "Ostatnie 7 dni",
+      last90Days: "Ostatnie 90 dni",
+      lastMonth: "Ostatni miesiąc",
+      lastQuarter: "Ostatni kwartał",
+      lastWeek: "Ostatni tydzień",
+      lastYear: "Ostatni rok",
+      thisMonth: "Bieżący miesiąc",
+      thisQuarter: "Bieżący kwartał",
+      thisWeek: "Bieżący tydzień",
+      thisYear: "Bieżący rok",
+      today: "Dziś",
+      yesterday: "Wczoraj",
+    },
+    timePeriod: {
+      day: "Dzień",
+      month: "Miesiąc",
+      quarter: "Kwartał",
+      week: "Tydzień",
+      year: "Rok",
+    },
+  },
+  errors: {
+    invalid_request_data: "Nieprawidłowe dane żądania",
+  },
+  shared: {
+    permissions: {
+      errors: {
+        definitionError: "Błąd definicji punktu końcowego",
+        platformAccessDenied: "Odmowa dostępu na {{platform}}: {{reason}}",
+        insufficientRoles:
+          "Użytkownik {{userId}} nie ma wymaganych ról: {{requiredRoles}}",
+      },
+    },
+    endpoints: {
+      definition: {
+        loader: {
+          errors: {
+            endpointNotFound: "Nie znaleziono punktu końcowego",
+            loadFailed: "Nie udało się załadować punktu końcowego",
+            batchLoadFailed: "Nie udało się załadować punktów końcowych",
+          },
+        },
+      },
+    },
+  },
+};

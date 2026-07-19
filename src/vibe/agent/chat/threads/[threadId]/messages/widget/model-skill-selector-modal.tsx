@@ -4,7 +4,6 @@ import { useChatSettings } from "next-vibe/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "next-vibe/agent/chat/settings/repository-client";
 import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { cn } from "next-vibe/core/utils/utils";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { Button } from "next-vibe/ui/ui/button";
@@ -13,6 +12,7 @@ import { Send } from "next-vibe/ui/ui/icons/Send";
 import { X } from "next-vibe/ui/ui/icons/X";
 import { Textarea } from "next-vibe/ui/ui/textarea";
 import { H3, P } from "next-vibe/ui/ui/typography";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 import { useState } from "react";
 

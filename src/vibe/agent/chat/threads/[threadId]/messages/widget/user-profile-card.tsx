@@ -6,9 +6,9 @@
 "use client";
 import type { ChatMessage } from "next-vibe/agent/chat/db";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { cn } from "next-vibe/core/utils/utils";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 
 import { formatRelativeTime } from "@/_pages/chat/lib/utils/formatting";

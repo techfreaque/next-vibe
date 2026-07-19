@@ -19,19 +19,19 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
-import { Platform } from "next-vibe/core/definition/platform";
 import { WidgetDataSchema } from "next-vibe/core/utils/json";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { Platform } from "next-vibe/platforms/platforms";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   backButton,
-  customWidgetObject,
   objectField,
   requestDataArrayOptionalField,
   requestField,
   responseArrayField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { DefaultFolderId } from "../../chat/config";

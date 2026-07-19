@@ -7,7 +7,6 @@
 import { and, desc, eq, gt, inArray, isNull, ne, or, sql } from "drizzle-orm";
 import { DefaultFolderId } from "next-vibe/agent/chat/config";
 import { getFullPath } from "next-vibe/core/core-utils/path";
-import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -21,7 +20,9 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import { AuthRepository } from "next-vibe/identity/auth/repository";
+import { identityEnv } from "next-vibe/identity/env";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { Platform } from "next-vibe/platforms/platforms";
 import { splitTaskArgs } from "next-vibe/tasks/cron/arg-splitter";
 import {
   cronTasks as cronTasksTable,
@@ -35,8 +36,6 @@ import {
   scopedTranslation as tasksScopedTranslation,
 } from "next-vibe/tasks/i18n";
 import type { PulseStatusResponseOutput } from "next-vibe/tasks/pulse/status/definition";
-
-import { env } from "@/env/env";
 
 import { isCronTaskDue } from "../cron-formatter";
 import {
@@ -205,7 +204,7 @@ export class PulseHealthRepository {
       const tasksSkipped: string[] = [];
 
       // Resolve admin user for system tasks (cached for entire pulse cycle)
-      const adminEmail = env.VIBE_ADMIN_USER_EMAIL;
+      const adminEmail = identityEnv.VIBE_ADMIN_USER_EMAIL;
       const adminAuthResult = adminEmail
         ? await AuthRepository.authenticateUserByEmail(
             adminEmail,
@@ -479,7 +478,7 @@ export class PulseHealthRepository {
                       logger,
                       platform: Platform.CRON,
                       cronTaskId: dbTask.id,
-                      streamContext: {
+                      toolExecutionContext: {
                         // Cron tasks never carry the context explicitly — a
                         // revival adopts the THREAD anchor at stream setup.
                         rootFolderId: DefaultFolderId.BACKGROUND,
@@ -603,7 +602,7 @@ export class PulseHealthRepository {
 
                 const logMessage = finalMessage
                   ? finalMessageParams
-                    ? finalMessage.replace(
+                    ? finalMessage.replaceAll(
                         /\{\{(\w+)\}\}/g,
                         (match, key: string) =>
                           String(finalMessageParams?.[key] ?? match),

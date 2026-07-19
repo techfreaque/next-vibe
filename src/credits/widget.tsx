@@ -41,7 +41,7 @@ import {
   useWidgetNavigation,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JSX } from "react";
 import { useState } from "react";
 

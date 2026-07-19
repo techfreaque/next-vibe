@@ -6,7 +6,7 @@
 
 import chalk from "chalk";
 import { Box, Text } from "ink";
-import { Platform } from "next-vibe/core/definition/platform";
+import { Platform } from "next-vibe/platforms/platforms";
 import { useWidgetPlatform } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useMemo } from "react";
@@ -78,7 +78,7 @@ export function GetFocusedWindowCliWidget({
     if (v.monitor) {
       meta.push(`monitor: ${chalk.cyan(v.monitor)}`);
     }
-    if (meta.length) {
+    if (meta.length > 0) {
       lines.push(`    ${chalk.dim(meta.join("  "))}`);
     }
     return lines.join("\n");

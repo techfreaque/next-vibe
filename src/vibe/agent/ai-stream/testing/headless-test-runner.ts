@@ -10,7 +10,7 @@ import type { HeadlessAiStreamResult } from "next-vibe/agent/ai-stream/repositor
 import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
 import {
   DefaultFolderId,
-  rootlessStreamContext,
+  rootlessToolExecutionContext,
 } from "next-vibe/agent/chat/config";
 import type { ChatMessage, MessageMetadata } from "next-vibe/agent/chat/db";
 import {
@@ -27,10 +27,9 @@ import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
 } from "next-vibe/identity/auth/types";
+import { identityEnv } from "next-vibe/identity/env";
 import { createEndpointLogger } from "next-vibe/logger/server";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
-
-import { env } from "@/env/env";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 
 import type { ChatModelId } from "../models";
 
@@ -40,7 +39,7 @@ import type { ChatModelId } from "../models";
  */
 export async function resolveUser(
   email: string,
-  password: string = env.VIBE_ADMIN_USER_PASSWORD,
+  password: string = identityEnv.VIBE_ADMIN_USER_PASSWORD,
 ): Promise<JwtPrivatePayloadType | null> {
   const resolved = await resolveUserAndToken(email, password);
   return resolved?.user ?? null;
@@ -52,7 +51,7 @@ export async function resolveUser(
  */
 export async function resolveUserAndToken(
   email: string,
-  password: string = env.VIBE_ADMIN_USER_PASSWORD,
+  password: string = identityEnv.VIBE_ADMIN_USER_PASSWORD,
 ): Promise<{ user: JwtPrivatePayloadType; token: string } | null> {
   const logger = createEndpointLogger(false, defaultLocale);
   const loginDef = (await import("@/user/public/login/definition")).default;
@@ -60,7 +59,7 @@ export async function resolveUserAndToken(
   // sendTestRequest resolves the public caller (admin leadId) for us — no
   // fabricated lead row, no direct DB write.
   const loginResult = await sendTestRequest({
-    streamContext: rootlessStreamContext(),
+    toolExecutionContext: rootlessToolExecutionContext(),
     endpoint: loginDef.POST,
     data: { email, password, rememberMe: false },
   });
@@ -96,7 +95,7 @@ export async function getOrCreateFolder(
     await import("next-vibe/agent/chat/folders/[rootFolderId]/definition")
   ).default;
   const listResult = await sendTestRequest({
-    streamContext: rootlessStreamContext(),
+    toolExecutionContext: rootlessToolExecutionContext(),
     endpoint: listDef.GET,
     urlPathParams: { rootFolderId },
     user,
@@ -123,7 +122,7 @@ export async function getOrCreateFolder(
     await import("next-vibe/agent/chat/folders/[rootFolderId]/create/definition")
   ).default;
   const createResult = await sendTestRequest({
-    streamContext: rootlessStreamContext(),
+    toolExecutionContext: rootlessToolExecutionContext(),
     endpoint: createDef.POST,
     data: { name, parentId: parentId ?? undefined },
     urlPathParams: { rootFolderId },
@@ -138,7 +137,7 @@ export async function getOrCreateFolder(
   const folderId = createResult.data?.["folderId"];
   if (typeof folderId !== "string") {
     // oxlint-disable-next-line restricted-syntax -- intentional throw in test helper
-    throw new Error(
+    throw new TypeError(
       `getOrCreateFolder: folder create returned no folderId for "${name}"`,
     );
   }
@@ -150,10 +149,10 @@ export interface TestStreamParams {
   user: JwtPayloadType;
   /**
    * Fixture record/replay context for the case — travels the whole chain
-   * (streamContext → providers/media/remote dispatch) and anchors on the
+   * (toolExecutionContext → providers/media/remote dispatch) and anchors on the
    * thread at creation. Explicit, never ambient.
    */
-  streamContext: ToolExecutionContext;
+  toolExecutionContext: ToolExecutionContext;
   threadId?: string;
   skill?: string;
   /**
@@ -378,7 +377,7 @@ export async function fetchThreadMessages(
     await import("next-vibe/agent/chat/threads/[threadId]/messages/definition")
   ).default;
   const result = await sendTestRequest({
-    streamContext: rootlessStreamContext(),
+    toolExecutionContext: rootlessToolExecutionContext(),
     endpoint: msgsDef.GET,
     data: { rootFolderId },
     urlPathParams: { threadId },
@@ -411,7 +410,7 @@ export async function fetchThreadStreamingState(
     await import("next-vibe/agent/chat/threads/[threadId]/messages/definition")
   ).default;
   const result = await sendTestRequest({
-    streamContext: rootlessStreamContext(),
+    toolExecutionContext: rootlessToolExecutionContext(),
     endpoint: msgsDef.GET,
     data: { rootFolderId: DefaultFolderId.PRIVATE },
     urlPathParams: { threadId },
@@ -451,7 +450,7 @@ export async function waitForThreadIdle(
   ).default;
   while (Date.now() - start < maxWaitMs) {
     const result = await sendTestRequest({
-      streamContext: rootlessStreamContext(),
+      toolExecutionContext: rootlessToolExecutionContext(),
       endpoint: msgsDef.GET,
       data: { rootFolderId },
       urlPathParams: { threadId },
@@ -495,7 +494,7 @@ export async function waitForThreadSettled(
   ).default;
   while (Date.now() - start < maxWaitMs) {
     const result = await sendTestRequest({
-      streamContext: rootlessStreamContext(),
+      toolExecutionContext: rootlessToolExecutionContext(),
       endpoint: msgsDef.GET,
       data: { rootFolderId },
       urlPathParams: { threadId },
@@ -532,7 +531,7 @@ export async function fetchThreadMeta(
     await import("next-vibe/agent/chat/threads/[threadId]/definition")
   ).default;
   const result = await sendTestRequest({
-    streamContext: rootlessStreamContext(),
+    toolExecutionContext: rootlessToolExecutionContext(),
     endpoint: threadDef.GET,
     data: { rootFolderId },
     urlPathParams: { threadId },
@@ -576,7 +575,7 @@ export async function fetchFavoriteConfigAndModel(
     await import("next-vibe/agent/skills/favorites/[id]/definition")
   ).default;
   const getResult = await sendTestRequest({
-    streamContext: rootlessStreamContext(),
+    toolExecutionContext: rootlessToolExecutionContext(),
     endpoint: favByIdDef.GET,
     urlPathParams: { id: favoriteId },
     user,
@@ -698,7 +697,7 @@ export async function runTestStream(
     favoriteConfig: paramFavoriteConfig,
     operationOverride: callerOperationOverride,
     settleTimeoutMs,
-    streamContext,
+    toolExecutionContext,
     timezone = "UTC",
   } = params;
 
@@ -772,7 +771,7 @@ export async function runTestStream(
   const postResult = await sendTestRequest({
     endpoint: streamDef.POST,
     user,
-    streamContext,
+    toolExecutionContext,
     data: {
       operation,
       rootFolderId,

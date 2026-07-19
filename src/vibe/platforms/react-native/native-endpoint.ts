@@ -16,14 +16,13 @@
  */
 
 import { type CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import { type CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { scopedTranslation as reactNativeScopedTranslation } from "next-vibe/platforms/react-native/i18n";
-
-import { envClient } from "@/env/env-client";
 
 /**
  * Type helpers to extract input/output types from endpoint definitions

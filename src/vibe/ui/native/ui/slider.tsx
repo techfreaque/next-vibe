@@ -3,7 +3,7 @@
  * Uses @rn-primitives/slider
  */
 import * as SliderPrimitive from "@rn-primitives/slider";
-import { cn } from "next-vibe/core/utils/utils";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import * as React from "react";
 
 import { convertCSSToViewStyle } from "../../native/utils/style-converter";

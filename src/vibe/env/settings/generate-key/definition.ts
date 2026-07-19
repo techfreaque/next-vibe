@@ -12,7 +12,10 @@ import {
 } from "next-vibe/core/definition/enums";
 import { scopedTranslation } from "next-vibe/env/settings/generate-key/i18n";
 import { UserRole } from "next-vibe/identity/roles/enum";
-import { objectField, responseField } from "next-vibe/unified-ui/_shared/utils";
+import {
+  objectField,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 export const { GET } = createEndpoint({

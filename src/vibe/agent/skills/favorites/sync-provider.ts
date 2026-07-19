@@ -51,7 +51,7 @@ import {
 import {
   type IconKey,
   IconKeyDB,
-} from "next-vibe/unified-ui/form-fields/icon-field/icons";
+} from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import { z } from "zod";
 
 import { chatFavorites } from "./db";

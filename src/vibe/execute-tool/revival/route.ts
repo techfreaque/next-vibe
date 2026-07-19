@@ -9,15 +9,15 @@ import { RevivalRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, user, locale, logger, t, streamContext }) =>
+    handler: ({ data, user, locale, logger, t, toolExecutionContext }) =>
       RevivalRepository.resume(
         data,
         user,
         locale,
         logger,
         t,
-        streamContext.abortSignal,
-        streamContext.subAgentDepth,
+        toolExecutionContext.abortSignal,
+        toolExecutionContext.subAgentDepth,
       ),
   },
 });

@@ -10,7 +10,7 @@ import { Span } from "next-vibe/ui/ui/span";
 import { Strong } from "next-vibe/ui/ui/strong";
 import { H2, H3, P } from "next-vibe/ui/ui/typography";
 import { Ul } from "next-vibe/ui/ui/ul";
-import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 
 import { ProductIds, productsRepository } from "@/products/repository-client";
 

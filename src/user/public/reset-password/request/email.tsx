@@ -12,20 +12,20 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { ReactElement } from "react";
 import { z } from "zod";
 
-import { getEnvAvailability } from "next-vibe/agent/env-availability";
-import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
+import { RESET_TOKEN_EXPIRY } from "@/env/constants";
+import { configScopedTranslation } from "@/env/i18n";
 import { EmailTemplate } from "@/messenger/providers/email/smtp-client/components/template.email";
 import {
   createTrackingContext,
   type TrackingContext,
 } from "@/messenger/providers/email/smtp-client/components/tracking_context.email";
 import type { EmailTemplateDefinition } from "@/messenger/registry/template";
-import { RESET_TOKEN_EXPIRY } from "@/env/constants";
-import { env } from "@/env/env";
-import { configScopedTranslation } from "@/env/i18n";
+import { getEnvAvailability } from "next-vibe/agent/env-availability";
+import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
+import { coreEnv } from "next-vibe/core/env";
 import { scopedTranslation as resetPasswordScopedTranslation } from "../i18n";
 import { PasswordRepository } from "../repository";
 import type {
@@ -262,7 +262,7 @@ export const passwordResetRequestEmailTemplate: EmailTemplateDefinition<
       }
 
       const token = tokenResponse.data;
-      const passwordResetUrl = `${env.NEXT_PUBLIC_APP_URL}/${locale}/user/reset-password/${token}`;
+      const passwordResetUrl = `${coreEnv.NEXT_PUBLIC_APP_URL}/${locale}/user/reset-password/${token}`;
 
       const templateProps: PasswordResetRequestProps = {
         publicName: user.publicName,

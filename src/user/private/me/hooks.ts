@@ -16,8 +16,8 @@ import { useEffect, useRef } from "react";
 import {
   createCustomStateKey,
   useCustomState,
-} from "../../../vibe/platforms/react/hooks/store";
-import { useApiQuery } from "../../../vibe/platforms/react/hooks/use-api-query";
+} from "../../../vibe/unified-ui/hooks/store";
+import { useApiQuery } from "../../../vibe/unified-ui/hooks/use-api-query";
 import meEndpoints, { type MeGetResponseOutput } from "./definition";
 
 /****************************

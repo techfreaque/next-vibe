@@ -5,12 +5,12 @@ import {
   Preview,
   Section,
 } from "@react-email/components";
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JSX, ReactNode } from "react";
 
 import { contactClientRepository } from "@/contact/repository-client";
 import { FEEDBACK_REWARD_CREDITS } from "@/credits/constants";
-import { envClient } from "@/env/env-client";
 import { configScopedTranslation } from "@/env/i18n";
 
 import { scopedTranslation } from "../i18n";

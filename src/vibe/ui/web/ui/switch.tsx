@@ -1,7 +1,7 @@
 "use client";
 
 import * as SwitchPrimitives from "@radix-ui/react-switch";
-import { cn } from "next-vibe/core/utils/utils";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import * as React from "react";
 
 import type { StyleType } from "../../web/utils/style-type";

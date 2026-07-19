@@ -111,7 +111,7 @@ export async function sendViaMessagingAccount(
     if (!sendResult.success) {
       // Record failed attempt
       await db.insert(emails).values({
-        subject: params.subject ?? params.message.substring(0, 100),
+        subject: params.subject ?? params.message.slice(0, 100),
         recipientEmail: params.to,
         senderEmail: account.fromId ?? "unknown",
         type: MessageType.TRANSACTIONAL,
@@ -138,7 +138,7 @@ export async function sendViaMessagingAccount(
     const [emailRecord] = await db
       .insert(emails)
       .values({
-        subject: params.subject ?? params.message.substring(0, 100),
+        subject: params.subject ?? params.message.slice(0, 100),
         recipientEmail: params.to,
         senderEmail: account.fromId ?? "unknown",
         type: MessageType.TRANSACTIONAL,

@@ -28,7 +28,6 @@ const getLocalInstanceId = vi.fn(async (): Promise<string> => "self-instance");
 vi.mock("./registry", () => ({
   dispatchRemoteEvent: (...args: unknown[]): Promise<void> =>
     dispatchRemoteEvent(...(args as [])),
-  registerRemoteEventHandlers: (): void => undefined,
 }));
 
 vi.mock("next-vibe/remote-connection/repository", () => ({

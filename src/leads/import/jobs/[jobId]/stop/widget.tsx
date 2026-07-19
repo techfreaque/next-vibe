@@ -11,7 +11,7 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import React from "react";
 
 import type definition from "./definition";

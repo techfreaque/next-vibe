@@ -5,10 +5,13 @@
 
 "use client";
 
-import { Check, ChevronDown, Search, X } from "lucide-react";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
-import { cn } from "next-vibe/core/utils/utils";
+import { Check } from "next-vibe/ui/ui/icons/Check";
+import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
+import { Search } from "next-vibe/ui/ui/icons/Search";
+import { X } from "next-vibe/ui/ui/icons/X";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 import React, { useMemo, useState } from "react";
 

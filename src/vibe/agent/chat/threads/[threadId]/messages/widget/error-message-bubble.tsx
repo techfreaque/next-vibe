@@ -1,23 +1,25 @@
 "use client";
 
-import { AlertCircle, CheckCircle2, StopCircle } from "lucide-react";
 import { StreamErrorType } from "next-vibe/agent/ai-stream/repository/core/constants";
 import type { DefaultFolderId } from "next-vibe/agent/chat/config";
 import type { ChatMessage } from "next-vibe/agent/chat/db";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
-import { cn } from "next-vibe/core/utils/utils";
 import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import { Div } from "next-vibe/ui/ui/div";
+import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
+import { CheckCircle2 } from "next-vibe/ui/ui/icons/CheckCircle2";
+import { StopCircle } from "next-vibe/ui/ui/icons/StopCircle";
 import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
 import { Span } from "next-vibe/ui/ui/span";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetLogger,
   useWidgetNavigation,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 import { useState } from "react";
 
@@ -310,7 +312,7 @@ function interpolateParams(
   if (!params) {
     return message;
   }
-  return message.replace(/\{\{(\w+)\}\}/g, (match, key: string) =>
+  return message.replaceAll(/\{\{(\w+)\}\}/g, (match, key: string) =>
     key in params ? String(params[key]) : match,
   );
 }

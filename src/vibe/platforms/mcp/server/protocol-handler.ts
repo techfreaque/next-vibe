@@ -6,17 +6,17 @@
 import "server-only";
 
 import type { IDefinitionLoader } from "next-vibe/core/definition/loader";
-import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { permissionsRegistry } from "next-vibe/core/permissions/registry";
+import {
+  definitionsRegistry,
+  type IDefinitionsRegistry,
+} from "next-vibe/core/route/definitions-registry";
+import { permissionsRegistry } from "next-vibe/core/route/definitions-registry";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import {
-  definitionsRegistry,
-  type IDefinitionsRegistry,
-} from "next-vibe/platforms/definitions-registry";
+import { Platform } from "next-vibe/platforms/platforms";
 
 import { MCPRegistry, mcpRegistry } from "../registry";
 import type {

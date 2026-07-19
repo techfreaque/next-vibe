@@ -28,7 +28,7 @@ import {
   type UserPermissionRoleValue,
   UserRole,
 } from "next-vibe/identity/roles/enum";
-import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 
 import type { ChatTranslationKey } from "@/_pages/chat/i18n";
 
@@ -206,7 +206,7 @@ export interface ToolExecutionContext {
    */
   currentToolMessageId: string | undefined;
   /**
-   * Read-only reference to StreamContext.pendingToolMessages.
+   * Read-only reference to toolExecutionContext.pendingToolMessages.
    * Keyed by AI SDK toolCallId. Set once in stream-setup and never replaced.
    * tools-loader inject currentToolMessageId from this map before each execute() call.
    * Not present in non-streaming contexts (cron, headless).
@@ -229,14 +229,14 @@ export interface ToolExecutionContext {
     | undefined;
   /**
    * De-duplicated keys for raw toolCallIds that collided within a step (see
-   * StreamContext.duplicateToolCallKeys). Read by tools-loader's execute()
+   * toolExecutionContext.duplicateToolCallKeys). Read by tools-loader's execute()
    * wrapper to resolve which pendingToolMessages entry a given execute()
    * invocation corresponds to. Not present in non-streaming contexts.
    */
   duplicateToolCallKeys: Map<string, string[]> | undefined;
   /**
    * How many times tools-loader's execute() wrapper has claimed a pending
-   * entry for a given raw toolCallId (see StreamContext.executeClaimCount).
+   * entry for a given raw toolCallId (see toolExecutionContext.executeClaimCount).
    * Mutated in place by tools-loader - callers share the same Map instance.
    * Not present in non-streaming contexts.
    */
@@ -310,7 +310,7 @@ export interface ToolExecutionContext {
   /**
    * Set by escalateToTask(callbackMode=wait) to trigger endLoop semantics:
    * wait for all parallel tools to finish, then stop the AI loop without a
-   * new request. Bridged to StreamContext.shouldStopLoop in index.ts.
+   * new request. Bridged to toolExecutionContext.shouldStopLoop in index.ts.
    * Optional - only present in streaming contexts (bridged via defineProperty).
    */
   shouldStopLoop?: boolean;
@@ -323,8 +323,8 @@ export interface ToolExecutionContext {
    * Bridge contract (one-way: execute-tool → ai-stream):
    *   - local-execute.ts sets this when the TARGET tool requires confirmation
    *     (requiresConfirmation gate fires inside execute-tool, which has no direct
-   *     access to ai-stream's StreamContext).
-   *   - stream-part-handler.ts mirrors it onto StreamContext.stepHasToolsAwaitingConfirmation
+   *     access to ai-stream's toolExecutionContext).
+   *   - stream-part-handler.ts mirrors it onto toolExecutionContext.stepHasToolsAwaitingConfirmation
    *     at tool-result time so the finish-step abort fires correctly.
    * Do not read this field in execute-tool itself — it is a signal OUT to the stream layer.
    */
@@ -367,9 +367,9 @@ export interface ToolExecutionContext {
    * Only available in streaming contexts - undefined for cron/headless invocations.
    *
    * Usage:
-   *   if (context.streamContext.escalateToTask) {
-   *     const { taskId, onComplete } = await context.streamContext.escalateToTask({
-   *       callbackMode: context.streamContext.callerCallbackMode,
+   *   if (context.toolExecutionContext.escalateToTask) {
+   *     const { taskId, onComplete } = await context.toolExecutionContext.escalateToTask({
+   *       callbackMode: context.toolExecutionContext.callerCallbackMode,
    *       displayName: "My long task",
    *     });
    *     // ... do long-running work ...
@@ -511,7 +511,7 @@ export function makeHeadlessContext(
  * required across the whole chain, so a missing context anywhere ON a real
  * stream path is a compile error, while these true roots stay greppable.
  */
-export function rootlessStreamContext(): ToolExecutionContext {
+export function rootlessToolExecutionContext(): ToolExecutionContext {
   // no user context — UTC (dates not user-facing here)
   return makeHeadlessContext(undefined, undefined, "UTC");
 }

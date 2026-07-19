@@ -27,7 +27,7 @@ import type { VoiceModelSelection } from "next-vibe/agent/text-to-speech/models"
 import type { VideoGenModelSelection } from "next-vibe/agent/video-generation/models";
 import { iconSchema } from "next-vibe/core/definition/common.schema";
 import { users } from "next-vibe/identity/user/db";
-import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 
 import type { ToolConfigItem } from "../../chat/settings/definition";
 

@@ -14,7 +14,6 @@ import {
   LanguagesOptions,
 } from "next-vibe/core/i18n/core/config";
 import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
-import { cn } from "next-vibe/core/utils/utils";
 import {
   DeviceType,
   EmailCampaignStage,
@@ -82,6 +81,7 @@ import { Textarea } from "next-vibe/ui/ui/textarea";
 import { P } from "next-vibe/ui/ui/typography";
 import { WidgetHeader } from "next-vibe/ui/ui/widget-header";
 import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetContext,
   useWidgetEndpointMutations,

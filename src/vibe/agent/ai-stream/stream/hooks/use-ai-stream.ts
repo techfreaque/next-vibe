@@ -12,13 +12,13 @@
  */
 
 import { parseError } from "next-vibe/core/utils/parse-error";
-import { useApiMutation } from "next-vibe/platforms/react/hooks/use-api-mutation";
 import { toast } from "next-vibe/ui/hooks/use-toast";
 import {
   useWidgetLocale,
   useWidgetLogger,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
 import { useCallback, useMemo } from "react";
 
 import { buildWsChannel } from "../../../../realtime/channel";

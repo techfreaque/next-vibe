@@ -1,4 +1,5 @@
 import type { Metadata, ResolvingMetadata } from "next";
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import { Alert, AlertDescription } from "next-vibe/ui/ui/alert";
@@ -14,7 +15,6 @@ import { Ul } from "next-vibe/ui/ui/ul";
 import type { JSX } from "react";
 
 import { contactClientRepository } from "@/contact/repository-client";
-import { envClient } from "@/env/env-client";
 import { configScopedTranslation } from "@/env/i18n";
 
 import { ImprintClientInteraction } from "./_components/imprint-client-content";

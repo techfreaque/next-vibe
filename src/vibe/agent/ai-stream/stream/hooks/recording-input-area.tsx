@@ -6,7 +6,6 @@
  * Used by both ChatInput and MessageEditor
  */
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { cn } from "next-vibe/core/utils/utils";
 import { AudioWaveform } from "next-vibe/ui/ui/audio-waveform";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -19,6 +18,7 @@ import { Send } from "next-vibe/ui/ui/icons/Send";
 import { Type } from "next-vibe/ui/ui/icons/Type";
 import { X } from "next-vibe/ui/ui/icons/X";
 import { Span } from "next-vibe/ui/ui/span";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 
 import { scopedTranslation as aiStreamScopedTranslation } from "../i18n";

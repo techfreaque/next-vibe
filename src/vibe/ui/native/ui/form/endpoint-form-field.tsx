@@ -8,11 +8,7 @@ import { styled } from "nativewind";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import type { TParams } from "next-vibe/core/i18n/core/static-types";
-import { cn } from "next-vibe/core/utils/utils";
-import {
-  type ReactT,
-  scopedTranslation as unifiedInterfaceScopedTranslation,
-} from "next-vibe/platforms/react/i18n";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type {
   FieldConfig,
   FieldStyleClassName,
@@ -20,7 +16,11 @@ import type {
   RequiredFieldTheme,
 } from "next-vibe/unified-ui/_shared/field-config-types";
 import { getFieldConfig } from "next-vibe/unified-ui/_shared/infer-field-config";
-import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import {
+  type ReactHooksT,
+  scopedTranslation as unifiedInterfaceScopedTranslation,
+} from "next-vibe/unified-ui/hooks/i18n";
+import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JSX } from "react";
 import type {
   ControllerRenderProps,
@@ -295,7 +295,7 @@ function renderLabel<TKey extends string>(
   theme: RequiredFieldTheme,
   labelClassName: string,
   t: <K extends string>(key: K, params?: TParams) => TranslatedKeyType, // Adapted translation for definition keys
-  widgetT: ReactT, // Scoped translation for hardcoded framework keys
+  widgetT: ReactHooksT, // Scoped translation for hardcoded framework keys
 ): JSX.Element | null {
   const { style } = theme;
 
@@ -345,7 +345,7 @@ function renderFieldInput<
   field: ControllerRenderProps<TFieldValues, TName>,
   inputClassName: string,
   t: <K extends string>(key: K, params?: TParams) => TranslatedKeyType, // Adapted translation for definition keys (uses scopedT when available)
-  widgetT: ReactT, // Scoped translation for hardcoded framework keys
+  widgetT: ReactHooksT, // Scoped translation for hardcoded framework keys
   disabled?: boolean,
 ): JSX.Element {
   switch (config.type) {

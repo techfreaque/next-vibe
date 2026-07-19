@@ -63,8 +63,8 @@ function slugify(value: string): string {
   return (
     value
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "")
+      .replaceAll(/[^a-z0-9]+/g, "-")
+      .replaceAll(/^-|-$/g, "")
       .slice(0, 60) || "gen"
   );
 }
@@ -227,12 +227,12 @@ export async function readGenPath(
 
   const frontmatterLines = [
     "---",
-    `prompt: "${gen.prompt.replace(/"/g, '\\"')}"`,
+    `prompt: "${gen.prompt.replaceAll('"', '\\"')}"`,
     `mediaType: "${gen.mediaType}"`,
     `mediaUrl: "${gen.mediaUrl}"`,
     `tool: "${gen.toolName}"`,
     `threadId: "${gen.threadId}"`,
-    `threadTitle: "${gen.threadTitle.replace(/"/g, '\\"')}"`,
+    `threadTitle: "${gen.threadTitle.replaceAll('"', '\\"')}"`,
     `generatedAt: "${gen.generatedAt.toISOString()}"`,
     ...(gen.creditCost !== undefined ? [`creditCost: ${gen.creditCost}`] : []),
     ...(gen.durationSeconds !== undefined

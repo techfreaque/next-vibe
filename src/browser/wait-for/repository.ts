@@ -4,7 +4,6 @@
 
 import "server-only";
 
-import type { Platform } from "next-vibe/core/definition/platform";
 import type {
   ContentResponse,
   ResponseType,
@@ -14,6 +13,7 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import type { Platform } from "next-vibe/platforms/platforms";
 
 import { BrowserTool } from "../enum";
 import type { BrowserT } from "../i18n";

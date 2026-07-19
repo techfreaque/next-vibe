@@ -1,10 +1,9 @@
 import { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import { CODING_AGENT_ALIAS } from "next-vibe/agent/coding-agent/constants";
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { HEALTH_ALIAS } from "next-vibe/server/server/health/constants";
-
-import { envClient } from "@/env/env-client";
 
 import {
   CORTEX_LIST_ALIAS,

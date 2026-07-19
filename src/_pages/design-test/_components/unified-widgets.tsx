@@ -84,7 +84,7 @@ function WidgetCard({
         </Div>
         <CardDescription className="text-xs">{description}</CardDescription>
         <Muted className="text-[10px] font-mono">
-          {WIDGET_BASE}/{category}/{name.toLowerCase().replace(/\s+/g, "-")}
+          {WIDGET_BASE}/{category}/{name.toLowerCase().replaceAll(/\s+/g, "-")}
           /react.tsx
         </Muted>
       </CardHeader>

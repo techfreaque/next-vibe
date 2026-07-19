@@ -62,7 +62,7 @@ export interface SearchProviderConfig {
     logger: EndpointLogger,
     locale: CountryLanguage,
     user: JwtPayloadType,
-    streamContext: ToolExecutionContext,
+    toolExecutionContext: ToolExecutionContext,
   ) => Promise<ResponseType<WebSearchResponse>>;
 }
 
@@ -73,7 +73,14 @@ const braveProvider: SearchProviderConfig = {
   id: SearchProvider.BRAVE,
   isAvailable: () => getEnvAvailability().braveSearch,
   creditCost: FEATURE_COSTS.BRAVE_SEARCH,
-  search: async (query, options, logger, locale, user, streamContext) => {
+  search: async (
+    query,
+    options,
+    logger,
+    locale,
+    user,
+    toolExecutionContext,
+  ) => {
     const { BraveSearchRepository } = await import("./brave/repository");
     const { scopedTranslation } = await import("./brave/i18n");
     const { t } = scopedTranslation.scopedT(locale);
@@ -88,7 +95,7 @@ const braveProvider: SearchProviderConfig = {
       logger,
       t,
       user,
-      streamContext,
+      toolExecutionContext,
     );
 
     if (!result.success) {
@@ -109,7 +116,14 @@ const kagiProvider: SearchProviderConfig = {
   id: SearchProvider.KAGI,
   isAvailable: () => getEnvAvailability().kagiSearch,
   creditCost: FEATURE_COSTS.KAGI_SEARCH,
-  search: async (query, options, logger, locale, user, streamContext) => {
+  search: async (
+    query,
+    options,
+    logger,
+    locale,
+    user,
+    toolExecutionContext,
+  ) => {
     void options; // Kagi doesn't support maxResults/freshness/includeNews
     const { KagiSearchRepository } = await import("./kagi/repository");
     const { scopedTranslation } = await import("./kagi/i18n");
@@ -120,7 +134,7 @@ const kagiProvider: SearchProviderConfig = {
       logger,
       t,
       user,
-      streamContext,
+      toolExecutionContext,
     );
 
     if (!result.success) {

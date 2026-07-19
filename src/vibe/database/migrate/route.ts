@@ -14,10 +14,9 @@ export const { tools } = endpointsHandler({
   endpoint: migrateEndpoints,
   [Methods.POST]: {
     handler: async ({ t, logger }) =>
-      (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-        )
-      ).DatabaseMigrationRepository.runMigrations(t, logger),
+      (await import("./repository")).DatabaseMigrationRepository.runMigrations(
+        t,
+        logger,
+      ),
   },
 });

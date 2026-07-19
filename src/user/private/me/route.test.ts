@@ -1,8 +1,8 @@
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import meEndpoints from "./definition";
@@ -16,7 +16,7 @@ describe("GET /user/private/me", () => {
 
   it("returns full profile for authenticated admin user", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: meEndpoints.GET,
       user: adminUser,
     });
@@ -46,7 +46,7 @@ describe("GET /user/private/me", () => {
 
   it("rejects unauthenticated request with AUTH_ERROR or FORBIDDEN", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: meEndpoints.GET,
       user: {
         isPublic: true,
@@ -81,7 +81,7 @@ describe("POST /user/private/me — update profile", () => {
     const newPublicName = `TestAdmin-${Date.now()}`;
 
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: meEndpoints.POST,
       data: {
         basicInfo: {
@@ -111,7 +111,7 @@ describe("POST /user/private/me — update profile", () => {
 
     // Restore original name so other tests aren't affected
     await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: meEndpoints.POST,
       data: {
         basicInfo: {
@@ -124,7 +124,7 @@ describe("POST /user/private/me — update profile", () => {
 
   it("rejects invalid email format with VALIDATION_ERROR", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: meEndpoints.POST,
       data: {
         basicInfo: {
@@ -145,7 +145,7 @@ describe("POST /user/private/me — update profile", () => {
 
   it("rejects privateName shorter than 2 chars with VALIDATION_ERROR", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: meEndpoints.POST,
       data: {
         basicInfo: {
@@ -166,7 +166,7 @@ describe("POST /user/private/me — update profile", () => {
 
   it("unauthenticated request is rejected", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: meEndpoints.POST,
       data: {
         basicInfo: {
@@ -203,7 +203,7 @@ describe("DELETE /user/private/me — account deletion", () => {
 
   it("unauthenticated user cannot delete an account", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: meEndpoints.DELETE,
       user: {
         isPublic: true,

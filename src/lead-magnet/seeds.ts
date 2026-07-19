@@ -7,18 +7,18 @@
 
 import { eq } from "drizzle-orm";
 import { db } from "next-vibe/database";
+import { identityEnv } from "next-vibe/identity/env";
 import { users } from "next-vibe/identity/user/db";
 import { formatDatabase } from "next-vibe/logger/formatters";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { env } from "@/env/env";
 import { messengerAccounts } from "@/messenger/accounts/db";
 import {
   CampaignType,
   MessageChannel,
   MessengerAccountStatus,
+  MessengerProvider,
 } from "@/messenger/accounts/enum";
-import { MessengerProvider } from "@/messenger/accounts/enum";
 import { EmailSecurityType } from "@/messenger/providers/email/enum";
 
 import { leadMagnetConfigs } from "./db";
@@ -81,7 +81,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
     }
 
     // 2. Seed the lead magnet platform-email config for admin
-    const adminEmail = env.VIBE_ADMIN_USER_EMAIL;
+    const adminEmail = identityEnv.VIBE_ADMIN_USER_EMAIL;
     if (!adminEmail) {
       logger.warn(
         "VIBE_ADMIN_USER_EMAIL not set, skipping lead magnet config seed",

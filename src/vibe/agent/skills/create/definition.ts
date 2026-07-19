@@ -26,14 +26,14 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
-import { apiClient } from "next-vibe/platforms/react/hooks/store";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   backButton,
-  customWidgetObject,
   requestField,
   responseField,
   submitButton,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
+import { apiClient } from "next-vibe/unified-ui/hooks/store";
 import { z } from "zod";
 
 import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
@@ -166,25 +166,24 @@ const { POST } = createEndpoint({
                   ),
                 },
               };
-            } else {
-              // Create new section for this category
-              const categoryConfig = CATEGORY_CONFIG[data.requestData.category];
-
-              const newSection: SkillSection = {
-                sectionIcon: categoryConfig.icon,
-                sectionTitle: t(categoryConfig.category),
-                sectionCount: 1,
-                skills: [newSkill],
-              };
-
-              return {
-                success: true,
-                data: {
-                  ...oldData.data,
-                  sections: [...oldData.data.sections, newSection],
-                },
-              };
             }
+            // Create new section for this category
+            const categoryConfig = CATEGORY_CONFIG[data.requestData.category];
+
+            const newSection: SkillSection = {
+              sectionIcon: categoryConfig.icon,
+              sectionTitle: t(categoryConfig.category),
+              sectionCount: 1,
+              skills: [newSkill],
+            };
+
+            return {
+              success: true,
+              data: {
+                ...oldData.data,
+                sections: [...oldData.data.sections, newSection],
+              },
+            };
           },
         );
       },
@@ -574,7 +573,7 @@ const { POST } = createEndpoint({
           { SkillsRepositoryClient },
           { scopedTranslation: skillsScopedTranslation },
         ] = await Promise.all([
-          import("next-vibe/platforms/react/hooks/store"),
+          import("next-vibe/unified-ui/hooks/store"),
           import("../definition"),
           import("../repository-client"),
           import("../i18n"),

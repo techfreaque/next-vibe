@@ -13,6 +13,7 @@ import type { ChatMessage } from "next-vibe/agent/chat/db";
 import { ChatBootContext } from "next-vibe/agent/chat/hooks/context";
 import { useChatNavigationStore } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
 import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
+import { platform } from "next-vibe/core/env-client";
 import { Div } from "next-vibe/ui/ui/div";
 import {
   useWidgetLocale,
@@ -30,7 +31,6 @@ import React, {
 
 import { LAYOUT, useInputHeight } from "@/_pages/chat/lib/config/constants";
 import { buildMessagePath } from "@/_pages/chat/lib/utils/thread-builder";
-import { platform } from "@/env/env-client";
 
 import type definition from "../definition";
 import messagesDefinition from "../definition";
@@ -89,7 +89,7 @@ function useCliMessages(widgetMessages: ChatMessage[]): ChatMessage[] {
       return;
     }
     const { executeQuery } =
-      await import("next-vibe/platforms/react/hooks/query-executor");
+      await import("next-vibe/unified-ui/hooks/query-executor");
     const response = await executeQuery<typeof messagesDefinition.GET>({
       endpoint: messagesDefinition.GET,
       logger,

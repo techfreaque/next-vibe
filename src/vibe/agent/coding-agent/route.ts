@@ -12,7 +12,14 @@ import { dispatchCodingAgent } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, user, logger, t, cronTaskId, streamContext }) =>
-      dispatchCodingAgent(data, user, logger, t, cronTaskId, streamContext),
+    handler: ({ data, user, logger, t, cronTaskId, toolExecutionContext }) =>
+      dispatchCodingAgent(
+        data,
+        user,
+        logger,
+        t,
+        cronTaskId,
+        toolExecutionContext,
+      ),
   },
 });

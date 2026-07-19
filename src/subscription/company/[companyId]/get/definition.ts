@@ -17,7 +17,7 @@ import {
   objectField,
   requestUrlPathParamsField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { PaymentProviderDB } from "@/payment/enum";

@@ -53,7 +53,7 @@ export class RsiIndicatorRepository {
           continue;
         }
         const change = p.value - prev.value;
-        const gain = change >= 0 ? change : 0;
+        const gain = Math.max(change, 0);
         const loss = change < 0 ? -change : 0;
         // Wilder smoothing
         avgGain = (avgGain * (period - 1) + gain) / period;

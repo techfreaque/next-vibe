@@ -37,7 +37,7 @@ export async function resolveCallerRequestDefaults(params: {
     user: ctx.user,
     locale: ctx.locale,
     platform: ctx.platform,
-    streamContext: ctx.streamContext,
+    toolExecutionContext: ctx.toolExecutionContext,
   };
   const patch = await requestDefaults(defaultsCtx, {
     requestData: params.input ?? {},
@@ -83,7 +83,7 @@ export async function resolveCallerFieldDefaults(params: {
       user: ctx.user,
       locale: ctx.locale,
       platform: ctx.platform,
-      streamContext: ctx.streamContext,
+      toolExecutionContext: ctx.toolExecutionContext,
     });
     if (value !== undefined) {
       input = { ...input, [field]: value };

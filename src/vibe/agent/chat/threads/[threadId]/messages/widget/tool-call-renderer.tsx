@@ -23,10 +23,8 @@ import type { ToolCall } from "next-vibe/agent/chat/db";
 import { useChatNavigationStore } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { definitionLoader } from "next-vibe/core/definition/loader";
-import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
-import { cn } from "next-vibe/core/utils/utils";
 import { AWAIT_TASK_ALIAS } from "next-vibe/execute-tool/await-task/constants";
 import { endpoints as cancelCallEndpoints } from "next-vibe/execute-tool/call-control/cancel/definition";
 import { endpoints as detachCallEndpoints } from "next-vibe/execute-tool/call-control/detach/definition";
@@ -37,12 +35,7 @@ import {
 } from "next-vibe/execute-tool/constants";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { type EndpointLogger } from "next-vibe/logger/types";
-import { useApiMutation } from "next-vibe/platforms/react/hooks/use-api-mutation";
-import { NavigationStackProvider } from "next-vibe/platforms/react/hooks/use-navigation-stack";
-import {
-  type ReactTranslationKey,
-  scopedTranslation as reactScopedTranslation,
-} from "next-vibe/platforms/react/i18n";
+import { Platform } from "next-vibe/platforms/platforms";
 import { endpoints as cronIdEndpoints } from "next-vibe/tasks/cron/[id]/definition";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
@@ -59,12 +52,19 @@ import { Copy } from "next-vibe/ui/ui/icons/Copy";
 import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
 import { X } from "next-vibe/ui/ui/icons/X";
 import { Span } from "next-vibe/ui/ui/span";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
+import {
+  type ReactHooksTranslationKey,
+  scopedTranslation as reactScopedTranslation,
+} from "next-vibe/unified-ui/hooks/i18n";
+import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
+import { NavigationStackProvider } from "next-vibe/unified-ui/hooks/use-navigation-stack";
+import { EndpointRenderer } from "next-vibe/unified-ui/renderers/web/EndpointRenderer";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import {
   Icon,
   type IconKey,
-} from "next-vibe/unified-ui/form-fields/icon-field/icons";
-import { EndpointRenderer } from "next-vibe/unified-ui/renderers/react/EndpointRenderer";
-import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
+} from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JSX } from "react";
 import { useCallback, useEffect, useState } from "react";
 import type { FieldValues } from "react-hook-form";
@@ -1566,7 +1566,7 @@ export function ToolCallRenderer({
                           submitButton={
                             needsConfirmation
                               ? {
-                                  text: "widgets.toolCall.actions.confirm" satisfies ReactTranslationKey,
+                                  text: "widgets.toolCall.actions.confirm" satisfies ReactHooksTranslationKey,
                                   variant:
                                     decision?.type === "confirmed"
                                       ? "default"

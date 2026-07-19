@@ -4,7 +4,7 @@
 
 import "server-only";
 
-import { isCliPlatform, Platform } from "next-vibe/core/definition/platform";
+import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -15,40 +15,75 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { ConfigRepositoryImpl } from "next-vibe/tooling/check/config/repository";
-import type { CheckConfig } from "next-vibe/tooling/check/config/types";
-import type { LintResponseOutput } from "next-vibe/tooling/check/lint/definition";
-import { LintRepository } from "next-vibe/tooling/check/lint/repository";
-import type { OxlintResponseOutput } from "next-vibe/tooling/check/oxlint/definition";
-import { scopedTranslation as oxlintScopedTranslation } from "next-vibe/tooling/check/oxlint/i18n";
-import { OxlintRepository } from "next-vibe/tooling/check/oxlint/repository";
+import { isCliPlatform, Platform } from "next-vibe/platforms/platforms";
+
+import { ConfigRepositoryImpl } from "../config/repository";
+import type { CheckConfig } from "../config/types";
+import type { CheckVibeCheckT, CheckVibeCheckTranslationKey } from "../i18n";
 import {
-  calculateFilteredSummary,
-  filterIssues,
-} from "next-vibe/tooling/check/shared/filter-utils";
-import type { TypecheckResponseOutput } from "next-vibe/tooling/check/typecheck/definition";
-import { scopedTranslation as typecheckScopedTranslation } from "next-vibe/tooling/check/typecheck/i18n";
-import { TsgoDaemon } from "next-vibe/tooling/check/typecheck/lsp-daemon";
-import { TypecheckRepository } from "next-vibe/tooling/check/typecheck/repository";
-import type {
-  CheckVibeCheckT,
-  CheckVibeCheckTranslationKey,
-} from "next-vibe/tooling/check/vibe-check/i18n";
+  scopedTranslation as oxlintScopedTranslation,
+  scopedTranslation as typecheckScopedTranslation,
+} from "../i18n";
+import { calculateFilteredSummary, filterIssues } from "./filter-utils";
+import { LintRepository } from "./lint/repository";
+import { OxlintRepository } from "./oxlint/repository";
+import { TypecheckRepository } from "./typecheck/repository";
 
-import { env } from "@/env/env";
+// ── Inline types (definitions removed) ──────────────────────
 
-import type {
-  VibeCheckRequestOutput,
-  VibeCheckResponseOutput,
-} from "./definition";
+interface CheckItem {
+  file: string;
+  line?: number;
+  column?: number;
+  rule?: string;
+  severity: "error" | "warning" | "info";
+  message: string;
+}
 
+interface CheckFileStats {
+  file: string;
+  errors: number;
+  warnings: number;
+  total: number;
+}
+
+interface SharedResponseOutput {
+  editorUriSchema?: string;
+  items?: CheckItem[] | null;
+  files?: CheckFileStats[] | null;
+  totalIssues: number;
+  totalFiles: number;
+  totalErrors?: number;
+  filteredIssues?: number;
+  filteredFiles?: number;
+  displayedIssues?: number;
+  displayedFiles?: number;
+  truncatedMessage?: string;
+  currentPage?: number;
+  totalPages?: number;
+}
+
+interface VibeCheckRequestOutput {
+  paths?: string | string[];
+  timeout?: number;
+  limit?: number;
+  page?: number;
+  filter?: string | string[];
+  summaryOnly: boolean;
+  extensive?: boolean;
+  strict?: boolean;
+}
+
+type VibeCheckResponseOutput = SharedResponseOutput;
+type OxlintResponseOutput = SharedResponseOutput;
+type TypecheckResponseOutput = SharedResponseOutput;
 type CheckType = "oxlint" | "eslint" | "typecheck";
 
 interface CheckResult {
   type: CheckType;
   result:
     | ResponseType<OxlintResponseOutput>
-    | ResponseType<LintResponseOutput>
+    | ResponseType<VibeCheckResponseOutput>
     | ResponseType<TypecheckResponseOutput>;
   duration: number;
 }
@@ -84,6 +119,7 @@ export class VibeCheckRepository {
     platform: Platform,
     locale: CountryLanguage,
     extensive: boolean,
+    strict: boolean,
     signal: AbortSignal,
   ): Promise<CheckResult> {
     const startTime = Date.now();
@@ -98,6 +134,7 @@ export class VibeCheckRepository {
         page: 1,
         summaryOnly: false,
         extensive,
+        strict,
       },
       logger,
       platform,
@@ -171,17 +208,10 @@ export class VibeCheckRepository {
     locale: CountryLanguage,
     extensive: boolean,
     signal: AbortSignal,
-    forceLspDaemon = false,
   ): Promise<CheckResult> {
     const startTime = Date.now();
     const { t: typecheckT } = typecheckScopedTranslation.scopedT(locale);
-    const effectiveConfig: CheckConfig =
-      forceLspDaemon && config.typecheck.enabled
-        ? {
-            ...config,
-            typecheck: { ...config.typecheck, useLspDaemon: true },
-          }
-        : config;
+
     const result = await TypecheckRepository.execute(
       {
         path,
@@ -197,7 +227,7 @@ export class VibeCheckRepository {
       platform,
       typecheckT,
       locale,
-      effectiveConfig,
+      config,
       signal,
     );
 
@@ -302,13 +332,6 @@ export class VibeCheckRepository {
         );
       }
 
-      // Kill and restart LSP daemon if requested
-      if (data.restartLsp) {
-        const pidPath = `${process.cwd()}/.tmp/tsgo-lsp.pid`;
-        TsgoDaemon.kill(pidPath);
-        logger.info("LSP daemon restarted");
-      }
-
       // Apply defaults from check.config.ts
       const defaults = configResult.config.vibeCheck || {};
 
@@ -331,8 +354,13 @@ export class VibeCheckRepository {
       // Resolve the effective extensive flag (request overrides config default)
       const isExtensive = data.extensive ?? defaults.extensive ?? false;
 
+      // `--strict` reports the strict rules regardless of the strictPaths
+      // whitelist. Request-only: there is no config default, because a config
+      // that always ignored its own whitelist would just be a whitelist of one.
+      const isStrict = data.strict ?? false;
+
       const pathsToCheck = this.normalizePaths(effectiveData.paths);
-      const baseDir = env.PROJECT_ROOT || "./";
+      const baseDir = coreEnv.PROJECT_ROOT || "./";
       const performanceTimings: Partial<Record<TranslatedKeyType, number>> = {};
       let firstCheckStart = 0;
       let lastCheckEnd = 0;
@@ -362,6 +390,7 @@ export class VibeCheckRepository {
             platform,
             locale,
             isExtensive,
+            isStrict,
             signal,
           ).then((result) => {
             if (firstCheckStart === 0) {
@@ -436,7 +465,6 @@ export class VibeCheckRepository {
             locale,
             isExtensive,
             signal,
-            data.restartLsp === true,
           ).then((result) => {
             if (firstCheckStart === 0) {
               firstCheckStart = Date.now();

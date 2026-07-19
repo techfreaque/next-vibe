@@ -13,6 +13,10 @@ export const translations: typeof enTranslations = {
       tools: "tools",
     },
     fields: {
+      interactive: {
+        label: "Interaktiv",
+        description: "Vollständigen interaktiven Tool-Browser öffnen",
+      },
       query: {
         label: "Suchanfrage (optional)",
         description:

@@ -9,7 +9,7 @@ import "server-only";
  */
 import { eq } from "drizzle-orm";
 import {
-  rootlessStreamContext,
+  rootlessToolExecutionContext,
   type ToolExecutionContext,
 } from "next-vibe/agent/chat/config";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
@@ -39,7 +39,7 @@ export interface EmbedOptions {
   /** Feature name for usage history */
   feature?: CortexCreditFeatureValue;
   /** Fixture chain of the triggering execution — binds the embedding call. */
-  streamContext: ToolExecutionContext;
+  toolExecutionContext: ToolExecutionContext;
 }
 
 /**
@@ -112,12 +112,12 @@ async function embedNode(
       return; // Content unchanged - skip
     }
 
-    // Production callers always pass a streamContext (required in EmbedOptions);
+    // Production callers always pass a toolExecutionContext (required in EmbedOptions);
     // the only option-less callers are standalone tests/maintenance with no
     // stream, which route live via an explicit thread-less root.
     const embedding = await generateEmbedding(
       textToEmbed,
-      options?.streamContext ?? rootlessStreamContext(),
+      options?.toolExecutionContext ?? rootlessToolExecutionContext(),
     );
 
     if (!embedding) {

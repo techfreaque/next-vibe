@@ -12,7 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: newPageEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger, platform, streamContext }) =>
+    handler: ({ data, t, logger, platform, toolExecutionContext }) =>
       BrowserSharedRepository.executeMCPTool(
         {
           toolName: BrowserTool.NEW_PAGE,
@@ -27,7 +27,7 @@ export const { POST, tools } = endpointsHandler({
         t,
         logger,
         platform,
-        streamContext.threadId,
+        toolExecutionContext.threadId,
       ),
   },
 });

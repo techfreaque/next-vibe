@@ -13,14 +13,16 @@ import { readFile } from "node:fs/promises";
 import type {
   GeneratorContext,
   GeneratorResult,
-} from "next-vibe/tooling/generators/shared/shared-inputs";
+} from "next-vibe/core/generators/shared/shared-inputs";
 import {
   generateFileHeader,
   getRelativeImportPath,
   writeGeneratedFile,
-} from "next-vibe/tooling/generators/shared/utils";
+} from "next-vibe/core/generators/shared/utils";
 
-const OUTPUT_FILE = "src/generated/tasks/index.ts";
+import { GENERATED_DIR } from "@/env/paths";
+
+const OUTPUT_FILE = `${GENERATED_DIR}/tasks/index.ts`;
 
 /**
  * Validate that every task/runner file exports the expected symbol. Throws a plain

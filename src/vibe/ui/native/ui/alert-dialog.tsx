@@ -1,5 +1,5 @@
 import * as AlertDialogPrimitive from "@rn-primitives/alert-dialog";
-import { cn } from "next-vibe/core/utils/utils";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import * as React from "react";
 import type { ViewStyle } from "react-native";
 import { StyleSheet, View } from "react-native";

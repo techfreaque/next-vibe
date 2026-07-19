@@ -35,7 +35,7 @@ import type { AiStreamT } from "../../stream/i18n";
 import { createFixtureFetch } from "../../testing/fetch-cache";
 import { buildToolResultOutput } from "../context/tool-output";
 import { buildSseMessageRow } from "../core/db-writer/sse-row";
-import { type StreamContext } from "../core/stream";
+import { type ToolExecutionContextImpl } from "../core/stream";
 import { walkToLeafMessage } from "../core/tree-walk";
 import type { HeadlessAiStreamResult } from "../setup/setup";
 
@@ -136,8 +136,8 @@ export function publishWakeUpSignal(
 export async function injectPendingWakeUpResults(params: {
   messages: ModelMessage[];
   payloads: WakeUpPayload[];
-  ctx: StreamContext;
-  streamContext: ToolExecutionContext;
+  ctx: ToolExecutionContextImpl;
+  toolExecutionContext: ToolExecutionContext;
   threadId: string;
   modelConfig: ChatModelOption;
   user: JwtPayloadType;
@@ -147,7 +147,7 @@ export async function injectPendingWakeUpResults(params: {
     messages,
     payloads,
     ctx,
-    streamContext,
+    toolExecutionContext,
     threadId,
     modelConfig,
     user,
@@ -194,7 +194,7 @@ export async function injectPendingWakeUpResults(params: {
       toolName,
       modelConfig,
       true,
-      createFixtureFetch(streamContext, logger),
+      createFixtureFetch(toolExecutionContext, logger),
     );
     extended.push(
       {
@@ -225,10 +225,12 @@ export async function injectPendingWakeUpResults(params: {
 
     // 3. Suppress the post-stream revival batch for this payload — it was
     //    delivered inline (same contract await-task uses).
-    if (!streamContext.suppressedWakeUpToolMessageIds) {
-      streamContext.suppressedWakeUpToolMessageIds = new Set();
+    if (!toolExecutionContext.suppressedWakeUpToolMessageIds) {
+      toolExecutionContext.suppressedWakeUpToolMessageIds = new Set();
     }
-    streamContext.suppressedWakeUpToolMessageIds.add(payload.toolMessageId);
+    toolExecutionContext.suppressedWakeUpToolMessageIds.add(
+      payload.toolMessageId,
+    );
 
     logger.debug("[WakeUp] Injected result into live stream", {
       threadId,
@@ -391,7 +393,7 @@ export async function fireWakeUpRevival(
   params: FireWakeUpRevivalParams,
 ): Promise<ResponseType<HeadlessAiStreamResult>> {
   // Fixture context needs no special handling here: it is anchored on the
-  // THREAD (chat_threads.stream_context.streamContext) and adopted by stream setup,
+  // THREAD (chat_threads.stream_context.toolExecutionContext) and adopted by stream setup,
   // so a revival firing in ANY process continues the dispatching test's
   // context; content-addressed fixture matching (fetch-cache requestHash)
   // keeps the revival's model calls distinct from the dispatch turn's.

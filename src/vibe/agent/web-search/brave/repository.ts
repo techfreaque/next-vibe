@@ -81,7 +81,7 @@ export class BraveSearchRepository {
     logger: EndpointLogger,
     t: BraveT,
     user: JwtPayloadType,
-    streamContext: ToolExecutionContext,
+    toolExecutionContext: ToolExecutionContext,
   ): Promise<ResponseType<BraveSearchGetResponseOutput>> {
     // Guard: key not configured
     if (!agentEnv.BRAVE_SEARCH_API_KEY) {
@@ -126,14 +126,14 @@ export class BraveSearchRepository {
       return fetchResult;
     }
 
-    const toolMessageId = streamContext?.currentToolMessageId;
+    const toolMessageId = toolExecutionContext?.currentToolMessageId;
     if (toolMessageId && !user.isPublic) {
       const userId = user.id;
       const month = new Date().toISOString().slice(0, 7);
       const slug = `${query
         .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "")
+        .replaceAll(/[^a-z0-9]+/g, "-")
+        .replaceAll(/^-|-$/g, "")
         .slice(0, 60)}-${toolMessageId}`;
       void Promise.all([
         import("next-vibe/agent/cortex/mounts/searches"),
@@ -149,7 +149,7 @@ export class BraveSearchRepository {
                   userId,
                   path,
                   result.content,
-                  streamContext,
+                  toolExecutionContext,
                 ),
             )
             .catch(() => undefined);

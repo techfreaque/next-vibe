@@ -16,7 +16,7 @@ import "server-only";
 
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { describe, expect, it } from "vitest";
 
 import definitions from "./definition";
@@ -34,7 +34,7 @@ describe("Remote Connection connect-reverse", () => {
 
   it("CR1: POST register rejects empty instanceId", async () => {
     const result = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: definitions.POST,
       data: {
         instanceId: "",
@@ -56,7 +56,7 @@ describe("Remote Connection connect-reverse", () => {
 
   it("CR2: POST register rejects missing localUrl", async () => {
     const result = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: definitions.POST,
       // @ts-expect-error intentional — testing missing required field
       data: { instanceId: "hermes" },
@@ -69,7 +69,7 @@ describe("Remote Connection connect-reverse", () => {
 
   it("CR3: POST register rejects invalid URL for localUrl", async () => {
     const result = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: definitions.POST,
       data: {
         instanceId: "hermes",
@@ -91,7 +91,7 @@ describe("Remote Connection connect-reverse", () => {
 
   it("CR4: POST register is admin-only", async () => {
     const result = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: definitions.POST,
       data: {
         instanceId: "hermes",
@@ -114,7 +114,7 @@ describe("Remote Connection connect-reverse", () => {
 
   it("CRU1: PATCH update returns not-found for unknown instanceId", async () => {
     const result = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: updateDefinitions.PATCH,
       data: {
         instanceId: "does-not-exist-xyz",
@@ -135,7 +135,7 @@ describe("Remote Connection connect-reverse", () => {
 
   it("CRU2: PATCH update is admin-only", async () => {
     const result = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: updateDefinitions.PATCH,
       data: {
         instanceId: "hermes",

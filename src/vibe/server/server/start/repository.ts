@@ -12,6 +12,7 @@ import { spawn } from "node:child_process";
 import { mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { monitorEventLoopDelay } from "node:perf_hooks";
 
+import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -48,9 +49,8 @@ import type { WebSocketServerHandle } from "next-vibe/realtime/server";
 import type { ServerStartT } from "next-vibe/server/server/start/i18n";
 import { scopedTranslation as serverStartScopedTranslation } from "next-vibe/server/server/start/i18n";
 
-import { env } from "@/env/env";
-
 import { ServerFramework } from "../enum";
+import { serverSystemEnv } from "../env";
 import {
   addPidToFile,
   cleanupPidFile,
@@ -216,7 +216,7 @@ export class ServerStartRepository {
     // parent environment, replacing it with the supervisor-specific cap.
     const existingNodeOptions = process.env["NODE_OPTIONS"] ?? "";
     const strippedNodeOptions = existingNodeOptions
-      .replace(/--max-old-space-size=\d+/g, "")
+      .replaceAll(/--max-old-space-size=\d+/g, "")
       .trim();
     Object.assign(process.env, {
       NODE_OPTIONS:
@@ -266,7 +266,7 @@ export class ServerStartRepository {
         VIBE_SUPERVISED: "1",
         // Remove the supervisor's small cap so the child isn't artificially limited
         NODE_OPTIONS: (process.env["NODE_OPTIONS"] ?? "")
-          .replace(/--max-old-space-size=\d+/g, "")
+          .replaceAll(/--max-old-space-size=\d+/g, "")
           .trim(),
       };
 
@@ -902,7 +902,7 @@ export class ServerStartRepository {
     // Derive port: explicit --port > NEXT_PUBLIC_APP_URL port > default 3000
     const port =
       data.port ??
-      ServerStartRepository.portFromUrl(env.NEXT_PUBLIC_APP_URL) ??
+      ServerStartRepository.portFromUrl(coreEnv.NEXT_PUBLIC_APP_URL) ??
       3000;
 
     // Patch NEXT_PUBLIC_APP_URL to reflect the actual port so child processes see the right URL.
@@ -1380,7 +1380,7 @@ export class ServerStartRepository {
       const { startWebSocketServer, NEXT_PORT_OFFSET } =
         await import("next-vibe/realtime/server");
 
-      const disableProxy = env.VIBE_DISABLE_PROXY;
+      const disableProxy = serverSystemEnv.VIBE_DISABLE_PROXY;
       // In proxy mode (default): Next.js on port+NEXT_PORT_OFFSET, Bun proxy on main port.
       // In direct mode (VIBE_DISABLE_PROXY=true): Next.js on main port, WS sidecar on port+1000.
       const WS_SIDECAR_OFFSET = 1000;

@@ -9,7 +9,7 @@ import { LogIn } from "next-vibe/ui/ui/icons/LogIn";
 import { UserPlus } from "next-vibe/ui/ui/icons/UserPlus";
 import { Link } from "next-vibe/ui/ui/link";
 import { H2, P } from "next-vibe/ui/ui/typography";
-import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 
 import meDefinition from "@/user/private/me/definition";

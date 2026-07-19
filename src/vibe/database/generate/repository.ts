@@ -5,6 +5,7 @@
 
 import { spawn, spawnSync } from "node:child_process";
 
+import { buildPackageRunnerCommand, coreEnv } from "next-vibe/core/env";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -13,6 +14,7 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
+import { databaseEnv } from "next-vibe/database/env";
 import { scopedTranslation } from "next-vibe/database/generate/i18n";
 import {
   formatActionCommand,
@@ -20,8 +22,6 @@ import {
   formatDuration,
 } from "next-vibe/logger/formatters";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { env } from "@/env/env";
 
 import type { GenerateResponseOutput } from "./definition";
 
@@ -39,20 +39,30 @@ export class DatabaseGenerateRepository {
   ): Promise<ResponseType<GenerateResponseOutput>> {
     const { t } = scopedTranslation.scopedT(defaultLocale);
     const startTime = Date.now();
+    const runner = buildPackageRunnerCommand(
+      coreEnv.PACKAGE_MANAGER,
+      "drizzle-kit",
+      ["generate"],
+    );
+    const invocation = `${runner.command} ${runner.args.join(" ")}`;
 
     try {
       logger.debug(
-        `⚙️  ${formatActionCommand("Generating migrations using:", "bunx drizzle-kit generate")}`,
+        `⚙️  ${formatActionCommand("Generating migrations using:", invocation)}`,
       );
 
-      const spawnEnv = { ...process.env, DATABASE_URL: env.DATABASE_URL };
+      const spawnEnv = {
+        ...process.env,
+        DATABASE_URL: databaseEnv.DATABASE_URL,
+      };
 
       if (silent) {
         // Silent mode (vibe dev): capture and discard all output
-        const result = spawnSync("bunx", ["drizzle-kit", "generate"], {
+        const result = spawnSync(runner.command, runner.args, {
           encoding: "utf8",
           cwd: process.cwd(),
           env: spawnEnv,
+          shell: runner.shell,
         });
 
         const duration = Date.now() - startTime;
@@ -77,7 +87,7 @@ export class DatabaseGenerateRepository {
 
         logger.info(
           formatDatabase(
-            `${formatActionCommand("Generated migrations using:", "bunx drizzle-kit generate")} in ${formatDuration(duration)}`,
+            `${formatActionCommand("Generated migrations using:", invocation)} in ${formatDuration(duration)}`,
             "⚙️ ",
           ),
         );
@@ -92,10 +102,11 @@ export class DatabaseGenerateRepository {
       // - After 6s without it → flush buffer to stdout and pipe live from then on
       // - FORCE_TTY=1 tells drizzle-kit's TTY check to treat stdin as a TTY
       const exitCode = await new Promise<number>((resolve, reject) => {
-        const child = spawn("bunx", ["drizzle-kit", "generate"], {
+        const child = spawn(runner.command, runner.args, {
           stdio: ["inherit", "pipe", "pipe"],
           cwd: process.cwd(),
           env: { ...spawnEnv, FORCE_COLOR: "1", FORCE_TTY: "1" },
+          shell: runner.shell,
         });
 
         const chunks: Buffer[] = [];
@@ -151,7 +162,7 @@ export class DatabaseGenerateRepository {
 
       logger.info(
         formatDatabase(
-          `${formatActionCommand("Generated migrations using:", "bunx drizzle-kit generate")} in ${formatDuration(duration)}`,
+          `${formatActionCommand("Generated migrations using:", invocation)} in ${formatDuration(duration)}`,
           "⚙️ ",
         ),
       );

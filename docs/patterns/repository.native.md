@@ -19,8 +19,8 @@ Do NOT return `fail()` for unimplemented methods. Throwing causes the app to cra
 // repository.native.ts
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 
-import { nativeEndpoint } from "@/system/unified-interface/react-native/native-endpoint";
-import type { EndpointLogger } from "@/system/unified-interface/shared/logger/endpoint";
+import { nativeEndpoint } from "next-vibe/platforms/react-native/native-endpoint";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { UserRepositoryType } from "./repository";
@@ -123,7 +123,7 @@ Both files export the same class name. The bundler resolves which to use based o
 ### 4. Use nativeEndpoint for Type-Safe HTTP
 
 ```typescript
-import { nativeEndpoint } from "@/system/unified-interface/react-native/native-endpoint";
+import { nativeEndpoint } from "next-vibe/platforms/react-native/native-endpoint";
 import definitions from "./definition";
 
 static async get(

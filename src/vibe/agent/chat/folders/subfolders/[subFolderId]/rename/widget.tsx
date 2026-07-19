@@ -1,10 +1,10 @@
 "use client";
 
 import { Div } from "next-vibe/ui/ui/div";
-import { IconFieldWidget } from "next-vibe/unified-ui/form-fields/icon-field/widget";
-import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
+import { IconFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/icon-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 
 import type definitions from "./definition";

@@ -19,6 +19,7 @@ import "server-only";
 
 import { randomBytes } from "node:crypto";
 
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -30,8 +31,6 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { scopedTranslation } from "next-vibe/platforms/vibe-frame/mount/i18n";
-
-import { envClient } from "@/env/env-client";
 
 import { frameExchangeTokens } from "../db";
 import { generateFrameId } from "../types";
@@ -81,7 +80,7 @@ export class VibeFrameConfigRepository {
     const base = envClient.NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
     // endpoint "contact_POST" → path "contact/POST"
     // endpoint "agent_search_kagi_POST" → path "agent/search/kagi/POST"
-    const endpointPath = endpointId.replace(/_/g, "/");
+    const endpointPath = endpointId.replaceAll("_", "/");
     const url = new URL(`${base}/${locale}/frame/${endpointPath}`);
 
     url.searchParams.set("frameId", frameId);

@@ -125,7 +125,7 @@ export async function installStorage(
     const values = buildMinioTenantValues(storageReplicas, clusterName);
     const helmInstall = `
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
-echo '${values.replace(/'/g, "'\\''")}' > /tmp/minio-values.yaml
+echo '${values.replaceAll("'", "'\\''")}' > /tmp/minio-values.yaml
 helm upgrade --install minio-tenant minio-operator/tenant \
   --namespace next-vibe \
   --values /tmp/minio-values.yaml \

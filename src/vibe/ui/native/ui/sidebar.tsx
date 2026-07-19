@@ -4,7 +4,7 @@ import * as Slot from "@rn-primitives/slot";
 import type { VariantProps } from "class-variance-authority";
 import { cva } from "class-variance-authority";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
-import { cn } from "next-vibe/core/utils/utils";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import * as React from "react";
 import type { PressableProps, ViewProps } from "react-native";
 import { Dimensions, Pressable, ScrollView, View } from "react-native";

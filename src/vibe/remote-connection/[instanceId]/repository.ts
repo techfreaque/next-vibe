@@ -566,8 +566,8 @@ export class RemoteConnectionInstanceRepository {
     // Step 2: Regenerate reverse token via self-login
     let reverseToken: string | undefined;
     let reverseLeadId: string | undefined;
-    const { envClient } = await import("@/env/env-client");
-    const localUrl = envClient.NEXT_PUBLIC_APP_URL;
+    const { coreClientEnv } = await import("next-vibe/core/env-client");
+    const localUrl = coreClientEnv.NEXT_PUBLIC_APP_URL;
     if (localUrl) {
       const loginEndpoints = await import("@/user/public/login/definition");
       const { response: localLoginResp, networkError: localLoginNetworkError } =

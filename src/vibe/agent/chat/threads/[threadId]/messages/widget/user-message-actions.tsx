@@ -3,7 +3,6 @@ import type { DefaultFolderId } from "next-vibe/agent/chat/config";
 import type { ChatMessage } from "next-vibe/agent/chat/db";
 import { useTTSAudio } from "next-vibe/agent/text-to-speech/hooks";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { cn } from "next-vibe/core/utils/utils";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
@@ -14,6 +13,7 @@ import { Square } from "next-vibe/ui/ui/icons/Square";
 import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
 import { Volume2 } from "next-vibe/ui/ui/icons/Volume2";
 import { X } from "next-vibe/ui/ui/icons/X";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { useWidgetNavigation } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type React from "react";
 

@@ -14,10 +14,10 @@ export const { tools } = endpointsHandler({
   endpoint: guardStartEndpoints,
   [Methods.POST]: {
     handler: async ({ data, logger, t }) =>
-      (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-        )
-      ).GuardStartRepository.startGuard(data, logger, t),
+      (await import("./repository")).GuardStartRepository.startGuard(
+        data,
+        logger,
+        t,
+      ),
   },
 });

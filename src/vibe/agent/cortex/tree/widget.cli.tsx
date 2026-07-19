@@ -7,7 +7,7 @@
 
 import chalk from "chalk";
 import { Box, Text } from "ink";
-import { Platform } from "next-vibe/core/definition/platform";
+import { Platform } from "next-vibe/platforms/platforms";
 import { useWidgetPlatform } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useMemo } from "react";
@@ -46,14 +46,14 @@ export function CortexTreeWidget({ field }: CliWidgetProps): JSX.Element {
       .split("\n")
       .map((line) => {
         // Color directory names (ending with /)
-        if (line.match(/\S+\/(\s|$)/)) {
-          return line.replace(/([^\s├│└─]+\/)/g, (m) => {
+        if (/\S+\/(\s|$)/.test(line)) {
+          return line.replaceAll(/([^\s├│└─]+\/)/g, (m) => {
             const colorFn = mountDirColors[m] ?? chalk.cyan;
             return colorFn.bold(m);
           });
         }
         // Color file names
-        return line.replace(/([^\s├│└─]+\.\w+)/g, (m) => chalk.green(m));
+        return line.replaceAll(/([^\s├│└─]+\.\w+)/g, (m) => chalk.green(m));
       })
       .join("\n");
 

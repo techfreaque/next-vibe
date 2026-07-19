@@ -14,15 +14,14 @@ import {
 } from "node:crypto";
 
 import { and, eq, sql } from "drizzle-orm";
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import {
   type ResponseType,
   success,
 } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
+import { identityEnv } from "next-vibe/identity/env";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { env } from "@/env/env";
-import { envClient } from "@/env/env-client";
 
 import type {
   ConnectionHealth,
@@ -47,7 +46,7 @@ export class RemoteConnectionRepository {
   private static getEncryptionKey(): Buffer {
     return createHash("sha256")
       .update("remote-token-aes:")
-      .update(env.JWT_SECRET_KEY)
+      .update(identityEnv.JWT_SECRET_KEY)
       .digest();
   }
 

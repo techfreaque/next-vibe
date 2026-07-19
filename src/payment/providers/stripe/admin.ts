@@ -7,6 +7,7 @@
 import "server-only";
 
 import { and, eq } from "drizzle-orm";
+import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -18,8 +19,6 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { env } from "@/env/env";
 
 import { paymentTransactions } from "../../db";
 import { InvoiceStatus } from "../../enum";
@@ -277,7 +276,8 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
 
       const session = await stripeClient.billingPortal.sessions.create({
         customer: stripeCustomerId,
-        return_url: data.returnUrl || `${env.NEXT_PUBLIC_APP_URL}/dashboard`,
+        return_url:
+          data.returnUrl || `${coreEnv.NEXT_PUBLIC_APP_URL}/dashboard`,
       });
 
       logger.debug("Customer portal session created", {

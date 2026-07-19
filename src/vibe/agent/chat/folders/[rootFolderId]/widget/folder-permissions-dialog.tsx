@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "next-vibe/ui/ui/dialog";
-import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 import { useMemo } from "react";
 

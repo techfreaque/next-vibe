@@ -29,7 +29,7 @@ import {
 } from "next-vibe/agent/ai-stream/testing/headless-test-runner";
 import {
   DefaultFolderId,
-  rootlessStreamContext,
+  rootlessToolExecutionContext,
 } from "next-vibe/agent/chat/config";
 import { chatThreads } from "next-vibe/agent/chat/db";
 import { NO_SKILL_ID } from "next-vibe/agent/skills/constants";
@@ -38,16 +38,15 @@ import type { FavoriteConfig } from "next-vibe/agent/skills/favorites/db";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { identityEnv } from "next-vibe/identity/env";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import {
   instanceIdentities,
   remoteConnections,
 } from "next-vibe/remote-connection/db";
 import { RemoteConnectionRepository } from "next-vibe/remote-connection/repository";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
-import { env } from "@/env/env";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -88,7 +87,7 @@ const logger = createEndpointLogger(false, defaultLocale);
 // ─── Setup / Teardown ────────────────────────────────────────────────────────
 
 beforeAll(async () => {
-  const resolved = await resolveUserAndToken(env.VIBE_ADMIN_USER_EMAIL);
+  const resolved = await resolveUserAndToken(identityEnv.VIBE_ADMIN_USER_EMAIL);
   if (!resolved) {
     // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
     throw new Error(
@@ -115,11 +114,10 @@ beforeAll(async () => {
   previousDefaultInstanceId = existingDefault?.instanceId;
 
   // Ensure sufficient credits for AI stream calls during this test suite
-  const creditsDefinition = (
-    await import("@/credits/admin-add/definition")
-  ).default;
+  const creditsDefinition = (await import("@/credits/admin-add/definition"))
+    .default;
   await sendTestRequest({
-    streamContext: undefined,
+    toolExecutionContext: undefined,
     endpoint: creditsDefinition.POST,
     data: { targetUserId: user.id, amount: 100 },
     user,
@@ -246,7 +244,7 @@ describe("headless-client connection registration", () => {
       await import("next-vibe/remote-connection/list/definition")
     ).default;
     const result = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: listDef.GET,
       data: {},
       user,
@@ -287,7 +285,7 @@ describe("headless-client AI stream via REMOTE folder", () => {
 
     const { result, messages } = await runTestStream({
       // Live relay E2E — streams hit the real instances, no fixtures.
-      streamContext: rootlessStreamContext(),
+      toolExecutionContext: rootlessToolExecutionContext(),
       prompt:
         "Output the entire '## System Context' section from your system prompt verbatim. " +
         "No commentary, no markdown changes — copy it exactly as-is.",
@@ -333,7 +331,7 @@ describe("headless-client AI stream via REMOTE folder", () => {
 
     const { result, messages } = await runTestStream({
       // Live relay E2E — streams hit the real instances, no fixtures.
-      streamContext: rootlessStreamContext(),
+      toolExecutionContext: rootlessToolExecutionContext(),
       prompt: "Reply with: STORED",
       user,
       rootFolderId: DefaultFolderId.REMOTE,

@@ -14,13 +14,12 @@
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
+import { identityEnv } from "next-vibe/identity/env";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
-import { env } from "@/env/env";
 
 import { companies, companyMembers } from "../db";
 import { CompanyMemberRole } from "../enum";
@@ -57,11 +56,11 @@ describe("CompanyAuthRepository.requireMember", () => {
   const nonExistentCompanyId = "00000000-0000-0000-0000-000000000002";
 
   beforeAll(async () => {
-    const userId = await resolveUserId(env.VIBE_ADMIN_USER_EMAIL);
+    const userId = await resolveUserId(identityEnv.VIBE_ADMIN_USER_EMAIL);
     if (!userId) {
       // oxlint-disable-next-line restricted-syntax
       throw new Error(
-        `${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
+        `${identityEnv.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
       );
     }
     adminUserId = userId;

@@ -486,7 +486,7 @@ Optimistic/post-success cache updates live in `definition.ts` inside `mutationOp
 
 ```typescript
 // definition.ts
-import { apiClient } from "@/system/unified-interface/react/hooks/store";
+import { apiClient } from "next-vibe/unified-ui/hooks/store";
 
 options: {
   mutationOptions: {
@@ -571,7 +571,7 @@ companyId: requestField(scopedTranslation, {
 When a list endpoint is opened in **picker mode**, detect it with `usePickerCallback`. Pass the **full entity snapshot** — not just `id` — so the caller's update widget can show a context header and pre-fill fields without an extra network round-trip.
 
 ```typescript
-import { usePickerCallback } from "@/system/unified-interface/unified-ui/widgets/_shared/picker-context";
+import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import { setCachedEntity } from "../_shared/entity-picker-cache"; // see below
 
 const onPick = usePickerCallback<{
@@ -1105,7 +1105,7 @@ The domain `scopedTranslation` lives in the category's `i18n/` folder (e.g. `com
 
 ```typescript
 // definition.ts
-import { lazyWidget } from "@/system/unified-interface/unified-ui/widgets/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 
 const InvoiceListWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.InvoiceListWidget })),
@@ -1138,9 +1138,9 @@ import {
   useWidgetEndpointMutations,
   useWidgetPlatform,
   useWidgetSelector,
-} from "@/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 
-import { usePickerCallback } from "@/system/unified-interface/unified-ui/widgets/_shared/picker-context";
+import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 ```
 
 | Hook                                     | Returns                                    | Use for                                          |
@@ -1223,7 +1223,7 @@ For truly generic components (buttons, inputs, icons): `src/packages/next-vibe-u
 To embed another endpoint's UI as a dialog, wrap `EndpointsPage` in a dialog shell:
 
 ```typescript
-import { EndpointsPage } from "@/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 
 <Dialog open={open} onOpenChange={onOpenChange}>
   <DialogContent>

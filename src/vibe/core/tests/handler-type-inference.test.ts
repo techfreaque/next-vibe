@@ -25,7 +25,7 @@ import type {
   JWTPublicPayloadType,
 } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
-import { objectField } from "next-vibe/unified-ui/_shared/utils";
+import { objectField } from "next-vibe/unified-ui/_shared/utils-i18n";
 
 // Helper type to test if two types are exactly equal
 type Expect<T extends true> = T;

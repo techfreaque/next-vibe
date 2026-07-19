@@ -70,10 +70,10 @@ export class CortexExecRepository {
   // Built with RegExp constructor to avoid no-control-regex lint rule
   private static readonly ANSI_RE = new RegExp(
     [
-      "\x1b\\[[0-9;]*[a-zA-Z]",
-      "\x1b\\]0;[^\x07]*\x07",
-      "\x1b\\][^\x07]*\x07",
-      "\x1b\\[\\?[0-9;]*[a-zA-Z]",
+      "\u001B\\[[0-9;]*[a-zA-Z]",
+      "\u001B\\]0;[^\u0007]*\u0007",
+      "\u001B\\][^\u0007]*\u0007",
+      "\u001B\\[\\?[0-9;]*[a-zA-Z]",
     ].join("|"),
     "g",
   );
@@ -85,7 +85,7 @@ export class CortexExecRepository {
     logger: EndpointLogger,
     user: JwtPayloadType,
     t: CortexExecT,
-    streamContext: ToolExecutionContext,
+    toolExecutionContext: ToolExecutionContext,
   ): Promise<ResponseType<CortexExecResponseOutput>> {
     const timeoutMs = data.timeoutMs ?? this.DEFAULT_TIMEOUT_MS;
     const command = data.command;
@@ -124,9 +124,16 @@ export class CortexExecRepository {
 
     if (
       timeoutMs > this.ESCALATE_THRESHOLD_MS &&
-      streamContext.escalateToTask
+      toolExecutionContext.escalateToTask
     ) {
-      return this.escalateToTask(data, logger, user, t, streamContext, conn);
+      return this.escalateToTask(
+        data,
+        logger,
+        user,
+        t,
+        toolExecutionContext,
+        conn,
+      );
     }
 
     if (conn.kind === "remote") {
@@ -200,7 +207,7 @@ export class CortexExecRepository {
   }
 
   private static labelToSlug(label: string): string {
-    return label.toLowerCase().replace(/\s+/g, "-");
+    return label.toLowerCase().replaceAll(/\s+/g, "-");
   }
 
   // ─── Connection Resolution ─────────────────────────────────────────────────
@@ -443,7 +450,7 @@ export class CortexExecRepository {
 
       // cd to default mount cwd on startup
       if (startCwd !== homeDir) {
-        proc.stdin.write(`cd "${startCwd.replace(/"/g, '\\"')}"\n`);
+        proc.stdin.write(`cd "${startCwd.replaceAll('"', '\\"')}"\n`);
       }
 
       logger.info(t("log.openedLocal"), { sessionId, slug: conn.slug });
@@ -564,7 +571,7 @@ export class CortexExecRepository {
 
     // cd to default mount cwd on startup
     if (defaultMount[0]) {
-      channel.write(`cd "${startCwd.replace(/"/g, '\\"')}"\n`);
+      channel.write(`cd "${startCwd.replaceAll('"', '\\"')}"\n`);
     }
 
     logger.info(t("log.openedSsh"), {
@@ -673,7 +680,7 @@ export class CortexExecRepository {
 
   private static cleanTerminalOutput(raw: string, command: string): string {
     // Strip ANSI escape sequences and carriage returns
-    let cleaned = raw.replace(this.ANSI_RE, "").replace(/\r/g, "");
+    let cleaned = raw.replace(this.ANSI_RE, "").replaceAll("\r", "");
 
     const lines = cleaned.split("\n");
     const result: string[] = [];
@@ -716,8 +723,8 @@ export class CortexExecRepository {
     ).join("\n");
 
     return output
-      .replace(/^\$\s*$/gm, "")
-      .replace(/\n{3,}/g, "\n\n")
+      .replaceAll(/^\$\s*$/gm, "")
+      .replaceAll(/\n{3,}/g, "\n\n")
       .trim();
   }
 
@@ -743,10 +750,10 @@ export class CortexExecRepository {
     logger: EndpointLogger,
     user: JwtPayloadType,
     t: CortexExecT,
-    streamContext: ToolExecutionContext,
+    toolExecutionContext: ToolExecutionContext,
     conn: { kind: "local" | "ssh" | "remote"; slug: string },
   ): Promise<ResponseType<CortexExecResponseOutput>> {
-    const { taskId, onComplete } = await streamContext.escalateToTask!();
+    const { taskId, onComplete } = await toolExecutionContext.escalateToTask!();
 
     logger.info(t("log.escalated"), {
       taskId,
@@ -756,7 +763,7 @@ export class CortexExecRepository {
 
     void (async (): Promise<void> => {
       const noEscalateContext: ToolExecutionContext = {
-        ...streamContext,
+        ...toolExecutionContext,
         escalateToTask: undefined,
       };
       const result = await CortexExecRepository.exec(

@@ -312,7 +312,7 @@ export async function ensureLocalConnection(
 
 /** "Local Machine" → "local-machine" */
 function labelToSlug(label: string): string {
-  return label.toLowerCase().replace(/\s+/g, "-");
+  return label.toLowerCase().replaceAll(/\s+/g, "-");
 }
 
 async function getConnection(

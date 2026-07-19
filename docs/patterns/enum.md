@@ -10,7 +10,7 @@
 
 ```typescript
 // enum.ts
-import { createEnumOptions } from "@/system/unified-interface/shared/field/enum";
+import { createEnumOptions } from "next-vibe/unified-ui/_shared/enum";
 import { scopedTranslation } from "./i18n"; // value import (not type-only)
 
 export const {

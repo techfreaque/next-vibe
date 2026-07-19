@@ -23,16 +23,16 @@ import {
 } from "next-vibe/core/definition/enums";
 import { UserPermissionRole, UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   backButton,
-  customWidgetObject,
   navigateButtonField,
   objectField,
   requestField,
   responseArrayField,
   responseField,
   widgetField,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { parseSkillId } from "../../chat/slugify";
@@ -356,7 +356,7 @@ const { GET } = createEndpoint({
           skillSingleDefinition,
           { ChatFavoritesRepositoryClient },
         ] = await Promise.all([
-          import("next-vibe/platforms/react/hooks/store"),
+          import("next-vibe/unified-ui/hooks/store"),
           import("./definition"),
           import("../definition"),
           import("../[id]/definition"),

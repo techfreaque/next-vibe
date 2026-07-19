@@ -5,6 +5,7 @@
 
 import { spawnSync } from "node:child_process";
 
+import { buildPackageRunnerCommand, coreEnv } from "next-vibe/core/env";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -13,6 +14,7 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
+import { databaseEnv } from "next-vibe/database/env";
 import type { MigrateT } from "next-vibe/database/migrate/i18n";
 import { scopedTranslation } from "next-vibe/database/migrate/i18n";
 import {
@@ -22,8 +24,6 @@ import {
 } from "next-vibe/logger/formatters";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { env } from "@/env/env";
-
 import type { MigrateResponseOutput } from "./definition";
 
 export class DatabaseMigrationRepository {
@@ -32,24 +32,25 @@ export class DatabaseMigrationRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<MigrateResponseOutput>> {
     const startTime = Date.now();
+    const runner = buildPackageRunnerCommand(
+      coreEnv.PACKAGE_MANAGER,
+      "drizzle-kit",
+      ["migrate"],
+    );
+    const invocation = [runner.command, ...runner.args].join(" ");
 
     try {
       logger.debug(
-        `🔄 ${formatActionCommand("Running migrations using:", "bunx drizzle-kit migrate")}`,
+        `🔄 ${formatActionCommand("Running migrations using:", invocation)}`,
       );
 
-      // Use the same bun binary that is running this process - works in Docker (/usr/local/bin/bun)
-      // and locally (~/.bun/bin/bun) without depending on PATH.
-      const result = spawnSync(
-        process.execPath,
-        ["x", "drizzle-kit", "migrate"],
-        {
-          encoding: "utf8",
-          cwd: process.cwd(),
-          env: { ...process.env, DATABASE_URL: env.DATABASE_URL },
-          timeout: 60_000,
-        },
-      );
+      const result = spawnSync(runner.command, runner.args, {
+        encoding: "utf8",
+        cwd: process.cwd(),
+        env: { ...process.env, DATABASE_URL: databaseEnv.DATABASE_URL },
+        timeout: 60_000,
+        shell: runner.shell,
+      });
 
       if (result.error) {
         return fail({
@@ -81,7 +82,7 @@ export class DatabaseMigrationRepository {
       const duration = Date.now() - startTime;
       logger.info(
         formatDatabase(
-          `${formatActionCommand("Migrations completed using:", "bunx drizzle-kit migrate")} in ${formatDuration(duration)}`,
+          `${formatActionCommand("Migrations completed using:", invocation)} in ${formatDuration(duration)}`,
           "✅",
         ),
       );

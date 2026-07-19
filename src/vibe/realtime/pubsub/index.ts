@@ -7,7 +7,7 @@
  * - "redis": Redis PUBLISH/SUBSCRIBE for multi-instance deployments
  */
 
-import { env } from "@/env/env";
+import { realtimeEnv } from "next-vibe/realtime/env";
 
 import { LocalPubSubAdapter } from "./local-adapter";
 import { RedisPubSubAdapter } from "./redis-adapter";
@@ -35,9 +35,9 @@ export function getPubSubAdapter(): PubSubAdapter {
     return instance;
   }
 
-  if (env.WS_PUBSUB_TYPE === "redis") {
-    instance = env.REDIS_URL
-      ? new RedisPubSubAdapter(env.REDIS_URL)
+  if (realtimeEnv.WS_PUBSUB_TYPE === "redis") {
+    instance = realtimeEnv.REDIS_URL
+      ? new RedisPubSubAdapter(realtimeEnv.REDIS_URL)
       : fallbackToLocal();
   } else {
     instance = new LocalPubSubAdapter();

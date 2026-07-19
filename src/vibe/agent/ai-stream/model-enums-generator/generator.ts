@@ -16,7 +16,7 @@ import { join } from "node:path";
 import type {
   GeneratorContext,
   GeneratorResult,
-} from "next-vibe/tooling/generators/shared/shared-inputs";
+} from "next-vibe/core/generators/shared/shared-inputs";
 
 import { getSrcDir } from "@/env/paths";
 

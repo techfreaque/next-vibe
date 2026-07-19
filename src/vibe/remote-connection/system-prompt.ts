@@ -9,10 +9,10 @@ import type {
 } from "next-vibe/agent/ai-stream/system-prompt/types";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import { db } from "next-vibe/database";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
-import { envClient } from "@/env/env-client";
 import { sshConnections } from "@/ssh/db";
 
 import { remoteConnections } from "./db";

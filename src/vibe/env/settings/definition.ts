@@ -18,12 +18,12 @@ import { scopedTranslation } from "next-vibe/env/settings/i18n";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { SyncScopeSchema } from "next-vibe/remote-connection/db";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
-  customWidgetObject,
   objectField,
   requestField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { ENV_KEYS, type EnvKeyName } from "@/generated/env/keys";
@@ -294,6 +294,7 @@ export const { PATCH } = createEndpoint({
   subCategory: "settingsEnv",
   tags: ["patch.tags.settings" as const],
   aliases: ["init", "set-setting"] as const,
+  cli: { alwaysInteractive: true },
 
   fields: customWidgetObject({
     render: SystemSettingsPatchWidget,

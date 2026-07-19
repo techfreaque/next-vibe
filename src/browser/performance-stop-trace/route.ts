@@ -12,7 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: performanceStopTraceEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger, platform, streamContext }) =>
+    handler: ({ data, t, logger, platform, toolExecutionContext }) =>
       BrowserSharedRepository.executeMCPTool(
         {
           toolName: BrowserTool.PERFORMANCE_STOP_TRACE,
@@ -24,7 +24,7 @@ export const { POST, tools } = endpointsHandler({
         t,
         logger,
         platform,
-        streamContext.threadId,
+        toolExecutionContext.threadId,
       ),
   },
 });

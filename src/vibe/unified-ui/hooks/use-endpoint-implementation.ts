@@ -1,0 +1,525 @@
+"use client";
+
+import type { EndpointReadOptions } from "next-vibe/core/definition/create";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { Methods } from "next-vibe/core/definition/enums";
+import { useTranslation } from "next-vibe/core/i18n/core/client";
+import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import type { DeepPartial } from "next-vibe/core/utils/type-utils";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { scopedTranslation as reactScopedTranslation } from "next-vibe/unified-ui/hooks/i18n";
+import { useMemo } from "react";
+import type { UseFormReturn } from "react-hook-form";
+
+import type {
+  DeleteRequest,
+  DeleteResponse,
+  DeleteUrlVariables,
+  PatchRequest,
+  PatchResponse,
+  PatchUrlVariables,
+  PrimaryMutationRequest,
+  PrimaryMutationResponse,
+  PrimaryMutationUrlVariables,
+} from "./endpoint-helpers";
+import type {
+  EndpointReturn,
+  FormAlertState,
+  OptionsOptional,
+  UseEndpointOptions,
+  UseEndpointOptionsBase,
+} from "./endpoint-types";
+import {
+  useAvailableMethods,
+  usePrimaryMutationMethod,
+} from "./endpoint-utils";
+import type { ApiMutationOptions } from "./types";
+import { useEndpointCreate } from "./use-endpoint-create";
+import { useEndpointDelete } from "./use-endpoint-delete";
+import { useEndpointRead } from "./use-endpoint-read";
+import { useEndpointSubscription } from "./use-endpoint-subscription";
+
+/**
+ * Hook that provides all CRUD operations for an endpoints object
+ *
+ * Features:
+ * - Automatically detects available HTTP methods (GET, POST, PUT, PATCH, DELETE)
+ * - Provides query functionality for GET endpoints
+ * - Provides form functionality for mutation endpoints
+ * - Auto-prefills form data from GET endpoint when available
+ * - Type-safe with full TypeScript inference based on endpoint input
+ * - Uses existing useApiQuery and useApiForm hooks for consistency
+ * - Supports both top-level and nested options for better DX
+ *
+ * @param endpoints - Object containing endpoint definitions (e.g., { GET: endpoint, POST: endpoint })
+ * @param options - Configuration options for forms and queries
+ * @param logger - Logger instance for debugging
+ * @returns Object with all available operations based on endpoint methods
+ */
+// Public overload: options required/optional based on endpoint requirements
+export function useEndpoint<
+  T extends Partial<Record<Methods, CreateApiEndpointAny>>,
+  TOptional extends boolean = OptionsOptional<T>,
+>(
+  endpoints: T,
+  options: TOptional extends true
+    ? UseEndpointOptions<T> | undefined
+    : UseEndpointOptions<T>,
+  logger: EndpointLogger,
+  user: JwtPayloadType,
+): EndpointReturn<T>;
+// Internal overload: always accepts undefined (used by useEndpointManaged)
+export function useEndpoint<
+  T extends Partial<Record<Methods, CreateApiEndpointAny>>,
+>(
+  endpoints: T,
+  options: UseEndpointOptionsBase<T> | undefined,
+  logger: EndpointLogger,
+  user: JwtPayloadType,
+): EndpointReturn<T>;
+export function useEndpoint<
+  T extends Partial<Record<Methods, CreateApiEndpointAny>>,
+>(
+  endpoints: T,
+  options: UseEndpointOptionsBase<T> | undefined,
+  logger: EndpointLogger,
+  user: JwtPayloadType,
+): EndpointReturn<T> {
+  const { locale } = useTranslation();
+  // Detect available methods and determine primary mutation method
+  const availableMethods = useAvailableMethods(endpoints);
+  const primaryMutationMethod = usePrimaryMutationMethod(availableMethods);
+
+  // Extract endpoints
+  const readEndpoint = endpoints.GET ?? null;
+
+  const primaryEndpoint = primaryMutationMethod
+    ? (endpoints[primaryMutationMethod] ?? null)
+    : null;
+
+  const deleteEndpoint = endpoints.DELETE ?? null;
+
+  // Merge endpoint-level options with hook options (hook options take precedence)
+  // Extract endpoint read options if it's a GET endpoint.
+  // readEndpoint is always endpoints.GET so its options are always EndpointReadOptions.
+  // The union type can't be narrowed structurally here, so we cast safely.
+  const endpointReadOptions = readEndpoint?.options as
+    | EndpointReadOptions<never, never, never>
+    | undefined;
+
+  const readQueryEnabled =
+    options?.read?.queryOptions?.enabled ??
+    endpointReadOptions?.queryOptions?.enabled ??
+    true;
+  const readUrlPathParams = options?.read?.urlPathParams;
+  const readStaleTime =
+    options?.read?.queryOptions?.staleTime ??
+    endpointReadOptions?.queryOptions?.staleTime ??
+    5 * 60 * 1000;
+  const readRefetchOnWindowFocus =
+    options?.read?.queryOptions?.refetchOnWindowFocus ??
+    endpointReadOptions?.queryOptions?.refetchOnWindowFocus ??
+    true;
+  const rawRefetchInterval =
+    options?.read?.queryOptions?.refetchInterval ??
+    endpointReadOptions?.queryOptions?.refetchInterval;
+  const readRefetchInterval: number | false | undefined =
+    typeof rawRefetchInterval === "number" || rawRefetchInterval === false
+      ? rawRefetchInterval
+      : undefined;
+  const autoPrefillEnabled = options?.autoPrefill ?? true;
+
+  // Use read hook for GET endpoints - route to client or server
+  // Extract form options carefully handling the union type
+  const endpointAutoSubmit =
+    endpointReadOptions?.formOptions &&
+    "autoSubmit" in endpointReadOptions.formOptions
+      ? endpointReadOptions.formOptions.autoSubmit
+      : undefined;
+  const endpointDebounceMs =
+    endpointReadOptions?.formOptions &&
+    "debounceMs" in endpointReadOptions.formOptions
+      ? endpointReadOptions.formOptions.debounceMs
+      : undefined;
+
+  const readPersistForm = options?.read?.formOptions?.persistForm ?? false;
+  const readPersistenceKey = options?.read?.formOptions?.persistenceKey;
+  const readAutoSubmit =
+    options?.read?.formOptions?.autoSubmit ?? endpointAutoSubmit;
+  const readDebounceMs =
+    options?.read?.formOptions?.debounceMs ?? endpointDebounceMs;
+  const readQueryKey = options?.read?.queryOptions?.queryKey;
+  const readInitialState = options?.read?.initialState;
+  const readInitialData = options?.read?.initialData;
+  const readOptions = useMemo(
+    () => ({
+      formOptions: {
+        persistForm: readPersistForm,
+        persistenceKey: readPersistenceKey,
+        // Default to false: auto-submit on form value changes causes a
+        // re-render loop when the query's onSuccess resets form values.
+        // Only enable when explicitly configured by endpoint or caller.
+        autoSubmit: readAutoSubmit ?? false,
+        debounceMs: readDebounceMs,
+      },
+      queryOptions: {
+        enabled: readQueryEnabled,
+        staleTime: readStaleTime,
+        refetchOnWindowFocus: readRefetchOnWindowFocus,
+        refetchInterval: readRefetchInterval,
+        queryKey: readQueryKey,
+      },
+      urlPathParams: readUrlPathParams,
+      autoPrefillConfig: {
+        autoPrefill: autoPrefillEnabled,
+        autoPrefillFromLocalStorage: false,
+        showUnsavedChangesAlert: false,
+        clearStorageAfterSubmit: false,
+      },
+      initialState: readInitialState,
+      initialData: readInitialData,
+    }),
+    [
+      readPersistForm,
+      readPersistenceKey,
+      readAutoSubmit,
+      readDebounceMs,
+      readQueryEnabled,
+      readStaleTime,
+      readRefetchOnWindowFocus,
+      readRefetchInterval,
+      readQueryKey,
+      readUrlPathParams,
+      autoPrefillEnabled,
+      readInitialState,
+      readInitialData,
+    ],
+  );
+
+  const read = useEndpointRead(readEndpoint, logger, user, readOptions);
+
+  // Subscribe to definition-driven WS events for the GET endpoint.
+  // read?.cacheKey is the same key useEndpointRead built - guaranteed to match.
+  // read.form.getValues() provides the current request data (e.g. rootFolderId)
+  // to onEvent callbacks via requestDataRef - no re-subscription on form changes.
+  //
+  // CACHE-GATED: only subscribe when the endpoint's query is actually
+  // materialized (read.response present). With no cache entry there is nothing
+  // for an incoming event to merge into, and the next read refetches fresh — so a
+  // subscription would only cost a connection + auth round-trip for nothing. The
+  // fresh-thread flow pre-seeds the messages cache before subscribing, so its
+  // first stream events still land. `subscribeToEvents` remains the opt-in
+  // ceiling; cache presence refines it.
+  const subscribeEnabled =
+    (options?.subscribeToEvents ?? false) && read?.response !== undefined;
+  useEndpointSubscription(
+    readEndpoint,
+    subscribeEnabled,
+    readUrlPathParams,
+    read?.form.getValues() as Record<string, WidgetData> | undefined,
+    logger,
+    read?.cacheKey,
+    user,
+    locale,
+  );
+
+  // Use the appropriate operation based on endpoint type
+  const autoPrefillData = useMemo(() => {
+    if (autoPrefillEnabled && read?.response?.success) {
+      return read.response.data;
+    }
+    return;
+  }, [autoPrefillEnabled, read?.response]);
+
+  // Merge create options - only use hook-provided options (endpoint-level options not accessible due to dynamic endpoint selection)
+  const createFormOptions = useMemo(() => {
+    const hookOpts = options?.create?.formOptions;
+
+    return {
+      persistForm: hookOpts?.persistForm ?? false,
+      persistenceKey: hookOpts?.persistenceKey,
+      defaultValues: hookOpts?.defaultValues,
+    };
+  }, [options?.create?.formOptions]);
+
+  const createMutationOptions = useMemo(():
+    | ApiMutationOptions<
+        PrimaryMutationRequest<T>,
+        PrimaryMutationResponse<T>,
+        PrimaryMutationUrlVariables<T>
+      >
+    | undefined => {
+    return options?.create?.mutationOptions;
+  }, [options?.create?.mutationOptions]);
+
+  const createInitialState = useMemo(() => {
+    return options?.create?.initialState as
+      | DeepPartial<PrimaryMutationRequest<T>>
+      | undefined;
+  }, [options?.create?.initialState]);
+
+  const createAutoPrefillData = useMemo(():
+    | DeepPartial<PrimaryMutationRequest<T>>
+    | undefined => {
+    return (autoPrefillData ?? options?.create?.autoPrefillData) as
+      | DeepPartial<PrimaryMutationRequest<T>>
+      | undefined;
+  }, [autoPrefillData, options?.create?.autoPrefillData]);
+
+  const createUrlPathParams =
+    options?.create?.urlPathParams ?? readUrlPathParams;
+
+  // Always call the hook unconditionally - it handles null endpoints internally
+  const createOperation = useEndpointCreate(
+    primaryEndpoint,
+    logger,
+    user,
+    locale,
+    {
+      formOptions: createFormOptions,
+      mutationOptions: createMutationOptions,
+      urlPathParams: createUrlPathParams,
+      autoPrefillData: createAutoPrefillData,
+      initialState: createInitialState,
+    },
+  );
+
+  // Calculate the appropriate reset data for form clearing
+  const resetData = useMemo(() => {
+    if (autoPrefillData) {
+      return autoPrefillData;
+    }
+    return createFormOptions.defaultValues;
+  }, [autoPrefillData, createFormOptions.defaultValues]);
+
+  // Merge delete options - only use hook-provided options (endpoint-level options not accessible due to dynamic endpoint selection)
+  const deleteMutationOptions = useMemo(():
+    | ApiMutationOptions<
+        DeleteRequest<T>,
+        DeleteResponse<T>,
+        DeleteUrlVariables<T>
+      >
+    | undefined => {
+    return options?.delete?.mutationOptions;
+  }, [options?.delete?.mutationOptions]);
+
+  const deleteUrlPathParams = options?.delete?.urlPathParams;
+
+  const deleteAutoPrefillData = useMemo(():
+    | DeepPartial<DeleteRequest<T>>
+    | undefined => {
+    return options?.delete?.autoPrefillData;
+  }, [options?.delete?.autoPrefillData]);
+
+  // Hook will merge endpoint options with passed options internally
+  const deleteOperation = useEndpointDelete(deleteEndpoint, logger, user, {
+    mutationOptions: deleteMutationOptions,
+    urlPathParams: deleteUrlPathParams,
+    autoPrefillData: deleteAutoPrefillData,
+  });
+
+  const isLoading =
+    read?.isLoading ||
+    createOperation?.isSubmitting ||
+    deleteOperation?.isSubmitting ||
+    false;
+
+  // Combined error state - all hooks return compatible error types
+  const error: ErrorResponseType | null =
+    read?.error ||
+    createOperation?.submitError ||
+    deleteOperation?.submitError ||
+    null;
+
+  // Memoize create operation wrapper
+  const create = useMemo(() => {
+    if (!createOperation) {
+      return undefined;
+    }
+
+    return {
+      ...createOperation,
+      values: createOperation.form.getValues(),
+      setValue: createOperation.form.setValue.bind(createOperation.form),
+      onSubmit: createOperation.submitForm,
+      reset: (): void => createOperation.form.reset(resetData || {}),
+      isSuccess: createOperation.isSubmitSuccessful,
+      isDirty: createOperation.form.formState.isDirty,
+      error:
+        createOperation.submitError &&
+        Object.keys(createOperation.submitError).length > 0
+          ? createOperation.submitError
+          : null,
+    };
+  }, [createOperation, resetData]);
+
+  // Generate alert state from success/error states and endpoint types
+  const alert = useMemo((): FormAlertState | null => {
+    if (!primaryEndpoint) {
+      return null;
+    }
+
+    const { t: scopedT } = primaryEndpoint.scopedTranslation.scopedT(locale);
+    const { t: reactT } = reactScopedTranslation.scopedT(locale);
+
+    // Check for success state
+
+    if (create?.isSuccess && primaryEndpoint.successTypes) {
+      return {
+        variant: "success",
+        title: {
+          message: scopedT(primaryEndpoint.successTypes.title),
+        },
+        message: {
+          message: scopedT(primaryEndpoint.successTypes.description),
+        },
+      };
+    }
+
+    // Check for error state
+
+    if (error && primaryEndpoint.errorTypes) {
+      // Try to find matching error type from endpoint by checking the errorKey
+
+      const errorTypeEntries = Object.entries(primaryEndpoint.errorTypes);
+      const matchingEntry = errorTypeEntries.find(([hookErrorType]) => {
+        // Check if the error's errorKey matches any of the HookErrorTypes
+        return error.errorType?.errorKey?.includes(hookErrorType.toLowerCase());
+      });
+
+      if (matchingEntry?.[1]) {
+        const errorConfig = matchingEntry[1];
+        return {
+          variant: "destructive",
+          title: {
+            message: scopedT(errorConfig.title),
+          },
+          message: {
+            message: scopedT(errorConfig.description),
+          },
+        };
+      }
+
+      // Fallback to generic error
+      return {
+        variant: "destructive",
+        title: {
+          message: reactT("widgets.error.title"),
+        },
+        message: {
+          message: error.message,
+          messageParams: error.messageParams,
+        },
+      };
+    }
+
+    return null;
+  }, [create?.isSuccess, error, primaryEndpoint, locale]);
+
+  // Handle PATCH endpoint as update operation
+  const patchEndpoint = endpoints.PATCH ?? null;
+
+  // Merge update options - only use hook-provided options (endpoint-level options not accessible due to dynamic endpoint selection)
+  const updateFormOptions = useMemo(() => {
+    const hookOpts = options?.update?.formOptions;
+
+    return {
+      persistForm: hookOpts?.persistForm ?? false,
+      persistenceKey: hookOpts?.persistenceKey,
+      defaultValues: hookOpts?.defaultValues,
+    };
+  }, [options?.update?.formOptions]);
+
+  const updateMutationOptions = useMemo(():
+    | ApiMutationOptions<
+        PatchRequest<T>,
+        PatchResponse<T>,
+        PatchUrlVariables<T>
+      >
+    | undefined => {
+    return options?.update?.mutationOptions;
+  }, [options?.update?.mutationOptions]);
+
+  const updateInitialState = useMemo(() => {
+    return options?.update?.initialState as
+      | DeepPartial<PatchRequest<T>>
+      | undefined;
+  }, [options?.update?.initialState]);
+
+  const updateAutoPrefillData = useMemo(():
+    | DeepPartial<PatchRequest<T>>
+    | undefined => {
+    return (autoPrefillData ?? options?.update?.autoPrefillData) as
+      | DeepPartial<PatchRequest<T>>
+      | undefined;
+  }, [autoPrefillData, options?.update?.autoPrefillData]);
+
+  const updateUrlPathParams =
+    options?.update?.urlPathParams ?? readUrlPathParams;
+
+  // Hook will merge endpoint options with passed options internally
+  const updateOperation = useEndpointCreate(
+    patchEndpoint,
+    logger,
+    user,
+    locale,
+    {
+      formOptions: updateFormOptions,
+      mutationOptions: updateMutationOptions,
+      urlPathParams: updateUrlPathParams,
+      autoPrefillData: updateAutoPrefillData,
+      initialState: updateInitialState,
+    },
+  );
+
+  // Memoize update operation wrapper
+  const updateValues = updateOperation?.form.watch();
+  const update = useMemo(() => {
+    if (!updateOperation) {
+      return undefined;
+    }
+
+    return {
+      form: updateOperation.form,
+      response: updateOperation.response,
+      isSuccess: updateOperation.isSubmitSuccessful,
+      error:
+        updateOperation.submitError &&
+        Object.keys(updateOperation.submitError).length > 0
+          ? updateOperation.submitError
+          : null,
+      values: updateValues,
+      setValue: updateOperation.form.setValue.bind(updateOperation.form),
+      submit: async (
+        data: typeof updateOperation.form extends UseFormReturn<infer TValues>
+          ? TValues
+          : never,
+      ): Promise<void> => {
+        updateOperation.form.reset(data);
+        await updateOperation.submitForm();
+      },
+      reset: (): void => updateOperation.form.reset(resetData || {}),
+      isSubmitting: updateOperation.isSubmitting,
+      isDirty: updateOperation.form.formState.isDirty,
+      clearSavedForm: updateOperation.clearSavedForm,
+      setErrorType: updateOperation.setErrorType,
+    };
+  }, [updateOperation, updateValues, resetData]);
+
+  // Memoize return object for stable reference
+  return useMemo(
+    () =>
+      ({
+        alert,
+        read: read ?? undefined,
+        create,
+        update,
+        delete: deleteOperation ?? undefined,
+        isLoading,
+        error,
+      }) as EndpointReturn<T>,
+    [alert, read, create, update, deleteOperation, isLoading, error],
+  );
+}

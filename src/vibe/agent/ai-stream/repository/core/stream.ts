@@ -1,5 +1,5 @@
 /**
- * AI Stream core state — live-stream mutable state (StreamContext), the
+ * AI Stream core state — live-stream mutable state (ToolExecutionContextImpl), the
  * in-memory stream/queue registries with streaming-state transitions, and
  * abort-controller wiring.
  */
@@ -17,8 +17,10 @@ import { CronTaskStatus } from "next-vibe/tasks/enum";
 import type { CreditsT as ModuleT } from "@/credits/i18n";
 
 import { bubbleFolderActivity } from "../../../chat/bubble-folder-activity";
-import type { ToolExecutionContext } from "../../../chat/config";
-import type { DefaultFolderId } from "../../../chat/config";
+import type {
+  DefaultFolderId,
+  ToolExecutionContext,
+} from "../../../chat/config";
 import {
   chatThreads,
   type MessageMetadata,
@@ -48,10 +50,10 @@ export interface PendingToolData {
 }
 
 /**
- * StreamContext - Encapsulates all mutable state during a stream
+ * ToolExecutionContextImpl - Encapsulates all mutable state during a stream
  * MUST call cleanup() when stream ends to prevent memory leaks
  */
-export class StreamContext {
+export class ToolExecutionContextImpl {
   /** Centralised, throttled DB writer for all assistant message writes */
   readonly dbWriter: MessageDbWriter;
   /** Typed WS emitter for this thread's messages channel. Use this from all stream handlers. */
@@ -213,7 +215,7 @@ export class StreamContext {
     streamRunId: string | undefined;
     /** Fixture chain of the stream — bound onto the dbWriter so embedding-sync
      *  API calls record/replay like every other AI/media call. */
-    streamContext: ToolExecutionContext;
+    toolExecutionContext: ToolExecutionContext;
   }) {
     this.streamRunId = params.streamRunId;
     this.sequenceId = params.sequenceId;
@@ -231,7 +233,7 @@ export class StreamContext {
       params.locale,
       this.wsEmit,
       params.emitTitle,
-      params.streamContext,
+      params.toolExecutionContext,
     );
   }
 
@@ -282,7 +284,7 @@ export class StreamContext {
     // Flush any remaining throttled writes - log if it fails so we know messages were lost
     void this.dbWriter.flushAll().catch((err: Error) => {
       this.logger.warn(
-        "[StreamContext] flushAll failed during cleanup - some writes may be lost",
+        "[ToolExecutionContextImpl] flushAll failed during cleanup - some writes may be lost",
         {
           error: err.message,
         },
@@ -308,7 +310,7 @@ export class StreamContext {
  * Resolve the effective (possibly de-duplicated) key for a RAW toolCallId,
  * consuming one "claim" from the given counter map. Shared by
  * claimExecuteToolCallId/claimResultToolCallId below - split into two
- * functions (rather than one taking a StreamContext) so each caller's
+ * functions (rather than one taking a ToolExecutionContextImpl) so each caller's
  * minimal structural type only needs the one counter it actually uses:
  * tools-loader's execute() wrapper only ever sees ToolExecutionContext
  * (chat/config.ts), which doesn't carry resultClaimCount.
@@ -333,10 +335,10 @@ function claim(
 
 /**
  * Resolve the effective (possibly de-duplicated) toolCallId for THIS
- * execute() invocation - see StreamContext.duplicateToolCallKeys for why a
+ * execute() invocation - see ToolExecutionContextImpl.duplicateToolCallKeys for why a
  * provider-side id collision within one step needs this. Used by
  * tools-loader's execute() wrapper, which only has ToolExecutionContext
- * (not the full StreamContext) - a no-op (returns rawToolCallId unchanged)
+ * (not the full ToolExecutionContextImpl) - a no-op (returns rawToolCallId unchanged)
  * outside a streaming context where these maps aren't wired up.
  */
 export function claimExecuteToolCallId(
@@ -352,10 +354,10 @@ export function claimExecuteToolCallId(
 /**
  * Same as claimExecuteToolCallId, but for tool-result/tool-error part
  * matching in the loop (a separate counter - a different consumer than
- * execute()). Always called with the full StreamContext.
+ * execute()). Always called with the full ToolExecutionContextImpl.
  */
 export function claimResultToolCallId(
-  ctx: StreamContext,
+  ctx: ToolExecutionContextImpl,
   rawToolCallId: string,
 ): string {
   return claim(ctx.duplicateToolCallKeys, ctx.resultClaimCount, rawToolCallId);
@@ -449,7 +451,7 @@ export async function clearStreamingState(
   logger: EndpointLogger,
   user: JwtPayloadType,
   /**
-   * Ownership token of the finishing stream (streamContext.streamRunId).
+   * Ownership token of the finishing stream (ToolExecutionContextImpl.streamRunId).
    * When provided, the clear only applies while chat_threads.streamingRunId
    * still matches — a stale finalizer whose claim was superseded by a newer
    * stream (queued turn, revival) becomes a no-op instead of clobbering it.

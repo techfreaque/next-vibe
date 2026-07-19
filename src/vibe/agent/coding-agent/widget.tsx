@@ -20,7 +20,6 @@ import { GroupedAssistantMessage } from "next-vibe/agent/chat/threads/[threadId]
 import type { MessageGroup } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/message-grouping";
 import { StaticUserMessageBubble } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
 import { NO_SKILL_ID } from "next-vibe/agent/skills/constants";
-import { cn } from "next-vibe/core/utils/utils";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
@@ -39,6 +38,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe/ui/ui/tooltip";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetContext,
   useWidgetDisabled,
@@ -51,8 +51,8 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 

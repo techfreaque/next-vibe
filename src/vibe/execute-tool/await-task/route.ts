@@ -7,7 +7,13 @@ import { AwaitTaskRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, user, logger, t, streamContext }) =>
-      AwaitTaskRepository.awaitTask(data, user, logger, t, streamContext),
+    handler: ({ data, user, logger, t, toolExecutionContext }) =>
+      AwaitTaskRepository.awaitTask(
+        data,
+        user,
+        logger,
+        t,
+        toolExecutionContext,
+      ),
   },
 });

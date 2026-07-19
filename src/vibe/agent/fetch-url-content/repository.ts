@@ -114,7 +114,7 @@ function filterByQuery(content: string, query: string): TruncateResult {
     regex = new RegExp(query, "i");
   } catch {
     // Invalid regex - fall back to literal substring
-    regex = new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+    regex = new RegExp(query.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
   }
 
   // Score paragraphs by number of regex matches

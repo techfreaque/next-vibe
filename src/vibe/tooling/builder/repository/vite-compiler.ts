@@ -83,7 +83,7 @@ function serverOnlyTracePlugin(
 ): Plugin {
   const shimRel = moduleAliases["server-only"];
   const shimAbsolute = shimRel
-    ? resolve(rootDir, shimRel).replace(/\\/g, "/")
+    ? resolve(rootDir, shimRel).replaceAll("\\", "/")
     : null;
 
   // Collect importer→resolved edges so we know who imported the shim.
@@ -104,7 +104,7 @@ function serverOnlyTracePlugin(
         importer &&
         shimAbsolute &&
         (source === "server-only" ||
-          source.replace(/\\/g, "/").endsWith("server-only.ts"))
+          source.replaceAll("\\", "/").endsWith("server-only.ts"))
       ) {
         let set = importersByResolved.get(shimAbsolute);
         if (!set) {
@@ -121,7 +121,7 @@ function serverOnlyTracePlugin(
         return null;
       }
 
-      const normalized = id.replace(/\\/g, "/").replace(/\?.*$/, "");
+      const normalized = id.replaceAll("\\", "/").replace(/\?.*$/, "");
       if (normalized !== shimAbsolute) {
         return null;
       }
@@ -857,11 +857,11 @@ class ViteCompiler {
             // Strip string literals and comments to avoid false positives
             // (e.g. `kind: "redirect"` or `// redirects to overview` keeping the import).
             const nonImportCodeNoStrings = nonImportCode
-              .replace(/"[^"\\]*(?:\\.[^"\\]*)*"/g, '""')
-              .replace(/'[^'\\]*(?:\\.[^'\\]*)*'/g, "''")
-              .replace(/`[^`\\]*(?:\\.[^`\\]*)*`/g, "``")
-              .replace(/\/\*[\s\S]*?\*\//g, "")
-              .replace(/\/\/[^\n]*/g, "");
+              .replaceAll(/"[^"\\]*(?:\\.[^"\\]*)*"/g, '""')
+              .replaceAll(/'[^'\\]*(?:\\.[^'\\]*)*'/g, "''")
+              .replaceAll(/`[^`\\]*(?:\\.[^`\\]*)*`/g, "``")
+              .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+              .replaceAll(/\/\/[^\n]*/g, "");
             const filteredLines = lines.filter((line) => {
               const trimmed = line.trimStart();
               if (
@@ -1456,11 +1456,11 @@ class ViteCompiler {
               // Strip string literals and comments to avoid false positives
               // (e.g. `kind: "redirect"` or `// redirects to overview` keeping the import).
               const nonImportCodeNoStrings = nonImportCode
-                .replace(/"[^"\\]*(?:\\.[^"\\]*)*"/g, '""')
-                .replace(/'[^'\\]*(?:\\.[^'\\]*)*'/g, "''")
-                .replace(/`[^`\\]*(?:\\.[^`\\]*)*`/g, "``")
-                .replace(/\/\*[\s\S]*?\*\//g, "")
-                .replace(/\/\/[^\n]*/g, "");
+                .replaceAll(/"[^"\\]*(?:\\.[^"\\]*)*"/g, '""')
+                .replaceAll(/'[^'\\]*(?:\\.[^'\\]*)*'/g, "''")
+                .replaceAll(/`[^`\\]*(?:\\.[^`\\]*)*`/g, "``")
+                .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+                .replaceAll(/\/\/[^\n]*/g, "");
               const filteredLines = lines.filter((line) => {
                 const trimmed = line.trimStart();
                 // Only process value imports (not `import type`)
@@ -1529,7 +1529,7 @@ class ViteCompiler {
                 return undefined;
               }
               // Replace bare `_c = Foo` with `var _c = Foo`
-              const patched = code.replace(/\n(_c\d*) = /g, "\nvar $1 = ");
+              const patched = code.replaceAll(/\n(_c\d*) = /g, "\nvar $1 = ");
               return { code: patched, map: null };
             },
           } as Plugin,
@@ -1556,7 +1556,7 @@ class ViteCompiler {
               // specifiers - the lazy i18n loader pattern uses both forms.
               const imports: string[] = [];
               let counter = 0;
-              const rewritten = code.replace(
+              const rewritten = code.replaceAll(
                 /\brequire\((['"`])([^'"`)]+)\1\)/g,
                 (...[, , specifier]) => {
                   const varName = `__cjsImport_${counter++}`;

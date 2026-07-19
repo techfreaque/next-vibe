@@ -8,7 +8,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, user, logger, t, streamContext }) =>
-      CortexExecRepository.exec(data, logger, user, t, streamContext),
+    handler: async ({ data, user, logger, t, toolExecutionContext }) =>
+      CortexExecRepository.exec(data, logger, user, t, toolExecutionContext),
   },
 });

@@ -4,7 +4,7 @@
  */
 import { GripVertical } from "lucide-react-native";
 import { styled } from "nativewind";
-import { cn } from "next-vibe/core/utils/utils";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import React from "react";
 import { View } from "react-native";
 

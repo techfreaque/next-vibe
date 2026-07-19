@@ -19,8 +19,8 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field/widget";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import React, { useCallback, useMemo, useState } from "react";
 
 import type definition from "./definition";
@@ -110,7 +110,7 @@ function BarChartSection({
         {top.map((item) => (
           <Div key={item.x} className="flex items-center gap-2">
             <Span className="text-xs text-muted-foreground w-28 truncate flex-shrink-0">
-              {(item.label ?? item.x).replace(/_/g, " ")}
+              {(item.label ?? item.x).replaceAll("_", " ")}
             </Span>
             <Div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
               <Div

@@ -11,7 +11,7 @@ import {
   useWidgetLocale,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import { useMemo } from "react";
 
 interface FavoriteDetailWidgetProps {

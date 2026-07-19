@@ -4,9 +4,9 @@
  */
 
 import { Link } from "@react-email/components";
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CSSProperties, JSX, ReactNode } from "react";
 
-import { envClient } from "@/env/env-client";
 import {
   ensureFullUrl,
   generateTrackingLinkUrl,

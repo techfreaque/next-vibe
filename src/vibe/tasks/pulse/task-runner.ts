@@ -5,15 +5,15 @@
  */
 import "server-only";
 
+import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { formatDuration, formatTask } from "next-vibe/logger/formatters";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { tasksEnv } from "next-vibe/tasks/env";
 import type { TasksTranslationKey } from "next-vibe/tasks/i18n";
 import type { TaskRunner } from "next-vibe/tasks/unified-runner/types";
-
-import { env } from "@/env/env";
 
 import { CronTaskPriority, TaskCategory } from "../enum";
 
@@ -37,10 +37,10 @@ const pulseTaskRunner: TaskRunner<TasksTranslationKey> = {
     cronUser: JwtPrivatePayloadType;
   }): Promise<void> {
     const { signal, logger, systemLocale } = props;
-    const PULSE_INTERVAL = (env.PULSE_INTERVAL_MINUTES ?? 1) * 60 * 1000;
+    const PULSE_INTERVAL = (tasksEnv.PULSE_INTERVAL_MINUTES ?? 1) * 60 * 1000;
     logger.info(
       formatTask(
-        `Started task runner with pulse of ${env.PULSE_INTERVAL_MINUTES === 1 ? "1 minute" : `${env.PULSE_INTERVAL_MINUTES} minutes`}`,
+        `Started task runner with pulse of ${tasksEnv.PULSE_INTERVAL_MINUTES === 1 ? "1 minute" : `${tasksEnv.PULSE_INTERVAL_MINUTES} minutes`}`,
         "💓",
       ),
     );
@@ -72,7 +72,7 @@ const pulseTaskRunner: TaskRunner<TasksTranslationKey> = {
           const failureCount = summary.tasksFailed.length;
           const duration = summary.totalExecutionTimeMs;
 
-          if (env.NODE_ENV !== "production") {
+          if (coreEnv.NODE_ENV !== "production") {
             logger.info(
               formatTask(
                 `Pulse #${pulseCount}: ${successCount} tasks succeeded, ${failureCount} tasks failed in ${formatDuration(duration)}`,

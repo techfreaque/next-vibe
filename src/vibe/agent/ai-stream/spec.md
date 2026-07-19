@@ -270,7 +270,7 @@ in-flight remote pending calls.
 AI sees: `{ taskId, status, result?, waiting }`.
 
 Lives in `execute-tool/await-task/` — it is an execute-tool sub-endpoint.
-Its only ai-stream coupling is `streamContext` fields (`waitingForRemoteResult`,
+Its only ai-stream coupling is `toolExecutionContext` fields (`waitingForRemoteResult`,
 `suppressedWakeUpToolMessageIds`).
 
 ---
@@ -303,7 +303,7 @@ For tools that may run longer than the configured timeout (SSH, coding-agent):
 
 1. `wireEscalateToTask` (in `repository/core/escalation-handler.ts`) creates a
    RUNNING `cronTasks` row via `TaskCompletion.createEscalationTask`.
-2. Sets `streamContext.waitingForRemoteResult=true`, `pendingTimeoutMs` from
+2. Sets `toolExecutionContext.waitingForRemoteResult=true`, `pendingTimeoutMs` from
    endpoint config.
 3. Emits `STREAMING_STATE_CHANGED → waiting` immediately.
 4. After parallel tool batch: stream detects `waitingForRemoteResult=true` →
@@ -311,7 +311,7 @@ For tools that may run longer than the configured timeout (SSH, coding-agent):
 5. Tool goroutine continues; `onComplete(result)` is the callback when done.
 6. `onComplete` → `TaskCompletion.handle` → queue → revival.
 
-**Cancel propagation**: `streamContext.onEscalatedTaskCancel` marks the task
+**Cancel propagation**: `toolExecutionContext.onEscalatedTaskCancel` marks the task
 CANCELLED and resets thread to `idle`.
 
 `escalation-handler.ts` is the only ai-stream file that directly creates task

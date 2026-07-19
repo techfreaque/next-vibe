@@ -19,20 +19,30 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
-import { Platform } from "next-vibe/core/definition/platform";
 import { WidgetDataSchema } from "next-vibe/core/utils/json";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { scopedTranslation } from "next-vibe/platforms/ai/i18n";
-import { taskInputSchema } from "next-vibe/tasks/cron/db";
+import { Platform } from "next-vibe/platforms/platforms";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
-  customWidgetObject,
   requestField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
-import { CallbackMode, EXECUTE_TOOL_ALIAS } from "./constants";
+import { EXECUTE_TOOL_ALIAS } from "./constants";
+// THE DEFINITION SEAM: the request fields that describe the tool call's DISPATCH
+// (instanceId → another instance; callbackMode → another time) rather than the
+// call itself. A local-only deployment (CLI + MCP, no task system, no remote
+// instances) points this ONE import at ./definition-dispatch-fields-local, and
+// both fields leave the contract — nothing is advertised that cannot be honoured.
+import {
+  dispatchRequestExamples,
+  dispatchRequestFields,
+  dispatchResponseExamples,
+  dispatchResponseFields,
+} from "./definition-dispatch-fields";
 
 const ExecuteToolWidget = lazyWidget(() =>
   import("./widget").then((m) => ({
@@ -102,47 +112,16 @@ const { POST } = createEndpoint({
         label: "executeTool.post.fields.input.label",
         description: "executeTool.post.fields.input.description",
         columns: 12,
-        schema: taskInputSchema.default({}),
+        // A tool's input is a plain record of WidgetData. This used to borrow
+        // `taskInputSchema` from tasks/cron/db — an identical shape, but importing
+        // it dragged the whole task system into execute-tool's definition graph for
+        // no reason. execute-tool's input is not a task input; the match was
+        // incidental.
+        schema: z.record(z.string(), WidgetDataSchema).default({}),
       }),
 
-      instanceId: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "executeTool.post.fields.instanceId.label",
-        description: "executeTool.post.fields.instanceId.description",
-        visibleFor: [
-          UserRole.CUSTOMER,
-          UserRole.PARTNER_ADMIN,
-          UserRole.PARTNER_EMPLOYEE,
-          UserRole.ADMIN,
-        ] as const,
-        columns: 12,
-        schema: z.string().optional(),
-      }),
-
-      callbackMode: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "executeTool.post.fields.callbackMode.label",
-        description: "executeTool.post.fields.callbackMode.description",
-        visibleFor: [
-          UserRole.CUSTOMER,
-          UserRole.PARTNER_ADMIN,
-          UserRole.PARTNER_EMPLOYEE,
-          UserRole.ADMIN,
-        ] as const,
-        columns: 12,
-        schema: z
-          .enum([
-            CallbackMode.WAIT,
-            CallbackMode.DETACH,
-            CallbackMode.END_LOOP,
-            CallbackMode.WAKE_UP,
-            CallbackMode.APPROVE,
-          ])
-          .optional()
-          .default(CallbackMode.WAIT),
-      }),
+      // Dispatch fields (instanceId / callbackMode) — see the seam import above.
+      ...dispatchRequestFields,
 
       // ── Response fields ───────────────────────────────────────────────────
 
@@ -154,26 +133,8 @@ const { POST } = createEndpoint({
         schema: WidgetDataSchema.optional(),
       }),
 
-      taskId: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: z.string().optional(),
-      }),
-
-      hint: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: z.string().optional(),
-      }),
-
-      // Explicit execution outcome on the tool-execute-result wire event.
-      // Without it the requester had to INFER failure from hint presence —
-      // a successful result carrying a hint would be misclassified as failed.
-      status: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: z.enum(["completed", "failed"]).optional(),
-      }),
+      // Dispatch outputs (taskId / hint / status) — see the seam import above.
+      ...dispatchResponseFields,
     },
   }),
 
@@ -255,7 +216,7 @@ const { POST } = createEndpoint({
         // copy (the thread syncs cross-instance), so its external calls
         // record/replay in the caller's folder and continue the same ordinal
         // sequence. A plain thread id — absence is the switch (no env flag).
-        streamContext: z.string().optional(),
+        toolExecutionContext: z.string().optional(),
       }),
     },
     "tool-execute-result": {
@@ -285,27 +246,12 @@ const { POST } = createEndpoint({
         toolName: "agent_chat_characters_GET",
         input: {},
       },
-      remoteBackground: {
-        toolName: "bash",
-        input: { command: "echo hello" },
-        instanceId: "hermes",
-        callbackMode: CallbackMode.DETACH,
-      },
-      remoteWakeUp: {
-        toolName: "bash",
-        input: { command: "ls /tmp" },
-        instanceId: "hermes",
-        callbackMode: CallbackMode.WAKE_UP,
-      },
+      ...dispatchRequestExamples,
     },
     responses: {
       // Response is the target route's .data passed through in `result`
       default: { result: {} },
-      // Remote execution returns a task ID (async)
-      remote: {
-        taskId: "task-uuid-here",
-        hint: "Result/return will be injected when complete and wakes up the thread. Call await-task only if you need the result before continuing.",
-      },
+      ...dispatchResponseExamples,
     },
   },
 });

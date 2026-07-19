@@ -11,13 +11,14 @@
 import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
 
-import { createCliWidgetPlugin } from "next-vibe/platforms/cli/cli-widget-plugin-factory";
 import type { BuildConfig } from "next-vibe/tooling/builder/definition";
 import {
   BunBuildTypeEnum,
   BunTargetEnum,
   SourcemapModeEnum,
 } from "next-vibe/tooling/builder/enum";
+
+import { createCliWidgetPlugin } from "@/vibe/platforms/cli/runtime/cli-widget-plugin-factory";
 
 import manifest from "./package";
 

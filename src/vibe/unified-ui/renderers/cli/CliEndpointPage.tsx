@@ -28,18 +28,18 @@ import {
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import { AgentAvailabilityProvider } from "next-vibe/agent/env-availability-context";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { scopedTranslation as cliScopedTranslation } from "next-vibe/platforms/cli/i18n";
-import { QueryProvider } from "next-vibe/platforms/react/hooks/query-provider";
+import { Platform } from "next-vibe/platforms/platforms";
 import { LoggerProvider } from "next-vibe/ui/hooks/logger-provider";
+import { QueryProvider } from "next-vibe/unified-ui/hooks/query-provider";
 import type { JSX, ReactNode } from "react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-import { EndpointsPage } from "../react/EndpointsPage";
+import { EndpointsPage } from "../web/EndpointsPage";
 
 // ─── Error Boundary ──────────────────────────────────────────────────────────
 
@@ -159,7 +159,7 @@ function buildExampleCommand(
     }
 
     // Convert camelCase to kebab-case for CLI flags
-    const kebabKey = key.replace(
+    const kebabKey = key.replaceAll(
       /[A-Z]/g,
       (match) => `-${match.toLowerCase()}`,
     );
@@ -386,24 +386,24 @@ function InkEndpointPage<
 
 const TMP_DIR = resolve(process.cwd(), ".tmp");
 const ANSI_RE =
-  /\x1b\[[0-9;]*[A-Za-z]|\x1b\][^\x07]*\x07|\x1b\[[?]?[0-9;]*[a-zA-Z]/g; // eslint-disable-line no-control-regex
+  /\u001B\[[0-9;]*[A-Za-z]|\u001B\][^\u0007]*\u0007|\u001B\[[?]?[0-9;]*[a-zA-Z]/g; // eslint-disable-line no-control-regex
 const IDLE_TIMEOUT_MS = 20 * 60 * 1000; // 20 minutes
 
 /** Key name → ANSI escape sequence mapping for agent-injected keystrokes */
 const KEY_MAP: Record<string, string> = {
   Enter: "\r",
   Tab: "\t",
-  Escape: "\x1b",
-  Up: "\x1b[A",
-  Down: "\x1b[B",
-  Right: "\x1b[C",
-  Left: "\x1b[D",
-  Backspace: "\x7f",
-  Delete: "\x1b[3~",
+  Escape: "\u001B",
+  Up: "\u001B[A",
+  Down: "\u001B[B",
+  Right: "\u001B[C",
+  Left: "\u001B[D",
+  Backspace: "\u007F",
+  Delete: "\u001B[3~",
   Space: " ",
-  "Shift+Tab": "\x1b[Z",
-  "Ctrl+C": "\x03",
-  "Ctrl+D": "\x04",
+  "Shift+Tab": "\u001B[Z",
+  "Ctrl+C": "\u0003",
+  "Ctrl+D": "\u0004",
 };
 
 function frameFilePath(pid: number): string {

@@ -4,7 +4,7 @@
  */
 import { Minus } from "lucide-react-native";
 import { styled } from "nativewind";
-import { cn } from "next-vibe/core/utils/utils";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import React, { createContext, useContext, useState } from "react";
 import { Text as RNText, TextInput, View } from "react-native";
 

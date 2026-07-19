@@ -17,15 +17,25 @@ import {
   contactClientEnvSchema,
 } from "../../contact/env-client";
 import {
-  envClient as env_envClient,
-  envClientExamples,
-  envClientSchema as env_envClientSchema,
-} from "../../env/env-client";
-import {
   paymentClientEnv,
   paymentClientEnvExamples,
   paymentClientEnvSchema,
 } from "../../payment/env-client";
+import {
+  agentClientEnv,
+  agentClientEnvExamples,
+  agentClientEnvSchema,
+} from "../../vibe/agent/env-client";
+import {
+  coreClientEnv,
+  coreClientEnvExamples,
+  coreClientEnvSchema,
+} from "../../vibe/core/env-client";
+import {
+  loggerClientEnv,
+  loggerClientEnvExamples,
+  loggerClientEnvSchema,
+} from "../../vibe/logger/env-client";
 
 // Platform detection (will be set at runtime)
 const isServer = typeof globalThis.document === "undefined";
@@ -45,15 +55,25 @@ export const envClientModules = {
     schema: contactClientEnvSchema,
     examples: contactClientEnvExamples,
   },
-  env: {
-    env: env_envClient,
-    schema: env_envClientSchema,
-    examples: envClientExamples,
-  },
   payment: {
     env: paymentClientEnv,
     schema: paymentClientEnvSchema,
     examples: paymentClientEnvExamples,
+  },
+  agent: {
+    env: agentClientEnv,
+    schema: agentClientEnvSchema,
+    examples: agentClientEnvExamples,
+  },
+  core: {
+    env: coreClientEnv,
+    schema: coreClientEnvSchema,
+    examples: coreClientEnvExamples,
+  },
+  logger: {
+    env: loggerClientEnv,
+    schema: loggerClientEnvSchema,
+    examples: loggerClientEnvExamples,
   },
 } as const;
 
@@ -62,8 +82,10 @@ export { platform };
 
 // Combined client schema
 export const envClientSchema = contactClientEnvSchema
-  .merge(env_envClientSchema)
-  .merge(paymentClientEnvSchema);
+  .merge(paymentClientEnvSchema)
+  .merge(agentClientEnvSchema)
+  .merge(coreClientEnvSchema)
+  .merge(loggerClientEnvSchema);
 
 export type EnvClient = z.infer<typeof envClientSchema>;
 

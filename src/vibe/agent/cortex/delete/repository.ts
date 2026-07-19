@@ -18,7 +18,7 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { createEndpointEmitter } from "next-vibe/realtime/emitter";
 
-import { rootlessStreamContext } from "../../chat/config";
+import { rootlessToolExecutionContext } from "../../chat/config";
 import { cortexNodes } from "../db";
 import { CortexNodeType } from "../enum";
 import {
@@ -90,7 +90,7 @@ export class CortexDeleteRepository {
             user,
             locale,
             logger,
-            streamContext: rootlessStreamContext(),
+            toolExecutionContext: rootlessToolExecutionContext(),
           },
           path,
           mountPrefix,

@@ -258062,6 +258062,39 @@
         "response": true
       },
       "children": {
+        "interactive": {
+          "type": "form_field",
+          "fieldType": "boolean",
+          "label": "Interaktywny",
+          "description": "Otwórz pełną interaktywną przeglądarkę narzędzi",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "boolean"
+                },
+                "type": "boolean"
+              }
+            },
+            "type": "optional"
+          },
+          "hiddenForPlatforms": [
+            "ai",
+            "mcp",
+            "cron",
+            "remote-skill",
+            "trpc",
+            "next-page",
+            "next-api",
+            "electron",
+            "frame"
+          ],
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "query": {
           "type": "form_field",
           "fieldType": "text",

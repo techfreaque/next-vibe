@@ -11,7 +11,7 @@ import {
 } from "next-vibe/agent/ai-stream/system-prompt/builder";
 import {
   type DefaultFolderId,
-  rootlessStreamContext,
+  rootlessToolExecutionContext,
 } from "next-vibe/agent/chat/config";
 import { CHAT_MESSAGE_COLUMNS, chatMessages } from "next-vibe/agent/chat/db";
 import { chatSettings } from "next-vibe/agent/chat/settings/db";
@@ -147,7 +147,7 @@ export async function buildDebugSystemPrompt({
     const [{ systemPrompt, trailingSystemMessage }, rawScores, threadMsgs] =
       await Promise.all([
         buildSystemPrompt({
-          streamContext: rootlessStreamContext(),
+          toolExecutionContext: rootlessToolExecutionContext(),
           skillId: skillId ?? null,
           user,
           logger,

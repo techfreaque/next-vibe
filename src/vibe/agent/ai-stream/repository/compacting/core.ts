@@ -14,7 +14,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type { ChatMessage } from "../../../chat/db";
 import { calculateCreditCost } from "../../../models/models";
 import { type ChatModelId, getChatModelById } from "../../models";
-import type { StreamContext } from "../core/stream";
+import type { ToolExecutionContextImpl } from "../core/stream";
 
 /**
  * Hard cap for the compacting LLM call. Summarization of a large thread
@@ -86,7 +86,7 @@ export async function runCompactingLLM(params: {
   messagesToCompact: ChatMessage[];
   user: JwtPayloadType;
   abortSignal: AbortSignal;
-  ctx: StreamContext;
+  ctx: ToolExecutionContextImpl;
   logger: EndpointLogger;
 }): Promise<CompactingLLMOutcome> {
   const {

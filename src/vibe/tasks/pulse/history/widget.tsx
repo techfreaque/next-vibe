@@ -4,7 +4,6 @@
  */
 
 "use client";
-import { cn } from "next-vibe/core/utils/utils";
 import { PulseExecutionStatus } from "next-vibe/tasks/enum";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -21,6 +20,7 @@ import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
 import { TrendingUp } from "next-vibe/ui/ui/icons/TrendingUp";
 import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
 import { Span } from "next-vibe/ui/ui/span";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -29,8 +29,8 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { DateFieldWidget } from "next-vibe/unified-ui/form-fields/date-field/widget";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import { DateFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/date-field/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import React, { useCallback, useMemo, useState } from "react";
 
 import type endpoints from "./definition";

@@ -5,11 +5,11 @@
 
 "use client";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
-import { cn } from "next-vibe/core/utils/utils";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   Icon,
   type IconKey,
-} from "next-vibe/unified-ui/form-fields/icon-field/icons";
+} from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import * as React from "react";
 
 import { Span } from "./span";

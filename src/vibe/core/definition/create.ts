@@ -18,12 +18,6 @@ import type { TParams } from "next-vibe/core/i18n/core/static-types";
 import { UserRole, type UserRoleValue } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type {
-  ApiFormOptions,
-  ApiMutationOptions,
-  ApiQueryFormOptions,
-  ApiQueryOptions,
-} from "next-vibe/platforms/react/hooks/types";
-import type {
   ChannelDeclaration,
   EndpointEventsMap,
   EndpointEventsMapBase,
@@ -46,7 +40,13 @@ import {
   generateFormSchema,
   generateSchemaForUsage as generateSchemaFromUtils,
 } from "next-vibe/unified-ui/_shared/utils";
-import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import type {
+  ApiFormOptions,
+  ApiMutationOptions,
+  ApiQueryFormOptions,
+  ApiQueryOptions,
+} from "next-vibe/unified-ui/hooks/types";
+import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import type { z } from "zod";
 
 import type { SubCategoryKey } from "@/generated/categories/registry";
@@ -224,15 +224,6 @@ export interface ApiEndpoint<
   readonly allowedRoles: TUserRoleValue;
 
   /**
-   * Roles allowed to access this endpoint in local mode (NEXT_PUBLIC_LOCAL_MODE=true).
-   * - undefined (not set): falls back to allowedRoles with UserRole.PUBLIC stripped
-   *   (except login and reset-password endpoints which keep PUBLIC)
-   * - [] (empty array): endpoint is disabled for everyone in local mode
-   * - [UserRole.ADMIN, ...]: explicit override - only those roles are allowed
-   */
-  readonly allowedLocalModeRoles?: readonly UserRoleValue[];
-
-  /**
    * Roles allowed to use client-side route (localStorage/IndexedDB)
    * If not specified, only allowedRoles can access (must use server route)
    * Use [UserRole.PUBLIC] to allow unauthenticated access via client route
@@ -319,6 +310,8 @@ export interface ApiEndpoint<
   readonly cli?: {
     // TODO: use keyof TRequestInput, TResponseInput, TUrlVariablesInput
     firstCliArgKey?: string;
+    /** Forces interactive Ink UI for this endpoint regardless of whether -i was passed */
+    alwaysInteractive?: boolean;
   };
 
   /**
@@ -839,7 +832,6 @@ export function createEndpoint<
     tags: config.tags,
     fields: config.fields,
     allowedRoles: config.allowedRoles,
-    allowedLocalModeRoles: config.allowedLocalModeRoles,
     allowedClientRoles: config.allowedClientRoles,
     useClientRoute: config.useClientRoute,
     examples: config.examples,

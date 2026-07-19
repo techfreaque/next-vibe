@@ -27,6 +27,7 @@
  */
 
 import { Slot, useLocalSearchParams } from "expo-router";
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { createEndpointLogger } from "next-vibe/logger/server";
@@ -36,8 +37,6 @@ import type React from "react";
 import type { JSX, ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
-
-import { envClient } from "@/env/env-client";
 
 /**
  * Next.js 15 async component props format

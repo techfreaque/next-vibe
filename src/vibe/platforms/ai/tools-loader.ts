@@ -19,9 +19,8 @@ import {
 } from "next-vibe/core/core-utils/path";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { FieldUsage } from "next-vibe/core/definition/enums";
-import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { permissionsRegistry } from "next-vibe/core/permissions/registry";
+import { permissionsRegistry } from "next-vibe/core/route/definitions-registry";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import {
@@ -31,6 +30,7 @@ import {
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { filterUserPermissionRoles } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { Platform } from "next-vibe/platforms/platforms";
 import {
   collectServerDefaults,
   generateSchemaForUsage,
@@ -58,7 +58,7 @@ function createToolFromEndpoint(
     user: JwtPayloadType;
     locale: CountryLanguage;
     logger: EndpointLogger;
-    streamContext: ToolExecutionContext;
+    toolExecutionContext: ToolExecutionContext;
     requiresConfirmation: boolean;
   },
 ): CoreTool {
@@ -106,7 +106,9 @@ function createToolFromEndpoint(
   if (toolName !== "await-task" && toolName !== EXECUTE_TOOL_ALIAS) {
     // Filter out callback modes blocked for this folder type.
     const blockedModes = new Set(
-      FOLDER_BLOCKED_CALLBACK_MODES[context.streamContext.rootFolderId] ?? [],
+      FOLDER_BLOCKED_CALLBACK_MODES[
+        context.toolExecutionContext.rootFolderId
+      ] ?? [],
     );
     const allowedModes = allCallbackModes.filter((m) => !blockedModes.has(m));
 
@@ -191,7 +193,7 @@ function createToolFromEndpoint(
           user: context.user,
           locale: context.locale,
           platform: Platform.AI as Platform,
-          streamContext: context.streamContext,
+          toolExecutionContext: context.toolExecutionContext,
         };
         for (const [key, resolver] of Object.entries(serverDefaults)) {
           const resolved = await resolver(ctx);
@@ -216,21 +218,23 @@ function createToolFromEndpoint(
       context.logger.debug("[ToolsLoader] CoreTool execute called", {
         toolName,
         callbackMode,
-        threadId: context.streamContext.threadId,
-        aiMessageId: context.streamContext.aiMessageId,
-        streamContextRef: !!context.streamContext,
+        threadId: context.toolExecutionContext.threadId,
+        aiMessageId: context.toolExecutionContext.aiMessageId,
+        toolExecutionContextRef: !!context.toolExecutionContext,
       });
       // Defense in depth: reject callback modes blocked for this folder type
       // even if the AI bypassed the schema enum restriction.
       const folderBlockedModes =
-        FOLDER_BLOCKED_CALLBACK_MODES[context.streamContext.rootFolderId] ?? [];
+        FOLDER_BLOCKED_CALLBACK_MODES[
+          context.toolExecutionContext.rootFolderId
+        ] ?? [];
       if (callbackMode && folderBlockedModes.includes(callbackMode)) {
         context.logger.warn(
           "[ToolsLoader] Blocked callbackMode for restricted folder",
           {
             toolName,
             callbackMode,
-            rootFolderId: context.streamContext.rootFolderId,
+            rootFolderId: context.toolExecutionContext.rootFolderId,
           },
         );
         return {
@@ -242,7 +246,7 @@ function createToolFromEndpoint(
 
       // Race tool execution against the abort signal so cancellation
       // kills even long-running tool calls immediately.
-      const abortSignal = context.streamContext.abortSignal;
+      const abortSignal = context.toolExecutionContext.abortSignal;
       const executeToolInline = async (): Promise<WidgetData> => {
         // Detach and wakeUp need task creation + backfill + resume-stream scheduling.
         // Route through RouteExecuteRepository which handles both modes.
@@ -268,7 +272,7 @@ function createToolFromEndpoint(
         // plain synchronous tools with no callbackMode.
         //
         // For WAIT/END_LOOP modes: eagerly mark waitingForRemoteResult on the SHARED
-        // streamContext SYNCHRONOUSLY (before any await). The AI SDK can emit finish-step
+        // toolExecutionContext SYNCHRONOUSLY (before any await). The AI SDK can emit finish-step
         // concurrently with async tool execution. If we wait until after DB operations in
         // RouteExecuteRepository.execute(), FinishStep fires while waitingForRemoteResult
         // is still undefined and skips the REMOTE_TOOL_WAIT abort, leaving thread "idle".
@@ -292,38 +296,40 @@ function createToolFromEndpoint(
         const didEagerlySetWaiting =
           (earlyCallbackMode === CallbackMode.WAIT ||
             earlyCallbackMode === CallbackMode.END_LOOP) &&
-          !!context.streamContext &&
+          !!context.toolExecutionContext &&
           (toolName !== EXECUTE_TOOL_ALIAS || isRemoteExecuteToolWait);
         if (didEagerlySetWaiting) {
-          context.streamContext.waitingForRemoteResult = true;
+          context.toolExecutionContext.waitingForRemoteResult = true;
         }
 
         // Inject the correct toolMessageId for this specific parallel tool call.
         // pendingToolMessages is keyed by an EFFECTIVE toolCallId - populated
         // by the loop's tool-call handler under the raw id normally, or under
         // a de-duplicated key when the provider reused the raw id for two
-        // calls in one step (see duplicateToolCallKeys on StreamContext).
+        // calls in one step (see duplicateToolCallKeys on toolExecutionContext).
         // claimExecuteToolCallId resolves which one THIS execute()
         // invocation corresponds to (executeClaimCount tracks how many times
         // we've claimed for this raw id so far - shared with no one else).
         // The AI SDK may call execute() before stream-part-handler processes the tool-call event,
         // so spin-wait up to 200ms (20 × 10ms) for the entry to appear.
-        // Resolve per-call toolMessageId BEFORE touching shared streamContext.
+        // Resolve per-call toolMessageId BEFORE touching shared toolExecutionContext.
         // Two parallel tools each have a distinct options.toolCallId.
-        // We must NOT write to context.streamContext.callerToolCallId (shared) here —
+        // We must NOT write to context.toolExecutionContext.callerToolCallId (shared) here —
         // that would race with the sibling call and both would end up with the same ID.
         // Instead, resolve the values locally and pass a per-call context snapshot.
         let perCallToolMessageId: string | undefined;
         let perCallLeafMessageId: string | null = null;
         let effectiveToolCallId = options?.toolCallId;
 
-        if (options?.toolCallId && context.streamContext) {
+        if (options?.toolCallId && context.toolExecutionContext) {
           effectiveToolCallId = claimExecuteToolCallId(
-            context.streamContext,
+            context.toolExecutionContext,
             options.toolCallId,
           );
           let pending =
-            context.streamContext.pendingToolMessages?.get(effectiveToolCallId);
+            context.toolExecutionContext.pendingToolMessages?.get(
+              effectiveToolCallId,
+            );
           if (!pending) {
             // Brief spin-wait: stream-part-handler is processing the tool-call event concurrently.
             // In practice this resolves within 1-2 ticks; 200ms cap is a generous safety bound.
@@ -332,7 +338,7 @@ function createToolFromEndpoint(
                 setTimeout(resolve, 10);
               });
               pending =
-                context.streamContext.pendingToolMessages?.get(
+                context.toolExecutionContext.pendingToolMessages?.get(
                   effectiveToolCallId,
                 );
             }
@@ -341,7 +347,7 @@ function createToolFromEndpoint(
             perCallToolMessageId = pending.messageId;
             perCallLeafMessageId =
               pending.toolCallData?.parentId ??
-              context.streamContext.leafMessageId ??
+              context.toolExecutionContext.leafMessageId ??
               null;
           }
         }
@@ -363,10 +369,10 @@ function createToolFromEndpoint(
         // Build a per-call context snapshot with the resolved IDs.
         // Reset waitingForRemoteResult to false in the copy so we can detect whether
         // RouteExecuteRepository.execute() actually created a WAIT task (sets it to true).
-        // This avoids mutating the shared streamContext which would race with sibling parallel calls.
-        const perCallStreamContext = context.streamContext
+        // This avoids mutating the shared toolExecutionContext which would race with sibling parallel calls.
+        const perCalltoolExecutionContext = context.toolExecutionContext
           ? {
-              ...context.streamContext,
+              ...context.toolExecutionContext,
               waitingForRemoteResult: false as boolean | undefined,
               // Effective (possibly de-duplicated) id, not the raw SDK id -
               // nested lookups (local.ts, remote.ts, guards.ts) read this
@@ -375,15 +381,16 @@ function createToolFromEndpoint(
               callerToolCallId: effectiveToolCallId,
               currentToolMessageId:
                 perCallToolMessageId ??
-                context.streamContext.currentToolMessageId,
+                context.toolExecutionContext.currentToolMessageId,
               leafMessageId:
-                perCallLeafMessageId ?? context.streamContext.leafMessageId,
+                perCallLeafMessageId ??
+                context.toolExecutionContext.leafMessageId,
               // Pass the tool's configured stream timeout so execute-tool/escalateToTask
               // can use it instead of the hardcoded 90s default.
               // undefined = not set on definition → callers use default 90_000.
               callerTimeoutMs: endpoint.streamTimeoutMs,
             }
-          : context.streamContext;
+          : context.toolExecutionContext;
 
         context.logger.debug(
           "[ToolsLoader] executing via RouteExecuteRepository",
@@ -391,8 +398,9 @@ function createToolFromEndpoint(
             toolName,
             callbackMode,
             callerToolCallId: options?.toolCallId,
-            currentToolMessageId: perCallStreamContext?.currentToolMessageId,
-            aiMessageId: context.streamContext.aiMessageId,
+            currentToolMessageId:
+              perCalltoolExecutionContext?.currentToolMessageId,
+            aiMessageId: context.toolExecutionContext.aiMessageId,
           },
         );
 
@@ -402,33 +410,33 @@ function createToolFromEndpoint(
           context.locale,
           context.logger,
           execT,
-          perCallStreamContext ?? context.streamContext,
+          perCalltoolExecutionContext ?? context.toolExecutionContext,
           Platform.AI,
         );
 
-        // Propagate waitingForRemoteResult back to the shared streamContext.
-        // perCallStreamContext started with waitingForRemoteResult=false; execute() sets it
+        // Propagate waitingForRemoteResult back to the shared toolExecutionContext.
+        // perCalltoolExecutionContext started with waitingForRemoteResult=false; execute() sets it
         // to true only when a real remote WAIT/END_LOOP task was created.
         // If execute() did NOT create a WAIT task, reset the eager flag we set above.
-        // Propagate the confirmation gate back to the shared streamContext.
+        // Propagate the confirmation gate back to the shared toolExecutionContext.
         // execute-tool's gate sets the flag on the per-call snapshot; stopWhen
         // and finish-step read the shared context - without this the stream
         // would start the AI-response turn despite the pending confirmation.
         if (
-          perCallStreamContext?.stepHasToolsAwaitingConfirmation &&
-          context.streamContext
+          perCalltoolExecutionContext?.stepHasToolsAwaitingConfirmation &&
+          context.toolExecutionContext
         ) {
-          context.streamContext.stepHasToolsAwaitingConfirmation = true;
+          context.toolExecutionContext.stepHasToolsAwaitingConfirmation = true;
         }
 
-        if (perCallStreamContext?.waitingForRemoteResult) {
+        if (perCalltoolExecutionContext?.waitingForRemoteResult) {
           // Confirm: a real WAIT task was created - keep the shared flag true
-          if (context.streamContext) {
-            context.streamContext.waitingForRemoteResult = true;
+          if (context.toolExecutionContext) {
+            context.toolExecutionContext.waitingForRemoteResult = true;
           }
-        } else if (didEagerlySetWaiting && context.streamContext) {
+        } else if (didEagerlySetWaiting && context.toolExecutionContext) {
           // No WAIT task created (e.g. local execution, direct HTTP, dedup) - reset
-          context.streamContext.waitingForRemoteResult = false;
+          context.toolExecutionContext.waitingForRemoteResult = false;
         }
 
         if (!result.success) {
@@ -635,7 +643,7 @@ export async function loadTools(params: {
   /** Map of tool IDs to their confirmation requirements (from API request) */
   toolConfirmationConfig?: Map<string, boolean>;
   /** Stream context - rootFolderId, threadId, aiMessageId, etc. */
-  streamContext: ToolExecutionContext;
+  toolExecutionContext: ToolExecutionContext;
 }): Promise<{
   tools: Record<string, CoreTool> | undefined;
   toolsMeta: Map<
@@ -758,7 +766,8 @@ export async function loadTools(params: {
     if (
       remoteToolNames.length > 0 &&
       !params.user.isPublic &&
-      FOLDER_ALLOWS_REMOTE_TOOLS[params.streamContext.rootFolderId] !== false
+      FOLDER_ALLOWS_REMOTE_TOOLS[params.toolExecutionContext.rootFolderId] !==
+        false
     ) {
       // Group by instanceId so we fetch capabilities once per instance
       const byInstance = new Map<string, string[]>();
@@ -856,7 +865,7 @@ export async function loadTools(params: {
       user: params.user,
       locale: params.locale,
       logger: params.logger,
-      streamContext: params.streamContext,
+      toolExecutionContext: params.toolExecutionContext,
       requiresConfirmation: false,
     });
 

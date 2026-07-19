@@ -1,5 +1,4 @@
 "use client";
-import { cn } from "next-vibe/core/utils/utils";
 import { Button } from "next-vibe/ui/ui/button";
 import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
 import {
@@ -8,6 +7,7 @@ import {
   PopoverTrigger,
 } from "next-vibe/ui/ui/popover";
 import { Span } from "next-vibe/ui/ui/span";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 import { useMemo, useSyncExternalStore } from "react";
 
@@ -34,7 +34,7 @@ import {
   useWidgetLogger,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 
 import type { SkillGetResponseOutput } from "../../../../skills/[id]/definition";
 import { useSkill } from "../../../../skills/[id]/hooks";

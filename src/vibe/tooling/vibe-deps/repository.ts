@@ -1,8 +1,16 @@
 import "server-only";
 
-import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
+import { toPosixPath } from "next-vibe/core/generators/shared/utils";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -11,7 +19,6 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { toPosixPath } from "next-vibe/tooling/generators/shared/utils";
 
 import { getSrcDir } from "@/env/paths";
 
@@ -42,6 +49,43 @@ import {
 
 const PROJECT_ROOT = process.cwd();
 const SRC_ROOT = getSrcDir();
+
+/**
+ * Markers that identify the project root. `.git` is the primary; the lockfile is
+ * the fallback for a source export with no git dir. Deliberately NOT
+ * package.json — a nested package would stop the walk at the wrong directory.
+ */
+const ROOT_MARKERS = [".git", "bun.lock"] as const;
+
+/** Nearest ancestor of `from` (inclusive) holding a root marker, else null. */
+function walkUpForMarker(from: string): string | null {
+  let dir = resolve(from);
+  for (;;) {
+    if (ROOT_MARKERS.some((m) => existsSync(join(dir, m)))) {
+      return dir;
+    }
+    const parent = dirname(dir);
+    if (parent === dir) {
+      return null;
+    }
+    dir = parent;
+  }
+}
+
+/**
+ * Scratch dir for machine-readable output — gitignored, never committed.
+ *
+ * Anchored on THIS FILE's location, not `process.cwd()`: the CLI runs this
+ * source in place, so the source path identifies the project no matter which
+ * directory the user invoked from. Writing `.tmp` relative to cwd would scatter
+ * the JSON into whatever folder the shell happened to be in.
+ */
+const TMP_DIR = join(
+  walkUpForMarker(dirname(fileURLToPath(import.meta.url))) ??
+    walkUpForMarker(process.cwd()) ??
+    process.cwd(),
+  ".tmp",
+);
 
 // Graph key = posix path relative to PROJECT_ROOT, e.g. "src/config/constants.ts"
 // For files inside src/, next-vibe/* aliases resolve to the same key.
@@ -270,7 +314,7 @@ function collectBuildInputs(sources: ReadonlyMap<string, string>): Set<string> {
     const p = join(PROJECT_ROOT, cfg);
     if (existsSync(p)) {
       // tsconfig paths use "./src/…"; normalize the leading "./".
-      addFrom(readFileSync(p, "utf8").replace(/["']\.\/src\//g, '"src/'));
+      addFrom(readFileSync(p, "utf8").replaceAll(/["']\.\/src\//g, '"src/'));
     }
   }
   return inputs;
@@ -401,7 +445,7 @@ function collectTestWords(): Set<string> {
 /** Count whole-word occurrences of `name` in `src`. */
 function countOccurrences(src: string, name: string): number {
   const re = new RegExp(
-    `\\b${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`,
+    `\\b${name.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`,
     "g",
   );
   return (src.match(re) ?? []).length;
@@ -410,7 +454,7 @@ function countOccurrences(src: string, name: string): number {
 /** 1-based line numbers where whole-word `name` occurs in `src`. */
 function occurrenceLines(src: string, name: string): number[] {
   const re = new RegExp(
-    `\\b${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`,
+    `\\b${name.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`,
     "g",
   );
   const lines: number[] = [];
@@ -961,7 +1005,8 @@ function graphToJson(
 
 function writeDependenciesJson(graph: Graph, logger: EndpointLogger): void {
   try {
-    const outPath = join(PROJECT_ROOT, "dependencies.json");
+    mkdirSync(TMP_DIR, { recursive: true });
+    const outPath = join(TMP_DIR, "dependencies.json");
     const data = {
       generatedAt: new Date().toISOString(),
       totalFiles: graph.size,
@@ -1633,7 +1678,7 @@ function buildUnusedSymbols(
       isFrameworkEntrypoint(key) ||
       isKnownEntrypoint(key) ||
       buildInputs.has(key) ||
-      node.importedBy.size !== 0
+      node.importedBy.size > 0
     ) {
       continue;
     }
@@ -1956,7 +2001,8 @@ function writeBoundariesJson(
   logger: EndpointLogger,
 ): void {
   try {
-    const outPath = join(PROJECT_ROOT, "dependencies-boundaries.json");
+    mkdirSync(TMP_DIR, { recursive: true });
+    const outPath = join(TMP_DIR, "dependencies-boundaries.json");
     const data = {
       generatedAt: new Date().toISOString(),
       packages: config.packages.map((p) => ({ name: p.name, roots: p.roots })),

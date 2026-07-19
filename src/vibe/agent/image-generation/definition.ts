@@ -10,15 +10,15 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
-import { Platform } from "next-vibe/core/definition/platform";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { Platform } from "next-vibe/platforms/platforms";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   backButton,
-  customWidgetObject,
   requestField,
   responseField,
   submitButton,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { lazyWidget } from "../../unified-ui/_shared/lazy-widget";

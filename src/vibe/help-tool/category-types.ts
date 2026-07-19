@@ -10,7 +10,7 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 
 import type { pathToAliasMap } from "@/generated/endpoints/alias-map";
 

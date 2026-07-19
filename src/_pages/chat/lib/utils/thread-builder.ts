@@ -136,7 +136,7 @@ export function buildMessagePath(
         const idx = siblings.findIndex((s) => s.id === msg.id);
         branchInfo[msg.parentId] = {
           siblings,
-          currentIndex: idx >= 0 ? idx : 0,
+          currentIndex: Math.max(idx, 0),
         };
       }
     }
@@ -150,7 +150,7 @@ export function buildMessagePath(
         const rootIdx = rootMessages.findIndex((r) => r.id === oldest.id);
         branchInfo[BRANCH_INDEX_KEY] = {
           siblings: rootMessages,
-          currentIndex: rootIdx >= 0 ? rootIdx : 0,
+          currentIndex: Math.max(rootIdx, 0),
         };
       }
     }

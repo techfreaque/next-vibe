@@ -57,7 +57,7 @@ export function patchKubeconfig(
   kubeconfig: string,
   externalIp: string,
 ): string {
-  return kubeconfig.replace(
+  return kubeconfig.replaceAll(
     /https?:\/\/127\.0\.0\.1/g,
     `https://${externalIp}`,
   );

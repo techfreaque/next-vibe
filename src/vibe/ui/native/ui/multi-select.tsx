@@ -2,7 +2,7 @@
  * MultiSelect Component for React Native
  * Imports types from web and provides native implementation
  */
-import { cn } from "next-vibe/core/utils/utils";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import * as React from "react";
 import { Pressable, View } from "react-native";
 

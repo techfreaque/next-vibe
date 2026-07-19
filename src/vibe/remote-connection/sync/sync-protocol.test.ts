@@ -39,10 +39,9 @@ import { CortexNodeType } from "next-vibe/agent/cortex/enum";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { identityEnv } from "next-vibe/identity/env";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
-import { env } from "@/env/env";
 
 import {
   ATLAS_INSTANCE_ID,
@@ -109,11 +108,11 @@ describe("Sync Protocol — buildSyncPayloads (in-process)", () => {
   });
 
   it("SP6a: cursor advancement — documents return 0 items after cursor is current", async () => {
-    const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+    const resolved = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
       // oxlint-disable-next-line restricted-syntax
       throw new Error(
-        `${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
+        `${identityEnv.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
       );
     }
 
@@ -169,11 +168,11 @@ describe("Sync Protocol — buildSyncPayloads (in-process)", () => {
   }, 30_000);
 
   it("SP6b: stale cursor for one provider → only that provider has new records", async () => {
-    const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+    const resolved = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
       // oxlint-disable-next-line restricted-syntax
       throw new Error(
-        `${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
+        `${identityEnv.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
       );
     }
 
@@ -232,11 +231,11 @@ describe("Sync Protocol — buildSyncPayloads (in-process)", () => {
   }, 30_000);
 
   it("SP6c: all providers differ → all serialized", async () => {
-    const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+    const resolved = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
       // oxlint-disable-next-line restricted-syntax
       throw new Error(
-        `${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
+        `${identityEnv.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
       );
     }
 
@@ -254,11 +253,11 @@ describe("Sync Protocol — buildSyncPayloads (in-process)", () => {
   }, 30_000);
 
   it("SP7a: applySyncPayloads routes to correct provider by key", async () => {
-    const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+    const resolved = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
       // oxlint-disable-next-line restricted-syntax
       throw new Error(
-        `${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
+        `${identityEnv.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
       );
     }
 
@@ -273,11 +272,11 @@ describe("Sync Protocol — buildSyncPayloads (in-process)", () => {
   }, 30_000);
 
   it("SP7b: unregistered key in applySyncPayloads → no throw, key absent from results", async () => {
-    const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+    const resolved = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
       // oxlint-disable-next-line restricted-syntax
       throw new Error(
-        `${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
+        `${identityEnv.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
       );
     }
 
@@ -294,11 +293,11 @@ describe("Sync Protocol — buildSyncPayloads (in-process)", () => {
   }, 30_000);
 
   it("SP8a: conflict resolution — incoming updatedAt > local → overwrite", async () => {
-    const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+    const resolved = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
       // oxlint-disable-next-line restricted-syntax
       throw new Error(
-        `${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
+        `${identityEnv.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
       );
     }
 
@@ -364,11 +363,11 @@ describe("Sync Protocol — buildSyncPayloads (in-process)", () => {
   }, 30_000);
 
   it("SP8b: conflict resolution — incoming updatedAt < local → keep local", async () => {
-    const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+    const resolved = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
       // oxlint-disable-next-line restricted-syntax
       throw new Error(
-        `${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
+        `${identityEnv.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
       );
     }
 
@@ -434,11 +433,11 @@ describe("Sync Protocol — buildSyncPayloads (in-process)", () => {
   }, 30_000);
 
   it("SP8c: conflict resolution — same updatedAt → remote wins (>=)", async () => {
-    const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+    const resolved = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
       // oxlint-disable-next-line restricted-syntax
       throw new Error(
-        `${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
+        `${identityEnv.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
       );
     }
 
@@ -525,11 +524,11 @@ describe("Sync Protocol — buildSyncPayloads (in-process)", () => {
 
     registerSyncProvider(testProvider);
 
-    const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+    const resolved = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
       // oxlint-disable-next-line restricted-syntax
       throw new Error(
-        `${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
+        `${identityEnv.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
       );
     }
 
@@ -554,15 +553,15 @@ if (_remoteUrl) {
     let prodAdminToken: string;
 
     beforeAll(async () => {
-      const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+      const resolved = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
       expect(
         resolved,
-        `SP: admin user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe dev`,
+        `SP: admin user ${identityEnv.VIBE_ADMIN_USER_EMAIL} not found — run: vibe dev`,
       ).toBeTruthy();
       if (!resolved) {
         // oxlint-disable-next-line restricted-syntax
         throw new Error(
-          `SP: admin user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe dev`,
+          `SP: admin user ${identityEnv.VIBE_ADMIN_USER_EMAIL} not found — run: vibe dev`,
         );
       }
       testUser = resolved;
@@ -980,8 +979,7 @@ if (_remoteUrl) {
         );
 
         // SP5: the skill must NOT appear on atlas (syncScope.skills=false)
-        const { customSkills } =
-          await import("next-vibe/agent/skills/db");
+        const { customSkills } = await import("next-vibe/agent/skills/db");
         const localRows = await db
           .select({ slug: customSkills.slug })
           .from(customSkills)
@@ -1056,8 +1054,7 @@ if (_remoteUrl) {
         await triggerHermesPull(prodAdminToken, _remoteUrl!);
 
         // Poll atlas DB until the skill arrives (or 15s timeout)
-        const { customSkills } =
-          await import("next-vibe/agent/skills/db");
+        const { customSkills } = await import("next-vibe/agent/skills/db");
 
         const arrivedRow = await pollUntil(
           "SP5b: skill must arrive on atlas when syncScope.skills=true",

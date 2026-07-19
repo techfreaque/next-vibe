@@ -6,7 +6,6 @@
 import "server-only";
 
 import { and, count, eq, ilike, inArray, not, or } from "drizzle-orm";
-import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -24,6 +23,7 @@ import { LeadAuthRepository } from "next-vibe/identity/lead/device-auth";
 import { UserRole, type UserRoleValue } from "next-vibe/identity/roles/enum";
 import { UserRolesRepository } from "next-vibe/identity/roles/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { Platform } from "next-vibe/platforms/platforms";
 
 import type { NewUser, User } from "./db";
 import { users } from "./db";
@@ -47,11 +47,11 @@ export function deriveSlug(name: string): string {
   return name
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // strip diacritics
-    .replace(/[^a-z0-9\s-]/g, "") // keep alphanumeric, spaces, hyphens
+    .replaceAll(/[\u0300-\u036F]/g, "") // strip diacritics
+    .replaceAll(/[^a-z0-9\s-]/g, "") // keep alphanumeric, spaces, hyphens
     .trim()
-    .replace(/[\s]+/g, "-") // spaces → hyphens
-    .replace(/-{2,}/g, "-") // collapse multiple hyphens
+    .replaceAll(/[\s]+/g, "-") // spaces → hyphens
+    .replaceAll(/-{2,}/g, "-") // collapse multiple hyphens
     .slice(0, 60); // max length
 }
 

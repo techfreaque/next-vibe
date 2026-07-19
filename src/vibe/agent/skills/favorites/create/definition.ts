@@ -31,13 +31,13 @@ import {
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   backButton,
-  customWidgetObject,
   requestField,
   responseField,
   submitButton,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { parseSkillId } from "../../../chat/slugify";
@@ -84,8 +84,7 @@ const { POST } = createEndpoint({
         user,
         availability,
       }) => {
-        const { apiClient } =
-          await import("next-vibe/platforms/react/hooks/store");
+        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
         const favoritesDefinition = await import("../definition");
         const charactersDefinition = await import("../../definition");
         const characterSingleDefinitions =

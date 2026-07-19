@@ -1,3 +1,4 @@
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Div } from "next-vibe/ui/ui/div";
 import { BookOpen } from "next-vibe/ui/ui/icons/BookOpen";
@@ -21,7 +22,6 @@ import { H3, P } from "next-vibe/ui/ui/typography";
 import type React from "react";
 
 import { GITHUB_REPO_URL } from "@/env/constants";
-import { envClient } from "@/env/env-client";
 import { configScopedTranslation } from "@/env/i18n";
 
 import { Logo } from "../../_components/logo";

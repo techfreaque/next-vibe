@@ -4,15 +4,15 @@
 
 "use client";
 
-import { scopedTranslation as unifiedInterfaceScopedTranslation } from "next-vibe/platforms/react/i18n";
 import { Div } from "next-vibe/ui/ui/div";
 import { ExternalLink } from "next-vibe/ui/ui/link";
 import { Span } from "next-vibe/ui/ui/span";
 import { H3 } from "next-vibe/ui/ui/typography";
 import {
-    useWidgetLocale,
-    useWidgetValue,
+  useWidgetLocale,
+  useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { scopedTranslation as unifiedInterfaceScopedTranslation } from "next-vibe/unified-ui/hooks/i18n";
 import { useMemo } from "react";
 
 import type definition from "./definition";

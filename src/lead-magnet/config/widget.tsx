@@ -29,7 +29,7 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 import React, { useCallback, useMemo, useState } from "react";
 
@@ -129,7 +129,7 @@ export function LeadMagnetConfigContainer(): JSX.Element {
     void (async (): Promise<void> => {
       const [configDef, { apiClient }] = await Promise.all([
         import("./definition"),
-        import("next-vibe/platforms/react/hooks/store"),
+        import("next-vibe/unified-ui/hooks/store"),
       ]);
       if (!user) {
         return;

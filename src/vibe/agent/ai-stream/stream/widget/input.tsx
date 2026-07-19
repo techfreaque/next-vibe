@@ -40,10 +40,6 @@ import { CortexButton } from "next-vibe/agent/cortex/widget/cortex-button";
 import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import type { FavoriteConfig } from "next-vibe/agent/skills/favorites/db";
 import { ChatFavoritesRepositoryClient } from "next-vibe/agent/skills/favorites/repository-client";
-import { cn } from "next-vibe/core/utils/utils";
-import { apiClient } from "next-vibe/platforms/react/hooks/store";
-import { useApiMutation } from "next-vibe/platforms/react/hooks/use-api-mutation";
-import { useApiQuery } from "next-vibe/platforms/react/hooks/use-api-query";
 import { endpoints as cronIdEndpoints } from "next-vibe/tasks/cron/[id]/definition";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -71,11 +67,15 @@ import {
   TooltipTrigger,
 } from "next-vibe/ui/ui/tooltip";
 import { P } from "next-vibe/ui/ui/typography";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetLocale,
   useWidgetLogger,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { apiClient } from "next-vibe/unified-ui/hooks/store";
+import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
+import { useApiQuery } from "next-vibe/unified-ui/hooks/use-api-query";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 

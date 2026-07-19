@@ -48,7 +48,7 @@ export class KagiSearchRepository {
     logger: EndpointLogger,
     t: KagiT,
     user: JwtPayloadType,
-    streamContext: ToolExecutionContext,
+    toolExecutionContext: ToolExecutionContext,
   ): Promise<ResponseType<KagiSearchGetResponseOutput>> {
     // Guard: key not configured
     if (!agentEnv.KAGI_API_KEY) {
@@ -85,14 +85,14 @@ export class KagiSearchRepository {
       return fetchResult;
     }
 
-    const toolMessageId = streamContext?.currentToolMessageId;
+    const toolMessageId = toolExecutionContext?.currentToolMessageId;
     if (toolMessageId && !user.isPublic) {
       const userId = user.id;
       const month = new Date().toISOString().slice(0, 7);
       const slug = `${data.query
         .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "")
+        .replaceAll(/[^a-z0-9]+/g, "-")
+        .replaceAll(/^-|-$/g, "")
         .slice(0, 60)}-${toolMessageId}`;
       void Promise.all([
         import("next-vibe/agent/cortex/mounts/searches"),
@@ -108,7 +108,7 @@ export class KagiSearchRepository {
                   userId,
                   path,
                   result.content,
-                  streamContext,
+                  toolExecutionContext,
                 ),
             )
             .catch(() => undefined);

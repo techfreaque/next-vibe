@@ -11,11 +11,10 @@ import {
   processMessageGroupForTTS,
 } from "next-vibe/agent/text-to-speech/content-processing";
 import type { TtsModelId } from "next-vibe/agent/text-to-speech/models";
-import type { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { cn } from "next-vibe/core/utils/utils";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import type { Platform } from "next-vibe/platforms/platforms";
 import {
   copyImageToClipboard,
   copyToClipboard,
@@ -32,6 +31,7 @@ import { Markdown } from "next-vibe/ui/ui/markdown";
 import { Span } from "next-vibe/ui/ui/span";
 import { P } from "next-vibe/ui/ui/typography";
 import { Video } from "next-vibe/ui/ui/video";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   type JSX,
   memo,

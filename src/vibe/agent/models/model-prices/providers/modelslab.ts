@@ -112,10 +112,10 @@ interface ParsedSettings {
  */
 function parsePriceFromDetailPage(html: string): ParsedPrice | null {
   const text = html
-    .replace(/&quot;/g, '"')
-    .replace(/&amp;/g, "&")
-    .replace(/&#039;/g, "'")
-    .replace(/<[^>]+>/g, " ");
+    .replaceAll("&quot;", '"')
+    .replaceAll("&amp;", "&")
+    .replaceAll("&#039;", "'")
+    .replaceAll(/<[^>]+>/g, " ");
 
   // Pattern 1: Resolution-based pricing "Cost for 720P: $0.10/second, 1080P: $0.15/second"
   const resolutionPattern =
@@ -239,14 +239,14 @@ function extractParamSection(text: string, paramName: string): string | null {
 
 /** Check if a string looks like a resolution value (not an aspect ratio) */
 function isResolutionValue(s: string): boolean {
-  const trimmed = s.trim().replace(/[()]/g, "");
+  const trimmed = s.trim().replaceAll(/[()]/g, "");
   // Valid resolution patterns: 720p, 1080p, 480P, FHD, 2K, 4K, HD
   return /^\d+[pP]$|^(?:FHD|HD|2K|4K|UHD|SD)$/i.test(trimmed);
 }
 
 /** Normalize resolution values: "720P" → "720p", keep named ones as-is */
 function normalizeResolution(s: string): string {
-  const trimmed = s.trim().replace(/[()]/g, "");
+  const trimmed = s.trim().replaceAll(/[()]/g, "");
   // Lowercase the 'p' suffix: "720P" → "720p"
   return trimmed.replace(/^(\d+)[pP]$/, "$1p");
 }
@@ -311,7 +311,9 @@ function parseSettingsFromLlmsTxt(text: string): ParsedSettings {
     // Extract tokens that look like resolutions
     const tokens = resSection
       .split(/[,|]/)
-      .map((s) => s.trim().replace(/[()]/g, "").split(/\s/)[0]?.trim() ?? "");
+      .map(
+        (s) => s.trim().replaceAll(/[()]/g, "").split(/\s/)[0]?.trim() ?? "",
+      );
     const resValues = tokens.filter(isResolutionValue).map(normalizeResolution);
     if (resValues.length > 0) {
       settings.resolutions = [...new Set(resValues)];
@@ -547,8 +549,8 @@ export class ModelslabPriceFetcher extends PriceFetcher {
             providerModel: config.providerModel,
             field: "pricingByResolution",
             tsLiteral: JSON.stringify(pricingObj)
-              .replace(/"/g, '"')
-              .replace(/,/g, ", "),
+              .replaceAll('"', '"')
+              .replaceAll(",", ", "),
             source: detailUrl,
           });
         }

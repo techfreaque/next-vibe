@@ -492,7 +492,7 @@ export interface StreamSetupResult {
   /** Tear down the stream-control pub/sub subscription — called on cleanup. */
   cancelStreamControlSub: () => void;
   /** Rich context for tool executions - rootFolderId, threadId, aiMessageId, etc. */
-  streamContext: ToolExecutionContext;
+  toolExecutionContext: ToolExecutionContext;
   /**
    * When true, all tool confirmations were wakeUp-pending (goroutines still running).
    * The AI turn should be skipped - resume-stream will handle revival for each task.
@@ -502,7 +502,7 @@ export interface StreamSetupResult {
   bridgeContext: BridgeContext;
   /** Params used to build the system prompt - stored for compacting refresh */
   systemPromptParams: SystemPromptParams;
-  // resolvedFavoriteConfig lives inside streamContext.resolvedFavoriteConfig
+  // resolvedFavoriteConfig lives inside toolExecutionContext.resolvedFavoriteConfig
   // - no top-level duplicate needed.
 }
 
@@ -533,7 +533,7 @@ export async function setupAiStream(params: {
   suppressSelfIdentity?: boolean;
   /** Relay receiver: caller instance that owns this thread — rename round-trips to it. */
   relayCallerInstanceId?: string;
-  /** Override the favoriteId stored in streamContext (used by headless runs with explicit favoriteId) */
+  /** Override the favoriteId stored in toolExecutionContext (used by headless runs with explicit favoriteId) */
   favoriteIdOverride: string | undefined;
   /** Override resolved media gen model selections - used by integration tests to force a specific model */
   mediaModelOverrides?: {
@@ -605,7 +605,7 @@ export async function setupAiStream(params: {
     toolConfirmationCount: data.toolConfirmations?.length ?? 0,
   });
 
-  // Create abort controller early so signal is available for confirmations and streamContext
+  // Create abort controller early so signal is available for confirmations and toolExecutionContext
   const streamAbortController = AbortControllerSetup.setupAbortController({
     maxDuration: params.maxDuration,
     parentSignal: params.parentAbortSignal,
@@ -639,7 +639,7 @@ export async function setupAiStream(params: {
     isRevival: params.isRevival,
     // Thread anchor not loaded yet at this phase — the thread id is the
     // only explicit carrier here.
-    streamContext: threadFixtureContext,
+    toolExecutionContext: threadFixtureContext,
     resolvedRelayContext,
   });
   if (!confirmationsResult.success) {
@@ -672,7 +672,7 @@ export async function setupAiStream(params: {
     locale,
     logger,
     sttModelSelection: resolvedFavoriteConfig?.sttModelSelection ?? null,
-    streamContext: threadFixtureContext,
+    toolExecutionContext: threadFixtureContext,
   });
 
   if (!operationResult.success) {
@@ -787,7 +787,7 @@ export async function setupAiStream(params: {
     logger,
     t: aiStreamT,
     // Embed the user message at write time (row lands with its search vector).
-    streamContext: threadFixtureContext,
+    toolExecutionContext: threadFixtureContext,
   });
 
   if (!userMessageResult.success) {
@@ -881,7 +881,7 @@ export async function setupAiStream(params: {
   // at message-write time) — no query string is built or embedded here.
   const systemPromptParams: SystemPromptParams = {
     // The thread id flows separately as the fixture anchor now.
-    streamContext: threadFixtureContext,
+    toolExecutionContext: threadFixtureContext,
     // Cortex search awaits this so it sees the just-written user message's vector.
     messageEmbedReady,
     skillId: data.skill,
@@ -974,7 +974,7 @@ export async function setupAiStream(params: {
   const aiMessageCreatedAt = new Date();
 
   // Build the rich stream context - passed through to all tool executions
-  const streamContext: ToolExecutionContext = {
+  const toolExecutionContext: ToolExecutionContext = {
     // Ownership token for this stream's 'streaming' claim — only the owner
     // may clear the state later (clearStreamingState guard).
     streamRunId: crypto.randomUUID(),
@@ -1016,7 +1016,7 @@ export async function setupAiStream(params: {
     currentToolMessageId: undefined,
     callerToolCallId: undefined,
     callerCallbackMode: undefined,
-    // pendingToolMessages is wired after StreamContext is created (see index.ts)
+    // pendingToolMessages is wired after toolExecutionContext is created (see index.ts)
     pendingToolMessages: undefined,
     duplicateToolCallKeys: undefined,
     executeClaimCount: undefined,
@@ -1075,7 +1075,7 @@ export async function setupAiStream(params: {
     upcomingAssistantMessageCreatedAt: aiMessageCreatedAt,
     modelConfig,
     trailingSystemMessage,
-    streamContext: streamContext,
+    toolExecutionContext: toolExecutionContext,
   });
 
   // Apply deniedTools filter: strip blocked tools from both visible and active sets.
@@ -1083,7 +1083,7 @@ export async function setupAiStream(params: {
   const applyDeniedFilter = <T extends { toolId: string }>(
     tools: T[] | null | undefined,
   ): T[] | null | undefined => {
-    if (!resolvedToolConfig.deniedToolIds.size || !tools) {
+    if (resolvedToolConfig.deniedToolIds.size === 0 || !tools) {
       return tools;
     }
     return tools.filter((t) => !resolvedToolConfig.deniedToolIds.has(t.toolId));
@@ -1188,13 +1188,13 @@ export async function setupAiStream(params: {
         logger,
         systemPrompt: builtSystemPrompt,
         toolConfirmationResults,
-        streamContext,
+        toolExecutionContext,
       });
 
   const provider = ProviderFactoryClass.getProviderForModel(
     modelConfig,
     logger,
-    streamContext,
+    toolExecutionContext,
   );
 
   // Register tool executors for Agent SDK provider (uses CoreTool execute functions)
@@ -1216,11 +1216,11 @@ export async function setupAiStream(params: {
   });
 
   // streamAbortController was created early (before tool confirmations) so the signal
-  // is already wired into streamContext.abortSignal above.
+  // is already wired into toolExecutionContext.abortSignal above.
 
-  // Wire escalateToTask into streamContext — extracted to escalation-handler.ts
+  // Wire escalateToTask into toolExecutionContext — extracted to escalation-handler.ts
   wireEscalateToTask({
-    streamContext,
+    toolExecutionContext,
     user,
     locale,
     logger,
@@ -1262,9 +1262,9 @@ export async function setupAiStream(params: {
       if (
         isStreamAbort(abortErr) &&
         abortErr.reason === AbortReason.USER_CANCELLED &&
-        streamContext.onEscalatedTaskCancel
+        toolExecutionContext.onEscalatedTaskCancel
       ) {
-        void streamContext.onEscalatedTaskCancel();
+        void toolExecutionContext.onEscalatedTaskCancel();
       }
     },
     { once: true },
@@ -1282,7 +1282,7 @@ export async function setupAiStream(params: {
       state: ThreadStreamingState.STREAMING,
       logger,
       user,
-      streamingRunId: streamContext.streamRunId,
+      streamingRunId: toolExecutionContext.streamRunId,
       resolvedRelayContext,
     });
   }
@@ -1335,7 +1335,7 @@ export async function setupAiStream(params: {
       streamAbortController,
       cancelStreamControlSub: streamControlSub.cancel,
       effectiveCompactTrigger,
-      streamContext,
+      toolExecutionContext,
       bridgeContext,
       systemPromptParams,
     },

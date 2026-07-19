@@ -64,8 +64,8 @@ Use a folder when the file would exceed ~200 lines or when there are clearly sep
 `useEndpoint()` is the foundation. All endpoint hooks wrap it.
 
 ```typescript
-import { useEndpoint } from "@/system/unified-interface/react/hooks/use-endpoint";
-import type { EndpointReturn } from "@/system/unified-interface/react/hooks/endpoint-types";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
+import type { EndpointReturn } from "next-vibe/unified-ui/hooks/endpoint-types";
 ```
 
 ### Minimal hook

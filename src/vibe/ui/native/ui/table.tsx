@@ -1,5 +1,5 @@
 import * as TablePrimitive from "@rn-primitives/table";
-import { cn } from "next-vibe/core/utils/utils";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import * as React from "react";
 import type { ViewStyle } from "react-native";
 import { Pressable, Text as RNText, View as RNView } from "react-native";

@@ -16,7 +16,7 @@ import "server-only";
 import { sql } from "drizzle-orm";
 import {
   type DefaultFolderId,
-  rootlessStreamContext,
+  rootlessToolExecutionContext,
 } from "next-vibe/agent/chat/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
@@ -310,7 +310,7 @@ export async function getOrCreateRemoteFolderChain(params: {
   names: readonly string[];
 }): Promise<string> {
   const { sendTestRequest } =
-    await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
+    await import("next-vibe/tooling/testing/testing-suite/send-test-request");
   const listDef = (
     await import("next-vibe/agent/chat/folders/[rootFolderId]/definition")
   ).default;
@@ -320,7 +320,7 @@ export async function getOrCreateRemoteFolderChain(params: {
   let parentId: string | null = null;
   for (const name of params.names) {
     const listResult = await sendTestRequest({
-      streamContext: rootlessStreamContext(),
+      toolExecutionContext: rootlessToolExecutionContext(),
       endpoint: listDef.GET,
       urlPathParams: { rootFolderId: params.rootFolderId },
       user: params.user,
@@ -343,7 +343,7 @@ export async function getOrCreateRemoteFolderChain(params: {
     }
     const createResult: ResponseType<Record<string, WidgetData>> =
       await sendTestRequest({
-        streamContext: rootlessStreamContext(),
+        toolExecutionContext: rootlessToolExecutionContext(),
         endpoint: createDef.POST,
         data: { name, parentId: parentId ?? undefined },
         urlPathParams: { rootFolderId: params.rootFolderId },

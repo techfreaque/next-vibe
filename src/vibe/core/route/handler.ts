@@ -9,11 +9,11 @@ import "server-only";
 import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
 import { DEFAULT_ENDPOINT_TIMEOUT_MS } from "next-vibe/core/definition/create";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import type { TParams } from "next-vibe/core/i18n/core/static-types";
-import { permissionsRegistry } from "next-vibe/core/permissions/registry";
+import { scopedTranslation as sharedScopedTranslation } from "next-vibe/core/i18n/shared";
+import { permissionsRegistry } from "next-vibe/core/route/definitions-registry";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import type {
   JwtPayloadType,
@@ -23,16 +23,16 @@ import type {
 import type { UserRole, UserRoleValue } from "next-vibe/identity/roles/enum";
 import { filterUserPermissionRoles } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type { CacheKeyRequestInput } from "next-vibe/platforms/react/hooks/query-key-builder";
+import type { Platform } from "next-vibe/platforms/platforms";
 import type { HasClientDeliveredEventsOf } from "next-vibe/realtime/structured-events";
 import type { NextRequest } from "next-vibe/ui/lib/request";
 import {
   collectServerDefaults,
   generateRoleFilteredRequestSchema,
 } from "next-vibe/unified-ui/_shared/utils";
+import type { CacheKeyRequestInput } from "next-vibe/unified-ui/hooks/query-key-builder";
 import type { z } from "zod";
 
-import { scopedTranslation as sharedScopedTranslation } from "@/_pages/shared/i18n";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import type {
   EmailHandler,
@@ -156,7 +156,7 @@ interface ApiHandlerProps<
   /** Stream context - rich metadata about the AI streaming session.
    *  Contains rootFolderId, threadId, aiMessageId, etc.
    *  Populated at every entry point (web, CLI, MCP, cron, AI tool). */
-  streamContext: ToolExecutionContext;
+  toolExecutionContext: ToolExecutionContext;
 }
 
 /**
@@ -289,19 +289,72 @@ export interface RemoteEventHandlerProps<
 /**
  * Map of server-side remote event handlers, keyed by event name.
  * Only events declared with `remoteEvent: true` on the definition are valid keys.
+ *
+ * Each handler is declared via a method declaration (`bivarianceHack`) for the
+ * same reason ChannelResolverFn is: a route's CONCRETE handler — props narrowed
+ * to its own endpoint and event name — must stay assignable to the type-erased
+ * `OnRemoteEventMap<CreateApiEndpointAny>` the registries consume. Plain function
+ * properties are contravariant in their params under strictFunctionTypes, which
+ * would reject every concrete route at that erased boundary; method params are
+ * bivariant, which is the variance we want here.
  */
 export type OnRemoteEventMap<TEndpoint extends CreateApiEndpointAny> = {
   [K in keyof TEndpoint["types"]["Events"] as TEndpoint["types"]["Events"][K] extends {
     remoteEvent: true;
   }
     ? K
-    : never]: (
-    props: RemoteEventHandlerProps<
-      TEndpoint,
-      K & keyof TEndpoint["types"]["Events"]
-    >,
-  ) => Promise<void> | void;
+    : never]: {
+    bivarianceHack(
+      props: RemoteEventHandlerProps<
+        TEndpoint,
+        K & keyof TEndpoint["types"]["Events"]
+      >,
+    ): Promise<void> | void;
+  }["bivarianceHack"];
 };
+
+/**
+ * The props a relayed event carries at the DISPATCH boundary, in wire shape.
+ *
+ * `OnRemoteEventMap<CreateApiEndpointAny>` is not usable for dispatch: the erased
+ * endpoint has `TEvents = any`, so its per-event payload types collapse and no
+ * concrete envelope satisfies them. The bridge parses the envelope against the
+ * event declaration's schemas and hands handlers exactly this shape instead —
+ * the same data, typed as what actually came off the wire.
+ *
+ * The four payload fields are `WidgetData` — the JSON union — rather than a
+ * record: an event that declares no `responseFields` types its handler's
+ * `responseData` as `undefined`, and only the union that already spans both a
+ * parsed record and `undefined` can describe every declared handler at once.
+ * Handlers still see their own precise types; this is only the erased view the
+ * registry dispatches through.
+ */
+export interface RemoteEventDispatchProps {
+  readonly responseData: WidgetData;
+  readonly requestData: WidgetData;
+  readonly urlPathParams: WidgetData;
+  readonly payload: WidgetData;
+  readonly instanceId: string;
+  readonly originInstanceId: string;
+  readonly user: JwtPrivatePayloadType;
+  readonly locale: CountryLanguage;
+  readonly logger: EndpointLogger;
+  readonly isServer: true;
+}
+
+/**
+ * A route's `onRemoteEvent` as the registry consumes it — keyed by event name,
+ * props erased to wire shape. Handlers are declared as methods (`bivarianceHack`)
+ * so a route's CONCRETE map assigns here: its narrower per-event props relate to
+ * the wire shape in one direction, which bivariance accepts. Same trick, and same
+ * reason, as ChannelResolverFn.
+ */
+export type OnRemoteEventDispatchMap = Record<
+  string,
+  {
+    bivarianceHack(props: RemoteEventDispatchProps): Promise<void> | void;
+  }["bivarianceHack"]
+>;
 
 type _IsAnyEvents<T> = 0 extends 1 & T ? true : false;
 
@@ -466,7 +519,7 @@ export type GenericHandlerReturnType<TEndpoint extends CreateApiEndpointAny> =
     platform: Platform;
     request?: NextRequest; // Optional NextRequest for Next.js platform
     cronTaskId?: string; // Cron task DB ID when executed by the task runner
-    streamContext: ToolExecutionContext;
+    toolExecutionContext: ToolExecutionContext;
   }) => Promise<HandlerResponse<TEndpoint["types"]["ResponseOutput"]>>) & {
     // Optional here because this is the runtime-CONSTRUCTED handler type (the
     // dispatcher checks presence at runtime). Author-time exhaustiveness — every
@@ -531,7 +584,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
     platform,
     request,
     cronTaskId,
-    streamContext,
+    toolExecutionContext,
   }): Promise<HandlerResponse<T["types"]["ResponseOutput"]>> => {
     const { t } = endpoint.scopedTranslation.scopedT(locale);
     const { t: tCredits } = creditsScopedTranslation.scopedT(locale);
@@ -600,7 +653,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
         user,
         locale,
         platform,
-        streamContext,
+        toolExecutionContext,
       };
       const patch = await requestDefaults(defaultsCtx, {
         requestData: data as Partial<T["types"]["RequestInput"]>,
@@ -652,7 +705,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
         user,
         locale,
         platform,
-        streamContext,
+        toolExecutionContext,
       };
       for (const [key, resolver] of Object.entries(mergedDefaults)) {
         if (reqData[key] === undefined && resolver) {
@@ -732,7 +785,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
         request,
         platform,
         cronTaskId,
-        streamContext,
+        toolExecutionContext,
       }),
     );
 

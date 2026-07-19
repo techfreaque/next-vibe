@@ -4,7 +4,7 @@
  */
 
 import { createEnumOptions } from "next-vibe/unified-ui/_shared/enum";
-import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 
 import { ModelUtility, type ModelUtilityValue } from "../models/enum";
 import type { ModelsTranslationKey } from "../models/i18n";

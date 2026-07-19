@@ -1,7 +1,7 @@
 "use client";
-import { cn } from "next-vibe/core/utils/utils";
 import { Div } from "next-vibe/ui/ui/div";
 import { Span } from "next-vibe/ui/ui/span";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 
 import {
   useWidgetForm,

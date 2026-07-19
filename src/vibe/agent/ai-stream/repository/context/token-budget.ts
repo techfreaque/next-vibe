@@ -164,7 +164,7 @@ interface ShouldTriggerCompactingParams {
   compactTrigger?: number;
   /** Fixture chain of the stream — the estimation pass converts messages
    *  (attachment downloads) and must record/replay like every other call. */
-  streamContext: ToolExecutionContext;
+  toolExecutionContext: ToolExecutionContext;
 }
 
 /**
@@ -191,7 +191,7 @@ export async function shouldTriggerCompacting(
     rootFolderId,
     logger,
     compactTrigger,
-    streamContext,
+    toolExecutionContext,
   } = params;
 
   // Step 1: Get branch messages (server DB or incognito storage)
@@ -294,7 +294,7 @@ export async function shouldTriggerCompacting(
     rootFolderId,
     modelConfig,
     undefined,
-    streamContext,
+    toolExecutionContext,
   );
   const systemTokens = Math.ceil(systemPrompt.length / 3.5);
   const toolsTokens = tools ? Math.ceil(JSON.stringify(tools).length / 2.5) : 0;

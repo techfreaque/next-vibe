@@ -24,18 +24,20 @@ import type { ReactElement } from "react";
 import React from "react";
 import { z } from "zod";
 
-import { getEnvAvailability } from "next-vibe/agent/env-availability";
-import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
+import { configScopedTranslation } from "@/env/i18n";
 import type {
   EmailResolvedData,
   EmailTemplateDefinition,
 } from "@/messenger/registry/template";
-import { env } from "@/env/env";
-import { configScopedTranslation } from "@/env/i18n";
+import { getEnvAvailability } from "next-vibe/agent/env-availability";
+import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
+import { coreEnv } from "next-vibe/core/env";
 
-import { FEATURED_MODELS } from "../../../vibe/agent/ai-stream/models";
+import { UserDetailLevel } from "next-vibe/identity/user/enum";
+import { scopedTranslation as userScopedTranslation } from "next-vibe/identity/user/i18n";
+import { UserRepository } from "next-vibe/identity/user/repository";
 import { contactClientRepository } from "../../../contact/repository-client";
 import { EmailTemplate } from "../../../messenger/providers/email/smtp-client/components/template.email";
 import {
@@ -48,9 +50,7 @@ import {
   type UserCreateRequestOutput,
   type UserCreateResponseOutput,
 } from "../../../users/create/definition";
-import { UserDetailLevel } from "next-vibe/identity/user/enum";
-import { scopedTranslation as userScopedTranslation } from "next-vibe/identity/user/i18n";
-import { UserRepository } from "next-vibe/identity/user/repository";
+import { FEATURED_MODELS } from "../../../vibe/agent/ai-stream/models";
 import type signupDefinition from "./definition";
 import {
   type SignupPostRequestOutput,
@@ -506,7 +506,7 @@ function renderAdminNotificationEmailContent(
     undefined, // no leadId for admin notification emails
     user.id, // userId for admin notification about this user
     undefined, // no campaignId for transactional emails
-    env.NEXT_PUBLIC_APP_URL,
+    coreEnv.NEXT_PUBLIC_APP_URL,
   );
 
   const { t: globalT } = configScopedTranslation.scopedT(locale);

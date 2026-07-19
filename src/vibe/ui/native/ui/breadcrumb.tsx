@@ -6,7 +6,7 @@ import * as Slot from "@rn-primitives/slot";
 import { ChevronRight } from "lucide-react-native";
 import { styled } from "nativewind";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
-import { cn } from "next-vibe/core/utils/utils";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import React from "react";
 import { Pressable, Text as RNText, View } from "react-native";
 

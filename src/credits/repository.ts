@@ -2408,28 +2408,27 @@ export class CreditRepository {
             });
             // Return partial flag so callers can propagate it
             return success({ partial: true });
-          } else {
-            // For tools/endpoints: insufficient credits, rollback without creating record
-            const availableCredits = [
-              ...(pool.userWallet ? [pool.userWallet] : []),
-              ...pool.leadWallets,
-            ].reduce(
-              (sum, wallet) =>
-                sum + wallet.balance + (wallet.freeCreditsRemaining ?? 0),
-              0,
-            );
-
-            logger.warn("Insufficient credits for tool/endpoint", {
-              requested: amount,
-              available: availableCredits,
-              poolId: pool.poolId,
-              feature,
-            });
-            return fail({
-              message: t("errors.insufficientCredits"),
-              errorType: ErrorResponseTypes.BAD_REQUEST,
-            });
           }
+          // For tools/endpoints: insufficient credits, rollback without creating record
+          const availableCredits = [
+            ...(pool.userWallet ? [pool.userWallet] : []),
+            ...pool.leadWallets,
+          ].reduce(
+            (sum, wallet) =>
+              sum + wallet.balance + (wallet.freeCreditsRemaining ?? 0),
+            0,
+          );
+
+          logger.warn("Insufficient credits for tool/endpoint", {
+            requested: amount,
+            available: availableCredits,
+            poolId: pool.poolId,
+            feature,
+          });
+          return fail({
+            message: t("errors.insufficientCredits"),
+            errorType: ErrorResponseTypes.BAD_REQUEST,
+          });
         }
 
         return success({ partial: false });
@@ -2802,20 +2801,21 @@ export class CreditRepository {
       const leadWalletIds = allWallets
         .filter((w) => w.leadId !== null)
         .map((w) => w.id);
-      const [latestGrant] = leadWalletIds.length
-        ? await db
-            .select()
-            .from(creditTransactions)
-            .where(
-              and(
-                inArray(creditTransactions.walletId, leadWalletIds),
-                eq(creditTransactions.freePeriodId, currentPeriodId),
-                eq(creditTransactions.type, CreditTransactionType.FREE_GRANT),
-              ),
-            )
-            .orderBy(desc(creditTransactions.createdAt))
-            .limit(1)
-        : [];
+      const [latestGrant] =
+        leadWalletIds.length > 0
+          ? await db
+              .select()
+              .from(creditTransactions)
+              .where(
+                and(
+                  inArray(creditTransactions.walletId, leadWalletIds),
+                  eq(creditTransactions.freePeriodId, currentPeriodId),
+                  eq(creditTransactions.type, CreditTransactionType.FREE_GRANT),
+                ),
+              )
+              .orderBy(desc(creditTransactions.createdAt))
+              .limit(1)
+          : [];
 
       // Calculate total spending from other linked lead wallets in current period (for summary entry)
       // Only count USAGE after the most recent FREE_GRANT to avoid counting old usage

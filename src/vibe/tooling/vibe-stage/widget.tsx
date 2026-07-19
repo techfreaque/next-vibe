@@ -9,19 +9,17 @@
 
 "use client";
 
-import {
-  CheckCircle2,
-  GitBranch,
-  GitMerge,
-  Loader2,
-  MoveRight,
-  SkipForward,
-  Trash2,
-} from "lucide-react";
-import { Platform } from "next-vibe/core/definition/platform";
+import { Platform } from "next-vibe/platforms/platforms";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
+import { CheckCircle2 } from "next-vibe/ui/ui/icons/CheckCircle2";
+import { GitBranch } from "next-vibe/ui/ui/icons/GitBranch";
+import { GitMerge } from "next-vibe/ui/ui/icons/GitMerge";
+import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
+import { MoveRight } from "next-vibe/ui/ui/icons/MoveRight";
+import { SkipForward } from "next-vibe/ui/ui/icons/SkipForward";
+import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
 import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetEndpointMutations,
@@ -30,8 +28,8 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
-import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 
 import type definition from "./definition";
 

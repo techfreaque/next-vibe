@@ -17,16 +17,16 @@
  * - Local development
  */
 
-import type { BoilerplatePluginConfig } from "next-vibe/tooling/check/config/types";
-import type {
-  createPluginMessages,
-  loadPluginConfig,
-} from "next-vibe/tooling/check/oxlint/plugins/shared/config-loader";
+import type { BoilerplatePluginConfig } from "../../../../../config/types";
 import type {
   OxlintASTNode,
   OxlintComment,
   OxlintRuleContext,
-} from "next-vibe/tooling/check/oxlint/types";
+} from "../../../types";
+import type {
+  createPluginMessages,
+  loadPluginConfig,
+} from "../../shared/config-loader";
 
 // ============================================================
 // Types
@@ -214,8 +214,7 @@ function getConfigLoader(): typeof configLoader {
   }
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports -- Plugin context requires sync loading
-    configLoader =
-      require("next-vibe/tooling/check/oxlint/plugins/shared/config-loader") as typeof configLoader;
+    configLoader = require("../../shared/config-loader") as typeof configLoader;
     return configLoader;
   } catch {
     return null;

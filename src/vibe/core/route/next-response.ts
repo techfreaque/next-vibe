@@ -7,8 +7,8 @@
 import { formatValidationErrorCompact } from "next-vibe/core/core-utils/format-validation-error";
 import { validateData } from "next-vibe/core/core-utils/validation";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { scopedTranslation as sharedScopedTranslation } from "next-vibe/core/i18n/shared";
 import type {
   ErrorResponseType,
   ResponseType,
@@ -20,9 +20,8 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { Platform } from "next-vibe/platforms/platforms";
 import { NextResponse } from "next-vibe/ui/lib/request";
-
-import { scopedTranslation as sharedScopedTranslation } from "@/_pages/shared/i18n";
 
 /**
  * Wraps a validated success response in NextResponse

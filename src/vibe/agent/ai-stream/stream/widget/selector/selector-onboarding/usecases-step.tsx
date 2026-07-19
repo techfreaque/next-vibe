@@ -21,10 +21,8 @@ import { ChatFavoritesRepositoryClient } from "next-vibe/agent/skills/favorites/
 import { scopedTranslation as skillsScopedTranslation } from "next-vibe/agent/skills/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { success } from "next-vibe/core/route/response.schema";
-import { cn } from "next-vibe/core/utils/utils";
 import type { UserPermissionRoleValue } from "next-vibe/identity/roles/enum";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { apiClient } from "next-vibe/platforms/react/hooks/store";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
@@ -41,10 +39,12 @@ import { Sparkles } from "next-vibe/ui/ui/icons/Sparkles";
 import { Users } from "next-vibe/ui/ui/icons/Users";
 import { Span } from "next-vibe/ui/ui/span";
 import { H3, P } from "next-vibe/ui/ui/typography";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetLogger,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { apiClient } from "next-vibe/unified-ui/hooks/store";
 import { type JSX, useCallback, useState } from "react";
 
 import {

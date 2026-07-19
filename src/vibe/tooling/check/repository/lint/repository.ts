@@ -6,25 +6,62 @@
 import { promises as fs } from "node:fs";
 import { dirname, relative } from "node:path";
 
-import { Platform } from "next-vibe/core/definition/platform";
+import { buildPackageRunnerCommand, coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType as ApiResponseType } from "next-vibe/core/route/response.schema";
 import { success } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { ConfigRepositoryImpl } from "next-vibe/tooling/check/config/repository";
-import { sortIssuesByLocation } from "next-vibe/tooling/check/config/shared";
-import type { CheckConfig } from "next-vibe/tooling/check/config/types";
+import { Platform } from "next-vibe/platforms/platforms";
 import {
   calculateFilteredSummary,
   filterIssues,
-} from "next-vibe/tooling/check/shared/filter-utils";
+} from "next-vibe/tooling/check/repository/filter-utils";
 
-import type {
-  LintIssue,
-  LintRequestOutput,
-  LintResponseOutput,
-} from "./definition";
+import { ConfigRepositoryImpl } from "../../config/repository";
+import { sortIssuesByLocation } from "../../config/shared";
+import type { CheckConfig } from "../../config/types";
+// ── Inline types (definition removed) ───────────────────────
+
+export interface LintIssue {
+  file: string;
+  line?: number;
+  column?: number;
+  rule?: string;
+  severity: "error" | "warning" | "info";
+  message: string;
+}
+
+export interface LintRequestOutput {
+  path?: string | string[];
+  fix: boolean;
+  timeout: number;
+  cacheDir?: string;
+  skipSorting?: boolean;
+  limit: number;
+  page: number;
+  summaryOnly: boolean;
+  extensive?: boolean;
+  filter?: string | string[];
+}
+
+export interface VibeCheckResponseOutput {
+  editorUriSchema?: string;
+  items?: LintIssue[] | null;
+  files?:
+    | { file: string; errors: number; warnings: number; total: number }[]
+    | null;
+  totalIssues: number;
+  totalFiles: number;
+  totalErrors?: number;
+  filteredIssues?: number;
+  filteredFiles?: number;
+  displayedIssues?: number;
+  displayedFiles?: number;
+  truncatedMessage?: string;
+  currentPage?: number;
+  totalPages?: number;
+}
 
 /**
  * Run ESLint Repository
@@ -37,7 +74,7 @@ export class LintRepository {
     providedConfig: CheckConfig | undefined,
     signal: AbortSignal,
     locale: CountryLanguage,
-  ): Promise<ApiResponseType<LintResponseOutput>> {
+  ): Promise<ApiResponseType<VibeCheckResponseOutput>> {
     const isMCP = platform === Platform.MCP;
     try {
       // Use provided config or load it
@@ -194,7 +231,7 @@ export class LintRepository {
     skipFiles = false,
     extraIgnorePatterns?: string[],
     signal?: AbortSignal,
-  ): Promise<LintResponseOutput> {
+  ): Promise<VibeCheckResponseOutput> {
     const cacheDir = checkConfig.eslint.cachePath;
     await fs.mkdir(dirname(cacheDir), { recursive: true });
 
@@ -217,7 +254,6 @@ export class LintRepository {
         : [];
 
     const args = [
-      "eslint",
       "--format=json",
       "--cache",
       "--cache-location",
@@ -234,7 +270,15 @@ export class LintRepository {
       args.push("--fix");
     }
 
-    logger.debug(`[ESLINT] Executing command: bunx ${args.join(" ")}`);
+    const runner = buildPackageRunnerCommand(
+      coreEnv.PACKAGE_MANAGER,
+      "eslint",
+      args,
+    );
+
+    logger.debug(
+      `[ESLINT] Executing command: ${runner.command} ${runner.args.join(" ")}`,
+    );
 
     const { spawn } = await import("node:child_process");
     const stdout = await new Promise<string>((resolve, reject) => {
@@ -242,10 +286,10 @@ export class LintRepository {
         reject(new Error("Aborted"));
         return;
       }
-      const child = spawn("bunx", args, {
+      const child = spawn(runner.command, runner.args, {
         cwd: process.cwd(),
         stdio: ["ignore", "pipe", "pipe"],
-        shell: false,
+        shell: runner.shell,
         signal,
       });
 
@@ -356,7 +400,7 @@ export class LintRepository {
     allIssues: LintIssue[],
     data: LintRequestOutput,
     skipFiles = false,
-  ): LintResponseOutput {
+  ): VibeCheckResponseOutput {
     if (data.summaryOnly) {
       const summary = calculateFilteredSummary(
         allIssues,

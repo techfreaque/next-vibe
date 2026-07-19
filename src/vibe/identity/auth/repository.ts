@@ -7,7 +7,7 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 import { jwtVerify, SignJWT } from "jose";
-import { isCliPlatform, Platform } from "next-vibe/core/definition/platform";
+import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -21,6 +21,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import { Environment } from "next-vibe/env/env-util";
 import { scopedTranslation } from "next-vibe/identity/auth/i18n";
+import { identityEnv } from "next-vibe/identity/env";
 import { leads, userLeadLinks } from "next-vibe/identity/lead/db";
 import { LeadAuthRepository } from "next-vibe/identity/lead/device-auth";
 import { LeadSource, LeadStatus } from "next-vibe/identity/lead/enum";
@@ -37,13 +38,13 @@ import { users } from "next-vibe/identity/user/db";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { isCliPlatform, Platform } from "next-vibe/platforms/platforms";
 
 import {
   AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS,
   BEARER_LEAD_ID_SEPARATOR,
   LEAD_ID_COOKIE_NAME,
 } from "@/env/constants";
-import { env } from "@/env/env";
 
 import { type AuthContext } from "./base-auth-handler";
 import { getPlatformAuthHandler } from "./factory";
@@ -62,7 +63,7 @@ export class AuthRepository {
    * Module-level secret key for JWT operations
    */
   private static readonly SECRET_KEY: Uint8Array = new TextEncoder().encode(
-    env.JWT_SECRET_KEY,
+    identityEnv.JWT_SECRET_KEY,
   );
 
   /**
@@ -119,7 +120,7 @@ export class AuthRepository {
         value: leadId,
         httpOnly: true,
         path: "/",
-        secure: env.NODE_ENV === Environment.PRODUCTION,
+        secure: coreEnv.NODE_ENV === Environment.PRODUCTION,
         sameSite: "lax" as const,
         maxAge: 365 * 24 * 60 * 60 * 10, // 10 years (effectively permanent)
       });
@@ -820,7 +821,7 @@ export class AuthRepository {
       if (!token) {
         if (isCliPlatform(context.platform)) {
           // Try CLI email auth if no token (works for both CLI and CLI_PACKAGE)
-          const cliEmail = env.VIBE_ADMIN_USER_EMAIL;
+          const cliEmail = identityEnv.VIBE_ADMIN_USER_EMAIL;
           if (cliEmail) {
             logger.debug("Attempting CLI email authentication");
             return await AuthRepository.authenticateUserByEmail(

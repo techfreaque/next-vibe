@@ -17,13 +17,13 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import AlertWidget from "next-vibe/unified-ui/display-only/alert/widget";
-import { LinkWidget } from "next-vibe/unified-ui/display-only/link/widget";
-import { BooleanFieldWidget } from "next-vibe/unified-ui/form-fields/boolean-field/widget";
-import { EmailFieldWidget } from "next-vibe/unified-ui/form-fields/email-field/widget";
-import { PasswordFieldWidget } from "next-vibe/unified-ui/form-fields/password-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
-import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
+import AlertWidget from "next-vibe/unified-ui/widgets/display-only/alert/widget";
+import { LinkWidget } from "next-vibe/unified-ui/widgets/display-only/link/widget";
+import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
+import { EmailFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/email-field/widget";
+import { PasswordFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/password-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 
 import type definition from "./definition";
 

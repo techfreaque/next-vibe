@@ -26,9 +26,8 @@ import { chatFolders } from "next-vibe/agent/chat/db";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { identityEnv } from "next-vibe/identity/env";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
-import { env } from "@/env/env";
 
 import {
   ATLAS_INSTANCE_ID,
@@ -62,10 +61,10 @@ if (_remoteUrl) {
     let prodUserId: string;
 
     beforeAll(async () => {
-      const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+      const resolved = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
       expect(
         resolved,
-        `Admin user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe dev`,
+        `Admin user ${identityEnv.VIBE_ADMIN_USER_EMAIL} not found — run: vibe dev`,
       ).toBeTruthy();
       if (!resolved) {
         return;
@@ -170,9 +169,8 @@ if (_remoteUrl) {
         `CF2: creating a thread in REMOTE/${HERMES_INSTANCE_ID} must stamp loopInstanceId=${HERMES_INSTANCE_ID}`,
       ).toBe(HERMES_INSTANCE_ID);
 
-      const { ExecuteToolRouting } = await import(
-        "next-vibe/remote-connection/routing"
-      );
+      const { ExecuteToolRouting } =
+        await import("next-vibe/remote-connection/routing");
       const { createEndpointLogger } = await import("next-vibe/logger/server");
       const target = await ExecuteToolRouting.resolveTarget({
         userId: testUser.id,
@@ -227,7 +225,6 @@ if (_remoteUrl) {
         `CF4: remoteConnections row for instanceId=${ATLAS_INSTANCE_ID} missing in prod DB after connect() — routing via REMOTE folder ancestry requires the row to exist`,
       ).toBeDefined();
     });
-
 
     // ── RC1: local-to-local registration ──────────────────────────────────
     // connect() calls register() on the remote. When both instances are

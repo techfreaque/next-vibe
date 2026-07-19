@@ -8,7 +8,7 @@ import { Brain } from "next-vibe/ui/ui/icons/Brain";
 import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
 import { Link } from "next-vibe/ui/ui/link";
 import { H1, P } from "next-vibe/ui/ui/typography";
-import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 
 import { scopedTranslation } from "./i18n";

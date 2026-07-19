@@ -29,7 +29,7 @@ import { DefaultFolderId } from "next-vibe/agent/chat/config";
 import messagesDefinition from "next-vibe/agent/chat/threads/[threadId]/messages/definition";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import type { JSX } from "react";
 import { useMemo } from "react";
 

@@ -4,7 +4,6 @@
  */
 
 "use client";
-import { cn } from "next-vibe/core/utils/utils";
 import { useSilentHistory } from "next-vibe/ui/hooks/use-navigation";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Button } from "next-vibe/ui/ui/button";
@@ -19,6 +18,7 @@ import { Search } from "next-vibe/ui/ui/icons/Search";
 import { TrendingUp } from "next-vibe/ui/ui/icons/TrendingUp";
 import { Input } from "next-vibe/ui/ui/input";
 import { Span } from "next-vibe/ui/ui/span";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetContext,
   useWidgetForm,

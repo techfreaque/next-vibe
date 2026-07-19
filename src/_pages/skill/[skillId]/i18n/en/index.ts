@@ -13,7 +13,7 @@ export const translations = {
     allSkills: "All skills",
     backArrow: "\u2190",
     forwardArrow: "\u2192",
-    copyright: "\u00a9",
+    copyright: "\u00A9",
   },
   ownership: {
     system: "Official",

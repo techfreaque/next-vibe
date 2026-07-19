@@ -1,6 +1,6 @@
 "use client";
 
-import { Platform } from "next-vibe/core/definition/platform";
+import { Platform } from "next-vibe/platforms/platforms";
 import { Div } from "next-vibe/ui/ui/div";
 import { Span } from "next-vibe/ui/ui/span";
 import {

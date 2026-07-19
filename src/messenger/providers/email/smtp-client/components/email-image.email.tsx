@@ -7,9 +7,8 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { Img } from "@react-email/components";
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { JSX } from "react";
-
-import { envClient } from "@/env/env-client";
 
 interface EmailImageProps {
   src: string; // Relative path like "/images/unbottled-icon.png"

@@ -245,9 +245,9 @@ export const translations: typeof enTranslations = {
       pending: "Ausstehend",
       running: "In Bearbeitung",
     },
-    loading: "Importauftr\u00e4ge werden geladen\u2026",
+    loading: "Importauftr\u00E4ge werden geladen\u2026",
     empty: {
-      title: "Keine Importauftr\u00e4ge gefunden",
+      title: "Keine Importauftr\u00E4ge gefunden",
       withFilter:
         "Versuchen Sie einen anderen Filter oder starten Sie einen neuen Import.",
       withoutFilter: "Starten Sie Ihren ersten Import, um ihn hier zu sehen.",

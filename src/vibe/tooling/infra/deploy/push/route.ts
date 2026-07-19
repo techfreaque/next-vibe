@@ -9,10 +9,6 @@ export const { tools } = endpointsHandler({
   endpoint: deployPushEndpoints,
   [Methods.POST]: {
     handler: async ({ data, logger, t }) =>
-      (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-        )
-      ).DeployPushRepository.push(data, logger, t),
+      (await import("./repository")).DeployPushRepository.push(data, logger, t),
   },
 });

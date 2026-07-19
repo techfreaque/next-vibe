@@ -13,14 +13,14 @@ import messageIdDefinitions from "next-vibe/agent/chat/threads/[threadId]/messag
 import voteDefinitions from "next-vibe/agent/chat/threads/[threadId]/messages/[messageId]/vote/definition";
 import type { FavoriteConfig } from "next-vibe/agent/skills/favorites/db";
 import { parseError } from "next-vibe/core/utils/parse-error";
-import { apiClient } from "next-vibe/platforms/react/hooks/store";
-import { useApiMutation } from "next-vibe/platforms/react/hooks/use-api-mutation";
 import { toast } from "next-vibe/ui/hooks/use-toast";
 import {
   useWidgetLocale,
   useWidgetLogger,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { apiClient } from "next-vibe/unified-ui/hooks/store";
+import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
 import { useCallback, useMemo, useRef } from "react";
 
 import type { StartStreamFn } from "../../../../../ai-stream/stream/hooks/shared";

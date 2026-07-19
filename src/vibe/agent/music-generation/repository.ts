@@ -53,7 +53,7 @@ export class MusicGenerationRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: MusicGenerationT,
-    streamContext: ToolExecutionContext,
+    toolExecutionContext: ToolExecutionContext,
   ): Promise<ResponseType<MusicGenerationPostResponseOutput>> {
     // model is resolved via requestDefaults in route.ts (from favorites/skill config)
     if (!data.model) {
@@ -124,7 +124,7 @@ export class MusicGenerationRepository {
 
     // One fixture-aware fetch per generation - carries the repeat counter for
     // poll loops, so it must not be recreated per call.
-    const fetchImpl = createFixtureFetch(streamContext, logger);
+    const fetchImpl = createFixtureFetch(toolExecutionContext, logger);
 
     let generationResult: ResponseType<{
       audioUrl: string;
@@ -175,7 +175,7 @@ export class MusicGenerationRepository {
           locale,
           logger,
           featureLabel: t("post.title"),
-          streamContext,
+          toolExecutionContext,
         });
         break;
 
@@ -207,9 +207,9 @@ export class MusicGenerationRepository {
     // Upload to our storage so the URL is persistent and access-controlled.
     // Incognito threads have no server-side thread row — the file is owned by
     // the caller's leadId and served only to that lead (browser).
-    const scThreadId = streamContext?.threadId;
+    const scThreadId = toolExecutionContext?.threadId;
     const isIncognito =
-      streamContext?.rootFolderId === DefaultFolderId.INCOGNITO;
+      toolExecutionContext?.rootFolderId === DefaultFolderId.INCOGNITO;
     if (scThreadId) {
       try {
         const storage = getStorageAdapter();
@@ -256,13 +256,13 @@ export class MusicGenerationRepository {
       durationSeconds: finalDurationSeconds,
     });
 
-    const toolMessageId = streamContext?.currentToolMessageId;
+    const toolMessageId = toolExecutionContext?.currentToolMessageId;
     if (toolMessageId && !user.isPublic) {
       const month = new Date().toISOString().slice(0, 7);
       const slug = `${data.prompt
         .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "")
+        .replaceAll(/[^a-z0-9]+/g, "-")
+        .replaceAll(/^-|-$/g, "")
         .slice(0, 60)}-${toolMessageId}`;
       void Promise.all([
         import("next-vibe/agent/cortex/mounts/gens"),
@@ -278,7 +278,7 @@ export class MusicGenerationRepository {
                   user.id,
                   path,
                   result.content,
-                  streamContext,
+                  toolExecutionContext,
                 ),
             )
             .catch(() => undefined);
@@ -295,7 +295,7 @@ export class MusicGenerationRepository {
 
   static async getRequestDefaults(ctx: {
     user: JwtPayloadType;
-    streamContext: ToolExecutionContext;
+    toolExecutionContext: ToolExecutionContext;
   }): Promise<Partial<MusicGenerationPostRequestInput>> {
     const { getInstanceAvailability } = await import("../env-availability");
     const availability = await getInstanceAvailability();
@@ -310,13 +310,14 @@ export class MusicGenerationRepository {
       const { ModalityResolver } =
         await import("next-vibe/agent/ai-stream/repository/core/modality-resolver");
       const { favorite, skill } = await resolveSkillFavoriteContext({
-        favoriteId: ctx.streamContext.favoriteId ?? null,
-        skillId: ctx.streamContext.skillId ?? null,
+        favoriteId: ctx.toolExecutionContext.favoriteId ?? null,
+        skillId: ctx.toolExecutionContext.skillId ?? null,
         userId,
       });
       sel = ModalityResolver.resolveMusicGenSelection({ favorite, skill });
     }
-    sel ??= ctx.streamContext.resolvedMediaSelections?.musicGenModelSelection;
+    sel ??=
+      ctx.toolExecutionContext.resolvedMediaSelections?.musicGenModelSelection;
     const model = filterMusicGenModels(sel, ctx.user, availability)[0]?.id;
     if (!model) {
       return {};

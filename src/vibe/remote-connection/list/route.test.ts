@@ -10,7 +10,7 @@ import "server-only";
 
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { describe, expect, it } from "vitest";
 
 import endpoints from "./definition";
@@ -27,7 +27,7 @@ describe("Remote Connection list", () => {
 
   it("RL1: GET returns success with connections array", async () => {
     const result = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: endpoints.GET,
       data: {},
     });
@@ -46,7 +46,7 @@ describe("Remote Connection list", () => {
 
   it("RL2: GET is admin-only", async () => {
     const result = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: endpoints.GET,
       data: {},
       user: customerUser,
@@ -59,7 +59,7 @@ describe("Remote Connection list", () => {
 
   it("RL3: GET activeOnly=true returns success (array may be empty)", async () => {
     const result = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: endpoints.GET,
       data: { activeOnly: true },
     });

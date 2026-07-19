@@ -17,7 +17,6 @@ import "server-only";
 
 import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
 import { getFullPath } from "next-vibe/core/core-utils/path";
-import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { GenericHandlerBase } from "next-vibe/core/route/handler";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -33,6 +32,7 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { Platform } from "next-vibe/platforms/platforms";
 
 import { scopedTranslation as systemScopedTranslation } from "@/_pages/shared/i18n";
 import { getEndpoint } from "@/generated/endpoints/endpoint";
@@ -58,7 +58,7 @@ export class RouteExecutionExecutor {
     logger: EndpointLogger;
     platform: Platform;
     /** Stream context - rootFolderId, threadId, aiMessageId, etc. */
-    streamContext: ToolExecutionContext;
+    toolExecutionContext: ToolExecutionContext;
     /** Pre-loaded route handler - avoids a second dynamic import when caller already loaded it */
     preloadedHandler?: GenericHandlerBase | null;
   }): Promise<ResponseType<TResult>> {
@@ -122,7 +122,7 @@ export class RouteExecutionExecutor {
         locale: params.locale,
         logger: params.logger,
         platform: params.platform,
-        streamContext: params.streamContext,
+        toolExecutionContext: params.toolExecutionContext,
       });
 
       // Streaming responses are not supported in CLI/AI/MCP platforms

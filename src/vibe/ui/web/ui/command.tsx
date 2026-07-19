@@ -2,7 +2,7 @@
 
 import type { DialogProps } from "@radix-ui/react-dialog";
 import { Command as CommandPrimitive } from "cmdk";
-import { cn } from "next-vibe/core/utils/utils";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import * as React from "react";
 
 import { MagnifyingGlassIcon } from "../../web/ui/icons/MagnifyingGlassIcon";

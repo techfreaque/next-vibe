@@ -6,6 +6,7 @@
 import "server-only";
 
 import { render } from "@react-email/render";
+import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -19,7 +20,6 @@ import type { LeadWithEmailType } from "next-vibe/identity/lead/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { contactClientRepository } from "@/contact/repository-client";
-import { env } from "@/env/env";
 import { configScopedTranslation } from "@/env/i18n";
 import { CampaignType } from "@/messenger/accounts/enum";
 import { scopedTranslation as smtpScopedTranslation } from "@/messenger/providers/email/smtp-client/i18n";
@@ -123,7 +123,7 @@ export class TestEmailRepository {
           companyName: configLocalT("appName"),
           companyEmail: contactClientRepository.getSupportEmail(emailLocale),
           campaignId: "test-campaign-id",
-          baseUrl: env.NEXT_PUBLIC_APP_URL,
+          baseUrl: coreEnv.NEXT_PUBLIC_APP_URL,
         },
         logger,
       );
@@ -139,7 +139,7 @@ export class TestEmailRepository {
         });
       }
 
-      const unsubscribeUrl = `${env.NEXT_PUBLIC_APP_URL}/${emailLocale}/newsletter/unsubscribe/${encodeURIComponent(
+      const unsubscribeUrl = `${coreEnv.NEXT_PUBLIC_APP_URL}/${emailLocale}/newsletter/unsubscribe/${encodeURIComponent(
         data.testEmail,
       )}`;
 

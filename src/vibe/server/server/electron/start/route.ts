@@ -14,9 +14,7 @@ export const { tools } = endpointsHandler({
   [Methods.POST]: {
     handler: async ({ data, logger, t }) =>
       (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-        )
+        await import("./repository")
       ).ElectronStartRepository.electronStartRepository(data, logger, t),
   },
 });

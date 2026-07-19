@@ -5,7 +5,6 @@
  * Per-type rendering: images (preview), video (player), audio (player), generic (icon row).
  * Handles server-stored files (URL) and incognito files (base64 → blob URL).
  */
-import { cn } from "next-vibe/core/utils/utils";
 import { Audio } from "next-vibe/ui/ui/audio";
 import { Div } from "next-vibe/ui/ui/div";
 import { Download } from "next-vibe/ui/ui/icons/Download";
@@ -17,6 +16,7 @@ import { Image } from "next-vibe/ui/ui/image";
 import { ExternalLink } from "next-vibe/ui/ui/link";
 import { Span } from "next-vibe/ui/ui/span";
 import { Video } from "next-vibe/ui/ui/video";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 

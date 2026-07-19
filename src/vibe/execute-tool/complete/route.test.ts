@@ -17,7 +17,7 @@ import "server-only";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { CronTaskStatus } from "next-vibe/tasks/enum";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { describe, expect, it } from "vitest";
 
 import { endpoints } from "./definition";
@@ -34,7 +34,7 @@ describe("execute-tool/complete", () => {
 
   it("EC1: POST rejects missing taskId", async () => {
     const result = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: endpoints.POST,
       // @ts-expect-error intentional — testing missing required field
       data: { status: CronTaskStatus.COMPLETED },
@@ -47,7 +47,7 @@ describe("execute-tool/complete", () => {
 
   it("EC2: POST with missing status and no wakeUpContext returns not-found", async () => {
     const result = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: endpoints.POST,
       data: { taskId: "some-task-id" } as Parameters<
         typeof sendTestRequest<typeof endpoints.POST>
@@ -64,7 +64,7 @@ describe("execute-tool/complete", () => {
 
   it("EC3: POST rejects invalid status value", async () => {
     const result = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: endpoints.POST,
       // @ts-expect-error intentional — testing invalid enum value
       data: { taskId: "some-task-id", status: "invalid-status" },
@@ -77,7 +77,7 @@ describe("execute-tool/complete", () => {
 
   it("EC4: POST with unknown taskId and no wakeUpContext returns not-found", async () => {
     const result = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: endpoints.POST,
       data: {
         taskId: "non-existent-task-00000000",
@@ -93,7 +93,7 @@ describe("execute-tool/complete", () => {
 
   it("EC5: POST is admin-only", async () => {
     const result = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: endpoints.POST,
       data: {
         taskId: "some-task-id",

@@ -3,7 +3,6 @@ import "server-only";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { Methods } from "next-vibe/core/definition/enums";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { registerRemoteEventHandlers } from "next-vibe/realtime/remote-event-bridge/registry";
 /**
  * Endpoint Handler Implementation
  * Main function for creating type-safe multi-method handlers
@@ -139,12 +138,6 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       }
       if (methodConfig.onRemoteEvent) {
         result.tools[Methods.GET].onRemoteEvent = methodConfig.onRemoteEvent;
-        registerRemoteEventHandlers(
-          endpoint.path,
-          Methods.GET,
-          methodConfig.onRemoteEvent,
-          endpoint,
-        );
       }
       // Exposed for dispatchers (execute-tool remote dispatch) to pre-resolve
       // caller-context defaults before shipping the call to a peer.
@@ -178,12 +171,6 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       }
       if (methodConfig.onRemoteEvent) {
         result.tools[Methods.POST].onRemoteEvent = methodConfig.onRemoteEvent;
-        registerRemoteEventHandlers(
-          endpoint.path,
-          Methods.POST,
-          methodConfig.onRemoteEvent,
-          endpoint,
-        );
       }
       if (methodConfig.fieldDefaults) {
         result.tools[Methods.POST].fieldDefaults = methodConfig.fieldDefaults;
@@ -215,12 +202,6 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       }
       if (methodConfig.onRemoteEvent) {
         result.tools[Methods.PUT].onRemoteEvent = methodConfig.onRemoteEvent;
-        registerRemoteEventHandlers(
-          endpoint.path,
-          Methods.PUT,
-          methodConfig.onRemoteEvent,
-          endpoint,
-        );
       }
       if (methodConfig.fieldDefaults) {
         result.tools[Methods.PUT].fieldDefaults = methodConfig.fieldDefaults;
@@ -253,12 +234,6 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       }
       if (methodConfig.onRemoteEvent) {
         result.tools[Methods.PATCH].onRemoteEvent = methodConfig.onRemoteEvent;
-        registerRemoteEventHandlers(
-          endpoint.path,
-          Methods.PATCH,
-          methodConfig.onRemoteEvent,
-          endpoint,
-        );
       }
       if (methodConfig.fieldDefaults) {
         result.tools[Methods.PATCH].fieldDefaults = methodConfig.fieldDefaults;
@@ -291,12 +266,6 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       }
       if (methodConfig.onRemoteEvent) {
         result.tools[Methods.DELETE].onRemoteEvent = methodConfig.onRemoteEvent;
-        registerRemoteEventHandlers(
-          endpoint.path,
-          Methods.DELETE,
-          methodConfig.onRemoteEvent,
-          endpoint,
-        );
       }
       if (methodConfig.fieldDefaults) {
         result.tools[Methods.DELETE].fieldDefaults = methodConfig.fieldDefaults;

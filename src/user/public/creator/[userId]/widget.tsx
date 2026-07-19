@@ -65,7 +65,7 @@ function CreatorLeadCaptureForm({
     void (async (): Promise<void> => {
       try {
         const [{ apiClient }, captureDef] = await Promise.all([
-          import("next-vibe/platforms/react/hooks/store"),
+          import("next-vibe/unified-ui/hooks/store"),
           import("@/lead-magnet/capture/definition"),
         ]);
         const result = await apiClient.mutate(

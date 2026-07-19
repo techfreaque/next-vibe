@@ -30,16 +30,16 @@ import "server-only";
 globalThis.AI_SDK_LOG_WARNINGS = false;
 
 import { DefaultFolderId } from "next-vibe/agent/chat/config";
-import { Platform } from "next-vibe/core/definition/platform";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { identityEnv } from "next-vibe/identity/env";
 import { createEndpointLogger } from "next-vibe/logger/server";
+import { Platform } from "next-vibe/platforms/platforms";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
-import { env } from "@/env/env";
 
 import { seedCaseThread } from "../../testing/fixture-seed";
 import {
@@ -223,14 +223,16 @@ describe("Compacting - context management", () => {
   }
 
   beforeAll(async () => {
-    const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
+    const resolved = await resolveUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
     expect(
       resolved,
-      `${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe dev`,
+      `${identityEnv.VIBE_ADMIN_USER_EMAIL} not found — run: vibe dev`,
     ).toBeTruthy();
     if (!resolved) {
       // oxlint-disable-next-line restricted-syntax
-      throw new Error(`${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe dev`);
+      throw new Error(
+        `${identityEnv.VIBE_ADMIN_USER_EMAIL} not found — run: vibe dev`,
+      );
     }
     testUser = resolved;
 
@@ -350,7 +352,7 @@ describe("Compacting - context management", () => {
   fit(
     "C1: mid-stream compacting — large initial context, fires after 5 tools, tools still work after, model responds C1_PASS",
     async () => {
-      const { threadId: fixtureThreadId, streamContext: fixtureCtx } =
+      const { threadId: fixtureThreadId, toolExecutionContext: fixtureCtx } =
         await seedCaseThread("compacting-first-tool");
 
       // Temporarily lower compactTrigger on the fav to force mid-stream compacting.
@@ -383,7 +385,7 @@ describe("Compacting - context management", () => {
           rootFolderId: DefaultFolderId.PRIVATE,
           subFolderId: compactingFolderId,
           threadId: fixtureThreadId,
-          streamContext: fixtureCtx,
+          toolExecutionContext: fixtureCtx,
         });
 
         expect(result.success, "C1: stream must succeed").toBe(true);
@@ -484,7 +486,7 @@ describe("Compacting - context management", () => {
   fit(
     "C2: mid-stream compacting — compacting fires during tool loop, chain stays linear, follow-up turn appends correctly",
     async () => {
-      const { threadId: fixtureThreadId, streamContext: fixtureCtx } =
+      const { threadId: fixtureThreadId, toolExecutionContext: fixtureCtx } =
         await seedCaseThread("compacting-mid-stream");
 
       // Temporarily lower compactTrigger on the fav to force mid-stream compacting.
@@ -519,7 +521,7 @@ describe("Compacting - context management", () => {
           rootFolderId: DefaultFolderId.PRIVATE,
           subFolderId: compactingFolderId,
           threadId: fixtureThreadId,
-          streamContext: fixtureCtx,
+          toolExecutionContext: fixtureCtx,
         });
 
         expect(turn1.result.success, "C2-T1: turn 1 stream must succeed").toBe(
@@ -573,7 +575,7 @@ describe("Compacting - context management", () => {
           user: testUser,
           favoriteId: mainFavoriteId,
           threadId: fixtureThreadId,
-          streamContext: fixtureCtx,
+          toolExecutionContext: fixtureCtx,
         });
 
         expect(turn2.result.success, "C2-T2: turn 2 stream must succeed").toBe(

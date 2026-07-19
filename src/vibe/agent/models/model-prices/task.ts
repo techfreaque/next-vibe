@@ -6,6 +6,7 @@
 
 import "server-only";
 
+import { coreEnv } from "next-vibe/core/env";
 import { Environment } from "next-vibe/env/env-util";
 import {
   CRON_SCHEDULES,
@@ -18,8 +19,6 @@ import {
   type Task,
 } from "next-vibe/tasks/unified-runner/types";
 
-import { env } from "@/env/env";
-
 import definitions from "./definition";
 import { tools } from "./route";
 
@@ -29,7 +28,7 @@ const modelPricesTask = createCronTask(definitions.GET, tools.GET, {
   description: "updateAllModelPrices.description" as const,
   schedule: CRON_SCHEDULES.WEEKLY_MONDAY_6AM,
   category: TaskCategory.MAINTENANCE,
-  enabled: env.NODE_ENV === Environment.DEVELOPMENT,
+  enabled: coreEnv.NODE_ENV === Environment.DEVELOPMENT,
   priority: CronTaskPriority.LOW,
   timeout: TASK_TIMEOUTS.MEDIUM,
   historyInterval: HISTORY_INTERVALS.EVERY_RUN,

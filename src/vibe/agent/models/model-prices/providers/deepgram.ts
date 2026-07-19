@@ -54,8 +54,8 @@ async function scrapePricing(
     while ((rowMatch = rowRegex.exec(html)) !== null) {
       const rowHtml = rowMatch[1];
       const rowText = rowHtml
-        .replace(/<[^>]+>/g, " ")
-        .replace(/\s+/g, " ")
+        .replaceAll(/<[^>]+>/g, " ")
+        .replaceAll(/\s+/g, " ")
         .trim();
 
       // Extract first $/min price (pay-as-you-go rate)

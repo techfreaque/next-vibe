@@ -13,7 +13,7 @@ import "server-only";
 import type {
   GeneratorContext,
   GeneratorResult,
-} from "next-vibe/tooling/generators/shared/shared-inputs";
+} from "next-vibe/core/generators/shared/shared-inputs";
 
 import { generateCategoryIndex } from "./generator-category-index";
 import { generateClientRoutes } from "./generator-client-routes";

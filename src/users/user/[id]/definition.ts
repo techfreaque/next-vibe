@@ -15,9 +15,9 @@ import {
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   backButton,
-  customWidgetObject,
   objectField,
   requestResponseField,
   requestUrlPathParamsField,
@@ -25,7 +25,7 @@ import {
   responseArrayField,
   responseField,
   submitButton,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import {
@@ -425,8 +425,7 @@ const { PUT } = createEndpoint({
   options: {
     mutationOptions: {
       onSuccess: async (data) => {
-        const { apiClient } =
-          await import("next-vibe/platforms/react/hooks/store");
+        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
         const listDefinition = await import("../../list/definition");
 
         // Optimistically update user in list
@@ -719,8 +718,7 @@ const { DELETE } = createEndpoint({
   options: {
     mutationOptions: {
       onSuccess: async (data) => {
-        const { apiClient } =
-          await import("next-vibe/platforms/react/hooks/store");
+        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
         const listDefinition = await import("../../list/definition");
 
         // Optimistically remove deleted user from list

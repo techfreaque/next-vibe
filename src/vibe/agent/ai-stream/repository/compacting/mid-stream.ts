@@ -19,7 +19,7 @@ import { v4 as uuidv4 } from "uuid";
 import type { ChatModelId } from "../../models";
 import type { AiStreamT } from "../../stream/i18n";
 import { AbortReason, StreamAbortError } from "../core/constants";
-import type { StreamContext } from "../core/stream";
+import type { ToolExecutionContextImpl } from "../core/stream";
 import { buildCompactingInstructions, runCompactingLLM } from "./core";
 
 /** How many recent non-system messages to preserve verbatim (not summarized). */
@@ -42,7 +42,7 @@ export class MidStreamCompactingHandler {
    */
   static async compact(params: {
     stepMessages: ModelMessage[];
-    ctx: StreamContext;
+    ctx: ToolExecutionContextImpl;
     model: ChatModelId;
     skill: string;
     threadId: string;
@@ -323,7 +323,7 @@ export class MidStreamCompactingHandler {
   private static async handleFailure(params: {
     compactingMessageId: string;
     errorMessage: string;
-    ctx: StreamContext;
+    ctx: ToolExecutionContextImpl;
     streamAbortController: AbortController;
     t: AiStreamT;
   }): Promise<void> {

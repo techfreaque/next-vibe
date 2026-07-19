@@ -25,15 +25,14 @@ import { and, eq, isNull, sql } from "drizzle-orm";
 import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
 import {
   DefaultFolderId,
-  rootlessStreamContext,
+  rootlessToolExecutionContext,
 } from "next-vibe/agent/chat/config";
 import { chatFolders, chatThreads } from "next-vibe/agent/chat/db";
 import { chatFavorites } from "next-vibe/agent/skills/favorites/db";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { identityEnv } from "next-vibe/identity/env";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
-import { env } from "@/env/env";
 
 import { runTestStream } from "../../agent/ai-stream/testing/headless-test-runner";
 import {
@@ -104,15 +103,15 @@ if (_remoteUrl && _isFixtureMode) {
     let tmFavoriteId: string;
 
     beforeAll(async () => {
-      const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+      const resolved = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
       expect(
         resolved,
-        `Admin user ${env.VIBE_ADMIN_USER_EMAIL} not found in local DB — run: vibe dev`,
+        `Admin user ${identityEnv.VIBE_ADMIN_USER_EMAIL} not found in local DB — run: vibe dev`,
       ).toBeTruthy();
       if (!resolved) {
         // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
         throw new Error(
-          `TM setup failed: admin user ${env.VIBE_ADMIN_USER_EMAIL} not found in local DB — cannot continue suite (run: vibe dev)`,
+          `TM setup failed: admin user ${identityEnv.VIBE_ADMIN_USER_EMAIL} not found in local DB — cannot continue suite (run: vibe dev)`,
         );
       }
       testUser = resolved;
@@ -248,7 +247,7 @@ if (_remoteUrl && _isFixtureMode) {
     // ── TM1: threadMirrorMode='both' — thread on initiating side AND remote ──
 
     it("TM1: stream from remote/hermes folder stores thread locally (remote/hermes) AND on hermes (remote/atlas)", async () => {
-      const fixtureCtx: ToolExecutionContext = rootlessStreamContext();
+      const fixtureCtx: ToolExecutionContext = rootlessToolExecutionContext();
 
       // threadMirrorMode='both' is the default set by connect().
       // Stream from remote/hermes → resolveTarget() matches folderId routing rule
@@ -260,7 +259,7 @@ if (_remoteUrl && _isFixtureMode) {
         rootFolderId: DefaultFolderId.REMOTE,
         subFolderId: localFolderId,
         favoriteId: tmFavoriteId,
-        streamContext: fixtureCtx,
+        toolExecutionContext: fixtureCtx,
       });
 
       expect(
@@ -354,7 +353,7 @@ if (_remoteUrl && _isFixtureMode) {
     // mirrored thread reaches a terminal (idle) streaming state on atlas.
 
     it("TM3: atlas → hermes stream mirrors thread to atlas and reaches idle", async () => {
-      const fixtureCtx: ToolExecutionContext = rootlessStreamContext();
+      const fixtureCtx: ToolExecutionContext = rootlessToolExecutionContext();
 
       const { result } = await runTestStream({
         user: testUser,
@@ -362,7 +361,7 @@ if (_remoteUrl && _isFixtureMode) {
         rootFolderId: DefaultFolderId.REMOTE,
         subFolderId: localFolderId,
         favoriteId: tmFavoriteId,
-        streamContext: fixtureCtx,
+        toolExecutionContext: fixtureCtx,
       });
 
       expect(

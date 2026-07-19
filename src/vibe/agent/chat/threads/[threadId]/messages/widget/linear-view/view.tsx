@@ -10,12 +10,12 @@ import type { ChatMessage } from "next-vibe/agent/chat/db";
 import { getVoteStatus } from "next-vibe/agent/chat/threads/[threadId]/messages/[messageId]/vote/utils";
 import type { TtsModelId } from "next-vibe/agent/text-to-speech/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { cn } from "next-vibe/core/utils/utils";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { ErrorBoundary } from "next-vibe/ui/ui/error-boundary";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 import React, { memo, useMemo } from "react";
 

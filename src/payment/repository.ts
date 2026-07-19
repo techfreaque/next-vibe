@@ -55,6 +55,7 @@ const PAYMENT_METHOD_TO_STRIPE: Record<
   [PaymentMethodType.SEPA_DEBIT]: "sepa_debit",
 };
 
+import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -62,7 +63,6 @@ import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
-import { env } from "@/env/env";
 
 import { subscriptions } from "../subscription/db";
 import { paymentMethods, paymentTransactions, paymentWebhooks } from "./db";
@@ -106,7 +106,7 @@ export class PaymentRepository {
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<PaymentPostResponseOutput>> {
-    if (env.NEXT_PUBLIC_LOCAL_MODE) {
+    if (coreEnv.NEXT_PUBLIC_LOCAL_MODE) {
       logger.info("Payment disabled in local mode");
       return fail({
         message: t("errors.localMode"),
@@ -194,9 +194,9 @@ export class PaymentRepository {
         payment_method_types: paymentMethodTypes,
         mode: modeValue,
         success_url:
-          data.successUrl || `${env.NEXT_PUBLIC_APP_URL}/payment/success`,
+          data.successUrl || `${coreEnv.NEXT_PUBLIC_APP_URL}/payment/success`,
         cancel_url:
-          data.cancelUrl || `${env.NEXT_PUBLIC_APP_URL}/payment/cancel`,
+          data.cancelUrl || `${coreEnv.NEXT_PUBLIC_APP_URL}/payment/cancel`,
         line_items: [
           {
             price: data.priceId,

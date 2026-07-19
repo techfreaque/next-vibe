@@ -17,12 +17,12 @@ import { UserRole } from "next-vibe/identity/roles/enum";
 import { scopedTranslation } from "next-vibe/tasks/cron/history/i18n";
 import { CronTaskPriorityDB, CronTaskStatusDB } from "next-vibe/tasks/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   backButton,
-  customWidgetObject,
   requestField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { CRON_HISTORY_ALIAS } from "./constants";

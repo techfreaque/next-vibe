@@ -5,8 +5,9 @@
 
 "use client";
 
-import { Minus, Plus } from "lucide-react";
-import { cn } from "next-vibe/core/utils/utils";
+import { Minus } from "next-vibe/ui/ui/icons/Minus";
+import { Plus } from "next-vibe/ui/ui/icons/Plus";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 import { useEffect, useRef } from "react";
 

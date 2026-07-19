@@ -7,8 +7,8 @@ import {
   zodSchemaToJsonSchema,
 } from "next-vibe/core/definition/endpoint-to-metadata";
 import { FieldUsage } from "next-vibe/core/definition/enums";
-import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { Platform } from "next-vibe/platforms/platforms";
 import {
   hasChild,
   hasChildren,
@@ -245,9 +245,8 @@ function addDescriptionsToWrappedSchema<TFieldDef>(
     );
     if (schema instanceof z.ZodOptional) {
       return enhancedInner.optional();
-    } else {
-      return enhancedInner.nullable();
     }
+    return enhancedInner.nullable();
   } else if (
     innerSchema instanceof z.ZodArray &&
     typeof fieldDef === "object" &&
@@ -263,9 +262,8 @@ function addDescriptionsToWrappedSchema<TFieldDef>(
     );
     if (schema instanceof z.ZodOptional) {
       return enhancedInner.optional();
-    } else {
-      return enhancedInner.nullable();
     }
+    return enhancedInner.nullable();
   }
 
   return schema;

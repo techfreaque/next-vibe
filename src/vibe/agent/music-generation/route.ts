@@ -17,14 +17,14 @@ import { MusicGenerationRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, user, locale, logger, t, streamContext }) =>
+    handler: ({ data, user, locale, logger, t, toolExecutionContext }) =>
       MusicGenerationRepository.generateMusic(
         data,
         user,
         locale,
         logger,
         t,
-        streamContext,
+        toolExecutionContext,
       ),
     requestDefaults: (ctx) => MusicGenerationRepository.getRequestDefaults(ctx),
   },

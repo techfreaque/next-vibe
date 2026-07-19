@@ -6,12 +6,11 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { identityEnv } from "next-vibe/identity/env";
 import { UserPermissionRole, UserRole } from "next-vibe/identity/roles/enum";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { env } from "@/env/env";
 
 import type { UserCreateRequestOutput } from "./create/definition";
 import { scopedTranslation as createScopedTranslation } from "./create/i18n";
@@ -40,7 +39,7 @@ export async function dev(
   try {
     // Get admin user to act as creator
     const adminUserResponse = await UserRepository.getUserByEmail(
-      env.VIBE_ADMIN_USER_EMAIL,
+      identityEnv.VIBE_ADMIN_USER_EMAIL,
       UserDetailLevel.STANDARD,
       locale,
       logger,
@@ -188,7 +187,7 @@ export async function test(
   try {
     // Get admin user to act as creator
     const adminUserResponse = await UserRepository.getUserByEmail(
-      env.VIBE_ADMIN_USER_EMAIL,
+      identityEnv.VIBE_ADMIN_USER_EMAIL,
       UserDetailLevel.STANDARD,
       locale,
       logger,

@@ -9,7 +9,7 @@ RUN apk add --no-cache bash
 # Set environment variables needed for vibe setup during build
 ENV NODE_ENV=development
 ENV NEXT_PUBLIC_APP_URL=http://localhost:3000
-ENV NEXT_PUBLIC_TEST_SERVER_URL=http://localhost:3000
+ENV TEST_SERVER_URL=http://localhost:3000
 ENV NEXT_PUBLIC_DEBUG_PRODUCTION=false
 ENV NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_dummy
 ENV NEXT_PUBLIC_SUPPORT_EMAIL_DE=support@example.com

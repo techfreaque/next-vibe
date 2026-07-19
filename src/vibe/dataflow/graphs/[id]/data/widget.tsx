@@ -26,7 +26,6 @@ import type {
   UTCTimestamp,
 } from "lightweight-charts";
 import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
-import { cn } from "next-vibe/core/utils/utils";
 import { GraphOwnerType, GraphResolution } from "next-vibe/dataflow/enum";
 import type { GraphNodeConfig } from "next-vibe/dataflow/graph/schema";
 import type { GraphConfig } from "next-vibe/dataflow/graph/types";
@@ -36,7 +35,6 @@ import {
   type Resolution,
   RESOLUTION_MS,
 } from "next-vibe/dataflow/shared/fields";
-import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { getRootCssVar } from "next-vibe/ui/lib/css-vars";
 import {
   addDocumentListener,
@@ -69,6 +67,7 @@ import { Shield } from "next-vibe/ui/ui/icons/Shield";
 import { X } from "next-vibe/ui/ui/icons/X";
 import { Span } from "next-vibe/ui/ui/span";
 import { P } from "next-vibe/ui/ui/typography";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetEndpointMutations,
   useWidgetLocale,
@@ -78,6 +77,7 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import React, {
   useCallback,
   useEffect,
@@ -197,7 +197,9 @@ function deduplicatePoints(
 }
 
 function humanizeNodeId(nodeId: string): string {
-  return nodeId.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  return nodeId
+    .replaceAll("_", " ")
+    .replaceAll(/\b\w/g, (c) => c.toUpperCase());
 }
 
 function formatValue(v: number): string {
@@ -418,7 +420,7 @@ function renderSeriesData(
   oldestLoadedRef: React.MutableRefObject<number | null>,
   didFitContentRef: React.MutableRefObject<boolean>,
 ): void {
-  if (!series.length || panesRef.current.size === 0) {
+  if (series.length === 0 || panesRef.current.size === 0) {
     return;
   }
 
@@ -1002,7 +1004,7 @@ function useMultiPaneRenderer(
   // ── Data rendering ──────────────────────────────────────────────────────
 
   useEffect(() => {
-    if (!chartReadyGen || !series.length || panesRef.current.size === 0) {
+    if (!chartReadyGen || series.length === 0 || panesRef.current.size === 0) {
       return;
     }
     renderSeriesData(
@@ -1413,7 +1415,7 @@ function CrosshairTooltip({
   crosshair: CrosshairState;
   containerRef: React.RefObject<HTMLDivElement | null>;
 }): React.JSX.Element | null {
-  if (!crosshair.points.length || !containerRef.current) {
+  if (crosshair.points.length === 0 || !containerRef.current) {
     return null;
   }
   const containerWidth = containerRef.current.clientWidth;
@@ -1927,8 +1929,7 @@ export function GraphChartView(): React.JSX.Element {
       setOptimisticConfig(newConfig);
       setIsSavingLayout(true);
       void (async (): Promise<void> => {
-        const { apiClient } =
-          await import("next-vibe/platforms/react/hooks/store");
+        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
         const result = await apiClient.mutate(
           editDefinitions.PUT,
           logger,

@@ -3,7 +3,6 @@
  */
 
 "use client";
-import { cn } from "next-vibe/core/utils/utils";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { EmptyBlock } from "next-vibe/ui/ui/empty-block";
@@ -20,6 +19,7 @@ import { Span } from "next-vibe/ui/ui/span";
 import { StatusPill } from "next-vibe/ui/ui/status-pill";
 import { WidgetHeader } from "next-vibe/ui/ui/widget-header";
 import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetContext,
@@ -30,8 +30,8 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field/widget";
-import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
+import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import React, { useCallback, useMemo } from "react";
 
 import { scopedTranslation as messagesScopedTranslation } from "@/messenger/messages/i18n";

@@ -9,20 +9,23 @@ import {
   PATH_SEPARATOR,
   pathSegmentsToToolName,
 } from "next-vibe/core/core-utils/path";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
 import type {
   GeneratorContext,
   GeneratorResult,
-} from "next-vibe/tooling/generators/shared/shared-inputs";
+} from "next-vibe/core/generators/shared/shared-inputs";
 import {
   extractNestedPath,
   extractPathKey,
+  toImportUrl,
   writeGeneratedFile,
-} from "next-vibe/tooling/generators/shared/utils";
+} from "next-vibe/core/generators/shared/utils";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
-const OUTPUT_FILE = "src/generated/routes/client.ts";
+import { GENERATED_DIR } from "@/env/paths";
+
+const OUTPUT_FILE = `${GENERATED_DIR}/routes/client.ts`;
 
 /**
  * Generate the client routes index (route-handlers-client.ts). Consumes the shared
@@ -86,7 +89,7 @@ class ClientRoutesGenerator {
     let lastMessage = "unknown error";
     for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
       try {
-        const mod: Record<string, WidgetData> = await import(file);
+        const mod: Record<string, WidgetData> = await import(toImportUrl(file));
         return { mod };
       } catch (error) {
         lastMessage = parseError(error).message;

@@ -23,9 +23,9 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { MarkdownWidget } from "next-vibe/unified-ui/display-only/markdown/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
-import { SearchBarWidget } from "next-vibe/unified-ui/interactive/search-bar/widget";
+import { MarkdownWidget } from "next-vibe/unified-ui/widgets/display-only/markdown/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
+import { SearchBarWidget } from "next-vibe/unified-ui/widgets/interactive/search-bar/widget";
 import type { JSX } from "react";
 
 import { SearchProvider } from "../enum";
@@ -128,7 +128,7 @@ export function KagiSearchResultsContainer({
   const references = value?.references ?? [];
 
   const output = value?.output
-    ? value.output.replace(/【(\d+)】/g, (match, num) => {
+    ? value.output.replaceAll(/【(\d+)】/g, (match, num) => {
         const index = parseInt(num, 10) - 1;
         const ref = references[index];
         return ref ? `[${num}](${ref.url})` : match;

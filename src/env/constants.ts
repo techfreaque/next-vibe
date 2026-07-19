@@ -1,4 +1,3 @@
-export const DEFAULT_PROJECT_URL = "https://unbottled.ai"; // eslint-disable-line i18next/no-literal-string
 export const GITHUB_REPO_URL = "https://github.com/techfreaque/next-vibe"; // eslint-disable-line i18next/no-literal-string
 
 /**

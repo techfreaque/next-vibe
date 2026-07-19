@@ -1,10 +1,9 @@
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { Link } from "next-vibe/ui/ui/link";
 import type { JSX } from "react";
-
-import { envClient } from "@/env/env-client";
 
 import { scopedTranslation } from "../i18n";
 

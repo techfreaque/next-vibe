@@ -110,7 +110,7 @@ function isAlreadyUpToDate(
   newValue: number,
 ): boolean {
   const regex = new RegExp(
-    `${field}:\\s*${String(newValue).replace(/\./g, "\\.")}[,]?\\s*// updated: \\d{4}-\\d{2}-\\d{2} from `,
+    `${field}:\\s*${String(newValue).replaceAll(".", "\\.")}[,]?\\s*// updated: \\d{4}-\\d{2}-\\d{2} from `,
   );
   return regex.test(line);
 }
@@ -325,7 +325,7 @@ function isModalityUpToDate(
   field: string,
   arrayStr: string,
 ): boolean {
-  const escaped = arrayStr.replace(/[[\]]/g, "\\$&");
+  const escaped = arrayStr.replaceAll(/[[\]]/g, "\\$&");
   const regex = new RegExp(
     `${field}:\\s*${escaped}[,]?\\s*// updated: \\d{4}-\\d{2}-\\d{2} from `,
   );
@@ -932,7 +932,7 @@ export class ModelPricesRepository {
           continue;
         }
 
-        const escaped = update.providerModel.replace(
+        const escaped = update.providerModel.replaceAll(
           /[.*+?^${}()|[\]\\]/g,
           "\\$&",
         );
@@ -1047,7 +1047,7 @@ export class ModelPricesRepository {
       for (const settingsUpdate of allSettingsUpdates) {
         // Find which role file contains this providerModel
         for (const [role, fileContent] of Object.entries(roleFileContents)) {
-          const escaped = settingsUpdate.providerModel.replace(
+          const escaped = settingsUpdate.providerModel.replaceAll(
             /[.*+?^${}()|[\]\\]/g,
             "\\$&",
           );
@@ -1132,7 +1132,10 @@ export class ModelPricesRepository {
         const enumPrefix = enumPrefixForRole[role] ?? role;
         const fileContent = roleFileContents[role];
         for (const modelId of Object.keys(defs)) {
-          const escapedModelId = modelId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+          const escapedModelId = modelId.replaceAll(
+            /[.*+?^${}()|[\]\\]/g,
+            "\\$&",
+          );
           const enumKeyMatch = new RegExp(
             `(\\w+)\\s*=\\s*"${escapedModelId}"`,
           ).exec(fileContent);
@@ -1218,7 +1221,10 @@ export class ModelPricesRepository {
           }
 
           // Find the enum key name for this model ID value in the file
-          const escapedModelId = modelId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+          const escapedModelId = modelId.replaceAll(
+            /[.*+?^${}()|[\]\\]/g,
+            "\\$&",
+          );
           const enumKeyMatch = new RegExp(
             `(\\w+)\\s*=\\s*"${escapedModelId}"`,
           ).exec(fileContent);

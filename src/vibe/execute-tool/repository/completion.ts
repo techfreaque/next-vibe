@@ -949,7 +949,7 @@ export class TaskCompletion {
    * behavior-preserving:
    *   - Favorite/skill cascade: this uses resolveSkillFavoriteContext (a single
    *     combined lookup) and cascades favorite.modelSelection →
-   *     skill.modelSelection ALWAYS trying BOTH the streamContext favorite AND
+   *     skill.modelSelection ALWAYS trying BOTH the toolExecutionContext favorite AND
    *     its skillId. resolveModelSkill instead, when a favoriteId is present,
    *     resolves the model from the favorite (with the favorite's OWN skill
    *     variant as fallback) and never consults the separately-supplied skillId.
@@ -962,7 +962,7 @@ export class TaskCompletion {
    * Keeping this separate preserves the per-tool-call model-resolution behavior.
    */
   static async resolveStreamModelId(
-    streamContext: ToolExecutionContext,
+    toolExecutionContext: ToolExecutionContext,
     user: JwtPayloadType,
   ): Promise<ChatModelId | null> {
     const userId = !user.isPublic ? user.id : undefined;
@@ -972,8 +972,8 @@ export class TaskCompletion {
       await import("next-vibe/agent/ai-stream/repository/core/modality-resolver");
 
     const { favorite: fav, skill } = await resolveSkillFavoriteContext({
-      favoriteId: streamContext.favoriteId,
-      skillId: streamContext.skillId,
+      favoriteId: toolExecutionContext.favoriteId,
+      skillId: toolExecutionContext.skillId,
       userId,
     });
     return resolveChatModelId(

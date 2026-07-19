@@ -28,8 +28,8 @@ import type {
   ConstrainedChildUsage,
   FieldUsageConfig,
 } from "next-vibe/unified-ui/_shared/types";
-import { objectOptionalField, requestDataArrayField, responseArrayField, responseArrayOptionalField } from "next-vibe/unified-ui/_shared/utils";
-import { objectField, requestField, requestResponseField, requestUrlPathParamsField, responseField } from "next-vibe/unified-ui/_shared/utils";
+import { objectOptionalField, requestDataArrayField, responseArrayField, responseArrayOptionalField } from "next-vibe/unified-ui/_shared/utils-i18n";
+import { objectField, requestField, requestResponseField, requestUrlPathParamsField, responseField } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 const genericST: { ScopedTranslationKey: string } = {

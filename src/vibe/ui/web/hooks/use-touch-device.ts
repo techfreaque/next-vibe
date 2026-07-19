@@ -1,9 +1,8 @@
 "use client";
 
+import { platform } from "next-vibe/core/env-client";
 import { useEffect } from "react";
 import { create } from "zustand";
-
-import { platform } from "@/env/env-client";
 
 interface TouchDeviceStore {
   isTouch: boolean;

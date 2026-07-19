@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import { Badge } from "next-vibe/ui/ui/badge";
@@ -12,7 +13,6 @@ import { Span } from "next-vibe/ui/ui/span";
 import { H1, H2, H3, P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 
-import { envClient } from "@/env/env-client";
 import { configScopedTranslation } from "@/env/i18n";
 
 import { scopedTranslation } from "./i18n";

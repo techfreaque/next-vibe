@@ -1,10 +1,10 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { env } from "@/env/env";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { identityEnv } from "next-vibe/identity/env";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import loginOptionsEndpoints from "./definition";
 
 const endpoint = loginOptionsEndpoints.GET;
@@ -24,7 +24,7 @@ describe("GET /user/public/login/options", () => {
 
   it("returns general login options without email", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint,
       data: {},
       user: publicUser(),
@@ -52,9 +52,9 @@ describe("GET /user/public/login/options", () => {
 
   it("returns user-specific options when email is provided for known user", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint,
-      data: { email: env.VIBE_ADMIN_USER_EMAIL },
+      data: { email: identityEnv.VIBE_ADMIN_USER_EMAIL },
       user: publicUser(),
     });
 
@@ -66,14 +66,14 @@ describe("GET /user/public/login/options", () => {
 
     const { response } = res.data;
     expect(response.success).toBe(true);
-    expect(response.forUser).toBe(env.VIBE_ADMIN_USER_EMAIL);
+    expect(response.forUser).toBe(identityEnv.VIBE_ADMIN_USER_EMAIL);
     expect(response.loginMethods.password.enabled).toBe(true);
     expect(response.security.requireTwoFactor).toBe(false);
   });
 
   it("returns NOT_FOUND for unknown email", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint,
       data: { email: "nobody-123456@example-nonexistent.invalid" },
       user: publicUser(),
@@ -91,7 +91,7 @@ describe("GET /user/public/login/options", () => {
 
   it("returns VALIDATION_ERROR for invalid email format", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint,
       data: { email: "not-an-email" },
       user: publicUser(),
@@ -108,7 +108,7 @@ describe("GET /user/public/login/options", () => {
 
   it("social providers array has expected shape when present", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint,
       data: {},
       user: publicUser(),

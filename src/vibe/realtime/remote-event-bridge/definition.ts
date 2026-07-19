@@ -22,7 +22,10 @@ import {
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { scopedTranslation } from "next-vibe/realtime/remote-event-bridge/i18n";
-import { objectField, requestField } from "next-vibe/unified-ui/_shared/utils";
+import {
+  objectField,
+  requestField,
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import type { AnyEndpointEventEnvelope } from "../structured-events";

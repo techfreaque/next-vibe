@@ -6,8 +6,8 @@
 import "server-only";
 
 import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
-import type { Platform } from "next-vibe/core/definition/platform";
 import type { WidgetData } from "next-vibe/core/utils/json";
+import type { Platform } from "next-vibe/platforms/platforms";
 
 import type { CallbackModeValue } from "../../constants";
 import executeDefinition from "../../definition";
@@ -32,7 +32,7 @@ export async function emitToolRequest(params: {
    * the receiver records/replays the relayed execution's external calls
    * under the SAME per-test directory. Explicit chain, never ambient.
    */
-  streamContext: ToolExecutionContext;
+  toolExecutionContext: ToolExecutionContext;
   locale: string;
   logger: RouteExecuteContext["logger"];
   user: RouteExecuteContext["user"];
@@ -41,7 +41,7 @@ export async function emitToolRequest(params: {
   // The wire carries only the caller's fixture thread id (a string) — the
   // receiver rebuilds its own headless context around it. Spreading the full
   // ToolExecutionContext object would not match the string wire schema.
-  const threadId = params.streamContext.threadId;
+  const threadId = params.toolExecutionContext.threadId;
   createEndpointEmitter(
     executeDefinition.POST,
     params.logger,
@@ -64,7 +64,7 @@ export async function emitToolRequest(params: {
       callerSkillId: params.callerSkillId ?? undefined,
       callerFavoriteId: params.callerFavoriteId ?? undefined,
       callerPlatform: params.callerPlatform,
-      ...(threadId ? { streamContext: threadId } : {}),
+      ...(threadId ? { toolExecutionContext: threadId } : {}),
     },
   });
 }

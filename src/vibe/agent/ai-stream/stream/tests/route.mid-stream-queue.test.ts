@@ -43,10 +43,9 @@ import { ChatMessageRole } from "next-vibe/agent/chat/enum";
 import { NO_SKILL_ID } from "next-vibe/agent/skills/constants";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { identityEnv } from "next-vibe/identity/env";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { beforeAll, describe, expect, it } from "vitest";
-
-import { env } from "@/env/env";
 
 import { DEFAULT_CHAT_MODEL_ID } from "../../constants";
 import { AiStreamRepository } from "../../repository";
@@ -354,10 +353,10 @@ describe("Mid-Stream Queue - chain integrity", () => {
   }
 
   beforeAll(async () => {
-    const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
+    const resolved = await resolveUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
     expect(
       resolved,
-      `${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe dev`,
+      `${identityEnv.VIBE_ADMIN_USER_EMAIL} not found — run: vibe dev`,
     ).toBeTruthy();
     if (!resolved) {
       return;

@@ -664,7 +664,7 @@ export async function listMonitors(
     });
     // Strip ANSI escape codes before parsing
     // eslint-disable-next-line no-control-regex
-    const clean = r.stdout.replace(/\x1b\[[0-9;]*m/g, "");
+    const clean = r.stdout.replaceAll(/\x1B\[[0-9;]*m/g, "");
     const lines = clean.split("\n");
     let pendingName: string | null = null;
     let idx = 0;
@@ -813,7 +813,7 @@ async function getImageDimensions(
   path: string,
 ): Promise<{ width: number; height: number } | null> {
   if (process.platform === "win32") {
-    const psPath = path.replace(/'/g, "''");
+    const psPath = path.replaceAll(/'/g, "''");
     const script = `Add-Type -AssemblyName System.Drawing; $i=[System.Drawing.Image]::FromFile('${psPath}'); Write-Output "$($i.Width)x$($i.Height)"; $i.Dispose()`;
     try {
       const r = await execFile(
@@ -877,8 +877,8 @@ async function downscaleImage(
         /* try next */
       }
     }
-    const psIn = inputPath.replace(/'/g, "''");
-    const psOut = outputPath.replace(/'/g, "''");
+    const psIn = inputPath.replaceAll(/'/g, "''");
+    const psOut = outputPath.replaceAll(/'/g, "''");
     const script = `
 Add-Type -AssemblyName System.Drawing
 $img = [System.Drawing.Image]::FromFile('${psIn}')
@@ -1011,7 +1011,7 @@ export class DesktopScreenshotRepository {
       process.env["TEMP"] ?? process.env["TMP"] ?? "C:\\Windows\\Temp";
     const rawOutputPath =
       data.outputPath ?? `${tmpDir}\\vibe-screenshot-${executionId}.png`;
-    const psOutputPath = rawOutputPath.replace(/'/g, "''");
+    const psOutputPath = rawOutputPath.replaceAll(/'/g, "''");
 
     const captureScript = `
 Add-Type -AssemblyName System.Windows.Forms
@@ -1502,7 +1502,7 @@ print('NODE_COUNT:' + str(node_count[0]))
 }
 
 function buildWinUiaScript(appName: string, maxDepth: number): string {
-  const safeAppName = appName.replace(/'/g, "''");
+  const safeAppName = appName.replaceAll(/'/g, "''");
   return `
 Add-Type -AssemblyName UIAutomationClient
 Add-Type -AssemblyName UIAutomationTypes
@@ -3089,7 +3089,7 @@ print("KWIN_LIST_END_${executionId}");
     const script = `
 var wins = workspace.windowList();
 for (var i = 0; i < wins.length; i++) {
-  if (String(wins[i].internalId) === "${resolvedId.replace(/[^a-zA-Z0-9{}\\-]/g, "")}") {
+  if (String(wins[i].internalId) === "${resolvedId.replaceAll(/[^a-zA-Z0-9{}\\-]/g, "")}") {
     workspace.activeWindow = wins[i];
     break;
   }
@@ -3254,7 +3254,7 @@ for (var i = 0; i < wins.length; i++) {
     const targetX = mx + Math.round(mw / 4);
     const targetY = my + Math.round(mh / 4);
 
-    const safeId = resolvedId.replace(/[^a-zA-Z0-9{}-]/g, "");
+    const safeId = resolvedId.replaceAll(/[^a-zA-Z0-9{}-]/g, "");
     // Use object literal instead of Qt.rect() — Qt is not available in the
     // KWin scripting context on KDE Plasma 6+. Object literals work natively.
     // Also call setMaximize(false, false) first: maximized windows ignore

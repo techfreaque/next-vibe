@@ -1,5 +1,5 @@
 import * as ContextMenuPrimitive from "@rn-primitives/context-menu";
-import { cn } from "next-vibe/core/utils/utils";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import * as React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 

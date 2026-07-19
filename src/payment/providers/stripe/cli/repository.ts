@@ -188,7 +188,7 @@ export class CliStripeRepository {
       // eslint-disable-next-line i18next/no-literal-string
       const replacement = `STRIPE_WEBHOOK_SECRET="${secret}"`;
       envContent = /^STRIPE_WEBHOOK_SECRET=.*$/m.test(envContent)
-        ? envContent.replace(/^STRIPE_WEBHOOK_SECRET=.*$/gm, replacement)
+        ? envContent.replaceAll(/^STRIPE_WEBHOOK_SECRET=.*$/gm, replacement)
         : `${envContent}\n${replacement}\n`;
       fs.writeFileSync(envPath, envContent, "utf-8");
       logger.debug("Updated STRIPE_WEBHOOK_SECRET in .env");

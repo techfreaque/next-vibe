@@ -13,6 +13,7 @@
 import "server-only";
 
 import { and, eq, sql } from "drizzle-orm";
+import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import {
@@ -38,7 +39,6 @@ import {
   LineType,
   PeriodStatus,
 } from "@/chart-of-accounts/enum";
-import { env } from "@/env/env";
 
 import { paymentInvoiceLines, paymentInvoices } from "../../../db";
 import { InvoiceStatus } from "../../../enum";
@@ -118,7 +118,7 @@ export class InvoiceSendRepository {
 
       // Generate public view token for customer link
       const viewToken = generateInvoiceViewToken(urlPathParams.invoiceId);
-      const viewUrl = `${env.NEXT_PUBLIC_APP_URL}/invoice/${urlPathParams.invoiceId}?token=${viewToken}`;
+      const viewUrl = `${coreEnv.NEXT_PUBLIC_APP_URL}/invoice/${urlPathParams.invoiceId}?token=${viewToken}`;
 
       logger.debug("Invoice sent", {
         invoiceId: urlPathParams.invoiceId,

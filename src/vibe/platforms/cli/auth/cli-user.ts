@@ -13,14 +13,13 @@ import type {
   JwtPrivatePayloadType,
   JWTPublicPayloadType,
 } from "next-vibe/identity/auth/types";
+import { identityEnv } from "next-vibe/identity/env";
 import {
   UserPermissionRole,
   type UserPermissionRoleValue,
 } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { scopedTranslation as cliScopedTranslation } from "next-vibe/platforms/cli/i18n";
-
-import { env } from "@/env/env";
 
 /**
  * Default CLI user configuration
@@ -32,7 +31,7 @@ const DEFAULT_CLI_USER_ID = "00000000-0000-0000-0000-000000000001";
  * Returns null if VIBE_ADMIN_USER_EMAIL is not set
  */
 function getCliUserEmail(): string | null {
-  return env.VIBE_ADMIN_USER_EMAIL ?? null;
+  return identityEnv.VIBE_ADMIN_USER_EMAIL ?? null;
 }
 
 /**

@@ -1,8 +1,6 @@
 "use client";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
-import { cn } from "next-vibe/core/utils/utils";
 import { UserRole } from "next-vibe/identity/roles/enum";
-import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -20,12 +18,14 @@ import { MetricCard } from "next-vibe/ui/ui/metric-card";
 import { MetricGrid } from "next-vibe/ui/ui/metric-grid";
 import { Skeleton } from "next-vibe/ui/ui/skeleton";
 import { Span } from "next-vibe/ui/ui/span";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import type { JSX } from "react";
 
 import { scopedTranslation as subscriptionScopedT } from "@/_pages/subscription/i18n";

@@ -46,7 +46,7 @@ interface EmbeddingResponse {
 export async function generateEmbedding(
   text: string,
   /** Fixture chain of the calling stream — undefined callers hit live fetch. */
-  streamContext: ToolExecutionContext,
+  toolExecutionContext: ToolExecutionContext,
 ): Promise<number[] | null> {
   const apiKey = agentEnv.OPENROUTER_API_KEY;
   if (!apiKey) {
@@ -60,7 +60,7 @@ export async function generateEmbedding(
 
   // One fixture-aware fetch per embedding call - carries the repeat counter
   // across chunked requests, so it must not be recreated per chunk.
-  const fetchImpl = createFixtureFetch(streamContext);
+  const fetchImpl = createFixtureFetch(toolExecutionContext);
 
   // Model context is 8192 tokens. Chars-per-token varies by content (code,
   // non-Latin text, etc. run denser than ~4:1), so this stays well under the
@@ -117,7 +117,7 @@ export async function generateEmbedding(
     // embedding is NOT benign — it means the fixture is missing or the live
     // record leg broke. Throw so the test fails loudly instead of silently
     // degrading to no-memory. Prod (no fixtures row) stays resilient → null.
-    if (await isFixtureContext(streamContext)) {
+    if (await isFixtureContext(toolExecutionContext)) {
       // oxlint-disable-next-line restricted-syntax -- fail the fixture run loudly
       throw error instanceof Error
         ? error
@@ -134,14 +134,14 @@ export async function generateEmbedding(
  * fail the run rather than silently degrade.
  */
 async function isFixtureContext(
-  streamContext: ToolExecutionContext,
+  toolExecutionContext: ToolExecutionContext,
 ): Promise<boolean> {
-  if (!streamContext.threadId) {
+  if (!toolExecutionContext.threadId) {
     return false;
   }
   const { readFixturePrefix } =
     await import("next-vibe/agent/ai-stream/testing/fetch-cache");
-  return (await readFixturePrefix(streamContext.threadId)) !== null;
+  return (await readFixturePrefix(toolExecutionContext.threadId)) !== null;
 }
 
 /**

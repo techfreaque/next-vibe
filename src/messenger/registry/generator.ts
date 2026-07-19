@@ -5,18 +5,18 @@
 
 import "server-only";
 
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { formatWarning } from "next-vibe/logger/formatters";
-import type { EndpointLogger } from "next-vibe/logger/types";
 import type {
   GeneratorContext,
   GeneratorResult,
-} from "next-vibe/tooling/generators/shared/shared-inputs";
+} from "next-vibe/core/generators/shared/shared-inputs";
 import {
   generateFileHeader,
   stripProjectRoot,
   writeGeneratedFile,
-} from "next-vibe/tooling/generators/shared/utils";
+} from "next-vibe/core/generators/shared/utils";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { formatWarning } from "next-vibe/logger/formatters";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type {
   EmailTemplateDefinitionAny,

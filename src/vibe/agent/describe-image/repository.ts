@@ -52,7 +52,7 @@ export class DescribeImageRepository {
     t: DescribeImageT,
     favoriteId: string | undefined,
     /** Fixture chain of the calling stream — the vision model call binds it. */
-    streamContext: ToolExecutionContext,
+    toolExecutionContext: ToolExecutionContext,
   ): Promise<ResponseType<DescribeImagePostResponseOutput>> {
     const tCredits = creditsScopedTranslation.scopedT(locale).t;
     const userId = !user.isPublic && "id" in user ? user.id : undefined;
@@ -100,7 +100,7 @@ export class DescribeImageRepository {
       const visionProvider = ProviderFactory.getProviderForModel(
         visionModel,
         logger,
-        streamContext,
+        toolExecutionContext,
       );
 
       const result = await aiGenerateText({

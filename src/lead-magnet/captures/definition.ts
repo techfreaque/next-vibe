@@ -5,10 +5,8 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
-import {
-  customWidgetObject,
-  responseField,
-} from "next-vibe/unified-ui/_shared/utils";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
+import { responseField } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { lazyWidget } from "../../vibe/unified-ui/_shared/lazy-widget";

@@ -5,9 +5,8 @@
 
 import "server-only";
 
+import { coreEnv } from "next-vibe/core/env";
 import { Environment } from "next-vibe/env/env-util";
-
-import { env } from "@/env/env";
 
 import { serverSystemEnv } from "./env";
 
@@ -68,7 +67,7 @@ function detectEnvironment(): ServerEnvironmentType {
   }
 
   // Check NODE_ENV
-  const nodeEnv = env.NODE_ENV;
+  const nodeEnv = coreEnv.NODE_ENV;
   if (nodeEnv === Environment.PRODUCTION) {
     return "production";
   }
@@ -221,7 +220,7 @@ export function getCurrentEnvironmentInfo(): CurrentEnvironmentInfo {
     isServerless: environment === "serverless",
     isDevelopment: environment === "development",
     isProduction: environment === "production",
-    nodeEnv: env.NODE_ENV,
+    nodeEnv: coreEnv.NODE_ENV,
     platform,
   };
 }

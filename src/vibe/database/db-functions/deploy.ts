@@ -15,6 +15,7 @@ import { readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 
 import { sql } from "drizzle-orm";
+import { toImportUrl } from "next-vibe/core/generators/shared/utils";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import {
   formatDatabase,
@@ -148,7 +149,9 @@ async function deployFile(
 
   try {
     const mod = (await import(
-      /* webpackIgnore: true */ /* turbopackIgnore: true */ filePath
+      /* webpackIgnore: true */ /* turbopackIgnore: true */ toImportUrl(
+        filePath,
+      )
     )) as Record<string, DbFunctionLike | undefined>;
     let count = 0;
 

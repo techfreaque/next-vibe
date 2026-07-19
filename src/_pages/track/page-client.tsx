@@ -3,12 +3,12 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { LeadSource } from "next-vibe/identity/lead/enum";
-import { useApiQuery } from "next-vibe/platforms/react/hooks/use-api-query";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { useSearchParams } from "next-vibe/ui/hooks/use-navigation";
 import { assignUrl } from "next-vibe/ui/lib/location";
 import { Div } from "next-vibe/ui/ui/div";
 import { P } from "next-vibe/ui/ui/typography";
+import { useApiQuery } from "next-vibe/unified-ui/hooks/use-api-query";
 import type React from "react";
 
 import { scopedTranslation } from "@/_pages/track/i18n";

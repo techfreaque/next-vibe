@@ -21,8 +21,8 @@ import type {
   JwtPrivatePayloadType,
 } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import backfillEndpoint from "./backfill/definition";
@@ -49,7 +49,7 @@ describe("Cortex Embedding Backfill E2E", () => {
 
   it("runs backfill as admin and returns the numeric count shape", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: backfillEndpoint.POST,
       data: { force: false },
       user,
@@ -74,7 +74,7 @@ describe("Cortex Embedding Backfill E2E", () => {
 
   it("is idempotent — a second run still returns a valid count shape", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: backfillEndpoint.POST,
       data: { force: false },
       user,
@@ -97,7 +97,7 @@ describe("Cortex Embedding Backfill E2E", () => {
 
   it("rejects a public (non-admin) caller", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: backfillEndpoint.POST,
       data: { force: false },
       user: publicUser,

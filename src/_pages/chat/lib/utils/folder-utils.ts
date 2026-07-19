@@ -10,7 +10,7 @@ import {
 } from "next-vibe/agent/chat/config";
 import type { ChatFolder } from "next-vibe/agent/chat/db";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 
 import { scopedTranslation as chatScopedTranslation } from "@/_pages/chat/i18n";
 

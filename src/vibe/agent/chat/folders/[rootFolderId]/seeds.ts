@@ -10,7 +10,7 @@ import {
   type UserPermissionRoleValue,
 } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 
 import { DefaultFolderId } from "../../config";
 import { chatFolders } from "../../db";

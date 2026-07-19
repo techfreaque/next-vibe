@@ -14,14 +14,14 @@ import { ImageGenerationRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, user, locale, logger, t, streamContext }) =>
+    handler: ({ data, user, locale, logger, t, toolExecutionContext }) =>
       ImageGenerationRepository.generateImage(
         data,
         user,
         locale,
         logger,
         t,
-        streamContext,
+        toolExecutionContext,
       ),
     requestDefaults: (ctx) => ImageGenerationRepository.getRequestDefaults(ctx),
   },

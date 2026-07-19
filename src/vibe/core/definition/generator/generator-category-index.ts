@@ -13,23 +13,26 @@ import "server-only";
 import { readFileSync } from "node:fs";
 import { basename } from "node:path";
 
+import type {
+  GeneratorContext,
+  GeneratorResult,
+} from "next-vibe/core/generators/shared/shared-inputs";
+import {
+  generateFileHeader,
+  jsonToTs,
+  toImportUrl,
+  writeGeneratedFile,
+} from "next-vibe/core/generators/shared/utils";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type {
   CategoryDefinition,
   SubcategoryDefinition,
 } from "next-vibe/help-tool/category-types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import type {
-  GeneratorContext,
-  GeneratorResult,
-} from "next-vibe/tooling/generators/shared/shared-inputs";
-import {
-  generateFileHeader,
-  jsonToTs,
-  writeGeneratedFile,
-} from "next-vibe/tooling/generators/shared/utils";
 
-const OUTPUT_FILE = "src/generated/categories/registry.ts";
+import { GENERATED_DIR } from "@/env/paths";
+
+const OUTPUT_FILE = `${GENERATED_DIR}/categories/registry.ts`;
 
 interface CategoryEntry {
   exportName: string;
@@ -57,7 +60,7 @@ async function extractCategories(
 
       const mod = (await import(
         /* @vite-ignore */
-        catFile
+        toImportUrl(catFile)
       )) as Record<string, CategoryDefinition>;
       const def = mod["category"];
 
@@ -96,11 +99,17 @@ function generateContent(categories: CategoryEntry[]): string {
 
   const keys = categories.map((c) => c.def.key);
   const keyUnionSingle = keys.map((k) => `"${k}"`).join(" | ");
-  // keyUnion: either " value1 | value2" (inline) or "\n  | v1\n  | v2" (expanded)
+  // keyUnion: either " value1 | value2" (inline) or "\n  | v1\n  | v2" (expanded).
+  // With NO categories the join yields "", which would emit the syntactically
+  // invalid `export type CategoryKey = ;` — every consumer of the generated file
+  // then fails to parse. With zero categories there is no registry to constrain against, so `string`
+  // (accept any) is the right contract — `never` would reject every definition.
   const keyUnion =
-    `export type CategoryKey = ${keyUnionSingle};`.length <= 80
-      ? ` ${keyUnionSingle}`
-      : `\n  | ${keys.map((k) => `"${k}"`).join("\n  | ")}`;
+    keys.length === 0
+      ? " string"
+      : `export type CategoryKey = ${keyUnionSingle};`.length <= 80
+        ? ` ${keyUnionSingle}`
+        : `\n  | ${keys.map((k) => `"${k}"`).join("\n  | ")}`;
 
   const subKeys = new Set<string>();
   for (const c of categories) {
@@ -112,10 +121,13 @@ function generateContent(categories: CategoryEntry[]): string {
   }
   const subKeysSorted = [...subKeys];
   const subKeyUnionSingle = subKeysSorted.map((k) => `"${k}"`).join(" | ");
+  // Same empty-union guard as CategoryKey above.
   const subKeyUnion =
-    `export type SubCategoryKey = ${subKeyUnionSingle};`.length <= 80
-      ? ` ${subKeyUnionSingle}`
-      : `\n  | ${subKeysSorted.map((k) => `"${k}"`).join("\n  | ")}`;
+    subKeysSorted.length === 0
+      ? " string"
+      : `export type SubCategoryKey = ${subKeyUnionSingle};`.length <= 80
+        ? ` ${subKeyUnionSingle}`
+        : `\n  | ${subKeysSorted.map((k) => `"${k}"`).join("\n  | ")}`;
 
   const registryEntries = categories
     .map((c) => {

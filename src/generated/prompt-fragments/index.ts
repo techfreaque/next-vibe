@@ -130,9 +130,11 @@ export async function getPromptFragment(
         }),
       );
     case "contact":
-      return import("@/contact/system-prompt").then(({ contactFragment }) => ({
-        contactFragment,
-      }));
+      return import("@/contact/system-prompt").then(
+        ({ contactFragment }) => ({
+          contactFragment,
+        }),
+      );
     case "cortex":
       return import("@/vibe/agent/cortex/system-prompt").then(
         ({ cortexFragment }) => ({
@@ -140,9 +142,11 @@ export async function getPromptFragment(
         }),
       );
     case "desktop":
-      return import("@/desktop/system-prompt").then(({ desktopFragment }) => ({
-        desktopFragment,
-      }));
+      return import("@/desktop/system-prompt").then(
+        ({ desktopFragment }) => ({
+          desktopFragment,
+        }),
+      );
     case "extra-instructions":
       return import("@/vibe/agent/ai-stream/system-prompt/system-prompt").then(
         ({

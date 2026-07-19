@@ -285,7 +285,7 @@ export async function runWsProviderStream(params: {
         locale,
         logger,
         systemPrompt: "",
-        streamContext: headlessCtx,
+        toolExecutionContext: headlessCtx,
       });
       if (loaded.tools) {
         toolsOverride = loaded.tools;

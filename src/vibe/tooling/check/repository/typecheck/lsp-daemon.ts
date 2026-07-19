@@ -800,11 +800,11 @@ export class TsgoDaemon {
   private matchGlob(pattern: string, relativePath: string): boolean {
     const DOUBLE_STAR = "DOUBLESTAR";
     const escaped = pattern
-      .replace(/[.+^${}()|[\]\\]/g, "\\$&") // escape regex special chars (not * or ?)
-      .replace(/\*\*/g, DOUBLE_STAR) // placeholder for **
-      .replace(/\*/g, "[^/]*") // * matches within a segment
-      .replace(/\?/g, "[^/]") // ? matches one char
-      .replace(new RegExp(DOUBLE_STAR, "g"), ".*"); // ** matches anything including /
+      .replaceAll(/[.+^${}()|[\]\\]/g, "\\$&") // escape regex special chars (not * or ?)
+      .replaceAll("**", DOUBLE_STAR) // placeholder for **
+      .replaceAll("*", "[^/]*") // * matches within a segment
+      .replaceAll("?", "[^/]") // ? matches one char
+      .replaceAll(new RegExp(DOUBLE_STAR, "g"), ".*"); // ** matches anything including /
     const re = new RegExp(`^${escaped}$`);
     return re.test(relativePath);
   }
@@ -839,7 +839,7 @@ export class TsgoDaemon {
     try {
       const raw = readFileSync(join(this.projectRoot, "tsconfig.json"), "utf8");
       // Strip line comments before parsing (tsconfig allows // comments)
-      const stripped = raw.replace(/\/\/[^\n]*/g, "");
+      const stripped = raw.replaceAll(/\/\/[^\n]*/g, "");
       const parsed = JSON.parse(stripped) as { exclude?: string[] };
       return Array.isArray(parsed.exclude) ? parsed.exclude : [];
     } catch {
@@ -883,7 +883,9 @@ export class TsgoDaemon {
     const filtered =
       allIgnore.length > 0
         ? files.filter((f) => {
-            const rel = relative(cwd, f);
+            // Patterns are written with "/", so normalize Windows separators
+            // before matching or the ignore list silently matches nothing.
+            const rel = relative(cwd, f).replaceAll("\\", "/");
             return !allIgnore.some((pat) => {
               // Bare name with no separators or globs: match any path segment
               if (!pat.includes("/") && !pat.includes("*")) {

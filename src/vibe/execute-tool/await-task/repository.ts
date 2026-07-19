@@ -6,7 +6,7 @@
  *
  * Already completed → returns result inline (stream continues).
  * Still running     → writes WAIT revival context onto the task row,
- *                     sets streamContext.waitingForRemoteResult=true (stream pauses),
+ *                     sets toolExecutionContext.waitingForRemoteResult=true (stream pauses),
  *                     revived via resume-stream when the task calls TaskCompletion.handle.
  */
 
@@ -48,7 +48,7 @@ export class AwaitTaskRepository {
     user: JwtPayloadType,
     logger: EndpointLogger,
     t: AwaitTaskT,
-    streamContext: ToolExecutionContext,
+    toolExecutionContext: ToolExecutionContext,
   ): Promise<ResponseType<AwaitTaskResponseOutput>> {
     const { taskId } = data;
 
@@ -60,7 +60,7 @@ export class AwaitTaskRepository {
         // Suppress any wakeUp signal for the original dispatch tool message —
         // await-task is taking over delivery.
         AwaitTaskRepository.suppressWakeUp(
-          streamContext,
+          toolExecutionContext,
           pendingCall.toolMessageId,
         );
 
@@ -125,12 +125,13 @@ export class AwaitTaskRepository {
           );
         }
 
-        const pendThreadId = streamContext.threadId;
+        const pendThreadId = toolExecutionContext.threadId;
         const pendToolMessageId =
-          streamContext.currentToolMessageId ?? streamContext.aiMessageId;
+          toolExecutionContext.currentToolMessageId ??
+          toolExecutionContext.aiMessageId;
         if (pendThreadId && pendToolMessageId) {
           const pendModelId = await TaskCompletion.resolveStreamModelId(
-            streamContext,
+            toolExecutionContext,
             user,
           );
 
@@ -143,11 +144,11 @@ export class AwaitTaskRepository {
             callbackMode: CallbackMode.WAIT,
             threadId: pendThreadId,
             toolMessageId: pendToolMessageId,
-            leafMessageId: streamContext.leafMessageId ?? null,
+            leafMessageId: toolExecutionContext.leafMessageId ?? null,
             modelId: pendModelId,
-            skillId: streamContext.skillId ?? null,
-            favoriteId: streamContext.favoriteId ?? null,
-            subAgentDepth: streamContext.subAgentDepth ?? 0,
+            skillId: toolExecutionContext.skillId ?? null,
+            favoriteId: toolExecutionContext.favoriteId ?? null,
+            subAgentDepth: toolExecutionContext.subAgentDepth ?? 0,
             ownerUserId: !user.isPublic ? user.id : null,
             selfInstanceId: null,
             logger,
@@ -185,8 +186,8 @@ export class AwaitTaskRepository {
             });
           }
 
-          streamContext.waitingForRemoteResult = true;
-          streamContext.pendingTimeoutMs = 90_000;
+          toolExecutionContext.waitingForRemoteResult = true;
+          toolExecutionContext.pendingTimeoutMs = 90_000;
           logger.info(
             "[AwaitTask] Registered thread as waiter on pending remote call",
             {
@@ -197,7 +198,7 @@ export class AwaitTaskRepository {
           );
         } else {
           logger.warn(
-            "[AwaitTask] No streamContext target - returning pending status",
+            "[AwaitTask] No toolExecutionContext target - returning pending status",
             { taskId },
           );
         }
@@ -259,9 +260,10 @@ export class AwaitTaskRepository {
       const originalArgs =
         Object.keys(cleanTaskInput).length > 0 ? cleanTaskInput : undefined;
 
-      // Compute the tool message ID upfront — available from streamContext regardless of task state.
+      // Compute the tool message ID upfront — available from toolExecutionContext regardless of task state.
       const effectiveToolMessageId =
-        streamContext.currentToolMessageId ?? streamContext.aiMessageId;
+        toolExecutionContext.currentToolMessageId ??
+        toolExecutionContext.aiMessageId;
 
       // Already terminal — return result inline.
       if (AwaitTaskRepository.isTerminal(task.lastExecutionStatus)) {
@@ -300,7 +302,7 @@ export class AwaitTaskRepository {
 
         // Suppress any pending wakeUp revival — we're delivering inline.
         AwaitTaskRepository.suppressWakeUp(
-          streamContext,
+          toolExecutionContext,
           effectiveToolMessageId ?? null,
         );
 
@@ -317,7 +319,7 @@ export class AwaitTaskRepository {
 
       // Task still running — register this stream as a waiter via WAIT mode.
       // TaskCompletion.handle will backfill the tool message and schedule resume-stream.
-      const effectiveThreadId = streamContext.threadId;
+      const effectiveThreadId = toolExecutionContext.threadId;
 
       // Cross-instance / headless caller with NOTHING to park: returning
       // "pending" is useless (there is no local stream to pause and revive —
@@ -372,7 +374,7 @@ export class AwaitTaskRepository {
       // park a resume-stream task here: the inline block below IS the wait, and a
       // parked task racing the goroutine's enable+fire is exactly that double-fire.
       AwaitTaskRepository.suppressWakeUp(
-        streamContext,
+        toolExecutionContext,
         effectiveToolMessageId ?? null,
       );
 
@@ -494,16 +496,16 @@ export class AwaitTaskRepository {
    * await-task is taking over delivery of the result.
    */
   private static suppressWakeUp(
-    streamContext: ToolExecutionContext,
+    toolExecutionContext: ToolExecutionContext,
     toolMessageId: string | null | undefined,
   ): void {
-    if (!streamContext || !toolMessageId) {
+    if (!toolExecutionContext || !toolMessageId) {
       return;
     }
-    if (!streamContext.suppressedWakeUpToolMessageIds) {
-      streamContext.suppressedWakeUpToolMessageIds = new Set();
+    if (!toolExecutionContext.suppressedWakeUpToolMessageIds) {
+      toolExecutionContext.suppressedWakeUpToolMessageIds = new Set();
     }
-    streamContext.suppressedWakeUpToolMessageIds.add(toolMessageId);
+    toolExecutionContext.suppressedWakeUpToolMessageIds.add(toolMessageId);
   }
 
   /**

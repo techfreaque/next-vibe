@@ -9,14 +9,14 @@ import "server-only";
 
 import { createHmac, timingSafeEqual } from "node:crypto";
 
-import { env } from "@/env/env";
+import { identityEnv } from "next-vibe/identity/env";
 
 /**
  * Generate a view token for a given invoiceId.
  * Token = HMAC-SHA256(JWT_SECRET_KEY, invoiceId) as hex string.
  */
 export function generateInvoiceViewToken(invoiceId: string): string {
-  const secret = env.JWT_SECRET_KEY;
+  const secret = identityEnv.JWT_SECRET_KEY;
   return createHmac("sha256", secret).update(invoiceId).digest("hex");
 }
 

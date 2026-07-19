@@ -14,7 +14,7 @@ import { BraveSearchRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: braveSearchDefinition,
   [Methods.GET]: {
-    handler: ({ data, user, logger, t, streamContext }) =>
+    handler: ({ data, user, logger, t, toolExecutionContext }) =>
       BraveSearchRepository.search(
         data.query,
         {
@@ -25,7 +25,7 @@ export const { GET, tools } = endpointsHandler({
         logger,
         t,
         user,
-        streamContext,
+        toolExecutionContext,
       ),
   },
 });

@@ -5,7 +5,6 @@ import {
   useChatNavigationStore,
 } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { cn } from "next-vibe/core/utils/utils";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { getElementById } from "next-vibe/ui/lib/dom";
 import { getCurrentUrl } from "next-vibe/ui/lib/location";
@@ -21,6 +20,7 @@ import { Square } from "next-vibe/ui/ui/icons/Square";
 import { Volume2 } from "next-vibe/ui/ui/icons/Volume2";
 import { X } from "next-vibe/ui/ui/icons/X";
 import { Span } from "next-vibe/ui/ui/span";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { useWidgetNavigation } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 

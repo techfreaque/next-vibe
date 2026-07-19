@@ -9,15 +9,15 @@ import { DescribeImageRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, user, locale, logger, t, streamContext }) =>
+    handler: ({ data, user, locale, logger, t, toolExecutionContext }) =>
       DescribeImageRepository.describeImage(
         data,
         user,
         locale,
         logger,
         t,
-        streamContext.favoriteId,
-        streamContext,
+        toolExecutionContext.favoriteId,
+        toolExecutionContext,
       ),
   },
 });

@@ -9,10 +9,10 @@ export const { tools } = endpointsHandler({
   endpoint: scaleReplicasEndpoints,
   [Methods.POST]: {
     handler: async ({ data, logger, t }) =>
-      (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-        )
-      ).ScaleReplicasRepository.scale(data, logger, t),
+      (await import("./repository")).ScaleReplicasRepository.scale(
+        data,
+        logger,
+        t,
+      ),
   },
 });

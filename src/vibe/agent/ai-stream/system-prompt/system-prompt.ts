@@ -7,13 +7,13 @@ import { scopedTranslation as chatScopedTranslation } from "next-vibe/agent/chat
 import { chatSettings } from "next-vibe/agent/chat/settings/db";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import { languageConfig } from "next-vibe/core/i18n";
 import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import { db } from "next-vibe/database";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { users as usersTable } from "next-vibe/identity/user/db";
 
-import { envClient } from "@/env/env-client";
 import { ProductIds, productsRepository } from "@/products/repository-client";
 
 import { DESCRIBE_IMAGE_ALIAS } from "../../describe-image/constants";

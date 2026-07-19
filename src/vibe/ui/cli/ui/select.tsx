@@ -138,7 +138,7 @@ export function Select<TValue extends string>({
         if (key.return || key.downArrow || key.upArrow) {
           // Find cursor position of current value
           const idx = enabledItems.findIndex((i) => i.value === value);
-          setCursor(idx >= 0 ? idx : 0);
+          setCursor(Math.max(idx, 0));
           setOpen(true);
         }
         return;

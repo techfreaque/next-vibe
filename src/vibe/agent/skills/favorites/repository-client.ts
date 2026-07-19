@@ -17,9 +17,9 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { executeQuery } from "next-vibe/platforms/react/hooks/query-executor";
 import { getLocalItem, storage } from "next-vibe/ui/lib/storage";
-import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import { executeQuery } from "next-vibe/unified-ui/hooks/query-executor";
+import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 
 import type { ChatModelSelection } from "../../ai-stream/models";
 import { STORAGE_KEYS } from "../../chat/constants";

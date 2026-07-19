@@ -22,9 +22,6 @@ import {
 } from "next-vibe/agent/chat/enum";
 import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import { success } from "next-vibe/core/route/response.schema";
-import { cn } from "next-vibe/core/utils/utils";
-import { apiClient } from "next-vibe/platforms/react/hooks/store";
-import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { useRouter, useSilentHistory } from "next-vibe/ui/hooks/use-navigation";
 import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import {
@@ -71,15 +68,18 @@ import { Shield } from "next-vibe/ui/ui/icons/Shield";
 import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
 import { Input } from "next-vibe/ui/ui/input";
 import { Span } from "next-vibe/ui/ui/span";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetContext,
   useWidgetForm,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
-import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
-import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
+import { apiClient } from "next-vibe/unified-ui/hooks/store";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
+import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import { useMemo, useState } from "react";
 
 import { chatColors, chatTransitions } from "@/_pages/chat/lib/design-tokens";

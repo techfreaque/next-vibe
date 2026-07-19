@@ -8,7 +8,6 @@
 
 import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
-import type { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { GenericHandlerBase } from "next-vibe/core/route/handler";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -16,6 +15,7 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { AiT } from "next-vibe/platforms/ai/i18n";
+import type { Platform } from "next-vibe/platforms/platforms";
 import type {
   RemoteCallParams,
   RemoteCallResult,
@@ -67,7 +67,7 @@ export interface RouteExecuteContext {
   locale: CountryLanguage;
   logger: EndpointLogger;
   t: AiT;
-  streamContext: ToolExecutionContext;
+  toolExecutionContext: ToolExecutionContext;
   platform: Platform;
   /**
    * Pre-loaded route handler for the local WAIT path. When a caller (MCP

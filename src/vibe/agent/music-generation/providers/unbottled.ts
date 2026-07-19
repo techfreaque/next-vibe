@@ -23,7 +23,7 @@ export async function generateMusicWithUnbottled(params: {
   logger: EndpointLogger;
   locale: CountryLanguage;
   featureLabel: string;
-  streamContext: ToolExecutionContext;
+  toolExecutionContext: ToolExecutionContext;
 }): Promise<
   ResponseType<{
     audioUrl: string;
@@ -31,7 +31,8 @@ export async function generateMusicWithUnbottled(params: {
     durationSeconds: number;
   }>
 > {
-  const { input, user, logger, locale, featureLabel, streamContext } = params;
+  const { input, user, logger, locale, featureLabel, toolExecutionContext } =
+    params;
 
   const remoteResult = await RouteExecuteRepository.runAsSystemProvider({
     definition: definitions.POST,
@@ -39,7 +40,7 @@ export async function generateMusicWithUnbottled(params: {
     user,
     locale,
     logger,
-    streamContext,
+    toolExecutionContext,
   });
 
   if (!remoteResult.success) {

@@ -24,11 +24,9 @@ import { CortexModal } from "next-vibe/agent/cortex/widget/cortex-modal";
 import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
 import { AIToolsModal } from "next-vibe/agent/tools/widget/ai-tools-modal";
+import { platform } from "next-vibe/core/env-client";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { UserRole } from "next-vibe/identity/roles/enum";
-import type { UseEndpointOptions } from "next-vibe/platforms/react/hooks/endpoint-types";
-import { apiClient } from "next-vibe/platforms/react/hooks/store";
-import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { usePathname, useRouter } from "next-vibe/ui/hooks/use-navigation";
 import { useResizeObserver } from "next-vibe/ui/hooks/use-resize-observer";
 import { useSafeAreaInsets } from "next-vibe/ui/hooks/use-safe-area-insets";
@@ -50,12 +48,14 @@ import {
   useWidgetLogger,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
+import type { UseEndpointOptions } from "next-vibe/unified-ui/hooks/endpoint-types";
+import { apiClient } from "next-vibe/unified-ui/hooks/store";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import { InputHeightProvider } from "@/_pages/chat/lib/config/constants";
-import { platform } from "@/env/env-client";
 
 import type definition from "../definition";
 import type { AiStreamPostResponseOutput } from "../definition";

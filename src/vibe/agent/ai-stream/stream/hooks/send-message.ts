@@ -18,8 +18,8 @@ import { success } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { apiClient } from "next-vibe/platforms/react/hooks/store";
 import { getCurrentUrl, silentReplaceState } from "next-vibe/ui/lib/location";
+import { apiClient } from "next-vibe/unified-ui/hooks/store";
 
 import type { StartStreamFn } from "./shared";
 import { createAndSendUserMessage } from "./shared";

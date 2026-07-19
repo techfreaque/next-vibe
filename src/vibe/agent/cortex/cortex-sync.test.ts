@@ -48,6 +48,7 @@ import {
 import { skillsSyncProvider } from "next-vibe/agent/skills/sync-provider";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
+import { databaseEnv } from "next-vibe/database/env";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import * as userSchema from "next-vibe/identity/user/db";
 import { createEndpointLogger } from "next-vibe/logger/server";
@@ -58,11 +59,9 @@ import {
   ensureProvidersRegistered,
   type SyncProvider,
 } from "next-vibe/remote-connection/sync/provider";
-import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
+import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
 import { Pool } from "pg";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
-import { env } from "@/env/env";
 
 import { cortexNodes } from "./db";
 import { documentsSyncProvider } from "./sync-provider";
@@ -116,7 +115,7 @@ interface ProdDbConnection {
 }
 
 function getProdDb(): ProdDbConnection {
-  const baseUrl = env.DATABASE_URL.replace(/:\d+\//, `:5433/`);
+  const baseUrl = databaseEnv.DATABASE_URL.replace(/:\d+\//, `:5433/`);
   const pool = new Pool({
     connectionString: baseUrl,
     max: 3,

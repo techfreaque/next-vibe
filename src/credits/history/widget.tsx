@@ -4,16 +4,16 @@
 
 "use client";
 import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
-import { cn } from "next-vibe/core/utils/utils";
 import { Div } from "next-vibe/ui/ui/div";
 import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetContext,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { PaginationWidget } from "next-vibe/unified-ui/containers/pagination/widget";
+import { PaginationWidget } from "next-vibe/unified-ui/widgets/containers/pagination/widget";
 
 import { CreditsTabHeader } from "../credits-tab-header";
 import type definition from "./definition";

@@ -109,7 +109,7 @@ export class VideoGenerationRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: VideoGenerationT,
-    streamContext: ToolExecutionContext,
+    toolExecutionContext: ToolExecutionContext,
   ): Promise<ResponseType<VideoGenerationPostResponseOutput>> {
     // model is resolved via fieldDefaults in route.ts (from favorites/skill config)
     if (!data.model) {
@@ -258,7 +258,7 @@ export class VideoGenerationRepository {
 
     // One fixture-aware fetch per generation - carries the repeat counter for
     // poll loops, so it must not be recreated per call.
-    const fetchImpl = createFixtureFetch(streamContext, logger);
+    const fetchImpl = createFixtureFetch(toolExecutionContext, logger);
 
     // Inline any of OUR storage URLs (localhost/access-controlled) to base64 data
     // URIs before handing them to an external provider, which cannot fetch them.
@@ -304,7 +304,7 @@ export class VideoGenerationRepository {
           locale,
           logger,
           featureLabel: t("post.title"),
-          streamContext,
+          toolExecutionContext,
         });
         break;
 
@@ -355,9 +355,9 @@ export class VideoGenerationRepository {
     // Upload to our storage so the URL is persistent and access-controlled.
     // Incognito threads have no server-side thread row — the file is owned by
     // the caller's leadId and served only to that lead (browser).
-    const scThreadId = streamContext.threadId;
+    const scThreadId = toolExecutionContext.threadId;
     const isIncognito =
-      streamContext.rootFolderId === DefaultFolderId.INCOGNITO;
+      toolExecutionContext.rootFolderId === DefaultFolderId.INCOGNITO;
     if (scThreadId) {
       try {
         const storage = getStorageAdapter();
@@ -417,13 +417,13 @@ export class VideoGenerationRepository {
       durationSeconds: finalDurationSeconds,
     });
 
-    const toolMessageId = streamContext.currentToolMessageId;
+    const toolMessageId = toolExecutionContext.currentToolMessageId;
     if (toolMessageId && !user.isPublic) {
       const month = new Date().toISOString().slice(0, 7);
       const slug = `${data.prompt
         .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "")
+        .replaceAll(/[^a-z0-9]+/g, "-")
+        .replaceAll(/^-|-$/g, "")
         .slice(0, 60)}-${toolMessageId}`;
       void Promise.all([
         import("next-vibe/agent/cortex/mounts/gens"),
@@ -439,7 +439,7 @@ export class VideoGenerationRepository {
                   user.id,
                   path,
                   result.content,
-                  streamContext,
+                  toolExecutionContext,
                 ),
             )
             .catch(() => undefined);
@@ -456,7 +456,7 @@ export class VideoGenerationRepository {
 
   static async getRequestDefaults(ctx: {
     user: JwtPayloadType;
-    streamContext: ToolExecutionContext;
+    toolExecutionContext: ToolExecutionContext;
   }): Promise<Partial<VideoGenerationPostRequestInput>> {
     const { getInstanceAvailability } = await import("../env-availability");
     const availability = await getInstanceAvailability();
@@ -471,13 +471,14 @@ export class VideoGenerationRepository {
       const { ModalityResolver } =
         await import("next-vibe/agent/ai-stream/repository/core/modality-resolver");
       const { favorite, skill } = await resolveSkillFavoriteContext({
-        favoriteId: ctx.streamContext.favoriteId ?? null,
-        skillId: ctx.streamContext.skillId ?? null,
+        favoriteId: ctx.toolExecutionContext.favoriteId ?? null,
+        skillId: ctx.toolExecutionContext.skillId ?? null,
         userId,
       });
       sel = ModalityResolver.resolveVideoGenSelection({ favorite, skill });
     }
-    sel ??= ctx.streamContext.resolvedMediaSelections?.videoGenModelSelection;
+    sel ??=
+      ctx.toolExecutionContext.resolvedMediaSelections?.videoGenModelSelection;
     const model = filterVideoGenModels(sel, ctx.user, availability)[0]?.id;
     if (!model) {
       return {};

@@ -17,8 +17,8 @@ import { and, eq } from "drizzle-orm";
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { companies, companyMembers } from "../../companies/db";
@@ -131,7 +131,7 @@ describe("Catalog Product Ownership Auth", () => {
     "CP1: personal product owner can update it successfully",
     async () => {
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: updateEndpoints.PATCH,
         data: { fields: { name: "Updated Personal Product" } },
         urlPathParams: { productId: personalProductId },
@@ -159,7 +159,7 @@ describe("Catalog Product Ownership Auth", () => {
         id: "00000000-0000-0000-0000-000000000011",
       };
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: updateEndpoints.PATCH,
         data: { fields: { name: "Hacked" } },
         urlPathParams: { productId: personalProductId },
@@ -181,7 +181,7 @@ describe("Catalog Product Ownership Auth", () => {
     "CP3: empty fields object returns VALIDATION_ERROR",
     async () => {
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: updateEndpoints.PATCH,
         data: { fields: {} },
         urlPathParams: { productId: personalProductId },
@@ -205,7 +205,7 @@ describe("Catalog Product Ownership Auth", () => {
     async () => {
       // Admin has ADMIN role in the company (set in beforeAll)
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: updateEndpoints.PATCH,
         data: { fields: { name: "Updated Company Product" } },
         urlPathParams: { productId: companyProductId },
@@ -240,7 +240,7 @@ describe("Catalog Product Ownership Auth", () => {
         );
 
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: updateEndpoints.PATCH,
         data: { fields: { name: "Should Fail" } },
         urlPathParams: { productId: companyProductId },

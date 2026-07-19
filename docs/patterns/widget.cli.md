@@ -80,19 +80,20 @@ CLI widgets use **Ink context hooks**, not the React `useWidget*` hooks from `wi
 
 ```typescript
 import {
-  useInkWidgetLocale, // CountryLanguage
-  useInkWidgetPlatform, // Platform enum
-  useInkWidgetUser, // JwtPayloadType
-  useInkWidgetLogger, // EndpointLogger
-  useInkWidgetForm, // form state (interactive mode)
-  useInkWidgetResponse, // full response object
-  useInkWidgetResponseOnly, // boolean - response-only mode
-  useInkWidgetTranslation, // scoped t() function
-  useInkWidgetShowLabels, // false for MCP (suppress labels)
-} from "@/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
+  useWidgetLocale, // CountryLanguage
+  useWidgetPlatform, // Platform enum
+  useWidgetUser, // JwtPayloadType
+  useWidgetLogger, // EndpointLogger
+  useWidgetForm, // form state (interactive mode)
+  useWidgetResponse, // full response object
+  useWidgetResponseOnly, // boolean - response-only mode
+  useWidgetTranslation, // scoped t() function
+  useCliPlatform, // "cli" | "mcp"
+  useIsMcp, // boolean
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 ```
 
-Never use React `useWidgetForm`, `useWidgetData`, etc. - those are web-only.
+There is **one** widget-context module and **one** set of hooks - the same `useWidget*` hooks serve web and CLI widgets alike. The context they read from is what differs, and the renderer supplies it. `useCliPlatform()` and `useIsMcp()` are the CLI-side conveniences on top of `useWidgetPlatform()`.
 
 ---
 
@@ -100,14 +101,14 @@ Never use React `useWidgetForm`, `useWidgetData`, etc. - those are web-only.
 
 MCP consumers are AI agents reading plain text. CLI consumers are humans reading a terminal. They need fundamentally different output. **Always handle both.**
 
-Use `useInkWidgetPlatform()` to branch:
+Use `useWidgetPlatform()` to branch:
 
 ```tsx
-import { Platform } from "@/system/unified-interface/shared/types/platform";
-import { useInkWidgetPlatform } from "@/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
+import { Platform } from "next-vibe/platforms/platforms";
+import { useWidgetPlatform } from "next-vibe/unified-ui/_shared/use-widget-context";
 
 export function MyWidget({ field }: CliWidgetProps): React.JSX.Element {
-  const platform = useInkWidgetPlatform();
+  const platform = useWidgetPlatform();
   const isMcp = platform === Platform.MCP;
   const value = field.value;
 
@@ -303,7 +304,7 @@ if (!value) return <Box />;  // ✅
 - [ ] `ComponentName.cliWidget = true as const` on the export
 - [ ] Props: `{ field: { value: T | null | undefined }, fieldName: string }`
 - [ ] Empty state returns `<Box />` not `null`
-- [ ] MCP vs CLI divergence handled via `useInkWidgetPlatform()`
+- [ ] MCP vs CLI divergence handled via `useWidgetPlatform()`
 - [ ] No chalk/terminal-links in MCP path
 - [ ] List endpoints: detail threshold applied (≤5 full detail, >5 compact list)
 - [ ] Pagination hints present for both MCP (plain text) and CLI (dim hint with command)

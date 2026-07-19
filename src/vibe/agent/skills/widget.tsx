@@ -6,8 +6,7 @@
 import { useTourState } from "next-vibe/agent/chat/tour-state";
 import { ModelCreditDisplay } from "next-vibe/agent/models/widget/model-credit-display";
 import { getBestChatModelForFavorite } from "next-vibe/agent/skills/favorites/[id]/definition";
-import { isCliPlatform } from "next-vibe/core/definition/platform";
-import { cn } from "next-vibe/core/utils/utils";
+import { isCliPlatform } from "next-vibe/platforms/platforms";
 import { usePathname } from "next-vibe/ui/hooks/use-pathname";
 import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
@@ -50,6 +49,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe/ui/ui/tooltip";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
@@ -60,12 +60,12 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import BadgeWidget from "next-vibe/unified-ui/display-only/badge/widget";
-import IconWidget from "next-vibe/unified-ui/display-only/icon/widget";
-import { SeparatorWidget } from "next-vibe/unified-ui/display-only/separator/widget";
-import TextWidget from "next-vibe/unified-ui/display-only/text/widget";
-import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import BadgeWidget from "next-vibe/unified-ui/widgets/display-only/badge/widget";
+import IconWidget from "next-vibe/unified-ui/widgets/display-only/icon/widget";
+import { SeparatorWidget } from "next-vibe/unified-ui/widgets/display-only/separator/widget";
+import TextWidget from "next-vibe/unified-ui/widgets/display-only/text/widget";
+import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useSelectorOnboardingContext } from "../ai-stream/stream/widget/selector/selector-onboarding/context";
@@ -1794,8 +1794,7 @@ export function EditFavBeforeAddButton({
     setIsLoading(true);
 
     try {
-      const { apiClient } =
-        await import("next-vibe/platforms/react/hooks/store");
+      const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
       const skillSingleDefinitions = await import("./[id]/definition");
       const createFavoriteDefinitions =
         await import("./favorites/create/definition");
@@ -2009,8 +2008,7 @@ export function SkillFavoriteActions({
     try {
       const { ChatSettingsRepositoryClient } =
         await import("../chat/settings/repository-client");
-      const { apiClient } =
-        await import("next-vibe/platforms/react/hooks/store");
+      const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
       const favoritesDefinition = await import("./favorites/[id]/definition");
 
       // Fetch the favorite to get its data
@@ -2070,8 +2068,7 @@ export function SkillFavoriteActions({
     try {
       const { ChatSettingsRepositoryClient } =
         await import("../chat/settings/repository-client");
-      const { apiClient } =
-        await import("next-vibe/platforms/react/hooks/store");
+      const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
       const favoritesDefinition = await import("./favorites/[id]/definition");
 
       // Fetch the favorite to get its data
@@ -2122,7 +2119,7 @@ export function SkillFavoriteActions({
 
   const handleAddAnother = async (e: ButtonMouseEvent): Promise<void> => {
     e.stopPropagation();
-    const { apiClient } = await import("next-vibe/platforms/react/hooks/store");
+    const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
     const skillSingleDefinitions = await import("./[id]/definition");
     const createFavoriteDefinitions =
       await import("./favorites/create/definition");

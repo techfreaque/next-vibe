@@ -5,6 +5,7 @@
  */
 
 import { and, eq, gt, isNull } from "drizzle-orm";
+import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import { db } from "next-vibe/database";
@@ -21,7 +22,6 @@ import type { NextRequest, NextResponse } from "next-vibe/ui/lib/request";
 import { NextResponse as NextResponseClass } from "next-vibe/ui/lib/request";
 
 import { LEAD_ID_COOKIE_NAME } from "@/env/constants";
-import { env } from "@/env/env";
 
 export const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -182,7 +182,7 @@ export async function createLeadId(
     value: leadId,
     httpOnly: true,
     path: "/",
-    secure: env.NODE_ENV === Environment.PRODUCTION,
+    secure: coreEnv.NODE_ENV === Environment.PRODUCTION,
     sameSite: "lax" as const,
     maxAge: 365 * 24 * 60 * 60 * 10, // 10 years (effectively permanent)
   });

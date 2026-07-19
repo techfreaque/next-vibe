@@ -89,7 +89,7 @@ export class ExportEnvRepository {
         }
         const eqIdx = trimmed.indexOf("=");
         const k = trimmed.slice(0, eqIdx);
-        const v = trimmed.slice(eqIdx + 1).replace(/^"|"$/g, "");
+        const v = trimmed.slice(eqIdx + 1).replaceAll(/^"|"$/g, "");
         rawEnvMap.set(k, v);
       }
 

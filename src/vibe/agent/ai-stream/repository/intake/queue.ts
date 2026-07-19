@@ -107,7 +107,7 @@ export async function runAutoQueueBranch(params: {
     user,
     authorName,
     logger,
-    streamContext: queueEmbedContext,
+    toolExecutionContext: queueEmbedContext,
     extraMetadata: {
       isQueued: true,
       queuedSettings: {

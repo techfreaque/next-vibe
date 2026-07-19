@@ -12,7 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: takeScreenshotEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger, streamContext }) =>
+    handler: ({ data, t, logger, toolExecutionContext }) =>
       DesktopScreenshotRepository.takeScreenshot(
         {
           outputPath: data.outputPath,
@@ -22,7 +22,7 @@ export const { POST, tools } = endpointsHandler({
         },
         t,
         logger,
-        streamContext.threadId,
+        toolExecutionContext.threadId,
       ),
   },
 });

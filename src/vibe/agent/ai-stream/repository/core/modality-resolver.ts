@@ -107,7 +107,15 @@ export interface BridgeContext {
   favorite: BridgeFavorite | null;
 }
 
-export interface MessageVariant {
+/**
+ * A type alias, NOT an interface: this rides an endpoint payload (message
+ * metadata), so it must be assignable to `WidgetData`, whose record arm is
+ * `{ [key: string]: WidgetData }`. TypeScript grants an implicit index signature
+ * to object type aliases but never to interfaces, so an interface here is
+ * unassignable at every erased payload boundary.
+ */
+// eslint-disable-next-line typescript/consistent-type-definitions -- Must be a type alias, not an interface: only aliases get the implicit index signature that makes this assignable to WidgetData on an endpoint payload. See above.
+export type MessageVariant = {
   modality: Modality;
   content: string; // text content or storage URL
   modelId:
@@ -120,14 +128,14 @@ export interface MessageVariant {
   creditCost?: number;
   createdAt: string; // ISO timestamp
   bridgeType?: BridgeType; // set for gap-fill variants so the UI can pick the right label/icon
-}
+};
 
 export type BridgeType = "stt" | "vision" | "translation" | "tts";
 
 /**
  * Resolve the chat model ID from already-loaded favorite + skill data.
  * Priority: favorite.modelSelection → skill variant.modelSelection → null.
- * without it being pre-computed on streamContext.
+ * without it being pre-computed on toolExecutionContext.
  */
 /**
  * Resolve chat model ID from already-loaded favorite config and skill variant.

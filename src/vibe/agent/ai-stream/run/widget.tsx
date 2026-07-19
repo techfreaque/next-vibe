@@ -10,12 +10,10 @@
 
 import { getFullPath } from "next-vibe/core/core-utils/path";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { Platform } from "next-vibe/core/definition/platform";
+import { platform } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import helpDefinitions from "next-vibe/help-tool/definition";
-import { apiClient } from "next-vibe/platforms/react/hooks/store";
-import { useApiMutation } from "next-vibe/platforms/react/hooks/use-api-mutation";
-import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
+import { Platform } from "next-vibe/platforms/platforms";
 import type { AutocompleteOption } from "next-vibe/ui/ui/autocomplete-field";
 import { AutocompleteField } from "next-vibe/ui/ui/autocomplete-field";
 import { Badge } from "next-vibe/ui/ui/badge";
@@ -52,13 +50,16 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { NumberFieldWidget } from "next-vibe/unified-ui/form-fields/number-field/widget";
-import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field/widget";
-import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
-import { TextareaFieldWidget } from "next-vibe/unified-ui/form-fields/textarea-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
-import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
+import { apiClient } from "next-vibe/unified-ui/hooks/store";
+import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
+import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/number-field/widget";
+import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
+import { TextareaFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/textarea-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import type { JSX } from "react";
 import React, {
   useCallback,
@@ -69,7 +70,6 @@ import React, {
 } from "react";
 
 import { InputHeightProvider } from "@/_pages/chat/lib/config/constants";
-import { platform } from "@/env/env-client";
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import { CortexModal } from "../../../agent/cortex/widget/cortex-modal";

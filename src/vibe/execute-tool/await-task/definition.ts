@@ -11,11 +11,11 @@ import { UserRole } from "next-vibe/identity/roles/enum";
 import { taskInputSchema } from "next-vibe/tasks/cron/db";
 import { CronTaskStatus, CronTaskStatusDB } from "next-vibe/tasks/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
-  customWidgetObject,
   requestField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { AWAIT_TASK_ALIAS } from "./constants";

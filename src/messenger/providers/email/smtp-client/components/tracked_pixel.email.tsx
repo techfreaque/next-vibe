@@ -4,9 +4,9 @@
  */
 
 import { Img } from "@react-email/components";
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { JSX } from "react";
 
-import { envClient } from "@/env/env-client";
 import { generateTrackingPixelUrl } from "@/leads/tracking/utils";
 
 import { type TrackingContext } from "./tracking_context.email";

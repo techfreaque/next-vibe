@@ -6,6 +6,7 @@ import type { Metadata, Viewport } from "next";
 import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import { cookies } from "next-vibe/ui/lib/headers";
@@ -18,7 +19,6 @@ import { Script } from "next-vibe/ui/ui/script";
 import { Scripts } from "next-vibe/ui/ui/scripts";
 import type { JSX, ReactNode } from "react";
 
-import { envClient } from "@/env/env-client";
 import { configScopedTranslation } from "@/env/i18n";
 
 import { scopedTranslation } from "./layout-i18n";

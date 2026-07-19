@@ -1,6 +1,7 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
 
+import { platform } from "next-vibe/core/env-client";
 import {
   removeRootCssVar,
   rootHasClass,
@@ -12,8 +13,6 @@ import { Div } from "next-vibe/ui/ui/div";
 import { P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 import { useCallback, useState } from "react";
-
-import { platform } from "@/env/env-client";
 
 interface PaletteColors {
   // Light mode

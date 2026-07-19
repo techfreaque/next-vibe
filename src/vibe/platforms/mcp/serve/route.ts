@@ -7,10 +7,10 @@ export const { tools } = endpointsHandler({
   endpoint: serveDefinition,
   [Methods.POST]: {
     handler: async ({ logger, locale, user }) =>
-      (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-        )
-      ).MCPServeRepository.startServer(logger, locale, user),
+      (await import("./repository")).MCPServeRepository.startServer(
+        logger,
+        locale,
+        user,
+      ),
   },
 });

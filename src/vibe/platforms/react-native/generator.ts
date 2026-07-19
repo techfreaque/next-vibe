@@ -3,12 +3,12 @@ import "server-only";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { findFilesByName } from "next-vibe/tooling/generators/shared/scanner";
+import { findFilesByName } from "next-vibe/core/generators/shared/scanner";
 import type {
   GeneratorContext,
   GeneratorResult,
-} from "next-vibe/tooling/generators/shared/shared-inputs";
+} from "next-vibe/core/generators/shared/shared-inputs";
+import { parseError } from "next-vibe/core/utils/parse-error";
 
 import { getSrcDir, getUiDir } from "@/env/paths";
 
@@ -30,9 +30,18 @@ function hasCustomDirective(filePath: string): boolean {
   }
 }
 
+/**
+ * Relative paths are used both as import specifiers and matched against "/"
+ * separators, so normalize away Windows backslashes at the boundary. A raw
+ * backslash would otherwise land inside an import string as an escape sequence.
+ */
+function toPosix(p: string): string {
+  return p.replaceAll("\\", "/");
+}
+
 function findFiles(dir: string, pattern: string): string[] {
   return findFilesByName(dir, pattern)
-    .map((r: { fullPath: string }) => relative(dir, r.fullPath))
+    .map((r: { fullPath: string }) => toPosix(relative(dir, r.fullPath)))
     .filter((p: string) => !p.includes("/i18n/"));
 }
 
@@ -50,7 +59,7 @@ function formatCall(fnName: string, importPath: string): string {
 
 function pageContent(relativePath: string, kind: "page" | "layout"): string {
   const importPath = `@/_pages${relativePath ? `/${relativePath}` : ""}/${kind}`;
-  const wrapperPath = `@/vibe/platforms/react-native/nextjs-compat-wrapper`;
+  const wrapperPath = `next-vibe/platforms/react-native/nextjs-compat-wrapper`;
   if (kind === "page") {
     return `import { createPageWrapperWithImport } from "${wrapperPath}";\n${formatCall("createPageWrapperWithImport", importPath)}\n`;
   }
@@ -75,7 +84,7 @@ export async function generate(
   mkdirSync(TARGET_DIR, { recursive: true });
 
   for (const pageFile of findFiles(SOURCE_DIR, "page.tsx")) {
-    const rel = dirname(pageFile);
+    const rel = toPosix(dirname(pageFile));
     const targetPath = join(TARGET_DIR, rel, "index.tsx");
     try {
       if (hasCustomDirective(targetPath)) {
@@ -95,7 +104,7 @@ export async function generate(
   }
 
   for (const layoutFile of findFiles(SOURCE_DIR, "layout.tsx")) {
-    const rel = dirname(layoutFile);
+    const rel = toPosix(dirname(layoutFile));
     const targetPath = join(TARGET_DIR, rel, "_layout.tsx");
     try {
       if (hasCustomDirective(targetPath)) {

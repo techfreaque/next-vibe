@@ -1,12 +1,12 @@
 "use client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { cn } from "next-vibe/core/utils/utils";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
 import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
 import { GitBranch } from "next-vibe/ui/ui/icons/GitBranch";
 import { Span } from "next-vibe/ui/ui/span";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 import { memo } from "react";
 

@@ -26,7 +26,7 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import type { ExtractScopedKeyType } from "next-vibe/core/i18n/core/static-types";
 import { UserRole } from "next-vibe/identity/roles/enum";
-import { objectField, requestField } from "next-vibe/unified-ui/_shared/utils";
+import { objectField, requestField } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import {

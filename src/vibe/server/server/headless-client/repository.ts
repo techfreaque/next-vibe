@@ -245,8 +245,8 @@ export class HeadlessClientRepository {
         const sqlPath = join(process.cwd(), "drizzle", `${entry.tag}.sql`);
         // Strip pgvector (not bundled in PGlite WASM) and rewrite vector columns to text.
         const sql = readFileSync(sqlPath, "utf8")
-          .replace(/CREATE EXTENSION IF NOT EXISTS vector[^;]*;/gi, "")
-          .replace(/vector\(\d+\)/gi, "text");
+          .replaceAll(/CREATE EXTENSION IF NOT EXISTS vector[^;]*;/gi, "")
+          .replaceAll(/vector\(\d+\)/gi, "text");
         logger.info(`[HeadlessClient] Applying migration: ${entry.tag}`);
         await client.exec(sql);
         await client.query(

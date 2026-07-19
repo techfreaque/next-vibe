@@ -24,4 +24,4 @@ loadEnvironment();
 // No fixture-mode env flag exists anymore: fixture record/replay activates
 // solely when a `fixtures` table row exists for the stream's threadId (seeded
 // by the harness per case, on every instance). The engine reads/bumps it by
-// threadId — the streamContext carried down the chain only supplies that id.
+// threadId — the toolExecutionContext carried down the chain only supplies that id.

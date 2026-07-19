@@ -21,7 +21,7 @@ export function scrollToPosition(
 }
 
 export function triggerPrint(): void {
-  process.stdout.write("\x1B[?1049h");
+  process.stdout.write("\u001B[?1049h");
 }
 
 export function getReferrer(): string {

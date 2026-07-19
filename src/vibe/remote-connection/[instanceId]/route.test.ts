@@ -17,7 +17,7 @@ import "server-only";
 
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { describe, expect, it } from "vitest";
 
 import definitions from "./definition";
@@ -36,7 +36,7 @@ describe("Remote Connection [instanceId]", () => {
 
   it("RC-GET1: GET returns isConnected=false when no row exists for instance", async () => {
     const result = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: definitions.GET,
       urlPathParams: { instanceId: NONEXISTENT_INSTANCE },
     });
@@ -55,7 +55,7 @@ describe("Remote Connection [instanceId]", () => {
 
   it("RC-GET2: GET is rejected for non-admin users", async () => {
     const result = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: definitions.GET,
       urlPathParams: { instanceId: NONEXISTENT_INSTANCE },
       user: customerUser,
@@ -68,7 +68,7 @@ describe("Remote Connection [instanceId]", () => {
 
   it("RC-PAT1: PATCH rejects customer setting admin-only fields", async () => {
     const result = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: definitions.PATCH,
       urlPathParams: { instanceId: NONEXISTENT_INSTANCE },
       data: {
@@ -91,7 +91,7 @@ describe("Remote Connection [instanceId]", () => {
 
   it("RC-PAT2: PATCH with no-op fields returns not-found (no row exists)", async () => {
     const result = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: definitions.PATCH,
       urlPathParams: { instanceId: NONEXISTENT_INSTANCE },
       data: {
@@ -113,7 +113,7 @@ describe("Remote Connection [instanceId]", () => {
 
   it("RC-DEL1: DELETE returns not-found for unknown instanceId", async () => {
     const result = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: definitions.DELETE,
       urlPathParams: { instanceId: NONEXISTENT_INSTANCE },
     });

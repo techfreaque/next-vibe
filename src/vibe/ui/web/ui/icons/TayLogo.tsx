@@ -1,6 +1,5 @@
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { JSX } from "react";
-
-import { envClient } from "@/env/env-client";
 
 /**
  * Tay Logo for Web

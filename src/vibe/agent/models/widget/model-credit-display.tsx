@@ -162,8 +162,8 @@ export function ModelCreditDisplay({
   const { t } = scopedTranslation.scopedT(locale);
   const model = findModel(modelId);
   const [isOpen, setIsOpen] = useState(false);
-  const openTimeoutRef = useRef<number | null>(null);
-  const closeTimeoutRef = useRef<number | null>(null);
+  const openTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Determine currency based on country
   const country = getCountryFromLocale(locale);

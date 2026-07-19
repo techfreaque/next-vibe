@@ -1,8 +1,8 @@
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import avatarEndpoints from "./definition";
@@ -20,7 +20,7 @@ describe("POST /user/private/me/avatar", () => {
     });
 
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: avatarEndpoints.POST,
       data: {
         fileUpload: {
@@ -45,7 +45,7 @@ describe("POST /user/private/me/avatar", () => {
     });
 
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: avatarEndpoints.POST,
       data: {
         fileUpload: {
@@ -68,7 +68,7 @@ describe("POST /user/private/me/avatar", () => {
     const file = new File(["data"], "avatar.jpg", { type: "image/jpeg" });
 
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: avatarEndpoints.POST,
       data: {
         fileUpload: { file },
@@ -111,7 +111,7 @@ describe("POST /user/private/me/avatar", () => {
     const file = new File([jpegBytes], "avatar.jpg", { type: "image/jpeg" });
 
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: avatarEndpoints.POST,
       data: {
         fileUpload: { file },
@@ -143,7 +143,7 @@ describe("DELETE /user/private/me/avatar", () => {
 
   it("rejects unauthenticated user with FORBIDDEN", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: avatarEndpoints.DELETE,
       user: {
         isPublic: true,
@@ -163,7 +163,7 @@ describe("DELETE /user/private/me/avatar", () => {
 
   it("deletes avatar (or no-ops if no avatar) and returns a message", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: avatarEndpoints.DELETE,
       user: adminUser,
     });

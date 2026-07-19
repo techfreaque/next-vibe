@@ -33,8 +33,8 @@ import { ChatFavoritesRepositoryClient } from "next-vibe/agent/skills/favorites/
 import leadCurrentReferralDefinition, {
   type LeadCurrentReferralGetResponseOutput,
 } from "@/referral/lead/current/definition";
-import { executeQuery } from "next-vibe/platforms/react/hooks/query-executor";
-import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
+import { executeQuery } from "next-vibe/unified-ui/hooks/query-executor";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetForm,
@@ -44,14 +44,14 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { AlertWidget } from "next-vibe/unified-ui/display-only/alert/widget";
-import { LinkWidget } from "next-vibe/unified-ui/display-only/link/widget";
-import { BooleanFieldWidget } from "next-vibe/unified-ui/form-fields/boolean-field/widget";
-import { EmailFieldWidget } from "next-vibe/unified-ui/form-fields/email-field/widget";
-import { PasswordFieldWidget } from "next-vibe/unified-ui/form-fields/password-field/widget";
-import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
-import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
+import { AlertWidget } from "next-vibe/unified-ui/widgets/display-only/alert/widget";
+import { LinkWidget } from "next-vibe/unified-ui/widgets/display-only/link/widget";
+import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
+import { EmailFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/email-field/widget";
+import { PasswordFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/password-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import { PasswordStrengthIndicator } from "./password-strength-indicator";
 
 import type definition from "../definition";

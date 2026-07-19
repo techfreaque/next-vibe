@@ -13,26 +13,28 @@ import {
   definitionLoader,
   type IDefinitionLoader,
 } from "next-vibe/core/definition/loader";
-import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { permissionsRegistry } from "next-vibe/core/permissions/registry";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
-import type { ContentBlock } from "next-vibe/core/route/response.schema";
+import {
+  definitionsRegistry,
+  type IDefinitionsRegistry,
+  permissionsRegistry,
+} from "next-vibe/core/route/definitions-registry";
+import type {
+  ContentBlock,
+  ResponseType,
+} from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import {
-  definitionsRegistry,
-  type IDefinitionsRegistry,
-} from "next-vibe/platforms/definitions-registry";
 import { scopedTranslation as mcpScopedTranslation } from "next-vibe/platforms/mcp/i18n";
-import { VIBE_CHECK_TOOL_NAMES } from "next-vibe/tooling/check/vibe-check/constants";
+import { Platform } from "next-vibe/platforms/platforms";
 import { McpResultFormatter } from "next-vibe/unified-ui/renderers/mcp/McpResultFormatter";
 
-import type { MCPContent } from "./types";
+import { VIBE_CHECK_TOOL_NAMES } from "../../tooling/check/constants";
 import type {
+  MCPContent,
   MCPExecutionContext,
   MCPToolCallResult,
   MCPToolMetadata,
@@ -191,7 +193,11 @@ export class MCPRegistry {
         locale: context.locale,
         logger,
         // no user context — UTC (dates not user-facing here)
-        streamContext: makeHeadlessContext(context.signal, undefined, "UTC"),
+        toolExecutionContext: makeHeadlessContext(
+          context.signal,
+          undefined,
+          "UTC",
+        ),
         platform: Platform.MCP,
       });
       if (!result.success) {
@@ -236,7 +242,11 @@ export class MCPRegistry {
     }
 
     // no user context — UTC (dates not user-facing here)
-    const streamContext = makeHeadlessContext(context.signal, undefined, "UTC");
+    const toolExecutionContext = makeHeadlessContext(
+      context.signal,
+      undefined,
+      "UTC",
+    );
 
     // Remote routing: check if a remote connection's routing rules match this request.
     // Same logic as CLI remote leg — if a target is found, route through runInProcess
@@ -265,7 +275,7 @@ export class MCPRegistry {
           user: context.user,
           locale: context.locale,
           logger,
-          streamContext,
+          toolExecutionContext,
           platform: Platform.MCP,
         });
         return await this.convertToMCPResult(
@@ -310,7 +320,7 @@ export class MCPRegistry {
         user: context.user,
         locale: context.locale,
         logger,
-        streamContext,
+        toolExecutionContext,
         platform: Platform.MCP,
         preloadedHandler: freshHandler,
       });

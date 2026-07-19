@@ -5,7 +5,7 @@
  */
 
 import { and, desc, eq, inArray, or, sql } from "drizzle-orm";
-import { rootlessStreamContext } from "next-vibe/agent/chat/config";
+import { rootlessToolExecutionContext } from "next-vibe/agent/chat/config";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -25,8 +25,10 @@ import type {
   CronTaskPutResponseOutput,
 } from "next-vibe/tasks/cron/[id]/definition";
 import type { CronTaskRecentExecution } from "next-vibe/tasks/cron/history/definition";
-import type { CronTaskItem } from "next-vibe/tasks/cron/tasks/definition";
-import type { CronTaskResponseType as CronTaskResponse } from "next-vibe/tasks/cron/tasks/definition";
+import type {
+  CronTaskItem,
+  CronTaskResponseType as CronTaskResponse,
+} from "next-vibe/tasks/cron/tasks/definition";
 import type { TasksT } from "next-vibe/tasks/i18n";
 import { scopedTranslation } from "next-vibe/tasks/i18n";
 import type { z } from "zod";
@@ -34,8 +36,7 @@ import type { z } from "zod";
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import { calculateNextExecutionTime } from "../cron-formatter";
-import { CronTaskStatus } from "../enum";
-import { TaskCategory, TaskCategoryDB } from "../enum";
+import { CronTaskStatus, TaskCategory, TaskCategoryDB } from "../enum";
 import type {
   CronTaskExecution,
   CronTaskRow,
@@ -340,7 +341,7 @@ export class CronTasksRepository {
               task.userId!,
               `/tasks/${task.id}.md`,
               embeddingContent,
-              rootlessStreamContext(),
+              rootlessToolExecutionContext(),
             );
           })
           .catch(() => {

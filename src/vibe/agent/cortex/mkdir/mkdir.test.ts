@@ -16,8 +16,8 @@ import { and, eq, like } from "drizzle-orm";
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { cortexNodes } from "../db";
@@ -48,7 +48,7 @@ async function listEntries(
   path: string,
 ): Promise<Array<{ entryPath: string; nodeType: string }> | null> {
   const res = await sendTestRequest({
-    streamContext: undefined,
+    toolExecutionContext: undefined,
     endpoint: listEndpoint.GET,
     data: { path },
     user,
@@ -82,7 +82,7 @@ describe("Cortex Mkdir E2E", () => {
     const path = `${TEST_PREFIX}/basic`;
 
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: mkdirEndpoint.POST,
       data: { path, createParents: true },
       user,
@@ -120,7 +120,7 @@ describe("Cortex Mkdir E2E", () => {
     const c = `${b}/c`;
 
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: mkdirEndpoint.POST,
       data: { path: c, createParents: true },
       user,
@@ -161,7 +161,7 @@ describe("Cortex Mkdir E2E", () => {
     const path = `${TEST_PREFIX}/views/kanban-board`;
 
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: mkdirEndpoint.POST,
       data: { path, viewType: CortexViewType.KANBAN, createParents: true },
       user,
@@ -195,7 +195,7 @@ describe("Cortex Mkdir E2E", () => {
     const path = `${TEST_PREFIX}/views-update`;
     // Create without a view.
     const created = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: mkdirEndpoint.POST,
       data: { path, createParents: true },
       user,
@@ -204,7 +204,7 @@ describe("Cortex Mkdir E2E", () => {
 
     // mkdir again WITH a viewType → upserts the view onto the existing dir.
     const withView = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: mkdirEndpoint.POST,
       data: { path, viewType: CortexViewType.WIKI, createParents: true },
       user,
@@ -219,7 +219,7 @@ describe("Cortex Mkdir E2E", () => {
 
     // mkdir again WITHOUT a viewType → existing view is preserved, not nulled.
     const noView = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: mkdirEndpoint.POST,
       data: { path, createParents: true },
       user,
@@ -237,7 +237,7 @@ describe("Cortex Mkdir E2E", () => {
     const path = `${TEST_PREFIX}/idempotent`;
 
     const first = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: mkdirEndpoint.POST,
       data: { path, createParents: true },
       user,
@@ -253,7 +253,7 @@ describe("Cortex Mkdir E2E", () => {
 
     // Repeat — repository returns success with created=false when path exists.
     const second = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: mkdirEndpoint.POST,
       data: { path, createParents: true },
       user,
@@ -276,7 +276,7 @@ describe("Cortex Mkdir E2E", () => {
     const path = `${TEST_PREFIX}/no-parents/leaf`;
 
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: mkdirEndpoint.POST,
       data: { path, createParents: false },
       user,
@@ -303,7 +303,7 @@ describe("Cortex Mkdir E2E", () => {
   it("mkdir under a read-only virtual mount (/threads) is rejected with FORBIDDEN", async () => {
     // /threads is a virtual mount that is NOT writable → mkdir is forbidden.
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: mkdirEndpoint.POST,
       data: { path: "/threads/new-folder", createParents: true },
       user,
@@ -321,7 +321,7 @@ describe("Cortex Mkdir E2E", () => {
     const dir = `${TEST_PREFIX}/round-trip`;
 
     const mk = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: mkdirEndpoint.POST,
       data: { path: dir, createParents: true },
       user,
@@ -336,7 +336,7 @@ describe("Cortex Mkdir E2E", () => {
     const filePath = `${dir}/note.md`;
     const content = "# Inside the new dir\n\nStay sharp.";
     const write = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: writeEndpoint.POST,
       data: { path: filePath, content, createParents: false },
       user,
@@ -350,7 +350,7 @@ describe("Cortex Mkdir E2E", () => {
     }
 
     const read = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: readEndpoint.GET,
       data: { path: filePath },
       user,

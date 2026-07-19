@@ -12,7 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: evaluateScriptEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger, platform, streamContext }) =>
+    handler: ({ data, t, logger, platform, toolExecutionContext }) =>
       BrowserSharedRepository.executeEvaluateScript(
         {
           toolName: BrowserTool.EVALUATE_SCRIPT,
@@ -25,7 +25,7 @@ export const { POST, tools } = endpointsHandler({
         t,
         logger,
         platform,
-        streamContext.threadId,
+        toolExecutionContext.threadId,
       ),
   },
 });

@@ -1,6 +1,5 @@
 "use client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { cn } from "next-vibe/core/utils/utils";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -9,6 +8,7 @@ import { Copy } from "next-vibe/ui/ui/icons/Copy";
 import { FileText } from "next-vibe/ui/ui/icons/FileText";
 import { Markdown } from "next-vibe/ui/ui/markdown";
 import { Span } from "next-vibe/ui/ui/span";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 import { useCallback, useState } from "react";
 

@@ -6,6 +6,7 @@
 import "server-only";
 
 import { and, count, desc, eq, gte, inArray, lt, sql } from "drizzle-orm";
+import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { CountryLanguageValues } from "next-vibe/core/i18n/core/config";
 import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
@@ -36,7 +37,6 @@ import { getCronFrequencyMinutes } from "next-vibe/tasks/cron-formatter";
 import { CronTaskStatus } from "next-vibe/tasks/enum";
 import { isValidEnumValue } from "next-vibe/unified-ui/_shared/enum";
 
-import { env } from "@/env/env";
 import { MessageStatus } from "@/messenger/messages/enum";
 
 import { campaignStarterConfigs } from "../campaign-starter/db";
@@ -232,7 +232,7 @@ export class CampaignStatsRepository {
 
       // ── Weekly quota progress ─────────────────────────────────────────────
       const environment =
-        env.NODE_ENV === Environment.PRODUCTION
+        coreEnv.NODE_ENV === Environment.PRODUCTION
           ? Environment.PRODUCTION
           : Environment.DEVELOPMENT;
 

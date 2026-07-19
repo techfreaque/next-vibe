@@ -1,14 +1,13 @@
 export const dynamic = "force-dynamic";
 
 import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { redirect } from "next-vibe/ui/lib/redirect";
-
-import { env } from "@/env/env";
 
 interface ChatPageProps {
   params: Promise<{
@@ -26,7 +25,7 @@ export async function tanstackLoader({
   const { locale } = await params;
 
   // In local mode, go straight to chat
-  if (env.NEXT_PUBLIC_LOCAL_MODE) {
+  if (coreEnv.NEXT_PUBLIC_LOCAL_MODE) {
     const logger = createEndpointLogger(false, locale);
     const userResponse = await UserRepository.getUserByAuth(
       {

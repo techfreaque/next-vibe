@@ -7,6 +7,7 @@ import {
   getAvailableProviderCount,
   type ModelCountsByContentLevel,
 } from "next-vibe/agent/models/all-models";
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import { UserRole } from "next-vibe/identity/roles/enum";
@@ -17,7 +18,6 @@ import { Div } from "next-vibe/ui/ui/div";
 import { P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 
-import { envClient } from "@/env/env-client";
 import { configScopedTranslation } from "@/env/i18n";
 
 import { HomeClient } from "./_components/home-client";

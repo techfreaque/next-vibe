@@ -3,6 +3,7 @@
  *
  * This file exports the middleware system for Next.js applications.
  */
+import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Environment } from "next-vibe/env/env-util";
 import {
@@ -25,7 +26,6 @@ import {
   CSRF_TOKEN_COOKIE_NAME,
   LEAD_ID_COOKIE_NAME,
 } from "@/env/constants";
-import { env } from "@/env/env";
 
 import { extractLocaleFromPath, shouldSkipPath } from "./utils";
 
@@ -66,14 +66,14 @@ function stampCsrfCookie(request: NextRequest, response: NextResponse): void {
   const token =
     existing && existing.length >= 32
       ? existing
-      : crypto.randomUUID().replace(/-/g, "");
+      : crypto.randomUUID().replaceAll("-", "");
 
   response.cookies.set({
     name: CSRF_TOKEN_COOKIE_NAME,
     value: token,
     httpOnly: false, // Must be readable by JS for the double-submit pattern
     path: "/",
-    secure: env.NODE_ENV === Environment.PRODUCTION,
+    secure: coreEnv.NODE_ENV === Environment.PRODUCTION,
     sameSite: "strict" as const,
     maxAge: 24 * 60 * 60, // 1 day - refreshed on every request
   });
@@ -124,7 +124,7 @@ export async function middleware(
   // Step 1: Strip bare "/en/" prefix hallucinated by AI tools in local testing.
   // Redirect to the path without it so normal locale detection takes over.
   // Skipped in production - this only happens during local dev/testing.
-  if (env.NODE_ENV !== Environment.PRODUCTION) {
+  if (coreEnv.NODE_ENV !== Environment.PRODUCTION) {
     const pathParts = path.split("/").filter(Boolean);
     const isApiRoute = pathParts[0] === "api";
     const bareSegment = isApiRoute ? pathParts[1] : pathParts[0];
@@ -191,7 +191,7 @@ export async function middleware(
             value: payload.leadId,
             httpOnly: true,
             path: "/",
-            secure: env.NODE_ENV === Environment.PRODUCTION,
+            secure: coreEnv.NODE_ENV === Environment.PRODUCTION,
             sameSite: "none" as const, // Required for cross-origin iframes
             maxAge: 365 * 24 * 60 * 60 * 10,
           });
@@ -202,7 +202,7 @@ export async function middleware(
             value: payload.authToken,
             httpOnly: true,
             path: "/",
-            secure: env.NODE_ENV === Environment.PRODUCTION,
+            secure: coreEnv.NODE_ENV === Environment.PRODUCTION,
             sameSite: "none" as const, // Required for cross-origin iframes
             maxAge: 30 * 24 * 60 * 60, // 30 days
           });
@@ -259,7 +259,7 @@ export async function middleware(
             value: newLeadId,
             httpOnly: true,
             path: "/",
-            secure: env.NODE_ENV === Environment.PRODUCTION,
+            secure: coreEnv.NODE_ENV === Environment.PRODUCTION,
             sameSite: "lax" as const,
             maxAge: 365 * 24 * 60 * 60 * 10,
           });
@@ -301,7 +301,7 @@ export async function middleware(
         value: urlLeadId,
         httpOnly: true,
         path: "/",
-        secure: env.NODE_ENV === Environment.PRODUCTION,
+        secure: coreEnv.NODE_ENV === Environment.PRODUCTION,
         sameSite: "lax" as const,
         maxAge: 365 * 24 * 60 * 60 * 10,
       });

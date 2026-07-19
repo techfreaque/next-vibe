@@ -4,7 +4,6 @@
  */
 
 "use client";
-import { cn } from "next-vibe/core/utils/utils";
 import { openInNewTab } from "next-vibe/ui/lib/location";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -17,13 +16,14 @@ import { MousePointerClick } from "next-vibe/ui/ui/icons/MousePointerClick";
 import { User } from "next-vibe/ui/ui/icons/User";
 import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
 import { Span } from "next-vibe/ui/ui/span";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetContext,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import React, { useCallback } from "react";
 
 import type definition from "./definition";
@@ -87,7 +87,7 @@ export function LeadEngagementTrackingContainer({
   }, [navigate]);
 
   const engagementTypeLabel = data?.responseEngagementType
-    ? String(data.responseEngagementType).replace(/_/g, " ")
+    ? String(data.responseEngagementType).replaceAll("_", " ")
     : null;
 
   const createdAtFormatted = data?.createdAt

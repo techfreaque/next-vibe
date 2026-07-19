@@ -21,22 +21,22 @@ There is a convention to group data sources under a `data-sources/` folder when 
 ```typescript
 // data-sources/cron-executions-failed/definition.ts
 
-import { createEndpoint } from "@/system/unified-interface/shared/endpoints/definition/create";
-import { objectField } from "@/system/unified-interface/shared/field/utils";
+import { createEndpoint } from "next-vibe/core/definition/create";
+import { objectField } from "next-vibe/unified-ui/_shared/utils";
 import {
   EndpointErrorTypes,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/system/unified-interface/shared/types/enums";
+} from "next-vibe/core/definition/enums";
 import {
   lookbackRequestField,
   nodeMetaResponseField,
   rangeRequestField,
   resolutionRequestField,
   timeSeriesResponseField,
-} from "@/system/unified-interface/vibe-sense/shared/fields";
-import { UserRole } from "@/user/user-roles/enum";
+} from "next-vibe/dataflow/shared/fields";
+import { UserRole } from "next-vibe/identity/roles/enum";
 
 import { CRON_EXECUTIONS_FAILED_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
@@ -189,7 +189,7 @@ Data source repositories follow the standard pattern - return `ResponseType<T>`,
 
 import "server-only";
 
-import type { EndpointLogger } from "@/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import { ResponseType, success, fail } from "@/shared/types/endpoint-types";
 import type { NodeMeta, TimeSeries } from "../../shared/fields";
 

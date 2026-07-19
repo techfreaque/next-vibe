@@ -14,14 +14,14 @@ import endpoints from "./definition";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: async ({ data, user, locale, logger, t, streamContext }) =>
+    handler: async ({ data, user, locale, logger, t, toolExecutionContext }) =>
       AiStreamRepository.runAndWait({
         data,
         user,
         locale,
         logger,
         t,
-        streamContext,
+        toolExecutionContext,
       }),
   },
 });

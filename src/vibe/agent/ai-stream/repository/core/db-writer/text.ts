@@ -187,7 +187,11 @@ export async function emitContentDone(
     w.assistantEmbedPromise = (async (): Promise<void> => {
       const { embedAssistantMessageRow } =
         await import("next-vibe/agent/cortex/embeddings/message-embed");
-      await embedAssistantMessageRow(messageId, content, w.streamContext);
+      await embedAssistantMessageRow(
+        messageId,
+        content,
+        w.toolExecutionContext,
+      );
     })();
   }
 }

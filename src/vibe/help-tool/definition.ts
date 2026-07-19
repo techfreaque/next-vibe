@@ -17,16 +17,16 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
-import { Platform } from "next-vibe/core/definition/platform";
 import { WidgetDataSchema } from "next-vibe/core/utils/json";
 import { scopedTranslation } from "next-vibe/help-tool/i18n";
 import { UserPermissionRole, UserRole } from "next-vibe/identity/roles/enum";
+import { Platform } from "next-vibe/platforms/platforms";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
-  customWidgetObject,
   requestField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { TOOL_HELP_ALIAS } from "./constants";
@@ -116,6 +116,25 @@ const { GET } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // === REQUEST FIELDS ===
+      interactive: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "get.fields.interactive.label" as const,
+        description: "get.fields.interactive.description" as const,
+        schema: z.boolean().optional(),
+        hiddenForPlatforms: [
+          Platform.AI,
+          Platform.MCP,
+          Platform.CRON,
+          Platform.REMOTE_SKILL,
+          Platform.TRPC,
+          Platform.NEXT_PAGE,
+          Platform.NEXT_API,
+          Platform.ELECTRON,
+          Platform.FRAME,
+        ],
+      }),
+
       query: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,

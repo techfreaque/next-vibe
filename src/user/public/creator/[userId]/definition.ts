@@ -5,13 +5,8 @@
 import { z } from "zod";
 
 import { createEndpoint } from "next-vibe/core/definition/create";
-import {
-  customWidgetObject,
-  objectField,
-  requestUrlPathParamsField,
-  responseArrayField,
-  responseField,
-} from "next-vibe/unified-ui/_shared/utils";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
+import { objectField, requestUrlPathParamsField, responseArrayField, responseField } from "next-vibe/unified-ui/_shared/utils-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,

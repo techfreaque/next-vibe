@@ -5,7 +5,7 @@
 import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 
-import { rootlessStreamContext } from "next-vibe/agent/chat/config";
+import { rootlessToolExecutionContext } from "next-vibe/agent/chat/config";
 import { endpointToUrlSegment } from "next-vibe/core/core-utils/path";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { Methods } from "next-vibe/core/definition/enums";
@@ -17,7 +17,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { ATLAS_PID_FILE, readPidFilePort } from "next-vibe/server/server/pid";
-import { scopedTranslation } from "next-vibe/tooling/check/i18n";
+import { scopedTranslation } from "next-vibe/tooling/testing/test/i18n";
 
 import {
   cdpNavigatePage,
@@ -104,7 +104,7 @@ export async function sendBrowserTestRequest<
     const port = readPidFilePort(ATLAS_PID_FILE);
     if (!port) {
       return fail({
-        message: t("testing.test.errors.internal.title"),
+        message: t("errors.internal.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: "Atlas dev server not running — start with vibe dev",
@@ -140,7 +140,7 @@ export async function sendBrowserTestRequest<
         endpoint: def,
         data: input,
         user: testUser,
-        streamContext: rootlessStreamContext(),
+        toolExecutionContext: rootlessToolExecutionContext(),
       };
       return sendTestRequest(
         args as Parameters<typeof sendTestRequest>[0] as SendArgs,
@@ -174,7 +174,7 @@ export async function sendBrowserTestRequest<
       });
       if (!blankResult.success) {
         return fail({
-          message: t("testing.test.errors.internal.title"),
+          message: t("errors.internal.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             error: `Browser open failed: ${blankResult.message}`,
@@ -277,7 +277,7 @@ export async function sendBrowserTestRequest<
         });
         if (!fillResult.success) {
           return fail({
-            message: t("testing.test.errors.internal.title"),
+            message: t("errors.internal.title"),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: {
               error: `Browser fill failed: ${fillResult.message}`,
@@ -320,7 +320,7 @@ export async function sendBrowserTestRequest<
         });
         if (!clickResult.success) {
           return fail({
-            message: t("testing.test.errors.internal.title"),
+            message: t("errors.internal.title"),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: {
               error: `Browser click submit failed: ${clickResult.message}`,
@@ -374,7 +374,7 @@ export async function sendBrowserTestRequest<
         });
         if (!evalResult.success) {
           return fail({
-            message: t("testing.test.errors.internal.title"),
+            message: t("errors.internal.title"),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: {
               error: `evaluate-script failed: ${evalResult.message}`,
@@ -403,7 +403,7 @@ export async function sendBrowserTestRequest<
 
       if (!rawJson) {
         return fail({
-          message: t("testing.test.errors.internal.title"),
+          message: t("errors.internal.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             error: `Mutation result not available within ${responseTimeoutMs}ms`,
@@ -424,7 +424,7 @@ export async function sendBrowserTestRequest<
         >;
       } catch {
         return fail({
-          message: t("testing.test.errors.internal.title"),
+          message: t("errors.internal.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             error: `Could not parse cache JSON: ${rawJson.slice(0, 400)}`,
@@ -434,7 +434,7 @@ export async function sendBrowserTestRequest<
 
       if (cachedResponse === null) {
         return fail({
-          message: t("testing.test.errors.notFound.title"),
+          message: t("errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: {
             error: `Mutation cache empty — response never loaded`,
@@ -451,7 +451,7 @@ export async function sendBrowserTestRequest<
   } catch (error) {
     const { t: t2 } = scopedTranslation.scopedT(defaultLocale);
     return fail({
-      message: t2("testing.test.errors.internal.title"),
+      message: t2("errors.internal.title"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
       messageParams: { error: parseError(error).message },
     });

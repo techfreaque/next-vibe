@@ -117,7 +117,7 @@ export async function installDatabase(
     );
     const applyResult = await sshExecCommand(
       client,
-      `echo '${manifest.replace(/'/g, "'\\''")}' | k3s kubectl apply -f -`,
+      `echo '${manifest.replaceAll("'", "'\\''")}' | k3s kubectl apply -f -`,
       30000,
     );
 

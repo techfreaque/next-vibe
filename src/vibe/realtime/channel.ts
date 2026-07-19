@@ -23,7 +23,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import {
   buildKey,
   type CacheKeyRequestInput,
-} from "next-vibe/platforms/react/hooks/query-key-builder";
+} from "next-vibe/unified-ui/hooks/query-key-builder";
 
 /**
  * Build the shared (resource-kind) WS channel key for an endpoint instance.

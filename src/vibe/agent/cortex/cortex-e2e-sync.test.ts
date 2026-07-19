@@ -37,14 +37,12 @@ import {
   triggerHermesPull,
 } from "next-vibe/agent/ai-stream/testing/remote-setup";
 import { DefaultFolderId } from "next-vibe/agent/chat/config";
-import {
-  ChatMessageRole,
-  ThreadStatus,
-} from "next-vibe/agent/chat/enum";
+import { ChatMessageRole, ThreadStatus } from "next-vibe/agent/chat/enum";
 import { SkillCategory } from "next-vibe/agent/skills/enum";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { identityEnv } from "next-vibe/identity/env";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import remoteConnectionDefinitions from "next-vibe/remote-connection/[instanceId]/definition";
 import remoteConnectDefinitions from "next-vibe/remote-connection/connect/definition";
@@ -57,11 +55,9 @@ import {
   collectCursors,
   ensureProvidersRegistered,
 } from "next-vibe/remote-connection/sync/provider";
-import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
-import { env } from "@/env/env";
 
 import { cortexNodes } from "./db";
 import { CortexNodeType } from "./enum";
@@ -121,11 +117,11 @@ describe("E2E Sync: documents provider (cross-instance CRUD)", () => {
   const D_NESTED_CONTENT = `# Nested Document\n\nSubfolder sync test.\nMarker: ${RUN_ID}`;
 
   beforeAll(async () => {
-    const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+    const resolved = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
       expect(
         false,
-        `[E2E-doc] Dev user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
+        `[E2E-doc] Dev user ${identityEnv.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
       ).toBe(true);
       return;
     }
@@ -142,7 +138,7 @@ describe("E2E Sync: documents provider (cross-instance CRUD)", () => {
 
     try {
       await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectionDefinitions.DELETE,
         urlPathParams: { instanceId: HERMES_INSTANCE_ID },
         user: devUser,
@@ -150,7 +146,7 @@ describe("E2E Sync: documents provider (cross-instance CRUD)", () => {
       const preCleanProdUserId = await resolveProdUserId();
       if (preCleanProdUserId) {
         await sendTestRequest({
-          streamContext: undefined,
+          toolExecutionContext: undefined,
           endpoint: remoteConnectionDefinitions.DELETE,
           urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
           user: devUser,
@@ -158,12 +154,12 @@ describe("E2E Sync: documents provider (cross-instance CRUD)", () => {
         });
       }
       const connectResult = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectDefinitions.POST,
         data: {
           remoteUrl: remoteUrl!,
-          email: env.VIBE_ADMIN_USER_EMAIL,
-          password: env.VIBE_ADMIN_USER_PASSWORD,
+          email: identityEnv.VIBE_ADMIN_USER_EMAIL,
+          password: identityEnv.VIBE_ADMIN_USER_PASSWORD,
           // Cortex e2e exercises memory/document mirroring — full sync scope.
           syncScope: {
             memories: true,
@@ -216,7 +212,7 @@ describe("E2E Sync: documents provider (cross-instance CRUD)", () => {
     }
     if (devUser) {
       await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectionDefinitions.DELETE,
         urlPathParams: { instanceId: HERMES_INSTANCE_ID },
         user: devUser,
@@ -224,7 +220,7 @@ describe("E2E Sync: documents provider (cross-instance CRUD)", () => {
     }
     if (prodUserId) {
       await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectionDefinitions.DELETE,
         urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
         user: devUser,
@@ -247,7 +243,7 @@ describe("E2E Sync: documents provider (cross-instance CRUD)", () => {
 
       const { default: cortexWriteDef } = await import("./write/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: cortexWriteDef.POST,
         data: { path: D_FILE_PATH, content: D_CONTENT, createParents: true },
         instanceId: HERMES_INSTANCE_ID,
@@ -287,7 +283,7 @@ describe("E2E Sync: documents provider (cross-instance CRUD)", () => {
 
       const { default: cortexWriteDef } = await import("./write/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: cortexWriteDef.POST,
         data: {
           path: D_NESTED_PATH,
@@ -331,7 +327,7 @@ describe("E2E Sync: documents provider (cross-instance CRUD)", () => {
       const updatedContent = `${D_CONTENT}\n\n## Updated\n\nAdded by D3 test.`;
       const { default: cortexWriteDef } = await import("./write/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: cortexWriteDef.POST,
         data: {
           path: D_FILE_PATH,
@@ -388,7 +384,7 @@ describe("E2E Sync: documents provider (cross-instance CRUD)", () => {
 
       const { default: cortexDeleteDef } = await import("./delete/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: cortexDeleteDef.DELETE,
         data: { path: D_FILE_PATH, recursive: false },
         instanceId: HERMES_INSTANCE_ID,
@@ -431,7 +427,7 @@ describe("E2E Sync: documents provider (cross-instance CRUD)", () => {
       // Write to hermes via runInProcessTyped — hermes writes to its DB and WS-pushes to atlas
       const { default: cortexWriteDef } = await import("./write/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: cortexWriteDef.POST,
         data: {
           path: reversePath,
@@ -490,7 +486,7 @@ describe("E2E Sync: documents provider (cross-instance CRUD)", () => {
       // Step 1: Write "older" version to hermes via runInProcessTyped (gets current timestamp on hermes)
       const { default: cortexWriteDef } = await import("./write/definition");
       const hermesResult = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: cortexWriteDef.POST,
         data: {
           path: biPath,
@@ -572,11 +568,11 @@ describe("E2E Sync: documents provider (cross-instance CRUD, reverse-ws)", () =>
   const D_NESTED_CONTENT = `# Nested Document\n\nSubfolder sync test.\nMarker: ${RUN_ID}`;
 
   beforeAll(async () => {
-    const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+    const resolved = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
       expect(
         false,
-        `[E2E-doc-rws] Dev user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
+        `[E2E-doc-rws] Dev user ${identityEnv.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
       ).toBe(true);
       return;
     }
@@ -593,7 +589,7 @@ describe("E2E Sync: documents provider (cross-instance CRUD, reverse-ws)", () =>
 
     try {
       await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectionDefinitions.DELETE,
         urlPathParams: { instanceId: HERMES_INSTANCE_ID },
         user: devUser,
@@ -601,7 +597,7 @@ describe("E2E Sync: documents provider (cross-instance CRUD, reverse-ws)", () =>
       const preCleanProdUserId = await resolveProdUserId();
       if (preCleanProdUserId) {
         await sendTestRequest({
-          streamContext: undefined,
+          toolExecutionContext: undefined,
           endpoint: remoteConnectionDefinitions.DELETE,
           urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
           user: devUser,
@@ -609,12 +605,12 @@ describe("E2E Sync: documents provider (cross-instance CRUD, reverse-ws)", () =>
         });
       }
       const connectResult = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectDefinitions.POST,
         data: {
           remoteUrl: remoteUrl!,
-          email: env.VIBE_ADMIN_USER_EMAIL,
-          password: env.VIBE_ADMIN_USER_PASSWORD,
+          email: identityEnv.VIBE_ADMIN_USER_EMAIL,
+          password: identityEnv.VIBE_ADMIN_USER_PASSWORD,
           // Cortex e2e exercises memory/document mirroring — full sync scope.
           syncScope: {
             memories: true,
@@ -688,7 +684,7 @@ describe("E2E Sync: documents provider (cross-instance CRUD, reverse-ws)", () =>
     }
     if (devUser) {
       await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectionDefinitions.DELETE,
         urlPathParams: { instanceId: HERMES_INSTANCE_ID },
         user: devUser,
@@ -696,7 +692,7 @@ describe("E2E Sync: documents provider (cross-instance CRUD, reverse-ws)", () =>
     }
     if (prodUserId) {
       await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectionDefinitions.DELETE,
         urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
         user: devUser,
@@ -719,7 +715,7 @@ describe("E2E Sync: documents provider (cross-instance CRUD, reverse-ws)", () =>
 
       const { default: cortexWriteDef } = await import("./write/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: cortexWriteDef.POST,
         data: { path: D_FILE_PATH, content: D_CONTENT, createParents: true },
         instanceId: HERMES_INSTANCE_ID,
@@ -759,7 +755,7 @@ describe("E2E Sync: documents provider (cross-instance CRUD, reverse-ws)", () =>
 
       const { default: cortexWriteDef } = await import("./write/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: cortexWriteDef.POST,
         data: {
           path: D_NESTED_PATH,
@@ -803,7 +799,7 @@ describe("E2E Sync: documents provider (cross-instance CRUD, reverse-ws)", () =>
       const updatedContent = `${D_CONTENT}\n\n## Updated\n\nAdded by D3-rws test.`;
       const { default: cortexWriteDef } = await import("./write/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: cortexWriteDef.POST,
         data: {
           path: D_FILE_PATH,
@@ -859,7 +855,7 @@ describe("E2E Sync: documents provider (cross-instance CRUD, reverse-ws)", () =>
 
       const { default: cortexDeleteDef } = await import("./delete/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: cortexDeleteDef.DELETE,
         data: { path: D_FILE_PATH, recursive: false },
         instanceId: HERMES_INSTANCE_ID,
@@ -899,11 +895,11 @@ describe("E2E Sync: memories provider (cross-instance CRUD)", () => {
   const M_SUB_CONTENT = `# Subfolder Memory\n\nNested memory test.\nMarker: ${RUN_ID}`;
 
   beforeAll(async () => {
-    const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+    const resolved = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
       expect(
         false,
-        `[E2E-mem] Dev user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
+        `[E2E-mem] Dev user ${identityEnv.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
       ).toBe(true);
       return;
     }
@@ -920,7 +916,7 @@ describe("E2E Sync: memories provider (cross-instance CRUD)", () => {
 
     try {
       await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectionDefinitions.DELETE,
         urlPathParams: { instanceId: HERMES_INSTANCE_ID },
         user: devUser,
@@ -928,7 +924,7 @@ describe("E2E Sync: memories provider (cross-instance CRUD)", () => {
       const preCleanProdUserId = await resolveProdUserId();
       if (preCleanProdUserId) {
         await sendTestRequest({
-          streamContext: undefined,
+          toolExecutionContext: undefined,
           endpoint: remoteConnectionDefinitions.DELETE,
           urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
           user: devUser,
@@ -936,12 +932,12 @@ describe("E2E Sync: memories provider (cross-instance CRUD)", () => {
         });
       }
       const connectResult = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectDefinitions.POST,
         data: {
           remoteUrl: remoteUrl!,
-          email: env.VIBE_ADMIN_USER_EMAIL,
-          password: env.VIBE_ADMIN_USER_PASSWORD,
+          email: identityEnv.VIBE_ADMIN_USER_EMAIL,
+          password: identityEnv.VIBE_ADMIN_USER_PASSWORD,
           // Cortex e2e exercises memory/document mirroring — full sync scope.
           syncScope: {
             memories: true,
@@ -992,7 +988,7 @@ describe("E2E Sync: memories provider (cross-instance CRUD)", () => {
     }
     if (devUser) {
       await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectionDefinitions.DELETE,
         urlPathParams: { instanceId: HERMES_INSTANCE_ID },
         user: devUser,
@@ -1000,7 +996,7 @@ describe("E2E Sync: memories provider (cross-instance CRUD)", () => {
     }
     if (prodUserId) {
       await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectionDefinitions.DELETE,
         urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
         user: devUser,
@@ -1023,7 +1019,7 @@ describe("E2E Sync: memories provider (cross-instance CRUD)", () => {
 
       const { default: cortexWriteDef } = await import("./write/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: cortexWriteDef.POST,
         data: { path: M_FILE_PATH, content: M_CONTENT, createParents: true },
         instanceId: HERMES_INSTANCE_ID,
@@ -1062,7 +1058,7 @@ describe("E2E Sync: memories provider (cross-instance CRUD)", () => {
 
       const { default: cortexWriteDef } = await import("./write/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: cortexWriteDef.POST,
         data: {
           path: M_SUBFOLDER_PATH,
@@ -1106,7 +1102,7 @@ describe("E2E Sync: memories provider (cross-instance CRUD)", () => {
       const updatedContent = `${M_CONTENT}\n\n## Updated by M3`;
       const { default: cortexWriteDef } = await import("./write/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: cortexWriteDef.POST,
         data: {
           path: M_FILE_PATH,
@@ -1163,7 +1159,7 @@ describe("E2E Sync: memories provider (cross-instance CRUD)", () => {
 
       const { default: cortexDeleteDef } = await import("./delete/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: cortexDeleteDef.DELETE,
         data: { path: M_FILE_PATH, recursive: false },
         instanceId: HERMES_INSTANCE_ID,
@@ -1206,7 +1202,7 @@ describe("E2E Sync: memories provider (cross-instance CRUD)", () => {
       // Write to hermes via runInProcessTyped — hermes writes to its DB and WS-pushes to atlas
       const { default: cortexWriteDef } = await import("./write/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: cortexWriteDef.POST,
         data: {
           path: reversePath,
@@ -1335,11 +1331,11 @@ describe("E2E Sync: memories provider (cross-instance CRUD, reverse-ws)", () => 
   const M_SUB_CONTENT = `# Subfolder Memory\n\nNested memory test.\nMarker: ${RUN_ID}`;
 
   beforeAll(async () => {
-    const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+    const resolved = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
       expect(
         false,
-        `[E2E-mem-rws] Dev user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
+        `[E2E-mem-rws] Dev user ${identityEnv.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
       ).toBe(true);
       return;
     }
@@ -1356,7 +1352,7 @@ describe("E2E Sync: memories provider (cross-instance CRUD, reverse-ws)", () => 
 
     try {
       await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectionDefinitions.DELETE,
         urlPathParams: { instanceId: HERMES_INSTANCE_ID },
         user: devUser,
@@ -1364,7 +1360,7 @@ describe("E2E Sync: memories provider (cross-instance CRUD, reverse-ws)", () => 
       const preCleanProdUserId = await resolveProdUserId();
       if (preCleanProdUserId) {
         await sendTestRequest({
-          streamContext: undefined,
+          toolExecutionContext: undefined,
           endpoint: remoteConnectionDefinitions.DELETE,
           urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
           user: devUser,
@@ -1372,12 +1368,12 @@ describe("E2E Sync: memories provider (cross-instance CRUD, reverse-ws)", () => 
         });
       }
       const connectResult = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectDefinitions.POST,
         data: {
           remoteUrl: remoteUrl!,
-          email: env.VIBE_ADMIN_USER_EMAIL,
-          password: env.VIBE_ADMIN_USER_PASSWORD,
+          email: identityEnv.VIBE_ADMIN_USER_EMAIL,
+          password: identityEnv.VIBE_ADMIN_USER_PASSWORD,
           // Cortex e2e exercises memory/document mirroring — full sync scope.
           syncScope: {
             memories: true,
@@ -1449,7 +1445,7 @@ describe("E2E Sync: memories provider (cross-instance CRUD, reverse-ws)", () => 
     }
     if (devUser) {
       await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectionDefinitions.DELETE,
         urlPathParams: { instanceId: HERMES_INSTANCE_ID },
         user: devUser,
@@ -1457,7 +1453,7 @@ describe("E2E Sync: memories provider (cross-instance CRUD, reverse-ws)", () => 
     }
     if (prodUserId) {
       await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectionDefinitions.DELETE,
         urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
         user: devUser,
@@ -1480,7 +1476,7 @@ describe("E2E Sync: memories provider (cross-instance CRUD, reverse-ws)", () => 
 
       const { default: cortexWriteDef } = await import("./write/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: cortexWriteDef.POST,
         data: { path: M_FILE_PATH, content: M_CONTENT, createParents: true },
         instanceId: HERMES_INSTANCE_ID,
@@ -1519,7 +1515,7 @@ describe("E2E Sync: memories provider (cross-instance CRUD, reverse-ws)", () => 
 
       const { default: cortexWriteDef } = await import("./write/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: cortexWriteDef.POST,
         data: {
           path: M_SUBFOLDER_PATH,
@@ -1563,7 +1559,7 @@ describe("E2E Sync: memories provider (cross-instance CRUD, reverse-ws)", () => 
       const updatedContent = `${M_CONTENT}\n\n## Updated by M3-rws`;
       const { default: cortexWriteDef } = await import("./write/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: cortexWriteDef.POST,
         data: {
           path: M_FILE_PATH,
@@ -1619,7 +1615,7 @@ describe("E2E Sync: memories provider (cross-instance CRUD, reverse-ws)", () => 
 
       const { default: cortexDeleteDef } = await import("./delete/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: cortexDeleteDef.DELETE,
         data: { path: M_FILE_PATH, recursive: false },
         instanceId: HERMES_INSTANCE_ID,
@@ -1657,11 +1653,11 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
   const TEST_SKILL_SLUG = `e2e-sync-skill-${RUN_ID}`;
 
   beforeAll(async () => {
-    const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+    const resolved = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
       expect(
         false,
-        `[E2E-skill] Dev user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
+        `[E2E-skill] Dev user ${identityEnv.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
       ).toBe(true);
       return;
     }
@@ -1678,7 +1674,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
 
     try {
       await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectionDefinitions.DELETE,
         urlPathParams: { instanceId: HERMES_INSTANCE_ID },
         user: devUser,
@@ -1686,7 +1682,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
       const preCleanProdUserId = await resolveProdUserId();
       if (preCleanProdUserId) {
         await sendTestRequest({
-          streamContext: undefined,
+          toolExecutionContext: undefined,
           endpoint: remoteConnectionDefinitions.DELETE,
           urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
           user: devUser,
@@ -1694,12 +1690,12 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
         });
       }
       const connectResult = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectDefinitions.POST,
         data: {
           remoteUrl: remoteUrl!,
-          email: env.VIBE_ADMIN_USER_EMAIL,
-          password: env.VIBE_ADMIN_USER_PASSWORD,
+          email: identityEnv.VIBE_ADMIN_USER_EMAIL,
+          password: identityEnv.VIBE_ADMIN_USER_PASSWORD,
           // Cortex e2e exercises memory/document mirroring — full sync scope.
           syncScope: {
             memories: true,
@@ -1730,8 +1726,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
   afterAll(async () => {
     // Clean dev custom skills
     if (devUser) {
-      const { customSkills } =
-        await import("next-vibe/agent/skills/db");
+      const { customSkills } = await import("next-vibe/agent/skills/db");
       await db
         .delete(customSkills)
         .where(
@@ -1754,7 +1749,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
     }
     if (devUser) {
       await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectionDefinitions.DELETE,
         urlPathParams: { instanceId: HERMES_INSTANCE_ID },
         user: devUser,
@@ -1762,7 +1757,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
     }
     if (prodUserId) {
       await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectionDefinitions.DELETE,
         urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
         user: devUser,
@@ -1786,7 +1781,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
       const { default: skillCreateDef } =
         await import("next-vibe/agent/skills/create/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: skillCreateDef.POST,
         data: {
           name: "E2E Sync Skill",
@@ -1840,7 +1835,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
       const { default: skillDef } =
         await import("next-vibe/agent/skills/[id]/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: skillDef.PATCH,
         data: {
           name: "E2E Sync Skill Updated",
@@ -1892,7 +1887,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
       const { default: skillDef } =
         await import("next-vibe/agent/skills/[id]/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: skillDef.DELETE,
         urlPathParams: { id: prodSkillId },
         instanceId: HERMES_INSTANCE_ID,
@@ -1946,7 +1941,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
       const { default: skillCreateDef } =
         await import("next-vibe/agent/skills/create/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: skillCreateDef.POST,
         data: {
           name: "Reverse Skill",
@@ -1969,8 +1964,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
       // Trigger hermes pull — direct-http mode has no persistent WS from atlas to hermes.
       await triggerHermesPull(prodAdminToken, remoteUrl!);
 
-      const { customSkills } =
-        await import("next-vibe/agent/skills/db");
+      const { customSkills } = await import("next-vibe/agent/skills/db");
       const s4Skill = await pollUntil(
         "S4: reverse-synced skill must appear on dev",
         async () => {
@@ -2005,8 +1999,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD)", () => {
       await ensureProvidersRegistered();
       const cursorsBefore = await collectCursors(devUser.id);
 
-      const { customSkills } =
-        await import("next-vibe/agent/skills/db");
+      const { customSkills } = await import("next-vibe/agent/skills/db");
       const isoSlug = `${TEST_SKILL_SLUG}-isolation`;
       await db.insert(customSkills).values({
         id: randomUUID(),
@@ -2071,11 +2064,11 @@ describe("E2E Sync: skills provider (cross-instance CRUD, reverse-ws)", () => {
   const RUN_ID = `rws-${Date.now().toString(36)}`;
 
   beforeAll(async () => {
-    const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+    const resolved = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
       expect(
         false,
-        `[E2E-skill-rws] Dev user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
+        `[E2E-skill-rws] Dev user ${identityEnv.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
       ).toBe(true);
       return;
     }
@@ -2092,7 +2085,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD, reverse-ws)", () => {
 
     try {
       await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectionDefinitions.DELETE,
         urlPathParams: { instanceId: HERMES_INSTANCE_ID },
         user: devUser,
@@ -2100,7 +2093,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD, reverse-ws)", () => {
       const preCleanProdUserId = await resolveProdUserId();
       if (preCleanProdUserId) {
         await sendTestRequest({
-          streamContext: undefined,
+          toolExecutionContext: undefined,
           endpoint: remoteConnectionDefinitions.DELETE,
           urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
           user: devUser,
@@ -2108,12 +2101,12 @@ describe("E2E Sync: skills provider (cross-instance CRUD, reverse-ws)", () => {
         });
       }
       const connectResult = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectDefinitions.POST,
         data: {
           remoteUrl: remoteUrl!,
-          email: env.VIBE_ADMIN_USER_EMAIL,
-          password: env.VIBE_ADMIN_USER_PASSWORD,
+          email: identityEnv.VIBE_ADMIN_USER_EMAIL,
+          password: identityEnv.VIBE_ADMIN_USER_PASSWORD,
           // Cortex e2e exercises memory/document mirroring — full sync scope.
           syncScope: {
             memories: true,
@@ -2165,8 +2158,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD, reverse-ws)", () => {
     }
     // Clean dev custom skills
     if (devUser) {
-      const { customSkills } =
-        await import("next-vibe/agent/skills/db");
+      const { customSkills } = await import("next-vibe/agent/skills/db");
       await db
         .delete(customSkills)
         .where(
@@ -2189,7 +2181,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD, reverse-ws)", () => {
     }
     if (devUser) {
       await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectionDefinitions.DELETE,
         urlPathParams: { instanceId: HERMES_INSTANCE_ID },
         user: devUser,
@@ -2197,7 +2189,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD, reverse-ws)", () => {
     }
     if (prodUserId) {
       await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectionDefinitions.DELETE,
         urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
         user: devUser,
@@ -2221,7 +2213,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD, reverse-ws)", () => {
       const { default: skillCreateDef } =
         await import("next-vibe/agent/skills/create/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: skillCreateDef.POST,
         data: {
           name: "E2E Sync Skill RWS",
@@ -2275,7 +2267,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD, reverse-ws)", () => {
       const { default: skillDef } =
         await import("next-vibe/agent/skills/[id]/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: skillDef.PATCH,
         data: {
           name: "E2E Sync Skill RWS Updated",
@@ -2330,7 +2322,7 @@ describe("E2E Sync: skills provider (cross-instance CRUD, reverse-ws)", () => {
       const { default: skillDef } =
         await import("next-vibe/agent/skills/[id]/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: skillDef.DELETE,
         urlPathParams: { id: prodSkillId },
         instanceId: HERMES_INSTANCE_ID,
@@ -2396,11 +2388,11 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
   const TH_MSG_CONTENT = `Hello from thread sync test ${RUN_ID}`;
 
   beforeAll(async () => {
-    const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+    const resolved = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
       expect(
         false,
-        `[E2E-thread] Dev user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
+        `[E2E-thread] Dev user ${identityEnv.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
       ).toBe(true);
       return;
     }
@@ -2417,7 +2409,7 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
 
     try {
       await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectionDefinitions.DELETE,
         urlPathParams: { instanceId: HERMES_INSTANCE_ID },
         user: devUser,
@@ -2425,7 +2417,7 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
       const preCleanProdUserId = await resolveProdUserId();
       if (preCleanProdUserId) {
         await sendTestRequest({
-          streamContext: undefined,
+          toolExecutionContext: undefined,
           endpoint: remoteConnectionDefinitions.DELETE,
           urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
           user: devUser,
@@ -2433,12 +2425,12 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
         });
       }
       const connectResult = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectDefinitions.POST,
         data: {
           remoteUrl: remoteUrl!,
-          email: env.VIBE_ADMIN_USER_EMAIL,
-          password: env.VIBE_ADMIN_USER_PASSWORD,
+          email: identityEnv.VIBE_ADMIN_USER_EMAIL,
+          password: identityEnv.VIBE_ADMIN_USER_PASSWORD,
           // Cortex e2e exercises memory/document mirroring — full sync scope.
           syncScope: {
             memories: true,
@@ -2497,7 +2489,7 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
     }
     if (devUser) {
       await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectionDefinitions.DELETE,
         urlPathParams: { instanceId: HERMES_INSTANCE_ID },
         user: devUser,
@@ -2505,7 +2497,7 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
     }
     if (prodUserId) {
       await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectionDefinitions.DELETE,
         urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
         user: devUser,
@@ -2529,7 +2521,7 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
       const { default: threadsDef } =
         await import("next-vibe/agent/chat/threads/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: threadsDef.POST,
         data: {
           id: TH_THREAD_ID,
@@ -2584,7 +2576,7 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
       const { default: messagesDef } =
         await import("next-vibe/agent/chat/threads/[threadId]/messages/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: messagesDef.POST,
         data: {
           rootFolderId: DefaultFolderId.PRIVATE,
@@ -2633,7 +2625,7 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
       const { default: renameDef } =
         await import("next-vibe/agent/chat/threads/rename/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: renameDef.PATCH,
         data: {
           threadId: TH_THREAD_ID,
@@ -2682,7 +2674,7 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
       const { default: threadsDef } =
         await import("next-vibe/agent/chat/threads/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: threadsDef.POST,
         data: {
           rootFolderId: DefaultFolderId.PRIVATE,
@@ -2700,8 +2692,7 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
       // Trigger hermes pull — threads are pull-on-connect only (no persistent WS atlas→hermes).
       await triggerHermesPull(prodAdminToken, remoteUrl!);
 
-      const { chatThreads: ct } =
-        await import("next-vibe/agent/chat/db");
+      const { chatThreads: ct } = await import("next-vibe/agent/chat/db");
       const devThread = await pollUntil(
         "TH4: reverse-synced thread must appear on dev",
         async () => {
@@ -2742,8 +2733,7 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
       const now = new Date();
       const olderTime = new Date(now.getTime() - 3_600_000); // 1h older
 
-      const { chatThreads: ct } =
-        await import("next-vibe/agent/chat/db");
+      const { chatThreads: ct } = await import("next-vibe/agent/chat/db");
 
       // Write newer version on dev
       await db.insert(ct).values({
@@ -2844,8 +2834,7 @@ describe("E2E Sync: threads provider (pull-on-connect cross-instance)", () => {
         await sleep(4000);
 
         // 5. Assert the thread does NOT appear on atlas
-        const { chatThreads: ct } =
-          await import("next-vibe/agent/chat/db");
+        const { chatThreads: ct } = await import("next-vibe/agent/chat/db");
         const rows = await db
           .select({ id: ct.id })
           .from(ct)
@@ -4281,11 +4270,11 @@ describe("E2E Sync: WS push (live sync on mutation)", () => {
   const RUN_ID = Date.now().toString(36);
 
   beforeAll(async () => {
-    const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+    const resolved = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
     if (!resolved) {
       expect(
         false,
-        `[E2E-ws] Dev user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
+        `[E2E-ws] Dev user ${identityEnv.VIBE_ADMIN_USER_EMAIL} not found — run: vibe seed`,
       ).toBe(true);
       return;
     }
@@ -4302,7 +4291,7 @@ describe("E2E Sync: WS push (live sync on mutation)", () => {
 
     try {
       await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectionDefinitions.DELETE,
         urlPathParams: { instanceId: HERMES_INSTANCE_ID },
         user: devUser,
@@ -4310,7 +4299,7 @@ describe("E2E Sync: WS push (live sync on mutation)", () => {
       const preCleanProdUserId = await resolveProdUserId();
       if (preCleanProdUserId) {
         await sendTestRequest({
-          streamContext: undefined,
+          toolExecutionContext: undefined,
           endpoint: remoteConnectionDefinitions.DELETE,
           urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
           user: devUser,
@@ -4318,12 +4307,12 @@ describe("E2E Sync: WS push (live sync on mutation)", () => {
         });
       }
       const connectResult = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectDefinitions.POST,
         data: {
           remoteUrl: remoteUrl!,
-          email: env.VIBE_ADMIN_USER_EMAIL,
-          password: env.VIBE_ADMIN_USER_PASSWORD,
+          email: identityEnv.VIBE_ADMIN_USER_EMAIL,
+          password: identityEnv.VIBE_ADMIN_USER_PASSWORD,
           // Cortex e2e exercises memory/document mirroring — full sync scope.
           syncScope: {
             memories: true,
@@ -4373,7 +4362,7 @@ describe("E2E Sync: WS push (live sync on mutation)", () => {
     }
     if (devUser) {
       await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectionDefinitions.DELETE,
         urlPathParams: { instanceId: HERMES_INSTANCE_ID },
         user: devUser,
@@ -4381,7 +4370,7 @@ describe("E2E Sync: WS push (live sync on mutation)", () => {
     }
     if (prodUserId) {
       await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: remoteConnectionDefinitions.DELETE,
         urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
         user: devUser,
@@ -4407,7 +4396,7 @@ describe("E2E Sync: WS push (live sync on mutation)", () => {
 
       const { default: cortexWriteDef } = await import("./write/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: cortexWriteDef.POST,
         data: { path: wsPath, content: wsContent, createParents: true },
         instanceId: HERMES_INSTANCE_ID,
@@ -4450,7 +4439,7 @@ describe("E2E Sync: WS push (live sync on mutation)", () => {
 
       const { default: cortexWriteDef } = await import("./write/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: cortexWriteDef.POST,
         data: { path: wsPath, content: wsContent, createParents: true },
         instanceId: HERMES_INSTANCE_ID,
@@ -4491,7 +4480,7 @@ describe("E2E Sync: WS push (live sync on mutation)", () => {
       const { default: skillCreateDef } =
         await import("next-vibe/agent/skills/create/definition");
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: skillCreateDef.POST,
         data: {
           name: "WS Push Skill",

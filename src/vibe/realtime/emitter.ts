@@ -19,13 +19,13 @@ import "server-only";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import type { SyncDomain } from "next-vibe/remote-connection/db";
 import type {
   CacheKeyParams,
   CacheKeyParamValue,
   CacheKeyRequestData,
   CacheKeyRequestInput,
-} from "next-vibe/platforms/react/hooks/query-key-builder";
-import type { SyncDomain } from "next-vibe/remote-connection/db";
+} from "next-vibe/unified-ui/hooks/query-key-builder";
 
 import { buildUserWsChannel, buildWsChannel } from "./channel";
 import { getLocalBroadcast } from "./local-broadcast";

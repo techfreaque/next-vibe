@@ -8,8 +8,8 @@
 import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { apiClient } from "next-vibe/platforms/react/hooks/store";
-import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
+import { apiClient } from "next-vibe/unified-ui/hooks/store";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { useCallback, useMemo } from "react";
 
 import type { ViewModeValue } from "../enum";

@@ -10,16 +10,16 @@
 
 "use client";
 import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
-import { cn } from "next-vibe/core/utils/utils";
-import { apiClient } from "next-vibe/platforms/react/hooks/store";
 import { Button } from "next-vibe/ui/ui/button";
 import { ThumbsDown } from "next-vibe/ui/ui/icons/ThumbsDown";
 import { ThumbsUp } from "next-vibe/ui/ui/icons/ThumbsUp";
 import { Span } from "next-vibe/ui/ui/span";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetContext,
   useWidgetLogger,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { apiClient } from "next-vibe/unified-ui/hooks/store";
 import { type JSX, useCallback, useState } from "react";
 
 import type { SkillVoteDirectionValue } from "../../enum";

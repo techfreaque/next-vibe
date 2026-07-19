@@ -66,7 +66,7 @@ import type { CallbackModeValue } from "next-vibe/execute-tool/constants";
 import { leads } from "next-vibe/identity/lead/db";
 import { type UserPermissionRoleValue } from "next-vibe/identity/roles/enum";
 import { users } from "next-vibe/identity/user/db";
-import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import type { z } from "zod";
 
 import type { FavoriteConfig } from "../skills/favorites/db";
@@ -78,7 +78,17 @@ import {
   ThreadStreamingStateDB,
 } from "./enum";
 
-export interface ToolCall {
+/**
+ * A tool call as persisted on a message and shipped over endpoint payloads.
+ *
+ * A type alias, NOT an interface: this rides an endpoint payload, so it must be
+ * assignable to `WidgetData`, whose record arm is `{ [key: string]: WidgetData }`.
+ * TypeScript grants an implicit index signature to object type aliases but never
+ * to interfaces, so an interface here is unassignable at every erased payload
+ * boundary (e.g. a route's onRemoteEvent vs OnRemoteEventDispatchMap).
+ */
+// eslint-disable-next-line typescript/consistent-type-definitions -- Must be a type alias, not an interface: only aliases get the implicit index signature that makes this assignable to WidgetData on an endpoint payload. See above.
+export type ToolCall = {
   toolCallId: string; // AI SDK tool call ID (e.g., "toolu_bdrk_01X8QxqpkW7HVqYiChTpDLzN")
   toolName: string;
   args: WidgetData;
@@ -136,7 +146,7 @@ export interface ToolCall {
    * call parks (WAIT auto-upgrade / await-task).
    */
   pendingCallInline?: boolean;
-}
+};
 
 /**
  * Tool cost information
@@ -169,8 +179,15 @@ export interface ToolCallMetadata {
 /**
  * Message metadata structure
  * Can contain different metadata types depending on message role
+ *
+ * A type alias, NOT an interface: this rides an endpoint payload, so it must be
+ * assignable to `WidgetData`, whose record arm is `{ [key: string]: WidgetData }`.
+ * TypeScript grants an implicit index signature to object type aliases but never
+ * to interfaces, so an interface here is unassignable at every erased payload
+ * boundary (e.g. a route's onRemoteEvent vs OnRemoteEventDispatchMap).
  */
-export interface MessageMetadata {
+// eslint-disable-next-line typescript/consistent-type-definitions -- Must be a type alias, not an interface: only aliases get the implicit index signature that makes this assignable to WidgetData on an endpoint payload. See above.
+export type MessageMetadata = {
   // Token and generation info (for ASSISTANT messages)
   generationTime?: number;
   promptTokens?: number;
@@ -285,7 +302,7 @@ export interface MessageMetadata {
     favoriteConfig: FavoriteConfig | null;
     timezone: string;
   };
-}
+};
 
 /**
  * Chat Folders Table

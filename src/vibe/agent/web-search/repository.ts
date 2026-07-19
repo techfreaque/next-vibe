@@ -68,7 +68,7 @@ export class WebSearchRepository {
     logger: EndpointLogger,
     t: WebSearchT,
     locale: CountryLanguage,
-    streamContext: ToolExecutionContext,
+    toolExecutionContext: ToolExecutionContext,
   ): Promise<ResponseType<WebSearchResponse>> {
     // Validate query
     if (
@@ -131,7 +131,7 @@ export class WebSearchRepository {
       logger,
       locale,
       user,
-      streamContext,
+      toolExecutionContext,
     );
 
     return result;

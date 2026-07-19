@@ -3,10 +3,10 @@ import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import { getChatModelById } from "next-vibe/agent/ai-stream/models";
 import type { DefaultFolderId } from "next-vibe/agent/chat/config";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { cn } from "next-vibe/core/utils/utils";
 import { Div } from "next-vibe/ui/ui/div";
 import { Span } from "next-vibe/ui/ui/span";
-import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 

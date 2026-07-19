@@ -3,11 +3,11 @@ import { useChatInputStore } from "next-vibe/agent/ai-stream/stream/hooks/input-
 import debugDefinition from "next-vibe/agent/ai-stream/system-prompt/debug/definition";
 import type { ChatMessage } from "next-vibe/agent/chat/db";
 import { ChatMessageRole } from "next-vibe/agent/chat/enum";
-import { cn } from "next-vibe/core/utils/utils";
-import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { Div } from "next-vibe/ui/ui/div";
 import { ErrorBoundary } from "next-vibe/ui/ui/error-boundary";
 import { Markdown } from "next-vibe/ui/ui/markdown";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import type { JSX } from "react";
 import React, {
   useCallback,

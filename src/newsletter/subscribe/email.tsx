@@ -4,6 +4,7 @@
  */
 
 import { Button, Hr, Link, Section } from "@react-email/components";
+import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -11,11 +12,9 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import type { ReactElement } from "react";
-import React from "react";
 import { z } from "zod";
 
 import { contactClientRepository } from "@/contact/repository-client";
-import { env } from "@/env/env";
 import { configScopedTranslation } from "@/env/i18n";
 import type { EmailTemplateDefinition } from "@/messenger/registry/template";
 
@@ -154,7 +153,7 @@ function NewsletterWelcomeEmail({
       >
         {t("emailTemplate.welcome.unsubscribe_text")}{" "}
         <Link
-          href={`${env.NEXT_PUBLIC_APP_URL}/${locale}/story/newsletter/unsubscribe/${encodeURIComponent(
+          href={`${coreEnv.NEXT_PUBLIC_APP_URL}/${locale}/story/newsletter/unsubscribe/${encodeURIComponent(
             props.email,
           )}`}
           style={{ color: "#4f46e5" }}
@@ -363,7 +362,7 @@ function AdminNotificationEmailContent({
       {/* View in admin panel button */}
       <Section style={{ textAlign: "center", marginTop: "24px" }}>
         <Button
-          href={`${env.NEXT_PUBLIC_APP_URL}/admin/newsletter`}
+          href={`${coreEnv.NEXT_PUBLIC_APP_URL}/admin/newsletter`}
           style={{
             backgroundColor: "#4f46e5",
             borderRadius: "6px",

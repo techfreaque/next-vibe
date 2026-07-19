@@ -14,13 +14,13 @@ import { RebuildRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: rebuildEndpoints,
   [Methods.POST]: {
-    handler: ({ data, locale, logger, t, streamContext }) =>
+    handler: ({ data, locale, logger, t, toolExecutionContext }) =>
       RebuildRepository.execute(
         data,
         locale,
         logger,
         t,
-        streamContext.abortSignal,
+        toolExecutionContext.abortSignal,
       ),
   },
 });

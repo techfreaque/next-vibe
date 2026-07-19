@@ -45,7 +45,7 @@ declare global {
 }
 
 export function ensureGlobals(): void {
-  if (typeof globalThis.__vibeWidgetByFile !== "undefined") {
+  if (globalThis.__vibeWidgetByFile !== undefined) {
     return;
   }
   globalThis.__vibeWidgetByFile = new Map();
@@ -121,7 +121,7 @@ export function lazyWidget(
 
   function getOrCreateModulePromise(): Promise<AnyComponent> | null {
     // drizzle-kit: plain Node.js ESM, no import.meta.env, can't resolve .tsx
-    if (typeof import.meta.env === "undefined") {
+    if (import.meta.env === undefined) {
       return null;
     }
     if (state.modulePromise === null) {
@@ -142,7 +142,7 @@ export function lazyWidget(
   // Only the factory reference is stored here — no import is triggered.
   _lazyWidgetRegistry.push(async () => {
     // Skip in drizzle-kit / plain Node contexts without Vite.
-    if (typeof import.meta.env === "undefined") {
+    if (import.meta.env === undefined) {
       return;
     }
     await getOrCreateModulePromise();

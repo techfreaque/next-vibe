@@ -29,12 +29,12 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { MarkdownWidget } from "next-vibe/unified-ui/display-only/markdown/widget";
-import { BooleanFieldWidget } from "next-vibe/unified-ui/form-fields/boolean-field/widget";
-import { NumberFieldWidget } from "next-vibe/unified-ui/form-fields/number-field/widget";
-import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
-import { SearchBarWidget } from "next-vibe/unified-ui/interactive/search-bar/widget";
+import { MarkdownWidget } from "next-vibe/unified-ui/widgets/display-only/markdown/widget";
+import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
+import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/number-field/widget";
+import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
+import { SearchBarWidget } from "next-vibe/unified-ui/widgets/interactive/search-bar/widget";
 import type { JSX } from "react";
 
 import type definition from "./definition";
@@ -203,7 +203,7 @@ export function WebSearchResultsContainer({
 
   // Replace Kagi reference markers 【1】 with markdown links
   const output = value?.output
-    ? value.output.replace(/【(\d+)】/g, (match, num) => {
+    ? value.output.replaceAll(/【(\d+)】/g, (match, num) => {
         const index = parseInt(num, 10) - 1;
         const ref = results[index];
         return ref ? `[${num}](${ref.url})` : match;

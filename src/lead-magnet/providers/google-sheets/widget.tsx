@@ -77,8 +77,7 @@ export function GoogleSheetsWidget(): JSX.Element {
     setLoadingSheets(true);
     void (async (): Promise<void> => {
       try {
-        const { apiClient } =
-          await import("next-vibe/platforms/react/hooks/store");
+        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
         const sheetsListDef = await import("./sheets-list/definition");
         if (!user) {
           return;
@@ -123,8 +122,7 @@ export function GoogleSheetsWidget(): JSX.Element {
     setSaveError("");
     void (async (): Promise<void> => {
       try {
-        const { apiClient } =
-          await import("next-vibe/platforms/react/hooks/store");
+        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
         const def = await import("./definition");
         if (!user) {
           return;

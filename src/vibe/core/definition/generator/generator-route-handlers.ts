@@ -9,25 +9,28 @@ import { readFile, writeFile } from "node:fs/promises";
 
 import { PATH_SEPARATOR } from "next-vibe/core/core-utils/path";
 import type { ApiSection } from "next-vibe/core/definition/endpoint-base";
-import type { GenericHandlerBase } from "next-vibe/core/route/handler";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { formatCount, formatWarning } from "next-vibe/logger/formatters";
-import type { EndpointLogger } from "next-vibe/logger/types";
 import type {
   GeneratorContext,
   GeneratorResult,
-} from "next-vibe/tooling/generators/shared/shared-inputs";
+} from "next-vibe/core/generators/shared/shared-inputs";
 import {
   extractNestedPath,
   extractPathKey,
   generateAbsoluteImportPath,
   generateFileHeader,
   stripProjectRoot,
+  toImportUrl,
   writeGeneratedFile,
-} from "next-vibe/tooling/generators/shared/utils";
+} from "next-vibe/core/generators/shared/utils";
+import type { GenericHandlerBase } from "next-vibe/core/route/handler";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { formatCount, formatWarning } from "next-vibe/logger/formatters";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
-const OUTPUT_FILE = "src/generated/routes/handlers.ts";
+import { GENERATED_DIR } from "@/env/paths";
+
+const OUTPUT_FILE = `${GENERATED_DIR}/routes/handlers.ts`;
 
 /**
  * Serialize path segments into the canonical single-line array literal used in
@@ -247,7 +250,7 @@ class RouteHandlersGenerator {
   ): Promise<string[]> {
     const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
     try {
-      const definition = (await import(definitionPath)) as {
+      const definition = (await import(toImportUrl(definitionPath))) as {
         default?: ApiSection;
       };
       let defaultExport;
@@ -285,7 +288,7 @@ class RouteHandlersGenerator {
   ): Promise<Array<{ alias: string; method: string }>> {
     const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
     try {
-      const definition = (await import(definitionPath)) as {
+      const definition = (await import(toImportUrl(definitionPath))) as {
         default?: Record<string, { aliases?: string[] }>;
       };
       let defaultExport;
@@ -349,7 +352,7 @@ class RouteHandlersGenerator {
 
       let defaultExport: ApiSection | undefined;
       try {
-        const definition = (await import(definitionPath)) as {
+        const definition = (await import(toImportUrl(definitionPath))) as {
           default?: ApiSection;
         };
         try {
@@ -508,9 +511,7 @@ class RouteHandlersGenerator {
         prewarmPaths.push(path);
       }
       // Add turbopack/webpack ignore hints for routes that scan the filesystem
-      const ignoreComment = needsTurbopackIgnore(importPath)
-        ? "/* turbopackIgnore: true */ /* webpackIgnore: true */ "
-        : "";
+      const ignoreComment = needsTurbopackIgnore(importPath) ? "" : "";
       // Static import strings for bundler tracing
       const returnWithTools = `      return (await import(${ignoreComment}"${importPath}")).tools`;
       const returnWithParen = `      return (await import(${ignoreComment}"${importPath}"))`;
@@ -689,7 +690,7 @@ ${hotPathEntries.join("\n")}
   ): Promise<Array<{ method: string; scope: string | undefined }>> {
     const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
     try {
-      const definition = (await import(definitionPath)) as {
+      const definition = (await import(toImportUrl(definitionPath))) as {
         default?: Record<
           string,
           {
@@ -758,7 +759,7 @@ ${hotPathEntries.join("\n")}
   ): Promise<string[]> {
     const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
     try {
-      const definition = (await import(definitionPath)) as {
+      const definition = (await import(toImportUrl(definitionPath))) as {
         default?: Record<
           string,
           { events?: Record<string, { remoteEvent?: true }> }
@@ -846,7 +847,7 @@ ${hotPathEntries.join("\n")}
         { resolveChannel?: GenericHandlerBase["resolveChannel"] } | undefined
       >;
       try {
-        const routeModule = (await import(routeFile)) as {
+        const routeModule = (await import(toImportUrl(routeFile))) as {
           tools?: Record<
             string,
             | { resolveChannel?: GenericHandlerBase["resolveChannel"] }
@@ -950,7 +951,7 @@ ${hotPathEntries.join("\n")}
     const entries = targets
       .map(
         (target) => `    {
-      path: ${target.defAlias}.default.${target.method}.path,
+      endpoint: ${target.defAlias}.default.${target.method},
       method: "${target.method}",
       importRoute: () => import("${target.routeImport}"),
     },`,
@@ -961,12 +962,14 @@ ${hotPathEntries.join("\n")}
 
 /* eslint-disable prettier/prettier */
 
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type { RegistryRouteModule } from "next-vibe/realtime/ws-channel-registry";
 
 export interface RemoteEventRouteEntry {
-  path: readonly string[];
+  /** The endpoint definition: canonical path to match on, schemas to gate the envelope. */
+  endpoint: CreateApiEndpointAny;
   method: string;
-  /** Loading the route module registers its onRemoteEvent handlers. */
+  /** Loading the route module gives access to its onRemoteEvent handlers. */
   importRoute: () => Promise<RegistryRouteModule>;
 }
 
@@ -975,6 +978,11 @@ export interface RemoteEventRouteEntry {
  * its canonical definition path — the bridge dispatch force-loads the target
  * route through this registry when a relayed event arrives before anything
  * imported the route in this process.
+ *
+ * Definition modules are imported eagerly (lightweight, side-effect-free) so the
+ * dispatch has the endpoint's path and schemas without loading route code; route
+ * modules are imported lazily, only once an event actually targets them. Mirrors
+ * the ws-channels registry.
  */
 export async function getRemoteEventRoutes(): Promise<RemoteEventRouteEntry[]> {
   const [

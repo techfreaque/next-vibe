@@ -593,7 +593,7 @@ export class RevivalRepository {
           // back to resolving from favoriteId (the favorite-only original turn).
           //
           // LOOP-REMOTE fallback: a wakeUp dispatched inside a relayed executor
-          // loop settles in a goroutine whose streamContext carries no model/
+          // loop settles in a goroutine whose toolExecutionContext carries no model/
           // favorite/skill (the executor resolves its OWN identity per turn and
           // never stamps them onto the async task). Without a source the revival
           // failed with "No model resolved". The THREAD itself ran the turn, so
@@ -897,15 +897,14 @@ export class RevivalRepository {
             logger,
           );
           return success({ resumed: false, lastAiMessageId: null });
-        } else {
-          logger.warn(
-            "[Revival] toolMessageId provided but message/toolCall not found",
-            {
-              threadId,
-              toolMessageId,
-            },
-          );
         }
+        logger.warn(
+          "[Revival] toolMessageId provided but message/toolCall not found",
+          {
+            threadId,
+            toolMessageId,
+          },
+        );
       }
 
       if (isLive) {

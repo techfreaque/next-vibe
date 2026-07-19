@@ -11,14 +11,14 @@ import { CronBulkRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: async ({ data, user, locale, logger, t, streamContext }) =>
+    handler: async ({ data, user, locale, logger, t, toolExecutionContext }) =>
       await CronBulkRepository.executeBulkAction(
         data,
         user,
         locale,
         t,
         logger,
-        streamContext.abortSignal,
+        toolExecutionContext.abortSignal,
       ),
   },
 });

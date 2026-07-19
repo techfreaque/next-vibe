@@ -16,7 +16,6 @@ import type {
   Time,
   UTCTimestamp,
 } from "lightweight-charts";
-import { cn } from "next-vibe/core/utils/utils";
 import graphsDefinitions from "next-vibe/dataflow/graphs/definition";
 import { scopedTranslation as vibeSenseT } from "next-vibe/dataflow/i18n";
 import { getRootCssVar } from "next-vibe/ui/lib/css-vars";
@@ -29,6 +28,7 @@ import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
 import { Plus } from "next-vibe/ui/ui/icons/Plus";
 import { Span } from "next-vibe/ui/ui/span";
 import { P } from "next-vibe/ui/ui/typography";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetContext,
   useWidgetEndpointMutations,
@@ -502,15 +502,15 @@ export function DataSourceChartWidget({
   const handleCreateGraph = useCallback((): void => {
     const nodeId = (definition.POST.path as string[])
       .join("_")
-      .replace(/-/g, "_");
+      .replaceAll("-", "_");
     navigation.push(graphsDefinitions.POST, {
       data: {
         name: label,
         slug: (definition.POST.path as string[])
           .join("-")
           .toLowerCase()
-          .replace(/[^a-z0-9-]/g, "-")
-          .replace(/-+/g, "-"),
+          .replaceAll(/[^a-z0-9-]/g, "-")
+          .replaceAll(/-+/g, "-"),
         config: {
           nodes: {
             [nodeId]: {

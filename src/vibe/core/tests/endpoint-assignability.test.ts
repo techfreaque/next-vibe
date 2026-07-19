@@ -25,7 +25,7 @@ import type {
   ConstrainedChildUsage,
   FieldUsageConfig,
 } from "next-vibe/unified-ui/_shared/types";
-import { objectField, requestUrlPathParamsField } from "next-vibe/unified-ui/_shared/utils";
+import { objectField, requestUrlPathParamsField } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 const genericST: { ScopedTranslationKey: string } = {

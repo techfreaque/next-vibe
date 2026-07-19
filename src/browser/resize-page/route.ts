@@ -14,7 +14,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: resizePageEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger, platform, streamContext }) =>
+    handler: ({ data, t, logger, platform, toolExecutionContext }) =>
       BrowserSharedRepository.executeResizePage<ResizePageResponseOutput>(
         {
           toolName: BrowserTool.RESIZE_PAGE,
@@ -27,7 +27,7 @@ export const { POST, tools } = endpointsHandler({
         t,
         logger,
         platform,
-        streamContext.threadId,
+        toolExecutionContext.threadId,
       ),
   },
 });

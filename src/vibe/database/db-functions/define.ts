@@ -333,7 +333,7 @@ function extractLogicBody(
   // Replace the query proxy param name with __q (the runtime variable).
   // Only replace `q.something` usages - not standalone `q` references.
   if (qParamName !== "__q" && qParamName !== "_") {
-    body = body.replace(
+    body = body.replaceAll(
       new RegExp(`\\b${escapeRegex(qParamName)}\\.`, "g"),
       "__q.",
     );
@@ -361,7 +361,7 @@ function extractLogicBody(
 
 /** Escape a string for use in a RegExp */
 function escapeRegex(str: string): string {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return str.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 // ---------------------------------------------------------------------------
@@ -373,14 +373,14 @@ function inlineParams(
   queryText: string,
   values: (string | number | boolean | null | undefined)[],
 ): string {
-  return queryText.replace(/\$(\d+)::\w+/g, (...args) => {
+  return queryText.replaceAll(/\$(\d+)::\w+/g, (...args) => {
     const idx = args[1] as string;
     const value = values[Number(idx) - 1];
     if (value === null || value === undefined) {
       return "NULL";
     }
     if (typeof value === "string") {
-      return `'${value.replace(/'/g, "''")}'`;
+      return `'${value.replaceAll("'", "''")}'`;
     }
     if (typeof value === "boolean") {
       return value ? "TRUE" : "FALSE";
@@ -462,7 +462,7 @@ function generateBody(
         }
         // Static value → inline as literal
         if (typeof p === "string") {
-          return `"${p.replace(/"/g, '\\"')}"`;
+          return `"${p.replaceAll('"', '\\"')}"`;
         }
         if (p === null) {
           return "null";
@@ -473,10 +473,10 @@ function generateBody(
 
     const paramsArray = `[${resolvedParams.join(", ")}]`;
     const escapedSql = compiled.sql
-      .replace(/\\/g, "\\\\")
-      .replace(/"/g, '\\"')
-      .replace(/\r?\n/g, "\\n")
-      .replace(/\t/g, "\\t");
+      .replaceAll("\\", "\\\\")
+      .replaceAll('"', '\\"')
+      .replaceAll(/\r?\n/g, "\\n")
+      .replaceAll("	", "\\t");
 
     // Drizzle generates snake_case column names in SQL, but the TypeScript
     // type uses camelCase (Drizzle's field names). Map snake_case → camelCase

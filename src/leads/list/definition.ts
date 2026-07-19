@@ -30,15 +30,15 @@ import {
 } from "next-vibe/identity/lead/enum";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   backButton,
-  customWidgetObject,
   objectField,
   responseArrayField,
   responseField,
   widgetField,
-} from "next-vibe/unified-ui/_shared/utils";
-import { paginationField } from "next-vibe/unified-ui/containers/pagination/types";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
+import { paginationField } from "next-vibe/unified-ui/widgets/containers/pagination/types";
 import { z } from "zod";
 
 import {

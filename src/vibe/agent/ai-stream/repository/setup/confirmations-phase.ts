@@ -46,7 +46,7 @@ export async function runConfirmationsPhase(params: {
   subAgentDepth: number;
   isRevival: boolean | undefined;
   /** Fixture chain of the stream — confirmed tool executions ride it. */
-  streamContext: ToolExecutionContext;
+  toolExecutionContext: ToolExecutionContext;
   resolvedRelayContext?: ResolvedRelayContext;
 }): Promise<ResponseType<ConfirmationsPhaseResult>> {
   const {
@@ -61,7 +61,7 @@ export async function runConfirmationsPhase(params: {
     headless,
     subAgentDepth,
     isRevival,
-    streamContext,
+    toolExecutionContext,
   } = params;
 
   if (!(data.toolConfirmations && data.toolConfirmations.length > 0)) {
@@ -74,11 +74,11 @@ export async function runConfirmationsPhase(params: {
     };
   }
 
-  const confirmationStreamContext: ToolExecutionContext = {
+  const confirmationtoolExecutionContext: ToolExecutionContext = {
     rootFolderId: data.rootFolderId,
     threadId: data.threadId ?? undefined,
-    timezone: streamContext.timezone,
-    voiceEnabled: streamContext.voiceEnabled,
+    timezone: toolExecutionContext.timezone,
+    voiceEnabled: toolExecutionContext.voiceEnabled,
     aiMessageId: undefined,
     currentToolMessageId: undefined,
     callerToolCallId: undefined,
@@ -109,7 +109,7 @@ export async function runConfirmationsPhase(params: {
     logger,
     user,
     t: aiStreamT,
-    streamContext: confirmationStreamContext,
+    toolExecutionContext: confirmationtoolExecutionContext,
     resolvedRelayContext: params.resolvedRelayContext,
   });
 
@@ -119,12 +119,12 @@ export async function runConfirmationsPhase(params: {
 
   // If execute-tool (queue WAIT) set waitingForRemoteResult during confirmation,
   // propagate to the main stream so it aborts without creating an AI response.
-  // Without this, the main streamContext starts with waitingForRemoteResult=undefined
+  // Without this, the main toolExecutionContext starts with waitingForRemoteResult=undefined
   // and the AI turn runs, creating a response before the revival fires — branch violation.
   return success({
     toolConfirmationResults: confirmationResult.data,
     confirmationSetWaitingForRemote:
-      confirmationStreamContext.waitingForRemoteResult === true,
+      confirmationtoolExecutionContext.waitingForRemoteResult === true,
   });
 }
 /**

@@ -107,16 +107,8 @@ Use `next-vibe-ui/ui/theme-provider` for theme wrapping and `useThemeToggle()` f
 When writing `widget.tsx` components that render on native:
 
 - Use `next-vibe-ui/ui/*` components - they resolve to the correct native primitives
-- For native-only platform detection use `platform-helpers`:
 
-```typescript
-import {
-  isNative,
-  platformSelect,
-} from "@/system/unified-interface/react-native/platform-helpers";
-
-const fontSize = platformSelect({ native: 16, web: 14 });
-```
+**There is no runtime native check, and no `Platform.NATIVE`.** The `Platform` enum describes who _called_ the endpoint (`CLI`, `AI`, `MCP`, `NEXT_PAGE`, …), not what the UI is rendering on. Native is a **build target**: `next-vibe-ui` resolves to one of `src/vibe/ui/{web,native,tanstack,cli}` per bundle, so the swap happens before your code runs. Push the difference down into the `next-vibe-ui` component rather than branching in shared code.
 
 - Never import from `react-native` directly in shared widget code
 - Touch targets: minimum 44×44pt, stacked layouts, no hover-only interactions

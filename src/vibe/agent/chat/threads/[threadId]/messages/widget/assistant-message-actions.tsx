@@ -7,7 +7,6 @@ import {
 import { useTTSAudio } from "next-vibe/agent/text-to-speech/hooks";
 import type { TtsModelId } from "next-vibe/agent/text-to-speech/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { cn } from "next-vibe/core/utils/utils";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
@@ -26,6 +25,7 @@ import {
   PopoverTrigger,
 } from "next-vibe/ui/ui/popover";
 import { Span } from "next-vibe/ui/ui/span";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetItem,
   useWidgetNavigation,

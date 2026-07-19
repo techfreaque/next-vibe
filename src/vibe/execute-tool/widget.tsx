@@ -16,8 +16,6 @@ import { getFullPath } from "next-vibe/core/core-utils/path";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { scopedTranslation as executeToolScopedTranslation } from "next-vibe/execute-tool/i18n";
 import helpEndpoints from "next-vibe/help-tool/definition";
-import type { UseEndpointOptions } from "next-vibe/platforms/react/hooks/endpoint-types";
-import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { VibeFrameHost } from "next-vibe/platforms/vibe-frame/VibeFrameHost";
 import remoteConnectionListDefinition from "next-vibe/remote-connection/list/definition";
 import type { AutocompleteOption } from "next-vibe/ui/ui/autocomplete-field";
@@ -46,8 +44,10 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { EndpointRenderer } from "next-vibe/unified-ui/renderers/react/EndpointRenderer";
-import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
+import type { UseEndpointOptions } from "next-vibe/unified-ui/hooks/endpoint-types";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
+import { EndpointRenderer } from "next-vibe/unified-ui/renderers/web/EndpointRenderer";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 

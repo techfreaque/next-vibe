@@ -12,7 +12,7 @@ import {
 import { Maximize } from "next-vibe/ui/ui/icons/Maximize";
 import { Zap } from "next-vibe/ui/ui/icons/Zap";
 import { Link } from "next-vibe/ui/ui/link";
-import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 
 import { scopedTranslation } from "@/_pages/tools/i18n";

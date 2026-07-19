@@ -369,14 +369,14 @@ async function insertInline(
       // Fallback: attach to body so frame still mounts
       const fallback = createElement("div");
       appendToBody(fallback);
-      scheduleIdle(() => fallback.appendChild(iframe));
+      scheduleIdle(() => fallback.append(iframe));
       return fallback;
     }
-    scheduleIdle(() => el.appendChild(iframe));
+    scheduleIdle(() => el.append(iframe));
     return el as HTMLElement;
   }
 
-  scheduleIdle(() => targetSpec.appendChild(iframe));
+  scheduleIdle(() => targetSpec.append(iframe));
   return targetSpec;
 }
 
@@ -413,9 +413,9 @@ function insertOverlay(
     }
   });
 
-  dialog.appendChild(closeBtn);
-  dialog.appendChild(iframe);
-  overlay.appendChild(dialog);
+  dialog.append(closeBtn);
+  dialog.append(iframe);
+  overlay.append(dialog);
   appendToBody(overlay);
 
   return overlay;

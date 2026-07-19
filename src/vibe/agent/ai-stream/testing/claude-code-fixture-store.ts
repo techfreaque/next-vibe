@@ -53,11 +53,11 @@ interface PartsFixtureFile {
  * stream's thread the producer runs directly.
  */
 export async function withClaudeCodeFixture(
-  streamContext: ToolExecutionContext | undefined,
+  toolExecutionContext: ToolExecutionContext | undefined,
   modelId: string,
   producer: () => Promise<ReadableStream<LanguageModelV2StreamPart>>,
 ): Promise<ReadableStream<LanguageModelV2StreamPart>> {
-  const threadId = streamContext?.threadId;
+  const threadId = toolExecutionContext?.threadId;
   // No thread → not a fixture run. Read prefix + bump the run's single ordinal
   // in one round-trip (same counter the HTTP engine bumps). No prefix → live.
   const fx = threadId ? await readAndBumpFixture(threadId) : null;

@@ -1,11 +1,11 @@
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { env } from "@/env/env";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { identityEnv } from "next-vibe/identity/env";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import loginEndpoints from "./definition";
 
 const endpoint = loginEndpoints.POST;
@@ -25,11 +25,11 @@ describe("POST /user/public/login", () => {
 
   it("succeeds with correct credentials and returns token + leadId", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint,
       data: {
-        email: env.VIBE_ADMIN_USER_EMAIL,
-        password: env.VIBE_ADMIN_USER_PASSWORD,
+        email: identityEnv.VIBE_ADMIN_USER_EMAIL,
+        password: identityEnv.VIBE_ADMIN_USER_PASSWORD,
         rememberMe: true,
       },
       user: publicUser(),
@@ -51,10 +51,10 @@ describe("POST /user/public/login", () => {
 
   it("rejects wrong password with UNAUTHORIZED", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint,
       data: {
-        email: env.VIBE_ADMIN_USER_EMAIL,
+        email: identityEnv.VIBE_ADMIN_USER_EMAIL,
         password: "definitely-wrong-password-xyz",
         rememberMe: false,
       },
@@ -70,7 +70,7 @@ describe("POST /user/public/login", () => {
 
   it("rejects non-existent email with UNAUTHORIZED (not user-enumeration)", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint,
       data: {
         email: "nobody-at-all-does-not-exist@example.com",
@@ -90,7 +90,7 @@ describe("POST /user/public/login", () => {
 
   it("rejects invalid email format with VALIDATION_ERROR", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint,
       data: {
         email: "not-an-email",
@@ -109,10 +109,10 @@ describe("POST /user/public/login", () => {
 
   it("rejects empty password with VALIDATION_ERROR", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint,
       data: {
-        email: env.VIBE_ADMIN_USER_EMAIL,
+        email: identityEnv.VIBE_ADMIN_USER_EMAIL,
         password: "",
         rememberMe: false,
       },
@@ -128,11 +128,11 @@ describe("POST /user/public/login", () => {
 
   it("rememberMe=false still returns a valid token", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint,
       data: {
-        email: env.VIBE_ADMIN_USER_EMAIL,
-        password: env.VIBE_ADMIN_USER_PASSWORD,
+        email: identityEnv.VIBE_ADMIN_USER_EMAIL,
+        password: identityEnv.VIBE_ADMIN_USER_PASSWORD,
         rememberMe: false,
       },
       user: publicUser(),
@@ -146,11 +146,11 @@ describe("POST /user/public/login", () => {
 
   it("email is case-insensitive (uppercase email matches lowercase stored)", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint,
       data: {
-        email: env.VIBE_ADMIN_USER_EMAIL.toUpperCase(),
-        password: env.VIBE_ADMIN_USER_PASSWORD,
+        email: identityEnv.VIBE_ADMIN_USER_EMAIL.toUpperCase(),
+        password: identityEnv.VIBE_ADMIN_USER_PASSWORD,
         rememberMe: false,
       },
       user: publicUser(),

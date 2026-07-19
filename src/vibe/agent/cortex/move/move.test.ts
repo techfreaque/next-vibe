@@ -15,8 +15,8 @@ import { and, eq, like, or } from "drizzle-orm";
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { cortexNodes } from "../db";
@@ -45,7 +45,7 @@ async function cleanup(userId: string): Promise<void> {
 /** Write a file via the real WRITE endpoint; fails the test if it does not stick. */
 async function writeFile(path: string, content: string): Promise<void> {
   const res = await sendTestRequest({
-    streamContext: undefined,
+    toolExecutionContext: undefined,
     endpoint: writeEndpoint.POST,
     data: { path, content, createParents: true },
     user,
@@ -59,7 +59,7 @@ async function writeFile(path: string, content: string): Promise<void> {
 /** Read a file via the real READ endpoint and return content, or null on failure. */
 async function readContent(path: string): Promise<string | null> {
   const res = await sendTestRequest({
-    streamContext: undefined,
+    toolExecutionContext: undefined,
     endpoint: readEndpoint.GET,
     data: { path },
     user,
@@ -77,7 +77,7 @@ async function readContent(path: string): Promise<string | null> {
 /** Assert a READ of `path` fails with NOT_FOUND (old path no longer resolves). */
 async function expectNotFound(path: string): Promise<void> {
   const res = await sendTestRequest({
-    streamContext: undefined,
+    toolExecutionContext: undefined,
     endpoint: readEndpoint.GET,
     data: { path },
     user,
@@ -92,7 +92,7 @@ async function expectNotFound(path: string): Promise<void> {
 /** List a directory and return entry paths, or null on failure. */
 async function listPaths(path: string): Promise<string[] | null> {
   const res = await sendTestRequest({
-    streamContext: undefined,
+    toolExecutionContext: undefined,
     endpoint: listEndpoint.GET,
     data: { path },
     user,
@@ -126,7 +126,7 @@ describe("Cortex Move E2E", () => {
     await writeFile(from, content);
 
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: moveEndpoint.POST,
       data: { from, to },
       user,
@@ -156,7 +156,7 @@ describe("Cortex Move E2E", () => {
 
     // Materialize the destination dir up front.
     const mk = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: mkdirEndpoint.POST,
       data: { path: newDir, createParents: true },
       user,
@@ -167,7 +167,7 @@ describe("Cortex Move E2E", () => {
     ).toBe(true);
 
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: moveEndpoint.POST,
       data: { from, to },
       user,
@@ -200,7 +200,7 @@ describe("Cortex Move E2E", () => {
     await writeFile(rootFileFrom, rootContent);
 
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: moveEndpoint.POST,
       data: { from: fromDir, to: toDir },
       user,
@@ -231,7 +231,7 @@ describe("Cortex Move E2E", () => {
     await writeFile(to, "destination already here");
 
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: moveEndpoint.POST,
       data: { from, to },
       user,
@@ -251,7 +251,7 @@ describe("Cortex Move E2E", () => {
 
   it("move of a non-existent source is rejected with NOT_FOUND", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: moveEndpoint.POST,
       data: {
         from: `${TEST_PREFIX}/ghost-never-written.md`,
@@ -271,7 +271,7 @@ describe("Cortex Move E2E", () => {
   it("move from a read-only virtual mount (/threads) is rejected with FORBIDDEN", async () => {
     // /threads is a virtual mount that is not writable → move source forbidden.
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: moveEndpoint.POST,
       data: {
         from: "/threads/auth-redesign.md",
@@ -297,7 +297,7 @@ describe("Cortex Move E2E", () => {
     await writeFile(from, content);
 
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: moveEndpoint.POST,
       data: { from, to },
       user,

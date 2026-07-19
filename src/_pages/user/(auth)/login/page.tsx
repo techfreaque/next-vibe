@@ -1,6 +1,8 @@
 export const dynamic = "force-dynamic";
 
 import type { Metadata, Route } from "next";
+import { coreEnv } from "next-vibe/core/env";
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -13,8 +15,6 @@ import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
 import { Link } from "next-vibe/ui/ui/link";
 import type { JSX } from "react";
 
-import { env } from "@/env/env";
-import { envClient } from "@/env/env-client";
 import { configScopedTranslation } from "@/env/i18n";
 import { DEV_SEED_PASSWORD, DEV_SEED_USERS } from "@/user/dev-seed-users";
 import { scopedTranslation as loginScopedTranslation } from "@/user/public/login/i18n";
@@ -146,8 +146,9 @@ export async function tanstackLoader({
   }
 
   const devSeedPassword =
-    env.NODE_ENV === "development" ? DEV_SEED_PASSWORD : null;
-  const devSeedUsers = env.NODE_ENV === "development" ? DEV_SEED_USERS : null;
+    coreEnv.NODE_ENV === "development" ? DEV_SEED_PASSWORD : null;
+  const devSeedUsers =
+    coreEnv.NODE_ENV === "development" ? DEV_SEED_USERS : null;
 
   return {
     locale,

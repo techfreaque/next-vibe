@@ -6,7 +6,6 @@
 
 "use client";
 import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
-import { cn } from "next-vibe/core/utils/utils";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
@@ -20,6 +19,7 @@ import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
 import { RotateCcw } from "next-vibe/ui/ui/icons/RotateCcw";
 import { Pre } from "next-vibe/ui/ui/pre";
 import { Span } from "next-vibe/ui/ui/span";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -30,10 +30,10 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { DateFieldWidget } from "next-vibe/unified-ui/form-fields/date-field/widget";
-import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field/widget";
-import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { DateFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/date-field/widget";
+import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import React, { useCallback, useState } from "react";
 
 import type endpoints from "./definition";
@@ -276,8 +276,7 @@ export function ErrorLogsContainer({ field }: WidgetProps): React.JSX.Element {
       }
       setUpdatingFingerprint(fingerprint);
       try {
-        const { apiClient } =
-          await import("next-vibe/platforms/react/hooks/store");
+        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
         const endpointsDef = await import("./definition");
         await apiClient.mutate(
           endpointsDef.PATCH,

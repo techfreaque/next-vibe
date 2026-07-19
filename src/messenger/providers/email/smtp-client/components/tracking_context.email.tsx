@@ -3,9 +3,8 @@
  * Shared types and utilities for email tracking
  */
 
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-
-import { envClient } from "@/env/env-client";
 
 /**
  * Tracking context for email components

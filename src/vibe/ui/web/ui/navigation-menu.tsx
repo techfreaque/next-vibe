@@ -2,7 +2,7 @@
 
 import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
 import { cva, type VariantProps } from "class-variance-authority";
-import { cn } from "next-vibe/core/utils/utils";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import * as React from "react";
 
 import { ChevronDownIcon } from "../../web/ui/icons/ChevronDownIcon";

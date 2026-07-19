@@ -9,7 +9,6 @@ import "server-only";
 
 import { and, eq, isNull, like, or, sql } from "drizzle-orm";
 import Imap from "imap";
-import { Platform } from "next-vibe/core/definition/platform";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -22,6 +21,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { leads } from "next-vibe/identity/lead/db";
 import { LeadStatus } from "next-vibe/identity/lead/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { Platform } from "next-vibe/platforms/platforms";
 import { cronTasks, type NewCronTask } from "next-vibe/tasks/cron/db";
 import { CronTaskPriority, TaskCategory } from "next-vibe/tasks/enum";
 

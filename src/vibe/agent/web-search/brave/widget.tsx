@@ -23,11 +23,11 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { BooleanFieldWidget } from "next-vibe/unified-ui/form-fields/boolean-field/widget";
-import { NumberFieldWidget } from "next-vibe/unified-ui/form-fields/number-field/widget";
-import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
-import { SearchBarWidget } from "next-vibe/unified-ui/interactive/search-bar/widget";
+import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
+import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/number-field/widget";
+import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
+import { SearchBarWidget } from "next-vibe/unified-ui/widgets/interactive/search-bar/widget";
 import type { JSX } from "react";
 
 import { SearchProvider } from "../enum";

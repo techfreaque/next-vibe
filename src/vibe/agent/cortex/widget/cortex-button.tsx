@@ -2,7 +2,6 @@
 import { DefaultFolderId } from "next-vibe/agent/chat/config";
 import { scopedTranslation } from "next-vibe/agent/cortex/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { cn } from "next-vibe/core/utils/utils";
 import { Button } from "next-vibe/ui/ui/button";
 import { Brain } from "next-vibe/ui/ui/icons/Brain";
 import {
@@ -12,6 +11,7 @@ import {
 } from "next-vibe/ui/ui/popover";
 import { Span } from "next-vibe/ui/ui/span";
 import { P } from "next-vibe/ui/ui/typography";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 
 import { useCortexModalStore } from "./store";

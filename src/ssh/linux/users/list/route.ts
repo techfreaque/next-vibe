@@ -11,10 +11,11 @@ export const { GET, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
     handler: async ({ data, logger, user, t }) =>
-      (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-        )
-      ).LinuxUsersListRepository.list(data, logger, user, t),
+      (await import("./repository")).LinuxUsersListRepository.list(
+        data,
+        logger,
+        user,
+        t,
+      ),
   },
 });

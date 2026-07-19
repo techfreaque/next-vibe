@@ -25,8 +25,8 @@ import { join, resolve } from "node:path";
 
 import { beforeAll, describe, expect, it } from "bun:test";
 
-import type { LspIssue } from "../typecheck/lsp-daemon";
-import { TsgoDaemon } from "../typecheck/lsp-daemon";
+import type { LspIssue } from "./repository/typecheck/lsp-daemon";
+import { TsgoDaemon } from "./repository/typecheck/lsp-daemon";
 
 const TEST_PROJECT_PATH = resolve(__dirname, "../test-project");
 const ROOT_PATH = resolve(__dirname, "../../../../..");

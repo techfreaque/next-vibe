@@ -27,7 +27,7 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { type JSX, useCallback } from "react";
 
 import type endpoints from "./definition";
@@ -116,7 +116,7 @@ export function ConnectionsListContainer(_props: {
     (conn: Connection) =>
       (e: ButtonMouseEvent): void => {
         e.stopPropagation();
-        const slug = conn.label.toLowerCase().replace(/\s+/g, "-");
+        const slug = conn.label.toLowerCase().replaceAll(/\s+/g, "-");
         void (async (): Promise<void> => {
           const def = await import("next-vibe/agent/cortex/exec/definition");
           navigate(def.default.POST, {

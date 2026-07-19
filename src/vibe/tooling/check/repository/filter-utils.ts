@@ -83,6 +83,13 @@ function isGlobPattern(str: string): boolean {
 }
 
 /**
+ * Regex character class matching either path separator, so a glob written with
+ * "/" also matches Windows paths (src\foo\bar.ts).
+ */
+const SEP = String.raw`[/\\]`;
+const NOT_SEP = String.raw`[^/\\]`;
+
+/**
  * Convert a glob pattern to a regex pattern
  * Handles both simple patterns (*.test.ts) and path patterns (src/nested/files.tsx)
  * Patterns without slashes are automatically made recursive (prepend **)
@@ -96,36 +103,38 @@ function globToRegex(glob: string): string {
     pattern = `**/${pattern}`;
   }
 
-  // Replace glob wildcards with placeholders BEFORE escaping other special chars
-  // Handle ** before * to distinguish them
-  pattern = pattern.replace(/\*\*/g, "\x00"); // Placeholder for **
-  pattern = pattern.replace(/\*/g, "\x01"); // Placeholder for *
-  pattern = pattern.replace(/\?/g, "\x02"); // Placeholder for ?
+  // Replace glob wildcards and path separators with placeholders BEFORE escaping
+  // other special chars. Handle ** before * to distinguish them.
+  pattern = pattern.replaceAll("**", "\u0000"); // Placeholder for **
+  pattern = pattern.replaceAll("*", "\u0001"); // Placeholder for *
+  pattern = pattern.replaceAll("?", "\u0002"); // Placeholder for ?
+  pattern = pattern.replaceAll("/", "\u0003"); // Placeholder for a path separator
 
   // Now escape regex special chars (everything except our placeholders)
-  pattern = pattern.replace(/[.+^${}()|[\]\\]/g, "\\$&");
+  pattern = pattern.replaceAll(/[.+^${}()|[\]\\]/g, "\\$&");
 
-  // Replace placeholders with regex equivalents
-  // ** at the start means "optional path/" to handle both root-level and nested files
-  // eslint-disable-next-line no-control-regex
-  if (pattern.startsWith("\x00/")) {
-    // eslint-disable-next-line no-control-regex
-    pattern = pattern.replace(/\x00\//, "(?:.*\\/)?");
-  } else {
-    // ** in the middle followed by / should match zero or more path segments
-    // eslint-disable-next-line no-control-regex
-    pattern = pattern.replace(/\x00\//g, "(?:.*\\/)?");
-    // Any remaining ** matches everything
-    // eslint-disable-next-line no-control-regex
-    pattern = pattern.replace(/\x00/g, ".*");
+  // Replace placeholders with regex equivalents.
+  // "**/" matches zero or more path segments — at the start of a pattern this
+  // also lets it match root-level files. Any remaining "**" (e.g. a trailing
+  // one, as in "**/test-project/**") matches everything.
+  //
+  // The placeholders MUST stay written as \u000N escapes. An autofix once
+  // rewrote these from regex form to string arguments and ate the control
+  // characters, leaving `replaceAll("", ...)` — which inserts between every
+  // character and silently turns every glob into nonsense. Every ignore
+  // pattern and filter in the checker runs through here.
+  pattern = pattern.replaceAll("\u0000\u0003", `(?:.*${SEP})?`);
+  pattern = pattern.replaceAll("\u0000", ".*");
+  pattern = pattern.replaceAll("\u0001", `${NOT_SEP}*`); // * matches anything except a separator
+  pattern = pattern.replaceAll("\u0002", NOT_SEP); // ? matches any single non-separator char
+  pattern = pattern.replaceAll("\u0003", SEP);
+
+  // Anchor both ends. Without a start anchor a pattern matches mid-segment —
+  // "**/fixtures/**" would also ignore "src/generated/ai-fixtures/x.ts". The
+  // leading "(?:.*[/\\])?" of a "**/" pattern still allows matching at any depth.
+  if (!pattern.startsWith("^")) {
+    pattern = `^${pattern}`;
   }
-
-  // eslint-disable-next-line no-control-regex
-  pattern = pattern.replace(/\x01/g, "[^/]*"); // * matches anything except /
-  // eslint-disable-next-line no-control-regex
-  pattern = pattern.replace(/\x02/g, "[^/]"); // ? matches any single char except /
-
-  // Add end anchor to avoid matching too much
   if (!pattern.endsWith("$")) {
     pattern += "$";
   }
@@ -168,7 +177,24 @@ function hasRegexSyntax(str: string): boolean {
  * Escape special regex characters for literal matching
  */
 function escapeRegex(str: string): string {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return str.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/**
+ * Does `filePath` match any of `globs`?
+ *
+ * Strictly the path — no message or rule text, unlike {@link matchesFilter},
+ * which is deliberately fuzzy because a human typed it. Config-driven scoping
+ * has to be exact: a pedantic warning whose *message* happened to contain
+ * "src/vibe" must not count as being in that directory.
+ *
+ * Empty `globs` matches nothing, not everything — these lists are opt-in.
+ */
+export function matchesAnyGlob(
+  filePath: string,
+  globs: readonly string[],
+): boolean {
+  return globs.some((glob) => new RegExp(globToRegex(glob)).test(filePath));
 }
 
 /**

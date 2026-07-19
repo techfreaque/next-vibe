@@ -14,7 +14,7 @@ import { UserRole } from "next-vibe/identity/roles/enum";
 import {
   objectField,
   requestUrlPathParamsField,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { THREAD_FILES_ALIAS } from "./constants";

@@ -36,9 +36,8 @@ import { chatFavorites } from "next-vibe/agent/skills/favorites/db";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { identityEnv } from "next-vibe/identity/env";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
-import { env } from "@/env/env";
 
 import { ChatModelId } from "../../models";
 import { seedCaseThread } from "../../testing/fixture-seed";
@@ -68,15 +67,15 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
       resolveProdUserId,
     } = await import("../../testing/remote-setup");
 
-    const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
+    const resolved = await resolveUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
     expect(
       resolved,
-      `Admin user ${env.VIBE_ADMIN_USER_EMAIL} not found - run: vibe dev`,
+      `Admin user ${identityEnv.VIBE_ADMIN_USER_EMAIL} not found - run: vibe dev`,
     ).toBeTruthy();
     if (!resolved) {
       // oxlint-disable-next-line restricted-syntax
       throw new Error(
-        `Admin user ${env.VIBE_ADMIN_USER_EMAIL} not found - run: vibe dev`,
+        `Admin user ${identityEnv.VIBE_ADMIN_USER_EMAIL} not found - run: vibe dev`,
       );
     }
     testUser = resolved;
@@ -175,8 +174,8 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
 
   // ── VC1: Thea uses ai-run with vibe-coder skill ──────────────────────────
   it("VC1: when codingAgent=next-vibe-coder, Thea delegates coding tasks via ai-run(skill=vibe-coder)", async () => {
-    const { threadId: fixtureThreadId, streamContext: fixtureCtx } =
-            await seedCaseThread("vibe-coder-vc1");
+    const { threadId: fixtureThreadId, toolExecutionContext: fixtureCtx } =
+      await seedCaseThread("vibe-coder-vc1");
 
     const { result, messages } = await runTestStream({
       user: testUser,
@@ -188,7 +187,7 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
       // window) legitimately takes 2-4 min on a live first recording.
       settleTimeoutMs: 240_000,
       threadId: fixtureThreadId,
-      streamContext: fixtureCtx,
+      toolExecutionContext: fixtureCtx,
     });
 
     expect(
@@ -202,7 +201,7 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
 
     // Strip <think>...</think> blocks before assertions - AI reasoning may contain
     // the words "FAILED" or "STEP_OK" while narrating the instructions, not as outcomes.
-    const aiContent = (result.data.lastAiMessageContent ?? "").replace(
+    const aiContent = (result.data.lastAiMessageContent ?? "").replaceAll(
       /<think>[\s\S]*?<\/think>/g,
       "",
     );
@@ -274,8 +273,8 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
 
   // ── VC2: vibe-coder skill has SSH awareness ───────────────────────────────
   it("VC2: vibe-coder skill has ssh-exec available and provides SSH guidance when no connections exist", async () => {
-    const { threadId: fixtureThreadId, streamContext: fixtureCtx } =
-            await seedCaseThread("vibe-coder-vc2");
+    const { threadId: fixtureThreadId, toolExecutionContext: fixtureCtx } =
+      await seedCaseThread("vibe-coder-vc2");
 
     const { result, messages } = await runTestStream({
       user: testUser,
@@ -284,7 +283,7 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
       rootFolderId: DefaultFolderId.PRIVATE,
       subFolderId: vibeCoderFolderId,
       threadId: fixtureThreadId,
-      streamContext: fixtureCtx,
+      toolExecutionContext: fixtureCtx,
     });
 
     expect(
@@ -298,7 +297,7 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
 
     // Strip <think>...</think> blocks before assertions - AI reasoning may contain
     // the words "FAILED" or "STEP_OK" while narrating the instructions, not as outcomes.
-    const aiContent = (result.data.lastAiMessageContent ?? "").replace(
+    const aiContent = (result.data.lastAiMessageContent ?? "").replaceAll(
       /<think>[\s\S]*?<\/think>/g,
       "",
     );

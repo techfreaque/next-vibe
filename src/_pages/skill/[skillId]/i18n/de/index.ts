@@ -14,7 +14,7 @@ export const translations: typeof enTranslations = {
     allSkills: "Alle Skills",
     backArrow: "\u2190",
     forwardArrow: "\u2192",
-    copyright: "\u00a9",
+    copyright: "\u00A9",
   },
   ownership: {
     system: "Offiziell",

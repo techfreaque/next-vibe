@@ -12,7 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: clickEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger, platform, streamContext }) =>
+    handler: ({ data, t, logger, platform, toolExecutionContext }) =>
       BrowserSharedRepository.executeClick<ClickResponseOutput>(
         {
           toolName: BrowserTool.CLICK,
@@ -25,7 +25,7 @@ export const { POST, tools } = endpointsHandler({
         t,
         logger,
         platform,
-        streamContext.threadId,
+        toolExecutionContext.threadId,
       ),
   },
 });

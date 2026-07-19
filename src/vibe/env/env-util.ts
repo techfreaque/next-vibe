@@ -1,8 +1,8 @@
 import { validateData } from "next-vibe/core/core-utils/validation";
-import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { isRuntimeEnvPlaceholder } from "next-vibe/platforms/cli/runtime/runtime-env-placeholders";
+import { Platform } from "next-vibe/platforms/platforms";
 import type { z } from "zod";
 
 interface EnvHint {

@@ -5,7 +5,6 @@
 
 "use client";
 import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
-import { cn } from "next-vibe/core/utils/utils";
 import exportEnvEndpoints from "next-vibe/env/settings/export-env/definition";
 import { ServerFramework } from "next-vibe/server/server/enum";
 import { storage } from "next-vibe/ui/lib/storage";
@@ -33,6 +32,7 @@ import {
 } from "next-vibe/ui/ui/select";
 import { Span } from "next-vibe/ui/ui/span";
 import { Switch } from "next-vibe/ui/ui/switch";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetContext,
   useWidgetLocale,
@@ -41,7 +41,7 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useState } from "react";
 
@@ -423,8 +423,7 @@ export function SystemSettingsWidget(): JSX.Element {
           filtered[key] = val;
         }
       }
-      const { apiClient } =
-        await import("next-vibe/platforms/react/hooks/store");
+      const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
       const endpointsDef = await import("./definition");
       await apiClient.mutate(
         endpointsDef.PATCH,
@@ -449,8 +448,7 @@ export function SystemSettingsWidget(): JSX.Element {
     }
     setApplying(true);
     try {
-      const { apiClient } =
-        await import("next-vibe/platforms/react/hooks/store");
+      const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
       const rebuildDef =
         await import("next-vibe/server/server/rebuild/definition");
       await apiClient.mutate(

@@ -12,26 +12,26 @@ function stripMarkdown(content: string): string {
   return (
     content
       // Remove think blocks (tags + content)
-      .replace(/<think>[\s\S]*?<\/think>/gi, "")
+      .replaceAll(/<think>[\s\S]*?<\/think>/gi, "")
       // Remove Chat tags but keep content
-      .replace(/<Chat>([\s\S]*?)<\/Chat>/gi, "$1")
+      .replaceAll(/<Chat>([\s\S]*?)<\/Chat>/gi, "$1")
       // Remove headings markers
-      .replace(/^#{1,6}\s+/gm, "")
+      .replaceAll(/^#{1,6}\s+/gm, "")
       // Remove bold/italic
-      .replace(/\*{1,3}([^*]+)\*{1,3}/g, "$1")
-      .replace(/_{1,3}([^_]+)_{1,3}/g, "$1")
+      .replaceAll(/\*{1,3}([^*]+)\*{1,3}/g, "$1")
+      .replaceAll(/_{1,3}([^_]+)_{1,3}/g, "$1")
       // Remove inline code backticks
-      .replace(/`([^`]+)`/g, "$1")
+      .replaceAll(/`([^`]+)`/g, "$1")
       // Remove code fences
-      .replace(/^```[\s\S]*?```/gm, "")
+      .replaceAll(/^```[\s\S]*?```/gm, "")
       // Remove blockquote markers
-      .replace(/^>\s+/gm, "")
+      .replaceAll(/^>\s+/gm, "")
       // Remove horizontal rules
-      .replace(/^[-*_]{3,}\s*$/gm, "")
+      .replaceAll(/^[-*_]{3,}\s*$/gm, "")
       // Remove image syntax
-      .replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1")
+      .replaceAll(/!\[([^\]]*)\]\([^)]*\)/g, "$1")
       // Remove link syntax but keep text
-      .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+      .replaceAll(/\[([^\]]+)\]\([^)]*\)/g, "$1")
       .trim()
   );
 }

@@ -14,7 +14,14 @@ import { WebSearchRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: webSearchDefinition,
   [Methods.GET]: {
-    handler: ({ data, user, logger, t, locale, streamContext }) =>
-      WebSearchRepository.search(data, user, logger, t, locale, streamContext),
+    handler: ({ data, user, logger, t, locale, toolExecutionContext }) =>
+      WebSearchRepository.search(
+        data,
+        user,
+        logger,
+        t,
+        locale,
+        toolExecutionContext,
+      ),
   },
 });

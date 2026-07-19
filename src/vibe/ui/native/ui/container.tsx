@@ -3,7 +3,7 @@
  * Provides consistent max-width and padding for app pages
  */
 import { styled } from "nativewind";
-import { cn } from "next-vibe/core/utils/utils";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { View } from "react-native";
 
 import { convertCSSToViewStyle } from "../../native/utils/style-converter";

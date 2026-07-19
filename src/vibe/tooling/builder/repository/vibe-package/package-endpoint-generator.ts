@@ -15,12 +15,13 @@ import {
   endpointToToolName,
   getPreferredToolName,
 } from "next-vibe/core/core-utils/path";
-import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
 import {
   findFilesRecursively,
   generateFileHeader,
+  toImportUrl,
   writeGeneratedFile,
-} from "next-vibe/tooling/generators/shared/utils";
+} from "next-vibe/core/generators/shared/utils";
+import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
 
 import { getApiDir } from "@/env/paths";
 
@@ -64,13 +65,13 @@ export class PackageEndpointGeneratorRepository {
 
     let definition;
     try {
-      definition = await import(defFile);
+      definition = await import(toImportUrl(defFile));
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       if (msg.includes("before initialization")) {
         await Bun.sleep(10);
         try {
-          definition = await import(defFile);
+          definition = await import(toImportUrl(defFile));
         } catch {
           return identifiers;
         }
@@ -186,13 +187,13 @@ export class PackageEndpointGeneratorRepository {
 
       let definition;
       try {
-        definition = await import(defFile);
+        definition = await import(toImportUrl(defFile));
       } catch (error) {
         const msg = error instanceof Error ? error.message : String(error);
         if (msg.includes("before initialization")) {
           await Bun.sleep(10);
           try {
-            definition = await import(defFile);
+            definition = await import(toImportUrl(defFile));
           } catch {
             continue;
           }
@@ -247,7 +248,7 @@ export class PackageEndpointGeneratorRepository {
     for (const defFile of filteredDefinitionFiles) {
       let definition;
       try {
-        definition = await import(defFile);
+        definition = await import(toImportUrl(defFile));
       } catch {
         continue;
       }

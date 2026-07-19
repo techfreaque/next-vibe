@@ -6,7 +6,7 @@
 import { existsSync, promises as fs } from "node:fs";
 import { relative, resolve as resolvePath } from "node:path";
 
-import { Platform } from "next-vibe/core/definition/platform";
+import { buildPackageRunnerCommand, coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType as ApiResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -16,20 +16,59 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { ConfigRepositoryImpl } from "next-vibe/tooling/check/config/repository";
-import { sortIssuesByLocation } from "next-vibe/tooling/check/config/shared";
-import type { CheckConfig } from "next-vibe/tooling/check/config/types";
-import type { CheckOxlintT } from "next-vibe/tooling/check/oxlint/i18n";
+import { Platform } from "next-vibe/platforms/platforms";
+
+import { ConfigRepositoryImpl } from "../../config/repository";
+import { sortIssuesByLocation } from "../../config/shared";
+import type { CheckConfig } from "../../config/types";
+import type { CheckVibeCheckT } from "../../i18n";
 import {
   calculateFilteredSummary,
   filterIssues,
-} from "next-vibe/tooling/check/shared/filter-utils";
+  matchesAnyGlob,
+} from "../filter-utils";
+// ── Inline types (definition removed) ───────────────────────
 
-import type {
-  OxlintIssue,
-  OxlintRequestOutput,
-  OxlintResponseOutput,
-} from "./definition";
+export interface OxlintIssue {
+  file: string;
+  line?: number;
+  column?: number;
+  rule?: string;
+  severity: "error" | "warning" | "info";
+  message: string;
+}
+
+export interface OxlintRequestOutput {
+  path?: string | string[];
+  fix: boolean;
+  timeout: number;
+  skipSorting?: boolean;
+  limit: number;
+  page: number;
+  summaryOnly: boolean;
+  extensive?: boolean;
+  /** Report strict rules everywhere, ignoring the strictPaths whitelist. */
+  strict?: boolean;
+  filter?: string | string[];
+}
+
+export interface OxlintResponseOutput {
+  editorUriSchema?: string;
+  items?: OxlintIssue[] | null;
+  files?:
+    | { file: string; errors: number; warnings: number; total: number }[]
+    | null;
+  totalIssues: number;
+  totalFiles: number;
+  totalErrors?: number;
+  filteredIssues?: number;
+  filteredFiles?: number;
+  displayedIssues?: number;
+  displayedFiles?: number;
+  truncatedMessage?: string;
+  currentPage?: number;
+  totalPages?: number;
+}
 
 /**
  * Run Oxlint Repository
@@ -39,7 +78,7 @@ export class OxlintRepository {
     data: OxlintRequestOutput,
     logger: EndpointLogger,
     platform: Platform,
-    t: CheckOxlintT,
+    t: CheckVibeCheckT,
     signal: AbortSignal,
     locale: CountryLanguage,
     providedConfig: CheckConfig | undefined,
@@ -144,6 +183,7 @@ export class OxlintRepository {
         logger,
         config,
         t,
+        effectiveData.strict ?? false,
         activeIgnorePatterns,
         signal,
       );
@@ -209,7 +249,8 @@ export class OxlintRepository {
     timeout: number,
     logger: EndpointLogger,
     config: CheckConfig,
-    t: CheckOxlintT,
+    t: CheckVibeCheckT,
+    strict: boolean,
     extraIgnorePatterns?: string[],
     signal?: AbortSignal,
   ): Promise<ApiResponseType<{ issues: OxlintIssue[] }>> {
@@ -236,7 +277,6 @@ export class OxlintRepository {
 
     const baseArgs = configExists
       ? [
-          "oxlint",
           "--format=json",
           "--config",
           oxlintConfigPath,
@@ -246,7 +286,6 @@ export class OxlintRepository {
           ...paths,
         ]
       : [
-          "oxlint",
           "--format=json",
           // Fallback: Enable plugins manually if no config
           "--tsconfig",
@@ -285,27 +324,136 @@ export class OxlintRepository {
             `[OXLINT] Oxfmt formatting failed: ${String(oxfmtResult.reason)}`,
           );
         }
-        return success(oxlintResult.value);
-      } else {
-        // eslint-disable-next-line i18next/no-literal-string
-        logger.error(`[OXLINT] Fix failed: ${String(oxlintResult.reason)}`);
-        return fail({
-          message: t("errors.oxlintFailed"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: { error: parseError(oxlintResult.reason).message },
+        return success({
+          issues: OxlintRepository.scopeStrictIssues(
+            oxlintResult.value.issues,
+            config,
+            strict,
+            logger,
+          ),
         });
       }
+      // eslint-disable-next-line i18next/no-literal-string
+      logger.error(`[OXLINT] Fix failed: ${String(oxlintResult.reason)}`);
+      return fail({
+        message: t("errors.oxlintFailed"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(oxlintResult.reason).message },
+      });
     }
 
     // Just run normal check
-    return success(
-      await OxlintRepository.runOxlintCommand(
-        baseArgs,
-        timeout,
-        logger,
-        signal,
-      ),
+    const checkResult = await OxlintRepository.runOxlintCommand(
+      baseArgs,
+      timeout,
+      logger,
+      signal,
     );
+    return success({
+      issues: OxlintRepository.scopeStrictIssues(
+        checkResult.issues,
+        config,
+        strict,
+        logger,
+      ),
+    });
+  }
+
+  /**
+   * Bare rule name, from either form it appears in.
+   *
+   * A config key is `unicorn/prefer-node-protocol` or `curly`; the matching
+   * diagnostic code is `eslint-plugin-unicorn(prefer-node-protocol)` or
+   * `eslint(curly)`. Neither the plugin prefix nor the wrapper is stable between
+   * the two, so both collapse to the part that is.
+   */
+  private static bareRuleName(value: string): string {
+    const wrapped = /\(([^()]+)\)\s*$/.exec(value);
+    const name = wrapped ? wrapped[1] : value;
+    return name.slice(name.lastIndexOf("/") + 1);
+  }
+
+  /**
+   * The rules this config opts into, by bare name.
+   *
+   * Every entry in `rules` is a rule we deliberately switched on — oxlint's
+   * defaults come from `categories`, not from here — so this block IS the strict
+   * set, and reading it back means the whitelist never needs a second inventory
+   * that could drift from it.
+   */
+  private static strictRuleNames(config: CheckConfig): Set<string> {
+    if (!config.oxlint.enabled) {
+      return new Set();
+    }
+    const names = new Set<string>();
+    for (const [key, value] of Object.entries(config.oxlint.rules ?? {})) {
+      // `["warn", { max: 150 }]` is as much "on" as `"warn"`.
+      const severity = Array.isArray(value) ? value[0] : value;
+      if (severity !== "off") {
+        names.add(OxlintRepository.bareRuleName(key));
+      }
+    }
+    return names;
+  }
+
+  /**
+   * Drop strict issues for files outside the opted-in paths.
+   *
+   * Strict means anything this config asked for on top of oxlint's baseline: a
+   * rule named in `rules`, or the `pedantic` category (which reports as `warn`).
+   * What survives everywhere is `correctness`/`suspicious` — oxlint's own
+   * "outright wrong" set, worth failing on in any file.
+   *
+   * Filtering here rather than in the oxlint config is not a shortcut: oxlint
+   * cannot scope a *category* to a path at all. `overrides` accepts `rules`
+   * only, and nested configs are ignored under `-c`.
+   */
+  private static scopeStrictIssues(
+    issues: OxlintIssue[],
+    config: CheckConfig,
+    strict: boolean,
+    logger: EndpointLogger,
+  ): OxlintIssue[] {
+    // `--strict` asks for the whole rule set on whatever was checked, whitelist
+    // or not — the point is to see what a path would have to fix before it can
+    // be added to one.
+    if (strict) {
+      return issues;
+    }
+
+    const strictPaths = config.oxlint.enabled
+      ? config.oxlint.strictPaths
+      : undefined;
+    // No whitelist configured: strict rules apply everywhere, as before.
+    if (!strictPaths) {
+      return issues;
+    }
+
+    const { include, exclude = [] } = strictPaths;
+    const strictRules = OxlintRepository.strictRuleNames(config);
+
+    const kept = issues.filter((issue) => {
+      const isStrict =
+        issue.severity === "warning" ||
+        (issue.rule !== undefined &&
+          strictRules.has(OxlintRepository.bareRuleName(issue.rule)));
+      if (!isStrict) {
+        return true;
+      }
+      return (
+        matchesAnyGlob(issue.file, include) &&
+        !matchesAnyGlob(issue.file, exclude)
+      );
+    });
+
+    const dropped = issues.length - kept.length;
+    if (dropped > 0) {
+      logger.debug(
+        // eslint-disable-next-line i18next/no-literal-string
+        `[OXLINT] Dropped ${dropped} strict issue(s) outside the opted-in paths`,
+      );
+    }
+    return kept;
   }
 
   /**
@@ -333,7 +481,6 @@ export class OxlintRepository {
         : [];
     /* eslint-enable i18next/no-literal-string */
     const command = [
-      "oxfmt",
       "--config",
       configPath,
       ...ignoreArgs,
@@ -341,16 +488,24 @@ export class OxlintRepository {
       ...excludeArgs,
     ];
 
-    logger.debug(`[OXLINT] Executing Oxfmt command: bunx ${command.join(" ")}`);
+    const runner = buildPackageRunnerCommand(
+      coreEnv.PACKAGE_MANAGER,
+      "oxfmt",
+      command,
+    );
+
+    logger.debug(
+      `[OXLINT] Executing Oxfmt command: ${runner.command} ${runner.args.join(" ")}`,
+    );
 
     const { spawn } = await import("node:child_process");
 
     return await new Promise((resolve, reject) => {
       /* eslint-disable i18next/no-literal-string */
-      const child = spawn("bunx", command, {
+      const child = spawn(runner.command, runner.args, {
         cwd: process.cwd(),
         stdio: ["ignore", "pipe", "pipe"],
-        shell: false,
+        shell: runner.shell,
       });
       /* eslint-enable i18next/no-literal-string */
 
@@ -524,8 +679,16 @@ export class OxlintRepository {
   ): Promise<{
     issues: OxlintIssue[];
   }> {
+    const runner = buildPackageRunnerCommand(
+      coreEnv.PACKAGE_MANAGER,
+      "oxlint",
+      args,
+    );
+
     // eslint-disable-next-line i18next/no-literal-string
-    logger.debug(`[OXLINT] Executing command: bunx ${args.join(" ")}`);
+    logger.debug(
+      `[OXLINT] Executing command: ${runner.command} ${runner.args.join(" ")}`,
+    );
 
     // Use spawn for execution
     const { spawn } = await import("node:child_process");
@@ -534,10 +697,10 @@ export class OxlintRepository {
         reject(new Error("Aborted"));
         return;
       }
-      const child = spawn("bunx", args, {
+      const child = spawn(runner.command, runner.args, {
         cwd: process.cwd(),
         stdio: ["ignore", "pipe", "pipe"],
-        shell: false,
+        shell: runner.shell,
         signal,
       });
 

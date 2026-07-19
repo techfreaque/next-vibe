@@ -65,8 +65,8 @@ function slugify(value: string): string {
   return (
     value
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "")
+      .replaceAll(/[^a-z0-9]+/g, "-")
+      .replaceAll(/^-|-$/g, "")
       .slice(0, 50) || "untitled"
   );
 }
@@ -217,12 +217,12 @@ export async function readUploadPath(
 
   const frontmatterLines = [
     "---",
-    `filename: "${attachment.filename.replace(/"/g, '\\"')}"`,
+    `filename: "${attachment.filename.replaceAll('"', '\\"')}"`,
     ...(attachment.url ? [`url: "${attachment.url}"`] : [`embedded: true`]),
     `mimeType: "${attachment.mimeType}"`,
     `size: "${formatBytes(attachment.size)}"`,
     `threadId: "${attachment.threadId}"`,
-    `threadTitle: "${attachment.threadTitle.replace(/"/g, '\\"')}"`,
+    `threadTitle: "${attachment.threadTitle.replaceAll('"', '\\"')}"`,
     `uploadedAt: "${attachment.uploadedAt.toISOString()}"`,
     "---",
   ];
@@ -413,8 +413,8 @@ export async function searchUploads(
       const typeFolder = getMimeTypeFolder(mimeType);
       const threadSlug = `${slugify(row.threadTitle ?? "untitled")}-${row.threadId}`;
       const safeFilename = filename
-        .replace(/[^a-z0-9.\-_]/gi, "-")
-        .replace(/-+/g, "-")
+        .replaceAll(/[^a-z0-9.\-_]/gi, "-")
+        .replaceAll(/-+/g, "-")
         .replace(/^\./, "");
       const path = `/uploads/${typeFolder}/${threadSlug}/${safeFilename}.md`;
       const excerpt = (

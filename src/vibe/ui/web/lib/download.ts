@@ -29,7 +29,7 @@ export function downloadFromUrl(filename: string, url: string): void {
   a.href = url;
   a.download = filename;
   a.target = "_blank";
-  document.body.appendChild(a);
+  document.body.append(a);
   a.click();
   document.body.removeChild(a);
 }

@@ -11,6 +11,10 @@ export const translations = {
       tools: "tools",
     },
     fields: {
+      interactive: {
+        label: "Interactive",
+        description: "Open the full interactive tool browser",
+      },
       query: {
         label: "Search Query (optional)",
         description:

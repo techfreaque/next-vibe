@@ -29,12 +29,11 @@
 import "server-only";
 
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { envClient } from "@/env/env-client";
 
 import { buildUserWsChannel } from "./channel";
 import { getLocalBroadcast } from "./local-broadcast";

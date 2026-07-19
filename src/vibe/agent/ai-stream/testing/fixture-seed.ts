@@ -60,12 +60,12 @@ export async function seedFixtureThread(
 export async function seedCaseThread(
   prefix: string,
   alsoRemote = false,
-): Promise<{ threadId: string; streamContext: ToolExecutionContext }> {
+): Promise<{ threadId: string; toolExecutionContext: ToolExecutionContext }> {
   const threadId = crypto.randomUUID();
   await seedFixtureThread(threadId, prefix, alsoRemote);
   return {
     threadId,
-    streamContext: makeHeadlessContext(
+    toolExecutionContext: makeHeadlessContext(
       undefined,
       threadId,
       /* no user context — UTC (dates not user-facing here) */ "UTC",

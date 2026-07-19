@@ -9,10 +9,10 @@
 
 import "server-only";
 
-import { Platform } from "next-vibe/core/definition/platform";
-import { permissionsRegistry } from "next-vibe/core/permissions/registry";
+import { permissionsRegistry } from "next-vibe/core/route/definitions-registry";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { Platform } from "next-vibe/platforms/platforms";
 
 import { endpointsMeta } from "@/generated/endpoints/meta/en";
 
@@ -31,9 +31,7 @@ function countForPlatformAndUser(
   user: JwtPayloadType,
 ): number {
   return endpointsMeta.filter((ep) => {
-    const allowedRoles = ep.allowedRoles as Parameters<
-      typeof permissionsRegistry.checkPlatformAccess
-    >[0];
+    const allowedRoles = ep.allowedRoles;
     const platformAccess = permissionsRegistry.checkPlatformAccess(
       allowedRoles,
       platform,
@@ -84,9 +82,7 @@ function ensureComputed(): void {
   };
   for (const platform of allPlatforms) {
     for (const ep of endpointsMeta) {
-      const allowedRoles = ep.allowedRoles as Parameters<
-        typeof permissionsRegistry.checkPlatformAccess
-      >[0];
+      const allowedRoles = ep.allowedRoles;
       const platformAccess = permissionsRegistry.checkPlatformAccess(
         allowedRoles,
         platform,

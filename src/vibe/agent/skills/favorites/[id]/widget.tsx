@@ -40,7 +40,6 @@ import { getBestTtsModel } from "next-vibe/agent/text-to-speech/models";
 import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "next-vibe/agent/video-generation/constants";
 import { getBestVideoGenModel } from "next-vibe/agent/video-generation/models";
 import helpDefinitions from "next-vibe/help-tool/definition";
-import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
@@ -74,11 +73,12 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { AlertWidget } from "next-vibe/unified-ui/display-only/alert/widget";
-import { IconFieldWidget } from "next-vibe/unified-ui/form-fields/icon-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
+import { AlertWidget } from "next-vibe/unified-ui/widgets/display-only/alert/widget";
+import { IconFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/icon-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
 
@@ -454,7 +454,7 @@ export function FavoriteEditContainer({
 
     // Get modelId from the favorites list
     // We need to fetch it from the favorites list GET endpoint
-    const { apiClient } = await import("next-vibe/platforms/react/hooks/store");
+    const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
     const favoritesDefinition = await import("../definition");
 
     const favoritesData = apiClient.getEndpointData(

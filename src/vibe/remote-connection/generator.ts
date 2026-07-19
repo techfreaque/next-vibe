@@ -22,6 +22,16 @@ import { join } from "node:path";
 import { getPreferredToolName } from "next-vibe/core/core-utils/path";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { Methods } from "next-vibe/core/definition/enums";
+import type {
+  GeneratorContext,
+  GeneratorResult,
+} from "next-vibe/core/generators/shared/shared-inputs";
+import {
+  findFilesRecursively,
+  generateFileHeader,
+  toImportUrl,
+  writeGeneratedFile,
+} from "next-vibe/core/generators/shared/utils";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { UserPermissionRoleValue } from "next-vibe/identity/roles/enum";
@@ -32,19 +42,10 @@ import {
 } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { RemoteToolCapability } from "next-vibe/remote-connection/db";
-import type {
-  GeneratorContext,
-  GeneratorResult,
-} from "next-vibe/tooling/generators/shared/shared-inputs";
-import {
-  findFilesRecursively,
-  generateFileHeader,
-  writeGeneratedFile,
-} from "next-vibe/tooling/generators/shared/utils";
 
-import { getApiDir } from "@/env/paths";
+import { GENERATED_DIR, getApiDir } from "@/env/paths";
 
-const OUTPUT_DIR = "src/generated/remote-capabilities";
+const OUTPUT_DIR = `${GENERATED_DIR}/remote-capabilities`;
 
 // ─── Build version ────────────────────────────────────────────────────────────
 
@@ -255,7 +256,7 @@ class RemoteCapabilitiesGenerator {
       default?: Record<string, CreateApiEndpointAny>;
     } | null> => {
       try {
-        return (await import(defFile)) as {
+        return (await import(toImportUrl(defFile))) as {
           default?: Record<string, CreateApiEndpointAny>;
         };
       } catch (error) {
@@ -265,7 +266,7 @@ class RemoteCapabilitiesGenerator {
             setTimeout(resolve, 10);
           });
           try {
-            return (await import(defFile)) as {
+            return (await import(toImportUrl(defFile))) as {
               default?: Record<string, CreateApiEndpointAny>;
             };
           } catch (retryError) {
@@ -519,7 +520,7 @@ class RemoteCapabilitiesGenerator {
     // Prettier collapses arrays of strings/numbers/booleans/null/empty-objects when
     // the full line (indentation + key + collapsed array) fits ≤80 chars.
     // Match: "key": [\n  item,\n  item\n] where each item is a JSON scalar or {}
-    const collapsed = raw.replace(
+    const collapsed = raw.replaceAll(
       /^( *"[^"]+": )\[(\n\s+(?:"[^"]*"|true|false|null|-?\d+(?:\.\d+)?|{}),?\s*)+\n\s*\]/gm,
       (match, prefix: string) => {
         const arrayPart = match.slice((prefix as string).length);

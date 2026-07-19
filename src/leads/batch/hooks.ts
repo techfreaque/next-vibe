@@ -12,9 +12,9 @@ import type {
   LeadSource,
   LeadStatus,
 } from "next-vibe/identity/lead/enum";
-import type { EndpointReturn } from "next-vibe/platforms/react/hooks/endpoint-types";
-import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
+import type { EndpointReturn } from "next-vibe/unified-ui/hooks/endpoint-types";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { useCallback, useEffect, useState } from "react";
 
 import type { LeadListGetRequestTypeOutput } from "../list/definition";

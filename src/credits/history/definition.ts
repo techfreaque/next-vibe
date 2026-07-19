@@ -14,15 +14,15 @@ import {
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   backButton,
-  customWidgetObject,
   objectField,
   requestField,
   responseArrayField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils";
-import { paginationField } from "next-vibe/unified-ui/containers/pagination/types";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
+import { paginationField } from "next-vibe/unified-ui/widgets/containers/pagination/types";
 import { z } from "zod";
 
 import { CreditTransactionType } from "../enum";

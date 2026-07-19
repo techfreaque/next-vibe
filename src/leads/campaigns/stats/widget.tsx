@@ -6,7 +6,6 @@
 "use client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getDefaultTimezone } from "next-vibe/core/i18n/core/localization-utils";
-import { cn } from "next-vibe/core/utils/utils";
 import { scopedTranslation as leadsI18n } from "next-vibe/identity/lead/i18n";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { formatCronScheduleShort } from "next-vibe/tasks/cron-formatter";
@@ -29,6 +28,7 @@ import { SectionGroup } from "next-vibe/ui/ui/section-group";
 import { Span } from "next-vibe/ui/ui/span";
 import { WidgetHeader } from "next-vibe/ui/ui/widget-header";
 import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetContext,
   useWidgetLocale,

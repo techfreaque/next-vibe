@@ -17,14 +17,14 @@ import {
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   backButton,
-  customWidgetObject,
   requestField,
   requestUrlPathParamsField,
   responseField,
   submitButton,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { SKILL_VOTE_ALIAS } from "../../constants";
@@ -193,7 +193,7 @@ const { POST } = createEndpoint({
         const skillId = urlPathParams.id;
 
         const [{ apiClient }, skillsDefinition] = await Promise.all([
-          import("next-vibe/platforms/react/hooks/store"),
+          import("next-vibe/unified-ui/hooks/store"),
           import("../../definition"),
         ]);
         apiClient.updateEndpointData(

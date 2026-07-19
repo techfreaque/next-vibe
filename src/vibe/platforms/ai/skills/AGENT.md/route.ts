@@ -14,11 +14,10 @@
  *   - [character-id]-skill.md → per-character focused skill manifests
  */
 
+import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
-
-import { env } from "@/env/env";
 
 import { getListableSkills } from "../markdown-generator";
 
@@ -27,7 +26,7 @@ const CACHE_MAX_AGE = 300; // 5 minutes - now includes dynamic character list
 async function generateGatewayMarkdown(
   locale: CountryLanguage,
 ): Promise<string> {
-  const baseUrl = env.NEXT_PUBLIC_APP_URL ?? "https://your-app.com";
+  const baseUrl = coreEnv.NEXT_PUBLIC_APP_URL ?? "https://your-app.com";
   const skillsBase = `${baseUrl}/api/${locale}/system/platforms/ai/skills`;
   const now = new Date().toISOString();
 

@@ -14,7 +14,8 @@
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, renameSync, rmSync } from "node:fs";
 
-import { Platform } from "next-vibe/core/definition/platform";
+import { buildPackageRunnerCommand, coreEnv } from "next-vibe/core/env";
+import { GenerateAllRepository } from "next-vibe/core/generators/repository";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -27,10 +28,12 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { DatabaseMigrationRepository } from "next-vibe/database/migrate/repository";
 import { SeedRepository } from "next-vibe/database/seed/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { Platform } from "next-vibe/platforms/platforms";
 import type { RebuildT } from "next-vibe/server/server/rebuild/i18n";
-import { scopedTranslation as checkScopedTranslation } from "next-vibe/tooling/check/vibe-check/i18n";
-import { VibeCheckRepository } from "next-vibe/tooling/check/vibe-check/repository";
-import { GenerateAllRepository } from "next-vibe/tooling/generators/repository";
+import { scopedTranslation as checkScopedTranslation } from "next-vibe/tooling/check/i18n";
+import { VibeCheckRepository } from "next-vibe/tooling/check/repository/repository";
+
+import { GENERATED_DIR } from "@/env/paths";
 
 import { ServerFramework } from "../enum";
 import { readPidFilePort, VIBE_START_PID_FILE } from "../pid";
@@ -99,7 +102,7 @@ export class RebuildRepository {
         try {
           const generateResult = await GenerateAllRepository.generateAll(
             {
-              outputDir: "src/generated",
+              outputDir: GENERATED_DIR,
               verbose: false,
               skipEndpoints: false,
               skipSeeds: false,
@@ -176,12 +179,16 @@ export class RebuildRepository {
         }
 
         const buildArgs =
-          data.webpack !== false
-            ? ["next", "build", "--webpack"]
-            : ["next", "build"];
-        const buildResult = spawnSync("bunx", buildArgs, {
+          data.webpack !== false ? ["build", "--webpack"] : ["build"];
+        const runner = buildPackageRunnerCommand(
+          coreEnv.PACKAGE_MANAGER,
+          "next",
+          buildArgs,
+        );
+        const buildResult = spawnSync(runner.command, runner.args, {
           stdio: "inherit",
           cwd,
+          shell: runner.shell,
           env: {
             ...process.env,
             NODE_ENV: "production",

@@ -2,7 +2,6 @@
 import type { DefaultFolderId } from "next-vibe/agent/chat/config";
 import type { ChatMessage } from "next-vibe/agent/chat/db";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { cn } from "next-vibe/core/utils/utils";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { Badge } from "next-vibe/ui/ui/badge";
@@ -14,6 +13,7 @@ import { Image as ImageIcon } from "next-vibe/ui/ui/icons/Image";
 import { Music } from "next-vibe/ui/ui/icons/Music";
 import { X } from "next-vibe/ui/ui/icons/X";
 import { Span } from "next-vibe/ui/ui/span";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { useWidgetItem } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { memo, useCallback, useState } from "react";

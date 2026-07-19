@@ -1,11 +1,10 @@
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { identityEnv } from "next-vibe/identity/env";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { beforeAll, describe, expect, it } from "vitest";
-
-import { env } from "@/env/env";
 
 import passwordEndpoints from "./definition";
 
@@ -20,7 +19,7 @@ describe("POST /user/private/me/password", () => {
 
   it("rejects wrong current password with UNAUTHORIZED", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint,
       data: {
         currentCredentials: {
@@ -46,11 +45,11 @@ describe("POST /user/private/me/password", () => {
 
   it("rejects new password shorter than 8 chars with VALIDATION_ERROR", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint,
       data: {
         currentCredentials: {
-          currentPassword: env.VIBE_ADMIN_USER_PASSWORD,
+          currentPassword: identityEnv.VIBE_ADMIN_USER_PASSWORD,
         },
         newCredentials: {
           newPassword: "short",
@@ -71,7 +70,7 @@ describe("POST /user/private/me/password", () => {
 
   it("rejects current password shorter than 8 chars with VALIDATION_ERROR", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint,
       data: {
         currentCredentials: {
@@ -96,7 +95,7 @@ describe("POST /user/private/me/password", () => {
 
   it("rejects unauthenticated user with FORBIDDEN", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint,
       data: {
         currentCredentials: {
@@ -125,11 +124,11 @@ describe("POST /user/private/me/password", () => {
 
   it("rejects invalid 2FA code format (not 6 chars) with VALIDATION_ERROR", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint,
       data: {
         currentCredentials: {
-          currentPassword: env.VIBE_ADMIN_USER_PASSWORD,
+          currentPassword: identityEnv.VIBE_ADMIN_USER_PASSWORD,
         },
         newCredentials: {
           newPassword: "NewSecure456!",

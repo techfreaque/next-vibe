@@ -18,10 +18,10 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import BadgeWidget from "next-vibe/unified-ui/display-only/badge/widget";
-import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
-import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import BadgeWidget from "next-vibe/unified-ui/widgets/display-only/badge/widget";
+import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 
 import type definition from "./definition";
 import type { FolderPermissionsTranslationKey } from "./i18n";

@@ -4,7 +4,6 @@ import type { ChatMessage } from "next-vibe/agent/chat/db";
 import { useChatNavigationStore } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
 import { getVoteStatus } from "next-vibe/agent/chat/threads/[threadId]/messages/[messageId]/vote/utils";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { cn } from "next-vibe/core/utils/utils";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
@@ -13,8 +12,9 @@ import { Button } from "next-vibe/ui/ui/button";
 import { Div, type DivMouseEvent } from "next-vibe/ui/ui/div";
 import { Markdown } from "next-vibe/ui/ui/markdown";
 import { Span, type SpanMouseEvent } from "next-vibe/ui/ui/span";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { useWidgetNavigation } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JSX } from "react";
 import React, { memo, useCallback, useMemo } from "react";
 

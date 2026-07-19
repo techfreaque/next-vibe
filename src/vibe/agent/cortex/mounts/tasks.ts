@@ -44,7 +44,7 @@ export async function readTaskPath(
   const frontmatterLines = [
     "---",
     `taskId: "${task.id}"`,
-    `name: "${(task.displayName ?? "Unnamed").replace(/"/g, '\\"')}"`,
+    `name: "${(task.displayName ?? "Unnamed").replaceAll('"', '\\"')}"`,
     `status: "${task.lastExecutionStatus ?? "pending"}"`,
     `enabled: ${task.enabled}`,
   ];

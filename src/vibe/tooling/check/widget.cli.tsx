@@ -4,13 +4,13 @@
 
 import chalk from "chalk";
 import { Box, Text } from "ink";
-import { Platform } from "next-vibe/core/definition/platform";
-import { scopedTranslation as unifiedInterfaceScopedTranslation } from "next-vibe/platforms/react/i18n";
+import { Platform } from "next-vibe/platforms/platforms";
 import {
-    useWidgetLocale,
-    useWidgetPlatform,
+  useWidgetLocale,
+  useWidgetPlatform,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { CliIcon } from "next-vibe/unified-ui/form-fields/icon-field/cli-icons";
+import { scopedTranslation as unifiedInterfaceScopedTranslation } from "next-vibe/unified-ui/hooks/i18n";
+import { CliIcon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/cli-icons";
 import type { JSX } from "react";
 import { useMemo } from "react";
 import terminalLink from "terminal-link";

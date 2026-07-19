@@ -7,8 +7,8 @@ import { mcpSilentMode } from "next-vibe/logger/debug";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { binaryStartTime } from "../run-cli";
 import type { RouteExecutionResult } from "./route-executor";
+import { binaryStartTime } from "./run-cli";
 
 /**
  * Internal Node.js handle type for resource monitoring

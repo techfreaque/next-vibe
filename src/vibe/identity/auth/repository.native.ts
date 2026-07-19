@@ -3,7 +3,6 @@
  * Implements AuthRepository interface for React Native
  */
 
-import type { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -17,6 +16,7 @@ import { scopedTranslation } from "next-vibe/identity/auth/i18n";
 import type { UserRoleValue } from "next-vibe/identity/roles/enum";
 import type { CompleteUserType } from "next-vibe/identity/user/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import type { Platform } from "next-vibe/platforms/platforms";
 import { storage } from "next-vibe/ui/lib/storage";
 
 import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/env/constants";

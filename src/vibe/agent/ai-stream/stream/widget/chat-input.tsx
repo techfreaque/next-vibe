@@ -15,7 +15,6 @@ import {
 import { AGENT_MESSAGE_LENGTH } from "next-vibe/agent/chat/constants";
 import type { EnabledTool } from "next-vibe/agent/chat/hooks/store";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { cn } from "next-vibe/core/utils/utils";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { openInNewTab } from "next-vibe/ui/lib/location";
@@ -34,6 +33,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe/ui/ui/tooltip";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX, ReactNode } from "react";
 import { useCallback, useEffect, useRef } from "react";
 

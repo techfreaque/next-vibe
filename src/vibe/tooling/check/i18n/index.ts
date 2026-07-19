@@ -4,8 +4,8 @@ import { translations as enTranslations } from "./en";
 
 export const scopedTranslation = createScopedTranslation({
   en: enTranslations,
-  de: () => require("next-vibe/tooling/check/vibe-check/i18n/de").translations,
-  pl: () => require("next-vibe/tooling/check/vibe-check/i18n/pl").translations,
+  de: () => require("./de").translations,
+  pl: () => require("./pl").translations,
 });
 
 export type CheckVibeCheckTranslationKey =

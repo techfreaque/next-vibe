@@ -7,19 +7,20 @@ import "server-only";
 
 import { dirname, join } from "node:path";
 
-import type { EnvExample, EnvFieldType } from "next-vibe/env/define-env";
-import { formatCount, formatWarning } from "next-vibe/logger/formatters";
 import type {
   GeneratorContext,
   GeneratorResult,
-} from "next-vibe/tooling/generators/shared/shared-inputs";
+} from "next-vibe/core/generators/shared/shared-inputs";
 import {
   generateFileHeader as sharedGenerateFileHeader,
   jsonToTs,
   stripProjectRoot,
-} from "next-vibe/tooling/generators/shared/utils";
+  toImportUrl,
+} from "next-vibe/core/generators/shared/utils";
+import type { EnvExample, EnvFieldType } from "next-vibe/env/define-env";
+import { formatCount, formatWarning } from "next-vibe/logger/formatters";
 
-import { getApiDir } from "@/env/paths";
+import { GENERATED_DIR, getApiDir } from "@/env/paths";
 
 import type { EnvValidationErrorType } from "./generator-validator";
 
@@ -70,7 +71,7 @@ import {
   generateFileHeader,
   getRelativeImportPath,
   writeGeneratedFile,
-} from "next-vibe/tooling/generators/shared/utils";
+} from "next-vibe/core/generators/shared/utils";
 
 import {
   checkDuplicateModuleNames,
@@ -78,7 +79,7 @@ import {
   validateEnvFileExports,
 } from "./generator-validator";
 
-const OUTPUT_DIR = "src/generated";
+const OUTPUT_DIR = GENERATED_DIR;
 
 /** A validated env module — enough for env-keys to import its examples from source. */
 interface ValidatedEnvModule {
@@ -700,7 +701,7 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
     const keyOwner = new Map<string, KeyOwner>();
 
     for (const mod of modules) {
-      const moduleImport = await import(mod.filePath);
+      const moduleImport = await import(toImportUrl(mod.filePath));
       const examples = moduleImport[mod.examplesExportName] as Array<{
         key: string;
         example: string | false;
@@ -733,7 +734,7 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
     const emittedKeys = new Set<string>();
 
     for (const mod of modules) {
-      const moduleImport = await import(mod.filePath);
+      const moduleImport = await import(toImportUrl(mod.filePath));
       const examples = moduleImport[mod.examplesExportName] as Array<{
         key: string;
         example: string | false;
@@ -857,7 +858,7 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
 
 // ─── Env keys metadata (reads the generated env registry) ───────────────────
 
-const ENV_KEYS_OUTPUT = "src/generated/env/keys.ts";
+const ENV_KEYS_OUTPUT = `${GENERATED_DIR}/env/keys.ts`;
 
 /** Serializable metadata for a single env key. */
 export interface EnvKeyMeta {
@@ -958,7 +959,10 @@ async function generateEnvKeys(
   // data (no ESM-cache staleness, no second pass).
   const moduleExamples = await Promise.all(
     modules.map(async (m) => {
-      const mod = (await import(m.filePath)) as Record<string, EnvExample[]>;
+      const mod = (await import(toImportUrl(m.filePath))) as Record<
+        string,
+        EnvExample[]
+      >;
       return {
         moduleName: m.moduleName,
         examples: mod[m.examplesExportName] ?? [],

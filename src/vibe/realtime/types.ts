@@ -20,7 +20,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type {
   CacheKeyParamValue,
   CacheKeyRequestInput,
-} from "next-vibe/platforms/react/hooks/query-key-builder";
+} from "next-vibe/unified-ui/hooks/query-key-builder";
 import { z } from "zod";
 
 import type { AnyEndpointEventEnvelope } from "./structured-events";

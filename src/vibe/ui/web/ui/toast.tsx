@@ -2,8 +2,8 @@
 
 import * as ToastPrimitives from "@radix-ui/react-toast";
 import { cva } from "class-variance-authority";
-import { X } from "lucide-react";
-import { cn } from "next-vibe/core/utils/utils";
+import { X } from "next-vibe/ui/ui/icons/X";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import * as React from "react";
 
 import { useTouchDevice } from "../../web/hooks/use-touch-device";

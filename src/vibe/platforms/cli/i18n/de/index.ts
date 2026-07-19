@@ -290,6 +290,8 @@ export const translations: typeof enTranslations = {
         "Nicht am Remote-Host angemeldet. Ausführen: vibe login --target remote",
       remoteNoLeadId: "Identität vom Remote-Host konnte nicht abgerufen werden",
       remoteServerError: "Remote-Server-Fehler",
+      remoteNotAvailable:
+        "Remote-Ausführung ist in diesem Build nicht enthalten",
     },
     endpoints: {
       endpointHandler: {

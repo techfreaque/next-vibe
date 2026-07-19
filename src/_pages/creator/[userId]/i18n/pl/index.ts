@@ -23,7 +23,7 @@ export const translations: typeof enTranslations = {
   },
   nav: {
     backArrow: "\u2190",
-    copyright: "\u00a9",
+    copyright: "\u00A9",
   },
   list: {
     headline: "Bądź na bieżąco",

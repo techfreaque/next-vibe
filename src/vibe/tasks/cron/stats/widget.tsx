@@ -4,7 +4,6 @@
  */
 
 "use client";
-import { cn } from "next-vibe/core/utils/utils";
 import { scopedTranslation as tasksScopedTranslation } from "next-vibe/tasks/i18n";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -20,6 +19,7 @@ import { TrendingDown } from "next-vibe/ui/ui/icons/TrendingDown";
 import { TrendingUp } from "next-vibe/ui/ui/icons/TrendingUp";
 import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
 import { Span } from "next-vibe/ui/ui/span";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetContext,
   useWidgetLocale,
@@ -27,7 +27,7 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import React, { useCallback, useMemo } from "react";
 
 import type statsEndpoints from "./definition";

@@ -13,8 +13,8 @@ import { and, eq, like } from "drizzle-orm";
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { cortexNodes } from "../db";
@@ -56,7 +56,7 @@ describe("Cortex Write E2E", () => {
     const content = "# Create Test\n\nFresh file body.";
 
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: writeEndpoint.POST,
       data: { path, content, createParents: true },
       user,
@@ -79,7 +79,7 @@ describe("Cortex Write E2E", () => {
       "---\ntitle: Round Trip\nstatus: open\n---\n\n# Body\n\nExact bytes must survive.";
 
     const writeRes = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: writeEndpoint.POST,
       data: { path, content, createParents: true },
       user,
@@ -93,7 +93,7 @@ describe("Cortex Write E2E", () => {
     }
 
     const readRes = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: readEndpoint.GET,
       data: { path },
       user,
@@ -119,7 +119,7 @@ describe("Cortex Write E2E", () => {
     const content = "# Listed\n\nShould appear in listing.";
 
     const writeRes = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: writeEndpoint.POST,
       data: { path, content, createParents: true },
       user,
@@ -133,7 +133,7 @@ describe("Cortex Write E2E", () => {
     }
 
     const listRes = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: listEndpoint.GET,
       data: { path: dir },
       user,
@@ -161,7 +161,7 @@ describe("Cortex Write E2E", () => {
     const content = "# In Tree\n\nTree must render this file.";
 
     const writeRes = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: writeEndpoint.POST,
       data: { path, content, createParents: true },
       user,
@@ -175,7 +175,7 @@ describe("Cortex Write E2E", () => {
     }
 
     const treeRes = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: treeEndpoint.GET,
       data: { path: `${TEST_PREFIX}/treetest`, depth: 5 },
       user,
@@ -198,7 +198,7 @@ describe("Cortex Write E2E", () => {
     const content = "# Nested\n\nDeep child via createParents.";
 
     const writeRes = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: writeEndpoint.POST,
       data: { path, content, createParents: true },
       user,
@@ -214,7 +214,7 @@ describe("Cortex Write E2E", () => {
 
     // Parent dir was materialized and lists the nested file
     const listRes = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: listEndpoint.GET,
       data: { path: dir },
       user,
@@ -232,7 +232,7 @@ describe("Cortex Write E2E", () => {
 
     // And readable with identical content
     const readRes = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: readEndpoint.GET,
       data: { path },
       user,
@@ -253,7 +253,7 @@ describe("Cortex Write E2E", () => {
     const second = "# Version 2\n\nReplaced content, longer than before.";
 
     const writeFirst = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: writeEndpoint.POST,
       data: { path, content: first, createParents: true },
       user,
@@ -268,7 +268,7 @@ describe("Cortex Write E2E", () => {
     expect(writeFirst.data.created).toBe(true);
 
     const writeSecond = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: writeEndpoint.POST,
       data: { path, content: second, createParents: true },
       user,
@@ -283,7 +283,7 @@ describe("Cortex Write E2E", () => {
     expect(writeSecond.data.created).toBe(false);
 
     const readRes = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: readEndpoint.GET,
       data: { path },
       user,
@@ -304,7 +304,7 @@ describe("Cortex Write E2E", () => {
       "---\nstatus: open\npriority: 3\npublished: true\n---\n\n# Body\n\nFrontmatter parse target.";
 
     const writeRes = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: writeEndpoint.POST,
       data: { path, content, createParents: true },
       user,
@@ -319,7 +319,7 @@ describe("Cortex Write E2E", () => {
 
     // Read exposes the raw markdown (frontmatter is not parsed in the read response)
     const readRes = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: readEndpoint.GET,
       data: { path },
       user,
@@ -350,7 +350,7 @@ describe("Cortex Write E2E", () => {
 
   it("rejects writes to a read-only virtual mount path (/threads) with FORBIDDEN", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: writeEndpoint.POST,
       data: {
         path: "/threads/foo.md",
@@ -373,7 +373,7 @@ describe("Cortex Write E2E", () => {
     const expectedBytes = Buffer.byteLength(content, "utf8");
 
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: writeEndpoint.POST,
       data: { path, content, createParents: true },
       user,
@@ -388,7 +388,7 @@ describe("Cortex Write E2E", () => {
 
     // Cross-verify the size the read endpoint reports.
     const readRes = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: readEndpoint.GET,
       data: { path },
       user,

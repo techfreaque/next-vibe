@@ -3,13 +3,13 @@
  * Simplified icon selection UI with categories and search
  */
 import { useTranslation } from "next-vibe/core/i18n/core/client";
-import { cn } from "next-vibe/core/utils/utils";
-import type { CategoryKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
+import type { CategoryKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import {
   Icon,
   ICON_CATEGORIES,
   ICON_CATEGORIES_LIST,
-} from "next-vibe/unified-ui/form-fields/icon-field/icons";
+} from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 import {

@@ -12,7 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: fillEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger, platform, streamContext }) =>
+    handler: ({ data, t, logger, platform, toolExecutionContext }) =>
       BrowserSharedRepository.executeFill<FillResponseOutput>(
         {
           toolName: BrowserTool.FILL,
@@ -25,7 +25,7 @@ export const { POST, tools } = endpointsHandler({
         t,
         logger,
         platform,
-        streamContext.threadId,
+        toolExecutionContext.threadId,
       ),
   },
 });

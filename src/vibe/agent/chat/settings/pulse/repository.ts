@@ -15,7 +15,7 @@ import { db } from "next-vibe/database";
 import { TASK_TIMEOUTS } from "next-vibe/tasks/constants";
 import { cronTasks } from "next-vibe/tasks/cron/db";
 import { CronTaskPriority, TaskCategory } from "next-vibe/tasks/enum";
-import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 
 import type { ChatSettings } from "../db";
 import {

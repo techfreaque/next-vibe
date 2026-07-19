@@ -13,6 +13,8 @@
  *     full, or partially (import hunks only) for files that also carry real code.
  *  5. definition.ts `path: [...]` line changes inside `createEndpoint()` — the
  *     path array is purely declarative metadata; changes here are always safe.
+ *  6. camelCase identifier renames — a -/+ line pair identical except for
+ *     camelCase identifier tokens. Case-convention changes never qualify.
  *
  * Diffs that add/remove suppression comments are never auto-staged.
  */
@@ -23,6 +25,7 @@ import { spawn } from "node:child_process";
 import { existsSync, promises as fsp } from "node:fs";
 import { resolve as resolvePath } from "node:path";
 
+import { hasCustomDirective } from "next-vibe/core/generators/shared/custom-directive";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -33,7 +36,6 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { ConfigRepositoryImpl } from "next-vibe/tooling/check/config/repository";
-import { hasCustomDirective } from "next-vibe/tooling/generators/shared/custom-directive";
 
 import type {
   VibeStageRequestOutput,
@@ -44,6 +46,22 @@ import type { CheckVibeStageT } from "./i18n";
 // ============================================================
 // Helpers
 // ============================================================
+
+/**
+ * Maximum number of file-path arguments to pass in a single spawn() call.
+ * Keeps total command-line length well under Windows' 32 767-character limit
+ * and libuv's uv_spawn limit on all platforms.
+ */
+const ARG_CHUNK_SIZE = 150;
+
+/** Split an array into chunks of at most `size` items. */
+function chunkArray<T>(arr: T[], size: number): T[][] {
+  const chunks: T[][] = [];
+  for (let i = 0; i < arr.length; i += size) {
+    chunks.push(arr.slice(i, i + size));
+  }
+  return chunks;
+}
 
 /** Run a shell command and resolve with stdout. Rejects on non-zero exit. */
 function runCommand(
@@ -456,6 +474,279 @@ function isPathLineGroup(lines: string[]): boolean {
   return hasOpener;
 }
 
+// ============================================================
+// camelCase identifier renames
+// ============================================================
+
+/**
+ * A camelCase identifier: leading lowercase letter, then letters/digits only.
+ * A single all-lowercase word (`single`, `user`) IS camelCase — the convention
+ * only forbids a separator or a leading capital, not a one-word name.
+ *
+ * Both sides of a rename must match this. That makes the rule case-to-case and
+ * never cross-case: `user_name` → `userName` is rejected (the old side is
+ * snake_case), as is `userName` → `UserName`. A convention switch is a real
+ * refactor and stays unstaged for review; only camelCase → camelCase auto-stages.
+ */
+const CAMEL_CASE_PATTERN = /^[a-z][a-zA-Z0-9]*$/;
+
+/**
+ * Words that LOOK like camelCase but are not renameable identifiers — swapping
+ * one for another changes behaviour, it doesn't rename anything. Without this,
+ * `const` → `let`, `true` → `false`, and `string` → `number` would all read as
+ * one-word "camelCase renames" and auto-stage real semantic edits.
+ *
+ * Contextual words (`type`, `from`, `get`, `as`) are included even though they
+ * can be legitimate variable names: mis-skipping a rename costs nothing (the
+ * file just stays unstaged), mis-staging a keyword swap costs review.
+ */
+const RESERVED_WORDS = new Set([
+  // Declarations / control flow
+  "const",
+  "let",
+  "var",
+  "function",
+  "class",
+  "extends",
+  "implements",
+  "return",
+  "if",
+  "else",
+  "for",
+  "while",
+  "do",
+  "switch",
+  "case",
+  "default",
+  "break",
+  "continue",
+  "try",
+  "catch",
+  "finally",
+  "throw",
+  "new",
+  "delete",
+  "typeof",
+  "instanceof",
+  "in",
+  "of",
+  "this",
+  "super",
+  "void",
+  "yield",
+  "async",
+  "await",
+  "static",
+  "get",
+  "set",
+  // Module syntax
+  "import",
+  "export",
+  "from",
+  "as",
+  // Literals
+  "true",
+  "false",
+  "null",
+  "undefined",
+  // TypeScript syntax + primitive types
+  "type",
+  "interface",
+  "enum",
+  "namespace",
+  "declare",
+  "abstract",
+  "readonly",
+  "public",
+  "private",
+  "protected",
+  "is",
+  "keyof",
+  "infer",
+  "satisfies",
+  "any",
+  "unknown",
+  "never",
+  "string",
+  "number",
+  "boolean",
+  "object",
+  "symbol",
+  "bigint",
+]);
+
+/** A camelCase name that is safe to treat as a renameable identifier. */
+function isCamelCaseIdentifier(name: string): boolean {
+  return CAMEL_CASE_PATTERN.test(name) && !RESERVED_WORDS.has(name);
+}
+
+interface LineToken {
+  text: string;
+  isIdentifier: boolean;
+  /** Token sits between quotes — its text is data, not a reference. */
+  inString: boolean;
+}
+
+const IDENT_START_CHAR = /[A-Za-z_$]/;
+const IDENT_BODY_CHAR = /[A-Za-z0-9_$]/;
+
+/**
+ * Split one raw line into identifier tokens and single-character separators,
+ * tracking quote state so a word inside a string literal is marked `inString`.
+ *
+ * A diff line is examined alone, so an unterminated quote (a template literal
+ * spanning lines) just runs to end-of-line. That can only mark MORE tokens as
+ * in-string than really are, which can only reject a hunk — never accept a bad
+ * one, so the failure direction is the safe one.
+ */
+function tokenizeLine(line: string): LineToken[] {
+  const tokens: LineToken[] = [];
+  let quote: string | null = null;
+  let i = 0;
+
+  const readIdentifier = (start: number): number => {
+    let end = start;
+    while (end < line.length && IDENT_BODY_CHAR.test(line[end] ?? "")) {
+      end++;
+    }
+    return end;
+  };
+
+  while (i < line.length) {
+    const ch = line[i] ?? "";
+
+    if (quote !== null) {
+      // Escape sequence — consume both chars so `\"` never closes the string.
+      if (ch === "\\") {
+        tokens.push({
+          text: line.slice(i, i + 2),
+          isIdentifier: false,
+          inString: true,
+        });
+        i += 2;
+        continue;
+      }
+      if (ch === quote) {
+        quote = null;
+        tokens.push({ text: ch, isIdentifier: false, inString: false });
+        i++;
+        continue;
+      }
+      if (IDENT_START_CHAR.test(ch)) {
+        const end = readIdentifier(i);
+        tokens.push({
+          text: line.slice(i, end),
+          isIdentifier: true,
+          inString: true,
+        });
+        i = end;
+        continue;
+      }
+      tokens.push({ text: ch, isIdentifier: false, inString: true });
+      i++;
+      continue;
+    }
+
+    if (ch === '"' || ch === "'" || ch === "`") {
+      quote = ch;
+      tokens.push({ text: ch, isIdentifier: false, inString: false });
+      i++;
+      continue;
+    }
+
+    if (IDENT_START_CHAR.test(ch)) {
+      const end = readIdentifier(i);
+      tokens.push({
+        text: line.slice(i, end),
+        isIdentifier: true,
+        inString: false,
+      });
+      i = end;
+      continue;
+    }
+
+    tokens.push({ text: ch, isIdentifier: false, inString: false });
+    i++;
+  }
+
+  return tokens;
+}
+
+/**
+ * True when `newLine` is `oldLine` with one or more camelCase identifiers
+ * renamed, and nothing else touched.
+ *
+ * Every non-identifier token — punctuation, operators, indentation, numeric
+ * literals — must be byte-identical, so the two lines have to share an exact
+ * shape. Anything that reflows the line (a formatter re-wrap) breaks that shape
+ * and is rejected rather than guessed at.
+ *
+ * Identifiers inside string literals are excluded: an i18n key, a route path or
+ * a SQL fragment that changes is a data change with runtime meaning, not a
+ * rename, even when it happens to be spelled in camelCase.
+ */
+function isCamelCaseRenameLinePair(oldLine: string, newLine: string): boolean {
+  const oldTokens = tokenizeLine(oldLine);
+  const newTokens = tokenizeLine(newLine);
+  if (oldTokens.length !== newTokens.length) {
+    return false;
+  }
+
+  let renames = 0;
+  for (let i = 0; i < oldTokens.length; i++) {
+    const o = oldTokens[i];
+    const n = newTokens[i];
+    if (!o || !n) {
+      return false;
+    }
+    if (
+      o.text === n.text &&
+      o.isIdentifier === n.isIdentifier &&
+      o.inString === n.inString
+    ) {
+      continue;
+    }
+    // A difference is only allowed between two bare camelCase identifiers.
+    if (!o.isIdentifier || !n.isIdentifier || o.inString || n.inString) {
+      return false;
+    }
+    if (!isCamelCaseIdentifier(o.text) || !isCamelCaseIdentifier(n.text)) {
+      return false;
+    }
+    renames++;
+  }
+
+  // No differing token means the pair isn't a rename at all (whitespace-only or
+  // an in-string edit that slipped through as equal) — don't claim it.
+  return renames > 0;
+}
+
+/**
+ * Returns true if the hunk is purely camelCase identifier renames.
+ *
+ * With `--unified=0` git emits a hunk's removals before its additions, so the
+ * two blocks pair up by index. An unequal count means lines were added or
+ * dropped, not renamed, and the hunk is rejected.
+ *
+ * Exported for unit testing.
+ */
+export function allLinesAreCamelCaseRenames(changedLines: string[]): boolean {
+  const removed = changedLines
+    .filter((l) => l.startsWith("-"))
+    .map((l) => l.slice(1));
+  const added = changedLines
+    .filter((l) => l.startsWith("+"))
+    .map((l) => l.slice(1));
+
+  if (removed.length === 0 || removed.length !== added.length) {
+    return false;
+  }
+
+  return removed.every((oldLine, i) =>
+    isCamelCaseRenameLinePair(oldLine, added[i] ?? ""),
+  );
+}
+
 function isBoilerplateCandidate(filePath: string): boolean {
   return (
     ROUTE_PATTERN.test(filePath) ||
@@ -483,10 +774,11 @@ function isAutoStagedGeneratedOutput(filePath: string, cwd: string): boolean {
 /** Parse a unified diff into header lines and hunk arrays. */
 function parseDiff(
   diff: string,
-): { headerLines: string[]; hunks: string[][] } | null {
+): { headerLines: string[]; hunks: string[][]; isModeOnly: boolean } | null {
   const lines = diff.split("\n");
   const headerLines: string[] = [];
   let bodyStart = 0;
+  let isModeOnly = false;
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i] ?? "";
@@ -497,6 +789,10 @@ function parseDiff(
       line.startsWith("+++ ")
     ) {
       headerLines.push(line);
+      bodyStart = i + 1;
+    } else if (line.startsWith("old mode ") || line.startsWith("new mode ")) {
+      // File permission change only — no content hunks follow.
+      isModeOnly = true;
       bodyStart = i + 1;
     } else if (line.startsWith("@@")) {
       break;
@@ -521,7 +817,7 @@ function parseDiff(
     hunks.push(currentHunk);
   }
 
-  return { headerLines, hunks };
+  return { headerLines, hunks, isModeOnly };
 }
 
 /**
@@ -538,42 +834,51 @@ async function batchUnstagedDiffs(
   cwd: string,
   pathspecs: string[],
 ): Promise<Map<string, string>> {
-  const args = ["diff", "--unified=0", "--no-color", "--no-ext-diff"];
-  if (pathspecs.length > 0) {
-    args.push("--", ...pathspecs);
-  }
-  const combined = await runCommandCapture("git", args, cwd);
   const map = new Map<string, string>();
-  if (!combined.trim()) {
-    return map;
-  }
 
-  const lines = combined.split("\n");
-  let current: string[] = [];
-  let currentPath: string | null = null;
+  // Chunk pathspecs to avoid ENAMETOOLONG when the working tree has many files.
+  const chunks =
+    pathspecs.length === 0
+      ? [[]] // single empty call → full-tree diff
+      : chunkArray(pathspecs, ARG_CHUNK_SIZE);
 
-  const flush = (): void => {
-    if (currentPath !== null && current.length > 0) {
-      map.set(currentPath, current.join("\n"));
+  for (const chunk of chunks) {
+    const args = ["diff", "--unified=0", "--no-color", "--no-ext-diff"];
+    if (chunk.length > 0) {
+      args.push("--", ...chunk);
     }
-  };
+    const combined = await runCommandCapture("git", args, cwd);
+    if (!combined.trim()) {
+      continue;
+    }
 
-  for (const line of lines) {
-    if (line.startsWith("diff --git ")) {
-      flush();
-      current = [line];
-      // b-side of "diff --git a/<x> b/<y>" as a provisional key.
-      const m = /^diff --git a\/(.+) b\/(.+)$/.exec(line);
-      currentPath = m ? (m[2] ?? null) : null;
-    } else {
-      current.push(line);
-      // Prefer the exact "+++ b/<path>" path when present (handles /dev/null etc.).
-      if (line.startsWith("+++ b/")) {
-        currentPath = line.slice("+++ b/".length);
+    const lines = combined.split("\n");
+    let current: string[] = [];
+    let currentPath: string | null = null;
+
+    const flush = (): void => {
+      if (currentPath !== null && current.length > 0) {
+        map.set(currentPath, current.join("\n"));
+      }
+    };
+
+    for (const line of lines) {
+      if (line.startsWith("diff --git ")) {
+        flush();
+        current = [line];
+        // b-side of "diff --git a/<x> b/<y>" as a provisional key.
+        const m = /^diff --git a\/(.+) b\/(.+)$/.exec(line);
+        currentPath = m ? (m[2] ?? null) : null;
+      } else {
+        current.push(line);
+        // Prefer the exact "+++ b/<path>" path when present (handles /dev/null etc.).
+        if (line.startsWith("+++ b/")) {
+          currentPath = line.slice("+++ b/".length);
+        }
       }
     }
+    flush();
   }
-  flush();
 
   return map;
 }
@@ -621,8 +926,9 @@ function rewriteHunkNewStart(hunkHeader: string, newStart: number): string {
  * Strategy:
  *  1. u0Unstaged = `git diff --unified=0 -- file` (WC vs index) — the true unstaged
  *     hunks with line numbers relative to the current index. This is what we apply.
- *  2. Classify each unstaged hunk: import-only, path-only, or mixed.
- *  3. If all hunks are safe (imports or definition path lines) → importOnly=true, full-file stage.
+ *  2. Classify each unstaged hunk: import-only, path-only, rename-only, or mixed.
+ *  3. If all hunks are safe (imports, definition path lines, or camelCase
+ *     renames) → importOnly=true, full-file stage.
  *  4. If some are safe → build patch from safe hunks for partial stage.
  *
  * Using WC-vs-index (not WC-vs-HEAD) for the patch eliminates line-number mismatches
@@ -645,7 +951,17 @@ function analyzeFileDiff(
   }
 
   const u0Parsed = parseDiff(u0Unstaged);
-  if (!u0Parsed || u0Parsed.hunks.length === 0) {
+  if (!u0Parsed) {
+    return null;
+  }
+
+  // Mode-only diff (old mode → new mode, no content hunks): safe to stage — the
+  // executable bit change is always a phantom diff from cross-platform checkouts.
+  if (u0Parsed.hunks.length === 0 && u0Parsed.isModeOnly) {
+    return { importOnly: true, importHunksPatch: null };
+  }
+
+  if (u0Parsed.hunks.length === 0) {
     return null;
   }
 
@@ -667,6 +983,8 @@ function analyzeFileDiff(
       opts.isDefinitionFile &&
       allLinesAreDefinitionPath(changedLines)
     ) {
+      safeHunkStarts.add(start);
+    } else if (allLinesAreCamelCaseRenames(changedLines)) {
       safeHunkStarts.add(start);
     } else {
       hasUnsafeHunk = true;
@@ -1170,30 +1488,38 @@ async function checkBoilerplateCompliance(
   const cleanFiles = new Set<string>();
 
   try {
-    const args = ["--format", "json", "--config", tmpConfigPath, ...files];
-    // oxlint exits non-zero when violations found - capture regardless
-    const output = await runCommandCapture("oxlint", args, cwd);
+    const allDiagnostics: OxlintDiagnostic[] = [];
 
-    if (!output.trim()) {
-      // No output = no violations
-      for (const f of files) {
-        cleanFiles.add(f);
+    // Chunk file list to avoid ENAMETOOLONG on large working trees.
+    for (const chunk of chunkArray(files, ARG_CHUNK_SIZE)) {
+      const args = ["--format", "json", "--config", tmpConfigPath, ...chunk];
+      // oxlint exits non-zero when violations found - capture regardless
+      const output = await runCommandCapture("oxlint", args, cwd);
+
+      if (!output.trim()) {
+        // No output = no violations in this chunk; chunk files are clean.
+        continue;
       }
-      return cleanFiles;
-    }
 
-    let diagnostics: OxlintDiagnostic[] = [];
-    try {
-      diagnostics = JSON.parse(output) as OxlintDiagnostic[];
-    } catch {
-      logger.warn(
-        `[VIBE-STAGE] Could not parse oxlint output: ${output.slice(0, 200)}`,
-      );
-      return cleanFiles;
+      let chunkDiagnostics: OxlintDiagnostic[] = [];
+      try {
+        chunkDiagnostics = JSON.parse(output) as OxlintDiagnostic[];
+      } catch {
+        logger.warn(
+          `[VIBE-STAGE] Could not parse oxlint output: ${output.slice(0, 200)}`,
+        );
+        // Treat the whole chunk as potentially violating to be safe.
+        for (const f of chunk) {
+          allDiagnostics.push({ filename: f });
+        }
+        continue;
+      }
+
+      allDiagnostics.push(...chunkDiagnostics);
     }
 
     const filesWithViolations = new Set<string>();
-    for (const diag of diagnostics) {
+    for (const diag of allDiagnostics) {
       if (diag.filename) {
         const rel = diag.filename.startsWith(cwd)
           ? diag.filename.slice(cwd.length + 1)
@@ -1311,18 +1637,14 @@ export class VibeStageRepository {
 
       if (!data.dryRun && deletionsToStage.length > 0) {
         // `git rm --cached` for still-tracked, plus index-remove for worktree-gone.
-        await runCommand(
-          "git",
-          [
-            "rm",
-            "--cached",
-            "--quiet",
-            "--ignore-unmatch",
-            "--",
-            ...deletionsToStage,
-          ],
-          cwd,
-        );
+        // Chunked to avoid ENAMETOOLONG when many files are deleted at once.
+        for (const chunk of chunkArray(deletionsToStage, ARG_CHUNK_SIZE)) {
+          await runCommand(
+            "git",
+            ["rm", "--cached", "--quiet", "--ignore-unmatch", "--", ...chunk],
+            cwd,
+          );
+        }
       }
       for (const d of deletionsToStage) {
         deleted.push(d);
@@ -1447,8 +1769,11 @@ export class VibeStageRepository {
       }
 
       // git add full files unless dry run
+      // Chunked to avoid ENAMETOOLONG when many files are staged at once.
       if (!data.dryRun && staged.length > 0) {
-        await runCommand("git", ["add", "--", ...staged], cwd);
+        for (const chunk of chunkArray(staged, ARG_CHUNK_SIZE)) {
+          await runCommand("git", ["add", "--", ...chunk], cwd);
+        }
         logger.debug(`[VIBE-STAGE] Staged ${String(staged.length)} files`);
       }
 

@@ -186,7 +186,7 @@ export class CortexTreeRepository {
           const labelSlugMap = new Map(
             connRows.map((r) => [
               r.id,
-              r.label.toLowerCase().replace(/\s+/g, "-"),
+              r.label.toLowerCase().replaceAll(/\s+/g, "-"),
             ]),
           );
           const mountsByConn = new Map<string, typeof allMounts>();
@@ -257,7 +257,7 @@ export class CortexTreeRepository {
               .from(connsTable)
               .where(eq(connsTable.userId, userId));
             const connRow = connRows.find(
-              (r) => r.label.toLowerCase().replace(/\s+/g, "-") === slug,
+              (r) => r.label.toLowerCase().replaceAll(/\s+/g, "-") === slug,
             );
             lines.push(`${slug}/`);
             if (connRow) {
@@ -346,7 +346,7 @@ export class CortexTreeRepository {
           const labelSlugMap = new Map(
             connRows.map((r) => [
               r.id,
-              r.label.toLowerCase().replace(/\s+/g, "-"),
+              r.label.toLowerCase().replaceAll(/\s+/g, "-"),
             ]),
           );
           const mountsByConn = new Map<string, typeof allMounts>();

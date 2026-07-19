@@ -44,7 +44,7 @@ import "server-only";
 import {
   DefaultFolderId,
   makeHeadlessContext,
-  rootlessStreamContext,
+  rootlessToolExecutionContext,
   type ToolExecutionContext,
 } from "next-vibe/agent/chat/config";
 import { ChatMessageRole } from "next-vibe/agent/chat/enum";
@@ -52,15 +52,14 @@ import { ChatMessageRole } from "next-vibe/agent/chat/enum";
 // before any module opens a socket. HTTP fixtures need no install anymore
 // (explicit FixtureContext on each call), but WS interception is still global.
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { identityEnv } from "next-vibe/identity/env";
 import {
   closeConnection,
   reloadWsProviderConnector,
   restartConnection,
 } from "next-vibe/realtime/connector";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
-import { env } from "@/env/env";
 
 import { seedFixtureThread } from "../../testing/fixture-seed";
 import {
@@ -91,7 +90,7 @@ const _isFixtureMode = isHermesInFixtureMode();
  * cleanup DELETE traffic, no AI. Thread-less root: localhost is never
  * intercepted and these calls have no fixture run to anchor.
  */
-const unbottledSetupFixture = rootlessStreamContext();
+const unbottledSetupFixture = rootlessToolExecutionContext();
 
 // ── Suite A: WS-Provider ──────────────────────────────────────────────────────
 
@@ -103,7 +102,7 @@ const wsProviderFlagsPatch = async (
   const connByIdDef =
     await import("next-vibe/remote-connection/[instanceId]/definition");
   await sendTestRequest({
-    streamContext: unbottledSetupFixture,
+    toolExecutionContext: unbottledSetupFixture,
     endpoint: connByIdDef.default.PATCH,
     data: {
       isInferenceProvider: true,
@@ -136,12 +135,12 @@ const wsProviderReverseWsHooks = makeReverseWsSetup(_remoteUrl, {
 
 async function cleanupHermesConnections(
   testUser: JwtPrivatePayloadType,
-  streamContext: ToolExecutionContext,
+  toolExecutionContext: ToolExecutionContext,
 ): Promise<void> {
   const connListDef =
     await import("next-vibe/remote-connection/list/definition");
   const listResult = await sendTestRequest({
-    streamContext,
+    toolExecutionContext,
     endpoint: connListDef.default.GET,
     data: {},
     user: testUser,
@@ -167,7 +166,7 @@ async function cleanupHermesConnections(
       endpoint: connByIdDef.default.DELETE,
       urlPathParams: { instanceId: row.instanceId },
       user: testUser,
-      streamContext,
+      toolExecutionContext,
     });
   }
 }
@@ -187,7 +186,7 @@ async function setupUnbottled(testUser: JwtPrivatePayloadType): Promise<void> {
     endpoint: connListDefSetup.default.GET,
     data: {},
     user: testUser,
-    streamContext: unbottledSetupFixture,
+    toolExecutionContext: unbottledSetupFixture,
   });
 
   const connRow = connListResult.success
@@ -218,7 +217,7 @@ async function setupUnbottled(testUser: JwtPrivatePayloadType): Promise<void> {
     },
     urlPathParams: { instanceId: connRow.instanceId },
     user: testUser,
-    streamContext: unbottledSetupFixture,
+    toolExecutionContext: unbottledSetupFixture,
   });
 }
 
@@ -302,7 +301,7 @@ async function runReverseWsPulse(threadId: string): Promise<void> {
 
   while (Date.now() < deadline) {
     const threadResult = await sendTestRequest({
-      streamContext: rootlessStreamContext(),
+      toolExecutionContext: rootlessToolExecutionContext(),
       endpoint: threadByIdDef.default.GET,
       data: { rootFolderId: DefaultFolderId.REMOTE },
       urlPathParams: { threadId },
@@ -369,15 +368,15 @@ if (_remoteUrl && _isFixtureMode) {
     let wp3Wp6FolderId: string;
 
     beforeAll(async () => {
-      const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+      const resolved = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
       expect(
         resolved,
-        `WP3-WP6: admin user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe dev`,
+        `WP3-WP6: admin user ${identityEnv.VIBE_ADMIN_USER_EMAIL} not found — run: vibe dev`,
       ).toBeTruthy();
       if (!resolved) {
         // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
         throw new Error(
-          `WP3-WP6 setup failed: admin user ${env.VIBE_ADMIN_USER_EMAIL} not found`,
+          `WP3-WP6 setup failed: admin user ${identityEnv.VIBE_ADMIN_USER_EMAIL} not found`,
         );
       }
       testUser = resolved;
@@ -408,7 +407,11 @@ if (_remoteUrl && _isFixtureMode) {
         threadId: wp3Wp6ThreadId,
         rootFolderId: DefaultFolderId.PRIVATE,
         subFolderId: wp3Wp6FolderId,
-        streamContext: makeHeadlessContext(undefined, wp3Wp6ThreadId, /* no user context — UTC (dates not user-facing here) */ "UTC"),
+        toolExecutionContext: makeHeadlessContext(
+          undefined,
+          wp3Wp6ThreadId,
+          /* no user context — UTC (dates not user-facing here) */ "UTC",
+        ),
       });
 
       expect(
@@ -438,7 +441,7 @@ if (_remoteUrl && _isFixtureMode) {
       const threadDef =
         await import("next-vibe/agent/chat/threads/[threadId]/definition");
       const threadResult = await sendTestRequest({
-        streamContext: rootlessStreamContext(),
+        toolExecutionContext: rootlessToolExecutionContext(),
         endpoint: threadDef.default.GET,
         data: { rootFolderId: DefaultFolderId.PRIVATE },
         urlPathParams: { threadId },

@@ -2,7 +2,6 @@
  * Help Repository
  * One class, all platforms:
  *  - Tool discovery / search / detail (AI, MCP, CLI, Web)
- *  - CLI interactive terminal explorer (--interactive flag)
  *
  * Uses static endpoints-meta (generated) for all listing/filtering/searching.
  * Only loads full endpoint definitions for parameter schema in detail view.
@@ -15,13 +14,13 @@ import {
   enrichJsonSchemaFromFields,
   zodSchemaToJsonSchema,
 } from "next-vibe/core/definition/endpoint-to-metadata";
+import type { EndpointMeta } from "next-vibe/core/definition/endpoints-meta";
 import { FieldUsage } from "next-vibe/core/definition/enums";
-import { Platform } from "next-vibe/core/definition/platform";
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { permissionsRegistry } from "next-vibe/core/route/definitions-registry";
 import type { InferJwtPayloadTypeFromRoles } from "next-vibe/core/route/handler";
 import {
-  ErrorResponseTypes,
-  fail,
   type ResponseType,
   success,
 } from "next-vibe/core/route/response.schema";
@@ -38,12 +37,9 @@ import {
   type UserRoleValue,
 } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type { CliCompatiblePlatform } from "next-vibe/platforms/cli/runtime/route-executor";
+import { Platform } from "next-vibe/platforms/platforms";
 import { generateSchemaForUsage } from "next-vibe/unified-ui/_shared/utils";
-import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
 import { z } from "zod";
-
-import { envClient } from "@/env/env-client";
 
 import type {
   HelpGetRequestOutput,
@@ -53,31 +49,6 @@ import type {
 } from "./definition";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
-
-interface HelpInteractiveResult {
-  started: boolean;
-}
-
-interface EndpointMeta {
-  toolName: string;
-  method: string;
-  path: string[];
-  allowedRoles: string[];
-  aliases: string[];
-  title: string;
-  titleShort: string;
-  description: string;
-  icon: IconKey;
-  category: string;
-  subCategory: string;
-  tags: string[];
-  credits?: number;
-  requiresConfirmation?: boolean;
-  examples?: {
-    inputs?: Record<string, Record<string, WidgetData>>;
-    responses?: Record<string, Record<string, WidgetData>>;
-  };
-}
 
 export class HelpRepository {
   // ─── Platform/role filtering on static meta ────────────────────────────────
@@ -89,113 +60,37 @@ export class HelpRepository {
   /** For AI/MCP: if matchedCount exceeds this, return only categories (no tool names) to save tokens */
   private static readonly COMPACT_CATEGORY_ONLY_THRESHOLD = 100;
 
-  private static checkPlatformAccess(
-    roles: string[],
-    platform: Platform,
-  ): boolean {
-    if (
-      envClient.NODE_ENV === "production" &&
-      !envClient.NEXT_PUBLIC_LOCAL_MODE &&
-      roles.includes(PlatformMarker.PRODUCTION_OFF)
-    ) {
-      return false;
-    }
-    switch (platform) {
-      case Platform.CLI:
-        // CLI_OFF opts out of CLI (and MCP by extension)
-        return !roles.includes(PlatformMarker.CLI_OFF);
-      case Platform.MCP:
-        // MCP requires CLI-accessible + not MCP-specifically-off
-        return (
-          !roles.includes(PlatformMarker.CLI_OFF) &&
-          !roles.includes(PlatformMarker.MCP_OFF)
-        );
-      case Platform.CLI_PACKAGE:
-        // Public CLI tools: must be CLI-accessible + have auth bypass marker
-        return (
-          !roles.includes(PlatformMarker.CLI_OFF) &&
-          roles.includes(PlatformMarker.CLI_AUTH_BYPASS)
-        );
-      case Platform.AI:
-        // AI tool: not opted out of AI tools specifically
-        return !roles.includes(PlatformMarker.AI_TOOL_OFF);
-      case Platform.CRON:
-        // Cron jobs: same as AI tool (server-side invocation)
-        return !roles.includes(PlatformMarker.AI_TOOL_OFF);
-      case Platform.REMOTE_SKILL:
-        // Skills: not opted out of skills
-        return !roles.includes(PlatformMarker.SKILL_OFF);
-      case Platform.NEXT_PAGE:
-      case Platform.NEXT_API:
-      case Platform.TRPC:
-      case Platform.ELECTRON:
-      case Platform.FRAME:
-        // All web surfaces: not opted out of web
-        return !roles.includes(PlatformMarker.WEB_OFF);
-      default:
-        return true;
-    }
-  }
-
-  private static checkUserAccess(
-    roles: string[],
-    userRoles: string[],
-    isPublic: boolean,
-    platform?: Platform,
-  ): boolean {
-    // CLI_AUTH_BYPASS means the endpoint opted into CLI access without auth —
-    // only bypass role check when actually on the CLI_PACKAGE platform.
-    if (
-      platform === Platform.CLI_PACKAGE &&
-      roles.includes(PlatformMarker.CLI_AUTH_BYPASS)
-    ) {
-      return true;
-    }
-    const permRoles = roles.filter(
-      (r) =>
-        !r.endsWith("Off") &&
-        !r.endsWith("Bypass") &&
-        r !== PlatformMarker.MCP_VISIBLE &&
-        r !== PlatformMarker.SKILL_OFF,
-    );
-    if (permRoles.length === 0) {
-      return false;
-    }
-    if (permRoles.includes(UserPermissionRole.PUBLIC)) {
-      return true;
-    }
-    if (isPublic) {
-      return false;
-    }
-    return permRoles.some((r) => userRoles.includes(r));
-  }
-
+  /**
+   * Listing must agree with execution, so both go through permissionsRegistry.
+   * This used to be a local re-implementation of checkPlatformAccess/hasEndpointPermission
+   * over string[] roles, and had drifted: it missed WEB_OFF for Platform.AI, blocked
+   * Platform.CRON on AI_TOOL_OFF instead of WEB_OFF, ignored NEXT_PUBLIC_LOCAL_MODE and
+   * allowedClientRoles, and detected markers by string suffix. The generated meta now
+   * carries typed UserRoleValue[], so the registry's own API takes it directly.
+   */
   private static filterMetaForUser(
     meta: EndpointMeta[],
     platform: Platform,
-    userRoles: string[],
-    isPublic: boolean,
+    user: JwtPayloadType,
   ): EndpointMeta[] {
-    return meta.filter((m) => {
-      const platformOk = HelpRepository.checkPlatformAccess(
-        m.allowedRoles,
-        platform,
-      );
-      if (!platformOk) {
-        return false;
-      }
-      return HelpRepository.checkUserAccess(
-        m.allowedRoles,
-        userRoles,
-        isPublic,
-        platform,
-      );
-    });
+    return meta.filter(
+      (m) =>
+        permissionsRegistry.checkPlatformAccess(m.allowedRoles, platform)
+          .allowed &&
+        // Meta carries no allowedClientRoles: client-route fallback is a web-render
+        // concern and never widens what a tool listing may show.
+        permissionsRegistry.checkRolePermission(
+          m.allowedRoles,
+          undefined,
+          user,
+          platform,
+        ),
+    );
   }
 
-  private static getMetaPlatforms(roles: string[]): Platform[] {
-    return (Object.values(Platform) as Platform[]).filter((p) =>
-      HelpRepository.checkPlatformAccess(roles, p),
+  private static getMetaPlatforms(roles: readonly UserRoleValue[]): Platform[] {
+    return Object.values(Platform).filter(
+      (p) => permissionsRegistry.checkPlatformAccess(roles, p).allowed,
     );
   }
 
@@ -345,7 +240,7 @@ export class HelpRepository {
   }
 
   private static normLabel(s: string): string {
-    return s.toLowerCase().replace(/[\s_-]+/g, "");
+    return s.toLowerCase().replaceAll(/[\s_-]+/g, "");
   }
 
   /** Case/space-insensitive equality — used to drop name fields that just echo. */
@@ -512,25 +407,6 @@ export class HelpRepository {
   ): Promise<CreateApiEndpointAny | null> {
     const { getEndpoint } = await import("@/generated/endpoints/endpoint");
     return getEndpoint(tool.toolName);
-  }
-  /**
-   * Start interactive CLI session - Ink-based route navigator.
-   */
-  static async startInteractive(
-    user: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]> | undefined,
-    locale: CountryLanguage,
-    platform: CliCompatiblePlatform,
-  ): Promise<ResponseType<HelpInteractiveResult>> {
-    if (!user) {
-      const { t } = scopedTranslation.scopedT(locale);
-      return fail({
-        message: t("interactive.errors.unauthorized.title"),
-        errorType: ErrorResponseTypes.UNAUTHORIZED,
-      });
-    }
-    const { startInteractiveHelp } = await import("./interactive.cli");
-    await startInteractiveHelp(user, locale, platform);
-    return success({ started: true });
   }
 
   /**
@@ -914,7 +790,7 @@ export class HelpRepository {
         ? import("@/generated/endpoints/meta/pl")
         : import("@/generated/endpoints/meta/en"));
     logger.debug("[HelpTool] PROBE meta module imported", { localeFile });
-    const allMeta = metaModule.endpointsMeta as EndpointMeta[];
+    const allMeta = metaModule.endpointsMeta;
     logger.debug("[HelpTool] PROBE meta parsed", { count: allMeta.length });
 
     // Discovery platform - what platform context are we listing tools for?
@@ -933,18 +809,26 @@ export class HelpRepository {
     const viewAsRole = isAdmin ? data.viewAsRole : undefined;
     const isPublicView =
       viewAsRole === UserPermissionRole.PUBLIC || user.isPublic;
-    const userRoles = viewAsRole
-      ? [viewAsRole]
-      : user.isPublic
-        ? [UserPermissionRole.PUBLIC]
-        : [...user.roles];
+    // The user whose eyes we list through: the caller, or the impersonated role.
+    // Also drives the pin defaults below, so listing and pins agree.
+    const effectiveUser: JwtPayloadType = isPublicView
+      ? {
+          leadId: user.leadId,
+          roles: [UserPermissionRole.PUBLIC] as const,
+          isPublic: true as const,
+        }
+      : {
+          id: user.isPublic ? "" : user.id,
+          leadId: user.leadId,
+          roles: viewAsRole ? [viewAsRole] : [...user.roles],
+          isPublic: false as const,
+        };
 
     // Filter meta by platform + user roles
     const filteredByPlatform = HelpRepository.filterMetaForUser(
       allMeta,
       discoveryPlatform,
-      userRoles,
-      isPublicView,
+      effectiveUser,
     );
 
     // Admin platform badges - derived directly from allowedRoles in meta.
@@ -957,7 +841,22 @@ export class HelpRepository {
       return HelpRepository.getMetaPlatforms(tool.allowedRoles);
     };
 
-    let platformFilteredMeta = filteredByPlatform;
+    // MCP tool discovery is opt-in: the list returned over MCP must agree with the MCP
+    // server's own tools/list (platforms/mcp/server/protocol-handler.ts), which requires
+    // MCP_VISIBLE. filterMetaForUser goes through checkPlatformAccess, where MCP
+    // *execution* is opt-out — so without this narrowing the listing advertises every
+    // MCP-callable tool rather than the discovery set. MCP only: the other compact
+    // platforms (AI/CRON) have no opt-in marker and stay opt-out.
+    // Execution stays opt-out, so allAccessibleMeta below is deliberately NOT narrowed:
+    // detail lookups still resolve a non-visible tool by exact name.
+    let platformFilteredMeta =
+      discoveryPlatform === Platform.MCP
+        ? filteredByPlatform.filter(
+            (m) =>
+              permissionsRegistry.checkMcpDiscoveryAccess(m.allowedRoles)
+                .allowed,
+          )
+        : filteredByPlatform;
     // Keep an unfiltered copy for detail-mode lookups (detail should search all accessible tools,
     // not just the active pinned/allowed subset chosen for list display).
     const allAccessibleMeta = filteredByPlatform;
@@ -993,8 +892,7 @@ export class HelpRepository {
     let aiMetaForStats: EndpointMeta[] = HelpRepository.filterMetaForUser(
       allMeta,
       Platform.AI,
-      userRoles,
-      isPublicView,
+      effectiveUser,
     );
     // Hoisted so statsMeta (outside the try block) can reference them.
     let cascadeBase: Array<{
@@ -1056,21 +954,8 @@ export class HelpRepository {
           pinnedBase = resolved.pinnedBase;
         }
 
-        // When viewing as a different role, use that role's defaults for pins
-        const effectiveUser: JwtPayloadType = viewAsRole
-          ? isPublicView
-            ? {
-                leadId: user.leadId,
-                roles: [UserPermissionRole.PUBLIC] as const,
-                isPublic: true as const,
-              }
-            : {
-                id: user.isPublic ? "" : user.id,
-                leadId: user.leadId,
-                roles: [viewAsRole] as [typeof viewAsRole],
-                isPublic: false as const,
-              }
-          : user;
+        // effectiveUser (hoisted above) already resolves view-as-role, so the pin
+        // defaults below and the listing filter agree on whose view this is.
 
         // aiMetaForStats already computed above (hoisted for statsMeta access).
         const aiMeta = aiMetaForStats;
@@ -1119,8 +1004,7 @@ export class HelpRepository {
           cliMetaCached ??= HelpRepository.filterMetaForUser(
             allMeta,
             Platform.CLI,
-            userRoles,
-            isPublicView,
+            effectiveUser,
           );
           return cliMetaCached;
         };
@@ -1128,8 +1012,7 @@ export class HelpRepository {
           mcpMetaCached ??= HelpRepository.filterMetaForUser(
             allMeta,
             Platform.MCP,
-            userRoles,
-            isPublicView,
+            effectiveUser,
           );
           return mcpMetaCached;
         };
@@ -1138,9 +1021,12 @@ export class HelpRepository {
           const cliMeta = getCliMeta();
           const mcpMeta = getMcpMeta();
           cliAllowedCount = cliMeta.length;
-          // MCP: pinned = tools with MCP_VISIBLE (discovery list); allowed = all MCP-callable tools
-          mcpPinnedCount = mcpMeta.filter((m) =>
-            m.allowedRoles.includes(PlatformMarker.MCP_VISIBLE),
+          // MCP: pinned = the discovery list (MCP_VISIBLE opt-in, via the same check the
+          // server lists through); allowed = all MCP-callable tools.
+          mcpPinnedCount = mcpMeta.filter(
+            (m) =>
+              permissionsRegistry.checkMcpDiscoveryAccess(m.allowedRoles)
+                .allowed,
           ).length;
           mcpAllowedCount = mcpMeta.length;
         }
@@ -1160,8 +1046,7 @@ export class HelpRepository {
           const webMeta = HelpRepository.filterMetaForUser(
             allMeta,
             Platform.NEXT_PAGE,
-            userRoles,
-            isPublicView,
+            effectiveUser,
           );
           platformFilteredMeta = webMeta.filter((m) => inSet(m, webPinnedIds));
         } else if (statsFilter === "allowed" || statsFilter === "all") {
@@ -1170,8 +1055,13 @@ export class HelpRepository {
         } else if (statsFilter === "cliAllowed" && isAdmin) {
           platformFilteredMeta = getCliMeta();
         } else if (statsFilter === "mcpPinned" && isAdmin) {
-          platformFilteredMeta = getMcpMeta().filter((m) =>
-            m.allowedRoles.includes(PlatformMarker.MCP_VISIBLE),
+          // Goes through checkMcpDiscoveryAccess rather than testing for the marker
+          // directly, so this view cannot drift from what the server actually lists
+          // (the marker alone ignores PRODUCTION_OFF / MCP_OFF / CLI_OFF).
+          platformFilteredMeta = getMcpMeta().filter(
+            (m) =>
+              permissionsRegistry.checkMcpDiscoveryAccess(m.allowedRoles)
+                .allowed,
           );
         } else if (statsFilter === "mcpAllowed" && isAdmin) {
           platformFilteredMeta = getMcpMeta();

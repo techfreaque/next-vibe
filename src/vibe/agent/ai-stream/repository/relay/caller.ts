@@ -141,7 +141,7 @@ export async function runRelayBranch(
   // relayed turn's prompt build to the thread by id — the fixtures table
   // (keyed by threadId) anchors record/replay for any external call.
   const { makeHeadlessContext } = await import("next-vibe/agent/chat/config");
-  const streamContext = makeHeadlessContext(
+  const toolExecutionContext = makeHeadlessContext(
     undefined,
     data.threadId,
     data.timezone,
@@ -301,7 +301,7 @@ export async function runRelayBranch(
   if (shipClientPromptAndTools) {
     const [promptResult, toolSchemas] = await Promise.all([
       buildSystemPrompt({
-        streamContext,
+        toolExecutionContext,
         skillId: data.skill ?? null,
         user,
         logger,

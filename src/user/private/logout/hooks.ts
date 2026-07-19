@@ -10,14 +10,14 @@ import { scopedTranslation as authScopedTranslation } from "next-vibe/identity/a
 import { AuthClientRepository } from "next-vibe/identity/auth/repository-client";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { apiClient } from "next-vibe/platforms/react/hooks/store";
 import { useToast } from "next-vibe/ui/hooks/use-toast";
 import { assignUrl } from "next-vibe/ui/lib/location";
+import { apiClient } from "next-vibe/unified-ui/hooks/store";
+import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
 import { useCallback } from "react";
 
 import definitions from "@/credits/definition";
 
-import { useApiMutation } from "../../../vibe/platforms/react/hooks/use-api-mutation";
 import logoutEndpoints from "./definition";
 import { scopedTranslation } from "./i18n";
 

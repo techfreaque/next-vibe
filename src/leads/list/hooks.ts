@@ -6,8 +6,8 @@
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { LeadSortField, SortOrder } from "next-vibe/identity/lead/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type { EndpointReturn } from "next-vibe/platforms/react/hooks/endpoint-types";
-import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
+import type { EndpointReturn } from "next-vibe/unified-ui/hooks/endpoint-types";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 
 import definitions from "./definition";
 

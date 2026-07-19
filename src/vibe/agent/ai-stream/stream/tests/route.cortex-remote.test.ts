@@ -39,14 +39,13 @@ import {
   DefaultFolderId,
   makeHeadlessContext,
 } from "next-vibe/agent/chat/config";
-import { Platform } from "next-vibe/core/definition/platform";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { identityEnv } from "next-vibe/identity/env";
 import { createEndpointLogger } from "next-vibe/logger/server";
+import { Platform } from "next-vibe/platforms/platforms";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
-import { env } from "@/env/env";
 
 import { seedCaseThread } from "../../testing/fixture-seed";
 import {
@@ -114,15 +113,15 @@ if (!_resolvedRemoteUrl) {
 } else {
   describe("AI Stream Integration - Cross-Instance Cortex (direct-http)", () => {
     beforeAll(async () => {
-      const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+      const resolved = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
       expect(
         resolved,
-        `${env.VIBE_ADMIN_USER_EMAIL} not found - run: vibe dev`,
+        `${identityEnv.VIBE_ADMIN_USER_EMAIL} not found - run: vibe dev`,
       ).toBeTruthy();
       if (!resolved) {
         // oxlint-disable-next-line restricted-syntax
         throw new Error(
-          `${env.VIBE_ADMIN_USER_EMAIL} not found - run: vibe dev`,
+          `${identityEnv.VIBE_ADMIN_USER_EMAIL} not found - run: vibe dev`,
         );
       }
       testUser = resolved;
@@ -189,8 +188,10 @@ if (!_resolvedRemoteUrl) {
       it(
         "A1: AI calls hermes cortex-list via execute-tool and gets a result back",
         async () => {
-          const { threadId: fixtureThreadId, streamContext: fixtureCtx } =
-            await seedCaseThread(`${CACHE_PREFIX}a1`, true);
+          const {
+            threadId: fixtureThreadId,
+            toolExecutionContext: fixtureCtx,
+          } = await seedCaseThread(`${CACHE_PREFIX}a1`, true);
 
           const { result, messages } = await runTestStream({
             prompt:
@@ -202,7 +203,7 @@ if (!_resolvedRemoteUrl) {
             rootFolderId: DefaultFolderId.PRIVATE,
             subFolderId: privateTestFolderId,
             threadId: fixtureThreadId,
-            streamContext: fixtureCtx,
+            toolExecutionContext: fixtureCtx,
           });
 
           expect(
@@ -286,7 +287,11 @@ if (!_resolvedRemoteUrl) {
             rootFolderId: DefaultFolderId.PRIVATE,
             subFolderId: privateTestFolderId,
             threadId: sharedThreadId,
-            streamContext: makeHeadlessContext(undefined, sharedThreadId, /* no user context — UTC (dates not user-facing here) */ "UTC"),
+            toolExecutionContext: makeHeadlessContext(
+              undefined,
+              sharedThreadId,
+              /* no user context — UTC (dates not user-facing here) */ "UTC",
+            ),
           });
 
           expect(
@@ -347,8 +352,10 @@ if (!_resolvedRemoteUrl) {
       it(
         "B1: AI loop runs on hermes via folder routing, reads hermes cortex natively",
         async () => {
-          const { threadId: fixtureThreadId, streamContext: fixtureCtx } =
-            await seedCaseThread(`${CACHE_PREFIX}b1`, true);
+          const {
+            threadId: fixtureThreadId,
+            toolExecutionContext: fixtureCtx,
+          } = await seedCaseThread(`${CACHE_PREFIX}b1`, true);
 
           // Stream into REMOTE/hermes/tests/cortex-remote.
           // REMOTE-folder routing: folder ancestry resolves to hermes connection deterministically.
@@ -364,7 +371,7 @@ if (!_resolvedRemoteUrl) {
             rootFolderId: DefaultFolderId.REMOTE,
             subFolderId: remoteHermesFolderId,
             threadId: fixtureThreadId,
-            streamContext: fixtureCtx,
+            toolExecutionContext: fixtureCtx,
           });
 
           expect(

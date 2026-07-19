@@ -6,6 +6,7 @@
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
+import { toImportUrl } from "next-vibe/core/generators/shared/utils";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -108,7 +109,7 @@ export class ConfigLoader implements IConfigLoader {
       );
       logger.debug(`📄 Config  ${configPath}`);
 
-      const importedModule = (await import(fullPath)) as
+      const importedModule = (await import(toImportUrl(fullPath))) as
         | BuildConfigModule
         | Record<string, BuildConfig | undefined>;
 

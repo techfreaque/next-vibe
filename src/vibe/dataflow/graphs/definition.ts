@@ -15,13 +15,13 @@ import { graphConfigSchema } from "next-vibe/dataflow/graph/schema";
 import { scopedTranslation } from "next-vibe/dataflow/graphs/i18n";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
-  customWidgetObject,
   objectField,
   requestField,
   responseArrayField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { VIBE_SENSE_GRAPHS_ALIAS } from "./constants";

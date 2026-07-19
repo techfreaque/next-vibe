@@ -11,7 +11,7 @@ import messagesDefinition from "next-vibe/agent/chat/threads/[threadId]/messages
 import type { FavoriteConfig } from "next-vibe/agent/skills/favorites/db";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { apiClient } from "next-vibe/platforms/react/hooks/store";
+import { apiClient } from "next-vibe/unified-ui/hooks/store";
 
 import type { AiStreamPostRequestOutput } from "../definition";
 import type { StartStreamFn } from "./shared";

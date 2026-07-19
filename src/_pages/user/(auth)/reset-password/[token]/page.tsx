@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -14,7 +15,6 @@ import { ErrorBoundary } from "next-vibe/ui/ui/error-boundary";
 import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
 import type { JSX } from "react";
 
-import { envClient } from "@/env/env-client";
 import { configScopedTranslation } from "@/env/i18n";
 import { scopedTranslation as resetPasswordScopedTranslation } from "@/user/public/reset-password/i18n";
 import { PasswordRepository } from "@/user/public/reset-password/repository";

@@ -1,19 +1,19 @@
 /**
  * Per-step token accounting for the StreamLoop.
  *
- * Stateless: the running counters live on the StreamContext (core state);
+ * Stateless: the running counters live on the ToolExecutionContextImpl (core state);
  * these static ops read/write them so multi-step billing stays accurate
  * without a per-loop instance.
  */
 
 import "server-only";
 
-import type { StreamContext } from "../core/stream";
+import type { ToolExecutionContextImpl } from "../core/stream";
 
 /** Accumulates per-step token counts for accurate multi-step credit billing. */
 export class TokenAccumulator {
   static accumulate(
-    ctx: StreamContext,
+    ctx: ToolExecutionContextImpl,
     step: {
       inputTokens: number;
       outputTokens: number;
@@ -41,7 +41,7 @@ export class TokenAccumulator {
    * accumulators stay at zero — fall back to SDK aggregate (single-step, accurate).
    */
   static finalize(
-    ctx: StreamContext,
+    ctx: ToolExecutionContextImpl,
     sdk: {
       inputTokens: number;
       outputTokens: number;

@@ -14,10 +14,10 @@ export const { tools } = endpointsHandler({
   endpoint: releaseToolEndpoints,
   [Methods.POST]: {
     handler: async ({ data, locale, logger }) =>
-      (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-        )
-      ).releaseToolRepository.execute(data, locale, logger),
+      (await import("./repository")).releaseToolRepository.execute(
+        data,
+        locale,
+        logger,
+      ),
   },
 });

@@ -48,7 +48,17 @@ const features = {
   node: true, // Node.js rules
   unicorn: true, // Unicorn rules (modern JS)
   nextjs: true, // Next.js specific rules
-  pedantic: false, // Stricter/pedantic rules
+
+  /**
+   * The pedantic category, on top of the `rules` block below. Both are scoped by
+   * `oxlint.strictPaths`, so this only decides whether the category runs at all.
+   *
+   * Repo-wide it produces thousands of warnings nobody reads, which is the same
+   * as off but noisier. Scoped to the trees that are already clean, they keep
+   * meaning something, and the list grows as more of the repo comes up to
+   * standard.
+   */
+  pedantic: false,
   // Custom plugins
   i18n: true, // Check for untranslated strings
   jsxCapitalization: true, // Enforce capitalized JSX components
@@ -106,7 +116,7 @@ const { oxlintIgnores, eslintIgnores } = formatIgnorePatterns([
   ".nyc_output",
   "build",
   "test-files",
-  "test-project",
+  "**/test-project/**",
   "public/vibe-frame/**",
   // Files
   ".DS_Store",
@@ -117,7 +127,6 @@ const { oxlintIgnores, eslintIgnores } = formatIgnorePatterns([
   ".env.development",
   ".env.production",
   "next-env.d.ts",
-  "nativewind-env.d.ts",
   "**/fixtures/**",
   "src/generated/ai-fixtures/**",
   // Glob patterns
@@ -131,6 +140,7 @@ const typecheck = {
   enabled: true as const,
   cachePath: ".tmp/typecheck-cache",
   useTsgo: features.tsgo,
+  ignorePatterns: oxlintIgnores,
   nonExtensiveIgnorePatterns: nonExtensivePatterns,
   // Keep a warm tsgo LSP daemon instead of cold-spawning tsgo on every check.
   // First run pays the cold-start cost; subsequent runs return in ~1-3s.
@@ -161,17 +171,19 @@ const oxlint: CheckConfig["oxlint"] = {
   ],
   jsPlugins: [
     ...(features.restrictedSyntax
-      ? ["@next-vibe/checker/oxlint-plugins/restricted-syntax.ts"]
+      ? ["next-vibe/tooling/checker/oxlint/oxlint-plugins/restricted-syntax.ts"]
       : []),
     ...(features.jsxCapitalization
-      ? ["@next-vibe/checker/oxlint-plugins/jsx-capitalization.ts"]
+      ? [
+          "next-vibe/tooling/checker/oxlint/oxlint-plugins/jsx-capitalization.ts",
+        ]
       : []),
     ...(features.i18n ? ["@next-vibe/checker/oxlint-plugins/i18n.ts"] : []),
     ...(features.boilerplate
-      ? ["@next-vibe/checker/oxlint-plugins/boilerplate.ts"]
+      ? ["next-vibe/tooling/checker/oxlint/oxlint-plugins/boilerplate.ts"]
       : []),
     ...(features.vibeBoundary
-      ? ["@next-vibe/checker/oxlint-plugins/vibe-boundary.ts"]
+      ? ["next-vibe/tooling/checker/oxlint/oxlint-plugins/vibe-boundary.ts"]
       : []),
   ],
   categories: {
@@ -193,6 +205,7 @@ const oxlint: CheckConfig["oxlint"] = {
     "array-callback-return": "error",
     "no-constructor-return": "error",
     "no-self-compare": "error",
+    "no-shadow": "error",
     "no-unreachable-loop": "error",
     "no-unused-private-class-members": "error",
     "prefer-template": "error",

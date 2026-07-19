@@ -39,10 +39,9 @@ import "server-only";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { identityEnv } from "next-vibe/identity/env";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
-import { env } from "@/env/env";
 
 import {
   connectToHermes,
@@ -166,7 +165,7 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
         endpoint: definition,
         data: input as CreateApiEndpointAny["types"]["RequestOutput"],
         user: atlasUser,
-        streamContext: undefined,
+        toolExecutionContext: undefined,
       });
       if (!result.success) {
         return {
@@ -179,9 +178,7 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
     }
 
     async function browserNewPage(session: string, url: string): Promise<void> {
-      const def = (
-        await import("@/browser/new-page/definition")
-      ).default;
+      const def = (await import("@/browser/new-page/definition")).default;
       const r = await browserRun(def.POST, {
         url,
         replacePage: true,
@@ -194,9 +191,7 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
     }
 
     async function browserSnapshot(session: string): Promise<string> {
-      const def = (
-        await import("@/browser/take-snapshot/definition")
-      ).default;
+      const def = (await import("@/browser/take-snapshot/definition")).default;
       const r = await browserRun(def.POST, { instanceId: session });
       expect(r.success, `browser-take-snapshot failed: ${r.message}`).toBe(
         true,
@@ -209,8 +204,7 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
       uid: string,
       value: string,
     ): Promise<void> {
-      const def = (await import("@/browser/fill/definition"))
-        .default;
+      const def = (await import("@/browser/fill/definition")).default;
       const r = await browserRun(def.POST, {
         uid,
         value,
@@ -220,8 +214,7 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
     }
 
     async function browserClick(session: string, uid: string): Promise<void> {
-      const def = (await import("@/browser/click/definition"))
-        .default;
+      const def = (await import("@/browser/click/definition")).default;
       const r = await browserRun(def.POST, {
         uid,
         dblClick: false,
@@ -237,9 +230,7 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
       text: string | string[],
       timeoutMs = 20_000,
     ): Promise<void> {
-      const def = (
-        await import("@/browser/wait-for/definition")
-      ).default;
+      const def = (await import("@/browser/wait-for/definition")).default;
       const r = await browserRun(def.POST, {
         text: Array.isArray(text) ? text : [text],
         timeout: timeoutMs,
@@ -256,9 +247,7 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
       session: string,
       url: string,
     ): Promise<void> {
-      const def = (
-        await import("@/browser/navigate-page/definition")
-      ).default;
+      const def = (await import("@/browser/navigate-page/definition")).default;
       const r = await browserRun(def.POST, {
         type: "url",
         url,
@@ -287,7 +276,10 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
         const quickLoginUid = findUid(
           snapshot,
           new RegExp(
-            env.VIBE_ADMIN_USER_EMAIL.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+            identityEnv.VIBE_ADMIN_USER_EMAIL.replaceAll(
+              /[.*+?^${}()|[\]\\]/g,
+              "\\$&",
+            ),
             "i",
           ),
         );
@@ -322,11 +314,11 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
         return;
       }
 
-      await browserFill(session, emailUid, env.VIBE_ADMIN_USER_EMAIL);
+      await browserFill(session, emailUid, identityEnv.VIBE_ADMIN_USER_EMAIL);
       await browserFill(
         session,
         passwordUid,
-        env.VIBE_ADMIN_USER_PASSWORD ?? "password123",
+        identityEnv.VIBE_ADMIN_USER_PASSWORD ?? "password123",
       );
 
       const snapshot2 = await browserSnapshot(session);
@@ -356,7 +348,7 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
         await import("next-vibe/agent/skills/favorites/[id]/definition")
       ).default;
       const list = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: favListDef.GET,
         data: {},
         user: atlasUser,
@@ -376,7 +368,7 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
       await Promise.allSettled(
         toDelete.map((f: { id: string }) =>
           sendTestRequest({
-            streamContext: undefined,
+            toolExecutionContext: undefined,
             endpoint: favDelDef.DELETE,
             urlPathParams: { id: f.id },
             user: atlasUser,
@@ -458,7 +450,7 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
         await import("next-vibe/remote-connection/[instanceId]/definition")
       ).default;
       const result = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: connByIdDef.PATCH,
         data: {
           transportMode: mode,
@@ -480,7 +472,7 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
 
       // Verify both sides updated
       const status = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: connByIdDef.GET,
         urlPathParams: { instanceId: "hermes" },
         user: atlasUser,
@@ -498,7 +490,7 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
     // ── Setup / teardown ──────────────────────────────────────────────────
 
     beforeAll(async () => {
-      const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+      const resolved = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
       expect(resolved, "Admin user not found in atlas DB").toBeTruthy();
       if (!resolved) {
         return;
@@ -513,7 +505,7 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
         await import("next-vibe/remote-connection/[instanceId]/definition")
       ).default;
       const patchResult = await sendTestRequest({
-        streamContext: undefined,
+        toolExecutionContext: undefined,
         endpoint: connByIdDef.PATCH,
         data: {
           syncScope: {

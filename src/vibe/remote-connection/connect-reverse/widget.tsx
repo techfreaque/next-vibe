@@ -15,9 +15,9 @@ import {
 import { Div } from "next-vibe/ui/ui/div";
 import { Server } from "next-vibe/ui/ui/icons/Server";
 import { useWidgetLocale } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
-import { UrlFieldWidget } from "next-vibe/unified-ui/form-fields/url-field/widget";
-import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
+import { UrlFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/url-field/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 
 import type definitions from "./definition";

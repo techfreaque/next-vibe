@@ -2,9 +2,8 @@
 import "server-only";
 
 import type { SystemPromptFragment } from "next-vibe/agent/ai-stream/system-prompt/types";
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-
-import { envClient } from "@/env/env-client";
 
 import { FETCH_URL_SHORT_ALIAS } from "../fetch-url-content/constants";
 import { WEB_SEARCH_ALIAS } from "./constants";

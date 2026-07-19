@@ -1,6 +1,6 @@
 // Testing infrastructure - test descriptions are for developers, not end users
 
-import { rootlessStreamContext } from "next-vibe/agent/chat/config";
+import { rootlessToolExecutionContext } from "next-vibe/agent/chat/config";
 import type {
   CreateApiEndpoint,
   InferRequestOutput,
@@ -116,7 +116,7 @@ export function testEndpoint<
             typeof sendTestRequest
           >[0]["urlPathParams"],
           user,
-          streamContext: rootlessStreamContext(),
+          toolExecutionContext: rootlessToolExecutionContext(),
         });
       },
     };

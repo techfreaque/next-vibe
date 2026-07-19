@@ -66,7 +66,6 @@ import {
   videoGenModelSelectionSchema,
 } from "next-vibe/agent/video-generation/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { cn } from "next-vibe/core/utils/utils";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { usePathname } from "next-vibe/ui/hooks/use-pathname";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
@@ -132,6 +131,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe/ui/ui/tooltip";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetContext,
@@ -143,20 +143,20 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { AlertWidget } from "next-vibe/unified-ui/display-only/alert/widget";
-import { MarkdownWidget } from "next-vibe/unified-ui/display-only/markdown/widget";
-import { BooleanFieldWidget } from "next-vibe/unified-ui/form-fields/boolean-field/widget";
+import { AlertWidget } from "next-vibe/unified-ui/widgets/display-only/alert/widget";
+import { MarkdownWidget } from "next-vibe/unified-ui/widgets/display-only/markdown/widget";
+import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
 import {
   Icon,
   type IconKey,
-} from "next-vibe/unified-ui/form-fields/icon-field/icons";
-import { IconFieldWidget } from "next-vibe/unified-ui/form-fields/icon-field/widget";
-import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field/widget";
-import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
-import { TextareaFieldWidget } from "next-vibe/unified-ui/form-fields/textarea-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
+} from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+import { IconFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/icon-field/widget";
+import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
+import { TextareaFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/textarea-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -2531,7 +2531,7 @@ function LeadCaptureForm({
     void (async (): Promise<void> => {
       try {
         const [{ apiClient }, captureDef] = await Promise.all([
-          import("next-vibe/platforms/react/hooks/store"),
+          import("next-vibe/unified-ui/hooks/store"),
           import("@/lead-magnet/capture/definition"),
         ]);
 
@@ -2779,7 +2779,7 @@ function CreatorOtherSkills({
     void (async (): Promise<void> => {
       try {
         const [{ apiClient }, listDef] = await Promise.all([
-          import("next-vibe/platforms/react/hooks/store"),
+          import("next-vibe/unified-ui/hooks/store"),
           import("../definition"),
         ]);
 
@@ -3196,8 +3196,7 @@ function ShareEarnButton({
 
     setLoading(true);
     try {
-      const { apiClient } =
-        await import("next-vibe/platforms/react/hooks/store");
+      const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
       const codesListDef = await import("@/referral/codes/list/definition");
       const result = await apiClient.fetch(
         codesListDef.default.GET,
@@ -3231,8 +3230,7 @@ function ShareEarnButton({
     }
     setCreating(true);
     try {
-      const { apiClient } =
-        await import("next-vibe/platforms/react/hooks/store");
+      const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
       const referralDef = await import("@/referral/definition");
       const result = await apiClient.fetch(
         referralDef.default.POST,
@@ -3491,8 +3489,7 @@ function CustomizeAndAddButton({
     setIsLoading(true);
 
     try {
-      const { apiClient } =
-        await import("next-vibe/platforms/react/hooks/store");
+      const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
       const skillSingleDefinitions = await import("./definition");
       const createFavoriteDefinitions =
         await import("../favorites/create/definition");

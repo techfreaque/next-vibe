@@ -4,7 +4,6 @@
 
 "use client";
 import { objectEntries } from "next-vibe/core/utils/object";
-import { cn } from "next-vibe/core/utils/utils";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
@@ -25,6 +24,7 @@ import {
 import { Span } from "next-vibe/ui/ui/span";
 import { WidgetHeader } from "next-vibe/ui/ui/widget-header";
 import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { isValidEnumValue } from "next-vibe/unified-ui/_shared/enum";
 import {
   useWidgetContext,

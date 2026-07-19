@@ -9,10 +9,10 @@ export const { POST, tools } = endpointsHandler({
   endpoint: vibeDepsEndpoints,
   [Methods.POST]: {
     handler: async ({ data, logger, t }) =>
-      (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-        )
-      ).VibeDepsRepository.execute(data, logger, t),
+      (await import("./repository")).VibeDepsRepository.execute(
+        data,
+        logger,
+        t,
+      ),
   },
 });

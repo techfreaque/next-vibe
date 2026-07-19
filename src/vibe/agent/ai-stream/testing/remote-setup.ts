@@ -22,11 +22,13 @@ import { existsSync, readFileSync } from "node:fs";
 
 import { and, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
-import { rootlessStreamContext } from "next-vibe/agent/chat/config";
+import { rootlessToolExecutionContext } from "next-vibe/agent/chat/config";
 import { ThreadStreamingState } from "next-vibe/agent/chat/enum";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
+import { databaseEnv } from "next-vibe/database/env";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { identityEnv } from "next-vibe/identity/env";
 import * as userSchema from "next-vibe/identity/user/db";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import * as remoteConnectionSchema from "next-vibe/remote-connection/db";
@@ -37,8 +39,6 @@ import {
 import { RemoteTransport } from "next-vibe/remote-connection/transport";
 import { Pool } from "pg";
 import { describe, expect, it } from "vitest";
-
-import { env } from "@/env/env";
 
 import * as fixtureSchema from "./fixtures.db";
 
@@ -204,7 +204,7 @@ export function getProdDb(): ReturnType<
   >
 > {
   if (!prodDb) {
-    const baseUrl = env.DATABASE_URL.replace(
+    const baseUrl = databaseEnv.DATABASE_URL.replace(
       /:\d+\//,
       `:${String(PROD_DB_PORT)}/`,
     );
@@ -290,13 +290,13 @@ export async function resolveDevUser(
 export async function resolveProdUserId(): Promise<string> {
   const pdb = getProdDb();
   const rows = await pdb.execute<{ id: string }>(
-    sql`SELECT id FROM users WHERE email = ${env.VIBE_ADMIN_USER_EMAIL} LIMIT 1`,
+    sql`SELECT id FROM users WHERE email = ${identityEnv.VIBE_ADMIN_USER_EMAIL} LIMIT 1`,
   );
   if (rows.rows.length === 0) {
     // eslint-disable-next-line i18next/no-literal-string
     // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
     throw new Error(
-      `resolveProdUserId: admin user ${env.VIBE_ADMIN_USER_EMAIL} not found in prod DB`,
+      `resolveProdUserId: admin user ${identityEnv.VIBE_ADMIN_USER_EMAIL} not found in prod DB`,
     );
   }
   return rows.rows[0]!.id;
@@ -383,18 +383,18 @@ export async function ensureRemoteUserCredits(
   minCredits: number,
 ): Promise<void> {
   const { sendTestRequest } =
-    await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
+    await import("next-vibe/tooling/testing/testing-suite/send-test-request");
   const adminAddDefinitions = (await import("@/credits/admin-add/definition"))
     .default;
-  const adminUser = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+  const adminUser = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
   if (!adminUser) {
     // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
     throw new Error(
-      `[ensureRemoteUserCredits] Admin user ${env.VIBE_ADMIN_USER_EMAIL} not found in atlas DB`,
+      `[ensureRemoteUserCredits] Admin user ${identityEnv.VIBE_ADMIN_USER_EMAIL} not found in atlas DB`,
     );
   }
   const result = await sendTestRequest({
-    streamContext: rootlessStreamContext(),
+    toolExecutionContext: rootlessToolExecutionContext(),
     endpoint: adminAddDefinitions.POST,
     data: { targetUserId: userId, amount: minCredits },
     user: adminUser,
@@ -457,7 +457,7 @@ export async function connectToHermes(
     ...options?.syncScope,
   };
   const { sendTestRequest } =
-    await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
+    await import("next-vibe/tooling/testing/testing-suite/send-test-request");
 
   // Pre-clean both sides so connect never hits a 409 conflict.
   // Restore atlas identity first — a prior headless run may have left
@@ -473,12 +473,12 @@ export async function connectToHermes(
     await import("next-vibe/remote-connection/connect/definition")
   ).default;
   const result = await sendTestRequest({
-    streamContext: rootlessStreamContext(),
+    toolExecutionContext: rootlessToolExecutionContext(),
     endpoint: connectDef.POST,
     data: {
       remoteUrl,
-      email: env.VIBE_ADMIN_USER_EMAIL,
-      password: env.VIBE_ADMIN_USER_PASSWORD,
+      email: identityEnv.VIBE_ADMIN_USER_EMAIL,
+      password: identityEnv.VIBE_ADMIN_USER_PASSWORD,
       // EXACTLY the domains this suite tests (all-off by default) — see options.
       syncScope: effectiveSyncScope,
     },
@@ -505,7 +505,7 @@ export async function connectToHermes(
     await import("next-vibe/remote-connection/[instanceId]/definition")
   ).default;
   const patchResult = await sendTestRequest({
-    streamContext: rootlessStreamContext(),
+    toolExecutionContext: rootlessToolExecutionContext(),
     endpoint: connByIdDef.PATCH,
     data: {
       transportMode: "direct-http",
@@ -627,7 +627,7 @@ export async function connectToHermesLocalAi(
   };
 
   const { sendTestRequest } =
-    await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
+    await import("next-vibe/tooling/testing/testing-suite/send-test-request");
   const connByIdDef = (
     await import("next-vibe/remote-connection/[instanceId]/definition")
   ).default;
@@ -639,7 +639,7 @@ export async function connectToHermesLocalAi(
   // hermes's own transportMode — it stays direct-http so the result returns to
   // atlas over http (the bridge's back leg). One call; the mirror does the rest.
   const localPatch = await sendTestRequest({
-    streamContext: rootlessStreamContext(),
+    toolExecutionContext: rootlessToolExecutionContext(),
     endpoint: connByIdDef.PATCH,
     data: {
       transportMode: "reverse-ws",
@@ -671,14 +671,14 @@ async function waitForHermesConnectorReady(
   timeoutMs = 30_000,
 ): Promise<void> {
   const { sendTestRequest } =
-    await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
+    await import("next-vibe/tooling/testing/testing-suite/send-test-request");
   const connByIdDef = (
     await import("next-vibe/remote-connection/[instanceId]/definition")
   ).default;
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
     const res = await sendTestRequest({
-      streamContext: rootlessStreamContext(),
+      toolExecutionContext: rootlessToolExecutionContext(),
       endpoint: connByIdDef.GET,
       urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
       user,
@@ -721,15 +721,15 @@ export async function disconnectFromHermesLocalAi(
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function disconnectFromHermes(_userId: string): Promise<void> {
   const { sendTestRequest } =
-    await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
-  const adminUser = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+    await import("next-vibe/tooling/testing/testing-suite/send-test-request");
+  const adminUser = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
   if (!adminUser) {
     return;
   }
   const listDef = (await import("next-vibe/remote-connection/list/definition"))
     .default;
   const listResult = await sendTestRequest({
-    streamContext: rootlessStreamContext(),
+    toolExecutionContext: rootlessToolExecutionContext(),
     endpoint: listDef.GET,
     data: {},
     user: adminUser,
@@ -743,7 +743,7 @@ export async function disconnectFromHermes(_userId: string): Promise<void> {
   for (const conn of listResult.data.connections) {
     if (conn.instanceId.startsWith("hermes")) {
       await sendTestRequest({
-        streamContext: rootlessStreamContext(),
+        toolExecutionContext: rootlessToolExecutionContext(),
         endpoint: connByIdDef.DELETE,
         urlPathParams: { instanceId: conn.instanceId },
         user: adminUser,
@@ -761,15 +761,15 @@ export async function disconnectFromHermes(_userId: string): Promise<void> {
  */
 export async function normalizeHermesSyncScope(): Promise<void> {
   const { sendTestRequest } =
-    await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
-  const adminUser = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+    await import("next-vibe/tooling/testing/testing-suite/send-test-request");
+  const adminUser = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
   if (!adminUser) {
     return;
   }
   const listDef = (await import("next-vibe/remote-connection/list/definition"))
     .default;
   const listResult = await sendTestRequest({
-    streamContext: rootlessStreamContext(),
+    toolExecutionContext: rootlessToolExecutionContext(),
     endpoint: listDef.GET,
     data: {},
     user: adminUser,
@@ -783,7 +783,7 @@ export async function normalizeHermesSyncScope(): Promise<void> {
   for (const conn of listResult.data.connections) {
     if (conn.instanceId.startsWith("hermes")) {
       await sendTestRequest({
-        streamContext: rootlessStreamContext(),
+        toolExecutionContext: rootlessToolExecutionContext(),
         endpoint: connByIdDef.PATCH,
         // Local suites (no explicit remote setup) test NO sync — force every
         // domain off on any lingering hermes connection so a prior remote
@@ -818,8 +818,8 @@ export async function unregisterDevFromHermes(
   // WS and releases the in-memory sync slot — a direct DB delete would skip that
   // and leave a stuck sync slot ("pull-on-connect skipped - already in flight").
   const { sendTestRequest } =
-    await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
-  const adminUser = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+    await import("next-vibe/tooling/testing/testing-suite/send-test-request");
+  const adminUser = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
   if (!adminUser) {
     return;
   }
@@ -830,7 +830,7 @@ export async function unregisterDevFromHermes(
   ).default;
   try {
     const listResult = await sendTestRequest({
-      streamContext: rootlessStreamContext(),
+      toolExecutionContext: rootlessToolExecutionContext(),
       endpoint: listDef.GET,
       data: {},
       user: adminUser,
@@ -843,7 +843,7 @@ export async function unregisterDevFromHermes(
       : [{ instanceId: ATLAS_INSTANCE_ID }];
     for (const row of atlasRows) {
       await sendTestRequest({
-        streamContext: rootlessStreamContext(),
+        toolExecutionContext: rootlessToolExecutionContext(),
         endpoint: connByIdDef.DELETE,
         urlPathParams: { instanceId: row.instanceId },
         user: adminUser,
@@ -853,7 +853,7 @@ export async function unregisterDevFromHermes(
   } catch {
     // Best-effort: at minimum delete the canonical atlas row via the endpoint.
     await sendTestRequest({
-      streamContext: rootlessStreamContext(),
+      toolExecutionContext: rootlessToolExecutionContext(),
       endpoint: connByIdDef.DELETE,
       urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
       user: adminUser,
@@ -910,19 +910,19 @@ export async function restoreHermesIdentity(
  */
 export async function restoreAtlasIdentity(): Promise<void> {
   const { sendTestRequest } =
-    await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
+    await import("next-vibe/tooling/testing/testing-suite/send-test-request");
   const selfRenameDef = (
     await import("next-vibe/remote-connection/self/rename/definition")
   ).default;
-  const adminUser = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+  const adminUser = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
   if (!adminUser) {
     // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
     throw new Error(
-      `restoreAtlasIdentity: admin user ${env.VIBE_ADMIN_USER_EMAIL} not found`,
+      `restoreAtlasIdentity: admin user ${identityEnv.VIBE_ADMIN_USER_EMAIL} not found`,
     );
   }
   await sendTestRequest({
-    streamContext: rootlessStreamContext(),
+    toolExecutionContext: rootlessToolExecutionContext(),
     endpoint: selfRenameDef.PATCH,
     data: { newInstanceId: ATLAS_INSTANCE_ID, propagate: false },
     user: adminUser,
@@ -948,19 +948,19 @@ async function triggerHermesReconnect(): Promise<void> {
   // reverse-mirror and CLOBBERED atlas's just-set threads:true → false, silently
   // dropping every folder/thread mirror event. reconnectNow only; scope untouched.
   const { sendTestRequest } =
-    await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
+    await import("next-vibe/tooling/testing/testing-suite/send-test-request");
   const connByIdDef = (
     await import("next-vibe/remote-connection/[instanceId]/definition")
   ).default;
-  const adminUser = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+  const adminUser = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
   if (!adminUser) {
     // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
     throw new Error(
-      `triggerHermesReconnect: admin user ${env.VIBE_ADMIN_USER_EMAIL} not found`,
+      `triggerHermesReconnect: admin user ${identityEnv.VIBE_ADMIN_USER_EMAIL} not found`,
     );
   }
   const resp = await sendTestRequest({
-    streamContext: rootlessStreamContext(),
+    toolExecutionContext: rootlessToolExecutionContext(),
     endpoint: connByIdDef.PATCH,
     data: {
       reconnectNow: true,
@@ -1105,8 +1105,8 @@ export async function resolveProdAdminToken(
       connection: { remoteUrl, token: "" },
       definition: loginDef.POST,
       input: {
-        email: env.VIBE_ADMIN_USER_EMAIL,
-        password: env.VIBE_ADMIN_USER_PASSWORD,
+        email: identityEnv.VIBE_ADMIN_USER_EMAIL,
+        password: identityEnv.VIBE_ADMIN_USER_PASSWORD,
         rememberMe: true,
       },
       locale: defaultLocale,

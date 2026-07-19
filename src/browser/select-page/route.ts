@@ -14,7 +14,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: selectPageEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, t, logger, platform, streamContext }) =>
+    handler: ({ data, t, logger, platform, toolExecutionContext }) =>
       BrowserSharedRepository.executeSelectPage<SelectPageResponseOutput>(
         {
           toolName: BrowserTool.SELECT_PAGE,
@@ -27,7 +27,7 @@ export const { POST, tools } = endpointsHandler({
         t,
         logger,
         platform,
-        streamContext.threadId,
+        toolExecutionContext.threadId,
       ),
   },
 });

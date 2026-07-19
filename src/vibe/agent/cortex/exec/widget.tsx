@@ -9,7 +9,6 @@
 "use client";
 
 import cortexListDefinitions from "next-vibe/agent/cortex/list/definition";
-import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import {
   useSearchParams,
   useSilentHistory,
@@ -50,7 +49,8 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import {
   type JSX,
   useCallback,
@@ -107,7 +107,7 @@ function connectionSubtitle(conn: Connection): string {
 }
 
 function connectionToSlug(conn: Connection): string {
-  return conn.label.toLowerCase().replace(/\s+/g, "-");
+  return conn.label.toLowerCase().replaceAll(/\s+/g, "-");
 }
 
 function buildBreadcrumbs(

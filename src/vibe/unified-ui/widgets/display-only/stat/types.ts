@@ -1,0 +1,67 @@
+/**
+ * Stat Widget Type Definitions
+ */
+
+import type { SpacingSize, WidgetType } from "next-vibe/core/definition/enums";
+import type { NumberWidgetSchema } from "next-vibe/unified-ui/_shared/schema-constraints";
+import type {
+  BasePrimitiveWidgetConfig,
+  FieldUsageConfig,
+} from "next-vibe/unified-ui/_shared/types";
+import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+
+/**
+ * Stat Widget Configuration
+ */
+export interface StatWidgetConfig<
+  TKey extends string,
+  TSchema extends TSchemaType extends "widget" ? never : NumberWidgetSchema,
+  TUsage extends FieldUsageConfig,
+  TSchemaType extends "primitive" | "widget",
+> extends BasePrimitiveWidgetConfig<TUsage, TSchemaType, TSchema> {
+  type: WidgetType.STAT;
+  label?: NoInfer<TKey>;
+  format?: StatFormat;
+  icon?: IconKey;
+  variant?: StatVariant;
+  trend?: "up" | "down" | "neutral";
+  trendValue?: number;
+  size?: "sm" | "md" | "lg";
+  /** Card padding */
+  padding?: SpacingSize;
+  /** Value text size */
+  valueSize?: "xs" | "sm" | "base" | "lg" | "xl" | "2xl" | "3xl";
+  /** Label text size */
+  labelSize?: "xs" | "sm" | "base" | "lg";
+  /** Icon size */
+  iconSize?: "xs" | "sm" | "base" | "lg";
+  /** Spacing after icon */
+  iconSpacing?: SpacingSize;
+  /** Trend indicator size */
+  trendSize?: "xs" | "sm" | "base";
+  /** Trend icon size */
+  trendIconSize?: "xs" | "sm" | "base";
+  /** Gap in trend indicator */
+  trendGap?: SpacingSize;
+  /** Spacing after trend */
+  trendSpacing?: SpacingSize;
+  /** Spacing after value (before label) */
+  labelSpacing?: SpacingSize;
+  schema: TSchema;
+}
+
+/**
+ * Stat format types from UI config
+ */
+export type StatFormat = "number" | "percentage" | "currency" | "compact";
+
+/**
+ * Stat variant types from UI config
+ */
+export type StatVariant =
+  | "default"
+  | "success"
+  | "warning"
+  | "danger"
+  | "info"
+  | "muted";

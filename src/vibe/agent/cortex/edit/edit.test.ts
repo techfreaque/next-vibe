@@ -13,8 +13,8 @@ import { and, eq, like } from "drizzle-orm";
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { cortexNodes } from "../db";
@@ -41,7 +41,7 @@ async function cleanup(userId: string): Promise<void> {
 /** Write a file via the real WRITE endpoint; fails the test if it does not stick. */
 async function writeFile(path: string, content: string): Promise<void> {
   const res = await sendTestRequest({
-    streamContext: undefined,
+    toolExecutionContext: undefined,
     endpoint: writeEndpoint.POST,
     data: { path, content, createParents: true },
     user,
@@ -55,7 +55,7 @@ async function writeFile(path: string, content: string): Promise<void> {
 /** Read a file via the real READ endpoint and return its content, or null on failure. */
 async function readContent(path: string): Promise<string | null> {
   const res = await sendTestRequest({
-    streamContext: undefined,
+    toolExecutionContext: undefined,
     endpoint: readEndpoint.GET,
     data: { path },
     user,
@@ -87,7 +87,7 @@ describe("Cortex Edit E2E", () => {
     await writeFile(path, "# Greeting\n\nHello world. Stay sharp.");
 
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: editEndpoint.PATCH,
       data: { path, find: "Hello", replace: "Goodbye" },
       user,
@@ -112,7 +112,7 @@ describe("Cortex Edit E2E", () => {
     await writeFile(path, "TOKEN one\nTOKEN two\nTOKEN three\n");
 
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: editEndpoint.PATCH,
       data: { path, find: "TOKEN", replace: "MARK" },
       user,
@@ -137,7 +137,7 @@ describe("Cortex Edit E2E", () => {
     await writeFile(path, original);
 
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: editEndpoint.PATCH,
       data: { path, find: "DOES_NOT_EXIST", replace: "x" },
       user,
@@ -161,7 +161,7 @@ describe("Cortex Edit E2E", () => {
     await writeFile(path, "L1\nL2\nL3\nL4\nL5");
 
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: editEndpoint.PATCH,
       data: { path, startLine: 2, endLine: 3, newContent: "REPLACED" },
       user,
@@ -185,7 +185,7 @@ describe("Cortex Edit E2E", () => {
 
     // Grow the content: "beta" (4 bytes) -> "delta-epsilon" (13 bytes).
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: editEndpoint.PATCH,
       data: { path, find: "beta", replace: "delta-epsilon" },
       user,
@@ -203,7 +203,7 @@ describe("Cortex Edit E2E", () => {
 
     // Read reports the same recomputed size and content.
     const readRes = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: readEndpoint.GET,
       data: { path },
       user,
@@ -221,7 +221,7 @@ describe("Cortex Edit E2E", () => {
 
   it("edit a non-existent path → NOT_FOUND", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: editEndpoint.PATCH,
       data: {
         path: `${TEST_PREFIX}/ghost-never-written.md`,
@@ -241,7 +241,7 @@ describe("Cortex Edit E2E", () => {
 
   it("edit a read-only virtual mount path (/threads) is rejected with FORBIDDEN", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: editEndpoint.PATCH,
       data: { path: "/threads/auth-redesign.md", find: "a", replace: "b" },
       user,
@@ -263,7 +263,7 @@ describe("Cortex Edit E2E", () => {
     await writeFile(path, original);
 
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: editEndpoint.PATCH,
       data: { path, find: "Body text needs work.", replace: "Body rewritten." },
       user,

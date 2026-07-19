@@ -81,21 +81,20 @@ export async function fetchBranchMessages(params: {
       parentMessageId,
     });
     return branchMessages;
-  } else {
-    const branchMessages = await fetchAncestorBranch(
-      threadId,
-      parentMessageId,
-      logger,
-    );
-    logger.debug("[fetchBranchMessages] Server branch messages fetched", {
-      count: branchMessages.length,
-      parentMessageId,
-      stoppedAtCompacting: branchMessages[0]?.metadata?.isCompacting
-        ? branchMessages[0]?.id
-        : null,
-    });
-    return branchMessages;
   }
+  const branchMessages = await fetchAncestorBranch(
+    threadId,
+    parentMessageId,
+    logger,
+  );
+  logger.debug("[fetchBranchMessages] Server branch messages fetched", {
+    count: branchMessages.length,
+    parentMessageId,
+    stoppedAtCompacting: branchMessages[0]?.metadata?.isCompacting
+      ? branchMessages[0]?.id
+      : null,
+  });
+  return branchMessages;
 }
 
 // ─── Stage: hydrate (attachment base64) ───
@@ -220,7 +219,7 @@ interface BuildMessageContextParams {
   /** Pre-built trailing system message string (STT + tasks + memories + favorites), built in builder.ts via generator.ts */
   trailingSystemMessage: string;
   /** Fixture chain of the calling stream — attachment/media downloads bind it. */
-  streamContext: ToolExecutionContext;
+  toolExecutionContext: ToolExecutionContext;
 }
 
 /**
@@ -448,7 +447,7 @@ export async function buildMessageContext(
           params.rootFolderId,
           params.modelConfig,
           params.operation === "wakeup-resume",
-          params.streamContext,
+          params.toolExecutionContext,
         )
       : [];
 
@@ -593,7 +592,7 @@ interface RebuildWithCompactedHistoryParams {
   locale: CountryLanguage;
   modelConfig?: ChatModelOption;
   /** Fixture chain of the calling stream — attachment/media downloads bind it. */
-  streamContext: ToolExecutionContext;
+  toolExecutionContext: ToolExecutionContext;
 }
 
 /**
@@ -648,7 +647,7 @@ export async function rebuildWithCompactedHistory(
       params.rootFolderId,
       params.modelConfig,
       undefined,
-      params.streamContext,
+      params.toolExecutionContext,
     );
     messages.push(...converted);
   }

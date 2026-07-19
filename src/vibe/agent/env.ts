@@ -296,3 +296,35 @@ export const {
     s3: { ...baseFields, ...s3Fields },
   },
 });
+
+/**
+ * Public agent availability flags — derived from validated API keys.
+ * Written to process.env as a module side effect so Next.js bundler and child
+ * processes see them without any extra wiring.
+ */
+export const agentPublicFlags = {
+  NEXT_PUBLIC_AGENT_OPEN_ROUTER: Boolean(agentEnv.OPENROUTER_API_KEY),
+  NEXT_PUBLIC_AGENT_CLAUDE_CODE: agentEnv.CLAUDE_CODE_ENABLED,
+  NEXT_PUBLIC_AGENT_VOICE: Boolean(agentEnv.EDEN_AI_API_KEY),
+  NEXT_PUBLIC_AGENT_BRAVE_SEARCH: Boolean(agentEnv.BRAVE_SEARCH_API_KEY),
+  NEXT_PUBLIC_AGENT_KAGI_SEARCH: Boolean(agentEnv.KAGI_API_KEY),
+  NEXT_PUBLIC_AGENT_UNCENSORED_AI: Boolean(agentEnv.UNCENSORED_AI_API_KEY),
+  NEXT_PUBLIC_AGENT_FREEDOM_GPT: Boolean(agentEnv.FREEDOMGPT_API_KEY),
+  NEXT_PUBLIC_AGENT_GAB_AI: Boolean(agentEnv.GAB_AI_API_KEY),
+  NEXT_PUBLIC_AGENT_VENICE_AI: Boolean(agentEnv.VENICE_AI_API_KEY),
+  NEXT_PUBLIC_AGENT_SCRAPPEY: Boolean(agentEnv.SCRAPPEY_API_KEY),
+  NEXT_PUBLIC_AGENT_OPEN_AI_IMAGES: Boolean(agentEnv.OPENAI_API_KEY),
+  NEXT_PUBLIC_AGENT_OPEN_AI_STT: Boolean(agentEnv.OPENAI_API_KEY),
+  NEXT_PUBLIC_AGENT_REPLICATE: Boolean(agentEnv.REPLICATE_API_TOKEN),
+  NEXT_PUBLIC_AGENT_FAL_AI: Boolean(agentEnv.FAL_AI_API_KEY),
+  NEXT_PUBLIC_AGENT_MODELS_LAB: Boolean(agentEnv.MODELSLAB_API_KEY),
+  NEXT_PUBLIC_AGENT_EDEN_AI_STT: Boolean(agentEnv.EDEN_AI_API_KEY),
+  NEXT_PUBLIC_AGENT_DEEPGRAM: Boolean(agentEnv.DEEPGRAM_API_KEY),
+  NEXT_PUBLIC_AGENT_OPEN_AI_TTS: Boolean(agentEnv.OPENAI_API_KEY),
+  NEXT_PUBLIC_AGENT_EDEN_AI_TTS: Boolean(agentEnv.EDEN_AI_API_KEY),
+  NEXT_PUBLIC_AGENT_ELEVENLABS: Boolean(agentEnv.ELEVENLABS_API_KEY),
+} as const;
+
+for (const [key, value] of Object.entries(agentPublicFlags)) {
+  (process.env as Record<string, string>)[key] = String(value);
+}

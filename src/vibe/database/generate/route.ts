@@ -9,10 +9,8 @@ export const { tools } = endpointsHandler({
   endpoint: generateEndpoints,
   [Methods.POST]: {
     handler: async ({ logger }) =>
-      (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-        )
-      ).DatabaseGenerateRepository.runGenerate(logger),
+      (await import("./repository")).DatabaseGenerateRepository.runGenerate(
+        logger,
+      ),
   },
 });

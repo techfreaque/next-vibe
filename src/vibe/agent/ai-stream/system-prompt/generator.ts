@@ -11,18 +11,20 @@ import "server-only";
 
 import { readFileSync } from "node:fs";
 
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
 import type {
   GeneratorContext,
   GeneratorResult,
-} from "next-vibe/tooling/generators/shared/shared-inputs";
+} from "next-vibe/core/generators/shared/shared-inputs";
 import {
   generateFileHeader,
   writeGeneratedFile,
-} from "next-vibe/tooling/generators/shared/utils";
+} from "next-vibe/core/generators/shared/utils";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
-const OUTPUT_FILE = "src/generated/prompt-fragments/index.ts";
+import { GENERATED_DIR } from "@/env/paths";
+
+const OUTPUT_FILE = `${GENERATED_DIR}/prompt-fragments/index.ts`;
 
 /** Fragment entry discovered from scanning */
 interface FragmentEntry {
@@ -75,7 +77,7 @@ export async function generate(
 class PromptFragmentsGenerator {
   /** Convert kebab-case fragment ID to camelCase variable name, e.g. "user-name" → "userName" */
   private static toCamel(id: string): string {
-    return id.replace(/-([a-z])/g, (m) => m[1].toUpperCase());
+    return id.replaceAll(/-([a-z])/g, (m) => m[1].toUpperCase());
   }
 
   /**

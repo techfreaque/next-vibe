@@ -15,7 +15,7 @@
 // Scoped endpoint registry - bundled at build time from the generated files
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 
-import { runCli } from "./run-cli";
+import { runCli } from "./runtime/run-cli";
 
 // These are replaced by Bun `define` at build time.
 declare const VIBE_PACKAGE_NAME: string;

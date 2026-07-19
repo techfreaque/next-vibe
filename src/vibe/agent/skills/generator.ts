@@ -13,20 +13,21 @@ import "server-only";
 import { readFileSync, writeFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 
-import { parseError } from "next-vibe/core/utils/parse-error";
 import type {
   GeneratorContext,
   GeneratorResult,
-} from "next-vibe/tooling/generators/shared/shared-inputs";
+} from "next-vibe/core/generators/shared/shared-inputs";
 import {
   generateFileHeader,
   getRelativeImportPath,
+  toImportUrl,
   writeGeneratedFile,
-} from "next-vibe/tooling/generators/shared/utils";
+} from "next-vibe/core/generators/shared/utils";
+import { parseError } from "next-vibe/core/utils/parse-error";
 
-import { getSrcDir } from "@/env/paths";
+import { GENERATED_DIR, getSrcDir } from "@/env/paths";
 
-const OUTPUT_FILE = "src/generated/skills/index.ts";
+const OUTPUT_FILE = `${GENERATED_DIR}/skills/index.ts`;
 
 /** Skill IDs that go into COMPANION_SKILLS (order matters). */
 const COMPANION_SKILL_IDS = ["thea", "hermes"] as const;
@@ -59,7 +60,7 @@ async function extractSkills(
       }
 
       const exportName = exportMatch[1];
-      const mod = (await import(skillFile)) as Record<
+      const mod = (await import(toImportUrl(skillFile))) as Record<
         string,
         { id?: string; systemPrompt?: string }
       >;
@@ -245,8 +246,9 @@ async function generateSkillEmbeddings(
   const { computeEmbeddingHash, generateEmbedding } =
     await import("next-vibe/agent/cortex/embeddings/service");
   // Build-time skill embedding generation — no stream; thread-less root runs live.
-  const { rootlessStreamContext } = await import("next-vibe/agent/chat/config");
-  const rootCtx = rootlessStreamContext();
+  const { rootlessToolExecutionContext } =
+    await import("next-vibe/agent/chat/config");
+  const rootCtx = rootlessToolExecutionContext();
 
   const skillFiles = ctx.files.skill;
 

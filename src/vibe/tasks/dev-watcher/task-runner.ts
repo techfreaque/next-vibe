@@ -8,21 +8,21 @@
 
 import "server-only";
 
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { Environment } from "next-vibe/env/env-util";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { TasksTranslationKey } from "next-vibe/tasks/i18n";
-import type { TaskRunner } from "next-vibe/tasks/unified-runner/types";
-import { GeneratorRunner } from "next-vibe/tooling/generators/generator";
-import type { LiveIndex } from "next-vibe/tooling/generators/shared/live-index";
+import { coreEnv } from "next-vibe/core/env";
+import { GeneratorRunner } from "next-vibe/core/generators/generator";
+import type { LiveIndex } from "next-vibe/core/generators/shared/live-index";
 import {
   buildLiveIndex,
   classifyFile,
   clearDirtyFlags,
   updateLiveIndex,
-} from "next-vibe/tooling/generators/shared/live-index";
-
-import { env } from "@/env/env";
+} from "next-vibe/core/generators/shared/live-index";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { Environment } from "next-vibe/env/env-util";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { tasksEnv } from "next-vibe/tasks/env";
+import type { TasksTranslationKey } from "next-vibe/tasks/i18n";
+import type { TaskRunner } from "next-vibe/tasks/unified-runner/types";
 
 import { CronTaskPriority, TaskCategory } from "../enum";
 import { DEV_WATCHER_TASK_NAME } from "./constants";
@@ -38,11 +38,11 @@ const devWatcherTaskRunner: TaskRunner<TasksTranslationKey> = {
   name: DEV_WATCHER_TASK_NAME,
   description: "devWatcher.description",
   category: TaskCategory.DEVELOPMENT,
-  enabled: env.NODE_ENV === Environment.DEVELOPMENT,
+  enabled: coreEnv.NODE_ENV === Environment.DEVELOPMENT,
   priority: CronTaskPriority.MEDIUM,
 
   async run({ logger, signal, skipTanstack }) {
-    if (env.NODE_ENV !== Environment.DEVELOPMENT) {
+    if (coreEnv.NODE_ENV !== Environment.DEVELOPMENT) {
       logger.debug("Dev watcher skipped (not in development mode)");
       return;
     }
@@ -272,7 +272,7 @@ const startSmartFileWatcher = async (
   await runDirtyGenerators();
 
   // In non-continuous mode: only run once on startup, then listen for 'r' to re-run
-  if (!env.DEV_WATCHER_CONTINUOUS) {
+  if (!tasksEnv.DEV_WATCHER_CONTINUOUS) {
     logger.debug(
       "📌 One-shot mode (DEV_WATCHER_CONTINUOUS=false). Press 'r' to regenerate.",
     );
@@ -301,7 +301,7 @@ const startSmartFileWatcher = async (
       const onData = (chunk: Buffer): void => {
         const key = chunk.toString();
         // Ctrl+C - restore terminal and re-raise SIGINT
-        if (key === "\x03") {
+        if (key === "\u0003") {
           if (process.stdin.isTTY) {
             process.stdin.setRawMode(false);
           }

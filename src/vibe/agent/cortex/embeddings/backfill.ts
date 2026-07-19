@@ -149,7 +149,7 @@ async function materializeVirtualMounts(userId: string): Promise<number> {
       const content = buildThinThreadContent(thread);
       const slug = (thread.title ?? "thread")
         .toLowerCase()
-        .replace(/[^a-z0-9-]/g, "-")
+        .replaceAll(/[^a-z0-9-]/g, "-")
         .slice(0, 50);
       await upsertVirtualNode(
         userId,

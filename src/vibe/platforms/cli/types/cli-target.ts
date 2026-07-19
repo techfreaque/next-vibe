@@ -17,3 +17,13 @@ export const CliTarget = {
 } as const;
 
 export type CliTargetValue = (typeof CliTarget)[keyof typeof CliTarget];
+
+/**
+ * Name of the CLI: the globally installed binary, the directory it is installed
+ * into, and the name the CLI reports in its own help output.
+ *
+ * Forks that vendor this framework alongside the original override the value so
+ * both can sit on one machine without either overwriting the other's global
+ * binary.
+ */
+export const CLI_BINARY_NAME = "vibe" as const;

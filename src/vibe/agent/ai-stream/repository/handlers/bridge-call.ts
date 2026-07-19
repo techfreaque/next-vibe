@@ -286,7 +286,7 @@ export class BridgeCall {
     logger: EndpointLogger;
     user: JwtPayloadType;
     /** Fixture chain of the owning stream — vision-bridge model calls bind it. */
-    streamContext: ToolExecutionContext;
+    toolExecutionContext: ToolExecutionContext;
     locale: CountryLanguage;
     availability: AgentEnvAvailability;
   }): Promise<string | null> {
@@ -337,7 +337,7 @@ export class BridgeCall {
         modality,
         bridgeType,
         availability,
-        streamContext: params.streamContext,
+        toolExecutionContext: params.toolExecutionContext,
       });
     }
 
@@ -355,7 +355,7 @@ export class BridgeCall {
         modality,
         bridgeType,
         availability,
-        streamContext: params.streamContext,
+        toolExecutionContext: params.toolExecutionContext,
       });
     }
 
@@ -371,7 +371,7 @@ export class BridgeCall {
       modality,
       bridgeType,
       availability,
-      streamContext: params.streamContext,
+      toolExecutionContext: params.toolExecutionContext,
     });
   }
 
@@ -388,7 +388,7 @@ export class BridgeCall {
     bridgeType: "stt" | "vision" | "translation" | "tts";
     availability: AgentEnvAvailability;
     /** Fixture chain of the owning stream — vision-bridge model calls bind it. */
-    streamContext: ToolExecutionContext;
+    toolExecutionContext: ToolExecutionContext;
   }): Promise<string | null> {
     const {
       part,
@@ -427,7 +427,7 @@ export class BridgeCall {
       provider: ProviderFactory.getProviderForModel(
         visionModel,
         logger,
-        params.streamContext,
+        params.toolExecutionContext,
       ),
       contentPart: {
         type: "image" as const,
@@ -461,7 +461,7 @@ export class BridgeCall {
     bridgeType: "stt" | "vision" | "translation" | "tts";
     availability: AgentEnvAvailability;
     /** Fixture chain of the owning stream — vision-bridge model calls bind it. */
-    streamContext: ToolExecutionContext;
+    toolExecutionContext: ToolExecutionContext;
   }): Promise<string | null> {
     const {
       part,
@@ -505,7 +505,7 @@ export class BridgeCall {
       provider: ProviderFactory.getProviderForModel(
         audioVisionModel,
         logger,
-        params.streamContext,
+        params.toolExecutionContext,
       ),
       contentPart: fileData,
       promptText: BRIDGE_PROMPTS.audio,
@@ -538,7 +538,7 @@ export class BridgeCall {
     bridgeType: "stt" | "vision" | "translation" | "tts";
     availability: AgentEnvAvailability;
     /** Fixture chain of the owning stream — vision-bridge model calls bind it. */
-    streamContext: ToolExecutionContext;
+    toolExecutionContext: ToolExecutionContext;
   }): Promise<string | null> {
     const {
       part,
@@ -577,7 +577,7 @@ export class BridgeCall {
       provider: ProviderFactory.getProviderForModel(
         videoVisionModel,
         logger,
-        params.streamContext,
+        params.toolExecutionContext,
       ),
       contentPart: fileData,
       promptText: BRIDGE_PROMPTS.video,
@@ -609,7 +609,7 @@ export class BridgeCall {
     locale: CountryLanguage;
     availability: AgentEnvAvailability;
     /** Fixture chain of the owning stream — vision-bridge model calls bind it. */
-    streamContext: ToolExecutionContext;
+    toolExecutionContext: ToolExecutionContext;
   }): Promise<string | null> {
     const {
       mediaUrl,
@@ -653,7 +653,7 @@ export class BridgeCall {
     const visionProvider = ProviderFactory.getProviderForModel(
       visionModel,
       logger,
-      params.streamContext,
+      params.toolExecutionContext,
     );
 
     const promptText =

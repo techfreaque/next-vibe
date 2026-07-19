@@ -4,6 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { DefaultFolderId } from "next-vibe/agent/chat/config";
 import { chatThreads, threadShareLinks } from "next-vibe/agent/chat/db";
+import { coreEnv } from "next-vibe/core/env";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -14,8 +15,6 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { env } from "@/env/env";
 
 import type {
   ShareLinkCreateRequestOutput,
@@ -86,7 +85,7 @@ export class ShareLinksRepository {
       const shareLinks = links.map((link) => ({
         id: link.id,
         token: link.token,
-        shareUrl: `${env.NEXT_PUBLIC_APP_URL}/shared/${link.token}`,
+        shareUrl: `${coreEnv.NEXT_PUBLIC_APP_URL}/shared/${link.token}`,
         label: link.label,
         allowPosting: link.allowPosting,
         requireAuth: link.requireAuth,

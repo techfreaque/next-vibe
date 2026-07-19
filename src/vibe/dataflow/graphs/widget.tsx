@@ -5,7 +5,6 @@
 
 "use client";
 import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
-import { cn } from "next-vibe/core/utils/utils";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Button } from "next-vibe/ui/ui/button";
 import { Card, CardContent } from "next-vibe/ui/ui/card";
@@ -24,6 +23,7 @@ import { X } from "next-vibe/ui/ui/icons/X";
 import { Input } from "next-vibe/ui/ui/input";
 import { Span } from "next-vibe/ui/ui/span";
 import { P } from "next-vibe/ui/ui/typography";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetEndpointMutations,
   useWidgetForm,

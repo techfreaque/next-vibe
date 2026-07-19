@@ -8,13 +8,13 @@
 import { type CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { type EndpointLogger } from "next-vibe/logger/types";
-import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { useCallback, useMemo } from "react";
 
 import type {
   EndpointReturn,
   FormAlertState,
-} from "../../vibe/platforms/react/hooks/endpoint-types";
+} from "../../vibe/unified-ui/hooks/endpoint-types";
 import type { LeadsStatsResponseOutput } from "./definition";
 import definitions from "./definition";
 

@@ -14,18 +14,15 @@ import { DefaultFolderId } from "next-vibe/agent/chat/config";
 import { chatThreads } from "next-vibe/agent/chat/db";
 import { ThreadStatus } from "next-vibe/agent/chat/enum";
 import { customSkills } from "next-vibe/agent/skills/db";
-import {
-  SkillCategory,
-  SkillOwnershipType,
-} from "next-vibe/agent/skills/enum";
+import { SkillCategory, SkillOwnershipType } from "next-vibe/agent/skills/enum";
 import {
   ErrorResponseTypes,
   type ResponseType,
 } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { cortexNodes } from "../db";
@@ -124,7 +121,7 @@ async function deleteTestFixtures(userId: string): Promise<void> {
 /** Write a file via the real WRITE endpoint; fails the test if it does not stick. */
 async function writeFile(path: string, content: string): Promise<void> {
   const res = await sendTestRequest({
-    streamContext: undefined,
+    toolExecutionContext: undefined,
     endpoint: writeEndpoint.POST,
     data: { path, content, createParents: true },
     user,
@@ -138,7 +135,7 @@ async function writeFile(path: string, content: string): Promise<void> {
 /** Create a directory via the real MKDIR endpoint; fails the test if it does not stick. */
 async function mkdir(path: string): Promise<void> {
   const res = await sendTestRequest({
-    streamContext: undefined,
+    toolExecutionContext: undefined,
     endpoint: mkdirEndpoint.POST,
     data: { path, createParents: true },
     user,
@@ -153,7 +150,7 @@ function listDir(
   path: string,
 ): Promise<ResponseType<CortexListResponseOutput>> {
   return sendTestRequest({
-    streamContext: undefined,
+    toolExecutionContext: undefined,
     endpoint: listEndpoint.GET,
     data: { path },
     user,

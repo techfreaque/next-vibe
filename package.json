@@ -79,7 +79,7 @@
     }
   },
   "scripts": {
-    "postinstall": "bun src/vibe/platforms/cli/vibe-runtime.ts setup || echo 'Vibe setup failed - run manually if needed'",
+    "postinstall": "node src/vibe/core/setup/postinstall.mjs",
     "vibe": "vibe",
     "dev": "vibe dev",
     "build": "vibe build",

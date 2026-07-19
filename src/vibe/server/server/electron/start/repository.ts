@@ -11,6 +11,7 @@
 import { execSync, spawn } from "node:child_process";
 import path from "node:path";
 
+import { buildPackageRunnerCommand, coreEnv } from "next-vibe/core/env";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -79,11 +80,17 @@ export class ElectronStartRepository {
         ELECTRON_SPAWN_VIBE_START: data.vibeStart ? "true" : "false",
       };
 
-      const electronProcess = spawn("bunx", ["electron", mainJs], {
+      const runner = buildPackageRunnerCommand(
+        coreEnv.PACKAGE_MANAGER,
+        "electron",
+        [mainJs],
+      );
+      const electronProcess = spawn(runner.command, runner.args, {
         detached: true,
         stdio: "ignore",
         env: electronEnv,
         cwd: process.cwd(),
+        shell: runner.shell,
       });
       electronProcess.unref();
 

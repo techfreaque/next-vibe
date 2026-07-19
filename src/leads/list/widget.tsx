@@ -7,7 +7,6 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
 import { objectEntries } from "next-vibe/core/utils/object";
-import { cn } from "next-vibe/core/utils/utils";
 import {
   type LeadStatusFilter,
   type LeadStatusFilterValue,
@@ -39,6 +38,7 @@ import { Span } from "next-vibe/ui/ui/span";
 import { StatusPill } from "next-vibe/ui/ui/status-pill";
 import { WidgetHeader } from "next-vibe/ui/ui/widget-header";
 import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetContext,
@@ -49,10 +49,10 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { MultiSelectFieldWidget } from "next-vibe/unified-ui/form-fields/multiselect-field/widget";
-import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field/widget";
-import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import { MultiSelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/multiselect-field/widget";
+import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import React, { useCallback, useMemo } from "react";
 
 import type definition from "./definition";

@@ -3,14 +3,14 @@ import { getChatModelById } from "next-vibe/agent/ai-stream/models";
 import type { DefaultFolderId } from "next-vibe/agent/chat/config";
 import type { ChatMessage } from "next-vibe/agent/chat/db";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { cn } from "next-vibe/core/utils/utils";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { Markdown } from "next-vibe/ui/ui/markdown";
 import { Span, type SpanMouseEvent } from "next-vibe/ui/ui/span";
-import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JSX } from "react";
 import React from "react";
 

@@ -64,7 +64,7 @@ const STATUS_BADGE_CLASS: Record<string, string> = {
 };
 
 function statusLabel(status: string): string {
-  return status.replace(/_/g, " ");
+  return status.replaceAll(/_/g, " ");
 }
 
 function TransferRow({

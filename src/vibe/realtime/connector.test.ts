@@ -46,12 +46,11 @@ import {
 import { customSkills } from "next-vibe/agent/skills/db";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { identityEnv } from "next-vibe/identity/env";
 import type { SyncScope } from "next-vibe/remote-connection/db";
 import { remoteConnections } from "next-vibe/remote-connection/db";
-import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
-import { env } from "@/env/env";
 
 import type { ConnectionConfig } from "./connector";
 import {
@@ -159,12 +158,12 @@ async function patchHermesAtlasConnection(
   patch: { syncScope?: SyncScope; newInstanceId?: string },
 ): Promise<void> {
   const { sendTestRequest } =
-    await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
+    await import("next-vibe/tooling/testing/testing-suite/send-test-request");
   const connByIdDef = (
     await import("next-vibe/remote-connection/[instanceId]/definition")
   ).default;
   const result = await sendTestRequest({
-    streamContext: undefined,
+    toolExecutionContext: undefined,
     endpoint: connByIdDef.PATCH,
     urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
     data: {
@@ -199,10 +198,10 @@ if (_remoteUrl) {
     let prodUserId: string;
 
     beforeAll(async () => {
-      const resolved = await resolveDevUser(env.VIBE_ADMIN_USER_EMAIL);
+      const resolved = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
       expect(
         resolved,
-        `Admin user ${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe dev`,
+        `Admin user ${identityEnv.VIBE_ADMIN_USER_EMAIL} not found — run: vibe dev`,
       ).toBeTruthy();
       if (!resolved) {
         return;
@@ -482,10 +481,8 @@ if (_remoteUrl) {
         });
 
         // Write a document node on dev with a unique syncId so we can detect if it appears on prod
-        const { cortexNodes } =
-          await import("next-vibe/agent/cortex/db");
-        const { CortexNodeType } =
-          await import("next-vibe/agent/cortex/enum");
+        const { cortexNodes } = await import("next-vibe/agent/cortex/db");
+        const { CortexNodeType } = await import("next-vibe/agent/cortex/enum");
         const docSyncId = randomUUID();
         const docPath = `/documents/connector-cn5-${docSyncId}.md`;
 
@@ -780,12 +777,12 @@ if (_remoteUrl) {
         // over the reverse-ws connection (updates atlas's row + REMOTE subfolder).
         {
           const { sendTestRequest } =
-            await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
+            await import("next-vibe/tooling/testing/testing-suite/send-test-request");
           const selfRenameDef = (
             await import("next-vibe/remote-connection/self/rename/definition")
           ).default;
           const renameResult = await sendTestRequest({
-            streamContext: undefined,
+            toolExecutionContext: undefined,
             endpoint: selfRenameDef.PATCH,
             data: { newInstanceId, propagate: true },
             user: testUser,
@@ -821,10 +818,8 @@ if (_remoteUrl) {
         ).toBe(newInstanceId);
 
         // REMOTE subfolder must be renamed too
-        const { chatFolders } =
-          await import("next-vibe/agent/chat/db");
-        const { DefaultFolderId } =
-          await import("next-vibe/agent/chat/config");
+        const { chatFolders } = await import("next-vibe/agent/chat/db");
+        const { DefaultFolderId } = await import("next-vibe/agent/chat/config");
         const { isNull } = await import("drizzle-orm");
 
         const renamedFolder = await pollUntil(
@@ -856,12 +851,12 @@ if (_remoteUrl) {
         // of this one) starts from contaminated state.
         {
           const { sendTestRequest } =
-            await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
+            await import("next-vibe/tooling/testing/testing-suite/send-test-request");
           const selfRenameDef = (
             await import("next-vibe/remote-connection/self/rename/definition")
           ).default;
           const restoreResult = await sendTestRequest({
-            streamContext: undefined,
+            toolExecutionContext: undefined,
             endpoint: selfRenameDef.PATCH,
             data: { newInstanceId: HERMES_INSTANCE_ID, propagate: true },
             user: testUser,
@@ -965,12 +960,12 @@ if (_remoteUrl) {
         // this is atlas's own row for hermes).
         {
           const { sendTestRequest } =
-            await import("next-vibe/tooling/check/testing/testing-suite/send-test-request");
+            await import("next-vibe/tooling/testing/testing-suite/send-test-request");
           const connByIdDef = (
             await import("next-vibe/remote-connection/[instanceId]/definition")
           ).default;
           const patchResult = await sendTestRequest({
-            streamContext: undefined,
+            toolExecutionContext: undefined,
             endpoint: connByIdDef.PATCH,
             urlPathParams: { instanceId: HERMES_INSTANCE_ID },
             data: {

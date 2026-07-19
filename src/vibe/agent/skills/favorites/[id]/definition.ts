@@ -39,9 +39,9 @@ import { EXECUTE_TOOL_ALIAS } from "next-vibe/execute-tool/constants";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   backButton,
-  customWidgetObject,
   deleteButton,
   navigateButtonField,
   objectField,
@@ -50,7 +50,7 @@ import {
   responseField,
   submitButton,
   widgetField,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { ChatModelId } from "../../../ai-stream/models";
@@ -99,8 +99,7 @@ const { DELETE } = createEndpoint({
     mutationOptions: {
       onSuccess: async (data) => {
         // Import apiClient and favorites list GET endpoint
-        const { apiClient } =
-          await import("next-vibe/platforms/react/hooks/store");
+        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
         const favoritesDefinition = await import("../definition");
         const charactersDefinition = await import("../../definition");
 
@@ -312,7 +311,7 @@ const { DELETE } = createEndpoint({
         }
         const [{ apiClient }, favoritesDefinition, charactersDefinition] =
           await Promise.all([
-            import("next-vibe/platforms/react/hooks/store"),
+            import("next-vibe/unified-ui/hooks/store"),
             import("../definition"),
             import("../../definition"),
           ]);
@@ -414,8 +413,7 @@ const { PATCH } = createEndpoint({
           data;
 
         // Import dependencies
-        const { apiClient } =
-          await import("next-vibe/platforms/react/hooks/store");
+        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
         const favoritesDefinition = await import("../definition");
         const { ChatFavoritesRepositoryClient } =
           await import("../repository-client");
@@ -950,7 +948,7 @@ const { PATCH } = createEndpoint({
           skillSingleDefinition,
           { ChatFavoritesRepositoryClient },
         ] = await Promise.all([
-          import("next-vibe/platforms/react/hooks/store"),
+          import("next-vibe/unified-ui/hooks/store"),
           import("../definition"),
           import("../../[id]/definition"),
           import("../repository-client"),

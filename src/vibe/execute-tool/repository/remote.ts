@@ -18,7 +18,6 @@ import "server-only";
 
 import { eq, sql as drizzleSql } from "drizzle-orm";
 import { getPreferredName } from "next-vibe/core/core-utils/path";
-import { Platform } from "next-vibe/core/definition/platform";
 import {
   ErrorResponseTypes,
   fail,
@@ -26,6 +25,7 @@ import {
 } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
+import { Platform } from "next-vibe/platforms/platforms";
 import { CronTaskStatus } from "next-vibe/tasks/enum";
 
 import { getEndpoint } from "@/generated/endpoints/endpoint";
@@ -77,7 +77,7 @@ export class RemoteDispatch {
     instanceId: string;
   }): Promise<PhaseResult> {
     const { ctx, data, input, instanceId } = params;
-    const { user, logger, t, streamContext, platform } = ctx;
+    const { user, logger, t, toolExecutionContext, platform } = ctx;
 
     // Strip instanceId from input for AI tool calls — the remote instance executes
     // the tool locally; leaving it in makes endpoints like tool-help interpret it as
@@ -189,7 +189,7 @@ export class RemoteDispatch {
       const gate = await ExecuteToolGuards.applyConfirmationGate({
         toolName,
         data: { callbackMode: data.callbackMode },
-        streamContext,
+        toolExecutionContext,
         logger,
       });
       if (gate) {
@@ -213,7 +213,7 @@ export class RemoteDispatch {
       };
     }
 
-    // Get threadId and tool message ID from streamContext (set by the calling AI stream).
+    // Get threadId and tool message ID from toolExecutionContext (set by the calling AI stream).
     // tools-loader injects currentToolMessageId from pendingToolMessages before execute() runs.
     const remoteResult = await RemoteDispatch.dispatchOverTransport({
       ctx: transportCtx,
@@ -221,9 +221,10 @@ export class RemoteDispatch {
       instanceId,
       callbackMode,
       strippedInput,
-      effectiveThreadId: streamContext.threadId,
+      effectiveThreadId: toolExecutionContext.threadId,
       effectiveToolMessageId:
-        streamContext.currentToolMessageId ?? streamContext.aiMessageId,
+        toolExecutionContext.currentToolMessageId ??
+        toolExecutionContext.aiMessageId,
     });
     if (remoteResult.kind === "return") {
       return remoteResult;
@@ -346,7 +347,7 @@ export class RemoteDispatch {
       locale,
       logger,
       t,
-      streamContext,
+      toolExecutionContext,
       platform,
     } = ctx;
     if (rawUser.isPublic) {
@@ -356,8 +357,8 @@ export class RemoteDispatch {
 
     const callId = LocalExecution.generateTaskId("remote-ws", {
       instanceId,
-      toolCallId: streamContext.callerToolCallId,
-      streamContext,
+      toolCallId: toolExecutionContext.callerToolCallId,
+      toolExecutionContext,
     });
 
     // Shared deadline backstop: after PENDING_CALL_DEADLINE_MS with no result
@@ -395,10 +396,10 @@ export class RemoteDispatch {
           output: { error: errorMessage },
           taskId: callId,
           modelId: resolvedModelId,
-          skillId: streamContext.skillId ?? null,
-          favoriteId: streamContext.favoriteId ?? null,
-          leafMessageId: streamContext.leafMessageId ?? null,
-          subAgentDepth: streamContext.subAgentDepth ?? 0,
+          skillId: toolExecutionContext.skillId ?? null,
+          favoriteId: toolExecutionContext.favoriteId ?? null,
+          leafMessageId: toolExecutionContext.leafMessageId ?? null,
+          subAgentDepth: toolExecutionContext.subAgentDepth ?? 0,
           ownerUser: user,
           logger,
           directResumeLocale: locale,
@@ -577,11 +578,11 @@ export class RemoteDispatch {
           callbackMode: CallbackMode.WAKE_UP,
           threadId: effectiveThreadId ?? "",
           toolMessageId: effectiveToolMessageId,
-          leafMessageId: streamContext.leafMessageId ?? null,
+          leafMessageId: toolExecutionContext.leafMessageId ?? null,
           modelId: resolvedModelId,
-          skillId: streamContext.skillId ?? null,
-          favoriteId: streamContext.favoriteId ?? null,
-          subAgentDepth: streamContext.subAgentDepth ?? 0,
+          skillId: toolExecutionContext.skillId ?? null,
+          favoriteId: toolExecutionContext.favoriteId ?? null,
+          subAgentDepth: toolExecutionContext.subAgentDepth ?? 0,
           ownerUserId: user.id,
           selfInstanceId: null,
           logger,
@@ -600,9 +601,9 @@ export class RemoteDispatch {
         input: strippedInput,
         callbackMode,
         callerPlatform: platform,
-        callerSkillId: streamContext.skillId ?? null,
-        callerFavoriteId: streamContext.favoriteId ?? null,
-        streamContext: streamContext,
+        callerSkillId: toolExecutionContext.skillId ?? null,
+        callerFavoriteId: toolExecutionContext.favoriteId ?? null,
+        toolExecutionContext: toolExecutionContext,
         locale,
         logger,
         user,
@@ -668,9 +669,9 @@ export class RemoteDispatch {
       input: strippedInput,
       callbackMode,
       callerPlatform: platform,
-      callerSkillId: streamContext.skillId ?? null,
-      callerFavoriteId: streamContext.favoriteId ?? null,
-      streamContext: streamContext,
+      callerSkillId: toolExecutionContext.skillId ?? null,
+      callerFavoriteId: toolExecutionContext.favoriteId ?? null,
+      toolExecutionContext: toolExecutionContext,
       locale,
       logger,
       user,
@@ -715,11 +716,11 @@ export class RemoteDispatch {
           callbackMode: CallbackMode.WAKE_UP,
           threadId: effectiveThreadId,
           toolMessageId: effectiveToolMessageId,
-          leafMessageId: streamContext.leafMessageId ?? null,
+          leafMessageId: toolExecutionContext.leafMessageId ?? null,
           modelId: resolvedModelId,
-          skillId: streamContext.skillId ?? null,
-          favoriteId: streamContext.favoriteId ?? null,
-          subAgentDepth: streamContext.subAgentDepth ?? 0,
+          skillId: toolExecutionContext.skillId ?? null,
+          favoriteId: toolExecutionContext.favoriteId ?? null,
+          subAgentDepth: toolExecutionContext.subAgentDepth ?? 0,
           ownerUserId: user.id,
           selfInstanceId: null,
           logger,

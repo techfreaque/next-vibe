@@ -1,6 +1,6 @@
 import * as RadioGroupPrimitive from "@rn-primitives/radio-group";
 import { styled } from "nativewind";
-import { cn } from "next-vibe/core/utils/utils";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import * as React from "react";
 import { View } from "react-native";
 

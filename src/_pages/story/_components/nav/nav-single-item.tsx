@@ -1,6 +1,5 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
-import { cn } from "next-vibe/core/utils/utils";
 import type { BadgeVariant } from "next-vibe/ui/ui/badge";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Button } from "next-vibe/ui/ui/button";
@@ -14,6 +13,7 @@ import {
   TooltipTrigger,
 } from "next-vibe/ui/ui/tooltip";
 import { P } from "next-vibe/ui/ui/typography";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX, ReactNode } from "react";
 
 import { scopedTranslation, type StoryComponentsTranslationKey } from "../i18n";

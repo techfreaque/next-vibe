@@ -23,6 +23,7 @@
 
 import { and, eq } from "drizzle-orm";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import { coreClientEnv } from "next-vibe/core/env-client";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
@@ -40,8 +41,6 @@ import {
 import { RemoteConnectionRepository } from "next-vibe/remote-connection/repository";
 import { RemoteTransport } from "next-vibe/remote-connection/transport";
 import { z } from "zod";
-
-import { env } from "@/env/env";
 
 import { buildUserWsChannel } from "./channel";
 import type { AnyEndpointEventEnvelope } from "./structured-events";
@@ -1016,7 +1015,7 @@ export async function acquireConnection(
 export function openConnection(config: ConnectionConfig): void {
   // Cloud instances never open outbound WS connections.
   // They receive connections from local instances only.
-  if (env.NEXT_PUBLIC_VIBE_IS_CLOUD) {
+  if (coreClientEnv.NEXT_PUBLIC_VIBE_IS_CLOUD) {
     _logger.debug("[Connector] openConnection: skipped (cloud instance)", {
       instanceId: config.instanceId,
     });

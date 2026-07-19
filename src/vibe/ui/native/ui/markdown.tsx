@@ -3,7 +3,7 @@
  * TODO: Implement markdown rendering using react-native-markdown-display or similar
  * Currently renders plain text
  */
-import { cn } from "next-vibe/core/utils/utils";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { memo } from "react";
 import { Text as RNText, View } from "react-native";
 

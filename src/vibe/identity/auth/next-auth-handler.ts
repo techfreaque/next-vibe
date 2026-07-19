@@ -1,5 +1,6 @@
 import "server-only";
 
+import { coreEnv } from "next-vibe/core/env";
 import { type CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -23,7 +24,6 @@ import {
   BEARER_LEAD_ID_SEPARATOR,
   LEAD_ID_COOKIE_NAME,
 } from "@/env/constants";
-import { env } from "@/env/env";
 
 /**
  * Web Authentication Handler
@@ -110,7 +110,7 @@ export class WebAuthHandler extends BaseAuthHandler {
         value: token,
         httpOnly: true,
         path: "/",
-        secure: env.NODE_ENV === Environment.PRODUCTION,
+        secure: coreEnv.NODE_ENV === Environment.PRODUCTION,
         sameSite: "lax" as const,
       };
 
@@ -127,7 +127,7 @@ export class WebAuthHandler extends BaseAuthHandler {
         value: leadId,
         httpOnly: true,
         path: "/",
-        secure: env.NODE_ENV === Environment.PRODUCTION,
+        secure: coreEnv.NODE_ENV === Environment.PRODUCTION,
         sameSite: "lax" as const,
         maxAge: 365 * 24 * 60 * 60 * 10, // 10 years (effectively permanent)
       });

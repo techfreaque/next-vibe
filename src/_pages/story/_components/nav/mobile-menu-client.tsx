@@ -1,6 +1,5 @@
 "use client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { cn } from "next-vibe/core/utils/utils";
 import { addDocumentListener } from "next-vibe/ui/lib/dom";
 import type { BadgeVariant } from "next-vibe/ui/ui/badge";
 import { Button } from "next-vibe/ui/ui/button";
@@ -12,6 +11,7 @@ import { X } from "next-vibe/ui/ui/icons/X";
 import { Link } from "next-vibe/ui/ui/link";
 import { AnimatePresence, MotionDiv } from "next-vibe/ui/ui/motion";
 import { Span } from "next-vibe/ui/ui/span";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 import { useCallback, useEffect, useState } from "react";
 

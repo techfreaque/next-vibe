@@ -98,10 +98,10 @@ export const translations: typeof enTranslations = {
       description:
         "Po włączeniu sprawdza również pliki testowe (*.test.ts, *.test.tsx) i automatycznie generowane pliki (system/generated/**). Domyślnie wyłączone - włącz do walidacji wydania lub gdy chcesz jawnie sprawdzić wygenerowany/testowy kod.",
     },
-    restartLsp: {
-      label: "Restartuj LSP",
+    strict: {
+      label: "Strict",
       description:
-        "Zabija demona LSP przed uruchomieniem. Użyj, gdy demon się zawiesi lub zwraca nieaktualne wyniki.",
+        "Report the strict rules for every path checked, ignoring the strictPaths whitelist in check.config.ts. Off by default: those rules only apply to trees that are already clean, so they stay quiet elsewhere. Enable to see what a path would have to fix before it can be added to the whitelist.",
     },
   },
 
@@ -178,6 +178,19 @@ export const translations: typeof enTranslations = {
       title: "Konflikt",
       description: "Wystąpił konflikt podczas Vibe Check",
     },
+    parseTsconfig: {
+      title: "Nie można wczytać tsconfig",
+      message: "Nie można przeanalizować tsconfig.json",
+    },
+    noTsFiles: {
+      title: "Nie znaleziono plików TypeScript",
+      message: "Żadne pliki TypeScript nie pasują do podanych ścieżek",
+    },
+    aborted: {
+      title: "Sprawdzanie przerwane",
+    },
+    oxlintDisabled: "Oxlint jest wyłączony w check.config.ts",
+    oxlintFailed: "Sprawdzanie Oxlint nie powiodło się",
   },
 
   success: {

@@ -21,8 +21,10 @@
 
 import "server-only";
 
-import type { DefaultFolderId } from "next-vibe/agent/chat/config";
-import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
+import type {
+  DefaultFolderId,
+  ToolExecutionContext,
+} from "next-vibe/agent/chat/config";
 import type { ChatMessage } from "next-vibe/agent/chat/db";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -99,7 +101,7 @@ export interface SystemPromptResult {
 
 export interface SystemPromptParams {
   /** Fixture thread id — cortex vector-search embeddings bind it. */
-  streamContext: ToolExecutionContext;
+  toolExecutionContext: ToolExecutionContext;
   skillId: string | null | undefined;
   user: JwtPayloadType;
   logger: EndpointLogger;
@@ -166,7 +168,7 @@ export async function buildSystemPrompt(
   });
 
   const serverParams: SystemPromptServerParams = {
-    streamContext: params.streamContext,
+    toolExecutionContext: params.toolExecutionContext,
     user,
     logger,
     locale,

@@ -7,6 +7,7 @@ import "server-only";
 
 import { render } from "@react-email/render";
 import { and, eq, isNotNull, isNull, sql } from "drizzle-orm";
+import { coreEnv } from "next-vibe/core/env";
 import { getLocaleFromLanguageAndCountry } from "next-vibe/core/i18n/core/language-utils";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -31,7 +32,6 @@ import { cronTasks, type NewCronTask } from "next-vibe/tasks/cron/db";
 import { CronTaskPriority, TaskCategory } from "next-vibe/tasks/enum";
 
 import { contactClientRepository } from "@/contact/repository-client";
-import { env } from "@/env/env";
 import { configScopedTranslation } from "@/env/i18n";
 import { messengerAccounts } from "@/messenger/accounts/db";
 import { scopedTranslation as smtpScopedTranslation } from "@/messenger/providers/email/smtp-client/i18n";
@@ -76,7 +76,7 @@ interface StageProcessOptions {
 const EMAIL_CAMPAIGNS_TASK_ID = "email-campaigns";
 
 function getDefaultConfig(): EmailCampaignsConfigGetResponseOutput {
-  const isProduction = env.NODE_ENV === Environment.PRODUCTION;
+  const isProduction = coreEnv.NODE_ENV === Environment.PRODUCTION;
   return {
     enabled: false,
     dryRun: !isProduction,
@@ -501,7 +501,7 @@ export class EmailCampaignsRepository {
             variantRow?.companyEmail ??
             contactClientRepository.getSupportEmail(leadLocale);
           const emailBaseUrl =
-            accountRow?.emailDomain ?? env.NEXT_PUBLIC_APP_URL;
+            accountRow?.emailDomain ?? coreEnv.NEXT_PUBLIC_APP_URL;
 
           const rendered = await emailRendererService.renderEmail(
             leadWithEmail,

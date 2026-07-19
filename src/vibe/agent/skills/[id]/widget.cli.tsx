@@ -10,7 +10,7 @@
 
 import chalk from "chalk";
 import { Box, Text } from "ink";
-import { Platform } from "next-vibe/core/definition/platform";
+import { Platform } from "next-vibe/platforms/platforms";
 import { useWidgetPlatform } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useMemo } from "react";
@@ -62,7 +62,7 @@ function renderGetMcp(value: SkillGetResponseOutput): string {
   return lines.join("\n");
 }
 
-export function SkillGetCliWidget({ field }: GetCliWidgetProps): JSX.Element {
+export function SkillViewContainer({ field }: GetCliWidgetProps): JSX.Element {
   const platform = useWidgetPlatform();
   const isMcp = platform === Platform.MCP;
 
@@ -85,7 +85,7 @@ export function SkillGetCliWidget({ field }: GetCliWidgetProps): JSX.Element {
   );
 }
 
-SkillGetCliWidget.cliWidget = true as const;
+SkillViewContainer.cliWidget = true as const;
 
 // ── PATCH Widget ──────────────────────────────────────────────────────────────
 
@@ -106,7 +106,7 @@ function renderPatchMcp(_value: SkillUpdateResponseOutput): string {
   return "Skill updated successfully.";
 }
 
-export function SkillEditCliWidget({
+export function SkillEditContainer({
   field,
 }: PatchCliWidgetProps): JSX.Element {
   const platform = useWidgetPlatform();
@@ -131,8 +131,4 @@ export function SkillEditCliWidget({
   );
 }
 
-SkillEditCliWidget.cliWidget = true as const;
-
-// Aliases for lazy widget factory
-export { SkillGetCliWidget as SkillViewContainer };
-export { SkillEditCliWidget as SkillEditContainer };
+SkillEditContainer.cliWidget = true as const;

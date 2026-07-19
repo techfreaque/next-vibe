@@ -11,7 +11,7 @@ import { and, eq, like, sql } from "drizzle-orm";
 import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
 import {
   DefaultFolderId,
-  rootlessStreamContext,
+  rootlessToolExecutionContext,
 } from "next-vibe/agent/chat/config";
 import { chatThreads } from "next-vibe/agent/chat/db";
 import { db } from "next-vibe/database";
@@ -73,7 +73,7 @@ export interface RunStreamDeps {
   /**
    * Per-case fixture context, set by each test case before its first stream
    * (suite-closure state, same pattern as getTestSubFolderId). runStream
-   * passes it EXPLICITLY into runTestStream → streamContext → the whole
+   * passes it EXPLICITLY into runTestStream → toolExecutionContext → the whole
    * chain; the thread anchors it for later turns and revivals.
    */
   getCaseFixture: () => ToolExecutionContext | undefined;
@@ -98,7 +98,7 @@ export interface RunStreamDeps {
 
 export type RunStreamParams = Omit<
   Parameters<typeof runTestStream>[0],
-  "streamContext"
+  "toolExecutionContext"
 > & {
   /** Set ONLY for tests that exercise tool error paths. */
   allowToolErrors?: boolean;
@@ -107,7 +107,7 @@ export type RunStreamParams = Omit<
    * deps.getCaseFixture() — that injection IS the conscious explicit pass
    * required by runTestStream's own signature. Set to override per call.
    */
-  streamContext?: ToolExecutionContext;
+  toolExecutionContext?: ToolExecutionContext;
 };
 
 export type RunStreamFn = (
@@ -232,15 +232,17 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
     // The case's fixture context (thread-anchored, carries the threadId). A
     // per-call override wins; otherwise the suite-closure case fixture; a case
     // that set neither runs with an explicit thread-less root (live external).
-    const caseStreamContext =
-      params.streamContext ?? deps.getCaseFixture() ?? rootlessStreamContext();
+    const casetoolExecutionContext =
+      params.toolExecutionContext ??
+      deps.getCaseFixture() ??
+      rootlessToolExecutionContext();
     const firstResult = await runTestStream({
       timezone: deps.timezone,
       ...params,
       // The seeded case threadId (or an explicit per-call one) — its fixtures
       // row is already written, so the AI loop replays from ordinal 0.
       threadId: effectiveThreadId,
-      streamContext: caseStreamContext,
+      toolExecutionContext: casetoolExecutionContext,
       rootFolderId: effectiveRootFolderId,
       subFolderId: effectiveSubFolderId,
       // Remote-folder loop-local topology is a CONNECTION setting
@@ -814,7 +816,7 @@ async function assertCasePlacement(
   // a suite sharing another's fixtures still lands its threads in its OWN folder.
   const threadCasePrefix = cfg.threadCasePrefix ?? cfg.cachePrefix;
   const testCaseName =
-    threadCasePrefix.replace(/[^a-z0-9-]/gi, "").replace(/-+$/, "") ||
+    threadCasePrefix.replaceAll(/[^a-z0-9-]/gi, "").replace(/-+$/, "") ||
     "regular";
   const { assertThreadPlacement, HERMES_INSTANCE_ID, SELF_INSTANCE_ID } =
     await import("../../../testing/remote-setup");

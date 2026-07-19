@@ -16,7 +16,7 @@ import type {
   AnyChildrenConstrain,
   FieldUsageConfig,
 } from "next-vibe/unified-ui/_shared/types";
-import { objectField } from "next-vibe/unified-ui/_shared/utils";
+import { objectField } from "next-vibe/unified-ui/_shared/utils-i18n";
 import type { z } from "zod";
 const genericST: { ScopedTranslationKey: string } = {
   ScopedTranslationKey: "",

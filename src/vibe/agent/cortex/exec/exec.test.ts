@@ -19,8 +19,8 @@ import "server-only";
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import execEndpoint from "../exec/definition";
@@ -36,7 +36,7 @@ let user: JwtPrivatePayloadType;
  */
 async function resolveLocalPath(): Promise<string> {
   const res = await sendTestRequest({
-    streamContext: undefined,
+    toolExecutionContext: undefined,
     endpoint: listEndpoint.GET,
     data: { path: "/ssh" },
     user,
@@ -85,7 +85,7 @@ describe("Cortex Exec E2E", () => {
     const path = await resolveLocalPath();
 
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: execEndpoint.POST,
       data: { path, command: "echo hello-cortex-exec", timeoutMs: 5000 },
       user,
@@ -111,7 +111,7 @@ describe("Cortex Exec E2E", () => {
     // CWD marker still arrives and the exec settles normally. (`exit N` would
     // kill the shell and is intentionally avoided.)
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: execEndpoint.POST,
       data: { path, command: "echo before-false; false", timeoutMs: 5000 },
       user,
@@ -132,7 +132,7 @@ describe("Cortex Exec E2E", () => {
     // Exec only accepts /ssh/<connection> paths. A document path fails to parse
     // a connection slug and returns a BAD_REQUEST validation failure.
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: execEndpoint.POST,
       data: { path: "/documents/not-a-connection", command: "echo nope" },
       user,
@@ -149,7 +149,7 @@ describe("Cortex Exec E2E", () => {
 
   it("returns NOT_FOUND for an /ssh path with no matching connection", async () => {
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: execEndpoint.POST,
       data: {
         path: "/ssh/does-not-exist-connection-xyz",
@@ -173,7 +173,7 @@ describe("Cortex Exec E2E", () => {
     // workingDir must be absolute and free of "..". A traversal path is rejected
     // before any connection/shell work happens.
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: execEndpoint.POST,
       data: { path, command: "pwd", workingDir: "../../etc" },
       user,
@@ -197,7 +197,7 @@ describe("Cortex Exec E2E", () => {
     // the exec settles on timeout. Returns success with a (possibly
     // truncated) partial output rather than throwing.
     const res = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: execEndpoint.POST,
       data: { path, command: "sleep 5", timeoutMs: 500 },
       user,

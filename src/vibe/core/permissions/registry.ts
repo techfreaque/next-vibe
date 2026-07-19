@@ -6,9 +6,8 @@
  */
 
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { InferJwtPayloadTypeFromRoles } from "next-vibe/core/route/handler";
+import { scopedTranslation } from "next-vibe/core/i18n/shared";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -18,14 +17,11 @@ import {
   PlatformMarker,
   type PlatformMarkerValue,
   UserPermissionRole,
-  type UserPermissionRoleValue,
   UserRole,
   type UserRoleValue,
 } from "next-vibe/identity/roles/enum";
 import { scopedTranslation as userRolesScopedTranslation } from "next-vibe/identity/roles/i18n";
-
-import { scopedTranslation } from "@/_pages/shared/i18n";
-import { envClient } from "@/env/env-client";
+import { Platform } from "next-vibe/platforms/platforms";
 
 /**
  * Platform access check result
@@ -34,16 +30,6 @@ interface PlatformAccessResult {
   allowed: boolean;
   reason?: string;
   blockedByRole?: UserRoleValue;
-}
-
-/**
- * User role check result
- */
-interface UserRoleCheckResult {
-  allowed: boolean;
-  reason?: string;
-  userRoles?: readonly (typeof UserPermissionRoleValue)[];
-  requiredRoles?: readonly (typeof UserPermissionRoleValue)[];
 }
 
 /**
@@ -116,8 +102,8 @@ class PermissionsRegistry implements IPermissionsRegistry {
     // Check production environment restrictions
     // Skip when local mode is active (NEXT_PUBLIC_LOCAL_MODE=true)
     if (
-      envClient.NODE_ENV === "production" &&
-      !envClient.NEXT_PUBLIC_LOCAL_MODE &&
+      process.env["NODE_ENV"] === "production" &&
+      process.env["NEXT_PUBLIC_LOCAL_MODE"] !== "true" &&
       platformMarkers.includes(PlatformMarker.PRODUCTION_OFF)
     ) {
       return {
@@ -249,8 +235,8 @@ class PermissionsRegistry implements IPermissionsRegistry {
     const platformMarkers = filterPlatformMarkers(allowedRoles);
 
     if (
-      envClient.NODE_ENV === "production" &&
-      !envClient.NEXT_PUBLIC_LOCAL_MODE &&
+      process.env["NODE_ENV"] === "production" &&
+      process.env["NEXT_PUBLIC_LOCAL_MODE"] !== "true" &&
       platformMarkers.includes(PlatformMarker.PRODUCTION_OFF)
     ) {
       return {
@@ -285,56 +271,6 @@ class PermissionsRegistry implements IPermissionsRegistry {
   }
 
   /**
-   * Check if user has required permission roles for the endpoint
-   */
-  checkUserRoles(
-    user: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>,
-    permissionRoles: readonly (typeof UserPermissionRoleValue)[],
-    userRoles: (typeof UserPermissionRoleValue)[],
-  ): UserRoleCheckResult {
-    // If no permission roles defined, endpoint is open to all
-    if (permissionRoles.length === 0) {
-      return { allowed: true };
-    }
-
-    // Check if PUBLIC is allowed (anyone can access)
-    if (permissionRoles.includes(UserPermissionRole.PUBLIC)) {
-      return { allowed: true };
-    }
-
-    // For public users (not authenticated), check if PUBLIC is allowed
-    if (user.isPublic) {
-      return {
-        allowed: false,
-        reason:
-          "Authentication required - endpoint does not allow public access",
-        userRoles: [],
-        requiredRoles: permissionRoles,
-      };
-    }
-
-    // Check if user has any of the required roles
-    const hasRequiredRole = permissionRoles.some((requiredRole) =>
-      userRoles.includes(requiredRole),
-    );
-
-    if (!hasRequiredRole) {
-      return {
-        allowed: false,
-        reason: "User does not have required role for this endpoint",
-        userRoles,
-        requiredRoles: permissionRoles,
-      };
-    }
-
-    return {
-      allowed: true,
-      userRoles,
-      requiredRoles: permissionRoles,
-    };
-  }
-
-  /**
    * Validate endpoint access - consolidated platform and permission checking
    * Returns ResponseType with detailed error information
    * Used by handler.ts and loader.ts for consistent access validation
@@ -356,55 +292,6 @@ class PermissionsRegistry implements IPermissionsRegistry {
           error: "Endpoint allowedRoles is not properly configured",
         },
       };
-    }
-
-    // In local mode, use explicit roles from definition.
-    // If allowedLocalModeRoles is set, use it as an override; otherwise use allowedRoles as-is.
-    if (envClient.NEXT_PUBLIC_LOCAL_MODE) {
-      const localModeRoles: readonly UserRoleValue[] =
-        endpoint.allowedLocalModeRoles ?? endpoint.allowedRoles;
-
-      // Also enforce platform access (CLI_OFF, WEB_OFF, etc.) in local mode
-      const platformAccess = this.checkPlatformAccess(localModeRoles, platform);
-      if (!platformAccess.allowed) {
-        return {
-          success: false,
-          message: scopedTranslation
-            .scopedT(locale)
-            .t("shared.permissions.errors.platformAccessDenied", {
-              platform: String(platform),
-              reason: platformAccess.reason || "Platform not allowed",
-            }),
-          errorType: ErrorResponseTypes.FORBIDDEN,
-        };
-      }
-
-      // Check user permissions against effective local mode roles
-      const hasPermission = this.hasEndpointPermissionForRoles(
-        localModeRoles,
-        user,
-        platform,
-      );
-      if (!hasPermission) {
-        const { t: tRoles } = userRolesScopedTranslation.scopedT(locale);
-        return {
-          success: false,
-          message: scopedTranslation
-            .scopedT(locale)
-            .t("shared.permissions.errors.insufficientRoles", {
-              userId: user.isPublic ? "public" : user.id,
-              requiredRoles: localModeRoles
-                .map((role) => tRoles(role))
-                .join(", "),
-              userRoles: user.roles?.length
-                ? user.roles.map((role) => tRoles(role)).join(", ")
-                : "none",
-            }),
-          errorType: ErrorResponseTypes.FORBIDDEN,
-        };
-      }
-
-      return { success: true, data: true };
     }
 
     // 1. Check platform access first
@@ -450,60 +337,6 @@ class PermissionsRegistry implements IPermissionsRegistry {
       success: true,
       data: true,
     };
-  }
-
-  /**
-   * Returns true for login and password-reset endpoints that must remain
-   * publicly accessible even in local mode (no-signup, admin-managed users).
-   */
-  private isPublicAuthEndpoint(path: readonly string[]): boolean {
-    // Paths: ["user","public","login"], ["user","public","reset-password","request"],
-    //        ["user","public","reset-password","confirm"], ["user","public","reset-password","validate"]
-    if (path.length < 3) {
-      return false;
-    }
-    if (path[0] !== "user" || path[1] !== "public") {
-      return false;
-    }
-    if (path[2] === "login") {
-      return true;
-    }
-    if (path[2] === "reset-password") {
-      return true;
-    }
-    return false;
-  }
-
-  /**
-   * Check if user has permission given an explicit roles array (used for local mode).
-   * Reuses the same role-matching logic as hasEndpointPermission but against a supplied list.
-   */
-  private hasEndpointPermissionForRoles(
-    roles: readonly UserRoleValue[],
-    user: JwtPayloadType,
-    platform?: Platform,
-  ): boolean {
-    // Check for CLI auth bypass - only bypasses role check for CLI_PACKAGE platform
-    const platformMarkers = filterPlatformMarkers(roles);
-    if (
-      platform === Platform.CLI_PACKAGE &&
-      this.allowsCliAuthBypass(platformMarkers)
-    ) {
-      return true;
-    }
-
-    const permissionRoles = filterUserPermissionRoles(roles);
-    if (permissionRoles.length === 0) {
-      return true;
-    }
-    if (permissionRoles.includes(UserPermissionRole.PUBLIC)) {
-      return true;
-    }
-    if (user.isPublic) {
-      return false;
-    }
-    const userRoles: readonly UserRoleValue[] = user.roles;
-    return roles.some((r) => userRoles.includes(r));
   }
 
   /**
@@ -613,55 +446,6 @@ class PermissionsRegistry implements IPermissionsRegistry {
   }
 
   /**
-   * Get role priority for permission hierarchy (PRIVATE - used internally)
-   */
-  private getRolePriority(role: typeof UserPermissionRoleValue): number {
-    const priorities: Record<typeof UserPermissionRoleValue, number> = {
-      [UserPermissionRole.PUBLIC]: 0,
-      [UserPermissionRole.CUSTOMER]: 5,
-      [UserPermissionRole.PARTNER_EMPLOYEE]: 20,
-      [UserPermissionRole.PARTNER_ADMIN]: 50,
-      [UserPermissionRole.ADMIN]: 100,
-    };
-
-    return priorities[role];
-  }
-
-  /**
-   * Check if role A can access role B's resources (PRIVATE - used internally)
-   */
-  private canAccessRole(
-    userRole: typeof UserPermissionRoleValue,
-    requiredRole: typeof UserPermissionRoleValue,
-  ): boolean {
-    // Opt-out roles can't be used for access checks
-    if (this.isOptOutRole(requiredRole)) {
-      return false;
-    }
-    const userPriority = this.getRolePriority(userRole);
-    const requiredPriority = this.getRolePriority(requiredRole);
-    return userPriority >= requiredPriority;
-  }
-
-  /**
-   * Check if user can execute batch operations (PRIVATE - used internally)
-   */
-  private canExecuteBatchOperations(user: JwtPayloadType): boolean {
-    return !user.isPublic;
-  }
-
-  /**
-   * Get maximum tools per message for user (PRIVATE - used internally)
-   */
-  private getMaxToolsPerMessage(user: JwtPayloadType): number {
-    if (user.isPublic) {
-      return 3; // Limited for public users
-    }
-
-    return 10; // Default max tools per request for authenticated users
-  }
-
-  /**
    * Get platforms endpoint is available on
    */
   getAvailablePlatforms(endpoint: CreateApiEndpointAny): Platform[] {
@@ -717,8 +501,8 @@ class PermissionsRegistry implements IPermissionsRegistry {
     // Check if endpoint is disabled in production environment
     // Skip when local mode is active (NEXT_PUBLIC_LOCAL_MODE=true)
     if (
-      process.env.NODE_ENV === "production" &&
-      !envClient.NEXT_PUBLIC_LOCAL_MODE &&
+      process.env["NODE_ENV"] === "production" &&
+      process.env["NEXT_PUBLIC_LOCAL_MODE"] !== "true" &&
       endpoint.allowedRoles.includes(UserRole.PRODUCTION_OFF)
     ) {
       return true;

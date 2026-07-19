@@ -94,7 +94,7 @@ export class PosOrderCreateRepository {
 
       // Generate order number based on current timestamp
       const now = new Date();
-      const dateStr = now.toISOString().slice(0, 10).replace(/-/g, "");
+      const dateStr = now.toISOString().slice(0, 10).replaceAll(/-/g, "");
       const timeStr = now.getTime().toString().slice(-6);
       const orderNumber = `POS-${dateStr}-${timeStr}`;
 

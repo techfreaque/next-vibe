@@ -7,11 +7,11 @@
 import "server-only";
 
 import { and, eq, sql } from "drizzle-orm";
-import { rootlessStreamContext } from "next-vibe/agent/chat/config";
+import { rootlessToolExecutionContext } from "next-vibe/agent/chat/config";
 import { chatMessages } from "next-vibe/agent/chat/db";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { expect } from "vitest";
 
 /** Timestamp of the most recent getBalance() call - bounds the charge audit window. */
@@ -40,7 +40,7 @@ export async function getBalance(user: JwtPrivatePayloadType): Promise<number> {
     const res = await sendTestRequest({
       endpoint: creditsDef.GET,
       user,
-      streamContext: rootlessStreamContext(),
+      toolExecutionContext: rootlessToolExecutionContext(),
     });
     if (!res.success) {
       // oxlint-disable-next-line restricted-syntax
@@ -85,7 +85,7 @@ export async function pinBalance(
   const deficit = credits - current;
   const adminAddDef = (await import("@/credits/admin-add/definition")).default;
   const result = await sendTestRequest({
-    streamContext: rootlessStreamContext(),
+    toolExecutionContext: rootlessToolExecutionContext(),
     endpoint: adminAddDef.POST,
     data: { targetUserId: user.id, amount: Math.ceil(deficit) },
     user,

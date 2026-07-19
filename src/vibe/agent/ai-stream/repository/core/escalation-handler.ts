@@ -29,7 +29,7 @@ import type { ChatModelId } from "../../models";
 import { transitionStreamingState } from "./streaming-state";
 
 /**
- * Wire `streamContext.escalateToTask` so tools can escape the 90-second stream
+ * Wire `toolExecutionContext.escalateToTask` so tools can escape the 90-second stream
  * timeout for long-running work (SSH, claude-code, etc.).
  *
  * The stream aborts via REMOTE_TOOL_WAIT — the UI stays in a visible, cancellable
@@ -37,19 +37,19 @@ import { transitionStreamingState } from "./streaming-state";
  * CANCELLED and unlocks the thread.
  */
 export function wireEscalateToTask({
-  streamContext,
+  toolExecutionContext,
   user,
   locale,
   logger,
   model,
 }: {
-  streamContext: ToolExecutionContext;
+  toolExecutionContext: ToolExecutionContext;
   user: JwtPayloadType;
   locale: CountryLanguage;
   logger: EndpointLogger;
   model: ChatModelId | undefined;
 }): void {
-  streamContext.escalateToTask = async (options?: {
+  toolExecutionContext.escalateToTask = async (options?: {
     callbackMode?: CallbackModeValue;
     displayName?: string;
   }): Promise<{
@@ -64,7 +64,7 @@ export function wireEscalateToTask({
 
     const callbackMode = options?.callbackMode ?? CallbackMode.WAKE_UP;
 
-    const taskThreadId = streamContext.threadId;
+    const taskThreadId = toolExecutionContext.threadId;
     if (!taskThreadId) {
       // Escalation defers work to a task whose result routes back to THIS
       // thread — there is nothing to escalate without a persisted thread.
@@ -72,8 +72,9 @@ export function wireEscalateToTask({
       throw new Error("escalateToTask: no threadId on the stream context");
     }
     const taskToolMessageId =
-      streamContext.currentToolMessageId ?? streamContext.aiMessageId;
-    const taskLeafMessageId = streamContext.leafMessageId;
+      toolExecutionContext.currentToolMessageId ??
+      toolExecutionContext.aiMessageId;
+    const taskLeafMessageId = toolExecutionContext.leafMessageId;
 
     const escalatedTaskId = await TaskCompletion.createEscalationTask(
       {
@@ -83,9 +84,9 @@ export function wireEscalateToTask({
         toolMessageId: taskToolMessageId ?? null,
         leafMessageId: taskLeafMessageId ?? null,
         modelId: model ?? null,
-        skillId: streamContext.skillId ?? null,
-        favoriteId: streamContext.favoriteId ?? null,
-        subAgentDepth: streamContext.subAgentDepth,
+        skillId: toolExecutionContext.skillId ?? null,
+        favoriteId: toolExecutionContext.favoriteId ?? null,
+        subAgentDepth: toolExecutionContext.subAgentDepth,
         userId: user.id ?? "",
       },
       logger,
@@ -93,13 +94,13 @@ export function wireEscalateToTask({
 
     // Always abort via REMOTE_TOOL_WAIT — stream dies, thread → waiting.
     // callbackMode controls what happens ON revival, not how the stream stops.
-    streamContext.waitingForRemoteResult = true;
-    streamContext.pendingEscalatedTaskId = escalatedTaskId;
-    const escalateTimeoutMs = streamContext.callerTimeoutMs;
+    toolExecutionContext.waitingForRemoteResult = true;
+    toolExecutionContext.pendingEscalatedTaskId = escalatedTaskId;
+    const escalateTimeoutMs = toolExecutionContext.callerTimeoutMs;
     if (escalateTimeoutMs === undefined) {
-      streamContext.pendingTimeoutMs = 90_000;
+      toolExecutionContext.pendingTimeoutMs = 90_000;
     } else if (escalateTimeoutMs > 0) {
-      streamContext.pendingTimeoutMs = escalateTimeoutMs;
+      toolExecutionContext.pendingTimeoutMs = escalateTimeoutMs;
     }
 
     if (taskThreadId) {
@@ -129,8 +130,8 @@ export function wireEscalateToTask({
     });
 
     // Wire cancel propagation: when the user cancels, mark the task CANCELLED.
-    streamContext.onEscalatedTaskCancel = async (): Promise<void> => {
-      streamContext.onEscalatedTaskCancel = undefined;
+    toolExecutionContext.onEscalatedTaskCancel = async (): Promise<void> => {
+      toolExecutionContext.onEscalatedTaskCancel = undefined;
       try {
         await db
           .update(cronTasks)
@@ -165,7 +166,7 @@ export function wireEscalateToTask({
         | { success: true; data?: Record<string, WidgetData> }
         | ErrorResponseType,
     ): Promise<void> => {
-      streamContext.onEscalatedTaskCancel = undefined;
+      toolExecutionContext.onEscalatedTaskCancel = undefined;
       const { CallbackMode: CM } =
         await import("next-vibe/execute-tool/constants");
 
@@ -194,10 +195,10 @@ export function wireEscalateToTask({
           output: finalOutput,
           taskId: escalatedTaskId,
           modelId: model ?? null,
-          skillId: streamContext.skillId ?? null,
-          favoriteId: streamContext.favoriteId ?? null,
+          skillId: toolExecutionContext.skillId ?? null,
+          favoriteId: toolExecutionContext.favoriteId ?? null,
           leafMessageId: taskLeafMessageId ?? null,
-          subAgentDepth: streamContext.subAgentDepth,
+          subAgentDepth: toolExecutionContext.subAgentDepth,
           ownerUser: user,
           logger,
           directResumeLocale: locale,

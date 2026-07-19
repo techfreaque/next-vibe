@@ -7,7 +7,7 @@
 
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 
 import definitions from "./definition";
 

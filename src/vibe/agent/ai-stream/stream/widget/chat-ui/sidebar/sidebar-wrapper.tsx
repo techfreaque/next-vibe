@@ -4,14 +4,14 @@ import { useChatBootContext } from "next-vibe/agent/chat/hooks/context";
 import { useChatNavigationStore } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
 import { scopedTranslation } from "next-vibe/agent/chat/threads/widget/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { cn } from "next-vibe/core/utils/utils";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { useWindowSize } from "next-vibe/ui/hooks/use-window-size";
 import { Div } from "next-vibe/ui/ui/div";
 import { AnimatePresence, MotionDiv } from "next-vibe/ui/ui/motion";
 import { ResizableContainer } from "next-vibe/ui/ui/resizable";
-import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX, ReactNode } from "react";
 import { useMemo } from "react";
 

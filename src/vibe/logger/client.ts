@@ -78,7 +78,7 @@ function reportToServer(
   void (async (): Promise<void> => {
     try {
       const [{ executeMutation }, { POST }] = await Promise.all([
-        import("next-vibe/platforms/react/hooks/mutation-executor"),
+        import("next-vibe/unified-ui/hooks/mutation-executor"),
         import("next-vibe/logger/error-monitor/client-log/definition"),
       ]);
 

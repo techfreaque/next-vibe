@@ -17,12 +17,11 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { identityEnv } from "next-vibe/identity/env";
 import { LeadAuthRepository } from "next-vibe/identity/lead/device-auth";
 import { UserRolesRepository } from "next-vibe/identity/roles/repository";
 import { users as usersTable } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { env } from "@/env/env";
 
 import type { TaskOwner } from "./db";
 
@@ -49,7 +48,7 @@ export async function resolveTaskOwnerUser(
     if (cachedAdminAuth) {
       return { user: cachedAdminAuth, locale: systemLocale };
     }
-    const adminEmail = env.VIBE_ADMIN_USER_EMAIL;
+    const adminEmail = identityEnv.VIBE_ADMIN_USER_EMAIL;
     if (!adminEmail) {
       logger.error(
         "[resolveTaskOwnerUser] VIBE_ADMIN_USER_EMAIL not set - cannot resolve system task user",

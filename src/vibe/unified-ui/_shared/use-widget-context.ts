@@ -10,7 +10,7 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import type { TParams } from "next-vibe/core/i18n/core/static-types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { type UseNavigationStackReturn } from "next-vibe/platforms/react/hooks/use-navigation-stack";
+import { type UseNavigationStackReturn } from "next-vibe/unified-ui/hooks/use-navigation-stack";
 import { createContext, useContext } from "react";
 
 import type { ReactWidgetContext } from "./react-types";
@@ -352,7 +352,7 @@ export {
 // CLI surface helpers - safe to call from cli/ui components
 // ---------------------------------------------------------------------------
 
-import { isAgentPlatform } from "next-vibe/core/definition/platform";
+import { isAgentPlatform } from "next-vibe/platforms/platforms";
 
 export type CliSurface = "cli" | "mcp";
 

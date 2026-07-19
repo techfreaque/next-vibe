@@ -15,10 +15,10 @@ export const { tools } = endpointsHandler({
   [Methods.POST]: {
     email: undefined,
     handler: async ({ data, logger, t }) =>
-      (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-        )
-      ).GuardStatusRepository.getStatus(data, logger, t),
+      (await import("./repository")).GuardStatusRepository.getStatus(
+        data,
+        logger,
+        t,
+      ),
   },
 });

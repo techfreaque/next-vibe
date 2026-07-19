@@ -9,8 +9,7 @@ import chalk from "chalk";
 import { Box, Text, useApp, useInput, useStdin } from "ink";
 import TextInput from "ink-text-input";
 import { makeHeadlessContext } from "next-vibe/agent/chat/config";
-import { Platform } from "next-vibe/core/definition/platform";
-import { useApiMutation } from "next-vibe/platforms/react/hooks/use-api-mutation";
+import { Platform } from "next-vibe/platforms/platforms";
 import { scopedTranslation as connectScopedTranslation } from "next-vibe/remote-connection/connect/i18n";
 import type { SyncScope } from "next-vibe/remote-connection/db";
 import { SyncScopeSchema } from "next-vibe/remote-connection/db";
@@ -22,6 +21,7 @@ import {
   useWidgetTranslation,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -301,7 +301,7 @@ function CliEditor({ value, onDone }: EditorProps): JSX.Element {
         logger,
         platform: platform,
         // no user context \u2014 UTC (dates not user-facing here)
-        streamContext: makeHeadlessContext(undefined, undefined, "UTC"),
+        toolExecutionContext: makeHeadlessContext(undefined, undefined, "UTC"),
       });
       setSaveMsg("Saved \u2713");
       setEdits({});
@@ -362,7 +362,7 @@ function CliEditor({ value, onDone }: EditorProps): JSX.Element {
   const windowStart = Math.max(0, currentRowIdx - Math.floor(WINDOW / 2));
   const visible = rows.slice(windowStart, windowStart + WINDOW);
 
-  const sensitiveIcon = "\u26a1";
+  const sensitiveIcon = "\u26A1";
   const hasEdits = Object.keys(edits).length > 0;
 
   return (
@@ -401,7 +401,7 @@ function CliEditor({ value, onDone }: EditorProps): JSX.Element {
         return (
           <Box key={`${s.moduleName}.${s.key}`}>
             <Text color={isCurrent ? "cyan" : undefined}>
-              {isCurrent ? "\u25b8 " : "  "}
+              {isCurrent ? "\u25B8 " : "  "}
             </Text>
             <Text color={isCurrent ? "cyan" : "blue"} bold={isCurrent}>
               {s.key.padEnd(38)}
@@ -716,7 +716,7 @@ function CliWizard({ value, onDone }: WizardProps): JSX.Element {
         logger,
         platform: platform,
         // no user context — UTC (dates not user-facing here)
-        streamContext: makeHeadlessContext(undefined, undefined, "UTC"),
+        toolExecutionContext: makeHeadlessContext(undefined, undefined, "UTC"),
       });
       setSaveMsg("Saved ✓");
     } catch {
@@ -772,7 +772,7 @@ function CliWizard({ value, onDone }: WizardProps): JSX.Element {
     }
   }, [done, onDone]);
 
-  const sensitiveIcon = "\u26a1";
+  const sensitiveIcon = "\u26A1";
 
   if (done) {
     return (
@@ -1029,7 +1029,11 @@ export function SystemSettingsPatchWidget(): JSX.Element {
           logger,
           platform: platform as Platform,
           // no user context — UTC (dates not user-facing here)
-          streamContext: makeHeadlessContext(undefined, undefined, "UTC"),
+          toolExecutionContext: makeHeadlessContext(
+            undefined,
+            undefined,
+            "UTC",
+          ),
         });
         if (result.success) {
           const value = result.data;

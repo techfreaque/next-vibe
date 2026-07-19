@@ -11,15 +11,17 @@ import "server-only";
 import type {
   GeneratorContext,
   GeneratorResult,
-} from "next-vibe/tooling/generators/shared/shared-inputs";
+} from "next-vibe/core/generators/shared/shared-inputs";
 import {
   extractModuleName,
   generateFileHeader,
   getRelativeImportPath,
   writeGeneratedFile,
-} from "next-vibe/tooling/generators/shared/utils";
+} from "next-vibe/core/generators/shared/utils";
 
-const OUTPUT_FILE = "src/generated/seeds/index.ts";
+import { GENERATED_DIR } from "@/env/paths";
+
+const OUTPUT_FILE = `${GENERATED_DIR}/seeds/index.ts`;
 
 function generateContent(seedFiles: string[], outputFile: string): string {
   const switchCases: string[] = [];

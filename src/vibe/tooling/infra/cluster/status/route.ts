@@ -9,10 +9,6 @@ export const { tools } = endpointsHandler({
   endpoint: clusterStatusEndpoints,
   [Methods.GET]: {
     handler: async ({ logger, t }) =>
-      (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-        )
-      ).ClusterStatusRepository.get(logger, t),
+      (await import("./repository")).ClusterStatusRepository.get(logger, t),
   },
 });

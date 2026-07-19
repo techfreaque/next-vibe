@@ -7,11 +7,7 @@ export const { DELETE, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.DELETE]: {
     handler: async ({ data, logger, urlPathParams, t }) =>
-      (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-        )
-      ).LinuxUserDeleteRepository.delete(
+      (await import("./repository")).LinuxUserDeleteRepository.delete(
         data,
         logger,
         urlPathParams?.["username"] ?? "",

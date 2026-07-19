@@ -801,7 +801,7 @@ export class LeadsImportRepository {
 
       const headers = lines[0]
         .split(",")
-        .map((h) => h.trim().replace(/"/g, ""));
+        .map((h) => h.trim().replaceAll('"', ""));
       const batchEnd = Math.min(
         job.currentBatchStart + job.batchSize,
         lines.length - 1,
@@ -831,7 +831,7 @@ export class LeadsImportRepository {
         if (!line.trim()) {
           continue;
         }
-        const values = line.split(",").map((v) => v.trim().replace(/"/g, ""));
+        const values = line.split(",").map((v) => v.trim().replaceAll('"', ""));
         const row: Record<string, string> = {};
         headers.forEach((header, idx) => {
           row[header] = values[idx] ?? "";
@@ -1012,7 +1012,7 @@ export class LeadsImportRepository {
 
       const headers = lines[0]
         .split(",")
-        .map((h) => h.trim().replace(/"/g, ""));
+        .map((h) => h.trim().replaceAll('"', ""));
       let successCount = 0;
       let failCount = 0;
       let dupCount = 0;
@@ -1023,7 +1023,7 @@ export class LeadsImportRepository {
         if (!line.trim()) {
           continue;
         }
-        const values = line.split(",").map((v) => v.trim().replace(/"/g, ""));
+        const values = line.split(",").map((v) => v.trim().replaceAll('"', ""));
         const row: Record<string, string> = {};
         headers.forEach((header, idx) => {
           row[header] = values[idx] ?? "";

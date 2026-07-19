@@ -24,7 +24,9 @@ import * as resolveTaskUser from "next-vibe/tasks/cron/resolve-task-user";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { RouteExecuteRepository } from "./repository";
+import { handleIncomingToolRequest } from "./repository/incoming";
 import { PendingCalls } from "./repository/pending-calls";
+import { handleToolResult } from "./repository/result-handler";
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -32,12 +34,8 @@ function makeLogger(): ReturnType<typeof createEndpointLogger> {
   return createEndpointLogger(false, defaultLocale);
 }
 
-type IncomingProps = Parameters<
-  typeof RouteExecuteRepository.handleIncomingToolRequest
->[0];
-type ResultProps = Parameters<
-  typeof RouteExecuteRepository.handleToolResult
->[0];
+type IncomingProps = Parameters<typeof handleIncomingToolRequest>[0];
+type ResultProps = Parameters<typeof handleToolResult>[0];
 
 function makeIncomingProps(
   overrides: Pick<IncomingProps, "requestData" | "payload"> & {
@@ -107,7 +105,7 @@ describe("RouteExecuteRepository remote handlers", () => {
       closeConnectorSocket: vi.fn(),
     });
 
-    await RouteExecuteRepository.handleIncomingToolRequest(
+    await handleIncomingToolRequest(
       makeIncomingProps({
         requestData: {
           toolName: "bash",
@@ -142,7 +140,7 @@ describe("RouteExecuteRepository remote handlers", () => {
       closeConnectorSocket: vi.fn(),
     });
 
-    await RouteExecuteRepository.handleIncomingToolRequest(
+    await handleIncomingToolRequest(
       makeIncomingProps({
         requestData: {
           toolName: "bash",
@@ -192,7 +190,7 @@ describe("RouteExecuteRepository remote handlers", () => {
       .spyOn(PendingCalls, "complete")
       .mockReturnValue({ kind: "unknown" });
 
-    await RouteExecuteRepository.handleToolResult(
+    await handleToolResult(
       makeResultProps({
         responseData: {
           taskId: undefined,
@@ -213,7 +211,7 @@ describe("RouteExecuteRepository remote handlers", () => {
         toolMessageId: null,
       });
 
-    await RouteExecuteRepository.handleToolResult(
+    await handleToolResult(
       makeResultProps({
         responseData: {
           taskId: "call-7",
@@ -233,7 +231,7 @@ describe("RouteExecuteRepository remote handlers", () => {
       .spyOn(PendingCalls, "complete")
       .mockReturnValue({ kind: "unknown" });
 
-    await RouteExecuteRepository.handleToolResult(
+    await handleToolResult(
       makeResultProps({
         responseData: { taskId: "call-9", result: null, hint: "boom" },
       }),

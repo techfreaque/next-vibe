@@ -12,12 +12,8 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
-import {
-  customWidgetObject,
-  requestField,
-  responseField,
-  widgetField,
-} from "next-vibe/unified-ui/_shared/utils";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
+import { requestField, responseField, widgetField } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { chatModelSelectionSchema } from "next-vibe/agent/ai-stream/models";
 import { voiceModelSelectionSchema } from "next-vibe/agent/text-to-speech/models";
 

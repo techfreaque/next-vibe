@@ -5,11 +5,10 @@
 
 import { eq } from "drizzle-orm";
 import { db } from "next-vibe/database";
+import { identityEnv } from "next-vibe/identity/env";
 import { users } from "next-vibe/identity/user/db";
 import { formatDatabase } from "next-vibe/logger/formatters";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { env } from "@/env/env";
 
 import { ensureUniqueSlug, generateSlug } from "../chat/slugify";
 import type { SkillVariantData } from "./db";
@@ -182,7 +181,7 @@ This skill has 999 votes. Test that the verified badge renders correctly, vote c
 export async function dev(logger: EndpointLogger): Promise<void> {
   try {
     // Find the admin user (index 0 = first dev seed user)
-    const adminEmail = env.VIBE_ADMIN_USER_EMAIL;
+    const adminEmail = identityEnv.VIBE_ADMIN_USER_EMAIL;
     if (!adminEmail) {
       logger.warn("VIBE_ADMIN_USER_EMAIL not set, skipping skill seeds");
       return;

@@ -17,11 +17,11 @@ export function generateSlug(input: string): string {
       .toLowerCase()
       .trim()
       // Replace common special chars with dashes
-      .replace(/[^a-z0-9-]/g, "-")
+      .replaceAll(/[^a-z0-9-]/g, "-")
       // Collapse multiple dashes
-      .replace(/-{2,}/g, "-")
+      .replaceAll(/-{2,}/g, "-")
       // Trim dashes from ends
-      .replace(/^-+|-+$/g, "")
+      .replaceAll(/^-+|-+$/g, "")
       // Limit length
       .slice(0, 80)
   );

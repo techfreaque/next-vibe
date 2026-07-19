@@ -13,14 +13,16 @@ import { readFile } from "node:fs/promises";
 import type {
   GeneratorContext,
   GeneratorResult,
-} from "next-vibe/tooling/generators/shared/shared-inputs";
+} from "next-vibe/core/generators/shared/shared-inputs";
 import {
   generateFileHeader,
   getRelativeImportPath,
   writeGeneratedFile,
-} from "next-vibe/tooling/generators/shared/utils";
+} from "next-vibe/core/generators/shared/utils";
 
-const OUTPUT_FILE = "src/generated/dataflow/graph-seeds-index.ts";
+import { GENERATED_DIR } from "@/env/paths";
+
+const OUTPUT_FILE = `${GENERATED_DIR}/dataflow/graph-seeds-index.ts`;
 
 async function validateFiles(files: string[]): Promise<string | null> {
   for (const file of files) {

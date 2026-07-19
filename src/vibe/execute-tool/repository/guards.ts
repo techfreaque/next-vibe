@@ -38,12 +38,12 @@ export class ExecuteToolGuards {
     data: RouteExecuteRequestOutput;
     toolName: string;
     instanceId: string | undefined;
-    streamContext: ToolExecutionContext;
+    toolExecutionContext: ToolExecutionContext;
     logger: EndpointLogger;
   }): RouteExecuteRequestOutput {
-    const { data, toolName, instanceId, streamContext, logger } = params;
+    const { data, toolName, instanceId, toolExecutionContext, logger } = params;
 
-    if (instanceId && streamContext.isRevival) {
+    if (instanceId && toolExecutionContext.isRevival) {
       const callbackMode = data.callbackMode ?? CallbackMode.WAIT;
       if (callbackMode === CallbackMode.WAIT) {
         logger.debug(
@@ -68,23 +68,24 @@ export class ExecuteToolGuards {
     data: RouteExecuteRequestOutput;
     toolName: string;
     instanceId: string | undefined;
-    streamContext: ToolExecutionContext;
+    toolExecutionContext: ToolExecutionContext;
     logger: EndpointLogger;
     t: AiT;
   }): Promise<ResponseType<RouteExecuteResponseOutput> | null> {
-    const { data, toolName, instanceId, streamContext, logger, t } = params;
+    const { data, toolName, instanceId, toolExecutionContext, logger, t } =
+      params;
 
     const { FOLDER_ALLOWS_REMOTE_TOOLS, FOLDER_BLOCKED_CALLBACK_MODES } =
       await import("next-vibe/agent/chat/config");
 
     if (
       instanceId &&
-      FOLDER_ALLOWS_REMOTE_TOOLS[streamContext.rootFolderId] === false
+      FOLDER_ALLOWS_REMOTE_TOOLS[toolExecutionContext.rootFolderId] === false
     ) {
       logger.warn("[RouteExecute] Remote tool blocked for restricted folder", {
         toolName,
         instanceId,
-        rootFolderId: streamContext.rootFolderId,
+        rootFolderId: toolExecutionContext.rootFolderId,
       });
       return fail({
         message: t("executeTool.post.errors.validation.title"),
@@ -94,12 +95,12 @@ export class ExecuteToolGuards {
 
     const effectiveCallbackMode = data.callbackMode ?? CallbackMode.WAIT;
     const folderBlockedModes =
-      FOLDER_BLOCKED_CALLBACK_MODES[streamContext.rootFolderId] ?? [];
+      FOLDER_BLOCKED_CALLBACK_MODES[toolExecutionContext.rootFolderId] ?? [];
     if (folderBlockedModes.includes(effectiveCallbackMode)) {
       logger.warn("[RouteExecute] Blocked callbackMode for restricted folder", {
         toolName,
         callbackMode: effectiveCallbackMode,
-        rootFolderId: streamContext.rootFolderId,
+        rootFolderId: toolExecutionContext.rootFolderId,
       });
       return fail({
         message: t("executeTool.post.errors.validation.title"),
@@ -188,21 +189,22 @@ export class ExecuteToolGuards {
   static async applyConfirmationGate(params: {
     toolName: string;
     data: { callbackMode?: string | null };
-    streamContext: ToolExecutionContext;
+    toolExecutionContext: ToolExecutionContext;
     logger: EndpointLogger;
   }): Promise<{ status: string; toolName: string } | null> {
-    const { toolName, data, streamContext, logger } = params;
+    const { toolName, data, toolExecutionContext, logger } = params;
     if (
       data.callbackMode === "approve" ||
-      streamContext.isConfirmedReExecution === true ||
-      (streamContext.headless === true && streamContext.relayReceiver !== true)
+      toolExecutionContext.isConfirmedReExecution === true ||
+      (toolExecutionContext.headless === true &&
+        toolExecutionContext.relayReceiver !== true)
     ) {
       return null;
     }
     const { getEndpoint } = await import("@/generated/endpoints/endpoint");
     const targetEndpoint = await getEndpoint(toolName);
     const contextRequiresConfirmation =
-      streamContext.confirmationOverrides?.some(
+      toolExecutionContext.confirmationOverrides?.some(
         (o) =>
           o.requiresConfirmation &&
           (o.toolId === toolName ||
@@ -210,11 +212,11 @@ export class ExecuteToolGuards {
       ) ?? false;
     logger.debug("[RouteExecute] Confirmation gate evaluated", {
       toolName,
-      headless: streamContext.headless,
-      relayReceiver: streamContext.relayReceiver,
-      overrideCount: streamContext.confirmationOverrides?.length ?? 0,
+      headless: toolExecutionContext.headless,
+      relayReceiver: toolExecutionContext.relayReceiver,
+      overrideCount: toolExecutionContext.confirmationOverrides?.length ?? 0,
       overrideToolIds:
-        streamContext.confirmationOverrides
+        toolExecutionContext.confirmationOverrides
           ?.filter((o) => o.requiresConfirmation)
           .map((o) => o.toolId)
           .join(",") ?? "",
@@ -233,9 +235,10 @@ export class ExecuteToolGuards {
     // final toolCall with waitingForConfirmation=true. Without this it spreads
     // toolCallData.toolCall (waitingForConfirmation=false for execute-tool)
     // and overwrites any DB update made here.
-    const callerToolCallId = streamContext.callerToolCallId;
-    if (callerToolCallId && streamContext.pendingToolMessages) {
-      const pending = streamContext.pendingToolMessages.get(callerToolCallId);
+    const callerToolCallId = toolExecutionContext.callerToolCallId;
+    if (callerToolCallId && toolExecutionContext.pendingToolMessages) {
+      const pending =
+        toolExecutionContext.pendingToolMessages.get(callerToolCallId);
       if (pending?.toolCallData) {
         pending.toolCallData.toolCall = {
           ...pending.toolCallData.toolCall,
@@ -246,7 +249,7 @@ export class ExecuteToolGuards {
       }
     }
     // Signal the stream to abort at finish-step before the AI response turn.
-    streamContext.stepHasToolsAwaitingConfirmation = true;
+    toolExecutionContext.stepHasToolsAwaitingConfirmation = true;
     return { status: "waiting_for_confirmation", toolName };
   }
 

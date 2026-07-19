@@ -5,7 +5,7 @@
  * and matched by REQUEST CONTENT — zero global or process state. Every call
  * site that talks to an external service (AI providers, media generation, TTS/
  * STT, embeddings) receives the context down the execution chain
- * (ToolExecutionContext.streamContext) and binds it once via
+ * (ToolExecutionContext.toolExecutionContext) and binds it once via
  * `createFixtureFetch(context)`.
  *
  * Caches every call as two files:
@@ -27,7 +27,7 @@
  * preserves RESULT order but not fetch-FIRING order, so racing bumps would
  * assign ordinals non-deterministically. The gap-fill layer therefore RESERVES
  * each bridge call's ordinal synchronously in a stable order BEFORE the
- * fan-out (reserveFixtureOrdinals) and pins it on streamContext.fixtureOrdinal
+ * fan-out (reserveFixtureOrdinals) and pins it on toolExecutionContext.fixtureOrdinal
  * so the racing fetches replay the same file every run.
  *
  * Response file formats:
@@ -92,7 +92,7 @@ export const FIXTURE_STRICT = false;
 
 /**
  * The ONE value that flows the execution chain (ToolExecutionContext.
- * streamContext, the tool-execute-request wire payload, revival records).
+ * toolExecutionContext, the tool-execute-request wire payload, revival records).
  * There is no process or global replay state anywhere: fixture matching is
  * ordinal-addressed (see bumpFixtureCounter): the run's single counter, stored
  * in the fixtures table, orders the recordings.
@@ -158,11 +158,11 @@ type ResFile =
 export function normalizeEmbeddingBodyForHash(bodyStr: string): string {
   return (
     bodyStr
-      .replace(/ID:[0-9a-f]{6,}/g, "ID:X")
-      .replace(/Posted:[^|\]\\"]+/g, "Posted:X")
+      .replaceAll(/ID:[0-9a-f]{6,}/g, "ID:X")
+      .replaceAll(/Posted:[^|\]\\"]+/g, "Posted:X")
       // Per-run UUIDs (thread/message/file ids embedded in cortex document paths
       // and titles, e.g. `.../tool-catalog-deep-dive-<uuid>.md`) vary every run.
-      .replace(
+      .replaceAll(
         /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi,
         "UUID",
       )
@@ -171,7 +171,7 @@ export function normalizeEmbeddingBodyForHash(bodyStr: string): string {
       // every run. The cortex system-prompt embeds this text, so an unstripped
       // timestamp drifted the hash → strict cache miss every run. Match with or
       // without milliseconds and trailing Z/offset.
-      .replace(
+      .replaceAll(
         /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})?/g,
         "TIMESTAMP",
       )
@@ -181,8 +181,8 @@ export function normalizeEmbeddingBodyForHash(bodyStr: string): string {
 export function slugify(s: string): string {
   return s
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
+    .replaceAll(/[^a-z0-9]+/g, "-")
+    .replaceAll(/^-+|-+$/g, "")
     .slice(0, 60);
 }
 
@@ -237,7 +237,7 @@ function deriveModelName(url: string, bodyStr: string): string {
         .filter((p) => p && isStableWord(p))
         .slice(-2)
         .join("-") ||
-      u.hostname.split(".")[0]?.replace(/[^a-z]+/gi, "") ||
+      u.hostname.split(".")[0]?.replaceAll(/[^a-z]+/gi, "") ||
       "host";
     const pathParts = u.pathname
       .split("/")
@@ -380,7 +380,7 @@ export async function readAndBumpFixture(
  * Reserve `count` fixture ordinals up-front, in order, for a DETERMINISTIC
  * PARALLEL FAN-OUT (gap-fill). The caller bumps the shared counter `count`
  * times SEQUENTIALLY here — before firing its concurrent bridge fetches — then
- * pins one reserved ordinal per fetch via streamContext.fixtureOrdinal. This
+ * pins one reserved ordinal per fetch via toolExecutionContext.fixtureOrdinal. This
  * moves the ordinal ASSIGNMENT out of the racing fetches (which would otherwise
  * bump in nondeterministic resolution order) while the model calls themselves
  * still run in parallel.
@@ -996,27 +996,27 @@ function fixturesEnabled(): boolean {
 /**
  * Bind a fixture-aware fetch to a stream context — THE entry into the engine.
  * Every AI/media/embedding/TTS/STT call site already has the ToolExecutionContext
- * (or one) and passes it here; the engine uses `streamContext` as the
+ * (or one) and passes it here; the engine uses `toolExecutionContext` as the
  * fixture scope, reading the thread's prefix + bumping its ordinal from the DB
  * per fetch. In prod (or with no context/threadId) this is the plain live
  * fetch — zero overhead.
  */
 export function createFixtureFetch(
-  streamContext: ToolExecutionContext | undefined,
+  toolExecutionContext: ToolExecutionContext | undefined,
   logger: EndpointLogger = createEndpointLogger(false, defaultLocale),
 ): typeof globalThis.fetch {
-  const threadId = streamContext?.threadId;
+  const threadId = toolExecutionContext?.threadId;
   if (!threadId || !fixturesEnabled()) {
     // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- live fetch outside dev/test or with no thread scope
     return fetch;
   }
   // A parallel-fan-out caller (gap-fill) binds a per-call context carrying a
   // pre-reserved ordinal; the racing fetch uses it verbatim (no counter race).
-  const pinnedOrdinal = streamContext?.fixtureOrdinal;
+  const pinnedOrdinal = toolExecutionContext?.fixtureOrdinal;
   // Sub-stream lineage: the engine walks this → parent → root to find the run's
   // fixture folder (incognito sub-streams have no DB row, so the first hop is
   // in-context).
-  const contextParentThreadId = streamContext?.parentThreadId;
+  const contextParentThreadId = toolExecutionContext?.parentThreadId;
   // Bun's fetch type carries a `preconnect` member — satisfy it by borrowing
   // the real one (a pure DNS/TLS warm-up; irrelevant to record/replay).
   const bound = Object.assign(

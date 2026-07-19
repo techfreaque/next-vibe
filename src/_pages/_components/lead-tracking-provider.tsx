@@ -4,11 +4,11 @@ import { useTranslation } from "next-vibe/core/i18n/core/client";
 import type { JWTPublicPayloadType } from "next-vibe/identity/auth/types";
 import { EngagementTypes } from "next-vibe/identity/lead/enum";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { useApiMutation } from "next-vibe/platforms/react/hooks/use-api-mutation";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { getReferrer } from "next-vibe/ui/lib/dom";
 import { getCurrentUrl } from "next-vibe/ui/lib/location";
 import { getUserAgent } from "next-vibe/ui/lib/media";
+import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
 import { useEffect, useRef } from "react";
 
 import trackingEndpoints from "@/leads/tracking/definition";

@@ -37,7 +37,7 @@ export async function processOperation(params: {
   logger: EndpointLogger;
   sttModelSelection: SttModelSelection | null;
   /** Fixture thread id of the calling stream — the STT call binds it. */
-  streamContext: ToolExecutionContext;
+  toolExecutionContext: ToolExecutionContext;
 }): Promise<
   ResponseType<{
     threadId: string;
@@ -59,7 +59,7 @@ export async function processOperation(params: {
     locale,
     logger,
     sttModelSelection,
-    streamContext,
+    toolExecutionContext,
   } = params;
 
   let voiceTranscription: {
@@ -95,7 +95,7 @@ export async function processOperation(params: {
             locale,
             logger,
             sttModelSelection,
-            streamContext,
+            toolExecutionContext,
           );
 
         if (!transcriptionResult.success) {
@@ -198,7 +198,7 @@ export async function createUserMessageWithAttachments(params: {
   logger: EndpointLogger;
   t: AiStreamT;
   /** Fixture chain — used to embed the user message at write time. */
-  streamContext?: ToolExecutionContext;
+  toolExecutionContext?: ToolExecutionContext;
 }): Promise<
   ResponseType<{
     userMessageId: string | null;
@@ -358,20 +358,19 @@ export async function createUserMessageWithAttachments(params: {
             userMessageId,
             attachments: result.data,
           };
-        } else {
-          logger.error(
-            "[File Processing] Failed to upload attachments to storage",
-            {
-              messageId: userMessageId,
-              errorMessage: result.message,
-            },
-          );
-
-          return {
-            success: false,
-            userMessageId,
-          };
         }
+        logger.error(
+          "[File Processing] Failed to upload attachments to storage",
+          {
+            messageId: userMessageId,
+            errorMessage: result.message,
+          },
+        );
+
+        return {
+          success: false,
+          userMessageId,
+        };
       });
     }
   }
@@ -393,7 +392,7 @@ export async function createUserMessageWithAttachments(params: {
         user: params.user,
         authorName,
         logger,
-        streamContext: params.streamContext,
+        toolExecutionContext: params.toolExecutionContext,
         attachments:
           attachmentMetadata.length > 0 ? attachmentMetadata : undefined,
       });

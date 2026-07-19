@@ -1,0 +1,30 @@
+{
+  "mcpServers": {
+    "hermes": {
+      "command": "bun",
+      "args": [
+        "--preload",
+        "C:/Users/mabr/projects/next-vibe/src/vibe/platforms/cli/runtime/env-preload.ts",
+        "C:/Users/mabr/projects/next-vibe/src/vibe/platforms/cli/vibe-runtime.ts",
+        "mcp",
+        "--hermes"
+      ],
+      "env": {
+        "NODE_ENV": "production",
+        "PROJECT_ROOT": "C:/Users/mabr/projects/next-vibe"
+      }
+    },
+    "atlas": {
+      "command": "bun",
+      "args": [
+        "--preload",
+        "C:/Users/mabr/projects/next-vibe/src/vibe/platforms/cli/runtime/env-preload.ts",
+        "C:/Users/mabr/projects/next-vibe/src/vibe/platforms/cli/vibe-runtime.ts",
+        "mcp"
+      ],
+      "env": {
+        "PROJECT_ROOT": "C:/Users/mabr/projects/next-vibe"
+      }
+    }
+  }
+}

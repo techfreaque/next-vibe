@@ -320,9 +320,9 @@ export async function toAiSdkMessage(
       // not be re-sent to AI as part of history).
       if (message.content?.trim()) {
         const strippedContent = message.content
-          .replace(/<think>[\s\S]*?<\/think>/g, "")
+          .replaceAll(/<think>[\s\S]*?<\/think>/g, "")
           .replace(/<think>[\s\S]*$/i, "")
-          .replace(/<\/think>/gi, "")
+          .replaceAll("</think>", "")
           .trim();
         if (strippedContent) {
           assistantParts.push({ type: "text", text: strippedContent });
@@ -491,10 +491,10 @@ export async function toAiSdkMessages(
   rootFolderId: DefaultFolderId,
   modelConfig: ChatModelOption | undefined,
   isRevival: boolean | undefined,
-  streamContext: ToolExecutionContext,
+  toolExecutionContext: ToolExecutionContext,
 ): Promise<ModelMessage[]> {
   // One fixture-aware fetch per conversion pass (attachment/media downloads).
-  const fetchImpl = createFixtureFetch(streamContext, logger);
+  const fetchImpl = createFixtureFetch(toolExecutionContext, logger);
   const result: ModelMessage[] = [];
 
   // Track sequenceIds for which we have already emitted a metadata system message.

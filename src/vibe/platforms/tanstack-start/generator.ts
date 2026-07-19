@@ -18,20 +18,20 @@ import {
 import path, { join, relative, resolve } from "node:path";
 
 import type { ApiSection } from "next-vibe/core/definition/endpoint-base";
+import { hasCustomDirective } from "next-vibe/core/generators/shared/custom-directive";
+import { findFilesByName } from "next-vibe/core/generators/shared/scanner";
+import type {
+  GeneratorContext,
+  GeneratorResult,
+} from "next-vibe/core/generators/shared/shared-inputs";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import {
   filterPlatformMarkers,
   PlatformMarker,
   type UserRoleValue,
 } from "next-vibe/identity/roles/enum";
-import { hasCustomDirective } from "next-vibe/tooling/generators/shared/custom-directive";
-import { findFilesByName } from "next-vibe/tooling/generators/shared/scanner";
-import type {
-  GeneratorContext,
-  GeneratorResult,
-} from "next-vibe/tooling/generators/shared/shared-inputs";
 
-import { getApiDir, getUiDir } from "@/env/paths";
+import { GENERATED_DIR, getApiDir, getUiDir } from "@/env/paths";
 
 // Use POSIX dirname so segment splitting on "/" works on Windows too
 const posixDirname = path.posix.dirname;
@@ -60,7 +60,7 @@ function apiDir(): string {
   return getApiDir();
 }
 function routesDir(): string {
-  return join(projectRoot(), "src/generated/app-tanstack/routes");
+  return join(projectRoot(), `${GENERATED_DIR}/app-tanstack/routes`);
 }
 
 function findFiles(dir: string, pattern: string): string[] {
@@ -256,7 +256,7 @@ function buildPaths(
     importSuffix = "route";
   }
   const srcDirFromRoot = relative(projectRoot(), sourceDir)
-    .replace(/\\/g, "/")
+    .replaceAll("\\", "/")
     .replace(/^src(\/|$)/, "");
   const importBase = srcDirFromRoot ? `@/${srcDirFromRoot}` : "@";
   const importPath =
@@ -320,7 +320,7 @@ function emitRootRedirect(result: GenerationResult): void {
     `});`,
     ``,
   ].join("\n");
-  const rel = relative(projectRoot(), outPath).replace(/\\/g, "/");
+  const rel = relative(projectRoot(), outPath).replaceAll("\\", "/");
   if (writeIfNotCustom(outPath, content)) {
     result.created.push(rel);
   } else {
@@ -461,7 +461,7 @@ function emitLayoutFile(
     "layout",
   );
   const outPath = join(routesDir(), `${flatName}.tsx`);
-  const srcRelative = relative(projectRoot(), srcFile).replace(/\\/g, "/");
+  const srcRelative = relative(projectRoot(), srcFile).replaceAll("\\", "/");
   const hasTanstackLoader = hasTanstackLoaderExport(srcFile);
   const isClientComponent =
     hasUseClientDirective(srcFile) || hasSyncDefaultExport(srcFile);
@@ -564,7 +564,7 @@ function emitLayoutFile(
     ].join("\n");
   }
   if (writeIfNotCustom(outPath, content)) {
-    result.created.push(relative(projectRoot(), outPath).replace(/\\/g, "/"));
+    result.created.push(relative(projectRoot(), outPath).replaceAll("\\", "/"));
   }
 }
 
@@ -585,7 +585,7 @@ function emitPageFile(
       .replace(new RegExp(`/\\$${catchAllName}$`), "/$");
   }
   const outPath = join(routesDir(), `${flatName}.tsx`);
-  const srcRelative = relative(projectRoot(), srcFile).replace(/\\/g, "/");
+  const srcRelative = relative(projectRoot(), srcFile).replaceAll("\\", "/");
   const hasSearch = hasSearchParamsInLoader(srcFile);
   const lines = [
     `// AUTO-GENERATED from ${srcRelative}. Add "use custom" to this file to preserve customizations.`,
@@ -681,7 +681,7 @@ function emitPageFile(
     ``,
   );
   if (writeIfNotCustom(outPath, lines.join("\n"))) {
-    result.created.push(relative(projectRoot(), outPath).replace(/\\/g, "/"));
+    result.created.push(relative(projectRoot(), outPath).replaceAll("\\", "/"));
   }
 }
 
@@ -693,7 +693,7 @@ function emitApiFile(
 ): void {
   const { flatName, routePath, importPath } = buildPaths(dir, sourceDir, "api");
   const outPath = join(routesDir(), `${flatName}.ts`);
-  const srcRelative = relative(projectRoot(), srcFile).replace(/\\/g, "/");
+  const srcRelative = relative(projectRoot(), srcFile).replaceAll("\\", "/");
   const content = [
     `// AUTO-GENERATED from ${srcRelative}. Add "use custom" to this file to preserve customizations.`,
     `import { createFileRoute } from "@tanstack/react-router";`,
@@ -704,17 +704,15 @@ function emitApiFile(
     ``,
   ].join("\n");
   if (writeIfNotCustom(outPath, content)) {
-    result.created.push(relative(projectRoot(), outPath).replace(/\\/g, "/"));
+    result.created.push(relative(projectRoot(), outPath).replaceAll("\\", "/"));
   }
 }
 
 async function regenerateRouteTree(result: GenerationResult): Promise<void> {
-  const srcDirectory = join(projectRoot(), "src/generated/app-tanstack");
+  const srcDirectory = join(projectRoot(), `${GENERATED_DIR}/app-tanstack`);
   try {
     const routerGeneratorPkg = "@tanstack/router-generator";
-    const { Generator, getConfig } = (await import(
-      /* turbopackIgnore: true */ /* webpackIgnore: true */ routerGeneratorPkg
-    )) as {
+    const { Generator, getConfig } = (await import(routerGeneratorPkg)) as {
       getConfig: (inlineConfig: {
         routesDirectory: string;
         generatedRouteTree: string;
@@ -730,7 +728,7 @@ async function regenerateRouteTree(result: GenerationResult): Promise<void> {
     await new Generator({ config, root: projectRoot() }).run();
   } catch (error) {
     result.errors.push({
-      file: "src/generated/app-tanstack/routeTree.gen.ts",
+      file: `${GENERATED_DIR}/app-tanstack/routeTree.gen.ts`,
       error: parseError(error).message,
     });
   }

@@ -22,7 +22,7 @@ import {
   requestUrlPathParamsField,
   responseField,
   submitButton,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { scopedTranslation } from "./i18n";

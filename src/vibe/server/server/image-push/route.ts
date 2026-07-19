@@ -14,10 +14,10 @@ export const { tools } = endpointsHandler({
   endpoint: imagePushEndpoints,
   [Methods.POST]: {
     handler: async ({ data, logger, t }) =>
-      (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-        )
-      ).ImagePushRepository.execute(data, logger, t),
+      (await import("./repository")).ImagePushRepository.execute(
+        data,
+        logger,
+        t,
+      ),
   },
 });

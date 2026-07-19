@@ -5,7 +5,6 @@
 import "server-only";
 
 import type { JSONValue } from "ai";
-import { Platform } from "next-vibe/core/definition/platform";
 import {
   type ErrorResponseType,
   ErrorResponseTypes,
@@ -14,6 +13,7 @@ import {
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { CallbackMode, CallbackModeDB } from "next-vibe/execute-tool/constants";
+import { Platform } from "next-vibe/platforms/platforms";
 
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 
@@ -66,7 +66,7 @@ async function enrichToolArgsWithRequestDefaults(
         user: state.p.user,
         locale: state.p.locale,
         platform: Platform.AI,
-        streamContext: state.p.streamContext,
+        toolExecutionContext: state.p.toolExecutionContext,
       },
       { requestData: targetInput, urlPathParams: {} },
     );
@@ -299,7 +299,7 @@ export async function onToolResult(
 } | null> {
   const {
     ctx,
-    streamContext,
+    toolExecutionContext,
     threadId,
     isIncognito,
     userId,
@@ -389,7 +389,7 @@ export async function onToolResult(
     (toolCallData.toolCall.callbackMode === "detach" ||
       toolCallData.toolCall.callbackMode === "wakeUp");
   // Mark as "pending" for remote wait when:
-  // 1. streamContext.waitingForRemoteResult=true - set by escalateToTask or remote queue WAIT/END_LOOP
+  // 1. toolExecutionContext.waitingForRemoteResult=true - set by escalateToTask or remote queue WAIT/END_LOOP
   //    before processToolResult is called. This covers escalated tools (e.g. claude-code) whose
   //    own output shape doesn't signal pending.
   // 2. Output shape {status: "status.pending"} - set by execute-tool for remote queue WAIT/wakeUp.
@@ -401,7 +401,7 @@ export async function onToolResult(
   let isWaitingForRemote =
     !effectiveIsError &&
     !isDetach &&
-    streamContext.waitingForRemoteResult === true;
+    toolExecutionContext.waitingForRemoteResult === true;
   if (
     !isWaitingForRemote &&
     !effectiveIsError &&
@@ -435,14 +435,14 @@ export async function onToolResult(
     // A tool that signals pending via its OUTPUT SHAPE (execute-tool's remote
     // queue WAIT / wakeUp — the loop-remote path where the executor's own
     // execute-tool returns {status:"status.pending"} rather than going through
-    // escalateToTask) must ALSO raise the SHARED streamContext flag. The
+    // escalateToTask) must ALSO raise the SHARED toolExecutionContext flag. The
     // finish-step abort (REMOTE_TOOL_WAIT) and the SDK stopWhen predicate both
-    // key off `streamContext.waitingForRemoteResult`; without setting it the loop
+    // key off `toolExecutionContext.waitingForRemoteResult`; without setting it the loop
     // starts another model turn with a pending (result-less) tool message and the
     // AI SDK throws AI_NoOutputGeneratedError → the whole turn surfaces as a
     // STREAM_ERROR instead of cleanly parking in "waiting" for the revival.
     if (isWaitingForRemote) {
-      streamContext.waitingForRemoteResult = true;
+      toolExecutionContext.waitingForRemoteResult = true;
     }
   }
 
@@ -455,7 +455,7 @@ export async function onToolResult(
   // is the confirmation gate's/APPROVE mode's authoritative "halt, await user"
   // marker that MUST be written to the tool message (the abort at finish-step +
   // the phase-2 re-execution both key off it). When this tool runs in a PARALLEL
-  // batch alongside a genuinely remote-pending sibling, streamContext's shared
+  // batch alongside a genuinely remote-pending sibling, toolExecutionContext's shared
   // `waitingForRemoteResult` flag leaks onto it and would wrongly skip the write,
   // leaving the approve tool message result-less. Never skip a confirmation
   // placeholder.
@@ -877,7 +877,7 @@ async function executeFallbackTool(
   toolName: string,
   args: WidgetData | undefined,
 ): Promise<{ data: WidgetData } | { error: string } | null> {
-  const { user, locale, logger, streamContext } = state.p;
+  const { user, locale, logger, toolExecutionContext } = state.p;
 
   try {
     logger.debug(
@@ -904,7 +904,7 @@ async function executeFallbackTool(
       user,
       locale,
       logger,
-      streamContext,
+      toolExecutionContext,
       platform: Platform.AI,
     });
 

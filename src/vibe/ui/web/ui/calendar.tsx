@@ -1,8 +1,9 @@
 /* eslint-disable i18next/no-literal-string */
 "use client";
 
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
-import { cn } from "next-vibe/core/utils/utils";
+import { ChevronLeftIcon } from "next-vibe/ui/ui/icons/ChevronLeftIcon";
+import { ChevronRightIcon } from "next-vibe/ui/ui/icons/ChevronRightIcon";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { ComponentProps, JSX, ReactNode } from "react";
 import { DayPicker, type DayPickerProps } from "react-day-picker";
 

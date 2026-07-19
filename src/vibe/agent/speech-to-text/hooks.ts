@@ -14,9 +14,9 @@ import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translat
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { downloadBinaryFile } from "next-vibe/ui/lib/download";
 import { getMicrophoneStream, getUserAgent } from "next-vibe/ui/lib/media";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { useCallback, useMemo, useRef, useState } from "react";
 
 import speechToTextDefinitions from "./definition";

@@ -9,7 +9,7 @@
 import "server-only";
 
 import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
-import { rootlessStreamContext } from "next-vibe/agent/chat/config";
+import { rootlessToolExecutionContext } from "next-vibe/agent/chat/config";
 import { getInstanceAvailability } from "next-vibe/agent/env-availability";
 import type { ImageGenModelId } from "next-vibe/agent/image-generation/models";
 import { getBestImageGenModel } from "next-vibe/agent/image-generation/models";
@@ -20,7 +20,7 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { createEndpointLogger } from "next-vibe/logger/server";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 
 /**
  * A resolved test favorite: its DB id plus the CONCRETE models the stream would
@@ -69,7 +69,7 @@ export async function ensureVariantFavorite(
 
   // Reuse an existing favorite for this variant (runtime override wins).
   const favsResult = await sendTestRequest({
-    streamContext: rootlessStreamContext(),
+    toolExecutionContext: rootlessToolExecutionContext(),
     endpoint: favsDef,
     data: { pageSize: 500 },
     user,
@@ -85,7 +85,7 @@ export async function ensureVariantFavorite(
 
   if (!favoriteId) {
     const created = await sendTestRequest({
-      streamContext: rootlessStreamContext(),
+      toolExecutionContext: rootlessToolExecutionContext(),
       endpoint: favoriteCreateDef,
       data: { skillId: variantSkillId },
       user,
@@ -174,7 +174,7 @@ export async function createQualityTesterFavorite(
     ),
   ]);
   const favsResult = await sendTestRequest({
-    streamContext: rootlessStreamContext(),
+    toolExecutionContext: rootlessToolExecutionContext(),
     endpoint: favsDef,
     data: { pageSize: 500 },
     user,
@@ -186,7 +186,7 @@ export async function createQualityTesterFavorite(
   for (const fav of favsList) {
     if (String(fav["skillId"] ?? "").startsWith("quality-tester")) {
       await sendTestRequest({
-        streamContext: rootlessStreamContext(),
+        toolExecutionContext: rootlessToolExecutionContext(),
         endpoint: favoriteDeleteDef,
         urlPathParams: { id: String(fav["id"]) },
         user,
@@ -194,7 +194,7 @@ export async function createQualityTesterFavorite(
     }
   }
   const createResult = await sendTestRequest({
-    streamContext: rootlessStreamContext(),
+    toolExecutionContext: rootlessToolExecutionContext(),
     endpoint: favoriteCreateDef,
     data: { skillId: "quality-tester__budget" },
     user,

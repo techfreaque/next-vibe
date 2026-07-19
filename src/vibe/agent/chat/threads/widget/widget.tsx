@@ -15,9 +15,6 @@ import { ThreadPermissionsDialog } from "next-vibe/agent/chat/threads/[threadId]
 import { ThreadShareDialog } from "next-vibe/agent/chat/threads/[threadId]/share-links/widget";
 import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import { success } from "next-vibe/core/route/response.schema";
-import { cn } from "next-vibe/core/utils/utils";
-import { apiClient } from "next-vibe/platforms/react/hooks/store";
-import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { useSilentHistory } from "next-vibe/ui/hooks/use-navigation";
 import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import {
@@ -63,12 +60,15 @@ import {
   TooltipTrigger,
 } from "next-vibe/ui/ui/tooltip";
 import { P } from "next-vibe/ui/ui/typography";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetContext,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { Icon } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import { apiClient } from "next-vibe/unified-ui/hooks/store";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
+import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import React, { useEffect, useMemo, useState } from "react";
 
 import { chatColors, chatTransitions } from "@/_pages/chat/lib/design-tokens";

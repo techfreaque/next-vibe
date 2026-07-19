@@ -14,21 +14,20 @@ import LinkExtension from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import {
-  Bold,
-  Code,
-  Heading1,
-  Heading2,
-  Heading3,
-  Italic,
-  Link as LinkIcon,
-  List,
-  ListOrdered,
-  Minus,
-  Quote,
-  Strikethrough,
-} from "lucide-react";
-import { cn } from "next-vibe/core/utils/utils";
+import { type IconComponent } from "next-vibe/ui/lib/helper";
+import { Bold } from "next-vibe/ui/ui/icons/Bold";
+import { Code } from "next-vibe/ui/ui/icons/Code";
+import { Heading1 } from "next-vibe/ui/ui/icons/Heading1";
+import { Heading2 } from "next-vibe/ui/ui/icons/Heading2";
+import { Heading3 } from "next-vibe/ui/ui/icons/Heading3";
+import { Italic } from "next-vibe/ui/ui/icons/Italic";
+import { Link as LinkIcon } from "next-vibe/ui/ui/icons/Link";
+import { List } from "next-vibe/ui/ui/icons/List";
+import { ListOrdered } from "next-vibe/ui/ui/icons/ListOrdered";
+import { Minus } from "next-vibe/ui/ui/icons/Minus";
+import { Quote } from "next-vibe/ui/ui/icons/Quote";
+import { Strikethrough } from "next-vibe/ui/ui/icons/Strikethrough";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 import { useCallback, useEffect, useRef } from "react";
 import {
@@ -395,7 +394,7 @@ function ToolbarButton({
 
 // ─── Toolbar config ─────────────────────────────────────────────────
 interface ToolbarItemConfig {
-  Icon: React.FC<{ className?: string }>;
+  Icon: IconComponent;
   fallbackLabel: string;
   isActive: (editor: EditorInstance) => boolean;
   command: (editor: EditorInstance) => void;

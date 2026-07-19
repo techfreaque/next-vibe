@@ -28,16 +28,16 @@ import {
   TaskOutputModeDB,
 } from "next-vibe/tasks/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   backButton,
-  customWidgetObject,
   objectField,
   requestField,
   requestUrlPathParamsField,
   responseField,
   submitButton,
   widgetField,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { taskInputSchema, taskOwnerSchema } from "../db";
@@ -821,8 +821,7 @@ const { PUT } = createEndpoint({
   options: {
     mutationOptions: {
       onSuccess: async ({ responseData, pathParams, logger }) => {
-        const { apiClient } =
-          await import("next-vibe/platforms/react/hooks/store");
+        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
         const tasksDef = await import("next-vibe/tasks/cron/tasks/definition");
         const queueDef = await import("next-vibe/tasks/cron/queue/definition");
         const updatedTask = responseData.task;
@@ -1027,8 +1026,7 @@ const { DELETE } = createEndpoint({
   options: {
     mutationOptions: {
       onSuccess: async ({ pathParams, logger }) => {
-        const { apiClient } =
-          await import("next-vibe/platforms/react/hooks/store");
+        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
         const tasksDef = await import("next-vibe/tasks/cron/tasks/definition");
         const queueDef = await import("next-vibe/tasks/cron/queue/definition");
 

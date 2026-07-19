@@ -14,11 +14,9 @@ import { ModelSelectionType } from "next-vibe/agent/skills/enum";
 import type { FavoriteConfig } from "next-vibe/agent/skills/favorites/db";
 import { ChatFavoritesRepositoryClient } from "next-vibe/agent/skills/favorites/repository-client";
 import type { TtsModelId } from "next-vibe/agent/text-to-speech/models";
+import { platform } from "next-vibe/core/env-client";
 import { success } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
-import { cn } from "next-vibe/core/utils/utils";
-import { executeQuery } from "next-vibe/platforms/react/hooks/query-executor";
-import { apiClient } from "next-vibe/platforms/react/hooks/store";
 import { getElementById, querySelector } from "next-vibe/ui/lib/dom";
 import { getCurrentUrl, silentReplaceState } from "next-vibe/ui/lib/location";
 import { Button } from "next-vibe/ui/ui/button";
@@ -27,6 +25,7 @@ import { Div } from "next-vibe/ui/ui/div";
 import { ErrorBoundary } from "next-vibe/ui/ui/error-boundary";
 import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
 import { Span } from "next-vibe/ui/ui/span";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetEndpointMutations,
   useWidgetForm,
@@ -35,6 +34,8 @@ import {
   useWidgetSelector,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { executeQuery } from "next-vibe/unified-ui/hooks/query-executor";
+import { apiClient } from "next-vibe/unified-ui/hooks/store";
 import type { JSX } from "react";
 import {
   useCallback,
@@ -56,7 +57,6 @@ import {
   buildMessagePath,
   getRootMessages,
 } from "@/_pages/chat/lib/utils/thread-builder";
-import { platform } from "@/env/env-client";
 
 import type { MessageMetadata } from "../../../../db";
 import { NEW_MESSAGE_ID, ViewMode } from "../../../../enum";

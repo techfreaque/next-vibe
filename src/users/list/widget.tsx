@@ -6,7 +6,6 @@
 "use client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
-import { cn } from "next-vibe/core/utils/utils";
 import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -22,6 +21,7 @@ import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
 import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
 import { UserPlus } from "next-vibe/ui/ui/icons/UserPlus";
 import { Span } from "next-vibe/ui/ui/span";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetContext,
@@ -32,9 +32,9 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field/widget";
-import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
+import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import React, { useCallback } from "react";
 
 import {

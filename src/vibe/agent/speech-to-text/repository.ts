@@ -163,7 +163,7 @@ export class SpeechToTextRepository {
     logger: EndpointLogger,
     sttModelSelection: SttModelSelection | SttModelId | null,
     /** Fixture chain of the calling stream — provider calls bind it. */
-    streamContext: ToolExecutionContext,
+    toolExecutionContext: ToolExecutionContext,
   ): Promise<ResponseType<SpeechToTextPostResponseOutput>> {
     const t = sttScopedTranslation.scopedT(locale).t;
     const language = getLanguageFromLocale(locale);
@@ -243,7 +243,7 @@ export class SpeechToTextRepository {
 
     // One fixture-aware fetch per transcription - carries the repeat counter
     // for poll loops, so it must not be recreated per call.
-    const fetchImpl = createFixtureFetch(streamContext, logger);
+    const fetchImpl = createFixtureFetch(toolExecutionContext, logger);
 
     try {
       // Fan out chunks up to CHUNK_CONCURRENCY in parallel, preserve order

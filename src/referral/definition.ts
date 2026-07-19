@@ -23,7 +23,7 @@ import {
   responseField,
   submitButton,
   widgetField,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import type { CodesListGetResponseOutput } from "./codes/list/definition";
@@ -50,8 +50,7 @@ export const { POST } = createEndpoint({
   options: {
     mutationOptions: {
       onSuccess: async (data) => {
-        const { apiClient } =
-          await import("next-vibe/platforms/react/hooks/store");
+        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
         const codesListDefinition = await import("./codes/list/definition");
 
         // Get the new code from request

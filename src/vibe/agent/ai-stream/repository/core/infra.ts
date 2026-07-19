@@ -31,7 +31,7 @@ export class ProviderFactory {
      * Fixture record/replay context of the execution chain (tests only) —
      * bound ONCE here into the provider's fetch. Absent = plain live fetch.
      */
-    streamContext: ToolExecutionContext,
+    toolExecutionContext: ToolExecutionContext,
   ): ReturnType<
     | typeof createOpenRouter
     | typeof createUncensoredAI
@@ -40,10 +40,10 @@ export class ProviderFactory {
     | typeof createVeniceAI
     | typeof createClaudeCode
   > {
-    const fetchImpl = createFixtureFetch(streamContext, logger);
+    const fetchImpl = createFixtureFetch(toolExecutionContext, logger);
     switch (modelOption.apiProvider) {
       case ApiProvider.CLAUDE_CODE:
-        return createClaudeCode(logger, undefined, streamContext);
+        return createClaudeCode(logger, undefined, toolExecutionContext);
 
       case ApiProvider.UNCENSORED_AI:
         return createUncensoredAI(logger, fetchImpl);

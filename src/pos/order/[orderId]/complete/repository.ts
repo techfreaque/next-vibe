@@ -222,7 +222,7 @@ export class PosOrderCompleteRepository {
 
                 // Generate entry number
                 const now = new Date();
-                const entryNumber = `POS-${now.toISOString().slice(0, 10).replace(/-/g, "")}-${now.getTime().toString().slice(-8)}`;
+                const entryNumber = `POS-${now.toISOString().slice(0, 10).replaceAll(/-/g, "")}-${now.getTime().toString().slice(-8)}`;
 
                 const [entry] = await db
                   .insert(journalEntries)

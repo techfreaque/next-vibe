@@ -8,8 +8,6 @@ import "server-only";
 import { and, asc, eq, inArray, or, sql } from "drizzle-orm";
 import { getInstanceAvailability } from "next-vibe/agent/env-availability";
 import type { VoiceModelSelection } from "next-vibe/agent/text-to-speech/models";
-import type { Platform } from "next-vibe/core/definition/platform";
-import { isAgentPlatform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { RemoteEventHandlerProps } from "next-vibe/core/route/handler";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -23,6 +21,8 @@ import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import type { Platform } from "next-vibe/platforms/platforms";
+import { isAgentPlatform } from "next-vibe/platforms/platforms";
 import { createEndpointEmitter } from "next-vibe/realtime/emitter";
 
 import { chatSettings } from "../../chat/settings/db";

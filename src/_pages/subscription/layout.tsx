@@ -1,7 +1,6 @@
 export const dynamic = "force-dynamic";
 
 import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
-import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -10,6 +9,7 @@ import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import type { StandardUserType } from "next-vibe/identity/user/types";
 import { createEndpointLogger } from "next-vibe/logger/server";
+import { Platform } from "next-vibe/platforms/platforms";
 import { Div } from "next-vibe/ui/ui/div";
 import { PageLayout } from "next-vibe/ui/ui/page-layout";
 import type { JSX, ReactNode } from "react";

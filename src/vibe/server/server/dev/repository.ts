@@ -11,8 +11,10 @@ import { execSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeSync } from "node:fs";
 import { basename, join } from "node:path";
 
+import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
+import { databaseEnv } from "next-vibe/database/env";
 import { DatabaseGenerateRepository } from "next-vibe/database/generate/repository";
 import { closeDatabase, reopenDatabase } from "next-vibe/database/index";
 import { DatabaseMigrationRepository } from "next-vibe/database/migrate/repository";
@@ -47,7 +49,7 @@ import { DEV_WATCHER_TASK_NAME } from "next-vibe/tasks/dev-watcher/constants";
 import { UnifiedTaskRunnerRepository } from "next-vibe/tasks/unified-runner/repository";
 import type { Task } from "next-vibe/tasks/unified-runner/types";
 
-import { env } from "@/env/env";
+import { GENERATED_DIR } from "@/env/paths";
 
 import { ServerFramework } from "../enum";
 import {
@@ -253,7 +255,7 @@ export class DevRepository {
         const { Pool } = await import("pg");
 
         const pool = new Pool({
-          connectionString: env.DATABASE_URL,
+          connectionString: databaseEnv.DATABASE_URL,
           connectionTimeoutMillis: 5000,
         });
 
@@ -457,7 +459,7 @@ export class DevRepository {
     const port =
       data.port ??
       (isLocalDev ? LOCAL_BASE_PORT : undefined) ??
-      DevRepository.portFromUrl(env.NEXT_PUBLIC_APP_URL) ??
+      DevRepository.portFromUrl(coreEnv.NEXT_PUBLIC_APP_URL) ??
       3000;
 
     // Patch NEXT_PUBLIC_APP_URL to reflect the actual port.
@@ -964,8 +966,8 @@ export class DevRepository {
       }
     }
 
-    const { env: serverEnv } = await import("@/env/env");
-    const disableProxy = serverEnv.VIBE_DISABLE_PROXY;
+    const { serverSystemEnv } = await import("next-vibe/server/server/env");
+    const disableProxy = serverSystemEnv.VIBE_DISABLE_PROXY;
 
     // Import WS module to get NEXT_PORT_OFFSET
     const { startWebSocketServer, NEXT_PORT_OFFSET } =
@@ -1225,7 +1227,7 @@ export class DevRepository {
       // plugin scans it - it will throw ENOENT if the folder is missing.
       const routesDir = join(
         process.cwd(),
-        "src/generated/app-tanstack/routes",
+        `${GENERATED_DIR}/app-tanstack/routes`,
       );
       if (!existsSync(routesDir)) {
         mkdirSync(routesDir, { recursive: true });

@@ -7,12 +7,14 @@
 
 /* eslint-disable prettier/prettier */
 
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type { RegistryRouteModule } from "next-vibe/realtime/ws-channel-registry";
 
 export interface RemoteEventRouteEntry {
-  path: readonly string[];
+  /** The endpoint definition: canonical path to match on, schemas to gate the envelope. */
+  endpoint: CreateApiEndpointAny;
   method: string;
-  /** Loading the route module registers its onRemoteEvent handlers. */
+  /** Loading the route module gives access to its onRemoteEvent handlers. */
   importRoute: () => Promise<RegistryRouteModule>;
 }
 
@@ -21,6 +23,11 @@ export interface RemoteEventRouteEntry {
  * its canonical definition path — the bridge dispatch force-loads the target
  * route through this registry when a relayed event arrives before anything
  * imported the route in this process.
+ *
+ * Definition modules are imported eagerly (lightweight, side-effect-free) so the
+ * dispatch has the endpoint's path and schemas without loading route code; route
+ * modules are imported lazily, only once an event actually targets them. Mirrors
+ * the ws-channels registry.
  */
 export async function getRemoteEventRoutes(): Promise<RemoteEventRouteEntry[]> {
   const [
@@ -69,102 +76,102 @@ export async function getRemoteEventRoutes(): Promise<RemoteEventRouteEntry[]> {
 
   return [
     {
-      path: vibe_agent_chat_folder_contents_rootFolderId_GETDef.default.GET.path,
+      endpoint: vibe_agent_chat_folder_contents_rootFolderId_GETDef.default.GET,
       method: "GET",
       importRoute: () => import("@/vibe/agent/chat/folder-contents/[rootFolderId]/route"),
     },
     {
-      path: vibe_agent_chat_threads_GETDef.default.GET.path,
+      endpoint: vibe_agent_chat_threads_GETDef.default.GET,
       method: "GET",
       importRoute: () => import("@/vibe/agent/chat/threads/route"),
     },
     {
-      path: vibe_agent_chat_threads_POSTDef.default.POST.path,
+      endpoint: vibe_agent_chat_threads_POSTDef.default.POST,
       method: "POST",
       importRoute: () => import("@/vibe/agent/chat/threads/route"),
     },
     {
-      path: vibe_agent_chat_threads_threadId_DELETEDef.default.DELETE.path,
+      endpoint: vibe_agent_chat_threads_threadId_DELETEDef.default.DELETE,
       method: "DELETE",
       importRoute: () => import("@/vibe/agent/chat/threads/[threadId]/route"),
     },
     {
-      path: vibe_agent_chat_threads_threadId_messages_GETDef.default.GET.path,
+      endpoint: vibe_agent_chat_threads_threadId_messages_GETDef.default.GET,
       method: "GET",
       importRoute: () => import("@/vibe/agent/chat/threads/[threadId]/messages/route"),
     },
     {
-      path: vibe_agent_chat_threads_threadId_PATCHDef.default.PATCH.path,
+      endpoint: vibe_agent_chat_threads_threadId_PATCHDef.default.PATCH,
       method: "PATCH",
       importRoute: () => import("@/vibe/agent/chat/threads/[threadId]/route"),
     },
     {
-      path: vibe_agent_cortex_delete_DELETEDef.default.DELETE.path,
+      endpoint: vibe_agent_cortex_delete_DELETEDef.default.DELETE,
       method: "DELETE",
       importRoute: () => import("@/vibe/agent/cortex/delete/route"),
     },
     {
-      path: vibe_agent_cortex_edit_PATCHDef.default.PATCH.path,
+      endpoint: vibe_agent_cortex_edit_PATCHDef.default.PATCH,
       method: "PATCH",
       importRoute: () => import("@/vibe/agent/cortex/edit/route"),
     },
     {
-      path: vibe_agent_cortex_mkdir_POSTDef.default.POST.path,
+      endpoint: vibe_agent_cortex_mkdir_POSTDef.default.POST,
       method: "POST",
       importRoute: () => import("@/vibe/agent/cortex/mkdir/route"),
     },
     {
-      path: vibe_agent_cortex_move_POSTDef.default.POST.path,
+      endpoint: vibe_agent_cortex_move_POSTDef.default.POST,
       method: "POST",
       importRoute: () => import("@/vibe/agent/cortex/move/route"),
     },
     {
-      path: vibe_agent_cortex_write_POSTDef.default.POST.path,
+      endpoint: vibe_agent_cortex_write_POSTDef.default.POST,
       method: "POST",
       importRoute: () => import("@/vibe/agent/cortex/write/route"),
     },
     {
-      path: vibe_agent_skills_create_POSTDef.default.POST.path,
+      endpoint: vibe_agent_skills_create_POSTDef.default.POST,
       method: "POST",
       importRoute: () => import("@/vibe/agent/skills/create/route"),
     },
     {
-      path: vibe_agent_skills_favorites_create_POSTDef.default.POST.path,
+      endpoint: vibe_agent_skills_favorites_create_POSTDef.default.POST,
       method: "POST",
       importRoute: () => import("@/vibe/agent/skills/favorites/create/route"),
     },
     {
-      path: vibe_agent_skills_favorites_id_DELETEDef.default.DELETE.path,
+      endpoint: vibe_agent_skills_favorites_id_DELETEDef.default.DELETE,
       method: "DELETE",
       importRoute: () => import("@/vibe/agent/skills/favorites/[id]/route"),
     },
     {
-      path: vibe_agent_skills_favorites_id_PATCHDef.default.PATCH.path,
+      endpoint: vibe_agent_skills_favorites_id_PATCHDef.default.PATCH,
       method: "PATCH",
       importRoute: () => import("@/vibe/agent/skills/favorites/[id]/route"),
     },
     {
-      path: vibe_agent_skills_favorites_reorder_POSTDef.default.POST.path,
+      endpoint: vibe_agent_skills_favorites_reorder_POSTDef.default.POST,
       method: "POST",
       importRoute: () => import("@/vibe/agent/skills/favorites/reorder/route"),
     },
     {
-      path: vibe_agent_skills_id_DELETEDef.default.DELETE.path,
+      endpoint: vibe_agent_skills_id_DELETEDef.default.DELETE,
       method: "DELETE",
       importRoute: () => import("@/vibe/agent/skills/[id]/route"),
     },
     {
-      path: vibe_agent_skills_id_PATCHDef.default.PATCH.path,
+      endpoint: vibe_agent_skills_id_PATCHDef.default.PATCH,
       method: "PATCH",
       importRoute: () => import("@/vibe/agent/skills/[id]/route"),
     },
     {
-      path: vibe_agent_skills_id_publish_PATCHDef.default.PATCH.path,
+      endpoint: vibe_agent_skills_id_publish_PATCHDef.default.PATCH,
       method: "PATCH",
       importRoute: () => import("@/vibe/agent/skills/[id]/publish/route"),
     },
     {
-      path: vibe_execute_tool_POSTDef.default.POST.path,
+      endpoint: vibe_execute_tool_POSTDef.default.POST,
       method: "POST",
       importRoute: () => import("@/vibe/execute-tool/route"),
     },

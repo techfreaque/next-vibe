@@ -14,10 +14,6 @@ export const { tools } = endpointsHandler({
   endpoint: builderEndpoints,
   [Methods.POST]: {
     handler: async ({ data, logger, t }) =>
-      (
-        await import(
-          /* turbopackIgnore: true */ /* webpackIgnore: true */ "./repository"
-        )
-      ).builderRepository.execute(data, logger, t),
+      (await import("./repository")).builderRepository.execute(data, logger, t),
   },
 });

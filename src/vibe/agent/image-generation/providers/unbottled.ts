@@ -24,9 +24,10 @@ export async function generateImageWithUnbottled(params: {
   locale: CountryLanguage;
   featureLabel: string;
   /** Caller's tool-execution context — the fixture chain rides it into the provider dispatch. */
-  streamContext: ToolExecutionContext;
+  toolExecutionContext: ToolExecutionContext;
 }): Promise<ResponseType<{ imageUrl: string; creditCost: number }>> {
-  const { input, user, logger, locale, featureLabel, streamContext } = params;
+  const { input, user, logger, locale, featureLabel, toolExecutionContext } =
+    params;
 
   const remoteResult = await RouteExecuteRepository.runAsSystemProvider({
     definition: definitions.POST,
@@ -34,7 +35,7 @@ export async function generateImageWithUnbottled(params: {
     user,
     locale,
     logger,
-    streamContext,
+    toolExecutionContext,
   });
 
   if (!remoteResult.success) {

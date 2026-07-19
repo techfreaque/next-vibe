@@ -62,7 +62,7 @@ export class GapFillExecutor {
     user: JwtPayloadType;
     locale: CountryLanguage;
     /** Fixture chain of the owning stream — vision-bridge model calls bind it. */
-    streamContext: ToolExecutionContext;
+    toolExecutionContext: ToolExecutionContext;
   }): Promise<ModelMessage[]> {
     const {
       messages,
@@ -88,7 +88,7 @@ export class GapFillExecutor {
       user,
       locale,
       availability,
-      streamContext: params.streamContext,
+      toolExecutionContext: params.toolExecutionContext,
     };
 
     // ── Deterministic fixture ordinals for the parallel fan-out ─────────────
@@ -97,12 +97,12 @@ export class GapFillExecutor {
     // is nondeterministic. We therefore enumerate the bridge jobs in a STABLE
     // order (message index, then part index), reserve one fixture ordinal per
     // job UP FRONT, and hand each racing call its own pinned ordinal via a
-    // cloned streamContext. No-op outside a fixture run (reserve returns []).
+    // cloned toolExecutionContext. No-op outside a fixture run (reserve returns []).
     const bridgeKeys = GapFillExecutor.planBridgeKeys(messages, activeModel);
     const reserved =
-      bridge.streamContext?.threadId && bridgeKeys.length > 0
+      bridge.toolExecutionContext?.threadId && bridgeKeys.length > 0
         ? await reserveFixtureOrdinals(
-            bridge.streamContext.threadId,
+            bridge.toolExecutionContext.threadId,
             bridgeKeys.length,
           )
         : [];
@@ -116,12 +116,15 @@ export class GapFillExecutor {
     // Clone the shared bridge context, pinning the fixture ordinal for one call.
     const pinBridge = (key: string): typeof bridge => {
       const ord = ordinalByKey.get(key);
-      if (ord === undefined || !bridge.streamContext) {
+      if (ord === undefined || !bridge.toolExecutionContext) {
         return bridge;
       }
       return {
         ...bridge,
-        streamContext: { ...bridge.streamContext, fixtureOrdinal: ord },
+        toolExecutionContext: {
+          ...bridge.toolExecutionContext,
+          fixtureOrdinal: ord,
+        },
       };
     };
 
@@ -272,9 +275,9 @@ export class GapFillExecutor {
       MEDIA_TOOL_NAMES,
     );
     const p2Reserved =
-      bridge.streamContext?.threadId && p2Keys.length > 0
+      bridge.toolExecutionContext?.threadId && p2Keys.length > 0
         ? await reserveFixtureOrdinals(
-            bridge.streamContext.threadId,
+            bridge.toolExecutionContext.threadId,
             p2Keys.length,
           )
         : [];

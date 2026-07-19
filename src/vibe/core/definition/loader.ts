@@ -1,5 +1,6 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { permissionsRegistry } from "next-vibe/core/permissions/registry";
+import { scopedTranslation } from "next-vibe/core/i18n/shared";
+import { permissionsRegistry } from "next-vibe/core/route/definitions-registry";
 import {
   ErrorResponseTypes,
   fail,
@@ -9,13 +10,12 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import type { Platform } from "next-vibe/platforms/platforms";
 import { reloadPage } from "next-vibe/ui/lib/location";
 
-import { scopedTranslation } from "@/_pages/shared/i18n";
 import { getEndpoint as globalGetEndpoint } from "@/generated/endpoints/endpoint";
 
 import type { CreateApiEndpointAny } from "./endpoint-base";
-import type { Platform } from "./platform";
 
 export type GetEndpointFn = (
   path: string,

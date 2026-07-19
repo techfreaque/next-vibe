@@ -24,7 +24,7 @@ export const { POST, tools } = endpointsHandler({
       logger,
       user,
       request,
-      streamContext,
+      toolExecutionContext,
     }) =>
       AiStreamRepository.createAiStream({
         data,
@@ -33,7 +33,7 @@ export const { POST, tools } = endpointsHandler({
         logger,
         user,
         request,
-        subAgentDepth: streamContext.subAgentDepth,
+        subAgentDepth: toolExecutionContext.subAgentDepth,
       }),
   },
 });

@@ -33,8 +33,6 @@ import { useTourState } from "next-vibe/agent/chat/tour-state";
 import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import { ModelCreditDisplay } from "next-vibe/agent/models/widget/model-credit-display";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { cn } from "next-vibe/core/utils/utils";
-import { apiClient } from "next-vibe/platforms/react/hooks/store";
 import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
 import { Div, type DivRefObject } from "next-vibe/ui/ui/div";
@@ -55,6 +53,7 @@ import {
   PopoverTrigger,
 } from "next-vibe/ui/ui/popover";
 import { Span } from "next-vibe/ui/ui/span";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   arrayFieldPath,
   withValue,
@@ -65,13 +64,14 @@ import {
   useWidgetNavigation,
   useWidgetSelector,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import BadgeWidget from "next-vibe/unified-ui/display-only/badge/widget";
-import IconWidget from "next-vibe/unified-ui/display-only/icon/widget";
-import TextWidget from "next-vibe/unified-ui/display-only/text/widget";
+import { apiClient } from "next-vibe/unified-ui/hooks/store";
+import BadgeWidget from "next-vibe/unified-ui/widgets/display-only/badge/widget";
+import IconWidget from "next-vibe/unified-ui/widgets/display-only/icon/widget";
+import TextWidget from "next-vibe/unified-ui/widgets/display-only/text/widget";
 import {
   Icon,
   type IconKey,
-} from "next-vibe/unified-ui/form-fields/icon-field/icons";
+} from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import React, { useCallback, useMemo, useState } from "react";
 
 import { ChatSettingsRepositoryClient } from "../../chat/settings/repository-client";

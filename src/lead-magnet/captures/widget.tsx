@@ -41,7 +41,7 @@ function downloadCsv(items: CaptureItem[]): void {
   ]);
   const csv = [header, ...rows]
     .map((row) =>
-      row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","),
+      row.map((cell) => `"${String(cell).replaceAll(/"/g, '""')}"`).join(","),
     )
     .join("\n");
 

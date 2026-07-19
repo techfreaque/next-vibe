@@ -22,19 +22,20 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { Platform } from "next-vibe/core/definition/platform";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
 import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { identityEnv } from "next-vibe/identity/env";
 import { leadDb } from "next-vibe/identity/lead/db";
 import { UserRoleDB } from "next-vibe/identity/roles/enum";
 import { userRoles } from "next-vibe/identity/user/db";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { Platform } from "next-vibe/platforms/platforms";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import closePageEndpoints from "@/browser/close-page/definition";
@@ -52,7 +53,6 @@ import selectPageEndpoints from "@/browser/select-page/definition";
 import takeScreenshotEndpoints from "@/browser/take-screenshot/definition";
 import takeSnapshotEndpoints from "@/browser/take-snapshot/definition";
 import waitForEndpoints from "@/browser/wait-for/definition";
-import { env } from "@/env/env";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -126,7 +126,7 @@ async function run<TDef extends CreateApiEndpointAny>(
     endpoint: definition,
     data: input as CreateApiEndpointAny["types"]["RequestOutput"],
     user,
-    streamContext: undefined,
+    toolExecutionContext: undefined,
   });
   if (!result.success) {
     return {
@@ -272,10 +272,10 @@ describe("Browser Tools", () => {
       return;
     }
 
-    const resolved = await resolveUser(env.VIBE_ADMIN_USER_EMAIL);
+    const resolved = await resolveUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
     expect(
       resolved,
-      `${env.VIBE_ADMIN_USER_EMAIL} not found — run: vibe dev`,
+      `${identityEnv.VIBE_ADMIN_USER_EMAIL} not found — run: vibe dev`,
     ).toBeTruthy();
     if (!resolved) {
       return;

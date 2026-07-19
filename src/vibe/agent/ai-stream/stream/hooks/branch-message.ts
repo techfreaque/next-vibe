@@ -10,7 +10,7 @@ import type { FavoriteConfig } from "next-vibe/agent/skills/favorites/db";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { apiClient } from "next-vibe/platforms/react/hooks/store";
+import { apiClient } from "next-vibe/unified-ui/hooks/store";
 
 import type { StartStreamFn } from "./shared";
 import { createAndSendUserMessage } from "./shared";

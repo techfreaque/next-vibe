@@ -27,7 +27,7 @@ import { Users } from "next-vibe/ui/ui/icons/Users";
 import { Link } from "next-vibe/ui/ui/link";
 import { Span } from "next-vibe/ui/ui/span";
 import { H1, H2, H3, Muted, P } from "next-vibe/ui/ui/typography";
-import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";

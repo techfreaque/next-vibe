@@ -3,13 +3,13 @@
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { UseNavigationStackReturn } from "next-vibe/platforms/react/hooks/use-navigation-stack";
 import { useRouter, useSearchParams } from "next-vibe/ui/hooks/use-navigation";
 import { Alert, AlertDescription, AlertTitle } from "next-vibe/ui/ui/alert";
 import { Container } from "next-vibe/ui/ui/container";
 import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
 import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
-import { EndpointsPage } from "next-vibe/unified-ui/renderers/react/EndpointsPage";
+import type { UseNavigationStackReturn } from "next-vibe/unified-ui/hooks/use-navigation-stack";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 import { useMemo } from "react";
 

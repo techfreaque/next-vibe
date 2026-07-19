@@ -2,7 +2,7 @@
  * Title Component for React Native
  * Provides semantic heading levels with responsive sizing
  */
-import { cn } from "next-vibe/core/utils/utils";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { TextStyle } from "react-native";
 import { Text as RNText } from "react-native";
 

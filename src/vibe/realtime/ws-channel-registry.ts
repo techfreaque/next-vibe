@@ -20,7 +20,10 @@
  */
 
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { GenericHandlerBase } from "next-vibe/core/route/handler";
+import type {
+  GenericHandlerBase,
+  OnRemoteEventDispatchMap,
+} from "next-vibe/core/route/handler";
 
 export interface WsChannelEntry {
   endpoint: CreateApiEndpointAny;
@@ -50,18 +53,26 @@ export const userChannelResolver: NonNullable<
 > = () => ({ kind: "user" });
 
 /**
- * A route module as the registry consumes it — only the `tools` map matters, and
- * within it only `resolveChannel`. The resolver is accepted via a method
- * declaration (`bivarianceHack`) so a route's CONCRETE resolver — narrower
- * urlPathParams/requestData than the erased base — is assignable here without a
- * cast: TypeScript treats method parameters bivariantly, which is exactly the
- * variance we want at this type-erased registration boundary. Generic over the
- * route module so each `import("…/route")` keeps its own type.
+ * A route module as the registries consume it — only the `tools` map matters, and
+ * within it only the server-side callbacks (`resolveChannel`, `onRemoteEvent`).
+ * The endpoint definition is NOT read from here: both registries carry it on their
+ * own generated entry, imported straight from the definition module, so a route
+ * never has to smuggle its definition through the handler object.
+ *
+ * The resolver is accepted via a method declaration (`bivarianceHack`) so a
+ * route's CONCRETE resolver — narrower urlPathParams/requestData than the erased
+ * base — is assignable here without a cast: TypeScript treats method parameters
+ * bivariantly, which is exactly the variance we want at this type-erased
+ * registration boundary. Generic over the route module so each
+ * `import("…/route")` keeps its own type.
  */
 export interface RegistryRouteModule {
   tools: Record<
     string,
-    | { resolveChannel?: NonNullable<GenericHandlerBase["resolveChannel"]> }
+    | {
+        resolveChannel?: NonNullable<GenericHandlerBase["resolveChannel"]>;
+        onRemoteEvent?: OnRemoteEventDispatchMap;
+      }
     | undefined
   >;
 }

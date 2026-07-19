@@ -1,5 +1,5 @@
 import { useTranslation } from "next-vibe/core/i18n/core/client";
-import { cn } from "next-vibe/core/utils/utils";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import * as React from "react";
 import { Pressable, View } from "react-native";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";

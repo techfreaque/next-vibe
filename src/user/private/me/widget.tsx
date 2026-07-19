@@ -3,6 +3,7 @@
 import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import skillsDef from "next-vibe/agent/skills/definition";
 import { SkillOwnershipType } from "next-vibe/agent/skills/enum";
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import { scopedTranslation as userRoleScopedTranslation } from "next-vibe/identity/roles/i18n";
 import { useRouter } from "next-vibe/ui/hooks/use-navigation";
 import { assignUrl } from "next-vibe/ui/lib/location";
@@ -43,13 +44,15 @@ import {
   useWidgetTranslation,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { BooleanFieldWidget } from "next-vibe/unified-ui/form-fields/boolean-field/widget";
-import { ColorFieldWidget } from "next-vibe/unified-ui/form-fields/color-field/widget";
-import { FileFieldWidget } from "next-vibe/unified-ui/form-fields/file-field/widget";
-import { MarkdownTextareaFieldWidget } from "next-vibe/unified-ui/form-fields/markdown-textarea-field/widget";
-import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
-import { UrlFieldWidget } from "next-vibe/unified-ui/form-fields/url-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
+import { apiClient } from "next-vibe/unified-ui/hooks/store";
+import { useApiQuery } from "next-vibe/unified-ui/hooks/use-api-query";
+import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
+import { ColorFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/color-field/widget";
+import { FileFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/file-field/widget";
+import { MarkdownTextareaFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/markdown-textarea-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
+import { UrlFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/url-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import {
   type JSX,
   useCallback,
@@ -66,7 +69,6 @@ import {
   ProfileSocialPills,
 } from "@/_pages/creator/[userId]/_shared/profile-content";
 import creditsDef from "@/credits/definition";
-import { envClient } from "@/env/env-client";
 import configDef from "@/lead-magnet/config/definition";
 import subscriptionDef from "@/subscription/definition";
 import { SubscriptionStatus } from "@/subscription/enum";
@@ -76,8 +78,6 @@ import addressesDef from "@/user/private/me/addresses/definition";
 import passwordDef from "@/user/private/me/password/definition";
 import sessionsDef from "@/user/private/sessions/definition";
 
-import { apiClient } from "../../../vibe/platforms/react/hooks/store";
-import { useApiQuery } from "../../../vibe/platforms/react/hooks/use-api-query";
 import avatarDef from "./avatar/definition";
 import type meDefinition from "./definition";
 import type { MeGetResponseOutput, MePostRequestOutput } from "./definition";

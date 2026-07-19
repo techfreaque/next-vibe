@@ -12,7 +12,7 @@
  *
  * INTERACTIVE MODE (interactiveMode:true)
  *   Opens a terminal window. Three paths:
- *   1. streamContext.escalateToTask present → tracking task + wakeUp revival
+ *   1. toolExecutionContext.escalateToTask present → tracking task + wakeUp revival
  *   2. cronTaskId present (goroutine) → reuse parent task ID for revival (exists on both instances)
  *   3. CLI/cron → detached spawn, no revival
  */
@@ -79,8 +79,8 @@ function commandExists(cmd: string): boolean {
 }
 
 function buildShellCommand(bin: string, args: string[], cwd: string): string {
-  const escaped = args.map((a) => `'${a.replace(/'/g, "'\\''")}'`);
-  return `cd '${cwd.replace(/'/g, "'\\''")}' && ${bin} ${escaped.join(" ")}`;
+  const escaped = args.map((a) => `'${a.replaceAll("'", "'\\''")}'`);
+  return `cd '${cwd.replaceAll("'", "'\\''")}' && ${bin} ${escaped.join(" ")}`;
 }
 
 export interface TerminalEmulator {
@@ -98,7 +98,7 @@ function detectTerminal(logger: EndpointLogger): TerminalEmulator | undefined {
           const shellCmd = args[0] ?? "";
           return [
             "-e",
-            `tell application "Terminal" to do script "${shellCmd.replace(/"/g, '\\"')}"`,
+            `tell application "Terminal" to do script "${shellCmd.replaceAll('"', '\\"')}"`,
           ];
         },
       };
@@ -265,7 +265,7 @@ export async function runCodingAgent(
   logger: EndpointLogger,
   t: CodingAgentT,
   cronTaskId: string | undefined,
-  streamContext: ToolExecutionContext,
+  toolExecutionContext: ToolExecutionContext,
 ): Promise<ResponseType<CodingAgentResponse>> {
   const timeoutMs = 30 * 60 * 1000;
   const start = Date.now();
@@ -290,15 +290,18 @@ export async function runCodingAgent(
   }
 
   // ── Interactive mode ────────────────────────────────────────────────────────
-  const title = data.taskTitle || data.prompt.slice(0, 80).replace(/\n/g, " ");
+  const title =
+    data.taskTitle || data.prompt.slice(0, 80).replaceAll("\n", " ");
 
   // Path 1: streaming context → escalateToTask
-  if (streamContext.escalateToTask) {
-    const callbackMode = streamContext.callerCallbackMode ?? CallbackMode.WAIT;
-    const { taskId: trackingTaskId } = await streamContext.escalateToTask({
-      callbackMode,
-      displayName: title,
-    });
+  if (toolExecutionContext.escalateToTask) {
+    const callbackMode =
+      toolExecutionContext.callerCallbackMode ?? CallbackMode.WAIT;
+    const { taskId: trackingTaskId } =
+      await toolExecutionContext.escalateToTask({
+        callbackMode,
+        displayName: title,
+      });
 
     const finalArgs = provider.injectTaskContext
       ? provider.injectTaskContext(
@@ -338,11 +341,11 @@ export async function runCodingAgent(
     if (
       (callbackMode === CallbackMode.WAIT ||
         callbackMode === CallbackMode.END_LOOP) &&
-      streamContext
+      toolExecutionContext
     ) {
-      streamContext.waitingForRemoteResult = true;
+      toolExecutionContext.waitingForRemoteResult = true;
       // No timeout - interactive sessions can take arbitrarily long.
-      streamContext.pendingTimeoutMs = 0;
+      toolExecutionContext.pendingTimeoutMs = 0;
       return success({
         output: `Interactive ${provider.bin} session launched. Waiting for completion.`,
         durationMs: Date.now() - start,
@@ -452,7 +455,7 @@ export async function dispatchCodingAgent(
   logger: EndpointLogger,
   t: CodingAgentT,
   cronTaskId: string | undefined,
-  streamContext: ToolExecutionContext,
+  toolExecutionContext: ToolExecutionContext,
 ): Promise<ResponseType<RunResponseOutput>> {
   if (user.isPublic || !user.id) {
     return fail({
@@ -480,6 +483,6 @@ export async function dispatchCodingAgent(
     logger,
     t,
     cronTaskId,
-    streamContext,
+    toolExecutionContext,
   );
 }

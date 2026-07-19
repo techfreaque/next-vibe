@@ -17,8 +17,8 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { apiClient } from "next-vibe/platforms/react/hooks/store";
-import type { IconKey } from "next-vibe/unified-ui/form-fields/icon-field/icons";
+import { apiClient } from "next-vibe/unified-ui/hooks/store";
+import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 
 import type { DefaultFolderId } from "../../config";
 import type { ChatFolder } from "../../db";

@@ -18,7 +18,7 @@ import { MessagesRepository } from "../../../chat/threads/[threadId]/messages/re
 import type { ChatModelId } from "../../models";
 import type { AiStreamT } from "../../stream/i18n";
 import { toAiSdkMessages } from "../context/convert";
-import type { StreamContext } from "../core/stream";
+import type { ToolExecutionContextImpl } from "../core/stream";
 import { buildCompactingInstructions, runCompactingLLM } from "./core";
 
 /**
@@ -36,7 +36,7 @@ export class CompactingHandler {
     threadId: string;
     parentId: string | null;
     sequenceId: string;
-    ctx: StreamContext;
+    ctx: ToolExecutionContextImpl;
     isIncognito: boolean;
     userId: string | undefined;
     user: JwtPayloadType;
@@ -52,7 +52,7 @@ export class CompactingHandler {
     /** Pre-gap-filled history messages. When provided, skip internal MessageConverter call. */
     preFilledHistoryMessages?: Parameters<typeof streamText>[0]["messages"];
     /** Fixture chain of the calling stream — attachment/media downloads bind it. */
-    streamContext: ToolExecutionContext;
+    toolExecutionContext: ToolExecutionContext;
   }): Promise<
     | {
         success: true;
@@ -96,7 +96,7 @@ export class CompactingHandler {
           rootFolderId,
           undefined,
           undefined,
-          params.streamContext,
+          params.toolExecutionContext,
         );
 
     const { CONTEXT_LINE_PREFIX, formatAbsoluteTimestamp } =
@@ -251,7 +251,9 @@ export class CompactingHandler {
         const tokenMatch = /(\d[\d,]+)\s*(?:input\s*)?tokens/i.exec(
           errorObj.message,
         );
-        const tokenCount = tokenMatch ? tokenMatch[1].replace(/,/g, "") : null;
+        const tokenCount = tokenMatch
+          ? tokenMatch[1].replaceAll(",", "")
+          : null;
         const isExpensive =
           isContextLimit &&
           tokenCount !== null &&

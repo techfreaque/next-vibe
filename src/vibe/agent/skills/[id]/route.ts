@@ -19,14 +19,21 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
   },
   [Methods.PATCH]: {
     email: undefined,
-    handler: ({ data, urlPathParams, user, logger, locale, streamContext }) =>
+    handler: ({
+      data,
+      urlPathParams,
+      user,
+      logger,
+      locale,
+      toolExecutionContext,
+    }) =>
       SkillsRepository.updateSkill(
         data,
         urlPathParams,
         user,
         logger,
         locale,
-        streamContext,
+        toolExecutionContext,
       ),
     resolveChannel: (ctx) => SkillsRepository.resolveSubscriptionChannel(ctx),
     onRemoteEvent: {

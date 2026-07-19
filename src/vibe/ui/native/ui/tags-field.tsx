@@ -3,7 +3,7 @@
  * Production-ready multi-select tags input with suggestions and custom values
  */
 import { useTranslation } from "next-vibe/core/i18n/core/client";
-import { cn } from "next-vibe/core/utils/utils";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import React, { useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 

@@ -34,8 +34,8 @@ function slugify(title: string): string {
   return (
     title
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "")
+      .replaceAll(/[^a-z0-9]+/g, "-")
+      .replaceAll(/^-|-$/g, "")
       .slice(0, 60) || "untitled"
   );
 }
@@ -97,7 +97,7 @@ export async function readThreadPath(
   const frontmatterLines = [
     "---",
     `threadId: "${thread.id}"`,
-    `title: "${(thread.title ?? "Untitled").replace(/"/g, '\\"')}"`,
+    `title: "${(thread.title ?? "Untitled").replaceAll('"', '\\"')}"`,
   ];
 
   if (thread.defaultModel) {

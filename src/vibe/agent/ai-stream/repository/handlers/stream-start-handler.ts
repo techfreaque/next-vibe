@@ -17,7 +17,7 @@ import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import type { ToolCall } from "../../../chat/db";
 import type { MessagesWsEmit } from "../../../chat/threads/[threadId]/messages/emitter";
 import type { EmitThreadTitleFn } from "../core/message-db-writer";
-import { StreamContext } from "../core/stream";
+import { ToolExecutionContextImpl } from "../core/stream";
 import {
   createStreamingTTSHandler,
   type StreamingTTSHandler,
@@ -54,10 +54,10 @@ export class StreamStartHandler {
      */
     confirmationParentLeafId: string | undefined;
     /** Fixture chain of the stream — bound onto the dbWriter for embedding-sync. */
-    streamContext: ToolExecutionContext;
+    toolExecutionContext: ToolExecutionContext;
     /** Force a specific sequenceId - used by wakeUp revival to share sequence with deferred tool pair */
     sequenceIdOverride?: string;
-  }): StreamContext {
+  }): ToolExecutionContextImpl {
     const {
       userMessageId,
       effectiveParentMessageId,
@@ -70,7 +70,7 @@ export class StreamStartHandler {
       emitTitle,
       streamRunId,
       confirmationParentLeafId,
-      streamContext,
+      toolExecutionContext,
       sequenceIdOverride,
     } = params;
     const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
@@ -98,7 +98,7 @@ export class StreamStartHandler {
       initialAiParentId ??
       null;
 
-    const ctx = new StreamContext({
+    const ctx = new ToolExecutionContextImpl({
       sequenceId,
       initialParentId: initialParentForContext,
       initialAssistantMessageId: aiMessageId,
@@ -109,7 +109,7 @@ export class StreamStartHandler {
       wsEmit,
       emitTitle,
       streamRunId,
-      streamContext,
+      toolExecutionContext,
     });
 
     // Update last known values for error handling (accessible in catch blocks)
@@ -172,7 +172,7 @@ export class StreamStartHandler {
     emitTitle: EmitThreadTitleFn;
     availability: AgentEnvAvailability;
     /** The stream's fixture chain — TTS provider calls bind record/replay to it. */
-    streamContext: ToolExecutionContext;
+    toolExecutionContext: ToolExecutionContext;
     /** Ownership token for the stream's 'streaming' claim (ToolExecutionContext.streamRunId). */
     streamRunId: string | undefined;
     /** Branch leaf below the last confirmed tool — see initializeContext. */
@@ -180,7 +180,7 @@ export class StreamStartHandler {
     /** Force a specific sequenceId - used by wakeUp revival to share sequence with deferred tool pair */
     sequenceIdOverride?: string;
   }): {
-    ctx: StreamContext;
+    ctx: ToolExecutionContextImpl;
     ttsHandler: StreamingTTSHandler | null;
     emittedToolResultIds: Set<string> | undefined;
   } {
@@ -202,7 +202,7 @@ export class StreamStartHandler {
       emitTitle,
       sequenceIdOverride,
       availability,
-      streamContext,
+      toolExecutionContext,
       streamRunId,
       confirmationParentLeafId,
     } = params;
@@ -220,7 +220,7 @@ export class StreamStartHandler {
       emitTitle,
       streamRunId,
       confirmationParentLeafId,
-      streamContext,
+      toolExecutionContext,
       sequenceIdOverride,
     });
 
@@ -279,7 +279,7 @@ export class StreamStartHandler {
         user,
         enabled: true,
         availability,
-        streamContext,
+        toolExecutionContext,
       });
       ttsHandler.setThreadId(threadId);
       logger.debug("[AI Stream] Voice mode enabled - streaming TTS active", {

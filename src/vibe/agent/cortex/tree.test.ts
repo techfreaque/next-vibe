@@ -13,8 +13,8 @@ import { and, eq, like } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { resolveTestAdminUser } from "next-vibe/tooling/check/testing/testing-suite/resolve-test-user";
-import { sendTestRequest } from "next-vibe/tooling/check/testing/testing-suite/send-test-request";
+import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { cortexNodes } from "./db";
@@ -42,7 +42,7 @@ async function cleanup(userId: string): Promise<void> {
 /** Write a file via the real WRITE endpoint; fails the test if it does not stick. */
 async function writeFile(path: string, content: string): Promise<void> {
   const res = await sendTestRequest({
-    streamContext: undefined,
+    toolExecutionContext: undefined,
     endpoint: writeEndpoint.POST,
     data: { path, content, createParents: true },
     user,
@@ -56,7 +56,7 @@ async function writeFile(path: string, content: string): Promise<void> {
 /** Create a directory via the real MKDIR endpoint; fails the test if it does not stick. */
 async function mkdir(path: string): Promise<void> {
   const res = await sendTestRequest({
-    streamContext: undefined,
+    toolExecutionContext: undefined,
     endpoint: mkdirEndpoint.POST,
     data: { path, createParents: true },
     user,
@@ -72,7 +72,7 @@ function getTree(
   depth: number,
 ): Promise<ResponseType<CortexTreeResponseOutput>> {
   return sendTestRequest({
-    streamContext: undefined,
+    toolExecutionContext: undefined,
     endpoint: treeEndpoint.GET,
     data: { path, depth },
     user,
@@ -213,7 +213,7 @@ describe("Cortex Tree E2E", () => {
 
     // Cross-check entry counts against the live LIST result.
     const listRes = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: listEndpoint.GET,
       data: { path: "/skills" },
       user,
@@ -269,7 +269,7 @@ describe("Cortex Tree E2E", () => {
     }
 
     const listRes = await sendTestRequest({
-      streamContext: undefined,
+      toolExecutionContext: undefined,
       endpoint: listEndpoint.GET,
       data: { path: base },
       user,

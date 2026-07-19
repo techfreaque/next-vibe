@@ -10,8 +10,8 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type {
   EndpointReturn,
   UseEndpointOptions,
-} from "next-vibe/platforms/react/hooks/endpoint-types";
-import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
+} from "next-vibe/unified-ui/hooks/endpoint-types";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 
 import definitions from "./definition";
 

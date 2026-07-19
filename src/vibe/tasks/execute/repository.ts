@@ -8,7 +8,6 @@ import "server-only";
 import { and, eq, isNull, ne, or, sql } from "drizzle-orm";
 import { makeHeadlessContext } from "next-vibe/agent/chat/config";
 import { getFullPath } from "next-vibe/core/core-utils/path";
-import { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -22,6 +21,7 @@ import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { Platform } from "next-vibe/platforms/platforms";
 import { splitTaskArgs } from "next-vibe/tasks/cron/arg-splitter";
 import { cronTasks, dbUserIdToOwner } from "next-vibe/tasks/cron/db";
 import { createTaskEmitters } from "next-vibe/tasks/cron/emitter";
@@ -244,7 +244,7 @@ export class TaskExecuteRepository {
             platform: Platform.CRON,
             cronTaskId: task.id,
             // no user context — UTC (dates not user-facing here)
-            streamContext: makeHeadlessContext(
+            toolExecutionContext: makeHeadlessContext(
               taskAbortController.signal,
               undefined,
               "UTC",

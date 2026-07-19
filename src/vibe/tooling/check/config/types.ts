@@ -145,21 +145,49 @@ interface OxlintConfigOptions {
     builtin?: boolean;
   };
   globals?: Record<string, "readonly" | "writable" | "off">;
+  /**
+   * Per-path rule overrides, passed to oxlint verbatim. Later entries win.
+   *
+   * `rules` only. This used to also declare `categories`, which oxlint rejects
+   * outright — `unknown field 'categories', expected one of 'files', 'env',
+   * 'globals', 'plugins', 'jsPlugins', 'rules'` — so the whole config fails to
+   * parse and nothing lints. A category cannot be scoped to a path here; see
+   * `strictPaths` for how that is done instead.
+   */
   overrides?: Array<{
     files: string[];
     rules?: LintConfigElement;
-    categories?: {
-      correctness?: Severity;
-      suspicious?: Severity;
-      pedantic?: Severity;
-      style?: Severity;
-    };
   }>;
 }
 
 /** Oxlint disabled - no other settings required */
 interface OxlintConfigDisabled {
   enabled: false;
+}
+
+/**
+ * Which paths the *strict* rules are reported for.
+ *
+ * "Strict" means everything this config opts into on top of oxlint's baseline:
+ * every rule listed in `rules` (they are off by default — we turned them on),
+ * plus the `pedantic` category. What stays outside the whitelist is oxlint's own
+ * `correctness`/`suspicious` categories: code that is outright wrong, which is
+ * worth failing on anywhere.
+ *
+ * The scoping cannot live in the oxlint config. oxlint has no way to set a
+ * *category* for a subset of files — `overrides` takes `rules` only, and a
+ * nested `.oxlintrc.json` is ignored whenever `-c` is passed, which the checker
+ * always does. So the rules run everywhere and vibe check drops the issues for
+ * files outside `include`.
+ *
+ * Rules are matched by name against this config's own `rules` block, so the
+ * whitelist stays a list of paths and never needs a parallel rule inventory.
+ */
+export interface StrictPathsConfig {
+  /** Globs where strict issues are reported. Empty means nowhere. */
+  include: string[];
+  /** Globs that opt back out, even inside an `include`. Wins over `include`. */
+  exclude?: string[];
 }
 
 /** Oxlint enabled - required paths */
@@ -171,6 +199,8 @@ interface OxlintConfigEnabled extends OxlintConfigOptions {
   cachePath: string;
   /** File extensions to lint (e.g., [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"]) */
   lintableExtensions: string[];
+  /** Where the strict rules apply. Omitted means nowhere. */
+  strictPaths?: StrictPathsConfig;
 }
 
 export type OxlintConfig = OxlintConfigDisabled | OxlintConfigEnabled;
@@ -227,6 +257,8 @@ interface TypecheckConfigEnabled {
   cachePath: string;
   /** Use tsgo instead of tsc for type checking (default: false uses tsc) */
   useTsgo?: boolean;
+  /** Ignore patterns always applied regardless of extensive mode (glob patterns for tsconfig exclude) */
+  ignorePatterns?: string[];
   /** Extra ignore patterns applied only in non-extensive mode (glob patterns for tsconfig exclude) */
   nonExtensiveIgnorePatterns?: string[];
   /**
@@ -470,7 +502,7 @@ type EslintConfig = EslintConfigDisabled | EslintConfigEnabled;
 
 /** Optional testing settings */
 interface TestingConfigOptions {
-  /** Command to run tests (default: "bunx vitest") */
+  /** Command to run tests (default: vitest via the PACKAGE_MANAGER runner) */
   command?: string;
   /** Timeout for test runs in milliseconds */
   timeout?: number;

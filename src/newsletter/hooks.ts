@@ -8,14 +8,14 @@
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointReturn } from "next-vibe/platforms/react/hooks/endpoint-types";
+import { useLogger } from "next-vibe/ui/hooks/use-logger";
+import type { InputChangeEvent } from "next-vibe/ui/ui/input";
+import type { EndpointReturn } from "next-vibe/unified-ui/hooks/endpoint-types";
 import {
   createCustomStateKey,
   useCustomState,
-} from "next-vibe/platforms/react/hooks/store";
-import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
-import { useLogger } from "next-vibe/ui/hooks/use-logger";
-import type { InputChangeEvent } from "next-vibe/ui/ui/input";
+} from "next-vibe/unified-ui/hooks/store";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { useCallback, useMemo } from "react";
 
 import { scopedTranslation } from "./i18n";

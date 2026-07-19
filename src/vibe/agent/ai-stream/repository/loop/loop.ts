@@ -13,7 +13,7 @@
  * part types to per-part handlers in loop/{text,media,tool}-parts.ts; abort +
  * completion live in loop/finalize.ts. The handlers share the loop's mutable
  * instance state via the StreamLoopState facade (loop/state.ts) — this class
- * implements it and passes itself as the state argument. StreamContext
+ * implements it and passes itself as the state argument. toolExecutionContext
  * remains the shared state store readable by the registry and the
  * orchestrator (index.ts).
  */
@@ -193,9 +193,9 @@ export class StreamLoop implements StreamLoopState {
                   // execution context synchronously inside execute() - read it
                   // here too so the SDK never starts the next step before the
                   // part consumer has bridged it onto the loop context.
-                  this.p.streamContext.stepHasToolsAwaitingConfirmation ===
-                    true ||
-                  this.p.streamContext.waitingForRemoteResult === true
+                  this.p.toolExecutionContext
+                    .stepHasToolsAwaitingConfirmation === true ||
+                  this.p.toolExecutionContext.waitingForRemoteResult === true
               )(),
             ],
             // Per-step message-list override — the official AI SDK hook.
@@ -312,7 +312,7 @@ export class StreamLoop implements StreamLoopState {
       streamAbortController,
       ttsHandler,
       logger,
-      streamContext,
+      toolExecutionContext,
     } = this.p;
 
     if (part.type === "file") {
@@ -477,18 +477,18 @@ export class StreamLoop implements StreamLoopState {
           clearPendingQueueParent: false,
         });
 
-        // Expose the current tool message ID to streamContext.
+        // Expose the current tool message ID to toolExecutionContext.
         // tools-loader execute() wrapper reads from ctx.pendingToolMessages
         // keyed by toolCallId for parallel-safe per-tool lookup.
-        streamContext.currentToolMessageId =
+        toolExecutionContext.currentToolMessageId =
           result.pendingToolMessage.messageId;
 
         // If escalateToTask() fired BEFORE this TOOL message was created (the common
         // case for interactive tools like claude-code), backfill the correct TOOL message
         // ID onto the escalated task row now that we have it.
-        if (streamContext.pendingEscalatedTaskId) {
-          const escalatedId = streamContext.pendingEscalatedTaskId;
-          streamContext.pendingEscalatedTaskId = undefined; // consume it
+        if (toolExecutionContext.pendingEscalatedTaskId) {
+          const escalatedId = toolExecutionContext.pendingEscalatedTaskId;
+          toolExecutionContext.pendingEscalatedTaskId = undefined; // consume it
           const toolMsgId = result.pendingToolMessage.messageId;
           void (async (): Promise<void> => {
             try {
@@ -529,7 +529,7 @@ export class StreamLoop implements StreamLoopState {
         // Updated on every tool-call so it reflects the latest branch tip if
         // multiple sequential tool calls happen in the same step.
         if (result.pendingToolMessage.toolCallData.parentId) {
-          streamContext.leafMessageId =
+          toolExecutionContext.leafMessageId =
             result.pendingToolMessage.toolCallData.parentId;
         }
 
@@ -602,7 +602,7 @@ export class StreamLoop implements StreamLoopState {
       // execution context (it has no LoopContext access). Mirror it onto the
       // loop context so stopWhen/finish-step abort before the AI-response turn,
       // exactly like a direct call to a requiresConfirmation tool.
-      if (streamContext.stepHasToolsAwaitingConfirmation) {
+      if (toolExecutionContext.stepHasToolsAwaitingConfirmation) {
         ctx.stepHasToolsAwaitingConfirmation = true;
       }
       const { effectiveToolCallId, pending } = this.resolvePendingToolMessage(
@@ -659,7 +659,7 @@ export class StreamLoop implements StreamLoopState {
         if (
           ctx.stepHasToolsAwaitingConfirmation &&
           ctx.pendingToolMessages.size === 0 &&
-          !streamContext.waitingForRemoteResult
+          !toolExecutionContext.waitingForRemoteResult
         ) {
           logger.debug(
             "[AI Stream] APPROVE - all tool results in, aborting provider stream before AI response turn",
@@ -677,7 +677,7 @@ export class StreamLoop implements StreamLoopState {
         // the abort signal was checked, consuming an extra fetch-cache counter slot and
         // skewing fixture indices. Deferring to finish-step guarantees no call 2.
         // /report backfills the real result and resume-stream wakes the thread.
-        if (streamContext.waitingForRemoteResult) {
+        if (toolExecutionContext.waitingForRemoteResult) {
           logger.debug(
             "[AI Stream] Remote tool wait mode - deferring abort to finish-step",
             {
@@ -805,7 +805,7 @@ export class StreamLoop implements StreamLoopState {
   /**
    * Resolve the pendingToolMessages entry for a RAW toolCallId as emitted by
    * the provider - routing to the correct de-duplicated key when this raw id
-   * collided within the step (see duplicateToolCallKeys on StreamContext).
+   * collided within the step (see duplicateToolCallKeys on toolExecutionContext).
    * Best-effort FIFO: the Nth tool-result/tool-error for a raw id is assumed
    * to correspond to the Nth tool-call for that raw id, which holds whenever
    * completion order matches call order (true for same-tool same-step calls

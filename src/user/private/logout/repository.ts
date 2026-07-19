@@ -5,7 +5,6 @@
 
 import "server-only";
 
-import type { Platform } from "next-vibe/core/definition/platform";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -19,6 +18,7 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { scopedTranslation as sessionScopedTranslation } from "next-vibe/identity/session/i18n";
 import { SessionRepository } from "next-vibe/identity/session/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import type { Platform } from "next-vibe/platforms/platforms";
 
 import type { LogoutPostResponseOutput } from "./definition";
 import type { LogoutT } from "./i18n";

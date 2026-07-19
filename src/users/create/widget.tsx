@@ -5,7 +5,6 @@
 
 "use client";
 import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
-import { cn } from "next-vibe/core/utils/utils";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -20,21 +19,22 @@ import { Shield } from "next-vibe/ui/ui/icons/Shield";
 import { UserCheck } from "next-vibe/ui/ui/icons/UserCheck";
 import { UserPlus } from "next-vibe/ui/ui/icons/UserPlus";
 import { Span } from "next-vibe/ui/ui/span";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { BooleanFieldWidget } from "next-vibe/unified-ui/form-fields/boolean-field/widget";
-import { EmailFieldWidget } from "next-vibe/unified-ui/form-fields/email-field/widget";
-import { MultiSelectFieldWidget } from "next-vibe/unified-ui/form-fields/multiselect-field/widget";
-import { PasswordFieldWidget } from "next-vibe/unified-ui/form-fields/password-field/widget";
-import { SelectFieldWidget } from "next-vibe/unified-ui/form-fields/select-field/widget";
-import { TextFieldWidget } from "next-vibe/unified-ui/form-fields/text-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe/unified-ui/interactive/submit-button/widget";
+import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
+import { EmailFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/email-field/widget";
+import { MultiSelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/multiselect-field/widget";
+import { PasswordFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/password-field/widget";
+import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import React, { useState } from "react";
 
 import type definition from "./definition";
@@ -196,7 +196,7 @@ export function UserCreateContainer({
                             "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200",
                         )}
                       >
-                        {roleName.replace(/_/g, " ")}
+                        {roleName.replaceAll("_", " ")}
                       </Span>
                     );
                   })}

@@ -30,9 +30,9 @@ import {
 } from "next-vibe/identity/lead/enum";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   backButton,
-  customWidgetObject,
   objectField,
   requestField,
   requestUrlPathParamsField,
@@ -40,7 +40,7 @@ import {
   responseField,
   submitButton,
   widgetField,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { scopedTranslation } from "./i18n";

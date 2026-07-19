@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import type { JWTPublicPayloadType } from "next-vibe/identity/auth/types";
@@ -30,7 +31,6 @@ import {
   GITHUB_REPO_URL,
   PLATFORM_COUNT,
 } from "@/env/constants";
-import { envClient } from "@/env/env-client";
 import { configScopedTranslation } from "@/env/i18n";
 
 import { ContactFormSection } from "../_components/contact-form-section";

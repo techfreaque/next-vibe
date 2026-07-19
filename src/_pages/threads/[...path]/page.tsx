@@ -41,6 +41,7 @@ import { scopedTranslation as threadsScopedTranslation } from "next-vibe/agent/c
 import { ThreadsRepository } from "next-vibe/agent/chat/threads/repository";
 import type { SkillGetResponseOutput } from "next-vibe/agent/skills/[id]/definition";
 import { SkillsRepository } from "next-vibe/agent/skills/repository";
+import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
@@ -56,7 +57,6 @@ import { isUUID, parseChatUrl } from "@/_pages/chat/lib/url-parser";
 import type { CreditsGetResponseOutput } from "@/credits/definition";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
-import { env } from "@/env/env";
 
 import { ThreadsPageClient } from "./page-client";
 
@@ -150,7 +150,7 @@ export async function tanstackLoader({
   }
 
   if (
-    env.NEXT_PUBLIC_LOCAL_MODE &&
+    coreEnv.NEXT_PUBLIC_LOCAL_MODE &&
     user.isPublic &&
     earlyRootFolderId !== DefaultFolderId.INCOGNITO
   ) {

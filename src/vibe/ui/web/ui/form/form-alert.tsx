@@ -1,6 +1,9 @@
-import { AlertCircle, AlertTriangle, CheckCircle, Info } from "lucide-react";
 import type { MessageResponseType } from "next-vibe/core/route/response.schema";
-import { cn } from "next-vibe/core/utils/utils";
+import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
+import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
+import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
+import { Info } from "next-vibe/ui/ui/icons/Info";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 
 import type { StyleType } from "../../../web/utils/style-type";

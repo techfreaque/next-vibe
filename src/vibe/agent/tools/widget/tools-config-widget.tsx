@@ -14,12 +14,10 @@
 "use client";
 import { getDefaultToolIdsForUser } from "next-vibe/agent/chat/constants";
 import type { EnabledTool } from "next-vibe/agent/chat/hooks/store";
-import { cn } from "next-vibe/core/utils/utils";
 import type { HelpToolMetadataSerialized } from "next-vibe/help-tool/definition";
 import helpDefinitions from "next-vibe/help-tool/definition";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { useEndpoint } from "next-vibe/platforms/react/hooks/use-endpoint";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -43,6 +41,8 @@ import {
   TooltipTrigger,
 } from "next-vibe/ui/ui/tooltip";
 import { P } from "next-vibe/ui/ui/typography";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
@@ -143,8 +143,8 @@ function getSubcategory(toolName: string): string {
   return resources
     .map((s: string) =>
       s
-        .replace(/([A-Z])/g, " $1")
-        .replace(/[-]/g, " ")
+        .replaceAll(/([A-Z])/g, " $1")
+        .replaceAll(/[-]/g, " ")
         .trim()
         .replace(/^\w/, (c: string) => c.toUpperCase()),
     )

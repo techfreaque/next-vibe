@@ -231,7 +231,7 @@ export const translations: typeof enTranslations = {
         tryCtaSub: "Darmowe konto. Bez karty kredytowej. Gotowe w 30 sekund.",
         startFree: "Zacznij za darmo",
         alreadyHaveAccount: "Masz juz konto?",
-        copyright: "\u00a9",
+        copyright: "\u00A9",
         allSkills: "Wszystkie skille",
         featuredSkill: "Wyrozniany skill",
         aboutSkill: "O tym skillu",

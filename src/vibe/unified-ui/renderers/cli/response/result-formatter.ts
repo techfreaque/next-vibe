@@ -21,7 +21,7 @@ import React from "react";
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import { renderToString as fastRenderToString } from "../../cli/response/fast-ink-renderer/renderer";
-import { prewarmBuiltinWidgets } from "../../react/WidgetRenderer";
+import { prewarmBuiltinWidgets } from "../../web/WidgetRenderer";
 import { CliErrorFormatter } from "./error-formatter";
 import { CliRenderTree } from "./render-tree";
 

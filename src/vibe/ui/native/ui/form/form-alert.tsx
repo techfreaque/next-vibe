@@ -10,7 +10,7 @@ import {
   CheckCircle,
   Info,
 } from "lucide-react-native";
-import { cn } from "next-vibe/core/utils/utils";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 
 import { convertCSSToViewStyle } from "../../../native/utils/style-converter";

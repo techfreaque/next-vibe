@@ -269,15 +269,23 @@ export function isContentResponse<T>(
 
 export type MessageResponseType = z.infer<typeof messageResponseSchema>;
 
-export interface ErrorResponseType<
+/**
+ * A type alias, NOT an interface: this rides endpoint payloads (e.g. a tool
+ * call's `error`), so it must be assignable to `WidgetData`, whose record arm is
+ * `{ [key: string]: WidgetData }`. TypeScript grants an implicit index signature
+ * to object type aliases but never to interfaces, so an interface here is
+ * unassignable at every erased payload boundary.
+ */
+// eslint-disable-next-line typescript/consistent-type-definitions -- Must be a type alias, not an interface: only aliases get the implicit index signature that makes this assignable to WidgetData on an endpoint payload. See above.
+export type ErrorResponseType<
   TKey extends TranslatedKeyType = TranslatedKeyType,
-> {
+> = {
   success: false;
   message: TKey;
   messageParams?: TParams;
   errorType: ErrorResponseTypesElements[keyof ErrorResponseTypesElements];
   cause?: ErrorResponseType;
-}
+};
 
 export interface SuccessResponseType<TResponseData> {
   success: true;

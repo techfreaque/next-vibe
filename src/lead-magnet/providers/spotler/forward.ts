@@ -20,7 +20,7 @@ function makeOAuthHeader(
   consumerSecret: string,
 ): OAuthHeader {
   const timestamp = Math.floor(Date.now() / 1000).toString();
-  const nonce = Math.random().toString(36).substring(2);
+  const nonce = Math.random().toString(36).slice(2);
   const method = "POST";
 
   const params: Record<string, string> = {

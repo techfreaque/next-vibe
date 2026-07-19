@@ -24,7 +24,7 @@ import {
   backButton,
   objectField,
   submitButton,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 
 import { EVALUATOR_CROSSOVER_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
