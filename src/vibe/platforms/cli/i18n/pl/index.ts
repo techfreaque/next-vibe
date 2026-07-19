@@ -256,7 +256,10 @@ export const translations: typeof enTranslations = {
       verbose: "Włącz szczegółowe wyjście",
       dryRun: "Wykonaj próbny przebieg bez wykonywania",
       target:
-        "Cel wykonania: dev (domyślny), local (podglądowa baza), lub remote (HTTP przez NEXT_PUBLIC_PROJECT_URL)",
+        "Cel wykonania: dev (domyślny) lub local (podglądowa baza z --hermes)",
+      thea: "Skrót od --remote (celuje w instancję 'thea')",
+      remote:
+        "Wykonaj na zdalnej instancji po ID (domyślnie: thea). Połączenie pobierane z aktywnej bazy.",
       interactive: "Włącz tryb interaktywny",
     },
     errors: {
@@ -286,8 +289,10 @@ export const translations: typeof enTranslations = {
       remoteReadFailed: "Nie udało się odczytać zdalnej sesji",
       remoteWriteFailed: "Nie udało się zapisać zdalnej sesji",
       remoteClearFailed: "Nie udało się wyczyścić zdalnej sesji",
+      remoteNoConnection:
+        "Brak aktywnego połączenia dla instancji '{{instanceId}}'. Uruchom: vibe connect <url>",
       remoteNotLoggedIn:
-        "Nie zalogowano na zdalnym hoście. Uruchom: vibe login --target remote",
+        "Nie zalogowano na zdalnym hoście. Uruchom: vibe --remote login",
       remoteNoLeadId: "Nie udało się uzyskać tożsamości ze zdalnego hosta",
       remoteServerError: "Błąd zdalnego serwera",
       remoteNotAvailable: "Ta wersja nie obsługuje zdalnego wykonywania",
@@ -352,6 +357,7 @@ export const translations: typeof enTranslations = {
                 tabNextField:
                   "Tab: następne pole | Enter: wyślij | q/Esc: wyjdź",
                 ctrlCExitHint: "Naciśnij Ctrl+C ponownie, aby wyjść",
+                escExitHint: "Naciśnij Esc ponownie, aby wyjść",
               },
             },
             pagination: {

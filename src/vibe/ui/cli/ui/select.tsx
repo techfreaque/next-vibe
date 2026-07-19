@@ -25,7 +25,11 @@ import type {
   SelectTriggerProps,
   SelectValueProps,
 } from "../../web/ui/select";
-import { useFocusScopeRegister, useShouldFocus } from "./dialog";
+import {
+  useFocusScopeRegister,
+  useOverlayLock,
+  useShouldFocus,
+} from "./dialog";
 
 export type {
   SelectContentProps,
@@ -78,7 +82,8 @@ const SPACE = "\u0020";
 const CHECK = "\u2713";
 const BLANK = "\u0020";
 // Terminal-only hint strings - not user-facing i18n content
-const HINT_NAV = "\u2191\u2193 navigate, Enter select, Esc cancel";
+const HINT_NAV =
+  "\u2191\u2193/Tab navigate \u00b7 Enter select \u00b7 Esc cancel";
 const SEPARATOR_LINE =
   "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500";
 
@@ -97,6 +102,8 @@ export function Select<TValue extends string>({
   const [, forceUpdate] = useState(0);
   // Stable ID for Ink's focus system
   const idRef = useRef(`select-${Math.random().toString(36).slice(2, 7)}`);
+  // Cursor position when dropdown was opened — restored on Esc/Left cancel
+  const openCursorRef = useRef(0);
   const shouldFocus = useShouldFocus();
   const { isFocused } = useFocus({
     id: idRef.current,
@@ -104,6 +111,8 @@ export function Select<TValue extends string>({
     isActive: shouldFocus,
   });
   useFocusScopeRegister(idRef.current);
+  // Lock overlay when open — deactivates Tab navigation outside the select
+  useOverlayLock(open);
 
   const registerItem = useCallback(
     (itemValue: string, label: string, itemDisabled: boolean) => {
@@ -135,17 +144,31 @@ export function Select<TValue extends string>({
       }
 
       if (!open) {
-        if (key.return || key.downArrow || key.upArrow) {
-          // Find cursor position of current value
+        if (key.return || key.rightArrow) {
+          // Find cursor position of current value and save it as the cancel restore point
           const idx = enabledItems.findIndex((i) => i.value === value);
-          setCursor(Math.max(idx, 0));
+          const startIdx = Math.max(idx, 0);
+          setCursor(startIdx);
+          openCursorRef.current = startIdx;
           setOpen(true);
         }
         return;
       }
 
-      if (key.escape) {
+      if (key.escape || key.leftArrow) {
+        // Restore cursor to where it was when opened (cancel)
+        setCursor(openCursorRef.current);
         setOpen(false);
+        return;
+      }
+
+      // Tab/Shift+Tab cycle through items when open (mirrors arrow behavior)
+      if (key.tab) {
+        if (key.shift) {
+          setCursor((c) => Math.max(0, c - 1));
+        } else {
+          setCursor((c) => Math.min(enabledItems.length - 1, c + 1));
+        }
         return;
       }
 
@@ -197,7 +220,9 @@ export function Select<TValue extends string>({
   );
 
   return (
-    <SelectContext.Provider value={ctx}>{children}</SelectContext.Provider>
+    <SelectContext.Provider value={ctx}>
+      <Box flexDirection="column">{children}</Box>
+    </SelectContext.Provider>
   );
 }
 Select.displayName = "Select";
@@ -211,7 +236,10 @@ export function SelectValue({ placeholder }: SelectValueProps): JSX.Element {
   const { value, items, disabled, open, isFocused } = useSelectContext();
   const isMcp = useIsMcp();
 
-  const selectedLabel = items.find((i) => i.value === value)?.label ?? value;
+  // Only use value as label when items have been registered; before that show placeholder
+  const matchedItem = items.find((i) => i.value === value);
+  const selectedLabel =
+    items.length > 0 ? (matchedItem?.label ?? value) : undefined;
   const display = selectedLabel ?? placeholder ?? "select";
 
   if (isMcp) {
@@ -261,21 +289,19 @@ export function SelectContent({ children }: SelectContentProps): JSX.Element {
   const { open } = useSelectContext();
   const isMcp = useIsMcp();
 
-  // Always render children (so SelectItem can register themselves)
-  // But only show visually when open (in non-MCP mode)
   if (isMcp) {
     return <>{children}</>;
   }
 
-  if (!open) {
-    // Still render children invisibly so items can register
-    return <Box display="flex">{children}</Box>;
-  }
-
+  // Always render children so SelectItem useEffect can register items.
+  // Items themselves return null when !ctx.open, so only visible when open.
+  // Stable single Box so Ink never remounts SelectItem children.
+  // Hint and separator only show when open; items self-hide via ctx.open check.
   return (
-    <Box flexDirection="column" marginTop={1}>
-      <Text dimColor>{HINT_NAV}</Text>
+    <Box flexDirection="column">
+      {open ? <Text dimColor>{HINT_NAV}</Text> : null}
       {children}
+      {open ? <Text dimColor>{SEPARATOR_LINE}</Text> : null}
     </Box>
   );
 }

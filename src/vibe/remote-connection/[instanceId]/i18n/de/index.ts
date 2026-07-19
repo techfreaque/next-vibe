@@ -32,7 +32,7 @@ export const translations: typeof enTranslations = {
       benefit1:
         "Erinnerungen synchronisieren sich automatisch zwischen diesem Gerät und deinem Cloud-Konto",
       benefit2: "KI-Tools von der Kommandozeile nutzen mit",
-      benefit2Code: "vibe --thea",
+      benefit2Code: "vibe --remote",
       benefit3: "Lokal und Cloud bleiben synchron",
     },
     behaviorSection: "Verhalten",

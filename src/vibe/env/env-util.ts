@@ -166,3 +166,17 @@ export enum Environment {
   TEST = "test",
   DEVELOPMENT = "development",
 }
+
+export enum VibeMode {
+  /** Personal local agent instance — you + your AI. No auth wall, no payments, no SaaS features. */
+  AGENT = "agent",
+  /** Cloud SaaS deployment (unbottled.ai). Multi-user, auth, payments, subscriptions. Receives sync, never pushes back. */
+  CLOUD = "cloud",
+  /** Atlas dev instance — coding/testing. Neither agent nor cloud. Default when no mode set. */
+  DEV = "dev",
+}
+
+export const VibeModeValues = Object.values(VibeMode) as [
+  VibeMode,
+  ...VibeMode[],
+];

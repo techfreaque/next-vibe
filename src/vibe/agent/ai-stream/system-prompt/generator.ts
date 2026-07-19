@@ -11,18 +11,16 @@ import "server-only";
 
 import { readFileSync } from "node:fs";
 
-import type {
-  GeneratorContext,
-  GeneratorResult,
-} from "next-vibe/core/generators/shared/shared-inputs";
+import type { GeneratorDefinition } from "next-vibe/core/generators/shared/shared-inputs";
 import {
+  findFilesRecursively,
   generateFileHeader,
   writeGeneratedFile,
 } from "next-vibe/core/generators/shared/utils";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { GENERATED_DIR } from "@/env/paths";
+import { GENERATED_DIR, getApiDir } from "@/env/paths";
 
 const OUTPUT_FILE = `${GENERATED_DIR}/prompt-fragments/index.ts`;
 
@@ -38,40 +36,6 @@ interface FragmentEntry {
   fragmentExportNames: string[];
   /** The specific export name for THIS fragment ID, e.g. "memoriesFragment" */
   ownExportName: string;
-}
-
-/**
- * Generate the prompt fragments index (isomorphic + server + client). Consumes the
- * shared promptFragment file list; writes three files. Byte-identical to the former
- * tooling/generators/prompt-fragments.
- */
-export async function generate(
-  ctx: GeneratorContext,
-): Promise<GeneratorResult> {
-  const { logger } = ctx;
-  const promptFiles = ctx.files.promptFragment;
-
-  logger.debug(`Found ${promptFiles.length} prompt fragment files`);
-
-  const fragments = await PromptFragmentsGenerator.extractFragments(
-    promptFiles,
-    logger,
-  );
-
-  const content = PromptFragmentsGenerator.generateContent(fragments);
-  const serverOutputFile = OUTPUT_FILE.replace(/\/index\.ts$/, "/server.ts");
-  const serverContent =
-    PromptFragmentsGenerator.generateServerContent(fragments);
-
-  await Promise.all([
-    writeGeneratedFile(OUTPUT_FILE, content),
-    writeGeneratedFile(serverOutputFile, serverContent),
-  ]);
-
-  return {
-    summary: `prompt fragments (${fragments.length} fragments)`,
-    counts: { fragments: fragments.length },
-  };
 }
 
 class PromptFragmentsGenerator {
@@ -533,3 +497,42 @@ ${pushLines}
 `;
   }
 }
+
+export const generator: GeneratorDefinition = {
+  key: "prompt-fragments",
+  phase: "default",
+  needs: {},
+  cacheKey: "prompt-fragments",
+  findInputs(live) {
+    if (live) {
+      return [...live.promptFragmentFiles].toSorted();
+    }
+    return findFilesRecursively(getApiDir(), "system-prompt.ts").toSorted();
+  },
+  async generate(ctx) {
+    const { logger } = ctx;
+    const promptFiles = ctx.files.promptFragment;
+
+    logger.debug(`Found ${promptFiles.length} prompt fragment files`);
+
+    const fragments = await PromptFragmentsGenerator.extractFragments(
+      promptFiles,
+      logger,
+    );
+
+    const content = PromptFragmentsGenerator.generateContent(fragments);
+    const serverOutputFile = OUTPUT_FILE.replace(/\/index\.ts$/, "/server.ts");
+    const serverContent =
+      PromptFragmentsGenerator.generateServerContent(fragments);
+
+    await Promise.all([
+      writeGeneratedFile(OUTPUT_FILE, content),
+      writeGeneratedFile(serverOutputFile, serverContent),
+    ]);
+
+    return {
+      summary: `prompt fragments (${fragments.length} fragments)`,
+      counts: { fragments: fragments.length },
+    };
+  },
+};

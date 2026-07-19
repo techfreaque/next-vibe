@@ -9,13 +9,15 @@ import type {
   ErrorResponseType,
   ResponseType,
 } from "next-vibe/core/route/response.schema";
+import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
+import type { AiT } from "next-vibe/platforms/ai/i18n";
 
 import { BEARER_LEAD_ID_SEPARATOR } from "@/env/constants";
 
 import type { RouteExecuteResponseOutput } from "../../definition";
 import executeDefinition from "../../definition";
-import type { DirectCallResult, RouteExecuteContext } from "../types";
+import type { RouteExecuteContext } from "../types";
 
 /**
  * Synchronous direct-http remote call: POST the target tool to the peer's
@@ -31,9 +33,11 @@ export async function callToolDirect(params: {
   input: Record<string, WidgetData> | null;
   locale: string;
   logger: RouteExecuteContext["logger"];
+  t: AiT;
   toolTimeoutMs?: number;
-}): Promise<DirectCallResult> {
-  const { remoteUrl, token, leadId, toolName, input, locale, logger } = params;
+}): Promise<ResponseType<RouteExecuteResponseOutput>> {
+  const { remoteUrl, token, leadId, toolName, input, locale, logger, t } =
+    params;
   const url = `${remoteUrl}/api/${locale}/${executeDefinition.POST.path.join("/")}`;
   const timeoutMs =
     params.toolTimeoutMs === 0 ? 600_000 : (params.toolTimeoutMs ?? 90_000);
@@ -113,21 +117,31 @@ export async function callToolDirect(params: {
           status: resp.status,
           remoteMessage,
         });
-        return { ok: false, remoteMessage };
+        return fail({
+          message: remoteMessage
+            ? t("executeTool.post.errors.remoteFailed.title", {
+                message: remoteMessage,
+              })
+            : t("executeTool.post.errors.notFound.title"),
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        });
       }
       const body =
         (await resp.json()) as ResponseType<RouteExecuteResponseOutput>;
-      if (!body.success) {
-        return { ok: false, remoteMessage: String(body.message) };
-      }
-      return { ok: true, data: body.data };
+      return body;
     } catch (err) {
       logger.warn("[RouteExecute] callToolDirect network error", {
         toolName,
         error: err instanceof Error ? err.message : String(err),
       });
-      return { ok: false };
+      return fail({
+        message: t("executeTool.post.errors.network.title"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
     }
   }
-  return { ok: false };
+  return fail({
+    message: t("executeTool.post.errors.network.title"),
+    errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+  });
 }

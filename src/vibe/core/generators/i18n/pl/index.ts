@@ -99,5 +99,17 @@ export const translations: typeof enTranslations = {
       title: "Sukces",
       description: "Operacja zakończona pomyślnie",
     },
+    widget: {
+      title: "Generowanie kodu",
+      statsTitle: "Podsumowanie",
+      outputTitle: "Dziennik generatora",
+      total: "Łącznie",
+      ran: "Wygenerowano",
+      skipped: "Bez zmian",
+      outputDir: "Wyjście",
+      noOutput: "Brak wyników. Uruchom generowanie, aby zobaczyć wyniki.",
+      submit: "Uruchom generatory",
+      running: "Trwa generowanie...",
+    },
   },
 };

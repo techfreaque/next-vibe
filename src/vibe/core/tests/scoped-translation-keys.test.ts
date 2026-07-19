@@ -26,13 +26,13 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import type { ExtractScopedKeyType } from "next-vibe/core/i18n/core/static-types";
 import { UserRole } from "next-vibe/identity/roles/enum";
-import { objectField, requestField } from "next-vibe/unified-ui/_shared/utils-i18n";
+import {
+  objectField,
+  requestField,
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
-import {
-  type ContactTranslationKey,
-  scopedTranslation,
-} from "@/contact/i18n";
+import { type ContactTranslationKey, scopedTranslation } from "@/contact/i18n";
 
 // ============================================================================
 // PROGRESSIVE TYPE TESTS - Isolating where property-level errors break
@@ -756,7 +756,7 @@ const scopedEndpointCorrect = createEndpoint({
         label: "form.fields.email.label",
         placeholder: "form.fields.email.placeholder",
         columns: 12,
-        schema: z.string().email(),
+        schema: z.email(),
       }),
     },
   }),
@@ -1182,7 +1182,7 @@ const scopedEndpointInvalidEmailFieldLabel = createEndpoint({
         // @ts-expect-error - Invalid email field label key
         label: "invalid.email.field.label.key",
         columns: 12,
-        schema: z.string().email(),
+        schema: z.email(),
       }),
     },
   }),

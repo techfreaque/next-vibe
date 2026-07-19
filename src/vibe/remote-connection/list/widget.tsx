@@ -10,6 +10,7 @@
 
 import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
+import { VibeMode } from "next-vibe/env/env-util";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
@@ -757,7 +758,7 @@ export function RemoteConnectionsListContainer(): JSX.Element {
 
   const connections = data?.connections ?? [];
   const selfInstanceId = data?.selfInstanceId ?? null;
-  const isCloud = envClient.NEXT_PUBLIC_VIBE_IS_CLOUD;
+  const isCloud = envClient.NEXT_PUBLIC_VIBE_MODE === VibeMode.CLOUD;
   const isAdmin =
     !user.isPublic && user.roles?.includes(UserPermissionRole.ADMIN) === true;
 

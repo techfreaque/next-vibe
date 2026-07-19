@@ -11,6 +11,7 @@ import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import { languageConfig } from "next-vibe/core/i18n";
 import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import { db } from "next-vibe/database";
+import { VibeMode } from "next-vibe/env/env-util";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { users as usersTable } from "next-vibe/identity/user/db";
 
@@ -202,7 +203,7 @@ export const platformOverviewFragment: SystemPromptFragment = {
     const isAdmin =
       !params.user.isPublic &&
       params.user.roles.includes(UserPermissionRole.ADMIN);
-    const isLocalMode = envClient.NEXT_PUBLIC_LOCAL_MODE;
+    const vibeMode = envClient.NEXT_PUBLIC_VIBE_MODE;
     const appName =
       params.appName ??
       chatScopedTranslation.scopedT(locale).t("config.appName");
@@ -226,9 +227,10 @@ export const platformOverviewFragment: SystemPromptFragment = {
     );
     const uncensoredNames = FEATURED_MODELS.uncensored.join(", ");
 
-    const creditLines = isLocalMode
-      ? `- **Credits:** 1 credit = $0.01. Cost varies by model.`
-      : `- **Credits:** 1 credit = $0.01. Cost varies by model.
+    const creditLines =
+      vibeMode === VibeMode.AGENT
+        ? `- **Credits:** 1 credit = $0.01. Cost varies by model.`
+        : `- **Credits:** 1 credit = $0.01. Cost varies by model.
 - **Free tier:** ${freeTierCredits} credits/month via browser ID - no account needed.
 - **Subscription:** ${subLabel}. **Credit packs:** ${packLabel}.`;
 
@@ -531,7 +533,7 @@ export const bootstrapFragment: SystemPromptFragment = {
       !params.user.isPublic &&
       params.user.roles.includes(UserPermissionRole.ADMIN);
     const isPublicUser = params.user.isPublic;
-    const isLocalMode = envClient.NEXT_PUBLIC_LOCAL_MODE;
+    const vibeMode = envClient.NEXT_PUBLIC_VIBE_MODE;
     const appName =
       params.appName ??
       chatScopedTranslation.scopedT(locale).t("config.appName");
@@ -553,7 +555,7 @@ export const bootstrapFragment: SystemPromptFragment = {
     const userType = isAdmin ? "admin" : isPublicUser ? "public" : "user";
 
     if (userType === "public") {
-      if (isLocalMode) {
+      if (vibeMode === VibeMode.AGENT) {
         return `## Getting Started
 
 You're chatting as a guest on this self-hosted instance - no account required for basic use. You can use the **public** folder (visible to everyone) and **incognito** (browser-local only).
@@ -633,7 +635,7 @@ export const guestContextFragment: SystemPromptFragment = {
       return null;
     }
     const { locale, rootFolderId } = params;
-    const isLocalMode = envClient.NEXT_PUBLIC_LOCAL_MODE;
+    const vibeMode = envClient.NEXT_PUBLIC_VIBE_MODE;
     const isIncognito = rootFolderId === DefaultFolderId.INCOGNITO;
     const freeTierCredits = productsRepository.getProduct(
       ProductIds.FREE_TIER,
@@ -650,7 +652,7 @@ export const guestContextFragment: SystemPromptFragment = {
     const subLabel = `${currencySymbol(subscriptionProduct.currency)}${subscriptionProduct.price}/month → ${subscriptionProduct.credits} credits`;
     const packLabel = `${currencySymbol(creditPackProduct.currency)}${creditPackProduct.price} → ${creditPackProduct.credits} permanent credits`;
 
-    if (isLocalMode) {
+    if (vibeMode === VibeMode.AGENT) {
       if (isIncognito) {
         return `## Guest User Context (Incognito)
 

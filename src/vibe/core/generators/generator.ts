@@ -1,352 +1,194 @@
 /**
- * Generators domain generator — the orchestrator (registry + run).
+ * Generators Index Generator.
  *
- * ONE entry per domain generator, with per-generator enable/opt-out. Builds the
- * shared context once, runs the def-scan group sequentially (Bun TDZ), everything
- * else in parallel, with gen-cache skipping. Imported by this domain's repository.ts
- * (the `vibe gen` endpoint) and by the dev-watcher.
+ * Scans every generator.ts in the project, reads its exported `generator` const
+ * (key, phase, needs, cacheKey, output, generate), and emits
+ * src/generated/generators/index.ts — the GENERATORS_REGISTRY the orchestrator
+ * (repository.ts) imports.
  *
- * Bootstrap-safe: this module and everything it imports depend ONLY on source (never
- * on `src/generated/*`), so `bun repository.ts` regenerates from scratch even when no
- * generated files exist yet.
+ * Adding a new generator: create a generator.ts with a `generator` export and
+ * run `vibe gen`. No manual index editing needed.
+ *
+ * Bootstrap-safe: never imports from src/generated/*.
  */
 
 import "server-only";
 
-import { generate as generateAiStreamEnums } from "next-vibe/agent/ai-stream/model-enums-generator/generator";
-import { generate as generatePromptFragments } from "next-vibe/agent/ai-stream/system-prompt/generator";
-import { generate as generateCortex } from "next-vibe/agent/cortex/seeds/generator";
-import { generate as generateAgentDocs } from "next-vibe/agent/skills/default-skills/vibe-coder/generator";
-import { generate as generateSkills } from "next-vibe/agent/skills/generator";
-import { generate as generateEndpointFramework } from "next-vibe/core/definition/generator/generator";
-import {
-  findGeneratorInputs,
-  type GeneratorKey,
-} from "next-vibe/core/generators/shared/find-generator-inputs";
-import {
-  type GenState,
-  isUnchanged,
-  markDone,
-  readGenState,
-  writeGenState,
-} from "next-vibe/core/generators/shared/gen-cache";
-import type { LiveIndex } from "next-vibe/core/generators/shared/live-index";
-import {
-  buildGeneratorContext,
-  type GeneratorContext,
-  type GeneratorResult,
+import { readFileSync } from "node:fs";
+import { join, relative } from "node:path";
+
+import type {
+  GeneratorContext,
+  GeneratorResult,
 } from "next-vibe/core/generators/shared/shared-inputs";
-import { generate as generateSetupIndex } from "next-vibe/core/setup/generator";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { generate as generateSeeds } from "next-vibe/database/seed/generator";
-import { generate as generateDataflow } from "next-vibe/dataflow/generator";
-import { generate as generateEnv } from "next-vibe/env/generator/generator";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { generate as generateNextApp } from "next-vibe/platforms/next-app/generator";
-import { generate as generateNativeIndexes } from "next-vibe/platforms/react-native/generator";
-import { generate as generateTanstackRoutes } from "next-vibe/platforms/tanstack-start/generator";
-import { generate as generateRemoteCapabilities } from "next-vibe/remote-connection/generator";
-import { generate as generateTasks } from "next-vibe/tasks/generator";
+import {
+  findFilesRecursively,
+  generateFileHeader,
+  writeGeneratedFile,
+} from "next-vibe/core/generators/shared/utils";
 
-import { GENERATED_DIR, NEXT_APP_DIR } from "@/env/paths";
-import { generate as generateEmail } from "@/messenger/registry/generator";
+import { GENERATED_DIR, getApiDir } from "@/env/paths";
 
-// ───────────────────────────────────────────────────────────────────────────
-// Registry: one entry per domain generator (enable/opt-out here)
-// ───────────────────────────────────────────────────────────────────────────
+export const OUTPUT_FILE = `${GENERATED_DIR}/generators/index.ts`;
 
-type GeneratorPhase = "def-scan" | "default";
+// ---------------------------------------------------------------------------
+// Meta extraction — reads generator export from source (no runtime import).
+// ---------------------------------------------------------------------------
 
-interface GeneratorEntry {
+interface GeneratorFileMeta {
+  absPath: string;
+  importPath: string;
+  importName: string;
   key: string;
+  phase: string;
+  needsDefinitionModules: boolean;
+  cacheKey: string | null;
+}
+
+/** Convert an absolute path to the shortest alias-based import path. */
+function toImportAlias(absPath: string): string {
+  const cwd = process.cwd();
+  const rel = relative(cwd, absPath).replace(/\\/g, "/").replace(/\.ts$/, "");
+  if (rel.startsWith("src/vibe/")) {
+    return `next-vibe/${rel.slice("src/vibe/".length)}`;
+  }
+  if (rel.startsWith("src/")) {
+    return `@/${rel.slice("src/".length)}`;
+  }
+  return `./${rel}`;
+}
+
+/** Derive a camelCase import name from the generator key, e.g. "endpoint-framework" → "generatorEndpointFramework". */
+function toImportName(key: string): string {
+  const pascal = key
+    .split("-")
+    .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
+    .join("");
+  return `generator${pascal}`;
+}
+
+function extractMeta(absPath: string): GeneratorFileMeta | null {
+  const src = readFileSync(absPath, "utf-8");
+
+  // Must export a `generator` const.
+  if (!/export\s+const\s+generator\b/.test(src)) {
+    return null;
+  }
+
+  const keyMatch = /key:\s*["']([^"']+)["']/.exec(src);
+  const phaseMatch = /phase:\s*["']([^"']+)["']/.exec(src);
+  const cacheKeyMatch = /cacheKey:\s*["']([^"']+)["']/.exec(src);
+  const needsDef =
+    /needsDefinitionModules:\s*true|definitionModules:\s*true/.test(src);
+
+  if (!keyMatch || !phaseMatch) {
+    return null;
+  }
+
+  const key = keyMatch[1];
+  return {
+    absPath,
+    importPath: toImportAlias(absPath),
+    importName: toImportName(key),
+    key,
+    phase: phaseMatch[1],
+    needsDefinitionModules: needsDef,
+    cacheKey: cacheKeyMatch?.[1] ?? null,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Code generation
+// ---------------------------------------------------------------------------
+
+function renderIndex(entries: GeneratorFileMeta[]): string {
+  const header = generateFileHeader(
+    "Generators Registry",
+    "Generators Index Generator",
+    { command: "vibe gen", generators: entries.length },
+  );
+
+  const imports = entries
+    .map(
+      (e) => `import { generator as ${e.importName} } from "${e.importPath}";`,
+    )
+    .join("\n");
+
+  const registryEntries = entries
+    .map((e) => {
+      return [
+        "  {",
+        `    ...${e.importName},`,
+        `    run: ${e.importName}.generate,`,
+        `    enabled: true,`,
+        "  },",
+      ].join("\n");
+    })
+    .join("\n");
+
+  return `${header}
+
+import "server-only";
+
+import type { GeneratorContext, GeneratorDefinition, GeneratorResult } from "next-vibe/core/generators/shared/shared-inputs";
+
+${imports}
+
+export interface GeneratorEntry extends GeneratorDefinition {
   run: (ctx: GeneratorContext) => Promise<GeneratorResult>;
-  phase: GeneratorPhase;
-  needs: { definitionModules?: boolean };
-  /** gen-cache fingerprint key, or null to never cache. */
-  cacheKey: GeneratorKey | null;
-  /** Primary output (relative to cwd) — used for gen-cache staleness. */
-  output: string;
   enabled: boolean;
 }
 
-interface RunGeneratorsOptions {
-  logger: EndpointLogger;
-  force?: boolean;
-  live?: LiveIndex;
-  only?: ReadonlySet<string>;
-  overrides?: Partial<Record<string, boolean>>;
-  noCache?: boolean;
+export const GENERATORS_REGISTRY: readonly GeneratorEntry[] = [
+${registryEntries}
+];
+`;
 }
 
-interface RunGeneratorsResult {
-  ran: string[];
-  skipped: string[];
-  failed: { key: string; error: string }[];
-  output: string[];
-}
+export async function generate(
+  ctx: GeneratorContext,
+): Promise<GeneratorResult> {
+  const { logger } = ctx;
+  const cwd = process.cwd();
+  const apiDir = getApiDir();
 
-type RunOutcome =
-  | { status: "ran"; summary: string; cacheKey: GeneratorKey | null }
-  | { status: "skipped" }
-  | { status: "failed"; error: string };
+  // Scan all generator.ts files, excluding this file itself.
+  const selfPath = join(
+    cwd,
+    "src",
+    "vibe",
+    "core",
+    "generators",
+    "generator.ts",
+  );
+  const allGeneratorFiles = findFilesRecursively(apiDir, "generator.ts").filter(
+    (f) => f !== selfPath,
+  );
 
-/**
- * The generators orchestrator — a single static class owning the registry and the
- * run logic. `runGenerators` / `REGISTRY` are exposed as static members.
- */
-export class GeneratorRunner {
-  static readonly REGISTRY: readonly GeneratorEntry[] = [
-    // def-scan (sequential): everything derived from endpoint definitions.
-    {
-      key: "endpoint-framework",
-      run: generateEndpointFramework,
-      phase: "def-scan",
-      needs: { definitionModules: true },
-      cacheKey: "endpoints",
-      output: `${GENERATED_DIR}/endpoints/endpoint.ts`,
-      enabled: true,
-    },
-    // default (parallel).
-    {
-      key: "remote-capabilities",
-      run: generateRemoteCapabilities,
-      phase: "default",
-      needs: {},
-      cacheKey: "endpoints",
-      output: `${GENERATED_DIR}/remote-capabilities/en/public.json`,
-      enabled: true,
-    },
-    {
-      key: "seeds",
-      run: generateSeeds,
-      phase: "default",
-      needs: {},
-      cacheKey: "seeds",
-      output: `${GENERATED_DIR}/seeds/index.ts`,
-      enabled: true,
-    },
-    {
-      key: "tasks",
-      run: generateTasks,
-      phase: "default",
-      needs: {},
-      cacheKey: "task-index",
-      output: `${GENERATED_DIR}/tasks/index.ts`,
-      enabled: true,
-    },
-    {
-      key: "skills",
-      run: generateSkills,
-      phase: "default",
-      needs: {},
-      cacheKey: "skills-index",
-      output: `${GENERATED_DIR}/skills/index.ts`,
-      enabled: true,
-    },
-    {
-      key: "prompt-fragments",
-      run: generatePromptFragments,
-      phase: "default",
-      needs: {},
-      cacheKey: "prompt-fragments",
-      output: `${GENERATED_DIR}/prompt-fragments/index.ts`,
-      enabled: true,
-    },
-    {
-      key: "email",
-      run: generateEmail,
-      phase: "default",
-      needs: {},
-      cacheKey: "email-templates",
-      output: `${GENERATED_DIR}/email/index.ts`,
-      enabled: true,
-    },
-    {
-      key: "env",
-      run: generateEnv,
-      phase: "default",
-      needs: {},
-      cacheKey: "env",
-      output: `${GENERATED_DIR}/env/index.ts`,
-      enabled: true,
-    },
-    {
-      key: "setup-index",
-      run: generateSetupIndex,
-      phase: "default",
-      needs: {},
-      cacheKey: "setup-index",
-      output: `${GENERATED_DIR}/setup/index.ts`,
-      enabled: true,
-    },
-    {
-      key: "agent-docs",
-      run: generateAgentDocs,
-      phase: "default",
-      needs: {},
-      cacheKey: "agent-docs",
-      output: "CLAUDE.md",
-      enabled: true,
-    },
-    {
-      key: "dataflow",
-      run: generateDataflow,
-      phase: "default",
-      needs: {},
-      cacheKey: "graph-seeds-index",
-      output: `${GENERATED_DIR}/dataflow/graph-seeds-index.ts`,
-      enabled: true,
-    },
-    {
-      key: "cortex",
-      run: generateCortex,
-      phase: "default",
-      needs: {},
-      cacheKey: null,
-      output: `${GENERATED_DIR}/skills/index.ts`,
-      enabled: true,
-    },
-    {
-      key: "ai-stream-enums",
-      run: generateAiStreamEnums,
-      phase: "default",
-      needs: {},
-      cacheKey: null,
-      output: "src/vibe/agent/ai-stream/vision-models.generated.ts",
-      enabled: true,
-    },
-    {
-      key: "tanstack-routes",
-      run: generateTanstackRoutes,
-      phase: "default",
-      needs: { definitionModules: true },
-      cacheKey: "tanstack-routes",
-      output: `${GENERATED_DIR}/app-tanstack/routes`,
-      enabled: true,
-    },
-    {
-      key: "next-app",
-      run: generateNextApp,
-      phase: "default",
-      needs: { definitionModules: true },
-      cacheKey: "next-app",
-      // Next.js only resolves the App Router at src/app — this generator's
-      // output is the one that cannot live under GENERATED_DIR.
-      output: NEXT_APP_DIR,
-      enabled: true,
-    },
-    {
-      key: "native-indexes",
-      run: generateNativeIndexes,
-      phase: "default",
-      needs: {},
-      cacheKey: "native-indexes",
-      output: `${GENERATED_DIR}/app-native`,
-      enabled: true,
-    },
-  ] as const;
-
-  /** Resolve which generators to run given the options (opt-out + only-set). */
-  private static resolve(opts: RunGeneratorsOptions): GeneratorEntry[] {
-    return GeneratorRunner.REGISTRY.filter((g) => {
-      if (opts.only && !opts.only.has(g.key)) {
-        return false;
-      }
-      return opts.overrides?.[g.key] ?? g.enabled;
-    });
-  }
-
-  /** Run one generator, applying gen-cache skip. */
-  private static async runOne(
-    gen: GeneratorEntry,
-    ctx: GeneratorContext,
-    genState: GenState,
-    opts: RunGeneratorsOptions,
-  ): Promise<RunOutcome> {
-    if (!opts.noCache && !opts.force && gen.cacheKey) {
-      const inputs = findGeneratorInputs(gen.cacheKey, opts.live);
-      if (isUnchanged(gen.cacheKey, inputs, gen.output, genState)) {
-        return { status: "skipped" };
-      }
-    }
-
-    try {
-      const result = await gen.run(ctx);
-      if (result.failed) {
-        return { status: "failed", error: result.failed };
-      }
-      return { status: "ran", summary: result.summary, cacheKey: gen.cacheKey };
-    } catch (error) {
-      return { status: "failed", error: parseError(error).message };
+  const entries: GeneratorFileMeta[] = [];
+  for (const absPath of allGeneratorFiles) {
+    const meta = extractMeta(absPath);
+    if (meta) {
+      entries.push(meta);
     }
   }
 
-  /**
-   * Orchestrate a generation run. def-scan sequential, default parallel. Called by
-   * the endpoint (repository.ts) and the dev-watcher.
-   */
-  static async runGenerators(
-    opts: RunGeneratorsOptions,
-  ): Promise<RunGeneratorsResult> {
-    const { logger } = opts;
-    const generators = GeneratorRunner.resolve(opts);
-
-    const ctx = await buildGeneratorContext({
-      logger,
-      force: opts.force ?? false,
-      live: opts.live,
-      need: {
-        definitionModules: generators.some((g) => g.needs.definitionModules),
-      },
-    });
-
-    const genState: GenState = opts.noCache || opts.force ? {} : readGenState();
-    const result: RunGeneratorsResult = {
-      ran: [],
-      skipped: [],
-      failed: [],
-      output: [],
-    };
-    const recordedCacheKeys = new Set<GeneratorKey>();
-
-    const record = (key: string, outcome: RunOutcome): void => {
-      if (outcome.status === "ran") {
-        result.ran.push(key);
-        result.output.push(`✅ ${key}: ${outcome.summary}`);
-        if (outcome.cacheKey) {
-          recordedCacheKeys.add(outcome.cacheKey);
-        }
-      } else if (outcome.status === "skipped") {
-        result.skipped.push(key);
-        result.output.push(`⏭️  ${key}: unchanged`);
-      } else {
-        result.failed.push({ key, error: outcome.error });
-        result.output.push(`❌ ${key}: ${outcome.error}`);
-        logger.error(`Generator ${key} failed: ${outcome.error}`);
-      }
-    };
-
-    // def-scan: sequential (Bun TDZ).
-    for (const gen of generators.filter((g) => g.phase === "def-scan")) {
-      record(gen.key, await GeneratorRunner.runOne(gen, ctx, genState, opts));
+  // Stable order: def-scan first, then default; alphabetical within each phase.
+  entries.sort((a, b) => {
+    if (a.phase === "def-scan" && b.phase !== "def-scan") {
+      return -1;
     }
-
-    // default: parallel.
-    const parallelGens = generators.filter((g) => g.phase === "default");
-    const outcomes = await Promise.all(
-      parallelGens.map((gen) =>
-        GeneratorRunner.runOne(gen, ctx, genState, opts),
-      ),
-    );
-    parallelGens.forEach((gen, i) => record(gen.key, outcomes[i]));
-
-    if (!opts.noCache && !opts.force) {
-      for (const cacheKey of recordedCacheKeys) {
-        markDone(cacheKey, findGeneratorInputs(cacheKey, opts.live), genState);
-      }
-      writeGenState(genState);
+    if (a.phase !== "def-scan" && b.phase === "def-scan") {
+      return 1;
     }
+    return a.key.localeCompare(b.key);
+  });
 
-    return result;
-  }
+  await writeGeneratedFile(OUTPUT_FILE, renderIndex(entries));
+  logger.debug(`generators index: wrote ${entries.length} entries`);
+
+  return {
+    summary: `generators index (${entries.length} generators)`,
+    counts: { generators: entries.length },
+  };
 }

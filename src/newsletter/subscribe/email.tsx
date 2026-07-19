@@ -35,7 +35,7 @@ import { scopedTranslation } from "./i18n";
 // ============================================================================
 
 const newsletterWelcomePropsSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   name: z.string().optional(),
   leadId: z.string().optional(),
   userId: z.string().optional(),
@@ -384,7 +384,7 @@ function AdminNotificationEmailContent({
 // ============================================================================
 
 const adminNewsletterSubscribePropsSchema = z.object({
-  subscriberEmail: z.string().email(),
+  subscriberEmail: z.email(),
   subscriberName: z.string().optional(),
 });
 

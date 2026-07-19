@@ -322,7 +322,7 @@ export type NewCustomSkill = typeof customSkills.$inferInsert;
  * boundary (e.g. a route's onRemoteEvent vs OnRemoteEventDispatchMap). The alias
  * pins the type exactly as an interface did — same depth guarantee.
  */
-// eslint-disable-next-line typescript/consistent-type-definitions -- Must be a type alias, not an interface: only aliases get the implicit index signature that makes this assignable to WidgetData on an endpoint payload. See above.
+// eslint-disable-next-line typescript/consistent-type-definitions, @typescript-eslint/consistent-type-definitions -- Must be a type alias, not an interface: only aliases get the implicit index signature that makes this assignable to WidgetData on an endpoint payload. See above.
 export type SkillVariantData = {
   id: string;
   displayName?: string;

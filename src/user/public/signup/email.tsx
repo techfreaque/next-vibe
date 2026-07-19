@@ -832,7 +832,7 @@ function renderAdminNotificationEmailContent(
 const adminSignupPropsSchema = z.object({
   privateName: z.string(),
   publicName: z.string(),
-  email: z.string().email(),
+  email: z.email(),
   userId: z.string(),
   subscribeToNewsletter: z.boolean().optional(),
 });

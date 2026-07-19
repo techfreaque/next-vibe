@@ -28,8 +28,17 @@ import type {
   ConstrainedChildUsage,
   FieldUsageConfig,
 } from "next-vibe/unified-ui/_shared/types";
-import { objectOptionalField, requestDataArrayField, responseArrayField, responseArrayOptionalField } from "next-vibe/unified-ui/_shared/utils-i18n";
-import { objectField, requestField, requestResponseField, requestUrlPathParamsField, responseField } from "next-vibe/unified-ui/_shared/utils-i18n";
+import {
+  objectField,
+  objectOptionalField,
+  requestDataArrayField,
+  requestField,
+  requestResponseField,
+  requestUrlPathParamsField,
+  responseArrayField,
+  responseArrayOptionalField,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 const genericST: { ScopedTranslationKey: string } = {
@@ -1458,7 +1467,7 @@ const test20_1_defaultField = objectField(genericST, {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.EMAIL,
       label: "Email",
-      schema: z.string().email(),
+      schema: z.email(),
     }),
   },
 });

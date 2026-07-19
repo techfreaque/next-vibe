@@ -909,8 +909,7 @@ type View =
  * response. Meta is also what the detail view needs — it resolves full definitions
  * from it via getEndpoint().
  *
- * Both imports stay deferred: definitions-registry is server-only, and neither
- * belongs on the response path's module graph.
+ * Both imports stay deferred so neither lands on the response path's module graph.
  */
 async function getToolsForUser(
   platform: CliCompatiblePlatform,
@@ -918,7 +917,7 @@ async function getToolsForUser(
 ): Promise<{ tools: ToolInfo[]; categories: CategoryInfo[] }> {
   const [{ endpointsMeta }, { permissionsRegistry }] = await Promise.all([
     import("@/generated/endpoints/meta/en"),
-    import("next-vibe/core/route/definitions-registry"),
+    import("next-vibe/core/permissions/registry"),
   ]);
 
   const tools: ToolInfo[] = [];

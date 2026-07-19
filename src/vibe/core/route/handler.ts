@@ -13,7 +13,7 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import type { TParams } from "next-vibe/core/i18n/core/static-types";
 import { scopedTranslation as sharedScopedTranslation } from "next-vibe/core/i18n/shared";
-import { permissionsRegistry } from "next-vibe/core/route/definitions-registry";
+import { permissionsRegistry } from "next-vibe/core/permissions/registry";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import type {
   JwtPayloadType,

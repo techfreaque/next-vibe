@@ -71,6 +71,16 @@ export const translations: typeof enTranslations = {
         title: "Framework",
         description: "Frontend framework/bundler",
       },
+      vibeMode: {
+        title: "Tryb instancji",
+        description:
+          "Nadpisuje tryb instancji w czasie wykonania. Patchuje zbudowany bundle. 'agent' = osobista lokalna instancja. 'cloud' = SaaS. 'dev' = instancja deweloperska.",
+        options: {
+          agent: "Agent (osobista lokalna instancja)",
+          cloud: "Cloud (wdrożenie SaaS)",
+          dev: "Dev (instancja deweloperska)",
+        },
+      },
       skipTaskRunner: {
         title: "Pomiń Task Runner",
         description: "Pomiń Task Runner",

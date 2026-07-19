@@ -113,11 +113,13 @@ interface CliOptions {
   debug?: boolean;
   interactive?: boolean;
   agentControl?: boolean;
-  dryRun?: boolean;
   platform?: Platform;
   hermes?: boolean;
   preview?: boolean;
+  /** Shorthand for --remote with instanceId "thea". */
   thea?: boolean;
+  /** Instance ID to target remotely. Bare --remote defaults to "thea". */
+  remote?: string | boolean;
 }
 
 const CLI_VERSION = "3.3.3" as const;
@@ -176,11 +178,11 @@ export function runCli({
       "--agent-control",
       "Enable file-based IPC for AI agent control (frame capture + key injection)",
       false,
-    ) // eslint-disable-line i18next/no-literal-string
-    .option("--dry-run", earlyT("vibe.help.dryRun"), false)
+    )
     .option("--hermes", earlyT("vibe.help.target"), false) // eslint-disable-line i18next/no-literal-string
     .option("--preview", earlyT("vibe.help.target"), false) // eslint-disable-line i18next/no-literal-string
-    .option("--thea", earlyT("vibe.help.target"), false) // eslint-disable-line i18next/no-literal-string
+    .option("--thea", earlyT("vibe.help.thea"), false) // eslint-disable-line i18next/no-literal-string
+    .option("--remote [instanceId]", earlyT("vibe.help.remote")) // eslint-disable-line i18next/no-literal-string
     .option(
       "--platform <platform>", // eslint-disable-line i18next/no-literal-string
       `Override detected platform. Valid values: ${Object.values(Platform).join(", ")}`, // eslint-disable-line i18next/no-literal-string
@@ -250,23 +252,19 @@ export function runCli({
           : null;
         const effectivePlatform: Platform = platformOverride ?? cliPlatform;
 
-        const targetArg: CliTargetValue = options.thea
-          ? CliTarget.REMOTE
-          : options.hermes || options.preview
-            ? CliTarget.LOCAL
-            : CliTarget.DEV;
         let cliTarget: CliTargetValue;
-        let resolvedRemoteUrl: string | undefined;
+        let resolvedRemoteInstanceId: string | undefined;
 
-        if (targetArg === CliTarget.REMOTE) {
+        if (options.thea) {
           cliTarget = CliTarget.REMOTE;
-          resolvedRemoteUrl =
-            process.env["VIBE_REMOTE_URL"] ||
-            process.env["NEXT_PUBLIC_PROJECT_URL"] ||
-            "https://unbottled.ai";
-          resolvedRemoteUrl = resolvedRemoteUrl.replace(/\/+$/, "");
+          resolvedRemoteInstanceId = "thea";
+        } else if (options.remote !== undefined && options.remote !== false) {
+          cliTarget = CliTarget.REMOTE;
+          resolvedRemoteInstanceId =
+            typeof options.remote === "string" ? options.remote : "thea";
         } else if (
-          targetArg === CliTarget.LOCAL ||
+          options.hermes ||
+          options.preview ||
           process.env["IS_PREVIEW_MODE"] === "true"
         ) {
           cliTarget = CliTarget.LOCAL;
@@ -306,73 +304,46 @@ export function runCli({
           };
           process.once("SIGINT", sigintHandler);
 
-          if (
+          // Shared options for every executeRoute call this invocation makes.
+          const baseRouteOptions = {
+            data: undefined as Record<string, WidgetData> | undefined,
+            urlPathParams: undefined,
+            cliArgs: {
+              positionalArgs: [] as string[],
+              namedArgs: {} as Record<string, WidgetData>,
+              rawTokens: undefined as string[] | undefined,
+            },
+            locale: options.locale,
+            platform: effectivePlatform,
+            output: options.output ?? DEFAULT_OUTPUT,
+            verbose: debug ?? false,
+            interactive: options.interactive ?? false,
+            agentControl: options.agentControl ?? false,
+            cliTarget,
+            remoteInstanceId: resolvedRemoteInstanceId,
+            signal: cliAbortController.signal,
+          };
+
+          const isHelpFlag =
             !command ||
             command === "-h" ||
             command === "--help" ||
-            command === "-?"
-          ) {
+            command === "-?";
+          const isHelpArg =
+            !isHelpFlag &&
+            (args?.includes("-h") ||
+              args?.includes("--help") ||
+              args?.includes("-?"));
+          if (isHelpFlag || isHelpArg) {
             performanceMonitor.mark("routeStart");
             const helpResult = await RouteDelegationHandler.executeRoute(
               "help",
               {
-                data: undefined,
-                urlPathParams: undefined,
-                cliArgs: { positionalArgs: [], namedArgs: {} },
-                locale: options.locale,
-                platform: effectivePlatform,
-                output: options.output ?? DEFAULT_OUTPUT,
-                verbose: debug ?? false,
-                interactive: options.interactive ?? false,
-                agentControl: options.agentControl ?? false,
-                dryRun: options.dryRun ?? false,
-                cliTarget,
-                remoteUrl: resolvedRemoteUrl,
-                signal: cliAbortController.signal,
-              },
-              logger,
-              loader,
-            );
-            performanceMonitor.mark("routeEnd");
-            performanceMonitor.mark("renderStart");
-            if (helpResult.formattedOutput) {
-              await new Promise<void>((resolve) => {
-                process.stdout.write(`${helpResult.formattedOutput}\n`, () => {
-                  resolve();
-                });
-              });
-            }
-            performanceMonitor.mark("renderEnd");
-            await cliResourceManager.cleanupAndExit(
-              logger,
-              debug ?? false,
-              helpResult,
-            );
-            return;
-          }
-
-          if (
-            args?.includes("-h") ||
-            args?.includes("--help") ||
-            args?.includes("-?")
-          ) {
-            performanceMonitor.mark("routeStart");
-            const helpResult = await RouteDelegationHandler.executeRoute(
-              "help",
-              {
-                data: undefined,
-                urlPathParams: undefined,
-                cliArgs: { positionalArgs: [command], namedArgs: {} },
-                locale: options.locale,
-                platform: effectivePlatform,
-                output: options.output ?? DEFAULT_OUTPUT,
-                verbose: debug ?? false,
-                interactive: options.interactive ?? false,
-                agentControl: options.agentControl ?? false,
-                dryRun: options.dryRun ?? false,
-                cliTarget,
-                remoteUrl: resolvedRemoteUrl,
-                signal: cliAbortController.signal,
+                ...baseRouteOptions,
+                cliArgs: {
+                  positionalArgs: isHelpFlag || !command ? [] : [command],
+                  namedArgs: {},
+                },
               },
               logger,
               loader,
@@ -409,15 +380,14 @@ export function runCli({
               : args || [];
 
           performanceMonitor.mark("parseStart");
-          let parsedData: Record<string, WidgetData> | undefined;
           if (options.data) {
             try {
-              parsedData = JSON.parse(options.data.trim()) as Record<
+              baseRouteOptions.data = JSON.parse(options.data.trim()) as Record<
                 string,
                 WidgetData
               >;
             } catch {
-              parsedData = {};
+              baseRouteOptions.data = {};
             }
           }
           performanceMonitor.mark("parseEnd");
@@ -451,25 +421,14 @@ export function runCli({
           logger.debug("[CLI] routeStart");
           performanceMonitor.mark("routeStart");
           const result = await RouteDelegationHandler.executeRoute(
-            command,
+            command ?? "",
             {
-              data: parsedData,
-              urlPathParams: undefined,
+              ...baseRouteOptions,
               cliArgs: {
                 positionalArgs: parsedArgs.positionalArgs,
                 namedArgs: parsedArgs.namedArgs,
                 rawTokens,
               },
-              locale: options.locale,
-              platform: effectivePlatform,
-              output: options.output ?? DEFAULT_OUTPUT,
-              verbose: debug ?? false,
-              interactive: options.interactive ?? false,
-              agentControl: options.agentControl ?? false,
-              dryRun: options.dryRun ?? false,
-              cliTarget,
-              remoteUrl: resolvedRemoteUrl,
-              signal: cliAbortController.signal,
             },
             logger,
             loader,

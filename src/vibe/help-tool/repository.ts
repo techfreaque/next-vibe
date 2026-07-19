@@ -18,7 +18,7 @@ import type { EndpointMeta } from "next-vibe/core/definition/endpoints-meta";
 import { FieldUsage } from "next-vibe/core/definition/enums";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { permissionsRegistry } from "next-vibe/core/route/definitions-registry";
+import { permissionsRegistry } from "next-vibe/core/permissions/registry";
 import type { InferJwtPayloadTypeFromRoles } from "next-vibe/core/route/handler";
 import {
   type ResponseType,
@@ -64,7 +64,7 @@ export class HelpRepository {
    * Listing must agree with execution, so both go through permissionsRegistry.
    * This used to be a local re-implementation of checkPlatformAccess/hasEndpointPermission
    * over string[] roles, and had drifted: it missed WEB_OFF for Platform.AI, blocked
-   * Platform.CRON on AI_TOOL_OFF instead of WEB_OFF, ignored NEXT_PUBLIC_LOCAL_MODE and
+   * Platform.CRON on AI_TOOL_OFF instead of WEB_OFF, ignored NEXT_PUBLIC_VIBE_MODE and
    * allowedClientRoles, and detected markers by string suffix. The generated meta now
    * carries typed UserRoleValue[], so the registry's own API takes it directly.
    */

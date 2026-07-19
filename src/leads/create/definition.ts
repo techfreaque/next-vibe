@@ -114,7 +114,7 @@ const { POST } = createEndpoint({
             description: "post.email.description",
             placeholder: "post.email.placeholder",
             columns: 12,
-            schema: z.string().email(),
+            schema: z.email(),
           }),
 
           businessName: requestField(scopedTranslation, {
@@ -249,7 +249,7 @@ const { POST } = createEndpoint({
               email: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 label: "post.response.summary.email",
-                schema: z.string().email().nullable(),
+                schema: z.email().nullable(),
               }),
               status: responseField(scopedTranslation, {
                 type: WidgetType.BADGE,

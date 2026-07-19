@@ -32,7 +32,7 @@ export const {
     example: "admin@please.change.me",
     comment:
       "Root admin email. Used for CLI auth, API tool access, and all admin endpoints. Change via the app syncs to DB.",
-    commented: true,
+    commented: false,
     onboardingRequired: true,
     onboardingStep: 1,
     onboardingGroup: "admin",
@@ -43,7 +43,7 @@ export const {
     example: "your-admin-password",
     comment:
       "Root admin password. Protects all exposed tools/endpoints. Use a strong password in production! Change via the app syncs to DB.",
-    commented: true,
+    commented: false,
     sensitive: true,
     onboardingRequired: true,
     onboardingStep: 1,

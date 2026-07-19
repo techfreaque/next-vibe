@@ -102,7 +102,7 @@ function spawnVibeStart(): ChildProcess {
     env: {
       ...process.env,
       NODE_ENV: "production",
-      NEXT_PUBLIC_LOCAL_MODE: "true",
+      NEXT_PUBLIC_VIBE_MODE: "agent",
       IS_PREVIEW_MODE: "true",
     },
     cwd: projectDir,

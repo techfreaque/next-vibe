@@ -9,6 +9,7 @@
 import "server-only";
 
 import type { SetupEntry } from "next-vibe/core/setup/types";
+
 import * as setup_0 from "../../vibe/core/generators/setup";
 import * as setup_1 from "../../vibe/platforms/cli/setup";
 import * as setup_2 from "../../vibe/platforms/mcp/setup";

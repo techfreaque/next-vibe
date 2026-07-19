@@ -99,5 +99,18 @@ export const translations: typeof enTranslations = {
       title: "Erfolg",
       description: "Vorgang erfolgreich abgeschlossen",
     },
+    widget: {
+      title: "Code-Generierung",
+      statsTitle: "Laufzusammenfassung",
+      outputTitle: "Generator-Protokoll",
+      total: "Gesamt",
+      ran: "Generiert",
+      skipped: "Unverändert",
+      outputDir: "Ausgabe",
+      noOutput:
+        "Noch keine Ausgabe. Generierung starten, um Ergebnisse zu sehen.",
+      submit: "Generatoren starten",
+      running: "Wird ausgeführt...",
+    },
   },
 };

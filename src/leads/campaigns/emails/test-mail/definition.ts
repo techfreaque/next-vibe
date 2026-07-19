@@ -245,7 +245,7 @@ const { POST } = createEndpoint({
           testEmail: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "post.response.testEmail.content",
-            schema: z.string().email(),
+            schema: z.email(),
           }),
           subject: responseField(scopedTranslation, {
             type: WidgetType.TEXT,

@@ -11,6 +11,7 @@ import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import { db } from "next-vibe/database";
+import { VibeMode } from "next-vibe/env/env-util";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
 import { sshConnections } from "@/ssh/db";
@@ -43,8 +44,8 @@ export async function loadRemoteInstancesContext(
   ]);
 
   const appUrl = envClient.NEXT_PUBLIC_APP_URL;
-  const isLocalMode = envClient.NEXT_PUBLIC_LOCAL_MODE;
-  const isDev = process.env["NODE_ENV"] === "development";
+  const vibeMode = envClient.NEXT_PUBLIC_VIBE_MODE;
+  const isDev = vibeMode === VibeMode.DEV;
   const totalModelCount = getAvailableModelCount(isAdmin, getEnvAvailability());
 
   return {
@@ -54,7 +55,7 @@ export async function loadRemoteInstancesContext(
     isAdmin,
     appName: params.appName ?? "",
     appUrl,
-    isLocalMode,
+    isLocalMode: vibeMode === VibeMode.AGENT,
     isDev,
     totalModelCount,
     sshConnectionCount: sshCount[0]?.count ?? 0,
@@ -85,7 +86,7 @@ export const systemContextFragment: SystemPromptFragment = {
     const lines = [
       `## System Context`,
       ``,
-      `- **Instance:** ${isLocalMode ? "Self-hosted / local" : "Cloud production"} (${appName})`,
+      `- **Instance:** ${isLocalMode ? "Self-hosted / local" : isDev ? "Dev / coding instance" : "Cloud production"} (${appName})`,
       `- **URL:** ${appUrl}`,
     ];
 

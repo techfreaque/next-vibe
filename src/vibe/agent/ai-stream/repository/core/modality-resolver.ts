@@ -114,7 +114,7 @@ export interface BridgeContext {
  * to object type aliases but never to interfaces, so an interface here is
  * unassignable at every erased payload boundary.
  */
-// eslint-disable-next-line typescript/consistent-type-definitions -- Must be a type alias, not an interface: only aliases get the implicit index signature that makes this assignable to WidgetData on an endpoint payload. See above.
+// eslint-disable-next-line typescript/consistent-type-definitions, @typescript-eslint/consistent-type-definitions -- Must be a type alias, not an interface: only aliases get the implicit index signature that makes this assignable to WidgetData on an endpoint payload. See above.
 export type MessageVariant = {
   modality: Modality;
   content: string; // text content or storage URL

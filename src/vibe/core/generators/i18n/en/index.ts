@@ -97,5 +97,17 @@ export const translations = {
       title: "Success",
       description: "Operation completed successfully",
     },
+    widget: {
+      title: "Code Generation",
+      statsTitle: "Run summary",
+      outputTitle: "Generator log",
+      total: "Total",
+      ran: "Generated",
+      skipped: "Unchanged",
+      outputDir: "Output",
+      noOutput: "No output yet. Run generation to see results.",
+      submit: "Run generators",
+      running: "Running...",
+    },
   },
 };

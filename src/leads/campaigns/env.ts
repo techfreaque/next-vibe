@@ -13,7 +13,7 @@ export const {
   examples: leadsCampaignsEnvExamples,
 } = defineEnv({
   LEADS_EMAIL_FROM_EMAIL: {
-    schema: z.string().email().optional(),
+    schema: z.email().optional(),
     example: "leads@example.com",
     comment: "Lead campaigns SMTP",
     commented: true,

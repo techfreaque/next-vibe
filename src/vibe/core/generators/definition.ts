@@ -12,12 +12,17 @@ import {
 } from "next-vibe/core/definition/enums";
 import { scopedTranslation } from "next-vibe/core/generators/i18n";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
-  objectField,
   requestField,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
+
+const GenerateAllWidget = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.GenerateAllWidget })),
+);
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -39,76 +44,10 @@ const { POST } = createEndpoint({
   ],
   aliases: ["generate-all", "gen", "generate"],
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "post.container.title",
-    columns: 12,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: GenerateAllWidget,
+    usage: { request: "data", response: true } as const,
     children: {
-      // === REQUEST FIELDS ===
-      rootDir: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "post.fields.rootDir.label",
-        description: "post.fields.rootDir.description",
-        columns: 6,
-        schema: z.string().optional(),
-      }),
-
-      outputDir: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "post.fields.outputDir.label",
-        description: "post.fields.outputDir.description",
-        columns: 6,
-        schema: z.string().optional().default("src/generated"),
-      }),
-
-      verbose: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label: "post.fields.verbose.label",
-        description: "post.fields.verbose.description",
-        columns: 4,
-        schema: z.boolean().optional().default(false),
-      }),
-
-      skipEndpoints: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label: "post.fields.skipEndpoints.label",
-        description: "post.fields.skipEndpoints.description",
-        columns: 4,
-        schema: z.boolean().optional().default(false),
-      }),
-
-      skipSeeds: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label: "post.fields.skipSeeds.label",
-        description: "post.fields.skipSeeds.description",
-        columns: 4,
-        schema: z.boolean().optional().default(false),
-      }),
-
-      skipTaskIndex: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label: "post.fields.skipTaskIndex.label",
-        description: "post.fields.skipTaskIndex.description",
-        columns: 4,
-        schema: z.boolean().optional().default(false),
-      }),
-
-      skipTanstack: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label: "post.fields.skipTanstack.label",
-        description: "post.fields.skipTanstack.description",
-        columns: 4,
-        schema: z.boolean().optional().default(false),
-      }),
-
       force: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
@@ -125,16 +64,10 @@ const { POST } = createEndpoint({
         schema: z.boolean(),
       }),
 
-      generationCompleted: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "post.fields.generationCompleted.title",
-        schema: z.boolean(),
-      }),
-
       output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "post.fields.output.title",
-        schema: z.string(),
+        schema: z.string().optional(),
       }),
 
       generationStats: responseField(scopedTranslation, {
@@ -200,93 +133,27 @@ const { POST } = createEndpoint({
   // === EXAMPLES ===
   examples: {
     requests: {
-      default: {
-        outputDir: "src/generated",
-        verbose: false,
-        skipEndpoints: false,
-        skipSeeds: false,
-      },
-      success: {
-        outputDir: "src/generated",
-        verbose: false,
-        skipEndpoints: false,
-        skipSeeds: false,
-      },
-      verbose: {
-        outputDir: "src/generated",
-        verbose: true,
-        skipEndpoints: false,
-        skipSeeds: false,
-      },
-      skipSome: {
-        outputDir: "src/generated",
-        verbose: false,
-        skipEndpoints: true,
-        skipSeeds: false,
-      },
+      default: { force: false },
+      force: { force: true },
     },
     responses: {
       default: {
         success: true,
-        generationCompleted: true,
-        output: "✅ Generation completed successfully",
         generationStats: {
           totalGenerators: 2,
           generatorsRun: 2,
           generatorsSkipped: 0,
-          outputDirectory: "reports",
-          functionalGeneratorsCompleted: true,
-        },
-      },
-      success: {
-        success: true,
-        generationCompleted: true,
-        output:
-          "🚀 Generating some vibe...\nStep 1: Running functional generators...\n✅ Vibe generation completed successfully!",
-        generationStats: {
-          totalGenerators: 2,
-          generatorsRun: 2,
-          generatorsSkipped: 0,
-          outputDirectory: "reports",
-          functionalGeneratorsCompleted: true,
-        },
-      },
-      verbose: {
-        success: true,
-        generationCompleted: true,
-        output:
-          "🚀 Generating some vibe (verbose mode)...\nStep 1: Running functional generators...\n✅ Vibe generation completed successfully!",
-        generationStats: {
-          totalGenerators: 2,
-          generatorsRun: 2,
-          generatorsSkipped: 0,
-          outputDirectory: "reports",
-          functionalGeneratorsCompleted: true,
-        },
-      },
-      skipSome: {
-        success: true,
-        generationCompleted: true,
-        output:
-          "🚀 Generating some vibe (with skips)...\nStep 1: Running functional generators...\n✅ Vibe generation completed successfully!",
-        generationStats: {
-          totalGenerators: 2,
-          generatorsRun: 1,
-          generatorsSkipped: 1,
-          outputDirectory: "custom-reports",
+          outputDirectory: "src/generated",
           functionalGeneratorsCompleted: true,
         },
       },
       withSkips: {
         success: true,
-        generationCompleted: true,
-        output:
-          "🚀 Generating some vibe...\nStep 1: Running functional generators (some skipped)...\n✅ Vibe generation completed successfully!",
         generationStats: {
           totalGenerators: 2,
           generatorsRun: 1,
           generatorsSkipped: 1,
-          outputDirectory: "custom-reports",
+          outputDirectory: "src/generated",
           functionalGeneratorsCompleted: true,
         },
       },

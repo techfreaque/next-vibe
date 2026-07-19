@@ -71,6 +71,16 @@ export const translations = {
         description:
           "Use webpack instead of Turbopack. Lower memory usage (~7.5 GB vs ~12 GB). Enabled by default in production Docker builds.",
       },
+      vibeMode: {
+        title: "Instance Mode",
+        description:
+          "Bakes the instance mode into the Next.js bundle. 'agent' = personal local instance. 'cloud' = SaaS deployment. 'dev' = coding instance (default). Overrides NEXT_PUBLIC_VIBE_MODE in .env.",
+        options: {
+          agent: "Agent (personal local instance)",
+          cloud: "Cloud (SaaS deployment)",
+          dev: "Dev (coding instance, default)",
+        },
+      },
       skipEndpoints: {
         title: "Skip Endpoints Generation",
         description: "Skip generating endpoint files",

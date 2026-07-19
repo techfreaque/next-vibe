@@ -13,11 +13,7 @@ import {
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import type { TParams } from "next-vibe/core/i18n/core/static-types";
-import type {
-  ErrorResponseType,
-  ResponseType,
-} from "next-vibe/core/route/response.schema";
-import { success } from "next-vibe/core/route/response.schema";
+import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
@@ -40,11 +36,6 @@ import { getEndpoint } from "@/generated/endpoints/endpoint";
 // ./auth/cli-user + ./auth/session-file with their identity/DB surface.
 import { resolveCliUser } from "./cli-auth";
 import { CliInputParser } from "./parsing";
-// THE REMOTE SEAM: the --thea/--hermes remote leg — HTTP dispatch to another
-// instance, remote session/cookies, remote login bookkeeping. It is the only thing
-// pulling remote-connection + the DB into the CLI runtime. A local-only build
-// points this single import at ./remote-target-local and drops ./remote-target.
-import { executeRemoteEndpoint } from "./remote-target";
 
 // Lazy-loaded to avoid pulling in ~50 Ink widget modules at startup (~120ms)
 let _resultFormatter: typeof CliResultFormatterType | null = null;
@@ -57,41 +48,18 @@ async function getResultFormatter(): Promise<typeof CliResultFormatterType> {
   return _resultFormatter;
 }
 
-interface CliResponseData {
-  [key: string]:
-    | string
-    | number
-    | boolean
-    | null
-    | undefined
-    | CliResponseData
-    | CliResponseData[];
-}
+type CliResponseData = Record<string, WidgetData>;
 
-/**
- * Unwrap execute-tool's local-WAIT response shape into the raw endpoint data the
- * CLI formatter expects. runInProcess wraps success as `{ result: <data> }` for
- * MCP/AI rendering; CLI needs `<data>` flat. isErrorResponse / performance ride
- * through on the response options (CLI uses them for exit codes + the summary).
- */
-function unwrapExecuteToolResult(
-  raw: ResponseType<WidgetData>,
-): ResponseType<CliResponseData> {
-  if (!raw.success) {
-    return raw as ResponseType<CliResponseData>;
-  }
-  const wrapped = raw.data;
-  const data: CliResponseData =
-    wrapped !== null &&
-    typeof wrapped === "object" &&
-    !Array.isArray(wrapped) &&
-    "result" in wrapped
-      ? ((wrapped as { result: WidgetData })["result"] as CliResponseData)
-      : (wrapped as CliResponseData);
-  return success(data, {
-    ...(raw.isErrorResponse && { isErrorResponse: true }),
-    ...(raw.performance && { performance: raw.performance }),
-  });
+function isRecord(
+  v: WidgetData | null | undefined,
+): v is Record<string, WidgetData> {
+  return (
+    v !== null &&
+    v !== undefined &&
+    typeof v === "object" &&
+    !(v instanceof Date) &&
+    !Array.isArray(v)
+  );
 }
 
 /** CLI-compatible platforms for type assertions */
@@ -169,7 +137,6 @@ interface CliExecutionOptions {
    * Auth still resolves the real CLI user; only the reported platform changes.
    */
   platform: Platform;
-  dryRun: boolean | undefined;
   interactive: boolean | undefined;
   /** Enable file-based IPC for AI agent control (frame capture + key injection) */
   agentControl: boolean | undefined;
@@ -177,8 +144,8 @@ interface CliExecutionOptions {
   output: "json" | "pretty" | undefined;
   /** Execution target: dev, local, or remote */
   cliTarget: CliTargetValue;
-  /** Remote URL when cliTarget === REMOTE */
-  remoteUrl?: string;
+  /** Instance ID to target when cliTarget === REMOTE (looked up from remote_connections) */
+  remoteInstanceId?: string;
   /** Optional abort signal (e.g. from SIGINT) to cancel long-running commands */
   signal: AbortSignal;
 }
@@ -255,7 +222,6 @@ export class RouteDelegationHandler {
             namedArgs: options.cliArgs?.namedArgs ?? [],
             rawTokens: options.cliArgs?.rawTokens,
             interactive: false,
-            dryRun: options.dryRun ?? false,
           },
           logger,
         );
@@ -295,90 +261,19 @@ export class RouteDelegationHandler {
           namedArgs: options.cliArgs?.namedArgs ?? [],
           rawTokens: options.cliArgs?.rawTokens,
           interactive: false, // Non-interactive mode - args only
-          dryRun: options.dryRun ?? false,
         },
         logger,
       );
 
-      // CLI-specific: Handle dry run
-      if (options.dryRun) {
-        logger.info("🔍 Dry run - would execute with:");
-        logger.info(
-          JSON.stringify(
-            { data: inputData.data, urlPathParams: inputData.urlPathParams },
-            null,
-            2,
-          ),
-        );
-        const dryRunData: CliResponseData = Object.assign(
-          { dryRun: true } as CliResponseData,
-          inputData.data || {},
-          inputData.urlPathParams
-            ? { urlPathParams: inputData.urlPathParams }
-            : {},
-        );
-        return {
-          success: true,
-          data: dryRunData,
-          metadata: {
-            executionTime: Date.now() - startTime,
-            endpointPath: resolvedCommand,
-            resolvedCommand,
-          },
-        };
-      }
-
-      // Remote execution: transport-aware dispatch
-      if (
-        options.cliTarget === CliTarget.REMOTE &&
-        options.remoteUrl &&
-        endpoint
-      ) {
-        const remoteResult = await executeRemoteEndpoint({
-          endpoint,
-          data: inputData.data || {},
-          urlPathParams: inputData.urlPathParams,
-          locale: options.locale,
-          logger,
-          remoteUrl: options.remoteUrl,
-          userId: !cliUser.isPublic && cliUser.id ? cliUser.id : undefined,
-          user: cliUser,
-          signal: options.signal,
-          platform: options.platform,
-        });
-
-        const routeResult: RouteExecutionResult = {
-          success: remoteResult.success,
-          data: remoteResult.success
-            ? (remoteResult.data as CliResponseData)
-            : undefined,
-          error: remoteResult.success ? undefined : remoteResult.message,
-          errorParams: remoteResult.success
-            ? undefined
-            : remoteResult.messageParams,
-          metadata: {
-            executionTime: Date.now() - startTime,
-            endpointPath: resolvedCommand,
-            method: endpoint.method,
-            resolvedCommand,
-          },
-        };
-
-        const { output: formattedOutput, renderMs } = await (
-          await getResultFormatter()
-        ).formatResult(
-          routeResult,
-          options.output || "pretty",
-          options.locale,
-          options.verbose || false,
-          logger,
-          endpoint,
-          cliUser,
-          inputData.data,
-        );
-
-        return { ...routeResult, formattedOutput, renderMs };
-      }
+      // Single dispatch path for local and remote calls.
+      // Remote: instanceId routes through execute-tool's RemoteDispatch which resolves
+      // the connection row, validates it, and picks direct-http or reverse-ws.
+      // Local: instanceId undefined → runs in-process.
+      // To add a remote connection: vibe remote-connect <url> (not vibe --remote login).
+      const remoteInstanceId =
+        options.cliTarget === CliTarget.REMOTE
+          ? options.remoteInstanceId
+          : undefined;
 
       // CLI-specific: Show execution info if verbose
       if (options.verbose) {
@@ -395,10 +290,11 @@ export class RouteDelegationHandler {
         }
       }
 
-      // Delegate to the unified execute-tool repository — the single dispatch
-      // path (permission cascade, folder restrictions, confirmation gate) shared
-      // with AI/MCP/remote. CLI keeps its own concerns: arg parsing (pre-split
-      // urlPathParams), handler reuse (preloadedHandler), and output formatting.
+      // Single dispatch path for both local and remote non-login/logout calls.
+      // Remote: instanceId routes through execute-tool's remote dispatch (direct-http
+      // or reverse-ws per connection config). Local: instanceId is undefined, runs
+      // in-process. Both share the same permission cascade, folder restrictions,
+      // confirmation gate, and callback mode handling.
       const { RouteExecuteRepository } =
         await import("next-vibe/execute-tool/repository");
       const rawResult = await RouteExecuteRepository.runInProcess({
@@ -406,46 +302,42 @@ export class RouteDelegationHandler {
         input: inputData.data || {},
         urlPathParams: inputData.urlPathParams || {},
         callbackMode: "wait",
+        instanceId: remoteInstanceId,
         user: cliUser,
         locale: options.locale,
         logger,
         platform: options.platform,
-        preloadedHandler: routeHandler,
-        // no user context — UTC (dates not user-facing here)
+        // Only pass preloadedHandler for local path — remote ignores it.
+        preloadedHandler: remoteInstanceId ? undefined : routeHandler,
         toolExecutionContext: makeHeadlessContext(
           options.signal,
           undefined,
           "UTC",
         ),
       });
-      // runInProcess wraps inline WAIT success as { result: <data> } for MCP/AI
-      // display. CLI formatting needs the raw endpoint data — unwrap it.
-      const result: ResponseType<CliResponseData> =
-        unwrapExecuteToolResult(rawResult);
 
-      // 7. Convert ResponseType to RouteExecutionResult
       const routeResult: RouteExecutionResult = {
-        success: result.success,
-        data: result.success ? result.data : undefined,
-        error: result.success ? undefined : result.message,
-        errorParams: result.success ? undefined : result.messageParams,
-        inputData: result.success ? undefined : inputData.data,
+        success: rawResult.success,
+        data:
+          rawResult.success && isRecord(rawResult.data)
+            ? rawResult.data
+            : undefined,
+        error: rawResult.success ? undefined : rawResult.message,
+        errorParams: rawResult.success ? undefined : rawResult.messageParams,
+        inputData: rawResult.success ? undefined : inputData.data,
         metadata: {
           executionTime: Date.now() - startTime,
           endpointPath: resolvedCommand,
           method: "",
           resolvedCommand,
         },
-        // Pass through isErrorResponse from API response for CLI exit code handling
-        // Note: isErrorResponse can be true even when result.success is true (e.g., vibe check found errors)
         isErrorResponse:
-          "isErrorResponse" in result && result.isErrorResponse
+          "isErrorResponse" in rawResult && rawResult.isErrorResponse
             ? true
             : undefined,
-        // Pass through performance metadata from API response for execution summary
         performance:
-          "performance" in result && result.performance
-            ? result.performance
+          "performance" in rawResult && rawResult.performance
+            ? rawResult.performance
             : undefined,
         endpointLoadMs,
       };

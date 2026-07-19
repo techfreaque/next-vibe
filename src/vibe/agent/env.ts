@@ -1,7 +1,7 @@
 /**
  * Agent Environment
  *
- * When NEXT_PUBLIC_LOCAL_MODE is enabled (default for self-hosted installs),
+ * When NEXT_PUBLIC_VIBE_MODE is "agent" (self-hosted/local instance),
  * all AI provider API keys are optional. Missing keys disable the corresponding
  * feature with user-friendly setup instructions rather than crashing on startup.
  */

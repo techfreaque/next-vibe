@@ -40,7 +40,7 @@ import { RouteExecuteRepository } from "./index";
 export async function emitToolResult(
   callId: string,
   localUserId: string,
-  result: ResponseType<RouteExecuteResponseOutput>,
+  result: ResponseType<WidgetData>,
   logger: EndpointLogger,
   /** The requester connection (our local name for it). Addressed frame:
    *  other peers of this account never see the result. undefined = legacy
@@ -48,9 +48,7 @@ export async function emitToolResult(
   targetInstanceId: string | undefined,
 ): Promise<void> {
   const resultData: WidgetData = result.success
-    ? (JSON.parse(
-        JSON.stringify(result.data.result ?? result.data),
-      ) as WidgetData)
+    ? (JSON.parse(JSON.stringify(result.data)) as WidgetData)
     : {
         // Failure fidelity across the wire: carry the ORIGINAL errorType so
         // the requester's inline mapping reconstructs the real failure
@@ -135,7 +133,7 @@ export async function handleIncomingToolRequest(
     callbackMode === CallbackMode.WAKE_UP;
 
   const relayResult = async (
-    result: ResponseType<RouteExecuteResponseOutput>,
+    result: ResponseType<WidgetData>,
   ): Promise<void> => {
     logger.debug("[RouteExecute] relaying result to requester", {
       callId: roundtrip.callId,
@@ -204,7 +202,7 @@ export async function handleIncomingToolRequest(
       : {}),
   };
 
-  const runExecute = (): Promise<ResponseType<RouteExecuteResponseOutput>> =>
+  const runExecute = (): Promise<ResponseType<WidgetData>> =>
     RouteExecuteRepository.execute(
       {
         toolName: requestData.toolName,

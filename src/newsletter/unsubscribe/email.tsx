@@ -37,7 +37,7 @@ type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 // ============================================================================
 
 const newsletterUnsubscribePropsSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
 });
 
 type NewsletterUnsubscribeProps = z.infer<
@@ -284,7 +284,7 @@ function AdminUnsubscribeNotificationEmailContent({
 // ============================================================================
 
 const adminNewsletterUnsubscribePropsSchema = z.object({
-  unsubscribedEmail: z.string().email(),
+  unsubscribedEmail: z.email(),
 });
 
 type AdminNewsletterUnsubscribeProps = z.infer<

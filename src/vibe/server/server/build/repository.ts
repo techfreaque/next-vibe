@@ -4,6 +4,7 @@
  */
 
 import { buildPackageRunnerCommand, coreEnv } from "next-vibe/core/env";
+import { VibeMode } from "next-vibe/env/env-util";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -22,8 +23,6 @@ import { scopedTranslation as dockerOperationsScopedTranslation } from "next-vib
 import { scopedTranslation as dbUtilsScopedTranslation } from "next-vibe/database/utils/i18n";
 import type { ServerBuildT } from "next-vibe/server/server/build/i18n";
 import { scopedTranslation as builderScopedTranslation } from "next-vibe/tooling/builder/i18n";
-
-import { GENERATED_DIR } from "@/env/paths";
 
 import { ServerFramework } from "../enum";
 import { readPidFilePort, VIBE_START_PID_FILE } from "../pid";
@@ -83,15 +82,7 @@ export class BuildRepository {
         output.push(t("post.repository.messages.generatingEndpoints"));
         try {
           const generateResult = await GenerateAllRepository.generateAll(
-            {
-              outputDir: GENERATED_DIR,
-              verbose: false,
-              skipEndpoints: !data.generateEndpoints,
-              skipSeeds: !data.generateSeeds,
-              skipTaskIndex: false,
-              skipTanstack: data.framework !== ServerFramework.TANSTACK,
-              force: false,
-            },
+            { force: false },
             logger,
             locale,
           );
@@ -253,6 +244,7 @@ export class BuildRepository {
             NODE_ENV: "production",
             NEXT_DIST_DIR: ".next-prod",
             NODE_OPTIONS: "--max-old-space-size=10000",
+            ...(data.vibeMode ? { NEXT_PUBLIC_VIBE_MODE: data.vibeMode } : {}),
           },
         });
         if (buildResult.status === 0) {
@@ -345,7 +337,7 @@ export class BuildRepository {
       // (environment.ts swaps DATABASE_URL port for build/start)
       if (
         (data.migrate || data.seed) &&
-        process.env["NEXT_PUBLIC_LOCAL_MODE"] === "true"
+        coreEnv.NEXT_PUBLIC_VIBE_MODE !== VibeMode.CLOUD
       ) {
         try {
           const { DbUtilsRepository } =

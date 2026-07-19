@@ -4,7 +4,7 @@
  * Distinguishes the three execution contexts for CLI commands:
  * - DEV:    Atlas dev instance (port 5432, `vibe dev`, no flags)
  * - LOCAL:  Hermes instance (port 5433, `vibe start` / `--hermes`)
- * - REMOTE: Thea prod instance via HTTP (`--thea`)
+ * - REMOTE: Remote instance via HTTP (`--remote [instanceId]`)
  */
 
 export const CliTarget = {
@@ -12,8 +12,8 @@ export const CliTarget = {
   DEV: "atlas",
   /** Hermes instance - preview DB port, `vibe start` / `--hermes` */
   LOCAL: "hermes",
-  /** Thea prod instance via HTTP - `--thea` */
-  REMOTE: "thea",
+  /** Execute on a remote instance looked up by instanceId from the active DB's remote_connections */
+  REMOTE: "remote",
 } as const;
 
 export type CliTargetValue = (typeof CliTarget)[keyof typeof CliTarget];

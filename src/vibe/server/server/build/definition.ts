@@ -6,8 +6,14 @@
 import { z } from "zod";
 
 import { createEndpoint } from "next-vibe/core/definition/create";
+import { VibeMode, VibeModeValues } from "next-vibe/env/env-util";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
-import { objectField, requestField, responseArrayOptionalField, responseField } from "next-vibe/unified-ui/_shared/utils-i18n";
+import {
+  objectField,
+  requestField,
+  responseArrayOptionalField,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -131,6 +137,25 @@ const { POST } = createEndpoint({
         label: "post.fields.webpack.title",
         description: "post.fields.webpack.description",
         schema: z.boolean().optional().default(true),
+      }),
+
+      vibeMode: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "post.fields.vibeMode.title",
+        description: "post.fields.vibeMode.description",
+        options: [
+          {
+            value: VibeMode.AGENT,
+            label: "post.fields.vibeMode.options.agent",
+          },
+          {
+            value: VibeMode.CLOUD,
+            label: "post.fields.vibeMode.options.cloud",
+          },
+          { value: VibeMode.DEV, label: "post.fields.vibeMode.options.dev" },
+        ],
+        schema: z.enum(VibeModeValues).optional(),
       }),
 
       // === RESPONSE FIELDS ===

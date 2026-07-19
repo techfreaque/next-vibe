@@ -9,6 +9,7 @@ import { exec } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import { promisify } from "node:util";
 
+import { coreEnv } from "next-vibe/core/env";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -16,6 +17,7 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
+import { VibeMode } from "next-vibe/env/env-util";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
@@ -46,7 +48,7 @@ export class LinuxUsersListRepository {
       );
     }
 
-    const isLocalMode = process.env["NEXT_PUBLIC_LOCAL_MODE"] !== "false";
+    const isLocalMode = coreEnv.NEXT_PUBLIC_VIBE_MODE !== VibeMode.CLOUD;
     if (!isLocalMode) {
       return fail({
         message: t("errors.localModeOnly.title"),

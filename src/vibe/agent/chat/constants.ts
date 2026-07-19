@@ -3,7 +3,6 @@
  * Centralized constants for chat system including storage keys, limits, and defaults
  */
 
-import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole, UserRole } from "next-vibe/identity/roles/enum";
 
@@ -139,7 +138,7 @@ export function getDefaultToolIds(
   isAdmin?: boolean,
   isCustomer?: boolean,
 ): readonly string[] {
-  const effectiveAdmin = isAdmin ?? envClient.NEXT_PUBLIC_LOCAL_MODE;
+  const effectiveAdmin = isAdmin ?? false;
   if (effectiveAdmin) {
     return DEFAULT_AI_PINNED_IDS[UserRole.ADMIN] ?? [];
   }

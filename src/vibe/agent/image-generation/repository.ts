@@ -454,7 +454,7 @@ export class ImageGenerationRepository {
 
     const { t: aiStreamT } = aiStreamScopedTranslation.scopedT(locale);
 
-    const sizeHint = data.size > 0 ? ` Output size: ${data.size}.` : "";
+    const sizeHint = data.size ? ` Output size: ${data.size}.` : "";
     const qualityHint = data.quality ? ` Quality: ${data.quality}.` : "";
     const refHint = data.inputMediaUrl
       ? ` Use this image as reference: ${data.inputMediaUrl}`

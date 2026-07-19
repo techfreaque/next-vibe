@@ -3,7 +3,7 @@
  */
 
 import { defineEnvClient } from "next-vibe/env/define-env-client";
-import { Environment } from "next-vibe/env/env-util";
+import { Environment, VibeMode, VibeModeValues } from "next-vibe/env/env-util";
 import { getCurrentOrigin } from "next-vibe/ui/lib/location";
 import { z } from "zod";
 
@@ -42,14 +42,12 @@ export const {
       "Project URL - defaults to https://unbottled.ai. Override to use your own domain.",
     commented: true,
   },
-  NEXT_PUBLIC_LOCAL_MODE: {
-    schema: z
-      .string()
-      .optional()
-      .default("false")
-      .transform((v) => v === "true"),
-    value: process.env.NEXT_PUBLIC_LOCAL_MODE,
-    example: "false",
+  NEXT_PUBLIC_VIBE_MODE: {
+    schema: z.enum(VibeModeValues).default(VibeMode.DEV),
+    value: process.env.NEXT_PUBLIC_VIBE_MODE,
+    example: VibeMode.DEV,
+    comment:
+      "Instance mode. 'agent' = personal local instance (no auth wall, no payments). 'cloud' = SaaS deployment (auth, payments, receive-only sync). 'dev' = Atlas coding instance (default).",
   },
   NEXT_PUBLIC_DEBUG_PRODUCTION: {
     schema: z
@@ -59,17 +57,6 @@ export const {
       .transform((v) => v === "true"),
     value: process.env.NEXT_PUBLIC_DEBUG_PRODUCTION,
     example: "false",
-  },
-  NEXT_PUBLIC_VIBE_IS_CLOUD: {
-    schema: z
-      .string()
-      .optional()
-      .default("false")
-      .transform((v) => v === "true"),
-    value: process.env.NEXT_PUBLIC_VIBE_IS_CLOUD,
-    example: "false",
-    comment:
-      "Set to true on cloud/SaaS instances that receive syncs from users. Disables outbound task/memory sync so the cloud instance never pushes back to user devices.",
   },
 });
 

@@ -286,7 +286,20 @@ export class RouteExecuteRepository {
         waitResult,
         platform,
       );
-      return waitResult;
+      if (!waitResult.success) {
+        return waitResult;
+      }
+      // Wrap local WAIT data in `result` to satisfy the route schema.
+      // Preserves isErrorResponse / performance for CLI exit codes and timing.
+      return success(
+        { result: waitResult.data },
+        {
+          ...(waitResult.isErrorResponse && { isErrorResponse: true }),
+          ...(waitResult.performance && {
+            performance: waitResult.performance,
+          }),
+        },
+      );
     } catch (error) {
       const msg = parseError(error).message;
       logToolLine(
@@ -365,10 +378,11 @@ export class RouteExecuteRepository {
     if (!result.success) {
       return result;
     }
-    // RouteExecuteResponseOutput is a plain serialisable object — safe to round-trip to WidgetData.
-    const data: WidgetData = JSON.parse(JSON.stringify(result.data));
-    // Preserve the target's isErrorResponse / performance metadata (CLI uses
-    // isErrorResponse for exit codes, performance for its execution summary).
+    // Local WAIT wraps the target's output in `result` to satisfy the route schema.
+    // Async/remote responses carry taskId/hint/status at the top level — no `result` field.
+    // Either way, normalize to plain WidgetData via JSON round-trip (wire-safety).
+    const payload: WidgetData = result.data.result ?? result.data;
+    const data: WidgetData = JSON.parse(JSON.stringify(payload));
     return success(data, {
       ...(result.isErrorResponse && { isErrorResponse: true }),
       ...(result.performance && { performance: result.performance }),
@@ -420,9 +434,6 @@ export class RouteExecuteRepository {
 
     // When instanceId or callbackMode is set, route through execute() so remote dispatch,
     // incognito blocking, callback mode handling, and task creation all apply.
-    // The execute() → runInProcess() path wraps the response in { result: ... } for
-    // MCP/AI display, but for typed calls we need the raw endpoint data. We recover it
-    // by unwrapping after execute() has already validated routing.
     if (rest.instanceId ?? rest.callbackMode) {
       const routingResult = await RouteExecuteRepository.runInProcess({
         toolName,
@@ -438,19 +449,6 @@ export class RouteExecuteRepository {
         toolExecutionContext,
         platform: rest.platform ?? Platform.NEXT_API,
       });
-      // runInProcess wraps inline WAIT results as { result: <data> } for MCP/AI display.
-      // For typed callers we unwrap to return the raw endpoint data (matching local path).
-      if (
-        routingResult.success &&
-        typeof routingResult.data === "object" &&
-        routingResult.data !== null &&
-        !Array.isArray(routingResult.data) &&
-        "result" in routingResult.data
-      ) {
-        return success(routingResult.data.result) as ResponseType<
-          TDef["types"]["ResponseOutput"]
-        >;
-      }
       return routingResult as ResponseType<TDef["types"]["ResponseOutput"]>;
     }
 

@@ -1,6 +1,7 @@
 import { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import { CODING_AGENT_ALIAS } from "next-vibe/agent/coding-agent/constants";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
+import { VibeMode } from "next-vibe/env/env-util";
 import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { HEALTH_ALIAS } from "next-vibe/server/server/health/constants";
@@ -37,7 +38,10 @@ export const deploymentAgentSkill: Skill = {
   icon: "rocket",
   category: SkillCategory.CODING,
   ownershipType: SkillOwnershipType.SYSTEM,
-  userRole: envClient.NEXT_PUBLIC_LOCAL_MODE ? [UserPermissionRole.ADMIN] : [],
+  userRole:
+    envClient.NEXT_PUBLIC_VIBE_MODE === VibeMode.AGENT
+      ? [UserPermissionRole.ADMIN]
+      : [],
   availableTools: [
     tool(CODING_AGENT_ALIAS),
     tool(HEALTH_ALIAS),

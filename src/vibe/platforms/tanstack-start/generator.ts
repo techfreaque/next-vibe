@@ -20,10 +20,7 @@ import path, { join, relative, resolve } from "node:path";
 import type { ApiSection } from "next-vibe/core/definition/endpoint-base";
 import { hasCustomDirective } from "next-vibe/core/generators/shared/custom-directive";
 import { findFilesByName } from "next-vibe/core/generators/shared/scanner";
-import type {
-  GeneratorContext,
-  GeneratorResult,
-} from "next-vibe/core/generators/shared/shared-inputs";
+import type { GeneratorDefinition } from "next-vibe/core/generators/shared/shared-inputs";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import {
   filterPlatformMarkers,
@@ -734,91 +731,126 @@ async function regenerateRouteTree(result: GenerationResult): Promise<void> {
   }
 }
 
-export async function generate(
-  ctx: GeneratorContext,
-): Promise<GeneratorResult> {
-  const result: GenerationResult = { created: [], skipped: [], errors: [] };
-  const ui = uiDir();
-  const api = apiDir();
-  const routes = routesDir();
-
-  if (!existsSync(ui)) {
-    return {
-      summary: "tanstack routes (ui dir missing)",
-      counts: { created: 0, skipped: 0 },
-    };
-  }
-
-  mkdirSync(routes, { recursive: true });
-  cleanupGeneratedFiles(routes);
-
-  for (const relPath of findFiles(ui, "layout.tsx")) {
-    const dir = posixDirname(relPath);
-    if (dir === ".") {
-      result.skipped.push(relPath);
-      continue;
+export const generator: GeneratorDefinition = {
+  key: "tanstack-routes",
+  phase: "default",
+  needs: { definitionModules: true },
+  cacheKey: "tanstack-routes",
+  findInputs(live) {
+    const pagesDir = getUiDir();
+    if (live) {
+      return [
+        ...live.routeFiles,
+        ...findFilesByName(pagesDir, "page.tsx").map(
+          (r: { fullPath: string }) => r.fullPath,
+        ),
+        ...findFilesByName(pagesDir, "layout.tsx").map(
+          (r: { fullPath: string }) => r.fullPath,
+        ),
+      ].toSorted();
     }
-    const srcFile = join(ui, relPath);
-    if (hasCustomDirective(srcFile)) {
-      result.skipped.push(relPath);
-      continue;
-    }
-    try {
-      emitLayoutFile(dir, srcFile, ui, result);
-    } catch (error) {
-      result.errors.push({ file: relPath, error: parseError(error).message });
-    }
-  }
+    return [
+      ...findFilesByName(getApiDir(), "route.ts").map(
+        (r: { fullPath: string }) => r.fullPath,
+      ),
+      ...findFilesByName(pagesDir, "page.tsx").map(
+        (r: { fullPath: string }) => r.fullPath,
+      ),
+      ...findFilesByName(pagesDir, "layout.tsx").map(
+        (r: { fullPath: string }) => r.fullPath,
+      ),
+    ].toSorted();
+  },
+  async generate(ctx) {
+    const result: GenerationResult = { created: [], skipped: [], errors: [] };
+    const ui = uiDir();
+    const api = apiDir();
+    const routes = routesDir();
 
-  for (const relPath of findFiles(ui, "page.tsx")) {
-    const dir = posixDirname(relPath);
-    const srcFile = join(ui, relPath);
-    if (hasCustomDirective(srcFile)) {
-      result.skipped.push(relPath);
-      continue;
+    if (!existsSync(ui)) {
+      return {
+        summary: "tanstack routes (ui dir missing)",
+        counts: { created: 0, skipped: 0 },
+      };
     }
-    try {
-      emitPageFile(dir, srcFile, ui, result);
-    } catch (error) {
-      result.errors.push({ file: relPath, error: parseError(error).message });
-    }
-  }
 
-  if (existsSync(api)) {
-    for (const relPath of findFiles(api, "route.ts")) {
+    mkdirSync(routes, { recursive: true });
+    cleanupGeneratedFiles(routes);
+
+    for (const relPath of findFiles(ui, "layout.tsx")) {
       const dir = posixDirname(relPath);
-      const srcFile = join(api, relPath);
+      if (dir === ".") {
+        result.skipped.push(relPath);
+        continue;
+      }
+      const srcFile = join(ui, relPath);
       if (hasCustomDirective(srcFile)) {
         result.skipped.push(relPath);
         continue;
       }
-      if (!hasHttpExports(srcFile)) {
-        result.skipped.push(relPath);
-        continue;
-      }
-      if (isWebExcluded(srcFile, ctx.computed.definitionModules)) {
-        result.skipped.push(relPath);
-        continue;
-      }
       try {
-        emitApiFile(dir, srcFile, api, result);
+        emitLayoutFile(dir, srcFile, ui, result);
       } catch (error) {
         result.errors.push({ file: relPath, error: parseError(error).message });
       }
     }
-  }
 
-  emitRootRedirect(result);
-  await regenerateRouteTree(result);
+    for (const relPath of findFiles(ui, "page.tsx")) {
+      const dir = posixDirname(relPath);
+      const srcFile = join(ui, relPath);
+      if (hasCustomDirective(srcFile)) {
+        result.skipped.push(relPath);
+        continue;
+      }
+      try {
+        emitPageFile(dir, srcFile, ui, result);
+      } catch (error) {
+        result.errors.push({ file: relPath, error: parseError(error).message });
+      }
+    }
 
-  if (result.errors.length > 0) {
+    if (existsSync(api)) {
+      for (const relPath of findFiles(api, "route.ts")) {
+        const dir = posixDirname(relPath);
+        const srcFile = join(api, relPath);
+        if (hasCustomDirective(srcFile)) {
+          result.skipped.push(relPath);
+          continue;
+        }
+        if (!hasHttpExports(srcFile)) {
+          result.skipped.push(relPath);
+          continue;
+        }
+        if (isWebExcluded(srcFile, ctx.computed.definitionModules)) {
+          result.skipped.push(relPath);
+          continue;
+        }
+        try {
+          emitApiFile(dir, srcFile, api, result);
+        } catch (error) {
+          result.errors.push({
+            file: relPath,
+            error: parseError(error).message,
+          });
+        }
+      }
+    }
+
+    emitRootRedirect(result);
+    await regenerateRouteTree(result);
+
+    if (result.errors.length > 0) {
+      return {
+        summary: `tanstack routes (${String(result.created.length)} created, ${String(result.errors.length)} errors)`,
+        failed: result.errors.map((e) => `${e.file}: ${e.error}`).join("; "),
+      };
+    }
     return {
-      summary: `tanstack routes (${String(result.created.length)} created, ${String(result.errors.length)} errors)`,
-      failed: result.errors.map((e) => `${e.file}: ${e.error}`).join("; "),
+      summary: `tanstack routes (${String(result.created.length)} created, ${String(result.skipped.length)} skipped)`,
+      counts: {
+        created: result.created.length,
+        skipped: result.skipped.length,
+      },
     };
-  }
-  return {
-    summary: `tanstack routes (${String(result.created.length)} created, ${String(result.skipped.length)} skipped)`,
-    counts: { created: result.created.length, skipped: result.skipped.length },
-  };
-}
+  },
+};

@@ -30,7 +30,7 @@ export const translations = {
       benefit1:
         "Memories sync automatically between this device and your cloud account",
       benefit2: "Run AI tools from the command line with",
-      benefit2Code: "vibe --thea",
+      benefit2Code: "vibe --remote",
       benefit3: "Local and cloud stay in sync",
     },
     // ── Behavior section ───────────────────────────────────────────────────

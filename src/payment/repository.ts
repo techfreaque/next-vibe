@@ -58,6 +58,7 @@ const PAYMENT_METHOD_TO_STRIPE: Record<
 import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
+import { VibeMode } from "next-vibe/env/env-util";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -106,8 +107,8 @@ export class PaymentRepository {
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<PaymentPostResponseOutput>> {
-    if (coreEnv.NEXT_PUBLIC_LOCAL_MODE) {
-      logger.info("Payment disabled in local mode");
+    if (coreEnv.NEXT_PUBLIC_VIBE_MODE === VibeMode.AGENT) {
+      logger.info("Payment disabled in agent mode");
       return fail({
         message: t("errors.localMode"),
         errorType: ErrorResponseTypes.FORBIDDEN,

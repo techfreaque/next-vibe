@@ -17,7 +17,7 @@ import { readFileSync } from "node:fs";
 
 import type {
   GeneratorContext,
-  GeneratorResult,
+  GeneratorDefinition,
 } from "next-vibe/core/generators/shared/shared-inputs";
 import {
   findFilesRecursively,
@@ -142,18 +142,25 @@ ${registry}
 `;
 }
 
-export async function generate(
-  ctx: GeneratorContext,
-): Promise<GeneratorResult> {
-  const entries = collectSetupFiles(
-    findFilesRecursively(getApiDir(), isSetupFile),
-    ctx.logger,
-  );
+export const generator: GeneratorDefinition = {
+  key: "setup-index",
+  phase: "default",
+  needs: {},
+  cacheKey: "setup-index",
+  findInputs() {
+    return findFilesRecursively(getApiDir(), isSetupFile);
+  },
+  async generate(ctx) {
+    const entries = collectSetupFiles(
+      findFilesRecursively(getApiDir(), isSetupFile),
+      ctx.logger,
+    );
 
-  await writeGeneratedFile(OUTPUT_FILE, renderRegistry(entries));
+    await writeGeneratedFile(OUTPUT_FILE, renderRegistry(entries));
 
-  return {
-    summary: `setup index (${entries.length} setup files)`,
-    counts: { setups: entries.length },
-  };
-}
+    return {
+      summary: `setup index (${entries.length} setup files)`,
+      counts: { setups: entries.length },
+    };
+  },
+};

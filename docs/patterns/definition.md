@@ -95,7 +95,7 @@ fields: objectField(scopedTranslation, {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.EMAIL,
       label: "create.form.email.label",
-      schema: z.string().email(),
+      schema: z.email(),
     }),
     name: requestField(scopedTranslation, {
       type: WidgetType.FORM_FIELD,
@@ -608,7 +608,7 @@ contactInfo: objectField(st, {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.EMAIL,
       label: "post.email.label",
-      schema: z.string().email(),
+      schema: z.email(),
       columns: 6,
     }),
     phone: requestField(st, {
@@ -671,7 +671,7 @@ email: requestField(st, {
   fieldType: FieldDataType.EMAIL,
   label: "post.email.label",
   description: "post.email.description",
-  schema: z.string().email(),
+  schema: z.email(),
   columns: 12,
 });
 ```
@@ -907,7 +907,7 @@ fields: objectField(st, {
     email: responseField(st, {
       type: WidgetType.TEXT,
       content: "get.response.email.content",
-      schema: z.string().email(),
+      schema: z.email(),
     }),
     createdAt: responseField(st, {
       type: WidgetType.TEXT,
@@ -938,7 +938,7 @@ fields: objectField(st, {
         email: responseField(st, {
           type: WidgetType.TEXT,
           content: "get.response.profile.email.content",
-          schema: z.string().email(),
+          schema: z.email(),
         }),
       },
     }),

@@ -4,10 +4,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 
 import { findFilesByName } from "next-vibe/core/generators/shared/scanner";
-import type {
-  GeneratorContext,
-  GeneratorResult,
-} from "next-vibe/core/generators/shared/shared-inputs";
+import type { GeneratorDefinition } from "next-vibe/core/generators/shared/shared-inputs";
 import { parseError } from "next-vibe/core/utils/parse-error";
 
 import { getSrcDir, getUiDir } from "@/env/paths";
@@ -66,71 +63,97 @@ function pageContent(relativePath: string, kind: "page" | "layout"): string {
   return `import { createLayoutWrapperWithImport } from "${wrapperPath}";\n${formatCall("createLayoutWrapperWithImport", importPath)}\n`;
 }
 
-export async function generate(
-  ctx: GeneratorContext,
-): Promise<GeneratorResult> {
-  void ctx;
-  const created: string[] = [];
-  const skipped: string[] = [];
-  const errors: { file: string; error: string }[] = [];
-
-  if (!existsSync(SOURCE_DIR)) {
-    return {
-      summary: "native indexes (source dir missing)",
-      counts: { created: 0, skipped: 0 },
-    };
-  }
-
-  mkdirSync(TARGET_DIR, { recursive: true });
-
-  for (const pageFile of findFiles(SOURCE_DIR, "page.tsx")) {
-    const rel = toPosix(dirname(pageFile));
-    const targetPath = join(TARGET_DIR, rel, "index.tsx");
-    try {
-      if (hasCustomDirective(targetPath)) {
-        skipped.push(rel);
-        continue;
-      }
-      mkdirSync(dirname(targetPath), { recursive: true });
-      writeFileSync(
-        targetPath,
-        pageContent(rel === "." ? "" : rel, "page"),
-        "utf-8",
-      );
-      created.push(rel);
-    } catch (error) {
-      errors.push({ file: rel, error: parseError(error).message });
+export const generator: GeneratorDefinition = {
+  key: "native-indexes",
+  phase: "default",
+  needs: {},
+  cacheKey: "native-indexes",
+  findInputs(live) {
+    const pagesDir = getUiDir();
+    if (live) {
+      return [
+        ...live.routeFiles,
+        ...findFilesByName(pagesDir, "page.tsx").map(
+          (r: { fullPath: string }) => r.fullPath,
+        ),
+        ...findFilesByName(pagesDir, "layout.tsx").map(
+          (r: { fullPath: string }) => r.fullPath,
+        ),
+      ].toSorted();
     }
-  }
+    return [
+      ...findFilesByName(pagesDir, "page.tsx").map(
+        (r: { fullPath: string }) => r.fullPath,
+      ),
+      ...findFilesByName(pagesDir, "layout.tsx").map(
+        (r: { fullPath: string }) => r.fullPath,
+      ),
+    ].toSorted();
+  },
+  async generate(ctx) {
+    void ctx;
+    const created: string[] = [];
+    const skipped: string[] = [];
+    const errors: { file: string; error: string }[] = [];
 
-  for (const layoutFile of findFiles(SOURCE_DIR, "layout.tsx")) {
-    const rel = toPosix(dirname(layoutFile));
-    const targetPath = join(TARGET_DIR, rel, "_layout.tsx");
-    try {
-      if (hasCustomDirective(targetPath)) {
-        skipped.push(rel);
-        continue;
-      }
-      mkdirSync(dirname(targetPath), { recursive: true });
-      writeFileSync(
-        targetPath,
-        pageContent(rel === "." ? "" : rel, "layout"),
-        "utf-8",
-      );
-      created.push(rel);
-    } catch (error) {
-      errors.push({ file: rel, error: parseError(error).message });
+    if (!existsSync(SOURCE_DIR)) {
+      return {
+        summary: "native indexes (source dir missing)",
+        counts: { created: 0, skipped: 0 },
+      };
     }
-  }
 
-  if (errors.length > 0) {
+    mkdirSync(TARGET_DIR, { recursive: true });
+
+    for (const pageFile of findFiles(SOURCE_DIR, "page.tsx")) {
+      const rel = toPosix(dirname(pageFile));
+      const targetPath = join(TARGET_DIR, rel, "index.tsx");
+      try {
+        if (hasCustomDirective(targetPath)) {
+          skipped.push(rel);
+          continue;
+        }
+        mkdirSync(dirname(targetPath), { recursive: true });
+        writeFileSync(
+          targetPath,
+          pageContent(rel === "." ? "" : rel, "page"),
+          "utf-8",
+        );
+        created.push(rel);
+      } catch (error) {
+        errors.push({ file: rel, error: parseError(error).message });
+      }
+    }
+
+    for (const layoutFile of findFiles(SOURCE_DIR, "layout.tsx")) {
+      const rel = toPosix(dirname(layoutFile));
+      const targetPath = join(TARGET_DIR, rel, "_layout.tsx");
+      try {
+        if (hasCustomDirective(targetPath)) {
+          skipped.push(rel);
+          continue;
+        }
+        mkdirSync(dirname(targetPath), { recursive: true });
+        writeFileSync(
+          targetPath,
+          pageContent(rel === "." ? "" : rel, "layout"),
+          "utf-8",
+        );
+        created.push(rel);
+      } catch (error) {
+        errors.push({ file: rel, error: parseError(error).message });
+      }
+    }
+
+    if (errors.length > 0) {
+      return {
+        summary: `native indexes (${String(created.length)} created, ${String(errors.length)} errors)`,
+        failed: errors.map((e) => `${e.file}: ${e.error}`).join("; "),
+      };
+    }
     return {
-      summary: `native indexes (${String(created.length)} created, ${String(errors.length)} errors)`,
-      failed: errors.map((e) => `${e.file}: ${e.error}`).join("; "),
+      summary: `native indexes (${String(created.length)} created, ${String(skipped.length)} skipped)`,
+      counts: { created: created.length, skipped: skipped.length },
     };
-  }
-  return {
-    summary: `native indexes (${String(created.length)} created, ${String(skipped.length)} skipped)`,
-    counts: { created: created.length, skipped: skipped.length },
-  };
-}
+  },
+};

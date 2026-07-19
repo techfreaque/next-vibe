@@ -329,7 +329,10 @@ function isAllowedRouteImport(source: string): boolean {
     source === "./repository" ||
     source === "../repository" ||
     source === "../../../repository" ||
-    source === "../../repository"
+    source === "../../repository" ||
+    source.startsWith("./repository/") ||
+    source.startsWith("../repository/") ||
+    source.startsWith("../../repository/")
   ) {
     return true;
   }

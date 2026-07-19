@@ -1,3 +1,4 @@
+import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -12,7 +13,9 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
   locale: CountryLanguage,
   requestData: TEndpoint["types"]["RequestOutput"],
   pathParams: TEndpoint["types"]["UrlVariablesOutput"],
+  availability: AgentEnvAvailability,
 ): Promise<ResponseType<TEndpoint["types"]["ResponseOutput"]>> {
+  void availability; // CLI does not gate on env availability — parameter required by shared call signature
   logger.debug("callApi [cli]", {
     endpoint: endpoint.path.join("/"),
     method: endpoint.method,

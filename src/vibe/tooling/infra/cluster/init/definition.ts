@@ -55,7 +55,7 @@ export const { POST } = createEndpoint({
         label: "cluster.init.post.fields.email.label",
         description: "cluster.init.post.fields.email.description",
         placeholder: "cluster.init.post.fields.email.placeholder",
-        schema: z.string().email(),
+        schema: z.email(),
       }),
       k3sVersion: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

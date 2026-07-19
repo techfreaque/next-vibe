@@ -36,11 +36,11 @@ export function Tooltip({
   return <>{children}</>;
 }
 
-export function TooltipTrigger({
-  children,
-}: TooltipTriggerProps): React.JSX.Element | null {
-  // Render children - in CLI the trigger is the interactive element itself
-  return <>{children}</>;
+export function TooltipTrigger(
+  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+  _props: TooltipTriggerProps,
+): React.JSX.Element | null {
+  return null;
 }
 
 export function TooltipContent({
@@ -52,6 +52,7 @@ export function TooltipContent({
     return <Text> ({children})</Text>;
   }
 
-  // In CLI, tooltip content is suppressed - the trigger itself is sufficient
+  // In CLI, tooltip content is suppressed (no hover). Descriptions are shown
+  // via the field widget's inline descriptionStyle when needed.
   return null;
 }

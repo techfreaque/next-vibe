@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import { DefaultFolderId } from "next-vibe/agent/chat/config";
 import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { VibeMode } from "next-vibe/env/env-util";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
@@ -24,8 +25,8 @@ export async function tanstackLoader({
 }: ChatPageProps): Promise<never> {
   const { locale } = await params;
 
-  // In local mode, go straight to chat
-  if (coreEnv.NEXT_PUBLIC_LOCAL_MODE) {
+  // Agent mode only: go straight to chat (no landing page)
+  if (coreEnv.NEXT_PUBLIC_VIBE_MODE === VibeMode.AGENT) {
     const logger = createEndpointLogger(false, locale);
     const userResponse = await UserRepository.getUserByAuth(
       {
@@ -69,8 +70,8 @@ export function TanstackPage(): never {
 
 /**
  * Root homepage.
- * - Local mode (vibe start): redirects to chat (threads)
- * - All other modes (dev/prod): redirects to story page
+ * - Agent mode: redirects to chat (threads)
+ * - Cloud/dev mode: redirects to story page
  */
 export default async function HomePage({
   params,

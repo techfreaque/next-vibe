@@ -73,6 +73,16 @@ export const translations: typeof enTranslations = {
         description:
           "Webpack statt Turbopack verwenden. Geringerer Speicherverbrauch (~7,5 GB vs ~12 GB). Standardmäßig aktiv in Docker-Produktions-Builds.",
       },
+      vibeMode: {
+        title: "Instanz-Modus",
+        description:
+          "Bäckt den Instanz-Modus ins Next.js-Bundle. 'agent' = persönliche lokale Instanz. 'cloud' = SaaS-Deployment. 'dev' = Coding-Instanz (Standard).",
+        options: {
+          agent: "Agent (persönliche lokale Instanz)",
+          cloud: "Cloud (SaaS-Deployment)",
+          dev: "Dev (Coding-Instanz, Standard)",
+        },
+      },
       skipEndpoints: {
         title: "Endpunkt-Generierung überspringen",
         description: "Generierung von Endpunkt-Dateien überspringen",

@@ -1,6 +1,6 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { scopedTranslation } from "next-vibe/core/i18n/shared";
-import { permissionsRegistry } from "next-vibe/core/route/definitions-registry";
+import { permissionsRegistry } from "next-vibe/core/permissions/registry";
 import {
   ErrorResponseTypes,
   fail,

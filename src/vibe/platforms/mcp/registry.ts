@@ -14,10 +14,10 @@ import {
   type IDefinitionLoader,
 } from "next-vibe/core/definition/loader";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { permissionsRegistry } from "next-vibe/core/permissions/registry";
 import {
   definitionsRegistry,
   type IDefinitionsRegistry,
-  permissionsRegistry,
 } from "next-vibe/core/route/definitions-registry";
 import type {
   ContentBlock,
@@ -514,18 +514,7 @@ export class MCPRegistry {
     const { t } = mcpScopedTranslation.scopedT(locale);
 
     if (result.success && result.data) {
-      // Unwrap execute-tool's { result: ... } wrapper - MCP receives data directly,
-      // not nested inside a `result` key. Any other single-key { result: X } wrapper
-      // from intermediary endpoints is also unwrapped.
       let data: TData = result.data;
-      if (
-        typeof data === "object" &&
-        data !== null &&
-        "result" in data &&
-        Object.keys(data).length === 1
-      ) {
-        data = (data as Record<string, TData>)["result"] as TData;
-      }
 
       // ContentResponse (e.g. screenshots): return content blocks directly.
       // May appear at the top level or inside an unwrapped execute-tool wrapper.

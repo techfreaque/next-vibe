@@ -136,11 +136,6 @@ export function Button({
   // container can auto-focus the first item when it opens.
   useFocusScopeRegister(idRef.current);
 
-  if (isFocused) {
-    // eslint-disable-next-line no-console
-    console.error(`[F] ${idRef.current} ${title ?? "?"}`);
-  }
-
   useInput(
     (input, key) => {
       if (key.return || input === " ") {

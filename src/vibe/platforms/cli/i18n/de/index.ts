@@ -256,7 +256,10 @@ export const translations: typeof enTranslations = {
       verbose: "Ausführliche Ausgabe aktivieren",
       dryRun: "Testlauf ohne Ausführung durchführen",
       target:
-        "Ausführungsziel: dev (Standard), local (Preview-DB), oder remote (HTTP via NEXT_PUBLIC_PROJECT_URL)",
+        "Ausführungsziel: dev (Standard) oder local (Preview-DB mit --hermes)",
+      thea: "Kurzform für --remote (zielt auf die 'thea'-Instanz)",
+      remote:
+        "Auf einer Remote-Instanz ausführen (Standard: thea). Verbindung wird aus der aktiven DB geladen.",
       interactive: "Interaktiven Modus aktivieren",
     },
     errors: {
@@ -286,8 +289,10 @@ export const translations: typeof enTranslations = {
       remoteReadFailed: "Remote-Sitzung konnte nicht gelesen werden",
       remoteWriteFailed: "Remote-Sitzung konnte nicht geschrieben werden",
       remoteClearFailed: "Remote-Sitzung konnte nicht gelöscht werden",
+      remoteNoConnection:
+        "Keine aktive Verbindung für Instanz '{{instanceId}}'. Ausführen: vibe connect <url>",
       remoteNotLoggedIn:
-        "Nicht am Remote-Host angemeldet. Ausführen: vibe login --target remote",
+        "Nicht am Remote-Host angemeldet. Ausführen: vibe --remote login",
       remoteNoLeadId: "Identität vom Remote-Host konnte nicht abgerufen werden",
       remoteServerError: "Remote-Server-Fehler",
       remoteNotAvailable:
@@ -352,6 +357,7 @@ export const translations: typeof enTranslations = {
                 tabNextField:
                   "Tab: nächstes Feld | Enter: absenden | q/Esc: beenden",
                 ctrlCExitHint: "Drücke Ctrl+C erneut zum Beenden",
+                escExitHint: "Drücke Esc erneut zum Beenden",
               },
             },
             pagination: {

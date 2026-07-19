@@ -303,7 +303,7 @@ const { POST } = createEndpoint({
         label: "post.fields.companyEmail.label",
         description: "post.fields.companyEmail.description",
         columns: 4,
-        schema: z.string().email().optional(),
+        schema: z.email().optional(),
       }),
 
       // Response - the created record
@@ -476,7 +476,7 @@ const { PATCH } = createEndpoint({
         label: "patch.fields.companyEmail.label",
         description: "patch.fields.companyEmail.description",
         columns: 4,
-        schema: z.string().email().optional().nullable(),
+        schema: z.email().optional().nullable(),
       }),
 
       // Response

@@ -78,6 +78,21 @@ export interface GeneratorResult {
   failed?: string;
 }
 
+/** The contract every domain generator.ts exports as a single `generator` const. */
+export interface GeneratorDefinition {
+  key: string;
+  phase: "def-scan" | "default";
+  needs: { definitionModules?: boolean };
+  cacheKey: string | null;
+  /**
+   * Return the input files whose changes should invalidate the gen-cache.
+   * Only needed when the generator has domain-specific inputs not covered by
+   * the shared file-pattern scanning in find-generator-inputs.ts.
+   */
+  findInputs: (live?: LiveIndex) => string[];
+  generate: (ctx: GeneratorContext) => Promise<GeneratorResult>;
+}
+
 // ---------------------------------------------------------------------------
 // TDZ-guarded shared parse
 // ---------------------------------------------------------------------------

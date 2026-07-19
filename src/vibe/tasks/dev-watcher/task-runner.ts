@@ -9,7 +9,7 @@
 import "server-only";
 
 import { coreEnv } from "next-vibe/core/env";
-import { GeneratorRunner } from "next-vibe/core/generators/generator";
+import { GeneratorRunner } from "next-vibe/core/generators/repository";
 import type { LiveIndex } from "next-vibe/core/generators/shared/live-index";
 import {
   buildLiveIndex,
@@ -405,10 +405,7 @@ const startPollingWatcher = async (
       const action = watchCount === 1 ? "Initial startup" : "Polling cycle";
       logger.info(`⏰ ${action} #${watchCount} - Running generators...`);
 
-      await GeneratorRunner.runGenerators({
-        logger,
-        overrides: watchCount !== 1 ? { seeds: false } : undefined,
-      });
+      await GeneratorRunner.runGenerators({ logger });
 
       logger.info(`✅ ${action} #${watchCount} completed`);
     } catch (error) {

@@ -12,10 +12,7 @@ import "server-only";
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-import type {
-  GeneratorContext,
-  GeneratorResult,
-} from "next-vibe/core/generators/shared/shared-inputs";
+import type { GeneratorDefinition } from "next-vibe/core/generators/shared/shared-inputs";
 
 import { getSrcDir } from "@/env/paths";
 
@@ -91,62 +88,101 @@ ${items},
 `;
 }
 
-/** Generate cortex seed embeddings. Scans cortex/seeds; writes sibling files. */
-export async function generate(
-  ctx: GeneratorContext,
-): Promise<GeneratorResult> {
-  const { logger } = ctx;
+export const generator: GeneratorDefinition = {
+  key: "cortex",
+  phase: "default",
+  needs: {},
+  cacheKey: "cortex-seeds",
+  findInputs() {
+    return scanSeedFiles(join(getSrcDir(), "vibe", "agent", "cortex", "seeds"));
+  },
+  /** Generate cortex seed embeddings. Scans cortex/seeds; writes sibling files. */
+  async generate(ctx) {
+    const { logger } = ctx;
 
-  const { computeEmbeddingHash, generateEmbedding } =
-    await import("next-vibe/agent/cortex/embeddings/service");
-  // Seed generation is a standalone build step with NO stream — an explicit
-  // thread-less headless context routes its embeddings live (never a fixture).
-  const { makeHeadlessContext } = await import("next-vibe/agent/chat/config");
-  // no user context — UTC (dates not user-facing here)
-  const rootCtx = makeHeadlessContext(undefined, undefined, "UTC");
-  const { getAllTemplates } =
-    await import("next-vibe/agent/cortex/seeds/templates");
-  const { defaultLocale } = await import("next-vibe/core/i18n/core/config");
-  const ALL_SEEDS = getAllTemplates(defaultLocale).map((item) => ({ item }));
+    const { computeEmbeddingHash } =
+      await import("next-vibe/agent/cortex/embeddings/service");
+    const { getAllTemplates } =
+      await import("next-vibe/agent/cortex/seeds/templates");
+    const { defaultLocale } = await import("next-vibe/core/i18n/core/config");
+    const ALL_SEEDS = getAllTemplates(defaultLocale).map((item) => ({ item }));
 
-  const seedsDir = join(getSrcDir(), "vibe", "agent", "cortex", "seeds");
+    const seedsDir = join(getSrcDir(), "vibe", "agent", "cortex", "seeds");
+    const seedFiles = scanSeedFiles(seedsDir);
 
-  const seedFiles = scanSeedFiles(seedsDir);
-
-  const idToSeedFile = new Map<string, string>();
-  for (const filePath of seedFiles) {
-    const content = readFileSync(filePath, "utf-8");
-    const idMatch = /id:\s*["']([^"']+)["']/.exec(content);
-    if (idMatch) {
-      idToSeedFile.set(idMatch[1], filePath);
-    }
-  }
-
-  let generated = 0;
-  let skipped = 0;
-  const total = ALL_SEEDS.length;
-
-  const dynamicEmbeddings: Array<{
-    id: string;
-    path: string;
-    hash: string;
-    embedding: string;
-  }> = [];
-  const dynamicEmbeddingsFile = join(seedsDir, "dynamic.embedding.ts");
-  const existingDynamic = readFileSafe(dynamicEmbeddingsFile);
-
-  for (const { item } of ALL_SEEDS) {
-    const seedFile = idToSeedFile.get(item.id);
-    const hash = computeEmbeddingHash(item.path, item.content);
-
-    if (seedFile) {
-      const embeddingFile = seedFile.replace(/\.ts$/, ".embedding.ts");
-      const existingHash = extractHash(readFileSafe(embeddingFile));
-      if (existingHash === hash) {
-        skipped++;
-        continue;
+    const idToSeedFile = new Map<string, string>();
+    for (const filePath of seedFiles) {
+      const content = readFileSync(filePath, "utf-8");
+      const idMatch = /id:\s*["']([^"']+)["']/.exec(content);
+      if (idMatch) {
+        idToSeedFile.set(idMatch[1], filePath);
       }
+    }
 
+    const dynamicEmbeddingsFile = join(seedsDir, "dynamic.embedding.ts");
+    const existingDynamic = readFileSafe(dynamicEmbeddingsFile);
+
+    // Pass 1: hash-check only — no API calls, no heavy imports.
+    interface WorkItem {
+      item: (typeof ALL_SEEDS)[number]["item"];
+      seedFile: string | undefined;
+      hash: string;
+      embeddingFile: string;
+    }
+    const needsWork: WorkItem[] = [];
+    let skipped = 0;
+
+    for (const { item } of ALL_SEEDS) {
+      const seedFile = idToSeedFile.get(item.id);
+      const hash = computeEmbeddingHash(item.path, item.content);
+
+      if (seedFile) {
+        const embeddingFile = seedFile.replace(/\.ts$/, ".embedding.ts");
+        const existingHash = extractHash(readFileSafe(embeddingFile));
+        if (existingHash === hash) {
+          skipped++;
+        } else {
+          needsWork.push({ item, seedFile, hash, embeddingFile });
+        }
+      } else {
+        if (existingDynamic.includes(`"${hash}"`)) {
+          skipped++;
+        } else {
+          needsWork.push({
+            item,
+            seedFile: undefined,
+            hash,
+            embeddingFile: "",
+          });
+        }
+      }
+    }
+
+    const total = ALL_SEEDS.length;
+
+    // Early exit when everything is cached — no API, no context setup.
+    if (needsWork.length === 0) {
+      return {
+        summary: `cortex embeddings (${total} seeds, 0 embedded, ${skipped} cached)`,
+        counts: { seeds: total, embedded: 0, cached: skipped },
+      };
+    }
+
+    // Pass 2: heavy imports only if there's actual work.
+    const { generateEmbedding } =
+      await import("next-vibe/agent/cortex/embeddings/service");
+    const { makeHeadlessContext } = await import("next-vibe/agent/chat/config");
+    const rootCtx = makeHeadlessContext(undefined, undefined, "UTC");
+
+    let generated = 0;
+    const dynamicEmbeddings: Array<{
+      id: string;
+      path: string;
+      hash: string;
+      embedding: string;
+    }> = [];
+
+    for (const { item, seedFile, hash, embeddingFile } of needsWork) {
       const textToEmbed = `${item.path}\n\n${item.content}`;
       const embedding = await generateEmbedding(textToEmbed, rootCtx);
       if (!embedding) {
@@ -155,60 +191,46 @@ export async function generate(
         continue;
       }
 
-      const relPath = embeddingFile.replace(`${seedsDir}/`, "");
-      const depth = relPath.split("/").length - 1;
-      const relPrefix = "../".repeat(depth);
-
       const embeddingStr = `[${embedding.map((v) => Number(v.toPrecision(15))).join(",")}]`;
-      writeFileSync(
-        embeddingFile,
-        buildSeedEmbeddingFile(
-          item.path,
+
+      if (seedFile) {
+        const relPath = embeddingFile.replace(`${seedsDir}/`, "");
+        const depth = relPath.split("/").length - 1;
+        const relPrefix = "../".repeat(depth);
+        writeFileSync(
+          embeddingFile,
+          buildSeedEmbeddingFile(
+            item.path,
+            hash,
+            embeddingStr,
+            `${relPrefix}types`,
+          ),
+          "utf-8",
+        );
+        logger.debug(`  embedded: ${item.id}`);
+      } else {
+        dynamicEmbeddings.push({
+          id: item.id,
+          path: item.path,
           hash,
-          embeddingStr,
-          `${relPrefix}types`,
-        ),
+          embedding: embeddingStr,
+        });
+        logger.debug(`  embedded (dynamic): ${item.id}`);
+      }
+      generated++;
+    }
+
+    if (dynamicEmbeddings.length > 0) {
+      writeFileSync(
+        dynamicEmbeddingsFile,
+        buildDynamicEmbeddingsFile(dynamicEmbeddings),
         "utf-8",
       );
-
-      generated++;
-      logger.debug(`  embedded: ${item.id}`);
-    } else {
-      if (existingDynamic.includes(`"${hash}"`)) {
-        skipped++;
-        continue;
-      }
-
-      const textToEmbed = `${item.path}\n\n${item.content}`;
-      const embedding = await generateEmbedding(textToEmbed, rootCtx);
-      if (!embedding) {
-        logger.warn(`  skipped (API unavailable): ${item.id}`);
-        skipped++;
-        continue;
-      }
-
-      const embeddingStr = `[${embedding.map((v) => Number(v.toPrecision(15))).join(",")}]`;
-      dynamicEmbeddings.push({
-        id: item.id,
-        path: item.path,
-        hash,
-        embedding: embeddingStr,
-      });
-      generated++;
-      logger.debug(`  embedded (dynamic): ${item.id}`);
     }
-  }
 
-  if (dynamicEmbeddings.length > 0) {
-    writeFileSync(
-      dynamicEmbeddingsFile,
-      buildDynamicEmbeddingsFile(dynamicEmbeddings),
-      "utf-8",
-    );
-  }
-
-  return {
-    summary: `cortex embeddings (${total} seeds, ${generated} embedded, ${skipped} cached)`,
-    counts: { seeds: total, embedded: generated, cached: skipped },
-  };
-}
+    return {
+      summary: `cortex embeddings (${total} seeds, ${generated} embedded, ${skipped} cached)`,
+      counts: { seeds: total, embedded: generated, cached: skipped },
+    };
+  },
+};

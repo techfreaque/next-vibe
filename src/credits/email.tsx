@@ -45,7 +45,7 @@ const creditPackEmailPropsSchema = z.object({
   userId: z.string(),
   leadId: z.string(),
   credits: z.number(),
-  userEmail: z.string().email(),
+  userEmail: z.email(),
 });
 
 type CreditPackEmailProps = z.infer<typeof creditPackEmailPropsSchema>;
@@ -300,7 +300,7 @@ export const creditPackUserEmailTemplate: EmailTemplateDefinition<
 // ============================================================================
 
 const creditPackAdminEmailPropsSchema = z.object({
-  userEmail: z.string().email(),
+  userEmail: z.email(),
   credits: z.number(),
 });
 

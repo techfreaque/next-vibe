@@ -39,7 +39,7 @@ import { contactClientRepository } from "./repository-client";
 
 const contactFormPropsSchema = z.object({
   name: z.string(),
-  email: z.string().email(),
+  email: z.email(),
   company: z.string().optional(),
   subject: z.string(),
   priority: z.string().optional(),
@@ -412,7 +412,7 @@ export const contactFormEmailTemplate: EmailTemplateDefinition<
 // Admin contact notification template - same component, isForCompany forced true
 const adminContactPropsSchema = z.object({
   name: z.string(),
-  email: z.string().email(),
+  email: z.email(),
   company: z.string().optional(),
   subject: z.string(),
   priority: z.string().optional(),

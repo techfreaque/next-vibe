@@ -10,17 +10,15 @@ import "server-only";
 
 import { readFile } from "node:fs/promises";
 
-import type {
-  GeneratorContext,
-  GeneratorResult,
-} from "next-vibe/core/generators/shared/shared-inputs";
+import type { GeneratorDefinition } from "next-vibe/core/generators/shared/shared-inputs";
 import {
+  findFilesRecursively,
   generateFileHeader,
   getRelativeImportPath,
   writeGeneratedFile,
 } from "next-vibe/core/generators/shared/utils";
 
-import { GENERATED_DIR } from "@/env/paths";
+import { GENERATED_DIR, getApiDir } from "@/env/paths";
 
 const OUTPUT_FILE = `${GENERATED_DIR}/dataflow/graph-seeds-index.ts`;
 
@@ -79,25 +77,34 @@ ${spreadEntries.join("\n")}
 `;
 }
 
-/** Generate the graph seeds index. Consumes shared graph-seed file list; writes one file. */
-export async function generate(
-  ctx: GeneratorContext,
-): Promise<GeneratorResult> {
-  const seedFiles = ctx.files.graphSeed;
+export const generator: GeneratorDefinition = {
+  key: "dataflow",
+  phase: "default",
+  needs: {},
+  cacheKey: "graph-seeds-index",
+  findInputs(live) {
+    if (live) {
+      return [...live.graphSeedFiles].toSorted();
+    }
+    return findFilesRecursively(getApiDir(), "graph-seeds.ts");
+  },
+  async generate(ctx) {
+    const seedFiles = ctx.files.graphSeed;
 
-  const validationError = await validateFiles(seedFiles);
-  if (validationError) {
+    const validationError = await validateFiles(seedFiles);
+    if (validationError) {
+      return {
+        summary: "graph seeds index (failed validation)",
+        failed: `Graph seeds index generation failed: ${validationError}`,
+      };
+    }
+
+    const content = generateContent(seedFiles, OUTPUT_FILE);
+    await writeGeneratedFile(OUTPUT_FILE, content);
+
     return {
-      summary: "graph seeds index (failed validation)",
-      failed: `Graph seeds index generation failed: ${validationError}`,
+      summary: `graph seeds index (${seedFiles.length} modules)`,
+      counts: { modules: seedFiles.length },
     };
-  }
-
-  const content = generateContent(seedFiles, OUTPUT_FILE);
-  await writeGeneratedFile(OUTPUT_FILE, content);
-
-  return {
-    summary: `graph seeds index (${seedFiles.length} modules)`,
-    counts: { modules: seedFiles.length },
-  };
-}
+  },
+};

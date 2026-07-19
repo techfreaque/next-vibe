@@ -110,7 +110,7 @@ const { GET } = createEndpoint({
                 type: WidgetType.TEXT,
                 content:
                   "id.get.response.userProfile.basicInfo.email.content" as const,
-                schema: z.string().email().describe("User's email address"),
+                schema: z.email().describe("User's email address"),
               }),
               privateName: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,

@@ -104,7 +104,7 @@ const { GET } = createEndpoint({
         description: "create.customerEmail.description" as const,
         placeholder: "create.customerEmail.placeholder" as const,
         columns: 12,
-        schema: z.string().email().optional(),
+        schema: z.email().optional(),
       }),
       sessionUrl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -265,7 +265,7 @@ const { POST } = createEndpoint({
         description: "create.customerEmail.description" as const,
         placeholder: "create.customerEmail.placeholder" as const,
         columns: 12,
-        schema: z.string().email().optional(),
+        schema: z.email().optional(),
       }),
       sessionUrl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,

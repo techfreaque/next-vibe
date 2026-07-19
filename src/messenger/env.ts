@@ -14,7 +14,7 @@ export const {
   examples: messengerEnvExamples,
 } = defineEnv({
   EMAIL_FROM_EMAIL: {
-    schema: z.string().email().optional(),
+    schema: z.email().optional(),
     example: "noreply@example.com",
     commented: true,
     fieldType: "email",

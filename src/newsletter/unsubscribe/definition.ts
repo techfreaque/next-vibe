@@ -58,7 +58,7 @@ const { POST } = createEndpoint({
     children: {
       // === REQUEST FIELDS ===
       email: requestField(scopedTranslation, {
-        schema: z.string().email(),
+        schema: z.email(),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.EMAIL,
         label: "email.label",

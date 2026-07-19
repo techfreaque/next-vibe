@@ -74,6 +74,16 @@ export const translations: typeof enTranslations = {
         description:
           "Użyj webpack zamiast Turbopack. Mniejsze użycie pamięci (~7,5 GB vs ~12 GB). Domyślnie włączone w produkcyjnych buildach Docker.",
       },
+      vibeMode: {
+        title: "Tryb instancji",
+        description:
+          "Wbudowuje tryb instancji w bundle Next.js. 'agent' = osobista lokalna instancja. 'cloud' = wdrożenie SaaS. 'dev' = instancja deweloperska (domyślnie).",
+        options: {
+          agent: "Agent (osobista lokalna instancja)",
+          cloud: "Cloud (wdrożenie SaaS)",
+          dev: "Dev (instancja deweloperska, domyślnie)",
+        },
+      },
       skipEndpoints: {
         title: "Pomiń generowanie punktów końcowych",
         description: "Pomiń generowanie plików punktów końcowych",

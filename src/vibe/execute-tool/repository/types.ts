@@ -27,6 +27,8 @@ import type {
 } from "next-vibe/remote-connection/types";
 import type { CronTaskStatusDB } from "next-vibe/tasks/enum";
 
+import type { RouteExecuteResponseOutput } from "../definition";
+
 export type {
   RemoteCallParams,
   RemoteCallResult,
@@ -36,8 +38,6 @@ export type {
   ResolveInferenceProviderParams,
   ResolveTargetParams,
 };
-
-import type { RouteExecuteResponseOutput } from "../definition";
 
 /* ── Execution context ─────────────────────────────────────────────────────── */
 
@@ -92,15 +92,6 @@ export interface RouteExecuteContext {
 export type PhaseResult =
   | { kind: "return"; value: ResponseType<RouteExecuteResponseOutput> }
   | { kind: "fallthrough" };
-
-/** Discriminated result of a synchronous direct-http tool call. */
-export type DirectCallResult =
-  | { ok: true; data: RouteExecuteResponseOutput }
-  | {
-      ok: false;
-      /** The peer's error message, when its response body carried one. */
-      remoteMessage?: string;
-    };
 
 /* ── Guards ────────────────────────────────────────────────────────────────── */
 

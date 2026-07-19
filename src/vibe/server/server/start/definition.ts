@@ -12,6 +12,7 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
+import { VibeMode, VibeModeValues } from "next-vibe/env/env-util";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { scopedTranslation } from "next-vibe/server/server/start/i18n";
 import {
@@ -129,6 +130,26 @@ const { POST } = createEndpoint({
         columns: 6,
         options: ServerFrameworkOptions,
         schema: z.enum(ServerFramework).default(ServerFramework.NEXT),
+      }),
+
+      vibeMode: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "post.fields.vibeMode.title",
+        description: "post.fields.vibeMode.description",
+        columns: 12,
+        options: [
+          {
+            value: VibeMode.AGENT,
+            label: "post.fields.vibeMode.options.agent",
+          },
+          {
+            value: VibeMode.CLOUD,
+            label: "post.fields.vibeMode.options.cloud",
+          },
+          { value: VibeMode.DEV, label: "post.fields.vibeMode.options.dev" },
+        ],
+        schema: z.enum(VibeModeValues).optional(),
       }),
 
       // === RESPONSE FIELDS ===

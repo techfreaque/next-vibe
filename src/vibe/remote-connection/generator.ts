@@ -24,6 +24,7 @@ import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-ba
 import { Methods } from "next-vibe/core/definition/enums";
 import type {
   GeneratorContext,
+  GeneratorDefinition,
   GeneratorResult,
 } from "next-vibe/core/generators/shared/shared-inputs";
 import {
@@ -57,19 +58,6 @@ const OUTPUT_DIR = `${GENERATED_DIR}/remote-capabilities`;
  * subprocess calls are opaque to Turbopack's static file-glob analysis.
  */
 // ─── Repository ───────────────────────────────────────────────────────────────
-
-/**
- * Generate remote capability snapshots (en/de/pl × public/customer/admin JSON +
- * version.ts). Byte-identical to the former tooling/generators/remote-capabilities.
- * Loads definitions itself (self-contained, TDZ-guarded). NOTE: version.ts is
- * intentionally non-deterministic (git SHA / package version / timestamp) and is
- * excluded from the byte-identical cutover gate.
- */
-export async function generate(
-  ctx: GeneratorContext,
-): Promise<GeneratorResult> {
-  return RemoteCapabilitiesGenerator.run(ctx, OUTPUT_DIR);
-}
 
 class RemoteCapabilitiesGenerator {
   /**
@@ -558,3 +546,22 @@ export const CAPABILITIES_VERSION = ${JSON.stringify(version)};
 `;
   }
 }
+
+export const generator: GeneratorDefinition = {
+  key: "remote-capabilities",
+  phase: "default",
+  needs: {},
+  cacheKey: "endpoints",
+  findInputs(live) {
+    if (live) {
+      return [...live.definitionFiles, ...live.routeFiles].toSorted();
+    }
+    return [
+      ...findFilesRecursively(getApiDir(), "definition.ts"),
+      ...findFilesRecursively(getApiDir(), "route.ts"),
+    ].toSorted();
+  },
+  async generate(ctx) {
+    return RemoteCapabilitiesGenerator.run(ctx, OUTPUT_DIR);
+  },
+};

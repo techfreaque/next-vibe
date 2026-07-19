@@ -1,6 +1,7 @@
 "use client";
 
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import { Platform } from "next-vibe/platforms/platforms";
 import { Button } from "next-vibe/ui/ui/button";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { ReactStaticWidgetProps } from "next-vibe/unified-ui/_shared/react-types";
@@ -12,6 +13,7 @@ import {
   useWidgetIsSubmitting,
   useWidgetLocale,
   useWidgetOnSubmit,
+  useWidgetPlatform,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import {
   getIconSizeClassName,
@@ -47,6 +49,8 @@ export function SubmitButtonWidget<
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
   const isSubmitting = useWidgetIsSubmitting();
+  const platform = useWidgetPlatform();
+  const isCli = platform === Platform.CLI || platform === Platform.MCP;
   const { t: globalT } = unifiedInterfaceScopedTranslation.scopedT(locale);
   const {
     text: textKey,
@@ -83,6 +87,14 @@ export function SubmitButtonWidget<
       variant={variant === "primary" ? "default" : variant}
       size={size}
       className={className}
+      // CLI has no form submit event; wire onClick explicitly
+      onClick={
+        isCli && onSubmit
+          ? () => {
+              onSubmit();
+            }
+          : undefined
+      }
     >
       {icon && (
         <Icon

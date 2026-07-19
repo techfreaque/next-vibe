@@ -111,20 +111,13 @@ export function fingerprint(files: readonly string[]): string {
 }
 
 /**
- * Returns true if the generator's inputs haven't changed since the last run
- * AND the given output file exists on disk.
- *
- * Both conditions must hold to safely skip generation.
+ * Returns true if the generator's inputs haven't changed since the last run.
  */
 export function isUnchanged(
   key: string,
   files: readonly string[],
-  outputFile: string,
   state: GenState,
 ): boolean {
-  if (!existsSync(outputFile)) {
-    return false;
-  }
   const saved = state[key];
   if (saved === undefined) {
     return false;

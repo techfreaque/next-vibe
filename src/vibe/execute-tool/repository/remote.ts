@@ -452,30 +452,15 @@ export class RemoteDispatch {
         input: strippedInput,
         locale,
         logger,
+        t,
         toolTimeoutMs: dispatchToolDef?.timeoutMs,
       });
-      if (direct.ok) {
-        // No transport attestation here: this inline leg also serves
-        // control-plane reads (mirror-back GETs, connection PATCHes) that would
-        // clobber the EVENT-protocol attestation right after a relay. The
-        // lastTransportUsed stamp belongs to pushRemoteEvent's delivery legs —
-        // the wire the relay actually rode.
-        return { kind: "return", value: success(direct.data) };
-      }
-      // Propagate the peer's real error message (e.g. "Read-Only") — an opaque
-      // "not found" would mislead the AI about a tool that exists but refused.
-      return {
-        kind: "return",
-        value: fail({
-          message: direct.remoteMessage
-            ? t("executeTool.post.errors.remoteFailed.title", {
-                message: direct.remoteMessage,
-              })
-            : t("executeTool.post.errors.notFound.title"),
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-          messageParams: { toolName },
-        }),
-      };
+      // No transport attestation here: this inline leg also serves
+      // control-plane reads (mirror-back GETs, connection PATCHes) that would
+      // clobber the EVENT-protocol attestation right after a relay. The
+      // lastTransportUsed stamp belongs to pushRemoteEvent's delivery legs —
+      // the wire the relay actually rode.
+      return { kind: "return", value: direct };
     }
 
     logger.debug("[RouteExecute] Remote dispatch (event)", {

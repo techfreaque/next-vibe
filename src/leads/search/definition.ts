@@ -42,7 +42,7 @@ const LeadsSearchContainer = lazyWidget(() =>
 // Inline schema to avoid deprecated schema.ts imports
 const leadResponseSchema = z.object({
   id: z.uuid(),
-  email: z.string().email(),
+  email: z.email(),
   businessName: z.string(),
   phone: z.string().optional(),
   website: z.string().url().optional(),

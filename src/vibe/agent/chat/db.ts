@@ -87,7 +87,7 @@ import {
  * to interfaces, so an interface here is unassignable at every erased payload
  * boundary (e.g. a route's onRemoteEvent vs OnRemoteEventDispatchMap).
  */
-// eslint-disable-next-line typescript/consistent-type-definitions -- Must be a type alias, not an interface: only aliases get the implicit index signature that makes this assignable to WidgetData on an endpoint payload. See above.
+// eslint-disable-next-line typescript/consistent-type-definitions, @typescript-eslint/consistent-type-definitions -- Must be a type alias, not an interface: only aliases get the implicit index signature that makes this assignable to WidgetData on an endpoint payload. See above.
 export type ToolCall = {
   toolCallId: string; // AI SDK tool call ID (e.g., "toolu_bdrk_01X8QxqpkW7HVqYiChTpDLzN")
   toolName: string;
@@ -186,7 +186,7 @@ export interface ToolCallMetadata {
  * to interfaces, so an interface here is unassignable at every erased payload
  * boundary (e.g. a route's onRemoteEvent vs OnRemoteEventDispatchMap).
  */
-// eslint-disable-next-line typescript/consistent-type-definitions -- Must be a type alias, not an interface: only aliases get the implicit index signature that makes this assignable to WidgetData on an endpoint payload. See above.
+// eslint-disable-next-line typescript/consistent-type-definitions, @typescript-eslint/consistent-type-definitions -- Must be a type alias, not an interface: only aliases get the implicit index signature that makes this assignable to WidgetData on an endpoint payload. See above.
 export type MessageMetadata = {
   // Token and generation info (for ASSISTANT messages)
   generationTime?: number;

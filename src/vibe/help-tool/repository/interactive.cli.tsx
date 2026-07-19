@@ -30,7 +30,7 @@ import { createEndpointLogger } from "next-vibe/logger/server";
 import { scopedTranslation as cliScopedTranslation } from "next-vibe/platforms/cli/i18n";
 import type { CliCompatiblePlatform } from "next-vibe/platforms/cli/runtime/route-executor";
 import { Platform } from "next-vibe/platforms/platforms";
-import type { EndpointRenderer } from "next-vibe/unified-ui/renderers/react/EndpointRenderer";
+import type { EndpointRenderer } from "next-vibe/unified-ui/renderers/web/EndpointRenderer";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -51,8 +51,10 @@ async function getInkEndpointRenderer(): Promise<{
   EndpointRenderer: InkEndpointRendererType;
 }> {
   if (!InkEndpointRendererModule) {
-    InkEndpointRendererModule =
-      await import("next-vibe/unified-ui/renderers/react/EndpointRenderer");
+    const loaded =
+      await import("next-vibe/unified-ui/renderers/web/EndpointRenderer");
+    InkEndpointRendererModule = loaded;
+    return loaded;
   }
   return InkEndpointRendererModule;
 }
@@ -741,7 +743,7 @@ function InteractiveHelp({
           locale,
           logger: createEndpointLogger(false, locale),
           platform,
-          streamContext: {
+          toolExecutionContext: {
             // no user context — UTC (dates not user-facing here)
             ...makeHeadlessContext(undefined, undefined, "UTC"),
             rootFolderId: DefaultFolderId.PRIVATE,

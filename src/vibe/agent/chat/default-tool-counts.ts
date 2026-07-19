@@ -9,7 +9,7 @@
 
 import "server-only";
 
-import { permissionsRegistry } from "next-vibe/core/route/definitions-registry";
+import { permissionsRegistry } from "next-vibe/core/permissions/registry";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { Platform } from "next-vibe/platforms/platforms";

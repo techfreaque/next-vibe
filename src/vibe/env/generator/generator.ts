@@ -9,7 +9,7 @@ import { dirname, join } from "node:path";
 
 import type {
   GeneratorContext,
-  GeneratorResult,
+  GeneratorDefinition,
 } from "next-vibe/core/generators/shared/shared-inputs";
 import {
   generateFileHeader as sharedGenerateFileHeader,
@@ -17,12 +17,23 @@ import {
   stripProjectRoot,
   toImportUrl,
 } from "next-vibe/core/generators/shared/utils";
+import {
+  findFilesRecursively,
+  generateFileHeader,
+  getRelativeImportPath,
+  writeGeneratedFile,
+} from "next-vibe/core/generators/shared/utils";
 import type { EnvExample, EnvFieldType } from "next-vibe/env/define-env";
 import { formatCount, formatWarning } from "next-vibe/logger/formatters";
 
 import { GENERATED_DIR, getApiDir } from "@/env/paths";
 
 import type { EnvValidationErrorType } from "./generator-validator";
+import {
+  checkDuplicateModuleNames,
+  formatValidationErrors,
+  validateEnvFileExports,
+} from "./generator-validator";
 
 /**
  * Entry for .env.example generation
@@ -65,19 +76,6 @@ interface EnvValidationError {
   message: string;
   details?: EnvValidationErrorDetails;
 }
-
-import {
-  findFilesRecursively,
-  generateFileHeader,
-  getRelativeImportPath,
-  writeGeneratedFile,
-} from "next-vibe/core/generators/shared/utils";
-
-import {
-  checkDuplicateModuleNames,
-  formatValidationErrors,
-  validateEnvFileExports,
-} from "./generator-validator";
 
 const OUTPUT_DIR = GENERATED_DIR;
 
@@ -268,23 +266,33 @@ class EnvGeneratorRepository {
         // Sort so src/config modules appear first, then pair each directory's
         // env.ts (server) immediately followed by env-client.ts (client).
         // Within a pair, server comes first so client keys win deduplication.
-        const configPath = join(getApiDir(), "config");
+        const vibeCorePath = join(getApiDir(), "vibe", "core");
+        const vibeIdentityPath = join(getApiDir(), "vibe", "identity");
+        const vibePath = join(getApiDir(), "vibe");
+        const groupRank = (filePath: string): number => {
+          if (filePath.startsWith(`${vibeIdentityPath}/`)) {
+            return 0;
+          }
+          if (filePath.startsWith(`${vibeCorePath}/`)) {
+            return 1;
+          }
+          if (filePath.startsWith(`${vibePath}/`)) {
+            return 2;
+          }
+          return 3;
+        };
         const allModules = [
           ...validServerModules,
           ...validClientModules,
         ].toSorted((a, b): number => {
+          const aGroup = groupRank(a.filePath);
+          const bGroup = groupRank(b.filePath);
+          if (aGroup !== bGroup) {
+            return aGroup - bGroup;
+          }
           const aDir = dirname(a.filePath);
           const bDir = dirname(b.filePath);
-          const aIsConfig = aDir === configPath;
-          const bIsConfig = bDir === configPath;
-          // config directory always comes first
-          if (aIsConfig && !bIsConfig) {
-            return -1;
-          }
-          if (!aIsConfig && bIsConfig) {
-            return 1;
-          }
-          // group by directory
+          // group by directory A-Z
           if (aDir !== bDir) {
             return aDir.localeCompare(bDir);
           }
@@ -1003,21 +1011,31 @@ async function generateEnvKeys(
   return keys.length;
 }
 
-/**
- * The single env-domain generator: builds the env registry (index + client +
- * .env.example + Docker), then the env-keys metadata (which reads the registry).
- */
-export async function generate(
-  ctx: GeneratorContext,
-): Promise<GeneratorResult> {
-  const env = await EnvGeneratorRepository.generateEnv(ctx);
-  const keyCount = await generateEnvKeys(ctx, env.modules);
-  return {
-    summary: `env (${env.serverEnvFiles} server, ${env.clientEnvFiles} client); env keys (${keyCount})`,
-    counts: {
-      serverModules: env.serverEnvFiles,
-      clientModules: env.clientEnvFiles,
-      envKeys: keyCount,
-    },
-  };
-}
+export const generator: GeneratorDefinition = {
+  key: "env",
+  phase: "default",
+  needs: {},
+  cacheKey: "env",
+  findInputs() {
+    const apiDir = getApiDir();
+    const configDir = join(process.cwd(), "src", "config");
+    return [
+      ...findFilesRecursively(apiDir, "env.ts"),
+      ...findFilesRecursively(configDir, "env.ts"),
+      ...findFilesRecursively(apiDir, "env-client.ts"),
+      ...findFilesRecursively(configDir, "env-client.ts"),
+    ].toSorted();
+  },
+  async generate(ctx) {
+    const env = await EnvGeneratorRepository.generateEnv(ctx);
+    const keyCount = await generateEnvKeys(ctx, env.modules);
+    return {
+      summary: `env (${env.serverEnvFiles} server, ${env.clientEnvFiles} client); env keys (${keyCount})`,
+      counts: {
+        serverModules: env.serverEnvFiles,
+        clientModules: env.clientEnvFiles,
+        envKeys: keyCount,
+      },
+    };
+  },
+};

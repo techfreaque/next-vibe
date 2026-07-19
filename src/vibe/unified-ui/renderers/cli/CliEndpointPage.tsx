@@ -39,7 +39,9 @@ import { QueryProvider } from "next-vibe/unified-ui/hooks/query-provider";
 import type { JSX, ReactNode } from "react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
+import { isOverlayOpen } from "../../../ui/cli/ui/dialog";
 import { EndpointsPage } from "../web/EndpointsPage";
+import { prewarmLazyWidgets } from "./response/result-formatter";
 
 // ─── Error Boundary ──────────────────────────────────────────────────────────
 
@@ -199,7 +201,7 @@ function InkEndpointPage<
   initialData,
 }: InkEndpointPageProps<T>): JSX.Element {
   const { exit } = useApp();
-  const { focus } = useFocusManager();
+  const { focus, focusNext, focusPrevious } = useFocusManager();
 
   // After all fields mount, focus the primary prompt field (if present).
   // Delay slightly so all useFocus() registrations complete first.
@@ -223,9 +225,12 @@ function InkEndpointPage<
 
   const { isRawModeSupported } = useStdin();
   const [ctrlCHint, setCtrlCHint] = useState(false);
+  const [escHint, setEscHint] = useState(false);
   const lastCtrlCRef = useRef(0);
+  const lastEscRef = useRef(0);
 
-  // Double Ctrl+C within 3 seconds to exit. First press shows hint.
+  // Double Ctrl+C or double Esc within 3 seconds to exit.
+  // Arrow keys navigate between form fields when no overlay (dropdown) is open.
   useInput(
     (input, key) => {
       if (input === "c" && key.ctrl) {
@@ -237,6 +242,24 @@ function InkEndpointPage<
         lastCtrlCRef.current = now;
         setCtrlCHint(true);
         setTimeout(() => setCtrlCHint(false), 3000);
+      }
+      if (key.escape && !isOverlayOpen()) {
+        const now = Date.now();
+        if (now - lastEscRef.current < 3000) {
+          exit();
+          return;
+        }
+        lastEscRef.current = now;
+        setEscHint(true);
+        setTimeout(() => setEscHint(false), 3000);
+      }
+      // Arrow keys move between fields when dropdown is closed
+      if (!isOverlayOpen()) {
+        if (key.downArrow) {
+          focusNext();
+        } else if (key.upArrow) {
+          focusPrevious();
+        }
       }
     },
     { isActive: isRawModeSupported },
@@ -302,12 +325,16 @@ function InkEndpointPage<
             endpointOptions={endpointOptions}
           />
         </InkErrorBoundary>
-        {ctrlCHint && (
+        {(ctrlCHint || escHint) && (
           <Box>
             <Text color="yellow" bold>
-              {cliT(
-                "vibe.endpoints.renderers.cliUi.widgets.common.hints.ctrlCExitHint",
-              )}
+              {escHint
+                ? cliT(
+                    "vibe.endpoints.renderers.cliUi.widgets.common.hints.escExitHint",
+                  )
+                : cliT(
+                    "vibe.endpoints.renderers.cliUi.widgets.common.hints.ctrlCExitHint",
+                  )}
             </Text>
           </Box>
         )}
@@ -364,7 +391,13 @@ function InkEndpointPage<
 
       {/* Footer */}
       <Box marginTop={1}>
-        {ctrlCHint ? (
+        {escHint ? (
+          <Text color="yellow" bold>
+            {cliT(
+              "vibe.endpoints.renderers.cliUi.widgets.common.hints.escExitHint",
+            )}
+          </Text>
+        ) : ctrlCHint ? (
           <Text color="yellow" bold>
             {cliT(
               "vibe.endpoints.renderers.cliUi.widgets.common.hints.ctrlCExitHint",
@@ -685,6 +718,13 @@ export async function renderInkEndpointPage<
     );
     return;
   }
+
+  // Preload all lazy widgets so the first frame renders immediately (no Suspense blank flash)
+  await Promise.all(
+    Object.values(props.endpoint)
+      .filter(Boolean)
+      .map((ep) => prewarmLazyWidgets(ep as CreateApiEndpointAny)),
+  );
 
   // Set up agent control (frame file + keys polling) only when requested
   const agentCtrl = useAgentControl ? setupAgentControl(pid) : null;

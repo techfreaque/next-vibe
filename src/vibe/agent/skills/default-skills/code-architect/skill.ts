@@ -10,6 +10,7 @@ import {
 } from "next-vibe/agent/cortex/constants";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import { SQL_ALIAS } from "next-vibe/database/sql/constants";
+import { VibeMode } from "next-vibe/env/env-util";
 import { AWAIT_TASK_ALIAS } from "next-vibe/execute-tool/await-task/constants";
 import { EXECUTE_TOOL_ALIAS } from "next-vibe/execute-tool/constants";
 import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
@@ -44,7 +45,10 @@ export const codeArchitectSkill: Skill = {
   icon: "code",
   category: SkillCategory.CODING,
   ownershipType: SkillOwnershipType.SYSTEM,
-  userRole: envClient.NEXT_PUBLIC_LOCAL_MODE ? [UserPermissionRole.ADMIN] : [],
+  userRole:
+    envClient.NEXT_PUBLIC_VIBE_MODE === VibeMode.AGENT
+      ? [UserPermissionRole.ADMIN]
+      : [],
   pinnedTools: [
     tool(TOOL_HELP_ALIAS),
     tool(EXECUTE_TOOL_ALIAS),

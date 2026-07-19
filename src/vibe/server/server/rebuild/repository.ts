@@ -33,9 +33,6 @@ import type { RebuildT } from "next-vibe/server/server/rebuild/i18n";
 import { scopedTranslation as checkScopedTranslation } from "next-vibe/tooling/check/i18n";
 import { VibeCheckRepository } from "next-vibe/tooling/check/repository/repository";
 
-import { GENERATED_DIR } from "@/env/paths";
-
-import { ServerFramework } from "../enum";
 import { readPidFilePort, VIBE_START_PID_FILE } from "../pid";
 import type {
   RebuildRequestOutput,
@@ -101,15 +98,7 @@ export class RebuildRepository {
       const codegenOk = await runStep(t("post.steps.codegen"), async () => {
         try {
           const generateResult = await GenerateAllRepository.generateAll(
-            {
-              outputDir: GENERATED_DIR,
-              verbose: false,
-              skipEndpoints: false,
-              skipSeeds: false,
-              skipTaskIndex: false,
-              skipTanstack: data.framework !== ServerFramework.TANSTACK,
-              force: false,
-            },
+            { force: false },
             logger,
             locale,
           );

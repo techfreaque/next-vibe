@@ -3,6 +3,7 @@ import "server-only";
 
 import type { SystemPromptFragment } from "next-vibe/agent/ai-stream/system-prompt/types";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
+import { VibeMode } from "next-vibe/env/env-util";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
 import { FETCH_URL_SHORT_ALIAS } from "../fetch-url-content/constants";
@@ -18,14 +19,15 @@ export const webFragment: SystemPromptFragment = {
     const isAdmin =
       !params.user.isPublic &&
       params.user.roles.includes(UserPermissionRole.ADMIN);
-    const isLocalMode = envClient.NEXT_PUBLIC_LOCAL_MODE;
+    const vibeMode = envClient.NEXT_PUBLIC_VIBE_MODE;
 
     let hasBrowser = false;
     if (isAdmin) {
       try {
         const { browserEnv } = await import("@/browser/env");
         hasBrowser =
-          isLocalMode || browserEnv.CHROME_EXECUTABLE_PATH !== undefined;
+          vibeMode !== VibeMode.CLOUD ||
+          browserEnv.CHROME_EXECUTABLE_PATH !== undefined;
       } catch {
         // Browser module not available
       }
@@ -43,7 +45,7 @@ You can search the web and read URLs:
       lines.push(`
 
 You have full browser automation. \`tool-help query=browser\` lists all tools; \`tool-help query=browser-<toolname>\` gives full schema.`);
-    } else if (!isLocalMode) {
+    } else if (vibeMode === VibeMode.CLOUD) {
       lines.push(`
 For JS-heavy sites or interactive pages, the local version of unbottled includes full browser automation.`);
     }

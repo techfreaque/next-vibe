@@ -297,7 +297,7 @@ const payoutAdminEmailPropsSchema = z.object({
   amountCents: z.number(),
   currency: z.string(),
   walletAddress: z.string().optional().nullable(),
-  userEmail: z.string().email().optional(),
+  userEmail: z.email().optional(),
 });
 
 type PayoutAdminEmailProps = z.infer<typeof payoutAdminEmailPropsSchema>;

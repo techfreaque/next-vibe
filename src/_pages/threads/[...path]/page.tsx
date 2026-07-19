@@ -43,6 +43,7 @@ import type { SkillGetResponseOutput } from "next-vibe/agent/skills/[id]/definit
 import { SkillsRepository } from "next-vibe/agent/skills/repository";
 import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { VibeMode } from "next-vibe/env/env-util";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
@@ -150,7 +151,7 @@ export async function tanstackLoader({
   }
 
   if (
-    coreEnv.NEXT_PUBLIC_LOCAL_MODE &&
+    coreEnv.NEXT_PUBLIC_VIBE_MODE === VibeMode.AGENT &&
     user.isPublic &&
     earlyRootFolderId !== DefaultFolderId.INCOGNITO
   ) {

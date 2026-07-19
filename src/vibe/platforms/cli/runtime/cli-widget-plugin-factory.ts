@@ -65,13 +65,13 @@ export function createCliWidgetPlugin(_rootDir?: string): BunPlugin {
   // Param kept for call-site compatibility; bases are now derived from this
   // file's own location (see doc comment above).
   void _rootDir;
-  // This factory lives at system/platforms/cli/. The UI mirrors live at
-  // system/ui/{web,cli}. Deriving the bases from this file's own location makes
+  // This factory lives at vibe/platforms/cli/runtime/. The UI mirrors live at
+  // vibe/ui/{web,cli}. Deriving the bases from this file's own location makes
   // the redirect independent of each caller's (historically inconsistent)
   // rootDir argument - the reason CLI widgets stopped being swapped and web
   // components (Card/Accordion/Checkbox) leaked onto the CLI, crashing the
   // renderer on browser-only APIs like requestAnimationFrame.
-  const UI_BASE = resolve(import.meta.dir, "../../ui");
+  const UI_BASE = resolve(import.meta.dir, "../../../ui");
   const WEB_BASE = toPosix(resolve(UI_BASE, "web"));
   const CLI_BASE = toPosix(resolve(UI_BASE, "cli"));
   // Directories where cli/ mirrors web/ structure
@@ -171,7 +171,11 @@ export function createCliWidgetPlugin(_rootDir?: string): BunPlugin {
       });
 
       // Rule 2 (.ts): use onResolve to redirect path without touching Bun's module registry.
-      build.onResolve({ filter: /\.ts$/ }, ({ path, importer }) => {
+      // Shared handler: resolve the abs path, check for .cli.ts/.cli.tsx sibling.
+      function resolveCliSibling(
+        path: string,
+        importer: string | undefined,
+      ): { path: string } | undefined {
         if (!path.startsWith(".") || !importer) {
           return undefined;
         }
@@ -194,7 +198,16 @@ export function createCliWidgetPlugin(_rootDir?: string): BunPlugin {
           break;
         }
         return undefined;
-      });
+      }
+
+      // Explicit .ts extension imports
+      build.onResolve({ filter: /\.ts$/ }, ({ path, importer }) =>
+        resolveCliSibling(path, importer),
+      );
+      // Extensionless relative imports (e.g. "./call-api" → "./call-api.cli.ts")
+      build.onResolve({ filter: /^\.\.?\// }, ({ path, importer }) =>
+        resolveCliSibling(path, importer),
+      );
     },
   };
 }

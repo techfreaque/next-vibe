@@ -1,10 +1,11 @@
 /**
  * Contact Form Widget
- * Rich UI for submitting a contact form with success state and post-send actions.
+ * Single widget for web, CLI, and MCP. Platform differences handled via isCli.
  */
 
 "use client";
 
+import { Platform } from "next-vibe/platforms/platforms";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div, type DivMouseEvent } from "next-vibe/ui/ui/div";
 import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
@@ -15,6 +16,7 @@ import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetForm,
   useWidgetOnSubmit,
+  useWidgetPlatform,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
@@ -40,6 +42,8 @@ export function ContactFormWidget({
   const t = useWidgetTranslation<typeof definition.POST>();
   const form = useWidgetForm<typeof definition.POST>();
   const onSubmit = useWidgetOnSubmit();
+  const platform = useWidgetPlatform();
+  const isCli = platform === Platform.CLI || platform === Platform.MCP;
   const [showNoEmailWarning, setShowNoEmailWarning] = useState(false);
   const emailFieldRef = useRef<HTMLDivElement>(null);
 
@@ -69,6 +73,19 @@ export function ContactFormWidget({
 
   // Success state
   if (data?.success) {
+    if (isCli) {
+      return (
+        <Div className="flex flex-col gap-2">
+          <Div className="flex items-center gap-2">
+            <CheckCircle className="h-5 w-5 text-success" />
+            <Span className="font-semibold">{t("success.title")}</Span>
+          </Div>
+          <Span className="text-muted-foreground">
+            {t("success.description")}
+          </Span>
+        </Div>
+      );
+    }
     return (
       <Div className="flex flex-col gap-4 p-4">
         <Div className="rounded-lg border border-success/30 bg-success/10 p-6 flex flex-col items-center gap-3 text-center">
@@ -82,7 +99,29 @@ export function ContactFormWidget({
     );
   }
 
-  // Form state
+  // CLI form: no header (outer frame has it), tight spacing
+  if (isCli) {
+    return (
+      <Div className="flex flex-col gap-2">
+        <FormAlertWidget field={{}} />
+        <TextFieldWidget fieldName="name" field={children.name} />
+        <EmailFieldWidget fieldName="email" field={children.email} />
+        <SelectFieldWidget fieldName="subject" field={children.subject} />
+        <SelectFieldWidget fieldName="priority" field={children.priority} />
+        <TextareaFieldWidget fieldName="message" field={children.message} />
+        <SubmitButtonWidget<typeof definition.POST>
+          field={{
+            text: "form.submitButton.label",
+            loadingText: "form.submitButton.loadingText",
+            icon: "send",
+            variant: "primary",
+          }}
+        />
+      </Div>
+    );
+  }
+
+  // Web form: full header, description, noEmail warning flow
   return (
     <Div className="flex flex-col gap-4 p-4">
       {/* Header */}

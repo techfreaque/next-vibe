@@ -684,21 +684,10 @@
           "schema": {
             "def": {
               "type": "string",
-              "checks": [
-                {
-                  "def": {
-                    "type": "string",
-                    "format": "email",
-                    "check": "string_format",
-                    "abort": false,
-                    "pattern": {}
-                  },
-                  "type": "string",
-                  "format": "email",
-                  "minLength": null,
-                  "maxLength": null
-                }
-              ]
+              "format": "email",
+              "check": "string_format",
+              "abort": false,
+              "pattern": {}
             },
             "type": "string",
             "format": "email",
@@ -1582,21 +1571,10 @@
                             {
                               "def": {
                                 "type": "string",
-                                "checks": [
-                                  {
-                                    "def": {
-                                      "type": "string",
-                                      "format": "email",
-                                      "check": "string_format",
-                                      "abort": false,
-                                      "pattern": {}
-                                    },
-                                    "type": "string",
-                                    "format": "email",
-                                    "minLength": null,
-                                    "maxLength": null
-                                  }
-                                ]
+                                "format": "email",
+                                "check": "string_format",
+                                "abort": false,
+                                "pattern": {}
                               },
                               "type": "string",
                               "format": "email",
@@ -1618,21 +1596,10 @@
                           {
                             "def": {
                               "type": "string",
-                              "checks": [
-                                {
-                                  "def": {
-                                    "type": "string",
-                                    "format": "email",
-                                    "check": "string_format",
-                                    "abort": false,
-                                    "pattern": {}
-                                  },
-                                  "type": "string",
-                                  "format": "email",
-                                  "minLength": null,
-                                  "maxLength": null
-                                }
-                              ]
+                              "format": "email",
+                              "check": "string_format",
+                              "abort": false,
+                              "pattern": {}
                             },
                             "type": "string",
                             "format": "email",
@@ -1670,21 +1637,10 @@
                           {
                             "def": {
                               "type": "string",
-                              "checks": [
-                                {
-                                  "def": {
-                                    "type": "string",
-                                    "format": "email",
-                                    "check": "string_format",
-                                    "abort": false,
-                                    "pattern": {}
-                                  },
-                                  "type": "string",
-                                  "format": "email",
-                                  "minLength": null,
-                                  "maxLength": null
-                                }
-                              ]
+                              "format": "email",
+                              "check": "string_format",
+                              "abort": false,
+                              "pattern": {}
                             },
                             "type": "string",
                             "format": "email",
@@ -1706,21 +1662,10 @@
                         {
                           "def": {
                             "type": "string",
-                            "checks": [
-                              {
-                                "def": {
-                                  "type": "string",
-                                  "format": "email",
-                                  "check": "string_format",
-                                  "abort": false,
-                                  "pattern": {}
-                                },
-                                "type": "string",
-                                "format": "email",
-                                "minLength": null,
-                                "maxLength": null
-                              }
-                            ]
+                            "format": "email",
+                            "check": "string_format",
+                            "abort": false,
+                            "pattern": {}
                           },
                           "type": "string",
                           "format": "email",
@@ -2318,21 +2263,10 @@
                             {
                               "def": {
                                 "type": "string",
-                                "checks": [
-                                  {
-                                    "def": {
-                                      "type": "string",
-                                      "format": "email",
-                                      "check": "string_format",
-                                      "abort": false,
-                                      "pattern": {}
-                                    },
-                                    "type": "string",
-                                    "format": "email",
-                                    "minLength": null,
-                                    "maxLength": null
-                                  }
-                                ]
+                                "format": "email",
+                                "check": "string_format",
+                                "abort": false,
+                                "pattern": {}
                               },
                               "type": "string",
                               "format": "email",
@@ -2354,21 +2288,10 @@
                           {
                             "def": {
                               "type": "string",
-                              "checks": [
-                                {
-                                  "def": {
-                                    "type": "string",
-                                    "format": "email",
-                                    "check": "string_format",
-                                    "abort": false,
-                                    "pattern": {}
-                                  },
-                                  "type": "string",
-                                  "format": "email",
-                                  "minLength": null,
-                                  "maxLength": null
-                                }
-                              ]
+                              "format": "email",
+                              "check": "string_format",
+                              "abort": false,
+                              "pattern": {}
                             },
                             "type": "string",
                             "format": "email",
@@ -2406,21 +2329,10 @@
                           {
                             "def": {
                               "type": "string",
-                              "checks": [
-                                {
-                                  "def": {
-                                    "type": "string",
-                                    "format": "email",
-                                    "check": "string_format",
-                                    "abort": false,
-                                    "pattern": {}
-                                  },
-                                  "type": "string",
-                                  "format": "email",
-                                  "minLength": null,
-                                  "maxLength": null
-                                }
-                              ]
+                              "format": "email",
+                              "check": "string_format",
+                              "abort": false,
+                              "pattern": {}
                             },
                             "type": "string",
                             "format": "email",
@@ -2442,21 +2354,10 @@
                         {
                           "def": {
                             "type": "string",
-                            "checks": [
-                              {
-                                "def": {
-                                  "type": "string",
-                                  "format": "email",
-                                  "check": "string_format",
-                                  "abort": false,
-                                  "pattern": {}
-                                },
-                                "type": "string",
-                                "format": "email",
-                                "minLength": null,
-                                "maxLength": null
-                              }
-                            ]
+                            "format": "email",
+                            "check": "string_format",
+                            "abort": false,
+                            "pattern": {}
                           },
                           "type": "string",
                           "format": "email",
@@ -10152,21 +10053,10 @@
           "schema": {
             "def": {
               "type": "string",
-              "checks": [
-                {
-                  "def": {
-                    "type": "string",
-                    "format": "email",
-                    "check": "string_format",
-                    "abort": false,
-                    "pattern": {}
-                  },
-                  "type": "string",
-                  "format": "email",
-                  "minLength": null,
-                  "maxLength": null
-                }
-              ]
+              "format": "email",
+              "check": "string_format",
+              "abort": false,
+              "pattern": {}
             },
             "type": "string",
             "format": "email",
@@ -10247,21 +10137,10 @@
           "schema": {
             "def": {
               "type": "string",
-              "checks": [
-                {
-                  "def": {
-                    "type": "string",
-                    "format": "email",
-                    "check": "string_format",
-                    "abort": false,
-                    "pattern": {}
-                  },
-                  "type": "string",
-                  "format": "email",
-                  "minLength": null,
-                  "maxLength": null
-                }
-              ]
+              "format": "email",
+              "check": "string_format",
+              "abort": false,
+              "pattern": {}
             },
             "type": "string",
             "format": "email",
@@ -10516,21 +10395,10 @@
           "schema": {
             "def": {
               "type": "string",
-              "checks": [
-                {
-                  "def": {
-                    "type": "string",
-                    "format": "email",
-                    "check": "string_format",
-                    "abort": false,
-                    "pattern": {}
-                  },
-                  "type": "string",
-                  "format": "email",
-                  "minLength": null,
-                  "maxLength": null
-                }
-              ]
+              "format": "email",
+              "check": "string_format",
+              "abort": false,
+              "pattern": {}
             },
             "type": "string",
             "format": "email",

@@ -210,7 +210,7 @@ export async function authorizeWsChannel(
   }
 
   const { permissionsRegistry } =
-    await import("next-vibe/core/route/definitions-registry");
+    await import("next-vibe/core/permissions/registry");
   const { Platform } = await import("next-vibe/platforms/platforms");
   const roleResult = permissionsRegistry.validateEndpointAccess(
     entry.endpoint,

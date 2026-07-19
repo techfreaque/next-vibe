@@ -660,7 +660,7 @@ status: text("status", { enum: LeadStatusDB });
 // ❌ WRONG - API validation in db.ts
 // db.ts
 export const createLeadSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   businessName: z.string().min(1),
 });
 

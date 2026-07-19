@@ -67,7 +67,7 @@ Three instances, three purposes. Never confuse them.
 | ---------- | ------------------ | --------------- | ---------- | ---------------------------------- |
 | **Atlas**  | _(no flags)_       | Atlas dev DB    | \`atlas\`    | Dev/coding instance. You live here. |
 | **Hermes** | \`--hermes\`         | Hermes local DB | \`hermes\`   | Max's daily driver. Local preview. |
-| **Thea**   | \`--hermes --thea\`  | Prod DB         | \`thea\`     | Cloud AI on VPS. Production.       |
+| **Thea**   | \`--hermes --remote\` | Prod DB         | \`thea\`     | Cloud AI on VPS. Production.       |
 
 Each instance runs **two server modes** — dev (TanStack/Vite, hot reload) and prod (Next.js build). They use different pid/log files and ports.
 
@@ -91,7 +91,7 @@ Each instance runs **two server modes** — dev (TanStack/Vite, hot reload) and 
 - **New endpoints:** \`vibe gen\` after adding - regenerates MCP/CLI tool lists.
 - **Seeds:** \`vibe seed\` manual, or automatic on \`vibe dev\` startup.
 - **DB queries:** \`vibe sql "SELECT ..."\` or \`vibe sql --queryFile=path\`
-- **CLI instance targeting:** Default (no flags) → Atlas dev DB. \`--hermes\` → Hermes local DB. \`--thea\` → remote connection for that user. \`--hermes --thea\` → Thea prod DB.
+- **CLI instance targeting:** Default (no flags) → Atlas dev DB. \`--hermes\` → Hermes local DB. \`--remote\` → remote instance "thea" from Atlas DB. \`--hermes --remote\` → remote instance "thea" from Hermes DB. \`--remote=<id>\` → any connected instance by label.
 
 ## Code Quality - Absolute Rules
 

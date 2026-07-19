@@ -307,14 +307,10 @@ export class CliInputParser {
    */
   private static buildOptionsData(
     interactive: boolean,
-    dryRun: boolean,
   ): Partial<Record<string, WidgetData>> {
     const optionsData: Partial<Record<string, WidgetData>> = {};
     if (interactive) {
       optionsData.interactive = true;
-    }
-    if (dryRun) {
-      optionsData.dryRun = true;
     }
     return optionsData;
   }
@@ -552,8 +548,6 @@ export class CliInputParser {
     // Skip these CLI-level options (already in context.options)
     const CLI_LEVEL_OPTIONS = new Set([
       "interactive",
-      "dryRun",
-      "dry-run",
       "verbose",
       "debug",
       "output",
@@ -612,7 +606,6 @@ export class CliInputParser {
       /** Raw tokens after the command - used to re-parse with endpoint boolean field knowledge */
       rawTokens?: string[];
       interactive: boolean;
-      dryRun: boolean;
     },
     logger: EndpointLogger,
   ): Promise<CollectedCliRequestData> {
@@ -620,7 +613,6 @@ export class CliInputParser {
     const contextData = params.data;
     const urlPathParams = params.urlPathParams;
     const interactive = params.interactive;
-    const dryRun = params.dryRun;
 
     // Re-parse tokens with endpoint boolean field awareness when raw tokens are available.
     // The initial parse in vibe-runtime.ts didn't know the endpoint yet, so boolean flags
@@ -644,9 +636,9 @@ export class CliInputParser {
     );
 
     if (contextData || (cliData && Object.keys(cliData).length > 0)) {
-      // Merge context options (interactive, dryRun) into data only if explicitly set
+      // Merge context options (interactive) into data only if explicitly set
       // Don't merge if they're CLI defaults to allow schema defaults to apply
-      const optionsData = CliInputParser.buildOptionsData(interactive, dryRun);
+      const optionsData = CliInputParser.buildOptionsData(interactive);
 
       const mergedData = CliInputParser.mergeData(
         optionsData,
@@ -695,7 +687,7 @@ export class CliInputParser {
       );
 
       inputData.data = CliInputParser.mergeData(
-        CliInputParser.buildOptionsData(interactive, dryRun),
+        CliInputParser.buildOptionsData(interactive),
         formData,
       );
     } else {

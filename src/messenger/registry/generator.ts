@@ -7,9 +7,11 @@ import "server-only";
 
 import type {
   GeneratorContext,
+  GeneratorDefinition,
   GeneratorResult,
 } from "next-vibe/core/generators/shared/shared-inputs";
 import {
+  findFilesRecursively,
   generateFileHeader,
   stripProjectRoot,
   writeGeneratedFile,
@@ -18,6 +20,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { formatWarning } from "next-vibe/logger/formatters";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { getApiDir } from "@/env/paths";
 import type {
   EmailTemplateDefinitionAny,
   TemplateCachedMetadata,
@@ -37,43 +40,55 @@ interface TemplateInfo {
  */
 const OUTPUT_FILE = "src/generated/email/index.ts";
 
-/**
- * Generate the email template registry (server + client). Consumes the shared
- * email file list; writes generated.ts + generated.client.ts. Byte-identical to the
- * former tooling/generators/email-templates.
- */
-export async function generate(
-  ctx: GeneratorContext,
-): Promise<GeneratorResult> {
-  const { logger } = ctx;
-  const templateFiles = ctx.files.email;
+export const generator: GeneratorDefinition = {
+  key: "email",
+  phase: "default",
+  needs: {},
+  cacheKey: "email-templates",
+  findInputs(live) {
+    if (live) {
+      return [...live.emailFiles].toSorted();
+    }
+    return findFilesRecursively(getApiDir(), "email.tsx").toSorted();
+  },
+  async generate(ctx) {
+    /**
+     * Generate the email template registry (server + client). Consumes the shared
+     * email file list; writes generated.ts + generated.client.ts. Byte-identical to the
+     * former tooling/generators/email-templates.
+     */
+    const { logger } = ctx;
+    const templateFiles = ctx.files.email;
 
-  logger.debug(`Found ${templateFiles.length} template files`);
+    logger.debug(`Found ${templateFiles.length} template files`);
 
-  if (templateFiles.length === 0) {
-    logger.warn(formatWarning("No email templates found"));
-    return { summary: "email templates (0 found)", counts: { templates: 0 } };
-  }
+    if (templateFiles.length === 0) {
+      logger.warn(formatWarning("No email templates found"));
+      return { summary: "email templates (0 found)", counts: { templates: 0 } };
+    }
 
-  const templates = await EmailTemplateGenerator.loadTemplates(
-    templateFiles,
-    logger,
-  );
-  logger.debug(`Loaded ${templates.length} valid templates`);
+    const templates = await EmailTemplateGenerator.loadTemplates(
+      templateFiles,
+      logger,
+    );
+    logger.debug(`Loaded ${templates.length} valid templates`);
 
-  const serverContent = EmailTemplateGenerator.generateServerContent(templates);
-  const clientContent = EmailTemplateGenerator.generateClientContent(templates);
+    const serverContent =
+      EmailTemplateGenerator.generateServerContent(templates);
+    const clientContent =
+      EmailTemplateGenerator.generateClientContent(templates);
 
-  const clientOutputFile = OUTPUT_FILE.replace(/\/index\.ts$/, "/client.ts");
+    const clientOutputFile = OUTPUT_FILE.replace(/\/index\.ts$/, "/client.ts");
 
-  await writeGeneratedFile(OUTPUT_FILE, serverContent);
-  await writeGeneratedFile(clientOutputFile, clientContent);
+    await writeGeneratedFile(OUTPUT_FILE, serverContent);
+    await writeGeneratedFile(clientOutputFile, clientContent);
 
-  return {
-    summary: `email templates (${templates.length} templates, server + client)`,
-    counts: { templates: templates.length },
-  };
-}
+    return {
+      summary: `email templates (${templates.length} templates, server + client)`,
+      counts: { templates: templates.length },
+    };
+  },
+};
 
 class EmailTemplateGenerator {
   /**

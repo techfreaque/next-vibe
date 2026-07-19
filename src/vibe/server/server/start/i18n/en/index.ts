@@ -69,6 +69,16 @@ export const translations = {
         title: "Framework",
         description: "Frontend framework/bundler to start",
       },
+      vibeMode: {
+        title: "Instance Mode",
+        description:
+          "Override instance mode at runtime. Patches the built bundle. 'agent' = personal local instance. 'cloud' = SaaS. 'dev' = coding instance.",
+        options: {
+          agent: "Agent (personal local instance)",
+          cloud: "Cloud (SaaS deployment)",
+          dev: "Dev (coding instance)",
+        },
+      },
       skipTaskRunner: {
         title: "Skip Task Runner",
         description: "Skip starting the task runner",

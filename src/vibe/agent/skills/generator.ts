@@ -15,9 +15,11 @@ import { basename, dirname, join } from "node:path";
 
 import type {
   GeneratorContext,
+  GeneratorDefinition,
   GeneratorResult,
 } from "next-vibe/core/generators/shared/shared-inputs";
 import {
+  findFilesRecursively,
   generateFileHeader,
   getRelativeImportPath,
   toImportUrl,
@@ -25,7 +27,7 @@ import {
 } from "next-vibe/core/generators/shared/utils";
 import { parseError } from "next-vibe/core/utils/parse-error";
 
-import { GENERATED_DIR, getSrcDir } from "@/env/paths";
+import { GENERATED_DIR, getApiDir, getSrcDir } from "@/env/paths";
 
 const OUTPUT_FILE = `${GENERATED_DIR}/skills/index.ts`;
 
@@ -355,21 +357,27 @@ async function generateSkillEmbeddings(
   return { total, generated, skipped };
 }
 
-/**
- * The single skills-domain generator: builds the skills index, then the skill
- * embeddings (which read the index). One export, shared skill scan.
- */
-export async function generate(
-  ctx: GeneratorContext,
-): Promise<GeneratorResult> {
-  const { result: index, skills } = await generateSkillsIndex(ctx);
-  const emb = await generateSkillEmbeddings(ctx, skills);
-  return {
-    summary: `${index.summary}; embeddings (${emb.generated} embedded, ${emb.skipped} cached)`,
-    counts: {
-      ...index.counts,
-      embedded: emb.generated,
-      cached: emb.skipped,
-    },
-  };
-}
+export const generator: GeneratorDefinition = {
+  key: "skills",
+  phase: "default",
+  needs: {},
+  cacheKey: "skills-index",
+  findInputs(live) {
+    if (live) {
+      return [...live.defaultSkillFiles].toSorted();
+    }
+    return findFilesRecursively(getApiDir(), "skill.ts");
+  },
+  async generate(ctx) {
+    const { result: index, skills } = await generateSkillsIndex(ctx);
+    const emb = await generateSkillEmbeddings(ctx, skills);
+    return {
+      summary: `${index.summary}; embeddings (${emb.generated} embedded, ${emb.skipped} cached)`,
+      counts: {
+        ...index.counts,
+        embedded: emb.generated,
+        cached: emb.skipped,
+      },
+    };
+  },
+};

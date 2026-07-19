@@ -253,7 +253,7 @@ const { PATCH } = createEndpoint({
           .string()
           .optional()
           .transform((v) => (v === "" ? undefined : v))
-          .pipe(z.string().email().optional()),
+          .pipe(z.email().optional()),
       }),
       password: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

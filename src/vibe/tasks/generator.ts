@@ -10,17 +10,15 @@ import "server-only";
 
 import { readFile } from "node:fs/promises";
 
-import type {
-  GeneratorContext,
-  GeneratorResult,
-} from "next-vibe/core/generators/shared/shared-inputs";
+import type { GeneratorDefinition } from "next-vibe/core/generators/shared/shared-inputs";
 import {
+  findFilesRecursively,
   generateFileHeader,
   getRelativeImportPath,
   writeGeneratedFile,
 } from "next-vibe/core/generators/shared/utils";
 
-import { GENERATED_DIR } from "@/env/paths";
+import { GENERATED_DIR, getApiDir } from "@/env/paths";
 
 const OUTPUT_FILE = `${GENERATED_DIR}/tasks/index.ts`;
 
@@ -149,26 +147,39 @@ export default allTasks;
 `;
 }
 
-/** Generate the task index. Consumes shared file lists; writes one file. */
-export async function generate(
-  ctx: GeneratorContext,
-): Promise<GeneratorResult> {
-  const taskFiles = ctx.files.task;
-  const taskRunnerFiles = ctx.files.taskRunner;
+export const generator: GeneratorDefinition = {
+  key: "tasks",
+  phase: "default",
+  needs: {},
+  cacheKey: "task-index",
+  findInputs(live) {
+    const apiDir = getApiDir();
+    if (live) {
+      return [...live.taskFiles, ...live.taskRunnerFiles].toSorted();
+    }
+    return [
+      ...findFilesRecursively(apiDir, "task.ts"),
+      ...findFilesRecursively(apiDir, "task-runner.ts"),
+    ].toSorted();
+  },
+  async generate(ctx) {
+    const taskFiles = ctx.files.task;
+    const taskRunnerFiles = ctx.files.taskRunner;
 
-  const validationError = await validateTaskFiles(taskFiles, taskRunnerFiles);
-  if (validationError) {
+    const validationError = await validateTaskFiles(taskFiles, taskRunnerFiles);
+    if (validationError) {
+      return {
+        summary: "task index (failed validation)",
+        failed: `Task file validation failed: ${validationError}`,
+      };
+    }
+
+    const content = generateContent(taskFiles, taskRunnerFiles, OUTPUT_FILE);
+    await writeGeneratedFile(OUTPUT_FILE, content);
+
     return {
-      summary: "task index (failed validation)",
-      failed: `Task file validation failed: ${validationError}`,
+      summary: `task index (${taskFiles.length} tasks, ${taskRunnerFiles.length} runners)`,
+      counts: { tasks: taskFiles.length, runners: taskRunnerFiles.length },
     };
-  }
-
-  const content = generateContent(taskFiles, taskRunnerFiles, OUTPUT_FILE);
-  await writeGeneratedFile(OUTPUT_FILE, content);
-
-  return {
-    summary: `task index (${taskFiles.length} tasks, ${taskRunnerFiles.length} runners)`,
-    counts: { tasks: taskFiles.length, runners: taskRunnerFiles.length },
-  };
-}
+  },
+};

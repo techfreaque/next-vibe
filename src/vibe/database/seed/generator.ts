@@ -8,18 +8,16 @@
 
 import "server-only";
 
-import type {
-  GeneratorContext,
-  GeneratorResult,
-} from "next-vibe/core/generators/shared/shared-inputs";
+import type { GeneratorDefinition } from "next-vibe/core/generators/shared/shared-inputs";
 import {
   extractModuleName,
+  findFilesRecursively,
   generateFileHeader,
   getRelativeImportPath,
   writeGeneratedFile,
 } from "next-vibe/core/generators/shared/utils";
 
-import { GENERATED_DIR } from "@/env/paths";
+import { GENERATED_DIR, getApiDir } from "@/env/paths";
 
 const OUTPUT_FILE = `${GENERATED_DIR}/seeds/index.ts`;
 
@@ -82,16 +80,25 @@ export function hasSeedModule(moduleName: string): boolean {
 `;
 }
 
-/** Generate the seeds index. Consumes shared seed file list; writes one file. */
-export async function generate(
-  ctx: GeneratorContext,
-): Promise<GeneratorResult> {
-  const seedFiles = ctx.files.seed;
-  const content = generateContent(seedFiles, OUTPUT_FILE);
-  await writeGeneratedFile(OUTPUT_FILE, content);
+export const generator: GeneratorDefinition = {
+  key: "seeds",
+  phase: "default",
+  needs: {},
+  cacheKey: "seeds",
+  findInputs(live) {
+    if (live) {
+      return [...live.seedFiles].toSorted();
+    }
+    return findFilesRecursively(getApiDir(), "seeds.ts");
+  },
+  async generate(ctx) {
+    const seedFiles = ctx.files.seed;
+    const content = generateContent(seedFiles, OUTPUT_FILE);
+    await writeGeneratedFile(OUTPUT_FILE, content);
 
-  return {
-    summary: `seeds index (${seedFiles.length} modules)`,
-    counts: { seeds: seedFiles.length },
-  };
-}
+    return {
+      summary: `seeds index (${seedFiles.length} modules)`,
+      counts: { seeds: seedFiles.length },
+    };
+  },
+};

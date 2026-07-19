@@ -74,7 +74,7 @@ const { POST } = createEndpoint({
         description:
           "preview.sendTest.post.fields.recipientEmail.description" as const,
         columns: 12,
-        schema: z.string().email(),
+        schema: z.email(),
       }),
 
       language: requestField(scopedTranslation, {

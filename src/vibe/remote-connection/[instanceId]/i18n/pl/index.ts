@@ -31,7 +31,7 @@ export const translations: typeof enTranslations = {
       benefit1:
         "Wspomnienia synchronizują się automatycznie między tym urządzeniem a kontem w chmurze",
       benefit2: "Uruchamiaj narzędzia AI z wiersza poleceń za pomocą",
-      benefit2Code: "vibe --thea",
+      benefit2Code: "vibe --remote",
       benefit3: "Lokalna instancja i chmura pozostają zsynchronizowane",
     },
     behaviorSection: "Zachowanie",

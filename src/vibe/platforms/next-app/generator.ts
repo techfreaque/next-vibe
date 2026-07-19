@@ -13,10 +13,7 @@ import { dirname, join, relative } from "node:path";
 
 import type { ApiSection } from "next-vibe/core/definition/endpoint-base";
 import { hasCustomDirective } from "next-vibe/core/generators/shared/custom-directive";
-import type {
-  GeneratorContext,
-  GeneratorResult,
-} from "next-vibe/core/generators/shared/shared-inputs";
+import type { GeneratorDefinition } from "next-vibe/core/generators/shared/shared-inputs";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import {
   filterPlatformMarkers,
@@ -300,82 +297,111 @@ function emitProxyShell(
   }
 }
 
-export async function generate(
-  ctx: GeneratorContext,
-): Promise<GeneratorResult> {
-  const created: string[] = [];
-  const skipped: string[] = [];
-  const removed: string[] = [];
-  const errors: { file: string; error: string }[] = [];
+export const generator: GeneratorDefinition = {
+  key: "next-app",
+  phase: "default",
+  needs: { definitionModules: true },
+  cacheKey: "next-app",
+  findInputs(live) {
+    const specialFiles = [
+      "error.tsx",
+      "global-error.tsx",
+      "not-found.tsx",
+      "loading.tsx",
+      "template.tsx",
+      "default.tsx",
+    ];
+    const specials = specialFiles.flatMap((name) => findFiles(UI_DIR, name));
+    if (live) {
+      return [
+        ...live.routeFiles,
+        ...findFiles(UI_DIR, "page.tsx"),
+        ...findFiles(UI_DIR, "layout.tsx"),
+        ...specials,
+      ].toSorted();
+    }
+    return [
+      ...findFiles(API_DIR, "route.ts"),
+      ...findFiles(UI_DIR, "page.tsx"),
+      ...findFiles(UI_DIR, "layout.tsx"),
+      ...specials,
+    ].toSorted();
+  },
+  async generate(ctx) {
+    const created: string[] = [];
+    const skipped: string[] = [];
+    const removed: string[] = [];
+    const errors: { file: string; error: string }[] = [];
 
-  // — UI: page.tsx, layout.tsx, and all special Next.js file types —
-  emit(
-    findFiles(UI_DIR, "page.tsx"),
-    UI_DIR,
-    OUT_UI,
-    "page",
-    created,
-    skipped,
-    errors,
-  );
-  emit(
-    findFiles(UI_DIR, "layout.tsx"),
-    UI_DIR,
-    OUT_UI,
-    "layout",
-    created,
-    skipped,
-    errors,
-  );
-  for (const specialFile of SPECIAL_FILES) {
+    // — UI: page.tsx, layout.tsx, and all special Next.js file types —
     emit(
-      findFiles(UI_DIR, specialFile),
+      findFiles(UI_DIR, "page.tsx"),
       UI_DIR,
       OUT_UI,
-      "special",
+      "page",
       created,
       skipped,
       errors,
     );
-  }
+    emit(
+      findFiles(UI_DIR, "layout.tsx"),
+      UI_DIR,
+      OUT_UI,
+      "layout",
+      created,
+      skipped,
+      errors,
+    );
+    for (const specialFile of SPECIAL_FILES) {
+      emit(
+        findFiles(UI_DIR, specialFile),
+        UI_DIR,
+        OUT_UI,
+        "special",
+        created,
+        skipped,
+        errors,
+      );
+    }
 
-  // — API: route.ts shells, skipping WEB_OFF / PRODUCTION_OFF endpoints —
-  emit(
-    findFiles(API_DIR, "route.ts", [], API_EXCLUDE_DIRS),
-    API_DIR,
-    OUT_API,
-    "route",
-    created,
-    skipped,
-    errors,
-    (f) => {
-      if (!hasHttpExports(f)) {
-        return false;
-      }
-      return !isWebExcluded(f, ctx.computed.definitionModules);
-    },
-  );
+    // — API: route.ts shells, skipping WEB_OFF / PRODUCTION_OFF endpoints —
+    emit(
+      findFiles(API_DIR, "route.ts", [], API_EXCLUDE_DIRS),
+      API_DIR,
+      OUT_API,
+      "route",
+      created,
+      skipped,
+      errors,
+      (f) => {
+        if (!hasHttpExports(f)) {
+          return false;
+        }
+        return !isWebExcluded(f, ctx.computed.definitionModules);
+      },
+    );
 
-  // — proxy.ts at app root —
-  emitProxyShell(created, skipped, errors);
+    // — proxy.ts at app root —
+    emitProxyShell(created, skipped, errors);
 
-  // — Stale shell cleanup —
-  cleanupStaleShells(OUT_UI, UI_DIR, removed);
-  // Also clean API stale shells (map generated/app/api/[locale] ↔ src/)
-  cleanupStaleShells(OUT_API, API_DIR, removed);
+    // — Stale shell cleanup —
+    cleanupStaleShells(OUT_UI, UI_DIR, removed);
+    // Also clean API stale shells (map generated/app/api/[locale] ↔ src/)
+    cleanupStaleShells(OUT_API, API_DIR, removed);
 
-  if (errors.length > 0) {
+    if (errors.length > 0) {
+      return {
+        summary: `next-app shells (${String(created.length)} created, ${String(removed.length)} removed, ${String(errors.length)} errors)`,
+        failed: errors.map((e) => `${e.file}: ${e.error}`).join("; "),
+      };
+    }
     return {
-      summary: `next-app shells (${String(created.length)} created, ${String(removed.length)} removed, ${String(errors.length)} errors)`,
-      failed: errors.map((e) => `${e.file}: ${e.error}`).join("; "),
+      summary: `next-app shells (${String(created.length)} created, ${String(skipped.length)} skipped, ${String(removed.length)} removed)`,
+      counts: {
+        created: created.length,
+        skipped: skipped.length,
+        removed: removed.length,
+      },
     };
-  }
-  return {
-    summary: `next-app shells (${String(created.length)} created, ${String(skipped.length)} skipped, ${String(removed.length)} removed)`,
-    counts: {
-      created: created.length,
-      skipped: skipped.length,
-      removed: removed.length,
-    },
-  };
-}
+  },
+};

@@ -61,7 +61,7 @@ const { GET } = createEndpoint({
         placeholder: "email.placeholder",
         helpText: "email.helpText",
         columns: 12,
-        schema: z.string().email(),
+        schema: z.email(),
         order: 1,
       }),
       // RESPONSE FIELDS

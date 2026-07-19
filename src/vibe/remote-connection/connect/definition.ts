@@ -11,6 +11,7 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
+import { VibeMode } from "next-vibe/env/env-util";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
@@ -33,9 +34,10 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["vibe", "remote-connection", "connect"],
-  allowedRoles: envClient.NEXT_PUBLIC_VIBE_IS_CLOUD
-    ? ([] as const) // Cloud instances don't initiate connections; local side does
-    : ([UserRole.ADMIN] as const),
+  allowedRoles:
+    envClient.NEXT_PUBLIC_VIBE_MODE === VibeMode.CLOUD
+      ? ([] as const) // Cloud instances don't initiate connections; local side does
+      : ([UserRole.ADMIN] as const),
   title: "post.title" as const,
   titleShort: "post.titleShort" as const,
   description: "post.description" as const,

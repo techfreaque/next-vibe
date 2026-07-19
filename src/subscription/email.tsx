@@ -509,7 +509,7 @@ export const subscriptionSuccessEmailTemplate: EmailTemplateDefinition<
 const adminSubscriptionPropsSchema = z.object({
   privateName: z.string(),
   publicName: z.string(),
-  email: z.string().email(),
+  email: z.email(),
   planName: z.string(),
   statusName: z.string(),
 });

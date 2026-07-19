@@ -99,7 +99,7 @@ const { POST } = createEndpoint({
             description: "post.email.description",
             placeholder: "post.email.placeholder",
             schema: z
-              .union([z.string().email(), z.literal("")])
+              .union([z.email(), z.literal("")])
               .optional()
               .transform((v) => (v === "" ? undefined : v)),
           }),

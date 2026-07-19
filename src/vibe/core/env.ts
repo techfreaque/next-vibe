@@ -8,7 +8,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { delimiter, dirname, join } from "node:path";
 
 import { defineEnv } from "next-vibe/env/define-env";
-import { Environment } from "next-vibe/env/env-util";
+import { Environment, VibeMode, VibeModeValues } from "next-vibe/env/env-util";
 import { z } from "zod";
 
 import { isHermesDev, isPreviewMode } from "@/vibe/env/detect";
@@ -347,16 +347,13 @@ export const {
     commented: true,
     fieldType: "boolean",
   },
-  NEXT_PUBLIC_LOCAL_MODE: {
+  NEXT_PUBLIC_VIBE_MODE: {
     schema: z
-      .string()
-      .optional()
-      .default(isPreviewMode ? "true" : "false")
-      .transform((v) => v !== "false"),
-    example: "true",
+      .enum(VibeModeValues)
+      .default(isPreviewMode ? VibeMode.AGENT : VibeMode.DEV),
+    example: VibeMode.DEV,
     comment:
-      "Self-hosted mode. Hides SaaS features (login buttons, lead management), makes AI keys optional, and adjusts navigation. Set automatically by vibe build/start.",
-    fieldType: "boolean",
+      "Instance mode. 'agent' = personal local instance. 'cloud' = SaaS deployment. 'dev' = Atlas coding instance (default). Set automatically by vibe build/start.",
   },
   NEXT_PUBLIC_APP_URL: {
     schema: z.preprocess(
@@ -406,20 +403,5 @@ export const {
     comment:
       "Absolute path to the project root. Mainly needed for MCP servers which often run in a different working directory.",
     commented: true,
-  },
-  VIBE_REMOTE_URL: {
-    schema: z
-      .string()
-      .url()
-      .default(
-        // NEXT_PUBLIC_PROJECT_URL is owned by core/env-client.ts; read it from
-        // process.env (already set by loadEnvironment) to avoid importing the
-        // client env here, which would evaluate it before this module's defineEnv.
-        process.env["NEXT_PUBLIC_PROJECT_URL"] ?? "https://unbottled.ai",
-      ),
-    example: "https://unbottled.ai",
-    comment: "Remote server URL for `vibe --thea` CLI execution.",
-    commented: true,
-    fieldType: "url",
   },
 });

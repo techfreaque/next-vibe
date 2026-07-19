@@ -1,5 +1,6 @@
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { VibeMode } from "next-vibe/env/env-util";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { Link } from "next-vibe/ui/ui/link";
@@ -12,7 +13,7 @@ interface AuthButtonsProps {
 }
 
 export function AuthButtons({ locale }: AuthButtonsProps): JSX.Element {
-  if (envClient.NEXT_PUBLIC_LOCAL_MODE) {
+  if (envClient.NEXT_PUBLIC_VIBE_MODE === VibeMode.AGENT) {
     return <></>;
   }
 

@@ -908,6 +908,11 @@ export class ServerStartRepository {
     // Patch NEXT_PUBLIC_APP_URL to reflect the actual port so child processes see the right URL.
     ServerStartRepository.patchPublicUrlPort(port);
 
+    // Inject vibeMode into process.env so child processes and runtime-env-patch inherit it.
+    if (data.vibeMode) {
+      Object.assign(process.env, { NEXT_PUBLIC_VIBE_MODE: data.vibeMode });
+    }
+
     // Mode-based process splitting: "all" (default), "web", "tasks"
     const mode = data.mode ?? "all";
     const runDb = data.dbSetup && (mode === "all" || mode === "tasks");

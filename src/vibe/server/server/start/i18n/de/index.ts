@@ -72,6 +72,16 @@ export const translations: typeof enTranslations = {
         title: "Framework",
         description: "Frontend-Framework/Bundler",
       },
+      vibeMode: {
+        title: "Instanz-Modus",
+        description:
+          "Überschreibt den Instanz-Modus zur Laufzeit. Patcht das gebaute Bundle. 'agent' = persönliche lokale Instanz. 'cloud' = SaaS. 'dev' = Coding-Instanz.",
+        options: {
+          agent: "Agent (persönliche lokale Instanz)",
+          cloud: "Cloud (SaaS-Deployment)",
+          dev: "Dev (Coding-Instanz)",
+        },
+      },
       skipTaskRunner: {
         title: "Task Runner überspringen",
         description: "Task Runner überspringen",

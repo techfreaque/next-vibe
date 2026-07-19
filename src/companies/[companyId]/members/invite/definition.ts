@@ -66,7 +66,7 @@ const { POST } = createEndpoint({
         label: "post.email.label",
         description: "post.email.description",
         placeholder: "post.email.placeholder",
-        schema: z.string().email(),
+        schema: z.email(),
       }),
       role: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

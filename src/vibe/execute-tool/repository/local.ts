@@ -10,7 +10,7 @@
  *   2. Enforce requiresConfirmation (the same gate as a direct call).
  *   3. Execute the target via RouteExecutionExecutor.executeGenericHandler.
  *   4. Discard the result if the stream was cancelled mid-execution.
- *   5. Compact validation errors and wrap the success data in { result: ... }.
+ *   5. Compact validation errors and return success data directly.
  */
 
 import "server-only";
@@ -29,10 +29,7 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import { CallbackMode, type CallbackModeValue } from "../constants";
-import type {
-  RouteExecuteRequestOutput,
-  RouteExecuteResponseOutput,
-} from "../definition";
+import type { RouteExecuteRequestOutput } from "../definition";
 // Type-only: the implementation is loaded on demand (see the subscribe site below),
 // so ./control-signals and its realtime dependency stay out of the headless graph.
 import type { ControlAction } from "./control-signals";
@@ -90,7 +87,7 @@ export class LocalExecution {
     input: RouteExecuteRequestOutput["input"];
     instanceId: string | undefined;
     callbackMode: CallbackModeValue | null;
-  }): Promise<ResponseType<RouteExecuteResponseOutput>> {
+  }): Promise<ResponseType<WidgetData>> {
     const { ctx, data, input, instanceId, callbackMode } = params;
     const {
       toolName,
@@ -145,7 +142,7 @@ export class LocalExecution {
         logger,
       });
       if (gate) {
-        return success({ result: gate });
+        return success(gate);
       }
     }
 
@@ -299,15 +296,11 @@ export class LocalExecution {
       return result;
     }
 
-    // Wrap target's .data in `result` so MCP/UI renders it. Preserve the target's
-    // isErrorResponse / performance metadata — CLI relies on isErrorResponse for
-    // exit codes (e.g. vibe check) and on performance for its execution summary.
-    return success(
-      { result: result.data },
-      {
-        ...(result.isErrorResponse && { isErrorResponse: true }),
-        ...(result.performance && { performance: result.performance }),
-      },
-    );
+    // Preserve isErrorResponse / performance metadata — CLI relies on isErrorResponse
+    // for exit codes (e.g. vibe check) and on performance for its execution summary.
+    return success(result.data, {
+      ...(result.isErrorResponse && { isErrorResponse: true }),
+      ...(result.performance && { performance: result.performance }),
+    });
   }
 }

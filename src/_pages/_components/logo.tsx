@@ -6,6 +6,7 @@ import {
   platform,
 } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { VibeMode } from "next-vibe/env/env-util";
 import { Div } from "next-vibe/ui/ui/div";
 import { Image } from "next-vibe/ui/ui/image";
 import { Link } from "next-vibe/ui/ui/link";
@@ -31,7 +32,7 @@ export function Logo({
   disabled?: boolean;
 }): JSX.Element {
   const { t: configT } = configScopedTranslation.scopedT(locale);
-  const isLocalMode = envClient.NEXT_PUBLIC_LOCAL_MODE;
+  const isLocalMode = envClient.NEXT_PUBLIC_VIBE_MODE === VibeMode.AGENT;
   const innerClassName = cn(
     "inline-flex items-center gap-1.5 no-underline! hover:no-underline!",
     linkClassName,

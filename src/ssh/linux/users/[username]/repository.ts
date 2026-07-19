@@ -27,14 +27,6 @@ export class LinuxUserDeleteRepository {
     username: string,
     t: UsersUsernameT,
   ): Promise<ResponseType<LinuxUserDeleteResponseOutput>> {
-    const isLocalMode = process.env["NEXT_PUBLIC_LOCAL_MODE"] !== "false";
-    if (!isLocalMode) {
-      return fail({
-        message: t("errors.localModeOnly.title"),
-        errorType: ErrorResponseTypes.FORBIDDEN,
-      });
-    }
-
     // Refuse to delete current process user
     const currentUser = userInfo().username;
     if (username === currentUser) {

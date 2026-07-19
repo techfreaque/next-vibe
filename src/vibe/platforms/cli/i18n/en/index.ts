@@ -253,7 +253,10 @@ export const translations = {
       verbose: "Enable verbose output",
       dryRun: "Perform a dry run without executing",
       target:
-        "Execution target: dev (default), local (preview DB), or remote (HTTP via NEXT_PUBLIC_PROJECT_URL)",
+        "Execution target: dev (default) or local (preview DB with --hermes)",
+      thea: "Shorthand for --remote (targets the 'thea' instance)",
+      remote:
+        "Execute on a remote instance by ID (default: thea). Looks up the connection from the active DB.",
       interactive: "Enter interactive mode",
     },
     errors: {
@@ -283,8 +286,10 @@ export const translations = {
       remoteReadFailed: "Failed to read remote session",
       remoteWriteFailed: "Failed to write remote session",
       remoteClearFailed: "Failed to clear remote session",
+      remoteNoConnection:
+        "No active connection for instance '{{instanceId}}'. Run: vibe connect <url>",
       remoteNotLoggedIn:
-        "Not logged in to remote host. Run: vibe login --target remote",
+        "Not logged in to remote host. Run: vibe --remote login",
       remoteNoLeadId: "Could not obtain identity from remote host",
       remoteServerError: "Remote server error",
       remoteNotAvailable: "Remote execution is not available in this build",
@@ -347,6 +352,7 @@ export const translations = {
                 executing: "Executing...",
                 tabNextField: "tab: next field | enter: submit | q/esc: exit",
                 ctrlCExitHint: "Press Ctrl+C again to exit",
+                escExitHint: "Press Esc again to exit",
               },
             },
             pagination: {

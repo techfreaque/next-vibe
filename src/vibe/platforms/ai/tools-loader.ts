@@ -20,7 +20,7 @@ import {
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { FieldUsage } from "next-vibe/core/definition/enums";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { permissionsRegistry } from "next-vibe/core/route/definitions-registry";
+import { permissionsRegistry } from "next-vibe/core/permissions/registry";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import {
@@ -452,16 +452,6 @@ function createToolFromEndpoint(
               : String(result.message)
             : String(result.message);
           return { success: false as const, message: errMsg };
-        }
-
-        // execute-tool wraps inline (WAIT/END_LOOP) results as { result: actualData }.
-        // execute-tool itself expects this shape to stay as-is (the AI reads it).
-        // For all other tools, unwrap so the AI sees the tool's actual data directly.
-        if (toolName !== EXECUTE_TOOL_ALIAS) {
-          const d = result.data as Record<string, WidgetData> | null;
-          if (d !== null && typeof d === "object" && "result" in d) {
-            return d.result as WidgetData;
-          }
         }
 
         return result.data as WidgetData;

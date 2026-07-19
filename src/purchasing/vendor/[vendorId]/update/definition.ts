@@ -85,7 +85,7 @@ const { PATCH } = createEndpoint({
         description: "vendorUpdate.patch.email.description" as const,
         placeholder: "vendorUpdate.patch.email.placeholder" as const,
         columns: 6,
-        schema: z.string().email().optional(),
+        schema: z.email().optional(),
       }),
       phone: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
