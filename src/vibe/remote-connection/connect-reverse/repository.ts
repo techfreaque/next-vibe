@@ -56,7 +56,7 @@ export class RemoteConnectionRegisterRepository {
     if (!localUrl || !token || !leadId) {
       return false;
     }
-    const healthDef = await import("../../platforms/web/server/health/definition");
+    const healthDef = await import("../../platforms/web/health/definition");
     // Deliberate over-the-wire reachability probe — the point is to prove the URL
     // is directly reachable, so it must go over HTTP (not runInProcessTyped, which
     // runs in-process and proves nothing).

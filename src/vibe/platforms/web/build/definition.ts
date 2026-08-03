@@ -1,0 +1,304 @@
+/**
+ * Build the application Endpoint Definition
+ * Production-ready endpoint for build the application
+ */
+
+import { z } from "zod";
+
+import { createEndpoint } from "../../../core/definition/create-i18n";
+import { VibeMode, VibeModeValues } from "../../../env/env-util";
+import { customWidgetObject } from "../../../unified-ui/_shared/utils";
+import {
+  objectField,
+  requestField,
+  responseArrayOptionalField,
+  responseField,
+} from "../../../unified-ui/_shared/utils-i18n";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  LayoutType,
+  Methods,
+  WidgetType,
+} from "../../../core/definition/enums";
+import { UserRole } from "../../../identity/roles/enum";
+
+import { ServerFramework, ServerFrameworkOptions } from "../enum";
+import { scopedTranslation } from "./i18n";
+
+import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
+import { BUILD_ALIAS, BUILD_SERVER_ALIAS } from "./constants";
+
+const BuildResultWidget = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.BuildResultWidget })),
+);
+
+const { POST } = createEndpoint({
+  scopedTranslation,
+  method: Methods.POST,
+  path: ["vibe", "platforms", "web", "server", "build"],
+  title: "post.title",
+  titleShort: "post.titleShort",
+  description: "post.description",
+  category: "devTools",
+  subCategory: "serverManagement",
+  tags: ["tags.build"],
+  icon: "package",
+  timeoutMs: 0,
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.CLI_AUTH_BYPASS,
+    UserRole.AI_TOOL_OFF,
+    UserRole.WEB_OFF,
+  ],
+  aliases: [BUILD_ALIAS, BUILD_SERVER_ALIAS],
+
+  fields: customWidgetObject({
+    render: BuildResultWidget,
+    usage: { request: "data", response: true } as const,
+    children: {
+      // === REQUEST FIELDS ===
+      package: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.package.title",
+        description: "post.fields.package.description",
+        schema: z.boolean().default(true),
+      }),
+
+      generate: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.generate.title",
+        description: "post.fields.generate.description",
+        schema: z.boolean().default(true),
+      }),
+
+      generateEndpoints: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.generateEndpoints.title",
+        description: "post.fields.generateEndpoints.description",
+        schema: z.boolean().default(true),
+      }),
+
+      generateSeeds: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.generateSeeds.title",
+        description: "post.fields.generateSeeds.description",
+        schema: z.boolean().default(true),
+      }),
+
+      nextBuild: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.nextBuild.title",
+        description: "post.fields.nextBuild.description",
+        schema: z.boolean().default(true),
+      }),
+
+      migrate: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.migrate.title",
+        description: "post.fields.migrate.description",
+        schema: z.boolean().default(true),
+      }),
+
+      seed: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.seed.title",
+        description: "post.fields.seed.description",
+        schema: z.boolean().default(true),
+      }),
+
+      force: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.force.title",
+        description: "post.fields.force.description",
+        schema: z.boolean().default(false),
+      }),
+
+      framework: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "post.fields.framework.title",
+        description: "post.fields.framework.description",
+        options: ServerFrameworkOptions,
+        schema: z.enum(ServerFramework).default(ServerFramework.NEXT),
+      }),
+
+      webpack: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.webpack.title",
+        description: "post.fields.webpack.description",
+        schema: z.boolean().optional().default(true),
+      }),
+
+      vibeMode: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "post.fields.vibeMode.title",
+        description: "post.fields.vibeMode.description",
+        options: [
+          {
+            value: VibeMode.AGENT,
+            label: "post.fields.vibeMode.options.agent",
+          },
+          {
+            value: VibeMode.CLOUD,
+            label: "post.fields.vibeMode.options.cloud",
+          },
+          { value: VibeMode.DEV, label: "post.fields.vibeMode.options.dev" },
+        ],
+        schema: z.enum(VibeModeValues).optional(),
+      }),
+
+      // === RESPONSE FIELDS ===
+      success: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.fields.success.title",
+        schema: z.boolean(),
+      }),
+
+      output: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.fields.output.title",
+        schema: z.string(),
+      }),
+
+      duration: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.fields.duration.title",
+        schema: z.coerce.number(),
+      }),
+
+      errors: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.fields.errors.title",
+        schema: z.array(z.string()).optional(),
+      }),
+
+      steps: responseArrayOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: objectField(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          usage: { response: true },
+          layoutType: LayoutType.STACKED,
+          columns: 12,
+          children: {
+            label: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              schema: z.string(),
+            }),
+            ok: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              schema: z.boolean(),
+            }),
+            skipped: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              schema: z.boolean(),
+            }),
+          },
+        }),
+      }),
+    },
+  }),
+
+  // === ERROR HANDLING ===
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
+    },
+  },
+
+  // === SUCCESS HANDLING ===
+  successTypes: {
+    title: "post.success.title",
+    description: "post.success.description",
+  },
+
+  // === EXAMPLES ===
+  examples: {
+    requests: {
+      default: {},
+      noDb: {
+        migrate: false,
+        seed: false,
+        force: false,
+      },
+
+      tanstackBuild: {
+        framework: ServerFramework.TANSTACK,
+      },
+    },
+    responses: {
+      default: {
+        success: true,
+        output:
+          "✅ Application build completed successfully\n🚀 Your application is ready for production deployment!",
+        duration: 30000,
+      },
+      noDb: {
+        success: true,
+        output: "✅ Application build completed successfully",
+        duration: 25000,
+      },
+      packageOnly: {
+        success: true,
+        output: "✅ Package build completed successfully",
+        duration: 15000,
+      },
+      tanstackBuild: {
+        success: true,
+        output: "✅ TanStack/Vite build completed successfully",
+        duration: 10000,
+      },
+    },
+  },
+});
+
+const buildDefinition = { POST };
+export type BuildRequestInput = typeof POST.types.RequestInput;
+export type BuildRequestOutput = typeof POST.types.RequestOutput;
+export type BuildResponseInput = typeof POST.types.ResponseInput;
+export type BuildResponseOutput = typeof POST.types.ResponseOutput;
+
+export default buildDefinition;

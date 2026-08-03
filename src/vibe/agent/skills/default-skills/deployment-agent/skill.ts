@@ -4,7 +4,7 @@ import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import { VibeMode } from "next-vibe/env/env-util";
 import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { HEALTH_ALIAS } from "next-vibe/platforms/web/server/health/constants";
+import { HEALTH_ALIAS } from "next-vibe/platforms/web/health/constants";
 
 import {
   CORTEX_LIST_ALIAS,

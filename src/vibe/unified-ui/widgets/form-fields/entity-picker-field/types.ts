@@ -33,7 +33,7 @@ export interface EntityPickerFieldWidgetConfig<
   fieldType: FieldDataType.ENTITY_PICKER;
   /**
    * The list endpoint. Either a direct reference or an async resolver
-   * (`() => import("../../../../platforms/web/server/rebuild/definition").then((m) => m.default.GET)`) so that
+   * (`() => import("../../../../platforms/web/rebuild/definition").then((m) => m.default.GET)`) so that
    * cross-feature references don't create static import cycles between
    * definition files. Resolved lazily by the widget at render time.
    */

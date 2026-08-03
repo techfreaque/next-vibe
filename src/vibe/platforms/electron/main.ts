@@ -23,7 +23,7 @@ import {
   nativeImage,
   shell,
 } from "electron";
-import { databaseEnv } from "../../database/env";
+import { databaseEnv } from "../web/env";
 
 // Must be set before app is ready - used by Wayland compositor as window class
 app.setName("Unbottled");

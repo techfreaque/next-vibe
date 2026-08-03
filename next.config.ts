@@ -125,7 +125,7 @@ const nextConfig: NextConfig = {
       "src/vibe/**/generator.ts": {
         loaders: ["ignore-loader"],
       },
-      "src/vibe/platforms/web/server/rebuild/**": {
+      "src/vibe/platforms/web/rebuild/**": {
         loaders: ["ignore-loader"],
       },
       "src/**/seeds.ts": {

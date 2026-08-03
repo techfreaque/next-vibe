@@ -3,7 +3,7 @@
  *
  * Usage in definition.ts:
  *   const MyWidget = lazyWidget(() =>
- *     import("../../platforms/web/server/rebuild/widget").then((m) => ({ default: m.MyWidget })),
+ *     import("../../platforms/web/rebuild/widget").then((m) => ({ default: m.MyWidget })),
  *   );
  *
  * HMR (Vite dev): The `widget-hmr` Vite plugin injects `import.meta.hot.accept()`

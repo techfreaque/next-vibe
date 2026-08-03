@@ -4,7 +4,7 @@
  * Generated API route files (src/generated/app-tanstack/routes/api.*.ts) import
  * `wrapNextApiRoute` from `../nextjs-compat-wrapper`, i.e. this path. The
  * implementation lives under the migrated system package
- * (system/platforms/web/tanstack-start/nextjs-compat-wrapper). This barrel keeps the
+ * (system/platforms/web/frameworks/tanstack-start/nextjs-compat-wrapper). This barrel keeps the
  * generated route imports resolvable without regenerating every route file.
  */
 export {
@@ -15,4 +15,4 @@ export {
   runPageLoader,
   toNextParams,
   wrapNextApiRoute,
-} from "next-vibe/platforms/web/tanstack-start/nextjs-compat-wrapper";
+} from "next-vibe/platforms/web/frameworks/tanstack-start/nextjs-compat-wrapper";

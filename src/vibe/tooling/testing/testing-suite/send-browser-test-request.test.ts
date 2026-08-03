@@ -34,7 +34,7 @@ const TEST_TIMEOUT = 120_000;
 describe("sendBrowserTestRequest", () => {
   beforeAll(async () => {
     const { readPidFilePort, ATLAS_PID_FILE } =
-      await import("../../../platforms/web/server/pid");
+      await import("../../../platforms/web/pid");
     expect(
       readPidFilePort(ATLAS_PID_FILE),
       "Atlas dev server not running — start with `vibe dev`",

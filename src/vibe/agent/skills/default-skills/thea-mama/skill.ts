@@ -4,7 +4,7 @@ import { WEB_SEARCH_ALIAS } from "../../../web-search/constants";
 import { EXECUTE_TOOL_ALIAS } from "next-vibe/execute-tool/constants";
 import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { HEALTH_ALIAS } from "next-vibe/platforms/web/server/health/constants";
+import { HEALTH_ALIAS } from "next-vibe/platforms/web/health/constants";
 
 import {
   CORTEX_DELETE_ALIAS,
