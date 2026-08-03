@@ -24,6 +24,7 @@ export interface SettingsPageData {
   locale: CountryLanguage;
   isAuthenticated: boolean;
   user: JwtPayloadType;
+  platform: Platform;
 }
 
 export async function generateMetadata({
@@ -50,19 +51,21 @@ export async function tanstackLoader({
   );
   const isAuthenticated = !user.isPublic && !!user.id;
 
-  return { locale, isAuthenticated, user };
+  return { locale, isAuthenticated, user, platform: Platform.NEXT_PAGE };
 }
 
 export function TanstackPage({
   locale,
   isAuthenticated,
   user,
+  platform,
 }: SettingsPageData): JSX.Element {
   return (
     <SettingsPageClient
       locale={locale}
       isAuthenticated={isAuthenticated}
       user={user}
+      platform={platform}
     />
   );
 }

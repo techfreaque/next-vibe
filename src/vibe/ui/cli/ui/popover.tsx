@@ -27,7 +27,7 @@ export type {
   PopoverTriggerProps,
 } from "../../web/ui/popover";
 
-import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 
 import type {
   PopoverAnchorProps,

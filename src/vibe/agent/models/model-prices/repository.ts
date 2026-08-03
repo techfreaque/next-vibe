@@ -422,19 +422,6 @@ function applyModalityUpdate(
 // PROVIDER ENTRY OPERATIONS (add/remove)
 // ============================================
 
-/** Role → model definition file path */
-export function getRoleFilePaths(): Record<string, string> {
-  const agentDir = join(getSrcDir(), "vibe/agent");
-  return {
-    chat: join(agentDir, "ai-stream/models.ts"),
-    "image-gen": join(agentDir, "image-generation/models.ts"),
-    "music-gen": join(agentDir, "music-generation/models.ts"),
-    "video-gen": join(agentDir, "video-generation/models.ts"),
-    tts: join(agentDir, "text-to-speech/models.ts"),
-    stt: join(agentDir, "speech-to-text/models.ts"),
-  };
-}
-
 /** Enum prefix by role for model definition blocks */
 const ENUM_PREFIX_BY_ROLE: Record<string, string> = {
   chat: "ChatModelId",
@@ -1387,9 +1374,8 @@ export class ModelPricesRepository {
       const parsedError = parseError(error);
       logger.error("Failed to update model prices", parsedError);
       return fail({
-        message: t("get.errors.unknown.title"),
+        message: t("get.errors.unknown.detail", { error: parsedError.message }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
       });
     }
   }

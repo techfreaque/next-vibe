@@ -2,7 +2,7 @@
 
 import { Slot } from "@radix-ui/react-slot";
 import { styled } from "nativewind";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../../unified-ui/_shared/cn";
 import * as React from "react";
 import type { FieldPath, FieldValues } from "react-hook-form";
 import { Controller, FormProvider, useFormContext } from "react-hook-form";
@@ -99,13 +99,13 @@ const useFormField = (): UseFormFieldReturn => {
   const { getFieldState, formState } = useFormContext();
 
   if (!fieldContext) {
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Standard React context hook pattern - throw is correct for developer mistakes
+    // oxlint-disable-next-line restricted/restricted-syntax -- Standard React context hook pattern - throw is correct for developer mistakes
     // eslint-disable-next-line i18next/no-literal-string -- Error handling for context
     throw new Error("useFormField should be used within <FormField>");
   }
 
   if (!itemContext) {
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Standard React context hook pattern - throw is correct for developer mistakes
+    // oxlint-disable-next-line restricted/restricted-syntax -- Standard React context hook pattern - throw is correct for developer mistakes
     // eslint-disable-next-line i18next/no-literal-string -- Error handling for context
     throw new Error("useFormField should be used within <FormItem>");
   }

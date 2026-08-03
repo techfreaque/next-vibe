@@ -506,9 +506,9 @@ export const translations: typeof enTranslations = {
     use_checkout_flow_description:
       "Bezpośrednie tworzenie subskrypcji nie jest dozwolone. Proszę użyć procesu płatności.",
     sync_failed: "Nie udało się zsynchronizować subskrypcji z bazą danych",
-    database_error: "Wystąpił błąd bazy danych",
+    database_error: "Wystąpił błąd bazy danych: {{error}}",
     create_crashed: "Utworzenie subskrypcji nie powiodło się",
-    cancel_failed: "Nie udało się anulować subskrypcji",
+    cancel_failed: "Nie udało się anulować subskrypcji: {{error}}",
     user_not_found: "Nie znaleziono użytkownika",
     stripe_customer_creation_failed: "Nie udało się utworzyć klienta Stripe",
     not_implemented_on_native:
@@ -517,8 +517,8 @@ export const translations: typeof enTranslations = {
   },
 
   sync: {
-    failed: "Nie udało się zsynchronizować subskrypcji",
-    stripe_error: "Błąd synchronizacji Stripe",
+    failed: "Nie udało się zsynchronizować subskrypcji: {{error}}",
+    stripe_error: "Błąd synchronizacji Stripe: {{error}}",
     success: "Subskrypcja zsynchronizowana pomyślnie",
   },
 

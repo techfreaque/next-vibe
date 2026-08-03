@@ -44,8 +44,8 @@ import {
   resolveProdUserId,
   triggerHermesPull,
   unregisterDevFromHermes,
-} from "next-vibe/agent/ai-stream/testing/remote-setup";
-import { skillsSyncProvider } from "next-vibe/agent/skills/sync-provider";
+} from "../ai-stream/testing/remote-setup";
+import { skillsSyncProvider } from "../skills/sync-provider";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import { databaseEnv } from "next-vibe/database/env";

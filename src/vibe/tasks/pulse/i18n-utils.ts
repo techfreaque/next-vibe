@@ -3,9 +3,9 @@
  * (the boilerplate lint rule only allows the two standard exports there).
  */
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { TasksTranslationKey } from "next-vibe/tasks/i18n";
-import { scopedTranslation } from "next-vibe/tasks/i18n";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import type { TasksTranslationKey } from "../i18n";
+import { scopedTranslation } from "../i18n";
 
 /**
  * Resolve a task display name that may be a scoped translation key or a plain string.

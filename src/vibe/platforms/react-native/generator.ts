@@ -3,11 +3,11 @@ import "server-only";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 
-import { findFilesByName } from "next-vibe/core/generators/shared/scanner";
-import type { GeneratorDefinition } from "next-vibe/core/generators/shared/shared-inputs";
-import { parseError } from "next-vibe/core/utils/parse-error";
+import { findFilesByName } from "../../core/generators/shared/scanner";
+import type { GeneratorDefinition } from "../../core/generators/shared/shared-inputs";
+import { parseError } from "../../core/utils/parse-error";
 
-import { getSrcDir, getUiDir } from "@/env/paths";
+import { getSrcDir, getUiDir, VIBE_IMPORT_ALIAS } from "@/env/paths";
 
 const SOURCE_DIR = getUiDir();
 const TARGET_DIR = join(getSrcDir(), "generated/app-native/[locale]");
@@ -56,7 +56,7 @@ function formatCall(fnName: string, importPath: string): string {
 
 function pageContent(relativePath: string, kind: "page" | "layout"): string {
   const importPath = `@/_pages${relativePath ? `/${relativePath}` : ""}/${kind}`;
-  const wrapperPath = `next-vibe/platforms/react-native/nextjs-compat-wrapper`;
+  const wrapperPath = `${VIBE_IMPORT_ALIAS}/platforms/react-native/nextjs-compat-wrapper`;
   if (kind === "page") {
     return `import { createPageWrapperWithImport } from "${wrapperPath}";\n${formatCall("createPageWrapperWithImport", importPath)}\n`;
   }

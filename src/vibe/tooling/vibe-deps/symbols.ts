@@ -150,13 +150,30 @@ export interface UsageIndex {
    * dead. Any static method whose owner is here must be treated as reachable.
    */
   dynamicClassRefs: Set<string>;
+  /** original identifier → every alias it's ever renamed to (`X as Y`). */
+  aliasesOf: Map<string, Set<string>>;
 }
 
 const WORD_RE = /[A-Za-z_]\w*/g;
-const MEMBER_RE = /([A-Z][A-Za-z0-9_]*)\.([A-Za-z_]\w*)/g;
+// Owner identifier may start lowercase too — some repository classes in this
+// codebase are deliberately named like an instance (`contactClientRepository`,
+// `cancelRepository`, `voteRepository`, `pathRepository`) even though they're
+// exported classes with static methods. Requiring an uppercase first letter
+// made every call site of such a class's static methods invisible to the
+// usage index (`contactClientRepository.getSupportEmail(...)` never matched),
+// so those methods always looked 100% dead regardless of real callers.
+const MEMBER_RE = /([A-Za-z_]\w*)\.([A-Za-z_]\w*)/g;
 // `<lowercaseVar>.ClassName` — a Capitalized member pulled off a lowercase
 // module-like object. Distinct from MEMBER_RE (which keys ClassName.method).
 const MODULE_MEMBER_RE = /\b([a-z_]\w*)\.([A-Z][A-Za-z0-9_]*)\b/g;
+// `import { Owner as Alias } from "..."` — a renamed import. A caller then
+// writes `Alias.method(...)`, which MEMBER_RE indexes under "Alias.method",
+// never the declaring class's real "Owner.method" — so a static method whose
+// only callers go through a renamed import always looked 100% dead. Scanning
+// for the general `X as Y` shape (not scoped to import lines) is deliberately
+// loose — a stray false alias only widens what counts as "used", it can never
+// hide genuinely dead code, matching this tool's conservative bias.
+const AS_ALIAS_RE = /\b([A-Za-z_]\w*)\s+as\s+([A-Za-z_]\w*)\b/g;
 
 /** Build a corpus-wide usage index in one pass over file sources. */
 export function buildUsageIndex(
@@ -165,6 +182,7 @@ export function buildUsageIndex(
   const fileMentions = new Map<string, Set<string>>();
   const memberMentions = new Map<string, Set<string>>();
   const dynamicClassRefs = new Set<string>();
+  const aliasesOf = new Map<string, Set<string>>();
 
   for (const [file, src] of sources) {
     const seenWords = new Set<string>();
@@ -199,9 +217,21 @@ export function buildUsageIndex(
       // as a dynamically-reached class (e.g. `mod.CliResultFormatter`).
       dynamicClassRefs.add(m[2]);
     }
+
+    AS_ALIAS_RE.lastIndex = 0;
+    while ((m = AS_ALIAS_RE.exec(src)) !== null) {
+      const original = m[1]!;
+      const alias = m[2]!;
+      let set = aliasesOf.get(original);
+      if (!set) {
+        set = new Set();
+        aliasesOf.set(original, set);
+      }
+      set.add(alias);
+    }
   }
 
-  return { fileMentions, memberMentions, dynamicClassRefs };
+  return { fileMentions, memberMentions, dynamicClassRefs, aliasesOf };
 }
 
 export interface SymbolUsage extends SymbolDef {
@@ -226,6 +256,16 @@ export function usageFor(sym: SymbolDef, index: UsageIndex): SymbolUsage {
       return { ...sym, usedInFiles: [sym.file], usageCount: 1 };
     }
     files = index.memberMentions.get(`${sym.owner}.${sym.name}`);
+    // A caller may reach the class through a renamed import
+    // (`import { Owner as Alias } from "..."`, then `Alias.method(...)`) —
+    // that call site is indexed under "Alias.method", never "Owner.method".
+    // Union in every alias of this owner too.
+    for (const alias of index.aliasesOf.get(sym.owner) ?? []) {
+      const aliasFiles = index.memberMentions.get(`${alias}.${sym.name}`);
+      if (aliasFiles) {
+        files = files ? new Set([...files, ...aliasFiles]) : aliasFiles;
+      }
+    }
   } else {
     files = index.fileMentions.get(sym.name);
   }

@@ -6,7 +6,7 @@
  * so this transformer returns an empty series.
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,

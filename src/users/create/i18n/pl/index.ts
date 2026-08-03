@@ -211,7 +211,7 @@ export const translations: typeof enTranslations = {
         description: "Masz niezapisane zmiany, które zostaną utracone",
       },
       internal: {
-        title: "Błąd wewnętrzny",
+        title: "Błąd wewnętrzny: {{details}}",
         description: "Wystąpił błąd wewnętrzny podczas tworzenia użytkownika",
       },
     },

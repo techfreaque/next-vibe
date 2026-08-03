@@ -127,6 +127,7 @@ export const translations = {
       server: {
         title: "Server Error",
         description: "An internal server error occurred",
+        detail: "Server Error: {{error}}",
       },
       network: {
         title: "Network Error",
@@ -294,10 +295,12 @@ export const translations = {
       notFound: {
         title: "Thread Not Found",
         description: "The thread to update could not be found",
+        detail: "Thread not found: {{threadId}}",
       },
       server: {
         title: "Server Error",
         description: "An internal server error occurred",
+        detail: "Server Error: {{error}}",
       },
       network: {
         title: "Network Error",
@@ -378,10 +381,12 @@ export const translations = {
       notFound: {
         title: "Thread Not Found",
         description: "The thread to delete could not be found",
+        detail: "Thread not found: {{threadId}}",
       },
       server: {
         title: "Server Error",
         description: "An internal server error occurred",
+        detail: "Server Error: {{error}}",
       },
       network: {
         title: "Network Error",

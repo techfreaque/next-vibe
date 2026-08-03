@@ -1,14 +1,14 @@
 "use client";
 
 import useEmblaCarousel from "embla-carousel-react";
-import { useTranslation } from "next-vibe/core/i18n/core/client";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { useTranslation } from "../../../core/i18n/core/client";
+import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 
-import { uiScopedTranslation } from "../../web/i18n";
-import { ArrowLeftIcon } from "../../web/ui/icons/ArrowLeftIcon";
-import { ArrowRightIcon } from "../../web/ui/icons/ArrowRightIcon";
-import type { StyleType } from "../../web/utils/style-type";
+import { uiScopedTranslation } from "../i18n";
+import { ArrowLeftIcon } from "./icons/ArrowLeftIcon";
+import { ArrowRightIcon } from "./icons/ArrowRightIcon";
+import type { StyleType } from "../utils/style-type";
 import { Button } from "./button";
 import type { DivKeyboardEvent } from "./div";
 
@@ -56,7 +56,7 @@ function useCarousel(): CarouselContextProps {
   const context = React.useContext(CarouselContext);
 
   if (!context) {
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Standard React context hook pattern - throw is correct for developer mistakes
+    // oxlint-disable-next-line restricted/restricted-syntax -- Standard React context hook pattern - throw is correct for developer mistakes
     // eslint-disable-next-line i18next/no-literal-string -- Error handling for context
     throw new Error("useCarousel must be used within a <Carousel />");
   }

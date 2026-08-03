@@ -3,7 +3,7 @@
  * PATCH endpoint for recording which custom skill brought a lead (first-touch)
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,

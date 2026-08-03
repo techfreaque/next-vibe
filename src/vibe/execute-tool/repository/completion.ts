@@ -16,50 +16,47 @@
 import "server-only";
 
 import { and, eq, gt, ne, sql } from "drizzle-orm";
-import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
-import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
-import type { ToolCall } from "next-vibe/agent/chat/db";
-import { chatMessages, chatThreads } from "next-vibe/agent/chat/db";
-import {
-  ChatMessageRole,
-  ThreadStreamingState,
-} from "next-vibe/agent/chat/enum";
-import { createMessagesEmitter } from "next-vibe/agent/chat/threads/[threadId]/messages/emitter";
-import { getEnvAvailability } from "next-vibe/agent/env-availability";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
-import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { db } from "next-vibe/database";
+import type { ChatModelId } from "../../agent/ai-stream/models";
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
+import type { ToolCall } from "../../agent/chat/db";
+import { chatMessages, chatThreads } from "../../agent/chat/db";
+import { ChatMessageRole, ThreadStreamingState } from "../../agent/chat/enum";
+import { createMessagesEmitter } from "../../agent/chat/threads/[threadId]/messages/emitter";
+import { getEnvAvailability } from "../../agent/env-availability";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import type { ErrorResponseType } from "../../core/route/response.schema";
+import { ErrorResponseTypes } from "../../core/route/response.schema";
+import type { WidgetData } from "../../core/utils/json";
+import { db } from "../../database";
 import {
   endpoints as revivalEndpoints,
   REVIVAL_ALIAS as RESUME_STREAM_ALIAS,
-} from "next-vibe/execute-tool/revival/definition";
-import { scopedTranslation as revivalScopedTranslation } from "next-vibe/execute-tool/revival/i18n";
+} from "../revival/definition";
+import { scopedTranslation as revivalScopedTranslation } from "../revival/i18n";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
-} from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { cronTasks, dbUserIdToOwner } from "next-vibe/tasks/cron/db";
-import { createTaskEmitters } from "next-vibe/tasks/cron/emitter";
-import { CronTasksRepository } from "next-vibe/tasks/cron/repository";
-import { resolveTaskOwnerUser } from "next-vibe/tasks/cron/resolve-task-user";
+} from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
+import { cronTasks, dbUserIdToOwner } from "../../tasks/cron/db";
+import { createTaskEmitters } from "../../tasks/cron/emitter";
+import { CronTasksRepository } from "../../tasks/cron/repository";
+import { resolveTaskOwnerUser } from "../../tasks/cron/resolve-task-user";
 import {
   CronTaskPriority,
   CronTaskStatus,
   TaskCategory,
   TaskOutputMode,
-} from "next-vibe/tasks/enum";
+} from "../../tasks/enum";
 
 import { CallbackMode, type CallbackModeValue } from "../constants";
-import type { WakeUpConfirmRaceResult } from "./types";
+import type { WakeUpConfirmRaceResult } from "./types-dispatch";
 
 export class TaskCompletion {
   /**
    * Serialize a handler's fail() response into the stored task output,
    * preserving the EXACT ErrorResponseType shape ({ success:false, message,
-   * messageParams?, errorType, cause? }). The dispatch tool message backfill,
+   * errorType, cause? }). The dispatch tool message backfill,
    * the execution-history row, the wakeUp deferred result and the relay wire
    * all read this object — nulling it surfaced failed tasks as a bare
    * { success:false, status:"failed" } with the real cause (e.g. an
@@ -69,7 +66,6 @@ export class TaskCompletion {
     return {
       success: false,
       message: error.message,
-      ...(error.messageParams ? { messageParams: error.messageParams } : {}),
       errorType: {
         errorKey: error.errorType.errorKey,
         errorCode: error.errorType.errorCode,
@@ -239,7 +235,7 @@ export class TaskCompletion {
             // live event push). pushThreadSync no-ops for non-mirrored threads.
             if (existing.threadId) {
               const { pushThreadSync } =
-                await import("next-vibe/agent/chat/threads/sync-provider");
+                await import("../../agent/chat/threads/sync-provider");
               await pushThreadSync(existing.threadId, ownerUser.id, logger);
             }
           } else {
@@ -320,7 +316,7 @@ export class TaskCompletion {
     ) {
       try {
         const { clearStreamingState } =
-          await import("next-vibe/agent/ai-stream/repository/core/stream");
+          await import("../../agent/ai-stream/repository/core/stream");
 
         // Skip if the parent stream is still active: a fast-completing detach
         // goroutine must not set the thread idle while the AI is still in its
@@ -354,7 +350,7 @@ export class TaskCompletion {
           });
           // Also update the thread LIST so sidebar badges reflect the new state.
           const { createThreadsGetEmitter } =
-            await import("next-vibe/agent/chat/threads/emitter");
+            await import("../../agent/chat/threads/emitter");
           createThreadsGetEmitter(logger, ownerUser, {
             rootFolderId: currentThread.rootFolderId,
             subFolderId: null,
@@ -476,8 +472,7 @@ export class TaskCompletion {
             // Always use ownerUser for the revival stream - correct credit validation.
             // Await so callers that await TaskCompletion.handle (e.g. pulse) get a
             // fully resolved revival.
-            const { RevivalRepository } =
-              await import("next-vibe/execute-tool/revival/repository");
+            const { RevivalRepository } = await import("../revival/repository");
             await RevivalRepository.resume(
               resumeInput,
               ownerUser,
@@ -912,8 +907,7 @@ export class TaskCompletion {
     }
 
     const { t } = revivalScopedTranslation.scopedT(locale);
-    const { RevivalRepository } =
-      await import("next-vibe/execute-tool/revival/repository");
+    const { RevivalRepository } = await import("../revival/repository");
     await RevivalRepository.resume(
       parkedTask.taskInput,
       ownerCtx.user,
@@ -954,7 +948,7 @@ export class TaskCompletion {
    *     resolves the model from the favorite (with the favorite's OWN skill
    *     variant as fallback) and never consults the separately-supplied skillId.
    *   - Availability: this uses getEnvAvailability() (static env); resolveModelSkill
-   *     uses getInstanceAvailability() (augmented with live remote-inference
+   *     uses getEnvAvailability() (augmented with live remote-inference
    *     state). Same env can resolve to a different best model.
    *   - Shape: this returns model-only (the sole field every caller reads) with
    *     no locale/logger/t threading; resolveModelSkill returns the full
@@ -967,9 +961,9 @@ export class TaskCompletion {
   ): Promise<ChatModelId | null> {
     const userId = !user.isPublic ? user.id : undefined;
     const { resolveSkillFavoriteContext } =
-      await import("next-vibe/agent/skills/resolver");
+      await import("../../agent/skills/resolver");
     const { resolveChatModelId } =
-      await import("next-vibe/agent/ai-stream/repository/core/modality-resolver");
+      await import("../../agent/ai-stream/repository/core/modality-resolver");
 
     const { favorite: fav, skill } = await resolveSkillFavoriteContext({
       favoriteId: toolExecutionContext.favoriteId,
@@ -980,7 +974,7 @@ export class TaskCompletion {
       fav?.modelSelection ?? undefined,
       skill?.modelSelection ?? undefined,
       user,
-      getEnvAvailability(),
+      await getEnvAvailability(),
     );
   }
 

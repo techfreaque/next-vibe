@@ -17,7 +17,8 @@
  * render() itself and exported startInteractiveHelp(). Nothing ever imported that
  * export, and the widget-stub plugin only rewrites widget.tsx (see
  * tooling/builder/repository/vibe-package/package-plugins.ts), so the file was
- * never reachable from any surface. It lives here now: one widget per endpoint.
+ * never reachable from any surface. It lives here now: one widget per endpoint,
+ * and that dead file is gone.
  */
 
 import chalk from "chalk";
@@ -26,15 +27,16 @@ import SelectInput from "ink-select-input";
 import {
   DefaultFolderId,
   makeHeadlessContext,
-} from "next-vibe/agent/chat/config";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { UserRole } from "next-vibe/identity/roles/enum";
-import { scopedTranslation as cliScopedTranslation } from "next-vibe/platforms/cli/i18n";
-import type { CliCompatiblePlatform } from "next-vibe/platforms/cli/runtime/route-executor";
-import { Platform } from "next-vibe/platforms/platforms";
+} from "next-vibe/core/execution-context";
+import type { CreateApiEndpointAny } from "../core/definition/endpoint-base";
+import type { ResponseType } from "../core/route/response.schema";
+import type { WidgetData } from "../core/utils/json";
+import type { JwtPayloadType } from "../identity/auth/types";
+import { UserRole } from "../identity/roles/enum";
+import { scopedTranslation as cliScopedTranslation } from "../platforms/cli/i18n";
+import type { CliCompatiblePlatform } from "../platforms/cli/runtime/route-executor";
+import { CLI_BINARY_NAME } from "../platforms/cli/types/cli-target";
+import { Platform } from "../platforms/platforms";
 import {
   useWidgetContext,
   useWidgetDisabled,
@@ -42,8 +44,8 @@ import {
   useWidgetLogger,
   useWidgetPlatform,
   useWidgetResponseOnly,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
-import { EndpointRenderer } from "next-vibe/unified-ui/renderers/web/EndpointRenderer";
+} from "../unified-ui/_shared/use-widget-context";
+import { EndpointRenderer } from "../unified-ui/renderers/web/EndpointRenderer";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -431,6 +433,14 @@ function wrapExampleCli(cmd: string, flags: string[]): string {
 
 // ── Detail Mode (single tool) ────────────────────────────────────────────
 
+/**
+ * One tool, rendered in full.
+ *
+ * `showSearchHelp` appends the help search/filter reference. Off by default:
+ * a direct `<cli> <tool> -h` already names the tool, so that block is noise.
+ * The multi-result path turns it on, where narrowing the search is the useful
+ * next action.
+ */
 function renderDetailCli(tool: HelpToolItem): string {
   const lines: string[] = [];
   const nameDisplay = tool.aliases?.length
@@ -458,7 +468,9 @@ function renderDetailCli(tool: HelpToolItem): string {
       `${chalk.dim("Confirm")}   ${chalk.red("Yes - requires confirmation")}`,
     );
   }
-  lines.push(`${chalk.dim("Call as")}   vibe ${chalk.green(tool.name)}`);
+  lines.push(
+    `${chalk.dim("Call as")}   ${CLI_BINARY_NAME} ${chalk.green(tool.name)}`,
+  );
 
   // Parameters
   if (tool.parameters && typeof tool.parameters === "object") {
@@ -519,7 +531,7 @@ function renderDetailCli(tool: HelpToolItem): string {
             flags.push(flag);
           }
         }
-        const cmd = `vibe ${tool.name}`;
+        const cmd = `${CLI_BINARY_NAME} ${tool.name}`;
         lines.push(chalk.dim(`  ${exName}:`));
         lines.push(`  ${wrapExampleCli(cmd, flags)}`);
         lines.push("");
@@ -527,20 +539,34 @@ function renderDetailCli(tool: HelpToolItem): string {
     }
   }
 
-  // vibe help usage reference - always shown at the bottom of detail view
+  return lines.join("\n");
+}
+
+/**
+ * The help search/filter reference.
+ *
+ * Deliberately NOT part of a detail view. `<cli> <tool> -h` asked for exactly
+ * one tool and got it; telling the user how to search for tools answers a
+ * question they did not ask and buries the answer they did. And when several
+ * tools are auto-expanded, repeating this nine-line block between each one is
+ * worse than printing it once — so the multi-result path appends it a single
+ * time at the end.
+ */
+function renderSearchHelpCli(): string {
+  const lines: string[] = [];
   lines.push(chalk.dim("─".repeat(49)));
   lines.push(
-    `  ${chalk.bold("vibe help")} ${chalk.dim("— search & filter options")}`,
+    `  ${chalk.bold(`${CLI_BINARY_NAME} help`)} ${chalk.dim("— search & filter options")}`,
   );
   lines.push("");
   const helpCmds: [string, string][] = [
-    ["vibe help", "list all tools"],
-    ["vibe help <query>", "search by keyword"],
-    ["vibe help --toolName=<name>", "show this detail view"],
-    ["vibe help --category=<cat>", "filter by category"],
-    ["vibe help --subCategory=<sub>", "filter by subcategory"],
-    ["vibe help --page=<n>", "paginate results"],
-    ["vibe help --pageSize=<n>", "results per page (max 1000)"],
+    [`${CLI_BINARY_NAME} help`, "list all tools"],
+    [`${CLI_BINARY_NAME} help <query>`, "search by keyword"],
+    [`${CLI_BINARY_NAME} help --toolName=<name>`, "show this detail view"],
+    [`${CLI_BINARY_NAME} help --category=<cat>`, "filter by category"],
+    [`${CLI_BINARY_NAME} help --subCategory=<sub>`, "filter by subcategory"],
+    [`${CLI_BINARY_NAME} help --page=<n>`, "paginate results"],
+    [`${CLI_BINARY_NAME} help --pageSize=<n>`, "results per page (max 1000)"],
   ];
   const helpCmdCol = Math.max(...helpCmds.map(([cmd]) => cmd.length));
   for (const [cmd, desc] of helpCmds) {
@@ -548,7 +574,6 @@ function renderDetailCli(tool: HelpToolItem): string {
       `  ${chalk.green(cmd.padEnd(helpCmdCol + 2))}${chalk.dim(desc)}`,
     );
   }
-
   return lines.join("\n");
 }
 
@@ -597,7 +622,7 @@ function renderDetailMcp(tool: HelpToolItem): string {
           "--",
           true,
         );
-        lines.push(`  ${exName}: vibe ${tool.name} ${args}`);
+        lines.push(`  ${exName}: ${CLI_BINARY_NAME} ${tool.name} ${args}`);
       }
     }
   }
@@ -642,7 +667,7 @@ function renderCategoriesCli(
   lines.push(
     chalk.dim(
       hint ??
-        `Use: vibe help --category="<name>" or --subCategory="<name>" to filter`,
+        `Use: ${CLI_BINARY_NAME} help --category="<name>" or --subCategory="<name>" to filter`,
     ),
   );
 
@@ -740,13 +765,15 @@ function renderToolListCli(
   if (currentPage && totalPages && totalPages > 1) {
     lines.push(
       chalk.dim(
-        `Page ${currentPage}/${totalPages} - vibe help --page=${currentPage + 1}`,
+        `Page ${currentPage}/${totalPages} - ${CLI_BINARY_NAME} help --page=${currentPage + 1}`,
       ),
     );
   }
 
   // Footer - use server hint if available, fallback to default
-  lines.push(chalk.dim(hint ?? `Use: vibe help <name> for full details`));
+  lines.push(
+    chalk.dim(hint ?? `Use: ${CLI_BINARY_NAME} help <name> for full details`),
+  );
 
   return lines.join("\n");
 }
@@ -817,7 +844,11 @@ function HelpToolsResponse({ field }: CliWidgetProps): JSX.Element {
         isMcp ? renderDetailMcp(t) : renderDetailCli(t),
       );
       const sep = isMcp ? "\n---\n" : `\n${chalk.dim("─".repeat(60))}\n`;
-      return sections.join(sep);
+      const joined = sections.join(sep);
+      // Once, after everything - not repeated between sections. MCP gets none:
+      // an agent reads the tool list programmatically and every extra line is
+      // wasted context.
+      return isMcp ? joined : `${joined}\n${renderSearchHelpCli()}`;
     }
 
     // Mode 2: Category overview (no tools, categories present)
@@ -870,13 +901,17 @@ interface SelectItem<V> {
 }
 
 interface CategoryInfo {
+  /** Registry key — what tools are filtered by. */
   name: string;
+  /** Display label from the category registry. */
+  label: string;
   subCategories: SubCategoryInfo[];
   totalCount: number;
 }
 
 interface SubCategoryInfo {
   name: string;
+  label: string;
   category: string;
   count: number;
 }
@@ -885,7 +920,9 @@ interface ToolInfo {
   name: string;
   description: string;
   category: string;
+  categoryLabel: string;
   subCategory: string;
+  subCategoryLabel: string;
   method: string;
   toolName: string;
   credits?: number;
@@ -914,10 +951,11 @@ type View =
 async function getToolsForUser(
   platform: CliCompatiblePlatform,
   user: JwtPayloadType,
+  locale: string,
 ): Promise<{ tools: ToolInfo[]; categories: CategoryInfo[] }> {
   const [{ endpointsMeta }, { permissionsRegistry }] = await Promise.all([
     import("@/generated/endpoints/meta/en"),
-    import("next-vibe/core/permissions/registry"),
+    import("../core/permissions/registry"),
   ]);
 
   const tools: ToolInfo[] = [];
@@ -946,7 +984,9 @@ async function getToolsForUser(
       name: ep.toolName,
       description: ep.description,
       category: cat,
+      categoryLabel: getCategoryLabel(cat, locale),
       subCategory: sub,
+      subCategoryLabel: getSubCategoryLabel(cat, sub, locale),
       method: ep.method,
       toolName: ep.toolName,
       credits: ep.credits,
@@ -965,9 +1005,15 @@ async function getToolsForUser(
     .map(([name, subMap]) => {
       const subCategories: SubCategoryInfo[] = [...subMap.entries()]
         .toSorted(([a], [b]) => a.localeCompare(b))
-        .map(([subName, count]) => ({ name: subName, category: name, count }));
+        .map(([subName, count]) => ({
+          name: subName,
+          label: getSubCategoryLabel(name, subName, locale),
+          category: name,
+          count,
+        }));
       return {
         name,
+        label: getCategoryLabel(name, locale),
         subCategories,
         totalCount: subCategories.reduce((n, s) => n + s.count, 0),
       };
@@ -983,6 +1029,10 @@ async function getToolsForUser(
  * undefined (help-tool's own widget crashes on `tools.length`). The CLI route
  * executor strips the same envelope for the same reason; see
  * unwrapExecuteToolResult in platforms/cli/runtime/route-executor.ts.
+ *
+ * Re-shapes the response rather than rebuilding it via success(), which would mean
+ * a value import of response.schema for no gain — the spread already carries
+ * isErrorResponse/performance/headers through untouched.
  */
 function unwrapToolResult(
   raw: ResponseType<WidgetData>,
@@ -1063,7 +1113,7 @@ function CategoryView({
     () => [
       { label: `All Tools (${totalTools})`, value: null, key: "__all__" },
       ...categories.map((cat) => ({
-        label: `${cat.name.padEnd(28)} ${cat.subCategories.length} groups · ${cat.totalCount} tools`,
+        label: `${cat.label.padEnd(28)} ${cat.subCategories.length} groups · ${cat.totalCount} tools`,
         value: cat.name,
         key: cat.name,
       })),
@@ -1107,7 +1157,7 @@ function SubCategoryView({
   onSelectAll,
   onBack,
 }: {
-  category: string;
+  category: CategoryInfo;
   subCategories: SubCategoryInfo[];
   onSelect: (subCategory: string) => void;
   onSelectAll: () => void;
@@ -1120,14 +1170,18 @@ function SubCategoryView({
   const items: SelectItem<string | null>[] = useMemo(
     () => [
       { label: "< Back to categories", value: "__back__", key: "__back__" },
-      { label: `All in ${category} (${total})`, value: null, key: "__all__" },
+      {
+        label: `All in ${category.label} (${total})`,
+        value: null,
+        key: "__all__",
+      },
       ...subCategories.map((sub) => ({
-        label: `${sub.name.padEnd(28)} ${sub.count} tools`,
+        label: `${sub.label.padEnd(28)} ${sub.count} tools`,
         value: sub.name,
         key: sub.name,
       })),
     ],
-    [subCategories, category, total],
+    [subCategories, category.label, total],
   );
 
   // eslint-disable-next-line no-unused-vars -- useInput requires (input, key) signature
@@ -1152,9 +1206,9 @@ function SubCategoryView({
 
   return (
     <Box flexDirection="column">
-      <Breadcrumb parts={["Help", category]} />
+      <Breadcrumb parts={["Help", category.label]} />
       <Header
-        title={`${category} - ${subCategories.length} groups · ${total} tools`}
+        title={`${category.label} - ${subCategories.length} groups · ${total} tools`}
         subtitle={cliT("vibe.interactive.help.selectCategory")}
       />
       <SelectInput<string | null>
@@ -1233,12 +1287,20 @@ function ToolListView({
     [onBack, onSelect],
   );
 
+  // Labels come off the first matching tool: every tool in a filtered list shares
+  // the same category/subCategory, so this avoids re-resolving the registry here.
+  const first = filtered[0];
+  const categoryLabel = category ? (first?.categoryLabel ?? category) : null;
+  const subCategoryLabel = subCategory
+    ? (first?.subCategoryLabel ?? subCategory)
+    : null;
+
   const breadcrumb = [
     "Help",
-    ...(category ? [category] : []),
-    ...(subCategory ? [subCategory] : []),
+    ...(categoryLabel ? [categoryLabel] : []),
+    ...(subCategoryLabel ? [subCategoryLabel] : []),
   ];
-  const title = subCategory ?? category ?? "All Tools";
+  const title = subCategoryLabel ?? categoryLabel ?? "All Tools";
 
   return (
     <Box flexDirection="column">
@@ -1287,7 +1349,7 @@ function ToolDetailView({
   return (
     <Box flexDirection="column">
       <Breadcrumb
-        parts={["Help", tool.category, tool.subCategory, tool.name]}
+        parts={["Help", tool.categoryLabel, tool.subCategoryLabel, tool.name]}
       />
 
       <Box
@@ -1308,8 +1370,10 @@ function ToolDetailView({
         <Box gap={4}>
           <Text>
             <Text dimColor>{cliT("vibe.interactive.help.category")}</Text>
-            {tool.category}
-            {tool.subCategory !== tool.category ? ` › ${tool.subCategory}` : ""}
+            {tool.categoryLabel}
+            {tool.subCategory !== tool.category
+              ? ` › ${tool.subCategoryLabel}`
+              : ""}
           </Text>
           <Text>
             <Text dimColor>{cliT("vibe.interactive.help.method")}</Text>
@@ -1324,7 +1388,7 @@ function ToolDetailView({
         </Box>
         <Text>
           <Text dimColor>{"Call as   "}</Text>
-          <Text color="green">{`vibe ${tool.name}`}</Text>
+          <Text color="green">{`${CLI_BINARY_NAME} ${tool.name}`}</Text>
         </Text>
       </Box>
 
@@ -1399,8 +1463,8 @@ function ResultView({
       <Breadcrumb
         parts={[
           "Help",
-          tool.category,
-          tool.subCategory,
+          tool.categoryLabel,
+          tool.subCategoryLabel,
           tool.name,
           cliT("vibe.interactive.help.result"),
         ]}
@@ -1464,17 +1528,19 @@ function HelpToolsBrowser(): JSX.Element {
 
   useEffect(() => {
     let cancelled = false;
-    void getToolsForUser(platform, user).then(({ tools: t, categories: c }) => {
-      if (!cancelled) {
-        setTools(t);
-        setCategories(c);
-      }
-      return undefined;
-    });
+    void getToolsForUser(platform, user, locale).then(
+      ({ tools: t, categories: c }) => {
+        if (!cancelled) {
+          setTools(t);
+          setCategories(c);
+        }
+        return undefined;
+      },
+    );
     return (): void => {
       cancelled = true;
     };
-  }, [platform, user]);
+  }, [platform, user, locale]);
 
   // Global quit
   useInput((input) => {
@@ -1547,7 +1613,7 @@ function HelpToolsBrowser(): JSX.Element {
 
     // Deferred: the execution stack is the heaviest graph in the build and the
     // response path must never pay for it.
-    void import("next-vibe/execute-tool/repository")
+    void import("../execute-tool/repository")
       .then(({ RouteExecuteRepository }) =>
         RouteExecuteRepository.runInProcess({
           toolName: tool.toolName,
@@ -1608,7 +1674,7 @@ function HelpToolsBrowser(): JSX.Element {
 
       {view.type === "subcategories" && currentCategoryInfo && (
         <SubCategoryView
-          category={currentCategoryInfo.name}
+          category={currentCategoryInfo}
           subCategories={currentCategoryInfo.subCategories}
           onSelect={(sub) =>
             handleSubCategorySelect(currentCategoryInfo.name, sub)

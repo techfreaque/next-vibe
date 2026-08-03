@@ -7,7 +7,7 @@
 // Set process name for system monitor / ps (must happen before any async work)
 import { writeFileSync } from "node:fs";
 
-import { CLI_BINARY_NAME } from "next-vibe/platforms/cli/types/cli-target";
+import { CLI_BINARY_NAME } from "./types/cli-target";
 
 try {
   const subcmd = process.argv[2] ?? "cli";

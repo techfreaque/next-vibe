@@ -176,21 +176,32 @@ export const translations: typeof enTranslations = {
         buildStart: "🚀 Rozpoczynanie budowania aplikacji...",
         packageBuildStart: "Budowanie pakietu...",
         packageBuildSuccess: "✅ Budowanie pakietu zakończone pomyślnie",
-        packageBuildFailed: "Budowanie pakietu nie powiodło się",
+        packageBuildFailed: "Budowanie pakietu nie powiodło się: {{error}}",
         buildPrerequisites: "Uruchamianie wymagań budowania...",
         skipGeneration:
           "Pomijanie generowania punktów końcowych API (--skip-generation)",
         generatingEndpoints: "Generowanie punktów końcowych API...",
         generationSuccess: "✅ Generowanie kodu zakończone pomyślnie",
         generationFailed: "Generowanie kodu nie powiodło się",
+        generationFailedDetail: "Generowanie kodu nie powiodło się: {{error}}",
+        tanstackBuildStart: "Budowanie TanStack Start (SSR)...",
+        tanstackBuildSuccess:
+          "✅ Budowanie TanStack Start (SSR) zakończone pomyślnie",
+        tanstackBuildFailed: "Budowanie TanStack Start nie powiodło się",
+        tanstackBuildFailedDetail:
+          "Budowanie TanStack Start nie powiodło się: {{error}}",
         skipNextBuild:
           "Pomijanie budowania Next.js (będzie obsługiwane przez package.json)",
         buildingNextjs: "Budowanie aplikacji Next.js...",
         nextjsBuildSuccess: "✅ Budowanie Next.js zakończone pomyślnie",
-        nextjsBuildFailed: "Budowanie Next.js nie powiodło się",
+        nextjsBuildFailed: "Budowanie Next.js nie powiodło się: {{error}}",
+        nextjsBuildOom:
+          "Budowanie Next.js przerwane przez system (prawdopodobnie brak pamięci) - sygnał: {{signal}}",
+        nextjsBuildExitCode: "Budowanie Next.js zakończyło się kodem {{code}}",
         skipProdDb:
           "Pomijanie operacji produkcyjnej bazy danych (--run-prod-database=false)",
-        buildFailed: "❌ Budowanie nie powiodło się",
+        buildFailed: "❌ Budowanie nie powiodło się: {{error}}",
+        unknownError: "nieznany błąd",
         schemaGenerationStart: "Generowanie schematu bazy danych...",
         schemaGenerationSuccess:
           "✅ Generowanie schematu bazy danych zakończone",
@@ -205,15 +216,13 @@ export const translations: typeof enTranslations = {
         prodDbSuccess:
           "🎉 Operacje produkcyjnej bazy danych zakończone pomyślnie",
         prodDbFailed:
-          "❌ Budowanie produkcyjne nie powiodło się podczas operacji bazy danych",
+          "❌ Budowanie produkcyjne nie powiodło się podczas operacji bazy danych: {{error}}. Uruchom bazę poleceniem 'docker compose -f docker-compose-dev.yml up -d'.",
+        prodDbConnectionFailed:
+          "❌ Budowanie produkcyjne nie powiodło się podczas operacji bazy danych: baza jest niedostępna ({{error}}). Sprawdź, czy działa, a jeśli nie - uruchom ją poleceniem 'docker compose -f docker-compose-dev.yml up -d'.",
         prodDbNotReady:
           "💡 To budowanie NIE jest gotowe do wdrożenia produkcyjnego",
         deploymentReady:
           "🚀 Twoja aplikacja jest gotowa do wdrożenia produkcyjnego!",
-        dbConnectionError:
-          "Połączenie z bazą danych nie powiodło się. Upewnij się, że baza danych działa i jest dostępna.",
-        dbStartSuggestion:
-          "Spróbuj uruchomić 'docker compose -f docker-compose-dev.yml up -d', aby uruchomić bazę danych",
         nextBuildHandled:
           "✅ Budowanie Next.js będzie obsługiwane przez polecenie yarn build",
         failedProdMigrations: "Nie udało się uruchomić migracji produkcyjnych",

@@ -31,7 +31,7 @@ export type {
   DialogTriggerProps,
 } from "../../web/ui/dialog";
 
-import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 
 import type {
   DialogCloseProps,

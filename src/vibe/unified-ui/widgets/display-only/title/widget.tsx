@@ -4,17 +4,17 @@
  */
 
 "use client";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Div } from "next-vibe/ui/ui/div";
 import { Span } from "next-vibe/ui/ui/span";
 import { Title } from "next-vibe/ui/ui/title";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../_shared/cn";
 import type {
   ReactRequestResponseWidgetProps,
   ReactStaticWidgetProps,
   ReactWidgetPropsNoValue,
-} from "next-vibe/unified-ui/_shared/react-types";
-import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
+} from "../../../_shared/react-types";
+import type { FieldUsageConfig } from "../../../_shared/types";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -22,12 +22,12 @@ import {
   useWidgetLogger,
   useWidgetResponse,
   useWidgetTranslation,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
+} from "../../../_shared/use-widget-context";
 import {
   getSpacingClassName,
   getTextSizeClassName,
-} from "next-vibe/unified-ui/_shared/widget-helpers";
-import { formatIfDate } from "next-vibe/unified-ui/widgets/display-only/text/shared";
+} from "../../../_shared/widget-helpers";
+import { formatIfDate } from "../text/shared";
 import type { JSX } from "react";
 
 import { extractTitleData } from "./shared";

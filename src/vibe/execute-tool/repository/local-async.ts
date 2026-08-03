@@ -3,7 +3,8 @@
  *
  * Extracted from local.ts to keep local.ts free of DB/cron imports.
  * All methods here touch the DB (cronTasks, cronTaskExecutions, chatMessages).
- * The WAIT path (execute / generateTaskId) stays in local.ts.
+ * The inline WAIT path stays in local.ts; task/call id minting is shared with
+ * the remote path and owned by ./task-id.
  *
  * DETACH and WAKE_UP share ONE async flow; they differ only in what happens
  * after the tool finishes:
@@ -22,21 +23,20 @@
 import "server-only";
 
 import { and, eq, sql } from "drizzle-orm";
-import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
-import { success } from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { db } from "next-vibe/database";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { Platform } from "next-vibe/platforms/platforms";
-import { cronTaskExecutions, cronTasks } from "next-vibe/tasks/cron/db";
-import type { CronTaskStatusDB } from "next-vibe/tasks/enum";
+import type { ResponseType } from "../../core/route/response.schema";
+import { success } from "../../core/route/response.schema";
+import type { WidgetData } from "../../core/utils/json";
+import { db } from "../../database";
+import type { JwtPrivatePayloadType } from "../../identity/auth/types";
+import { Platform } from "../../platforms/platforms";
+import { cronTaskExecutions, cronTasks } from "../../tasks/cron/db";
+import type { CronTaskStatusDB } from "../../tasks/enum";
 import {
   CronTaskPriority,
   CronTaskStatus,
   TaskCategory,
   TaskOutputMode,
-} from "next-vibe/tasks/enum";
+} from "../../tasks/enum";
 
 import {
   CallbackMode,
@@ -47,7 +47,9 @@ import type { RouteExecuteResponseOutput } from "../definition";
 import { TaskCompletion } from "./completion";
 import { RouteExecutionExecutor } from "./core";
 import { PendingCalls } from "./pending-calls";
-import type { GoroutineResult, RouteExecuteContext } from "./types";
+import { generateTaskId } from "./task-id";
+import type { RouteExecuteContext } from "./types";
+import type { GoroutineResult } from "./types-dispatch";
 
 export class LocalExecutionAsync {
   /**
@@ -68,7 +70,7 @@ export class LocalExecutionAsync {
     // await-task targeted at either side resolves the same task.
     const taskId =
       toolExecutionContext.remoteDispatchCallId ??
-      LocalExecutionAsync.generateTaskId(isWakeUp ? "local-wu" : "local-bg", {
+      generateTaskId(isWakeUp ? "local-wu" : "local-bg", {
         toolCallId: toolExecutionContext.callerToolCallId,
         toolExecutionContext: toolExecutionContext,
       });
@@ -336,7 +338,7 @@ export class LocalExecutionAsync {
 
     const taskId =
       toolExecutionContext.remoteDispatchCallId ??
-      LocalExecutionAsync.generateTaskId(isWakeUp ? "local-wu" : "local-bg", {
+      generateTaskId(isWakeUp ? "local-wu" : "local-bg", {
         toolCallId: toolExecutionContext.callerToolCallId,
         toolExecutionContext,
       });
@@ -505,34 +507,6 @@ export class LocalExecutionAsync {
   /* ── Internals ──────────────────────────────────────────────────────────── */
 
   /**
-   * Generate a task ID for local async tasks and remote dispatch callIds.
-   * Duplicated from LocalExecution to avoid importing from local.ts (which would
-   * re-introduce a static dependency on this file from that module).
-   */
-  static generateTaskId(
-    type: "local-bg" | "local-wu" | "remote-ws" | "remote-direct",
-    options?: {
-      instanceId?: string;
-      toolCallId?: string;
-      toolExecutionContext: ToolExecutionContext;
-    },
-  ): string {
-    const { instanceId, toolCallId, toolExecutionContext } = options ?? {};
-    const prefix = instanceId ? `${type}-${instanceId}` : type;
-    if (!toolCallId) {
-      return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    }
-    const token = toolCallId
-      .replaceAll(/[^a-zA-Z0-9]+/g, "-")
-      .replaceAll(/^-+|-+$/g, "");
-    const deterministic = `${prefix}-${token}`;
-    if (toolExecutionContext) {
-      return deterministic;
-    }
-    return `${deterministic}-${Math.random().toString(36).slice(2, 8)}`;
-  }
-
-  /**
    * Patch a tool message to the PENDING state after a mid-flight conversion and
    * emit `tool-result-updated`. Sets callbackMode to the new async mode so the UI
    * renders it as pending; the completion path later emits the final result.
@@ -546,8 +520,7 @@ export class LocalExecutionAsync {
     logger: RouteExecuteContext["logger"];
   }): Promise<void> {
     const { toolMessageId, threadId, mode, taskId, user, logger } = params;
-    const { chatMessages, chatThreads } =
-      await import("next-vibe/agent/chat/db");
+    const { chatMessages, chatThreads } = await import("../../agent/chat/db");
     const [msg] = await db
       .select({ metadata: chatMessages.metadata })
       .from(chatMessages)
@@ -578,7 +551,7 @@ export class LocalExecutionAsync {
       return;
     }
     const { createMessagesEmitter } =
-      await import("next-vibe/agent/chat/threads/[threadId]/messages/emitter");
+      await import("../../agent/chat/threads/[threadId]/messages/emitter");
     createMessagesEmitter(logger, user, {
       threadId,
       rootFolderId: threadRow.rootFolderId,
@@ -780,7 +753,7 @@ export class LocalExecutionAsync {
     threadId: string;
   }): Promise<{ id: string; parentId: string | null } | null> {
     const { callerToolCallId, threadId } = params;
-    const { chatMessages } = await import("next-vibe/agent/chat/db");
+    const { chatMessages } = await import("../../agent/chat/db");
     const [row] = await db
       .select({ id: chatMessages.id, parentId: chatMessages.parentId })
       .from(chatMessages)

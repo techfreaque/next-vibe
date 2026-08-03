@@ -7,11 +7,11 @@ import "server-only";
  */
 import { createHash } from "node:crypto";
 
-import { createFixtureFetch } from "next-vibe/agent/ai-stream/testing/fetch-cache";
-import { agentEnv } from "next-vibe/agent/env";
+import { createFixtureFetch } from "../../ai-stream/testing/fetch-cache";
+import { agentEnv } from "../../env";
 import { parseError } from "next-vibe/core/utils/parse-error";
 
-import type { ToolExecutionContext } from "../../chat/config";
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 
 /** Embedding model used for all cortex and message embeddings */
 export const EMBEDDING_MODEL = "baai/bge-m3";
@@ -140,7 +140,7 @@ async function isFixtureContext(
     return false;
   }
   const { readFixturePrefix } =
-    await import("next-vibe/agent/ai-stream/testing/fetch-cache");
+    await import("../../ai-stream/testing/fetch-cache");
   return (await readFixturePrefix(toolExecutionContext.threadId)) !== null;
 }
 

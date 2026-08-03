@@ -6,60 +6,23 @@
 
 import "server-only";
 
-import { validateData } from "next-vibe/core/core-utils/validation";
-import type { Methods } from "next-vibe/core/definition/enums";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { CountryLanguageValues } from "next-vibe/core/i18n/core/config";
-import { scopedTranslation as sharedScopedTranslation } from "next-vibe/core/i18n/shared";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import { validateData } from "../core-utils/validation";
+import type { CreateApiEndpointAny } from "../definition/endpoint-base";
+import type { Methods } from "../definition/enums";
+import type { CountryLanguage } from "../i18n/core/config";
+import { scopedTranslation as sharedScopedTranslation } from "../i18n/shared";
+import type { WidgetData } from "../utils/json";
+import { parseError } from "../utils/parse-error";
+import type { EndpointLogger } from "../../logger/types";
 import {
   isAgentPlatform,
   isCliPlatform,
   Platform,
-} from "next-vibe/platforms/platforms";
-import { z } from "zod";
+} from "../../platforms/platforms";
+import type { z } from "zod";
 
-import {
-  ErrorResponseTypes,
-  fail,
-  type ResponseType,
-  success,
-} from "./response.schema";
-
-/**
- * Validate locale using the standard schema
- */
-function validateLocale(
-  locale: CountryLanguage,
-  logger: EndpointLogger,
-  platform: Platform,
-): ResponseType<CountryLanguage> {
-  const localeValidation = validateData(
-    locale,
-    z.enum(CountryLanguageValues).optional(),
-    logger,
-    locale,
-    platform,
-    "locale-validation",
-  );
-  const validatedLocale = localeValidation.success
-    ? localeValidation.data
-    : undefined;
-  if (!validatedLocale) {
-    logger.error("Invalid locale provided:", locale);
-    const { t } = sharedScopedTranslation.scopedT(locale);
-    return fail({
-      message: t("errors.invalid_request_data"),
-      errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
-      messageParams: {
-        error: "Invalid locale provided",
-      },
-    });
-  }
-  return success(validatedLocale);
-}
+import { ErrorResponseTypes, fail, type ResponseType } from "./response.schema";
+import { validateLocale } from "./validate-locale";
 
 /**
  * CLI validation context
@@ -144,6 +107,22 @@ export function validateHandlerRequestData<
   >,
   logger: EndpointLogger,
   platform: Platform,
+  /**
+   * Full endpoint definition, used to build the CLI example command shown on a
+   * validation failure.
+   *
+   * REQUIRED, and threaded from the route rather than looked up here. The route
+   * has already loaded this definition before dispatch — passing it down is free,
+   * whereas re-resolving it at this depth would mean a registry lookup or a
+   * module-level cache, i.e. ambient state standing in for an argument the
+   * caller already holds.
+   *
+   * Kept separate from the schemas above because the caller passes a
+   * ROLE-FILTERED request schema, not the endpoint's raw one; this is the
+   * unfiltered definition, and conflating them would leak fields a role cannot
+   * see into the example command.
+   */
+  endpointDefinition: CreateApiEndpointAny,
 ): ResponseType<
   ValidatedRequestData<z.output<TRequestSchema>, z.output<TUrlSchema>>
 > {
@@ -159,9 +138,10 @@ export function validateHandlerRequestData<
       context.urlParameters,
       endpoint.requestUrlPathParamsSchema,
       logger,
-      context.locale,
       platform,
       `${context.endpointPath}/url-params`,
+      validatedLocale,
+      endpointDefinition,
     );
     if (!urlValidation.success) {
       const logUrl =
@@ -189,9 +169,10 @@ export function validateHandlerRequestData<
       normalizedRequestData,
       endpoint.requestSchema,
       logger,
-      context.locale,
       platform,
       context.endpointPath,
+      validatedLocale,
+      endpointDefinition,
     );
     if (!requestValidation.success) {
       const logReq =
@@ -226,14 +207,12 @@ export function validateHandlerRequestData<
       endpoint: context.endpointPath,
     });
     const { t } = sharedScopedTranslation.scopedT(context.locale);
-    return {
-      success: false,
-      message: t("errors.invalid_request_data"),
-      errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
-      messageParams: {
+    return fail({
+      message: t("errors.invalidRequestDataDetail", {
         error: parseError(error).message,
-      },
-    };
+      }),
+      errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
+    });
   }
 }
 
@@ -242,7 +221,7 @@ export function validateHandlerRequestData<
  * Returns validated data or error
  */
 export function validateResponseData<TResponseOutput>(
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Schema validation: Response data can be any type until validated against schema, so unknown is correct.
+  // eslint-disable-next-line restricted/no-unknown -- Schema validation: Response data can be any type until validated against schema, so unknown is correct.
   data: unknown,
   schema: z.ZodTypeAny,
   logger: EndpointLogger,
@@ -255,25 +234,24 @@ export function validateResponseData<TResponseOutput>(
     data,
     schema,
     logger,
-    locale,
     platform,
     endpointPath,
+    locale,
   );
 
   if (!validation.success) {
     logger.error("[Request Validator] Response validation failed", {
       error: validation.message,
-      messageParams: validation.messageParams,
       endpoint: endpointPath,
     });
-    return {
-      success: false,
-      message: t("errorTypes.invalid_response_error"),
-      errorType: ErrorResponseTypes.INVALID_RESPONSE_ERROR,
-      messageParams: {
+    // `errorTypes.invalid_response_error` is the generic ErrorResponseTypes
+    // label and renders param-free, so the schema detail gets its own key.
+    return fail({
+      message: t("errors.invalidResponseDetail", {
         error: validation.message,
-      },
-    };
+      }),
+      errorType: ErrorResponseTypes.INVALID_RESPONSE_ERROR,
+    });
   }
 
   return {

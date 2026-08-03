@@ -1,15 +1,15 @@
 "use client";
 
-import type { EndpointReadOptions } from "next-vibe/core/definition/create";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { Methods } from "next-vibe/core/definition/enums";
-import { useTranslation } from "next-vibe/core/i18n/core/client";
-import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import type { DeepPartial } from "next-vibe/core/utils/type-utils";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { scopedTranslation as reactScopedTranslation } from "next-vibe/unified-ui/hooks/i18n";
+import type { EndpointReadOptions } from "../../core/definition/create";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
+import type { Methods } from "../../core/definition/enums";
+import { useTranslation } from "../../core/i18n/core/client";
+import type { ErrorResponseType } from "../../core/route/response.schema";
+import type { WidgetData } from "../../core/utils/json";
+import type { DeepPartial } from "../../core/utils/type-utils";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
+import { scopedTranslation as reactScopedTranslation } from "./i18n";
 import { useMemo } from "react";
 import type { UseFormReturn } from "react-hook-form";
 
@@ -408,9 +408,9 @@ export function useEndpoint<
         title: {
           message: reactT("widgets.error.title"),
         },
+        // `error.message` is already fully interpolated - nothing left to fill in.
         message: {
           message: error.message,
-          messageParams: error.messageParams,
         },
       };
     }

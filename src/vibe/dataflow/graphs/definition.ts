@@ -2,26 +2,26 @@
  * Vibe Sense - Graphs List + Create Endpoint Definitions
  */
 
-import { dateSchema } from "next-vibe/core/definition/common.schema";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { dateSchema } from "../../core/definition/common.schema";
+import { createEndpoint } from "../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { graphConfigSchema } from "next-vibe/dataflow/graph/schema";
-import { scopedTranslation } from "next-vibe/dataflow/graphs/i18n";
-import { UserRole } from "next-vibe/identity/roles/enum";
-import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
-import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
+} from "../../core/definition/enums";
+import { graphConfigSchema } from "../graph/schema";
+import { scopedTranslation } from "./i18n";
+import { UserRole } from "../../identity/roles/enum";
+import { lazyWidget } from "../../unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "../../unified-ui/_shared/utils";
 import {
   objectField,
   requestField,
   responseArrayField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { VIBE_SENSE_GRAPHS_ALIAS } from "./constants";

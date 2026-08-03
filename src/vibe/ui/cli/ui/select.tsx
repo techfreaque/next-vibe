@@ -3,7 +3,7 @@
  * Items are collected via SelectItem children, Select manages state
  */
 import { Box, Text, useFocus, useInput } from "ink";
-import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import {
   createContext,

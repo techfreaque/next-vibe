@@ -214,7 +214,9 @@ export const translations = {
     conflict: {
       title: "Account Conflict",
       description: "An account with this email already exists",
+      detail: "An account with this email already exists. Log in instead.",
     },
+    userNotFound: "No account found for {{email}}",
     forbidden: {
       title: "Forbidden",
       description: "Access denied",
@@ -232,7 +234,7 @@ export const translations = {
       description: "You have unsaved changes",
     },
     internal: {
-      title: "Internal Error",
+      title: "Signup failed for {{email}}: {{error}}",
       description: "An internal error occurred",
     },
   },
@@ -262,7 +264,7 @@ export const translations = {
         description: "Please enter a valid email address",
       },
       internal: {
-        title: "Email Check Error",
+        title: "Could not check {{email}}: {{error}}",
         description: "Error checking email availability",
       },
       unknown: {

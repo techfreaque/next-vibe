@@ -5,19 +5,19 @@
 import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 
-import { rootlessToolExecutionContext } from "next-vibe/agent/chat/config";
-import { endpointToUrlSegment } from "next-vibe/core/core-utils/path";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { Methods } from "next-vibe/core/definition/enums";
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
-import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { ATLAS_PID_FILE, readPidFilePort } from "next-vibe/server/server/pid";
-import { scopedTranslation } from "next-vibe/tooling/testing/test/i18n";
+import { rootlessToolExecutionContext } from "next-vibe/core/execution-context";
+import { endpointToUrlSegment } from "../../../core/core-utils/path";
+import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
+import { Methods } from "../../../core/definition/enums";
+import { defaultLocale } from "../../../core/i18n/core/config";
+import type { ResponseType } from "../../../core/route/response.schema";
+import { ErrorResponseTypes, fail } from "../../../core/route/response.schema";
+import type { WidgetData } from "../../../core/utils/json";
+import { parseError } from "../../../core/utils/parse-error";
+import type { JwtPayloadType } from "../../../identity/auth/types";
+import { UserPermissionRole } from "../../../identity/roles/enum";
+import { ATLAS_PID_FILE, readPidFilePort } from "../../../server/server/pid";
+import { scopedTranslation } from "../test/i18n";
 
 import {
   cdpNavigatePage,
@@ -104,11 +104,8 @@ export async function sendBrowserTestRequest<
     const port = readPidFilePort(ATLAS_PID_FILE);
     if (!port) {
       return fail({
-        message: t("errors.internal.title"),
+        message: t("errors.browser.serverNotRunning"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
-          error: "Atlas dev server not running — start with vibe dev",
-        },
       });
     }
 
@@ -174,11 +171,10 @@ export async function sendBrowserTestRequest<
       });
       if (!blankResult.success) {
         return fail({
-          message: t("errors.internal.title"),
+          message: t("errors.browser.openFailed", {
+            detail: blankResult.message,
+          }),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: {
-            error: `Browser open failed: ${blankResult.message}`,
-          },
         });
       }
       pageOpened = true;
@@ -186,12 +182,11 @@ export async function sendBrowserTestRequest<
       // ── 5b. Create a real DB session + inject auth cookie before navigating ──
       if (!testUser.isPublic) {
         const { AuthRepository } =
-          await import("next-vibe/identity/auth/repository");
+          await import("../../../identity/auth/repository");
         const { SessionRepository } =
-          await import("next-vibe/identity/session/repository");
+          await import("../../../identity/session/repository");
         const { AUTH_TOKEN_COOKIE_NAME } = await import("@/env/constants");
-        const { createEndpointLogger } =
-          await import("next-vibe/logger/server");
+        const { createEndpointLogger } = await import("../../../logger/server");
         const logger = createEndpointLogger(false, defaultLocale);
         const tokenResult = await AuthRepository.signJwt(
           testUser,
@@ -277,11 +272,10 @@ export async function sendBrowserTestRequest<
         });
         if (!fillResult.success) {
           return fail({
-            message: t("errors.internal.title"),
+            message: t("errors.browser.fillFailed", {
+              detail: fillResult.message,
+            }),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
-            messageParams: {
-              error: `Browser fill failed: ${fillResult.message}`,
-            },
           });
         }
       }
@@ -320,11 +314,10 @@ export async function sendBrowserTestRequest<
         });
         if (!clickResult.success) {
           return fail({
-            message: t("errors.internal.title"),
+            message: t("errors.browser.submitFailed", {
+              detail: clickResult.message,
+            }),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
-            messageParams: {
-              error: `Browser click submit failed: ${clickResult.message}`,
-            },
           });
         }
       }
@@ -374,11 +367,10 @@ export async function sendBrowserTestRequest<
         });
         if (!evalResult.success) {
           return fail({
-            message: t("errors.internal.title"),
+            message: t("errors.browser.evaluateFailed", {
+              detail: evalResult.message,
+            }),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
-            messageParams: {
-              error: `evaluate-script failed: ${evalResult.message}`,
-            },
           });
         }
         const rawText = extractTextFromResponse(
@@ -403,11 +395,10 @@ export async function sendBrowserTestRequest<
 
       if (!rawJson) {
         return fail({
-          message: t("errors.internal.title"),
+          message: t("errors.browser.resultTimeout", {
+            timeoutMs: responseTimeoutMs,
+          }),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: {
-            error: `Mutation result not available within ${responseTimeoutMs}ms`,
-          },
         });
       }
 
@@ -424,21 +415,17 @@ export async function sendBrowserTestRequest<
         >;
       } catch {
         return fail({
-          message: t("errors.internal.title"),
+          message: t("errors.browser.parseFailed", {
+            raw: rawJson.slice(0, 400),
+          }),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: {
-            error: `Could not parse cache JSON: ${rawJson.slice(0, 400)}`,
-          },
         });
       }
 
       if (cachedResponse === null) {
         return fail({
-          message: t("errors.notFound.title"),
+          message: t("errors.browser.cacheEmpty"),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: {
-            error: `Mutation cache empty — response never loaded`,
-          },
         });
       }
 
@@ -449,11 +436,11 @@ export async function sendBrowserTestRequest<
       }
     }
   } catch (error) {
-    const { t: t2 } = scopedTranslation.scopedT(defaultLocale);
     return fail({
-      message: t2("errors.internal.title"),
+      message: t("errors.browser.requestFailed", {
+        detail: parseError(error).message,
+      }),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: { error: parseError(error).message },
     });
   }
 }

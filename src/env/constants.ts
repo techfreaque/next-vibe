@@ -1,3 +1,6 @@
+import { coreClientEnv } from "next-vibe/core/env-client";
+import { Environment } from "next-vibe/env/env-util";
+
 export const GITHUB_REPO_URL = "https://github.com/techfreaque/next-vibe"; // eslint-disable-line i18next/no-literal-string
 
 /**
@@ -43,11 +46,11 @@ export const LOCALE_COOKIE_NAME = "locale";
  * an unexpected port.
  */
 function getPortSuffix(): string {
-  if (process.env.NODE_ENV === "production") {
+  if (coreClientEnv.NODE_ENV === Environment.PRODUCTION) {
     return "";
   }
   try {
-    const url = process.env.NEXT_PUBLIC_APP_URL;
+    const url = coreClientEnv.NEXT_PUBLIC_APP_URL;
     if (url) {
       const parsed = new URL(url);
       const port = parsed.port;

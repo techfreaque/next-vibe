@@ -1,6 +1,6 @@
 "use client";
 import { ChatModelId } from "next-vibe/agent/ai-stream/models";
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { ChatMessage } from "next-vibe/agent/chat/db";
 import { ChatMessageRole } from "next-vibe/agent/chat/enum";
 import { GroupedAssistantMessage } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";

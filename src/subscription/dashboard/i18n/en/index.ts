@@ -19,6 +19,7 @@ export const translations = {
       server: {
         title: "Server Error",
         description: "Unable to load subscription data",
+        detail: "Could not load your subscription: {{error}}",
       },
       unknown: {
         title: "Unknown Error",

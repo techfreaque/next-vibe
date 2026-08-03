@@ -1,8 +1,8 @@
 "use client";
 
-import { PATH_SEPARATOR } from "next-vibe/core/core-utils/path";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { Methods } from "next-vibe/core/definition/enums";
+import { PATH_SEPARATOR } from "../../core/core-utils/path";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
+import { Methods } from "../../core/definition/enums";
 
 /**
  * Resolve an endpoint definition by alias or slash-path.

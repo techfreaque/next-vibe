@@ -1,15 +1,15 @@
 import { QueryClientProvider } from "@tanstack/react-query";
-import { getEnvAvailability } from "next-vibe/agent/env-availability";
-import { AgentAvailabilityProvider } from "next-vibe/agent/env-availability-context";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { Platform } from "next-vibe/platforms/platforms";
+import type { AgentEnvAvailability } from "../../../../agent/env-availability";
+import { AgentAvailabilityProvider } from "../../../../agent/env-availability-store";
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
+import type { CountryLanguage } from "../../../../core/i18n/core/config";
+import type { WidgetData } from "../../../../core/utils/json";
+import type { JwtPayloadType } from "../../../../identity/auth/types";
+import type { EndpointLogger } from "../../../../logger/types";
+import type { Platform } from "../../../../platforms/platforms";
 import { LoggerProvider } from "next-vibe/ui/hooks/logger-provider";
-import { queryClient } from "next-vibe/unified-ui/hooks/store";
-import { NavigationStackProvider } from "next-vibe/unified-ui/hooks/use-navigation-stack";
+import { queryClient } from "../../../hooks/store";
+import { NavigationStackProvider } from "../../../hooks/use-navigation-stack";
 import type { JSX } from "react";
 
 import { EndpointRenderer } from "../../web/EndpointRenderer";
@@ -20,17 +20,27 @@ export function CliRenderTree({
   data,
   logger,
   user,
+  platform,
+  availability,
 }: {
   endpoint: CreateApiEndpointAny;
   locale: CountryLanguage;
   data: WidgetData;
   logger: EndpointLogger;
   user: JwtPayloadType;
+  /**
+   * The surface actually being rendered for. Defaults to CLI, but `vibe <cmd>
+   * --platform=mcp` renders through this same tree and must reach widgets as
+   * MCP — otherwise every `useIsMcp()` branch silently reports CLI and agents
+   * get decorated, context-expensive output.
+   */
+  platform: Platform;
+  /** Computed by the async caller — this tree renders synchronously. */
+  availability: AgentEnvAvailability;
 }): JSX.Element {
-  const availability = getEnvAvailability();
   return (
     <QueryClientProvider client={queryClient}>
-      <LoggerProvider locale={locale} availability={availability}>
+      <LoggerProvider locale={locale}>
         <AgentAvailabilityProvider availability={availability}>
           <NavigationStackProvider>
             <EndpointRenderer
@@ -41,7 +51,7 @@ export function CliRenderTree({
               user={user}
               response={{ success: true, data }}
               responseOnly={true}
-              platform={Platform.CLI}
+              platform={platform}
             />
           </NavigationStackProvider>
         </AgentAvailabilityProvider>

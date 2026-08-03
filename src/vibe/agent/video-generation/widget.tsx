@@ -1,10 +1,10 @@
 "use client";
-import { ModelCreditDisplay } from "next-vibe/agent/models/widget/model-credit-display";
+import { ModelCreditDisplay } from "../models/widget/model-credit-display";
 import {
   ModelSelector,
   ModelSelectorTrigger,
-} from "next-vibe/agent/models/widget/model-selector";
-import { ModelSelectionType } from "next-vibe/agent/skills/enum";
+} from "../models/widget/model-selector";
+import { ModelSelectionType } from "../skills/enum";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -32,7 +32,7 @@ import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/sub
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 
-import { useProviderAvailability } from "../env-availability-context";
+import { useProviderAvailability } from "../env-availability-store";
 import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "./constants";
 import type definition from "./definition";
 import type { VideoGenerationPostRequestOutput } from "./definition";

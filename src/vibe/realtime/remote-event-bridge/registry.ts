@@ -13,15 +13,15 @@
  *   payload       ← payloadType (zod schema on the event declaration)
  */
 
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { RemoteEventContext } from "next-vibe/core/route/handler";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { WidgetDataSchema } from "next-vibe/core/utils/json";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
+import type { RemoteEventContext } from "../../core/route/handler-realtime";
+import type { WidgetData } from "../../core/utils/json";
+import { WidgetDataSchema } from "../../core/utils/json";
+import type { EndpointLogger } from "../../logger/types";
 import { z } from "zod";
 
-import type { AnyEndpointEventEnvelope } from "../structured-events";
-import type { RegistryRouteModule } from "../ws-channel-registry";
+import type { AnyEndpointEventEnvelope } from "../core/structured-events";
+import type { RegistryRouteModule } from "../server/ws-channel-registry";
 
 const recordSchema: z.ZodType<Record<string, WidgetData>> = z.record(
   z.string(),

@@ -72,23 +72,61 @@ export const translations: typeof enTranslations = {
   },
   errors: {
     invalid_request_data: "Nieprawidłowe dane żądania",
+    invalidLocaleDetail: 'Nieprawidłowy locale "{{locale}}"',
+    invalidRequestDataDetail: "Nieprawidłowe dane żądania: {{error}}",
+    invalidResponseDetail: "Nieprawidłowe dane odpowiedzi: {{error}}",
+    invalidErrorResponseDetail: "Błędna odpowiedź błędu: {{error}}",
+    csrfFailedDetail: "Żądanie zablokowane przez ochronę CSRF: {{reason}}",
+    csrfReasonUnknown: "Weryfikacja tokenu CSRF nie powiodła się",
+    internalDetail: "Błąd wewnętrzny: {{error}}",
+    authenticationFailed: "Uwierzytelnianie użytkownika nie powiodło się",
+  },
+  validation: {
+    missingFields: "Brakuje wymaganych pól ({{count}}):",
+    failedOne: "Walidacja nie powiodła się (1 błąd):",
+    failedMany: "Walidacja nie powiodła się (błędów: {{count}}):",
+    cliHints:
+      "\n\nPrzykład:\n  {{example}}\n\nAlbo uruchom interaktywnie:\n  {{interactive}}\n\nWięcej informacji:\n  {{help}}",
+    report: "{{header}}{{fields}}{{hints}}",
+    unexpected: "Walidacja nieoczekiwanie nie powiodła się: {{error}}",
   },
   shared: {
     permissions: {
       errors: {
-        definitionError: "Błąd definicji punktu końcowego",
-        platformAccessDenied: "Odmowa dostępu na {{platform}}: {{reason}}",
+        definitionError: "Błąd definicji punktu końcowego: {{reason}}",
+        allowedRolesMissing:
+          "Błąd definicji punktu końcowego: brakuje allowedRoles albo nie jest listą",
+        platformAccessDenied: {
+          productionDisabled:
+            "Odmowa dostępu na {{platform}}: ten punkt końcowy jest wyłączony na produkcji",
+          platformExcluded:
+            "Odmowa dostępu na {{platform}}: ten punkt końcowy nie jest udostępniony na tej platformie",
+          cliPackageAuthRequired:
+            "Odmowa dostępu na {{platform}}: ten punkt końcowy wymaga uwierzytelnienia, którego pakiet CLI nie zapewnia",
+          mcpNotListed:
+            "Odmowa dostępu na {{platform}}: ten punkt końcowy nie jest wystawiony na MCP",
+        },
         insufficientRoles:
-          "Użytkownik {{userId}} nie ma wymaganych ról: {{requiredRoles}}",
+          "Użytkownik {{userId}} nie ma wymaganych ról: {{requiredRoles}} (posiada: {{userRoles}})",
+        insufficientRolesNoRoles:
+          "Użytkownik {{userId}} nie ma wymaganych ról: {{requiredRoles}} (posiada: brak)",
+        insufficientRolesPublic:
+          "Dostęp publiczny nie ma wymaganych ról: {{requiredRoles}} (posiada: {{userRoles}})",
+        insufficientRolesPublicNoRoles:
+          "Dostęp publiczny nie ma wymaganych ról: {{requiredRoles}} (posiada: brak)",
       },
     },
     endpoints: {
       definition: {
         loader: {
           errors: {
-            endpointNotFound: "Nie znaleziono punktu końcowego",
-            loadFailed: "Nie udało się załadować punktu końcowego",
-            batchLoadFailed: "Nie udało się załadować punktów końcowych",
+            endpointNotFound: "Nie znaleziono punktu końcowego: {{identifier}}",
+            loadFailed:
+              "Nie udało się załadować punktu końcowego {{identifier}}: {{error}}",
+            batchLoadFailed:
+              "Nie udało się załadować {{failedCount}} z {{totalCount}} punktów końcowych",
+            batchLoadError:
+              "Nie udało się załadować {{failedCount}} z {{totalCount}} punktów końcowych: {{error}}",
           },
         },
       },

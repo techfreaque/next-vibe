@@ -5,17 +5,17 @@
 
 import "server-only";
 
-import { Methods } from "next-vibe/core/definition/enums";
-import { endpointsHandler } from "next-vibe/core/route/multi";
+import { Methods } from "../definition/enums";
+import { endpointsHandler } from "../route/multi";
 
 import generateAllEndpoints from "./definition";
 
 export const { tools } = endpointsHandler({
   endpoint: generateAllEndpoints,
   [Methods.POST]: {
-    handler: async ({ data, logger, locale }) =>
+    handler: async ({ data, logger }) =>
       (
         await import(/* @vite-ignore */ "./repository")
-      ).GenerateAllRepository.generateAll(data, logger, locale),
+      ).GenerateAllRepository.generateAll(data, logger),
   },
 });

@@ -5,20 +5,16 @@
 
 import "server-only";
 
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
+import type { CountryLanguage } from "../../core/i18n/core/config";
 import type {
   GenericHandlerBase,
   GenericHandlerReturnType,
-} from "next-vibe/core/route/handler";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type {
-  CronTaskPriority,
-  TaskCategory,
-  TaskOutputMode,
-} from "next-vibe/tasks/enum";
+} from "../../core/route/handler";
+import type { WidgetData } from "../../core/utils/json";
+import type { JwtPrivatePayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
+import type { CronTaskPriority, TaskCategory, TaskOutputMode } from "../enum";
 
 /**
  * Derives the taskInput type for a cron task from its endpoint types.

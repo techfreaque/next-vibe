@@ -9,7 +9,7 @@ import {
   TimePeriod,
 } from "next-vibe/core/core-utils/stats-filtering.schema";
 import { dateSchema } from "next-vibe/core/definition/common.schema";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -17,7 +17,7 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
-import { CountryFilter, LanguageFilter } from "next-vibe/core/i18n/core/config";
+import { CountryFilter, LanguageFilter } from "next-vibe/identity/lead/enum";
 import {
   ActivityType,
   EmailCampaignStage,

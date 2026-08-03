@@ -40,19 +40,19 @@ import {
   useNodesState,
   useReactFlow,
 } from "@xyflow/react";
-import { FieldDataType } from "next-vibe/core/definition/enums";
-import { GraphResolution } from "next-vibe/dataflow/enum";
-import type { GraphNodeConfig } from "next-vibe/dataflow/graph/schema";
+import { FieldDataType } from "../../../../core/definition/enums";
+import { GraphResolution } from "../../../enum";
+import type { GraphNodeConfig } from "../../../graph/schema";
 import type {
   GraphConfig,
   GraphEdge,
   NodePosition,
   TriggerConfig,
-} from "next-vibe/dataflow/graph/types";
-import parentDefinitions from "next-vibe/dataflow/graphs/[id]/data/definition";
-import versionsDefinitions from "next-vibe/dataflow/graphs/[id]/versions/definition";
-import type { Resolution } from "next-vibe/dataflow/shared/fields";
-import { ResolutionValues } from "next-vibe/dataflow/shared/fields";
+} from "../../../graph/types";
+import parentDefinitions from "../data/definition";
+import versionsDefinitions from "../versions/definition";
+import type { Resolution } from "../../../shared/fields";
+import { ResolutionValues } from "../../../shared/fields";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { addWindowListener } from "next-vibe/ui/lib/dom";
 import { Badge } from "next-vibe/ui/ui/badge";
@@ -98,7 +98,7 @@ import {
 } from "next-vibe/ui/ui/select";
 import { Span } from "next-vibe/ui/ui/span";
 import { P } from "next-vibe/ui/ui/typography";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../../unified-ui/_shared/cn";
 import {
   useWidgetForm,
   useWidgetIsSubmitting,
@@ -108,8 +108,8 @@ import {
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
-import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
+} from "../../../../unified-ui/_shared/use-widget-context";
+import { useEndpoint } from "../../../../unified-ui/hooks/use-endpoint";
 import React, {
   useCallback,
   useEffect,
@@ -2304,8 +2304,7 @@ function EditFormInner({
     }
     setDirty(false);
     void (async (): Promise<void> => {
-      const dataDef =
-        await import("next-vibe/dataflow/graphs/[id]/data/definition");
+      const dataDef = await import("../data/definition");
       navigation.push(dataDef.default.GET, {
         urlPathParams: { id: savedResponse.newId },
       });
@@ -2728,7 +2727,7 @@ function EditFormInner({
       navigation.pop();
     } else {
       void (async (): Promise<void> => {
-        const listDef = await import("next-vibe/dataflow/graphs/definition");
+        const listDef = await import("../../definition");
         navigation.push(listDef.default.GET);
       })();
     }
@@ -2764,7 +2763,7 @@ function EditFormInner({
       navigation.pop();
     } else {
       void (async (): Promise<void> => {
-        const listDef = await import("next-vibe/dataflow/graphs/definition");
+        const listDef = await import("../../definition");
         navigation.push(listDef.default.GET);
       })();
     }

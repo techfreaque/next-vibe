@@ -99,12 +99,11 @@ export class LogoutRepository {
     } catch (error) {
       logger.error("Error during logout process", parseError(error));
       return fail({
-        message: t("errors.internal.title"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
-          userId: user.id ?? "unknown",
+        message: t("errors.internal.detail", {
           error: parseError(error).message,
-        },
+          userId: user.id,
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }

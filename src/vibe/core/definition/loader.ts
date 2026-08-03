@@ -1,16 +1,17 @@
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { scopedTranslation } from "next-vibe/core/i18n/shared";
-import { permissionsRegistry } from "next-vibe/core/permissions/registry";
+import type { CountryLanguage } from "../i18n/core/config";
+import { scopedTranslation } from "../i18n/shared";
+import { resolveEndpointAccessDenial } from "../permissions/denial-message";
+import { permissionsRegistry } from "../permissions/registry";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { Platform } from "next-vibe/platforms/platforms";
+} from "../route/response.schema";
+import { parseError } from "../utils/parse-error";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
+import type { Platform } from "../../platforms/platforms";
 import { reloadPage } from "next-vibe/ui/lib/location";
 
 import { getEndpoint as globalGetEndpoint } from "@/generated/endpoints/endpoint";
@@ -70,9 +71,9 @@ export class DefinitionLoader implements IDefinitionLoader {
         return fail({
           message: t(
             "shared.endpoints.definition.loader.errors.endpointNotFound",
+            { identifier },
           ),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { identifier },
         });
       }
 
@@ -83,11 +84,10 @@ export class DefinitionLoader implements IDefinitionLoader {
           endpoint,
           user,
           platform,
-          locale,
         );
 
-        if (!accessValidation.success) {
-          return accessValidation;
+        if (!accessValidation.allowed) {
+          return resolveEndpointAccessDenial(accessValidation.denial, locale);
         }
       }
 
@@ -115,9 +115,11 @@ export class DefinitionLoader implements IDefinitionLoader {
         `[Definition Loader] Failed to load definition (identifier: ${identifier}, error: ${parsed.message})`,
       );
       return fail({
-        message: t("shared.endpoints.definition.loader.errors.loadFailed"),
+        message: t("shared.endpoints.definition.loader.errors.loadFailed", {
+          identifier,
+          error: parsed.message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { identifier, error: parsed.message },
       });
     }
   }
@@ -143,17 +145,19 @@ export class DefinitionLoader implements IDefinitionLoader {
 
       const failures = results.filter((r) => !r.success);
       if (failures.length > 0) {
-        const firstFailure = failures[0];
+        const firstFailure = failures.find((r) => !r.success);
         return fail({
           message: t(
             "shared.endpoints.definition.loader.errors.batchLoadFailed",
+            {
+              failedCount: failures.length,
+              totalCount: identifiers.length,
+            },
           ),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: {
-            failedCount: failures.length,
-            totalCount: identifiers.length,
-          },
-          cause: firstFailure.success === false ? firstFailure : undefined,
+          // Spread rather than `cause: ... : undefined` so the key is absent when
+          // there is no cause, instead of present-and-undefined.
+          ...(firstFailure?.success === false ? { cause: firstFailure } : {}),
         });
       }
 
@@ -167,13 +171,14 @@ export class DefinitionLoader implements IDefinitionLoader {
         error: parseError(error).message,
       });
       return fail({
-        message: t("shared.endpoints.definition.loader.errors.batchLoadFailed"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
+        // Distinct key from the per-failure branch above: this one also carries
+        // the thrown error, and a key must never leave a placeholder unfilled.
+        message: t("shared.endpoints.definition.loader.errors.batchLoadError", {
           failedCount: identifiers.length,
           totalCount: identifiers.length,
           error: parseError(error).message,
-        },
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }

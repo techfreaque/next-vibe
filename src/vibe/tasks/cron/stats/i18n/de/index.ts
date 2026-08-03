@@ -4,7 +4,8 @@ export const translations: typeof enTranslations = {
   category: "Aufgabenverwaltung",
 
   errors: {
-    fetchCronTaskStats: "Fehler beim Abrufen der Cron-Aufgabenstatistiken",
+    fetchCronTaskStats:
+      "Cron-Aufgabenstatistiken nicht abrufbar ({{type}}, {{period}}, Aufgabe {{taskId}}): {{error}}",
   },
 
   get: {

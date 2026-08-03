@@ -11,21 +11,21 @@ import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EnvExample } from "next-vibe/env/define-env";
+} from "../../../core/route/response.schema";
+import { parseError } from "../../../core/utils/parse-error";
+import type { EnvExample } from "../../define-env";
 import {
   decryptEnvValue,
   isEncryptedValue,
   loadOrCreateKey,
-} from "next-vibe/env/env-crypto";
-import type { ExportEnvT } from "next-vibe/env/settings/export-env/i18n";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../env-crypto";
+import type { ExportEnvT } from "./i18n";
+import type { EndpointLogger } from "../../../logger/types";
 
 import type { ExportEnvResponseOutput } from "./definition";
 

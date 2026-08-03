@@ -3,6 +3,7 @@
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { Platform } from "next-vibe/platforms/platforms";
 import remoteConnectionListDefinition from "next-vibe/remote-connection/list/definition";
 import { useRouter } from "next-vibe/ui/hooks/use-navigation";
 import { Container } from "next-vibe/ui/ui/container";
@@ -14,6 +15,7 @@ import { useMemo } from "react";
 interface Props {
   locale: CountryLanguage;
   user: JwtPayloadType;
+  platform: Platform;
 }
 
 const PATH_TO_TAB: Record<string, string> = {
@@ -21,7 +23,11 @@ const PATH_TO_TAB: Record<string, string> = {
   "credits/history": "history",
 };
 
-export function RemotePageClient({ locale, user }: Props): JSX.Element {
+export function RemotePageClient({
+  locale,
+  user,
+  platform,
+}: Props): JSX.Element {
   const router = useRouter();
 
   const navigationOverride = useMemo(
@@ -49,6 +55,7 @@ export function RemotePageClient({ locale, user }: Props): JSX.Element {
         endpoint={remoteConnectionListDefinition}
         user={user}
         locale={locale}
+        platform={platform}
         navigationOverride={navigationOverride}
       />
     </Container>

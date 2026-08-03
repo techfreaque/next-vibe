@@ -74,7 +74,7 @@ export class AdminAddCreditsRepository {
       return result;
     }
     return success({
-      message: `Successfully added ${data.amount} bonus credits`,
+      message: t("repository.bonusCreditsAdded", { amount: data.amount }),
     });
   }
 }

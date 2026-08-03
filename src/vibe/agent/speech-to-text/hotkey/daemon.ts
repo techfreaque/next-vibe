@@ -233,6 +233,6 @@ export async function startHotkeyDaemon(
   }
 
   // This should never be reached, but TypeScript needs it
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Daemon termination
+  // eslint-disable-next-line restricted/restricted-syntax, i18next/no-literal-string -- Daemon termination
   throw new Error("Hotkey daemon terminated unexpectedly");
 }

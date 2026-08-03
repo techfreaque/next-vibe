@@ -64,6 +64,10 @@ export const translations: typeof enTranslations = {
       server: {
         title: "Serverfehler",
         description: "Interner Serverfehler",
+        viBuildFailed: "vibe build fehlgeschlagen: {{error}}",
+        compileFailed: "Electron-Kompilierung fehlgeschlagen: {{error}}",
+        builderFailed: "electron-builder fehlgeschlagen: {{error}}",
+        buildFailed: "Electron-Build fehlgeschlagen: {{error}}",
       },
       unknown: {
         title: "Unbekannter Fehler",

@@ -96,53 +96,64 @@ export const translations = {
 
   errors: {
     userNotFound: {
+      detail: "No account found for user {{userId}}",
       title: "User Not Found",
       description: "The specified user could not be found",
     },
     customerCreationFailed: {
+      detail:
+        "Could not set up your NOWPayments customer record: {{error}} (user {{userId}})",
       title: "Customer Creation Failed",
-      description: "Failed to ensure NOWPayments customer: {error}",
+      description: "Failed to ensure NOWPayments customer: {{error}}",
     },
     productNotFound: {
+      detail: "No such product: {{productId}}",
       title: "Product Not Found",
-      description: "The specified product could not be found: {productId}",
+      description: "The specified product could not be found: {{productId}}",
     },
     userEmailRequired: {
       title: "User Email Required",
-      description: "User email is required for subscriptions: {userId}",
+      description: "User email is required for subscriptions: {{userId}}",
     },
     checkoutCreationFailed: {
+      detail: "Could not start crypto checkout: {{error}}",
       title: "Checkout Creation Failed",
-      description: "Failed to create NOWPayments checkout session: {error}",
+      description: "Failed to create NOWPayments checkout session: {{error}}",
     },
     invoiceCreationFailed: {
+      detail: "Could not create the NOWPayments invoice: {{error}}",
       title: "Invoice Creation Failed",
-      description: "Failed to create NOWPayments invoice: {error}",
+      description: "Failed to create NOWPayments invoice: {{error}}",
     },
     invalidApiKey: {
+      detail:
+        "Invalid NOWPayments API key. Check NOWPAYMENTS_API_KEY in your environment and confirm the key at https://nowpayments.io/app/dashboard",
       title: "Invalid API Key",
       description:
         "Invalid NOWPayments API key. Please check your configuration and ensure you have a valid API key from https://nowpayments.io/app/dashboard",
     },
     planCreationFailed: {
       title: "Plan Creation Failed",
-      description: "Failed to create NOWPayments subscription plan: {error}",
+      description: "Failed to create NOWPayments subscription plan: {{error}}",
     },
     subscriptionCreationFailed: {
       title: "Subscription Creation Failed",
-      description: "Failed to create NOWPayments subscription: {error}",
+      description: "Failed to create NOWPayments subscription: {{error}}",
     },
     subscriptionRetrievalFailed: {
+      detail: "Could not load the NOWPayments subscription: {{error}}",
       title: "Subscription Retrieval Failed",
-      description: "Failed to retrieve NOWPayments subscription: {error}",
+      description: "Failed to retrieve NOWPayments subscription: {{error}}",
     },
     subscriptionCancellationFailed: {
+      detail: "Could not cancel the NOWPayments subscription: {{error}}",
       title: "Subscription Cancellation Failed",
-      description: "Failed to cancel NOWPayments subscription: {error}",
+      description: "Failed to cancel NOWPayments subscription: {{error}}",
     },
     subscriptionListFailed: {
+      detail: "Could not list NOWPayments subscriptions: {{error}}",
       title: "Subscription List Failed",
-      description: "Failed to list NOWPayments subscriptions: {error}",
+      description: "Failed to list NOWPayments subscriptions: {{error}}",
     },
     notConfigured: {
       title: "NOWPayments Not Configured",
@@ -150,13 +161,16 @@ export const translations = {
         "NOWPayments is not configured - set NOWPAYMENTS_API_KEY and NOWPAYMENTS_IPN_SECRET in your .env",
     },
     webhookVerificationFailed: {
+      detail: "Could not verify the NOWPayments webhook: {{error}}",
+      invalidSignature: "Webhook signature does not match",
       title: "Webhook Verification Failed",
-      description: "Failed to verify NOWPayments webhook signature: {error}",
+      description: "Failed to verify NOWPayments webhook signature: {{error}}",
     },
     paymentStatusFailed: {
+      detail: "Could not read the payment status from NOWPayments: {{error}}",
       title: "Payment Status Retrieval Failed",
       description:
-        "Failed to retrieve payment status from NOWPayments: {error}",
+        "Failed to retrieve payment status from NOWPayments: {{error}}",
     },
   },
 

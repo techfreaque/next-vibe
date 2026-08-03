@@ -27,11 +27,10 @@ import {
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { TOUR_DATA_ATTRS } from "next-vibe/agent/ai-stream/stream/widget/chat-ui/welcome-tour/tour-attrs";
-import { parseSkillId } from "next-vibe/agent/chat/slugify";
-import { useTourState } from "next-vibe/agent/chat/tour-state";
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
-import { ModelCreditDisplay } from "next-vibe/agent/models/widget/model-credit-display";
+import { TOUR_DATA_ATTRS } from "../../ai-stream/stream/widget/chat-ui/welcome-tour/tour-attrs";
+import { parseSkillId } from "../../chat/slugify";
+import { useTourState } from "../../chat/tour-state";
+import { ModelCreditDisplay } from "../../models/widget/model-credit-display";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
@@ -68,10 +67,8 @@ import { apiClient } from "next-vibe/unified-ui/hooks/store";
 import BadgeWidget from "next-vibe/unified-ui/widgets/display-only/badge/widget";
 import IconWidget from "next-vibe/unified-ui/widgets/display-only/icon/widget";
 import TextWidget from "next-vibe/unified-ui/widgets/display-only/text/widget";
-import {
-  Icon,
-  type IconKey,
-} from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+import { type IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import React, { useCallback, useMemo, useState } from "react";
 
 import { ChatSettingsRepositoryClient } from "../../chat/settings/repository-client";
@@ -868,7 +865,6 @@ export function FavoritesListContainer({
   const { push: navigate } = useWidgetNavigation();
   const context = useWidgetContext();
   const { logger, locale, user } = context;
-  const availability = useProviderAvailability();
   const favoritesData = useWidgetSelector<typeof definition.GET>()(
     (d) => d?.favorites,
   );
@@ -914,19 +910,10 @@ export function FavoritesListContainer({
         logger,
         locale,
         user,
-        availability,
       });
       useTourState.getState().setModelSelectorOpen(false);
     },
-    [
-      onPickRaw,
-      favoriteSelectOverride,
-      hideChrome,
-      logger,
-      locale,
-      user,
-      availability,
-    ],
+    [onPickRaw, favoriteSelectOverride, hideChrome, logger, locale, user],
   );
 
   const rawFavoritesList = useMemo(
@@ -1020,7 +1007,6 @@ export function FavoritesListContainer({
           },
           undefined,
           locale,
-          availability,
         )
         .then(() => {
           logger.info("Favorites positions updated successfully");
@@ -1037,7 +1023,7 @@ export function FavoritesListContainer({
           setDragOverride(null);
         });
     },
-    [logger, user, locale, availability],
+    [logger, user, locale],
   );
 
   /**
@@ -1265,7 +1251,6 @@ function DeleteVariantButton({
   size?: "sm";
 }): React.JSX.Element {
   const [isLoading, setIsLoading] = useState(false);
-  const availability = useProviderAvailability();
   const { t } = scopedTranslation.scopedT(locale);
   const isSmall = size === "sm";
   const iconSize = isSmall ? "h-3 w-3" : "h-4 w-4";
@@ -1286,7 +1271,6 @@ function DeleteVariantButton({
         undefined,
         { id: item.id },
         locale,
-        availability,
       );
 
       apiClient.updateEndpointData(definition.GET, logger, (oldData) => {
@@ -1372,7 +1356,6 @@ function DeleteGroupButton({
   locale: CountryLanguage;
 }): React.JSX.Element {
   const [isLoading, setIsLoading] = useState(false);
-  const availability = useProviderAvailability();
   const { t } = scopedTranslation.scopedT(locale);
 
   const handleConfirm = async (e: ButtonMouseEvent): Promise<void> => {
@@ -1390,7 +1373,6 @@ function DeleteGroupButton({
             undefined,
             { id: item.id },
             locale,
-            availability,
           ),
         ),
       );
@@ -1488,7 +1470,6 @@ function AddVariantRow({
   locale: CountryLanguage;
 }): React.JSX.Element {
   const [isLoading, setIsLoading] = useState(false);
-  const availability = useProviderAvailability();
   const { t } = scopedTranslation.scopedT(locale);
 
   const handleClick = async (e: ButtonMouseEvent): Promise<void> => {
@@ -1531,7 +1512,6 @@ function AddVariantRow({
         undefined,
         { id: baseSkillId },
         locale,
-        availability,
       );
       if (!characterResponse.success) {
         return;

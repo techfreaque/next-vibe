@@ -4,7 +4,7 @@
  * Replaces the separate media-prices and openrouter endpoints.
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   LayoutType,

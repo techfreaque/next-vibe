@@ -5,15 +5,15 @@
 
 import { execSync } from "node:child_process";
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { scopedTranslation } from "next-vibe/tooling/release/i18n";
+} from "../../../core/route/response.schema";
+import type { EndpointLogger } from "../../../logger/types";
+import { scopedTranslation } from "../i18n";
 
 import type { GitInfo, GitOpsConfig, RepoInfo } from "../definition";
 import { MESSAGES } from "./constants";
@@ -286,9 +286,8 @@ class GitService {
           logger.error("git tag failed", { stderr, tag, cwd });
           const { t } = scopedTranslation.scopedT(locale);
           return fail({
-            message: t("git.tagFailed"),
+            message: t("errors.gitTagFailed", { tag, error: stderr }),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
-            messageParams: { tag, error: stderr },
           });
         }
       }
@@ -313,9 +312,8 @@ class GitService {
           logger.error("git push failed", { stderr, remote, cwd });
           const { t: tGit } = scopedTranslation.scopedT(locale);
           return fail({
-            message: tGit("git.pushFailed"),
+            message: tGit("errors.gitPushFailed", { remote, error: stderr }),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
-            messageParams: { remote, error: stderr },
           });
         }
 
@@ -335,9 +333,12 @@ class GitService {
             logger.error("git push tag failed", { stderr, remote, tag, cwd });
             const { t: tPushTag } = scopedTranslation.scopedT(locale);
             return fail({
-              message: tPushTag("git.pushFailed"),
+              message: tPushTag("errors.gitPushTagFailed", {
+                tag,
+                remote,
+                error: stderr,
+              }),
               errorType: ErrorResponseTypes.INTERNAL_ERROR,
-              messageParams: { tag, remote, error: stderr },
             });
           }
         }

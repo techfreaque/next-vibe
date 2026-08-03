@@ -297,9 +297,9 @@ export const translations: typeof enTranslations = {
       "Twoje konto zostało zablokowane. Skontaktuj się z pomocą techniczną.",
     invalid_credentials: "Nieprawidłowy e-mail lub hasło",
     two_factor_required: "Wymagana dwuskładnikowa autoryzacja",
-    auth_error: "Wystąpił błąd uwierzytelniania",
-    user_not_found: "Użytkownik nie znaleziony",
-    session_creation_failed: "Nie udało się utworzyć sesji",
+    auth_error: "Logowanie dla {{email}} nie powiodło się: {{error}}",
+    user_not_found: "Nie znaleziono użytkownika {{userId}}",
+    session_creation_failed: "Nie udało się utworzyć sesji dla {{userId}}: {{error}}",
     token_save_failed: "Nie udało się zapisać tokenu uwierzytelniania",
     validation: {
       title: "Walidacja nie powiodła się",

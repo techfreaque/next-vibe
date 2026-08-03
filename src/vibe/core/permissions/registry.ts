@@ -1,11 +1,7 @@
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { coreClientEnv as envClient } from "next-vibe/core/env-client";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { scopedTranslation } from "next-vibe/core/i18n/shared";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
-import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
-import { VibeMode } from "next-vibe/env/env-util";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { CreateApiEndpointAny } from "../definition/endpoint-base";
+import { coreClientEnv as envClient } from "../env-client";
+import { VibeMode } from "../../env/env-util";
+import type { JwtPayloadType } from "../../identity/auth/types";
 import {
   filterPlatformMarkers,
   filterUserPermissionRoles,
@@ -13,23 +9,16 @@ import {
   UserPermissionRole,
   UserRole,
   type UserRoleValue,
-} from "next-vibe/identity/roles/enum";
-import { scopedTranslation as userRolesScopedTranslation } from "next-vibe/identity/roles/i18n";
-import { Platform } from "next-vibe/platforms/platforms";
-
-interface PlatformAccessResult {
-  allowed: boolean;
-  reason?: string;
-  blockedByRole?: UserRoleValue;
-}
+} from "../../identity/roles/enum";
+import { Platform } from "../../platforms/platforms";
+import type { EndpointAccessResult, PlatformAccessResult } from "./types";
 
 interface IPermissionsRegistry {
   validateEndpointAccess(
     endpoint: CreateApiEndpointAny,
     user: JwtPayloadType,
     platform: Platform,
-    locale: CountryLanguage,
-  ): ResponseType<true>;
+  ): EndpointAccessResult;
 
   checkPlatformAccess(
     allowedRoles: readonly UserRoleValue[],
@@ -70,7 +59,7 @@ class PermissionsRegistry implements IPermissionsRegistry {
     ) {
       return {
         allowed: false,
-        reason: "Endpoint is disabled in production environment",
+        reason: "productionDisabled",
         blockedByRole: PlatformMarker.PRODUCTION_OFF,
       };
     }
@@ -80,7 +69,7 @@ class PermissionsRegistry implements IPermissionsRegistry {
         if (platformMarkers.includes(PlatformMarker.CLI_OFF)) {
           return {
             allowed: false,
-            reason: `Endpoint is not accessible via ${Platform.CLI} platform`,
+            reason: "platformExcluded",
             blockedByRole: PlatformMarker.CLI_OFF,
           };
         }
@@ -95,7 +84,7 @@ class PermissionsRegistry implements IPermissionsRegistry {
         ) {
           return {
             allowed: false,
-            reason: `Endpoint is not accessible via ${Platform.MCP} platform`,
+            reason: "platformExcluded",
             blockedByRole: platformMarkers.includes(PlatformMarker.MCP_OFF)
               ? PlatformMarker.MCP_OFF
               : PlatformMarker.CLI_OFF,
@@ -107,7 +96,7 @@ class PermissionsRegistry implements IPermissionsRegistry {
         if (platformMarkers.includes(PlatformMarker.SKILL_OFF)) {
           return {
             allowed: false,
-            reason: `Endpoint is excluded from ${Platform.REMOTE_SKILL} platform (has SKILL_OFF marker)`,
+            reason: "platformExcluded",
             blockedByRole: PlatformMarker.SKILL_OFF,
           };
         }
@@ -117,15 +106,14 @@ class PermissionsRegistry implements IPermissionsRegistry {
         if (platformMarkers.includes(PlatformMarker.CLI_OFF)) {
           return {
             allowed: false,
-            reason: "Endpoint is not accessible via CLI_PACKAGE platform",
+            reason: "platformExcluded",
             blockedByRole: PlatformMarker.CLI_OFF,
           };
         }
         if (!platformMarkers.includes(PlatformMarker.CLI_AUTH_BYPASS)) {
           return {
             allowed: false,
-            reason:
-              "Endpoint requires authentication which is not available in CLI_PACKAGE mode",
+            reason: "cliPackageAuthRequired",
             blockedByRole: PlatformMarker.CLI_AUTH_BYPASS,
           };
         }
@@ -138,7 +126,7 @@ class PermissionsRegistry implements IPermissionsRegistry {
         ) {
           return {
             allowed: false,
-            reason: "Endpoint is not accessible via AI tools",
+            reason: "platformExcluded",
             blockedByRole: platformMarkers.includes(PlatformMarker.AI_TOOL_OFF)
               ? PlatformMarker.AI_TOOL_OFF
               : PlatformMarker.WEB_OFF,
@@ -151,7 +139,7 @@ class PermissionsRegistry implements IPermissionsRegistry {
         if (platformMarkers.includes(PlatformMarker.WEB_OFF)) {
           return {
             allowed: false,
-            reason: "Endpoint is not accessible via cron platform",
+            reason: "platformExcluded",
             blockedByRole: PlatformMarker.WEB_OFF,
           };
         }
@@ -165,7 +153,7 @@ class PermissionsRegistry implements IPermissionsRegistry {
         if (platformMarkers.includes(PlatformMarker.WEB_OFF)) {
           return {
             allowed: false,
-            reason: "Endpoint is not accessible via Web platform",
+            reason: "platformExcluded",
             blockedByRole: PlatformMarker.WEB_OFF,
           };
         }
@@ -192,7 +180,7 @@ class PermissionsRegistry implements IPermissionsRegistry {
     ) {
       return {
         allowed: false,
-        reason: "Endpoint is disabled in production environment",
+        reason: "productionDisabled",
         blockedByRole: PlatformMarker.PRODUCTION_OFF,
       };
     }
@@ -200,7 +188,7 @@ class PermissionsRegistry implements IPermissionsRegistry {
     if (!platformMarkers.includes(PlatformMarker.MCP_VISIBLE)) {
       return {
         allowed: false,
-        reason: "Endpoint is not listed on MCP (requires MCP_VISIBLE marker)",
+        reason: "mcpNotListed",
         blockedByRole: PlatformMarker.MCP_VISIBLE,
       };
     }
@@ -211,7 +199,7 @@ class PermissionsRegistry implements IPermissionsRegistry {
     ) {
       return {
         allowed: false,
-        reason: "Endpoint is explicitly excluded from MCP",
+        reason: "platformExcluded",
         blockedByRole: platformMarkers.includes(PlatformMarker.MCP_OFF)
           ? PlatformMarker.MCP_OFF
           : PlatformMarker.CLI_OFF,
@@ -225,18 +213,9 @@ class PermissionsRegistry implements IPermissionsRegistry {
     endpoint: CreateApiEndpointAny,
     user: JwtPayloadType,
     platform: Platform,
-    locale: CountryLanguage,
-  ): ResponseType<true> {
+  ): EndpointAccessResult {
     if (!endpoint.allowedRoles || !Array.isArray(endpoint.allowedRoles)) {
-      const { t } = scopedTranslation.scopedT(locale);
-      return {
-        success: false,
-        message: t("shared.permissions.errors.definitionError"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
-          error: "Endpoint allowedRoles is not properly configured",
-        },
-      };
+      return { allowed: false, denial: { cause: "allowedRolesMissing" } };
     }
 
     const platformAccess = this.checkPlatformAccess(
@@ -245,14 +224,12 @@ class PermissionsRegistry implements IPermissionsRegistry {
     );
     if (!platformAccess.allowed) {
       return {
-        success: false,
-        message: scopedTranslation
-          .scopedT(locale)
-          .t("shared.permissions.errors.platformAccessDenied", {
-            platform: String(platform),
-            reason: platformAccess.reason ?? "Platform not allowed",
-          }),
-        errorType: ErrorResponseTypes.FORBIDDEN,
+        allowed: false,
+        denial: {
+          cause: "platformDenied",
+          platform,
+          reason: platformAccess.reason ?? "platformExcluded",
+        },
       };
     }
 
@@ -263,25 +240,18 @@ class PermissionsRegistry implements IPermissionsRegistry {
       platform,
     );
     if (!hasPermission) {
-      const { t: tRoles } = userRolesScopedTranslation.scopedT(locale);
       return {
-        success: false,
-        message: scopedTranslation
-          .scopedT(locale)
-          .t("shared.permissions.errors.insufficientRoles", {
-            userId: user.isPublic ? "public" : user.id,
-            requiredRoles: endpoint.allowedRoles
-              .map((role) => tRoles(role))
-              .join(", "),
-            userRoles: user.roles?.length
-              ? user.roles.map((role) => tRoles(role)).join(", ")
-              : "none",
-          }),
-        errorType: ErrorResponseTypes.FORBIDDEN,
+        allowed: false,
+        denial: {
+          cause: "insufficientRoles",
+          userId: user.isPublic ? null : user.id,
+          requiredRoles: endpoint.allowedRoles,
+          userRoles: user.roles ?? [],
+        },
       };
     }
 
-    return { success: true, data: true };
+    return { allowed: true };
   }
 
   checkRolePermission(

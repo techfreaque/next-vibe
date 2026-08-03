@@ -4,41 +4,34 @@ import { and, eq, sql } from "drizzle-orm";
 import {
   type BridgeContext,
   ModalityResolver,
-} from "next-vibe/agent/ai-stream/repository/core/modality-resolver";
-import {
-  buildSystemPrompt,
-  createMetadataSystemMessage,
-} from "next-vibe/agent/ai-stream/system-prompt/builder";
+} from "../../repository/core/modality-resolver";
+import { buildSystemPrompt, createMetadataSystemMessage } from "../builder";
 import {
   type DefaultFolderId,
   rootlessToolExecutionContext,
-} from "next-vibe/agent/chat/config";
-import { CHAT_MESSAGE_COLUMNS, chatMessages } from "next-vibe/agent/chat/db";
-import { chatSettings } from "next-vibe/agent/chat/settings/db";
-import {
-  isSkillVariantId,
-  isUuid,
-  parseSkillId,
-} from "next-vibe/agent/chat/slugify";
-import { loadRawEmbeddingScores } from "next-vibe/agent/cortex/system-prompt";
-import { getInstanceAvailability } from "next-vibe/agent/env-availability";
+} from "../../../../core/execution-context";
+import { CHAT_MESSAGE_COLUMNS, chatMessages } from "../../../chat/db";
+import { chatSettings } from "../../../chat/settings/db";
+import { isSkillVariantId, isUuid, parseSkillId } from "../../../chat/slugify";
+import { loadRawEmbeddingScores } from "../../../cortex/system-prompt";
+import { getEnvAvailability } from "../../../env-availability";
 import {
   getBestImageGenModel,
   type ImageGenModelSelection,
-} from "next-vibe/agent/image-generation/models";
+} from "../../../image-generation/models";
 import {
   getBestMusicGenModel,
   type MusicGenModelSelection,
-} from "next-vibe/agent/music-generation/models";
+} from "../../../music-generation/models";
 import {
   chatFavorites,
   FAVORITE_CONFIG_COLUMNS,
   type FavoriteConfig,
-} from "next-vibe/agent/skills/favorites/db";
+} from "../../../skills/favorites/db";
 import {
   getBestVideoGenModel,
   type VideoGenModelSelection,
-} from "next-vibe/agent/video-generation/models";
+} from "../../../video-generation/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -118,7 +111,7 @@ export async function buildDebugSystemPrompt({
     const userId = user.isPublic ? undefined : user.id;
     const [favorite, availability] = await Promise.all([
       userId ? loadActiveFavorite(userId) : Promise.resolve(null),
-      getInstanceAvailability(),
+      getEnvAvailability(),
     ]);
 
     const bridgeContext: BridgeContext = {

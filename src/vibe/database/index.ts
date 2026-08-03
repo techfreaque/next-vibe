@@ -2,8 +2,8 @@ import "server-only";
 
 import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
 import { drizzle as drizzlePglite } from "drizzle-orm/pglite";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import { parseError } from "../core/utils/parse-error";
+import type { EndpointLogger } from "../logger/types";
 import type { Pool } from "pg";
 
 import {

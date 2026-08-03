@@ -1,22 +1,20 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
+import type { CountryLanguage } from "../../core/i18n/core/config";
 import type {
   ErrorResponseType,
   ResponseType,
-} from "next-vibe/core/route/response.schema";
-import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
-import {
-  isErrorResponseType,
-  parseError,
-} from "next-vibe/core/utils/parse-error";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../core/route/response.schema";
+import { ErrorResponseTypes, fail } from "../../core/route/response.schema";
+import { isErrorResponseType, parseError } from "../../core/utils/parse-error";
+import type { WidgetData } from "../../core/utils/json";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
 import { storage } from "next-vibe/ui/lib/storage";
-import { extractSchemaDefaults } from "next-vibe/unified-ui/_shared/utils";
-import { scopedTranslation as hooksTranslation } from "next-vibe/unified-ui/hooks/i18n";
+import { extractSchemaDefaults } from "../_shared/utils";
+import { scopedTranslation as hooksTranslation } from "./i18n";
 import { useCallback, useEffect, useMemo } from "react";
 import { useForm, type UseFormProps } from "react-hook-form";
 
@@ -134,10 +132,20 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
   const mergedDefaultValues: TEndpoint["types"]["FormValues"] = useMemo(() => {
     const provided = resolvedOptions.defaultValues;
     if (provided && Object.keys(provided).length > 0) {
+      // Only keys with an actual value override a schema default. Object.assign
+      // copies `undefined` entries too, so a caller passing a key it has no
+      // value for — the CLI builds one entry per known field — silently wiped
+      // out `.default(1)` and the form started empty.
+      const defined: Record<string, WidgetData> = {};
+      for (const [key, value] of Object.entries(provided)) {
+        if (value !== undefined) {
+          defined[key] = value;
+        }
+      }
       // Request outputs are always Zod object outputs; merge as records
       // (Object.assign avoids the "spread on non-object generic" error while
       // preserving the precise RequestOutput type).
-      return Object.assign({}, schemaDefaultValues, provided);
+      return Object.assign({}, schemaDefaultValues, defined);
     }
     return schemaDefaultValues;
   }, [schemaDefaultValues, resolvedOptions.defaultValues]);
@@ -398,13 +406,15 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
           errors: JSON.stringify(errors),
         });
 
-        // Create an error response for form validation errors
+        // The `.title` key renders generically elsewhere, so the field errors
+        // go in a sibling that can carry them.
         const errorResponse = fail({
           message: hooksTranslation
             .scopedT(locale)
-            .t("mutationForm.post.errors.validation_error.title"),
+            .t("mutationForm.post.errors.validation_error.detail", {
+              errors: JSON.stringify(errors),
+            }),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: { formErrors: JSON.stringify(errors) },
         });
 
         // Set the error in the form state so it's displayed

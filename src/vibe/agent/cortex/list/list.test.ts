@@ -9,12 +9,12 @@
 import "server-only";
 
 import { and, eq, like, or } from "drizzle-orm";
-import { DEFAULT_CHAT_MODEL_SELECTION } from "next-vibe/agent/ai-stream/constants";
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
-import { chatThreads } from "next-vibe/agent/chat/db";
-import { ThreadStatus } from "next-vibe/agent/chat/enum";
-import { customSkills } from "next-vibe/agent/skills/db";
-import { SkillCategory, SkillOwnershipType } from "next-vibe/agent/skills/enum";
+import { DEFAULT_CHAT_MODEL_SELECTION } from "../../ai-stream/constants";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
+import { chatThreads } from "../../chat/db";
+import { ThreadStatus } from "../../chat/enum";
+import { customSkills } from "../../skills/db";
+import { SkillCategory, SkillOwnershipType } from "../../skills/enum";
 import {
   ErrorResponseTypes,
   type ResponseType,
@@ -28,7 +28,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { cortexNodes } from "../db";
 import listEndpoint, {
   type CortexListResponseOutput,
-} from "../list/definition";
+} from "./definition";
 import mkdirEndpoint from "../mkdir/definition";
 import writeEndpoint from "../write/definition";
 

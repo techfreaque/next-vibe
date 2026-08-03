@@ -5,8 +5,8 @@
 
 import * as readline from "node:readline";
 
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import { parseError } from "../../../core/utils/parse-error";
+import type { EndpointLogger } from "../../../logger/types";
 
 import type { JsonRpcRequest, JsonRpcResponse } from "../types";
 
@@ -62,7 +62,7 @@ export class StdioTransport implements IMCPTransport {
 
     // Handle close - stdin closed means the MCP client disconnected; exit cleanly
     this.readlineInterface.on("close", () => {
-      this.logger.info("[MCP Transport] STDIO closed, exiting");
+      this.logger.debug("[MCP Transport] STDIO closed, exiting");
       this.running = false;
       process.exit(0);
     });
@@ -128,7 +128,7 @@ export class StdioTransport implements IMCPTransport {
     }
 
     this.running = false;
-    this.logger.info("[MCP Transport] STDIO transport stopped");
+    this.logger.debug("[MCP Transport] STDIO transport stopped");
   }
 
   /**
@@ -137,7 +137,7 @@ export class StdioTransport implements IMCPTransport {
   // eslint-disable-next-line @typescript-eslint/require-await
   async send(message: JsonRpcResponse): Promise<void> {
     if (!this.running) {
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Transport infrastructure requires throwing for invalid state
+      // eslint-disable-next-line restricted/no-throw, i18next/no-literal-string -- Transport infrastructure requires throwing for invalid state
       throw new Error("Transport not running");
     }
 
@@ -151,7 +151,7 @@ export class StdioTransport implements IMCPTransport {
       this.logger.error("[MCP Transport] Failed to send message", {
         error: parseError(error).message,
       });
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Re-throw transport errors for caller to handle
+      // eslint-disable-next-line restricted/no-throw -- Re-throw transport errors for caller to handle
       throw error;
     }
   }

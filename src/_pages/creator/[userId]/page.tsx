@@ -96,6 +96,7 @@ export async function tanstackLoader({
     locale,
     creatorId: userId,
     viewer,
+    platform: Platform.NEXT_PAGE,
     initialData: response.success ? response.data : undefined,
   };
 }

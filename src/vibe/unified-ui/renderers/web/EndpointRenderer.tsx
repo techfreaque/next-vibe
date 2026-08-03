@@ -12,35 +12,35 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { WidgetType } from "next-vibe/core/definition/enums";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
+import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
+import { WidgetType } from "../../../core/definition/enums";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import type { TranslatedKeyType } from "../../../core/i18n/core/scoped-translation";
 import type {
   ContentBlock,
   ResponseType,
-} from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { Platform } from "next-vibe/platforms/platforms";
+} from "../../../core/route/response.schema";
+import type { WidgetData } from "../../../core/utils/json";
+import type { JwtPayloadType } from "../../../identity/auth/types";
+import type { EndpointLogger } from "../../../logger/types";
+import { Platform } from "../../../platforms/platforms";
 import { Div } from "next-vibe/ui/ui/div";
 import { Form } from "next-vibe/ui/ui/form/form";
 import {
   extractAllFields,
   scanForInlineButtons,
   withValueNonStrict,
-} from "next-vibe/unified-ui/_shared/field-helpers";
+} from "../../_shared/field-helpers";
 import type {
   EndpointFormValues,
   ReactWidgetContext,
-} from "next-vibe/unified-ui/_shared/react-types";
-import { isResponseField } from "next-vibe/unified-ui/_shared/type-guards";
-import { WidgetContextProvider } from "next-vibe/unified-ui/_shared/WidgetContextProvider";
+} from "../../_shared/react-types";
+import { isResponseField } from "../../_shared/type-guards";
+import { WidgetContextProvider } from "../../_shared/WidgetContextProvider";
 import {
   useNavigationStack,
   type UseNavigationStackReturn,
-} from "next-vibe/unified-ui/hooks/use-navigation-stack";
+} from "../../hooks/use-navigation-stack";
 import type { JSX } from "react";
 import { useCallback, useMemo } from "react";
 import type {
@@ -135,7 +135,7 @@ interface EndpointRendererProps<TEndpoint extends CreateApiEndpointAny> {
    *  Use this to embed endpoint fields inside an existing form (avoids nested <form>). */
   _noFormElement?: boolean;
   /** Platform identifier - defaults to NEXT_PAGE */
-  platform?: Platform;
+  platform: Platform;
   /** When true, only renders response fields (used by CLI result formatter) */
   responseOnly?: boolean;
   /** Navigation override — replaces the default NavigationStack navigation in widget context */
@@ -315,7 +315,7 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
     data &&
     typeof data === "object" &&
     !Array.isArray(data) &&
-    "__isContentResponse" in data &&
+    "isContentResponse" in data &&
     "content" in data &&
     Array.isArray(data.content)
   ) {

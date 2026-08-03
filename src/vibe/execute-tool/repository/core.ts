@@ -15,11 +15,11 @@
 
 import "server-only";
 
-import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
-import { getFullPath } from "next-vibe/core/core-utils/path";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { GenericHandlerBase } from "next-vibe/core/route/handler";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
+import { getFullPath } from "../../core/core-utils/path";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import type { GenericHandlerBase } from "../../core/route/handler";
+import type { ResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
@@ -27,15 +27,17 @@ import {
   isFileResponse,
   isStreamingResponse,
   success,
-} from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { Platform } from "next-vibe/platforms/platforms";
+} from "../../core/route/response.schema";
+import type { WidgetData } from "../../core/utils/json";
+import { parseError } from "../../core/utils/parse-error";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
+import { Platform } from "../../platforms/platforms";
 
 import { scopedTranslation as systemScopedTranslation } from "@/_pages/shared/i18n";
 import { getEndpoint } from "@/generated/endpoints/endpoint";
+
+import { toAiToolResult } from "./result-ai-parts";
 
 export class RouteExecutionExecutor {
   /**
@@ -72,17 +74,21 @@ export class RouteExecutionExecutor {
         // is mid-evaluation. A beat later the fully-evaluated module is cached
         // and the same import succeeds.
         const { getRouteHandler } = await import("@/generated/routes/handlers");
-        for (let attempt = 0; attempt < 4; attempt++) {
+        // 8 attempts x 100ms backoff (2800ms total window). More, shorter
+        // retries beat fewer, longer ones here: the partial-namespace window is
+        // brief, so retrying sooner usually succeeds on attempt 2-3, while the
+        // wider total window still covers a slow cold evaluation.
+        for (let attempt = 0; attempt < 8; attempt++) {
           if (attempt > 0) {
             await new Promise((resolve) => {
-              setTimeout(resolve, 200 * attempt);
+              setTimeout(resolve, 100 * attempt);
             });
           }
           try {
             handlerResult = await getRouteHandler(params.toolName);
             break;
           } catch (importError) {
-            if (attempt === 3) {
+            if (attempt === 7) {
               // oxlint-disable-next-line restricted-syntax -- re-throw into the existing catch
               throw importError;
             }
@@ -141,33 +147,12 @@ export class RouteExecutionExecutor {
         });
       }
 
-      // Content responses carry mixed content blocks (text + images).
-      // For AI platform: convert to ToolResultOutput { type: "content", value: [...] } so
-      // the AI SDK sends image parts as structured image-data (image tokens) instead of
-      // serializing the ContentResponse as raw JSON text (which counts base64 as millions
-      // of text tokens and causes context overflow).
+      // Content responses carry mixed content blocks (text + images). Every
+      // surface but AI takes them as-is; AI needs the SDK's structured part
+      // shape (see ./result-ai-parts for why).
       if (isContentResponse(result)) {
         if (params.platform === Platform.AI) {
-          type AiPart =
-            | { type: "text"; text: string }
-            | { type: "image-data"; data: string; mediaType: string };
-          const parts: AiPart[] = [];
-          for (const b of result.content) {
-            if (b.type === "text") {
-              parts.push({ type: "text", text: b.text });
-            } else if (b.type === "image") {
-              parts.push({
-                type: "image-data",
-                data: b.data,
-                mediaType: b.mimeType,
-              });
-            }
-          }
-          return success(
-            (parts.length > 0
-              ? { type: "content", value: parts }
-              : { status: "screenshot_taken" }) as TResult,
-          );
+          return success(toAiToolResult<TResult>(result.content));
         }
         return success(result as TResult);
       }
@@ -191,8 +176,12 @@ export class RouteExecutionExecutor {
           error: parsedError.message,
         },
       );
+      // `cli.vibe.errors.unknownError` is rendered bare as the CLI error
+      // formatter's fallback label, so the cause goes in its own key.
       return fail({
-        message: t("cli.vibe.errors.unknownError"),
+        message: t("cli.vibe.errors.unknownErrorDetail", {
+          error: parsedError.message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

@@ -165,7 +165,7 @@ async function testWindowFetch(): Promise<Response> {
 // ============================================================================
 
 async function testAllowedFetch(): Promise<Response> {
-  // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external API
+  // oxlint-disable-next-line restricted/restricted-syntax -- external API
   return await fetch("https://example.com");
 }
 

@@ -170,6 +170,7 @@ export const translations: typeof enTranslations = {
       server: {
         title: "Serverfehler",
         description: "Interner Serverfehler aufgetreten",
+        detail: "Testversand fehlgeschlagen: {{error}}",
       },
       unknown: {
         title: "Unbekannter Fehler",
@@ -196,11 +197,13 @@ export const translations: typeof enTranslations = {
         description: "Datenkonflikt aufgetreten",
       },
       templateNotFound: {
-        title: "Vorlage nicht gefunden",
+        title:
+          "Keine Vorlage für {{emailJourneyVariant}} / {{emailCampaignStage}}",
         description: "E-Mail-Vorlage für angegebene Parameter nicht gefunden",
       },
       sendingFailed: {
-        title: "Senden fehlgeschlagen",
+        title:
+          "Versand an {{recipient}} fehlgeschlagen ({{subject}}): {{error}}",
         description: "Test-E-Mail konnte nicht gesendet werden",
       },
     },

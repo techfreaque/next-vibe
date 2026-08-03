@@ -97,9 +97,8 @@ export class MessengerSendRepository {
       const parsedError = parseError(error);
       logger.error("Messenger send: Critical error", parsedError);
       return fail({
-        message: t("errors.server.title"),
+        message: t("errors.server.detail", { error: parsedError.message }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
       });
     }
   }

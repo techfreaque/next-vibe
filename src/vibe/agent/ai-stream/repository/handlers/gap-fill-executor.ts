@@ -22,12 +22,12 @@ import type {
   TextPart,
   ToolResultPart,
 } from "ai";
-import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
-import { getInstanceAvailability } from "next-vibe/agent/env-availability";
-import { IMAGE_GEN_ALIAS } from "next-vibe/agent/image-generation/constants";
-import type { Modality } from "next-vibe/agent/models/enum";
-import { AUDIO_GEN_TOOL_NAME } from "next-vibe/agent/music-generation/constants";
-import { VIDEO_GEN_TOOL_NAME } from "next-vibe/agent/video-generation/constants";
+import type { ToolExecutionContext } from "../../../../core/execution-context";
+import { getEnvAvailability } from "../../../env-availability";
+import { IMAGE_GEN_ALIAS } from "../../../image-generation/constants";
+import type { Modality } from "../../../models/enum";
+import { AUDIO_GEN_TOOL_NAME } from "../../../music-generation/constants";
+import { VIDEO_GEN_TOOL_NAME } from "../../../video-generation/constants";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -77,7 +77,7 @@ export class GapFillExecutor {
       locale,
     } = params;
 
-    const availability = await getInstanceAvailability();
+    const availability = await getEnvAvailability();
 
     // Invariant bridge-call context — shared by every attachment bridge below.
     const bridge = {

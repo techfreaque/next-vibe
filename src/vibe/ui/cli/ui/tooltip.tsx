@@ -2,11 +2,13 @@
  * CLI Tooltip
  *
  * In terminal there are no hover states.
- * - TooltipTrigger: renders children (the interactive element)
+ * - TooltipTrigger: suppressed. Its children are the hover affordance itself —
+ *   an info icon that exists only to reveal the tooltip — so on a surface with
+ *   no hover it would render a glyph that does nothing.
  * - TooltipContent: suppressed in CLI (noise), compact in MCP
  */
 import { Text } from "ink";
-import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import * as React from "react";
 
 export type {

@@ -2,7 +2,7 @@
  * UI Component Exports
  *
  * This file re-exports all UI components and functions (excluding types).
- * For icons, use `export * from "../../native/ui/icons"` to get all icon exports.
+ * For icons, use `export * from "./icons"` to get all icon exports.
  */
 
 // ============================================================================
@@ -196,32 +196,32 @@ void testFormElement;
 export * from "./form-element";
 
 // form/endpoint-form-field
-import * as EndpointFormField from "../../native/ui/form/endpoint-form-field";
+import * as EndpointFormField from "./form/endpoint-form-field";
 import type * as webEndpointFormField from "../../web/ui/form/endpoint-form-field";
 const testEndpointFormField: typeof webEndpointFormField = EndpointFormField;
 void testEndpointFormField;
-export * from "../../native/ui/form/endpoint-form-field";
+export * from "./form/endpoint-form-field";
 
 // form/form
-import * as FormForm from "../../native/ui/form/form";
+import * as FormForm from "./form/form";
 import type * as webFormForm from "../../web/ui/form/form";
 const testFormForm: typeof webFormForm = FormForm;
 void testFormForm;
-export * from "../../native/ui/form/form";
+export * from "./form/form";
 
 // form/form-alert
-import * as FormAlert from "../../native/ui/form/form-alert";
+import * as FormAlert from "./form/form-alert";
 import type * as webFormAlert from "../../web/ui/form/form-alert";
 const testFormAlert: typeof webFormAlert = FormAlert;
 void testFormAlert;
-export * from "../../native/ui/form/form-alert";
+export * from "./form/form-alert";
 
 // form/form-section
-import * as FormSection from "../../native/ui/form/form-section";
+import * as FormSection from "./form/form-section";
 import type * as webFormSection from "../../web/ui/form/form-section";
 const testFormSection: typeof webFormSection = FormSection;
 void testFormSection;
-export * from "../../native/ui/form/form-section";
+export * from "./form/form-section";
 
 // ============================================================================
 // Layout & Container Components

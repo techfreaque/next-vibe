@@ -180,7 +180,7 @@ const DEFAULT_MESSAGES: BoilerplateMessages = {
   i18nEnExtraDeclaration:
     "i18n/en/index.ts must contain only the `export const translations` declaration.",
   i18nLangWrongImport:
-    "i18n/de or i18n/pl index.ts may only import `type { translations as enTranslations } from 'next-vibe/ui/ui/src/vibe/generated/endpoints/meta/en'`.",
+    "i18n/de or i18n/pl index.ts may only import `type { translations as enTranslations } from '../en'`.",
   i18nLangNotSingleExport:
     "i18n/de or i18n/pl index.ts must export exactly one `export const translations: typeof enTranslations = { ... }`.",
   i18nLangExtraDeclaration:
@@ -189,7 +189,7 @@ const DEFAULT_MESSAGES: BoilerplateMessages = {
     "i18n/de or i18n/pl `translations` must be typed as `typeof enTranslations`.",
   // i18n/index.ts (root scoped translation factory)
   i18nIndexWrongImport:
-    "i18n/index.ts may only import `createScopedTranslation` from 'next-vibe/core/i18n/core/scoped-translation' and `translations as enTranslations` from 'next-vibe/ui/ui/icons/src/vibe/generated/endpoints/meta/en'.",
+    "i18n/index.ts may only import `createScopedTranslation` from '../../../../../../../core/i18n/core/scoped-translation' and `translations as enTranslations` from './en'.",
   i18nIndexMissingScopedTranslation:
     "i18n/index.ts must export `const scopedTranslation = createScopedTranslation({...})` and type exports for TranslationKey and T.",
   i18nIndexExtraDeclaration:
@@ -346,13 +346,13 @@ function isAllowedRouteImport(source: string): boolean {
   if (/(^|\/)dataflow\/repository$/.test(source)) {
     return true;
   }
-  if (source.includes("next-vibe/core/definition/enums")) {
+  if (source.includes("core/definition/enums")) {
     return true;
   }
   if (source.includes("/email")) {
     return true;
   }
-  if (source.includes("next-vibe/core/route/multi")) {
+  if (source.includes("core/route/multi")) {
     return true;
   }
   return false;
@@ -667,8 +667,8 @@ const i18nPatternRule = {
     if (isIndex) {
       // i18n/index.ts: scoped translation factory
       // Allowed imports:
-      //   import { createScopedTranslation } from 'next-vibe/core/i18n/core/scoped-translation'
-      //   import { translations as enTranslations } from 'next-vibe/ui/ui/icons/src/vibe/generated/endpoints/meta/en'
+      //   import { createScopedTranslation } from '../../../../../../../core/i18n/core/scoped-translation'
+      //   import { translations as enTranslations } from './en'
       // Allowed exports:
       //   export const scopedTranslation = createScopedTranslation({...})
       //   export type [Name]TranslationKey = ...
@@ -687,7 +687,7 @@ const i18nPatternRule = {
           }
 
           const isAllowed =
-            source === "next-vibe/core/i18n/core/scoped-translation" ||
+            /(^|\/)core\/i18n\/core\/scoped-translation$/.test(source) ||
             source === "./en";
 
           if (!isAllowed) {
@@ -787,7 +787,7 @@ const i18nPatternRule = {
           return;
         }
 
-        // de/pl: only allowed import is `import type { translations as enTranslations } from 'next-vibe/ui/ui/src/vibe/generated/endpoints/meta/en'`
+        // de/pl: only allowed import is `import type { translations as enTranslations } from '../en'`
         if (isLang) {
           const imp = node as ImportDeclaration;
           const source = imp.source.value;

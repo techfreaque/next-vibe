@@ -5,30 +5,30 @@
  *         Resolution controls bucket size; cursor enables backwards pagination.
  */
 
-import { dateSchema } from "next-vibe/core/definition/common.schema";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { dateSchema } from "../../../../core/definition/common.schema";
+import { createEndpoint } from "../../../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
+} from "../../../../core/definition/enums";
 import {
   GraphOwnerType,
   GraphResolution,
   GraphResolutionDB,
-} from "next-vibe/dataflow/enum";
-import { graphConfigSchema } from "next-vibe/dataflow/graph/schema";
-import { scopedTranslation } from "next-vibe/dataflow/graphs/[id]/data/i18n";
-import { UserRole } from "next-vibe/identity/roles/enum";
-import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
+} from "../../../enum";
+import { graphConfigSchema } from "../../../graph/schema";
+import { scopedTranslation } from "./i18n";
+import { UserRole } from "../../../../identity/roles/enum";
+import { customWidgetObject } from "../../../../unified-ui/_shared/utils";
 import {
   objectField,
   requestField,
   requestUrlPathParamsField,
   responseArrayField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../../../unified-ui/_shared/utils-i18n";
 import React from "react";
 import { z } from "zod";
 
@@ -62,7 +62,7 @@ const { GET } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         listEndpoint: async () =>
-          (await import("next-vibe/dataflow/graphs/definition")).default.GET,
+          (await import("../../definition")).default.GET,
         labelField: "name",
         label: "get.fields.id.label",
         description: "get.fields.id.description",

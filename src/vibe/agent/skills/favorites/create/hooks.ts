@@ -6,7 +6,7 @@
 
 "use client";
 
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
+import { useProviderAvailability } from "../../../env-availability-store";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -168,7 +168,6 @@ export function useAddToFavorites({
             undefined,
             { id: plainSkillId },
             locale,
-            availability,
           );
 
           if (!characterResponse.success) {
@@ -218,7 +217,6 @@ export function useAddToFavorites({
         },
         undefined,
         locale,
-        availability,
       );
 
       if (!createResponse.success) {
@@ -250,7 +248,6 @@ export function useAddToFavorites({
             { skillId: plainSkillId },
             undefined,
             locale,
-            availability,
           );
         })();
       }

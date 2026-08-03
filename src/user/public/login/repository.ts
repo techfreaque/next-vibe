@@ -225,12 +225,11 @@ export class LoginRepository {
       return sessionResponse;
     } catch (error) {
       return fail({
-        message: t("errors.auth_error"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
+        message: t("errors.auth_error", {
           email,
           error: parseError(error).message,
-        },
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -343,9 +342,8 @@ export class LoginRepository {
       );
       if (!userResponse.success) {
         return fail({
-          message: t("errors.user_not_found"),
+          message: t("errors.user_not_found", { userId }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { userId },
           cause: userResponse,
         });
       }
@@ -479,12 +477,11 @@ export class LoginRepository {
         error: parseError(error).message,
       });
       return fail({
-        message: t("errors.session_creation_failed"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
+        message: t("errors.session_creation_failed", {
           userId,
           error: parseError(error).message,
-        },
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -602,9 +599,8 @@ export class LoginRepository {
         );
         if (!user.success) {
           return fail({
-            message: t("errors.user_not_found"),
+            message: t("errors.user_not_found", { userId: email }),
             errorType: ErrorResponseTypes.NOT_FOUND,
-            messageParams: { userId: email },
             cause: user,
           });
         }
@@ -622,12 +618,11 @@ export class LoginRepository {
       return success(options);
     } catch (error) {
       return fail({
-        message: t("errors.auth_error"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
+        message: t("errors.auth_error", {
           email: email || "unknown",
           error: parseError(error).message,
-        },
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }

@@ -3,26 +3,27 @@
  * Defines endpoint for creating new favorites
  */
 
-import type { ChatModelSelection } from "next-vibe/agent/ai-stream/models";
-import { chatModelSelectionSchema } from "next-vibe/agent/ai-stream/models";
+import type { ChatModelSelection } from "../../../ai-stream/models";
+import { getClientAvailability } from "../../../env-availability-store";
+import { chatModelSelectionSchema } from "../../../ai-stream/models";
 import {
   audioVisionModelSelectionSchema,
   imageVisionModelSelectionSchema,
   videoVisionModelSelectionSchema,
-} from "next-vibe/agent/ai-stream/vision-models";
-import { imageGenModelSelectionSchema } from "next-vibe/agent/image-generation/models";
-import { musicGenModelSelectionSchema } from "next-vibe/agent/music-generation/models";
-import { sttModelSelectionSchema } from "next-vibe/agent/speech-to-text/models";
+} from "../../../ai-stream/vision-models";
+import { imageGenModelSelectionSchema } from "../../../image-generation/models";
+import { musicGenModelSelectionSchema } from "../../../music-generation/models";
+import { sttModelSelectionSchema } from "../../../speech-to-text/models";
 import {
   TtsModelId,
   voiceModelSelectionSchema,
-} from "next-vibe/agent/text-to-speech/models";
-import { videoGenModelSelectionSchema } from "next-vibe/agent/video-generation/models";
+} from "../../../text-to-speech/models";
+import { videoGenModelSelectionSchema } from "../../../video-generation/models";
 import {
   iconSchema,
   translatedValueSchema,
 } from "next-vibe/core/definition/common.schema";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -82,8 +83,8 @@ const { POST } = createEndpoint({
         logger,
         locale,
         user,
-        availability,
       }) => {
+        const availability = getClientAvailability();
         const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
         const favoritesDefinition = await import("../definition");
         const charactersDefinition = await import("../../definition");
@@ -112,7 +113,6 @@ const { POST } = createEndpoint({
             undefined,
             { id: resolvedSkillId },
             locale,
-            availability,
           );
         }
 

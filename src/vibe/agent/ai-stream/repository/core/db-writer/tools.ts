@@ -7,7 +7,7 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import type { ChatModelId } from "../../../models";
 import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";

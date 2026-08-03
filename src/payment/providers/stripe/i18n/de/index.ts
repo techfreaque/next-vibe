@@ -26,7 +26,7 @@ export const translations: typeof enTranslations = {
   status: {
     authenticated: "Authentifiziert und bereit",
     not_authenticated: "Nicht authentifiziert — führe 'stripe login' aus",
-    not_installed: "Stripe CLI ist nicht installiert",
+    not_installed: "Stripe CLI ist nicht installiert. {{instructions}}",
   },
 
   errors: {
@@ -51,6 +51,7 @@ export const translations: typeof enTranslations = {
       description: "Stripe CLI ist nicht installiert",
     },
     serverError: {
+      detail: "Stripe-CLI-Listener fehlgeschlagen: {{error}}",
       title: "Serverfehler",
       description: "Fehler beim Starten des Stripe Listeners",
     },
@@ -68,34 +69,45 @@ export const translations: typeof enTranslations = {
     },
     execution_failed: "Stripe CLI-Operation fehlgeschlagen",
     userNotFound: {
+      detail: "Kein Konto für Benutzer {{userId}} gefunden",
       title: "Benutzer nicht gefunden",
       description: "Der angegebene Benutzer wurde nicht gefunden",
     },
     customerCreationFailed: {
+      detail:
+        "Stripe-Kundenkonto konnte nicht angelegt werden: {{error}} (Benutzer {{userId}})",
       title: "Kundenerstellung fehlgeschlagen",
       description: "Stripe-Kunde konnte nicht erstellt werden",
     },
     customerRetrievalFailed: {
+      detail:
+        "Stripe-Kundendaten konnten nicht geladen werden: {{error}} (Benutzer {{userId}})",
       title: "Kundenabruf fehlgeschlagen",
       description: "Stripe-Kundeninformationen konnten nicht abgerufen werden",
     },
     checkoutCreationFailed: {
+      detail: "Bezahlvorgang konnte nicht gestartet werden: {{error}}",
       title: "Checkout-Erstellung fehlgeschlagen",
       description: "Stripe-Checkout-Sitzung konnte nicht erstellt werden",
     },
     webhookVerificationFailed: {
+      detail: "Stripe-Webhook konnte nicht verifiziert werden: {{error}}",
       title: "Webhook-Verifizierung fehlgeschlagen",
       description: "Webhook-Signatur konnte nicht verifiziert werden",
     },
     subscriptionRetrievalFailed: {
+      detail: "Abonnement konnte nicht von Stripe geladen werden: {{error}}",
       title: "Abonnement-Abruf fehlgeschlagen",
       description: "Abonnement konnte nicht von Stripe abgerufen werden",
     },
     subscriptionCancellationFailed: {
+      detail: "Abonnement konnte nicht gekündigt werden: {{error}}",
       title: "Abonnement-Kündigung fehlgeschlagen",
       description: "Abonnement konnte in Stripe nicht gekündigt werden",
     },
     priceCreationFailed: {
+      detail:
+        "Stripe-Preis konnte nicht angelegt werden: {{error}} (Produkt {{productId}})",
       title: "Preis-Erstellung fehlgeschlagen",
       description: "Preis konnte in Stripe nicht erstellt werden",
     },

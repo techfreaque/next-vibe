@@ -78,20 +78,26 @@ export const translations: typeof enTranslations = {
     email: {
       defaultSenderName: "System",
       errors: {
-        sending_failed: "Nie udało się wysłać e-maila do {{recipient}}",
+        sending_failed:
+          "Nie udało się wysłać e-maila do {{recipient}}: {{error}}",
+        invalid_locale:
+          "Nie można wysłać do {{recipient}}: '{{locale}}' to nieprawidłowa lokalizacja",
       },
     },
   },
   emailHandling: {
     email: {
       errors: {
-        rendering_failed: "Nie udało się renderować szablonu e-mail",
-        send_failed: "Nie udało się wysłać e-maila",
+        rendering_failed: "Nie udało się renderować szablonu e-mail: {{error}}",
+        send_failed: "Nie udało się wysłać e-maila: {{error}}",
         email_failed_subject: "E-mail nie powiódł się",
         unknown_recipient: "Nieznany odbiorca",
         unknown_sender: "System",
         email_render_exception: "Wystąpił wyjątek renderowania e-maila",
         batch_send_failed: "Nie udało się wysłać wsadowo e-maili",
+        batch_send_failed_item: "Wysyłka wsadowa nie powiodła się: {{error}}",
+        batch_send_failed_all:
+          "Nie udało się wysłać wsadowo e-maili: {{errors}}",
       },
     },
   },
@@ -104,23 +110,34 @@ export const translations: typeof enTranslations = {
       server: {
         title: "Błąd serwera",
         description: "Wystąpił błąd na serwerze SMTP",
+        detail: "Wysyłka SMTP nie powiodła się: {{error}}",
+        detail_account:
+          "Błąd SMTP na koncie {{accountName}} ({{accountId}}): {{error}}",
+        detail_attempt:
+          "Konto SMTP {{accountId}} zawiodło przy próbie {{attempt}}: {{error}}",
+        detail_exhausted: "Konto SMTP {{accountId}} wyczerpało wszystkie próby",
       },
       rejected: {
-        title: "Email odrzucony",
+        title: "E-mail do {{recipient}} odrzucony: {{reason}}",
         defaultReason: "Email odrzucony przez serwer",
       },
       no_recipients: {
-        title: "Brak zaakceptowanych odbiorców",
+        title: "Nie zaakceptowano odbiorcy {{recipient}}",
         defaultReason: "Brak zaakceptowanych odbiorców",
       },
       rate_limit: {
-        title: "Przekroczono limit szybkości",
+        title:
+          "Limit godzinowy konta {{accountName}} wyczerpany: wysłano {{current}}/{{limit}}, pozostało {{remainingCapacity}}",
       },
       capacity: {
-        title: "Błąd pojemności",
+        title: "Sprawdzenie pojemności nie powiodło się: {{error}}",
       },
       no_account: {
         title: "Brak dostępnego konta SMTP",
+        detail_criteria:
+          "Brak konta SMTP dla {{campaignType}} / {{journeyVariant}} / {{campaignStage}} / {{country}} / {{language}}",
+        detail_campaign: "Brak konta SMTP dla typu kampanii {{campaignType}}",
+        detail_account: "Nie znaleziono konta SMTP {{accountId}}",
       },
     },
   },
@@ -129,6 +146,10 @@ export const translations: typeof enTranslations = {
       server: {
         title: "Błąd serwera metadanych email",
         description: "Nie udało się zapisać metadanych emaila",
+        detail_store:
+          "Nie udało się zapisać metadanych dla {{recipient}}: {{error}}",
+        detail_engagement:
+          "Nie udało się zaktualizować interakcji dla wiadomości {{emailId}}: {{error}}",
       },
     },
   },

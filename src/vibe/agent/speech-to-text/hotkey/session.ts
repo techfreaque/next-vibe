@@ -85,7 +85,7 @@ export class SpeechHotkeySession {
    */
   async start(): Promise<void> {
     if (this.isRecording) {
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Session state error
+      // eslint-disable-next-line restricted/restricted-syntax, i18next/no-literal-string -- Session state error
       throw new SessionError(
         "Recording already in progress",
         "ALREADY_RECORDING",
@@ -132,7 +132,7 @@ export class SpeechHotkeySession {
         status: RecordingStatus.ERROR,
         lastError: error instanceof Error ? error : new Error(String(error)),
       };
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Session error
+      // eslint-disable-next-line restricted/restricted-syntax, i18next/no-literal-string -- Session error
       throw new SessionError(
         `Failed to start recording: ${String(error)}`,
         "START_FAILED",
@@ -146,7 +146,7 @@ export class SpeechHotkeySession {
    */
   async stop(): Promise<string> {
     if (!this.isRecording) {
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Session state error
+      // eslint-disable-next-line restricted/restricted-syntax, i18next/no-literal-string -- Session state error
       throw new SessionError(
         "No recording in progress",
         "NOT_RECORDING",
@@ -156,7 +156,7 @@ export class SpeechHotkeySession {
 
     const audioPath = this.state.currentRecordingPath;
     if (!audioPath) {
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Session state error
+      // eslint-disable-next-line restricted/restricted-syntax, i18next/no-literal-string -- Session state error
       throw new SessionError(
         "Recording path not found",
         "INVALID_STATE",
@@ -180,7 +180,7 @@ export class SpeechHotkeySession {
       // Validate audio file
       const isValid = await validateAudioFile(audioPath);
       if (!isValid) {
-        // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Session validation error
+        // eslint-disable-next-line restricted/restricted-syntax, i18next/no-literal-string -- Session validation error
         throw new Error("Invalid or empty audio file");
       }
 
@@ -191,7 +191,7 @@ export class SpeechHotkeySession {
         status: RecordingStatus.ERROR,
         lastError: error instanceof Error ? error : new Error(String(error)),
       };
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Session error
+      // eslint-disable-next-line restricted/restricted-syntax, i18next/no-literal-string -- Session error
       throw new SessionError(
         `Failed to stop recording: ${String(error)}`,
         "STOP_FAILED",
@@ -268,7 +268,7 @@ export class SpeechHotkeySession {
         await this.cleanupTempFile(audioPath);
       }
 
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Session error
+      // eslint-disable-next-line restricted/restricted-syntax, i18next/no-literal-string -- Session error
       throw new SessionError(
         `Failed to transcribe and insert: ${errorName}: ${errorMessage}${errorStack ? `\n${errorStack}` : ""}`,
         "INSERT_FAILED",

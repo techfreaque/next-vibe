@@ -7,6 +7,7 @@ import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
+import { Platform } from "next-vibe/platforms/platforms";
 import { redirect } from "next-vibe/ui/lib/redirect";
 import { Div } from "next-vibe/ui/ui/div";
 import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
@@ -28,6 +29,7 @@ export interface SignUpPageData {
   locale: CountryLanguage;
   user: JwtPayloadType | null;
   initialReferralCode: string | null;
+  platform: Platform;
 }
 
 /**
@@ -92,7 +94,12 @@ export async function tanstackLoader({
   }
 
   if (!user.success) {
-    return { locale, user: null, initialReferralCode: null };
+    return {
+      locale,
+      user: null,
+      initialReferralCode: null,
+      platform: Platform.NEXT_PAGE,
+    };
   }
 
   const leadId = user.data.leadId;
@@ -132,13 +139,19 @@ export async function tanstackLoader({
     }
   }
 
-  return { locale, user: user.data, initialReferralCode };
+  return {
+    locale,
+    user: user.data,
+    initialReferralCode,
+    platform: Platform.NEXT_PAGE,
+  };
 }
 
 export function TanstackPage({
   locale,
   user,
   initialReferralCode,
+  platform,
 }: SignUpPageData): JSX.Element {
   const { t } = pageT.scopedT(locale);
 
@@ -159,6 +172,7 @@ export function TanstackPage({
         locale={locale}
         initialReferralCode={initialReferralCode}
         user={user}
+        platform={platform}
       />
     </>
   );

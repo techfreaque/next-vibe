@@ -1,29 +1,29 @@
 // Testing infrastructure - test descriptions are for developers, not end users
 
-import { rootlessToolExecutionContext } from "next-vibe/agent/chat/config";
+import { rootlessToolExecutionContext } from "next-vibe/core/execution-context";
 import type {
   CreateApiEndpoint,
   InferRequestOutput,
   InferResponseOutput,
   InferUrlVariablesOutput,
-} from "next-vibe/core/definition/create";
-import type { Methods } from "next-vibe/core/definition/enums";
-import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
+} from "../../../core/definition/create";
+import type { Methods } from "../../../core/definition/enums";
+import { ErrorResponseTypes } from "../../../core/route/response.schema";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
-} from "next-vibe/identity/auth/types";
+} from "../../../identity/auth/types";
 import {
   UserPermissionRole,
   UserRole,
   type UserRoleValue,
-} from "next-vibe/identity/roles/enum";
-import type { EndpointEventsMap } from "next-vibe/realtime/structured-events";
-import type { UnifiedField } from "next-vibe/unified-ui/_shared/configs";
+} from "../../../identity/roles/enum";
+import type { EndpointEventsMap } from "../../../realtime/core/structured-events";
+import type { UnifiedField } from "../../../unified-ui/_shared/configs";
 import type {
   AnyChildrenConstrain,
   FieldUsageConfig,
-} from "next-vibe/unified-ui/_shared/types";
+} from "../../../unified-ui/_shared/types";
 import { beforeAll, describe, expect, it } from "vitest";
 import type { z } from "zod";
 
@@ -185,10 +185,16 @@ export function testEndpoint<
                 if (
                   response.errorType?.errorCode ===
                     ErrorResponseTypes.INTERNAL_ERROR.errorCode &&
-                  response.messageParams?.error
+                  response.message
                 ) {
                   // Only fail if it's a test infrastructure error (route not found, handler missing, etc.)
-                  const errorMsg = String(response.messageParams.error);
+                  const errorMsg = response.message;
+                  // Substring probes, not key lookups: "Route module not found"
+                  // and "Handler not found" come from the route executor, while
+                  // "Streaming responses are not supported" is the EN text of
+                  // `errors.streamingUnsupported` in testing/test/i18n. Tests always
+                  // run under defaultLocale, so matching EN is sound - but changing
+                  // any of those strings must update these probes in the same edit.
                   const isInfraError =
                     errorMsg.includes("Route module not found") ||
                     errorMsg.includes("Handler not found") ||

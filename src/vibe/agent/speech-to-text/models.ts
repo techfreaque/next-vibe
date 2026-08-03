@@ -161,11 +161,6 @@ function buildSttModelOptions(): SttModelOption[] {
 
 export const sttModelOptions: SttModelOption[] = buildSttModelOptions();
 
-export const SttModelIdOptions = Object.values(SttModelId).map((id) => ({
-  value: id,
-  label: sttModelOptions.find((m) => m.id === id)?.name ?? id,
-}));
-
 // ============================================================
 // STT MODEL SELECTION SCHEMA
 // ============================================================

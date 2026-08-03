@@ -6,11 +6,11 @@
 import "server-only";
 
 import type { ModelMessage } from "ai";
-import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
+import type { ToolExecutionContext } from "../../../../core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { DefaultFolderId } from "../../../chat/config";
+import type { DefaultFolderId } from "../../../../core/execution-context";
 import type { ChatMessage, ToolCall } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
 import { MessagesRepository } from "../../../chat/threads/[threadId]/messages/repository";
@@ -254,7 +254,7 @@ export async function buildMessageContext(
         messageHistoryLength: params.messageHistory.length,
       },
     );
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Security violation should throw immediately
+    // eslint-disable-next-line restricted/restricted-syntax -- Security violation should throw immediately
     throw new Error(
       "messageHistory is only allowed for incognito mode. Server-side threads fetch history from database.",
     );

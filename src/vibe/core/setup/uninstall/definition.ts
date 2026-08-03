@@ -4,37 +4,45 @@
  * Following migration guide: Files at level of usage, split god repositories
  */
 
-import { translatedValueSchema } from "next-vibe/core/definition/common.schema";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { UserRole } from "../../../identity/roles/enum";
+import { createEndpoint } from "../../definition/create";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { scopedTranslation } from "next-vibe/core/setup/uninstall/i18n";
-import { UserRole } from "next-vibe/identity/roles/enum";
+} from "../../definition/enums";
+import { CLI_BINARY_NAME } from "../../../platforms/cli/types/cli-target";
+import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
 import {
-  objectField,
+  customWidgetObject,
   requestField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../../unified-ui/_shared/utils";
 import { z } from "zod";
+
+const SetupUninstallWidget = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.SetupUninstallWidget })),
+);
 
 /**
  * Setup Uninstall Endpoint Definition
  */
 const { POST } = createEndpoint({
-  scopedTranslation,
-  title: "post.title",
-  titleShort: "post.titleShort",
-  description: "post.description",
+  title: `Uninstall the ${CLI_BINARY_NAME} command`,
+  titleShort: "Uninstall CLI",
+  description: `Remove the global ${CLI_BINARY_NAME} command from every location the installer may have written it to. Leaves this project untouched.`,
   icon: "package",
   category: "devTools",
   subCategory: "interfacesCli",
-  tags: ["post.title"],
-  allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF],
+  tags: ["Uninstall"],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.CLI_AUTH_BYPASS,
+    UserRole.WEB_OFF,
+    UserRole.AI_TOOL_OFF,
+    UserRole.PRODUCTION_OFF,
+  ],
   aliases: ["uninstall", "setup:uninstall"],
   method: Methods.POST,
   path: ["vibe", "core", "setup", "uninstall"],
@@ -53,63 +61,60 @@ const { POST } = createEndpoint({
         results: [
           {
             key: "src/vibe/platforms/cli",
-            description: "vibe command",
+            description: `the global ${CLI_BINARY_NAME} command`,
             summary: "removed 1 binary shim(s)",
             ok: true,
           },
         ],
-        message: "Vibe CLI uninstalled successfully",
+        message: "Operation completed successfully",
       },
       verbose: {
         success: true,
         results: [
           {
             key: "src/vibe/platforms/cli",
-            description: "vibe command",
+            description: `the global ${CLI_BINARY_NAME} command`,
             summary: "removed 1 binary shim(s)",
             ok: true,
           },
           {
             key: "src/vibe/platforms/mcp",
-            description: "MCP config",
+            description:
+              "MCP server config for Claude Code, Cursor and VS Code",
             summary: "removed 3 MCP config file(s)",
             ok: true,
           },
         ],
-        message: "Vibe CLI uninstalled successfully",
+        message: "Operation completed successfully",
       },
     },
   },
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "post.title",
-    description: "post.description",
-    layoutType: LayoutType.GRID,
-    columns: 12,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: SetupUninstallWidget,
+    usage: { request: "data", response: true } as const,
     children: {
       // === REQUEST FIELDS ===
-      verbose: requestField(scopedTranslation, {
+      verbose: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "post.title",
-        description: "post.description",
+        label: "Verbose",
+        description: "List every file that was removed.",
         columns: 6,
         schema: z.boolean().default(false),
       }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(scopedTranslation, {
+      success: responseField({
         type: WidgetType.TEXT,
-        label: "post.success.title",
+        label: "Success",
         schema: z.boolean(),
       }),
 
       // One entry per discovered setup.ts — the mirror of install.
-      results: responseField(scopedTranslation, {
+      results: responseField({
         type: WidgetType.TEXT,
-        label: "post.title",
+        label: "Setups",
         schema: z.array(
           z.object({
             key: z.string(),
@@ -120,10 +125,10 @@ const { POST } = createEndpoint({
         ),
       }),
 
-      message: responseField(scopedTranslation, {
+      message: responseField({
         type: WidgetType.TEXT,
-        label: "post.success.description",
-        schema: translatedValueSchema,
+        label: "Result",
+        schema: z.string().optional(),
       }),
     },
   }),
@@ -131,47 +136,47 @@ const { POST } = createEndpoint({
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "post.errors.validation.title",
-      description: "post.errors.validation.description",
+      title: "Validation Error",
+      description: "Invalid request parameters",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "post.errors.unauthorized.title",
-      description: "post.errors.unauthorized.description",
+      title: "Unauthorized",
+      description: "Authentication required",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "post.errors.server.title",
-      description: "post.errors.server.description",
+      title: "Server Error",
+      description: "Internal server error occurred",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "post.errors.network.title",
-      description: "post.errors.network.description",
+      title: "Network Error",
+      description: "Network error occurred",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "post.errors.forbidden.title",
-      description: "post.errors.forbidden.description",
+      title: "Forbidden",
+      description: "Access forbidden",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "post.errors.notFound.title",
-      description: "post.errors.notFound.description",
+      title: "Not Found",
+      description: "Resource not found",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "post.errors.unknown.title",
-      description: "post.errors.unknown.description",
+      title: "Unknown Error",
+      description: "An unknown error occurred",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "post.errors.conflict.title",
-      description: "post.errors.conflict.description",
+      title: "Conflict",
+      description: "Data conflict occurred",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "post.errors.conflict.title",
-      description: "post.errors.conflict.description",
+      title: "Conflict",
+      description: "Data conflict occurred",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "post.success.title",
-    description: "post.success.description",
+    title: "Success",
+    description: "Operation completed successfully",
   },
 });
 

@@ -2,7 +2,7 @@
  * UI Component Exports
  *
  * This file re-exports all UI components and functions (excluding types).
- * For icons, use `export * from "../../web/ui/icons"` to get all icon exports.
+ * For icons, use `export * from "./icons"` to get all icon exports.
  */
 
 // ============================================================================
@@ -212,7 +212,7 @@ export {
 export { FormElement } from "./form-element";
 
 // form/endpoint-form-field
-export { EndpointFormField } from "../../web/ui/form/endpoint-form-field";
+export { EndpointFormField } from "./form/endpoint-form-field";
 
 // form/form
 export {
@@ -224,13 +224,13 @@ export {
   FormLabel,
   FormMessage,
   useFormField,
-} from "../../web/ui/form/form";
+} from "./form/form";
 
 // form/form-alert
-export { FormAlert } from "../../web/ui/form/form-alert";
+export { FormAlert } from "./form/form-alert";
 
 // form/form-section
-export { FormFieldGroup, FormSection } from "../../web/ui/form/form-section";
+export { FormFieldGroup, FormSection } from "./form/form-section";
 
 // ============================================================================
 // Layout & Container Components

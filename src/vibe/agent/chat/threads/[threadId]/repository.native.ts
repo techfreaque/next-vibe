@@ -3,9 +3,9 @@
  * Implements ThreadByIdRepository static interface for React Native
  */
 
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { RemoteEventHandlerProps } from "next-vibe/core/route/handler";
+import type { RemoteEventHandlerProps } from "next-vibe/core/route/handler-realtime";
 import {
   ErrorResponseTypes,
   fail,
@@ -58,7 +58,6 @@ export class ThreadByIdRepository {
       success: false,
       errorType: response.errorType,
       message: response.message,
-      messageParams: response.messageParams,
     };
   }
 

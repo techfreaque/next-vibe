@@ -1,16 +1,16 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { ResponseType } from "../../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { InfraT } from "next-vibe/tooling/infra/i18n";
+} from "../../../../core/route/response.schema";
+import { parseError } from "../../../../core/utils/parse-error";
+import { db } from "../../../../database";
+import type { EndpointLogger } from "../../../../logger/types";
+import type { InfraT } from "../../i18n";
 
 import {
   getConnectionCredentials,

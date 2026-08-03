@@ -3,8 +3,8 @@
  * Handles GET, PUT, DELETE for individual cron tasks
  */
 
-import { Methods } from "next-vibe/core/definition/enums";
-import { endpointsHandler } from "next-vibe/core/route/multi";
+import { Methods } from "../../../core/definition/enums";
+import { endpointsHandler } from "../../../core/route/multi";
 
 import { CronTasksRepository } from "../repository";
 import { endpoints } from "./definition";

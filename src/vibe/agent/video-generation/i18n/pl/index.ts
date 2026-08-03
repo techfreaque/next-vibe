@@ -109,6 +109,7 @@ export const translations: typeof enTranslations = {
         "Wybrany model nie obsługuje generowania wideo. Wybierz model wideo.",
       notConfigured:
         "{{label}} nie jest skonfigurowany. Dodaj {{envKey}} do pliku .env. Pobierz klucz pod adresem {{url}}",
+      providerUnsupported: "{{label}} nie jest jeszcze obsługiwany",
       insufficientCredits:
         "Niewystarczające kredyty. Saldo: {{balance}}, wymagane: {{minimum}}",
       balanceCheckFailed: "Nie udało się sprawdzić salda kredytów",
@@ -121,6 +122,15 @@ export const translations: typeof enTranslations = {
       generationFailed: "Generowanie wideo nie powiodło się: {{error}}",
       providerError: "Błąd dostawcy: {{error}}",
       noVideoUrl: "Dostawca nie zwrócił URL wideo",
+      generationFailedUnknown:
+        "Generowanie wideo nie powiodło się – dostawca nie podał powodu",
+      providerErrorUnknown: "Dostawca zgłosił błąd bez żadnego komunikatu",
+      nonJsonResponse:
+        "Dostawca wideo zwrócił odpowiedź spoza JSON (HTTP {{status}}): {{body}}",
+      providerHttpError: "Dostawca wideo zwrócił HTTP {{status}}: {{body}}",
+      jobFailedStatus: "Zadanie wideo zakończyło się ze statusem: {{status}}",
+      requestAborted: "Generowanie wideo zostało przerwane",
+      requestTimedOut: "Przekroczono czas oczekiwania na generowanie wideo",
       creditsFailed: "Nie udało się odjąć kredytów za generowanie wideo",
       inputMediaRequired:
         "Ten model wymaga URL obrazu wejściowego. Wklej link do obrazu, który chcesz animować.",

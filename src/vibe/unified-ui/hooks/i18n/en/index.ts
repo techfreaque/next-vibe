@@ -124,10 +124,21 @@ export const translations = {
   },
   apiUtils: {
     errors: {
+      // Bare labels - kept placeholder-free for generic rendering.
       http_error: "HTTP Error",
       validation_error: "Validation Error",
       internal_error: "Internal Error",
       auth_required: "Authentication Required",
+      missingUrlParam: 'Missing URL parameter "{{param}}" for {{path}}',
+      httpStatus: "Request to {{url}} failed with status {{status}}",
+      responseValidation: "Server response failed validation: {{error}}",
+      malformedResponse: "Malformed response from {{url}}",
+      requestFailed: "Request to {{path}} failed: {{error}}",
+      /**
+       * `reason` is the endpoint's own declared error-type description, already
+       * translated in its scope - this frame only adds the where and the cause.
+       */
+      endpointFailed: "{{reason}} — {{path}}: {{error}}",
     },
   },
   mutationForm: {
@@ -138,14 +149,16 @@ export const translations = {
         },
         validation_error: {
           title: "Validation Error",
+          detail: "Form validation failed: {{errors}}",
         },
       },
     },
   },
   queryForm: {
     errors: {
-      network_failure: "Network failure",
+      network_failure: "Network failure in form {{formId}}: {{error}}",
       validation_failed: "Validation failed",
+      validationFailedDetail: "Validation failed in form {{formId}}: {{error}}",
     },
   },
   store: {

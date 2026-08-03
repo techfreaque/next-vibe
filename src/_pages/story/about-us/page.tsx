@@ -97,7 +97,10 @@ export async function tanstackLoader({
   params,
 }: Props): Promise<AboutUsPageData> {
   const { locale } = await params;
-  const totalModelCount = getAvailableModelCount(false, getEnvAvailability());
+  const totalModelCount = getAvailableModelCount(
+    false,
+    await getEnvAvailability(),
+  );
   return { locale, totalModelCount };
 }
 

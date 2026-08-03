@@ -72,8 +72,8 @@ import React, {
 import { InputHeightProvider } from "@/_pages/chat/lib/config/constants";
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 
-import { CortexModal } from "../../../agent/cortex/widget/cortex-modal";
-import { DefaultFolderId } from "../../chat/config";
+import { CortexModal } from "../../cortex/widget/cortex-modal";
+import { DefaultFolderId } from "../../../core/execution-context";
 import { ChatMessageRole, ThreadStreamingState } from "../../chat/enum";
 import type { EnabledTool } from "../../chat/hooks/store";
 import {
@@ -272,6 +272,7 @@ const PreCallEndpointsPage = React.memo(function PreCallEndpointsPage({
   user: ReturnType<typeof useWidgetUser>;
 }): JSX.Element {
   const logger = useWidgetLogger();
+  const widgetPlatform = useWidgetPlatform();
   const endpoint = useMemo(
     () => ({ [method]: resolvedEndpoint }),
     [method, resolvedEndpoint],
@@ -282,6 +283,7 @@ const PreCallEndpointsPage = React.memo(function PreCallEndpointsPage({
       locale={locale}
       user={user}
       logger={logger}
+      platform={widgetPlatform}
     />
   );
 });
@@ -558,6 +560,7 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
   const { t } = runScopedTranslation.scopedT(locale);
   const user = useWidgetUser();
   const logger = useWidgetLogger();
+  const widgetPlatform = useWidgetPlatform();
   const onSubmit = useWidgetOnSubmit();
   const isSubmitting = useWidgetIsSubmitting();
   const isDisabled = useWidgetDisabled();
@@ -832,6 +835,7 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
                   rootFolderId={rootFolderValue}
                   locale={locale}
                   user={user}
+                  platform={widgetPlatform}
                   className="rounded-lg bg-background"
                   refetchInterval={isSubmitting ? 2000 : false}
                   initialData={mockMessagesInitialData}
@@ -879,8 +883,8 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
           </Div>
         </Div>
       </Div>
-      <AIToolsModal locale={locale} user={user} />
-      <CortexModal locale={locale} user={user} />
+      <AIToolsModal locale={locale} user={user} platform={widgetPlatform} />
+      <CortexModal locale={locale} user={user} platform={widgetPlatform} />
     </InputHeightProvider>
   );
 }

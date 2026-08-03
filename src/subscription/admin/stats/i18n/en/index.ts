@@ -93,6 +93,7 @@ export const translations = {
       server: {
         title: "Server Error",
         description: "Unable to generate statistics",
+        detail: "Could not build the statistics: {{error}}",
       },
       unknown: {
         title: "Unknown Error",

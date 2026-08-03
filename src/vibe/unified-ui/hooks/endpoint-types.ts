@@ -1,11 +1,10 @@
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import type {
   ErrorResponseType,
   MessageResponseType,
   ResponseType,
-} from "next-vibe/core/route/response.schema";
-import type { Prettify } from "next-vibe/core/utils/type-utils";
-import type { DeepPartial } from "next-vibe/core/utils/type-utils";
+} from "../../core/route/response.schema";
+import type { DeepPartial, Prettify } from "../../core/utils/type-utils";
 import type { UseFormReturn } from "react-hook-form";
 import type { ZodType } from "zod";
 import type { ZodTypeDef } from "zod/v3";

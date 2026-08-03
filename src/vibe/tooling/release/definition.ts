@@ -12,18 +12,18 @@
  * - Asset zipping and uploading
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { UserRole } from "next-vibe/identity/roles/enum";
-import { scopedTranslation } from "next-vibe/tooling/release/i18n";
-import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
-import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
+} from "../../core/definition/enums";
+import { UserRole } from "../../identity/roles/enum";
+import { scopedTranslation } from "./i18n";
+import { lazyWidget } from "../../unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "../../unified-ui/_shared/utils";
 import {
   objectField,
   objectOptionalField,
@@ -31,7 +31,7 @@ import {
   requestField,
   responseArrayOptionalField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 const ReleaseResultWidget = lazyWidget(() =>

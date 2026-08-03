@@ -3,8 +3,8 @@
  * Handles GET and POST requests for listing and creating cron tasks
  */
 
-import { Methods } from "next-vibe/core/definition/enums";
-import { endpointsHandler } from "next-vibe/core/route/multi";
+import { Methods } from "../../../core/definition/enums";
+import { endpointsHandler } from "../../../core/route/multi";
 
 import { endpoints } from "./definition";
 import { CronTasksListRepository } from "./repository";

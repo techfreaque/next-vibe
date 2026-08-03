@@ -2,8 +2,8 @@
  * Core Client Environment
  */
 
-import { defineEnvClient } from "next-vibe/env/define-env-client";
-import { Environment, VibeMode, VibeModeValues } from "next-vibe/env/env-util";
+import { defineEnvClient } from "../env/define-env-client";
+import { Environment, VibeMode, VibeModeValues } from "../env/env-util";
 import { getCurrentOrigin } from "next-vibe/ui/lib/location";
 import { z } from "zod";
 
@@ -59,5 +59,3 @@ export const {
     example: "false",
   },
 });
-
-export type CoreClientEnv = typeof coreClientEnv;

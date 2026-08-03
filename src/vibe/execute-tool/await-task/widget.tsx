@@ -1,18 +1,19 @@
 "use client";
 
-import { getFullPath } from "next-vibe/core/core-utils/path";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { WidgetData } from "next-vibe/core/utils/json";
+import { getFullPath } from "../../core/core-utils/path";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
+import type { WidgetData } from "../../core/utils/json";
 import { Div } from "next-vibe/ui/ui/div";
 import { P } from "next-vibe/ui/ui/typography";
 import {
   useWidgetDisabled,
   useWidgetLocale,
+  useWidgetPlatform,
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
-import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
+} from "../../unified-ui/_shared/use-widget-context";
+import { EndpointsPage } from "../../unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -38,6 +39,7 @@ function toRecord(
 export function AwaitTaskWidget(): JSX.Element {
   const locale = useWidgetLocale();
   const user = useWidgetUser();
+  const platform = useWidgetPlatform();
   const t = useWidgetTranslation<typeof definition.POST>();
   const disabled = useWidgetDisabled();
 
@@ -139,6 +141,7 @@ export function AwaitTaskWidget(): JSX.Element {
           endpoint={{ [resolvedMethod]: resolvedEndpoint }}
           locale={locale}
           user={user}
+          platform={platform}
           disabled={true}
           endpointOptions={displayOptions}
         />

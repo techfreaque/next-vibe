@@ -5,16 +5,16 @@
 
 import { spawn } from "node:child_process";
 
-import { buildPackageRunnerCommand, coreEnv } from "next-vibe/core/env";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { buildPackageRunnerCommand, coreEnv } from "../../core/env";
+import type { ResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { StudioT } from "next-vibe/database/studio/i18n";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../core/route/response.schema";
+import { parseError } from "../../core/utils/parse-error";
+import type { StudioT } from "./i18n";
+import type { EndpointLogger } from "../../logger/types";
 
 import type { StudioRequestOutput, StudioResponseOutput } from "./definition";
 
@@ -102,15 +102,15 @@ export class StudioRepository {
 
       // Log the exit status
       if (exitResult.error) {
+        // `post.errors.server.title` is the definition's declared SERVER_ERROR
+        // label and renders param-free there, so the cause goes in its own key.
         return await Promise.resolve(
           fail({
-            message: t("post.errors.server.title"),
-            errorType: ErrorResponseTypes.INTERNAL_ERROR,
-            messageParams: {
+            message: t("post.errors.server.detail", {
+              seconds: (duration / 1000).toFixed(2),
               error: exitResult.error.message,
-              output: `Failed to start Drizzle Studio: ${exitResult.error.message}`,
-              duration,
-            },
+            }),
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
           }),
         );
       } else if (exitResult.code !== null && exitResult.code !== 0) {
@@ -138,13 +138,11 @@ export class StudioRepository {
 
       return await Promise.resolve(
         fail({
-          message: t("post.errors.server.title"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: {
+          message: t("post.errors.server.detail", {
+            seconds: (duration / 1000).toFixed(2),
             error: parsedError.message,
-            output: `Failed to start Drizzle Studio: ${parsedError.message}`,
-            duration,
-          },
+          }),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
         }),
       );
     }

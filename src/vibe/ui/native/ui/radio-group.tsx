@@ -1,11 +1,11 @@
 import * as RadioGroupPrimitive from "@rn-primitives/radio-group";
 import { styled } from "nativewind";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import { View } from "react-native";
 
-import { Check } from "../../native/ui/icons/Check";
-import { convertCSSToViewStyle } from "../../native/utils/style-converter";
+import { Check } from "./icons/Check";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 import type {
   RadioGroupItemProps,
   RadioGroupRootProps,

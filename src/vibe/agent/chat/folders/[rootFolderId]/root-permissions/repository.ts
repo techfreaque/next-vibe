@@ -9,11 +9,11 @@ import {
   DEFAULT_FOLDER_CONFIGS,
   isDefaultFolderId,
   isIncognitoFolder,
-} from "next-vibe/agent/chat/config";
+} from "../../../config";
 import {
   canCreateFolder,
   hasRolePermission,
-} from "next-vibe/agent/chat/permissions/permissions";
+} from "../../../permissions/permissions";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import { success } from "next-vibe/core/route/response.schema";

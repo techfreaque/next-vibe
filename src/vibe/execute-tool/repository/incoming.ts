@@ -9,27 +9,41 @@ import "server-only";
 import {
   makeHeadlessContext,
   type ToolExecutionContext,
-} from "next-vibe/agent/chat/config";
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import type { RemoteEventHandlerProps } from "next-vibe/core/route/handler";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+} from "next-vibe/core/execution-context";
+import { defaultLocale } from "../../core/i18n/core/config";
+import type { RemoteEventHandlerProps } from "../../core/route/handler-realtime";
+import type { ResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { Platform } from "next-vibe/platforms/platforms";
-import { dbUserIdToOwner } from "next-vibe/tasks/cron/db";
-import { resolveTaskOwnerUser } from "next-vibe/tasks/cron/resolve-task-user";
+} from "../../core/route/response.schema";
+import type { WidgetData } from "../../core/utils/json";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
+import { Platform } from "../../platforms/platforms";
+import { dbUserIdToOwner } from "../../tasks/cron/db";
+import { resolveTaskOwnerUser } from "../../tasks/cron/resolve-task-user";
 
 import { CallbackMode } from "../constants";
 import executeDefinition, {
   type RouteExecuteResponseOutput,
 } from "../definition";
 import { RouteExecuteRepository } from "./index";
+
+/**
+ * At-least-once delivery guard for inbound tool-execute-requests: callIds
+ * currently executing in THIS process. The reverse-ws hub can deliver one
+ * request to several lingering connector sockets (reconnect churn), and each
+ * delivery would spawn a full duplicate execution. Entries are removed when
+ * the execution settles, so deterministic callIds (fixture mode) can re-run
+ * across test runs.
+ *
+ * Lives here rather than on RouteExecuteRepository because this file is its only
+ * producer AND its only consumer — it guards inbound WIRE deliveries, which is
+ * precisely what a deployment without a wire protocol never has.
+ */
+const inFlightIncomingCalls = new Set<string>();
 
 /**
  * Relay a finished tool result back to the requester as a `tool-execute-result`
@@ -78,7 +92,7 @@ export async function emitToolResult(
     status: result.success ? "completed" : "failed",
   };
 
-  const { createEndpointEmitter } = await import("next-vibe/realtime/emitter");
+  const { createEndpointEmitter } = await import("../../realtime/core/emitter");
   // Emit as OUR local user so pushRemoteEvent finds our back-connection rows
   // (keyed by our userId). The requester matches the result by callId.
   const localUser: JwtPayloadType = {
@@ -104,14 +118,14 @@ export async function handleIncomingToolRequest(
   const { requestData, payload: roundtrip, user, logger } = props;
   const localUserId = user.id;
 
-  if (RouteExecuteRepository.inFlightIncomingCalls.has(roundtrip.callId)) {
+  if (inFlightIncomingCalls.has(roundtrip.callId)) {
     logger.debug(
       "[RouteExecute] handleIncomingToolRequest: duplicate delivery — skipped",
       { callId: roundtrip.callId },
     );
     return;
   }
-  RouteExecuteRepository.inFlightIncomingCalls.add(roundtrip.callId);
+  inFlightIncomingCalls.add(roundtrip.callId);
 
   const owner = dbUserIdToOwner(localUserId);
   const taskUserCtx = await resolveTaskOwnerUser(owner, defaultLocale, logger);
@@ -120,11 +134,11 @@ export async function handleIncomingToolRequest(
       "[RouteExecute] handleIncomingToolRequest: failed to resolve user",
       { localUserId },
     );
-    RouteExecuteRepository.inFlightIncomingCalls.delete(roundtrip.callId);
+    inFlightIncomingCalls.delete(roundtrip.callId);
     return;
   }
 
-  const { scopedTranslation } = await import("next-vibe/platforms/ai/i18n");
+  const { scopedTranslation } = await import("../../platforms/ai/i18n");
   const { t } = scopedTranslation.scopedT(defaultLocale);
   const abortController = new AbortController();
   const callbackMode = requestData.callbackMode ?? CallbackMode.WAIT;
@@ -140,7 +154,7 @@ export async function handleIncomingToolRequest(
       success: result.success,
       originInstanceId: props.originInstanceId ?? null,
     });
-    RouteExecuteRepository.inFlightIncomingCalls.delete(roundtrip.callId);
+    inFlightIncomingCalls.delete(roundtrip.callId);
     // Fan the result back over the RECEIVER's local connections (keyed by
     // our local userId, NOT the requester's id — the bridge resolves the
     // back leg from our remoteConnections rows). The requester matches by
@@ -190,11 +204,10 @@ export async function handleIncomingToolRequest(
               outcome.status === "completed"
                 ? success({ result: outcome.output ?? {} })
                 : fail({
-                    message: t("executeTool.post.errors.unknown.title"),
-                    errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                    messageParams: {
+                    message: t("executeTool.post.errors.unknown.detail", {
                       error: outcome.errorMessage ?? "Tool execution failed",
-                    },
+                    }),
+                    errorType: ErrorResponseTypes.INTERNAL_ERROR,
                   }),
             );
           },
@@ -241,7 +254,7 @@ export async function handleIncomingToolRequest(
   void (async (): Promise<void> => {
     await relayResult(await runExecute());
   })().catch((error: Error) => {
-    RouteExecuteRepository.inFlightIncomingCalls.delete(roundtrip.callId);
+    inFlightIncomingCalls.delete(roundtrip.callId);
     logger.error(
       "[RouteExecute] handleIncomingToolRequest: WAIT execution failed",
       { callId: roundtrip.callId, error: error.message },

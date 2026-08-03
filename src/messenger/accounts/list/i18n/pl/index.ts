@@ -69,7 +69,11 @@ export const translations: typeof enTranslations = {
     forbidden: { title: "Zabronione", description: "Odmowa dostępu" },
     notFound: { title: "Nie znaleziono", description: "Zasób nie znaleziony" },
     conflict: { title: "Konflikt", description: "Wystąpił konflikt danych" },
-    server: { title: "Błąd serwera", description: "Nie udało się pobrać kont" },
+    server: {
+      title: "Błąd serwera",
+      description: "Nie udało się pobrać kont",
+      detail: "Nie udało się wczytać kont: {{error}}",
+    },
     networkError: {
       title: "Błąd sieci",
       description: "Komunikacja sieciowa nie powiodła się",

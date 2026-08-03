@@ -4,7 +4,7 @@
 
 import "server-only";
 
-import { defineEnv } from "next-vibe/env/define-env";
+import { defineEnv } from "../env/define-env";
 import { z } from "zod";
 
 export const {

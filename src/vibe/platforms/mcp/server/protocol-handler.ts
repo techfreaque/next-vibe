@@ -5,18 +5,19 @@
 
 import "server-only";
 
-import type { IDefinitionLoader } from "next-vibe/core/definition/loader";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { permissionsRegistry } from "next-vibe/core/permissions/registry";
+import type { IDefinitionLoader } from "../../../core/definition/loader";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import { permissionsRegistry } from "../../../core/permissions/registry";
 import {
   definitionsRegistry,
   type IDefinitionsRegistry,
-} from "next-vibe/core/route/definitions-registry";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { Platform } from "next-vibe/platforms/platforms";
+} from "../../../core/route/definitions-registry";
+import type { WidgetData } from "../../../core/utils/json";
+import { parseError } from "../../../core/utils/parse-error";
+import type { JwtPayloadType } from "../../../identity/auth/types";
+import { filterUserPermissionRoles } from "../../../identity/roles/enum";
+import type { EndpointLogger } from "../../../logger/types";
+import { Platform } from "../../platforms";
 
 import { MCPRegistry, mcpRegistry } from "../registry";
 import type {
@@ -272,8 +273,9 @@ class MCPProtocolHandler implements IMCPProtocolHandler {
     );
 
     // Convert to MCP tool format with proper JSON Schema and translated descriptions
+    const userRoles = filterUserPermissionRoles(this.user.roles);
     const tools = discoverableEndpoints.map((endpoint) =>
-      endpointToMCPTool(endpoint, this.locale),
+      endpointToMCPTool(endpoint, this.locale, userRoles),
     );
 
     this.logger.debug(`[MCP Protocol] Tools listed count=${tools.length}`);

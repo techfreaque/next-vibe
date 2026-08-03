@@ -285,7 +285,7 @@ const noLiteralStringRule = {
     return {
       // JSX Text nodes
       JSXText(node: OxlintASTNode): void {
-        // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- AST node parsing: Node values from the parser are unknown until runtime type checking
+        // eslint-disable-next-line restricted/no-unknown -- AST node parsing: Node values from the parser are unknown until runtime type checking
         const value = (node as { value?: unknown }).value;
         if (typeof value !== "string") {
           return;

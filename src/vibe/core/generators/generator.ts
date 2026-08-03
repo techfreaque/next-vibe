@@ -15,19 +15,26 @@
 import "server-only";
 
 import { readFileSync } from "node:fs";
-import { join, relative } from "node:path";
+import { relative } from "node:path";
+import { fileURLToPath } from "node:url";
 
-import type {
-  GeneratorContext,
-  GeneratorResult,
-} from "next-vibe/core/generators/shared/shared-inputs";
+import type { GeneratorContext, GeneratorResult } from "./shared/shared-inputs";
 import {
   findFilesRecursively,
   generateFileHeader,
+  getRelativeImportPath,
+  toPosixPath,
   writeGeneratedFile,
-} from "next-vibe/core/generators/shared/utils";
+} from "./shared/utils";
 
-import { GENERATED_DIR, getApiDir } from "@/env/paths";
+import {
+  APP_IMPORT_ROOT,
+  GENERATED_DIR,
+  getApiDir,
+  getProjectRoot,
+  VIBE_DIR,
+  VIBE_IMPORT_ALIAS,
+} from "@/env/paths";
 
 export const OUTPUT_FILE = `${GENERATED_DIR}/generators/index.ts`;
 
@@ -45,17 +52,33 @@ interface GeneratorFileMeta {
   cacheKey: string | null;
 }
 
-/** Convert an absolute path to the shortest alias-based import path. */
+/**
+ * Convert an absolute path to the shortest alias-based import path.
+ *
+ * Anchored on the PROJECT ROOT, because VIBE_DIR and GENERATED_DIR are both
+ * project-root-relative. Deliberately {@link getProjectRoot} and not
+ * `getSrcDir()`: here the latter means `<root>/src`, so relativizing against it
+ * drops the "src/vibe/" prefix the alias branch matches on and every generator
+ * silently falls through to a relative path.
+ *
+ * The app-level branch reads {@link APP_IMPORT_ROOT} rather than hardcoding
+ * `src/` → `@/`. A vendored copy with no such alias sets it to null and the
+ * branch disappears, instead of the pair having to be edited out by hand.
+ */
 function toImportAlias(absPath: string): string {
-  const cwd = process.cwd();
-  const rel = relative(cwd, absPath).replace(/\\/g, "/").replace(/\.ts$/, "");
-  if (rel.startsWith("src/vibe/")) {
-    return `next-vibe/${rel.slice("src/vibe/".length)}`;
+  const rel = relative(getProjectRoot(), absPath)
+    .replaceAll("\\", "/")
+    .replace(/\.ts$/, "");
+  if (rel.startsWith(`${VIBE_DIR}/`)) {
+    return `${VIBE_IMPORT_ALIAS}/${rel.slice(VIBE_DIR.length + 1)}`;
   }
-  if (rel.startsWith("src/")) {
-    return `@/${rel.slice("src/".length)}`;
+  if (APP_IMPORT_ROOT && rel.startsWith(`${APP_IMPORT_ROOT.dir}/`)) {
+    return `${APP_IMPORT_ROOT.alias}/${rel.slice(APP_IMPORT_ROOT.dir.length + 1)}`;
   }
-  return `./${rel}`;
+  // Last resort: a path relative to the OUTPUT file's directory. `./${rel}` was
+  // wrong — that is relative to the project root, not to the generated file
+  // that has to resolve it.
+  return getRelativeImportPath(absPath, OUTPUT_FILE);
 }
 
 /** Derive a camelCase import name from the generator key, e.g. "endpoint-framework" → "generatorEndpointFramework". */
@@ -68,12 +91,22 @@ function toImportName(key: string): string {
 }
 
 function extractMeta(absPath: string): GeneratorFileMeta | null {
-  const src = readFileSync(absPath, "utf-8");
+  const file = readFileSync(absPath, "utf-8");
 
   // Must export a `generator` const.
-  if (!/export\s+const\s+generator\b/.test(src)) {
+  const declIndex = file.search(/export\s+const\s+generator\b/);
+  if (declIndex === -1) {
     return null;
   }
+
+  /**
+   * Scan from the declaration onward, never the whole file. Generators are
+   * code-generators: their bodies are full of template strings that contain
+   * `key: "..."` and `phase: "..."` as EMITTED source. Matching from the top of
+   * the file would happily read a generated artefact's field as this
+   * generator's own metadata.
+   */
+  const src = file.slice(declIndex);
 
   const keyMatch = /key:\s*["']([^"']+)["']/.exec(src);
   const phaseMatch = /phase:\s*["']([^"']+)["']/.exec(src);
@@ -126,11 +159,17 @@ function renderIndex(entries: GeneratorFileMeta[]): string {
     })
     .join("\n");
 
+  // The emitted import is written with the alias, NOT a relative path. The
+  // relative form is resolved from the GENERATED file's directory, not this
+  // one, so the two are never the same string — and an editor (or a sed)
+  // fixing this module's own imports will happily rewrite the template's
+  // literal to match, silently pointing the generated registry at a directory
+  // that does not exist. That has already happened once here.
   return `${header}
 
 import "server-only";
 
-import type { GeneratorContext, GeneratorDefinition, GeneratorResult } from "next-vibe/core/generators/shared/shared-inputs";
+import type { GeneratorContext, GeneratorDefinition, GeneratorResult } from "${VIBE_IMPORT_ALIAS}/core/generators/shared/shared-inputs";
 
 ${imports}
 
@@ -145,22 +184,25 @@ ${registryEntries}
 `;
 }
 
+/**
+ * `Pick<..., "logger">` rather than the full context: this generator does its own
+ * generator.ts scan and never reads the shared file lists or parsed definitions.
+ * Narrowing the parameter lets the orchestrator run it BEFORE building the shared
+ * context — which it must, since the registry that context is sized from is this
+ * generator's output.
+ */
 export async function generate(
-  ctx: GeneratorContext,
+  ctx: Pick<GeneratorContext, "logger">,
 ): Promise<GeneratorResult> {
   const { logger } = ctx;
-  const cwd = process.cwd();
   const apiDir = getApiDir();
 
-  // Scan all generator.ts files, excluding this file itself.
-  const selfPath = join(
-    cwd,
-    "src",
-    "vibe",
-    "core",
-    "generators",
-    "generator.ts",
-  );
+  // Exclude this file itself, located from its own module URL rather than a
+  // hardcoded "src/vibe/core/generators/generator.ts" under cwd. The literal
+  // form silently stops excluding the moment the framework is vendored at a
+  // different path or the process runs from another directory — and a
+  // meta-generator that registers itself recurses.
+  const selfPath = toPosixPath(fileURLToPath(import.meta.url));
   const allGeneratorFiles = findFilesRecursively(apiDir, "generator.ts").filter(
     (f) => f !== selfPath,
   );

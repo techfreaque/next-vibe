@@ -12,20 +12,17 @@
  * - Union variant selection and discriminator extraction
  */
 
-import { WidgetType } from "next-vibe/core/definition/enums";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import type { UserPermissionRoleValue } from "next-vibe/identity/roles/enum";
-import type { UnifiedField } from "next-vibe/unified-ui/_shared/configs";
-import {
-  isRequestField,
-  isResponseField,
-} from "next-vibe/unified-ui/_shared/type-guards";
+import { WidgetType } from "../../../core/definition/enums";
+import type { WidgetData } from "../../../core/utils/json";
+import type { UserPermissionRoleValue } from "../../../identity/roles/enum";
+import type { UnifiedField } from "../../_shared/configs";
+import { isRequestField, isResponseField } from "../../_shared/type-guards";
 import type {
   AnyChildrenConstrain,
   BaseWidgetConfig,
   FieldUsageConfig,
   SchemaTypes,
-} from "next-vibe/unified-ui/_shared/types";
+} from "../../_shared/types";
 import type z from "zod";
 
 /**

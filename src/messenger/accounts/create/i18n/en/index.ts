@@ -336,6 +336,7 @@ export const translations = {
     server: {
       title: "Server Error",
       description: "Failed to create account",
+      detail: "Account creation failed: {{error}}",
     },
     networkError: {
       title: "Network Error",

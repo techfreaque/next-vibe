@@ -3,22 +3,23 @@
  * Defines endpoint for creating a new custom skill
  */
 
-import type { ChatModelSelection } from "next-vibe/agent/ai-stream/models";
+import type { ChatModelSelection } from "../../ai-stream/models";
+import { getClientAvailability } from "../../env-availability-store";
 import {
   audioVisionModelSelectionSchema,
   imageVisionModelSelectionSchema,
   videoVisionModelSelectionSchema,
-} from "next-vibe/agent/ai-stream/vision-models";
-import { imageGenModelSelectionSchema } from "next-vibe/agent/image-generation/models";
-import { musicGenModelSelectionSchema } from "next-vibe/agent/music-generation/models";
-import { sttModelSelectionSchema } from "next-vibe/agent/speech-to-text/models";
-import { voiceModelSelectionSchema } from "next-vibe/agent/text-to-speech/models";
-import { videoGenModelSelectionSchema } from "next-vibe/agent/video-generation/models";
+} from "../../ai-stream/vision-models";
+import { imageGenModelSelectionSchema } from "../../image-generation/models";
+import { musicGenModelSelectionSchema } from "../../music-generation/models";
+import { sttModelSelectionSchema } from "../../speech-to-text/models";
+import { voiceModelSelectionSchema } from "../../text-to-speech/models";
+import { videoGenModelSelectionSchema } from "../../video-generation/models";
 import {
   iconSchema,
   translatedValueSchema,
 } from "next-vibe/core/definition/common.schema";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -36,7 +37,7 @@ import {
 import { apiClient } from "next-vibe/unified-ui/hooks/store";
 import { z } from "zod";
 
-import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { ChatModelId, getBestChatModel } from "../../ai-stream/models";
 import { SKILL_CREATE_ALIAS } from "../constants";
 import { skillVariantsSchema } from "../db";
@@ -92,7 +93,7 @@ const { POST } = createEndpoint({
         const skillsDefinition = await import("../definition");
 
         // Optimistically add the new skill to the list
-        const { availability } = data;
+        const availability = getClientAvailability();
         const { t } = scopedTranslation.scopedT(data.locale);
         apiClient.updateEndpointData(
           skillsDefinition.default.GET,
@@ -557,14 +558,7 @@ const { POST } = createEndpoint({
         "pinnedTools",
         "compactTrigger",
       ] as const,
-      onEvent: async ({
-        responseData,
-        requestData,
-        logger,
-        locale,
-        user,
-        agentEnvAvailability,
-      }) => {
+      onEvent: async ({ responseData, requestData, logger, locale, user }) => {
         const category = requestData.category;
 
         const [
@@ -597,7 +591,7 @@ const { POST } = createEndpoint({
           },
           t,
           user,
-          agentEnvAvailability,
+          getClientAvailability(),
         );
         client.updateEndpointData(
           skillsDefinition.default.GET,

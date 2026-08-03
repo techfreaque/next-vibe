@@ -61,6 +61,10 @@ export const translations = {
       server: {
         title: "Server Error",
         description: "Internal server error occurred",
+        viBuildFailed: "vibe build failed: {{error}}",
+        compileFailed: "Electron compilation failed: {{error}}",
+        builderFailed: "electron-builder failed: {{error}}",
+        buildFailed: "Electron build failed: {{error}}",
       },
       unknown: {
         title: "Unknown Error",

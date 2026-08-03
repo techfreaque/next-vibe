@@ -57,15 +57,15 @@ export const translations = {
       description: "Docker command exceeded timeout limit",
     },
     executionFailed: {
-      title: "Execution Failed",
+      title: "Execution failed: {{error}}",
       description: "Docker command execution failed",
     },
     composeDownFailed: {
-      title: "Compose Down Failed",
+      title: "Compose down failed: {{error}}",
       description: "Docker Compose down operation failed",
     },
     composeUpFailed: {
-      title: "Compose Up Failed",
+      title: "Compose up failed: {{error}}",
       description: "Docker Compose up operation failed",
     },
   },

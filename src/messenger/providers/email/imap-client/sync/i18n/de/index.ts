@@ -109,6 +109,8 @@ export const translations: typeof enTranslations = {
     server: {
       title: "Serverfehler",
       description: "Interner Serverfehler",
+      detail_sync: "Synchronisierung fehlgeschlagen: {{error}}",
+      detail_status: "Sync-Status konnte nicht gelesen werden: {{error}}",
     },
     unknown: {
       title: "Unbekannter Fehler",

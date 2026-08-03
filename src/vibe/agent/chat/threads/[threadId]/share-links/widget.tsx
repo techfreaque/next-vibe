@@ -1,7 +1,6 @@
 "use client";
 
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { success } from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -57,7 +56,6 @@ export function ThreadShareDialog({
   onThreadMoved,
 }: ThreadShareDialogProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
-  const availability = useProviderAvailability();
 
   const isInSharedFolder = currentRootFolderId === DefaultFolderId.SHARED;
   const [overridePublic, setOverridePublic] = useState<boolean | null>(null);
@@ -107,8 +105,7 @@ export function ThreadShareDialog({
     setIsToggling(true);
     try {
       // Optimistic: update threads sidebar cache
-      const threadsDefModule =
-        await import("next-vibe/agent/chat/threads/definition");
+      const threadsDefModule = await import("../../definition");
       apiClient.updateEndpointData(
         threadsDefModule.default.GET,
         logger,
@@ -132,7 +129,7 @@ export function ThreadShareDialog({
 
       // Optimistic: remove from current folder-contents cache
       const folderContentsDefModule =
-        await import("next-vibe/agent/chat/folder-contents/[rootFolderId]/definition");
+        await import("../../../folder-contents/[rootFolderId]/definition");
       apiClient.updateEndpointData(
         folderContentsDefModule.default.GET,
         logger,
@@ -160,7 +157,6 @@ export function ThreadShareDialog({
         { rootFolderId: targetFolderId, folderId: null },
         { threadId },
         locale,
-        availability,
       );
 
       setOverridePublic(targetPublic);
@@ -175,7 +171,6 @@ export function ThreadShareDialog({
     logger,
     user,
     locale,
-    availability,
     onThreadMoved,
   ]);
 

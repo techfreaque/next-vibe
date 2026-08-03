@@ -1,4 +1,4 @@
-// oxlint-disable oxlint-plugin-restricted/restricted-syntax
+// oxlint-disable oxlint-plugin-restricted/no-throw
 /**
  * Remote Event Bridge Tests
  *
@@ -20,13 +20,13 @@ import {
   disconnectFromHermesLocalAi,
   HERMES_INSTANCE_ID,
   resolveRemoteUrlSync,
-} from "next-vibe/agent/ai-stream/testing/remote-setup";
-import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
-import { rootlessToolExecutionContext } from "next-vibe/agent/chat/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
-import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
+} from "../../agent/ai-stream/testing/remote-setup";
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
+import { rootlessToolExecutionContext } from "next-vibe/core/execution-context";
+import type { ResponseType } from "../../core/route/response.schema";
+import type { JwtPrivatePayloadType } from "../../identity/auth/types";
+import { resolveTestAdminUser } from "../../tooling/testing/testing-suite/resolve-test-user";
+import { sendTestRequest } from "../../tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import type {
@@ -49,10 +49,10 @@ async function routeBridgeToHermes(
   toolExecutionContext: ToolExecutionContext,
 ): Promise<ResponseType<RemoteEventBridgeResponseOutput>> {
   const { RouteExecuteRepository } =
-    await import("next-vibe/execute-tool/repository");
-  const { CallbackMode } = await import("next-vibe/execute-tool/constants");
-  const { createEndpointLogger } = await import("next-vibe/logger/server");
-  const { defaultLocale } = await import("next-vibe/core/i18n/core/config");
+    await import("../../execute-tool/repository");
+  const { CallbackMode } = await import("../../execute-tool/constants");
+  const { createEndpointLogger } = await import("../../logger/server");
+  const { defaultLocale } = await import("../../core/i18n/core/config");
 
   return RouteExecuteRepository.runInProcessTyped({
     definition: endpoints.POST,
@@ -148,7 +148,7 @@ describe("Remote Event Bridge", () => {
       const fixtureCtx: ToolExecutionContext = rootlessToolExecutionContext();
 
       const { RemoteConnectionRepository } =
-        await import("next-vibe/remote-connection/repository");
+        await import("../../remote-connection/repository");
       const selfInstanceId =
         await RemoteConnectionRepository.getLocalInstanceId(testUser.id);
 
@@ -183,7 +183,7 @@ describe("Remote Event Bridge", () => {
     // ── REB-LOCAL-INVALID-PAYLOAD ─────────────────────────────────────────────
 
     it("REB-LOCAL-INVALID-PAYLOAD: handleRemoteEvent with invalid payload does not throw", async () => {
-      const { createEndpointLogger } = await import("next-vibe/logger/server");
+      const { createEndpointLogger } = await import("../../logger/server");
       const logger = createEndpointLogger(false, "en-US");
 
       // Empty payload: missing the required endpointPath/endpointMethod/

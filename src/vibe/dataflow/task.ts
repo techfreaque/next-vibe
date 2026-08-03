@@ -11,18 +11,15 @@
 
 import "server-only";
 
-import cleanupDefinitions from "next-vibe/dataflow/cleanup/definition";
-import { tools as cleanupTools } from "next-vibe/dataflow/cleanup/route";
+import cleanupDefinitions from "./cleanup/definition";
+import { tools as cleanupTools } from "./cleanup/route";
 import {
   CRON_SCHEDULES,
   HISTORY_INTERVALS,
   TASK_TIMEOUTS,
-} from "next-vibe/tasks/constants";
-import { CronTaskPriority, TaskCategory } from "next-vibe/tasks/enum";
-import {
-  createCronTask,
-  type Task,
-} from "next-vibe/tasks/unified-runner/types";
+} from "../tasks/constants";
+import { CronTaskPriority, TaskCategory } from "../tasks/enum";
+import { createCronTask, type Task } from "../tasks/unified-runner/types";
 
 const vibeSenseCleanupTask = createCronTask(
   cleanupDefinitions.POST,

@@ -44,6 +44,8 @@ export const translations = {
         title: "Invalid input",
         description:
           "Check that threadId is a valid UUID and at least one field is provided",
+        noActiveThread: "No active thread in the stream context",
+        folderUnresolved: "Could not resolve the thread's folder",
       },
       unauthorized: {
         title: "Not signed in",
@@ -56,10 +58,12 @@ export const translations = {
       notFound: {
         title: "Thread not found",
         description: "No thread exists with this ID",
+        detail: "Thread not found: {{threadId}}",
       },
       server: {
         title: "Server error",
         description: "Failed to rename the thread",
+        detail: "Server Error: {{error}}",
       },
       network: {
         title: "Network error",

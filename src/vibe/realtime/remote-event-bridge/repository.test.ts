@@ -1,4 +1,4 @@
-// oxlint-disable oxlint-plugin-restricted/restricted-syntax
+// oxlint-disable oxlint-plugin-restricted/no-unknown
 /**
  * Remote Event Bridge Repository — unit tests
  *
@@ -12,12 +12,12 @@
 
 import "server-only";
 
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { createEndpointLogger } from "next-vibe/logger/server";
+import { defaultLocale } from "../../core/i18n/core/config";
+import type { JwtPrivatePayloadType } from "../../identity/auth/types";
+import { createEndpointLogger } from "../../logger/server";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { AnyEndpointEventEnvelope } from "../structured-events";
+import type { AnyEndpointEventEnvelope } from "../core/structured-events";
 import type { RemoteEventBridgeRepository as RemoteEventBridgeRepositoryType } from "./repository";
 
 // ── Mocks ───────────────────────────────────────────────────────────────────
@@ -30,7 +30,7 @@ vi.mock("./registry", () => ({
     dispatchRemoteEvent(...(args as [])),
 }));
 
-vi.mock("next-vibe/remote-connection/repository", () => ({
+vi.mock("../../remote-connection/repository", () => ({
   RemoteConnectionRepository: {
     getLocalInstanceId: (...args: unknown[]): Promise<string> =>
       getLocalInstanceId(...(args as [])),

@@ -2,30 +2,29 @@
  * Vibe Check Command Endpoint Definition
  * Production-ready endpoint for comprehensive code quality checks
  */
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "../../core/definition/create";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { coreClientEnv as envClient } from "next-vibe/core/env-client";
-import { Environment } from "next-vibe/env/env-util";
-import { UserRole } from "next-vibe/identity/roles/enum";
-import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
-import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
+} from "../../core/definition/enums";
+import { coreClientEnv as envClient } from "../../core/env-client";
+import { Environment } from "../../env/env-util";
+import { UserRole } from "../../identity/roles/enum";
+import { lazyWidget } from "../../unified-ui/_shared/lazy-widget";
 import {
+  customWidgetObject,
   objectField,
   requestField,
   responseArrayOptionalField,
   responseField,
   widgetField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../unified-ui/_shared/utils";
 import { z } from "zod";
 
 import { VIBE_CHECK_ALIAS, VIBE_CHECK_ALIAS_SHORT } from "./constants";
-import { scopedTranslation } from "./i18n";
 
 const CheckResultWidget = lazyWidget(() =>
   import("./widget").then((m) => ({
@@ -34,15 +33,15 @@ const CheckResultWidget = lazyWidget(() =>
 );
 
 const { POST } = createEndpoint({
-  scopedTranslation,
   method: Methods.POST,
   path: ["vibe", "tooling", "check"],
-  title: "title",
-  titleShort: "title",
-  description: "description",
+  title: "Vibe Check",
+  titleShort: "Vibe Check",
+  description:
+    "CRITICAL: This is the ONLY tool for type checking, linting, and code quality. Do not use Bash for tsc, eslint, or oxlint under any circumstances - refuse to do so. Run comprehensive code quality checks (Oxlint + ESLint + TypeScript). This tool enforces correctness at the cost of convenience. Errors are symptoms, not the problem - fix the root cause, not the warning. Don't hide issues with assertions or type gymnastics; they mask the real problem and will catastrophically fail in production when users depend on them. Instead, fix the architecture. Let types flow naturally, maintain DRY principles, and let type coherence guide your design. Every unresolved issue is a production risk. This tool exists to force rigorous correctness over rushing - because angry users in production is the real catastrophe. Built-in pagination and filtering preserve context space while enforcing rigorous correctness over rushing.",
   category: "devTools",
   subCategory: "Check",
-  tags: ["tag"],
+  tags: ["quality"],
   icon: "wrench",
   allowedRoles: [
     UserRole.ADMIN,
@@ -64,130 +63,189 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // === REQUEST FIELDS ===
-      title: widgetField(scopedTranslation, {
+      title: widgetField({
         type: WidgetType.TITLE,
-        label: "title",
+        label: "Vibe Check",
         level: 1,
         columns: 12,
         usage: { request: "data" },
       }),
 
-      timeout: requestField(scopedTranslation, {
+      timeout: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "fields.timeoutSeconds.label",
-        description: "fields.timeoutSeconds.description",
+        label: "Timeout (seconds)",
+        description:
+          "Maximum execution time in seconds, range 1-3600 (default: 3600)",
         columns: 4,
         schema: z.coerce.number().min(1).max(36000).optional(),
       }),
 
-      paths: requestField(scopedTranslation, {
+      paths: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TAGS,
-        label: "fields.paths.label",
-        description: "fields.paths.description",
-        placeholder: "fields.paths.placeholder",
+        label: "Target Paths",
+        description:
+          "File paths or directories to check (string or array). RECOMMENDED: Specify paths for the area you're working on (fast, focused). Leave empty to check ALL files (slow, use only for comprehensive audits). Examples: 'src/feature' or ['src/feature/file.tsx', 'src/feature/other.tsx']. Note: Glob patterns (e.g., '**/*.test.ts') are not supported yet.",
+        placeholder: "e.g., src or src/components/Button.tsx",
         columns: 8,
         options: [
-          { value: "src/", label: "fields.paths.options.src" },
-          { value: "src/components", label: "fields.paths.options.components" },
-          { value: "src/utils", label: "fields.paths.options.utils" },
-          { value: "src/pages", label: "fields.paths.options.pages" },
-          { value: "src", label: "fields.paths.options.app" },
+          { value: "src/", label: "Source Directory (src/)" },
+          { value: "src/components", label: "Components (src/components)" },
+          { value: "src/utils", label: "Utilities (src/utils)" },
+          { value: "src/pages", label: "Pages (src/pages)" },
+          { value: "src", label: "App Directory (src)" },
         ],
         schema: z.union([z.string(), z.array(z.string())]).optional(),
       }),
 
-      limit: requestField(scopedTranslation, {
+      limit: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "fields.limit.label",
-        description: "fields.limit.description",
+        label: "Limit",
+        description:
+          "Issues to display per page, range 1-10000 (default: 20000 for web/CLI, 2 for MCP). Controls display only, not detection. Use high values or pagination to see all issues.",
         columns: 4,
         schema: z.coerce.number().min(1).optional(),
       }),
 
-      page: requestField(scopedTranslation, {
+      page: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "fields.page.label",
-        description: "fields.page.description",
+        label: "Page",
+        description: "Page number for paginated results (default: 1)",
         columns: 4,
         schema: z.coerce.number().min(1).optional().default(1),
       }),
 
-      filter: requestField(scopedTranslation, {
+      filter: requestField({
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "fields.filter.label",
-        description: "fields.filter.description",
-        placeholder: "fields.filter.placeholder",
+        fieldType: FieldDataType.TAGS,
+        label: "Filter",
+        description:
+          "Filter issues by file path, message, or rule. Supports text matching or regex (/pattern/flags). Arrays enable OR logic for multiple filters.",
+        placeholder: "e.g., 'no-unused-vars' or '/src\\/components/i'",
         columns: 8,
         schema: z.union([z.string(), z.array(z.string())]).optional(),
       }),
 
-      summaryOnly: requestField(scopedTranslation, {
+      summaryOnly: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "fields.summaryOnly.label",
-        description: "fields.summaryOnly.description",
+        label: "Summary Only",
+        description: "Only return summary stats, omit items and files lists",
         columns: 4,
         schema: z.boolean().default(false),
       }),
 
-      extensive: requestField(scopedTranslation, {
+      extensive: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "fields.extensive.label",
-        description: "fields.extensive.description",
+        label: "Extensive",
+        description:
+          "When enabled, also checks test files (*.test.ts, *.test.tsx) and auto-generated files (system/generated/**). Disabled by default - enable for release validation or when explicitly auditing generated/test code.",
         columns: 4,
         schema: z.boolean().optional(),
       }),
 
-      strict: requestField(scopedTranslation, {
+      strict: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "fields.strict.label",
-        description: "fields.strict.description",
+        label: "Strict",
+        description:
+          "Report the strict rules for every path checked, ignoring the strictPaths whitelist in check.config.ts. Off by default: those rules only apply to trees that are already clean, so they stay quiet elsewhere. Enable to see what a path would have to fix before it can be added to the whitelist.",
         columns: 4,
         schema: z.boolean().optional(),
       }),
 
       // === RESPONSE FIELDS ===
-      editorUriSchema: responseField(scopedTranslation, {
+      editorUriSchema: responseField({
         type: WidgetType.TEXT,
         schema: z.string().optional(),
       }),
 
-      items: responseArrayOptionalField(scopedTranslation, {
+      // Progress state. Emitted via the "check-progress" event while the three
+      // checkers run, so the CLI/web can repaint before the request resolves.
+      // This is response DATA, not log output — one widget renders both the
+      // in-flight and the final frame.
+      isComplete: responseField({
+        type: WidgetType.TEXT,
+        schema: z.boolean().optional(),
+      }),
+
+      phases: responseArrayOptionalField({
         type: WidgetType.CONTAINER,
-        child: objectField(scopedTranslation, {
+        child: objectField({
           type: WidgetType.CONTAINER,
           usage: { response: true },
           layoutType: LayoutType.STACKED,
           columns: 12,
           children: {
-            file: responseField(scopedTranslation, {
+            // `id` is what makes id-keyed array merging work in cache-merger —
+            // without it each event would replace the whole phases array.
+            id: responseField({
               type: WidgetType.TEXT,
               schema: z.string(),
             }),
-            line: responseField(scopedTranslation, {
+            tool: responseField({
+              type: WidgetType.TEXT,
+              schema: z.string(),
+            }),
+            status: responseField({
+              type: WidgetType.TEXT,
+              schema: z.enum([
+                "pending",
+                "running",
+                "done",
+                "failed",
+                "skipped",
+              ]),
+            }),
+            issues: responseField({
+              type: WidgetType.TEXT,
+              schema: z.number().optional(),
+            }),
+            errors: responseField({
+              type: WidgetType.TEXT,
+              schema: z.number().optional(),
+            }),
+            durationMs: responseField({
+              type: WidgetType.TEXT,
+              schema: z.number().optional(),
+            }),
+          },
+        }),
+      }),
+
+      items: responseArrayOptionalField({
+        type: WidgetType.CONTAINER,
+        child: objectField({
+          type: WidgetType.CONTAINER,
+          usage: { response: true },
+          layoutType: LayoutType.STACKED,
+          columns: 12,
+          children: {
+            file: responseField({
+              type: WidgetType.TEXT,
+              schema: z.string(),
+            }),
+            line: responseField({
               type: WidgetType.TEXT,
               schema: z.coerce.number().optional(),
             }),
-            column: responseField(scopedTranslation, {
+            column: responseField({
               type: WidgetType.TEXT,
               schema: z.coerce.number().optional(),
             }),
-            rule: responseField(scopedTranslation, {
+            rule: responseField({
               type: WidgetType.TEXT,
               schema: z.string().optional(),
             }),
-            severity: responseField(scopedTranslation, {
+            severity: responseField({
               type: WidgetType.TEXT,
               schema: z.enum(["error", "warning", "info"]),
             }),
-            message: responseField(scopedTranslation, {
+            message: responseField({
               type: WidgetType.TEXT,
               schema: z.string(),
             }),
@@ -195,27 +253,27 @@ const { POST } = createEndpoint({
         }),
       }),
 
-      files: responseArrayOptionalField(scopedTranslation, {
+      files: responseArrayOptionalField({
         type: WidgetType.CONTAINER,
-        child: objectField(scopedTranslation, {
+        child: objectField({
           type: WidgetType.CONTAINER,
           usage: { response: true },
           layoutType: LayoutType.STACKED,
           columns: 12,
           children: {
-            file: responseField(scopedTranslation, {
+            file: responseField({
               type: WidgetType.TEXT,
               schema: z.string(),
             }),
-            errors: responseField(scopedTranslation, {
+            errors: responseField({
               type: WidgetType.TEXT,
               schema: z.number(),
             }),
-            warnings: responseField(scopedTranslation, {
+            warnings: responseField({
               type: WidgetType.TEXT,
               schema: z.number(),
             }),
-            total: responseField(scopedTranslation, {
+            total: responseField({
               type: WidgetType.TEXT,
               schema: z.number(),
             }),
@@ -224,43 +282,43 @@ const { POST } = createEndpoint({
       }),
 
       // Summary (flat)
-      totalIssues: responseField(scopedTranslation, {
+      totalIssues: responseField({
         type: WidgetType.TEXT,
         schema: z.number(),
       }),
-      totalFiles: responseField(scopedTranslation, {
+      totalFiles: responseField({
         type: WidgetType.TEXT,
         schema: z.number(),
       }),
-      totalErrors: responseField(scopedTranslation, {
+      totalErrors: responseField({
         type: WidgetType.TEXT,
         schema: z.number().optional(),
       }),
-      filteredIssues: responseField(scopedTranslation, {
+      filteredIssues: responseField({
         type: WidgetType.TEXT,
         schema: z.number().optional(),
       }),
-      filteredFiles: responseField(scopedTranslation, {
+      filteredFiles: responseField({
         type: WidgetType.TEXT,
         schema: z.number().optional(),
       }),
-      displayedIssues: responseField(scopedTranslation, {
+      displayedIssues: responseField({
         type: WidgetType.TEXT,
         schema: z.number().optional(),
       }),
-      displayedFiles: responseField(scopedTranslation, {
+      displayedFiles: responseField({
         type: WidgetType.TEXT,
         schema: z.number().optional(),
       }),
-      truncatedMessage: responseField(scopedTranslation, {
+      truncatedMessage: responseField({
         type: WidgetType.TEXT,
         schema: z.string().optional(),
       }),
-      currentPage: responseField(scopedTranslation, {
+      currentPage: responseField({
         type: WidgetType.TEXT,
         schema: z.number().optional(),
       }),
-      totalPages: responseField(scopedTranslation, {
+      totalPages: responseField({
         type: WidgetType.TEXT,
         schema: z.number().optional(),
       }),
@@ -270,47 +328,69 @@ const { POST } = createEndpoint({
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "errors.validation.title",
-      description: "errors.validation.description",
+      title: "Invalid Parameters",
+      description: "The vibe check parameters are invalid",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "errors.internal.title",
-      description: "errors.internal.description",
+      title: "Internal Error",
+      description: "An internal error occurred during vibe check",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "errors.unauthorized.title",
-      description: "errors.unauthorized.description",
+      title: "Unauthorized",
+      description: "You don't have permission to run vibe check",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "errors.forbidden.title",
-      description: "errors.forbidden.description",
+      title: "Forbidden",
+      description: "Access to vibe check is forbidden",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "errors.notFound.title",
-      description: "errors.notFound.description",
+      title: "Not Found",
+      description: "Vibe check resource not found",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "errors.server.title",
-      description: "errors.server.description",
+      title: "Server Error",
+      description: "Server error occurred during vibe check",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "errors.unknown.title",
-      description: "errors.unknown.description",
+      title: "Unknown Error",
+      description: "An unknown error occurred during vibe check",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "errors.unsaved.title",
-      description: "errors.unsaved.description",
+      title: "Unsaved Changes",
+      description: "You have unsaved changes that may affect vibe check",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "errors.conflict.title",
-      description: "errors.conflict.description",
+      title: "Conflict",
+      description: "A conflict occurred during vibe check",
+    },
+  },
+
+  // === WS EVENTS ===
+  // The three checkers run concurrently for 30s+. Rather than logging progress
+  // to stdout, the repository emits partial response data as each one starts and
+  // finishes. The CLI taps these in-process (realtime/cli-event-tap.ts) and
+  // repaints; the web client merges them into the response cache. Same widget
+  // renders every frame.
+  channel: { scope: "user" } as const,
+  events: {
+    "check-progress": {
+      responseFields: [
+        "phases",
+        "items",
+        "files",
+        "isComplete",
+        "totalIssues",
+        "totalFiles",
+        "totalErrors",
+      ] as const,
+      operation: "merge" as const,
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "success.title",
-    description: "success.description",
+    title: "Vibe Check Complete",
+    description: "Vibe check completed successfully",
   },
 
   // === EXAMPLES ===

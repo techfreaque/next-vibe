@@ -43,6 +43,7 @@ export const translations: typeof enTranslations = {
       internal: {
         title: "Błąd serwera",
         description: "Wewnętrzny błąd serwera",
+        detail: "Nie udało się wczytać Twoich adresów: {{error}}",
       },
       unknown: {
         title: "Nieznany błąd",
@@ -149,6 +150,7 @@ export const translations: typeof enTranslations = {
       internal: {
         title: "Błąd serwera",
         description: "Wewnętrzny błąd serwera",
+        detail: "Nie udało się zapisać adresu: {{error}}",
       },
       unknown: {
         title: "Nieznany błąd",

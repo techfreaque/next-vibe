@@ -3,7 +3,7 @@
  * Fetches a stored image by URL and returns it so the AI can re-examine it.
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,

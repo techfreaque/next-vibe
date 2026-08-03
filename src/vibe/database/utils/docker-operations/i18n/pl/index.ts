@@ -59,15 +59,15 @@ export const translations: typeof enTranslations = {
       description: "Polecenie Docker przekroczyło limit czasu",
     },
     executionFailed: {
-      title: "Wykonanie nie powiodło się",
+      title: "Wykonanie nie powiodło się: {{error}}",
       description: "Wykonanie polecenia Docker nie powiodło się",
     },
     composeDownFailed: {
-      title: "Compose Down nie powiodło się",
+      title: "Compose Down nie powiodło się: {{error}}",
       description: "Operacja Docker Compose down nie powiodła się",
     },
     composeUpFailed: {
-      title: "Compose Up nie powiodło się",
+      title: "Compose Up nie powiodło się: {{error}}",
       description: "Operacja Docker Compose up nie powiodła się",
     },
   },

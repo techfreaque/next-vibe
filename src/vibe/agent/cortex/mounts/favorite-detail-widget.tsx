@@ -6,9 +6,10 @@
 
 "use client";
 
-import favoriteDefinitions from "next-vibe/agent/skills/favorites/[id]/definition";
+import favoriteDefinitions from "../../skills/favorites/[id]/definition";
 import {
   useWidgetLocale,
+  useWidgetPlatform,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
@@ -34,6 +35,7 @@ export function FavoriteDetailWidget({
 }: FavoriteDetailWidgetProps): React.JSX.Element | null {
   const locale = useWidgetLocale();
   const user = useWidgetUser();
+  const platform = useWidgetPlatform();
 
   const id = useMemo(() => extractFavoriteId(path), [path]);
 
@@ -46,6 +48,7 @@ export function FavoriteDetailWidget({
       endpoint={favoriteDefinitions}
       locale={locale}
       user={user}
+      platform={platform}
       endpointOptions={{
         read: {
           urlPathParams: { id },

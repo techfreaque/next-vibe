@@ -5,28 +5,27 @@
 
 import type { SQL } from "drizzle-orm";
 import { and, count, desc, eq, gte, ilike, lte, or, sql } from "drizzle-orm";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import { type Countries, type Languages } from "../../core/i18n/core/config";
 import {
   convertCountryFilter,
   convertLanguageFilter,
-  type Countries,
   type CountryFilter,
   type LanguageFilter,
-  type Languages,
-} from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+} from "./enum";
+import type { ResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
-import { withTransaction } from "next-vibe/database/utils/repository-helpers";
-import type { LeadsT } from "next-vibe/identity/lead/i18n";
-import { scopedTranslation } from "next-vibe/identity/lead/i18n";
-import { users } from "next-vibe/identity/user/db";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../core/route/response.schema";
+import { parseError } from "../../core/utils/parse-error";
+import { db } from "../../database";
+import { withTransaction } from "../../database/utils/repository-helpers";
+import type { LeadsT } from "./i18n";
+import { scopedTranslation } from "./i18n";
+import { users } from "../user/db";
+import type { EndpointLogger } from "../../logger/types";
 
 import type { BatchUpdateRequestOutput } from "@/leads/batch/definition";
 import { BatchOperationScope } from "@/leads/batch/definition";
@@ -1058,9 +1057,10 @@ export class LeadsRepository {
     } catch (error) {
       logger.error("Error fetching lead by ID (internal)", parseError(error));
       return fail({
-        message: t("leadsErrors.leads.get.error.server.title"),
+        message: t("leadsErrors.leads.get.error.server.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }

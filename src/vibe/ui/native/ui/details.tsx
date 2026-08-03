@@ -6,7 +6,7 @@ import * as React from "react";
 import type { ViewStyle } from "react-native";
 import { View } from "react-native";
 
-import { convertCSSToViewStyle } from "../../native/utils/style-converter";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 import type { DetailsProps } from "../../web/ui/details";
 import { applyStyleType } from "../../web/utils/style-type";
 

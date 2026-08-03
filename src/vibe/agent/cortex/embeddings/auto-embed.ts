@@ -11,7 +11,7 @@ import { eq } from "drizzle-orm";
 import {
   rootlessToolExecutionContext,
   type ToolExecutionContext,
-} from "next-vibe/agent/chat/config";
+} from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -159,7 +159,7 @@ async function deductEmbeddingCredits(options: EmbedOptions): Promise<void> {
       await import("@/credits/i18n");
     const { t: tCredits } = creditsScopedTranslation.scopedT(options.locale!);
     const { scopedTranslation: cortexScopedTranslation } =
-      await import("next-vibe/agent/cortex/i18n");
+      await import("../i18n");
     const { t: tCortex } = cortexScopedTranslation.scopedT(options.locale!);
     const featureKey = options.feature ?? CortexCreditFeature.EMBEDDING;
 

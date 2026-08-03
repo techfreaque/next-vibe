@@ -29,23 +29,19 @@ import "server-only";
 globalThis.AI_SDK_LOG_WARNINGS = false;
 
 import { and, eq, like } from "drizzle-orm";
-import { DEFAULT_CHAT_MODEL_SELECTION } from "next-vibe/agent/ai-stream/constants";
-import { seedCaseThread } from "next-vibe/agent/ai-stream/testing/fixture-seed";
+import { DEFAULT_CHAT_MODEL_SELECTION } from "../ai-stream/constants";
+import { seedCaseThread } from "../ai-stream/testing/fixture-seed";
 import {
   getOrCreateFolder,
   runTestStream,
   type SlimMessage,
   toolResultRecord,
-} from "next-vibe/agent/ai-stream/testing/headless-test-runner";
-import {
-  DefaultFolderId,
-  makeHeadlessContext,
-  rootlessToolExecutionContext,
-} from "next-vibe/agent/chat/config";
-import { chatMessages, chatThreads } from "next-vibe/agent/chat/db";
-import { ChatMessageRole } from "next-vibe/agent/chat/enum";
-import { SkillCategory, SkillOwnershipType } from "next-vibe/agent/skills/enum";
-import { chatFavorites } from "next-vibe/agent/skills/favorites/db";
+} from "../ai-stream/testing/headless-test-runner";
+import { DefaultFolderId, makeHeadlessContext, rootlessToolExecutionContext } from "next-vibe/core/execution-context";
+import { chatMessages, chatThreads } from "../chat/db";
+import { ChatMessageRole } from "../chat/enum";
+import { SkillCategory, SkillOwnershipType } from "../skills/enum";
+import { chatFavorites } from "../skills/favorites/db";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
@@ -1330,7 +1326,7 @@ describe("Cortex Mount: /skills", () => {
     // Create a test skill so the /skills mount has something to list/read
     // IMPORTANT: slug must be deterministic (not timestamp-based) so fixture replay works
     const { customSkills: customSkillsTable } =
-      await import("next-vibe/agent/skills/db");
+      await import("../skills/db");
     testSkillSlug = "cortex-test-skill-fixture";
     const [inserted] = await db
       .insert(customSkillsTable)
@@ -1378,7 +1374,7 @@ describe("Cortex Mount: /skills", () => {
       return;
     }
     const { customSkills: customSkillsTable } =
-      await import("next-vibe/agent/skills/db");
+      await import("../skills/db");
     await db
       .delete(customSkillsTable)
       .where(eq(customSkillsTable.id, testSkillId));
@@ -2591,7 +2587,7 @@ describe("Cortex System Prompt Injection", () => {
     const { threadId: seededThreadId, toolExecutionContext: seedCtx } =
       await seedCaseThread(label);
     const { MessagesRepository } =
-      await import("next-vibe/agent/chat/threads/[threadId]/messages/repository");
+      await import("../chat/threads/[threadId]/messages/repository");
     await MessagesRepository.createUserMessage({
       messageId: crypto.randomUUID(),
       threadId: seededThreadId,

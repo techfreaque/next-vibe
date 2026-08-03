@@ -3,22 +3,22 @@
  * Perform a bulk action on multiple cron tasks at once
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { UserRole } from "next-vibe/identity/roles/enum";
-import { scopedTranslation } from "next-vibe/tasks/cron/bulk/i18n";
+} from "../../../core/definition/enums";
+import { UserRole } from "../../../identity/roles/enum";
+import { scopedTranslation } from "./i18n";
 import {
   objectField,
   requestField,
   responseArrayField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../../unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 const BULK_ACTIONS = ["delete", "enable", "disable", "run"] as const;

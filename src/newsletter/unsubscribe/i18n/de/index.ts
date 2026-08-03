@@ -85,6 +85,7 @@ export const translations: typeof enTranslations = {
       title: "Interner Fehler",
       description:
         "Beim Verarbeiten Ihrer Abmeldeanfrage ist ein Fehler aufgetreten",
+      detail: "Abmeldung fehlgeschlagen: {{error}}",
     },
   },
   post: {

@@ -8,7 +8,7 @@
  */
 import { Box, Text, useFocus, useInput, useStdin } from "ink";
 import TextInput from "ink-text-input";
-import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useMemo, useRef, useState } from "react";
 

@@ -5,19 +5,12 @@
 
 import { resolve } from "node:path";
 
-import { afterEach, describe, expect, it, mock } from "bun:test";
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import { createEndpointLogger } from "next-vibe/logger/server";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import { afterEach, describe, expect, it } from "bun:test";
+import { defaultLocale } from "../../../core/i18n/core/config";
+import { createEndpointLogger } from "../../../logger/server";
+import type { EndpointLogger } from "../../../logger/types";
 
-// Mock the i18n module before importing build-executor
-mock.module("next-vibe/core/i18n/core/shared", () => ({
-  simpleT: (): { t: (key: string) => string } => ({
-    t: (key: string): string => key,
-  }),
-}));
-
-import type { BuilderT } from "next-vibe/tooling/builder/i18n";
+import type { BuilderT } from "../i18n";
 
 import { BuildProfileEnum, ViteBuildTypeEnum } from "../enum";
 import { buildExecutor } from "./build-executor";

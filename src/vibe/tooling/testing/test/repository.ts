@@ -5,14 +5,14 @@
 
 // CLI output messages don't need internationalization
 
-import type { ResponseType as ApiResponseType } from "next-vibe/core/route/response.schema";
+import type { ResponseType as ApiResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../../core/route/response.schema";
+import { parseError } from "../../../core/utils/parse-error";
+import type { EndpointLogger } from "../../../logger/types";
 
 import type { TestRequestOutput, TestResponseOutput } from "./definition";
 import type { TestingTestT } from "./i18n";
@@ -116,13 +116,12 @@ export class TestRepository {
       );
 
       return fail({
-        message: t("errors.internal.title"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
-          error: parsedError.message,
-          output: output.trim(),
+        message: t("errors.executionFailed", {
           duration,
-        },
+          detail: parsedError.message,
+          output: output.trim(),
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }

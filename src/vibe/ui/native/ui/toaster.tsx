@@ -5,7 +5,7 @@
 import React from "react";
 import { View } from "react-native";
 
-import { useToast } from "../../native/hooks/use-toast";
+import { useToast } from "../hooks/use-toast";
 import {
   Toast,
   ToastClose,

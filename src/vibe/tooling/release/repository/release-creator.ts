@@ -7,16 +7,16 @@ import { execSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { basename, resolve } from "node:path";
 
-import { type CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { type CountryLanguage } from "../../../core/i18n/core/config";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { scopedTranslation } from "next-vibe/tooling/release/i18n";
+} from "../../../core/route/response.schema";
+import { parseError } from "../../../core/utils/parse-error";
+import type { EndpointLogger } from "../../../logger/types";
+import { scopedTranslation } from "../i18n";
 
 import type { PackageJson, ReleaseOptions, VersionInfo } from "../definition";
 import { MESSAGES } from "./constants";
@@ -175,9 +175,8 @@ class ReleaseCreator {
       logger.error(MESSAGES.GITHUB_RELEASE_FAILED, parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("gitRelease.failed"),
+        message: t("gitRelease.failed", { error: String(error) }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: String(error) },
       });
     }
   }
@@ -268,9 +267,8 @@ class ReleaseCreator {
       logger.error(MESSAGES.GITLAB_RELEASE_FAILED, parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("gitRelease.failed"),
+        message: t("gitlab.failed", { error: String(error) }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: String(error) },
       });
     }
   }

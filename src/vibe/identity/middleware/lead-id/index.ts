@@ -5,19 +5,19 @@
  */
 
 import { and, eq, gt, isNull } from "drizzle-orm";
-import { coreEnv } from "next-vibe/core/env";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
-import { db } from "next-vibe/database";
-import { Environment } from "next-vibe/env/env-util";
-import { leads } from "next-vibe/identity/lead/db";
+import { coreEnv } from "../../../core/env";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import { getLanguageAndCountryFromLocale } from "../../../core/i18n/core/language-utils";
+import { db } from "../../../database";
+import { Environment } from "../../../env/env-util";
+import { leads } from "../../lead/db";
 import {
   createAnonymousLead,
   validateLeadIdExists,
-} from "next-vibe/identity/lead/middleware-ops";
-import { createEndpointLogger } from "next-vibe/logger/server";
-import { frameExchangeTokens } from "next-vibe/platforms/vibe-frame/db";
-import { shouldSkipPath } from "next-vibe/server/middleware/utils";
+} from "../../lead/middleware-ops";
+import { createEndpointLogger } from "../../../logger/server";
+import { frameExchangeTokens } from "../../../platforms/vibe-frame/db";
+import { shouldSkipPath } from "../../../server/middleware/utils";
 import type { NextRequest, NextResponse } from "next-vibe/ui/lib/request";
 import { NextResponse as NextResponseClass } from "next-vibe/ui/lib/request";
 

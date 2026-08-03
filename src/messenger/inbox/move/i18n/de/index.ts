@@ -42,7 +42,11 @@ export const translations: typeof enTranslations = {
       title: "Nicht angemeldet",
       description: "Anmeldung erforderlich",
     },
-    server: { title: "Serverfehler", description: "Interner Serverfehler" },
+    server: {
+      title: "Serverfehler",
+      description: "Interner Serverfehler",
+      detail: "Verschieben fehlgeschlagen: {{error}}",
+    },
     unknown: {
       title: "Unbekannter Fehler",
       description: "Ein unerwarteter Fehler ist aufgetreten",

@@ -335,6 +335,7 @@ export const translations = {
         notFound: {
           title: "User Not Found",
           description: "The requested user could not be found",
+          detail: "No user found with ID {{userId}}.",
         },
         conflict: {
           title: "Conflict Error",
@@ -351,6 +352,7 @@ export const translations = {
         server: {
           title: "Server Error",
           description: "Unable to retrieve user due to server error",
+          detail: "Could not load this user: {{error}}",
         },
         unknown: {
           title: "Unknown Error",
@@ -541,6 +543,7 @@ export const translations = {
         notFound: {
           title: "User Not Found",
           description: "The user to update could not be found",
+          detail: "No user found with ID {{userId}}.",
         },
         conflict: {
           title: "Update Conflict",
@@ -549,6 +552,7 @@ export const translations = {
         server: {
           title: "Server Error",
           description: "Unable to update user due to server error",
+          detail: "Could not save changes to this user: {{error}}",
         },
         unknown: {
           title: "Unknown Error",
@@ -623,10 +627,12 @@ export const translations = {
         notFound: {
           title: "User Not Found",
           description: "The user to delete could not be found",
+          detail: "No user found with ID {{userId}}.",
         },
         server: {
           title: "Server Error",
           description: "Unable to delete user due to server error",
+          detail: "Could not delete this user: {{error}}",
         },
         unknown: {
           title: "Unknown Error",

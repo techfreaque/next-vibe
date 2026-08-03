@@ -2,10 +2,10 @@
  * Password Field Widget Types
  */
 
-import type { FieldDataType } from "next-vibe/core/definition/enums";
-import type { StringWidgetSchema } from "next-vibe/unified-ui/_shared/schema-constraints";
-import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
-import type { BaseFormFieldWidgetConfig } from "next-vibe/unified-ui/widgets/form-fields/_shared/types";
+import type { FieldDataType } from "../../../../core/definition/enums";
+import type { StringWidgetSchema } from "../../../_shared/schema-constraints";
+import type { FieldUsageConfig } from "../../../_shared/types";
+import type { BaseFormFieldWidgetConfig } from "../_shared/types";
 
 export interface PasswordFieldWidgetConfig<
   out TKey extends string,

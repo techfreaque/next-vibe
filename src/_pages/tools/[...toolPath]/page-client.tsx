@@ -8,6 +8,7 @@ import type {
 import helpDefinitions from "next-vibe/help-tool/definition";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import type { Platform } from "next-vibe/platforms/platforms";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { useSearchParams } from "next-vibe/ui/hooks/use-navigation";
 import { Div } from "next-vibe/ui/ui/div";
@@ -90,9 +91,11 @@ function parseInitialState(
 export function ToolDetailPageClient({
   locale,
   user,
+  platform,
 }: {
   locale: CountryLanguage;
   user: JwtPayloadType;
+  platform: Platform;
   toolAlias: string;
   initialHelpData?: HelpGetResponseOutput | null;
 }): JSX.Element {
@@ -138,6 +141,7 @@ export function ToolDetailPageClient({
         endpoint={helpDefinitions}
         locale={locale}
         user={user}
+        platform={platform}
         endpointInstance={endpointInstance}
         endpointOptions={endpointOptions}
         className="flex flex-col flex-1 min-h-0 w-full"

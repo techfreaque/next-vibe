@@ -6,29 +6,29 @@
 import "server-only";
 
 import { and, eq, isNull, ne, or, sql } from "drizzle-orm";
-import { makeHeadlessContext } from "next-vibe/agent/chat/config";
-import { getFullPath } from "next-vibe/core/core-utils/path";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { makeHeadlessContext } from "next-vibe/core/execution-context";
+import { getFullPath } from "../../core/core-utils/path";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import type { ResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   isFileResponse,
   isStreamingResponse,
   success,
-} from "next-vibe/core/route/response.schema";
-import { db } from "next-vibe/database";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { Platform } from "next-vibe/platforms/platforms";
-import { splitTaskArgs } from "next-vibe/tasks/cron/arg-splitter";
-import { cronTasks, dbUserIdToOwner } from "next-vibe/tasks/cron/db";
-import { createTaskEmitters } from "next-vibe/tasks/cron/emitter";
-import { CronTasksRepository } from "next-vibe/tasks/cron/repository";
-import { resolveTaskOwnerUser } from "next-vibe/tasks/cron/resolve-task-user";
-import type { TaskExecuteT } from "next-vibe/tasks/execute/i18n";
-import { scopedTranslation as tasksScopedTranslation } from "next-vibe/tasks/i18n";
+} from "../../core/route/response.schema";
+import { db } from "../../database";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import { UserPermissionRole } from "../../identity/roles/enum";
+import type { EndpointLogger } from "../../logger/types";
+import { Platform } from "../../platforms/platforms";
+import { splitTaskArgs } from "../cron/arg-splitter";
+import { cronTasks, dbUserIdToOwner } from "../cron/db";
+import { createTaskEmitters } from "../cron/emitter";
+import { CronTasksRepository } from "../cron/repository";
+import { resolveTaskOwnerUser } from "../cron/resolve-task-user";
+import type { TaskExecuteT } from "./i18n";
+import { scopedTranslation as tasksScopedTranslation } from "../i18n";
 
 import { CronTaskStatus, type CronTaskStatusValue } from "../enum";
 import type {
@@ -65,9 +65,8 @@ export class TaskExecuteRepository {
     const task = rows[0];
     if (!task) {
       return fail({
-        message: t("errors.notFound"),
+        message: t("errors.notFound", { taskId: data.taskId }),
         errorType: ErrorResponseTypes.NOT_FOUND,
-        messageParams: { taskId: data.taskId },
       });
     }
 

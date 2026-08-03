@@ -7,11 +7,11 @@ import "server-only";
 import { existsSync, readFileSync } from "node:fs";
 import { delimiter, dirname, join } from "node:path";
 
-import { defineEnv } from "next-vibe/env/define-env";
-import { Environment, VibeMode, VibeModeValues } from "next-vibe/env/env-util";
+import { defineEnv } from "../env/define-env";
+import { Environment, VibeMode, VibeModeValues } from "../env/env-util";
 import { z } from "zod";
 
-import { isHermesDev, isPreviewMode } from "@/vibe/env/detect";
+import { isHermesDev, isPreviewMode } from "../env/detect";
 
 export const PackageManager = {
   BUN: "bun",
@@ -332,6 +332,7 @@ export const {
   PACKAGE_MANAGER: {
     schema: z.enum(packageManagerValues).default(detectPackageManager()),
     example: "bun",
+    commented: true,
     comment:
       "Package manager used to run bundled binaries (oxlint, oxfmt, tsc, vitest). Auto-detected from the packageManager field, then the lockfile, then npm_config_user_agent; set this to override.",
     fieldType: "select",

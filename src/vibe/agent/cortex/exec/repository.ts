@@ -10,7 +10,7 @@ import { spawn } from "node:child_process";
 import { randomUUID } from "node:crypto";
 
 import { and, eq, or } from "drizzle-orm";
-import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -31,7 +31,9 @@ import {
 } from "@/ssh/client";
 import { sshConnectionMounts, sshConnections } from "@/ssh/db";
 import { ExecBackend, SshAuthType, SshSessionStatus } from "@/ssh/enum";
+import { sshEnv } from "@/ssh/env";
 
+import { cortexEnv } from "../env";
 import type {
   CortexExecRequestOutput,
   CortexExecResponseOutput,
@@ -47,19 +49,14 @@ import {
 } from "./pool";
 
 export class CortexExecRepository {
-  private static readonly MAX_OUTPUT_BYTES = Number(
-    process.env["LOCAL_MAX_OUTPUT_BYTES"] ?? 32768,
-  );
+  private static readonly MAX_OUTPUT_BYTES = cortexEnv.LOCAL_MAX_OUTPUT_BYTES;
 
-  private static readonly DEFAULT_TIMEOUT_MS = Number(
-    process.env["LOCAL_DEFAULT_TIMEOUT_MS"] ?? 30000,
-  );
+  private static readonly DEFAULT_TIMEOUT_MS =
+    cortexEnv.LOCAL_DEFAULT_TIMEOUT_MS;
 
   private static readonly ESCALATE_THRESHOLD_MS = 89_000;
 
-  private static readonly IDLE_TIMEOUT_MS = Number(
-    process.env["SSH_IDLE_TIMEOUT_MS"] ?? 300000,
-  );
+  private static readonly IDLE_TIMEOUT_MS = sshEnv.SSH_IDLE_TIMEOUT_MS;
 
   private static readonly MAX_BUF = 65536;
 
@@ -265,7 +262,7 @@ export class CortexExecRepository {
       }
 
       const { remoteConnections } =
-        await import("../../../remote-connection/db");
+        await import("next-vibe/remote-connection/db");
       const remoteRows = await db
         .select({
           id: remoteConnections.id,

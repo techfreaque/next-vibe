@@ -8,12 +8,12 @@ import { and, eq } from "drizzle-orm";
 import {
   rootlessToolExecutionContext,
   type ToolExecutionContext,
-} from "next-vibe/agent/chat/config";
+} from "next-vibe/core/execution-context";
 import {
   type CountryLanguage,
   defaultLocale,
 } from "next-vibe/core/i18n/core/config";
-import type { RemoteEventHandlerProps } from "next-vibe/core/route/handler";
+import type { RemoteEventHandlerProps } from "next-vibe/core/route/handler-realtime";
 import {
   ErrorResponseTypes,
   fail,
@@ -24,9 +24,9 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { createEndpointEmitter } from "next-vibe/realtime/emitter";
+import { createEndpointEmitter } from "next-vibe/realtime/core/emitter";
 
-import type { EndpointLogger } from "../../../logger/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import { applyFindReplace, applyLineReplace } from "../_shared/edit-operations";
 import { cortexNodes } from "../db";
 import { CortexCreditFeature, CortexNodeType } from "../enum";
@@ -42,6 +42,29 @@ import {
 } from "../repository";
 import editDefinitions from "./definition";
 import { type CortexEditT, scopedTranslation } from "./i18n";
+
+/**
+ * Names the edit params the caller actually supplied. The error then points at
+ * what arrived instead of only restating the contract, which is what an agent
+ * needs to correct its next call.
+ */
+function listProvidedEditParams(
+  t: CortexEditT,
+  provided: {
+    find?: string;
+    replace?: string;
+    startLine?: number;
+    endLine?: number;
+    newContent?: string;
+  },
+): string {
+  const names = Object.entries(provided)
+    .filter(([, value]) => value !== undefined)
+    .map(([name]) => name);
+  return names.length > 0
+    ? names.join(", ")
+    : t("patch.errors.noParamsProvided");
+}
 
 export class CortexEditRepository {
   static async editFile({
@@ -144,7 +167,8 @@ export class CortexEditRepository {
       if (result.replacements === 0) {
         return fail({
           message: t("patch.errors.findNotFound", {
-            details: `"${find.slice(0, 120)}${find.length > 120 ? "…" : ""}" in ${path}. Use cortex-read to get the current file content and retry with the exact text.`,
+            snippet: `${find.slice(0, 120)}${find.length > 120 ? "…" : ""}`,
+            path,
           }),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
@@ -161,8 +185,10 @@ export class CortexEditRepository {
       const lineCount = content.split("\n").length;
       if (startLine > lineCount || endLine > lineCount) {
         return fail({
-          message: t("patch.errors.invalidParams", {
-            details: `Line range ${startLine}-${endLine} is out of bounds. File has ${lineCount} lines.`,
+          message: t("patch.errors.lineRangeOutOfBounds", {
+            startLine,
+            endLine,
+            lineCount,
           }),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
@@ -171,8 +197,14 @@ export class CortexEditRepository {
       replacements = 1;
     } else {
       return fail({
-        message: t("patch.errors.invalidParams", {
-          details: `Use {find+replace} or {startLine+endLine+newContent}. Got: find=${find !== undefined ? "set" : "unset"}, replace=${replace !== undefined ? "set" : "unset"}, startLine=${startLine !== undefined ? "set" : "unset"}, endLine=${endLine !== undefined ? "set" : "unset"}, newContent=${newContent !== undefined ? "set" : "unset"}`,
+        message: t("patch.errors.missingEditStrategy", {
+          provided: listProvidedEditParams(t, {
+            find,
+            replace,
+            startLine,
+            endLine,
+            newContent,
+          }),
         }),
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
       });
@@ -302,7 +334,8 @@ export class CortexEditRepository {
       if (result.replacements === 0) {
         return fail({
           message: t("patch.errors.findNotFound", {
-            details: `"${find.slice(0, 120)}${find.length > 120 ? "…" : ""}" in ${path}. Use cortex-read to get the current file content and retry with the exact text.`,
+            snippet: `${find.slice(0, 120)}${find.length > 120 ? "…" : ""}`,
+            path,
           }),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
@@ -319,8 +352,10 @@ export class CortexEditRepository {
       const lineCount = content.split("\n").length;
       if (startLine > lineCount || endLine > lineCount) {
         return fail({
-          message: t("patch.errors.invalidParams", {
-            details: `Line range ${startLine}-${endLine} is out of bounds. File has ${lineCount} lines.`,
+          message: t("patch.errors.lineRangeOutOfBounds", {
+            startLine,
+            endLine,
+            lineCount,
           }),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
@@ -329,8 +364,14 @@ export class CortexEditRepository {
       replacements = 1;
     } else {
       return fail({
-        message: t("patch.errors.invalidParams", {
-          details: `Use {find+replace} or {startLine+endLine+newContent}. Got: find=${find !== undefined ? "set" : "unset"}, replace=${replace !== undefined ? "set" : "unset"}, startLine=${startLine !== undefined ? "set" : "unset"}, endLine=${endLine !== undefined ? "set" : "unset"}, newContent=${newContent !== undefined ? "set" : "unset"}`,
+        message: t("patch.errors.missingEditStrategy", {
+          provided: listProvidedEditParams(t, {
+            find,
+            replace,
+            startLine,
+            endLine,
+            newContent,
+          }),
         }),
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
       });

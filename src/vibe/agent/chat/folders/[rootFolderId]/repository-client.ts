@@ -6,8 +6,8 @@
 
 "use client";
 
-import type { FolderContentsItem } from "next-vibe/agent/chat/folder-contents/[rootFolderId]/definition";
-import folderContentsDefinitions from "next-vibe/agent/chat/folder-contents/[rootFolderId]/definition";
+import type { FolderContentsItem } from "../../folder-contents/[rootFolderId]/definition";
+import folderContentsDefinitions from "../../folder-contents/[rootFolderId]/definition";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -18,12 +18,9 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { apiClient } from "next-vibe/unified-ui/hooks/store";
-import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 
-import type { DefaultFolderId } from "../../config";
 import type { ChatFolder } from "../../db";
 import {
-  createIncognitoFolder,
   deleteFolder,
   getFoldersForRoot,
   updateIncognitoFolder,
@@ -95,38 +92,6 @@ export class ChatFoldersRepositoryClient {
   }
 
   /**
-   * Create folder (mirrors server createFolder)
-   */
-  static async createFolder(
-    name: string,
-    rootFolderId: DefaultFolderId,
-    parentId: string | null,
-    icon: IconKey | null,
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<ResponseType<{ id: string }>> {
-    const { t } = scopedTranslation.scopedT(locale);
-    try {
-      const folder = await createIncognitoFolder(
-        name,
-        rootFolderId,
-        parentId,
-        icon ?? undefined,
-      );
-
-      logger.debug("Client: created incognito folder", { id: folder.id });
-
-      return success({ id: folder.id });
-    } catch (error) {
-      logger.error("Failed to create incognito folder", parseError(error));
-      return fail({
-        message: t("get.errors.server.title"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      });
-    }
-  }
-
-  /**
    * Update folder (mirrors server updateFolder)
    */
   static async updateFolder(
@@ -180,37 +145,6 @@ export class ChatFoldersRepositoryClient {
           rootFolderId: newItem.rootFolderId,
         },
         requestData: { subFolderId: newItem.parentId, threadIds: null },
-      },
-    );
-  }
-
-  /**
-   * Optimistically update a folder's fields in the folder-contents cache.
-   */
-  static updateFolderInCache(
-    folderId: string,
-    rootFolderId: DefaultFolderId,
-    parentId: string | null,
-    updates: Partial<FolderContentsItem>,
-    logger: EndpointLogger,
-  ): void {
-    apiClient.updateEndpointData(
-      folderContentsDefinitions.GET,
-      logger,
-      (old) => {
-        if (!old?.success) {
-          return old;
-        }
-        return success({
-          ...old.data,
-          items: old.data.items.map((item) =>
-            item.id === folderId ? { ...item, ...updates } : item,
-          ),
-        });
-      },
-      {
-        urlPathParams: { rootFolderId },
-        requestData: { subFolderId: parentId, threadIds: null },
       },
     );
   }

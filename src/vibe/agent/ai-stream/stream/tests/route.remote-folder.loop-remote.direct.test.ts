@@ -9,7 +9,7 @@
 
 import "server-only";
 
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import { DefaultFolderId } from "../../../../core/execution-context";
 
 import {
   failSuitePrerequisites,

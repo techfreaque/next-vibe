@@ -2,15 +2,19 @@
  * Generators endpoint repository — the `vibe gen` surface.
  *
  * Contains the GeneratorRunner orchestrator and the endpoint handler.
- * The registry lives in src/generated/generators/index.ts — edit it directly
- * to add/remove generators, no meta-generator needed.
+ * The registry lives in <GENERATED_DIR>/generators/index.ts, emitted by
+ * ./generator.ts from the `generator` const each domain generator exports.
  *
- * BOOTSTRAP FALLBACK: `bun src/vibe/core/generators/repository.ts`
- * runs the full generation from scratch — even with zero generated files or a
- * broken CLI.
+ * BOOTSTRAP FALLBACK: running this file directly performs the full generation
+ * from scratch — even with zero generated files or a broken CLI. The
+ * generators-index pre-step below writes the registry before it is imported, so
+ * an empty generated tree still bootstraps.
  */
 
 import "server-only";
+
+import { realpathSync } from "node:fs";
+import { pathToFileURL } from "node:url";
 
 import {
   type GenState,
@@ -18,32 +22,31 @@ import {
   markDone,
   readGenState,
   writeGenState,
-} from "next-vibe/core/generators/shared/gen-cache";
-import type { LiveIndex } from "next-vibe/core/generators/shared/live-index";
-import type { GeneratorContext } from "next-vibe/core/generators/shared/shared-inputs";
-import { buildGeneratorContext } from "next-vibe/core/generators/shared/shared-inputs";
-import { findFilesRecursively } from "next-vibe/core/generators/shared/utils";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+} from "./shared/gen-cache";
+import type {
+  GeneratorContext,
+  GeneratorInputIndex,
+} from "./shared/shared-inputs";
+import { buildGeneratorContext } from "./shared/shared-inputs";
+import { findFilesRecursively } from "./shared/utils";
 import {
   ErrorResponseTypes,
-  fail,
+  failInline,
   type ResponseType as BaseResponseType,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { createEndpointLogger } from "next-vibe/logger/server";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../route/response.schema";
+import { parseError } from "../utils/parse-error";
+import { createEndpointLogger } from "../../logger/server";
+import type { EndpointLogger } from "../../logger/types";
 
 import { GENERATED_DIR, getApiDir } from "@/env/paths";
 import type { GeneratorEntry } from "@/generated/generators/index";
-import { GENERATORS_REGISTRY } from "@/generated/generators/index";
 
 import type {
   GenerateAllRequestOutput,
   GenerateAllResponseOutput,
 } from "./definition";
-import { generate as generateGeneratorsIndex } from "./generator";
-import { scopedTranslation } from "./i18n";
+import { generate as generateGeneratorsIndex, OUTPUT_FILE } from "./generator";
 
 // ---------------------------------------------------------------------------
 // Orchestrator
@@ -52,7 +55,7 @@ import { scopedTranslation } from "./i18n";
 interface RunGeneratorsOptions {
   logger: EndpointLogger;
   force?: boolean;
-  live?: LiveIndex;
+  live?: GeneratorInputIndex;
   only?: ReadonlySet<string>;
   noCache?: boolean;
 }
@@ -62,6 +65,11 @@ interface RunGeneratorsResult {
   skipped: string[];
   failed: { key: string; error: string }[];
   output: string[];
+  /**
+   * Size of the generated registry. Reported from the run rather than read off a
+   * static `REGISTRY` getter, because the registry is now loaded inside the run.
+   */
+  totalGenerators: number;
 }
 
 type RunOutcome =
@@ -75,12 +83,29 @@ type RunOutcome =
  * gen-cache skipping.
  */
 export class GeneratorRunner {
-  static get REGISTRY(): readonly GeneratorEntry[] {
-    return GENERATORS_REGISTRY;
+  /**
+   * Load the generated registry.
+   *
+   * Deliberately a dynamic import inside the run, NOT a module-level static one:
+   * the registry is generated output, and the pre-step below is what writes it.
+   * A static import is resolved when this module loads, which made the documented
+   * bootstrap fallback (`bun repository.ts` on a tree with no src/generated/*)
+   * die with "Cannot find module @/generated/generators/index" before a single
+   * generator could run — the one situation the fallback exists for. Importing
+   * after the pre-step means the file is always on disk by the time we need it.
+   */
+  private static async loadRegistry(): Promise<readonly GeneratorEntry[]> {
+    const mod = (await import("@/generated/generators/index")) as {
+      GENERATORS_REGISTRY: readonly GeneratorEntry[];
+    };
+    return mod.GENERATORS_REGISTRY;
   }
 
-  private static resolve(opts: RunGeneratorsOptions): GeneratorEntry[] {
-    return GENERATORS_REGISTRY.filter((g) => {
+  private static resolve(
+    registry: readonly GeneratorEntry[],
+    opts: RunGeneratorsOptions,
+  ): GeneratorEntry[] {
+    return registry.filter((g) => {
       if (opts.only && !opts.only.has(g.key)) {
         return false;
       }
@@ -96,7 +121,7 @@ export class GeneratorRunner {
   ): Promise<RunOutcome> {
     if (!opts.noCache && !opts.force && gen.cacheKey) {
       const inputs = gen.findInputs(opts.live);
-      if (isUnchanged(gen.cacheKey, inputs, genState)) {
+      if (isUnchanged(gen.cacheKey, inputs, gen.output, genState)) {
         return { status: "skipped" };
       }
     }
@@ -126,20 +151,12 @@ export class GeneratorRunner {
     opts: RunGeneratorsOptions,
   ): Promise<RunGeneratorsResult> {
     const { logger } = opts;
-    const generators = GeneratorRunner.resolve(opts);
-
-    const ctx = await buildGeneratorContext({
-      logger,
-      force: opts.force ?? false,
-      live: opts.live,
-      need: {
-        definitionModules: generators.some((g) => g.needs.definitionModules),
-      },
-    });
 
     const genState: GenState = opts.noCache || opts.force ? {} : readGenState();
 
-    // Pre-step: generators index (not in registry — circular import).
+    // Pre-step: generators index (not in registry — circular import). Runs
+    // FIRST, before the registry is imported, so a tree with no generated files
+    // still bootstraps.
     const generatorsIndexKey = "generators-index";
     const generatorsIndexInputs = findFilesRecursively(
       getApiDir(),
@@ -148,13 +165,19 @@ export class GeneratorRunner {
     const skipGeneratorsIndex =
       !opts.noCache &&
       !opts.force &&
-      isUnchanged(generatorsIndexKey, generatorsIndexInputs, genState);
+      isUnchanged(
+        generatorsIndexKey,
+        generatorsIndexInputs,
+        OUTPUT_FILE,
+        genState,
+      );
 
     const result: RunGeneratorsResult = {
       ran: [],
       skipped: [],
       failed: [],
       output: [],
+      totalGenerators: 0,
     };
     const recordedCacheKeys = new Set<string>();
 
@@ -180,7 +203,7 @@ export class GeneratorRunner {
       result.output.push(`✅ generators-index: cached`);
     } else {
       try {
-        const indexResult = await generateGeneratorsIndex(ctx);
+        const indexResult = await generateGeneratorsIndex({ logger });
         result.ran.push("generators-index");
         result.output.push(`✅ generators-index: ${indexResult.summary}`);
         if (!opts.noCache && !opts.force) {
@@ -193,6 +216,20 @@ export class GeneratorRunner {
         logger.error(`Generator generators-index failed: ${msg}`);
       }
     }
+
+    // Registry is imported only now — the pre-step above just wrote it.
+    const registry = await GeneratorRunner.loadRegistry();
+    const generators = GeneratorRunner.resolve(registry, opts);
+    result.totalGenerators = registry.length;
+
+    const ctx = await buildGeneratorContext({
+      logger,
+      force: opts.force ?? false,
+      live: opts.live,
+      need: {
+        definitionModules: generators.some((g) => g.needs.definitionModules),
+      },
+    });
 
     // def-scan: sequential (Bun TDZ).
     for (const gen of generators.filter((g) => g.phase === "def-scan")) {
@@ -230,7 +267,6 @@ export class GenerateAllRepository {
   static async generateAll(
     data: GenerateAllRequestOutput,
     logger: EndpointLogger,
-    locale: CountryLanguage,
   ): Promise<BaseResponseType<GenerateAllResponseOutput>> {
     try {
       const result = await GeneratorRunner.runGenerators({
@@ -239,13 +275,9 @@ export class GenerateAllRepository {
       });
 
       if (result.failed.length > 0) {
-        const { t } = scopedTranslation.scopedT(locale);
-        return fail({
-          message: t("post.errors.internal.title"),
+        return failInline({
+          message: `Generators failed: ${result.failed.map((f) => `${f.key}: ${f.error}`).join("; ")}`,
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: {
-            error: result.failed.map((f) => `${f.key}: ${f.error}`).join("; "),
-          },
         });
       }
 
@@ -254,7 +286,7 @@ export class GenerateAllRepository {
         generationCompleted: true,
         output: result.output.join("\n"),
         generationStats: {
-          totalGenerators: GeneratorRunner.REGISTRY.length,
+          totalGenerators: result.totalGenerators,
           generatorsRun: result.ran.length,
           generatorsSkipped: result.skipped.length,
           outputDirectory: GENERATED_DIR,
@@ -263,29 +295,50 @@ export class GenerateAllRepository {
       });
     } catch (error) {
       const errorMessage = parseError(error);
-      const { t } = scopedTranslation.scopedT(locale);
-      return fail({
-        message: t("post.errors.internal.title"),
+      return failInline({
+        message: `Generator run failed: ${errorMessage.message}`,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: errorMessage.message },
       });
     }
   }
 }
 
 /**
- * Bootstrap CLI entry: `bun repository.ts` regenerates everything from scratch.
+ * True when this module is the process entry point. `import.meta.main` would
+ * say the same thing in one word, but it does not exist on node — comparing the
+ * resolved argv[1] to this module's URL works on both runtimes. realpath so a
+ * symlinked bin (node_modules/.bin) still matches.
+ */
+function isEntryPoint(): boolean {
+  const entry = process.argv[1];
+  if (!entry) {
+    return false;
+  }
+  try {
+    return pathToFileURL(realpathSync(entry)).href === import.meta.url;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Bootstrap CLI entry: running this file directly regenerates everything from scratch.
  * Calls the orchestrator directly (no endpoint definition / no generated-file
  * imports beyond the generators index) so it works even when the CLI is broken.
  */
-if (import.meta.main) {
+if (isEntryPoint()) {
   const logger = createEndpointLogger(false, "en-US");
-  void GeneratorRunner.runGenerators({ logger }).then((r) => {
+  // force: the gen-cache answers "did the INPUTS change" — meaningless on a
+  // wiped tree, where a stale .tmp/gen-state.json would skip generators whose
+  // output no longer exists. From-scratch means regenerate everything.
+  void GeneratorRunner.runGenerators({ logger, force: true }).then((r) => {
     logger.info(r.output.join("\n"));
     if (r.failed.length > 0) {
       logger.error(
         `Generation failed: ${r.failed.map((f) => f.key).join(", ")}`,
       );
+      // Non-zero exit so callers (postinstall bootstrap loop) can retry.
+      process.exitCode = 1;
     }
     return undefined;
   });

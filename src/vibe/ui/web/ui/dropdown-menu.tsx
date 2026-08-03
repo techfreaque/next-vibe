@@ -1,13 +1,13 @@
 "use client";
 
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 
-import { CheckIcon } from "../../web/ui/icons/CheckIcon";
-import { ChevronRightIcon } from "../../web/ui/icons/ChevronRightIcon";
-import { DotFilledIcon } from "../../web/ui/icons/DotFilledIcon";
-import type { StyleType } from "../../web/utils/style-type";
+import { CheckIcon } from "./icons/CheckIcon";
+import { ChevronRightIcon } from "./icons/ChevronRightIcon";
+import { DotFilledIcon } from "./icons/DotFilledIcon";
+import type { StyleType } from "../utils/style-type";
 import type { DivMouseEvent } from "./div";
 
 // Cross-platform types

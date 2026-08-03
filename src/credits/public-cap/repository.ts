@@ -135,7 +135,7 @@ export class PublicCapRepository {
         .where(eq(publicFreeTierDailyCap.id, rowResult.data.id));
 
       return success({
-        message: `Daily cap updated to ${capAmount} credits`,
+        message: t("repository.capUpdated", { capAmount }),
       });
     } catch (error) {
       logger.error("Failed to update public cap", parseError(error));

@@ -168,6 +168,7 @@ export const translations = {
       server: {
         title: "Server Error",
         description: "Internal server error occurred",
+        detail: "Test send failed: {{error}}",
       },
       unknown: {
         title: "Unknown Error",
@@ -194,11 +195,12 @@ export const translations = {
         description: "Data conflict occurred",
       },
       templateNotFound: {
-        title: "Template Not Found",
+        title:
+          "No template for {{emailJourneyVariant}} / {{emailCampaignStage}}",
         description: "Email template not found for specified parameters",
       },
       sendingFailed: {
-        title: "Sending Failed",
+        title: "Send to {{recipient}} failed ({{subject}}): {{error}}",
         description: "Failed to send test email",
       },
     },

@@ -3,7 +3,7 @@ import "server-only";
 import { PGlite } from "@electric-sql/pglite";
 import { type NodePgDatabase } from "drizzle-orm/node-postgres";
 import { type PgliteDatabase } from "drizzle-orm/pglite";
-import { databaseEnv } from "next-vibe/database/env";
+import { databaseEnv } from "./env";
 import { Pool } from "pg";
 
 /**
@@ -95,7 +95,7 @@ export function recreatePool(): Pool | null {
 // PGlite is API-compatible with NodePgDatabase at runtime (same pg-core query builders).
 // The types diverge only in their HKT; this bridge function hides the cast in one place
 // so callers see NodePgDatabase and get correct .returning()/.execute() overloads.
-// eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- drizzle's schema generic is bound to Record<string, unknown>; this must match its constraint exactly.
+// eslint-disable-next-line restricted/no-unknown -- drizzle's schema generic is bound to Record<string, unknown>; this must match its constraint exactly.
 export function pgliteAsNodePg<TSchema extends Record<string, unknown>>(
   client: PgliteDatabase<TSchema>,
 ): NodePgDatabase<TSchema> {

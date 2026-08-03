@@ -22,7 +22,7 @@ export type {
   AlertDialogTriggerProps,
 } from "../../web/ui/alert-dialog";
 
-import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 
 import type {
   AlertDialogActionProps,

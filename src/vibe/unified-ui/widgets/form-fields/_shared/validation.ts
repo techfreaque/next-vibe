@@ -2,7 +2,7 @@
  * Shared validation utilities for form field widgets
  */
 
-import type { FieldValidationState } from "next-vibe/unified-ui/_shared/field-config-types";
+import type { FieldValidationState } from "../../../_shared/field-config-types";
 
 /**
  * Form field error interface

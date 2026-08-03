@@ -4,26 +4,27 @@
 
 import "server-only";
 
-import { coreEnv } from "next-vibe/core/env";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { existsSync } from "node:fs";
+import { isAbsolute, posix, resolve } from "node:path";
+
+import { coreEnv } from "../../../core/env";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
-  fail,
+  failInline,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { isCliPlatform, Platform } from "next-vibe/platforms/platforms";
+} from "../../../core/route/response.schema";
+import { parseError } from "../../../core/utils/parse-error";
+import type { JwtPayloadType } from "../../../identity/auth/types";
+import type { EndpointLogger } from "../../../logger/types";
+import { Platform } from "../../../platforms/platforms";
+import { createEndpointEmitter } from "../../../realtime/core/emitter";
+
+import { getInvocationDir } from "@/env/paths";
 
 import { ConfigRepositoryImpl } from "../config/repository";
 import type { CheckConfig } from "../config/types";
-import type { CheckVibeCheckT, CheckVibeCheckTranslationKey } from "../i18n";
-import {
-  scopedTranslation as oxlintScopedTranslation,
-  scopedTranslation as typecheckScopedTranslation,
-} from "../i18n";
+import vibeCheckEndpoints from "../definition";
 import { calculateFilteredSummary, filterIssues } from "./filter-utils";
 import { LintRepository } from "./lint/repository";
 import { OxlintRepository } from "./oxlint/repository";
@@ -61,6 +62,24 @@ interface SharedResponseOutput {
   truncatedMessage?: string;
   currentPage?: number;
   totalPages?: number;
+  phases?: CheckPhase[] | null;
+  isComplete?: boolean;
+}
+
+type CheckPhaseStatus = "pending" | "running" | "done" | "failed" | "skipped";
+
+/**
+ * One checker's progress row. `id` is what makes the cache-merger update a
+ * single phase in place — id-keyed arrays merge by id, so an emit carrying only
+ * the oxlint row leaves eslint/typecheck untouched.
+ */
+interface CheckPhase {
+  id: CheckType;
+  tool: string;
+  status: CheckPhaseStatus;
+  issues?: number;
+  errors?: number;
+  durationMs?: number;
 }
 
 interface VibeCheckRequestOutput {
@@ -98,16 +117,13 @@ interface CheckIssue {
 }
 
 export class VibeCheckRepository {
-  private static getPerformanceKey(
-    type: CheckType,
-    t: CheckVibeCheckT,
-  ): ReturnType<CheckVibeCheckT> {
-    const keyMap: Record<CheckType, CheckVibeCheckTranslationKey> = {
-      oxlint: "performance.oxlint",
-      eslint: "performance.eslint",
-      typecheck: "performance.typecheck",
+  private static getPerformanceKey(type: CheckType): string {
+    const keyMap: Record<CheckType, string> = {
+      oxlint: "Oxlint",
+      eslint: "ESLint",
+      typecheck: "TypeScript",
     };
-    return t(keyMap[type]);
+    return keyMap[type];
   }
 
   private static async runOxlintCheck(
@@ -117,13 +133,11 @@ export class VibeCheckRepository {
     config: CheckConfig,
     logger: EndpointLogger,
     platform: Platform,
-    locale: CountryLanguage,
     extensive: boolean,
     strict: boolean,
     signal: AbortSignal,
   ): Promise<CheckResult> {
     const startTime = Date.now();
-    const { t: oxlintT } = oxlintScopedTranslation.scopedT(locale);
     const result = await OxlintRepository.execute(
       {
         path: paths.length === 1 ? paths[0] : paths,
@@ -138,17 +152,15 @@ export class VibeCheckRepository {
       },
       logger,
       platform,
-      oxlintT,
       signal,
-      locale,
       config,
     );
-    const oxlintMsg = `✓ Oxlint check completed with ${result.success ? result.data.items?.length : 0} issues`;
-    if (isCliPlatform(platform)) {
-      logger.info(oxlintMsg);
-    } else {
-      logger.debug(oxlintMsg);
-    }
+    // Completion is reported through the "check-progress" event (see execute),
+    // which renders as a phase row in the widget on every platform. Keeping an
+    // info-level stdout write here would tear the repainting live frame.
+    logger.debug(
+      `✓ Oxlint check completed with ${result.success ? result.data.items?.length : 0} issues`,
+    );
     return {
       type: "oxlint",
       result,
@@ -163,7 +175,6 @@ export class VibeCheckRepository {
     config: CheckConfig,
     logger: EndpointLogger,
     platform: Platform,
-    locale: CountryLanguage,
     extensive: boolean,
     signal: AbortSignal,
   ): Promise<CheckResult> {
@@ -184,14 +195,10 @@ export class VibeCheckRepository {
       platform,
       config,
       signal,
-      locale,
     );
-    const eslintMsg = `✓ ESLint check completed with ${result.success ? result.data.items?.length : 0} issues`;
-    if (isCliPlatform(platform)) {
-      logger.info(eslintMsg);
-    } else {
-      logger.debug(eslintMsg);
-    }
+    logger.debug(
+      `✓ ESLint check completed with ${result.success ? result.data.items?.length : 0} issues`,
+    );
     return {
       type: "eslint",
       result,
@@ -205,12 +212,13 @@ export class VibeCheckRepository {
     config: CheckConfig,
     logger: EndpointLogger,
     platform: Platform,
-    locale: CountryLanguage,
     extensive: boolean,
+    // Without this the `--strict` request flag never reached the typechecker:
+    // resolveEnforcedOptions read `data.strict`, which was always undefined.
+    strict: boolean,
     signal: AbortSignal,
   ): Promise<CheckResult> {
     const startTime = Date.now();
-    const { t: typecheckT } = typecheckScopedTranslation.scopedT(locale);
 
     const result = await TypecheckRepository.execute(
       {
@@ -222,21 +230,17 @@ export class VibeCheckRepository {
         page: 1,
         summaryOnly: false,
         extensive,
+        strict,
       },
       logger,
       platform,
-      typecheckT,
-      locale,
       config,
       signal,
     );
 
-    const typecheckMsg = `✓ TypeScript check completed with ${result.success ? result.data.items?.length : 0} issues`;
-    if (isCliPlatform(platform)) {
-      logger.info(typecheckMsg);
-    } else {
-      logger.debug(typecheckMsg);
-    }
+    logger.debug(
+      `✓ TypeScript check completed with ${result.success ? result.data.items?.length : 0} issues`,
+    );
     return {
       type: "typecheck",
       result,
@@ -280,8 +284,7 @@ export class VibeCheckRepository {
     data: VibeCheckRequestOutput,
     logger: EndpointLogger,
     platform: Platform,
-    t: CheckVibeCheckT,
-    locale: CountryLanguage,
+    user: JwtPayloadType,
     signal: AbortSignal,
   ): Promise<ResponseType<VibeCheckResponseOutput>> {
     const isMCP = platform === Platform.MCP;
@@ -289,7 +292,6 @@ export class VibeCheckRepository {
       logger.debug("[VIBE-CHECK] ensureConfigReady start");
       const configResult = await ConfigRepositoryImpl.ensureConfigReady(
         logger,
-        locale,
         false,
       );
       logger.debug("[VIBE-CHECK] ensureConfigReady done");
@@ -326,7 +328,7 @@ export class VibeCheckRepository {
           {
             isErrorResponse: true,
             performance: {
-              [t("performance.total")]: 0,
+              ["Total"]: 0,
             },
           },
         );
@@ -360,10 +362,80 @@ export class VibeCheckRepository {
       const isStrict = data.strict ?? false;
 
       const pathsToCheck = this.normalizePaths(effectiveData.paths);
+
+      // Fail on a path that isn't there rather than handing it to the checkers.
+      // tsc's own complaint for a non-existent include is TS18003, which names
+      // the temp config we generated instead of the path the user typed.
+      const missingPaths = pathsToCheck
+        .filter((p): p is string => Boolean(p))
+        .filter((p) => !existsSync(resolve(p)));
+      if (missingPaths.length > 0) {
+        return failInline({
+          message: VibeCheckRepository.missingPathsMessage(missingPaths),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+
       const baseDir = coreEnv.PROJECT_ROOT || "./";
-      const performanceTimings: Partial<Record<TranslatedKeyType, number>> = {};
+      const performanceTimings: Partial<Record<string, number>> = {};
       let firstCheckStart = 0;
       let lastCheckEnd = 0;
+
+      // ── Progress reporting ──────────────────────────────────────────────
+      // The three checkers run concurrently for tens of seconds. Instead of
+      // logging to stdout, emit partial response data: the CLI taps these
+      // in-process and repaints its frame, the web client merges them into the
+      // response cache, and MCP ignores them. Progress is DATA, not output.
+      const emitProgress = createEndpointEmitter(
+        vibeCheckEndpoints.POST,
+        logger,
+        user,
+      );
+      const phases: CheckPhase[] = [];
+      const completedIssues: CheckIssue[] = [];
+
+      /**
+       * Emit the current progress snapshot: phase rows plus running totals.
+       *
+       * Deliberately does NOT carry items/files. Results are only meaningful once
+       * every checker has reported — a partial list would show issues that a
+       * later checker reorders, and would let the widget render a conclusion
+       * ("no issues") that is not yet true. The final response is the only thing
+       * that renders results, so buildResponse (sort + filter + paginate + file
+       * stats) also never runs on the progress path, where it would repeat over
+       * the whole issue set on every checker completion.
+       */
+      const publishProgress = (): void => {
+        emitProgress("check-progress", {
+          responseData: {
+            phases: phases.map((phase) => ({ ...phase })),
+            isComplete: false,
+            totalIssues: completedIssues.length,
+            totalFiles: new Set(completedIssues.map((issue) => issue.file))
+              .size,
+          },
+        });
+      };
+
+      /** Mark a checker finished and publish its results into the live frame. */
+      const completePhase = (checkResult: CheckResult): void => {
+        const issues = this.extractIssuesFromResult(checkResult.result);
+        completedIssues.push(...issues);
+        const phase = phases.find((entry) => entry.id === checkResult.type);
+        if (phase) {
+          // "done" means the tool RAN. A tool that died must not render the
+          // same "✓ 0 issues" row as one that ran and found nothing — that row
+          // is the whole reason a crashed checker read as a clean tree.
+          const failed = !checkResult.result.success;
+          phase.status = failed ? "failed" : "done";
+          phase.issues = issues.length;
+          phase.errors = failed
+            ? Math.max(issues.length, 1)
+            : issues.filter((issue) => issue.severity === "error").length;
+          phase.durationMs = checkResult.duration;
+        }
+        publishProgress();
+      };
 
       // Run checkers for all paths in parallel
       // Oxlint supports multiple paths natively, but TypeScript and ESLint need separate runs per path
@@ -375,11 +447,7 @@ export class VibeCheckRepository {
           pathsToCheck.length === 0
             ? baseDir
             : pathsToCheck.map((p) => p || baseDir);
-        if (isCliPlatform(platform)) {
-          logger.info("Starting Oxlint check...");
-        } else {
-          logger.debug("Starting Oxlint check...");
-        }
+        phases.push({ id: "oxlint", tool: "Oxlint", status: "running" });
         promises.push(
           this.runOxlintCheck(
             Array.isArray(oxlintPaths) ? oxlintPaths : [oxlintPaths],
@@ -388,7 +456,6 @@ export class VibeCheckRepository {
             configResult.config,
             logger,
             platform,
-            locale,
             isExtensive,
             isStrict,
             signal,
@@ -397,6 +464,7 @@ export class VibeCheckRepository {
               firstCheckStart = Date.now();
             }
             lastCheckEnd = Date.now();
+            completePhase(result);
             return result;
           }),
         );
@@ -412,11 +480,7 @@ export class VibeCheckRepository {
           Array.isArray(eslintPaths) && eslintPaths.length === 1
             ? eslintPaths[0]
             : eslintPaths;
-        if (isCliPlatform(platform)) {
-          logger.info("Starting ESLint check...");
-        } else {
-          logger.debug("Starting ESLint check...");
-        }
+        phases.push({ id: "eslint", tool: "ESLint", status: "running" });
         promises.push(
           this.runEslintCheck(
             eslintPath,
@@ -425,7 +489,6 @@ export class VibeCheckRepository {
             configResult.config,
             logger,
             platform,
-            locale,
             isExtensive,
             signal,
           ).then((result) => {
@@ -433,6 +496,7 @@ export class VibeCheckRepository {
               firstCheckStart = Date.now();
             }
             lastCheckEnd = Date.now();
+            completePhase(result);
             return result;
           }),
         );
@@ -443,18 +507,16 @@ export class VibeCheckRepository {
         !effectiveData.skipTypecheck &&
         configResult.config.typecheck.enabled
       ) {
-        const nonEmptyPaths = pathsToCheck.filter(Boolean) as string[];
+        const nonEmptyPaths = pathsToCheck.filter((p): p is string =>
+          Boolean(p),
+        );
         const typecheckPath =
           nonEmptyPaths.length === 0
             ? undefined
             : nonEmptyPaths.length === 1
               ? nonEmptyPaths[0]
               : nonEmptyPaths;
-        if (isCliPlatform(platform)) {
-          logger.info("Starting TypeScript check...");
-        } else {
-          logger.debug("Starting TypeScript check...");
-        }
+        phases.push({ id: "typecheck", tool: "TypeScript", status: "running" });
         promises.push(
           this.runTypecheckCheck(
             typecheckPath,
@@ -462,18 +524,23 @@ export class VibeCheckRepository {
             configResult.config,
             logger,
             platform,
-            locale,
             isExtensive,
+            isStrict,
             signal,
           ).then((result) => {
             if (firstCheckStart === 0) {
               firstCheckStart = Date.now();
             }
             lastCheckEnd = Date.now();
+            completePhase(result);
             return result;
           }),
         );
       }
+
+      // Frame 1: every checker shown as running before any of them returns, so
+      // the user sees the work start instead of a blank terminal.
+      publishProgress();
 
       const checkResults = await Promise.allSettled(promises);
 
@@ -496,14 +563,12 @@ export class VibeCheckRepository {
       logger.debug("All checks completed");
 
       if (firstCheckStart > 0 && lastCheckEnd > 0) {
-        performanceTimings[t("performance.total")] =
-          lastCheckEnd - firstCheckStart;
+        performanceTimings["Total"] = lastCheckEnd - firstCheckStart;
       }
 
       const { allIssues, hasErrors } = this.processCheckResults(
         checkResults,
         performanceTimings,
-        t,
       );
 
       const sortedIssues = this.sortIssues(allIssues);
@@ -517,36 +582,84 @@ export class VibeCheckRepository {
         data.summaryOnly, // Pass summaryOnly flag
       );
 
-      return success(response, {
-        isErrorResponse: hasErrors ? true : undefined,
-        performance: performanceTimings,
-      });
+      return success(
+        {
+          ...response,
+          phases: phases.map((phase) => ({ ...phase })),
+          isComplete: true,
+        },
+        {
+          isErrorResponse: hasErrors ? true : undefined,
+          performance: performanceTimings,
+        },
+      );
     } catch (error) {
       logger.error("Vibe check failed", parseError(error));
-      return fail({
-        message: t("errors.internal.title"),
+      return failInline({
+        message: `Vibe check failed: ${String(error)}`,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: String(error) },
       });
     }
+  }
+
+  /**
+   * Explain a path that isn't on disk.
+   *
+   * A path with no separator at all, in a repo where nothing matches it, is
+   * almost always a POSIX shell eating a Windows backslash: `src\vibe` reaches
+   * us as `srcvibe`, because bash treats `\` as an escape long before argv is
+   * built. There is nothing to recover at that point, so say so.
+   */
+  private static missingPathsMessage(missingPaths: string[]): string {
+    const list = missingPaths.join(", ");
+    const looksEscaped = missingPaths.some(
+      (p) => !p.includes("/") && !p.includes("\\"),
+    );
+    const hint = looksEscaped
+      ? " (if you typed a Windows path in bash, quote it or use forward slashes — the backslash was consumed by the shell)"
+      : "";
+    return `Path not found: ${list}${hint}`;
+  }
+
+  /**
+   * An explicit path is relative to where the user typed it, not to the project
+   * root the runtime chdir'd to. Rebasing it here is what makes `vibe check
+   * ./widget.tsx` from inside a feature folder mean that file.
+   */
+  private static toProjectRelative(
+    path: string,
+    invocationDir: string,
+  ): string {
+    if (isAbsolute(path) || invocationDir === ".") {
+      return path;
+    }
+    return posix.join(invocationDir, path.replaceAll("\\", "/"));
   }
 
   private static normalizePaths(
     paths: string | string[] | undefined,
   ): (string | undefined)[] {
-    if (!paths) {
-      return [undefined];
-    }
+    const invocationDir = getInvocationDir();
+
     if (typeof paths === "string") {
-      return [paths];
+      return [VibeCheckRepository.toProjectRelative(paths, invocationDir)];
     }
-    return paths.length > 0 ? paths : [undefined];
+    if (paths && paths.length > 0) {
+      return paths.map((path) =>
+        VibeCheckRepository.toProjectRelative(path, invocationDir),
+      );
+    }
+    // No path at all: check where the user is standing. The runtime chdirs to
+    // the project root before anything runs, so the old `undefined` default
+    // silently meant "the entire repo" no matter where the command was typed.
+    // "." IS the root - keep the undefined the checkers already read as
+    // "everything".
+    return invocationDir === "." ? [undefined] : [invocationDir];
   }
 
   private static processCheckResults(
     checkResults: PromiseSettledResult<CheckResult>[],
-    performanceTimings: Partial<Record<TranslatedKeyType, number>>,
-    t: CheckVibeCheckT,
+    performanceTimings: Partial<Record<string, number>>,
   ): { allIssues: CheckIssue[]; hasErrors: boolean } {
     const allIssues: CheckIssue[] = [];
     let hasErrors = false;
@@ -565,7 +678,7 @@ export class VibeCheckRepository {
       const { type, result, duration } = checkResult.value;
 
       // Accumulate performance timing
-      const key = this.getPerformanceKey(type, t);
+      const key = this.getPerformanceKey(type);
       performanceTimings[key] = (performanceTimings[key] ?? 0) + duration;
 
       // Extract issues
@@ -577,8 +690,24 @@ export class VibeCheckRepository {
         }
       }
 
+      // A leg that FAILED is not a leg that found nothing, and the difference
+      // has to reach the output. `hasErrors` alone did not: the summary counts
+      // `allIssues`, so a dead tool contributed zero rows and printed
+      // "✓ No issues found" — a tool that crashed on startup looked exactly
+      // like a clean codebase. That is the worst possible failure mode for a
+      // gate, because green is precisely when nobody investigates.
+      //
+      // Pushing a real issue makes it visible, counted, and non-zero.
       if (!result.success) {
         hasErrors = true;
+        allIssues.push({
+          file: `${this.getPerformanceKey(type)} FAILED TO RUN`,
+          severity: "error",
+          rule: "check/tool-failure",
+          message:
+            `${this.getPerformanceKey(type)} did not complete, so its result is unknown — this is NOT a pass. ` +
+            `${"message" in result && result.message ? result.message : "No further detail was reported."}`,
+        });
       }
     }
 

@@ -10,10 +10,10 @@ import {
   CheckCircle,
   Info,
 } from "lucide-react-native";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../../unified-ui/_shared/cn";
 import type { JSX } from "react";
 
-import { convertCSSToViewStyle } from "../../../native/utils/style-converter";
+import { convertCSSToViewStyle } from "../../utils/style-converter";
 // Import all public types from web version (web is source of truth)
 import type { FormAlertProps } from "../../../web/ui/form/form-alert";
 import { Alert, AlertDescription, AlertTitle } from "../alert";

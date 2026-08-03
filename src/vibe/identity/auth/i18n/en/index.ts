@@ -11,6 +11,12 @@ export const translations = {
       token_save_failed: "Failed to save authentication token",
       token_get_failed: "Failed to retrieve authentication token",
       token_remove_failed: "Failed to remove authentication token",
+      token_save_failed_detail:
+        "Failed to save authentication token: {{error}}",
+      token_get_failed_detail:
+        "Failed to retrieve authentication token: {{error}}",
+      token_remove_failed_detail:
+        "Failed to remove authentication token: {{error}}",
     },
   },
   debug: {
@@ -66,22 +72,23 @@ export const translations = {
     session_retrieval_failed: "Failed to retrieve session",
     missing_token: "Authentication token is missing",
     invalid_token_signature: "Token signature is invalid",
+    invalid_token_signature_detail: "Token signature check failed: {{error}}",
     jwt_payload_missing_id: "JWT payload is missing user ID",
-    cookie_set_failed: "Failed to set authentication cookie",
-    cookie_clear_failed: "Failed to clear authentication cookie",
+    cookie_set_failed: "Failed to set authentication cookie: {{error}}",
+    cookie_clear_failed: "Failed to clear authentication cookie: {{error}}",
     publicPayloadNotSupported:
       "Public JWT payload is not supported for CLI authentication",
-    jwt_signing_failed: "Failed to sign JWT token",
-    authentication_failed: "Authentication failed",
-    user_not_authenticated: "User is not authenticated",
+    jwt_signing_failed: "Failed to sign JWT token: {{error}}",
+    authentication_failed: "Authentication failed: {{error}}",
+    user_not_authenticated: "User is not authenticated: {{email}}",
     publicUserNotAllowed: "Public user is not allowed for this endpoint",
     validation_failed: "Validation failed",
     failed_to_create_lead: "Failed to create lead",
     native: {
       unsupported:
         "This authentication method is not supported on React Native",
-      storage_failed: "Failed to store authentication data",
-      clear_failed: "Failed to clear authentication data",
+      storage_failed: "Failed to store authentication data: {{error}}",
+      clear_failed: "Failed to clear authentication data: {{error}}",
     },
     not_implemented_native:
       "This feature is not yet implemented for React Native",

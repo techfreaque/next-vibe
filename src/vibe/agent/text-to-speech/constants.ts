@@ -3,7 +3,7 @@ import {
   ModelSortDirection,
   ModelSortField,
 } from "../skills/enum";
-import type { VoiceModelSelection } from "../text-to-speech/models";
+import type { VoiceModelSelection } from "./models";
 import { TtsModelId } from "./models";
 
 export const TEXT_TO_SPEECH_ALIAS = "text-to-speech" as const;

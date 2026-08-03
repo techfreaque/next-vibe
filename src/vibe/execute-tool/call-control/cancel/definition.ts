@@ -8,21 +8,21 @@
  * parallel execution (e.g. abandon a stuck command without ending the turn).
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { UserRole } from "next-vibe/identity/roles/enum";
-import { scopedTranslation } from "next-vibe/platforms/ai/i18n";
+} from "../../../core/definition/enums";
+import { UserRole } from "../../../identity/roles/enum";
+import { scopedTranslation } from "../../../platforms/ai/i18n";
 import {
   objectField,
   requestField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../../unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 const { POST } = createEndpoint({

@@ -5,25 +5,24 @@
 
 import "server-only";
 
-import { and, count, eq, ilike, inArray, not, or } from "drizzle-orm";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { and, eq, not } from "drizzle-orm";
+import type { CountryLanguage } from "../../core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
-import { scopedTranslation as authScopedTranslation } from "next-vibe/identity/auth/i18n";
-import { hashPassword } from "next-vibe/identity/auth/password";
-import { AuthRepository } from "next-vibe/identity/auth/repository";
-import { userLeadLinks } from "next-vibe/identity/lead/db";
-import { LeadAuthRepository } from "next-vibe/identity/lead/device-auth";
-import { UserRole, type UserRoleValue } from "next-vibe/identity/roles/enum";
-import { UserRolesRepository } from "next-vibe/identity/roles/repository";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { Platform } from "next-vibe/platforms/platforms";
+} from "../../core/route/response.schema";
+import { parseError } from "../../core/utils/parse-error";
+import { db } from "../../database";
+import { scopedTranslation as authScopedTranslation } from "../auth/i18n";
+import { hashPassword } from "../auth/password";
+import { AuthRepository } from "../auth/repository";
+import { LeadAuthRepository } from "../lead/device-auth";
+import { UserRole, type UserRoleValue } from "../roles/enum";
+import { UserRolesRepository } from "../roles/repository";
+import type { EndpointLogger } from "../../logger/types";
+import { Platform } from "../../platforms/platforms";
 
 import type { NewUser, User } from "./db";
 import { users } from "./db";
@@ -35,7 +34,6 @@ import type {
   ExtendedUserType,
   StandardUserType,
   UserFetchOptions,
-  UserSearchOptions,
   UserType,
 } from "./types";
 
@@ -59,14 +57,6 @@ export function deriveSlug(name: string): string {
  * User Repository
  */
 export class UserRepository {
-  /**
-   * 24h cache for active user count
-   */
-  private static activeUserCountCache: {
-    count: number;
-    timestamp: number;
-  } | null = null;
-  private static readonly CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
   /**
    * Get authenticated user with specified detail level
    */
@@ -98,9 +88,8 @@ export class UserRepository {
 
       if (!verifiedUser) {
         return fail({
-          message: t("errors.auth_required"),
+          message: t("errors.auth_required", { roles: roles.join(",") }),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
-          messageParams: { roles: roles.join(",") },
         });
       }
 
@@ -132,9 +121,10 @@ export class UserRepository {
       logger.error("Error getting authenticated user", parseError(error));
       const { t } = userScopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.auth_retrieval_failed"),
+        message: t("errors.auth_retrieval_failed", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -156,9 +146,8 @@ export class UserRepository {
 
       if (results.length === 0) {
         return fail({
-          message: t("errors.not_found"),
+          message: t("errors.not_found_by_id", { userId }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { userId },
         });
       }
 
@@ -171,9 +160,8 @@ export class UserRepository {
       );
       if (!userRolesResponse.success) {
         return fail({
-          message: t("errors.roles_lookup_failed"),
+          message: t("errors.roles_lookup_failed", { userId }),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: { userId },
           cause: userRolesResponse,
         });
       }
@@ -235,9 +223,11 @@ export class UserRepository {
       logger.error("Error getting user by ID", parseError(error));
       const { t } = userScopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.id_lookup_failed"),
+        message: t("errors.id_lookup_failed", {
+          userId,
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { userId, error: parseError(error).message },
       });
     }
   }
@@ -262,9 +252,8 @@ export class UserRepository {
 
       if (results.length === 0) {
         return fail({
-          message: t("errors.not_found"),
+          message: t("errors.not_found_by_email", { email }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { email },
         });
       }
 
@@ -280,9 +269,11 @@ export class UserRepository {
       logger.debug("Error getting user by email", parseError(error));
       const { t } = userScopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.email_lookup_failed"),
+        message: t("errors.email_lookup_failed", {
+          email,
+          error: errorMessage,
+        }),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { email, error: errorMessage },
       });
     }
   }
@@ -306,9 +297,11 @@ export class UserRepository {
       logger.error("Error checking if user exists", parseError(error));
       const { t } = userScopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.id_lookup_failed"),
+        message: t("errors.id_lookup_failed", {
+          userId,
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { userId, error: parseError(error).message },
       });
     }
   }
@@ -332,9 +325,11 @@ export class UserRepository {
       logger.error("Error checking if email exists", parseError(error));
       const { t } = userScopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.email_check_failed"),
+        message: t("errors.email_check_failed", {
+          email,
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { email, error: parseError(error).message },
       });
     }
   }
@@ -363,239 +358,12 @@ export class UserRepository {
       );
       const { t } = userScopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.email_duplicate_check_failed"),
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: {
+        message: t("errors.email_duplicate_check_failed", {
           email,
           excludeUserId,
           error: parseError(error).message,
-        },
-      });
-    }
-  }
-
-  /**
-   * Search for users
-   */
-  static async searchUsers(
-    query: string,
-    options: UserSearchOptions,
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<ResponseType<StandardUserType[]>> {
-    try {
-      const { limit = 10, offset = 0 } = options;
-
-      logger.debug("Searching users", { query, limit, offset });
-
-      let searchResults;
-
-      if (query.trim().length === 0) {
-        searchResults = await db
-          .select()
-          .from(users)
-          .limit(limit)
-          .offset(offset)
-          .orderBy(users.privateName, users.publicName);
-      } else {
-        const privateNamePattern = `%${query}%`;
-        const publicNamePattern = `%${query}%`;
-        const emailPattern = `%${query}%`;
-
-        searchResults = await db
-          .select()
-          .from(users)
-          .where(
-            or(
-              ilike(users.privateName, privateNamePattern),
-              ilike(users.publicName, publicNamePattern),
-              ilike(users.email, emailPattern),
-            ),
-          )
-          .limit(limit)
-          .offset(offset)
-          .orderBy(users.privateName, users.publicName);
-      }
-
-      const userIds = searchResults.map((u) => u.id);
-      const rolesMapResponse = await UserRolesRepository.findByUserIds(
-        userIds,
-        logger,
-        locale,
-      );
-
-      if (!rolesMapResponse.success) {
-        const { t } = userScopedTranslation.scopedT(locale);
-        return fail({
-          message: t("errors.roles_batch_fetch_failed"),
-          errorType: ErrorResponseTypes.DATABASE_ERROR,
-          messageParams: { count: userIds.length },
-          cause: rolesMapResponse,
-        });
-      }
-
-      const rolesMap = rolesMapResponse.data;
-
-      const leadLinks = await db
-        .select({ userId: userLeadLinks.userId, leadId: userLeadLinks.leadId })
-        .from(userLeadLinks)
-        .where(inArray(userLeadLinks.userId, userIds));
-      const leadIdMap = new Map(leadLinks.map((l) => [l.userId, l.leadId]));
-
-      const mappedResults: StandardUserType[] = searchResults.map((user) => {
-        const userRoles = rolesMap.get(user.id) || [];
-        return {
-          id: user.id,
-          leadId: leadIdMap.get(user.id) ?? "",
-          isPublic: false,
-          privateName: user.privateName,
-          publicName: user.publicName,
-          email: user.email,
-          locale: user.locale,
-          isActive: user.isActive,
-          emailVerified: user.emailVerified,
-          requireTwoFactor: false,
-          marketingConsent: user.marketingConsent ?? false,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
-          userRoles,
-          roles: userRoles.map((r) => r.role),
-        };
-      });
-
-      return success(mappedResults);
-    } catch (error) {
-      logger.error("Error searching users", parseError(error));
-      const { t } = userScopedTranslation.scopedT(locale);
-      return fail({
-        message: t("errors.search_failed"),
+        }),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { query, error: parseError(error).message },
-      });
-    }
-  }
-
-  /**
-   * Get all users with pagination
-   */
-  static async getAllUsers(
-    options: UserSearchOptions,
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<ResponseType<StandardUserType[]>> {
-    try {
-      const { limit = 10, offset = 0 } = options;
-
-      logger.debug("Getting all users", { limit, offset });
-
-      const allUsers = await db
-        .select()
-        .from(users)
-        .limit(limit)
-        .offset(offset)
-        .orderBy(users.privateName, users.publicName);
-
-      const userIds = allUsers.map((u) => u.id);
-      const rolesMapResponse = await UserRolesRepository.findByUserIds(
-        userIds,
-        logger,
-        locale,
-      );
-
-      if (!rolesMapResponse.success) {
-        const { t } = userScopedTranslation.scopedT(locale);
-        return fail({
-          message: t("errors.roles_batch_fetch_failed"),
-          errorType: ErrorResponseTypes.DATABASE_ERROR,
-          messageParams: { count: userIds.length },
-          cause: rolesMapResponse,
-        });
-      }
-
-      const rolesMap = rolesMapResponse.data;
-
-      const leadLinks = await db
-        .select({ userId: userLeadLinks.userId, leadId: userLeadLinks.leadId })
-        .from(userLeadLinks)
-        .where(inArray(userLeadLinks.userId, userIds));
-      const leadIdMap = new Map(leadLinks.map((l) => [l.userId, l.leadId]));
-
-      const mappedResults: StandardUserType[] = allUsers.map((user) => {
-        const userRoles = rolesMap.get(user.id) || [];
-        return {
-          id: user.id,
-          leadId: leadIdMap.get(user.id) ?? user.id,
-          privateName: user.privateName,
-          publicName: user.publicName,
-          email: user.email,
-          locale: user.locale,
-          isActive: user.isActive,
-          emailVerified: user.emailVerified,
-          isPublic: false,
-          requireTwoFactor: false,
-          marketingConsent: user.marketingConsent ?? false,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
-          userRoles,
-          roles: userRoles.map((r) => r.role),
-        };
-      });
-
-      return success(mappedResults);
-    } catch (error) {
-      logger.error("Error getting all users", parseError(error));
-      const { t } = userScopedTranslation.scopedT(locale);
-      return fail({
-        message: t("errors.search_failed"),
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { error: parseError(error).message },
-      });
-    }
-  }
-
-  /**
-   * Get total count of users matching search query
-   */
-  static async getUserSearchCount(
-    query: string,
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<ResponseType<number>> {
-    try {
-      logger.debug("Getting user search count", { query });
-
-      let countQuery;
-
-      if (query.trim().length === 0) {
-        countQuery = db.select({ count: count() }).from(users);
-      } else {
-        const privateNamePattern = `%${query}%`;
-        const publicNamePattern = `%${query}%`;
-        const emailPattern = `%${query}%`;
-
-        countQuery = db
-          .select({ count: count() })
-          .from(users)
-          .where(
-            or(
-              ilike(users.privateName, privateNamePattern),
-              ilike(users.publicName, publicNamePattern),
-              ilike(users.email, emailPattern),
-            ),
-          );
-      }
-
-      const result = await countQuery;
-      const totalCount = result[0]?.count || 0;
-
-      return success(totalCount);
-    } catch (error) {
-      logger.error("Error getting user search count", parseError(error));
-      const { t } = userScopedTranslation.scopedT(locale);
-      return fail({
-        message: t("errors.search_failed"),
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { query, error: parseError(error).message },
       });
     }
   }
@@ -619,9 +387,10 @@ export class UserRepository {
       if (results.length === 0) {
         const { t } = userScopedTranslation.scopedT(locale);
         return fail({
-          message: t("errors.creation_failed"),
+          message: t("errors.creation_failed", {
+            error: t("errors.no_data_returned"),
+          }),
           errorType: ErrorResponseTypes.DATABASE_ERROR,
-          messageParams: { error: "no data returned" },
         });
       }
       const createdUser = results[0] as User;
@@ -652,151 +421,15 @@ export class UserRepository {
       );
       const { t } = userScopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.password_hashing_failed"),
+        message: t("errors.password_hashing_failed", {
+          email: data.email,
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { email: data.email, error: parseError(error).message },
       });
     }
   }
 
-  /**
-   * Search users with pagination metadata
-   */
-  static async searchUsersWithPagination(
-    searchTerm: string,
-    options: {
-      limit?: number;
-      offset?: number;
-      roles?: UserRoleValue[];
-    },
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<
-    ResponseType<{
-      users: Array<StandardUserType & { createdAt: Date; updatedAt: Date }>;
-      pagination: {
-        currentPage: number;
-        totalPages: number;
-        itemsPerPage: number;
-        totalItems: number;
-        hasMore: boolean;
-        hasPrevious: boolean;
-      };
-      searchInfo: {
-        searchTerm: string | undefined;
-        appliedFilters: UserRoleValue[];
-        searchTime: string;
-        totalResults: number;
-      };
-    }>
-  > {
-    const currentLimit = options.limit ?? 20;
-    const currentOffset = options.offset ?? 0;
-
-    const searchResult = await UserRepository.searchUsers(
-      searchTerm,
-      { limit: currentLimit, offset: currentOffset, roles: options.roles },
-      logger,
-      locale,
-    );
-
-    if (!searchResult.success) {
-      return searchResult;
-    }
-
-    const totalCountResult = await UserRepository.getUserSearchCount(
-      searchTerm,
-      logger,
-      locale,
-    );
-
-    if (!totalCountResult.success) {
-      return totalCountResult;
-    }
-
-    const total = totalCountResult.data;
-    const hasMore = currentOffset + searchResult.data.length < total;
-    const totalPages = Math.ceil(total / currentLimit);
-    const currentPage = Math.floor(currentOffset / currentLimit) + 1;
-
-    const serializedUsers = searchResult.data.map((user) => ({
-      ...user,
-      createdAt:
-        user.createdAt instanceof Date
-          ? user.createdAt
-          : new Date(user.createdAt),
-      updatedAt:
-        user.updatedAt instanceof Date
-          ? user.updatedAt
-          : new Date(user.updatedAt),
-    }));
-
-    return success({
-      users: serializedUsers,
-      pagination: {
-        currentPage,
-        totalPages,
-        itemsPerPage: currentLimit,
-        totalItems: total,
-        hasMore,
-        hasPrevious: currentOffset > 0,
-      },
-      searchInfo: {
-        searchTerm: searchTerm || undefined,
-        appliedFilters: options.roles || [],
-        searchTime: "0.5s",
-        totalResults: total,
-      },
-    });
-  }
-
-  /**
-   * Get total count of active users with 24h caching
-   */
-  static async getActiveUserCount(
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<ResponseType<number>> {
-    try {
-      const now = Date.now();
-
-      if (
-        UserRepository.activeUserCountCache &&
-        now - UserRepository.activeUserCountCache.timestamp <
-          UserRepository.CACHE_DURATION_MS
-      ) {
-        logger.debug("Returning cached active user count", {
-          count: UserRepository.activeUserCountCache.count,
-          age: `${Math.floor((now - UserRepository.activeUserCountCache.timestamp) / 1000 / 60 / 60)}h`,
-        });
-        return success(UserRepository.activeUserCountCache.count);
-      }
-
-      logger.debug("Fetching fresh active user count from database");
-
-      const [{ total }] = await db
-        .select({ total: count() })
-        .from(users)
-        .where(eq(users.isActive, true));
-
-      UserRepository.activeUserCountCache = {
-        count: total,
-        timestamp: now,
-      };
-
-      logger.debug("Active user count fetched and cached", { count: total });
-
-      return success(total);
-    } catch (error) {
-      logger.error("Error getting active user count", parseError(error));
-      const { t } = userScopedTranslation.scopedT(locale);
-      return fail({
-        message: t("errors.count_failed"),
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { error: parseError(error).message },
-      });
-    }
-  }
   static async getUserPublicName(
     userId: string | undefined,
     logger: EndpointLogger,
@@ -827,9 +460,3 @@ export class UserRepository {
     }
   }
 }
-
-// Type for native repository type checking
-export type UserRepositoryType = Pick<
-  typeof UserRepository,
-  keyof typeof UserRepository
->;

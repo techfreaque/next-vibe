@@ -12,7 +12,7 @@ import "server-only";
 import { createHash } from "node:crypto";
 
 import { tool } from "ai";
-import { getStorageAdapter } from "next-vibe/agent/chat/storage/index";
+import { getStorageAdapter } from "../chat/storage/index";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import TurndownService from "turndown";
@@ -263,7 +263,7 @@ class FetchUrlService {
     const apiUrl = `${this.SCRAPPEY_API_URL}?key=${agentEnv.SCRAPPEY_API_KEY}`;
 
     try {
-      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+      // oxlint-disable-next-line restricted/no-raw-fetch
       const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
@@ -477,9 +477,8 @@ export class FetchUrlContentRepository {
       });
 
       return fail({
-        message: t("get.errors.internal.title"),
+        message: t("get.errors.internal.detail", { message: result.error }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { message: result.error },
       });
     }
 
@@ -496,7 +495,7 @@ export class FetchUrlContentRepository {
 
     return success({
       success: true,
-      message: `${t("get.success.title")}: ${fetchedUrl}`,
+      message: t("get.success.detail", { url: fetchedUrl }),
       content: processed.content,
       fetchedUrl,
       statusCode,

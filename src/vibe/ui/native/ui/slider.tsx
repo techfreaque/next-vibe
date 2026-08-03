@@ -3,10 +3,10 @@
  * Uses @rn-primitives/slider
  */
 import * as SliderPrimitive from "@rn-primitives/slider";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 
-import { convertCSSToViewStyle } from "../../native/utils/style-converter";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 import type {
   SliderRangeProps,
   SliderRootProps,

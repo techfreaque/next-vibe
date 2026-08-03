@@ -3,7 +3,7 @@
  * Defines endpoint for computing root folder permissions
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -19,7 +19,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
-import { DefaultFolderId } from "../../../config";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { scopedTranslation } from "./i18n";
 
 /**

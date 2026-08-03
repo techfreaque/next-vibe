@@ -30,6 +30,7 @@ export interface ReferralPageData {
   locale: CountryLanguage;
   isAuthenticated: boolean;
   user: JwtPayloadType;
+  platform: Platform;
 }
 
 export async function generateMetadata({
@@ -61,19 +62,26 @@ export async function tanstackLoader({
     logger,
   );
   const isAuthenticated = !minimalUser.isPublic && !!minimalUser.id;
-  return { locale, isAuthenticated, user: minimalUser };
+  return {
+    locale,
+    isAuthenticated,
+    user: minimalUser,
+    platform: Platform.NEXT_PAGE,
+  };
 }
 
 export function TanstackPage({
   locale,
   isAuthenticated,
   user,
+  platform,
 }: ReferralPageData): JSX.Element {
   return (
     <ReferralPageClient
       locale={locale}
       isAuthenticated={isAuthenticated}
       user={user}
+      platform={platform}
     />
   );
 }

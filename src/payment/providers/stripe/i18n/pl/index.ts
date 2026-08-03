@@ -27,7 +27,7 @@ export const translations: typeof enTranslations = {
   status: {
     authenticated: "Uwierzytelniony i gotowy",
     not_authenticated: "Nieuwierzytelniony — uruchom 'stripe login'",
-    not_installed: "Stripe CLI nie jest zainstalowany",
+    not_installed: "Stripe CLI nie jest zainstalowany. {{instructions}}",
   },
 
   errors: {
@@ -52,6 +52,7 @@ export const translations: typeof enTranslations = {
       description: "Stripe CLI nie jest zainstalowany",
     },
     serverError: {
+      detail: "Nasłuch Stripe CLI nie powiódł się: {{error}}",
       title: "Błąd serwera",
       description: "Błąd podczas uruchamiania listenera Stripe",
     },
@@ -69,34 +70,45 @@ export const translations: typeof enTranslations = {
     },
     execution_failed: "Operacja Stripe CLI nie powiodła się",
     userNotFound: {
+      detail: "Nie znaleziono konta dla użytkownika {{userId}}",
       title: "Nie znaleziono użytkownika",
       description: "Określony użytkownik nie został znaleziony",
     },
     customerCreationFailed: {
+      detail:
+        "Nie udało się utworzyć konta klienta Stripe: {{error}} (użytkownik {{userId}})",
       title: "Tworzenie klienta nie powiodło się",
       description: "Nie udało się utworzyć klienta Stripe",
     },
     customerRetrievalFailed: {
+      detail:
+        "Nie udało się pobrać danych klienta Stripe: {{error}} (użytkownik {{userId}})",
       title: "Pobieranie klienta nie powiodło się",
       description: "Nie udało się pobrać informacji o kliencie Stripe",
     },
     checkoutCreationFailed: {
+      detail: "Nie udało się rozpocząć płatności: {{error}}",
       title: "Tworzenie checkout nie powiodło się",
       description: "Nie udało się utworzyć sesji checkout Stripe",
     },
     webhookVerificationFailed: {
+      detail: "Nie udało się zweryfikować webhooka Stripe: {{error}}",
       title: "Weryfikacja webhooka nie powiodła się",
       description: "Nie udało się zweryfikować podpisu webhooka",
     },
     subscriptionRetrievalFailed: {
+      detail: "Nie udało się pobrać subskrypcji ze Stripe: {{error}}",
       title: "Pobieranie subskrypcji nie powiodło się",
       description: "Nie udało się pobrać subskrypcji ze Stripe",
     },
     subscriptionCancellationFailed: {
+      detail: "Nie udało się anulować subskrypcji: {{error}}",
       title: "Anulowanie subskrypcji nie powiodło się",
       description: "Nie udało się anulować subskrypcji w Stripe",
     },
     priceCreationFailed: {
+      detail:
+        "Nie udało się utworzyć ceny w Stripe: {{error}} (produkt {{productId}})",
       title: "Tworzenie ceny nie powiodło się",
       description: "Nie udało się utworzyć ceny w Stripe",
     },

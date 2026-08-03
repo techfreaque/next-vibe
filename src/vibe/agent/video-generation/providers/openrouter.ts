@@ -1,8 +1,8 @@
 import "server-only";
 
-import { agentEnv } from "next-vibe/agent/env";
-import { pollDelay } from "next-vibe/agent/shared/poll-delay";
-import { scopedTranslation } from "next-vibe/agent/video-generation/i18n";
+import { agentEnv } from "../../env";
+import { pollDelay } from "../../shared/poll-delay";
+import { scopedTranslation } from "../i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -233,20 +233,26 @@ export async function generateVideoWithOpenRouter(params: {
       submitData = JSON.parse(submitText) as OpenRouterVideoSubmitResponse;
     } catch {
       return fail({
-        message: t("post.errors.providerError", {
-          error: `Non-JSON response (HTTP ${submitRes.status}): ${submitText.slice(0, 200)}`,
+        message: t("post.errors.nonJsonResponse", {
+          status: String(submitRes.status),
+          body: submitText.slice(0, 200),
         }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
 
     if (!submitRes.ok || submitData.error) {
-      const errMsg =
-        submitData.error ??
-        `HTTP ${submitRes.status}: ${submitText.slice(0, 200)}`;
-      logger.error("[OpenRouter Video] Submit failed", { error: errMsg });
+      logger.error("[OpenRouter Video] Submit failed", {
+        status: submitRes.status,
+        error: submitData.error ?? submitText.slice(0, 200),
+      });
       return fail({
-        message: t("post.errors.providerError", { error: errMsg }),
+        message: submitData.error
+          ? t("post.errors.providerError", { error: submitData.error })
+          : t("post.errors.providerHttpError", {
+              status: String(submitRes.status),
+              body: submitText.slice(0, 200),
+            }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
@@ -313,22 +319,21 @@ export async function generateVideoWithOpenRouter(params: {
         statusData.status === "cancelled" ||
         statusData.status === "expired"
       ) {
-        const errMsg = statusData.error ?? `Job ${statusData.status}`;
         logger.error("[OpenRouter Video] Job terminal failure", {
           status: statusData.status,
-          error: errMsg,
+          error: statusData.error,
         });
         return fail({
-          message: t("post.errors.providerError", { error: errMsg }),
+          message: statusData.error
+            ? t("post.errors.providerError", { error: statusData.error })
+            : t("post.errors.jobFailedStatus", { status: statusData.status }),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         });
       }
     }
 
     return fail({
-      message: t("post.errors.providerError", {
-        error: "Timed out waiting for video generation",
-      }),
+      message: t("post.errors.requestTimedOut"),
       errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
     });
   } catch (error) {

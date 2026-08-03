@@ -10,10 +10,10 @@
 
 import "server-only";
 
-import type { GeneratorDefinition } from "next-vibe/core/generators/shared/shared-inputs";
-import { findFilesRecursively } from "next-vibe/core/generators/shared/utils";
+import type { GeneratorDefinition } from "../../generators/shared/shared-inputs";
+import { findFilesRecursively } from "../../generators/shared/utils";
 
-import { getApiDir } from "@/env/paths";
+import { GENERATED_DIR, getApiDir } from "@/env/paths";
 
 import { generateCategoryIndex } from "./generator-category-index";
 import { generateClientRoutes } from "./generator-client-routes";
@@ -36,6 +36,22 @@ export const generator: GeneratorDefinition = {
       ...findFilesRecursively(apiDir, "route.ts"),
     ].toSorted();
   },
+  /**
+   * Only the artefacts written on EVERY successful run. The per-locale meta
+   * files under endpoints/meta/ and the ws-channel registries are deliberately
+   * absent: meta paths depend on the configured locales, and ws-channels is
+   * realtime-gated (a build without realtime never writes it). Listing either
+   * would make the existence check fail permanently and the cache never hit.
+   */
+  output: [
+    `${GENERATED_DIR}/endpoints/endpoint.ts`,
+    `${GENERATED_DIR}/endpoints/alias-map.ts`,
+    `${GENERATED_DIR}/endpoints/hot-paths.ts`,
+    `${GENERATED_DIR}/routes/handlers.ts`,
+    `${GENERATED_DIR}/routes/hot-paths.ts`,
+    `${GENERATED_DIR}/routes/client.ts`,
+    `${GENERATED_DIR}/categories/registry.ts`,
+  ],
   async generate(ctx) {
     // Endpoint-registry group — fixed order (Bun TDZ safety on definition init).
     const meta = await generateEndpointsMeta(ctx);
@@ -44,14 +60,20 @@ export const generator: GeneratorDefinition = {
     const client = await generateClientRoutes(ctx);
     const category = await generateCategoryIndex(ctx);
 
+    const parts = [meta, endpoint, routes, client, category];
+
+    // A sub-generator's `failed` is a hard stop (e.g. the fail-closed WS channel
+    // guard check), and it has to reach the orchestrator. Aggregating only the
+    // summaries swallowed it: the run was recorded as successful and markDone
+    // cached the fingerprint, so the very next run skipped the gate entirely —
+    // the summary string said "failed" while nothing acted on it.
+    const failures = parts
+      .map((p) => p.failed)
+      .filter((f): f is string => f !== undefined);
+
     return {
-      summary: [
-        meta.summary,
-        endpoint.summary,
-        routes.summary,
-        client.summary,
-        category.summary,
-      ].join("; "),
+      ...(failures.length > 0 ? { failed: failures.join("; ") } : {}),
+      summary: parts.map((p) => p.summary).join("; "),
       counts: {
         ...meta.counts,
         ...endpoint.counts,

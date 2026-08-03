@@ -1,7 +1,7 @@
 import "server-only";
 
-import { agentEnv } from "next-vibe/agent/env";
-import { scopedTranslation } from "next-vibe/agent/image-generation/i18n";
+import { agentEnv } from "../../env";
+import { scopedTranslation } from "../i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,

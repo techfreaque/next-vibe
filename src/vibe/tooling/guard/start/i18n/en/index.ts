@@ -66,6 +66,13 @@ export const translations = {
       title: "Conflict",
       description: "Guard environment already started",
     },
+    jailSetupFailed: "Guard jail setup failed: {{detail}}",
+    vscodeSetupFailed: "VSCode integration setup failed: {{detail}}",
+    startFailed: "Internal error while starting the guard: {{detail}}",
+    guardIdLookupUnsupported:
+      "Lookup by guard ID is not implemented yet - use the project path instead.",
+    notAVscodeProject:
+      "Guard requires a VSCode project - no .vscode directory in {{projectPath}}",
   },
   success: {
     title: "Success",

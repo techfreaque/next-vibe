@@ -4,42 +4,8 @@
  */
 
 import type { Route } from "next";
-import {
-  DefaultFolderId,
-  isDefaultFolderId,
-} from "next-vibe/agent/chat/config";
-import type { ChatFolder } from "next-vibe/agent/chat/db";
+import type { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-
-import type { ChatTranslationKey } from "@/_pages/chat/i18n";
-
-/**
- * Get the root folder ID for a given folder
- * @param folders - Record of all folders
- * @param folderId - ID of the folder to check
- * @returns Root folder ID (one of the default folder IDs)
- */
-export function getRootFolderId(
-  folders: Record<string, ChatFolder>,
-  folderId: string | null | undefined,
-): DefaultFolderId {
-  if (!folderId) {
-    return DefaultFolderId.PRIVATE;
-  }
-
-  // Check if this is already a root folder
-  if (isDefaultFolderId(folderId)) {
-    return folderId;
-  }
-
-  // Find the folder and traverse up to root
-  const folder = folders[folderId];
-  if (!folder) {
-    return DefaultFolderId.PRIVATE;
-  }
-
-  return folder.rootFolderId;
-}
 
 /**
  * Build URL for a folder
@@ -60,48 +26,4 @@ export function buildFolderUrl(
     return `/${locale}/threads/${rootFolderId}/${subFolderId}`;
   }
   return `/${locale}/threads/${rootFolderId}`;
-}
-
-/**
- * Get the translation key for "New Chat" button based on root folder
- * @param rootFolderId - ID of the root folder
- * @returns Translation key like "app.chat.common.newPrivateChat"
- */
-export function getNewChatTranslationKey(
-  rootFolderId: DefaultFolderId,
-): ChatTranslationKey {
-  switch (rootFolderId) {
-    case DefaultFolderId.PRIVATE:
-      return "common.newPrivateChat";
-    case DefaultFolderId.SHARED:
-      return "common.newSharedChat";
-    case DefaultFolderId.PUBLIC:
-      return "common.newPublicChat";
-    case DefaultFolderId.INCOGNITO:
-      return "common.newIncognitoChat";
-    default:
-      return "common.newChat";
-  }
-}
-
-/**
- * Get the translation key for "New Folder" button based on root folder
- * @param rootFolderId - ID of the root folder
- * @returns Translation key like "app.chat.common.newPrivateFolder"
- */
-export function getNewFolderTranslationKey(
-  rootFolderId: DefaultFolderId,
-): ChatTranslationKey {
-  switch (rootFolderId) {
-    case DefaultFolderId.PRIVATE:
-      return "common.newPrivateFolder";
-    case DefaultFolderId.SHARED:
-      return "common.newSharedFolder";
-    case DefaultFolderId.PUBLIC:
-      return "common.newPublicFolder";
-    case DefaultFolderId.INCOGNITO:
-      return "common.newIncognitoFolder";
-    default:
-      return "folderList.newFolder";
-  }
 }

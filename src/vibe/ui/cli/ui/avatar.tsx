@@ -28,8 +28,10 @@ export function Avatar({ children }: AvatarRootProps): JSX.Element {
 }
 Avatar.displayName = "Avatar";
 
-// AvatarImage is a no-op in CLI - terminal cannot display images
-export function AvatarImage(): null {
+// AvatarImage is a no-op in CLI - terminal cannot display images. It still accepts
+// the full prop surface so callers type-check unchanged.
+export function AvatarImage(_props: AvatarImageProps): null {
+  void _props;
   return null;
 }
 AvatarImage.displayName = "AvatarImage";

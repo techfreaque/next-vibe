@@ -3,19 +3,19 @@
  * Client+server safe. No server imports.
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
-import { EndpointErrorTypes, Methods } from "next-vibe/core/definition/enums";
+import { createEndpoint } from "../../../core/definition/create-i18n";
+import { EndpointErrorTypes, Methods } from "../../../core/definition/enums";
 import {
   lookbackRequestField,
   nodeMetaResponseField,
   rangeRequestField,
   resolutionRequestField,
   timeSeriesResponseField,
-} from "next-vibe/dataflow/shared/fields";
-import { UserRole } from "next-vibe/identity/roles/enum";
-import { scopedTranslation } from "next-vibe/tasks/data-sources/cron-executions-failed/i18n";
-import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
-import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
+} from "../../../dataflow/shared/fields";
+import { UserRole } from "../../../identity/roles/enum";
+import { scopedTranslation } from "./i18n";
+import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "../../../unified-ui/_shared/utils";
 
 import { CRON_EXECUTIONS_FAILED_ALIAS } from "./constants";
 const CronExecutionsFailedWidget = lazyWidget(() =>

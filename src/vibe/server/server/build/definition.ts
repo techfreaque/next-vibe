@@ -5,28 +5,28 @@
 
 import { z } from "zod";
 
-import { createEndpoint } from "next-vibe/core/definition/create";
-import { VibeMode, VibeModeValues } from "next-vibe/env/env-util";
-import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
+import { createEndpoint } from "../../../core/definition/create-i18n";
+import { VibeMode, VibeModeValues } from "../../../env/env-util";
+import { customWidgetObject } from "../../../unified-ui/_shared/utils";
 import {
   objectField,
   requestField,
   responseArrayOptionalField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../../unified-ui/_shared/utils-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { UserRole } from "next-vibe/identity/roles/enum";
+} from "../../../core/definition/enums";
+import { UserRole } from "../../../identity/roles/enum";
 
 import { ServerFramework, ServerFrameworkOptions } from "../enum";
-import { scopedTranslation } from "next-vibe/server/server/build/i18n";
+import { scopedTranslation } from "./i18n";
 
-import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
 import { BUILD_ALIAS, BUILD_SERVER_ALIAS } from "./constants";
 
 const BuildResultWidget = lazyWidget(() =>

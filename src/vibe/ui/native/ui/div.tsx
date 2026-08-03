@@ -8,7 +8,7 @@ import {
   convertCSSToViewStyle,
   styledNative,
   styledNativeRef,
-} from "../../native/utils/style-converter";
+} from "../utils/style-converter";
 import type {
   DivGenericTarget,
   DivMouseEvent,

@@ -12,11 +12,11 @@
 import "server-only";
 
 import { and, eq, isNull } from "drizzle-orm";
-import { db } from "next-vibe/database";
-import { getLatestRun } from "next-vibe/dataflow/store/runs";
-import { maybeColorize, semantic } from "next-vibe/logger/colors";
-import { formatDuration, formatSense } from "next-vibe/logger/formatters";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import { db } from "../../database";
+import { getLatestRun } from "../store/runs";
+import { maybeColorize, semantic } from "../../logger/colors";
+import { formatDuration, formatSense } from "../../logger/formatters";
+import type { EndpointLogger } from "../../logger/types";
 
 import { pipelineGraphs } from "../db";
 import { RunStatus } from "../enum";

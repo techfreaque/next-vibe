@@ -6,7 +6,7 @@
  * uninstall runs every `uninstall()`. See docs/patterns/setup.md.
  */
 
-import type { EndpointLogger } from "next-vibe/logger/types";
+import type { EndpointLogger } from "../../logger/types";
 
 /**
  * Filenames that declare a setup module: `setup.ts`, or `<name>.setup.ts`.
@@ -34,6 +34,7 @@ export function setupKeyFor(relPath: string): string {
   return relPath.replace(/\/setup\.ts$/, "").replace(/\.setup\.ts$/, "");
 }
 
+/** What a setup reports back after doing its work. */
 export interface SetupResult {
   /** Absolute paths created, rewritten, or removed. Empty is a valid no-op. */
   changed: string[];
@@ -60,11 +61,19 @@ export interface SetupResult {
  * root itself, so there is no context to thread and nothing for a caller to get
  * wrong.
  */
-export type SetupFn = (logger: EndpointLogger) => Promise<SetupResult>;
+type SetupFn = (logger: EndpointLogger) => Promise<SetupResult>;
 
-/** The shape every `setup.ts` must satisfy. */
-export interface SetupModule {
-  /** Shown in setup output to say what this setup owns. A label, not a sentence. */
+/**
+ * The shape every `setup.ts` must satisfy.
+ *
+ * Structural only — not exported. docs/patterns/setup.md has authors write plain
+ * `install`/`uninstall` functions returning `SetupResult`; the module is matched
+ * by shape, never by annotation. `SetupEntry` below is the exported surface.
+ */
+interface SetupModule {
+  /**
+   * Shown in setup output to say what this setup owns. A label, not a sentence.
+   */
   description: string;
   install: SetupFn;
   uninstall: SetupFn;

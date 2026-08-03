@@ -1,13 +1,13 @@
-import { ChatModelId } from "next-vibe/agent/ai-stream/models";
-import { CODING_AGENT_ALIAS } from "next-vibe/agent/coding-agent/constants";
+import { ChatModelId } from "../../../ai-stream/models";
+import { CODING_AGENT_ALIAS } from "../../../coding-agent/constants";
 import {
   CORTEX_DELETE_ALIAS,
   CORTEX_EDIT_ALIAS,
   CORTEX_LIST_ALIAS,
   CORTEX_WRITE_ALIAS,
-} from "next-vibe/agent/cortex/constants";
-import { FETCH_URL_SHORT_ALIAS } from "next-vibe/agent/fetch-url-content/constants";
-import { WEB_SEARCH_ALIAS } from "next-vibe/agent/web-search/constants";
+} from "../../../cortex/constants";
+import { FETCH_URL_SHORT_ALIAS } from "../../../fetch-url-content/constants";
+import { WEB_SEARCH_ALIAS } from "../../../web-search/constants";
 import { EXECUTE_TOOL_ALIAS } from "next-vibe/execute-tool/constants";
 import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";

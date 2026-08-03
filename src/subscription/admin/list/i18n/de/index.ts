@@ -87,6 +87,7 @@ export const translations: typeof enTranslations = {
       server: {
         title: "Serverfehler",
         description: "Abonnements konnten nicht abgerufen werden",
+        detail: "Abonnementliste nicht abrufbar: {{error}}",
       },
       unknown: {
         title: "Unbekannter Fehler",

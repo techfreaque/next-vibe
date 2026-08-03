@@ -1,6 +1,5 @@
 {
   "recommendations": [
-    "davidanson.vscode-markdownlint",
     "typescriptteam.native-preview",
     "oxc.oxc-vscode",
     "oven.bun-vscode"

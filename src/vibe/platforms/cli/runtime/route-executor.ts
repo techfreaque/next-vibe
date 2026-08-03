@@ -4,28 +4,24 @@
  * Handles CLI-specific concerns: argument parsing, interactive forms, output formatting
  */
 
-import { makeHeadlessContext } from "next-vibe/agent/chat/config";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import { makeHeadlessContext } from "next-vibe/core/execution-context";
+import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
 import {
   definitionLoader,
   type IDefinitionLoader,
-} from "next-vibe/core/definition/loader";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
-import type { TParams } from "next-vibe/core/i18n/core/static-types";
-import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { scopedTranslation as cliScopedTranslation } from "next-vibe/platforms/cli/i18n";
-import {
-  CliTarget,
-  type CliTargetValue,
-} from "next-vibe/platforms/cli/types/cli-target";
-import type { Platform } from "next-vibe/platforms/platforms";
-import type { CliResultFormatter as CliResultFormatterType } from "next-vibe/unified-ui/renderers/cli/response/result-formatter";
+} from "../../../core/definition/loader";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import type { TranslatedKeyType } from "../../../core/i18n/core/scoped-translation";
+import type { ErrorResponseType } from "../../../core/route/response.schema";
+import type { WidgetData } from "../../../core/utils/json";
+import { parseError } from "../../../core/utils/parse-error";
+import { TOOL_HELP_ALIAS } from "../../../help-tool/constants";
+import type { JwtPayloadType } from "../../../identity/auth/types";
+import type { EndpointLogger } from "../../../logger/types";
+import { scopedTranslation as cliScopedTranslation } from "../i18n";
+import { CliTarget, type CliTargetValue } from "../types/cli-target";
+import { isAgentPlatform, type Platform } from "../../platforms";
+import type { CliResultFormatter as CliResultFormatterType } from "../../../unified-ui/renderers/cli/response/result-formatter";
 
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 
@@ -37,12 +33,96 @@ import { getEndpoint } from "@/generated/endpoints/endpoint";
 import { resolveCliUser } from "./cli-auth";
 import { CliInputParser } from "./parsing";
 
+/**
+ * Start a repainting live frame for an endpoint that declares `events`.
+ *
+ * Returns null when live rendering does not apply — no endpoint, no declared
+ * events, remote execution, JSON output, or a non-TTY stdout. In every one of
+ * those cases the command behaves exactly as it did before: one final frame.
+ *
+ * Both modules are imported lazily so the CLI's startup path stays free of the
+ * renderer and realtime layers for the vast majority of commands that have no
+ * events to show.
+ */
+async function startLiveRenderIfSupported({
+  endpoint,
+  isLocal,
+  outputFormat,
+  locale,
+  user,
+  logger,
+  platform,
+}: {
+  endpoint: CreateApiEndpointAny | null;
+  isLocal: boolean;
+  outputFormat: string;
+  locale: CountryLanguage;
+  user: JwtPayloadType;
+  logger: EndpointLogger;
+  platform: Platform;
+}): Promise<{ finish: () => Promise<void> } | null> {
+  if (!endpoint || !isLocal || outputFormat === "json") {
+    return null;
+  }
+
+  // Never live-render for an agent surface. An MCP/AI consumer reads one final
+  // result — repaint frames are pure context cost, and a widget that renders
+  // nothing on MCP (a progress-only frame) would trip the renderer's
+  // empty-output guard and dump raw JSON on every tick.
+  if (isAgentPlatform(platform)) {
+    return null;
+  }
+
+  const { endpointHasEvents, startCliEventTap } =
+    await import("../../../realtime/core/cli-event-tap");
+  if (!endpointHasEvents(endpoint)) {
+    return null;
+  }
+
+  const { createLiveFrame } =
+    await import("../../../unified-ui/renderers/cli/response/live-frame");
+  const frame = createLiveFrame({ endpoint, locale, logger, user, platform });
+  if (!frame.isLive) {
+    // Piped/redirected output — never emit cursor escapes into a file.
+    return null;
+  }
+
+  // Resolve this endpoint's lazy CLI widgets NOW, concurrently with the work the
+  // command is about to do. The renderer awaits the same prewarm before it can
+  // paint, and for a widget tree like check's that costs ~3s of module loading -
+  // paid on the FIRST event, which is exactly when the first frame is due. The
+  // result was events arriving at ~4s and nothing on screen until ~8s, so live
+  // progress looked like it only rendered on completion. The prewarm is cached
+  // (resolved entries are skipped), so doing it here just moves the cost off the
+  // paint path. Fire-and-forget: a failure here is not fatal, the renderer
+  // re-awaits it and surfaces the error itself.
+  // The IMPORT is deferred too, not just the call. result-formatter pulls ~50
+  // Ink widget modules (see getResultFormatter below, which exists for exactly
+  // that reason) - awaiting it here would move that cost onto the startup path
+  // of every endpoint that declares events, which is the opposite of the point.
+  void import("../../../unified-ui/renderers/cli/response/result-formatter")
+    .then((mod) => mod.prewarmLazyWidgets(endpoint))
+    .catch((error: Error) => {
+      logger.debug(`[CLI] Widget prewarm failed: ${error.message}`);
+    });
+
+  const tap = startCliEventTap({ endpoint, logger });
+  tap.onUpdate((data) => frame.update(data));
+
+  return {
+    finish: async (): Promise<void> => {
+      tap.stop();
+      await frame.stop();
+    },
+  };
+}
+
 // Lazy-loaded to avoid pulling in ~50 Ink widget modules at startup (~120ms)
 let _resultFormatter: typeof CliResultFormatterType | null = null;
 async function getResultFormatter(): Promise<typeof CliResultFormatterType> {
   if (!_resultFormatter) {
     const mod =
-      await import("next-vibe/unified-ui/renderers/cli/response/result-formatter");
+      await import("../../../unified-ui/renderers/cli/response/result-formatter");
     _resultFormatter = mod.CliResultFormatter;
   }
   return _resultFormatter;
@@ -80,8 +160,9 @@ export interface RouteExecutionResult {
   /** Error message */
   error?: TranslatedKeyType;
 
-  /** Error parameters for translation */
-  errorParams?: TParams;
+  /** Error type from the route response, used to discriminate validation
+   *  failures without inspecting the rendered message text. */
+  errorType?: ErrorResponseType["errorType"];
 
   /** Original input data provided by the user (for --interactive hint pre-fill) */
   inputData?: Record<string, WidgetData>;
@@ -210,7 +291,7 @@ export class RouteDelegationHandler {
         options.interactive || (endpoint?.cli?.alwaysInteractive ?? false);
       if (effectiveInteractive && endpoint) {
         const { renderInkEndpointPage } =
-          await import("next-vibe/unified-ui/renderers/cli/CliEndpointPage");
+          await import("../../../unified-ui/renderers/cli/CliEndpointPage");
 
         // Collect CLI input data first (parse args, but no interactive prompts)
         const inputData = await CliInputParser.collectCliRequestData(
@@ -295,26 +376,56 @@ export class RouteDelegationHandler {
       // or reverse-ws per connection config). Local: instanceId is undefined, runs
       // in-process. Both share the same permission cascade, folder restrictions,
       // confirmation gate, and callback mode handling.
-      const { RouteExecuteRepository } =
-        await import("next-vibe/execute-tool/repository");
-      const rawResult = await RouteExecuteRepository.runInProcess({
-        toolName: resolvedCommand,
-        input: inputData.data || {},
-        urlPathParams: inputData.urlPathParams || {},
-        callbackMode: "wait",
-        instanceId: remoteInstanceId,
-        user: cliUser,
-        locale: options.locale,
-        logger,
-        platform: options.platform,
-        // Only pass preloadedHandler for local path — remote ignores it.
-        preloadedHandler: remoteInstanceId ? undefined : routeHandler,
-        toolExecutionContext: makeHeadlessContext(
-          options.signal,
-          undefined,
-          "UTC",
-        ),
-      });
+      // Realtime: when the endpoint declares events and we are running it
+      // locally, tap the in-process emitter and repaint a live frame while the
+      // handler works. Remote execution is excluded — those events are delivered
+      // over the wire to the remote's subscribers, not to this process.
+      //
+      // Loaded CONCURRENTLY with the execute-tool import above: both are pure
+      // module loads with no ordering dependency between them, and each costs
+      // hundreds of ms on a cold module graph (execute-tool ~450ms, the live
+      // render's realtime + live-frame imports ~300ms). Awaiting them in
+      // sequence simply added those numbers together on the startup path of
+      // every command. Both are still resolved before runInProcess, so the tap
+      // is registered before the handler can emit its first event.
+      const [{ RouteExecuteRepository }, liveRender] = await Promise.all([
+        import("../../../execute-tool/repository"),
+        startLiveRenderIfSupported({
+          endpoint,
+          isLocal: remoteInstanceId === undefined,
+          outputFormat: options.output || "pretty",
+          locale: options.locale,
+          user: cliUser,
+          logger,
+          platform: options.platform,
+        }),
+      ]);
+
+      let rawResult;
+      try {
+        rawResult = await RouteExecuteRepository.runInProcess({
+          toolName: resolvedCommand,
+          input: inputData.data || {},
+          urlPathParams: inputData.urlPathParams || {},
+          callbackMode: "wait",
+          instanceId: remoteInstanceId,
+          user: cliUser,
+          locale: options.locale,
+          logger,
+          platform: options.platform,
+          // Only pass preloadedHandler for local path — remote ignores it.
+          preloadedHandler: remoteInstanceId ? undefined : routeHandler,
+          toolExecutionContext: makeHeadlessContext(
+            options.signal,
+            undefined,
+            "UTC",
+          ),
+        });
+      } finally {
+        // Always tear down: the tap owns a global broadcast registration and the
+        // frame owns the cursor. Leaking either would corrupt later commands.
+        await liveRender?.finish();
+      }
 
       const routeResult: RouteExecutionResult = {
         success: rawResult.success,
@@ -323,7 +434,7 @@ export class RouteDelegationHandler {
             ? rawResult.data
             : undefined,
         error: rawResult.success ? undefined : rawResult.message,
-        errorParams: rawResult.success ? undefined : rawResult.messageParams,
+        errorType: rawResult.success ? undefined : rawResult.errorType,
         inputData: rawResult.success ? undefined : inputData.data,
         metadata: {
           executionTime: Date.now() - startTime,
@@ -353,6 +464,7 @@ export class RouteDelegationHandler {
         logger,
         endpoint,
         cliUser,
+        options.platform,
         inputData.data,
       );
 
@@ -370,10 +482,9 @@ export class RouteDelegationHandler {
       const { t } = cliScopedTranslation.scopedT(options.locale);
       const errorResult: RouteExecutionResult = {
         success: false,
-        error: t("vibe.errors.executionFailed"),
-        errorParams: {
+        error: t("vibe.errors.executionFailedDetail", {
           error: parseError(error).message,
-        },
+        }),
         metadata: {
           executionTime: Date.now() - startTime,
           endpointPath: resolvedCommand,

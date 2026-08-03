@@ -1,9 +1,9 @@
 "use client";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
-import type { ReactStaticWidgetProps } from "next-vibe/unified-ui/_shared/react-types";
-import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
+import { cn } from "../../../_shared/cn";
+import type { ReactStaticWidgetProps } from "../../../_shared/react-types";
+import type { FieldUsageConfig } from "../../../_shared/types";
 import {
   useWidgetEndpoint,
   useWidgetForm,
@@ -13,12 +13,12 @@ import {
   useWidgetResponse,
   useWidgetTranslation,
   useWidgetUser,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
+} from "../../../_shared/use-widget-context";
 import {
   getIconSizeClassName,
   getSpacingClassName,
-} from "next-vibe/unified-ui/_shared/widget-helpers";
-import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+} from "../../../_shared/widget-helpers";
+import { Icon } from "../../form-fields/icon-field/icon-component";
 import type { JSX } from "react";
 
 import type { NavigateButtonWidgetConfig } from "./types";

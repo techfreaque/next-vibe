@@ -50,6 +50,7 @@ export const translations: typeof enTranslations = {
         description: "Ungültige Anfrageparameter",
       },
       server: {
+        detail: "Rechnung konnte nicht erstellt werden: {{error}}",
         title: "Serverfehler",
         description: "Interner Serverfehler",
       },
@@ -66,6 +67,8 @@ export const translations: typeof enTranslations = {
         description: "Zugriff verboten",
       },
       notFound: {
+        noStripeCustomer:
+          "Für dein Konto existiert kein Stripe-Kundendatensatz",
         title: "Nicht gefunden",
         description: "Ressource nicht gefunden",
       },

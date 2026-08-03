@@ -84,6 +84,9 @@ export const translations = {
       title: "Conflict",
       description: "Data conflict occurred",
     },
+    missingTarget:
+      "Validation error: specify projectPath, guardId, or stopAll.",
+    stopFailed: "Internal error while stopping the guard: {{detail}}",
   },
 
   success: {

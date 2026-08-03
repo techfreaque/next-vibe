@@ -30,6 +30,9 @@ export const translations = {
         description: "Invalid request parameters",
       },
       server: {
+        detail: "Could not open the billing portal: {{error}}",
+        portalNotConfigured:
+          "The Stripe Customer Portal is not set up yet. Configure it at https://dashboard.stripe.com/test/settings/billing/portal",
         title: "Server Error",
         description: "Internal server error occurred",
       },
@@ -46,6 +49,7 @@ export const translations = {
         description: "Access forbidden",
       },
       notFound: {
+        noStripeCustomer: "No Stripe customer record exists for your account",
         title: "Not Found",
         description: "Resource not found",
       },

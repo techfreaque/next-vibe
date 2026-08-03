@@ -112,9 +112,6 @@ export class PaymentRepository {
       return fail({
         message: t("errors.localMode"),
         errorType: ErrorResponseTypes.FORBIDDEN,
-        messageParams: {
-          error: t("errors.unauthorized.description"),
-        },
       });
     }
 
@@ -123,11 +120,8 @@ export class PaymentRepository {
       if (user.isPublic) {
         logger.error("payment.create.error.publicUserNotAllowed");
         return fail({
-          message: t("errors.unauthorized.title"),
+          message: t("errors.unauthorized.signInRequired"),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
-          messageParams: {
-            error: t("errors.unauthorized.description"),
-          },
         });
       }
 
@@ -147,9 +141,8 @@ export class PaymentRepository {
       if (!userRecord) {
         logger.error("payment.create.error.userNotFound", { userId: user.id });
         return fail({
-          message: t("create.errors.notFound.title"),
+          message: t("create.errors.notFound.detail", { userId: user.id }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { userId: user.id },
         });
       }
 
@@ -175,12 +168,8 @@ export class PaymentRepository {
       const stripe = StripeProvider.getStripe();
       if (!stripe) {
         return fail({
-          message: t("create.errors.server.title"),
+          message: t("create.errors.server.stripeNotConfigured"),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-          messageParams: {
-            error:
-              "Stripe is not configured - set STRIPE_SECRET_KEY in your .env",
-          },
         });
       }
       // Map our enum values to Stripe API values via typed lookup tables
@@ -242,9 +231,10 @@ export class PaymentRepository {
           // Ignore expiration errors
         });
         return fail({
-          message: t("create.errors.server.title"),
+          message: t("create.errors.server.detail", {
+            error: parseError(dbError).message,
+          }),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: { error: parseError(dbError).message },
         });
       }
 
@@ -271,9 +261,10 @@ export class PaymentRepository {
       });
 
       return fail({
-        message: t("create.errors.server.title"),
+        message: t("create.errors.server.detail", {
+          error: parsedError.message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
       });
     }
   }
@@ -289,11 +280,8 @@ export class PaymentRepository {
       if (user.isPublic) {
         logger.error("payment.get.error.publicUserNotAllowed");
         return fail({
-          message: t("errors.unauthorized.title"),
+          message: t("errors.unauthorized.signInRequired"),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
-          messageParams: {
-            error: t("errors.unauthorized.description"),
-          },
         });
       }
 
@@ -339,9 +327,8 @@ export class PaymentRepository {
       });
 
       return fail({
-        message: t("get.errors.server.title"),
+        message: t("get.errors.server.detail", { error: parsedError.message }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
       });
     }
   }
@@ -436,9 +423,10 @@ export class PaymentRepository {
           error: verificationResult.message,
         });
         return fail({
-          message: t("errors.webhookVerificationFailed"),
+          message: t("errors.webhookVerificationFailed", {
+            error: verificationResult.message,
+          }),
           errorType: ErrorResponseTypes.BAD_REQUEST,
-          messageParams: { error: verificationResult.message },
         });
       }
 
@@ -534,9 +522,8 @@ export class PaymentRepository {
       });
 
       return fail({
-        message: t("errors.server.title"),
+        message: t("errors.server.detail", { error: parsedError.message }),
         errorType: ErrorResponseTypes.BAD_REQUEST,
-        messageParams: { error: parsedError.message },
       });
     }
   }

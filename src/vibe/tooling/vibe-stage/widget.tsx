@@ -9,7 +9,7 @@
 
 "use client";
 
-import { Platform } from "next-vibe/platforms/platforms";
+import { Platform } from "../../platforms/platforms";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -27,9 +27,9 @@ import {
   useWidgetPlatform,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
-import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
+} from "../../unified-ui/_shared/use-widget-context";
+import { FormAlertWidget } from "../../unified-ui/widgets/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "../../unified-ui/widgets/interactive/submit-button/widget";
 
 import type definition from "./definition";
 

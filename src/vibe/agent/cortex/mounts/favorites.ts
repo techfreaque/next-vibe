@@ -12,8 +12,8 @@ import "server-only";
  * Custom skills: <slug>-<variantId> or just <slug> for single-variant.
  */
 import { and, count as drizzleCount, eq } from "drizzle-orm";
-import type { ToolConfigItem } from "next-vibe/agent/chat/settings/definition";
-import type { FavoriteGetModelSelection } from "next-vibe/agent/skills/favorites/[id]/definition";
+import type { ToolConfigItem } from "../../chat/settings/definition";
+import type { FavoriteGetModelSelection } from "../../skills/favorites/[id]/definition";
 import { db } from "next-vibe/database";
 
 import type { VirtualListEntry, VirtualReadResult } from "./resolver";
@@ -33,7 +33,7 @@ export async function readFavoritePath(
 
   const fileKey = segments[1]!.replace(/\.md$/, "");
 
-  const { chatFavorites } = await import("next-vibe/agent/skills/favorites/db");
+  const { chatFavorites } = await import("../../skills/favorites/db");
 
   const UUID_RE =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -151,7 +151,7 @@ export async function listFavoritePath(
     return [];
   }
 
-  const { chatFavorites } = await import("next-vibe/agent/skills/favorites/db");
+  const { chatFavorites } = await import("../../skills/favorites/db");
 
   const rows = await db
     .select({
@@ -188,7 +188,7 @@ export async function listFavoritePath(
  * Get favorites count
  */
 export async function getFavoriteCount(userId: string): Promise<number> {
-  const { chatFavorites } = await import("next-vibe/agent/skills/favorites/db");
+  const { chatFavorites } = await import("../../skills/favorites/db");
 
   const rows = await db
     .select({ count: drizzleCount() })

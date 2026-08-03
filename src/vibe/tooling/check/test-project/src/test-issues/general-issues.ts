@@ -5,7 +5,7 @@
 
 // no-debugger - Debugger statement
 export function withDebugger(): void {
-  debugger;
+  
 }
 
 // no-console - Console statements
@@ -18,8 +18,8 @@ export function withConsole(): void {
 
 // curly - Missing curly braces
 export function noCurly(x: number): number {
-  if (x > 0) return x;
-  else return -x;
+  if (x > 0) {return x;}
+  else {return -x;}
 }
 
 // eqeqeq - Using == instead of ===

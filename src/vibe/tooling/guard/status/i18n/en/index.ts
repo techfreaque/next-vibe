@@ -106,6 +106,8 @@ export const translations = {
         title: "Internal Error",
         description: "Internal server error occurred",
       },
+      statusFailed:
+        "Internal error while checking the guard status: {{detail}}",
     },
     success: {
       title: "Success",

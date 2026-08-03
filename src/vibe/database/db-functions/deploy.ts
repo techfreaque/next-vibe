@@ -15,14 +15,14 @@ import { readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 
 import { sql } from "drizzle-orm";
-import { toImportUrl } from "next-vibe/core/generators/shared/utils";
-import { parseError } from "next-vibe/core/utils/parse-error";
+import { toImportUrl } from "../../core/generators/shared/utils";
+import { parseError } from "../../core/utils/parse-error";
 import {
   formatDatabase,
   formatDuration,
   formatError,
-} from "next-vibe/logger/formatters";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../logger/formatters";
+import type { EndpointLogger } from "../../logger/types";
 
 import { getApiDir } from "@/env/paths";
 
@@ -96,7 +96,7 @@ async function ensurePlv8Extension(logger: EndpointLogger): Promise<void> {
       "Failed to create PL/v8 extension. Is plv8 installed in your PostgreSQL instance?",
       parsed,
     );
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Extension is a hard requirement
+    // eslint-disable-next-line restricted/restricted-syntax -- Extension is a hard requirement
     throw new Error(`PL/v8 extension not available: ${parsed.message}`, {
       cause: error,
     });
@@ -200,7 +200,7 @@ async function deploySingleFunction(
       await db.execute(sql.raw(`DROP FUNCTION IF EXISTS ${fn.name} CASCADE`));
       await db.execute(sql.raw(sqlStatement));
     } else {
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Re-throw non-return-type errors
+      // eslint-disable-next-line restricted/restricted-syntax -- Re-throw non-return-type errors
       throw error;
     }
   }

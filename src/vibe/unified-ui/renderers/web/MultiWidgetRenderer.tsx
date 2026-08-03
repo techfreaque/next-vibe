@@ -1,10 +1,10 @@
 "use client";
 
-import type { InferResponseOutput } from "next-vibe/core/definition/create";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { WidgetData } from "next-vibe/core/utils/json";
+import type { InferResponseOutput } from "../../../core/definition/create";
+import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
+import type { WidgetData } from "../../../core/utils/json";
 import { Div } from "next-vibe/ui/ui/div";
-import { withValueNonStrict } from "next-vibe/unified-ui/_shared/field-helpers";
+import { withValueNonStrict } from "../../_shared/field-helpers";
 import type {
   AnyChildrenConstrain,
   ArrayChildConstraint,
@@ -12,12 +12,12 @@ import type {
   FieldUsageConfig,
   ObjectChildrenConstraint,
   UnionObjectWidgetConfigConstrain,
-} from "next-vibe/unified-ui/_shared/types";
+} from "../../_shared/types";
 import {
   useWidgetForm,
   useWidgetResponseOnly,
   useWidgetUser,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
+} from "../../_shared/use-widget-context";
 import type { JSX } from "react";
 import { useMemo } from "react";
 import type { Path } from "react-hook-form";

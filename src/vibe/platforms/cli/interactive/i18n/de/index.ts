@@ -46,6 +46,11 @@ export const translations: typeof enTranslations = {
       notFound: {
         title: "Keine Sitzung",
         description: "Keine aktive interaktive Sitzung gefunden",
+        noSession:
+          "Keine interaktive Sitzung aktiv. Starte eine mit: vibe <alias> -i --agent-control",
+        deadSession: "Sitzung mit PID {{pid}} läuft nicht mehr.",
+        frameNotFound:
+          "Sitzung {{pid}} hat noch kein Bild gerendert. Kurz warten und erneut versuchen.",
       },
       unknown: {
         title: "Unbekannter Fehler",
@@ -116,6 +121,11 @@ export const translations: typeof enTranslations = {
       notFound: {
         title: "Keine Sitzung",
         description: "Keine aktive interaktive Sitzung gefunden",
+        noSession:
+          "Keine interaktive Sitzung aktiv. Starte eine mit: vibe <alias> -i --agent-control",
+        deadSession: "Sitzung mit PID {{pid}} läuft nicht mehr.",
+        keysNotFound:
+          "Sitzung {{pid}} nimmt noch keine Tasteneingaben an. Kurz warten und erneut versuchen.",
       },
       unknown: {
         title: "Unbekannter Fehler",

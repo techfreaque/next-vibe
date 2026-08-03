@@ -11,6 +11,10 @@ export const translations: typeof enTranslations = {
       tryAgain: "Spróbuj ponownie",
       backToHome: "Powrót do strony głównej",
     },
+    frame: {
+      endpointNotFound: "Nie znaleziono endpointu „{{endpointId}}”",
+      endpointLoadFailed: "Nie udało się załadować endpointu",
+    },
     notFound: {
       title: "Strona nie znaleziona",
       description: "Szukana strona nie istnieje lub została przeniesiona.",

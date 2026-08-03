@@ -97,6 +97,7 @@ export const translations: typeof enTranslations = {
       server: {
         title: "Serverfehler",
         description: "Checkout-Sitzung konnte nicht erstellt werden",
+        detail: "Checkout konnte nicht gestartet werden: {{error}}",
       },
       unknown: {
         title: "Unbekannter Fehler",

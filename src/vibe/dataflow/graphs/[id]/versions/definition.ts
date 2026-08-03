@@ -4,22 +4,22 @@
  * GET - Walk the parentVersionId chain for a graph and return the ancestor list.
  */
 
-import { dateSchema } from "next-vibe/core/definition/common.schema";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { dateSchema } from "../../../../core/definition/common.schema";
+import { createEndpoint } from "../../../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { scopedTranslation } from "next-vibe/dataflow/graphs/[id]/versions/i18n";
-import { UserRole } from "next-vibe/identity/roles/enum";
+} from "../../../../core/definition/enums";
+import { scopedTranslation } from "./i18n";
+import { UserRole } from "../../../../identity/roles/enum";
 import {
   objectField,
   requestUrlPathParamsField,
   responseArrayField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../../../unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 const { GET } = createEndpoint({
@@ -43,7 +43,7 @@ const { GET } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         listEndpoint: async () =>
-          (await import("next-vibe/dataflow/graphs/definition")).default.GET,
+          (await import("../../definition")).default.GET,
         labelField: "name",
         label: "get.fields.id.label",
         description: "get.fields.id.description",

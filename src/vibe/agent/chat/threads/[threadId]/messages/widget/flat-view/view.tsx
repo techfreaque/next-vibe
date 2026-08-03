@@ -5,8 +5,8 @@
 
 "use client";
 
-import type { ChatMessage } from "next-vibe/agent/chat/db";
-import { useChatNavigationStore } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
+import type { ChatMessage } from "../../../../../db";
+import { useChatNavigationStore } from "../../../../../hooks/use-chat-navigation-store";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";

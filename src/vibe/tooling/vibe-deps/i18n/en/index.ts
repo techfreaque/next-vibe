@@ -171,6 +171,7 @@ export const translations = {
       title: "Not Found",
       description: "The specified focus path was not found",
     },
+    focusNotFound: "No files match the focus path {{focus}}",
     server: {
       title: "Server Error",
       description: "Server error occurred during dependency analysis",

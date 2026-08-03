@@ -456,6 +456,7 @@ export const translations = {
     serverError: {
       title: "Server Error",
       description: "Internal server error occurred",
+      detail: "Something broke on our end: {{error}}",
     },
     unknown: {
       title: "Unknown Error",

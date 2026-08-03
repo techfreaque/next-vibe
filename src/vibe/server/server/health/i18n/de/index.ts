@@ -164,6 +164,7 @@ export const translations: typeof enTranslations = {
       server: {
         title: "Serverfehler",
         description: "Interner Serverfehler aufgetreten",
+        checkFailed: "Systemprüfung fehlgeschlagen: {{error}}",
       },
       unknown: {
         title: "Unbekannter Fehler",

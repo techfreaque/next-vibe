@@ -1,6 +1,5 @@
 "use client";
 
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -25,6 +24,7 @@ import {
   useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
+  useWidgetPlatform,
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
@@ -53,6 +53,7 @@ function ProviderForm({
 }): JSX.Element {
   const locale = useWidgetLocale();
   const user = useWidgetUser();
+  const platform = useWidgetPlatform();
   const [endpointDef, setEndpointDef] = useState<{
     POST: CreateApiEndpointAny;
   } | null>(null);
@@ -87,6 +88,7 @@ function ProviderForm({
       endpoint={endpointDef}
       locale={locale}
       user={user}
+      platform={platform}
       endpointOptions={{
         create: {
           formOptions: { persistForm: false },
@@ -100,8 +102,8 @@ function ProviderForm({
 export function LeadMagnetConfigContainer(): JSX.Element {
   const locale = useWidgetLocale();
   const user = useWidgetUser();
+  const platform = useWidgetPlatform();
   const logger = useWidgetLogger();
-  const availability = useProviderAvailability();
   const { endpointMutations } = useWidgetContext();
   const { pop, canGoBack } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof endpoints.GET>();
@@ -141,12 +143,11 @@ export function LeadMagnetConfigContainer(): JSX.Element {
         undefined,
         undefined,
         locale,
-        availability,
       );
       endpointMutations?.read?.refetch?.();
       setOverride(null);
     })();
-  }, [user, locale, logger, availability, endpointMutations]);
+  }, [user, locale, logger, endpointMutations]);
 
   return (
     <WidgetShell>
@@ -275,6 +276,7 @@ export function LeadMagnetConfigContainer(): JSX.Element {
         <CapturedLeadsSection
           locale={locale}
           user={user}
+          platform={platform}
           capturedLeadsLabel={t("widget.capturedLeads")}
         />
       </Div>
@@ -285,10 +287,12 @@ export function LeadMagnetConfigContainer(): JSX.Element {
 function CapturedLeadsSection({
   locale,
   user,
+  platform,
   capturedLeadsLabel,
 }: {
   locale: ReturnType<typeof useWidgetLocale>;
   user: ReturnType<typeof useWidgetUser>;
+  platform: ReturnType<typeof useWidgetPlatform>;
   capturedLeadsLabel: string;
 }): JSX.Element {
   const [capturesDef, setCapturesDef] = React.useState<{
@@ -313,7 +317,12 @@ function CapturedLeadsSection({
     <Div className="flex flex-col gap-3 pt-2">
       <Div className="h-px bg-border" />
       <Span className="text-sm font-semibold px-1">{capturedLeadsLabel}</Span>
-      <EndpointsPage endpoint={capturesDef} locale={locale} user={user} />
+      <EndpointsPage
+        endpoint={capturesDef}
+        locale={locale}
+        user={user}
+        platform={platform}
+      />
     </Div>
   );
 }

@@ -623,7 +623,7 @@ export const translations: typeof enTranslations = {
   scripts: {
     invalidPackageJson: "Ungültiges package.json-Format in {{path}}",
     testsFailed: "Tests fehlgeschlagen in {{path}}: {{error}}",
-    lintFailed: "Linting fehlgeschlagen in {{path}}",
+    lintFailed: "Linting fehlgeschlagen in {{path}}: {{output}}",
     typecheckFailed: "Typprüfung fehlgeschlagen in {{path}}: {{error}}",
     buildFailed: "Build fehlgeschlagen in {{path}}: {{error}}",
     packageJsonNotFound: "Package.json nicht gefunden in {{path}}",
@@ -645,7 +645,7 @@ export const translations: typeof enTranslations = {
     pushSuccess: "Änderungen zu Remote gepusht",
     noCommits: "Keine neuen Commits seit Tag '{{lastTag}}'",
     uncommittedChanges: "Nicht commitete Änderungen erkannt",
-    notOnMain: "Nicht auf main-Branch (aktuell: {{currentBranch}})",
+    notOnMain: "Nicht auf Branch '{{main}}' (aktuell: {{currentBranch}})",
     commitFailed: "Commit fehlgeschlagen",
     tagFailed: "Tag-Erstellung fehlgeschlagen",
     pushFailed: "Push zu Remote fehlgeschlagen",
@@ -726,7 +726,7 @@ export const translations: typeof enTranslations = {
   hooks: {
     running: "Führe {{hook}}-Hook für {{package}} aus...",
     completed: "Hook {{hook}} abgeschlossen für {{package}}",
-    failed: "Hook {{hook}} fehlgeschlagen für {{package}}: {{error}}",
+    failed: "Hook-Befehl '{{command}}' fehlgeschlagen: {{error}}",
     skipped: "Überspringe {{hook}}-Hook (continueOnError)",
   },
   npm: {
@@ -740,7 +740,7 @@ export const translations: typeof enTranslations = {
   changelog: {
     generating: "Generiere Changelog für {{package}}...",
     generated: "Changelog generiert für {{package}}",
-    failed: "Changelog-Generierung fehlgeschlagen für {{package}}: {{error}}",
+    failed: "Changelog-Generierung fehlgeschlagen für {{directory}}: {{error}}",
     noChanges: "Keine Änderungen für Changelog von {{package}}",
   },
   branch: {

@@ -16,28 +16,28 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import type { ChatModelSelection } from "next-vibe/agent/ai-stream/models";
-import { chatModelSelectionSchema } from "next-vibe/agent/ai-stream/models";
+import type { ChatModelSelection } from "../ai-stream/models";
+import { chatModelSelectionSchema } from "../ai-stream/models";
 import type {
   AudioVisionModelSelection,
   ImageVisionModelSelection,
   VideoVisionModelSelection,
-} from "next-vibe/agent/ai-stream/vision-models";
+} from "../ai-stream/vision-models";
 import {
   audioVisionModelSelectionSchema,
   imageVisionModelSelectionSchema,
   videoVisionModelSelectionSchema,
-} from "next-vibe/agent/ai-stream/vision-models";
-import type { ImageGenModelSelection } from "next-vibe/agent/image-generation/models";
-import { imageGenModelSelectionSchema } from "next-vibe/agent/image-generation/models";
-import type { MusicGenModelSelection } from "next-vibe/agent/music-generation/models";
-import { musicGenModelSelectionSchema } from "next-vibe/agent/music-generation/models";
-import type { SttModelSelection } from "next-vibe/agent/speech-to-text/models";
-import { sttModelSelectionSchema } from "next-vibe/agent/speech-to-text/models";
-import type { VoiceModelSelection } from "next-vibe/agent/text-to-speech/models";
-import { voiceModelSelectionSchema } from "next-vibe/agent/text-to-speech/models";
-import type { VideoGenModelSelection } from "next-vibe/agent/video-generation/models";
-import { videoGenModelSelectionSchema } from "next-vibe/agent/video-generation/models";
+} from "../ai-stream/vision-models";
+import type { ImageGenModelSelection } from "../image-generation/models";
+import { imageGenModelSelectionSchema } from "../image-generation/models";
+import type { MusicGenModelSelection } from "../music-generation/models";
+import { musicGenModelSelectionSchema } from "../music-generation/models";
+import type { SttModelSelection } from "../speech-to-text/models";
+import { sttModelSelectionSchema } from "../speech-to-text/models";
+import type { VoiceModelSelection } from "../text-to-speech/models";
+import { voiceModelSelectionSchema } from "../text-to-speech/models";
+import type { VideoGenModelSelection } from "../video-generation/models";
+import { videoGenModelSelectionSchema } from "../video-generation/models";
 import { iconSchema } from "next-vibe/core/definition/common.schema";
 import { users } from "next-vibe/identity/user/db";
 import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";

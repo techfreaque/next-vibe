@@ -1,4 +1,4 @@
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import Animated, {
   useAnimatedStyle,

@@ -1,10 +1,10 @@
 // oxlint-disable prefer-tag-over-role
 import { styled } from "nativewind";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import { Text as RNText } from "react-native";
 
-import { convertCSSToTextStyle } from "../../native/utils/style-converter";
+import { convertCSSToTextStyle } from "../utils/style-converter";
 import type {
   AccessibilityRoleValue,
   BlockQuoteProps,

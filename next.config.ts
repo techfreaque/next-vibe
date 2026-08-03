@@ -146,7 +146,7 @@ const nextConfig: NextConfig = {
         loaders: ["ignore-loader"],
       },
       // AI test fixtures (recorded HTTP/WS/claude-code exchanges + media) —
-      // 1.5G of JSON/binary read via fs at runtime, never imported.
+      // JSON/binary read via fs at runtime, never imported.
       "src/generated/ai-fixtures/**": {
         loaders: ["ignore-loader"],
       },

@@ -8,20 +8,39 @@ import "server-only";
 import type {
   DefaultFolderId,
   ToolExecutionContext,
-} from "next-vibe/agent/chat/config";
-import { getPreferredName } from "next-vibe/core/core-utils/path";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
-import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { AiT } from "next-vibe/platforms/ai/i18n";
+} from "next-vibe/core/execution-context";
+import { getPreferredName } from "../../core/core-utils/path";
+import type { ResponseType } from "../../core/route/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "../../core/route/response.schema";
+import type { WidgetData } from "../../core/utils/json";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
+import type { AiT } from "../../platforms/ai/i18n";
 
 import { CallbackMode } from "../constants";
 import type {
   RouteExecuteRequestOutput,
   RouteExecuteResponseOutput,
 } from "../definition";
-import type { ResolvedToolPermissions, ToolConfigItem } from "./types";
+import type { RouteExecuteContext } from "./types";
+
+/** Structurally identical to chat/settings' ToolConfigItem — redeclared here so
+ * the execute-tool type graph never pulls a full endpoint-definition module. */
+export interface ToolConfigItem {
+  toolId: string;
+  requiresConfirmation: boolean;
+}
+
+export interface ResolvedToolPermissions {
+  /** Whitelist: null = all tools allowed; array = only these may execute */
+  availableTools: ToolConfigItem[] | null;
+  /** Union of skill + favorite + folder hard-blocked tool IDs */
+  deniedToolIds: Set<string>;
+}
 
 export class ExecuteToolGuards {
   /**
@@ -76,7 +95,7 @@ export class ExecuteToolGuards {
       params;
 
     const { FOLDER_ALLOWS_REMOTE_TOOLS, FOLDER_BLOCKED_CALLBACK_MODES } =
-      await import("next-vibe/agent/chat/config");
+      await import("../../agent/chat/config");
 
     if (
       instanceId &&
@@ -125,7 +144,7 @@ export class ExecuteToolGuards {
     logger: EndpointLogger;
   }): Promise<ResolvedToolPermissions> {
     const { resolveAgentContext } =
-      await import("next-vibe/agent/skills/resolve-context");
+      await import("../../agent/skills/resolve-context");
     const resolved = await resolveAgentContext({
       favoriteId: params.favoriteId,
       skillId: params.skillId,
@@ -251,6 +270,76 @@ export class ExecuteToolGuards {
     // Signal the stream to abort at finish-step before the AI response turn.
     toolExecutionContext.stepHasToolsAwaitingConfirmation = true;
     return { status: "waiting_for_confirmation", toolName };
+  }
+
+  /**
+   * The whole pre-execution gate for a local call, in one entry point: the
+   * permission cascade followed by the requiresConfirmation gate.
+   *
+   * Both gates need an agent context to mean anything — the cascade reads
+   * favoriteId/skillId, and the confirmation gate returns early for a plain
+   * headless caller because confirmation is a stream-only mechanism. Bundling
+   * them here keeps ./local.ts down to one call, so a deployment with neither
+   * favorites/skills nor a confirmation UI declines this module rather than
+   * editing two inline blocks out of the execution path.
+   *
+   * Returns a response to short-circuit with, or null to proceed to execution.
+   * Ordering is load-bearing and unchanged: permissions first (a denied tool
+   * must never reach the confirmation UI), confirmation second.
+   */
+  static async preflight(params: {
+    ctx: RouteExecuteContext;
+    callbackMode: string | null | undefined;
+    instanceId: string | undefined;
+  }): Promise<ResponseType<WidgetData> | null> {
+    const { ctx, callbackMode, instanceId } = params;
+    const { toolName, user, logger, t, toolExecutionContext } = ctx;
+
+    // Resolve the callable tool set (pinned ∪ available) + denied via THE central
+    // cascade (favorite → skill → NO_SKILL/role defaults). Uses the toolExecutionContext's
+    // favoriteId/skillId set by the AI loop that called us; folder blocks fold in.
+    const permissions = await ExecuteToolGuards.resolveToolPermissions({
+      favoriteId: toolExecutionContext.favoriteId,
+      skillId: toolExecutionContext.skillId,
+      user,
+      rootFolderId: toolExecutionContext.rootFolderId,
+      logger,
+    });
+
+    const permissionBlock = ExecuteToolGuards.checkToolPermission(
+      toolName,
+      permissions,
+    );
+    if (permissionBlock !== null) {
+      logger.warn("[RouteExecute] execute-tool denied by permission cascade", {
+        toolName,
+        reason: permissionBlock,
+        rootFolderId: toolExecutionContext.rootFolderId,
+        deniedToolIds: [...permissions.deniedToolIds],
+        whitelistSize: permissions.availableTools?.length ?? null,
+      });
+      return fail({
+        message: t("executeTool.post.errors.forbidden.title"),
+        errorType: ErrorResponseTypes.FORBIDDEN,
+      });
+    }
+
+    // Enforce requiresConfirmation for the TARGET tool — shared gate with the
+    // remote dispatch path: the endpoint definition AND the per-context
+    // confirmation cascade both apply uniformly wherever the tool would run.
+    if (!instanceId) {
+      const gate = await ExecuteToolGuards.applyConfirmationGate({
+        toolName,
+        data: { callbackMode },
+        toolExecutionContext,
+        logger,
+      });
+      if (gate) {
+        return success(gate);
+      }
+    }
+
+    return null;
   }
 
   private static normalizeItems(

@@ -7,10 +7,7 @@ import Animated, {
   LinearTransition,
 } from "react-native-reanimated";
 
-import {
-  convertCSSToViewStyle,
-  styledNative,
-} from "../../native/utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import type {
   CollapsibleContentProps,
   CollapsibleProps,

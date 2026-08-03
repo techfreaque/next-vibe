@@ -57,6 +57,7 @@ export const translations = {
       notFound: {
         title: "Nie znaleziono",
         description: "Twórca nie znaleziony",
+        detail: "Nie ma profilu twórcy dla {{userId}}",
       },
       conflict: { title: "Konflikt", description: "Konflikt zapytania" },
       network: { title: "Blad sieci", description: "Blad sieci" },
@@ -64,7 +65,11 @@ export const translations = {
         title: "Niezapisane zmiany",
         description: "Niezapisane zmiany",
       },
-      internal: { title: "Blad serwera", description: "Wewnetrzny blad" },
+      internal: {
+        title: "Blad serwera",
+        description: "Wewnetrzny blad",
+        detail: "Nie udało się wczytać profilu twórcy: {{error}}",
+      },
       unknown: { title: "Nieznany blad", description: "Nieznany blad" },
     },
     success: {

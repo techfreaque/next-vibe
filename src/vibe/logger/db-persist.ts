@@ -10,13 +10,13 @@ import "server-only";
 
 import { createHash } from "node:crypto";
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { CountryLanguage } from "../core/i18n/core/config";
 import {
   errorLogs,
   MAX_MESSAGE_LENGTH,
   MAX_STACK_LENGTH,
   type NewErrorLog,
-} from "next-vibe/logger/error-monitor/db";
+} from "./error-monitor/db";
 
 import { type ErrorLogLevel, type LoggerMetadata } from "./types";
 
@@ -130,7 +130,7 @@ export function persistErrorLog(
   void (async (): Promise<void> => {
     try {
       // Dynamic import to avoid circular dependencies and module-level DB init
-      const { db } = await import("next-vibe/database");
+      const { db } = await import("../database");
 
       const { sql } = await import("drizzle-orm");
 

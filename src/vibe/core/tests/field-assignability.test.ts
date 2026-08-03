@@ -7,8 +7,8 @@
 import type {
   RequestResponseWidgetConfig,
   UnifiedField,
-} from "next-vibe/unified-ui/_shared/configs";
-import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
+} from "../../unified-ui/_shared/configs";
+import type { FieldUsageConfig } from "../../unified-ui/_shared/types";
 import type { z } from "zod";
 
 // Test: Can a specific RequestResponseWidgetConfig be assigned to generic UnifiedField?

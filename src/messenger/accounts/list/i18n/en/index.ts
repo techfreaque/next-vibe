@@ -105,6 +105,7 @@ export const translations = {
     server: {
       title: "Server Error",
       description: "Failed to retrieve accounts",
+      detail: "Couldn't load accounts: {{error}}",
     },
     networkError: {
       title: "Network Error",

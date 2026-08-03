@@ -16,7 +16,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { DefaultFolderId } from "../../../chat/config";
+import { DefaultFolderId } from "../../../../core/execution-context";
 import {
   CHAT_MESSAGE_COLUMNS,
   chatMessages,
@@ -89,7 +89,8 @@ export async function runAutoQueueBranch(params: {
   // the queue processor picks it up (only re-parented), so this is its one write
   // — the row must land with its search vector here. The threadId anchors the
   // fixture chain so replay is deterministic.
-  const { makeHeadlessContext } = await import("next-vibe/agent/chat/config");
+  const { makeHeadlessContext } =
+    await import("../../../../core/execution-context");
   const queueEmbedContext = makeHeadlessContext(
     undefined,
     data.threadId,

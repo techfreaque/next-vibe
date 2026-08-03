@@ -1,4 +1,4 @@
-// oxlint-disable oxlint-plugin-restricted/restricted-syntax
+// oxlint-disable oxlint-plugin-restricted/no-unknown
 /**
  * Route Execute Repository — remote wire-handler unit tests
  *
@@ -13,14 +13,14 @@
 
 import "server-only";
 
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { createEndpointLogger } from "next-vibe/logger/server";
+import { defaultLocale } from "../core/i18n/core/config";
+import type { JwtPrivatePayloadType } from "../identity/auth/types";
+import { createEndpointLogger } from "../logger/server";
 import {
   clearLocalBroadcast,
   registerLocalBroadcast,
-} from "next-vibe/realtime/local-broadcast";
-import * as resolveTaskUser from "next-vibe/tasks/cron/resolve-task-user";
+} from "../realtime/core/local-broadcast";
+import * as resolveTaskUser from "../tasks/cron/resolve-task-user";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { RouteExecuteRepository } from "./repository";
@@ -177,7 +177,7 @@ describe("RouteExecuteRepository remote handlers", () => {
       { eventName: string; responseData: { taskId: string } },
     ];
     // User events ride per-endpoint channels: user/{uid}/ws-<endpoint>.
-    expect(channel).toBe(`user/${USER_ID}/ws-system-execute-tool-POST`);
+    expect(channel).toBe(`user/${USER_ID}/ws-vibe-execute-tool-POST`);
     expect(event).toBe("__event__");
     expect(data.eventName).toBe("tool-execute-result");
     expect(data.responseData.taskId).toBe("call-42");

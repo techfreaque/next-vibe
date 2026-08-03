@@ -110,6 +110,7 @@ export const translations: typeof enTranslations = {
     },
     errors: {
       alreadySubscribed: {
+        detail: "Du hast bereits ein aktives Abonnement (Benutzer {{userId}})",
         title: "Bereits abonniert",
         description: "Sie haben bereits ein aktives Abonnement",
       },
@@ -134,10 +135,12 @@ export const translations: typeof enTranslations = {
         description: "Zugriff verboten",
       },
       notFound: {
+        detail: "Kein Konto für Benutzer {{userId}} gefunden",
         title: "Nicht gefunden",
         description: "Checkout-Sitzung nicht gefunden",
       },
       server: {
+        detail: "Bezahlvorgang konnte nicht gestartet werden: {{error}}",
         title: "Serverfehler",
         description: "Interner Serverfehler aufgetreten",
       },
@@ -162,6 +165,7 @@ export const translations: typeof enTranslations = {
 
   // General error message
   error: "Ein Fehler ist beim Checkout aufgetreten",
+  errorDetail: "Checkout fehlgeschlagen: {{error}}",
 
   // Subscription plan labels
   plans: {

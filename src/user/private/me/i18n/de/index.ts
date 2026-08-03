@@ -64,6 +64,7 @@ export const translations: typeof enTranslations = {
       notFound: {
         title: "Nicht gefunden",
         description: "Benutzerprofil nicht gefunden",
+        detail: "Ihr Profil wurde nicht gefunden (Benutzer {{userId}})",
       },
       conflict: {
         title: "Konflikt",
@@ -80,6 +81,8 @@ export const translations: typeof enTranslations = {
       internal: {
         title: "Interner Fehler",
         description: "Interner Serverfehler aufgetreten",
+        detail:
+          "Profil konnte nicht geladen werden: {{error}} (Benutzer {{userId}})",
       },
       unknown: {
         title: "Unbekannter Fehler",
@@ -322,6 +325,8 @@ export const translations: typeof enTranslations = {
       validation: {
         title: "Validierungsfehler",
         description: "Ungültige Anfrageparameter",
+        emailTaken:
+          "Diese E-Mail-Adresse gehört bereits zu einem anderen Konto",
       },
       unauthorized: {
         title: "Nicht autorisiert",
@@ -334,10 +339,14 @@ export const translations: typeof enTranslations = {
       notFound: {
         title: "Nicht gefunden",
         description: "Benutzerprofil nicht gefunden",
+        detail:
+          "Zu aktualisierendes Profil nicht gefunden (Benutzer {{userId}})",
       },
       conflict: {
         title: "Konflikt",
         description: "Datenkonflikt aufgetreten",
+        creatorSlugTaken:
+          "Dieser Creator-Name ist bereits vergeben - wählen Sie einen anderen",
       },
       network: {
         title: "Netzwerkfehler",
@@ -350,6 +359,8 @@ export const translations: typeof enTranslations = {
       internal: {
         title: "Interner Fehler",
         description: "Interner Serverfehler aufgetreten",
+        detail:
+          "Profil konnte nicht gespeichert werden: {{error}} (Benutzer {{userId}})",
       },
       unknown: {
         title: "Unbekannter Fehler",
@@ -387,6 +398,7 @@ export const translations: typeof enTranslations = {
       notFound: {
         title: "Nicht gefunden",
         description: "Benutzerkonto nicht gefunden",
+        detail: "Zu löschendes Konto nicht gefunden (Benutzer {{userId}})",
       },
       conflict: {
         title: "Konflikt",
@@ -403,6 +415,8 @@ export const translations: typeof enTranslations = {
       internal: {
         title: "Interner Fehler",
         description: "Interner Serverfehler aufgetreten",
+        detail:
+          "Konto konnte nicht gelöscht werden: {{error}} (Benutzer {{userId}})",
       },
       unknown: {
         title: "Unbekannter Fehler",
@@ -467,7 +481,7 @@ export const translations: typeof enTranslations = {
       add: "Zur Sammlung hinzufügen",
       public: "Community",
       showLess: "Weniger anzeigen",
-      hubSubtitle: "{count} veröffentlicht",
+      hubSubtitle: "{{count}} veröffentlicht",
     },
     nav: {
       logout: "Abmelden",
@@ -481,7 +495,7 @@ export const translations: typeof enTranslations = {
       noSubscription: "Kein aktiver Plan",
       upgrade: "Upgraden",
       addresses: "Rechnungsadressen",
-      addressCount: "{count} gespeichert",
+      addressCount: "{{count}} gespeichert",
       addAddress: "Adresse hinzufügen",
       manageAddresses: "Verwalten",
       noAddresses: "Keine gespeichert",

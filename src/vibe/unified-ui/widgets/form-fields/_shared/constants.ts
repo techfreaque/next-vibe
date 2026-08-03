@@ -2,7 +2,7 @@
  * Shared constants for form field widgets
  */
 
-import type { RequiredFieldTheme } from "next-vibe/unified-ui/_shared/field-config-types";
+import type { RequiredFieldTheme } from "../../../_shared/field-config-types";
 
 /**
  * Default theme for required fields

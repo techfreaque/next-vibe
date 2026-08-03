@@ -60,6 +60,7 @@ export interface NewsletterUnsubscribeWithEmailPageData {
   locale: CountryLanguage;
   decodedEmail: string;
   authUser: JwtPayloadType;
+  platform: Platform;
 }
 
 export async function tanstackLoader({
@@ -82,19 +83,21 @@ export async function tanstackLoader({
     notFound();
   }
 
-  return { locale, decodedEmail, authUser };
+  return { locale, decodedEmail, authUser, platform: Platform.NEXT_PAGE };
 }
 
 export function TanstackPage({
   locale,
   decodedEmail,
   authUser,
+  platform,
 }: NewsletterUnsubscribeWithEmailPageData): JSX.Element {
   return (
     <UnsubscribePageClient
       locale={locale}
       user={authUser}
       prefilledEmail={decodedEmail}
+      platform={platform}
     />
   );
 }

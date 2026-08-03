@@ -1,6 +1,5 @@
 "use client";
 
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import {
   assignUrl,
   getCurrentUrl,
@@ -43,7 +42,6 @@ export function GoogleSheetsWidget(): JSX.Element {
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
-  const availability = useProviderAvailability();
   const t = useWidgetTranslation<typeof endpoints.POST>();
   const { endpointMutations } = useWidgetContext();
 
@@ -89,7 +87,6 @@ export function GoogleSheetsWidget(): JSX.Element {
           undefined,
           undefined,
           locale,
-          availability,
         );
         if (result.success && result.data) {
           setSheets(result.data.sheets);
@@ -99,7 +96,7 @@ export function GoogleSheetsWidget(): JSX.Element {
         setLoadingSheets(false);
       }
     })();
-  }, [user, locale, logger, availability]);
+  }, [user, locale, logger]);
 
   useEffect(() => {
     if (isConnected && sheets.length === 0) {
@@ -138,7 +135,6 @@ export function GoogleSheetsWidget(): JSX.Element {
           },
           undefined,
           locale,
-          availability,
         );
         endpointMutations?.read?.refetch?.();
       } catch {
@@ -147,16 +143,7 @@ export function GoogleSheetsWidget(): JSX.Element {
         setSaving(false);
       }
     })();
-  }, [
-    selectedSheetId,
-    sheetTab,
-    user,
-    locale,
-    logger,
-    availability,
-    endpointMutations,
-    t,
-  ]);
+  }, [selectedSheetId, sheetTab, user, locale, logger, endpointMutations, t]);
 
   if (!isConnected) {
     return (

@@ -1,10 +1,10 @@
 import * as Slot from "@rn-primitives/slot";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import { Text as RNText } from "react-native";
 
-import type { SlottableTextPropsWithClassName } from "../../native/lib/types";
-import { convertCSSToTextStyle } from "../../native/utils/style-converter";
+import type { SlottableTextPropsWithClassName } from "../lib/types";
+import { convertCSSToTextStyle } from "../utils/style-converter";
 import { applyStyleType } from "../../web/utils/style-type";
 
 const TextClassContext = React.createContext<string | undefined>(undefined);

@@ -5,25 +5,13 @@
 
 "use client";
 
-import { useTranslation } from "next-vibe/core/i18n/core/client";
-import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { useToast } from "next-vibe/ui/hooks/use-toast";
 import type { EndpointReturn } from "next-vibe/unified-ui/hooks/endpoint-types";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { useCallback, useMemo } from "react";
 
-import { configScopedTranslation } from "@/env/i18n";
-import { handleCheckoutRedirect } from "@/payment/utils/redirect";
-
 import definitions, { type CreditsGetResponseOutput } from "./definition";
-import historyDefinitions from "./history/definition";
-import purchaseDefinitions, {
-  type CreditsPurchasePostRequestOutput,
-  type CreditsPurchasePostResponseOutput,
-} from "./purchase/definition";
 
 export interface UseCreditsReturn extends EndpointReturn<typeof definitions> {
   /**
@@ -93,114 +81,4 @@ export function useCredits(
   }
 
   return result;
-}
-
-/**
- * Hook for fetching credit transaction history
- */
-export function useCreditHistory(
-  user: JwtPayloadType,
-  logger: EndpointLogger,
-): EndpointReturn<typeof historyDefinitions> {
-  return useEndpoint(
-    historyDefinitions,
-    {
-      read: {
-        initialState: { targetUserId: undefined, targetLeadId: undefined },
-        queryOptions: {
-          enabled: true,
-          refetchOnWindowFocus: false,
-          staleTime: 30 * 1000, // 30 seconds
-        },
-      },
-    },
-    logger,
-    user,
-  );
-}
-
-/**
- * Hook for purchasing credit packs
- * Provides full endpoint interface with form controls and automatic Stripe redirect
- */
-export function useCreditPurchase(
-  user: JwtPayloadType,
-  logger: EndpointLogger,
-): EndpointReturn<typeof purchaseDefinitions> {
-  const { toast } = useToast();
-  const { locale } = useTranslation();
-  const { t } = configScopedTranslation.scopedT(locale);
-
-  // Success callback for credit purchase
-  const handlePurchaseSuccess = useCallback(
-    (data: {
-      requestData: CreditsPurchasePostRequestOutput;
-      pathParams: undefined;
-      responseData: CreditsPurchasePostResponseOutput;
-    }) => {
-      try {
-        logger.debug("Credits purchase success callback triggered");
-
-        // Handle redirect to Stripe checkout
-        const redirected = handleCheckoutRedirect(
-          { success: true, data: data.responseData },
-          (errorMessage) => {
-            logger.error("Credits purchase Stripe redirect failed", {
-              error: errorMessage,
-            });
-            toast({
-              title: t("error.title"),
-              description: errorMessage,
-              variant: "destructive",
-            });
-          },
-        );
-
-        if (!redirected) {
-          logger.error("Credits purchase Stripe redirect returned false");
-        }
-      } catch (error) {
-        logger.error("Credits purchase processing failed", parseError(error));
-        toast({
-          title: t("error.title"),
-          description: t("error.description"),
-          variant: "destructive",
-        });
-      }
-    },
-    [logger, toast, t],
-  );
-
-  // Error callback for credit purchase
-  const handlePurchaseError = useCallback(
-    (data: {
-      error: ErrorResponseType;
-      requestData: CreditsPurchasePostRequestOutput;
-      pathParams: undefined;
-    }) => {
-      logger.error("Credits purchase endpoint error", parseError(data.error));
-      // Toast is handled by useEndpoint's alert system
-    },
-    [logger],
-  );
-
-  return useEndpoint(
-    purchaseDefinitions,
-    {
-      create: {
-        formOptions: {
-          persistForm: false,
-          defaultValues: {
-            quantity: 1,
-          },
-        },
-        mutationOptions: {
-          onSuccess: handlePurchaseSuccess,
-          onError: handlePurchaseError,
-        },
-      },
-    },
-    logger,
-    user,
-  );
 }

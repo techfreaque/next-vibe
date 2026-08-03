@@ -9,6 +9,7 @@
 import cronTaskDefinitions from "next-vibe/tasks/cron/[id]/definition";
 import {
   useWidgetLocale,
+  useWidgetPlatform,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
@@ -34,6 +35,7 @@ export function TaskDetailWidget({
 }: TaskDetailWidgetProps): React.JSX.Element | null {
   const locale = useWidgetLocale();
   const user = useWidgetUser();
+  const platform = useWidgetPlatform();
 
   const id = useMemo(() => extractTaskId(path), [path]);
 
@@ -46,6 +48,7 @@ export function TaskDetailWidget({
       endpoint={cronTaskDefinitions}
       locale={locale}
       user={user}
+      platform={platform}
       endpointOptions={{
         read: {
           urlPathParams: { id },

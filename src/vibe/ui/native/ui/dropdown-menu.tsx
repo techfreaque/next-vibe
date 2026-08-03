@@ -1,14 +1,11 @@
 import * as DropdownMenuPrimitive from "@rn-primitives/dropdown-menu";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { Check } from "../../native/ui/icons/Check";
-import { ChevronRight } from "../../native/ui/icons/ChevronRight";
-import {
-  convertCSSToViewStyle,
-  styledNative,
-} from "../../native/utils/style-converter";
+import { Check } from "./icons/Check";
+import { ChevronRight } from "./icons/ChevronRight";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import type {
   DropdownMenuCheckboxItemProps,
   DropdownMenuContentProps,

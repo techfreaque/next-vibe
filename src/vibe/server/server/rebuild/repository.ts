@@ -14,24 +14,23 @@
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, renameSync, rmSync } from "node:fs";
 
-import { buildPackageRunnerCommand, coreEnv } from "next-vibe/core/env";
-import { GenerateAllRepository } from "next-vibe/core/generators/repository";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { buildPackageRunnerCommand, coreEnv } from "../../../core/env";
+import { GenerateAllRepository } from "../../../core/generators/repository";
+import type { TranslatedKeyType } from "../../../core/i18n/core/scoped-translation";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { DatabaseMigrationRepository } from "next-vibe/database/migrate/repository";
-import { SeedRepository } from "next-vibe/database/seed/repository";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { Platform } from "next-vibe/platforms/platforms";
-import type { RebuildT } from "next-vibe/server/server/rebuild/i18n";
-import { scopedTranslation as checkScopedTranslation } from "next-vibe/tooling/check/i18n";
-import { VibeCheckRepository } from "next-vibe/tooling/check/repository/repository";
+} from "../../../core/route/response.schema";
+import { parseError } from "../../../core/utils/parse-error";
+import { DatabaseMigrationRepository } from "../../../database/migrate/repository";
+import { SeedRepository } from "../../../database/seed/repository";
+import type { JwtPayloadType } from "../../../identity/auth/types";
+import type { EndpointLogger } from "../../../logger/types";
+import { Platform } from "../../../platforms/platforms";
+import type { RebuildT } from "./i18n";
+import { VibeCheckRepository } from "../../../tooling/check/repository/repository";
 
 import { readPidFilePort, VIBE_START_PID_FILE } from "../pid";
 import type {
@@ -46,9 +45,9 @@ import type {
 export class RebuildRepository {
   static async execute(
     data: RebuildRequestOutput,
-    locale: CountryLanguage,
     logger: EndpointLogger,
     t: RebuildT,
+    user: JwtPayloadType,
     signal: AbortSignal,
   ): Promise<ResponseType<RebuildResponseOutput>> {
     const errors: string[] = [];
@@ -100,12 +99,11 @@ export class RebuildRepository {
           const generateResult = await GenerateAllRepository.generateAll(
             { force: false },
             logger,
-            locale,
           );
           return generateResult.success
             ? null
             : t("post.steps.codegenFailed", {
-                error: generateResult.message ?? "Generation failed",
+                error: generateResult.message ?? t("post.steps.unknownError"),
               });
         } catch (error) {
           return t("post.steps.codegenFailed", {
@@ -124,13 +122,11 @@ export class RebuildRepository {
 
       // Step 2: Vibe check (code quality gate)
       const vibeOk = await runStep(t("post.steps.vibeCheck"), async () => {
-        const { t: checkT } = checkScopedTranslation.scopedT(locale);
         const checkResult = await VibeCheckRepository.execute(
           { summaryOnly: true, page: 1 },
           logger,
           Platform.CLI,
-          checkT,
-          locale,
+          user,
           signal,
         );
         if (checkResult.success) {
@@ -191,8 +187,10 @@ export class RebuildRepository {
           const isOom =
             exitSignal === "SIGKILL" || exitCode === 137 || exitCode === 134;
           const detail = isOom
-            ? `Next.js build killed by OS (likely OOM) - signal: ${exitSignal ?? exitCode}`
-            : `Next.js build exited with code ${exitCode ?? "unknown"}`;
+            ? t("post.steps.buildOom", {
+                signal: String(exitSignal ?? exitCode ?? -1),
+              })
+            : t("post.steps.buildExitCode", { code: String(exitCode ?? -1) });
           logger.error("Next.js rebuild failed", {
             exitCode,
             exitSignal,
@@ -232,10 +230,13 @@ export class RebuildRepository {
             // Ignore cleanup errors
           }
         }
+        // `post.errors.server.title` is the definition's declared SERVER_ERROR
+        // label and renders param-free there, so each cause gets its own key.
         return fail({
-          message: t("post.errors.server.title"),
+          message: t("post.errors.server.buildFailed", {
+            error: errors[errors.length - 1] ?? t("post.steps.unknownError"),
+          }),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: { error: errors[errors.length - 1] ?? "" },
         });
       }
 
@@ -244,13 +245,16 @@ export class RebuildRepository {
         const migrateResult = await DatabaseMigrationRepository.migrate(logger);
         return migrateResult.success
           ? null
-          : (migrateResult.message ?? "Migrations failed");
+          : t("post.steps.migrationFailed", {
+              error: migrateResult.message ?? t("post.steps.unknownError"),
+            });
       });
       if (!migrateOk) {
         return fail({
-          message: t("post.errors.server.title"),
+          message: t("post.errors.server.migrationsFailed", {
+            error: errors[errors.length - 1] ?? t("post.steps.unknownError"),
+          }),
           errorType: ErrorResponseTypes.DATABASE_ERROR,
-          messageParams: { error: errors[errors.length - 1] ?? "" },
         });
       }
 
@@ -302,9 +306,10 @@ export class RebuildRepository {
       });
     } catch (error) {
       return fail({
-        message: t("post.errors.server.title"),
+        message: t("post.errors.server.rebuildFailed", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -328,9 +333,8 @@ export class RebuildRepository {
 
     if (isNaN(pid) || pid <= 0) {
       return fail({
-        message: t("post.steps.invalidPid"),
+        message: t("post.steps.invalidPid", { pid: pidStr }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { pid: pidStr },
       });
     }
 
@@ -338,9 +342,8 @@ export class RebuildRepository {
       process.kill(pid, 0);
     } catch {
       return fail({
-        message: t("post.steps.processNotRunning"),
+        message: t("post.steps.processNotRunning", { pid: String(pid) }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { pid: String(pid) },
       });
     }
 
@@ -350,9 +353,10 @@ export class RebuildRepository {
       return success({ pid });
     } catch (error) {
       return fail({
-        message: t("post.steps.signalFailed"),
+        message: t("post.steps.signalFailed", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }

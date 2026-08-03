@@ -173,20 +173,30 @@ export const translations = {
         buildStart: "🚀 Starting application build...",
         packageBuildStart: "Building package...",
         packageBuildSuccess: "✅ Package build completed successfully",
-        packageBuildFailed: "Package build failed",
+        packageBuildFailed: "Package build failed: {{error}}",
         buildPrerequisites: "Running build prerequisites...",
         skipGeneration: "Skipping API endpoint generation (--skip-generation)",
         generatingEndpoints: "Generating API endpoints...",
         generationSuccess: "✅ Code generation completed successfully",
         generationFailed: "Code generation failed",
+        generationFailedDetail: "Code generation failed: {{error}}",
+        tanstackBuildStart: "Building TanStack Start (SSR)...",
+        tanstackBuildSuccess:
+          "✅ TanStack Start (SSR) build completed successfully",
+        tanstackBuildFailed: "TanStack Start build failed",
+        tanstackBuildFailedDetail: "TanStack Start build failed: {{error}}",
         skipNextBuild:
           "Skipping Next.js build (will be handled by package.json)",
         buildingNextjs: "Building Next.js application...",
         nextjsBuildSuccess: "✅ Next.js build completed successfully",
-        nextjsBuildFailed: "Next.js build failed",
+        nextjsBuildFailed: "Next.js build failed: {{error}}",
+        nextjsBuildOom:
+          "Next.js build killed by the OS (likely out of memory) - signal: {{signal}}",
+        nextjsBuildExitCode: "Next.js build exited with code {{code}}",
         skipProdDb:
           "Skipping production database operations (--run-prod-database=false)",
-        buildFailed: "❌ Build failed",
+        buildFailed: "❌ Build failed: {{error}}",
+        unknownError: "unknown error",
         schemaGenerationStart: "Generating database schema...",
         schemaGenerationSuccess: "✅ Database schema generation completed",
         schemaGenerationFailed: "Database schema generation failed",
@@ -198,14 +208,13 @@ export const translations = {
         prodDbStart: "🚀 Running production database operations...",
         prodDbSuccess:
           "🎉 Production database operations completed successfully",
-        prodDbFailed: "❌ Production build failed during database operations",
+        prodDbFailed:
+          "❌ Production build failed during database operations: {{error}}. Try running 'docker compose -f docker-compose-dev.yml up -d' to start the database.",
+        prodDbConnectionFailed:
+          "❌ Production build failed during database operations: the database is unreachable ({{error}}). Make sure it is running, then try 'docker compose -f docker-compose-dev.yml up -d' to start it.",
         prodDbNotReady: "💡 This build is NOT ready for production deployment",
         deploymentReady:
           "🚀 Your application is ready for production deployment!",
-        dbConnectionError:
-          "Database connection failed. Please ensure the database is running and accessible.",
-        dbStartSuggestion:
-          "Try running 'docker compose -f docker-compose-dev.yml up -d' to start the database",
         nextBuildHandled:
           "✅ Next.js build will be handled by yarn build command",
         failedProdMigrations: "Failed to run production migrations",

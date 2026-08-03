@@ -5,12 +5,12 @@
 
 "use client";
 
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
-import type { TParams } from "next-vibe/core/i18n/core/static-types";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { type UseNavigationStackReturn } from "next-vibe/unified-ui/hooks/use-navigation-stack";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import type { TranslatedKeyType } from "../../core/i18n/core/scoped-translation";
+import type { TParams } from "../../core/i18n/core/static-types";
+import type { EndpointLogger } from "../../logger/types";
+import { type UseNavigationStackReturn } from "../hooks/use-navigation-stack";
 import { createContext, useContext } from "react";
 
 import type { ReactWidgetContext } from "./react-types";
@@ -38,7 +38,7 @@ export function useWidgetContextStore<
 >(): WidgetContextStoreType<TEndpoint, ReactWidgetContext<TEndpoint>> {
   const store = useContext(WidgetContextStoreContext);
   if (!store) {
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Provider check
+    // oxlint-disable-next-line restricted/no-throw -- Provider check
     throw new Error(
       "useWidgetContextStore must be used within a WidgetContextStoreProvider",
     );
@@ -352,7 +352,7 @@ export {
 // CLI surface helpers - safe to call from cli/ui components
 // ---------------------------------------------------------------------------
 
-import { isAgentPlatform } from "next-vibe/platforms/platforms";
+import { isAgentPlatform } from "../../platforms/platforms";
 
 export type CliSurface = "cli" | "mcp";
 

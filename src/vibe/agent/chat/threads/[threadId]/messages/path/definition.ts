@@ -3,9 +3,9 @@
  * Retrieves messages following a specific conversation path with branch metadata
  */
 
-import { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import { ChatModelId } from "../../../../../ai-stream/models";
 import { dateSchema } from "next-vibe/core/definition/common.schema";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -23,7 +23,8 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
-import { DefaultFolderId, rootFolderIdOptions } from "../../../../config";
+import { rootFolderIdOptions } from "../../../../config";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { MessageMetadata } from "../../../../db";
 import { ChatMessageRole } from "../../../../enum";
 import { scopedTranslation } from "./i18n";

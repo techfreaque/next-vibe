@@ -65,56 +65,6 @@ export function useNewsletterStatus(
   );
 }
 
-/**
- * Hook for newsletter subscription
- */
-export function useNewsletterSubscription(
-  user: JwtPayloadType,
-): EndpointReturn<typeof subscribeEndpoints> {
-  const logger = useLogger();
-
-  return useEndpoint(
-    subscribeEndpoints,
-    {
-      create: {
-        formOptions: {
-          defaultValues: {
-            email: "",
-            name: "",
-            preferences: [],
-          },
-        },
-      },
-    },
-    logger,
-    user,
-  );
-}
-
-/**
- * Hook for newsletter unsubscription
- */
-export function useNewsletterUnsubscription(
-  user: JwtPayloadType,
-): EndpointReturn<typeof unsubscribeEndpoints> {
-  const logger = useLogger();
-
-  return useEndpoint(
-    unsubscribeEndpoints,
-    {
-      create: {
-        formOptions: {
-          defaultValues: {
-            email: "",
-          },
-        },
-      },
-    },
-    logger,
-    user,
-  );
-}
-
 /****************************
  * COMBINED HOOKS
  ****************************/

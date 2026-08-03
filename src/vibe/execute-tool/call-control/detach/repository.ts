@@ -1,19 +1,19 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-import { chatThreads } from "next-vibe/agent/chat/db";
-import { ThreadStreamingState } from "next-vibe/agent/chat/enum";
+import { chatThreads } from "../../../agent/chat/db";
+import { ThreadStreamingState } from "../../../agent/chat/enum";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
   success,
-} from "next-vibe/core/route/response.schema";
-import { db } from "next-vibe/database";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { AiT } from "next-vibe/platforms/ai/i18n";
+} from "../../../core/route/response.schema";
+import { db } from "../../../database";
+import type { JwtPayloadType } from "../../../identity/auth/types";
+import { UserPermissionRole } from "../../../identity/roles/enum";
+import type { EndpointLogger } from "../../../logger/types";
+import type { AiT } from "../../../platforms/ai/i18n";
 
 import { ControlSignals } from "../../repository/control-signals";
 import { PendingCalls } from "../../repository/pending-calls";
@@ -127,8 +127,8 @@ export class DetachCallRepository {
 
     const [{ createMessagesGetEmitter }, { createThreadsGetEmitter }] =
       await Promise.all([
-        import("next-vibe/agent/chat/threads/[threadId]/messages/emitter"),
-        import("next-vibe/agent/chat/threads/emitter"),
+        import("../../../agent/chat/threads/[threadId]/messages/emitter"),
+        import("../../../agent/chat/threads/emitter"),
       ]);
     const now = new Date();
     const threadUpdate = {
@@ -153,7 +153,7 @@ export class DetachCallRepository {
     });
     if (thread.rootFolderId) {
       const { createFolderContentsEmitter } =
-        await import("next-vibe/agent/chat/folder-contents/[rootFolderId]/emitter");
+        await import("../../../agent/chat/folder-contents/[rootFolderId]/emitter");
       createFolderContentsEmitter(
         logger,
         user,

@@ -6,7 +6,7 @@
  * can render without the full chat infrastructure.
  */
 
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { ChatBootValue } from "next-vibe/agent/chat/hooks/context";
 import { ChatBootContext } from "next-vibe/agent/chat/hooks/context";
 import { ChatNavigationProvider } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";

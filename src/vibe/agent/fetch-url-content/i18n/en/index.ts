@@ -61,11 +61,15 @@ export const translations = {
       internal: {
         title: "Fetch Error",
         description: "An error occurred while fetching the URL",
+        // Dedicated key: `title` doubles as the generic errorTypes label, so the
+        // detail placeholder lives here instead of leaking into those labels.
+        detail: "Fetch Error: {{message}}",
       },
     },
     success: {
       title: "Fetch Successful",
       description: "The URL content was fetched successfully",
+      detail: "Fetched {{url}}",
     },
   },
   tags: {

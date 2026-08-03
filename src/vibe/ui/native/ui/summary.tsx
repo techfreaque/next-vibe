@@ -1,11 +1,11 @@
 "use client";
 
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { JSX } from "react";
 import * as React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
-import { convertCSSToTextStyle } from "../../native/utils/style-converter";
+import { convertCSSToTextStyle } from "../utils/style-converter";
 import type { SummaryProps } from "../../web/ui/summary";
 import { DetailsContext } from "./details";
 

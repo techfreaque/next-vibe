@@ -123,9 +123,10 @@ export class SubscriptionAdminStatsRepository {
       );
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("get.errors.server.title"),
+        message: t("get.errors.server.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }

@@ -1,20 +1,20 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { useTranslation } from "next-vibe/core/i18n/core/client";
-import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
+import { useTranslation } from "../../core/i18n/core/client";
+import type { ErrorResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../core/route/response.schema";
+import { parseError } from "../../core/utils/parse-error";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
 import { storage } from "next-vibe/ui/lib/storage";
-import { extractSchemaDefaults } from "next-vibe/unified-ui/_shared/utils";
-import { scopedTranslation as hooksScopedTranslation } from "next-vibe/unified-ui/hooks/i18n";
+import { extractSchemaDefaults } from "../_shared/utils";
+import { scopedTranslation as hooksScopedTranslation } from "./i18n";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useForm, type UseFormProps } from "react-hook-form";
 
@@ -72,13 +72,13 @@ function mergeWithDefaults<T>(saved: T, defaults: T): T {
           !Array.isArray(defaultValue) &&
           defaultValue !== null
         ) {
-          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          // eslint-disable-next-line restricted/no-unknown
           (result as Record<string, unknown>)[key] = mergeWithDefaults(
             savedValue,
             defaultValue,
           );
         } else {
-          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+          // eslint-disable-next-line restricted/no-unknown
           (result as Record<string, unknown>)[key] = savedValue;
         }
       }
@@ -142,7 +142,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
   TEndpoint["types"]["FormValues"]
 > {
   if (!endpoint) {
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- React hook requires throwing for missing required endpoint parameter
+    // eslint-disable-next-line restricted/no-throw, i18next/no-literal-string -- React hook requires throwing for missing required endpoint parameter
     throw new Error("Endpoint is required");
   }
   const { locale } = useTranslation();
@@ -449,11 +449,14 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
   const setError = useCallback(
     (error: Error | null) => {
       if (error) {
-        // Convert Error to ErrorResponseType
+        // `queryForm.errors.validation_failed` renders bare elsewhere, so the
+        // form id and cause go in a sibling that can carry them.
         const errorResponse = fail({
-          message: hooksT("queryForm.errors.validation_failed"),
+          message: hooksT("queryForm.errors.validationFailedDetail", {
+            formId,
+            error: error.message,
+          }),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: { formId, message: error.message },
         });
         setFormErrorStore(formId, errorResponse);
       } else {
@@ -767,9 +770,11 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
           });
 
           const errorResponse = fail({
-            message: hooksT("queryForm.errors.network_failure"),
+            message: hooksT("queryForm.errors.network_failure", {
+              formId,
+              error: errorMessage,
+            }),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            messageParams: { formId, error: errorMessage },
           });
 
           // Set the error in the form state
@@ -800,11 +805,12 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
         // Error handler - form is invalid
         (errors) => {
           if (options.onError) {
-            // Create a proper error response for validation errors with translation key
             const errorResponse = fail({
-              message: hooksT("queryForm.errors.validation_failed"),
+              message: hooksT("queryForm.errors.validationFailedDetail", {
+                formId,
+                error: JSON.stringify(errors),
+              }),
               errorType: ErrorResponseTypes.VALIDATION_ERROR,
-              messageParams: { formId, errors: JSON.stringify(errors) },
             });
 
             // Call the onError callback with the validation error

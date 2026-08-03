@@ -18,14 +18,11 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { ThreadStatus, ThreadStreamingState } from "../enum";
 import {
-  createIncognitoThread,
   deleteThread,
   getThreadsForFolder,
   updateIncognitoThread,
 } from "../incognito/storage";
 import type {
-  ThreadCreateRequestOutput,
-  ThreadCreateResponseOutput,
   ThreadListRequestOutput,
   ThreadListResponseOutput,
 } from "./definition";
@@ -109,41 +106,6 @@ export class ChatThreadsRepositoryClient {
       logger.error("Failed to load incognito threads", parseError(error));
       return fail({
         message: t("get.errors.server.title"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      });
-    }
-  }
-
-  /**
-   * Create thread (mirrors server createThread)
-   */
-  static async createThread(
-    data: ThreadCreateRequestOutput,
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<ResponseType<ThreadCreateResponseOutput>> {
-    const { t } = scopedTranslation.scopedT(locale);
-    try {
-      const threadId = data.id ?? crypto.randomUUID();
-      const thread = await createIncognitoThread(
-        data.title ?? "New Chat",
-        data.rootFolderId,
-        data.subFolderId ?? null,
-        threadId,
-      );
-
-      logger.debug("Client: created incognito thread", { threadId });
-
-      return success({
-        threadId: thread.id,
-        status: ThreadStatus.ACTIVE,
-        createdAt: new Date(thread.createdAt),
-        updatedAt: new Date(thread.updatedAt),
-      });
-    } catch (error) {
-      logger.error("Failed to create incognito thread", parseError(error));
-      return fail({
-        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

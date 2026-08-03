@@ -81,10 +81,14 @@ export const translations: typeof enTranslations = {
         description: "Dostęp zabroniony",
       },
       notFound: {
+        detail: "Nie znaleziono transakcji o identyfikatorze {{transactionId}}",
         title: "Nie znaleziono",
         description: "Transakcja nie została znaleziona",
       },
       server: {
+        detail: "Nie udało się przetworzyć zwrotu: {{error}}",
+        noPaymentIntent:
+          "Ta transakcja nie ma powiązanej płatności Stripe, więc nie można jej zwrócić",
         title: "Błąd serwera",
         description: "Wystąpił wewnętrzny błąd serwera",
       },

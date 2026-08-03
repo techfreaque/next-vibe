@@ -1,4 +1,4 @@
-// oxlint-disable oxlint-plugin-restricted/restricted-syntax
+// oxlint-disable oxlint-plugin-restricted/no-raw-fetch
 import {
   ErrorResponseTypes,
   fail,

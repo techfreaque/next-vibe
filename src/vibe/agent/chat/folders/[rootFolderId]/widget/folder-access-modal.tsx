@@ -1,7 +1,7 @@
 "use client";
 
 import type { Route } from "next";
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Button } from "next-vibe/ui/ui/button";
 import {

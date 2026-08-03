@@ -11,13 +11,13 @@ import "server-only";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import type { InteractiveT } from "next-vibe/platforms/cli/interactive/i18n";
+} from "../../../core/route/response.schema";
+import type { InteractiveT } from "./i18n";
 
 const TMP_DIR = resolve(process.cwd(), ".tmp");
 const PID_FILE = resolve(TMP_DIR, ".vibe-interactive.pid");
@@ -57,34 +57,30 @@ function getActivePid(): number | null {
 }
 
 /**
+ * Outcome of PID resolution, reported as data rather than as a message.
+ *
+ * `capture.*` and `sendKeys.*` are separate translation scopes, so a shared
+ * helper cannot name the key without building it from a template literal. It
+ * returns the case instead and each caller translates it from its own scope,
+ * which keeps every key a statically checked literal.
+ */
+type PidResolution =
+  | { status: "ok"; pid: number }
+  | { status: "noSession" }
+  | { status: "notRunning"; pid: number };
+
+/**
  * Resolve PID: use provided value or auto-detect from PID file.
  */
-function resolvePid(
-  t: InteractiveT,
-  pidInput: number | null | undefined,
-  errorPrefix: "capture" | "sendKeys",
-): { pid: number } | ResponseType<never> {
+function resolvePid(pidInput: number | null | undefined): PidResolution {
   const pid = pidInput ?? getActivePid();
   if (pid === null || pid === undefined) {
-    return fail({
-      message: t(`${errorPrefix}.errors.notFound.title`),
-      errorType: ErrorResponseTypes.NOT_FOUND,
-      messageParams: {
-        error:
-          "No active interactive session. Start one with: vibe <alias> -i --agent-control",
-      },
-    });
+    return { status: "noSession" };
   }
   if (!isProcessRunning(pid)) {
-    return fail({
-      message: t(`${errorPrefix}.errors.notFound.title`),
-      errorType: ErrorResponseTypes.NOT_FOUND,
-      messageParams: {
-        error: `Session PID ${pid} is not running`,
-      },
-    });
+    return { status: "notRunning", pid };
   }
-  return { pid };
+  return { status: "ok", pid };
 }
 
 /**
@@ -120,20 +116,28 @@ export class InteractiveRepository {
     t: InteractiveT,
     pidInput: number | null | undefined,
   ): ResponseType<FrameData> {
-    const resolved = resolvePid(t, pidInput, "capture");
-    if ("success" in resolved) {
-      return resolved;
+    const resolved = resolvePid(pidInput);
+    if (resolved.status === "noSession") {
+      return fail({
+        message: t("capture.errors.notFound.noSession"),
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
+    }
+    if (resolved.status === "notRunning") {
+      return fail({
+        message: t("capture.errors.notFound.deadSession", {
+          pid: resolved.pid,
+        }),
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
     }
     const { pid } = resolved;
 
     const framePath = resolve(TMP_DIR, `.vibe-interactive-${pid}.frame`);
     if (!existsSync(framePath)) {
       return fail({
-        message: t("capture.errors.notFound.title"),
+        message: t("capture.errors.notFound.frameNotFound", { pid }),
         errorType: ErrorResponseTypes.NOT_FOUND,
-        messageParams: {
-          error: `Frame file not found for PID ${pid}. Session may not have rendered yet.`,
-        },
       });
     }
 
@@ -158,20 +162,28 @@ export class InteractiveRepository {
     pidInput: number | null | undefined,
     waitMs?: number | null,
   ): Promise<ResponseType<FrameData>> {
-    const resolved = resolvePid(t, pidInput, "sendKeys");
-    if ("success" in resolved) {
-      return resolved;
+    const resolved = resolvePid(pidInput);
+    if (resolved.status === "noSession") {
+      return fail({
+        message: t("sendKeys.errors.notFound.noSession"),
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
+    }
+    if (resolved.status === "notRunning") {
+      return fail({
+        message: t("sendKeys.errors.notFound.deadSession", {
+          pid: resolved.pid,
+        }),
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
     }
     const { pid } = resolved;
 
     const keysPath = resolve(TMP_DIR, `.vibe-interactive-${pid}.keys`);
     if (!existsSync(keysPath)) {
       return fail({
-        message: t("sendKeys.errors.notFound.title"),
+        message: t("sendKeys.errors.notFound.keysNotFound", { pid }),
         errorType: ErrorResponseTypes.NOT_FOUND,
-        messageParams: {
-          error: `Keys file not found for PID ${pid}. Session may not be ready.`,
-        },
       });
     }
 

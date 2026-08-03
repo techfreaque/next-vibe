@@ -20,10 +20,10 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import type { GraphConfig } from "next-vibe/dataflow/graph/types";
-import type { DataPoint } from "next-vibe/dataflow/shared/fields";
-import { ResolutionValues } from "next-vibe/dataflow/shared/fields";
-import { users } from "next-vibe/identity/user/db";
+import type { GraphConfig } from "./graph/types";
+import type { DataPoint } from "./shared/fields";
+import { ResolutionValues } from "./shared/fields";
+import { users } from "../identity/user/db";
 import type { z } from "zod";
 
 import {

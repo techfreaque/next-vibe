@@ -9,24 +9,21 @@
  *   CLI   - response mode (default) or interactive mode (--interactive flag)
  */
 
-import { iconSchema } from "next-vibe/core/definition/common.schema";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { iconSchema } from "../core/definition/common.schema";
+import { createEndpoint } from "../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { WidgetDataSchema } from "next-vibe/core/utils/json";
-import { scopedTranslation } from "next-vibe/help-tool/i18n";
-import { UserPermissionRole, UserRole } from "next-vibe/identity/roles/enum";
-import { Platform } from "next-vibe/platforms/platforms";
-import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
-import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
-import {
-  requestField,
-  responseField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../core/definition/enums";
+import { WidgetDataSchema } from "../core/utils/json";
+import { scopedTranslation } from "./i18n";
+import { UserPermissionRole, UserRole } from "../identity/roles/enum";
+import { Platform } from "../platforms/platforms";
+import { lazyWidget } from "../unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "../unified-ui/_shared/utils";
+import { requestField, responseField } from "../unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { TOOL_HELP_ALIAS } from "./constants";

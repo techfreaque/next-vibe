@@ -32,7 +32,6 @@ import {
   videoGenModelDefinitions,
   videoGenModelOptions,
 } from "../video-generation/models";
-import type { Modality } from "./enum";
 import {
   type AnyModelId,
   type AnyModelOption,
@@ -220,20 +219,4 @@ export function getAvailableModelCountsByContentLevel(
   }
 
   return counts;
-}
-
-export const TOTAL_CHARACTER_COUNT = 52;
-
-export function hasNativeInput(
-  model: AnyModelOption,
-  modality: Modality,
-): boolean {
-  return model.inputs.includes(modality);
-}
-
-export function hasNativeOutput(
-  model: AnyModelOption,
-  modality: Modality,
-): boolean {
-  return model.outputs.includes(modality);
 }

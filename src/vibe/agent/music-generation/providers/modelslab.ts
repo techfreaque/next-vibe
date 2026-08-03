@@ -1,8 +1,8 @@
 import "server-only";
 
-import { agentEnv } from "next-vibe/agent/env";
-import { scopedTranslation } from "next-vibe/agent/music-generation/i18n";
-import { pollDelay } from "next-vibe/agent/shared/poll-delay";
+import { agentEnv } from "../../env";
+import { scopedTranslation } from "../i18n";
+import { pollDelay } from "../../shared/poll-delay";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,

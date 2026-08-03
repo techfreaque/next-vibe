@@ -27,12 +27,12 @@ export type TranslatedKeyType = "createScopedTranslation-key";
  * @example
  * // In src/sms/i18n/index.ts
  * import { createScopedTranslation } from "./scoped-translation";
- * import { translations as enTranslations } from "next-vibe/ui/ui/icons/src/vibe/generated/endpoints/meta/en";
+ * import { translations as enTranslations } from "./en";
  *
  * export const simpleT = createScopedTranslation({
  *   en: enTranslations,
- *   de: () => require("next-vibe/ui/ui/icons/src/vibe/generated/endpoints/meta/de").translations,  // lazy - loaded on first DE request
- *   pl: () => require("next-vibe/ui/ui/icons/src/vibe/generated/endpoints/meta/pl").translations,  // lazy - loaded on first PL request
+ *   de: () => require("./de").translations,  // lazy - loaded on first DE request
+ *   pl: () => require("./pl").translations,  // lazy - loaded on first PL request
  * });
  *
  * // Usage:
@@ -101,7 +101,7 @@ export function createScopedTranslation<
   return {
     ScopedTranslationKey: undefined as DotNotation<TEN>,
     translationKeySchema: () =>
-      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+      // oxlint-disable-next-line restricted/no-unknown
       z.string() as unknown as z.ZodType<DotNotation<TEN>>,
 
     scopedT: function simpleT(locale: CountryLanguage): {

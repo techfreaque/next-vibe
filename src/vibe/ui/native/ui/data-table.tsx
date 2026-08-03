@@ -7,7 +7,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { JSX } from "react";
 import * as React from "react";
 import {
@@ -19,7 +19,7 @@ import {
 } from "react-native";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 
-import { styledNative } from "../../native/utils/style-converter";
+import { styledNative } from "../utils/style-converter";
 import type { DataTableProps } from "../../web/ui/data-table";
 import {
   Table,

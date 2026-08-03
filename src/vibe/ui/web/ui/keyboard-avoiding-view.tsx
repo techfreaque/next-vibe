@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import * as React from "react";
 
-import type { StyleType } from "../../web/utils/style-type";
+import type { StyleType } from "../utils/style-type";
 
 export type KeyboardAvoidingViewProps = {
   children?: ReactNode;

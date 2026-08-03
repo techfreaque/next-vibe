@@ -48,8 +48,6 @@ export const PROFILE_SOCIALS = [
   { key: "websiteUrl" as const, Icon: Globe, label: "Website" },
 ] as const;
 
-export type ProfileSocialKey = (typeof PROFILE_SOCIALS)[number]["key"];
-
 export interface ProfileData {
   publicName: string;
   avatarUrl?: string | null;

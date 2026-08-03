@@ -25,6 +25,7 @@ import {
   MessengerAccountStatus,
   MessengerProvider as MessengerProviderEnum,
 } from "../../accounts/enum";
+import { messengerEnv } from "../../env";
 import { scopedTranslation as providerScopedTranslation } from "../../i18n";
 import type { SendMessageInput, SendMessageResult } from "../provider";
 import { SendOnlyProvider } from "../send-only-base";
@@ -65,7 +66,7 @@ export class ResendMessengerProvider extends SendOnlyProvider {
         )
         .limit(1);
 
-      const apiKey = account?.apiKey ?? process.env.RESEND_API_KEY;
+      const apiKey = account?.apiKey ?? messengerEnv.RESEND_API_KEY;
       if (!apiKey) {
         return fail({
           message: t("providers.errors.resendKeyNotConfigured"),
@@ -75,7 +76,7 @@ export class ResendMessengerProvider extends SendOnlyProvider {
 
       const fromEmail =
         account?.smtpFromEmail ??
-        process.env.RESEND_FROM_EMAIL ??
+        messengerEnv.RESEND_FROM_EMAIL ??
         "noreply@example.com";
       const fromName = input.senderName ?? account?.name ?? "Messenger";
 

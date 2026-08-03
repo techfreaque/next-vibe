@@ -6,19 +6,16 @@
 
 import "server-only";
 
-import type { HeadlessAiStreamResult } from "next-vibe/agent/ai-stream/repository/setup/setup";
-import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
+import type { HeadlessAiStreamResult } from "../repository/setup/setup";
+import type { ToolExecutionContext } from "../../../core/execution-context";
 import {
   DefaultFolderId,
   rootlessToolExecutionContext,
-} from "next-vibe/agent/chat/config";
-import type { ChatMessage, MessageMetadata } from "next-vibe/agent/chat/db";
-import {
-  ChatMessageRole,
-  ThreadStreamingState,
-} from "next-vibe/agent/chat/enum";
-import { NO_SKILL_ID } from "next-vibe/agent/skills/constants";
-import type { FavoriteConfig } from "next-vibe/agent/skills/favorites/db";
+} from "../../../core/execution-context";
+import type { ChatMessage, MessageMetadata } from "../../chat/db";
+import { ChatMessageRole, ThreadStreamingState } from "../../chat/enum";
+import { NO_SKILL_ID } from "../../skills/constants";
+import type { FavoriteConfig } from "../../skills/favorites/db";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
@@ -91,9 +88,8 @@ export async function getOrCreateFolder(
   name: string,
   parentId: string | null = null,
 ): Promise<string> {
-  const listDef = (
-    await import("next-vibe/agent/chat/folders/[rootFolderId]/definition")
-  ).default;
+  const listDef = (await import("../../chat/folders/[rootFolderId]/definition"))
+    .default;
   const listResult = await sendTestRequest({
     toolExecutionContext: rootlessToolExecutionContext(),
     endpoint: listDef.GET,
@@ -119,7 +115,7 @@ export async function getOrCreateFolder(
   }
 
   const createDef = (
-    await import("next-vibe/agent/chat/folders/[rootFolderId]/create/definition")
+    await import("../../chat/folders/[rootFolderId]/create/definition")
   ).default;
   const createResult = await sendTestRequest({
     toolExecutionContext: rootlessToolExecutionContext(),
@@ -374,7 +370,7 @@ export async function fetchThreadMessages(
   rootFolderId: DefaultFolderId = DefaultFolderId.PRIVATE,
 ): Promise<SlimMessage[]> {
   const msgsDef = (
-    await import("next-vibe/agent/chat/threads/[threadId]/messages/definition")
+    await import("../../chat/threads/[threadId]/messages/definition")
   ).default;
   const result = await sendTestRequest({
     toolExecutionContext: rootlessToolExecutionContext(),
@@ -407,7 +403,7 @@ export async function fetchThreadStreamingState(
   user: JwtPayloadType,
 ): Promise<string | undefined> {
   const msgsDef = (
-    await import("next-vibe/agent/chat/threads/[threadId]/messages/definition")
+    await import("../../chat/threads/[threadId]/messages/definition")
   ).default;
   const result = await sendTestRequest({
     toolExecutionContext: rootlessToolExecutionContext(),
@@ -446,7 +442,7 @@ export async function waitForThreadIdle(
   const pollIntervalMs = 25;
   const start = Date.now();
   const msgsDef = (
-    await import("next-vibe/agent/chat/threads/[threadId]/messages/definition")
+    await import("../../chat/threads/[threadId]/messages/definition")
   ).default;
   while (Date.now() - start < maxWaitMs) {
     const result = await sendTestRequest({
@@ -490,7 +486,7 @@ export async function waitForThreadSettled(
   const pollIntervalMs = 500;
   const start = Date.now();
   const msgsDef = (
-    await import("next-vibe/agent/chat/threads/[threadId]/messages/definition")
+    await import("../../chat/threads/[threadId]/messages/definition")
   ).default;
   while (Date.now() - start < maxWaitMs) {
     const result = await sendTestRequest({
@@ -527,9 +523,8 @@ export async function fetchThreadMeta(
   user: JwtPayloadType,
   rootFolderId: DefaultFolderId = DefaultFolderId.PRIVATE,
 ): Promise<{ title: string | null; description: string | null }> {
-  const threadDef = (
-    await import("next-vibe/agent/chat/threads/[threadId]/definition")
-  ).default;
+  const threadDef = (await import("../../chat/threads/[threadId]/definition"))
+    .default;
   const result = await sendTestRequest({
     toolExecutionContext: rootlessToolExecutionContext(),
     endpoint: threadDef.GET,
@@ -571,9 +566,8 @@ export async function fetchFavoriteConfigAndModel(
   model: ChatModelId;
   skill: string;
 }> {
-  const favByIdDef = (
-    await import("next-vibe/agent/skills/favorites/[id]/definition")
-  ).default;
+  const favByIdDef = (await import("../../skills/favorites/[id]/definition"))
+    .default;
   const getResult = await sendTestRequest({
     toolExecutionContext: rootlessToolExecutionContext(),
     endpoint: favByIdDef.GET,
@@ -590,7 +584,7 @@ export async function fetchFavoriteConfigAndModel(
   // The favorites GET merges the variant into skillId ("slug__variant"); split
   // it back out so the config carries the same variantId the DB row has.
   const { parseSkillId: parseSkillIdForVariant } =
-    await import("next-vibe/agent/chat/slugify");
+    await import("../../chat/slugify");
   const favoriteConfig: FavoriteConfig = {
     id: favoriteId,
     skillId: data.skillId,
@@ -617,9 +611,8 @@ export async function fetchFavoriteConfigAndModel(
   // Resolve the model the favorite would run — same cascade the client uses:
   // favorite modelSelection → skill variant modelSelection.
   const { getBestChatModel } = await import("../models");
-  const { getInstanceAvailability } =
-    await import("next-vibe/agent/env-availability");
-  const availability = await getInstanceAvailability();
+  const { getEnvAvailability } = await import("../../env-availability");
+  const availability = await getEnvAvailability();
   let model: ChatModelId | undefined;
   if (favoriteConfig.modelSelection) {
     model = getBestChatModel(
@@ -630,9 +623,8 @@ export async function fetchFavoriteConfigAndModel(
   }
   if (!model && skill !== NO_SKILL_ID) {
     const logger = createEndpointLogger(false, defaultLocale);
-    const { SkillsRepository } =
-      await import("next-vibe/agent/skills/repository");
-    const { parseSkillId } = await import("next-vibe/agent/chat/slugify");
+    const { SkillsRepository } = await import("../../skills/repository");
+    const { parseSkillId } = await import("../../chat/slugify");
     const skillResult = await SkillsRepository.getSkillById(
       { id: skill },
       user,
@@ -717,13 +709,12 @@ export async function runTestStream(
     skill = skillParam ?? resolved.skill;
   } else if (favoriteConfig) {
     const { getBestChatModel } = await import("../models");
-    const { getInstanceAvailability } =
-      await import("next-vibe/agent/env-availability");
+    const { getEnvAvailability } = await import("../../env-availability");
     if (favoriteConfig.modelSelection) {
       model = getBestChatModel(
         favoriteConfig.modelSelection,
         user,
-        await getInstanceAvailability(),
+        await getEnvAvailability(),
       )?.id;
     }
     skill = skillParam ?? favoriteConfig.skillId ?? NO_SKILL_ID;
@@ -743,9 +734,7 @@ export async function runTestStream(
   // ── Stream POST body — identical to createAndSendUserMessage (shared.ts) ──
   const userMessageId = hasToolConfirmations ? null : crypto.randomUUID();
 
-  const streamDef = (
-    await import("next-vibe/agent/ai-stream/stream/definition")
-  ).default;
+  const streamDef = (await import("../stream/definition")).default;
 
   // Real clients always pass parentMessageId = current leaf of the thread.
   // When callers don't provide explicitParentMessageId but do provide threadId

@@ -35,6 +35,7 @@ export const translations: typeof enTranslations = {
       network: {
         title: "Błąd sieci",
         description: "Błąd sieci podczas łączenia z bazą danych",
+        detail: "Ping bazy danych nie powiódł się: {{error}}",
       },
       forbidden: {
         title: "Zabronione",

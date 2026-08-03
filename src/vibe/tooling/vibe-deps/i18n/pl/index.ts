@@ -174,6 +174,7 @@ export const translations: typeof enTranslations = {
       title: "Nie znaleziono",
       description: "Podana ścieżka focusu nie została znaleziona",
     },
+    focusNotFound: "Żaden plik nie pasuje do ścieżki focusu {{focus}}",
     server: {
       title: "Błąd serwera",
       description: "Podczas analizy zależności wystąpił błąd serwera",

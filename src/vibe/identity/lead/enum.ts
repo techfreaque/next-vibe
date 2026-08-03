@@ -3,8 +3,9 @@
  * Using createEnumOptions wrapper for unified DRY configuration
  */
 
-import { scopedTranslation } from "next-vibe/identity/lead/i18n";
-import { createEnumOptions } from "next-vibe/unified-ui/_shared/enum";
+import { scopedTranslation } from "./i18n";
+import { Countries, Languages } from "../../core/i18n/core/config";
+import { createEnumOptions } from "../../unified-ui/_shared/enum";
 
 export const {
   enum: EngagementTypes,
@@ -618,3 +619,74 @@ export const DeviceTypeDB = [
   DeviceType.BOT,
   DeviceType.UNKNOWN,
 ] as const;
+
+/**
+ * Country and language filters for the lead admin surfaces.
+ *
+ * These lived in core/i18n/core/config.ts, which made every consumer of the
+ * framework's locale types also carry a leads-admin concern. Nothing about
+ * filtering leads is an i18n primitive: it is a lead query parameter that
+ * happens to be keyed by country/language, so it belongs beside the other lead
+ * filters here.
+ *
+ * Values are the raw country/language codes, NOT translation keys, unlike the
+ * createEnumOptions enums above. They are compared against and written to the
+ * `country`/`language` columns, so they must stay verbatim.
+ */
+export enum CountryFilter {
+  ALL = "all",
+  DE = "DE",
+  PL = "PL",
+  US = "US",
+  GLOBAL = "GLOBAL",
+}
+
+export enum LanguageFilter {
+  ALL = "all",
+  EN = "en",
+  DE = "de",
+  PL = "pl",
+}
+
+/**
+ * Narrow a country filter to a country code, or null for "no filter".
+ *
+ * Switch rather than a cast: a string enum member is not assignable to its own
+ * literal type in TypeScript, so mapping each member explicitly is what lets
+ * this return a real `Countries` without asserting.
+ */
+export function convertCountryFilter(
+  country: CountryFilter | Countries | undefined,
+): Countries | null {
+  switch (country) {
+    case CountryFilter.DE:
+      return Countries.DE;
+    case CountryFilter.PL:
+      return Countries.PL;
+    case CountryFilter.US:
+      return Countries.US;
+    case CountryFilter.GLOBAL:
+      return Countries.GLOBAL;
+    default:
+      // Covers CountryFilter.ALL and undefined alike: both mean "unfiltered".
+      return null;
+  }
+}
+
+/**
+ * Narrow a language filter to a language code, or null for "no filter".
+ */
+export function convertLanguageFilter(
+  language: LanguageFilter | Languages | undefined,
+): Languages | null {
+  switch (language) {
+    case LanguageFilter.EN:
+      return Languages.EN;
+    case LanguageFilter.DE:
+      return Languages.DE;
+    case LanguageFilter.PL:
+      return Languages.PL;
+    default:
+      return null;
+  }
+}

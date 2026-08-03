@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
+import type { ToolExecutionContext } from "../../../../core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -17,7 +17,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { DefaultFolderId } from "../../../chat/config";
+import type { DefaultFolderId } from "../../../../core/execution-context";
 import type { ChatMessageRole } from "../../../chat/enum";
 import { MessagesRepository } from "../../../chat/threads/[threadId]/messages/repository";
 import type { SttModelSelection } from "../../../speech-to-text/models";

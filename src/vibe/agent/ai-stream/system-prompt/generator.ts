@@ -229,7 +229,7 @@ class PromptFragmentsGenerator {
 
     return `${header}
 
-import type { PromptFragmentModule } from "next-vibe/agent/ai-stream/system-prompt/types";
+import type { PromptFragmentModule } from "./types";
 
 /**
  * All registered prompt fragment IDs.

@@ -1,12 +1,12 @@
 import { styled } from "nativewind";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import { Text as RNText, View } from "react-native";
 
 import {
   convertCSSToTextStyle,
   convertCSSToViewStyle,
-} from "../../native/utils/style-converter";
+} from "../utils/style-converter";
 import type {
   CardContentProps,
   CardDescriptionProps,

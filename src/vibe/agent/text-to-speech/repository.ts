@@ -5,10 +5,10 @@
 
 import "server-only";
 
-import { createFixtureFetch } from "next-vibe/agent/ai-stream/testing/fetch-cache";
-import { getStorageAdapter } from "next-vibe/agent/chat/storage/index";
-import { ApiProvider } from "next-vibe/agent/models/models";
-import { ModelSelectionType } from "next-vibe/agent/skills/enum";
+import { createFixtureFetch } from "../ai-stream/testing/fetch-cache";
+import { getStorageAdapter } from "../chat/storage/index";
+import { ApiProvider } from "../models/models";
+import { ModelSelectionType } from "../skills/enum";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import {
@@ -28,12 +28,13 @@ import {
   TTS_MINIMUM_BALANCE,
 } from "@/products/repository-client";
 
-import { DefaultFolderId, type ToolExecutionContext } from "../chat/config";
-import { agentEnv } from "../env";
 import {
-  getInstanceAvailability,
-  PROVIDER_SETUP_INSTRUCTIONS,
-} from "../env-availability";
+  DefaultFolderId,
+  type ToolExecutionContext,
+} from "next-vibe/core/execution-context";
+import { agentEnv } from "../env";
+import { PROVIDER_SETUP_INSTRUCTIONS } from "../env-availability";
+import { getEnvAvailability } from "../env-availability";
 import type {
   TextToSpeechPostRequestOutput,
   TextToSpeechPostResponseOutput,
@@ -333,7 +334,7 @@ export class TextToSpeechRepository {
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
-    const _ttsAvailability = await getInstanceAvailability();
+    const _ttsAvailability = await getEnvAvailability();
     const modelOption = getBestTtsModel(
       { selectionType: ModelSelectionType.MANUAL, manualModelId: data.voiceId },
       user,
@@ -380,12 +381,11 @@ export class TextToSpeechRepository {
         minimum: TTS_MINIMUM_BALANCE,
       });
       return fail({
-        message: t("post.errors.insufficientCredits"),
-        errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
-        messageParams: {
+        message: t("post.errors.insufficientCredits", {
           balance: balanceResult.data.total.toString(),
           minimum: TTS_MINIMUM_BALANCE.toString(),
-        },
+        }),
+        errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
       });
     }
 

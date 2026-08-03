@@ -8,8 +8,8 @@
 
 import "server-only";
 
-import { DEFAULT_CHAT_MODEL_ID } from "next-vibe/agent/ai-stream/constants";
-import { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import { DEFAULT_CHAT_MODEL_ID } from "./ai-stream/constants";
+import { ChatModelId } from "./ai-stream/models";
 import { defineEnv } from "next-vibe/env/define-env";
 import { z } from "zod";
 

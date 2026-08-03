@@ -9,23 +9,23 @@ import type {
   ApiEndpoint,
   CreateApiEndpoint,
   EndpointReadOptions,
-} from "next-vibe/core/definition/create";
-import type { ExamplesList, ExtractInput, ExtractOutput, InferSchemaFromField } from "next-vibe/core/definition/endpoint";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+} from "../definition/create";
+import type { ExamplesList, ExtractInput, ExtractOutput, InferSchemaFromField } from "../definition/endpoint";
+import type { CreateApiEndpointAny } from "../definition/endpoint-base";
 import type {
   EndpointErrorTypes,
   FieldUsage,
   Methods,
-} from "next-vibe/core/definition/enums";
-import { FieldDataType, WidgetType } from "next-vibe/core/definition/enums";
-import type { UserRoleValue } from "next-vibe/identity/roles/enum";
-import type { UnifiedField } from "next-vibe/unified-ui/_shared/configs";
+} from "../definition/enums";
+import { FieldDataType, WidgetType } from "../definition/enums";
+import type { UserRoleValue } from "../../identity/roles/enum";
+import type { UnifiedField } from "../../unified-ui/_shared/configs";
 import type {
   AnyChildrenConstrain,
   ConstrainedChildUsage,
   FieldUsageConfig,
-} from "next-vibe/unified-ui/_shared/types";
-import { objectField, requestUrlPathParamsField } from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../unified-ui/_shared/types";
+import { objectField, requestUrlPathParamsField } from "../../unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 const genericST: { ScopedTranslationKey: string } = {
@@ -1074,7 +1074,7 @@ const test8_1: Test8_1_Result = "PASS"; // Intersection preserves variance from 
 // LEVEL 10: Test with actual createEndpoint-returned value (same as task.ts)
 // ============================================================================
 
-import type cleanupDefinitions from "next-vibe/dataflow/cleanup/definition";
+import type cleanupDefinitions from "../../dataflow/cleanup/definition";
 
 type ActualEndpoint = typeof cleanupDefinitions.POST;
 

@@ -933,6 +933,7 @@ export const translations: typeof enTranslations = {
         description: "Authentifizierung erforderlich",
       },
       notFound: {
+        detail: "Kein Konto für Benutzer {{userId}} gefunden",
         title: "Nicht gefunden",
         description: "Zahlungssitzung nicht gefunden",
       },
@@ -941,6 +942,9 @@ export const translations: typeof enTranslations = {
         description: "Berechtigung verweigert",
       },
       server: {
+        detail: "Zahlungsvorgang konnte nicht erstellt werden: {{error}}",
+        stripeNotConfigured:
+          "Stripe ist noch nicht eingerichtet. Hinterlege STRIPE_SECRET_KEY in deiner Umgebung.",
         title: "Serverfehler",
         description: "Interner Serverfehler aufgetreten",
       },
@@ -1007,6 +1011,7 @@ export const translations: typeof enTranslations = {
         description: "Berechtigung verweigert",
       },
       server: {
+        detail: "Zahlungsinformationen konnten nicht geladen werden: {{error}}",
         title: "Serverfehler",
         description: "Interner Serverfehler aufgetreten",
       },
@@ -1044,6 +1049,7 @@ export const translations: typeof enTranslations = {
       description: "Zahlung nicht gefunden",
     },
     unauthorized: {
+      signInRequired: "Melde dich an, um Zahlungen zu verwalten",
       title: "Nicht autorisiert",
       description: "Authentifizierung erforderlich",
     },
@@ -1052,6 +1058,7 @@ export const translations: typeof enTranslations = {
       description: "Berechtigung verweigert",
     },
     server: {
+      detail: "Zahlungs-Webhook konnte nicht verarbeitet werden: {{error}}",
       title: "Serverfehler",
       description: "Interner Serverfehler aufgetreten",
     },
@@ -1078,8 +1085,9 @@ export const translations: typeof enTranslations = {
     },
     customerCreationFailed: "Fehler beim Erstellen des Stripe-Kunden",
     customerNotFound: "Stripe-Kunde nicht gefunden",
-    localMode: "Zahlung ist im lokalen Entwicklungsmodus deaktiviert",
-    webhookVerificationFailed: "Webhook-Signaturverifizierung fehlgeschlagen",
+    localMode: "Zahlung ist im lokalen Entwicklungsmodus deaktiviert.",
+    webhookVerificationFailed:
+      "Webhook-Signaturverifizierung fehlgeschlagen: {{error}}",
   },
 
   // Top-level success

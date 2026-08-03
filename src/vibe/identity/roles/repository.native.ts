@@ -3,10 +3,10 @@
  * Implements UserRolesRepository interface for React Native
  */
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
-import type { NewUserRole, UserRole } from "next-vibe/identity/user/db";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import type { ResponseType } from "../../core/route/response.schema";
+import type { NewUserRole, UserRole } from "../user/db";
+import type { EndpointLogger } from "../../logger/types";
 
 import type { UserRole as UserRoleEnum } from "./enum";
 import { type UserPermissionRoleValue } from "./enum";
@@ -26,18 +26,6 @@ export class UserRolesRepository {
   ): Promise<ResponseType<UserRole[]>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("findByUserId is not implemented on native");
-  }
-
-  static async findByUserIds(
-    // oxlint-disable-next-line no-unused-vars
-    _userIds: string[],
-    // oxlint-disable-next-line no-unused-vars
-    _logger: EndpointLogger,
-    // oxlint-disable-next-line no-unused-vars
-    _locale: CountryLanguage,
-  ): Promise<ResponseType<Map<string, UserRole[]>>> {
-    // oxlint-disable-next-line restricted-syntax
-    throw new Error("findByUserIds is not implemented on native");
   }
 
   static async deleteByUserId(

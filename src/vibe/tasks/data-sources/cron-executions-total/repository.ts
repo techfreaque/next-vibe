@@ -10,16 +10,16 @@ import { and, count, gte, lte, sql } from "drizzle-orm";
 import {
   type ResponseType,
   success,
-} from "next-vibe/core/route/response.schema";
-import { db } from "next-vibe/database";
+} from "../../../core/route/response.schema";
+import { db } from "../../../database";
 import type {
   DataPoint,
   Resolution,
   TimeRange,
-} from "next-vibe/dataflow/shared/fields";
-import { resolutionBucketExpr } from "next-vibe/dataflow/shared/query-utils";
-import { fillGaps } from "next-vibe/dataflow/shared/range";
-import { cronTaskExecutions } from "next-vibe/tasks/cron/db";
+} from "../../../dataflow/shared/fields";
+import { resolutionBucketExpr } from "../../../dataflow/shared/query-utils";
+import { fillGaps } from "../../../dataflow/shared/range";
+import { cronTaskExecutions } from "../../cron/db";
 
 export class QueryCronExecutionsTotalRepository {
   static async queryCronExecutionsTotal(data: {

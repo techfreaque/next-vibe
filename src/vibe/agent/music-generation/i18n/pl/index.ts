@@ -96,6 +96,7 @@ export const translations: typeof enTranslations = {
         "Wybrany model nie obsługuje generowania muzyki. Wybierz model muzyczny.",
       notConfigured:
         "{{label}} nie jest skonfigurowany. Dodaj {{envKey}} do pliku .env. Pobierz klucz pod adresem {{url}}",
+      providerUnsupported: "{{label}} nie jest jeszcze obsługiwany",
       insufficientCredits:
         "Niewystarczające kredyty. Saldo: {{balance}}, wymagane: {{minimum}}",
       balanceCheckFailed: "Nie udało się sprawdzić salda kredytów",

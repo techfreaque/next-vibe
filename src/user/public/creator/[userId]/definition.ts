@@ -4,7 +4,7 @@
 
 import { z } from "zod";
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import { objectField, requestUrlPathParamsField, responseArrayField, responseField } from "next-vibe/unified-ui/_shared/utils-i18n";
 import {

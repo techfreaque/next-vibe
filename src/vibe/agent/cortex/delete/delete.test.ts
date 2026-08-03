@@ -34,7 +34,7 @@ import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-te
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { cortexNodes } from "../db";
-import deleteEndpoint from "../delete/definition";
+import deleteEndpoint from "./definition";
 import { removeVirtualNodesByEntityId } from "../embeddings/sync-virtual";
 import { CortexNodeType } from "../enum";
 import listEndpoint from "../list/definition";

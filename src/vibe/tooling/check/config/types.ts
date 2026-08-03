@@ -166,22 +166,13 @@ interface OxlintConfigDisabled {
 }
 
 /**
- * Which paths the *strict* rules are reported for.
- *
- * "Strict" means everything this config opts into on top of oxlint's baseline:
- * every rule listed in `rules` (they are off by default — we turned them on),
- * plus the `pedantic` category. What stays outside the whitelist is oxlint's own
- * `correctness`/`suspicious` categories: code that is outright wrong, which is
- * worth failing on anywhere.
+ * Where the rules named in `strictRules` are reported.
  *
  * The scoping cannot live in the oxlint config. oxlint has no way to set a
  * *category* for a subset of files — `overrides` takes `rules` only, and a
  * nested `.oxlintrc.json` is ignored whenever `-c` is passed, which the checker
- * always does. So the rules run everywhere and vibe check drops the issues for
- * files outside `include`.
- *
- * Rules are matched by name against this config's own `rules` block, so the
- * whitelist stays a list of paths and never needs a parallel rule inventory.
+ * always does. So every rule runs everywhere and the checker drops the strict
+ * ones for files outside `include`.
  */
 export interface StrictPathsConfig {
   /** Globs where strict issues are reported. Empty means nowhere. */
@@ -199,8 +190,18 @@ interface OxlintConfigEnabled extends OxlintConfigOptions {
   cachePath: string;
   /** File extensions to lint (e.g., [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"]) */
   lintableExtensions: string[];
-  /** Where the strict rules apply. Omitted means nowhere. */
+  /** Where {@link strictRules} apply. Omitted means every rule is repo-wide. */
   strictPaths?: StrictPathsConfig;
+  /**
+   * The rules that only apply inside `strictPaths`. Everything else in `rules`
+   * is enforced everywhere.
+   *
+   * Explicit rather than inferred: "we turned it on, so it must be strict" reads
+   * well until it silences `no-explicit-any` in the code that needs it most.
+   * Bare names match either spelling — `no-explicit-any` covers both
+   * `typescript/no-explicit-any` and `typescript-eslint(no-explicit-any)`.
+   */
+  strictRules?: string[];
 }
 
 export type OxlintConfig = OxlintConfigDisabled | OxlintConfigEnabled;
@@ -255,6 +256,29 @@ interface TypecheckConfigEnabled {
   enabled: true;
   /** Path to directory for tsbuildinfo cache files */
   cachePath: string;
+  /**
+   * compilerOptions forced on top of whatever tsconfig owns the files.
+   *
+   * A project's own tsconfig says how IT builds; this says how the repo is
+   * checked, and the checker's job is the second one. A nested project that
+   * sets `noImplicitAny: false` would otherwise opt itself out of the very rule
+   * the check exists to enforce, and the run would report it clean. Overriding
+   * here means a project cannot silence the checker by editing its own config.
+   *
+   * Applied everywhere. The counterpart of the oxlint `rules` block.
+   */
+  compilerOptions?: Record<string, boolean | string | string[]>;
+  /**
+   * compilerOptions forced only inside `oxlint.strictPaths`, or everywhere when
+   * `strict` is requested. The counterpart of oxlint's strict rules.
+   *
+   * Unlike a lint rule, a compilerOption cannot be scoped to a subset of files —
+   * it belongs to the whole program. So this is decided per run, from the target
+   * being checked: point at a whitelisted tree and it applies; point elsewhere
+   * and only `compilerOptions` does. A repo-wide run checks each project
+   * separately, so each gets the answer for its own path.
+   */
+  strictCompilerOptions?: Record<string, boolean | string | string[]>;
   /** Use tsgo instead of tsc for type checking (default: false uses tsc) */
   useTsgo?: boolean;
   /** Ignore patterns always applied regardless of extensive mode (glob patterns for tsconfig exclude) */

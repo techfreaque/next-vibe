@@ -1,7 +1,7 @@
 import NextImage from "next/image";
 import type { JSX } from "react";
 
-import type { StyleType } from "../../web/utils/style-type";
+import type { StyleType } from "../utils/style-type";
 
 export type ImageProps = {
   src: string;

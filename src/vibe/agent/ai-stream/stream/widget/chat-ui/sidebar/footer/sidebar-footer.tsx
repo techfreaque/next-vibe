@@ -1,7 +1,7 @@
 "use client";
 
-import { useChatBootContext } from "next-vibe/agent/chat/hooks/context";
-import { scopedTranslation } from "next-vibe/agent/chat/threads/widget/i18n";
+import { useChatBootContext } from "../../../../../../chat/hooks/context";
+import { scopedTranslation } from "../../../../../../chat/threads/widget/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";

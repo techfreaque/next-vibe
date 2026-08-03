@@ -1,12 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { JSX, ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { DragHandleDots2Icon } from "../../web/ui/icons/DragHandleDots2Icon";
-import type { StyleType } from "../../web/utils/style-type";
+import { DragHandleDots2Icon } from "./icons/DragHandleDots2Icon";
+import type { StyleType } from "../utils/style-type";
 import type { DivMouseEvent } from "./div";
 
 export interface ResizableContainerProps {

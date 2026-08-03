@@ -2438,6 +2438,7 @@ export const translations = {
           error: "Error calling MCP tool",
           invalidJsonArguments: "Invalid JSON arguments",
           executionFailed: "Tool execution failed: {{error}}",
+          newPageFailed: "Could not open a new page",
           toolExecutionFailed: "Failed to execute {{toolName}}",
         },
       },

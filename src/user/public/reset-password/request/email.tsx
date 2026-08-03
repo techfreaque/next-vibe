@@ -237,9 +237,8 @@ export const passwordResetRequestEmailTemplate: EmailTemplateDefinition<
       if (!userResponse.success) {
         // will not get sent to the user as ignoreError is true
         return fail({
-          message: t("errors.no_email"),
+          message: t("errors.no_email", { email: requestData.email }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { email: requestData.email },
           cause: userResponse,
         });
       }
@@ -254,9 +253,11 @@ export const passwordResetRequestEmailTemplate: EmailTemplateDefinition<
       );
       if (!tokenResponse.success) {
         return fail({
-          message: t("errors.email_generation_failed"),
+          message: t("errors.email_generation_failed", {
+            email: requestData.email,
+            errorMessage: tokenResponse.message,
+          }),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: { email: requestData.email },
           cause: tokenResponse,
         });
       }
@@ -268,7 +269,7 @@ export const passwordResetRequestEmailTemplate: EmailTemplateDefinition<
         publicName: user.publicName,
         userId: user.id,
         passwordResetUrl,
-        totalModelCount: getAvailableModelCount(false, getEnvAvailability()),
+        totalModelCount: getAvailableModelCount(false, await getEnvAvailability()),
       };
 
       return success({
@@ -288,12 +289,11 @@ export const passwordResetRequestEmailTemplate: EmailTemplateDefinition<
       logger.error("Error generating password reset email", parseError(error));
       const parsedError = parseError(error);
       return fail({
-        message: t("errors.email_generation_failed"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
+        message: t("errors.email_generation_failed", {
           email: requestData.email,
           errorMessage: parsedError.message,
-        },
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   },

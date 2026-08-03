@@ -8,14 +8,14 @@
  * transformers, data sources).
  */
 
-import { dateSchema } from "next-vibe/core/definition/common.schema";
-import { FieldDataType, WidgetType } from "next-vibe/core/definition/enums";
-import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
-import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
+import { dateSchema } from "../../core/definition/common.schema";
+import { FieldDataType, WidgetType } from "../../core/definition/enums";
+import { lazyWidget } from "../../unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "../../unified-ui/_shared/utils";
 import {
   requestField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { GraphResolution, GraphResolutionDB } from "../enum";

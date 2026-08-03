@@ -4,7 +4,7 @@
  */
 
 "use client";
-import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
+import { formatSimpleDate } from "../../core/i18n/core/localization-utils";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Button } from "next-vibe/ui/ui/button";
 import { Card, CardContent } from "next-vibe/ui/ui/card";
@@ -23,7 +23,7 @@ import { X } from "next-vibe/ui/ui/icons/X";
 import { Input } from "next-vibe/ui/ui/input";
 import { Span } from "next-vibe/ui/ui/span";
 import { P } from "next-vibe/ui/ui/typography";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../unified-ui/_shared/cn";
 import {
   useWidgetEndpointMutations,
   useWidgetForm,
@@ -31,7 +31,7 @@ import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
+} from "../../unified-ui/_shared/use-widget-context";
 import React, { useCallback, useMemo } from "react";
 
 import { GraphOwnerType, GraphResolution } from "../enum";
@@ -316,8 +316,7 @@ export function GraphListContainer(): React.JSX.Element {
   const handleView = useCallback(
     (graph: GraphSummary): void => {
       void (async (): Promise<void> => {
-        const dataDef =
-          await import("next-vibe/dataflow/graphs/[id]/data/definition");
+        const dataDef = await import("./[id]/data/definition");
         navigation.push(dataDef.default.GET, {
           urlPathParams: { id: graph.id },
           data: { resolution: GraphResolution.ONE_DAY },
@@ -329,8 +328,7 @@ export function GraphListContainer(): React.JSX.Element {
 
   const handleCreate = useCallback((): void => {
     void (async (): Promise<void> => {
-      const editDef =
-        await import("next-vibe/dataflow/graphs/[id]/edit/definition");
+      const editDef = await import("./[id]/edit/definition");
       navigation.push(editDef.default.PUT, {
         urlPathParams: { id: "new" },
         onSuccessCallback: () => {
@@ -343,8 +341,7 @@ export function GraphListContainer(): React.JSX.Element {
   const handleArchive = useCallback(
     (graph: GraphSummary): void => {
       void (async (): Promise<void> => {
-        const archiveDef =
-          await import("next-vibe/dataflow/graphs/[id]/archive/definition");
+        const archiveDef = await import("./[id]/archive/definition");
         navigation.push(archiveDef.default.POST, {
           urlPathParams: { id: graph.id },
           renderInModal: true,
@@ -358,8 +355,7 @@ export function GraphListContainer(): React.JSX.Element {
   const handleDelete = useCallback(
     (graph: GraphSummary): void => {
       void (async (): Promise<void> => {
-        const deleteDef =
-          await import("next-vibe/dataflow/graphs/[id]/delete/definition");
+        const deleteDef = await import("./[id]/delete/definition");
         navigation.push(deleteDef.default.DELETE, {
           urlPathParams: { id: graph.id },
           renderInModal: true,

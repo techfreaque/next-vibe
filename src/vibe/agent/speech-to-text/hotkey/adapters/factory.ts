@@ -63,7 +63,7 @@ export function createRecorder(options?: RecorderFactoryOptions): Recorder {
 
     default:
       // This should never happen due to TypeScript exhaustiveness checking
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Adapter factory initialization error
+      // eslint-disable-next-line restricted/restricted-syntax, i18next/no-literal-string -- Adapter factory initialization error
       throw new Error(`Unsupported platform: ${String(platform)}`);
   }
 }
@@ -93,7 +93,7 @@ export function createTyper(options?: TyperFactoryOptions): Typer {
 
     default:
       // This should never happen due to TypeScript exhaustiveness checking
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Adapter factory initialization error
+      // eslint-disable-next-line restricted/restricted-syntax, i18next/no-literal-string -- Adapter factory initialization error
       throw new Error(`Unsupported platform: ${String(platform)}`);
   }
 }
@@ -142,7 +142,7 @@ export async function createBestAdapters(): Promise<{
   const typerDepsOk = await typer.checkDependencies();
 
   if (!typerDepsOk) {
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Adapter factory initialization error
+    // eslint-disable-next-line restricted/restricted-syntax, i18next/no-literal-string -- Adapter factory initialization error
     throw new Error(
       `Typer dependencies not available for ${String(platform)}. Please install required tools.`,
     );

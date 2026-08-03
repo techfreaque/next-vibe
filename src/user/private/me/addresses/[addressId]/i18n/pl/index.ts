@@ -104,6 +104,7 @@ export const translations: typeof enTranslations = {
       internal: {
         title: "Błąd serwera",
         description: "Wewnętrzny błąd serwera",
+        detail: "Nie udało się zaktualizować adresu: {{error}}",
       },
       unknown: {
         title: "Nieznany błąd",
@@ -156,6 +157,7 @@ export const translations: typeof enTranslations = {
       internal: {
         title: "Błąd serwera",
         description: "Wewnętrzny błąd serwera",
+        detail: "Nie udało się usunąć adresu: {{error}}",
       },
       unknown: {
         title: "Nieznany błąd",

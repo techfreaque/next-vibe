@@ -56,9 +56,9 @@ const vector1024 = customType<{
   },
 });
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
-import type { MessageVariant } from "next-vibe/agent/ai-stream/repository/core/modality-resolver";
-import type { Modality } from "next-vibe/agent/models/enum";
+import type { ChatModelId } from "../ai-stream/models";
+import type { MessageVariant } from "../ai-stream/repository/core/modality-resolver";
+import type { Modality } from "../models/enum";
 import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { createRelationalDb } from "next-vibe/database/relational";
@@ -70,7 +70,7 @@ import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-fiel
 import type { z } from "zod";
 
 import type { FavoriteConfig } from "../skills/favorites/db";
-import type { DefaultFolderId } from "./config";
+import type { DefaultFolderId } from "next-vibe/core/execution-context";
 import {
   ChatMessageRoleDB,
   ThreadStatusDB,

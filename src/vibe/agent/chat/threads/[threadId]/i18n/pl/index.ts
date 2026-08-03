@@ -130,6 +130,7 @@ export const translations: typeof enTranslations = {
       server: {
         title: "Błąd serwera",
         description: "Wystąpił wewnętrzny błąd serwera",
+        detail: "Błąd serwera: {{error}}",
       },
       network: {
         title: "Błąd sieci",
@@ -297,10 +298,12 @@ export const translations: typeof enTranslations = {
       notFound: {
         title: "Wątek nie znaleziony",
         description: "Wątek do aktualizacji nie został znaleziony",
+        detail: "Nie znaleziono wątku: {{threadId}}",
       },
       server: {
         title: "Błąd serwera",
         description: "Wystąpił wewnętrzny błąd serwera",
+        detail: "Błąd serwera: {{error}}",
       },
       network: {
         title: "Błąd sieci",
@@ -382,10 +385,12 @@ export const translations: typeof enTranslations = {
       notFound: {
         title: "Wątek nie znaleziony",
         description: "Wątek do usunięcia nie został znaleziony",
+        detail: "Nie znaleziono wątku: {{threadId}}",
       },
       server: {
         title: "Błąd serwera",
         description: "Wystąpił wewnętrzny błąd serwera",
+        detail: "Błąd serwera: {{error}}",
       },
       network: {
         title: "Błąd sieci",

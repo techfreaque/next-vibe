@@ -44,6 +44,11 @@ export const translations = {
       notFound: {
         title: "No Session",
         description: "No active interactive session found",
+        noSession:
+          "No interactive session running. Start one with: vibe <alias> -i --agent-control",
+        deadSession: "Session PID {{pid}} is no longer running.",
+        frameNotFound:
+          "No rendered frame for session {{pid}} yet. Give it a moment and retry.",
       },
       unknown: {
         title: "Unknown Error",
@@ -114,6 +119,11 @@ export const translations = {
       notFound: {
         title: "No Session",
         description: "No active interactive session found",
+        noSession:
+          "No interactive session running. Start one with: vibe <alias> -i --agent-control",
+        deadSession: "Session PID {{pid}} is no longer running.",
+        keysNotFound:
+          "Session {{pid}} is not accepting keys yet. Give it a moment and retry.",
       },
       unknown: {
         title: "Unknown Error",

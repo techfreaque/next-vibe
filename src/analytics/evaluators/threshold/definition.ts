@@ -5,7 +5,7 @@
  * Fires when a series value satisfies a comparison against a constant.
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -196,8 +196,6 @@ const { POST } = createEndpoint({
 });
 
 export type ThresholdRequestOutput = typeof POST.types.RequestOutput;
-
-export type ThresholdParams = Pick<ThresholdRequestOutput, "op" | "value">;
 
 const definitions = { POST };
 export default definitions;

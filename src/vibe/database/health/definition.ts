@@ -3,19 +3,19 @@
  * POST endpoint to verify database connectivity (called by cron)
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   LayoutType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { UserRole } from "next-vibe/identity/roles/enum";
-import { scopedTranslation } from "next-vibe/tasks/i18n";
+} from "../../core/definition/enums";
+import { UserRole } from "../../identity/roles/enum";
+import { scopedTranslation } from "../../tasks/i18n";
 import {
   objectField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { DB_HEALTH_ALIAS } from "./constants";

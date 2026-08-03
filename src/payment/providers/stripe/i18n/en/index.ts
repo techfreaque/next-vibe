@@ -24,7 +24,7 @@ export const translations = {
   status: {
     authenticated: "Authenticated and ready",
     not_authenticated: "Not authenticated — run 'stripe login'",
-    not_installed: "Stripe CLI is not installed",
+    not_installed: "Stripe CLI is not installed. {{instructions}}",
   },
 
   errors: {
@@ -49,6 +49,7 @@ export const translations = {
       description: "Stripe CLI is not installed",
     },
     serverError: {
+      detail: "Stripe CLI listener failed: {{error}}",
       title: "Server Error",
       description: "An error occurred while running the Stripe listener",
     },
@@ -57,6 +58,8 @@ export const translations = {
       description: "An unexpected error occurred",
     },
     customerRetrievalFailed: {
+      detail:
+        "Could not load your Stripe customer record: {{error}} (user {{userId}})",
       title: "Customer Retrieval Failed",
       description: "Failed to retrieve Stripe customer information",
     },
@@ -70,30 +73,39 @@ export const translations = {
     },
     execution_failed: "Stripe CLI operation failed",
     userNotFound: {
+      detail: "No account found for user {{userId}}",
       title: "User Not Found",
       description: "The specified user was not found",
     },
     customerCreationFailed: {
+      detail:
+        "Could not create your Stripe customer record: {{error}} (user {{userId}})",
       title: "Customer Creation Failed",
       description: "Failed to create Stripe customer",
     },
     checkoutCreationFailed: {
+      detail: "Could not start checkout: {{error}}",
       title: "Checkout Creation Failed",
       description: "Failed to create Stripe checkout session",
     },
     webhookVerificationFailed: {
+      detail: "Could not verify the Stripe webhook: {{error}}",
       title: "Webhook Verification Failed",
       description: "Failed to verify webhook signature",
     },
     subscriptionRetrievalFailed: {
+      detail: "Could not load the subscription from Stripe: {{error}}",
       title: "Subscription Retrieval Failed",
       description: "Failed to retrieve subscription from Stripe",
     },
     subscriptionCancellationFailed: {
+      detail: "Could not cancel the subscription: {{error}}",
       title: "Subscription Cancellation Failed",
       description: "Failed to cancel subscription in Stripe",
     },
     priceCreationFailed: {
+      detail:
+        "Could not create the Stripe price: {{error}} (product {{productId}})",
       title: "Price Creation Failed",
       description: "Failed to create price in Stripe",
     },

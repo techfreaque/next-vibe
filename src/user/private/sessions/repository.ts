@@ -61,9 +61,10 @@ export class SessionManagementRepository {
     } catch (error) {
       logger.error("Failed to list sessions", parseError(error));
       return fail({
-        message: t("create.errors.server.title"),
+        message: t("list.errors.server.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -117,9 +118,10 @@ export class SessionManagementRepository {
     } catch (error) {
       logger.error("Failed to create named session", parseError(error));
       return fail({
-        message: t("create.errors.server.title"),
+        message: t("create.errors.server.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -141,9 +143,8 @@ export class SessionManagementRepository {
 
       if (deleted.length === 0) {
         return fail({
-          message: t("revoke.errors.notFound.title"),
+          message: t("revoke.errors.notFound.detail", { sessionId }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { sessionId },
         });
       }
 
@@ -155,9 +156,10 @@ export class SessionManagementRepository {
     } catch (error) {
       logger.error("Failed to revoke session", parseError(error));
       return fail({
-        message: t("create.errors.server.title"),
+        message: t("revoke.errors.server.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }

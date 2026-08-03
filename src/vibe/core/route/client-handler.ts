@@ -4,11 +4,10 @@
  * Mirrors server route handler structure but runs in browser
  */
 
-import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { JWTPublicPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import type { CreateApiEndpointAny } from "../definition/endpoint-base";
+import type { CountryLanguage } from "../i18n/core/config";
+import type { JWTPublicPayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
 
 import type { ResponseType } from "./response.schema";
 
@@ -26,7 +25,6 @@ export type ClientHandlerFunction<
   locale: CountryLanguage;
   logger: EndpointLogger;
   user: JWTPublicPayloadType;
-  availability: AgentEnvAvailability;
 }) => Promise<ResponseType<TResponseOutput>> | ResponseType<TResponseOutput>;
 
 /**

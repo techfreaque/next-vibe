@@ -2,7 +2,7 @@
  * Helper functions for flat message view (4chan-style)
  */
 
-import type { ChatMessage } from "next-vibe/agent/chat/db";
+import type { ChatMessage } from "../../../../../db";
 
 /**
  * Count how many messages are direct replies to this message

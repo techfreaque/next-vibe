@@ -28,7 +28,7 @@ import {
   convertLanguageFilter,
   CountryFilter,
   LanguageFilter,
-} from "next-vibe/core/i18n/core/config";
+} from "next-vibe/identity/lead/enum";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,

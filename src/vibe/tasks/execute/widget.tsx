@@ -6,9 +6,9 @@
 
 "use client";
 
-import { getFullPath } from "next-vibe/core/core-utils/path";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { endpoints as cronTaskEndpoints } from "next-vibe/tasks/cron/[id]/definition";
+import { getFullPath } from "../../core/core-utils/path";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
+import { endpoints as cronTaskEndpoints } from "../cron/[id]/definition";
 import { Div } from "next-vibe/ui/ui/div";
 import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
 import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
@@ -21,16 +21,17 @@ import {
   useWidgetForm,
   useWidgetLocale,
   useWidgetLogger,
+  useWidgetPlatform,
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
-import { type UseEndpointOptions } from "next-vibe/unified-ui/hooks/endpoint-types";
-import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
-import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
-import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
+} from "../../unified-ui/_shared/use-widget-context";
+import { type UseEndpointOptions } from "../../unified-ui/hooks/endpoint-types";
+import { useEndpoint } from "../../unified-ui/hooks/use-endpoint";
+import { EndpointsPage } from "../../unified-ui/renderers/web/EndpointsPage";
+import { TextFieldWidget } from "../../unified-ui/widgets/form-fields/text-field/widget";
+import { NavigateButtonWidget } from "../../unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "../../unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -111,6 +112,7 @@ export function TaskExecuteContainer({ field }: WidgetProps): JSX.Element {
   const form = useWidgetForm<typeof endpoints.POST>();
   const locale = useWidgetLocale();
   const user = useWidgetUser();
+  const platform = useWidgetPlatform();
   const logger = useWidgetLogger();
   const children = field.children;
 
@@ -315,6 +317,7 @@ export function TaskExecuteContainer({ field }: WidgetProps): JSX.Element {
             endpoint={{ [toolMethod]: toolEndpoint }}
             locale={locale}
             user={user}
+            platform={platform}
             disabled={true}
             endpointOptions={
               toolMethod === "GET"
@@ -376,6 +379,7 @@ export function TaskExecuteContainer({ field }: WidgetProps): JSX.Element {
             endpoint={{ [toolMethod]: toolEndpoint } as EndpointMethods}
             locale={locale}
             user={user}
+            platform={platform}
             endpointOptions={toolEndpointOptions}
           />
         </Div>

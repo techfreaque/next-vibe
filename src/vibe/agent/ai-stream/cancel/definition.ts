@@ -3,7 +3,7 @@
  * Cancels an active AI streaming response for a given thread.
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -92,7 +92,7 @@ const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         listEndpoint: async () =>
-          (await import("next-vibe/agent/chat/threads/definition")).default.GET,
+          (await import("../../chat/threads/definition")).default.GET,
         labelField: "title",
         label: "post.threadId.label",
         description: "post.threadId.description",

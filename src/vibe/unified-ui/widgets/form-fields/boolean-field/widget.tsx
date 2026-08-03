@@ -5,7 +5,7 @@
 
 "use client";
 
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Button } from "next-vibe/ui/ui/button";
 import { Checkbox } from "next-vibe/ui/ui/checkbox";
 import { Div } from "next-vibe/ui/ui/div";
@@ -26,18 +26,18 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe/ui/ui/tooltip";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
-import type { ReactFormFieldProps } from "next-vibe/unified-ui/_shared/react-types";
-import type { BooleanWidgetSchema } from "next-vibe/unified-ui/_shared/schema-constraints";
-import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
+import { cn } from "../../../_shared/cn";
+import type { ReactFormFieldProps } from "../../../_shared/react-types";
+import type { BooleanWidgetSchema } from "../../../_shared/schema-constraints";
+import type { FieldUsageConfig } from "../../../_shared/types";
 import {
   useWidgetDisabled,
   useWidgetForm,
   useWidgetLocale,
   useWidgetTranslation,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
-import { scopedTranslation as unifiedInterfaceScopedTranslation } from "next-vibe/unified-ui/hooks/i18n";
-import { getTheme } from "next-vibe/unified-ui/widgets/form-fields/_shared/constants";
+} from "../../../_shared/use-widget-context";
+import { scopedTranslation as unifiedInterfaceScopedTranslation } from "../../../hooks/i18n";
+import { getTheme } from "../_shared/constants";
 import type { JSX } from "react";
 
 import type { BooleanFieldWidgetConfig } from "./types";

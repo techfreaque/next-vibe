@@ -5,24 +5,24 @@
 
 import { spawnSync } from "node:child_process";
 
-import { buildPackageRunnerCommand, coreEnv } from "next-vibe/core/env";
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { buildPackageRunnerCommand, coreEnv } from "../../core/env";
+import { defaultLocale } from "../../core/i18n/core/config";
+import type { ResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { databaseEnv } from "next-vibe/database/env";
-import type { MigrateT } from "next-vibe/database/migrate/i18n";
-import { scopedTranslation } from "next-vibe/database/migrate/i18n";
+} from "../../core/route/response.schema";
+import { parseError } from "../../core/utils/parse-error";
+import { databaseEnv } from "../env";
+import type { MigrateT } from "./i18n";
+import { scopedTranslation } from "./i18n";
 import {
   formatActionCommand,
   formatDatabase,
   formatDuration,
-} from "next-vibe/logger/formatters";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../logger/formatters";
+import type { EndpointLogger } from "../../logger/types";
 
 import type { MigrateResponseOutput } from "./definition";
 
@@ -53,10 +53,14 @@ export class DatabaseMigrationRepository {
       });
 
       if (result.error) {
+        // `post.errors.network.title` is the definition's declared
+        // NETWORK_ERROR label and renders param-free there, so the cause goes
+        // in its own key.
         return fail({
-          message: t("post.errors.network.title"),
+          message: t("post.errors.network.detail", {
+            error: result.error.message,
+          }),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: { error: result.error.message },
         });
       }
 
@@ -68,14 +72,14 @@ export class DatabaseMigrationRepository {
         logger.error(
           `Migration failed with exit code ${String(result.status)}: ${rawOutput}`,
         );
+        // drizzle-kit is silent on some failures, so fall back to the exit code.
         return fail({
-          message: t("post.errors.network.title"),
+          message: rawOutput
+            ? t("post.errors.network.detail", { error: rawOutput })
+            : t("post.errors.network.exitCode", {
+                code: String(result.status),
+              }),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: {
-            error:
-              rawOutput ||
-              `drizzle-kit migrate exited with code ${String(result.status)}`,
-          },
         });
       }
 
@@ -92,9 +96,10 @@ export class DatabaseMigrationRepository {
       const parsedError = parseError(error);
       logger.error("Migration error", { error: parsedError.message });
       return fail({
-        message: t("post.errors.network.title"),
+        message: t("post.errors.network.detail", {
+          error: parsedError.message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
       });
     }
   }

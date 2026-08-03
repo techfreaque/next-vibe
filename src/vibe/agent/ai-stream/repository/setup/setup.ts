@@ -7,21 +7,21 @@ import "server-only";
 
 import type { ModelMessage } from "ai";
 import { and, eq, sql } from "drizzle-orm";
-import { getInstanceAvailability } from "next-vibe/agent/env-availability";
+import { getEnvAvailability } from "../../../env-availability";
 import {
   getBestImageGenModel,
   type ImageGenModelSelection,
-} from "next-vibe/agent/image-generation/models";
-import { ApiProvider } from "next-vibe/agent/models/models";
+} from "../../../image-generation/models";
+import { ApiProvider } from "../../../models/models";
 import {
   getBestMusicGenModel,
   type MusicGenModelSelection,
-} from "next-vibe/agent/music-generation/models";
-import type { VoiceModelSelection } from "next-vibe/agent/text-to-speech/models";
+} from "../../../music-generation/models";
+import type { VoiceModelSelection } from "../../../text-to-speech/models";
 import {
   getBestVideoGenModel,
   type VideoGenModelSelection,
-} from "next-vibe/agent/video-generation/models";
+} from "../../../video-generation/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -32,14 +32,15 @@ import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { CoreTool } from "next-vibe/platforms/ai/tools-loader";
-import type { ResolvedRelayContext } from "next-vibe/realtime/remote-event-bridge/relay-context";
+import { Platform } from "next-vibe/platforms/platforms";
+import type { ResolvedRelayContext } from "next-vibe/realtime/core/relay-context";
 import type { NextRequest } from "next-vibe/ui/lib/request";
 
 import {
   DefaultFolderId,
   makeHeadlessContext,
   type ToolExecutionContext,
-} from "../../../chat/config";
+} from "../../../../core/execution-context";
 import { type ToolCall } from "../../../chat/db";
 import type { ChatMessageRole } from "../../../chat/enum";
 import { ThreadStreamingState } from "../../../chat/enum";
@@ -223,7 +224,7 @@ function resolveBridgeModelSelections(params: {
       }
     | undefined;
   user: JwtPayloadType;
-  availability: Awaited<ReturnType<typeof getInstanceAvailability>>;
+  availability: Awaited<ReturnType<typeof getEnvAvailability>>;
   logger: EndpointLogger;
 }): {
   resolvedTtsSelection: VoiceModelSelection;
@@ -344,7 +345,7 @@ async function resolveRemoteFolderPrompt(params: {
   }
 
   const { ThreadsRepository: ThreadsRepoForLoop } =
-    await import("next-vibe/agent/chat/threads/repository");
+    await import("../../../chat/threads/repository");
   // Pure placement walk — the loop-routing variant returns null for
   // loopLocation:'caller' connections, which is EXACTLY the local-loop case
   // that needs the remote prompt.
@@ -356,15 +357,15 @@ async function resolveRemoteFolderPrompt(params: {
 
   const { RouteExecuteRepository } =
     await import("next-vibe/execute-tool/repository");
-  const promptDef = (
-    await import("next-vibe/agent/ai-stream/system-prompt/debug/definition")
-  ).default;
+  const promptDef = (await import("../../system-prompt/debug/definition"))
+    .default;
   const remotePromptResult = await RouteExecuteRepository.runInProcessTyped({
     definition: promptDef.GET,
     instanceId: remoteFolderInstance,
     user,
     locale,
     logger,
+    platform: Platform.AI,
     input: {
       skillId: data.skill ?? undefined,
       rootFolderId: DefaultFolderId.PRIVATE,
@@ -564,7 +565,7 @@ export async function setupAiStream(params: {
     mediaModelOverrides,
     resolvedRelayContext,
   } = params;
-  const availability = await getInstanceAvailability();
+  const availability = await getEnvAvailability();
   const isIncognito = data.rootFolderId === "incognito";
 
   // The fixture chain is keyed by threadId (dedicated `fixtures` table, written

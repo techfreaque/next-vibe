@@ -13,30 +13,32 @@ import type {
   ErrorResponseType,
   ResponseType,
   SuccessResponseType,
-} from "next-vibe/core/route/response.schema";
+} from "../route/response.schema";
 import type {
   ConstrainedChildUsage,
   FieldUsageConfig,
   ObjectChildrenConstraint,
-} from "next-vibe/unified-ui/_shared/types";
-import { objectField, responseField } from "next-vibe/unified-ui/_shared/utils-i18n";
-import type { EndpointReturn } from "next-vibe/unified-ui/hooks/endpoint-types";
+} from "../../unified-ui/_shared/types";
+import {
+  objectField,
+  responseField,
+} from "../../unified-ui/_shared/utils-i18n";
+import type { EndpointReturn } from "../../unified-ui/hooks/endpoint-types";
 import type { z } from "zod";
 
 import type imapAccountsListDefinition from "@/messenger/accounts/list/definition";
 
-const genericST: { ScopedTranslationKey: string } = { ScopedTranslationKey: "" };
-import type { InferSchemaFromField } from "next-vibe/core/definition/endpoint";
-import type { FieldUsage } from "next-vibe/core/definition/enums";
-import {
-  LayoutType,
-  WidgetType,
-} from "next-vibe/core/definition/enums";
-import type { UnifiedField } from "next-vibe/unified-ui/_shared/configs";
+const genericST: { ScopedTranslationKey: string } = {
+  ScopedTranslationKey: "",
+};
+import type { InferSchemaFromField } from "../definition/endpoint";
+import type { FieldUsage } from "../definition/enums";
+import { LayoutType, WidgetType } from "../definition/enums";
+import type { UnifiedField } from "../../unified-ui/_shared/configs";
 import type {
   ObjectWidgetConfig,
   RequestResponseWidgetConfig,
-} from "next-vibe/unified-ui/_shared/configs";
+} from "../../unified-ui/_shared/configs";
 
 // Legacy ObjectField type alias for backward compatibility in tests
 // ObjectField<TChildren, TUsage, TKey> → ObjectWidgetConfig<TKey, TUsage, "object", TChildren>
@@ -640,7 +642,7 @@ type Test13j2_UsageMatches = Test10f_ImapFields extends {
 
 // 13j-3: Does children match any record?
 type Test13j3_ChildrenMatches = Test10f_ImapFields extends {
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type testing requires unknown for runtime structure validation
+  // eslint-disable-next-line restricted/no-unknown -- Type testing requires unknown for runtime structure validation
   children: Record<string, unknown>;
 }
   ? true

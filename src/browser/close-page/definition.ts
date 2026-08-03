@@ -3,7 +3,7 @@
  * Closes the page by its index. The last open page cannot be closed
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,

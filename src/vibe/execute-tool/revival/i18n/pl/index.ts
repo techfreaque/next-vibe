@@ -4,6 +4,8 @@ export const translations: typeof enTranslations = {
   errors: {
     unexpectedError:
       "Wystąpił nieoczekiwany błąd: {{error}}. Spróbuj ponownie.",
+    modelNotResolved:
+      "Nie udało się ustalić modelu dla tego wątku - nie można wznowić strumienia.",
   },
   post: {
     title: "Wznowienie",

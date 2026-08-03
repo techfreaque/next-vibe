@@ -3,22 +3,22 @@
  * POST endpoint to execute a graph from an inline config (no DB save required)
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { graphConfigSchema } from "next-vibe/dataflow/graph/schema";
-import { scopedTranslation } from "next-vibe/dataflow/run-config/i18n";
-import { UserRole } from "next-vibe/identity/roles/enum";
+} from "../../core/definition/enums";
+import { graphConfigSchema } from "../graph/schema";
+import { scopedTranslation } from "./i18n";
+import { UserRole } from "../../identity/roles/enum";
 import {
   objectField,
   requestField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { RUN_CONFIG_ALIAS } from "./constants";

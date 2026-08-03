@@ -122,7 +122,12 @@ export const translations: typeof enTranslations = {
       description:
         "Ihr Kontaktformular kann derzeit nicht verarbeitet werden. Bitte versuchen Sie es später erneut.",
     },
-    repositoryCreateFailed: "Kontaktanfrage konnte nicht erstellt werden",
+    repositoryCreateFailed:
+      "Kontaktanfrage konnte nicht erstellt werden: {{error}}",
+    repositoryCreateFailedForEmail:
+      "Kontaktanfrage für {{email}} konnte nicht erstellt werden",
+    repositoryCreateFailedWithDetails:
+      "Kontaktanfrage konnte nicht erstellt werden: {{error}}. {{details}}",
     repositoryCreateDetails:
       "Ihr Kontaktformular kann derzeit nicht verarbeitet werden. Bitte versuchen Sie es später erneut.",
     noContactReturned:

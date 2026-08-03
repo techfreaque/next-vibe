@@ -3,15 +3,18 @@
  * Editable text field with inline editing capability
  */
 
-import type { SpacingSize, WidgetType } from "next-vibe/core/definition/enums";
+import type {
+  SpacingSize,
+  WidgetType,
+} from "../../../../core/definition/enums";
 import type {
   NumberWidgetSchema,
   StringWidgetSchema,
-} from "next-vibe/unified-ui/_shared/schema-constraints";
+} from "../../../_shared/schema-constraints";
 import type {
   BasePrimitiveWidgetConfig,
   FieldUsageConfig,
-} from "next-vibe/unified-ui/_shared/types";
+} from "../../../_shared/types";
 import { z } from "zod";
 
 /**

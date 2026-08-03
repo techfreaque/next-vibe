@@ -5,16 +5,16 @@
 
 import "server-only";
 
-import { Methods } from "next-vibe/core/definition/enums";
-import { endpointsHandler } from "next-vibe/core/route/multi";
+import { Methods } from "../../definition/enums";
+import { endpointsHandler } from "../../route/multi";
 
 import uninstallEndpoints from "./definition";
 import { SetupUninstallRepository } from "./repository";
 
-export const { POST, tools } = endpointsHandler({
+export const { tools } = endpointsHandler({
   endpoint: uninstallEndpoints,
   [Methods.POST]: {
-    handler: ({ user, t, logger }) =>
-      SetupUninstallRepository.uninstallCli(user, t, logger),
+    handler: ({ user, logger }) =>
+      SetupUninstallRepository.uninstallCli(user, logger),
   },
 });

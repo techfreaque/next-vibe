@@ -3,7 +3,7 @@
  * Clones an estimate to a new DRAFT with the same lines
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,

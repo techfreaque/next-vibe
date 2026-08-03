@@ -1,17 +1,17 @@
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "../../../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { UserRole } from "next-vibe/identity/roles/enum";
-import { scopedTranslation } from "next-vibe/tooling/infra/i18n";
+} from "../../../../core/definition/enums";
+import { UserRole } from "../../../../identity/roles/enum";
+import { scopedTranslation } from "../../i18n";
 import {
   objectField,
   responseArrayField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../../../unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 export const { GET } = createEndpoint({

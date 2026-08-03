@@ -67,8 +67,8 @@ export function DistractingElements(): React.ReactElement {
 export function RedundantRole(): React.ReactElement {
   return (
     <div>
-      <button role="button">Click me</button>
-      <nav role="navigation">Navigation</nav>
+      <button >Click me</button>
+      <nav >Navigation</nav>
     </div>
   );
 }

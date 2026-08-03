@@ -15,7 +15,7 @@ import { createContext, useContext, useMemo } from "react";
 import type { CreditsGetResponseOutput } from "@/credits/definition";
 
 import type { SkillGetResponseOutput } from "../../skills/[id]/definition";
-import { DefaultFolderId } from "../config";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { FolderContentsResponseOutput } from "../folder-contents/[rootFolderId]/definition";
 import type { FolderListResponseOutput } from "../folders/[rootFolderId]/definition";
 import type { PublicFeedGetResponseOutput } from "../public-feed/definition";

@@ -105,7 +105,7 @@ One row per pulse tick. Counts tasks discovered, due, executed, succeeded, faile
 type TaskOwner = { type: "system" } | { type: "user"; userId: string };
 ```
 
-Helper constants and functions: `SYSTEM_OWNER`, `userOwner(id)`, `dbUserIdToOwner(id)`, `toDbUserId(owner)`.
+Helper constants and functions: `SYSTEM_OWNER`, `dbUserIdToOwner(id)`, `toDbUserId(owner)`.
 
 ## Execution Flow
 

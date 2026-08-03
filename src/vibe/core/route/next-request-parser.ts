@@ -6,8 +6,8 @@
 
 import "server-only";
 
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import { parseError } from "../utils/parse-error";
+import type { EndpointLogger } from "../../logger/types";
 import type { NextRequest } from "next-vibe/ui/lib/request";
 
 /**
@@ -153,7 +153,7 @@ export function parseSearchParams(searchParams: URLSearchParams): ParsedObject {
  * Handles multiple values with same key as arrays (e.g., multiple attachments)
  */
 function parseFormData(
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, @typescript-eslint/no-explicit-any -- Infrastructure: FormData type compatibility between Next.js and web standards
+  // eslint-disable-next-line restricted/restricted-syntax, @typescript-eslint/no-explicit-any -- Infrastructure: FormData type compatibility between Next.js and web standards
   formData: any,
 ): Record<
   string,
@@ -390,7 +390,7 @@ export async function parseRequestBody(
       const formData = await request.formData();
 
       // Check if there's a "data" field with JSON (mixed FormData + JSON pattern)
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, @typescript-eslint/no-explicit-any -- Infrastructure: FormData type compatibility
+      // eslint-disable-next-line restricted/restricted-syntax, @typescript-eslint/no-explicit-any -- Infrastructure: FormData type compatibility
       const dataField = (formData as any).get("data") as string | File | null;
       if (dataField && typeof dataField === "string") {
         // Parse the JSON data field
@@ -398,7 +398,7 @@ export async function parseRequestBody(
 
         // Log raw FormData keys for diagnostics (helps debug file upload issues)
         const rawFormDataKeys: string[] = [];
-        // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, @typescript-eslint/no-explicit-any -- Infrastructure: FormData type compatibility
+        // eslint-disable-next-line restricted/restricted-syntax, @typescript-eslint/no-explicit-any -- Infrastructure: FormData type compatibility
         for (const [key] of (formData as any).entries()) {
           rawFormDataKeys.push(key as string);
         }

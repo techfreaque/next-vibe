@@ -108,11 +108,11 @@ export const translations: typeof enTranslations = {
       description: "Wystąpił konflikt danych",
     },
     destruction_failed: {
-      title: "Niszczenie Guard nie powiodło się",
+      title: "Niszczenie Guard nie powiodło się: {{error}}",
       description: "Nie udało się zniszczyć środowiska guard",
     },
     guard_not_found: {
-      title: "Guard nie znaleziony",
+      title: "Nie znaleziono guard dla projektu '{{project}}'",
       description: "Nie znaleziono środowiska guard dla określonego projektu",
     },
   },

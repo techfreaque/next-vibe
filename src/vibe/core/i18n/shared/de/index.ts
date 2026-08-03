@@ -72,23 +72,61 @@ export const translations: typeof enTranslations = {
   },
   errors: {
     invalid_request_data: "Ungültige Anfragedaten",
+    invalidLocaleDetail: 'Ungültiges Locale "{{locale}}"',
+    invalidRequestDataDetail: "Ungültige Anfragedaten: {{error}}",
+    invalidResponseDetail: "Ungültige Antwortdaten: {{error}}",
+    invalidErrorResponseDetail: "Fehlerhafte Fehlerantwort: {{error}}",
+    csrfFailedDetail: "Anfrage vom CSRF-Schutz blockiert: {{reason}}",
+    csrfReasonUnknown: "CSRF-Token-Prüfung fehlgeschlagen",
+    internalDetail: "Interner Fehler: {{error}}",
+    authenticationFailed: "Benutzer-Authentifizierung fehlgeschlagen",
+  },
+  validation: {
+    missingFields: "Pflichtfelder fehlen ({{count}}):",
+    failedOne: "Validierung fehlgeschlagen (1 Fehler):",
+    failedMany: "Validierung fehlgeschlagen ({{count}} Fehler):",
+    cliHints:
+      "\n\nBeispiel:\n  {{example}}\n\nOder interaktiv ausführen:\n  {{interactive}}\n\nWeitere Infos:\n  {{help}}",
+    report: "{{header}}{{fields}}{{hints}}",
+    unexpected: "Validierung unerwartet fehlgeschlagen: {{error}}",
   },
   shared: {
     permissions: {
       errors: {
-        definitionError: "Fehler in der Endpunkt-Definition",
-        platformAccessDenied: "Zugriff auf {{platform}} verweigert: {{reason}}",
+        definitionError: "Fehler in der Endpunkt-Definition: {{reason}}",
+        allowedRolesMissing:
+          "Fehler in der Endpunkt-Definition: allowedRoles fehlt oder ist keine Liste",
+        platformAccessDenied: {
+          productionDisabled:
+            "Zugriff auf {{platform}} verweigert: dieser Endpunkt ist in der Produktion deaktiviert",
+          platformExcluded:
+            "Zugriff auf {{platform}} verweigert: dieser Endpunkt wird auf dieser Plattform nicht bereitgestellt",
+          cliPackageAuthRequired:
+            "Zugriff auf {{platform}} verweigert: dieser Endpunkt erfordert eine Authentifizierung, die das CLI-Paket nicht leisten kann",
+          mcpNotListed:
+            "Zugriff auf {{platform}} verweigert: dieser Endpunkt ist auf MCP nicht gelistet",
+        },
         insufficientRoles:
-          "Benutzer {{userId}} fehlen erforderliche Rollen: {{requiredRoles}}",
+          "Benutzer {{userId}} fehlen erforderliche Rollen: {{requiredRoles}} (vorhanden: {{userRoles}})",
+        insufficientRolesNoRoles:
+          "Benutzer {{userId}} fehlen erforderliche Rollen: {{requiredRoles}} (vorhanden: keine)",
+        insufficientRolesPublic:
+          "Öffentlichem Zugriff fehlen erforderliche Rollen: {{requiredRoles}} (vorhanden: {{userRoles}})",
+        insufficientRolesPublicNoRoles:
+          "Öffentlichem Zugriff fehlen erforderliche Rollen: {{requiredRoles}} (vorhanden: keine)",
       },
     },
     endpoints: {
       definition: {
         loader: {
           errors: {
-            endpointNotFound: "Endpunkt nicht gefunden",
-            loadFailed: "Endpunkt konnte nicht geladen werden",
-            batchLoadFailed: "Endpunkte konnten nicht geladen werden",
+            endpointNotFound: "Endpunkt nicht gefunden: {{identifier}}",
+            loadFailed:
+              "Endpunkt {{identifier}} konnte nicht geladen werden: {{error}}",
+            batchLoadFailed:
+              "{{failedCount}} von {{totalCount}} Endpunkten konnten nicht geladen werden",
+            batchLoadError:
+              "{{failedCount}} von {{totalCount}} Endpunkten konnten nicht geladen werden: {{error}}",
           },
         },
       },

@@ -5,15 +5,14 @@
 
 "use client";
 
-import type { FolderListResponseOutput } from "next-vibe/agent/chat/folders/[rootFolderId]/definition";
-import foldersDefinition from "next-vibe/agent/chat/folders/[rootFolderId]/definition";
+import type { FolderListResponseOutput } from "../../folders/[rootFolderId]/definition";
+import foldersDefinition from "../../folders/[rootFolderId]/definition";
 import {
   type ChatT,
   scopedTranslation as chatScopedTranslation,
-} from "next-vibe/agent/chat/i18n";
-import { ThreadPermissionsDialog } from "next-vibe/agent/chat/threads/[threadId]/permissions/widget";
-import { ThreadShareDialog } from "next-vibe/agent/chat/threads/[threadId]/share-links/widget";
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
+} from "../../i18n";
+import { ThreadPermissionsDialog } from "../[threadId]/permissions/widget";
+import { ThreadShareDialog } from "../[threadId]/share-links/widget";
 import { success } from "next-vibe/core/route/response.schema";
 import { useSilentHistory } from "next-vibe/ui/hooks/use-navigation";
 import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
@@ -68,12 +67,12 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { apiClient } from "next-vibe/unified-ui/hooks/store";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
-import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import React, { useEffect, useMemo, useState } from "react";
 
 import { chatColors, chatTransitions } from "@/_pages/chat/lib/design-tokens";
 
-import { DefaultFolderId } from "../../config";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { ChatThread } from "../../db";
 import { ThreadStreamingState } from "../../enum";
 import { useChatStore } from "../../hooks/store";
@@ -115,7 +114,6 @@ function ThreadRow({
 }): React.JSX.Element {
   const isTouch = useTouchDevice();
   const { locale, logger, user } = useWidgetContext();
-  const availability = useProviderAvailability();
   const { t } = scopedTranslation.scopedT(locale);
   const { t: tChat } = chatScopedTranslation.scopedT(locale);
   const isThreadStreaming = thread.streamingState !== ThreadStreamingState.IDLE;
@@ -208,8 +206,7 @@ function ThreadRow({
         locale,
       );
     } else {
-      const threadDef =
-        await import("next-vibe/agent/chat/threads/[threadId]/definition");
+      const threadDef = await import("../[threadId]/definition");
       await apiClient.mutate(
         threadDef.default.PATCH,
         logger,
@@ -217,7 +214,6 @@ function ThreadRow({
         { ...updates, rootFolderId: thread.rootFolderId },
         { threadId: thread.id },
         locale,
-        availability,
       );
     }
   };
@@ -301,8 +297,7 @@ function ThreadRow({
           locale,
         );
       } else {
-        const threadDef =
-          await import("next-vibe/agent/chat/threads/[threadId]/definition");
+        const threadDef = await import("../[threadId]/definition");
         await apiClient.mutate(
           threadDef.default.DELETE,
           logger,
@@ -310,7 +305,6 @@ function ThreadRow({
           { rootFolderId: thread.rootFolderId },
           { threadId: thread.id },
           locale,
-          availability,
         );
       }
     })();

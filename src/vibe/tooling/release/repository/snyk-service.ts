@@ -5,16 +5,17 @@
 
 import { execSync } from "node:child_process";
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { scopedTranslation } from "next-vibe/tooling/release/i18n";
+} from "../../../core/route/response.schema";
+import { parseError } from "../../../core/utils/parse-error";
+import type { EndpointLogger } from "../../../logger/types";
+import { releaseEnv } from "../env";
+import { scopedTranslation } from "../i18n";
 
 import { MESSAGES } from "./constants";
 
@@ -55,9 +56,8 @@ class SnykService {
       logger.error(MESSAGES.SNYK_TEST_FAILED, parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("snyk.testFailed"),
+        message: t("snyk.testFailed", { packageName, error: String(error) }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { packageName, error: String(error) },
       });
     }
   }
@@ -81,8 +81,7 @@ class SnykService {
       return success();
     }
 
-    const env = process.env;
-    if (!env["SNYK_TOKEN"]) {
+    if (!releaseEnv.SNYK_TOKEN) {
       logger.warn(MESSAGES.SNYK_TOKEN_REQUIRED);
       return success();
     }
@@ -95,9 +94,8 @@ class SnykService {
       logger.error(MESSAGES.SNYK_MONITOR_FAILED, parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("snyk.monitorFailed"),
+        message: t("snyk.monitorFailed", { packageName, error: String(error) }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { packageName, error: String(error) },
       });
     }
   }

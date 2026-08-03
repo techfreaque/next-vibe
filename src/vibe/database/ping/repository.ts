@@ -4,15 +4,15 @@
  */
 
 import { sql } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { ResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { PingT } from "next-vibe/database/ping/i18n";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../core/route/response.schema";
+import { parseError } from "../../core/utils/parse-error";
+import type { PingT } from "./i18n";
+import type { EndpointLogger } from "../../logger/types";
 
 import { db, rawPool } from "..";
 import type { PingRequestOutput, PingResponseOutput } from "./definition";
@@ -47,10 +47,13 @@ export class DatabasePingRepository {
 
       return success(response);
     } catch (error) {
+      // `post.errors.network.title` is the definition's declared NETWORK_ERROR
+      // label and renders param-free there, so the cause goes in its own key.
       return fail({
-        message: t("post.errors.network.title"),
+        message: t("post.errors.network.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: String(error) },
       });
     }
   }

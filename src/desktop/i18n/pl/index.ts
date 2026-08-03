@@ -1116,6 +1116,7 @@ export const translations: typeof enTranslations = {
     actionTypeText: "Wpisz tekst",
     actionPressKey: "Naciśnij klawisz",
     actionScreenshot: "Zrzut ekranu",
+    actionScreenshotOnMonitor: "Zrzut ekranu: {{monitor}}",
     actionA11yTree: "Drzewo A11y",
     actionAllWindows: "← Wszystkie okna",
     actionAllMonitors: "Wszystkie monitory →",
@@ -1155,9 +1156,26 @@ export const translations: typeof enTranslations = {
       "Wymagane narzędzie nie znalezione: {{tool}}. Zainstaluj przez: {{installCmd}}",
     screenshotFailed: "Nie udało się wykonać zrzutu ekranu",
     accessibilityFailed: "Nie udało się pobrać drzewa dostępności",
+    accessibilityFailedWithError:
+      "Nie udało się pobrać drzewa dostępności: {{error}}",
     focusWindowRequiresIdentifier:
       "Wymagane jest co najmniej jedno z: windowId, pid lub title",
     missingDep:
       "Brakuje pakietu systemowego: {{dep}}. Powinno pojawić się okno autoryzacji - zatwierdź, aby zainstalować automatycznie.",
+    scriptWriteFailed: "Nie udało się zapisać skryptu: {{error}}",
+    monitorNotFoundByName: "Nie znaleziono monitora „{{monitorName}}”",
+    screenIndexOutOfRange: "Indeks ekranu {{screen}} poza zakresem",
+    unknownKeyName: "Nieznana nazwa klawisza: {{key}}",
+    focusedWindowParseFailed: "Nie udało się odczytać danych aktywnego okna",
+    couldNotListWindows: "Nie udało się pobrać listy okien",
+    noWindowWithPid: "Brak okna o PID {{pid}}",
+    noWindowWithTitle: "Brak okna z tytułem zawierającym „{{title}}”",
+    provideMonitorNameOrIndex: "Podaj monitorName lub monitorIndex",
+    monitorNotFound: "Nie znaleziono monitora: {{monitor}}",
+    noActiveWindow: "Brak aktywnego okna",
+    kwinNoOutput: "Skrypt KWin nie zwrócił żadnych danych",
+    kwinNoWindowData: "Brak danych okna w wyniku skryptu KWin",
+    windowMoveNoEffect:
+      "Przeniesienie okna nie zadziałało — okno nie trafiło na monitor {{monitor}}",
   },
 };

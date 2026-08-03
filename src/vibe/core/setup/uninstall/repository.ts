@@ -8,31 +8,31 @@
 import "server-only";
 
 import chalk from "chalk";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { ResponseType } from "../../route/response.schema";
 import {
   ErrorResponseTypes,
-  fail,
+  failInline,
   success,
-} from "next-vibe/core/route/response.schema";
-import { runSetups } from "next-vibe/core/setup/run-setups";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../route/response.schema";
+import { runSetups } from "../run-setups";
+import { parseError } from "../../utils/parse-error";
+import type { JwtPayloadType } from "../../../identity/auth/types";
+import { CLI_BINARY_NAME } from "../../../platforms/cli/types/cli-target";
+import type { EndpointLogger } from "../../../logger/types";
 
 import type { UninstallResponseOutput } from "./definition";
-import type { SetupUninstallT } from "./i18n";
 
 export class SetupUninstallRepository {
   static async uninstallCli(
     user: JwtPayloadType,
-    t: SetupUninstallT,
     logger: EndpointLogger,
   ): Promise<ResponseType<UninstallResponseOutput>> {
     if (!user?.id) {
-      return fail({
-        message: t("post.errors.unauthorized.title"),
+      // `title`/`description` are the definition's declared error-type labels and
+      // render on their own there, so the spoken sentence stands apart from them.
+      return failInline({
+        message: `Sign in before uninstalling the ${CLI_BINARY_NAME} command.`,
         errorType: ErrorResponseTypes.UNAUTHORIZED,
-        messageParams: { error: t("post.errors.unauthorized.description") },
       });
     }
 
@@ -52,21 +52,14 @@ export class SetupUninstallRepository {
         })),
         message:
           failed.length === 0
-            ? t("post.success.description")
-            : t("post.errors.server.description"),
+            ? "Operation completed successfully"
+            : "Internal server error occurred",
       });
     } catch (error) {
       const parsedError = parseError(error);
-      return fail({
-        message: t("post.errors.server.title"),
+      return failInline({
+        message: `Uninstall failed: ${parsedError.message}\n${parsedError.stack ?? "No stack trace available."}`,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
-          // eslint-disable-next-line i18next/no-literal-string
-          error: "Uninstall failed",
-          reason: parsedError.message,
-          // eslint-disable-next-line i18next/no-literal-string
-          stack: parsedError.stack || "No stack trace available",
-        },
       });
     }
   }

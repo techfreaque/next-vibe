@@ -3,7 +3,7 @@
  * Scroll at coordinates using xdotool click with mouse buttons 4/5/6/7
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,

@@ -130,6 +130,12 @@ export const translations: typeof enTranslations = {
       validation_error: "Validierungsfehler",
       internal_error: "Interner Fehler",
       auth_required: "Authentifizierung erforderlich",
+      missingUrlParam: 'URL-Parameter "{{param}}" fehlt für {{path}}',
+      httpStatus: "Anfrage an {{url}} mit Status {{status}} fehlgeschlagen",
+      responseValidation: "Serverantwort ist ungültig: {{error}}",
+      malformedResponse: "Fehlerhafte Antwort von {{url}}",
+      requestFailed: "Anfrage an {{path}} fehlgeschlagen: {{error}}",
+      endpointFailed: "{{reason}} — {{path}}: {{error}}",
     },
   },
   mutationForm: {
@@ -140,14 +146,17 @@ export const translations: typeof enTranslations = {
         },
         validation_error: {
           title: "Validierungsfehler",
+          detail: "Formularprüfung fehlgeschlagen: {{errors}}",
         },
       },
     },
   },
   queryForm: {
     errors: {
-      network_failure: "Netzwerkfehler",
+      network_failure: "Netzwerkfehler im Formular {{formId}}: {{error}}",
       validation_failed: "Validierung fehlgeschlagen",
+      validationFailedDetail:
+        "Validierung im Formular {{formId}} fehlgeschlagen: {{error}}",
     },
   },
   store: {

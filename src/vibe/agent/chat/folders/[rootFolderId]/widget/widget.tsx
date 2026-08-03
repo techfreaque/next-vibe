@@ -8,15 +8,12 @@
 import {
   getFolderTourAttr,
   TOUR_DATA_ATTRS,
-} from "next-vibe/agent/ai-stream/stream/widget/chat-ui/welcome-tour/tour-attrs";
-import {
-  DEFAULT_FOLDER_CONFIGS,
-  DefaultFolderId,
-  isDefaultFolderId,
-} from "next-vibe/agent/chat/config";
-import { NEW_MESSAGE_ID } from "next-vibe/agent/chat/enum";
-import folderContentsDefinition from "next-vibe/agent/chat/folder-contents/[rootFolderId]/definition";
-import cortexSearchDefinitions from "next-vibe/agent/cortex/search/definition";
+} from "../../../../ai-stream/stream/widget/chat-ui/welcome-tour/tour-attrs";
+import { DEFAULT_FOLDER_CONFIGS, isDefaultFolderId } from "../../../config";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
+import { NEW_MESSAGE_ID } from "../../../enum";
+import folderContentsDefinition from "../../../folder-contents/[rootFolderId]/definition";
+import cortexSearchDefinitions from "../../../../cortex/search/definition";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { useSilentHistory } from "next-vibe/ui/hooks/use-navigation";
 import { Button } from "next-vibe/ui/ui/button";
@@ -44,11 +41,12 @@ import {
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetContext,
+  useWidgetPlatform,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
-import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useChatBootContext } from "../../../hooks/context";
@@ -229,6 +227,7 @@ const UUID_REGEX =
 export function FoldersListContainer(): React.JSX.Element {
   const field = useWidgetValue<typeof definition.GET>();
   const { user, locale, logger } = useWidgetContext();
+  const platform = useWidgetPlatform();
   const { initialFolderContentsData, initialRootFolderId } =
     useChatBootContext();
   const { t } = scopedTranslation.scopedT(locale);
@@ -533,6 +532,7 @@ export function FoldersListContainer(): React.JSX.Element {
                   endpoint={folderContentsDefinition}
                   locale={locale}
                   user={user}
+                  platform={platform}
                   endpointOptions={{
                     read: {
                       urlPathParams: { rootFolderId: activeRootFolderId },
@@ -566,6 +566,7 @@ export function FoldersListContainer(): React.JSX.Element {
                 endpoint={folderContentsDefinition}
                 locale={locale}
                 user={user}
+                platform={platform}
                 endpointOptions={{
                   read: {
                     urlPathParams: { rootFolderId: activeRootFolderId },
@@ -596,6 +597,7 @@ export function FoldersListContainer(): React.JSX.Element {
             endpoint={{ POST: createFolderDefinition.POST }}
             locale={locale}
             user={user}
+            platform={platform}
             endpointOptions={{
               create: {
                 urlPathParams: { rootFolderId: activeRootFolderId },

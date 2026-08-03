@@ -4,24 +4,22 @@
  * Following migration guide: Files at level of usage, split god repositories
  */
 
-import { translatedValueSchema } from "next-vibe/core/definition/common.schema";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { UserRole } from "../../../identity/roles/enum";
+import { createEndpoint } from "../../definition/create";
 import {
   EndpointErrorTypes,
   FieldDataType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { scopedTranslation } from "next-vibe/core/setup/install/i18n";
-import { UserRole } from "next-vibe/identity/roles/enum";
-import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
+} from "../../definition/enums";
+import { CLI_BINARY_NAME } from "../../../platforms/cli/types/cli-target";
+import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
 import {
+  customWidgetObject,
   requestField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../../unified-ui/_shared/utils";
 import { z } from "zod";
-
-import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
 
 // Lazy import to avoid TDZ circular dependency in MCP context
 // (widget.tsx type-imports definition → circular module resolution → "Cannot access 'default' before initialization")
@@ -35,19 +33,19 @@ const SetupInstallWidget = lazyWidget(() =>
  * Setup Install Endpoint Definition
  */
 const { POST } = createEndpoint({
-  scopedTranslation,
-  title: "post.title",
-  titleShort: "post.titleShort",
-  description: "post.description",
+  title: `Install the ${CLI_BINARY_NAME} command`,
+  titleShort: "Install CLI",
+  description: `Install ${CLI_BINARY_NAME} as a global command so it runs from any directory, in this project or any other. Re-running reinstalls from scratch.`,
   icon: "download",
   category: "devTools",
   subCategory: "interfacesCli",
-  tags: ["post.title"],
+  tags: ["Install"],
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.CLI_AUTH_BYPASS,
     UserRole.WEB_OFF,
     UserRole.AI_TOOL_OFF,
+    UserRole.PRODUCTION_OFF,
   ],
   aliases: ["install", "setup", "update", "setup:update"],
   method: Methods.POST,
@@ -67,12 +65,12 @@ const { POST } = createEndpoint({
         results: [
           {
             key: "src/vibe/platforms/cli",
-            description: "vibe command",
-            summary: "binary installed at /usr/local/bin/vibe",
+            description: `the global ${CLI_BINARY_NAME} command`,
+            summary: `binary installed at /usr/local/bin/${CLI_BINARY_NAME}`,
             ok: true,
           },
         ],
-        message: "installSuccessAt",
+        message: "Operation completed successfully",
       },
       verbose: {
         success: true,
@@ -85,18 +83,19 @@ const { POST } = createEndpoint({
           },
           {
             key: "src/vibe/platforms/cli",
-            description: "vibe command",
-            summary: "binary installed at /usr/local/bin/vibe",
+            description: `the global ${CLI_BINARY_NAME} command`,
+            summary: `binary installed at /usr/local/bin/${CLI_BINARY_NAME}`,
             ok: true,
           },
           {
             key: "src/vibe/platforms/mcp",
-            description: "MCP config",
+            description:
+              "MCP server config for Claude Code, Cursor and VS Code",
             summary: "wrote 3 MCP config file(s)",
             ok: true,
           },
         ],
-        message: "installSuccessAt",
+        message: "Operation completed successfully",
       },
     },
   },
@@ -106,28 +105,29 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // === REQUEST FIELDS ===
-      verbose: requestField(scopedTranslation, {
+      verbose: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "post.title",
-        description: "post.description",
+        label: "Verbose",
+        description:
+          "Report where the command was installed and whether PATH had to change.",
         columns: 6,
         schema: z.boolean().default(false),
       }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(scopedTranslation, {
+      success: responseField({
         type: WidgetType.TEXT,
-        label: "post.success.title",
+        label: "Success",
         schema: z.boolean(),
       }),
 
       // One entry per discovered setup.ts. Deliberately not CLI-specific:
       // installing the shim is just one setup among however many the project
       // declares, so this endpoint reports them all the same way.
-      results: responseField(scopedTranslation, {
+      results: responseField({
         type: WidgetType.TEXT,
-        label: "post.title",
+        label: "Setups",
         schema: z.array(
           z.object({
             key: z.string(),
@@ -138,10 +138,10 @@ const { POST } = createEndpoint({
         ),
       }),
 
-      message: responseField(scopedTranslation, {
+      message: responseField({
         type: WidgetType.TEXT,
-        label: "post.title",
-        schema: translatedValueSchema,
+        label: "Result",
+        schema: z.string().optional(),
       }),
     },
   }),
@@ -149,47 +149,47 @@ const { POST } = createEndpoint({
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "post.errors.validation.title",
-      description: "post.errors.validation.description",
+      title: "Validation Error",
+      description: "Invalid request parameters",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "post.errors.unauthorized.title",
-      description: "post.errors.unauthorized.description",
+      title: "Unauthorized",
+      description: "Authentication required",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "post.errors.server.title",
-      description: "post.errors.server.description",
+      title: "Server Error",
+      description: "Internal server error occurred",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "post.errors.network.title",
-      description: "post.errors.network.description",
+      title: "Network Error",
+      description: "Network error occurred",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "post.errors.forbidden.title",
-      description: "post.errors.forbidden.description",
+      title: "Forbidden",
+      description: "Access forbidden",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "post.errors.notFound.title",
-      description: "post.errors.notFound.description",
+      title: "Not Found",
+      description: "Resource not found",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "post.errors.unknown.title",
-      description: "post.errors.unknown.description",
+      title: "Unknown Error",
+      description: "An unknown error occurred",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "post.errors.conflict.title",
-      description: "post.errors.conflict.description",
+      title: "Conflict",
+      description: "Data conflict occurred",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "post.errors.conflict.title",
-      description: "post.errors.conflict.description",
+      title: "Conflict",
+      description: "Data conflict occurred",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "post.success.title",
-    description: "post.success.description",
+    title: "Success",
+    description: "Operation completed successfully",
   },
 });
 

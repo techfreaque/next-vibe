@@ -5,23 +5,23 @@
 
 import { spawn, spawnSync } from "node:child_process";
 
-import { buildPackageRunnerCommand, coreEnv } from "next-vibe/core/env";
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { buildPackageRunnerCommand, coreEnv } from "../../core/env";
+import { defaultLocale } from "../../core/i18n/core/config";
+import type { ResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { databaseEnv } from "next-vibe/database/env";
-import { scopedTranslation } from "next-vibe/database/generate/i18n";
+} from "../../core/route/response.schema";
+import { parseError } from "../../core/utils/parse-error";
+import { databaseEnv } from "../env";
+import { scopedTranslation } from "./i18n";
 import {
   formatActionCommand,
   formatDatabase,
   formatDuration,
-} from "next-vibe/logger/formatters";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../logger/formatters";
+import type { EndpointLogger } from "../../logger/types";
 
 import type { GenerateResponseOutput } from "./definition";
 
@@ -68,20 +68,23 @@ export class DatabaseGenerateRepository {
         const duration = Date.now() - startTime;
 
         if (result.error) {
+          // `post.errors.network.title` is the definition's declared
+          // NETWORK_ERROR label and renders param-free there, so the cause
+          // goes in its own key.
           return fail({
-            message: t("post.errors.network.title"),
+            message: t("post.errors.network.detail", {
+              error: result.error.message,
+            }),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
-            messageParams: { error: result.error.message },
           });
         }
 
         if (result.status !== 0) {
           return fail({
-            message: t("post.errors.network.title"),
+            message: t("post.errors.network.exitCode", {
+              code: String(result.status),
+            }),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
-            messageParams: {
-              error: `drizzle-kit generate exited with code ${String(result.status)}`,
-            },
           });
         }
 
@@ -152,11 +155,10 @@ export class DatabaseGenerateRepository {
 
       if (exitCode !== 0) {
         return fail({
-          message: t("post.errors.network.title"),
+          message: t("post.errors.network.exitCode", {
+            code: String(exitCode),
+          }),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: {
-            error: `drizzle-kit generate exited with code ${String(exitCode)}`,
-          },
         });
       }
 
@@ -172,9 +174,10 @@ export class DatabaseGenerateRepository {
       const parsedError = parseError(error);
       logger.error("Generate error", { error: parsedError.message });
       return fail({
-        message: t("post.errors.network.title"),
+        message: t("post.errors.network.detail", {
+          error: parsedError.message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
       });
     }
   }

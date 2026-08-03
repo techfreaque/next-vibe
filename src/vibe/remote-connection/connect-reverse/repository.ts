@@ -15,16 +15,16 @@
 import "server-only";
 
 import { and, eq } from "drizzle-orm";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { CountryLanguage } from "../../core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
   success,
-} from "next-vibe/core/route/response.schema";
-import { db } from "next-vibe/database";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../core/route/response.schema";
+import { db } from "../../database";
+import type { JwtPrivatePayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
 
 import { instanceIdentities, remoteConnections, SyncScopeSchema } from "../db";
 import { RemoteConnectionRepository } from "../repository";
@@ -56,7 +56,7 @@ export class RemoteConnectionRegisterRepository {
     if (!localUrl || !token || !leadId) {
       return false;
     }
-    const healthDef = await import("next-vibe/server/server/health/definition");
+    const healthDef = await import("../../server/server/health/definition");
     // Deliberate over-the-wire reachability probe — the point is to prove the URL
     // is directly reachable, so it must go over HTTP (not runInProcessTyped, which
     // runs in-process and proves nothing).

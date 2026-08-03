@@ -10,7 +10,6 @@ import {
   calculateCreditCost,
   defaultFeatures,
   filterRoleModels,
-  getModelForProvider,
   getProviderPrice,
   type ModelDefinition,
   type ModelOptionImageBased,
@@ -1323,23 +1322,6 @@ export function getImageGenModelById(
   modelId: ImageGenModelId,
 ): ImageGenModelOption | undefined {
   return imageGenModelOptionsIndex[modelId];
-}
-
-/**
- * Resolve an image gen model option using a specific API provider.
- * Picks the cheapest provider variant for `modelId` that matches `provider` from the pool.
- * Falls back to the default (cheapest overall) if no matching provider exists.
- */
-export function getImageGenModelForProvider(
-  modelId: ImageGenModelId,
-  provider: ApiProvider,
-): ImageGenModelOption | undefined {
-  return getModelForProvider(
-    modelId,
-    provider,
-    imageGenModelOptionsPool,
-    getImageGenModelById(modelId),
-  );
 }
 
 // ============================================================

@@ -1,9 +1,10 @@
 import { Text } from "ink";
-import { useCliPlatform } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { useCliPlatform } from "../../../unified-ui/_shared/use-widget-context";
 import * as React from "react";
 import terminalLink from "terminal-link";
 
 import type { ExternalLinkProps, LinkProps } from "../../web/ui/link";
+import { parseClassesToInkProps } from "./tailwind-to-ink";
 
 function renderChildren(children: React.ReactNode): string {
   if (typeof children === "string") {
@@ -66,30 +67,50 @@ Link.displayName = "Link";
 export function ExternalLink({
   children,
   href,
+  className,
+  unlinkedLabel,
 }: ExternalLinkProps): React.JSX.Element {
   const surface = useCliPlatform();
   const label = renderChildren(children);
+  // className wins over the cyan/underline default, exactly as it does on web —
+  // a caller styling its links (e.g. plain blue file positions) must not have to
+  // stop using the primitive to get there.
+  const { text } = parseClassesToInkProps(className);
 
   if (surface === "mcp") {
-    return (
+    return unlinkedLabel === undefined ? (
       <Text>
         {label}: {href}
       </Text>
+    ) : (
+      <Text>{unlinkedLabel}</Text>
     );
   }
 
   if (process.stdout.isTTY) {
-    const linked = terminalLink(label, href);
+    const linked = terminalLink(
+      label,
+      href,
+      unlinkedLabel === undefined
+        ? {}
+        : { fallback: (): string => unlinkedLabel },
+    );
     return (
-      <Text color="cyan" underline>
+      <Text color="cyan" underline {...text}>
         {linked}
       </Text>
     );
   }
 
-  return (
-    <Text color="cyan">
+  // No TTY: a bare label with the raw href appended is the only way to stay
+  // useful, unless the caller supplied a self-describing label.
+  return unlinkedLabel === undefined ? (
+    <Text color="cyan" {...text}>
       {label} ({href})
+    </Text>
+  ) : (
+    <Text color="cyan" {...text}>
+      {unlinkedLabel}
     </Text>
   );
 }

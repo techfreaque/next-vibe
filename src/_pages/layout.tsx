@@ -47,7 +47,7 @@ export async function generateMetadata({
     title: t("meta.defaultTitle"),
     category: t("meta.category"),
     description: t("meta.description", {
-      modelCount: getAvailableModelCount(false, getEnvAvailability()),
+      modelCount: getAvailableModelCount(false, await getEnvAvailability()),
     }),
     image: `${envClient.NEXT_PUBLIC_APP_URL}/og-image.jpg`,
     imageAlt: t("meta.imageAlt"),
@@ -116,9 +116,7 @@ export async function tanstackLoader({
   };
   const themeCookie = (await cookies()).get("theme_v2")?.value;
   const theme: "light" | "dark" = themeCookie === "light" ? "light" : "dark";
-  const { getInstanceAvailability } =
-    await import("next-vibe/agent/env-availability");
-  const availability = await getInstanceAvailability();
+  const availability = await getEnvAvailability();
 
   return { locale, structuredData, theme, availability };
 }

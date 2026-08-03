@@ -12,11 +12,11 @@
  * - Support for all 5 interfaces
  */
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
-import type { TParams } from "next-vibe/core/i18n/core/static-types";
-import { UserRole, type UserRoleValue } from "next-vibe/identity/roles/enum";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import type { CountryLanguage } from "../i18n/core/config";
+import type { TranslatedKeyType } from "../i18n/core/scoped-translation";
+import type { TParams } from "../i18n/core/static-types";
+import type { UserRoleValue } from "../../identity/roles/enum";
+import type { EndpointLogger } from "../../logger/types";
 import type {
   ChannelDeclaration,
   EndpointEventsMap,
@@ -30,27 +30,25 @@ import type {
   EventUrlPayloads,
   HasClientDeliveredEventsOf,
   WithPayloadCtx,
-} from "next-vibe/realtime/structured-events";
-import type { UnifiedField } from "next-vibe/unified-ui/_shared/configs";
+} from "../../realtime/core/structured-events";
+import type { UnifiedField } from "../../unified-ui/_shared/configs";
 import type {
   AnyChildrenConstrain,
   FieldUsageConfig,
-} from "next-vibe/unified-ui/_shared/types";
-import {
-  generateFormSchema,
-  generateSchemaForUsage as generateSchemaFromUtils,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "../../unified-ui/_shared/types";
 import type {
   ApiFormOptions,
   ApiMutationOptions,
   ApiQueryFormOptions,
   ApiQueryOptions,
-} from "next-vibe/unified-ui/hooks/types";
-import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+} from "../../unified-ui/hooks/types";
+import type { IconKey } from "../../unified-ui/widgets/form-fields/icon-field/icons";
 import type { z } from "zod";
 
-import type { SubCategoryKey } from "@/generated/categories/registry";
-import type { CategoryKey } from "@/generated/categories/registry";
+import type {
+  CategoryKey,
+  SubCategoryKey,
+} from "@/generated/categories/registry";
 
 import type {
   EndpointExamples,
@@ -60,8 +58,12 @@ import type {
   InferSchemaFromField,
   MergeFormValues,
 } from "./endpoint";
+import {
+  buildDefinitionSchemas,
+  makeRequiresAuthentication,
+} from "./definition-schemas";
 import type { EndpointErrorTypes, Methods } from "./enums";
-import { FieldUsage } from "./enums";
+import type { FieldUsage } from "./enums";
 
 /**
  * The `channel` config field requirement, derived from the events map:
@@ -76,7 +78,7 @@ import { FieldUsage } from "./enums";
  *   (requestData: TRequestOutput, responseData: TResponseOutput, etc.) eliminating
  *   implicit-any errors in callback parameters under noImplicitAny.
  */
-type ChannelConfigField<TResponse, TRequest, TUrl, TEvents, TChannel> =
+export type ChannelConfigField<TResponse, TRequest, TUrl, TEvents, TChannel> =
   HasClientDeliveredEventsOf<TEvents> extends true
     ? {
         channel: TChannel;
@@ -91,6 +93,23 @@ type ChannelConfigField<TResponse, TRequest, TUrl, TEvents, TChannel> =
           channel?: never;
           events?: TEvents & WithPayloadCtx<TEvents, TResponse, TRequest, TUrl>;
         };
+
+/**
+ * Pass-through translator for inline endpoints - hands the key straight back,
+ * because for them the "key" IS the display text.
+ *
+ * This is NOT an i18n system: no locale handling, no lookup, no interpolation.
+ * It exists purely so `scopedTranslation` can stay a required property, which
+ * the widget/hook layer relies on to infer `TKey`. Inline definitions carry
+ * their copy at the call site, so the key IS the text.
+ */
+const NO_TRANSLATION = {
+  ScopedTranslationKey: "",
+  scopedT: (): { t: (key: string) => TranslatedKeyType } => ({
+    // oxlint-disable-next-line restricted/restricted-syntax
+    t: (key: string): TranslatedKeyType => key as TranslatedKeyType,
+  }),
+};
 
 // Extract schema type directly from field, bypassing complex field structure
 type ExtractSchemaType<F> = F extends { schema: z.ZodType<infer T> }
@@ -293,10 +312,14 @@ export interface ApiEndpoint<
   readonly tags: readonly NoInfer<TScopedTranslationKey>[];
 
   /**
-   * Scoped translation function for this endpoint.
-   * Required - endpoints must declare their i18n scope explicitly.
-   * TScopedTranslationKey is inferred from scopedTranslation.ScopedTranslationKey,
-   * so all title/description/category/tags/field labels must be valid scoped keys.
+   * Scoped i18n for this endpoint.
+   *
+   * Real scope for endpoints built with `createEndpoint` from `create-i18n.ts`.
+   * For inline endpoints (`./create`) this is {@link NO_TRANSLATION}, a
+   * pass-through that hands the key straight back - the copy is already the
+   * text. It exists only so the ~75 files that read
+   * `TEndpoint["scopedTranslation"]["ScopedTranslationKey"]` keep inferring
+   * `TKey`; making this optional breaks that inference framework-wide.
    */
   readonly scopedTranslation: {
     readonly ScopedTranslationKey: TScopedTranslationKey;
@@ -538,37 +561,6 @@ type InferObjectType<C, Usage extends FieldUsage> =
       }
     : never;
 
-// --- SCHEMA GENERATION FROM UNIFIED FIELDS ---
-// Use the proper generateSchemaForUsage function from utils
-const generateSchemaForUsage = generateSchemaFromUtils;
-
-function generateRequestDataSchema<F>(
-  field: F,
-): InferSchemaFromField<F, FieldUsage.RequestData> {
-  return generateSchemaForUsage<F, FieldUsage.RequestData>(
-    field,
-    FieldUsage.RequestData,
-  );
-}
-
-function generateRequestUrlSchema<F>(
-  field: F,
-): InferSchemaFromField<F, FieldUsage.RequestUrlParams> {
-  return generateSchemaForUsage<F, FieldUsage.RequestUrlParams>(
-    field,
-    FieldUsage.RequestUrlParams,
-  );
-}
-
-function generateResponseSchema<F>(
-  field: F,
-): InferSchemaFromField<F, FieldUsage.ResponseData> {
-  return generateSchemaForUsage<F, FieldUsage.ResponseData>(
-    field,
-    FieldUsage.ResponseData,
-  );
-}
-
 export interface CreateApiEndpoint<
   out TMethod extends Methods,
   out TUserRoleValue extends readonly UserRoleValue[],
@@ -721,7 +713,7 @@ export interface CreateApiEndpoint<
 /**
  * Return type for createEndpoint with full type inference from fields
  */
-type CreateEndpointReturnInMethod<
+export type CreateEndpointReturnInMethod<
   TMethod extends Methods,
   TUserRoleValue extends readonly UserRoleValue[],
   TScopedTranslationKey extends string,
@@ -751,14 +743,16 @@ type CreateEndpointReturnInMethod<
 };
 
 /**
- * Create an endpoint definition with perfect type inference from unified fields
- * Returns both legacy format and new destructured format for maximum compatibility
+ * Shared endpoint builder behind `createEndpoint` here and the scoped
+ * `createEndpoint` in `create-i18n.ts`.
  *
- * Translation key inference:
- * - TScopedTranslationKey is inferred from scopedTranslation.ScopedTranslationKey when provided
- * - Defaults to TranslationKey (global keys) when scopedTranslation is not provided
+ * `scopedTranslation` is taken as a separate parameter rather than read off
+ * `config` so both wrappers can pass a config typed WITHOUT it. Reconstructing
+ * `Omit<ApiEndpoint<...>, "scopedTranslation"> & { scopedTranslation }` back
+ * into `ApiEndpoint<...>` is not provable while the type params are unresolved,
+ * and splitting the argument avoids needing a cast to paper over it.
  */
-export function createEndpoint<
+export function buildEndpoint<
   const TMethod extends Methods,
   const TUserRoleValue extends readonly UserRoleValue[],
   TScopedTranslationKey extends string,
@@ -782,7 +776,10 @@ export function createEndpoint<
   > = EndpointEventsMapBase,
   const TChannel extends ChannelDeclaration | undefined = undefined,
 >(
-  config: ApiEndpoint<TMethod, TUserRoleValue, TScopedTranslationKey, TFields> &
+  config: Omit<
+    ApiEndpoint<TMethod, TUserRoleValue, TScopedTranslationKey, TFields>,
+    "scopedTranslation"
+  > &
     ChannelConfigField<
       InferResponseOutput<TFields>,
       InferRequestOutput<TFields>,
@@ -790,6 +787,12 @@ export function createEndpoint<
       TEvents,
       TChannel
     >,
+  scopedTranslation: ApiEndpoint<
+    TMethod,
+    TUserRoleValue,
+    TScopedTranslationKey,
+    TFields
+  >["scopedTranslation"],
 ): CreateEndpointReturnInMethod<
   TMethod,
   TUserRoleValue,
@@ -798,14 +801,14 @@ export function createEndpoint<
   TEvents,
   TChannel
 > {
-  const requestSchema = generateRequestDataSchema(config.fields);
-  const responseSchema = generateResponseSchema(config.fields);
-  const requestUrlSchema = generateRequestUrlSchema(config.fields);
-  const formSchema = generateFormSchema(config.fields);
-
-  function requiresAuthentication(): boolean {
-    return !config.allowedRoles.includes(UserRole.PUBLIC);
-  }
+  // Definition-build context (which roles and which platform the static schemas
+  // are built for, and what "needs auth" means) lives in ./definition-schemas so
+  // this builder stays free of any deployment-shaped assumption.
+  const { requestSchema, responseSchema, requestUrlSchema, formSchema } =
+    buildDefinitionSchemas(config.fields, config.allowedRoles);
+  const requiresAuthentication = makeRequiresAuthentication(
+    config.allowedRoles,
+  );
 
   const endpointDefinition: CreateApiEndpoint<
     TMethod,
@@ -837,7 +840,7 @@ export function createEndpoint<
     examples: config.examples,
     errorTypes: config.errorTypes,
     successTypes: config.successTypes,
-    scopedTranslation: config.scopedTranslation,
+    scopedTranslation,
     debug: config.debug,
     aliases: config.aliases,
     cli: config.cli,
@@ -922,4 +925,106 @@ export function createEndpoint<
     TEvents,
     TChannel
   >;
+}
+
+/**
+ * Config for {@link createEndpoint} - every translation key widened to `string`,
+ * because the copy is literal text rather than i18n keys.
+ */
+export type EndpointConfig<
+  TMethod extends Methods,
+  TUserRoleValue extends readonly UserRoleValue[],
+  TFields extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >,
+> = Omit<
+  ApiEndpoint<TMethod, TUserRoleValue, string, TFields>,
+  "scopedTranslation"
+>;
+
+/**
+ * Create an endpoint whose copy lives inline - the default.
+ *
+ * Titles, descriptions, tags, error/success types and field labels are plain
+ * strings that render verbatim on every surface (web, CLI, MCP, AI, native).
+ * The endpoint has NO `scopedTranslation`, so nothing in this module depends on
+ * the i18n folder at runtime.
+ *
+ * Use the field helpers from `next-vibe/unified-ui/_shared/utils` (NOT
+ * `utils-i18n`) - they take no `scopedTranslation` argument and already type
+ * their labels as `string`.
+ *
+ * For an endpoint that must ship in DE/PL, use `createEndpoint` from
+ * `next-vibe/core/definition/create-i18n` instead.
+ *
+ * ```ts
+ * export const { POST } = createEndpoint({
+ *   method: Methods.POST,
+ *   title: "Create company",
+ *   description: "Register a new company under your account.",
+ *   tags: ["companies", "onboarding"],
+ *   fields: objectField({
+ *     type: WidgetType.CONTAINER,
+ *     usage: { request: "data", response: true },
+ *     children: {
+ *       name: requestField({
+ *         type: WidgetType.FORM_FIELD,
+ *         fieldType: FieldDataType.TEXT,
+ *         label: "Company name",
+ *         schema: z.string().min(2),
+ *       }),
+ *     },
+ *   }),
+ *   // ...remaining required config, unchanged
+ * });
+ * ```
+ *
+ * Trade-off: inline copy is single-language. Switch to the `create-i18n`
+ * variant as soon as an endpoint has to ship in DE/PL.
+ */
+export function createEndpoint<
+  const TMethod extends Methods,
+  const TUserRoleValue extends readonly UserRoleValue[],
+  const TFields extends UnifiedField<
+    string,
+    z.ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, FieldUsageConfig>
+  >,
+  const TEvents extends EndpointEventsMap<
+    InferResponseOutput<TFields>,
+    InferRequestOutput<TFields>,
+    InferUrlVariablesOutput<TFields>,
+    TEvents
+  > = EndpointEventsMapBase,
+  const TChannel extends ChannelDeclaration | undefined = undefined,
+>(
+  config: EndpointConfig<TMethod, TUserRoleValue, TFields> &
+    ChannelConfigField<
+      InferResponseOutput<TFields>,
+      InferRequestOutput<TFields>,
+      InferUrlVariablesOutput<TFields>,
+      TEvents,
+      TChannel
+    >,
+): CreateEndpointReturnInMethod<
+  TMethod,
+  TUserRoleValue,
+  string,
+  TFields,
+  TEvents,
+  TChannel
+> {
+  // Pass-through translator: the config's strings are already display text.
+  return buildEndpoint<
+    TMethod,
+    TUserRoleValue,
+    string,
+    TFields,
+    TEvents,
+    TChannel
+  >(config, NO_TRANSLATION);
 }

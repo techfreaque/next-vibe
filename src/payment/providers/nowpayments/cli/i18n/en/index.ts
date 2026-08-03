@@ -23,6 +23,8 @@ export const translations = {
     },
     errors: {
       notInstalled: {
+        instructions:
+          "To install ngrok:\n\n1. Visit https://ngrok.com/download\n2. Download ngrok for your platform\n3. Extract it and move it into your PATH\n4. Run: ngrok authtoken YOUR_AUTH_TOKEN (get your token at https://dashboard.ngrok.com/get-started/your-authtoken)\n\nOr install it with a package manager:\n- macOS: brew install ngrok/ngrok/ngrok\n- Linux: snap install ngrok\n- Windows: choco install ngrok",
         title: "ngrok not installed",
         description:
           "ngrok is required to start the tunnel. Install it and try again.",
@@ -48,6 +50,7 @@ export const translations = {
         description: "Resource not found",
       },
       serverError: {
+        noTunnelUrl: "Could not read the ngrok tunnel URL",
         title: "Server Error",
         description: "Failed to start tunnel",
       },

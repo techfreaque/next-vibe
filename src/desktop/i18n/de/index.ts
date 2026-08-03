@@ -1171,6 +1171,7 @@ export const translations: typeof enTranslations = {
     actionTypeText: "Text eingeben",
     actionPressKey: "Taste drücken",
     actionScreenshot: "Screenshot",
+    actionScreenshotOnMonitor: "Screenshot: {{monitor}}",
     actionA11yTree: "A11y-Baum",
     actionAllWindows: "← Alle Fenster",
     actionAllMonitors: "Alle Monitore →",
@@ -1210,9 +1211,27 @@ export const translations: typeof enTranslations = {
       "Erforderliches Tool nicht gefunden: {{tool}}. Installieren mit: {{installCmd}}",
     screenshotFailed: "Screenshot konnte nicht aufgenommen werden",
     accessibilityFailed: "Barrierefreiheitsbaum konnte nicht abgerufen werden",
+    accessibilityFailedWithError:
+      "Barrierefreiheitsbaum nicht abrufbar: {{error}}",
     focusWindowRequiresIdentifier:
       "Mindestens eines von windowId, pid oder title wird benötigt",
     missingDep:
       "Systempaket fehlt: {{dep}}. Ein Authentifizierungsdialog sollte erschienen sein - bestätigen, um automatisch zu installieren.",
+    scriptWriteFailed: "Skript konnte nicht geschrieben werden: {{error}}",
+    monitorNotFoundByName: "Monitor „{{monitorName}}“ nicht gefunden",
+    screenIndexOutOfRange: "Bildschirmindex {{screen}} außerhalb des Bereichs",
+    unknownKeyName: "Unbekannter Tastenname: {{key}}",
+    focusedWindowParseFailed:
+      "Ausgabe des aktiven Fensters konnte nicht ausgewertet werden",
+    couldNotListWindows: "Fensterliste nicht abrufbar",
+    noWindowWithPid: "Kein Fenster mit PID {{pid}}",
+    noWindowWithTitle: "Kein Fenster mit „{{title}}“ im Titel",
+    provideMonitorNameOrIndex: "monitorName oder monitorIndex angeben",
+    monitorNotFound: "Monitor nicht gefunden: {{monitor}}",
+    noActiveWindow: "Kein aktives Fenster",
+    kwinNoOutput: "KWin-Skript lieferte keine Ausgabe",
+    kwinNoWindowData: "Keine Fensterdaten in der KWin-Skriptausgabe",
+    windowMoveNoEffect:
+      "Fensterverschiebung wirkungslos — Fenster erreichte Monitor {{monitor}} nie",
   },
 };

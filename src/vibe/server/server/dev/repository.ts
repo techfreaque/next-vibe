@@ -11,25 +11,26 @@ import { execSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeSync } from "node:fs";
 import { basename, join } from "node:path";
 
-import { coreEnv } from "next-vibe/core/env";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { databaseEnv } from "next-vibe/database/env";
-import { DatabaseGenerateRepository } from "next-vibe/database/generate/repository";
-import { closeDatabase, reopenDatabase } from "next-vibe/database/index";
-import { DatabaseMigrationRepository } from "next-vibe/database/migrate/repository";
-import { SeedRepository } from "next-vibe/database/seed/repository";
-import { scopedTranslation as dockerScopedTranslation } from "next-vibe/database/utils/docker-operations/i18n";
-import { DockerOperationsRepository } from "next-vibe/database/utils/docker-operations/repository";
-import { scopedTranslation as dbUtilsScopedTranslation } from "next-vibe/database/utils/i18n";
-import { DbUtilsRepository } from "next-vibe/database/utils/repository";
-import { formatLogPrefix } from "next-vibe/logger/create-logger";
+import { coreEnv } from "../../../core/env";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import { parseError } from "../../../core/utils/parse-error";
+import { databaseEnv } from "../../../database/env";
+import { DatabaseGenerateRepository } from "../../../database/generate/repository";
+import { closeDatabase, reopenDatabase } from "../../../database/index";
+import { DatabaseMigrationRepository } from "../../../database/migrate/repository";
+import { SeedRepository } from "../../../database/seed/repository";
+import { scopedTranslation as dockerScopedTranslation } from "../../../database/utils/docker-operations/i18n";
+import { DockerOperationsRepository } from "../../../database/utils/docker-operations/repository";
+import { scopedTranslation as dbUtilsScopedTranslation } from "../../../database/utils/i18n";
+import { DbUtilsRepository } from "../../../database/utils/repository";
+import { formatLogPrefix } from "../../../logger/create-logger";
+import { loggerEnv } from "../../../logger/env";
 import {
   appendRawToServerLog,
   truncateClientLogs,
   truncateServerLog,
   writeServerLogOfflineHint,
-} from "next-vibe/logger/file";
+} from "../../../logger/file";
 import {
   createNextjsFormatter,
   formatActionCommand,
@@ -43,11 +44,11 @@ import {
   formatStartup,
   formatTask,
   formatWarning,
-} from "next-vibe/logger/formatters";
-import type { EndpointLogger, LoggerMetadata } from "next-vibe/logger/types";
-import { DEV_WATCHER_TASK_NAME } from "next-vibe/tasks/dev-watcher/constants";
-import { UnifiedTaskRunnerRepository } from "next-vibe/tasks/unified-runner/repository";
-import type { Task } from "next-vibe/tasks/unified-runner/types";
+} from "../../../logger/formatters";
+import type { EndpointLogger, LoggerMetadata } from "../../../logger/types";
+import { DEV_WATCHER_TASK_NAME } from "../../../tasks/dev-watcher/constants";
+import { UnifiedTaskRunnerRepository } from "../../../tasks/unified-runner/repository";
+import type { Task } from "../../../tasks/unified-runner/types";
 
 import { GENERATED_DIR } from "@/env/paths";
 
@@ -283,7 +284,7 @@ export class DevRepository {
           logger.error(
             "❌ Database connection timeout - this will cause errors",
           );
-          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- CLI fatal error requires throw to halt execution
+          // eslint-disable-next-line restricted/restricted-syntax -- CLI fatal error requires throw to halt execution
           throw new Error(
             `Database connection timeout after ${maxAttempts} attempts (${(maxAttempts * delayMs) / 1000}s)`,
           );
@@ -302,7 +303,7 @@ export class DevRepository {
   private static readonly PREVIEW_COMPOSE_FILE = "docker-compose.preview.yml";
 
   private static get projectSlug(): string {
-    return basename(process.env["PROJECT_ROOT"] ?? process.cwd());
+    return basename(coreEnv.PROJECT_ROOT ?? process.cwd());
   }
 
   private static get ATLAS_PROJECT_NAME(): string {
@@ -319,7 +320,7 @@ export class DevRepository {
     logger: EndpointLogger,
   ): Promise<never> {
     // vibe --hermes dev uses IS_PREVIEW_MODE=true to signal it targets the preview DB
-    const isLocalDev = process.env["IS_PREVIEW_MODE"] === "true";
+    const isLocalDev = coreEnv.IS_PREVIEW_MODE;
     DevRepository.activePidFile = isLocalDev
       ? HERMES_DEV_PID_FILE
       : ATLAS_PID_FILE;
@@ -360,16 +361,16 @@ export class DevRepository {
     //     termFd only — logger already calls onFileLog for the file side, so going
     //     through tee would double-write to the log file.
     //   - process.stderr.write → termFd only for the same reason.
-    if (process.env["VIBE_LOG_TARGET"] === "file") {
+    if (loggerEnv.VIBE_LOG_TARGET === "file") {
       try {
-        const logPath = process.env["VIBE_LOG_FILE"] ?? ".atlas.log";
-        const logDir = process.env["VIBE_LOG_PATH"];
+        const logPath = loggerEnv.VIBE_LOG_FILE;
+        const logDir = loggerEnv.VIBE_LOG_PATH;
         if (logDir) {
           const { isAbsolute, join: pathJoin } = await import("node:path");
           const { spawn } = await import("node:child_process");
           const absDir = isAbsolute(logDir)
             ? logDir
-            : pathJoin(process.env["PROJECT_ROOT"] ?? process.cwd(), logDir);
+            : pathJoin(coreEnv.PROJECT_ROOT ?? process.cwd(), logDir);
           if (!existsSync(absDir)) {
             mkdirSync(absDir, { recursive: true });
           }
@@ -673,8 +674,9 @@ export class DevRepository {
   ): Promise<void> {
     try {
       const { RemoteConnectionRepository } =
-        await import("next-vibe/remote-connection/repository");
-      const { openConnection } = await import("next-vibe/realtime/connector");
+        await import("../../../remote-connection/repository");
+      const { openConnection } =
+        await import("../../../realtime/server/connector");
       const connections =
         await RemoteConnectionRepository.getAllActiveConnectionsForSync();
       let opened = 0;
@@ -776,7 +778,7 @@ export class DevRepository {
 
       // Deploy db-functions (idempotent - runs after every migration)
       const { deployDbFunctions } =
-        await import("next-vibe/database/db-functions/deploy");
+        await import("../../../database/db-functions/deploy");
       await deployDbFunctions(logger);
 
       // Seed database if not skipped
@@ -880,7 +882,7 @@ export class DevRepository {
       logger.vibe(
         `   Try: ${formatCommand(`docker compose -f ${composeFile} up -d`)}`,
       );
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- CLI fatal error requires throw to halt execution
+      // eslint-disable-next-line restricted/restricted-syntax -- CLI fatal error requires throw to halt execution
       throw new Error("Failed to start database");
     }
 
@@ -966,12 +968,12 @@ export class DevRepository {
       }
     }
 
-    const { serverSystemEnv } = await import("next-vibe/server/server/env");
+    const { serverSystemEnv } = await import("../env");
     const disableProxy = serverSystemEnv.VIBE_DISABLE_PROXY;
 
     // Import WS module to get NEXT_PORT_OFFSET
     const { startWebSocketServer, NEXT_PORT_OFFSET } =
-      await import("next-vibe/realtime/server");
+      await import("../../../realtime/server/server");
 
     // In proxy mode (default): Next.js on port+NEXT_PORT_OFFSET, Bun proxy on main port.
     // In direct mode (VIBE_DISABLE_PROXY=true): Next.js on main port, WS sidecar on port+1000.
@@ -1196,14 +1198,14 @@ export class DevRepository {
     // Uses @tanstack/react-start/plugin/vite + nitro plugins.
     if (tanstack) {
       const { viteCompiler } =
-        await import("next-vibe/tooling/builder/repository/vite-compiler");
+        await import("../../../tooling/builder/repository/vite-compiler");
       const { ViteBuildTypeEnum } =
-        await import("next-vibe/tooling/builder/enum");
+        await import("../../../tooling/builder/enum");
       const { configLoader } =
-        await import("next-vibe/tooling/builder/repository/config-loader");
+        await import("../../../tooling/builder/repository/config-loader");
       const { scopedTranslation: builderScopedTranslation } =
-        await import("next-vibe/tooling/builder/i18n");
-      const { defaultLocale } = await import("next-vibe/core/i18n/core/config");
+        await import("../../../tooling/builder/i18n");
+      const { defaultLocale } = await import("../../../core/i18n/core/config");
       const { t: builderT } = builderScopedTranslation.scopedT(defaultLocale);
       const configResult = await configLoader.load(
         "build.config.ts",

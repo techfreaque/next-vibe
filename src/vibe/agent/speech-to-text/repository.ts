@@ -5,9 +5,9 @@
 
 import "server-only";
 
-import { createFixtureFetch } from "next-vibe/agent/ai-stream/testing/fetch-cache";
-import { ApiProvider } from "next-vibe/agent/models/models";
-import { pollDelay } from "next-vibe/agent/shared/poll-delay";
+import { createFixtureFetch } from "../ai-stream/testing/fetch-cache";
+import { ApiProvider } from "../models/models";
+import { pollDelay } from "../shared/poll-delay";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -29,14 +29,13 @@ import {
   STT_MINIMUM_BALANCE,
 } from "@/products/repository-client";
 
-import type { ToolExecutionContext } from "../chat/config";
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 import { agentEnv } from "../env";
 import {
   buildMissingKeyMessage,
-  getEnvAvailability,
-  getInstanceAvailability,
   PROVIDER_SETUP_INSTRUCTIONS,
 } from "../env-availability";
+import { getEnvAvailability } from "../env-availability";
 import { ModelSelectionType } from "../skills/enum";
 import { DEFAULT_STT_MODEL_SELECTION } from "./constants";
 import type { SpeechToTextPostResponseOutput } from "./definition";
@@ -103,9 +102,7 @@ export class SpeechToTextRepository {
   > {
     if (!modelOption) {
       return fail({
-        message: t("post.errors.transcriptionFailed", {
-          error: "No STT provider available",
-        }),
+        message: t("post.errors.noSttProvider"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
@@ -144,8 +141,8 @@ export class SpeechToTextRepository {
           sttModelId: modelOption.id,
         });
         return fail({
-          message: t("post.errors.transcriptionFailed", {
-            error: `Unsupported provider: ${modelOption.apiProvider}`,
+          message: t("post.errors.unsupportedProvider", {
+            provider: modelOption.apiProvider,
           }),
           errorType: ErrorResponseTypes.BAD_REQUEST,
         });
@@ -176,7 +173,7 @@ export class SpeechToTextRepository {
             manualModelId: sttModelSelection,
           }
         : (sttModelSelection ?? DEFAULT_STT_MODEL_SELECTION);
-    const _sttAvailability = await getInstanceAvailability();
+    const _sttAvailability = await getEnvAvailability();
     const modelOption = getBestSttModel(selection, user, _sttAvailability);
 
     if (!modelOption) {
@@ -184,10 +181,7 @@ export class SpeechToTextRepository {
         selection,
       });
       return fail({
-        message: t("post.errors.transcriptionFailed", {
-          error:
-            "No speech-to-text provider is configured. Add OPENAI_API_KEY, EDEN_AI_API_KEY, or DEEPGRAM_API_KEY, or connect a system inference provider.",
-        }),
+        message: t("post.errors.noSttProviderConfigured"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
@@ -439,9 +433,7 @@ export class SpeechToTextRepository {
       const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.openAiImages;
       logger.error("[STT] OpenAI API key not configured");
       return fail({
-        message: t("post.errors.transcriptionFailed", {
-          error: `${label} key (${envKey}) not configured. Get yours at ${url}`,
-        }),
+        message: t("post.errors.notConfigured", { label, envKey, url }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
@@ -542,7 +534,7 @@ export class SpeechToTextRepository {
       edenAiCostUsd: number | undefined;
     }>
   > {
-    if (!getEnvAvailability().voice) {
+    if (!(await getEnvAvailability()).voice) {
       logger.error(
         "[STT] Eden AI not configured",
         buildMissingKeyMessage("voice"),
@@ -710,12 +702,10 @@ export class SpeechToTextRepository {
     }>
   > {
     if (!agentEnv.DEEPGRAM_API_KEY) {
+      const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.deepgram;
       logger.error("[STT] Deepgram API key not configured");
       return fail({
-        message: t("post.errors.transcriptionFailed", {
-          error:
-            "DEEPGRAM_API_KEY not configured. Get yours at https://console.deepgram.com",
-        }),
+        message: t("post.errors.notConfigured", { label, envKey, url }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
@@ -861,9 +851,7 @@ export class SpeechToTextRepository {
               availableProviders: Object.keys(resultData.results || {}),
             });
             return fail({
-              message: t("post.errors.transcriptionFailed", {
-                error: `Provider ${provider} not found in results`,
-              }),
+              message: t("post.errors.providerResultMissing", { provider }),
               errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
             });
           }

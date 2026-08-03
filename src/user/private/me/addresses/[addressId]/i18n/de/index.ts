@@ -104,7 +104,11 @@ export const translations: typeof enTranslations = {
         title: "Ungespeicherte Änderungen",
         description: "Es gibt ungespeicherte Änderungen",
       },
-      internal: { title: "Serverfehler", description: "Interner Serverfehler" },
+      internal: {
+        title: "Serverfehler",
+        description: "Interner Serverfehler",
+        detail: "Adresse konnte nicht aktualisiert werden: {{error}}",
+      },
       unknown: {
         title: "Unbekannter Fehler",
         description: "Ein unbekannter Fehler ist aufgetreten",
@@ -156,7 +160,11 @@ export const translations: typeof enTranslations = {
         title: "Ungespeicherte Änderungen",
         description: "Es gibt ungespeicherte Änderungen",
       },
-      internal: { title: "Serverfehler", description: "Interner Serverfehler" },
+      internal: {
+        title: "Serverfehler",
+        description: "Interner Serverfehler",
+        detail: "Adresse konnte nicht gelöscht werden: {{error}}",
+      },
       unknown: {
         title: "Unbekannter Fehler",
         description: "Ein unbekannter Fehler ist aufgetreten",

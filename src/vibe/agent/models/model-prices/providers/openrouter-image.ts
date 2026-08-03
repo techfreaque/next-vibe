@@ -134,7 +134,7 @@ export class OpenRouterImagePriceFetcher extends PriceFetcher {
 
     const priceMap = new Map<string, ParsedImageModel>();
     try {
-      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+      // oxlint-disable-next-line restricted/no-raw-fetch
       const response = await fetch(OpenRouterImagePriceFetcher.API_URL, {
         headers: { "Content-Type": "application/json" },
       });

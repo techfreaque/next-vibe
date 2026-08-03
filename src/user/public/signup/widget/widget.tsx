@@ -27,7 +27,7 @@ import { Link } from "next-vibe/ui/ui/link";
 import { Span } from "next-vibe/ui/ui/span";
 import { useEffect, useMemo, useState } from "react";
 
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
+import { useProviderAvailability } from "next-vibe/agent/env-availability-store";
 import skillSingleDefinition from "next-vibe/agent/skills/[id]/definition";
 import { ChatFavoritesRepositoryClient } from "next-vibe/agent/skills/favorites/repository-client";
 import leadCurrentReferralDefinition, {
@@ -145,7 +145,6 @@ export function SignupFormContainer({
             logger,
             user,
             locale,
-            availability,
             requestData: undefined,
             pathParams: { id: s.skillId },
           });

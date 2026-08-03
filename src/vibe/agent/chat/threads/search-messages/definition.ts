@@ -4,7 +4,7 @@
  */
 
 import { dateSchema } from "next-vibe/core/definition/common.schema";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -21,7 +21,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
-import { DefaultFolderId } from "../../config";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { ChatMessageRole, ChatMessageRoleDB } from "../../enum";
 import { SEARCH_MESSAGES_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";

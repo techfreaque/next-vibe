@@ -118,10 +118,12 @@ export const translations: typeof enTranslations = {
     maxConnections: "Maksymalna liczba połączeń",
   },
   errors: {
-    health_check_failed: "Sprawdzenie stanu bazy danych nie powiodło się",
-    connection_failed: "Połączenie z bazą danych nie powiodło się",
-    stats_failed: "Nie udało się pobrać statystyk bazy danych",
-    docker_check_failed: "Sprawdzenie dostępności Docker nie powiodło się",
+    health_check_failed:
+      "Sprawdzenie stanu bazy danych nie powiodło się: {{error}}",
+    connection_failed: "Połączenie z bazą danych nie powiodło się: {{error}}",
+    stats_failed: "Nie udało się pobrać statystyk bazy danych: {{error}}",
+    docker_check_failed:
+      "Sprawdzenie dostępności Dockera nie powiodło się: {{error}}",
     reset_failed: "Operacja resetowania bazy danych nie powiodła się",
     manage_failed: "Operacja zarządzania bazą danych nie powiodła się",
     reset_operation_failed: "Operacja resetowania nie powiodła się",

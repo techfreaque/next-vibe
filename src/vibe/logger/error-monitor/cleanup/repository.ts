@@ -6,10 +6,10 @@
 import "server-only";
 
 import { count, inArray, lt } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
-import { success } from "next-vibe/core/route/response.schema";
-import { db } from "next-vibe/database";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import type { ResponseType } from "../../../core/route/response.schema";
+import { success } from "../../../core/route/response.schema";
+import { db } from "../../../database";
+import type { EndpointLogger } from "../../types";
 
 import { errorLogs } from "../db";
 import type { CleanupPostResponseOutput } from "./definition";

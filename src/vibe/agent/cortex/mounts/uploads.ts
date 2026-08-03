@@ -6,8 +6,8 @@ import "server-only";
  * Each file renders as markdown with a download link + metadata frontmatter.
  * Organized by MIME type: images/, documents/, audio/, video/, other/
  */
-import { and, desc, eq, isNotNull, or, sql } from "drizzle-orm";
-import { chatMessages, chatThreads } from "next-vibe/agent/chat/db";
+import { and, desc, eq, isNotNull, sql } from "drizzle-orm";
+import { chatMessages, chatThreads } from "../../chat/db";
 import { db } from "next-vibe/database";
 
 import type { VirtualListEntry, VirtualReadResult } from "./resolver";
@@ -344,87 +344,6 @@ export async function listUploadPath(
   }
 
   return [];
-}
-
-export interface VirtualSearchHit {
-  path: string;
-  excerpt: string;
-  updatedAt: Date;
-}
-
-/**
- * Direct keyword search across uploads - one DB query, no file-by-file reads.
- * Matches against filename and user message context.
- */
-export async function searchUploads(
-  userId: string,
-  query: string,
-  limit: number,
-): Promise<VirtualSearchHit[]> {
-  const pattern = `%${query}%`;
-  const rows = await db
-    .select({
-      metadata: chatMessages.metadata,
-      content: chatMessages.content,
-      createdAt: chatMessages.createdAt,
-      threadId: chatMessages.threadId,
-      threadTitle: chatThreads.title,
-    })
-    .from(chatMessages)
-    .innerJoin(chatThreads, eq(chatMessages.threadId, chatThreads.id))
-    .where(
-      and(
-        eq(chatThreads.userId, userId),
-        isNotNull(chatMessages.metadata),
-        sql`${chatMessages.metadata}->'attachments' IS NOT NULL`,
-        sql`jsonb_array_length((${chatMessages.metadata}->'attachments')::jsonb) > 0`,
-        or(
-          sql`${chatMessages.content}::text ILIKE ${pattern}`,
-          sql`${chatMessages.metadata}::text ILIKE ${pattern}`,
-        ),
-      ),
-    )
-    .orderBy(desc(chatMessages.createdAt))
-    .limit(limit);
-
-  const hits: VirtualSearchHit[] = [];
-  for (const row of rows) {
-    const meta = row.metadata as {
-      attachments?: {
-        id?: string;
-        url?: string;
-        data?: string;
-        filename?: string;
-        name?: string;
-        mimeType?: string;
-        type?: string;
-        size?: number;
-      }[];
-    } | null;
-    if (!meta?.attachments) {
-      continue;
-    }
-    for (const att of meta.attachments) {
-      const filename = att.filename ?? att.name ?? "";
-      if (!filename) {
-        continue;
-      }
-      const mimeType = att.mimeType ?? att.type ?? "application/octet-stream";
-      const typeFolder = getMimeTypeFolder(mimeType);
-      const threadSlug = `${slugify(row.threadTitle ?? "untitled")}-${row.threadId}`;
-      const safeFilename = filename
-        .replaceAll(/[^a-z0-9.\-_]/gi, "-")
-        .replaceAll(/-+/g, "-")
-        .replace(/^\./, "");
-      const path = `/uploads/${typeFolder}/${threadSlug}/${safeFilename}.md`;
-      const excerpt = (
-        typeof row.content === "string" ? row.content : filename
-      ).slice(0, 150);
-      hits.push({ path, excerpt, updatedAt: row.createdAt });
-      break; // one hit per message is enough
-    }
-  }
-  return hits;
 }
 
 /**

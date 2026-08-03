@@ -28,6 +28,7 @@ export const translations: typeof enTranslations = {
       server: {
         title: "Błąd serwera",
         description: "Wewnętrzny błąd serwera podczas zasiewu",
+        detail: "Zasiew bazy danych nie powiódł się: {{error}}",
       },
       internal: {
         title: "Błąd wewnętrzny",

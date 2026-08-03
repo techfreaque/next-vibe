@@ -137,11 +137,10 @@ export class SessionCleanupRepository {
       if (errors.length > 0) {
         const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: t("errors.partial_failure.title"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: {
+          message: t("errors.partial_failure.title", {
             errors: errors.join(", ") || t("errors.unknown_error.title"),
-          },
+          }),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
 
@@ -157,9 +156,8 @@ export class SessionCleanupRepository {
 
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.execution_failed.title"),
+        message: t("errors.execution_failed.title", { error: errorMessage }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: errorMessage },
       });
     }
   }

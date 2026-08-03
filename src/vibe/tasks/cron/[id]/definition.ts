@@ -3,32 +3,32 @@
  * Endpoints for managing individual cron tasks
  */
 
-import { dateSchema } from "next-vibe/core/definition/common.schema";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { dateSchema } from "../../../core/definition/common.schema";
+import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { UserRole } from "next-vibe/identity/roles/enum";
-import { scopedTranslation } from "next-vibe/tasks/cron/[id]/i18n";
+} from "../../../core/definition/enums";
+import { UserRole } from "../../../identity/roles/enum";
+import { scopedTranslation } from "./i18n";
 import {
   CronTaskPriority,
   CronTaskPriorityOptions,
   CronTaskStatusOptions,
   TaskCategory,
   TaskOutputModeOptions,
-} from "next-vibe/tasks/enum";
+} from "../../enum";
 import {
   CronTaskPriorityDB,
   CronTaskStatusDB,
   TaskCategoryDB,
   TaskOutputModeDB,
-} from "next-vibe/tasks/enum";
-import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
-import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
+} from "../../enum";
+import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "../../../unified-ui/_shared/utils";
 import {
   backButton,
   objectField,
@@ -37,7 +37,7 @@ import {
   responseField,
   submitButton,
   widgetField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../../unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { taskInputSchema, taskOwnerSchema } from "../db";
@@ -48,13 +48,13 @@ import {
 } from "./constants";
 
 const CronTaskDetailContainer = lazyWidget(() =>
-  import("next-vibe/tasks/cron/[id]/widget/widget").then((m) => ({
+  import("./widget/widget").then((m) => ({
     default: m.CronTaskDetailContainer,
   })),
 );
 
 const CronTaskEditContainer = lazyWidget(() =>
-  import("next-vibe/tasks/cron/[id]/widget/widget").then((m) => ({
+  import("./widget/widget").then((m) => ({
     default: m.CronTaskEditContainer,
   })),
 );
@@ -821,9 +821,9 @@ const { PUT } = createEndpoint({
   options: {
     mutationOptions: {
       onSuccess: async ({ responseData, pathParams, logger }) => {
-        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
-        const tasksDef = await import("next-vibe/tasks/cron/tasks/definition");
-        const queueDef = await import("next-vibe/tasks/cron/queue/definition");
+        const { apiClient } = await import("../../../unified-ui/hooks/store");
+        const tasksDef = await import("../tasks/definition");
+        const queueDef = await import("../queue/definition");
         const updatedTask = responseData.task;
 
         // Update the task in the tasks list cache
@@ -1026,9 +1026,9 @@ const { DELETE } = createEndpoint({
   options: {
     mutationOptions: {
       onSuccess: async ({ pathParams, logger }) => {
-        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
-        const tasksDef = await import("next-vibe/tasks/cron/tasks/definition");
-        const queueDef = await import("next-vibe/tasks/cron/queue/definition");
+        const { apiClient } = await import("../../../unified-ui/hooks/store");
+        const tasksDef = await import("../tasks/definition");
+        const queueDef = await import("../queue/definition");
 
         // Remove from tasks list cache
         apiClient.updateEndpointData(tasksDef.default.GET, logger, (old) => {

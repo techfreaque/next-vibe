@@ -1,9 +1,9 @@
 import { styled } from "nativewind";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { convertCSSToViewStyle } from "../../native/utils/style-converter";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 import type { BodyProps } from "../../web/ui/body";
 import { applyStyleType } from "../../web/utils/style-type";
 

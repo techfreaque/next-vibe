@@ -31,7 +31,7 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { useWidgetValue } from "next-vibe/unified-ui/_shared/use-widget-value";
 
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
+import { useProviderAvailability } from "next-vibe/agent/env-availability-store";
 
 import { GET } from "./definition";
 import { scopedTranslation } from "./i18n";
@@ -75,7 +75,6 @@ function CreatorLeadCaptureForm({
           { skillId, firstName: firstName.trim(), email: email.trim() },
           undefined,
           locale,
-          availability,
         );
         setState(result.success ? "done" : "error");
       } catch {

@@ -31,6 +31,7 @@ interface Props {
 export interface HelpPageData {
   locale: CountryLanguage;
   jwtUser: JwtPayloadType;
+  platform: Platform;
   userEmail?: string;
   subPrice: string;
   subCredits: number;
@@ -86,7 +87,10 @@ export async function tanstackLoader({ params }: Props): Promise<HelpPageData> {
   const currencySymbol = countryInfo.symbol;
 
   const isAdmin = !jwtUser.isPublic && jwtUser.roles.includes(UserRole.ADMIN);
-  const modelCount = getAvailableModelCount(isAdmin, getEnvAvailability());
+  const modelCount = getAvailableModelCount(
+    isAdmin,
+    await getEnvAvailability(),
+  );
 
   let userEmail: string | undefined;
   if (!jwtUser.isPublic) {
@@ -104,6 +108,7 @@ export async function tanstackLoader({ params }: Props): Promise<HelpPageData> {
   return {
     locale,
     jwtUser,
+    platform: Platform.NEXT_PAGE,
     userEmail,
     subPrice: `${currencySymbol}${subPrice}`,
     subCredits,
@@ -116,6 +121,7 @@ export async function tanstackLoader({ params }: Props): Promise<HelpPageData> {
 export function TanstackPage({
   locale,
   jwtUser,
+  platform,
   userEmail,
   subPrice,
   subCredits,
@@ -142,6 +148,7 @@ export function TanstackPage({
       <HelpPageClient
         locale={locale}
         user={jwtUser}
+        platform={platform}
         userEmail={userEmail}
         modelCount={modelCount}
         subPrice={subPrice}

@@ -3,12 +3,12 @@
  * Compound widget: large text input + submit button in one row.
  */
 
-import type { WidgetType } from "next-vibe/core/definition/enums";
+import type { WidgetType } from "../../../../core/definition/enums";
 import type {
   BasePrimitiveWidgetConfig,
   FieldUsageConfig,
-} from "next-vibe/unified-ui/_shared/types";
-import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+} from "../../../_shared/types";
+import type { IconKey } from "../../form-fields/icon-field/icons";
 import type { z } from "zod";
 
 /**

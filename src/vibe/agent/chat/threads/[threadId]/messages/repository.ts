@@ -6,15 +6,15 @@
 import "server-only";
 
 import { and, desc, eq, ne, sql } from "drizzle-orm";
-import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
-import { fetchAncestorBranch } from "next-vibe/agent/ai-stream/repository/core/tree-walk";
-import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
-import { scopedTranslation as chatScopedTranslation } from "next-vibe/agent/chat/i18n";
+import type { ChatModelId } from "../../../../ai-stream/models";
+import { fetchAncestorBranch } from "../../../../ai-stream/repository/core/tree-walk";
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
+import { scopedTranslation as chatScopedTranslation } from "../../../i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type {
   ChannelDecision,
   RemoteEventHandlerProps,
-} from "next-vibe/core/route/handler";
+} from "next-vibe/core/route/handler-realtime";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -31,7 +31,7 @@ import { cronTasks } from "next-vibe/tasks/cron/db";
 import { CronTaskStatus } from "next-vibe/tasks/enum";
 
 import { bubbleFolderActivity } from "../../../bubble-folder-activity";
-import { DefaultFolderId } from "../../../config";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import {
   CHAT_MESSAGE_COLUMNS,
   chatFolders,
@@ -208,53 +208,6 @@ export class MessagesRepository {
     return branchMessages;
   }
 
-  /**
-   * Get parent message for retry/edit operations
-   * Note: This method does NOT check thread ownership - that's handled at the API route level
-   * We just need to verify the message exists and return its data
-   */
-  static async getParentMessage(
-    messageId: string,
-    userId: string | undefined,
-    logger: EndpointLogger,
-  ): Promise<{
-    id: string;
-    threadId: string;
-    role: ChatMessageRole;
-    content: string | null;
-    parentId: string | null;
-  } | null> {
-    // Get the message by ID (supports both user and AI messages)
-    const [message] = await db
-      .select(CHAT_MESSAGE_COLUMNS)
-      .from(chatMessages)
-      .where(eq(chatMessages.id, messageId))
-      .limit(1);
-
-    if (!message) {
-      logger.error("Parent message not found", {
-        messageId,
-        userId: userId ?? "public",
-      });
-      return null;
-    }
-
-    logger.info("Found parent message", {
-      messageId: message.id,
-      threadId: message.threadId,
-      role: message.role,
-      authorId: message.authorId,
-    });
-
-    return {
-      id: message.id,
-      threadId: message.threadId,
-      role: message.role,
-      content: message.content,
-      parentId: message.parentId,
-    };
-  }
-
   static async createUserMessage(params: {
     messageId: string;
     threadId: string;
@@ -392,7 +345,7 @@ export class MessagesRepository {
       ? (async (): Promise<void> => {
           try {
             const { embedMessageContent } =
-              await import("next-vibe/agent/cortex/embeddings/message-embed");
+              await import("../../../../cortex/embeddings/message-embed");
             const fields = await embedMessageContent(
               { role: params.role, content: params.content, metadata: null },
               toolExecutionContext,
@@ -474,37 +427,6 @@ export class MessagesRepository {
     params.logger.debug("Re-parented user message after compacting", {
       messageId: params.messageId,
       newParentId: params.newParentId,
-    });
-  }
-
-  static async createAiMessagePlaceholder(params: {
-    messageId: string;
-    threadId: string;
-    parentId: string | null;
-    userId: string | undefined;
-    model: ChatModelId;
-    skill: string | null | undefined;
-    sequenceId: string | null;
-    logger: EndpointLogger;
-  }): Promise<void> {
-    await db.insert(chatMessages).values({
-      id: params.messageId,
-      threadId: params.threadId,
-      role: ChatMessageRole.ASSISTANT,
-      content: " ",
-      parentId: params.parentId,
-      authorId: params.userId ?? null,
-      sequenceId: params.sequenceId,
-      isAI: true,
-      model: params.model,
-      skill: params.skill ?? null,
-    });
-
-    params.logger.info("Created AI message placeholder", {
-      messageId: params.messageId,
-      threadId: params.threadId,
-      sequenceId: params.sequenceId,
-      userId: params.userId ?? "public",
     });
   }
 
@@ -777,29 +699,6 @@ export class MessagesRepository {
     }
   }
 
-  static handleAnswerAsAiOperation<
-    T extends {
-      threadId?: string | null;
-      parentMessageId?: string | null;
-      content: string;
-      role: ChatMessageRole;
-    },
-  >(
-    data: T,
-  ): {
-    threadId: string | null | undefined;
-    parentMessageId: string | null | undefined;
-    content: string;
-    role: ChatMessageRole;
-  } {
-    return {
-      threadId: data.threadId,
-      parentMessageId: data.parentMessageId,
-      content: data.content,
-      role: data.role,
-    };
-  }
-
   /**
    * List all messages in a thread
    */
@@ -919,9 +818,10 @@ export class MessagesRepository {
     } catch (error) {
       logger.error("Error listing messages", parseError(error));
       return fail({
-        message: t("get.errors.server.title"),
+        message: t("get.errors.server.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -1038,11 +938,8 @@ export class MessagesRepository {
 
         if (!parentMessage) {
           return fail({
-            message: t("post.errors.validation.title"),
+            message: t("post.errors.validation.parentNotFound"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            messageParams: {
-              error: "Parent message not found",
-            },
           });
         }
       }
@@ -1099,9 +996,10 @@ export class MessagesRepository {
     } catch (error) {
       logger.error("Error creating message", parseError(error));
       return fail({
-        message: t("post.errors.server.title"),
+        message: t("post.errors.server.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -1381,7 +1279,7 @@ export class MessagesRemoteRepository {
       // Brand-new mirror thread: surface it in open sidebars immediately —
       // thread-updated later delivers title + folder placement.
       const { createFolderContentsEmitter } =
-        await import("next-vibe/agent/chat/folder-contents/[rootFolderId]/emitter");
+        await import("../../../folder-contents/[rootFolderId]/emitter");
       const now = new Date();
       createFolderContentsEmitter(
         logger,

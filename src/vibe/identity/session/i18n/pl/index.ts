@@ -7,13 +7,18 @@ export const translations: typeof enTranslations = {
     },
   },
   errors: {
-    session_not_found: "Sesja nie znaleziona",
-    session_lookup_failed: "Wyszukiwanie sesji nie powiodło się",
+    session_not_found: "Nie znaleziono sesji dla tokenu {{token}}",
+    session_token_missing: "Brak tokenu sesji ({{reason}})",
+    session_lookup_failed: "Nie udało się pobrać sesji {{token}}: {{error}}",
+    current_session_failed: "Nie udało się odczytać bieżącej sesji: {{error}}",
     expired_sessions_delete_failed: "Usuwanie wygasłych sesji nie powiodło się",
-    session_creation_failed: "Tworzenie sesji nie powiodło się",
-    session_creation_database_error: "Błąd bazy danych podczas tworzenia sesji",
-    user_sessions_delete_failed: "Usuwanie sesji użytkownika nie powiodło się",
-    expired: "Sesja wygasła",
+    session_creation_failed:
+      "Nie udało się utworzyć sesji dla użytkownika {{userId}}",
+    session_creation_database_error:
+      "Błąd bazy danych przy tworzeniu sesji dla użytkownika {{userId}}: {{error}}",
+    user_sessions_delete_failed:
+      "Nie udało się usunąć sesji {{sessionId}}: {{error}}",
+    expired: "Sesja wygasła {{expiresAt}}",
   },
   post: {
     title: "Tytuł",

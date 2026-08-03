@@ -1,12 +1,12 @@
 import { styled } from "nativewind";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import React, { useEffect, useState } from "react";
 import { Appearance, useColorScheme, View } from "react-native";
 
 /** Mirrors the web constant - no cookie in React Native but exported for interface parity */
 export const THEME_COOKIE_NAME = "theme_v2";
 
-import { convertCSSToViewStyle } from "../../native/utils/style-converter";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 import type {
   ThemeProviderProps,
   UseThemeToggleReturn,

@@ -5,14 +5,13 @@
  */
 
 "use client";
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
-import instanceEndpoints from "next-vibe/remote-connection/[instanceId]/definition";
-import { scopedTranslation as connectScopedTranslation } from "next-vibe/remote-connection/connect/i18n";
-import type { SyncScope } from "next-vibe/remote-connection/db";
-import { SyncScopeSchema } from "next-vibe/remote-connection/db";
-import { useRemoteConnections } from "next-vibe/remote-connection/list/hooks";
-import type { SyncProviderInfo } from "next-vibe/remote-connection/sync/providers/definition";
-import syncProvidersDefinitions from "next-vibe/remote-connection/sync/providers/definition";
+import instanceEndpoints from "../../remote-connection/[instanceId]/definition";
+import { scopedTranslation as connectScopedTranslation } from "../../remote-connection/connect/i18n";
+import type { SyncScope } from "../../remote-connection/db";
+import { SyncScopeSchema } from "../../remote-connection/db";
+import { useRemoteConnections } from "../../remote-connection/list/hooks";
+import type { SyncProviderInfo } from "../../remote-connection/sync/providers/definition";
+import syncProvidersDefinitions from "../../remote-connection/sync/providers/definition";
 import { storage } from "next-vibe/ui/lib/storage";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -35,16 +34,16 @@ import {
 } from "next-vibe/ui/ui/select";
 import { Span } from "next-vibe/ui/ui/span";
 import { Switch } from "next-vibe/ui/ui/switch";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../unified-ui/_shared/cn";
 import {
   useWidgetContext,
   useWidgetLocale,
   useWidgetLogger,
   useWidgetTranslation,
   useWidgetUser,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
-import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
-import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
+} from "../../unified-ui/_shared/use-widget-context";
+import { useApiMutation } from "../../unified-ui/hooks/use-api-mutation";
+import { useEndpoint } from "../../unified-ui/hooks/use-endpoint";
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useState } from "react";
 
@@ -597,7 +596,6 @@ export function SettingsWizard({ data, onDone }: WizardProps): JSX.Element {
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
-  const availability = useProviderAvailability();
   const { endpointMutations } = useWidgetContext();
 
   const { wizardSteps, modules } = data;
@@ -624,9 +622,8 @@ export function SettingsWizard({ data, onDone }: WizardProps): JSX.Element {
         return;
       }
       try {
-        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
-        const generateKeyDef =
-          await import("next-vibe/env/settings/generate-key/definition");
+        const { apiClient } = await import("../../unified-ui/hooks/store");
+        const generateKeyDef = await import("./generate-key/definition");
         const result = await apiClient.fetch(
           generateKeyDef.default.GET,
           logger,
@@ -634,7 +631,6 @@ export function SettingsWizard({ data, onDone }: WizardProps): JSX.Element {
           undefined,
           undefined,
           locale,
-          availability,
         );
         if (result.success && result.data) {
           handleEdit(key, result.data.key);
@@ -643,7 +639,7 @@ export function SettingsWizard({ data, onDone }: WizardProps): JSX.Element {
         // ignore
       }
     },
-    [user, logger, locale, handleEdit, availability],
+    [user, logger, locale, handleEdit],
   );
 
   const saveCurrentStep = useCallback(async (): Promise<void> => {
@@ -663,7 +659,7 @@ export function SettingsWizard({ data, onDone }: WizardProps): JSX.Element {
 
     setSaving(true);
     try {
-      const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
+      const { apiClient } = await import("../../unified-ui/hooks/store");
       const endpointsDef = await import("./definition");
       await apiClient.mutate(
         endpointsDef.PATCH,
@@ -673,21 +669,12 @@ export function SettingsWizard({ data, onDone }: WizardProps): JSX.Element {
         toSave as any,
         undefined,
         locale,
-        availability,
       );
       endpointMutations?.read?.refetch?.();
     } finally {
       setSaving(false);
     }
-  }, [
-    activeWizardStep,
-    edits,
-    user,
-    logger,
-    locale,
-    availability,
-    endpointMutations,
-  ]);
+  }, [activeWizardStep, edits, user, logger, locale, endpointMutations]);
 
   const handleNext = useCallback(async (): Promise<void> => {
     await saveCurrentStep();

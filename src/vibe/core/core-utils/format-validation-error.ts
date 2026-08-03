@@ -1,10 +1,23 @@
 /**
- * Shared validation error parser and formatters
- * parseValidationError extracts structured data - each platform formats it.
+ * Shared validation error formatters.
+ *
+ * These take the Zod issues directly: `validateData` picks the variant that
+ * suits the calling platform and puts the finished text in `message`. Consumers
+ * downstream render that string as-is - none of them reconstruct anything.
+ *
+ * Both variants take `t` and return an already-translated message, so the copy
+ * ships in de/pl like everything else. Field names and Zod's own issue text are
+ * data, not copy, and stay verbatim.
  */
 
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { WidgetData } from "next-vibe/core/utils/json";
+import type { TranslatedKeyType } from "../i18n/core/scoped-translation";
+import type { scopedTranslation as sharedScopedTranslation } from "../i18n/shared";
+import type { CreateApiEndpointAny } from "../definition/endpoint-base";
+import type { WidgetData } from "../utils/json";
+import { CLI_BINARY_NAME } from "../../platforms/cli/types/cli-target";
+import type { ZodIssue } from "zod";
+
+type SharedT = ReturnType<typeof sharedScopedTranslation.scopedT>["t"];
 
 /**
  * Convert camelCase to kebab-case for CLI flags
@@ -33,27 +46,7 @@ function serializeFlag(key: string, value: WidgetData): string {
 }
 
 /**
- * Parse a comma-joined validation error string into field/message pairs
- * Input: "name: msg, email: msg2"
- */
-function parseFieldErrors(
-  errorStr: string,
-): Array<{ field: string; message: string }> {
-  const parts = errorStr.split(/,\s*(?=\w[\w.]*:\s)/);
-  return parts.map((part) => {
-    const colonIdx = part.indexOf(":");
-    if (colonIdx === -1) {
-      return { field: "", message: part.trim() };
-    }
-    return {
-      field: part.slice(0, colonIdx).trim(),
-      message: part.slice(colonIdx + 1).trim(),
-    };
-  });
-}
-
-/**
- * Structured data extracted from a validation error response.
+ * Structured data extracted from a validation failure.
  * Each platform uses this to build its own formatted message.
  */
 interface ValidationErrorData {
@@ -70,31 +63,27 @@ interface ValidationErrorData {
 }
 
 /**
- * Extract structured validation error data from messageParams.
- * Returns null if messageParams don't match the validation error shape.
+ * Build formatter input straight from the Zod issues.
+ *
+ * Field and message come off `issue.path` / `issue.message`. The previous design
+ * joined these into a single string, smuggled it through the i18n params
+ * channel, then regex-split it back apart here - a round trip that destroyed the
+ * structure it then had to guess at. The issues are the source of truth, so they
+ * are what the formatters take.
  */
-function parseValidationError(
-  messageParams: Record<string, string | number> | undefined,
+function buildValidationData(
+  issues: ZodIssue[],
   endpoint?: CreateApiEndpointAny | null,
   inputData?: Record<string, WidgetData>,
-): ValidationErrorData | null {
-  if (
-    !messageParams ||
-    !("error" in messageParams) ||
-    !("errorCount" in messageParams)
-  ) {
-    return null;
-  }
-
-  const rawErrors = String(messageParams.error);
-  const count = Number(messageParams.errorCount);
-  const parsed = parseFieldErrors(rawErrors);
-
-  const fields = parsed.map(({ field, message }) => ({
-    field,
-    flagName: field ? camelToKebab(field) : "",
-    message,
-  }));
+): ValidationErrorData {
+  const fields = issues.map((issue) => {
+    const field = issue.path.join(".");
+    return {
+      field,
+      flagName: field ? camelToKebab(field) : "",
+      message: issue.message,
+    };
+  });
 
   const alias = endpoint
     ? endpoint.aliases && endpoint.aliases.length > 0
@@ -111,7 +100,7 @@ function parseValidationError(
       : {};
 
   return {
-    count,
+    count: issues.length,
     fields,
     alias,
     exampleValues,
@@ -120,44 +109,36 @@ function parseValidationError(
 }
 
 /**
- * Format validation error for CLI output.
+ * Format validation errors for CLI output.
  * Bullets per field + vibe example command + --interactive hint + vibe help.
  */
 export function formatValidationErrorDetails(
-  messageParams: Record<string, string | number> | undefined,
+  t: SharedT,
+  issues: ZodIssue[],
   endpoint: CreateApiEndpointAny | null | undefined,
   /** Already-provided input values - used to pre-fill the --interactive hint */
   inputData?: Record<string, WidgetData> | undefined,
-): string | null {
-  const data = parseValidationError(messageParams, endpoint, inputData);
-  if (!data) {
-    return null;
-  }
+): TranslatedKeyType {
+  const {
+    count,
+    fields,
+    alias,
+    exampleValues,
+    inputData: input,
+  } = buildValidationData(issues, endpoint, inputData);
 
-  const { count, fields, alias, exampleValues, inputData: input } = data;
+  const header = t("validation.missingFields", { count });
+  const fieldLines = formatFieldLines(fields, true);
 
-  // eslint-disable-next-line i18next/no-literal-string
-  let out = `Missing required fields (${count}):`;
-  for (const { flagName, field, message } of fields) {
-    if (field) {
-      // eslint-disable-next-line i18next/no-literal-string
-      out += `\n  • --${flagName}: ${message}`;
-    } else {
-      // eslint-disable-next-line i18next/no-literal-string
-      out += `\n  • ${message}`;
-    }
-  }
-
+  let hints = "";
   if (alias) {
     const merged = { ...exampleValues, ...input };
-
-    if (Object.keys(merged).length > 0) {
-      const flags = Object.entries(merged)
-        .map(([k, v]) => serializeFlag(k, v))
-        .join(" ");
-      // eslint-disable-next-line i18next/no-literal-string
-      out += `\n\nExample:\n  vibe ${alias} ${flags}`;
-    }
+    const exampleFlags =
+      Object.keys(merged).length > 0
+        ? Object.entries(merged)
+            .map(([k, v]) => serializeFlag(k, v))
+            .join(" ")
+        : "";
 
     const existingFlags =
       Object.keys(input).length > 0
@@ -167,42 +148,58 @@ export function formatValidationErrorDetails(
             .join(" ")} `
         : "";
 
-    // eslint-disable-next-line i18next/no-literal-string
-    out += `\n\nOr run interactively:\n  vibe ${alias} ${existingFlags}--interactive`;
-
-    // eslint-disable-next-line i18next/no-literal-string
-    out += `\n\nMore info:\n  vibe help ${alias}`;
+    hints = t("validation.cliHints", {
+      example: `${CLI_BINARY_NAME} ${alias} ${exampleFlags}`.trimEnd(),
+      interactive: `${CLI_BINARY_NAME} ${alias} ${existingFlags}--interactive`,
+      help: `${CLI_BINARY_NAME} help ${alias}`,
+    });
   }
 
+  return t("validation.report", { header, fields: fieldLines, hints });
+}
+
+/**
+ * Bullet list of per-field issues. Deliberately not translated: every token is
+ * either a field/flag name or Zod's own message, so there is no copy to render.
+ */
+function formatFieldLines(
+  fields: ValidationErrorData["fields"],
+  asFlag: boolean,
+): string {
+  let out = "";
+  for (const { flagName, field, message } of fields) {
+    if (field) {
+      out += asFlag
+        ? `\n  • --${flagName}: ${message}`
+        : `\n  • ${field}: ${message}`;
+    } else {
+      out += `\n  • ${message}`;
+    }
+  }
   return out;
 }
 
 /**
- * Format validation error for API/MCP/AI output.
+ * Format validation errors for API/MCP/AI output.
  * Compact field list only - no vibe CLI hints.
  */
 export function formatValidationErrorCompact(
-  messageParams: Record<string, string | number> | undefined,
+  t: SharedT,
+  issues: ZodIssue[],
   endpoint?: CreateApiEndpointAny | null,
-): string | null {
-  const data = parseValidationError(messageParams, endpoint);
-  if (!data) {
-    return null;
-  }
+): TranslatedKeyType {
+  const { count, fields } = buildValidationData(issues, endpoint);
 
-  const { count, fields } = data;
+  // Two explicit keys rather than a count placeholder: plural agreement differs
+  // per language and the scoped translator has no plural rules.
+  const header =
+    count === 1
+      ? t("validation.failedOne")
+      : t("validation.failedMany", { count });
 
-  // eslint-disable-next-line i18next/no-literal-string
-  let out = `Validation failed (${count} error${count === 1 ? "" : "s"}):`;
-  for (const { field, message } of fields) {
-    if (field) {
-      // eslint-disable-next-line i18next/no-literal-string
-      out += `\n  • ${field}: ${message}`;
-    } else {
-      // eslint-disable-next-line i18next/no-literal-string
-      out += `\n  • ${message}`;
-    }
-  }
-
-  return out;
+  return t("validation.report", {
+    header,
+    fields: formatFieldLines(fields, false),
+    hints: "",
+  });
 }

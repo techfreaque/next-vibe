@@ -4,19 +4,23 @@ import { mkdirSync, readFileSync } from "node:fs";
 import { hostname } from "node:os";
 import { join } from "node:path";
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
-import { isPglite } from "next-vibe/database/index";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { RemoteConnectionRepository } from "next-vibe/remote-connection/repository";
-import { scopedTranslation } from "next-vibe/server/server/headless-client/i18n";
+} from "../../../core/route/response.schema";
+import { coreEnv } from "../../../core/env";
+import { parseError } from "../../../core/utils/parse-error";
+import { db } from "../../../database";
+import { isPglite } from "../../../database/index";
+import { identityEnv } from "../../../identity/env";
+import type { JwtPayloadType } from "../../../identity/auth/types";
+import type { EndpointLogger } from "../../../logger/types";
+import { Environment } from "../../../env/env-util";
+import { RemoteConnectionRepository } from "../../../remote-connection/repository";
+import { serverSystemEnv } from "../env";
+import { scopedTranslation } from "./i18n";
 
 import type {
   HeadlessClientRequestOutput,
@@ -40,10 +44,10 @@ export class HeadlessClientRepository {
     // Resolve computer name: explicit CLI arg → env override → dev fixed name → OS hostname
     // In development, default to "headless-client" so all dev machines share a stable ID.
     // In production, fall back to the OS hostname so each machine is distinct.
-    const isDev = process.env["NODE_ENV"] !== "production";
+    const isDev = coreEnv.NODE_ENV !== Environment.PRODUCTION;
     const computerName =
       request.computerName ??
-      process.env["VIBE_COMPUTER_NAME"] ??
+      serverSystemEnv.VIBE_COMPUTER_NAME ??
       (isDev ? "headless-client" : (hostname().split(".")[0] ?? "headless"));
 
     // Ensure .tmp exists for pid/log files and activate file logging
@@ -79,8 +83,8 @@ export class HeadlessClientRepository {
     try {
       const [{ openConnection }, { remoteConnections }, { eq, and }] =
         await Promise.all([
-          import("next-vibe/realtime/connector"),
-          import("next-vibe/remote-connection/db"),
+          import("../../../realtime/server/connector"),
+          import("../../../remote-connection/db"),
           import("drizzle-orm"),
         ]);
 
@@ -92,8 +96,8 @@ export class HeadlessClientRepository {
         rawUserId && rawUserId !== CLI_BYPASS_ID ? rawUserId : undefined;
       if (!userId) {
         const { AuthRepository } =
-          await import("next-vibe/identity/auth/repository");
-        const adminEmail = process.env["VIBE_ADMIN_USER_EMAIL"] ?? "";
+          await import("../../../identity/auth/repository");
+        const adminEmail = identityEnv.VIBE_ADMIN_USER_EMAIL;
         const adminAuth = await AuthRepository.authenticateUserByEmail(
           adminEmail,
           locale,
@@ -207,7 +211,7 @@ export class HeadlessClientRepository {
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<string | null> {
-    const { pgliteClient: client } = await import("next-vibe/database");
+    const { pgliteClient: client } = await import("../../../database");
     if (!client) {
       return "pgliteClient is null — not running in PGlite mode";
     }
@@ -257,7 +261,7 @@ export class HeadlessClientRepository {
 
       // Seed production data (admin user + roles) so the task runner can authenticate.
       const { seedDatabase } =
-        await import("next-vibe/database/seed/seed-manager");
+        await import("../../../database/seed/seed-manager");
       await seedDatabase("prod", logger, locale);
       logger.info("[HeadlessClient] Production seed complete");
       return null;
@@ -273,7 +277,7 @@ export class HeadlessClientRepository {
   ): Promise<void> {
     try {
       const { UnifiedTaskRunnerRepository } =
-        await import("next-vibe/tasks/unified-runner/repository");
+        await import("../../../tasks/unified-runner/repository");
 
       UnifiedTaskRunnerRepository.environment = "production";
 

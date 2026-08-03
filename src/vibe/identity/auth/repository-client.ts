@@ -14,16 +14,16 @@
  * All methods return ResponseType<T> for consistent error handling
  */
 
-import { platform } from "next-vibe/core/env-client";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { platform } from "../../core/env-client";
+import type { ResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { AuthT } from "next-vibe/identity/auth/i18n";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../core/route/response.schema";
+import { parseError } from "../../core/utils/parse-error";
+import type { AuthT } from "./i18n";
+import type { EndpointLogger } from "../../logger/types";
 import { storage } from "next-vibe/ui/lib/storage";
 
 // Storage key for auth token
@@ -33,44 +33,6 @@ const AUTH_TOKEN_STORAGE_KEY = "auth_token";
  * Auth Client Repository Implementation
  */
 export class AuthClientRepository {
-  /**
-   * Stores the JWT token using platform-agnostic storage
-   * For web, uses localStorage (tokens can also be in httpOnly cookies)
-   * For React Native, uses AsyncStorage automatically via next-vibe-ui
-   */
-  static async setAuthToken(
-    token: string,
-    logger: EndpointLogger,
-    t: AuthT,
-  ): Promise<ResponseType<void>> {
-    try {
-      if (platform.isServer) {
-        logger.error("setAuthToken cannot be called on the server");
-
-        return fail({
-          message: t("authClient.errors.token_save_failed"),
-          errorType: ErrorResponseTypes.AUTH_ERROR,
-        });
-      }
-
-      // Use platform-agnostic storage (localStorage for web, AsyncStorage for React Native)
-      await storage.setItem(AUTH_TOKEN_STORAGE_KEY, token);
-      logger.debug("Auth token stored successfully", {
-        platform: platform.isReactNative ? "React Native" : "Web",
-      });
-
-      return success();
-    } catch (error) {
-      logger.error("Error setting auth token", parseError(error));
-
-      return fail({
-        message: t("authClient.errors.token_save_failed"),
-        errorType: ErrorResponseTypes.AUTH_ERROR,
-        messageParams: { error: String(error) },
-      });
-    }
-  }
-
   /**
    * Retrieves the stored JWT token using platform-agnostic storage
    * For web, retrieves from localStorage
@@ -102,9 +64,10 @@ export class AuthClientRepository {
       logger.error("Error getting auth token", parseError(error));
 
       return fail({
-        message: t("authClient.errors.token_get_failed"),
+        message: t("authClient.errors.token_get_failed_detail", {
+          error: String(error),
+        }),
         errorType: ErrorResponseTypes.AUTH_ERROR,
-        messageParams: { error: String(error) },
       });
     }
   }
@@ -139,9 +102,10 @@ export class AuthClientRepository {
       logger.error("Error removing auth token", parseError(error));
 
       return fail({
-        message: t("authClient.errors.token_remove_failed"),
+        message: t("authClient.errors.token_remove_failed_detail", {
+          error: String(error),
+        }),
         errorType: ErrorResponseTypes.AUTH_ERROR,
-        messageParams: { error: String(error) },
       });
     }
   }

@@ -4,15 +4,16 @@ import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { ResponseType } from "../../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { InfraT } from "next-vibe/tooling/infra/i18n";
+} from "../../../../core/route/response.schema";
+import { parseError } from "../../../../core/utils/parse-error";
+import type { EndpointLogger } from "../../../../logger/types";
+import { infraEnv } from "../../env";
+import type { InfraT } from "../../i18n";
 
 import { getSrcDir } from "@/env/paths";
 
@@ -31,7 +32,7 @@ export class DeployPreviewRepository {
 
     try {
       const pulumiBin =
-        process.env["PULUMI_BIN"] ??
+        infraEnv.PULUMI_BIN ??
         `${process.env["HOME"] ?? "/root"}/.pulumi/bin/pulumi`;
 
       if (!existsSync(pulumiBin)) {
@@ -58,7 +59,7 @@ export class DeployPreviewRepository {
       const env: NodeJS.ProcessEnv = {
         ...process.env,
         PULUMI_BACKEND_URL: `file://${statePath}`,
-        PULUMI_CONFIG_PASSPHRASE: process.env["PULUMI_PASSPHRASE"] ?? "",
+        PULUMI_CONFIG_PASSPHRASE: infraEnv.PULUMI_PASSPHRASE ?? "",
       };
 
       const result = spawnSync(pulumiBin, args, {

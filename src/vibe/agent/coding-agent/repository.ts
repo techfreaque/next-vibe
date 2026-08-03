@@ -22,8 +22,8 @@ import { execSync, spawn } from "node:child_process";
 import { once } from "node:events";
 
 import { eq } from "drizzle-orm";
-import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
-import { chatSettings } from "next-vibe/agent/chat/settings/db";
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
+import { chatSettings } from "../chat/settings/db";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -238,8 +238,9 @@ async function runBatch(
       errOutput: errOutput.slice(0, 200),
     });
     return fail({
-      message: t("codingAgent.run.post.errors.internalExitCode.title"),
-      messageParams: { exitCode: String(exitCode) },
+      message: t("codingAgent.run.post.errors.internalExitCode.title", {
+        exitCode: String(exitCode),
+      }),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }

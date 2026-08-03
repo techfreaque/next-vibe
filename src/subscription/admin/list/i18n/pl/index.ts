@@ -87,6 +87,7 @@ export const translations: typeof enTranslations = {
       server: {
         title: "Błąd serwera",
         description: "Nie udało się pobrać subskrypcji",
+        detail: "Nie udało się pobrać listy subskrypcji: {{error}}",
       },
       unknown: {
         title: "Nieznany błąd",

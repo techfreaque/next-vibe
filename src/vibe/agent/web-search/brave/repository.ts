@@ -5,8 +5,8 @@
 
 import "server-only";
 
-import { agentEnv } from "next-vibe/agent/env";
-import { PROVIDER_SETUP_INSTRUCTIONS } from "next-vibe/agent/env-availability";
+import { agentEnv } from "../../env";
+import { PROVIDER_SETUP_INSTRUCTIONS } from "../../env-availability";
 import {
   ErrorResponseTypes,
   fail,
@@ -16,7 +16,7 @@ import {
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { ToolExecutionContext } from "../../chat/config";
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 import type { BraveSearchGetResponseOutput } from "./definition";
 import type { BraveT } from "./i18n";
 
@@ -102,9 +102,10 @@ export class BraveSearchRepository {
 
     if (query.length > this.MAX_QUERY_LENGTH) {
       return fail({
-        message: t("get.errors.queryTooLong.title"),
+        message: t("get.errors.queryTooLong.title", {
+          maxLength: this.MAX_QUERY_LENGTH,
+        }),
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
-        messageParams: { maxLength: this.MAX_QUERY_LENGTH },
       });
     }
 
@@ -136,8 +137,8 @@ export class BraveSearchRepository {
         .replaceAll(/^-|-$/g, "")
         .slice(0, 60)}-${toolMessageId}`;
       void Promise.all([
-        import("next-vibe/agent/cortex/mounts/searches"),
-        import("next-vibe/agent/cortex/embeddings/sync-virtual"),
+        import("../../cortex/mounts/searches"),
+        import("../../cortex/embeddings/sync-virtual"),
       ])
         .then(([{ readSearchPath }, { syncVirtualNodeToEmbedding }]) => {
           const path = `/searches/${month}/${slug}.md`;
@@ -192,7 +193,7 @@ export class BraveSearchRepository {
     }, this.TIMEOUT);
 
     try {
-      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+      // oxlint-disable-next-line restricted/no-raw-fetch
       const response = await fetch(url, {
         method: "GET",
         headers: {

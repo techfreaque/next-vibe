@@ -132,9 +132,10 @@ export class ReferralRepository {
     } catch (error) {
       logger.error("Failed to create referral code", parseError(error));
       return fail({
-        message: t("errors.serverError.title"),
+        message: t("errors.serverError.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -211,9 +212,10 @@ export class ReferralRepository {
     } catch (error) {
       logger.error("Failed to get referral codes", parseError(error));
       return fail({
-        message: t("errors.serverError.title"),
+        message: t("errors.serverError.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -260,9 +262,10 @@ export class ReferralRepository {
       logger.error("Failed to validate referral code", parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.serverError.title"),
+        message: t("errors.serverError.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -327,9 +330,10 @@ export class ReferralRepository {
       logger.error("Failed to link referral to lead", parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.serverError.title"),
+        message: t("errors.serverError.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -367,9 +371,10 @@ export class ReferralRepository {
       logger.error("Failed to get latest referral code", parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.serverError.title"),
+        message: t("errors.serverError.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -415,9 +420,10 @@ export class ReferralRepository {
       );
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.serverError.title"),
+        message: t("errors.serverError.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -534,9 +540,10 @@ export class ReferralRepository {
       logger.error("Failed to convert lead referral", parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.serverError.title"),
+        message: t("errors.serverError.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -631,9 +638,10 @@ export class ReferralRepository {
     } catch (error) {
       logger.error("Failed to get referral stats", parseError(error));
       return fail({
-        message: t("errors.serverError.title"),
+        message: t("errors.serverError.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -681,9 +689,10 @@ export class ReferralRepository {
     } catch (error) {
       logger.error("Failed to get referral earnings", parseError(error));
       return fail({
-        message: t("errors.serverError.title"),
+        message: t("errors.serverError.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -775,9 +784,10 @@ export class ReferralRepository {
       logger.error("Failed to apply referral payout", parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.serverError.title"),
+        message: t("errors.serverError.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }

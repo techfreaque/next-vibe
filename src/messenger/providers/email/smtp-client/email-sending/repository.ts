@@ -104,12 +104,11 @@ export class EmailSendingRepository {
       if (!localeMapping) {
         logger.error("Invalid locale format", { locale: params.locale });
         return fail({
-          message: t("emailSending.email.errors.sending_failed"),
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: {
+          message: t("emailSending.email.errors.invalid_locale", {
             recipient: params.toEmail,
-            error: `Invalid locale format: ${params.locale}`,
-          },
+            locale: params.locale,
+          }),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
 
@@ -152,10 +151,11 @@ export class EmailSendingRepository {
           subject: params.subject,
           error: emailResponse.message,
         });
+        // The inner failure now carries its own detail in the message text, so
+        // forwarding it verbatim keeps everything the params used to add.
         return fail({
           message: emailResponse.message,
           errorType: emailResponse.errorType ?? ErrorResponseTypes.EMAIL_ERROR,
-          messageParams: emailResponse.messageParams,
           cause: emailResponse,
         });
       }
@@ -183,12 +183,11 @@ export class EmailSendingRepository {
         subject: params.subject,
       });
       return fail({
-        message: t("emailSending.email.errors.sending_failed"),
-        errorType: ErrorResponseTypes.EMAIL_ERROR,
-        messageParams: {
+        message: t("emailSending.email.errors.sending_failed", {
           recipient: params.toEmail,
           error: parseError(error).message,
-        },
+        }),
+        errorType: ErrorResponseTypes.EMAIL_ERROR,
       });
     }
   }

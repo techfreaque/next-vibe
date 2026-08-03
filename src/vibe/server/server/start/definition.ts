@@ -3,23 +3,23 @@
  * Production-ready endpoint for starting the production server
  */
 
-import { translatedValueSchema } from "next-vibe/core/definition/common.schema";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { translatedValueSchema } from "../../../core/definition/common.schema";
+import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { VibeMode, VibeModeValues } from "next-vibe/env/env-util";
-import { UserRole } from "next-vibe/identity/roles/enum";
-import { scopedTranslation } from "next-vibe/server/server/start/i18n";
+} from "../../../core/definition/enums";
+import { VibeMode, VibeModeValues } from "../../../env/env-util";
+import { UserRole } from "../../../identity/roles/enum";
+import { scopedTranslation } from "./i18n";
 import {
   objectField,
   requestField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../../unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { ServerFramework, ServerFrameworkOptions } from "../enum";

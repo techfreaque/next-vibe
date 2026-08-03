@@ -1,7 +1,7 @@
-import { DEFAULT_CHAT_MODEL_ID } from "next-vibe/agent/ai-stream/constants";
-import { ChatModelId } from "next-vibe/agent/ai-stream/models";
-import { FETCH_URL_SHORT_ALIAS } from "next-vibe/agent/fetch-url-content/constants";
-import { WEB_SEARCH_ALIAS } from "next-vibe/agent/web-search/constants";
+import { DEFAULT_CHAT_MODEL_ID } from "../../../ai-stream/constants";
+import { ChatModelId } from "../../../ai-stream/models";
+import { FETCH_URL_SHORT_ALIAS } from "../../../fetch-url-content/constants";
+import { WEB_SEARCH_ALIAS } from "../../../web-search/constants";
 import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 

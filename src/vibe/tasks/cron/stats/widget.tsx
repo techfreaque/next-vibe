@@ -4,7 +4,7 @@
  */
 
 "use client";
-import { scopedTranslation as tasksScopedTranslation } from "next-vibe/tasks/i18n";
+import { scopedTranslation as tasksScopedTranslation } from "../../i18n";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { Activity } from "next-vibe/ui/ui/icons/Activity";
@@ -19,15 +19,15 @@ import { TrendingDown } from "next-vibe/ui/ui/icons/TrendingDown";
 import { TrendingUp } from "next-vibe/ui/ui/icons/TrendingUp";
 import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
 import { Span } from "next-vibe/ui/ui/span";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import {
   useWidgetContext,
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
+} from "../../../unified-ui/_shared/use-widget-context";
+import { NavigateButtonWidget } from "../../../unified-ui/widgets/interactive/navigate-button/widget";
 import React, { useCallback, useMemo } from "react";
 
 import type statsEndpoints from "./definition";
@@ -65,7 +65,7 @@ import {
   type CronTaskPriorityValue,
   CronTaskStatus,
   type CronTaskStatusValue,
-} from "next-vibe/tasks/enum";
+} from "../../enum";
 
 // ─── Priority color map ────────────────────────────────────────────────────────
 // Keyed on enum values (i18n key strings), not plain short strings
@@ -597,21 +597,21 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
 
   const handleViewTasks = useCallback((): void => {
     void (async (): Promise<void> => {
-      const m = await import("next-vibe/tasks/cron/tasks/definition");
+      const m = await import("../tasks/definition");
       navigate(m.default.GET, {});
     })();
   }, [navigate]);
 
   const handleViewHistory = useCallback((): void => {
     void (async (): Promise<void> => {
-      const m = await import("next-vibe/tasks/cron/history/definition");
+      const m = await import("../history/definition");
       navigate(m.default.GET, {});
     })();
   }, [navigate]);
 
   const handleViewPulse = useCallback((): void => {
     void (async (): Promise<void> => {
-      const m = await import("next-vibe/tasks/pulse/history/definition");
+      const m = await import("../../pulse/history/definition");
       navigate(m.default.GET, {});
     })();
   }, [navigate]);

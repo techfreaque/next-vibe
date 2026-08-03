@@ -13,7 +13,7 @@
  */
 
 import { jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
-import type { WidgetData } from "next-vibe/core/utils/json";
+import type { WidgetData } from "../core/utils/json";
 
 export const pendingCallResults = pgTable("pending_call_results", {
   /** The requester's callId — one durable result per call. */

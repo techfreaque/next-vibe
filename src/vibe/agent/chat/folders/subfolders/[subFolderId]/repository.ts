@@ -1,8 +1,8 @@
 import "server-only";
 
 import { eq, inArray } from "drizzle-orm";
-import { chatFolders, chatThreads } from "next-vibe/agent/chat/db";
-import { canManageFolder } from "next-vibe/agent/chat/permissions/permissions";
+import { chatFolders, chatThreads } from "../../../db";
+import { canManageFolder } from "../../../permissions/permissions";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -278,11 +278,11 @@ export class FolderRepository {
       logger.info("Folder deleted", { folderId: data.id });
 
       const { createEndpointEmitter } =
-        await import("next-vibe/realtime/emitter");
+        await import("next-vibe/realtime/core/emitter");
       const { default: folderContentsDefinitions } =
-        await import("next-vibe/agent/chat/folder-contents/[rootFolderId]/definition");
+        await import("../../../folder-contents/[rootFolderId]/definition");
       const { FolderContentsRepository } =
-        await import("next-vibe/agent/chat/folder-contents/[rootFolderId]/repository");
+        await import("../../../folder-contents/[rootFolderId]/repository");
       const rootFolderKind = FolderContentsRepository.emitChannelForFolder(
         folder.rootFolderId,
       ).kind;
@@ -310,9 +310,9 @@ export class FolderRepository {
       // root cache) and kick off cortex cleanup for each deleted thread.
       if (affectedThreads.length > 0) {
         const { default: threadsByIdDefinitions } =
-          await import("next-vibe/agent/chat/threads/[threadId]/definition");
+          await import("../../../threads/[threadId]/definition");
         const { removeVirtualNodesByEntityId } =
-          await import("next-vibe/agent/cortex/embeddings/sync-virtual");
+          await import("../../../../cortex/embeddings/sync-virtual");
         for (const thread of affectedThreads) {
           if (thread.rootFolderId) {
             createEndpointEmitter(threadsByIdDefinitions.DELETE, logger, user, {

@@ -11,18 +11,18 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
-import type { InferSchemaFromField } from "next-vibe/core/definition/endpoint";
-import type { FieldUsage } from "next-vibe/core/definition/enums";
+import { createEndpoint } from "../definition/create-i18n";
+import type { InferSchemaFromField } from "../definition/endpoint";
+import type { FieldUsage } from "../definition/enums";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { UserRole } from "next-vibe/identity/roles/enum";
-import { objectField, requestField, responseArrayField, responseField } from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../definition/enums";
+import { UserRole } from "../../identity/roles/enum";
+import { objectField, requestField, responseArrayField, responseField } from "../../unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 // Helper type to test if two types are exactly equal

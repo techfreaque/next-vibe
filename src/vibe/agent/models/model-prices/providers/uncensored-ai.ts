@@ -35,7 +35,7 @@ export class UncensoredAiPriceFetcher extends PriceFetcher {
 
     try {
       // Fetch the HTML page to find the JS bundle URL
-      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+      // oxlint-disable-next-line restricted/no-raw-fetch
       const pageResponse = await fetch(API_PAGE_URL, {
         headers: {
           "User-Agent":
@@ -71,7 +71,7 @@ export class UncensoredAiPriceFetcher extends PriceFetcher {
       }
 
       const bundleUrl = `https://uncensored.ai${bundleMatch[1]}`;
-      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+      // oxlint-disable-next-line restricted/no-raw-fetch
       const bundleResponse = await fetch(bundleUrl, {
         headers: { "User-Agent": "Mozilla/5.0 (compatible)" },
       });

@@ -19,6 +19,7 @@ import {
   MessengerAccountStatus,
   MessengerProvider,
 } from "@/messenger/accounts/enum";
+import { messengerEnv } from "@/messenger/env";
 import { EmailSecurityType } from "@/messenger/providers/email/enum";
 
 import { leadMagnetConfigs } from "./db";
@@ -30,14 +31,12 @@ const SMTP_ACCOUNT_NAME = "[DEV] Platform Email (SMTP)";
 export async function dev(logger: EndpointLogger): Promise<void> {
   try {
     // 1. Seed the SMTP messenger account using env credentials
-    const smtpHost = process.env.EMAIL_HOST;
-    const smtpUser = process.env.EMAIL_USER;
-    const smtpPass = process.env.EMAIL_PASS;
-    const smtpFromEmail = process.env.EMAIL_FROM_EMAIL;
-    const smtpFromName = process.env.EMAIL_FROM_NAME;
-    const smtpPort = process.env.EMAIL_PORT
-      ? Number(process.env.EMAIL_PORT)
-      : 587;
+    const smtpHost = messengerEnv.EMAIL_HOST;
+    const smtpUser = messengerEnv.EMAIL_USER;
+    const smtpPass = messengerEnv.EMAIL_PASS;
+    const smtpFromEmail = messengerEnv.EMAIL_FROM_EMAIL;
+    const smtpFromName = messengerEnv.EMAIL_FROM_NAME;
+    const smtpPort = messengerEnv.EMAIL_PORT ?? 587;
 
     if (!smtpHost || !smtpUser || !smtpPass || !smtpFromEmail) {
       logger.warn(

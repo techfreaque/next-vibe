@@ -7,29 +7,26 @@
 
 import "server-only";
 
-import { makeHeadlessContext } from "next-vibe/agent/chat/config";
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import type { GraphNodeConfig } from "next-vibe/dataflow/graph/schema";
-import type { GraphEdge } from "next-vibe/dataflow/graph/types";
+import { makeHeadlessContext } from "next-vibe/core/execution-context";
+import { defaultLocale } from "../../core/i18n/core/config";
+import type { WidgetData } from "../../core/utils/json";
+import type { GraphNodeConfig } from "../graph/schema";
+import type { GraphEdge } from "../graph/types";
 import {
   type DataPoint,
   DataPointSchema,
   type Resolution,
   type SignalEvent,
   type TimeRange,
-} from "next-vibe/dataflow/shared/fields";
-import { needsScaleUp, scaleUpSeries } from "next-vibe/dataflow/shared/range";
-import {
-  readDatapoints,
-  writeDatapoints,
-} from "next-vibe/dataflow/store/datapoints";
-import { writeSignals } from "next-vibe/dataflow/store/signals";
-import { RouteExecutionExecutor } from "next-vibe/execute-tool/repository/core";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import type { createEndpointLogger } from "next-vibe/logger/server";
-import { Platform } from "next-vibe/platforms/platforms";
+} from "../shared/fields";
+import { needsScaleUp, scaleUpSeries } from "../shared/range";
+import { readDatapoints, writeDatapoints } from "../store/datapoints";
+import { writeSignals } from "../store/signals";
+import { RouteExecutionExecutor } from "../../execute-tool/repository/core";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import { UserPermissionRole } from "../../identity/roles/enum";
+import type { createEndpointLogger } from "../../logger/server";
+import { Platform } from "../../platforms/platforms";
 
 import { GraphResolution } from "../enum";
 
@@ -363,9 +360,6 @@ async function callEndpoint(
       "errorType" in result && result.errorType
         ? result.errorType.errorCode
         : undefined,
-    errorDetail: result.messageParams
-      ? JSON.stringify(result.messageParams)
-      : undefined,
     nodeId,
     inputKeys: Object.keys(data).join(", "),
     inputSample: JSON.stringify(data).slice(0, 500),

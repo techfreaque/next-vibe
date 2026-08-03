@@ -1,7 +1,7 @@
 "use client";
 
 import { styled } from "nativewind";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import {
   Pressable,
@@ -11,10 +11,7 @@ import {
   View,
 } from "react-native";
 
-import {
-  convertCSSToViewStyle,
-  styledNative,
-} from "../../native/utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 // Import all cross-platform type definitions from web (source of truth)
 import type {
   CommandDialogProps,

@@ -6,7 +6,7 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-import { chatSettings } from "next-vibe/agent/chat/settings/db";
+import { chatSettings } from "../chat/settings/db";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -18,7 +18,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { ToolExecutionContext } from "../chat/config";
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 import type { WebSearchGetRequestOutput } from "./definition";
 import { SearchProvider, type SearchProviderValue } from "./enum";
 import type { WebSearchT } from "./i18n";
@@ -84,9 +84,10 @@ export class WebSearchRepository {
 
     if (data.query.length > this.MAX_QUERY_LENGTH) {
       return fail({
-        message: t("get.errors.queryTooLong.title"),
+        message: t("get.errors.queryTooLong.title", {
+          maxLength: this.MAX_QUERY_LENGTH,
+        }),
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
-        messageParams: { maxLength: this.MAX_QUERY_LENGTH },
       });
     }
 

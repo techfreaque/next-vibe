@@ -64,8 +64,13 @@ export const translations: typeof enTranslations = {
         description: "Nie możesz tego edytować",
       },
       notFound: { title: "Nie znaleziono", description: "Plik nie istnieje" },
-      findNotFound: "Tekst nie znaleziony: {{details}}",
-      invalidParams: "Nieprawidłowe parametry: {{details}}",
+      findNotFound:
+        'Nie znaleziono tekstu: "{{snippet}}" w {{path}}. Odczytaj plik przez cortex-read i spróbuj ponownie z dokładnym tekstem.',
+      lineRangeOutOfBounds:
+        "Zakres linii {{startLine}}-{{endLine}} wykracza poza plik. Plik ma {{lineCount}} linii.",
+      missingEditStrategy:
+        "Podaj find + replace albo startLine + endLine + newContent. Otrzymano: {{provided}}.",
+      noParamsProvided: "nic",
       server: { title: "Błąd serwera", description: "Coś poszło nie tak" },
       unknown: { title: "Błąd", description: "Coś poszło nie tak" },
       unsavedChanges: {

@@ -15,12 +15,12 @@
 import "server-only";
 
 import { and, eq, isNull, like, or } from "drizzle-orm";
-import { DEFAULT_CHAT_MODEL_SELECTION } from "next-vibe/agent/ai-stream/constants";
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
-import { chatThreads } from "next-vibe/agent/chat/db";
-import { ThreadStatus } from "next-vibe/agent/chat/enum";
-import { customSkills } from "next-vibe/agent/skills/db";
-import { SkillCategory, SkillOwnershipType } from "next-vibe/agent/skills/enum";
+import { DEFAULT_CHAT_MODEL_SELECTION } from "../../ai-stream/constants";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
+import { chatThreads } from "../../chat/db";
+import { ThreadStatus } from "../../chat/enum";
+import { customSkills } from "../../skills/db";
+import { SkillCategory, SkillOwnershipType } from "../../skills/enum";
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
@@ -32,7 +32,7 @@ import { cortexNodes } from "../db";
 import { embedNodeNow } from "../embeddings/auto-embed";
 import { upsertVirtualNode } from "../embeddings/sync-virtual";
 import { CortexNodeType } from "../enum";
-import searchEndpoint from "../search/definition";
+import searchEndpoint from "./definition";
 import writeEndpoint from "../write/definition";
 
 const TEST_PREFIX = "/documents/search-test";

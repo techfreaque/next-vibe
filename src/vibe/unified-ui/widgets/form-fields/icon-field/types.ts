@@ -7,10 +7,10 @@ import type {
   IconSchemaNullishType,
   IconSchemaOptionalType,
   IconSchemaType,
-} from "next-vibe/core/definition/common.schema";
-import type { FieldDataType } from "next-vibe/core/definition/enums";
-import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
-import type { BaseFormFieldWidgetConfig } from "next-vibe/unified-ui/widgets/form-fields/_shared/types";
+} from "../../../../core/definition/common.schema";
+import type { FieldDataType } from "../../../../core/definition/enums";
+import type { FieldUsageConfig } from "../../../_shared/types";
+import type { BaseFormFieldWidgetConfig } from "../_shared/types";
 
 export interface IconFieldWidgetConfig<
   out TKey extends string,

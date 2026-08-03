@@ -86,6 +86,9 @@ export const translations: typeof enTranslations = {
       title: "Konflikt",
       description: "Datenkonflikt aufgetreten",
     },
+    missingTarget:
+      "Validierungsfehler: projectPath, guardId oder stopAll angeben.",
+    stopFailed: "Interner Fehler beim Stoppen des Guards: {{detail}}",
   },
 
   success: {

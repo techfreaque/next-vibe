@@ -4,29 +4,29 @@
  */
 
 "use client";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { getDefaultTimezone } from "next-vibe/core/i18n/core/localization-utils";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import cronTaskIdDefinition from "next-vibe/tasks/cron/[id]/definition";
-import bulkEndpoints from "next-vibe/tasks/cron/bulk/definition";
-import cronHistoryDefinition from "next-vibe/tasks/cron/history/definition";
-import cronTasksDefinition from "next-vibe/tasks/cron/tasks/definition";
-import { formatCronScheduleShort } from "next-vibe/tasks/cron-formatter";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import { getDefaultTimezone } from "../../../core/i18n/core/localization-utils";
+import type { EndpointLogger } from "../../../logger/types";
+import cronTaskIdDefinition from "../[id]/definition";
+import bulkEndpoints from "../bulk/definition";
+import cronHistoryDefinition from "../history/definition";
+import cronTasksDefinition from "../tasks/definition";
+import { formatCronScheduleShort } from "../../cron-formatter";
 import type {
   CronTaskPriorityDB,
   CronTaskPriorityFilterValue,
   TaskCategoryDB,
   TaskCategoryValue,
-} from "next-vibe/tasks/enum";
+} from "../../enum";
 import {
   CronTaskHiddenFilter,
   CronTaskPriority,
   CronTaskPriorityOptions,
   CronTaskStatus,
   TaskCategoryOptions,
-} from "next-vibe/tasks/enum";
-import executeDefinition from "next-vibe/tasks/execute/definition";
-import { scopedTranslation as tasksScopedTranslation } from "next-vibe/tasks/i18n";
+} from "../../enum";
+import executeDefinition from "../../execute/definition";
+import { scopedTranslation as tasksScopedTranslation } from "../../i18n";
 import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import {
   AlertDialog,
@@ -66,7 +66,7 @@ import {
   SelectValue,
 } from "next-vibe/ui/ui/select";
 import { Span } from "next-vibe/ui/ui/span";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -76,9 +76,9 @@ import {
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
-import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
+} from "../../../unified-ui/_shared/use-widget-context";
+import { useApiMutation } from "../../../unified-ui/hooks/use-api-mutation";
+import { NavigateButtonWidget } from "../../../unified-ui/widgets/interactive/navigate-button/widget";
 import React, {
   useCallback,
   useEffect,
@@ -765,10 +765,8 @@ export function CronQueueContainer({ field }: WidgetProps): React.JSX.Element {
         .then(async () => {
           handleClearSelection();
           // Update caches optimistically - no refetch needed
-          const { apiClient } =
-            await import("next-vibe/unified-ui/hooks/store");
-          const tasksDef =
-            await import("next-vibe/tasks/cron/tasks/definition");
+          const { apiClient } = await import("../../../unified-ui/hooks/store");
+          const tasksDef = await import("../tasks/definition");
           const queueDef = await import("./definition");
           if (action === "delete") {
             apiClient.updateEndpointData(
@@ -869,7 +867,7 @@ export function CronQueueContainer({ field }: WidgetProps): React.JSX.Element {
 
   const handleNavigateStats = useCallback((): void => {
     void (async (): Promise<void> => {
-      const m = await import("next-vibe/tasks/cron/stats/definition");
+      const m = await import("../stats/definition");
       navigate(m.default.GET, {});
     })();
   }, [navigate]);

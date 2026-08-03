@@ -152,8 +152,7 @@ export function TakeScreenshotWidget({
   };
 
   const title = data?.capturedMonitor
-    ? /* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */
-      `${t("widget.actionScreenshot")}: ${data.capturedMonitor}`
+    ? t("widget.actionScreenshotOnMonitor", { monitor: data.capturedMonitor })
     : t("widget.actionScreenshot");
 
   return (

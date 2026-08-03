@@ -116,18 +116,3 @@ export type Modality = "text" | "audio" | "image" | "video";
 // ============================================
 
 export type ChatMode = "text" | "voice" | "call";
-
-export const CHAT_MODE_IDS = [
-  "text",
-  "voice",
-  "call",
-] as const satisfies ChatMode[];
-
-export const ChatModeOptions: Array<{ value: ChatMode; label: string }> = [
-  // eslint-disable-next-line i18next/no-literal-string -- UI labels for chat mode
-  { value: "text", label: "Text" },
-  // eslint-disable-next-line i18next/no-literal-string -- UI labels for chat mode
-  { value: "voice", label: "Voice" },
-  // eslint-disable-next-line i18next/no-literal-string -- UI labels for chat mode
-  { value: "call", label: "Call" },
-];

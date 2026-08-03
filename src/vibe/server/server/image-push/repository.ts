@@ -11,14 +11,14 @@ import "server-only";
 
 import { spawn, spawnSync } from "node:child_process";
 
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../../core/route/response.schema";
+import { parseError } from "../../../core/utils/parse-error";
+import type { EndpointLogger } from "../../../logger/types";
 
 import type {
   ImagePushRequestOutput,
@@ -73,9 +73,10 @@ export class ImagePushRepository {
         error: buildResult.error.message,
       });
       return fail({
-        message: t("post.errors.server.title"),
+        message: t("post.repository.messages.dockerBuildFailed", {
+          error: buildResult.error.message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: buildResult.error.message },
       });
     }
 
@@ -93,9 +94,10 @@ export class ImagePushRepository {
         signal: buildResult.signal,
       });
       return fail({
-        message: t("post.errors.server.title"),
+        message: t("post.repository.messages.dockerBuildFailed", {
+          error: detail,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: detail },
       });
     }
 
@@ -178,14 +180,11 @@ export class ImagePushRepository {
         error: transferResult.error.message,
       });
       return fail({
-        message: t("post.errors.server.title"),
+        message: t("post.repository.messages.sshTransferFailed", {
+          target: sshTarget,
+          error: transferResult.error.message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
-          error: t("post.repository.messages.sshTransferFailed", {
-            target: sshTarget,
-            error: transferResult.error.message,
-          }),
-        },
       });
     }
 
@@ -203,14 +202,11 @@ export class ImagePushRepository {
         signal: transferResult.signal,
       });
       return fail({
-        message: t("post.errors.server.title"),
+        message: t("post.repository.messages.sshTransferFailed", {
+          target: sshTarget,
+          error: detail,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
-          error: t("post.repository.messages.sshTransferFailed", {
-            target: sshTarget,
-            error: detail,
-          }),
-        },
       });
     }
 
@@ -267,14 +263,11 @@ export class ImagePushRepository {
         });
         settle(
           fail({
-            message: t("post.errors.server.title"),
+            message: t("post.repository.messages.sshTransferFailed", {
+              target: sshTarget,
+              error: err.message,
+            }),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
-            messageParams: {
-              error: t("post.repository.messages.sshTransferFailed", {
-                target: sshTarget,
-                error: err.message,
-              }),
-            },
           }),
         );
       });
@@ -284,14 +277,11 @@ export class ImagePushRepository {
           if (execErr) {
             settle(
               fail({
-                message: t("post.errors.server.title"),
+                message: t("post.repository.messages.sshTransferFailed", {
+                  target: sshTarget,
+                  error: execErr.message,
+                }),
                 errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                messageParams: {
-                  error: t("post.repository.messages.sshTransferFailed", {
-                    target: sshTarget,
-                    error: execErr.message,
-                  }),
-                },
               }),
             );
             return;
@@ -313,18 +303,15 @@ export class ImagePushRepository {
               });
               settle(
                 fail({
-                  message: t("post.errors.server.title"),
+                  message: t("post.repository.messages.sshTransferFailed", {
+                    target: sshTarget,
+                    error:
+                      stderr ||
+                      t("post.repository.messages.buildExitCode", {
+                        code: code ?? -1,
+                      }),
+                  }),
                   errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                  messageParams: {
-                    error: t("post.repository.messages.sshTransferFailed", {
-                      target: sshTarget,
-                      error:
-                        stderr ||
-                        t("post.repository.messages.buildExitCode", {
-                          code: code ?? -1,
-                        }),
-                    }),
-                  },
                 }),
               );
               return;
@@ -341,14 +328,11 @@ export class ImagePushRepository {
             stream.close();
             settle(
               fail({
-                message: t("post.errors.server.title"),
+                message: t("post.repository.messages.sshTransferFailed", {
+                  target: sshTarget,
+                  error: err.message,
+                }),
                 errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                messageParams: {
-                  error: t("post.repository.messages.sshTransferFailed", {
-                    target: sshTarget,
-                    error: err.message,
-                  }),
-                },
               }),
             );
           });
@@ -383,18 +367,20 @@ export class ImagePushRepository {
       const sha = result.stdout.trim();
       if (result.status !== 0 || !sha) {
         return fail({
-          message: t("post.errors.server.title"),
+          message: t("post.repository.messages.gitShaFailed"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: { error: t("post.repository.messages.gitShaFailed") },
         });
       }
       return success(sha);
     } catch (error) {
       logger.error("Failed to resolve git SHA", parseError(error));
+      // The success-path branch above reports gitShaFailed without a cause, so
+      // the variant carrying the thrown error needs its own key.
       return fail({
-        message: t("post.errors.server.title"),
+        message: t("post.repository.messages.gitShaFailedDetail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }

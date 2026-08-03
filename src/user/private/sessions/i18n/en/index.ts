@@ -33,7 +33,11 @@ export const translations = {
         description: "Authentication required",
       },
       validation: { title: "Validation Error", description: "Invalid request" },
-      server: { title: "Server Error", description: "Internal server error" },
+      server: {
+        title: "Server Error",
+        description: "Internal server error",
+        detail: "Could not load your sessions: {{error}}",
+      },
       unknown: {
         title: "Unknown Error",
         description: "An unknown error occurred",
@@ -72,7 +76,11 @@ export const translations = {
         description: "Authentication required",
       },
       validation: { title: "Validation Error", description: "Invalid request" },
-      server: { title: "Server Error", description: "Internal server error" },
+      server: {
+        title: "Server Error",
+        description: "Internal server error",
+        detail: "Could not create the session token: {{error}}",
+      },
       unknown: {
         title: "Unknown Error",
         description: "An unknown error occurred",
@@ -104,7 +112,11 @@ export const translations = {
         description: "Authentication required",
       },
       validation: { title: "Validation Error", description: "Invalid request" },
-      server: { title: "Server Error", description: "Internal server error" },
+      server: {
+        title: "Server Error",
+        description: "Internal server error",
+        detail: "Could not revoke the session: {{error}}",
+      },
       unknown: {
         title: "Unknown Error",
         description: "An unknown error occurred",
@@ -114,7 +126,11 @@ export const translations = {
         description: "Network error occurred",
       },
       forbidden: { title: "Forbidden", description: "Access forbidden" },
-      notFound: { title: "Not Found", description: "Session not found" },
+      notFound: {
+        title: "Not Found",
+        description: "Session not found",
+        detail: "No session with ID {{sessionId}} belongs to your account",
+      },
       conflict: { title: "Conflict", description: "Data conflict" },
     },
   },

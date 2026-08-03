@@ -4,23 +4,25 @@
  */
 
 import { mkdirSync, writeFileSync } from "node:fs";
+import { getEnvAvailability } from "../../../../agent/env-availability";
 import { join } from "node:path";
 
-import { getFullPath } from "next-vibe/core/core-utils/path";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ContentBlock } from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { EXECUTE_TOOL_ALIAS } from "next-vibe/execute-tool/constants";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { RouteExecutionResult } from "next-vibe/platforms/cli/runtime/route-executor";
+import { getFullPath } from "../../../../core/core-utils/path";
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
+import type { CountryLanguage } from "../../../../core/i18n/core/config";
+import type { ContentBlock } from "../../../../core/route/response.schema";
+import type { WidgetData } from "../../../../core/utils/json";
+import { parseError } from "../../../../core/utils/parse-error";
+import { EXECUTE_TOOL_ALIAS } from "../../../../execute-tool/constants";
+import type { JwtPayloadType } from "../../../../identity/auth/types";
+import type { EndpointLogger } from "../../../../logger/types";
+import type { RouteExecutionResult } from "../../../../platforms/cli/runtime/route-executor";
+import type { Platform } from "../../../../platforms/platforms";
 import React from "react";
 
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 
-import { renderToString as fastRenderToString } from "../../cli/response/fast-ink-renderer/renderer";
+import { renderToString as fastRenderToString } from "./fast-ink-renderer/renderer";
 import { prewarmBuiltinWidgets } from "../../web/WidgetRenderer";
 import { CliErrorFormatter } from "./error-formatter";
 import { CliRenderTree } from "./render-tree";
@@ -35,8 +37,8 @@ function saveContentResponseImages(data: WidgetData): WidgetData {
     !data ||
     typeof data !== "object" ||
     Array.isArray(data) ||
-    !("__isContentResponse" in data) ||
-    !data.__isContentResponse ||
+    !("isContentResponse" in data) ||
+    !data.isContentResponse ||
     !("content" in data) ||
     !Array.isArray(data.content)
   ) {
@@ -148,16 +150,12 @@ export class CliResultFormatter {
     logger: EndpointLogger,
     endpoint: CreateApiEndpointAny | null,
     user: JwtPayloadType,
-    requestInput?: Record<string, WidgetData>,
+    platform: Platform,
+    requestInput: Record<string, WidgetData> | undefined,
   ): Promise<{ output: string; renderMs: number }> {
     if (!result.success) {
       return {
-        output: CliErrorFormatter.formatErrorResult(
-          result,
-          locale,
-          verbose,
-          endpoint,
-        ),
+        output: CliErrorFormatter.formatErrorResult(result, locale, verbose),
         renderMs: 0,
       };
     }
@@ -167,9 +165,6 @@ export class CliResultFormatter {
 
     // Only show metadata in verbose mode
     if (verbose) {
-      // eslint-disable-next-line i18next/no-literal-string
-      output += "✅ Success\n";
-
       // Add execution metadata if available
       if (result.metadata?.route) {
         // eslint-disable-next-line i18next/no-literal-string
@@ -228,6 +223,7 @@ export class CliResultFormatter {
               locale,
               logger,
               user,
+              platform,
             );
           } else {
             // Fallback to JSON without endpoint definition
@@ -248,19 +244,25 @@ export class CliResultFormatter {
   /**
    * Render data using endpoint definition
    * Uses fast renderer with hook support
+   *
+   * Public because live-frame.ts calls it repeatedly to repaint a progressive
+   * result region — realtime rendering is "render a whole new frame per update",
+   * since the fast renderer has no diffing path.
    */
-  private static async renderWithEndpoint(
+  static async renderWithEndpoint(
     data: WidgetData,
     endpoint: CreateApiEndpointAny,
     locale: CountryLanguage,
     logger: EndpointLogger,
     user: JwtPayloadType,
+    platform: Platform,
   ): Promise<string> {
     try {
       const perfStart = performance.now();
 
       // Pre-warm any lazy CLI widgets so they're resolved before sync rendering
       await prewarmLazyWidgets(endpoint);
+      const availability = await getEnvAvailability();
 
       // Save ContentResponse images to .tmp/screenshots/ for CLI
       const processedData = saveContentResponseImages(data);
@@ -273,6 +275,8 @@ export class CliResultFormatter {
         data: processedData,
         logger,
         user,
+        platform,
+        availability,
       });
       const componentTime = performance.now() - createStart;
 

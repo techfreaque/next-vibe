@@ -130,6 +130,7 @@ export const translations = {
     },
   },
   repository: {
+    capUpdated: "Daily cap set to {{capAmount}} credits",
     capExceeded:
       "Free tier daily limit reached. Please sign up or try again tomorrow.",
     getCapFailed: "Failed to retrieve free-tier cap configuration",

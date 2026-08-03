@@ -35,6 +35,7 @@ export interface VibeFramePageData {
   urlPathParams: Record<string, string>;
   data: Record<string, string>;
   user: JwtPayloadType;
+  platform: Platform;
 }
 
 export async function tanstackLoader({
@@ -96,6 +97,7 @@ export async function tanstackLoader({
     urlPathParams,
     data,
     user,
+    platform: Platform.NEXT_PAGE,
   };
 }
 
@@ -108,6 +110,7 @@ export function TanstackPage({
   urlPathParams,
   data,
   user,
+  platform,
 }: VibeFramePageData): JSX.Element {
   return (
     <VibeFramePageClient
@@ -119,6 +122,7 @@ export function TanstackPage({
       urlPathParams={urlPathParams}
       data={data}
       user={user}
+      platform={platform}
     />
   );
 }

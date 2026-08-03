@@ -3,7 +3,7 @@
  * List all open windows using wmctrl -lGp
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   Methods,

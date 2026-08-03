@@ -214,9 +214,8 @@ export class NewsletterSubscribeRepository {
       });
 
       return fail({
-        message: t("errors.internal.title"),
+        message: t("errors.internal.detail", { error: parsedError.message }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
       });
     }
   }

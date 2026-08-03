@@ -12,7 +12,7 @@
 
 "use client";
 
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { UserPermissionRole } from "../../identity/roles/enum";
 import {
   Card,
   CardContent,
@@ -32,15 +32,15 @@ import {
   useWidgetLocale,
   useWidgetLogger,
   useWidgetUser,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
-import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
-import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
-import { EmailFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/email-field/widget";
-import { PasswordFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/password-field/widget";
-import { UrlFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/url-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
+} from "../../unified-ui/_shared/use-widget-context";
+import { useEndpoint } from "../../unified-ui/hooks/use-endpoint";
+import { BooleanFieldWidget } from "../../unified-ui/widgets/form-fields/boolean-field/widget";
+import { EmailFieldWidget } from "../../unified-ui/widgets/form-fields/email-field/widget";
+import { PasswordFieldWidget } from "../../unified-ui/widgets/form-fields/password-field/widget";
+import { UrlFieldWidget } from "../../unified-ui/widgets/form-fields/url-field/widget";
+import { FormAlertWidget } from "../../unified-ui/widgets/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "../../unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "../../unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 

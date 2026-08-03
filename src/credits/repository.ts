@@ -83,7 +83,7 @@ import type {
   VideoVisionModelId,
 } from "../vibe/agent/ai-stream/vision-models";
 import { withTransaction } from "../vibe/database/utils/repository-helpers";
-import { createEndpointEmitter } from "../vibe/realtime/emitter";
+import { createEndpointEmitter } from "../vibe/realtime/core/emitter";
 import { FREE_CREDIT_POOL } from "./constants";
 import {
   creditPacks,
@@ -98,8 +98,6 @@ import {
   CreditPackType,
   type CreditPackTypeValue,
   CreditTransactionType,
-  CreditTypeIdentifier,
-  type CreditTypeIdentifierValue,
 } from "./enum";
 import type {
   CreditsHistoryGetRequestOutput,
@@ -3012,61 +3010,6 @@ export class CreditRepository {
   }
 
   /**
-   * Get credit identifier based on subscription status
-   */
-  static async getCreditIdentifierBySubscription(
-    userId: string,
-    leadId: string,
-    logger: EndpointLogger,
-    t: CreditsT,
-  ): Promise<
-    ResponseType<{
-      userId?: string;
-      leadId?: string;
-      creditType: CreditTypeIdentifierValue;
-    }>
-  > {
-    try {
-      // Check if user has an active subscription
-      const [subscription] = await db
-        .select()
-        .from(subscriptions)
-        .where(eq(subscriptions.userId, userId))
-        .limit(1);
-
-      const hasActiveSubscription =
-        subscription && subscription.status === SubscriptionStatus.ACTIVE;
-
-      if (hasActiveSubscription) {
-        logger.debug("Using user credits (subscription)", {
-          userId,
-          subscriptionId: subscription.id,
-        });
-        return success({
-          userId,
-          creditType: CreditTypeIdentifier.USER_SUBSCRIPTION,
-        });
-      }
-
-      // No subscription: use user wallet (which has free credits)
-      logger.debug("Using user credits (no subscription)", { userId });
-      return success({
-        userId,
-        creditType: CreditTypeIdentifier.LEAD_FREE,
-      });
-    } catch (error) {
-      logger.error("Failed to get credit identifier", parseError(error), {
-        userId,
-        leadId,
-      });
-      return fail({
-        message: t("errors.getCreditIdentifierFailed"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      });
-    }
-  }
-
-  /**
    * Deduct credits for a feature (high-level wrapper)
    */
   static async deductCreditsForFeature(
@@ -3724,14 +3667,6 @@ export class CreditRepository {
   }
 
   /**
-   * Generate unique message ID for credit transactions
-   * Moved from BaseCreditHandler to enforce repository-first architecture
-   */
-  static generateMessageId(): string {
-    return `msg_${Date.now()}_${Math.random().toString(36).slice(2, 15)}`;
-  }
-
-  /**
    * Add earned credits from referral commission
    * Creates an "earned" credit pack with REFERRAL_EARNING transaction
    */
@@ -4047,87 +3982,6 @@ export class CreditRepository {
   }
 
   /**
-   * Get referral transactions for a user (earnings and payouts)
-   */
-  static async getReferralTransactions(
-    userId: string,
-    limit: number,
-    offset: number,
-    logger: EndpointLogger,
-    t: CreditsT,
-  ): Promise<
-    ResponseType<{
-      transactions: CreditTransactionOutput[];
-      totalCount: number;
-    }>
-  > {
-    try {
-      const walletResult = await CreditRepository.getOrCreateUserWallet(
-        userId,
-        logger,
-        t,
-      );
-      if (!walletResult.success) {
-        return walletResult;
-      }
-
-      const wallet = walletResult.data;
-
-      // Get only referral-related transactions
-      const transactions = await db
-        .select()
-        .from(creditTransactions)
-        .where(
-          and(
-            eq(creditTransactions.walletId, wallet.id),
-            inArray(creditTransactions.type, [
-              CreditTransactionType.REFERRAL_EARNING,
-              CreditTransactionType.REFERRAL_PAYOUT,
-            ]),
-          ),
-        )
-        .orderBy(desc(creditTransactions.createdAt))
-        .limit(limit)
-        .offset(offset);
-
-      const [{ count }] = await db
-        .select({ count: sql<number>`count(*)` })
-        .from(creditTransactions)
-        .where(
-          and(
-            eq(creditTransactions.walletId, wallet.id),
-            inArray(creditTransactions.type, [
-              CreditTransactionType.REFERRAL_EARNING,
-              CreditTransactionType.REFERRAL_PAYOUT,
-            ]),
-          ),
-        );
-
-      const result: CreditTransactionOutput[] = transactions.map((txn) => ({
-        id: txn.id,
-        amount: txn.amount,
-        balanceAfter: txn.balanceAfter,
-        type: txn.type,
-        messageId: txn.messageId,
-        createdAt: txn.createdAt,
-      }));
-
-      return success({
-        transactions: result,
-        totalCount: count,
-      });
-    } catch (error) {
-      logger.error("Failed to get referral transactions", parseError(error), {
-        userId,
-      });
-      return fail({
-        message: t("errors.getReferralTransactionsFailed"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      });
-    }
-  }
-
-  /**
    * Fire-and-forget: fetch updated balance and broadcast it on the credits WS channel.
    * Called after every credit deduction so the client balance updates in real time.
    */
@@ -4181,16 +4035,13 @@ export type CreditRepositoryType = Pick<
   | "deductCreditsForTTS"
   | "deductEarnedCredits"
   | "expireCredits"
-  | "generateMessageId"
   | "getBalance"
   | "getCreditBalanceForUser"
-  | "getCreditIdentifierBySubscription"
   | "getEarnedCreditsBalance"
   | "getLeadBalance"
   | "getLeadPool"
   | "getLeadPoolOnly"
   | "getOrCreateLeadByIp"
-  | "getReferralTransactions"
   | "getTransactionHistory"
   | "getUserPool"
   | "handleCreditPackPurchase"

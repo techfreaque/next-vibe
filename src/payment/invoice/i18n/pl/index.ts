@@ -50,6 +50,7 @@ export const translations: typeof enTranslations = {
         description: "Nieprawidłowe parametry żądania",
       },
       server: {
+        detail: "Nie udało się utworzyć faktury: {{error}}",
         title: "Błąd serwera",
         description: "Wystąpił wewnętrzny błąd serwera",
       },
@@ -66,6 +67,7 @@ export const translations: typeof enTranslations = {
         description: "Dostęp zabroniony",
       },
       notFound: {
+        noStripeCustomer: "Twoje konto nie ma rekordu klienta Stripe",
         title: "Nie znaleziono",
         description: "Zasób nie został znaleziony",
       },

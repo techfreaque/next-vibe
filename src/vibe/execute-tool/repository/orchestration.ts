@@ -26,12 +26,12 @@
 
 import "server-only";
 
-import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
-import { success } from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import type { ChatModelId } from "../../agent/ai-stream/models";
+import type { ResponseType } from "../../core/route/response.schema";
+import { success } from "../../core/route/response.schema";
+import type { WidgetData } from "../../core/utils/json";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
 
 import type { CallbackModeValue } from "../constants";
 import { CallbackMode } from "../constants";
@@ -39,7 +39,7 @@ import type {
   RouteExecuteRequestOutput,
   RouteExecuteResponseOutput,
 } from "../definition";
-import type { RouteExecuteContext } from "./types";
+import type { RouteExecuteDispatchContext } from "./types-dispatch";
 
 /**
  * Resolve the active chat model from the favorite/skill cascade — LAZY:
@@ -51,7 +51,7 @@ export async function resolveModelIdIfNeeded(params: {
   instanceId: string | undefined;
   callbackMode: CallbackModeValue | null;
   user: JwtPayloadType;
-  toolExecutionContext: RouteExecuteContext["toolExecutionContext"];
+  toolExecutionContext: RouteExecuteDispatchContext["toolExecutionContext"];
 }): Promise<ChatModelId | null> {
   const needsCascade =
     Boolean(params.instanceId && !params.user.isPublic) ||
@@ -72,7 +72,7 @@ export async function resolveModelIdIfNeeded(params: {
  * the call is a plain local WAIT and ./index.ts should execute it inline.
  */
 export async function orchestrateNonLocal(params: {
-  ctx: RouteExecuteContext;
+  ctx: RouteExecuteDispatchContext;
   data: RouteExecuteRequestOutput;
   input: Record<string, WidgetData>;
   instanceId: string | undefined;

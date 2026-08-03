@@ -1,6 +1,6 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 import { Text, useFocus, useInput, useStdin } from "ink";
-import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useRef } from "react";
 

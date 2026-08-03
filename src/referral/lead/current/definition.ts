@@ -3,7 +3,7 @@
  * Returns the referral code linked to the current lead (from JWT), if any
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   Methods,

@@ -351,7 +351,13 @@ export const translations = {
       title: "Name Conflict",
       description: "An account with this name already exists",
     },
-    server: { title: "Server Error", description: "Failed to process request" },
+    server: {
+      title: "Server Error",
+      description: "Failed to process request",
+      detail_get: "Couldn't load the account: {{error}}",
+      detail_update: "Couldn't save the account: {{error}}",
+      detail_delete: "Couldn't delete the account: {{error}}",
+    },
     networkError: {
       title: "Network Error",
       description: "Network communication failed",

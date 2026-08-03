@@ -4,9 +4,9 @@ import type { ThemeProviderProps as NextThemesProviderProps } from "next-themes"
 import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes";
 import React, { type JSX, useEffect, useState } from "react";
 
-import { setCookie } from "../../web/lib/cookies";
-import { storage } from "../../web/lib/storage";
-import type { StyleType } from "../../web/utils/style-type";
+import { setCookie } from "../lib/cookies";
+import { storage } from "../lib/storage";
+import type { StyleType } from "../utils/style-type";
 
 export const THEME_COOKIE_NAME = "theme_v2";
 

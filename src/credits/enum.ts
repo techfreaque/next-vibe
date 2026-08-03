@@ -85,6 +85,5 @@ export const CreditTransactionTypeDB = [
 /**
  * Value types derived directly from DB arrays
  */
-export type CreditTypeIdentifierValue = (typeof CreditTypeIdentifierDB)[number];
 export type CreditTransactionTypeValue =
   (typeof CreditTransactionTypeDB)[number];

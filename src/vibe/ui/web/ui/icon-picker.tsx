@@ -3,18 +3,18 @@
  * Simplified icon selection UI with categories and search
  * @packageDocumentation
  */
-import { useTranslation } from "next-vibe/core/i18n/core/client";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
-import type { CategoryKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+import { useTranslation } from "../../../core/i18n/core/client";
+import { cn } from "../../../unified-ui/_shared/cn";
+import type { CategoryKey } from "../../../unified-ui/widgets/form-fields/icon-field/icons";
 import {
-  Icon,
   ICON_CATEGORIES,
   type IconKey,
-} from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+} from "../../../unified-ui/widgets/form-fields/icon-field/icons";
+import { Icon } from "../../../unified-ui/widgets/form-fields/icon-field/icon-component";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
-import { uiScopedTranslation } from "../../web/i18n";
+import { uiScopedTranslation } from "../i18n";
 import { Button } from "./button";
 import { Dialog, DialogContent, DialogTrigger } from "./dialog";
 import { Div } from "./div";

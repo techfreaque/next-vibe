@@ -32,6 +32,9 @@ export const translations: typeof enTranslations = {
         description: "Nieprawidłowe parametry żądania",
       },
       server: {
+        detail: "Nie udało się otworzyć portalu płatności: {{error}}",
+        portalNotConfigured:
+          "Portal klienta Stripe nie jest jeszcze skonfigurowany. Ustaw go na https://dashboard.stripe.com/test/settings/billing/portal",
         title: "Błąd serwera",
         description: "Wystąpił wewnętrzny błąd serwera",
       },
@@ -48,6 +51,7 @@ export const translations: typeof enTranslations = {
         description: "Dostęp zabroniony",
       },
       notFound: {
+        noStripeCustomer: "Twoje konto nie ma rekordu klienta Stripe",
         title: "Nie znaleziono",
         description: "Zasób nie został znaleziony",
       },

@@ -1,20 +1,19 @@
-import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
-import { type CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { EndpointErrorTypes } from "next-vibe/core/definition/enums";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { callApi as CallApiFn } from "./call-api";
+import { type CreateApiEndpointAny } from "../../core/definition/endpoint-base";
+import { EndpointErrorTypes } from "../../core/definition/enums";
+import type { CountryLanguage } from "../../core/i18n/core/config";
 import type {
   ErrorResponseType,
   ResponseType,
-} from "next-vibe/core/route/response.schema";
-import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../core/route/response.schema";
+import { ErrorResponseTypes, fail } from "../../core/route/response.schema";
+import { parseError } from "../../core/utils/parse-error";
+import { scopedTranslation as hooksTranslation } from "./i18n";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
 import { z } from "zod";
 
 import { scopedTranslation as sharedScopedTranslation } from "@/_pages/shared/i18n";
-
-import { callApi } from "./call-api";
 
 interface QueryExecutorOptions<TRequest, TResponse, TUrlVariables> {
   onSuccess?: (
@@ -34,6 +33,18 @@ interface QueryExecutorOptions<TRequest, TResponse, TUrlVariables> {
   }) => void | Promise<void>;
 }
 
+// Resolved at CALL time, not import time. Bun links the entire static import
+// graph before any module body runs, so the CLI override plugin registered in
+// vibe-runtime.ts has not been installed yet when a top-level
+// `import { callApi } from "./call-api"` is resolved — the web (HTTP) build wins
+// and the CLI ends up making loopback requests to a server that is not running.
+// A dynamic import resolves after registration, which is exactly why lazily
+// imported widgets already got their .cli.tsx counterparts.
+async function loadCallApi(): Promise<typeof CallApiFn> {
+  const mod = await import("./call-api");
+  return mod.callApi;
+}
+
 export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
   endpoint,
   logger,
@@ -41,7 +52,6 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
   pathParams,
   locale,
   user,
-  availability,
   options = {},
 }: {
   endpoint: TEndpoint;
@@ -54,7 +64,6 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
     : TEndpoint["types"]["UrlVariablesOutput"];
   locale: CountryLanguage;
   user: JwtPayloadType;
-  availability: AgentEnvAvailability;
   options?: QueryExecutorOptions<
     TEndpoint["types"]["RequestOutput"],
     TEndpoint["types"]["ResponseOutput"],
@@ -105,13 +114,18 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
             .t(validationErrorConfig.description)
         : sharedT("errors.validationFailed.description");
 
+      // `message` is whichever error-type description the endpoint declared -
+      // already translated in its own scope, so it rides in as `reason` rather
+      // than gaining a placeholder it cannot carry.
       const errorResponse = fail({
-        message,
+        message: hooksTranslation
+          .scopedT(locale)
+          .t("apiUtils.errors.endpointFailed", {
+            reason: message,
+            path: endpoint.path.join("/"),
+            error: requestValidation.error.message,
+          }),
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
-        messageParams: {
-          endpoint: endpoint.path.join("/"),
-          error: requestValidation.error.message,
-        },
       });
 
       if (options.onError) {
@@ -127,6 +141,7 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
   }
 
   try {
+    const callApi = await loadCallApi();
     const response = await callApi(
       endpoint,
       logger,
@@ -134,7 +149,6 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
       locale,
       requestData,
       pathParams,
-      availability,
     );
 
     if (!response.success) {
@@ -191,12 +205,14 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
       : sharedT3("errors.serverError.description");
 
     const errorResponse = fail({
-      message,
+      message: hooksTranslation
+        .scopedT(locale)
+        .t("apiUtils.errors.endpointFailed", {
+          reason: message,
+          path: endpoint.path.join("/"),
+          error: parsedError.message,
+        }),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: {
-        error: parsedError.message,
-        endpoint: endpoint.path.join("/"),
-      },
     });
 
     if (options.onError) {

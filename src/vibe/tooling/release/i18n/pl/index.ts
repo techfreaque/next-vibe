@@ -620,7 +620,7 @@ export const translations: typeof enTranslations = {
   scripts: {
     invalidPackageJson: "Nieprawidłowy format package.json w {{path}}",
     testsFailed: "Testy nie powiodły się w {{path}}: {{error}}",
-    lintFailed: "Linting nie powiódł się w {{path}}",
+    lintFailed: "Linting nie powiódł się w {{path}}: {{output}}",
     typecheckFailed: "Sprawdzanie typów nie powiodło się w {{path}}: {{error}}",
     buildFailed: "Budowanie nie powiodło się w {{path}}: {{error}}",
     packageJsonNotFound: "Nie znaleziono package.json w {{path}}",
@@ -643,7 +643,7 @@ export const translations: typeof enTranslations = {
     pushSuccess: "Zmiany wypchnięte do zdalnego repozytorium",
     noCommits: "Brak nowych commitów od tagu '{{lastTag}}'",
     uncommittedChanges: "Wykryto niezatwierdzone zmiany",
-    notOnMain: "Nie na gałęzi main (bieżąca: {{currentBranch}})",
+    notOnMain: "Nie na gałęzi '{{main}}' (bieżąca: {{currentBranch}})",
     commitFailed: "Commit nie powiódł się",
     tagFailed: "Tworzenie tagu nie powiodło się",
     pushFailed: "Push do zdalnego repozytorium nie powiódł się",
@@ -725,7 +725,7 @@ export const translations: typeof enTranslations = {
   hooks: {
     running: "Uruchamianie hooka {{hook}} dla {{package}}...",
     completed: "Hook {{hook}} zakończony dla {{package}}",
-    failed: "Hook {{hook}} nie powiódł się dla {{package}}: {{error}}",
+    failed: "Komenda hooka '{{command}}' nie powiodła się: {{error}}",
     skipped: "Pomijanie hooka {{hook}} (continueOnError)",
   },
   npm: {
@@ -739,7 +739,7 @@ export const translations: typeof enTranslations = {
     generating: "Generowanie changelogu dla {{package}}...",
     generated: "Changelog wygenerowany dla {{package}}",
     failed:
-      "Generowanie changelogu nie powiodło się dla {{package}}: {{error}}",
+      "Generowanie changelogu nie powiodło się dla {{directory}}: {{error}}",
     noChanges: "Brak zmian do dodania do changelogu dla {{package}}",
   },
   branch: {

@@ -23,7 +23,6 @@ import type {
 import creditsDefinitions, {
   type CreditsGetResponseOutput,
 } from "./definition";
-import type { CreditTypeIdentifierValue } from "./enum";
 import type {
   CreditsHistoryGetRequestOutput,
   CreditsHistoryGetResponseOutput,
@@ -56,10 +55,11 @@ export class CreditRepository {
     if (response.success) {
       return success(response.data);
     }
+    // Upstream already interpolated its params into `message`, so forwarding the
+    // message alone preserves the full detail.
     return fail({
       message: response.message,
       errorType: response.errorType,
-      messageParams: response.messageParams,
     });
   }
 
@@ -206,28 +206,6 @@ export class CreditRepository {
     throw new Error("handleCreditPackPurchase is not implemented on native");
   }
 
-  static async getCreditIdentifierBySubscription(
-    // oxlint-disable-next-line no-unused-vars
-    _userId: string,
-    // oxlint-disable-next-line no-unused-vars
-    _leadId: string,
-    // oxlint-disable-next-line no-unused-vars
-    _logger: EndpointLogger,
-    // oxlint-disable-next-line no-unused-vars -- required for type compatibility
-    _t: CreditsT,
-  ): Promise<
-    ResponseType<{
-      userId?: string;
-      leadId?: string;
-      creditType: CreditTypeIdentifierValue;
-    }>
-  > {
-    // oxlint-disable-next-line restricted-syntax
-    throw new Error(
-      "getCreditIdentifierBySubscription is not implemented on native",
-    );
-  }
-
   static async deductCreditsForFeature(
     // oxlint-disable-next-line no-unused-vars
     _user: JwtPayloadType,
@@ -290,10 +268,6 @@ export class CreditRepository {
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("deductCreditsWithValidation is not implemented on native");
-  }
-
-  static generateMessageId(): string {
-    return `msg_${Date.now()}_${Math.random().toString(36).slice(2, 15)}`;
   }
 
   static async getUserPool(
@@ -448,27 +422,6 @@ export class CreditRepository {
   ): Promise<ResponseType<void>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("deductEarnedCredits is not implemented on native");
-  }
-
-  static async getReferralTransactions(
-    // oxlint-disable-next-line no-unused-vars
-    _userId: string,
-    // oxlint-disable-next-line no-unused-vars
-    _limit: number,
-    // oxlint-disable-next-line no-unused-vars
-    _offset: number,
-    // oxlint-disable-next-line no-unused-vars
-    _logger: EndpointLogger,
-    // oxlint-disable-next-line no-unused-vars -- required for type compatibility
-    _t: CreditsT,
-  ): Promise<
-    ResponseType<{
-      transactions: CreditTransactionOutput[];
-      totalCount: number;
-    }>
-  > {
-    // oxlint-disable-next-line restricted-syntax
-    throw new Error("getReferralTransactions is not implemented on native");
   }
 
   static async handleNowPaymentsCreditSuccessRedirect(

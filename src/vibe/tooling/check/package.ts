@@ -20,7 +20,7 @@
  *   import { TypecheckRepository } from "@next-vibe/checker/typecheck"
  */
 
-import type { PackageManifest } from "next-vibe/tooling/builder/repository/vibe-package/types";
+import type { PackageManifest } from "../builder/repository/vibe-package/types";
 
 import { GITHUB_REPO_URL } from "@/env/constants";
 

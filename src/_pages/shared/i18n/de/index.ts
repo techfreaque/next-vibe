@@ -95,6 +95,7 @@ export const translations: typeof enTranslations = {
         routeNotFound: "Route für Tool nicht gefunden: {{toolName}}",
         executionFailed: "Ausführung fehlgeschlagen",
         unknownError: "Ein unbekannter Fehler ist aufgetreten",
+        unknownErrorDetail: "Ein unbekannter Fehler ist aufgetreten: {{error}}",
       },
     },
   },

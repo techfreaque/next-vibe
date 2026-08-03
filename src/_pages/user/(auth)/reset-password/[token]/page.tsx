@@ -8,6 +8,7 @@ import type { ResponseType } from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
+import { Platform } from "next-vibe/platforms/platforms";
 import { redirect } from "next-vibe/ui/lib/redirect";
 import { Alert, AlertDescription, AlertTitle } from "next-vibe/ui/ui/alert";
 import { Div } from "next-vibe/ui/ui/div";
@@ -76,6 +77,7 @@ export interface ResetPasswordConfirmPageData {
   token: string;
   user: JwtPayloadType | undefined;
   tokenValidationResponse: ResponseType<ResetPasswordValidateGetResponseOutput>;
+  platform: Platform;
 }
 
 export async function tanstackLoader({
@@ -113,7 +115,13 @@ export async function tanstackLoader({
     locale,
   );
 
-  return { locale, token, user, tokenValidationResponse };
+  return {
+    locale,
+    token,
+    user,
+    tokenValidationResponse,
+    platform: Platform.NEXT_PAGE,
+  };
 }
 
 export function TanstackPage({
@@ -121,6 +129,7 @@ export function TanstackPage({
   token,
   user,
   tokenValidationResponse,
+  platform,
 }: ResetPasswordConfirmPageData): JSX.Element {
   const { t } = pageT.scopedT(locale);
 
@@ -146,6 +155,7 @@ export function TanstackPage({
           locale={locale}
           token={token}
           tokenValidationResponse={tokenValidationResponse}
+          platform={platform}
         />
       </Div>
     </ErrorBoundary>

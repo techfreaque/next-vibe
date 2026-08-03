@@ -6,11 +6,11 @@
 "use client";
 
 import { CalendarIcon } from "next-vibe/ui/ui/icons/CalendarIcon";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { JSX } from "react";
 import { useState } from "react";
 
-import type { StyleType } from "../../web/utils/style-type";
+import type { StyleType } from "../utils/style-type";
 import { Button } from "./button";
 import { Calendar } from "./calendar";
 import { Input } from "./input";

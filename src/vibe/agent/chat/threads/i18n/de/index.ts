@@ -160,6 +160,7 @@ export const translations: typeof enTranslations = {
       server: {
         title: "Serverfehler",
         description: "Ein interner Serverfehler ist aufgetreten",
+        detail: "Serverfehler: {{error}}",
       },
       network: {
         title: "Netzwerkfehler",
@@ -285,14 +286,17 @@ export const translations: typeof enTranslations = {
         description: "Sie haben keine Berechtigung, Threads zu erstellen",
         incognitoNotAllowed:
           "Inkognito-Threads können nicht auf dem Server erstellt werden",
+        cannotCreateHere: "Thread kann an diesem Ort nicht erstellt werden",
       },
       notFound: {
         title: "Nicht gefunden",
         description: "Ressource nicht gefunden",
+        folderNotFound: "Ordner nicht gefunden",
       },
       server: {
         title: "Serverfehler",
         description: "Ein interner Serverfehler ist aufgetreten",
+        detail: "Serverfehler: {{error}}",
       },
       network: {
         title: "Netzwerkfehler",

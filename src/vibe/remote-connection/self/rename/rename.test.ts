@@ -25,21 +25,18 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 
 import { and, eq, isNull, sql } from "drizzle-orm";
-import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
-import {
-  DefaultFolderId,
-  rootlessToolExecutionContext,
-} from "next-vibe/agent/chat/config";
-import { chatFolders } from "next-vibe/agent/chat/db";
-import { chatFavorites } from "next-vibe/agent/skills/favorites/db";
-import { db } from "next-vibe/database";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { identityEnv } from "next-vibe/identity/env";
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
+import { DefaultFolderId, rootlessToolExecutionContext } from "next-vibe/core/execution-context";
+import { chatFolders } from "../../../agent/chat/db";
+import { chatFavorites } from "../../../agent/skills/favorites/db";
+import { db } from "../../../database";
+import type { JwtPrivatePayloadType } from "../../../identity/auth/types";
+import { identityEnv } from "../../../identity/env";
 import {
   instanceIdentities,
   remoteConnections,
-} from "next-vibe/remote-connection/db";
-import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
+} from "../../db";
+import { sendTestRequest } from "../../../tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { runTestStream } from "../../../agent/ai-stream/testing/headless-test-runner";

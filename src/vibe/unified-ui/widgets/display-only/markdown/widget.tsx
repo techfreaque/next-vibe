@@ -1,20 +1,20 @@
 "use client";
 
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Div } from "next-vibe/ui/ui/div";
 import { Markdown } from "next-vibe/ui/ui/markdown";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../_shared/cn";
 import type {
   ReactRequestResponseWidgetProps,
   ReactStaticWidgetProps,
-} from "next-vibe/unified-ui/_shared/react-types";
-import type { StringWidgetSchema } from "next-vibe/unified-ui/_shared/schema-constraints";
-import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
+} from "../../../_shared/react-types";
+import type { StringWidgetSchema } from "../../../_shared/schema-constraints";
+import type { FieldUsageConfig } from "../../../_shared/types";
 import {
   useWidgetForm,
   useWidgetLocale,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
-import { scopedTranslation as unifiedInterfaceScopedTranslation } from "next-vibe/unified-ui/hooks/i18n";
+} from "../../../_shared/use-widget-context";
+import { scopedTranslation as unifiedInterfaceScopedTranslation } from "../../../hooks/i18n";
 import type { JSX } from "react";
 
 import type { MarkdownWidgetConfig } from "./types";

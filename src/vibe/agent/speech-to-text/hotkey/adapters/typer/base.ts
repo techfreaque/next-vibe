@@ -28,14 +28,14 @@ export abstract class BaseTyper implements Typer {
    */
   async insertText(text: string): Promise<void> {
     if (!text || text.length === 0) {
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Typer validation error
+      // eslint-disable-next-line restricted/restricted-syntax -- Typer validation error
       throw new TyperError("Cannot insert empty text", "EMPTY_TEXT", { text });
     }
 
     // Check dependencies before attempting insertion
     const hasDepends = await this.checkDependencies();
     if (!hasDepends) {
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Typer dependency error
+      // eslint-disable-next-line restricted/restricted-syntax -- Typer dependency error
       throw new TyperError(
         "Required dependencies not available",
         "MISSING_DEPENDENCIES",
@@ -48,7 +48,7 @@ export abstract class BaseTyper implements Typer {
     try {
       await this.insertTextImpl(text);
     } catch (error) {
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Typer execution error
+      // eslint-disable-next-line restricted/restricted-syntax -- Typer execution error
       throw new TyperError(
         `Failed to insert text: ${String(error)}`,
         "INSERT_FAILED",

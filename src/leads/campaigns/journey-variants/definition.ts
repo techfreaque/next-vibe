@@ -4,7 +4,7 @@
  */
 
 import { dateSchema } from "next-vibe/core/definition/common.schema";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -385,7 +385,7 @@ const { POST } = createEndpoint({
         id: "00000000-0000-0000-0000-000000000000",
         active: true,
         checkErrors: [],
-        createdAt: new Date().toISOString(),
+        createdAt: new Date("2025-01-01T00:00:00Z").toISOString(),
       },
     },
   },

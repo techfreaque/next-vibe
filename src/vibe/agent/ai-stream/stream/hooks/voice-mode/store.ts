@@ -5,7 +5,7 @@
 
 "use client";
 
-import type { ChatMode } from "next-vibe/agent/models/enum";
+import type { ChatMode } from "../../../../models/enum";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -229,13 +229,6 @@ export const useVoiceModeStore = create<VoiceModeState>()(
     },
   ),
 );
-
-/**
- * Hook to get voice mode settings
- */
-export function useVoiceMode(): VoiceMode {
-  return useVoiceModeStore((state) => state.settings);
-}
 
 /**
  * Hook to get voice runtime state

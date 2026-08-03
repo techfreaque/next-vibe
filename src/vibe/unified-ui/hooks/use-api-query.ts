@@ -1,18 +1,17 @@
 "use client";
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
-import type { EndpointReadOptions } from "next-vibe/core/definition/create";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { useTranslation } from "next-vibe/core/i18n/core/client";
+import type { EndpointReadOptions } from "../../core/definition/create";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
+import { useTranslation } from "../../core/i18n/core/client";
 import type {
   ErrorResponseType,
   ResponseType,
-} from "next-vibe/core/route/response.schema";
-import { success } from "next-vibe/core/route/response.schema";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { ReactHooksTranslationKey } from "next-vibe/unified-ui/hooks/i18n";
+} from "../../core/route/response.schema";
+import { success } from "../../core/route/response.schema";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
+import type { ReactHooksTranslationKey } from "./i18n";
 import { useCallback, useMemo, useRef } from "react";
 
 import { executeQuery } from "./query-executor";
@@ -90,7 +89,6 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
     };
   }): ApiQueryReturn<TEndpoint["types"]["ResponseOutput"]> {
   const { locale } = useTranslation();
-  const availability = useProviderAvailability();
 
   const {
     queryKey: customQueryKey,
@@ -216,7 +214,6 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
         pathParams: urlPathParams,
         locale,
         user,
-        availability,
         options: {
           onSuccess: async (context) => {
             // Call endpoint-defined onSuccess first (from endpoint.options.queryOptions.onSuccess)
@@ -315,7 +312,12 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
   return useMemo(() => {
     type QueryStatus = "loading" | "error" | "success" | "idle";
 
-    const responseData = query.data;
+    // Annotated to shed the NoInfer<> wrapper React Query puts on `data`:
+    // NoInfer<A | B> is not treated as a union by control-flow analysis, so
+    // `responseData.success === false` would not narrow to the error arm.
+    const responseData:
+      | ResponseType<TEndpoint["types"]["ResponseOutput"]>
+      | undefined = query.data;
     const data = responseData?.success ? responseData.data : undefined;
     const error = responseData?.success === false ? responseData : undefined;
 

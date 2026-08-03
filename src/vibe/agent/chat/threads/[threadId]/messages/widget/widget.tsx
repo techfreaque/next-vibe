@@ -8,11 +8,10 @@
 
 "use client";
 
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
-import type { ChatMessage } from "next-vibe/agent/chat/db";
-import { ChatBootContext } from "next-vibe/agent/chat/hooks/context";
-import { useChatNavigationStore } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
+import type { ChatMessage } from "../../../../db";
+import { ChatBootContext } from "../../../../hooks/context";
+import { useChatNavigationStore } from "../../../../hooks/use-chat-navigation-store";
 import { platform } from "next-vibe/core/env-client";
 import { Div } from "next-vibe/ui/ui/div";
 import {
@@ -80,7 +79,6 @@ function useCliMessages(widgetMessages: ChatMessage[]): ChatMessage[] {
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
-  const availability = useProviderAvailability();
   const rootFolderId = useChatNavigationStore((s) => s.currentRootFolderId);
   const activeThreadId = useChatNavigationStore((s) => s.activeThreadId);
 
@@ -101,7 +99,6 @@ function useCliMessages(widgetMessages: ChatMessage[]): ChatMessage[] {
       } as (typeof messagesDefinition.GET)["types"]["UrlVariablesOutput"],
       locale,
       user,
-      availability,
     });
     if (response?.success) {
       setCliMessages(
@@ -118,7 +115,7 @@ function useCliMessages(widgetMessages: ChatMessage[]): ChatMessage[] {
         })),
       );
     }
-  }, [activeThreadId, rootFolderId, logger, locale, user, availability]);
+  }, [activeThreadId, rootFolderId, logger, locale, user]);
 
   useEffect(() => {
     if (!isCli || !activeThreadId) {

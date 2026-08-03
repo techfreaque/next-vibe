@@ -1,12 +1,12 @@
 "use client";
-import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
-import { getChatModelById } from "next-vibe/agent/ai-stream/models";
-import type { DefaultFolderId } from "next-vibe/agent/chat/config";
+import type { ChatModelId } from "../../../../../ai-stream/models";
+import { getChatModelById } from "../../../../../ai-stream/models";
+import type { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Div } from "next-vibe/ui/ui/div";
 import { Span } from "next-vibe/ui/ui/span";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
-import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 

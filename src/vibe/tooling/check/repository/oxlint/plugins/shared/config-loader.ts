@@ -20,7 +20,7 @@ import type {
   JsxCapitalizationPluginConfig,
   LintConfigValue,
   RestrictedSyntaxPluginConfig,
-} from "next-vibe/tooling/check/config/types";
+} from "../../../../config/types";
 
 // ============================================================
 // Types
@@ -30,14 +30,26 @@ import type {
 type PluginName =
   | "oxlint-plugin-i18n/no-literal-string"
   | "oxlint-plugin-jsx-capitalization/jsx-capitalization"
-  | "oxlint-plugin-restricted/restricted-syntax"
+  | "oxlint-plugin-restricted/no-unknown"
+  | "oxlint-plugin-restricted/no-object-type"
+  | "oxlint-plugin-restricted/no-throw"
+  | "oxlint-plugin-restricted/no-jsx-in-object-literal"
+  | "oxlint-plugin-restricted/no-raw-fetch"
+  | "oxlint-plugin-restricted/no-browser-globals"
+  | "oxlint-plugin-restricted/no-endpoints-page-in-server-entry"
   | "oxlint-plugin-boilerplate/route-pattern";
 
 /** Map plugin names to their config types */
 interface PluginConfigMap {
   "oxlint-plugin-i18n/no-literal-string": I18nPluginConfig;
   "oxlint-plugin-jsx-capitalization/jsx-capitalization": JsxCapitalizationPluginConfig;
-  "oxlint-plugin-restricted/restricted-syntax": RestrictedSyntaxPluginConfig;
+  "oxlint-plugin-restricted/no-unknown": RestrictedSyntaxPluginConfig;
+  "oxlint-plugin-restricted/no-object-type": RestrictedSyntaxPluginConfig;
+  "oxlint-plugin-restricted/no-throw": RestrictedSyntaxPluginConfig;
+  "oxlint-plugin-restricted/no-jsx-in-object-literal": RestrictedSyntaxPluginConfig;
+  "oxlint-plugin-restricted/no-raw-fetch": RestrictedSyntaxPluginConfig;
+  "oxlint-plugin-restricted/no-browser-globals": RestrictedSyntaxPluginConfig;
+  "oxlint-plugin-restricted/no-endpoints-page-in-server-entry": RestrictedSyntaxPluginConfig;
   "oxlint-plugin-boilerplate/route-pattern": BoilerplatePluginConfig;
 }
 

@@ -1,46 +1,39 @@
 import "server-only";
 
 import { and, eq, sql } from "drizzle-orm";
-import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
-import { resolveModelSkill } from "next-vibe/agent/ai-stream/repository/core/modality-resolver";
+import type { ChatModelId } from "../../agent/ai-stream/models";
+import { resolveModelSkill } from "../../agent/ai-stream/repository/core/modality-resolver";
 import {
   claimRevivalSlot,
   resetStreamingToIdle as resetStreamingToIdleShared,
-} from "next-vibe/agent/ai-stream/repository/core/stream";
-import { walkToLeafMessage } from "next-vibe/agent/ai-stream/repository/core/tree-walk";
+} from "../../agent/ai-stream/repository/core/stream";
+import { walkToLeafMessage } from "../../agent/ai-stream/repository/core/tree-walk";
 import {
   emitStreamFinished,
   fireWakeUpRevival,
   insertDeferredWakeUpMessage,
   publishWakeUpSignal,
   type WakeUpPayload,
-} from "next-vibe/agent/ai-stream/repository/revival/revival";
-import type { AiStreamT } from "next-vibe/agent/ai-stream/stream/i18n";
-import { scopedTranslation as aiStreamScopedTranslation } from "next-vibe/agent/ai-stream/stream/i18n";
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
-import {
-  chatMessages,
-  chatThreads,
-  type ToolCall,
-} from "next-vibe/agent/chat/db";
-import {
-  ChatMessageRole,
-  ThreadStreamingState,
-} from "next-vibe/agent/chat/enum";
-import { createMessagesEmitter } from "next-vibe/agent/chat/threads/[threadId]/messages/emitter";
-import type { FavoriteConfig } from "next-vibe/agent/skills/favorites/db";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+} from "../../agent/ai-stream/repository/revival/revival";
+import type { AiStreamT } from "../../agent/ai-stream/stream/i18n";
+import { scopedTranslation as aiStreamScopedTranslation } from "../../agent/ai-stream/stream/i18n";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
+import { chatMessages, chatThreads, type ToolCall } from "../../agent/chat/db";
+import { ChatMessageRole, ThreadStreamingState } from "../../agent/chat/enum";
+import { createMessagesEmitter } from "../../agent/chat/threads/[threadId]/messages/emitter";
+import type { FavoriteConfig } from "../../agent/skills/favorites/db";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import type { ResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { CronTasksRepository } from "next-vibe/tasks/cron/repository";
+} from "../../core/route/response.schema";
+import { parseError } from "../../core/utils/parse-error";
+import { db } from "../../database";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
+import { CronTasksRepository } from "../../tasks/cron/repository";
 
 import {
   endpoints as revivalEndpoints,
@@ -663,9 +656,7 @@ export class RevivalRepository {
               modelId,
             });
             return fail({
-              message: t("errors.unexpectedError", {
-                error: "No model resolved",
-              }),
+              message: t("errors.modelNotResolved"),
               errorType: ErrorResponseTypes.INTERNAL_ERROR,
             });
           }

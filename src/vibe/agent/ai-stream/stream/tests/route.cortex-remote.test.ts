@@ -35,10 +35,7 @@
 
 import "server-only";
 
-import {
-  DefaultFolderId,
-  makeHeadlessContext,
-} from "next-vibe/agent/chat/config";
+import { DefaultFolderId, makeHeadlessContext } from "../../../../core/execution-context";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
@@ -435,7 +432,7 @@ if (!_resolvedRemoteUrl) {
 
           // Verify the thread exists locally (the caller owns its copy)
           const threadDef =
-            await import("next-vibe/agent/chat/threads/[threadId]/definition");
+            await import("../../../chat/threads/[threadId]/definition");
           const localThreadResult =
             await RouteExecuteRepository.runInProcessTyped({
               definition: threadDef.default.GET,

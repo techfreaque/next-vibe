@@ -17,21 +17,21 @@ import {
   or,
 } from "drizzle-orm";
 import { nanoid } from "nanoid";
-import { getFullPath } from "next-vibe/core/core-utils/path";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { getFullPath } from "../../../core/core-utils/path";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { CronTasksT } from "next-vibe/tasks/cron/tasks/i18n";
-import { calculateNextExecutionTime } from "next-vibe/tasks/cron-formatter";
+} from "../../../core/route/response.schema";
+import { parseError } from "../../../core/utils/parse-error";
+import { db } from "../../../database";
+import type { JwtPayloadType } from "../../../identity/auth/types";
+import { UserPermissionRole } from "../../../identity/roles/enum";
+import type { EndpointLogger } from "../../../logger/types";
+import type { CronTasksT } from "./i18n";
+import { calculateNextExecutionTime } from "../../cron-formatter";
 import {
   CronTaskEnabledFilter,
   CronTaskHiddenFilter,
@@ -40,8 +40,8 @@ import {
   TaskCategory,
   TaskCategoryDB,
   TaskOutputMode,
-} from "next-vibe/tasks/enum";
-import type { NotificationTarget } from "next-vibe/tasks/unified-runner/types";
+} from "../../enum";
+import type { NotificationTarget } from "../../unified-runner/types";
 
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 
@@ -525,7 +525,7 @@ export class CronTasksListRepository {
           resolvedTargetInstance = data.targetInstance;
         } else {
           const { RemoteConnectionRepository } =
-            await import("next-vibe/remote-connection/repository");
+            await import("../../../remote-connection/repository");
           const conn =
             await RemoteConnectionRepository.getConnectionForInstance(
               userId,

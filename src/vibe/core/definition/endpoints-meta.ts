@@ -20,9 +20,9 @@
  * files stay pure data at runtime - safe to import on any platform, client included.
  */
 
-import type { WidgetData } from "next-vibe/core/utils/json";
-import type { UserRoleValue } from "next-vibe/identity/roles/enum";
-import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+import type { WidgetData } from "../utils/json";
+import type { UserRoleValue } from "../../identity/roles/enum";
+import type { IconKey } from "../../unified-ui/widgets/form-fields/icon-field/icons";
 
 export interface EndpointMeta {
   /** Full tool name: path segments joined by "_" + "_" + METHOD */

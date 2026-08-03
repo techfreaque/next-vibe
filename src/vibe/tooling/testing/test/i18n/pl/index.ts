@@ -76,6 +76,28 @@ export const translations: typeof enTranslations = {
       title: "Konflikt",
       description: "Wykryto konflikt wykonania testów",
     },
+    executionFailed:
+      "Wykonanie testów nie powiodło się po {{duration}} ms: {{detail}}\n{{output}}",
+    streamingUnsupported:
+      "Odpowiedzi strumieniowe nie są obsługiwane w testach",
+    responseSchemaFailed:
+      "Walidacja schematu odpowiedzi dla {{path}} nie powiodła się: {{issues}}",
+    requestFailed: "Żądanie testowe nie powiodło się: {{detail}}",
+    browser: {
+      serverNotRunning:
+        "Serwer deweloperski Atlas nie działa - uruchom go poleceniem vibe dev",
+      openFailed: "Nie udało się otworzyć strony w przeglądarce: {{detail}}",
+      fillFailed: "Nie udało się wypełnić pól formularza: {{detail}}",
+      submitFailed: "Nie udało się kliknąć przycisku wysyłania: {{detail}}",
+      evaluateFailed:
+        "Wykonanie skryptu na stronie nie powiodło się: {{detail}}",
+      resultTimeout: "Brak wyniku mutacji w ciągu {{timeoutMs}} ms",
+      parseFailed:
+        "Nie udało się odczytać zapisanej odpowiedzi jako JSON: {{raw}}",
+      cacheEmpty:
+        "Pamięć podręczna mutacji jest pusta - odpowiedź nigdy się nie wczytała",
+      requestFailed: "Test w przeglądarce nie powiódł się: {{detail}}",
+    },
   },
 
   success: {

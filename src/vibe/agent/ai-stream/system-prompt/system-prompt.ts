@@ -2,11 +2,11 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
-import { scopedTranslation as chatScopedTranslation } from "next-vibe/agent/chat/i18n";
-import { chatSettings } from "next-vibe/agent/chat/settings/db";
-import { getEnvAvailability } from "next-vibe/agent/env-availability";
-import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
+import { DefaultFolderId } from "../../../core/execution-context";
+import { scopedTranslation as chatScopedTranslation } from "../../chat/i18n";
+import { chatSettings } from "../../chat/settings/db";
+import { getEnvAvailability } from "../../env-availability";
+import { getAvailableModelCount } from "../../models/all-models";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import { languageConfig } from "next-vibe/core/i18n";
 import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
@@ -223,7 +223,7 @@ export const platformOverviewFragment: SystemPromptFragment = {
     const packLabel = `${currencySymbol(creditPackProduct.currency)}${creditPackProduct.price} → ${creditPackProduct.credits} permanent credits`;
     const totalModelCount = getAvailableModelCount(
       isAdmin,
-      getEnvAvailability(),
+      await getEnvAvailability(),
     );
     const uncensoredNames = FEATURED_MODELS.uncensored.join(", ");
 

@@ -1,6 +1,6 @@
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { ALL_METHODS, Methods } from "next-vibe/core/definition/enums";
-import type { DeepPartial } from "next-vibe/core/utils/type-utils";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
+import { ALL_METHODS, Methods } from "../../core/definition/enums";
+import type { DeepPartial } from "../../core/utils/type-utils";
 import { useMemo } from "react";
 
 import type {
@@ -51,7 +51,7 @@ export function usePrimaryMutationMethod(
  * @returns True if value is a plain object
  */
 function isPlainObject(
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type guard requires unknown for runtime type checking
+  // eslint-disable-next-line restricted/no-unknown -- Type guard requires unknown for runtime type checking
   value: unknown,
 ): value is Record<string, DeepPartial<never>> {
   return (
@@ -69,7 +69,6 @@ function isPlainObject(
  * Special handling: chains functions for the same key instead of replacing
  */
 export function deepMerge<T>(...sources: (T | null | undefined)[]): T {
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Deep merge requires dynamic object building
   const result: Record<string, DeepPartial<never>> = {};
 
   for (const source of sources) {

@@ -3,6 +3,7 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { Platform } from "next-vibe/platforms/platforms";
 import { useRouter } from "next-vibe/ui/hooks/use-navigation";
 import { Button } from "next-vibe/ui/ui/button";
 import { Card, CardContent } from "next-vibe/ui/ui/card";
@@ -21,6 +22,7 @@ interface ResetPasswordConfirmFormProps {
   token: string;
   tokenValidationResponse: ResponseType<ResetPasswordValidateGetResponseOutput>;
   user: JwtPayloadType;
+  platform: Platform;
 }
 
 export default function ResetPasswordConfirmForm({
@@ -28,6 +30,7 @@ export default function ResetPasswordConfirmForm({
   token,
   tokenValidationResponse,
   user,
+  platform,
 }: ResetPasswordConfirmFormProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const router = useRouter();
@@ -76,6 +79,7 @@ export default function ResetPasswordConfirmForm({
         endpoint={resetConfirmDefinitions}
         locale={locale}
         user={user}
+        platform={platform}
         endpointOptions={{
           create: {
             initialState: {

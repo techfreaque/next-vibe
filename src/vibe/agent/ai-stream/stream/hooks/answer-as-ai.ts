@@ -3,12 +3,12 @@
  * Handles answering as AI in both incognito and server modes
  */
 
-import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
-import type { ChatMessage } from "next-vibe/agent/chat/db";
-import { ChatMessageRole } from "next-vibe/agent/chat/enum";
-import messagesDefinition from "next-vibe/agent/chat/threads/[threadId]/messages/definition";
-import type { FavoriteConfig } from "next-vibe/agent/skills/favorites/db";
+import type { ChatModelId } from "../../models";
+import { DefaultFolderId } from "../../../../core/execution-context";
+import type { ChatMessage } from "../../../chat/db";
+import { ChatMessageRole } from "../../../chat/enum";
+import messagesDefinition from "../../../chat/threads/[threadId]/messages/definition";
+import type { FavoriteConfig } from "../../../skills/favorites/db";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { apiClient } from "next-vibe/unified-ui/hooks/store";
@@ -71,7 +71,7 @@ export async function answerAsAI(
     currentRootFolderId === DefaultFolderId.INCOGNITO
   ) {
     const { getMessagesForThread } =
-      await import("next-vibe/agent/chat/incognito/storage");
+      await import("../../../chat/incognito/storage");
     allMessages = await getMessagesForThread(activeThreadId);
   }
 
@@ -99,7 +99,7 @@ export async function answerAsAI(
       // Incognito threads live only in localStorage - send their current
       // title/description so the server-side rename prompt fragment sees them.
       const { getIncognitoThread } =
-        await import("next-vibe/agent/chat/incognito/storage");
+        await import("../../../chat/incognito/storage");
       const incognitoThread = await getIncognitoThread(activeThreadId);
       incognitoThreadTitle = incognitoThread?.title ?? null;
       incognitoThreadDescription = incognitoThread?.description ?? null;

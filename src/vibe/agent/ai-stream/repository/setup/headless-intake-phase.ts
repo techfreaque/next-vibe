@@ -14,7 +14,7 @@ import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { DefaultFolderId } from "../../../chat/config";
+import { DefaultFolderId } from "../../../../core/execution-context";
 import { chatMessages, type MessageMetadata } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
 import { ThreadsRepository } from "../../../chat/threads/repository";

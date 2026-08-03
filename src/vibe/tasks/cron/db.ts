@@ -13,11 +13,11 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { WidgetDataSchema } from "next-vibe/core/utils/json";
-import { users } from "next-vibe/identity/user/db";
-import type { NotificationTarget } from "next-vibe/tasks/unified-runner/types";
+import type { ErrorResponseType } from "../../core/route/response.schema";
+import type { WidgetData } from "../../core/utils/json";
+import { WidgetDataSchema } from "../../core/utils/json";
+import { users } from "../../identity/user/db";
+import type { NotificationTarget } from "../unified-runner/types";
 import { z } from "zod";
 
 import {
@@ -132,14 +132,6 @@ export const cronTasks = pgTable("cron_tasks", {
  * DB stores null for system tasks; use dbUserIdToOwner() / toDbUserId() at the boundary.
  */
 export type TaskOwner = { type: "user"; userId: string } | { type: "system" };
-
-/**
- * Convert a non-nullable userId string to a user TaskOwner.
- * Use this when you already know userId is a real user ID.
- */
-export function userOwner(userId: string): TaskOwner & { type: "user" } {
-  return { type: "user", userId };
-}
 
 /** The system owner singleton - for seed files and system tasks only. */
 export const SYSTEM_OWNER: TaskOwner & { type: "system" } = {

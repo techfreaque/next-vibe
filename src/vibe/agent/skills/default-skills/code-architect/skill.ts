@@ -1,13 +1,13 @@
-import { ChatModelId } from "next-vibe/agent/ai-stream/models";
-import { AI_RUN_ALIAS } from "next-vibe/agent/ai-stream/run/constants";
-import { CODING_AGENT_ALIAS } from "next-vibe/agent/coding-agent/constants";
+import { ChatModelId } from "../../../ai-stream/models";
+import { AI_RUN_ALIAS } from "../../../ai-stream/run/constants";
+import { CODING_AGENT_ALIAS } from "../../../coding-agent/constants";
 import {
   CORTEX_EDIT_ALIAS,
   CORTEX_LIST_ALIAS,
   CORTEX_READ_ALIAS,
   CORTEX_SEARCH_ALIAS,
   CORTEX_WRITE_ALIAS,
-} from "next-vibe/agent/cortex/constants";
+} from "../../../cortex/constants";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import { SQL_ALIAS } from "next-vibe/database/sql/constants";
 import { VibeMode } from "next-vibe/env/env-util";

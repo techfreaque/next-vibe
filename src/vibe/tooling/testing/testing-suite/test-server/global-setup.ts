@@ -3,11 +3,11 @@
  * This runs once before all test files
  */
 
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { closeDatabase } from "next-vibe/database/index";
-import { SeedRepository } from "next-vibe/database/seed/repository";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { loadEnvironment } from "next-vibe/platforms/cli/runtime/environment";
+import { parseError } from "../../../../core/utils/parse-error";
+import { closeDatabase } from "../../../../database/index";
+import { SeedRepository } from "../../../../database/seed/repository";
+import type { EndpointLogger } from "../../../../logger/types";
+import { loadEnvironment } from "../../../../platforms/cli/runtime/environment";
 
 import teardown from "./global-teardown";
 import { startServer } from "./test-server";
@@ -30,7 +30,7 @@ export default async function setup(
     logger.error("Error during test setup:", parseError(error));
     // Make sure to disconnect Prisma on error
     await closeDatabase(logger).catch(void logger.error);
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Test infrastructure can throw errors
+    // eslint-disable-next-line restricted/restricted-syntax -- Test infrastructure can throw errors
     throw error;
   }
 }

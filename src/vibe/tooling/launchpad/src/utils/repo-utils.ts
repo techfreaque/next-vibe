@@ -9,7 +9,7 @@ import type {
   LaunchpadConfig,
   LaunchpadFolder,
   LaunchpadPackage,
-} from "next-vibe/tooling/launchpad/src/types/types";
+} from "../types/types";
 // eslint-disable-next-line eslint-plugin-import/no-named-as-default
 import simpleGit from "simple-git";
 

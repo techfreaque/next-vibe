@@ -86,9 +86,10 @@ export const translations: typeof enTranslations = {
           description: "Wystąpił nieoczekiwany błąd",
         },
         dependenciesMissing:
-          "Wymagane zależności niedostępne: {missing}. {recommendations}",
-        invalidAction: "Nieprawidłowa akcja: {action}",
-        actionFailed: "Nie udało się wykonać akcji: {error}",
+          "Wymagane zależności niedostępne: {{missing}}. {{recommendations}}",
+        invalidAction: "Nieprawidłowa akcja: {{action}}",
+        noActionProvided: "Nie podano akcji",
+        actionFailed: "Nie udało się wykonać akcji: {{error}}",
         alreadyRecording: "Nagrywanie już w toku",
         notRecording: "Brak nagrywania w toku",
       },
@@ -199,6 +200,13 @@ export const translations: typeof enTranslations = {
       },
       apiKeyMissing: "Klucz API Eden AI nie jest skonfigurowany",
       transcriptionFailed: "Transkrypcja nie powiodła się: {{error}}",
+      noSttProvider: "Brak dostępnego dostawcy transkrypcji mowy",
+      unsupportedProvider: "Nieobsługiwany dostawca transkrypcji: {{provider}}",
+      noSttProviderConfigured:
+        "Nie skonfigurowano żadnego dostawcy transkrypcji mowy. Dodaj OPENAI_API_KEY, EDEN_AI_API_KEY albo DEEPGRAM_API_KEY – lub podłącz systemowego dostawcę inferencji.",
+      notConfigured:
+        "{{label}} nie jest skonfigurowany. Dodaj {{envKey}} do pliku .env. Pobierz klucz pod adresem {{url}}",
+      providerResultMissing: "Dostawca {{provider}} nie zwrócił żadnego wyniku",
       audioTooShort:
         "Nagranie zbyt krótkie. Przytrzymaj przycisk dłużej i mów wyraźnie.",
       noAudioFile: "Nie podano pliku audio",

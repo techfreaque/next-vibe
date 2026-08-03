@@ -21,12 +21,12 @@
 import "server-only";
 
 import { and, eq, isNull, sql } from "drizzle-orm";
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
-import { chatFolders } from "next-vibe/agent/chat/db";
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import { db } from "next-vibe/database";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { identityEnv } from "next-vibe/identity/env";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
+import { chatFolders } from "../../agent/chat/db";
+import { defaultLocale } from "../../core/i18n/core/config";
+import { db } from "../../database";
+import type { JwtPrivatePayloadType } from "../../identity/auth/types";
+import { identityEnv } from "../../identity/env";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import {
@@ -160,7 +160,7 @@ if (_remoteUrl) {
       // gets its loop location STAMPED ONCE at creation (loop_instance_id);
       // routing then resolves purely from that explicit value.
       const { ThreadsRepository } =
-        await import("next-vibe/agent/chat/threads/repository");
+        await import("../../agent/chat/threads/repository");
       const stampedLoop = await ThreadsRepository.deriveLoopInstanceFromFolder(
         folder.id,
       );
@@ -170,8 +170,8 @@ if (_remoteUrl) {
       ).toBe(HERMES_INSTANCE_ID);
 
       const { ExecuteToolRouting } =
-        await import("next-vibe/remote-connection/routing");
-      const { createEndpointLogger } = await import("next-vibe/logger/server");
+        await import("../routing");
+      const { createEndpointLogger } = await import("../../logger/server");
       const target = await ExecuteToolRouting.resolveTarget({
         userId: testUser.id,
         loopInstanceId: stampedLoop ?? undefined,
@@ -288,7 +288,7 @@ if (_remoteUrl) {
     // ── RC3: transport is auto-negotiated — never user-set ─────────────────
 
     it("RC3: connect definition does NOT expose transportMode — transport is auto-negotiated", async () => {
-      const definitions = await import("../connect/definition");
+      const definitions = await import("./definition");
       const children = definitions.default.POST.fields.children;
       expect(
         "transportMode" in children,

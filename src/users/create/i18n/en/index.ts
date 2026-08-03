@@ -204,7 +204,7 @@ export const translations = {
         description: "You have unsaved changes that will be lost",
       },
       internal: {
-        title: "Internal Error",
+        title: "Internal Error: {{details}}",
         description: "An internal error occurred while creating the user",
       },
     },

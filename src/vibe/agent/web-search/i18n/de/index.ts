@@ -92,7 +92,7 @@ export const translations: typeof enTranslations = {
         description: "Bitte gib eine Suchanfrage ein",
       },
       queryTooLong: {
-        title: "Suchanfrage ist zu lang",
+        title: "Suchanfrage ist zu lang (max. {{maxLength}} Zeichen)",
         description: "Die Anfrage darf maximal 400 Zeichen lang sein",
       },
       noProvider: {

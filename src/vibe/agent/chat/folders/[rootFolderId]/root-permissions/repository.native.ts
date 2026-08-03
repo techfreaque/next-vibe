@@ -46,7 +46,6 @@ export class RootFolderPermissionsRepository {
       success: false,
       errorType: response.errorType,
       message: response.message,
-      messageParams: response.messageParams,
     };
   }
 }

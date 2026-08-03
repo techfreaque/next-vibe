@@ -1,13 +1,13 @@
 "use client";
 
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import {
   FormAlert,
   type FormAlertState,
 } from "next-vibe/ui/ui/form/form-alert";
-import type { ReactStaticWidgetProps } from "next-vibe/unified-ui/_shared/react-types";
-import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
-import { useWidgetResponse } from "next-vibe/unified-ui/_shared/use-widget-context";
+import type { ReactStaticWidgetProps } from "../../../_shared/react-types";
+import type { FieldUsageConfig } from "../../../_shared/types";
+import { useWidgetResponse } from "../../../_shared/use-widget-context";
 import type { JSX } from "react";
 
 import type { FormAlertWidgetConfig } from "./types";
@@ -30,9 +30,9 @@ export function FormAlertWidget<
   if (response && response.success === false) {
     const alert: FormAlertState = {
       variant: "destructive",
+      // `response.message` is already fully interpolated - nothing left to fill in.
       message: {
         message: response.message,
-        messageParams: response.messageParams,
       },
     };
     return <FormAlert alert={alert} className={field.className} />;

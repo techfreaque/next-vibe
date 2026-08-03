@@ -58,7 +58,7 @@ class DependencyCheckerImpl implements IDependencyChecker {
   async ensure(command: string, friendlyName: string): Promise<void> {
     const path = await this.which(command);
     if (!path) {
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Dependency check error
+      // eslint-disable-next-line restricted/restricted-syntax, i18next/no-literal-string -- Dependency check error
       throw new DependencyError(
         `${friendlyName} not found. Please install "${command}" and ensure it's in PATH.`,
         command,
@@ -235,7 +235,7 @@ export async function ensureDirectory(dir: string): Promise<void> {
   try {
     await Bun.spawn(["mkdir", "-p", dir]).exited;
   } catch (error) {
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Directory creation error
+    // eslint-disable-next-line restricted/restricted-syntax, i18next/no-literal-string -- Directory creation error
     throw new Error(`Failed to create directory ${dir}: ${String(error)}`, {
       cause: error,
     });

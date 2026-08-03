@@ -55,6 +55,15 @@ export interface ExternalLinkProps {
   className?: string;
   download?: string | boolean;
   title?: string;
+  /**
+   * Label to show when the surface cannot render a real hyperlink, so the href
+   * would otherwise have to be printed inline to stay useful. A terminal without
+   * OSC-8 support is the case that needs it: `12:5` is meaningless unlinked,
+   * where `src/foo.ts:12:5` still tells you where to look.
+   *
+   * Ignored on web, which can always render an anchor.
+   */
+  unlinkedLabel?: string;
 }
 
 /**

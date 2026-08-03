@@ -75,20 +75,24 @@ export const translations = {
     email: {
       defaultSenderName: "System",
       errors: {
-        sending_failed: "Failed to send email to {{recipient}}",
+        sending_failed: "Failed to send email to {{recipient}}: {{error}}",
+        invalid_locale:
+          "Can't send to {{recipient}}: '{{locale}}' is not a valid locale",
       },
     },
   },
   emailHandling: {
     email: {
       errors: {
-        rendering_failed: "Failed to render email template",
-        send_failed: "Failed to send email",
+        rendering_failed: "Failed to render email template: {{error}}",
+        send_failed: "Failed to send email: {{error}}",
         email_failed_subject: "Email Failed",
         unknown_recipient: "Unknown recipient",
         unknown_sender: "System",
         email_render_exception: "Email rendering exception occurred",
         batch_send_failed: "Batch email send failed",
+        batch_send_failed_item: "Batch send failed: {{error}}",
+        batch_send_failed_all: "Batch email send failed: {{errors}}",
       },
     },
   },
@@ -101,23 +105,34 @@ export const translations = {
       server: {
         title: "Server Error",
         description: "An error occurred on the SMTP server",
+        detail: "SMTP send failed: {{error}}",
+        detail_account:
+          "SMTP failure on {{accountName}} ({{accountId}}): {{error}}",
+        detail_attempt:
+          "SMTP account {{accountId}} failed on attempt {{attempt}}: {{error}}",
+        detail_exhausted: "SMTP account {{accountId}} exhausted all retries",
       },
       rejected: {
-        title: "Email Rejected",
+        title: "Email to {{recipient}} rejected: {{reason}}",
         defaultReason: "Email rejected by server",
       },
       no_recipients: {
-        title: "No Recipients Accepted",
+        title: "No recipients accepted for {{recipient}}",
         defaultReason: "No recipients accepted",
       },
       rate_limit: {
-        title: "Rate Limit Exceeded",
+        title:
+          "Hourly rate limit hit on {{accountName}}: {{current}}/{{limit}} sent, {{remainingCapacity}} left",
       },
       capacity: {
-        title: "Capacity Error",
+        title: "Capacity check failed: {{error}}",
       },
       no_account: {
         title: "No SMTP Account Available",
+        detail_criteria:
+          "No SMTP account for {{campaignType}} / {{journeyVariant}} / {{campaignStage}} / {{country}} / {{language}}",
+        detail_campaign: "No SMTP account for campaign type {{campaignType}}",
+        detail_account: "SMTP account {{accountId}} not found",
       },
     },
   },
@@ -126,6 +141,9 @@ export const translations = {
       server: {
         title: "Email Metadata Server Error",
         description: "Failed to store email metadata",
+        detail_store: "Couldn't store metadata for {{recipient}}: {{error}}",
+        detail_engagement:
+          "Couldn't update engagement for message {{emailId}}: {{error}}",
       },
     },
   },

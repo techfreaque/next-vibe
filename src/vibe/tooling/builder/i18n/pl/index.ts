@@ -95,7 +95,10 @@ export const translations: typeof enTranslations = {
     cleaningFolders: "Czyszczenie folderów...",
     buildingVersion: "Budowanie wersji {{version}}...",
     bundlingCli: "Pakowanie CLI z Bun...",
-    bundleFailed: "Pakowanie nie powiodło się",
+    bundleFailed: "Pakowanie nie powiodło się: {{error}}",
+    bundleFailedUnknown: "Pakowanie nie powiodło się - bez komunikatu błędu",
+    outputMissing:
+      "Pakowanie nie dało wyniku: {{output}} nie istnieje lub jest pusty",
     bundleSuccess: "CLI spakowane pomyślnie",
     creatingPackageJson: "Tworzenie package.json...",
     copyingFiles: "Kopiowanie README i LICENSE...",
@@ -627,7 +630,7 @@ export const translations: typeof enTranslations = {
     },
     errors: {
       buildFailed: {
-        title: "Kompilacja nie powiodła się",
+        title: "Kompilacja nie powiodła się: {{error}}",
         description: "Proces kompilacji zakończył się błędem",
       },
       validation: {

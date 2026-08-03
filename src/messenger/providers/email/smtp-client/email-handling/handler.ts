@@ -9,13 +9,11 @@ import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-ba
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import type { TParams } from "next-vibe/core/i18n/core/static-types";
-import type { InferJwtPayloadTypeFromRoles } from "next-vibe/core/route/handler";
+import type { InferJwtPayloadTypeFromRoles } from "next-vibe/core/route/handler-roles";
 import type {
   ErrorResponseType,
   SuccessResponseType,
 } from "next-vibe/core/route/response.schema";
-import type { UserRoleValue } from "next-vibe/identity/roles/enum";
-
 import type {
   EmailRenderProps,
   EmailRenderSkip,
@@ -24,31 +22,6 @@ import type {
 } from "@/messenger/registry/template";
 
 export type { EmailRenderProps, EmailRenderSkip, EmailResolvedData };
-
-/**
- * Email Function Type - resolver that maps request context to email data.
- */
-export type EmailFunctionType<
-  TRequest,
-  TResponse,
-  TUrlVariables,
-  TScopedTranslationKey extends string,
-  TUserRoles extends readonly UserRoleValue[],
-> = (
-  props: EmailRenderProps<
-    TRequest,
-    TResponse,
-    TUrlVariables,
-    TScopedTranslationKey,
-    TUserRoles
-  >,
-) =>
-  | Promise<
-      | SuccessResponseType<EmailResolvedData | EmailRenderSkip>
-      | ErrorResponseType
-    >
-  | SuccessResponseType<EmailResolvedData | EmailRenderSkip>
-  | ErrorResponseType;
 
 /**
  * Email handler - carries the template typed by its render/scopedTranslation surface.

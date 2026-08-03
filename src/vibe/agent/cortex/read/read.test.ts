@@ -9,9 +9,9 @@
 import "server-only";
 
 import { and, eq, like } from "drizzle-orm";
-import { DEFAULT_CHAT_MODEL_SELECTION } from "next-vibe/agent/ai-stream/constants";
-import { customSkills } from "next-vibe/agent/skills/db";
-import { SkillCategory, SkillOwnershipType } from "next-vibe/agent/skills/enum";
+import { DEFAULT_CHAT_MODEL_SELECTION } from "../../ai-stream/constants";
+import { customSkills } from "../../skills/db";
+import { SkillCategory, SkillOwnershipType } from "../../skills/enum";
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
@@ -21,7 +21,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { cortexNodes } from "../db";
 import listEndpoint from "../list/definition";
-import readEndpoint from "../read/definition";
+import readEndpoint from "./definition";
 import writeEndpoint from "../write/definition";
 
 const TEST_PREFIX = "/documents/read-test";

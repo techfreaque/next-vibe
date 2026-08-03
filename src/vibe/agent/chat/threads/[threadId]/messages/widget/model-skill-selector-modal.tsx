@@ -1,8 +1,8 @@
 "use client";
-import { Selector } from "next-vibe/agent/ai-stream/stream/widget/selector/index";
-import { useChatSettings } from "next-vibe/agent/chat/settings/hooks";
-import { ChatSettingsRepositoryClient } from "next-vibe/agent/chat/settings/repository-client";
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
+import { Selector } from "../../../../../ai-stream/stream/widget/selector/index";
+import { useChatSettings } from "../../../../settings/hooks";
+import { ChatSettingsRepositoryClient } from "../../../../settings/repository-client";
+import { useProviderAvailability } from "../../../../../env-availability-store";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";

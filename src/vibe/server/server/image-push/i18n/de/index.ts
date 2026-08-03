@@ -83,7 +83,7 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Server-Fehler",
-        description: "Docker-Build oder -Push fehlgeschlagen: {{error}}",
+        description: "Docker-Build oder -Push fehlgeschlagen",
       },
       unknown: {
         title: "Unbekannter Fehler",
@@ -109,8 +109,11 @@ export const translations: typeof enTranslations = {
         pushSuccess: "🚀 {{refs}} gepusht",
         buildExitCode: "docker buildx wurde mit Code {{code}} beendet",
         buildKilled: "docker buildx wurde durch Signal {{signal}} beendet",
+        dockerBuildFailed: "Docker-Build fehlgeschlagen: {{error}}",
         gitShaFailed:
           "Der aktuelle Git-Commit-SHA konnte nicht ermittelt werden",
+        gitShaFailedDetail:
+          "Der aktuelle Git-Commit-SHA konnte nicht ermittelt werden: {{error}}",
         sshTransferStart: "📡 Übertrage {{refs}} per ssh an {{target}} ...",
         sshTransferSuccess: "🚀 {{refs}} per ssh an {{target}} übertragen",
         sshTransferFailed:

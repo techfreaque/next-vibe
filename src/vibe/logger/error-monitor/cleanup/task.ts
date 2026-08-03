@@ -5,12 +5,9 @@
 
 import "server-only";
 
-import { CRON_SCHEDULES, TASK_TIMEOUTS } from "next-vibe/tasks/constants";
-import { CronTaskPriority, TaskCategory } from "next-vibe/tasks/enum";
-import {
-  createCronTask,
-  type Task,
-} from "next-vibe/tasks/unified-runner/types";
+import { CRON_SCHEDULES, TASK_TIMEOUTS } from "../../../tasks/constants";
+import { CronTaskPriority, TaskCategory } from "../../../tasks/enum";
+import { createCronTask, type Task } from "../../../tasks/unified-runner/types";
 
 import definitions from "./definition";
 import { tools } from "./route";

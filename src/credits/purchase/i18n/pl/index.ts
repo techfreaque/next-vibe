@@ -97,6 +97,7 @@ export const translations: typeof enTranslations = {
       server: {
         title: "Błąd serwera",
         description: "Nie udało się utworzyć sesji płatności",
+        detail: "Nie udało się rozpocząć płatności: {{error}}",
       },
       unknown: {
         title: "Nieznany błąd",

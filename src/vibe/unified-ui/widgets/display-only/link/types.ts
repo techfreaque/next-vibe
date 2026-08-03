@@ -3,14 +3,13 @@
  * Renders clickable hyperlinks with external link indicators
  */
 
-import type { Route } from "next";
-import type { WidgetType } from "next-vibe/core/definition/enums";
-import type { StringWidgetSchema } from "next-vibe/unified-ui/_shared/schema-constraints";
+import type { WidgetType } from "../../../../core/definition/enums";
+import type { StringWidgetSchema } from "../../../_shared/schema-constraints";
 import type {
   BasePrimitiveWidgetConfig,
   FieldUsageConfig,
-} from "next-vibe/unified-ui/_shared/types";
-import type { SpacingSize } from "next-vibe/unified-ui/widgets/display-only/title/types";
+} from "../../../_shared/types";
+import type { SpacingSize } from "../title/types";
 import type { z } from "zod";
 
 /**
@@ -67,8 +66,15 @@ export interface LinkWidgetConfig<
 > extends BasePrimitiveWidgetConfig<TUsage, TSchemaType, TSchema> {
   type: WidgetType.LINK;
 
-  /** Static URL path or route - used when no dynamic value */
-  href?: Route | string;
+  /**
+   * Static URL path or route - used when no dynamic value.
+   *
+   * Deliberately plain `string` rather than next's typed-routes `Route`. Route
+   * is a string subtype, so `Route | string` already collapsed to `string` and
+   * the brand bought nothing — while the import made this the only module in
+   * unified-ui that reached for `next`. The widget layer stays framework-free.
+   */
+  href?: string;
 
   /** Static link text translation key */
   text?: NoInfer<TKey>;

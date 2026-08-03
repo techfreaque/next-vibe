@@ -1,8 +1,9 @@
 import "server-only";
 
-import { agentEnv } from "next-vibe/agent/env";
-import { scopedTranslation } from "next-vibe/agent/image-generation/i18n";
-import { pollDelay } from "next-vibe/agent/shared/poll-delay";
+import { agentEnv } from "../../env";
+import { scopedTranslation } from "../i18n";
+import { pollDelay } from "../../shared/poll-delay";
+import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -11,6 +12,7 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
+import { Environment } from "next-vibe/env/env-util";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 interface FalAiResponse {
@@ -25,7 +27,7 @@ interface FalAiStatusResponse {
   status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "FAILED";
 }
 
-const POLL_INTERVAL_MS = process.env.NODE_ENV === "test" ? 50 : 2000;
+const POLL_INTERVAL_MS = coreEnv.NODE_ENV === Environment.TEST ? 50 : 2000;
 const MAX_POLL_ATTEMPTS = 30;
 
 export async function generateWithFalAi(params: {

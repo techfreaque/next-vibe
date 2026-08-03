@@ -1,4 +1,4 @@
-import { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import { ChatModelId } from "../../../ai-stream/models";
 
 import type { Skill } from "../../config";
 import {

@@ -6,7 +6,9 @@
  */
 
 import { describe, expect, it } from "bun:test";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import { filterUserPermissionRoles } from "../../identity/roles/enum";
+import type { EndpointLogger } from "../../logger/types";
+import { Platform } from "../../platforms/platforms";
 import { z } from "zod";
 
 import productUpdateDefinition from "@/products/catalog/[productId]/update/definition";
@@ -430,7 +432,11 @@ describe("generateFormSchema", () => {
   it("merges request-data and url-path-param fields into one ZodObject", () => {
     // PATCH products/catalog/[productId]/update has `productId` as a url-path-param
     // field and request-data fields (name, etc.). The form must hold both.
-    const formSchema = generateFormSchema(productUpdateDefinition.PATCH.fields);
+    const formSchema = generateFormSchema(
+      productUpdateDefinition.PATCH.fields,
+      filterUserPermissionRoles(productUpdateDefinition.PATCH.allowedRoles),
+      Platform.NEXT_API,
+    );
     expect(formSchema).toBeInstanceOf(z.ZodObject);
 
     const keys = Object.keys(formSchema.shape);
@@ -455,7 +461,11 @@ describe("generateFormSchema", () => {
       productUpdateDefinition.PATCH.formSchema.shape,
     ).toSorted();
     const regeneratedKeys = Object.keys(
-      generateFormSchema(productUpdateDefinition.PATCH.fields).shape,
+      generateFormSchema(
+        productUpdateDefinition.PATCH.fields,
+        filterUserPermissionRoles(productUpdateDefinition.PATCH.allowedRoles),
+        Platform.NEXT_API,
+      ).shape,
     ).toSorted();
     expect(storedKeys).toEqual(regeneratedKeys);
     // Sanity: it actually contains the url-path-param key.

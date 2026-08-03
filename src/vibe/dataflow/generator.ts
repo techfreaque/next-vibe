@@ -10,17 +10,24 @@ import "server-only";
 
 import { readFile } from "node:fs/promises";
 
-import type { GeneratorDefinition } from "next-vibe/core/generators/shared/shared-inputs";
+import type { GeneratorDefinition } from "../core/generators/shared/shared-inputs";
 import {
   findFilesRecursively,
   generateFileHeader,
   getRelativeImportPath,
   writeGeneratedFile,
-} from "next-vibe/core/generators/shared/utils";
+} from "../core/generators/shared/utils";
 
-import { GENERATED_DIR, getApiDir } from "@/env/paths";
+import { GENERATED_DIR, getApiDir, VIBE_DIR } from "@/env/paths";
 
 const OUTPUT_FILE = `${GENERATED_DIR}/dataflow/graph-seeds-index.ts`;
+
+/**
+ * Where GraphSeedEntry actually lives. The emitted import resolves from the
+ * generated file's directory, not this one — a hand-written "./graph/types"
+ * pointed at <generated>/dataflow/graph/types, which does not exist.
+ */
+const GRAPH_TYPES_MODULE = `${VIBE_DIR}/dataflow/graph/types.ts`;
 
 async function validateFiles(files: string[]): Promise<string | null> {
   for (const file of files) {
@@ -64,7 +71,7 @@ function generateContent(seedFiles: string[], outputFile: string): string {
 /* eslint-disable prettier/prettier */
 /* eslint-disable simple-import-sort/imports */
 
-import type { GraphSeedEntry } from "next-vibe/dataflow/graph/types";
+import type { GraphSeedEntry } from "${getRelativeImportPath(GRAPH_TYPES_MODULE, outputFile)}";
 
 ${imports.join("\n")}
 
@@ -88,6 +95,7 @@ export const generator: GeneratorDefinition = {
     }
     return findFilesRecursively(getApiDir(), "graph-seeds.ts");
   },
+  output: OUTPUT_FILE,
   async generate(ctx) {
     const seedFiles = ctx.files.graphSeed;
 

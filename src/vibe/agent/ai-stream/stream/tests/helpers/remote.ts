@@ -17,7 +17,7 @@ import { sql } from "drizzle-orm";
 import {
   type DefaultFolderId,
   rootlessToolExecutionContext,
-} from "next-vibe/agent/chat/config";
+} from "../../../../../core/execution-context";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
@@ -112,7 +112,7 @@ function makeRemoteSetup(
         const { getOrCreateFolder } =
           await import("../../../testing/headless-test-runner");
         const { DefaultFolderId: FolderIds } =
-          await import("next-vibe/agent/chat/config");
+          await import("../../../../../core/execution-context");
         // Build REMOTE/<instance>/private — the peer's own-thread landing lives
         // under `private` (mirror subtree segment). The base suite then nests
         // tests/<case> below this, so a case thread sits at
@@ -312,10 +312,10 @@ export async function getOrCreateRemoteFolderChain(params: {
   const { sendTestRequest } =
     await import("next-vibe/tooling/testing/testing-suite/send-test-request");
   const listDef = (
-    await import("next-vibe/agent/chat/folders/[rootFolderId]/definition")
+    await import("../../../../chat/folders/[rootFolderId]/definition")
   ).default;
   const createDef = (
-    await import("next-vibe/agent/chat/folders/[rootFolderId]/create/definition")
+    await import("../../../../chat/folders/[rootFolderId]/create/definition")
   ).default;
   let parentId: string | null = null;
   for (const name of params.names) {

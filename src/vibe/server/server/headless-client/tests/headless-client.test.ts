@@ -21,31 +21,28 @@ import "server-only";
 import { readFileSync } from "node:fs";
 
 import { and, eq } from "drizzle-orm";
-import { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import { ChatModelId } from "../../../../agent/ai-stream/models";
 import {
   getOrCreateFolder,
   resolveUserAndToken,
   runTestStream,
-} from "next-vibe/agent/ai-stream/testing/headless-test-runner";
-import {
-  DefaultFolderId,
-  rootlessToolExecutionContext,
-} from "next-vibe/agent/chat/config";
-import { chatThreads } from "next-vibe/agent/chat/db";
-import { NO_SKILL_ID } from "next-vibe/agent/skills/constants";
-import { ModelSelectionType } from "next-vibe/agent/skills/enum";
-import type { FavoriteConfig } from "next-vibe/agent/skills/favorites/db";
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import { db } from "next-vibe/database";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { identityEnv } from "next-vibe/identity/env";
-import { createEndpointLogger } from "next-vibe/logger/server";
+} from "../../../../agent/ai-stream/testing/headless-test-runner";
+import { DefaultFolderId, rootlessToolExecutionContext } from "next-vibe/core/execution-context";
+import { chatThreads } from "../../../../agent/chat/db";
+import { NO_SKILL_ID } from "../../../../agent/skills/constants";
+import { ModelSelectionType } from "../../../../agent/skills/enum";
+import type { FavoriteConfig } from "../../../../agent/skills/favorites/db";
+import { defaultLocale } from "../../../../core/i18n/core/config";
+import { db } from "../../../../database";
+import type { JwtPrivatePayloadType } from "../../../../identity/auth/types";
+import { identityEnv } from "../../../../identity/env";
+import { createEndpointLogger } from "../../../../logger/server";
 import {
   instanceIdentities,
   remoteConnections,
-} from "next-vibe/remote-connection/db";
-import { RemoteConnectionRepository } from "next-vibe/remote-connection/repository";
-import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
+} from "../../../../remote-connection/db";
+import { RemoteConnectionRepository } from "../../../../remote-connection/repository";
+import { sendTestRequest } from "../../../../tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -241,7 +238,7 @@ describe("headless-client connection registration", () => {
 
   it("selfInstanceId reported by remote-connection/list is headless-client", async () => {
     const listDef = (
-      await import("next-vibe/remote-connection/list/definition")
+      await import("../../../../remote-connection/list/definition")
     ).default;
     const result = await sendTestRequest({
       toolExecutionContext: undefined,

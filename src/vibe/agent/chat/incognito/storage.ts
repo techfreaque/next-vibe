@@ -8,7 +8,7 @@
 
 import { storage } from "next-vibe/ui/lib/storage";
 
-import type { DefaultFolderId } from "../config";
+import type { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 import { ThreadStatus, ThreadStreamingState } from "../enum";
 
@@ -132,100 +132,6 @@ export async function saveMessage(message: ChatMessage): Promise<void> {
 }
 
 /**
- * Save message with attachments to storage
- * Converts File objects to base64 and stores in message metadata
- */
-export async function saveMessageWithAttachments(
-  message: ChatMessage,
-  attachments: File[],
-): Promise<void> {
-  if (attachments.length === 0) {
-    return saveMessage(message);
-  }
-
-  const { convertFilesToIncognitoAttachments } = await import("./file-utils");
-  const incognitoAttachments =
-    await convertFilesToIncognitoAttachments(attachments);
-
-  const messageWithAttachments: ChatMessage = {
-    ...message,
-    metadata: {
-      ...message.metadata,
-      attachments: incognitoAttachments,
-    },
-  };
-
-  return saveMessage(messageWithAttachments);
-}
-
-/**
- * Save folder to storage
- */
-export async function saveFolder(folder: ChatFolder): Promise<void> {
-  const folders = await getItem<Record<string, ChatFolder>>(
-    STORAGE_KEYS.FOLDERS,
-    {},
-  );
-  folders[folder.id] = folder;
-  await setItem(STORAGE_KEYS.FOLDERS, folders);
-}
-
-/**
- * Create new folder in incognito mode
- */
-export async function createIncognitoFolder(
-  name: string,
-  rootFolderId: DefaultFolderId,
-  parentId: string | null = null,
-  icon: ChatFolder["icon"] = "folder",
-): Promise<ChatFolder> {
-  const folders = await getItem<Record<string, ChatFolder>>(
-    STORAGE_KEYS.FOLDERS,
-    {},
-  );
-
-  // Compute sort order: max among siblings + 1
-  const siblings = Object.values(folders).filter(
-    (f) => f.rootFolderId === rootFolderId && f.parentId === parentId,
-  );
-  const maxSortOrder = siblings.reduce(
-    (max, f) => Math.max(max, f.sortOrder ?? 0),
-    -1,
-  );
-
-  const folder: ChatFolder = {
-    id: crypto.randomUUID(),
-    userId: null,
-    leadId: null,
-    rootFolderId,
-    name,
-    icon: icon ?? "folder",
-    color: null,
-    parentId,
-    expanded: false,
-    sortOrder: maxSortOrder + 1,
-    pinned: false,
-    rolesView: null,
-    rolesManage: null,
-    rolesCreateThread: null,
-    rolesPost: null,
-    rolesModerate: null,
-    rolesAdmin: null,
-    canManage: true,
-    canCreateThread: true,
-    canModerate: false,
-    canDelete: true,
-    canManagePermissions: false,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  };
-
-  folders[folder.id] = folder;
-  await setItem(STORAGE_KEYS.FOLDERS, folders);
-  return folder;
-}
-
-/**
  * Update folder in incognito mode
  */
 export async function updateIncognitoFolder(
@@ -307,24 +213,6 @@ export async function deleteFolder(folderId: string): Promise<void> {
   for (const threadId of threadsToDelete) {
     await deleteThread(threadId);
   }
-}
-
-/**
- * Set active thread
- */
-export async function setActiveThread(threadId: string | null): Promise<void> {
-  await setItem(STORAGE_KEYS.ACTIVE_THREAD, threadId);
-}
-
-/**
- * Set current folder
- */
-export async function setCurrentFolder(
-  rootFolderId: DefaultFolderId,
-  subFolderId: string | null,
-): Promise<void> {
-  await setItem(STORAGE_KEYS.CURRENT_ROOT_FOLDER, rootFolderId);
-  await setItem(STORAGE_KEYS.CURRENT_SUB_FOLDER, subFolderId);
 }
 
 /**
@@ -433,27 +321,6 @@ export async function getMessagesForThread(
     .filter((msg) => msg.threadId === threadId)
     .map(parseMessage) // Parse dates
     .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
-}
-
-/**
- * Clear all incognito data
- */
-export async function clearIncognitoData(): Promise<void> {
-  if (typeof window !== "undefined") {
-    for (const key of Object.values(STORAGE_KEYS)) {
-      await storage.removeItem(key);
-    }
-    // Files are stored in message metadata and cleared with messages
-  }
-}
-
-/**
- * Generate unique ID for incognito mode
- */
-export function generateIncognitoId(): string {
-  // Generate a valid UUID for compatibility with server validation
-  // The prefix is not used anymore since we need proper UUIDs
-  return crypto.randomUUID();
 }
 
 /**

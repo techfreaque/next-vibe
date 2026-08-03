@@ -13,34 +13,25 @@ import {
   DefinitionLoader,
   type GetEndpointFn,
   type IDefinitionLoader,
-} from "next-vibe/core/definition/loader";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+} from "../../../core/definition/loader";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
 import {
   DefinitionsRegistry,
   type IDefinitionsRegistry,
-} from "next-vibe/core/route/definitions-registry";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { enableMcpSilentMode } from "next-vibe/logger/debug";
-import { createEndpointLogger } from "next-vibe/logger/server";
-import { cliEnv } from "next-vibe/platforms/cli/env";
-import { scopedTranslation as cliScopedTranslation } from "next-vibe/platforms/cli/i18n";
-import {
-  type EnvironmentResult,
-  loadEnvironment,
-} from "next-vibe/platforms/cli/runtime/environment";
-import {
-  ErrorHandler,
-  setupGlobalErrorHandlers,
-} from "next-vibe/platforms/cli/runtime/execution-errors";
-import { CliInputParser } from "next-vibe/platforms/cli/runtime/parsing";
-import { RouteDelegationHandler } from "next-vibe/platforms/cli/runtime/route-executor";
-import {
-  CliTarget,
-  type CliTargetValue,
-} from "next-vibe/platforms/cli/types/cli-target";
-import { Platform } from "next-vibe/platforms/platforms";
+} from "../../../core/route/definitions-registry";
+import type { WidgetData } from "../../../core/utils/json";
+import { parseError } from "../../../core/utils/parse-error";
+import type { JwtPayloadType } from "../../../identity/auth/types";
+import { enableMcpSilentMode } from "../../../logger/debug";
+import { createEndpointLogger } from "../../../logger/server";
+import { cliEnv } from "../env";
+import { scopedTranslation as cliScopedTranslation } from "../i18n";
+import { type EnvironmentResult, loadEnvironment } from "./environment";
+import { ErrorHandler, setupGlobalErrorHandlers } from "./execution-errors";
+import { CliInputParser } from "./parsing";
+import { RouteDelegationHandler } from "./route-executor";
+import { CliTarget, type CliTargetValue } from "../types/cli-target";
+import { Platform } from "../../platforms";
 
 import { pathToAliasMap } from "@/generated/endpoints/alias-map";
 
@@ -113,7 +104,7 @@ interface CliOptions {
   debug?: boolean;
   interactive?: boolean;
   agentControl?: boolean;
-  platform?: Platform;
+  platform: Platform;
   hermes?: boolean;
   preview?: boolean;
   /** Shorthand for --remote with instanceId "thea". */
@@ -287,8 +278,7 @@ export function runCli({
           );
         }
 
-        const { cliResourceManager } =
-          await import("next-vibe/platforms/cli/runtime/debug");
+        const { cliResourceManager } = await import("./debug");
         await cliResourceManager.initialize(logger, options.locale);
         const performanceMonitor = cliResourceManager.getPerformanceMonitor();
 
@@ -397,7 +387,7 @@ export function runCli({
           if (command === "mcp" && (loader || defRegistry)) {
             performanceMonitor.mark("routeStart");
             const { MCPServeRepository } =
-              await import("next-vibe/platforms/mcp/serve/repository");
+              await import("../../mcp/serve/repository");
             const mcpPublicUser: JwtPayloadType = {
               isPublic: true,
               leadId: "00000000-0000-0000-0000-000000000000",
@@ -468,8 +458,9 @@ export function runCli({
           }
           await cliResourceManager.cleanupAndExit(logger, debug ?? false, {
             success: false,
-            error: t("vibe.errors.executionFailed"),
-            errorParams: { error: handled.message },
+            error: t("vibe.errors.executionFailedDetail", {
+              error: handled.message,
+            }),
           });
           process.exit(handled.exitCode);
         }

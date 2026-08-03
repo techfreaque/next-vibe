@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { SystemPromptFragment } from "next-vibe/agent/ai-stream/system-prompt/types";
+import type { SystemPromptFragment } from "../ai-stream/system-prompt/types";
 
 // ─── Fragment ──────────────────────────────────────────────────────────────────
 

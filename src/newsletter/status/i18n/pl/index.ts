@@ -32,6 +32,7 @@ export const translations: typeof enTranslations = {
     internal: {
       title: "Błąd wewnętrzny",
       description: "Wystąpił błąd podczas sprawdzania statusu subskrypcji",
+      detail: "Nie udało się sprawdzić statusu subskrypcji: {{error}}",
     },
     unauthorized: {
       title: "Nieautoryzowany",

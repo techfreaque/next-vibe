@@ -7,15 +7,21 @@ export const translations: typeof enTranslations = {
     },
   },
   errors: {
-    session_not_found: "Sitzung nicht gefunden",
-    session_lookup_failed: "Sitzungssuche fehlgeschlagen",
+    session_not_found: "Sitzung für Token {{token}} nicht gefunden",
+    session_token_missing: "Kein Sitzungstoken gefunden ({{reason}})",
+    session_lookup_failed:
+      "Sitzungsabfrage {{token}} fehlgeschlagen: {{error}}",
+    current_session_failed:
+      "Aktuelle Sitzung konnte nicht gelesen werden: {{error}}",
     expired_sessions_delete_failed:
       "Löschen abgelaufener Sitzungen fehlgeschlagen",
-    session_creation_failed: "Sitzungserstellung fehlgeschlagen",
+    session_creation_failed:
+      "Sitzungserstellung für Benutzer {{userId}} fehlgeschlagen",
     session_creation_database_error:
-      "Datenbankfehler beim Erstellen der Sitzung",
-    user_sessions_delete_failed: "Löschen der Benutzersitzungen fehlgeschlagen",
-    expired: "Sitzung ist abgelaufen",
+      "Datenbankfehler bei Sitzungserstellung für Benutzer {{userId}}: {{error}}",
+    user_sessions_delete_failed:
+      "Sitzung {{sessionId}} konnte nicht gelöscht werden: {{error}}",
+    expired: "Sitzung ist am {{expiresAt}} abgelaufen",
   },
   post: {
     title: "Titel",

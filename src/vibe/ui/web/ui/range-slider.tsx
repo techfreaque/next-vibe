@@ -4,12 +4,10 @@
  */
 
 "use client";
-import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
-import {
-  Icon,
-  type IconKey,
-} from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+import type { TranslatedKeyType } from "../../../core/i18n/core/scoped-translation";
+import { cn } from "../../../unified-ui/_shared/cn";
+import { type IconKey } from "../../../unified-ui/widgets/form-fields/icon-field/icons";
+import { Icon } from "../../../unified-ui/widgets/form-fields/icon-field/icon-component";
 import * as React from "react";
 
 import { Span } from "./span";

@@ -4,8 +4,8 @@
  */
 
 "use client";
-import { CronTaskStatus, type CronTaskStatusValue } from "next-vibe/tasks/enum";
-import { scopedTranslation as tasksScopedTranslation } from "next-vibe/tasks/i18n";
+import { CronTaskStatus, type CronTaskStatusValue } from "../../enum";
+import { scopedTranslation as tasksScopedTranslation } from "../../i18n";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { Activity } from "next-vibe/ui/ui/icons/Activity";
@@ -22,7 +22,7 @@ import { TrendingUp } from "next-vibe/ui/ui/icons/TrendingUp";
 import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
 import { Pre } from "next-vibe/ui/ui/pre";
 import { Span } from "next-vibe/ui/ui/span";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -30,11 +30,11 @@ import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
-import { DateFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/date-field/widget";
-import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
+} from "../../../unified-ui/_shared/use-widget-context";
+import { DateFieldWidget } from "../../../unified-ui/widgets/form-fields/date-field/widget";
+import { TextFieldWidget } from "../../../unified-ui/widgets/form-fields/text-field/widget";
+import { FormAlertWidget } from "../../../unified-ui/widgets/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "../../../unified-ui/widgets/interactive/navigate-button/widget";
 import React, { useCallback, useMemo, useState } from "react";
 
 import type endpoints from "./definition";
@@ -315,15 +315,11 @@ function ExecutionCard({
                   {execution.error.errorType.errorKey}
                 </Span>
               </Div>
+              {/* The message already carries the interpolated detail that used
+                  to be dumped separately as raw params. */}
               <Span className="text-sm text-destructive whitespace-pre-wrap break-words">
                 {execution.error.message}
               </Span>
-              {execution.error.messageParams &&
-                Object.keys(execution.error.messageParams).length > 0 && (
-                  <Pre className="text-xs text-destructive font-mono bg-destructive/10 rounded p-2 overflow-auto">
-                    {JSON.stringify(execution.error.messageParams, null, 2)}
-                  </Pre>
-                )}
             </>
           )}
         </Div>
@@ -397,21 +393,21 @@ export function CronHistoryContainer({
 
   const handleViewTasks = useCallback((): void => {
     void (async (): Promise<void> => {
-      const m = await import("next-vibe/tasks/cron/tasks/definition");
+      const m = await import("../tasks/definition");
       navigate(m.default.GET, {});
     })();
   }, [navigate]);
 
   const handleViewStats = useCallback((): void => {
     void (async (): Promise<void> => {
-      const m = await import("next-vibe/tasks/cron/stats/definition");
+      const m = await import("../stats/definition");
       navigate(m.default.GET, {});
     })();
   }, [navigate]);
 
   const handleViewPulse = useCallback((): void => {
     void (async (): Promise<void> => {
-      const m = await import("next-vibe/tasks/pulse/history/definition");
+      const m = await import("../../pulse/history/definition");
       navigate(m.default.GET, {});
     })();
   }, [navigate]);

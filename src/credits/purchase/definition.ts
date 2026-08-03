@@ -3,7 +3,7 @@
  * Defines endpoint for purchasing credit packs via Stripe
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,

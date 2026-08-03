@@ -22,30 +22,50 @@
 import "server-only";
 
 import { and, eq } from "drizzle-orm";
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
-import { success } from "next-vibe/core/route/response.schema";
-import { db } from "next-vibe/database";
+import { defaultLocale } from "../../core/i18n/core/config";
+import type { ResponseType } from "../../core/route/response.schema";
+import { success } from "../../core/route/response.schema";
+import { db } from "../../database";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
-} from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { remoteConnections } from "next-vibe/remote-connection/db";
-import { RemoteConnectionRepository } from "next-vibe/remote-connection/repository";
+} from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
+import { Platform } from "../../platforms/platforms";
+import { remoteConnections } from "../../remote-connection/db";
+import { RemoteConnectionRepository } from "../../remote-connection/repository";
 
-import type {
-  RemoteEventRelayPayload,
-  RemoteEventWirePayload,
-} from "../emitter";
-import { createEndpointEmitter } from "../emitter";
-import type { AnyEndpointEventEnvelope } from "../structured-events";
+import { createEndpointEmitter } from "../core/emitter";
+import type { ResolvedRelayContext } from "../core/relay-context";
+import type { RemoteEventRelayPayload } from "../core/relay-hook";
+import { registerRemoteRelay } from "../core/relay-hook";
+import type { AnyEndpointEventEnvelope } from "../core/structured-events";
+import type { SyncDomain } from "../core/sync-domain";
 import type {
   RemoteEventBridgeRequestOutput,
   RemoteEventBridgeResponseOutput,
 } from "./definition";
 import { dispatchRemoteEvent } from "./registry";
-import type { ResolvedRelayContext } from "./relay-context";
+
+/**
+ * Wire body of a relayed remote-event (what the bridge receives). Carried in the
+ * bridge transport event's responseData. The envelope carries all 4 event fields
+ * (responseData, requestData, urlPathParams, payload) plus endpointPath,
+ * endpointMethod, eventName — no duplication of routing fields at the wire level.
+ *
+ * Server-side only: nothing outside the bridge builds or reads a wire frame.
+ */
+export interface RemoteEventWirePayload<TPayload = AnyEndpointEventEnvelope> {
+  originInstanceId: string;
+  syncDomain?: SyncDomain;
+  envelope: TPayload;
+  /**
+   * Receiver ADDRESS for point-to-point frames on the shared reverse-ws hub
+   * channel: the target connection's leadId (both sides know it — rename-proof,
+   * unlike instance names). Set by the bridge per delivery leg.
+   */
+  targetLeadId?: string;
+}
 
 /**
  * The generic remote-event wire payload. The envelope carries all 4 event fields
@@ -242,7 +262,7 @@ export class RemoteEventBridgeRepository {
     // provider — the bridge stays domain-agnostic.
     if (syncDomain) {
       const { ensureProvidersRegistered, getSyncProviders } =
-        await import("next-vibe/remote-connection/sync/provider");
+        await import("../../remote-connection/sync/provider");
       await ensureProvidersRegistered();
       const provider = getSyncProviders().get(syncDomain);
       if (provider?.remoteEventGate) {
@@ -396,9 +416,8 @@ export class RemoteEventBridgeRepository {
         mode: "WAIT" | "DETACH",
       ): Promise<void> => {
         const { RouteExecuteRepository } =
-          await import("next-vibe/execute-tool/repository");
-        const { CallbackMode } =
-          await import("next-vibe/execute-tool/constants");
+          await import("../../execute-tool/repository");
+        const { CallbackMode } = await import("../../execute-tool/constants");
         const { default: bridgeDefinition } = await import("./definition");
         await RouteExecuteRepository.runInProcessTyped({
           definition: bridgeDefinition.POST,
@@ -408,6 +427,7 @@ export class RemoteEventBridgeRepository {
           user: relayUser,
           locale: defaultLocale,
           logger,
+          platform: Platform.NEXT_API,
           input: { eventName: BRIDGE_TRANSPORT_EVENT, payload: w },
         }).catch((err) => {
           logger.error("[RemoteEventBridge] pushRemoteEvent dispatch failed", {
@@ -591,7 +611,7 @@ export class RemoteEventBridgeRepository {
       // its effects (onRemoteEvent) must respect that user's actual permissions,
       // not a fabricated role.
       const { UserRolesRepository } =
-        await import("next-vibe/identity/roles/repository");
+        await import("../../identity/roles/repository");
       const rolesResult = await UserRolesRepository.getUserRoles(
         userId,
         logger,
@@ -632,3 +652,20 @@ export class RemoteEventBridgeRepository {
     }
   }
 }
+
+// Claim the emitter's relay slot at module init. This is the ONLY wiring between
+// the emitter and the bridge: core never imports this module, so an install
+// without a database simply never registers and every remoteEvent emit reports
+// `relayed: false` instead of taking the process down on a failed import.
+//
+// pushRemoteEvent is async and the hook is fire-and-forget, so the rejection has
+// to be absorbed here — an unreachable peer or a DB blip must not surface as an
+// unhandled rejection in whatever repository happened to call emit().
+registerRemoteRelay((payload) => {
+  void RemoteEventBridgeRepository.pushRemoteEvent(payload).catch((err) => {
+    payload.logger.warn("[RemoteEventBridge] relay failed", {
+      eventName: payload.envelope.eventName,
+      error: err instanceof Error ? err.message : String(err),
+    });
+  });
+});

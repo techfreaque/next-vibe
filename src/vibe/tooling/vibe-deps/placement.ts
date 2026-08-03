@@ -1,5 +1,7 @@
 import "server-only";
 
+import { VIBE_DIR } from "@/env/paths";
+
 /**
  * Placement model for `vibe deps`.
  *
@@ -21,13 +23,13 @@ import "server-only";
  */
 
 /** Top-level src prefix that maps to the vibe framework folder. */
-export const SYSTEM_ROOT = "src/vibe/";
+export const SYSTEM_ROOT = `${VIBE_DIR}/`;
 
 /** The locale-root that holds domains + system. */
 export const LOCALE_ROOT = "src/";
 
 /** The tool's own files — the one true skip. */
-export const SELF_ROOT = "src/vibe/tooling/vibe-deps/";
+export const SELF_ROOT = `${SYSTEM_ROOT}tooling/vibe-deps/`;
 
 /** The tool's own files — the single legitimate skip. */
 export function isSelf(key: string): boolean {
@@ -459,7 +461,7 @@ export function placementOf(
     const alreadyVibe = isInSystem(key);
     return {
       kind: "promote",
-      suggestedDir: alreadyVibe ? fileDir : "src/vibe",
+      suggestedDir: alreadyVibe ? fileDir : VIBE_DIR,
       note: alreadyVibe
         ? `wide coupling across ${String(parentDomainSpread)} domains`
         : `used by ${String(parentDomainSpread)} domains from ${fileParentDomain} — promote into system`,

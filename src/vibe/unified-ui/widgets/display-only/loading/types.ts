@@ -2,11 +2,14 @@
  * Loading Widget Type Definitions
  */
 
-import type { SpacingSize, WidgetType } from "next-vibe/core/definition/enums";
+import type {
+  SpacingSize,
+  WidgetType,
+} from "../../../../core/definition/enums";
 import type {
   BasePrimitiveDisplayOnlyWidgetConfig,
   FieldUsageConfig,
-} from "next-vibe/unified-ui/_shared/types";
+} from "../../../_shared/types";
 
 /**
  * Loading Widget Configuration

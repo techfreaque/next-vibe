@@ -1,11 +1,8 @@
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import { Pressable, Text as RNText } from "react-native";
 
-import {
-  convertCSSToViewStyle,
-  styledNative,
-} from "../../native/utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import type { ButtonMouseEvent, ButtonProps } from "../../web/ui/button";
 import { buttonTextVariants, buttonVariants } from "../../web/ui/button";
 import { applyStyleType } from "../../web/utils/style-type";

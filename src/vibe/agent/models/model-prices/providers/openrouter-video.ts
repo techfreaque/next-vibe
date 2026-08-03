@@ -19,7 +19,7 @@
 
 import "server-only";
 
-import { agentEnv } from "next-vibe/agent/env";
+import { agentEnv } from "../../../env";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { videoGenModelDefinitions } from "../../../video-generation/models";
@@ -168,7 +168,7 @@ export class OpenRouterVideoPriceFetcher extends PriceFetcher {
 
     let apiModels: ORVideoModel[];
     try {
-      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external OR pricing API
+      // oxlint-disable-next-line restricted/no-raw-fetch -- external OR pricing API
       const res = await fetch("https://openrouter.ai/api/v1/videos/models", {
         headers: {
           // eslint-disable-next-line i18next/no-literal-string

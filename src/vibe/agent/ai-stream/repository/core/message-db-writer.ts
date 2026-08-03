@@ -18,9 +18,9 @@
 
 import "server-only";
 
-import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
-import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
-import type { Modality } from "next-vibe/agent/models/enum";
+import type { ChatModelId } from "../../models";
+import type { ToolExecutionContext } from "../../../../core/execution-context";
+import type { Modality } from "../../../models/enum";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import type { ErrorResponseType } from "next-vibe/core/route/response.schema";

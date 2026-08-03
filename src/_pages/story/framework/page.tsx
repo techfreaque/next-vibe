@@ -4,6 +4,7 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import type { JWTPublicPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { Platform } from "next-vibe/platforms/platforms";
 import { Button } from "next-vibe/ui/ui/button";
 import { Card, CardContent } from "next-vibe/ui/ui/card";
 import { Div } from "next-vibe/ui/ui/div";
@@ -51,6 +52,7 @@ export interface FrameworkPageData {
   cloneCode: string;
   startCode: string;
   aiCode: string;
+  platform: Platform;
 }
 
 function getCodeSnippets(locale: CountryLanguage): {
@@ -271,6 +273,7 @@ export async function tanstackLoader({
     locale,
     endpointCount: endpointsMeta.length,
     ...snippets,
+    platform: Platform.NEXT_PAGE,
   };
 }
 
@@ -334,6 +337,7 @@ export function TanstackPage({
   cloneCode,
   startCode,
   aiCode,
+  platform,
 }: FrameworkPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
@@ -662,7 +666,11 @@ export function TanstackPage({
                 {t("enterprise.description")}
               </P>
             </Div>
-            <ContactFormSection locale={locale} user={publicUser} />
+            <ContactFormSection
+              locale={locale}
+              user={publicUser}
+              platform={platform}
+            />
           </Div>
         </Div>
       </Div>

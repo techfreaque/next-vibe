@@ -4,22 +4,22 @@
  * Public - client-side code can call this even when unauthenticated.
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { WidgetDataSchema } from "next-vibe/core/utils/json";
-import { UserRole } from "next-vibe/identity/roles/enum";
-import { scopedTranslation } from "next-vibe/logger/error-monitor/client-log/i18n";
+} from "../../../core/definition/enums";
+import { WidgetDataSchema } from "../../../core/utils/json";
+import { UserRole } from "../../../identity/roles/enum";
+import { scopedTranslation } from "./i18n";
 import {
   objectField,
   requestField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../../unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { CLIENT_LOG_PATH } from "./constants";

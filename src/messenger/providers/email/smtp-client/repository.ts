@@ -185,25 +185,23 @@ export class SmtpRepository {
 
         if (isLeadCampaign) {
           return fail({
-            message: t("sending.errors.no_account.title"),
-            errorType: ErrorResponseTypes.NOT_FOUND,
-            messageParams: {
+            message: t("sending.errors.no_account.detail_criteria", {
               campaignType: data.selectionCriteria.campaignType,
-              emailJourneyVariant:
-                data.selectionCriteria.emailJourneyVariant || "null",
-              emailCampaignStage:
-                data.selectionCriteria.emailCampaignStage || "null",
+              // Em dash reads the same in every locale; "null" would be
+              // untranslated English leaking into a user-facing message.
+              journeyVariant: data.selectionCriteria.emailJourneyVariant ?? "—",
+              campaignStage: data.selectionCriteria.emailCampaignStage ?? "—",
               country: data.selectionCriteria.country,
               language: data.selectionCriteria.language,
-            },
+            }),
+            errorType: ErrorResponseTypes.NOT_FOUND,
           });
         }
         return fail({
-          message: t("sending.errors.no_account.title"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: {
+          message: t("sending.errors.no_account.detail_campaign", {
             campaignType: data.selectionCriteria.campaignType,
-          },
+          }),
+          errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
@@ -255,11 +253,10 @@ export class SmtpRepository {
     } catch (error) {
       logger.error("Critical error in email sending", parseError(error));
       return fail({
-        message: t("sending.errors.server.title"),
-        errorType: ErrorResponseTypes.EMAIL_ERROR,
-        messageParams: {
+        message: t("sending.errors.server.detail", {
           error: parseError(error).message,
-        },
+        }),
+        errorType: ErrorResponseTypes.EMAIL_ERROR,
       });
     }
   }
@@ -310,9 +307,10 @@ export class SmtpRepository {
     } catch (error) {
       logger.error("Error getting total sending capacity", parseError(error));
       return fail({
-        message: t("sending.errors.capacity.title"),
+        message: t("sending.errors.capacity.title", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.EMAIL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -340,9 +338,10 @@ export class SmtpRepository {
 
       if (!row) {
         return fail({
-          message: t("sending.errors.no_account.title"),
+          message: t("sending.errors.no_account.detail_account", {
+            accountId: data.accountId,
+          }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { accountId: data.accountId },
         });
       }
 
@@ -353,11 +352,12 @@ export class SmtpRepository {
         t,
       );
       if (!transportResult.success) {
+        // The inner failure now carries its own detail in the message text, so
+        // forwarding it verbatim keeps everything the params used to add.
         return fail({
           message: transportResult.message,
           errorType:
             transportResult.errorType || ErrorResponseTypes.EMAIL_ERROR,
-          messageParams: transportResult.messageParams,
           cause: transportResult,
         });
       }
@@ -375,9 +375,10 @@ export class SmtpRepository {
       );
 
       return fail({
-        message: t("sending.errors.server.title"),
+        message: t("sending.errors.server.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -605,13 +606,12 @@ export class SmtpRepository {
       );
 
       return fail({
-        message: t("sending.errors.server.title"),
-        errorType: ErrorResponseTypes.EMAIL_ERROR,
-        messageParams: {
-          accountId: account.id,
+        message: t("sending.errors.server.detail_account", {
           accountName: account.name,
+          accountId: account.id,
           error: parseError(error).message,
-        },
+        }),
+        errorType: ErrorResponseTypes.EMAIL_ERROR,
       });
     }
   }
@@ -687,13 +687,12 @@ export class SmtpRepository {
       } catch (error) {
         const errorMessage = parseError(error).message;
         lastError = fail({
-          message: t("sending.errors.server.title"),
-          errorType: ErrorResponseTypes.EMAIL_ERROR,
-          messageParams: {
-            error: errorMessage,
+          message: t("sending.errors.server.detail_attempt", {
             accountId: account.id,
             attempt: attempt.toString(),
-          },
+            error: errorMessage,
+          }),
+          errorType: ErrorResponseTypes.EMAIL_ERROR,
         });
 
         const isRetryable = this.isRetryableError(errorMessage);
@@ -711,9 +710,10 @@ export class SmtpRepository {
     return (
       lastError ||
       fail({
-        message: t("sending.errors.server.title"),
+        message: t("sending.errors.server.detail_exhausted", {
+          accountId: account.id,
+        }),
         errorType: ErrorResponseTypes.EMAIL_ERROR,
-        messageParams: { accountId: account.id },
       })
     );
   }
@@ -741,10 +741,11 @@ export class SmtpRepository {
           t,
         );
         if (!rateLimitCheck.success) {
+          // The inner failure now carries its own detail in the message text, so
+          // forwarding it verbatim keeps everything the params used to add.
           return fail({
             message: rateLimitCheck.message,
             errorType: rateLimitCheck.errorType,
-            messageParams: rateLimitCheck.messageParams,
             cause: rateLimitCheck,
           });
         }
@@ -766,11 +767,12 @@ export class SmtpRepository {
         t,
       );
       if (!transportResult.success) {
+        // The inner failure now carries its own detail in the message text, so
+        // forwarding it verbatim keeps everything the params used to add.
         return fail({
           message: transportResult.message,
           errorType:
             transportResult.errorType || ErrorResponseTypes.EMAIL_ERROR,
-          messageParams: transportResult.messageParams,
           cause: transportResult,
         });
       }
@@ -808,9 +810,11 @@ export class SmtpRepository {
         );
 
         return fail({
-          message: t("sending.errors.rejected.title"),
+          message: t("sending.errors.rejected.title", {
+            recipient: params.to,
+            reason: rejectedReason,
+          }),
           errorType: ErrorResponseTypes.EMAIL_ERROR,
-          messageParams: { recipient: params.to, reason: rejectedReason },
         });
       }
 
@@ -823,9 +827,10 @@ export class SmtpRepository {
         );
 
         return fail({
-          message: t("sending.errors.no_recipients.title"),
+          message: t("sending.errors.no_recipients.title", {
+            recipient: params.to,
+          }),
           errorType: ErrorResponseTypes.EMAIL_ERROR,
-          messageParams: { recipient: params.to },
         });
       }
 
@@ -891,13 +896,12 @@ export class SmtpRepository {
       }
 
       return fail({
-        message: t("sending.errors.server.title"),
-        errorType: ErrorResponseTypes.EMAIL_ERROR,
-        messageParams: {
-          error: errorMessage,
-          accountId: account.id,
+        message: t("sending.errors.server.detail_account", {
           accountName: account.name,
-        },
+          accountId: account.id,
+          error: errorMessage,
+        }),
+        errorType: ErrorResponseTypes.EMAIL_ERROR,
       });
     }
   }
@@ -948,15 +952,13 @@ export class SmtpRepository {
 
       if (!canSend) {
         return fail({
-          message: t("sending.errors.rate_limit.title"),
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: {
+          message: t("sending.errors.rate_limit.title", {
             accountName: account.name,
             limit: account.rateLimitPerHour.toString(),
             current: emailsSentThisHour.toString(),
-            timeWindow: "hour",
             remainingCapacity: "0",
-          },
+          }),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
 
@@ -1102,22 +1104,5 @@ export class SmtpRepository {
     } catch (error) {
       logger.error("Error updating account health", parseError(error));
     }
-  }
-
-  /**
-   * Close all cached transports
-   */
-  async closeAllTransports(): Promise<void> {
-    for (const [, transport] of SmtpRepository.transportCache.entries()) {
-      try {
-        await new Promise<void>((resolve) => {
-          transport.close();
-          resolve();
-        });
-      } catch {
-        // Ignore transport close errors
-      }
-    }
-    SmtpRepository.transportCache.clear();
   }
 }

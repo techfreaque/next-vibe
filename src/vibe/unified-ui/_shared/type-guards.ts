@@ -14,7 +14,7 @@
  * context - unlike UnifiedField which requires resolved conditional types.
  */
 
-import type { WidgetData } from "next-vibe/core/utils/json";
+import type { WidgetData } from "../../core/utils/json";
 import type z from "zod";
 
 import type { UnifiedField } from "./configs";

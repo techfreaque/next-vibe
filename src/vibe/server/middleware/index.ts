@@ -3,9 +3,9 @@
  *
  * This file exports the middleware system for Next.js applications.
  */
-import { coreEnv } from "next-vibe/core/env";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { Environment } from "next-vibe/env/env-util";
+import { coreEnv } from "../../core/env";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import { Environment } from "../../env/env-util";
 import {
   checkLeadId,
   createLeadId,
@@ -15,9 +15,9 @@ import {
   redeemExchangeToken,
   updateLeadLocale,
   UUID_REGEX,
-} from "next-vibe/identity/middleware/lead-id/index";
-import type { LanguageMiddlewareOptions } from "next-vibe/server/middleware/language/index";
-import { detectLocale } from "next-vibe/server/middleware/language/index";
+} from "../../identity/middleware/lead-id/index";
+import type { LanguageMiddlewareOptions } from "./language/index";
+import { detectLocale } from "./language/index";
 import type { NextRequest, NextResponse } from "next-vibe/ui/lib/request";
 import { NextResponse as NextResponseClass } from "next-vibe/ui/lib/request";
 

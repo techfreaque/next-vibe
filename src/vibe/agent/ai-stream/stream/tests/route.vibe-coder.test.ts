@@ -24,15 +24,15 @@ import "server-only";
 globalThis.AI_SDK_LOG_WARNINGS = false;
 
 import { eq } from "drizzle-orm";
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
-import { chatSettings } from "next-vibe/agent/chat/settings/db";
+import { DefaultFolderId } from "../../../../core/execution-context";
+import { chatSettings } from "../../../chat/settings/db";
 import {
   ContentLevel,
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
-} from "next-vibe/agent/skills/enum";
-import { chatFavorites } from "next-vibe/agent/skills/favorites/db";
+} from "../../../skills/enum";
+import { chatFavorites } from "../../../skills/favorites/db";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";

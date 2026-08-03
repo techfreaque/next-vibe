@@ -178,21 +178,32 @@ export const translations: typeof enTranslations = {
         buildStart: "🚀 Anwendungs-Build wird gestartet...",
         packageBuildStart: "Paket wird erstellt...",
         packageBuildSuccess: "✅ Paket-Build erfolgreich abgeschlossen",
-        packageBuildFailed: "Paket-Build fehlgeschlagen",
+        packageBuildFailed: "Paket-Build fehlgeschlagen: {{error}}",
         buildPrerequisites: "Build-Voraussetzungen werden ausgeführt...",
         skipGeneration:
           "API-Endpunkt-Generierung wird übersprungen (--skip-generation)",
         generatingEndpoints: "API-Endpunkte werden generiert...",
         generationSuccess: "✅ Code-Generierung erfolgreich abgeschlossen",
         generationFailed: "Code-Generierung fehlgeschlagen",
+        generationFailedDetail: "Code-Generierung fehlgeschlagen: {{error}}",
+        tanstackBuildStart: "TanStack Start (SSR) wird erstellt...",
+        tanstackBuildSuccess:
+          "✅ TanStack Start (SSR)-Build erfolgreich abgeschlossen",
+        tanstackBuildFailed: "TanStack Start-Build fehlgeschlagen",
+        tanstackBuildFailedDetail:
+          "TanStack Start-Build fehlgeschlagen: {{error}}",
         skipNextBuild:
           "Next.js-Build wird übersprungen (wird von package.json behandelt)",
         buildingNextjs: "Next.js-Anwendung wird erstellt...",
         nextjsBuildSuccess: "✅ Next.js-Build erfolgreich abgeschlossen",
-        nextjsBuildFailed: "Next.js-Build fehlgeschlagen",
+        nextjsBuildFailed: "Next.js-Build fehlgeschlagen: {{error}}",
+        nextjsBuildOom:
+          "Next.js-Build vom Betriebssystem abgebrochen (vermutlich Speichermangel) - Signal: {{signal}}",
+        nextjsBuildExitCode: "Next.js-Build wurde mit Code {{code}} beendet",
         skipProdDb:
           "Produktions-Datenbankoperationen werden übersprungen (--run-prod-database=false)",
-        buildFailed: "❌ Build fehlgeschlagen",
+        buildFailed: "❌ Build fehlgeschlagen: {{error}}",
+        unknownError: "unbekannter Fehler",
         schemaGenerationStart: "Datenbank-Schema wird generiert...",
         schemaGenerationSuccess:
           "✅ Datenbank-Schema-Generierung abgeschlossen",
@@ -206,15 +217,13 @@ export const translations: typeof enTranslations = {
         prodDbSuccess:
           "🎉 Produktions-Datenbankoperationen erfolgreich abgeschlossen",
         prodDbFailed:
-          "❌ Produktions-Build während Datenbankoperationen fehlgeschlagen",
+          "❌ Produktions-Build während Datenbankoperationen fehlgeschlagen: {{error}}. Starte die Datenbank mit 'docker compose -f docker-compose-dev.yml up -d'.",
+        prodDbConnectionFailed:
+          "❌ Produktions-Build während Datenbankoperationen fehlgeschlagen: Datenbank nicht erreichbar ({{error}}). Prüfe, ob sie läuft, und starte sie sonst mit 'docker compose -f docker-compose-dev.yml up -d'.",
         prodDbNotReady:
           "💡 Dieser Build ist NICHT für Produktionsbereitstellung bereit",
         deploymentReady:
           "🚀 Ihre Anwendung ist bereit für Produktionsbereitstellung!",
-        dbConnectionError:
-          "Datenbankverbindung fehlgeschlagen. Stellen Sie sicher, dass die Datenbank läuft und erreichbar ist.",
-        dbStartSuggestion:
-          "Versuchen Sie 'docker compose -f docker-compose-dev.yml up -d' auszuführen, um die Datenbank zu starten",
         nextBuildHandled:
           "✅ Next.js-Build wird vom yarn build-Befehl behandelt",
         failedProdMigrations:

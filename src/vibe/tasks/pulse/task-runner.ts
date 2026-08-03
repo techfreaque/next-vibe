@@ -5,15 +5,15 @@
  */
 import "server-only";
 
-import { coreEnv } from "next-vibe/core/env";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { formatDuration, formatTask } from "next-vibe/logger/formatters";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { tasksEnv } from "next-vibe/tasks/env";
-import type { TasksTranslationKey } from "next-vibe/tasks/i18n";
-import type { TaskRunner } from "next-vibe/tasks/unified-runner/types";
+import { coreEnv } from "../../core/env";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import { parseError } from "../../core/utils/parse-error";
+import type { JwtPrivatePayloadType } from "../../identity/auth/types";
+import { formatDuration, formatTask } from "../../logger/formatters";
+import type { EndpointLogger } from "../../logger/types";
+import { tasksEnv } from "../env";
+import type { TasksTranslationKey } from "../i18n";
+import type { TaskRunner } from "../unified-runner/types";
 
 import { CronTaskPriority, TaskCategory } from "../enum";
 
@@ -81,16 +81,12 @@ const pulseTaskRunner: TaskRunner<TasksTranslationKey> = {
             );
           }
         } else {
-          // pulseResult.message is the generic translated i18n string
-          // ("An internal error occurred") - the real cause lives in
-          // messageParams and was never being logged, making every pulse
-          // failure indistinguishable from every other one.
+          // `pulseResult.message` now carries the specific cause appended to the
+          // generic label, so no separate params channel is needed to tell one
+          // pulse failure from another.
           logger.error(
             `Pulse #${pulseCount} failed`,
             new Error(pulseResult.message),
-            {
-              messageParams: pulseResult.messageParams,
-            },
           );
         }
       } catch (error) {

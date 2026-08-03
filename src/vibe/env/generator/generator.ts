@@ -10,23 +10,38 @@ import { dirname, join } from "node:path";
 import type {
   GeneratorContext,
   GeneratorDefinition,
-} from "next-vibe/core/generators/shared/shared-inputs";
-import {
-  generateFileHeader as sharedGenerateFileHeader,
-  jsonToTs,
-  stripProjectRoot,
-  toImportUrl,
-} from "next-vibe/core/generators/shared/utils";
+} from "../../core/generators/shared/shared-inputs";
 import {
   findFilesRecursively,
   generateFileHeader,
   getRelativeImportPath,
+  jsonToTs,
+  generateFileHeader as sharedGenerateFileHeader,
+  stripProjectRoot,
+  toImportUrl,
+  toPosixPath,
   writeGeneratedFile,
-} from "next-vibe/core/generators/shared/utils";
-import type { EnvExample, EnvFieldType } from "next-vibe/env/define-env";
-import { formatCount, formatWarning } from "next-vibe/logger/formatters";
+} from "../../core/generators/shared/utils";
+import type { EnvExample, EnvFieldType } from "../define-env";
+import { formatCount, formatWarning } from "../../logger/formatters";
 
-import { GENERATED_DIR, getApiDir } from "@/env/paths";
+import {
+  GENERATED_DIR,
+  getApiDir,
+  getVibeDir,
+  PROJECT_IGNORE_DIRS,
+  VIBE_DIR,
+} from "@/env/paths";
+
+/**
+ * Real locations of the modules the emitted env files import. These resolve from
+ * the GENERATED file's directory, not this one — hand-written "../define-env"
+ * etc. were computed against this generator (where they are correct, see the
+ * type-only import above) and pointed at <generated>/, which holds none of them.
+ */
+const DEFINE_ENV_MODULE = `${VIBE_DIR}/env/define-env.ts`;
+const ENV_LOGGER_MODULE = `${VIBE_DIR}/env/env-logger.ts`;
+const ENV_UTIL_MODULE = `${VIBE_DIR}/env/env-util.ts`;
 
 import type { EnvValidationErrorType } from "./generator-validator";
 import {
@@ -101,14 +116,11 @@ class EnvGeneratorRepository {
       const apiDir = getApiDir();
       const configDir = join(getApiDir(), "config");
 
-      const excludeDirs = [
-        "node_modules",
-        ".git",
-        ".next",
-        "dist",
-        "generated",
-        "shared", // Exclude the shared/env utilities
-      ];
+      // The one list, spread unchanged. A hand-written copy used to live here and
+      // had drifted - it lost `.tmp`, so this generator walked into
+      // `.tmp/todelete/`, hit discarded copies of real env modules, called them
+      // duplicate module names and skipped the REAL ones too.
+      const excludeDirs = PROJECT_IGNORE_DIRS;
 
       // Discover server env files (from API directory and config directory)
       logger.debug("Discovering server env files");
@@ -263,20 +275,28 @@ class EnvGeneratorRepository {
         );
 
         // Generate .env.example file
-        // Sort so src/config modules appear first, then pair each directory's
-        // env.ts (server) immediately followed by env-client.ts (client).
-        // Within a pair, server comes first so client keys win deduplication.
-        const vibeCorePath = join(getApiDir(), "vibe", "core");
-        const vibeIdentityPath = join(getApiDir(), "vibe", "identity");
-        const vibePath = join(getApiDir(), "vibe");
+        // Sort so the framework's foundational modules lead (identity, then
+        // core, then the rest of the framework), app modules follow, and each
+        // directory's env.ts (server) is immediately followed by its
+        // env-client.ts. Within a pair server comes first, so client keys win
+        // deduplication.
+        //
+        // POSIX-normalized throughout: `getVibeDir()` comes back with the host
+        // separator, so on Windows a `${dir}/` prefix test against a discovered
+        // path never matches and every module silently collapses into the
+        // trailing group — the whole file degrades to flat A-Z.
+        const vibePath = toPosixPath(getVibeDir());
+        const vibeCorePath = `${vibePath}/core`;
+        const vibeIdentityPath = `${vibePath}/identity`;
         const groupRank = (filePath: string): number => {
-          if (filePath.startsWith(`${vibeIdentityPath}/`)) {
+          const path = toPosixPath(filePath);
+          if (path.startsWith(`${vibeIdentityPath}/`)) {
             return 0;
           }
-          if (filePath.startsWith(`${vibeCorePath}/`)) {
+          if (path.startsWith(`${vibeCorePath}/`)) {
             return 1;
           }
-          if (filePath.startsWith(`${vibePath}/`)) {
+          if (path.startsWith(`${vibePath}/`)) {
             return 2;
           }
           return 3;
@@ -448,10 +468,9 @@ class EnvGeneratorRepository {
 
 import "server-only";
 
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import type { EnvExample, EnvRecord } from "next-vibe/env/define-env";
-import { envValidationLogger } from "next-vibe/env/env-logger";
-import { validateEnv } from "next-vibe/env/env-util";
+import type { EnvExample, EnvRecord } from "${getRelativeImportPath(DEFINE_ENV_MODULE, outputFile)}";
+import { envValidationLogger } from "${getRelativeImportPath(ENV_LOGGER_MODULE, outputFile)}";
+import { validateEnv } from "${getRelativeImportPath(ENV_UTIL_MODULE, outputFile)}";
 import type { z } from "zod";
 
 // Import env modules
@@ -490,7 +509,6 @@ export function validateAllEnv(): Env {
     { ...process.env, platform },
     envSchema,
     envValidationLogger,
-    defaultLocale,
   );
 }
 
@@ -624,9 +642,8 @@ export function getEnvModuleNames(): (keyof typeof envModules)[] {
     // eslint-disable-next-line i18next/no-literal-string
     return `${header}
 
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import { envValidationLogger } from "next-vibe/env/env-logger";
-import { validateEnv } from "next-vibe/env/env-util";
+import { envValidationLogger } from "${getRelativeImportPath(ENV_LOGGER_MODULE, outputFile)}";
+import { validateEnv } from "${getRelativeImportPath(ENV_UTIL_MODULE, outputFile)}";
 import type { z } from "zod";
 
 // Import client env modules
@@ -664,7 +681,6 @@ export function validateAllClientEnv(): EnvClient {
     { ...process.env, platform },
     envClientSchema,
     envValidationLogger,
-    defaultLocale,
   );
 }
 
@@ -1026,6 +1042,13 @@ export const generator: GeneratorDefinition = {
       ...findFilesRecursively(configDir, "env-client.ts"),
     ].toSorted();
   },
+  /**
+   * Only the env-keys registry, which every successful run writes. The server
+   * and client env modules are skipped under `dryRun`, and the Dockerfile /
+   * compose rewrites only happen when those files exist — none of them is a
+   * reliable "this generator has run" marker.
+   */
+  output: ENV_KEYS_OUTPUT,
   async generate(ctx) {
     const env = await EnvGeneratorRepository.generateEnv(ctx);
     const keyCount = await generateEnvKeys(ctx, env.modules);

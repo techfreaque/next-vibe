@@ -16,13 +16,13 @@
 
 import "server-only";
 
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
 import {
   KeyedRemoteSignal,
   type KeyedSignalSubscription,
-} from "next-vibe/realtime/keyed-signal";
-import type { WsWireMessage } from "next-vibe/realtime/types";
+} from "../../realtime/server/keyed-signal";
+import type { WsWireMessage } from "../../realtime/core/types";
 
 import executeDefinition from "../definition";
 

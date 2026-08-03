@@ -5,17 +5,17 @@
 
 "use client";
 
-import { useTranslation } from "next-vibe/core/i18n/core/client";
-import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
+import { useTranslation } from "../../../core/i18n/core/client";
+import type { TranslatedKeyType } from "../../../core/i18n/core/scoped-translation";
 import { Check } from "next-vibe/ui/ui/icons/Check";
 import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
 import { Search } from "next-vibe/ui/ui/icons/Search";
 import { X } from "next-vibe/ui/ui/icons/X";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { JSX } from "react";
 import React, { useMemo, useState } from "react";
 
-import { uiScopedTranslation } from "../../web/i18n";
+import { uiScopedTranslation } from "../i18n";
 import { Badge } from "./badge";
 import { Button } from "./button";
 import {

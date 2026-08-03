@@ -12,7 +12,7 @@
  * the React Query cache without unnecessary re-renders.
  */
 
-import type { WidgetData } from "next-vibe/core/utils/json";
+import type { WidgetData } from "../../core/utils/json";
 
 interface WithId {
   id: string | number;

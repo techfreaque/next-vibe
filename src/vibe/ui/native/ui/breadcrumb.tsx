@@ -5,15 +5,12 @@
 import * as Slot from "@rn-primitives/slot";
 import { ChevronRight } from "lucide-react-native";
 import { styled } from "nativewind";
-import { useTranslation } from "next-vibe/core/i18n/core/client";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { useTranslation } from "../../../core/i18n/core/client";
+import { cn } from "../../../unified-ui/_shared/cn";
 import React from "react";
 import { Pressable, Text as RNText, View } from "react-native";
 
-import {
-  convertCSSToViewStyle,
-  styledNative,
-} from "../../native/utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { uiScopedTranslation } from "../../web/i18n";
 import type {
   BreadcrumbEllipsisProps,

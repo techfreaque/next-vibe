@@ -1,67 +1,103 @@
-import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
-import type { TParams } from "next-vibe/core/i18n/core/static-types";
+import type { VibeTranslationKey } from "../i18n/shared";
+import type { TranslatedKeyType } from "../i18n/core/scoped-translation";
 import { z } from "zod";
-
-import { type SharedTranslationKey } from "@/_pages/shared/i18n";
 
 /**
  * Create a standardized error response with a translation key
+ *
+ * Interpolation belongs in the `t()` call, not here: `t(key, params)` already
+ * substitutes `{{param}}` placeholders, so a response carries finished text.
+ *
+ * ```ts
+ * return fail({ message: t("errors.notFound.title", { path }), errorType });
+ * ```
+ *
  * @param message - The already translated error message
  * @param errorType - The type of error
- * @param messageParams - Optional parameters for the translation
  * @param cause - Optional cause of the error to aid debugging
  * @returns A standardized error response with translation key
  */
 export function fail({
   message,
   errorType,
-  messageParams,
   cause,
 }: {
   message: TranslatedKeyType;
   errorType: ErrorResponseTypesElements[keyof ErrorResponseTypesElements];
-  messageParams?: TParams;
   cause?: ErrorResponseType;
 }): ErrorResponseType {
   return {
     success: false,
     message,
-    messageParams,
     errorType,
     cause,
   };
 }
 
 /**
- * Custom error class that carries ErrorResponseType data
- * This allows ErrorResponseType to be thrown and caught in try-catch blocks
+ * Create an error response from literal, already-display-ready text.
+ *
+ * RESTRICTED to the modules that have NO i18n scope, and that list is exactly
+ * three: `src/vibe/tooling/check/**`, `src/vibe/core/setup/**` and
+ * `src/vibe/core/generators/**`. All three build their endpoints with the
+ * non-i18n `createEndpoint` from `core/definition/create.ts`, so none has a
+ * `t()` to produce a `TranslatedKeyType` — {@link fail} is not merely
+ * discouraged there, it does not typecheck. Every other module in the repo HAS
+ * a scope and MUST use {@link fail} with `t()`.
+ *
+ * The test for admission is that the module has dropped i18n wholesale, not that
+ * a literal would be convenient at one call site. Adding a module here without
+ * dropping its scope is the mistake the paragraph below describes.
+ *
+ * Reaching for this elsewhere produces half-translated output - a German user
+ * reading "Interner Fehler: failed to setup guard jail". That happened at ~200
+ * sites and had to be undone; the shortcut is always more tempting than it looks,
+ * so the boundary is the rule rather than a judgement call.
+ *
+ * The three shapes this exists to prevent, all of which leak untranslated
+ * English into a translated message:
+ *
+ * ```ts
+ * // (A) concatenating a detail onto a translated label
+ * fail({ message: `${t("errors.server.title")}: ${error.message}` })
+ * // (B) an English literal smuggled through the params object
+ * fail({ message: t("errors.executionFailed", { error: "new_page failed" }) })
+ * // (C) English prose assembled at the call site
+ * fail({ message: t("errors.commandFailed", { error: `Monitor "${name}" not found` }) })
+ * ```
+ *
+ * `t()` params carry raw runtime VALUES - a caught error's `.message`, an id, a
+ * path, a count. Never prose. If the English words exist only at the call site,
+ * they belong in a translation key:
+ *
+ * ```ts
+ * fail({ message: t("errors.monitorNotFound", { monitorName: name }) });
+ * ```
+ *
+ * When a key is also rendered param-free (a static banner, or an `errorTypes:`
+ * entry in an endpoint definition), do NOT add a placeholder to it - it would
+ * render raw `{{error}}` there. SPLIT it: keep the bare key for that use and add
+ * a sibling detail key carrying the placeholder.
+ *
+ * Neither function takes interpolation params: for `fail` they belong in
+ * `t(key, params)`, which fills `{{param}}` before the text reaches a response.
  */
-export class ErrorResponseError extends Error {
-  readonly errorResponse: ErrorResponseType;
-
-  constructor(errorResponse: ErrorResponseType) {
-    super(errorResponse.message);
-    this.name = "ErrorResponseError";
-    this.errorResponse = errorResponse;
-  }
-}
-
-/**
- * Create a throwable error response with a translation key
- * This creates an ErrorResponseType and throws it as an ErrorResponseError
- * @param message - The translation key for the error message
- * @param errorType - The type of error
- * @param messageParams - Optional parameters for the translation
- * @throws ErrorResponseError containing the ErrorResponseType
- */
-export function throwErrorResponse(
-  message: TranslatedKeyType,
-  errorType: ErrorResponseTypesElements[keyof ErrorResponseTypesElements],
-  messageParams?: TParams,
-): never {
-  const errorResponse = fail({ message, errorType, messageParams });
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Core utility function that intentionally throws for error propagation
-  throw new ErrorResponseError(errorResponse);
+export function failInline({
+  message,
+  errorType,
+  cause,
+}: {
+  message: string;
+  errorType: ErrorResponseTypesElements[keyof ErrorResponseTypesElements];
+  cause?: ErrorResponseType;
+}): ErrorResponseType {
+  return {
+    success: false,
+    // oxlint-disable-next-line restricted/restricted-syntax
+    message: message as TranslatedKeyType,
+    errorType,
+    cause,
+  };
 }
 
 /**
@@ -72,8 +108,12 @@ interface SuccessResponseOptions {
   isErrorResponse?: true;
   /** Custom headers to include in the HTTP response */
   headers?: Record<string, string>;
-  /** Performance metadata (translation keys as keys, duration in ms as values) */
-  performance?: Partial<Record<TranslatedKeyType, number>>;
+  /**
+   * Performance metadata (display label as key, duration in ms as value).
+   * Labels are translated text from `t()` for scoped endpoints, or plain
+   * literals for `createEndpointInline` ones - both are already display-ready.
+   */
+  performance?: Partial<Record<string, number>>;
 }
 
 /**
@@ -104,21 +144,6 @@ export function success<TResponse>(
 
 const messageResponseSchema = z.object({
   message: z.string() as z.ZodType<TranslatedKeyType>,
-  messageParams: z
-    .record(z.string(), z.union([z.string(), z.coerce.number()]))
-    .optional(),
-});
-
-export const errorResponseSchema = z.object({
-  success: z.literal(false),
-  message: z.string() as z.ZodType<TranslatedKeyType>,
-  messageParams: z
-    .record(z.string(), z.union([z.string(), z.coerce.number()]))
-    .optional(),
-  errorType: z.object({
-    errorKey: z.string(),
-    errorCode: z.coerce.number(),
-  }),
 });
 
 export type ResponseType<
@@ -134,7 +159,7 @@ export type ResponseType<
  * NOTE: This is NOT part of ResponseType - it's a separate return type for streaming handlers
  */
 export interface StreamingResponse {
-  __isStreamingResponse: true;
+  isStreamingResponse: true;
   response: Response;
 }
 
@@ -146,7 +171,7 @@ export interface StreamingResponse {
  * NOTE: This is NOT part of ResponseType - it's a separate return type for file handlers
  */
 export interface FileResponse {
-  __isFileResponse: true;
+  isFileResponse: true;
   buffer: Buffer | ReadableStream | Blob;
   contentType: string;
   headers?: Record<string, string>;
@@ -173,7 +198,7 @@ export type ContentBlock =
  * NOTE: This is NOT part of ResponseType - it's a separate return type like FileResponse
  */
 export interface ContentResponse {
-  __isContentResponse: true;
+  isContentResponse: true;
   content: ContentBlock[];
 }
 
@@ -192,7 +217,7 @@ export type HandlerResponse<T> =
  */
 export function createStreamingResponse(response: Response): StreamingResponse {
   return {
-    __isStreamingResponse: true,
+    isStreamingResponse: true,
     response,
   };
 }
@@ -206,7 +231,7 @@ export function createFileResponse(
   headers?: Record<string, string>,
 ): FileResponse {
   return {
-    __isFileResponse: true,
+    isFileResponse: true,
     buffer,
     contentType,
     headers,
@@ -220,7 +245,7 @@ export function createContentResponse(
   content: ContentBlock[],
 ): ContentResponse {
   return {
-    __isContentResponse: true,
+    isContentResponse: true,
     content,
   };
 }
@@ -234,8 +259,8 @@ export function isStreamingResponse<T>(
   return (
     typeof value === "object" &&
     value !== null &&
-    "__isStreamingResponse" in value &&
-    value.__isStreamingResponse === true
+    "isStreamingResponse" in value &&
+    value.isStreamingResponse === true
   );
 }
 
@@ -248,8 +273,8 @@ export function isFileResponse<T>(
   return (
     typeof value === "object" &&
     value !== null &&
-    "__isFileResponse" in value &&
-    value.__isFileResponse === true
+    "isFileResponse" in value &&
+    value.isFileResponse === true
   );
 }
 
@@ -262,8 +287,8 @@ export function isContentResponse<T>(
   return (
     typeof value === "object" &&
     value !== null &&
-    "__isContentResponse" in value &&
-    value.__isContentResponse === true
+    "isContentResponse" in value &&
+    value.isContentResponse === true
   );
 }
 
@@ -282,7 +307,6 @@ export type ErrorResponseType<
 > = {
   success: false;
   message: TKey;
-  messageParams?: TParams;
   errorType: ErrorResponseTypesElements[keyof ErrorResponseTypesElements];
   cause?: ErrorResponseType;
 };
@@ -297,7 +321,6 @@ export interface SuccessResponseType<TResponseData> {
    *  (e.g. interactive Claude Code sessions that use the complete-task MCP tool). */
   taskLifecycleManagedExternally?: true;
   message?: never;
-  messageParams?: never;
   errorType?: never;
   cause?: never;
 }
@@ -340,9 +363,11 @@ type ErrorTypes =
   | "PAYMENT_REQUIRED"
   | "CONFLICT";
 
-type ErrorResponseTypesElements = {
+export type ErrorResponseTypesElements = {
   [errorType in ErrorTypes]: {
-    errorKey: SharedTranslationKey;
+    // Keyed off the framework's own shared scope, not the app's. `core` has to be
+    // vendorable standalone, so it must not reach up into `_pages` for a type.
+    errorKey: VibeTranslationKey;
     errorCode: number;
   };
 };

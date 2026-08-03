@@ -14,14 +14,14 @@ import { join } from "node:path";
 import {
   endpointToToolName,
   getPreferredToolName,
-} from "next-vibe/core/core-utils/path";
+} from "../../../../core/core-utils/path";
 import {
   findFilesRecursively,
   generateFileHeader,
   toImportUrl,
   writeGeneratedFile,
-} from "next-vibe/core/generators/shared/utils";
-import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
+} from "../../../../core/generators/shared/utils";
+import { TOOL_HELP_ALIAS } from "../../../../help-tool/constants";
 
 import { getApiDir } from "@/env/paths";
 
@@ -379,7 +379,7 @@ ${aliasMapEntries}
 
 /* eslint-disable prettier/prettier */
 
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 
 /**
  * Dynamically import endpoint definition by path (scoped to this package).
@@ -400,7 +400,7 @@ ${cases.join("\n")}
 
 /* eslint-disable prettier/prettier */
 
-import type { GenericHandlerBase } from "next-vibe/core/route/handler";
+import type { GenericHandlerBase } from "../../../../core/route/handler";
 
 /**
  * Dynamically import route handler by path (scoped to this package).

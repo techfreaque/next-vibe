@@ -4,23 +4,15 @@
  * All validation is handled by genericHandler
  */
 
-import { formatValidationErrorCompact } from "next-vibe/core/core-utils/format-validation-error";
-import { validateData } from "next-vibe/core/core-utils/validation";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { scopedTranslation as sharedScopedTranslation } from "next-vibe/core/i18n/shared";
-import type {
-  ErrorResponseType,
-  ResponseType,
-} from "next-vibe/core/route/response.schema";
-import {
-  errorResponseSchema,
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/core/route/response.schema";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { Platform } from "next-vibe/platforms/platforms";
+import { validateData } from "../core-utils/validation";
+import type { CreateApiEndpointAny } from "../definition/endpoint-base";
+import type { CountryLanguage } from "../i18n/core/config";
+import { scopedTranslation as sharedScopedTranslation } from "../i18n/shared";
+import type { ErrorResponseType, ResponseType } from "./response.schema";
+import { errorResponseSchema } from "./error-response.schema";
+import { ErrorResponseTypes, fail, success } from "./response.schema";
+import type { EndpointLogger } from "../../logger/types";
+import { Platform } from "../../platforms/platforms";
 import { NextResponse } from "next-vibe/ui/lib/request";
 
 /**
@@ -71,30 +63,21 @@ function buildErrorChain(error: ErrorResponseType): {
 
 /**
  * Wraps an error response in NextResponse
- * Properly translates errors and builds clean error chains.
- * When endpoint is provided, validation errors get a compact field-level message.
+ * Builds clean error chains. Messages arrive already translated and, for
+ * validation failures, already formatted by validateData.
  */
 export function wrapErrorResponse(
   error: ErrorResponseType,
-  locale: CountryLanguage,
   logger: EndpointLogger,
+  locale: CountryLanguage,
   endpoint?: CreateApiEndpointAny | null,
 ): NextResponse<ErrorResponseType> {
-  // Enrich validation errors with compact field-level details for external callers
-  const compactDetails = formatValidationErrorCompact(
-    error.messageParams,
-    endpoint,
-  );
-  if (compactDetails) {
-    error = { ...error, message: compactDetails as typeof error.message };
-  }
   // Build clean error chain
   const { logChain } = buildErrorChain(error);
 
   // Log the full error chain for debugging
   logger.error(`API Error:\n${logChain.join("\n")}`, {
     endpoint: endpoint?.aliases?.[0] ?? endpoint?.path?.join("/"),
-    messageParams: error.messageParams,
     errorKey: error.errorType.errorKey,
     errorCode: error.errorType.errorCode,
   });
@@ -104,9 +87,9 @@ export function wrapErrorResponse(
     error,
     errorResponseSchema,
     logger,
-    locale,
     Platform.NEXT_API,
     "error-response-schema",
+    locale,
   );
 
   // Handle validation errors in the error response itself
@@ -114,12 +97,13 @@ export function wrapErrorResponse(
     logger.error(
       `Error response validation failed: ${validationResult.message ?? "Unknown validation error"}`,
     );
-    const { t: sharedT } = sharedScopedTranslation.scopedT(locale);
+    const { t } = sharedScopedTranslation.scopedT(locale);
     return NextResponse.json(
       fail({
-        message: sharedT("errorTypes.invalid_response_error"),
+        message: t("errors.invalidErrorResponseDetail", {
+          error: validationResult.message,
+        }),
         errorType: ErrorResponseTypes.INVALID_RESPONSE_ERROR,
-        messageParams: { error: validationResult.message },
       }),
       { status: 500 },
     );

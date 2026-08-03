@@ -6,17 +6,17 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import type { ResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
-import type { SessionT } from "next-vibe/identity/session/i18n";
-import { scopedTranslation } from "next-vibe/identity/session/i18n";
+} from "../../core/route/response.schema";
+import { parseError } from "../../core/utils/parse-error";
+import { db } from "../../database";
+import type { SessionT } from "./i18n";
+import { scopedTranslation } from "./i18n";
 import { cookies } from "next-vibe/ui/lib/headers";
 
 import { AUTH_TOKEN_COOKIE_NAME } from "@/env/constants";
@@ -60,20 +60,18 @@ export class SessionRepository {
       // Token not found in database and not a JWT
 
       return fail({
-        message: t("errors.session_not_found"),
+        message: t("errors.session_not_found", { token }),
         errorType: ErrorResponseTypes.NOT_FOUND,
-        messageParams: { token },
       });
     } catch (error) {
       // Note: Logger not available for internal session methods
 
       return fail({
-        message: t("errors.session_lookup_failed"),
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: {
+        message: t("errors.session_lookup_failed", {
           token,
           error: parseError(error).message,
-        },
+        }),
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
       });
     }
   }
@@ -100,9 +98,8 @@ export class SessionRepository {
 
       if (result.length === 0) {
         return fail({
-          message: t("errors.session_not_found"),
+          message: t("errors.session_not_found", { token }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { token },
         });
       }
 
@@ -113,12 +110,11 @@ export class SessionRepository {
       // Note: Logger not available for internal session methods
 
       return fail({
-        message: t("errors.session_lookup_failed"),
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: {
+        message: t("errors.session_lookup_failed", {
           token,
           error: parseError(error).message,
-        },
+        }),
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
       });
     }
   }
@@ -140,9 +136,10 @@ export class SessionRepository {
       if (results.length === 0) {
         const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: t("errors.session_creation_failed"),
+          message: t("errors.session_creation_failed", {
+            userId: data.userId,
+          }),
           errorType: ErrorResponseTypes.DATABASE_ERROR,
-          messageParams: { userId: data.userId, operation: "create" },
         });
       }
 
@@ -151,13 +148,11 @@ export class SessionRepository {
       // Note: Logger not available for internal session methods
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.session_creation_database_error"),
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: {
+        message: t("errors.session_creation_database_error", {
           userId: data.userId,
-          operation: "create",
           error: parseError(error).message,
-        },
+        }),
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
       });
     }
   }
@@ -176,12 +171,12 @@ export class SessionRepository {
       return success();
     } catch (error) {
       return fail({
-        message: t("errors.user_sessions_delete_failed"),
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: {
-          userId: sessionId,
+        // The param was named userId but always held a session id.
+        message: t("errors.user_sessions_delete_failed", {
+          sessionId,
           error: parseError(error).message,
-        },
+        }),
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
       });
     }
   }
@@ -199,10 +194,14 @@ export class SessionRepository {
       const token = cookiesStore.get(AUTH_TOKEN_COOKIE_NAME)?.value;
 
       if (!token) {
+        // session_not_found now reports a token; there is none here, so this
+        // case gets its own key carrying the reason instead.
         return fail({
-          message: t("errors.session_not_found"),
+          message: t("errors.session_token_missing", {
+            // The enum value is itself a translation key, so resolve it.
+            reason: t(SessionErrorReason.NO_TOKEN_IN_COOKIES),
+          }),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
-          messageParams: { reason: SessionErrorReason.NO_TOKEN_IN_COOKIES },
         });
       }
 
@@ -218,9 +217,10 @@ export class SessionRepository {
       // Check if session is expired
       if (session.expiresAt <= now) {
         return fail({
-          message: t("errors.expired"),
+          message: t("errors.expired", {
+            expiresAt: session.expiresAt.toISOString(),
+          }),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
-          messageParams: { expiresAt: session.expiresAt.toISOString() },
         });
       }
 
@@ -232,12 +232,13 @@ export class SessionRepository {
     } catch (error) {
       // Note: Logger not available for internal session methods
 
+      // No token in scope here, so session_lookup_failed (which reports one)
+      // does not fit; this path gets its own key.
       return fail({
-        message: t("errors.session_lookup_failed"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
+        message: t("errors.current_session_failed", {
           error: error instanceof Error ? error.message : String(error),
-        },
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }

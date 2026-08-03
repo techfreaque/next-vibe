@@ -31,7 +31,7 @@
  *   VibeFrame.mount({ serverUrl, endpoint, target });
  */
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { CountryLanguage } from "../../core/i18n/core/config";
 import {
   appendToBody,
   createElement,
@@ -562,7 +562,7 @@ async function fetchFrameConfig(
   }
 
   try {
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- standalone cross-origin embed script: runs on third-party pages, zero-dep, cannot use next-vibe-ui or in-process transport
+    // oxlint-disable-next-line restricted/no-raw-fetch -- standalone cross-origin embed script: runs on third-party pages, zero-dep, cannot use next-vibe-ui or in-process transport
     const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

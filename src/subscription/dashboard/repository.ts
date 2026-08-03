@@ -90,9 +90,10 @@ export class SubscriptionDashboardRepository {
     } catch (error) {
       logger.error("Error loading subscription dashboard", parseError(error));
       return fail({
-        message: t("get.errors.server.title"),
+        message: t("get.errors.server.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }

@@ -1,5 +1,5 @@
-import { scopedTranslation } from "next-vibe/identity/roles/i18n";
-import { createEnumOptions } from "next-vibe/unified-ui/_shared/enum";
+import { createEnumOptions } from "../../unified-ui/_shared/enum";
+import { scopedTranslation } from "./i18n";
 
 /**
  * User Permission Roles - Actual roles assigned to users in the database

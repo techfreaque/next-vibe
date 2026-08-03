@@ -57,9 +57,8 @@ export class AvatarRepository {
       );
       if (!userResponse.success) {
         return fail({
-          message: t("errors.user_not_found"),
+          message: t("errors.user_not_found", { userId }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { userId },
           cause: userResponse,
         });
       }
@@ -74,12 +73,11 @@ export class AvatarRepository {
       ];
       if (!allowedTypes.includes(file.type)) {
         return fail({
-          message: t("errors.invalid_file_type"),
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: {
+          message: t("errors.invalid_file_type", {
             allowedTypes: allowedTypes.join(", "),
             providedType: file.type,
-          },
+          }),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
 
@@ -87,12 +85,11 @@ export class AvatarRepository {
       const maxSizeBytes = 5 * 1024 * 1024; // 5MB
       if (file.size > maxSizeBytes) {
         return fail({
-          message: t("errors.file_too_large"),
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: {
+          message: t("errors.file_too_large", {
             maxSize: "5MB",
             providedSize: `${Math.round(file.size / 1024 / 1024)}MB`,
-          },
+          }),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
 
@@ -137,9 +134,11 @@ export class AvatarRepository {
     } catch (error) {
       logger.error("Error uploading user avatar", parseError(error));
       return fail({
-        message: t("errors.failed_to_upload_avatar"),
+        message: t("errors.failed_to_upload_avatar", {
+          userId,
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { userId, error: String(error) },
       });
     }
   }
@@ -168,9 +167,8 @@ export class AvatarRepository {
       );
       if (!userResponse.success) {
         return fail({
-          message: t("errors.user_not_found"),
+          message: t("errors.user_not_found", { userId }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { userId },
           cause: userResponse,
         });
       }
@@ -201,9 +199,11 @@ export class AvatarRepository {
     } catch (error) {
       logger.error("Error deleting user avatar", parseError(error));
       return fail({
-        message: t("errors.failed_to_delete_avatar"),
+        message: t("errors.failed_to_delete_avatar", {
+          userId,
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { userId, error: String(error) },
       });
     }
   }

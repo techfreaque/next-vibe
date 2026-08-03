@@ -11,11 +11,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { SmtpClientT } from "../i18n";
-import type {
-  SmtpCapacityResponseOutput,
-  SmtpSendParams,
-  SmtpSendResult,
-} from "../repository";
+import type { SmtpSendParams, SmtpSendResult } from "../repository";
 import { SmtpRepository } from "../repository";
 
 /**
@@ -39,26 +35,5 @@ export class SmtpSendingRepository {
       roles: [],
     };
     return SmtpRepository.sendEmail(data, serviceUser, t, logger);
-  }
-
-  /**
-   * Get total sending capacity - delegates to SmtpRepository.
-   */
-  static async getTotalSendingCapacity(
-    data: Record<string, never>,
-    user: JwtPayloadType,
-    logger: EndpointLogger,
-    t: SmtpClientT,
-  ): Promise<ResponseType<SmtpCapacityResponseOutput>> {
-    return SmtpRepository.getTotalSendingCapacity(data, user, t, logger);
-  }
-
-  /**
-   * Close all cached SMTP transports.
-   */
-  static async closeAllTransports(logger: EndpointLogger): Promise<void> {
-    const repo = new SmtpRepository();
-    await repo.closeAllTransports();
-    logger.debug("SmtpSendingRepository: closed all transports");
   }
 }

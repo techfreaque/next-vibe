@@ -6,9 +6,9 @@ import { cwd } from "node:process";
 import { parse } from "node:url";
 
 import next from "next";
-import { coreEnv } from "next-vibe/core/env";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import { coreEnv } from "../../../../core/env";
+import { parseError } from "../../../../core/utils/parse-error";
+import type { EndpointLogger } from "../../../../logger/types";
 
 // Server state (singleton)
 let app: ReturnType<typeof next> | undefined;
@@ -65,7 +65,7 @@ export async function startServer(logger: EndpointLogger): Promise<void> {
     });
   } catch (error) {
     logger.error("Failed to start server:", parseError(error));
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Test infrastructure can throw errors
+    // eslint-disable-next-line restricted/restricted-syntax -- Test infrastructure can throw errors
     throw error;
   }
 }

@@ -14,7 +14,7 @@
 import "server-only";
 
 import { and, desc, eq } from "drizzle-orm";
-import { db } from "next-vibe/database";
+import { db } from "../database";
 
 import { remoteConnections } from "./db";
 import { RemoteConnectionRepository } from "./repository";
@@ -55,6 +55,19 @@ export class ExecuteToolRouting {
     params: ResolveTargetParams,
   ): Promise<RemoteTarget | null> {
     const { userId, instanceId, loopInstanceId, logger } = params;
+
+    // No explicit target → the answer is "run locally", whatever the table says.
+    // Both remaining branches key off instanceId / loopInstanceId, so without
+    // either one this function returns null regardless of the query result.
+    //
+    // Checking FIRST matters: every MCP and AI tool dispatch calls resolveTarget,
+    // and neither passes a target for a plain local call. Loading the table there
+    // was a guaranteed-useless round-trip that made every tool — including ones
+    // that touch no database at all, like tool-help and check — depend on
+    // remote_connections being reachable.
+    if (!instanceId && !loopInstanceId) {
+      return null;
+    }
 
     const activeRows = await ExecuteToolRouting.loadActiveConnections(userId);
     if (activeRows.length === 0) {

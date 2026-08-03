@@ -175,6 +175,7 @@ export const translations: typeof enTranslations = {
       title: "Nicht gefunden",
       description: "Der angegebene Fokus-Pfad wurde nicht gefunden",
     },
+    focusNotFound: "Keine Datei passt zum Fokus-Pfad {{focus}}",
     server: {
       title: "Serverfehler",
       description: "Serverfehler während der Abhängigkeitsanalyse aufgetreten",

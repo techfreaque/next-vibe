@@ -7,17 +7,18 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
   success,
-} from "next-vibe/core/route/response.schema";
-import { db } from "next-vibe/database";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { cronTasks } from "next-vibe/tasks/cron/db";
+} from "../../../core/route/response.schema";
+import { db } from "../../../database";
+import type { JwtPrivatePayloadType } from "../../../identity/auth/types";
+import type { EndpointLogger } from "../../../logger/types";
+import type { Platform } from "../../../platforms/platforms";
+import { cronTasks } from "../../../tasks/cron/db";
 
 import { instanceIdentities } from "../../db";
 import { RemoteConnectionRepository } from "../../repository";
@@ -32,6 +33,7 @@ export class RemoteConnectionSelfRenameRepository {
     newInstanceId: string,
     locale: CountryLanguage,
     propagate: boolean,
+    platform: Platform,
   ): Promise<ResponseType<RemoteConnectionSelfRenamePatchResponseOutput>> {
     const [oldIdentity] = await db
       .select({ instanceId: instanceIdentities.instanceId })
@@ -91,7 +93,7 @@ export class RemoteConnectionSelfRenameRepository {
     // the peer's own identity.
     void (async (): Promise<void> => {
       const { RouteExecuteRepository } =
-        await import("next-vibe/execute-tool/repository");
+        await import("../../../execute-tool/repository");
       const { default: reverseUpdateDef } =
         await import("../../connect-reverse/update/definition");
       const conns = await RemoteConnectionRepository.getAllActiveConnections(
@@ -126,6 +128,7 @@ export class RemoteConnectionSelfRenameRepository {
               user,
               locale,
               logger,
+              platform,
             });
           if (propagateResult.success) {
             logger.info("[SELF-RENAME] Propagated rename to remote", {

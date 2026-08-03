@@ -8,24 +8,33 @@ import "server-only";
 import {
   endpointToToolName,
   getPreferredToolName,
-} from "next-vibe/core/core-utils/path";
+} from "../../core-utils/path";
 import type {
   GeneratorContext,
   GeneratorResult,
-} from "next-vibe/core/generators/shared/shared-inputs";
+} from "../../generators/shared/shared-inputs";
 import {
   generateAbsoluteImportPath,
   generateFileHeader,
+  getRelativeImportPath,
   stripProjectRoot,
   toImportUrl,
+  toProjectRelativePath,
   writeGeneratedFile,
-} from "next-vibe/core/generators/shared/utils";
-import { formatWarning } from "next-vibe/logger/formatters";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../generators/shared/utils";
+import { formatWarning } from "../../../logger/formatters";
+import type { EndpointLogger } from "../../../logger/types";
 
-import { GENERATED_DIR } from "@/env/paths";
+import { GENERATED_DIR, VIBE_DIR } from "@/env/paths";
 
 const OUTPUT_FILE = `${GENERATED_DIR}/endpoints/endpoint.ts`;
+
+/**
+ * Where CreateApiEndpointAny actually lives. The emitted import resolves from
+ * the generated file's directory, not this one — a hand-written "../endpoint-base"
+ * pointed at <generated>/endpoint-base, which does not exist.
+ */
+const ENDPOINT_BASE_MODULE = `${VIBE_DIR}/core/definition/endpoint-base.ts`;
 
 /**
  * Generate endpoint.ts + alias-map.ts + endpoint-hot-paths.ts. Consumes shared
@@ -87,7 +96,7 @@ class EndpointGenerator {
   }> {
     const pathMap: Record<
       string,
-      { importPath: string; absPath: string; method: string }
+      { importPath: string; relPath: string; method: string }
     > = {};
     const allPaths: string[] = [];
     let endpointCount = 0;
@@ -95,6 +104,7 @@ class EndpointGenerator {
     // Build path map with real aliases (deduplicate)
     for (const defFile of definitionFiles) {
       const importPath = generateAbsoluteImportPath(defFile, "definition");
+      const relPath = toProjectRelativePath(defFile);
 
       // Load the actual definition - let TypeScript infer the concrete type
       let definition;
@@ -182,7 +192,7 @@ class EndpointGenerator {
         const toolName = endpointToToolName(endpoint);
 
         if (!pathMap[toolName]) {
-          pathMap[toolName] = { importPath, absPath: defFile, method };
+          pathMap[toolName] = { importPath, relPath, method };
           allPaths.push(toolName);
           endpointCount++;
         }
@@ -191,7 +201,7 @@ class EndpointGenerator {
         if (endpoint.aliases && Array.isArray(endpoint.aliases)) {
           for (const alias of endpoint.aliases) {
             if (!pathMap[alias]) {
-              pathMap[alias] = { importPath, absPath: defFile, method };
+              pathMap[alias] = { importPath, relPath, method };
               allPaths.push(alias);
             }
           }
@@ -285,7 +295,7 @@ class EndpointGenerator {
     const prewarmSeen = new Set<string>();
     const prewarmPaths: string[] = [];
     for (const path of allPaths) {
-      const { importPath, absPath, method } = pathMap[path];
+      const { importPath, relPath, method } = pathMap[path];
       if (!prewarmSeen.has(importPath)) {
         prewarmSeen.add(importPath);
         prewarmPaths.push(path);
@@ -332,14 +342,14 @@ class EndpointGenerator {
       // eslint-disable-next-line i18next/no-literal-string
       const hotPathNeedsQuotes = /[^a-zA-Z0-9_$]/.test(path);
       const hotPathKey = hotPathNeedsQuotes ? `"${path}"` : path;
-      const absPathLine = `    absPath: "${absPath}",`;
-      if (absPathLine.length <= 80) {
+      const relPathLine = `    relPath: "${relPath}",`;
+      if (relPathLine.length <= 80) {
         hotPathEntries.push(
-          `  ${hotPathKey}: {\n    absPath: "${absPath}",\n    method: "${method}",\n  },`,
+          `  ${hotPathKey}: {\n    relPath: "${relPath}",\n    method: "${method}",\n  },`,
         );
       } else {
         hotPathEntries.push(
-          `  ${hotPathKey}: {\n    absPath:\n      "${absPath}",\n    method: "${method}",\n  },`,
+          `  ${hotPathKey}: {\n    relPath:\n      "${relPath}",\n    method: "${method}",\n  },`,
         );
       }
     }
@@ -387,7 +397,7 @@ ${aliasMapEntries}
 
 /* eslint-disable prettier/prettier */
 
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CreateApiEndpointAny } from "${getRelativeImportPath(ENDPOINT_BASE_MODULE, OUTPUT_FILE)}";
 
 /**
  * Single-flight queue for the lazy definition imports below. Definition
@@ -470,13 +480,17 @@ if (
 /* eslint-disable prettier/prettier */
 
 /**
- * Maps every endpoint path to its import path and HTTP method.
+ * Maps every endpoint path to its src-relative path and HTTP method.
  * Used by the MCP hot-loader to build fresh (cache-busted) imports at runtime
  * without static import strings that bundlers would trace.
+ *
+ * Paths are relative because this file is committed: an absolute path is only
+ * ever correct on the machine that ran the generator. The hot-loader resolves
+ * them against the same src root at runtime.
  */
 export const endpointHotPaths: Record<
   string,
-  { absPath: string; method: string }
+  { relPath: string; method: string }
 > = {
 ${hotPathEntries.join("\n")}
 };

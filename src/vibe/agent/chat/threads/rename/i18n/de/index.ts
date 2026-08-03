@@ -46,6 +46,8 @@ export const translations: typeof enTranslations = {
         title: "Ungültige Eingabe",
         description:
           "Prüfen Sie, ob die Thread-ID eine gültige UUID ist und mindestens ein Feld angegeben wurde",
+        noActiveThread: "Kein aktiver Thread im Stream-Kontext",
+        folderUnresolved: "Ordner des Threads konnte nicht ermittelt werden",
       },
       unauthorized: {
         title: "Nicht angemeldet",
@@ -58,10 +60,12 @@ export const translations: typeof enTranslations = {
       notFound: {
         title: "Thread nicht gefunden",
         description: "Kein Thread mit dieser ID vorhanden",
+        detail: "Thread nicht gefunden: {{threadId}}",
       },
       server: {
         title: "Serverfehler",
         description: "Thread konnte nicht umbenannt werden",
+        detail: "Serverfehler: {{error}}",
       },
       network: {
         title: "Netzwerkfehler",

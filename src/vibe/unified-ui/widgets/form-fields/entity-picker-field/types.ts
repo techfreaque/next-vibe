@@ -2,11 +2,11 @@
  * Entity Picker Field Widget Types
  */
 
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { FieldDataType } from "next-vibe/core/definition/enums";
-import type { StringWidgetSchema } from "next-vibe/unified-ui/_shared/schema-constraints";
-import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
-import type { BaseFormFieldWidgetConfig } from "next-vibe/unified-ui/widgets/form-fields/_shared/types";
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
+import type { FieldDataType } from "../../../../core/definition/enums";
+import type { StringWidgetSchema } from "../../../_shared/schema-constraints";
+import type { FieldUsageConfig } from "../../../_shared/types";
+import type { BaseFormFieldWidgetConfig } from "../_shared/types";
 
 /**
  * Entity picker field widget configuration.
@@ -33,7 +33,7 @@ export interface EntityPickerFieldWidgetConfig<
   fieldType: FieldDataType.ENTITY_PICKER;
   /**
    * The list endpoint. Either a direct reference or an async resolver
-   * (`() => import("next-vibe/server/server/rebuild/definition").then((m) => m.default.GET)`) so that
+   * (`() => import("../../../../server/server/rebuild/definition").then((m) => m.default.GET)`) so that
    * cross-feature references don't create static import cycles between
    * definition files. Resolved lazily by the widget at render time.
    */

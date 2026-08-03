@@ -129,6 +129,7 @@ export const translations: typeof enTranslations = {
       server: {
         title: "Serverfehler",
         description: "Ein interner Serverfehler ist aufgetreten",
+        detail: "Serverfehler: {{error}}",
       },
       network: {
         title: "Netzwerkfehler",
@@ -297,10 +298,12 @@ export const translations: typeof enTranslations = {
         title: "Thread nicht gefunden",
         description:
           "Der zu aktualisierende Thread konnte nicht gefunden werden",
+        detail: "Thread nicht gefunden: {{threadId}}",
       },
       server: {
         title: "Serverfehler",
         description: "Ein interner Serverfehler ist aufgetreten",
+        detail: "Serverfehler: {{error}}",
       },
       network: {
         title: "Netzwerkfehler",
@@ -381,10 +384,12 @@ export const translations: typeof enTranslations = {
       notFound: {
         title: "Thread nicht gefunden",
         description: "Der zu löschende Thread konnte nicht gefunden werden",
+        detail: "Thread nicht gefunden: {{threadId}}",
       },
       server: {
         title: "Serverfehler",
         description: "Ein interner Serverfehler ist aufgetreten",
+        detail: "Serverfehler: {{error}}",
       },
       network: {
         title: "Netzwerkfehler",

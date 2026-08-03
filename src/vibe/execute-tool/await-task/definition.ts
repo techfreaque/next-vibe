@@ -1,21 +1,21 @@
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { WidgetDataSchema } from "next-vibe/core/utils/json";
-import { scopedTranslation } from "next-vibe/execute-tool/await-task/i18n";
-import { UserRole } from "next-vibe/identity/roles/enum";
-import { taskInputSchema } from "next-vibe/tasks/cron/db";
-import { CronTaskStatus, CronTaskStatusDB } from "next-vibe/tasks/enum";
-import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
-import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
+} from "../../core/definition/enums";
+import { WidgetDataSchema } from "../../core/utils/json";
+import { scopedTranslation } from "./i18n";
+import { UserRole } from "../../identity/roles/enum";
+import { taskInputSchema } from "../../tasks/cron/db";
+import { CronTaskStatus, CronTaskStatusDB } from "../../tasks/enum";
+import { lazyWidget } from "../../unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "../../unified-ui/_shared/utils";
 import {
   requestField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { AWAIT_TASK_ALIAS } from "./constants";

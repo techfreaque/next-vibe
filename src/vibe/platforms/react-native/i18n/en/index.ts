@@ -1,10 +1,12 @@
 export const translations = {
   errors: {
-    missingUrlParam: "Missing URL parameter",
-    urlConstructionFailed: "URL construction failed",
-    validationFailed: "Validation failed",
-    htmlResponseReceived: "HTML response received instead of JSON",
-    networkError: "Network error occurred",
+    missingUrlParam:
+      "Missing URL parameter {{paramName}} for endpoint {{endpoint}}",
+    urlConstructionFailed: "URL construction failed: {{error}}",
+    validationFailed: "Validation failed: {{error}}",
+    htmlResponseReceived:
+      "HTML response received instead of JSON from {{url}} (status {{status}}). Check that the API server is running and the endpoint exists.",
+    networkError: "Network error occurred: {{error}}",
     failedToLoadPage: "Failed to load page",
   },
   generate: {

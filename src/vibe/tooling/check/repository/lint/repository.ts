@@ -6,17 +6,13 @@
 import { promises as fs } from "node:fs";
 import { dirname, relative } from "node:path";
 
-import { buildPackageRunnerCommand, coreEnv } from "next-vibe/core/env";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType as ApiResponseType } from "next-vibe/core/route/response.schema";
-import { success } from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { Platform } from "next-vibe/platforms/platforms";
-import {
-  calculateFilteredSummary,
-  filterIssues,
-} from "next-vibe/tooling/check/repository/filter-utils";
+import { buildPackageRunnerCommand, coreEnv } from "../../../../core/env";
+import type { ResponseType as ApiResponseType } from "../../../../core/route/response.schema";
+import { success } from "../../../../core/route/response.schema";
+import { parseError } from "../../../../core/utils/parse-error";
+import type { EndpointLogger } from "../../../../logger/types";
+import { Platform } from "../../../../platforms/platforms";
+import { calculateFilteredSummary, filterIssues } from "../filter-utils";
 
 import { ConfigRepositoryImpl } from "../../config/repository";
 import { sortIssuesByLocation } from "../../config/shared";
@@ -73,7 +69,6 @@ export class LintRepository {
     platform: Platform,
     providedConfig: CheckConfig | undefined,
     signal: AbortSignal,
-    locale: CountryLanguage,
   ): Promise<ApiResponseType<VibeCheckResponseOutput>> {
     const isMCP = platform === Platform.MCP;
     try {
@@ -84,7 +79,6 @@ export class LintRepository {
       } else {
         const configResult = await ConfigRepositoryImpl.ensureConfigReady(
           logger,
-          locale,
           false,
         );
 

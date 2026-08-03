@@ -54,10 +54,14 @@ export const translations = {
         notFound: {
           title: "Tool Not Found",
           description: "No registered tool matches the given toolName",
+          // `title` is the definition's declared NOT_FOUND label and renders
+          // param-free there, so the tool name gets its own key.
+          detail: 'No registered tool matches "{{toolName}}"',
         },
         remoteFailed: {
           title: "Remote tool failed: {{message}}",
           description: "The remote instance rejected or failed the call",
+          detail: 'Remote tool "{{toolName}}" failed: {{message}}',
         },
         server: {
           title: "Execution Error",
@@ -68,8 +72,11 @@ export const translations = {
           description: "Network error during tool execution",
         },
         unknown: {
+          // `title` is a declared errorTypes label and renders param-free, so
+          // the cause lives in `detail` instead.
           title: "Unknown Error",
           description: "An unexpected error occurred during execution",
+          detail: "Unknown error during execution: {{error}}",
         },
       },
       success: {

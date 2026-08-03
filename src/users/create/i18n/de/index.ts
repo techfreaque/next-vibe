@@ -213,7 +213,7 @@ export const translations: typeof enTranslations = {
           "Sie haben nicht gespeicherte Änderungen, die verloren gehen",
       },
       internal: {
-        title: "Interner Fehler",
+        title: "Interner Fehler: {{details}}",
         description:
           "Ein interner Fehler ist beim Erstellen des Benutzers aufgetreten",
       },

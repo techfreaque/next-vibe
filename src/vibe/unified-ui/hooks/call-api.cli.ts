@@ -1,10 +1,9 @@
-import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { Platform } from "next-vibe/platforms/platforms";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import type { ResponseType } from "../../core/route/response.schema";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
+import { Platform } from "../../platforms/platforms";
 
 export async function callApi<TEndpoint extends CreateApiEndpointAny>(
   endpoint: TEndpoint,
@@ -13,9 +12,7 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
   locale: CountryLanguage,
   requestData: TEndpoint["types"]["RequestOutput"],
   pathParams: TEndpoint["types"]["UrlVariablesOutput"],
-  availability: AgentEnvAvailability,
 ): Promise<ResponseType<TEndpoint["types"]["ResponseOutput"]>> {
-  void availability; // CLI does not gate on env availability — parameter required by shared call signature
   logger.debug("callApi [cli]", {
     endpoint: endpoint.path.join("/"),
     method: endpoint.method,

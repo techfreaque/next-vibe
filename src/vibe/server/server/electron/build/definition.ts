@@ -6,18 +6,18 @@
 
 import { z } from "zod";
 
-import { createEndpoint } from "next-vibe/core/definition/create";
-import { objectField, requestField, responseField } from "next-vibe/unified-ui/_shared/utils-i18n";
+import { createEndpoint } from "../../../../core/definition/create-i18n";
+import { objectField, requestField, responseField } from "../../../../unified-ui/_shared/utils-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { UserRole } from "next-vibe/identity/roles/enum";
+} from "../../../../core/definition/enums";
+import { UserRole } from "../../../../identity/roles/enum";
 
-import { scopedTranslation } from "next-vibe/server/server/electron/build/i18n";
+import { scopedTranslation } from "./i18n";
 
 import { ELECTRON_BUILD_ALIAS } from "./constants";
 

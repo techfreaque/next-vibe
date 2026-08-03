@@ -1,8 +1,8 @@
 import "server-only";
 
-import { agentEnv } from "next-vibe/agent/env";
-import { pollDelay } from "next-vibe/agent/shared/poll-delay";
-import { scopedTranslation } from "next-vibe/agent/video-generation/i18n";
+import { agentEnv } from "../../env";
+import { pollDelay } from "../../shared/poll-delay";
+import { scopedTranslation } from "../i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -179,9 +179,7 @@ export async function generateVideoWithModelsLab(params: {
       for (let attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt++) {
         if (signal?.aborted) {
           return fail({
-            message: t("post.errors.generationFailed", {
-              error: "Request aborted",
-            }),
+            message: t("post.errors.requestAborted"),
             errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           });
         }
@@ -216,9 +214,9 @@ export async function generateVideoWithModelsLab(params: {
 
         if (pollResult.status === "error") {
           return fail({
-            message: t("post.errors.generationFailed", {
-              error: pollResult.message ?? "Unknown error",
-            }),
+            message: pollResult.message
+              ? t("post.errors.generationFailed", { error: pollResult.message })
+              : t("post.errors.generationFailedUnknown"),
             errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           });
         }
@@ -283,9 +281,7 @@ export async function generateVideoWithModelsLab(params: {
       }
 
       return fail({
-        message: t("post.errors.generationFailed", {
-          error: "Request timed out",
-        }),
+        message: t("post.errors.requestTimedOut"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
@@ -293,8 +289,8 @@ export async function generateVideoWithModelsLab(params: {
     // Error response. init_image rejections are misleading as-is (the URL is
     // fine — the model/endpoint combination doesn't support image-to-video),
     // so translate them into an actionable hint the AI can act on.
-    const rawError = result.message ?? "Unknown error";
-    if (inputImageUrl && /init_image/i.test(String(rawError))) {
+    const rawError = result.message;
+    if (inputImageUrl && rawError && /init_image/i.test(rawError)) {
       return fail({
         message: t("post.errors.imageInputUnsupported", {
           model: providerModel,
@@ -303,9 +299,9 @@ export async function generateVideoWithModelsLab(params: {
       });
     }
     return fail({
-      message: t("post.errors.providerError", {
-        error: rawError,
-      }),
+      message: rawError
+        ? t("post.errors.providerError", { error: rawError })
+        : t("post.errors.providerErrorUnknown"),
       errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
     });
   } catch (error) {

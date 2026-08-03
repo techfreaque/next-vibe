@@ -4,6 +4,7 @@ import type { ImageProps } from "../../web/ui/image";
 
 export type { ImageProps } from "../../web/ui/image";
 
-export function Image(): null {
+export function Image(_props: ImageProps): null {
+  void _props;
   return null;
 }

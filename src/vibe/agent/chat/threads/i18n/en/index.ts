@@ -157,6 +157,7 @@ export const translations = {
       server: {
         title: "Server Error",
         description: "An internal server error occurred",
+        detail: "Server Error: {{error}}",
       },
       network: {
         title: "Network Error",
@@ -282,14 +283,17 @@ export const translations = {
         description: "You don't have permission to create threads",
         incognitoNotAllowed:
           "Incognito threads cannot be created on the server",
+        cannotCreateHere: "You can't create a thread in this location",
       },
       notFound: {
         title: "Not Found",
         description: "Resource not found",
+        folderNotFound: "Folder not found",
       },
       server: {
         title: "Server Error",
         description: "An internal server error occurred",
+        detail: "Server Error: {{error}}",
       },
       network: {
         title: "Network Error",

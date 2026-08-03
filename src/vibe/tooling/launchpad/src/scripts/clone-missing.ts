@@ -1,15 +1,15 @@
 /// <reference types="node" />
 import { join } from "node:path";
 
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { LaunchpadT } from "next-vibe/tooling/launchpad/i18n";
-import type { LaunchpadConfig } from "next-vibe/tooling/launchpad/src/types/types";
+import type { EndpointLogger } from "../../../../logger/types";
+import type { LaunchpadT } from "../../i18n";
+import type { LaunchpadConfig } from "../types/types";
 import {
   cloneRepo,
   closePrompt,
   getAllRepos,
   repoExists,
-} from "next-vibe/tooling/launchpad/src/utils/repo-utils";
+} from "../utils/repo-utils";
 export async function cloneMissingRepos(
   logger: EndpointLogger,
   rootDir: string,

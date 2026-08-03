@@ -275,7 +275,7 @@ export const translations = {
     sync: {
       failed: "Sync failed",
       account: {
-        failed: "Account sync failed",
+        failed: "Account sync failed: {{error}}",
       },
       folder: {
         failed: "Folder sync failed",
@@ -336,8 +336,8 @@ export const translations = {
       },
       errors: {
         default: "IMAP sync failed",
-        account_failed: "Account sync failed",
-        folder_sync_failed: "Folder sync failed",
+        account_failed: "Account sync failed: {{error}}",
+        folder_sync_failed: "Folder sync failed: {{error}}",
         message_sync_error: "Message sync error",
         message_sync_failed: "Message sync failed",
       },

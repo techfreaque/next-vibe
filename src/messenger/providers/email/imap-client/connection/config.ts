@@ -25,24 +25,6 @@ export interface ImapConnectionConfig {
 }
 
 /**
- * IMAP Connection Result
- */
-export interface ImapConnectionResult {
-  success: boolean;
-  status: (typeof ImapConnectionStatus)[keyof typeof ImapConnectionStatus];
-  message: string;
-  details?: {
-    host: string;
-    port: number;
-    secure: boolean;
-    authMethod: string;
-    responseTime?: number;
-    serverCapabilities?: string[];
-  };
-  error?: string;
-}
-
-/**
  * IMAP Folder Information
  */
 export interface ImapFolderInfo {
@@ -137,19 +119,4 @@ export interface ImapMessageListRequestOutput {
  */
 export interface ImapMessageListResponseOutput {
   messages: ImapMessageInfo[];
-}
-
-/**
- * IMAP Connection Close Request Type
- */
-export interface ImapConnectionCloseRequestOutput {
-  account: ImapAccountShape;
-}
-
-/**
- * IMAP Connection Close Response Type
- */
-export interface ImapConnectionCloseResponseOutput {
-  success: boolean;
-  message: TranslatedKeyType;
 }

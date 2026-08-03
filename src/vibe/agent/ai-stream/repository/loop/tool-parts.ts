@@ -348,8 +348,8 @@ export async function onToolResult(
   let toolError: ErrorResponseType | undefined;
   if (effectiveIsError) {
     if (isErrorResponse && typeof output === "object" && output !== null) {
-      // Output is a structured ErrorResponseType from fail() - pass through its
-      // message as messageParams so the AI sees the specific error detail
+      // Output is a structured ErrorResponseType from fail() - fold its message
+      // into the detail key so the AI sees the specific error
       // (e.g. "Tool not found: xyz") rather than a generic wrapper.
       const errObj = output as Record<string, JSONValue>;
       const errDetail =
@@ -912,15 +912,11 @@ async function executeFallbackTool(
       logger.warn("[AI Stream] Fallback tool execution failed", {
         toolName,
         error: result.message,
-        messageParams: result.messageParams,
         args: JSON.stringify(args ?? {}).slice(0, 500),
       });
-      const extraDetail = result.messageParams?.error;
-      const errorMsg =
-        extraDetail && !result.message.includes(extraDetail as string)
-          ? `${result.message}: ${extraDetail}`
-          : result.message;
-      return { error: errorMsg };
+      // Detail that used to arrive via messageParams is now interpolated into
+      // the message itself, so it needs no separate append.
+      return { error: result.message };
     }
 
     // runInProcess wraps success data as { result: actualData } for MCP/AI display.

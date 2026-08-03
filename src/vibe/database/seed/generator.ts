@@ -8,18 +8,47 @@
 
 import "server-only";
 
-import type { GeneratorDefinition } from "next-vibe/core/generators/shared/shared-inputs";
+import type { GeneratorDefinition } from "../../core/generators/shared/shared-inputs";
 import {
-  extractModuleName,
   findFilesRecursively,
   generateFileHeader,
   getRelativeImportPath,
+  toPosixPath,
   writeGeneratedFile,
-} from "next-vibe/core/generators/shared/utils";
+} from "../../core/generators/shared/utils";
 
-import { GENERATED_DIR, getApiDir } from "@/env/paths";
+import { GENERATED_DIR, getApiDir, VIBE_DIR } from "@/env/paths";
+
+/**
+ * Module name a seeds file belongs to.
+ *   .../core/leads/seeds.ts              -> "leads"
+ *   .../core/emails/smtp-client/seeds.ts -> "smtp-client"
+ *
+ * Lives here rather than in the shared generator utilities because this is its
+ * only caller. A helper with one consumer that sits in a shared module reads as
+ * part of the shared contract, and every vendored copy of that module then
+ * carries it as a dead export.
+ */
+function extractModuleName(filePath: string, coreMarker = "core"): string {
+  const pathParts = toPosixPath(filePath).split("/");
+  const coreIndex = pathParts.findIndex((p) => p === coreMarker);
+
+  if (coreIndex === -1 || coreIndex >= pathParts.length - 1) {
+    return pathParts.at(-2) || "unknown";
+  }
+
+  const moduleParts = pathParts.slice(coreIndex + 1, pathParts.length - 1);
+  return moduleParts.at(-1) || moduleParts.join("-");
+}
 
 const OUTPUT_FILE = `${GENERATED_DIR}/seeds/index.ts`;
+
+/**
+ * Where EnvironmentSeeds actually lives. The emitted import resolves from the
+ * generated file's directory, not this one — a hand-written "./seed-manager"
+ * pointed at <generated>/seeds/seed-manager, which does not exist.
+ */
+const SEED_MANAGER_MODULE = `${VIBE_DIR}/database/seed/seed-manager.ts`;
 
 function generateContent(seedFiles: string[], outputFile: string): string {
   const switchCases: string[] = [];
@@ -45,7 +74,7 @@ function generateContent(seedFiles: string[], outputFile: string): string {
 
 /* eslint-disable prettier/prettier */
 
-import type { EnvironmentSeeds } from "next-vibe/database/seed/seed-manager";
+import type { EnvironmentSeeds } from "${getRelativeImportPath(SEED_MANAGER_MODULE, outputFile)}";
 
 /**
  * Dynamically import seed module by name
@@ -91,6 +120,7 @@ export const generator: GeneratorDefinition = {
     }
     return findFilesRecursively(getApiDir(), "seeds.ts");
   },
+  output: OUTPUT_FILE,
   async generate(ctx) {
     const seedFiles = ctx.files.seed;
     const content = generateContent(seedFiles, OUTPUT_FILE);

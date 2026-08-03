@@ -16,7 +16,8 @@ import { join } from "node:path";
 import type { z } from "zod";
 import { z as zod } from "zod";
 
-import { decryptEnvObject, loadOrCreateKey } from "./env-crypto";
+import { envValidationLogger } from "./env-logger";
+import { getRawEnv } from "./env-source";
 import { validateEnv } from "./env-util";
 
 /** Built-in generators for autoGenerate field */
@@ -117,25 +118,6 @@ function applyGenerate(
   rawEnv[key] = value;
   persistGeneratedEnvVar(key, value);
 }
-
-/**
- * Lazily decrypted process.env - computed once, reused across all defineEnv calls.
- * Decrypts vibe:enc:* values using the project key file.
- */
-let _decryptedEnv: NodeJS.ProcessEnv | undefined;
-function getDecryptedEnv(): NodeJS.ProcessEnv {
-  if (!_decryptedEnv) {
-    _decryptedEnv = decryptEnvObject(
-      process.env as Record<string, string | undefined>,
-      loadOrCreateKey(),
-    ) as NodeJS.ProcessEnv;
-  }
-  return _decryptedEnv;
-}
-
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
-
-import { envValidationLogger } from "./env-logger";
 
 /** Concrete env var value type — all env vars resolve to one of these primitives. */
 type EnvValue = string | number | boolean | undefined;
@@ -314,7 +296,7 @@ export function defineEnv(
 
     // Apply generate/autoGenerate for all variant fields before validation
     const discriminatorValues = Object.keys(unionInput.variants);
-    const rawEnv = getDecryptedEnv();
+    const rawEnv = getRawEnv();
     for (const variantFields of Object.values(unionInput.variants)) {
       for (const [key, def] of Object.entries(variantFields)) {
         applyGenerate(
@@ -340,7 +322,6 @@ export function defineEnv(
       envWithDiscriminatorDefault,
       discriminatedUnionSchema,
       envValidationLogger,
-      defaultLocale,
       unionHints,
     );
 
@@ -395,7 +376,7 @@ export function defineEnv(
   const fields = input as Fields;
 
   // Apply generate/autoGenerate for missing fields before validation
-  const rawEnvForFields = getDecryptedEnv();
+  const rawEnvForFields = getRawEnv();
   for (const [key, def] of Object.entries(fields)) {
     applyGenerate(
       key,
@@ -430,18 +411,7 @@ export function defineEnv(
   for (const [key, def] of Object.entries(fields)) {
     hints[key] = { example: def.example, comment: def.comment };
   }
-  const env = validateEnv(
-    rawEnvForFields,
-    schema,
-    envValidationLogger,
-    defaultLocale,
-    hints,
-  );
+  const env = validateEnv(rawEnvForFields, schema, envValidationLogger, hints);
   writeEnvToProcess(env as Record<string, EnvValue>);
   return { env, schema, examples };
 }
-
-/**
- * Define and validate client environment variables (alias for defineEnv)
- */
-export const defineEnvClient = defineEnv;

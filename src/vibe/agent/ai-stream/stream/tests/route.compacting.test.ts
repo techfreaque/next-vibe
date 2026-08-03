@@ -29,7 +29,7 @@ import "server-only";
 // eslint-disable-next-line i18next/no-literal-string
 globalThis.AI_SDK_LOG_WARNINGS = false;
 
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import { DefaultFolderId } from "../../../../core/execution-context";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
@@ -65,9 +65,9 @@ async function withFavCompactTrigger(
 ): Promise<() => Promise<void>> {
   const userId = "id" in user ? String(user.id) : "";
   const { resolveFavoriteConfig } =
-    await import("next-vibe/agent/skills/favorites/repository");
+    await import("../../../skills/favorites/repository");
   const patchDef =
-    await import("next-vibe/agent/skills/favorites/[id]/definition").then(
+    await import("../../../skills/favorites/[id]/definition").then(
       (m) => m.default.PATCH,
     );
 
@@ -252,10 +252,10 @@ describe("Compacting - context management", () => {
     // ── Resolve quality-tester__budget favorite ──
     // Use existing fav if present (respects user overrides). Create only if absent.
     const [favsDef, favoriteCreateDef] = await Promise.all([
-      import("next-vibe/agent/skills/favorites/definition").then(
+      import("../../../skills/favorites/definition").then(
         (m) => m.default.GET,
       ),
-      import("next-vibe/agent/skills/favorites/create/definition").then(
+      import("../../../skills/favorites/create/definition").then(
         (m) => m.default.POST,
       ),
     ]);

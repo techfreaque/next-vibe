@@ -1,10 +1,10 @@
 "use client";
 
-import { useChatBootContext } from "next-vibe/agent/chat/hooks/context";
-import { useChatSettings } from "next-vibe/agent/chat/settings/hooks";
-import { ChatSettingsRepositoryClient } from "next-vibe/agent/chat/settings/repository-client";
-import { ViewModeToggle } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/view-mode-toggle";
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
+import { useChatBootContext } from "../../../chat/hooks/context";
+import { useChatSettings } from "../../../chat/settings/hooks";
+import { ChatSettingsRepositoryClient } from "../../../chat/settings/repository-client";
+import { ViewModeToggle } from "../../../chat/threads/[threadId]/messages/widget/view-mode-toggle";
+import { useProviderAvailability } from "../../../env-availability-store";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Div } from "next-vibe/ui/ui/div";
 import {

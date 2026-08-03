@@ -1,5 +1,5 @@
 import * as AccordionPrimitive from "@rn-primitives/accordion";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import { Pressable } from "react-native";
 import Animated, {
@@ -14,11 +14,8 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-import { ChevronDown } from "../../native/ui/icons/ChevronDown";
-import {
-  convertCSSToViewStyle,
-  styledNative,
-} from "../../native/utils/style-converter";
+import { ChevronDown } from "./icons/ChevronDown";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import type {
   AccordionContentProps,
   AccordionItemProps,

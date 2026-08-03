@@ -720,6 +720,64 @@ status: requestField(st, {
 
 All translation keys are **short, scoped** relative to the module's i18n scope. The old global `"app.api.*"` format is **FORBIDDEN** in new code - a refactor agent will migrate existing usages.
 
+### Two createEndpoint variants: inline (default) vs scoped i18n
+
+There are two modules, each exporting `createEndpoint`:
+
+| Module                        | Copy             | Field helpers        | Repository   |
+| ----------------------------- | ---------------- | -------------------- | ------------ |
+| `core/definition/create`      | literal strings  | `_shared/utils`      | `failInline` |
+| `core/definition/create-i18n` | scoped i18n keys | `_shared/utils-i18n` | `fail`       |
+
+The split keeps single-language modules off the i18n folder entirely. The inline variant takes **no `scopedTranslation`** - titles, descriptions, tags, error/success types and field labels are plain strings that render verbatim on every surface (web, CLI, MCP, AI, native).
+
+```typescript
+import { createEndpoint } from "next-vibe/core/definition/create";
+// NOTE: plain `utils`, not `utils-i18n` - these take no scopedTranslation arg
+import { objectField, requestField } from "next-vibe/unified-ui/_shared/utils";
+
+const { POST } = createEndpoint({
+  method: Methods.POST,
+  path: ["companies", "create"],
+  title: "Create company",
+  titleShort: "Create",
+  description: "Register a new company under your account.",
+  tags: ["companies", "onboarding"],
+  fields: objectField({
+    type: WidgetType.CONTAINER,
+    usage: { request: "data", response: true },
+    children: {
+      name: requestField({
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "Company name",
+        schema: z.string().min(2),
+      }),
+    },
+  }),
+  // ...remaining required config is identical to createEndpoint
+});
+```
+
+Everything else is unchanged: schema generation, field inference, events, channels and `POST.types.*` behave identically in both. The inline variant attaches a pass-through `scopedTranslation` that hands keys straight back - it exists only so the widget layer can keep inferring `TKey`, and inline definitions never call it.
+
+**The repository uses `failInline`, not `fail`.** `fail({ message })` requires a `TranslatedKeyType` — text that came out of a `t()` call. An inline module has no `t()`, so it uses the literal counterpart:
+
+```typescript
+import { failInline } from "next-vibe/core/route/response.schema";
+
+return failInline({
+  message: `Template not found at ${templatePath}`,
+  errorType: ErrorResponseTypes.NOT_FOUND,
+});
+```
+
+`failInline` has **no `messageParams`** — that field exists to fill placeholders into a static translation key. Inline copy is built at the call site, so interpolate with a template literal and keep the sentence readable. `logger.*` already takes plain strings, so it needs no wrapper either.
+
+Do NOT route literals through a translation function to satisfy the brand (`t("Internal Error")`) — that is ceremony with no i18n behind it. `failInline` is the one sanctioned place a literal becomes a message, which keeps the brand on `fail` meaningful for scoped endpoints.
+
+**Trade-off:** inline copy is single-language - the locale argument is ignored. Use it for internal tooling, admin-only endpoints and prototypes. **Anything user-facing that must ship in DE/PL uses `createEndpoint` + `createScopedTranslation`.** Migrating later means moving the strings into `i18n/` and swapping the field helpers back to `utils-i18n`.
+
 ### Key Structure
 
 ```text

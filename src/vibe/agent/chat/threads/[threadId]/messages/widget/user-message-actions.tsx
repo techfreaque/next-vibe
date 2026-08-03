@@ -1,7 +1,7 @@
 "use client";
-import type { DefaultFolderId } from "next-vibe/agent/chat/config";
-import type { ChatMessage } from "next-vibe/agent/chat/db";
-import { useTTSAudio } from "next-vibe/agent/text-to-speech/hooks";
+import type { DefaultFolderId } from "next-vibe/core/execution-context";
+import type { ChatMessage } from "../../../../db";
+import { useTTSAudio } from "../../../../../text-to-speech/hooks";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -73,8 +73,7 @@ export function UserMessageActions({
 
   const handleDelete = (): void => {
     void (async (): Promise<void> => {
-      const messageIdDefs =
-        await import("next-vibe/agent/chat/threads/[threadId]/messages/[messageId]/definition");
+      const messageIdDefs = await import("../[messageId]/definition");
       navigate(messageIdDefs.default.DELETE, {
         urlPathParams: { threadId: message.threadId, messageId: message.id },
         data: rootFolderId ? { rootFolderId } : undefined,

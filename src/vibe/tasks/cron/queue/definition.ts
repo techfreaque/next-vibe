@@ -4,18 +4,18 @@
  * Defaults: enabled tasks only, all visibility (including hidden).
  */
 
-import { dateSchema } from "next-vibe/core/definition/common.schema";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { dateSchema } from "../../../core/definition/common.schema";
+import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { WidgetDataSchema } from "next-vibe/core/utils/json";
-import { UserRole } from "next-vibe/identity/roles/enum";
-import { scopedTranslation } from "next-vibe/tasks/cron/queue/i18n";
+} from "../../../core/definition/enums";
+import { WidgetDataSchema } from "../../../core/utils/json";
+import { UserRole } from "../../../identity/roles/enum";
+import { scopedTranslation } from "./i18n";
 import {
   CronTaskHiddenFilter,
   CronTaskHiddenFilterDB,
@@ -26,16 +26,16 @@ import {
   TaskCategoryDB,
   TaskCategoryOptions,
   TaskOutputModeDB,
-} from "next-vibe/tasks/enum";
-import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
-import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
+} from "../../enum";
+import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "../../../unified-ui/_shared/utils";
 import {
   backButton,
   objectField,
   requestField,
   responseArrayField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../../unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { taskOwnerSchema } from "../db";

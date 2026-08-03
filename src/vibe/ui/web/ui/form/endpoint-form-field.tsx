@@ -6,30 +6,28 @@
 
 "use client";
 
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
-import type { TParams } from "next-vibe/core/i18n/core/static-types";
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
+import type { CountryLanguage } from "../../../../core/i18n/core/config";
+import type { TranslatedKeyType } from "../../../../core/i18n/core/scoped-translation";
+import type { TParams } from "../../../../core/i18n/core/static-types";
 import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
 import { Calendar } from "next-vibe/ui/ui/icons/Calendar";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../../unified-ui/_shared/cn";
 import type {
   FieldConfig,
   FieldStyleClassName,
   FieldValidationState,
   PrefillDisplayConfig,
   RequiredFieldTheme,
-} from "next-vibe/unified-ui/_shared/field-config-types";
-import { getFieldConfig } from "next-vibe/unified-ui/_shared/infer-field-config";
+} from "../../../../unified-ui/_shared/field-config-types";
+import { getFieldConfig } from "../../../../unified-ui/_shared/infer-field-config";
 import {
   type ReactHooksT,
   scopedTranslation as unifiedInterfaceScopedTranslation,
-} from "next-vibe/unified-ui/hooks/i18n";
-import { getTheme } from "next-vibe/unified-ui/widgets/form-fields/_shared/constants";
-import {
-  Icon,
-  type IconKey,
-} from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+} from "../../../../unified-ui/hooks/i18n";
+import { getTheme } from "../../../../unified-ui/widgets/form-fields/_shared/constants";
+import { type IconKey } from "../../../../unified-ui/widgets/form-fields/icon-field/icons";
+import { Icon } from "../../../../unified-ui/widgets/form-fields/icon-field/icon-component";
 import type { JSX } from "react";
 import type {
   Control,
@@ -38,7 +36,7 @@ import type {
   FieldValues,
 } from "react-hook-form";
 
-import { Info } from "../../../web/ui/icons/Info";
+import { Info } from "../icons/Info";
 import { safeGetRequiredFields } from "../../../zod-required-fields";
 import { AutocompleteField } from "../autocomplete-field";
 import { Badge } from "../badge";
@@ -599,7 +597,7 @@ function renderFieldInput<
 
     case "phone": {
       if (config.type !== "phone") {
-        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type guard for developer mistakes at runtime
+        // oxlint-disable-next-line restricted/restricted-syntax -- Type guard for developer mistakes at runtime
         // eslint-disable-next-line i18next/no-literal-string -- Error handling for invalid config
         throw new Error("Invalid config type for phone field");
       }
@@ -825,7 +823,7 @@ export function EndpointFormField<
     (endpointFields ? getFieldConfig(endpointFields, name) : null);
 
   if (!config) {
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Developer mistake - missing required prop
+    // oxlint-disable-next-line restricted/restricted-syntax -- Developer mistake - missing required prop
     // eslint-disable-next-line i18next/no-literal-string -- Error handling for missing config
     throw new Error(
       `EndpointFormField: No config provided for field "${name}". ` +

@@ -3,25 +3,25 @@
  * Handles oxlint operations using child_process.spawn
  */
 
+import { cpus } from "node:os";
+
 import { existsSync, promises as fs } from "node:fs";
 import { relative, resolve as resolvePath } from "node:path";
 
-import { buildPackageRunnerCommand, coreEnv } from "next-vibe/core/env";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType as ApiResponseType } from "next-vibe/core/route/response.schema";
+import { buildPackageRunnerCommand, coreEnv } from "../../../../core/env";
+import type { ResponseType as ApiResponseType } from "../../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
-  fail,
+  failInline,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { Platform } from "next-vibe/platforms/platforms";
+} from "../../../../core/route/response.schema";
+import { parseError } from "../../../../core/utils/parse-error";
+import type { EndpointLogger } from "../../../../logger/types";
+import { Platform } from "../../../../platforms/platforms";
 
 import { ConfigRepositoryImpl } from "../../config/repository";
 import { sortIssuesByLocation } from "../../config/shared";
 import type { CheckConfig } from "../../config/types";
-import type { CheckVibeCheckT } from "../../i18n";
 import {
   calculateFilteredSummary,
   filterIssues,
@@ -78,9 +78,7 @@ export class OxlintRepository {
     data: OxlintRequestOutput,
     logger: EndpointLogger,
     platform: Platform,
-    t: CheckVibeCheckT,
     signal: AbortSignal,
-    locale: CountryLanguage,
     providedConfig: CheckConfig | undefined,
   ): Promise<ApiResponseType<OxlintResponseOutput>> {
     const isMCP = platform === Platform.MCP;
@@ -96,7 +94,6 @@ export class OxlintRepository {
       } else {
         const configResult = await ConfigRepositoryImpl.ensureConfigReady(
           logger,
-          locale,
           false,
         );
         if (!configResult.ready) {
@@ -182,7 +179,6 @@ export class OxlintRepository {
         effectiveData.timeout,
         logger,
         config,
-        t,
         effectiveData.strict ?? false,
         activeIgnorePatterns,
         signal,
@@ -210,7 +206,6 @@ export class OxlintRepository {
       return success(response);
     } catch (error) {
       const errorMessage = parseError(error).message;
-      // eslint-disable-next-line i18next/no-literal-string
       logger.error(`[OXLINT] Execution failed: ${errorMessage}`);
 
       return success({
@@ -249,7 +244,6 @@ export class OxlintRepository {
     timeout: number,
     logger: EndpointLogger,
     config: CheckConfig,
-    t: CheckVibeCheckT,
     strict: boolean,
     extraIgnorePatterns?: string[],
     signal?: AbortSignal,
@@ -258,8 +252,8 @@ export class OxlintRepository {
 
     // Build oxlint command arguments
     if (!config.oxlint.enabled) {
-      return fail({
-        message: t("errors.oxlintDisabled"),
+      return failInline({
+        message: "Oxlint is disabled in check.config.ts",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -269,15 +263,33 @@ export class OxlintRepository {
     const configExists = existsSync(oxlintConfigPath);
 
     // Build extra --ignore-pattern flags for non-extensive mode
-    /* eslint-disable i18next/no-literal-string */
     const ignorePatternArgs =
       extraIgnorePatterns && extraIgnorePatterns.length > 0
         ? extraIgnorePatterns.flatMap((p) => ["--ignore-pattern", p])
         : [];
 
+    // oxlint stands up one JavaScript runtime PER WORKER THREAD to host JS
+    // plugins, so the cost scales with core count, not with how many files are
+    // linted: on a 20-core box that is ~4.9s of pure bootstrap before any work.
+    // Measured - a do-nothing plugin costs the same as a real one, and one file
+    // costs the same as 911. Capping at 4 threads was the measured optimum
+    // (7.7x faster on a scoped run) with byte-identical diagnostics.
+    //
+    // Only applied when JS plugins are actually loaded. Native-only runs get
+    // every core, because there the thread count makes no difference and
+    // capping would cost ~11%.
+    const jsPluginCount = config.oxlint.enabled
+      ? (config.oxlint.jsPlugins?.length ?? 0)
+      : 0;
+    const threadArgs =
+      jsPluginCount > 0
+        ? [`--threads=${Math.min(cpus().length, 4)}`]
+        : ([] as string[]);
+
     const baseArgs = configExists
       ? [
           "--format=json",
+          ...threadArgs,
           "--config",
           oxlintConfigPath,
           "--tsconfig",
@@ -287,6 +299,7 @@ export class OxlintRepository {
         ]
       : [
           "--format=json",
+          ...threadArgs,
           // Fallback: Enable plugins manually if no config
           "--tsconfig",
           "./tsconfig.json",
@@ -298,7 +311,6 @@ export class OxlintRepository {
           ...ignorePatternArgs,
           ...paths,
         ];
-    /* eslint-enable i18next/no-literal-string */
 
     // If fix is requested, run oxlint --fix and oxfmt in parallel
     if (fix && config.prettier.enabled) {
@@ -333,12 +345,10 @@ export class OxlintRepository {
           ),
         });
       }
-      // eslint-disable-next-line i18next/no-literal-string
       logger.error(`[OXLINT] Fix failed: ${String(oxlintResult.reason)}`);
-      return fail({
-        message: t("errors.oxlintFailed"),
+      return failInline({
+        message: `Oxlint check failed: ${parseError(oxlintResult.reason).message}`,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(oxlintResult.reason).message },
       });
     }
 
@@ -373,27 +383,14 @@ export class OxlintRepository {
     return name.slice(name.lastIndexOf("/") + 1);
   }
 
-  /**
-   * The rules this config opts into, by bare name.
-   *
-   * Every entry in `rules` is a rule we deliberately switched on — oxlint's
-   * defaults come from `categories`, not from here — so this block IS the strict
-   * set, and reading it back means the whitelist never needs a second inventory
-   * that could drift from it.
-   */
+  /** The configured strict rules, by bare name. */
   private static strictRuleNames(config: CheckConfig): Set<string> {
     if (!config.oxlint.enabled) {
       return new Set();
     }
-    const names = new Set<string>();
-    for (const [key, value] of Object.entries(config.oxlint.rules ?? {})) {
-      // `["warn", { max: 150 }]` is as much "on" as `"warn"`.
-      const severity = Array.isArray(value) ? value[0] : value;
-      if (severity !== "off") {
-        names.add(OxlintRepository.bareRuleName(key));
-      }
-    }
-    return names;
+    return new Set(
+      (config.oxlint.strictRules ?? []).map(OxlintRepository.bareRuleName),
+    );
   }
 
   /**
@@ -433,11 +430,16 @@ export class OxlintRepository {
     const strictRules = OxlintRepository.strictRuleNames(config);
 
     const kept = issues.filter((issue) => {
-      const isStrict =
-        issue.severity === "warning" ||
-        (issue.rule !== undefined &&
-          strictRules.has(OxlintRepository.bareRuleName(issue.rule)));
-      if (!isStrict) {
+      const ruleName =
+        issue.rule === undefined
+          ? undefined
+          : OxlintRepository.bareRuleName(issue.rule);
+
+      // Named, or nothing. Severity used to stand in for "strict" here, which
+      // quietly swept up anything reported as a warning — the restricted-syntax
+      // plugin included, so `unknown`/`object` went silent outside the whitelist
+      // without anyone asking for that.
+      if (ruleName === undefined || !strictRules.has(ruleName)) {
         return true;
       }
       return (
@@ -449,7 +451,6 @@ export class OxlintRepository {
     const dropped = issues.length - kept.length;
     if (dropped > 0) {
       logger.debug(
-        // eslint-disable-next-line i18next/no-literal-string
         `[OXLINT] Dropped ${dropped} strict issue(s) outside the opted-in paths`,
       );
     }
@@ -469,7 +470,6 @@ export class OxlintRepository {
     if (paths.length === 0) {
       return;
     }
-    /* eslint-disable i18next/no-literal-string */
     const ignoreArgs =
       ignoreFilePath && existsSync(`${process.cwd()}/${ignoreFilePath}`)
         ? ["--ignore-path", `${process.cwd()}/${ignoreFilePath}`]
@@ -479,7 +479,6 @@ export class OxlintRepository {
       extraIgnorePatterns && extraIgnorePatterns.length > 0
         ? extraIgnorePatterns.map((p) => `!${p}`)
         : [];
-    /* eslint-enable i18next/no-literal-string */
     const command = [
       "--config",
       configPath,
@@ -501,13 +500,11 @@ export class OxlintRepository {
     const { spawn } = await import("node:child_process");
 
     return await new Promise((resolve, reject) => {
-      /* eslint-disable i18next/no-literal-string */
       const child = spawn(runner.command, runner.args, {
         cwd: process.cwd(),
         stdio: ["ignore", "pipe", "pipe"],
         shell: runner.shell,
       });
-      /* eslint-enable i18next/no-literal-string */
 
       let stderr = "";
 
@@ -517,11 +514,9 @@ export class OxlintRepository {
 
       child.on("close", (code) => {
         if (code === 0) {
-          // eslint-disable-next-line i18next/no-literal-string
           logger.debug("[OXLINT] Oxfmt formatting completed");
           resolve();
         } else {
-          // eslint-disable-next-line i18next/no-literal-string
           reject(new Error(`Oxfmt failed with exit code ${code}: ${stderr}`));
         }
       });
@@ -685,7 +680,6 @@ export class OxlintRepository {
       args,
     );
 
-    // eslint-disable-next-line i18next/no-literal-string
     logger.debug(
       `[OXLINT] Executing command: ${runner.command} ${runner.args.join(" ")}`,
     );
@@ -715,7 +709,7 @@ export class OxlintRepository {
         stderrOutput += data.toString();
       });
 
-      child.on("close", (code) => {
+      child.on("close", (code, killedBySignal) => {
         // Oxlint exit codes: 0=no issues, 1=lint issues found, 2=fatal/config error
         // Unlike ESLint, oxlint doesn't output valid results on fatal errors
         // So we only accept 0 and 1, reject on code >= 2
@@ -723,9 +717,37 @@ export class OxlintRepository {
           const errorMsg =
             stderrOutput.trim() || `Oxlint failed with exit code ${code}`;
           reject(new Error(errorMsg));
-        } else {
-          resolve(output);
+          return;
         }
+        // A null code means the process was killed by a signal, not that it
+        // exited cleanly - oxlint panics (`Insufficient memory to create
+        // fixed-size allocator pool`) and OOM kills land here. Falling through
+        // to resolve() parsed the empty stdout as zero issues and reported a
+        // CLEAN LINT for a checker that never ran. A crashed linter must fail
+        // the run, never pass it.
+        // A WORKER-thread panic does not change the process exit code: oxlint
+        // still exits 0 and emits JSON, just with the panicked worker's files
+        // missing. That renders as a clean lint for a run that silently checked
+        // less than it claimed - the most dangerous failure this tool has,
+        // because it is indistinguishable from success. Exit codes cannot see
+        // it; only stderr can.
+        const panicked = /panicked at|Insufficient memory|fatal runtime error/i;
+        if (panicked.test(stderrOutput)) {
+          reject(
+            new Error(
+              `Oxlint panicked mid-run, so its results are incomplete and cannot be trusted: ${stderrOutput.trim()}`,
+            ),
+          );
+          return;
+        }
+        if (code === null) {
+          const errorMsg =
+            stderrOutput.trim() ||
+            `Oxlint was killed by signal ${killedBySignal ?? "unknown"} without exiting`;
+          reject(new Error(errorMsg));
+          return;
+        }
+        resolve(output);
       });
 
       child.on("error", (error) => {
@@ -750,7 +772,6 @@ export class OxlintRepository {
     // Parse oxlint output
     const result = await OxlintRepository.parseOxlintOutput(stdout, logger);
 
-    // eslint-disable-next-line i18next/no-literal-string
     logger.debug(`[OXLINT] Completed with ${result.issues.length} issues`);
 
     return result;
@@ -806,7 +827,6 @@ export class OxlintRepository {
         parsedOutput = JSON.parse(stdout) as OxlintOutput;
       } catch (parseJsonError) {
         // JSON parse failed - log the error and return empty results
-        // eslint-disable-next-line i18next/no-literal-string
         logger.warn(
           `[OXLINT] Failed to parse JSON output: ${parseJsonError instanceof Error ? parseJsonError.message : String(parseJsonError)} (preview: ${stdout.slice(0, 100)}...)`,
         );
@@ -856,7 +876,6 @@ export class OxlintRepository {
       }
     } catch (error) {
       // Unexpected error during processing
-      // eslint-disable-next-line i18next/no-literal-string
       logger.error(
         `[OXLINT] Unexpected error processing results: ${error instanceof Error ? error.message : String(error)}`,
       );

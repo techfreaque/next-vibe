@@ -6,15 +6,12 @@
 import "server-only";
 
 import { and, eq, sql } from "drizzle-orm";
-import { StreamErrorType } from "next-vibe/agent/ai-stream/repository/core/constants";
-import { buildSseMessageRow } from "next-vibe/agent/ai-stream/repository/core/db-writer/sse-row";
-import { chatMessages, chatThreads } from "next-vibe/agent/chat/db";
-import {
-  ChatMessageRole,
-  ThreadStreamingState,
-} from "next-vibe/agent/chat/enum";
-import { createMessagesEmitter } from "next-vibe/agent/chat/threads/[threadId]/messages/emitter";
-import { MessagesRepository } from "next-vibe/agent/chat/threads/[threadId]/messages/repository";
+import { StreamErrorType } from "../repository/core/constants";
+import { buildSseMessageRow } from "../repository/core/db-writer/sse-row";
+import { chatMessages, chatThreads } from "../../chat/db";
+import { ChatMessageRole, ThreadStreamingState } from "../../chat/enum";
+import { createMessagesEmitter } from "../../chat/threads/[threadId]/messages/emitter";
+import { MessagesRepository } from "../../chat/threads/[threadId]/messages/repository";
 import {
   ErrorResponseTypes,
   fail,

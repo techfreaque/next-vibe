@@ -7,13 +7,13 @@
 
 import "server-only";
 
-import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
-import { agentEnv } from "next-vibe/agent/env";
+import type { ToolExecutionContext } from "../../../../core/execution-context";
+import { agentEnv } from "../../../env";
 import {
   type AgentEnvAvailability,
   buildMissingKeyMessage,
-} from "next-vibe/agent/env-availability";
-import { ApiProvider } from "next-vibe/agent/models/models";
+} from "../../../env-availability";
+import { ApiProvider } from "../../../models/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";

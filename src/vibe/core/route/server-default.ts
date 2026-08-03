@@ -1,7 +1,7 @@
-import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { Platform } from "next-vibe/platforms/platforms";
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
+import type { CountryLanguage } from "../i18n/core/config";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { Platform } from "../../platforms/platforms";
 
 /**
  * Context passed to `serverDefault` callbacks on fields.

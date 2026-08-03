@@ -3,7 +3,7 @@
  * Enforces explicit process.env references for Next.js bundler
  */
 
-import { isRuntimeEnvPlaceholder } from "next-vibe/platforms/cli/runtime/runtime-env-placeholders";
+import { isRuntimeEnvPlaceholder } from "../platforms/cli/runtime/runtime-env-placeholders";
 import type { z } from "zod";
 import { z as zod } from "zod";
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { DEFAULT_FOLDER_CONFIGS } from "next-vibe/agent/chat/config";
+import { DEFAULT_FOLDER_CONFIGS } from "../../../../config";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { ScrollArea } from "next-vibe/ui/ui/scroll-area";
@@ -10,7 +10,7 @@ import {
   useWidgetForm,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
-import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";

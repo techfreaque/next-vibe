@@ -53,6 +53,8 @@ export const translations: typeof enTranslations = {
       network: {
         title: "Netzwerkfehler",
         description: "Netzwerkfehler während des Migrationsvorgangs",
+        detail: "Migration fehlgeschlagen: {{error}}",
+        exitCode: "drizzle-kit migrate mit Code {{code}} beendet",
       },
     },
     success: {

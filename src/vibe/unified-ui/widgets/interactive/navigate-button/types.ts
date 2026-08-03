@@ -2,17 +2,20 @@
  * Navigate Button Widget Type Definitions
  */
 
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { SpacingSize, WidgetType } from "next-vibe/core/definition/enums";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
+import type {
+  SpacingSize,
+  WidgetType,
+} from "../../../../core/definition/enums";
+import type { CountryLanguage } from "../../../../core/i18n/core/config";
+import type { WidgetData } from "../../../../core/utils/json";
+import type { JwtPayloadType } from "../../../../identity/auth/types";
+import type { EndpointLogger } from "../../../../logger/types";
 import type {
   BasePrimitiveDisplayOnlyWidgetConfig,
   FieldUsageConfig,
-} from "next-vibe/unified-ui/_shared/types";
-import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+} from "../../../_shared/types";
+import type { IconKey } from "../../form-fields/icon-field/icons";
 
 /**
  * Endpoint reference: direct object or async resolver (for breaking circular deps)

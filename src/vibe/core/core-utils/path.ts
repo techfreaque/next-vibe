@@ -3,8 +3,8 @@
  * Common path manipulation functions
  */
 
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { Methods } from "next-vibe/core/definition/enums";
+import type { CreateApiEndpointAny } from "../definition/endpoint-base";
+import type { Methods } from "../definition/enums";
 
 /**
  * Lazy-loaded alias map. The generated file may not exist during bootstrap
@@ -42,7 +42,7 @@ function joinPath(path: readonly string[]): string {
   // Validate no segments contain underscores
   for (const segment of path) {
     if (segment.includes("_")) {
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build-time validation: This throw is intentional to catch developer configuration errors early during endpoint definition. Invalid paths would break AI tool calling, so we fail fast at build time rather than runtime.
+      // eslint-disable-next-line restricted/no-throw -- Build-time validation: This throw is intentional to catch developer configuration errors early during endpoint definition. Invalid paths would break AI tool calling, so we fail fast at build time rather than runtime.
       throw new Error(
         `Path segment contains underscore which conflicts with separator: "${segment}". ` +
           `Full path: ${[...path].join(" / ")}. ` +

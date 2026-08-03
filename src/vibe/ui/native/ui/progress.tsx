@@ -1,5 +1,5 @@
 import * as ProgressPrimitive from "@rn-primitives/progress";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import Animated, {
   Extrapolation,

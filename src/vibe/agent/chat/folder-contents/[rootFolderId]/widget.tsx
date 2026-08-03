@@ -12,15 +12,9 @@
  * root-folder tabs, new-chat button, search, and the top-level EndpointsPage call.
  */
 
-import {
-  DefaultFolderId,
-  isDefaultFolderId,
-} from "next-vibe/agent/chat/config";
-import {
-  NEW_MESSAGE_ID,
-  ThreadStreamingState,
-} from "next-vibe/agent/chat/enum";
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
+import { isDefaultFolderId } from "../../config";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
+import { NEW_MESSAGE_ID, ThreadStreamingState } from "../../enum";
 import { success } from "next-vibe/core/route/response.schema";
 import { useRouter, useSilentHistory } from "next-vibe/ui/hooks/use-navigation";
 import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
@@ -72,13 +66,14 @@ import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetContext,
   useWidgetForm,
+  useWidgetPlatform,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { apiClient } from "next-vibe/unified-ui/hooks/store";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
-import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import { useMemo, useState } from "react";
 
@@ -189,7 +184,6 @@ function ThreadRow({
   allFolders: FolderFromList[];
 }): React.JSX.Element {
   const { locale, logger, user } = useWidgetContext();
-  const availability = useProviderAvailability();
   const { t: tFolders } = foldersScopedTranslation.scopedT(locale);
   const { t } = threadsScopedTranslation.scopedT(locale);
   const { t: tChat } = chatScopedTranslation.scopedT(locale);
@@ -320,7 +314,6 @@ function ThreadRow({
         { ...updates, rootFolderId: item.rootFolderId },
         { threadId: item.id },
         locale,
-        availability,
       );
     }
   };
@@ -372,7 +365,6 @@ function ThreadRow({
           { rootFolderId: item.rootFolderId },
           { threadId: item.id },
           locale,
-          availability,
         );
       }
     })();
@@ -550,7 +542,6 @@ function ThreadRow({
                               },
                               { threadId: item.id },
                               locale,
-                              availability,
                             );
                           })();
                         }}
@@ -699,7 +690,6 @@ function ThreadRowShared({
   item: FolderContentsItem;
 }): React.JSX.Element {
   const { locale, logger, user } = useWidgetContext();
-  const availability = useProviderAvailability();
   const { t: tFolders } = foldersScopedTranslation.scopedT(locale);
   const { t } = threadsScopedTranslation.scopedT(locale);
   const isTouch = useTouchDevice();
@@ -791,7 +781,6 @@ function ThreadRowShared({
       { ...updates, rootFolderId: item.rootFolderId },
       { threadId: item.id },
       locale,
-      availability,
     );
   };
 
@@ -837,7 +826,6 @@ function ThreadRowShared({
         { rootFolderId: item.rootFolderId },
         { threadId: item.id },
         locale,
-        availability,
       );
     })();
     setDeleteDialogOpen(false);
@@ -1111,7 +1099,7 @@ function FolderRow({
 }): React.JSX.Element {
   const isTouch = useTouchDevice();
   const { locale, logger, user } = useWidgetContext();
-  const availability = useProviderAvailability();
+  const platform = useWidgetPlatform();
   const { t } = foldersScopedTranslation.scopedT(locale);
   const { t: tChat } = chatScopedTranslation.scopedT(locale);
   const setNavigation = useChatNavigationStore((s) => s.setNavigation);
@@ -1320,7 +1308,6 @@ function FolderRow({
         updates,
         { subFolderId: item.id },
         locale,
-        availability,
       );
     }
   };
@@ -1393,7 +1380,6 @@ function FolderRow({
           undefined,
           { subFolderId: item.id },
           locale,
-          availability,
         );
       }
     })();
@@ -1605,6 +1591,7 @@ function FolderRow({
             endpoint={definitions}
             locale={locale}
             user={user}
+            platform={platform}
             endpointOptions={{
               read: {
                 urlPathParams: { rootFolderId: activeRootFolderId },
@@ -1634,6 +1621,7 @@ function FolderRow({
             endpoint={renameDefinitions}
             locale={locale}
             user={user}
+            platform={platform}
             endpointOptions={{
               update: {
                 urlPathParams: { subFolderId: item.id },
@@ -1669,6 +1657,7 @@ function FolderRow({
             endpoint={{ POST: createFolderDefinition.POST }}
             locale={locale}
             user={user}
+            platform={platform}
             endpointOptions={{
               create: {
                 urlPathParams: { rootFolderId: item.rootFolderId },

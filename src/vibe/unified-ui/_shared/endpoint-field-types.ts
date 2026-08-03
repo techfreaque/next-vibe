@@ -3,8 +3,8 @@
  * Provides full type inference from definition.POST.fields to form components
  */
 
-import type { Countries } from "next-vibe/core/i18n/core/config";
-import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+import type { Countries } from "../../core/i18n/core/config";
+import type { IconKey } from "../widgets/form-fields/icon-field/icons";
 
 import type { PrefillDisplayConfig } from "./field-config-types";
 
@@ -27,8 +27,6 @@ export interface EndpointFieldStructure<TKey extends string> {
     description?: TKey;
     disabled?: boolean;
     className?: string;
-    defaultCountry?: Countries;
-    preferredCountries?: Countries[];
     min?: number;
     max?: number;
     step?: number;
@@ -50,6 +48,9 @@ export interface EndpointFieldStructure<TKey extends string> {
     maxLabel?: TKey;
     minDefault?: string | number;
     maxDefault?: string | number;
+    // Phone field specific
+    defaultCountry?: Countries;
+    preferredCountries?: Countries[];
     // Readonly and prefill display options
     readonly?: boolean;
     prefillDisplay?: PrefillDisplayConfig<TKey>;

@@ -104,22 +104,6 @@ export async function convertFilesToIncognitoAttachments(
 }
 
 /**
- * Generate blob URL from base64 data
- */
-export function base64ToBlobUrl(base64: string, mimeType: string): string {
-  const byteString = atob(base64);
-  const arrayBuffer = new ArrayBuffer(byteString.length);
-  const uint8Array = new Uint8Array(arrayBuffer);
-
-  for (let i = 0; i < byteString.length; i++) {
-    uint8Array[i] = byteString.charCodeAt(i);
-  }
-
-  const blob = new Blob([arrayBuffer], { type: mimeType });
-  return URL.createObjectURL(blob);
-}
-
-/**
  * Convert base64 string to File object
  */
 export function base64ToFile(
@@ -140,17 +124,6 @@ export function base64ToFile(
 }
 
 /**
- * Convert incognito attachments back to File objects
- */
-export function convertIncognitoAttachmentsToFiles(
-  attachments: IncognitoAttachment[],
-): File[] {
-  return attachments
-    .filter((att) => att.data)
-    .map((att) => base64ToFile(att.data, att.filename, att.mimeType));
-}
-
-/**
  * Download file from URL and convert to File object
  * Used for branching/editing messages in private mode where attachments are stored as S3 URLs
  * Returns null if download fails
@@ -160,7 +133,7 @@ export async function urlToFile(
   filename: string,
   mimeType: string,
   /** Fixture-aware fetch when called inside a stream; defaults to live fetch. */
-  // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- live-fetch default for callers without a fixture chain
+  // oxlint-disable-next-line restricted/restricted-syntax -- live-fetch default for callers without a fixture chain
   fetchImpl: typeof globalThis.fetch = fetch,
 ): Promise<File | null> {
   try {

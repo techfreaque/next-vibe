@@ -5,10 +5,10 @@
  */
 
 import { and, desc, eq, gt, inArray, isNull, ne, or, sql } from "drizzle-orm";
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
-import { getFullPath } from "next-vibe/core/core-utils/path";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
+import { getFullPath } from "../../core/core-utils/path";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import type { ResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
@@ -16,26 +16,23 @@ import {
   isFileResponse,
   isStreamingResponse,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
-import { AuthRepository } from "next-vibe/identity/auth/repository";
-import { identityEnv } from "next-vibe/identity/env";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { Platform } from "next-vibe/platforms/platforms";
-import { splitTaskArgs } from "next-vibe/tasks/cron/arg-splitter";
-import {
-  cronTasks as cronTasksTable,
-  dbUserIdToOwner,
-} from "next-vibe/tasks/cron/db";
-import { createTaskEmitters } from "next-vibe/tasks/cron/emitter";
-import { CronTasksRepository } from "next-vibe/tasks/cron/repository";
-import { resolveTaskOwnerUser } from "next-vibe/tasks/cron/resolve-task-user";
+} from "../../core/route/response.schema";
+import { parseError } from "../../core/utils/parse-error";
+import { db } from "../../database";
+import { AuthRepository } from "../../identity/auth/repository";
+import { identityEnv } from "../../identity/env";
+import type { EndpointLogger } from "../../logger/types";
+import { Platform } from "../../platforms/platforms";
+import { splitTaskArgs } from "../cron/arg-splitter";
+import { cronTasks as cronTasksTable, dbUserIdToOwner } from "../cron/db";
+import { createTaskEmitters } from "../cron/emitter";
+import { CronTasksRepository } from "../cron/repository";
+import { resolveTaskOwnerUser } from "../cron/resolve-task-user";
 import {
   scopedTranslation,
   scopedTranslation as tasksScopedTranslation,
-} from "next-vibe/tasks/i18n";
-import type { PulseStatusResponseOutput } from "next-vibe/tasks/pulse/status/definition";
+} from "../i18n";
+import type { PulseStatusResponseOutput } from "./status/definition";
 
 import { isCronTaskDue } from "../cron-formatter";
 import {
@@ -179,7 +176,6 @@ export class PulseHealthRepository {
         totalExecutionTimeMs: number;
         errors?: Array<{
           message: string;
-          messageParams?: Record<string, string | number | boolean>;
           errorType: string;
         }>;
       };
@@ -193,7 +189,7 @@ export class PulseHealthRepository {
       const now = new Date();
 
       const { RemoteConnectionRepository } =
-        await import("next-vibe/remote-connection/repository");
+        await import("../../remote-connection/repository");
       const instanceId =
         RemoteConnectionRepository.deriveDefaultSelfInstanceId();
 
@@ -445,9 +441,6 @@ export class PulseHealthRepository {
               let finalStatus: typeof CronTaskStatusValue =
                 CronTaskStatus.FAILED;
               let finalMessage: string | null = null;
-              let finalMessageParams:
-                | Record<string, string | number | boolean>
-                | undefined;
               let finalDurationMs = 0;
               let didLogHistory = false;
 
@@ -598,17 +591,10 @@ export class PulseHealthRepository {
 
                 finalStatus = attemptStatus;
                 finalMessage = typedResult.message ?? null;
-                finalMessageParams = typedResult.messageParams;
 
-                const logMessage = finalMessage
-                  ? finalMessageParams
-                    ? finalMessage.replaceAll(
-                        /\{\{(\w+)\}\}/g,
-                        (match, key: string) =>
-                          String(finalMessageParams?.[key] ?? match),
-                      )
-                    : finalMessage
-                  : null;
+                // Already fully interpolated by the failing handler's `t()` call,
+                // so there are no `{{param}}` placeholders left to substitute.
+                const logMessage = finalMessage;
 
                 if (attempt < maxRetries) {
                   logger.warn(
@@ -752,9 +738,10 @@ export class PulseHealthRepository {
     } catch (error) {
       const { t } = tasksScopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.repositoryInternalError"),
+        message: t("errors.repositoryInternalErrorDetail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }

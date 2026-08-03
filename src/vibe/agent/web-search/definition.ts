@@ -3,7 +3,7 @@
  * Routes to user's preferred search provider (Brave, Kagi, or auto-detect)
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,

@@ -9,36 +9,33 @@ import {
   DEFAULT_CHAT_MODEL_SELECTION,
   DEFAULT_IMAGE_VISION_MODEL_SELECTION,
   DEFAULT_VIDEO_VISION_MODEL_SELECTION,
-} from "next-vibe/agent/ai-stream/constants";
-import {
-  type ChatModelId,
-  getBestChatModel,
-} from "next-vibe/agent/ai-stream/models";
+} from "../../../ai-stream/constants";
+import { type ChatModelId, getBestChatModel } from "../../../ai-stream/models";
 import {
   getBestAudioVisionModel,
   getBestImageVisionModel,
   getBestVideoVisionModel,
-} from "next-vibe/agent/ai-stream/vision-models";
-import { parseSkillId } from "next-vibe/agent/chat/slugify";
-import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
-import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "next-vibe/agent/image-generation/constants";
-import { getBestImageGenModel } from "next-vibe/agent/image-generation/models";
+} from "../../../ai-stream/vision-models";
+import { parseSkillId } from "../../../chat/slugify";
+import type { AgentEnvAvailability } from "../../../env-availability";
+import { useProviderAvailability } from "../../../env-availability-store";
+import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "../../../image-generation/constants";
+import { getBestImageGenModel } from "../../../image-generation/models";
 import {
   ModelSelector,
   ModelSelectorTrigger,
-} from "next-vibe/agent/models/widget/model-selector";
-import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "next-vibe/agent/music-generation/constants";
-import { getBestMusicGenModel } from "next-vibe/agent/music-generation/models";
-import { scopedTranslation as skillIdTranslation } from "next-vibe/agent/skills/[id]/i18n";
-import { ModelGroup } from "next-vibe/agent/skills/[id]/widget";
-import { NO_SKILL_ID } from "next-vibe/agent/skills/constants";
-import { DEFAULT_STT_MODEL_SELECTION } from "next-vibe/agent/speech-to-text/constants";
-import { getBestSttModel } from "next-vibe/agent/speech-to-text/models";
-import { DEFAULT_TTS_MODEL_SELECTION } from "next-vibe/agent/text-to-speech/constants";
-import { getBestTtsModel } from "next-vibe/agent/text-to-speech/models";
-import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "next-vibe/agent/video-generation/constants";
-import { getBestVideoGenModel } from "next-vibe/agent/video-generation/models";
+} from "../../../models/widget/model-selector";
+import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "../../../music-generation/constants";
+import { getBestMusicGenModel } from "../../../music-generation/models";
+import { scopedTranslation as skillIdTranslation } from "../../[id]/i18n";
+import { ModelGroup } from "../../[id]/widget";
+import { NO_SKILL_ID } from "../../constants";
+import { DEFAULT_STT_MODEL_SELECTION } from "../../../speech-to-text/constants";
+import { getBestSttModel } from "../../../speech-to-text/models";
+import { DEFAULT_TTS_MODEL_SELECTION } from "../../../text-to-speech/constants";
+import { getBestTtsModel } from "../../../text-to-speech/models";
+import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "../../../video-generation/constants";
+import { getBestVideoGenModel } from "../../../video-generation/models";
 import helpDefinitions from "next-vibe/help-tool/definition";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -478,7 +475,6 @@ export function FavoriteEditContainer({
       logger,
       locale,
       user,
-      availability,
     });
   };
 
@@ -1579,7 +1575,6 @@ function SaveAndUseButton({
           logger,
           locale,
           user,
-          availability,
         });
 
         // Pop navigation like the regular save button does

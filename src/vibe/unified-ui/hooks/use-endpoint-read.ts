@@ -3,9 +3,9 @@
 
 "use client";
 
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
 import { useMemo } from "react";
 
 import type { AutoPrefillConfig, FormDataSources } from "./endpoint-types";

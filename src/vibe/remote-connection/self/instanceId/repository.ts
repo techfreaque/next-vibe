@@ -9,9 +9,9 @@ import "server-only";
 import {
   type ResponseType,
   success,
-} from "next-vibe/core/route/response.schema";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../../core/route/response.schema";
+import type { JwtPrivatePayloadType } from "../../../identity/auth/types";
+import type { EndpointLogger } from "../../../logger/types";
 
 import { RemoteConnectionRepository } from "../../repository";
 import type { RemoteConnectionSelfInstanceIdGetResponseOutput } from "./definition";

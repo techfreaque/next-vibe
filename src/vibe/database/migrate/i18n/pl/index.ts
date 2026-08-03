@@ -52,6 +52,8 @@ export const translations: typeof enTranslations = {
       network: {
         title: "Błąd sieci",
         description: "Błąd sieci podczas operacji migracji",
+        detail: "Migracja nie powiodła się: {{error}}",
+        exitCode: "drizzle-kit migrate zakończone kodem {{code}}",
       },
     },
     success: {

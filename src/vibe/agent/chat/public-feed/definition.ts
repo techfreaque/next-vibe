@@ -4,7 +4,7 @@
  */
 
 import { dateSchema } from "next-vibe/core/definition/common.schema";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -23,7 +23,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
-import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { ThreadStreamingStateDB } from "../enum";
 import { scopedTranslation } from "./i18n";
 

@@ -3,19 +3,19 @@
 import * as Slot from "@rn-primitives/slot";
 import type { VariantProps } from "class-variance-authority";
 import { cva } from "class-variance-authority";
-import { useTranslation } from "next-vibe/core/i18n/core/client";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { useTranslation } from "../../../core/i18n/core/client";
+import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import type { PressableProps, ViewProps } from "react-native";
 import { Dimensions, Pressable, ScrollView, View } from "react-native";
 
-import { useIsMobile } from "../../native/hooks/use-mobile";
-import { PanelLeft } from "../../native/ui/icons/PanelLeft";
+import { useIsMobile } from "../hooks/use-mobile";
+import { PanelLeft } from "./icons/PanelLeft";
 import {
   convertCSSToViewStyle,
   styledNative,
   styledNativeRef,
-} from "../../native/utils/style-converter";
+} from "../utils/style-converter";
 import { uiScopedTranslation } from "../../web/i18n";
 import { applyStyleType } from "../../web/utils/style-type";
 import { Button } from "./button";
@@ -230,7 +230,7 @@ const SidebarContext = React.createContext<SidebarContextType | null>(null);
 function useSidebar(): SidebarContextType {
   const context = React.useContext(SidebarContext);
   if (!context) {
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Standard React context hook pattern - throw is correct for developer mistakes
+    // oxlint-disable-next-line restricted/restricted-syntax -- Standard React context hook pattern - throw is correct for developer mistakes
     // eslint-disable-next-line i18next/no-literal-string -- Error handling for context
     throw new Error("useSidebar must be used within a SidebarProvider.");
   }

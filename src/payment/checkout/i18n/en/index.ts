@@ -108,6 +108,7 @@ export const translations = {
     },
     errors: {
       alreadySubscribed: {
+        detail: "You already have an active subscription (user {{userId}})",
         title: "Already Subscribed",
         description: "You already have an active subscription",
       },
@@ -131,10 +132,12 @@ export const translations = {
         description: "Access forbidden",
       },
       notFound: {
+        detail: "No account found for user {{userId}}",
         title: "Not Found",
         description: "Checkout session not found",
       },
       server: {
+        detail: "Checkout could not be started: {{error}}",
         title: "Server Error",
         description: "Internal server error occurred",
       },
@@ -159,6 +162,7 @@ export const translations = {
 
   // General error message
   error: "An error occurred during checkout",
+  errorDetail: "Checkout failed: {{error}}",
 
   // Subscription plan labels
   plans: {

@@ -12,24 +12,21 @@ import {
   type ChatModelId,
   type ChatModelSelection,
   getChatModelById,
-} from "next-vibe/agent/ai-stream/models";
-import { COMPACT_TRIGGER } from "next-vibe/agent/ai-stream/repository/core/constants";
-import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
-import { ModelCreditDisplay } from "next-vibe/agent/models/widget/model-credit-display";
-import { DEFAULT_SKILLS } from "next-vibe/agent/skills/config";
-import { getBestChatModelForFavorite } from "next-vibe/agent/skills/favorites/[id]/definition";
-import { useFavoriteCreate } from "next-vibe/agent/skills/favorites/create/hooks";
-import type { FavoriteCard } from "next-vibe/agent/skills/favorites/definition";
-import favoritesEndpoint from "next-vibe/agent/skills/favorites/definition";
-import { FavoriteSelectProvider } from "next-vibe/agent/skills/favorites/favorite-select-context";
-import { useChatFavorites } from "next-vibe/agent/skills/favorites/hooks/hooks";
-import { scopedTranslation as skillsScopedTranslation } from "next-vibe/agent/skills/i18n";
-import {
-  SearchProvider,
-  SearchProviderOptions,
-} from "next-vibe/agent/web-search/enum";
-import { scopedTranslation as searchScopedTranslation } from "next-vibe/agent/web-search/i18n";
+} from "../../ai-stream/models";
+import { COMPACT_TRIGGER } from "../../ai-stream/repository/core/constants";
+import type { AgentEnvAvailability } from "../../env-availability";
+import { useProviderAvailability } from "../../env-availability-store";
+import { ModelCreditDisplay } from "../../models/widget/model-credit-display";
+import { DEFAULT_SKILLS } from "../../skills/config";
+import { getBestChatModelForFavorite } from "../../skills/favorites/[id]/definition";
+import { useFavoriteCreate } from "../../skills/favorites/create/hooks";
+import type { FavoriteCard } from "../../skills/favorites/definition";
+import favoritesEndpoint from "../../skills/favorites/definition";
+import { FavoriteSelectProvider } from "../../skills/favorites/favorite-select-context";
+import { useChatFavorites } from "../../skills/favorites/hooks/hooks";
+import { scopedTranslation as skillsScopedTranslation } from "../../skills/i18n";
+import { SearchProvider, SearchProviderOptions } from "../../web-search/enum";
+import { scopedTranslation as searchScopedTranslation } from "../../web-search/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getDefaultTimezone } from "next-vibe/core/i18n/core/localization-utils";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -80,18 +77,19 @@ import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetLocale,
   useWidgetLogger,
+  useWidgetPlatform,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { apiClient } from "next-vibe/unified-ui/hooks/store";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
-import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import type { JSX, ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
 
 import { buildFolderUrl } from "@/_pages/chat/lib/utils/navigation";
 
-import { DefaultFolderId } from "../config";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { parseSkillId } from "../slugify";
 import type definition from "./definition";
 import type { ChatSettingsUpdateRequestOutput } from "./definition";
@@ -694,6 +692,7 @@ function PulseFavSlot({
 }): JSX.Element {
   const user = useWidgetUser();
   const logger = useWidgetLogger();
+  const platform = useWidgetPlatform();
   const [open, setOpen] = useState(false);
 
   const { favorites } = useChatFavorites(logger, { activeFavoriteId: null });
@@ -761,6 +760,7 @@ function PulseFavSlot({
               endpoint={favoritesEndpoint}
               locale={locale}
               user={user}
+              platform={platform}
             />
           </FavoriteSelectProvider>
         </Div>
@@ -809,7 +809,6 @@ function PulseSectionDreaming({
   const router = useRouter();
   const [isRunning, setIsRunning] = useState(false);
 
-  const availability = useProviderAvailability();
   const folderUrl = subFolderId
     ? buildFolderUrl(locale, DefaultFolderId.BACKGROUND, subFolderId)
     : null;
@@ -824,7 +823,6 @@ function PulseSectionDreaming({
         { taskId },
         undefined,
         locale,
-        availability,
       );
       if (folderUrl) {
         router.push(folderUrl);
@@ -832,7 +830,7 @@ function PulseSectionDreaming({
     } finally {
       setIsRunning(false);
     }
-  }, [taskId, logger, user, locale, folderUrl, router, availability]);
+  }, [taskId, logger, user, locale, folderUrl, router]);
 
   return (
     <SettingsSection
@@ -929,7 +927,6 @@ function PulseSectionAutopilot({
   const router = useRouter();
   const [isRunning, setIsRunning] = useState(false);
 
-  const availability = useProviderAvailability();
   const folderUrl = subFolderId
     ? buildFolderUrl(locale, DefaultFolderId.BACKGROUND, subFolderId)
     : null;
@@ -944,7 +941,6 @@ function PulseSectionAutopilot({
         { taskId },
         undefined,
         locale,
-        availability,
       );
       if (folderUrl) {
         router.push(folderUrl);
@@ -952,7 +948,7 @@ function PulseSectionAutopilot({
     } finally {
       setIsRunning(false);
     }
-  }, [taskId, logger, user, locale, folderUrl, router, availability]);
+  }, [taskId, logger, user, locale, folderUrl, router]);
 
   return (
     <SettingsSection
@@ -1054,7 +1050,6 @@ function PulseSectionMama({
   const { t } = scopedTranslation.scopedT(locale);
   const logger = useWidgetLogger();
   const user = useWidgetUser();
-  const availability = useProviderAvailability();
   const [isRunning, setIsRunning] = useState(false);
 
   const handleRunNow = useCallback(async (): Promise<void> => {
@@ -1067,12 +1062,11 @@ function PulseSectionMama({
         { taskId: MAMA_TASK_ID },
         undefined,
         locale,
-        availability,
       );
     } finally {
       setIsRunning(false);
     }
-  }, [logger, user, locale, availability]);
+  }, [logger, user, locale]);
 
   return (
     <SettingsSection

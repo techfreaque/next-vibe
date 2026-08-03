@@ -4,17 +4,17 @@
  * Fundamental type definitions used throughout the endpoint types system.
  */
 
-import type { ObjectWidgetConfig } from "next-vibe/unified-ui/_shared/configs";
+import type { WidgetData } from "../utils/json";
+import type { ObjectWidgetConfig } from "../../unified-ui/_shared/configs";
 import type {
   ArrayChildConstraint,
   FieldUsageConfig,
   ObjectChildrenConstraint,
-} from "next-vibe/unified-ui/_shared/types";
+} from "../../unified-ui/_shared/types";
 import type { z } from "zod";
 
 // Re-export UnifiedField from configs.ts where it's now defined
-export type { UnifiedField } from "next-vibe/unified-ui/_shared/configs";
-import type { WidgetData } from "next-vibe/core/utils/json";
+export type { UnifiedField } from "../../unified-ui/_shared/configs";
 
 import type { CreateApiEndpointAny } from "./endpoint-base";
 import type { FieldUsage } from "./enums";

@@ -1,5 +1,7 @@
 // oxlint-disable nextjs/no-head-element
 import { HeadContent } from "@tanstack/react-router";
+import { coreClientEnv } from "../../../core/env-client";
+import { Environment } from "../../../env/env-util";
 import type { JSX, ReactNode } from "react";
 
 export interface HeadProps {
@@ -9,7 +11,7 @@ export interface HeadProps {
 export function Head({ children }: HeadProps): JSX.Element {
   return (
     <head>
-      {process.env.NODE_ENV === "development" && (
+      {coreClientEnv.NODE_ENV === Environment.DEVELOPMENT && (
         <>
           {/* Synchronous placeholder so $RefreshReg$/$RefreshSig$ exist before
               any module scripts execute. Without this, the first page load after

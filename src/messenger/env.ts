@@ -86,4 +86,19 @@ export const {
     example: "your_imap_password",
     commented: true,
   },
+  RESEND_API_KEY: {
+    schema: z.string().optional(),
+    example: "re_your_resend_api_key",
+    comment:
+      "Resend API key. Used as the default email provider when no SMTP account is configured.",
+    commented: true,
+    sensitive: true,
+  },
+  RESEND_FROM_EMAIL: {
+    schema: z.email().optional(),
+    example: "noreply@example.com",
+    comment: "From address for emails sent via Resend.",
+    commented: true,
+    fieldType: "email",
+  },
 });

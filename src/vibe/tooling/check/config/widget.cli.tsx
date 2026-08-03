@@ -11,13 +11,13 @@
 
 import chalk from "chalk";
 import { Box, Text, useInput, useStdin } from "ink";
-import { Platform } from "next-vibe/platforms/platforms";
+import { Platform } from "../../../platforms/platforms";
 import {
   useWidgetContext,
   useWidgetForm,
   useWidgetPlatform,
   useWidgetResponseOnly,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
+} from "../../../unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useCallback, useState } from "react";
 
@@ -41,33 +41,21 @@ interface WizardStep {
 
 // ── Constants ─────────────────────────────────────────────────────────────
 
-// eslint-disable-next-line i18next/no-literal-string
 const WIZARD_TITLE = "\uD83D\uDD27 Interactive Configuration Setup";
 
 // ── Step definitions ──────────────────────────────────────────────────────
 
-// eslint-disable-next-line i18next/no-literal-string
 const STEP_LABELS = {
-  // eslint-disable-next-line i18next/no-literal-string
   createMcpConfig: "Create MCP config (.mcp.json / mcp.json)?",
-  // eslint-disable-next-line i18next/no-literal-string
   updateVscodeSettings: "Update VSCode settings (.vscode/settings.json)?",
-  // eslint-disable-next-line i18next/no-literal-string
   updatePackageJson: "Update package.json scripts (check, lint, typecheck)?",
-  // eslint-disable-next-line i18next/no-literal-string
   enableEslint:
     "Enable ESLint? (import sorting, React hooks - slower but catches more)",
-  // eslint-disable-next-line i18next/no-literal-string
   enableReactRules: "Enable React-specific linting rules?",
-  // eslint-disable-next-line i18next/no-literal-string
   enableNextjsRules: "Enable Next.js-specific linting rules?",
-  // eslint-disable-next-line i18next/no-literal-string
   enableI18nRules: "Enable i18n linting rules?",
-  // eslint-disable-next-line i18next/no-literal-string
   jsxCapitalization: "Enforce JSX component name capitalization?",
-  // eslint-disable-next-line i18next/no-literal-string
   enablePedanticRules: "Enable stricter/pedantic rules?",
-  // eslint-disable-next-line i18next/no-literal-string
   enableRestrictedSyntax: "Restrict throw, unknown, and object types?",
 } as const;
 
@@ -217,7 +205,6 @@ function ConfigCreateWizard({ onSubmit }: WizardProps): JSX.Element {
               <Text color="green">{`  \u2713 `}</Text>
               <Text dimColor>{s.label}</Text>
               <Text color={answers[s.key] ? "green" : "red"}>
-                {/* eslint-disable-next-line i18next/no-literal-string */}
                 {answers[s.key] ? " yes" : " no"}
               </Text>
             </Box>
@@ -236,7 +223,6 @@ function ConfigCreateWizard({ onSubmit }: WizardProps): JSX.Element {
         <Text bold>{step.label}</Text>
         <Box marginTop={1}>
           <Text dimColor>
-            {/* eslint-disable-next-line i18next/no-literal-string */}
             {`default: ${step.defaultValue ? "yes" : "no"}  \u2014 [y] yes  [n] no  [Enter] accept default`}
           </Text>
         </Box>

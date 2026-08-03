@@ -1,43 +1,22 @@
 /**
- * Shared types for the execute-tool repository modules.
+ * Shared types for the LOCAL execute-tool path — "run it here, now, inline".
  *
- * Every interface used across the repository helper classes (core, routing,
- * transport, guards, local, remote, completion, pending-calls) lives here —
- * the helper files themselves contain only their class (repository pattern).
+ * Scope rule for this file: a type belongs here only if the local path needs it.
+ * Everything describing a call that runs somewhere else (remote dispatch) or at
+ * some other time (the task system) lives in ./types-dispatch, so a local-only
+ * deployment can decline that module wholesale instead of editing around the
+ * clusters. The split is the type-level half of the ./orchestration-local vs
+ * ./orchestration seam — keep both halves on the same side when moving a type.
  */
 
-import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
-import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { GenericHandlerBase } from "next-vibe/core/route/handler";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { AiT } from "next-vibe/platforms/ai/i18n";
-import type { Platform } from "next-vibe/platforms/platforms";
-import type {
-  RemoteCallParams,
-  RemoteCallResult,
-  RemoteConnectionRow,
-  RemoteConnInfo,
-  RemoteTarget,
-  ResolveInferenceProviderParams,
-  ResolveTargetParams,
-} from "next-vibe/remote-connection/types";
-import type { CronTaskStatusDB } from "next-vibe/tasks/enum";
-
-import type { RouteExecuteResponseOutput } from "../definition";
-
-export type {
-  RemoteCallParams,
-  RemoteCallResult,
-  RemoteConnectionRow,
-  RemoteConnInfo,
-  RemoteTarget,
-  ResolveInferenceProviderParams,
-  ResolveTargetParams,
-};
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import type { GenericHandlerBase } from "../../core/route/handler";
+import type { WidgetData } from "../../core/utils/json";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
+import type { AiT } from "../../platforms/ai/i18n";
+import type { Platform } from "../../platforms/platforms";
 
 /* ── Execution context ─────────────────────────────────────────────────────── */
 
@@ -55,14 +34,17 @@ export interface BaseExecutionContext<TData> {
 /**
  * Immutable snapshot shared by every execute-tool phase handler.
  *
- * Built once in RouteExecuteRepository.execute() after the prefix parse, model
- * resolution, and the revival circuit-breaker have run. toolName here is
- * already the post-prefix (and, on the remote path, preferred) name.
- * resolvedModelId is the cascade result stored for revival.
+ * Built once in RouteExecuteRepository.execute() after the prefix parse and the
+ * revival circuit-breaker have run. toolName here is already the post-prefix
+ * (and, on the remote path, preferred) name.
+ *
+ * The dispatch-only model cascade result is NOT here — it hangs off
+ * RouteExecuteDispatchContext in ./types-dispatch, which intersects this type.
+ * That keeps the local path's context free of any agent-model dependency while
+ * still letting index.ts build one object and hand it to both sides.
  */
 export interface RouteExecuteContext {
   toolName: string;
-  resolvedModelId: ChatModelId | null;
   user: JwtPayloadType;
   locale: CountryLanguage;
   logger: EndpointLogger;
@@ -84,95 +66,3 @@ export interface RouteExecuteContext {
    */
   urlPathParams?: Record<string, WidgetData>;
 }
-
-/**
- * Phase handler outcome. "return" means the orchestrator returns the wrapped
- * value immediately; "fallthrough" means continue to the next phase.
- */
-export type PhaseResult =
-  | { kind: "return"; value: ResponseType<RouteExecuteResponseOutput> }
-  | { kind: "fallthrough" };
-
-/* ── Guards ────────────────────────────────────────────────────────────────── */
-
-/** Structurally identical to chat/settings' ToolConfigItem — kept local so the
- * execute-tool type graph never pulls a full endpoint-definition module. */
-export interface ToolConfigItem {
-  toolId: string;
-  requiresConfirmation: boolean;
-}
-
-export interface ResolvedToolPermissions {
-  /** Whitelist: null = all tools allowed; array = only these may execute */
-  availableTools: ToolConfigItem[] | null;
-  /** Union of skill + favorite + folder hard-blocked tool IDs */
-  deniedToolIds: Set<string>;
-}
-
-/* ── Pending calls ─────────────────────────────────────────────────────────── */
-
-export interface PendingCallResult {
-  status: "completed" | "failed";
-  output: Record<string, WidgetData> | null;
-}
-
-export interface PendingCallEntry {
-  callId: string;
-  instanceId: string;
-  toolName: string;
-  /** The tool's input args — so await-task can render the awaited tool's inputs. */
-  input: Record<string, WidgetData> | null;
-  threadId: string | null;
-  toolMessageId: string | null;
-  userId: string | null;
-  createdAt: number;
-  deadlineTimer: ReturnType<typeof setTimeout> | null;
-  result: PendingCallResult | null;
-  waiters: Array<(result: PendingCallResult) => void>;
-  tombstoneTimer: ReturnType<typeof setTimeout> | null;
-  /** Fired exactly once when the call settles (result, discard, or deadline).
-   *  Carries transport-lifecycle cleanup — e.g. releasing the connector ref
-   *  held open so the reverse-ws result event has a live subscriber. */
-  onSettled: (() => void) | null;
-}
-
-export interface PendingCallInfo {
-  callId: string;
-  instanceId: string;
-  toolName: string;
-  input: Record<string, WidgetData> | null;
-  threadId: string | null;
-  toolMessageId: string | null;
-  userId: string | null;
-  result: PendingCallResult | null;
-}
-
-export type CompletePendingCallOutcome =
-  | {
-      kind: "completed";
-      threadId: string | null;
-      toolMessageId: string | null;
-    }
-  | { kind: "duplicate" }
-  | { kind: "unknown" };
-
-export interface TaskCompletionSignal {
-  status: string;
-}
-
-/* ── Local async execution ─────────────────────────────────────────────────── */
-
-export interface GoroutineResult {
-  finalStatus: (typeof CronTaskStatusDB)[number];
-  finalResult: Record<string, WidgetData> | null;
-  /** The target's fail() message when execution failed — preserved so wire
-   *  relays (receiver → requester result events) keep the real error text. */
-  errorMessage: string | null;
-  completedAt: Date;
-}
-
-/* ── Completion ────────────────────────────────────────────────────────────── */
-
-export type WakeUpConfirmRaceResult =
-  | { kind: "case-b"; wakeUpPending: true }
-  | { kind: "case-a" };

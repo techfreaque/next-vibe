@@ -12,9 +12,8 @@
 
 "use client";
 
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
-import { Methods } from "next-vibe/core/definition/enums";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { Methods } from "../../core/definition/enums";
+import { UserPermissionRole } from "../../identity/roles/enum";
 import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
 import {
   Card,
@@ -48,20 +47,21 @@ import {
   useWidgetLogger,
   useWidgetNavigation,
   useWidgetOnSubmit,
+  useWidgetPlatform,
   useWidgetUser,
   useWidgetValue,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
-import { apiClient } from "next-vibe/unified-ui/hooks/store";
-import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
-import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
-import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
-import { EmailFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/email-field/widget";
-import { PasswordFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/password-field/widget";
-import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
-import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
-import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
+} from "../../unified-ui/_shared/use-widget-context";
+import { apiClient } from "../../unified-ui/hooks/store";
+import { useEndpoint } from "../../unified-ui/hooks/use-endpoint";
+import { EndpointsPage } from "../../unified-ui/renderers/web/EndpointsPage";
+import { BooleanFieldWidget } from "../../unified-ui/widgets/form-fields/boolean-field/widget";
+import { EmailFieldWidget } from "../../unified-ui/widgets/form-fields/email-field/widget";
+import { PasswordFieldWidget } from "../../unified-ui/widgets/form-fields/password-field/widget";
+import { SelectFieldWidget } from "../../unified-ui/widgets/form-fields/select-field/widget";
+import { TextFieldWidget } from "../../unified-ui/widgets/form-fields/text-field/widget";
+import { FormAlertWidget } from "../../unified-ui/widgets/interactive/form-alert/widget";
+import { NavigateButtonWidget } from "../../unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "../../unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
@@ -328,11 +328,11 @@ function ViewWidget({
   const locale = useWidgetLocale();
   const { t } = scopedTranslation.scopedT(locale);
   const user = useWidgetUser();
+  const platform = useWidgetPlatform();
   const logger = useWidgetLogger();
   const { push: navigate, pop, canGoBack, current } = useWidgetNavigation();
   const endpointMutations = useWidgetEndpointMutations();
   const [isReconnecting, setIsReconnecting] = useState(false);
-  const availability = useProviderAvailability();
 
   const status = useWidgetValue<typeof definitionsType.GET>();
   const instanceId =
@@ -412,6 +412,7 @@ function ViewWidget({
             endpoint={connectDefinitions}
             locale={locale}
             user={user}
+            platform={platform}
           />
         </SectionGroup>
       </WidgetShell>
@@ -455,7 +456,6 @@ function ViewWidget({
           },
           { instanceId },
           locale,
-          availability,
         );
         void endpointMutations?.read?.refetch();
       } finally {
@@ -488,7 +488,7 @@ function ViewWidget({
   const handleOpenCortex = (e: ButtonMouseEvent): void => {
     e.stopPropagation();
     void (async (): Promise<void> => {
-      const defs = await import("next-vibe/agent/cortex/list/definition");
+      const defs = await import("../../agent/cortex/list/definition");
       navigate(defs.default.GET, {});
     })();
   };
@@ -496,7 +496,7 @@ function ViewWidget({
   const handleOpenTerminals = (e: ButtonMouseEvent): void => {
     e.stopPropagation();
     void (async (): Promise<void> => {
-      const defs = await import("next-vibe/agent/cortex/terminals/definition");
+      const defs = await import("../../agent/cortex/terminals/definition");
       navigate(defs.default.GET, {});
     })();
   };

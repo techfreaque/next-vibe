@@ -12,9 +12,9 @@
  * Every tool in this manifest REQUIRES a Bearer JWT token.
  */
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import { parseError } from "next-vibe/core/utils/parse-error";
+import type { CountryLanguage } from "../../../../core/i18n/core/config";
+import { defaultLocale } from "../../../../core/i18n/core/config";
+import { parseError } from "../../../../core/utils/parse-error";
 
 import { generateSkillMarkdown } from "../markdown-generator";
 

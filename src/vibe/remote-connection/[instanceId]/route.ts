@@ -7,8 +7,8 @@
 
 import "server-only";
 
-import { Methods } from "next-vibe/core/definition/enums";
-import { endpointsHandler } from "next-vibe/core/route/multi";
+import { Methods } from "../../core/definition/enums";
+import { endpointsHandler } from "../../core/route/multi";
 
 import definitions from "./definition";
 import { RemoteConnectionInstanceRepository } from "./repository";
@@ -26,13 +26,14 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
   },
   [Methods.PATCH]: {
     email: undefined,
-    handler: ({ user, logger, urlPathParams, data, locale }) =>
+    handler: ({ user, logger, urlPathParams, data, locale, platform }) =>
       RemoteConnectionInstanceRepository.updateConnection(
         user,
         logger,
         urlPathParams.instanceId,
         data,
         locale,
+        platform,
       ),
   },
   [Methods.DELETE]: {

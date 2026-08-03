@@ -3,6 +3,7 @@ import * as React from "react";
 
 import type { DivProps, DivRefObject } from "../../web/ui/div";
 import { parseClassesToInkProps } from "./tailwind-to-ink";
+import { TextStyleProvider } from "./text-style-context";
 
 /**
  * Wrap bare string/number children in <Text> so Ink doesn't crash.
@@ -36,7 +37,7 @@ function sanitizeChildren(children: React.ReactNode): React.ReactNode {
 export const Div = React.forwardRef<DivRefObject, DivProps>(
   ({ className, children }: DivProps, ref: React.Ref<DivRefObject>) => {
     void ref; // intentionally unused - no DOM in terminal
-    const { box, hidden } = parseClassesToInkProps(className);
+    const { box, text, hidden } = parseClassesToInkProps(className);
 
     if (hidden) {
       return null;
@@ -47,7 +48,16 @@ export const Div = React.forwardRef<DivRefObject, DivProps>(
     // (matching CSS flex default), which overrides this via spread.
     const boxProps = { flexDirection: "column" as const, ...box };
 
-    return <Box {...boxProps}>{sanitizeChildren(children)}</Box>;
+    // An Ink Box cannot carry text style, so `text-*` / `font-bold` on a Div
+    // would otherwise be dropped. Publish it instead: Span and the icons pick it
+    // up and merge their own on top, reproducing CSS inheritance.
+    return (
+      <Box {...boxProps}>
+        <TextStyleProvider style={text}>
+          {sanitizeChildren(children)}
+        </TextStyleProvider>
+      </Box>
+    );
   },
 );
 

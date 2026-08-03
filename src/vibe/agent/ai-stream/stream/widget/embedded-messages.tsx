@@ -2,13 +2,14 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { Platform } from "next-vibe/platforms/platforms";
 import { Div } from "next-vibe/ui/ui/div";
 import type { UseEndpointOptions } from "next-vibe/unified-ui/hooks/endpoint-types";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 import { useMemo } from "react";
 
-import type { DefaultFolderId } from "../../../chat/config";
+import type { DefaultFolderId } from "../../../../core/execution-context";
 import messagesDefinition from "../../../chat/threads/[threadId]/messages/definition";
 
 interface MessagesEndpoint {
@@ -27,6 +28,7 @@ export function EmbeddedMessagesView({
   rootFolderId,
   locale,
   user,
+  platform,
   className,
   refetchInterval,
   initialData,
@@ -35,6 +37,7 @@ export function EmbeddedMessagesView({
   rootFolderId: DefaultFolderId;
   locale: CountryLanguage;
   user: JwtPayloadType;
+  platform: Platform;
   className?: string;
   refetchInterval?: number | false;
   initialData?: typeof messagesDefinition.GET.types.ResponseOutput;
@@ -61,6 +64,7 @@ export function EmbeddedMessagesView({
         endpointOptions={endpointOptions}
         locale={locale}
         user={user}
+        platform={platform}
       />
     </Div>
   );

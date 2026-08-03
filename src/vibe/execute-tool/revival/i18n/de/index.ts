@@ -4,6 +4,8 @@ export const translations: typeof enTranslations = {
   errors: {
     unexpectedError:
       "Ein unerwarteter Fehler ist aufgetreten: {{error}}. Bitte erneut versuchen.",
+    modelNotResolved:
+      "Für diesen Thread konnte kein Modell ermittelt werden - der Stream lässt sich nicht fortsetzen.",
   },
   post: {
     title: "Wiederaufnahme",

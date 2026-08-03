@@ -9,17 +9,17 @@ import { constants, existsSync } from "node:fs";
 import { access, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import type { ResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { SystemSettingsT } from "next-vibe/env/settings/i18n";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../core/route/response.schema";
+import { parseError } from "../../core/utils/parse-error";
+import type { SystemSettingsT } from "./i18n";
+import type { JwtPrivatePayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
 import type { ZodTypeAny } from "zod";
 
 import type { EnvExample } from "../define-env";
@@ -591,9 +591,9 @@ export class SystemSettingsRepository {
     const { email, password, remoteUrl, syncScope } = data;
 
     const { RemoteConnectionConnectRepository } =
-      await import("next-vibe/remote-connection/connect/repository");
+      await import("../../remote-connection/connect/repository");
     const { scopedTranslation: connectScopedTranslation } =
-      await import("next-vibe/remote-connection/connect/i18n");
+      await import("../../remote-connection/connect/i18n");
     const { t: connectT } = connectScopedTranslation.scopedT(locale);
 
     const result = await RemoteConnectionConnectRepository.connectRemote(

@@ -83,7 +83,6 @@ function generateCacheKey(
   pathType: PathType,
   targetPath?: string | string[],
 ): string {
-  // eslint-disable-next-line i18next/no-literal-string
   const baseKey = `typecheck_${pathType}`;
 
   if (!targetPath || (Array.isArray(targetPath) && targetPath.length === 0)) {
@@ -95,7 +94,6 @@ function generateCacheKey(
     : targetPath;
 
   // Create hash of the path for consistent cache keys
-  // eslint-disable-next-line i18next/no-literal-string
   const pathHash = createHash("md5")
     .update(pathForHash)
     .digest("hex")
@@ -109,7 +107,6 @@ function generateCacheKey(
     return `${baseKey}_multi_${pathHash}`;
   }
 
-  // eslint-disable-next-line i18next/no-literal-string
   return `${baseKey}_folder_${pathHash}`;
 }
 
@@ -119,10 +116,19 @@ function generateCacheKey(
  */
 function resolvePathToInclude(path: string): string {
   const resolvedPath = resolve(path);
+  // tsconfig globs are always POSIX-style, whatever the user typed. A Windows
+  // "src\vibe\tooling" left as-is would match nothing and silently widen the
+  // check to the whole project.
+  const posixPath = toPosixPath(path);
   if (existsSync(resolvedPath) && statSync(resolvedPath).isFile()) {
-    return path;
+    return posixPath;
   }
-  return `${path}/**/*`;
+  return `${posixPath}/**/*`;
+}
+
+/** tsconfig include/exclude globs use forward slashes on every platform. */
+export function toPosixPath(path: string): string {
+  return path.replaceAll("\\", "/");
 }
 
 /**
@@ -154,7 +160,6 @@ export function createTypecheckConfig(
     cacheKey,
     buildInfoFile: join(
       cachePath,
-      // eslint-disable-next-line i18next/no-literal-string
       pathType === PathType.NO_PATH
         ? "tsconfig.tsbuildinfo"
         : `tsconfig.${cacheKey}.tsbuildinfo`,
@@ -162,7 +167,6 @@ export function createTypecheckConfig(
   };
 
   if (needsTempConfig) {
-    // eslint-disable-next-line i18next/no-literal-string
     result.tempConfigFile = join(cachePath, `tsconfig.${cacheKey}.json`);
   }
 
@@ -198,8 +202,11 @@ export function shouldIncludeFile(
   }
 
   try {
-    const normalizedFilePath = resolve(filePath);
-    const normalizedTargetPath = resolve(targetPath);
+    // Compare in POSIX form. `resolve()` returns backslashes on Windows, so the
+    // directory test below (which appends "/") could never match there - every
+    // targeted check silently fell back to reporting the WHOLE project.
+    const normalizedFilePath = toPosixPath(resolve(filePath));
+    const normalizedTargetPath = toPosixPath(resolve(targetPath));
 
     // Check if the file is the exact target or within the target directory
     return (

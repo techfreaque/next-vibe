@@ -4,7 +4,8 @@ export const translations: typeof enTranslations = {
   category: "Zarządzanie zadaniami",
 
   errors: {
-    fetchCronTaskStats: "Nie udało się pobrać statystyk zadań cron",
+    fetchCronTaskStats:
+      "Nie udało się pobrać statystyk zadań cron ({{type}}, {{period}}, zadanie {{taskId}}): {{error}}",
   },
 
   get: {

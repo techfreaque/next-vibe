@@ -1,4 +1,4 @@
-import { coreClientEnv as envClient } from "next-vibe/core/env-client";
+import { coreClientEnv as envClient } from "../../../../core/env-client";
 import type { JSX } from "react";
 
 /**

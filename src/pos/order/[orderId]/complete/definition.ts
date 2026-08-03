@@ -3,7 +3,7 @@
  * Completes an order, validates full payment, and posts a journal entry
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,

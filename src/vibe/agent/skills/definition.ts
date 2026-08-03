@@ -3,13 +3,13 @@
  * Defines endpoint for listing skills
  */
 
-import { ChatModelId } from "next-vibe/agent/ai-stream/models";
-import { DEFAULT_TTS_VOICE_ID } from "next-vibe/agent/text-to-speech/constants";
+import { ChatModelId } from "../ai-stream/models";
+import { DEFAULT_TTS_VOICE_ID } from "../text-to-speech/constants";
 import {
   iconSchema,
   translatedValueSchema,
 } from "next-vibe/core/definition/common.schema";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,

@@ -81,7 +81,7 @@ export function getTelegramProvider(botToken?: string): SmsProvider {
           parse_mode: "HTML",
         });
 
-        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+        // oxlint-disable-next-line restricted/no-raw-fetch
         const response = await fetch(url, {
           method: "POST",
           headers: {
@@ -96,14 +96,15 @@ export function getTelegramProvider(botToken?: string): SmsProvider {
         if (!data.ok) {
           const errorData = data as TelegramErrorResponse;
           return fail({
-            message: t("sms.error.delivery_failed"),
-            errorType: ErrorResponseTypes.SMS_ERROR,
-            messageParams: {
+            message: t("sms.error.delivery_failed", {
+              phoneNumber: params.to,
               error:
                 errorData.description ??
-                // eslint-disable-next-line i18next/no-literal-string
-                `Error ${errorData.error_code ?? "unknown"}`,
-            },
+                t("sms.error.error_code", {
+                  code: errorData.error_code ?? t("sms.error.unknown_code"),
+                }),
+            }),
+            errorType: ErrorResponseTypes.SMS_ERROR,
           });
         }
 
@@ -120,13 +121,14 @@ export function getTelegramProvider(botToken?: string): SmsProvider {
         };
       } catch (error) {
         return fail({
-          message: t("sms.error.delivery_failed"),
-          errorType: ErrorResponseTypes.SMS_ERROR,
-          messageParams: {
+          message: t("sms.error.delivery_failed", {
+            phoneNumber: params.to,
             error:
-              // eslint-disable-next-line i18next/no-literal-string
-              error instanceof Error ? error.message : "Unknown error",
-          },
+              error instanceof Error
+                ? error.message
+                : t("sms.error.unknown_error"),
+          }),
+          errorType: ErrorResponseTypes.SMS_ERROR,
         });
       }
     },

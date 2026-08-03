@@ -3,22 +3,22 @@
  * Production-ready endpoint for executing SQL queries
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { WidgetDataSchema } from "next-vibe/core/utils/json";
-import { scopedTranslation } from "next-vibe/database/sql/i18n";
-import { UserRole } from "next-vibe/identity/roles/enum";
+} from "../../core/definition/enums";
+import { WidgetDataSchema } from "../../core/utils/json";
+import { scopedTranslation } from "./i18n";
+import { UserRole } from "../../identity/roles/enum";
 import {
   objectField,
   requestField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { SQL_ALIAS } from "./constants";

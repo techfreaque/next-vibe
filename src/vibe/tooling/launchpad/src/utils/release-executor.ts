@@ -5,17 +5,18 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
 import inquirer from "inquirer";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { LaunchpadT } from "next-vibe/tooling/launchpad/i18n";
-import { scopedTranslation as launchpadScopedTranslation } from "next-vibe/tooling/launchpad/i18n";
+import type { CountryLanguage } from "../../../../core/i18n/core/config";
+import { parseError } from "../../../../core/utils/parse-error";
+import type { EndpointLogger } from "../../../../logger/types";
+import type { LaunchpadT } from "../../i18n";
+import { scopedTranslation as launchpadScopedTranslation } from "../../i18n";
+import { releaseEnv } from "../../../release/env";
 import type {
   ReleaseOrchestrationOptions,
   ReleaseState,
   ReleaseTarget,
   VersionBumpType,
-} from "next-vibe/tooling/launchpad/src/types/types";
+} from "../types/types";
 
 import { discoverReleaseTargets } from "./release-discovery";
 import { StateManager } from "./state-manager";
@@ -406,7 +407,7 @@ export class ReleaseExecutor {
         `❌ ${t("releaseExecutor.weeklyUpdate.failed")}:`,
         parseError(error),
       );
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
+      // eslint-disable-next-line restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
       throw error;
     }
   }
@@ -416,9 +417,9 @@ export class ReleaseExecutor {
   }
 
   private runSnykMonitoring(branchName: string, locale: CountryLanguage): void {
-    const snykToken = process.env.SNYK_TOKEN;
+    const snykToken = releaseEnv.SNYK_TOKEN;
     const { t } = launchpadScopedTranslation.scopedT(locale);
-    const snykOrgKey = process.env.SNYK_ORG_KEY;
+    const snykOrgKey = releaseEnv.SNYK_ORG_KEY;
 
     if (!snykToken || !snykOrgKey) {
       this.logger.info(`⚠️  ${t("releaseExecutor.snyk.noCredentials")}`);
@@ -501,7 +502,7 @@ This is an automated update. Please review changes before merging.`;
     locale: CountryLanguage,
   ): Promise<void> {
     const { t } = launchpadScopedTranslation.scopedT(locale);
-    const githubToken = process.env.GITHUB_TOKEN;
+    const githubToken = releaseEnv.GITHUB_TOKEN;
     if (!githubToken) {
       this.logger.info(`⚠️  ${t("releaseExecutor.github.noToken")}`);
       return;

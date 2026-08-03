@@ -455,29 +455,6 @@ export class TsgoDaemon {
     return inst;
   }
 
-  /** Kill the bridge process for the given pid file and clean up socket+pid. */
-  static kill(pidPath: string): void {
-    const sockPath = pidPath.replace(/\.pid$/, ".sock");
-    try {
-      if (existsSync(pidPath)) {
-        const pid = parseInt(readFileSync(pidPath, "utf8").trim(), 10);
-        if (pid && !isNaN(pid)) {
-          try {
-            process.kill(pid, "SIGTERM");
-          } catch {
-            // already dead
-          }
-        }
-        rmSync(pidPath, { force: true });
-      }
-    } catch {
-      // ignore
-    }
-    rmSync(sockPath, { force: true });
-    // Drop any cached instance so the next call spawns fresh
-    TsgoDaemon.instances.delete(pidPath);
-  }
-
   // --------------------------------------------------------
   // Lifecycle
   // --------------------------------------------------------
@@ -587,7 +564,7 @@ export class TsgoDaemon {
       }
     }
     if (lastError) {
-      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- propagating socket connect error; no ResponseType<T> layer here (low-level transport)
+      // oxlint-disable-next-line restricted/restricted-syntax -- propagating socket connect error; no ResponseType<T> layer here (low-level transport)
       throw lastError;
     }
 

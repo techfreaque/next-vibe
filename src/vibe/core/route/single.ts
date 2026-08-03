@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CreateApiEndpointAny } from "../definition/endpoint-base";
 
 import {
   type ApiHandlerOptions,

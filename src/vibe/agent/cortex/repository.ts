@@ -157,31 +157,6 @@ export function normalizeToCanonicalPath(
 }
 
 /**
- * Convert a canonical path back to locale-aware path for display.
- * e.g. /memories/identity → /erinnerungen/identity (for DE locale)
- * Note: only the ROOT segment is localized; file/subdir names stay as stored.
- */
-export function canonicalToLocalePath(
-  path: string,
-  locale: CountryLanguage,
-): string {
-  const roots = getLocaleRootsSync(locale);
-  if (path === MEMORIES_PREFIX) {
-    return roots.memories;
-  }
-  if (path.startsWith(`${MEMORIES_PREFIX}/`)) {
-    return roots.memories + path.slice(MEMORIES_PREFIX.length);
-  }
-  if (path === DOCUMENTS_PREFIX) {
-    return roots.documents;
-  }
-  if (path.startsWith(`${DOCUMENTS_PREFIX}/`)) {
-    return roots.documents + path.slice(DOCUMENTS_PREFIX.length);
-  }
-  return path;
-}
-
-/**
  * Normalize a path: resolve "..", ensure leading "/", remove trailing "/", collapse "//"
  */
 export function normalizePath(raw: string): string {

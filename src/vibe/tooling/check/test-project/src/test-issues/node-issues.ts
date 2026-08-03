@@ -30,14 +30,14 @@ export function uselessSpread(arr: string[]): string[] {
 
 // unicorn/prefer-array-flat — use .flat() instead of reduce (fixable)
 export function flatBad(arrs: string[][]): string[] {
-  return arrs.reduce((acc, val) => acc.concat(val), []);
+  return arrs.flat();
 }
 
 // unicorn/prefer-array-flat-map — use flatMap (fixable)
 export function flatMapBad(arr: string[]): string[] {
   return arr
     .map((x) => [x, x.toUpperCase()])
-    .reduce((acc, val) => acc.concat(val), []);
+    .flat();
 }
 
 // unicorn/prefer-set-size — use .size (fixable)

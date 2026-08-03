@@ -1,8 +1,8 @@
 import * as AvatarPrimitive from "@rn-primitives/avatar";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 
-import { styledNative } from "../../native/utils/style-converter";
+import { styledNative } from "../utils/style-converter";
 // Import ALL types from web version (web is source of truth)
 import type {
   AvatarFallbackProps,

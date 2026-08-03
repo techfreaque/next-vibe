@@ -616,7 +616,7 @@ export const translations = {
   scripts: {
     invalidPackageJson: "Invalid package.json format in {{path}}",
     testsFailed: "Tests failed in {{path}}: {{error}}",
-    lintFailed: "Linting failed in {{path}}",
+    lintFailed: "Linting failed in {{path}}: {{output}}",
     typecheckFailed: "Type checking failed in {{path}}: {{error}}",
     buildFailed: "Build failed in {{path}}: {{error}}",
     packageJsonNotFound: "Package.json not found in {{path}}",
@@ -636,7 +636,7 @@ export const translations = {
     pushSuccess: "Changes pushed to remote",
     noCommits: "No new commits since tag '{{lastTag}}'",
     uncommittedChanges: "Uncommitted changes detected",
-    notOnMain: "Not on main branch (current: {{currentBranch}})",
+    notOnMain: "Not on branch '{{main}}' (current: {{currentBranch}})",
     commitFailed: "Failed to commit changes",
     tagFailed: "Failed to create tag",
     pushFailed: "Failed to push to remote",
@@ -713,7 +713,7 @@ export const translations = {
   hooks: {
     running: "Running {{hook}} hook for {{package}}...",
     completed: "Hook {{hook}} completed for {{package}}",
-    failed: "Hook {{hook}} failed for {{package}}: {{error}}",
+    failed: "Hook command '{{command}}' failed: {{error}}",
     skipped: "Skipping {{hook}} hook (continueOnError)",
   },
   npm: {
@@ -726,7 +726,7 @@ export const translations = {
   changelog: {
     generating: "Generating changelog for {{package}}...",
     generated: "Changelog generated for {{package}}",
-    failed: "Failed to generate changelog for {{package}}: {{error}}",
+    failed: "Failed to generate changelog for {{directory}}: {{error}}",
     noChanges: "No changes to add to changelog for {{package}}",
   },
   branch: {

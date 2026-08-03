@@ -33,7 +33,7 @@ import {
   type StopCondition,
   streamText as aiStreamText,
 } from "ai";
-import { calculateCreditCost } from "next-vibe/agent/models/models";
+import { calculateCreditCost } from "../../../models/models";
 import type { WidgetData } from "next-vibe/core/utils/json";
 
 import {
@@ -288,7 +288,7 @@ export class StreamLoop implements StreamLoopState {
       }
 
       // Not an abort error, re-throw to outer StreamErrorCatchHandler
-      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Re-throw is necessary here to propagate to StreamErrorCatchHandler
+      // oxlint-disable-next-line restricted/restricted-syntax -- Re-throw is necessary here to propagate to StreamErrorCatchHandler
       throw streamError;
     } finally {
       FirstPartWatchdog.clear(this.p.ctx);

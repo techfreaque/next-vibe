@@ -922,6 +922,7 @@ export const translations: typeof enTranslations = {
         description: "Wymagana autoryzacja",
       },
       notFound: {
+        detail: "Nie znaleziono konta dla użytkownika {{userId}}",
         title: "Nie znaleziono",
         description: "Sesja płatności nie została znaleziona",
       },
@@ -930,6 +931,9 @@ export const translations: typeof enTranslations = {
         description: "Brak uprawnień",
       },
       server: {
+        detail: "Nie udało się utworzyć sesji płatności: {{error}}",
+        stripeNotConfigured:
+          "Stripe nie jest jeszcze skonfigurowany. Dodaj STRIPE_SECRET_KEY do swojego środowiska.",
         title: "Błąd serwera",
         description: "Wystąpił błąd wewnętrzny serwera",
       },
@@ -996,6 +1000,7 @@ export const translations: typeof enTranslations = {
         description: "Brak uprawnień",
       },
       server: {
+        detail: "Nie udało się pobrać informacji o płatnościach: {{error}}",
         title: "Błąd serwera",
         description: "Wystąpił błąd wewnętrzny serwera",
       },
@@ -1033,6 +1038,7 @@ export const translations: typeof enTranslations = {
       description: "Płatność nie została znaleziona",
     },
     unauthorized: {
+      signInRequired: "Zaloguj się, aby zarządzać płatnościami",
       title: "Brak autoryzacji",
       description: "Wymagana autoryzacja",
     },
@@ -1041,6 +1047,7 @@ export const translations: typeof enTranslations = {
       description: "Brak uprawnień",
     },
     server: {
+      detail: "Nie udało się przetworzyć webhooka płatności: {{error}}",
       title: "Błąd serwera",
       description: "Wystąpił błąd wewnętrzny serwera",
     },
@@ -1067,8 +1074,9 @@ export const translations: typeof enTranslations = {
     },
     customerCreationFailed: "Nie udało się utworzyć klienta Stripe",
     customerNotFound: "Nie znaleziono klienta Stripe",
-    localMode: "Płatność jest wyłączona w lokalnym trybie deweloperskim",
-    webhookVerificationFailed: "Weryfikacja podpisu webhooka nie powiodła się",
+    localMode: "Płatność jest wyłączona w lokalnym trybie deweloperskim.",
+    webhookVerificationFailed:
+      "Weryfikacja podpisu webhooka nie powiodła się: {{error}}",
   },
 
   // Top-level success

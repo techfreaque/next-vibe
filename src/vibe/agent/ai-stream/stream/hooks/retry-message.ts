@@ -3,10 +3,10 @@
  * Handles retrying messages in both incognito and server modes
  */
 
-import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
-import messagesDefinition from "next-vibe/agent/chat/threads/[threadId]/messages/definition";
-import type { FavoriteConfig } from "next-vibe/agent/skills/favorites/db";
+import type { ChatModelId } from "../../models";
+import { DefaultFolderId } from "../../../../core/execution-context";
+import messagesDefinition from "../../../chat/threads/[threadId]/messages/definition";
+import type { FavoriteConfig } from "../../../skills/favorites/db";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -57,7 +57,7 @@ export async function retryMessage(
   // Fallback: incognito storage (not in apiClient cache after page reload)
   if (!message && currentRootFolderId === DefaultFolderId.INCOGNITO) {
     const { getMessagesForThread } =
-      await import("next-vibe/agent/chat/incognito/storage");
+      await import("../../../chat/incognito/storage");
     const msgs = await getMessagesForThread(activeThreadId);
     message = msgs.find((m) => m.id === messageId);
   }

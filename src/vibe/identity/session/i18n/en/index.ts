@@ -5,13 +5,17 @@ export const translations = {
     },
   },
   errors: {
-    session_not_found: "Session not found",
-    session_lookup_failed: "Failed to lookup session",
+    session_not_found: "Session not found for token {{token}}",
+    session_token_missing: "No session token found ({{reason}})",
+    session_lookup_failed: "Failed to look up session {{token}}: {{error}}",
+    current_session_failed: "Failed to read the current session: {{error}}",
     expired_sessions_delete_failed: "Failed to delete expired sessions",
-    session_creation_failed: "Failed to create session",
-    session_creation_database_error: "Database error while creating session",
-    user_sessions_delete_failed: "Failed to delete user sessions",
-    expired: "Session has expired",
+    session_creation_failed: "Failed to create session for user {{userId}}",
+    session_creation_database_error:
+      "Database error creating session for user {{userId}}: {{error}}",
+    user_sessions_delete_failed:
+      "Failed to delete session {{sessionId}}: {{error}}",
+    expired: "Session expired at {{expiresAt}}",
   },
   post: {
     title: "Session",

@@ -2,24 +2,25 @@ import "server-only";
 
 import {
   existsSync,
-  mkdirSync,
   readdirSync,
   readFileSync,
   rmSync,
   statSync,
-  writeFileSync,
 } from "node:fs";
 import { dirname, join, relative } from "node:path";
 
-import type { ApiSection } from "next-vibe/core/definition/endpoint-base";
-import { hasCustomDirective } from "next-vibe/core/generators/shared/custom-directive";
-import type { GeneratorDefinition } from "next-vibe/core/generators/shared/shared-inputs";
-import { parseError } from "next-vibe/core/utils/parse-error";
+import type { ApiSection } from "../../core/definition/endpoint-base";
+import { coreEnv } from "../../core/env";
+import { hasCustomDirective } from "../../core/generators/shared/custom-directive";
+import type { GeneratorDefinition } from "../../core/generators/shared/shared-inputs";
+import { writeFileIfChanged } from "../../core/generators/shared/utils";
+import { parseError } from "../../core/utils/parse-error";
+import { Environment } from "../../env/env-util";
 import {
   filterPlatformMarkers,
   PlatformMarker,
   type UserRoleValue,
-} from "next-vibe/identity/roles/enum";
+} from "../../identity/roles/enum";
 
 import {
   getApiDir,
@@ -27,6 +28,7 @@ import {
   getNextAppDir,
   getSrcDir,
   getUiDir,
+  getVibeDir,
 } from "@/env/paths";
 
 const PROJECT_ROOT = process.cwd();
@@ -35,7 +37,7 @@ const API_DIR = getApiDir();
 // Directories inside src/ that contain framework/system code — not user API routes.
 const SRC_DIR = getSrcDir();
 const API_EXCLUDE_DIRS = new Set([
-  join(SRC_DIR, "vibe"),
+  getVibeDir(),
   join(SRC_DIR, "_pages"),
   join(SRC_DIR, "_old"),
   getGeneratedDir(),
@@ -59,7 +61,7 @@ const SPECIAL_FILES = [
 ] as const;
 const CLIENT_REQUIRED = new Set(["error.tsx", "global-error.tsx"]);
 
-const IS_PROD = process.env["NODE_ENV"] === "production";
+const IS_PROD = coreEnv.NODE_ENV === Environment.PRODUCTION;
 
 // Returns true when a route should be excluded from the Next.js generated app.
 // Reads allowedRoles from the evaluated definitionModules map (populated by the
@@ -141,12 +143,18 @@ function hasHttpExports(file: string): boolean {
   );
 }
 
+/**
+ * Returns whether the shell is generator-owned (false only when a "use custom"
+ * directive means we must preserve the file) — NOT whether bytes hit the disk.
+ * The write itself is content-conditional: these shells land under `src/app/**`
+ * which `getApiDir()` (= `src/`) scans as `route.ts` INPUT, so rewriting
+ * identical bytes would bump mtime and re-dirty the gen-cache every run.
+ */
 function writeIfNotCustom(outPath: string, content: string): boolean {
   if (existsSync(outPath) && hasCustomDirective(outPath)) {
     return false;
   }
-  mkdirSync(dirname(outPath), { recursive: true });
-  writeFileSync(outPath, content, "utf8");
+  writeFileIfChanged(outPath, content);
   return true;
 }
 

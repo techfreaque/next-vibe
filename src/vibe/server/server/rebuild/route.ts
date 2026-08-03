@@ -5,8 +5,8 @@
 
 import "server-only";
 
-import { Methods } from "next-vibe/core/definition/enums";
-import { endpointsHandler } from "next-vibe/core/route/multi";
+import { Methods } from "../../../core/definition/enums";
+import { endpointsHandler } from "../../../core/route/multi";
 
 import rebuildEndpoints from "./definition";
 import { RebuildRepository } from "./repository";
@@ -14,12 +14,12 @@ import { RebuildRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: rebuildEndpoints,
   [Methods.POST]: {
-    handler: ({ data, locale, logger, t, toolExecutionContext }) =>
+    handler: ({ data, logger, t, user, toolExecutionContext }) =>
       RebuildRepository.execute(
         data,
-        locale,
         logger,
         t,
+        user,
         toolExecutionContext.abortSignal,
       ),
   },

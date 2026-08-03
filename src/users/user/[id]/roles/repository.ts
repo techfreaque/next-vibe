@@ -53,9 +53,10 @@ export class UserRoleManagementRepository {
     if (!targetUser) {
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("roles.post.errors.notFound.title"),
+        message: t("roles.post.errors.notFound.detail", {
+          userId: urlPathParams.id,
+        }),
         errorType: ErrorResponseTypes.NOT_FOUND,
-        messageParams: { userId: urlPathParams.id },
       });
     }
 
@@ -68,9 +69,11 @@ export class UserRoleManagementRepository {
     if (!result.success || !result.data) {
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("roles.post.errors.server.title"),
+        message: t("roles.post.errors.server.detail", {
+          userId: urlPathParams.id,
+          role: data.role,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { userId: urlPathParams.id, role: data.role },
       });
     }
 
@@ -110,9 +113,10 @@ export class UserRoleManagementRepository {
     if (!targetUser) {
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("roles.delete.errors.notFound.title"),
+        message: t("roles.delete.errors.notFound.detail", {
+          userId: urlPathParams.id,
+        }),
         errorType: ErrorResponseTypes.NOT_FOUND,
-        messageParams: { userId: urlPathParams.id },
       });
     }
 
@@ -126,9 +130,11 @@ export class UserRoleManagementRepository {
     if (!result.success) {
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("roles.delete.errors.server.title"),
+        message: t("roles.delete.errors.server.detail", {
+          userId: urlPathParams.id,
+          role: data.role,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { userId: urlPathParams.id, role: data.role },
       });
     }
 

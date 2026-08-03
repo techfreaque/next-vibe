@@ -2,10 +2,10 @@
  * Container Component
  * Provides consistent max-width and padding for app pages that don't need full width
  */
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { JSX, ReactNode } from "react";
 
-import type { StyleType } from "../../web/utils/style-type";
+import type { StyleType } from "../utils/style-type";
 
 // Cross-platform props interface
 export type ContainerProps = {

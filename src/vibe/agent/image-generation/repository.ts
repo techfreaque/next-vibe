@@ -5,16 +5,16 @@
 
 import "server-only";
 
-import { createFixtureFetch } from "next-vibe/agent/ai-stream/testing/fetch-cache";
-import { getStorageAdapter } from "next-vibe/agent/chat/storage/index";
-import { parseStorageUrl } from "next-vibe/agent/chat/storage/url-utils";
+import { createFixtureFetch } from "../ai-stream/testing/fetch-cache";
+import { getStorageAdapter } from "../chat/storage/index";
+import { parseStorageUrl } from "../chat/storage/url-utils";
 import {
   ApiProvider,
   isModelOptionImageBased,
   isModelProviderAvailable,
   type ModelOptionImageBased,
   type ModelOptionTokenBased,
-} from "next-vibe/agent/models/models";
+} from "../models/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -24,6 +24,7 @@ import {
 } from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import type { Platform } from "next-vibe/platforms/platforms";
 
 import { STANDARD_MARKUP_PERCENTAGE } from "@/products/constants";
 
@@ -36,7 +37,7 @@ import {
   DefaultFolderId,
   makeHeadlessContext,
   type ToolExecutionContext,
-} from "../chat/config";
+} from "next-vibe/core/execution-context";
 import { ChatMessageRole } from "../chat/enum";
 import { getEnvAvailability } from "../env-availability";
 import {
@@ -106,6 +107,7 @@ export class ImageGenerationRepository {
     logger: EndpointLogger,
     t: ImageGenerationT,
     toolExecutionContext: ToolExecutionContext,
+    platform: Platform,
   ): Promise<ResponseType<ImageGenerationPostResponseOutput>> {
     // model is resolved via fieldDefaults in route.ts (from favorites/skill config)
     if (!data.model) {
@@ -195,11 +197,10 @@ export class ImageGenerationRepository {
     );
 
     // Check provider availability before attempting generation
-    if (!isModelProviderAvailable(imageModel, getEnvAvailability())) {
+    if (!isModelProviderAvailable(imageModel, await getEnvAvailability())) {
       return fail({
-        message: t("post.errors.notConfigured", {
+        message: t("post.errors.providerUnavailable", {
           label: imageModel.apiProvider,
-          envKey: "N/A",
           url: "https://unbottled.ai",
         }),
         errorType: ErrorResponseTypes.BAD_REQUEST,
@@ -301,6 +302,7 @@ export class ImageGenerationRepository {
           locale,
           logger,
           featureLabel: t("post.title"),
+          platform,
           // The media-gen context is a narrowed shape — rebuild a headless
           // context carrying its abort wiring + fixture chain for dispatch.
           toolExecutionContext: makeHeadlessContext(
@@ -313,9 +315,8 @@ export class ImageGenerationRepository {
 
       default:
         return fail({
-          message: t("post.errors.notConfigured", {
+          message: t("post.errors.providerUnavailable", {
             label: imageModel.apiProvider,
-            envKey: "N/A",
             url: "https://unbottled.ai",
           }),
           errorType: ErrorResponseTypes.BAD_REQUEST,
@@ -344,7 +345,7 @@ export class ImageGenerationRepository {
       try {
         const imgRes = await fetchImpl(imageUrl);
         if (!imgRes.ok) {
-          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- intentional throw to fall through to catch
+          // eslint-disable-next-line restricted/restricted-syntax -- intentional throw to fall through to catch
           throw new Error(`Image fetch failed: ${String(imgRes.status)}`);
         }
         const arrayBuf = await imgRes.arrayBuffer();
@@ -406,8 +407,8 @@ export class ImageGenerationRepository {
         .replaceAll(/^-|-$/g, "")
         .slice(0, 60)}-${toolMessageId}`;
       void Promise.all([
-        import("next-vibe/agent/cortex/mounts/gens"),
-        import("next-vibe/agent/cortex/embeddings/sync-virtual"),
+        import("../cortex/mounts/gens"),
+        import("../cortex/embeddings/sync-virtual"),
       ])
         .then(([{ readGenPath }, { syncVirtualNodeToEmbedding }]) => {
           const path = `/gens/images/${month}/${slug}.md`;
@@ -524,9 +525,7 @@ export class ImageGenerationRepository {
     let imageUrl = result.data.lastGeneratedMediaUrl;
     if (!imageUrl) {
       return fail({
-        message: t("post.errors.generationFailed", {
-          error: "Model did not generate an image",
-        }),
+        message: t("post.errors.noImageGenerated"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
@@ -593,8 +592,7 @@ export class ImageGenerationRepository {
     user: JwtPayloadType;
     toolExecutionContext: ToolExecutionContext;
   }): Promise<Partial<ImageGenerationPostRequestInput>> {
-    const { getInstanceAvailability } = await import("../env-availability");
-    const availability = await getInstanceAvailability();
+    const availability = await getEnvAvailability();
     const userId =
       ctx.user && !ctx.user.isPublic && "id" in ctx.user
         ? ctx.user.id
@@ -602,9 +600,9 @@ export class ImageGenerationRepository {
     let sel: ImageGenModelSelection | undefined;
     if (userId) {
       const { resolveSkillFavoriteContext } =
-        await import("next-vibe/agent/skills/resolver");
+        await import("../skills/resolver");
       const { ModalityResolver } =
-        await import("next-vibe/agent/ai-stream/repository/core/modality-resolver");
+        await import("../ai-stream/repository/core/modality-resolver");
       const { favorite, skill } = await resolveSkillFavoriteContext({
         favoriteId: ctx.toolExecutionContext.favoriteId ?? null,
         skillId: ctx.toolExecutionContext.skillId ?? null,

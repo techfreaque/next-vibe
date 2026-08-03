@@ -3,37 +3,37 @@
  * Production-ready endpoint for running all code generators
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { UserRole } from "../../identity/roles/enum";
+import { createEndpoint } from "../definition/create";
 import {
   EndpointErrorTypes,
   FieldDataType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { scopedTranslation } from "next-vibe/core/generators/i18n";
-import { UserRole } from "next-vibe/identity/roles/enum";
-import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
-import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
+} from "../definition/enums";
+import { lazyWidget } from "../../unified-ui/_shared/lazy-widget";
 import {
+  customWidgetObject,
   requestField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../unified-ui/_shared/utils";
 import { z } from "zod";
+
+import { GENERATED_DIR } from "@/env/paths";
 
 const GenerateAllWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.GenerateAllWidget })),
 );
 
 const { POST } = createEndpoint({
-  scopedTranslation,
   method: Methods.POST,
   path: ["vibe", "core", "generators"],
-  title: "post.title",
-  titleShort: "post.titleShort",
-  description: "post.description",
+  title: "Generate All",
+  titleShort: "Generate All",
+  description: "Run all code generators",
   category: "devTools",
   subCategory: "Generators",
-  tags: ["post.title"],
+  tags: ["Generate All"],
   icon: "sparkles",
   allowedRoles: [
     UserRole.ADMIN,
@@ -48,31 +48,37 @@ const { POST } = createEndpoint({
     render: GenerateAllWidget,
     usage: { request: "data", response: true } as const,
     children: {
-      force: requestField(scopedTranslation, {
+      force: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "post.fields.force.label",
-        description: "post.fields.force.description",
+        label: "Force",
+        description: "Ignore cached hashes and run all generators",
         columns: 4,
         schema: z.boolean().optional().default(false),
       }),
 
       // === RESPONSE FIELDS ===
-      success: responseField(scopedTranslation, {
+      success: responseField({
         type: WidgetType.TEXT,
-        label: "post.fields.success.title",
+        label: "Success",
         schema: z.boolean(),
       }),
 
-      output: responseField(scopedTranslation, {
+      generationCompleted: responseField({
         type: WidgetType.TEXT,
-        label: "post.fields.output.title",
+        label: "Generation Completed",
+        schema: z.boolean(),
+      }),
+
+      output: responseField({
+        type: WidgetType.TEXT,
+        label: "Output",
         schema: z.string().optional(),
       }),
 
-      generationStats: responseField(scopedTranslation, {
+      generationStats: responseField({
         type: WidgetType.TEXT,
-        label: "post.fields.generationStats.title",
+        label: "Generation Statistics",
         schema: z.object({
           totalGenerators: z.coerce.number(),
           generatorsRun: z.coerce.number(),
@@ -87,47 +93,47 @@ const { POST } = createEndpoint({
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "post.errors.validation.title",
-      description: "post.errors.validation.description",
+      title: "Validation Error",
+      description: "Invalid request parameters",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "post.errors.network.title",
-      description: "post.errors.network.description",
+      title: "Network Error",
+      description: "Network error occurred",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "post.errors.unauthorized.title",
-      description: "post.errors.unauthorized.description",
+      title: "Unauthorized",
+      description: "Authentication required",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "post.errors.forbidden.title",
-      description: "post.errors.forbidden.description",
+      title: "Forbidden",
+      description: "Access forbidden",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "post.errors.notFound.title",
-      description: "post.errors.notFound.description",
+      title: "Not Found",
+      description: "Resource not found",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "post.errors.internal.title",
-      description: "post.errors.internal.description",
+      title: "Internal Error",
+      description: "Internal server error occurred",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "post.errors.unknown.title",
-      description: "post.errors.unknown.description",
+      title: "Unknown Error",
+      description: "An unknown error occurred",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "post.errors.internal.title",
-      description: "post.errors.internal.description",
+      title: "Internal Error",
+      description: "Internal server error occurred",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "post.errors.conflict.title",
-      description: "post.errors.conflict.description",
+      title: "Conflict",
+      description: "Data conflict occurred",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "post.success.title",
-    description: "post.success.description",
+    title: "Success",
+    description: "Operation completed successfully",
   },
 
   // === EXAMPLES ===
@@ -139,21 +145,23 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         success: true,
+        generationCompleted: true,
         generationStats: {
           totalGenerators: 2,
           generatorsRun: 2,
           generatorsSkipped: 0,
-          outputDirectory: "src/generated",
+          outputDirectory: GENERATED_DIR,
           functionalGeneratorsCompleted: true,
         },
       },
       withSkips: {
         success: true,
+        generationCompleted: true,
         generationStats: {
           totalGenerators: 2,
           generatorsRun: 1,
           generatorsSkipped: 1,
-          outputDirectory: "src/generated",
+          outputDirectory: GENERATED_DIR,
           functionalGeneratorsCompleted: true,
         },
       },

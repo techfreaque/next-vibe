@@ -65,6 +65,15 @@ interface DirtyFlags {
 /**
  * Live in-memory index maintained by the dev watcher.
  * All Sets contain absolute paths.
+ *
+ * Must remain structurally assignable to `GeneratorInputIndex` (shared-inputs.ts),
+ * which is the shape generators' `findInputs` actually consumes — the orchestrator
+ * passes this straight into it, so dropping or renaming a file-set field below
+ * breaks that call site at compile time. Deliberately NOT declared as
+ * `extends GeneratorInputIndex`: that contract exposes ReadonlySet to consumers,
+ * while the watcher mutates these sets in place. The dependency direction is
+ * one-way (shared-inputs knows nothing about this module) so the generator
+ * contract stays watcher-free and a fork with no watcher can drop this file.
  */
 export interface LiveIndex {
   // --- Endpoint generators (endpoints-index, endpoint, route-handlers) ---

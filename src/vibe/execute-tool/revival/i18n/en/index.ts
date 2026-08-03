@@ -2,6 +2,8 @@ export const translations = {
   errors: {
     unexpectedError:
       "An unexpected error occurred: {{error}}. Please try again.",
+    modelNotResolved:
+      "Could not resolve a model for this thread - the stream cannot be revived.",
   },
   post: {
     title: "Revival",

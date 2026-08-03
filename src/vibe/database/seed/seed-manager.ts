@@ -1,7 +1,7 @@
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { formatDatabase, formatDuration } from "next-vibe/logger/formatters";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import { parseError } from "../../core/utils/parse-error";
+import { formatDatabase, formatDuration } from "../../logger/formatters";
+import type { EndpointLogger } from "../../logger/types";
 
 import { getAllSeedModuleNames, getSeedModule } from "@/generated/seeds/index";
 
@@ -81,7 +81,7 @@ async function runSeeds(
           logger.error(`Error seeding ${moduleId}:`, parseError(error));
           seedResults.failed.push(moduleId);
           // Re-throw to propagate seeding errors to the main process
-          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Seed infrastructure needs to propagate errors
+          // eslint-disable-next-line restricted/restricted-syntax -- Seed infrastructure needs to propagate errors
           throw error;
         }
       } else {
@@ -112,7 +112,7 @@ export async function seedDatabase(
   } catch (error) {
     logger.error("❌ Error seeding database:", parseError(error));
     // Don't call process.exit here - let the caller handle the error
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Seed infrastructure needs to propagate errors
+    // eslint-disable-next-line restricted/restricted-syntax -- Seed infrastructure needs to propagate errors
     throw error;
   }
   // Don't close database here - it needs to stay open for the application

@@ -2,13 +2,16 @@
  * Stat Widget Type Definitions
  */
 
-import type { SpacingSize, WidgetType } from "next-vibe/core/definition/enums";
-import type { NumberWidgetSchema } from "next-vibe/unified-ui/_shared/schema-constraints";
+import type {
+  SpacingSize,
+  WidgetType,
+} from "../../../../core/definition/enums";
+import type { NumberWidgetSchema } from "../../../_shared/schema-constraints";
 import type {
   BasePrimitiveWidgetConfig,
   FieldUsageConfig,
-} from "next-vibe/unified-ui/_shared/types";
-import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+} from "../../../_shared/types";
+import type { IconKey } from "../../form-fields/icon-field/icons";
 
 /**
  * Stat Widget Configuration

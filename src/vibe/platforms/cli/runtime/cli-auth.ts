@@ -19,32 +19,28 @@
  * every endpoint exactly as before.
  */
 
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
 import type {
   JwtPayloadType,
   JWTPublicPayloadType,
-} from "next-vibe/identity/auth/types";
+} from "../../../identity/auth/types";
 import {
   filterPlatformMarkers,
   PlatformMarker,
   UserPermissionRole,
-} from "next-vibe/identity/roles/enum";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { createCliBypassUser } from "next-vibe/platforms/cli/auth/cli-bypass-user";
-import type { getCliUser } from "next-vibe/platforms/cli/auth/cli-user";
-import {
-  CliTarget,
-  type CliTargetValue,
-} from "next-vibe/platforms/cli/types/cli-target";
-import { Platform } from "next-vibe/platforms/platforms";
+} from "../../../identity/roles/enum";
+import type { EndpointLogger } from "../../../logger/types";
+import { createCliBypassUser } from "../auth/cli-bypass-user";
+import type { getCliUser } from "../auth/cli-user";
+import { CliTarget, type CliTargetValue } from "../types/cli-target";
+import { Platform } from "../../platforms";
 
 // Lazy-loaded: only needed for MCP + non-bypass paths, not for normal `vibe c`
 let _getCliUser: typeof getCliUser | null = null;
 async function loadGetCliUser(): Promise<typeof getCliUser> {
   if (!_getCliUser) {
-    _getCliUser = (await import("next-vibe/platforms/cli/auth/cli-user"))
-      .getCliUser;
+    _getCliUser = (await import("../auth/cli-user")).getCliUser;
   }
   return _getCliUser;
 }

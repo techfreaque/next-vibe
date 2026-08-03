@@ -486,9 +486,10 @@ export class SubscriptionRepository {
     } catch (error) {
       logger.error("Error getting subscription:", parseError(error));
       return fail({
-        message: t("errors.database_error"),
+        message: t("errors.database_error", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -611,11 +612,8 @@ export class SubscriptionRepository {
 
       if (!currentSubscription[0]) {
         return fail({
-          message: t("errors.not_found"),
+          message: t("errors.not_found_description"),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: {
-            error: t("errors.not_found_description"),
-          },
         });
       }
 
@@ -638,11 +636,8 @@ export class SubscriptionRepository {
 
       if (results.length === 0) {
         return fail({
-          message: t("errors.not_found"),
+          message: t("errors.not_found_description"),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: {
-            error: t("errors.not_found_description"),
-          },
         });
       }
 
@@ -663,9 +658,10 @@ export class SubscriptionRepository {
     } catch (error) {
       logger.error("Error updating subscription:", parseError(error));
       return fail({
-        message: t("errors.database_error"),
+        message: t("errors.database_error", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -741,9 +737,10 @@ export class SubscriptionRepository {
     } catch (error) {
       logger.error("Error canceling subscription:", parseError(error));
       return fail({
-        message: t("errors.cancel_failed"),
+        message: t("errors.cancel_failed", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -998,7 +995,7 @@ export class SubscriptionRepository {
                     planName: t(subRecord.planId),
                     totalModelCount: getAvailableModelCount(
                       false,
-                      getEnvAvailability(),
+                      await getEnvAvailability(),
                     ),
                   },
                   t,
@@ -1909,9 +1906,10 @@ export class SubscriptionRepository {
             subscriptionId: localSubscription.providerSubscriptionId,
           });
           return fail({
-            message: t("sync.stripe_error"),
+            message: t("sync.stripe_error", {
+              error: parseError(error).message,
+            }),
             errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-            messageParams: { error: parseError(error).message },
           });
         }
       }
@@ -2035,9 +2033,10 @@ export class SubscriptionRepository {
         userId,
       });
       return fail({
-        message: t("sync.failed"),
+        message: t("sync.failed", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }

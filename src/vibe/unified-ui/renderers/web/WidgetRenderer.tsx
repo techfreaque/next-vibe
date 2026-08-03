@@ -1,15 +1,15 @@
 "use client";
 
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { FieldDataType, WidgetType } from "next-vibe/core/definition/enums";
-import type { ReactWidgetProps } from "next-vibe/unified-ui/_shared/react-types";
+import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
+import { FieldDataType, WidgetType } from "../../../core/definition/enums";
+import type { ReactWidgetProps } from "../../_shared/react-types";
 import type {
   AnyChildrenConstrain,
   ConstrainedChildUsage,
   DispatchField,
   FieldUsageConfig,
-} from "next-vibe/unified-ui/_shared/types";
-import { useWidgetLocale } from "next-vibe/unified-ui/_shared/use-widget-context";
+} from "../../_shared/types";
+import { useWidgetLocale } from "../../_shared/use-widget-context";
 import React, { type JSX, Suspense } from "react";
 import type { z } from "zod";
 
@@ -88,100 +88,91 @@ const widgetRegistry: Record<
   LazyWidgetEntry
 > = {
   [WidgetType.TEXT]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/display-only/text/widget"),
+    () => import("../../widgets/display-only/text/widget"),
   ),
   [WidgetType.DESCRIPTION]: lazyEntry(
-    () =>
-      import("next-vibe/unified-ui/widgets/display-only/description/widget"),
+    () => import("../../widgets/display-only/description/widget"),
   ),
   [WidgetType.METADATA]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/display-only/metadata/widget"),
+    () => import("../../widgets/display-only/metadata/widget"),
   ),
   [WidgetType.KEY_VALUE]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/display-only/key-value/widget"),
+    () => import("../../widgets/display-only/key-value/widget"),
   ),
   [WidgetType.BADGE]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/display-only/badge/widget"),
+    () => import("../../widgets/display-only/badge/widget"),
   ),
   [WidgetType.ICON]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/display-only/icon/widget"),
+    () => import("../../widgets/display-only/icon/widget"),
   ),
   [WidgetType.MARKDOWN]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/display-only/markdown/widget"),
+    () => import("../../widgets/display-only/markdown/widget"),
   ),
   [WidgetType.MARKDOWN_EDITOR]: lazyEntry(
-    () =>
-      import("next-vibe/unified-ui/widgets/form-fields/markdown-editor/widget"),
+    () => import("../../widgets/form-fields/markdown-editor/widget"),
   ),
   [WidgetType.TITLE]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/display-only/title/widget"),
+    () => import("../../widgets/display-only/title/widget"),
   ),
   [WidgetType.LINK]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/display-only/link/widget"),
+    () => import("../../widgets/display-only/link/widget"),
   ),
   [WidgetType.CODE_OUTPUT]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/containers/code-output/widget"),
+    () => import("../../widgets/containers/code-output/widget"),
   ),
   [WidgetType.CODE_QUALITY_LIST]: lazyEntry(
-    () =>
-      import("next-vibe/unified-ui/widgets/display-only/code-quality-list/widget"),
+    () => import("../../widgets/display-only/code-quality-list/widget"),
   ),
   [WidgetType.PAGINATION]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/containers/pagination/widget"),
+    () => import("../../widgets/containers/pagination/widget"),
   ),
   [WidgetType.STAT]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/display-only/stat/widget"),
+    () => import("../../widgets/display-only/stat/widget"),
   ),
   [WidgetType.CHART]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/display-only/chart/widget"),
+    () => import("../../widgets/display-only/chart/widget"),
   ),
   [WidgetType.CONTAINER]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/containers/container/widget"),
+    () => import("../../widgets/containers/container/widget"),
   ),
   [WidgetType.SEPARATOR]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/display-only/separator/widget"),
+    () => import("../../widgets/display-only/separator/widget"),
   ),
   [WidgetType.BUTTON]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/interactive/button/widget"),
+    () => import("../../widgets/interactive/button/widget"),
   ),
   [WidgetType.NAVIGATE_BUTTON]: lazyEntry(
-    () =>
-      import("next-vibe/unified-ui/widgets/interactive/navigate-button/widget"),
+    () => import("../../widgets/interactive/navigate-button/widget"),
   ),
   [WidgetType.SUBMIT_BUTTON]: lazyEntry(
-    () =>
-      import("next-vibe/unified-ui/widgets/interactive/submit-button/widget"),
+    () => import("../../widgets/interactive/submit-button/widget"),
   ),
   [WidgetType.ALERT]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/display-only/alert/widget"),
+    () => import("../../widgets/display-only/alert/widget"),
   ),
   [WidgetType.FORM_ALERT]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/interactive/form-alert/widget"),
+    () => import("../../widgets/interactive/form-alert/widget"),
   ),
   [WidgetType.STATUS_INDICATOR]: lazyEntry(
-    () =>
-      import("next-vibe/unified-ui/widgets/display-only/status-indicator/widget"),
+    () => import("../../widgets/display-only/status-indicator/widget"),
   ),
   [WidgetType.EMPTY_STATE]: lazyEntry(
-    () =>
-      import("next-vibe/unified-ui/widgets/display-only/empty-state/widget"),
+    () => import("../../widgets/display-only/empty-state/widget"),
   ),
   [WidgetType.CODE_QUALITY_FILES]: lazyEntry(
-    () =>
-      import("next-vibe/unified-ui/widgets/display-only/code-quality-files/widget"),
+    () => import("../../widgets/display-only/code-quality-files/widget"),
   ),
   [WidgetType.CODE_QUALITY_SUMMARY]: lazyEntry(
-    () =>
-      import("next-vibe/unified-ui/widgets/display-only/code-quality-summary/widget"),
+    () => import("../../widgets/display-only/code-quality-summary/widget"),
   ),
   [WidgetType.AVATAR]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/display-only/avatar/widget"),
+    () => import("../../widgets/display-only/avatar/widget"),
   ),
   [WidgetType.LOADING]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/display-only/loading/widget"),
+    () => import("../../widgets/display-only/loading/widget"),
   ),
   [WidgetType.SEARCH_BAR]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/interactive/search-bar/widget"),
+    () => import("../../widgets/interactive/search-bar/widget"),
   ),
 };
 
@@ -190,119 +181,100 @@ const widgetRegistry: Record<
 // matching the previous switch's default branch.
 const formFieldRegistry: Partial<Record<FieldDataType, LazyWidgetEntry>> = {
   [FieldDataType.BOOLEAN]: lazyEntry(
-    () =>
-      import("next-vibe/unified-ui/widgets/form-fields/boolean-field/widget"),
+    () => import("../../widgets/form-fields/boolean-field/widget"),
   ),
   [FieldDataType.COLOR]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/form-fields/color-field/widget"),
+    () => import("../../widgets/form-fields/color-field/widget"),
   ),
   [FieldDataType.COUNTRY_SELECT]: lazyEntry(
-    () =>
-      import("next-vibe/unified-ui/widgets/form-fields/country-select-field/widget"),
+    () => import("../../widgets/form-fields/country-select-field/widget"),
   ),
   [FieldDataType.CURRENCY_SELECT]: lazyEntry(
-    () =>
-      import("next-vibe/unified-ui/widgets/form-fields/currency-select-field/widget"),
+    () => import("../../widgets/form-fields/currency-select-field/widget"),
   ),
   [FieldDataType.DATE]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/form-fields/date-field/widget"),
+    () => import("../../widgets/form-fields/date-field/widget"),
   ),
   [FieldDataType.DATE_RANGE]: lazyEntry(
-    () =>
-      import("next-vibe/unified-ui/widgets/form-fields/date-range-field/widget"),
+    () => import("../../widgets/form-fields/date-range-field/widget"),
   ),
   [FieldDataType.DATETIME]: lazyEntry(
-    () =>
-      import("next-vibe/unified-ui/widgets/form-fields/datetime-field/widget"),
+    () => import("../../widgets/form-fields/datetime-field/widget"),
   ),
   [FieldDataType.EMAIL]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/form-fields/email-field/widget"),
+    () => import("../../widgets/form-fields/email-field/widget"),
   ),
   [FieldDataType.ENTITY_PICKER]: lazyEntry(
-    () =>
-      import("next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget"),
+    () => import("../../widgets/form-fields/entity-picker-field/widget"),
   ),
   [FieldDataType.FILE]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/form-fields/file-field/widget"),
+    () => import("../../widgets/form-fields/file-field/widget"),
   ),
   [FieldDataType.FILTER_PILLS]: lazyEntry(
-    () =>
-      import("next-vibe/unified-ui/widgets/form-fields/filter-pills-field/widget"),
+    () => import("../../widgets/form-fields/filter-pills-field/widget"),
   ),
   [FieldDataType.ICON]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/form-fields/icon-field/widget"),
+    () => import("../../widgets/form-fields/icon-field/widget"),
   ),
   [FieldDataType.INT]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/form-fields/int-field/widget"),
+    () => import("../../widgets/form-fields/int-field/widget"),
   ),
   [FieldDataType.JSON]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/form-fields/json-field/widget"),
+    () => import("../../widgets/form-fields/json-field/widget"),
   ),
   [FieldDataType.LANGUAGE_SELECT]: lazyEntry(
-    () =>
-      import("next-vibe/unified-ui/widgets/form-fields/language-select-field/widget"),
+    () => import("../../widgets/form-fields/language-select-field/widget"),
   ),
   [FieldDataType.MARKDOWN_TEXTAREA]: lazyEntry(
-    () =>
-      import("next-vibe/unified-ui/widgets/form-fields/markdown-textarea-field/widget"),
+    () => import("../../widgets/form-fields/markdown-textarea-field/widget"),
   ),
   [FieldDataType.MULTISELECT]: lazyEntry(
-    () =>
-      import("next-vibe/unified-ui/widgets/form-fields/multiselect-field/widget"),
+    () => import("../../widgets/form-fields/multiselect-field/widget"),
   ),
   [FieldDataType.NUMBER]: lazyEntry(
-    () =>
-      import("next-vibe/unified-ui/widgets/form-fields/number-field/widget"),
+    () => import("../../widgets/form-fields/number-field/widget"),
   ),
   [FieldDataType.PASSWORD]: lazyEntry(
-    () =>
-      import("next-vibe/unified-ui/widgets/form-fields/password-field/widget"),
+    () => import("../../widgets/form-fields/password-field/widget"),
   ),
   [FieldDataType.TEL]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/form-fields/phone-field/widget"),
+    () => import("../../widgets/form-fields/phone-field/widget"),
   ),
   [FieldDataType.RANGE_SLIDER]: lazyEntry(
-    () =>
-      import("next-vibe/unified-ui/widgets/form-fields/range-slider-field/widget"),
+    () => import("../../widgets/form-fields/range-slider-field/widget"),
   ),
   [FieldDataType.SELECT]: lazyEntry(
-    () =>
-      import("next-vibe/unified-ui/widgets/form-fields/select-field/widget"),
+    () => import("../../widgets/form-fields/select-field/widget"),
   ),
   [FieldDataType.SLIDER]: lazyEntry(
-    () =>
-      import("next-vibe/unified-ui/widgets/form-fields/slider-field/widget"),
+    () => import("../../widgets/form-fields/slider-field/widget"),
   ),
   [FieldDataType.TAGS]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/form-fields/tags-field/widget"),
+    () => import("../../widgets/form-fields/tags-field/widget"),
   ),
   [FieldDataType.TEXT]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/form-fields/text-field/widget"),
+    () => import("../../widgets/form-fields/text-field/widget"),
   ),
   [FieldDataType.TEXTAREA]: lazyEntry(
-    () =>
-      import("next-vibe/unified-ui/widgets/form-fields/textarea-field/widget"),
+    () => import("../../widgets/form-fields/textarea-field/widget"),
   ),
   [FieldDataType.TEXT_ARRAY]: lazyEntry(
-    () =>
-      import("next-vibe/unified-ui/widgets/form-fields/text-array-field/widget"),
+    () => import("../../widgets/form-fields/text-array-field/widget"),
   ),
   [FieldDataType.TIME]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/form-fields/time-field/widget"),
+    () => import("../../widgets/form-fields/time-field/widget"),
   ),
   [FieldDataType.TIME_RANGE]: lazyEntry(
-    () =>
-      import("next-vibe/unified-ui/widgets/form-fields/time-range-field/widget"),
+    () => import("../../widgets/form-fields/time-range-field/widget"),
   ),
   [FieldDataType.TIMEZONE]: lazyEntry(
-    () =>
-      import("next-vibe/unified-ui/widgets/form-fields/timezone-field/widget"),
+    () => import("../../widgets/form-fields/timezone-field/widget"),
   ),
   [FieldDataType.URL]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/form-fields/url-field/widget"),
+    () => import("../../widgets/form-fields/url-field/widget"),
   ),
   [FieldDataType.UUID]: lazyEntry(
-    () => import("next-vibe/unified-ui/widgets/form-fields/uuid-field/widget"),
+    () => import("../../widgets/form-fields/uuid-field/widget"),
   ),
 };
 

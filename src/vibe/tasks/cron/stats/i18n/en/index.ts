@@ -2,7 +2,8 @@ export const translations = {
   category: "Task Management",
 
   errors: {
-    fetchCronTaskStats: "Failed to fetch cron task statistics",
+    fetchCronTaskStats:
+      "Failed to fetch cron task statistics ({{type}}, {{period}}, task {{taskId}}): {{error}}",
   },
 
   get: {

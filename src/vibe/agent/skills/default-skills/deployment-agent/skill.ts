@@ -1,5 +1,5 @@
-import { ChatModelId } from "next-vibe/agent/ai-stream/models";
-import { CODING_AGENT_ALIAS } from "next-vibe/agent/coding-agent/constants";
+import { ChatModelId } from "../../../ai-stream/models";
+import { CODING_AGENT_ALIAS } from "../../../coding-agent/constants";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import { VibeMode } from "next-vibe/env/env-util";
 import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";

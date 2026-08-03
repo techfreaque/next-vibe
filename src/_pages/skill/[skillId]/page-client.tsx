@@ -4,6 +4,7 @@ import type { SkillGetResponseOutput } from "next-vibe/agent/skills/[id]/definit
 import skillDefs from "next-vibe/agent/skills/[id]/definition";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { Platform } from "next-vibe/platforms/platforms";
 import { Div } from "next-vibe/ui/ui/div";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
@@ -50,6 +51,7 @@ export interface SkillLandingPageProps {
   locale: CountryLanguage;
   skillId: string;
   user: JwtPayloadType;
+  platform: Platform;
   /** Pre-built sign-up URL with ref/skillId params, resolved server-side */
   signupUrl: string;
   appName: string;
@@ -65,6 +67,7 @@ export function SkillLandingPage({
   locale,
   skillId,
   user,
+  platform,
   skillData,
 }: SkillLandingPageProps): JSX.Element {
   return (
@@ -82,6 +85,7 @@ export function SkillLandingPage({
         }}
         locale={locale}
         user={user}
+        platform={platform}
         forceMethod="GET"
       />
     </Div>

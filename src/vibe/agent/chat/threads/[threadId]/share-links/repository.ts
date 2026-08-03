@@ -2,8 +2,8 @@ import "server-only";
 
 import { and, eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
-import { chatThreads, threadShareLinks } from "next-vibe/agent/chat/db";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
+import { chatThreads, threadShareLinks } from "../../../db";
 import { coreEnv } from "next-vibe/core/env";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {

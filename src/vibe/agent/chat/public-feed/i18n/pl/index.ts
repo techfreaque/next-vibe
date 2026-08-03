@@ -76,6 +76,7 @@ export const translations: typeof enTranslations = {
       server: {
         title: "Błąd serwera",
         description: "Wystąpił wewnętrzny błąd serwera",
+        detail: "Błąd serwera: {{error}}",
       },
       serverError: {
         title: "Błąd serwera",

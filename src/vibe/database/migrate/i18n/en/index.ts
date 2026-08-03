@@ -50,6 +50,8 @@ export const translations = {
       network: {
         title: "Network Error",
         description: "Network error during migration operation",
+        detail: "Migration failed: {{error}}",
+        exitCode: "drizzle-kit migrate exited with code {{code}}",
       },
     },
     success: {

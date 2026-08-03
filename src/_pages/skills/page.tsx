@@ -23,6 +23,7 @@ interface SkillsPageProps {
 export interface SkillsPageData {
   locale: CountryLanguage;
   user: JwtPayloadType;
+  platform: Platform;
 }
 
 export async function tanstackLoader({
@@ -37,11 +38,15 @@ export async function tanstackLoader({
     logger,
   );
 
-  return { locale, user };
+  return { locale, user, platform: Platform.NEXT_PAGE };
 }
 
-export function TanstackPage({ locale, user }: SkillsPageData): JSX.Element {
-  return <SkillsPageClient locale={locale} user={user} />;
+export function TanstackPage({
+  locale,
+  user,
+  platform,
+}: SkillsPageData): JSX.Element {
+  return <SkillsPageClient locale={locale} user={user} platform={platform} />;
 }
 
 export default async function SkillsPage({

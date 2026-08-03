@@ -75,6 +75,9 @@ export const translations = {
       server: {
         title: "Server Error",
         description: "An internal server error occurred",
+        // `title` doubles as the generic errorTypes label - detail lives here so
+        // no raw placeholder leaks into those labels.
+        detail: "Server Error: {{error}}",
       },
       serverError: {
         title: "Server Error",

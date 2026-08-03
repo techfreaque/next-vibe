@@ -128,7 +128,11 @@ export const translations = {
       description:
         "Unable to process your contact form at this time. Please try again later.",
     },
-    repositoryCreateFailed: "Failed to create contact request",
+    repositoryCreateFailed: "Failed to create contact request: {{error}}",
+    repositoryCreateFailedForEmail:
+      "Failed to create contact request for {{email}}",
+    repositoryCreateFailedWithDetails:
+      "Failed to create contact request: {{error}}. {{details}}",
     repositoryCreateDetails:
       "Unable to process your contact form at this time. Please try again later.",
     noContactReturned: "No contact record was returned after creation",

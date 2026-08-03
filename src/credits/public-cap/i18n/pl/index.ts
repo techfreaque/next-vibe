@@ -135,6 +135,7 @@ export const translations: typeof enTranslations = {
     },
   },
   repository: {
+    capUpdated: "Dzienny limit ustawiony na {{capAmount}} kredytów",
     capExceeded:
       "Osiągnięto dzienny limit darmowych kredytów. Zarejestruj się lub spróbuj ponownie jutro.",
     getCapFailed: "Nie udało się pobrać konfiguracji limitu darmowych kredytów",

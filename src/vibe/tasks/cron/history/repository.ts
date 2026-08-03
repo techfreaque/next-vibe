@@ -18,19 +18,19 @@ import {
   or,
   sql,
 } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { CronHistoryT } from "next-vibe/tasks/cron/history/i18n";
-import { CronTaskPriority, CronTaskStatus } from "next-vibe/tasks/enum";
+} from "../../../core/route/response.schema";
+import { parseError } from "../../../core/utils/parse-error";
+import { db } from "../../../database";
+import type { JwtPayloadType } from "../../../identity/auth/types";
+import { UserPermissionRole } from "../../../identity/roles/enum";
+import type { EndpointLogger } from "../../../logger/types";
+import type { CronHistoryT } from "./i18n";
+import { CronTaskPriority, CronTaskStatus } from "../../enum";
 
 import { cronTaskExecutions, cronTasks } from "../db";
 import type {
@@ -49,6 +49,10 @@ export class CronHistoryRepository {
     t: CronHistoryT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronHistoryResponseOutput>> {
+    // Hoisted above the try so the catch can report the limit it attempted.
+    const limit =
+      data?.limit && Number(data.limit) > 0 ? Number(data.limit) : 50;
+
     try {
       logger.debug("Fetching task execution history", { filters: data });
 
@@ -56,9 +60,6 @@ export class CronHistoryRepository {
         !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
       const userId = !user.isPublic ? user.id : null;
 
-      // Parse pagination with type safety
-      const limit =
-        data?.limit && Number(data.limit) > 0 ? Number(data.limit) : 50;
       const offset = data?.offset ? Number(data.offset) : 0;
 
       // Base conditions (applied to all queries including status counts)
@@ -248,9 +249,10 @@ export class CronHistoryRepository {
             durationMs: exec.durationMs,
             error: exec.error
               ? fail({
+                  // The stored message was already interpolated when the
+                  // execution failed, so it needs no params alongside it.
                   message:
                     exec.error?.message ?? t("errors.repositoryInternalError"),
-                  messageParams: exec.error?.messageParams,
                   errorType:
                     exec.error?.errorType ?? ErrorResponseTypes.INTERNAL_ERROR,
                 })
@@ -292,14 +294,20 @@ export class CronHistoryRepository {
         error: parsedError.message,
       });
 
+      // taskId is an optional filter, so the unfiltered case gets its own key
+      // rather than an untranslatable "unknown" placeholder.
       return fail({
-        message: t("errors.fetchCronTaskHistory"),
+        message: data.taskId
+          ? t("errors.fetchCronTaskHistoryDetail", {
+              taskId: data.taskId,
+              limit,
+              error: parsedError.message,
+            })
+          : t("errors.fetchCronTaskHistoryAllDetail", {
+              limit,
+              error: parsedError.message,
+            }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
-          error: parsedError.message,
-          taskId: data.taskId || "unknown",
-          limit: data.limit || 50,
-        },
       });
     }
   }

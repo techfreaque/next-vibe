@@ -170,6 +170,7 @@ export const translations: typeof enTranslations = {
       server: {
         title: "Błąd serwera",
         description: "Wystąpił wewnętrzny błąd serwera",
+        detail: "Wysyłka testowa nie powiodła się: {{error}}",
       },
       unknown: {
         title: "Nieznany błąd",
@@ -196,11 +197,13 @@ export const translations: typeof enTranslations = {
         description: "Wystąpił konflikt danych",
       },
       templateNotFound: {
-        title: "Nie znaleziono szablonu",
+        title:
+          "Brak szablonu dla {{emailJourneyVariant}} / {{emailCampaignStage}}",
         description: "Nie znaleziono szablonu e-mail dla podanych parametrów",
       },
       sendingFailed: {
-        title: "Wysyłanie nie powiodło się",
+        title:
+          "Wysyłka do {{recipient}} nie powiodła się ({{subject}}): {{error}}",
         description: "Nie udało się wysłać testowego e-maila",
       },
     },

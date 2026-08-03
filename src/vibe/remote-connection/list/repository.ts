@@ -5,15 +5,12 @@
  */
 
 import { and, eq } from "drizzle-orm";
-import {
-  type ResponseType,
-  success,
-} from "next-vibe/core/route/response.schema";
-import { db } from "next-vibe/database";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { cronTasks } from "next-vibe/tasks/cron/db";
+import { type ResponseType, success } from "../../core/route/response.schema";
+import { db } from "../../database";
+import type { JwtPrivatePayloadType } from "../../identity/auth/types";
+import { UserPermissionRole } from "../../identity/roles/enum";
+import type { EndpointLogger } from "../../logger/types";
+import { cronTasks } from "../../tasks/cron/db";
 
 import { remoteConnections } from "../db";
 import { RemoteConnectionRepository } from "../repository";

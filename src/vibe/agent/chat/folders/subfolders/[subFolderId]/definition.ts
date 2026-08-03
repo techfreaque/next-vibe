@@ -3,12 +3,12 @@
  * Defines endpoints for getting and deleting individual subfolders
  */
 
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import {
   dateSchema,
   iconSchema,
 } from "next-vibe/core/definition/common.schema";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,

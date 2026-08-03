@@ -38,8 +38,8 @@ import "server-only";
 
 import { getTableName, sql } from "drizzle-orm";
 import type { PgTableWithColumns } from "drizzle-orm/pg-core";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import { parseError } from "../../core/utils/parse-error";
+import type { EndpointLogger } from "../../logger/types";
 
 import { db } from "..";
 import type { CompiledQuery, PlaceholderParam, StaticParam } from "./context";
@@ -234,7 +234,7 @@ export function defineDbFunction<
         return mapRow(rows[0], returnEntries) as InferRecord<TReturn>;
       } catch (error) {
         logger.error(`DB function ${def.name} failed`, parseError(error));
-        // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- DB function wrapper must propagate DB errors
+        // eslint-disable-next-line restricted/restricted-syntax -- DB function wrapper must propagate DB errors
         throw error;
       }
     },
@@ -316,7 +316,7 @@ function extractLogicBody(
   const bodyEnd = src.lastIndexOf("}");
 
   if (bodyStart === -1 || bodyEnd === -1 || bodyEnd <= bodyStart) {
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- framework error during deploy, not user error
+    // eslint-disable-next-line restricted/restricted-syntax -- framework error during deploy, not user error
     throw new Error(
       `defineDbFunction: logic must be a function with a block body. Got: ${src.slice(0, 100)}`,
     );

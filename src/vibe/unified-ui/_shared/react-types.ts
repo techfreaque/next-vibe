@@ -1,9 +1,9 @@
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
+import type { CountryLanguage } from "../../core/i18n/core/config";
 import type {
   CancelButtonConfig,
   SubmitButtonConfig,
-} from "next-vibe/unified-ui/renderers/web/EndpointRenderer";
+} from "../renderers/web/EndpointRenderer";
 import type React from "react";
 import type { UseFormReturn } from "react-hook-form";
 import type z from "zod";

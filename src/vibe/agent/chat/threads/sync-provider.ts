@@ -26,7 +26,7 @@ import {
   notInArray,
   sql,
 } from "drizzle-orm";
-import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import type { ChatModelId } from "../../ai-stream/models";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { WidgetDataSchema } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
@@ -41,7 +41,7 @@ import {
 import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import { z } from "zod";
 
-import { DefaultFolderId } from "../config";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import {
   CHAT_MESSAGE_COLUMNS,
   chatFolders,
@@ -649,8 +649,8 @@ export async function pushFolderChainToPeer(
   }
   const [{ createFolderContentsEmitter }, folderContentsDefinitions] =
     await Promise.all([
-      import("next-vibe/agent/chat/folder-contents/[rootFolderId]/emitter"),
-      import("next-vibe/agent/chat/folder-contents/[rootFolderId]/definition"),
+      import("../folder-contents/[rootFolderId]/emitter"),
+      import("../folder-contents/[rootFolderId]/definition"),
     ]);
   const emitUser: JwtPrivatePayloadType = {
     id: userId,
@@ -701,7 +701,7 @@ export async function pushFolderChainToPeer(
   // built-in relay is fire-and-forget; calling the bridge directly lets us await.
   const { RemoteEventBridgeRepository } =
     await import("next-vibe/realtime/remote-event-bridge/repository");
-  const { buildWsChannel } = await import("next-vibe/realtime/channel");
+  const { buildWsChannel } = await import("next-vibe/realtime/core/channel");
   const def = folderContentsDefinitions.default.GET;
   const urlPathParams = { rootFolderId: DefaultFolderId.REMOTE };
   const channel = buildWsChannel(
@@ -782,8 +782,8 @@ export async function pushThreadSync(
     // label. No payload.
     const [{ createEndpointEmitter }, { default: threadsByIdDefinitions }] =
       await Promise.all([
-        import("next-vibe/realtime/emitter"),
-        import("next-vibe/agent/chat/threads/[threadId]/definition"),
+        import("next-vibe/realtime/core/emitter"),
+        import("./[threadId]/definition"),
       ]);
     const user: JwtPrivatePayloadType = {
       id: userId,
@@ -1663,7 +1663,7 @@ export const threadsSyncProvider: SyncProvider = {
           );
         if (staleMirrors.length > 0) {
           const { ThreadByIdRepository } =
-            await import("next-vibe/agent/chat/threads/[threadId]/repository");
+            await import("./[threadId]/repository");
           const user: JwtPrivatePayloadType = {
             id: userId,
             leadId: userId,

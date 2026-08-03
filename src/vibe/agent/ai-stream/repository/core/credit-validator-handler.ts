@@ -1,11 +1,11 @@
 import "server-only";
 
-import type { ChatModelOption } from "next-vibe/agent/ai-stream/models";
+import type { ChatModelOption } from "../../models";
 import {
   DEFAULT_INPUT_TOKENS,
   DEFAULT_OUTPUT_TOKENS,
-} from "next-vibe/agent/models/constants";
-import { calculateCreditCost } from "next-vibe/agent/models/models";
+} from "../../../models/constants";
+import { calculateCreditCost } from "../../../models/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,

@@ -5,23 +5,20 @@
 
 import "server-only";
 
-import {
-  PATH_SEPARATOR,
-  pathSegmentsToToolName,
-} from "next-vibe/core/core-utils/path";
+import { PATH_SEPARATOR, pathSegmentsToToolName } from "../../core-utils/path";
 import type {
   GeneratorContext,
   GeneratorResult,
-} from "next-vibe/core/generators/shared/shared-inputs";
+} from "../../generators/shared/shared-inputs";
 import {
   extractNestedPath,
   extractPathKey,
   toImportUrl,
   writeGeneratedFile,
-} from "next-vibe/core/generators/shared/utils";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../generators/shared/utils";
+import type { WidgetData } from "../../utils/json";
+import { parseError } from "../../utils/parse-error";
+import type { EndpointLogger } from "../../../logger/types";
 
 import { GENERATED_DIR } from "@/env/paths";
 

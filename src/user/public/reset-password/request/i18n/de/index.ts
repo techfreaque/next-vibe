@@ -101,8 +101,8 @@ export const translations: typeof enTranslations = {
       title: "Konflikt",
       description: "Datenkonflikt aufgetreten",
     },
-    no_email: "Kein Konto mit dieser E-Mail-Adresse gefunden",
-    email_generation_failed: "E-Mail konnte nicht generiert werden",
+    no_email: "Kein Konto zu {{email}} gefunden",
+    email_generation_failed: "Zurücksetzungs-E-Mail für {{email}} konnte nicht erstellt werden: {{errorMessage}}",
   },
   success: {
     title: "Anfrage gesendet",

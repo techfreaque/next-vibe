@@ -8,7 +8,11 @@
 
 import { describe, expect, it } from "bun:test";
 
-import { allLinesAreCamelCaseRenames } from "./repository";
+import {
+  allLinesAreCamelCaseRenames,
+  allLinesAreMarkdownTableReflow,
+  allLinesAreWhitespaceOnly,
+} from "./repository";
 
 /** Build a `--unified=0` changed-line block from paired old/new lines. */
 function hunk(pairs: Array<[string, string]>): string[] {
@@ -168,5 +172,183 @@ describe("allLinesAreCamelCaseRenames", () => {
 
   it("rejects an empty hunk", () => {
     expect(allLinesAreCamelCaseRenames([])).toBe(false);
+  });
+});
+
+describe("allLinesAreWhitespaceOnly", () => {
+  it("accepts a single-line re-indent", () => {
+    expect(
+      allLinesAreWhitespaceOnly(["-            });", "+          });"]),
+    ).toBe(true);
+  });
+
+  it("accepts a multi-line block reflow", () => {
+    expect(
+      allLinesAreWhitespaceOnly([
+        "-        <NavigationStackProvider>",
+        "-          <EndpointRenderer",
+        "+          <NavigationStackProvider>",
+        "+            <EndpointRenderer",
+      ]),
+    ).toBe(true);
+  });
+
+  it("rejects a pair with a real content change alongside the reflow", () => {
+    expect(
+      allLinesAreWhitespaceOnly([
+        "-        const userName = a;",
+        "+          const displayName = a;",
+      ]),
+    ).toBe(false);
+  });
+
+  it("rejects a pair that is byte-identical (not actually a diff)", () => {
+    expect(
+      allLinesAreWhitespaceOnly(["-        const a = 1;", "+        const a = 1;"]),
+    ).toBe(false);
+  });
+
+  it("rejects a pair of all-whitespace lines", () => {
+    expect(allLinesAreWhitespaceOnly(["-    ", "+  "])).toBe(false);
+  });
+
+  it("rejects unbalanced add/remove counts", () => {
+    expect(
+      allLinesAreWhitespaceOnly([
+        "-        const a = 1;",
+        "+          const a = 1;",
+        "+          const b = 2;",
+      ]),
+    ).toBe(false);
+  });
+
+  it("rejects a pure addition", () => {
+    expect(allLinesAreWhitespaceOnly(["+          const a = 1;"])).toBe(false);
+  });
+
+  it("rejects an empty hunk", () => {
+    expect(allLinesAreWhitespaceOnly([])).toBe(false);
+  });
+
+  it("accepts a multi-line call collapsed onto one line (same tokens, different line count)", () => {
+    expect(
+      allLinesAreWhitespaceOnly([
+        "-      reportToServer(",
+        "-        level,",
+        "-        message,",
+        "-        error,",
+        "-      );",
+        "+      reportToServer(level, message, error);",
+      ]),
+    ).toBe(true);
+  });
+
+  it("accepts a collapse where the multi-line form has a trailing comma", () => {
+    expect(
+      allLinesAreWhitespaceOnly([
+        "-      reportToServer(",
+        "-        level,",
+        "-        message,",
+        "-        error,",
+        "-        tabId,",
+        "-      );",
+        "+      reportToServer(level, message, error, tabId);",
+      ]),
+    ).toBe(true);
+  });
+
+  it("rejects a collapse that also drops an argument", () => {
+    expect(
+      allLinesAreWhitespaceOnly([
+        "-      reportToServer(",
+        "-        level,",
+        "-        message,",
+        "-        error,",
+        "-        tabId,",
+        "-      );",
+        "+      reportToServer(level, message, error);",
+      ]),
+    ).toBe(false);
+  });
+
+  it("accepts a single line expanded across multiple lines", () => {
+    expect(
+      allLinesAreWhitespaceOnly([
+        "-      onEvent: async ({ requestData, locale, user }) => {",
+        "+      onEvent: async ({",
+        "+        requestData,",
+        "+        locale,",
+        "+        user,",
+        "+      }) => {",
+      ]),
+    ).toBe(true);
+  });
+
+  it("rejects a spacing change inside a string literal (real content, not layout)", () => {
+    expect(
+      allLinesAreWhitespaceOnly([
+        '-  t("click  here");',
+        '+  t("click here");',
+      ]),
+    ).toBe(false);
+  });
+
+  it("accepts reflow around an untouched string literal", () => {
+    expect(
+      allLinesAreWhitespaceOnly([
+        '-  const msg =    t("click here");',
+        '+  const msg = t("click here");',
+      ]),
+    ).toBe(true);
+  });
+});
+
+describe("allLinesAreMarkdownTableReflow", () => {
+  it("accepts a column-width realignment across header, separator, and data rows", () => {
+    expect(
+      allLinesAreMarkdownTableReflow([
+        "-| Instance   | CLI flags          | Role                                |",
+        "-| ---------- | ------------------ | ------------------------------------ |",
+        "-| **Atlas**  | _(no flags)_       | Dev/coding instance. You live here. |",
+        "+| Instance   | CLI flags           | Role                                |",
+        "+| ---------- | ------------------- | ------------------------------------ |",
+        "+| **Atlas**  | _(no flags)_        | Dev/coding instance. You live here. |",
+      ]),
+    ).toBe(true);
+  });
+
+  it("rejects a cell content change disguised as realignment", () => {
+    expect(
+      allLinesAreMarkdownTableReflow([
+        "-| Instance   | Role       |",
+        "+| Instance   | Function   |",
+      ]),
+    ).toBe(false);
+  });
+
+  it("rejects an alignment-colon change on a separator row", () => {
+    expect(
+      allLinesAreMarkdownTableReflow(["-| --- |", "+| ---: |"]),
+    ).toBe(false);
+  });
+
+  it("rejects a non-table line", () => {
+    expect(
+      allLinesAreMarkdownTableReflow(["-const a = 1;", "+const a = 2;"]),
+    ).toBe(false);
+  });
+
+  it("rejects unbalanced row counts", () => {
+    expect(
+      allLinesAreMarkdownTableReflow([
+        "-| a | b |",
+        "+| a | b |",
+        "+| c | d |",
+      ]),
+    ).toBe(false);
+  });
+
+  it("rejects an empty hunk", () => {
+    expect(allLinesAreMarkdownTableReflow([])).toBe(false);
   });
 });

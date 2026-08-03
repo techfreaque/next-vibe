@@ -3,7 +3,7 @@
  * Capture a screenshot of the desktop using spectacle (fallback: scrot)
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,

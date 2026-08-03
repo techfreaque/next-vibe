@@ -8,7 +8,7 @@
 import "server-only";
 
 import { desc, eq } from "drizzle-orm";
-import { db } from "next-vibe/database";
+import { db } from "../../database";
 
 import { pipelineRuns } from "../db";
 import { RunStatus, type RunStatusType } from "../enum";

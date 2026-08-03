@@ -3,11 +3,14 @@
  * Renders a horizontal line divider to separate content sections
  */
 
-import type { SpacingSize, WidgetType } from "next-vibe/core/definition/enums";
+import type {
+  SpacingSize,
+  WidgetType,
+} from "../../../../core/definition/enums";
 import type {
   BasePrimitiveDisplayOnlyWidgetConfig,
   FieldUsageConfig,
-} from "next-vibe/unified-ui/_shared/types";
+} from "../../../_shared/types";
 
 /**
  * Separator Widget Configuration

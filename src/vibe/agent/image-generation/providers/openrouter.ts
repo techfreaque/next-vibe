@@ -1,7 +1,7 @@
 import "server-only";
 
-import { agentEnv } from "next-vibe/agent/env";
-import { scopedTranslation } from "next-vibe/agent/image-generation/i18n";
+import { agentEnv } from "../../env";
+import { scopedTranslation } from "../i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -90,8 +90,9 @@ export async function generateWithOpenRouter(params: {
         body: rawText.slice(0, 500),
       });
       return fail({
-        message: t("post.errors.requestFailed", {
-          message: `Non-JSON response (HTTP ${response.status}): ${rawText.slice(0, 200)}`,
+        message: t("post.errors.nonJsonResponse", {
+          status: response.status,
+          body: rawText.slice(0, 200),
         }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });

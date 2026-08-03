@@ -12,26 +12,27 @@ import { spawn } from "node:child_process";
 import { mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { monitorEventLoopDelay } from "node:perf_hooks";
 
-import { coreEnv } from "next-vibe/core/env";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { coreEnv } from "../../../core/env";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { readProcMeminfo } from "next-vibe/database/health/repository";
-import { scopedTranslation as dockerOperationsScopedTranslation } from "next-vibe/database/utils/docker-operations/i18n";
-import { scopedTranslation as dbUtilsScopedTranslation } from "next-vibe/database/utils/i18n";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { formatLogPrefix } from "next-vibe/logger/create-logger";
+} from "../../../core/route/response.schema";
+import { parseError } from "../../../core/utils/parse-error";
+import { databaseEnv } from "../../../database/env";
+import { readProcMeminfo } from "../../../database/health/repository";
+import { scopedTranslation as dockerOperationsScopedTranslation } from "../../../database/utils/docker-operations/i18n";
+import { scopedTranslation as dbUtilsScopedTranslation } from "../../../database/utils/i18n";
+import type { JwtPayloadType } from "../../../identity/auth/types";
+import { formatLogPrefix } from "../../../logger/create-logger";
 import {
   appendRawToServerLog,
   truncateClientLogs,
   truncateServerLog,
   writeServerLogOfflineHint,
-} from "next-vibe/logger/file";
+} from "../../../logger/file";
 import {
   createNextjsFormatter,
   formatConfig,
@@ -43,11 +44,11 @@ import {
   formatStartup,
   formatTask,
   formatWarning,
-} from "next-vibe/logger/formatters";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { WebSocketServerHandle } from "next-vibe/realtime/server";
-import type { ServerStartT } from "next-vibe/server/server/start/i18n";
-import { scopedTranslation as serverStartScopedTranslation } from "next-vibe/server/server/start/i18n";
+} from "../../../logger/formatters";
+import type { EndpointLogger } from "../../../logger/types";
+import type { WebSocketServerHandle } from "../../../realtime/server/server";
+import type { ServerStartT } from "./i18n";
+import { scopedTranslation as serverStartScopedTranslation } from "./i18n";
 
 import { ServerFramework } from "../enum";
 import { serverSystemEnv } from "../env";
@@ -618,7 +619,7 @@ export class ServerStartRepository {
     runSeed: boolean,
     runNext: boolean,
   ): void {
-    const currentEnv = process.env["NODE_ENV"] || "production";
+    const currentEnv = coreEnv.NODE_ENV;
     const mode = data.mode ?? "all";
     ServerStartRepository.log(
       `${formatLogPrefix()}${formatStartup("Starting Production Server", "🚀")}`,
@@ -637,7 +638,7 @@ export class ServerStartRepository {
     ServerStartRepository.log("");
     if (runDb) {
       ServerStartRepository.log(
-        `  ${formatConfig("Database", "ENABLED")}  ${formatHint(`(${ServerStartRepository.maskDatabaseUrl(process.env["DATABASE_URL"])})`)}`,
+        `  ${formatConfig("Database", "ENABLED")}  ${formatHint(`(${ServerStartRepository.maskDatabaseUrl(databaseEnv.DATABASE_URL)})`)}`,
       );
       ServerStartRepository.log(`    ${formatConfig("Migrations", "YES")}`);
       ServerStartRepository.log(
@@ -665,7 +666,7 @@ export class ServerStartRepository {
     try {
       const { t: dbUtilsT } = dbUtilsScopedTranslation.scopedT(locale);
       const { DbUtilsRepository } =
-        await import("next-vibe/database/utils/repository");
+        await import("../../../database/utils/repository");
       const dockerCheckResult = await DbUtilsRepository.isDockerAvailable(
         dbUtilsT,
         logger,
@@ -678,13 +679,11 @@ export class ServerStartRepository {
       } else {
         const dbStart = Date.now();
         const { DockerOperationsRepository } =
-          await import("next-vibe/database/utils/docker-operations/repository");
+          await import("../../../database/utils/docker-operations/repository");
         const { t: dockerOpsT } =
           dockerOperationsScopedTranslation.scopedT(locale);
         const { basename } = await import("node:path");
-        const projectSlug = basename(
-          process.env["PROJECT_ROOT"] ?? process.cwd(),
-        );
+        const projectSlug = basename(coreEnv.PROJECT_ROOT ?? process.cwd());
         const dbStartResult = await DockerOperationsRepository.dockerComposeUp(
           logger,
           dockerOpsT,
@@ -696,7 +695,7 @@ export class ServerStartRepository {
         if (dbStartResult.success) {
           logger.info(
             formatDatabase(
-              `Started PostgreSQL using: 'docker-compose.preview.yml' (port ${process.env["PREVIEW_DB_PORT"] || "5433"}) in ${formatDuration(Date.now() - dbStart)}`,
+              `Started PostgreSQL using: 'docker-compose.preview.yml' (port ${databaseEnv.PREVIEW_DB_PORT}) in ${formatDuration(Date.now() - dbStart)}`,
               "🐘",
             ),
           );
@@ -712,7 +711,7 @@ export class ServerStartRepository {
 
       // Run migrations
       const { DatabaseMigrationRepository } =
-        await import("next-vibe/database/migrate/repository");
+        await import("../../../database/migrate/repository");
       const migrateResult = await DatabaseMigrationRepository.migrate(logger);
       if (!migrateResult.success) {
         logger.vibe(
@@ -727,13 +726,13 @@ export class ServerStartRepository {
 
       // Deploy db-functions (idempotent - runs after every migration)
       const { deployDbFunctions } =
-        await import("next-vibe/database/db-functions/deploy");
+        await import("../../../database/db-functions/deploy");
       await deployDbFunctions(logger);
 
       // Seed database if enabled
       if (runSeed) {
         const { SeedRepository } =
-          await import("next-vibe/database/seed/repository");
+          await import("../../../database/seed/repository");
         await SeedRepository.seed("prod", logger);
       } else {
         logger.vibe(formatSkip("Database seeding skipped"));
@@ -756,8 +755,9 @@ export class ServerStartRepository {
   ): Promise<void> {
     try {
       const { RemoteConnectionRepository } =
-        await import("next-vibe/remote-connection/repository");
-      const { openConnection } = await import("next-vibe/realtime/connector");
+        await import("../../../remote-connection/repository");
+      const { openConnection } =
+        await import("../../../realtime/server/connector");
       const connections =
         await RemoteConnectionRepository.getAllActiveConnectionsForSync();
       let opened = 0;
@@ -805,7 +805,7 @@ export class ServerStartRepository {
     try {
       logger.debug(formatTask("Starting task runner"));
       const { UnifiedTaskRunnerRepository } =
-        await import("next-vibe/tasks/unified-runner/repository");
+        await import("../../../tasks/unified-runner/repository");
 
       UnifiedTaskRunnerRepository.environment = "production";
 
@@ -1211,7 +1211,7 @@ export class ServerStartRepository {
       try {
         const { Pool } = await import("pg");
         const pool = new Pool({
-          connectionString: process.env["DATABASE_URL"],
+          connectionString: databaseEnv.DATABASE_URL,
           connectionTimeoutMillis: 5000,
         });
 
@@ -1383,7 +1383,7 @@ export class ServerStartRepository {
     try {
       // Import WS module to get NEXT_PORT_OFFSET
       const { startWebSocketServer, NEXT_PORT_OFFSET } =
-        await import("next-vibe/realtime/server");
+        await import("../../../realtime/server/server");
 
       const disableProxy = serverSystemEnv.VIBE_DISABLE_PROXY;
       // In proxy mode (default): Next.js on port+NEXT_PORT_OFFSET, Bun proxy on main port.
@@ -1597,7 +1597,7 @@ export class ServerStartRepository {
 
     while (Date.now() - start < timeoutMs) {
       try {
-        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- server-liveness probe (waits for the just-started server to accept requests)
+        // oxlint-disable-next-line restricted/no-raw-fetch -- server-liveness probe (waits for the just-started server to accept requests)
         const response = await fetch(url, { method: "HEAD" });
         if (response.ok || response.status === 404) {
           return;

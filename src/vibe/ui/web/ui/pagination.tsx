@@ -1,13 +1,13 @@
 "use client";
-import { useTranslation } from "next-vibe/core/i18n/core/client";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { useTranslation } from "../../../core/i18n/core/client";
+import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 
-import { uiScopedTranslation } from "../../web/i18n";
-import { ChevronLeftIcon } from "../../web/ui/icons/ChevronLeftIcon";
-import { ChevronRightIcon } from "../../web/ui/icons/ChevronRightIcon";
-import { DotsHorizontalIcon } from "../../web/ui/icons/DotsHorizontalIcon";
-import type { StyleType } from "../../web/utils/style-type";
+import { uiScopedTranslation } from "../i18n";
+import { ChevronLeftIcon } from "./icons/ChevronLeftIcon";
+import { ChevronRightIcon } from "./icons/ChevronRightIcon";
+import { DotsHorizontalIcon } from "./icons/DotsHorizontalIcon";
+import type { StyleType } from "../utils/style-type";
 import { buttonVariants } from "./button";
 
 // Cross-platform types

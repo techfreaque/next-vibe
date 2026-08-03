@@ -1,11 +1,17 @@
-import { type CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { scopedTranslation as sharedScopedTranslation } from "next-vibe/core/i18n/shared";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
-import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { Platform } from "next-vibe/platforms/platforms";
-import { isAgentPlatform, isCliPlatform } from "next-vibe/platforms/platforms";
+import {
+  formatValidationErrorCompact,
+  formatValidationErrorDetails,
+} from "./format-validation-error";
+import type { CreateApiEndpointAny } from "../definition/endpoint-base";
+import type { CountryLanguage } from "../i18n/core/config";
+import { scopedTranslation as sharedScopedTranslation } from "../i18n/shared";
+import type { ResponseType } from "../route/response.schema";
+import { ErrorResponseTypes, fail } from "../route/response.schema";
+import type { WidgetData } from "../utils/json";
+import { parseError } from "../utils/parse-error";
+import type { EndpointLogger } from "../../logger/types";
+import type { Platform } from "../../platforms/platforms";
+import { isAgentPlatform, isCliPlatform } from "../../platforms/platforms";
 import type { ZodError, ZodIssue } from "zod";
 import { z } from "zod";
 
@@ -15,18 +21,22 @@ import { z } from "zod";
  * @param data - The data to validate (can be any type from HTTP)
  * @param schema - The schema to validate against
  * @param logger - Logger instance
- * @param locale - Locale for error messages
  * @returns A response with the validated data or error
  */
 export function validateData<TSchema extends z.ZodType>(
   data: Parameters<TSchema["parse"]>[0],
   schema: TSchema,
   logger: EndpointLogger,
-  locale: CountryLanguage,
   platform: Platform,
   endpointPath: string,
+  locale: CountryLanguage,
+  /**
+   * Endpoint definition, used to build the CLI example command. Omitted by the
+   * callers that validate something other than user input (the locale, and
+   * response payloads), where an example command would be misleading.
+   */
+  endpoint?: CreateApiEndpointAny | null,
 ): ResponseType<z.infer<TSchema>> {
-  const { t: sharedT } = sharedScopedTranslation.scopedT(locale);
   if (isEmptyObjectSchema(schema)) {
     return { success: true, data: {} as z.infer<TSchema> };
   }
@@ -37,12 +47,17 @@ export function validateData<TSchema extends z.ZodType>(
     return { success: true, data: undefined as z.infer<TSchema> };
   }
 
+  // Not an endpoint handler, so there is no `t` prop to inherit - this is one of
+  // the framework entry points that has to build its own from the request locale.
+  const { t } = sharedScopedTranslation.scopedT(locale);
+
   try {
     const result = schema.safeParse(data);
 
     if (!result.success) {
+      const issues = result.error.issues ?? [];
       const formattedErrors = formatZodErrors(result.error);
-      const errorCount = result.error.issues?.length || 0;
+      const errorCount = issues.length;
       const isQuietPlatform =
         isCliPlatform(platform) || isAgentPlatform(platform);
       const logValidationDetails = isQuietPlatform
@@ -66,13 +81,17 @@ export function validateData<TSchema extends z.ZodType>(
         formattedErrors,
         payload: truncatedPayload,
       });
+      // The CLI is the only surface with room for the example command and the
+      // --interactive hint; every other surface gets the compact field list.
+      // Formatting here is what lets the response carry finished text instead of
+      // parts that four separate consumers had to reassemble.
+      const message = isCliPlatform(platform)
+        ? formatValidationErrorDetails(t, issues, endpoint, asInputData(data))
+        : formatValidationErrorCompact(t, issues, endpoint);
+
       return fail({
-        message: sharedT("errorTypes.validation_error"),
+        message,
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
-        messageParams: {
-          error: formattedErrors.join(", "),
-          errorCount: errorCount,
-        },
       });
     }
 
@@ -82,11 +101,24 @@ export function validateData<TSchema extends z.ZodType>(
     const parsedError = parseError(error);
     logger.error("Unexpected validation error", parsedError);
     return fail({
-      message: sharedT("errorTypes.validation_error"),
+      message: t("validation.unexpected", { error: parsedError.message }),
       errorType: ErrorResponseTypes.VALIDATION_ERROR,
-      messageParams: { error: parsedError.message },
     });
   }
+}
+
+/**
+ * Narrow the payload to the record shape the --interactive hint pre-fills from.
+ * Non-object payloads (a bare locale string) have nothing to pre-fill.
+ */
+function asInputData(
+  // eslint-disable-next-line restricted/no-unknown -- Mirrors validateData's input, which is untyped until validated
+  data: unknown,
+): Record<string, WidgetData> | undefined {
+  return typeof data === "object" && data !== null && !Array.isArray(data)
+    ? // oxlint-disable-next-line restricted/restricted-syntax
+      (data as Record<string, WidgetData>)
+    : undefined;
 }
 
 /**

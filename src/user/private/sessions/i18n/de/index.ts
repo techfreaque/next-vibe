@@ -37,7 +37,11 @@ export const translations: typeof enTranslations = {
         title: "Validierungsfehler",
         description: "Ungültige Anfrage",
       },
-      server: { title: "Serverfehler", description: "Interner Serverfehler" },
+      server: {
+        title: "Serverfehler",
+        description: "Interner Serverfehler",
+        detail: "Sitzungen konnten nicht geladen werden: {{error}}",
+      },
       unknown: {
         title: "Unbekannter Fehler",
         description: "Ein unbekannter Fehler ist aufgetreten",
@@ -83,7 +87,11 @@ export const translations: typeof enTranslations = {
         title: "Validierungsfehler",
         description: "Ungültige Anfrage",
       },
-      server: { title: "Serverfehler", description: "Interner Serverfehler" },
+      server: {
+        title: "Serverfehler",
+        description: "Interner Serverfehler",
+        detail: "Sitzungstoken konnte nicht erstellt werden: {{error}}",
+      },
       unknown: {
         title: "Unbekannter Fehler",
         description: "Ein unbekannter Fehler ist aufgetreten",
@@ -121,7 +129,11 @@ export const translations: typeof enTranslations = {
         title: "Validierungsfehler",
         description: "Ungültige Anfrage",
       },
-      server: { title: "Serverfehler", description: "Interner Serverfehler" },
+      server: {
+        title: "Serverfehler",
+        description: "Interner Serverfehler",
+        detail: "Sitzung konnte nicht widerrufen werden: {{error}}",
+      },
       unknown: {
         title: "Unbekannter Fehler",
         description: "Ein unbekannter Fehler ist aufgetreten",
@@ -134,6 +146,7 @@ export const translations: typeof enTranslations = {
       notFound: {
         title: "Nicht gefunden",
         description: "Sitzung nicht gefunden",
+        detail: "Keine Sitzung mit der ID {{sessionId}} gehört zu Ihrem Konto",
       },
       conflict: { title: "Konflikt", description: "Datenkonflikt" },
     },

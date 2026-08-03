@@ -17,6 +17,8 @@ export const translations = {
       network: {
         title: "Generation Failed",
         description: "drizzle-kit generate failed",
+        detail: "drizzle-kit generate failed: {{error}}",
+        exitCode: "drizzle-kit generate exited with code {{code}}",
       },
       unauthorized: {
         title: "Unauthorized",

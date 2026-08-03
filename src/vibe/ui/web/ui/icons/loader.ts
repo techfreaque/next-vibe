@@ -7,7 +7,7 @@
  * and cause build failures in strict compiler modes.
  */
 
-import type { IconComponent } from "../../../web/lib/helper";
+import type { IconComponent } from "../../lib/helper";
 
 type IconModule = Record<string, IconComponent>;
 

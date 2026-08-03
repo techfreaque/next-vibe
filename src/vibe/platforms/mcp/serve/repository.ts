@@ -5,14 +5,14 @@
 
 import "server-only";
 
-import type { IDefinitionLoader } from "next-vibe/core/definition/loader";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { IDefinitionsRegistry } from "next-vibe/core/route/definitions-registry";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
-import { success } from "next-vibe/core/route/response.schema";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { MCPServer } from "next-vibe/platforms/mcp/server/server";
+import type { IDefinitionLoader } from "../../../core/definition/loader";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import type { IDefinitionsRegistry } from "../../../core/route/definitions-registry";
+import type { ResponseType } from "../../../core/route/response.schema";
+import { success } from "../../../core/route/response.schema";
+import type { JwtPayloadType } from "../../../identity/auth/types";
+import type { EndpointLogger } from "../../../logger/types";
+import { MCPServer } from "../server/server";
 
 import type { MCPRegistry } from "../registry";
 import type { MCPServeResponseInput } from "./definition";

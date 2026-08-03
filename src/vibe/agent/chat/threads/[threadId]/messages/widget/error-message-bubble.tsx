@@ -1,10 +1,11 @@
 "use client";
 
-import { StreamErrorType } from "next-vibe/agent/ai-stream/repository/core/constants";
-import type { DefaultFolderId } from "next-vibe/agent/chat/config";
-import type { ChatMessage } from "next-vibe/agent/chat/db";
+import { StreamErrorType } from "../../../../../ai-stream/repository/core/constants";
+import type { DefaultFolderId } from "next-vibe/core/execution-context";
+import type { ChatMessage } from "../../../../db";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
+import { scopedTranslation as vibeScopedTranslation } from "next-vibe/core/i18n/shared";
 import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
 import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import { Div } from "next-vibe/ui/ui/div";
@@ -17,13 +18,13 @@ import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetLogger,
   useWidgetNavigation,
+  useWidgetPlatform,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 import { useState } from "react";
 
-import { scopedTranslation as sharedScopedTranslation } from "@/_pages/shared/i18n";
 import type { ContactRequest } from "@/contact/definition";
 import { useUser } from "@/user/private/me/hooks";
 
@@ -46,10 +47,13 @@ export function ErrorMessageBubble({
 }: ErrorMessageBubbleProps): JSX.Element {
   const { locale } = useTranslation();
   const { t: ts } = scopedTranslation.scopedT(locale);
-  const { t: sharedT } = sharedScopedTranslation.scopedT(locale);
+  // `errorType.errorKey` is keyed to the framework's own shared scope, not the
+  // app's, so it has to be rendered by that scope's translator.
+  const { t: vibeT } = vibeScopedTranslation.scopedT(locale);
   const { push: navigate } = useWidgetNavigation();
   const logger = useWidgetLogger();
   const user = useWidgetUser();
+  const platform = useWidgetPlatform();
   const { user: profileData } = useUser(user, logger);
   const isTouch = useTouchDevice();
   const { group, groupHover } = useMessageGroupName();
@@ -95,7 +99,7 @@ export function ErrorMessageBubble({
               onClick={(): void => {
                 void (async (): Promise<void> => {
                   const messageIdDefs =
-                    await import("next-vibe/agent/chat/threads/[threadId]/messages/[messageId]/definition");
+                    await import("../[messageId]/definition");
                   navigate(messageIdDefs.default.DELETE, {
                     urlPathParams: {
                       threadId: message.threadId,
@@ -125,10 +129,10 @@ export function ErrorMessageBubble({
     const parsed = JSON.parse(message.content || "{}") as ErrorResponseType;
     if (parsed && typeof parsed === "object" && "message" in parsed) {
       errorData = parsed;
-      displayContent = interpolateParams(parsed.message, parsed.messageParams);
+      displayContent = parsed.message;
 
       if (parsed.errorType?.errorKey) {
-        errorTypeDisplay = sharedT(parsed.errorType.errorKey);
+        errorTypeDisplay = vibeT(parsed.errorType.errorKey);
       }
 
       if (parsed.cause) {
@@ -145,8 +149,7 @@ export function ErrorMessageBubble({
 
   const handleDelete = (): void => {
     void (async (): Promise<void> => {
-      const messageIdDefs =
-        await import("next-vibe/agent/chat/threads/[threadId]/messages/[messageId]/definition");
+      const messageIdDefs = await import("../[messageId]/definition");
       navigate(messageIdDefs.default.DELETE, {
         urlPathParams: { threadId: message.threadId, messageId: message.id },
         data: { rootFolderId },
@@ -269,6 +272,7 @@ export function ErrorMessageBubble({
                 endpoint={{ POST: contactEndpoint }}
                 locale={locale}
                 user={user}
+                platform={platform}
                 endpointOptions={{
                   create: { autoPrefillData: contactPrefill ?? undefined },
                 }}
@@ -305,23 +309,11 @@ export function ErrorMessageBubble({
   );
 }
 
-function interpolateParams(
-  message: string,
-  params?: Record<string, string | number>,
-): string {
-  if (!params) {
-    return message;
-  }
-  return message.replaceAll(/\{\{(\w+)\}\}/g, (match, key: string) =>
-    key in params ? String(params[key]) : match,
-  );
-}
-
 function translateErrorRecursive(
   error: ErrorResponseType,
   causeLabel: string,
 ): string {
-  const mainMessage = interpolateParams(error.message, error.messageParams);
+  const mainMessage = error.message;
 
   if (error.cause) {
     const causeMessage = translateErrorRecursive(error.cause, causeLabel);

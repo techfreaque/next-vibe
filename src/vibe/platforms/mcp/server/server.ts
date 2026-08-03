@@ -6,12 +6,12 @@
 
 import "server-only";
 
-import type { IDefinitionLoader } from "next-vibe/core/definition/loader";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { IDefinitionsRegistry } from "next-vibe/core/route/definitions-registry";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import type { IDefinitionLoader } from "../../../core/definition/loader";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import type { IDefinitionsRegistry } from "../../../core/route/definitions-registry";
+import { parseError } from "../../../core/utils/parse-error";
+import type { JwtPayloadType } from "../../../identity/auth/types";
+import type { EndpointLogger } from "../../../logger/types";
 
 import type { MCPRegistry } from "../registry";
 import { createMCPProtocolHandler } from "./protocol-handler";
@@ -54,7 +54,7 @@ export class MCPServer {
     const isMCPServerEnabled = process.env.VIBE_MCP_DISABLED !== "true";
     if (!isMCPServerEnabled) {
       logger.error("[MCP Server] MCP server is disabled");
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- MCP server infrastructure requires throwing for disabled server
+      // eslint-disable-next-line restricted/no-throw, i18next/no-literal-string -- MCP server infrastructure requires throwing for disabled server
       throw new Error("MCP server is disabled");
     }
 
@@ -103,7 +103,7 @@ export class MCPServer {
       logger.error("[MCP Server] Failed to start", {
         error: parseError(error).message,
       });
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Re-throw MCP server startup errors for caller to handle
+      // eslint-disable-next-line restricted/no-throw -- Re-throw MCP server startup errors for caller to handle
       throw error;
     }
   }

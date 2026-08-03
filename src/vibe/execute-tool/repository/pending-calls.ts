@@ -36,7 +36,7 @@
 
 import "server-only";
 
-import type { WidgetData } from "next-vibe/core/utils/json";
+import type { WidgetData } from "../../core/utils/json";
 
 import type {
   CompletePendingCallOutcome,
@@ -44,7 +44,7 @@ import type {
   PendingCallInfo,
   PendingCallResult,
   TaskCompletionSignal,
-} from "./types";
+} from "./types-dispatch";
 
 export class PendingCalls {
   /** How long completed entries stay queryable for late waiters/duplicates. */
@@ -340,8 +340,8 @@ export class PendingCalls {
       return true;
     }
     try {
-      const { chatMessages } = await import("next-vibe/agent/chat/db");
-      const { db } = await import("next-vibe/database");
+      const { chatMessages } = await import("../../agent/chat/db");
+      const { db } = await import("../../database");
       const { eq } = await import("drizzle-orm");
 
       // Persisted-result handoff FIRST: a detach dispatch never backfills its

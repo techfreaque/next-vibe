@@ -1,9 +1,11 @@
-// oxlint-disable oxlint-plugin-restricted/restricted-syntax
+// oxlint-disable oxlint-plugin-restricted/no-raw-fetch
 /**
  * Google Sheets OAuth helpers
  * Handles OAuth URL construction, state token generation, and token exchange
  */
 import "server-only";
+
+import { googleSheetsEnv } from "./env";
 
 const GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth";
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
@@ -14,15 +16,15 @@ const SCOPES = [
 ].join(" ");
 
 function getClientId(): string {
-  return process.env["GOOGLE_SHEETS_CLIENT_ID"] ?? "";
+  return googleSheetsEnv.GOOGLE_SHEETS_CLIENT_ID ?? "";
 }
 
 function getClientSecret(): string {
-  return process.env["GOOGLE_SHEETS_CLIENT_SECRET"] ?? "";
+  return googleSheetsEnv.GOOGLE_SHEETS_CLIENT_SECRET ?? "";
 }
 
 function getRedirectUri(baseUrl: string): string {
-  const override = process.env["GOOGLE_SHEETS_REDIRECT_URI"];
+  const override = googleSheetsEnv.GOOGLE_SHEETS_REDIRECT_URI;
   if (override) {
     return override;
   }

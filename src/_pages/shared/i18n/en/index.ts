@@ -89,7 +89,10 @@ export const translations = {
       errors: {
         routeNotFound: "Route not found for tool: {{toolName}}",
         executionFailed: "Execution failed",
+        // Bare label - the CLI error formatter renders it param-free as its
+        // last-resort fallback, so the cause gets its own key.
         unknownError: "An unknown error occurred",
+        unknownErrorDetail: "An unknown error occurred: {{error}}",
       },
     },
   },

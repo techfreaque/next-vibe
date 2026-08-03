@@ -76,7 +76,7 @@ export class StripePriceManager {
       const productName = t(product.name);
       const productDescription = t(product.description, {
         subCredits: product.credits,
-        modelCount: getAvailableModelCount(false, getEnvAvailability()),
+        modelCount: getAvailableModelCount(false, await getEnvAvailability()),
       });
 
       logger.info("Creating Stripe price with locale-adjusted pricing", {
@@ -142,9 +142,11 @@ export class StripePriceManager {
         interval,
       });
       return fail({
-        message: tStripe("errors.priceCreationFailed.title"),
+        message: tStripe("errors.priceCreationFailed.detail", {
+          error: parseError(error).message,
+          productId,
+        }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: parseError(error).message, productId },
       });
     }
   }

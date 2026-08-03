@@ -16,7 +16,7 @@ import "server-only";
 import {
   makeHeadlessContext,
   type ToolExecutionContext,
-} from "next-vibe/agent/chat/config";
+} from "../../../core/execution-context";
 import { db } from "next-vibe/database";
 
 import { fixtures } from "./fixtures.db";

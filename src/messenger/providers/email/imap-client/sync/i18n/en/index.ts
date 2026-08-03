@@ -107,6 +107,8 @@ export const translations = {
     server: {
       title: "Server Error",
       description: "Internal server error occurred",
+      detail_sync: "Sync failed: {{error}}",
+      detail_status: "Couldn't read sync status: {{error}}",
     },
     unknown: {
       title: "Unknown Error",

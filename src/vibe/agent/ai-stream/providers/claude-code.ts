@@ -28,7 +28,7 @@ import type {
 import type { SDKPartialAssistantMessage } from "@anthropic-ai/claude-agent-sdk";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { ToolExecutionContext } from "../../chat/config";
+import type { ToolExecutionContext } from "../../../core/execution-context";
 import { withClaudeCodeFixture } from "../testing/claude-code-fixture-store";
 import { AgentToolExecutorRegistry } from "./anthropic-agent-tool-bridge";
 import { logProviderRequest } from "./shared/debug-file-logger";
@@ -183,14 +183,14 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
       .map((t) => {
         const inputShape = jsonSchemaToZodV4Shape(
           z4,
-          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- JSON Schema is untyped by nature
+          // eslint-disable-next-line restricted/no-unknown -- JSON Schema is untyped by nature
           t.inputSchema as Record<string, unknown>,
         );
         return sdkTool(
           t.name,
           t.description ?? t.name,
           inputShape,
-          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- MCP handler args are dynamic
+          // eslint-disable-next-line restricted/no-unknown -- MCP handler args are dynamic
           async (args: Record<string, unknown>) => {
             const toolCallId = crypto.randomUUID();
 
@@ -658,7 +658,7 @@ function mapStreamEvent(
 function jsonSchemaToZodV4Shape(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Zod v4 module type
   z4: any,
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- JSON Schema is untyped by nature
+  // eslint-disable-next-line restricted/no-unknown -- JSON Schema is untyped by nature
   schema: Record<string, unknown>,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Zod raw shape
 ): Record<string, any> {
@@ -666,7 +666,7 @@ function jsonSchemaToZodV4Shape(
     return {};
   }
 
-  /* eslint-disable oxlint-plugin-restricted/restricted-syntax -- JSON Schema properties are untyped */
+  /* eslint-disable oxlint-plugin-restricted/no-unknown -- JSON Schema properties are untyped */
   const properties = schema.properties as Record<
     string,
     Record<string, unknown>

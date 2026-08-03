@@ -76,8 +76,7 @@ async function renderSkillVariant(
 
   const fm = ["---", `skillId: "${skill.id}"`, `slug: "${slug}"`];
 
-  const { scopedTranslation: skillsT } =
-    await import("next-vibe/agent/skills/i18n");
+  const { scopedTranslation: skillsT } = await import("../../skills/i18n");
   const { t } = skillsT.scopedT(locale ?? "en-US");
 
   if (variant) {
@@ -144,10 +143,10 @@ export async function readSkillPath(
   }
 
   const raw = parseSegment(segments[1]!);
-  const { customSkills } = await import("next-vibe/agent/skills/db");
+  const { customSkills } = await import("../../skills/db");
 
   // Load all accessible skills (own + favorited)
-  const { chatFavorites } = await import("next-vibe/agent/skills/favorites/db");
+  const { chatFavorites } = await import("../../skills/favorites/db");
 
   const favRows = await db
     .select({ skillId: chatFavorites.skillId })
@@ -215,8 +214,8 @@ export async function listSkillPath(
   }
 
   const [{ customSkills }, { chatFavorites }] = await Promise.all([
-    import("next-vibe/agent/skills/db"),
-    import("next-vibe/agent/skills/favorites/db"),
+    import("../../skills/db"),
+    import("../../skills/favorites/db"),
   ]);
 
   const favRows = await db
@@ -285,8 +284,8 @@ export async function listSkillPath(
  */
 export async function getSkillCount(userId: string): Promise<number> {
   const [{ customSkills }, { chatFavorites }] = await Promise.all([
-    import("next-vibe/agent/skills/db"),
-    import("next-vibe/agent/skills/favorites/db"),
+    import("../../skills/db"),
+    import("../../skills/favorites/db"),
   ]);
 
   const favRows = await db
@@ -377,7 +376,7 @@ export async function writeSkillPath(
   const raw = parseSegment(segments[1]!);
   const parsed = parseSkillMarkdown(content);
 
-  const { customSkills } = await import("next-vibe/agent/skills/db");
+  const { customSkills } = await import("../../skills/db");
 
   // Find the skill: try UUID first, then slug, then slug-variantId prefix
   const rows = await db
@@ -421,7 +420,7 @@ export async function writeSkillPath(
 
   void (async (): Promise<void> => {
     const { syncVirtualNodeToEmbedding } =
-      await import("next-vibe/agent/cortex/embeddings/sync-virtual");
+      await import("../embeddings/sync-virtual");
     await syncVirtualNodeToEmbedding(
       ctx.userId,
       path,
@@ -445,7 +444,7 @@ export async function deleteSkillPath(
   }
 
   const raw = parseSegment(segments[1]!);
-  const { customSkills } = await import("next-vibe/agent/skills/db");
+  const { customSkills } = await import("../../skills/db");
 
   const rows = await db
     .select({
@@ -476,8 +475,7 @@ export async function deleteSkillPath(
   await db.delete(customSkills).where(eq(customSkills.id, targetId));
 
   void (async (): Promise<void> => {
-    const { removeVirtualNode } =
-      await import("next-vibe/agent/cortex/embeddings/sync-virtual");
+    const { removeVirtualNode } = await import("../embeddings/sync-virtual");
     await removeVirtualNode(ctx.userId, path);
   })().catch(() => {
     // Best-effort embedding sync
@@ -504,7 +502,7 @@ export async function moveSkillPath(
     return null;
   }
 
-  const { customSkills } = await import("next-vibe/agent/skills/db");
+  const { customSkills } = await import("../../skills/db");
 
   const rows = await db
     .select({
@@ -559,7 +557,7 @@ export async function moveSkillPath(
 
   void (async (): Promise<void> => {
     const { removeVirtualNode, syncVirtualNodeToEmbedding } =
-      await import("next-vibe/agent/cortex/embeddings/sync-virtual");
+      await import("../embeddings/sync-virtual");
     await removeVirtualNode(ctx.userId, fromPath);
     const readResult = await readSkillPath(ctx.userId, toPath);
     if (readResult) {

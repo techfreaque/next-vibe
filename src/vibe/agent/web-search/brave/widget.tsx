@@ -7,7 +7,7 @@
 
 "use client";
 
-import { useChatSettings } from "next-vibe/agent/chat/settings/hooks";
+import { useChatSettings } from "../../chat/settings/hooks";
 import { Button } from "next-vibe/ui/ui/button";
 import { Card, CardContent } from "next-vibe/ui/ui/card";
 import { Div } from "next-vibe/ui/ui/div";

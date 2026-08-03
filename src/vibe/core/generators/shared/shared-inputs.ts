@@ -13,13 +13,9 @@
 
 import "server-only";
 
-import type { ApiSection } from "next-vibe/core/definition/endpoint-base";
-import type { LiveIndex } from "next-vibe/core/generators/shared/live-index";
-import {
-  findFilesRecursively,
-  toImportUrl,
-} from "next-vibe/core/generators/shared/utils";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import type { ApiSection } from "../../definition/endpoint-base";
+import { findFilesRecursively, toImportUrl } from "./utils";
+import type { EndpointLogger } from "../../../logger/types";
 
 import { getApiDir } from "@/env/paths";
 
@@ -33,6 +29,37 @@ import { getApiDir } from "@/env/paths";
  * the import failed (logged, skipped downstream).
  */
 type DefinitionDefault = ApiSection | null;
+
+/**
+ * The warm file index `findInputs` MAY consume — the optional fast path.
+ *
+ * A dev watcher can maintain this index so generators resolve their inputs from
+ * memory instead of re-walking the tree. It is optional by construction: a build
+ * that ships no watcher simply never passes one, and every `findInputs` falls
+ * back to a disk scan.
+ *
+ * Declared structurally here rather than imported from the watcher module on
+ * purpose — that keeps `GeneratorDefinition` a SINGLE shape across trees. A fork
+ * with no watcher can drop live-index.ts entirely and this module still
+ * compiles, because nothing in the generator contract depends on it.
+ *
+ * The watcher's own `LiveIndex` satisfies this by construction; it carries extra
+ * state (dirty flags, method cache) that input resolution has no business
+ * reading, which is exactly why this narrower shape exists.
+ */
+export interface GeneratorInputIndex {
+  definitionFiles: ReadonlySet<string>;
+  routeFiles: ReadonlySet<string>;
+  clientRouteFiles: ReadonlySet<string>;
+  taskFiles: ReadonlySet<string>;
+  taskRunnerFiles: ReadonlySet<string>;
+  seedFiles: ReadonlySet<string>;
+  emailFiles: ReadonlySet<string>;
+  graphSeedFiles: ReadonlySet<string>;
+  promptFragmentFiles: ReadonlySet<string>;
+  defaultSkillFiles: ReadonlySet<string>;
+  categoryFiles: ReadonlySet<string>;
+}
 
 /** File lists, scanned once. Empty arrays when a category has no files. */
 interface GeneratorFileLists {
@@ -86,10 +113,24 @@ export interface GeneratorDefinition {
   cacheKey: string | null;
   /**
    * Return the input files whose changes should invalidate the gen-cache.
-   * Only needed when the generator has domain-specific inputs not covered by
-   * the shared file-pattern scanning in find-generator-inputs.ts.
+   *
+   * The {@link GeneratorInputIndex} argument is an OPTIONAL fast path: when a
+   * watcher supplies a warm index, read the pre-built sets; otherwise scan disk.
+   * An implementation that ignores it entirely — `findInputs()` with no
+   * parameter — satisfies this signature, so a build with no watcher needs no
+   * change to this contract.
    */
-  findInputs: (live?: LiveIndex) => string[];
+  findInputs: (live?: GeneratorInputIndex) => string[];
+  /**
+   * Output artefact(s), project-root relative — the gen-cache existence check.
+   * Deleting any listed file forces a re-run even when the input fingerprint is
+   * unchanged; without it a deleted output stays gone until someone runs --force.
+   *
+   * Optional because a generator that writes a whole directory tree (route
+   * shells, native indexes) has no single file whose absence proves the work is
+   * undone. Those omit it and keep the inputs-only behaviour.
+   */
+  output?: string | readonly string[];
   generate: (ctx: GeneratorContext) => Promise<GeneratorResult>;
 }
 
@@ -150,10 +191,10 @@ async function importDefaultWithRetry(
 function scanFileLists(
   apiDir: string,
   apiRoot: string,
-  live?: LiveIndex,
+  live?: GeneratorInputIndex,
 ): GeneratorFileLists {
   const fromLive = (
-    set: Set<string> | undefined,
+    set: ReadonlySet<string> | undefined,
     dir: string,
     name: string,
   ): string[] => (set ? [...set] : findFilesRecursively(dir, name));
@@ -191,7 +232,7 @@ interface BuildContextOptions {
   logger: EndpointLogger;
   force: boolean;
   /** Warm index from the dev watcher; disk scan when absent. */
-  live?: LiveIndex;
+  live?: GeneratorInputIndex;
   /**
    * Which computed artifacts to eagerly build. `definitionModules` is parsed only
    * when requested (the endpoint generators need it; a task-only dirty run does not).

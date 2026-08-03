@@ -95,6 +95,7 @@ export const translations = {
       server: {
         title: "Server Error",
         description: "Failed to create checkout session",
+        detail: "Checkout could not be started: {{error}}",
       },
       unknown: {
         title: "Unknown Error",

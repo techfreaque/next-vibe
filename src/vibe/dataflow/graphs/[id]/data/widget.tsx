@@ -25,16 +25,12 @@ import type {
   Time,
   UTCTimestamp,
 } from "lightweight-charts";
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
-import { GraphOwnerType, GraphResolution } from "next-vibe/dataflow/enum";
-import type { GraphNodeConfig } from "next-vibe/dataflow/graph/schema";
-import type { GraphConfig } from "next-vibe/dataflow/graph/types";
-import editDefinitions from "next-vibe/dataflow/graphs/[id]/edit/definition";
-import versionsDefinitions from "next-vibe/dataflow/graphs/[id]/versions/definition";
-import {
-  type Resolution,
-  RESOLUTION_MS,
-} from "next-vibe/dataflow/shared/fields";
+import { GraphOwnerType, GraphResolution } from "../../../enum";
+import type { GraphNodeConfig } from "../../../graph/schema";
+import type { GraphConfig } from "../../../graph/types";
+import editDefinitions from "../edit/definition";
+import versionsDefinitions from "../versions/definition";
+import { type Resolution, RESOLUTION_MS } from "../../../shared/fields";
 import { getRootCssVar } from "next-vibe/ui/lib/css-vars";
 import {
   addDocumentListener,
@@ -67,7 +63,7 @@ import { Shield } from "next-vibe/ui/ui/icons/Shield";
 import { X } from "next-vibe/ui/ui/icons/X";
 import { Span } from "next-vibe/ui/ui/span";
 import { P } from "next-vibe/ui/ui/typography";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../../unified-ui/_shared/cn";
 import {
   useWidgetEndpointMutations,
   useWidgetLocale,
@@ -76,8 +72,8 @@ import {
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
-import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
+} from "../../../../unified-ui/_shared/use-widget-context";
+import { useEndpoint } from "../../../../unified-ui/hooks/use-endpoint";
 import React, {
   useCallback,
   useEffect,
@@ -1798,7 +1794,6 @@ export function GraphChartView(): React.JSX.Element {
   const logger = useWidgetLogger();
   const user = useWidgetUser();
   const locale = useWidgetLocale();
-  const availability = useProviderAvailability();
 
   const [resolution, setResolution] = useState<Resolution>(
     GraphResolution.ONE_DAY,
@@ -1929,7 +1924,8 @@ export function GraphChartView(): React.JSX.Element {
       setOptimisticConfig(newConfig);
       setIsSavingLayout(true);
       void (async (): Promise<void> => {
-        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
+        const { apiClient } =
+          await import("../../../../unified-ui/hooks/store");
         const result = await apiClient.mutate(
           editDefinitions.PUT,
           logger,
@@ -1937,7 +1933,6 @@ export function GraphChartView(): React.JSX.Element {
           { config: newConfig },
           { id: graph.id },
           locale,
-          availability,
         );
         setIsSavingLayout(false);
         if (result.success) {
@@ -1960,7 +1955,7 @@ export function GraphChartView(): React.JSX.Element {
         }
       })();
     },
-    [graph, logger, user, locale, availability, navigation, t],
+    [graph, logger, user, locale, navigation, t],
   );
 
   // Node display configs from graph config (uses optimistic config when in-flight)
@@ -2103,7 +2098,7 @@ export function GraphChartView(): React.JSX.Element {
       navigation.pop();
     } else {
       void (async (): Promise<void> => {
-        const listDef = await import("next-vibe/dataflow/graphs/definition");
+        const listDef = await import("../../definition");
         navigation.push(listDef.default.GET);
       })();
     }
@@ -2114,8 +2109,7 @@ export function GraphChartView(): React.JSX.Element {
       return;
     }
     void (async (): Promise<void> => {
-      const backtestDef =
-        await import("next-vibe/dataflow/graphs/[id]/backtest/definition");
+      const backtestDef = await import("../backtest/definition");
       navigation.push(backtestDef.default.POST, {
         urlPathParams: { id: graph.id },
         renderInModal: true,
@@ -2128,8 +2122,7 @@ export function GraphChartView(): React.JSX.Element {
       return;
     }
     void (async (): Promise<void> => {
-      const editDef =
-        await import("next-vibe/dataflow/graphs/[id]/edit/definition");
+      const editDef = await import("../edit/definition");
       navigation.push(editDef.default.PUT, {
         urlPathParams: { id: graph.id },
       });
@@ -2141,8 +2134,7 @@ export function GraphChartView(): React.JSX.Element {
       return;
     }
     void (async (): Promise<void> => {
-      const archiveDef =
-        await import("next-vibe/dataflow/graphs/[id]/archive/definition");
+      const archiveDef = await import("../archive/definition");
       navigation.push(archiveDef.default.POST, {
         urlPathParams: { id: graph.id },
         renderInModal: true,
@@ -2156,8 +2148,7 @@ export function GraphChartView(): React.JSX.Element {
       return;
     }
     void (async (): Promise<void> => {
-      const promoteDef =
-        await import("next-vibe/dataflow/graphs/[id]/promote/definition");
+      const promoteDef = await import("../promote/definition");
       navigation.push(promoteDef.default.POST, {
         urlPathParams: { id: graph.id },
         renderInModal: true,

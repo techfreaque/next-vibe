@@ -8,21 +8,21 @@
 
 import "server-only";
 
-import { coreEnv } from "next-vibe/core/env";
-import { GeneratorRunner } from "next-vibe/core/generators/repository";
-import type { LiveIndex } from "next-vibe/core/generators/shared/live-index";
+import { coreEnv } from "../../core/env";
+import { GeneratorRunner } from "../../core/generators/repository";
+import type { LiveIndex } from "../../core/generators/shared/live-index";
 import {
   buildLiveIndex,
   classifyFile,
   clearDirtyFlags,
   updateLiveIndex,
-} from "next-vibe/core/generators/shared/live-index";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { Environment } from "next-vibe/env/env-util";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { tasksEnv } from "next-vibe/tasks/env";
-import type { TasksTranslationKey } from "next-vibe/tasks/i18n";
-import type { TaskRunner } from "next-vibe/tasks/unified-runner/types";
+} from "../../core/generators/shared/live-index";
+import { parseError } from "../../core/utils/parse-error";
+import { Environment } from "../../env/env-util";
+import type { EndpointLogger } from "../../logger/types";
+import { tasksEnv } from "../env";
+import type { TasksTranslationKey } from "../i18n";
+import type { TaskRunner } from "../unified-runner/types";
 
 import { CronTaskPriority, TaskCategory } from "../enum";
 import { DEV_WATCHER_TASK_NAME } from "./constants";

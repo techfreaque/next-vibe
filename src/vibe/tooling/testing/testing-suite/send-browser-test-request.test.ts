@@ -9,7 +9,7 @@
 
 import "server-only";
 
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import userCreateDefinitions, {
@@ -34,7 +34,7 @@ const TEST_TIMEOUT = 120_000;
 describe("sendBrowserTestRequest", () => {
   beforeAll(async () => {
     const { readPidFilePort, ATLAS_PID_FILE } =
-      await import("next-vibe/server/server/pid");
+      await import("../../../server/server/pid");
     expect(
       readPidFilePort(ATLAS_PID_FILE),
       "Atlas dev server not running — start with `vibe dev`",

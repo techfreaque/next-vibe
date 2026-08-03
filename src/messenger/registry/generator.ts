@@ -5,11 +5,7 @@
 
 import "server-only";
 
-import type {
-  GeneratorContext,
-  GeneratorDefinition,
-  GeneratorResult,
-} from "next-vibe/core/generators/shared/shared-inputs";
+import type { GeneratorDefinition } from "next-vibe/core/generators/shared/shared-inputs";
 import {
   findFilesRecursively,
   generateFileHeader,
@@ -269,11 +265,11 @@ class EmailTemplateGenerator {
             metadata: {
               id,
               version: templateDef.meta.version,
-              // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- meta fields are string keys; any/unknown from EmailTemplateDefinitionAny
+              // eslint-disable-next-line restricted/restricted-syntax -- meta fields are string keys; any/unknown from EmailTemplateDefinitionAny
               name: templateDef.meta.name as string,
-              // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- meta fields are string keys; any/unknown from EmailTemplateDefinitionAny
+              // eslint-disable-next-line restricted/restricted-syntax -- meta fields are string keys; any/unknown from EmailTemplateDefinitionAny
               description: templateDef.meta.description as string,
-              // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- meta fields are string keys; any/unknown from EmailTemplateDefinitionAny
+              // eslint-disable-next-line restricted/restricted-syntax -- meta fields are string keys; any/unknown from EmailTemplateDefinitionAny
               category: templateDef.meta.category as string,
               path: stripProjectRoot(file),
               exampleProps: validProps,
@@ -530,11 +526,11 @@ export async function getTranslatedTemplateMetadata(
   const { t } = template.scopedTranslation.scopedT(locale);
   return {
     ...cached,
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- sealed dispatch: keys come from the same template's own translation scope
+    // eslint-disable-next-line restricted/restricted-syntax -- sealed dispatch: keys come from the same template's own translation scope
     name: t(template.meta.name as never),
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- sealed dispatch: keys come from the same template's own translation scope
+    // eslint-disable-next-line restricted/restricted-syntax -- sealed dispatch: keys come from the same template's own translation scope
     description: t(template.meta.description as never),
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- sealed dispatch: keys come from the same template's own translation scope
+    // eslint-disable-next-line restricted/restricted-syntax -- sealed dispatch: keys come from the same template's own translation scope
     category: t(template.meta.category as never),
   };
 }
@@ -556,15 +552,15 @@ export function translatePreviewFields(
   for (const [key, field] of Object.entries(fields)) {
     result[key] = {
       ...field,
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- sealed dispatch: keys come from the same template's own translation scope
+      // eslint-disable-next-line restricted/restricted-syntax -- sealed dispatch: keys come from the same template's own translation scope
       label: t(field.label as never),
       description: field.description
-        ? // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- sealed dispatch: keys come from the same template's own translation scope
+        ? // eslint-disable-next-line restricted/restricted-syntax -- sealed dispatch: keys come from the same template's own translation scope
           t(field.description as never)
         : undefined,
       options: field.options?.map((opt) => ({
         value: opt.value,
-        // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- sealed dispatch: keys come from the same template's own translation scope
+        // eslint-disable-next-line restricted/restricted-syntax -- sealed dispatch: keys come from the same template's own translation scope
         label: t(opt.label as never),
       })),
     };

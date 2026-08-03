@@ -8,7 +8,7 @@
  * Auto-upgrades trust_level to VERIFIED when vote_count >= threshold.
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,

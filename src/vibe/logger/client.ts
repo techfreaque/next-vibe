@@ -4,9 +4,8 @@
  * Import this in all client code: "use client" components, client hooks, etc.
  */
 
-import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import type { CountryLanguage } from "../core/i18n/core/config";
+import { UserPermissionRole } from "../identity/roles/enum";
 
 import { createLogger } from "./create-logger";
 import type { EndpointLogger, LoggerMetadata } from "./types";
@@ -54,7 +53,6 @@ function reportToServer(
   metadata: LoggerMetadata[],
   locale: CountryLanguage,
   tabId: string | undefined,
-  availability: AgentEnvAvailability,
 ): void {
   const allMeta = error !== undefined ? [error, ...metadata] : metadata;
   const metaPayload = allMeta
@@ -78,8 +76,8 @@ function reportToServer(
   void (async (): Promise<void> => {
     try {
       const [{ executeMutation }, { POST }] = await Promise.all([
-        import("next-vibe/unified-ui/hooks/mutation-executor"),
-        import("next-vibe/logger/error-monitor/client-log/definition"),
+        import("../unified-ui/hooks/mutation-executor"),
+        import("./error-monitor/client-log/definition"),
       ]);
 
       // Minimal public-user stub - server re-auths from the JWT cookie.
@@ -101,7 +99,6 @@ function reportToServer(
         pathParams: undefined as never,
         locale,
         user: publicUser,
-        availability,
       });
     } catch {
       // silently swallow - client logger must never cascade
@@ -112,22 +109,13 @@ function reportToServer(
 export function createClientLogger(
   debugEnabled = false,
   locale: CountryLanguage,
-  availability: AgentEnvAvailability,
   tabId?: string,
 ): EndpointLogger {
   return createLogger(
     debugEnabled,
     locale,
     (level, message, error, metadata) => {
-      reportToServer(
-        level,
-        message,
-        error,
-        metadata,
-        locale,
-        tabId,
-        availability,
-      );
+      reportToServer(level, message, error, metadata, locale, tabId);
     },
   );
 }

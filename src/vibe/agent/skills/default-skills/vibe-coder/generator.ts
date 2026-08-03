@@ -48,10 +48,12 @@ export const generator: GeneratorDefinition = {
       ),
     ];
   },
+  // Derived from the same fixed TARGETS list the run writes, so the two cannot
+  // drift apart when a doc target is added or renamed.
+  output: TARGETS.map((target) => target.fileName),
   /** Generate CLAUDE.md + AGENTS.md from PROJECT_INSTRUCTIONS. */
   async generate(ctx) {
-    const { PROJECT_INSTRUCTIONS } =
-      await import("next-vibe/agent/skills/default-skills/vibe-coder/skill");
+    const { PROJECT_INSTRUCTIONS } = await import("./skill");
 
     const projectRoot = process.cwd();
     let filesWritten = 0;

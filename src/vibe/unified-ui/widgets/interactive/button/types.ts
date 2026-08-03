@@ -2,14 +2,17 @@
  * Button Widget Type Definitions
  */
 
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { SpacingSize, WidgetType } from "next-vibe/core/definition/enums";
-import type { ReactWidgetContext } from "next-vibe/unified-ui/_shared/react-types";
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
+import type {
+  SpacingSize,
+  WidgetType,
+} from "../../../../core/definition/enums";
+import type { ReactWidgetContext } from "../../../_shared/react-types";
 import type {
   BasePrimitiveDisplayOnlyWidgetConfig,
   FieldUsageConfig,
-} from "next-vibe/unified-ui/_shared/types";
-import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+} from "../../../_shared/types";
+import type { IconKey } from "../../form-fields/icon-field/icons";
 
 /**
  * Button Widget Configuration

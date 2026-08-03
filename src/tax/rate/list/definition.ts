@@ -4,7 +4,7 @@
  */
 
 import { dateSchema } from "next-vibe/core/definition/common.schema";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -260,7 +260,6 @@ const { GET } = createEndpoint({
 export type TaxRateListRequestOutput = typeof GET.types.RequestOutput;
 export type TaxRateListRequestInput = typeof GET.types.RequestInput;
 export type TaxRateListResponseOutput = typeof GET.types.ResponseOutput;
-export type TaxRateListItem = TaxRateListResponseOutput["rates"][number];
 
 const definitions = { GET } as const;
 export default definitions;

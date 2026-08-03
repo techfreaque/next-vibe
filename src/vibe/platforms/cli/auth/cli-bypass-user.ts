@@ -3,8 +3,8 @@
  * Used when an endpoint has CLI_AUTH_BYPASS and the platform is not MCP.
  */
 
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import type { JwtPrivatePayloadType } from "../../../identity/auth/types";
+import { UserPermissionRole } from "../../../identity/roles/enum";
 
 const CLI_BYPASS_USER_ID = "00000000-0000-0000-0000-000000000001";
 

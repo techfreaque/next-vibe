@@ -79,7 +79,8 @@ export const translations = {
       },
       server: {
         title: "Server Error",
-        description: "Docker build or push failed: {{error}}",
+        // Declared errorTypes label - rendered param-free, so no placeholder.
+        description: "Docker build or push failed",
       },
       unknown: {
         title: "Unknown Error",
@@ -105,7 +106,10 @@ export const translations = {
         pushSuccess: "🚀 Pushed {{refs}}",
         buildExitCode: "docker buildx exited with code {{code}}",
         buildKilled: "docker buildx was killed by signal {{signal}}",
+        dockerBuildFailed: "Docker build failed: {{error}}",
         gitShaFailed: "Could not resolve the current git commit SHA",
+        gitShaFailedDetail:
+          "Could not resolve the current git commit SHA: {{error}}",
         sshTransferStart: "📡 Transferring {{refs}} to {{target}} via ssh ...",
         sshTransferSuccess: "🚀 Transferred {{refs}} to {{target}} via ssh",
         sshTransferFailed: "ssh transfer to {{target}} failed: {{error}}",

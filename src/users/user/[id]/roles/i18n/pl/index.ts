@@ -54,6 +54,7 @@ export const translations: typeof enTranslations = {
         notFound: {
           title: "Użytkownik nie znaleziony",
           description: "Nie można znaleźć podanego użytkownika",
+          detail: "Nie ma użytkownika o ID {{userId}}.",
         },
         conflict: {
           title: "Rola już przypisana",
@@ -70,6 +71,7 @@ export const translations: typeof enTranslations = {
         server: {
           title: "Błąd serwera",
           description: "Nie można dodać roli z powodu błędu serwera",
+          detail: "Nie udało się nadać roli {{role}} użytkownikowi {{userId}}.",
         },
         unknown: {
           title: "Nieznany błąd",
@@ -126,6 +128,7 @@ export const translations: typeof enTranslations = {
         notFound: {
           title: "Użytkownik nie znaleziony",
           description: "Nie można znaleźć podanego użytkownika",
+          detail: "Nie ma użytkownika o ID {{userId}}.",
         },
         conflict: {
           title: "Błąd konfliktu",
@@ -142,6 +145,8 @@ export const translations: typeof enTranslations = {
         server: {
           title: "Błąd serwera",
           description: "Nie można usunąć roli z powodu błędu serwera",
+          detail:
+            "Nie udało się odebrać roli {{role}} użytkownikowi {{userId}}.",
         },
         unknown: {
           title: "Nieznany błąd",

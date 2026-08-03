@@ -102,9 +102,10 @@ export class MessengerAccountEditRepository {
     } catch (error) {
       logger.error("Error getting messenger account", parseError(error));
       return fail({
-        message: t("errors.server.title"),
+        message: t("errors.server.detail_get", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -305,9 +306,10 @@ export class MessengerAccountEditRepository {
     } catch (error) {
       logger.error("Error updating messenger account", parseError(error));
       return fail({
-        message: t("errors.server.title"),
+        message: t("errors.server.detail_update", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -344,9 +346,10 @@ export class MessengerAccountEditRepository {
     } catch (error) {
       logger.error("Error deleting messenger account", parseError(error));
       return fail({
-        message: t("errors.server.title"),
+        message: t("errors.server.detail_delete", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }

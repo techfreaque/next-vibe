@@ -68,9 +68,8 @@ export class InboxFoldersRepository {
       const parsed = parseError(error);
       logger.error("inbox.folders: Critical error", parsed);
       return fail({
-        message: t("errors.server.title"),
+        message: t("errors.server.detail", { error: parsed.message }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsed.message },
       });
     }
   }

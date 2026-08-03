@@ -98,59 +98,74 @@ export const translations: typeof enTranslations = {
 
   errors: {
     userNotFound: {
+      detail: "Kein Konto für Benutzer {{userId}} gefunden",
       title: "Benutzer nicht gefunden",
       description: "Der angegebene Benutzer konnte nicht gefunden werden",
     },
     customerCreationFailed: {
+      detail:
+        "NOWPayments-Kundenkonto konnte nicht angelegt werden: {{error}} (Benutzer {{userId}})",
       title: "Kundenerstellung fehlgeschlagen",
-      description: "NOWPayments-Kunde konnte nicht erstellt werden: {error}",
+      description: "NOWPayments-Kunde konnte nicht erstellt werden: {{error}}",
     },
     productNotFound: {
+      detail: "Produkt {{productId}} existiert nicht",
       title: "Produkt nicht gefunden",
       description:
-        "Das angegebene Produkt konnte nicht gefunden werden: {productId}",
+        "Das angegebene Produkt konnte nicht gefunden werden: {{productId}}",
     },
     userEmailRequired: {
       title: "Benutzer-E-Mail erforderlich",
-      description: "Benutzer-E-Mail ist für Abonnements erforderlich: {userId}",
+      description:
+        "Benutzer-E-Mail ist für Abonnements erforderlich: {{userId}}",
     },
     checkoutCreationFailed: {
+      detail: "Krypto-Bezahlvorgang konnte nicht gestartet werden: {{error}}",
       title: "Checkout-Erstellung fehlgeschlagen",
       description:
-        "NOWPayments-Checkout-Sitzung konnte nicht erstellt werden: {error}",
+        "NOWPayments-Checkout-Sitzung konnte nicht erstellt werden: {{error}}",
     },
     invoiceCreationFailed: {
+      detail: "NOWPayments-Rechnung konnte nicht erstellt werden: {{error}}",
       title: "Rechnungserstellung fehlgeschlagen",
-      description: "NOWPayments-Rechnung konnte nicht erstellt werden: {error}",
+      description:
+        "NOWPayments-Rechnung konnte nicht erstellt werden: {{error}}",
     },
     invalidApiKey: {
+      detail:
+        "Ungültiger NOWPayments-API-Schlüssel. Prüfe NOWPAYMENTS_API_KEY in deiner Umgebung und bestätige den Schlüssel unter https://nowpayments.io/app/dashboard",
       title: "Ungültiger API-Schlüssel",
       description:
         "Ungültiger NOWPayments API-Schlüssel. Bitte überprüfen Sie Ihre Konfiguration und stellen Sie sicher, dass Sie einen gültigen API-Schlüssel von https://nowpayments.io/app/dashboard haben",
     },
     planCreationFailed: {
       title: "Plan-Erstellung fehlgeschlagen",
-      description: "NOWPayments-Abo-Plan konnte nicht erstellt werden: {error}",
+      description:
+        "NOWPayments-Abo-Plan konnte nicht erstellt werden: {{error}}",
     },
     subscriptionCreationFailed: {
       title: "Abo-Erstellung fehlgeschlagen",
       description:
-        "NOWPayments-Abonnement konnte nicht erstellt werden: {error}",
+        "NOWPayments-Abonnement konnte nicht erstellt werden: {{error}}",
     },
     subscriptionRetrievalFailed: {
+      detail: "NOWPayments-Abonnement konnte nicht geladen werden: {{error}}",
       title: "Abo-Abruf fehlgeschlagen",
       description:
-        "NOWPayments-Abonnement konnte nicht abgerufen werden: {error}",
+        "NOWPayments-Abonnement konnte nicht abgerufen werden: {{error}}",
     },
     subscriptionCancellationFailed: {
+      detail: "NOWPayments-Abonnement konnte nicht gekündigt werden: {{error}}",
       title: "Abo-Kündigung fehlgeschlagen",
       description:
-        "NOWPayments-Abonnement konnte nicht gekündigt werden: {error}",
+        "NOWPayments-Abonnement konnte nicht gekündigt werden: {{error}}",
     },
     subscriptionListFailed: {
+      detail:
+        "NOWPayments-Abonnements konnten nicht aufgelistet werden: {{error}}",
       title: "Abo-Listenabruf fehlgeschlagen",
       description:
-        "NOWPayments-Abonnements konnten nicht aufgelistet werden: {error}",
+        "NOWPayments-Abonnements konnten nicht aufgelistet werden: {{error}}",
     },
     notConfigured: {
       title: "NOWPayments nicht konfiguriert",
@@ -158,14 +173,18 @@ export const translations: typeof enTranslations = {
         "NOWPayments ist nicht konfiguriert - setze NOWPAYMENTS_API_KEY und NOWPAYMENTS_IPN_SECRET in deiner .env",
     },
     webhookVerificationFailed: {
+      detail: "NOWPayments-Webhook konnte nicht verifiziert werden: {{error}}",
+      invalidSignature: "Webhook-Signatur stimmt nicht überein",
       title: "Webhook-Verifizierung fehlgeschlagen",
       description:
-        "NOWPayments-Webhook-Signatur konnte nicht verifiziert werden: {error}",
+        "NOWPayments-Webhook-Signatur konnte nicht verifiziert werden: {{error}}",
     },
     paymentStatusFailed: {
+      detail:
+        "Zahlungsstatus konnte nicht von NOWPayments abgerufen werden: {{error}}",
       title: "Abruf des Zahlungsstatus fehlgeschlagen",
       description:
-        "Zahlungsstatus konnte nicht von NOWPayments abgerufen werden: {error}",
+        "Zahlungsstatus konnte nicht von NOWPayments abgerufen werden: {{error}}",
     },
   },
 

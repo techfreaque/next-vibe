@@ -1,12 +1,12 @@
 import "server-only";
 
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { ResponseType } from "../../../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
+} from "../../../../../core/route/response.schema";
+import { parseError } from "../../../../../core/utils/parse-error";
 
 import type { ClientT } from "@/ssh/client";
 import {

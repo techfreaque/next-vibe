@@ -46,6 +46,11 @@ export const translations: typeof enTranslations = {
       notFound: {
         title: "Brak sesji",
         description: "Nie znaleziono aktywnej sesji interaktywnej",
+        noSession:
+          "Żadna sesja interaktywna nie działa. Uruchom ją: vibe <alias> -i --agent-control",
+        deadSession: "Sesja o PID {{pid}} już nie działa.",
+        frameNotFound:
+          "Sesja {{pid}} nie wyrenderowała jeszcze ramki. Poczekaj chwilę i spróbuj ponownie.",
       },
       unknown: {
         title: "Nieznany błąd",
@@ -116,6 +121,11 @@ export const translations: typeof enTranslations = {
       notFound: {
         title: "Brak sesji",
         description: "Nie znaleziono aktywnej sesji interaktywnej",
+        noSession:
+          "Żadna sesja interaktywna nie działa. Uruchom ją: vibe <alias> -i --agent-control",
+        deadSession: "Sesja o PID {{pid}} już nie działa.",
+        keysNotFound:
+          "Sesja {{pid}} nie przyjmuje jeszcze klawiszy. Poczekaj chwilę i spróbuj ponownie.",
       },
       unknown: {
         title: "Nieznany błąd",

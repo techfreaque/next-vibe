@@ -21,7 +21,7 @@
 
 import "server-only";
 
-import { agentEnv } from "next-vibe/agent/env";
+import { agentEnv } from "../../../env";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
@@ -64,7 +64,7 @@ async function fetchUsdPerChar(
   }
 
   try {
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+    // oxlint-disable-next-line restricted/no-raw-fetch
     const response = await fetch(SUBSCRIPTION_URL, {
       headers: { "xi-api-key": apiKey },
     });

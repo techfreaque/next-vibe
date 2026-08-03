@@ -3,26 +3,26 @@
  * Defines endpoints for task execution history following MIGRATION_GUIDE.md patterns
  */
 
-import { dateSchema } from "next-vibe/core/definition/common.schema";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { dateSchema } from "../../../core/definition/common.schema";
+import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { errorResponseSchema } from "next-vibe/core/route/response.schema";
-import { WidgetDataSchema } from "next-vibe/core/utils/json";
-import { UserRole } from "next-vibe/identity/roles/enum";
-import { scopedTranslation } from "next-vibe/tasks/cron/history/i18n";
-import { CronTaskPriorityDB, CronTaskStatusDB } from "next-vibe/tasks/enum";
-import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
-import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
+} from "../../../core/definition/enums";
+import { errorResponseSchema } from "../../../core/route/error-response.schema";
+import { WidgetDataSchema } from "../../../core/utils/json";
+import { UserRole } from "../../../identity/roles/enum";
+import { scopedTranslation } from "./i18n";
+import { CronTaskPriorityDB, CronTaskStatusDB } from "../../enum";
+import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "../../../unified-ui/_shared/utils";
 import {
   backButton,
   requestField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../../unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { CRON_HISTORY_ALIAS } from "./constants";

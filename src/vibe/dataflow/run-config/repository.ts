@@ -5,17 +5,17 @@
 
 import "server-only";
 
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { ResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { runGraph } from "next-vibe/dataflow/engine/runner";
-import { graphConfigSchema } from "next-vibe/dataflow/graph/schema";
-import type { VibeSenseRunConfigT } from "next-vibe/dataflow/run-config/i18n";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../core/route/response.schema";
+import { parseError } from "../../core/utils/parse-error";
+import { runGraph } from "../engine/runner";
+import { graphConfigSchema } from "../graph/schema";
+import type { VibeSenseRunConfigT } from "./i18n";
+import type { EndpointLogger } from "../../logger/types";
 
 import type {
   RunConfigRequestOutput,
@@ -31,10 +31,13 @@ export class RunConfigRepository {
     try {
       const parsed = graphConfigSchema.safeParse(data.config);
       if (!parsed.success) {
+        // The `title`/`description` pair is the definition's declared
+        // VALIDATION_ERROR label and renders param-free there.
         return fail({
-          message: t("post.errors.validation.title"),
+          message: t("post.errors.validation.detail", {
+            error: parsed.error.message,
+          }),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: { error: parsed.error.message },
         });
       }
 
@@ -55,9 +58,8 @@ export class RunConfigRepository {
       const parsedError = parseError(error);
       logger.error("[vibe-sense] run-config failed", parsedError);
       return fail({
-        message: t("post.errors.server.title"),
+        message: t("post.errors.server.detail", { error: parsedError.message }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
       });
     }
   }

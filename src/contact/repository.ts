@@ -104,9 +104,10 @@ export class ContactRepository {
 
       if (!contact) {
         return fail({
-          message: t("errors.repositoryCreateFailed"),
+          message: t("errors.repositoryCreateFailedForEmail", {
+            email: email ?? "unknown",
+          }),
           errorType: ErrorResponseTypes.DATABASE_ERROR,
-          messageParams: { email: email ?? "unknown" },
         });
       }
 
@@ -148,12 +149,11 @@ export class ContactRepository {
       const parsedError = parseError(error);
       logger.error(t("repository.create.error"), parsedError);
       return fail({
-        message: t("errors.repositoryCreateFailed"),
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: {
+        message: t("errors.repositoryCreateFailedWithDetails", {
           error: parsedError.message,
           details: t("errors.repositoryCreateDetails"),
-        },
+        }),
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
       });
     }
   }
@@ -190,11 +190,10 @@ export class ContactRepository {
 
       if (!contact) {
         return fail({
-          message: t("errors.repositoryCreateFailed"),
-          errorType: ErrorResponseTypes.DATABASE_ERROR,
-          messageParams: {
+          message: t("errors.repositoryCreateFailed", {
             error: t("errors.noContactReturned"),
-          },
+          }),
+          errorType: ErrorResponseTypes.DATABASE_ERROR,
         });
       }
 
@@ -207,11 +206,10 @@ export class ContactRepository {
       const parsedError = parseError(error);
       logger.error(t("repository.seed.create.error"), parsedError);
       return fail({
-        message: t("errors.repositoryCreateFailed"),
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: {
+        message: t("errors.repositoryCreateFailed", {
           error: parsedError.message,
-        },
+        }),
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
       });
     }
   }

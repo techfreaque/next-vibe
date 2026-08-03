@@ -14,13 +14,15 @@
 
 import "server-only";
 
-import { pathSegmentsToToolName } from "next-vibe/core/core-utils/path";
-import { zodSchemaToJsonSchema } from "next-vibe/core/definition/endpoint-to-metadata";
-import { FieldUsage } from "next-vibe/core/definition/enums";
-import { coreEnv } from "next-vibe/core/env";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { generateSchemaForUsage } from "next-vibe/unified-ui/_shared/utils";
+import { pathSegmentsToToolName } from "../../../core/core-utils/path";
+import { zodSchemaToJsonSchema } from "../../../core/definition/endpoint-to-metadata";
+import { FieldUsage } from "../../../core/definition/enums";
+import { coreEnv } from "../../../core/env";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import type { WidgetData } from "../../../core/utils/json";
+import { filterUserPermissionRoles } from "../../../identity/roles/enum";
+import { Platform } from "../../platforms";
+import { generateSchemaForUsage } from "../../../unified-ui/_shared/utils";
 import { z } from "zod";
 
 // ============================================================================
@@ -187,14 +189,25 @@ async function renderInputSchemaBlock(toolName: string): Promise<string> {
       return "";
     }
 
+    // REMOTE_SKILL: this generator writes the AI skill markdown (AGENT.md and
+    // friends), which is exactly the surface that platform marker describes. Fields
+    // hidden for remote-skill discovery must not leak into the documented schema.
+    // No specific reader is known at doc-generation time, so the endpoint's own
+    // declared allowedRoles (every role that can ever call it) is the real,
+    // meaningful role set - matching the static-schema convention in create.ts.
+    const docUserRoles = filterUserPermissionRoles(endpoint.allowedRoles);
     const requestDataSchema = generateSchemaForUsage(
       endpoint.fields,
       FieldUsage.RequestData,
+      docUserRoles,
+      Platform.REMOTE_SKILL,
     ) as z.ZodObject<Record<string, z.ZodTypeAny>> | z.ZodNever;
 
     const urlParamsSchema = generateSchemaForUsage(
       endpoint.fields,
       FieldUsage.RequestUrlParams,
+      docUserRoles,
+      Platform.REMOTE_SKILL,
     ) as z.ZodObject<Record<string, z.ZodTypeAny>> | z.ZodNever;
 
     const combinedShape: Record<string, z.ZodTypeAny> = {};
@@ -577,7 +590,7 @@ export async function generateSkillAiRunMarkdown(
     return null;
   }
 
-  const { DEFAULT_SKILLS } = await import("next-vibe/agent/skills/config");
+  const { DEFAULT_SKILLS } = await import("../../../agent/skills/config");
   const defaultChar = DEFAULT_SKILLS.find((c) => c.id === skillId);
   const defaultVariant =
     defaultChar?.variants.find((v) => v.isDefault) ?? defaultChar?.variants[0];
@@ -878,13 +891,12 @@ async function getSkillSkillInfo(
   skillId: string,
   locale: CountryLanguage,
 ): Promise<SkillSkillInfo | null> {
-  const { DEFAULT_SKILLS } = await import("next-vibe/agent/skills/config");
+  const { DEFAULT_SKILLS } = await import("../../../agent/skills/config");
 
   // Check default/system skills first
   const defaultChar = DEFAULT_SKILLS.find((c) => c.id === skillId);
   if (defaultChar) {
-    const { UserPermissionRole } =
-      await import("next-vibe/identity/roles/enum");
+    const { UserPermissionRole } = await import("../../../identity/roles/enum");
 
     const roles = defaultChar.userRole ?? [
       UserPermissionRole.CUSTOMER,
@@ -900,7 +912,7 @@ async function getSkillSkillInfo(
     }
 
     const { scopedTranslation: charTranslation } =
-      await import("next-vibe/agent/skills/i18n");
+      await import("../../../agent/skills/i18n");
     const { t } = charTranslation.scopedT(locale);
 
     return {
@@ -920,9 +932,9 @@ async function getSkillSkillInfo(
   }
 
   // Fall back to DB - only PUBLIC custom skills are accessible without auth
-  const { db } = await import("next-vibe/database");
-  const { customSkills } = await import("next-vibe/agent/skills/db");
-  const { SkillOwnershipType } = await import("next-vibe/agent/skills/enum");
+  const { db } = await import("../../../database");
+  const { customSkills } = await import("../../../agent/skills/db");
+  const { SkillOwnershipType } = await import("../../../agent/skills/enum");
   const { eq, and } = await import("drizzle-orm");
 
   const [row] = await db
@@ -1008,7 +1020,7 @@ export async function generateSkillSkillMarkdown(
   }
 
   // Fetch model selection for accurate AI Run example
-  const { DEFAULT_SKILLS } = await import("next-vibe/agent/skills/config");
+  const { DEFAULT_SKILLS } = await import("../../../agent/skills/config");
   const defaultChar = DEFAULT_SKILLS.find((c) => c.id === skillId);
   const defaultVariant2 =
     defaultChar?.variants.find((v) => v.isDefault) ?? defaultChar?.variants[0];
@@ -1178,10 +1190,10 @@ export async function getListableSkills(locale: CountryLanguage): Promise<
     requiresAuth: boolean;
   }>
 > {
-  const { DEFAULT_SKILLS } = await import("next-vibe/agent/skills/config");
-  const { UserPermissionRole } = await import("next-vibe/identity/roles/enum");
+  const { DEFAULT_SKILLS } = await import("../../../agent/skills/config");
+  const { UserPermissionRole } = await import("../../../identity/roles/enum");
   const { scopedTranslation: charTranslation } =
-    await import("next-vibe/agent/skills/i18n");
+    await import("../../../agent/skills/i18n");
   const { t } = charTranslation.scopedT(locale);
 
   return DEFAULT_SKILLS.filter((char) => {

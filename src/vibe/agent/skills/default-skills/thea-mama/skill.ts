@@ -1,6 +1,6 @@
-import { AI_RUN_ALIAS } from "next-vibe/agent/ai-stream/run/constants";
-import { FETCH_URL_SHORT_ALIAS } from "next-vibe/agent/fetch-url-content/constants";
-import { WEB_SEARCH_ALIAS } from "next-vibe/agent/web-search/constants";
+import { AI_RUN_ALIAS } from "../../../ai-stream/run/constants";
+import { FETCH_URL_SHORT_ALIAS } from "../../../fetch-url-content/constants";
+import { WEB_SEARCH_ALIAS } from "../../../web-search/constants";
 import { EXECUTE_TOOL_ALIAS } from "next-vibe/execute-tool/constants";
 import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
@@ -18,7 +18,7 @@ import type { Skill } from "../../config";
 import { tool } from "../../constants";
 import { SkillCategory, SkillOwnershipType } from "../../enum";
 import { THEA_CORE_PROMPT } from "../thea/core";
-import { THEA_VARIANTS } from "../thea/skill";
+import { THEA_VARIANTS } from "../_shared/companion-selections";
 
 export const MAMA_SYSTEM_PROMPT = `${THEA_CORE_PROMPT}
 

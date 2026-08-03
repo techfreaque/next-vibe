@@ -15,9 +15,8 @@ import type { UITranslationKey } from "next-vibe/ui/i18n";
 import type * as IconsLibrary from "next-vibe/ui/ui/icons";
 import { loadIconModule } from "next-vibe/ui/ui/icons/loader";
 import { Span } from "next-vibe/ui/ui/span";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
-import type { JSX } from "react";
-import React, { useEffect, useState } from "react";
+import { cn } from "../../../_shared/cn";
+import React from "react";
 
 /**
  * Type for React components that accept className prop
@@ -29,7 +28,7 @@ export type IconComponent =
 /**
  * Type-safe icon names from the icon library
  */
-type IconLibraryName = keyof typeof IconsLibrary;
+export type IconLibraryName = keyof typeof IconsLibrary;
 
 /**
  * Icon loader function type
@@ -41,7 +40,7 @@ type IconLoader = (name: string) => Promise<{ [key: string]: IconComponent }>;
  * Delegates to loadIconModule which uses import.meta.glob so both
  * Vite (TanStack) and webpack (Next.js) can statically analyze the imports.
  */
-const loadIcon: IconLoader = (name: string) =>
+export const loadIcon: IconLoader = (name: string) =>
   loadIconModule(name) as Promise<{ [key: string]: IconComponent }>;
 
 /**
@@ -505,94 +504,6 @@ export type IconKey = keyof typeof ICON_REGISTRY;
  * DB enum array for Zod/Drizzle
  */
 export const IconKeyDB = Object.keys(ICON_REGISTRY) as readonly IconKey[];
-
-/**
- * Fallback component shown while icons are loading
- */
-const IconLoadingFallback: React.FC<{ className?: string }> = ({
-  className,
-}) => <Span className={cn("inline-block w-4 h-4", className)} />;
-
-/**
- * THE Icon component - use this everywhere
- * Handles lazy loading automatically
- *
- * @example
- * ```tsx
- * <Icon icon="folder" className="w-4 h-4" />
- * <Icon icon="🎨" className="w-4 h-4" />
- * ```
- */
-export const Icon: React.FC<{
-  icon: IconKey;
-  className?: string;
-}> = ({ icon, className }) => {
-  const [LoadedIcon, setLoadedIcon] = useState<IconComponent | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const registryValue = ICON_REGISTRY[icon];
-
-  // Load icon component from library
-  useEffect(() => {
-    // Only lazy load if it's a string component name from registry
-    if (typeof registryValue !== "string") {
-      setLoadedIcon(null);
-      return;
-    }
-
-    setIsLoading(true);
-    setLoadedIcon(null);
-
-    (async (): Promise<void> => {
-      try {
-        const iconModule = await loadIcon(registryValue);
-        const IconComp = iconModule[registryValue as IconLibraryName];
-
-        if (!IconComp) {
-          setLoadedIcon(
-            () =>
-              ({ className: cls }: { className?: string }): JSX.Element => (
-                /* oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- Fallback indicator */
-                <Span className={cls}>??</Span>
-              ),
-          );
-        } else {
-          setLoadedIcon(() => IconComp as IconComponent);
-        }
-      } catch {
-        // Error fallback
-        setLoadedIcon(
-          () =>
-            ({ className: cls }: { className?: string }): JSX.Element => (
-              /* oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- Error indicator */
-              <Span className={cls}>!</Span>
-            ),
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    })();
-  }, [registryValue]);
-
-  // Handle component from registry (emoji or special)
-  if (registryValue && typeof registryValue !== "string") {
-    const IconComponent = registryValue;
-    return <IconComponent className={className} />;
-  }
-
-  // Handle lazy-loaded icon
-  if (LoadedIcon) {
-    return <LoadedIcon className={className} />;
-  }
-
-  // Loading state
-  if (isLoading) {
-    return <IconLoadingFallback className={className} />;
-  }
-
-  // Fallback
-  return <IconLoadingFallback className={className} />;
-};
 
 /**
  * Icon categories for better organization

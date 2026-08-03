@@ -11,18 +11,14 @@
 
 import "server-only";
 
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import type { GraphNodeConfig } from "next-vibe/dataflow/graph/schema";
-import type { GraphConfig } from "next-vibe/dataflow/graph/types";
-import type {
-  DataPoint,
-  Resolution,
-  TimeRange,
-} from "next-vibe/dataflow/shared/fields";
-import type { SignalEvent } from "next-vibe/dataflow/shared/fields";
-import { RESOLUTION_MS } from "next-vibe/dataflow/shared/fields";
-import { completeRun, createRun } from "next-vibe/dataflow/store/runs";
-import { createEndpointLogger } from "next-vibe/logger/server";
+import { defaultLocale } from "../../core/i18n/core/config";
+import type { GraphNodeConfig } from "../graph/schema";
+import type { GraphConfig } from "../graph/types";
+import type { DataPoint, Resolution, TimeRange } from "../shared/fields";
+import type { SignalEvent } from "../shared/fields";
+import { RESOLUTION_MS } from "../shared/fields";
+import { completeRun, createRun } from "../store/runs";
+import { createEndpointLogger } from "../../logger/server";
 
 import { GraphResolution, RunStatus } from "../enum";
 import { executeNode, type ExecutionContext } from "./executor";

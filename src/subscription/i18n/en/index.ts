@@ -503,9 +503,9 @@ export const translations = {
       description: "Data conflict occurred",
     },
     sync_failed: "Failed to sync subscription with database",
-    database_error: "Database error occurred",
+    database_error: "Database error occurred: {{error}}",
     create_crashed: "Subscription creation failed",
-    cancel_failed: "Failed to cancel subscription",
+    cancel_failed: "Failed to cancel subscription: {{error}}",
     user_not_found: "User not found",
     stripe_customer_creation_failed: "Failed to create Stripe customer",
     not_implemented_on_native:
@@ -514,8 +514,8 @@ export const translations = {
   },
 
   sync: {
-    failed: "Failed to synchronize subscription",
-    stripe_error: "Stripe synchronization error",
+    failed: "Failed to synchronize subscription: {{error}}",
+    stripe_error: "Stripe synchronization error: {{error}}",
     success: "Subscription synchronized successfully",
   },
 

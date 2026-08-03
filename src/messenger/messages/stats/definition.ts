@@ -5,7 +5,7 @@
 
 import { chartDataSchema } from "next-vibe/core/core-utils/stats-filtering.schema";
 import { dateSchema } from "next-vibe/core/definition/common.schema";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,

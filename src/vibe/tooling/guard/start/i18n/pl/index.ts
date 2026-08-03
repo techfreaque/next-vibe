@@ -68,6 +68,15 @@ export const translations: typeof enTranslations = {
       title: "Konflikt",
       description: "Środowisko guard jest już uruchomione",
     },
+    jailSetupFailed:
+      "Konfiguracja izolacji guarda nie powiodła się: {{detail}}",
+    vscodeSetupFailed:
+      "Konfiguracja integracji z VSCode nie powiodła się: {{detail}}",
+    startFailed: "Błąd wewnętrzny podczas uruchamiania guarda: {{detail}}",
+    guardIdLookupUnsupported:
+      "Wyszukiwanie po ID guarda nie jest jeszcze zaimplementowane - podaj ścieżkę projektu.",
+    notAVscodeProject:
+      "Guard wymaga projektu VSCode - w {{projectPath}} brakuje katalogu .vscode",
   },
   success: {
     title: "Sukces",

@@ -1,20 +1,20 @@
 // Testing infrastructure - error messages are for test debugging, not end users
 
-import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
+import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
+import { defaultLocale } from "../../../core/i18n/core/config";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   isStreamingResponse,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { createEndpointLogger } from "next-vibe/logger/server";
-import { Platform } from "next-vibe/platforms/platforms";
-import { scopedTranslation } from "next-vibe/tooling/testing/test/i18n";
+} from "../../../core/route/response.schema";
+import { parseError } from "../../../core/utils/parse-error";
+import type { JwtPayloadType } from "../../../identity/auth/types";
+import { UserPermissionRole } from "../../../identity/roles/enum";
+import { createEndpointLogger } from "../../../logger/server";
+import { Platform } from "../../../platforms/platforms";
+import { scopedTranslation } from "../test/i18n";
 
 /**
  * Call the API handler directly via the vibe runtime executor
@@ -70,7 +70,7 @@ export async function sendTestRequest<TEndpoint extends CreateApiEndpointAny>({
     const logger = createEndpointLogger(false, defaultLocale);
 
     const { RouteExecuteRepository } =
-      await import("next-vibe/execute-tool/repository");
+      await import("../../../execute-tool/repository");
 
     // Execute using the shared route execution infrastructure. The caller's
     // toolExecutionContext (fixture chain, threadId) rides straight through — the
@@ -93,31 +93,27 @@ export async function sendTestRequest<TEndpoint extends CreateApiEndpointAny>({
     // Handle streaming responses (convert to error for tests)
     if (isStreamingResponse(result)) {
       return fail({
-        message: t("errors.internal.title"),
+        message: t("errors.streamingUnsupported"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
-          error: "Streaming responses are not supported in tests",
-        },
       });
     }
 
     // Validate response against endpoint schema if available.
     // Skip for ContentResponse (mixed content blocks) — it bypasses the typed schema.
     const { isContentResponse } =
-      await import("next-vibe/core/route/response.schema");
+      await import("../../../core/route/response.schema");
     const isContentData = result.success && isContentResponse(result.data);
     if (endpoint.responseSchema && result.success && !isContentData) {
       const parseResult = endpoint.responseSchema.safeParse(result.data);
       if (!parseResult.success) {
         return fail({
-          message: t("errors.internal.title"),
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: {
-            endpoint: endpoint.path.join("/"),
-            errors: parseResult.error.issues
+          message: t("errors.responseSchemaFailed", {
+            path: endpoint.path.join("/"),
+            issues: parseResult.error.issues
               .map((issue) => `${issue.path.join(".")}: ${issue.message}`)
               .join(", "),
-          },
+          }),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
     }
@@ -126,9 +122,8 @@ export async function sendTestRequest<TEndpoint extends CreateApiEndpointAny>({
   } catch (error) {
     const { t } = scopedTranslation.scopedT(defaultLocale);
     return fail({
-      message: t("errors.internal.title"),
+      message: t("errors.requestFailed", { detail: parseError(error).message }),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: { error: parseError(error).message },
     });
   }
 }

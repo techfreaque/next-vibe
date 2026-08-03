@@ -3,9 +3,9 @@ import "server-only";
 import {
   type ResponseType,
   success,
-} from "next-vibe/core/route/response.schema";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../../core/route/response.schema";
+import type { JwtPayloadType } from "../../../identity/auth/types";
+import type { EndpointLogger } from "../../../logger/types";
 
 import { ControlSignals } from "../../repository/control-signals";
 import type {

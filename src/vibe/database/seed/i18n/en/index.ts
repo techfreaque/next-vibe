@@ -26,6 +26,7 @@ export const translations = {
       server: {
         title: "Server Error",
         description: "Internal server error during seeding",
+        detail: "Database seeding failed: {{error}}",
       },
       internal: {
         title: "Internal Error",

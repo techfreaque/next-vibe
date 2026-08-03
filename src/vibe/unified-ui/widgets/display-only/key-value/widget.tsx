@@ -1,17 +1,17 @@
 "use client";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Div } from "next-vibe/ui/ui/div";
 import { Span } from "next-vibe/ui/ui/span";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
-import type { ReactRequestResponseWidgetProps } from "next-vibe/unified-ui/_shared/react-types";
-import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
+import { cn } from "../../../_shared/cn";
+import type { ReactRequestResponseWidgetProps } from "../../../_shared/react-types";
+import type { FieldUsageConfig } from "../../../_shared/types";
 import {
   useWidgetContext,
   useWidgetForm,
   useWidgetLocale,
   useWidgetTranslation,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
+} from "../../../_shared/use-widget-context";
 import type { JSX } from "react";
 
 import type { KeyValueWidgetConfig, KeyValueWidgetSchema } from "./types";

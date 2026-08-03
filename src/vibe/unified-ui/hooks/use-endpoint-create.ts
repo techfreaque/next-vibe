@@ -3,11 +3,11 @@
 
 "use client";
 
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { DeepPartial } from "next-vibe/core/utils/type-utils";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import type { DeepPartial } from "../../core/utils/type-utils";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
 import { useEffect, useMemo, useRef } from "react";
 
 import { deepMerge } from "./endpoint-utils";
@@ -157,13 +157,23 @@ export function useEndpointCreate<TEndpoint extends CreateApiEndpointAny>(
   useEffect(() => {
     if (formResult?.form && prefillKey !== prevPrefillKeyRef.current) {
       prevPrefillKeyRef.current = prefillKey;
-      const dataToReset = {
+      // reset() REPLACES every value, so the form's own defaults have to be
+      // carried along. Without them a prefill of `{interactive: true}` — which
+      // is all the interactive CLI supplies — wiped every `.default(…)` the
+      // schema declared, leaving the form (and the live command preview) empty.
+      const overrides = {
         ...options.urlPathParams,
         ...options.autoPrefillData,
         ...options.initialState,
       };
-      if (Object.keys(dataToReset).length > 0) {
-        formResult.form.reset(dataToReset);
+      if (Object.keys(overrides).length > 0) {
+        const defaults = formResult.form.formState.defaultValues ?? {};
+        // Absent prefill keys must not clobber a default with undefined, so
+        // only defined entries are layered over the form's own defaults.
+        const definedOverrides = Object.fromEntries(
+          Object.entries(overrides).filter(([, value]) => value !== undefined),
+        );
+        formResult.form.reset({ ...defaults, ...definedOverrides });
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- prefillKey is the stable serialized composite

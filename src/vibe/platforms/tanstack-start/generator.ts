@@ -13,22 +13,35 @@ import {
   readFileSync,
   rmSync,
   statSync,
-  writeFileSync,
 } from "node:fs";
 import path, { join, relative, resolve } from "node:path";
 
-import type { ApiSection } from "next-vibe/core/definition/endpoint-base";
-import { hasCustomDirective } from "next-vibe/core/generators/shared/custom-directive";
-import { findFilesByName } from "next-vibe/core/generators/shared/scanner";
-import type { GeneratorDefinition } from "next-vibe/core/generators/shared/shared-inputs";
-import { parseError } from "next-vibe/core/utils/parse-error";
+import type { ApiSection } from "../../core/definition/endpoint-base";
+import { coreEnv } from "../../core/env";
+import { hasCustomDirective } from "../../core/generators/shared/custom-directive";
+import { findFilesByName } from "../../core/generators/shared/scanner";
+import {
+  getRelativeImportPath,
+  writeFileIfChanged,
+} from "../../core/generators/shared/utils";
+import type { GeneratorDefinition } from "../../core/generators/shared/shared-inputs";
+import { parseError } from "../../core/utils/parse-error";
+import { Environment } from "../../env/env-util";
 import {
   filterPlatformMarkers,
   PlatformMarker,
   type UserRoleValue,
-} from "next-vibe/identity/roles/enum";
+} from "../../identity/roles/enum";
 
-import { GENERATED_DIR, getApiDir, getUiDir } from "@/env/paths";
+import { GENERATED_DIR, getApiDir, getUiDir, VIBE_DIR } from "@/env/paths";
+
+/**
+ * Where CountryLanguage actually lives. The emitted import resolves from the
+ * generated route's directory, not this generator's — a hand-written
+ * "../../core/i18n/core/config" pointed at <generated>/core/i18n/core/config,
+ * which does not exist.
+ */
+const I18N_CONFIG_MODULE = `${VIBE_DIR}/core/i18n/core/config.ts`;
 
 // Use POSIX dirname so segment splitting on "/" works on Windows too
 const posixDirname = path.posix.dirname;
@@ -66,11 +79,18 @@ function findFiles(dir: string, pattern: string): string[] {
   );
 }
 
+/**
+ * Returns whether the file is generator-owned (false only when a "use custom"
+ * directive means we must preserve it) — NOT whether bytes hit the disk. The
+ * write is content-conditional so identical output never bumps mtime, which
+ * would otherwise re-dirty the gen-cache of every generator scanning these
+ * paths as input.
+ */
 function writeIfNotCustom(outPath: string, content: string): boolean {
   if (hasCustomDirective(outPath)) {
     return false;
   }
-  writeFileSync(outPath, content, "utf-8");
+  writeFileIfChanged(outPath, content);
   return true;
 }
 
@@ -151,7 +171,7 @@ function hasHttpExports(filePath: string): boolean {
   );
 }
 
-const IS_PROD = process.env["NODE_ENV"] === "production";
+const IS_PROD = coreEnv.NODE_ENV === Environment.PRODUCTION;
 
 // Returns true when a route should be excluded from the TanStack generated app.
 // Reads allowedRoles from the evaluated definitionModules map. Unknown key or
@@ -310,7 +330,7 @@ function emitRootRedirect(result: GenerationResult): void {
     ``,
     `export const Route = createFileRoute("/")({`,
     `  loader: () => {`,
-    `    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax`,
+    `    // eslint-disable-next-line restricted/restricted-syntax`,
     `    throw new Error("This should never be called - middleware should have redirected");`,
     `  },`,
     `  component: () => null,`,
@@ -592,7 +612,7 @@ function emitPageFile(
   // Type imports: alphabetical by source ("next-vibe/..." before "react")
   if (catchAllName) {
     lines.push(
-      `import type { CountryLanguage } from "next-vibe/core/i18n/core/config";`,
+      `import type { CountryLanguage } from "${getRelativeImportPath(I18N_CONFIG_MODULE, outPath)}";`,
     );
   }
   lines.push(`import type { JSX } from "react";`);
@@ -761,6 +781,13 @@ export const generator: GeneratorDefinition = {
       ),
     ].toSorted();
   },
+  /**
+   * The route tree, not the route shells. The shells are a directory tree whose
+   * members each opt out via a custom directive, so no individual shell proves
+   * the run happened — but routeTree.gen.ts is regenerated from all of them on
+   * every successful run, so its absence does.
+   */
+  output: `${GENERATED_DIR}/app-tanstack/routeTree.gen.ts`,
   async generate(ctx) {
     const result: GenerationResult = { created: [], skipped: [], errors: [] };
     const ui = uiDir();

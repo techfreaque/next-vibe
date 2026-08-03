@@ -57,6 +57,7 @@ export const translations: typeof enTranslations = {
     internal: {
       title: "Błąd wewnętrzny",
       description: "Wystąpił błąd podczas przetwarzania Twojej subskrypcji",
+      detail: "Nie udało się zapisać do newslettera: {{error}}",
     },
   },
   post: {

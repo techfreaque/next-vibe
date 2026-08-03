@@ -1,11 +1,11 @@
 "use client";
 
 import * as AccordionPrimitive from "@radix-ui/react-accordion";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 
-import { ChevronDownIcon } from "../../web/ui/icons/ChevronDownIcon";
-import type { StyleType } from "../../web/utils/style-type";
+import { ChevronDownIcon } from "./icons/ChevronDownIcon";
+import type { StyleType } from "../utils/style-type";
 
 // Accordion
 export type AccordionProps = {

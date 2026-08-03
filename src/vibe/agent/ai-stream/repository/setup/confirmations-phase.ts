@@ -11,9 +11,9 @@ import {
 } from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type { ResolvedRelayContext } from "next-vibe/realtime/remote-event-bridge/relay-context";
+import type { ResolvedRelayContext } from "next-vibe/realtime/core/relay-context";
 
-import { type ToolExecutionContext } from "../../../chat/config";
+import { type ToolExecutionContext } from "../../../../core/execution-context";
 import { type ToolCall } from "../../../chat/db";
 import { type AiStreamPostRequestOutput } from "../../stream/definition";
 import type { AiStreamT } from "../../stream/i18n";

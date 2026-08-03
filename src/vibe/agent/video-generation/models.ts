@@ -8,7 +8,6 @@ import {
   buildModelOptionsIndex,
   defaultFeatures,
   filterRoleModels,
-  getModelForProvider,
   getProviderPrice,
   type ModelDefinition,
   type ModelOptionVideoBased,
@@ -2070,32 +2069,10 @@ export const videoGenModelOptions: VideoGenModelOption[] = Object.values(
   videoGenModelOptionsIndex,
 ).filter((m): m is VideoGenModelOption => m !== undefined);
 
-export const VideoGenModelIdOptions = videoGenModelOptions.map((m) => ({
-  value: m.id,
-  label: m.name,
-}));
-
 export function getVideoGenModelById(
   modelId: VideoGenModelId,
 ): VideoGenModelOption | undefined {
   return videoGenModelOptionsIndex[modelId];
-}
-
-/**
- * Resolve a video gen model option using a specific API provider.
- * Picks the cheapest provider variant for `modelId` that matches `provider` from the pool.
- * Falls back to the default (cheapest overall) if no matching provider exists.
- */
-export function getVideoGenModelForProvider(
-  modelId: VideoGenModelId,
-  provider: ApiProvider,
-): VideoGenModelOption | undefined {
-  return getModelForProvider(
-    modelId,
-    provider,
-    videoGenModelOptionsPool,
-    getVideoGenModelById(modelId),
-  );
 }
 
 // ============================================================

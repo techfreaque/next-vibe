@@ -16,8 +16,8 @@ import type {
   Time,
   UTCTimestamp,
 } from "lightweight-charts";
-import graphsDefinitions from "next-vibe/dataflow/graphs/definition";
-import { scopedTranslation as vibeSenseT } from "next-vibe/dataflow/i18n";
+import graphsDefinitions from "../graphs/definition";
+import { scopedTranslation as vibeSenseT } from "../i18n";
 import { getRootCssVar } from "next-vibe/ui/lib/css-vars";
 import { observeRootMutations } from "next-vibe/ui/lib/dom";
 import { Badge } from "next-vibe/ui/ui/badge";
@@ -28,7 +28,7 @@ import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
 import { Plus } from "next-vibe/ui/ui/icons/Plus";
 import { Span } from "next-vibe/ui/ui/span";
 import { P } from "next-vibe/ui/ui/typography";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../unified-ui/_shared/cn";
 import {
   useWidgetContext,
   useWidgetEndpointMutations,
@@ -36,7 +36,7 @@ import {
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetValue,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
+} from "../../unified-ui/_shared/use-widget-context";
 import React, {
   useCallback,
   useEffect,

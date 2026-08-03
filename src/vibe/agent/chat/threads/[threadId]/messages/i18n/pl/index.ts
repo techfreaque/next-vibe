@@ -157,6 +157,7 @@ export const translations: typeof enTranslations = {
       server: {
         title: "Server Error",
         description: "An internal server error occurred",
+        detail: "Błąd serwera: {{error}}",
       },
       unknown: {
         title: "Unknown Error",
@@ -260,6 +261,7 @@ export const translations: typeof enTranslations = {
       validation: {
         title: "Validation Error",
         description: "Invalid message data provided",
+        parentNotFound: "Nie znaleziono wiadomości nadrzędnej",
       },
       network: {
         title: "Network Error",
@@ -282,6 +284,7 @@ export const translations: typeof enTranslations = {
       server: {
         title: "Server Error",
         description: "An internal server error occurred",
+        detail: "Błąd serwera: {{error}}",
       },
       unknown: {
         title: "Unknown Error",

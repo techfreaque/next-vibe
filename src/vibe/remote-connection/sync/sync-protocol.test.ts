@@ -34,13 +34,13 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 
 import { and, eq, sql } from "drizzle-orm";
-import { cortexNodes } from "next-vibe/agent/cortex/db";
-import { CortexNodeType } from "next-vibe/agent/cortex/enum";
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import { db } from "next-vibe/database";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { identityEnv } from "next-vibe/identity/env";
-import { createEndpointLogger } from "next-vibe/logger/server";
+import { cortexNodes } from "../../agent/cortex/db";
+import { CortexNodeType } from "../../agent/cortex/enum";
+import { defaultLocale } from "../../core/i18n/core/config";
+import { db } from "../../database";
+import type { JwtPrivatePayloadType } from "../../identity/auth/types";
+import { identityEnv } from "../../identity/env";
+import { createEndpointLogger } from "../../logger/server";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import {
@@ -57,7 +57,8 @@ import {
   triggerHermesPull,
   unregisterDevFromHermes,
 } from "../../agent/ai-stream/testing/remote-setup";
-import type { SyncDomain, SyncScope } from "../db";
+import type { SyncDomain } from "../../realtime/core/sync-domain";
+import type { SyncScope } from "../db";
 import { remoteConnections } from "../db";
 import {
   applySyncPayloads,
@@ -979,7 +980,7 @@ if (_remoteUrl) {
         );
 
         // SP5: the skill must NOT appear on atlas (syncScope.skills=false)
-        const { customSkills } = await import("next-vibe/agent/skills/db");
+        const { customSkills } = await import("../../agent/skills/db");
         const localRows = await db
           .select({ slug: customSkills.slug })
           .from(customSkills)
@@ -1054,7 +1055,7 @@ if (_remoteUrl) {
         await triggerHermesPull(prodAdminToken, _remoteUrl!);
 
         // Poll atlas DB until the skill arrives (or 15s timeout)
-        const { customSkills } = await import("next-vibe/agent/skills/db");
+        const { customSkills } = await import("../../agent/skills/db");
 
         const arrivedRow = await pollUntil(
           "SP5b: skill must arrive on atlas when syncScope.skills=true",

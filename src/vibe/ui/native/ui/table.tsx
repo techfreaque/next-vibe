@@ -1,13 +1,10 @@
 import * as TablePrimitive from "@rn-primitives/table";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import type { ViewStyle } from "react-native";
 import { Pressable, Text as RNText, View as RNView } from "react-native";
 
-import {
-  convertCSSToViewStyle,
-  styledNative,
-} from "../../native/utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 // MUST import ALL props interfaces from web version (NO local type definitions)
 import type {
   TableBodyProps,

@@ -7,9 +7,9 @@
  */
 import { cva } from "class-variance-authority";
 import { Text, useFocus, useInput, useStdin } from "ink";
-import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { JSX, ReactNode } from "react";
-import { Children, isValidElement, useEffect, useRef } from "react";
+import { Children, Fragment, isValidElement, useEffect, useRef } from "react";
 
 import type { ButtonProps } from "../../web/ui/button";
 import { isOverlayOpen, useFocusScopeRegister, useShouldFocus } from "./dialog";
@@ -19,7 +19,11 @@ import { usePopoverTrigger } from "./popover";
 // Stub variants for CLI - CSS classes are unused in terminal rendering
 export const buttonVariants = cva("");
 export const buttonTextVariants = cva("");
-export type { ButtonSize, ButtonVariant } from "../../web/ui/button";
+export type {
+  ButtonMouseEvent,
+  ButtonSize,
+  ButtonVariant,
+} from "../../web/ui/button";
 
 /**
  * True if a string is a meaningful label (more than just an icon/emoji).
@@ -78,6 +82,29 @@ function childrenHaveText(c: ReactNode): boolean {
  * - Icon-only + focused → icon + title (acts like tooltip on hover)
  * - Icon-only + unfocused → icon only (compact)
  */
+/**
+ * Join a button's children with single spaces.
+ *
+ * A button is usually `<Icon/>` + label. On web the gap comes from the icon's
+ * `mr-2`, but a CLI icon renders as an Ink <Text> and margin classes do not
+ * apply to text — so the two ran together as `⚙Run Check`. Spacing has to be
+ * real characters on a terminal.
+ */
+function spaceChildren(children: ReactNode): ReactNode {
+  const parts = Children.toArray(children).filter(
+    (child) => child !== null && child !== undefined && child !== "",
+  );
+  if (parts.length <= 1) {
+    return parts[0] ?? null;
+  }
+  return parts.map((child, index) => (
+    <Fragment key={index}>
+      {index > 0 ? " " : ""}
+      {child}
+    </Fragment>
+  ));
+}
+
 function buildLabel(
   children: ReactNode,
   title: string | undefined,
@@ -93,11 +120,11 @@ function buildLabel(
   if (title && isFocused && !arr.some(hasText)) {
     return (
       <>
-        {children} {title}
+        {spaceChildren(children)} {title}
       </>
     );
   }
-  return children;
+  return spaceChildren(children);
 }
 
 let buttonIdCounter = 0;
@@ -175,8 +202,9 @@ export function Button({
 
   // Focus indicator: «label» when focused, [label] when not.
   // Text-based so it survives ANSI stripping in agent frame capture.
-  const open = isFocused ? "«" : "[";
-  const close = isFocused ? "»" : "]";
+  // Padded so the label never sits flush against the bracket: « Run Check »
+  const open = isFocused ? "« " : "[ ";
+  const close = isFocused ? " »" : " ]";
 
   if (variant === "destructive") {
     return (

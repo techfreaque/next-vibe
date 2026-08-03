@@ -3,17 +3,17 @@ import type {
   InferRequestOutput,
   InferResponseOutput,
   InferUrlVariablesOutput,
-} from "next-vibe/core/definition/create";
-import type { Methods } from "next-vibe/core/definition/enums";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { UserRoleValue } from "next-vibe/identity/roles/enum";
-import type { EndpointEventsMap } from "next-vibe/realtime/structured-events";
-import type { UnifiedField } from "next-vibe/unified-ui/_shared/configs";
+} from "../../../core/definition/create";
+import type { Methods } from "../../../core/definition/enums";
+import type { ResponseType } from "../../../core/route/response.schema";
+import type { JwtPayloadType } from "../../../identity/auth/types";
+import type { UserRoleValue } from "../../../identity/roles/enum";
+import type { EndpointEventsMap } from "../../../realtime/core/structured-events";
+import type { UnifiedField } from "../../../unified-ui/_shared/configs";
 import type {
   AnyChildrenConstrain,
   FieldUsageConfig,
-} from "next-vibe/unified-ui/_shared/types";
+} from "../../../unified-ui/_shared/types";
 import type { z } from "zod";
 
 /**

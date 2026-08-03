@@ -77,6 +77,27 @@ export const translations: typeof enTranslations = {
       title: "Konflikt",
       description: "Test-Ausführungskonflikt erkannt",
     },
+    executionFailed:
+      "Testausführung nach {{duration}} ms fehlgeschlagen: {{detail}}\n{{output}}",
+    streamingUnsupported:
+      "Streaming-Antworten werden in Tests nicht unterstützt",
+    responseSchemaFailed:
+      "Antwortschema-Validierung für {{path}} fehlgeschlagen: {{issues}}",
+    requestFailed: "Testanfrage fehlgeschlagen: {{detail}}",
+    browser: {
+      serverNotRunning:
+        "Der Atlas-Dev-Server läuft nicht - mit vibe dev starten",
+      openFailed: "Browser-Seite konnte nicht geöffnet werden: {{detail}}",
+      fillFailed: "Formularfelder konnten nicht ausgefüllt werden: {{detail}}",
+      submitFailed: "Absenden-Button konnte nicht geklickt werden: {{detail}}",
+      evaluateFailed:
+        "Skriptauswertung auf der Seite fehlgeschlagen: {{detail}}",
+      resultTimeout: "Kein Mutationsergebnis innerhalb von {{timeoutMs}} ms",
+      parseFailed:
+        "Zwischengespeicherte Antwort konnte nicht als JSON gelesen werden: {{raw}}",
+      cacheEmpty: "Mutations-Cache ist leer - die Antwort wurde nie geladen",
+      requestFailed: "Browser-Test fehlgeschlagen: {{detail}}",
+    },
   },
 
   success: {

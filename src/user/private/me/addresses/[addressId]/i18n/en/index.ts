@@ -99,7 +99,11 @@ export const translations = {
         title: "Unsaved Changes",
         description: "There are unsaved changes",
       },
-      internal: { title: "Server Error", description: "Internal server error" },
+      internal: {
+        title: "Server Error",
+        description: "Internal server error",
+        detail: "Could not update the address: {{error}}",
+      },
       unknown: {
         title: "Unknown Error",
         description: "An unknown error occurred",
@@ -145,7 +149,11 @@ export const translations = {
         title: "Unsaved Changes",
         description: "There are unsaved changes",
       },
-      internal: { title: "Server Error", description: "Internal server error" },
+      internal: {
+        title: "Server Error",
+        description: "Internal server error",
+        detail: "Could not delete the address: {{error}}",
+      },
       unknown: {
         title: "Unknown Error",
         description: "An unknown error occurred",

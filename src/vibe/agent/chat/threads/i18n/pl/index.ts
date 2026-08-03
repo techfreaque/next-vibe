@@ -160,6 +160,7 @@ export const translations: typeof enTranslations = {
       server: {
         title: "Błąd serwera",
         description: "Wystąpił wewnętrzny błąd serwera",
+        detail: "Błąd serwera: {{error}}",
       },
       network: {
         title: "Błąd sieci",
@@ -285,14 +286,17 @@ export const translations: typeof enTranslations = {
         description: "Nie masz uprawnień do tworzenia wątków",
         incognitoNotAllowed:
           "Wątki incognito nie mogą być tworzone na serwerze",
+        cannotCreateHere: "Nie możesz utworzyć wątku w tej lokalizacji",
       },
       notFound: {
         title: "Nie znaleziono",
         description: "Zasób nie znaleziony",
+        folderNotFound: "Nie znaleziono folderu",
       },
       server: {
         title: "Błąd serwera",
         description: "Wystąpił wewnętrzny błąd serwera",
+        detail: "Błąd serwera: {{error}}",
       },
       network: {
         title: "Błąd sieci",

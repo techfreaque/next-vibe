@@ -15,19 +15,19 @@
 import "server-only";
 
 import { and, eq } from "drizzle-orm";
-import { coreEnv } from "next-vibe/core/env";
-import { coreClientEnv as envClient } from "next-vibe/core/env-client";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { coreEnv } from "../../core/env";
+import { coreClientEnv as envClient } from "../../core/env-client";
+import type { CountryLanguage } from "../../core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
   success,
-} from "next-vibe/core/route/response.schema";
-import { db } from "next-vibe/database";
-import { AuthRepository } from "next-vibe/identity/auth/repository";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../core/route/response.schema";
+import { db } from "../../database";
+import { AuthRepository } from "../../identity/auth/repository";
+import type { JwtPrivatePayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
 
 import loginEndpoints, {
   type LoginPostResponseOutput,
@@ -575,7 +575,7 @@ export class RemoteConnectionConnectRepository {
           .limit(1);
         if (stored) {
           const { openConnection } =
-            await import("next-vibe/realtime/connector");
+            await import("../../realtime/server/connector");
           openConnection({
             id: stored.id,
             instanceId,

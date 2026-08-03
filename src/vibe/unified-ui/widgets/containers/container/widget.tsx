@@ -1,7 +1,7 @@
 "use client";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { LayoutType } from "next-vibe/core/definition/enums";
-import type { WidgetData } from "next-vibe/core/utils/json";
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
+import { LayoutType } from "../../../../core/definition/enums";
+import type { WidgetData } from "../../../../core/utils/json";
 import { Button } from "next-vibe/ui/ui/button";
 import {
   Card,
@@ -16,19 +16,16 @@ import {
   type FormAlertState,
 } from "next-vibe/ui/ui/form/form-alert";
 import { H1, P } from "next-vibe/ui/ui/typography";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
-import type { ReactWidgetProps } from "next-vibe/unified-ui/_shared/react-types";
-import {
-  hasChild,
-  hasChildren,
-} from "next-vibe/unified-ui/_shared/type-guards";
+import { cn } from "../../../_shared/cn";
+import type { ReactWidgetProps } from "../../../_shared/react-types";
+import { hasChild, hasChildren } from "../../../_shared/type-guards";
 import type {
   ArrayChildConstraint,
   ConstrainedChildUsage,
   FieldUsageConfig,
   ObjectChildrenConstraint,
   UnionObjectWidgetConfigConstrain,
-} from "next-vibe/unified-ui/_shared/types";
+} from "../../../_shared/types";
 import {
   useWidgetCancelButton,
   useWidgetContext,
@@ -40,18 +37,18 @@ import {
   useWidgetOnSubmit,
   useWidgetResponse,
   useWidgetSubmitButton,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
+} from "../../../_shared/use-widget-context";
 import {
   getIconSizeClassName,
   getLayoutClassName,
   getSpacingClassName,
   getTextSizeClassName,
   type LayoutConfig,
-} from "next-vibe/unified-ui/_shared/widget-helpers";
-import { scopedTranslation as reactScopedTranslation } from "next-vibe/unified-ui/hooks/i18n";
-import { MultiWidgetRenderer } from "next-vibe/unified-ui/renderers/web/MultiWidgetRenderer";
-import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
-import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+} from "../../../_shared/widget-helpers";
+import { scopedTranslation as reactScopedTranslation } from "../../../hooks/i18n";
+import { MultiWidgetRenderer } from "../../../renderers/web/MultiWidgetRenderer";
+import type { IconKey } from "../../form-fields/icon-field/icons";
+import { Icon } from "../../form-fields/icon-field/icon-component";
 import { type JSX } from "react";
 import type { Path } from "react-hook-form";
 import { useWatch } from "react-hook-form";
@@ -401,9 +398,9 @@ export function ContainerWidget<
   if (response && response.success === false) {
     formAlertState = {
       variant: "destructive",
+      // `response.message` is already fully interpolated - nothing left to fill in.
       message: {
         message: response.message,
-        messageParams: response.messageParams,
       },
     };
   }

@@ -4,6 +4,7 @@
  */
 
 import "server-only";
+import { agentClientEnv } from "../env-client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
@@ -15,8 +16,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { FEATURE_COSTS } from "@/products/repository-client";
 
-import type { ToolExecutionContext } from "../chat/config";
-import { getEnvAvailability } from "../env-availability";
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 import { SearchProvider, type SearchProviderValue } from "./enum";
 
 /**
@@ -71,7 +71,7 @@ export interface SearchProviderConfig {
  */
 const braveProvider: SearchProviderConfig = {
   id: SearchProvider.BRAVE,
-  isAvailable: () => getEnvAvailability().braveSearch,
+  isAvailable: (): boolean => agentClientEnv.NEXT_PUBLIC_AGENT_BRAVE_SEARCH,
   creditCost: FEATURE_COSTS.BRAVE_SEARCH,
   search: async (
     query,
@@ -114,7 +114,7 @@ const braveProvider: SearchProviderConfig = {
  */
 const kagiProvider: SearchProviderConfig = {
   id: SearchProvider.KAGI,
-  isAvailable: () => getEnvAvailability().kagiSearch,
+  isAvailable: (): boolean => agentClientEnv.NEXT_PUBLIC_AGENT_KAGI_SEARCH,
   creditCost: FEATURE_COSTS.KAGI_SEARCH,
   search: async (
     query,

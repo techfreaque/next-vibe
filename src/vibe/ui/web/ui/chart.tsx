@@ -1,7 +1,7 @@
 "use client";
 
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { ReactNode } from "react";
 import * as React from "react";
 import {
@@ -16,7 +16,7 @@ import {
   VictoryTooltip as VictoryTooltipBase,
 } from "victory";
 
-import type { StyleType } from "../../web/utils/style-type";
+import type { StyleType } from "../utils/style-type";
 
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: ".light", dark: ".dark" } as const;
@@ -102,7 +102,7 @@ export function useChart<
   const context = React.useContext(ChartContext);
 
   if (!context) {
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Standard React context hook pattern - throw is correct for developer mistakes
+    // oxlint-disable-next-line restricted/restricted-syntax -- Standard React context hook pattern - throw is correct for developer mistakes
     // eslint-disable-next-line i18next/no-literal-string -- Error handling for context
     throw new Error("useChart must be used within a <ChartContainer />");
   }

@@ -6,26 +6,25 @@
  */
 
 "use client";
-import { LocaleSelectorContent } from "next-vibe/agent/ai-stream/stream/widget/chat-ui/top-area/locale-selector-content";
+import { LocaleSelectorContent } from "../agent/ai-stream/stream/widget/chat-ui/top-area/locale-selector-content";
 import {
   getDefaultToolIdsForUser,
   getDefaultWebPinnedIdsForUser,
-} from "next-vibe/agent/chat/constants";
-import type { EnabledTool } from "next-vibe/agent/chat/hooks/store";
-import settingsDefinition from "next-vibe/agent/chat/settings/definition";
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
-import favoriteByIdDefinition from "next-vibe/agent/skills/favorites/[id]/definition";
-import favoritesListDefinition from "next-vibe/agent/skills/favorites/definition";
-import { endpointToUrlSegment } from "next-vibe/core/core-utils/path";
-import type { NavigationStackEntry } from "next-vibe/core/definition/endpoint";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { useTranslation } from "next-vibe/core/i18n/core/client";
-import { EXECUTE_TOOL_ALIAS } from "next-vibe/execute-tool/constants";
-import { scopedTranslation } from "next-vibe/help-tool/i18n";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { Platform } from "next-vibe/platforms/platforms";
-import { VibeFrameHost } from "next-vibe/platforms/vibe-frame/VibeFrameHost";
-import remoteConnectionListDefinition from "next-vibe/remote-connection/list/definition";
+} from "../agent/chat/constants";
+import type { EnabledTool } from "../agent/chat/hooks/store";
+import settingsDefinition from "../agent/chat/settings/definition";
+import favoriteByIdDefinition from "../agent/skills/favorites/[id]/definition";
+import favoritesListDefinition from "../agent/skills/favorites/definition";
+import { endpointToUrlSegment } from "../core/core-utils/path";
+import type { NavigationStackEntry } from "../core/definition/endpoint";
+import type { CreateApiEndpointAny } from "../core/definition/endpoint-base";
+import { useTranslation } from "../core/i18n/core/client";
+import { EXECUTE_TOOL_ALIAS } from "../execute-tool/constants";
+import { scopedTranslation } from "./i18n";
+import { UserPermissionRole } from "../identity/roles/enum";
+import { Platform } from "../platforms/platforms";
+import { VibeFrameHost } from "../platforms/vibe-frame/VibeFrameHost";
+import remoteConnectionListDefinition from "../remote-connection/list/definition";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import {
   useSearchParams,
@@ -95,7 +94,7 @@ import {
   TooltipTrigger,
 } from "next-vibe/ui/ui/tooltip";
 import { P } from "next-vibe/ui/ui/typography";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../unified-ui/_shared/cn";
 import {
   useWidgetDisabled,
   useWidgetEndpointMutations,
@@ -104,16 +103,17 @@ import {
   useWidgetLogger,
   useWidgetNavigation,
   useWidgetOnSubmit,
+  useWidgetPlatform,
   useWidgetUser,
   useWidgetValue,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
-import { resolveEndpoint } from "next-vibe/unified-ui/hooks/resolve-endpoint";
-import { apiClient } from "next-vibe/unified-ui/hooks/store";
-import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
-import { useUrlNavStack } from "next-vibe/unified-ui/hooks/use-url-nav-stack";
-import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
-import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
-import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+} from "../unified-ui/_shared/use-widget-context";
+import { resolveEndpoint } from "../unified-ui/hooks/resolve-endpoint";
+import { apiClient } from "../unified-ui/hooks/store";
+import { useEndpoint } from "../unified-ui/hooks/use-endpoint";
+import { useUrlNavStack } from "../unified-ui/hooks/use-url-nav-stack";
+import { EndpointsPage } from "../unified-ui/renderers/web/EndpointsPage";
+import type { IconKey } from "../unified-ui/widgets/form-fields/icon-field/icons";
+import { Icon } from "../unified-ui/widgets/form-fields/icon-field/icon-component";
 import type { JSX } from "react";
 import {
   createContext,
@@ -329,7 +329,7 @@ export function HelpToolsWidget(): JSX.Element {
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const locale = useWidgetLocale();
-  const availability = useProviderAvailability();
+  const platform = useWidgetPlatform();
   const form = useWidgetForm<typeof definition.GET>();
   const onSubmit = useWidgetOnSubmit();
   const endpointMutations = useWidgetEndpointMutations();
@@ -685,10 +685,9 @@ export function HelpToolsWidget(): JSX.Element {
         { webPinnedTools: tools },
         undefined,
         locale,
-        availability,
       );
     },
-    [user, logger, locale, availability],
+    [user, logger, locale],
   );
 
   // Load active favorite's tool config
@@ -753,17 +752,9 @@ export function HelpToolsWidget(): JSX.Element {
         { pinnedTools, modelSelection: activeFavoriteData.modelSelection },
         { id: effectiveFavoriteId },
         locale,
-        availability,
       );
     },
-    [
-      effectiveFavoriteId,
-      activeFavoriteData,
-      user,
-      logger,
-      locale,
-      availability,
-    ],
+    [effectiveFavoriteId, activeFavoriteData, user, logger, locale],
   );
 
   const saveAvailableTools = useCallback(
@@ -797,17 +788,9 @@ export function HelpToolsWidget(): JSX.Element {
         { availableTools, modelSelection: activeFavoriteData.modelSelection },
         { id: effectiveFavoriteId },
         locale,
-        availability,
       );
     },
-    [
-      effectiveFavoriteId,
-      activeFavoriteData,
-      user,
-      logger,
-      locale,
-      availability,
-    ],
+    [effectiveFavoriteId, activeFavoriteData, user, logger, locale],
   );
 
   // Reset both tool lists to null (inherit defaults) at once
@@ -840,16 +823,8 @@ export function HelpToolsWidget(): JSX.Element {
       },
       { id: effectiveFavoriteId },
       locale,
-      availability,
     );
-  }, [
-    effectiveFavoriteId,
-    activeFavoriteData,
-    user,
-    logger,
-    locale,
-    availability,
-  ]);
+  }, [effectiveFavoriteId, activeFavoriteData, user, logger, locale]);
   const { t } = scopedTranslation.scopedT(locale);
 
   const searchQuery = form.watch("query") ?? "";
@@ -2710,6 +2685,7 @@ export function HelpToolsWidget(): JSX.Element {
               }}
               locale={locale}
               user={user}
+              platform={platform}
               // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic endpoint type
               endpointOptions={{} as any}
               navigationOverride={urlNavStack}

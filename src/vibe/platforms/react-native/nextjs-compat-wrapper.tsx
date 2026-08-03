@@ -27,11 +27,11 @@
  */
 
 import { Slot, useLocalSearchParams } from "expo-router";
-import { coreClientEnv as envClient } from "next-vibe/core/env-client";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { createEndpointLogger } from "next-vibe/logger/server";
-import { scopedTranslation as reactNativeScopedTranslation } from "next-vibe/platforms/react-native/i18n";
+import { coreClientEnv as envClient } from "../../core/env-client";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import { parseError } from "../../core/utils/parse-error";
+import { createEndpointLogger } from "../../logger/server";
+import { scopedTranslation as reactNativeScopedTranslation } from "./i18n";
 import { Span } from "next-vibe/ui/ui/span";
 import type React from "react";
 import type { JSX, ReactNode } from "react";
@@ -95,7 +95,7 @@ type AnyNextAsyncPageComponent = (
  * @returns A synchronous Expo Router compatible component
  */
 export function createPageWrapperWithImport(
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Dynamic imports: Module exports are unknown until runtime. This is the standard TypeScript type for dynamic import() return values.
+  // eslint-disable-next-line restricted/no-unknown -- Dynamic imports: Module exports are unknown until runtime. This is the standard TypeScript type for dynamic import() return values.
   importFn: () => Promise<Record<string, unknown>>,
 ): () => React.ReactElement {
   return function PageWrapper(): React.ReactElement {
@@ -144,7 +144,7 @@ export function createPageWrapperWithImport(
             } else {
               logger.error("Failed to load page", { error: parsedError });
               if (envClient.NODE_ENV !== "production") {
-                // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Development debugging: Re-throw in dev mode so developers see full stack trace. In production, error is logged and handled via state.
+                // eslint-disable-next-line restricted/restricted-syntax -- Development debugging: Re-throw in dev mode so developers see full stack trace. In production, error is logged and handled via state.
                 throw err;
               }
             }
@@ -259,7 +259,7 @@ export function createLayoutWrapperWithImport(
           } catch (err) {
             if (!cancelled) {
               logger.error("Failed to load layout", { error: parseError(err) });
-              // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- React error boundary: Layout errors must be thrown so React's error boundary can catch and display them properly to the user.
+              // eslint-disable-next-line restricted/restricted-syntax -- React error boundary: Layout errors must be thrown so React's error boundary can catch and display them properly to the user.
               throw err;
             }
           }

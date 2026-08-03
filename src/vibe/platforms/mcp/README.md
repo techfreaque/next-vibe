@@ -1,114 +1,113 @@
 # MCP Server
 
-**Model Context Protocol executor for the Vibe unified-interface**
+Exposes vibe endpoints as [Model Context Protocol](https://modelcontextprotocol.io/) tools over
+JSON-RPC on STDIO, for AI assistants (Claude Code, Claude Desktop, Cline, …).
 
-Exposes API endpoints as MCP tools for AI assistants (Claude Desktop, Cline, etc.).
+MCP is one of this framework's surfaces. The closest sibling is the [CLI](../cli/README.md); both
+execute the same endpoints through the same handler.
 
-## Quick Start
+---
 
-Add to your AI assistant's MCP configuration:
+## Quick start
 
-```json
+```jsonc
 {
   "mcpServers": {
-    "Vibe": {
+    "vibe": {
       "command": "vibe",
-      "args": ["mcp"]
-    }
-  }
+      "args": ["mcp"],
+    },
+  },
 }
 ```
 
-## What is MCP?
+Editor configs are generated from [`mcp.template.json`](./mcp.template.json) by `vibe setup` — edit
+the template rather than the emitted `.mcp.json`, which is overwritten.
 
-[Model Context Protocol](https://modelcontextprotocol.io/) is an open standard for connecting AI assistants to external tools via JSON-RPC over STDIO.
+Debug logging: add `--verbose` to `args`. Because stdout is the protocol channel, debug output goes
+to the **log file** (`.tmp/.vibe-mcp.log`), never the console — see [`logger/spec.md`](../../logger/spec.md).
 
-## Configuration Examples
+---
 
-### Claude Desktop
+## Tool discovery is opt-in
 
-macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
-Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+A tool appears in the MCP tool list **only if its definition carries `MCP_VISIBLE`**:
 
-```json
-{
-  "mcpServers": {
-    "Vibe": {
-      "command": "npx",
-      "args": ["vibe", "mcp"],
-      "env": {
-        "NODE_ENV": "production"
-      }
-    }
-  }
-}
+```typescript
+allowedRoles: [UserRole.ADMIN, UserRole.MCP_VISIBLE] as const,
 ```
 
-### VS Code (Cline)
+This is the one place where a marker is opt-in rather than opt-out. `checkMcpDiscoveryAccess`
+(`core/permissions/registry.ts`) requires `MCP_VISIBLE` and rejects anything carrying
+`CLI_OFF` or `MCP_OFF`.
 
-`.vscode/settings.json`:
+**Discovery and execution are separate gates.** Execution is opt-_out_: a tool without
+`MCP_VISIBLE` is still executable over MCP (via `execute-tool`) as long as it has neither `CLI_OFF`
+nor `MCP_OFF`. It simply does not advertise itself. That asymmetry is deliberate — it keeps the
+advertised tool list small without making everything else unreachable.
 
-```json
-{
-  "cline.mcpServers": {
-    "Vibe": {
-      "command": "npx",
-      "args": ["vibe", "mcp"]
-    }
-  }
-}
+---
+
+## Tool naming
+
+`getPreferredToolName()` (`core/core-utils/path.ts`): **the first alias, if the endpoint has any;
+otherwise the canonical `<path>_<METHOD>` name.**
+
 ```
+help-tool  →  aliases: ["tool-help", "help", "h", …]  →  "tool-help"
+an endpoint with no aliases, path ["tools","x"], GET  →  "tools_x_GET"
+```
+
+So the first entry in `aliases` is load-bearing — it is the name agents will call. Order it
+deliberately.
+
+---
 
 ## Architecture
 
-The MCP server is another executor of the unified-interface framework, reusing:
-
-- **Endpoint Discovery**: Same registry as CLI
-- **Route Execution**: Same handler as web APIs
-- **Authentication**: Same JWT system (uses `cli@system.local` user)
-- **Validation**: Same Zod schemas from definitions
-- **i18n**: Same translation system
-
 ```
-AI Assistant → MCP Protocol (JSON-RPC/STDIO) → Tool Registry → Route Handler → API Endpoints
+AI assistant → JSON-RPC/STDIO → protocol-handler → registry → route handler → repository
 ```
 
-## Tool Naming
+| File                         | Role                                                |
+| ---------------------------- | --------------------------------------------------- |
+| `server/stdio-transport.ts`  | stdin/stdout framing. Never writes to stdout itself |
+| `server/protocol-handler.ts` | JSON-RPC dispatch; enforces `initialize` first      |
+| `server/converter.ts`        | endpoint definition → MCP tool schema               |
+| `server/server.ts`           | wiring                                              |
+| `registry.ts`                | which tools are visible/executable for the caller   |
+| `hot-loader.ts`              | endpoint loading                                    |
+| `serve/`                     | the `mcp` endpoint itself                           |
 
-Tools are named using API path structure:
+Reused from the rest of the framework: the endpoint registry, the route handler, and the Zod schemas
+from the definitions. An MCP tool call and a CLI command reach the same handler by the same path —
+only the rendering differs.
 
-```
-/user/create (POST) → user_create_POST
-/leads/list (GET)    → leads_list_GET
-```
+---
 
-Custom aliases can be defined in `definition.ts`:
+## Access
 
-```typescript
-createEndpoint({
-  aliases: ["create-user"],
-  // ...
-});
-```
+The MCP session resolves its caller through the normal route executor, using the same role-based
+access control as every other surface: session file (`.vibe.session`) → `VIBE_ADMIN_USER_EMAIL` →
+public user. If `VIBE_ADMIN_USER_EMAIL` is set but no such user exists, the call fails rather than
+silently downgrading.
 
-## Authentication & Permissions
+What gates each individual tool is the **permission registry**, from `allowedRoles` + platform
+markers (`CLI_OFF`, `MCP_OFF`, `MCP_VISIBLE`, `PRODUCTION_OFF`) — evaluated per call against the
+resolved user.
 
-- Uses same role-based access control as other interfaces
-- Auth flow: Session file (.vibe.session) → `VIBE_ADMIN_USER_EMAIL` env var → Public user with new lead
-- If `VIBE_ADMIN_USER_EMAIL` is set but user not found in DB, returns error
-- Public endpoints available without authentication
+---
 
-## Debug Mode
+## Output
 
-Add `--verbose` flag to enable debug logging:
+MCP responses are rendered by the endpoint's `widget.tsx` through the MCP renderer
+(`unified-ui/renderers/mcp/`). Widgets branch on `useWidgetPlatform() === Platform.MCP` to emit
+plain text — no chalk, no borders, one line per item. See
+[`docs/patterns/widget.md`](../../docs/patterns/widget.md#mcp-output-rules-strict).
 
-```json
-{
-  "mcpServers": {
-    "Vibe": {
-      "command": "vibe",
-      "args": ["mcp", "--verbose"]
-    }
-  }
-}
-```
+---
+
+## Related
+
+- [CLI README](../cli/README.md)
+- [Patterns](../../docs/patterns/README.md)

@@ -11,16 +11,16 @@
  * since every other setup reads generated code. It is not load-bearing: nothing
  * here depends on another setup having run.
  *
- * Runs all generators (force — the gen-state cache asks whether INPUTS changed,
- * which is the wrong question here: updated emit logic produces different output
- * from identical inputs, and the cache would keep the old file).
+ * Discovered by the `setup-index` generator, which this generator run also
+ * rewrites — safe because the registry is committed, so it always exists before
+ * the import that reads it.
  */
 
 import "server-only";
 
 import chalk from "chalk";
-import type { SetupResult } from "next-vibe/core/setup/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import type { SetupResult } from "../setup/types";
+import type { EndpointLogger } from "../../logger/types";
 
 import { GeneratorRunner } from "./repository";
 
@@ -28,6 +28,11 @@ import { GeneratorRunner } from "./repository";
 export const description = "generated code";
 
 export async function install(logger: EndpointLogger): Promise<SetupResult> {
+  // The gen-state cache asks whether the INPUTS changed — the wrong question
+  // for setup, which runs precisely when the framework itself did. Updated emit
+  // logic produces different output from identical inputs, and the cache would
+  // call that unchanged and keep the old file. `vibe gen` stays cached for the
+  // inner loop; setup rebuilds.
   const result = await GeneratorRunner.runGenerators({ logger, force: true });
 
   if (result.failed.length > 0) {

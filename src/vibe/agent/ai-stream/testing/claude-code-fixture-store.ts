@@ -27,7 +27,7 @@ import { join } from "node:path";
 
 import type { LanguageModelV2StreamPart } from "@ai-sdk/provider";
 
-import type { ToolExecutionContext } from "../../chat/config";
+import type { ToolExecutionContext } from "../../../core/execution-context";
 import {
   cacheDir,
   fileStem,

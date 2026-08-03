@@ -24,7 +24,7 @@ import { scopedTranslation } from "./retention/i18n";
 /**
  * Retention - Initial Contact
  */
-export const retentionInitialEmail: EmailTemplateFunction = ({
+export const retentionInitialEmail: EmailTemplateFunction = async ({
   data,
   locale,
   tracking,
@@ -45,7 +45,7 @@ export const retentionInitialEmail: EmailTemplateFunction = ({
 
       <HumanText variant="body">
         {t("initial.valueSummary", {
-          modelCount: getAvailableModelCount(false, getEnvAvailability()),
+          modelCount: getAvailableModelCount(false, await getEnvAvailability()),
         })}
       </HumanText>
 

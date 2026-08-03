@@ -3,7 +3,7 @@
  * Generates images from text prompts using various AI providers
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -21,7 +21,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
-import { lazyWidget } from "../../unified-ui/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { IMAGE_GEN_ALIAS } from "./constants";
 import {
   ImageQuality,

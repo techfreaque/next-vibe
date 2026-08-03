@@ -17,8 +17,8 @@ import {
   type FieldUsage,
   LayoutType,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { objectField, objectOptionalField, requestDataArrayField, requestDataArrayOptionalField, requestField, responseArrayField, responseArrayOptionalField, responseField } from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../definition/enums";
+import { objectField, objectOptionalField, requestDataArrayField, requestDataArrayOptionalField, requestField, responseArrayField, responseArrayOptionalField, responseField } from "../../unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 // Helper type to test if two types are exactly equal

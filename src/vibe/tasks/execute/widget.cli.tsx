@@ -7,11 +7,11 @@
 
 import chalk from "chalk";
 import { Box, Text } from "ink";
-import { Platform } from "next-vibe/platforms/platforms";
+import { Platform } from "../../platforms/platforms";
 import {
   useWidgetLocale,
   useWidgetPlatform,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
+} from "../../unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useMemo } from "react";
 

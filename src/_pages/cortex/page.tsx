@@ -22,6 +22,7 @@ interface CortexPageProps {
 export interface CortexPageData {
   locale: CountryLanguage;
   user: JwtPayloadType;
+  platform: Platform;
 }
 
 export async function tanstackLoader({
@@ -36,11 +37,15 @@ export async function tanstackLoader({
     logger,
   );
 
-  return { locale, user };
+  return { locale, user, platform: Platform.NEXT_PAGE };
 }
 
-export function TanstackPage({ locale, user }: CortexPageData): JSX.Element {
-  return <CortexPageClient locale={locale} user={user} />;
+export function TanstackPage({
+  locale,
+  user,
+  platform,
+}: CortexPageData): JSX.Element {
+  return <CortexPageClient locale={locale} user={user} platform={platform} />;
 }
 
 export default async function CortexPage({

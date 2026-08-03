@@ -6,14 +6,14 @@
 import "server-only";
 
 import { desc, lt, sql as sqlFn } from "drizzle-orm";
-import { chatMessages } from "next-vibe/agent/chat/db";
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import type { RemoteEventHandlerProps } from "next-vibe/core/route/handler";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { db } from "next-vibe/database";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { dbUserIdToOwner } from "next-vibe/tasks/cron/db";
-import { resolveTaskOwnerUser } from "next-vibe/tasks/cron/resolve-task-user";
+import { chatMessages } from "../../agent/chat/db";
+import { defaultLocale } from "../../core/i18n/core/config";
+import type { RemoteEventHandlerProps } from "../../core/route/handler-realtime";
+import type { WidgetData } from "../../core/utils/json";
+import { db } from "../../database";
+import type { EndpointLogger } from "../../logger/types";
+import { dbUserIdToOwner } from "../../tasks/cron/db";
+import { resolveTaskOwnerUser } from "../../tasks/cron/resolve-task-user";
 
 import { CallbackMode } from "../constants";
 import { pendingCallResults } from "../db";

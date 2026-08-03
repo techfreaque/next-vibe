@@ -1,11 +1,13 @@
 "use client";
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { coreClientEnv } from "../../../core/env-client";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import { Environment } from "../../../env/env-util";
 import type { ErrorInfo, JSX, ReactNode } from "react";
 import { Component } from "react";
 
-import { Info } from "../../web/ui/icons/Info";
-import { RotateCcw } from "../../web/ui/icons/RotateCcw";
+import { Info } from "./icons/Info";
+import { RotateCcw } from "./icons/RotateCcw";
 import {
   Accordion,
   AccordionContent,
@@ -217,7 +219,7 @@ export class ErrorBoundary extends Component<
     // In dev: re-throw so Next.js dev overlay shows the real error origin.
     // Mark it first so getDerivedStateFromError in parent boundaries re-throws
     // instead of catching - letting it propagate all the way to Next.js.
-    if (process.env.NODE_ENV !== "production") {
+    if (coreClientEnv.NODE_ENV !== Environment.PRODUCTION) {
       handledErrors.add(error);
       // eslint-disable-next-line no-restricted-syntax -- Required by React error boundary contract: re-throw in dev to surface original error in Next.js overlay
       throw error;

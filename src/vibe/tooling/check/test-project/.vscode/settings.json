@@ -1,7 +1,7 @@
 {
   "editor.formatOnSave": true,
   "oxc.enable": true,
-  "oxc.lint.run": "onSave",
+  "oxc.lint.run": "onType",
   "oxc.configPath": ".tmp/.oxlintrc.json",
   "oxc.fmt.configPath": ".tmp/.oxfmtrc.json",
   "oxc.fmt.experimental": true,
@@ -15,6 +15,7 @@
   "typescript.validate.enable": true,
   "typescript.suggest.autoImports": true,
   "typescript.preferences.preferTypeOnlyAutoImports": true,
+  "js/ts.experimental.useTsgo": true,
   "files.eol": "\n",
   "search.exclude": {
     "**/node_modules": true,
@@ -43,6 +44,5 @@
   "[javascriptreact]": {
     "editor.defaultFormatter": "oxc.oxc-vscode",
     "editor.formatOnSave": true
-  },
-  "js/ts.experimental.useTsgo": true
+  }
 }

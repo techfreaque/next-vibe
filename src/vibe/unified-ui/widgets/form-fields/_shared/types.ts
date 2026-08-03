@@ -2,13 +2,13 @@
  * Shared types for form field widgets
  */
 
-import type { WidgetType } from "next-vibe/core/definition/enums";
-import type { RequiredFieldTheme } from "next-vibe/unified-ui/_shared/field-config-types";
+import type { WidgetType } from "../../../../core/definition/enums";
+import type { RequiredFieldTheme } from "../../../_shared/field-config-types";
 import type {
   BasePrimitiveWidgetConfig,
   FieldUsageConfig,
-} from "next-vibe/unified-ui/_shared/types";
-import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+} from "../../../_shared/types";
+import type { IconKey } from "../icon-field/icons";
 import type { z } from "zod";
 
 /**

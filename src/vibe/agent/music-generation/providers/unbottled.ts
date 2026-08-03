@@ -1,15 +1,16 @@
 import "server-only";
 
-import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 import {
   checkMediaBalance,
   deductMediaCredits,
-} from "next-vibe/agent/shared/media-generation";
+} from "../../shared/media-generation";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import type { Platform } from "next-vibe/platforms/platforms";
 
 import { STANDARD_MARKUP_PERCENTAGE } from "@/products/constants";
 
@@ -24,6 +25,7 @@ export async function generateMusicWithUnbottled(params: {
   locale: CountryLanguage;
   featureLabel: string;
   toolExecutionContext: ToolExecutionContext;
+  platform: Platform;
 }): Promise<
   ResponseType<{
     audioUrl: string;
@@ -31,8 +33,15 @@ export async function generateMusicWithUnbottled(params: {
     durationSeconds: number;
   }>
 > {
-  const { input, user, logger, locale, featureLabel, toolExecutionContext } =
-    params;
+  const {
+    input,
+    user,
+    logger,
+    locale,
+    featureLabel,
+    toolExecutionContext,
+    platform,
+  } = params;
 
   const remoteResult = await RouteExecuteRepository.runAsSystemProvider({
     definition: definitions.POST,
@@ -41,6 +50,7 @@ export async function generateMusicWithUnbottled(params: {
     locale,
     logger,
     toolExecutionContext,
+    platform,
   });
 
   if (!remoteResult.success) {

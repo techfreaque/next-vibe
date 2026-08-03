@@ -11,16 +11,16 @@
 import { execSync, spawn } from "node:child_process";
 import path from "node:path";
 
-import { buildPackageRunnerCommand, coreEnv } from "next-vibe/core/env";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { buildPackageRunnerCommand, coreEnv } from "../../../../core/env";
+import type { ResponseType } from "../../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { ElectronStartT } from "next-vibe/server/server/electron/start/i18n";
+} from "../../../../core/route/response.schema";
+import { parseError } from "../../../../core/utils/parse-error";
+import type { EndpointLogger } from "../../../../logger/types";
+import type { ElectronStartT } from "./i18n";
 
 import type {
   ElectronStartRequestOutput,
@@ -60,13 +60,15 @@ export class ElectronStartRepository {
         output.push("   ✅ main.js + preload.js compiled to dist/electron/");
       } catch (err) {
         const msg = parseError(err).message;
-        errors.push(`Compilation failed: ${msg}`);
-        output.push(`   ❌ Compilation failed: ${msg}`);
+        // `post.errors.server.title` is the definition's declared SERVER_ERROR
+        // label and renders param-free there, so the cause gets its own key.
+        const failure = t("post.errors.server.compileFailed", { error: msg });
+        errors.push(failure);
+        output.push(`   ❌ ${failure}`);
         logger.error("Electron compilation failed", { error: msg });
         return fail({
-          message: t("post.errors.server.title"),
+          message: failure,
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: { error: msg },
         });
       }
 
@@ -117,9 +119,8 @@ export class ElectronStartRepository {
       const msg = parseError(err).message;
       logger.error("Electron start failed unexpectedly", { error: msg });
       return fail({
-        message: t("post.errors.server.title"),
+        message: t("post.errors.server.startFailed", { error: msg }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: msg },
       });
     }
   }

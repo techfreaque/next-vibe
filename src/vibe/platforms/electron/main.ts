@@ -23,6 +23,7 @@ import {
   nativeImage,
   shell,
 } from "electron";
+import { databaseEnv } from "../../database/env";
 
 // Must be set before app is ready - used by Wayland compositor as window class
 app.setName("Unbottled");
@@ -57,7 +58,7 @@ function derivePort(): number {
         isPreviewMode &&
         (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1")
       ) {
-        return parseInt(process.env["PREVIEW_PORT"] ?? "3001", 10);
+        return databaseEnv.PREVIEW_PORT;
       }
       if (parsed.port) {
         return parseInt(parsed.port, 10);
@@ -67,9 +68,7 @@ function derivePort(): number {
     }
   }
 
-  return isPreviewMode
-    ? parseInt(process.env["PREVIEW_PORT"] ?? "3001", 10)
-    : 3000;
+  return isPreviewMode ? databaseEnv.PREVIEW_PORT : 3000;
 }
 
 // Whether to spawn vibe start internally (false when electron:start already did it)
@@ -150,7 +149,7 @@ async function waitForServer(port: number): Promise<boolean> {
     try {
       // redirect:"manual" avoids chasing locale redirect loops (307 → /en-GLOBAL → ...).
       // Any response except 502/503/504 means the server is up.
-      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- server-liveness probe (waits for the bundled Next server to come up)
+      // oxlint-disable-next-line restricted/no-raw-fetch -- server-liveness probe (waits for the bundled Next server to come up)
       const res = await fetch(serverUrl, {
         method: "HEAD",
         redirect: "manual",

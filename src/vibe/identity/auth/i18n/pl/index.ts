@@ -13,6 +13,12 @@ export const translations: typeof enTranslations = {
       token_save_failed: "Nie udało się zapisać tokenu uwierzytelniania",
       token_get_failed: "Nie udało się pobrać tokenu uwierzytelniania",
       token_remove_failed: "Nie udało się usunąć tokenu uwierzytelniania",
+      token_save_failed_detail:
+        "Nie udało się zapisać tokenu uwierzytelniania: {{error}}",
+      token_get_failed_detail:
+        "Nie udało się pobrać tokenu uwierzytelniania: {{error}}",
+      token_remove_failed_detail:
+        "Nie udało się usunąć tokenu uwierzytelniania: {{error}}",
     },
   },
   errors: {
@@ -25,14 +31,18 @@ export const translations: typeof enTranslations = {
     session_retrieval_failed: "Nie udało się pobrać sesji",
     missing_token: "Token uwierzytelniania jest brakujący",
     invalid_token_signature: "Podpis tokenu jest nieprawidłowy",
+    invalid_token_signature_detail:
+      "Weryfikacja podpisu tokenu nie powiodła się: {{error}}",
     jwt_payload_missing_id: "JWT payload brakuje ID użytkownika",
-    cookie_set_failed: "Nie udało się ustawić cookie uwierzytelniania",
-    cookie_clear_failed: "Nie udało się usunąć cookie uwierzytelniania",
+    cookie_set_failed:
+      "Nie udało się ustawić cookie uwierzytelniania: {{error}}",
+    cookie_clear_failed:
+      "Nie udało się usunąć cookie uwierzytelniania: {{error}}",
     publicPayloadNotSupported:
       "Publiczny payload JWT nie jest obsługiwany dla uwierzytelniania CLI",
-    jwt_signing_failed: "Nie udało się podpisać tokenu JWT",
-    authentication_failed: "Uwierzytelnianie nie powiodło się",
-    user_not_authenticated: "Użytkownik nie jest uwierzytelniony",
+    jwt_signing_failed: "Nie udało się podpisać tokenu JWT: {{error}}",
+    authentication_failed: "Uwierzytelnianie nie powiodło się: {{error}}",
+    user_not_authenticated: "Użytkownik nie jest uwierzytelniony: {{email}}",
     publicUserNotAllowed:
       "Użytkownik publiczny nie jest dozwolony dla tego endpointu",
     validation_failed: "Walidacja nie powiodła się",
@@ -40,8 +50,10 @@ export const translations: typeof enTranslations = {
     native: {
       unsupported:
         "Ta metoda uwierzytelniania nie jest obsługiwana w React Native",
-      storage_failed: "Nie udało się zapisać danych uwierzytelniania",
-      clear_failed: "Nie udało się wyczyścić danych uwierzytelniania",
+      storage_failed:
+        "Nie udało się zapisać danych uwierzytelniania: {{error}}",
+      clear_failed:
+        "Nie udało się wyczyścić danych uwierzytelniania: {{error}}",
     },
     not_implemented_native:
       "Ta funkcja nie jest jeszcze zaimplementowana dla React Native",

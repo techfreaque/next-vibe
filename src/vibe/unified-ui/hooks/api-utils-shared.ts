@@ -1,4 +1,4 @@
-import type { WidgetData } from "next-vibe/core/utils/json";
+import type { WidgetData } from "../../core/utils/json";
 
 function isJsonObject(value: WidgetData): value is Record<string, WidgetData> {
   return (

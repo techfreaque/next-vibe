@@ -1,24 +1,18 @@
 "use client";
 
-import {
-  type ChatModelSelection,
-  getBestChatModel,
-} from "next-vibe/agent/ai-stream/models";
-import type { AiStreamT } from "next-vibe/agent/ai-stream/stream/i18n";
-import { scopedTranslation } from "next-vibe/agent/ai-stream/stream/i18n";
-import { useChatSettings } from "next-vibe/agent/chat/settings/hooks";
-import { formatSkillId, parseSkillId } from "next-vibe/agent/chat/slugify";
-import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
-import {
-  COMPANION_SKILLS,
-  DEFAULT_SKILLS,
-} from "next-vibe/agent/skills/config";
-import { ModelSelectionType } from "next-vibe/agent/skills/enum";
-import { useFavoriteCreate } from "next-vibe/agent/skills/favorites/create/hooks";
-import favoritesDefinition from "next-vibe/agent/skills/favorites/definition";
-import { ChatFavoritesRepositoryClient } from "next-vibe/agent/skills/favorites/repository-client";
-import { scopedTranslation as skillsScopedTranslation } from "next-vibe/agent/skills/i18n";
+import { type ChatModelSelection, getBestChatModel } from "../../../../models";
+import type { AiStreamT } from "../../../i18n";
+import { scopedTranslation } from "../../../i18n";
+import { useChatSettings } from "../../../../../chat/settings/hooks";
+import { formatSkillId, parseSkillId } from "../../../../../chat/slugify";
+import type { AgentEnvAvailability } from "../../../../../env-availability";
+import { useProviderAvailability } from "../../../../../env-availability-store";
+import { COMPANION_SKILLS, DEFAULT_SKILLS } from "../../../../../skills/config";
+import { ModelSelectionType } from "../../../../../skills/enum";
+import { useFavoriteCreate } from "../../../../../skills/favorites/create/hooks";
+import favoritesDefinition from "../../../../../skills/favorites/definition";
+import { ChatFavoritesRepositoryClient } from "../../../../../skills/favorites/repository-client";
+import { scopedTranslation as skillsScopedTranslation } from "../../../../../skills/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { success } from "next-vibe/core/route/response.schema";
 import type { UserPermissionRoleValue } from "next-vibe/identity/roles/enum";

@@ -6,12 +6,14 @@
 
 import "./reconciler-polyfill";
 
+import type { ColorSupportLevel } from "chalk";
 import { Chalk } from "chalk";
 import cliBoxes from "cli-boxes";
 import type { BoxProps, StaticProps, TextProps } from "ink";
 import { Box, Static, Text } from "ink";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import { parseError } from "../../../../../core/utils/parse-error";
+import { shouldUseColors } from "../../../../../logger/colors";
+import type { EndpointLogger } from "../../../../../logger/types";
 import React, {
   type JSXElementConstructor,
   type ReactElement,
@@ -22,6 +24,8 @@ import {
   DefaultEventPriority,
   LegacyRoot,
 } from "react-reconciler/constants.js";
+import stringWidth from "string-width";
+import stripAnsi from "strip-ansi";
 
 // NoEventPriority is available at runtime but not in type definitions
 const NoEventPriority = 0;
@@ -64,8 +68,28 @@ class RenderErrorBoundary extends React.Component<
   }
 }
 
-// Force chalk to output ANSI codes (level 3 = TrueColor support)
-const chalk = new Chalk({ level: 3 });
+/**
+ * Colour depth is DETECTED, never forced.
+ *
+ * Hardcoding `level: 3` emitted 24-bit SGR escapes into pipes, dumb terminals
+ * and `NO_COLOR` sessions. `shouldUseColors()` is the shared project policy
+ * (NO_COLOR / FORCE_COLOR / TERM=dumb / non-TTY); chalk's own detection then
+ * supplies the actual depth so a 16-colour terminal never gets truecolor.
+ */
+function resolveColorLevel(): ColorSupportLevel {
+  if (!shouldUseColors()) {
+    return 0;
+  }
+
+  // A bare Chalk instance auto-detects depth from the environment.
+  const detected = new Chalk().level;
+
+  // Policy says colour is wanted (e.g. FORCE_COLOR on a non-TTY) but detection
+  // found none — fall back to basic 16-colour rather than dropping styling.
+  return detected > 0 ? detected : 1;
+}
+
+const chalk = new Chalk({ level: resolveColorLevel() });
 
 // Noop function for reconciler callbacks
 // eslint-disable-next-line no-empty-function
@@ -97,11 +121,28 @@ interface RenderNode {
     string | number | boolean | null | undefined | RenderNode | RenderNode[]
   >;
   children: RenderNode[];
+  /**
+   * Ink's `internal_transform`. Ink's <Text> does NOT expose colour/bold/dim as
+   * props — it renders `<ink-text style={…} internal_transform={fn}>` and puts
+   * every style into that closure (see ink/build/components/Text.js). Since
+   * createInstance only copies primitive props, dropping this function silently
+   * discarded ALL text styling in the fast renderer.
+   *
+   * Ink's transform uses the default chalk instance, which auto-detects the
+   * terminal — so styling appears on a TTY and piped output stays clean.
+   */
+  transform?: InkTextTransform;
 }
 
 interface HostContext {
   isInsideText: boolean;
 }
+
+/**
+ * Ink's `internal_transform`: the closure <Text> uses to apply colour, bold,
+ * dim, underline and friends to its rendered content.
+ */
+type InkTextTransform = (content: string) => string;
 
 interface Container {
   node: RenderNode | null;
@@ -363,6 +404,13 @@ function renderText(node: RenderNode): string {
   // Exhaustive assignment to ensure we're aware of all aria props
   void props["aria-label"];
   void props["aria-hidden"];
+
+  // Ink's own styling, applied last so it composes over anything set above.
+  // This is where colour/bold/dim from <Text color=… bold> actually land — they
+  // are never props, only this closure.
+  if (node.transform) {
+    styled = node.transform(styled);
+  }
 
   return styled;
 }
@@ -659,7 +707,12 @@ function renderBox(node: RenderNode): string {
     const borderRight = props.borderRight ?? true;
 
     const lines = output.split("\n");
-    const maxWidth = Math.max(...lines.map((l) => l.length), 0);
+    // Border width must be measured in terminal columns, not UTF-16 code units:
+    // `output` already carries the children's ANSI colour codes (zero columns
+    // but many bytes) and may contain wide glyphs, so raw .length skews the
+    // right border away from the text it is supposed to box.
+    const displayWidth = (line: string): number => stringWidth(stripAnsi(line));
+    const maxWidth = Math.max(...lines.map(displayWidth), 0);
 
     // Get border characters based on style
     let borderChars: {
@@ -777,7 +830,8 @@ function renderBox(node: RenderNode): string {
             borderRightDimColor,
           )
         : "";
-      const paddedLine = line + " ".repeat(Math.max(0, maxWidth - line.length));
+      const paddedLine =
+        line + " ".repeat(Math.max(0, maxWidth - displayWidth(line)));
       borderedLines.push(left + paddedLine + right);
     }
 
@@ -987,6 +1041,7 @@ function createStaticReconciler(): ReturnType<typeof Reconciler> {
         | null
         | undefined
         | ReactNode
+        | InkTextTransform
         | Record<string, string | number | boolean | null | undefined>
       >,
     ): RenderNode {
@@ -1004,8 +1059,15 @@ function createStaticReconciler(): ReturnType<typeof Reconciler> {
         ) {
           const propValue = props[key];
 
-          // Handle Ink's style object - extract and flatten style properties
-          if (key === "style" && propValue && typeof propValue === "object") {
+          // Ink carries all text styling in this closure, not in props — the
+          // prop union above models it, so `typeof` narrows it directly.
+          if (key === "internal_transform" && typeof propValue === "function") {
+            instance.transform = propValue;
+          } else if (
+            key === "style" &&
+            propValue &&
+            typeof propValue === "object"
+          ) {
             // Copy all style properties to top-level props
             for (const styleKey in propValue) {
               if (Object.prototype.hasOwnProperty.call(propValue, styleKey)) {
@@ -1192,30 +1254,36 @@ function createStaticReconciler(): ReturnType<typeof Reconciler> {
     },
 
     detachDeletedInstance: noop,
+
+    // React 19 form-state plumbing. The reconciler reads both unconditionally
+    // while building the host transition context; leaving them undefined makes
+    // it dereference a missing context during render, so these are runtime
+    // requirements, not just type requirements. This renderer has no form
+    // primitives and never suspends on an action, so "not pending" is a
+    // constant and the context value never changes.
+    NotPendingTransition: null,
+    HostTransitionContext: React.createContext<null>(null),
   };
 
+  // @types/react-reconciler's ReactContext<T> demands renderer internals
+  // (_currentValue, _currentValue2, _threadCount) that @types/react's Context<T>
+  // does not expose, so the two packages are structurally incompatible here.
+  // The directive is used deliberately in preference to a cast: it asserts
+  // nothing false about the value, and it FAILS the build the day the two
+  // packages line up, so it cannot rot into a permanent silent exception.
+  // Dropping the field instead would trade a type error for a real React 19
+  // runtime gap - the reconciler reads it unconditionally during render.
+  // @ts-expect-error -- see above: cross-package ReactContext incompatibility
   return Reconciler(hostConfig);
 }
 
-/**
- * Extended reconciler type - React 19 adds updateContainerSync and flushSyncWork
- * but @types/react-reconciler doesn't include them yet.
- */
-interface ExtendedReconciler extends ReturnType<typeof createStaticReconciler> {
-  updateContainerSync: (
-    element: ReactElement | null,
-    container: ReturnType<
-      ReturnType<typeof createStaticReconciler>["createContainer"]
-    >,
-    parentComponent: null,
-    callback: () => void,
-  ) => void;
-  flushSyncWork: () => void;
-  flushPassiveEffects: () => boolean;
-}
-
-// Cache the reconciler instance
-let reconciler: ExtendedReconciler | null = null;
+// Cache the reconciler instance.
+// @types/react-reconciler 0.33 declares updateContainerSync, flushSyncWork and
+// flushPassiveEffects itself, so the local ExtendedReconciler that used to patch
+// them in is gone — it had drifted out of sync (it typed updateContainerSync as
+// returning void where the real signature returns a Lane) and only compiled
+// behind a cast.
+let reconciler: ReturnType<typeof createStaticReconciler> | null = null;
 
 /**
  * Render a React element tree with full hook support using react-reconciler.
@@ -1229,7 +1297,7 @@ function renderWithReconciler(
   logger: EndpointLogger,
 ): RenderNode | null {
   if (!reconciler) {
-    reconciler = createStaticReconciler() as ExtendedReconciler;
+    reconciler = createStaticReconciler();
   }
 
   const container: Container = { node: null };
@@ -1268,9 +1336,7 @@ function renderWithReconciler(
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- react-reconciler types lag behind: runtime expects onUncaughtError, onCaughtError, onRecoverableError
-  const createContainer = reconciler.createContainer as (...args: any[]) => any;
-  const root = createContainer(
+  const root = reconciler.createContainer(
     container,
     LegacyRoot,
     null,
@@ -1286,7 +1352,11 @@ function renderWithReconciler(
     (err: Error) => {
       recordError("Reconciler recoverable error", err);
     },
-    null,
+    // onDefaultTransitionIndicator: React 19 invokes this to show its built-in
+    // pending indicator. A static CLI frame never transitions, so it is never
+    // called - but the reconciler stores it unconditionally, so a function is
+    // safer here than the null this used to pass under an `any` cast.
+    noop,
   );
 
   let boundaryError: Error | null = null;

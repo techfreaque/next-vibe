@@ -63,11 +63,10 @@ export class EmailPreviewRenderRepository {
       if (!template) {
         logger.warn("Template not found", { templateId: data.templateId });
         return fail({
-          message: t("preview.sendTest.error.templateNotFound"),
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: {
+          message: t("preview.sendTest.error.templateNotFound", {
             templateId: data.templateId,
-          },
+          }),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
 
@@ -105,11 +104,10 @@ export class EmailPreviewRenderRepository {
           error: errorParsed,
         });
         return fail({
-          message: t("preview.sendTest.error.invalidProps"),
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: {
+          message: t("preview.sendTest.error.invalidProps", {
             error: errorParsed.message,
-          },
+          }),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
 
@@ -136,11 +134,10 @@ export class EmailPreviewRenderRepository {
         templateId: data.templateId,
       });
       return fail({
-        message: t("preview.sendTest.error.sendFailed"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
+        message: t("preview.sendTest.error.sendFailed", {
           error: errorParsed.message,
-        },
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }

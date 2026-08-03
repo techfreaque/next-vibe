@@ -298,9 +298,9 @@ export const translations: typeof enTranslations = {
       "Ihr Konto wurde gesperrt. Bitte kontaktieren Sie den Support.",
     invalid_credentials: "Ungültige E-Mail oder Passwort",
     two_factor_required: "Zwei-Faktor-Authentifizierung erforderlich",
-    auth_error: "Authentifizierungsfehler aufgetreten",
-    user_not_found: "Benutzer nicht gefunden",
-    session_creation_failed: "Sitzung konnte nicht erstellt werden",
+    auth_error: "Anmeldung für {{email}} fehlgeschlagen: {{error}}",
+    user_not_found: "Kein Benutzer zu {{userId}} gefunden",
+    session_creation_failed: "Sitzung für {{userId}} konnte nicht erstellt werden: {{error}}",
     token_save_failed:
       "Authentifizierungs-Token konnte nicht gespeichert werden",
     validation: {

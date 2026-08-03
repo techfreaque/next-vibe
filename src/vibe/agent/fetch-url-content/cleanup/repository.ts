@@ -6,7 +6,7 @@
 
 import "server-only";
 
-import { getStorageAdapter } from "next-vibe/agent/chat/storage/index";
+import { getStorageAdapter } from "../../chat/storage/index";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import { success } from "next-vibe/core/route/response.schema";
 import type { EndpointLogger } from "next-vibe/logger/types";

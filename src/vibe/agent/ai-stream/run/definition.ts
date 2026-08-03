@@ -10,8 +10,8 @@
  *     --skill=default --prompt="Summarise these skills"
  */
 
-import { MAX_TOOL_CALLS } from "next-vibe/agent/ai-stream/repository/core/constants";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { MAX_TOOL_CALLS } from "../repository/core/constants";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -34,7 +34,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
-import { DefaultFolderId } from "../../chat/config";
+import { DefaultFolderId } from "../../../core/execution-context";
 import { SKILL_CREATOR_ID } from "../../skills/constants";
 import { ChatModelId, ChatModelIdOptions, getChatModelById } from "../models";
 import { scopedTranslation } from "../stream/i18n";

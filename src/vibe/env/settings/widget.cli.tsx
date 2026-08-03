@@ -8,20 +8,20 @@
 import chalk from "chalk";
 import { Box, Text, useApp, useInput, useStdin } from "ink";
 import TextInput from "ink-text-input";
-import { makeHeadlessContext } from "next-vibe/agent/chat/config";
-import { Platform } from "next-vibe/platforms/platforms";
-import { scopedTranslation as connectScopedTranslation } from "next-vibe/remote-connection/connect/i18n";
-import type { SyncScope } from "next-vibe/remote-connection/db";
-import { SyncScopeSchema } from "next-vibe/remote-connection/db";
-import { useRemoteConnections } from "next-vibe/remote-connection/list/hooks";
+import { makeHeadlessContext } from "next-vibe/core/execution-context";
+import { Platform } from "../../platforms/platforms";
+import { scopedTranslation as connectScopedTranslation } from "../../remote-connection/connect/i18n";
+import type { SyncScope } from "../../remote-connection/db";
+import { SyncScopeSchema } from "../../remote-connection/db";
+import { useRemoteConnections } from "../../remote-connection/list/hooks";
 import {
   useWidgetLocale,
   useWidgetLogger,
   useWidgetPlatform,
   useWidgetTranslation,
   useWidgetUser,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
-import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
+} from "../../unified-ui/_shared/use-widget-context";
+import { useApiMutation } from "../../unified-ui/hooks/use-api-mutation";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -292,7 +292,7 @@ function CliEditor({ value, onDone }: EditorProps): JSX.Element {
     setSaveMsg(null);
     try {
       const { RouteExecuteRepository } =
-        await import("next-vibe/execute-tool/repository");
+        await import("../../execute-tool/repository");
       await RouteExecuteRepository.runInProcessTyped({
         definition: endpoints.PATCH,
         input: edits,
@@ -707,7 +707,7 @@ function CliWizard({ value, onDone }: WizardProps): JSX.Element {
     setSaveMsg(null);
     try {
       const { RouteExecuteRepository } =
-        await import("next-vibe/execute-tool/repository");
+        await import("../../execute-tool/repository");
       await RouteExecuteRepository.runInProcessTyped({
         definition: endpoints.PATCH,
         input: toSave,
@@ -845,7 +845,9 @@ function CliWizard({ value, onDone }: WizardProps): JSX.Element {
                   <Text dimColor>{t("wizard.ai.claudeInstallHint")}</Text>
                 </Box>
               )}
-              <Text dimColor>{`[${t("wizard.next")}] continue`}</Text>
+              <Text
+                dimColor
+              >{`[${t("wizard.next")}] ${t("wizard.continue")}`}</Text>
             </Box>
           ) : currentField.key === "OPENROUTER_API_KEY" ? (
             /* OpenRouter with extra hints */
@@ -1021,7 +1023,7 @@ export function SystemSettingsPatchWidget(): JSX.Element {
     void (async (): Promise<void> => {
       try {
         const { RouteExecuteRepository } =
-          await import("next-vibe/execute-tool/repository");
+          await import("../../execute-tool/repository");
         const result = await RouteExecuteRepository.runInProcessTyped({
           definition: endpoints.GET,
           user,
@@ -1111,7 +1113,7 @@ export function SystemSettingsPatchWidget(): JSX.Element {
         {data.isWritable ? t("widget.title") : t("widget.readOnlyBanner")}
       </Text>
       <Text dimColor>
-        {`  [w] ${t("widget.restartWizard")}  [e] ${t("widget.editSettings")}  [q] exit`}
+        {`  [w] ${t("widget.restartWizard")}  [e] ${t("widget.editSettings")}  [q] ${t("widget.exit")}`}
       </Text>
     </Box>
   );

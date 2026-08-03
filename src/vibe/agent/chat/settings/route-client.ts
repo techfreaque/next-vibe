@@ -1,4 +1,5 @@
 import { Methods } from "next-vibe/core/definition/enums";
+import { getClientAvailability } from "../../env-availability-store";
 import { clientEndpointsHandler } from "next-vibe/core/route/client-multi";
 
 import definitions from "./definition";
@@ -7,16 +8,20 @@ import { ChatSettingsRepositoryClient } from "./repository-client";
 export const { GET, POST } = clientEndpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
-    handler: ({ logger, user, availability }) =>
-      ChatSettingsRepositoryClient.getSettings(logger, user, availability),
+    handler: ({ logger, user }) =>
+      ChatSettingsRepositoryClient.getSettings(
+        logger,
+        user,
+        getClientAvailability(),
+      ),
   },
   [Methods.POST]: {
-    handler: ({ data, logger, user, availability }) =>
+    handler: ({ data, logger, user }) =>
       ChatSettingsRepositoryClient.updateSettings(
         data,
         logger,
         user,
-        availability,
+        getClientAvailability(),
       ),
   },
 });

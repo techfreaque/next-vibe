@@ -9,7 +9,7 @@ declare const process: {
 const DATABASE_URL = process?.env?.["DATABASE_URL"];
 
 if (!DATABASE_URL) {
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Configuration file needs to throw for missing environment variables
+  // eslint-disable-next-line restricted/restricted-syntax, i18next/no-literal-string -- Configuration file needs to throw for missing environment variables
   throw new Error("DATABASE_URL environment variable is required");
 }
 

@@ -2,12 +2,15 @@
  * CodeOutput Widget Type Definitions
  */
 
-import type { SpacingSize, WidgetType } from "next-vibe/core/definition/enums";
-import type { StringWidgetSchema } from "next-vibe/unified-ui/_shared/schema-constraints";
+import type {
+  SpacingSize,
+  WidgetType,
+} from "../../../../core/definition/enums";
+import type { StringWidgetSchema } from "../../../_shared/schema-constraints";
 import type {
   BasePrimitiveWidgetConfig,
   FieldUsageConfig,
-} from "next-vibe/unified-ui/_shared/types";
+} from "../../../_shared/types";
 
 /**
  * Code Output Widget Configuration

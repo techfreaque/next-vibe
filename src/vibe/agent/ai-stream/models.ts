@@ -5,7 +5,6 @@ import type { AgentEnvAvailability } from "../env-availability";
 import {
   ApiProvider,
   filterRoleModels,
-  getModelForProvider,
   getProviderPrice,
   type ModelDefinition,
   type ModelOptionCreditBased,
@@ -20,13 +19,6 @@ import { ModelSelectionType } from "../skills/enum";
 import { chatModelDefinitions, ChatModelId } from "./models-definitions";
 
 export { chatModelDefinitions, ChatModelId };
-
-/**
- * String-keyed lookup for chat model definitions.
- * Use this in media-gen files to avoid importing ChatModelId.
- */
-export const chatModelDefinitionsByString: Record<string, ModelDefinition> =
-  chatModelDefinitions;
 
 /**
  * Featured models by category for use in marketing content, emails, etc.
@@ -192,25 +184,6 @@ export function getChatModelById(
   return (
     chatModelOptionsIndex[modelId] ??
     chatModelOptionsIndex[ChatModelId.KIMI_K2]!
-  );
-}
-
-/**
- * Resolve a chat model option using a specific API provider.
- * Picks the cheapest provider variant for `modelId` that matches `provider` from the pool.
- * Falls back to the default (cheapest overall) if no matching provider exists.
- */
-export function getChatModelForProvider(
-  modelId: ChatModelId,
-  provider: ApiProvider,
-): ChatModelOption {
-  return (
-    getModelForProvider(
-      modelId,
-      provider,
-      chatModelOptionsPool,
-      getChatModelById(modelId),
-    ) ?? getChatModelById(modelId)
   );
 }
 

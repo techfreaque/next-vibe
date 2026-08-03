@@ -3,7 +3,7 @@
  * Creates a draft invoice from an accepted estimate and marks estimate as CONVERTED
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,

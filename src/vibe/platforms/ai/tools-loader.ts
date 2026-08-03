@@ -7,34 +7,31 @@
 import "server-only";
 
 import { jsonSchema, type JSONSchema7, tool } from "ai";
-import { claimExecuteToolCallId } from "next-vibe/agent/ai-stream/repository/core/stream";
+import { claimExecuteToolCallId } from "../../agent/ai-stream/repository/core/stream";
 import {
   FOLDER_ALLOWS_REMOTE_TOOLS,
   FOLDER_BLOCKED_CALLBACK_MODES,
-  type ToolExecutionContext,
-} from "next-vibe/agent/chat/config";
+} from "../../agent/chat/config";
+import { type ToolExecutionContext } from "next-vibe/core/execution-context";
 import {
   endpointToToolName,
   getPreferredToolName,
-} from "next-vibe/core/core-utils/path";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { FieldUsage } from "next-vibe/core/definition/enums";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { permissionsRegistry } from "next-vibe/core/permissions/registry";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import {
-  CallbackMode,
-  EXECUTE_TOOL_ALIAS,
-} from "next-vibe/execute-tool/constants";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { filterUserPermissionRoles } from "next-vibe/identity/roles/enum";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { Platform } from "next-vibe/platforms/platforms";
+} from "../../core/core-utils/path";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
+import { FieldUsage } from "../../core/definition/enums";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import { permissionsRegistry } from "../../core/permissions/registry";
+import type { WidgetData } from "../../core/utils/json";
+import { parseError } from "../../core/utils/parse-error";
+import { CallbackMode, EXECUTE_TOOL_ALIAS } from "../../execute-tool/constants";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import { filterUserPermissionRoles } from "../../identity/roles/enum";
+import type { EndpointLogger } from "../../logger/types";
+import { Platform } from "../platforms";
 import {
   collectServerDefaults,
   generateSchemaForUsage,
-} from "next-vibe/unified-ui/_shared/utils";
+} from "../../unified-ui/_shared/utils";
 import { z } from "zod";
 
 import { getEndpoint } from "@/generated/endpoints/endpoint";
@@ -353,9 +350,8 @@ function createToolFromEndpoint(
         }
 
         const { RouteExecuteRepository } =
-          await import("next-vibe/execute-tool/repository");
-        const { scopedTranslation: executeScopedT } =
-          await import("next-vibe/platforms/ai/i18n");
+          await import("../../execute-tool/repository");
+        const { scopedTranslation: executeScopedT } = await import("./i18n");
         const { t: execT } = executeScopedT.scopedT(context.locale);
 
         // execute-tool: restParams already has the correct shape ({ toolName, input, callbackMode, instanceId? })
@@ -440,18 +436,7 @@ function createToolFromEndpoint(
         }
 
         if (!result.success) {
-          // Return { success: false, message } so tool-result-handler's isErrorResponse
-          // check fires (looks for output.success === false + output.message: string).
-          // The handler extracts message, creates toolCall.error, sets status="failed".
-          // Returning { error: string } loses the structured shape and the tool renders
-          // as success in the UI.
-          const errMsg: string = result.messageParams?.error
-            ? typeof result.messageParams.error === "string" &&
-              !result.message.includes(result.messageParams.error)
-              ? `${String(result.message)}: ${result.messageParams.error}`
-              : String(result.message)
-            : String(result.message);
-          return { success: false as const, message: errMsg };
+          return result;
         }
 
         return result.data as WidgetData;
@@ -496,7 +481,7 @@ const allCallbackModes = ["detach", "wakeUp", "endLoop", "approve"];
  */
 export function generateInputSchema(
   endpoint: CreateApiEndpointAny,
-  userRoles?: ReturnType<typeof filterUserPermissionRoles>,
+  userRoles: ReturnType<typeof filterUserPermissionRoles>,
 ): z.ZodObject<Record<string, z.ZodTypeAny>> {
   if (!endpoint.fields) {
     return z.object({});
@@ -770,7 +755,7 @@ export async function loadTools(params: {
       }
 
       const { RemoteConnectionRepository } =
-        await import("next-vibe/remote-connection/repository");
+        await import("../../remote-connection/repository");
 
       for (const [instanceId, names] of byInstance) {
         const capabilities = await RemoteConnectionRepository.getCapabilities(

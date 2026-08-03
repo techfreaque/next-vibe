@@ -35,7 +35,7 @@ import {
 import { UserRolesRepository } from "next-vibe/identity/roles/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { DefaultFolderId } from "../config";
+import type { DefaultFolderId } from "next-vibe/core/execution-context";
 import { type DefaultFolderConfig, getDefaultFolderConfig } from "../config";
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 
@@ -313,7 +313,7 @@ export async function canCreateFolder(
   if (rootFolderId === "public" && parentId) {
     // Get parent folder to check permissions
     const { chatFolders } = await import("../db");
-    const { db } = await import("../../../database");
+    const { db } = await import("next-vibe/database");
     const { eq } = await import("drizzle-orm");
 
     const [parentFolder] = await db
@@ -498,20 +498,6 @@ export async function canHideFolder(
 
   // Check if user has required role
   return await hasRolePermission(user, effectiveRoles, logger, locale);
-}
-
-/**
- * Check if user can update a folder (rename, change icon, etc.)
- * Same as manage permission - uses rolesManage
- */
-export async function canUpdateFolder(
-  user: JwtPayloadType,
-  folder: ChatFolder,
-  logger: EndpointLogger,
-  locale: CountryLanguage,
-  allFolders: Record<string, ChatFolder> = {},
-): Promise<boolean> {
-  return await canManageFolder(user, folder, logger, locale, allFolders);
 }
 
 /**

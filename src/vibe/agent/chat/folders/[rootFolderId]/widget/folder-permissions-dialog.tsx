@@ -1,6 +1,6 @@
 "use client";
 
-import folderPermissionsDefinitions from "next-vibe/agent/chat/folders/subfolders/[subFolderId]/permissions/definition";
+import folderPermissionsDefinitions from "../../subfolders/[subFolderId]/permissions/definition";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { type EndpointLogger } from "next-vibe/logger/types";
@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "next-vibe/ui/ui/dialog";
+import { useWidgetPlatform } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 import { useMemo } from "react";
@@ -35,6 +36,7 @@ export function FolderPermissionsDialog({
   user,
 }: FolderPermissionsDialogProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
+  const platform = useWidgetPlatform();
 
   const endpointOptions = useMemo(
     () => ({
@@ -67,6 +69,7 @@ export function FolderPermissionsDialog({
           endpoint={folderPermissionsDefinitions}
           locale={locale}
           user={user}
+          platform={platform}
           endpointOptions={endpointOptions}
         />
       </DialogContent>

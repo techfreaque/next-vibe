@@ -5,9 +5,9 @@
  */
 import "server-only";
 
-import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import type { Platform } from "next-vibe/platforms/platforms";
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
+import type { WidgetData } from "../../../core/utils/json";
+import type { Platform } from "../../../platforms/platforms";
 
 import type { CallbackModeValue } from "../../constants";
 import executeDefinition from "../../definition";
@@ -37,7 +37,8 @@ export async function emitToolRequest(params: {
   logger: RouteExecuteContext["logger"];
   user: RouteExecuteContext["user"];
 }): Promise<void> {
-  const { createEndpointEmitter } = await import("next-vibe/realtime/emitter");
+  const { createEndpointEmitter } =
+    await import("../../../realtime/core/emitter");
   // The wire carries only the caller's fixture thread id (a string) — the
   // receiver rebuilds its own headless context around it. Spreading the full
   // ToolExecutionContext object would not match the string wire schema.

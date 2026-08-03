@@ -18,6 +18,12 @@ export const translations: typeof enTranslations = {
       token_get_failed: "Authentifizierungstoken konnte nicht abgerufen werden",
       token_remove_failed:
         "Authentifizierungstoken konnte nicht entfernt werden",
+      token_save_failed_detail:
+        "Authentifizierungstoken konnte nicht gespeichert werden: {{error}}",
+      token_get_failed_detail:
+        "Authentifizierungstoken konnte nicht abgerufen werden: {{error}}",
+      token_remove_failed_detail:
+        "Authentifizierungstoken konnte nicht entfernt werden: {{error}}",
     },
   },
   errors: {
@@ -30,15 +36,18 @@ export const translations: typeof enTranslations = {
     session_retrieval_failed: "Sitzung konnte nicht abgerufen werden",
     missing_token: "Authentifizierungs-Token fehlt",
     invalid_token_signature: "Token-Signatur ist ungültig",
+    invalid_token_signature_detail:
+      "Prüfung der Token-Signatur fehlgeschlagen: {{error}}",
     jwt_payload_missing_id: "JWT-Payload fehlt Benutzer-ID",
-    cookie_set_failed: "Authentifizierungs-Cookie konnte nicht gesetzt werden",
+    cookie_set_failed:
+      "Authentifizierungs-Cookie konnte nicht gesetzt werden: {{error}}",
     cookie_clear_failed:
-      "Authentifizierungs-Cookie konnte nicht gelöscht werden",
+      "Authentifizierungs-Cookie konnte nicht gelöscht werden: {{error}}",
     publicPayloadNotSupported:
       "Öffentlicher JWT-Payload wird für CLI-Authentifizierung nicht unterstützt",
-    jwt_signing_failed: "JWT-Token konnte nicht signiert werden",
-    authentication_failed: "Authentifizierung fehlgeschlagen",
-    user_not_authenticated: "Benutzer ist nicht authentifiziert",
+    jwt_signing_failed: "JWT-Token konnte nicht signiert werden: {{error}}",
+    authentication_failed: "Authentifizierung fehlgeschlagen: {{error}}",
+    user_not_authenticated: "Benutzer ist nicht authentifiziert: {{email}}",
     publicUserNotAllowed:
       "Öffentlicher Benutzer ist für diesen Endpunkt nicht erlaubt",
     validation_failed: "Validierung fehlgeschlagen",
@@ -47,8 +56,9 @@ export const translations: typeof enTranslations = {
       unsupported:
         "Diese Authentifizierungsmethode wird in React Native nicht unterstützt",
       storage_failed:
-        "Authentifizierungsdaten konnten nicht gespeichert werden",
-      clear_failed: "Authentifizierungsdaten konnten nicht gelöscht werden",
+        "Authentifizierungsdaten konnten nicht gespeichert werden: {{error}}",
+      clear_failed:
+        "Authentifizierungsdaten konnten nicht gelöscht werden: {{error}}",
     },
     not_implemented_native:
       "Diese Funktion ist noch nicht für React Native implementiert",

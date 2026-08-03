@@ -51,7 +51,7 @@ export abstract class BaseRecorder implements Recorder {
    */
   async start(destPath: string): Promise<void> {
     if (this._isRecording) {
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Recorder initialization error
+      // eslint-disable-next-line restricted/restricted-syntax -- Recorder initialization error
       throw new RecorderError(
         "Recording already in progress",
         "RECORDING_IN_PROGRESS",
@@ -80,7 +80,7 @@ export abstract class BaseRecorder implements Recorder {
     } catch (error) {
       this._isRecording = false;
       this._currentPath = null;
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Recorder initialization error
+      // eslint-disable-next-line restricted/restricted-syntax -- Recorder initialization error
       throw new RecorderError(
         `Failed to start recording: ${String(error)}`,
         "START_FAILED",
@@ -98,7 +98,7 @@ export abstract class BaseRecorder implements Recorder {
    */
   async stop(): Promise<void> {
     if (!this._isRecording || !this._process) {
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Recorder state error
+      // eslint-disable-next-line restricted/restricted-syntax -- Recorder state error
       throw new RecorderError("No recording in progress", "NO_RECORDING", {});
     }
 
@@ -110,7 +110,7 @@ export abstract class BaseRecorder implements Recorder {
       this._currentPath = null;
       this._process = undefined;
     } catch (error) {
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Recorder stop error
+      // eslint-disable-next-line restricted/restricted-syntax -- Recorder stop error
       throw new RecorderError(
         `Failed to stop recording: ${String(error)}`,
         "STOP_FAILED",

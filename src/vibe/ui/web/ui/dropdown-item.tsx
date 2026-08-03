@@ -3,7 +3,7 @@
 import type { JSX } from "react";
 import React, { useState } from "react";
 
-import type { StyleType } from "../../web/utils/style-type";
+import type { StyleType } from "../utils/style-type";
 import { Button } from "./button";
 
 export type DropdownItemProps = {

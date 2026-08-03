@@ -5,28 +5,27 @@
 
 import "server-only";
 
-import { Methods } from "next-vibe/core/definition/enums";
-import { endpointsHandler } from "next-vibe/core/route/multi";
+import { Methods } from "../../core/definition/enums";
+import { endpointsHandler } from "../../core/route/multi";
 
 import vibeCheckEndpoints from "./definition";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: vibeCheckEndpoints,
   [Methods.POST]: {
-    handler: async ({
-      data,
-      logger,
-      platform,
-      t,
-      locale,
-      toolExecutionContext,
-    }) =>
-      (await import("./repository/repository")).VibeCheckRepository.execute(
+    handler: async ({ data, logger, platform, user, toolExecutionContext }) =>
+      (
+        await import(
+          /* turbopackIgnore: true */ /* webpackIgnore: true */
+          "./repository/repository"
+        )
+      ).VibeCheckRepository.execute(
         data,
         logger,
         platform,
-        t,
-        locale,
+        // `user` binds the progress emitter to the caller's own channel — check
+        // results are private, so events ride user/{id} (channel scope "user").
+        user,
         toolExecutionContext.abortSignal,
       ),
   },

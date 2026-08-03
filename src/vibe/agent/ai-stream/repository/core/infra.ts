@@ -9,8 +9,8 @@ import "server-only";
 
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import type { JSONValue } from "ai";
-import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
-import { agentEnv } from "next-vibe/agent/env";
+import type { ToolExecutionContext } from "../../../../core/execution-context";
+import { agentEnv } from "../../../env";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { ApiProvider, type ModelOptionBase } from "../../../models/models";

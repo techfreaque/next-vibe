@@ -14,12 +14,12 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type { ResolvedRelayContext } from "next-vibe/realtime/remote-event-bridge/relay-context";
+import type { ResolvedRelayContext } from "next-vibe/realtime/core/relay-context";
 
 import {
   DefaultFolderId,
   type ToolExecutionContext,
-} from "../../../chat/config";
+} from "../../../../core/execution-context";
 import { chatMessages, chatThreads, type ToolCall } from "../../../chat/db";
 import { ChatMessageRole, ThreadStreamingState } from "../../../chat/enum";
 import { createFolderContentsEmitter } from "../../../chat/folder-contents/[rootFolderId]/emitter";

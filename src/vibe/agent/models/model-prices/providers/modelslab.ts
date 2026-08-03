@@ -371,7 +371,7 @@ async function fetchPage(
   logger: EndpointLogger,
 ): Promise<string | null> {
   try {
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external API
+    // oxlint-disable-next-line restricted/no-raw-fetch -- external API
     const response = await fetch(url, {
       headers: {
         "User-Agent": "Mozilla/5.0 (compatible; unbottled-ai/1.0)",

@@ -69,9 +69,9 @@ export class EmailHandlingRepository {
                     fail({
                       message: smtpT(
                         "emailHandling.email.errors.rendering_failed",
+                        { error: resolved.message },
                       ),
                       errorType: ErrorResponseTypes.EMAIL_ERROR,
-                      messageParams: { error: resolved.message },
                     }),
                   );
                 }
@@ -151,9 +151,10 @@ export class EmailHandlingRepository {
               if (!emailData.ignoreErrors && !emailSendResult.success) {
                 errors.push(
                   fail({
-                    message: smtpT("emailHandling.email.errors.send_failed"),
+                    message: smtpT("emailHandling.email.errors.send_failed", {
+                      error: emailSendResult.message,
+                    }),
                     errorType: ErrorResponseTypes.EMAIL_ERROR,
-                    messageParams: { error: emailSendResult.message },
                   }),
                 );
               }
@@ -216,9 +217,11 @@ export class EmailHandlingRepository {
 
               errors.push(
                 fail({
-                  message: smtpT("emailHandling.email.errors.rendering_failed"),
+                  message: smtpT(
+                    "emailHandling.email.errors.rendering_failed",
+                    { error: parsedError.message },
+                  ),
                   errorType: ErrorResponseTypes.EMAIL_ERROR,
-                  messageParams: { error: parsedError.message },
                 }),
               );
             }
@@ -229,9 +232,13 @@ export class EmailHandlingRepository {
         const { t: outerSmtpT } = scopedTranslation.scopedT(data.locale);
         errors.push(
           fail({
-            message: outerSmtpT("emailHandling.email.errors.batch_send_failed"),
+            message: outerSmtpT(
+              "emailHandling.email.errors.batch_send_failed_item",
+              {
+                error: parsedError.message,
+              },
+            ),
             errorType: ErrorResponseTypes.EMAIL_ERROR,
-            messageParams: { error: parsedError.message },
           }),
         );
       }
@@ -240,12 +247,15 @@ export class EmailHandlingRepository {
     if (errors.length > 0) {
       const { t: outerSmtpT } = scopedTranslation.scopedT(data.locale);
       logger.error("Email errors", errors);
+      const collectedErrors = errors.map((error) => error.message).join(", ");
       return fail({
-        message: outerSmtpT("emailHandling.email.errors.batch_send_failed"),
+        message: outerSmtpT(
+          "emailHandling.email.errors.batch_send_failed_all",
+          {
+            errors: collectedErrors,
+          },
+        ),
         errorType: ErrorResponseTypes.EMAIL_ERROR,
-        messageParams: {
-          errors: errors.map((error) => error.message).join(", "),
-        },
       });
     }
 

@@ -19,11 +19,17 @@ export const CliTarget = {
 export type CliTargetValue = (typeof CliTarget)[keyof typeof CliTarget];
 
 /**
- * Name of the CLI: the globally installed binary, the directory it is installed
- * into, and the name the CLI reports in its own help output.
+ * Names of the CLI: every alias installed as a globally available binary.
+ * The first entry is the default — the name used for the install directory,
+ * the CLI's own help/usage output, and every hint printed in code.
  *
- * Forks that vendor this framework alongside the original override the value so
- * both can sit on one machine without either overwriting the other's global
- * binary.
+ * Forks that vendor this framework alongside the original override the array
+ * so both can sit on one machine without either overwriting the other's
+ * global binary.
  */
-export const CLI_BINARY_NAME = "vibe" as const;
+export const CLI_BINARY_NAMES = ["vibe", "v"] as const;
+
+export type CliBinaryName = (typeof CLI_BINARY_NAMES)[number];
+
+/** The default alias — used for hints, usage strings, and the install directory name. */
+export const CLI_BINARY_NAME: CliBinaryName = CLI_BINARY_NAMES[0];

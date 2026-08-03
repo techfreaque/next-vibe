@@ -64,28 +64,55 @@ route handler ─► emitter ─► proxy sockets (in-process, or loopback POST)
                                └─ PubSubAdapter (local | redis) for multi-instance
 ```
 
-**Core files:**
+**Layout — three folders, one dependency direction:**
 
-- `server.ts` — Bun `serve()`: `/ws` upgrade, subscription sets, `broadcastLocal*`,
-  the `/ws/broadcast` POST sink, channel auth. Registers its broadcast fns into
-  `local-broadcast.ts` on boot for in-process delivery.
-- `local-broadcast.ts` — in-process bridge. When the proxy boots in this process
-  the emitter delivers directly; otherwise it falls back to the loopback POST.
+`core/` ← `server/`, `core/` ← `client/`. Nothing in `core/` imports from
+`server/` or `client/`, and that is the whole point: `core/` is what a CLI/MCP
+install takes. It reaches no WS server, no database, and no Next.js, so event
+declarations, emitting, and in-process observation all work with nothing else
+installed. Capabilities that DO need those things register themselves into core
+at module init (`local-broadcast.ts`, `relay-hook.ts`) rather than being imported
+by it.
+
+**`core/`:**
+
+- `structured-events.ts` — the event type system + `AnyEndpointEventEnvelope`.
+- `types.ts` — wire frames and channel descriptors.
 - `emitter.ts` — `createEndpointEmitter(endpoint, logger, user, channel, opts?)`
   binds the channel ONCE and returns a typed `emit(name, data)` that fires many
-  events on it; low-level `publishWsEvent` / `publishWsEventBatch`.
+  events on it; low-level `publishWsEvent`.
 - `channel.ts` — single source of truth for channel names: `buildWsChannel`,
   `buildUserWsChannel`. Only two channel kinds — `ws-…` and `user/{uid}/ws-…`;
   no bespoke cross-instance channel.
+- `local-broadcast.ts` — in-process bridge. When the proxy boots in this process
+  the emitter delivers directly; otherwise it falls back to the loopback POST.
+- `relay-hook.ts` — the same inversion for cross-instance relay: the bridge
+  registers, the emitter calls through. Keeps the DB out of core and breaks the
+  emitter ↔ bridge cycle.
+- `event-observers.ts` / `cli-event-tap.ts` — passive in-process taps. The CLI's
+  entire realtime story, with no socket anywhere.
+- `relay-context.ts` — pre-resolved relay context (session-scoped).
+- `sync-domain.ts` — `SYNC_DOMAINS` / `SyncDomain`, re-exported by
+  `remote-connection/db` so the drizzle module stays off core's import graph.
+- `env-availability.ts` — the augmentable env slot on the event handler context.
+
+**`server/`:**
+
+- `server.ts` — Bun `serve()`: `/ws` upgrade, subscription sets, `broadcastLocal*`,
+  the `/ws/broadcast` POST sink, channel auth. Registers its broadcast fns into
+  `core/local-broadcast.ts` on boot for in-process delivery.
 - `connector.ts` — reverse-ws connection manager (`WsConnection` + registry).
   One outbound socket per remote connection, opened on demand. Also runs the
   sync pull-on-connect over HTTP (bootstrap, before the socket is up).
-- `structured-events.ts` — the event type system + `AnyEndpointEventEnvelope`.
-- `client.ts` — single shared browser socket + imperative subscribe API.
-- `cache-merger.ts` — structural-sharing merge of event partials into the cache.
+- `http-proxy.ts`, `proxy-loading-page.ts`, `ws-channel-auth.ts`,
+  `ws-channel-registry.ts`, `keyed-signal.ts`, `env.ts`.
 - `pubsub/` — `local` (in-process) and `redis` adapters behind `PubSubAdapter`.
 - `remote-event-bridge/` — the cross-instance transport. One `repository.ts`
   (`RemoteEventBridgeRepository`) + `definition.ts` + `route.ts`.
+
+**`client/`:**
+
+- `client.ts` — single shared browser socket + imperative subscribe API.
 
 ---
 

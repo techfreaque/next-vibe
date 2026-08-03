@@ -8,7 +8,7 @@
 
 "use client";
 
-import cortexListDefinitions from "next-vibe/agent/cortex/list/definition";
+import cortexListDefinitions from "../list/definition";
 import {
   useSearchParams,
   useSilentHistory,
@@ -498,7 +498,7 @@ export function CortexExecWidget(_props: {
   const handleNavTerminals = (e: ButtonMouseEvent): void => {
     e.stopPropagation();
     void (async (): Promise<void> => {
-      const def = await import("next-vibe/agent/cortex/terminals/definition");
+      const def = await import("../terminals/definition");
       navigate(def.default.GET, {});
     })();
   };

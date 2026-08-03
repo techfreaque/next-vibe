@@ -33,18 +33,3 @@ export function handleCheckoutRedirect<T extends { checkoutUrl?: string }>(
   assignUrl(checkoutUrl);
   return true;
 }
-
-/**
- * Type guard to check if response has checkout URL
- */
-export function hasCheckoutUrl<T>(
-  response: ResponseType<T>,
-): response is ResponseType<T & { checkoutUrl: string }> {
-  return (
-    response.success &&
-    typeof response.data === "object" &&
-    response.data !== null &&
-    "checkoutUrl" in response.data &&
-    typeof response.data.checkoutUrl === "string"
-  );
-}

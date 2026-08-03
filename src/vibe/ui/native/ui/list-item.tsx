@@ -1,8 +1,8 @@
 import { styled } from "nativewind";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import { Pressable, View } from "react-native";
 
-import { styledNative } from "../../native/utils/style-converter";
+import { styledNative } from "../utils/style-converter";
 import type { ListItemProps } from "../../web/ui/list-item";
 import { Text } from "./text";
 

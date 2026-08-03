@@ -5,7 +5,7 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import type { TParams } from "next-vibe/core/i18n/core/static-types";
-import type { InferJwtPayloadTypeFromRoles } from "next-vibe/core/route/handler";
+import type { InferJwtPayloadTypeFromRoles } from "next-vibe/core/route/handler-roles";
 import type {
   ErrorResponseType,
   SuccessResponseType,
@@ -226,25 +226,6 @@ export type EmailTemplateDefinitionAny = EmailTemplateDefinition<
   any
 >;
 /* eslint-enable @typescript-eslint/no-explicit-any */
-
-/**
- * Template default export structure
- */
-export interface TemplateExport<
-  TProps,
-  TScopedTranslation extends {
-    scopedT: (locale: CountryLanguage) => ScopedTResult;
-  },
-> {
-  default: EmailTemplateDefinition<
-    TProps,
-    TScopedTranslation,
-    never,
-    never,
-    never,
-    readonly UserRoleValue[]
-  >;
-}
 
 /**
  * Sealed dispatch helpers for EmailTemplateDefinition union types.

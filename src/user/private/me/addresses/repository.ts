@@ -59,9 +59,10 @@ export class UserAddressesRepository {
     } catch (error) {
       logger.error("Error listing addresses", parseError(error));
       return fail({
-        message: t("list.errors.internal.title"),
+        message: t("list.errors.internal.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -146,9 +147,10 @@ export class UserAddressesRepository {
     } catch (error) {
       logger.error("Error creating address", parseError(error));
       return fail({
-        message: t("create.errors.internal.title"),
+        message: t("create.errors.internal.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }

@@ -18,7 +18,7 @@ import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-te
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { cortexNodes } from "../db";
-import editEndpoint from "../edit/definition";
+import editEndpoint from "./definition";
 import readEndpoint from "../read/definition";
 import writeEndpoint from "../write/definition";
 

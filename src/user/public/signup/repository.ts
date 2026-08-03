@@ -86,10 +86,6 @@ export class SignupRepository {
         return fail({
           message: t("fields.confirmPassword.validation.mismatch"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: {
-            field: "confirmPassword",
-            message: t("fields.confirmPassword.validation.mismatch"),
-          },
         });
       }
 
@@ -105,12 +101,8 @@ export class SignupRepository {
       }
       if (emailCheckResponse.data) {
         return fail({
-          message: t("errors.conflict.title"),
+          message: t("errors.conflict.detail"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: {
-            field: "email",
-            message: t("errors.conflict.description"),
-          },
         });
       }
 
@@ -391,12 +383,11 @@ export class SignupRepository {
       logger.error("Registration error", parseError(error));
       const parsedError = parseError(error);
       return fail({
-        message: t("errors.internal.title"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
+        message: t("errors.internal.title", {
           email: data.email ?? "unknown",
           error: parsedError.message,
-        },
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -510,12 +501,11 @@ export class SignupRepository {
       logger.error("User creation error", parseError(error));
       const { t: errT } = signupScopedTranslation.scopedT(locale);
       return fail({
-        message: errT("errors.internal.title"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
+        message: errT("errors.internal.title", {
           email: userInput.email,
           error: parseError(error).message,
-        },
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -543,9 +533,11 @@ export class SignupRepository {
       logger.error("Error checking email registration", parseError(error));
       const { t: checkErrT } = signupScopedTranslation.scopedT(locale);
       return fail({
-        message: checkErrT("emailCheck.errors.internal.title"),
+        message: checkErrT("emailCheck.errors.internal.title", {
+          error: parseError(error).message,
+          email,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message, email },
       });
     }
   }

@@ -390,6 +390,7 @@ export const translations: typeof enTranslations = {
       title: "Serverfehler",
       description:
         "Statistiken können aufgrund eines Serverfehlers nicht generiert werden",
+      detail: "Nutzerstatistik fehlgeschlagen: {{error}}",
     },
     unknown: {
       title: "Unbekannter Fehler",

@@ -1,4 +1,4 @@
-import type { ImageGenModelSelection } from "../image-generation/models";
+import type { ImageGenModelSelection } from "./models";
 import {
   ModelSelectionType,
   ModelSortDirection,

@@ -8,12 +8,12 @@
 /* eslint-disable i18next/no-literal-string */
 
 import { sql } from "drizzle-orm";
-import { getPreferredToolName } from "next-vibe/core/core-utils/path";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { db } from "next-vibe/database";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { NewCronTask } from "next-vibe/tasks/cron/db";
-import { cronTasks } from "next-vibe/tasks/cron/db";
+import { getPreferredToolName } from "../core/core-utils/path";
+import type { WidgetData } from "../core/utils/json";
+import { db } from "../database";
+import type { EndpointLogger } from "../logger/types";
+import type { NewCronTask } from "./cron/db";
+import { cronTasks } from "./cron/db";
 
 import { CronTaskPriority } from "./enum";
 

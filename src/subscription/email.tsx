@@ -460,7 +460,7 @@ export const subscriptionSuccessEmailTemplate: EmailTemplateDefinition<
     planName: "Premium Plan",
     totalModelCount: 42,
   },
-  render: ({ user, requestData, locale }) => {
+  render: async ({ user, requestData, locale }) => {
     const { t } = subscriptionScopedTranslation.scopedT(locale);
     const { t: configT } = configScopedTranslation.scopedT(locale);
     try {
@@ -469,7 +469,10 @@ export const subscriptionSuccessEmailTemplate: EmailTemplateDefinition<
         userId: requestData.user?.id ?? user.id,
         leadId: requestData.user?.leadId ?? user.leadId,
         planName: requestData.planName ?? "",
-        totalModelCount: getAvailableModelCount(false, getEnvAvailability()),
+        totalModelCount: getAvailableModelCount(
+          false,
+          await getEnvAvailability(),
+        ),
       };
       const tracking = createTrackingContext(
         locale,

@@ -3,7 +3,7 @@
  * Landing page with KPI counts for the current user's subscription data
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   Methods,

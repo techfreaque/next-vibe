@@ -5,11 +5,11 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import {
   type ChannelBinding,
   createEndpointEmitter,
-} from "next-vibe/realtime/emitter";
-import type { ResolvedRelayContext } from "next-vibe/realtime/remote-event-bridge/relay-context";
-import type { EmitEventNamed } from "next-vibe/realtime/structured-events";
+} from "next-vibe/realtime/core/emitter";
+import type { ResolvedRelayContext } from "next-vibe/realtime/core/relay-context";
+import type { EmitEventNamed } from "next-vibe/realtime/core/structured-events";
 
-import { DefaultFolderId } from "../../../config";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import messagesDefinitions from "./definition";
 
 export type MessagesWsEmit = EmitEventNamed<

@@ -4,12 +4,12 @@
  */
 
 import type { JSONSchema7 } from "json-schema";
-import { imageGenModelSelectionSchema } from "next-vibe/agent/image-generation/models";
-import { musicGenModelSelectionSchema } from "next-vibe/agent/music-generation/models";
-import { sttModelSelectionSchema } from "next-vibe/agent/speech-to-text/models";
-import { voiceModelSelectionSchema } from "next-vibe/agent/text-to-speech/models";
-import { videoGenModelSelectionSchema } from "next-vibe/agent/video-generation/models";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { imageGenModelSelectionSchema } from "../../image-generation/models";
+import { musicGenModelSelectionSchema } from "../../music-generation/models";
+import { sttModelSelectionSchema } from "../../speech-to-text/models";
+import { voiceModelSelectionSchema } from "../../text-to-speech/models";
+import { videoGenModelSelectionSchema } from "../../video-generation/models";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -27,8 +27,9 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
-import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
-import { DefaultFolderId, rootFolderIdOptions } from "../../chat/config";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { rootFolderIdOptions } from "../../chat/config";
+import { DefaultFolderId } from "../../../core/execution-context";
 import { AGENT_MESSAGE_LENGTH } from "../../chat/constants";
 import { ChatMessageRole } from "../../chat/enum";
 import { messageHistoryTolerantSchema } from "../../chat/message-schema";
@@ -140,7 +141,7 @@ const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         listEndpoint: async () =>
-          (await import("next-vibe/agent/chat/threads/definition")).default.GET,
+          (await import("../../chat/threads/definition")).default.GET,
         labelField: "title",
         label: "post.threadId.label",
         description: "post.threadId.description",
@@ -738,9 +739,6 @@ export type AiStreamPostRequestInput = typeof POST.types.RequestInput;
 export type AiStreamPostRequestOutput = typeof POST.types.RequestOutput;
 export type AiStreamPostResponseInput = typeof POST.types.ResponseInput;
 export type AiStreamPostResponseOutput = typeof POST.types.ResponseOutput;
-
-// Extract operation type for type-safe usage
-export type AiStreamOperation = AiStreamPostRequestOutput["operation"];
 
 /**
  * Export definitions

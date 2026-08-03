@@ -187,6 +187,7 @@ export const translations: typeof enTranslations = {
     generate: "Generuj",
     editConfirmHint: "[Enter] potwierdź  [Esc] anuluj",
     editSettings: "Edytuj ustawienia",
+    exit: "Wyjdź",
     loading: "Ładowanie ustawień...",
     exportProd: "Eksportuj dla produkcji",
     moduleLabels: {
@@ -207,6 +208,7 @@ export const translations: typeof enTranslations = {
     alreadyConfigured: "Już skonfigurowane",
     stepOf: "Krok {{step}} z {{total}}",
     next: "Dalej",
+    continue: "Kontynuuj",
     back: "Wstecz",
     skip: "Pomiń ten krok",
     finish: "Zakończ konfigurację",

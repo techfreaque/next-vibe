@@ -6,16 +6,16 @@
 
 import { spawn } from "node:child_process";
 
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { DockerOperationsT } from "next-vibe/database/utils/docker-operations/i18n";
-import { formatDuration } from "next-vibe/logger/formatters";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../../core/route/response.schema";
+import { parseError } from "../../../core/utils/parse-error";
+import type { DockerOperationsT } from "./i18n";
+import { formatDuration } from "../../../logger/formatters";
+import type { EndpointLogger } from "../../../logger/types";
 
 import type {
   DockerOperationRequestOutput,
@@ -94,9 +94,10 @@ export class DockerOperationsRepository {
       logger.error("🗄️  Docker command execution failed", parsedError);
 
       return fail({
-        message: t("errors.executionFailed.title"),
+        message: t("errors.executionFailed.title", {
+          error: parsedError.message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
       });
     }
   }
@@ -144,9 +145,10 @@ export class DockerOperationsRepository {
       logger.error("🗄️ Docker Compose down failed", parsedError);
 
       return fail({
-        message: t("errors.composeDownFailed.title"),
+        message: t("errors.composeDownFailed.title", {
+          error: parsedError.message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
       });
     }
   }
@@ -195,9 +197,10 @@ export class DockerOperationsRepository {
       logger.error("🗄️  Docker Compose up failed", parsedError);
 
       return fail({
-        message: t("errors.composeUpFailed.title"),
+        message: t("errors.composeUpFailed.title", {
+          error: parsedError.message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
       });
     }
   }

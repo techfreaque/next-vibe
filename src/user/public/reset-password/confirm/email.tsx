@@ -219,7 +219,7 @@ export const passwordResetConfirmEmailTemplate: EmailTemplateDefinition<
     const templateProps: PasswordResetConfirmProps = {
       publicName: user.publicName,
       userId: user.id,
-      totalModelCount: getAvailableModelCount(false, getEnvAvailability()),
+      totalModelCount: getAvailableModelCount(false, await getEnvAvailability()),
     };
 
     return success({

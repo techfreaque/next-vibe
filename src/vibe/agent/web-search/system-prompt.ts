@@ -1,7 +1,7 @@
 /* eslint-disable i18next/no-literal-string */
 import "server-only";
 
-import type { SystemPromptFragment } from "next-vibe/agent/ai-stream/system-prompt/types";
+import type { SystemPromptFragment } from "../ai-stream/system-prompt/types";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import { VibeMode } from "next-vibe/env/env-util";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";

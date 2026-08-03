@@ -79,10 +79,14 @@ export const translations = {
         description: "Permission denied",
       },
       notFound: {
+        detail: "No transaction found with id {{transactionId}}",
         title: "Not Found",
         description: "Transaction not found",
       },
       server: {
+        detail: "Could not process the refund: {{error}}",
+        noPaymentIntent:
+          "This transaction has no linked Stripe payment, so it cannot be refunded",
         title: "Server Error",
         description: "Internal server error occurred",
       },

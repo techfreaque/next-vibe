@@ -76,11 +76,11 @@ export const translations: typeof enTranslations = {
   errors: {
     default: "Wystąpił błąd podczas czyszczenia sesji",
     execution_failed: {
-      title: "Oczyszczanie sesji nie powiodło się",
+      title: "Oczyszczanie sesji nie powiodło się: {{error}}",
       description: "Błąd podczas oczyszczania wygasłych sesji",
     },
     partial_failure: {
-      title: "Częściowa awaria oczyszczania sesji",
+      title: "Częściowa awaria oczyszczania sesji: {{errors}}",
       description: "Niektóre sesje nie mogły zostać oczyszczone",
     },
     unknown_error: {

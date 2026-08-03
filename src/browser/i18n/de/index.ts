@@ -2558,6 +2558,7 @@ export const translations: typeof enTranslations = {
           error: "Fehler beim Aufrufen des MCP Tools",
           invalidJsonArguments: "Ungültige JSON-Argumente",
           executionFailed: "Tool-Ausführung fehlgeschlagen: {{error}}",
+          newPageFailed: "Neue Seite konnte nicht geöffnet werden",
           toolExecutionFailed: "Fehler beim Ausführen von {{toolName}}",
         },
       },

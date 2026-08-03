@@ -48,6 +48,7 @@ import {
   useWidgetContext,
   useWidgetLocale,
   useWidgetNavigation,
+  useWidgetPlatform,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
@@ -1062,6 +1063,7 @@ function CreditHistoryTab({
   };
 }): React.JSX.Element {
   const [def, setDef] = useState<{ GET: CreateApiEndpointAny } | null>(null);
+  const platform = useWidgetPlatform();
 
   if (!def) {
     void import("@/credits/history/definition").then((mod) => {
@@ -1077,6 +1079,7 @@ function CreditHistoryTab({
         endpoint={def}
         locale={locale}
         user={user}
+        platform={platform}
         endpointOptions={endpointOptions}
       />
     </Div>
@@ -1102,6 +1105,7 @@ function ReferralCodesTab({
   };
 }): React.JSX.Element {
   const [def, setDef] = useState<{ GET: CreateApiEndpointAny } | null>(null);
+  const platform = useWidgetPlatform();
 
   if (!def) {
     void import("@/referral/codes/list/definition").then((mod) => {
@@ -1117,6 +1121,7 @@ function ReferralCodesTab({
         endpoint={def}
         locale={locale}
         user={user}
+        platform={platform}
         endpointOptions={endpointOptions}
       />
     </Div>
@@ -1144,6 +1149,7 @@ function ReferralEarningsTab({
   };
 }): React.JSX.Element {
   const [def, setDef] = useState<{ GET: CreateApiEndpointAny } | null>(null);
+  const platform = useWidgetPlatform();
 
   if (!def) {
     void import("@/referral/earnings/list/definition").then((mod) => {
@@ -1159,6 +1165,7 @@ function ReferralEarningsTab({
         endpoint={def}
         locale={locale}
         user={user}
+        platform={platform}
         endpointOptions={endpointOptions}
       />
     </Div>
@@ -1184,6 +1191,7 @@ function FavoritesTab({
   };
 }): React.JSX.Element {
   const [def, setDef] = useState<{ GET: CreateApiEndpointAny } | null>(null);
+  const platform = useWidgetPlatform();
 
   if (!def) {
     void import("next-vibe/agent/skills/favorites/definition").then((mod) => {
@@ -1199,6 +1207,7 @@ function FavoritesTab({
         endpoint={def}
         locale={locale}
         user={user}
+        platform={platform}
         endpointOptions={endpointOptions}
       />
     </Div>
@@ -1224,6 +1233,7 @@ function SkillsTab({
   };
 }): React.JSX.Element {
   const [def, setDef] = useState<{ GET: CreateApiEndpointAny } | null>(null);
+  const platform = useWidgetPlatform();
 
   if (!def) {
     void import("next-vibe/agent/skills/definition").then((mod) => {
@@ -1239,6 +1249,7 @@ function SkillsTab({
         endpoint={def}
         locale={locale}
         user={user}
+        platform={platform}
         endpointOptions={endpointOptions}
       />
     </Div>

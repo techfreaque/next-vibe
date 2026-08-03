@@ -24,11 +24,10 @@
 
 import "server-only";
 
-import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import type { ResponseType } from "../../core/route/response.schema";
+import type { WidgetData } from "../../core/utils/json";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
 
 import type { CallbackModeValue } from "../constants";
 import type {
@@ -37,18 +36,32 @@ import type {
 } from "../definition";
 import type { RouteExecuteContext } from "./types";
 
-/** No cascade without remote/WAKE_UP. Always null. */
+/**
+ * No cascade without remote/WAKE_UP. Always null.
+ *
+ * Typed `Promise<null>` rather than `Promise<ChatModelId | null>`: it satisfies
+ * ./orchestration's contract structurally while keeping the agent model union —
+ * the one import that would drag ../../agent/ai-stream into an otherwise
+ * agent-free file — out of the local seam entirely. Narrower AND honest: this
+ * function has no other value to return.
+ */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars -- seam parity: the signature must match ./orchestration
 export function resolveModelIdIfNeeded(_params: {
   instanceId: string | undefined;
   callbackMode: CallbackModeValue | null;
   user: JwtPayloadType;
   toolExecutionContext: RouteExecuteContext["toolExecutionContext"];
-}): Promise<ChatModelId | null> {
+}): Promise<null> {
   return Promise.resolve(null);
 }
 
-/** No non-local branches. Always null → ./index.ts runs the local WAIT path. */
+/**
+ * No non-local branches. Always null → ./index.ts runs the local WAIT path.
+ *
+ * Takes the plain RouteExecuteContext, not the dispatch variant: a parameter
+ * accepting the wider type still accepts the dispatch context index.ts builds,
+ * and asking for less is what keeps ./types-dispatch off this file's graph.
+ */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars -- seam parity: the signature must match ./orchestration
 export function orchestrateNonLocal(_params: {
   ctx: RouteExecuteContext;

@@ -14,8 +14,8 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import { type CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { UserRoleDB } from "next-vibe/identity/roles/enum";
+import { type CountryLanguage } from "../../core/i18n/core/config";
+import { UserRoleDB } from "../roles/enum";
 import type { z } from "zod";
 
 import { UserNoteTypeDB } from "./enum";

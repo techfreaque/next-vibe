@@ -1,12 +1,9 @@
 import * as CheckboxPrimitive from "@rn-primitives/checkbox";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 
-import { Check } from "../../native/ui/icons/Check";
-import {
-  convertCSSToViewStyle,
-  styledNative,
-} from "../../native/utils/style-converter";
+import { Check } from "./icons/Check";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import type {
   CheckboxIndicatorProps,
   CheckboxRootProps,

@@ -1,8 +1,8 @@
-import { validateData } from "next-vibe/core/core-utils/validation";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { isRuntimeEnvPlaceholder } from "next-vibe/platforms/cli/runtime/runtime-env-placeholders";
-import { Platform } from "next-vibe/platforms/platforms";
+import { validateData } from "../core/core-utils/validation";
+import { defaultLocale } from "../core/i18n/core/config";
+import type { EndpointLogger } from "../logger/types";
+import { isRuntimeEnvPlaceholder } from "../platforms/cli/runtime/runtime-env-placeholders";
+import { Platform } from "../platforms/platforms";
 import type { z } from "zod";
 
 interface EnvHint {
@@ -21,7 +21,6 @@ export function validateEnv<TSchema extends z.ZodType>(
   },
   envSchema: TSchema,
   logger: EndpointLogger,
-  locale: CountryLanguage,
   hints?: Record<string, EnvHint>,
 ): z.infer<TSchema> {
   // Treat empty strings as undefined so optional schemas work correctly
@@ -56,7 +55,7 @@ export function validateEnv<TSchema extends z.ZodType>(
     const result = envSchema.safeParse(envForValidation);
     if (!result.success) {
       printEnvErrors(result.error, hints, logger);
-      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+      // oxlint-disable-next-line restricted/restricted-syntax
       throw new Error(
         "Environment variable validation failed. Check logs above.",
       );
@@ -69,26 +68,29 @@ export function validateEnv<TSchema extends z.ZodType>(
     envForValidation as z.input<TSchema>,
     envSchema,
     logger,
-    locale,
     Platform.NEXT_API,
     "env-validation",
+    // Boot-time check: the process is validating its own environment before any
+    // request exists, so there is no user locale to inherit.
+    defaultLocale,
   );
   if (!validationResult.success) {
-    const errors = validationResult.messageParams?.["error"] as
-      | string
-      | undefined;
+    // validateData now returns display-ready text on `message` (there is no
+    // separate params channel), so the detail is already formatted - indent its
+    // lines to sit inside the banner instead of re-splitting a params string.
+    const errors = validationResult.message;
     // eslint-disable-next-line i18next/no-literal-string
     const message = [
       "──────────────────────────────────────────────────────────",
       "  Environment variable validation failed",
       "──────────────────────────────────────────────────────────",
-      ...(errors ? errors.split(", ").map((e) => `  ✗ ${e}`) : []),
+      ...(errors ? errors.split("\n").map((e) => `  ✗ ${e}`) : []),
       "",
       "  Check your .env file. See .env.example for reference.",
       "──────────────────────────────────────────────────────────",
     ].join("\n");
     logger.error(message);
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+    // oxlint-disable-next-line restricted/restricted-syntax
     throw new Error(
       "Environment variable validation failed. Check logs above.",
     );

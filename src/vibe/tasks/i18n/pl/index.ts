@@ -84,7 +84,6 @@ export const translations: typeof enTranslations = {
   cron: {
     frequency: {
       everyMinute: "co minutę",
-      everyMinutes: "co {{interval}} minut",
       everyHour: "co godzinę",
       everyDays: "codziennie",
       hourly: "co godzinę",
@@ -168,7 +167,7 @@ export const translations: typeof enTranslations = {
   },
   errors: {
     // Cron Tasks errors
-    fetchCronTasks: "Nie udało się pobrać zadań Cron",
+    fetchCronTasks: "Nie udało się pobrać zadań Cron: {{error}}",
     createCronTask: "Nie udało się utworzyć zadania Cron",
     updateCronTask: "Nie udało się zaktualizować zadania Cron",
     deleteCronTask: "Nie udało się usunąć zadania Cron",
@@ -178,9 +177,10 @@ export const translations: typeof enTranslations = {
     cronTaskNotFound: "Zadanie Cron nie znalezione",
 
     // Unified Runner errors
-    startTaskRunner: "Nie udało się uruchomić Task Runnera",
+    startTaskRunner: "Nie udało się uruchomić Task Runnera: {{error}}",
     stopTaskRunner: "Nie udało się zatrzymać Task Runnera",
-    getTaskRunnerStatus: "Nie udało się pobrać statusu Task Runnera",
+    getTaskRunnerStatus:
+      'Nie udało się pobrać statusu Task Runnera: nieznana akcja "{{action}}"',
     executeCronTask: "Nie udało się wykonać zadania Cron",
 
     // Pulse errors
@@ -197,19 +197,25 @@ export const translations: typeof enTranslations = {
 
     // Repository errors
     repositoryNotFound: "Zasób nie znaleziony",
+    repositoryNotFoundDetail: "Nie znaleziono zadania o ID {{taskId}}",
     repositoryInternalError: "Wystąpił błąd wewnętrzny",
+    repositoryInternalErrorDetail: "Wystąpił błąd wewnętrzny: {{error}}",
     repositoryGetTaskForbidden:
-      "Nie masz uprawnień do wyświetlenia tego zadania",
+      "Nie masz uprawnień do wyświetlenia zadania {{taskId}}",
     repositoryUpdateTaskForbidden:
       "Nie masz uprawnień do aktualizacji tego zadania",
+    repositoryUpdateTaskForbiddenDetail:
+      "Nie masz uprawnień do aktualizacji zadania {{taskId}}",
     repositoryDeleteTaskForbidden:
-      "Nie masz uprawnień do usunięcia tego zadania",
+      "Nie masz uprawnień do usunięcia zadania {{taskId}}",
   },
   common: {
-    cronRepositoryTaskUpdateFailed: "Nie udało się zaktualizować zadania cron",
-    cronRepositoryTaskDeleteFailed: "Nie udało się usunąć zadania cron",
+    cronRepositoryTaskUpdateFailed:
+      "Nie udało się zaktualizować zadania cron {{taskId}}: {{error}}",
+    cronRepositoryTaskDeleteFailed:
+      "Nie udało się usunąć zadania cron {{taskId}}: {{error}}",
     cronRepositoryExecutionCreateFailed:
-      "Nie udało się utworzyć wykonania zadania cron",
+      "Nie udało się utworzyć wykonania zadania cron {{taskId}}: {{error}}",
     cronRepositoryExecutionUpdateFailed:
       "Nie udało się zaktualizować wykonania zadania cron",
     cronRepositoryExecutionsFetchFailed:

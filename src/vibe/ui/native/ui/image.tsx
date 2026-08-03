@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Image as RNImage } from "react-native";
 
-import { convertCSSToImageStyle } from "../../native/utils/style-converter";
+import { convertCSSToImageStyle } from "../utils/style-converter";
 import type { ImageProps } from "../../web/ui/image";
 
 export type { ImageProps } from "../../web/ui/image";

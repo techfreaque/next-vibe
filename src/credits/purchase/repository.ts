@@ -220,9 +220,10 @@ export class CreditPurchaseRepository {
         quantity: data.quantity,
       });
       return fail({
-        message: t("post.errors.server.title"),
+        message: t("post.errors.server.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }

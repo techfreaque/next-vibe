@@ -4,24 +4,24 @@
  * Public endpoint (validates API key in handler).
  */
 
-import { ChatModelId } from "next-vibe/agent/ai-stream/models";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { ChatModelId } from "../../agent/ai-stream/models";
+import { createEndpoint } from "../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { scopedTranslation } from "next-vibe/execute-tool/complete/i18n";
-import { UserRole } from "next-vibe/identity/roles/enum";
-import { taskInputSchema } from "next-vibe/tasks/cron/db";
-import { CronTaskStatus } from "next-vibe/tasks/enum";
+} from "../../core/definition/enums";
+import { scopedTranslation } from "./i18n";
+import { UserRole } from "../../identity/roles/enum";
+import { taskInputSchema } from "../../tasks/cron/db";
+import { CronTaskStatus } from "../../tasks/enum";
 import {
   objectField,
   requestField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 const { POST } = createEndpoint({

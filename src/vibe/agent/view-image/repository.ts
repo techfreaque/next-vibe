@@ -1,6 +1,6 @@
 import "server-only";
 
-import { fetchStorageFileAsBase64 } from "next-vibe/agent/chat/storage/url-utils";
+import { fetchStorageFileAsBase64 } from "../chat/storage/url-utils";
 import type { HandlerResponse } from "next-vibe/core/route/response.schema";
 import {
   createContentResponse,

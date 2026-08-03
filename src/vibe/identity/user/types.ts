@@ -4,44 +4,17 @@
  * Repository-first architecture: exports TypeOutput types for repositories and routes
  */
 
-import { dateSchema } from "next-vibe/core/definition/common.schema";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type {
-  JwtPayloadType,
-  JwtPrivatePayloadType,
-} from "next-vibe/identity/auth/types";
+import { dateSchema } from "../../core/definition/common.schema";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import type { JwtPayloadType, JwtPrivatePayloadType } from "../auth/types";
 import {
   UserPermissionRole,
   UserRoleDB,
   type UserRoleValue,
-} from "next-vibe/identity/roles/enum";
+} from "../roles/enum";
 import { z } from "zod";
 
-import {
-  Language,
-  Theme,
-  type UserDetailLevel,
-  type UserDetailLevelValue,
-} from "./enum";
-
-/**
- * User Preferences Schema
- * Defines user preferences
- */
-export const userPreferencesSchema = z
-  .object({
-    darkMode: z.boolean().default(false),
-    language: z.string().default(Language.EN),
-    theme: z.string().default(Theme.SYSTEM),
-  })
-  .partial();
-export type UserPreferencesType = z.infer<typeof userPreferencesSchema>;
-
-/**
- * Minimal User Schema
- * Essential user data
- */
-export type MinimalUserType = JwtPayloadType;
+import type { UserDetailLevel, UserDetailLevelValue } from "./enum";
 
 /**
  * Standard User Schema
@@ -143,12 +116,3 @@ export type ExtendedUserType<
   : T extends typeof UserDetailLevel.COMPLETE
     ? CompleteUserType
     : StandardUserType;
-
-/**
- * User search options
- */
-export interface UserSearchOptions {
-  limit?: number;
-  offset?: number;
-  roles?: UserRoleValue[keyof UserRoleValue][];
-}

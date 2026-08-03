@@ -131,6 +131,12 @@ export const translations: typeof enTranslations = {
       validation_error: "Błąd walidacji",
       internal_error: "Błąd wewnętrzny",
       auth_required: "Wymagana autoryzacja",
+      missingUrlParam: 'Brakuje parametru URL "{{param}}" dla {{path}}',
+      httpStatus: "Żądanie do {{url}} zakończone statusem {{status}}",
+      responseValidation: "Odpowiedź serwera nie przeszła walidacji: {{error}}",
+      malformedResponse: "Błędna odpowiedź z {{url}}",
+      requestFailed: "Żądanie do {{path}} nie powiodło się: {{error}}",
+      endpointFailed: "{{reason}} — {{path}}: {{error}}",
     },
   },
   mutationForm: {
@@ -141,14 +147,17 @@ export const translations: typeof enTranslations = {
         },
         validation_error: {
           title: "Błąd walidacji",
+          detail: "Walidacja formularza nie powiodła się: {{errors}}",
         },
       },
     },
   },
   queryForm: {
     errors: {
-      network_failure: "Błąd sieci",
+      network_failure: "Błąd sieci w formularzu {{formId}}: {{error}}",
       validation_failed: "Walidacja nie powiodła się",
+      validationFailedDetail:
+        "Walidacja w formularzu {{formId}} nie powiodła się: {{error}}",
     },
   },
   store: {

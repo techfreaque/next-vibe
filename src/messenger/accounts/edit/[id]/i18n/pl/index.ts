@@ -356,6 +356,9 @@ export const translations: typeof enTranslations = {
     server: {
       title: "Błąd serwera",
       description: "Nie udało się przetworzyć żądania",
+      detail_get: "Nie udało się wczytać konta: {{error}}",
+      detail_update: "Nie udało się zapisać konta: {{error}}",
+      detail_delete: "Nie udało się usunąć konta: {{error}}",
     },
     networkError: {
       title: "Błąd sieci",

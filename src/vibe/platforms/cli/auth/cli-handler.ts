@@ -1,10 +1,10 @@
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   type AuthContext,
   BaseAuthHandler,
-} from "next-vibe/identity/auth/base-auth-handler";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../../identity/auth/base-auth-handler";
+import type { EndpointLogger } from "../../../logger/types";
 
 import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/env/constants";
 

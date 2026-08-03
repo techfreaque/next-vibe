@@ -231,9 +231,10 @@ export class UsersStatsRepository {
       logger.error("Error fetching user statistics", parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.server.title"),
+        message: t("errors.server.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }

@@ -59,6 +59,7 @@ export const translations: typeof enTranslations = {
       unknown: {
         title: "Unbekannter Fehler",
         description: "Ein unerwarteter Fehler ist aufgetreten",
+        detail: "Unbekannter Fehler: {{error}}",
       },
       validation: {
         title: "Validierungsfehler",

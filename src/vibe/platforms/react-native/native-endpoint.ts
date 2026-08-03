@@ -15,14 +15,14 @@
  * - Clean architecture: Uses env-client.native.ts for configuration
  */
 
-import { type CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { coreClientEnv as envClient } from "next-vibe/core/env-client";
-import { type CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
-import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { scopedTranslation as reactNativeScopedTranslation } from "next-vibe/platforms/react-native/i18n";
+import { type CreateApiEndpointAny } from "../../core/definition/endpoint-base";
+import { coreClientEnv as envClient } from "../../core/env-client";
+import { type CountryLanguage } from "../../core/i18n/core/config";
+import type { ResponseType } from "../../core/route/response.schema";
+import { ErrorResponseTypes, fail } from "../../core/route/response.schema";
+import { parseError } from "../../core/utils/parse-error";
+import type { EndpointLogger } from "../../logger/types";
+import { scopedTranslation as reactNativeScopedTranslation } from "./i18n";
 
 /**
  * Type helpers to extract input/output types from endpoint definitions
@@ -94,9 +94,11 @@ function constructUrl<TEndpoint extends CreateApiEndpointAny>(
           return fail({
             message: reactNativeScopedTranslation
               .scopedT(locale)
-              .t("errors.missingUrlParam"),
+              .t("errors.missingUrlParam", {
+                paramName,
+                endpoint: endpoint.title,
+              }),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
-            messageParams: { paramName, endpoint: endpoint.title },
           });
         }
 
@@ -111,11 +113,8 @@ function constructUrl<TEndpoint extends CreateApiEndpointAny>(
     return fail({
       message: reactNativeScopedTranslation
         .scopedT(locale)
-        .t("errors.urlConstructionFailed"),
+        .t("errors.urlConstructionFailed", { error: String(error) }),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: {
-        error: String(error),
-      },
     });
   }
 }
@@ -131,7 +130,7 @@ function constructUrl<TEndpoint extends CreateApiEndpointAny>(
  * @example
  * ```typescript
  * import { nativeEndpoint } from './native-endpoint';
- * import { getUserByIdEndpoint } from 'next-vibe/logger/types';
+ * import { getUserByIdEndpoint } from '../../logger/types';
  *
  * // TypeScript automatically infers:
  * // - params must be: { urlPathParams: { id: string } }
@@ -169,11 +168,8 @@ export async function nativeEndpoint<TEndpoint extends CreateApiEndpointAny>(
         return fail({
           message: reactNativeScopedTranslation
             .scopedT(locale)
-            .t("errors.validationFailed"),
+            .t("errors.validationFailed", { error: String(validationError) }),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: {
-            error: String(validationError),
-          },
         });
       }
     }
@@ -233,7 +229,7 @@ export async function nativeEndpoint<TEndpoint extends CreateApiEndpointAny>(
     // Platform transport primitive: the native client's HTTP layer to the
     // server. A mobile device has no in-process server, so this is the wire —
     // it's the RN equivalent of the web client's fetch, not an app-code call.
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- native platform transport primitive
+    // oxlint-disable-next-line restricted/no-raw-fetch -- native platform transport primitive
     const fetchResponse = await fetch(fetchUrl, fetchOptions);
 
     // Check if response is OK
@@ -279,18 +275,15 @@ export async function nativeEndpoint<TEndpoint extends CreateApiEndpointAny>(
         return fail({
           message: reactNativeScopedTranslation
             .scopedT(locale)
-            .t("errors.htmlResponseReceived"),
+            .t("errors.htmlResponseReceived", {
+              url: fetchUrl,
+              status: fetchResponse.status,
+            }),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: {
-            url: fetchUrl,
-            status: fetchResponse.status,
-            // eslint-disable-next-line i18next/no-literal-string
-            hint: "Server returned HTML instead of JSON. Check that the API server is running and the endpoint exists.",
-          },
         });
       }
 
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure code requires throwing for system-level errors and initialization failures
+      // eslint-disable-next-line restricted/restricted-syntax -- Infrastructure code requires throwing for system-level errors and initialization failures
       throw jsonParseError;
     }
 
@@ -312,11 +305,8 @@ export async function nativeEndpoint<TEndpoint extends CreateApiEndpointAny>(
     return fail({
       message: reactNativeScopedTranslation
         .scopedT(locale)
-        .t("errors.networkError"),
+        .t("errors.networkError", { error: String(error) }),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: {
-        error: String(error),
-      },
     });
   }
 }

@@ -3,7 +3,7 @@
  * Defines the enums used in the user module
  */
 
-import { createEnumOptions } from "next-vibe/unified-ui/_shared/enum";
+import { createEnumOptions } from "../../unified-ui/_shared/enum";
 
 import { scopedTranslation } from "./i18n";
 

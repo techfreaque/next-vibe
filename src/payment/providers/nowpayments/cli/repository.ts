@@ -32,11 +32,8 @@ export class CliNowpaymentsRepositoryImpl {
     const installed = await CliNowpaymentsRepositoryImpl.isNgrokInstalled();
     if (!installed) {
       return fail({
-        message: t("post.errors.notInstalled.title"),
+        message: t("post.errors.notInstalled.instructions"),
         errorType: ErrorResponseTypes.NOT_FOUND,
-        messageParams: {
-          instructions: CliNowpaymentsRepositoryImpl.getInstallInstructions(),
-        },
       });
     }
 
@@ -49,20 +46,6 @@ export class CliNowpaymentsRepositoryImpl {
       ngrok.on("close", (code) => resolve(code === 0));
       ngrok.on("error", () => resolve(false));
     });
-  }
-
-  private static getInstallInstructions(): string {
-    return `To install ngrok:
-
-1. Visit https://ngrok.com/download
-2. Download ngrok for your platform
-3. Extract and move to your PATH
-4. Run: ngrok authtoken YOUR_AUTH_TOKEN (get token from https://dashboard.ngrok.com/get-started/your-authtoken)
-
-Or use package managers:
-- macOS: brew install ngrok/ngrok/ngrok
-- Linux: snap install ngrok
-- Windows: choco install ngrok`;
   }
 
   private static async runTunnel(
@@ -84,9 +67,8 @@ Or use package managers:
 
     if (!tunnelUrl) {
       return fail({
-        message: t("post.errors.serverError.title"),
+        message: t("post.errors.serverError.noTunnelUrl"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: "Failed to get ngrok tunnel URL" },
       });
     }
 
@@ -122,7 +104,7 @@ Or use package managers:
 
   private static async getTunnelUrl(): Promise<string | null> {
     try {
-      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+      // oxlint-disable-next-line restricted/no-raw-fetch
       const response = await fetch("http://localhost:4040/api/tunnels");
       const data = (await response.json()) as NgrokApiResponse;
       const tunnel = data.tunnels?.find((t) => t.proto === "https");

@@ -6,19 +6,19 @@
 import type {
   FieldDataType,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import type { TParams } from "next-vibe/core/i18n/core/static-types";
-import type { WidgetData } from "next-vibe/core/utils/json";
+} from "../../../../core/definition/enums";
+import type { TParams } from "../../../../core/i18n/core/static-types";
+import type { WidgetData } from "../../../../core/utils/json";
 import type {
   BooleanWidgetSchema,
   NumberWidgetSchema,
   StringWidgetSchema,
-} from "next-vibe/unified-ui/_shared/schema-constraints";
+} from "../../../_shared/schema-constraints";
 import type {
   BasePrimitiveWidgetConfig,
   FieldUsageConfig,
-} from "next-vibe/unified-ui/_shared/types";
-import type { SpacingSize } from "next-vibe/unified-ui/widgets/display-only/title/types";
+} from "../../../_shared/types";
+import type { SpacingSize } from "../title/types";
 import type { z } from "zod";
 
 /**

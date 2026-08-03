@@ -1,4 +1,4 @@
-import { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import { ChatModelId } from "../../../ai-stream/models";
 import { DB_HEALTH_ALIAS } from "next-vibe/database/health/constants";
 import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";

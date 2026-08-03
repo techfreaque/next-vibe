@@ -73,7 +73,7 @@ export const translations: typeof enTranslations = {
   },
   errors: {
     passwords_do_not_match: "Passwörter stimmen nicht überein",
-    user_not_found: "Benutzer nicht gefunden",
+    user_not_found: "Benutzer {{userId}} nicht gefunden",
     incorrect_password: "Falsches Passwort",
     update_failed: "Passwort konnte nicht aktualisiert werden",
     token_creation_failed: "Passwort-Token konnte nicht erstellt werden",

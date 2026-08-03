@@ -3,7 +3,7 @@
  * Serves uploaded files from filesystem storage
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   FieldDataType,
   LayoutType,
@@ -58,7 +58,7 @@ const { GET } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         listEndpoint: async () =>
-          (await import("next-vibe/agent/chat/threads/definition")).default.GET,
+          (await import("../../../definition")).default.GET,
         labelField: "title",
         schema: z.uuid(),
       }),

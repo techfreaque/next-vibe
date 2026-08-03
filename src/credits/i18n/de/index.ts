@@ -87,6 +87,7 @@ export const translations: typeof enTranslations = {
     },
   },
   repository: {
+    bonusCreditsAdded: "{{amount}} Bonus-Credits gutgeschrieben",
     tts: "Text-zu-Sprache",
     stt: "Sprache-zu-Text",
     search: "Suche",

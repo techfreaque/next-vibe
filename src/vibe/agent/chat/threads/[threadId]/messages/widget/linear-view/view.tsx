@@ -4,11 +4,11 @@
  */
 
 "use client";
-import type { SendMessageParams } from "next-vibe/agent/ai-stream/stream/hooks/send-message";
-import type { DefaultFolderId } from "next-vibe/agent/chat/config";
-import type { ChatMessage } from "next-vibe/agent/chat/db";
-import { getVoteStatus } from "next-vibe/agent/chat/threads/[threadId]/messages/[messageId]/vote/utils";
-import type { TtsModelId } from "next-vibe/agent/text-to-speech/models";
+import type { SendMessageParams } from "../../../../../../ai-stream/stream/hooks/send-message";
+import type { DefaultFolderId } from "next-vibe/core/execution-context";
+import type { ChatMessage } from "../../../../../db";
+import { getVoteStatus } from "../../[messageId]/vote/utils";
+import type { TtsModelId } from "../../../../../../text-to-speech/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";

@@ -7,8 +7,8 @@
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { runtimeEnvPlaceholder } from "next-vibe/platforms/cli/runtime/runtime-env-placeholders";
+import type { EndpointLogger } from "../../../logger/types";
+import { runtimeEnvPlaceholder } from "../../../platforms/cli/runtime/runtime-env-placeholders";
 
 const NEXT_BUILD_DIR = ".next-prod";
 /** Persisted webpack/RSC incremental cache - build intermediates, never served */

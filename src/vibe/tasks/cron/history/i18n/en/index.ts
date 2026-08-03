@@ -4,7 +4,10 @@ export const translations = {
   errors: {
     cronTaskNotFound: "Cron task not found",
     repositoryInternalError: "An internal error occurred",
-    fetchCronTaskHistory: "Failed to fetch cron task history",
+    fetchCronTaskHistoryDetail:
+      "Could not load history for task {{taskId}} (limit {{limit}}): {{error}}",
+    fetchCronTaskHistoryAllDetail:
+      "Could not load task history (limit {{limit}}): {{error}}",
   },
 
   get: {

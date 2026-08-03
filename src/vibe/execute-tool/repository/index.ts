@@ -21,78 +21,43 @@ import "server-only";
 import {
   makeHeadlessContext,
   type ToolExecutionContext,
-} from "next-vibe/agent/chat/config";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { GenericHandlerBase } from "next-vibe/core/route/handler";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+} from "next-vibe/core/execution-context";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import type { GenericHandlerBase } from "../../core/route/handler";
+import type { ResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { bold, maybeColorize, semantic } from "next-vibe/logger/colors";
-import { createEndpointLogger } from "next-vibe/logger/server";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { AiT } from "next-vibe/platforms/ai/i18n";
-import { Platform } from "next-vibe/platforms/platforms";
+} from "../../core/route/response.schema";
+import type { WidgetData } from "../../core/utils/json";
+import { parseError } from "../../core/utils/parse-error";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import { createEndpointLogger } from "../../logger/server";
+import type { EndpointLogger } from "../../logger/types";
+import type { AiT } from "../../platforms/ai/i18n";
+import { Platform } from "../../platforms/platforms";
 
 import type { CallbackModeValue } from "../constants";
-import { CallbackMode, CallbackModeDB } from "../constants";
+import { CallbackMode } from "../constants";
 import type {
   RouteExecuteRequestOutput,
   RouteExecuteResponseOutput,
 } from "../definition";
 import { RouteExecutionExecutor } from "./core";
+import { parseDispatchEnvelope } from "./envelope";
 import { ExecuteToolGuards } from "./guards";
 import { LocalExecution } from "./local";
+import { logToolLine } from "./log-line";
 // THE SEAM: every non-local branch (remote dispatch, APPROVE, DETACH/WAKE_UP)
 // and the model cascade they need. A local-only deployment (CLI + MCP, no task
 // system, no remote instances) points this single import at ./orchestration-local
 // and drops orchestration.ts + remote.ts + completion.ts + local-async.ts.
 import { orchestrateNonLocal, resolveModelIdIfNeeded } from "./orchestration";
-import type { RouteExecuteContext } from "./types";
-
-function logToolLine(
-  logger: EndpointLogger,
-  toolName: string,
-  mode: string | null,
-  durationMs: number,
-  result: { success: boolean; message?: string },
-  platform: Platform,
-): void {
-  if (platform !== Platform.NEXT_API && platform !== Platform.AI) {
-    return;
-  }
-  const ms = maybeColorize(`in ${durationMs}ms`, semantic.muted);
-  const modeTag =
-    mode && mode !== "wait" ? maybeColorize(` ${mode}`, semantic.muted) : "";
-  if (result.success) {
-    logger.vibe(
-      `TOOL ${bold(toolName)}${modeTag} ${maybeColorize("→ ok", semantic.success)} ${ms}`,
-    );
-  } else {
-    const msg = result.message ?? "error";
-    logger.vibe(
-      `TOOL ${bold(toolName)}${modeTag} ${maybeColorize(`→ ${msg}`, semantic.error)} ${ms}`,
-    );
-  }
-}
+import type { RouteExecuteDispatchContext } from "./types-dispatch";
 
 export class RouteExecuteRepository {
-  /**
-   * At-least-once delivery guard for inbound tool-execute-requests: callIds
-   * currently executing in THIS process. The reverse-ws hub can deliver one
-   * request to several lingering connector sockets (reconnect churn), and each
-   * delivery would spawn a full duplicate execution. Entries are removed when
-   * the execution settles, so deterministic callIds (fixture mode) can re-run
-   * across test runs.
-   */
-  static readonly inFlightIncomingCalls = new Set<string>();
-
   static async execute(
     data: RouteExecuteRequestOutput,
     user: JwtPayloadType,
@@ -132,65 +97,12 @@ export class RouteExecuteRepository {
         });
       }
 
-      // Public callers: force WAIT mode, block remote execution
-      if (user.isPublic) {
-        data = {
-          ...data,
-          callbackMode: CallbackMode.WAIT,
-          instanceId: undefined,
-        };
-      }
-
-      // Split prefixed tool ID: "hermes__ssh_exec_POST" → instanceId="hermes", toolName="ssh_exec_POST"
-      // Prefixed form takes precedence over explicit instanceId prop
-      let toolName = data.toolName;
+      // Normalize execute-tool's own envelope words (instance prefix,
+      // callbackMode) — see ./envelope for why that is a dispatch concern.
+      const envelope = parseDispatchEnvelope({ data, user, logger });
+      const { toolName, instanceId, input } = envelope;
+      data = envelope.data;
       _toolName = toolName;
-      let instanceId = data.instanceId;
-      const separatorIdx = toolName.indexOf("__");
-      if (separatorIdx !== -1) {
-        instanceId = toolName.slice(0, separatorIdx);
-        toolName = toolName.slice(separatorIdx + 2);
-        _toolName = toolName;
-      }
-
-      let { input } = data;
-
-      // Misplaced callbackMode hoist: models regularly put callbackMode INSIDE
-      // the target tool's input ({toolName: "generate_image", input: {prompt,
-      // callbackMode: "detach"}, callbackMode: "wait"}). callbackMode is
-      // execute-tool's OWN contract word — no target tool declares it — so the
-      // intent is unambiguous: hoist it to the envelope (input's value wins
-      // over an absent or default-"wait" envelope value) and strip it from the
-      // input so target-schema validation never sees it. Skip nested
-      // execute-tool inputs — there the inner envelope owns its callbackMode.
-      if (
-        toolName !== "execute-tool" &&
-        input !== null &&
-        typeof input === "object" &&
-        !Array.isArray(input) &&
-        "callbackMode" in input
-      ) {
-        const misplaced = CallbackModeDB.find(
-          (m) => m === String(input["callbackMode"]),
-        );
-        const cleanInput = { ...input };
-        delete cleanInput["callbackMode"];
-        input = cleanInput;
-        if (
-          misplaced &&
-          (data.callbackMode === undefined ||
-            data.callbackMode === null ||
-            data.callbackMode === CallbackMode.WAIT)
-        ) {
-          logger.debug(
-            "[RouteExecute] Hoisted misplaced callbackMode from input to envelope",
-            { toolName, misplaced, envelopeMode: data.callbackMode ?? null },
-          );
-          data = { ...data, callbackMode: misplaced, input };
-        } else {
-          data = { ...data, input };
-        }
-      }
 
       // Remote execution path - create a one-shot task for the target instance.
       // Revival circuit-breaker: auto-upgrade remote WAIT → WAKE_UP in revival
@@ -232,7 +144,9 @@ export class RouteExecuteRepository {
 
       // Shared context for every phase handler. toolName/instanceId are already
       // post-prefix; resolvedModelId is the cascade result stored for revival.
-      const ctx: RouteExecuteContext = {
+      // Built as the dispatch variant — LocalExecution asks only for the local
+      // RouteExecuteContext this intersects, so one object serves both sides.
+      const ctx: RouteExecuteDispatchContext = {
         toolName,
         resolvedModelId,
         user,
@@ -316,9 +230,8 @@ export class RouteExecuteRepository {
         stack: error instanceof Error ? (error.stack ?? "") : "",
       });
       return fail({
-        message: t("executeTool.post.errors.unknown.title"),
+        message: t("executeTool.post.errors.unknown.detail", { error: msg }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: msg },
       });
     }
   }
@@ -357,7 +270,7 @@ export class RouteExecuteRepository {
      */
     urlPathParams?: Record<string, WidgetData>;
   }): Promise<ResponseType<WidgetData>> {
-    const { scopedTranslation } = await import("next-vibe/platforms/ai/i18n");
+    const { scopedTranslation } = await import("../../platforms/ai/i18n");
     const { t } = scopedTranslation.scopedT(params.locale);
     const result = await RouteExecuteRepository.execute(
       {
@@ -406,7 +319,7 @@ export class RouteExecuteRepository {
       locale: CountryLanguage;
       logger: EndpointLogger;
       toolExecutionContext?: ToolExecutionContext;
-      platform?: Platform;
+      platform: Platform;
     } & (TDef["types"]["RequestOutput"] extends never
       ? { input?: never }
       : // RequestOutput for in-process callers; RequestInput additionally for
@@ -495,7 +408,7 @@ export class RouteExecuteRepository {
       locale: CountryLanguage;
       logger: EndpointLogger;
       toolExecutionContext: ToolExecutionContext;
-      platform?: Platform;
+      platform: Platform;
     } & (TDef["types"]["RequestOutput"] extends never
       ? { input?: never }
       : { input: TDef["types"]["RequestOutput"] }) &
@@ -513,8 +426,7 @@ export class RouteExecuteRepository {
       platform,
     } = params;
     const logger = params.logger ?? createEndpointLogger(false, locale);
-    const { scopedTranslation: spT } =
-      await import("next-vibe/platforms/ai/i18n");
+    const { scopedTranslation: spT } = await import("../../platforms/ai/i18n");
     const { t: spt } = spT.scopedT(locale);
 
     if (user.isPublic || !("id" in user)) {
@@ -525,7 +437,7 @@ export class RouteExecuteRepository {
     }
 
     const { ExecuteToolRouting } =
-      await import("next-vibe/remote-connection/routing");
+      await import("../../remote-connection/routing");
     const inferenceTarget = await ExecuteToolRouting.resolveInferenceProvider({
       userId: user.id,
       logger,

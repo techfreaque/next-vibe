@@ -3,11 +3,11 @@
 
 import { ChevronLeftIcon } from "next-vibe/ui/ui/icons/ChevronLeftIcon";
 import { ChevronRightIcon } from "next-vibe/ui/ui/icons/ChevronRightIcon";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { ComponentProps, JSX, ReactNode } from "react";
 import { DayPicker, type DayPickerProps } from "react-day-picker";
 
-import type { StyleType } from "../../web/utils/style-type";
+import type { StyleType } from "../utils/style-type";
 import { buttonVariants } from "./button";
 
 // Type for date range matching react-day-picker's DateRange

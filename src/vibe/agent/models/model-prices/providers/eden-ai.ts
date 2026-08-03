@@ -55,7 +55,7 @@ async function fetchEdenAiPricing(logger: EndpointLogger): Promise<{
   const stt = new Map<string, number>();
 
   try {
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+    // oxlint-disable-next-line restricted/no-raw-fetch
     const response = await fetch(API_URL, {
       headers: { Accept: "application/json" },
     });

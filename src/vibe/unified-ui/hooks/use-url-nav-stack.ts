@@ -1,9 +1,9 @@
 "use client";
 
-import { endpointToUrlSegment } from "next-vibe/core/core-utils/path";
-import type { NavigationStackEntry } from "next-vibe/core/definition/endpoint";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { resolveEndpoint } from "next-vibe/unified-ui/hooks/resolve-endpoint";
+import { endpointToUrlSegment } from "../../core/core-utils/path";
+import type { NavigationStackEntry } from "../../core/definition/endpoint";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
+import { resolveEndpoint } from "./resolve-endpoint";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { UseNavigationStackReturn } from "./use-navigation-stack";

@@ -9,7 +9,7 @@ import { and, eq } from "drizzle-orm";
 import { DEFAULT_CHAT_MODEL_SELECTION } from "next-vibe/agent/ai-stream/constants";
 import { getBestChatModel } from "next-vibe/agent/ai-stream/models";
 import { formatSkillId } from "next-vibe/agent/chat/slugify";
-import { getInstanceAvailability } from "next-vibe/agent/env-availability";
+import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import { getModelDisplayName } from "next-vibe/agent/models/all-models";
 import { modelProviders } from "next-vibe/agent/models/models";
 import { customSkills } from "next-vibe/agent/skills/db";
@@ -52,7 +52,7 @@ import type { MeT } from "./i18n";
 /** Fetch public skills for a user, enriched with model display info */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- inferred from complex mapped return
 async function fetchUserSkills(userId: string, viewer: JwtPayloadType) {
-  const viewerAvailability = await getInstanceAvailability();
+  const viewerAvailability = await getEnvAvailability();
   const skillRows = await db
     .select({
       id: customSkills.id,
@@ -182,9 +182,8 @@ export class UserProfileRepository {
       );
       if (!userResponse.success) {
         return fail({
-          message: t("get.errors.internal.title"),
+          message: t("get.errors.notFound.detail", { userId }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { userId },
           cause: userResponse,
         });
       }
@@ -205,12 +204,12 @@ export class UserProfileRepository {
       logger.error("Error getting user profile", parseError(error));
       const parsedError = parseError(error);
       return fail({
-        message: t("get.errors.internal.title"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
-          userId: user.isPublic ? "public" : (user.id ?? "unknown"),
+        message: t("get.errors.internal.detail", {
           error: parsedError.message,
-        },
+          // Public visitors carry no user id; the lead id still identifies them.
+          userId: user.id ?? user.leadId,
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -286,9 +285,8 @@ export class UserProfileRepository {
       >(userId, UserDetailLevel.COMPLETE, locale, logger);
       if (!userResponse.success) {
         return fail({
-          message: t("update.errors.unauthorized.title"),
+          message: t("update.errors.notFound.detail", { userId }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { userId },
           cause: userResponse,
         });
       }
@@ -306,12 +304,8 @@ export class UserProfileRepository {
 
         if (emailExistsResponse.success && emailExistsResponse.data) {
           return fail({
-            message: t("update.errors.validation.title"),
+            message: t("update.errors.validation.emailTaken"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            messageParams: {
-              field: "email",
-              message: t("update.errors.conflict.title"),
-            },
           });
         }
       }
@@ -361,9 +355,8 @@ export class UserProfileRepository {
               .limit(1);
             if (existing.length > 0 && existing[0].id !== userId) {
               return fail({
-                message: t("update.errors.conflict.title"),
+                message: t("update.errors.conflict.creatorSlugTaken"),
                 errorType: ErrorResponseTypes.VALIDATION_ERROR,
-                messageParams: { field: "creatorSlug" },
               });
             }
             updateData.creatorSlug = normalized;
@@ -502,12 +495,12 @@ export class UserProfileRepository {
       logger.error("Error updating user profile", parseError(error));
       const parsedError = parseError(error);
       return fail({
-        message: t("update.errors.internal.title"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
-          userId: user.id ?? "unknown",
+        message: t("update.errors.internal.detail", {
           error: parsedError.message,
-        },
+          // Public visitors carry no user id; the lead id still identifies them.
+          userId: user.id ?? user.leadId,
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -545,9 +538,8 @@ export class UserProfileRepository {
       );
       if (!userResponse.success) {
         return fail({
-          message: t("delete.errors.unauthorized.title"),
+          message: t("delete.errors.notFound.detail", { userId }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { userId },
           cause: userResponse,
         });
       }
@@ -632,12 +624,11 @@ export class UserProfileRepository {
       logger.error("Error deleting user account", parseError(error));
       const parsedError = parseError(error);
       return fail({
-        message: t("delete.errors.internal.title"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
-          userId: user.id ?? "unknown",
+        message: t("delete.errors.internal.detail", {
           error: parsedError.message,
-        },
+          userId: user.id,
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }

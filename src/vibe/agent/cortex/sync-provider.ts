@@ -4,10 +4,8 @@ import { and, asc, eq, inArray, or, sql } from "drizzle-orm";
 import { WidgetDataSchema } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
-import type {
-  StandardSyncCursor,
-  SyncDomain,
-} from "next-vibe/remote-connection/db";
+import type { SyncDomain } from "next-vibe/realtime/core/sync-domain";
+import type { StandardSyncCursor } from "next-vibe/remote-connection/db";
 import {
   type SyncProvider,
   toStandardCursor,

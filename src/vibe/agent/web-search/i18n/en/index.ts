@@ -89,7 +89,7 @@ export const translations = {
         description: "Please provide a search query",
       },
       queryTooLong: {
-        title: "Search query is too long",
+        title: "Search query is too long (max {{maxLength}} characters)",
         description: "Query must be 400 characters or less",
       },
       noProvider: {

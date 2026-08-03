@@ -31,7 +31,7 @@ import {
  * so domains can export it once at module load and keep using it.
  */
 export function createRelationalDb<
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- drizzle's schema generic is bound to Record<string, unknown>; this must match its constraint exactly.
+  // eslint-disable-next-line restricted/no-unknown -- drizzle's schema generic is bound to Record<string, unknown>; this must match its constraint exactly.
   TSchema extends Record<string, unknown>,
 >(schema: TSchema): NodePgDatabase<TSchema> {
   const build = (): NodePgDatabase<TSchema> => {

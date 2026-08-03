@@ -11,15 +11,12 @@
 
 "use client";
 
-import {
-  type ChatModelOption,
-  chatModelOptions,
-} from "next-vibe/agent/ai-stream/models";
-import { imageGenModelOptions } from "next-vibe/agent/image-generation/models";
-import { musicGenModelOptions } from "next-vibe/agent/music-generation/models";
-import { sttModelOptions } from "next-vibe/agent/speech-to-text/models";
-import { ttsModelOptions } from "next-vibe/agent/text-to-speech/models";
-import { videoGenModelOptions } from "next-vibe/agent/video-generation/models";
+import { type ChatModelOption, chatModelOptions } from "../../ai-stream/models";
+import { imageGenModelOptions } from "../../image-generation/models";
+import { musicGenModelOptions } from "../../music-generation/models";
+import { sttModelOptions } from "../../speech-to-text/models";
+import { ttsModelOptions } from "../../text-to-speech/models";
+import { videoGenModelOptions } from "../../video-generation/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import { Badge } from "next-vibe/ui/ui/badge";

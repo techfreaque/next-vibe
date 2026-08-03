@@ -1,7 +1,7 @@
 "use client";
 
-import type { ContentBlock } from "next-vibe/core/route/response.schema";
-import { Platform } from "next-vibe/platforms/platforms";
+import type { ContentBlock } from "../../../core/route/response.schema";
+import { Platform } from "../../../platforms/platforms";
 import { Div } from "next-vibe/ui/ui/div";
 import { Image } from "next-vibe/ui/ui/image";
 import { Span } from "next-vibe/ui/ui/span";
@@ -18,7 +18,7 @@ export function ContentBlocksRenderer({
   platform,
 }: {
   blocks: ContentBlock[];
-  platform?: Platform;
+  platform: Platform;
 }): JSX.Element {
   const isCli = platform === Platform.CLI || platform === Platform.CLI_PACKAGE;
 

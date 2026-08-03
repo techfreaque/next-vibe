@@ -7,7 +7,7 @@
 
 import "server-only";
 
-import { isStreamAbort } from "next-vibe/agent/ai-stream/repository/core/constants";
+import { isStreamAbort } from "../../repository/core/constants";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 

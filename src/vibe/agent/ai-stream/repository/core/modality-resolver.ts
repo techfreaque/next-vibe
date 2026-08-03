@@ -8,12 +8,9 @@ import {
   DEFAULT_AUDIO_VISION_MODEL_SELECTION,
   DEFAULT_IMAGE_VISION_MODEL_SELECTION,
   DEFAULT_VIDEO_VISION_MODEL_SELECTION,
-} from "next-vibe/agent/ai-stream/constants";
-import {
-  type ChatModelId,
-  getBestChatModel,
-} from "next-vibe/agent/ai-stream/models";
-import type { AiStreamT } from "next-vibe/agent/ai-stream/stream/i18n";
+} from "../../constants";
+import { type ChatModelId, getBestChatModel } from "../../models";
+import type { AiStreamT } from "../../stream/i18n";
 import {
   type AudioVisionModelId,
   type AudioVisionModelOption,
@@ -24,41 +21,36 @@ import {
   type ImageVisionModelOption,
   type VideoVisionModelId,
   type VideoVisionModelOption,
-} from "next-vibe/agent/ai-stream/vision-models";
-import { parseSkillId } from "next-vibe/agent/chat/slugify";
-import {
-  type AgentEnvAvailability,
-  getInstanceAvailability,
-} from "next-vibe/agent/env-availability";
-import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "next-vibe/agent/image-generation/constants";
-import type { ImageGenModelSelection } from "next-vibe/agent/image-generation/models";
-import type { Modality } from "next-vibe/agent/models/enum";
-import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "next-vibe/agent/music-generation/constants";
-import type { MusicGenModelSelection } from "next-vibe/agent/music-generation/models";
-import type { SkillVariant } from "next-vibe/agent/skills/config";
-import { NO_SKILL_ID } from "next-vibe/agent/skills/constants";
+} from "../../vision-models";
+import { parseSkillId } from "../../../chat/slugify";
+import { type AgentEnvAvailability } from "../../../env-availability";
+import { getEnvAvailability } from "../../../env-availability";
+import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "../../../image-generation/constants";
+import type { ImageGenModelSelection } from "../../../image-generation/models";
+import type { Modality } from "../../../models/enum";
+import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "../../../music-generation/constants";
+import type { MusicGenModelSelection } from "../../../music-generation/models";
+import type { SkillVariant } from "../../../skills/config";
+import { NO_SKILL_ID } from "../../../skills/constants";
 import type {
   ChatFavorite,
   FavoriteConfig,
-} from "next-vibe/agent/skills/favorites/db";
-import { buildFavoriteConfig } from "next-vibe/agent/skills/favorites/repository";
-import {
-  resolveFavorite,
-  resolveSkillVariant,
-} from "next-vibe/agent/skills/resolver";
-import { DEFAULT_STT_MODEL_SELECTION } from "next-vibe/agent/speech-to-text/constants";
+} from "../../../skills/favorites/db";
+import { buildFavoriteConfig } from "../../../skills/favorites/repository";
+import { resolveFavorite, resolveSkillVariant } from "../../../skills/resolver";
+import { DEFAULT_STT_MODEL_SELECTION } from "../../../speech-to-text/constants";
 import {
   getBestSttModel,
   type SttModelId,
   type SttModelOption,
-} from "next-vibe/agent/speech-to-text/models";
-import { DEFAULT_TTS_MODEL_SELECTION } from "next-vibe/agent/text-to-speech/constants";
+} from "../../../speech-to-text/models";
+import { DEFAULT_TTS_MODEL_SELECTION } from "../../../text-to-speech/constants";
 import {
   type TtsModelId,
   type VoiceModelSelection,
-} from "next-vibe/agent/text-to-speech/models";
-import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "next-vibe/agent/video-generation/constants";
-import type { VideoGenModelSelection } from "next-vibe/agent/video-generation/models";
+} from "../../../text-to-speech/models";
+import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "../../../video-generation/constants";
+import type { VideoGenModelSelection } from "../../../video-generation/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -243,7 +235,7 @@ export async function resolveModelSkill(params: {
     });
   }
 
-  const availability = await getInstanceAvailability();
+  const availability = await getEnvAvailability();
 
   // ── 2. Favorite → model (favorite modelSelection, skill-variant fallback) ─
   {

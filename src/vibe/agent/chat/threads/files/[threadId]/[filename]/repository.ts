@@ -7,8 +7,8 @@ import fs from "node:fs/promises";
 import path from "node:path";
 
 import { eq } from "drizzle-orm";
-import type { FileMetadata } from "next-vibe/agent/chat/storage/index";
-import { agentEnv } from "next-vibe/agent/env";
+import type { FileMetadata } from "../../../../storage/index";
+import { agentEnv } from "../../../../../env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   createFileResponse,

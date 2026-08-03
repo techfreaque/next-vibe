@@ -1,5 +1,5 @@
 import { MoveLeft as LucideMoveLeft } from "lucide-react";
 
-import { type IconComponent } from "../../../web/lib/helper";
+import { type IconComponent } from "../../lib/helper";
 
 export const MoveLeft: IconComponent = LucideMoveLeft;

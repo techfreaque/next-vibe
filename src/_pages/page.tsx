@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { VibeMode } from "next-vibe/env/env-util";

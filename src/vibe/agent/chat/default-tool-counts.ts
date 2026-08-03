@@ -10,66 +10,20 @@
 import "server-only";
 
 import { permissionsRegistry } from "next-vibe/core/permissions/registry";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { Platform } from "next-vibe/platforms/platforms";
 
 import { endpointsMeta } from "@/generated/endpoints/meta/en";
 
-import { getDefaultToolIds } from "./constants";
-
-/** Cached counts per role key */
-let publicCount: number | null = null;
-let customerCount: number | null = null;
-let adminCount: number | null = null;
+/** Cached count - max tool count across all platforms (admin-level) */
 let adminMaxAllPlatformsCount: number | null = null;
 
 const MOCK_ID = "00000000-0000-0000-0000-000000000000";
 
-function countForPlatformAndUser(
-  platform: Platform,
-  user: JwtPayloadType,
-): number {
-  return endpointsMeta.filter((ep) => {
-    const allowedRoles = ep.allowedRoles;
-    const platformAccess = permissionsRegistry.checkPlatformAccess(
-      allowedRoles,
-      platform,
-    );
-    if (!platformAccess.allowed) {
-      return false;
-    }
-    if (user.isPublic) {
-      return allowedRoles.includes(UserRole.PUBLIC);
-    }
-    return user.roles.some((role) => allowedRoles.includes(role));
-  }).length;
-}
-
 function ensureComputed(): void {
-  if (publicCount !== null) {
+  if (adminMaxAllPlatformsCount !== null) {
     return;
   }
-
-  publicCount = countForPlatformAndUser(Platform.AI, {
-    isPublic: true as const,
-    leadId: MOCK_ID,
-    roles: [UserRole.PUBLIC],
-  });
-
-  customerCount = countForPlatformAndUser(Platform.AI, {
-    id: MOCK_ID,
-    leadId: MOCK_ID,
-    isPublic: false as const,
-    roles: [UserRole.CUSTOMER],
-  });
-
-  adminCount = countForPlatformAndUser(Platform.AI, {
-    id: MOCK_ID,
-    leadId: MOCK_ID,
-    isPublic: false as const,
-    roles: [UserRole.ADMIN],
-  });
 
   // Max across all platforms for admin - deduped by path+method
   const allPlatforms = Object.values(Platform);
@@ -96,44 +50,6 @@ function ensureComputed(): void {
     }
   }
   adminMaxAllPlatformsCount = seen.size;
-}
-
-/**
- * Get the default active tool count for this user's role.
- * Returns a single number - the count of the role-appropriate DEFAULT_TOOL_IDS.
- */
-export function getDefaultActiveToolCount(user: JwtPayloadType): number {
-  if (user.isPublic) {
-    return getDefaultToolIds(false, false).length;
-  }
-  const isAdmin = user.roles.includes(UserRole.ADMIN);
-  return getDefaultToolIds(isAdmin, !isAdmin).length;
-}
-
-/**
- * Get the total available tool count for this user's role.
- * Computed once at boot, cached forever.
- */
-export function getTotalToolCount(user: JwtPayloadType): number {
-  ensureComputed();
-
-  if (user.isPublic) {
-    return publicCount!;
-  }
-  if (user.roles.includes(UserRole.ADMIN)) {
-    return adminCount!;
-  }
-  return customerCount!;
-}
-
-/**
- * Get the maximum tool count (admin-level, AI platform).
- * Represents the full platform capability regardless of user role.
- * Useful for marketing/landing pages that show total platform tools.
- */
-export function getMaxToolCount(): number {
-  ensureComputed();
-  return adminCount!;
 }
 
 /**

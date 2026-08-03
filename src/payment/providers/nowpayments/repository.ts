@@ -201,9 +201,8 @@ export class NOWPaymentsProvider implements PaymentProvider {
 
       if (!user) {
         return fail({
-          message: t("errors.userNotFound.title"),
+          message: t("errors.userNotFound.detail", { userId }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { userId },
         });
       }
 
@@ -221,9 +220,11 @@ export class NOWPaymentsProvider implements PaymentProvider {
         userId,
       });
       return fail({
-        message: t("errors.customerCreationFailed.title"),
+        message: t("errors.customerCreationFailed.detail", {
+          error: parseError(error).message,
+          userId,
+        }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: parseError(error).message, userId },
       });
     }
   }
@@ -264,9 +265,10 @@ export class NOWPaymentsProvider implements PaymentProvider {
 
       if (!product) {
         return fail({
-          message: t("errors.productNotFound.title"),
+          message: t("errors.productNotFound.detail", {
+            productId: params.productId,
+          }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { productId: params.productId },
         });
       }
 
@@ -281,9 +283,10 @@ export class NOWPaymentsProvider implements PaymentProvider {
         userId: params.userId,
       });
       return fail({
-        message: t("errors.checkoutCreationFailed.title"),
+        message: t("errors.checkoutCreationFailed.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -311,7 +314,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
       "",
     );
 
-    const callbackDomain = process.env["NOWPAYMENTS_CALLBACK_DOMAIN"];
+    const callbackDomain = paymentEnv.NOWPAYMENTS_CALLBACK_DOMAIN;
     const webhookBase = callbackDomain
       ? callbackDomain.replace(/\/$/, "")
       : coreEnv.NEXT_PUBLIC_APP_URL;
@@ -332,7 +335,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
       apiUrl: this.apiUrl,
     });
 
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external API
+    // oxlint-disable-next-line restricted/no-raw-fetch -- external API
     const response = await fetch(`${this.apiUrl}/invoice`, {
       method: "POST",
       headers: {
@@ -365,18 +368,13 @@ export class NOWPaymentsProvider implements PaymentProvider {
       // Provide specific error messages for common issues
       if (errorDetails.code === "INVALID_API_KEY" || response.status === 403) {
         return fail({
-          message: t("errors.invalidApiKey.title"),
+          message: t("errors.invalidApiKey.detail"),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-          messageParams: {
-            error:
-              "Invalid NOWPayments API key. Please check your NOWPAYMENTS_API_KEY environment variable and ensure it's valid. Visit https://nowpayments.io/app/dashboard to get your API key.",
-          },
         });
       }
       return fail({
-        message: t("errors.invoiceCreationFailed.title"),
+        message: t("errors.invoiceCreationFailed.detail", { error: errorText }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: errorText },
       });
     }
 
@@ -485,9 +483,8 @@ export class NOWPaymentsProvider implements PaymentProvider {
           calculatedSignature: `${calculatedSignature.slice(0, 10)}...`,
         });
         return fail({
-          message: t("errors.webhookVerificationFailed.title"),
+          message: t("errors.webhookVerificationFailed.invalidSignature"),
           errorType: ErrorResponseTypes.BAD_REQUEST,
-          messageParams: { error: "Invalid signature" },
         });
       }
 
@@ -570,9 +567,10 @@ export class NOWPaymentsProvider implements PaymentProvider {
         error: parseError(error),
       });
       return fail({
-        message: t("errors.webhookVerificationFailed.title"),
+        message: t("errors.webhookVerificationFailed.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.BAD_REQUEST,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -599,7 +597,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
       });
     }
     try {
-      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external API
+      // oxlint-disable-next-line restricted/no-raw-fetch -- external API
       const response = await fetch(
         `${this.apiUrl}/subscriptions/${subscriptionId}`,
         {
@@ -618,16 +616,17 @@ export class NOWPaymentsProvider implements PaymentProvider {
           subscriptionId,
         });
         return fail({
-          message: t("errors.subscriptionRetrievalFailed.title"),
+          message: t("errors.subscriptionRetrievalFailed.detail", {
+            error: errorText,
+          }),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-          messageParams: { error: errorText },
         });
       }
 
       const subscription: NOWPaymentsSubscription = await response.json();
 
       // Get the subscription plan to determine billing interval
-      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external API
+      // oxlint-disable-next-line restricted/no-raw-fetch -- external API
       const planResponse = await fetch(
         `${this.apiUrl}/subscriptions/plans/${subscription.subscription_plan_id}`,
         {
@@ -681,9 +680,10 @@ export class NOWPaymentsProvider implements PaymentProvider {
         subscriptionId,
       });
       return fail({
-        message: t("errors.subscriptionRetrievalFailed.title"),
+        message: t("errors.subscriptionRetrievalFailed.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -704,7 +704,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
       });
     }
     try {
-      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external API
+      // oxlint-disable-next-line restricted/no-raw-fetch -- external API
       const response = await fetch(
         `${this.apiUrl}/subscriptions/${subscriptionId}`,
         {
@@ -723,9 +723,10 @@ export class NOWPaymentsProvider implements PaymentProvider {
           subscriptionId,
         });
         return fail({
-          message: t("errors.subscriptionCancellationFailed.title"),
+          message: t("errors.subscriptionCancellationFailed.detail", {
+            error: errorText,
+          }),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-          messageParams: { error: errorText },
         });
       }
 
@@ -738,9 +739,10 @@ export class NOWPaymentsProvider implements PaymentProvider {
         subscriptionId,
       });
       return fail({
-        message: t("errors.subscriptionCancellationFailed.title"),
+        message: t("errors.subscriptionCancellationFailed.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -796,7 +798,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
   ): Promise<ResponseType<NOWPaymentsPaymentStatus>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external API
+      // oxlint-disable-next-line restricted/no-raw-fetch -- external API
       const response = await fetch(`${this.apiUrl}/payment/${paymentId}`, {
         method: "GET",
         headers: {
@@ -811,9 +813,8 @@ export class NOWPaymentsProvider implements PaymentProvider {
           error: errorText,
         });
         return fail({
-          message: t("errors.paymentStatusFailed.title"),
+          message: t("errors.paymentStatusFailed.detail", { error: errorText }),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-          messageParams: { error: errorText },
         });
       }
 
@@ -831,9 +832,10 @@ export class NOWPaymentsProvider implements PaymentProvider {
         paymentId,
       });
       return fail({
-        message: t("errors.paymentStatusFailed.title"),
+        message: t("errors.paymentStatusFailed.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -874,7 +876,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
         queryParams.append("offset", filters.offset.toString());
       }
 
-      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external API
+      // oxlint-disable-next-line restricted/no-raw-fetch -- external API
       const response = await fetch(
         `${this.apiUrl}/subscriptions?${queryParams.toString()}`,
         {
@@ -892,9 +894,10 @@ export class NOWPaymentsProvider implements PaymentProvider {
           error: errorText,
         });
         return fail({
-          message: t("errors.subscriptionListFailed.title"),
+          message: t("errors.subscriptionListFailed.detail", {
+            error: errorText,
+          }),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-          messageParams: { error: errorText },
         });
       }
 
@@ -911,9 +914,10 @@ export class NOWPaymentsProvider implements PaymentProvider {
         error: parseError(error),
       });
       return fail({
-        message: t("errors.subscriptionListFailed.title"),
+        message: t("errors.subscriptionListFailed.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }

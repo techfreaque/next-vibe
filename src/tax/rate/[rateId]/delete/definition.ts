@@ -3,7 +3,7 @@
  * POST endpoint to soft-delete (deactivate) a tax rate
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,

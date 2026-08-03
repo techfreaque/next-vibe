@@ -1,9 +1,9 @@
 import { parse } from "jsonc-parser";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
-import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
-
-import { scopedTranslation as sharedScopedTranslation } from "@/_pages/shared/i18n";
+import type { ResponseType } from "../../../core/route/response.schema";
+import {
+  ErrorResponseTypes,
+  failInline,
+} from "../../../core/route/response.schema";
 
 /**
  * JSON Parser with Comment Support
@@ -30,15 +30,12 @@ interface JsonWithComments {
  */
 export function parseJsonWithComments(
   jsonString: string,
-  locale: CountryLanguage,
 ): ResponseType<JsonWithComments> {
   try {
     const result = parse(jsonString);
     if (typeof result !== "object" || result === null) {
-      const { t: sharedT } = sharedScopedTranslation.scopedT(locale);
-
-      return fail({
-        message: sharedT("utils.parseJsonWithComments.errors.invalid_json"),
+      return failInline({
+        message: "Invalid JSON: expected an object",
         errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
       });
     }
@@ -48,13 +45,11 @@ export function parseJsonWithComments(
       data: result,
     };
   } catch (error) {
-    const { t: sharedT } = sharedScopedTranslation.scopedT(locale);
-    return fail({
-      message: sharedT("utils.parseJsonWithComments.errors.invalid_json"),
+    return failInline({
+      message: `Invalid JSON: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
       errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
-      messageParams: {
-        error: error instanceof Error ? error.message : String(error),
-      },
     });
   }
 }

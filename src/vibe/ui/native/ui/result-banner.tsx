@@ -1,5 +1,5 @@
 import { styled } from "nativewind";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import { View } from "react-native";
 
 import type { ResultBannerProps } from "../../web/ui/result-banner";

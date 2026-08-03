@@ -5,14 +5,14 @@
 
 "use client";
 
-import type { NavigationStackEntry } from "next-vibe/core/definition/endpoint";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { isCliPlatform, type Platform } from "next-vibe/platforms/platforms";
+import type { NavigationStackEntry } from "../../../core/definition/endpoint";
+import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import type { ErrorResponseType } from "../../../core/route/response.schema";
+import type { WidgetData } from "../../../core/utils/json";
+import type { JwtPayloadType } from "../../../identity/auth/types";
+import type { EndpointLogger } from "../../../logger/types";
+import { isCliPlatform, type Platform } from "../../../platforms/platforms";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { Dialog, DialogContent } from "next-vibe/ui/ui/dialog";
 import { Div } from "next-vibe/ui/ui/div";
@@ -24,20 +24,20 @@ import {
   SelectValue,
 } from "next-vibe/ui/ui/select";
 import { P } from "next-vibe/ui/ui/typography";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
-import { PickerProvider } from "next-vibe/unified-ui/_shared/picker-context";
+import { cn } from "../../_shared/cn";
+import { PickerProvider } from "../../_shared/picker-context";
 import type {
   OptionsOptional,
   UseEndpointOptions,
   UseEndpointOptionsBase,
-} from "next-vibe/unified-ui/hooks/endpoint-types";
-import { scopedTranslation } from "next-vibe/unified-ui/hooks/i18n";
-import type { ApiMutationOptions } from "next-vibe/unified-ui/hooks/types";
-import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
+} from "../../hooks/endpoint-types";
+import { scopedTranslation } from "../../hooks/i18n";
+import type { ApiMutationOptions } from "../../hooks/types";
+import { useEndpoint } from "../../hooks/use-endpoint";
 import {
   NavigationStackProvider,
   useNavigationStack,
-} from "next-vibe/unified-ui/hooks/use-navigation-stack";
+} from "../../hooks/use-navigation-stack";
 import { useMemo, useState } from "react";
 
 import { EndpointRenderer, type SubmitButtonConfig } from "./EndpointRenderer";
@@ -114,7 +114,7 @@ interface EndpointsPagePropsBase<
   /**
    * Platform override. When provided, passed to EndpointRenderer.
    */
-  platform?: Platform;
+  platform: Platform;
   /**
    * Logger override. When provided, used instead of useLogger() context.
    * Required for CLI/MCP contexts that don't have LoggerProvider.
@@ -307,7 +307,6 @@ function EndpointsPageInternal<
           logger: callLogger,
           user: callUser,
           locale: callLocale,
-          availability: callAvailability,
         }: Parameters<
           NonNullable<
             ApiMutationOptions<WidgetData, WidgetData, WidgetData>["onSuccess"]
@@ -321,7 +320,6 @@ function EndpointsPageInternal<
             logger: callLogger,
             user: callUser,
             locale: callLocale,
-            availability: callAvailability,
           });
 
           if (result) {
@@ -387,7 +385,6 @@ function EndpointsPageInternal<
         logger: callLogger,
         user: callUser,
         locale: callLocale,
-        availability: callAvailability,
       }: Parameters<
         NonNullable<
           ApiMutationOptions<WidgetData, WidgetData, WidgetData>["onSuccess"]
@@ -402,7 +399,6 @@ function EndpointsPageInternal<
             logger: callLogger,
             user: callUser,
             locale: callLocale,
-            availability: callAvailability,
           });
           if (result) {
             return result;
@@ -463,7 +459,6 @@ function EndpointsPageInternal<
         logger: callLogger,
         user: callUser,
         locale: callLocale,
-        availability: callAvailability,
       }: Parameters<
         NonNullable<
           ApiMutationOptions<WidgetData, WidgetData, WidgetData>["onSuccess"]
@@ -478,7 +473,6 @@ function EndpointsPageInternal<
             logger: callLogger,
             user: callUser,
             locale: callLocale,
-            availability: callAvailability,
           });
           if (result) {
             return result;
@@ -1098,7 +1092,7 @@ function StackEntryLayer({
   debug?: boolean;
   user: JwtPayloadType;
   locale: CountryLanguage;
-  platform?: Platform;
+  platform: Platform;
   modalOpenState: Record<number, boolean>;
   setModalOpenState: (
     state:
@@ -1237,6 +1231,7 @@ function StackEntryLayer({
             submitButton={submitButton}
             debug={debug}
             user={user}
+            platform={platform}
             _disableNavigationStack={true}
             navigationOverride={navigationOverride}
           />
@@ -1259,6 +1254,7 @@ function StackEntryLayer({
         >
           <EndpointsPageInternal
             user={user}
+            platform={platform}
             endpoint={{ POST: entry.endpoint }}
             locale={locale}
             className={className}
@@ -1293,6 +1289,7 @@ function StackEntryLayer({
         >
           <EndpointsPageInternal
             user={user}
+            platform={platform}
             endpoint={{ GET: entry.getEndpoint, PATCH: entry.endpoint }}
             locale={locale}
             className={className}
@@ -1336,6 +1333,7 @@ function StackEntryLayer({
         >
           <EndpointsPageInternal
             user={user}
+            platform={platform}
             endpoint={{ PATCH: entry.endpoint }}
             locale={locale}
             className={className}
@@ -1371,6 +1369,7 @@ function StackEntryLayer({
         >
           <EndpointsPageInternal
             user={user}
+            platform={platform}
             endpoint={{ DELETE: entry.endpoint }}
             locale={locale}
             className={className}
@@ -1427,6 +1426,7 @@ function StackEntryLayer({
       >
         <EndpointsPageInternal
           user={user}
+          platform={platform}
           endpoint={endpointConfig}
           locale={locale}
           className={className}

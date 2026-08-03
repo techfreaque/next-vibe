@@ -235,8 +235,6 @@ export const {
   ONE_TIME: "enums.paymentInterval.one_time",
 } as const);
 
-export type PaymentIntervalType = typeof PaymentIntervalValue;
-
 export const PaymentIntervalDB = [
   PaymentInterval.MONTH,
   PaymentInterval.YEAR,
@@ -256,8 +254,6 @@ export const {
   BANK_TRANSFER: "enums.manualPaymentMethod.bankTransfer",
   OTHER: "enums.manualPaymentMethod.other",
 } as const);
-
-export type ManualPaymentMethodType = typeof ManualPaymentMethodValue;
 
 export const ManualPaymentMethodDB = [
   ManualPaymentMethod.CASH,
@@ -280,8 +276,6 @@ export const {
   PAID: "enums.billStatus.PAID",
   DISPUTED: "enums.billStatus.DISPUTED",
 } as const);
-
-export type BillStatusType = typeof BillStatusValue;
 
 export const BillStatusDB = [
   BillStatus.DRAFT,
@@ -309,8 +303,6 @@ export const {
   EXPIRED: "enums.estimateStatus.EXPIRED",
   CONVERTED: "enums.estimateStatus.CONVERTED",
 } as const);
-
-export type EstimateStatusType = typeof EstimateStatusValue;
 
 export const EstimateStatusDB = [
   EstimateStatus.DRAFT,

@@ -4,7 +4,7 @@
  */
 
 "use client";
-import { PulseExecutionStatus } from "next-vibe/tasks/enum";
+import { PulseExecutionStatus } from "../../enum";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { Activity } from "next-vibe/ui/ui/icons/Activity";
@@ -20,7 +20,7 @@ import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
 import { TrendingUp } from "next-vibe/ui/ui/icons/TrendingUp";
 import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
 import { Span } from "next-vibe/ui/ui/span";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -28,9 +28,9 @@ import {
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
-import { DateFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/date-field/widget";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
+} from "../../../unified-ui/_shared/use-widget-context";
+import { DateFieldWidget } from "../../../unified-ui/widgets/form-fields/date-field/widget";
+import { NavigateButtonWidget } from "../../../unified-ui/widgets/interactive/navigate-button/widget";
 import React, { useCallback, useMemo, useState } from "react";
 
 import type endpoints from "./definition";
@@ -399,14 +399,14 @@ export function PulseHistoryContainer({
 
   const handleViewStats = useCallback((): void => {
     void (async (): Promise<void> => {
-      const m = await import("next-vibe/tasks/cron/stats/definition");
+      const m = await import("../../cron/stats/definition");
       navigate(m.default.GET, {});
     })();
   }, [navigate]);
 
   const handleViewHistory = useCallback((): void => {
     void (async (): Promise<void> => {
-      const m = await import("next-vibe/tasks/cron/history/definition");
+      const m = await import("../../cron/history/definition");
       navigate(m.default.GET, {});
     })();
   }, [navigate]);

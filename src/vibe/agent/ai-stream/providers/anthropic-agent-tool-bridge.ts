@@ -23,7 +23,7 @@ type ToolExecutor = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- tool args are dynamic
   args: any,
   options?: { toolCallId?: string },
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- generic executor return
+  // eslint-disable-next-line restricted/no-unknown -- generic executor return
 ) => Promise<unknown>;
 
 /**
@@ -88,7 +88,7 @@ export class AgentToolExecutorRegistry {
    */
   async execute(
     toolName: string,
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- MCP tool args are dynamic
+    // eslint-disable-next-line restricted/no-unknown -- MCP tool args are dynamic
     args: Record<string, unknown>,
     logger: EndpointLogger,
     toolCallId: string,

@@ -75,6 +75,7 @@ export const translations: typeof enTranslations = {
     server: {
       title: "Serverfehler",
       description: "Konten konnten nicht abgerufen werden",
+      detail: "Konten konnten nicht geladen werden: {{error}}",
     },
     networkError: {
       title: "Netzwerkfehler",

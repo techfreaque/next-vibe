@@ -1,13 +1,13 @@
 import "server-only";
 
 import { and, count, desc, eq, inArray, isNull, max } from "drizzle-orm";
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import {
   type ChatFolder,
   chatFolders,
   chatThreads,
   threadShareLinks,
-} from "next-vibe/agent/chat/db";
+} from "../../db";
 import {
   canCreateThreadInFolder,
   canDeleteFolder,
@@ -21,12 +21,12 @@ import {
   canPostInThread,
   canViewFolder,
   canViewThread,
-} from "next-vibe/agent/chat/permissions/permissions";
+} from "../../permissions/permissions";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type {
   ChannelDecision,
   RemoteEventHandlerProps,
-} from "next-vibe/core/route/handler";
+} from "next-vibe/core/route/handler-realtime";
 import {
   ErrorResponseTypes,
   fail,
@@ -37,7 +37,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type { EmitChannelDecision } from "next-vibe/realtime/structured-events";
+import type { EmitChannelDecision } from "next-vibe/realtime/core/structured-events";
 
 import { ThreadStreamingState } from "../../enum";
 import type {
@@ -790,8 +790,7 @@ export class FolderContentsRepository {
           ]
         : [],
     );
-    const { ensureMirrorFolders } =
-      await import("next-vibe/agent/chat/threads/sync-provider");
+    const { ensureMirrorFolders } = await import("../../threads/sync-provider");
     const leafId = await ensureMirrorFolders(
       userId,
       originInstanceId,
@@ -859,7 +858,7 @@ export class FolderContentsRepository {
       rolesAdmin: leaf.rolesAdmin ?? [],
     };
     const { createEndpointEmitter } =
-      await import("next-vibe/realtime/emitter");
+      await import("next-vibe/realtime/core/emitter");
     // Emit on the sub-folder channel where the mirror folder actually lives so
     // any open expanded view at that level gets the live update.
     createEndpointEmitter(definitions.GET, logger, user, {
@@ -929,7 +928,7 @@ export class FolderContentsRepository {
     }
     const { createFolderContentsEmitter } = await import("./emitter");
     const { createEndpointEmitter } =
-      await import("next-vibe/realtime/emitter");
+      await import("next-vibe/realtime/core/emitter");
     const updateItem = { ...mirrorRow, rootFolderId: DefaultFolderId.REMOTE };
     // Emit on the sub-folder channel where the mirror lives for live updates.
     createEndpointEmitter(definitions.GET, logger, user, {
@@ -1030,7 +1029,7 @@ export class FolderContentsRepository {
 
     const { createFolderContentsEmitter } = await import("./emitter");
     const { createEndpointEmitter } =
-      await import("next-vibe/realtime/emitter");
+      await import("next-vibe/realtime/core/emitter");
     const remoteKind = FolderContentsRepository.emitChannelForFolder(
       DefaultFolderId.REMOTE,
     ).kind;
@@ -1058,9 +1057,9 @@ export class FolderContentsRepository {
     // off cortex cleanup for each deleted remote thread.
     if (affectedThreads.length > 0) {
       const { default: threadsByIdDefinitions } =
-        await import("next-vibe/agent/chat/threads/[threadId]/definition");
+        await import("../../threads/[threadId]/definition");
       const { removeVirtualNodesByEntityId } =
-        await import("next-vibe/agent/cortex/embeddings/sync-virtual");
+        await import("../../../cortex/embeddings/sync-virtual");
       for (const thread of affectedThreads) {
         if (thread.rootFolderId) {
           createEndpointEmitter(threadsByIdDefinitions.DELETE, logger, user, {
@@ -1153,7 +1152,7 @@ export class FolderContentsRepository {
       return;
     }
     const { createEndpointEmitter } =
-      await import("next-vibe/realtime/emitter");
+      await import("next-vibe/realtime/core/emitter");
     createEndpointEmitter(definitions.GET, logger, user, {
       urlPathParams: { rootFolderId: urlPathParams.rootFolderId },
       requestData: {

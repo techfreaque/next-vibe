@@ -3,11 +3,11 @@
  * Based on MCP Specification v1.0
  */
 
-import type { Methods } from "next-vibe/core/definition/enums";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import type { BaseExecutionContext } from "next-vibe/execute-tool/repository/types";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { UserRoleValue } from "next-vibe/identity/roles/enum";
+import type { Methods } from "../../core/definition/enums";
+import type { WidgetData } from "../../core/utils/json";
+import type { BaseExecutionContext } from "../../execute-tool/repository/types";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { UserRoleValue } from "../../identity/roles/enum";
 import type { z } from "zod";
 
 /**

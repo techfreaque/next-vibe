@@ -131,6 +131,7 @@ export const translations: typeof enTranslations = {
     },
   },
   repository: {
+    capUpdated: "Tageslimit auf {{capAmount}} Credits gesetzt",
     capExceeded:
       "Tägliches Gratis-Limit erreicht. Bitte registrieren Sie sich oder versuchen Sie es morgen erneut.",
     getCapFailed: "Gratis-Limit-Konfiguration konnte nicht abgerufen werden",

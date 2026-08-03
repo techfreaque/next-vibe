@@ -5,7 +5,7 @@
  * Used by both the standalone embed script and the Next.js server.
  */
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { CountryLanguage } from "../../core/i18n/core/config";
 
 // ─── Mount Config ────────────────────────────────────────────────────────────
 // What the host page passes to mount an endpoint

@@ -3,7 +3,7 @@
  * POST endpoint to clean up expired sessions and tokens (called by cron)
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,

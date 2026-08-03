@@ -355,6 +355,7 @@ export const translations: typeof enTranslations = {
         notFound: {
           title: "Benutzer nicht gefunden",
           description: "Der angeforderte Benutzer konnte nicht gefunden werden",
+          detail: "Kein Benutzer mit der ID {{userId}} vorhanden.",
         },
         conflict: {
           title: "Konfliktfehler",
@@ -374,6 +375,7 @@ export const translations: typeof enTranslations = {
           title: "Serverfehler",
           description:
             "Benutzer kann aufgrund eines Serverfehlers nicht abgerufen werden",
+          detail: "Benutzerdaten nicht abrufbar: {{error}}",
         },
         unknown: {
           title: "Unbekannter Fehler",
@@ -571,6 +573,7 @@ export const translations: typeof enTranslations = {
           title: "Benutzer nicht gefunden",
           description:
             "Der zu aktualisierende Benutzer konnte nicht gefunden werden",
+          detail: "Kein Benutzer mit der ID {{userId}} vorhanden.",
         },
         conflict: {
           title: "Aktualisierungskonflikt",
@@ -581,6 +584,7 @@ export const translations: typeof enTranslations = {
           title: "Serverfehler",
           description:
             "Benutzer kann aufgrund eines Serverfehlers nicht aktualisiert werden",
+          detail: "Änderungen konnten nicht gespeichert werden: {{error}}",
         },
         unknown: {
           title: "Unbekannter Fehler",
@@ -657,11 +661,13 @@ export const translations: typeof enTranslations = {
         notFound: {
           title: "Benutzer nicht gefunden",
           description: "Der zu löschende Benutzer konnte nicht gefunden werden",
+          detail: "Kein Benutzer mit der ID {{userId}} vorhanden.",
         },
         server: {
           title: "Serverfehler",
           description:
             "Benutzer kann aufgrund eines Serverfehlers nicht gelöscht werden",
+          detail: "Benutzer konnte nicht gelöscht werden: {{error}}",
         },
         unknown: {
           title: "Unbekannter Fehler",

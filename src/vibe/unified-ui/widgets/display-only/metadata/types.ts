@@ -3,12 +3,12 @@
  * Displays very small, muted supplementary text for timestamps and metadata
  */
 
-import type { WidgetType } from "next-vibe/core/definition/enums";
-import type { StringWidgetSchema } from "next-vibe/unified-ui/_shared/schema-constraints";
+import type { WidgetType } from "../../../../core/definition/enums";
+import type { StringWidgetSchema } from "../../../_shared/schema-constraints";
 import type {
   BasePrimitiveWidgetConfig,
   FieldUsageConfig,
-} from "next-vibe/unified-ui/_shared/types";
+} from "../../../_shared/types";
 import type { z } from "zod";
 
 /**

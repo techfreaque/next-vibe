@@ -1,8 +1,8 @@
 import "server-only";
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import { defineEnv } from "next-vibe/env/define-env";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import { defaultLocale } from "../../core/i18n/core/config";
+import { defineEnv } from "../../env/define-env";
 import { z } from "zod";
 
 export const {

@@ -3,20 +3,20 @@
  * Implements AuthRepository interface for React Native
  */
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import type { ResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { AuthT } from "next-vibe/identity/auth/i18n";
-import { scopedTranslation } from "next-vibe/identity/auth/i18n";
-import type { UserRoleValue } from "next-vibe/identity/roles/enum";
-import type { CompleteUserType } from "next-vibe/identity/user/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { Platform } from "next-vibe/platforms/platforms";
+} from "../../core/route/response.schema";
+import { parseError } from "../../core/utils/parse-error";
+import type { AuthT } from "./i18n";
+import { scopedTranslation } from "./i18n";
+import type { UserRoleValue } from "../roles/enum";
+import type { CompleteUserType } from "../user/types";
+import type { EndpointLogger } from "../../logger/types";
+import type { Platform } from "../../platforms/platforms";
 import { storage } from "next-vibe/ui/lib/storage";
 
 import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/env/constants";
@@ -75,9 +75,8 @@ export class AuthRepository {
     } catch (error) {
       logger.error("Error storing auth token", parseError(error));
       return fail({
-        message: t("errors.native.storage_failed"),
+        message: t("errors.native.storage_failed", { error: String(error) }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: String(error) },
       });
     }
   }
@@ -94,9 +93,8 @@ export class AuthRepository {
     } catch (error) {
       logger.error("Error clearing auth token", parseError(error));
       return fail({
-        message: t("errors.native.clear_failed"),
+        message: t("errors.native.clear_failed", { error: String(error) }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: String(error) },
       });
     }
   }

@@ -22,8 +22,8 @@ import { existsSync, readFileSync } from "node:fs";
 
 import { and, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
-import { rootlessToolExecutionContext } from "next-vibe/agent/chat/config";
-import { ThreadStreamingState } from "next-vibe/agent/chat/enum";
+import { rootlessToolExecutionContext } from "../../../core/execution-context";
+import { ThreadStreamingState } from "../../chat/enum";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import { databaseEnv } from "next-vibe/database/env";
@@ -101,7 +101,7 @@ export async function isServerRunning(
     // Liveness probe: waits for a not-yet-started server process to come up. This
     // is the one sanctioned raw fetch — it must hit the wire before any session
     // or connection exists, so it cannot go through the typed remote path.
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- server-liveness probe
+    // oxlint-disable-next-line restricted/no-raw-fetch -- server-liveness probe
     const resp = await fetch(`${url}/api/en-US/system/runtime/server/health`, {
       signal: AbortSignal.timeout(3000),
     });
@@ -530,7 +530,7 @@ export async function connectToHermes(
   // relayStream() opens a per-stream dedicated WS instead.
   // reloadWsProviderConnector() handles any instanceId variant (e.g. "hermes-rn5-*").
   const { reloadWsProviderConnector } =
-    await import("next-vibe/realtime/connector");
+    await import("next-vibe/realtime/server/connector");
   reloadWsProviderConnector();
 
   // Trigger hermes to reconnect its atlas WS — this is the real connect event
@@ -1457,7 +1457,7 @@ export async function assertCronTaskCompleted(threadId: string): Promise<void> {
  * Assert that a thread is in idle state (not stuck in streaming/waiting).
  */
 export async function assertThreadIdle(threadId: string): Promise<void> {
-  const { chatThreads } = await import("next-vibe/agent/chat/db");
+  const { chatThreads } = await import("../../chat/db");
 
   const [thread] = await db
     .select({

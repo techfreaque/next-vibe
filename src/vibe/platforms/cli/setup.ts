@@ -22,10 +22,10 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import chalk from "chalk";
-import type { SetupResult } from "next-vibe/core/setup/types";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { CLI_BINARY_NAME } from "next-vibe/platforms/cli/types/cli-target";
+import type { SetupResult } from "../../core/setup/types";
+import { parseError } from "../../core/utils/parse-error";
+import type { EndpointLogger } from "../../logger/types";
+import { CLI_BINARY_NAME, CLI_BINARY_NAMES } from "./types/cli-target";
 
 class CliBinary {
   // eslint-disable-next-line i18next/no-literal-string
@@ -33,44 +33,109 @@ class CliBinary {
   private static readonly NPM_LINK_ARGS = ["link"] as const;
   private static readonly NPM_LINK_FORCE_ARGS = ["link", "--force"] as const;
 
-  /**
-   * Get the appropriate binary directory for the current platform
-   */
-  private static getBinaryDirectory(): string {
-    const platform = /*turbopackIgnore: true*/ os.platform();
-    const homeDir = /*turbopackIgnore: true*/ os.homedir();
+  /** PATH, split into normalized directory entries for comparison. */
+  private static pathEntries(): string[] {
+    return (process.env.PATH ?? "")
+      .split(path.delimiter)
+      .filter(Boolean)
+      .map((entry) => CliBinary.normalizeDir(entry));
+  }
 
-    switch (platform) {
-      case "win32": {
-        // Windows: Use a directory in PATH or create one
+  /** Compare form for a directory: case-insensitive on Windows, no trailing slash. */
+  private static normalizeDir(dir: string): string {
+    const trimmed = dir.replaceAll("\\", "/").replace(/\/+$/, "");
+    return os.platform() === "win32" ? trimmed.toLowerCase() : trimmed;
+  }
 
-        const windowsPath =
-          // eslint-disable-next-line i18next/no-literal-string
-          process.env.APPDATA || path.join(homeDir, "AppData", "Roaming");
-
-        return path.join(windowsPath, CLI_BINARY_NAME, "bin");
-      }
-
-      case "darwin":
-      case "linux":
-        // macOS and Linux: Use ~/.local/bin (commonly in PATH)
-        // eslint-disable-next-line i18next/no-literal-string
-        return path.join(homeDir, ".local", "bin");
-
-      default:
-        // Return a fallback path for unsupported platforms
-        // eslint-disable-next-line i18next/no-literal-string
-        return path.join(homeDir, ".local", "bin");
-    }
+  private static isOnPath(dir: string): boolean {
+    const target = CliBinary.normalizeDir(dir);
+    return CliBinary.pathEntries().includes(target);
   }
 
   /**
-   * Get the binary filename for the current platform
+   * Fallback install directory: a dedicated folder named after the default
+   * binary name. Only used when no shared runtime bin dir is on the live
+   * PATH — it needs a User PATH update and a new terminal to resolve, which
+   * is exactly why it is the last resort and not the default.
    */
-  private static getBinaryFilename(): string {
-    return os.platform() === "win32"
-      ? `${CLI_BINARY_NAME}.cmd`
-      : CLI_BINARY_NAME;
+  private static binaryDirectory(): string {
+    const homeDir = /*turbopackIgnore: true*/ os.homedir();
+    if (/*turbopackIgnore: true*/ os.platform() === "win32") {
+      const appData =
+        // eslint-disable-next-line i18next/no-literal-string
+        process.env.APPDATA || path.join(homeDir, "AppData", "Roaming");
+      return path.join(appData, CLI_BINARY_NAME);
+    }
+    // eslint-disable-next-line i18next/no-literal-string
+    return path.join(homeDir, ".local", CLI_BINARY_NAME);
+  }
+
+  /**
+   * Well-known shared runtime bin directories (npm's global dir, bun's, ...).
+   *
+   * The first one on the live PATH is THE install target — this setup process
+   * inherits the PATH of the terminal that (directly or via a package
+   * manager's postinstall) launched it, and writing the shim into a directory
+   * that terminal ALREADY searches is the one mechanism that makes the
+   * command resolve there immediately, in that same terminal, with no reload.
+   * A running shell's own PATH variable cannot be changed from outside, but
+   * its next lookup happily finds a new file in a directory it was already
+   * searching — which is exactly how a global npm install is usable the
+   * moment it finishes. Uninstall walks all of them so no copy survives a
+   * change of target between installs.
+   */
+  private static sharedBinDirectories(): string[] {
+    const homeDir = /*turbopackIgnore: true*/ os.homedir();
+    if (/*turbopackIgnore: true*/ os.platform() === "win32") {
+      const appData =
+        // eslint-disable-next-line i18next/no-literal-string
+        process.env.APPDATA || path.join(homeDir, "AppData", "Roaming");
+      return [
+        // eslint-disable-next-line i18next/no-literal-string
+        path.join(appData, "npm"),
+        // eslint-disable-next-line i18next/no-literal-string
+        path.join(homeDir, ".bun", "bin"),
+      ];
+    }
+    return [
+      // eslint-disable-next-line i18next/no-literal-string
+      path.join(homeDir, ".local", "bin"),
+      // eslint-disable-next-line i18next/no-literal-string
+      path.join(homeDir, ".bun", "bin"),
+      // eslint-disable-next-line i18next/no-literal-string
+      "/usr/local/bin",
+    ];
+  }
+
+  /**
+   * The directory the CURRENT terminal already searches, if any: the first
+   * shared bin dir that exists and is on this process's inherited PATH.
+   * Writing the shim here is what makes it callable in the terminal that ran
+   * the install, immediately, without opening a new one.
+   */
+  private static liveShellBinDirectory(): string | null {
+    for (const dir of CliBinary.sharedBinDirectories()) {
+      if (existsSync(dir) && CliBinary.isOnPath(dir)) {
+        return dir;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * The one directory to install into, plus whether it already resolves on
+   * PATH: the live-shell dir when one exists (available immediately in the
+   * current terminal), otherwise the dedicated fallback — the caller surfaces
+   * `onPath: false` for that case so it knows to persist the User PATH for
+   * future shells.
+   */
+  private static getBinaryDirectory(): { dir: string; onPath: boolean } {
+    const liveDir = CliBinary.liveShellBinDirectory();
+    if (liveDir) {
+      return { dir: liveDir, onPath: true };
+    }
+    const dir = CliBinary.binaryDirectory();
+    return { dir, onPath: CliBinary.isOnPath(dir) };
   }
 
   /**
@@ -226,9 +291,14 @@ while [ "$current_dir" != "$root" ]; do
   candidate="$current_dir/$REL_PATH"
   if [ -f "$candidate" ]; then
     PROC_NAME="${CLI_BINARY_NAME}-\${1:-cli}"
-    # Capture start time in ms before exec (EPOCHREALTIME is bash 5+; fall back to date)
+    # Capture start time in ms before exec (EPOCHREALTIME is bash 5+; fall back to date).
+    # LC_NUMERIC locales that use a comma decimal separator (e.g. de_DE) make bash
+    # render EPOCHREALTIME as "1784564118,183646" instead of "...118.183646" — the
+    # //,/. normalizes that before the dot-based split below, which would otherwise
+    # concatenate the whole value with itself and overflow the arithmetic expansion.
     if [ -n "\${EPOCHREALTIME+x}" ]; then
-      VIBE_START_TIME=$(( \${EPOCHREALTIME%.*}\${EPOCHREALTIME#*.} / 1000 ))
+      _epoch_dotted="\${EPOCHREALTIME//,/.}"
+      VIBE_START_TIME=$(( \${_epoch_dotted%.*}\${_epoch_dotted#*.} / 1000 ))
     else
       VIBE_START_TIME=$(date +%s%3N)
     fi
@@ -248,6 +318,50 @@ done
 echo "${CLI_BINARY_NAME}: could not find vibe-runtime.ts (looked for $REL_PATH upwards from $(pwd))" 1>&2
 exit 1
 `;
+  }
+
+  /**
+   * Write the full shim set for every alias into `dir` and return the written
+   * paths. On Windows that is three files per alias (.cmd for cmd.exe, .ps1
+   * for PowerShell, extensionless for Git Bash); on Unix one executable each.
+   */
+  private static writeShimSet(
+    dir: string,
+    binaryContent: string,
+    vibeRelativePath: string,
+    posixRelativePath: string,
+  ): string[] {
+    const isWindows = /*turbopackIgnore: true*/ os.platform() === "win32";
+    const written: string[] = [];
+    for (const name of CLI_BINARY_NAMES) {
+      // eslint-disable-next-line i18next/no-literal-string
+      const targetPath = path.join(dir, isWindows ? `${name}.cmd` : name);
+      writeFileSync(targetPath, binaryContent, { mode: 0o755 });
+      if (!isWindows) {
+        chmodSync(targetPath, 0o755);
+      }
+      written.push(targetPath);
+
+      if (isWindows) {
+        const bashShimPath = path.join(dir, name);
+        writeFileSync(
+          bashShimPath,
+          CliBinary.createUnixBinaryContent(posixRelativePath),
+          { mode: 0o755 },
+        );
+        written.push(bashShimPath);
+
+        // eslint-disable-next-line i18next/no-literal-string
+        const powerShellShimPath = path.join(dir, `${name}.ps1`);
+        writeFileSync(
+          powerShellShimPath,
+          CliBinary.createPowerShellBinaryContent(vibeRelativePath),
+          { mode: 0o755 },
+        );
+        written.push(powerShellShimPath);
+      }
+    }
+    return written;
   }
 
   /**
@@ -290,38 +404,46 @@ exit 1
    * All paths the dispatcher binary may have been written to on this platform.
    * Used to clear stale installs from every location before reinstalling.
    */
-  private static candidateBinaryPaths(): string[] {
+  // Public because uninstall removes exactly what install may have written, and
+  // checkInstallationStatus() looks for exactly the same set — keeping separate
+  // lists in sync by hand is what let shims survive an uninstall.
+  static candidateBinaryPaths(): string[] {
     const platform = /*turbopackIgnore: true*/ os.platform();
     const homeDir = /*turbopackIgnore: true*/ os.homedir();
     if (platform === "win32") {
-      const windowsAppData =
-        // eslint-disable-next-line i18next/no-literal-string
-        process.env.APPDATA || path.join(homeDir, "AppData", "Roaming");
-      const windowsLocalAppData =
-        // eslint-disable-next-line i18next/no-literal-string
-        process.env.LOCALAPPDATA || path.join(homeDir, "AppData", "Local");
-      // Three files per location on Windows: the .cmd for cmd.exe, the .ps1 for
-      // PowerShell, and an extensionless Git Bash companion. A shim missing from
-      // this list survives uninstall as a stale command on PATH.
-      // eslint-disable-next-line i18next/no-literal-string
+      // The dedicated install dir plus every shared dir an older install may
+      // have used. A stale shim left in any of them would still resolve on
+      // PATH and shadow this install.
       const binDirs = [
-        path.join(windowsAppData, CLI_BINARY_NAME, "bin"),
-        path.join(windowsLocalAppData, CLI_BINARY_NAME, "bin"),
+        CliBinary.binaryDirectory(),
+        ...CliBinary.sharedBinDirectories(),
       ];
-      return binDirs.flatMap((dir) => [
-        path.join(dir, `${CLI_BINARY_NAME}.cmd`),
-        path.join(dir, `${CLI_BINARY_NAME}.ps1`),
-        path.join(dir, CLI_BINARY_NAME),
-      ]);
+      // Three files per location per alias on Windows: the .cmd for cmd.exe,
+      // the .ps1 for PowerShell, and an extensionless Git Bash companion. A
+      // shim missing from this list survives uninstall as a stale command on
+      // PATH.
+      return [
+        ...new Set(
+          binDirs.flatMap((dir) =>
+            CLI_BINARY_NAMES.flatMap((name) => [
+              path.join(dir, `${name}.cmd`),
+              path.join(dir, `${name}.ps1`),
+              path.join(dir, name),
+            ]),
+          ),
+        ),
+      ];
     }
     return [
-      // eslint-disable-next-line i18next/no-literal-string
-      path.join(homeDir, ".local", "bin", CLI_BINARY_NAME),
-      // eslint-disable-next-line i18next/no-literal-string
-      path.join(homeDir, ".yarn", "bin", CLI_BINARY_NAME),
-      `/usr/local/bin/${CLI_BINARY_NAME}`,
-      `/usr/bin/${CLI_BINARY_NAME}`,
-    ];
+      ...new Set([
+        CliBinary.binaryDirectory(),
+        ...CliBinary.sharedBinDirectories(),
+        // eslint-disable-next-line i18next/no-literal-string
+        path.join(homeDir, ".yarn", "bin"),
+        // eslint-disable-next-line i18next/no-literal-string
+        "/usr/bin",
+      ]),
+    ].flatMap((dir) => CLI_BINARY_NAMES.map((name) => path.join(dir, name)));
   }
 
   /**
@@ -345,12 +467,25 @@ exit 1
   }
 
   /**
-   * Drop the global shim from every candidate location. PATH is deliberately
-   * left alone: the entry is harmless once empty, and a user may well have put
-   * that directory there themselves for something else.
+   * Drop the global shim from every candidate location, then remove the
+   * dedicated install directory (if now empty) and its PATH entry (Windows
+   * only — install never persists PATH on Unix, so there is nothing to
+   * reverse there). Stale candidate dirs from older install schemes are left
+   * alone even if empty: a user may have put something else there.
    */
-  static async uninstallBinary(): Promise<SetupResult> {
+  static async uninstallBinary(): Promise<SetupResult & { notes: string[] }> {
     const removed = await CliBinary.removeExistingBinaries();
+
+    const binDir = CliBinary.binaryDirectory();
+    const notes: string[] = [];
+    if (/*turbopackIgnore: true*/ os.platform() === "win32") {
+      const pathNote = await CliBinary.removeWindowsUserPath(binDir);
+      if (pathNote) {
+        notes.push(pathNote);
+      }
+    }
+    await CliBinary.removeDirectoryIfEmpty(binDir);
+
     return {
       changed: removed,
       summary:
@@ -359,6 +494,7 @@ exit 1
             `removed ${removed.length} binary shim(s)`
           : // eslint-disable-next-line i18next/no-literal-string
             "no binary to remove",
+      notes,
     };
   }
 
@@ -418,31 +554,8 @@ exit 1
       }
 
       // Get binary installation paths
-      const binDir = CliBinary.getBinaryDirectory();
-      const binaryFilename = CliBinary.getBinaryFilename();
-      const targetPath = path.join(binDir, binaryFilename);
-
-      // Always remove any existing binary before writing a fresh one
-      if (existsSync(targetPath)) {
-        try {
-          const fs = await import("node:fs/promises");
-          await fs.unlink(targetPath);
-        } catch {
-          // Ignore removal errors
-        }
-      }
-
-      // On Windows, also remove the Git Bash shim before reinstalling
-      const bashShimPath =
-        os.platform() === "win32" ? path.join(binDir, CLI_BINARY_NAME) : null;
-      if (bashShimPath && existsSync(bashShimPath)) {
-        try {
-          const fs = await import("node:fs/promises");
-          await fs.unlink(bashShimPath);
-        } catch {
-          // Ignore removal errors
-        }
-      }
+      const { dir: binDir, onPath: binDirOnPath } =
+        CliBinary.getBinaryDirectory();
 
       // Ensure binary directory exists
       try {
@@ -458,55 +571,42 @@ exit 1
 
       // Create binary content with the RELATIVE path so it can be found from any project
       const binaryContent = CliBinary.createBinaryContent(vibeRelativePath);
+      const isWindows = os.platform() === "win32";
+      const posixRelativePath = vibeRelativePath.replaceAll("\\", "/");
 
-      // Write binary file
-      writeFileSync(targetPath, binaryContent, { mode: 0o755 });
-
-      // Make executable on Unix systems
-      if (os.platform() !== "win32") {
-        chmodSync(targetPath, 0o755);
-      }
-
-      // Windows has three shells and no single shim satisfies them: cmd.exe runs
-      // the .cmd, Git Bash won't execute a .cmd and needs an extensionless shell
-      // script, and PowerShell needs a .ps1 to forward arguments without cmd's
-      // quoting rules rewriting them. Write all three so the command works
-      // whichever terminal the developer happens to open.
-      const companions: string[] = [];
-      if (os.platform() === "win32") {
-        const posixRelativePath = vibeRelativePath.replaceAll("\\", "/");
-
-        if (bashShimPath) {
-          writeFileSync(
-            bashShimPath,
-            CliBinary.createUnixBinaryContent(posixRelativePath),
-            { mode: 0o755 },
-          );
-          companions.push(bashShimPath);
-        }
-
-        const powerShellShimPath = path.join(binDir, `${CLI_BINARY_NAME}.ps1`);
-        writeFileSync(
-          powerShellShimPath,
-          CliBinary.createPowerShellBinaryContent(vibeRelativePath),
-          { mode: 0o755 },
-        );
-        companions.push(powerShellShimPath);
-      }
+      // Write one shim set per alias into the single install target — the
+      // live-shell dir when available, so the command resolves in the
+      // terminal that ran this the moment install returns. Windows has three
+      // shells and no single shim satisfies them: cmd.exe runs the .cmd, Git
+      // Bash won't execute a .cmd and needs an extensionless shell script,
+      // and PowerShell needs a .ps1 to forward arguments without cmd's
+      // quoting rules rewriting them. Write all three per alias so every
+      // alias works in whichever terminal the developer happens to open.
+      // removeExistingBinaries() above already cleared every candidate path,
+      // so this is always a fresh write.
+      const changed: string[] = CliBinary.writeShimSet(
+        binDir,
+        binaryContent,
+        vibeRelativePath,
+        posixRelativePath,
+      );
 
       const notes: string[] = [];
 
-      // Persist PATH for future shells and be explicit that this one will not
-      // see it — a child process cannot edit its parent's environment.
-      if (os.platform() === "win32") {
-        notes.push(await CliBinary.ensureWindowsUserPath(binDir));
-        // eslint-disable-next-line i18next/no-literal-string
-        notes.push("open a new terminal so the updated PATH takes effect");
-      } else {
-        // eslint-disable-next-line i18next/no-literal-string
-        notes.push(
-          `make sure ${binDir} is in your PATH — add to your shell profile: export PATH="${binDir}:$PATH"`,
-        );
+      // Only reached in the fallback case (no shared runtime dir on the live
+      // PATH): persist the dedicated dir on the User PATH so every shell
+      // opened from now on resolves it. The already-running terminal cannot
+      // be reached in this case — its PATH variable is private to it and it
+      // searches no directory the shim could be placed into.
+      if (!binDirOnPath) {
+        if (isWindows) {
+          await CliBinary.ensureWindowsUserPath(binDir);
+        } else {
+          // eslint-disable-next-line i18next/no-literal-string
+          notes.push(
+            `${binDir} is not in your PATH — add to your shell profile: export PATH="${binDir}:$PATH"`,
+          );
+        }
       }
 
       const status = await CliBinary.checkInstallationStatus();
@@ -515,14 +615,20 @@ exit 1
           changed: [],
           summary: "",
           notes: [],
-          failed: `binary written to ${targetPath} but ${CLI_BINARY_NAME} does not resolve afterwards`,
+          failed: `binary written to ${binDir} but ${CLI_BINARY_NAME} does not resolve afterwards`,
         };
       }
 
-      return {
-        changed: [targetPath, ...companions],
+      const defaultTargetPath = path.join(
+        binDir,
         // eslint-disable-next-line i18next/no-literal-string
-        summary: `binary installed at ${targetPath}`,
+        isWindows ? `${CLI_BINARY_NAME}.cmd` : CLI_BINARY_NAME,
+      );
+
+      return {
+        changed,
+        // eslint-disable-next-line i18next/no-literal-string
+        summary: `binary installed at ${defaultTargetPath}`,
         notes,
       };
     }
@@ -533,7 +639,11 @@ exit 1
    *
    * Uses PowerShell's [Environment]::SetEnvironmentVariable with the "User"
    * scope so the change persists across sessions without requiring admin
-   * rights. Existing shells need to be restarted to see the new PATH.
+   * rights. Also broadcasts WM_SETTINGCHANGE so processes launched from
+   * Explorer/the Start Menu after this point pick up the new PATH without a
+   * logoff — this does NOT reach the shell that ran install itself, since a
+   * running process's environment is private to it; the shim copy written to
+   * `liveShellBinDirectory()` is what covers that terminal.
    */
   private static async ensureWindowsUserPath(binDir: string): Promise<string> {
     /* eslint-disable i18next/no-literal-string */
@@ -552,6 +662,14 @@ if ($already) {
 } else {
   $newPath = if ($current) { "$current;$binDir" } else { $binDir }
   [Environment]::SetEnvironmentVariable('Path', $newPath, 'User')
+  try {
+    $sig = '[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]public static extern IntPtr SendMessageTimeout(IntPtr hWnd, uint Msg, UIntPtr wParam, string lParam, uint fuFlags, uint uTimeout, out UIntPtr lpdwResult);'
+    $type = Add-Type -MemberDefinition $sig -Name NativeMethods -Namespace Win32Broadcast -PassThru
+    $broadcastResult = [UIntPtr]::Zero
+    $type::SendMessageTimeout([IntPtr]0xffff, 0x1a, [UIntPtr]::Zero, 'Environment', 2, 5000, [ref]$broadcastResult) | Out-Null
+  } catch {
+    # Best-effort — the PATH write itself already succeeded either way.
+  }
   Write-Output "Added $binDir to user PATH"
 }
 `.trim();
@@ -570,11 +688,66 @@ if ($already) {
   }
 
   /**
+   * Idempotently remove `binDir` from the current user's PATH on Windows —
+   * the reverse of `ensureWindowsUserPath`, run on uninstall so the entry
+   * doesn't linger pointing at a directory that no longer has anything in it.
+   * Returns null when the directory wasn't in PATH to begin with.
+   */
+  private static async removeWindowsUserPath(
+    binDir: string,
+  ): Promise<string | null> {
+    /* eslint-disable i18next/no-literal-string */
+    const psScript = `
+$ErrorActionPreference = 'Stop'
+$binDir = ${CliBinary.toPowerShellLiteral(binDir)}
+$current = [Environment]::GetEnvironmentVariable('Path', 'User')
+if ($null -eq $current) { $current = '' }
+$parts = $current -split ';' | Where-Object { $_ -ne '' }
+$kept = $parts | Where-Object { $_.TrimEnd('\\') -ine $binDir.TrimEnd('\\') }
+if ($kept.Count -eq $parts.Count) {
+  Write-Output ''
+} else {
+  [Environment]::SetEnvironmentVariable('Path', ($kept -join ';'), 'User')
+  Write-Output "Removed $binDir from user PATH"
+}
+`.trim();
+    try {
+      const output = await CliBinary.runCommand(
+        "powershell",
+        ["-NoProfile", "-NonInteractive", "-Command", psScript],
+        { verbose: false, ignoreErrors: false },
+      );
+      return output.trim() || null;
+    } catch {
+      // Non-fatal — uninstall already removed the binaries; a leftover PATH
+      // entry that fails to clear is a stale directory reference, not a break.
+      return null;
+    }
+    /* eslint-enable i18next/no-literal-string */
+  }
+
+  /**
    * Quote a string as a PowerShell single-quoted literal (escaping ').
    */
   private static toPowerShellLiteral(value: string): string {
     // eslint-disable-next-line i18next/no-literal-string
     return `'${value.replaceAll("'", "''")}'`;
+  }
+
+  /** Remove `dir` if it exists and is empty. Leaves anything else untouched. */
+  private static async removeDirectoryIfEmpty(dir: string): Promise<void> {
+    if (!existsSync(dir)) {
+      return;
+    }
+    try {
+      const fs = await import("node:fs/promises");
+      const entries = await fs.readdir(dir);
+      if (entries.length === 0) {
+        await fs.rmdir(dir);
+      }
+    } catch {
+      // Ignore removal errors
+    }
   }
 
   private static async checkInstallationStatus(): Promise<{
@@ -583,45 +756,9 @@ if ($already) {
     path?: string;
   }> {
     try {
-      const platform = /*turbopackIgnore: true*/ os.platform();
-      const homeDir = /*turbopackIgnore: true*/ os.homedir();
-
-      let possiblePaths: string[];
-      if (platform === "win32") {
-        const windowsAppData =
-          // eslint-disable-next-line i18next/no-literal-string
-          process.env.APPDATA || path.join(homeDir, "AppData", "Roaming");
-        const windowsLocalAppData =
-          // eslint-disable-next-line i18next/no-literal-string
-          process.env.LOCALAPPDATA || path.join(homeDir, "AppData", "Local");
-        possiblePaths = [
-          // eslint-disable-next-line i18next/no-literal-string
-          path.join(
-            windowsAppData,
-            CLI_BINARY_NAME,
-            "bin",
-            `${CLI_BINARY_NAME}.cmd`,
-          ),
-          // eslint-disable-next-line i18next/no-literal-string
-          path.join(
-            windowsLocalAppData,
-            CLI_BINARY_NAME,
-            "bin",
-            `${CLI_BINARY_NAME}.cmd`,
-          ),
-        ];
-      } else {
-        possiblePaths = [
-          // eslint-disable-next-line i18next/no-literal-string
-          path.join(homeDir, ".local", "bin", CLI_BINARY_NAME),
-          // eslint-disable-next-line i18next/no-literal-string
-          path.join(homeDir, ".yarn", "bin", CLI_BINARY_NAME),
-
-          `/usr/local/bin/${CLI_BINARY_NAME}`,
-
-          `/usr/bin/${CLI_BINARY_NAME}`,
-        ];
-      }
+      // Same list install writes to and uninstall clears; a private copy here is
+      // how this check came to miss locations install had started using.
+      const possiblePaths = CliBinary.candidateBinaryPaths();
 
       for (const vibePath of possiblePaths) {
         if (existsSync(vibePath)) {
@@ -723,8 +860,14 @@ export async function install(logger: EndpointLogger): Promise<SetupResult> {
     return { changed, summary, failed };
   }
 
+  // Every shim written, not just the first. Windows gets three (.cmd for
+  // cmd.exe, extensionless for Git Bash, .ps1 for PowerShell) and reporting one
+  // of them makes an update look like it missed the other two — which is
+  // precisely the doubt a stale shim creates.
   logger.info(
-    `${chalk.green("✓")} ${description}\n    ${chalk.cyan(changed[0])}`,
+    `${chalk.green("✓")} ${description}\n${changed
+      .map((file) => `    ${chalk.cyan(file)}`)
+      .join("\n")}`,
   );
   // PATH notes are the one thing here a user must act on, so they are warnings
   // rather than another tick in a list of successes.
@@ -736,17 +879,20 @@ export async function install(logger: EndpointLogger): Promise<SetupResult> {
 }
 
 export async function uninstall(logger: EndpointLogger): Promise<SetupResult> {
-  const result = await CliBinary.uninstallBinary();
-  if (result.changed.length === 0) {
+  const { changed, summary, notes } = await CliBinary.uninstallBinary();
+  if (changed.length === 0) {
     logger.info(
       `${chalk.dim("·")} ${chalk.dim(`${description} — none found`)}`,
     );
-    return result;
+  } else {
+    logger.info(
+      `${chalk.yellow("−")} ${description}\n${changed
+        .map((file) => `    ${chalk.dim(file)}`)
+        .join("\n")}`,
+    );
   }
-  logger.info(
-    `${chalk.yellow("−")} ${description}\n${result.changed
-      .map((file) => `    ${chalk.dim(file)}`)
-      .join("\n")}`,
-  );
-  return result;
+  for (const note of notes) {
+    logger.info(`  ${chalk.dim("·")} ${chalk.dim(note)}`);
+  }
+  return { changed, summary };
 }

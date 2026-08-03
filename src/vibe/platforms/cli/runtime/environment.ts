@@ -6,7 +6,7 @@ import { dirname, join } from "node:path";
 const MODULE_LOAD_TIME = Date.now();
 
 import { config } from "dotenv";
-import { Platform } from "next-vibe/platforms/platforms";
+import { Platform } from "../../platforms";
 
 import { runtimeEnvPlaceholder } from "./runtime-env-placeholders";
 

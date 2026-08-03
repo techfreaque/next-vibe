@@ -82,7 +82,6 @@ export const translations = {
   cron: {
     frequency: {
       everyMinute: "every minute",
-      everyMinutes: "every {{interval}} minutes",
       everyHour: "every hour",
       everyDays: "every day",
       hourly: "hourly",
@@ -166,7 +165,7 @@ export const translations = {
   },
   errors: {
     // Cron Tasks errors
-    fetchCronTasks: "Failed to fetch cron tasks",
+    fetchCronTasks: "Failed to fetch cron tasks: {{error}}",
     createCronTask: "Failed to create cron task",
     updateCronTask: "Failed to update cron task",
     deleteCronTask: "Failed to delete cron task",
@@ -176,9 +175,10 @@ export const translations = {
     cronTaskNotFound: "Cron task not found",
 
     // Unified Runner errors
-    startTaskRunner: "Failed to start task runner",
+    startTaskRunner: "Failed to start task runner: {{error}}",
     stopTaskRunner: "Failed to stop task runner",
-    getTaskRunnerStatus: "Failed to get task runner status",
+    getTaskRunnerStatus:
+      'Failed to get task runner status: unknown action "{{action}}"',
     executeCronTask: "Failed to execute cron task",
 
     // Pulse errors
@@ -193,17 +193,25 @@ export const translations = {
 
     // Repository errors
     repositoryNotFound: "Resource not found",
+    repositoryNotFoundDetail: "No task found for ID {{taskId}}",
     repositoryInternalError: "An internal error occurred",
-    repositoryGetTaskForbidden: "You do not have permission to view this task",
+    repositoryInternalErrorDetail: "An internal error occurred: {{error}}",
+    repositoryGetTaskForbidden:
+      "You do not have permission to view task {{taskId}}",
     repositoryUpdateTaskForbidden:
       "You do not have permission to update this task",
+    repositoryUpdateTaskForbiddenDetail:
+      "You do not have permission to update task {{taskId}}",
     repositoryDeleteTaskForbidden:
-      "You do not have permission to delete this task",
+      "You do not have permission to delete task {{taskId}}",
   },
   common: {
-    cronRepositoryTaskUpdateFailed: "Failed to update cron task",
-    cronRepositoryTaskDeleteFailed: "Failed to delete cron task",
-    cronRepositoryExecutionCreateFailed: "Failed to create cron task execution",
+    cronRepositoryTaskUpdateFailed:
+      "Failed to update cron task {{taskId}}: {{error}}",
+    cronRepositoryTaskDeleteFailed:
+      "Failed to delete cron task {{taskId}}: {{error}}",
+    cronRepositoryExecutionCreateFailed:
+      "Failed to create execution for cron task {{taskId}}: {{error}}",
     cronRepositoryExecutionUpdateFailed: "Failed to update cron task execution",
     cronRepositoryExecutionsFetchFailed: "Failed to fetch cron task executions",
     cronRepositoryRecentExecutionsFetchFailed:

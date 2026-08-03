@@ -41,6 +41,7 @@ export const translations = {
       server: {
         title: "Server error",
         description: "Graph execution failed",
+        detail: "Graph execution failed: {{error}}",
       },
       unknown: {
         title: "Unknown error",
@@ -49,6 +50,7 @@ export const translations = {
       validation: {
         title: "Validation failed",
         description: "Invalid graph config or parameters",
+        detail: "Invalid graph config: {{error}}",
       },
       notFound: {
         title: "Not found",

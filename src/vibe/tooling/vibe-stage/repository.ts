@@ -15,6 +15,20 @@
  *     path array is purely declarative metadata; changes here are always safe.
  *  6. camelCase identifier renames — a -/+ line pair identical except for
  *     camelCase identifier tokens. Case-convention changes never qualify.
+ *  7. Whitespace-only reflow — a hunk whose removed and added blocks contain
+ *     the exact same tokens in the same order once decorative whitespace is
+ *     dropped. Covers re-indentation as well as a formatter collapsing/
+ *     expanding a statement across a different number of lines. Whitespace
+ *     INSIDE a string literal is never collapsed — that's content, not layout.
+ *  8. Phantom "modified" entries — git status reports the path as
+ *     worktree-modified but `git diff` shows no difference at all (worktree
+ *     content is byte-identical to the index, confirmed by git itself).
+ *     Staging is a no-op on content; it only refreshes the stale cached stat
+ *     that produced the phantom flag.
+ *  9. Markdown table column realignment (`.md` files only) — every changed
+ *     row's cell content is unchanged once padding is stripped; separator
+ *     rows may change dash count but not which side carries an alignment
+ *     colon.
  *
  * Diffs that add/remove suppression comments are never auto-staged.
  */
@@ -25,17 +39,16 @@ import { spawn } from "node:child_process";
 import { existsSync, promises as fsp } from "node:fs";
 import { resolve as resolvePath } from "node:path";
 
-import { hasCustomDirective } from "next-vibe/core/generators/shared/custom-directive";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { hasCustomDirective } from "../../core/generators/shared/custom-directive";
+import type { ResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { ConfigRepositoryImpl } from "next-vibe/tooling/check/config/repository";
+} from "../../core/route/response.schema";
+import { parseError } from "../../core/utils/parse-error";
+import type { EndpointLogger } from "../../logger/types";
+import { ConfigRepositoryImpl } from "../check/config/repository";
 
 import type {
   VibeStageRequestOutput,
@@ -123,6 +136,7 @@ function runCommandCapture(
 
 const ROUTE_PATTERN = /(?:^|\/)route\.ts$/;
 const DEFINITION_FILE_PATTERN = /(?:^|\/)definition\.ts$/;
+const MARKDOWN_FILE_PATTERN = /\.mdx?$/;
 const I18N_LANG_PATTERN = /\/i18n\/(?:en|de|pl)\/index\.ts$/;
 const I18N_INDEX_PATTERN = /\/i18n\/index\.ts$/;
 // All generator output now lives under the single top-level src/generated/
@@ -747,6 +761,198 @@ export function allLinesAreCamelCaseRenames(changedLines: string[]): boolean {
   );
 }
 
+/**
+ * Returns true if the hunk is purely a whitespace reflow: every removed/added
+ * line pair is byte-identical once leading/trailing whitespace is stripped, so
+ * only indentation changed and no token was touched.
+ *
+ * Compares the removed block and the added block as WHOLE units (not paired
+ * line-by-line), so it also catches reflow that changes the line count — a
+ * formatter collapsing a multi-line call onto one line, or expanding a long
+ * line across several, with the same tokens in the same order either way.
+ *
+ * Whitespace is only ever collapsed OUTSIDE string literals. A spacing change
+ * INSIDE a string ("click  here" → "click here") is real content — user-facing
+ * copy, a SQL fragment, a regex — not decoration, so it is never treated as
+ * reflow even though it looks whitespace-only at a glance. String-boundary
+ * tracking reuses the same tokenizer as the camelCase-rename check.
+ *
+ * Exported for unit testing.
+ */
+export function allLinesAreWhitespaceOnly(changedLines: string[]): boolean {
+  const removed = changedLines
+    .filter((l) => l.startsWith("-"))
+    .map((l) => l.slice(1));
+  const added = changedLines
+    .filter((l) => l.startsWith("+"))
+    .map((l) => l.slice(1));
+
+  if (removed.length === 0 || added.length === 0) {
+    return false;
+  }
+  if (removed.join("\n") === added.join("\n")) {
+    return false;
+  }
+
+  const oldTokens = stripDanglingCommas(reflowTokens(removed));
+  const newTokens = stripDanglingCommas(reflowTokens(added));
+
+  if (oldTokens.length === 0 || oldTokens.length !== newTokens.length) {
+    return false;
+  }
+
+  return oldTokens.every((token, i) => {
+    const other = newTokens[i];
+    return (
+      other !== undefined &&
+      token.text === other.text &&
+      token.isIdentifier === other.isIdentifier &&
+      token.inString === other.inString
+    );
+  });
+}
+
+const CLOSING_BRACKETS = new Set([")", "]", "}"]);
+
+/**
+ * Drop a comma token that sits immediately before a closing bracket.
+ *
+ * A trailing comma before `)`/`]`/`}` is syntactically optional in JS/TS —
+ * formatters add it in a multi-line list and omit it once the same list is
+ * collapsed onto one line (and vice versa). Without this, every prettier
+ * collapse/expand of a trailing-comma list would token-mismatch by exactly
+ * one comma and get rejected as a "real" change.
+ */
+function stripDanglingCommas(tokens: LineToken[]): LineToken[] {
+  return tokens.filter((token, i) => {
+    if (token.inString || token.text !== ",") {
+      return true;
+    }
+    const next = tokens[i + 1];
+    return !(next && !next.inString && CLOSING_BRACKETS.has(next.text));
+  });
+}
+
+/**
+ * Tokenize a block of lines (each via tokenizeLine independently — quote
+ * state does not carry across lines, so a real multi-line template literal
+ * can only cause a token mismatch and reject the hunk, never a false accept)
+ * and drop whitespace-only tokens that sit OUTSIDE a string literal. Tokens
+ * inside a string are kept as-is, including whitespace, so string content is
+ * compared verbatim rather than collapsed.
+ */
+function reflowTokens(lines: string[]): LineToken[] {
+  const tokens: LineToken[] = [];
+  for (const line of lines) {
+    for (const token of tokenizeLine(line)) {
+      if (!token.inString && token.text.trim() === "") {
+        continue;
+      }
+      tokens.push(token);
+    }
+  }
+  return tokens;
+}
+
+// ============================================================
+// Markdown table reflow
+// ============================================================
+
+// A markdown table row: starts and ends with `|` once trimmed. Matches both
+// data rows and separator rows (`| --- | :--- | ---: |`).
+const TABLE_ROW_PATTERN = /^\s*\|.*\|\s*$/;
+// A separator-row cell: dashes only, with optional leading/trailing colon for
+// alignment (`:---`, `---:`, `:---:`, `---`).
+const TABLE_SEPARATOR_CELL_PATTERN = /^:?-+:?$/;
+
+/** Split a markdown table row into its cell contents (outer pipes stripped). */
+function splitTableCells(line: string): string[] {
+  const trimmed = line.trim();
+  const inner = trimmed.slice(1, trimmed.endsWith("|") ? -1 : undefined);
+  return inner.split("|");
+}
+
+function isTableSeparatorRow(cells: string[]): boolean {
+  return cells.every((c) => TABLE_SEPARATOR_CELL_PATTERN.test(c.trim()));
+}
+
+/**
+ * Returns true if two markdown table rows differ only in column padding.
+ *
+ * Data rows: every cell's trimmed content must match exactly — only the
+ * padding whitespace may differ.
+ *
+ * Separator rows (`---`, `:---`, `---:`, `:---:`): the dash COUNT is allowed
+ * to change (that's the whole point of a width realignment — dashes are not
+ * whitespace, so the generic whitespace-reflow check above would reject
+ * this), but which side(s) carry an alignment colon must stay the same,
+ * otherwise the table's column alignment silently changes.
+ */
+function isMarkdownTableReflowPair(oldLine: string, newLine: string): boolean {
+  if (!TABLE_ROW_PATTERN.test(oldLine) || !TABLE_ROW_PATTERN.test(newLine)) {
+    return false;
+  }
+  const oldCells = splitTableCells(oldLine);
+  const newCells = splitTableCells(newLine);
+  if (oldCells.length !== newCells.length) {
+    return false;
+  }
+
+  const oldIsSep = isTableSeparatorRow(oldCells);
+  const newIsSep = isTableSeparatorRow(newCells);
+  if (oldIsSep !== newIsSep) {
+    // A row switching between "separator" and "data" is a structural change.
+    return false;
+  }
+
+  if (oldIsSep) {
+    return oldCells.every((cell, i) => {
+      const o = cell.trim();
+      const n = (newCells[i] ?? "").trim();
+      return (
+        o.startsWith(":") === n.startsWith(":") &&
+        o.endsWith(":") === n.endsWith(":")
+      );
+    });
+  }
+
+  return oldCells.every(
+    (cell, i) => cell.trim() === (newCells[i] ?? "").trim(),
+  );
+}
+
+/**
+ * Returns true if the hunk is purely a markdown table column-width
+ * realignment: every changed row is a table row (data or separator) whose
+ * cell content is unchanged once padding is stripped. Only called for `.md`
+ * files.
+ *
+ * Same removed/added pairing convention as allLinesAreCamelCaseRenames: with
+ * `--unified=0` git emits a hunk's removals before its additions, so the two
+ * blocks pair up by index. An unequal count means rows were added or removed,
+ * not just realigned, and the hunk is rejected.
+ *
+ * Exported for unit testing.
+ */
+export function allLinesAreMarkdownTableReflow(
+  changedLines: string[],
+): boolean {
+  const removed = changedLines
+    .filter((l) => l.startsWith("-"))
+    .map((l) => l.slice(1));
+  const added = changedLines
+    .filter((l) => l.startsWith("+"))
+    .map((l) => l.slice(1));
+
+  if (removed.length === 0 || removed.length !== added.length) {
+    return false;
+  }
+
+  return removed.every((oldLine, i) =>
+    isMarkdownTableReflowPair(oldLine, added[i] ?? ""),
+  );
+}
+
 function isBoilerplateCandidate(filePath: string): boolean {
   return (
     ROUTE_PATTERN.test(filePath) ||
@@ -927,8 +1133,9 @@ function rewriteHunkNewStart(hunkHeader: string, newStart: number): string {
  *  1. u0Unstaged = `git diff --unified=0 -- file` (WC vs index) — the true unstaged
  *     hunks with line numbers relative to the current index. This is what we apply.
  *  2. Classify each unstaged hunk: import-only, path-only, rename-only, or mixed.
- *  3. If all hunks are safe (imports, definition path lines, or camelCase
- *     renames) → importOnly=true, full-file stage.
+ *  3. If all hunks are safe (imports, definition path lines, camelCase
+ *     renames, whitespace reflow, or markdown table realignment) →
+ *     importOnly=true, full-file stage.
  *  4. If some are safe → build patch from safe hunks for partial stage.
  *
  * Using WC-vs-index (not WC-vs-HEAD) for the patch eliminates line-number mismatches
@@ -936,13 +1143,26 @@ function rewriteHunkNewStart(hunkHeader: string, newStart: number): string {
  */
 function analyzeFileDiff(
   u0Unstaged: string,
-  opts: { isDefinitionFile?: boolean } = {},
+  opts: {
+    isDefinitionFile?: boolean;
+    isPhantomModified?: boolean;
+    isMarkdownFile?: boolean;
+  } = {},
 ): {
   importOnly: boolean;
   importHunksPatch: string | null;
 } | null {
   if (!u0Unstaged.trim()) {
-    return null;
+    // git status listed this path as worktree-modified (Y=M), but `git diff`
+    // found no difference at all — a stale/racy status entry (e.g. mtime
+    // touched by a generator without any real content change). Staging is a
+    // content no-op; it just refreshes the cached stat and clears the phantom
+    // flag. Files included in the batch for other reasons (already fully
+    // staged with a clean worktree, e.g. Y=".") have nothing to reconcile —
+    // leave them alone rather than needlessly re-adding and re-reporting them.
+    return opts.isPhantomModified
+      ? { importOnly: true, importHunksPatch: null }
+      : null;
   }
 
   // Reject diffs that add or remove suppression comment lines — those must be reviewed.
@@ -985,6 +1205,13 @@ function analyzeFileDiff(
     ) {
       safeHunkStarts.add(start);
     } else if (allLinesAreCamelCaseRenames(changedLines)) {
+      safeHunkStarts.add(start);
+    } else if (allLinesAreWhitespaceOnly(changedLines)) {
+      safeHunkStarts.add(start);
+    } else if (
+      opts.isMarkdownFile &&
+      allLinesAreMarkdownTableReflow(changedLines)
+    ) {
       safeHunkStarts.add(start);
     } else {
       hasUnsafeHunk = true;
@@ -1552,7 +1779,6 @@ export class VibeStageRepository {
   static async execute(
     data: VibeStageRequestOutput,
     logger: EndpointLogger,
-    locale: CountryLanguage,
     t: CheckVibeStageT,
   ): Promise<ResponseType<VibeStageResponseOutput>> {
     const cwd = process.cwd();
@@ -1694,11 +1920,16 @@ export class VibeStageRepository {
 
       // Analyze all files for import-only diffs. One batched `git diff` for the
       // whole set (scoped to allFiles as pathspecs) instead of one spawn per file.
+      const phantomModifiedPaths = new Set(
+        status.filter((e) => e.worktree === "M").map((e) => e.path),
+      );
       const diffMap = await batchUnstagedDiffs(cwd, allFiles);
       const diffAnalyses = allFiles.map((f) => ({
         file: f,
         analysis: analyzeFileDiff(diffMap.get(f) ?? "", {
           isDefinitionFile: DEFINITION_FILE_PATTERN.test(f),
+          isPhantomModified: phantomModifiedPaths.has(f),
+          isMarkdownFile: MARKDOWN_FILE_PATTERN.test(f),
         }),
       }));
 
@@ -1728,7 +1959,7 @@ export class VibeStageRepository {
 
       // Ensure config is ready so the boilerplate plugin can resolve
       if (boilerplateCandidates.length > 0) {
-        await ConfigRepositoryImpl.ensureConfigReady(logger, locale, false);
+        await ConfigRepositoryImpl.ensureConfigReady(logger, false);
       }
 
       // Check boilerplate compliance

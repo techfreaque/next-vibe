@@ -3409,21 +3409,29 @@ export const translations: typeof enTranslations = {
   errors: {
     emailAlreadyInUse: "Adres e-mail jest już używany",
     locale_required: "Locale jest wymagane",
-    auth_required: "Wymagana autoryzacja",
-    auth_retrieval_failed: "Nie udało się pobrać autoryzacji",
+    auth_required: "Wymagana autoryzacja. Jedna z ról: {{roles}}",
+    auth_retrieval_failed: "Nie udało się pobrać autoryzacji: {{error}}",
     not_found: "Użytkownik nie znaleziony",
-    roles_lookup_failed: "Nie udało się pobrać ról użytkownika",
-    roles_batch_fetch_failed: "Nie udało się pobrać ról użytkowników wsadowo",
-    id_lookup_failed: "Nie udało się znaleźć użytkownika po ID",
-    email_lookup_failed: "Nie udało się znaleźć użytkownika po e-mailu",
-    email_check_failed: "Sprawdzenie e-maila nie powiodło się",
+    not_found_by_id: "Nie znaleziono użytkownika o ID {{userId}}",
+    not_found_by_email: "Nie znaleziono użytkownika z adresem e-mail {{email}}",
+    roles_lookup_failed: "Nie udało się pobrać ról użytkownika {{userId}}",
+    roles_batch_fetch_failed:
+      "Nie udało się pobrać ról dla {{count}} użytkowników",
+    id_lookup_failed: "Nie udało się znaleźć użytkownika {{userId}}: {{error}}",
+    email_lookup_failed:
+      "Nie udało się znaleźć użytkownika o e-mailu {{email}}: {{error}}",
+    email_check_failed:
+      "Sprawdzenie e-maila {{email}} nie powiodło się: {{error}}",
     email_duplicate_check_failed:
-      "Sprawdzenie duplikatu e-maila nie powiodło się",
-    search_failed: "Wyszukiwanie użytkowników nie powiodło się",
+      "Sprawdzenie duplikatu e-maila {{email}} (pomijając użytkownika {{excludeUserId}}) nie powiodło się: {{error}}",
+    search_failed:
+      "Wyszukiwanie użytkowników dla {{query}} nie powiodło się: {{error}}",
+    list_failed: "Nie udało się pobrać listy użytkowników: {{error}}",
     email_already_in_use: "Adres e-mail jest już używany",
-    creation_failed: "Nie udało się utworzyć użytkownika",
+    creation_failed: "Nie udało się utworzyć użytkownika: {{error}}",
     no_data_returned: "Brak danych zwróconych z bazy danych",
-    password_hashing_failed: "Hashowanie hasła nie powiodło się",
+    password_hashing_failed:
+      "Hashowanie hasła dla {{email}} nie powiodło się: {{error}}",
     not_implemented_on_native:
       "Ta funkcja nie jest zaimplementowana w React Native",
     count_failed: "Nie udało się pobrać liczby użytkowników: {{error}}",

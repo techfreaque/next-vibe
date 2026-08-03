@@ -6,11 +6,11 @@
 import "server-only";
 
 import type { ModelMessage, streamText } from "ai";
-import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
+import type { ToolExecutionContext } from "../../../../core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { DefaultFolderId } from "../../../chat/config";
+import type { DefaultFolderId } from "../../../../core/execution-context";
 import type { ChatMessage, MessageMetadata } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
 import type { ChatModelOption } from "../../models";

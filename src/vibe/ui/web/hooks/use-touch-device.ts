@@ -1,6 +1,6 @@
 "use client";
 
-import { platform } from "next-vibe/core/env-client";
+import { platform } from "../../../core/env-client";
 import { useEffect } from "react";
 import { create } from "zustand";
 

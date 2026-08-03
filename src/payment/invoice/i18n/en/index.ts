@@ -48,6 +48,7 @@ export const translations = {
         description: "Invalid request parameters",
       },
       server: {
+        detail: "Could not create the invoice: {{error}}",
         title: "Server Error",
         description: "Internal server error occurred",
       },
@@ -64,6 +65,7 @@ export const translations = {
         description: "Access forbidden",
       },
       notFound: {
+        noStripeCustomer: "No Stripe customer record exists for your account",
         title: "Not Found",
         description: "Resource not found",
       },

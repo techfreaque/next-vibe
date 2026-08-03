@@ -2,8 +2,8 @@
  * Error Logs Route Handler
  */
 
-import { Methods } from "next-vibe/core/definition/enums";
-import { endpointsHandler } from "next-vibe/core/route/multi";
+import { Methods } from "../../../core/definition/enums";
+import { endpointsHandler } from "../../../core/route/multi";
 
 import endpoints from "./definition";
 import { ErrorLogsRepository } from "./repository";

@@ -216,7 +216,9 @@ export const translations: typeof enTranslations = {
     conflict: {
       title: "Konflikt konta",
       description: "Konto z tym adresem e-mail już istnieje",
+      detail: "Konto z tym adresem e-mail już istnieje. Zaloguj się zamiast tego.",
     },
+    userNotFound: "Nie znaleziono konta dla {{email}}",
     forbidden: {
       title: "Dostęp Zabroniony",
       description: "Odmowa dostępu",
@@ -234,7 +236,7 @@ export const translations: typeof enTranslations = {
       description: "Masz niezapisane zmiany",
     },
     internal: {
-      title: "Błąd Wewnętrzny",
+      title: "Rejestracja dla {{email}} nie powiodła się: {{error}}",
       description: "Wystąpił błąd wewnętrzny",
     },
   },
@@ -264,7 +266,7 @@ export const translations: typeof enTranslations = {
         description: "Proszę wprowadzić prawidłowy adres e-mail",
       },
       internal: {
-        title: "Błąd Sprawdzania E-maila",
+        title: "Nie udało się sprawdzić {{email}}: {{error}}",
         description: "Błąd przy sprawdzaniu dostępności e-maila",
       },
       unknown: {

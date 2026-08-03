@@ -282,7 +282,7 @@ export const translations: typeof enTranslations = {
     sync: {
       failed: "Synchronizacja nie powiodła się",
       account: {
-        failed: "Synchronizacja konta nie powiodła się",
+        failed: "Synchronizacja konta nie powiodła się: {{error}}",
       },
       folder: {
         failed: "Synchronizacja folderu nie powiodła się",
@@ -343,8 +343,9 @@ export const translations: typeof enTranslations = {
       },
       errors: {
         default: "Synchronizacja IMAP nie powiodła się",
-        account_failed: "Synchronizacja konta nie powiodła się",
-        folder_sync_failed: "Synchronizacja folderu nie powiodła się",
+        account_failed: "Synchronizacja konta nie powiodła się: {{error}}",
+        folder_sync_failed:
+          "Synchronizacja folderu nie powiodła się: {{error}}",
         message_sync_error: "Błąd synchronizacji wiadomości",
         message_sync_failed: "Synchronizacja wiadomości nie powiodła się",
       },

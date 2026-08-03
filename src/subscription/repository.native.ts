@@ -75,10 +75,11 @@ export class SubscriptionRepository {
       return success(response.data);
     }
 
+    // Upstream already interpolated its params into `message`, so forwarding the
+    // message alone preserves the full detail.
     return fail({
       message: response.message,
       errorType: response.errorType ?? ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: response.messageParams,
     });
   }
 

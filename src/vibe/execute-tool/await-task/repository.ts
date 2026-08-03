@@ -13,25 +13,26 @@
 import "server-only";
 
 import { desc, eq, sql } from "drizzle-orm";
-import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
-import { chatMessages } from "next-vibe/agent/chat/db";
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
+import { chatMessages } from "../../agent/chat/db";
+import { defaultLocale } from "../../core/i18n/core/config";
+import type { ResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
-import type { AwaitTaskT } from "next-vibe/execute-tool/await-task/i18n";
-import { REVIVAL_ALIAS as RESUME_STREAM_ALIAS } from "next-vibe/execute-tool/revival/definition";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { cronTaskExecutions, cronTasks } from "next-vibe/tasks/cron/db";
-import { CronTaskStatus, type CronTaskStatusValue } from "next-vibe/tasks/enum";
+} from "../../core/route/response.schema";
+import type { WidgetData } from "../../core/utils/json";
+import { parseError } from "../../core/utils/parse-error";
+import { db } from "../../database";
+import type { AwaitTaskT } from "./i18n";
+import { REVIVAL_ALIAS as RESUME_STREAM_ALIAS } from "../revival/definition";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import { UserPermissionRole } from "../../identity/roles/enum";
+import type { EndpointLogger } from "../../logger/types";
+import type { Platform } from "../../platforms/platforms";
+import { cronTaskExecutions, cronTasks } from "../../tasks/cron/db";
+import { CronTaskStatus, type CronTaskStatusValue } from "../../tasks/enum";
 
 import { CallbackMode } from "../constants";
 import { TaskCompletion } from "../repository/completion";
@@ -49,6 +50,7 @@ export class AwaitTaskRepository {
     logger: EndpointLogger,
     t: AwaitTaskT,
     toolExecutionContext: ToolExecutionContext,
+    platform: Platform,
   ): Promise<ResponseType<AwaitTaskResponseOutput>> {
     const { taskId } = data;
 
@@ -88,8 +90,7 @@ export class AwaitTaskRepository {
         // have been consumed by ANOTHER process on this instance (its registry,
         // not ours). Ask the owner directly before parking this thread.
         if (pendingCall.instanceId) {
-          const { RouteExecuteRepository } =
-            await import("next-vibe/execute-tool/repository");
+          const { RouteExecuteRepository } = await import("../repository");
           const { default: awaitTaskDefinition } = await import("./definition");
           const remote = await RouteExecuteRepository.runInProcessTyped({
             definition: awaitTaskDefinition.POST,
@@ -99,6 +100,7 @@ export class AwaitTaskRepository {
             locale: defaultLocale,
             logger,
             callbackMode: CallbackMode.WAIT,
+            platform,
           });
           if (
             remote.success &&

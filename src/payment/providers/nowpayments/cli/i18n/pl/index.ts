@@ -25,6 +25,8 @@ export const translations: typeof enTranslations = {
     },
     errors: {
       notInstalled: {
+        instructions:
+          "Jak zainstalować ngrok:\n\n1. Wejdź na https://ngrok.com/download\n2. Pobierz ngrok dla swojej platformy\n3. Rozpakuj go i przenieś do swojego PATH\n4. Uruchom: ngrok authtoken TWOJ_AUTH_TOKEN (token znajdziesz na https://dashboard.ngrok.com/get-started/your-authtoken)\n\nAlbo zainstaluj menedżerem pakietów:\n- macOS: brew install ngrok/ngrok/ngrok\n- Linux: snap install ngrok\n- Windows: choco install ngrok",
         title: "ngrok nie jest zainstalowany",
         description:
           "ngrok jest wymagany do uruchomienia tunelu. Zainstaluj go i spróbuj ponownie.",
@@ -50,6 +52,7 @@ export const translations: typeof enTranslations = {
         description: "Zasób nie został znaleziony",
       },
       serverError: {
+        noTunnelUrl: "Nie udało się odczytać adresu tunelu ngrok",
         title: "Błąd serwera",
         description: "Nie udało się uruchomić tunelu",
       },

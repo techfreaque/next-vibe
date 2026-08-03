@@ -1,18 +1,18 @@
-import { ChatModelId } from "next-vibe/agent/ai-stream/models";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { ChatModelId } from "../../agent/ai-stream/models";
+import { createEndpoint } from "../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { WidgetDataSchema } from "next-vibe/core/utils/json";
-import { UserRole } from "next-vibe/identity/roles/enum";
+} from "../../core/definition/enums";
+import { WidgetDataSchema } from "../../core/utils/json";
+import { UserRole } from "../../identity/roles/enum";
 import {
   objectField,
   requestField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { scopedTranslation } from "./i18n";
@@ -203,7 +203,6 @@ const { POST } = createEndpoint({
 
 export const endpoints = { POST };
 
-export const revivalRequestSchema = POST.requestSchema;
 export type RevivalRequestInput = typeof POST.types.RequestInput;
 export type RevivalRequestOutput = typeof POST.types.RequestOutput;
 export type RevivalResponseOutput = typeof POST.types.ResponseOutput;

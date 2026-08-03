@@ -87,9 +87,10 @@ export const translations: typeof enTranslations = {
           description: "Ein unerwarteter Fehler ist aufgetreten",
         },
         dependenciesMissing:
-          "Erforderliche Abhängigkeiten nicht verfügbar: {missing}. {recommendations}",
-        invalidAction: "Ungültige Aktion: {action}",
-        actionFailed: "Fehler beim Ausführen der Aktion: {error}",
+          "Erforderliche Abhängigkeiten nicht verfügbar: {{missing}}. {{recommendations}}",
+        invalidAction: "Ungültige Aktion: {{action}}",
+        noActionProvided: "Keine Aktion angegeben",
+        actionFailed: "Fehler beim Ausführen der Aktion: {{error}}",
         alreadyRecording: "Aufnahme läuft bereits",
         notRecording: "Keine Aufnahme läuft",
       },
@@ -200,6 +201,14 @@ export const translations: typeof enTranslations = {
       },
       apiKeyMissing: "Eden AI API-Schlüssel ist nicht konfiguriert",
       transcriptionFailed: "Transkription fehlgeschlagen: {{error}}",
+      noSttProvider: "Kein Spracherkennungs-Anbieter verfügbar",
+      unsupportedProvider:
+        "Nicht unterstützter Spracherkennungs-Anbieter: {{provider}}",
+      noSttProviderConfigured:
+        "Kein Spracherkennungs-Anbieter konfiguriert. Hinterlege OPENAI_API_KEY, EDEN_AI_API_KEY oder DEEPGRAM_API_KEY – oder verbinde einen System-Inferenzanbieter.",
+      notConfigured:
+        "{{label}} ist nicht konfiguriert. Füge {{envKey}} zu deiner .env-Datei hinzu. Hol dir deinen Schlüssel unter {{url}}",
+      providerResultMissing: "Anbieter {{provider}} lieferte kein Ergebnis",
       audioTooShort:
         "Aufnahme zu kurz. Halte die Taste länger gedrückt und sprich deutlich.",
       noAudioFile: "Keine Audiodatei bereitgestellt",

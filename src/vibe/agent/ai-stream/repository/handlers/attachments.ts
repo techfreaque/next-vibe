@@ -15,7 +15,7 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { db } from "../../../../database";
+import { db } from "next-vibe/database";
 import { chatMessages } from "../../../chat/db";
 import type { AiStreamT } from "../../stream/i18n";
 import type { MessageDbWriter } from "../core/message-db-writer";
@@ -75,10 +75,9 @@ export class FileAttachmentHandler {
         });
         return fail({
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          message: t("route.errors.invalidRequestData"),
-          messageParams: {
-            issue: `File type not allowed: ${file.type}`,
-          },
+          message: t("route.errors.fileTypeNotAllowed", {
+            fileType: file.type,
+          }),
         });
       }
 

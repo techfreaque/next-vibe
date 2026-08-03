@@ -5,32 +5,32 @@
  */
 
 import { and, desc, eq, inArray, or, sql } from "drizzle-orm";
-import { rootlessToolExecutionContext } from "next-vibe/agent/chat/config";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { rootlessToolExecutionContext } from "next-vibe/core/execution-context";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import type { ResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../core/route/response.schema";
+import type { WidgetData } from "../../core/utils/json";
+import { parseError } from "../../core/utils/parse-error";
+import { db } from "../../database";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import { UserPermissionRole } from "../../identity/roles/enum";
+import type { EndpointLogger } from "../../logger/types";
 import type {
   CronTaskDeleteResponseOutput,
   CronTaskGetResponseOutput,
   CronTaskPutResponseOutput,
-} from "next-vibe/tasks/cron/[id]/definition";
-import type { CronTaskRecentExecution } from "next-vibe/tasks/cron/history/definition";
+} from "./[id]/definition";
+import type { CronTaskRecentExecution } from "./history/definition";
 import type {
   CronTaskItem,
   CronTaskResponseType as CronTaskResponse,
-} from "next-vibe/tasks/cron/tasks/definition";
-import type { TasksT } from "next-vibe/tasks/i18n";
-import { scopedTranslation } from "next-vibe/tasks/i18n";
+} from "./tasks/definition";
+import type { TasksT } from "../i18n";
+import { scopedTranslation } from "../i18n";
 import type { z } from "zod";
 
 import { getEndpoint } from "@/generated/endpoints/endpoint";
@@ -201,9 +201,8 @@ export class CronTasksRepository {
 
       if (!task) {
         return fail({
-          message: t("errors.repositoryNotFound"),
+          message: t("errors.repositoryNotFoundDetail", { taskId: id }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { taskId: id },
         });
       }
 
@@ -215,9 +214,8 @@ export class CronTasksRepository {
           (taskOwner.type === "user" && taskOwner.userId !== userId))
       ) {
         return fail({
-          message: t("errors.repositoryGetTaskForbidden"),
+          message: t("errors.repositoryGetTaskForbidden", { taskId: id }),
           errorType: ErrorResponseTypes.FORBIDDEN,
-          messageParams: { taskId: id },
         });
       }
 
@@ -236,9 +234,8 @@ export class CronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message: t("errors.fetchCronTasks"),
+        message: t("errors.fetchCronTasks", { error: parsedError.message }),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { message: parsedError.message },
       });
     }
   }
@@ -320,14 +317,15 @@ export class CronTasksRepository {
           });
         }
         return fail({
-          message: t("errors.repositoryUpdateTaskForbidden"),
+          message: t("errors.repositoryUpdateTaskForbiddenDetail", {
+            taskId: id,
+          }),
           errorType: ErrorResponseTypes.FORBIDDEN,
-          messageParams: { taskId: id },
         });
       }
 
       if (task.userId) {
-        void import("next-vibe/agent/cortex/embeddings/sync-virtual")
+        void import("../../agent/cortex/embeddings/sync-virtual")
           .then(({ syncVirtualNodeToEmbedding }) => {
             const embeddingContent = [
               `# ${task.displayName ?? task.id}`,
@@ -393,9 +391,11 @@ export class CronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message: t("common.cronRepositoryTaskUpdateFailed"),
+        message: t("common.cronRepositoryTaskUpdateFailed", {
+          taskId: id,
+          error: parsedError.message,
+        }),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { error: parsedError.message, taskId: id },
       });
     }
   }
@@ -436,9 +436,8 @@ export class CronTasksRepository {
           (existingOwner.type === "user" && existingOwner.userId !== userId))
       ) {
         return fail({
-          message: t("errors.repositoryDeleteTaskForbidden"),
+          message: t("errors.repositoryDeleteTaskForbidden", { taskId: id }),
           errorType: ErrorResponseTypes.FORBIDDEN,
-          messageParams: { taskId: id },
         });
       }
 
@@ -450,7 +449,7 @@ export class CronTasksRepository {
       if (userId) {
         void (async (): Promise<void> => {
           const { removeVirtualNode } =
-            await import("next-vibe/agent/cortex/embeddings/sync-virtual");
+            await import("../../agent/cortex/embeddings/sync-virtual");
           await removeVirtualNode(userId, `/tasks/${canonicalId}.md`);
         })().catch(() => {
           // Best-effort cortex cleanup
@@ -471,9 +470,11 @@ export class CronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message: t("common.cronRepositoryTaskDeleteFailed"),
+        message: t("common.cronRepositoryTaskDeleteFailed", {
+          taskId: id,
+          error: parsedError.message,
+        }),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { error: parsedError.message, taskId: id },
       });
     }
   }
@@ -497,9 +498,11 @@ export class CronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message: t("common.cronRepositoryExecutionCreateFailed"),
+        message: t("common.cronRepositoryExecutionCreateFailed", {
+          taskId: execution.taskId,
+          error: parsedError.message,
+        }),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { error: parsedError.message, taskId: execution.taskId },
       });
     }
   }
@@ -548,7 +551,7 @@ export class CronTasksRepository {
     try {
       // Query 1: Task definitions with enriched fields
       const { RemoteConnectionRepository } =
-        await import("next-vibe/remote-connection/repository");
+        await import("../../remote-connection/repository");
       const instanceId =
         await RemoteConnectionRepository.getLocalInstanceId(userId);
 
@@ -767,15 +770,6 @@ export class CronTasksRepository {
       row.taskInput,
     ) as z.output<TSchema>;
     return { ...row, taskInput: parsed };
-  }
-
-  /** Enable a task by id. Returns true if a row was found and updated. */
-  static async enable(id: string): Promise<boolean> {
-    const result = await db
-      .update(cronTasks)
-      .set({ enabled: true, updatedAt: new Date() })
-      .where(eq(cronTasks.id, id));
-    return (result.rowCount ?? 0) > 0;
   }
 
   /**

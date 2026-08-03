@@ -60,7 +60,7 @@ class PlatformDetectorImpl implements IPlatformDetector {
     }
 
     // Fallback for unknown platforms
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Platform detection error
+    // eslint-disable-next-line restricted/restricted-syntax, i18next/no-literal-string -- Platform detection error
     throw new Error(`Unsupported platform: ${process.platform}`);
   }
 
@@ -220,7 +220,7 @@ export async function getPlatformCapabilities(): Promise<PlatformCapabilities> {
     default: {
       // TypeScript exhaustiveness check
       const _exhaustive: never = platform;
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Platform detection error
+      // eslint-disable-next-line restricted/restricted-syntax, i18next/no-literal-string -- Platform detection error
       throw new Error(`Unknown platform: ${String(_exhaustive)}`);
     }
   }
@@ -304,7 +304,7 @@ export async function checkPlatformDependencies(
 
     default: {
       const _exhaustive: never = platform;
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Platform detection error
+      // eslint-disable-next-line restricted/restricted-syntax, i18next/no-literal-string -- Platform detection error
       throw new Error(`Unknown platform: ${String(_exhaustive)}`);
     }
   }

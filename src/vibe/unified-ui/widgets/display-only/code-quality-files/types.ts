@@ -2,11 +2,11 @@
  * Code Quality Files Widget Type Definitions
  */
 
-import type { WidgetType } from "next-vibe/core/definition/enums";
+import type { WidgetType } from "../../../../core/definition/enums";
 import type {
   BasePrimitiveWidgetConfig,
   FieldUsageConfig,
-} from "next-vibe/unified-ui/_shared/types";
+} from "../../../_shared/types";
 import type { z } from "zod";
 
 /**

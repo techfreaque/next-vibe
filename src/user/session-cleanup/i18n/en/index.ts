@@ -72,11 +72,11 @@ export const translations = {
   errors: {
     default: "An error occurred during session cleanup",
     execution_failed: {
-      title: "Session Cleanup Failed",
+      title: "Session Cleanup Failed: {{error}}",
       description: "Failed to clean up expired sessions",
     },
     partial_failure: {
-      title: "Partial Session Cleanup Failure",
+      title: "Partial Session Cleanup Failure: {{errors}}",
       description: "Some sessions could not be cleaned up",
     },
     unknown_error: {

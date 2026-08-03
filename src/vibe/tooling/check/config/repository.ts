@@ -12,25 +12,23 @@ import { existsSync, promises as fs } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { coreEnv, getPackageDlxRunner } from "next-vibe/core/env";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { coreEnv, getPackageDlxRunner } from "../../../core/env";
 import {
   ErrorResponseTypes,
-  fail,
+  failInline,
   type ResponseType,
   success,
-} from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { Platform } from "next-vibe/platforms/platforms";
+} from "../../../core/route/response.schema";
+import type { WidgetData } from "../../../core/utils/json";
+import { parseError } from "../../../core/utils/parse-error";
+import type { EndpointLogger } from "../../../logger/types";
+import type { Platform } from "../../../platforms/platforms";
 
 import { parseJsonWithComments } from "../repository/parse-json";
 import type {
   ConfigCreateRequestOutput,
   ConfigCreateResponseOutput,
 } from "./definition";
-import { type ConfigCreateT, scopedTranslation } from "./i18n";
 import type {
   CheckConfig,
   CreateDefaultCheckConfigResult,
@@ -78,181 +76,46 @@ export class ConfigRepositoryImpl {
 
   private static resolveJsPluginPath(pluginPath: string): string {
     // Pattern: @next-vibe/checker/oxlint-plugins/restricted-syntax.ts or .js
-    if (pluginPath.startsWith("@next-vibe/checker/oxlint-plugins/")) {
-      const fileName = pluginPath.slice(
-        "@next-vibe/checker/oxlint-plugins/".length,
-      );
+    const packagePrefix = "@next-vibe/checker/oxlint-plugins/";
+    if (pluginPath.startsWith(packagePrefix)) {
+      const fileName = pluginPath.slice(packagePrefix.length);
       const baseName = fileName.replace(/\.(ts|js)$/, "");
-      const extension = fileName.endsWith(".ts") ? "ts" : "js";
 
-      if (extension === "ts") {
-        // Local development: .ts -> source files
-        // Walk up from cwd to find the project root containing the plugin sources
-        let searchDir = process.cwd();
-        for (let i = 0; i < 10; i++) {
-          const sourcePath = resolve(
-            searchDir,
-            "src",
-            "vibe",
-            "tooling",
-            "check",
-            "repository",
-            "oxlint",
-            "plugins",
-            baseName,
-            "src",
-            "index.ts",
-          );
-          if (existsSync(sourcePath)) {
-            return sourcePath;
-          }
-          const parent = dirname(searchDir);
-          if (parent === searchDir) {
-            break;
-          }
-          searchDir = parent;
-        }
-      } else {
-        // Installed package: .js -> look for .ts in installed package first (package ships .ts sources)
-        const installedTsPath = resolve(
+      // Installed package (@next-vibe/checker ships .ts sources) takes
+      // precedence, so a consuming repo uses the published plugin rather than a
+      // stale local copy.
+      for (const candidate of [
+        resolve(
           process.cwd(),
           "node_modules",
           "@next-vibe",
           "checker",
           "oxlint-plugins",
           `${baseName}.ts`,
-        );
-        if (existsSync(installedTsPath)) {
-          return installedTsPath;
-        }
-
-        // Also try compiled .js (future: if package ships compiled files)
-        const compiledPath = resolve(
+        ),
+        resolve(
           process.cwd(),
           "node_modules",
           "@next-vibe",
           "checker",
           "oxlint-plugins",
           fileName,
-        );
-        if (existsSync(compiledPath)) {
-          return compiledPath;
-        }
-
-        // Fallback for .js: try finding .ts source files (dev environment / monorepo)
-        let searchDir = process.cwd();
-        for (let i = 0; i < 10; i++) {
-          const sourcePath = resolve(
-            searchDir,
-            "src",
-            "vibe",
-            "tooling",
-            "check",
-            "repository",
-            "oxlint",
-            "plugins",
-            baseName,
-            "src",
-            "index.ts",
-          );
-          if (existsSync(sourcePath)) {
-            return sourcePath;
-          }
-          const parent = dirname(searchDir);
-          if (parent === searchDir) {
-            break;
-          }
-          searchDir = parent;
+        ),
+      ]) {
+        if (existsSync(candidate)) {
+          return candidate;
         }
       }
 
-      const checkerSourcePath = resolve(
-        dirname(fileURLToPath(import.meta.url)),
-        "..",
-        "repository",
-        "oxlint",
-        "plugins",
-        baseName,
-        "src",
-        "index.ts",
-      );
-      if (existsSync(checkerSourcePath)) {
-        return checkerSourcePath;
-      }
-
-      // Fallback: return expected path from cwd
-      return resolve(
-        process.cwd(),
-        "src",
-        "vibe",
-        "tooling",
-        "check",
-        "repository",
-        "oxlint",
-        "plugins",
-        baseName,
-        "src",
-        "index.ts",
-      );
+      return ConfigRepositoryImpl.localPluginPath(baseName);
     }
 
-    // Pattern: next-vibe/tooling/checker/oxlint/oxlint-plugins/<name>.ts (internal monorepo path)
+    // Pattern: next-vibe/tooling/checker/oxlint/oxlint-plugins/<name>.ts
     const internalPrefix = "next-vibe/tooling/checker/oxlint/oxlint-plugins/";
     if (pluginPath.startsWith(internalPrefix)) {
       const fileName = pluginPath.slice(internalPrefix.length);
-      const baseName = fileName.replace(/\.(ts|js)$/, "");
-
-      const checkerSourcePath = resolve(
-        dirname(fileURLToPath(import.meta.url)),
-        "..",
-        "repository",
-        "oxlint",
-        "plugins",
-        baseName,
-        "src",
-        "index.ts",
-      );
-      if (existsSync(checkerSourcePath)) {
-        return checkerSourcePath;
-      }
-
-      let searchDir = process.cwd();
-      for (let i = 0; i < 10; i++) {
-        const sourcePath = resolve(
-          searchDir,
-          "src",
-          "vibe",
-          "tooling",
-          "check",
-          "repository",
-          "oxlint",
-          "plugins",
-          baseName,
-          "src",
-          "index.ts",
-        );
-        if (existsSync(sourcePath)) {
-          return sourcePath;
-        }
-        const parent = dirname(searchDir);
-        if (parent === searchDir) {
-          break;
-        }
-        searchDir = parent;
-      }
-
-      return resolve(
-        process.cwd(),
-        "src",
-        "vibe",
-        "tooling",
-        "check",
-        "repository",
-        "oxlint",
-        "plugins",
-        baseName,
-        "src",
-        "index.ts",
+      return ConfigRepositoryImpl.localPluginPath(
+        fileName.replace(/\.(ts|js)$/, ""),
       );
     }
 
@@ -263,6 +126,28 @@ export class ConfigRepositoryImpl {
 
     const absolutePath = `${process.cwd()}/${pluginPath}`;
     return existsSync(absolutePath) ? absolutePath : pluginPath;
+  }
+
+  /**
+   * A plugin's source, resolved from THIS file's location:
+   *   <check>/config/..  ->  <check>/repository/oxlint/plugins/<name>/src/index.ts
+   *
+   * Anchoring here - rather than walking up from cwd guessing at a `src/vibe/...`
+   * tree - is what makes the checker work wherever it is mounted. Getting it
+   * wrong is silent: oxlint fails the entire config load and the run still
+   * reports "0 issues", so a bad path reads as a clean lint.
+   */
+  private static localPluginPath(baseName: string): string {
+    return resolve(
+      dirname(fileURLToPath(import.meta.url)),
+      "..",
+      "repository",
+      "oxlint",
+      "plugins",
+      baseName,
+      "src",
+      "index.ts",
+    );
   }
 
   private static resolveJsPlugins(
@@ -525,7 +410,6 @@ export default checkConfig.eslint?.buildFlatConfig?.(
 
   static async ensureConfigReady(
     logger: EndpointLogger,
-    locale: CountryLanguage,
     createConfig: boolean,
   ): Promise<EnsureConfigResult> {
     const configPath = ConfigRepositoryImpl.getConfigFilePath();
@@ -545,7 +429,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
       if (createConfig) {
         logger.info("Creating default check.config.ts...");
         const createResult =
-          await ConfigRepositoryImpl.createDefaultCheckConfig(logger, locale);
+          await ConfigRepositoryImpl.createDefaultCheckConfig(logger);
         if (!createResult.success) {
           return {
             ready: false,
@@ -566,6 +450,15 @@ export default checkConfig.eslint?.buildFlatConfig?.(
       }
     }
 
+    // Do not time this call and report it as config-loading cost. This is the
+    // first `await` on the check path, so it absorbs whatever the event loop
+    // still has queued from CLI startup - measured at ~750ms, against ~3ms of
+    // actual work (1.5ms to import check.config.ts, the rest a stat).
+    // Wall-clock here has twice been misread as "check.config.ts is slow to
+    // compile", prompting attempts to cache the resolved config. Caching it buys
+    // ~3ms and risks serving stale lint rules. The real cost is upstream, in the
+    // ~2.3s between the `[ROUTE] executing` and `[RouteExecute] Executing route`
+    // log lines.
     const loaded = await ConfigRepositoryImpl.loadCheckConfig(logger);
     if (!loaded) {
       return {
@@ -589,7 +482,6 @@ export default checkConfig.eslint?.buildFlatConfig?.(
       const genResult = await ConfigRepositoryImpl.generateAllConfigs(
         logger,
         config,
-        locale,
       );
       if (genResult.success) {
         regenerated = true;
@@ -606,7 +498,6 @@ export default checkConfig.eslint?.buildFlatConfig?.(
     const vscodeResult = await ConfigRepositoryImpl.generateVSCodeSettings(
       logger,
       config,
-      locale,
     );
     if (!vscodeResult.success) {
       logger.warn("Failed to generate VSCode settings", {
@@ -620,7 +511,6 @@ export default checkConfig.eslint?.buildFlatConfig?.(
   private static async generateAllConfigs(
     logger: EndpointLogger,
     config: CheckConfig,
-    locale: CountryLanguage,
   ): Promise<
     ResponseType<{
       oxlintConfigPath?: string;
@@ -628,7 +518,6 @@ export default checkConfig.eslint?.buildFlatConfig?.(
       eslintConfigPath?: string;
     }>
   > {
-    const { t } = scopedTranslation.scopedT(locale);
     try {
       let oxlintConfigPath: string | undefined;
       let oxfmtConfigPath: string | undefined;
@@ -683,10 +572,9 @@ export default checkConfig.eslint?.buildFlatConfig?.(
     } catch (error) {
       const errorMessage = parseError(error).message;
       logger.error("Failed to generate configs", { error: errorMessage });
-      return fail({
-        message: t("errors.generateConfigsFailed"),
+      return failInline({
+        message: `Failed to generate configs: ${errorMessage}`,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: errorMessage },
       });
     }
   }
@@ -694,9 +582,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
   static async generateVSCodeSettings(
     logger: EndpointLogger,
     config: CheckConfig,
-    locale: CountryLanguage,
   ): Promise<ResponseType<GenerateVSCodeSettingsResult>> {
-    const { t } = scopedTranslation.scopedT(locale);
     const defaultSettingsPath = resolve(process.cwd(), ".vscode/settings.json");
 
     try {
@@ -721,10 +607,8 @@ export default checkConfig.eslint?.buildFlatConfig?.(
         await fs.mkdir(settingsDirectory, { recursive: true });
       }
 
-      const existingSettings = await ConfigRepositoryImpl.loadExistingSettings(
-        settingsPath,
-        locale,
-      );
+      const existingSettings =
+        await ConfigRepositoryImpl.loadExistingSettings(settingsPath);
       const newSettings: Record<string, WidgetData> = { ...existingSettings };
 
       // Apply all settings using static helpers
@@ -756,11 +640,23 @@ export default checkConfig.eslint?.buildFlatConfig?.(
         vscodeConfig.settings,
       );
 
-      await fs.writeFile(
-        settingsPath,
-        JSON.stringify(newSettings, null, 2),
-        "utf8",
-      );
+      // Only write when something actually changed. This runs on EVERY check,
+      // and an unconditional write re-stamps the file's mtime, which editors and
+      // file watchers treat as a real edit - reloading settings mid-session on a
+      // command that changed nothing.
+      const serialized = JSON.stringify(newSettings, null, 2);
+      const currentSettings = await fs
+        .readFile(settingsPath, "utf8")
+        .catch(() => null);
+
+      if (currentSettings === serialized) {
+        logger.debug("VSCode settings already up-to-date", {
+          path: settingsPath,
+        });
+        return success({ settingsPath });
+      }
+
+      await fs.writeFile(settingsPath, serialized, "utf8");
 
       logger.debug("Generated VSCode settings", { path: settingsPath });
 
@@ -770,19 +666,16 @@ export default checkConfig.eslint?.buildFlatConfig?.(
       logger.error("Failed to generate VSCode settings", {
         error: errorMessage,
       });
-      return fail({
-        message: t("errors.generateVSCodeSettingsFailed"),
+      return failInline({
+        message: `Failed to generate VSCode settings: ${errorMessage}`,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: errorMessage },
       });
     }
   }
 
   static async createDefaultCheckConfig(
     logger: EndpointLogger,
-    locale: CountryLanguage,
   ): Promise<ResponseType<CreateDefaultCheckConfigResult>> {
-    const { t } = scopedTranslation.scopedT(locale);
     const configPath = ConfigRepositoryImpl.getConfigFilePath();
 
     try {
@@ -791,8 +684,8 @@ export default checkConfig.eslint?.buildFlatConfig?.(
         await ConfigRepositoryImpl.findPackageRoot(currentDir);
 
       if (!packageRoot) {
-        return fail({
-          message: t("errors.packageRootNotFound"),
+        return failInline({
+          message: "Package root not found",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -800,10 +693,9 @@ export default checkConfig.eslint?.buildFlatConfig?.(
       const templatePath = resolve(packageRoot, "check.config.ts");
 
       if (!existsSync(templatePath)) {
-        return fail({
-          message: t("errors.templateNotFound"),
+        return failInline({
+          message: `Template not found at ${templatePath}`,
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { path: templatePath },
         });
       }
 
@@ -833,7 +725,6 @@ export default checkConfig.eslint?.buildFlatConfig?.(
       const mcpResult = await ConfigRepositoryImpl.createDefaultMcpConfig(
         logger,
         ".mcp.json",
-        locale,
       );
       if (!mcpResult.success) {
         logger.warn("Failed to create .mcp.json", {
@@ -843,7 +734,6 @@ export default checkConfig.eslint?.buildFlatConfig?.(
       const mcpCursorResult = await ConfigRepositoryImpl.createDefaultMcpConfig(
         logger,
         ".cursor/mcp.json",
-        locale,
       );
       if (!mcpCursorResult.success) {
         logger.warn("Failed to create .cursor/mcp.json", {
@@ -854,7 +744,6 @@ export default checkConfig.eslint?.buildFlatConfig?.(
       const mcpVscodeResult = await ConfigRepositoryImpl.createDefaultMcpConfig(
         logger,
         ".vscode/mcp.json",
-        locale,
       );
       if (!mcpVscodeResult.success) {
         logger.warn("Failed to create .vscode/mcp.json", {
@@ -866,10 +755,9 @@ export default checkConfig.eslint?.buildFlatConfig?.(
     } catch (error) {
       const errorMessage = parseError(error).message;
       logger.error("Failed to create check.config.ts", { error: errorMessage });
-      return fail({
-        message: t("errors.createConfigFailed"),
+      return failInline({
+        message: `Failed to create check.config.ts: ${errorMessage}`,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: errorMessage },
       });
     }
   }
@@ -877,15 +765,12 @@ export default checkConfig.eslint?.buildFlatConfig?.(
   static async createDefaultMcpConfig(
     logger: EndpointLogger,
     path: string,
-    locale: CountryLanguage,
   ): Promise<ResponseType<CreateDefaultMcpConfigResult>> {
-    const { t } = scopedTranslation.scopedT(locale);
     const projectPath = process.cwd();
     const mcpConfigPath = `${projectPath}/${path}`;
 
     try {
       // Use .mcp.example.json template if available, replacing {{PROJECT_PATH}}
-      // eslint-disable-next-line i18next/no-literal-string
       const examplePath = resolve(projectPath, ".mcp.example.json");
       let mcpContent: string;
 
@@ -900,7 +785,6 @@ export default checkConfig.eslint?.buildFlatConfig?.(
             mcpServers: {
               vibe: {
                 command: dlx.command,
-                // eslint-disable-next-line i18next/no-literal-string
                 args: [...dlx.args, "@next-vibe/checker@latest", "mcp"],
                 env: {
                   PROJECT_ROOT: projectPath,
@@ -923,10 +807,9 @@ export default checkConfig.eslint?.buildFlatConfig?.(
     } catch (error) {
       const errorMessage = parseError(error).message;
       logger.error("Failed to create .mcp.json", { error: errorMessage });
-      return fail({
-        message: t("errors.createMcpConfigFailed"),
+      return failInline({
+        message: `Failed to create .mcp.json: ${errorMessage}`,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: errorMessage },
       });
     }
   }
@@ -1052,14 +935,13 @@ export default checkConfig.eslint?.buildFlatConfig?.(
 
   private static async loadExistingSettings(
     settingsPath: string,
-    locale: CountryLanguage,
   ): Promise<Record<string, WidgetData>> {
     if (!existsSync(settingsPath)) {
       return {};
     }
     try {
       const content = await fs.readFile(settingsPath, "utf8");
-      const parseResult = parseJsonWithComments(content, locale);
+      const parseResult = parseJsonWithComments(content);
       if (parseResult.success && typeof parseResult.data === "object") {
         return parseResult.data as Record<string, WidgetData>;
       }
@@ -1198,9 +1080,7 @@ export class ConfigCreateRepository {
   static async execute(
     data: ConfigCreateRequestOutput,
     logger: EndpointLogger,
-    t: ConfigCreateT,
     platform: Platform,
-    locale: CountryLanguage,
   ): Promise<ResponseType<ConfigCreateResponseOutput>> {
     logger.debug("[Config Create] Repository received data", {
       data,
@@ -1210,22 +1090,20 @@ export class ConfigCreateRepository {
     try {
       const configPath = resolve(process.cwd(), "check.config.ts");
       if (existsSync(configPath)) {
-        return fail({
-          message: t("errors.conflict.title"),
-          messageParams: { path: configPath },
+        return failInline({
+          message: `Configuration already exists at ${configPath}`,
           errorType: ErrorResponseTypes.CONFLICT,
         });
       }
 
-      const configResult = await ConfigRepositoryImpl.createDefaultCheckConfig(
-        logger,
-        locale,
-      );
+      const configResult =
+        await ConfigRepositoryImpl.createDefaultCheckConfig(logger);
 
       if (!configResult.success) {
-        return fail({
-          message: t("errors.configCreation"),
-          messageParams: { error: configResult.message || "Unknown error" },
+        return failInline({
+          message: `Failed to create check.config.ts: ${
+            configResult.message || "Unknown error"
+          }`,
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -1280,7 +1158,10 @@ export class ConfigCreateRepository {
       }
       writeFileSync(createdConfigPath, configContent, "utf-8");
 
-      let mcpConfigPath: string | undefined;
+      // Every file actually written, not just the last one - three are created
+      // (.mcp.json, .cursor, .vscode) and reporting one made the other two
+      // look like they never happened.
+      const mcpConfigPaths: string[] = [];
       let vscodeSettingsPath: string | undefined;
 
       if (data.createMcpConfig) {
@@ -1292,12 +1173,11 @@ export class ConfigCreateRepository {
           const mcpResult = await ConfigRepositoryImpl.createDefaultMcpConfig(
             logger,
             mcpDest,
-            locale,
           );
           if (mcpResult.success) {
-            mcpConfigPath = mcpResult.data.mcpConfigPath;
+            mcpConfigPaths.push(mcpResult.data.mcpConfigPath);
           } else {
-            logger.warn(t("warnings.mcpConfigFailed"), {
+            logger.warn("Failed to create MCP config", {
               error: mcpResult.message,
             });
           }
@@ -1307,7 +1187,6 @@ export class ConfigCreateRepository {
       if (data.updateVscodeSettings) {
         const configReadResult = await ConfigRepositoryImpl.ensureConfigReady(
           logger,
-          locale,
           false,
         );
         if (configReadResult.ready) {
@@ -1315,12 +1194,11 @@ export class ConfigCreateRepository {
             await ConfigRepositoryImpl.generateVSCodeSettings(
               logger,
               configReadResult.config,
-              locale,
             );
           if (vscodeResult.success) {
             vscodeSettingsPath = vscodeResult.data.settingsPath;
           } else {
-            logger.warn(t("warnings.vscodeFailed"), {
+            logger.warn("Failed to update VSCode settings", {
               error: vscodeResult.message,
             });
           }
@@ -1342,18 +1220,18 @@ export class ConfigCreateRepository {
             writeFileSync(pkgPath, `${JSON.stringify(packageJson, null, 2)}\n`);
             packageJsonPath = pkgPath;
           } catch (error) {
-            logger.warn(t("warnings.packageJsonFailed"), {
+            logger.warn("Failed to update package.json", {
               error: parseError(error).message,
             });
           }
         } else {
-          logger.warn(t("warnings.packageJsonNotFound"));
+          logger.warn("package.json not found in current directory");
         }
       }
 
       const messages: string[] = [`✓ Created ${configResult.data.configPath}`];
-      if (mcpConfigPath) {
-        messages.push(`✓ Created ${mcpConfigPath}`);
+      for (const createdMcpPath of mcpConfigPaths) {
+        messages.push(`✓ Created ${createdMcpPath}`);
       }
       if (vscodeSettingsPath) {
         messages.push(`✓ Updated ${vscodeSettingsPath}`);
@@ -1364,10 +1242,9 @@ export class ConfigCreateRepository {
 
       return success({ message: messages.join("\n") });
     } catch (error) {
-      logger.error(t("errors.unexpected"), parseError(error));
-      return fail({
-        message: t("errors.unexpected"),
-        messageParams: { error: parseError(error).message },
+      logger.error("An unexpected error occurred", parseError(error));
+      return failInline({
+        message: `An unexpected error occurred: ${parseError(error).message}`,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

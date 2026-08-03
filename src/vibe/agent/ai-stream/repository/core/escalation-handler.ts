@@ -23,7 +23,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { cronTasks } from "next-vibe/tasks/cron/db";
 import { CronTaskStatus } from "next-vibe/tasks/enum";
 
-import type { ToolExecutionContext } from "../../../chat/config";
+import type { ToolExecutionContext } from "../../../../core/execution-context";
 import { ThreadStreamingState } from "../../../chat/enum";
 import type { ChatModelId } from "../../models";
 import { transitionStreamingState } from "./streaming-state";
@@ -68,7 +68,7 @@ export function wireEscalateToTask({
     if (!taskThreadId) {
       // Escalation defers work to a task whose result routes back to THIS
       // thread — there is nothing to escalate without a persisted thread.
-      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- escalateToTask has no ResponseType channel; a missing thread is a programmer error
+      // oxlint-disable-next-line restricted/restricted-syntax -- escalateToTask has no ResponseType channel; a missing thread is a programmer error
       throw new Error("escalateToTask: no threadId on the stream context");
     }
     const taskToolMessageId =

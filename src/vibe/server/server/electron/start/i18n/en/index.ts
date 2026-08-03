@@ -51,6 +51,8 @@ export const translations = {
       server: {
         title: "Server Error",
         description: "Internal server error occurred",
+        compileFailed: "Electron compilation failed: {{error}}",
+        startFailed: "Electron start failed: {{error}}",
       },
       unknown: {
         title: "Unknown Error",

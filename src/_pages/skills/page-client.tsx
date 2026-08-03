@@ -2,6 +2,7 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { Platform } from "next-vibe/platforms/platforms";
 import { Div } from "next-vibe/ui/ui/div";
 import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
 import { Zap } from "next-vibe/ui/ui/icons/Zap";
@@ -20,11 +21,13 @@ const SkillsContent = lazy(() => import("./skills-content"));
 interface SkillsPageClientProps {
   locale: CountryLanguage;
   user: JwtPayloadType;
+  platform: Platform;
 }
 
 export function SkillsPageClient({
   locale,
   user,
+  platform,
 }: SkillsPageClientProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
 
@@ -48,7 +51,7 @@ export function SkillsPageClient({
         {/* overflow-clip (not hidden) keeps the sticky header inside working */}
         <Div className="rounded-xl border bg-card overflow-clip">
           <Suspense fallback={null}>
-            <SkillsContent locale={locale} user={user} />
+            <SkillsContent locale={locale} user={user} platform={platform} />
           </Suspense>
         </Div>
       </Div>

@@ -5,34 +5,36 @@
 
 import "server-only";
 
-import { makeHeadlessContext } from "next-vibe/agent/chat/config";
-import { fetchStorageFileAsBase64 } from "next-vibe/agent/chat/storage/url-utils";
-import { formatValidationErrorCompact } from "next-vibe/core/core-utils/format-validation-error";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import { fetchStorageFileAsBase64 } from "../../agent/chat/storage/url-utils";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import {
   definitionLoader,
   type IDefinitionLoader,
-} from "next-vibe/core/definition/loader";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { permissionsRegistry } from "next-vibe/core/permissions/registry";
+} from "../../core/definition/loader";
+import { makeHeadlessContext } from "../../core/execution-context";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import { permissionsRegistry } from "../../core/permissions/registry";
 import {
   definitionsRegistry,
   type IDefinitionsRegistry,
-} from "next-vibe/core/route/definitions-registry";
+} from "../../core/route/definitions-registry";
 import type {
   ContentBlock,
   ResponseType,
-} from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { scopedTranslation as mcpScopedTranslation } from "next-vibe/platforms/mcp/i18n";
-import { Platform } from "next-vibe/platforms/platforms";
-import { McpResultFormatter } from "next-vibe/unified-ui/renderers/mcp/McpResultFormatter";
-
+} from "../../core/route/response.schema";
+import { ErrorResponseTypes } from "../../core/route/response.schema";
+import type { WidgetData } from "../../core/utils/json";
+import { parseError } from "../../core/utils/parse-error";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
+import { scopedTranslation as mcpScopedTranslation } from "./i18n";
+import { Platform } from "../platforms";
+import {
+  dispatchPrefixedToolName,
+  dispatchRoutedTool,
+} from "./remote-dispatch";
 import { VIBE_CHECK_TOOL_NAMES } from "../../tooling/check/constants";
+import { McpResultFormatter } from "../../unified-ui/renderers/mcp/McpResultFormatter";
 import type {
   MCPContent,
   MCPExecutionContext,
@@ -140,36 +142,6 @@ export class MCPRegistry {
   }
 
   /**
-   * Get tool metadata by name
-   */
-  async getToolByName(
-    name: string,
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<MCPToolMetadata | null> {
-    this.ensureInitialized(logger);
-
-    // Get all tools (this will be filtered by user in getTools, but here we need unfiltered)
-    // For now, we'll use a public user to get all tools
-    const publicUser: JwtPayloadType = {
-      isPublic: true,
-      leadId: "mcp-registry-anonymous",
-      roles: [UserPermissionRole.PUBLIC],
-    };
-
-    const tools = await this.getTools(publicUser, logger, locale);
-
-    // Try direct name match first
-    const tool = tools.find((t) => t.name === name);
-    if (tool) {
-      return tool;
-    }
-
-    // Try aliases
-    return tools.find((t) => t.aliases?.includes(name)) ?? null;
-  }
-
-  /**
    * Execute a tool
    */
   async executeTool(
@@ -181,34 +153,19 @@ export class MCPRegistry {
     const { t } = mcpScopedTranslation.scopedT(context.locale);
 
     // Prefixed tool name (e.g. "hermes__tool-help_POST") — route to remote instance via
-    // unified execute-tool repository instead of the local handler.
+    // unified execute-tool repository instead of the local handler. Checked before the
+    // local visibility check below: the prefix means the REMOTE instance authorizes it.
     if (context.toolName.includes("__")) {
-      const { RouteExecuteRepository } =
-        await import("next-vibe/execute-tool/repository");
-      const result = await RouteExecuteRepository.runInProcess({
-        toolName: context.toolName,
-        input: context.data as Record<string, WidgetData>,
-        callbackMode: "wait",
-        user: context.user,
-        locale: context.locale,
-        logger,
-        // no user context — UTC (dates not user-facing here)
-        toolExecutionContext: makeHeadlessContext(
-          context.signal,
-          undefined,
-          "UTC",
-        ),
-        platform: Platform.MCP,
-      });
-      if (!result.success) {
+      const outcome = await dispatchPrefixedToolName(context, logger);
+      if (outcome.kind === "failed") {
         return this.fail({
-          error: result.message,
+          error: outcome.message,
           code: MCPErrorCode.TOOL_EXECUTION_FAILED,
           details: { toolName: context.toolName },
         });
       }
       return await this.convertToMCPResult(
-        result,
+        outcome.result,
         context.toolName,
         context.locale,
         logger,
@@ -248,46 +205,23 @@ export class MCPRegistry {
       "UTC",
     );
 
-    // Remote routing: check if a remote connection's routing rules match this request.
-    // Same logic as CLI remote leg — if a target is found, route through runInProcess
-    // with instanceId so both direct-http and reverse-ws transports are handled uniformly.
-    // Hot-reload is local-only; remote execution uses the remote's own module cache.
-    const userId =
-      !context.user.isPublic && "id" in context.user
-        ? context.user.id
-        : undefined;
-    if (userId) {
-      const { ExecuteToolRouting } =
-        await import("next-vibe/remote-connection/routing");
-      const target = await ExecuteToolRouting.resolveTarget({
-        userId,
-        locale: context.locale,
+    // Remote routing: a connection rule for this user may claim the call for another
+    // instance. Null means it stays local.
+    const remoteResult = await dispatchRoutedTool(
+      context,
+      logger,
+      toolExecutionContext,
+    );
+    if (remoteResult) {
+      return await this.convertToMCPResult(
+        remoteResult,
+        context.toolName,
+        context.locale,
         logger,
-      });
-      if (target) {
-        const { RouteExecuteRepository } =
-          await import("next-vibe/execute-tool/repository");
-        const remoteResult = await RouteExecuteRepository.runInProcess({
-          toolName: context.toolName,
-          input: context.data as Record<string, WidgetData>,
-          instanceId: target.instanceId,
-          callbackMode: "wait",
-          user: context.user,
-          locale: context.locale,
-          logger,
-          toolExecutionContext,
-          platform: Platform.MCP,
-        });
-        return await this.convertToMCPResult(
-          remoteResult,
-          context.toolName,
-          context.locale,
-          logger,
-          null,
-          context.user,
-          context.data,
-        );
-      }
+        null,
+        context.user,
+        context.data,
+      );
     }
 
     // Hot reload: load fresh modules on every call so file changes are reflected
@@ -311,7 +245,7 @@ export class MCPRegistry {
     // formatting, and the Bun TDZ retry. freshHandler is undefined for
     // hot-reload-excluded tools → the executor loads the handler itself.
     const { RouteExecuteRepository } =
-      await import("next-vibe/execute-tool/repository");
+      await import("../../execute-tool/repository");
     const runTool = (): Promise<ResponseType<WidgetData>> =>
       RouteExecuteRepository.runInProcess({
         toolName: context.toolName,
@@ -338,13 +272,9 @@ export class MCPRegistry {
 
       // Bun TDZ race: dynamic imports can throw "Cannot access 'X' before initialization"
       // on first load. Retry once after 10ms to let the module settle.
-      if (
-        !result.success &&
-        result.messageParams &&
-        "error" in result.messageParams &&
-        typeof result.messageParams["error"] === "string" &&
-        result.messageParams["error"].includes("before initialization")
-      ) {
+      // The underlying text now rides in `message` (produced by the catch in
+      // execute-tool/repository/index.ts), not a separate params channel.
+      if (!result.success && result.message.includes("before initialization")) {
         await new Promise<void>((resolve) => {
           setTimeout(resolve, 10);
         });
@@ -360,12 +290,9 @@ export class MCPRegistry {
 
       // Load endpoint definition for rendering (success) or error formatting (validation errors)
       let endpoint: CreateApiEndpointAny | null = null;
-      const needsEndpoint =
-        (result.success && result.data) ||
-        (!result.success &&
-          result.messageParams &&
-          "error" in result.messageParams &&
-          "errorCount" in result.messageParams);
+      // Only the success path needs the definition now - validation errors
+      // arrive with their text already formatted.
+      const needsEndpoint = result.success && result.data;
       if (needsEndpoint) {
         if (isHotReload) {
           // Hot reload: bypass allDefinitionsCache and load fresh from disk
@@ -481,7 +408,7 @@ export class MCPRegistry {
     error: string;
     code: MCPErrorCode;
 
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Tool registration requires 'unknown' for flexible tool definitions
+    // eslint-disable-next-line restricted/no-unknown -- Infrastructure: Tool registration requires 'unknown' for flexible tool definitions
     details?: { [key: string]: unknown };
   }): MCPToolCallResult {
     return {
@@ -521,7 +448,7 @@ export class MCPRegistry {
       if (
         typeof data === "object" &&
         data !== null &&
-        "__isContentResponse" in data &&
+        "isContentResponse" in data &&
         "content" in data &&
         Array.isArray((data as Record<string, ContentBlock[]>).content)
       ) {
@@ -597,16 +524,15 @@ export class MCPRegistry {
       };
     }
 
-    // Error response
-    const compactDetails = formatValidationErrorCompact(
-      result.messageParams as Record<string, string | number> | undefined,
-      endpoint,
-    );
-
-    const isValidationError = compactDetails !== null;
-    const errorMessage =
-      compactDetails ??
-      (result.message ? result.message : t("registry.toolExecutionFailed"));
+    // Error response. Keyed off the error type rather than the message text -
+    // the type is set at the source and survives the JSON round trip, whereas
+    // sniffing the rendered text would be guesswork.
+    const isValidationError =
+      result.errorType.errorKey ===
+      ErrorResponseTypes.VALIDATION_ERROR.errorKey;
+    const errorMessage = result.message
+      ? result.message
+      : t("registry.toolExecutionFailed");
 
     return this.fail({
       error: errorMessage,

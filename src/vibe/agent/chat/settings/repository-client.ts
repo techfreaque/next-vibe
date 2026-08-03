@@ -4,14 +4,14 @@
  * Used for non-authenticated users
  */
 
-import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
+import type { AgentEnvAvailability } from "../../env-availability";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import { success } from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { storage } from "next-vibe/ui/lib/storage";
 
-import type { EndpointLogger } from "../../../logger/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import { DEFAULT_CHAT_MODEL_SELECTION } from "../../ai-stream/constants";
 import { type ChatModelId, getBestChatModel } from "../../ai-stream/models";
 import { ViewMode } from "../enum";
@@ -375,16 +375,6 @@ export class ChatSettingsRepositoryClient {
   }
 
   /**
-   * Clear settings from localStorage
-   */
-  static async clearLocalSettings(): Promise<void> {
-    if (typeof window === "undefined") {
-      return;
-    }
-    await storage.removeItem(STORAGE_KEY);
-  }
-
-  /**
    * Select a favorite and update settings
    * Handles optimistic updates for both settings and favorites list
    */
@@ -395,10 +385,8 @@ export class ChatSettingsRepositoryClient {
     logger: EndpointLogger;
     locale: CountryLanguage;
     user: JwtPayloadType;
-    availability: AgentEnvAvailability;
   }): Promise<void> {
-    const { favoriteId, modelId, skillId, logger, locale, user, availability } =
-      params;
+    const { favoriteId, modelId, skillId, logger, locale, user } = params;
 
     const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
     const settingsDefinition = await import("./definition");
@@ -458,7 +446,6 @@ export class ChatSettingsRepositoryClient {
         },
         undefined,
         locale,
-        availability,
       );
     } catch (error) {
       logger.error("Failed to update active favorite", {

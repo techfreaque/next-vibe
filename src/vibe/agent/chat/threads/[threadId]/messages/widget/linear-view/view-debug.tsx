@@ -1,8 +1,8 @@
 "use client";
-import { useChatInputStore } from "next-vibe/agent/ai-stream/stream/hooks/input-store";
-import debugDefinition from "next-vibe/agent/ai-stream/system-prompt/debug/definition";
-import type { ChatMessage } from "next-vibe/agent/chat/db";
-import { ChatMessageRole } from "next-vibe/agent/chat/enum";
+import { useChatInputStore } from "../../../../../../ai-stream/stream/hooks/input-store";
+import debugDefinition from "../../../../../../ai-stream/system-prompt/debug/definition";
+import type { ChatMessage } from "../../../../../db";
+import { ChatMessageRole } from "../../../../../enum";
 import { Div } from "next-vibe/ui/ui/div";
 import { ErrorBoundary } from "next-vibe/ui/ui/error-boundary";
 import { Markdown } from "next-vibe/ui/ui/markdown";

@@ -44,7 +44,7 @@ export class LinuxWaylandWtypeTyper extends BaseTyper {
     const exitCode = await proc.exited;
     if (exitCode !== 0) {
       const stderr = await new Response(proc.stderr).text();
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Typer execution error
+      // eslint-disable-next-line restricted/restricted-syntax, i18next/no-literal-string -- Typer execution error
       throw new Error(`wtype failed: ${stderr}`);
     }
   }
@@ -76,7 +76,7 @@ export class LinuxWaylandClipboardTyper extends BaseTyper {
 
     const copyExitCode = await copyProc.exited;
     if (copyExitCode !== 0) {
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Typer execution error
+      // eslint-disable-next-line restricted/restricted-syntax, i18next/no-literal-string -- Typer execution error
       throw new Error(
         `Failed to copy to clipboard (exit code: ${copyExitCode})`,
       );
@@ -91,7 +91,7 @@ export class LinuxWaylandClipboardTyper extends BaseTyper {
     const pasteExitCode = await pasteProc.exited;
     if (pasteExitCode !== 0) {
       const stderr = await new Response(pasteProc.stderr).text();
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Typer execution error
+      // eslint-disable-next-line restricted/restricted-syntax, i18next/no-literal-string -- Typer execution error
       throw new Error(`Failed to paste: ${stderr}`);
     }
 

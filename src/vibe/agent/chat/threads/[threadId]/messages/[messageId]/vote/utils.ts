@@ -3,7 +3,7 @@
  * Utilities for handling message upvotes/downvotes
  */
 
-import type { ChatMessage } from "next-vibe/agent/chat/db";
+import type { ChatMessage } from "../../../../../db";
 
 export interface VoteStatus {
   userVote: "up" | "down" | null;

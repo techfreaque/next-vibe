@@ -6,7 +6,7 @@
 import { execSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 
-import type { EndpointLogger } from "next-vibe/logger/types";
+import type { EndpointLogger } from "../../../logger/types";
 
 import type {
   PackageJson,

@@ -9,6 +9,10 @@ export const translations = {
       tryAgain: "Try Again",
       backToHome: "Back to Home",
     },
+    frame: {
+      endpointNotFound: 'Endpoint "{{endpointId}}" not found',
+      endpointLoadFailed: "Failed to load endpoint",
+    },
     notFound: {
       title: "Page Not Found",
       description:

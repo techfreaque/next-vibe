@@ -5,7 +5,7 @@
 
 "use client";
 
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import type { ReactElement, ReactNode } from "react";
 import { useEffect, useRef } from "react";
 

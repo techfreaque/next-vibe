@@ -14,14 +14,11 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 
-import { getInstanceAvailability } from "next-vibe/agent/env-availability";
+import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import { DEFAULT_CHAT_MODEL_SELECTION } from "next-vibe/agent/ai-stream/constants";
 import { getBestChatModel } from "next-vibe/agent/ai-stream/models";
 import { customSkills } from "next-vibe/agent/skills/db";
-import {
-  SkillOwnershipType,
-  SkillStatus,
-} from "next-vibe/agent/skills/enum";
+import { SkillOwnershipType, SkillStatus } from "next-vibe/agent/skills/enum";
 import { formatSkillId } from "next-vibe/agent/chat/slugify";
 import { getModelDisplayName } from "next-vibe/agent/models/all-models";
 import { modelProviders } from "next-vibe/agent/models/models";
@@ -70,14 +67,15 @@ export class CreatorProfileRepository {
 
       if (!resolvedId) {
         return fail({
-          message: t("get.errors.notFound.title"),
+          message: t("get.errors.notFound.detail", {
+            userId: urlPathParams.userId,
+          }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { userId: urlPathParams.userId },
         });
       }
 
       const userId = resolvedId;
-      const viewerAvailability = await getInstanceAvailability();
+      const viewerAvailability = await getEnvAvailability();
       logger.debug("Getting creator profile", { userId });
 
       const [userResults, skillRows, referralResult, configRows] =
@@ -125,9 +123,8 @@ export class CreatorProfileRepository {
 
       if (userResults.length === 0) {
         return fail({
-          message: t("get.errors.notFound.title"),
+          message: t("get.errors.notFound.detail", { userId }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { userId },
         });
       }
 
@@ -175,7 +172,11 @@ export class CreatorProfileRepository {
             const modelRow = bestModel
               ? {
                   modelIcon: bestModel.icon,
-                  modelInfo: getModelDisplayName(bestModel, false, viewerAvailability),
+                  modelInfo: getModelDisplayName(
+                    bestModel,
+                    false,
+                    viewerAvailability,
+                  ),
                   modelProvider:
                     modelProviders[bestModel.provider]?.name ??
                     bestModel.provider,
@@ -248,9 +249,10 @@ export class CreatorProfileRepository {
     } catch (error) {
       logger.error("Error getting creator profile", parseError(error));
       return fail({
-        message: t("get.errors.internal.title"),
+        message: t("get.errors.internal.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }

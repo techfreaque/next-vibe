@@ -17,16 +17,17 @@
 import "server-only";
 
 import { eq, sql as drizzleSql } from "drizzle-orm";
-import { getPreferredName } from "next-vibe/core/core-utils/path";
+import { getPreferredName } from "../../core/core-utils/path";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { db } from "next-vibe/database";
-import { Platform } from "next-vibe/platforms/platforms";
-import { CronTaskStatus } from "next-vibe/tasks/enum";
+} from "../../core/route/response.schema";
+import type { WidgetData } from "../../core/utils/json";
+import { db } from "../../database";
+import { Platform } from "../../platforms/platforms";
+import type { RemoteConnInfo } from "../../remote-connection/types";
+import { CronTaskStatus } from "../../tasks/enum";
 
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 
@@ -38,9 +39,9 @@ import {
 import type { RouteExecuteRequestOutput } from "../definition";
 import { TaskCompletion } from "./completion";
 import { ExecuteToolGuards } from "./guards";
-import { LocalExecution } from "./local";
 import { PendingCalls } from "./pending-calls";
 import { ResultSignals } from "./result-signals";
+import { generateTaskId } from "./task-id";
 import { callToolDirect } from "./transport/direct";
 import { emitToolRequest } from "./transport/events";
 import {
@@ -51,9 +52,8 @@ import {
 import type {
   PendingCallResult,
   PhaseResult,
-  RemoteConnInfo,
-  RouteExecuteContext,
-} from "./types";
+  RouteExecuteDispatchContext,
+} from "./types-dispatch";
 
 export class RemoteDispatch {
   /** Default inline WAIT timeout when the tool declares none. */
@@ -71,7 +71,7 @@ export class RemoteDispatch {
    * connection exists (never falls back to the local path).
    */
   static async dispatch(params: {
-    ctx: RouteExecuteContext;
+    ctx: RouteExecuteDispatchContext;
     data: RouteExecuteRequestOutput;
     input: RouteExecuteRequestOutput["input"];
     instanceId: string;
@@ -118,7 +118,7 @@ export class RemoteDispatch {
     // full-path forms resolve to the same snapshot entry.
     const toolName = preferredName;
     // Transport handlers operate on the preferred name.
-    const transportCtx: RouteExecuteContext = { ...ctx, toolName };
+    const transportCtx: RouteExecuteDispatchContext = { ...ctx, toolName };
 
     logger.debug("[RouteExecute] Remote dispatch", {
       toolName,
@@ -126,7 +126,7 @@ export class RemoteDispatch {
     });
 
     const { RemoteConnectionRepository } =
-      await import("next-vibe/remote-connection/repository");
+      await import("../../remote-connection/repository");
     if (user.isPublic) {
       return { kind: "fallthrough" };
     }
@@ -144,9 +144,8 @@ export class RemoteDispatch {
       return {
         kind: "return",
         value: fail({
-          message: t("executeTool.post.errors.notFound.title"),
+          message: t("executeTool.post.errors.notFound.detail", { toolName }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { toolName },
         }),
       };
     }
@@ -172,9 +171,8 @@ export class RemoteDispatch {
         return {
           kind: "return",
           value: fail({
-            message: t("executeTool.post.errors.notFound.title"),
+            message: t("executeTool.post.errors.notFound.detail", { toolName }),
             errorType: ErrorResponseTypes.NOT_FOUND,
-            messageParams: { toolName },
           }),
         };
       }
@@ -261,10 +259,10 @@ export class RemoteDispatch {
   static async storePendingCallId(
     toolMessageId: string,
     callId: string,
-    logger: RouteExecuteContext["logger"],
+    logger: RouteExecuteDispatchContext["logger"],
     inline = false,
   ): Promise<void> {
-    const { chatMessages } = await import("next-vibe/agent/chat/db");
+    const { chatMessages } = await import("../../agent/chat/db");
     // jsonb_set path-merge: only set toolCall.pendingCallId. A top-level `||` merge
     // would REPLACE the whole toolCall object, wiping toolCallId/toolName/args/status
     // (remote wakeUp never rewrites the row, so the clobber would persist into
@@ -324,7 +322,7 @@ export class RemoteDispatch {
    *     result event arrives.
    */
   private static async dispatchOverTransport(params: {
-    ctx: RouteExecuteContext;
+    ctx: RouteExecuteDispatchContext;
     connInfo: RemoteConnInfo;
     instanceId: string;
     callbackMode: CallbackModeValue;
@@ -355,7 +353,7 @@ export class RemoteDispatch {
     }
     const user = rawUser;
 
-    const callId = LocalExecution.generateTaskId("remote-ws", {
+    const callId = generateTaskId("remote-ws", {
       instanceId,
       toolCallId: toolExecutionContext.callerToolCallId,
       toolExecutionContext,
@@ -510,7 +508,7 @@ export class RemoteDispatch {
           const timer = setTimeout(() => {
             settle(() => undefined, false);
           }, 10_000);
-          import("next-vibe/realtime/connector")
+          import("../../realtime/server/connector")
             .then(async (m) => m.acquireConnection(instanceId))
             .then((release) => {
               clearTimeout(timer);
@@ -755,13 +753,13 @@ export class RemoteDispatch {
         kind: "return",
         value: fail({
           message: remoteMessage
-            ? t("executeTool.post.errors.remoteFailed.title", {
+            ? t("executeTool.post.errors.remoteFailed.detail", {
                 message: remoteMessage,
+                toolName,
               })
-            : t("executeTool.post.errors.notFound.title"),
+            : t("executeTool.post.errors.notFound.detail", { toolName }),
           errorType:
             preservedErrorType ?? ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-          messageParams: { toolName },
         }),
       };
     }

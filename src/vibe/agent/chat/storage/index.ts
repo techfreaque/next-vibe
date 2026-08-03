@@ -80,31 +80,6 @@ export interface StorageAdapter {
   listFilesByThread(threadId: string): Promise<FileMetadata[]>;
 }
 
-export interface FileUploadResult {
-  id: string;
-  url: string;
-  filename: string;
-  mimeType: string;
-  size: number;
-}
-
-export type StorageType = "s3" | "filesystem";
-
-export interface StorageConfig {
-  type: StorageType;
-  s3: {
-    endpoint?: string;
-    region: string;
-    bucket: string;
-    accessKeyId: string;
-    secretAccessKey: string;
-    publicUrlBase?: string;
-  };
-  filesystem: {
-    basePath: string;
-  };
-}
-
 let storageInstance: StorageAdapter | null = null;
 
 /**
@@ -122,11 +97,4 @@ export function getStorageAdapter(): StorageAdapter {
   }
 
   return storageInstance;
-}
-
-/**
- * Reset the storage instance (useful for testing)
- */
-export function resetStorageAdapter(): void {
-  storageInstance = null;
 }

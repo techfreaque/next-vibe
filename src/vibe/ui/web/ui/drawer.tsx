@@ -1,10 +1,10 @@
 "use client";
 
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import { Drawer as DrawerPrimitive } from "vaul";
 
-import type { StyleType } from "../../web/utils/style-type";
+import type { StyleType } from "../utils/style-type";
 
 // Cross-platform type exports
 export interface DrawerRootProps {

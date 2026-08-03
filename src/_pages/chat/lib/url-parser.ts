@@ -3,10 +3,8 @@
  * Utilities for parsing chat URL paths
  */
 
-import {
-  DefaultFolderId,
-  isDefaultFolderId,
-} from "next-vibe/agent/chat/config";
+import { isDefaultFolderId } from "next-vibe/agent/chat/config";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { NEW_MESSAGE_ID } from "next-vibe/agent/chat/enum";
 
 /**

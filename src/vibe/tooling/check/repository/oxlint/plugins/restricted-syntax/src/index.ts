@@ -1,13 +1,17 @@
 /**
  * Oxlint JS Plugin: Restricted Syntax
  *
- * Enforces custom syntax restrictions:
- * - No `unknown` type
- * - No `object` type
- * - No `throw` statements
- * - No JSX in object literals (except for common React node properties like content, icon, title, etc.)
- * - No raw `fetch()` (use typed endpoint hooks; external-API calls opt out with a disable comment)
- * - No `EndpointsPage` in server entry files (page/layout/template without 'use client' — extract a page-client.tsx)
+ * Enforces custom syntax restrictions, one rule name per ban:
+ * - `no-unknown` — no `unknown` type
+ * - `no-object-type` — no `object` type
+ * - `no-throw` — no `throw` statements
+ * - `no-jsx-in-object-literal` — no JSX in object literals (except common React
+ *   node properties like content, icon, title, …)
+ * - `no-raw-fetch` — no raw `fetch()` (use typed endpoint hooks; external-API
+ *   calls opt out with a disable comment)
+ * - `no-browser-globals` — no direct window/document/navigator/storage access
+ * - `no-endpoints-page-in-server-entry` — no `EndpointsPage` in server entry
+ *   files (page/layout/template without 'use client')
  *
  * Configuration is loaded from check.config.ts via the shared config loader.
  *
@@ -132,6 +136,24 @@ interface RestrictedSyntaxMessages {
   endpointsPageInServerEntry: string;
 }
 
+/** A single JSON-schema entry for a rule's options. */
+interface RuleOptionSchema {
+  type: string;
+  properties?: Record<string, { type: string; items?: { type: string } }>;
+}
+
+/** The shape oxlint expects from a rule module: metadata plus a visitor factory. */
+interface OxlintRule {
+  meta: {
+    type: string;
+    docs: { description: string; category: string; recommended: boolean };
+    schema: RuleOptionSchema[];
+  };
+  create: (
+    context: RestrictedSyntaxRuleContext,
+  ) => Record<string, (node: OxlintASTNode) => void>;
+}
+
 // ============================================================
 // Default Configuration
 // ============================================================
@@ -179,7 +201,7 @@ const DEFAULT_MESSAGES: RestrictedSyntaxMessages = {
   navigatorAccess:
     "Direct 'navigator' access is not allowed. Use getUserAgent() from 'next-vibe/ui/utils/browser', or useWindowSize() from 'next-vibe/ui/hooks/use-window-size' / useTouchDevice() from 'next-vibe/ui/hooks/use-touch-device'.",
   rawFetch:
-    "Raw 'fetch()' is not allowed. To read endpoint data, use the endpoint's typed hook (it handles caching, auth, and platform routing). Only genuine external-API calls may use raw fetch — mark those with '// oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external API'.",
+    "Raw 'fetch()' is not allowed. To read endpoint data, use the endpoint's typed hook (it handles caching, auth, and platform routing). Only genuine external-API calls may use raw fetch — mark those with '// oxlint-disable-next-line restricted/no-raw-fetch -- external API'.",
   endpointsPageInServerEntry:
     "'EndpointsPage' cannot be used in a server entry file (page/layout/template without 'use client') — its endpoint props don't survive the server→client boundary. Extract a page-client.tsx with 'use client' that renders EndpointsPage, and render that component from this file (see src/_pages/tools/page.tsx + page-client.tsx).",
 };
@@ -227,8 +249,10 @@ function loadRestrictedSyntaxConfig(): RestrictedSyntaxPluginConfig {
   const loader = getConfigLoader();
 
   if (loader) {
+    // Any of the rules works: they are configured with one shared options
+    // object, so this only needs a key that still exists.
     const result = loader.loadPluginConfig(
-      "oxlint-plugin-restricted/restricted-syntax",
+      "oxlint-plugin-restricted/no-unknown",
       DEFAULT_CONFIG,
     );
     cachedConfig = result.config ?? DEFAULT_CONFIG;
@@ -252,7 +276,7 @@ function loadConfigFallback(): RestrictedSyntaxPluginConfig {
       typeof checkConfig === "function" ? checkConfig() : checkConfig;
 
     const ruleConfig =
-      exported?.oxlint?.rules?.["oxlint-plugin-restricted/restricted-syntax"];
+      exported?.oxlint?.rules?.["oxlint-plugin-restricted/no-unknown"];
     if (Array.isArray(ruleConfig) && ruleConfig[1]) {
       return ruleConfig[1] as RestrictedSyntaxPluginConfig;
     }
@@ -278,6 +302,17 @@ function getMessages(): RestrictedSyntaxMessages {
 // Helper Functions
 // ============================================================
 
+/** Read the file being linted, across the context shapes oxlint has used. */
+function getContextFilename(context: RestrictedSyntaxRuleContext): string {
+  if (typeof context.getFilename === "function") {
+    return context.getFilename();
+  }
+  if (typeof context.filename === "string") {
+    return context.filename;
+  }
+  return "";
+}
+
 /**
  * Type guard to check if a node is a Property node
  */
@@ -291,15 +326,7 @@ function isProperty(node: OxlintASTNode): node is Property {
  * Check if the current file is in an allowed path where restricted syntax is permitted
  */
 function isAllowedPath(context: RestrictedSyntaxRuleContext): boolean {
-  let filename = "";
-
-  // Try to get filename from context
-  if (typeof context.getFilename === "function") {
-    filename = context.getFilename();
-  } else if (typeof context.filename === "string") {
-    filename = context.filename;
-  }
-
+  const filename = getContextFilename(context);
   if (!filename) {
     return false;
   }
@@ -321,11 +348,15 @@ function isAllowedPath(context: RestrictedSyntaxRuleContext): boolean {
 }
 
 /**
- * Check if the node has a disable comment
+ * Check if the node has a disable comment for this rule.
+ *
+ * Matches the rule's own name (e.g. "no-unknown") and the legacy combined name
+ * "restricted-syntax", so directives written before the split keep working.
  */
 function hasDisableComment(
   context: RestrictedSyntaxRuleContext,
   node: OxlintASTNode,
+  ruleName: string,
 ): boolean {
   // Try to get comments from context
   const getComments =
@@ -341,7 +372,8 @@ function hasDisableComment(
       return false;
     }
 
-    // Check if any preceding comment contains eslint-disable or oxlint-disable for restricted-syntax
+    // Check if any preceding comment disables this rule (by its own name) or
+    // carries a legacy combined "restricted-syntax" directive.
     for (const comment of comments) {
       if (!comment || typeof comment.value !== "string") {
         continue;
@@ -350,8 +382,8 @@ function hasDisableComment(
       if (
         (commentText.includes("eslint-disable-next-line") ||
           commentText.includes("oxlint-disable-next-line")) &&
-        (commentText.includes("restricted-syntax") ||
-          commentText.includes("no-restricted-syntax"))
+        (commentText.includes(ruleName) ||
+          commentText.includes("restricted-syntax"))
       ) {
         return true;
       }
@@ -422,6 +454,295 @@ function isJSXAllowedKey(
 
   return keyName !== null && jsxAllowedProperties.has(keyName);
 }
+
+/**
+ * Check if a node is a JSX element or fragment
+ */
+function isJSX(n: OxlintASTNode): boolean {
+  return n && (n.type === "JSXElement" || n.type === "JSXFragment");
+}
+
+/**
+ * Unwrap parenthesized expressions to get the inner node
+ */
+function unwrapParen(n: OxlintASTNode): OxlintASTNode {
+  let cur = n;
+  while (cur?.type === "ParenthesizedExpression") {
+    const expr = (cur as ParenthesizedExpression).expression;
+    if (!expr) {
+      break;
+    }
+    cur = expr;
+  }
+  return cur;
+}
+
+/**
+ * Return true if a CallExpression is a raw global `fetch(...)` call.
+ *
+ * Matches bare `fetch(...)`, `window.fetch(...)`, and `globalThis.fetch(...)`.
+ * Does NOT match method calls on other objects (e.g. `apiClient.fetch(...)`,
+ * `sourceCode.fetch(...)`), which are sanctioned wrappers, not the global.
+ */
+function isRawFetchCall(node: OxlintASTNode): boolean {
+  if (node.type !== "CallExpression") {
+    return false;
+  }
+  const callee = (node as CallExpression).callee;
+  if (!callee) {
+    return false;
+  }
+  // Bare `fetch(...)`
+  if (callee.type === "Identifier" && (callee as Identifier).name === "fetch") {
+    return true;
+  }
+  // `window.fetch(...)` / `globalThis.fetch(...)` / `self.fetch(...)`
+  if (callee.type === "MemberExpression") {
+    const mem = callee as MemberExpression;
+    if (mem.computed || mem.object?.type !== "Identifier") {
+      return false;
+    }
+    const objectName = (mem.object as Identifier).name;
+    if (
+      objectName !== "window" &&
+      objectName !== "globalThis" &&
+      objectName !== "self"
+    ) {
+      return false;
+    }
+    const property = mem.property;
+    if (!property) {
+      return false;
+    }
+    if (
+      property.type === "Identifier" &&
+      (property as Identifier).name === "fetch"
+    ) {
+      return true;
+    }
+    if (
+      property.type === "Literal" &&
+      (property as Literal).value === "fetch"
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// ============================================================
+// Rule Factory
+// ============================================================
+
+/**
+ * The options schema every rule in this plugin accepts.
+ *
+ * All rules are configured with one shared options object, so they must all
+ * accept the whole shape — a rule that declared only its own switch would make
+ * oxlint reject the shared object as having unknown properties.
+ */
+const SHARED_OPTIONS_SCHEMA: RuleOptionSchema[] = [
+  {
+    type: "object",
+    properties: {
+      noThrow: { type: "boolean" },
+      noUnknown: { type: "boolean" },
+      noObjectType: { type: "boolean" },
+      jsxAllowedProperties: { type: "array", items: { type: "string" } },
+    },
+  },
+];
+
+/** What a ban's visitors are handed. */
+interface BanRuleHelpers {
+  context: RestrictedSyntaxRuleContext;
+  options: RestrictedSyntaxPluginConfig;
+  messages: RestrictedSyntaxMessages;
+  /**
+   * Report `message` at `node`, unless a disable comment covers it.
+   *
+   * `disableAnchor` is the node whose preceding comments are read; it defaults
+   * to `node` but rules that report on a child (the JSX *value* of a property)
+   * anchor on the node a human would actually write the comment above.
+   */
+  report: (
+    node: OxlintASTNode,
+    message: string,
+    disableAnchor?: OxlintASTNode,
+  ) => void;
+}
+
+/**
+ * One rule per ban, rather than one rule with many visitors.
+ *
+ * The rule name is the only handle anything outside the plugin has: a diagnostic
+ * says `oxlint-plugin-restricted(<name>)`, and that name is what `strictRules`,
+ * an `eslint-disable` comment and an oxlint severity override all key on. While
+ * every ban reported as `restricted-syntax`, they could only ever be toggled
+ * together — you could not scope `unknown` to the strict paths while keeping
+ * `throw` repo-wide, or silence one line's `object` without silencing its
+ * `throw` too.
+ *
+ * Each still reads its own switch (`noUnknown`/`noObjectType`/`noThrow`), so the
+ * plugin config keeps working as before; this only splits *how they report*.
+ */
+function createBanRule(config: {
+  /** Rule name — appears verbatim in the diagnostic and in `strictRules`. */
+  name: string;
+  description: string;
+  /** Which plugin switch turns it off. */
+  isEnabled: (options: RestrictedSyntaxPluginConfig) => boolean;
+  /** Files this ban does not apply to at all (the abstraction layer itself). */
+  isExemptFile?: (context: RestrictedSyntaxRuleContext) => boolean;
+  createVisitors: (
+    helpers: BanRuleHelpers,
+  ) => Record<string, (node: OxlintASTNode) => void>;
+}): OxlintRule {
+  return {
+    meta: {
+      type: "problem",
+      docs: {
+        description: config.description,
+        category: "Best Practices",
+        recommended: true,
+      },
+      schema: SHARED_OPTIONS_SCHEMA,
+    },
+    create(
+      context: RestrictedSyntaxRuleContext,
+    ): Record<string, (node: OxlintASTNode) => void> {
+      const options = context.options?.[0] ?? loadRestrictedSyntaxConfig();
+      if (!config.isEnabled(options) || config.isExemptFile?.(context)) {
+        // No visitors at all — cheaper than checking the same flag per node.
+        return {};
+      }
+
+      const messages = getMessages();
+      const report = (
+        node: OxlintASTNode,
+        message: string,
+        disableAnchor?: OxlintASTNode,
+      ): void => {
+        if (hasDisableComment(context, disableAnchor ?? node, config.name)) {
+          return;
+        }
+        context.report({ node, message });
+      };
+
+      return config.createVisitors({ context, options, messages, report });
+    },
+  };
+}
+
+// ============================================================
+// Rules
+// ============================================================
+
+const noUnknownRule = createBanRule({
+  name: "no-unknown",
+  description: "Disallow the `unknown` type",
+  isEnabled: (options) => options.noUnknown !== false,
+  isExemptFile: isAllowedPath,
+  createVisitors: ({ messages, report }) => ({
+    TSUnknownKeyword: (node: OxlintASTNode): void =>
+      report(node, messages.unknownType),
+  }),
+});
+
+const noObjectTypeRule = createBanRule({
+  name: "no-object-type",
+  description: "Disallow the `object` type",
+  isEnabled: (options) => options.noObjectType !== false,
+  isExemptFile: isAllowedPath,
+  createVisitors: ({ messages, report }) => ({
+    TSObjectKeyword: (node: OxlintASTNode): void =>
+      report(node, messages.objectType),
+  }),
+});
+
+const noThrowRule = createBanRule({
+  name: "no-throw",
+  description: "Disallow `throw` statements",
+  isEnabled: (options) => options.noThrow !== false,
+  isExemptFile: isAllowedPath,
+  createVisitors: ({ messages, report }) => ({
+    ThrowStatement: (node: OxlintASTNode): void =>
+      report(node, messages.throwStatement),
+  }),
+});
+
+const noJsxInObjectLiteralRule = createBanRule({
+  name: "no-jsx-in-object-literal",
+  description:
+    "Disallow JSX values in object literals outside the React-node property allowlist",
+  // Always on: it has no switch of its own, the plugin being enabled is the switch.
+  isEnabled: () => true,
+  createVisitors: ({ context, messages, report }) => {
+    const jsxAllowedProperties = getJsxAllowedProperties(context);
+
+    return {
+      Property: (node: OxlintASTNode): void => {
+        // Only process ObjectProperty nodes
+        if (!isObjectProperty(node)) {
+          return;
+        }
+
+        // Skip properties that are allowed to have JSX values
+        if (isJSXAllowedKey(node, jsxAllowedProperties)) {
+          return;
+        }
+
+        const value = (node as Property).value;
+        if (!value) {
+          return;
+        }
+
+        // Check for direct JSX
+        if (isJSX(value)) {
+          report(value, messages.jsxInObjectLiteral, node);
+          return;
+        }
+
+        // Check for parenthesized JSX
+        if (value.type === "ParenthesizedExpression") {
+          const inner = unwrapParen(value);
+          if (isJSX(inner)) {
+            report(inner, messages.jsxInObjectLiteral, node);
+          }
+        }
+      },
+    };
+  },
+});
+
+/**
+ * No raw fetch — read endpoint data through typed hooks.
+ *
+ * No path is auto-exempt: genuine external-API calls opt out with an explicit
+ * disable comment ("you know it when you see it").
+ */
+const noRawFetchRule = createBanRule({
+  name: "no-raw-fetch",
+  description: "Disallow raw `fetch()` calls outside external-API integrations",
+  isEnabled: () => true,
+  createVisitors: ({ messages, report }) => ({
+    CallExpression: (node: OxlintASTNode): void => {
+      if (!isRawFetchCall(node)) {
+        return;
+      }
+      report(node, messages.rawFetch);
+    },
+  }),
+});
+
+// ============================================================
+// next-vibe layout-specific rules
+//
+// These two key on the next-vibe UI/Next.js layout — the `next-vibe/ui/*`
+// browser abstractions the messages point at, and the `EndpointsPage`
+// component. A consumer that does not vendor that UI layer has nothing for
+// them to point at, so they are not part of the shared rule set.
+// ============================================================
 
 /** Browser globals that must be accessed through vibe-ui abstractions */
 const BROWSER_GLOBALS = new Set([
@@ -599,12 +920,7 @@ function getBrowserGlobalMessage(
  * Check if the file is part of the browser abstraction layer (exempt from this rule).
  */
 function isBrowserImplFile(context: RestrictedSyntaxRuleContext): boolean {
-  let filename = "";
-  if (typeof context.getFilename === "function") {
-    filename = context.getFilename();
-  } else if (typeof context.filename === "string") {
-    filename = context.filename;
-  }
+  const filename = getContextFilename(context);
   if (!filename) {
     return false;
   }
@@ -664,12 +980,7 @@ const NEXT_SERVER_ENTRY_RE = /\/(?:page|layout|template|default)\.[jt]sx$/;
  * Check if the file is a Next.js server entry file (page/layout/template/default).
  */
 function isNextServerEntryFile(context: RestrictedSyntaxRuleContext): boolean {
-  let filename = "";
-  if (typeof context.getFilename === "function") {
-    filename = context.getFilename();
-  } else if (typeof context.filename === "string") {
-    filename = context.filename;
-  }
+  const filename = getContextFilename(context);
   if (!filename) {
     return false;
   }
@@ -723,133 +1034,46 @@ function importsEndpointsPage(node: OxlintASTNode): boolean {
   });
 }
 
-/**
- * Return true if a CallExpression is a raw global `fetch(...)` call.
- *
- * Matches bare `fetch(...)`, `window.fetch(...)`, and `globalThis.fetch(...)`.
- * Does NOT match method calls on other objects (e.g. `apiClient.fetch(...)`,
- * `sourceCode.fetch(...)`), which are sanctioned wrappers, not the global.
- */
-function isRawFetchCall(node: OxlintASTNode): boolean {
-  if (node.type !== "CallExpression") {
-    return false;
-  }
-  const callee = (node as CallExpression).callee;
-  if (!callee) {
-    return false;
-  }
-  // Bare `fetch(...)`
-  if (callee.type === "Identifier" && (callee as Identifier).name === "fetch") {
-    return true;
-  }
-  // `window.fetch(...)` / `globalThis.fetch(...)` / `self.fetch(...)`
-  if (callee.type === "MemberExpression") {
-    const mem = callee as MemberExpression;
-    if (mem.computed || mem.object?.type !== "Identifier") {
-      return false;
-    }
-    const objectName = (mem.object as Identifier).name;
-    if (
-      objectName !== "window" &&
-      objectName !== "globalThis" &&
-      objectName !== "self"
-    ) {
-      return false;
-    }
-    const property = mem.property;
-    if (!property) {
-      return false;
-    }
-    if (
-      property.type === "Identifier" &&
-      (property as Identifier).name === "fetch"
-    ) {
-      return true;
-    }
-    if (
-      property.type === "Literal" &&
-      (property as Literal).value === "fetch"
-    ) {
-      return true;
-    }
-  }
-  return false;
-}
-
-/**
- * Check if a node is a JSX element or fragment
- */
-function isJSX(n: OxlintASTNode): boolean {
-  return n && (n.type === "JSXElement" || n.type === "JSXFragment");
-}
-
-/**
- * Unwrap parenthesized expressions to get the inner node
- */
-function unwrapParen(n: OxlintASTNode): OxlintASTNode {
-  let cur = n;
-  while (cur?.type === "ParenthesizedExpression") {
-    const expr = (cur as ParenthesizedExpression).expression;
-    if (!expr) {
-      break;
-    }
-    cur = expr;
-  }
-  return cur;
-}
-
-// ============================================================
-// Rule Implementation
-// ============================================================
-
-const restrictedSyntaxRule = {
-  meta: {
-    type: "problem",
-    docs: {
-      description:
-        "Enforces restricted syntax patterns (no unknown, object, throw, JSX in non-React-node properties, raw fetch, EndpointsPage in server entry files)",
-      category: "Best Practices",
-      recommended: true,
+const noBrowserGlobalsRule = createBanRule({
+  name: "no-browser-globals",
+  description:
+    "Disallow direct window/document/navigator/storage access outside the UI abstraction layer",
+  isEnabled: () => true,
+  // Both the vibe UI primitives and the browser-abstraction implementations
+  // legitimately touch the raw globals — they are what app code should use.
+  isExemptFile: (context) =>
+    isAllowedPath(context) || isBrowserImplFile(context),
+  createVisitors: ({ messages, report }) => ({
+    MemberExpression: (node: OxlintASTNode): void => {
+      const result = getBrowserGlobal(node);
+      if (!result) {
+        return;
+      }
+      report(
+        node,
+        getBrowserGlobalMessage(
+          result.globalName,
+          result.propertyName,
+          messages,
+        ),
+      );
     },
-    schema: [
-      {
-        type: "object",
-        properties: {
-          jsxAllowedProperties: { type: "array", items: { type: "string" } },
-        },
-      },
-    ],
-  },
-  create(
-    context: RestrictedSyntaxRuleContext,
-  ): Record<string, (node: OxlintASTNode) => void> {
-    // Check if file is in allowed path (applies to all rules)
-    const isAllowed = isAllowedPath(context);
-    // Check if this file is the browser abstraction layer itself (exempt from browser global rules)
-    const isBrowserImpl = isBrowserImplFile(context);
+  }),
+});
 
-    // Load JSX allowed properties from rule options or config (single source of truth)
-    const jsxAllowedProperties = getJsxAllowedProperties(context);
-
-    // Load full restricted-syntax config to get feature flags
-    const pluginConfig = context.options?.[0] ?? loadRestrictedSyntaxConfig();
-    const noThrow = pluginConfig.noThrow !== false;
-    const noUnknown = pluginConfig.noUnknown !== false;
-    const noObjectType = pluginConfig.noObjectType !== false;
-
-    // Get customizable messages
-    const messages = getMessages();
-
-    // Server-entry tracking for the EndpointsPage rule. The directive prologue
-    // is visited before any ImportDeclaration, so the flag is always set in time.
-    const isServerEntry = isNextServerEntryFile(context);
+const noEndpointsPageInServerEntryRule = createBanRule({
+  name: "no-endpoints-page-in-server-entry",
+  description:
+    "Disallow `EndpointsPage` in Next.js server entry files (page/layout/template without 'use client')",
+  isEnabled: () => true,
+  isExemptFile: (context) => !isNextServerEntryFile(context),
+  createVisitors: ({ messages, report }) => {
+    // The directive prologue is visited before any ImportDeclaration, so the
+    // flag is always set in time.
     let hasUseClientDirective = false;
 
     return {
-      // ============================================================
-      // 'use client' directive detection (directive prologue only)
-      // ============================================================
-      Program(node: OxlintASTNode): void {
+      Program: (node: OxlintASTNode): void => {
         const body = (node as Program).body;
         if (!body || !Array.isArray(body)) {
           return;
@@ -867,151 +1091,21 @@ const restrictedSyntaxRule = {
 
       // Fallback for runtimes without a Program visitor: the directive's own
       // ExpressionStatement is visited before any later node in the file.
-      ExpressionStatement(node: OxlintASTNode): void {
+      ExpressionStatement: (node: OxlintASTNode): void => {
         if (isUseClientDirective(node)) {
           hasUseClientDirective = true;
         }
       },
 
-      // ============================================================
-      // No EndpointsPage in server entry files — it must live in a
-      // 'use client' component (page-client.tsx pattern).
-      // ============================================================
-      ImportDeclaration(node: OxlintASTNode): void {
-        if (!isServerEntry || hasUseClientDirective) {
+      ImportDeclaration: (node: OxlintASTNode): void => {
+        if (hasUseClientDirective || !importsEndpointsPage(node)) {
           return;
         }
-        if (!importsEndpointsPage(node)) {
-          return;
-        }
-        if (hasDisableComment(context, node)) {
-          return;
-        }
-        context.report({
-          node,
-          message: messages.endpointsPageInServerEntry,
-        });
-      },
-
-      // ============================================================
-      // Restricted syntax rules
-      // ============================================================
-      TSUnknownKeyword(node: OxlintASTNode): void {
-        if (!noUnknown || isAllowed || hasDisableComment(context, node)) {
-          return;
-        }
-        context.report({
-          node,
-          message: messages.unknownType,
-        });
-      },
-
-      TSObjectKeyword(node: OxlintASTNode): void {
-        if (!noObjectType || isAllowed || hasDisableComment(context, node)) {
-          return;
-        }
-        context.report({
-          node,
-          message: messages.objectType,
-        });
-      },
-
-      ThrowStatement(node: OxlintASTNode): void {
-        if (!noThrow || isAllowed || hasDisableComment(context, node)) {
-          return;
-        }
-        context.report({
-          node,
-          message: messages.throwStatement,
-        });
-      },
-
-      Property(node: OxlintASTNode): void {
-        // Only process ObjectProperty nodes
-        if (!isObjectProperty(node)) {
-          return;
-        }
-
-        // Skip properties that are allowed to have JSX values
-        if (isJSXAllowedKey(node, jsxAllowedProperties)) {
-          return;
-        }
-
-        const property = node as Property;
-        const value = property.value;
-
-        if (
-          !value ||
-          typeof value === "string" ||
-          typeof value === "number" ||
-          typeof value === "boolean" ||
-          value === null
-        ) {
-          return;
-        }
-
-        // Check for direct JSX
-        if (isJSX(value)) {
-          context.report({
-            node: value,
-            message: messages.jsxInObjectLiteral,
-          });
-          return;
-        }
-
-        // Check for parenthesized JSX
-        if (value.type === "ParenthesizedExpression") {
-          const inner = unwrapParen(value);
-          if (isJSX(inner)) {
-            context.report({
-              node: inner,
-              message: messages.jsxInObjectLiteral,
-            });
-          }
-        }
-      },
-
-      // ============================================================
-      // Browser global restrictions — use vibe-ui abstractions instead
-      // ============================================================
-      MemberExpression(node: OxlintASTNode): void {
-        if (isAllowed || isBrowserImpl || hasDisableComment(context, node)) {
-          return;
-        }
-        const result = getBrowserGlobal(node);
-        if (!result) {
-          return;
-        }
-        context.report({
-          node,
-          message: getBrowserGlobalMessage(
-            result.globalName,
-            result.propertyName,
-            messages,
-          ),
-        });
-      },
-
-      // ============================================================
-      // No raw fetch — read endpoint data through typed hooks.
-      // No path is auto-exempt: genuine external-API calls opt out
-      // with an explicit disable comment ("you know it when you see it").
-      // ============================================================
-      CallExpression(node: OxlintASTNode): void {
-        if (!isRawFetchCall(node)) {
-          return;
-        }
-        if (hasDisableComment(context, node)) {
-          return;
-        }
-        context.report({
-          node,
-          message: messages.rawFetch,
-        });
+        report(node, messages.endpointsPageInServerEntry);
       },
     };
   },
-};
+});
 
 // ============================================================
 // Plugin Export
@@ -1023,7 +1117,13 @@ export default {
     version: "1.0.0",
   },
   rules: {
-    "restricted-syntax": restrictedSyntaxRule,
+    "no-unknown": noUnknownRule,
+    "no-object-type": noObjectTypeRule,
+    "no-throw": noThrowRule,
+    "no-jsx-in-object-literal": noJsxInObjectLiteralRule,
+    "no-raw-fetch": noRawFetchRule,
+    "no-browser-globals": noBrowserGlobalsRule,
+    "no-endpoints-page-in-server-entry": noEndpointsPageInServerEntryRule,
   },
 };
 

@@ -1,19 +1,19 @@
 "use client";
 
-import { useChatInputStore } from "next-vibe/agent/ai-stream/stream/hooks/input-store";
-import { useAIStream } from "next-vibe/agent/ai-stream/stream/hooks/use-ai-stream";
-import type { ChatMessage } from "next-vibe/agent/chat/db";
-import { useChatBootContext } from "next-vibe/agent/chat/hooks/context";
-import { useChatNavigationStore } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
-import { useChatSettings } from "next-vibe/agent/chat/settings/hooks";
-import { ChatSettingsRepositoryClient } from "next-vibe/agent/chat/settings/repository-client";
-import { getDirectReplies } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/flat-view/helpers";
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
-import characterDefinitions from "next-vibe/agent/skills/[id]/definition";
-import { ModelSelectionType } from "next-vibe/agent/skills/enum";
-import type { FavoriteConfig } from "next-vibe/agent/skills/favorites/db";
-import { ChatFavoritesRepositoryClient } from "next-vibe/agent/skills/favorites/repository-client";
-import type { TtsModelId } from "next-vibe/agent/text-to-speech/models";
+import { useChatInputStore } from "../../../../../ai-stream/stream/hooks/input-store";
+import { useAIStream } from "../../../../../ai-stream/stream/hooks/use-ai-stream";
+import type { ChatMessage } from "../../../../db";
+import { useChatBootContext } from "../../../../hooks/context";
+import { useChatNavigationStore } from "../../../../hooks/use-chat-navigation-store";
+import { useChatSettings } from "../../../../settings/hooks";
+import { ChatSettingsRepositoryClient } from "../../../../settings/repository-client";
+import { getDirectReplies } from "./flat-view/helpers";
+import { useProviderAvailability } from "../../../../../env-availability-store";
+import characterDefinitions from "../../../../../skills/[id]/definition";
+import { ModelSelectionType } from "../../../../../skills/enum";
+import type { FavoriteConfig } from "../../../../../skills/favorites/db";
+import { ChatFavoritesRepositoryClient } from "../../../../../skills/favorites/repository-client";
+import type { TtsModelId } from "../../../../../text-to-speech/models";
 import { platform } from "next-vibe/core/env-client";
 import { success } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
@@ -350,7 +350,6 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
           pathParams: { threadId: activeThreadId },
           locale,
           user,
-          availability,
         });
 
         if (controller.signal.aborted) {
@@ -449,7 +448,6 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
             pathParams: { threadId },
             locale,
             user,
-            availability,
           });
 
           if (controller.signal.aborted) {
@@ -558,7 +556,6 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
       locale,
       logger,
       user,
-      availability,
     ],
   );
 
@@ -588,7 +585,6 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
             pathParams: { threadId },
             locale,
             user,
-            availability,
           });
 
           if (controller.signal.aborted) {
@@ -662,7 +658,6 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
       logger,
       user,
       setLeafMessageId,
-      availability,
     ],
   );
 

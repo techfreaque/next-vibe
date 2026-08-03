@@ -1,18 +1,15 @@
 import "server-only";
 
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { ResponseType } from "../../../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { ScaleComponentType } from "next-vibe/tooling/infra/enum";
-import { ScaleComponent } from "next-vibe/tooling/infra/enum";
-import {
-  getReplicaCount,
-  scaleDeployment,
-} from "next-vibe/tooling/infra/shared/pulumi/k3s/scripts";
+} from "../../../../../core/route/response.schema";
+import { parseError } from "../../../../../core/utils/parse-error";
+import type { ScaleComponentType } from "../../../enum";
+import { ScaleComponent } from "../../../enum";
+import { getReplicaCount, scaleDeployment } from "../k3s/scripts";
 
 import type { ClientT } from "@/ssh/client";
 import {

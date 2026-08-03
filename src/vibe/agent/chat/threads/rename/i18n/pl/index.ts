@@ -46,6 +46,8 @@ export const translations: typeof enTranslations = {
         title: "Nieprawidłowe dane",
         description:
           "Sprawdź, czy ID wątku jest poprawnym UUID i czy podano co najmniej jedno pole",
+        noActiveThread: "Brak aktywnego wątku w kontekście strumienia",
+        folderUnresolved: "Nie udało się ustalić folderu wątku",
       },
       unauthorized: {
         title: "Nie zalogowano",
@@ -58,10 +60,12 @@ export const translations: typeof enTranslations = {
       notFound: {
         title: "Wątek nie znaleziony",
         description: "Nie istnieje wątek o tym ID",
+        detail: "Nie znaleziono wątku: {{threadId}}",
       },
       server: {
         title: "Błąd serwera",
         description: "Nie udało się zmienić nazwy wątku",
+        detail: "Błąd serwera: {{error}}",
       },
       network: {
         title: "Błąd sieci",

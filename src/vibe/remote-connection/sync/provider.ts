@@ -12,13 +12,14 @@ import "server-only";
  *  - Cursor-first protocol: local sends cursors → remote returns only newer records
  *  - Orchestrating serialize/upsert across all providers
  */
-import type { EndpointLogger } from "next-vibe/logger/types";
+import type { EndpointLogger } from "../../logger/types";
+
+import type { SyncDomain } from "../../realtime/core/sync-domain";
 
 import {
   isSyncDomainEnabled,
   type StandardSyncCursor,
   type SyncCursor,
-  type SyncDomain,
   type SyncScope,
   type ThreadsSyncCursor,
 } from "../db";
@@ -354,10 +355,10 @@ export async function ensureProvidersRegistered(): Promise<void> {
   registrationPromise = (async (): Promise<void> => {
     const [cortexModule, skillsModule, favoritesModule, threadsModule] =
       await Promise.all([
-        import("next-vibe/agent/cortex/sync-provider"),
-        import("next-vibe/agent/skills/sync-provider"),
-        import("next-vibe/agent/skills/favorites/sync-provider"),
-        import("next-vibe/agent/chat/threads/sync-provider"),
+        import("../../agent/cortex/sync-provider"),
+        import("../../agent/skills/sync-provider"),
+        import("../../agent/skills/favorites/sync-provider"),
+        import("../../agent/chat/threads/sync-provider"),
       ]);
 
     registerSyncProvider(cortexModule.documentsSyncProvider);

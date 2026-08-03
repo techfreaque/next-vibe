@@ -162,6 +162,7 @@ export const translations = {
       server: {
         title: "Server Error",
         description: "Internal server error occurred",
+        checkFailed: "Health check failed: {{error}}",
       },
       unknown: {
         title: "Unknown Error",

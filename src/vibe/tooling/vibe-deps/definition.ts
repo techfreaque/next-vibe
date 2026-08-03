@@ -1,20 +1,20 @@
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { UserRole } from "next-vibe/identity/roles/enum";
-import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
-import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
+} from "../../core/definition/enums";
+import { UserRole } from "../../identity/roles/enum";
+import { lazyWidget } from "../../unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "../../unified-ui/_shared/utils";
 import {
   objectField,
   requestField,
   responseArrayOptionalField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { VIBE_DEPS_ALIAS } from "./constants";
@@ -42,7 +42,6 @@ const { POST } = createEndpoint({
     UserRole.CLI_AUTH_BYPASS,
     UserRole.WEB_OFF,
     UserRole.AI_TOOL_OFF,
-    UserRole.MCP_VISIBLE,
     UserRole.PRODUCTION_OFF,
   ],
   aliases: [VIBE_DEPS_ALIAS],

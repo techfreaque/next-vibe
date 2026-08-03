@@ -1,13 +1,13 @@
 "use client";
 
 import * as SelectPrimitive from "@radix-ui/react-select";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 
-import { Check } from "../../web/ui/icons/Check";
-import { ChevronDown } from "../../web/ui/icons/ChevronDown";
-import { ChevronUp } from "../../web/ui/icons/ChevronUp";
-import type { StyleType } from "../../web/utils/style-type";
+import { Check } from "./icons/Check";
+import { ChevronDown } from "./icons/ChevronDown";
+import { ChevronUp } from "./icons/ChevronUp";
+import type { StyleType } from "../utils/style-type";
 
 export interface SelectOption {
   value: string;

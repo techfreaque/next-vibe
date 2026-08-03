@@ -58,6 +58,9 @@ export const translations = {
       unknown: {
         title: "Unknown Error",
         description: "An unexpected error occurred",
+        // `title` doubles as the generic errorTypes label - detail lives here so
+        // no raw placeholder leaks into those labels.
+        detail: "Unknown Error: {{error}}",
       },
       validation: {
         title: "Validation Error",

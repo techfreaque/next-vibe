@@ -11,11 +11,9 @@ import {
   DEFAULT_WEB_PINNED_IDS,
 } from "@/generated/endpoints/meta/default-pins";
 
-import { CODING_AGENT_ALIAS } from "../coding-agent/constants";
 import {
   CORTEX_DELETE_ALIAS,
   CORTEX_EDIT_ALIAS,
-  CORTEX_EXEC_ALIAS,
   CORTEX_LIST_ALIAS,
   CORTEX_MKDIR_ALIAS,
   CORTEX_MOVE_ALIAS,
@@ -24,7 +22,7 @@ import {
   CORTEX_TREE_ALIAS,
   CORTEX_WRITE_ALIAS,
 } from "../cortex/constants";
-import { DefaultFolderId } from "./config";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 
 /**
  * Storage keys for localStorage persistence
@@ -42,33 +40,9 @@ export const STORAGE_KEYS = {
 } as const;
 
 /**
- * Chat system constraints and limits
- */
-export const CHAT_CONSTANTS = {
-  /** Default thread title translation key */
-  DEFAULT_THREAD_TITLE: "app.chat.common.newChat",
-} as const;
-
-/**
  * Agent message content length limit
  */
 export const AGENT_MESSAGE_LENGTH = 40000; // TODO find a better way and also better error
-
-/**
- * Default remote tools made available (enabled) when a remote instance is connected.
- * These are unprefixed tool IDs - the instanceId prefix (e.g. "hermes__") is added
- * at connect time when writing into the user's availableTools setting.
- */
-export const DEFAULT_REMOTE_TOOL_IDS = [
-  CODING_AGENT_ALIAS,
-  CORTEX_EXEC_ALIAS,
-] as const;
-
-/**
- * Default remote tools pinned into the AI context window on connect.
- * Empty by default - remote tools start as available-only.
- */
-export const DEFAULT_REMOTE_PINNED_IDS: readonly string[] = [];
 
 /**
  * Convenience wrapper: derive role flags from a JWT payload and return the

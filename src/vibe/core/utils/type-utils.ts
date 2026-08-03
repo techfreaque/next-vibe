@@ -6,7 +6,7 @@
  * Makes all properties in T optional recursively
  */
 export type DeepPartial<T> = {
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generic utility type for recursive type operations
+  // eslint-disable-next-line restricted/no-object-type -- Generic utility type for recursive type operations
   [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
 };
 

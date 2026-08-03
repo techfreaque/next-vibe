@@ -3,8 +3,8 @@ export const translations = {
 
   errors: {
     repositoryInternalError: "An internal error occurred",
-    fetchErrorLogs: "Failed to fetch error logs",
-    updateErrorLog: "Failed to update error log status",
+    fetchErrorLogs: "Failed to fetch error logs: {{error}}",
+    updateErrorLog: "Failed to update error log status: {{error}}",
   },
 
   statusFilter: {

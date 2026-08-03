@@ -256,9 +256,10 @@ export class EmailsRepository {
       logger.error("Error fetching emails", parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.server.title"),
+        message: t("errors.server.detail_list", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -321,9 +322,10 @@ export class EmailsRepository {
     } catch (error) {
       logger.error("Error fetching email by ID", parseError(error));
       return fail({
-        message: t("errors.server.title"),
+        message: t("errors.server.detail_get", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -354,9 +356,10 @@ export class EmailsRepository {
     } catch (error) {
       logger.error("Error creating email record", parseError(error));
       return fail({
-        message: t("errors.server.title"),
+        message: t("errors.server.detail_create", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }

@@ -1,3 +1,4 @@
+import "server-only";
 import { agentClientEnv } from "./env-client";
 
 export interface AgentEnvAvailability {
@@ -28,7 +29,7 @@ export interface AgentEnvAvailability {
   unbottledForce: boolean;
 }
 
-const agentEnvAvailability: AgentEnvAvailability = (() => {
+const envAvailability: AgentEnvAvailability = (() => {
   const braveSearch = agentClientEnv.NEXT_PUBLIC_AGENT_BRAVE_SEARCH;
   const kagiSearch = agentClientEnv.NEXT_PUBLIC_AGENT_KAGI_SEARCH;
 
@@ -54,6 +55,8 @@ const agentEnvAvailability: AgentEnvAvailability = (() => {
     openAiTts: agentClientEnv.NEXT_PUBLIC_AGENT_OPEN_AI_TTS,
     edenAiTts: agentClientEnv.NEXT_PUBLIC_AGENT_EDEN_AI_TTS,
     elevenlabs: agentClientEnv.NEXT_PUBLIC_AGENT_ELEVENLABS,
+    // Env alone knows nothing about live connections; getEnvAvailability()
+    // fills these from the connections DB.
     unbottledSystem: false,
     unbottledForce: false,
   };
@@ -170,23 +173,26 @@ export function buildMissingKeyMessage(
   return `${info.label} API key not configured. Add ${info.envKey}=<your-key> to your .env file. Get your key at ${info.url}`;
 }
 
-/** Env-flag-only availability (no WS state). Safe to call anywhere including client. */
-export function getEnvAvailability(): AgentEnvAvailability {
-  return agentEnvAvailability;
-}
-
 /**
- * Full instance availability — env flags + live WS inference state.
- * Server-side only (async, reads the executor's routing state).
+ * Full instance availability — env flags plus live connections-DB inference
+ * state. Server-only: reads the executor's routing state. Client surfaces get
+ * this value passed down from the page into AgentAvailabilityProvider.
  */
-export async function getInstanceAvailability(): Promise<AgentEnvAvailability> {
-  const { ExecuteToolRouting } =
-    await import("next-vibe/remote-connection/routing");
-  const { hasSystem, forceSystem } =
-    await ExecuteToolRouting.getInstanceInferenceState();
-  return {
-    ...agentEnvAvailability,
-    unbottledSystem: hasSystem,
-    unbottledForce: forceSystem,
-  };
+export async function getEnvAvailability(): Promise<AgentEnvAvailability> {
+  try {
+    const { ExecuteToolRouting } =
+      await import("next-vibe/remote-connection/routing");
+    const { hasSystem, forceSystem } =
+      await ExecuteToolRouting.getInstanceInferenceState();
+    return {
+      ...envAvailability,
+      unbottledSystem: hasSystem,
+      unbottledForce: forceSystem,
+    };
+  } catch {
+    // No reachable database (CLI without one, cold boot, outage). Env flags are
+    // still the truth for every non-relayed provider, so degrade to those
+    // instead of failing the caller.
+    return envAvailability;
+  }
 }

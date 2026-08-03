@@ -20,7 +20,7 @@ import { bubbleFolderActivity } from "../../../chat/bubble-folder-activity";
 import type {
   DefaultFolderId,
   ToolExecutionContext,
-} from "../../../chat/config";
+} from "../../../../core/execution-context";
 import {
   chatThreads,
   type MessageMetadata,

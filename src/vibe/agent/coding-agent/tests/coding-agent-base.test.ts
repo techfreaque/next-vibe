@@ -25,12 +25,9 @@ import "server-only";
 globalThis.AI_SDK_LOG_WARNINGS = false;
 
 import { and, eq, like, sql } from "drizzle-orm";
-import {
-  DefaultFolderId,
-  makeHeadlessContext,
-} from "next-vibe/agent/chat/config";
-import { chatThreads } from "next-vibe/agent/chat/db";
-import { chatFavorites } from "next-vibe/agent/skills/favorites/db";
+import { DefaultFolderId, makeHeadlessContext } from "next-vibe/core/execution-context";
+import { chatThreads } from "../../chat/db";
+import { chatFavorites } from "../../skills/favorites/db";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";

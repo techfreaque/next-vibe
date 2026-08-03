@@ -18,20 +18,28 @@ import { readFileSync } from "node:fs";
 import type {
   GeneratorContext,
   GeneratorDefinition,
-} from "next-vibe/core/generators/shared/shared-inputs";
+} from "../generators/shared/shared-inputs";
 import {
   findFilesRecursively,
   generateFileHeader,
   getRelativeImportPath,
   stripProjectRoot,
   writeGeneratedFile,
-} from "next-vibe/core/generators/shared/utils";
+} from "../generators/shared/utils";
 
-import { GENERATED_DIR, getApiDir } from "@/env/paths";
+import { GENERATED_DIR, getApiDir, VIBE_DIR } from "@/env/paths";
 
 import { isSetupFile, setupKeyFor } from "./types";
 
 const OUTPUT_FILE = `${GENERATED_DIR}/setup/index.ts`;
+
+/**
+ * Where SetupEntry actually lives. The emitted import has to be resolved from
+ * the generated file's directory, not this one — writing "./types" pointed at
+ * <generated>/setup/types, which does not exist, so every generated registry
+ * failed to typecheck.
+ */
+const TYPES_MODULE = `${VIBE_DIR}/core/setup/types.ts`;
 
 /** Required exports. A file missing any of them is not a setup module. */
 const REQUIRED_EXPORTS = ["description", "install", "uninstall"] as const;
@@ -133,7 +141,7 @@ function renderRegistry(entries: SetupFileInfo[]): string {
 
 import "server-only";
 
-import type { SetupEntry } from "next-vibe/core/setup/types";
+import type { SetupEntry } from "${getRelativeImportPath(TYPES_MODULE, OUTPUT_FILE)}";
 ${imports}
 
 export const SETUP_REGISTRY: readonly SetupEntry[] = [
@@ -148,8 +156,11 @@ export const generator: GeneratorDefinition = {
   needs: {},
   cacheKey: "setup-index",
   findInputs() {
+    // The same predicate the generator scans with — these are its cache inputs,
+    // so a file it collects but this misses would not invalidate the cache.
     return findFilesRecursively(getApiDir(), isSetupFile);
   },
+  output: OUTPUT_FILE,
   async generate(ctx) {
     const entries = collectSetupFiles(
       findFilesRecursively(getApiDir(), isSetupFile),

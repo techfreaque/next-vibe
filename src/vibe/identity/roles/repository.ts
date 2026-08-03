@@ -5,21 +5,21 @@
 
 import "server-only";
 
-import { and, eq, inArray } from "drizzle-orm";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { and, eq } from "drizzle-orm";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import type { ResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
-import { scopedTranslation } from "next-vibe/identity/roles/i18n";
-import type { NewUserRole, UserRole } from "next-vibe/identity/user/db";
-import { insertUserRoleSchema, userRoles } from "next-vibe/identity/user/db";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { createDefaultCliUser } from "next-vibe/platforms/cli/auth/cli-user";
+} from "../../core/route/response.schema";
+import { parseError } from "../../core/utils/parse-error";
+import { db } from "../../database";
+import { scopedTranslation } from "./i18n";
+import type { NewUserRole, UserRole } from "../user/db";
+import { insertUserRoleSchema, userRoles } from "../user/db";
+import type { EndpointLogger } from "../../logger/types";
+import { createDefaultCliUser } from "../../platforms/cli/auth/cli-user";
 
 import type { UserRole as UserRoleEnum, UserRoleDB } from "./enum";
 import { type UserPermissionRoleValue } from "./enum";
@@ -70,93 +70,20 @@ export class UserRolesRepository {
         parsedError.message.includes("connect")
       ) {
         return fail({
-          message: t("errors.find_failed"),
-          errorType: ErrorResponseTypes.DATABASE_ERROR,
-          messageParams: {
+          message: t("errors.find_failed", {
             userId,
             error: parsedError.message,
-            details: parsedError.message,
-          },
+          }),
+          errorType: ErrorResponseTypes.DATABASE_ERROR,
         });
       }
 
       return fail({
-        message: t("errors.find_failed"),
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { userId, error: parsedError.message },
-      });
-    }
-  }
-
-  /**
-   * Find user roles for multiple user IDs (batch operation)
-   * Optimized to avoid N+1 queries when fetching roles for multiple users
-   * @param userIds - Array of user IDs to fetch roles for
-   * @returns Map of userId -> roles for efficient lookups
-   */
-  static async findByUserIds(
-    userIds: string[],
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<ResponseType<Map<string, UserRole[]>>> {
-    try {
-      logger.debug("Batch finding user roles for multiple users", {
-        count: userIds.length,
-      });
-
-      // Handle empty array
-      if (userIds.length === 0) {
-        return success(new Map());
-      }
-
-      // Filter out default CLI user if present
-      const defaultCliUser = createDefaultCliUser();
-      const validUserIds = userIds.filter((id) => id !== defaultCliUser.id);
-
-      // If all users were CLI default users, return empty map
-      if (validUserIds.length === 0) {
-        const emptyMap = new Map<string, UserRole[]>();
-        userIds.forEach((id) => emptyMap.set(id, []));
-        return success(emptyMap);
-      }
-
-      // Single batch query for all user roles
-      const results = await db
-        .select()
-        .from(userRoles)
-        .where(inArray(userRoles.userId, validUserIds));
-
-      // Group roles by userId for efficient lookup
-      const rolesMap = new Map<string, UserRole[]>();
-
-      // Initialize map with empty arrays for all requested users
-      userIds.forEach((id) => rolesMap.set(id, []));
-
-      // Populate with actual roles
-      results.forEach((role) => {
-        const existing = rolesMap.get(role.userId) || [];
-        existing.push(role);
-        rolesMap.set(role.userId, existing);
-      });
-
-      logger.debug("Batch role lookup completed", {
-        requestedUsers: userIds.length,
-        totalRoles: results.length,
-      });
-
-      return success(rolesMap);
-    } catch (error) {
-      const parsedError = parseError(error);
-      logger.error("Error batch finding user roles", parsedError);
-      const { t } = scopedTranslation.scopedT(locale);
-
-      return fail({
-        message: t("errors.batch_find_failed"),
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: {
-          count: userIds.length,
+        message: t("errors.find_failed", {
+          userId,
           error: parsedError.message,
-        },
+        }),
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
       });
     }
   }
@@ -182,9 +109,8 @@ export class UserRolesRepository {
         // Access control is handled by platform-access checker, not user roles
         const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: t("errors.not_found"),
+          message: t("errors.not_found", { userId, role }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { userId, role },
         });
       }
 
@@ -201,9 +127,8 @@ export class UserRolesRepository {
       if (results.length === 0) {
         const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: t("errors.not_found"),
+          message: t("errors.not_found", { userId, role }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { userId, role },
         });
       }
 
@@ -215,9 +140,12 @@ export class UserRolesRepository {
       );
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.lookup_failed"),
+        message: t("errors.lookup_failed", {
+          userId,
+          role,
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { userId, role, error: parseError(error).message },
       });
     }
   }
@@ -261,11 +189,12 @@ export class UserRolesRepository {
       if (results.length === 0) {
         const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: t("errors.add_failed"),
-          errorType: ErrorResponseTypes.DATABASE_ERROR,
-          messageParams: {
+          message: t("errors.add_failed", {
+            userId: data.userId,
+            role: data.role,
             error: t("errors.no_data_returned"),
-          },
+          }),
+          errorType: ErrorResponseTypes.DATABASE_ERROR,
         });
       }
 
@@ -274,13 +203,12 @@ export class UserRolesRepository {
       logger.error("Error adding role to user", parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.add_failed"),
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: {
+        message: t("errors.add_failed", {
           userId: data.userId,
           role: data.role,
           error: parseError(error).message,
-        },
+        }),
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
       });
     }
   }
@@ -315,9 +243,12 @@ export class UserRolesRepository {
       logger.error("Error removing role from user", parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.remove_failed"),
+        message: t("errors.remove_failed", {
+          userId,
+          role,
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { userId, role, error: parseError(error).message },
       });
     }
   }
@@ -347,9 +278,12 @@ export class UserRolesRepository {
       logger.error("Error checking if user has role", parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.check_failed"),
+        message: t("errors.check_failed", {
+          userId,
+          role,
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { userId, role, error: parseError(error).message },
       });
     }
   }
@@ -374,9 +308,11 @@ export class UserRolesRepository {
       logger.error("Error deleting user roles by user ID", parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.delete_failed"),
+        message: t("errors.delete_failed", {
+          userId,
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { userId, error: parseError(error).message },
       });
     }
   }
@@ -401,9 +337,11 @@ export class UserRolesRepository {
       if (!rolesResult.success || !rolesResult.data) {
         const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: t("errors.find_failed"),
+          message: t("errors.find_failed", {
+            userId,
+            error: t("errors.no_data_returned"),
+          }),
           errorType: ErrorResponseTypes.DATABASE_ERROR,
-          messageParams: { userId },
         });
       }
 
@@ -417,9 +355,11 @@ export class UserRolesRepository {
       logger.error("Error getting user permission roles", parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.find_failed"),
+        message: t("errors.find_failed", {
+          userId,
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { userId, error: parseError(error).message },
       });
     }
   }

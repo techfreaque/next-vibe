@@ -1,8 +1,5 @@
 // oxlint-disable oxlint-plugin-boilerplate/i18n-pattern -- root i18n config, not a scoped translation file
-import type {
-  LanguageConfig,
-  LanguageDefaults,
-} from "next-vibe/core/i18n/core/config";
+import type { LanguageConfig, LanguageDefaults } from "./core/config";
 
 // ----------------
 // CONFIGURATION

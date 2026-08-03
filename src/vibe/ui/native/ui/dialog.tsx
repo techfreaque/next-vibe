@@ -1,14 +1,11 @@
 import * as DialogPrimitive from "@rn-primitives/dialog";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
-import { X } from "../../native/ui/icons/X";
-import {
-  convertCSSToViewStyle,
-  styledNative,
-} from "../../native/utils/style-converter";
+import { X } from "./icons/X";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import type {
   DialogCloseProps,
   DialogContentProps,

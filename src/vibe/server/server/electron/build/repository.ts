@@ -13,22 +13,22 @@ import { execSync } from "node:child_process";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
-import { coreEnv, getPackageRunner } from "next-vibe/core/env";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { coreEnv, getPackageRunner } from "../../../../core/env";
+import type { ResponseType } from "../../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
+} from "../../../../core/route/response.schema";
+import { parseError } from "../../../../core/utils/parse-error";
 
-import type { EndpointLogger } from "next-vibe/logger/types";
+import type { EndpointLogger } from "../../../../logger/types";
 
 import type {
   ElectronBuildRequestOutput,
   ElectronBuildResponseOutput,
 } from "./definition";
-import type { ElectronBuildT } from "next-vibe/server/server/electron/build/i18n";
+import type { ElectronBuildT } from "./i18n";
 
 export class ElectronBuildRepository {
   private static readonly ELECTRON_DIR =
@@ -74,10 +74,11 @@ export class ElectronBuildRepository {
           const msg = parseError(err).message;
           output.push(`   ❌ vibe build failed: ${msg}`);
           logger.error("vibe build failed", { error: msg });
+          // `post.errors.server.title` is the definition's declared SERVER_ERROR
+          // label and renders param-free there, so each cause gets its own key.
           return fail({
-            message: t("post.errors.server.title"),
+            message: t("post.errors.server.viBuildFailed", { error: msg }),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
-            messageParams: { error: msg },
           });
         }
       } else {
@@ -106,9 +107,8 @@ export class ElectronBuildRepository {
         output.push(`   ❌ Compilation failed: ${msg}`);
         logger.error("Electron compilation failed", { error: msg });
         return fail({
-          message: t("post.errors.server.title"),
+          message: t("post.errors.server.compileFailed", { error: msg }),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: { error: msg },
         });
       }
 
@@ -229,9 +229,8 @@ export class ElectronBuildRepository {
         output.push(`   ❌ electron-builder failed: ${msg}`);
         logger.error("electron-builder failed", { error: msg });
         return fail({
-          message: t("post.errors.server.title"),
+          message: t("post.errors.server.builderFailed", { error: msg }),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: { error: msg },
         });
       }
 
@@ -249,9 +248,8 @@ export class ElectronBuildRepository {
       const msg = parseError(err).message;
       logger.error("Electron build failed unexpectedly", { error: msg });
       return fail({
-        message: t("post.errors.server.title"),
+        message: t("post.errors.server.buildFailed", { error: msg }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: msg },
       });
     }
   }

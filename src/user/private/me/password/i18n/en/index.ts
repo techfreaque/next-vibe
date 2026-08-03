@@ -70,7 +70,7 @@ export const translations = {
   },
   errors: {
     passwords_do_not_match: "Passwords do not match",
-    user_not_found: "User not found",
+    user_not_found: "User {{userId}} not found",
     incorrect_password: "Incorrect password",
     update_failed: "Failed to update password",
     token_creation_failed: "Failed to create password token",

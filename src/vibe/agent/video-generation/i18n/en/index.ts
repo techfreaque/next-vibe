@@ -109,6 +109,7 @@ export const translations = {
         "The selected model does not support video generation. Please select a video model.",
       notConfigured:
         "{{label}} is not configured. Add {{envKey}} to your .env file. Get your key at {{url}}",
+      providerUnsupported: "{{label}} is not supported yet",
       insufficientCredits:
         "Insufficient credits. Balance: {{balance}}, required: {{minimum}}",
       balanceCheckFailed: "Failed to check your credit balance",
@@ -121,6 +122,15 @@ export const translations = {
       generationFailed: "Video generation failed: {{error}}",
       providerError: "Video provider error: {{error}}",
       noVideoUrl: "No video URL returned from provider",
+      generationFailedUnknown:
+        "Video generation failed and the provider gave no reason",
+      providerErrorUnknown: "Video provider failed without an error message",
+      nonJsonResponse:
+        "Video provider returned a non-JSON response (HTTP {{status}}): {{body}}",
+      providerHttpError: "Video provider returned HTTP {{status}}: {{body}}",
+      jobFailedStatus: "Video job ended with status: {{status}}",
+      requestAborted: "Video generation was aborted",
+      requestTimedOut: "Timed out waiting for video generation",
       creditsFailed: "Failed to deduct credits for video generation",
       inputMediaRequired:
         "This model requires an input image URL. Paste an image link to animate it.",

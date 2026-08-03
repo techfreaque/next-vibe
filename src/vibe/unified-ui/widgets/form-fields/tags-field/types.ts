@@ -3,14 +3,35 @@
  * Array of tags input with suggestions
  */
 
-import type { FieldDataType } from "next-vibe/core/definition/enums";
-import type { ArrayWidgetSchema } from "next-vibe/unified-ui/_shared/schema-constraints";
-import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
-import type { BaseFormFieldWidgetConfig } from "next-vibe/unified-ui/widgets/form-fields/_shared/types";
+import type { FieldDataType } from "../../../../core/definition/enums";
+import type { ArrayWidgetSchema } from "../../../_shared/schema-constraints";
+import type { FieldUsageConfig } from "../../../_shared/types";
+import type { BaseFormFieldWidgetConfig } from "../_shared/types";
+import type { z } from "zod";
+
+/**
+ * Schemas a tags field accepts.
+ *
+ * Beyond a plain array, a tags field may back a value that also accepts a SINGLE
+ * item on input — `vibe check src/foo` sends a bare string where
+ * `vibe check a b` sends a list. Such a field is a union, not a ZodArray, so it
+ * cannot satisfy ArrayWidgetSchema no matter how it is transformed (a coerced
+ * schema becomes a ZodPipe).
+ *
+ * Widening is scoped to this widget rather than ArrayWidgetSchema because it is
+ * only sound where the reader normalises: the widget always renders and writes
+ * an array, so a lone string exists on the way IN and nowhere else.
+ */
+export type TagsWidgetSchema =
+  | ArrayWidgetSchema
+  | z.ZodType<string | string[]>
+  | z.ZodType<string | string[] | null>
+  | z.ZodType<string | string[] | undefined>
+  | z.ZodType<string | string[] | null | undefined>;
 
 export interface TagsFieldWidgetConfig<
   out TKey extends string,
-  TSchema extends ArrayWidgetSchema,
+  TSchema extends TagsWidgetSchema,
   TUsage extends FieldUsageConfig,
 > extends BaseFormFieldWidgetConfig<TKey, TUsage, "primitive", TSchema> {
   fieldType: FieldDataType.TAGS;

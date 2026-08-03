@@ -8,8 +8,8 @@
 import "server-only";
 
 import { and, between, eq, lt, sql } from "drizzle-orm";
-import { db } from "next-vibe/database";
-import type { DataPoint, TimeRange } from "next-vibe/dataflow/shared/fields";
+import { db } from "../../database";
+import type { DataPoint, TimeRange } from "../shared/fields";
 
 import { pipelineDatapoints, pipelineRetentionConfig } from "../db";
 

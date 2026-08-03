@@ -4,12 +4,12 @@
  * Uses: endpoint.path + endpoint.method + urlPathParams + cacheKey request fields
  */
 
-import type { InferSchemaFromField } from "next-vibe/core/definition/endpoint";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { FieldUsage } from "next-vibe/core/definition/enums";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import type { InferSchemaFromField } from "../../core/definition/endpoint";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
+import type { FieldUsage } from "../../core/definition/enums";
+import type { WidgetData } from "../../core/utils/json";
+import { parseError } from "../../core/utils/parse-error";
+import type { EndpointLogger } from "../../logger/types";
 import type { z } from "zod";
 
 import type { FormQueryParams } from "./store";

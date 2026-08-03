@@ -1,4 +1,4 @@
-import type { EndpointLogger } from "next-vibe/logger/types";
+import type { EndpointLogger } from "../../../logger/types";
 
 export function getScreenWidth(logger: EndpointLogger): number {
   if (typeof window !== "undefined" && window.screen) {

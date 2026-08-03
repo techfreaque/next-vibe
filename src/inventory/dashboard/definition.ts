@@ -3,7 +3,7 @@
  * GET — live KPI snapshot for stock health, transfers, and warehouses
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,

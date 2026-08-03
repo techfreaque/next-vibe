@@ -3,11 +3,14 @@ export const translations = {
 
   tag: "avatar",
   errors: {
-    user_not_found: "User not found",
-    failed_to_upload_avatar: "Failed to upload avatar",
-    failed_to_delete_avatar: "Failed to delete avatar",
-    invalid_file_type: "Invalid file type",
-    file_too_large: "File too large",
+    user_not_found: "User {{userId}} not found",
+    failed_to_upload_avatar:
+      "Failed to upload avatar for {{userId}}: {{error}}",
+    failed_to_delete_avatar:
+      "Failed to delete avatar for {{userId}}: {{error}}",
+    invalid_file_type:
+      "Invalid file type {{providedType}}. Allowed: {{allowedTypes}}",
+    file_too_large: "File too large: {{providedSize}}. Max {{maxSize}}",
   },
   debug: {
     uploadingUserAvatar: "Uploading user avatar",

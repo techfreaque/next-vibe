@@ -17,6 +17,7 @@ export interface OverviewPageData {
   initialCredits: Awaited<
     ReturnType<typeof subscriptionLoader>
   >["initialCredits"];
+  platform: Awaited<ReturnType<typeof subscriptionLoader>>["platform"];
 }
 
 export async function tanstackLoader({
@@ -33,12 +34,14 @@ export function TanstackPage({
   locale,
   user,
   initialCredits,
+  platform,
 }: OverviewPageData): JSX.Element {
   return (
     <OverviewPageClient
       locale={locale}
       user={user}
       initialCredits={initialCredits}
+      platform={platform}
     />
   );
 }

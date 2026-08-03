@@ -3,7 +3,7 @@
  * Arrow keys to navigate, Space to toggle selection, Enter to confirm
  */
 import { Box, Text, useInput } from "ink";
-import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useState } from "react";
 

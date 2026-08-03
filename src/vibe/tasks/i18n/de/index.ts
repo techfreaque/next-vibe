@@ -84,7 +84,6 @@ export const translations: typeof enTranslations = {
   cron: {
     frequency: {
       everyMinute: "jede Minute",
-      everyMinutes: "alle {{interval}} Minuten",
       everyHour: "jede Stunde",
       everyDays: "jeden Tag",
       hourly: "stündlich",
@@ -168,7 +167,7 @@ export const translations: typeof enTranslations = {
   },
   errors: {
     // Cron Tasks errors
-    fetchCronTasks: "Fehler beim Abrufen der Cron-Aufgaben",
+    fetchCronTasks: "Fehler beim Abrufen der Cron-Aufgaben: {{error}}",
     createCronTask: "Fehler beim Erstellen der Cron-Aufgabe",
     updateCronTask: "Fehler beim Aktualisieren der Cron-Aufgabe",
     deleteCronTask: "Fehler beim Löschen der Cron-Aufgabe",
@@ -178,9 +177,10 @@ export const translations: typeof enTranslations = {
     cronTaskNotFound: "Cron-Aufgabe nicht gefunden",
 
     // Unified Runner errors
-    startTaskRunner: "Fehler beim Starten des Task Runners",
+    startTaskRunner: "Fehler beim Starten des Task Runners: {{error}}",
     stopTaskRunner: "Fehler beim Stoppen des Task Runners",
-    getTaskRunnerStatus: "Fehler beim Abrufen des Task Runner Status",
+    getTaskRunnerStatus:
+      'Fehler beim Abrufen des Task-Runner-Status: unbekannte Aktion "{{action}}"',
     executeCronTask: "Fehler beim Ausführen der Cron-Aufgabe",
 
     // Pulse errors
@@ -196,20 +196,26 @@ export const translations: typeof enTranslations = {
 
     // Repository errors
     repositoryNotFound: "Ressource nicht gefunden",
+    repositoryNotFoundDetail: "Keine Aufgabe mit der ID {{taskId}} gefunden",
     repositoryInternalError: "Ein interner Fehler ist aufgetreten",
+    repositoryInternalErrorDetail:
+      "Ein interner Fehler ist aufgetreten: {{error}}",
     repositoryGetTaskForbidden:
-      "Sie haben keine Berechtigung, diese Aufgabe anzuzeigen",
+      "Keine Berechtigung zum Anzeigen der Aufgabe {{taskId}}",
     repositoryUpdateTaskForbidden:
       "Sie haben keine Berechtigung, diese Aufgabe zu aktualisieren",
+    repositoryUpdateTaskForbiddenDetail:
+      "Keine Berechtigung zum Aktualisieren der Aufgabe {{taskId}}",
     repositoryDeleteTaskForbidden:
-      "Sie haben keine Berechtigung, diese Aufgabe zu löschen",
+      "Keine Berechtigung zum Löschen der Aufgabe {{taskId}}",
   },
   common: {
     cronRepositoryTaskUpdateFailed:
-      "Fehler beim Aktualisieren der Cron-Aufgabe",
-    cronRepositoryTaskDeleteFailed: "Fehler beim Löschen der Cron-Aufgabe",
+      "Cron-Aufgabe {{taskId}} konnte nicht aktualisiert werden: {{error}}",
+    cronRepositoryTaskDeleteFailed:
+      "Cron-Aufgabe {{taskId}} konnte nicht gelöscht werden: {{error}}",
     cronRepositoryExecutionCreateFailed:
-      "Fehler beim Erstellen der Cron-Aufgabenausführung",
+      "Ausführung der Cron-Aufgabe {{taskId}} konnte nicht angelegt werden: {{error}}",
     cronRepositoryExecutionUpdateFailed:
       "Fehler beim Aktualisieren der Cron-Aufgabenausführung",
     cronRepositoryExecutionsFetchFailed:

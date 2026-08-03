@@ -23,6 +23,7 @@ import type { Client as Ssh2Client, ClientChannel } from "ssh2";
 import { ConnectionCreateRepository } from "./connections/create/repository";
 import { sshConnections } from "./db";
 import { SshAuthType, type SshAuthTypeType } from "./enum";
+import { sshEnv } from "./env";
 
 /**
  * Minimal translation interface for client.ts error messages.
@@ -41,9 +42,7 @@ export type ClientT = (
 export type { ClientChannel };
 export type { Ssh2Client };
 
-const SSH_CONNECT_TIMEOUT_MS = Number(
-  process.env["SSH_CONNECT_TIMEOUT_MS"] ?? 10000,
-);
+const SSH_CONNECT_TIMEOUT_MS = sshEnv.SSH_CONNECT_TIMEOUT_MS;
 
 export interface SshCredentials {
   id: string;
@@ -54,23 +53,6 @@ export interface SshCredentials {
   secret: string;
   passphrase: string | null;
   fingerprint: string | null;
-}
-
-/**
- * Type guard for Node.js filesystem errors that have a `code` property.
- * Replaces `error as NodeJS.ErrnoException` casts in catch blocks.
- */
-export interface NodeError extends Error {
-  code?: string | number;
-  stdout?: string;
-  stderr?: string;
-  signal?: string;
-  killed?: boolean;
-}
-
-// eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type guard requires unknown to handle any error from catch blocks
-export function isNodeError(error: unknown): error is NodeError {
-  return error instanceof Error;
 }
 
 /** Compute SHA256 fingerprint of host key buffer (hex string) */
@@ -135,24 +117,6 @@ export async function getConnectionCredentials(
     passphrase,
     fingerprint: row.fingerprint ?? null,
   });
-}
-
-/**
- * Get the default connection ID for a user (or null if none).
- */
-export async function getDefaultConnectionId(
-  userId: string,
-): Promise<string | null> {
-  const [row] = await db
-    .select({ id: sshConnections.id })
-    .from(sshConnections)
-    .where(
-      and(
-        eq(sshConnections.userId, userId),
-        eq(sshConnections.isDefault, true),
-      ),
-    );
-  return row?.id ?? null;
 }
 
 /**

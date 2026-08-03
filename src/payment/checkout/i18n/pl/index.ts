@@ -110,6 +110,7 @@ export const translations: typeof enTranslations = {
     },
     errors: {
       alreadySubscribed: {
+        detail: "Masz już aktywną subskrypcję (użytkownik {{userId}})",
         title: "Już subskrybowany",
         description: "Masz już aktywną subskrypcję",
       },
@@ -134,10 +135,12 @@ export const translations: typeof enTranslations = {
         description: "Dostęp zabroniony",
       },
       notFound: {
+        detail: "Nie znaleziono konta dla użytkownika {{userId}}",
         title: "Nie znaleziono",
         description: "Sesja płatności nie została znaleziona",
       },
       server: {
+        detail: "Nie udało się rozpocząć płatności: {{error}}",
         title: "Błąd serwera",
         description: "Wystąpił wewnętrzny błąd serwera",
       },
@@ -162,6 +165,7 @@ export const translations: typeof enTranslations = {
 
   // General error message
   error: "Wystąpił błąd podczas płatności",
+  errorDetail: "Płatność nie powiodła się: {{error}}",
 
   // Subscription plan labels
   plans: {

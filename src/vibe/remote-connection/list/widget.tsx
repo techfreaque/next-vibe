@@ -8,10 +8,9 @@
 
 "use client";
 
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
-import { coreClientEnv as envClient } from "next-vibe/core/env-client";
-import { VibeMode } from "next-vibe/env/env-util";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { coreClientEnv as envClient } from "../../core/env-client";
+import { VibeMode } from "../../env/env-util";
+import { UserPermissionRole } from "../../identity/roles/enum";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
 import {
@@ -41,7 +40,7 @@ import { Separator } from "next-vibe/ui/ui/separator";
 import { Span } from "next-vibe/ui/ui/span";
 import { H3, P } from "next-vibe/ui/ui/typography";
 import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
-import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
+import { usePickerCallback } from "../../unified-ui/_shared/picker-context";
 import {
   useWidgetLocale,
   useWidgetLogger,
@@ -49,8 +48,8 @@ import {
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
-import { apiClient } from "next-vibe/unified-ui/hooks/store";
+} from "../../unified-ui/_shared/use-widget-context";
+import { apiClient } from "../../unified-ui/hooks/store";
 import type { JSX } from "react";
 import { useState } from "react";
 
@@ -162,7 +161,6 @@ function ReconnectButton({
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const locale = useWidgetLocale();
-  const availability = useProviderAvailability();
 
   // Incoming entries and healthy connections don't need a reconnect button
   if (conn.isReverseEntry || conn.healthStatus === "healthy") {
@@ -200,7 +198,6 @@ function ReconnectButton({
         },
         { instanceId: conn.instanceId },
         locale,
-        availability,
       );
     } finally {
       setIsLoading(false);

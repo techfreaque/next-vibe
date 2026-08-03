@@ -1,8 +1,8 @@
 import "server-only";
 
 import { and, desc, eq, isNull, or } from "drizzle-orm";
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
-import { chatFolders } from "next-vibe/agent/chat/db";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
+import { chatFolders } from "../../db";
 import {
   canCreateFolder,
   canCreateThreadInFolder,
@@ -11,7 +11,7 @@ import {
   canManageFolder,
   canManageFolderPermissions,
   canViewFolder,
-} from "next-vibe/agent/chat/permissions/permissions";
+} from "../../permissions/permissions";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -252,11 +252,8 @@ export class ChatFoldersRepository {
 
         if (rootFolderId === "incognito") {
           return fail({
-            message: t("post.errors.forbidden.title"),
+            message: t("post.errors.forbidden.incognitoNotAllowed"),
             errorType: ErrorResponseTypes.FORBIDDEN,
-            messageParams: {
-              message: t("post.errors.forbidden.incognitoNotAllowed"),
-            },
           });
         }
 

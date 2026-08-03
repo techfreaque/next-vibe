@@ -10,8 +10,8 @@ import type {
   LaunchpadConfig,
   LaunchpadFolder,
   LaunchpadPackage,
-} from "next-vibe/tooling/launchpad/src/types/types";
-import { cloneRepo } from "next-vibe/tooling/launchpad/src/utils/repo-utils";
+} from "../types/types";
+import { cloneRepo } from "../utils/repo-utils";
 const execAsync = promisify(exec);
 
 // Simple logger for launchpad CLI output
@@ -392,7 +392,7 @@ export async function navigateFolders(
       "Error navigating folders:",
       error instanceof Error ? error : String(error),
     );
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- CLI script throws for error reporting at startup
+    // eslint-disable-next-line restricted/restricted-syntax -- CLI script throws for error reporting at startup
     throw error;
   }
 }

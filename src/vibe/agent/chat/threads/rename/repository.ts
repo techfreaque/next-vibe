@@ -6,8 +6,8 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -19,7 +19,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { createEndpointEmitter } from "next-vibe/realtime/emitter";
+import { createEndpointEmitter } from "next-vibe/realtime/core/emitter";
 
 import { chatFolders, chatThreads } from "../../db";
 import { createFolderContentsEmitter } from "../../folder-contents/[rootFolderId]/emitter";
@@ -50,9 +50,8 @@ export class ThreadRenameRepository {
       const threadId = data.threadId ?? toolExecutionContext.threadId;
       if (!threadId) {
         return fail({
-          message: t("patch.errors.validation.title"),
+          message: t("patch.errors.validation.noActiveThread"),
           errorType: ErrorResponseTypes.BAD_REQUEST,
-          messageParams: { error: "no active thread in stream context" },
         });
       }
 
@@ -109,9 +108,8 @@ export class ThreadRenameRepository {
 
       if (!existingThread) {
         return fail({
-          message: t("patch.errors.notFound.title"),
+          message: t("patch.errors.notFound.detail", { threadId }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { threadId },
         });
       }
 
@@ -119,9 +117,8 @@ export class ThreadRenameRepository {
       rootFolderId = rootFolderId ?? existingThread.rootFolderId;
       if (!rootFolderId) {
         return fail({
-          message: t("patch.errors.validation.title"),
+          message: t("patch.errors.validation.folderUnresolved"),
           errorType: ErrorResponseTypes.BAD_REQUEST,
-          messageParams: { error: "could not resolve the thread's folder" },
         });
       }
 
@@ -194,7 +191,7 @@ export class ThreadRenameRepository {
       });
 
       if (!user.isPublic) {
-        void import("next-vibe/agent/ai-stream/repository/core/db-writer/embedding-sync")
+        void import("../../../ai-stream/repository/core/db-writer/embedding-sync")
           .then(({ syncThreadEmbedding }) =>
             syncThreadEmbedding(updatedThread.id, toolExecutionContext),
           )
@@ -210,9 +207,10 @@ export class ThreadRenameRepository {
     } catch (error) {
       logger.error("Error renaming thread", parseError(error));
       return fail({
-        message: t("patch.errors.server.title"),
+        message: t("patch.errors.server.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }

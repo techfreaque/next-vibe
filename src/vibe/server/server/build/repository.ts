@@ -3,26 +3,27 @@
  * Handles build the application operations
  */
 
-import { buildPackageRunnerCommand, coreEnv } from "next-vibe/core/env";
-import { VibeMode } from "next-vibe/env/env-util";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { buildPackageRunnerCommand, coreEnv } from "../../../core/env";
+import { databaseEnv } from "../../../database/env";
+import { VibeMode } from "../../../env/env-util";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
+} from "../../../core/route/response.schema";
+import { parseError } from "../../../core/utils/parse-error";
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { SeedRepository } from "next-vibe/database/seed/repository";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import { SeedRepository } from "../../../database/seed/repository";
+import type { EndpointLogger } from "../../../logger/types";
 
-import { GenerateAllRepository } from "next-vibe/core/generators/repository";
-import { DatabaseMigrationRepository } from "next-vibe/database/migrate/repository";
-import { scopedTranslation as dockerOperationsScopedTranslation } from "next-vibe/database/utils/docker-operations/i18n";
-import { scopedTranslation as dbUtilsScopedTranslation } from "next-vibe/database/utils/i18n";
-import type { ServerBuildT } from "next-vibe/server/server/build/i18n";
-import { scopedTranslation as builderScopedTranslation } from "next-vibe/tooling/builder/i18n";
+import { GenerateAllRepository } from "../../../core/generators/repository";
+import { DatabaseMigrationRepository } from "../../../database/migrate/repository";
+import { scopedTranslation as dockerOperationsScopedTranslation } from "../../../database/utils/docker-operations/i18n";
+import { scopedTranslation as dbUtilsScopedTranslation } from "../../../database/utils/i18n";
+import type { ServerBuildT } from "./i18n";
+import { scopedTranslation as builderScopedTranslation } from "../../../tooling/builder/i18n";
 
 import { ServerFramework } from "../enum";
 import { readPidFilePort, VIBE_START_PID_FILE } from "../pid";
@@ -84,7 +85,6 @@ export class BuildRepository {
           const generateResult = await GenerateAllRepository.generateAll(
             { force: false },
             logger,
-            locale,
           );
 
           if (generateResult.success) {
@@ -105,7 +105,12 @@ export class BuildRepository {
             }
           }
         } catch (generatorError) {
-          const errorMsg = `${t("post.repository.messages.generationFailed")}: ${parseError(generatorError).message}`;
+          // The non-throwing branch above reports generationFailed without a
+          // cause, so the thrown-error variant needs its own key.
+          const errorMsg = t(
+            "post.repository.messages.generationFailedDetail",
+            { error: parseError(generatorError).message },
+          );
           steps.push({ label: "Generate", ok: false, skipped: false });
           errors.push(errorMsg);
           if (!data.force) {
@@ -129,7 +134,7 @@ export class BuildRepository {
           output.push(t("post.repository.messages.packageBuildStart"));
           try {
             const { builderRepository } =
-              await import("next-vibe/tooling/builder/repository");
+              await import("../../../tooling/builder/repository");
             const { t: builderT } = builderScopedTranslation.scopedT(locale);
             const builderResult = await builderRepository.execute(
               { configPath: "build.config.ts" },
@@ -143,13 +148,12 @@ export class BuildRepository {
             } else {
               steps.push({ label: "Package", ok: false, skipped: false });
               const builderReason =
-                (builderResult.messageParams?.["error"] as
-                  | string
-                  | undefined) ??
                 builderResult.message ??
-                "unknown error";
+                t("post.repository.messages.unknownError");
               errors.push(
-                `${t("post.repository.messages.packageBuildFailed")}: ${builderReason}`,
+                t("post.repository.messages.packageBuildFailed", {
+                  error: builderReason,
+                }),
               );
               if (!data.force) {
                 const response: BuildResponseType = {
@@ -164,15 +168,15 @@ export class BuildRepository {
             }
           } catch (buildError) {
             const parsedError = parseError(buildError);
+            const failure = t("post.repository.messages.packageBuildFailed", {
+              error: parsedError.message,
+            });
             steps.push({ label: "Package", ok: false, skipped: false });
-            errors.push(
-              `${t("post.repository.messages.packageBuildFailed")}: ${parsedError.message}`,
-            );
+            errors.push(failure);
             if (!data.force) {
               return fail({
-                message: t("post.errors.server.title"),
+                message: failure,
                 errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                messageParams: { error: parsedError.message },
               });
             }
           }
@@ -181,10 +185,10 @@ export class BuildRepository {
         // Build TanStack Start (SSR) via vibe builder (uses build.config.ts).
         // build.config.ts already includes both the CLI/browser files (package)
         // and tanstack-start, so a single run covers both - no separate package build needed.
-        output.push("Building TanStack Start (SSR)...");
+        output.push(t("post.repository.messages.tanstackBuildStart"));
         try {
           const { builderRepository } =
-            await import("next-vibe/tooling/builder/repository");
+            await import("../../../tooling/builder/repository");
           const { t: builderT } = builderScopedTranslation.scopedT(locale);
           const tanstackBuildResult = await builderRepository.execute(
             { configPath: "build.config.ts" },
@@ -193,32 +197,36 @@ export class BuildRepository {
           );
           if (tanstackBuildResult.success && tanstackBuildResult.data) {
             output.push(tanstackBuildResult.data.output);
-            output.push("✅ TanStack Start (SSR) build completed successfully");
+            output.push(t("post.repository.messages.tanstackBuildSuccess"));
             steps.push({ label: "TanStack", ok: true, skipped: false });
             if (data.package) {
               steps.push({ label: "Package", ok: true, skipped: false });
             }
           } else {
             steps.push({ label: "TanStack", ok: false, skipped: false });
-            errors.push("TanStack Start build failed");
+            const failure = t("post.repository.messages.tanstackBuildFailed");
+            errors.push(failure);
             if (!data.force) {
               return fail({
-                message: t("post.errors.server.title"),
+                message: failure,
                 errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                messageParams: { error: "TanStack Start build failed" },
               });
             }
           }
         } catch (buildError) {
           const parsedError = parseError(buildError);
-          const errorMsg = `TanStack Start build failed: ${parsedError.message}`;
+          // The builder can also fail without throwing, and that path reports
+          // the cause-free key - so the thrown variant carries its own.
+          const errorMsg = t(
+            "post.repository.messages.tanstackBuildFailedDetail",
+            { error: parsedError.message },
+          );
           steps.push({ label: "TanStack", ok: false, skipped: false });
           errors.push(errorMsg);
           if (!data.force) {
             return fail({
-              message: t("post.errors.server.title"),
+              message: errorMsg,
               errorType: ErrorResponseTypes.INTERNAL_ERROR,
-              messageParams: { error: parsedError.message },
             });
           }
         }
@@ -256,9 +264,15 @@ export class BuildRepository {
           const isOom =
             exitSignal === "SIGKILL" || exitCode === 137 || exitCode === 134;
           const detail = isOom
-            ? `Next.js build killed by OS (likely OOM) - signal: ${exitSignal ?? exitCode}`
-            : `Next.js build exited with code ${exitCode ?? "unknown"}`;
-          const errorMsg = `${t("post.repository.messages.nextjsBuildFailed")}: ${detail}`;
+            ? t("post.repository.messages.nextjsBuildOom", {
+                signal: String(exitSignal ?? exitCode ?? -1),
+              })
+            : t("post.repository.messages.nextjsBuildExitCode", {
+                code: String(exitCode ?? -1),
+              });
+          const errorMsg = t("post.repository.messages.nextjsBuildFailed", {
+            error: detail,
+          });
           steps.push({ label: "Next.js", ok: false, skipped: false });
           errors.push(errorMsg);
           logger.error("Next.js build failed", {
@@ -269,11 +283,8 @@ export class BuildRepository {
 
           if (!data.force) {
             return fail({
-              message: t("post.errors.server.title"),
+              message: errorMsg,
               errorType: ErrorResponseTypes.INTERNAL_ERROR,
-              messageParams: {
-                error: detail,
-              },
             });
           }
         }
@@ -283,7 +294,7 @@ export class BuildRepository {
           output.push(t("post.repository.messages.packageBuildStart"));
           try {
             const { builderRepository } =
-              await import("next-vibe/tooling/builder/repository");
+              await import("../../../tooling/builder/repository");
             const { t: builderT } = builderScopedTranslation.scopedT(locale);
             const builderResult = await builderRepository.execute(
               { configPath: "build.config.ts" },
@@ -297,13 +308,12 @@ export class BuildRepository {
             } else {
               steps.push({ label: "Package", ok: false, skipped: false });
               const builderReason =
-                (builderResult.messageParams?.["error"] as
-                  | string
-                  | undefined) ??
                 builderResult.message ??
-                "unknown error";
+                t("post.repository.messages.unknownError");
               errors.push(
-                `${t("post.repository.messages.packageBuildFailed")}: ${builderReason}`,
+                t("post.repository.messages.packageBuildFailed", {
+                  error: builderReason,
+                }),
               );
               if (!data.force) {
                 const response: BuildResponseType = {
@@ -318,15 +328,15 @@ export class BuildRepository {
             }
           } catch (buildError) {
             const parsedError = parseError(buildError);
+            const failure = t("post.repository.messages.packageBuildFailed", {
+              error: parsedError.message,
+            });
             steps.push({ label: "Package", ok: false, skipped: false });
-            errors.push(
-              `${t("post.repository.messages.packageBuildFailed")}: ${parsedError.message}`,
-            );
+            errors.push(failure);
             if (!data.force) {
               return fail({
-                message: t("post.errors.server.title"),
+                message: failure,
                 errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                messageParams: { error: parsedError.message },
               });
             }
           }
@@ -341,7 +351,7 @@ export class BuildRepository {
       ) {
         try {
           const { DbUtilsRepository } =
-            await import("next-vibe/database/utils/repository");
+            await import("../../../database/utils/repository");
           const { t: dbUtilsT } = dbUtilsScopedTranslation.scopedT(locale);
           const dockerCheckResult = await DbUtilsRepository.isDockerAvailable(
             dbUtilsT,
@@ -355,7 +365,7 @@ export class BuildRepository {
             );
 
             const { DockerOperationsRepository } =
-              await import("next-vibe/database/utils/docker-operations/repository");
+              await import("../../../database/utils/docker-operations/repository");
             const { t: dockerOpsT } =
               dockerOperationsScopedTranslation.scopedT(locale);
             const dbStartResult =
@@ -369,7 +379,7 @@ export class BuildRepository {
 
             if (dbStartResult.success) {
               output.push(
-                `✅ Preview PostgreSQL started (port ${process.env["PREVIEW_DB_PORT"] || "5433"})`,
+                `✅ Preview PostgreSQL started (port ${databaseEnv.PREVIEW_DB_PORT})`,
               );
             } else {
               output.push(
@@ -403,11 +413,8 @@ export class BuildRepository {
               errors.push(t("post.repository.messages.failedProdMigrations"));
               if (!data.force) {
                 return fail({
-                  message: t("post.errors.server.title"),
+                  message: t("post.repository.messages.failedProdMigrations"),
                   errorType: ErrorResponseTypes.DATABASE_ERROR,
-                  messageParams: {
-                    error: t("post.repository.messages.failedProdMigrations"),
-                  },
                   cause: migrateResult,
                 });
               }
@@ -424,26 +431,25 @@ export class BuildRepository {
           output.push(t("post.repository.messages.prodDbSuccess"));
         } catch (dbError) {
           const parsedError = parseError(dbError);
-          let errorMsg = `${t("post.repository.messages.prodDbFailed")}: ${parsedError.message}`;
-
-          if (
+          const isConnectionError =
             parsedError.message.includes("ECONNREFUSED") ||
-            parsedError.message.includes("connect")
-          ) {
-            errorMsg = `${t("post.repository.messages.prodDbFailed")}: ${t("post.repository.messages.dbConnectionError")}`;
-          }
+            parsedError.message.includes("connect");
+          // A refused connection gets its own key so the copy can name the
+          // likely cause instead of just echoing the driver's text.
+          const errorMsg = isConnectionError
+            ? t("post.repository.messages.prodDbConnectionFailed", {
+                error: parsedError.message,
+              })
+            : t("post.repository.messages.prodDbFailed", {
+                error: parsedError.message,
+              });
 
           steps.push({ label: "DB", ok: false, skipped: false });
           errors.push(errorMsg);
           if (!data.force) {
             return fail({
-              message: t("post.errors.server.title"),
+              message: errorMsg,
               errorType: ErrorResponseTypes.DATABASE_ERROR,
-              messageParams: {
-                error: errorMsg,
-                details: parsedError.message,
-                suggestion: t("post.repository.messages.dbStartSuggestion"),
-              },
             });
           }
         }
@@ -470,18 +476,15 @@ export class BuildRepository {
       return success(response);
     } catch (error) {
       const parsedError = parseError(error);
+      const failure = t("post.repository.messages.buildFailed", {
+        error: parsedError.message,
+      });
 
-      errors.push(
-        `${t("post.repository.messages.buildFailed")}: ${parsedError.message}`,
-      );
+      errors.push(failure);
 
-      // Return error response with proper structure
       return fail({
-        message: t("post.errors.server.title"),
+        message: failure,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
-          error: parsedError.message,
-        },
       });
     }
   }
@@ -501,7 +504,7 @@ export class BuildRepository {
       try {
         const { Pool } = await import("pg");
         const pool = new Pool({
-          connectionString: process.env["DATABASE_URL"],
+          connectionString: databaseEnv.DATABASE_URL,
           connectionTimeoutMillis: 5000,
         });
 

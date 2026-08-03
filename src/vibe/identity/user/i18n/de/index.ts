@@ -3461,20 +3461,32 @@ export const translations: typeof enTranslations = {
   errors: {
     emailAlreadyInUse: "E-Mail-Adresse wird bereits verwendet",
     locale_required: "Locale ist erforderlich",
-    auth_required: "Authentifizierung ist erforderlich",
-    auth_retrieval_failed: "Authentifizierung konnte nicht abgerufen werden",
+    auth_required:
+      "Authentifizierung erforderlich. Eine dieser Rollen: {{roles}}",
+    auth_retrieval_failed:
+      "Authentifizierung konnte nicht abgerufen werden: {{error}}",
     not_found: "Benutzer nicht gefunden",
-    roles_lookup_failed: "Benutzerrollen konnten nicht abgerufen werden",
-    roles_batch_fetch_failed: "Batch-Abruf der Benutzerrollen fehlgeschlagen",
-    id_lookup_failed: "Benutzer konnte nicht über ID gefunden werden",
-    email_lookup_failed: "Benutzer konnte nicht über E-Mail gefunden werden",
-    email_check_failed: "E-Mail-Prüfung fehlgeschlagen",
-    email_duplicate_check_failed: "Duplikat-E-Mail-Prüfung fehlgeschlagen",
-    search_failed: "Benutzersuche fehlgeschlagen",
+    not_found_by_id: "Kein Benutzer mit der ID {{userId}} gefunden",
+    not_found_by_email:
+      "Kein Benutzer mit der E-Mail-Adresse {{email}} gefunden",
+    roles_lookup_failed: "Rollenabfrage für Benutzer {{userId}} fehlgeschlagen",
+    roles_batch_fetch_failed:
+      "Batch-Rollenabruf für {{count}} Benutzer fehlgeschlagen",
+    id_lookup_failed:
+      "Benutzer {{userId}} konnte nicht gefunden werden: {{error}}",
+    email_lookup_failed:
+      "Benutzer mit E-Mail {{email}} konnte nicht gefunden werden: {{error}}",
+    email_check_failed:
+      "E-Mail-Prüfung für {{email}} fehlgeschlagen: {{error}}",
+    email_duplicate_check_failed:
+      "Duplikat-Prüfung für E-Mail {{email}} (ohne Benutzer {{excludeUserId}}) fehlgeschlagen: {{error}}",
+    search_failed: "Benutzersuche nach {{query}} fehlgeschlagen: {{error}}",
+    list_failed: "Benutzerliste konnte nicht geladen werden: {{error}}",
     email_already_in_use: "E-Mail-Adresse wird bereits verwendet",
-    creation_failed: "Benutzer konnte nicht erstellt werden",
+    creation_failed: "Benutzer konnte nicht erstellt werden: {{error}}",
     no_data_returned: "Keine Daten von der Datenbank zurückgegeben",
-    password_hashing_failed: "Passwort-Hashing fehlgeschlagen",
+    password_hashing_failed:
+      "Passwort-Hashing für {{email}} fehlgeschlagen: {{error}}",
     not_implemented_on_native:
       "Diese Funktion ist in React Native nicht implementiert",
     count_failed: "Fehler beim Abrufen der Benutzeranzahl: {{error}}",

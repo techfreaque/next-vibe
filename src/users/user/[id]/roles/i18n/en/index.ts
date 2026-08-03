@@ -50,6 +50,7 @@ export const translations = {
         notFound: {
           title: "User Not Found",
           description: "The specified user could not be found",
+          detail: "No user found with ID {{userId}}.",
         },
         conflict: {
           title: "Role Already Assigned",
@@ -66,6 +67,7 @@ export const translations = {
         server: {
           title: "Server Error",
           description: "Unable to add role due to server error",
+          detail: "Could not grant the {{role}} role to user {{userId}}.",
         },
         unknown: {
           title: "Unknown Error",
@@ -119,6 +121,7 @@ export const translations = {
         notFound: {
           title: "User Not Found",
           description: "The specified user could not be found",
+          detail: "No user found with ID {{userId}}.",
         },
         conflict: {
           title: "Conflict Error",
@@ -135,6 +138,7 @@ export const translations = {
         server: {
           title: "Server Error",
           description: "Unable to remove role due to server error",
+          detail: "Could not remove the {{role}} role from user {{userId}}.",
         },
         unknown: {
           title: "Unknown Error",

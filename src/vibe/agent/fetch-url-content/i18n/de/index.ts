@@ -63,11 +63,13 @@ export const translations: typeof enTranslations = {
       internal: {
         title: "Abruffehler",
         description: "Beim Abrufen der URL ist ein Fehler aufgetreten",
+        detail: "Abruffehler: {{message}}",
       },
     },
     success: {
       title: "Abruf Erfolgreich",
       description: "Der URL-Inhalt wurde erfolgreich abgerufen",
+      detail: "{{url}} abgerufen",
     },
   },
   tags: {

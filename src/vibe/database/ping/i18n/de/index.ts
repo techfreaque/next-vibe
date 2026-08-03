@@ -36,6 +36,7 @@ export const translations: typeof enTranslations = {
       network: {
         title: "Netzwerkfehler",
         description: "Netzwerkfehler beim Verbinden mit der Datenbank",
+        detail: "Datenbank-Ping fehlgeschlagen: {{error}}",
       },
       forbidden: {
         title: "Verboten",

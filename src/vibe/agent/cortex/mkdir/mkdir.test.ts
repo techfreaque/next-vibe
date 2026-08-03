@@ -23,7 +23,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { cortexNodes } from "../db";
 import { CortexNodeType, CortexViewType } from "../enum";
 import listEndpoint from "../list/definition";
-import mkdirEndpoint from "../mkdir/definition";
+import mkdirEndpoint from "./definition";
 import readEndpoint from "../read/definition";
 import writeEndpoint from "../write/definition";
 

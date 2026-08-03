@@ -3,14 +3,15 @@
  * Defines endpoints for GET, PATCH (update), and DELETE operations on a single skill
  */
 
-import { parseSkillId } from "next-vibe/agent/chat/slugify";
-import { getModelDisplayName } from "next-vibe/agent/models/all-models";
+import { parseSkillId } from "../../chat/slugify";
+import { getClientAvailability } from "../../env-availability-store";
+import { getModelDisplayName } from "../../models/all-models";
 import {
   dateSchema,
   iconSchema,
   translatedValueSchema,
 } from "next-vibe/core/definition/common.schema";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -414,7 +415,7 @@ const { PATCH } = createEndpoint({
         );
 
         // Optimistically update the skill in the list
-        const { availability } = data;
+        const availability = getClientAvailability();
         apiClient.updateEndpointData(
           skillsDefinition.default.GET,
           data.logger,
@@ -792,14 +793,7 @@ const { PATCH } = createEndpoint({
         "category",
       ] as const,
       urlPathParamsFields: ["id"] as const,
-      onEvent: async ({
-        requestData,
-        urlPathParams,
-        logger,
-        locale,
-        user,
-        agentEnvAvailability,
-      }) => {
+      onEvent: async ({ requestData, urlPathParams, logger, locale, user }) => {
         const skillId = urlPathParams.id;
 
         const category = requestData.category;
@@ -831,7 +825,7 @@ const { PATCH } = createEndpoint({
           },
           t,
           user,
-          agentEnvAvailability,
+          getClientAvailability(),
         );
         apiClient.updateEndpointData(
           (await import("../definition")).default.GET,

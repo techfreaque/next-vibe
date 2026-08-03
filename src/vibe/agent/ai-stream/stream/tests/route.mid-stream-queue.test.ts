@@ -38,9 +38,9 @@
 
 import "server-only";
 
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
-import { ChatMessageRole } from "next-vibe/agent/chat/enum";
-import { NO_SKILL_ID } from "next-vibe/agent/skills/constants";
+import { DefaultFolderId } from "../../../../core/execution-context";
+import { ChatMessageRole } from "../../../chat/enum";
+import { NO_SKILL_ID } from "../../../skills/constants";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { identityEnv } from "next-vibe/identity/env";
@@ -49,8 +49,8 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { DEFAULT_CHAT_MODEL_ID } from "../../constants";
 import { AiStreamRepository } from "../../repository";
-import type { AiStreamPostRequestOutput } from "../../stream/definition";
-import { scopedTranslation } from "../../stream/i18n";
+import type { AiStreamPostRequestOutput } from "../definition";
+import { scopedTranslation } from "../i18n";
 import { seedFixtureThread } from "../../testing/fixture-seed";
 import {
   fetchThreadMessages,

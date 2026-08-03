@@ -14,14 +14,14 @@
 
 import { resolve } from "node:path";
 
-import { createCliWidgetPlugin } from "next-vibe/platforms/cli/runtime/cli-widget-plugin-factory";
-import type { BuildConfig } from "next-vibe/tooling/builder/definition";
+import { createCliWidgetPlugin } from "../../platforms/cli/runtime/cli-widget-plugin-factory";
+import type { BuildConfig } from "../builder/definition";
 import {
   BunBuildTypeEnum,
   BunTargetEnum,
   OutputFormatEnum,
   SourcemapModeEnum,
-} from "next-vibe/tooling/builder/enum";
+} from "../builder/enum";
 
 import manifest from "./package";
 
@@ -54,7 +54,7 @@ const config: BuildConfig = {
     // ── Oxlint JS plugins ────────────────────────────────────────────────────
     {
       input:
-        "src/vibe/tooling/check/oxlint/plugins/restricted-syntax/src/index.ts",
+        "src/vibe/tooling/check/repository/oxlint/plugins/restricted-syntax/src/index.ts",
       output: ".dist/checker/oxlint-plugins/restricted-syntax.js",
       type: BunBuildTypeEnum.MODULE,
       bunOptions: {
@@ -65,7 +65,7 @@ const config: BuildConfig = {
     },
     {
       input:
-        "src/vibe/tooling/check/oxlint/plugins/jsx-capitalization/src/index.ts",
+        "src/vibe/tooling/check/repository/oxlint/plugins/jsx-capitalization/src/index.ts",
       output: ".dist/checker/oxlint-plugins/jsx-capitalization.js",
       type: BunBuildTypeEnum.MODULE,
       bunOptions: {
@@ -75,8 +75,31 @@ const config: BuildConfig = {
       },
     },
     {
-      input: "src/vibe/tooling/check/oxlint/plugins/i18n/src/index.ts",
+      input:
+        "src/vibe/tooling/check/repository/oxlint/plugins/i18n/src/index.ts",
       output: ".dist/checker/oxlint-plugins/i18n.js",
+      type: BunBuildTypeEnum.MODULE,
+      bunOptions: {
+        target: BunTargetEnum.NODE,
+        format: OutputFormatEnum.ESM,
+        sourcemap: SourcemapModeEnum.NONE,
+      },
+    },
+    {
+      input:
+        "src/vibe/tooling/check/repository/oxlint/plugins/boilerplate/src/index.ts",
+      output: ".dist/checker/oxlint-plugins/boilerplate.js",
+      type: BunBuildTypeEnum.MODULE,
+      bunOptions: {
+        target: BunTargetEnum.NODE,
+        format: OutputFormatEnum.ESM,
+        sourcemap: SourcemapModeEnum.NONE,
+      },
+    },
+    {
+      input:
+        "src/vibe/tooling/check/repository/oxlint/plugins/vibe-boundary/src/index.ts",
+      output: ".dist/checker/oxlint-plugins/vibe-boundary.js",
       type: BunBuildTypeEnum.MODULE,
       bunOptions: {
         target: BunTargetEnum.NODE,

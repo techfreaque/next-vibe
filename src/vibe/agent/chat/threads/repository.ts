@@ -19,7 +19,7 @@ import {
   sql,
 } from "drizzle-orm";
 import { type CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { RemoteEventHandlerProps } from "next-vibe/core/route/handler";
+import type { RemoteEventHandlerProps } from "next-vibe/core/route/handler-realtime";
 import {
   ErrorResponseTypes,
   fail,
@@ -32,7 +32,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { leads } from "next-vibe/identity/lead/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { DefaultFolderId } from "../config";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { type ChatFolder, chatFolders, chatThreads } from "../db";
 import { ThreadStatus, ThreadStreamingState } from "../enum";
 import { scopedTranslation as chatScopedTranslation } from "../i18n";
@@ -449,12 +449,6 @@ export class ThreadsRepository {
     return success({ threadId, isNew: true });
   }
 
-  /** 24h cache for total conversations count */
-  private static totalConversationsCountCache: {
-    count: number;
-    timestamp: number;
-  } | null = null;
-  private static readonly CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
   /**
    * List threads with pagination and filtering
    */
@@ -753,9 +747,10 @@ export class ThreadsRepository {
     } catch (error) {
       logger.error("Error listing threads", parseError(error));
       return fail({
-        message: t("get.errors.server.title"),
+        message: t("get.errors.server.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -807,11 +802,8 @@ export class ThreadsRepository {
 
         if (!folderResult) {
           return fail({
-            message: t("post.errors.notFound.title"),
+            message: t("post.errors.notFound.folderNotFound"),
             errorType: ErrorResponseTypes.NOT_FOUND,
-            messageParams: {
-              message: "Folder not found",
-            },
           });
         }
 
@@ -883,11 +875,8 @@ export class ThreadsRepository {
 
       if (!hasPermission) {
         return fail({
-          message: t("post.errors.forbidden.title"),
+          message: t("post.errors.forbidden.cannotCreateHere"),
           errorType: ErrorResponseTypes.FORBIDDEN,
-          messageParams: {
-            message: "Cannot create thread in this location",
-          },
         });
       }
 
@@ -935,61 +924,10 @@ export class ThreadsRepository {
     } catch (error) {
       logger.error("Error creating thread", parseError(error));
       return fail({
-        message: t("post.errors.server.title"),
+        message: t("post.errors.server.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
-      });
-    }
-  }
-
-  /**
-   * Get total count of conversations/threads with 24h caching
-   */
-  static async getTotalConversationsCount(
-    logger: EndpointLogger,
-    t: ThreadsT,
-  ): Promise<ResponseType<number>> {
-    try {
-      const now = Date.now();
-
-      // Check if cache exists and is still valid (within 24h)
-      if (
-        ThreadsRepository.totalConversationsCountCache &&
-        now - ThreadsRepository.totalConversationsCountCache.timestamp <
-          ThreadsRepository.CACHE_DURATION_MS
-      ) {
-        logger.debug("Returning cached total conversations count", {
-          count: ThreadsRepository.totalConversationsCountCache.count,
-          age: `${Math.floor((now - ThreadsRepository.totalConversationsCountCache.timestamp) / 1000 / 60 / 60)}h`,
-        });
-        return success(ThreadsRepository.totalConversationsCountCache.count);
-      }
-
-      // Cache is invalid or doesn't exist - query database
-      logger.debug("Fetching fresh total conversations count from database");
-
-      const [{ total }] = await db.select({ total: count() }).from(chatThreads);
-
-      // Update cache
-      ThreadsRepository.totalConversationsCountCache = {
-        count: total,
-        timestamp: now,
-      };
-
-      logger.debug("Total conversations count fetched and cached", {
-        count: total,
-      });
-
-      return success(total);
-    } catch (error) {
-      logger.error(
-        "Error getting total conversations count",
-        parseError(error),
-      );
-      return fail({
-        message: t("errors.count_failed"),
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -1032,7 +970,7 @@ export class ThreadsRepository {
       return;
     }
     const { createEndpointEmitter } =
-      await import("next-vibe/realtime/emitter");
+      await import("next-vibe/realtime/core/emitter");
     createEndpointEmitter(definitions.GET, logger, user, {
       requestData: {
         rootFolderId: updatedRow.rootFolderId,
@@ -1084,8 +1022,7 @@ export class ThreadsRepository {
       mirrorFolderId = folderRow ? requestData.subFolderId : null;
     }
     if (mirrorFolderId === null && originInstanceId) {
-      const { resolveScaffoldFolderId } =
-        await import("next-vibe/agent/chat/threads/sync-provider");
+      const { resolveScaffoldFolderId } = await import("./sync-provider");
       const senderRootFolderId =
         requestData.rootFolderId ?? DefaultFolderId.PRIVATE;
       mirrorFolderId = await resolveScaffoldFolderId(
@@ -1127,7 +1064,7 @@ export class ThreadsRepository {
     // Surface the mirror in open sidebars (REMOTE root) — local WS
     // subscribers insert it into the folder-contents list cache.
     const { createFolderContentsEmitter } =
-      await import("next-vibe/agent/chat/folder-contents/[rootFolderId]/emitter");
+      await import("../folder-contents/[rootFolderId]/emitter");
     const now = new Date();
     createFolderContentsEmitter(
       logger,

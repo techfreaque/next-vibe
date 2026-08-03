@@ -25,21 +25,19 @@ import {
   getOrCreateFolder,
   runTestStream,
   toolResultRecord,
-} from "next-vibe/agent/ai-stream/testing/headless-test-runner";
-import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
-import {
-  DefaultFolderId,
-  rootlessToolExecutionContext,
-} from "next-vibe/agent/chat/config";
-import { chatFavorites } from "next-vibe/agent/skills/favorites/db";
-import { scopedTranslation as favoritesScopedTranslation } from "next-vibe/agent/skills/favorites/i18n";
-import { ChatFavoritesRepository } from "next-vibe/agent/skills/favorites/repository";
-import { resolveFavorite } from "next-vibe/agent/skills/resolver";
+} from "../ai-stream/testing/headless-test-runner";
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
+import { DefaultFolderId, rootlessToolExecutionContext } from "next-vibe/core/execution-context";
+import { chatFavorites } from "./favorites/db";
+import { scopedTranslation as favoritesScopedTranslation } from "./favorites/i18n";
+import { ChatFavoritesRepository } from "./favorites/repository";
+import { resolveFavorite } from "./resolver";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { createEndpointLogger } from "next-vibe/logger/server";
+import { Platform } from "next-vibe/platforms/platforms";
 import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -592,6 +590,7 @@ When BOTH are done, end with [TEST:PASS] on success or [TEST:FAIL: <reason>] on 
         logger,
         t,
         defaultLocale,
+        Platform.AI,
       );
 
       expect(

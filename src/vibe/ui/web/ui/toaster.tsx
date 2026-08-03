@@ -2,7 +2,7 @@
 
 import type { JSX } from "react";
 
-import { useToast } from "../../web/hooks/use-toast";
+import { useToast } from "../hooks/use-toast";
 import {
   Toast,
   ToastClose,

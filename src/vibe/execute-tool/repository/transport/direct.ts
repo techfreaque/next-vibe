@@ -8,10 +8,10 @@ import "server-only";
 import type {
   ErrorResponseType,
   ResponseType,
-} from "next-vibe/core/route/response.schema";
-import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import type { AiT } from "next-vibe/platforms/ai/i18n";
+} from "../../../core/route/response.schema";
+import { ErrorResponseTypes, fail } from "../../../core/route/response.schema";
+import type { WidgetData } from "../../../core/utils/json";
+import type { AiT } from "../../../platforms/ai/i18n";
 
 import { BEARER_LEAD_ID_SEPARATOR } from "@/env/constants";
 
@@ -52,7 +52,7 @@ export async function callToolDirect(params: {
       // sits on top of — it POSTs the tool to the peer's execute-tool endpoint and
       // must NOT re-enter execute() (would recurse). The one place raw fetch is the
       // irreducible wire for cross-instance dispatch.
-      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- cross-instance dispatch primitive
+      // oxlint-disable-next-line restricted/no-raw-fetch -- cross-instance dispatch primitive
       const resp = await fetch(url, {
         method: "POST",
         headers: {

@@ -7,7 +7,7 @@ import {
   ModelSortDirection,
   ModelSortField,
 } from "../skills/enum";
-import type { VideoGenModelSelection } from "../video-generation/models";
+import type { VideoGenModelSelection } from "./models";
 import { VideoGenModelId } from "./models";
 
 /** Primary alias used to register the generate_video AI tool */

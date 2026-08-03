@@ -1,9 +1,6 @@
-import { DEFAULT_CHAT_MODEL_ID } from "next-vibe/agent/ai-stream/constants";
-import { ChatModelId } from "next-vibe/agent/ai-stream/models";
-import {
-  SKILL_CREATOR_ID,
-  SKILLS_LIST_ALIAS,
-} from "next-vibe/agent/skills/constants";
+import { DEFAULT_CHAT_MODEL_ID } from "../../../ai-stream/constants";
+import { ChatModelId } from "../../../ai-stream/models";
+import { SKILL_CREATOR_ID, SKILLS_LIST_ALIAS } from "../../constants";
 import { EXECUTE_TOOL_ALIAS } from "next-vibe/execute-tool/constants";
 import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
 

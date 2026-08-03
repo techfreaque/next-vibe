@@ -117,11 +117,12 @@ export async function sendSms(
       reason: validation.reason,
     });
     return fail({
-      message: t("sms.error.invalid_phone_format"),
-      errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
-      messageParams: {
+      // Dedicated key: the plain `invalid_phone_format` is used by 11 param-less
+      // callers, so the reason detail needs its own placeholder-bearing key.
+      message: t("sms.error.invalid_phone_format_reason", {
         reason: validation.reason || "",
-      },
+      }),
+      errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
     });
   }
 
@@ -189,20 +190,19 @@ export async function sendSms(
       attempts: maxAttempts,
     });
     return fail({
-      message: t("sms.error.delivery_failed"),
+      message: t("sms.error.delivery_failed", {
+        phoneNumber: params.to,
+        error: lastError?.message ?? "",
+      }),
       errorType: ErrorResponseTypes.SMS_ERROR,
-      messageParams: {
-        errorMessage: lastError?.message ?? "",
-      },
     });
   } catch (error) {
     logger.error("sms.error.unexpected_error", parseError(error));
     return fail({
-      message: t("sms.error.unexpected_error"),
+      message: t("sms.error.unexpected_error", {
+        error: error instanceof Error ? error.message : "",
+      }),
       errorType: ErrorResponseTypes.SMS_ERROR,
-      messageParams: {
-        errorMessage: error instanceof Error ? error.message : "",
-      },
     });
   }
 }
@@ -253,11 +253,10 @@ export async function batchSendSms(
       totalResults: results.length,
     });
     return fail({
-      message: t("sms.error.all_failed"),
-      errorType: ErrorResponseTypes.SMS_ERROR,
-      messageParams: {
+      message: t("sms.error.all_failed", {
         totalResults: results.length.toString(),
-      },
+      }),
+      errorType: ErrorResponseTypes.SMS_ERROR,
     });
   }
 
@@ -267,12 +266,11 @@ export async function batchSendSms(
       totalCount: results.length,
     });
     return fail({
-      message: t("sms.error.partial_failure"),
-      errorType: ErrorResponseTypes.SMS_ERROR,
-      messageParams: {
+      message: t("sms.error.partial_failure", {
+        successCount: (results.length - failureCount).toString(),
         failureCount: failureCount.toString(),
-        totalCount: results.length.toString(),
-      },
+      }),
+      errorType: ErrorResponseTypes.SMS_ERROR,
     });
   }
 

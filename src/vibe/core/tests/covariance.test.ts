@@ -14,20 +14,20 @@
 import type {
   ApiEndpoint,
   CreateApiEndpoint,
-} from "next-vibe/core/definition/create";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { Methods } from "next-vibe/core/definition/enums";
-import { FieldDataType, WidgetType } from "next-vibe/core/definition/enums";
+} from "../definition/create";
+import type { CreateApiEndpointAny } from "../definition/endpoint-base";
+import type { Methods } from "../definition/enums";
+import { FieldDataType, WidgetType } from "../definition/enums";
 import {
   type UserRole,
   type UserRoleValue,
-} from "next-vibe/identity/roles/enum";
-import type { UnifiedField } from "next-vibe/unified-ui/_shared/configs";
+} from "../../identity/roles/enum";
+import type { UnifiedField } from "../../unified-ui/_shared/configs";
 import type {
   AnyChildrenConstrain,
   ConstrainedChildUsage,
   FieldUsageConfig,
-} from "next-vibe/unified-ui/_shared/types";
+} from "../../unified-ui/_shared/types";
 import {
   objectField,
   objectOptionalField,
@@ -38,7 +38,7 @@ import {
   responseArrayField,
   responseArrayOptionalField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 const genericST: { ScopedTranslationKey: string } = {

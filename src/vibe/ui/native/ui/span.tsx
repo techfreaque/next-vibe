@@ -5,10 +5,7 @@ import type { JSX } from "react";
 import * as React from "react";
 import { Pressable, Text as RNText } from "react-native";
 
-import {
-  convertCSSToTextStyle,
-  styledNative,
-} from "../../native/utils/style-converter";
+import { convertCSSToTextStyle, styledNative } from "../utils/style-converter";
 import type {
   SpanGenericTarget,
   SpanMouseEvent,

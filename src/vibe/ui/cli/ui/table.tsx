@@ -1,5 +1,5 @@
 import { Box, Text } from "ink";
-import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import * as React from "react";
 
@@ -13,6 +13,7 @@ import type {
   TableProps,
   TableRowProps,
 } from "../../web/ui/table";
+import { useSeparatorLine } from "../hooks/use-separator-width";
 import {
   parseClassesToBoxProps,
   parseClassesToTextProps,
@@ -30,7 +31,6 @@ export type {
   TableRowProps,
 } from "../../web/ui/table";
 
-const SEPARATOR = "\u2500".repeat(60);
 const CELL_DIVIDER = " | ";
 
 export function Table({ className, children }: TableProps): JSX.Element {
@@ -89,6 +89,7 @@ export function TableRow({
 }: TableRowProps): JSX.Element {
   const isMcp = useIsMcp();
   const boxProps = parseClassesToBoxProps(className);
+  const separator = useSeparatorLine();
   void onClick; // not interactive in terminal
 
   if (isMcp) {
@@ -112,7 +113,7 @@ export function TableRow({
         {children}
       </Box>
       <Box>
-        <Text dimColor>{SEPARATOR}</Text>
+        <Text dimColor>{separator}</Text>
       </Box>
     </Box>
   );

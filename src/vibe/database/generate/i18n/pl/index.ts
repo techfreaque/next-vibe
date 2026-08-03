@@ -19,6 +19,8 @@ export const translations: typeof enTranslations = {
       network: {
         title: "Generowanie nie powiodło się",
         description: "drizzle-kit generate nie powiodło się",
+        detail: "drizzle-kit generate nie powiodło się: {{error}}",
+        exitCode: "drizzle-kit generate zakończone kodem {{code}}",
       },
       unauthorized: {
         title: "Brak autoryzacji",

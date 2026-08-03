@@ -345,10 +345,12 @@ export const translations: typeof enTranslations = {
         notFound: {
           title: "Użytkownik nie znaleziony",
           description: "Żądany użytkownik nie został znaleziony",
+          detail: "Nie ma użytkownika o ID {{userId}}.",
         },
         server: {
           title: "Błąd serwera",
           description: "Nie można pobrać użytkownika z powodu błędu serwera",
+          detail: "Nie udało się wczytać tego użytkownika: {{error}}",
         },
         unknown: {
           title: "Nieznany błąd",
@@ -555,6 +557,7 @@ export const translations: typeof enTranslations = {
         notFound: {
           title: "Użytkownik nie znaleziony",
           description: "Użytkownik do aktualizacji nie został znaleziony",
+          detail: "Nie ma użytkownika o ID {{userId}}.",
         },
         conflict: {
           title: "Konflikt aktualizacji",
@@ -565,6 +568,7 @@ export const translations: typeof enTranslations = {
           title: "Błąd serwera",
           description:
             "Nie można zaktualizować użytkownika z powodu błędu serwera",
+          detail: "Nie udało się zapisać zmian: {{error}}",
         },
         unknown: {
           title: "Nieznany błąd",
@@ -641,10 +645,12 @@ export const translations: typeof enTranslations = {
         notFound: {
           title: "Użytkownik nie znaleziony",
           description: "Użytkownik do usunięcia nie został znaleziony",
+          detail: "Nie ma użytkownika o ID {{userId}}.",
         },
         server: {
           title: "Błąd serwera",
           description: "Nie można usunąć użytkownika z powodu błędu serwera",
+          detail: "Nie udało się usunąć tego użytkownika: {{error}}",
         },
         unknown: {
           title: "Nieznany błąd",

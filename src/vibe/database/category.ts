@@ -3,9 +3,9 @@
  * Covers schema migrations, SQL execution, seeding, and DB tooling.
  */
 
-import { SQL_ALIAS } from "next-vibe/database/sql/constants";
-import type { CategoryDefinition } from "next-vibe/help-tool/category-types";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { SQL_ALIAS } from "./sql/constants";
+import type { CategoryDefinition } from "../help-tool/category-types";
+import { UserPermissionRole } from "../identity/roles/enum";
 
 import { USER_ME_ALIAS } from "@/user/private/me/constants";
 

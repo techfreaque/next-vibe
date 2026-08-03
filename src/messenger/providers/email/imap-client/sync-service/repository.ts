@@ -28,14 +28,10 @@ import type {
 } from "@/messenger/messages/db";
 import { emails, messengerFolders } from "@/messenger/messages/db";
 
-import { messengerAccounts } from "../../../../accounts/db";
-import { MessengerAccountStatus } from "../../../../accounts/enum";
-import { MessageChannel } from "../../../../accounts/enum";
 import type { SpecialFolderTypeValue } from "../../../../messages/enum";
 import { MessageType, SpecialFolderType } from "../../../../messages/enum";
 import { ImapConnectionRepository } from "../connection/repository";
 import type { ImapAccountShape } from "../db";
-import { toImapShape } from "../db";
 import { ImapSpecialUseType, ImapSyncStatus } from "../enum";
 import { scopedTranslation } from "../i18n";
 
@@ -94,167 +90,6 @@ export class ImapSyncRepository {
     DRAFT: "\\Draft",
     ANSWERED: "\\Answered",
   } as const;
-  static async syncAllAccounts(
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<ResponseType<ImapSyncResult>> {
-    const { t } = scopedTranslation.scopedT(locale);
-    const startTime = Date.now();
-    let accountsProcessed = 0;
-    let foldersProcessed = 0;
-    let messagesProcessed = 0;
-    let foldersAdded = 0;
-    let foldersUpdated = 0;
-    let foldersDeleted = 0;
-    let messagesAdded = 0;
-    let messagesUpdated = 0;
-    let messagesDeleted = 0;
-    const errors: ErrorResponseType[] = [];
-
-    try {
-      logger.debug("Starting sync for all enabled IMAP accounts");
-
-      // Get all enabled IMAP accounts from messenger_accounts
-      const enabledRows = await db
-        .select()
-        .from(messengerAccounts)
-        .where(
-          and(
-            eq(messengerAccounts.channel, MessageChannel.EMAIL),
-            eq(messengerAccounts.status, MessengerAccountStatus.ACTIVE),
-            eq(messengerAccounts.imapSyncEnabled, true),
-          ),
-        );
-
-      const enabledAccounts: ImapAccountShape[] = enabledRows.map(toImapShape);
-
-      logger.debug(`Found ${enabledAccounts.length} enabled IMAP accounts`);
-
-      for (const account of enabledAccounts) {
-        try {
-          accountsProcessed++;
-          logger.debug(`Syncing account: ${account.email}`);
-
-          // Sync account
-          const accountResult = await ImapSyncRepository.syncAccount(
-            account,
-            logger,
-            locale,
-          );
-
-          if (accountResult.success) {
-            foldersProcessed +=
-              accountResult.data.result.results.foldersProcessed;
-            messagesProcessed +=
-              accountResult.data.result.results.messagesProcessed;
-            foldersAdded += accountResult.data.result.results.foldersAdded;
-            foldersUpdated += accountResult.data.result.results.foldersUpdated;
-            foldersDeleted += accountResult.data.result.results.foldersDeleted;
-            messagesAdded += accountResult.data.result.results.messagesAdded;
-            messagesUpdated +=
-              accountResult.data.result.results.messagesUpdated;
-            messagesDeleted +=
-              accountResult.data.result.results.messagesDeleted;
-            errors.push(...accountResult.data.result.results.errors);
-
-            // Update IMAP connected status in messenger_accounts
-            await db
-              .update(messengerAccounts)
-              .set({
-                imapIsConnected: true,
-                imapLastSyncAt: new Date(),
-                imapSyncError: null,
-                updatedAt: new Date(),
-              })
-              .where(eq(messengerAccounts.id, account.id));
-
-            logger.debug(`Successfully synced account: ${account.email}`);
-          } else {
-            errors.push(
-              fail({
-                message: t("imap.sync.errors.account_failed"),
-                errorType: ErrorResponseTypes.UNKNOWN_ERROR,
-                messageParams: { error: accountResult.message },
-              }),
-            );
-
-            // Update error state in messenger_accounts
-            await db
-              .update(messengerAccounts)
-              .set({
-                imapIsConnected: false,
-                imapSyncError: accountResult.message,
-                updatedAt: new Date(),
-              })
-              .where(eq(messengerAccounts.id, account.id));
-
-            logger.error(
-              `Failed to sync account: ${account.email}`,
-              accountResult.message,
-            );
-          }
-        } catch (error) {
-          const errorMessage = parseError(error).message;
-          errors.push(
-            fail({
-              message: t("imapErrors.sync.account.failed"),
-              errorType: ErrorResponseTypes.INTERNAL_ERROR,
-              messageParams: { error: errorMessage },
-            }),
-          );
-
-          // Update error state in messenger_accounts
-          await db
-            .update(messengerAccounts)
-            .set({
-              imapIsConnected: false,
-              imapSyncError: errorMessage,
-              updatedAt: new Date(),
-            })
-            .where(eq(messengerAccounts.id, account.id));
-
-          logger.error(
-            `Error syncing account ${account.email}`,
-            parseError(error),
-          );
-        }
-      }
-
-      const duration = Date.now() - startTime;
-      const isSuccessful = errors.length === 0;
-
-      const result: SyncResult = {
-        success: isSuccessful,
-        message: isSuccessful
-          ? t("imap.sync.messages.accounts.success")
-          : t("imap.sync.messages.accounts.successWithErrors"),
-        results: {
-          accountsProcessed,
-          foldersProcessed,
-          messagesProcessed,
-          foldersAdded,
-          foldersUpdated,
-          foldersDeleted,
-          messagesAdded,
-          messagesUpdated,
-          messagesDeleted,
-          duration,
-          errors,
-        },
-      };
-
-      logger.debug("Completed sync for all accounts");
-      return success({ result });
-    } catch (error) {
-      logger.error("Error in syncAllAccounts", parseError(error));
-
-      return fail({
-        message: t("imapErrors.sync.failed"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      });
-    }
-  }
-
   static async syncAccount(
     account: ImapAccountShape,
     logger: EndpointLogger,
@@ -381,7 +216,9 @@ export class ImapSyncRepository {
       logger.error(`Error syncing account ${account.email}`, parseError(error));
 
       return fail({
-        message: t("imapErrors.sync.account.failed"),
+        message: t("imapErrors.sync.account.failed", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -482,9 +319,10 @@ export class ImapSyncRepository {
           logger.error("Error syncing folder", parseError(error));
           errors.push(
             fail({
-              message: t("imap.sync.errors.folder_sync_failed"),
+              message: t("imap.sync.errors.folder_sync_failed", {
+                error: parseError(error).message,
+              }),
               errorType: ErrorResponseTypes.UNKNOWN_ERROR,
-              messageParams: { error: parseError(error).message },
             }),
           );
           logger.error(

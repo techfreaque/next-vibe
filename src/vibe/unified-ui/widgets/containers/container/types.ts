@@ -2,13 +2,13 @@
  * Container Widget Type Definitions
  */
 
-import type { InferSchemaFromField } from "next-vibe/core/definition/endpoint";
+import type { InferSchemaFromField } from "../../../../core/definition/endpoint";
 import type {
   FieldUsage,
   LayoutType,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import type { WidgetData } from "next-vibe/core/utils/json";
+} from "../../../../core/definition/enums";
+import type { WidgetData } from "../../../../core/utils/json";
 import type {
   ArrayChildConstraint,
   BaseArrayWidgetConfig,
@@ -18,10 +18,10 @@ import type {
   FieldUsageConfig,
   ObjectChildrenConstraint,
   UnionObjectWidgetConfigConstrain,
-} from "next-vibe/unified-ui/_shared/types";
-import type { CustomWidgetObjectConfig } from "next-vibe/unified-ui/widgets/containers/custom/types";
-import type { SpacingSize } from "next-vibe/unified-ui/widgets/display-only/title/types";
-import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+} from "../../../_shared/types";
+import type { CustomWidgetObjectConfig } from "../custom/types";
+import type { SpacingSize } from "../../display-only/title/types";
+import type { IconKey } from "../../form-fields/icon-field/icons";
 import type { z } from "zod";
 
 /**

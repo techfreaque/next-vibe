@@ -49,14 +49,22 @@ export const translations = {
       validation: { title: "Validation Error", description: "Invalid request" },
       unauthorized: { title: "Unauthorized", description: "Not authorized" },
       forbidden: { title: "Forbidden", description: "Access denied" },
-      notFound: { title: "Not Found", description: "Creator not found" },
+      notFound: {
+        title: "Not Found",
+        description: "Creator not found",
+        detail: "No creator profile exists for {{userId}}",
+      },
       conflict: { title: "Conflict", description: "Request conflict" },
       network: { title: "Network Error", description: "Network error" },
       unsavedChanges: {
         title: "Unsaved Changes",
         description: "Unsaved changes",
       },
-      internal: { title: "Server Error", description: "Internal error" },
+      internal: {
+        title: "Server Error",
+        description: "Internal error",
+        detail: "Could not load this creator profile: {{error}}",
+      },
       unknown: { title: "Unknown Error", description: "Unknown error" },
     },
     success: {

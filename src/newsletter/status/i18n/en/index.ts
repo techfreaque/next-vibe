@@ -29,6 +29,7 @@ export const translations = {
     internal: {
       title: "Internal Error",
       description: "An error occurred while checking the subscription status",
+      detail: "Subscription status check failed: {{error}}",
     },
     unauthorized: {
       title: "Unauthorized",

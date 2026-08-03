@@ -2,6 +2,7 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { Platform } from "next-vibe/platforms/platforms";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Button } from "next-vibe/ui/ui/button";
 import {
@@ -105,10 +106,12 @@ export function ReferralPageClient({
   locale,
   isAuthenticated,
   user,
+  platform,
 }: {
   locale: CountryLanguage;
   isAuthenticated: boolean;
   user: JwtPayloadType;
+  platform: Platform;
 }): JSX.Element {
   const { t } = pageT.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
@@ -291,6 +294,7 @@ export function ReferralPageClient({
                 endpoint={referralStatsDefinition}
                 user={user}
                 locale={locale}
+                platform={platform}
               />
             </Div>
             <Div>
@@ -298,6 +302,7 @@ export function ReferralPageClient({
                 endpoint={referralPayoutDefinition}
                 user={user}
                 locale={locale}
+                platform={platform}
               />
             </Div>
             <Card>
@@ -313,6 +318,7 @@ export function ReferralPageClient({
                   endpoint={referralDefinition}
                   user={user}
                   locale={locale}
+                  platform={platform}
                 />
               </CardContent>
             </Card>
@@ -329,6 +335,7 @@ export function ReferralPageClient({
                   endpoint={referralCodesListDefinition}
                   user={user}
                   locale={locale}
+                  platform={platform}
                 />
               </CardContent>
             </Card>

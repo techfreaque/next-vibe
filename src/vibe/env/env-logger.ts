@@ -3,7 +3,7 @@
  * Simple logger for environment validation that works in both browser and server contexts
  */
 
-import type { EndpointLogger } from "next-vibe/logger/types";
+import type { EndpointLogger } from "../logger/types";
 
 declare const process: {
   env: {

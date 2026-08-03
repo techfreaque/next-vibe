@@ -1,13 +1,13 @@
 import "server-only";
 
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { ResponseType } from "../../../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { kubectl } from "next-vibe/tooling/infra/shared/pulumi/k3s/scripts";
+} from "../../../../../core/route/response.schema";
+import { parseError } from "../../../../../core/utils/parse-error";
+import { kubectl } from "../k3s/scripts";
 
 import type { ClientT } from "@/ssh/client";
 import {

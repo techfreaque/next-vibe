@@ -16,7 +16,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { createEndpointEmitter } from "next-vibe/realtime/emitter";
+import { createEndpointEmitter } from "next-vibe/realtime/core/emitter";
 
 import { isUuid } from "../../../chat/slugify";
 import { chatFavorites } from "../db";

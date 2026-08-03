@@ -2,12 +2,12 @@
  * DatePicker Component for React Native
  * Date input with calendar - placeholder implementation
  */
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import React, { useState } from "react";
 import { Pressable, View } from "react-native";
 
-import { Calendar as CalendarIcon } from "../../native/ui/icons/Calendar";
-import { convertCSSToViewStyle } from "../../native/utils/style-converter";
+import { Calendar as CalendarIcon } from "./icons/Calendar";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 // Import all types from web (web is source of truth)
 import type { DatePickerProps } from "../../web/ui/date-picker";
 import { applyStyleType } from "../../web/utils/style-type";

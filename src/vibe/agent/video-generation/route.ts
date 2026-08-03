@@ -14,7 +14,15 @@ import { VideoGenerationRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, user, locale, logger, t, toolExecutionContext }) =>
+    handler: ({
+      data,
+      user,
+      locale,
+      logger,
+      t,
+      toolExecutionContext,
+      platform,
+    }) =>
       VideoGenerationRepository.generateVideo(
         data,
         user,
@@ -22,6 +30,7 @@ export const { POST, tools } = endpointsHandler({
         logger,
         t,
         toolExecutionContext,
+        platform,
       ),
     requestDefaults: (ctx) => VideoGenerationRepository.getRequestDefaults(ctx),
   },

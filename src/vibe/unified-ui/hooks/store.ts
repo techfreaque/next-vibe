@@ -1,18 +1,17 @@
 import type { QueryKey } from "@tanstack/react-query";
 import { QueryClient } from "@tanstack/react-query";
-import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
-import { type CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { Methods } from "next-vibe/core/definition/enums";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
+import { type CreateApiEndpointAny } from "../../core/definition/endpoint-base";
+import type { Methods } from "../../core/definition/enums";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import type { TranslatedKeyType } from "../../core/i18n/core/scoped-translation";
 import type {
   ErrorResponseType,
   ResponseType,
-} from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { generateStorageKey } from "next-vibe/unified-ui/hooks/storage-client";
+} from "../../core/route/response.schema";
+import type { WidgetData } from "../../core/utils/json";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
+import { generateStorageKey } from "./storage-client";
 import { z } from "zod";
 import { create } from "zustand";
 
@@ -368,7 +367,7 @@ export function deserializeQueryParams<T>(
     return {} as T;
   }
 
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Storage deserialization requires generic type handling
+  // eslint-disable-next-line restricted/no-unknown -- Storage deserialization requires generic type handling
   const result: Record<string, unknown> = {};
 
   for (const [key, value] of Object.entries(params)) {
@@ -414,7 +413,6 @@ export const apiClient = {
       ? undefined
       : TEndpoint["types"]["UrlVariablesOutput"],
     locale: CountryLanguage,
-    availability: AgentEnvAvailability,
     options: Omit<
       ApiQueryOptions<
         TEndpoint["types"]["RequestOutput"],
@@ -427,7 +425,7 @@ export const apiClient = {
     } = {},
   ): Promise<ResponseType<TEndpoint["types"]["ResponseOutput"]>> => {
     // Check if the endpoint expects undefined for request data
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Schema type cast requires 'unknown' for runtime type compatibility
+    // eslint-disable-next-line restricted/no-unknown -- Infrastructure: Schema type cast requires 'unknown' for runtime type compatibility
     const requestSchema = endpoint.requestSchema as unknown as z.ZodTypeAny;
     const isUndefinedSchema =
       requestSchema.safeParse(undefined).success &&
@@ -468,7 +466,6 @@ export const apiClient = {
       pathParams: pathParams as never,
       locale,
       user,
-      availability,
       options: {
         onSuccess: options.onSuccess,
         onError: options.onError,
@@ -492,7 +489,6 @@ export const apiClient = {
       ? undefined
       : TEndpoint["types"]["UrlVariablesOutput"],
     locale: CountryLanguage,
-    availability: AgentEnvAvailability,
     options: ApiMutationOptions<
       TEndpoint["types"]["RequestOutput"],
       TEndpoint["types"]["ResponseOutput"],
@@ -508,7 +504,6 @@ export const apiClient = {
       pathParams: pathParams as never,
       locale,
       user,
-      availability,
       options: {
         onSuccess: options.onSuccess
           ? (context) =>
@@ -519,7 +514,6 @@ export const apiClient = {
                 logger: context.logger,
                 user: context.user,
                 locale: context.locale,
-                availability: context.availability,
               })
           : undefined,
         onError: options.onError

@@ -161,9 +161,10 @@ export class MessengerAccountsListRepository {
     } catch (error) {
       logger.error("Error getting messenger accounts", parseError(error));
       return fail({
-        message: t("errors.server.title"),
+        message: t("errors.server.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }

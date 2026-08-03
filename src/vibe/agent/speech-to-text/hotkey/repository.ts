@@ -7,8 +7,8 @@
 
 import "server-only";
 
-import { rootlessToolExecutionContext } from "next-vibe/agent/chat/config";
-import type { SpeechToTextT } from "next-vibe/agent/speech-to-text/i18n";
+import { rootlessToolExecutionContext } from "next-vibe/core/execution-context";
+import type { SpeechToTextT } from "../i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -78,12 +78,11 @@ export class SttHotkeyRepository {
           missing: deps.missing.join(", "),
         });
         return fail({
-          message: t("hotkey.post.errors.dependenciesMissing"),
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: {
+          message: t("hotkey.post.errors.dependenciesMissing", {
             missing: deps.missing.join(", "),
             recommendations: deps.recommendations.join("; "),
-          },
+          }),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
 
@@ -134,9 +133,8 @@ export class SttHotkeyRepository {
         default:
           // No action provided - should not happen from CLI daemon mode
           return fail({
-            message: t("hotkey.post.errors.invalidAction"),
+            message: t("hotkey.post.errors.noActionProvided"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            messageParams: { action: "none" },
           });
       }
     } catch (error) {
@@ -166,9 +164,8 @@ export class SttHotkeyRepository {
       const errorMessage = parseError(error).message;
 
       return fail({
-        message: t("hotkey.post.errors.actionFailed"),
+        message: t("hotkey.post.errors.actionFailed", { error: errorMessage }),
         errorType: ErrorResponseTypes.UNKNOWN_ERROR,
-        messageParams: { error: errorMessage },
       });
     }
   }

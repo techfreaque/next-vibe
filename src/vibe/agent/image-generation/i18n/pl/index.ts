@@ -1,5 +1,5 @@
 // oxlint-disable-next-line oxlint-plugin-boilerplate/i18n-pattern
-import { translations as modelTranslations } from "next-vibe/agent/models/i18n/pl";
+import { translations as modelTranslations } from "../../../models/i18n/pl";
 
 import type { translations as enTranslations } from "../en";
 
@@ -108,6 +108,8 @@ export const translations: typeof enTranslations = {
         "Wybrany model nie obsługuje generowania obrazów. Wybierz model obrazu.",
       notConfigured:
         "{{label}} nie jest skonfigurowany. Dodaj {{envKey}} do pliku .env. Pobierz klucz pod adresem {{url}}",
+      providerUnavailable:
+        "{{label}} jest teraz niedostępny. Wybierz inny model na {{url}}",
       insufficientCredits:
         "Niewystarczające kredyty. Saldo: {{balance}}, wymagane: {{minimum}}",
       balanceCheckFailed: "Nie udało się sprawdzić salda kredytów",
@@ -120,6 +122,7 @@ export const translations: typeof enTranslations = {
       generationFailed: "Generowanie obrazu nie powiodło się",
       providerError: "Błąd dostawcy: {{error}}",
       noImageUrl: "Dostawca nie zwrócił URL obrazu",
+      noImageGenerated: "Model nie wygenerował żadnego obrazu",
       creditsFailed: "Nie udało się odjąć kredytów za generowanie obrazu",
       apiKeyNotConfigured: "Klucz API nie jest skonfigurowany",
       externalServiceError: "Błąd zewnętrznej usługi: {{message}}",
@@ -127,6 +130,8 @@ export const translations: typeof enTranslations = {
       requestTimedOut: "Przekroczono czas oczekiwania na generowanie obrazu",
       requestFailed: "Żądanie nie powiodło się: {{message}}",
       pollFailed: "Odpytywanie nie powiodło się ze statusem {{status}}",
+      nonJsonResponse:
+        "Dostawca zwrócił odpowiedź spoza formatu JSON (HTTP {{status}}): {{body}}",
     },
     success: {
       title: "Obraz wygenerowany",

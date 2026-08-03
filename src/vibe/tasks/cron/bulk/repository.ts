@@ -6,21 +6,21 @@
 import "server-only";
 
 import { and, eq, inArray, or } from "drizzle-orm";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { CronBulkT } from "next-vibe/tasks/cron/bulk/i18n";
-import { scopedTranslation as executeTranslation } from "next-vibe/tasks/execute/i18n";
-import { TaskExecuteRepository } from "next-vibe/tasks/execute/repository";
+} from "../../../core/route/response.schema";
+import { parseError } from "../../../core/utils/parse-error";
+import { db } from "../../../database";
+import type { JwtPayloadType } from "../../../identity/auth/types";
+import { UserPermissionRole } from "../../../identity/roles/enum";
+import type { EndpointLogger } from "../../../logger/types";
+import type { CronBulkT } from "./i18n";
+import { scopedTranslation as executeTranslation } from "../../execute/i18n";
+import { TaskExecuteRepository } from "../../execute/repository";
 
 import type { TaskOwner } from "../db";
 import { cronTasks, dbUserIdToOwner } from "../db";

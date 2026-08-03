@@ -85,7 +85,7 @@ export const forwardLead: ForwardLeadFn = async (credentials, lead, t) => {
     spotlerConsumerSecret,
   );
 
-  // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+  // oxlint-disable-next-line restricted/no-raw-fetch
   const response = await fetch(apiContactsUrl, {
     method: "POST",
     headers: {

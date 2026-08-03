@@ -10,7 +10,7 @@ import type { Metadata } from "next";
 import { DEFAULT_CHAT_MODEL_SELECTION } from "next-vibe/agent/ai-stream/constants";
 import { getBestChatModel } from "next-vibe/agent/ai-stream/models";
 import { parseSkillId } from "next-vibe/agent/chat/slugify";
-import { getInstanceAvailability } from "next-vibe/agent/env-availability";
+import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import { getBestImageGenModel } from "next-vibe/agent/image-generation/models";
 import { modelProviders } from "next-vibe/agent/models/models";
 import { getBestMusicGenModel } from "next-vibe/agent/music-generation/models";
@@ -25,6 +25,7 @@ import { UserRole } from "next-vibe/identity/roles/enum";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
+import { Platform } from "next-vibe/platforms/platforms";
 import { Div } from "next-vibe/ui/ui/div";
 import type { JSX } from "react";
 
@@ -91,6 +92,7 @@ export interface SkillLandingPageData {
   locale: CountryLanguage;
   skillId: string;
   user: JwtPayloadType;
+  platform: Platform;
   signupUrl: string;
   appName: string;
   resolvedModels: ResolvedSkillModels;
@@ -135,7 +137,7 @@ export async function tanstackLoader({
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
 
-  const availability = await getInstanceAvailability();
+  const availability = await getEnvAvailability();
 
   // Resolve per-variant model info server-side - avoids SSR circular dep in client bundle.
   const resolvedVariants: ResolvedSkillModels["variants"] = [];
@@ -302,6 +304,7 @@ export async function tanstackLoader({
     locale,
     skillId,
     user: skillUser,
+    platform: Platform.NEXT_PAGE,
     signupUrl,
     appName,
     resolvedModels,

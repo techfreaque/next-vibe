@@ -211,44 +211,8 @@ export class ImapSyncRepository {
       const parsedError = parseError(error);
       logger.error("Error in IMAP sync operation", parsedError);
       return fail({
-        message: t("errors.server.title"),
+        message: t("errors.server.detail_sync", { error: parsedError.message }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
-      });
-    }
-  }
-
-  /**
-   * Get sync status for all accounts
-   * Note: Returns same format as POST to match type definition
-   */
-  static getSyncStatus(
-    user: JwtPayloadType,
-    logger: EndpointLogger,
-    t: ImapSyncT,
-  ): ResponseType<ImapSyncPostResponseOutput> {
-    try {
-      logger.info("Getting IMAP sync status", { userId: user.id });
-
-      // Since GET returns same type as POST, return an empty sync result
-      // In a real implementation, this might fetch recent sync statistics
-      return success({
-        accountsProcessed: 0,
-        foldersProcessed: 0,
-        messagesProcessed: 0,
-        messagesAdded: 0,
-        messagesUpdated: 0,
-        messagesDeleted: 0,
-        duration: 0,
-        errors: [],
-      });
-    } catch (error) {
-      const parsedError = parseError(error);
-      logger.error("Error getting IMAP sync status", parsedError);
-      return fail({
-        message: t("errors.server.title"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
       });
     }
   }

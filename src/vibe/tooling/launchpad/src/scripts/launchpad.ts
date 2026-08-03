@@ -5,16 +5,13 @@ import inquirer from "inquirer";
 import {
   type CountryLanguage,
   defaultLocale,
-} from "next-vibe/core/i18n/core/config";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { createEndpointLogger } from "next-vibe/logger/server";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { scopedTranslation as launchpadScopedTranslation } from "next-vibe/tooling/launchpad/i18n";
-import type { VersionBumpType } from "next-vibe/tooling/launchpad/src/types/types";
-import {
-  getRootDirectory,
-  loadConfig,
-} from "next-vibe/tooling/launchpad/src/utils/config";
+} from "../../../../core/i18n/core/config";
+import { parseError } from "../../../../core/utils/parse-error";
+import { createEndpointLogger } from "../../../../logger/server";
+import type { EndpointLogger } from "../../../../logger/types";
+import { scopedTranslation as launchpadScopedTranslation } from "../../i18n";
+import type { VersionBumpType } from "../types/types";
+import { getRootDirectory, loadConfig } from "../utils/config";
 
 import { cloneMissingRepos } from "./clone-missing";
 import { navigateFolders } from "./navigate-folders";
@@ -136,7 +133,7 @@ program
         ) {
           versionBump = typedValue;
         } else {
-          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- CLI script throws for error reporting at startup
+          // eslint-disable-next-line restricted/restricted-syntax -- CLI script throws for error reporting at startup
           throw new Error(
             `Invalid version bump type: ${typedValue}. Must be one of: patch, minor, major, init`,
           );
@@ -193,7 +190,7 @@ program
 function handleError(
   logger: EndpointLogger,
   message: string,
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build Infrastructure: Package.json parsing requires 'unknown' for flexible config structure
+  // eslint-disable-next-line restricted/no-unknown -- Build Infrastructure: Package.json parsing requires 'unknown' for flexible config structure
   error: unknown,
 ): never {
   logger.error(message, parseError(error));

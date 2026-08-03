@@ -11,7 +11,7 @@
 
 export const dynamic = "force-dynamic";
 
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { NEW_MESSAGE_ID } from "next-vibe/agent/chat/enum";
 import type { FolderContentsResponseOutput } from "next-vibe/agent/chat/folder-contents/[rootFolderId]/definition";
 import { scopedTranslation as folderContentsScopedTranslation } from "next-vibe/agent/chat/folder-contents/[rootFolderId]/i18n";
@@ -50,6 +50,7 @@ import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { scopedTranslation as userScopedTranslation } from "next-vibe/identity/user/i18n";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
+import { Platform } from "next-vibe/platforms/platforms";
 import { redirect } from "next-vibe/ui/lib/redirect";
 import { Div } from "next-vibe/ui/ui/div";
 import type { JSX } from "react";
@@ -74,6 +75,7 @@ interface ThreadsPathPageProps {
 export interface ThreadsPathPageData {
   locale: CountryLanguage;
   user: JwtPayloadType | null;
+  platform: Platform;
   creditsToUse: CreditsGetResponseOutput;
   initialRootFolderId: DefaultFolderId;
   initialSubFolderId: string | null;
@@ -124,6 +126,7 @@ export async function tanstackLoader({
     return {
       locale,
       user: null,
+      platform: Platform.NEXT_PAGE,
       creditsToUse: {
         total: 0,
         expiring: 0,
@@ -441,6 +444,7 @@ export async function tanstackLoader({
   return {
     locale,
     user,
+    platform: Platform.NEXT_PAGE,
     creditsToUse,
     initialRootFolderId,
     initialSubFolderId,

@@ -56,11 +56,13 @@ export const translations: typeof enTranslations = {
         notFound: {
           title: "Tool nicht gefunden",
           description: "Kein registriertes Tool mit diesem Namen gefunden",
+          detail: 'Kein registriertes Tool mit dem Namen "{{toolName}}"',
         },
         remoteFailed: {
           title: "Remote-Tool fehlgeschlagen: {{message}}",
           description:
             "Die Remote-Instanz hat den Aufruf abgelehnt oder er ist fehlgeschlagen",
+          detail: 'Remote-Tool "{{toolName}}" fehlgeschlagen: {{message}}',
         },
         server: {
           title: "Ausführungsfehler",
@@ -73,6 +75,7 @@ export const translations: typeof enTranslations = {
         unknown: {
           title: "Unbekannter Fehler",
           description: "Ein unerwarteter Fehler ist aufgetreten",
+          detail: "Unbekannter Fehler bei der Ausführung: {{error}}",
         },
       },
       success: {

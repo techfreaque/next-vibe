@@ -1,11 +1,12 @@
 "use client";
-import foldersDefinition from "next-vibe/agent/chat/folders/[rootFolderId]/definition";
-import { useChatBootContext } from "next-vibe/agent/chat/hooks/context";
-import { useChatNavigationStore } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
-import { scopedTranslation } from "next-vibe/agent/chat/threads/widget/i18n";
+import foldersDefinition from "../../../../../chat/folders/[rootFolderId]/definition";
+import { useChatBootContext } from "../../../../../chat/hooks/context";
+import { useChatNavigationStore } from "../../../../../chat/hooks/use-chat-navigation-store";
+import { scopedTranslation } from "../../../../../chat/threads/widget/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import type { Platform } from "next-vibe/platforms/platforms";
 import { useWindowSize } from "next-vibe/ui/hooks/use-window-size";
 import { Div } from "next-vibe/ui/ui/div";
 import { AnimatePresence, MotionDiv } from "next-vibe/ui/ui/motion";
@@ -26,6 +27,7 @@ interface SidebarWrapperProps {
   locale: CountryLanguage;
   user: JwtPayloadType;
   logger: EndpointLogger;
+  platform: Platform;
   children?: ReactNode;
 }
 
@@ -33,10 +35,12 @@ function WidgetSidebar({
   locale,
   user,
   logger,
+  platform,
 }: {
   locale: CountryLanguage;
   user: JwtPayloadType;
   logger: EndpointLogger;
+  platform: Platform;
 }): JSX.Element {
   const { initialFoldersData, initialRootFolderId } = useChatBootContext();
 
@@ -71,6 +75,7 @@ function WidgetSidebar({
         endpoint={foldersDefinition}
         locale={locale}
         user={user}
+        platform={platform}
         forceMethod="GET"
         className="flex-1 h-full overflow-hidden"
         endpointOptions={foldersEndpointOptions}
@@ -84,6 +89,7 @@ export function SidebarWrapper({
   locale,
   user,
   logger,
+  platform,
   children,
 }: SidebarWrapperProps): JSX.Element {
   const [collapsed, setSidebarCollapsed] = useSidebarCollapsed();
@@ -110,7 +116,12 @@ export function SidebarWrapper({
               )}
             >
               <Div className="h-full w-full bg-background">
-                <WidgetSidebar locale={locale} user={user} logger={logger} />
+                <WidgetSidebar
+                  locale={locale}
+                  user={user}
+                  logger={logger}
+                  platform={platform}
+                />
               </Div>
             </MotionDiv>
           )}
@@ -156,7 +167,12 @@ export function SidebarWrapper({
               transition={{ duration: 0.4, ease: "easeInOut" }}
               className="h-full"
             >
-              <WidgetSidebar locale={locale} user={user} logger={logger} />
+              <WidgetSidebar
+                locale={locale}
+                user={user}
+                logger={logger}
+                platform={platform}
+              />
             </MotionDiv>
           )}
         </AnimatePresence>

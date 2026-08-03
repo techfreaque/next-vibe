@@ -6,23 +6,23 @@
 import "server-only";
 
 import { eq, sql } from "drizzle-orm";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
-import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
-import { fail, success } from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
-import { scopedTranslation } from "next-vibe/execute-tool/complete/i18n";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { CronTaskRow } from "next-vibe/tasks/cron/db";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import type { ResponseType } from "../../core/route/response.schema";
+import { ErrorResponseTypes } from "../../core/route/response.schema";
+import { fail, success } from "../../core/route/response.schema";
+import { parseError } from "../../core/utils/parse-error";
+import { db } from "../../database";
+import { scopedTranslation } from "./i18n";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
+import type { CronTaskRow } from "../../tasks/cron/db";
 import {
   cronTaskExecutions,
   cronTasks,
   dbUserIdToOwner,
-} from "next-vibe/tasks/cron/db";
-import { resolveTaskOwnerUser } from "next-vibe/tasks/cron/resolve-task-user";
-import { CronTaskStatus } from "next-vibe/tasks/enum";
+} from "../../tasks/cron/db";
+import { resolveTaskOwnerUser } from "../../tasks/cron/resolve-task-user";
+import { CronTaskStatus } from "../../tasks/enum";
 
 import type { CallbackModeValue } from "../constants";
 import { CallbackMode } from "../constants";
@@ -118,7 +118,7 @@ export class TaskReportRepository {
 
     try {
       const { RemoteConnectionRepository } =
-        await import("next-vibe/remote-connection/repository");
+        await import("../../remote-connection/repository");
       const selfInstanceId =
         owner.type === "user"
           ? await RemoteConnectionRepository.getLocalInstanceId(owner.userId)

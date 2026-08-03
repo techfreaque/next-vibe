@@ -185,6 +185,7 @@ export const translations = {
     generate: "Generate",
     editConfirmHint: "[Enter] confirm  [Esc] cancel",
     editSettings: "Edit settings",
+    exit: "Exit",
     loading: "Loading settings...",
     moduleLabels: {
       env: "Core",
@@ -204,6 +205,7 @@ export const translations = {
     alreadyConfigured: "Already configured",
     stepOf: "Step {{step}} of {{total}}",
     next: "Next",
+    continue: "Continue",
     back: "Back",
     skip: "Skip this step",
     finish: "Finish Setup",

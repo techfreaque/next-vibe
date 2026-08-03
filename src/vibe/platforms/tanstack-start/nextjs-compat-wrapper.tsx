@@ -83,7 +83,7 @@ export async function runPageLoader<T>(run: () => Promise<T>): Promise<T> {
         error instanceof ReferenceError &&
         error.message.includes("__vite_ssr_import_");
       if (!isPartialModule || attempt >= 20) {
-        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- loader errors must propagate to the router's error handling
+        // oxlint-disable-next-line restricted/restricted-syntax -- loader errors must propagate to the router's error handling
         throw error;
       }
       await new Promise((resolve) => {

@@ -9,17 +9,17 @@
  * sync-provider reuses it.
  */
 
-import { chatModelSelectionSchema } from "next-vibe/agent/ai-stream/models";
+import { chatModelSelectionSchema } from "../ai-stream/models";
 import {
   audioVisionModelSelectionSchema,
   imageVisionModelSelectionSchema,
   videoVisionModelSelectionSchema,
-} from "next-vibe/agent/ai-stream/vision-models";
-import { imageGenModelSelectionSchema } from "next-vibe/agent/image-generation/models";
-import { musicGenModelSelectionSchema } from "next-vibe/agent/music-generation/models";
-import { sttModelSelectionSchema } from "next-vibe/agent/speech-to-text/models";
-import { voiceModelSelectionSchema } from "next-vibe/agent/text-to-speech/models";
-import { videoGenModelSelectionSchema } from "next-vibe/agent/video-generation/models";
+} from "../ai-stream/vision-models";
+import { imageGenModelSelectionSchema } from "../image-generation/models";
+import { musicGenModelSelectionSchema } from "../music-generation/models";
+import { sttModelSelectionSchema } from "../speech-to-text/models";
+import { voiceModelSelectionSchema } from "../text-to-speech/models";
+import { videoGenModelSelectionSchema } from "../video-generation/models";
 import { iconSchema } from "next-vibe/core/definition/common.schema";
 import { z } from "zod";
 
@@ -135,8 +135,3 @@ export const syncedSkillSchema = z.object({
 });
 
 export type SyncedSkill = z.infer<typeof syncedSkillSchema>;
-
-/** Payload of the skill-created-full / skill-updated-full remote events. */
-export const skillFullEventSchema = z.object({
-  skills: z.array(syncedSkillSchema),
-});

@@ -7,38 +7,38 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 import { jwtVerify, SignJWT } from "jose";
-import { coreEnv } from "next-vibe/core/env";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { coreEnv } from "../../core/env";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import { getLanguageAndCountryFromLocale } from "../../core/i18n/core/language-utils";
+import type { ResponseType } from "../../core/route/response.schema";
+import { throwErrorResponse } from "../../core/route/error-response-error";
 import {
   ErrorResponseTypes,
   fail,
   success,
-  throwErrorResponse,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
-import { Environment } from "next-vibe/env/env-util";
-import { scopedTranslation } from "next-vibe/identity/auth/i18n";
-import { identityEnv } from "next-vibe/identity/env";
-import { leads, userLeadLinks } from "next-vibe/identity/lead/db";
-import { LeadAuthRepository } from "next-vibe/identity/lead/device-auth";
-import { LeadSource, LeadStatus } from "next-vibe/identity/lead/enum";
-import type { UserRoleValue } from "next-vibe/identity/roles/enum";
+} from "../../core/route/response.schema";
+import { parseError } from "../../core/utils/parse-error";
+import { db } from "../../database";
+import { Environment } from "../../env/env-util";
+import { scopedTranslation } from "./i18n";
+import { identityEnv } from "../env";
+import { leads, userLeadLinks } from "../lead/db";
+import { LeadAuthRepository } from "../lead/device-auth";
+import { LeadSource, LeadStatus } from "../lead/enum";
+import type { UserRoleValue } from "../roles/enum";
 import {
   filterUserPermissionRoles,
   UserPermissionRole,
   UserRole,
-} from "next-vibe/identity/roles/enum";
-import { UserRolesRepository } from "next-vibe/identity/roles/repository";
-import { scopedTranslation as sessionScopedTranslation } from "next-vibe/identity/session/i18n";
-import { SessionRepository } from "next-vibe/identity/session/repository";
-import { users } from "next-vibe/identity/user/db";
-import { UserDetailLevel } from "next-vibe/identity/user/enum";
-import { UserRepository } from "next-vibe/identity/user/repository";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { isCliPlatform, Platform } from "next-vibe/platforms/platforms";
+} from "../roles/enum";
+import { UserRolesRepository } from "../roles/repository";
+import { scopedTranslation as sessionScopedTranslation } from "../session/i18n";
+import { SessionRepository } from "../session/repository";
+import { users } from "../user/db";
+import { UserDetailLevel } from "../user/enum";
+import { UserRepository } from "../user/repository";
+import type { EndpointLogger } from "../../logger/types";
+import { isCliPlatform, Platform } from "../../platforms/platforms";
 
 import {
   AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS,
@@ -700,9 +700,10 @@ export class AuthRepository {
       logger.error("Error signing JWT token", parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.jwt_signing_failed"),
+        message: t("errors.jwt_signing_failed", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -765,9 +766,10 @@ export class AuthRepository {
       });
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.invalid_token_signature"),
+        message: t("errors.invalid_token_signature_detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.UNAUTHORIZED,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -1229,9 +1231,10 @@ export class AuthRepository {
       logger.error("Error storing auth token for platform", parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.cookie_set_failed"),
+        message: t("errors.cookie_set_failed", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -1256,9 +1259,10 @@ export class AuthRepository {
       logger.error("Error clearing auth token for platform", parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.cookie_clear_failed"),
+        message: t("errors.cookie_clear_failed", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -1312,9 +1316,10 @@ export class AuthRepository {
       logger.error("Error creating CLI token", parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.jwt_signing_failed"),
+        message: t("errors.jwt_signing_failed", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -1361,9 +1366,8 @@ export class AuthRepository {
         logger.debug("User not found in database", { email });
         const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: t("errors.user_not_authenticated"),
+          message: t("errors.user_not_authenticated", { email }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { email },
         });
       }
 
@@ -1405,9 +1409,10 @@ export class AuthRepository {
       logger.error("Error authenticating by email", parsedError);
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.authentication_failed"),
+        message: t("errors.authentication_failed", {
+          error: parsedError.message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
       });
     }
   }

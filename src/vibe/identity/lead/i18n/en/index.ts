@@ -5217,6 +5217,7 @@ export const translations = {
         error: {
           server: {
             title: "Server error retrieving leads",
+            detail: "Server error retrieving leads: {{error}}",
           },
           not_found: {
             title: "Leads not found",

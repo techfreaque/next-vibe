@@ -16,9 +16,9 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import { CountriesArr, LanguagesArr } from "next-vibe/core/i18n/core/config";
-import { createRelationalDb } from "next-vibe/database/relational";
-import { users } from "next-vibe/identity/user/db";
+import { CountriesArr, LanguagesArr } from "../../core/i18n/core/config";
+import { createRelationalDb } from "../../database/relational";
+import { users } from "../user/db";
 import type { z } from "zod";
 
 import { CampaignType } from "@/messenger/accounts/enum";

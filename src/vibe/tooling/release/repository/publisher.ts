@@ -7,16 +7,16 @@ import { execSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { scopedTranslation } from "next-vibe/tooling/release/i18n";
+} from "../../../core/route/response.schema";
+import { parseError } from "../../../core/utils/parse-error";
+import type { EndpointLogger } from "../../../logger/types";
+import { scopedTranslation } from "../i18n";
 
 import type { CIEnvironment, PackageJson, ReleaseOptions } from "../definition";
 import { MESSAGES } from "./constants";
@@ -62,9 +62,11 @@ class Publisher {
           logger.error(`Required environment variable ${value} is not set`);
           const { t } = scopedTranslation.scopedT(locale);
           return fail({
-            message: t("ci.envVarMissing"),
+            message: t("ci.envVarMissing", {
+              variable: value,
+              package: packageName,
+            }),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
-            messageParams: { variable: value, package: packageName },
           });
         }
         ciEnv[key] = envValue;
@@ -95,9 +97,11 @@ class Publisher {
       logger.error(MESSAGES.CI_COMMAND_FAILED, parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("ci.commandFailed"),
+        message: t("ci.commandFailed", {
+          package: packageName,
+          error: String(error),
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { package: packageName, error: String(error) },
       });
     }
   }
@@ -177,9 +181,11 @@ class Publisher {
       logger.error(MESSAGES.NPM_PUBLISH_FAILED, parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("npm.publishFailed"),
+        message: t("npm.publishFailed", {
+          package: packageJson.name,
+          error: String(error),
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { package: packageJson.name, error: String(error) },
       });
     }
   }
@@ -223,9 +229,11 @@ class Publisher {
       logger.error(MESSAGES.JSR_PUBLISH_FAILED, parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("npm.publishFailed"),
+        message: t("jsr.failed", {
+          package: packageJson.name,
+          error: String(error),
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { package: packageJson.name, error: String(error) },
       });
     }
   }

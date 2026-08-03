@@ -130,9 +130,10 @@ export class MessengerAccountCreateRepository {
     } catch (error) {
       logger.error("Error creating messenger account", parseError(error));
       return fail({
-        message: t("errors.server.title"),
+        message: t("errors.server.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }

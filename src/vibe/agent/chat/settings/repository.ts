@@ -6,7 +6,7 @@
 import "server-only";
 
 import { and, count, eq, isNull, sql } from "drizzle-orm";
-import { getInstanceAvailability } from "next-vibe/agent/env-availability";
+import { getEnvAvailability } from "../../env-availability";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -19,7 +19,7 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { cronTasks } from "next-vibe/tasks/cron/db";
 
-import { DefaultFolderId } from "../config";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { chatFolders, chatThreads } from "../db";
 import { chatSettings } from "./db";
 import type {
@@ -150,7 +150,7 @@ export class ChatSettingsRepository {
         logger.debug("No settings found for user, returning defaults");
         const defaults = ChatSettingsRepositoryClient.getDefaults(
           user,
-          await getInstanceAvailability(),
+          await getEnvAvailability(),
         );
         return success({
           ...defaults,
@@ -171,7 +171,7 @@ export class ChatSettingsRepository {
       const setting = settings[0];
       const defaults = ChatSettingsRepositoryClient.getDefaults(
         user,
-        await getInstanceAvailability(),
+        await getEnvAvailability(),
       );
       const result: ChatSettingsGetResponseOutput = {
         selectedModel: setting.selectedModel ?? defaults.selectedModel,
@@ -240,7 +240,7 @@ export class ChatSettingsRepository {
 
       const defaults = ChatSettingsRepositoryClient.getDefaults(
         user,
-        await getInstanceAvailability(),
+        await getEnvAvailability(),
       );
 
       let result: typeof existing;

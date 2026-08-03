@@ -90,6 +90,7 @@ export const translations = {
     server: {
       title: "Server Error",
       description: "An internal server error occurred while sending",
+      detail: "Send failed: {{error}}",
     },
     unknown: {
       title: "Unknown Error",

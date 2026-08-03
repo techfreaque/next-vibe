@@ -19,33 +19,38 @@ import { join } from "node:path";
 import {
   getPreferredToolName,
   pathSegmentsToToolName,
-} from "next-vibe/core/core-utils/path";
-import type {
-  ApiSection,
-  CreateApiEndpointAny,
-} from "next-vibe/core/definition/endpoint-base";
-import type { EndpointMeta } from "next-vibe/core/definition/endpoints-meta";
-import type { Methods } from "next-vibe/core/definition/enums";
+} from "../../core-utils/path";
+import type { ApiSection, CreateApiEndpointAny } from "../endpoint-base";
+import type { EndpointMeta } from "../endpoints-meta";
+import type { Methods } from "../enums";
 import type {
   GeneratorContext,
   GeneratorResult,
-} from "next-vibe/core/generators/shared/shared-inputs";
+} from "../../generators/shared/shared-inputs";
 import {
   generateFileHeader,
+  getRelativeImportPath,
   jsonToTs,
   toImportUrl,
   toPosixPath,
   writeGeneratedFile,
-} from "next-vibe/core/generators/shared/utils";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { formatCount, formatWarning } from "next-vibe/logger/formatters";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../generators/shared/utils";
+import type { CountryLanguage } from "../../i18n/core/config";
+import type { WidgetData } from "../../utils/json";
+import { parseError } from "../../utils/parse-error";
+import { formatCount, formatWarning } from "../../../logger/formatters";
+import type { EndpointLogger } from "../../../logger/types";
 
-import { GENERATED_DIR } from "@/env/paths";
+import { GENERATED_DIR, VIBE_DIR } from "@/env/paths";
 
 const OUTPUT_DIR = `${GENERATED_DIR}/endpoints/meta`;
+
+/**
+ * Where EndpointMeta actually lives. The emitted import resolves from the
+ * generated file's directory, not this one — a hand-written "../endpoints-meta"
+ * pointed at <generated>/endpoints/endpoints-meta, which does not exist.
+ */
+const ENDPOINTS_META_MODULE = `${VIBE_DIR}/core/definition/endpoints-meta.ts`;
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -163,7 +168,11 @@ class EndpointsMetaGenerator {
           locale,
           logger,
         );
-        const content = EndpointsMetaGenerator.renderFile(entries, locale);
+        const content = EndpointsMetaGenerator.renderFile(
+          entries,
+          locale,
+          outputFile,
+        );
 
         await writeGeneratedFile(outputFile, content);
         filesWritten++;
@@ -338,8 +347,8 @@ class EndpointsMetaGenerator {
         const inputs: Record<string, Record<string, WidgetData>> = {};
         for (const key of allKeys) {
           inputs[key] = {
-            ...(examplesRaw.requests?.[key] ?? {}),
-            ...(examplesRaw.urlPathParams?.[key] ?? {}),
+            ...examplesRaw.requests?.[key],
+            ...examplesRaw.urlPathParams?.[key],
           };
         }
         examples = {
@@ -466,6 +475,7 @@ class EndpointsMetaGenerator {
   private static renderFile(
     entries: EndpointMeta[],
     locale: CountryLanguage,
+    outputFile: string,
   ): string {
     // eslint-disable-next-line i18next/no-literal-string
     const header = generateFileHeader(
@@ -479,7 +489,7 @@ class EndpointsMetaGenerator {
     // eslint-disable-next-line i18next/no-literal-string
     return `${header}
 
-import type { EndpointMeta } from "next-vibe/core/definition/endpoints-meta";
+import type { EndpointMeta } from "${getRelativeImportPath(ENDPOINTS_META_MODULE, outputFile)}";
 
 export const endpointsMeta: EndpointMeta[] = ${entriesTs};
 `;

@@ -65,11 +65,10 @@ export class EmailPreviewSendTestRepository {
       if (!template) {
         logger.warn("Template not found", { templateId: data.templateId });
         return fail({
-          message: t("preview.sendTest.error.templateNotFound"),
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: {
+          message: t("preview.sendTest.error.templateNotFound", {
             templateId: data.templateId,
-          },
+          }),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
 
@@ -95,11 +94,10 @@ export class EmailPreviewSendTestRepository {
           error: errorParsed,
         });
         return fail({
-          message: t("preview.sendTest.error.invalidProps"),
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: {
+          message: t("preview.sendTest.error.invalidProps", {
             error: errorParsed.message,
-          },
+          }),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
 
@@ -127,11 +125,10 @@ export class EmailPreviewSendTestRepository {
           error: sendResult.message,
         });
         return fail({
-          message: t("preview.sendTest.error.sendFailed"),
-          errorType: ErrorResponseTypes.EMAIL_ERROR,
-          messageParams: {
+          message: t("preview.sendTest.error.sendFailed", {
             error: sendResult.message,
-          },
+          }),
+          errorType: ErrorResponseTypes.EMAIL_ERROR,
         });
       }
 
@@ -144,7 +141,9 @@ export class EmailPreviewSendTestRepository {
 
       return success({
         success: true,
-        message: t("preview.sendTest.success", {
+        // `preview.sendTest.success` is the widget's static result heading, so the
+        // recipient detail needs its own key rather than a placeholder on that one.
+        message: t("preview.sendTest.successDetail", {
           email: data.recipientEmail,
         }),
       });
@@ -155,11 +154,10 @@ export class EmailPreviewSendTestRepository {
         templateId: data.templateId,
       });
       return fail({
-        message: t("preview.sendTest.error.sendFailed"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
+        message: t("preview.sendTest.error.sendFailed", {
           error: errorParsed.message,
-        },
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }

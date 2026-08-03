@@ -9,6 +9,8 @@ import "server-only";
 import { existsSync, readdirSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 
+import { PROJECT_IGNORE_DIRS } from "@/env/paths";
+
 /**
  * Options for directory scanning
  */
@@ -88,17 +90,9 @@ interface ScanResultWithSegments extends ScanResultWithRelative {
   pathSegments: string[];
 }
 
-/**
- * Default directories to exclude
- */
-const DEFAULT_EXCLUDE_DIRS = [
-  "node_modules",
-  ".git",
-  ".next",
-  ".tmp",
-  "dist",
-  ".dist",
-];
+// Exclusions come from the single list in ./utils - this file used to keep its
+// own copy, which had already drifted (it was missing "generated"). See the
+// comment on PROJECT_IGNORE_DIRS there for why duplicating it is a trap.
 
 /**
  * Scan directory recursively and find matching files
@@ -110,7 +104,7 @@ function scanDirectory(
   const {
     filePattern,
     extensions = [],
-    excludeDirs = DEFAULT_EXCLUDE_DIRS,
+    excludeDirs = PROJECT_IGNORE_DIRS,
     excludeFiles = [],
     excludePatterns = [],
     maxDepth,
@@ -224,19 +218,5 @@ export function findFilesByName(
   return scanDirectory(baseDir, {
     ...options,
     filePattern: fileName,
-  });
-}
-
-/**
- * Get all route.ts files in a directory
- */
-export function findRouteFiles(
-  directory: string,
-  excludePatterns: string[] = [],
-): ScanResultWithSegments[] {
-  return scanDirectory(directory, {
-    filePattern: "route.ts",
-    excludePatterns,
-    excludeDirs: [...DEFAULT_EXCLUDE_DIRS, "trpc", "generated"],
   });
 }

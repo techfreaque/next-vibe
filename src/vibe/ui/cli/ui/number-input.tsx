@@ -4,10 +4,11 @@
  */
 import { Box, Text, useInput } from "ink";
 import TextInput from "ink-text-input";
-import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useState } from "react";
 
+import { useCaptureArrows, useCliFieldFocus } from "../lib/focus-manager";
 import type { NumberInputProps } from "../../web/ui/number-input";
 
 export type { NumberInputProps } from "../../web/ui/number-input";
@@ -19,9 +20,23 @@ export function NumberInput({
   max,
   step = 1,
   disabled = false,
+  name,
 }: NumberInputProps): JSX.Element | null {
   const isMcp = useIsMcp();
   const [text, setText] = useState(String(value));
+  // Same focus participation as Input — without it every NumberInput on screen
+  // is simultaneously active: Tab moves nothing, ink-text-input renders each one
+  // focused, and a single arrow key steps EVERY number field at once.
+  const isFocused = useCliFieldFocus(name ?? "number");
+  // While focused, ↑/↓ step the value instead of moving to the next field.
+  useCaptureArrows(isFocused && !disabled);
+
+  // Each bound applies on its own: a field with only `min: 0` must still clamp
+  // at 0. Requiring both bounds meant a one-sided range clamped at neither.
+  const clamp = (n: number): number => {
+    const lower = min !== undefined ? Math.max(min, n) : n;
+    return max !== undefined ? Math.min(max, lower) : lower;
+  };
 
   useInput(
     (input, key) => {
@@ -29,19 +44,17 @@ export function NumberInput({
         return;
       }
       if (key.upArrow || input === "+") {
-        const next =
-          max !== undefined ? Math.min(max, value + step) : value + step;
+        const next = clamp(value + step);
         onChange?.(next);
         setText(String(next));
       }
       if (key.downArrow || input === "-") {
-        const next =
-          min !== undefined ? Math.max(min, value - step) : value - step;
+        const next = clamp(value - step);
         onChange?.(next);
         setText(String(next));
       }
     },
-    { isActive: !isMcp && !disabled },
+    { isActive: isFocused && !disabled },
   );
 
   if (isMcp) {
@@ -64,18 +77,17 @@ export function NumberInput({
 
   return (
     <Box>
+      {/* "▸ " survives ANSI stripping so agents can detect focus (same as Input). */}
+      <Text>{isFocused ? "▸ " : "  "}</Text>
       <TextInput
         value={text}
+        focus={isFocused}
         placeholder={String(value)}
         onChange={(t): void => {
           setText(t);
           const num = parseFloat(t);
           if (!isNaN(num)) {
-            const clamped =
-              min !== undefined && max !== undefined
-                ? Math.min(max, Math.max(min, num))
-                : num;
-            onChange?.(clamped);
+            onChange?.(clamp(num));
           }
         }}
       />

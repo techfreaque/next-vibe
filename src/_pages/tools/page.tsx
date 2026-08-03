@@ -19,6 +19,7 @@ interface ToolsPageProps {
 export interface ToolsPageData {
   locale: CountryLanguage;
   user: JwtPayloadType;
+  platform: Platform;
   initialHelpData: HelpGetResponseOutput | null;
 }
 
@@ -51,18 +52,20 @@ export async function tanstackLoader({
     logger.error("[SSR help] catch:", parseError(e));
   }
 
-  return { locale, user, initialHelpData };
+  return { locale, user, platform: Platform.NEXT_PAGE, initialHelpData };
 }
 
 export function TanstackPage({
   locale,
   user,
+  platform,
   initialHelpData,
 }: ToolsPageData): JSX.Element {
   return (
     <ToolsPageClient
       locale={locale}
       user={user}
+      platform={platform}
       initialHelpData={initialHelpData}
     />
   );

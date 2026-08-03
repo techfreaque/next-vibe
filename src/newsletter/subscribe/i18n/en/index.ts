@@ -55,6 +55,7 @@ export const translations = {
     internal: {
       title: "Internal Error",
       description: "An error occurred while processing your subscription",
+      detail: "Subscription failed: {{error}}",
     },
   },
   post: {

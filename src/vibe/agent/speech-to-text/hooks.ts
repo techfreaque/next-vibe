@@ -8,9 +8,8 @@
 import {
   type ChatT,
   scopedTranslation as chatScopedTranslation,
-} from "next-vibe/agent/chat/i18n";
+} from "../chat/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -282,19 +281,10 @@ export function useEdenAISpeech({
           }
         },
         onError: ({ error: apiError }) => {
-          // Use the error message directly (already human-readable from server)
-          // Apply messageParams to interpolate {{placeholders}} in the translated string
-          const rawMessage =
+          // Server already interpolated its placeholders, so the message is
+          // display-ready - no client-side substitution left to do.
+          const errorMessage =
             apiError.message ?? t("hooks.stt.transcription-failed");
-          const errorMessage = (
-            apiError.messageParams
-              ? Object.entries(apiError.messageParams).reduce(
-                  (msg, [key, val]) =>
-                    msg.replaceAll(`{{${key}}}`, String(val)),
-                  rawMessage as string,
-                )
-              : rawMessage
-          ) as TranslatedKeyType;
           logger.error("STT: API returned error", {
             errorType: apiError.errorType,
             errorMessage: apiError.message,

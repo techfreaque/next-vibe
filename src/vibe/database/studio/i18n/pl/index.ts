@@ -29,6 +29,7 @@ export const translations: typeof enTranslations = {
       server: {
         title: "Błąd serwera",
         description: "Wewnętrzny błąd serwera podczas uruchamiania studio",
+        detail: "Drizzle Studio nie uruchomiło się po {{seconds}}s: {{error}}",
       },
       internal: {
         title: "Błąd wewnętrzny",

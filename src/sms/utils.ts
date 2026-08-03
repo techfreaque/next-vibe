@@ -125,13 +125,6 @@ export interface SmsProvider {
   };
 }
 
-/**
- * Return type for SMS render functions
- */
-export type SmsRenderReturnType = ResponseType<
-  SmsTemplateReturnType | SmsTemplateReturnType[]
->;
-
 export interface SmsRenderProps<
   TRequest,
   TResponse,
@@ -172,22 +165,6 @@ export interface SmsTemplateReturnType {
   message: string;
   from?: string;
   options?: ProviderBaseOptions;
-}
-
-/**
- * Type-safe options for SMS templates
- */
-export interface SmsTemplateOptions {
-  provider?: SmsProviders;
-  type?: string;
-  datacoding?: string;
-  reference?: string;
-  validity?: number;
-  smsType?: string;
-  gateway?: number;
-  attributes?: { [key: string]: string | number | boolean };
-  headers?: { [key: string]: string };
-  extraFields?: { [key: string]: string | number | boolean };
 }
 
 export interface SmsHandlerOptions {

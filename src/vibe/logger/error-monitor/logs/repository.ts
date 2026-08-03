@@ -7,19 +7,19 @@
 import "server-only";
 
 import { and, count, desc, eq, gte, ilike, lte } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { WidgetDataSchema } from "next-vibe/core/utils/json";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
-import type { ErrorLogsT } from "next-vibe/logger/error-monitor/logs/i18n";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { LoggerMetadata } from "next-vibe/logger/types";
+} from "../../../core/route/response.schema";
+import type { WidgetData } from "../../../core/utils/json";
+import { WidgetDataSchema } from "../../../core/utils/json";
+import { parseError } from "../../../core/utils/parse-error";
+import { db } from "../../../database";
+import type { ErrorLogsT } from "./i18n";
+import type { EndpointLogger } from "../../types";
+import type { LoggerMetadata } from "../../types";
 
 import { errorLogs } from "../db";
 
@@ -162,11 +162,8 @@ export class ErrorLogsRepository {
       });
 
       return fail({
-        message: t("errors.fetchErrorLogs"),
+        message: t("errors.fetchErrorLogs", { error: parsedError.message }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
-          error: parsedError.message,
-        },
       });
     }
   }
@@ -209,11 +206,8 @@ export class ErrorLogsRepository {
       });
 
       return fail({
-        message: t("errors.updateErrorLog"),
+        message: t("errors.updateErrorLog", { error: parsedError.message }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
-          error: parsedError.message,
-        },
       });
     }
   }

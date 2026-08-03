@@ -1,4 +1,4 @@
-import type { PackageManifest } from "next-vibe/tooling/builder/repository/vibe-package/types";
+import type { PackageManifest } from "../../../tooling/builder/repository/vibe-package/types";
 
 import { HEADLESS_CLIENT_ALIAS } from "./constants";
 

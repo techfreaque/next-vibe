@@ -117,10 +117,11 @@ export const translations: typeof enTranslations = {
     maxConnections: "Maximale Verbindungen",
   },
   errors: {
-    health_check_failed: "Datenbank-Gesundheitscheck fehlgeschlagen",
-    connection_failed: "Datenbankverbindung fehlgeschlagen",
-    stats_failed: "Fehler beim Abrufen der Datenbankstatistiken",
-    docker_check_failed: "Docker-Verfügbarkeitspr üfung fehlgeschlagen",
+    health_check_failed: "Datenbank-Gesundheitscheck fehlgeschlagen: {{error}}",
+    connection_failed: "Datenbankverbindung fehlgeschlagen: {{error}}",
+    stats_failed: "Datenbankstatistiken nicht abrufbar: {{error}}",
+    docker_check_failed:
+      "Docker-Verfügbarkeitsprüfung fehlgeschlagen: {{error}}",
     reset_failed: "Datenbank-Zurücksetzung fehlgeschlagen",
     manage_failed: "Datenbank-Verwaltungsvorgang fehlgeschlagen",
     reset_operation_failed: "Zurücksetzungsvorgang fehlgeschlagen",

@@ -8,14 +8,14 @@
 import { existsSync, mkdirSync, renameSync, statSync } from "node:fs";
 import { dirname, parse, resolve } from "node:path";
 
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { scopedTranslation } from "next-vibe/tooling/builder/i18n";
+} from "../../../core/route/response.schema";
+import type { EndpointLogger } from "../../../logger/types";
+import type { scopedTranslation } from "../i18n";
 
 type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
@@ -105,10 +105,9 @@ class BunCompiler implements IBunCompiler {
 
     if (!existsSync(entrypointPath)) {
       return fail({
-        message: t("errors.inputFileNotFound"),
-        messageParams: {
+        message: t("errors.inputFileNotFound", {
           filePath: fileConfig.input,
-        },
+        }),
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
@@ -214,10 +213,9 @@ class BunCompiler implements IBunCompiler {
 
     if (!result.success || errorLogs.length > 0) {
       return fail({
-        message: t("messages.bundleFailed"),
-        messageParams: {
-          error: errorLogs.join("\n") || "Unknown error",
-        },
+        message: errorLogs.length
+          ? t("messages.bundleFailed", { error: errorLogs.join("\n") })
+          : t("messages.bundleFailedUnknown"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -237,10 +235,7 @@ class BunCompiler implements IBunCompiler {
     // Detect silent build failure: file missing or empty after reported success
     if (size === 0) {
       return fail({
-        message: t("messages.bundleFailed"),
-        messageParams: {
-          error: `Output file missing or empty: ${fileConfig.output}`,
-        },
+        message: t("messages.outputMissing", { output: fileConfig.output }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

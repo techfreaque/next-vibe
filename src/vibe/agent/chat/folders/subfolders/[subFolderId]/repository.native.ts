@@ -54,7 +54,6 @@ export class FolderRepository {
       success: false,
       errorType: response.errorType,
       message: response.message,
-      messageParams: response.messageParams,
     };
   }
 

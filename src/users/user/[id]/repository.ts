@@ -56,9 +56,10 @@ export class UserByIdRepository {
       if (!foundUser) {
         const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: t("id.get.errors.notFound.title"),
+          message: t("id.get.errors.notFound.detail", {
+            userId: urlPathParams.id,
+          }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { userId: urlPathParams.id },
         });
       }
 
@@ -154,9 +155,10 @@ export class UserByIdRepository {
       const parsedError = parseError(error);
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("id.get.errors.server.title"),
+        message: t("id.get.errors.server.detail", {
+          error: parsedError.message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
       });
     }
   }
@@ -184,9 +186,10 @@ export class UserByIdRepository {
       if (!existingUser) {
         const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: t("id.put.errors.notFound.title"),
+          message: t("id.put.errors.notFound.detail", {
+            userId: urlPathParams.id,
+          }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { userId: urlPathParams.id },
         });
       }
 
@@ -271,9 +274,10 @@ export class UserByIdRepository {
       const parsedError = parseError(error);
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("id.put.errors.server.title"),
+        message: t("id.put.errors.server.detail", {
+          error: parsedError.message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
       });
     }
   }
@@ -300,9 +304,10 @@ export class UserByIdRepository {
       if (!existingUser) {
         const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: t("id.delete.errors.notFound.title"),
+          message: t("id.delete.errors.notFound.detail", {
+            userId: urlPathParams.id,
+          }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { userId: urlPathParams.id },
         });
       }
 
@@ -334,9 +339,10 @@ export class UserByIdRepository {
       const parsedError = parseError(error);
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("id.delete.errors.server.title"),
+        message: t("id.delete.errors.server.detail", {
+          error: parsedError.message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
       });
     }
   }

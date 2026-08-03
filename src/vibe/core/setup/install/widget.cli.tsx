@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import { Box, Text } from "ink";
-import { Platform } from "next-vibe/platforms/platforms";
-import { useWidgetPlatform } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { Platform } from "../../../platforms/platforms";
+import { useWidgetPlatform } from "../../../unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 
 import type { InstallResponseOutput } from "./definition";

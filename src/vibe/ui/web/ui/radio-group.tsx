@@ -1,11 +1,11 @@
 "use client";
 
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 
-import { CheckIcon } from "../../web/ui/icons/CheckIcon";
-import type { StyleType } from "../../web/utils/style-type";
+import { CheckIcon } from "./icons/CheckIcon";
+import type { StyleType } from "../utils/style-type";
 
 export type RadioGroupRootProps = {
   value?: string;

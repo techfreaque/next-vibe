@@ -10,17 +10,17 @@ import {
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { toPosixPath } from "next-vibe/core/generators/shared/utils";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { toPosixPath } from "../../core/generators/shared/utils";
+import type { ResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../core/route/response.schema";
+import { parseError } from "../../core/utils/parse-error";
+import type { EndpointLogger } from "../../logger/types";
 
-import { getSrcDir } from "@/env/paths";
+import { getSrcDir, VIBE_IMPORT_ALIAS } from "@/env/paths";
 
 import type { VibeDepsConfig, VibeDepsViolationKind } from "./config-types";
 import type {
@@ -37,7 +37,9 @@ import {
   isRouteExecuteEntrypoint,
   isSelf,
   isUiPageImporter,
+  LOCALE_ROOT,
   placementOf,
+  SYSTEM_ROOT,
   usageProfile,
 } from "./placement";
 import {
@@ -200,6 +202,19 @@ const CONVENTION_LOADED_FILES = new Set([
   "email.tsx", // → email-templates
   "prompt.ts", // → prompt-fragments
   "graph-seeds.ts", // → dataflow graph-seeds-index
+  // Next.js App Router special files under src/app/**, emitted by
+  // next-app/generator.ts's SPECIAL_FILES list — loaded by filename
+  // convention, never statically imported.
+  "error.tsx",
+  "global-error.tsx",
+  "not-found.tsx",
+  "loading.tsx",
+  "template.tsx",
+  "default.tsx",
+  // Next.js middleware convention (renamed from middleware.ts) — copied to
+  // the generated app root by next-app/generator.ts, loaded by the Next.js
+  // runtime by filename, never statically imported.
+  "proxy.ts",
 ]);
 
 function isFrameworkEntrypoint(key: string): boolean {
@@ -213,7 +228,7 @@ function isFrameworkEntrypoint(key: string): boolean {
  * mean dead. Each rule maps to one concrete loader; no fuzzy string matching
  * (that would false-negative real dead code). system-relative path (no ext).
  */
-const SYSTEM_PREFIX = "src/vibe/";
+const SYSTEM_PREFIX = SYSTEM_ROOT;
 function isKnownEntrypoint(key: string): boolean {
   const sysRel = key.startsWith(SYSTEM_PREFIX)
     ? key.slice(SYSTEM_PREFIX.length).replace(/\.(tsx?)$/, "")
@@ -388,11 +403,22 @@ function isFrameworkBoilerplateSymbol(sym: SymbolDef, file: string): boolean {
     return true;
   }
   // Endpoint type-quad: the halves ship together; only Output is usually read.
+  // Naming varies across the codebase (Type infix before OR after Input/
+  // Output, or omitted entirely) — cover every permutation actually in use:
+  // RequestInput, RequestTypeInput, RequestInputType, RequestType, ...
   if (
-    /(?:Request|Response)(?:Input|Output)$/.test(n) ||
-    /UrlVariables(?:Input|Output)$/.test(n) ||
+    (/(?:Request|Response)(?:Type)?(?:Input|Output)(?:Type)?$/.test(n) &&
+      n !== "Request" &&
+      n !== "Response") ||
+    /(?:Request|Response)Type$/.test(n) ||
+    /Url(?:Variables|Params)(?:Type)?(?:Input|Output)$/.test(n) ||
     /(?:Request|Response)Data$/.test(n)
   ) {
+    return true;
+  }
+  // WebSocket event-emit contract: the payload type is a compile-time tag for
+  // a generic `emit<T>()` call, never imported by name at the call site.
+  if (/EventPayloads?$/.test(n) || n.endsWith("WsEmit")) {
     return true;
   }
   // i18n contract exports, only inside an i18n/ tree.
@@ -405,6 +431,39 @@ function isFrameworkBoilerplateSymbol(sym: SymbolDef, file: string): boolean {
   // `allowedRoles` and nav config at runtime; the static import graph can't see
   // those call-sites. Convention: export names ending in `_ALIAS`.
   if (n.endsWith("_ALIAS")) {
+    return true;
+  }
+  // Page-data contract: every page.tsx exports a `<Name>PageData` type as the
+  // loader/component data contract for that route (same role as the endpoint
+  // Request/ResponseData quad above). Usually only consumed within the same
+  // file, but a sibling page-client.tsx sometimes imports it too — either way
+  // it's the page's public per-route contract, not an incidental leak.
+  if (n.endsWith("PageData")) {
+    return true;
+  }
+  // Drizzle schema contract, only inside a db.ts file (docs/patterns/database.md
+  // "Golden Rule: Use db.ts for database schemas" — db.ts holds ONLY schema
+  // definitions, nothing else). Each table's select-type, `New<Table>` insert
+  // type, `<table>Relations`, and `select/insert<X>Schema` drizzle-zod pair are
+  // part of the per-domain schema surface, constructed ad-hoc per call site via
+  // `getRelationalDb(schema)` (see src/vibe/database/relational.ts) rather than
+  // swept in by one central namespace import — so an unused member here means
+  // "not yet needed by a relational query", not dead code.
+  if (file.endsWith("/db.ts")) {
+    if (
+      sym.kind === "type" ||
+      n.endsWith("Relations") ||
+      /^(?:select|insert)[A-Z]\w*Schema$/.test(n)
+    ) {
+      return true;
+    }
+  }
+  // DB-enum contract, only inside an enum.ts file (docs/patterns/enum.md
+  // "Golden Rule: All enums use createEnumOptions(...), export enum/options/
+  // Value/DB" — the `DB` member is mandatory for every enum, feeding
+  // `text(col, { enum: XxxDB })` or a filter field's schema even when no
+  // current call site reads it yet).
+  if (file.endsWith("/enum.ts") && n.endsWith("DB")) {
     return true;
   }
   return false;
@@ -551,17 +610,31 @@ const SKIP_FILE_SUFFIXES = [
 ];
 
 // tsconfig alias prefixes → resolved src-relative prefix
-// Order matters: more specific first.
+// Order matters: more specific first — `matches` (below) preserves array order
+// and tries each candidate in turn, so a narrower alias listed before a wider
+// one that also matches the same import path wins.
 // next-vibe/* is a 2-candidate alias: system-first, then locale-root
 // (mirrors tsconfig "next-vibe/*": ["src/vibe/*", "src/*"]). The system tree
 // owns ui/, unified-ui/, etc., so the system candidate must be tried first.
 const ALIAS_PREFIXES: ReadonlyArray<{ alias: string; resolved: string }> = [
+  // next-vibe/ui/* → src/vibe/ui/web/*  (tsconfig.json override — MUST precede
+  // the generic next-vibe/* entries below: "next-vibe/ui/x" also starts with
+  // "next-vibe/", and without this narrower match first, resolveImport would
+  // compute "src/vibe/ui/x" (no such file) and every src/vibe/ui/web/** file
+  // reached only through this alias would show 0 importers / falsely dead).
+  { alias: `${VIBE_IMPORT_ALIAS}/ui/`, resolved: `${SYSTEM_ROOT}ui/web/` },
+  // next-vibe-ui/* → src/vibe/ui/tanstack/* then src/vibe/ui/web/*
+  // (tsconfig.tanstack.json override, same false-dead risk as above).
+  { alias: "next-vibe-ui/", resolved: `${SYSTEM_ROOT}ui/tanstack/` },
+  { alias: "next-vibe-ui/", resolved: `${SYSTEM_ROOT}ui/web/` },
+  // vibe-core/ui/* → src/vibe/ui/web/*  (tsconfig.json override).
+  { alias: "vibe-core/ui/", resolved: `${SYSTEM_ROOT}ui/web/` },
   // next-vibe/* → src/vibe/*  (framework tree, tried first)
-  { alias: "next-vibe/", resolved: "src/vibe/" },
+  { alias: `${VIBE_IMPORT_ALIAS}/`, resolved: SYSTEM_ROOT },
   // next-vibe/* → src/*  (locale-root fallback)
-  { alias: "next-vibe/", resolved: "src/" },
+  { alias: `${VIBE_IMPORT_ALIAS}/`, resolved: LOCALE_ROOT },
   // @/* → src/*
-  { alias: "@/", resolved: "src/" },
+  { alias: "@/", resolved: LOCALE_ROOT },
 ];
 
 function scanTsFiles(dir: string, results: string[] = []): string[] {
@@ -759,15 +832,15 @@ const DEFAULT_CONFIG: VibeDepsConfig = {
     {
       name: "vibe-ui",
       roots: [
-        "src/vibe/ui/web",
-        "src/vibe/ui/native",
-        "src/vibe/ui/cli",
-        "src/vibe/ui/tanstack",
+        `${SYSTEM_ROOT}ui/web`,
+        `${SYSTEM_ROOT}ui/native`,
+        `${SYSTEM_ROOT}ui/cli`,
+        `${SYSTEM_ROOT}ui/tanstack`,
       ],
     },
     {
       name: "vibe-unified-ui",
-      roots: ["src/vibe/unified-ui"],
+      roots: [`${SYSTEM_ROOT}unified-ui`],
     },
   ],
   allow: {
@@ -1583,7 +1656,15 @@ function buildUnusedSymbols(
         // reads `static method(` (unqualified) — the qualified string never
         // appears there, so every hit is a real in-file call → subtract 0.
         const declHit = sym.kind === "static-method" ? 0 : 1;
-        const inFileHits = countOccurrences(src, refName) - declHit;
+        // A static method calling a sibling static method writes `this.method(`,
+        // not the qualified `Owner.method` — count that form too, else every
+        // intra-class `this.x()` call reads as zero in-file usage and the
+        // method wrongly looks fully dead instead of internal-only.
+        const thisHits =
+          sym.kind === "static-method"
+            ? countOccurrences(src, `this.${sym.name}`)
+            : 0;
+        const inFileHits = countOccurrences(src, refName) - declHit + thisHits;
         // Public-API-surface files: a symbol with in-file usage is intentional
         // exported contract (widget component / *FieldConfig / shared schema),
         // often reached via lazyWidget dynamic imports the graph can't see.
@@ -2264,8 +2345,7 @@ export class VibeDepsRepository {
           );
           if (focusKeys.length === 0) {
             return fail({
-              message: t("errors.notFound.description"),
-              messageParams: { focus },
+              message: t("errors.focusNotFound", { focus }),
               errorType: ErrorResponseTypes.NOT_FOUND,
             });
           }
@@ -2351,8 +2431,7 @@ export class VibeDepsRepository {
         );
         if (focusMatches.length === 0) {
           return fail({
-            message: t("errors.notFound.description"),
-            messageParams: { focus },
+            message: t("errors.focusNotFound", { focus }),
             errorType: ErrorResponseTypes.NOT_FOUND,
           });
         }

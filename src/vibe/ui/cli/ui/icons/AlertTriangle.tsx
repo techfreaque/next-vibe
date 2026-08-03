@@ -1,9 +1,5 @@
-import { Text } from "ink";
-import type { JSX } from "react";
-
 import type { IconComponent } from "../../../web/lib/helper";
+import { makeCliIcon } from "./make-icon";
 
-const symbol = "⚠"; // eslint-disable-line i18next/no-literal-string
-export const AlertTriangle: IconComponent = (): JSX.Element => (
-  <Text>{symbol}</Text>
-);
+const symbol = "⚠️"; // eslint-disable-line i18next/no-literal-string
+export const AlertTriangle: IconComponent = makeCliIcon(symbol);

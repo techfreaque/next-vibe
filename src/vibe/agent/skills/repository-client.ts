@@ -10,19 +10,19 @@
  * - getFilteredTtsModels(), getFilteredSttModels(), etc.: Role-specific filtered models
  */
 
-import { DEFAULT_CHAT_MODEL_SELECTION } from "next-vibe/agent/ai-stream/constants";
-import type { ChatModelSelection } from "next-vibe/agent/ai-stream/models";
+import { DEFAULT_CHAT_MODEL_SELECTION } from "../ai-stream/constants";
+import type { ChatModelSelection } from "../ai-stream/models";
 import {
   type ChatModelOption,
   chatModelOptions,
   getBestChatModel,
   getChatModelById,
-} from "next-vibe/agent/ai-stream/models";
+} from "../ai-stream/models";
 import type {
   AudioVisionModelSelection,
   ImageVisionModelSelection,
   VideoVisionModelSelection,
-} from "next-vibe/agent/ai-stream/vision-models";
+} from "../ai-stream/vision-models";
 import {
   type AudioVisionModelOption,
   audioVisionModelOptions,
@@ -30,43 +30,31 @@ import {
   imageVisionModelOptions,
   type VideoVisionModelOption,
   videoVisionModelOptions,
-} from "next-vibe/agent/ai-stream/vision-models";
-import type { ImageGenModelSelection } from "next-vibe/agent/image-generation/models";
+} from "../ai-stream/vision-models";
+import type { ImageGenModelSelection } from "../image-generation/models";
 import {
   type ImageGenModelOption,
   imageGenModelOptions,
-} from "next-vibe/agent/image-generation/models";
-import { getModelDisplayName } from "next-vibe/agent/models/all-models";
-import type {
-  ModelOptionBase,
-  ModelOptionTokenBased,
-} from "next-vibe/agent/models/models";
-import { getModelPrice } from "next-vibe/agent/models/models";
-import {
-  isModelProviderAvailable,
-  modelProviders,
-} from "next-vibe/agent/models/models";
-import type { MusicGenModelSelection } from "next-vibe/agent/music-generation/models";
+} from "../image-generation/models";
+import { getModelDisplayName } from "../models/all-models";
+import type { ModelOptionBase, ModelOptionTokenBased } from "../models/models";
+import { getModelPrice } from "../models/models";
+import { isModelProviderAvailable, modelProviders } from "../models/models";
+import type { MusicGenModelSelection } from "../music-generation/models";
 import {
   type MusicGenModelOption,
   musicGenModelOptions,
-} from "next-vibe/agent/music-generation/models";
-import type { FavoriteGetModelSelection } from "next-vibe/agent/skills/favorites/[id]/definition";
-import type { SttModelSelection } from "next-vibe/agent/speech-to-text/models";
-import {
-  type SttModelOption,
-  sttModelOptions,
-} from "next-vibe/agent/speech-to-text/models";
-import type { VoiceModelSelection } from "next-vibe/agent/text-to-speech/models";
-import {
-  type TtsModelOption,
-  ttsModelOptions,
-} from "next-vibe/agent/text-to-speech/models";
-import type { VideoGenModelSelection } from "next-vibe/agent/video-generation/models";
+} from "../music-generation/models";
+import type { FavoriteGetModelSelection } from "./favorites/[id]/definition";
+import type { SttModelSelection } from "../speech-to-text/models";
+import { type SttModelOption, sttModelOptions } from "../speech-to-text/models";
+import type { VoiceModelSelection } from "../text-to-speech/models";
+import { type TtsModelOption, ttsModelOptions } from "../text-to-speech/models";
+import type { VideoGenModelSelection } from "../video-generation/models";
 import {
   type VideoGenModelOption,
   videoGenModelOptions,
-} from "next-vibe/agent/video-generation/models";
+} from "../video-generation/models";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
@@ -150,24 +138,6 @@ export class SkillsRepositoryClient {
       isDefault: isDefault ?? false,
       ...modelRow,
     };
-  }
-
-  /**
-   * Format credit cost for display (server-side version, no i18n)
-   */
-  static formatCreditCost(
-    cost: number,
-    t: SkillsT,
-    isTokenBased = false,
-  ): string {
-    const prefix = isTokenBased ? "~" : "";
-    if (cost === 0) {
-      return t("selector.free");
-    }
-    if (cost === 1) {
-      return `${prefix}${t("credits.credit", { count: cost })}`;
-    }
-    return `${prefix}${t("credits.credits", { count: cost })}`;
   }
 
   /**

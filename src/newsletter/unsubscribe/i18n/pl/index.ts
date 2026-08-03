@@ -84,6 +84,7 @@ export const translations: typeof enTranslations = {
       title: "Błąd wewnętrzny",
       description:
         "Wystąpił błąd podczas przetwarzania Twojego żądania wypisania",
+      detail: "Nie udało się wypisać z newslettera: {{error}}",
     },
   },
   post: {

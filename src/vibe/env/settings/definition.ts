@@ -4,26 +4,26 @@
  * PATCH: Update .env file values - flat individual fields per env key
  */
 
-import { translatedValueSchema } from "next-vibe/core/definition/common.schema";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { translatedValueSchema } from "../../core/definition/common.schema";
+import { createEndpoint } from "../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { type EnvKeyMeta } from "next-vibe/env/generator/generator";
-import { scopedTranslation } from "next-vibe/env/settings/i18n";
-import { UserRole } from "next-vibe/identity/roles/enum";
-import { SyncScopeSchema } from "next-vibe/remote-connection/db";
-import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
-import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
+} from "../../core/definition/enums";
+import { type EnvKeyMeta } from "../generator/generator";
+import { scopedTranslation } from "./i18n";
+import { UserRole } from "../../identity/roles/enum";
+import { SyncScopeSchema } from "../../remote-connection/db";
+import { lazyWidget } from "../../unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "../../unified-ui/_shared/utils";
 import {
   objectField,
   requestField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { ENV_KEYS, type EnvKeyName } from "@/generated/env/keys";

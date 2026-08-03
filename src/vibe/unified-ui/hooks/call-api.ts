@@ -1,26 +1,22 @@
-import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
-import { validateData } from "next-vibe/core/core-utils/validation";
-import { type CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { Methods } from "next-vibe/core/definition/enums";
-import {
-  coreClientEnv as envClient,
-  platform,
-} from "next-vibe/core/env-client";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { validateData } from "../../core/core-utils/validation";
+import { type CreateApiEndpointAny } from "../../core/definition/endpoint-base";
+import { Methods } from "../../core/definition/enums";
+import { coreClientEnv as envClient, platform } from "../../core/env-client";
+import type { CountryLanguage } from "../../core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
-} from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { scopedTranslation as authScopedTranslation } from "next-vibe/identity/auth/i18n";
-import { AuthClientRepository } from "next-vibe/identity/auth/repository-client";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { Platform } from "next-vibe/platforms/platforms";
+} from "../../core/route/response.schema";
+import type { WidgetData } from "../../core/utils/json";
+import { parseError } from "../../core/utils/parse-error";
+import { scopedTranslation as authScopedTranslation } from "../../identity/auth/i18n";
+import { AuthClientRepository } from "../../identity/auth/repository-client";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
+import { Platform } from "../../platforms/platforms";
 import { getCookie } from "next-vibe/ui/lib/cookies";
-import { scopedTranslation as hooksTranslation } from "next-vibe/unified-ui/hooks/i18n";
+import { scopedTranslation as hooksTranslation } from "./i18n";
 
 import {
   BEARER_LEAD_ID_SEPARATOR,
@@ -152,7 +148,6 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
   locale: CountryLanguage,
   requestData: TEndpoint["types"]["RequestOutput"],
   pathParams: TEndpoint["types"]["UrlVariablesOutput"],
-  availability: AgentEnvAvailability,
 ): Promise<ResponseType<TEndpoint["types"]["ResponseOutput"]>> {
   logger.debug("callApi", {
     endpoint: endpoint.path.join("/"),
@@ -179,7 +174,7 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
 
   if (!shouldUseClientRoute && endpoint.allowedClientRoles) {
     const { filterUserPermissionRoles, UserPermissionRole } =
-      await import("next-vibe/identity/roles/enum");
+      await import("../../identity/roles/enum");
     const clientPermissionRoles = filterUserPermissionRoles(
       endpoint.allowedClientRoles,
     );
@@ -196,8 +191,7 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
   }
 
   if (shouldUseClientRoute) {
-    const { endpointToToolName } =
-      await import("next-vibe/core/core-utils/path");
+    const { endpointToToolName } = await import("../../core/core-utils/path");
     const { getClientRouteHandler } = await import("@/generated/routes/client");
     const pathKey = endpointToToolName(endpoint);
     const handlerObject = await getClientRouteHandler(pathKey);
@@ -208,7 +202,6 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
         locale,
         logger,
         user,
-        availability,
       });
     }
     logger.warn(
@@ -228,12 +221,11 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
     return fail({
       message: hooksTranslation
         .scopedT(locale)
-        .t("apiUtils.errors.internal_error"),
+        .t("apiUtils.errors.missingUrlParam", {
+          param: missingParam,
+          path: endpoint.path.join("/"),
+        }),
       errorType: ErrorResponseTypes.VALIDATION_ERROR,
-      messageParams: {
-        paramName: missingParam,
-        endpoint: endpoint.path.join("/"),
-      },
     });
   }
 
@@ -280,7 +272,7 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
       options.body = postBody;
     }
 
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+    // oxlint-disable-next-line restricted/no-raw-fetch
     const response = await fetch(url, options);
     const json = (await response.json()) as ResponseType<
       TEndpoint["types"]["ResponseOutput"]
@@ -293,9 +285,8 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
       return fail({
         message: hooksTranslation
           .scopedT(locale)
-          .t("apiUtils.errors.http_error"),
+          .t("apiUtils.errors.httpStatus", { status: response.status, url }),
         errorType: ErrorResponseTypes.HTTP_ERROR,
-        messageParams: { statusCode: response.status, url },
       });
     }
 
@@ -304,17 +295,18 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
         json.data,
         endpoint.responseSchema,
         logger,
-        locale,
         Platform.NEXT_API,
         `${endpoint.path.join("/")}/${endpoint.method}`,
+        locale,
       );
       if (!validationResponse.success) {
         return fail({
           message: hooksTranslation
             .scopedT(locale)
-            .t("apiUtils.errors.validation_error"),
+            .t("apiUtils.errors.responseValidation", {
+              error: validationResponse.message,
+            }),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: { message: validationResponse.message },
         });
       }
       return { success: true, data: validationResponse.data };
@@ -327,20 +319,18 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
     return fail({
       message: hooksTranslation
         .scopedT(locale)
-        .t("apiUtils.errors.internal_error"),
+        .t("apiUtils.errors.malformedResponse", { url }),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: { url },
     });
   } catch (error) {
     return fail({
       message: hooksTranslation
         .scopedT(locale)
-        .t("apiUtils.errors.internal_error"),
+        .t("apiUtils.errors.requestFailed", {
+          path: endpoint.path.join("/"),
+          error: parseError(error).message,
+        }),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: {
-        error: parseError(error).message,
-        endpoint: endpoint.path.join("/"),
-      },
     });
   }
 }

@@ -18,8 +18,9 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { users } from "next-vibe/identity/user/db";
+import type { WidgetData } from "../core/utils/json";
+import { users } from "../identity/user/db";
+import type { SyncDomain } from "../realtime/core/sync-domain";
 import { z } from "zod";
 
 /**
@@ -80,22 +81,6 @@ export type TransportMode = z.infer<typeof TransportModeSchema>;
 export const ThreadMirrorModeSchema = z.enum(["both", "off"]);
 export type ThreadMirrorMode = z.infer<typeof ThreadMirrorModeSchema>;
 export type TransportModeValue = TransportMode;
-
-/** Which data providers are synced over this connection. */
-/**
- * The complete set of cross-instance sync domains. Each has a syncScope toggle on
- * the connection and a SyncProvider. An event's `syncDomain` must be one of these
- * — a non-existent domain (one without settings) is a compile error.
- */
-export const SYNC_DOMAINS = [
-  "memories",
-  "documents",
-  "skills",
-  "favorites",
-  "threads",
-] as const;
-
-export type SyncDomain = (typeof SYNC_DOMAINS)[number];
 
 // Per-field defaults so the connect UI can present a sensible starting scope
 // (memories/documents/skills/favorites on, threads off). The user always sends

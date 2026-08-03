@@ -64,8 +64,13 @@ export const translations: typeof enTranslations = {
         title: "Nicht gefunden",
         description: "Datei existiert nicht",
       },
-      findNotFound: "Text nicht gefunden: {{details}}",
-      invalidParams: "Ungültige Parameter: {{details}}",
+      findNotFound:
+        'Text nicht gefunden: "{{snippet}}" in {{path}}. Datei mit cortex-read lesen und mit dem exakten Text erneut versuchen.',
+      lineRangeOutOfBounds:
+        "Zeilenbereich {{startLine}}-{{endLine}} liegt außerhalb der Datei. Die Datei hat {{lineCount}} Zeilen.",
+      missingEditStrategy:
+        "Entweder find + replace oder startLine + endLine + newContent angeben. Erhalten: {{provided}}.",
+      noParamsProvided: "nichts",
       server: {
         title: "Serverfehler",
         description: "Etwas ist schiefgelaufen",

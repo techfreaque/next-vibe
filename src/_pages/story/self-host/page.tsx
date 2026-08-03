@@ -6,6 +6,7 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import type { JWTPublicPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { Platform } from "next-vibe/platforms/platforms";
 import { Button } from "next-vibe/ui/ui/button";
 import { Container } from "next-vibe/ui/ui/container";
 import { Div } from "next-vibe/ui/ui/div";
@@ -27,6 +28,7 @@ import { scopedTranslation } from "./i18n";
 export interface SelfHostPageData {
   locale: CountryLanguage;
   modelCount: number;
+  platform: Platform;
 }
 
 export async function tanstackLoader({
@@ -35,8 +37,8 @@ export async function tanstackLoader({
   params: Promise<{ locale: CountryLanguage }>;
 }): Promise<SelfHostPageData> {
   const { locale } = await params;
-  const modelCount = getAvailableModelCount(false, getEnvAvailability());
-  return { locale, modelCount };
+  const modelCount = getAvailableModelCount(false, await getEnvAvailability());
+  return { locale, modelCount, platform: Platform.NEXT_PAGE };
 }
 
 export const revalidate = 3600;
@@ -109,16 +111,25 @@ const INCLUDES = [
 export function TanstackPage({
   locale,
   modelCount,
+  platform,
 }: SelfHostPageData): JSX.Element {
-  return <SelfHostPageContent locale={locale} modelCount={modelCount} />;
+  return (
+    <SelfHostPageContent
+      locale={locale}
+      modelCount={modelCount}
+      platform={platform}
+    />
+  );
 }
 
 function SelfHostPageContent({
   locale,
   modelCount,
+  platform,
 }: {
   locale: CountryLanguage;
   modelCount: number;
+  platform: Platform;
 }): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
@@ -337,7 +348,11 @@ function SelfHostPageContent({
                 {t("enterprise.description")}
               </P>
             </Div>
-            <ContactFormSection locale={locale} user={publicUser} />
+            <ContactFormSection
+              locale={locale}
+              user={publicUser}
+              platform={platform}
+            />
           </Div>
         </Container>
       </Div>

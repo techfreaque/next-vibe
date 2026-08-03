@@ -10,16 +10,16 @@
 import "server-only";
 
 import { and, eq } from "drizzle-orm";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
   success,
-} from "next-vibe/core/route/response.schema";
-import { db } from "next-vibe/database";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../../core/route/response.schema";
+import { db } from "../../../database";
+import type { JwtPrivatePayloadType } from "../../../identity/auth/types";
+import type { EndpointLogger } from "../../../logger/types";
 
 import { remoteConnections } from "../../db";
 import type { ReverseUpdatePatchRequestOutput } from "./definition";
@@ -99,7 +99,7 @@ export class ReverseConnectionUpdateRepository {
     if (patch.instanceId) {
       const { renameInstanceFolder } = await import("../../instance-folder");
       await renameInstanceFolder(user.id, localInstanceId, patch.instanceId);
-      const { cronTasks } = await import("next-vibe/tasks/cron/db");
+      const { cronTasks } = await import("../../../tasks/cron/db");
       await db
         .update(cronTasks)
         .set({ targetInstance: patch.instanceId })
@@ -107,7 +107,7 @@ export class ReverseConnectionUpdateRepository {
       // Rekey the live connector (registry + reconnect state are keyed by
       // instanceId). restartConnection reloads the row under the new id.
       const { getWsConnection, closeConnection, restartConnection } =
-        await import("next-vibe/realtime/connector");
+        await import("../../../realtime/server/connector");
       if (getWsConnection(localInstanceId)) {
         closeConnection(localInstanceId);
         await restartConnection(patch.instanceId);
@@ -142,7 +142,7 @@ export class ReverseConnectionUpdateRepository {
       transportMode !== undefined
     ) {
       const { restartConnection } =
-        await import("next-vibe/realtime/connector");
+        await import("../../../realtime/server/connector");
       await restartConnection(effectiveInstanceId);
     }
 

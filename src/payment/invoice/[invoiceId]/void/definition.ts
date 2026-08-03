@@ -3,7 +3,7 @@
  * Transitions a DRAFT or OPEN invoice to VOID status and reverses any journal entry
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,

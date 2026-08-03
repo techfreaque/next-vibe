@@ -14,6 +14,7 @@ import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { SYSTEM_SETTINGS_ALIAS } from "next-vibe/env/settings/constants";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { Platform } from "next-vibe/platforms/platforms";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 
@@ -27,6 +28,7 @@ interface LoginFormProps {
   user: JwtPayloadType;
   devSeedPassword: string | null;
   devSeedUsers: typeof DEV_SEED_USERS | null;
+  platform: Platform;
 }
 
 /**
@@ -108,6 +110,7 @@ export function LoginForm({
   user,
   devSeedPassword,
   devSeedUsers,
+  platform,
 }: LoginFormProps): React.JSX.Element {
   const formRef = useRef<HTMLDivElement>(null);
 
@@ -118,6 +121,7 @@ export function LoginForm({
           endpoint={loginEndpoints}
           locale={locale}
           user={user}
+          platform={platform}
           endpointOptions={{
             create: {
               mutationOptions: {

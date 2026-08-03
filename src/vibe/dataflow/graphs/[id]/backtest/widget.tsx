@@ -17,10 +17,10 @@ import {
   useWidgetForm,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
-import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
-import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
+} from "../../../../unified-ui/_shared/use-widget-context";
+import { SelectFieldWidget } from "../../../../unified-ui/widgets/form-fields/select-field/widget";
+import { FormAlertWidget } from "../../../../unified-ui/widgets/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "../../../../unified-ui/widgets/interactive/submit-button/widget";
 import React, { useState } from "react";
 
 import type definition from "./definition";

@@ -6,7 +6,7 @@ import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-ba
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import type { TParams } from "next-vibe/core/i18n/core/static-types";
-import type { InferJwtPayloadTypeFromRoles } from "next-vibe/core/route/handler";
+import type { InferJwtPayloadTypeFromRoles } from "next-vibe/core/route/handler-roles";
 import type {
   ErrorResponseType,
   ResponseType,
@@ -83,9 +83,10 @@ export async function handleSms<TEndpoint extends CreateApiEndpointAny>({
             if (!smsData.ignoreErrors) {
               errors.push(
                 fail({
-                  message: tSms("sms.error.rendering_failed"),
+                  message: tSms("sms.error.rendering_failed", {
+                    error: result.message,
+                  }),
                   errorType: ErrorResponseTypes.SMS_ERROR,
-                  messageParams: { error: result.message },
                 }),
               );
             }
@@ -134,9 +135,10 @@ export async function handleSms<TEndpoint extends CreateApiEndpointAny>({
             if (!batchResult.success && !smsData.ignoreErrors) {
               errors.push(
                 fail({
-                  message: tSms("sms.error.batch_send_failed"),
+                  message: tSms("sms.error.batch_send_failed", {
+                    error: batchResult.message,
+                  }),
                   errorType: ErrorResponseTypes.SMS_ERROR,
-                  messageParams: { error: batchResult.message },
                 }),
               );
             }
@@ -156,9 +158,10 @@ export async function handleSms<TEndpoint extends CreateApiEndpointAny>({
             if (!smsData.ignoreErrors && !smsResponse.success) {
               errors.push(
                 fail({
-                  message: tSms("sms.error.send_failed"),
+                  message: tSms("sms.error.send_failed", {
+                    error: smsResponse.message,
+                  }),
                   errorType: ErrorResponseTypes.SMS_ERROR,
-                  messageParams: { error: smsResponse.message },
                 }),
               );
             }
@@ -170,9 +173,10 @@ export async function handleSms<TEndpoint extends CreateApiEndpointAny>({
           if (!smsData.ignoreErrors) {
             errors.push(
               fail({
-                message: tSms("sms.error.rendering_failed"),
+                message: tSms("sms.error.rendering_failed", {
+                  error: parsedError.message,
+                }),
                 errorType: ErrorResponseTypes.SMS_ERROR,
-                messageParams: { error: parsedError.message },
               }),
             );
           }
@@ -183,9 +187,10 @@ export async function handleSms<TEndpoint extends CreateApiEndpointAny>({
     logger.error("Error sending SMS:", parseError(error));
     errors.push(
       fail({
-        message: tSms("sms.error.delivery_failed"),
+        message: tSms("sms.error.unexpected_error", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.SMS_ERROR,
-        messageParams: { error: parseError(error).message },
       }),
     );
   }
@@ -203,9 +208,10 @@ export async function handleSms<TEndpoint extends CreateApiEndpointAny>({
       errors: errors.map((e) => e.message),
     });
     return fail({
-      message: tSms("sms.error.delivery_failed"),
+      message: tSms("sms.error.batch_delivery_failed", {
+        errorCount: errors.length,
+      }),
       errorType: ErrorResponseTypes.SMS_ERROR,
-      messageParams: { errorCount: errors.length },
     });
   }
 

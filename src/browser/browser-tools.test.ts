@@ -140,7 +140,7 @@ async function run<TDef extends CreateApiEndpointAny>(
 
 async function isChromeAvailable(): Promise<boolean> {
   try {
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external Chrome DevTools Protocol
+    // oxlint-disable-next-line restricted/no-raw-fetch -- external Chrome DevTools Protocol
     const r = await fetch("http://127.0.0.1:9222/json/version", {
       signal: AbortSignal.timeout(2000),
     });
@@ -171,7 +171,7 @@ function extractText(data: Record<string, WidgetData>): string {
 /** Return all open Chrome page tabs. */
 async function getChromeTabs(): Promise<Array<{ id: string; url: string }>> {
   try {
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external Chrome DevTools Protocol
+    // oxlint-disable-next-line restricted/no-raw-fetch -- external Chrome DevTools Protocol
     const r = await fetch("http://127.0.0.1:9222/json", {
       signal: AbortSignal.timeout(3000),
     });
@@ -226,7 +226,7 @@ async function closeTestTabs(
   const orphanBlanks = tabs.filter((t) => t.url === "about:blank");
   await Promise.allSettled(
     orphanBlanks.map((tab) =>
-      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external Chrome DevTools Protocol
+      // oxlint-disable-next-line restricted/restricted-syntax -- external Chrome DevTools Protocol
       fetch(`http://127.0.0.1:9222/json/close/${tab.id}`, {
         signal: AbortSignal.timeout(2000),
       }),

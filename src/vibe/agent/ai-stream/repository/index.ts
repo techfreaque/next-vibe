@@ -7,7 +7,7 @@ import "server-only";
 
 import type { JSONValue } from "ai";
 import { and, eq, sql } from "drizzle-orm";
-import { getInstanceAvailability } from "next-vibe/agent/env-availability";
+import { getEnvAvailability } from "../../env-availability";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -24,12 +24,15 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { CoreTool } from "next-vibe/platforms/ai/tools-loader";
 import { Platform } from "next-vibe/platforms/platforms";
-import type { ResolvedRelayContext } from "next-vibe/realtime/remote-event-bridge/relay-context";
+import type { ResolvedRelayContext } from "next-vibe/realtime/core/relay-context";
 import { RemoteEventBridgeRepository } from "next-vibe/realtime/remote-event-bridge/repository";
 import type { NextRequest } from "next-vibe/ui/lib/request";
 
-import type { ToolExecutionContext } from "../../chat/config";
-import { DefaultFolderId, makeHeadlessContext } from "../../chat/config";
+import type { ToolExecutionContext } from "../../../core/execution-context";
+import {
+  DefaultFolderId,
+  makeHeadlessContext,
+} from "../../../core/execution-context";
 import { chatMessages, chatThreads, type ToolCall } from "../../chat/db";
 import {
   ChatMessageRole,
@@ -1124,7 +1127,7 @@ export class AiStreamRepository {
     // Step 9: Start AI streaming (for all operations including answer-as-ai)
     try {
       const runStream = async (): Promise<void> => {
-        const streamAvailability = await getInstanceAvailability();
+        const streamAvailability = await getEnvAvailability();
 
         // Phase-2 confirmation parent: with parallel tools the confirmed
         // message is not necessarily the branch tip (a sibling tool that ran

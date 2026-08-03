@@ -12,7 +12,7 @@ import { and, asc, eq, sql } from "drizzle-orm";
 import {
   type ChatModelSelection,
   chatModelSelectionSchema,
-} from "next-vibe/agent/ai-stream/models";
+} from "../../ai-stream/models";
 import {
   type AudioVisionModelSelection,
   audioVisionModelSelectionSchema,
@@ -20,27 +20,27 @@ import {
   imageVisionModelSelectionSchema,
   type VideoVisionModelSelection,
   videoVisionModelSelectionSchema,
-} from "next-vibe/agent/ai-stream/vision-models";
+} from "../../ai-stream/vision-models";
 import {
   type ImageGenModelSelection,
   imageGenModelSelectionSchema,
-} from "next-vibe/agent/image-generation/models";
+} from "../../image-generation/models";
 import {
   type MusicGenModelSelection,
   musicGenModelSelectionSchema,
-} from "next-vibe/agent/music-generation/models";
+} from "../../music-generation/models";
 import {
   type SttModelSelection,
   sttModelSelectionSchema,
-} from "next-vibe/agent/speech-to-text/models";
+} from "../../speech-to-text/models";
 import {
   type VoiceModelSelection,
   voiceModelSelectionSchema,
-} from "next-vibe/agent/text-to-speech/models";
+} from "../../text-to-speech/models";
 import {
   type VideoGenModelSelection,
   videoGenModelSelectionSchema,
-} from "next-vibe/agent/video-generation/models";
+} from "../../video-generation/models";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { StandardSyncCursor } from "next-vibe/remote-connection/db";
@@ -145,43 +145,6 @@ export const syncedFavoriteSchema: z.ZodType<SyncedFavorite> = z.object({
 /** Natural dedup key: (skillId, variantId) — same favorite regardless of local UUID */
 function favoriteKey(skillId: string, variantId: string | null): string {
   return `${skillId}::${variantId ?? ""}`;
-}
-
-/**
- * Map a `chatFavorites` DB row to the wire-shaped SyncedFavorite.
- * Single source of truth for the row→wire projection — reused by
- * serializeFromCursor (pull sync) and the favorite-*-full remote events.
- */
-export function mapFavoriteRowToSynced(
-  r: typeof chatFavorites.$inferSelect,
-): SyncedFavorite {
-  return {
-    id: r.id,
-    slug: r.slug,
-    skillId: r.skillId,
-    variantId: r.variantId ?? null,
-    customVariantName: r.customVariantName ?? null,
-    customIcon: r.customIcon ?? null,
-    voiceModelSelection: r.voiceModelSelection ?? null,
-    sttModelSelection: r.sttModelSelection ?? null,
-    imageVisionModelSelection: r.imageVisionModelSelection ?? null,
-    videoVisionModelSelection: r.videoVisionModelSelection ?? null,
-    audioVisionModelSelection: r.audioVisionModelSelection ?? null,
-    imageGenModelSelection: r.imageGenModelSelection ?? null,
-    musicGenModelSelection: r.musicGenModelSelection ?? null,
-    videoGenModelSelection: r.videoGenModelSelection ?? null,
-    modelSelection: r.modelSelection ?? null,
-    position: r.position,
-    color: r.color ?? null,
-    compactTrigger: r.compactTrigger ?? null,
-    memoryLimit: r.memoryLimit ?? null,
-    availableTools: r.availableTools ?? null,
-    pinnedTools: r.pinnedTools ?? null,
-    deniedTools: r.deniedTools ?? null,
-    promptAppend: r.promptAppend ?? null,
-    subAgentFavoriteId: r.subAgentFavoriteId ?? null,
-    updatedAt: r.updatedAt.toISOString(),
-  };
 }
 
 // ─── Provider ────────────────────────────────────────────────────────────────

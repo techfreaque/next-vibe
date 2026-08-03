@@ -57,8 +57,13 @@ export const translations = {
       unauthorized: { title: "Not Logged In", description: "Log in first" },
       forbidden: { title: "No Access", description: "Can't edit this" },
       notFound: { title: "Not Found", description: "File doesn't exist" },
-      findNotFound: "Text not found: {{details}}",
-      invalidParams: "Invalid parameters: {{details}}",
+      findNotFound:
+        'Text not found: "{{snippet}}" in {{path}}. Read the file with cortex-read, then retry with the exact text.',
+      lineRangeOutOfBounds:
+        "Line range {{startLine}}-{{endLine}} is out of bounds. The file has {{lineCount}} lines.",
+      missingEditStrategy:
+        "Provide either find + replace, or startLine + endLine + newContent. Received: {{provided}}.",
+      noParamsProvided: "nothing",
       server: { title: "Server Error", description: "Something broke" },
       unknown: { title: "Error", description: "Something went wrong" },
       unsavedChanges: {

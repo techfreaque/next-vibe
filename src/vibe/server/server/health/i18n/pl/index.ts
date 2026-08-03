@@ -164,6 +164,7 @@ export const translations: typeof enTranslations = {
       server: {
         title: "Błąd serwera",
         description: "Wystąpił wewnętrzny błąd serwera",
+        checkFailed: "Kontrola stanu nie powiodła się: {{error}}",
       },
       unknown: {
         title: "Nieznany błąd",

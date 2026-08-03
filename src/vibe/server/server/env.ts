@@ -4,7 +4,7 @@
 
 import "server-only";
 
-import { defineEnv } from "next-vibe/env/define-env";
+import { defineEnv } from "../../env/define-env";
 import { z } from "zod";
 
 export const {
@@ -12,6 +12,13 @@ export const {
   schema: serverSystemEnvSchema,
   examples: serverSystemEnvExamples,
 } = defineEnv({
+  VIBE_COMPUTER_NAME: {
+    schema: z.string().optional(),
+    example: "my-desktop",
+    comment:
+      "Headless client identity. Overrides the auto-detected name (dev fixed name, or OS hostname in production).",
+    commented: true,
+  },
   VIBE_DISABLE_PROXY: {
     schema: z
       .string()

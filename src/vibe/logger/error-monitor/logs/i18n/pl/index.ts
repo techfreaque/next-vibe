@@ -5,8 +5,8 @@ export const translations: typeof enTranslations = {
 
   errors: {
     repositoryInternalError: "Wystąpił błąd wewnętrzny",
-    fetchErrorLogs: "Nie udało się pobrać logów błędów",
-    updateErrorLog: "Nie udało się zaktualizować statusu logu błędu",
+    fetchErrorLogs: "Nie udało się pobrać logów błędów: {{error}}",
+    updateErrorLog: "Nie udało się zaktualizować statusu logu błędu: {{error}}",
   },
 
   statusFilter: {

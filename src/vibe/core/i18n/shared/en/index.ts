@@ -70,23 +70,78 @@ export const translations = {
   },
   errors: {
     invalid_request_data: "Invalid request data",
+    // Detailed variants. The bare labels above and every `errorTypes.*` entry
+    // double as generic, param-free banner text, so the cause gets its own key
+    // rather than a placeholder bolted onto a shared label.
+    invalidLocaleDetail: 'Invalid locale "{{locale}}"',
+    invalidRequestDataDetail: "Invalid request data: {{error}}",
+    invalidResponseDetail: "Invalid response data: {{error}}",
+    invalidErrorResponseDetail: "Malformed error response: {{error}}",
+    csrfFailedDetail: "Request blocked by CSRF protection: {{reason}}",
+    csrfReasonUnknown: "CSRF token validation failed",
+    internalDetail: "Internal error: {{error}}",
+    authenticationFailed: "User authentication failed",
+  },
+  validation: {
+    missingFields: "Missing required fields ({{count}}):",
+    failedOne: "Validation failed (1 error):",
+    failedMany: "Validation failed ({{count}} errors):",
+    cliHints:
+      "\n\nExample:\n  {{example}}\n\nOr run interactively:\n  {{interactive}}\n\nMore info:\n  {{help}}",
+    /**
+     * Assembly shell, deliberately word-free so it is identical in every
+     * language: `fail()` takes a single already-translated message, so the
+     * header/bullet/hint parts have to meet inside one final `t()` call.
+     */
+    report: "{{header}}{{fields}}{{hints}}",
+    unexpected: "Validation failed unexpectedly: {{error}}",
   },
   shared: {
     permissions: {
       errors: {
-        definitionError: "Endpoint definition error",
-        platformAccessDenied: "Access denied on {{platform}}: {{reason}}",
+        definitionError: "Endpoint definition error: {{reason}}",
+        allowedRolesMissing:
+          "Endpoint definition error: allowedRoles is missing or is not a list",
+        /**
+         * One key per denial cause from checkPlatformAccess. The cause code
+         * selects the key; `platform` is the only parameter, and it is a raw
+         * runtime value.
+         */
+        platformAccessDenied: {
+          productionDisabled:
+            "Access denied on {{platform}}: this endpoint is disabled in production",
+          platformExcluded:
+            "Access denied on {{platform}}: this endpoint is not exposed on this platform",
+          cliPackageAuthRequired:
+            "Access denied on {{platform}}: this endpoint needs authentication, which the CLI package cannot provide",
+          mcpNotListed:
+            "Access denied on {{platform}}: this endpoint is not listed on MCP",
+        },
+        /**
+         * Four variants instead of one key with `{{userId}}`/`{{userRoles}}`
+         * placeholders filled by translated nouns: "public" and "none" are
+         * words, not values, so they belong inside the sentence.
+         */
         insufficientRoles:
-          "User {{userId}} lacks required roles: {{requiredRoles}}",
+          "User {{userId}} lacks required roles: {{requiredRoles}} (has: {{userRoles}})",
+        insufficientRolesNoRoles:
+          "User {{userId}} lacks required roles: {{requiredRoles}} (has: none)",
+        insufficientRolesPublic:
+          "User public lacks required roles: {{requiredRoles}} (has: {{userRoles}})",
+        insufficientRolesPublicNoRoles:
+          "User public lacks required roles: {{requiredRoles}} (has: none)",
       },
     },
     endpoints: {
       definition: {
         loader: {
           errors: {
-            endpointNotFound: "Endpoint not found",
-            loadFailed: "Failed to load endpoint",
-            batchLoadFailed: "Failed to load endpoints",
+            endpointNotFound: "Endpoint not found: {{identifier}}",
+            loadFailed: "Failed to load endpoint {{identifier}}: {{error}}",
+            batchLoadFailed:
+              "Failed to load {{failedCount}} of {{totalCount}} endpoints",
+            batchLoadError:
+              "Failed to load {{failedCount}} of {{totalCount}} endpoints: {{error}}",
           },
         },
       },

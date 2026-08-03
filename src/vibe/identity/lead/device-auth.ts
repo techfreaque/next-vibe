@@ -8,67 +8,23 @@
 
 import "server-only";
 
-import { and, eq, isNull, ne, or, sql } from "drizzle-orm";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
-import { success } from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
-import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
-import { CreditRepository } from "@/credits/repository";
+import { eq, or, sql } from "drizzle-orm";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import { getLanguageAndCountryFromLocale } from "../../core/i18n/core/language-utils";
+import type { ResponseType } from "../../core/route/response.schema";
+import { success } from "../../core/route/response.schema";
+import { parseError } from "../../core/utils/parse-error";
+import { db } from "../../database";
+import type { EndpointLogger } from "../../logger/types";
 
 import { leadLeadLinks, leads, userLeadLinks } from "./db";
 import { LeadSource, LeadStatus } from "./enum";
-
-/**
- */
-interface ClientInfo {
-  userAgent?: string;
-  ipAddress?: string;
-  referer?: string;
-}
 
 /**
  * Lead Auth Repository
  * Static class for all lead ID management and authentication integration
  */
 export class LeadAuthRepository {
-  /**
-   * Ensure public user has a valid leadId
-   * Creates new lead if cookie missing or invalid
-   */
-  static async ensurePublicLeadId(
-    cookieLeadId: string | undefined,
-    clientInfo: ClientInfo,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<{ leadId: string; isNew: boolean }> {
-    // If cookie has leadId, validate it
-    if (cookieLeadId) {
-      const isValid = await LeadAuthRepository.validateLeadId(
-        cookieLeadId,
-        logger,
-      );
-      if (isValid) {
-        logger.debug("Valid lead cookie found", { leadId: cookieLeadId });
-        return { leadId: cookieLeadId, isNew: false };
-      }
-      logger.debug("Invalid lead cookie", { invalidLeadId: cookieLeadId });
-    }
-
-    // Create new anonymous lead
-    const leadId = await LeadAuthRepository.createAnonymousLead(
-      clientInfo,
-      locale,
-      logger,
-    );
-    logger.debug(`Created anonymous lead ${leadId}`);
-    return { leadId, isNew: true };
-  }
-
   /**
    * Get leadId for authenticated user
    * With wallet-based system, we just get any linked lead (no primary concept)
@@ -166,173 +122,6 @@ export class LeadAuthRepository {
   }
 
   /**
-   * Check if a lead exists in the database
-   * Simple version without logger for middleware use
-   */
-  static async validateLeadIdExists(leadId: string): Promise<boolean> {
-    try {
-      const [lead] = await db
-        .select({ id: leads.id })
-        .from(leads)
-        .where(eq(leads.id, leadId))
-        .limit(1);
-
-      return !!lead;
-    } catch {
-      return false;
-    }
-  }
-
-  /**
-   * Create anonymous lead for website visitors
-   */
-  private static async createAnonymousLead(
-    clientInfo: ClientInfo,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<string> {
-    // Check for existing anonymous lead with same IP within last 5 minutes
-    // to prevent duplicate lead creation from multiple simultaneous requests
-    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-
-    const conditions = [
-      eq(leads.status, LeadStatus.WEBSITE_USER),
-      eq(leads.source, LeadSource.WEBSITE),
-      isNull(leads.email), // Anonymous leads have no email
-      sql`${leads.createdAt} > ${fiveMinutesAgo}`,
-    ];
-
-    if (clientInfo.ipAddress) {
-      conditions.push(
-        sql`${leads.metadata}->>'ipAddress' = ${clientInfo.ipAddress}`,
-      );
-    }
-
-    if (clientInfo.userAgent) {
-      conditions.push(
-        sql`${leads.metadata}->>'userAgent' = ${clientInfo.userAgent}`,
-      );
-    }
-
-    const [existingLead] = await db
-      .select()
-      .from(leads)
-      .where(and(...conditions))
-      .limit(1);
-
-    if (existingLead) {
-      logger.debug("Found existing anonymous lead", {
-        leadId: existingLead.id,
-      });
-      return existingLead.id;
-    }
-
-    // Extract country and language from locale
-    const { language, country } = getLanguageAndCountryFromLocale(locale);
-
-    // Create new anonymous lead
-    const [newLead] = await db
-      .insert(leads)
-      .values({
-        email: null,
-        businessName: "",
-        contactName: null,
-        phone: null,
-        website: null,
-        country,
-        language,
-        source: LeadSource.WEBSITE,
-        status: LeadStatus.WEBSITE_USER,
-        notes: null,
-        metadata: {
-          anonymous: true,
-          createdFromTracking: true,
-          userAgent: clientInfo.userAgent ?? null,
-          ipAddress: clientInfo.ipAddress ?? null,
-          referer: clientInfo.referer ?? null,
-          timestamp: new Date().toISOString(),
-        },
-      })
-      .returning();
-
-    logger.debug(`Created anonymous lead ${newLead.id}`);
-    // Create credit wallet for new lead (triggers via getLeadBalance)
-    const creditsT = creditsScopedTranslation.scopedT(locale).t;
-    await CreditRepository.getLeadBalance(newLead.id, logger, creditsT, locale);
-
-    // Link to other anonymous leads with the same IP created this month
-    if (clientInfo.ipAddress) {
-      await LeadAuthRepository.linkLeadsByIp(
-        newLead.id,
-        clientInfo.ipAddress,
-        logger,
-      );
-    }
-
-    return newLead.id;
-  }
-
-  /**
-   * Find other anonymous leads created this month with the same IP and link them.
-   * Inserts into leadLeadLinks with reason "ip_match". Uses onConflictDoNothing
-   * so concurrent requests and re-links are safe.
-   */
-  private static async linkLeadsByIp(
-    newLeadId: string,
-    ipAddress: string,
-    logger: EndpointLogger,
-  ): Promise<void> {
-    try {
-      const monthStart = new Date();
-      monthStart.setDate(1);
-      monthStart.setHours(0, 0, 0, 0);
-
-      // Cap at 20 - beyond that we already have enough pool links.
-      // A large unbounded VALUES clause overflows Drizzle's query AST stack.
-      const sameIpLeads = await db
-        .select({ id: leads.id })
-        .from(leads)
-        .where(
-          and(
-            ne(leads.id, newLeadId),
-            isNull(leads.email),
-            sql`${leads.metadata}->>'ipAddress' = ${ipAddress}`,
-            sql`${leads.createdAt} >= ${monthStart}`,
-          ),
-        )
-        .limit(20);
-
-      if (sameIpLeads.length === 0) {
-        return;
-      }
-
-      // Insert in small batches to keep the VALUES clause manageable
-      const BATCH_SIZE = 10;
-      for (let i = 0; i < sameIpLeads.length; i += BATCH_SIZE) {
-        const batch = sameIpLeads.slice(i, i + BATCH_SIZE);
-        await db
-          .insert(leadLeadLinks)
-          .values(
-            batch.map((existing) => ({
-              leadId1: newLeadId,
-              leadId2: existing.id,
-              linkReason: "ip_match" as const,
-            })),
-          )
-          .onConflictDoNothing();
-      }
-
-      logger.debug("Linked new lead to same-IP leads", {
-        newLeadId,
-        linkedCount: sameIpLeads.length,
-      });
-    } catch (error) {
-      // Non-critical - don't fail lead creation if IP linking fails
-      logger.error("Failed to link leads by IP", parseError(error).message);
-    }
-  }
-
-  /**
    * Create lead for user (when user has no leads)
    */
   private static async createLeadForUser(
@@ -341,7 +130,7 @@ export class LeadAuthRepository {
     logger: EndpointLogger,
   ): Promise<string> {
     // Get user email
-    const { users } = await import("next-vibe/identity/user/db");
+    const { users } = await import("../user/db");
     const [user] = await db
       .select({ email: users.email })
       .from(users)

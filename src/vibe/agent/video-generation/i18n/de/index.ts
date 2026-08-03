@@ -110,6 +110,7 @@ export const translations: typeof enTranslations = {
         "Das ausgewählte Modell unterstützt keine Videogenerierung. Bitte wähle ein Videomodell.",
       notConfigured:
         "{{label}} ist nicht konfiguriert. Füge {{envKey}} zu deiner .env-Datei hinzu. Hol dir deinen Schlüssel unter {{url}}",
+      providerUnsupported: "{{label}} wird noch nicht unterstützt",
       insufficientCredits:
         "Nicht genug Credits. Guthaben: {{balance}}, erforderlich: {{minimum}}",
       balanceCheckFailed: "Kontostand konnte nicht geprüft werden",
@@ -122,6 +123,16 @@ export const translations: typeof enTranslations = {
       generationFailed: "Videogenerierung fehlgeschlagen: {{error}}",
       providerError: "Anbieter-Fehler: {{error}}",
       noVideoUrl: "Kein Video-URL vom Anbieter zurückgegeben",
+      generationFailedUnknown:
+        "Videogenerierung fehlgeschlagen – der Anbieter nannte keinen Grund",
+      providerErrorUnknown: "Anbieter meldete einen Fehler ohne Fehlermeldung",
+      nonJsonResponse:
+        "Video-Anbieter lieferte keine JSON-Antwort (HTTP {{status}}): {{body}}",
+      providerHttpError:
+        "Video-Anbieter antwortete mit HTTP {{status}}: {{body}}",
+      jobFailedStatus: "Video-Auftrag endete mit Status: {{status}}",
+      requestAborted: "Videogenerierung abgebrochen",
+      requestTimedOut: "Zeitüberschreitung bei der Videogenerierung",
       creditsFailed:
         "Credits für Videogenerierung konnten nicht abgezogen werden",
       inputMediaRequired:

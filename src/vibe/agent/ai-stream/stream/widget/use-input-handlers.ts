@@ -3,8 +3,8 @@
  * Handles input submission, keyboard events, model changes, and prompt filling
  */
 
-import type { DefaultFolderId } from "next-vibe/agent/chat/config";
-import { useChatNavigationStore } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
+import type { DefaultFolderId } from "../../../../core/execution-context";
+import { useChatNavigationStore } from "../../../chat/hooks/use-chat-navigation-store";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { useSilentHistory } from "next-vibe/ui/hooks/use-navigation";

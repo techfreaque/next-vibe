@@ -26,6 +26,7 @@ export const translations = {
     internal: {
       title: "Internal Server Error",
       description: "An internal error occurred while logging out",
+      detail: "Logout failed: {{error}} (user {{userId}})",
     },
     unknown: {
       title: "Unknown Error",

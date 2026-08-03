@@ -24,8 +24,6 @@ import {
 } from "../enum";
 import type { ImapClientT } from "../i18n";
 import type {
-  ImapConnectionCloseRequestOutput,
-  ImapConnectionCloseResponseOutput,
   ImapConnectionConfig,
   ImapConnectionTestRequestOutput,
   ImapConnectionTestResponseOutput,
@@ -76,23 +74,9 @@ interface ImapMessageStruct {
 }
 
 /**
- * IMAP Connection Object Interface
- */
-interface ImapConnectionImpl {
-  state: string;
-  host: string;
-  port: number;
-  username: string;
-  capabilities: string[];
-  close: () => void;
-}
-
-/**
  * IMAP Connection Repository Implementation
  */
 export class ImapConnectionRepository {
-  private static connections: Map<string, ImapConnectionImpl> = new Map();
-
   /**
    * Map IMAP special use attributes to our enum values
    */
@@ -303,139 +287,6 @@ export class ImapConnectionRepository {
 
       return fail({
         message: t("imap.connection.test.failed"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      });
-    }
-  }
-
-  /**
-   * Connect to IMAP server
-   */
-  static async connect(
-    account: ImapAccountShape,
-    logger: EndpointLogger,
-    t: ImapClientT,
-  ): Promise<ResponseType<ImapConnectionImpl>> {
-    const config = ImapConnectionRepository.createConnectionConfig(account);
-    const connectionKey = `${config.host}:${config.port}:${config.username}`;
-
-    try {
-      logger.debug("Connecting to IMAP server", {
-        host: config.host,
-        port: config.port,
-        username: config.username,
-      });
-
-      // Check if connection already exists
-      if (ImapConnectionRepository.connections.has(connectionKey)) {
-        const existingConnection =
-          ImapConnectionRepository.connections.get(connectionKey);
-        if (
-          existingConnection &&
-          existingConnection.state === "authenticated"
-        ) {
-          logger.debug("Reusing existing IMAP connection", { connectionKey });
-          return success(existingConnection);
-        }
-      }
-
-      // Implement actual IMAP connection using node-imap
-      return await new Promise<ResponseType<ImapConnectionImpl>>(
-        (resolve, reject) => {
-          const imap = new Imap({
-            user: config.username,
-            password: config.password,
-            host: config.host,
-            port: config.port,
-            tls: config.secure || false,
-            tlsOptions: { rejectUnauthorized: false },
-            connTimeout: 10000,
-            authTimeout: 5000,
-          });
-
-          imap.once("ready", () => {
-            const connection: ImapConnectionImpl = {
-              state: "authenticated",
-              host: config.host,
-              port: config.port,
-              username: config.username,
-              capabilities: [],
-              close: () => {
-                logger.debug("Closing IMAP connection", { connectionKey });
-                ImapConnectionRepository.connections.delete(connectionKey);
-                imap.end();
-              },
-            };
-
-            ImapConnectionRepository.connections.set(connectionKey, connection);
-
-            logger.debug("IMAP connection established", {
-              host: config.host,
-              connectionKey,
-            });
-
-            resolve(success(connection));
-          });
-
-          imap.once("error", (err: Error) => {
-            logger.error("Error connecting to IMAP server", {
-              error: err.message,
-              host: config.host,
-              port: config.port,
-              secure: config.secure,
-              username: config.username,
-              errorDetails: err,
-            });
-            reject(err);
-          });
-
-          imap.connect();
-        },
-      );
-    } catch (error) {
-      logger.error("Failed to connect to IMAP server", parseError(error));
-      return fail({
-        message: t("imapErrors.connection.failed"),
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-      });
-    }
-  }
-
-  /**
-   * Disconnect from IMAP server
-   */
-  static async disconnect(
-    data: ImapConnectionCloseRequestOutput,
-    logger: EndpointLogger,
-    t: ImapClientT,
-  ): Promise<ResponseType<ImapConnectionCloseResponseOutput>> {
-    const config = ImapConnectionRepository.createConnectionConfig(
-      data.account,
-    );
-    const connectionKey = `${config.host}:${config.port}:${config.username}`;
-
-    try {
-      const connection =
-        ImapConnectionRepository.connections.get(connectionKey);
-      if (connection) {
-        connection.close();
-        ImapConnectionRepository.connections.delete(connectionKey);
-        logger.debug("IMAP connection closed", { connectionKey });
-      }
-
-      // Add a small delay to ensure cleanup
-      await new Promise<void>((resolve) => {
-        setTimeout(() => resolve(), 100);
-      });
-
-      return success({
-        success: true,
-        message: t("imap.connection.test.success"),
-      });
-    } catch (error) {
-      logger.error("Error closing IMAP connection", parseError(error));
-      return fail({
-        message: t("imapErrors.connection.close.failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -773,37 +624,5 @@ export class ImapConnectionRepository {
       disposition.type.toLowerCase() === "attachment"
       ? 1
       : 0;
-  }
-
-  /**
-   * Close all connections
-   */
-  static closeAllConnections(
-    logger: EndpointLogger,
-    t: ImapClientT,
-  ): ResponseType<{ success: boolean; message: string }> {
-    try {
-      logger.debug("Closing all IMAP connections");
-
-      // Close all connections synchronously (close() returns void, not Promise)
-      [...ImapConnectionRepository.connections.values()].forEach((connection) =>
-        connection.close(),
-      );
-
-      ImapConnectionRepository.connections.clear();
-
-      logger.debug("All IMAP connections closed");
-
-      return success({
-        success: true,
-        message: t("imap.connection.test.success"),
-      });
-    } catch (error) {
-      logger.error("Error closing IMAP connections", parseError(error));
-      return fail({
-        message: t("imapErrors.connection.close.failed"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      });
-    }
   }
 }

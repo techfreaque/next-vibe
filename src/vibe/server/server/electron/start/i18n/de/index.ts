@@ -53,6 +53,8 @@ export const translations: typeof enTranslations = {
       server: {
         title: "Serverfehler",
         description: "Interner Serverfehler",
+        compileFailed: "Electron-Kompilierung fehlgeschlagen: {{error}}",
+        startFailed: "Electron-Start fehlgeschlagen: {{error}}",
       },
       unknown: {
         title: "Unbekannter Fehler",

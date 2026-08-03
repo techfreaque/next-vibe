@@ -1,11 +1,11 @@
-import type { chatModelSelectionSchema } from "next-vibe/agent/ai-stream/models";
+import type { chatModelSelectionSchema } from "../ai-stream/models";
 import type {
   audioVisionModelSelectionSchema,
   imageVisionModelSelectionSchema,
   videoVisionModelSelectionSchema,
-} from "next-vibe/agent/ai-stream/vision-models";
-import type { imageGenModelSelectionSchema } from "next-vibe/agent/image-generation/models";
-import type { musicGenModelSelectionSchema } from "next-vibe/agent/music-generation/models";
+} from "../ai-stream/vision-models";
+import type { imageGenModelSelectionSchema } from "../image-generation/models";
+import type { musicGenModelSelectionSchema } from "../music-generation/models";
 import {
   ContentLevel,
   IntelligenceLevel,
@@ -13,10 +13,10 @@ import {
   ModelSortDirection,
   ModelSortField,
   PriceLevel,
-} from "next-vibe/agent/skills/enum";
-import type { sttModelSelectionSchema } from "next-vibe/agent/speech-to-text/models";
-import type { voiceModelSelectionSchema } from "next-vibe/agent/text-to-speech/models";
-import type { videoGenModelSelectionSchema } from "next-vibe/agent/video-generation/models";
+} from "../skills/enum";
+import type { sttModelSelectionSchema } from "../speech-to-text/models";
+import type { voiceModelSelectionSchema } from "../text-to-speech/models";
+import type { videoGenModelSelectionSchema } from "../video-generation/models";
 import { z } from "zod";
 
 export const sharedFilterPropsSchema = z.object({

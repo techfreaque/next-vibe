@@ -3,10 +3,10 @@
  * Reusable filtering infrastructure for stats endpoints
  */
 
-import { dateSchema } from "next-vibe/core/definition/common.schema";
-import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
-import { scopedTranslation } from "next-vibe/core/i18n/shared";
-import { createEnumOptions } from "next-vibe/unified-ui/_shared/enum";
+import { dateSchema } from "../definition/common.schema";
+import type { TranslatedKeyType } from "../i18n/core/scoped-translation";
+import { scopedTranslation } from "../i18n/shared";
+import { createEnumOptions } from "../../unified-ui/_shared/enum";
 import { z } from "zod";
 
 /**

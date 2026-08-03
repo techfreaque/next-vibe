@@ -3,12 +3,12 @@
  * Displays markdown-formatted content with GitHub-flavored styling
  */
 
-import type { WidgetType } from "next-vibe/core/definition/enums";
-import type { StringWidgetSchema } from "next-vibe/unified-ui/_shared/schema-constraints";
+import type { WidgetType } from "../../../../core/definition/enums";
+import type { StringWidgetSchema } from "../../../_shared/schema-constraints";
 import type {
   BasePrimitiveWidgetConfig,
   FieldUsageConfig,
-} from "next-vibe/unified-ui/_shared/types";
+} from "../../../_shared/types";
 
 /**
  * Markdown Widget Configuration

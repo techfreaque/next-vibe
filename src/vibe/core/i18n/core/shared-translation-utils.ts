@@ -69,9 +69,16 @@ export function processTranslationValue<K extends string>(
     let translationValue: string = value;
     if (params) {
       Object.entries(params).forEach(([paramKey, paramValue]) => {
+        // The replacement is a FUNCTION, not a string. A string replacement
+        // interprets `$&`, `$1`, `` $` `` etc. as patterns, so an interpolated
+        // value containing them is silently corrupted - and interpolated values
+        // are now overwhelmingly raw error text, which routinely carries `$`
+        // (shell vars, regex sources, prices). A function replacement is passed
+        // through verbatim.
+        const replacement = String(paramValue);
         translationValue = translationValue.replaceAll(
           new RegExp(`{{${paramKey}}}`, "g"),
-          String(paramValue),
+          () => replacement,
         );
       });
     }

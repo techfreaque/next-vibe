@@ -5,7 +5,7 @@
 
 "use client";
 
-import { scopedTranslation as chatScopedTranslation } from "next-vibe/agent/chat/i18n";
+import { scopedTranslation as chatScopedTranslation } from "../chat/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-empty-function */
-// eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type test file requires unknown for testing various type patterns
+// eslint-disable-next-line restricted/restricted-syntax -- Type test file requires unknown for testing various type patterns
 /**
  * Comprehensive Scoped Translation Keys Type Tests
  *
@@ -14,22 +14,19 @@
  * DO NOT DELETE.
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "../definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
-import type { ExtractScopedKeyType } from "next-vibe/core/i18n/core/static-types";
-import { UserRole } from "next-vibe/identity/roles/enum";
-import {
-  objectField,
-  requestField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../definition/enums";
+import type { CountryLanguage } from "../i18n/core/config";
+import type { TranslatedKeyType } from "../i18n/core/scoped-translation";
+import type { ExtractScopedKeyType } from "../i18n/core/static-types";
+import { UserRole } from "../../identity/roles/enum";
+import { objectField, requestField } from "../../unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { type ContactTranslationKey, scopedTranslation } from "@/contact/i18n";

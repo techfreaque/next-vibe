@@ -1,5 +1,5 @@
-import { useTranslation } from "next-vibe/core/i18n/core/client";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { useTranslation } from "../../../core/i18n/core/client";
+import { cn } from "../../../unified-ui/_shared/cn";
 import React from "react";
 import type { ScrollView as RNScrollView } from "react-native";
 import { Pressable, ScrollView, Text as RNText, View } from "react-native";
@@ -8,7 +8,7 @@ import {
   convertCSSToViewStyle,
   styledNative,
   styledNativeRef,
-} from "../../native/utils/style-converter";
+} from "../utils/style-converter";
 import { uiScopedTranslation } from "../../web/i18n";
 import type {
   CarouselApi,
@@ -40,7 +40,7 @@ const CarouselContext = React.createContext<CarouselContextProps | null>(null);
 function useCarousel(): CarouselContextProps {
   const context = React.useContext(CarouselContext);
   if (!context) {
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Standard React context hook pattern - throw is correct for developer mistakes
+    // oxlint-disable-next-line restricted/restricted-syntax -- Standard React context hook pattern - throw is correct for developer mistakes
     // eslint-disable-next-line i18next/no-literal-string -- Error handling for context
     throw new Error("useCarousel must be used within a <Carousel />");
   }

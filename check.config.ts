@@ -22,7 +22,7 @@ import type {
 // Vibe Check Defaults
 // --------------------------------------------------------
 const vibeCheck: CheckConfig["vibeCheck"] = {
-  fix: true,
+  fix: false,
   skipEslint: false,
   skipOxlint: false,
   skipTypecheck: false,
@@ -32,7 +32,7 @@ const vibeCheck: CheckConfig["vibeCheck"] = {
   editorUriScheme: "cursor://file/", // URI scheme for clickable file links
   // Extensive mode: when false (default), test and generated files are excluded.
   // use "vibe check --extensive" for release validation to catch issues in all files.
-  extensive: true,
+  extensive: false,
 };
 
 // ============================================================
@@ -69,6 +69,38 @@ const features = {
   tsgo: true, // Use tsgo instead of tsc for type checking
   strictTypes: true, // Strict type checking rules
 } as const;
+
+/**
+ * Passed to every restricted-syntax rule. Each rule reads only its own switch,
+ * but they share one options object so the plugin's config loader can find the
+ * options under any of the rule names.
+ */
+const restrictedSyntaxOptions = {
+  noThrow: true,
+  noUnknown: true,
+  noObjectType: true,
+  jsxAllowedProperties: [
+    "icon",
+    "content",
+    "title",
+    "description",
+    "children",
+    "header",
+    "footer",
+    "element",
+    "component",
+    "label",
+    "placeholder",
+    "tooltip",
+    "badge",
+    "prefix",
+    "suffix",
+    "startAdornment",
+    "endAdornment",
+    "emptyState",
+    "fallback",
+  ],
+};
 
 // ============================================================
 // Non-extensive ignore patterns (test + generated files)
@@ -178,7 +210,7 @@ const oxlint: CheckConfig["oxlint"] = {
           "next-vibe/tooling/checker/oxlint/oxlint-plugins/jsx-capitalization.ts",
         ]
       : []),
-    ...(features.i18n ? ["@next-vibe/checker/oxlint-plugins/i18n.ts"] : []),
+    ...(features.i18n ? ["@next-vibe/checker/oxlint-plugins/i18n.js"] : []),
     ...(features.boilerplate
       ? ["next-vibe/tooling/checker/oxlint/oxlint-plugins/boilerplate.ts"]
       : []),
@@ -255,6 +287,12 @@ const oxlint: CheckConfig["oxlint"] = {
     // ── React (enabled via react flag) ────────────────────────
     ...(features.react
       ? {
+          // Ported off eslint-plugin-react-hooks. Verified present in oxlint
+          // 1.57.0 - a rule name oxlint does not know makes it abort the whole
+          // config load while still reporting "0 issues", i.e. a silently
+          // passing lint, so these are checked against `oxlint --rules`.
+          "react/rules-of-hooks": "error",
+          "react/exhaustive-deps": "error",
           "react/jsx-key": "error",
           "react/jsx-no-duplicate-props": "error",
           "react/jsx-no-undef": "error",
@@ -370,33 +408,39 @@ const oxlint: CheckConfig["oxlint"] = {
 
     // ── Custom JS Plugins (enabled via feature flags) ────────
     // Options defined inline, plugins read from config.oxlint.rules
+    // One rule name per ban. The rule name is the only handle anything outside
+    // the plugin has — it is what a diagnostic prints, what `strictRules`
+    // matches, and what an `eslint-disable` silences. A single
+    // `restricted-syntax` rule could only ever be toggled all-or-nothing.
     ...(features.restrictedSyntax
       ? {
-          "oxlint-plugin-restricted/restricted-syntax": [
+          "oxlint-plugin-restricted/no-unknown": [
             "error",
-            {
-              jsxAllowedProperties: [
-                "icon",
-                "content",
-                "title",
-                "description",
-                "children",
-                "header",
-                "footer",
-                "element",
-                "component",
-                "label",
-                "placeholder",
-                "tooltip",
-                "badge",
-                "prefix",
-                "suffix",
-                "startAdornment",
-                "endAdornment",
-                "emptyState",
-                "fallback",
-              ],
-            },
+            restrictedSyntaxOptions,
+          ],
+          "oxlint-plugin-restricted/no-object-type": [
+            "error",
+            restrictedSyntaxOptions,
+          ],
+          "oxlint-plugin-restricted/no-throw": [
+            "error",
+            restrictedSyntaxOptions,
+          ],
+          "oxlint-plugin-restricted/no-jsx-in-object-literal": [
+            "error",
+            restrictedSyntaxOptions,
+          ],
+          "oxlint-plugin-restricted/no-raw-fetch": [
+            "error",
+            restrictedSyntaxOptions,
+          ],
+          "oxlint-plugin-restricted/no-browser-globals": [
+            "error",
+            restrictedSyntaxOptions,
+          ],
+          "oxlint-plugin-restricted/no-endpoints-page-in-server-entry": [
+            "error",
+            restrictedSyntaxOptions,
           ],
         }
       : {}),
@@ -895,17 +939,12 @@ const config = (): CheckConfig => {
             i18n: createEslintStub(["no-literal-string"]),
           },
           rules: {
+            // ESLint earns its place for exactly one thing: import/export
+            // ordering. oxlint has no port of simple-import-sort (its core
+            // sort-imports enforces a different, incompatible order), so this
+            // stays here while every other rule lives in the oxlint block.
             "simple-import-sort/imports": "error",
             "simple-import-sort/exports": "error",
-            ...(features.react
-              ? {
-                  "react-hooks/rules-of-hooks": "error",
-                  "react-hooks/exhaustive-deps": "error",
-                }
-              : {}),
-            ...(features.reactCompiler
-              ? { "react-compiler/react-compiler": "error" }
-              : {}),
             "no-unused-vars": "off",
             "no-console": "off",
             "no-template-curly-in-string": "off",
@@ -952,12 +991,6 @@ const config = (): CheckConfig => {
           rules: {
             "simple-import-sort/imports": "error",
             "simple-import-sort/exports": "error",
-            ...(features.react
-              ? {
-                  "react-hooks/rules-of-hooks": "error",
-                  "react-hooks/exhaustive-deps": "error",
-                }
-              : {}),
             "no-unused-vars": "off",
             "no-console": "off",
             "no-template-curly-in-string": "off",

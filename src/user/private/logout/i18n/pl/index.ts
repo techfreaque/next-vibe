@@ -28,6 +28,7 @@ export const translations: typeof enTranslations = {
     internal: {
       title: "Wewnętrzny Błąd Serwera",
       description: "Wystąpił błąd wewnętrzny podczas wylogowywania",
+      detail: "Wylogowanie nie powiodło się: {{error}} (użytkownik {{userId}})",
     },
     unknown: {
       title: "Nieznany Błąd",

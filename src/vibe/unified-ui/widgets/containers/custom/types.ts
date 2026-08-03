@@ -1,12 +1,12 @@
-import type { WidgetType } from "next-vibe/core/definition/enums";
+import type { WidgetType } from "../../../../core/definition/enums";
 import type {
   BaseObjectWidgetConfig,
   BasePrimitiveWidgetConfig,
   ConstrainedChildUsage,
   FieldUsageConfig,
   ObjectChildrenConstraint,
-} from "next-vibe/unified-ui/_shared/types";
-import type { BaseContainerLayoutProps } from "next-vibe/unified-ui/widgets/containers/container/types";
+} from "../../../_shared/types";
+import type { BaseContainerLayoutProps } from "../container/types";
 import type z from "zod";
 
 /**

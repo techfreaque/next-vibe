@@ -5,7 +5,7 @@
  * Deduplicates shared indicator nodes across multiple graphs.
  */
 
-import type { GraphConfig } from "next-vibe/dataflow/graph/types";
+import type { GraphConfig } from "../graph/types";
 
 // ─── Topological Sort ─────────────────────────────────────────────────────────
 

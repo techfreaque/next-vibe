@@ -10,17 +10,24 @@ import "server-only";
 
 import { readFile } from "node:fs/promises";
 
-import type { GeneratorDefinition } from "next-vibe/core/generators/shared/shared-inputs";
+import type { GeneratorDefinition } from "../core/generators/shared/shared-inputs";
 import {
   findFilesRecursively,
   generateFileHeader,
   getRelativeImportPath,
   writeGeneratedFile,
-} from "next-vibe/core/generators/shared/utils";
+} from "../core/generators/shared/utils";
 
-import { GENERATED_DIR, getApiDir } from "@/env/paths";
+import { GENERATED_DIR, getApiDir, VIBE_DIR } from "@/env/paths";
 
 const OUTPUT_FILE = `${GENERATED_DIR}/tasks/index.ts`;
+
+/**
+ * Where Task/TaskRegistry actually live. The emitted import resolves from the
+ * generated file's directory, not this one — a hand-written "./unified-runner/types"
+ * pointed at <generated>/tasks/unified-runner/types, which does not exist.
+ */
+const TASK_TYPES_MODULE = `${VIBE_DIR}/tasks/unified-runner/types.ts`;
 
 /**
  * Validate that every task/runner file exports the expected symbol. Throws a plain
@@ -99,7 +106,7 @@ function generateContent(
 /* eslint-disable prettier/prettier */
 /* eslint-disable simple-import-sort/imports */
 
-import type { Task, TaskRegistry } from "next-vibe/tasks/unified-runner/types";
+import type { Task, TaskRegistry } from "${getRelativeImportPath(TASK_TYPES_MODULE, outputFile)}";
 
 ${imports.join("\n")}
 
@@ -162,6 +169,7 @@ export const generator: GeneratorDefinition = {
       ...findFilesRecursively(apiDir, "task-runner.ts"),
     ].toSorted();
   },
+  output: OUTPUT_FILE,
   async generate(ctx) {
     const taskFiles = ctx.files.task;
     const taskRunnerFiles = ctx.files.taskRunner;

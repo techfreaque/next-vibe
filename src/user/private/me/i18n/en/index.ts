@@ -62,6 +62,7 @@ export const translations = {
       notFound: {
         title: "Not Found",
         description: "User profile not found",
+        detail: "We couldn't find your profile (user {{userId}})",
       },
       conflict: {
         title: "Conflict",
@@ -78,6 +79,7 @@ export const translations = {
       internal: {
         title: "Internal Error",
         description: "Internal server error occurred",
+        detail: "Could not load your profile: {{error}} (user {{userId}})",
       },
       unknown: {
         title: "Unknown Error",
@@ -317,6 +319,7 @@ export const translations = {
       validation: {
         title: "Validation Error",
         description: "Invalid request parameters",
+        emailTaken: "That email address already belongs to another account",
       },
       unauthorized: {
         title: "Unauthorized",
@@ -329,10 +332,12 @@ export const translations = {
       notFound: {
         title: "Not Found",
         description: "User profile not found",
+        detail: "We couldn't find your profile to update (user {{userId}})",
       },
       conflict: {
         title: "Conflict",
         description: "Data conflict occurred",
+        creatorSlugTaken: "That creator handle is already taken - pick another",
       },
       network: {
         title: "Network Error",
@@ -345,6 +350,7 @@ export const translations = {
       internal: {
         title: "Internal Error",
         description: "Internal server error occurred",
+        detail: "Could not save your profile: {{error}} (user {{userId}})",
       },
       unknown: {
         title: "Unknown Error",
@@ -381,6 +387,7 @@ export const translations = {
       notFound: {
         title: "Not Found",
         description: "User account not found",
+        detail: "We couldn't find your account to delete (user {{userId}})",
       },
       conflict: {
         title: "Conflict",
@@ -397,6 +404,7 @@ export const translations = {
       internal: {
         title: "Internal Error",
         description: "Internal server error occurred",
+        detail: "Could not delete your account: {{error}} (user {{userId}})",
       },
       unknown: {
         title: "Unknown Error",

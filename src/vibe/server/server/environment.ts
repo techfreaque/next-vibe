@@ -5,8 +5,8 @@
 
 import "server-only";
 
-import { coreEnv } from "next-vibe/core/env";
-import { Environment } from "next-vibe/env/env-util";
+import { coreEnv } from "../../core/env";
+import { Environment } from "../../env/env-util";
 
 import { serverSystemEnv } from "./env";
 

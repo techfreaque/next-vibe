@@ -19,24 +19,24 @@
 
 "use client";
 
-import { getPreferredToolName } from "next-vibe/core/core-utils/path";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { WidgetData } from "next-vibe/core/utils/json";
+import { getPreferredToolName } from "../../../../core/core-utils/path";
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
+import type { WidgetData } from "../../../../core/utils/json";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { Span } from "next-vibe/ui/ui/span";
-import type { ReactFormFieldProps } from "next-vibe/unified-ui/_shared/react-types";
-import type { StringWidgetSchema } from "next-vibe/unified-ui/_shared/schema-constraints";
-import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
+import type { ReactFormFieldProps } from "../../../_shared/react-types";
+import type { StringWidgetSchema } from "../../../_shared/schema-constraints";
+import type { FieldUsageConfig } from "../../../_shared/types";
 import {
   useIsMcp,
   useWidgetContext,
   useWidgetForm,
   useWidgetLocale,
   useWidgetNavigation,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
-import { scopedTranslation as unifiedInterfaceScopedTranslation } from "next-vibe/unified-ui/hooks/i18n";
+} from "../../../_shared/use-widget-context";
+import { scopedTranslation as unifiedInterfaceScopedTranslation } from "../../../hooks/i18n";
 import { type JSX, useEffect, useRef, useState } from "react";
 
 import type { EntityPickerFieldWidgetConfig } from "./types";

@@ -35,5 +35,3 @@ export function useSubscription(
     user,
   );
 }
-
-export type SubscriptionEndpointReturn = EndpointReturn<typeof definitions>;

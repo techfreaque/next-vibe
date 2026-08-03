@@ -7,30 +7,39 @@ import "server-only";
 
 import { readFile, writeFile } from "node:fs/promises";
 
-import { PATH_SEPARATOR } from "next-vibe/core/core-utils/path";
-import type { ApiSection } from "next-vibe/core/definition/endpoint-base";
+import { PATH_SEPARATOR } from "../../core-utils/path";
+import type { ApiSection } from "../endpoint-base";
 import type {
   GeneratorContext,
   GeneratorResult,
-} from "next-vibe/core/generators/shared/shared-inputs";
+} from "../../generators/shared/shared-inputs";
 import {
   extractNestedPath,
   extractPathKey,
   generateAbsoluteImportPath,
   generateFileHeader,
+  getRelativeImportPath,
   stripProjectRoot,
   toImportUrl,
+  toProjectRelativePath,
   writeGeneratedFile,
-} from "next-vibe/core/generators/shared/utils";
-import type { GenericHandlerBase } from "next-vibe/core/route/handler";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { formatCount, formatWarning } from "next-vibe/logger/formatters";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../generators/shared/utils";
+import type { WidgetData } from "../../utils/json";
+import { formatCount, formatWarning } from "../../../logger/formatters";
+import type { EndpointLogger } from "../../../logger/types";
 
-import { GENERATED_DIR } from "@/env/paths";
+import { GENERATED_DIR, VIBE_DIR } from "@/env/paths";
+
+import { WsChannelsGenerator } from "./generator-ws-channels";
 
 const OUTPUT_FILE = `${GENERATED_DIR}/routes/handlers.ts`;
+
+/**
+ * Where GenericHandlerBase actually lives. The emitted import resolves from the
+ * generated file's directory, not this one — a hand-written "../../route/handler"
+ * pointed at <generated>/route/handler, which does not exist.
+ */
+const HANDLER_MODULE = `${VIBE_DIR}/core/route/handler.ts`;
 
 /**
  * Serialize path segments into the canonical single-line array literal used in
@@ -179,7 +188,11 @@ class RouteHandlersGenerator {
 
       // Generate content with only valid route files
       const { content, hotPathsContent, routeCount } =
-        await RouteHandlersGenerator.generateContent(validRouteFiles, logger);
+        await RouteHandlersGenerator.generateContent(
+          validRouteFiles,
+          logger,
+          outputFile,
+        );
 
       // Write route-handlers.ts and hot-paths.ts
       const hotPathsFile = outputFile.replace(
@@ -189,52 +202,24 @@ class RouteHandlersGenerator {
       await writeGeneratedFile(outputFile, content, false);
       await writeGeneratedFile(hotPathsFile, hotPathsContent, false);
 
-      // Enforce that every subscribable WS channel has a resource-level
-      // canSubscribe guard on the emitting method. Fail-closed at build time:
-      // an unguarded channel would authorize on role alone (a leak), so we
-      // abort rather than generate it.
-      const wsErrors =
-        await RouteHandlersGenerator.validateWsChannels(validRouteFiles);
-      if (wsErrors.length > 0) {
-        for (const err of wsErrors) {
-          logger.error(formatWarning(err));
-        }
+      // Websocket channels and remote-event routes are an optional concern —
+      // see generator-ws-channels.ts. It validates the channel guards and emits
+      // both registries; a build without realtime never reaches this.
+      const ws = await WsChannelsGenerator.run(
+        validRouteFiles,
+        outputFile,
+        logger,
+      );
+      if (!ws.ok) {
         return {
           summary: "route handlers (failed: WS channel guards)",
-          failed: `Route handlers generation failed (WS channel guards): ${wsErrors.join("; ")}`,
+          failed: `Route handlers generation failed (WS channel guards): ${ws.failed}`,
         };
       }
 
-      // Generate ws-channels.ts alongside route-handlers — one entry per
-      // endpoint method that declares at least one client-delivered event.
-      const wsChannelsFile = outputFile.replace(
-        /\/handlers.ts$/,
-        "/ws-channels.ts",
-      );
-      const { content: wsContent, channelCount } =
-        await RouteHandlersGenerator.generateWsChannelsContent(validRouteFiles);
-      await writeGeneratedFile(wsChannelsFile, wsContent, false);
-      logger.debug(
-        `Generated ws-channels.ts with ${channelCount} channel entries`,
-      );
-
-      // remote-event-routes.ts — the bridge dispatch's force-load registry.
-      const remoteEventRoutesFile = outputFile.replace(
-        /\/handlers.ts$/,
-        "/remote-event-routes.ts",
-      );
-      const { content: reContent, routeCount: remoteEventRouteCount } =
-        await RouteHandlersGenerator.generateRemoteEventRoutesContent(
-          validRouteFiles,
-        );
-      await writeGeneratedFile(remoteEventRoutesFile, reContent, false);
-      logger.debug(
-        `Generated remote-event-routes.ts with ${remoteEventRouteCount} entries`,
-      );
-
       return {
-        summary: `route handlers (${routeCount} routes, ${channelCount} channels)`,
-        counts: { routes: routeCount, channels: channelCount },
+        summary: `route handlers (${routeCount} routes, ${ws.channelCount} channels)`,
+        counts: { routes: routeCount, channels: ws.channelCount },
       };
     }
   }
@@ -435,10 +420,11 @@ class RouteHandlersGenerator {
   private static async generateContent(
     routeFiles: string[],
     logger: EndpointLogger,
+    outputFile: string,
   ): Promise<{ content: string; hotPathsContent: string; routeCount: number }> {
     const pathMap: Record<
       string,
-      { importPath: string; absPath: string; method: string }
+      { importPath: string; relPath: string; method: string }
     > = {};
     const allPaths: string[] = [];
     let routeCount = 0;
@@ -447,6 +433,7 @@ class RouteHandlersGenerator {
     for (const routeFile of routeFiles) {
       const { path } = extractPathKey(routeFile);
       const importPath = generateAbsoluteImportPath(routeFile, "route");
+      const relPath = toProjectRelativePath(routeFile);
 
       // Get methods for this route from definition file
       const methods =
@@ -463,7 +450,7 @@ class RouteHandlersGenerator {
       for (const method of methods) {
         const pathWithMethod = `${path}${PATH_SEPARATOR}${method}`;
         if (!pathMap[pathWithMethod]) {
-          pathMap[pathWithMethod] = { importPath, absPath: routeFile, method };
+          pathMap[pathWithMethod] = { importPath, relPath, method };
           allPaths.push(pathWithMethod);
           routeCount++;
         }
@@ -475,7 +462,7 @@ class RouteHandlersGenerator {
       for (const { alias, method } of definitionAliases) {
         // Only add if not already present (first wins)
         if (!pathMap[alias]) {
-          pathMap[alias] = { importPath, absPath: routeFile, method };
+          pathMap[alias] = { importPath, relPath, method };
           allPaths.push(alias);
         }
       }
@@ -499,13 +486,13 @@ class RouteHandlersGenerator {
 
     // Generate static-import cases (bundler-traceable)
     const cases: string[] = [];
-    // Also build the hot-paths map: toolName -> { absPath, method }
+    // Also build the hot-paths map: toolName -> { relPath, method }
     const hotPathEntries: string[] = [];
     // One canonical path per unique module — enough to warm every import.
     const prewarmSeen = new Set<string>();
     const prewarmPaths: string[] = [];
     for (const path of allPaths) {
-      const { importPath, absPath, method } = pathMap[path];
+      const { importPath, relPath, method } = pathMap[path];
       if (!prewarmSeen.has(importPath)) {
         prewarmSeen.add(importPath);
         prewarmPaths.push(path);
@@ -552,14 +539,14 @@ class RouteHandlersGenerator {
       // eslint-disable-next-line i18next/no-literal-string
       const hotPathNeedsQuotes = /[^a-zA-Z0-9_$]/.test(path);
       const hotPathKey = hotPathNeedsQuotes ? `"${path}"` : path;
-      const absPathLine = `    absPath: "${absPath}",`;
-      if (absPathLine.length <= 80) {
+      const relPathLine = `    relPath: "${relPath}",`;
+      if (relPathLine.length <= 80) {
         hotPathEntries.push(
-          `  ${hotPathKey}: {\n    absPath: "${absPath}",\n    method: "${method}",\n  },`,
+          `  ${hotPathKey}: {\n    relPath: "${relPath}",\n    method: "${method}",\n  },`,
         );
       } else {
         hotPathEntries.push(
-          `  ${hotPathKey}: {\n    absPath:\n      "${absPath}",\n    method: "${method}",\n  },`,
+          `  ${hotPathKey}: {\n    relPath:\n      "${relPath}",\n    method: "${method}",\n  },`,
         );
       }
     }
@@ -575,7 +562,7 @@ class RouteHandlersGenerator {
     // eslint-disable-next-line i18next/no-literal-string
     const content = `${header}
 
-import type { GenericHandlerBase } from "next-vibe/core/route/handler";
+import type { GenericHandlerBase } from "${getRelativeImportPath(HANDLER_MODULE, outputFile)}";
 
 /* eslint-disable prettier/prettier */
 
@@ -660,478 +647,21 @@ if (
 /* eslint-disable prettier/prettier */
 
 /**
- * Maps every tool name to its import path and HTTP method.
+ * Maps every tool name to its src-relative path and HTTP method.
  * Used by the MCP hot-loader to build fresh (cache-busted) imports at runtime
  * without static import strings that bundlers would trace.
+ *
+ * Paths are relative because this file is committed: an absolute path is only
+ * ever correct on the machine that ran the generator. The hot-loader resolves
+ * them against the same src root at runtime.
  */
 export const routeHotPaths: Record<
   string,
-  { absPath: string; method: string }
+  { relPath: string; method: string }
 > = {
 ${hotPathEntries.join("\n")}
 };
 `;
     return { content, hotPathsContent, routeCount };
-  }
-
-  /**
-   * Extract methods that declare at least one CLIENT-DELIVERED event from a
-   * definition file.
-   *
-   * An endpoint method qualifies for WS channel authorization when its `events`
-   * map contains at least one event that is delivered to clients — i.e. an event
-   * whose `clientDelivery` flag is NOT `false`. Server-only-event endpoints
-   * (every event flagged `clientDelivery: false`, e.g. execute-tool's tool
-   * dispatch wires, remote-event-bridge, sync) are authorized as system
-   * channels and intentionally excluded here.
-   */
-  private static async extractWsMethodsFromDefinition(
-    routeFile: string,
-  ): Promise<Array<{ method: string; scope: string | undefined }>> {
-    const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
-    try {
-      const definition = (await import(toImportUrl(definitionPath))) as {
-        default?: Record<
-          string,
-          {
-            events?: Record<string, { clientDelivery?: false }>;
-            channel?: { scope?: string };
-          }
-        >;
-      };
-      let defaultExport;
-      try {
-        defaultExport = definition.default;
-      } catch {
-        // Bun plugin race - yield then retry
-        await new Promise((resolve) => {
-          setTimeout(resolve, 10);
-        });
-        defaultExport = definition.default;
-      }
-
-      if (!defaultExport) {
-        return [];
-      }
-
-      const HTTP_METHODS = [
-        "GET",
-        "POST",
-        "PUT",
-        "PATCH",
-        "DELETE",
-        "HEAD",
-        "OPTIONS",
-      ];
-      const methods: Array<{ method: string; scope: string | undefined }> = [];
-      for (const method of Object.keys(defaultExport)) {
-        if (!HTTP_METHODS.includes(method)) {
-          continue;
-        }
-        const events = defaultExport[method]?.events;
-        if (!events || typeof events !== "object") {
-          continue;
-        }
-        // Qualify only when at least one event is delivered to clients.
-        const hasClientEvent = Object.values(events).some(
-          (event) => event?.clientDelivery !== false,
-        );
-        if (hasClientEvent) {
-          methods.push({
-            method,
-            scope: defaultExport[method]?.channel?.scope,
-          });
-        }
-      }
-      return methods;
-    } catch {
-      return [];
-    }
-  }
-
-  /**
-   * Methods whose definition declares at least one `remoteEvent: true` event —
-   * these routes must be loadable BY PATH when a relayed event arrives before
-   * anything imported them in this process (see remote-event-bridge/registry).
-   */
-  private static async extractRemoteEventMethodsFromDefinition(
-    routeFile: string,
-  ): Promise<string[]> {
-    const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
-    try {
-      const definition = (await import(toImportUrl(definitionPath))) as {
-        default?: Record<
-          string,
-          { events?: Record<string, { remoteEvent?: true }> }
-        >;
-      };
-      let defaultExport;
-      try {
-        defaultExport = definition.default;
-      } catch {
-        await new Promise((resolve) => {
-          setTimeout(resolve, 10);
-        });
-        defaultExport = definition.default;
-      }
-      if (!defaultExport) {
-        return [];
-      }
-      const HTTP_METHODS = [
-        "GET",
-        "POST",
-        "PUT",
-        "PATCH",
-        "DELETE",
-        "HEAD",
-        "OPTIONS",
-      ];
-      const methods: string[] = [];
-      for (const method of Object.keys(defaultExport)) {
-        if (!HTTP_METHODS.includes(method)) {
-          continue;
-        }
-        const events = defaultExport[method]?.events;
-        if (!events || typeof events !== "object") {
-          continue;
-        }
-        const hasRemoteEvent = Object.values(events).some(
-          (event) => event?.remoteEvent === true,
-        );
-        if (hasRemoteEvent) {
-          methods.push(method);
-        }
-      }
-      return methods;
-    } catch {
-      return [];
-    }
-  }
-
-  /**
-   * Validate that every client-subscribable WS channel has a `resolveChannel`
-   * on the EXACT method that emits its events.
-   *
-   * This is the build-time BACKSTOP to the type-level enforcement (a method with
-   * client-delivered events whose definition has channel scope resource/resolved
-   * cannot compile without resolveChannel). It additionally guards the stale-
-   * generated-file case and the scope:"user" case (which the type forbids a
-   * resolver for — and which is correct: a user-scoped channel needs no resolver,
-   * so it's skipped here too).
-   *
-   * It also catches the wrong-method footgun: a `resolveChannel` on GET while the
-   * events live on PATCH/DELETE leaves those channels unguarded. We check the
-   * resolver on the channel's own method, matching the runtime (lazyResolveChannel
-   * keys by method too).
-   *
-   * Route modules are imported here (CLI/generator context, not the prod bundle
-   * init path) only for the small set of channel-bearing routes — bounded work,
-   * and the only reliable way to read the runtime `tools[method].resolveChannel`.
-   */
-  private static async validateWsChannels(
-    routeFiles: string[],
-  ): Promise<string[]> {
-    const errors: string[] = [];
-
-    for (const routeFile of routeFiles) {
-      const methods =
-        await RouteHandlersGenerator.extractWsMethodsFromDefinition(routeFile);
-      if (methods.length === 0) {
-        continue;
-      }
-
-      const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
-
-      let tools: Record<
-        string,
-        { resolveChannel?: GenericHandlerBase["resolveChannel"] } | undefined
-      >;
-      try {
-        const routeModule = (await import(toImportUrl(routeFile))) as {
-          tools?: Record<
-            string,
-            | { resolveChannel?: GenericHandlerBase["resolveChannel"] }
-            | undefined
-          >;
-        };
-        tools = routeModule.tools ?? {};
-      } catch (error) {
-        errors.push(
-          `WS channel validation could not import ${stripProjectRoot(routeFile)}: ` +
-            `${parseError(error).message}. A route that declares client-delivered ` +
-            `events must be importable so its resolveChannel can be verified.`,
-        );
-        continue;
-      }
-
-      const rel = stripProjectRoot(routeFile);
-      for (const { method, scope } of methods) {
-        if (scope === undefined) {
-          errors.push(
-            `Missing channel declaration in ${stripProjectRoot(definitionPath)} (${method}): ` +
-              `this method emits a client-delivered event but its definition has no ` +
-              `\`channel\`. Add \`channel: { scope: "user" | "resource" | "resolved" }\`.`,
-          );
-          continue;
-        }
-        // user scope is fully definition-decided — no route resolver required.
-        if (scope === "user") {
-          continue;
-        }
-        const handler = tools[method];
-        if (typeof handler?.resolveChannel !== "function") {
-          errors.push(
-            `Missing resolveChannel in ${rel} (${method}): the definition declares ` +
-              `channel scope "${scope}", so this method must supply a resolveChannel ` +
-              `that authorizes subscribers and decides the channel. Add it to the ` +
-              `${method} handler — on ${method} (the method that emits the events), ` +
-              `not another method of the same endpoint.`,
-          );
-        }
-      }
-    }
-
-    return errors;
-  }
-
-  /**
-   * Generate remote-event-routes.ts content: one entry per endpoint method
-   * that declares a `remoteEvent: true` event. The bridge dispatch force-loads
-   * the target route through THIS registry (definition imported eagerly for
-   * the canonical path, route imported lazily) instead of guessing aliases.
-   */
-  private static async generateRemoteEventRoutesContent(
-    routeFiles: string[],
-  ): Promise<{ content: string; routeCount: number }> {
-    interface RemoteEventTarget {
-      defImport: string;
-      routeImport: string;
-      method: string;
-      defAlias: string;
-    }
-    const targets: RemoteEventTarget[] = [];
-    for (const routeFile of routeFiles) {
-      const methods =
-        await RouteHandlersGenerator.extractRemoteEventMethodsFromDefinition(
-          routeFile,
-        );
-      if (methods.length === 0) {
-        continue;
-      }
-      const defImport = generateAbsoluteImportPath(routeFile, "definition");
-      const routeImport = generateAbsoluteImportPath(routeFile, "route");
-      const segments = extractNestedPath(routeFile);
-      const aliasBase = segments
-        .map((s: string) =>
-          s.replaceAll(/\[|\]/g, "").replaceAll(/[^A-Za-z0-9]/g, "_"),
-        )
-        .join("_");
-      for (const method of methods) {
-        targets.push({
-          defImport,
-          routeImport,
-          method,
-          defAlias: `${aliasBase}_${method}Def`,
-        });
-      }
-    }
-    targets.sort((a, b) => a.defAlias.localeCompare(b.defAlias));
-    const routeCount = targets.length;
-    const autoGenTitle = "AUTO-GENERATED FILE - DO NOT EDIT";
-    const generatorName = "generators/route-handlers";
-    const header = generateFileHeader(autoGenTitle, generatorName, {
-      "Remote-event routes found": routeCount,
-    });
-    const eagerImports = targets
-      .map((target) => `    import("${target.defImport}"),`)
-      .join("\n");
-    const eagerDestructure = targets
-      .map((target) => `    ${target.defAlias},`)
-      .join("\n");
-    const entries = targets
-      .map(
-        (target) => `    {
-      endpoint: ${target.defAlias}.default.${target.method},
-      method: "${target.method}",
-      importRoute: () => import("${target.routeImport}"),
-    },`,
-      )
-      .join("\n");
-    // eslint-disable-next-line i18next/no-literal-string
-    const content = `${header}
-
-/* eslint-disable prettier/prettier */
-
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { RegistryRouteModule } from "next-vibe/realtime/ws-channel-registry";
-
-export interface RemoteEventRouteEntry {
-  /** The endpoint definition: canonical path to match on, schemas to gate the envelope. */
-  endpoint: CreateApiEndpointAny;
-  method: string;
-  /** Loading the route module gives access to its onRemoteEvent handlers. */
-  importRoute: () => Promise<RegistryRouteModule>;
-}
-
-/**
- * Every endpoint that declares a remoteEvent:true event, addressable by
- * its canonical definition path — the bridge dispatch force-loads the target
- * route through this registry when a relayed event arrives before anything
- * imported the route in this process.
- *
- * Definition modules are imported eagerly (lightweight, side-effect-free) so the
- * dispatch has the endpoint's path and schemas without loading route code; route
- * modules are imported lazily, only once an event actually targets them. Mirrors
- * the ws-channels registry.
- */
-export async function getRemoteEventRoutes(): Promise<RemoteEventRouteEntry[]> {
-  const [
-${eagerDestructure}
-  ] = await Promise.all([
-${eagerImports}
-  ]);
-
-  return [
-${entries}
-  ];
-}
-`;
-    return { content, routeCount };
-  }
-
-  /**
-   * Generate ws-channels.ts content.
-   *
-   * For every endpoint method that declares a client-delivered event, emits an
-   * entry that:
-   *   - eagerly imports the definition module (lightweight, side-effect-free)
-   *     to read the endpoint object (path + allowedRoles), and
-   *   - lazily wires resolveChannel from the route module (deferred until first
-   *     call) to avoid pulling repositories/DB into WS channel registration.
-   *
-   * Mirrors the lazyResolveChannel pattern from ws-channel-registry.ts.
-   */
-  private static async generateWsChannelsContent(
-    routeFiles: string[],
-  ): Promise<{ content: string; channelCount: number }> {
-    interface WsChannelTarget {
-      defImport: string;
-      routeImport: string;
-      method: string;
-      defAlias: string;
-      scope: string | undefined;
-    }
-
-    const targets: WsChannelTarget[] = [];
-
-    for (const routeFile of routeFiles) {
-      const methods =
-        await RouteHandlersGenerator.extractWsMethodsFromDefinition(routeFile);
-      if (methods.length === 0) {
-        continue;
-      }
-
-      const defImport = generateAbsoluteImportPath(routeFile, "definition");
-      const routeImport = generateAbsoluteImportPath(routeFile, "route");
-      // Build a stable, unique alias from the path segments + method.
-      const segments = extractNestedPath(routeFile);
-      const aliasBase = segments
-        .map((s: string) =>
-          s.replaceAll(/\[|\]/g, "").replaceAll(/[^A-Za-z0-9]/g, "_"),
-        )
-        .join("_");
-
-      for (const { method, scope } of methods) {
-        targets.push({
-          defImport,
-          routeImport,
-          method,
-          defAlias: `${aliasBase}_${method}Def`,
-          scope,
-        });
-      }
-    }
-
-    // Stable order for deterministic output.
-    targets.sort((a, b) => a.defAlias.localeCompare(b.defAlias));
-
-    const channelCount = targets.length;
-
-    const autoGenTitle = "AUTO-GENERATED FILE - DO NOT EDIT";
-    const generatorName = "generators/route-handlers";
-    const header = generateFileHeader(autoGenTitle, generatorName, {
-      "Channels found": channelCount,
-    });
-
-    // Eager definition imports — collected into the Promise.all destructure.
-    const eagerImports = targets
-      .map((target) => `    import("${target.defImport}"),`)
-      .join("\n");
-    const eagerDestructure = targets
-      .map((target) => `    ${target.defAlias},`)
-      .join("\n");
-
-    // Entries: endpoint from the eager def + its resolveChannel. A `user`-scope
-    // channel rides the caller's own user/{id} channel — the framework's static
-    // `userChannelResolver` answers `{ kind: "user" }` with no route code (the
-    // route has no resolver, by design). resource/resolved scopes wire the route's
-    // resolveChannel lazily (deferred import to keep DB out of registration).
-    const entries = targets
-      .map((target) =>
-        target.scope === "user"
-          ? `    {
-      endpoint: ${target.defAlias}.default.${target.method},
-      resolveChannel: userChannelResolver,
-    },`
-          : ((): string => {
-              const arrowLine = `        () => import("${target.routeImport}"),`;
-              const importArg =
-                arrowLine.length <= 80
-                  ? `        () => import("${target.routeImport}"),`
-                  : `        () =>\n          import("${target.routeImport}"),`;
-              return `    {
-      endpoint: ${target.defAlias}.default.${target.method},
-      resolveChannel: lazyResolveChannel(
-${importArg}
-        "${target.method}",
-      ),
-    },`;
-            })(),
-      )
-      .join("\n");
-
-    // eslint-disable-next-line i18next/no-literal-string
-    const content = `${header}
-
-/* eslint-disable prettier/prettier */
-
-import {
-  lazyResolveChannel,
-  userChannelResolver,
-  type WsChannelEntry,
-} from "next-vibe/realtime/ws-channel-registry";
-
-/**
- * Returns every endpoint that exposes a client-subscribable WebSocket channel.
- *
- * Definition modules are imported eagerly (lightweight, side-effect-free) to
- * read the endpoint object (path + allowedRoles). Route modules are imported
- * lazily via lazyResolveChannel — only when a channel match needs resource-level
- * authorization — to avoid circular init errors in the production bundle.
- */
-export async function getGeneratedWsEndpoints(): Promise<WsChannelEntry[]> {
-  const [
-${eagerDestructure}
-  ] = await Promise.all([
-${eagerImports}
-  ]);
-
-  return [
-${entries}
-  ];
-}
-`;
-
-    return { content, channelCount };
   }
 }

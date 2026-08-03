@@ -7,6 +7,7 @@ import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import type { JWTPublicPayloadType } from "next-vibe/identity/auth/types";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
+import { Platform } from "next-vibe/platforms/platforms";
 import { redirect } from "next-vibe/ui/lib/redirect";
 import { Div } from "next-vibe/ui/ui/div";
 import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
@@ -26,6 +27,7 @@ export interface ResetPasswordPageData {
   locale: CountryLanguage;
   user: JWTPublicPayloadType | null;
   errorMessage: string | null;
+  platform: Platform;
 }
 
 /**
@@ -101,6 +103,7 @@ export async function tanstackLoader({
       errorMessage: verifiedUserResponse.success
         ? t("errors.unknown")
         : verifiedUserResponse.message,
+      platform: Platform.NEXT_PAGE,
     };
   }
 
@@ -108,13 +111,14 @@ export async function tanstackLoader({
     redirect(`/${locale}/`);
   }
 
-  return { locale, user, errorMessage: null };
+  return { locale, user, errorMessage: null, platform: Platform.NEXT_PAGE };
 }
 
 export function TanstackPage({
   locale,
   user,
   errorMessage,
+  platform,
 }: ResetPasswordPageData): JSX.Element {
   const { t } = pageT.scopedT(locale);
 
@@ -132,7 +136,7 @@ export function TanstackPage({
         {t("backToHome")}
       </Link>
 
-      <ResetPasswordForm locale={locale} user={user} />
+      <ResetPasswordForm locale={locale} user={user} platform={platform} />
     </Div>
   );
 }

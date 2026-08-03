@@ -5,7 +5,7 @@
  * Mirrors React widget architecture for consistency.
  */
 
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import type { MutableRefObject } from "react";
 
 import type { BaseWidgetContext } from "./types";

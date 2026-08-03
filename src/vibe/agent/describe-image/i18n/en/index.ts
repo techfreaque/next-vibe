@@ -65,7 +65,7 @@ export const translations = {
         description: "A conflict occurred",
       },
       noVisionModel: "No image vision model is configured",
-      descriptionFailed: "Failed to describe the image",
+      descriptionFailed: "Failed to describe the image: {{error}}",
       insufficientCredits:
         "Insufficient credits. Balance: {{balance}}, required: {{minimum}}",
       balanceCheckFailed: "Failed to check your credit balance",

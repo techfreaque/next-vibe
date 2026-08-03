@@ -1,6 +1,6 @@
 import type { JSX } from "react";
 
-import { type IconComponent } from "../../../web/lib/helper";
+import { type IconComponent } from "../../lib/helper";
 
 /** Gab social platform logo */
 export const SiGab: IconComponent = ({

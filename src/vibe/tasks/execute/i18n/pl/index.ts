@@ -9,7 +9,7 @@ export const translations: typeof enTranslations = {
     executeTask: "Nie udało się wykonać zadania",
     forbidden: "Nie masz uprawnień do wykonania tego zadania",
     alreadyRunning: "Zadanie jest już uruchomione",
-    notFound: "Zadanie nie zostało znalezione",
+    notFound: "Nie znaleziono zadania {{taskId}}",
   },
   post: {
     title: "Wykonaj zadanie",

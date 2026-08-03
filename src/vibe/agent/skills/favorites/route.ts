@@ -19,11 +19,11 @@ export const { GET, tools } = endpointsHandler({
         logger,
         t,
         locale,
+        platform,
         data.userId,
         data.query,
         data.page,
         data.pageSize,
-        platform,
       ),
   },
 });

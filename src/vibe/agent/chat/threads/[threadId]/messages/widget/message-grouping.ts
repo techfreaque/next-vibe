@@ -3,7 +3,7 @@
  * Groups messages that are part of the same AI response sequence
  */
 
-import type { ChatMessage, ToolCall } from "next-vibe/agent/chat/db";
+import type { ChatMessage } from "../../../../db";
 
 /**
  * Grouped message sequence
@@ -62,56 +62,4 @@ export function groupMessagesBySequence(
   }
 
   return groups;
-}
-
-/**
- * Check if a message has content after tool calls
- * Used to determine if tool calls should be collapsed by default
- */
-export function hasContentAfterToolCalls(group: MessageGroup): boolean {
-  if ((group.primary.content ?? "").trim().length > 0) {
-    return true;
-  }
-
-  return group.continuations.some(
-    (msg) => (msg.content ?? "").trim().length > 0,
-  );
-}
-
-/**
- * Get all tool calls from a message group
- * Combines tool calls from primary and all continuations
- */
-export function getAllToolCallsFromGroup(group: MessageGroup): ToolCall[] {
-  const allToolCalls: ToolCall[] = [];
-
-  // Add tool call from primary (metadata.toolCall is singular)
-  if (group.primary.metadata?.toolCall) {
-    allToolCalls.push(group.primary.metadata.toolCall);
-  }
-
-  // Add tool calls from continuations
-  for (const continuation of group.continuations) {
-    if (continuation.metadata?.toolCall) {
-      allToolCalls.push(continuation.metadata.toolCall);
-    }
-  }
-
-  return allToolCalls;
-}
-
-/**
- * Get combined content from a message group
- * Joins content from primary and all continuations
- */
-export function getCombinedContent(group: MessageGroup): string {
-  const contents = [group.primary.content ?? ""];
-
-  for (const continuation of group.continuations) {
-    if ((continuation.content ?? "").trim().length > 0) {
-      contents.push(continuation.content ?? "");
-    }
-  }
-
-  return contents.join("\n\n");
 }

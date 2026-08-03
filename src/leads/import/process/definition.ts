@@ -3,7 +3,7 @@
  * POST endpoint to process pending CSV import jobs (called by cron)
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,

@@ -4,9 +4,8 @@
  */
 
 "use client";
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
-import exportEnvEndpoints from "next-vibe/env/settings/export-env/definition";
-import { ServerFramework } from "next-vibe/server/server/enum";
+import exportEnvEndpoints from "./export-env/definition";
+import { ServerFramework } from "../../server/server/enum";
 import { storage } from "next-vibe/ui/lib/storage";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -32,16 +31,17 @@ import {
 } from "next-vibe/ui/ui/select";
 import { Span } from "next-vibe/ui/ui/span";
 import { Switch } from "next-vibe/ui/ui/switch";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../unified-ui/_shared/cn";
 import {
   useWidgetContext,
   useWidgetLocale,
   useWidgetLogger,
+  useWidgetPlatform,
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
-import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
+} from "../../unified-ui/_shared/use-widget-context";
+import { EndpointsPage } from "../../unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useState } from "react";
 
@@ -373,7 +373,7 @@ export function SystemSettingsWidget(): JSX.Element {
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
-  const availability = useProviderAvailability();
+  const platform = useWidgetPlatform();
   const { endpointMutations } = useWidgetContext();
   const isLoading = endpointMutations?.read?.isLoading ?? value === undefined;
   const [edits, setEdits] = useState<Record<string, string>>({});
@@ -423,7 +423,7 @@ export function SystemSettingsWidget(): JSX.Element {
           filtered[key] = val;
         }
       }
-      const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
+      const { apiClient } = await import("../../unified-ui/hooks/store");
       const endpointsDef = await import("./definition");
       await apiClient.mutate(
         endpointsDef.PATCH,
@@ -432,7 +432,6 @@ export function SystemSettingsWidget(): JSX.Element {
         filtered,
         undefined,
         locale,
-        availability,
       );
       setEdits({});
       setPendingRestart(true);
@@ -440,7 +439,7 @@ export function SystemSettingsWidget(): JSX.Element {
     } finally {
       setSaving(false);
     }
-  }, [edits, hasEdits, user, logger, locale, availability, endpointMutations]);
+  }, [edits, hasEdits, user, logger, locale, endpointMutations]);
 
   const handleApplyRestart = useCallback(async (): Promise<void> => {
     if (!user) {
@@ -448,9 +447,8 @@ export function SystemSettingsWidget(): JSX.Element {
     }
     setApplying(true);
     try {
-      const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
-      const rebuildDef =
-        await import("next-vibe/server/server/rebuild/definition");
+      const { apiClient } = await import("../../unified-ui/hooks/store");
+      const rebuildDef = await import("../../server/server/rebuild/definition");
       await apiClient.mutate(
         rebuildDef.default.POST,
         logger,
@@ -458,13 +456,12 @@ export function SystemSettingsWidget(): JSX.Element {
         { framework: ServerFramework.NEXT, webpack: true },
         undefined,
         locale,
-        availability,
       );
       setPendingRestart(false);
     } finally {
       setApplying(false);
     }
-  }, [user, logger, locale, availability]);
+  }, [user, logger, locale]);
 
   const tStr = t as (key: string) => string;
 
@@ -517,6 +514,7 @@ export function SystemSettingsWidget(): JSX.Element {
             endpoint={exportEnvEndpoints}
             locale={locale}
             user={user}
+            platform={platform}
           />
         </Div>
       )}

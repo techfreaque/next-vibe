@@ -150,9 +150,10 @@ export class UserAddressByIdRepository {
     } catch (error) {
       logger.error("Error updating address", parseError(error));
       return fail({
-        message: t("update.errors.internal.title"),
+        message: t("update.errors.internal.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -203,9 +204,10 @@ export class UserAddressByIdRepository {
     } catch (error) {
       logger.error("Error deleting address", parseError(error));
       return fail({
-        message: t("delete.errors.internal.title"),
+        message: t("delete.errors.internal.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }

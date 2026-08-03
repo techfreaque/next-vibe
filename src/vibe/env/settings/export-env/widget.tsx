@@ -16,7 +16,7 @@ import { Pre } from "next-vibe/ui/ui/pre";
 import {
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
+} from "../../../unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useState } from "react";
 

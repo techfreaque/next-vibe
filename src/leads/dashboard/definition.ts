@@ -3,7 +3,7 @@
  * GET — KPI counts, status breakdown, recent leads, and conversion metrics
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   Methods,

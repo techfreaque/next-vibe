@@ -3,7 +3,7 @@
  * Converts text to speech using AI providers (OpenAI TTS, ElevenLabs, Eden AI)
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -18,7 +18,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
-import { lazyWidget } from "../../unified-ui/_shared/lazy-widget";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { DEFAULT_TTS_VOICE_ID, TEXT_TO_SPEECH_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 import { TtsModelId, TtsModelIdOptions } from "./models";

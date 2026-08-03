@@ -5,15 +5,15 @@
 
 import "server-only";
 
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { ResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { UtilsT } from "next-vibe/database/utils/i18n";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../core/route/response.schema";
+import { parseError } from "../../core/utils/parse-error";
+import type { UtilsT } from "./i18n";
+import type { EndpointLogger } from "../../logger/types";
 
 import { db } from "..";
 // Logger will be provided by the route handler
@@ -82,9 +82,10 @@ export class DbUtilsRepository {
     } catch (error) {
       logger.error("Database health check failed:", parseError(error));
       return fail({
-        message: t("errors.health_check_failed"),
+        message: t("errors.health_check_failed", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -106,9 +107,10 @@ export class DbUtilsRepository {
     } catch (error) {
       logger.error("Database connection test failed:", parseError(error));
       return fail({
-        message: t("errors.connection_failed"),
+        message: t("errors.connection_failed", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -148,9 +150,8 @@ export class DbUtilsRepository {
         parseError(error),
       );
       return fail({
-        message: t("errors.stats_failed"),
+        message: t("errors.stats_failed", { error: parseError(error).message }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -180,9 +181,10 @@ export class DbUtilsRepository {
       });
     } catch (error) {
       return fail({
-        message: t("errors.docker_check_failed"),
+        message: t("errors.docker_check_failed", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }

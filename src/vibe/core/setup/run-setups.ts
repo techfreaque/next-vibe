@@ -12,65 +12,14 @@
 
 import "server-only";
 
-import { readFileSync } from "node:fs";
+import { parseError } from "../utils/parse-error";
+import type { EndpointLogger } from "../../logger/types";
 
-import {
-  findFilesRecursively,
-  stripProjectRoot,
-} from "next-vibe/core/generators/shared/utils";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import { loadSetupRegistry } from "./load-registry";
 
-import { getApiDir } from "@/env/paths";
+type SetupPhase = "install" | "uninstall";
 
-import { isSetupFile, type SetupEntry, setupKeyFor } from "./types";
-
-const REQUIRED_EXPORTS = ["description", "install", "uninstall"] as const;
-
-function hasRequiredExports(absPath: string): boolean {
-  const content = readFileSync(absPath, "utf-8");
-  return REQUIRED_EXPORTS.every((name) =>
-    new RegExp(`export\\s+(?:async\\s+)?(?:function|const)\\s+${name}\\b`).test(
-      content,
-    ),
-  );
-}
-
-async function loadSetupRegistry(): Promise<readonly SetupEntry[]> {
-  try {
-    const mod = await import("@/generated/setup");
-    return mod.SETUP_REGISTRY;
-  } catch {
-    // Generated index missing (fresh clone, pre-gen). Fall back to scan.
-    const files = findFilesRecursively(getApiDir(), isSetupFile)
-      .toSorted()
-      .filter(hasRequiredExports);
-
-    const entries: SetupEntry[] = [];
-    for (const absPath of files) {
-      try {
-        const mod = (await import(absPath)) as {
-          description: string;
-          install: SetupEntry["install"];
-          uninstall: SetupEntry["uninstall"];
-        };
-        entries.push({
-          key: setupKeyFor(stripProjectRoot(absPath)),
-          description: mod.description,
-          install: mod.install,
-          uninstall: mod.uninstall,
-        });
-      } catch {
-        // Skip modules that fail to import during bootstrap.
-      }
-    }
-    return entries;
-  }
-}
-
-export type SetupPhase = "install" | "uninstall";
-
-export interface SetupRunResult {
+interface SetupRunResult {
   key: string;
   description: string;
   /** The setup's own summary, or the failure reason when `ok` is false. */

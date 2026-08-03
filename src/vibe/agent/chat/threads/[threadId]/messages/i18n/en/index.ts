@@ -155,6 +155,7 @@ export const translations = {
       server: {
         title: "Server Error",
         description: "An internal server error occurred",
+        detail: "Server Error: {{error}}",
       },
       unknown: {
         title: "Unknown Error",
@@ -257,6 +258,7 @@ export const translations = {
       validation: {
         title: "Validation Error",
         description: "Invalid message data provided",
+        parentNotFound: "Parent message not found",
       },
       network: {
         title: "Network Error",
@@ -279,6 +281,7 @@ export const translations = {
       server: {
         title: "Server Error",
         description: "An internal server error occurred",
+        detail: "Server Error: {{error}}",
       },
       unknown: {
         title: "Unknown Error",

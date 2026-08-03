@@ -18,9 +18,9 @@ import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
-import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
+} from "../../../../unified-ui/_shared/use-widget-context";
+import { FormAlertWidget } from "../../../../unified-ui/widgets/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "../../../../unified-ui/widgets/interactive/submit-button/widget";
 import React, { useCallback } from "react";
 
 import type definition from "./definition";
@@ -32,7 +32,7 @@ export function DeleteWidget(): React.JSX.Element {
 
   const handleBackToList = useCallback((): void => {
     void (async (): Promise<void> => {
-      const listDef = await import("next-vibe/dataflow/graphs/definition");
+      const listDef = await import("../../definition");
       navigation.push(listDef.default.GET);
     })();
   }, [navigation]);

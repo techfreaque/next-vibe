@@ -3,16 +3,16 @@
  * Handles sending new messages in both incognito and server modes
  */
 
-import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
-import type { ChatMessage } from "next-vibe/agent/chat/db";
-import { ThreadStatus, ThreadStreamingState } from "next-vibe/agent/chat/enum";
-import folderContentsDefinition from "next-vibe/agent/chat/folder-contents/[rootFolderId]/definition";
-import { scopedTranslation as chatScopedTranslation } from "next-vibe/agent/chat/i18n";
-import messagesDefinition from "next-vibe/agent/chat/threads/[threadId]/messages/definition";
-import pathDefinitions from "next-vibe/agent/chat/threads/[threadId]/messages/path/definition";
-import threadsDefinition from "next-vibe/agent/chat/threads/definition";
-import type { FavoriteConfig } from "next-vibe/agent/skills/favorites/db";
+import type { ChatModelId } from "../../models";
+import { DefaultFolderId } from "../../../../core/execution-context";
+import type { ChatMessage } from "../../../chat/db";
+import { ThreadStatus, ThreadStreamingState } from "../../../chat/enum";
+import folderContentsDefinition from "../../../chat/folder-contents/[rootFolderId]/definition";
+import { scopedTranslation as chatScopedTranslation } from "../../../chat/i18n";
+import messagesDefinition from "../../../chat/threads/[threadId]/messages/definition";
+import pathDefinitions from "../../../chat/threads/[threadId]/messages/path/definition";
+import threadsDefinition from "../../../chat/threads/definition";
+import type { FavoriteConfig } from "../../../skills/favorites/db";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { success } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
@@ -108,7 +108,7 @@ export async function sendMessage(
       let threadMessages: ChatMessage[];
       if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
         const { getMessagesForThread } =
-          await import("next-vibe/agent/chat/incognito/storage");
+          await import("../../../chat/incognito/storage");
         threadMessages = await getMessagesForThread(threadIdToUse);
       } else {
         // Read from apiClient cache
@@ -230,7 +230,7 @@ export async function sendMessage(
 
       if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
         const { createIncognitoThread } =
-          await import("next-vibe/agent/chat/incognito/storage");
+          await import("../../../chat/incognito/storage");
         await createIncognitoThread(
           chatScopedTranslation.scopedT(locale).t("common.newChat"),
           currentRootFolderId,

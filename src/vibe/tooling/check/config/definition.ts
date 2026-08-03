@@ -3,23 +3,21 @@
  * Creates check.config.ts with optional MCP, VSCode, and rule configurations
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "../../../core/definition/create";
 import {
   EndpointErrorTypes,
   FieldDataType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { UserRole } from "next-vibe/identity/roles/enum";
-import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
-import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
+} from "../../../core/definition/enums";
+import { UserRole } from "../../../identity/roles/enum";
+import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
 import {
+  customWidgetObject,
   requestField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../../unified-ui/_shared/utils";
 import { z } from "zod";
-
-import { scopedTranslation } from "./i18n";
 
 // Lazy import to avoid TDZ circular dependency in MCP context
 // (widget.tsx type-imports definition → circular module resolution → "Cannot access 'default' before initialization")
@@ -30,15 +28,15 @@ const ConfigCreateWidget = lazyWidget(() =>
 );
 
 const { POST } = createEndpoint({
-  scopedTranslation,
   method: Methods.POST,
   path: ["vibe", "tooling", "check", "config"],
-  title: "title",
-  titleShort: "title",
-  description: "description",
+  title: "Create Check Configuration",
+  titleShort: "Create Check Configuration",
+  description:
+    "Create check.config.ts with optional MCP config, VSCode settings, and rule configurations. Run without options for interactive setup.",
   category: "devTools",
   subCategory: "Check",
-  tags: ["tag"],
+  tags: ["quality"],
   icon: "wrench",
   allowedRoles: [
     UserRole.ADMIN,
@@ -54,109 +52,118 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // === REQUEST FIELDS ===
-      createMcpConfig: requestField(scopedTranslation, {
+      createMcpConfig: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "fields.createMcpConfig.label",
-        description: "fields.createMcpConfig.description",
+        label: "Create MCP Config",
+        description:
+          "Create .mcp.json configuration file for Model Context Protocol integration",
         columns: 6,
         schema: z.boolean().optional().default(true),
       }),
 
-      updateVscodeSettings: requestField(scopedTranslation, {
+      updateVscodeSettings: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "fields.updateVscodeSettings.label",
-        description: "fields.updateVscodeSettings.description",
+        label: "Update VSCode Settings",
+        description:
+          "Update .vscode/settings.json with recommended ESLint and formatter settings",
         columns: 6,
         schema: z.boolean().optional().default(true),
       }),
 
-      updatePackageJson: requestField(scopedTranslation, {
+      updatePackageJson: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "fields.updatePackageJson.label",
-        description: "fields.updatePackageJson.description",
+        label: "Update package.json Scripts",
+        description:
+          "Add/update package.json scripts for check, lint, and typecheck commands",
         columns: 6,
         schema: z.boolean().optional().default(true),
       }),
 
-      enableEslint: requestField(scopedTranslation, {
+      enableEslint: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "fields.enableEslint.label",
-        description: "fields.enableEslint.description",
+        label: "Enable ESLint",
+        description:
+          "Enable ESLint for rules not yet supported by Oxlint (import sorting, React hooks). Disable for maximum speed if you don't need these rules.",
         columns: 6,
         schema: z.boolean().optional(),
       }),
 
-      enableReactRules: requestField(scopedTranslation, {
+      enableReactRules: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "fields.enableReactRules.label",
-        description: "fields.enableReactRules.description",
+        label: "Enable React Rules",
+        description:
+          "Enable React-specific linting rules (react-hooks, jsx-a11y)",
         columns: 4,
         schema: z.boolean().optional(),
       }),
 
-      enableNextjsRules: requestField(scopedTranslation, {
+      enableNextjsRules: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "fields.enableNextjsRules.label",
-        description: "fields.enableNextjsRules.description",
+        label: "Enable Next.js Rules",
+        description: "Enable Next.js-specific linting rules and configurations",
         columns: 4,
         schema: z.boolean().optional(),
       }),
 
-      enableI18nRules: requestField(scopedTranslation, {
+      enableI18nRules: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "fields.enableI18nRules.label",
-        description: "fields.enableI18nRules.description",
+        label: "Enable i18n Rules",
+        description:
+          "Enable internationalization linting rules (eslint-plugin-i18next)",
         columns: 4,
         schema: z.boolean().optional(),
       }),
 
-      jsxCapitalization: requestField(scopedTranslation, {
+      jsxCapitalization: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "fields.jsxCapitalization.label",
-        description: "fields.jsxCapitalization.description",
+        label: "JSX Capitalization",
+        description:
+          "Enforce capitalization of JSX component names (react/jsx-pascal-case)",
         columns: 4,
         schema: z.boolean().optional(),
       }),
 
-      enablePedanticRules: requestField(scopedTranslation, {
+      enablePedanticRules: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "fields.enablePedanticRules.label",
-        description: "fields.enablePedanticRules.description",
+        label: "Enable Pedantic Rules",
+        description:
+          "Enable stricter/pedantic linting rules for higher code quality",
         columns: 4,
         schema: z.boolean().optional(),
       }),
 
-      enableRestrictedSyntax: requestField(scopedTranslation, {
+      enableRestrictedSyntax: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "fields.enableRestrictedSyntax.label",
-        description: "fields.enableRestrictedSyntax.description",
+        label: "Enable Restricted Syntax",
+        description: "Restrict usage of throw, unknown, and object types",
         columns: 4,
         schema: z.boolean().optional(),
       }),
 
-      interactive: requestField(scopedTranslation, {
+      interactive: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "fields.interactive.label",
-        description: "fields.interactive.description",
+        label: "Interactive Mode",
+        description:
+          "Run in interactive mode and ask for each configuration option step by step",
         columns: 6,
         schema: z.boolean().optional().default(true),
       }),
 
       // === RESPONSE FIELDS ===
-      message: responseField(scopedTranslation, {
+      message: responseField({
         type: WidgetType.TEXT,
-        label: "response.message",
+        label: "Configuration created",
         schema: z.string(),
       }),
     },
@@ -165,47 +172,49 @@ const { POST } = createEndpoint({
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "errors.validation.title",
-      description: "errors.validation.description",
+      title: "Invalid Parameters",
+      description: "The configuration parameters are invalid",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "errors.internal.title",
-      description: "errors.internal.description",
+      title: "Internal Error",
+      description: "An internal error occurred during configuration",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "errors.validation.title",
-      description: "errors.validation.description",
+      title: "Invalid Parameters",
+      description: "The configuration parameters are invalid",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "errors.validation.title",
-      description: "errors.validation.description",
+      title: "Invalid Parameters",
+      description: "The configuration parameters are invalid",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "errors.validation.title",
-      description: "errors.validation.description",
+      title: "Invalid Parameters",
+      description: "The configuration parameters are invalid",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "errors.internal.title",
-      description: "errors.internal.description",
+      title: "Internal Error",
+      description: "An internal error occurred during configuration",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "errors.internal.title",
-      description: "errors.internal.description",
+      title: "Internal Error",
+      description: "An internal error occurred during configuration",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "errors.conflict.title",
-      description: "errors.conflict.description",
+      title: "Configuration Already Exists",
+      description:
+        "Configuration file already exists. Use --force to overwrite.",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "errors.conflict.title",
-      description: "errors.conflict.description",
+      title: "Configuration Already Exists",
+      description:
+        "Configuration file already exists. Use --force to overwrite.",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "success.title",
-    description: "success.description",
+    title: "Configuration Created",
+    description: "Configuration files created successfully",
   },
 
   // === EXAMPLES ===

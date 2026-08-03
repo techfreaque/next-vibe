@@ -69,7 +69,10 @@ export async function tanstackLoader({
   const isAdmin = !user.isPublic && user.roles.includes(UserRole.ADMIN);
   const { getEnvAvailability } =
     await import("next-vibe/agent/env-availability");
-  const totalModelCount = getAvailableModelCount(isAdmin, getEnvAvailability());
+  const totalModelCount = getAvailableModelCount(
+    isAdmin,
+    await getEnvAvailability(),
+  );
 
   return { locale, user, userProfile, hasSubscription, totalModelCount };
 }

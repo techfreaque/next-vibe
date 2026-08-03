@@ -8,13 +8,13 @@ import "server-only";
 import { execSync } from "node:child_process";
 import { freemem, totalmem } from "node:os";
 
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { ResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import type { TasksT } from "next-vibe/tasks/i18n";
+} from "../../core/route/response.schema";
+import type { TasksT } from "../../tasks/i18n";
 
 import { rawPool } from "..";
 

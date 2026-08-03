@@ -12,23 +12,20 @@
  * is the one exception — it has its own endpoint (execute-tool).
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { UserRole } from "next-vibe/identity/roles/enum";
-import { scopedTranslation } from "next-vibe/realtime/remote-event-bridge/i18n";
-import {
-  objectField,
-  requestField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../core/definition/enums";
+import { UserRole } from "../../identity/roles/enum";
+import { scopedTranslation } from "./i18n";
+import { objectField, requestField } from "../../unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
-import type { AnyEndpointEventEnvelope } from "../structured-events";
+import type { AnyEndpointEventEnvelope } from "../core/structured-events";
 
 const { POST } = createEndpoint({
   scopedTranslation,

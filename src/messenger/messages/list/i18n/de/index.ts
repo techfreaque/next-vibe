@@ -170,6 +170,9 @@ export const translations: typeof enTranslations = {
     server: {
       title: "Serverfehler",
       description: "Ein interner Serverfehler ist aufgetreten",
+      detail_list: "Nachrichten konnten nicht geladen werden: {{error}}",
+      detail_get: "Nachricht konnte nicht geladen werden: {{error}}",
+      detail_create: "Nachricht konnte nicht gespeichert werden: {{error}}",
     },
     unknown: {
       title: "Unbekannter Fehler",

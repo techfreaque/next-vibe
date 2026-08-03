@@ -52,19 +52,14 @@ import "server-only";
 globalThis.AI_SDK_LOG_WARNINGS = false;
 
 import { and, eq, sql } from "drizzle-orm";
-import {
-  DefaultFolderId,
-  makeHeadlessContext,
-  rootlessToolExecutionContext,
-  type ToolExecutionContext,
-} from "next-vibe/agent/chat/config";
-import { scopedTranslation as chatScopedTranslation } from "next-vibe/agent/chat/i18n";
+import { DefaultFolderId, makeHeadlessContext, rootlessToolExecutionContext, type ToolExecutionContext } from "../../../../core/execution-context";
+import { scopedTranslation as chatScopedTranslation } from "../../../chat/i18n";
 import {
   ContentLevel,
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
-} from "next-vibe/agent/skills/enum";
+} from "../../../skills/enum";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
@@ -249,8 +244,6 @@ async function loadFixture(filename: string, mimeType: string): Promise<File> {
     "..",
     "..",
     "..",
-    "..",
-    "..",
     "generated",
     "ai-fixtures",
     "media",
@@ -371,7 +364,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
     /** Fetch the current streamingState for a thread via the messages endpoint. */
     async function getStreamingState(tid: string): Promise<string | undefined> {
       const msgsDef = (
-        await import("next-vibe/agent/chat/threads/[threadId]/messages/definition")
+        await import("../../../chat/threads/[threadId]/messages/definition")
       ).default;
       const result = await sendTestRequest({
         toolExecutionContext: rootlessToolExecutionContext(),
@@ -443,7 +436,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       // is ONLY ever restricted for the duration of the T7 block.
       {
         const favByIdResetDef = (
-          await import("next-vibe/agent/skills/favorites/[id]/definition")
+          await import("../../../skills/favorites/[id]/definition")
         ).default;
         const favResetGet = await sendTestRequest({
           toolExecutionContext: rootlessToolExecutionContext(),
@@ -1296,7 +1289,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
             // The tool ran on whichever instance owns the loop; the caller's
             // own cortex is synced, so a local read reflects the write.
             const cortexReadDef = (
-              await import("next-vibe/agent/cortex/read/definition")
+              await import("../../../cortex/read/definition")
             ).default;
             const readRes = await sendTestRequest({
               toolExecutionContext: rootlessToolExecutionContext(),
@@ -3259,7 +3252,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
         // restricted for the duration of this T7 block.
         afterAll(async () => {
           const favByIdDef = (
-            await import("next-vibe/agent/skills/favorites/[id]/definition")
+            await import("../../../skills/favorites/[id]/definition")
           ).default;
           const favGet = await sendTestRequest({
             toolExecutionContext: rootlessToolExecutionContext(),
@@ -3296,7 +3289,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
             // The PATCH requires modelSelection, so read the current one first
             // and send it back unchanged (faithful client flow).
             const favByIdDefT7 = (
-              await import("next-vibe/agent/skills/favorites/[id]/definition")
+              await import("../../../skills/favorites/[id]/definition")
             ).default;
             // The gate applies to the TARGET tool uniformly — locally AND on
             // remote dispatch (guards.applyConfirmationGate runs in both
@@ -3319,7 +3312,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
             // the WHOLE role/folder tool list as available, flipping ONLY the
             // approve tool's confirmation flag; T7a-restore clears it to null.
             const { getDefaultToolIdsForFolder } =
-              await import("next-vibe/agent/chat/constants");
+              await import("../../../chat/constants");
             const fullToolList = getDefaultToolIdsForFolder(
               testUser,
               suiteRootFolderId,
@@ -3506,7 +3499,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
             // Restore the favorite to its pre-T7a state: clear availableTools whitelist
             // (null = allow all tools) so later tests see a clean config.
             const favByIdDefT7b = (
-              await import("next-vibe/agent/skills/favorites/[id]/definition")
+              await import("../../../skills/favorites/[id]/definition")
             ).default;
             const t7bFavGet = await sendTestRequest({
               toolExecutionContext: rootlessToolExecutionContext(),
@@ -5778,10 +5771,10 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
       beforeAll(async () => {
         // Resolve test favorites via endpoints (reuse existing, create if absent).
         const [favsDef, favoriteCreateDef] = await Promise.all([
-          import("next-vibe/agent/skills/favorites/definition").then(
+          import("../../../skills/favorites/definition").then(
             (m) => m.default.GET,
           ),
-          import("next-vibe/agent/skills/favorites/create/definition").then(
+          import("../../../skills/favorites/create/definition").then(
             (m) => m.default.POST,
           ),
         ]);
@@ -5842,15 +5835,15 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
         "F1: favorite resolution - manual, model switch, media models, filters all work",
         async () => {
           const favByIdDef = (
-            await import("next-vibe/agent/skills/favorites/[id]/definition")
+            await import("../../../skills/favorites/[id]/definition")
           ).default;
           const { getBestChatModelForFavorite } =
-            await import("next-vibe/agent/skills/favorites/[id]/definition");
-          const { getInstanceAvailability } =
-            await import("next-vibe/agent/env-availability");
+            await import("../../../skills/favorites/[id]/definition");
+          const { getEnvAvailability } =
+            await import("../../../env-availability");
           const { SkillsRepository } =
-            await import("next-vibe/agent/skills/repository");
-          const { parseSkillId } = await import("next-vibe/agent/chat/slugify");
+            await import("../../../skills/repository");
+          const { parseSkillId } = await import("../../../chat/slugify");
           const logger = createEndpointLogger(false, defaultLocale);
 
           // Resolve a favorite's model exactly like the web client: GET the
@@ -5896,7 +5889,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
               getRes.data.modelSelection,
               skillVariantSelection ?? undefined,
               testUser,
-              await getInstanceAvailability(),
+              await getEnvAvailability(),
             );
             return { model: best?.id, skill };
           };
@@ -5923,7 +5916,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
           // never a hardcoded model literal. Read the two variants' declared
           // model selections and assert resolution matches whatever they declare.
           const { qualityTesterSkill } =
-            await import("next-vibe/agent/skills/default-skills/quality-tester/skill");
+            await import("../../../skills/default-skills/quality-tester/skill");
           const budgetVariant = qualityTesterSkill.variants.find(
             (v) => v.id === "budget",
           );

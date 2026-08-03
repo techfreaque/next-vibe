@@ -6,17 +6,17 @@
 import { loadavg } from "node:os";
 import { performance } from "node:perf_hooks";
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { scopedTranslation as dbUtilsScopedTranslation } from "next-vibe/database/utils/i18n";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { ServerHealthT } from "next-vibe/server/server/health/i18n";
+} from "../../../core/route/response.schema";
+import { parseError } from "../../../core/utils/parse-error";
+import { scopedTranslation as dbUtilsScopedTranslation } from "../../../database/utils/i18n";
+import type { EndpointLogger } from "../../../logger/types";
+import type { ServerHealthT } from "./i18n";
 
 import { getCurrentEnvironmentInfo } from "../environment";
 import type {
@@ -157,10 +157,13 @@ export class HealthCheckRepository {
       const parsedError = parseError(error);
       logger.error("Health check failed", { error: parsedError.message });
 
+      // `get.errors.server.title` is the definition's declared SERVER_ERROR
+      // label and renders param-free there, so the cause gets its own key.
       return fail({
-        message: t("get.errors.server.description"),
+        message: t("get.errors.server.checkFailed", {
+          error: parsedError.message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
       });
     }
   }
@@ -224,7 +227,7 @@ export class HealthCheckRepository {
     try {
       // Import database utilities
       const { DbUtilsRepository } =
-        await import("next-vibe/database/utils/repository");
+        await import("../../../database/utils/repository");
 
       // Test database connection
       const { t: dbUtilsT } = dbUtilsScopedTranslation.scopedT(locale);

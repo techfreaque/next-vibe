@@ -13,8 +13,8 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-import { db } from "next-vibe/database";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import { db } from "../../database";
+import type { EndpointLogger } from "../../logger/types";
 
 import { PulseExecutionStatus } from "../enum";
 import { pulseExecutions } from "./db";

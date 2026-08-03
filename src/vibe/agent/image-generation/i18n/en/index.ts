@@ -1,5 +1,5 @@
 // oxlint-disable-next-line oxlint-plugin-boilerplate/i18n-pattern
-import { translations as modelTranslations } from "next-vibe/agent/models/i18n/en";
+import { translations as modelTranslations } from "../../../models/i18n/en";
 
 export const translations = {
   tags: {
@@ -107,6 +107,8 @@ export const translations = {
         "The selected model does not support image generation. Please select an image model.",
       notConfigured:
         "{{label}} is not configured. Add {{envKey}} to your .env file. Get your key at {{url}}",
+      providerUnavailable:
+        "{{label}} is unavailable right now. Pick another model at {{url}}",
       insufficientCredits:
         "Insufficient credits. Balance: {{balance}}, required: {{minimum}}",
       balanceCheckFailed: "Failed to check your credit balance",
@@ -119,6 +121,7 @@ export const translations = {
       generationFailed: "Image generation failed",
       providerError: "Image provider error: {{error}}",
       noImageUrl: "No image URL returned from provider",
+      noImageGenerated: "The model did not generate an image",
       creditsFailed: "Failed to deduct credits for image generation",
       apiKeyNotConfigured: "API key not configured",
       externalServiceError: "External service error: {{message}}",
@@ -126,6 +129,8 @@ export const translations = {
       requestTimedOut: "Request timed out waiting for image generation",
       requestFailed: "Request failed: {{message}}",
       pollFailed: "Poll request failed with status {{status}}",
+      nonJsonResponse:
+        "Provider returned a non-JSON response (HTTP {{status}}): {{body}}",
     },
     success: {
       title: "Image Generated",

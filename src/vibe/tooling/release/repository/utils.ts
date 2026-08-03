@@ -3,7 +3,7 @@
  * Type guards, retry logic, and helper functions
  */
 
-import type { WidgetData } from "next-vibe/core/utils/json";
+import type { WidgetData } from "../../../core/utils/json";
 
 import type { PackageJson, ParsedVersion, ReleaseConfig } from "../definition";
 
@@ -339,24 +339,6 @@ export function omit<T extends Record<string, WidgetData>, K extends keyof T>(
     delete result[key];
   }
   return result as Omit<T, K>;
-}
-
-// ============================================================================
-// Environment Helpers
-// ============================================================================
-
-/**
- * Check if running in production
- */
-export function isProduction(): boolean {
-  return process.env.NODE_ENV === "production";
-}
-
-/**
- * Check if running in development
- */
-export function isDevelopment(): boolean {
-  return process.env.NODE_ENV === "development" || !process.env.NODE_ENV;
 }
 
 // ============================================================================

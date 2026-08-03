@@ -2,15 +2,22 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   errors: {
-    find_failed: "Benutzerrollen konnten nicht gefunden werden",
-    batch_find_failed: "Batch-Suche nach Benutzerrollen fehlgeschlagen",
-    not_found: "Benutzerrolle nicht gefunden",
-    lookup_failed: "Benutzerrolle konnte nicht abgerufen werden",
-    add_failed: "Rolle konnte nicht zum Benutzer hinzugefügt werden",
+    find_failed:
+      "Rollensuche für Benutzer {{userId}} fehlgeschlagen: {{error}}",
+    batch_find_failed:
+      "Batch-Rollensuche für {{count}} Benutzer fehlgeschlagen: {{error}}",
+    not_found: "Rolle {{role}} für Benutzer {{userId}} nicht gefunden",
+    lookup_failed:
+      "Rollenabfrage {{role}} für Benutzer {{userId}} fehlgeschlagen: {{error}}",
+    add_failed:
+      "Rolle {{role}} konnte Benutzer {{userId}} nicht zugewiesen werden: {{error}}",
     no_data_returned: "Keine Daten von der Datenbank zurückgegeben",
-    remove_failed: "Rolle konnte nicht vom Benutzer entfernt werden",
-    check_failed: "Überprüfung ob Benutzer Rolle hat fehlgeschlagen",
-    delete_failed: "Benutzerrollen konnten nicht gelöscht werden",
+    remove_failed:
+      "Rolle {{role}} konnte Benutzer {{userId}} nicht entzogen werden: {{error}}",
+    check_failed:
+      "Rollenprüfung {{role}} für Benutzer {{userId}} fehlgeschlagen: {{error}}",
+    delete_failed:
+      "Rollenlöschung für Benutzer {{userId}} fehlgeschlagen: {{error}}",
     endpoint_not_created: "Benutzerrollen-Endpoint wurde noch nicht erstellt",
   },
   post: {

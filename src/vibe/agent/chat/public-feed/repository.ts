@@ -19,7 +19,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { DefaultFolderId } from "../config";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { chatFolders, chatMessages, chatThreads } from "../db";
 import type {
   PublicFeedGetRequestOutput,
@@ -177,9 +177,10 @@ export class PublicFeedRepository {
     } catch (error) {
       logger.error("Error fetching public feed", parseError(error));
       return fail({
-        message: t("get.errors.server.title"),
+        message: t("get.errors.server.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }

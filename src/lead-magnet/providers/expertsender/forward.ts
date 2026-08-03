@@ -12,7 +12,7 @@ export const forwardLead: ForwardLeadFn = async (credentials, lead, t) => {
   const { expertSenderApiDomain, expertSenderApiKey } = credentials;
   const { firstName, email, listId } = lead;
 
-  // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+  // oxlint-disable-next-line restricted/no-raw-fetch
   const response = await fetch(
     apiContactsUrl.replace("{domain}", expertSenderApiDomain),
     {

@@ -26,7 +26,7 @@ import { createContext, useContext, useRef } from "react";
 import type { StoreApi } from "zustand";
 import { createStore, useStore } from "zustand";
 
-import { DefaultFolderId } from "../config";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 
 /**
  * Navigation state shape
@@ -187,13 +187,6 @@ export function ChatNavigationProvider({
 // ─── Fallback store (outside provider) ───────────────────────────────────────
 
 const NULL_NAVIGATION_STORE = createChatNavigationStore();
-
-/**
- * Returns true if rendered inside a ChatNavigationProvider.
- */
-export function useIsInsideChatNavigationProvider(): boolean {
-  return useContext(ChatNavigationContext) !== null;
-}
 
 // ─── Hook ────────────────────────────────────────────────────────────────────
 

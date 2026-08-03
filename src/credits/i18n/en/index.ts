@@ -9,6 +9,7 @@ export const translations = {
     balance: "balance",
   },
   repository: {
+    bonusCreditsAdded: "Added {{amount}} bonus credits",
     tts: "Text-to-Speech",
     stt: "Speech-to-Text",
     search: "Search",

@@ -6,7 +6,7 @@
 
 "use client";
 
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import { useShallow } from "zustand/react/shallow";
 
 import type { ReactWidgetContext } from "./react-types";

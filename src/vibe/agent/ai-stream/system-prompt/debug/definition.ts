@@ -3,11 +3,11 @@
  * Admin/dev-only - renders the full system prompt for a given user context.
  */
 
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
-import { imageGenModelSelectionSchema } from "next-vibe/agent/image-generation/models";
-import { musicGenModelSelectionSchema } from "next-vibe/agent/music-generation/models";
-import { videoGenModelSelectionSchema } from "next-vibe/agent/video-generation/models";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { DefaultFolderId } from "../../../../core/execution-context";
+import { imageGenModelSelectionSchema } from "../../../image-generation/models";
+import { musicGenModelSelectionSchema } from "../../../music-generation/models";
+import { videoGenModelSelectionSchema } from "../../../video-generation/models";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -99,7 +99,7 @@ const { GET } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         listEndpoint: async () =>
-          (await import("next-vibe/agent/chat/threads/definition")).default.GET,
+          (await import("../../../chat/threads/definition")).default.GET,
         labelField: "title",
         label: "get.fields.threadId.label" as const,
         description: "get.fields.threadId.description" as const,
@@ -109,7 +109,7 @@ const { GET } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         listEndpoint: async () =>
-          (await import("next-vibe/agent/skills/definition")).default.GET,
+          (await import("../../../skills/definition")).default.GET,
         labelField: "name",
         valueField: "skillId",
         label: "get.fields.skillId.label" as const,

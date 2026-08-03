@@ -1,15 +1,17 @@
-import "server-only";
-
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { Methods } from "next-vibe/core/definition/enums";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 /**
  * Endpoint Handler Implementation
  * Main function for creating type-safe multi-method handlers
  */
+
+import "server-only";
+
+import type { CreateApiEndpointAny } from "../definition/endpoint-base";
+import { Methods } from "../definition/enums";
+import type { CountryLanguage } from "../i18n/core/config";
 import type { NextRequest, NextResponse } from "next-vibe/ui/lib/request";
 
 import type { GenericHandlerReturnType, MethodHandlerConfig } from "./handler";
+import { messagingHandlerOptions } from "./handler-messaging";
 import type { NextHandlerReturnType } from "./next-handler";
 import type { ResponseType } from "./response.schema";
 import { endpointHandler } from "./single";
@@ -119,12 +121,7 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       const handler = endpointHandler({
         endpoint,
         handler: methodConfig.handler,
-        email: methodConfig.email
-          ? { afterHandlerEmails: methodConfig.email }
-          : undefined,
-        sms: methodConfig.sms
-          ? { afterHandlerSms: methodConfig.sms }
-          : undefined,
+        ...messagingHandlerOptions(methodConfig),
         requestDefaults: methodConfig.requestDefaults,
         fieldDefaults: methodConfig.fieldDefaults,
       });
@@ -155,12 +152,7 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       const handler = endpointHandler({
         endpoint,
         handler: methodConfig.handler,
-        email: methodConfig.email
-          ? { afterHandlerEmails: methodConfig.email }
-          : undefined,
-        sms: methodConfig.sms
-          ? { afterHandlerSms: methodConfig.sms }
-          : undefined,
+        ...messagingHandlerOptions(methodConfig),
         requestDefaults: methodConfig.requestDefaults,
         fieldDefaults: methodConfig.fieldDefaults,
       });
@@ -186,12 +178,7 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       const handler = endpointHandler({
         endpoint,
         handler: methodConfig.handler,
-        email: methodConfig.email
-          ? { afterHandlerEmails: methodConfig.email }
-          : undefined,
-        sms: methodConfig.sms
-          ? { afterHandlerSms: methodConfig.sms }
-          : undefined,
+        ...messagingHandlerOptions(methodConfig),
         requestDefaults: methodConfig.requestDefaults,
         fieldDefaults: methodConfig.fieldDefaults,
       });
@@ -217,12 +204,7 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       const handler = endpointHandler({
         endpoint,
         handler: methodConfig.handler,
-        email: methodConfig.email
-          ? { afterHandlerEmails: methodConfig.email }
-          : undefined,
-        sms: methodConfig.sms
-          ? { afterHandlerSms: methodConfig.sms }
-          : undefined,
+        ...messagingHandlerOptions(methodConfig),
         requestDefaults: methodConfig.requestDefaults,
         fieldDefaults: methodConfig.fieldDefaults,
       });
@@ -249,12 +231,7 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       const handler = endpointHandler({
         endpoint,
         handler: methodConfig.handler,
-        email: methodConfig.email
-          ? { afterHandlerEmails: methodConfig.email }
-          : undefined,
-        sms: methodConfig.sms
-          ? { afterHandlerSms: methodConfig.sms }
-          : undefined,
+        ...messagingHandlerOptions(methodConfig),
         requestDefaults: methodConfig.requestDefaults,
         fieldDefaults: methodConfig.fieldDefaults,
       });

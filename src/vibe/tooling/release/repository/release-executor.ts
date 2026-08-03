@@ -4,13 +4,13 @@
  */
 
 import { confirm, select } from "@inquirer/prompts";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
+} from "../../../core/route/response.schema";
 import {
   formatConfig,
   formatDuration,
@@ -22,9 +22,9 @@ import {
   formatStartup,
   formatSuccess,
   formatWarning,
-} from "next-vibe/logger/formatters";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { scopedTranslation } from "next-vibe/tooling/release/i18n";
+} from "../../../logger/formatters";
+import type { EndpointLogger } from "../../../logger/types";
+import { scopedTranslation } from "../i18n";
 
 import type {
   GitInfo,
@@ -126,7 +126,6 @@ export class ReleaseExecutor implements IReleaseExecutor {
           return fail({
             message: configResult.message,
             errorType: configResult.errorType,
-            messageParams: configResult.messageParams,
           });
         }
         config = configResult.data;
@@ -213,7 +212,6 @@ export class ReleaseExecutor implements IReleaseExecutor {
         return fail({
           message: validationResult.message,
           errorType: validationResult.errorType,
-          messageParams: validationResult.messageParams,
         });
       }
       trackTime("validation", startTime);
@@ -348,9 +346,8 @@ export class ReleaseExecutor implements IReleaseExecutor {
         if (packages.length === 0) {
           const { t } = scopedTranslation.scopedT(locale);
           return fail({
-            message: t("errors.packageNotFound"),
+            message: t("errors.packageNotFound", { targetPackage }),
             errorType: ErrorResponseTypes.NOT_FOUND,
-            messageParams: { targetPackage },
           });
         }
       }

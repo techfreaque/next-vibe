@@ -6,15 +6,15 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { GuardStartT } from "next-vibe/tooling/guard/start/i18n";
+} from "../../../core/route/response.schema";
+import { parseError } from "../../../core/utils/parse-error";
+import type { EndpointLogger } from "../../../logger/types";
+import type { GuardStartT } from "./i18n";
 
 import type {
   GuardStartRequestOutput,
@@ -257,11 +257,10 @@ export class GuardStartRepository {
     } catch (error) {
       logger.error("Failed to setup guard jail:", parseError(error));
       return fail({
-        message: t("errors.internal.title"),
+        message: t("errors.jailSetupFailed", {
+          detail: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
-          error: error instanceof Error ? error.message : String(error),
-        },
       });
     }
   }
@@ -349,11 +348,10 @@ export class GuardStartRepository {
     } catch (error) {
       logger.error("Failed to setup VSCode integration:", parseError(error));
       return fail({
-        message: t("errors.internal.title"),
+        message: t("errors.vscodeSetupFailed", {
+          detail: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
-          error: error instanceof Error ? error.message : String(error),
-        },
       });
     }
   }
@@ -515,13 +513,12 @@ exec env -i \\
       );
     } catch (error) {
       logger.error("Guard start failed", parseError(error));
-      const parsedError =
-        error instanceof Error ? error : new Error(String(error));
 
       return fail({
-        message: t("errors.internal.title"),
+        message: t("errors.startFailed", {
+          detail: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
       });
     }
   }
@@ -535,11 +532,8 @@ exec env -i \\
 
     // For now, return error - guard ID lookup not implemented yet
     return fail({
-      message: t("errors.notFound.title"),
+      message: t("errors.guardIdLookupUnsupported"),
       errorType: ErrorResponseTypes.NOT_FOUND,
-      messageParams: {
-        error: `Guard ID lookup not implemented yet. Use project path instead.`,
-      },
     });
   }
 
@@ -556,11 +550,8 @@ exec env -i \\
     const vscodePath = path.join(projectPath, ".vscode");
     if (!fs.existsSync(vscodePath)) {
       return fail({
-        message: t("errors.notFound.title"),
+        message: t("errors.notAVscodeProject", { projectPath }),
         errorType: ErrorResponseTypes.NOT_FOUND,
-        messageParams: {
-          error: `Guard requires a VSCode project. .vscode directory not found in ${projectPath}`,
-        },
       });
     }
 

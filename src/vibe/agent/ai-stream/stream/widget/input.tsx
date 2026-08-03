@@ -8,38 +8,38 @@ import {
   DEFAULT_AUDIO_VISION_MODEL_SELECTION,
   DEFAULT_IMAGE_VISION_MODEL_SELECTION,
   DEFAULT_VIDEO_VISION_MODEL_SELECTION,
-} from "next-vibe/agent/ai-stream/constants";
-import { getChatModelById } from "next-vibe/agent/ai-stream/models";
+} from "../../constants";
+import { getChatModelById } from "../../models";
 import {
   ImageQuality,
   ImageSize,
   MusicDuration,
   useChatInputStore,
-} from "next-vibe/agent/ai-stream/stream/hooks/input-store";
-import { useAIStreamStore } from "next-vibe/agent/ai-stream/stream/hooks/store";
-import { useAIStream } from "next-vibe/agent/ai-stream/stream/hooks/use-ai-stream";
-import { TOUR_DATA_ATTRS } from "next-vibe/agent/ai-stream/stream/widget/chat-ui/welcome-tour/tour-attrs";
+} from "../hooks/input-store";
+import { useAIStreamStore } from "../hooks/store";
+import { useAIStream } from "../hooks/use-ai-stream";
+import { TOUR_DATA_ATTRS } from "./chat-ui/welcome-tour/tour-attrs";
 import {
   getBestAudioVisionModel,
   getBestImageVisionModel,
   getBestVideoVisionModel,
-} from "next-vibe/agent/ai-stream/vision-models";
-import { AGENT_MESSAGE_LENGTH } from "next-vibe/agent/chat/constants";
-import { NEW_MESSAGE_ID } from "next-vibe/agent/chat/enum";
-import { useChatBootContext } from "next-vibe/agent/chat/hooks/context";
-import { useChatStore } from "next-vibe/agent/chat/hooks/store";
-import { useChatNavigationStore } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
-import { useChatSettings } from "next-vibe/agent/chat/settings/hooks";
-import { ChatSettingsRepositoryClient } from "next-vibe/agent/chat/settings/repository-client";
-import messagesDefinition from "next-vibe/agent/chat/threads/[threadId]/messages/definition";
+} from "../../vision-models";
+import { AGENT_MESSAGE_LENGTH } from "../../../chat/constants";
+import { NEW_MESSAGE_ID } from "../../../chat/enum";
+import { useChatBootContext } from "../../../chat/hooks/context";
+import { useChatStore } from "../../../chat/hooks/store";
+import { useChatNavigationStore } from "../../../chat/hooks/use-chat-navigation-store";
+import { useChatSettings } from "../../../chat/settings/hooks";
+import { ChatSettingsRepositoryClient } from "../../../chat/settings/repository-client";
+import messagesDefinition from "../../../chat/threads/[threadId]/messages/definition";
 import {
   type MessageOperationsDeps,
   useMessageOperations,
-} from "next-vibe/agent/chat/threads/[threadId]/messages/hooks/use-operations";
-import { CortexButton } from "next-vibe/agent/cortex/widget/cortex-button";
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
-import type { FavoriteConfig } from "next-vibe/agent/skills/favorites/db";
-import { ChatFavoritesRepositoryClient } from "next-vibe/agent/skills/favorites/repository-client";
+} from "../../../chat/threads/[threadId]/messages/hooks/use-operations";
+import { CortexButton } from "../../../cortex/widget/cortex-button";
+import { useProviderAvailability } from "../../../env-availability-store";
+import type { FavoriteConfig } from "../../../skills/favorites/db";
+import { ChatFavoritesRepositoryClient } from "../../../skills/favorites/repository-client";
 import { endpoints as cronIdEndpoints } from "next-vibe/tasks/cron/[id]/definition";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";

@@ -5,15 +5,16 @@
  * Renders response data using endpoint definitions for pretty output.
  */
 
-import { getFullPath } from "next-vibe/core/core-utils/path";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { EXECUTE_TOOL_ALIAS } from "next-vibe/execute-tool/constants";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import { getFullPath } from "../../../core/core-utils/path";
+import { getEnvAvailability } from "../../../agent/env-availability";
+import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import type { ResponseType } from "../../../core/route/response.schema";
+import type { WidgetData } from "../../../core/utils/json";
+import { parseError } from "../../../core/utils/parse-error";
+import { EXECUTE_TOOL_ALIAS } from "../../../execute-tool/constants";
+import type { JwtPayloadType } from "../../../identity/auth/types";
+import type { EndpointLogger } from "../../../logger/types";
 import React from "react";
 
 import { getEndpoint } from "@/generated/endpoints/endpoint";
@@ -106,6 +107,7 @@ export class McpResultFormatter {
 
       // Pre-warm lazy widgets
       await prewarmLazyWidgets(endpoint);
+      const availability = await getEnvAvailability();
 
       // Create component
       const createStart = performance.now();
@@ -115,6 +117,7 @@ export class McpResultFormatter {
         data,
         logger,
         user,
+        availability,
       });
       const componentTime = performance.now() - createStart;
 

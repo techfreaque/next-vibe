@@ -20,10 +20,10 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-import { rootlessToolExecutionContext } from "next-vibe/agent/chat/config";
-import { chatThreads } from "next-vibe/agent/chat/db";
-import favoritesCreateDefinitions from "next-vibe/agent/skills/favorites/create/definition";
-import favoritesDefinitions from "next-vibe/agent/skills/favorites/definition";
+import { rootlessToolExecutionContext } from "next-vibe/core/execution-context";
+import { chatThreads } from "../../chat/db";
+import favoritesCreateDefinitions from "../../skills/favorites/create/definition";
+import favoritesDefinitions from "../../skills/favorites/definition";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import remoteConnectionByIdDefinitions from "next-vibe/remote-connection/[instanceId]/definition";

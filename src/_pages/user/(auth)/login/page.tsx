@@ -9,6 +9,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
+import { Platform } from "next-vibe/platforms/platforms";
 import { redirect } from "next-vibe/ui/lib/redirect";
 import { Div } from "next-vibe/ui/ui/div";
 import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
@@ -37,6 +38,7 @@ export interface LoginPageData {
   errorMessage: string | null;
   devSeedPassword: string | null;
   devSeedUsers: typeof DEV_SEED_USERS | null;
+  platform: Platform;
 }
 
 /**
@@ -131,6 +133,7 @@ export async function tanstackLoader({
       errorMessage: loginOptionsResponse.message,
       devSeedPassword: null,
       devSeedUsers: null,
+      platform: Platform.NEXT_PAGE,
     };
   }
   if (!verifiedUserResponse.success) {
@@ -142,6 +145,7 @@ export async function tanstackLoader({
       errorMessage: t("errors.failedToLoadBrowserIdentity"),
       devSeedPassword: null,
       devSeedUsers: null,
+      platform: Platform.NEXT_PAGE,
     };
   }
 
@@ -158,6 +162,7 @@ export async function tanstackLoader({
     errorMessage: null,
     devSeedPassword,
     devSeedUsers,
+    platform: Platform.NEXT_PAGE,
   };
 }
 
@@ -169,6 +174,7 @@ export function TanstackPage({
   errorMessage,
   devSeedPassword,
   devSeedUsers,
+  platform,
 }: LoginPageData): JSX.Element {
   const { t } = pageT.scopedT(locale);
 
@@ -191,6 +197,7 @@ export function TanstackPage({
         user={user}
         devSeedPassword={devSeedPassword}
         devSeedUsers={devSeedUsers}
+        platform={platform}
       />
     </Div>
   );

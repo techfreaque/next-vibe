@@ -527,9 +527,9 @@ export const translations: typeof enTranslations = {
       "Die direkte Erstellung von Abonnements ist nicht erlaubt. Bitte nutzen Sie den Checkout-Prozess.",
     sync_failed:
       "Synchronisierung des Abonnements mit Datenbank fehlgeschlagen",
-    database_error: "Datenbankfehler aufgetreten",
+    database_error: "Datenbankfehler aufgetreten: {{error}}",
     create_crashed: "Erstellung des Abonnements fehlgeschlagen",
-    cancel_failed: "Kündigung des Abonnements fehlgeschlagen",
+    cancel_failed: "Kündigung des Abonnements fehlgeschlagen: {{error}}",
     user_not_found: "Benutzer nicht gefunden",
     stripe_customer_creation_failed:
       "Stripe-Kunde konnte nicht erstellt werden",
@@ -539,8 +539,8 @@ export const translations: typeof enTranslations = {
   },
 
   sync: {
-    failed: "Synchronisierung des Abonnements fehlgeschlagen",
-    stripe_error: "Stripe-Synchronisierungsfehler",
+    failed: "Synchronisierung des Abonnements fehlgeschlagen: {{error}}",
+    stripe_error: "Stripe-Synchronisierungsfehler: {{error}}",
     success: "Abonnement erfolgreich synchronisiert",
   },
 

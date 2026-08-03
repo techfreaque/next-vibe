@@ -5,7 +5,7 @@
 
 "use client";
 
-import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import type { ChatModelId } from "../../ai-stream/models";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { apiClient } from "next-vibe/unified-ui/hooks/store";

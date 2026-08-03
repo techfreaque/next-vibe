@@ -136,13 +136,6 @@ export function formatNextjs(line: string): string {
 }
 
 /**
- * Format a generator message
- */
-export function formatGenerator(message: string, icon = "⚙️"): string {
-  return `${icon} ${maybeColorize(message, semantic.generator)}`;
-}
-
-/**
  * Format a progress message
  */
 export function formatProgress(message: string, icon = "⏳"): string {

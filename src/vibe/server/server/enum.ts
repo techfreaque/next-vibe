@@ -3,8 +3,8 @@
  * Defines enumeration values for server management operations
  */
 
-import { scopedTranslation } from "next-vibe/server/server/i18n";
-import { createEnumOptions } from "next-vibe/unified-ui/_shared/enum";
+import { scopedTranslation } from "./i18n";
+import { createEnumOptions } from "../../unified-ui/_shared/enum";
 
 /**
  * Process Status Enum

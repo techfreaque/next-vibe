@@ -7,7 +7,7 @@
 import "server-only";
 
 import type { ModelMessage } from "ai";
-import { calculateCreditCost } from "next-vibe/agent/models/models";
+import { calculateCreditCost } from "../../../models/models";
 
 import { ThreadStreamingState } from "../../../chat/enum";
 import {
@@ -395,8 +395,7 @@ async function injectQueuedMessage(
   // Must be awaited — fire-and-forget would allow finally to run first.
   const dequeueNow = new Date();
   const { db: dequeueDb } = await import("next-vibe/database");
-  const { chatMessages: dequeueMessages } =
-    await import("next-vibe/agent/chat/db");
+  const { chatMessages: dequeueMessages } = await import("../../../chat/db");
   const { eq: dequeueEq, sql: dequeuesSql } = await import("drizzle-orm");
   try {
     await dequeueDb
@@ -426,7 +425,7 @@ async function injectQueuedMessage(
   }
 
   // Emit dequeue event so the frontend cache updates isQueued → false.
-  const { ChatMessageRole } = await import("next-vibe/agent/chat/enum");
+  const { ChatMessageRole } = await import("../../../chat/enum");
   ctx.dbWriter.wsEmit("message-created", {
     urlPathParams: { threadId },
     responseData: {

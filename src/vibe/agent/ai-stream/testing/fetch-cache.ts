@@ -53,17 +53,17 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
+import type { ToolExecutionContext } from "../../../core/execution-context";
+import { coreEnv } from "next-vibe/core/env";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
+import { Environment } from "next-vibe/env/env-util";
 
-import { createEndpointLogger } from "../../../logger/server";
-import type { EndpointLogger } from "../../../logger/types";
+import { createEndpointLogger } from "next-vibe/logger/server";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 export const HTTP_CACHE_DIR = join(
   dirname(fileURLToPath(import.meta.url)),
-  "..",
-  "..",
   "..",
   "..",
   "..",
@@ -327,7 +327,7 @@ async function resolveFixtureRootThreadId(
 ): Promise<string | null> {
   const { db } = await import("next-vibe/database");
   const { fixtures } = await import("./fixtures.db");
-  const { chatThreads } = await import("next-vibe/agent/chat/db");
+  const { chatThreads } = await import("../../chat/db");
   const { eq } = await import("drizzle-orm");
   let current: string | null = threadId;
   const seen = new Set<string>();
@@ -654,7 +654,7 @@ async function engineFetch(
   /** In-context spawning thread for a sub-stream (lineage walk first hop). */
   contextParentThreadId: string | undefined,
 ): Promise<Response> {
-  // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- the record/replay engine's live leg
+  // oxlint-disable-next-line restricted/restricted-syntax -- the record/replay engine's live leg
   const originalFetch = fetch;
   const url =
     typeof input === "string"
@@ -989,8 +989,8 @@ function makeLiveFetchWatchdog(): {
  * no interception). The switch is the environment, not an ambient flag.
  */
 function fixturesEnabled(): boolean {
-  const env = process.env.NODE_ENV;
-  return env === "development" || env === "test";
+  const env = coreEnv.NODE_ENV;
+  return env === Environment.DEVELOPMENT || env === Environment.TEST;
 }
 
 /**
@@ -1007,7 +1007,7 @@ export function createFixtureFetch(
 ): typeof globalThis.fetch {
   const threadId = toolExecutionContext?.threadId;
   if (!threadId || !fixturesEnabled()) {
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- live fetch outside dev/test or with no thread scope
+    // oxlint-disable-next-line restricted/restricted-syntax -- live fetch outside dev/test or with no thread scope
     return fetch;
   }
   // A parallel-fan-out caller (gap-fill) binds a per-call context carrying a
@@ -1029,7 +1029,7 @@ export function createFixtureFetch(
         pinnedOrdinal,
         contextParentThreadId,
       ),
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- borrowing the live fetch's preconnect
+    // oxlint-disable-next-line restricted/restricted-syntax -- borrowing the live fetch's preconnect
     { preconnect: fetch.preconnect.bind(fetch) },
   );
   return bound;

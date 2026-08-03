@@ -8,25 +8,26 @@ import {
   chatModelSelectionSchema,
   filterChatModels,
   type getBestChatModel,
-} from "next-vibe/agent/ai-stream/models";
+} from "../../../ai-stream/models";
 import {
   audioVisionModelSelectionSchema,
   imageVisionModelSelectionSchema,
   videoVisionModelSelectionSchema,
-} from "next-vibe/agent/ai-stream/vision-models";
-import { parseSkillId } from "next-vibe/agent/chat/slugify";
-import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
-import { imageGenModelSelectionSchema } from "next-vibe/agent/image-generation/models";
-import { musicGenModelSelectionSchema } from "next-vibe/agent/music-generation/models";
-import { sttModelSelectionSchema } from "next-vibe/agent/speech-to-text/models";
-import { voiceModelSelectionSchema } from "next-vibe/agent/text-to-speech/models";
-import { videoGenModelSelectionSchema } from "next-vibe/agent/video-generation/models";
+} from "../../../ai-stream/vision-models";
+import { parseSkillId } from "../../../chat/slugify";
+import { getClientAvailability } from "../../../env-availability-store";
+import type { AgentEnvAvailability } from "../../../env-availability";
+import { imageGenModelSelectionSchema } from "../../../image-generation/models";
+import { musicGenModelSelectionSchema } from "../../../music-generation/models";
+import { sttModelSelectionSchema } from "../../../speech-to-text/models";
+import { voiceModelSelectionSchema } from "../../../text-to-speech/models";
+import { videoGenModelSelectionSchema } from "../../../video-generation/models";
 import {
   dateSchema,
   iconSchema,
   translatedValueSchema,
 } from "next-vibe/core/definition/common.schema";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -409,8 +410,8 @@ const { PATCH } = createEndpoint({
   options: {
     mutationOptions: {
       onSuccess: async (data) => {
-        const { logger, pathParams, requestData, user, locale, availability } =
-          data;
+        const { logger, pathParams, requestData, user, locale } = data;
+        const availability = getClientAvailability();
 
         // Import dependencies
         const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
@@ -474,7 +475,6 @@ const { PATCH } = createEndpoint({
               },
               undefined,
               locale,
-              availability,
             );
           } catch (error) {
             logger.error("Failed to update settings for active favorite", {
@@ -932,14 +932,7 @@ const { PATCH } = createEndpoint({
         "memoryLimit",
       ] as const,
       urlPathParamsFields: ["id"] as const,
-      onEvent: async ({
-        requestData,
-        urlPathParams,
-        logger,
-        locale,
-        user,
-        agentEnvAvailability,
-      }) => {
+      onEvent: async ({ requestData, urlPathParams, logger, locale, user }) => {
         const favoriteId = urlPathParams.id;
 
         const [
@@ -1012,7 +1005,7 @@ const { PATCH } = createEndpoint({
                 requestData.voiceModelSelection ?? null,
                 locale,
                 user,
-                agentEnvAvailability,
+                getClientAvailability(),
               );
             return {
               ...old,

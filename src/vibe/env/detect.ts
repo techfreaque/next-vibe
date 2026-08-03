@@ -20,5 +20,4 @@ export const isDevCommand = _isDevCommand;
 export const isHermesDev = _isHermesDev;
 export const isMcpCommand = _isMcpCommand;
 export const isStartCommand = _isStartCommand;
-export const hasLocalFlag = _hasLocalFlag;
 export const cliArgs = _args;

@@ -1,5 +1,5 @@
 // oxlint-disable-next-line oxlint-plugin-boilerplate/i18n-pattern
-import { translations as modelTranslations } from "next-vibe/agent/models/i18n/en";
+import { translations as modelTranslations } from "../../../models/i18n/en";
 
 export const translations = {
   category: "Agent",
@@ -85,7 +85,7 @@ export const translations = {
       balanceCheckFailed:
         "Unable to check your credit balance. Please try again",
       insufficientCredits:
-        "You don't have enough credits for this conversion. Please add more credits to continue",
+        "Not enough credits for this conversion. Balance: {{balance}}, minimum required: {{minimum}}. Top up to continue",
     },
     success: {
       title: "Success",

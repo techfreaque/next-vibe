@@ -4,23 +4,23 @@
  * Following migration guide patterns
  */
 
-import { dateSchema } from "next-vibe/core/definition/common.schema";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { dateSchema } from "../../core/definition/common.schema";
+import { createEndpoint } from "../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { scopedTranslation } from "next-vibe/database/utils/i18n";
-import { UserRole } from "next-vibe/identity/roles/enum";
+} from "../../core/definition/enums";
+import { scopedTranslation } from "./i18n";
+import { UserRole } from "../../identity/roles/enum";
 import {
   objectField,
   objectOptionalField,
   requestField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 /**

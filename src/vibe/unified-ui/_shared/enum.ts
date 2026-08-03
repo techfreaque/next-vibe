@@ -5,7 +5,7 @@
  * and Zod schema generation for the data-driven UI system.
  */
 
-import type { ExtractScopedTranslationKey } from "next-vibe/core/i18n/core/scoped-translation";
+import type { ExtractScopedTranslationKey } from "../../core/i18n/core/scoped-translation";
 
 /**
  * Wrapper function that creates enum-like object where keys map to their values
@@ -46,7 +46,7 @@ export function createEnumOptions<
     enum: enumObj,
     options: optionsArray,
     // intentionally unsafe cast to get a enum value type
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Type placeholder for enum value extraction requires 'unknown' cast for type system compatibility. This is a compile-time only type, never used at runtime.
+    // eslint-disable-next-line restricted/no-unknown -- Infrastructure: Type placeholder for enum value extraction requires 'unknown' cast for type system compatibility. This is a compile-time only type, never used at runtime.
     Value: undefined as unknown as T[keyof T],
   };
 }

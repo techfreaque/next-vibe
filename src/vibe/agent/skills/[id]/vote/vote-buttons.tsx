@@ -9,7 +9,6 @@
  */
 
 "use client";
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import { Button } from "next-vibe/ui/ui/button";
 import { ThumbsDown } from "next-vibe/ui/ui/icons/ThumbsDown";
 import { ThumbsUp } from "next-vibe/ui/ui/icons/ThumbsUp";
@@ -49,7 +48,6 @@ export function SkillVoteButtons({
 }: SkillVoteButtonsProps): JSX.Element {
   const { user, locale } = useWidgetContext();
   const logger = useWidgetLogger();
-  const availability = useProviderAvailability();
 
   const [userVote, setUserVote] = useState<VoteDir | null>(initialUserVote);
   const [voteCount, setVoteCount] = useState<number | null>(initialVoteCount);
@@ -81,7 +79,6 @@ export function SkillVoteButtons({
           { direction },
           { id: skillId },
           locale,
-          availability,
         );
         if (res?.success) {
           setUserVote(res.data.userVote);
@@ -101,7 +98,7 @@ export function SkillVoteButtons({
         setPending(false);
       }
     },
-    [pending, userVote, voteCount, logger, user, skillId, locale, availability],
+    [pending, userVote, voteCount, logger, user, skillId, locale],
   );
 
   const isSmall = size === "sm";

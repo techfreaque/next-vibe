@@ -5,7 +5,6 @@
 
 import "server-only";
 
-import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -18,7 +17,6 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { emails } from "../../../../messages/db";
 import type { MessageStatus, MessageType } from "../../../../messages/enum";
-import { MessageStatus as MS } from "../../../../messages/enum";
 import type { SmtpClientT } from "../i18n";
 
 interface StoreEmailMetadataParams {
@@ -43,18 +41,6 @@ interface StoreEmailMetadataParams {
   userId?: string | null;
   leadId?: string | null;
   metadata?: Record<string, string | number | boolean | undefined>;
-}
-
-interface UpdateEmailEngagementParams {
-  emailId: string;
-  engagement: {
-    deliveredAt?: Date;
-    openedAt?: Date;
-    clickedAt?: Date;
-    bouncedAt?: Date;
-    unsubscribedAt?: Date;
-    status?: (typeof MessageStatus)[keyof typeof MessageStatus];
-  };
 }
 
 interface EmailMetadataOperationResult {
@@ -128,94 +114,11 @@ export class EmailMetadataRepository {
       });
 
       return fail({
-        message: t("emailMetadata.errors.server.title"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
+        message: t("emailMetadata.errors.server.detail_store", {
           recipient: params.recipientEmail,
           error: parsedError.message,
-        },
-      });
-    }
-  }
-
-  static async updateEmailEngagement(
-    params: UpdateEmailEngagementParams,
-    logger: EndpointLogger,
-    t: SmtpClientT,
-  ): Promise<ResponseType<EmailMetadataOperationResult>> {
-    try {
-      logger.debug("Updating email engagement", {
-        emailId: params.emailId,
-      });
-
-      const updateData: {
-        deliveredAt?: Date;
-        openedAt?: Date;
-        clickedAt?: Date;
-        bouncedAt?: Date;
-        unsubscribedAt?: Date;
-        status?:
-          | typeof MS.BOUNCED
-          | typeof MS.UNSUBSCRIBED
-          | typeof MS.FAILED
-          | typeof MS.SENT
-          | typeof MS.DELIVERED;
-        updatedAt: Date;
-      } = {
-        updatedAt: new Date(),
-      };
-
-      if (params.engagement.deliveredAt) {
-        updateData.deliveredAt = params.engagement.deliveredAt;
-      }
-      if (params.engagement.openedAt) {
-        updateData.openedAt = params.engagement.openedAt;
-      }
-      if (params.engagement.clickedAt) {
-        updateData.clickedAt = params.engagement.clickedAt;
-      }
-      if (params.engagement.bouncedAt) {
-        updateData.bouncedAt = params.engagement.bouncedAt;
-        updateData.status = MS.BOUNCED;
-      }
-      if (params.engagement.unsubscribedAt) {
-        updateData.unsubscribedAt = params.engagement.unsubscribedAt;
-        updateData.status = MS.UNSUBSCRIBED;
-      }
-
-      if (
-        params.engagement.status &&
-        (params.engagement.status === MS.BOUNCED ||
-          params.engagement.status === MS.UNSUBSCRIBED ||
-          params.engagement.status === MS.FAILED)
-      ) {
-        updateData.status = params.engagement.status;
-      }
-
-      await db
-        .update(emails)
-        .set(updateData)
-        .where(eq(emails.id, params.emailId));
-
-      logger.debug("Email engagement updated successfully", {
-        emailId: params.emailId,
-      });
-
-      return success({ success: true });
-    } catch (error) {
-      const parsedError = parseError(error);
-      logger.error("Failed to update email engagement", parsedError.message, {
-        emailId: params.emailId,
-        error: parsedError.message,
-      });
-
-      return fail({
-        message: t("emailMetadata.errors.server.title"),
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
-          emailId: params.emailId,
-          error: parsedError.message,
-        },
       });
     }
   }

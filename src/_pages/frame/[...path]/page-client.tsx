@@ -11,6 +11,7 @@ import { useTheme } from "next-themes";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { Platform } from "next-vibe/platforms/platforms";
 import type {
   FrameTheme,
   ParentToFrameMessage,
@@ -21,9 +22,11 @@ import { getDocumentScrollHeight } from "next-vibe/ui/lib/dom";
 import { Div } from "next-vibe/ui/ui/div";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { getEndpoint } from "@/generated/endpoints/endpoint";
+
+import { scopedTranslation as pageT } from "../../[...notFound]/i18n";
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 
@@ -36,6 +39,7 @@ interface VibeFramePageClientProps {
   urlPathParams: Record<string, string>;
   data: Record<string, string>;
   user: JwtPayloadType;
+  platform: Platform;
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -46,8 +50,12 @@ export function VibeFramePageClient({
   frameId,
   theme: initialTheme,
   user,
+  platform,
 }: VibeFramePageClientProps): JSX.Element {
   const { setTheme: setNextTheme } = useTheme();
+  // scopedT builds a fresh closure per call; memoize so `t` stays a stable
+  // effect dependency and does not re-trigger the endpoint load every render.
+  const { t } = useMemo(() => pageT.scopedT(locale), [locale]);
   const [endpointDef, setEndpointDef] = useState<Awaited<
     ReturnType<typeof getEndpoint>
   > | null>(null);
@@ -99,12 +107,15 @@ export function VibeFramePageClient({
       try {
         const def = await getEndpoint(endpointId);
         if (!def) {
-          setError(`Endpoint "${endpointId}" not found`);
+          const notFoundMessage = t("pages.frame.endpointNotFound", {
+            endpointId,
+          });
+          setError(notFoundMessage);
           bridge.send({
             type: "vf:error",
             frameId,
             error: {
-              message: `Endpoint "${endpointId}" not found`,
+              message: notFoundMessage,
               errorType: "NOT_FOUND",
             },
           });
@@ -113,7 +124,9 @@ export function VibeFramePageClient({
         }
       } catch (err) {
         const message =
-          err instanceof Error ? err.message : "Failed to load endpoint";
+          err instanceof Error
+            ? err.message
+            : t("pages.frame.endpointLoadFailed");
         setError(message);
         bridge.send({
           type: "vf:error",
@@ -126,7 +139,7 @@ export function VibeFramePageClient({
     }
 
     void load();
-  }, [endpointId, frameId, bridge]);
+  }, [endpointId, frameId, bridge, t]);
 
   // ResizeObserver for auto-sizing
   useEffect(() => {
@@ -194,7 +207,12 @@ export function VibeFramePageClient({
 
   return (
     <Div ref={rootRef}>
-      <EndpointsPage endpoint={wrappedEndpoint} locale={locale} user={user} />
+      <EndpointsPage
+        endpoint={wrappedEndpoint}
+        locale={locale}
+        user={user}
+        platform={platform}
+      />
     </Div>
   );
 }

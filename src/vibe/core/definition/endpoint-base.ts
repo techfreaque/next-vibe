@@ -5,12 +5,12 @@
  * This file must NOT import from widgets/configs.ts
  */
 
-import type { UserRoleValue } from "next-vibe/identity/roles/enum";
-import type { UnifiedField } from "next-vibe/unified-ui/_shared/configs";
+import type { UserRoleValue } from "../../identity/roles/enum";
+import type { UnifiedField } from "../../unified-ui/_shared/configs";
 import type {
   AnyChildrenConstrain,
   FieldUsageConfig,
-} from "next-vibe/unified-ui/_shared/types";
+} from "../../unified-ui/_shared/types";
 import type { z } from "zod";
 
 import type { CreateApiEndpoint } from "./create";

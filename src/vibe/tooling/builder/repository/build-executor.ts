@@ -5,18 +5,18 @@
 
 import { resolve } from "node:path";
 
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { scopedTranslation } from "next-vibe/tooling/builder/i18n";
-import { npmPackageGenerator } from "next-vibe/tooling/builder/repository/vibe-package/npm-package-generator";
-import { PackageEndpointGeneratorRepository } from "next-vibe/tooling/builder/repository/vibe-package/package-endpoint-generator";
-import { createPackagePlugins } from "next-vibe/tooling/builder/repository/vibe-package/package-plugins";
+} from "../../../core/route/response.schema";
+import { parseError } from "../../../core/utils/parse-error";
+import type { EndpointLogger } from "../../../logger/types";
+import type { scopedTranslation } from "../i18n";
+import { npmPackageGenerator } from "./vibe-package/npm-package-generator";
+import { PackageEndpointGeneratorRepository } from "./vibe-package/package-endpoint-generator";
+import { createPackagePlugins } from "./vibe-package/package-plugins";
 
 import type {
   BuildConfig,
@@ -361,9 +361,10 @@ export class BuildExecutor {
       logger.error("Build failed", { error: parsedError, duration });
 
       return fail({
-        message: t("post.errors.buildFailed.title"),
+        message: t("post.errors.buildFailed.title", {
+          error: parsedError.message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
       });
     }
   }

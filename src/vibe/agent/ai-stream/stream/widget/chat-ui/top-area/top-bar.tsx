@@ -1,10 +1,10 @@
 "use client";
 
-import { isDefaultFolderId } from "next-vibe/agent/chat/config";
-import { NEW_MESSAGE_ID } from "next-vibe/agent/chat/enum";
-import { useChatStore } from "next-vibe/agent/chat/hooks/store";
-import { useChatNavigationStore } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
-import { scopedTranslation } from "next-vibe/agent/chat/threads/widget/i18n";
+import { isDefaultFolderId } from "../../../../../chat/config";
+import { NEW_MESSAGE_ID } from "../../../../../chat/enum";
+import { useChatStore } from "../../../../../chat/hooks/store";
+import { useChatNavigationStore } from "../../../../../chat/hooks/use-chat-navigation-store";
+import { scopedTranslation } from "../../../../../chat/threads/widget/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { useSilentHistory } from "next-vibe/ui/hooks/use-navigation";
 import { Button } from "next-vibe/ui/ui/button";

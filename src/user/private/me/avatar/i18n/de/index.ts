@@ -5,11 +5,14 @@ export const translations: typeof enTranslations = {
 
   tag: "avatar",
   errors: {
-    user_not_found: "Benutzer nicht gefunden",
-    failed_to_upload_avatar: "Avatar konnte nicht hochgeladen werden",
-    failed_to_delete_avatar: "Avatar konnte nicht gelöscht werden",
-    invalid_file_type: "Ungültiger Dateityp",
-    file_too_large: "Datei zu groß",
+    user_not_found: "Benutzer {{userId}} nicht gefunden",
+    failed_to_upload_avatar:
+      "Avatar-Upload für {{userId}} fehlgeschlagen: {{error}}",
+    failed_to_delete_avatar:
+      "Avatar-Löschung für {{userId}} fehlgeschlagen: {{error}}",
+    invalid_file_type:
+      "Dateityp {{providedType}} nicht zulässig. Erlaubt: {{allowedTypes}}",
+    file_too_large: "Datei zu groß: {{providedSize}}. Maximal {{maxSize}}",
   },
   debug: {
     uploadingUserAvatar: "Benutzer-Avatar wird hochgeladen",

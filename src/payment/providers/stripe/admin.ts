@@ -22,7 +22,6 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { paymentTransactions } from "../../db";
 import { InvoiceStatus } from "../../enum";
-import { scopedTranslation as paymentScopedTranslation } from "../../i18n";
 import type {
   PaymentInvoiceRequestOutput,
   PaymentInvoiceResponseOutput,
@@ -133,7 +132,6 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
     logger: EndpointLogger,
   ): Promise<ResponseType<PaymentInvoiceResponseOutput>> {
     const { t: tInvoice } = invoiceScopedTranslation.scopedT(locale);
-    const { t: tPayment } = paymentScopedTranslation.scopedT(locale);
     const { t: tStripe } = stripeScopedTranslation.scopedT(locale);
     const stripeClient = StripeProvider.getStripe();
     if (!stripeClient) {
@@ -156,11 +154,8 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
       if (!stripeCustomerId) {
         logger.error("payment.invoice.error.customerNotFound", { userId });
         return fail({
-          message: tInvoice("post.errors.notFound.title"),
+          message: tInvoice("post.errors.notFound.noStripeCustomer"),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: {
-            error: tPayment("errors.customerNotFound"),
-          },
         });
       }
 
@@ -233,9 +228,10 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
       });
 
       return fail({
-        message: tInvoice("post.errors.server.title"),
+        message: tInvoice("post.errors.server.detail", {
+          error: parsedError.message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
       });
     }
   }
@@ -247,7 +243,6 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
     logger: EndpointLogger,
   ): Promise<ResponseType<PaymentPortalResponseOutput>> {
     const { t: tPortal } = portalScopedTranslation.scopedT(locale);
-    const { t: tPayment } = paymentScopedTranslation.scopedT(locale);
     const { t: tStripe } = stripeScopedTranslation.scopedT(locale);
     const stripeClient = StripeProvider.getStripe();
     if (!stripeClient) {
@@ -266,11 +261,8 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
       if (!stripeCustomerId) {
         logger.error("payment.portal.error.customerNotFound", { userId });
         return fail({
-          message: tPortal("post.errors.notFound.title"),
+          message: tPortal("post.errors.notFound.noStripeCustomer"),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: {
-            error: tPayment("errors.customerNotFound"),
-          },
         });
       }
 
@@ -305,14 +297,8 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
         });
 
         return fail({
-          message: tPayment("errors.server.title"),
+          message: tPortal("post.errors.server.portalNotConfigured"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: {
-            error:
-              "Stripe Customer Portal is not configured. Please configure it in Stripe Dashboard.",
-            configUrl:
-              "https://dashboard.stripe.com/test/settings/billing/portal",
-          },
         });
       }
 
@@ -323,9 +309,8 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
       });
 
       return fail({
-        message: tPortal("post.errors.server.title"),
+        message: tPortal("post.errors.server.detail", { error: errorMessage }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: errorMessage },
       });
     }
   }
@@ -369,9 +354,10 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
           userId,
         });
         return fail({
-          message: tRefund("post.errors.notFound.title"),
+          message: tRefund("post.errors.notFound.detail", {
+            transactionId: data.transactionId,
+          }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { transactionId: data.transactionId },
         });
       }
 
@@ -382,11 +368,8 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
           transactionId: data.transactionId,
         });
         return fail({
-          message: tRefund("post.errors.server.title"),
+          message: tRefund("post.errors.server.noPaymentIntent"),
           errorType: ErrorResponseTypes.BAD_REQUEST,
-          messageParams: {
-            error: tRefund("post.errors.server.description"),
-          },
         });
       }
 
@@ -435,9 +418,10 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
       });
 
       return fail({
-        message: tRefund("post.errors.server.title"),
+        message: tRefund("post.errors.server.detail", {
+          error: parsedError.message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
       });
     }
   }

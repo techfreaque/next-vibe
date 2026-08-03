@@ -1,9 +1,8 @@
 "use client";
 
-import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { createClientLogger } from "next-vibe/logger/client";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import { createClientLogger } from "../../../logger/client";
+import type { EndpointLogger } from "../../../logger/types";
 import { getSessionItem, setSessionItem } from "next-vibe/ui/lib/storage";
 import {
   type Context,
@@ -46,19 +45,17 @@ function getOrCreateTabId(): string {
 
 export function LoggerProvider({
   locale,
-  availability,
   children,
 }: {
   locale: CountryLanguage;
-  availability: AgentEnvAvailability;
   children: ReactNode;
 }): JSX.Element {
   const logger = useMemo(() => {
     // The WS client no longer takes a global logger — it threads an EndpointLogger
     // per subscribe/preWarm call (see websocket/client.ts), so nothing to set here.
-    return createClientLogger(false, locale, availability, getOrCreateTabId());
+    return createClientLogger(false, locale, getOrCreateTabId());
     // locale changes are rare but must re-create so API calls use correct path
-  }, [locale, availability]);
+  }, [locale]);
 
   return (
     <LoggerContext.Provider value={logger}>{children}</LoggerContext.Provider>

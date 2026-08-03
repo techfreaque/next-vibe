@@ -311,6 +311,7 @@ export const translations: typeof enTranslations = {
     server: {
       title: "Serverfehler",
       description: "Konto konnte nicht erstellt werden",
+      detail: "Konto konnte nicht erstellt werden: {{error}}",
     },
     networkError: {
       title: "Netzwerkfehler",

@@ -41,7 +41,3 @@ export function useMessengerAccountsList(
     user,
   );
 }
-
-export type MessengerAccountsListEndpointReturn = EndpointReturn<
-  typeof definitions
->;

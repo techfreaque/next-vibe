@@ -3,18 +3,18 @@
  * Displays a colored badge with text/status information
  */
 
-import type { WidgetType } from "next-vibe/core/definition/enums";
-import type { WidgetData } from "next-vibe/core/utils/json";
+import type { WidgetType } from "../../../../core/definition/enums";
+import type { WidgetData } from "../../../../core/utils/json";
 import type { BadgeVariant } from "next-vibe/ui/ui/badge";
 import type {
   EnumWidgetSchema,
   NumberWidgetSchema,
   StringWidgetSchema,
-} from "next-vibe/unified-ui/_shared/schema-constraints";
+} from "../../../_shared/schema-constraints";
 import type {
   BasePrimitiveWidgetConfig,
   FieldUsageConfig,
-} from "next-vibe/unified-ui/_shared/types";
+} from "../../../_shared/types";
 import type { z } from "zod";
 
 /**

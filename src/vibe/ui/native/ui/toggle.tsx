@@ -1,13 +1,10 @@
 import * as TogglePrimitive from "@rn-primitives/toggle";
 import { cva } from "class-variance-authority";
 import type { LucideIcon } from "lucide-react-native";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 
-import {
-  convertCSSToViewStyle,
-  styledNative,
-} from "../../native/utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import type {
   ToggleRootProps,
   ToggleSize,

@@ -3,11 +3,11 @@
  * WYSIWYG rich text editor with toolbar and optional markdown preview
  */
 
-import type { FieldDataType } from "next-vibe/core/definition/enums";
+import type { FieldDataType } from "../../../../core/definition/enums";
 import type { ToolbarAction } from "next-vibe/ui/ui/markdown-editor";
-import type { StringWidgetSchema } from "next-vibe/unified-ui/_shared/schema-constraints";
-import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
-import type { BaseFormFieldWidgetConfig } from "next-vibe/unified-ui/widgets/form-fields/_shared/types";
+import type { StringWidgetSchema } from "../../../_shared/schema-constraints";
+import type { FieldUsageConfig } from "../../../_shared/types";
+import type { BaseFormFieldWidgetConfig } from "../_shared/types";
 
 export interface MarkdownTextareaFieldWidgetConfig<
   out TKey extends string,

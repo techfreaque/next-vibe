@@ -1,18 +1,17 @@
-import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { EndpointErrorTypes } from "next-vibe/core/definition/enums";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { callApi as CallApiFn } from "./call-api";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
+import { EndpointErrorTypes } from "../../core/definition/enums";
+import type { CountryLanguage } from "../../core/i18n/core/config";
 import type {
   ErrorResponseType,
   ResponseType,
-} from "next-vibe/core/route/response.schema";
-import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../core/route/response.schema";
+import { ErrorResponseTypes, fail } from "../../core/route/response.schema";
+import { parseError } from "../../core/utils/parse-error";
+import { scopedTranslation as hooksTranslation } from "./i18n";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
 import { z } from "zod";
-
-import { callApi } from "./call-api";
 
 interface MutationExecutorOptions<TRequest, TResponse, TUrlVariables> {
   onSuccess?: (context: {
@@ -22,7 +21,6 @@ interface MutationExecutorOptions<TRequest, TResponse, TUrlVariables> {
     logger: EndpointLogger;
     user: JwtPayloadType;
     locale: CountryLanguage;
-    availability: AgentEnvAvailability;
   }) => void | ErrorResponseType | Promise<void | ErrorResponseType>;
 
   onError?: (context: {
@@ -33,6 +31,18 @@ interface MutationExecutorOptions<TRequest, TResponse, TUrlVariables> {
   }) => void | Promise<void>;
 }
 
+// Resolved at CALL time, not import time. Bun links the entire static import
+// graph before any module body runs, so the CLI override plugin registered in
+// vibe-runtime.ts has not been installed yet when a top-level
+// `import { callApi } from "./call-api"` is resolved — the web (HTTP) build wins
+// and the CLI ends up making loopback requests to a server that is not running.
+// A dynamic import resolves after registration, which is exactly why lazily
+// imported widgets already got their .cli.tsx counterparts.
+async function loadCallApi(): Promise<typeof CallApiFn> {
+  const mod = await import("./call-api");
+  return mod.callApi;
+}
+
 export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
   endpoint,
   logger,
@@ -41,7 +51,6 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
   locale,
   options = {},
   user,
-  availability,
 }: {
   endpoint: TEndpoint;
   logger: EndpointLogger;
@@ -53,14 +62,13 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
     : TEndpoint["types"]["UrlVariablesOutput"];
   locale: CountryLanguage;
   user: JwtPayloadType;
-  availability: AgentEnvAvailability;
   options?: MutationExecutorOptions<
     TEndpoint["types"]["RequestOutput"],
     TEndpoint["types"]["ResponseOutput"],
     TEndpoint["types"]["UrlVariablesOutput"]
   >;
 }): Promise<ResponseType<TEndpoint["types"]["ResponseOutput"]>> {
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Schema type cast requires 'unknown' for runtime type compatibility
+  // eslint-disable-next-line restricted/no-unknown -- Infrastructure: Schema type cast requires 'unknown' for runtime type compatibility
   const requestSchema = endpoint.requestSchema as unknown as z.ZodTypeAny;
   const isUndefinedSchema =
     requestSchema.safeParse(undefined).success &&
@@ -93,6 +101,7 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
   }
 
   try {
+    const callApi = await loadCallApi();
     const response = await callApi(
       endpoint,
       logger,
@@ -100,7 +109,6 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
       locale,
       requestData,
       pathParams,
-      availability,
     );
 
     if (!response.success) {
@@ -123,7 +131,6 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
         logger,
         user,
         locale,
-        availability,
       });
 
       if (callbackResult) {
@@ -142,13 +149,17 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
     const { t } = endpoint.scopedTranslation.scopedT(locale);
     const errorMessage = t(serverErrorConfig?.description);
 
+    // The endpoint's declared description is placeholder-free by contract, so
+    // it rides in as an already-translated `reason` rather than gaining one.
     const errorResponse: ErrorResponseType = fail({
-      message: errorMessage,
+      message: hooksTranslation
+        .scopedT(locale)
+        .t("apiUtils.errors.endpointFailed", {
+          reason: errorMessage,
+          path: endpoint.path.join("/"),
+          error: parsedError.message,
+        }),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: {
-        error: parsedError.message,
-        endpoint: endpoint.path.join("/"),
-      },
     });
 
     logger.error("Mutation failed", {

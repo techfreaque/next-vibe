@@ -11,10 +11,10 @@
 import "server-only";
 
 import { and, eq } from "drizzle-orm";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
-import { maybeColorize, semantic } from "next-vibe/logger/colors";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import { parseError } from "../core/utils/parse-error";
+import { db } from "../database";
+import { maybeColorize, semantic } from "../logger/colors";
+import type { EndpointLogger } from "../logger/types";
 
 import { allGraphSeeds } from "@/generated/dataflow/graph-seeds-index";
 

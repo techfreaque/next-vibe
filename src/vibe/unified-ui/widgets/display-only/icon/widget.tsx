@@ -9,26 +9,24 @@ import type {
   IconSchemaNullishType,
   IconSchemaOptionalType,
   IconSchemaType,
-} from "next-vibe/core/definition/common.schema";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+} from "../../../../core/definition/common.schema";
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Div } from "next-vibe/ui/ui/div";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../_shared/cn";
 import type {
   ReactRequestResponseWidgetProps,
   ReactStaticWidgetProps,
   ReactWidgetPropsNoValue,
-} from "next-vibe/unified-ui/_shared/react-types";
-import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
-import { useWidgetForm } from "next-vibe/unified-ui/_shared/use-widget-context";
+} from "../../../_shared/react-types";
+import type { FieldUsageConfig } from "../../../_shared/types";
+import { useWidgetForm } from "../../../_shared/use-widget-context";
 import {
   getBorderRadiusClassName,
   getContainerSizeClassName,
   getIconSizeClassName,
-} from "next-vibe/unified-ui/_shared/widget-helpers";
-import {
-  Icon,
-  type IconKey,
-} from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+} from "../../../_shared/widget-helpers";
+import { type IconKey } from "../../form-fields/icon-field/icons";
+import { Icon } from "../../form-fields/icon-field/icon-component";
 import { type JSX, useMemo } from "react";
 
 import type { IconWidgetConfig } from "./types";

@@ -1,28 +1,28 @@
 "use client";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Card, CardContent } from "next-vibe/ui/ui/card";
 import { Minus } from "next-vibe/ui/ui/icons/Minus";
 import { TrendingDown } from "next-vibe/ui/ui/icons/TrendingDown";
 import { TrendingUp } from "next-vibe/ui/ui/icons/TrendingUp";
 import { Span } from "next-vibe/ui/ui/span";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../_shared/cn";
 import type {
   ReactRequestResponseWidgetProps,
   ReactStaticWidgetProps,
-} from "next-vibe/unified-ui/_shared/react-types";
-import type { NumberWidgetSchema } from "next-vibe/unified-ui/_shared/schema-constraints";
-import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
+} from "../../../_shared/react-types";
+import type { NumberWidgetSchema } from "../../../_shared/schema-constraints";
+import type { FieldUsageConfig } from "../../../_shared/types";
 import {
   useWidgetForm,
   useWidgetLocale,
   useWidgetTranslation,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
+} from "../../../_shared/use-widget-context";
 import {
   getIconSizeClassName,
   getSpacingClassName,
   getTextSizeClassName,
-} from "next-vibe/unified-ui/_shared/widget-helpers";
-import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+} from "../../../_shared/widget-helpers";
+import { Icon } from "../../form-fields/icon-field/icon-component";
 import type { JSX } from "react";
 
 import { formatStatValue } from "./shared";

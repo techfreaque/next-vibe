@@ -63,11 +63,13 @@ export const translations: typeof enTranslations = {
       internal: {
         title: "Błąd Pobierania",
         description: "Wystąpił błąd podczas pobierania adresu URL",
+        detail: "Błąd pobierania: {{message}}",
       },
     },
     success: {
       title: "Pobieranie Zakończone Sukcesem",
       description: "Zawartość URL została pomyślnie pobrana",
+      detail: "Pobrano {{url}}",
     },
   },
   tags: {

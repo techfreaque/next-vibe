@@ -82,9 +82,10 @@ export class SubscriptionCheckoutRepository {
             subscriptionId: existingSubscription.data.id,
           });
           return fail({
-            message: t("post.errors.alreadySubscribed.title"),
+            message: t("post.errors.alreadySubscribed.detail", {
+              userId: user.id,
+            }),
             errorType: ErrorResponseTypes.BAD_REQUEST,
-            messageParams: { userId: user.id },
           });
         }
       }
@@ -105,9 +106,8 @@ export class SubscriptionCheckoutRepository {
 
       if (!userResult.success || !userResult.data) {
         return fail({
-          message: t("post.errors.notFound.title"),
+          message: t("post.errors.notFound.detail", { userId: user.id }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { userId: user.id },
         });
       }
 
@@ -185,9 +185,8 @@ export class SubscriptionCheckoutRepository {
         errorConstructor: error?.constructor?.name,
       });
       return fail({
-        message: t("post.errors.server.title"),
+        message: t("post.errors.server.detail", { error: errorMessage }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: errorMessage },
       });
     }
   }

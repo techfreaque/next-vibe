@@ -4,14 +4,14 @@
  * Located in threads/[threadId]/messages/ folder as per architectural standards
  */
 
-import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
-import { answerAsAI as answerAsAIOp } from "next-vibe/agent/ai-stream/stream/hooks/answer-as-ai";
-import { branchMessage as branchMessageOp } from "next-vibe/agent/ai-stream/stream/hooks/branch-message";
-import { retryMessage as retryMessageOp } from "next-vibe/agent/ai-stream/stream/hooks/retry-message";
-import { sendMessage as sendMessageOp } from "next-vibe/agent/ai-stream/stream/hooks/send-message";
-import messageIdDefinitions from "next-vibe/agent/chat/threads/[threadId]/messages/[messageId]/definition";
-import voteDefinitions from "next-vibe/agent/chat/threads/[threadId]/messages/[messageId]/vote/definition";
-import type { FavoriteConfig } from "next-vibe/agent/skills/favorites/db";
+import type { ChatModelId } from "../../../../../ai-stream/models";
+import { answerAsAI as answerAsAIOp } from "../../../../../ai-stream/stream/hooks/answer-as-ai";
+import { branchMessage as branchMessageOp } from "../../../../../ai-stream/stream/hooks/branch-message";
+import { retryMessage as retryMessageOp } from "../../../../../ai-stream/stream/hooks/retry-message";
+import { sendMessage as sendMessageOp } from "../../../../../ai-stream/stream/hooks/send-message";
+import messageIdDefinitions from "../[messageId]/definition";
+import voteDefinitions from "../[messageId]/vote/definition";
+import type { FavoriteConfig } from "../../../../../skills/favorites/db";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { toast } from "next-vibe/ui/hooks/use-toast";
 import {
@@ -25,7 +25,7 @@ import { useCallback, useMemo, useRef } from "react";
 
 import type { StartStreamFn } from "../../../../../ai-stream/stream/hooks/shared";
 import type { UseAIStreamReturn } from "../../../../../ai-stream/stream/hooks/use-ai-stream";
-import { DefaultFolderId } from "../../../../config";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { useChatNavigationStore } from "../../../../hooks/use-chat-navigation-store";
 import messagesDefinition from "../definition";
 import { patchMessage, removeMessage } from "./update-messages";

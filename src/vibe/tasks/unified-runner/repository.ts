@@ -6,21 +6,21 @@
 
 import "server-only";
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import type { ResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
+} from "../../core/route/response.schema";
+import { parseError } from "../../core/utils/parse-error";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
-} from "next-vibe/identity/auth/types";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { scopedTranslation as tasksScopedTranslation } from "next-vibe/tasks/i18n";
+} from "../../identity/auth/types";
+import { UserPermissionRole } from "../../identity/roles/enum";
+import type { EndpointLogger } from "../../logger/types";
+import { scopedTranslation as tasksScopedTranslation } from "../i18n";
 
 import type {
   UnifiedRunnerRequestOutput,
@@ -131,9 +131,8 @@ export class UnifiedTaskRunnerRepository {
 
         default:
           return fail({
-            message: t("errors.getTaskRunnerStatus"),
+            message: t("errors.getTaskRunnerStatus", { action: data.action }),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            messageParams: { action: data.action },
           });
       }
     } catch (error) {
@@ -143,9 +142,10 @@ export class UnifiedTaskRunnerRepository {
       });
 
       return fail({
-        message: t("errors.startTaskRunner"),
+        message: t("errors.startTaskRunner", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -221,9 +221,8 @@ export class UnifiedTaskRunnerRepository {
 
       const { t: tasksT } = tasksScopedTranslation.scopedT(systemLocale);
       return fail({
-        message: tasksT("errors.startTaskRunner"),
+        message: tasksT("errors.startTaskRunner", { error: errorMsg }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: errorMsg },
       });
     }
   }
@@ -374,7 +373,7 @@ export class UnifiedTaskRunnerRepository {
     const { taskRegistry } = await import("@/generated/tasks/index");
 
     // Upsert task definitions into DB so they appear in the UI
-    const { prod: seedTasks } = await import("next-vibe/dataflow/seeds");
+    const { prod: seedTasks } = await import("../../dataflow/seeds");
     await seedTasks(logger);
 
     const abortController = new AbortController();
@@ -413,7 +412,10 @@ export class UnifiedTaskRunnerRepository {
       process.once("SIGTERM", shutdown);
     });
 
-    // Process exits after stop() completes above; this line never actually runs
+    // Process exits after stop() completes above; this line never actually runs.
+    // Not error handling - it is the only way to satisfy the `never` return type
+    // after the block above, so the restricted-syntax rule does not apply.
+    // oxlint-disable-next-line restricted/restricted-syntax
     throw new Error("unreachable");
   }
 

@@ -1,15 +1,15 @@
 /* eslint-disable i18next/no-literal-string */
 import "server-only";
 
-import type { SystemPromptFragment } from "next-vibe/agent/ai-stream/system-prompt/types";
-import type { FavoriteSummaryItem } from "next-vibe/agent/skills/favorites/favorites-formatter";
+import type { SystemPromptFragment } from "../ai-stream/system-prompt/types";
+import type { FavoriteSummaryItem } from "../skills/favorites/favorites-formatter";
 import { languageConfig } from "next-vibe/core/i18n";
 import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { CronTaskItem } from "next-vibe/tasks/cron/tasks/definition";
 
-import { parseError } from "../../core/utils/parse-error";
+import { parseError } from "next-vibe/core/utils/parse-error";
 import { stripFrontmatter, truncateContent } from "./_shared/text-utils";
 import {
   CORTEX_EXEC_ALIAS,
@@ -166,7 +166,7 @@ export const cortexFragment: SystemPromptFragment = {
         (n) => n.path.startsWith("/skills") && n.score >= 0.7,
       );
 
-      await import("next-vibe/agent/skills/db").catch(() => null);
+      await import("../skills/db").catch(() => null);
 
       const [
         counts,
@@ -1072,8 +1072,8 @@ async function loadFavoritesForCortex(
       { db: favDb },
       { asc: favAsc, eq: favEq, inArray: favInArray },
     ] = await Promise.all([
-      import("next-vibe/agent/skills/favorites/db"),
-      import("next-vibe/agent/chat/settings/db"),
+      import("../skills/favorites/db"),
+      import("../chat/settings/db"),
       import("next-vibe/database"),
       import("drizzle-orm"),
     ]);
@@ -1106,8 +1106,7 @@ async function loadFavoritesForCortex(
     ];
 
     if (customSkillUuids.length > 0) {
-      const { customSkills: customSkillsTable } =
-        await import("next-vibe/agent/skills/db");
+      const { customSkills: customSkillsTable } = await import("../skills/db");
       const customSkillsList = await favDb
         .select({
           id: customSkillsTable.id,
@@ -1616,7 +1615,8 @@ export async function loadRawEmbeddingScores(
   try {
     const { generateEmbedding } = await import("./embeddings/service");
     // Debug endpoint (no stream) — explicit thread-less context routes live.
-    const { makeHeadlessContext } = await import("../chat/config");
+    const { makeHeadlessContext } =
+      await import("next-vibe/core/execution-context");
     const queryEmbedding = await generateEmbedding(
       userMessage,
       // no user context — UTC (dates not user-facing here)

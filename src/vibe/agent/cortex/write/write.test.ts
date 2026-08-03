@@ -21,7 +21,7 @@ import { cortexNodes } from "../db";
 import listEndpoint from "../list/definition";
 import readEndpoint from "../read/definition";
 import treeEndpoint from "../tree/definition";
-import writeEndpoint from "../write/definition";
+import writeEndpoint from "./definition";
 
 const TEST_PREFIX = "/documents/write-test";
 const CLEANUP_PATTERN = `${TEST_PREFIX}%`;

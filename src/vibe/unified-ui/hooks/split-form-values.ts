@@ -1,4 +1,4 @@
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 
 /**
  * Split flat form values into the two buckets the API call expects.

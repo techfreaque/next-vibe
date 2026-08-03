@@ -1,8 +1,8 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-import { chatFolders } from "next-vibe/agent/chat/db";
-import { canManageFolderPermissions } from "next-vibe/agent/chat/permissions/permissions";
+import { chatFolders } from "../../../../db";
+import { canManageFolderPermissions } from "../../../../permissions/permissions";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {

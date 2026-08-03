@@ -75,9 +75,8 @@ export class StripeProvider implements PaymentProvider {
 
       if (!user) {
         return fail({
-          message: t("errors.userNotFound.title"),
+          message: t("errors.userNotFound.detail", { userId }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { userId },
         });
       }
 
@@ -112,9 +111,11 @@ export class StripeProvider implements PaymentProvider {
           } else {
             // Other errors (network, etc.) should be returned as failure
             return fail({
-              message: t("errors.customerRetrievalFailed.title"),
+              message: t("errors.customerRetrievalFailed.detail", {
+                error: error.message,
+                userId,
+              }),
               errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-              messageParams: { error: error.message, userId },
             });
           }
         }
@@ -146,9 +147,11 @@ export class StripeProvider implements PaymentProvider {
         userId,
       });
       return fail({
-        message: t("errors.customerCreationFailed.title"),
+        message: t("errors.customerCreationFailed.detail", {
+          error: parseError(error).message,
+          userId,
+        }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: parseError(error).message, userId },
       });
     }
   }
@@ -302,9 +305,10 @@ export class StripeProvider implements PaymentProvider {
       });
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.checkoutCreationFailed.title"),
+        message: t("errors.checkoutCreationFailed.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -477,9 +481,10 @@ export class StripeProvider implements PaymentProvider {
         error: parseError(error),
       });
       return fail({
-        message: t("errors.webhookVerificationFailed.title"),
+        message: t("errors.webhookVerificationFailed.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.BAD_REQUEST,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -579,9 +584,10 @@ export class StripeProvider implements PaymentProvider {
       });
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.subscriptionRetrievalFailed.title"),
+        message: t("errors.subscriptionRetrievalFailed.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -619,9 +625,10 @@ export class StripeProvider implements PaymentProvider {
       });
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.subscriptionCancellationFailed.title"),
+        message: t("errors.subscriptionCancellationFailed.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }

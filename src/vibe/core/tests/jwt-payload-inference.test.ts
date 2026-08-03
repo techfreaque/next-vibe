@@ -11,13 +11,13 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import type { InferJwtPayloadTypeFromRoles } from "next-vibe/core/route/handler";
+import type { InferJwtPayloadTypeFromRoles } from "../route/handler-roles";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
   JWTPublicPayloadType,
-} from "next-vibe/identity/auth/types";
-import type { UserRole } from "next-vibe/identity/roles/enum";
+} from "../../identity/auth/types";
+import type { UserRole } from "../../identity/roles/enum";
 
 // Helper type to test if two types are exactly equal
 type Expect<T extends true> = T;

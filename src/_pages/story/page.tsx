@@ -84,14 +84,17 @@ export async function tanstackLoader({
     return {
       locale,
       totalToolCount,
-      totalModelCount: getAvailableModelCount(false, getEnvAvailability()),
+      totalModelCount: getAvailableModelCount(
+        false,
+        await getEnvAvailability(),
+      ),
       totalProviderCount: getAvailableProviderCount(
         false,
-        getEnvAvailability(),
+        await getEnvAvailability(),
       ),
       modelCountsByTier: getAvailableModelCountsByContentLevel(
         false,
-        getEnvAvailability(),
+        await getEnvAvailability(),
       ),
       hasUser: false,
       authError: userResponse.message,
@@ -104,14 +107,17 @@ export async function tanstackLoader({
   return {
     locale,
     totalToolCount,
-    totalModelCount: getAvailableModelCount(isAdmin, getEnvAvailability()),
+    totalModelCount: getAvailableModelCount(
+      isAdmin,
+      await getEnvAvailability(),
+    ),
     totalProviderCount: getAvailableProviderCount(
       isAdmin,
-      getEnvAvailability(),
+      await getEnvAvailability(),
     ),
     modelCountsByTier: getAvailableModelCountsByContentLevel(
       isAdmin,
-      getEnvAvailability(),
+      await getEnvAvailability(),
     ),
     hasUser: !user.isPublic,
   };

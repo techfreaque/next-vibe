@@ -86,6 +86,7 @@ export const translations: typeof enTranslations = {
     },
   },
   repository: {
+    bonusCreditsAdded: "Dodano {{amount}} kredytów bonusowych",
     tts: "Tekst na mowę",
     stt: "Mowa na tekst",
     search: "Wyszukiwanie",

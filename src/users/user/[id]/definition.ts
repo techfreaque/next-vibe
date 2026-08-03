@@ -4,7 +4,7 @@
  */
 
 import { dateSchema } from "next-vibe/core/definition/common.schema";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 // // leadId schema not needed - using z.uuid() directly // TODO: Remove if not needed
 import {
   EndpointErrorTypes,

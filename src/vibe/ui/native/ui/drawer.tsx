@@ -2,12 +2,12 @@
  * Drawer Component for React Native
  * Bottom sheet drawer implementation using Modal
  */
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import React, { createContext, useContext, useState } from "react";
 import { Modal, Pressable, Text as RNText, View } from "react-native";
 import Animated, { SlideInDown, SlideOutDown } from "react-native-reanimated";
 
-import { convertCSSToViewStyle } from "../../native/utils/style-converter";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 // Import ALL types from web - ZERO definitions here
 import type {
   DrawerCloseProps,
@@ -29,7 +29,7 @@ const DrawerContext = createContext<DrawerContextValue | undefined>(undefined);
 function useDrawer(): DrawerContextValue {
   const context = useContext(DrawerContext);
   if (!context) {
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Standard React context hook pattern - throw is correct for developer mistakes
+    // oxlint-disable-next-line restricted/restricted-syntax -- Standard React context hook pattern - throw is correct for developer mistakes
     throw new Error("Drawer components must be used within Drawer"); // eslint-disable-line i18next/no-literal-string -- Error message
   }
   return context;

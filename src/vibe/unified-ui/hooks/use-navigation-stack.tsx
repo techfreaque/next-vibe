@@ -1,9 +1,9 @@
 "use client";
 
-import type { NavigationStackEntry } from "next-vibe/core/definition/endpoint";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import type { CliComponent } from "next-vibe/unified-ui/_shared/lazy-widget";
+import type { NavigationStackEntry } from "../../core/definition/endpoint";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
+import type { WidgetData } from "../../core/utils/json";
+import type { CliComponent } from "../_shared/lazy-widget";
 import { createContext, type ReactNode, useContext, useRef } from "react";
 import { createStore, type StoreApi, useStore } from "zustand";
 

@@ -4,7 +4,7 @@
  * Used by both ChatInput and MessageEditor
  */
 
-import { useEdenAISpeech } from "next-vibe/agent/speech-to-text/hooks";
+import { useEdenAISpeech } from "../../../speech-to-text/hooks";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";

@@ -1,6 +1,6 @@
 "use client";
-import type { EnabledTool } from "next-vibe/agent/chat/hooks/store";
-import { useToolsModalStore } from "next-vibe/agent/tools/store";
+import type { EnabledTool } from "../../../chat/hooks/store";
+import { useToolsModalStore } from "../../../tools/store";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import helpDefinitions from "next-vibe/help-tool/definition";
 import { Badge } from "next-vibe/ui/ui/badge";

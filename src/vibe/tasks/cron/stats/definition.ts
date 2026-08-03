@@ -3,23 +3,23 @@
  * Statistics and metrics for cron task system
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { UserRole } from "next-vibe/identity/roles/enum";
-import { scopedTranslation } from "next-vibe/tasks/cron/stats/i18n";
-import { CronTaskPriority, CronTaskStatus } from "next-vibe/tasks/enum";
-import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
-import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
+} from "../../../core/definition/enums";
+import { UserRole } from "../../../identity/roles/enum";
+import { scopedTranslation } from "./i18n";
+import { CronTaskPriority, CronTaskStatus } from "../../enum";
+import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "../../../unified-ui/_shared/utils";
 import {
   backButton,
   requestField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../../unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { CRON_STATS_ALIAS } from "./constants";

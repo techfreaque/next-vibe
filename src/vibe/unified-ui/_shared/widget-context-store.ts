@@ -3,7 +3,7 @@
  * Zustand store for widget rendering context to avoid prop drilling and optimize re-renders
  */
 
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 
 import type { InkWidgetContext } from "./cli-types";

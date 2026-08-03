@@ -8,26 +8,25 @@
 import type {
   InferFormSchema,
   InferSchemaFromField,
-} from "next-vibe/core/definition/endpoint";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+} from "../../core/definition/endpoint";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import {
   FieldUsage,
   type SpacingSize,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import type { ServerDefaultContext } from "next-vibe/core/route/server-default";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import type { UserPermissionRoleValue } from "next-vibe/identity/roles/enum";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { Platform } from "next-vibe/platforms/platforms";
-import type { CustomWidgetObjectConfig } from "next-vibe/unified-ui/widgets/containers/custom/types";
-import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
-import type { NavigateButtonWidgetConfig } from "next-vibe/unified-ui/widgets/interactive/navigate-button/types";
-import type { SearchBarWidgetConfig } from "next-vibe/unified-ui/widgets/interactive/search-bar/types";
-import type { SubmitButtonWidgetConfig } from "next-vibe/unified-ui/widgets/interactive/submit-button/types";
+} from "../../core/definition/enums";
+import type { ServerDefaultContext } from "../../core/route/server-default";
+import type { WidgetData } from "../../core/utils/json";
+import type { UserPermissionRoleValue } from "../../identity/roles/enum";
+import type { EndpointLogger } from "../../logger/types";
+import type { Platform } from "../../platforms/platforms";
+import type { CustomWidgetObjectConfig } from "../widgets/containers/custom/types";
+import type { IconKey } from "../widgets/form-fields/icon-field/icons";
+import type { NavigateButtonWidgetConfig } from "../widgets/interactive/navigate-button/types";
+import type { SearchBarWidgetConfig } from "../widgets/interactive/search-bar/types";
+import type { SubmitButtonWidgetConfig } from "../widgets/interactive/submit-button/types";
 import { z } from "zod";
 
-import type { UnifiedField } from "./configs";
 import type {
   ArrayWidgetConfig,
   DisplayOnlyWidgetConfig,
@@ -35,6 +34,7 @@ import type {
   ObjectUnionWidgetConfig,
   ObjectWidgetConfig,
   RequestResponseWidgetConfig,
+  UnifiedField,
 } from "./configs";
 import type {
   AnyChildrenConstrain,
@@ -52,7 +52,7 @@ import type {
 /**
  * Type guard to check if a value is a Zod schema
  */
-// eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type guard: Must accept unknown to narrow any value to z.ZodTypeAny. This is the standard TypeScript pattern for type guards.
+// eslint-disable-next-line restricted/no-unknown -- Type guard: Must accept unknown to narrow any value to z.ZodTypeAny. This is the standard TypeScript pattern for type guards.
 function isZodSchema(value: unknown): value is z.ZodTypeAny {
   return typeof value === "object" && value !== null && "_def" in value;
 }
@@ -62,14 +62,14 @@ function isZodSchema(value: unknown): value is z.ZodTypeAny {
 // ============================================================================
 
 interface ZodDefShape {
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type guard for Zod internal structure requires unknown type
+  // eslint-disable-next-line restricted/no-unknown -- Type guard for Zod internal structure requires unknown type
   _def: Record<string, unknown>;
 }
 
 /**
  * Type guard to check if a value is a Zod schema (has _def property)
  */
-// eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type guard parameter must accept unknown to narrow any value
+// eslint-disable-next-line restricted/no-unknown -- Type guard parameter must accept unknown to narrow any value
 function hasZodDef(value: unknown): value is ZodDefShape {
   return typeof value === "object" && value !== null && "_def" in value;
 }
@@ -78,7 +78,7 @@ function hasZodDef(value: unknown): value is ZodDefShape {
  * Safely get a property from an object if it exists
  */
 function getDefProperty<T>(
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generic type parameter for flexible property extraction
+  // eslint-disable-next-line restricted/no-unknown -- Generic type parameter for flexible property extraction
   def: Record<string, unknown>,
   key: string,
 ): T | undefined {
@@ -127,12 +127,12 @@ export function extractSchemaDefaults<T>(
 
     // Handle ZodDefault - has a defaultValue (can be value or function depending on Zod version)
     if (schema instanceof z.ZodDefault) {
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Zod internal _def structure requires unknown type, no definition.ts type available
+      // eslint-disable-next-line restricted/no-unknown -- Zod internal _def structure requires unknown type, no definition.ts type available
       const defaultValueOrFn = getDefProperty<unknown>(def, "defaultValue");
       // In Zod v4, defaultValue is the actual value; in older versions it may be a function
       const defaultValue =
         typeof defaultValueOrFn === "function"
-          ? // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Zod callback pattern requires unknown return type
+          ? // eslint-disable-next-line restricted/no-unknown -- Zod callback pattern requires unknown return type
             (defaultValueOrFn as () => unknown)()
           : defaultValueOrFn;
 
@@ -171,7 +171,7 @@ export function extractSchemaDefaults<T>(
         return {} as Partial<T>;
       }
 
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Building dynamic object from Zod schema requires unknown values
+      // eslint-disable-next-line restricted/no-unknown -- Building dynamic object from Zod schema requires unknown values
       const result: Record<string, unknown> = {};
       for (const [key, fieldSchema] of Object.entries(shapeObj)) {
         if (hasZodDef(fieldSchema)) {
@@ -581,8 +581,8 @@ export type InferObjectType<C, Usage extends FieldUsage> =
 export function generateSchemaForUsage<F, Usage extends FieldUsage>(
   field: F,
   targetUsage: Usage,
-  userRoles?: readonly (typeof UserPermissionRoleValue)[],
-  platform?: Platform,
+  userRoles: readonly (typeof UserPermissionRoleValue)[],
+  platform: Platform,
 ): InferSchemaFromField<F, Usage> {
   // Defensive check: ensure field is defined
   if (!field || typeof field !== "object") {
@@ -816,7 +816,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
     // Apply optional modifier if specified in widget config
     if ("optional" in typedField && typedField.optional) {
       const optionalSchema = objectSchema.nullable().optional();
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type casting: Complex Zod schema inference requires unknown as intermediate step for type safety between incompatible generic structures.
+      // eslint-disable-next-line restricted/no-unknown -- Type casting: Complex Zod schema inference requires unknown as intermediate step for type safety between incompatible generic structures.
       return optionalSchema as unknown as InferSchemaFromField<F, Usage>;
     }
 
@@ -897,6 +897,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
         variant,
         targetUsage,
         userRoles,
+        platform,
       );
 
       // Skip variants that don't match the usage
@@ -930,7 +931,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
       ],
     );
 
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, @typescript-eslint/no-explicit-any -- Schema generation requires type assertion for proper inference
+    // eslint-disable-next-line restricted/restricted-syntax, @typescript-eslint/no-explicit-any -- Schema generation requires type assertion for proper inference
     return unionSchema as any as InferSchemaFromField<F, Usage>;
   }
 
@@ -951,6 +952,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
           typedField.child,
           targetUsage,
           userRoles,
+          platform,
         );
         // Check if schema is z.never() using _def.type check
         if (childSchema._def.type === neverType) {
@@ -963,7 +965,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
       // Apply optional modifier if specified in config
       if (typedField.optional) {
         const optionalArraySchema = arraySchema.nullable().optional();
-        // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type casting: Complex Zod schema inference requires unknown as intermediate step for type safety between incompatible generic structures.
+        // eslint-disable-next-line restricted/no-unknown -- Type casting: Complex Zod schema inference requires unknown as intermediate step for type safety between incompatible generic structures.
         return optionalArraySchema as unknown as InferSchemaFromField<F, Usage>;
       }
 
@@ -985,11 +987,12 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
         childSchema = typedField.child;
       } else {
         // Child is a UnifiedField, generate schema from it
-        // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type casting: union schema return type requires cast to access ZodTypeAny._def
+        // eslint-disable-next-line restricted/restricted-syntax -- Type casting: union schema return type requires cast to access ZodTypeAny._def
         childSchema = generateSchemaForUsage<typeof typedField.child, Usage>(
           typedField.child,
           targetUsage,
           userRoles,
+          platform,
         ) as z.ZodTypeAny;
         // Check if schema is z.never() using _def.type check
         if (childSchema._def.type === neverType) {
@@ -1000,7 +1003,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
       // For array-optional, always apply nullable and optional
       const arrayOptionalSchema = z.array(childSchema).nullable().optional();
 
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type casting: Complex Zod schema inference requires unknown as intermediate step for type safety between incompatible generic structures.
+      // eslint-disable-next-line restricted/no-unknown -- Type casting: Complex Zod schema inference requires unknown as intermediate step for type safety between incompatible generic structures.
       return arrayOptionalSchema as unknown as InferSchemaFromField<F, Usage>;
     }
     return z.never() as InferSchemaFromField<F, Usage>;
@@ -1014,10 +1017,14 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
  */
 export function generateRequestDataSchema<F>(
   field: F,
+  userRoles: readonly (typeof UserPermissionRoleValue)[],
+  platform: Platform,
 ): InferSchemaFromField<F, FieldUsage.RequestData> {
   return generateSchemaForUsage<F, FieldUsage.RequestData>(
     field,
     FieldUsage.RequestData,
+    userRoles,
+    platform,
   );
 }
 
@@ -1030,7 +1037,7 @@ export function generateRequestDataSchema<F>(
 export function generateRoleFilteredRequestSchema<F>(
   field: F,
   userRoles: readonly (typeof UserPermissionRoleValue)[],
-  platform?: Platform,
+  platform: Platform,
 ): InferSchemaFromField<F, FieldUsage.RequestData> {
   return generateSchemaForUsage<F, FieldUsage.RequestData>(
     field,
@@ -1050,8 +1057,8 @@ export function generateRoleFilteredRequestSchema<F>(
  */
 export function collectServerDefaults<F>(
   fields: F,
-  userRoles?: readonly (typeof UserPermissionRoleValue)[],
-  platform?: Platform,
+  userRoles: readonly (typeof UserPermissionRoleValue)[],
+  platform: Platform,
 ): Record<
   string,
   (
@@ -1107,8 +1114,8 @@ function isFieldHidden(
     visibleFor?: readonly (typeof UserPermissionRoleValue)[];
     hiddenForPlatforms?: readonly Platform[];
   },
-  userRoles?: readonly (typeof UserPermissionRoleValue)[],
-  platform?: Platform,
+  userRoles: readonly (typeof UserPermissionRoleValue)[],
+  platform: Platform,
 ): boolean {
   // visibleFor check
   if (field.visibleFor !== undefined) {
@@ -1137,10 +1144,14 @@ function isFieldHidden(
  */
 export function generateRequestUrlSchema<F>(
   field: F,
+  userRoles: readonly (typeof UserPermissionRoleValue)[],
+  platform: Platform,
 ): InferSchemaFromField<F, FieldUsage.RequestUrlParams> {
   return generateSchemaForUsage<F, FieldUsage.RequestUrlParams>(
     field,
     FieldUsage.RequestUrlParams,
+    userRoles,
+    platform,
   );
 }
 
@@ -1149,10 +1160,14 @@ export function generateRequestUrlSchema<F>(
  */
 export function generateResponseSchema<F>(
   field: F,
+  userRoles: readonly (typeof UserPermissionRoleValue)[],
+  platform: Platform,
 ): InferSchemaFromField<F, FieldUsage.ResponseData> {
   return generateSchemaForUsage<F, FieldUsage.ResponseData>(
     field,
     FieldUsage.ResponseData,
+    userRoles,
+    platform,
   );
 }
 
@@ -1170,9 +1185,13 @@ export function generateResponseSchema<F>(
  * which is exactly the concrete schema type @hookform/resolvers' zodResolver
  * accepts (a bare z.ZodTypeAny does not).
  */
-export function generateFormSchema<F>(field: F): InferFormSchema<F> {
-  const requestSchema = generateRequestDataSchema(field);
-  const urlSchema = generateRequestUrlSchema(field);
+export function generateFormSchema<F>(
+  field: F,
+  userRoles: readonly (typeof UserPermissionRoleValue)[],
+  platform: Platform,
+): InferFormSchema<F> {
+  const requestSchema = generateRequestDataSchema(field, userRoles, platform);
+  const urlSchema = generateRequestUrlSchema(field, userRoles, platform);
 
   // Always build a fresh z.object so the runtime value is a plain z.ZodObject
   // (matching InferFormSchema<F>, which is always a z.ZodObject). request-data is

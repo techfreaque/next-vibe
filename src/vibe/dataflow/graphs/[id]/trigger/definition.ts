@@ -2,22 +2,22 @@
  * Vibe Sense - Graph Trigger Definition
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "../../../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { scopedTranslation } from "next-vibe/dataflow/graphs/[id]/trigger/i18n";
-import { UserRole } from "next-vibe/identity/roles/enum";
-import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
-import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
+} from "../../../../core/definition/enums";
+import { scopedTranslation } from "./i18n";
+import { UserRole } from "../../../../identity/roles/enum";
+import { lazyWidget } from "../../../../unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "../../../../unified-ui/_shared/utils";
 import {
   requestField,
   requestUrlPathParamsField,
   responseField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../../../unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 const TriggerWidget = lazyWidget(() =>
@@ -45,7 +45,7 @@ const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         listEndpoint: async () =>
-          (await import("next-vibe/dataflow/graphs/definition")).default.GET,
+          (await import("../../definition")).default.GET,
         labelField: "name",
         label: "post.fields.id.label",
         description: "post.fields.id.description",

@@ -8,17 +8,18 @@
 import "server-only";
 
 import { and, eq, isNull } from "drizzle-orm";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { CountryLanguage } from "../../core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
   success,
-} from "next-vibe/core/route/response.schema";
-import { db } from "next-vibe/database";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../core/route/response.schema";
+import { db } from "../../database";
+import type { JwtPrivatePayloadType } from "../../identity/auth/types";
+import { UserPermissionRole } from "../../identity/roles/enum";
+import type { EndpointLogger } from "../../logger/types";
+import type { Platform } from "../../platforms/platforms";
 
 import { remoteConnections } from "../db";
 import { RemoteConnectionRepository } from "../repository";
@@ -94,6 +95,7 @@ export class RemoteConnectionInstanceRepository {
     instanceId: string,
     data: RemoteConnectionByIdPatchRequestOutput,
     locale: CountryLanguage,
+    platform: Platform,
   ): Promise<ResponseType<RemoteConnectionByIdPatchResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
 
@@ -185,6 +187,7 @@ export class RemoteConnectionInstanceRepository {
         instanceId,
         newInstanceId,
         locale,
+        platform,
       );
     }
 
@@ -276,11 +279,10 @@ export class RemoteConnectionInstanceRepository {
         const selfInstanceId =
           RemoteConnectionRepository.deriveDefaultSelfInstanceId();
         const { RouteExecuteRepository } =
-          await import("next-vibe/execute-tool/repository");
-        const { CallbackMode } =
-          await import("next-vibe/execute-tool/constants");
+          await import("../../execute-tool/repository");
+        const { CallbackMode } = await import("../../execute-tool/constants");
         const reverseUpdateDef =
-          await import("next-vibe/remote-connection/connect-reverse/update/definition");
+          await import("../connect-reverse/update/definition");
         await RouteExecuteRepository.runInProcessTyped({
           definition: reverseUpdateDef.default.PATCH,
           instanceId: targetInstanceId,
@@ -288,6 +290,7 @@ export class RemoteConnectionInstanceRepository {
           user,
           locale,
           logger,
+          platform,
           input: {
             instanceId: selfInstanceId,
             // Mirror syncScope ONLY when the PATCH actually changed it — an
@@ -347,7 +350,7 @@ export class RemoteConnectionInstanceRepository {
     if (transportChanged || reconnectNow === true) {
       try {
         const { restartConnection } =
-          await import("next-vibe/realtime/connector");
+          await import("../../realtime/server/connector");
         await restartConnection(targetInstanceId);
       } catch (connectorErr) {
         logger.error("[PATCH] connector lifecycle failed (settings saved)", {
@@ -411,14 +414,14 @@ export class RemoteConnectionInstanceRepository {
     // Hot-close both sides of the WS connection immediately:
     // - outbound connector (local → remote outbound WS, if any)
     // - inbound connector socket (remote → local inbound WS, if any)
-    void import("next-vibe/realtime/connector")
+    void import("../../realtime/server/connector")
       .then(({ closeConnection }) => closeConnection(instanceId))
       .catch((err: Error) => {
         logger.warn("[DISCONNECT] Failed to close WS connector", {
           error: err.message,
         });
       });
-    void import("next-vibe/realtime/local-broadcast")
+    void import("../../realtime/core/local-broadcast")
       .then(({ closeLocalConnectorSocket }) =>
         closeLocalConnectorSocket(instanceId),
       )
@@ -566,7 +569,7 @@ export class RemoteConnectionInstanceRepository {
     // Step 2: Regenerate reverse token via self-login
     let reverseToken: string | undefined;
     let reverseLeadId: string | undefined;
-    const { coreClientEnv } = await import("next-vibe/core/env-client");
+    const { coreClientEnv } = await import("../../core/env-client");
     const localUrl = coreClientEnv.NEXT_PUBLIC_APP_URL;
     if (localUrl) {
       const loginEndpoints = await import("@/user/public/login/definition");
@@ -590,8 +593,7 @@ export class RemoteConnectionInstanceRepository {
 
     // Fallback: signed JWT
     if (!reverseToken) {
-      const { AuthRepository } =
-        await import("next-vibe/identity/auth/repository");
+      const { AuthRepository } = await import("../../identity/auth/repository");
       const reverseTokenResult = await AuthRepository.signJwt(
         user,
         logger,
@@ -618,8 +620,7 @@ export class RemoteConnectionInstanceRepository {
             setTimeout(resolve, delayMs);
           });
         }
-        const registerEndpoints =
-          await import("next-vibe/remote-connection/connect-reverse/definition");
+        const registerEndpoints = await import("../connect-reverse/definition");
         const {
           response: resp,
           status: respStatus,
@@ -686,7 +687,8 @@ export class RemoteConnectionInstanceRepository {
 
     // Step 5: Restart the live channel so it reconnects with the NEW token —
     // otherwise the open WS keeps authenticating with the rotated-out one.
-    const { restartConnection } = await import("next-vibe/realtime/connector");
+    const { restartConnection } =
+      await import("../../realtime/server/connector");
     await restartConnection(instanceId);
 
     logger.info("[REAUTH] Token refreshed and channel restarted", {
@@ -703,6 +705,7 @@ export class RemoteConnectionInstanceRepository {
     instanceId: string,
     newInstanceId: string,
     locale: CountryLanguage,
+    platform: Platform,
   ): Promise<void> {
     await db
       .update(remoteConnections)
@@ -715,7 +718,7 @@ export class RemoteConnectionInstanceRepository {
       );
 
     // Update cron tasks targeting old instanceId
-    const { cronTasks } = await import("next-vibe/tasks/cron/db");
+    const { cronTasks } = await import("../../tasks/cron/db");
     await db
       .update(cronTasks)
       .set({ targetInstance: newInstanceId })
@@ -724,8 +727,9 @@ export class RemoteConnectionInstanceRepository {
     // Rename remote subfolder (non-fatal)
     void (async (): Promise<void> => {
       try {
-        const { chatFolders } = await import("next-vibe/agent/chat/db");
-        const { DefaultFolderId } = await import("next-vibe/agent/chat/config");
+        const { chatFolders } = await import("../../agent/chat/db");
+        const { DefaultFolderId } =
+          await import("next-vibe/core/execution-context");
         await db
           .update(chatFolders)
           .set({ name: newInstanceId, updatedAt: new Date() })
@@ -755,7 +759,7 @@ export class RemoteConnectionInstanceRepository {
     void (async (): Promise<void> => {
       try {
         const { getWsConnection, closeConnection, restartConnection } =
-          await import("next-vibe/realtime/connector");
+          await import("../../realtime/server/connector");
         if (getWsConnection(instanceId)) {
           closeConnection(instanceId);
           await restartConnection(newInstanceId);
@@ -771,9 +775,8 @@ export class RemoteConnectionInstanceRepository {
       void (async (): Promise<void> => {
         try {
           const { RouteExecuteRepository } =
-            await import("next-vibe/execute-tool/repository");
-          const selfRenameDef =
-            await import("next-vibe/remote-connection/self/rename/definition");
+            await import("../../execute-tool/repository");
+          const selfRenameDef = await import("../self/rename/definition");
           const result = await RouteExecuteRepository.runInProcessTyped({
             definition: selfRenameDef.default.PATCH,
             input: { newInstanceId, propagate: false },
@@ -781,6 +784,7 @@ export class RemoteConnectionInstanceRepository {
             user,
             locale,
             logger,
+            platform,
           });
           if (result.success) {
             logger.info("[RENAME] Propagated self-rename to remote", {

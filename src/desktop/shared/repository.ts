@@ -272,8 +272,9 @@ export function checkPlatformSupported(
   }
   if (process.platform !== "linux" && process.platform !== "win32") {
     return fail({
-      message: t("repository.platformNotSupported"),
-      messageParams: { platform: process.platform },
+      message: t("repository.platformNotSupported", {
+        platform: process.platform,
+      }),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
@@ -301,8 +302,7 @@ export async function runCommand(
     const message = err instanceof Error ? err.message : String(err);
     logger.error(`[Desktop] Command failed: ${file}`, { args, message });
     return fail({
-      message: t("repository.commandFailed"),
-      messageParams: { error: message },
+      message: t("repository.commandFailed", { error: message }),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
@@ -316,8 +316,7 @@ export function isCommandError<T>(
 
 function missingDepFail<T>(t: DesktopT, dep: string): ResponseType<T> {
   return fail({
-    message: t("repository.missingDep"),
-    messageParams: { dep },
+    message: t("repository.missingDep", { dep }),
     errorType: ErrorResponseTypes.INTERNAL_ERROR,
   }) as ResponseType<T>;
 }
@@ -346,8 +345,7 @@ async function runPowerShell(
     writeFileSync(scriptPath, script, "utf-8");
   } catch (err) {
     return fail({
-      message: t("repository.commandFailed"),
-      messageParams: { error: `Failed to write script: ${String(err)}` },
+      message: t("repository.scriptWriteFailed", { error: String(err) }),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
@@ -370,8 +368,7 @@ async function runPowerShell(
     const message = err instanceof Error ? err.message : String(err);
     logger.error("[Desktop/Windows] PowerShell script failed", { message });
     return fail({
-      message: t("repository.commandFailed"),
-      messageParams: { error: message },
+      message: t("repository.commandFailed", { error: message }),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   } finally {
@@ -743,10 +740,6 @@ export async function listMonitors(
   return monitors;
 }
 
-export function invalidateMonitorCache(): void {
-  monitorCache = null;
-}
-
 // ---------------------------------------------------------------------------
 // AT-SPI2 bus address detection (Linux/Wayland)
 // ---------------------------------------------------------------------------
@@ -982,10 +975,9 @@ export class DesktopScreenshotRepository {
       );
       if (!targetMonitor) {
         return fail({
-          message: t("repository.commandFailed"),
-          messageParams: {
-            error: `Monitor "${data.monitorName}" not found`,
-          },
+          message: t("repository.monitorNotFoundByName", {
+            monitorName: data.monitorName,
+          }),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -993,10 +985,9 @@ export class DesktopScreenshotRepository {
       targetMonitor = monitors[data.screen];
       if (!targetMonitor) {
         return fail({
-          message: t("repository.commandFailed"),
-          messageParams: {
-            error: `Screen index ${data.screen} out of range`,
-          },
+          message: t("repository.screenIndexOutOfRange", {
+            screen: data.screen,
+          }),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -1685,8 +1676,9 @@ export class DesktopAccessibilityRepository {
           /* non-fatal */
         }
         return fail({
-          message: t("repository.accessibilityFailed"),
-          messageParams: { error: message },
+          message: t("repository.accessibilityFailedWithError", {
+            error: message,
+          }),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -1991,8 +1983,7 @@ Write-Output "OK"
     const keyScript = buildWindowsKeyScript(data.key);
     if (!keyScript) {
       return fail({
-        message: t("repository.commandFailed"),
-        messageParams: { error: `Unknown key name: ${data.key}` },
+        message: t("repository.unknownKeyName", { key: data.key }),
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
       });
     }
@@ -2232,8 +2223,7 @@ Write-Output "OK"
     const keyArgs = resolveKeyArgs(data.key);
     if (keyArgs.length === 0) {
       return fail({
-        message: t("repository.commandFailed"),
-        messageParams: { error: `Unknown key name: ${data.key}` },
+        message: t("repository.unknownKeyName", { key: data.key }),
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
       });
     }
@@ -2422,9 +2412,7 @@ $pid = 0u
       });
     } catch {
       return fail({
-        message: t("repository.commandFailed", {
-          error: "Failed to parse focused window output",
-        }),
+        message: t("repository.focusedWindowParseFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -2522,8 +2510,7 @@ Get-Process | Where-Object { $_.MainWindowTitle -ne "" -and $_.MainWindowHandle 
       );
       if (!listResult.success || !listResult.data.windows) {
         return fail({
-          message: t("repository.commandFailed"),
-          messageParams: { error: "Could not list windows" },
+          message: t("repository.couldNotListWindows"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -2534,12 +2521,10 @@ Get-Process | Where-Object { $_.MainWindowTitle -ne "" -and $_.MainWindowHandle 
       );
       if (!match) {
         return fail({
-          message: t("repository.commandFailed"),
-          messageParams: {
-            error: data.pid
-              ? `No window with PID ${data.pid}`
-              : `No window with title containing "${data.title}"`,
-          },
+          message:
+            data.pid !== undefined
+              ? t("repository.noWindowWithPid", { pid: data.pid })
+              : t("repository.noWindowWithTitle", { title: data.title ?? "" }),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -2578,9 +2563,7 @@ Write-Output "OK"
 
     if (data.monitorName === undefined && data.monitorIndex === undefined) {
       return fail({
-        message: t("repository.commandFailed", {
-          error: "Provide monitorName or monitorIndex",
-        }),
+        message: t("repository.provideMonitorNameOrIndex"),
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
       });
     }
@@ -2597,8 +2580,9 @@ Write-Output "OK"
 
     if (!targetMonitor) {
       return fail({
-        message: t("repository.commandFailed", {
-          error: `Monitor not found: ${data.monitorName ?? data.monitorIndex}`,
+        message: t("repository.monitorNotFound", {
+          // Guarded above: one of monitorName / monitorIndex is always present.
+          monitor: data.monitorName ?? data.monitorIndex ?? "",
         }),
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
@@ -2614,9 +2598,7 @@ Write-Output "OK"
       );
       if (!listResult.success || !listResult.data.windows) {
         return fail({
-          message: t("repository.commandFailed", {
-            error: "Could not list windows",
-          }),
+          message: t("repository.couldNotListWindows"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -2627,11 +2609,10 @@ Write-Output "OK"
       );
       if (!match) {
         return fail({
-          message: t("repository.commandFailed", {
-            error: data.pid
-              ? `No window with PID ${data.pid}`
-              : `No window with title containing "${data.title}"`,
-          }),
+          message:
+            data.pid !== undefined
+              ? t("repository.noWindowWithPid", { pid: data.pid })
+              : t("repository.noWindowWithTitle", { title: data.title ?? "" }),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -2778,9 +2759,7 @@ if (w) {
     );
     if (noneIdx >= 0) {
       return fail({
-        message: t("repository.commandFailed", {
-          error: "No active window",
-        }),
+        message: t("repository.noActiveWindow"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -2790,9 +2769,7 @@ if (w) {
     );
     if (startIdx < 0) {
       return fail({
-        message: t("repository.commandFailed", {
-          error: "KWin script produced no output",
-        }),
+        message: t("repository.kwinNoOutput"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -2800,9 +2777,7 @@ if (w) {
     const jsonLine = lines[startIdx + 1]?.trim();
     if (!jsonLine) {
       return fail({
-        message: t("repository.commandFailed", {
-          error: "No window data in KWin script output",
-        }),
+        message: t("repository.kwinNoWindowData"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -3060,8 +3035,7 @@ print("KWIN_LIST_END_${executionId}");
       const listResult = await DesktopWindowRepository.listWindows(t, logger);
       if (!listResult.success || !listResult.data.windows) {
         return fail({
-          message: t("repository.commandFailed"),
-          messageParams: { error: "Could not list windows" },
+          message: t("repository.couldNotListWindows"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -3072,12 +3046,10 @@ print("KWIN_LIST_END_${executionId}");
       );
       if (!match) {
         return fail({
-          message: t("repository.commandFailed"),
-          messageParams: {
-            error: data.pid
-              ? `No window with PID ${data.pid}`
-              : `No window with title containing "${data.title}"`,
-          },
+          message:
+            data.pid !== undefined
+              ? t("repository.noWindowWithPid", { pid: data.pid })
+              : t("repository.noWindowWithTitle", { title: data.title ?? "" }),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -3185,9 +3157,7 @@ for (var i = 0; i < wins.length; i++) {
     }
     if (data.monitorName === undefined && data.monitorIndex === undefined) {
       return fail({
-        message: t("repository.commandFailed", {
-          error: "Provide monitorName or monitorIndex",
-        }),
+        message: t("repository.provideMonitorNameOrIndex"),
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
       });
     }
@@ -3204,8 +3174,9 @@ for (var i = 0; i < wins.length; i++) {
 
     if (!targetMonitor) {
       return fail({
-        message: t("repository.commandFailed", {
-          error: `Monitor not found: ${data.monitorName ?? data.monitorIndex}`,
+        message: t("repository.monitorNotFound", {
+          // Guarded above: one of monitorName / monitorIndex is always present.
+          monitor: data.monitorName ?? data.monitorIndex ?? "",
         }),
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
@@ -3218,9 +3189,7 @@ for (var i = 0; i < wins.length; i++) {
       const listResult = await DesktopWindowRepository.listWindows(t, logger);
       if (!listResult.success || !listResult.data.windows) {
         return fail({
-          message: t("repository.commandFailed", {
-            error: "Could not list windows",
-          }),
+          message: t("repository.couldNotListWindows"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -3231,11 +3200,10 @@ for (var i = 0; i < wins.length; i++) {
       );
       if (!match) {
         return fail({
-          message: t("repository.commandFailed", {
-            error: data.pid
-              ? `No window with PID ${data.pid}`
-              : `No window with title containing "${data.title}"`,
-          }),
+          message:
+            data.pid !== undefined
+              ? t("repository.noWindowWithPid", { pid: data.pid })
+              : t("repository.noWindowWithTitle", { title: data.title ?? "" }),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -3425,9 +3393,7 @@ for (var i = 0; i < wins.length; i++) {
 
     if (!verified) {
       return fail({
-        message: t("repository.commandFailed", {
-          error: `Window move did not take effect — window did not reach monitor ${monName}`,
-        }),
+        message: t("repository.windowMoveNoEffect", { monitor: monName }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

@@ -2,12 +2,12 @@
  * MultiSelect Component for React Native
  * Imports types from web and provides native implementation
  */
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import { Pressable, View } from "react-native";
 
-import { Check, ChevronDown, X } from "../../native/ui/icons";
-import { convertCSSToViewStyle } from "../../native/utils/style-converter";
+import { Check, ChevronDown, X } from "./icons";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 // Import ALL types from web (source of truth)
 import type {
   MultiSelectOption,

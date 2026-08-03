@@ -43,6 +43,5 @@ export type Contact = z.infer<typeof selectContactSchema>;
 export type NewContact = z.infer<typeof insertContactSchema>;
 
 // Legacy exports for backward compatibility
-export const contactTable = contacts;
 export type InsertContactType = NewContact;
 export type SelectContactType = Contact;

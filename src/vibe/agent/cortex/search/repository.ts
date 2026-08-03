@@ -18,7 +18,7 @@ import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { ToolExecutionContext } from "../../chat/config";
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 import { truncateContent } from "../_shared/text-utils";
 import { cortexNodes } from "../db";
 import { CortexCreditFeature, CortexNodeType } from "../enum";
@@ -233,7 +233,7 @@ async function runVectorSearch(
       await import("@/credits/i18n");
     const { t: tCredits } = creditsScopedTranslation.scopedT(locale);
     const { scopedTranslation: cortexScopedTranslation } =
-      await import("next-vibe/agent/cortex/i18n");
+      await import("../i18n");
     const { t: tCortex } = cortexScopedTranslation.scopedT(locale);
     const { EMBEDDING_CREDIT_COST } = await import("../embeddings/service");
     await CreditRepository.deductCreditsForFeature(

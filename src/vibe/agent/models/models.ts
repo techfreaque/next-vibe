@@ -31,7 +31,6 @@ import {
   PriceLevel,
   PriceLevelDB,
 } from "../skills/enum";
-import type { SkillsT } from "../skills/i18n";
 import type { SttModelId, SttModelOption } from "../speech-to-text/models";
 import type { TtsModelId, TtsModelOption } from "../text-to-speech/models";
 import type {
@@ -1135,36 +1134,4 @@ export function buildModelOptionsIndex<TOption extends ModelOptionBase>(
     }
   }
   return index;
-}
-
-/**
- * Find the cheapest variant of `modelId` that uses `provider` from the given pool.
- * Pool must be sorted cheapest-first so the first matching entry is the cheapest.
- * Returns `fallback` (typically the default cheapest-overall entry) if no match.
- */
-export function getModelForProvider<TOption extends ModelOptionBase>(
-  modelId: string,
-  provider: ApiProvider,
-  pool: TOption[],
-  fallback: TOption | undefined,
-): TOption | undefined {
-  return (
-    pool.find((m) => m.id === modelId && m.apiProvider === provider) ?? fallback
-  );
-}
-
-/** Format credit cost for display */
-export function formatCreditCost(
-  cost: number,
-  t: SkillsT,
-  isTokenBased = false,
-): string {
-  const prefix = isTokenBased ? "~" : "";
-  if (cost === 0) {
-    return t("selector.free");
-  }
-  if (cost === 1) {
-    return `${prefix}${t("credits.credit", { count: cost })}`;
-  }
-  return `${prefix}${t("credits.credits", { count: cost })}`;
 }

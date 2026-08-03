@@ -75,7 +75,10 @@ export async function tanstackLoader({
   }
 
   const isAdmin = !user.isPublic && user.roles.includes(UserRole.ADMIN);
-  const totalModelCount = getAvailableModelCount(isAdmin, getEnvAvailability());
+  const totalModelCount = getAvailableModelCount(
+    isAdmin,
+    await getEnvAvailability(),
+  );
 
   const pathname = await getPathname();
   const normalizedPath = pathname.replace(/\/+$/, "");

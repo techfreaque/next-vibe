@@ -1,20 +1,18 @@
 import "server-only";
 
-import { getPreferredToolName } from "next-vibe/core/core-utils/path";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import { getPreferredToolName } from "../../../core/core-utils/path";
+import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
 import {
   enrichJsonSchemaFromFields,
   zodSchemaToJsonSchema,
-} from "next-vibe/core/definition/endpoint-to-metadata";
-import { FieldUsage } from "next-vibe/core/definition/enums";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { Platform } from "next-vibe/platforms/platforms";
-import {
-  hasChild,
-  hasChildren,
-} from "next-vibe/unified-ui/_shared/type-guards";
-import type { SchemaTypes } from "next-vibe/unified-ui/_shared/types";
-import { generateSchemaForUsage } from "next-vibe/unified-ui/_shared/utils";
+} from "../../../core/definition/endpoint-to-metadata";
+import { FieldUsage } from "../../../core/definition/enums";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import type { UserPermissionRoleValue } from "../../../identity/roles/enum";
+import { Platform } from "../../platforms";
+import { hasChild, hasChildren } from "../../../unified-ui/_shared/type-guards";
+import type { SchemaTypes } from "../../../unified-ui/_shared/types";
+import { generateSchemaForUsage } from "../../../unified-ui/_shared/utils";
 import { z } from "zod";
 
 import type { MCPTool } from "../types";
@@ -26,6 +24,7 @@ import type { MCPTool } from "../types";
 function generateInputSchema(
   endpoint: CreateApiEndpointAny,
   locale: CountryLanguage,
+  userRoles: readonly (typeof UserPermissionRoleValue)[],
 ): z.ZodObject<Record<string, z.ZodTypeAny>> {
   if (!endpoint.fields) {
     return z.object({});
@@ -37,14 +36,14 @@ function generateInputSchema(
     const requestDataSchema = generateSchemaForUsage(
       endpoint.fields,
       FieldUsage.RequestData,
-      undefined,
+      userRoles,
       Platform.MCP,
     ) as z.ZodObject<Record<string, z.ZodTypeAny>> | z.ZodNever;
 
     const urlPathParamsSchema = generateSchemaForUsage(
       endpoint.fields,
       FieldUsage.RequestUrlParams,
-      undefined,
+      userRoles,
       Platform.MCP,
     ) as z.ZodObject<Record<string, z.ZodTypeAny>> | z.ZodNever;
 
@@ -276,6 +275,7 @@ function addDescriptionsToWrappedSchema<TFieldDef>(
 export function endpointToMCPTool(
   endpoint: CreateApiEndpointAny,
   locale: CountryLanguage,
+  userRoles: readonly (typeof UserPermissionRoleValue)[],
 ): MCPTool {
   const toolName = getPreferredToolName(endpoint);
 
@@ -294,7 +294,7 @@ export function endpointToMCPTool(
   const description = (translatedDescription || toolName) + creditSuffix;
 
   // Generate Zod schema from endpoint fields with translated descriptions
-  const zodSchema = generateInputSchema(endpoint, locale);
+  const zodSchema = generateInputSchema(endpoint, locale, userRoles);
 
   // Convert to JSON Schema using shared utility
   // z.toJSONSchema automatically handles transforms and includes descriptions

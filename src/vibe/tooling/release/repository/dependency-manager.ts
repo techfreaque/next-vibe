@@ -5,16 +5,16 @@
 
 import { execSync } from "node:child_process";
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { scopedTranslation } from "next-vibe/tooling/release/i18n";
+} from "../../../core/route/response.schema";
+import { parseError } from "../../../core/utils/parse-error";
+import type { EndpointLogger } from "../../../logger/types";
+import { scopedTranslation } from "../i18n";
 
 import type {
   PackageJson,
@@ -157,9 +157,11 @@ class DependencyManager {
       logger.error(MESSAGES.DEPS_FAILED, parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("packageJson.errorUpdatingDeps"),
+        message: t("packageJson.errorUpdatingDeps", {
+          directory: cwd,
+          error: String(error),
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { directory: cwd, error: String(error) },
       });
     }
   }
@@ -199,9 +201,11 @@ class DependencyManager {
       logger.error(MESSAGES.DEPS_FAILED, parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("packageJson.errorUpdatingDeps"),
+        message: t("packageJson.errorUpdatingDeps", {
+          directory: cwd,
+          error: String(error),
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { directory: cwd, error: String(error) },
       });
     }
   }
@@ -248,7 +252,7 @@ class DependencyManager {
       }
 
       // Parse the JSON output from ncu
-      /* eslint-disable oxlint-plugin-restricted/restricted-syntax -- JSON.parse returns unknown by design */
+      /* eslint-disable oxlint-plugin-restricted/no-unknown -- JSON.parse returns unknown by design */
       let parsed: unknown;
       /* eslint-enable oxlint-plugin-restricted/restricted-syntax */
       try {
@@ -386,9 +390,11 @@ class DependencyManager {
       logger.error(MESSAGES.AUDIT_FAILED, parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("security.auditFailed"),
+        message: t("security.auditFailed", {
+          directory: cwd,
+          error: String(error),
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { directory: cwd, error: String(error) },
       });
     }
   }
@@ -430,9 +436,11 @@ class DependencyManager {
       logger.error("Deduplication failed", parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("dependencies.dedupeFailed"),
+        message: t("dependencies.dedupeFailed", {
+          directory: cwd,
+          error: String(error),
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { directory: cwd, error: String(error) },
       });
     }
   }

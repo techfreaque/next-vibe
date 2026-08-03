@@ -5,24 +5,51 @@
 
 import "server-only";
 
-import { existsSync, mkdirSync, readdirSync } from "node:fs";
-import { writeFile } from "node:fs/promises";
+import type { Dirent } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { pathToFileURL } from "node:url";
 
-import { PATH_SEPARATOR } from "next-vibe/core/core-utils/path";
+import { PATH_SEPARATOR } from "../../core-utils/path";
+
+import {
+  getApiDir,
+  getSrcDir,
+  PROJECT_IGNORE_DIRS,
+  ROUTE_ANCHOR_SEGMENT,
+} from "@/env/paths";
 
 /**
- * Default directories to exclude from scanning
+ * Does `relPath` (POSIX, relative to the scan root) fall under an ignore pattern?
+ *
+ * Two pattern forms, matched against the PATH rather than the bare directory
+ * name — a name-only test cannot express "the generated dir" without also
+ * excluding every unrelated directory that happens to share the name:
+ *
+ *   `**` + `/name`  — a directory called `name` at any depth (`**​/node_modules`)
+ *   `a/b/c`         — exactly that path, relative to the scan root
+ *
+ * Anything below a match is pruned too, so a matched directory is never entered.
  */
-export const DEFAULT_EXCLUDE_DIRS = [
-  "node_modules",
-  ".git",
-  ".next",
-  "dist",
-  ".dist",
-  "generated",
-];
+export function isIgnoredDir(
+  relPath: string,
+  patterns: readonly string[],
+): boolean {
+  const path = toPosixPath(relPath).replace(/^\.\//, "");
+  const name = path.split("/").at(-1) ?? "";
+  return patterns.some((pattern) => {
+    if (pattern.startsWith("**/")) {
+      return name === pattern.slice(3);
+    }
+    return path === pattern || path.startsWith(`${pattern}/`);
+  });
+}
 
 /**
  * Normalize a path to use forward slashes regardless of platform.
@@ -63,6 +90,19 @@ export function stripProjectRoot(filePath: string): string {
 }
 
 /**
+ * Src-relative POSIX path, for embedding in generated files.
+ *
+ * Anything written into `GENERATED_DIR` is committed and read back on another
+ * machine, another OS and another checkout directory, so an absolute path is
+ * only ever correct on the machine that ran the generator. Anchoring on
+ * {@link getSrcDir} keeps the value stable across checkouts; consumers
+ * re-absolutize it against the same anchor at runtime (see the MCP hot-loader).
+ */
+export function toProjectRelativePath(filePath: string): string {
+  return toPosixPath(relative(getSrcDir(), filePath));
+}
+
+/**
  * Recursively find files in a directory, by exact filename or by predicate.
  *
  * The predicate form exists for conventions that are a shape rather than a name
@@ -74,7 +114,7 @@ export function stripProjectRoot(filePath: string): string {
 export function findFilesRecursively(
   dir: string,
   target: string | ((filename: string) => boolean),
-  excludeDirs: string[] = DEFAULT_EXCLUDE_DIRS,
+  excludeDirs: readonly string[] = PROJECT_IGNORE_DIRS,
 ): string[] {
   const matches =
     typeof target === "string"
@@ -86,21 +126,32 @@ export function findFilesRecursively(
     return results;
   }
 
-  const entries = readdirSync(dir, { withFileTypes: true });
+  // A directory can vanish mid-walk — npm deletes staging directories in the
+  // background, and an interrupted install leaves them around. One unreadable
+  // directory must not take down the whole generator run.
+  let entries: Dirent[];
+  try {
+    entries = readdirSync(dir, { withFileTypes: true });
+  } catch {
+    return results;
+  }
+
+  // Ignore patterns are relative to the SCAN ROOT, not to the directory being
+  // read, so the root has to be carried down the recursion rather than
+  // recomputed - otherwise `tools/pcvibe/generated` would only ever match if the
+  // walk happened to start at the repo root.
+  const root = getApiDir();
 
   for (const entry of entries) {
     const fullPath = join(dir, entry.name);
 
-    // Skip excluded directories
-    if (entry.isDirectory() && excludeDirs.includes(entry.name)) {
-      continue;
-    }
-
     if (entry.isDirectory()) {
-      // Recursively search subdirectories
+      const rel = toPosixPath(relative(root, fullPath));
+      if (isIgnoredDir(rel, excludeDirs)) {
+        continue;
+      }
       results.push(...findFilesRecursively(fullPath, matches, excludeDirs));
     } else if (entry.isFile() && matches(entry.name)) {
-      // Found a matching file
       results.push(toPosixPath(fullPath));
     }
   }
@@ -130,29 +181,47 @@ export function getRelativeImportPath(
 }
 
 /**
- * Extract nested path segments from a file path
- * Example: src/vibe/agent/skills/definition.ts
- * Returns: ["agent", "chat", "characters"]
+ * Extract nested path segments from a file path.
+ *
+ * Segments are everything between the anchor and the target file:
+ *   src/[locale]/agent/chat/definition.ts (anchor "[locale]") -> ["agent","chat"]
+ *   src/vibe/core/generators/definition.ts (anchor scan root) -> ["vibe","core","generators"]
+ *
+ * Anchor resolution, in order:
+ *   1. a literal {@link ROUTE_ANCHOR_SEGMENT} segment
+ *   2. the CONFIGURED scan root from env/paths ({@link getApiDir})
+ *
+ * (2) is what keeps this function layout-agnostic. Definitions do not always sit
+ * under the anchor segment — a domain-driven tree has no `[locale]` in the path
+ * at all, and a vendored copy may have no `src/` either. Anchoring the fallback
+ * on the configured root keeps the segment semantics identical while letting the
+ * root move, instead of hardcoding a directory name the framework does not own.
  */
 export function extractNestedPath(
   filePath: string,
-  startMarker = "[locale]",
+  startMarker: string = ROUTE_ANCHOR_SEGMENT,
   endMarker?: string,
 ): string[] {
   const pathParts = toPosixPath(filePath).split("/");
 
   let startIndex = pathParts.findIndex((p) => p === startMarker);
   if (startIndex === -1) {
-    if (startMarker === "[locale]") {
-      // Domain-driven flat structure: src/<domain>/... has no [locale] segment.
-      // Fall back to "src" as the anchor so segments are extracted identically.
-      startIndex = pathParts.findIndex((p) => p === "src");
-      if (startIndex === -1) {
-        // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build-time generator that throws for invalid configuration at startup
-        throw new Error(`Could not find [locale] or src in path: ${filePath}`);
+    if (startMarker === ROUTE_ANCHOR_SEGMENT) {
+      // No anchor segment: fall back to the configured scan root. The root's own
+      // segments are not part of the route, so start just past its last one.
+      const rootParts = toPosixPath(getApiDir()).split("/").filter(Boolean);
+      const rootTail = rootParts.at(-1);
+      const rootTailIndex =
+        rootTail === undefined ? -1 : pathParts.lastIndexOf(rootTail);
+      if (rootTailIndex === -1) {
+        // eslint-disable-next-line restricted/no-throw -- Build-time generator that throws for invalid configuration at startup
+        throw new Error(
+          `Could not anchor path: ${filePath} is not under the configured scan root (${getApiDir()}), and has no ${ROUTE_ANCHOR_SEGMENT} segment`,
+        );
       }
+      startIndex = rootTailIndex;
     } else {
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build-time generator that throws for invalid configuration at startup
+      // eslint-disable-next-line restricted/no-throw -- Build-time generator that throws for invalid configuration at startup
       throw new Error(`Could not find ${startMarker} in path: ${filePath}`);
     }
   }
@@ -167,7 +236,7 @@ export function extractNestedPath(
     } else if (pathParts.includes("route-client.ts")) {
       actualEndMarker = "route-client.ts";
     } else {
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build-time generator that throws for invalid configuration at startup
+      // eslint-disable-next-line restricted/no-throw -- Build-time generator that throws for invalid configuration at startup
       throw new Error(
         `Could not auto-detect end marker (definition.ts, route.ts, or route-client.ts) in path: ${filePath}`,
       );
@@ -176,53 +245,63 @@ export function extractNestedPath(
 
   const endIndex = pathParts.findIndex((p) => p === actualEndMarker);
   if (endIndex === -1) {
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build-time generator that throws for invalid configuration at startup
+    // eslint-disable-next-line restricted/no-throw -- Build-time generator that throws for invalid configuration at startup
     throw new Error(`Could not find ${actualEndMarker} in path: ${filePath}`);
   }
 
-  // Extract path segments between locale and the target file
-  // Skip the [locale] marker itself, start from the next segment
+  // Extract path segments between the anchor and the target file
   return pathParts.slice(startIndex + 1, endIndex);
 }
 
 /**
- * Extract module name from file path
- * Example: .../core/leads/seeds.ts -> "leads"
- * Example: .../core/emails/smtp-client/seeds.ts -> "smtp-client"
+ * Write `content` to `filePath` only when the bytes on disk differ.
+ *
+ * Generators re-emit byte-identical output on almost every run. An
+ * unconditional write still bumps mtime, and the gen-cache fingerprints inputs
+ * as "path:mtime:size" — so a generator that WRITES files another generator
+ * SCANS AS INPUT re-dirties that generator on every run and the cache can never
+ * settle. The scan root covers generated output as well as hand-written source
+ * (route shells are emitted under it and match the same `route.ts` glob that
+ * feeds the endpoint generators), so this is not hypothetical: it is why four
+ * generators never reported `cached` on two consecutive no-change runs.
+ * Skipping the no-op write keeps mtimes stable and lets the cache converge.
+ *
+ * Returns true when bytes were actually written.
  */
-export function extractModuleName(
-  filePath: string,
-  coreMarker = "core",
-): string {
-  const pathParts = toPosixPath(filePath).split("/");
-  const coreIndex = pathParts.findIndex((p) => p === coreMarker);
-
-  if (coreIndex === -1 || coreIndex >= pathParts.length - 1) {
-    return pathParts.at(-2) || "unknown";
-  }
-
-  const moduleParts = pathParts.slice(coreIndex + 1, pathParts.length - 1);
-  return moduleParts.at(-1) || moduleParts.join("-");
-}
-
-/**
- * Write generated content to file
- */
-export async function writeGeneratedFile(
-  filePath: string,
-  content: string,
-  dryRun = false,
-): Promise<void> {
-  if (dryRun) {
-    return;
+export function writeFileIfChanged(filePath: string, content: string): boolean {
+  if (existsSync(filePath)) {
+    try {
+      if (readFileSync(filePath, "utf8") === content) {
+        return false;
+      }
+    } catch {
+      // Unreadable (permissions, partial write) — fall through and rewrite.
+    }
   }
 
   const outputDir = dirname(filePath);
   if (!existsSync(outputDir)) {
     mkdirSync(outputDir, { recursive: true });
   }
+  writeFileSync(filePath, content, "utf8");
+  return true;
+}
 
-  await writeFile(filePath, content, "utf8");
+/**
+ * Write generated content to file.
+ *
+ * Content-conditional via {@link writeFileIfChanged}: identical output is not
+ * rewritten, so mtimes stay stable across no-change runs.
+ */
+export function writeGeneratedFile(
+  filePath: string,
+  content: string,
+  dryRun = false,
+): Promise<void> {
+  if (!dryRun) {
+    writeFileIfChanged(filePath, content);
+  }
+  return Promise.resolve();
 }
 
 /**
@@ -266,10 +345,17 @@ function sanitizePathSegment(segment: string): string {
  * Real aliases come from definition files, not parameter format variations
  * Uses PATH_SEPARATOR constant for consistency
  * Sanitizes path segments to match endpointToToolName behavior
+ *
+ * The default anchor MUST stay {@link ROUTE_ANCHOR_SEGMENT} rather than a
+ * hardcoded "[locale]". They are the same string in this layout, but only the
+ * named constant lets {@link extractNestedPath} recognise the anchor as the
+ * configured one and fall back to the scan root when a path does not contain it.
+ * A literal defeats that branch and turns every anchor-less definition into a
+ * hard throw — which is exactly what a vendored copy with a different anchor hits.
  */
 export function extractPathKey(
   filePath: string,
-  startMarker = "[locale]",
+  startMarker: string = ROUTE_ANCHOR_SEGMENT,
 ): { path: string } {
   const nestedPath = extractNestedPath(filePath, startMarker);
   // Sanitize each segment to remove brackets from dynamic routes
@@ -310,7 +396,7 @@ function serializeString(s: string): string {
  * Render a value inline (single line, no trailing comma).
  * Returns null if the value contains nested multiline content.
  */
-// eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- generic serializer accepts any value
+// eslint-disable-next-line restricted/no-unknown -- generic serializer accepts any value
 function renderInline(value: unknown): string | null {
   if (value === null) {
     return "null";
@@ -338,7 +424,7 @@ function renderInline(value: unknown): string | null {
     return `[${parts.join(", ")}]`;
   }
   if (typeof value === "object") {
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- generic serializer
+    // eslint-disable-next-line restricted/no-unknown -- generic serializer
     const entries = Object.entries(value as Record<string, unknown>);
     if (entries.length === 0) {
       return "{}";
@@ -374,7 +460,7 @@ function renderInline(value: unknown): string | null {
  * @param prefixCols  Columns already used on the current line before this value (e.g. `  key: `.length)
  */
 export function jsonToTs(
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- generic serializer accepts any value
+  // eslint-disable-next-line restricted/no-unknown -- generic serializer accepts any value
   value: unknown,
   indentLevel = 0,
   prefixCols = 0,
@@ -436,7 +522,7 @@ export function jsonToTs(
 
   if (typeof value === "object") {
     // Skip undefined values (same as JSON.stringify behavior)
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- generic serializer
+    // eslint-disable-next-line restricted/no-unknown -- generic serializer
     const entries = Object.entries(value as Record<string, unknown>).filter(
       ([, v]) => v !== undefined,
     );

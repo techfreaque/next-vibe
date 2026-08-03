@@ -6,7 +6,10 @@ export const translations: typeof enTranslations = {
   errors: {
     cronTaskNotFound: "Zadanie cron nie znalezione",
     repositoryInternalError: "Wystąpił błąd wewnętrzny",
-    fetchCronTaskHistory: "Nie udało się pobrać historii zadań cron",
+    fetchCronTaskHistoryDetail:
+      "Nie udało się wczytać historii zadania {{taskId}} (limit {{limit}}): {{error}}",
+    fetchCronTaskHistoryAllDetail:
+      "Nie udało się wczytać historii zadań (limit {{limit}}): {{error}}",
   },
 
   get: {

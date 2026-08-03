@@ -6,15 +6,15 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { GuardStatusT } from "next-vibe/tooling/guard/status/i18n";
+} from "../../../core/route/response.schema";
+import { parseError } from "../../../core/utils/parse-error";
+import type { EndpointLogger } from "../../../logger/types";
+import type { GuardStatusT } from "./i18n";
 
 import type {
   GuardStatusRequestOutput,
@@ -53,13 +53,12 @@ export class GuardStatusRepository {
       return GuardStatusRepository.getAllGuardStatus(logger);
     } catch (error) {
       logger.error("Guard status check failed", parseError(error));
-      const parsedError =
-        error instanceof Error ? error : new Error(String(error));
 
       return fail({
-        message: t("post.errors.internal.title"),
+        message: t("post.errors.statusFailed", {
+          detail: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
       });
     }
   }

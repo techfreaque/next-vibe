@@ -4,11 +4,11 @@
  */
 import { Minus } from "lucide-react-native";
 import { styled } from "nativewind";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import React, { createContext, useContext, useState } from "react";
 import { Text as RNText, TextInput, View } from "react-native";
 
-import { convertCSSToViewStyle } from "../../native/utils/style-converter";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 // Import all public types from web version (web is source of truth)
 import type {
   InputOTPGroupProps,
@@ -31,7 +31,7 @@ const OTPContext = createContext<InternalOTPContextValue>(undefined);
 function useOTP(): OTPContextValue {
   const context = useContext(OTPContext);
   if (!context) {
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Standard React context hook pattern - throw is correct for developer mistakes
+    // oxlint-disable-next-line restricted/restricted-syntax -- Standard React context hook pattern - throw is correct for developer mistakes
     throw new Error("OTP components must be used within InputOTP"); // eslint-disable-line i18next/no-literal-string -- Error message
   }
   return context;

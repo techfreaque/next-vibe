@@ -91,7 +91,9 @@ export const translations = {
     cleaningFolders: "Cleaning folders...",
     buildingVersion: "Building version {{version}}...",
     bundlingCli: "Bundling CLI with Bun...",
-    bundleFailed: "Bundle failed",
+    bundleFailed: "Bundle failed: {{error}}",
+    bundleFailedUnknown: "Bundle failed without an error message",
+    outputMissing: "Bundle produced no output: {{output}} is missing or empty",
     bundleSuccess: "CLI bundled successfully",
     creatingPackageJson: "Creating package.json...",
     copyingFiles: "Copying README and LICENSE...",
@@ -625,7 +627,7 @@ export const translations = {
     },
     errors: {
       buildFailed: {
-        title: "Build Failed",
+        title: "Build Failed: {{error}}",
         description: "The build process failed with an error",
       },
       validation: {

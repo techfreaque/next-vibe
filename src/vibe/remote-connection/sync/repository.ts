@@ -7,22 +7,22 @@
 import "server-only";
 
 import { and, eq } from "drizzle-orm";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import {
   type CountryLanguage,
   defaultLocale,
-} from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+} from "../../core/i18n/core/config";
+import type { ResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../core/route/response.schema";
+import { parseError } from "../../core/utils/parse-error";
+import { db } from "../../database";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import { UserPermissionRole } from "../../identity/roles/enum";
+import type { EndpointLogger } from "../../logger/types";
 import { z } from "zod";
 
 import type { SyncCursor } from "../db";
@@ -92,7 +92,7 @@ export class TaskSyncRepository {
     userId: string,
   ): Promise<"admin" | "customer" | "public"> {
     const { userRoles: userRolesTable } =
-      await import("next-vibe/identity/user/db");
+      await import("../../identity/user/db");
     const userRoleRows = await db
       .select({ role: userRolesTable.role })
       .from(userRolesTable)

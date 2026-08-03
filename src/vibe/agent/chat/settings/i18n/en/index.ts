@@ -1,5 +1,5 @@
 // oxlint-disable-next-line oxlint-plugin-boilerplate/i18n-pattern
-import { translations as modelTranslations } from "next-vibe/agent/models/i18n/en";
+import { translations as modelTranslations } from "../../../../models/i18n/en";
 
 export const translations = {
   category: "Chat",

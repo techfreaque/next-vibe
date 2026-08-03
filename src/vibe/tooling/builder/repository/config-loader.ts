@@ -6,15 +6,15 @@
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
-import { toImportUrl } from "next-vibe/core/generators/shared/utils";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { toImportUrl } from "../../../core/generators/shared/utils";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { scopedTranslation } from "next-vibe/tooling/builder/i18n";
+} from "../../../core/route/response.schema";
+import type { EndpointLogger } from "../../../logger/types";
+import type { scopedTranslation } from "../i18n";
 
 type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
@@ -92,10 +92,9 @@ export class ConfigLoader implements IConfigLoader {
 
       if (!existsSync(fullPath)) {
         return fail({
-          message: t("errors.configNotFound"),
-          messageParams: {
+          message: t("errors.configNotFound", {
             path: configPath,
-          },
+          }),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }

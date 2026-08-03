@@ -2,6 +2,7 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { Platform } from "next-vibe/platforms/platforms";
 import { openUrl } from "next-vibe/ui/lib/location";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -21,6 +22,7 @@ import { scopedTranslation as pageT } from "./i18n";
 interface HelpPageClientProps {
   locale: CountryLanguage;
   user: JwtPayloadType;
+  platform: Platform;
   userEmail?: string;
   modelCount: number;
   subPrice: string;
@@ -32,6 +34,7 @@ interface HelpPageClientProps {
 export default function HelpPageClient({
   locale,
   user,
+  platform,
   userEmail,
   modelCount,
   subPrice,
@@ -59,6 +62,7 @@ export default function HelpPageClient({
           endpoint={contactDefinitions}
           locale={locale}
           user={user}
+          platform={platform}
           endpointOptions={
             userEmail
               ? { create: { autoPrefillData: { email: userEmail } } }

@@ -1,10 +1,10 @@
 import { styled } from "nativewind";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import type { TextStyle } from "react-native";
 import { Text } from "react-native";
 
-import { convertCSSToTextStyle } from "../../native/utils/style-converter";
+import { convertCSSToTextStyle } from "../utils/style-converter";
 import type { KbdMouseEvent, KbdProps } from "../../web/ui/kbd";
 import { applyStyleType } from "../../web/utils/style-type";
 

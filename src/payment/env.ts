@@ -37,6 +37,14 @@ export const {
     example: "your_nowpayments_ipn_secret",
     commented: true,
   },
+  NOWPAYMENTS_CALLBACK_DOMAIN: {
+    schema: z.string().url().optional(),
+    example: "https://your-domain.com",
+    comment:
+      "Public domain NOWPayments uses to reach the IPN webhook. Falls back to NEXT_PUBLIC_APP_URL when unset — set this when that URL is not externally reachable (e.g. localhost during preview).",
+    commented: true,
+    fieldType: "url",
+  },
   NOWPAYMENTS_API_URL: {
     schema: z
       .enum([

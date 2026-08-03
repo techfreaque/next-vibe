@@ -7,22 +7,22 @@ import { execSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
+} from "../../../core/route/response.schema";
+import { parseError } from "../../../core/utils/parse-error";
 import {
   formatError,
   formatProgress,
   formatSkip,
   formatSuccess,
-} from "next-vibe/logger/formatters";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { scopedTranslation } from "next-vibe/tooling/release/i18n";
+} from "../../../logger/formatters";
+import type { EndpointLogger } from "../../../logger/types";
+import { scopedTranslation } from "../i18n";
 
 import type { PackageManager } from "../definition";
 import { MESSAGES } from "./constants";
@@ -181,9 +181,8 @@ class QualityRunner implements IQualityRunner {
       logger.debug(MESSAGES.LINT_FAILED, { output });
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("scripts.lintFailed"),
+        message: t("scripts.lintFailed", { path: cwd, output }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { path: cwd, output },
       });
     }
   }
@@ -236,9 +235,11 @@ class QualityRunner implements IQualityRunner {
       logger.debug(MESSAGES.TYPECHECK_FAILED, parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("scripts.typecheckFailed"),
+        message: t("scripts.typecheckFailed", {
+          path: cwd,
+          error: String(error),
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { path: cwd, error: String(error) },
       });
     }
   }
@@ -275,9 +276,8 @@ class QualityRunner implements IQualityRunner {
       logger.debug(MESSAGES.BUILD_FAILED, parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("scripts.buildFailed"),
+        message: t("scripts.buildFailed", { path: cwd, error: String(error) }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { path: cwd, error: String(error) },
       });
     }
   }
@@ -326,9 +326,8 @@ class QualityRunner implements IQualityRunner {
       logger.debug(MESSAGES.TESTS_FAILED, parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("scripts.testsFailed"),
+        message: t("scripts.testsFailed", { path: cwd, error: String(error) }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { path: cwd, error: String(error) },
       });
     }
   }
@@ -362,9 +361,11 @@ class QualityRunner implements IQualityRunner {
       logger.debug(MESSAGES.INSTALL_FAILED, parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("dependencies.failed"),
+        message: t("dependencies.failed", {
+          directory: cwd,
+          error: String(error),
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { directory: cwd, error: String(error) },
       });
     }
   }
@@ -398,9 +399,11 @@ class QualityRunner implements IQualityRunner {
         logger.error(MESSAGES.CLEAN_FAILED, parseError(error));
         const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: t("scripts.buildFailed"),
+          message: t("scripts.buildFailed", {
+            path: cwd,
+            error: String(error),
+          }),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: { path: cwd, error: String(error) },
         });
       }
     }
@@ -424,9 +427,11 @@ class QualityRunner implements IQualityRunner {
           logger.error(MESSAGES.CLEAN_FAILED, parseError(error));
           const { t } = scopedTranslation.scopedT(locale);
           return fail({
-            message: t("scripts.buildFailed"),
+            message: t("scripts.buildFailed", {
+              path: cwd,
+              error: String(error),
+            }),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
-            messageParams: { path: cwd, error: String(error) },
           });
         }
       }

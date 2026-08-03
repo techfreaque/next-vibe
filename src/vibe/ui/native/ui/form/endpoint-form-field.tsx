@@ -5,22 +5,22 @@
 "use client";
 
 import { styled } from "nativewind";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
-import type { TParams } from "next-vibe/core/i18n/core/static-types";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
+import type { TranslatedKeyType } from "../../../../core/i18n/core/scoped-translation";
+import type { TParams } from "../../../../core/i18n/core/static-types";
+import { cn } from "../../../../unified-ui/_shared/cn";
 import type {
   FieldConfig,
   FieldStyleClassName,
   FieldValidationState,
   RequiredFieldTheme,
-} from "next-vibe/unified-ui/_shared/field-config-types";
-import { getFieldConfig } from "next-vibe/unified-ui/_shared/infer-field-config";
+} from "../../../../unified-ui/_shared/field-config-types";
+import { getFieldConfig } from "../../../../unified-ui/_shared/infer-field-config";
 import {
   type ReactHooksT,
   scopedTranslation as unifiedInterfaceScopedTranslation,
-} from "next-vibe/unified-ui/hooks/i18n";
-import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+} from "../../../../unified-ui/hooks/i18n";
+import type { IconKey } from "../../../../unified-ui/widgets/form-fields/icon-field/icons";
 import type { JSX } from "react";
 import type {
   ControllerRenderProps,
@@ -30,8 +30,8 @@ import type {
 } from "react-hook-form";
 import { View } from "react-native";
 
-import { Info } from "../../../native/ui/icons/Info";
-import { convertCSSToViewStyle } from "../../../native/utils/style-converter";
+import { Info } from "../icons/Info";
+import { convertCSSToViewStyle } from "../../utils/style-converter";
 import type {
   EndpointFormFieldProps,
   FormFieldError,
@@ -604,7 +604,7 @@ function renderFieldInput<
 
     case "phone": {
       if (config.type !== "phone") {
-        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type guard for developer mistakes at runtime
+        // oxlint-disable-next-line restricted/restricted-syntax -- Type guard for developer mistakes at runtime
         // eslint-disable-next-line i18next/no-literal-string -- Error handling for invalid config
         throw new Error("Invalid config type for phone field");
       }
@@ -752,7 +752,7 @@ export function EndpointFormField<
     (endpointFields ? getFieldConfig(endpointFields, name) : null);
 
   if (!config) {
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Developer mistake - missing required prop
+    // oxlint-disable-next-line restricted/restricted-syntax -- Developer mistake - missing required prop
     // eslint-disable-next-line i18next/no-literal-string -- Error handling for missing config
     throw new Error(
       `EndpointFormField: No config provided for field "${name}". ` +

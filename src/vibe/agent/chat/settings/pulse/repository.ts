@@ -7,9 +7,9 @@
 import "server-only";
 
 import { and, eq, isNull, sql } from "drizzle-orm";
-import { AI_RUN_ALIAS } from "next-vibe/agent/ai-stream/run/constants";
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
-import { chatFolders } from "next-vibe/agent/chat/db";
+import { AI_RUN_ALIAS } from "../../../ai-stream/run/constants";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
+import { chatFolders } from "../../db";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
 import { TASK_TIMEOUTS } from "next-vibe/tasks/constants";
@@ -343,17 +343,4 @@ export async function ensureMamaTask(
         updatedAt: new Date(),
       },
     });
-}
-
-/**
- * Disable a pulse task by ID. Used when user toggles off - keeps task row for re-enable later.
- */
-export async function disablePulseTask(
-  taskId: string,
-  userId: string,
-): Promise<void> {
-  await db
-    .update(cronTasks)
-    .set({ enabled: false, updatedAt: new Date() })
-    .where(and(eq(cronTasks.id, taskId), eq(cronTasks.userId, userId)));
 }

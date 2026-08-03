@@ -1,5 +1,5 @@
 import { Box } from "ink";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import type { JSX } from "react";
 import type { FieldPath, FieldValues } from "react-hook-form";
 

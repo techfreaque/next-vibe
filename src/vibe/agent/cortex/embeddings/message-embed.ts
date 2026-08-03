@@ -15,12 +15,12 @@ import "server-only";
 import { createHash } from "node:crypto";
 
 import { and, eq, ne } from "drizzle-orm";
-import type { MessageMetadata } from "next-vibe/agent/chat/db";
-import { chatMessages } from "next-vibe/agent/chat/db";
-import { ChatMessageRole } from "next-vibe/agent/chat/enum";
+import type { MessageMetadata } from "../../chat/db";
+import { chatMessages } from "../../chat/db";
+import { ChatMessageRole } from "../../chat/enum";
 import { db } from "next-vibe/database";
 
-import type { ToolExecutionContext } from "../../chat/config";
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 import { EMBEDDING_MODEL, generateEmbedding } from "./service";
 
 /** Max chars to embed per message (keeps token cost bounded) */

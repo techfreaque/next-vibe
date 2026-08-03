@@ -165,7 +165,7 @@ export function getMessageBirdProvider(): SmsProvider {
         // Make the API request
         // eslint-disable-next-line i18next/no-literal-string
         const authValue = `AccessKey ${accessKey}`;
-        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+        // oxlint-disable-next-line restricted/no-raw-fetch
         const response = await fetch(apiUrl, {
           method: "POST",
           headers: {
@@ -201,12 +201,12 @@ export function getMessageBirdProvider(): SmsProvider {
           }
 
           return fail({
-            message: t("sms.error.delivery_failed"),
-            errorType: ErrorResponseTypes.SMS_ERROR,
-            messageParams: {
+            message: t("sms.error.delivery_failed_http", {
+              phoneNumber: params.to,
               error: errorMessage,
-              errorCode: response.status,
-            },
+              status: response.status,
+            }),
+            errorType: ErrorResponseTypes.SMS_ERROR,
           });
         }
 
@@ -259,14 +259,15 @@ export function getMessageBirdProvider(): SmsProvider {
           data: responseObject,
         };
       } catch (error) {
-        // eslint-disable-next-line i18next/no-literal-string
-        const unknownErrorMsg = "Unknown error";
         return fail({
-          message: t("sms.error.delivery_failed"),
+          message: t("sms.error.delivery_failed", {
+            phoneNumber: params.to,
+            error:
+              error instanceof Error
+                ? error.message
+                : t("sms.error.unknown_error"),
+          }),
           errorType: ErrorResponseTypes.SMS_ERROR,
-          messageParams: {
-            error: error instanceof Error ? error.message : unknownErrorMsg,
-          },
         });
       }
     },

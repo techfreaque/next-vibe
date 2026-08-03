@@ -19,30 +19,30 @@ import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { getPreferredToolName } from "next-vibe/core/core-utils/path";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { Methods } from "next-vibe/core/definition/enums";
+import { getPreferredToolName } from "../core/core-utils/path";
+import type { CreateApiEndpointAny } from "../core/definition/endpoint-base";
+import { Methods } from "../core/definition/enums";
 import type {
   GeneratorContext,
   GeneratorDefinition,
   GeneratorResult,
-} from "next-vibe/core/generators/shared/shared-inputs";
+} from "../core/generators/shared/shared-inputs";
 import {
   findFilesRecursively,
   generateFileHeader,
   toImportUrl,
   writeGeneratedFile,
-} from "next-vibe/core/generators/shared/utils";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { UserPermissionRoleValue } from "next-vibe/identity/roles/enum";
+} from "../core/generators/shared/utils";
+import type { CountryLanguage } from "../core/i18n/core/config";
+import { parseError } from "../core/utils/parse-error";
+import type { UserPermissionRoleValue } from "../identity/roles/enum";
 import {
   filterUserPermissionRoles,
   PlatformMarker,
   UserPermissionRole,
-} from "next-vibe/identity/roles/enum";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { RemoteToolCapability } from "next-vibe/remote-connection/db";
+} from "../identity/roles/enum";
+import type { EndpointLogger } from "../logger/types";
+import type { RemoteToolCapability } from "./db";
 
 import { GENERATED_DIR, getApiDir } from "@/env/paths";
 
@@ -561,6 +561,13 @@ export const generator: GeneratorDefinition = {
       ...findFilesRecursively(getApiDir(), "route.ts"),
     ].toSorted();
   },
+  /**
+   * version.ts is the one artefact every successful run writes. The per-locale,
+   * per-role capability JSONs are deliberately absent: their paths depend on the
+   * configured locales and roles, so listing them would make the existence check
+   * fail permanently and the cache never hit.
+   */
+  output: `${OUTPUT_DIR}/version.ts`,
   async generate(ctx) {
     return RemoteCapabilitiesGenerator.run(ctx, OUTPUT_DIR);
   },

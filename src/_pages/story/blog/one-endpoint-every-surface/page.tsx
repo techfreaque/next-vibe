@@ -51,7 +51,7 @@ export async function tanstackLoader({
   const { locale } = await params;
   return {
     locale,
-    modelCount: getAvailableModelCount(false, getEnvAvailability()),
+    modelCount: getAvailableModelCount(false, await getEnvAvailability()),
   };
 }
 

@@ -5,10 +5,10 @@
 
 "use client";
 
-import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
+import type { TranslatedKeyType } from "../../../../core/i18n/core/scoped-translation";
 import type { JSX, ReactNode } from "react";
 
-import type { StyleType } from "../../../web/utils/style-type";
+import type { StyleType } from "../../utils/style-type";
 
 /**
  * Form Field Group Component

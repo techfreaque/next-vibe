@@ -1,7 +1,7 @@
 "use client";
 
 import { chatModelDefinitions } from "next-vibe/agent/ai-stream/models";
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
+import { useProviderAvailability } from "next-vibe/agent/env-availability-store";
 import { imageGenModelDefinitions } from "next-vibe/agent/image-generation/models";
 import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
 import { ModelUtility } from "next-vibe/agent/models/enum";
@@ -41,7 +41,7 @@ import {
   useWidgetNavigation,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import type { JSX } from "react";
 import { useState } from "react";
 

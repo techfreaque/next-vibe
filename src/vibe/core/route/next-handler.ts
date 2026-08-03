@@ -4,27 +4,24 @@
  * Handles ONLY Next.js-specific concerns: NextRequest parsing, NextResponse wrapping, streaming
  */
 
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { Methods } from "next-vibe/core/definition/enums";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { scopedTranslation as sharedScopedTranslation } from "next-vibe/core/i18n/shared";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
+import type { CreateApiEndpointAny } from "../definition/endpoint-base";
+import { Methods } from "../definition/enums";
+import type { CountryLanguage } from "../i18n/core/config";
+import { scopedTranslation as sharedScopedTranslation } from "../i18n/shared";
+import { type ApiHandlerOptions, createGenericHandler } from "./handler";
+import { ErrorResponseError } from "./error-response-error";
 import {
-  type ApiHandlerOptions,
-  createGenericHandler,
-} from "next-vibe/core/route/handler";
-import {
-  ErrorResponseError,
   ErrorResponseTypes,
   fail,
   isContentResponse,
   isFileResponse,
   isStreamingResponse,
   type ResponseType,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { createEndpointLogger } from "next-vibe/logger/server";
-import { Platform } from "next-vibe/platforms/platforms";
+} from "./response.schema";
+import { parseError } from "../utils/parse-error";
+import { createEndpointLogger } from "../../logger/server";
+import { Platform } from "../../platforms/platforms";
 import type { NextRequest } from "next-vibe/ui/lib/request";
 import { NextResponse } from "next-vibe/ui/lib/request";
 
@@ -133,13 +130,16 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
       if (!csrfCheck.valid) {
         const { t: sharedT } = sharedScopedTranslation.scopedT(locale);
         return wrapErrorResponse(
+          // `errorTypes.forbidden` is the generic ErrorResponseTypes label and
+          // renders param-free, so the CSRF reason gets its own key.
           fail({
-            message: sharedT("errorTypes.forbidden"),
+            message: sharedT("errors.csrfFailedDetail", {
+              reason: csrfCheck.reason ?? sharedT("errors.csrfReasonUnknown"),
+            }),
             errorType: ErrorResponseTypes.FORBIDDEN,
-            messageParams: { reason: csrfCheck.reason },
           }),
-          locale,
           logger,
+          locale,
         );
       }
 
@@ -223,7 +223,7 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
 
       // Handle errors - wrap in NextResponse
       if (!result.success) {
-        return wrapErrorResponse(result, locale, logger, endpoint);
+        return wrapErrorResponse(result, logger, locale, endpoint);
       }
 
       // Wrap validated success result in NextResponse
@@ -237,22 +237,23 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
         logger.debug("ErrorResponseError caught", {
           errorType: error.errorResponse.errorType,
         });
-        return wrapErrorResponse(error.errorResponse, locale, logger);
+        return wrapErrorResponse(error.errorResponse, logger, locale);
       }
 
       // Handle unexpected errors
       logger.error("Unexpected error in Next.js handler", parseError(error));
       const { t: sharedT } = sharedScopedTranslation.scopedT(locale);
       return wrapErrorResponse(
+        // `errorTypes.internal_error` is the generic ErrorResponseTypes label
+        // and renders param-free, so the thrown detail gets its own key.
         fail({
-          message: sharedT("errorTypes.internal_error"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: {
+          message: sharedT("errors.internalDetail", {
             error: parseError(error).message,
-          },
+          }),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
         }),
-        locale,
         logger,
+        locale,
       );
     }
   };

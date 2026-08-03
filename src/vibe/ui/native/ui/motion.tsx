@@ -19,7 +19,7 @@ import {
   convertCSSToImageStyle,
   convertCSSToTextStyle,
   convertCSSToViewStyle,
-} from "../../native/utils/style-converter";
+} from "../utils/style-converter";
 import type {
   AnimatePresenceProps,
   MotionButtonProps,

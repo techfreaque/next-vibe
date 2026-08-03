@@ -261,7 +261,7 @@ export function getAwsSnsProvider(): SmsProvider {
         const authorizationHeader = `${algorithm} Credential=${accessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
 
         // Make the request to AWS SNS
-        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+        // oxlint-disable-next-line restricted/no-raw-fetch
         const response = await fetch(endpoint, {
           method: "POST",
           headers: {
@@ -283,12 +283,11 @@ export function getAwsSnsProvider(): SmsProvider {
           const errorMessage = errorMatch?.[1] ?? "Unknown AWS SNS error";
 
           return fail({
-            message: t("sms.error.aws_sns_api_error"),
-            errorType: ErrorResponseTypes.SMS_ERROR,
-            messageParams: {
+            message: t("sms.error.aws_sns_api_error_http", {
               error: errorMessage,
-              statusCode: response.status,
-            },
+              status: response.status,
+            }),
+            errorType: ErrorResponseTypes.SMS_ERROR,
           });
         }
 
@@ -327,9 +326,8 @@ export function getAwsSnsProvider(): SmsProvider {
       } catch (error) {
         const parsedError = parseError(error);
         return fail({
-          message: t("sms.error.aws_sns_error"),
+          message: t("sms.error.aws_sns_error", { error: parsedError.message }),
           errorType: ErrorResponseTypes.SMS_ERROR,
-          messageParams: { error: parsedError.message },
         });
       }
     },

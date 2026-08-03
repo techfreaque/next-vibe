@@ -97,7 +97,9 @@ export const translations: typeof enTranslations = {
     cleaningFolders: "Ordner werden bereinigt...",
     buildingVersion: "Version {{version}} wird gebaut...",
     bundlingCli: "CLI wird mit Bun gebündelt...",
-    bundleFailed: "Bundle fehlgeschlagen",
+    bundleFailed: "Bundle fehlgeschlagen: {{error}}",
+    bundleFailedUnknown: "Bundle fehlgeschlagen - ohne Fehlermeldung",
+    outputMissing: "Bundle ohne Ergebnis: {{output}} fehlt oder ist leer",
     bundleSuccess: "CLI erfolgreich gebündelt",
     creatingPackageJson: "package.json wird erstellt...",
     copyingFiles: "README und LICENSE werden kopiert...",
@@ -631,7 +633,7 @@ export const translations: typeof enTranslations = {
     },
     errors: {
       buildFailed: {
-        title: "Build fehlgeschlagen",
+        title: "Build fehlgeschlagen: {{error}}",
         description: "Der Build-Prozess ist mit einem Fehler fehlgeschlagen",
       },
       validation: {

@@ -108,6 +108,7 @@ export const translations: typeof enTranslations = {
         title: "Interner Fehler",
         description: "Interner Serverfehler ist aufgetreten",
       },
+      statusFailed: "Interner Fehler beim Prüfen des Guard-Status: {{detail}}",
     },
     success: {
       title: "Erfolg",

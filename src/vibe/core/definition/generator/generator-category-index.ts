@@ -16,23 +16,32 @@ import { basename } from "node:path";
 import type {
   GeneratorContext,
   GeneratorResult,
-} from "next-vibe/core/generators/shared/shared-inputs";
+} from "../../generators/shared/shared-inputs";
 import {
   generateFileHeader,
+  getRelativeImportPath,
   jsonToTs,
   toImportUrl,
   writeGeneratedFile,
-} from "next-vibe/core/generators/shared/utils";
-import { parseError } from "next-vibe/core/utils/parse-error";
+} from "../../generators/shared/utils";
+import { parseError } from "../../utils/parse-error";
 import type {
   CategoryDefinition,
   SubcategoryDefinition,
-} from "next-vibe/help-tool/category-types";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+} from "../../../help-tool/category-types";
+import { UserPermissionRole } from "../../../identity/roles/enum";
 
-import { GENERATED_DIR } from "@/env/paths";
+import { GENERATED_DIR, VIBE_DIR } from "@/env/paths";
 
 const OUTPUT_FILE = `${GENERATED_DIR}/categories/registry.ts`;
+
+/**
+ * Where the category types actually live. The emitted import resolves from the
+ * generated file's directory, not this one — a hand-written "../../../help-tool/
+ * category-types" was computed against this generator (where it is correct, see
+ * the type-only import above) and pointed outside src/ entirely.
+ */
+const CATEGORY_TYPES_MODULE = `${VIBE_DIR}/help-tool/category-types.ts`;
 
 interface CategoryEntry {
   exportName: string;
@@ -87,7 +96,10 @@ async function extractCategories(
   });
 }
 
-function generateContent(categories: CategoryEntry[]): string {
+function generateContent(
+  categories: CategoryEntry[],
+  outputFile: string,
+): string {
   const header = generateFileHeader(
     "AUTO-GENERATED CATEGORY REGISTRY",
     "generators/category-index",
@@ -195,7 +207,7 @@ function generateContent(categories: CategoryEntry[]): string {
 import type {
   AdminGroup,
   CategoryDefinitionSerialized,
-} from "next-vibe/help-tool/category-types";
+} from "${getRelativeImportPath(CATEGORY_TYPES_MODULE, outputFile)}";
 
 export type CategoryKey =${keyUnion};
 
@@ -230,7 +242,7 @@ export async function generateCategoryIndex(
   ctx: GeneratorContext,
 ): Promise<GeneratorResult> {
   const categories = await extractCategories(ctx.files.category, ctx.logger);
-  const content = generateContent(categories);
+  const content = generateContent(categories, OUTPUT_FILE);
   await writeGeneratedFile(OUTPUT_FILE, content);
 
   return {

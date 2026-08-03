@@ -2,11 +2,11 @@
  * Form Alert Widget Type Definitions
  */
 
-import type { WidgetType } from "next-vibe/core/definition/enums";
+import type { WidgetType } from "../../../../core/definition/enums";
 import type {
   BasePrimitiveDisplayOnlyWidgetConfig,
   FieldUsageConfig,
-} from "next-vibe/unified-ui/_shared/types";
+} from "../../../_shared/types";
 
 /**
  * Form Alert Widget Configuration

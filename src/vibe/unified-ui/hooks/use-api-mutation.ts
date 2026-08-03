@@ -2,15 +2,14 @@
 
 import type { UseMutationResult } from "@tanstack/react-query";
 import { useMutation } from "@tanstack/react-query";
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
-import { type CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { useTranslation } from "next-vibe/core/i18n/core/client";
+import { type CreateApiEndpointAny } from "../../core/definition/endpoint-base";
+import { useTranslation } from "../../core/i18n/core/client";
 import type {
   ErrorResponseType,
   ResponseType,
-} from "next-vibe/core/route/response.schema";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../core/route/response.schema";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
 import { useCallback, useMemo, useState } from "react";
 
 import { executeMutation } from "./mutation-executor";
@@ -123,7 +122,6 @@ export function useApiMutation<TEndpoint extends CreateApiEndpointAny>(
   TEndpoint["types"]["UrlVariablesOutput"]
 > {
   const { locale } = useTranslation();
-  const availability = useProviderAvailability();
 
   // Track error state for backward compatibility
   const [localError, setLocalError] = useState<ErrorResponseType | null>(null);
@@ -163,7 +161,6 @@ export function useApiMutation<TEndpoint extends CreateApiEndpointAny>(
         pathParams: urlPathParams,
         locale,
         user,
-        availability,
         options: {
           onSuccess: options.onSuccess
             ? (
@@ -179,7 +176,6 @@ export function useApiMutation<TEndpoint extends CreateApiEndpointAny>(
                   logger: context.logger,
                   user: context.user,
                   locale: context.locale,
-                  availability: context.availability,
                 });
               }
             : undefined,
@@ -197,7 +193,7 @@ export function useApiMutation<TEndpoint extends CreateApiEndpointAny>(
 
       // If response is an error, throw it so React Query treats it as an error
       if (!response.success) {
-        // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- React Query pattern: Throwing inside mutation function is the standard way to trigger onError callback. This is documented React Query behavior.
+        // eslint-disable-next-line restricted/no-throw -- React Query pattern: Throwing inside mutation function is the standard way to trigger onError callback. This is documented React Query behavior.
         throw response;
       }
 

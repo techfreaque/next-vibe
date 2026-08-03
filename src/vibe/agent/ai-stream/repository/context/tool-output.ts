@@ -6,10 +6,10 @@
 import "server-only";
 
 import type { JSONValue } from "ai";
-import { IMAGE_GEN_ALIAS } from "next-vibe/agent/image-generation/constants";
-import type { Modality } from "next-vibe/agent/models/enum";
-import { AUDIO_GEN_TOOL_NAME } from "next-vibe/agent/music-generation/constants";
-import { VIDEO_GEN_TOOL_NAME } from "next-vibe/agent/video-generation/constants";
+import { IMAGE_GEN_ALIAS } from "../../../image-generation/constants";
+import type { Modality } from "../../../models/enum";
+import { AUDIO_GEN_TOOL_NAME } from "../../../music-generation/constants";
+import { VIDEO_GEN_TOOL_NAME } from "../../../video-generation/constants";
 import type { ContentBlock } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { EXECUTE_TOOL_ALIAS } from "next-vibe/execute-tool/constants";
@@ -71,7 +71,7 @@ type ShapedToolResultOutput =
 
 /**
  * Build tool result output, detecting ContentResponse to pass images to the AI model
- * When the result contains a ContentResponse (with __isContentResponse marker),
+ * When the result contains a ContentResponse (with isContentResponse marker),
  * we use the AI SDK's `type: 'content'` format with `media` parts so the
  * model can actually "see" images (e.g. screenshots from browser tools).
  *
@@ -86,7 +86,7 @@ export async function buildToolResultOutput(
   modelConfig?: ChatModelOption,
   isCurrentTurn?: boolean,
   /** Fixture-aware fetch for media downloads; defaults to live fetch. */
-  // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- live-fetch default for callers without a fixture chain
+  // oxlint-disable-next-line restricted/restricted-syntax -- live-fetch default for callers without a fixture chain
   fetchImpl: typeof globalThis.fetch = fetch,
 ): Promise<ShapedToolResultOutput> {
   // Check if result is a ContentResponse (stored as JSON with marker fields)
@@ -94,7 +94,7 @@ export async function buildToolResultOutput(
     result &&
     typeof result === "object" &&
     !Array.isArray(result) &&
-    "__isContentResponse" in result &&
+    "isContentResponse" in result &&
     "content" in result &&
     Array.isArray(result.content)
   ) {

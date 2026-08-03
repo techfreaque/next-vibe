@@ -3,6 +3,7 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import helpDefinitions from "next-vibe/help-tool/definition";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { Platform } from "next-vibe/platforms/platforms";
 import {
   DialogContent,
   DialogDescription,
@@ -20,6 +21,7 @@ import { scopedTranslation } from "@/_pages/tools/i18n";
 interface AIToolsModalContentProps {
   locale: CountryLanguage;
   user: JwtPayloadType;
+  platform: Platform;
 }
 
 /**
@@ -30,6 +32,7 @@ interface AIToolsModalContentProps {
 export function AIToolsModalContent({
   locale,
   user,
+  platform,
 }: AIToolsModalContentProps): JSX.Element {
   const { t: toolsT } = scopedTranslation.scopedT(locale);
 
@@ -55,6 +58,7 @@ export function AIToolsModalContent({
         endpoint={helpDefinitions}
         locale={locale}
         user={user}
+        platform={platform}
         endpointOptions={{
           read: {
             queryOptions: {

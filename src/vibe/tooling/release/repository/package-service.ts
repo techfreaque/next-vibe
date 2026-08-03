@@ -6,16 +6,16 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { scopedTranslation } from "next-vibe/tooling/release/i18n";
+} from "../../../core/route/response.schema";
+import { parseError } from "../../../core/utils/parse-error";
+import type { EndpointLogger } from "../../../logger/types";
+import { scopedTranslation } from "../i18n";
 
 import type { PackageJson, ReleasePackage } from "../definition";
 import { MESSAGES } from "./constants";
@@ -32,9 +32,8 @@ class PackageService {
     if (!existsSync(packageJsonPath)) {
       logger.error(MESSAGES.PACKAGE_JSON_NOT_FOUND, { path: packageJsonPath });
       return fail({
-        message: t("packageJson.notFound"),
+        message: t("packageJson.notFound", { path: packageJsonPath }),
         errorType: ErrorResponseTypes.NOT_FOUND,
-        messageParams: { path: packageJsonPath },
       });
     }
 
@@ -45,18 +44,16 @@ class PackageService {
       if (!parsedPkg) {
         logger.error(MESSAGES.PACKAGE_JSON_INVALID, { path: packageJsonPath });
         return fail({
-          message: t("packageJson.invalidFormat"),
+          message: t("packageJson.invalidFormat", { path: packageJsonPath }),
           errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
-          messageParams: { path: packageJsonPath },
         });
       }
       return success(parsedPkg);
     } catch (error) {
       logger.error(MESSAGES.PACKAGE_JSON_INVALID, parseError(error));
       return fail({
-        message: t("packageJson.errorReading"),
+        message: t("packageJson.errorReading", { error: String(error) }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: String(error) },
       });
     }
   }
@@ -75,9 +72,8 @@ class PackageService {
     if (!existsSync(packageJsonPath)) {
       logger.error(MESSAGES.PACKAGE_JSON_NOT_FOUND, { path: packageJsonPath });
       return fail({
-        message: t("packageJson.notFound"),
+        message: t("packageJson.notFound", { path: packageJsonPath }),
         errorType: ErrorResponseTypes.NOT_FOUND,
-        messageParams: { path: packageJsonPath },
       });
     }
 
@@ -93,9 +89,8 @@ class PackageService {
       ) {
         logger.error(MESSAGES.PACKAGE_JSON_INVALID, { path: packageJsonPath });
         return fail({
-          message: t("packageJson.invalidFormat"),
+          message: t("packageJson.invalidFormat", { path: packageJsonPath }),
           errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
-          messageParams: { path: packageJsonPath },
         });
       }
 
@@ -134,9 +129,11 @@ class PackageService {
     } catch (error) {
       logger.error(MESSAGES.VERSION_BUMPED, parseError(error));
       return fail({
-        message: t("packageJson.errorUpdatingVersion"),
+        message: t("packageJson.errorUpdatingVersion", {
+          directory: pkg.directory,
+          error: String(error),
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { directory: pkg.directory, error: String(error) },
       });
     }
   }

@@ -75,11 +75,11 @@ export const translations: typeof enTranslations = {
   errors: {
     default: "Ein Fehler ist beim Bereinigen der Sitzungen aufgetreten",
     execution_failed: {
-      title: "Sitzungsbereinigung fehlgeschlagen",
+      title: "Sitzungsbereinigung fehlgeschlagen: {{error}}",
       description: "Fehler beim Bereinigen abgelaufener Sitzungen",
     },
     partial_failure: {
-      title: "Teilweise Sitzungsbereinigung fehlgeschlagen",
+      title: "Sitzungsbereinigung teilweise fehlgeschlagen: {{errors}}",
       description: "Einige Sitzungen konnten nicht bereinigt werden",
     },
     unknown_error: {

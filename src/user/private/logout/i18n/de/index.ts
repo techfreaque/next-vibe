@@ -29,6 +29,7 @@ export const translations: typeof enTranslations = {
     internal: {
       title: "Interner Serverfehler",
       description: "Ein interner Fehler ist beim Abmelden aufgetreten",
+      detail: "Abmeldung fehlgeschlagen: {{error}} (Benutzer {{userId}})",
     },
     unknown: {
       title: "Unbekannter Fehler",

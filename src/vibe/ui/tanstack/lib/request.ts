@@ -5,7 +5,7 @@
  * tanstack/lib first so this file is used instead of next/server in Vite/TanStack.
  */
 
-import type { WidgetData } from "next-vibe/core/utils/json";
+import type { WidgetData } from "../../../core/utils/json";
 
 // ── Cookie helpers ────────────────────────────────────────────────────────────
 

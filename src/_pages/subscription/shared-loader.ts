@@ -5,6 +5,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
+import { Platform } from "next-vibe/platforms/platforms";
 import { notFound } from "next-vibe/ui/lib/not-found";
 import { redirect } from "next-vibe/ui/lib/redirect";
 
@@ -16,6 +17,7 @@ export interface SubscriptionPageData {
   locale: CountryLanguage;
   user: JwtPayloadType;
   initialCredits: CreditsGetResponseOutput | null;
+  platform: Platform;
 }
 
 interface LoaderInput {
@@ -94,5 +96,5 @@ export async function subscriptionLoader({
     initialCredits = creditsResponse.success ? creditsResponse.data : null;
   }
 
-  return { locale, user, initialCredits };
+  return { locale, user, initialCredits, platform: Platform.NEXT_PAGE };
 }

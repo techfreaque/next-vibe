@@ -37,7 +37,11 @@ export const translations: typeof enTranslations = {
         title: "Błąd walidacji",
         description: "Nieprawidłowe żądanie",
       },
-      server: { title: "Błąd serwera", description: "Wewnętrzny błąd serwera" },
+      server: {
+        title: "Błąd serwera",
+        description: "Wewnętrzny błąd serwera",
+        detail: "Nie udało się wczytać Twoich sesji: {{error}}",
+      },
       unknown: {
         title: "Nieznany błąd",
         description: "Wystąpił nieznany błąd",
@@ -79,7 +83,11 @@ export const translations: typeof enTranslations = {
         title: "Błąd walidacji",
         description: "Nieprawidłowe żądanie",
       },
-      server: { title: "Błąd serwera", description: "Wewnętrzny błąd serwera" },
+      server: {
+        title: "Błąd serwera",
+        description: "Wewnętrzny błąd serwera",
+        detail: "Nie udało się utworzyć tokenu sesji: {{error}}",
+      },
       unknown: {
         title: "Nieznany błąd",
         description: "Wystąpił nieznany błąd",
@@ -114,7 +122,11 @@ export const translations: typeof enTranslations = {
         title: "Błąd walidacji",
         description: "Nieprawidłowe żądanie",
       },
-      server: { title: "Błąd serwera", description: "Wewnętrzny błąd serwera" },
+      server: {
+        title: "Błąd serwera",
+        description: "Wewnętrzny błąd serwera",
+        detail: "Nie udało się unieważnić sesji: {{error}}",
+      },
       unknown: {
         title: "Nieznany błąd",
         description: "Wystąpił nieznany błąd",
@@ -124,6 +136,7 @@ export const translations: typeof enTranslations = {
       notFound: {
         title: "Nie znaleziono",
         description: "Sesja nie znaleziona",
+        detail: "Żadna sesja o ID {{sessionId}} nie należy do Twojego konta",
       },
       conflict: { title: "Konflikt", description: "Konflikt danych" },
     },

@@ -1,11 +1,11 @@
 import "server-only";
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
-import type { GraphConfig } from "next-vibe/dataflow/graph/types";
-import { VibeSenseRepository } from "next-vibe/dataflow/repository";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import type { CountryLanguage } from "../../../../core/i18n/core/config";
+import type { ResponseType } from "../../../../core/route/response.schema";
+import type { GraphConfig } from "../../../graph/types";
+import { VibeSenseRepository } from "../../../repository";
+import type { JwtPayloadType } from "../../../../identity/auth/types";
+import type { EndpointLogger } from "../../../../logger/types";
 
 import type { GraphEditPutResponseOutput } from "./definition";
 

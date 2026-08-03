@@ -4,7 +4,7 @@ import { existsSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { pathToFileURL } from "node:url";
 
-import type { ReleaseTarget } from "next-vibe/tooling/launchpad/src/types/types";
+import type { ReleaseTarget } from "../types/types";
 
 // Type for release config structure
 interface ReleaseConfig {
@@ -24,7 +24,7 @@ type LoadedModule =
   | ReleaseConfig
   | Record<
       string,
-      ReleaseConfig | Array<unknown> | string | number | boolean | null // eslint-disable-line oxlint-plugin-restricted/restricted-syntax -- Build Infrastructure: Release metadata extraction requires 'unknown'
+      ReleaseConfig | Array<unknown> | string | number | boolean | null // eslint-disable-line oxlint-plugin-restricted/no-unknown -- Build Infrastructure: Release metadata extraction requires 'unknown'
     >;
 
 /**

@@ -6,19 +6,19 @@
 import "server-only";
 
 import { and, avg, count, desc, eq, gte, max, min, sql } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { CronStatsT } from "next-vibe/tasks/cron/stats/i18n";
-import { CronTaskPriority, CronTaskStatus } from "next-vibe/tasks/enum";
+} from "../../../core/route/response.schema";
+import { parseError } from "../../../core/utils/parse-error";
+import { db } from "../../../database";
+import type { JwtPayloadType } from "../../../identity/auth/types";
+import { UserPermissionRole } from "../../../identity/roles/enum";
+import type { EndpointLogger } from "../../../logger/types";
+import type { CronStatsT } from "./i18n";
+import { CronTaskPriority, CronTaskStatus } from "../../enum";
 
 import { cronTaskExecutions, cronTasks } from "../db";
 import type {
@@ -382,14 +382,13 @@ export class CronStatsRepository {
         error: errorDetails.message,
       });
       return fail({
-        message: t("errors.fetchCronTaskStats"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
+        message: t("errors.fetchCronTaskStats", {
           error: errorDetails.message,
           period: data.period ?? "day",
           type: data.type ?? "overview",
           taskId: data.taskId ?? "unknown",
-        },
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }

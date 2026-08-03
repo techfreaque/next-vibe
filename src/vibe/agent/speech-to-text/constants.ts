@@ -3,7 +3,7 @@ import {
   ModelSortDirection,
   ModelSortField,
 } from "../skills/enum";
-import type { SttModelSelection } from "../speech-to-text/models";
+import type { SttModelSelection } from "./models";
 import { SttModelId } from "./models";
 
 /** Alias used when this endpoint is called as an AI tool */

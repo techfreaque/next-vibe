@@ -1,19 +1,20 @@
 import { Box, Text } from "ink";
-import { useIsMcp } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import * as React from "react";
 
 import type { TrProps } from "../../web/ui/tr";
+import { useSeparatorLine } from "../hooks/use-separator-width";
 import { parseClassesToBoxProps } from "./tailwind-to-ink";
 
 export type { TrProps } from "../../web/ui/tr";
 
-const SEPARATOR = "\u2500".repeat(60);
 const CELL_DIVIDER = " | ";
 
 export function Tr({ className, children }: TrProps): JSX.Element {
   const isMcp = useIsMcp();
   const boxProps = parseClassesToBoxProps(className);
+  const separator = useSeparatorLine();
 
   if (isMcp) {
     const cells: React.ReactNode[] = [];
@@ -36,7 +37,7 @@ export function Tr({ className, children }: TrProps): JSX.Element {
         {children}
       </Box>
       <Box>
-        <Text dimColor>{SEPARATOR}</Text>
+        <Text dimColor>{separator}</Text>
       </Box>
     </Box>
   );

@@ -160,7 +160,7 @@ export function getTwilioProvider(): SmsProvider {
         }
 
         // Make the API request
-        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+        // oxlint-disable-next-line restricted/no-raw-fetch
         const response = await fetch(baseUrl, {
           method: "POST",
           headers,
@@ -179,19 +179,20 @@ export function getTwilioProvider(): SmsProvider {
           const errorMessage =
             errorData.message ??
             errorData.error_message ??
-            // eslint-disable-next-line i18next/no-literal-string -- Technical error message from Twilio API
-            "Unknown Twilio error";
+            // Brand name, not prose - the enum value is lowercase and would
+            // read wrong inside a sentence.
+            t("sms.error.unknown_provider_error", { provider: "Twilio" });
 
           const errorCode =
             errorData.code ?? errorData.error_code ?? response.status;
 
           return fail({
-            message: t("sms.error.delivery_failed"),
-            errorType: ErrorResponseTypes.SMS_ERROR,
-            messageParams: {
+            message: t("sms.error.delivery_failed_code", {
+              phoneNumber: params.to,
               error: errorMessage,
-              errorCode,
-            },
+              code: errorCode,
+            }),
+            errorType: ErrorResponseTypes.SMS_ERROR,
           });
         }
 
@@ -227,14 +228,13 @@ export function getTwilioProvider(): SmsProvider {
         };
       } catch (error) {
         const errorMessage =
-          // eslint-disable-next-line i18next/no-literal-string -- Technical error message from exception
-          error instanceof Error ? error.message : "Unknown error";
+          error instanceof Error ? error.message : t("sms.error.unknown_error");
         return fail({
-          message: t("sms.error.delivery_failed"),
-          errorType: ErrorResponseTypes.SMS_ERROR,
-          messageParams: {
+          message: t("sms.error.delivery_failed", {
+            phoneNumber: params.to,
             error: errorMessage,
-          },
+          }),
+          errorType: ErrorResponseTypes.SMS_ERROR,
         });
       }
     },

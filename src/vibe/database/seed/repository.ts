@@ -3,17 +3,17 @@
  * Handles run database seeds operations
  */
 
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { defaultLocale } from "../../core/i18n/core/config";
+import type { ResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { SeedT } from "next-vibe/database/seed/i18n";
-import { scopedTranslation } from "next-vibe/database/seed/i18n";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../core/route/response.schema";
+import { parseError } from "../../core/utils/parse-error";
+import type { SeedT } from "./i18n";
+import { scopedTranslation } from "./i18n";
+import type { EndpointLogger } from "../../logger/types";
 
 import type { SeedRequestOutput, SeedResponseOutput } from "./definition";
 import type { EnvironmentSeeds } from "./seed-manager";
@@ -48,10 +48,11 @@ export class SeedRepository {
     } catch (error) {
       const parsed = parseError(error);
       logger.error("❌ Database seeding failed:", parsed);
+      // `post.errors.server.title` is the definition's declared SERVER_ERROR
+      // label and renders param-free there, so the cause goes in its own key.
       return fail({
-        message: t("post.errors.server.title"),
+        message: t("post.errors.server.detail", { error: parsed.message }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsed.message },
       });
     }
   }

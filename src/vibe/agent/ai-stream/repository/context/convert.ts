@@ -7,13 +7,13 @@ import "server-only";
 
 import type { ToolResultOutput } from "@ai-sdk/provider-utils";
 import type { ModelMessage, ToolCallPart } from "ai";
-import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
+import type { ToolExecutionContext } from "../../../../core/execution-context";
 import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { DefaultFolderId } from "../../../chat/config";
+import type { DefaultFolderId } from "../../../../core/execution-context";
 import type { ChatMessage, ToolCall } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
 import { fetchStorageFileAsBase64 } from "../../../chat/storage/url-utils";
@@ -154,7 +154,7 @@ export async function toAiSdkMessage(
    */
   resolvedDispatchToolCallIds?: ReadonlySet<string>,
   /** Fixture-aware fetch for attachment/media downloads; defaults to live fetch. */
-  // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- live-fetch default for callers without a fixture chain
+  // oxlint-disable-next-line restricted/restricted-syntax -- live-fetch default for callers without a fixture chain
   fetchImpl: typeof globalThis.fetch = fetch,
 ): Promise<ModelMessage | ModelMessage[] | null> {
   switch (message.role) {

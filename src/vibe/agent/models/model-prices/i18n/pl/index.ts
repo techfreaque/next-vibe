@@ -59,6 +59,7 @@ export const translations: typeof enTranslations = {
       unknown: {
         title: "Nieznany błąd",
         description: "Wystąpił nieoczekiwany błąd",
+        detail: "Nieznany błąd: {{error}}",
       },
       validation: {
         title: "Błąd walidacji",

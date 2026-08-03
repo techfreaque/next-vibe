@@ -38,7 +38,11 @@ export const translations: typeof enTranslations = {
   errors: {
     validation: { title: "Validation Error", description: "Check your input" },
     unauthorized: { title: "Unauthorized", description: "Login required" },
-    server: { title: "Server Error", description: "Internal server error" },
+    server: {
+      title: "Server Error",
+      description: "Internal server error",
+      detail: "Nie udało się wczytać skrzynki: {{error}}",
+    },
     unknown: { title: "Unknown Error", description: "Unexpected error" },
     forbidden: { title: "Forbidden", description: "Access denied" },
     network: { title: "Network Error", description: "Network error" },

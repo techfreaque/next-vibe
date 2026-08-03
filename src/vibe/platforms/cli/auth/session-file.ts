@@ -1,17 +1,18 @@
 import { promises as fs } from "node:fs";
 import { join } from "node:path";
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { coreEnv } from "../../../core/env";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { SessionData } from "next-vibe/identity/auth/base-auth-handler";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { scopedTranslation as cliScopedTranslation } from "next-vibe/platforms/cli/i18n";
+} from "../../../core/route/response.schema";
+import { parseError } from "../../../core/utils/parse-error";
+import type { SessionData } from "../../../identity/auth/base-auth-handler";
+import type { EndpointLogger } from "../../../logger/types";
+import { scopedTranslation as cliScopedTranslation } from "../i18n";
 
 /**
  * Session file path
@@ -25,8 +26,8 @@ const SESSION_FILE_NAME = ".vibe.session";
  */
 function getProjectRoot(): string {
   // Try environment variable first (can be set by CLI or MCP config)
-  if (process.env.VIBE_PROJECT_ROOT) {
-    return process.env.VIBE_PROJECT_ROOT;
+  if (coreEnv.PROJECT_ROOT) {
+    return coreEnv.PROJECT_ROOT;
   }
 
   // Fall back to process.cwd() - this will work when MCP server runs from project root
@@ -166,9 +167,8 @@ export async function writeSessionFile(
     );
     const { t } = cliScopedTranslation.scopedT(locale);
     return fail({
-      message: t("vibe.errors.writeFailed"),
+      message: t("vibe.errors.writeFailed", { error: parsedError.message }),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: { error: parsedError.message },
     });
   }
 }
@@ -206,9 +206,8 @@ export async function deleteSessionFile(
     );
     const { t } = cliScopedTranslation.scopedT(locale);
     return fail({
-      message: t("vibe.errors.deleteFailed"),
+      message: t("vibe.errors.deleteFailed", { error: parsedError.message }),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: { error: parsedError.message },
     });
   }
 }

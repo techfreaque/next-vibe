@@ -26,6 +26,21 @@ A `repository.ts` file **must contain only**:
 
 ## Core Principles
 
+### 0. `fail` vs `failInline`
+
+Which one you use is decided by the endpoint's definition, not by preference:
+
+| Definition uses                     | Repository uses | Message is                                        |
+| ----------------------------------- | --------------- | ------------------------------------------------- |
+| `createEndpoint` from `create-i18n` | `fail`          | `t("errors.notFound.title")` - a scoped i18n key  |
+| `createEndpoint` from `create`      | `failInline`    | `` `Template not found at ${path}` `` - a literal |
+
+`fail({ message })` takes a `TranslatedKeyType` — text that came out of a `t()` call — so a scoped endpoint cannot forget to translate. Inline endpoints have no `t()`, so they use `failInline`, which accepts a plain string.
+
+`failInline` has no `messageParams`: placeholders exist to fill a static key later, and inline copy is built at the call site. Interpolate with a template literal instead.
+
+Never wrap a literal in a translation call (`t("Internal Error")`) just to satisfy the type — see `definition.md` § "Two createEndpoint variants".
+
 ### 1. Static Class Pattern
 
 ```typescript

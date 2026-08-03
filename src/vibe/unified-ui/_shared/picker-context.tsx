@@ -1,6 +1,6 @@
 "use client";
 
-import type { WidgetData } from "next-vibe/core/utils/json";
+import type { WidgetData } from "../../core/utils/json";
 import type { JSX } from "react";
 import { createContext, type ReactNode, useContext } from "react";
 

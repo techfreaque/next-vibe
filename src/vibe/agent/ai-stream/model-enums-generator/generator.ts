@@ -39,7 +39,7 @@ export const generator: GeneratorDefinition = {
     const agentDir = join(getSrcDir(), "vibe", "agent");
 
     const { chatModelDefinitions, ChatModelId } =
-      (await import("next-vibe/agent/ai-stream/models")) as {
+      (await import("../models")) as {
         chatModelDefinitions: Parameters<
           typeof generateVisionEnumFileContent
         >[0];

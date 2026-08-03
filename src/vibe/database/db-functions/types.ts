@@ -34,7 +34,7 @@ export type InferRecord<R extends Record<string, PgType>> = {
  * Drizzle exposes the result type via `builder._.result` - we use this for inference.
  */
 export interface TypedQueryBuilder<TResult> {
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Drizzle's .toSQL() returns unknown[] params
+  // eslint-disable-next-line restricted/no-unknown -- Drizzle's .toSQL() returns unknown[] params
   toSQL(): { sql: string; params: unknown[] };
   /** Drizzle stores all HKT type params in `_` - `_.result` is the row array type */
   readonly _: { readonly result: TResult };

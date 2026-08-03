@@ -41,13 +41,8 @@
 
 import "server-only";
 
-import {
-  DefaultFolderId,
-  makeHeadlessContext,
-  rootlessToolExecutionContext,
-  type ToolExecutionContext,
-} from "next-vibe/agent/chat/config";
-import { ChatMessageRole } from "next-vibe/agent/chat/enum";
+import { DefaultFolderId, makeHeadlessContext, rootlessToolExecutionContext, type ToolExecutionContext } from "../../../../core/execution-context";
+import { ChatMessageRole } from "../../../chat/enum";
 // WS fixture record/replay — patches globalThis.WebSocket, must install
 // before any module opens a socket. HTTP fixtures need no install anymore
 // (explicit FixtureContext on each call), but WS interception is still global.
@@ -57,7 +52,7 @@ import {
   closeConnection,
   reloadWsProviderConnector,
   restartConnection,
-} from "next-vibe/realtime/connector";
+} from "next-vibe/realtime/server/connector";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -296,7 +291,7 @@ async function runReverseWsPulse(threadId: string): Promise<void> {
   console.log("[runReverseWsPulse] connector restarted — channel reopened");
 
   const threadByIdDef =
-    await import("next-vibe/agent/chat/threads/[threadId]/definition");
+    await import("../../../chat/threads/[threadId]/definition");
   const deadline = Date.now() + 60_000;
 
   while (Date.now() < deadline) {
@@ -439,7 +434,7 @@ if (_remoteUrl && _isFixtureMode) {
 
     it("WP3: originator owns the thread → thread + messages exist in atlas DB", async () => {
       const threadDef =
-        await import("next-vibe/agent/chat/threads/[threadId]/definition");
+        await import("../../../chat/threads/[threadId]/definition");
       const threadResult = await sendTestRequest({
         toolExecutionContext: rootlessToolExecutionContext(),
         endpoint: threadDef.default.GET,

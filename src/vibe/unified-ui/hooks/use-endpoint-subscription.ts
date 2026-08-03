@@ -20,18 +20,20 @@
  * Both carry only THIS endpoint instance's events — no cross-endpoint filtering.
  */
 
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { buildUserWsChannel, buildWsChannel } from "next-vibe/realtime/channel";
-import { subscribeToChannel } from "next-vibe/realtime/client";
-import type { AnyEndpointEventEnvelope } from "next-vibe/realtime/structured-events";
-import { eventDeclarationHasFields } from "next-vibe/realtime/structured-events";
-import type { WsChannelDescriptor } from "next-vibe/realtime/types";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import type { ResponseType } from "../../core/route/response.schema";
+import type { WidgetData } from "../../core/utils/json";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
+import {
+  buildUserWsChannel,
+  buildWsChannel,
+} from "../../realtime/core/channel";
+import { subscribeToChannel } from "../../realtime/client/client";
+import type { AnyEndpointEventEnvelope } from "../../realtime/core/structured-events";
+import { eventDeclarationHasFields } from "../../realtime/core/structured-events";
+import type { WsChannelDescriptor } from "../../realtime/core/types";
 import { useEffect, useRef } from "react";
 
 import {
@@ -112,10 +114,6 @@ export function useEndpointSubscription(
   userRef.current = user;
   const localeRef = useRef(locale);
   localeRef.current = locale;
-  // Client-side availability from the provider context (never the server module).
-  const availability = useProviderAvailability();
-  const availabilityRef = useRef(availability);
-  availabilityRef.current = availability;
 
   // Stable user id key - avoid re-subscribing when the user object is recreated.
   const userId = user ? (user.isPublic ? user.leadId : user.id) : undefined;
@@ -238,7 +236,6 @@ export function useEndpointSubscription(
           logger,
           user: currentUser,
           locale: localeRef.current,
-          agentEnvAvailability: availabilityRef.current,
         });
       }
     }

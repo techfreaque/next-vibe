@@ -1,6 +1,6 @@
 "use client";
 
-import { scopedTranslation } from "next-vibe/agent/ai-stream/stream/i18n";
+import { scopedTranslation } from "../../../i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";

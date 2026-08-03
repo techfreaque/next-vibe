@@ -2,6 +2,7 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { Platform } from "next-vibe/platforms/platforms";
 import { Button } from "next-vibe/ui/ui/button";
 import { Card, CardContent } from "next-vibe/ui/ui/card";
 import { Div } from "next-vibe/ui/ui/div";
@@ -20,12 +21,14 @@ export interface SettingsPageClientProps {
   locale: CountryLanguage;
   isAuthenticated: boolean;
   user: JwtPayloadType;
+  platform: Platform;
 }
 
 export function SettingsPageClient({
   locale,
   isAuthenticated,
   user,
+  platform,
 }: SettingsPageClientProps): JSX.Element {
   const { t } = pageT.scopedT(locale);
 
@@ -72,6 +75,7 @@ export function SettingsPageClient({
           forceMethod="POST"
           user={user}
           locale={locale}
+          platform={platform}
           endpointOptions={{
             create: { formOptions: { persistForm: false } },
           }}

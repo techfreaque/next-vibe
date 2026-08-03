@@ -2,12 +2,9 @@
 import { existsSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type {
-  ReleaseState,
-  ReleaseTarget,
-} from "next-vibe/tooling/launchpad/src/types/types";
+import { parseError } from "../../../../core/utils/parse-error";
+import type { EndpointLogger } from "../../../../logger/types";
+import type { ReleaseState, ReleaseTarget } from "../types/types";
 
 interface ParsedState {
   targets?: Array<ReleaseTarget>;

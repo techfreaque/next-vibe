@@ -1097,6 +1097,7 @@ export const translations = {
     actionTypeText: "Type Text",
     actionPressKey: "Press Key",
     actionScreenshot: "Screenshot",
+    actionScreenshotOnMonitor: "Screenshot: {{monitor}}",
     actionA11yTree: "A11y Tree",
     actionAllWindows: "← All windows",
     actionAllMonitors: "All monitors →",
@@ -1136,9 +1137,25 @@ export const translations = {
       "Required tool not found: {{tool}}. Install it with: {{installCmd}}",
     screenshotFailed: "Failed to capture screenshot",
     accessibilityFailed: "Failed to get accessibility tree",
+    accessibilityFailedWithError: "Failed to get accessibility tree: {{error}}",
     focusWindowRequiresIdentifier:
       "At least one of windowId, pid, or title is required",
     missingDep:
       "Required system package missing: {{dep}}. A system auth dialog should have appeared - approve it to install automatically.",
+    scriptWriteFailed: "Failed to write script: {{error}}",
+    monitorNotFoundByName: 'Monitor "{{monitorName}}" not found',
+    screenIndexOutOfRange: "Screen index {{screen}} out of range",
+    unknownKeyName: "Unknown key name: {{key}}",
+    focusedWindowParseFailed: "Failed to parse focused window output",
+    couldNotListWindows: "Could not list windows",
+    noWindowWithPid: "No window with PID {{pid}}",
+    noWindowWithTitle: 'No window with title containing "{{title}}"',
+    provideMonitorNameOrIndex: "Provide monitorName or monitorIndex",
+    monitorNotFound: "Monitor not found: {{monitor}}",
+    noActiveWindow: "No active window",
+    kwinNoOutput: "KWin script produced no output",
+    kwinNoWindowData: "No window data in KWin script output",
+    windowMoveNoEffect:
+      "Window move did not take effect — window never reached monitor {{monitor}}",
   },
 };

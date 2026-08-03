@@ -1,6 +1,6 @@
 "use client";
 
-import { ModelCreditDisplay } from "next-vibe/agent/models/widget/model-credit-display";
+import { ModelCreditDisplay } from "../widget/model-credit-display";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";

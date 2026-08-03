@@ -1,5 +1,5 @@
 // oxlint-disable-next-line oxlint-plugin-boilerplate/i18n-pattern
-import { translations as modelTranslations } from "next-vibe/agent/models/i18n/pl";
+import { translations as modelTranslations } from "../../../../models/i18n/pl";
 
 import type { translations as enTranslations } from "../en";
 
@@ -499,6 +499,7 @@ export const translations: typeof enTranslations = {
     errors: {
       invalidJson: "Nieprawidłowy JSON w treści żądania",
       invalidRequestData: "Nieprawidłowe dane żądania ({{issue}})",
+      fileTypeNotAllowed: "Niedozwolony typ pliku: {{fileType}}",
       uncensoredApiKeyMissing:
         "Klucz API Uncensored.ai nie został skonfigurowany",
       openrouterApiKeyMissing: "Klucz API OpenRouter nie został skonfigurowany",

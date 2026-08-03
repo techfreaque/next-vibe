@@ -1,5 +1,5 @@
 // oxlint-disable-next-line oxlint-plugin-boilerplate/i18n-pattern
-import { translations as modelTranslations } from "next-vibe/agent/models/i18n/de";
+import { translations as modelTranslations } from "../../../../models/i18n/de";
 
 import type { translations as enTranslations } from "../en";
 

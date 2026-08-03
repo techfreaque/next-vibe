@@ -3,15 +3,14 @@ import type {
   QueryKey,
   UseQueryOptions,
 } from "@tanstack/react-query";
-import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import type { TranslatedKeyType } from "../../core/i18n/core/scoped-translation";
 import type {
   ErrorResponseType,
   ResponseType,
-} from "next-vibe/core/route/response.schema";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../core/route/response.schema";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
 import type { FieldValues, UseFormProps, UseFormReturn } from "react-hook-form";
 
 /**
@@ -104,7 +103,6 @@ export interface ApiMutationOptions<TRequest, TResponse, TUrlVariables> {
     logger: EndpointLogger;
     user: JwtPayloadType;
     locale: CountryLanguage;
-    availability: AgentEnvAvailability;
   }) => ErrorResponseType | void | Promise<ErrorResponseType | void>;
   onError?: (data: {
     error: ErrorResponseType;

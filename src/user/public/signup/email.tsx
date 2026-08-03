@@ -36,7 +36,6 @@ import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
 import { coreEnv } from "next-vibe/core/env";
 
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
-import { scopedTranslation as userScopedTranslation } from "next-vibe/identity/user/i18n";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import { contactClientRepository } from "../../../contact/repository-client";
 import { EmailTemplate } from "../../../messenger/providers/email/smtp-client/components/template.email";
@@ -439,7 +438,6 @@ async function renderWelcomeEmailByEmail(
   locale: CountryLanguage,
   logger: EndpointLogger,
 ): Promise<SuccessResponseType<EmailResolvedData> | ErrorResponseType> {
-  const { t: tUser } = userScopedTranslation.scopedT(locale);
   const { t: signupT } = signupScopedTranslation.scopedT(locale);
   const userResponse = await UserRepository.getUserByEmail(
     email,
@@ -449,9 +447,8 @@ async function renderWelcomeEmailByEmail(
   );
   if (!userResponse.success) {
     return fail({
-      message: tUser("errors.not_found"),
+      message: signupT("errors.userNotFound", { email }),
       errorType: ErrorResponseTypes.NOT_FOUND,
-      messageParams: { email },
       cause: userResponse,
     });
   }
@@ -461,7 +458,7 @@ async function renderWelcomeEmailByEmail(
     privateName: user.privateName,
     userId: user.id,
     leadId: user.leadId,
-    totalModelCount: getAvailableModelCount(false, getEnvAvailability()),
+    totalModelCount: getAvailableModelCount(false, await getEnvAvailability()),
   };
   const { t: globalT } = configScopedTranslation.scopedT(locale);
 
@@ -926,7 +923,6 @@ async function renderAdminNotificationByEmail(
   locale: CountryLanguage,
   logger: EndpointLogger,
 ): Promise<SuccessResponseType<EmailResolvedData> | ErrorResponseType> {
-  const { t: tUser } = userScopedTranslation.scopedT(locale);
   const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
   const { t: signupT } = signupScopedTranslation.scopedT(locale);
   const { t: globalT } = configScopedTranslation.scopedT(locale);
@@ -938,9 +934,8 @@ async function renderAdminNotificationByEmail(
   );
   if (!userResponse.success) {
     return fail({
-      message: tUser("errors.not_found"),
+      message: signupT("errors.userNotFound", { email }),
       errorType: ErrorResponseTypes.NOT_FOUND,
-      messageParams: { email },
       cause: userResponse,
     });
   }

@@ -3,7 +3,7 @@
  * Send notifications via webhooks (Slack, Discord, Teams, Mattermost, Google Chat, etc.)
  */
 
-import type { EndpointLogger } from "next-vibe/logger/types";
+import type { EndpointLogger } from "../../../logger/types";
 
 import type {
   NotificationConfig,
@@ -608,7 +608,7 @@ class NotificationService implements INotificationService {
     try {
       // webhookUrl is guaranteed to exist since we validate it in sendNotification
       const webhookUrl = config.webhookUrl ?? "";
-      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+      // oxlint-disable-next-line restricted/no-raw-fetch
       const response = await fetch(webhookUrl, {
         method: "POST",
         headers: {

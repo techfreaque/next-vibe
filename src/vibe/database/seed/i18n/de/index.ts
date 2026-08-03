@@ -28,6 +28,7 @@ export const translations: typeof enTranslations = {
       server: {
         title: "Serverfehler",
         description: "Interner Serverfehler beim Seeding",
+        detail: "Datenbank-Seeding fehlgeschlagen: {{error}}",
       },
       internal: {
         title: "Interner Fehler",

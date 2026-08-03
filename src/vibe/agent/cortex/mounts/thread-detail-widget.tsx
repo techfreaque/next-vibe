@@ -7,13 +7,12 @@
 
 "use client";
 
-import {
-  DefaultFolderId,
-  isDefaultFolderId,
-} from "next-vibe/agent/chat/config";
-import messagesDefinitions from "next-vibe/agent/chat/threads/[threadId]/messages/definition";
+import { isDefaultFolderId } from "../../chat/config";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
+import messagesDefinitions from "../../chat/threads/[threadId]/messages/definition";
 import {
   useWidgetLocale,
+  useWidgetPlatform,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
@@ -72,6 +71,7 @@ export function ThreadDetailWidget({
 }: ThreadDetailWidgetProps): React.JSX.Element | null {
   const locale = useWidgetLocale();
   const user = useWidgetUser();
+  const platform = useWidgetPlatform();
 
   const info = useMemo(() => extractThreadInfo(path), [path]);
 
@@ -84,6 +84,7 @@ export function ThreadDetailWidget({
       endpoint={messagesDefinitions}
       locale={locale}
       user={user}
+      platform={platform}
       endpointOptions={{
         read: {
           urlPathParams: { threadId: info.threadId },

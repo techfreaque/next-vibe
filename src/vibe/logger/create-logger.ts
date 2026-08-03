@@ -6,8 +6,8 @@
  * stays free of node:fs and server-only imports — safe to bundle on the client.
  */
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { parseError } from "next-vibe/core/utils/parse-error";
+import type { CountryLanguage } from "../core/i18n/core/config";
+import { parseError } from "../core/utils/parse-error";
 
 import { colors, maybeColorize, semantic } from "./colors";
 import { enableDebugLogger, mcpSilentMode } from "./debug";

@@ -81,28 +81,3 @@ export function getChromeMCPConfig(): ChromeMCPConfig {
 
   return config;
 }
-
-/**
- * Get MCP server configuration for external clients
- * Returns the configuration that can be used in MCP client config files
- */
-export const getMCPServerConfig = (): {
-  mcpServers: {
-    "Chrome Dev Tools": {
-      command: string;
-      args: string[];
-      env?: Record<string, string>;
-    };
-  };
-} => {
-  const config = getChromeMCPConfig();
-  return {
-    mcpServers: {
-      "Chrome Dev Tools": {
-        command: config.command,
-        args: config.args,
-        env: config.env,
-      },
-    },
-  };
-};

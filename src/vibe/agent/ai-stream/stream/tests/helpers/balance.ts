@@ -7,8 +7,8 @@
 import "server-only";
 
 import { and, eq, sql } from "drizzle-orm";
-import { rootlessToolExecutionContext } from "next-vibe/agent/chat/config";
-import { chatMessages } from "next-vibe/agent/chat/db";
+import { rootlessToolExecutionContext } from "../../../../../core/execution-context";
+import { chatMessages } from "../../../../chat/db";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";

@@ -3,15 +3,15 @@
  * Handles stopping guard environments
  */
 
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { GuardStopT } from "next-vibe/tooling/guard/stop/i18n";
+} from "../../../core/route/response.schema";
+import { parseError } from "../../../core/utils/parse-error";
+import type { EndpointLogger } from "../../../logger/types";
+import type { GuardStopT } from "./i18n";
 
 import type {
   GuardStopRequestOutput,
@@ -52,21 +52,17 @@ export class GuardStopRepository {
       }
 
       return fail({
-        message: t("errors.validation.title"),
+        message: t("errors.missingTarget"),
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
-        messageParams: {
-          error: "Either projectPath, guardId, or stopAll must be specified",
-        }, // eslint-disable-line i18next/no-literal-string
       });
     } catch (error) {
       logger.error("Guard stop failed", parseError(error));
-      const parsedError =
-        error instanceof Error ? error : new Error(String(error));
 
       return fail({
-        message: t("errors.internal.title"),
+        message: t("errors.stopFailed", {
+          detail: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parsedError.message },
       });
     }
   }

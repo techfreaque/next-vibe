@@ -14,6 +14,8 @@ import {
   writeFileSync,
 } from "node:fs";
 import { resolve } from "node:path";
+import { getEnvAvailability } from "../../../agent/env-availability";
+import { AgentAvailabilityProvider } from "../../../agent/env-availability-store";
 import { PassThrough } from "node:stream";
 
 import {
@@ -25,20 +27,24 @@ import {
   useInput,
   useStdin,
 } from "ink";
-import { getEnvAvailability } from "next-vibe/agent/env-availability";
-import { AgentAvailabilityProvider } from "next-vibe/agent/env-availability-context";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { createEndpointLogger } from "next-vibe/logger/server";
-import { scopedTranslation as cliScopedTranslation } from "next-vibe/platforms/cli/i18n";
-import { Platform } from "next-vibe/platforms/platforms";
+import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import type { WidgetData } from "../../../core/utils/json";
+import type { JwtPayloadType } from "../../../identity/auth/types";
+import { createEndpointLogger } from "../../../logger/server";
+import { scopedTranslation as cliScopedTranslation } from "../../../platforms/cli/i18n";
+import { Platform } from "../../../platforms/platforms";
 import { LoggerProvider } from "next-vibe/ui/hooks/logger-provider";
-import { QueryProvider } from "next-vibe/unified-ui/hooks/query-provider";
+import { QueryProvider } from "../../hooks/query-provider";
 import type { JSX, ReactNode } from "react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
+import { areArrowsCaptured } from "../../../ui/cli/lib/focus-manager";
+import {
+  isEnterCaptured,
+  triggerSubmit,
+  useLiveRequestValues,
+} from "../../../ui/cli/lib/live-request-values";
 import { isOverlayOpen } from "../../../ui/cli/ui/dialog";
 import { EndpointsPage } from "../web/EndpointsPage";
 import { prewarmLazyWidgets } from "./response/result-formatter";
@@ -130,6 +136,11 @@ interface InkEndpointPageProps<
  * Build an example CLI command string from endpoint and current form values.
  * Shows `vibe <command> --key value` for each non-empty form field.
  */
+/** Quote a CLI argument only when it contains whitespace. */
+function quote(v: string): string {
+  return v.includes(" ") ? `"${v}"` : v;
+}
+
 function buildExampleCommand(
   endpoint: CreateApiEndpointAny,
   formValues: Record<string, WidgetData>,
@@ -152,13 +163,32 @@ function buildExampleCommand(
       continue;
     }
 
-    const strValue = String(value);
-
-    // First positional arg doesn't need a flag
-    if (key === firstArgKey) {
-      parts.push(strValue.includes(" ") ? `"${strValue}"` : strValue);
+    // `interactive` is always true here — it is what put us in this view. Echoing
+    // it back would make the copied command re-open the form instead of running.
+    if (key === "interactive") {
       continue;
     }
+
+    // First positional arg doesn't need a flag. Arrays become several
+    // positionals — that is exactly how the parser collects them back.
+    if (key === firstArgKey) {
+      if (Array.isArray(value)) {
+        for (const entry of value) {
+          parts.push(quote(String(entry)));
+        }
+      } else {
+        parts.push(quote(String(value)));
+      }
+      continue;
+    }
+
+    if (Array.isArray(value)) {
+      if (value.length === 0) {
+        continue;
+      }
+    }
+
+    const strValue = String(value);
 
     // Convert camelCase to kebab-case for CLI flags
     const kebabKey = key.replaceAll(
@@ -253,8 +283,17 @@ function InkEndpointPage<
         setEscHint(true);
         setTimeout(() => setEscHint(false), 3000);
       }
-      // Arrow keys move between fields when dropdown is closed
-      if (!isOverlayOpen()) {
+      // Enter submits from anywhere in the form, not just the submit button —
+      // unless a field is using Enter for its own editing (tags) or an overlay
+      // owns the key.
+      if (key.return && !isOverlayOpen() && !isEnterCaptured()) {
+        triggerSubmit();
+      }
+
+      // Arrow keys move between fields — unless an overlay is open, or the
+      // focused field has claimed them for its own value (a number field steps
+      // by ↑/↓, which must not jump to the next field). Tab still navigates.
+      if (!isOverlayOpen() && !areArrowsCaptured()) {
         if (key.downArrow) {
           focusNext();
         } else if (key.upArrow) {
@@ -266,9 +305,15 @@ function InkEndpointPage<
   );
 
   // Example CLI command based on endpoint path
+  // Live: reflects what is currently typed in the form, so the line under the
+  // description is always a runnable command you can copy.
+  const liveRequestValues = useLiveRequestValues();
   const exampleCommand = useMemo(
-    () => (activeEndpoint ? buildExampleCommand(activeEndpoint, {}) : ""),
-    [activeEndpoint],
+    () =>
+      activeEndpoint
+        ? buildExampleCommand(activeEndpoint, liveRequestValues)
+        : "",
+    [activeEndpoint, liveRequestValues],
   );
 
   const { t: cliT } = cliScopedTranslation.scopedT(locale);
@@ -722,8 +767,10 @@ export async function renderInkEndpointPage<
   // Preload all lazy widgets so the first frame renders immediately (no Suspense blank flash)
   await Promise.all(
     Object.values(props.endpoint)
-      .filter(Boolean)
-      .map((ep) => prewarmLazyWidgets(ep as CreateApiEndpointAny)),
+      // Predicate rather than filter(Boolean): the method map is all-optional,
+      // and filter(Boolean) does not narrow away the undefined for TypeScript.
+      .filter((ep): ep is CreateApiEndpointAny => ep !== undefined)
+      .map((ep) => prewarmLazyWidgets(ep)),
   );
 
   // Set up agent control (frame file + keys polling) only when requested
@@ -747,11 +794,11 @@ export async function renderInkEndpointPage<
   };
   process.on("SIGINT", sigintHandler);
 
-  const rootAvailability = getEnvAvailability();
+  const availability = await getEnvAvailability();
   const instance = render(
     <InkErrorBoundary label={LABEL_INK_ROOT}>
-      <LoggerProvider locale={props.locale} availability={rootAvailability}>
-        <AgentAvailabilityProvider availability={rootAvailability}>
+      <LoggerProvider locale={props.locale}>
+        <AgentAvailabilityProvider availability={availability}>
           <QueryProvider>
             <InkEndpointPage {...props} />
           </QueryProvider>

@@ -1,4 +1,4 @@
-// oxlint-disable oxlint-plugin-restricted/restricted-syntax
+// oxlint-disable oxlint-plugin-restricted/no-throw
 /**
  * TanStack Start shim for `server-only`.
  *

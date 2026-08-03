@@ -91,6 +91,7 @@ export const translations: typeof enTranslations = {
     server: {
       title: "Serverfehler",
       description: "Ein interner Serverfehler ist beim Senden aufgetreten",
+      detail: "Versand fehlgeschlagen: {{error}}",
     },
     unknown: {
       title: "Unbekannter Fehler",

@@ -1,5 +1,5 @@
 // oxlint-disable-next-line oxlint-plugin-boilerplate/i18n-pattern
-import { translations as modelTranslations } from "next-vibe/agent/models/i18n/de";
+import { translations as modelTranslations } from "../../../models/i18n/de";
 
 import type { translations as enTranslations } from "../en";
 
@@ -92,7 +92,7 @@ export const translations: typeof enTranslations = {
       balanceCheckFailed:
         "Ihr Guthaben konnte nicht überprüft werden. Bitte versuchen Sie es erneut",
       insufficientCredits:
-        "Sie haben nicht genügend Credits für diese Konvertierung. Bitte fügen Sie weitere Credits hinzu, um fortzufahren",
+        "Nicht genügend Credits für diese Konvertierung. Guthaben: {{balance}}, Mindestbetrag: {{minimum}}. Bitte aufladen",
     },
     success: {
       title: "Erfolg",

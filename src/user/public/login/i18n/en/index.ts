@@ -293,9 +293,9 @@ export const translations = {
       "Your account has been locked. Please contact support.",
     invalid_credentials: "Invalid email or password",
     two_factor_required: "Two-factor authentication required",
-    auth_error: "Authentication error occurred",
-    user_not_found: "User not found",
-    session_creation_failed: "Failed to create session",
+    auth_error: "Authentication failed for {{email}}: {{error}}",
+    user_not_found: "No user found for {{userId}}",
+    session_creation_failed: "Could not create a session for {{userId}}: {{error}}",
     token_save_failed: "Failed to save authentication token",
     validation: {
       title: "Validation Failed",

@@ -5,16 +5,16 @@
 
 "use client";
 
-import { useTranslation } from "next-vibe/core/i18n/core/client";
-import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
-import type { TParams } from "next-vibe/core/i18n/core/static-types";
+import { useTranslation } from "../../../core/i18n/core/client";
+import type { TranslatedKeyType } from "../../../core/i18n/core/scoped-translation";
+import type { TParams } from "../../../core/i18n/core/static-types";
 import { Plus } from "next-vibe/ui/ui/icons/Plus";
 import { X } from "next-vibe/ui/ui/icons/X";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { JSX } from "react";
 import { useRef, useState } from "react";
 
-import { uiScopedTranslation } from "../../web/i18n";
+import { uiScopedTranslation } from "../i18n";
 import { Badge } from "./badge";
 import { Button } from "./button";
 import { Input, type InputKeyboardEvent } from "./input";

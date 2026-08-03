@@ -2,15 +2,20 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   errors: {
-    find_failed: "Nie udało się znaleźć ról użytkownika",
-    batch_find_failed: "Nie udało się znaleźć ról użytkowników wsadowo",
-    not_found: "Rola użytkownika nie znaleziona",
-    lookup_failed: "Nie udało się pobrać roli użytkownika",
-    add_failed: "Nie udało się dodać roli do użytkownika",
+    find_failed: "Nie udało się znaleźć ról użytkownika {{userId}}: {{error}}",
+    batch_find_failed:
+      "Nie udało się pobrać ról dla {{count}} użytkowników: {{error}}",
+    not_found: "Nie znaleziono roli {{role}} dla użytkownika {{userId}}",
+    lookup_failed:
+      "Nie udało się pobrać roli {{role}} użytkownika {{userId}}: {{error}}",
+    add_failed:
+      "Nie udało się dodać roli {{role}} użytkownikowi {{userId}}: {{error}}",
     no_data_returned: "Brak danych zwróconych z bazy danych",
-    remove_failed: "Nie udało się usunąć roli od użytkownika",
-    check_failed: "Sprawdzenie czy użytkownik ma rolę nie powiodło się",
-    delete_failed: "Nie udało się usunąć ról użytkownika",
+    remove_failed:
+      "Nie udało się usunąć roli {{role}} użytkownikowi {{userId}}: {{error}}",
+    check_failed:
+      "Nie udało się sprawdzić roli {{role}} użytkownika {{userId}}: {{error}}",
+    delete_failed: "Nie udało się usunąć ról użytkownika {{userId}}: {{error}}",
     endpoint_not_created:
       "Endpoint ról użytkownika nie został jeszcze utworzony",
   },

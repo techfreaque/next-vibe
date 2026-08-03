@@ -1,7 +1,7 @@
 import "server-only";
 
-import { cliAuthHandler } from "next-vibe/platforms/cli/auth/cli-handler";
-import { Platform } from "next-vibe/platforms/platforms";
+import { cliAuthHandler } from "../../platforms/cli/auth/cli-handler";
+import { Platform } from "../../platforms/platforms";
 
 import type { BaseAuthHandler } from "./base-auth-handler";
 import { webAuthHandler } from "./next-auth-handler";
@@ -33,7 +33,7 @@ export function getPlatformAuthHandler(platform: Platform): BaseAuthHandler {
 
     default: {
       const _exhaustiveCheck: never = platform;
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Auth factory exhaustiveness check requires throwing for unsupported platforms
+      // eslint-disable-next-line restricted/restricted-syntax, i18next/no-literal-string -- Auth factory exhaustiveness check requires throwing for unsupported platforms
       throw new Error(`Unsupported platform: ${String(_exhaustiveCheck)}`);
     }
   }

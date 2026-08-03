@@ -82,8 +82,7 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Błąd serwera",
-        description:
-          "Budowanie lub wysyłka obrazu Docker nie powiodła się: {{error}}",
+        description: "Budowanie lub wysyłka obrazu Docker nie powiodła się",
       },
       unknown: {
         title: "Nieznany błąd",
@@ -109,7 +108,11 @@ export const translations: typeof enTranslations = {
         pushSuccess: "🚀 Wysłano {{refs}}",
         buildExitCode: "docker buildx zakończył się kodem {{code}}",
         buildKilled: "docker buildx został zabity sygnałem {{signal}}",
+        dockerBuildFailed:
+          "Budowanie obrazu Docker nie powiodło się: {{error}}",
         gitShaFailed: "Nie udało się ustalić bieżącego SHA commita Git",
+        gitShaFailedDetail:
+          "Nie udało się ustalić bieżącego SHA commita Git: {{error}}",
         sshTransferStart: "📡 Przesyłanie {{refs}} do {{target}} przez ssh ...",
         sshTransferSuccess: "🚀 Przesłano {{refs}} do {{target}} przez ssh",
         sshTransferFailed:

@@ -21,7 +21,7 @@ export const forwardLead: ForwardLeadFn = async (credentials, lead, t) => {
   payload.append("merge_fields[email]", email);
   payload.append("merge_fields[nombre]", firstName);
 
-  // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+  // oxlint-disable-next-line restricted/no-raw-fetch
   const response = await fetch(apiContactsUrl, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },

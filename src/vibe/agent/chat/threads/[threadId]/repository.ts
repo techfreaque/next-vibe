@@ -10,7 +10,7 @@ import {
   type CountryLanguage,
   defaultLocale,
 } from "next-vibe/core/i18n/core/config";
-import type { RemoteEventHandlerProps } from "next-vibe/core/route/handler";
+import type { RemoteEventHandlerProps } from "next-vibe/core/route/handler-realtime";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -21,9 +21,9 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { createEndpointEmitter } from "next-vibe/realtime/emitter";
+import { createEndpointEmitter } from "next-vibe/realtime/core/emitter";
 
-import { DefaultFolderId } from "../../config";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { chatFolders, chatThreads } from "../../db";
 import { ThreadStatus, ThreadStreamingState } from "../../enum";
 import { createFolderContentsEmitter } from "../../folder-contents/[rootFolderId]/emitter";
@@ -125,9 +125,10 @@ export class ThreadByIdRepository {
     } catch (error) {
       logger.error("Error getting thread by ID", parseError(error));
       return fail({
-        message: t("get.errors.server.title"),
+        message: t("get.errors.server.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -161,9 +162,8 @@ export class ThreadByIdRepository {
 
       if (!existingThread) {
         return fail({
-          message: t("patch.errors.notFound.title"),
+          message: t("patch.errors.notFound.detail", { threadId }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { threadId },
         });
       }
 
@@ -268,9 +268,10 @@ export class ThreadByIdRepository {
     } catch (error) {
       logger.error("Error updating thread", parseError(error), { threadId });
       return fail({
-        message: t("patch.errors.server.title"),
+        message: t("patch.errors.server.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -310,9 +311,8 @@ export class ThreadByIdRepository {
 
       if (!existingThread) {
         return fail({
-          message: t("delete.errors.notFound.title"),
+          message: t("delete.errors.notFound.detail", { threadId }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { threadId },
         });
       }
 
@@ -378,7 +378,7 @@ export class ThreadByIdRepository {
         }
         try {
           const { removeVirtualNodesByEntityId } =
-            await import("next-vibe/agent/cortex/embeddings/sync-virtual");
+            await import("../../../cortex/embeddings/sync-virtual");
           await removeVirtualNodesByEntityId(ownerId, "/threads", threadId);
           await removeVirtualNodesByEntityId(ownerId, "/uploads", threadId);
           for (const messageId of threadMessageIds) {
@@ -432,9 +432,10 @@ export class ThreadByIdRepository {
     } catch (error) {
       logger.error("Error deleting thread", parseError(error));
       return fail({
-        message: t("delete.errors.server.title"),
+        message: t("delete.errors.server.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -522,8 +523,7 @@ export class ThreadByIdRepository {
         ? (parsed.data.folderId ?? null)
         : null;
       if (mirrorFolderId === null && props.originInstanceId) {
-        const { resolveScaffoldFolderId } =
-          await import("next-vibe/agent/chat/threads/sync-provider");
+        const { resolveScaffoldFolderId } = await import("../sync-provider");
         const senderRootFolderId =
           parsed.data.rootFolderId ?? DefaultFolderId.PRIVATE;
         mirrorFolderId = await resolveScaffoldFolderId(

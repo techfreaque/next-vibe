@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { Platform } from "next-vibe/platforms/platforms";
 import type { JSX } from "react";
 
 import { subscriptionLoader } from "../shared-loader";
@@ -15,6 +16,7 @@ interface PageProps {
 export interface RemotePageData {
   locale: CountryLanguage;
   user: JwtPayloadType;
+  platform: Platform;
 }
 
 export async function tanstackLoader({
@@ -23,16 +25,24 @@ export async function tanstackLoader({
 }: PageProps): Promise<RemotePageData> {
   const { locale } = await params;
   const query = await searchParams;
-  const { locale: l, user } = await subscriptionLoader({
+  const {
+    locale: l,
+    user,
+    platform,
+  } = await subscriptionLoader({
     locale,
     requireAuth: true,
     searchParams: query,
   });
-  return { locale: l, user };
+  return { locale: l, user, platform };
 }
 
-export function TanstackPage({ locale, user }: RemotePageData): JSX.Element {
-  return <RemotePageClient locale={locale} user={user} />;
+export function TanstackPage({
+  locale,
+  user,
+  platform,
+}: RemotePageData): JSX.Element {
+  return <RemotePageClient locale={locale} user={user} platform={platform} />;
 }
 
 export default async function RemotePage({

@@ -8,7 +8,7 @@ import {
   UserPermissionRole,
   UserRoleDB,
   type UserRoleValue,
-} from "next-vibe/identity/roles/enum";
+} from "../roles/enum";
 import { z } from "zod";
 
 /**

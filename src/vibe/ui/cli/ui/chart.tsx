@@ -28,11 +28,17 @@ export function useChart(): ChartContextProps {
 }
 
 import type {
+  AreaProps,
+  AxisProps,
+  BarProps,
   ChartContainerProps,
   ChartContextProps,
   ChartDataPoint,
   ChartLegendContentProps,
+  ChartProps,
   ChartTooltipContentProps,
+  LineProps,
+  PieProps,
 } from "../../web/ui/chart";
 
 export function ChartContainer<TData extends ChartDataPoint = ChartDataPoint>({
@@ -61,27 +67,35 @@ export function ChartLegendContent({
   return <>{children}</>;
 }
 
-export function Chart(): null {
+// Charts have no terminal rendering. These accept the full web prop surface so
+// callers type-check unchanged, and discard it.
+export function Chart(_props: ChartProps): null {
+  void _props;
   return null;
 }
 
-export function Line(): null {
+export function Line(_props: LineProps): null {
+  void _props;
   return null;
 }
 
-export function Bar(): null {
+export function Bar(_props: BarProps): null {
+  void _props;
   return null;
 }
 
-export function Area(): null {
+export function Area(_props: AreaProps): null {
+  void _props;
   return null;
 }
 
-export function Pie(): null {
+export function Pie(_props: PieProps): null {
+  void _props;
   return null;
 }
 
-export function Axis(): null {
+export function Axis(_props: AxisProps): null {
+  void _props;
   return null;
 }
 

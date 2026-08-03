@@ -1,8 +1,8 @@
 import "server-only";
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
-import { success } from "next-vibe/core/route/response.schema";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import type { ResponseType } from "../../../core/route/response.schema";
+import { success } from "../../../core/route/response.schema";
 
 import { ensureProvidersRegistered, getSyncProviders } from "../provider";
 import type { SyncProvidersGetResponseOutput } from "./definition";

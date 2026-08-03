@@ -4,9 +4,9 @@
  * Used by both React and CLI implementations
  */
 
-import type { FieldDataType } from "next-vibe/core/definition/enums";
-import type { TParams } from "next-vibe/core/i18n/core/static-types";
-import type { WidgetData } from "next-vibe/core/utils/json";
+import type { FieldDataType } from "../../../../core/definition/enums";
+import type { TParams } from "../../../../core/i18n/core/static-types";
+import type { WidgetData } from "../../../../core/utils/json";
 import type z from "zod";
 
 import type { TextFormat, TextWidgetSchema } from "./types";

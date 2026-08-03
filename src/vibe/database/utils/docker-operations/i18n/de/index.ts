@@ -60,15 +60,15 @@ export const translations: typeof enTranslations = {
       description: "Docker-Befehl hat Timeout-Limit überschritten",
     },
     executionFailed: {
-      title: "Ausführung fehlgeschlagen",
+      title: "Ausführung fehlgeschlagen: {{error}}",
       description: "Docker-Befehlsausführung fehlgeschlagen",
     },
     composeDownFailed: {
-      title: "Compose Down fehlgeschlagen",
+      title: "Compose Down fehlgeschlagen: {{error}}",
       description: "Docker Compose Down-Operation fehlgeschlagen",
     },
     composeUpFailed: {
-      title: "Compose Up fehlgeschlagen",
+      title: "Compose Up fehlgeschlagen: {{error}}",
       description: "Docker Compose Up-Operation fehlgeschlagen",
     },
   },

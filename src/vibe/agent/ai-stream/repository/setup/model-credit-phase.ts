@@ -4,9 +4,9 @@
  */
 import "server-only";
 
-import { agentEnv } from "next-vibe/agent/env";
-import { buildMissingKeyMessage } from "next-vibe/agent/env-availability";
-import { ApiProvider } from "next-vibe/agent/models/models";
+import { agentEnv } from "../../../env";
+import { buildMissingKeyMessage } from "../../../env-availability";
+import { ApiProvider } from "../../../models/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,

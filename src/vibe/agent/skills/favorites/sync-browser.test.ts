@@ -342,10 +342,10 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
      */
     async function cleanCareerCoachOnAtlasApi(): Promise<void> {
       const favListDef = (
-        await import("next-vibe/agent/skills/favorites/definition")
+        await import("./definition")
       ).default;
       const favDelDef = (
-        await import("next-vibe/agent/skills/favorites/[id]/definition")
+        await import("./[id]/definition")
       ).default;
       const list = await sendTestRequest({
         toolExecutionContext: undefined,

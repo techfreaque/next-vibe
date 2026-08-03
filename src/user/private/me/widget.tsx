@@ -1,6 +1,5 @@
 "use client";
 
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import skillsDef from "next-vibe/agent/skills/definition";
 import { SkillOwnershipType } from "next-vibe/agent/skills/enum";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
@@ -173,7 +172,6 @@ export function MeDeleteWidget(): JSX.Element {
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
-  const availability = useProviderAvailability();
   const t = useWidgetTranslation<typeof meDefinition.DELETE>();
   const { pop } = useWidgetNavigation();
   const [confirmText, setConfirmText] = useState("");
@@ -198,7 +196,6 @@ export function MeDeleteWidget(): JSX.Element {
       undefined,
       undefined,
       locale,
-      availability,
     );
 
     if (result.success) {
@@ -210,7 +207,7 @@ export function MeDeleteWidget(): JSX.Element {
       setIsDeleting(false);
       setDeleteError(result.message ?? t("delete.errors.internal.title"));
     }
-  }, [user, logger, locale, availability, canDelete, isDeleting, t]);
+  }, [user, logger, locale, canDelete, isDeleting, t]);
 
   const deletedItems = [
     t("widget.deleteAccount.items.profile"),
@@ -442,7 +439,6 @@ function AvatarUploadButton({
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
-  const availability = useProviderAvailability();
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
@@ -462,7 +458,6 @@ function AvatarUploadButton({
           { fileUpload: { file } },
           undefined,
           locale,
-          availability,
         );
         setUploading(false);
         if (result.success && result.data.response?.avatarUrl) {
@@ -470,7 +465,7 @@ function AvatarUploadButton({
         }
       })();
     },
-    [user, logger, locale, availability, onUploaded],
+    [user, logger, locale, onUploaded],
   );
 
   const displayUrl = previewUrl ?? avatarUrl;

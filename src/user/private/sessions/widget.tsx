@@ -1,6 +1,5 @@
 "use client";
 
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import { Alert, AlertDescription } from "next-vibe/ui/ui/alert";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -40,7 +39,6 @@ export function UserSessionsContainer(): JSX.Element {
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
-  const availability = useProviderAvailability();
   const [revoking, setRevoking] = useState<string | null>(null);
   const [revokeError, setRevokeError] = useState<string | null>(null);
 
@@ -55,7 +53,6 @@ export function UserSessionsContainer(): JSX.Element {
         undefined,
         { id: session.id },
         locale,
-        availability,
       );
       setRevoking(null);
       if (!result.success) {

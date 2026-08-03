@@ -52,6 +52,8 @@ export const translations: typeof enTranslations = {
       server: {
         title: "Błąd serwera",
         description: "Wystąpił wewnętrzny błąd serwera",
+        compileFailed: "Kompilacja Electron nie powiodła się: {{error}}",
+        startFailed: "Uruchomienie Electron nie powiodło się: {{error}}",
       },
       unknown: {
         title: "Nieznany błąd",

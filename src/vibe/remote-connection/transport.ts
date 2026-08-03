@@ -11,12 +11,12 @@
 
 import "server-only";
 
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { Methods } from "next-vibe/core/definition/enums";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
-import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
+import type { CreateApiEndpointAny } from "../core/definition/endpoint-base";
+import { Methods } from "../core/definition/enums";
+import type { CountryLanguage } from "../core/i18n/core/config";
+import type { ResponseType } from "../core/route/response.schema";
+import { ErrorResponseTypes, fail } from "../core/route/response.schema";
+import type { WidgetData } from "../core/utils/json";
 
 import { BEARER_LEAD_ID_SEPARATOR, LEAD_ID_COOKIE_NAME } from "@/env/constants";
 
@@ -73,7 +73,7 @@ export class RemoteTransport {
       headers["Cookie"] = `${LEAD_ID_COOKIE_NAME}=${leadId}`;
     }
     try {
-      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- the ONE sanctioned remote raw-HTTP primitive; all other remote calls use runInProcessTyped
+      // oxlint-disable-next-line restricted/no-raw-fetch -- the ONE sanctioned remote raw-HTTP primitive; all other remote calls use runInProcessTyped
       const response = await fetch(fullUrl, {
         method,
         headers,

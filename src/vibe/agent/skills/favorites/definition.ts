@@ -3,17 +3,15 @@
  * Defines endpoint for listing user favorites
  */
 
-import {
-  ChatModelId,
-  chatModelSelectionSchema,
-} from "next-vibe/agent/ai-stream/models";
-import { DEFAULT_TTS_VOICE_ID } from "next-vibe/agent/text-to-speech/constants";
+import { ChatModelId, chatModelSelectionSchema } from "../../ai-stream/models";
+import { DEFAULT_TTS_VOICE_ID } from "../../text-to-speech/constants";
+import { getClientAvailability } from "../../env-availability-store";
 import {
   TtsModelId,
   voiceModelSelectionSchema,
-} from "next-vibe/agent/text-to-speech/models";
+} from "../../text-to-speech/models";
 import { iconSchema } from "next-vibe/core/definition/common.schema";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -340,13 +338,7 @@ const { GET } = createEndpoint({
       operation: "merge" as const,
       allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
       payloadType: favoriteCreatedPayloadSchema,
-      onEvent: async ({
-        payload: rawPayload,
-        logger,
-        locale,
-        user,
-        agentEnvAvailability,
-      }) => {
+      onEvent: async ({ payload: rawPayload, logger, locale, user }) => {
         // Explicit envelope parse (see favoriteCreatedPayloadSchema above).
         const payload = favoriteCreatedPayloadSchema.parse(rawPayload);
         const [
@@ -406,7 +398,7 @@ const { GET } = createEndpoint({
           payload.voiceModelSelection ?? null,
           locale,
           user,
-          agentEnvAvailability,
+          getClientAvailability(),
         );
 
         // View 1 — favorites list: append if not already present.

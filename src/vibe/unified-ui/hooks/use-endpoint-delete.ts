@@ -3,14 +3,14 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import type {
   ErrorResponseType,
   ResponseType,
-} from "next-vibe/core/route/response.schema";
-import type { DeepPartial } from "next-vibe/core/utils/type-utils";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../core/route/response.schema";
+import type { DeepPartial } from "../../core/utils/type-utils";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
 import { useCallback, useEffect, useMemo } from "react";
 import type { DefaultValues, UseFormReturn } from "react-hook-form";
 import { useForm } from "react-hook-form";

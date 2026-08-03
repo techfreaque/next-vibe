@@ -4,7 +4,7 @@
  */
 
 import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
-import { AgentAvailabilityProvider } from "next-vibe/agent/env-availability-context";
+import { AgentAvailabilityProvider } from "next-vibe/agent/env-availability-store";
 import { TranslationProvider } from "next-vibe/core/i18n/core/client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { LoggerProvider } from "next-vibe/ui/hooks/logger-provider";
@@ -35,7 +35,7 @@ export function RootProviders({
         enableSystem={false}
       >
         <TranslationProvider currentLocale={locale}>
-          <LoggerProvider locale={locale} availability={availability}>
+          <LoggerProvider locale={locale}>
             <AgentAvailabilityProvider availability={availability}>
               <ErrorBoundary locale={locale}>{children}</ErrorBoundary>
               <LeadTrackingProvider />

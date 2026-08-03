@@ -50,7 +50,7 @@ export async function fetchStorageFileAsBase64(
   url: string,
   user?: JwtPayloadType,
   /** Fixture-aware fetch when called inside a stream; defaults to live fetch. */
-  // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- live-fetch default for callers without a fixture chain
+  // oxlint-disable-next-line restricted/restricted-syntax -- live-fetch default for callers without a fixture chain
   fetchImpl: typeof globalThis.fetch = fetch,
 ): Promise<string | null> {
   const parsed = parseStorageUrl(url);

@@ -24,7 +24,7 @@ import { scopedTranslation } from "./signup-nurture/i18n";
 /**
  * Signup Nurture - Initial Contact
  */
-export const signupNurtureInitialEmail: EmailTemplateFunction = ({
+export const signupNurtureInitialEmail: EmailTemplateFunction = async ({
   data,
   locale,
   tracking,
@@ -47,7 +47,7 @@ export const signupNurtureInitialEmail: EmailTemplateFunction = ({
 
       <HumanText variant="body">
         {t("initial.modelChoice", {
-          modelCount: getAvailableModelCount(false, getEnvAvailability()),
+          modelCount: getAvailableModelCount(false, await getEnvAvailability()),
         })}
       </HumanText>
 

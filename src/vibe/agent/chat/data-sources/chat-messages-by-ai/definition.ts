@@ -3,7 +3,7 @@
  * Client+server safe. No server imports.
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import { EndpointErrorTypes, Methods } from "next-vibe/core/definition/enums";
 import { dataSourceWidget } from "next-vibe/dataflow/shared/fields";
 import { UserRole } from "next-vibe/identity/roles/enum";

@@ -2,11 +2,8 @@
  * Shared utility for loading message attachments
  */
 
-import type { ChatMessage } from "next-vibe/agent/chat/db";
-import {
-  base64ToFile,
-  urlToFile,
-} from "next-vibe/agent/chat/incognito/file-utils";
+import type { ChatMessage } from "../../../../db";
+import { base64ToFile, urlToFile } from "../../../../incognito/file-utils";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 export async function loadMessageAttachments(

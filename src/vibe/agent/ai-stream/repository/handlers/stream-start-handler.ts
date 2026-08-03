@@ -5,9 +5,9 @@
 import "server-only";
 
 import type { ModelMessage, ToolResultPart } from "ai";
-import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
-import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
-import type { VoiceModelSelection } from "next-vibe/agent/text-to-speech/models";
+import type { ToolExecutionContext } from "../../../../core/execution-context";
+import type { AgentEnvAvailability } from "../../../env-availability";
+import type { VoiceModelSelection } from "../../../text-to-speech/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";

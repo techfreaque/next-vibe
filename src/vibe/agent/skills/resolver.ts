@@ -9,11 +9,11 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
-import { getBestChatModel } from "next-vibe/agent/ai-stream/models";
-import type { BridgeSkill } from "next-vibe/agent/ai-stream/repository/core/modality-resolver";
-import { isUuid, parseSkillId } from "next-vibe/agent/chat/slugify";
-import { getInstanceAvailability } from "next-vibe/agent/env-availability";
+import type { ChatModelId } from "../ai-stream/models";
+import { getBestChatModel } from "../ai-stream/models";
+import type { BridgeSkill } from "../ai-stream/repository/core/modality-resolver";
+import { isUuid, parseSkillId } from "../chat/slugify";
+import { getEnvAvailability } from "../env-availability";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -321,7 +321,7 @@ export async function resolveFavorite(
   }
 
   const skill = favorite.skillId || NO_SKILL_ID;
-  const availability = await getInstanceAvailability();
+  const availability = await getEnvAvailability();
 
   const sel = favorite.modelSelection;
 

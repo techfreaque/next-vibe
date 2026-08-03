@@ -33,6 +33,7 @@ export const translations = {
       network: {
         title: "Network Error",
         description: "Network error occurred while connecting to database",
+        detail: "Database ping failed: {{error}}",
       },
       forbidden: {
         title: "Forbidden",

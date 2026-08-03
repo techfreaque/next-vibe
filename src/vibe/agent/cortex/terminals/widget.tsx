@@ -43,7 +43,7 @@ export function CortexTerminalsWidget(_props: {
 
   const navToExec = (): void => {
     void (async (): Promise<void> => {
-      const def = await import("next-vibe/agent/cortex/exec/definition");
+      const def = await import("../exec/definition");
       navigate(def.default.POST, {});
     })();
   };
@@ -66,7 +66,7 @@ export function CortexTerminalsWidget(_props: {
     (e: ButtonMouseEvent): void => {
       e.stopPropagation();
       void (async (): Promise<void> => {
-        const def = await import("next-vibe/agent/cortex/exec/definition");
+        const def = await import("../exec/definition");
         navigate(def.default.POST, {
           data: {
             path: `/ssh/${connectionSlug}`,

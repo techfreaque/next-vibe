@@ -7,12 +7,31 @@
 
 import "server-only";
 
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { GenericHandlerBase } from "next-vibe/core/route/handler";
+import { join } from "node:path";
+import { pathToFileURL } from "node:url";
+
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
+import type { GenericHandlerBase } from "../../core/route/handler";
+
+import { getSrcDir } from "@/env/paths";
+
+/**
+ * Build a cache-busted file:// URL for a generated path relative to the source root.
+ *
+ * The hot-paths maps store relative paths so they stay valid across checkouts;
+ * the source root is re-derived here at runtime. `pathToFileURL` rather than a
+ * `file://` template: on Windows the latter yields "file://C:/...", which
+ * parses "C:" as the URL host and fails to import.
+ */
+function toFreshUrl(relPath: string): string {
+  const url = pathToFileURL(join(getSrcDir(), relPath));
+  url.searchParams.set("t", String(Date.now()));
+  return url.href;
+}
 
 /**
  * Import a route handler fresh (cache-busted) by tool name.
- * Uses absolute filesystem paths so no bundler alias resolution is needed at runtime.
+ * Resolves to an absolute path at runtime so no bundler alias resolution is needed.
  */
 export async function getRouteHandlerFresh(
   toolName: string,
@@ -22,8 +41,8 @@ export async function getRouteHandlerFresh(
   if (!entry) {
     return null;
   }
-  // Construct file:// URL at runtime - bundler cannot statically trace this
-  const url = `file://${entry.absPath}?t=${Date.now()}`;
+  // Constructed at runtime - bundler cannot statically trace this
+  const url = toFreshUrl(entry.relPath);
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const mod = await import(/* webpackIgnore: true */ /* @vite-ignore */ url);
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -32,7 +51,7 @@ export async function getRouteHandlerFresh(
 
 /**
  * Import an endpoint definition fresh (cache-busted) by tool name.
- * Uses absolute filesystem paths so no bundler alias resolution is needed at runtime.
+ * Resolves to an absolute path at runtime so no bundler alias resolution is needed.
  */
 export async function getEndpointFresh(
   toolName: string,
@@ -42,7 +61,7 @@ export async function getEndpointFresh(
   if (!entry) {
     return null;
   }
-  const url = `file://${entry.absPath}?t=${Date.now()}`;
+  const url = toFreshUrl(entry.relPath);
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const mod = await import(/* webpackIgnore: true */ /* @vite-ignore */ url);
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access

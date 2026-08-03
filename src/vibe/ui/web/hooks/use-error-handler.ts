@@ -1,6 +1,6 @@
 "use client";
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
 import { useEffect } from "react";
 
 import { useLogger } from "./use-logger";

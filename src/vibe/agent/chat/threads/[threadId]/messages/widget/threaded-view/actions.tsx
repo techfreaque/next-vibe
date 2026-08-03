@@ -1,9 +1,9 @@
 "use client";
-import type { ChatMessage } from "next-vibe/agent/chat/db";
+import type { ChatMessage } from "../../../../../db";
 import {
   type ChatNavigationState,
   useChatNavigationStore,
-} from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
+} from "../../../../../hooks/use-chat-navigation-store";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { getElementById } from "next-vibe/ui/lib/dom";
@@ -99,8 +99,7 @@ export function ThreadedMessageActions({
 
   const handleDelete = (): void => {
     void (async (): Promise<void> => {
-      const messageIdDefs =
-        await import("next-vibe/agent/chat/threads/[threadId]/messages/[messageId]/definition");
+      const messageIdDefs = await import("../../[messageId]/definition");
       navigate(messageIdDefs.default.DELETE, {
         urlPathParams: { threadId: message.threadId, messageId: message.id },
         data: rootFolderId ? { rootFolderId } : undefined,

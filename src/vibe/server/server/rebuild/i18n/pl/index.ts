@@ -46,9 +46,13 @@ export const translations: typeof enTranslations = {
         "Vibe check: {{errors}} błędów, {{warnings}} ostrzeżeń. Użyj 'vibe check' lub MCP check tool po szczegóły.",
       vibeCheckError: "Vibe check nie powiódł się: {{error}}",
       buildFailed: "Build Next.js nie powiódł się: {{error}}",
+      buildOom:
+        "Build Next.js przerwany przez system (prawdopodobnie brak pamięci) - sygnał: {{signal}}",
+      buildExitCode: "Build Next.js zakończył się kodem {{code}}",
       migrationFailed: "Migracja nie powiodła się: {{error}}",
       seedingFailed: "Seeding nie powiódł się: {{error}}",
       restartFailed: "Restart serwera nie powiódł się: {{error}}",
+      unknownError: "nieznany błąd",
       noPidFile: "Nie znaleziono pliku .vibe-pid - czy vibe start działa?",
       invalidPid: "Nieprawidłowy PID w .vibe-pid: {{pid}}",
       processNotRunning: "Proces {{pid}} nie działa",
@@ -78,6 +82,9 @@ export const translations: typeof enTranslations = {
       server: {
         title: "Błąd serwera",
         description: "Wystąpił wewnętrzny błąd serwera podczas przebudowy",
+        buildFailed: "Build nie powiódł się: {{error}}",
+        migrationsFailed: "Migracje nie powiodły się: {{error}}",
+        rebuildFailed: "Przebudowa nie powiodła się: {{error}}",
       },
       unknown: {
         title: "Nieznany błąd",

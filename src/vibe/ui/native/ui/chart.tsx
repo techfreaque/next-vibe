@@ -1,9 +1,9 @@
 "use client";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import { Text, View } from "react-native";
 
-import { convertCSSToViewStyle } from "../../native/utils/style-converter";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 import type {
   AreaProps,
   AxisProps,
@@ -35,7 +35,7 @@ export function useChart<
   const context = React.useContext(ChartContext);
 
   if (!context) {
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Standard React context hook pattern - throw is correct for developer mistakes
+    // oxlint-disable-next-line restricted/restricted-syntax -- Standard React context hook pattern - throw is correct for developer mistakes
     // eslint-disable-next-line i18next/no-literal-string -- Error handling for context
     throw new Error("useChart must be used within a <ChartContainer />");
   }
@@ -187,13 +187,13 @@ export function ChartLegendContent({
 ChartLegendContent.displayName = "ChartLegendContent";
 
 // Lazy load Victory Native components to avoid Skia initialization errors
-// eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Victory Native props are dynamic
+// eslint-disable-next-line restricted/restricted-syntax -- Victory Native props are dynamic
 type VictoryPropsType = Record<
   string,
   | string
   | number
   | boolean
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Chart library type definition requires generic object type for flexible configuration
+  // eslint-disable-next-line restricted/restricted-syntax -- Chart library type definition requires generic object type for flexible configuration
   | object
   | React.ReactNode
   | React.ReactElement

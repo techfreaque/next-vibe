@@ -99,30 +99,40 @@ export const translations: typeof enTranslations = {
 
   errors: {
     userNotFound: {
+      detail: "Nie znaleziono konta dla użytkownika {{userId}}",
       title: "Użytkownik nie znaleziony",
       description: "Nie można znaleźć określonego użytkownika",
     },
     customerCreationFailed: {
+      detail:
+        "Nie udało się utworzyć konta klienta NOWPayments: {{error}} (użytkownik {{userId}})",
       title: "Tworzenie klienta nie powiodło się",
-      description: "Nie udało się utworzyć klienta NOWPayments: {error}",
+      description: "Nie udało się utworzyć klienta NOWPayments: {{error}}",
     },
     productNotFound: {
+      detail: "Produkt {{productId}} nie istnieje",
       title: "Produkt nie znaleziony",
-      description: "Nie można znaleźć określonego produktu: {productId}",
+      description: "Nie można znaleźć określonego produktu: {{productId}}",
     },
     userEmailRequired: {
       title: "Wymagany e-mail użytkownika",
-      description: "E-mail użytkownika jest wymagany dla subskrypcji: {userId}",
+      description:
+        "E-mail użytkownika jest wymagany dla subskrypcji: {{userId}}",
     },
     checkoutCreationFailed: {
+      detail: "Nie udało się rozpocząć płatności kryptowalutą: {{error}}",
       title: "Tworzenie checkout nie powiodło się",
-      description: "Nie udało się utworzyć sesji checkout NOWPayments: {error}",
+      description:
+        "Nie udało się utworzyć sesji checkout NOWPayments: {{error}}",
     },
     invoiceCreationFailed: {
+      detail: "Nie udało się utworzyć faktury NOWPayments: {{error}}",
       title: "Tworzenie faktury nie powiodło się",
-      description: "Nie udało się utworzyć faktury NOWPayments: {error}",
+      description: "Nie udało się utworzyć faktury NOWPayments: {{error}}",
     },
     invalidApiKey: {
+      detail:
+        "Nieprawidłowy klucz API NOWPayments. Sprawdź NOWPAYMENTS_API_KEY w swoim środowisku i potwierdź klucz na https://nowpayments.io/app/dashboard",
       title: "Nieprawidłowy klucz API",
       description:
         "Nieprawidłowy klucz API NOWPayments. Sprawdź swoją konfigurację i upewnij się, że masz prawidłowy klucz API z https://nowpayments.io/app/dashboard",
@@ -130,24 +140,27 @@ export const translations: typeof enTranslations = {
     planCreationFailed: {
       title: "Tworzenie planu nie powiodło się",
       description:
-        "Nie udało się utworzyć planu subskrypcji NOWPayments: {error}",
+        "Nie udało się utworzyć planu subskrypcji NOWPayments: {{error}}",
     },
     subscriptionCreationFailed: {
       title: "Tworzenie subskrypcji nie powiodło się",
-      description: "Nie udało się utworzyć subskrypcji NOWPayments: {error}",
+      description: "Nie udało się utworzyć subskrypcji NOWPayments: {{error}}",
     },
     subscriptionRetrievalFailed: {
+      detail: "Nie udało się pobrać subskrypcji NOWPayments: {{error}}",
       title: "Pobieranie subskrypcji nie powiodło się",
-      description: "Nie udało się pobrać subskrypcji NOWPayments: {error}",
+      description: "Nie udało się pobrać subskrypcji NOWPayments: {{error}}",
     },
     subscriptionCancellationFailed: {
+      detail: "Nie udało się anulować subskrypcji NOWPayments: {{error}}",
       title: "Anulowanie subskrypcji nie powiodło się",
-      description: "Nie udało się anulować subskrypcji NOWPayments: {error}",
+      description: "Nie udało się anulować subskrypcji NOWPayments: {{error}}",
     },
     subscriptionListFailed: {
+      detail: "Nie udało się pobrać listy subskrypcji NOWPayments: {{error}}",
       title: "Pobieranie listy subskrypcji nie powiodło się",
       description:
-        "Nie udało się pobrać listy subskrypcji NOWPayments: {error}",
+        "Nie udało się pobrać listy subskrypcji NOWPayments: {{error}}",
     },
     notConfigured: {
       title: "NOWPayments nie jest skonfigurowany",
@@ -155,14 +168,17 @@ export const translations: typeof enTranslations = {
         "NOWPayments nie jest skonfigurowany - ustaw NOWPAYMENTS_API_KEY i NOWPAYMENTS_IPN_SECRET w pliku .env",
     },
     webhookVerificationFailed: {
+      detail: "Nie udało się zweryfikować webhooka NOWPayments: {{error}}",
+      invalidSignature: "Podpis webhooka nie zgadza się",
       title: "Weryfikacja webhooka nie powiodła się",
       description:
-        "Nie udało się zweryfikować podpisu webhooka NOWPayments: {error}",
+        "Nie udało się zweryfikować podpisu webhooka NOWPayments: {{error}}",
     },
     paymentStatusFailed: {
+      detail: "Nie udało się pobrać statusu płatności z NOWPayments: {{error}}",
       title: "Pobieranie statusu płatności nie powiodło się",
       description:
-        "Nie udało się pobrać statusu płatności z NOWPayments: {error}",
+        "Nie udało się pobrać statusu płatności z NOWPayments: {{error}}",
     },
   },
 

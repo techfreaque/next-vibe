@@ -3,15 +3,16 @@
 import {
   type ChatT,
   scopedTranslation as chatScopedTranslation,
-} from "next-vibe/agent/chat/i18n";
-import { useTourState } from "next-vibe/agent/chat/tour-state";
-import favoritesEndpoint from "next-vibe/agent/skills/favorites/definition";
-import { useChatFavorites } from "next-vibe/agent/skills/favorites/hooks/hooks";
+} from "../../../../chat/i18n";
+import { useTourState } from "../../../../chat/tour-state";
+import favoritesEndpoint from "../../../../skills/favorites/definition";
+import { useChatFavorites } from "../../../../skills/favorites/hooks/hooks";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Div } from "next-vibe/ui/ui/div";
 import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetLogger,
+  useWidgetPlatform,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
@@ -46,6 +47,7 @@ function LoadingSpinner({ t }: { t: ChatT }): JSX.Element {
 export function SelectorContent({ locale }: SelectorContentProps): JSX.Element {
   const user = useWidgetUser();
   const logger = useWidgetLogger();
+  const platform = useWidgetPlatform();
   const { t } = chatScopedTranslation.scopedT(locale);
   const setOnboardingComplete = useTourState((s) => s.setOnboardingComplete);
   const setOnboardingCompanionId = useTourState(
@@ -107,6 +109,7 @@ export function SelectorContent({ locale }: SelectorContentProps): JSX.Element {
       locale={locale}
       user={user}
       logger={logger}
+      platform={platform}
     />
   );
 }

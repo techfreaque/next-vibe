@@ -3,6 +3,7 @@
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { Platform } from "next-vibe/platforms/platforms";
 import { useRouter, useSearchParams } from "next-vibe/ui/hooks/use-navigation";
 import { Alert, AlertDescription, AlertTitle } from "next-vibe/ui/ui/alert";
 import { Container } from "next-vibe/ui/ui/container";
@@ -22,6 +23,7 @@ interface Props {
   locale: CountryLanguage;
   user: JwtPayloadType;
   initialCredits: CreditsGetResponseOutput | null;
+  platform: Platform;
 }
 
 const PATH_TO_TAB: Record<string, string> = {
@@ -67,6 +69,7 @@ export function OverviewPageClient({
   locale,
   user,
   initialCredits,
+  platform,
 }: Props): JSX.Element {
   const router = useRouter();
 
@@ -96,6 +99,7 @@ export function OverviewPageClient({
         endpoint={creditsDefinition}
         user={user}
         locale={locale}
+        platform={platform}
         endpointOptions={{
           read: {
             initialData: initialCredits ?? undefined,

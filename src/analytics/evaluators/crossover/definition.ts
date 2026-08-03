@@ -5,7 +5,7 @@
  * Fires when series A crosses above series B.
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   LayoutType,

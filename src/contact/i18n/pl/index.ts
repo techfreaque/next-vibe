@@ -122,7 +122,12 @@ export const translations: typeof enTranslations = {
       description:
         "Nie można obecnie przetworzyć Twojego formularza kontaktowego. Spróbuj ponownie później.",
     },
-    repositoryCreateFailed: "Nie udało się utworzyć żądania kontaktu",
+    repositoryCreateFailed:
+      "Nie udało się utworzyć żądania kontaktu: {{error}}",
+    repositoryCreateFailedForEmail:
+      "Nie udało się utworzyć żądania kontaktu dla {{email}}",
+    repositoryCreateFailedWithDetails:
+      "Nie udało się utworzyć żądania kontaktu: {{error}}. {{details}}",
     repositoryCreateDetails:
       "Nie można obecnie przetworzyć Twojego formularza kontaktowego. Spróbuj ponownie później.",
     noContactReturned: "Po utworzeniu nie zwrócono rekordu kontaktu",

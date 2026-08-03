@@ -58,6 +58,7 @@ export const translations = {
       notFound: {
         title: "Nicht gefunden",
         description: "Creator nicht gefunden",
+        detail: "Für {{userId}} existiert kein Creator-Profil",
       },
       conflict: { title: "Konflikt", description: "Anfragenkonflikt" },
       network: { title: "Netzwerkfehler", description: "Netzwerkfehler" },
@@ -65,7 +66,11 @@ export const translations = {
         title: "Ungespeicherte Aenderungen",
         description: "Ungespeicherte Aenderungen",
       },
-      internal: { title: "Serverfehler", description: "Interner Fehler" },
+      internal: {
+        title: "Serverfehler",
+        description: "Interner Fehler",
+        detail: "Creator-Profil konnte nicht geladen werden: {{error}}",
+      },
       unknown: {
         title: "Unbekannter Fehler",
         description: "Unbekannter Fehler",

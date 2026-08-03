@@ -2,15 +2,15 @@
  * Pagination Widget Type Definitions
  */
 
-import type { SpacingSize } from "next-vibe/core/definition/enums";
-import { FieldDataType, WidgetType } from "next-vibe/core/definition/enums";
-import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
+import type { SpacingSize } from "../../../../core/definition/enums";
+import { FieldDataType, WidgetType } from "../../../../core/definition/enums";
+import type { TranslatedKeyType } from "../../../../core/i18n/core/scoped-translation";
 import type {
   BaseObjectWidgetConfig,
   FieldUsageConfig,
-} from "next-vibe/unified-ui/_shared/types";
-import type { TextWidgetConfig } from "next-vibe/unified-ui/widgets/display-only/text/types";
-import type { NumberFieldWidgetConfig } from "next-vibe/unified-ui/widgets/form-fields/number-field/types";
+} from "../../../_shared/types";
+import type { TextWidgetConfig } from "../../display-only/text/types";
+import type { NumberFieldWidgetConfig } from "../../form-fields/number-field/types";
 import z from "zod";
 
 export function paginationField(config?: {

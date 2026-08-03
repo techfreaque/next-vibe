@@ -462,6 +462,7 @@ export const translations: typeof enTranslations = {
     serverError: {
       title: "Serverfehler",
       description: "Interner Serverfehler aufgetreten",
+      detail: "Auf unserer Seite ist etwas schiefgelaufen: {{error}}",
     },
     unknown: {
       title: "Unbekannter Fehler",

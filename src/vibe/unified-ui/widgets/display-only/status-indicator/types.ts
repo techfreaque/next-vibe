@@ -2,15 +2,15 @@
  * Status Indicator Widget Type Definitions
  */
 
-import type { WidgetType } from "next-vibe/core/definition/enums";
+import type { WidgetType } from "../../../../core/definition/enums";
 import type {
   EnumWidgetSchema,
   StringWidgetSchema,
-} from "next-vibe/unified-ui/_shared/schema-constraints";
+} from "../../../_shared/schema-constraints";
 import type {
   BasePrimitiveWidgetConfig,
   FieldUsageConfig,
-} from "next-vibe/unified-ui/_shared/types";
+} from "../../../_shared/types";
 
 /**
  * Status indicator schema - must be a string or enum

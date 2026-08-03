@@ -220,7 +220,10 @@ export const translations: typeof enTranslations = {
     conflict: {
       title: "Kontokonflikt",
       description: "Ein Konto mit dieser E-Mail existiert bereits",
+      detail:
+        "Für diese E-Mail-Adresse besteht bereits ein Konto. Melden Sie sich stattdessen an.",
     },
+    userNotFound: "Kein Konto für {{email}} gefunden",
     forbidden: {
       title: "Zugriff verweigert",
       description: "Zugriff verweigert",
@@ -238,7 +241,7 @@ export const translations: typeof enTranslations = {
       description: "Sie haben nicht gespeicherte Änderungen",
     },
     internal: {
-      title: "Interner Fehler",
+      title: "Registrierung für {{email}} fehlgeschlagen: {{error}}",
       description: "Ein interner Fehler ist aufgetreten",
     },
   },
@@ -269,7 +272,7 @@ export const translations: typeof enTranslations = {
         description: "Bitte geben Sie eine gültige E-Mail-Adresse ein",
       },
       internal: {
-        title: "E-Mail-Prüfungsfehler",
+        title: "Prüfung von {{email}} fehlgeschlagen: {{error}}",
         description: "Fehler bei der Überprüfung der E-Mail-Verfügbarkeit",
       },
       unknown: {

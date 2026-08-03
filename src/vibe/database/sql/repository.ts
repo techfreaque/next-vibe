@@ -3,15 +3,15 @@
  * Handles SQL query execution with safety features
  */
 
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { ResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { SqlT } from "next-vibe/database/sql/i18n";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../core/route/response.schema";
+import { parseError } from "../../core/utils/parse-error";
+import type { SqlT } from "./i18n";
+import type { EndpointLogger } from "../../logger/types";
 
 import { db } from "..";
 import type { SqlRequestOutput, SqlResponseOutput } from "./definition";

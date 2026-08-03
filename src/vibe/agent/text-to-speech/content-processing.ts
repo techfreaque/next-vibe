@@ -3,7 +3,7 @@
  * Utilities for preparing message content for text-to-speech
  */
 
-import type { ChatMessage } from "next-vibe/agent/chat/db";
+import type { ChatMessage } from "../chat/db";
 import { definitionLoader } from "next-vibe/core/definition/loader";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";

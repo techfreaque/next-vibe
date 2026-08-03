@@ -388,6 +388,7 @@ export const translations: typeof enTranslations = {
     server: {
       title: "Błąd serwera",
       description: "Nie można wygenerować statystyk z powodu błędu serwera",
+      detail: "Nie udało się zbudować statystyk użytkowników: {{error}}",
     },
     unknown: {
       title: "Nieznany błąd",

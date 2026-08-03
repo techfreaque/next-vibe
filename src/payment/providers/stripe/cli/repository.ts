@@ -29,11 +29,10 @@ export class CliStripeRepository {
 
     if (!CliStripeRepository.isStripeCLIInstalled()) {
       return fail({
-        message: t("status.not_installed"),
-        errorType: ErrorResponseTypes.NOT_FOUND,
-        messageParams: {
+        message: t("status.not_installed", {
           instructions: CliStripeRepository.getStripeCLIInstallInstructions(),
-        },
+        }),
+        errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
 
@@ -53,9 +52,10 @@ export class CliStripeRepository {
     } catch (error) {
       logger.error("Error running Stripe CLI listener:", parseError(error));
       return fail({
-        message: t("errors.serverError.title"),
+        message: t("errors.serverError.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -138,9 +138,10 @@ export class CliStripeRepository {
       });
     } catch (error) {
       return fail({
-        message: t("errors.serverError.title"),
+        message: t("errors.serverError.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
 

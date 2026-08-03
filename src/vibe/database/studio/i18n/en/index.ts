@@ -26,6 +26,7 @@ export const translations = {
       server: {
         title: "Server Error",
         description: "Internal server error during studio launch",
+        detail: "Drizzle Studio failed to start after {{seconds}}s: {{error}}",
       },
       internal: {
         title: "Internal Error",

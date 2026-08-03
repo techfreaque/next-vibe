@@ -361,6 +361,9 @@ export const translations: typeof enTranslations = {
     server: {
       title: "Serverfehler",
       description: "Anfrage konnte nicht verarbeitet werden",
+      detail_get: "Konto konnte nicht geladen werden: {{error}}",
+      detail_update: "Konto konnte nicht gespeichert werden: {{error}}",
+      detail_delete: "Konto konnte nicht gelöscht werden: {{error}}",
     },
     networkError: {
       title: "Netzwerkfehler",

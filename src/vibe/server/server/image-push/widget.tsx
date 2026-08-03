@@ -17,8 +17,8 @@ import {
   useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetValue,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
+} from "../../../unified-ui/_shared/use-widget-context";
+import { FormAlertWidget } from "../../../unified-ui/widgets/interactive/form-alert/widget";
 import type { JSX } from "react";
 
 import type definition from "./definition";

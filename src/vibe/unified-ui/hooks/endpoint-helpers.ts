@@ -3,7 +3,7 @@
  * These helpers reduce duplication across hook types and component types
  */
 
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 
 // ============================================================================
 // METHOD-SPECIFIC TYPE EXTRACTORS

@@ -3,7 +3,7 @@
  * POST — advance bill status DRAFT→RECEIVED→APPROVED and post journal entry on APPROVED
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,

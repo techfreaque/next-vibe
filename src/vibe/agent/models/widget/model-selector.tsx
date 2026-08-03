@@ -11,7 +11,7 @@ import {
   chatModelOptions,
   filterChatModels,
   getBestChatModel,
-} from "next-vibe/agent/ai-stream/models";
+} from "../../ai-stream/models";
 import {
   AudioVisionModelId,
   filterAudioVisionModels,
@@ -22,21 +22,21 @@ import {
   getBestVideoVisionModel,
   ImageVisionModelId,
   VideoVisionModelId,
-} from "next-vibe/agent/ai-stream/vision-models";
-import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
+} from "../../ai-stream/vision-models";
+import type { AgentEnvAvailability } from "../../env-availability";
+import { useProviderAvailability } from "../../env-availability-store";
 import {
   filterImageGenModels,
   getBestImageGenModel,
   ImageGenModelId,
   imageGenModelOptions,
-} from "next-vibe/agent/image-generation/models";
+} from "../../image-generation/models";
 import {
   filterMusicGenModels,
   getBestMusicGenModel,
   MusicGenModelId,
   musicGenModelOptions,
-} from "next-vibe/agent/music-generation/models";
+} from "../../music-generation/models";
 import {
   CONTENT_DISPLAY,
   INTELLIGENCE_DISPLAY,
@@ -45,25 +45,25 @@ import {
   ModelSortField,
   ModelSortFieldOptions,
   PRICE_DISPLAY,
-} from "next-vibe/agent/skills/enum";
+} from "../../skills/enum";
 import {
   filterSttModels,
   getBestSttModel,
   SttModelId,
   sttModelOptions,
-} from "next-vibe/agent/speech-to-text/models";
+} from "../../speech-to-text/models";
 import {
   filterTtsModels,
   getBestTtsModel,
   TtsModelId,
   ttsModelOptions,
-} from "next-vibe/agent/text-to-speech/models";
+} from "../../text-to-speech/models";
 import {
   filterVideoGenModels,
   getBestVideoGenModel,
   VideoGenModelId,
   videoGenModelOptions,
-} from "next-vibe/agent/video-generation/models";
+} from "../../video-generation/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
@@ -94,7 +94,7 @@ import {
 } from "next-vibe/ui/ui/tooltip";
 import { P } from "next-vibe/ui/ui/typography";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
-import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 

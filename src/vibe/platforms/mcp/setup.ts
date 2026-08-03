@@ -18,11 +18,12 @@ import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import chalk from "chalk";
-import { coreEnv, getRuntimeInvocation } from "next-vibe/core/env";
-import type { SetupResult } from "next-vibe/core/setup/types";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import { coreEnv, getRuntimeInvocation } from "../../core/env";
+import type { SetupResult } from "../../core/setup/types";
+import type { WidgetData } from "../../core/utils/json";
+import { parseError } from "../../core/utils/parse-error";
+import { getProjectRoot } from "@/env/paths";
+import type { EndpointLogger } from "../../logger/types";
 import { z } from "zod";
 
 /**
@@ -100,14 +101,12 @@ const MCP_TARGETS: readonly {
   },
 ];
 
-/** Every path this writes — also what `uninstall()` removes. */
-export const MCP_GENERATED_PATHS: readonly string[] = MCP_TARGETS.map(
-  (target) => target.path,
-);
+// Both writeMcpConfigs and removeMcpConfigs walk MCP_TARGETS directly, so a
+// separate exported path list only restated it for nobody to read.
 
 /**
  * Resolved template, or the reason it could not be. Returned rather than thrown:
- * `restricted-syntax` bans `throw` here, and the setup contract expects a
+ * `no-throw` bans `throw` here, and the setup contract expects a
  * `failed` message anyway. See core/setup/types.
  */
 type TemplateResult =
@@ -196,14 +195,14 @@ function applyRuntime(
 }
 
 /**
- * Read the template and resolve its placeholders.
+ * Read `mcp.template.json` and resolve its placeholders.
  *
  * Parses before substituting so an interpolated value can never produce
  * malformed JSON, and validates the shape so a typo in the template surfaces
  * here rather than as an editor that silently starts no servers.
  */
 async function resolveMcpTemplate(): Promise<TemplateResult> {
-  const projectRoot = process.cwd();
+  const projectRoot = getProjectRoot();
   if (!existsSync(MCP_TEMPLATE_PATH)) {
     return {
       ok: false,
@@ -272,9 +271,10 @@ async function writeMcpConfigs(): Promise<{
   if (!resolved.ok) {
     return { changed: [], failed: resolved.failed };
   }
+  const projectRoot = getProjectRoot();
   const writtenPaths: string[] = [];
   for (const target of MCP_TARGETS) {
-    const destination = join(process.cwd(), target.path);
+    const destination = join(projectRoot, target.path);
     // Guarded rather than relying on `recursive: true` to be a no-op: under bun
     // it still fails with EEXIST for a directory that already exists, and the
     // most common target (.mcp.json) sits directly in the project root.
@@ -294,9 +294,10 @@ async function writeMcpConfigs(): Promise<{
 
 /** Remove every generated config. Absent files are already in the desired state. */
 async function removeMcpConfigs(): Promise<string[]> {
+  const projectRoot = getProjectRoot();
   const removedPaths: string[] = [];
   for (const target of MCP_TARGETS) {
-    const destination = join(process.cwd(), target.path);
+    const destination = join(projectRoot, target.path);
     if (existsSync(destination)) {
       await fs.rm(destination);
       removedPaths.push(destination);
@@ -312,7 +313,7 @@ export const description = "MCP config";
 
 /** Repo-relative and POSIX — an absolute Windows path buries the point. */
 function forDisplay(absolutePath: string): string {
-  return relative(process.cwd(), absolutePath).replaceAll("\\", "/");
+  return relative(getProjectRoot(), absolutePath).replaceAll("\\", "/");
 }
 
 export async function install(logger: EndpointLogger): Promise<SetupResult> {

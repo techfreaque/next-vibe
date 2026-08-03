@@ -7,12 +7,12 @@
 
 import "server-only";
 
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { createEndpointEmitter } from "next-vibe/realtime/emitter";
-import type { EmitEventNamed } from "next-vibe/realtime/structured-events";
-import queueDefinitions from "next-vibe/tasks/cron/queue/definition";
-import tasksDefinitions from "next-vibe/tasks/cron/tasks/definition";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
+import { createEndpointEmitter } from "../../realtime/core/emitter";
+import type { EmitEventNamed } from "../../realtime/core/structured-events";
+import queueDefinitions from "./queue/definition";
+import tasksDefinitions from "./tasks/definition";
 
 type TaskListEmitter = EmitEventNamed<
   (typeof tasksDefinitions)["GET"]["types"]["EventResponsePayloads"],

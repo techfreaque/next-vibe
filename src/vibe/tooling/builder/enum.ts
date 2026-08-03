@@ -5,8 +5,8 @@
  * These enums define the allowed values for various build configurations.
  */
 
-import { scopedTranslation } from "next-vibe/tooling/builder/i18n";
-import { createEnumOptions } from "next-vibe/unified-ui/_shared/enum";
+import { scopedTranslation } from "./i18n";
+import { createEnumOptions } from "../../unified-ui/_shared/enum";
 
 // ============================================================================
 // Build Configuration Enums

@@ -13,15 +13,13 @@ import {
   randomBytes,
 } from "node:crypto";
 
-import { and, eq, sql } from "drizzle-orm";
-import { coreClientEnv as envClient } from "next-vibe/core/env-client";
-import {
-  type ResponseType,
-  success,
-} from "next-vibe/core/route/response.schema";
-import { db } from "next-vibe/database";
-import { identityEnv } from "next-vibe/identity/env";
-import type { EndpointLogger } from "next-vibe/logger/types";
+import { and, eq } from "drizzle-orm";
+import { coreClientEnv as envClient } from "../core/env-client";
+import { coreEnv } from "../core/env";
+import { type ResponseType, success } from "../core/route/response.schema";
+import { db } from "../database";
+import { identityEnv } from "../identity/env";
+import type { EndpointLogger } from "../logger/types";
 
 import type {
   ConnectionHealth,
@@ -128,7 +126,7 @@ export class RemoteConnectionRepository {
    * and by getLocalInstanceId as a fallback when no DB record exists.
    */
   static deriveDefaultSelfInstanceId(): string {
-    if (process.env["IS_PREVIEW_MODE"] === "true") {
+    if (coreEnv.IS_PREVIEW_MODE) {
       return "hermes";
     }
 
@@ -446,44 +444,6 @@ export class RemoteConnectionRepository {
   }
 
   /**
-   * Get the full connection record (with decrypted token) for a specific user.
-   * Prefers isDefault=true, then most recently updated.
-   */
-  static async getRemoteConnectionRecord(
-    userId: string,
-    instanceId?: string,
-  ): Promise<{
-    remoteUrl: string;
-    token: string;
-    leadId: string;
-    instanceId: string;
-  } | null> {
-    const conditions = [eq(remoteConnections.userId, userId)];
-    if (instanceId) {
-      conditions.push(eq(remoteConnections.instanceId, instanceId));
-    }
-
-    const rows = await db
-      .select()
-      .from(remoteConnections)
-      .where(and(...conditions))
-      .orderBy(sql`${remoteConnections.updatedAt} DESC`)
-      .limit(1);
-
-    const row = rows[0];
-    if (!row || !row.isActive || !row.token) {
-      return null;
-    }
-
-    return {
-      remoteUrl: row.remoteUrl,
-      token: RemoteConnectionRepository.decryptToken(row.token),
-      leadId: row.leadId,
-      instanceId: row.instanceId,
-    };
-  }
-
-  /**
    * Get capabilities snapshot for a connection by instanceId.
    */
   static async getCapabilities(
@@ -561,28 +521,6 @@ export class RemoteConnectionRepository {
         ? RemoteConnectionRepository.decryptToken(row.token)
         : null,
     };
-  }
-
-  /**
-   * How the PEER reaches this side over the given connection (the mirror of the
-   * peer's own transportMode). Drives whether this side runs the reverse-ws
-   * connector: open one exactly when this returns "reverse-ws". Null if no row.
-   */
-  static async getRemoteTransportMode(
-    userId: string,
-    instanceId: string,
-  ): Promise<"reverse-ws" | "direct-http" | null> {
-    const [row] = await db
-      .select({ remoteTransportMode: remoteConnections.remoteTransportMode })
-      .from(remoteConnections)
-      .where(
-        and(
-          eq(remoteConnections.userId, userId),
-          eq(remoteConnections.isActive, true),
-          eq(remoteConnections.instanceId, instanceId),
-        ),
-      );
-    return row?.remoteTransportMode ?? null;
   }
 
   /**

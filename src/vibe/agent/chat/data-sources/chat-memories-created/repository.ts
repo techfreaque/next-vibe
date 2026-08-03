@@ -7,9 +7,9 @@
 import "server-only";
 
 import { and, count, gte, lte, sql } from "drizzle-orm";
-import { cortexNodes } from "next-vibe/agent/cortex/db";
-import { CortexNodeType } from "next-vibe/agent/cortex/enum";
-import { MEMORIES_PREFIX } from "next-vibe/agent/cortex/repository";
+import { cortexNodes } from "../../../cortex/db";
+import { CortexNodeType } from "../../../cortex/enum";
+import { MEMORIES_PREFIX } from "../../../cortex/repository";
 import {
   type ResponseType,
   success,

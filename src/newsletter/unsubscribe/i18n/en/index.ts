@@ -84,6 +84,7 @@ export const translations = {
       title: "Internal Error",
       description:
         "An error occurred while processing your unsubscribe request",
+      detail: "Unsubscribe failed: {{error}}",
     },
   },
   post: {

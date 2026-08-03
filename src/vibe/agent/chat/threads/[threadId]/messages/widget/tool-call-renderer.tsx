@@ -17,10 +17,10 @@
  */
 
 "use client";
-import type { SendMessageParams } from "next-vibe/agent/ai-stream/stream/hooks/send-message";
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
-import type { ToolCall } from "next-vibe/agent/chat/db";
-import { useChatNavigationStore } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
+import type { SendMessageParams } from "../../../../../ai-stream/stream/hooks/send-message";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
+import type { ToolCall } from "../../../../db";
+import { useChatNavigationStore } from "../../../../hooks/use-chat-navigation-store";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { definitionLoader } from "next-vibe/core/definition/loader";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
@@ -61,10 +61,8 @@ import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
 import { NavigationStackProvider } from "next-vibe/unified-ui/hooks/use-navigation-stack";
 import { EndpointRenderer } from "next-vibe/unified-ui/renderers/web/EndpointRenderer";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
-import {
-  Icon,
-  type IconKey,
-} from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+import { type IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import type { JSX } from "react";
 import { useCallback, useEffect, useState } from "react";
 import type { FieldValues } from "react-hook-form";
@@ -1287,6 +1285,7 @@ export function ToolCallRenderer({
                           logger={logger}
                           disabled={true}
                           response={undefined}
+                          platform={loadPlatform}
                         />
                       </NavigationStackProvider>
                     </Div>
@@ -1535,6 +1534,7 @@ export function ToolCallRenderer({
                         endpoint={{ GET: definition }}
                         locale={locale}
                         user={user}
+                        platform={loadPlatform}
                         endpointOptions={{
                           read: {
                             urlPathParams: argsObj as never,
@@ -1551,6 +1551,7 @@ export function ToolCallRenderer({
                           locale={locale}
                           data={mergedData}
                           logger={logger}
+                          platform={loadPlatform}
                           disabled={!needsConfirmation || hasPendingDecision}
                           form={
                             needsConfirmation || isDeclined

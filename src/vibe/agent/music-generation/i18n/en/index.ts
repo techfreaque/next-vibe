@@ -96,6 +96,7 @@ export const translations = {
         "The selected model does not support music generation. Please select a music model.",
       notConfigured:
         "{{label}} is not configured. Add {{envKey}} to your .env file. Get your key at {{url}}",
+      providerUnsupported: "{{label}} is not supported yet",
       insufficientCredits:
         "Insufficient credits. Balance: {{balance}}, required: {{minimum}}",
       balanceCheckFailed: "Failed to check your credit balance",

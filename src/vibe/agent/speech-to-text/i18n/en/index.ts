@@ -83,9 +83,10 @@ export const translations = {
           description: "An unexpected error occurred",
         },
         dependenciesMissing:
-          "Required dependencies not available: {missing}. {recommendations}",
-        invalidAction: "Invalid action: {action}",
-        actionFailed: "Failed to perform action: {error}",
+          "Required dependencies not available: {{missing}}. {{recommendations}}",
+        invalidAction: "Invalid action: {{action}}",
+        noActionProvided: "No action provided",
+        actionFailed: "Failed to perform action: {{error}}",
         alreadyRecording: "Recording already in progress",
         notRecording: "No recording in progress",
       },
@@ -195,6 +196,13 @@ export const translations = {
       },
       apiKeyMissing: "Eden AI API key is not configured",
       transcriptionFailed: "Transcription failed: {{error}}",
+      noSttProvider: "No speech-to-text provider available",
+      unsupportedProvider: "Unsupported speech-to-text provider: {{provider}}",
+      noSttProviderConfigured:
+        "No speech-to-text provider is configured. Add OPENAI_API_KEY, EDEN_AI_API_KEY, or DEEPGRAM_API_KEY, or connect a system inference provider.",
+      notConfigured:
+        "{{label}} is not configured. Add {{envKey}} to your .env file. Get your key at {{url}}",
+      providerResultMissing: "Provider {{provider}} returned no result",
       audioTooShort:
         "Recording too short. Hold the button longer and speak clearly.",
       noAudioFile: "No audio file provided",

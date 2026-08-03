@@ -68,6 +68,14 @@ export const translations: typeof enTranslations = {
       title: "Konflikt",
       description: "Guard-Umgebung bereits gestartet",
     },
+    jailSetupFailed: "Einrichtung des Guard-Jails fehlgeschlagen: {{detail}}",
+    vscodeSetupFailed:
+      "Einrichtung der VSCode-Integration fehlgeschlagen: {{detail}}",
+    startFailed: "Interner Fehler beim Starten des Guards: {{detail}}",
+    guardIdLookupUnsupported:
+      "Die Suche per Guard-ID ist noch nicht implementiert - stattdessen den Projektpfad angeben.",
+    notAVscodeProject:
+      "Guard benötigt ein VSCode-Projekt - in {{projectPath}} fehlt das Verzeichnis .vscode",
   },
   success: {
     title: "Erfolg",

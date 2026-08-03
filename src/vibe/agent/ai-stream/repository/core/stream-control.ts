@@ -21,8 +21,8 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import {
   KeyedRemoteSignal,
   type KeyedSignalSubscription,
-} from "next-vibe/realtime/keyed-signal";
-import type { WsWireMessage } from "next-vibe/realtime/types";
+} from "next-vibe/realtime/server/keyed-signal";
+import type { WsWireMessage } from "next-vibe/realtime/core/types";
 
 import streamDefinition from "../../stream/definition";
 

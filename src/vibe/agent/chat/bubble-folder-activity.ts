@@ -1,7 +1,7 @@
 import "server-only";
 
 import { sql } from "drizzle-orm";
-import type { DefaultFolderId } from "next-vibe/agent/chat/config";
+import type { DefaultFolderId } from "next-vibe/core/execution-context";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -44,7 +44,7 @@ export async function bubbleFolderActivity(
     return;
   }
   const { createFolderContentsEmitter } =
-    await import("next-vibe/agent/chat/folder-contents/[rootFolderId]/emitter");
+    await import("./folder-contents/[rootFolderId]/emitter");
   for (const folder of result.rows) {
     // Each folder is rendered in exactly one view: its parent's channel
     // (parent_id null → the root view). Emit there so that open list re-sorts.

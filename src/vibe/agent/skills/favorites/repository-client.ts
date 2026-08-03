@@ -4,8 +4,8 @@
  * Mirrors server repository structure but runs in browser
  */
 
-import skillSingleDefinition from "next-vibe/agent/skills/[id]/definition";
-import { DEFAULT_TTS_VOICE_ID } from "next-vibe/agent/text-to-speech/constants";
+import skillSingleDefinition from "../[id]/definition";
+import { DEFAULT_TTS_VOICE_ID } from "../../text-to-speech/constants";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -152,7 +152,6 @@ export class ChatFavoritesRepositoryClient {
               logger,
               user,
               locale,
-              availability,
               requestData: undefined,
               pathParams: { id: skillId },
             });

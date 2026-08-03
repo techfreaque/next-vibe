@@ -1,5 +1,5 @@
 "use client";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
@@ -12,19 +12,19 @@ import {
   SelectValue,
 } from "next-vibe/ui/ui/select";
 import { Span } from "next-vibe/ui/ui/span";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
-import type { ReactWidgetProps } from "next-vibe/unified-ui/_shared/react-types";
-import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
+import { cn } from "../../../_shared/cn";
+import type { ReactWidgetProps } from "../../../_shared/react-types";
+import type { FieldUsageConfig } from "../../../_shared/types";
 import {
   useWidgetForm,
   useWidgetLocale,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
+} from "../../../_shared/use-widget-context";
 import {
   getIconSizeClassName,
   getSpacingClassName,
   getTextSizeClassName,
-} from "next-vibe/unified-ui/_shared/widget-helpers";
-import { scopedTranslation as reactScopedTranslation } from "next-vibe/unified-ui/hooks/i18n";
+} from "../../../_shared/widget-helpers";
+import { scopedTranslation as reactScopedTranslation } from "../../../hooks/i18n";
 import type { JSX } from "react";
 
 import type { PaginationWidgetConfig } from "./types";

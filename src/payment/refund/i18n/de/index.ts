@@ -82,10 +82,14 @@ export const translations: typeof enTranslations = {
         description: "Zugriff verweigert",
       },
       notFound: {
+        detail: "Keine Transaktion mit der ID {{transactionId}} gefunden",
         title: "Nicht gefunden",
         description: "Transaktion nicht gefunden",
       },
       server: {
+        detail: "Rückerstattung konnte nicht verarbeitet werden: {{error}}",
+        noPaymentIntent:
+          "Zu dieser Transaktion existiert keine verknüpfte Stripe-Zahlung - eine Rückerstattung ist nicht möglich",
         title: "Serverfehler",
         description: "Interner Serverfehler aufgetreten",
       },

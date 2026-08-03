@@ -2,11 +2,11 @@
 
 import type { DialogProps } from "@radix-ui/react-dialog";
 import { Command as CommandPrimitive } from "cmdk";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 
-import { MagnifyingGlassIcon } from "../../web/ui/icons/MagnifyingGlassIcon";
-import type { StyleType } from "../../web/utils/style-type";
+import { MagnifyingGlassIcon } from "./icons/MagnifyingGlassIcon";
+import type { StyleType } from "../utils/style-type";
 import { Dialog, DialogContent } from "./dialog";
 
 // Command

@@ -281,7 +281,7 @@ export const translations: typeof enTranslations = {
     sync: {
       failed: "Synchronisation fehlgeschlagen",
       account: {
-        failed: "Kontosynchronisation fehlgeschlagen",
+        failed: "Kontosynchronisation fehlgeschlagen: {{error}}",
       },
       folder: {
         failed: "Ordnersynchronisation fehlgeschlagen",
@@ -342,8 +342,8 @@ export const translations: typeof enTranslations = {
       },
       errors: {
         default: "IMAP-Synchronisation fehlgeschlagen",
-        account_failed: "Kontosynchronisation fehlgeschlagen",
-        folder_sync_failed: "Ordnersynchronisation fehlgeschlagen",
+        account_failed: "Kontosynchronisation fehlgeschlagen: {{error}}",
+        folder_sync_failed: "Ordnersynchronisation fehlgeschlagen: {{error}}",
         message_sync_error: "Nachrichtensynchronisationsfehler",
         message_sync_failed: "Nachrichtensynchronisation fehlgeschlagen",
       },

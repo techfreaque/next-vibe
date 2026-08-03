@@ -279,27 +279,6 @@ export class LeadsImportRepository {
   }
 
   /**
-   * Check if a lead exists by email
-   */
-  static async recordExistsByEmail(
-    email: string,
-    logger: EndpointLogger,
-  ): Promise<boolean> {
-    try {
-      const existingLead = await db
-        .select({ id: leads.id })
-        .from(leads)
-        .where(eq(leads.email, email))
-        .limit(1);
-
-      return existingLead.length > 0;
-    } catch (error) {
-      logger.error("Error checking lead existence", parseError(error));
-      return false;
-    }
-  }
-
-  /**
    * High-level method for importing leads from CSV
    */
   static async importLeadsFromCsv(

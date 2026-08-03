@@ -8,7 +8,7 @@
  * what lets the bundler inline the value for the browser.
  */
 
-import { defineEnvClient } from "next-vibe/env/define-env-client";
+import { defineEnvClient } from "../env/define-env-client";
 import { z } from "zod";
 
 export const {
@@ -29,5 +29,3 @@ export const {
     commented: true,
   },
 });
-
-export type LoggerClientEnv = typeof loggerClientEnv;

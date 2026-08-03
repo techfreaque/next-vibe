@@ -3,9 +3,9 @@
  * Defines endpoints for getting, updating, and deleting individual threads
  */
 
-import { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import { ChatModelId } from "../../../ai-stream/models";
 import { dateSchema } from "next-vibe/core/definition/common.schema";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -15,7 +15,7 @@ import {
 } from "next-vibe/core/definition/enums";
 import { WidgetDataSchema } from "next-vibe/core/utils/json";
 import { UserRole, UserRoleDB } from "next-vibe/identity/roles/enum";
-import type { EmitEventNamed } from "next-vibe/realtime/structured-events";
+import type { EmitEventNamed } from "next-vibe/realtime/core/structured-events";
 import {
   objectField,
   requestField,
@@ -26,7 +26,8 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
-import { DefaultFolderId, rootFolderIdOptions } from "../../config";
+import { rootFolderIdOptions } from "../../config";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import {
   ThreadStatus,
   ThreadStatusOptions,

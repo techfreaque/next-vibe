@@ -5,16 +5,16 @@
 
 import { existsSync } from "node:fs";
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { scopedTranslation } from "next-vibe/tooling/release/i18n";
+} from "../../../core/route/response.schema";
+import { parseError } from "../../../core/utils/parse-error";
+import type { EndpointLogger } from "../../../logger/types";
+import { scopedTranslation } from "../i18n";
 
 import type { ReleaseConfig } from "../definition";
 import { DEFAULT_CONFIG_PATH, MESSAGES } from "./constants";
@@ -36,9 +36,8 @@ export class ConfigLoader {
     if (!existsSync(resolvedConfigPath)) {
       logger.error(MESSAGES.CONFIG_NOT_FOUND, { path: resolvedConfigPath });
       return fail({
-        message: t("config.fileNotFound"),
+        message: t("config.fileNotFound", { path: resolvedConfigPath }),
         errorType: ErrorResponseTypes.NOT_FOUND,
-        messageParams: { path: resolvedConfigPath },
       });
     }
 
@@ -63,9 +62,8 @@ export class ConfigLoader {
         path: resolvedConfigPath,
       });
       return fail({
-        message: t("config.errorLoading"),
+        message: t("config.errorLoading", { error: String(error) }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: String(error) },
       });
     }
   }

@@ -917,10 +917,14 @@ export const translations = {
         description: "Permission denied",
       },
       notFound: {
+        detail: "No account found for user {{userId}}",
         title: "Not Found",
         description: "Payment session not found",
       },
       server: {
+        detail: "Could not create the payment session: {{error}}",
+        stripeNotConfigured:
+          "Stripe is not set up yet. Add STRIPE_SECRET_KEY to your environment.",
         title: "Server Error",
         description: "Internal server error occurred",
       },
@@ -987,6 +991,7 @@ export const translations = {
         description: "Payment information not found",
       },
       server: {
+        detail: "Could not load your payment information: {{error}}",
         title: "Server Error",
         description: "Internal server error occurred",
       },
@@ -1024,6 +1029,7 @@ export const translations = {
       description: "Payment not found",
     },
     unauthorized: {
+      signInRequired: "Sign in to manage payments",
       title: "Unauthorized",
       description: "Authentication required",
     },
@@ -1032,6 +1038,7 @@ export const translations = {
       description: "Permission denied",
     },
     server: {
+      detail: "Payment webhook could not be processed: {{error}}",
       title: "Server Error",
       description: "Internal server error occurred",
     },
@@ -1057,8 +1064,9 @@ export const translations = {
     },
     customerCreationFailed: "Failed to create Stripe customer",
     customerNotFound: "Stripe customer not found",
-    localMode: "Payment is disabled in local development mode",
-    webhookVerificationFailed: "Webhook signature verification failed",
+    localMode: "Payment is disabled in local development mode.",
+    webhookVerificationFailed:
+      "Webhook signature verification failed: {{error}}",
   },
 
   // Top-level success

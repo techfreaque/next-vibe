@@ -65,7 +65,9 @@ export class UserCreateRepository {
 
       if (!createdUser) {
         return fail({
-          message: t("post.errors.internal.title"),
+          message: t("post.errors.internal.title", {
+            details: t("post.errors.internal.description"),
+          }),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -122,9 +124,10 @@ export class UserCreateRepository {
     } catch (error) {
       logger.error("Error creating user", parseError(error));
       return fail({
-        message: t("post.errors.internal.title"),
+        message: t("post.errors.internal.title", {
+          details: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { details: parseError(error).message },
       });
     }
   }

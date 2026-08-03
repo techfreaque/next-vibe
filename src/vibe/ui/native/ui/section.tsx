@@ -2,7 +2,7 @@ import { styled } from "nativewind";
 import * as React from "react";
 import { View } from "react-native";
 
-import { convertCSSToViewStyle } from "../../native/utils/style-converter";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 import type { SectionProps } from "../../web/ui/section";
 import { applyStyleType } from "../../web/utils/style-type";
 

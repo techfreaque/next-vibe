@@ -7,9 +7,10 @@
 
 "use client";
 
-import skillDefinitions from "next-vibe/agent/skills/[id]/definition";
+import skillDefinitions from "../../skills/[id]/definition";
 import {
   useWidgetLocale,
+  useWidgetPlatform,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
@@ -41,6 +42,7 @@ export function SkillDetailWidget({
 }: SkillDetailWidgetProps): React.JSX.Element | null {
   const locale = useWidgetLocale();
   const user = useWidgetUser();
+  const platform = useWidgetPlatform();
 
   const id = useMemo(() => extractSkillId(path), [path]);
 
@@ -53,6 +55,7 @@ export function SkillDetailWidget({
       endpoint={skillDefinitions}
       locale={locale}
       user={user}
+      platform={platform}
       endpointOptions={{
         read: {
           urlPathParams: { id },

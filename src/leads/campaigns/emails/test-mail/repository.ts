@@ -102,12 +102,11 @@ export class TestEmailRepository {
         )
       ) {
         return fail({
-          message: scopedT("post.errors.templateNotFound.title"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: {
+          message: scopedT("post.errors.templateNotFound.title", {
             emailJourneyVariant: data.emailJourneyVariant,
             emailCampaignStage: data.emailCampaignStage,
-          },
+          }),
+          errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
@@ -130,12 +129,11 @@ export class TestEmailRepository {
 
       if (!emailContent) {
         return fail({
-          message: scopedT("post.errors.templateNotFound.title"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: {
+          message: scopedT("post.errors.templateNotFound.title", {
             emailJourneyVariant: data.emailJourneyVariant,
             emailCampaignStage: data.emailCampaignStage,
-          },
+          }),
+          errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
@@ -177,16 +175,14 @@ export class TestEmailRepository {
             to: data.testEmail,
             subject: emailContent.subject,
             error: emailResponse.message,
-            errorParams: emailResponse.messageParams,
           });
           return fail({
-            message: scopedT("post.errors.sendingFailed.title"),
-            errorType: ErrorResponseTypes.EMAIL_ERROR,
-            messageParams: {
+            message: scopedT("post.errors.sendingFailed.title", {
               recipient: data.testEmail,
               subject: emailContent.subject,
               error: emailResponse.message,
-            },
+            }),
+            errorType: ErrorResponseTypes.EMAIL_ERROR,
             cause: emailResponse,
           });
         }
@@ -218,21 +214,21 @@ export class TestEmailRepository {
       } catch (error) {
         logger.error("test.email.send.error", parseError(error));
         return fail({
-          message: scopedT("post.errors.sendingFailed.title"),
-          errorType: ErrorResponseTypes.EMAIL_ERROR,
-          messageParams: {
+          message: scopedT("post.errors.sendingFailed.title", {
             recipient: data.testEmail,
             subject: emailContent.subject,
             error: parseError(error).message,
-          },
+          }),
+          errorType: ErrorResponseTypes.EMAIL_ERROR,
         });
       }
     } catch (error) {
       logger.error("test.email.send.server.error", parseError(error));
       return fail({
-        message: scopedT("post.errors.server.title"),
+        message: scopedT("post.errors.server.detail", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }

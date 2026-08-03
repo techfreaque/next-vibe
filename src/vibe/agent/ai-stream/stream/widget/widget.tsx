@@ -8,22 +8,19 @@
 
 "use client";
 
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
-import {
-  NEW_MESSAGE_ID,
-  ThreadStreamingState,
-} from "next-vibe/agent/chat/enum";
-import { useChatBootContext } from "next-vibe/agent/chat/hooks/context";
-import { useChatNavigationStore } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
-import publicFeedDefinition from "next-vibe/agent/chat/public-feed/definition";
-import messagesDefinition from "next-vibe/agent/chat/threads/[threadId]/messages/definition";
-import { useDeleteDialogStore } from "next-vibe/agent/chat/threads/[threadId]/messages/hooks/use-delete-dialog-store";
-import { scopedTranslation } from "next-vibe/agent/chat/threads/widget/i18n";
-import { ChatEmptyState } from "next-vibe/agent/chat/threads/widget/new-thread/empty-state";
-import { CortexModal } from "next-vibe/agent/cortex/widget/cortex-modal";
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
-import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
-import { AIToolsModal } from "next-vibe/agent/tools/widget/ai-tools-modal";
+import { DefaultFolderId } from "../../../../core/execution-context";
+import { NEW_MESSAGE_ID, ThreadStreamingState } from "../../../chat/enum";
+import { useChatBootContext } from "../../../chat/hooks/context";
+import { useChatNavigationStore } from "../../../chat/hooks/use-chat-navigation-store";
+import publicFeedDefinition from "../../../chat/public-feed/definition";
+import messagesDefinition from "../../../chat/threads/[threadId]/messages/definition";
+import { useDeleteDialogStore } from "../../../chat/threads/[threadId]/messages/hooks/use-delete-dialog-store";
+import { scopedTranslation } from "../../../chat/threads/widget/i18n";
+import { ChatEmptyState } from "../../../chat/threads/widget/new-thread/empty-state";
+import { CortexModal } from "../../../cortex/widget/cortex-modal";
+import { useProviderAvailability } from "../../../env-availability-store";
+import { getAvailableModelCount } from "../../../models/all-models";
+import { AIToolsModal } from "../../../tools/widget/ai-tools-modal";
 import { platform } from "next-vibe/core/env-client";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { UserRole } from "next-vibe/identity/roles/enum";
@@ -46,6 +43,7 @@ import { KeyboardAvoidingView } from "next-vibe/ui/ui/keyboard-avoiding-view";
 import {
   useWidgetLocale,
   useWidgetLogger,
+  useWidgetPlatform,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { UseEndpointOptions } from "next-vibe/unified-ui/hooks/endpoint-types";
@@ -95,6 +93,7 @@ function AiStreamChatArea(): JSX.Element {
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
+  const widgetPlatform = useWidgetPlatform();
   const activeThreadId = useChatNavigationStore((s) => s.activeThreadId);
   const rootFolderId = useChatNavigationStore((s) => s.currentRootFolderId);
 
@@ -217,6 +216,7 @@ function AiStreamChatArea(): JSX.Element {
                   className="flex flex-col flex-1 min-h-0"
                   locale={locale}
                   user={user}
+                  platform={widgetPlatform}
                 />
               ) : (
                 <ChatEmptyState locale={locale} inputHeight={inputHeight} />
@@ -231,12 +231,20 @@ function AiStreamChatArea(): JSX.Element {
 
           {/* AI Tools Modal */}
           <ErrorBoundary locale={locale}>
-            <AIToolsModal locale={locale} user={user} />
+            <AIToolsModal
+              locale={locale}
+              user={user}
+              platform={widgetPlatform}
+            />
           </ErrorBoundary>
 
           {/* Cortex Modal */}
           <ErrorBoundary locale={locale}>
-            <CortexModal locale={locale} user={user} />
+            <CortexModal
+              locale={locale}
+              user={user}
+              platform={widgetPlatform}
+            />
           </ErrorBoundary>
         </Div>
       </InputHeightProvider>
@@ -251,6 +259,7 @@ export function AiStreamWidget(_props: CustomWidgetProps): JSX.Element {
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const locale = useWidgetLocale();
+  const widgetPlatform = useWidgetPlatform();
   const { currentCountry } = useTranslation();
   const { initialPublicFeedData } = useChatBootContext();
 
@@ -310,7 +319,12 @@ export function AiStreamWidget(_props: CustomWidgetProps): JSX.Element {
 
         {/* Sidebar + main content */}
         <ErrorBoundary locale={locale}>
-          <SidebarWrapper locale={locale} user={user} logger={logger}>
+          <SidebarWrapper
+            locale={locale}
+            user={user}
+            logger={logger}
+            platform={widgetPlatform}
+          >
             <ErrorBoundary locale={locale}>
               {isPublicFeed ? (
                 <EndpointsPage
@@ -318,6 +332,7 @@ export function AiStreamWidget(_props: CustomWidgetProps): JSX.Element {
                   endpoint={publicFeedDefinition}
                   locale={locale}
                   user={user}
+                  platform={widgetPlatform}
                   className="h-full flex-1"
                   endpointOptions={{
                     read: {

@@ -12,12 +12,12 @@
 
 "use client";
 
-import { getFullPath } from "next-vibe/core/core-utils/path";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { scopedTranslation as executeToolScopedTranslation } from "next-vibe/execute-tool/i18n";
-import helpEndpoints from "next-vibe/help-tool/definition";
-import { VibeFrameHost } from "next-vibe/platforms/vibe-frame/VibeFrameHost";
-import remoteConnectionListDefinition from "next-vibe/remote-connection/list/definition";
+import { getFullPath } from "../core/core-utils/path";
+import type { CreateApiEndpointAny } from "../core/definition/endpoint-base";
+import { scopedTranslation as executeToolScopedTranslation } from "./i18n";
+import helpEndpoints from "../help-tool/definition";
+import { VibeFrameHost } from "../platforms/vibe-frame/VibeFrameHost";
+import remoteConnectionListDefinition from "../remote-connection/list/definition";
 import type { AutocompleteOption } from "next-vibe/ui/ui/autocomplete-field";
 import { AutocompleteField } from "next-vibe/ui/ui/autocomplete-field";
 import { Button } from "next-vibe/ui/ui/button";
@@ -43,11 +43,11 @@ import {
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
-import type { UseEndpointOptions } from "next-vibe/unified-ui/hooks/endpoint-types";
-import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
-import { EndpointRenderer } from "next-vibe/unified-ui/renderers/web/EndpointRenderer";
-import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
+} from "../unified-ui/_shared/use-widget-context";
+import type { UseEndpointOptions } from "../unified-ui/hooks/endpoint-types";
+import { useEndpoint } from "../unified-ui/hooks/use-endpoint";
+import { EndpointRenderer } from "../unified-ui/renderers/web/EndpointRenderer";
+import { EndpointsPage } from "../unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -420,6 +420,7 @@ export function ExecuteToolWidget(): JSX.Element {
           endpoint={{ [method]: resolvedEndpoint }}
           locale={locale}
           user={user}
+          platform={platform}
           disabled={disabled}
           endpointOptions={endpointOptions}
         />
@@ -447,6 +448,7 @@ export function ExecuteToolWidget(): JSX.Element {
             endpoint={{ [method]: resolvedEndpoint }}
             locale={locale}
             user={user}
+            platform={platform}
             disabled={true}
             endpointOptions={(() => {
               const mergedResult =

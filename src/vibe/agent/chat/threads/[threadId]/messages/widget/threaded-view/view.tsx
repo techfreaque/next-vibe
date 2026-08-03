@@ -1,11 +1,11 @@
 "use client";
-import type { ChatMessage } from "next-vibe/agent/chat/db";
-import { useChatNavigationStore } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
-import { getVoteStatus } from "next-vibe/agent/chat/threads/[threadId]/messages/[messageId]/vote/utils";
-import { getDirectReplies } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/flat-view/helpers";
-import { processMessageGroupForTTS } from "next-vibe/agent/text-to-speech/content-processing";
-import { useTTSAudio } from "next-vibe/agent/text-to-speech/hooks";
-import type { TtsModelId } from "next-vibe/agent/text-to-speech/models";
+import type { ChatMessage } from "../../../../../db";
+import { useChatNavigationStore } from "../../../../../hooks/use-chat-navigation-store";
+import { getVoteStatus } from "../../[messageId]/vote/utils";
+import { getDirectReplies } from "../flat-view/helpers";
+import { processMessageGroupForTTS } from "../../../../../../text-to-speech/content-processing";
+import { useTTSAudio } from "../../../../../../text-to-speech/hooks";
+import type { TtsModelId } from "../../../../../../text-to-speech/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";

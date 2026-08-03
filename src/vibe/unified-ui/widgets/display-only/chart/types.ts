@@ -2,12 +2,15 @@
  * Chart Widget Type Definitions
  */
 
-import type { SpacingSize, WidgetType } from "next-vibe/core/definition/enums";
-import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
+import type {
+  SpacingSize,
+  WidgetType,
+} from "../../../../core/definition/enums";
+import type { TranslatedKeyType } from "../../../../core/i18n/core/scoped-translation";
 import type {
   BasePrimitiveWidgetConfig,
   FieldUsageConfig,
-} from "next-vibe/unified-ui/_shared/types";
+} from "../../../_shared/types";
 import { z } from "zod";
 
 /**

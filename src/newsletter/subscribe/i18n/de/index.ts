@@ -59,6 +59,7 @@ export const translations: typeof enTranslations = {
       title: "Interner Fehler",
       description:
         "Beim Verarbeiten Ihres Abonnements ist ein Fehler aufgetreten",
+      detail: "Anmeldung fehlgeschlagen: {{error}}",
     },
   },
   post: {

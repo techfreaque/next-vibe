@@ -1,5 +1,5 @@
 // oxlint-disable-next-line oxlint-plugin-boilerplate/i18n-pattern
-import { translations as modelTranslations } from "next-vibe/agent/models/i18n/pl";
+import { translations as modelTranslations } from "../../../models/i18n/pl";
 
 import type { translations as enTranslations } from "../en";
 
@@ -87,7 +87,7 @@ export const translations: typeof enTranslations = {
       balanceCheckFailed:
         "Nie można sprawdzić salda kredytów. Spróbuj ponownie",
       insufficientCredits:
-        "Nie masz wystarczającej liczby kredytów na tę konwersję. Dodaj więcej kredytów, aby kontynuować",
+        "Za mało kredytów na tę konwersję. Saldo: {{balance}}, wymagane minimum: {{minimum}}. Doładuj, aby kontynuować",
     },
     success: {
       title: "Sukces",

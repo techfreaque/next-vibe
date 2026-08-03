@@ -1,5 +1,5 @@
 "use client";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { Check } from "next-vibe/ui/ui/icons/Check";
@@ -8,18 +8,18 @@ import { X } from "next-vibe/ui/ui/icons/X";
 import type { InputKeyboardEvent } from "next-vibe/ui/ui/input";
 import { Input } from "next-vibe/ui/ui/input";
 import { Span } from "next-vibe/ui/ui/span";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
-import type { ReactRequestResponseWidgetProps } from "next-vibe/unified-ui/_shared/react-types";
-import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
+import { cn } from "../../../_shared/cn";
+import type { ReactRequestResponseWidgetProps } from "../../../_shared/react-types";
+import type { FieldUsageConfig } from "../../../_shared/types";
 import {
   useWidgetDisabled,
   useWidgetForm,
   useWidgetIsInteractive,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
+} from "../../../_shared/use-widget-context";
 import {
   getIconSizeClassName,
   getSpacingClassName,
-} from "next-vibe/unified-ui/_shared/widget-helpers";
+} from "../../../_shared/widget-helpers";
 import type { JSX } from "react";
 import { useState } from "react";
 

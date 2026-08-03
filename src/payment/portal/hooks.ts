@@ -22,5 +22,3 @@ export function useCustomerPortal(
 ): EndpointReturn<typeof definitions> {
   return useEndpoint(definitions, undefined, logger, user);
 }
-
-export type CustomerPortalEndpointReturn = EndpointReturn<typeof definitions>;

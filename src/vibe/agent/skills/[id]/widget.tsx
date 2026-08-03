@@ -8,12 +8,12 @@ import {
   DEFAULT_CHAT_MODEL_SELECTION,
   DEFAULT_IMAGE_VISION_MODEL_SELECTION,
   DEFAULT_VIDEO_VISION_MODEL_SELECTION,
-} from "next-vibe/agent/ai-stream/constants";
+} from "../../ai-stream/constants";
 import {
   type ChatModelSelection,
   chatModelSelectionSchema,
   getBestChatModel,
-} from "next-vibe/agent/ai-stream/models";
+} from "../../ai-stream/models";
 import {
   type AudioVisionModelSelection,
   audioVisionModelSelectionSchema,
@@ -24,47 +24,47 @@ import {
   imageVisionModelSelectionSchema,
   type VideoVisionModelSelection,
   videoVisionModelSelectionSchema,
-} from "next-vibe/agent/ai-stream/vision-models";
-import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
-import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "next-vibe/agent/image-generation/constants";
+} from "../../ai-stream/vision-models";
+import type { AgentEnvAvailability } from "../../env-availability";
+import { useProviderAvailability } from "../../env-availability-store";
+import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "../../image-generation/constants";
 import {
   getBestImageGenModel,
   type ImageGenModelSelection,
   imageGenModelSelectionSchema,
-} from "next-vibe/agent/image-generation/models";
-import { type AnyModelOptionWithVision } from "next-vibe/agent/models/all-models";
-import { modelProviders } from "next-vibe/agent/models/models";
-import { ModelCreditDisplay } from "next-vibe/agent/models/widget/model-credit-display";
+} from "../../image-generation/models";
+import { type AnyModelOptionWithVision } from "../../models/all-models";
+import { modelProviders } from "../../models/models";
+import { ModelCreditDisplay } from "../../models/widget/model-credit-display";
 import {
   ModelSelector,
   ModelSelectorTrigger,
-} from "next-vibe/agent/models/widget/model-selector";
-import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "next-vibe/agent/music-generation/constants";
+} from "../../models/widget/model-selector";
+import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "../../music-generation/constants";
 import {
   getBestMusicGenModel,
   type MusicGenModelSelection,
   musicGenModelSelectionSchema,
-} from "next-vibe/agent/music-generation/models";
-import { DEFAULT_STT_MODEL_SELECTION } from "next-vibe/agent/speech-to-text/constants";
+} from "../../music-generation/models";
+import { DEFAULT_STT_MODEL_SELECTION } from "../../speech-to-text/constants";
 import {
   getBestSttModel,
   type SttModelSelection,
   sttModelSelectionSchema,
-} from "next-vibe/agent/speech-to-text/models";
-import { DEFAULT_TTS_MODEL_SELECTION } from "next-vibe/agent/text-to-speech/constants";
+} from "../../speech-to-text/models";
+import { DEFAULT_TTS_MODEL_SELECTION } from "../../text-to-speech/constants";
 import {
   getBestTtsModel,
   ttsModelOptions,
   type VoiceModelSelection,
   voiceModelSelectionSchema,
-} from "next-vibe/agent/text-to-speech/models";
-import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "next-vibe/agent/video-generation/constants";
+} from "../../text-to-speech/models";
+import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "../../video-generation/constants";
 import {
   getBestVideoGenModel,
   type VideoGenModelSelection,
   videoGenModelSelectionSchema,
-} from "next-vibe/agent/video-generation/models";
+} from "../../video-generation/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { usePathname } from "next-vibe/ui/hooks/use-pathname";
@@ -146,10 +146,8 @@ import {
 import { AlertWidget } from "next-vibe/unified-ui/widgets/display-only/alert/widget";
 import { MarkdownWidget } from "next-vibe/unified-ui/widgets/display-only/markdown/widget";
 import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
-import {
-  Icon,
-  type IconKey,
-} from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+import { type IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import { IconFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/icon-field/widget";
 import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
@@ -2142,11 +2140,10 @@ function VariantCard({
         logger,
         locale,
         user,
-        availability,
       });
       setIsActivating(false);
     })();
-  }, [matchingFav, user, resolved.chat, skillId, logger, locale, availability]);
+  }, [matchingFav, user, resolved.chat, skillId, logger, locale]);
 
   const handleGoToChat = useCallback((): void => {
     openUrl(`/${locale}/threads`);
@@ -2521,7 +2518,6 @@ function LeadCaptureForm({
   const [state, setState] = useState<CaptureState>("idle");
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
-  const availability = useProviderAvailability();
   const logger = useLogger();
   const handleSubmit = useCallback((): void => {
     if (!firstName.trim() || !email.trim()) {
@@ -2542,14 +2538,13 @@ function LeadCaptureForm({
           { skillId, firstName: firstName.trim(), email: email.trim() },
           undefined,
           locale,
-          availability,
         );
         setState(result.success ? "done" : "error");
       } catch {
         setState("error");
       }
     })();
-  }, [skillId, firstName, email, locale, availability, logger]);
+  }, [skillId, firstName, email, locale, logger]);
 
   const displayHeadline = headline ?? t("get.leadCapture.fallbackHeadline");
   const displayButton = buttonText ?? t("get.leadCapture.fallbackButton");
@@ -2790,7 +2785,6 @@ function CreatorOtherSkills({
           { sourceFilter: "enums.source.community" as const },
           undefined,
           locale,
-          availability,
         );
         if (result.success && Array.isArray(result.data)) {
           const filtered = (
@@ -3153,7 +3147,6 @@ function ShareEarnButton({
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(false);
   const [popoverRect, setPopoverRect] = useState<DOMRect | null>(null);
-  const availability = useProviderAvailability();
   const wrapperRef = useRef<DivRefObject>(null);
 
   useEffect(() => {
@@ -3205,7 +3198,6 @@ function ShareEarnButton({
         {},
         undefined,
         locale,
-        availability,
       );
       if (result.success) {
         const fetchedCodes = result.data.codes.map((c) => ({
@@ -3239,7 +3231,6 @@ function ShareEarnButton({
         { fieldsGrid: { code: newCode.trim() } },
         undefined,
         locale,
-        availability,
       );
       if (result.success) {
         const createdCode = newCode.trim();
@@ -3482,7 +3473,6 @@ function CustomizeAndAddButton({
   iconOnly?: boolean;
 }): React.JSX.Element {
   const [isLoading, setIsLoading] = useState(false);
-  const availability = useProviderAvailability();
 
   const handleClick = async (e: ButtonMouseEvent): Promise<void> => {
     e.stopPropagation();
@@ -3515,7 +3505,6 @@ function CustomizeAndAddButton({
             undefined,
             { id: skillId },
             locale,
-            availability,
           );
           if (!skillResponse.success) {
             return;

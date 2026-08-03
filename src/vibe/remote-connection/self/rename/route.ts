@@ -5,8 +5,8 @@
 
 import "server-only";
 
-import { Methods } from "next-vibe/core/definition/enums";
-import { endpointsHandler } from "next-vibe/core/route/multi";
+import { Methods } from "../../../core/definition/enums";
+import { endpointsHandler } from "../../../core/route/multi";
 
 import definition from "./definition";
 import { RemoteConnectionSelfRenameRepository } from "./repository";
@@ -15,7 +15,7 @@ export const { PATCH, tools } = endpointsHandler({
   endpoint: definition,
   [Methods.PATCH]: {
     email: undefined,
-    handler: ({ user, logger, t, data, locale }) =>
+    handler: ({ user, logger, t, data, locale, platform }) =>
       RemoteConnectionSelfRenameRepository.renameSelf(
         user,
         logger,
@@ -23,6 +23,7 @@ export const { PATCH, tools } = endpointsHandler({
         data.newInstanceId,
         locale,
         data.propagate ?? true,
+        platform,
       ),
   },
 });

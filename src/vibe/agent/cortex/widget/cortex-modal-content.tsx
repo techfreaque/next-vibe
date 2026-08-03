@@ -1,8 +1,9 @@
 "use client";
 
-import cortexListDefinitions from "next-vibe/agent/cortex/list/definition";
+import cortexListDefinitions from "../list/definition";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { Platform } from "next-vibe/platforms/platforms";
 import {
   DialogContent,
   DialogDescription,
@@ -20,11 +21,13 @@ import { scopedTranslation } from "@/_pages/cortex/i18n";
 interface CortexModalContentProps {
   locale: CountryLanguage;
   user: JwtPayloadType;
+  platform: Platform;
 }
 
 export function CortexModalContent({
   locale,
   user,
+  platform,
 }: CortexModalContentProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
 
@@ -50,6 +53,7 @@ export function CortexModalContent({
         endpoint={cortexListDefinitions}
         locale={locale}
         user={user}
+        platform={platform}
         endpointOptions={{
           read: {
             queryOptions: {

@@ -52,8 +52,6 @@ export const LoginShellDB = [
   LoginShell.NOLOGIN,
 ] as const;
 
-export type LoginShellType = typeof LoginShellValue;
-
 // ─── Session Status ───────────────────────────────────────────────────────────
 
 export enum SshSessionStatus {
@@ -117,5 +115,3 @@ export const ClusterRoleDB = [
   ClusterRole.WORKER,
   ClusterRole.STORAGE,
 ] as const;
-
-export type ClusterRoleType = typeof ClusterRoleValue;

@@ -56,11 +56,13 @@ export const translations: typeof enTranslations = {
         notFound: {
           title: "Narzędzie nie znalezione",
           description: "Brak zarejestrowanego narzędzia o podanej nazwie",
+          detail: 'Brak zarejestrowanego narzędzia o nazwie "{{toolName}}"',
         },
         remoteFailed: {
           title: "Zdalne narzędzie zawiodło: {{message}}",
           description:
             "Zdalna instancja odrzuciła wywołanie lub zakończyło się błędem",
+          detail: 'Zdalne narzędzie "{{toolName}}" zawiodło: {{message}}',
         },
         server: {
           title: "Błąd wykonania",
@@ -73,6 +75,7 @@ export const translations: typeof enTranslations = {
         unknown: {
           title: "Nieznany błąd",
           description: "Wystąpił nieoczekiwany błąd",
+          detail: "Nieznany błąd podczas wykonania: {{error}}",
         },
       },
       success: {

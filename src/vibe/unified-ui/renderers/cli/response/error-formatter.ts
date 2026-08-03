@@ -3,12 +3,11 @@
  * Static class for formatting errors and error chains
  */
 
-import { formatValidationErrorDetails } from "next-vibe/core/core-utils/format-validation-error";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
-import { scopedTranslation as cliScopedTranslation } from "next-vibe/platforms/cli/i18n";
-import type { RouteExecutionResult } from "next-vibe/platforms/cli/runtime/route-executor";
+import type { CountryLanguage } from "../../../../core/i18n/core/config";
+import type { TranslatedKeyType } from "../../../../core/i18n/core/scoped-translation";
+import { ErrorResponseTypes } from "../../../../core/route/response.schema";
+import { scopedTranslation as cliScopedTranslation } from "../../../../platforms/cli/i18n";
+import type { RouteExecutionResult } from "../../../../platforms/cli/runtime/route-executor";
 
 /**
  * Static class for error formatting
@@ -21,39 +20,19 @@ export class CliErrorFormatter {
     result: RouteExecutionResult,
     locale: CountryLanguage,
     verbose: boolean,
-    endpoint?: CreateApiEndpointAny | null,
   ): string {
     const { t: cliT } = cliScopedTranslation.scopedT(locale);
 
-    // Format validation errors nicely - each field on its own line
-    const errorParams = result.errorParams;
+    // Keyed off the error type, not the message text. Validation errors arrive
+    // fully formatted (bullets + example command) from validateData, so there is
+    // nothing left to reconstruct here - only the prefix differs.
     const isValidationError =
-      errorParams && "error" in errorParams && "errorCount" in errorParams;
+      result.errorType?.errorKey ===
+      ErrorResponseTypes.VALIDATION_ERROR.errorKey;
 
     // TranslatedKeyType values are already translated strings at runtime
-    const errorMessage: string =
-      result.error ?? cliT("vibe.errors.unknownError", result.errorParams);
-
-    let detailedError = errorMessage;
-    if (isValidationError) {
-      const details = formatValidationErrorDetails(
-        errorParams as Record<string, string | number>,
-        endpoint,
-        result.inputData,
-      );
-      if (details) {
-        // Skip the redundant "Validation Error" title - details are self-explanatory
-        detailedError = details;
-      }
-    } else if (errorParams && Object.keys(errorParams).length > 0) {
-      // Generic params - show as before
-      // eslint-disable-next-line i18next/no-literal-string
-      detailedError += "\n\nDetails:";
-      for (const [key, value] of Object.entries(errorParams)) {
-        // eslint-disable-next-line i18next/no-literal-string
-        detailedError += `\n  ${key}: ${value}`;
-      }
-    }
+    let detailedError: string =
+      result.error ?? cliT("vibe.errors.unknownError");
 
     const unknownErrorKey = cliT("vibe.errors.unknownError");
 
@@ -106,17 +85,6 @@ export class CliErrorFormatter {
 
     // eslint-disable-next-line i18next/no-literal-string
     output += `\n\n${indent}↳ Caused by${errorTypeInfo}: ${causeMessage}`;
-
-    // Add cause error params - ErrorResponseType uses 'messageParams' field
-    if (
-      result.cause.messageParams &&
-      Object.keys(result.cause.messageParams).length > 0
-    ) {
-      for (const [key, value] of Object.entries(result.cause.messageParams)) {
-        // eslint-disable-next-line i18next/no-literal-string
-        output += `\n${indent}  • ${key}: ${value}`;
-      }
-    }
 
     // Recursively format nested causes
     if (result.cause.cause) {

@@ -1,21 +1,18 @@
 import "server-only";
 
-import { coreEnv } from "next-vibe/core/env";
-import { type CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import { coreEnv } from "../../core/env";
+import { type CountryLanguage } from "../../core/i18n/core/config";
+import type { ResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { Environment } from "next-vibe/env/env-util";
-import {
-  type AuthContext,
-  BaseAuthHandler,
-} from "next-vibe/identity/auth/base-auth-handler";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { scopedTranslation as cliScopedTranslation } from "next-vibe/platforms/cli/i18n";
+} from "../../core/route/response.schema";
+import { parseError } from "../../core/utils/parse-error";
+import { Environment } from "../../env/env-util";
+import { type AuthContext, BaseAuthHandler } from "./base-auth-handler";
+import type { EndpointLogger } from "../../logger/types";
+import { scopedTranslation as cliScopedTranslation } from "../../platforms/cli/i18n";
 import { cookies } from "next-vibe/ui/lib/headers";
 
 import {
@@ -140,9 +137,10 @@ export class WebAuthHandler extends BaseAuthHandler {
       logger.error("Error storing auth token", parseError(error));
       const { t } = cliScopedTranslation.scopedT(locale);
       return fail({
-        message: t("vibe.errors.storeFailed"),
+        message: t("vibe.errors.storeFailed", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -176,9 +174,10 @@ export class WebAuthHandler extends BaseAuthHandler {
       logger.error("Error clearing auth token", parseError(error));
       const { t } = cliScopedTranslation.scopedT(locale);
       return fail({
-        message: t("vibe.errors.clearFailed"),
+        message: t("vibe.errors.clearFailed", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }

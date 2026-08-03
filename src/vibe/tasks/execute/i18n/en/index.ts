@@ -7,7 +7,7 @@ export const translations = {
     executeTask: "Failed to execute task",
     forbidden: "You do not have permission to execute this task",
     alreadyRunning: "Task is already running",
-    notFound: "Task not found",
+    notFound: "Task {{taskId}} not found",
   },
   post: {
     title: "Execute Task",

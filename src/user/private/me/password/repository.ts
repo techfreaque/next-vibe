@@ -87,9 +87,8 @@ export class PasswordUpdateRepository {
       );
       if (!userResponse.success) {
         return fail({
-          message: t("errors.user_not_found"),
+          message: t("errors.user_not_found", { userId }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { userId },
           cause: userResponse,
         });
       }
@@ -106,9 +105,8 @@ export class PasswordUpdateRepository {
 
       if (!userRecord) {
         return fail({
-          message: t("errors.user_not_found"),
+          message: t("errors.user_not_found", { userId }),
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { userId },
         });
       }
 

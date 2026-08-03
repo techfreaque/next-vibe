@@ -6,7 +6,7 @@
 
 import "server-only";
 
-import { agentEnv } from "next-vibe/agent/env";
+import { agentEnv } from "../../../env";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
@@ -95,7 +95,7 @@ export class ReplicatePriceFetcher extends PriceFetcher {
 
     if (apiToken) {
       try {
-        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external API
+        // oxlint-disable-next-line restricted/no-raw-fetch -- external API
         const response = await fetch(
           `https://api.replicate.com/v1/models/${owner}/${model}`,
           {
@@ -140,7 +140,7 @@ export class ReplicatePriceFetcher extends PriceFetcher {
 
     // Fall back to HTML scraping
     try {
-      // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- external API
+      // oxlint-disable-next-line restricted/no-raw-fetch -- external API
       const response = await fetch(`https://replicate.com/${owner}/${model}`, {
         headers: { "User-Agent": "Mozilla/5.0 (compatible; unbottled-ai/1.0)" },
       });

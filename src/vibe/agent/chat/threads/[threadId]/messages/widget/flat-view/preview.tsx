@@ -3,8 +3,8 @@
  */
 
 "use client";
-import type { DefaultFolderId } from "next-vibe/agent/chat/config";
-import type { ChatMessage } from "next-vibe/agent/chat/db";
+import type { DefaultFolderId } from "next-vibe/core/execution-context";
+import type { ChatMessage } from "../../../../../db";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { useWindowSize } from "next-vibe/ui/hooks/use-window-size";
 import type { DivRefObject } from "next-vibe/ui/ui/div";

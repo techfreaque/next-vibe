@@ -134,7 +134,7 @@ export class MidStreamCompactingHandler {
     let compactingParentId = pendingTail?.messageId ?? ctx.currentParentId;
     if (!pendingTail) {
       const { db } = await import("next-vibe/database");
-      const { chatMessages } = await import("next-vibe/agent/chat/db");
+      const { chatMessages } = await import("../../../chat/db");
       const { eq, desc } = await import("drizzle-orm");
       const [dbLeaf] = await db
         .select({ id: chatMessages.id })

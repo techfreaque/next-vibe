@@ -1,15 +1,12 @@
 import * as SelectPrimitive from "@rn-primitives/select";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import type { ViewStyle } from "react-native";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
-import { Check, ChevronDown, ChevronUp } from "../../native/ui/icons";
-import {
-  convertCSSToViewStyle,
-  styledNative,
-} from "../../native/utils/style-converter";
+import { Check, ChevronDown, ChevronUp } from "./icons";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 // Import ALL types from web (source of truth) - ZERO definitions in native
 import type {
   SelectContentProps,

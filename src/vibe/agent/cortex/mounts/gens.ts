@@ -7,7 +7,7 @@ import "server-only";
  * Reconstructed from chatMessages where toolCall.toolName is a generation tool.
  */
 import { and, desc, eq, isNotNull, or, sql } from "drizzle-orm";
-import { chatMessages, chatThreads } from "next-vibe/agent/chat/db";
+import { chatMessages, chatThreads } from "../../chat/db";
 import { db } from "next-vibe/database";
 
 import type { VirtualListEntry, VirtualReadResult } from "./resolver";
@@ -356,83 +356,6 @@ export async function listGenPath(
   }
 
   return [];
-}
-
-export interface VirtualSearchHit {
-  path: string;
-  excerpt: string;
-  updatedAt: Date;
-}
-
-/**
- * Direct keyword search across AI-generated media - one DB query, no file-by-file reads.
- * Matches against prompt text.
- */
-export async function searchGens(
-  userId: string,
-  query: string,
-  limit: number,
-): Promise<VirtualSearchHit[]> {
-  const pattern = `%${query}%`;
-  const toolNames = getGenToolNames();
-  const rows = await db
-    .select({
-      messageId: chatMessages.id,
-      metadata: chatMessages.metadata,
-      createdAt: chatMessages.createdAt,
-    })
-    .from(chatMessages)
-    .innerJoin(chatThreads, eq(chatMessages.threadId, chatThreads.id))
-    .where(
-      and(
-        eq(chatThreads.userId, userId),
-        isNotNull(chatMessages.metadata),
-        or(
-          ...toolNames.map(
-            (name) =>
-              sql`${chatMessages.metadata}->'toolCall'->>'toolName' = ${name}`,
-          ),
-        ),
-        sql`${chatMessages.metadata}->'toolCall'->'result' IS NOT NULL`,
-        sql`${chatMessages.metadata}->'toolCall'->'args'->>'prompt' ILIKE ${pattern}`,
-      ),
-    )
-    .orderBy(desc(chatMessages.createdAt))
-    .limit(limit);
-
-  const hits: VirtualSearchHit[] = [];
-  for (const row of rows) {
-    const meta = row.metadata as {
-      toolCall?: {
-        toolName: string;
-        args?: { prompt?: string };
-        result?: GenToolResult;
-        status?: string;
-      };
-    } | null;
-    if (!meta?.toolCall?.args?.prompt) {
-      continue;
-    }
-    const { toolName, args, result, status } = meta.toolCall;
-    if (status === "failed" || !result) {
-      continue;
-    }
-    const prompt = args?.prompt ?? "";
-    const genToolName = toolName as GenToolName;
-    const mediaType = GEN_TOOLS[genToolName];
-    if (!mediaType) {
-      continue;
-    }
-    const month = toMonthFolder(row.createdAt);
-    const slug = `${slugify(prompt)}-${row.messageId}`;
-    const path = `/gens/${mediaType}/${month}/${slug}.md`;
-    hits.push({
-      path,
-      excerpt: prompt.slice(0, 150),
-      updatedAt: row.createdAt,
-    });
-  }
-  return hits;
 }
 
 /**

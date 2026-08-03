@@ -46,7 +46,7 @@ export async function scrapeWithBrowser(
     if (clickButtonTexts) {
       for (const buttonText of clickButtonTexts) {
         const clicked = await page.evaluate((text: string) => {
-          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Playwright evaluate runs inside browser context, cannot use vibe-ui abstractions
+          // eslint-disable-next-line restricted/no-browser-globals -- Playwright evaluate runs inside browser context, cannot use vibe-ui abstractions
           const buttons = [...document.querySelectorAll("button")].filter(
             (b) => b.textContent?.trim() === text && b.offsetParent !== null,
           );
@@ -81,7 +81,7 @@ export async function scrapeWithBrowser(
       }
     }
 
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Playwright evaluate runs inside browser context, cannot use vibe-ui abstractions
+    // eslint-disable-next-line restricted/no-browser-globals -- Playwright evaluate runs inside browser context, cannot use vibe-ui abstractions
     const text = await page.evaluate(() => document.body.innerText);
     logger.debug("Browser scrape successful", {
       url,

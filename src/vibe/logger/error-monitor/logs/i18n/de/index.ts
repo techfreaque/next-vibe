@@ -5,9 +5,10 @@ export const translations: typeof enTranslations = {
 
   errors: {
     repositoryInternalError: "Ein interner Fehler ist aufgetreten",
-    fetchErrorLogs: "Fehlerprotokolle konnten nicht abgerufen werden",
+    fetchErrorLogs:
+      "Fehlerprotokolle konnten nicht abgerufen werden: {{error}}",
     updateErrorLog:
-      "Der Status des Fehlerprotokolls konnte nicht aktualisiert werden",
+      "Status des Fehlerprotokolls konnte nicht aktualisiert werden: {{error}}",
   },
 
   statusFilter: {

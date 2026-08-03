@@ -4,8 +4,10 @@
 
 import "server-only";
 
-import type { ToolExecutionContext } from "next-vibe/agent/chat/config";
+import type { ToolExecutionContext } from "../../../../../core/execution-context";
+import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { Environment } from "next-vibe/env/env-util";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { CreditsT } from "@/credits/i18n";
@@ -80,7 +82,7 @@ export interface DbWriterState {
  * replay): there is no DB-hammering concern in a test run, and the 300ms trailing
  * timer on every intermediate delta added dead wall-clock to every replayed turn.
  */
-export const THROTTLE_MS = process.env.NODE_ENV === "test" ? 0 : 300;
+export const THROTTLE_MS = coreEnv.NODE_ENV === Environment.TEST ? 0 : 300;
 
 /** Map a MIME type to an uploads mount type folder */
 export function getMimeTypeFolder(mimeType: string): string {

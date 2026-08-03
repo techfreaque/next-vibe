@@ -1,26 +1,26 @@
 "use client";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Div } from "next-vibe/ui/ui/div";
 import { ExternalLink as ExternalLinkIcon } from "next-vibe/ui/ui/icons/ExternalLink";
 import { ExternalLink } from "next-vibe/ui/ui/link";
 import { Span } from "next-vibe/ui/ui/span";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../_shared/cn";
 import type {
   ReactRequestResponseWidgetProps,
   ReactStaticWidgetProps,
-} from "next-vibe/unified-ui/_shared/react-types";
-import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
+} from "../../../_shared/react-types";
+import type { FieldUsageConfig } from "../../../_shared/types";
 import {
   useWidgetContext,
   useWidgetForm,
   useWidgetIsInteractive,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
+} from "../../../_shared/use-widget-context";
 import {
   getIconSizeClassName,
   getSpacingClassName,
   getTextSizeClassName,
   isExternalUrl,
-} from "next-vibe/unified-ui/_shared/widget-helpers";
+} from "../../../_shared/widget-helpers";
 import type { JSX } from "react";
 
 import { extractLinkData } from "./shared";

@@ -6,20 +6,20 @@
  */
 
 "use client";
-import { ChatModelId } from "next-vibe/agent/ai-stream/models";
-import { RecordingInputArea } from "next-vibe/agent/ai-stream/stream/hooks/recording-input-area";
-import { useVoiceRecording } from "next-vibe/agent/ai-stream/stream/hooks/use-voice-recording";
-import { WidgetChatInput } from "next-vibe/agent/ai-stream/stream/widget/chat-input";
-import { DefaultFolderId } from "next-vibe/agent/chat/config";
-import type { ChatMessage } from "next-vibe/agent/chat/db";
-import { ChatMessageRole } from "next-vibe/agent/chat/enum";
-import type { ChatBootValue } from "next-vibe/agent/chat/hooks/context";
-import { ChatBootContext } from "next-vibe/agent/chat/hooks/context";
-import { ChatNavigationProvider } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
-import { GroupedAssistantMessage } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
-import type { MessageGroup } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/message-grouping";
-import { StaticUserMessageBubble } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
-import { NO_SKILL_ID } from "next-vibe/agent/skills/constants";
+import { ChatModelId } from "../ai-stream/models";
+import { RecordingInputArea } from "../ai-stream/stream/hooks/recording-input-area";
+import { useVoiceRecording } from "../ai-stream/stream/hooks/use-voice-recording";
+import { WidgetChatInput } from "../ai-stream/stream/widget/chat-input";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
+import type { ChatMessage } from "../chat/db";
+import { ChatMessageRole } from "../chat/enum";
+import type { ChatBootValue } from "../chat/hooks/context";
+import { ChatBootContext } from "../chat/hooks/context";
+import { ChatNavigationProvider } from "../chat/hooks/use-chat-navigation-store";
+import { GroupedAssistantMessage } from "../chat/threads/[threadId]/messages/widget/grouped-assistant-message";
+import type { MessageGroup } from "../chat/threads/[threadId]/messages/widget/message-grouping";
+import { StaticUserMessageBubble } from "../chat/threads/[threadId]/messages/widget/user-message-bubble";
+import { NO_SKILL_ID } from "../skills/constants";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";

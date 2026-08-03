@@ -28,8 +28,8 @@ import { beforeAll, describe, expect, it } from "bun:test";
 import type { LspIssue } from "./repository/typecheck/lsp-daemon";
 import { TsgoDaemon } from "./repository/typecheck/lsp-daemon";
 
-const TEST_PROJECT_PATH = resolve(__dirname, "../test-project");
-const ROOT_PATH = resolve(__dirname, "../../../../..");
+const TEST_PROJECT_PATH = resolve(__dirname, "./test-project");
+const ROOT_PATH = resolve(__dirname, "../../../..");
 const TEST_PROJECT_CONFIG = resolve(TEST_PROJECT_PATH, "check.config.ts");
 const TEST_PROJECT_MCP_CONFIG = resolve(TEST_PROJECT_PATH, ".mcp.json");
 const TEST_PROJECT_CURSOR_MCP_CONFIG = resolve(

@@ -58,17 +58,6 @@ export async function getProviderByMessengerAccountId(
 }
 
 /**
- * Get the default email provider.
- * Prefers SMTP (full inbox support). Falls back to Resend if RESEND_API_KEY set and no SMTP accounts.
- */
-export function getDefaultEmailProvider(): MessengerProvider {
-  if (process.env.RESEND_API_KEY && !process.env.SMTP_HOST) {
-    return resendProvider;
-  }
-  return smtpProvider;
-}
-
-/**
  * Resolve a provider from channel + provider enum values + account ID.
  */
 function resolveProviderFromAccount(
@@ -93,26 +82,4 @@ function resolveProviderFromAccount(
 
   // SMS (TWILIO / AWS_SNS / MESSAGEBIRD / HTTP)
   return new SmsMessengerProvider(accountId);
-}
-
-/**
- * Get provider by channel - returns the default provider for that channel.
- * For SMS/WhatsApp/Telegram, caller must supply an accountId.
- */
-export function getProviderByChannel(
-  channel: string,
-  accountId?: string,
-): MessengerProvider {
-  switch (channel) {
-    case MessageChannel.EMAIL:
-      return getDefaultEmailProvider();
-    case MessageChannel.SMS:
-      return new SmsMessengerProvider(accountId ?? "");
-    case MessageChannel.WHATSAPP:
-      return new WhatsAppMessengerProvider(accountId ?? "");
-    case MessageChannel.TELEGRAM:
-      return new TelegramMessengerProvider(accountId ?? "");
-    default:
-      return getDefaultEmailProvider();
-  }
 }

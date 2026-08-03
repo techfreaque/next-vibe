@@ -98,8 +98,8 @@ export const translations = {
       title: "Conflict",
       description: "Data conflict occurred",
     },
-    no_email: "No account found with that email address",
-    email_generation_failed: "Failed to generate email",
+    no_email: "No account found for {{email}}",
+    email_generation_failed: "Could not build the reset email for {{email}}: {{errorMessage}}",
   },
   success: {
     title: "Request Sent",

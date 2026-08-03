@@ -2,8 +2,8 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-import type { SystemPromptFragment } from "next-vibe/agent/ai-stream/system-prompt/types";
-import { chatThreads } from "next-vibe/agent/chat/db";
+import type { SystemPromptFragment } from "../../../ai-stream/system-prompt/types";
+import { chatThreads } from "../../db";
 import { db } from "next-vibe/database";
 
 import { THREAD_RENAME_ALIAS } from "./constants";

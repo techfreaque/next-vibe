@@ -14,10 +14,10 @@
  *   - [character-id]-skill.md → per-character focused skill manifests
  */
 
-import { coreEnv } from "next-vibe/core/env";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import { parseError } from "next-vibe/core/utils/parse-error";
+import { coreEnv } from "../../../../core/env";
+import type { CountryLanguage } from "../../../../core/i18n/core/config";
+import { defaultLocale } from "../../../../core/i18n/core/config";
+import { parseError } from "../../../../core/utils/parse-error";
 
 import { getListableSkills } from "../markdown-generator";
 

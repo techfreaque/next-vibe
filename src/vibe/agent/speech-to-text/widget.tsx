@@ -3,8 +3,8 @@
 import {
   ModelSelector,
   ModelSelectorTrigger,
-} from "next-vibe/agent/models/widget/model-selector";
-import { ModelSelectionType } from "next-vibe/agent/skills/enum";
+} from "../models/widget/model-selector";
+import { ModelSelectionType } from "../skills/enum";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Button } from "next-vibe/ui/ui/button";

@@ -9,31 +9,29 @@
 import "server-only";
 
 import chalk from "chalk";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { ResponseType } from "../../route/response.schema";
 import {
   ErrorResponseTypes,
-  fail,
+  failInline,
   success,
-} from "next-vibe/core/route/response.schema";
-import { runSetups } from "next-vibe/core/setup/run-setups";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../route/response.schema";
+import { runSetups } from "../run-setups";
+import { parseError } from "../../utils/parse-error";
+import type { JwtPayloadType } from "../../../identity/auth/types";
+import { CLI_BINARY_NAME } from "../../../platforms/cli/types/cli-target";
+import type { EndpointLogger } from "../../../logger/types";
 
 import type { InstallResponseOutput } from "./definition";
-import type { SetupInstallT } from "./i18n";
 
 export class SetupInstallRepository {
   static async installCli(
     user: JwtPayloadType,
-    t: SetupInstallT,
     logger: EndpointLogger,
   ): Promise<ResponseType<InstallResponseOutput>> {
     if (!user?.id) {
-      return fail({
-        message: t("post.errors.unauthorized.title"),
+      return failInline({
+        message: `Sign in before installing the ${CLI_BINARY_NAME} command.`,
         errorType: ErrorResponseTypes.UNAUTHORIZED,
-        messageParams: { error: t("post.errors.unauthorized.description") },
       });
     }
 
@@ -55,21 +53,14 @@ export class SetupInstallRepository {
         })),
         message:
           failed.length === 0
-            ? t("post.success.description")
-            : t("post.errors.server.description"),
+            ? "Operation completed successfully"
+            : "Internal server error occurred",
       });
     } catch (error) {
       const parsedError = parseError(error);
-      return fail({
-        message: t("post.errors.server.title"),
+      return failInline({
+        message: `Install failed: ${parsedError.message}\n${parsedError.stack ?? "No stack trace available."}`,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
-          // eslint-disable-next-line i18next/no-literal-string
-          error: "Setup failed",
-          reason: parsedError.message,
-          // eslint-disable-next-line i18next/no-literal-string
-          stack: parsedError.stack || "No stack trace available",
-        },
       });
     }
   }

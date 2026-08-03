@@ -9,7 +9,7 @@ export async function copyToClipboard(text: string): Promise<boolean> {
 
 export async function copyImageToClipboard(url: string): Promise<boolean> {
   try {
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+    // oxlint-disable-next-line restricted/no-raw-fetch
     const res = await fetch(url);
     const blob = await res.blob();
     const mimeType = blob.type || "image/png";

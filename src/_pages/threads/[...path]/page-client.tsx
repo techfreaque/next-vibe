@@ -12,6 +12,7 @@ import type { ThreadsPathPageData } from "./page";
 export function ThreadsPageClient({
   locale,
   user,
+  platform,
   creditsToUse,
   initialRootFolderId,
   initialSubFolderId,
@@ -56,6 +57,7 @@ export function ThreadsPageClient({
           endpoint={aiStreamDefinition}
           locale={locale}
           user={user}
+          platform={platform}
           className="flex flex-col h-dvh w-full"
         />
       </ChatBootProvider>

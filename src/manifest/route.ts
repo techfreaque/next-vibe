@@ -51,7 +51,7 @@ export async function GET(
     name: configT("appName"),
     short_name: configT("appName"),
     description: configT("appDescription", {
-      modelCount: getAvailableModelCount(false, getEnvAvailability()),
+      modelCount: getAvailableModelCount(false, await getEnvAvailability()),
     }),
     start_url: `/${locale}/`,
     display: MANIFEST_CONSTANTS.DISPLAY,

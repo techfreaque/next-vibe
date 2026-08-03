@@ -43,6 +43,7 @@ export const translations: typeof enTranslations = {
       server: {
         title: "Błąd serwera",
         description: "Wykonanie grafu nie powiodło się",
+        detail: "Wykonanie grafu nie powiodło się: {{error}}",
       },
       unknown: {
         title: "Nieznany błąd",
@@ -51,6 +52,7 @@ export const translations: typeof enTranslations = {
       validation: {
         title: "Walidacja nie powiodła się",
         description: "Nieprawidłowa konfiguracja grafu lub parametry",
+        detail: "Nieprawidłowa konfiguracja grafu: {{error}}",
       },
       notFound: {
         title: "Nie znaleziono",

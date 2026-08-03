@@ -9,7 +9,7 @@
 import {
   getMessagesForThread,
   updateIncognitoMessage,
-} from "next-vibe/agent/chat/incognito/storage";
+} from "../../../../../incognito/storage";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {

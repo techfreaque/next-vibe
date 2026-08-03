@@ -5,7 +5,7 @@
  * Custom sandboxed script transformation - admin-only escape hatch.
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,

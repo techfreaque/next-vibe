@@ -4,7 +4,7 @@
  * Type utilities for constraining schemas based on widget type.
  */
 
-import type { dateSchema } from "next-vibe/core/definition/common.schema";
+import type { dateSchema } from "../../core/definition/common.schema";
 import type { z } from "zod";
 
 // ============================================================================

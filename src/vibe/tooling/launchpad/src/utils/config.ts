@@ -3,8 +3,8 @@
 import { existsSync } from "node:fs";
 import { dirname, join, parse, resolve } from "node:path";
 
-import type { LaunchpadT } from "next-vibe/tooling/launchpad/i18n";
-import type { LaunchpadConfig } from "next-vibe/tooling/launchpad/src/types/types";
+import type { LaunchpadT } from "../../i18n";
+import type { LaunchpadConfig } from "../types/types";
 
 export const DEFAULT_CONFIG_PATH = "launchpad.config.ts";
 
@@ -14,7 +14,7 @@ let configRootDir: string | null = null;
 // Get the root directory from the config file location
 export function getRootDirectory(t: LaunchpadT): string {
   if (!configRootDir) {
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
+    // eslint-disable-next-line restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
     throw new Error(t("errors.configNotLoaded"));
   }
   return configRootDir;
@@ -61,7 +61,7 @@ function findConfigUp(configFileName: string): string | null {
  * Type guard to validate that an imported module has the expected LaunchpadConfig structure
  */
 function isLaunchpadConfigModule(
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build Infrastructure: Type guard requires 'unknown' for runtime module validation
+  // eslint-disable-next-line restricted/no-unknown -- Build Infrastructure: Type guard requires 'unknown' for runtime module validation
   module: unknown,
 ): module is { default: LaunchpadConfig } {
   if (typeof module !== "object" || module === null) {
@@ -95,7 +95,7 @@ export async function loadConfig(
     // If explicit path is provided, use it directly
     resolvedConfigPath = resolve(process.cwd(), configPath);
     if (!existsSync(resolvedConfigPath)) {
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
+      // eslint-disable-next-line restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
       throw new Error(
         t("errors.configFileNotFound" as const, {
           path: resolvedConfigPath,
@@ -106,7 +106,7 @@ export async function loadConfig(
     // Otherwise search up from cwd
     const foundConfigPath = findConfigUp(configPath);
     if (!foundConfigPath) {
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
+      // eslint-disable-next-line restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
       throw new Error(
         t("errors.configFileNotFoundInParents" as const, {
           filename: configPath,
@@ -121,13 +121,13 @@ export async function loadConfig(
 
   try {
     // const compiledConfigPath = await getCompiledConfigPath(resolvedConfigPath);
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build Infrastructure: Dynamic config import requires 'unknown' for runtime type validation
+    // eslint-disable-next-line restricted/no-unknown -- Build Infrastructure: Dynamic config import requires 'unknown' for runtime type validation
     const importedModule: unknown = await import(
       `file://${resolvedConfigPath}`
     );
 
     if (!isLaunchpadConfigModule(importedModule)) {
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
+      // eslint-disable-next-line restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
       throw new Error(t("errors.invalidConfigFormat" as const));
     }
 
@@ -139,7 +139,7 @@ export async function loadConfig(
     // Re-throw the error with additional context
     const errorMessage = error instanceof Error ? error.message : String(error);
     const contextMessage = t("errors.errorLoadingConfig" as const);
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
+    // eslint-disable-next-line restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
     throw new Error(`${contextMessage} ${errorMessage}`, { cause: error });
   }
 }

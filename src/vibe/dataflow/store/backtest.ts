@@ -7,13 +7,13 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-import { db } from "next-vibe/database";
+import { db } from "../../database";
 import type {
   DataPoint,
   Resolution,
   SignalEvent,
   TimeRange,
-} from "next-vibe/dataflow/shared/fields";
+} from "../shared/fields";
 
 import { pipelineBacktestResults, pipelineBacktestRuns } from "../db";
 import { BacktestActionMode } from "../enum";

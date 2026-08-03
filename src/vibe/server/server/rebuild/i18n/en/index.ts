@@ -52,9 +52,13 @@ export const translations = {
         "Vibe check: {{errors}} errors, {{warnings}} warnings. Use 'vibe check' or the MCP check tool to see details.",
       vibeCheckError: "Vibe check failed: {{error}}",
       buildFailed: "Next.js build failed: {{error}}",
+      buildOom:
+        "Next.js build killed by the OS (likely out of memory) - signal: {{signal}}",
+      buildExitCode: "Next.js build exited with code {{code}}",
       migrationFailed: "Migration failed: {{error}}",
       seedingFailed: "Seeding failed: {{error}}",
       restartFailed: "Server restart failed: {{error}}",
+      unknownError: "unknown error",
       noPidFile: "No .vibe-pid file found - is vibe start running?",
       invalidPid: "Invalid PID in .vibe-pid: {{pid}}",
       processNotRunning: "Process {{pid}} is not running",
@@ -84,6 +88,9 @@ export const translations = {
       server: {
         title: "Server Error",
         description: "An internal server error occurred during rebuild",
+        buildFailed: "Build failed: {{error}}",
+        migrationsFailed: "Migrations failed: {{error}}",
+        rebuildFailed: "Rebuild failed: {{error}}",
       },
       unknown: {
         title: "Unknown Error",

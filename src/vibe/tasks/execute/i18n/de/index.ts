@@ -9,7 +9,7 @@ export const translations: typeof enTranslations = {
     executeTask: "Aufgabe konnte nicht ausgeführt werden",
     forbidden: "Sie haben keine Berechtigung, diese Aufgabe auszuführen",
     alreadyRunning: "Aufgabe wird bereits ausgeführt",
-    notFound: "Aufgabe nicht gefunden",
+    notFound: "Aufgabe {{taskId}} nicht gefunden",
   },
   post: {
     title: "Aufgabe ausführen",

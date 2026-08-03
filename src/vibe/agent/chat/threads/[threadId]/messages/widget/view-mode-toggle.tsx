@@ -1,5 +1,5 @@
 "use client";
-import { ViewMode, type ViewModeValue } from "next-vibe/agent/chat/enum";
+import { ViewMode, type ViewModeValue } from "../../../../enum";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";

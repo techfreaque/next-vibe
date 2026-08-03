@@ -5266,6 +5266,7 @@ export const translations: typeof enTranslations = {
         error: {
           server: {
             title: "Błąd serwera podczas pobierania leadów",
+            detail: "Błąd serwera podczas pobierania leadów: {{error}}",
           },
           not_found: {
             title: "Leady nie znalezione",

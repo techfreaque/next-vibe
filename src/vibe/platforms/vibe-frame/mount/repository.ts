@@ -19,18 +19,18 @@ import "server-only";
 
 import { randomBytes } from "node:crypto";
 
-import { coreClientEnv as envClient } from "next-vibe/core/env-client";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { coreClientEnv as envClient } from "../../../core/env-client";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { scopedTranslation } from "next-vibe/platforms/vibe-frame/mount/i18n";
+} from "../../../core/route/response.schema";
+import { parseError } from "../../../core/utils/parse-error";
+import { db } from "../../../database";
+import type { EndpointLogger } from "../../../logger/types";
+import { scopedTranslation } from "./i18n";
 
 import { frameExchangeTokens } from "../db";
 import { generateFrameId } from "../types";

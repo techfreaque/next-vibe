@@ -8,8 +8,8 @@
 import "server-only";
 
 import { lt } from "drizzle-orm";
-import { db } from "next-vibe/database";
-import type { SignalEvent } from "next-vibe/dataflow/shared/fields";
+import { db } from "../../database";
+import type { SignalEvent } from "../shared/fields";
 
 import { pipelineSignals } from "../db";
 

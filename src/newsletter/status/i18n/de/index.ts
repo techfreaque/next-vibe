@@ -33,6 +33,7 @@ export const translations: typeof enTranslations = {
       title: "Interner Fehler",
       description:
         "Beim Prüfen des Abonnementstatus ist ein Fehler aufgetreten",
+      detail: "Statusabfrage fehlgeschlagen: {{error}}",
     },
     unauthorized: {
       title: "Nicht autorisiert",

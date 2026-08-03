@@ -3,9 +3,9 @@
  */
 
 "use client";
-import { useTourState } from "next-vibe/agent/chat/tour-state";
-import { ModelCreditDisplay } from "next-vibe/agent/models/widget/model-credit-display";
-import { getBestChatModelForFavorite } from "next-vibe/agent/skills/favorites/[id]/definition";
+import { useTourState } from "../chat/tour-state";
+import { ModelCreditDisplay } from "../models/widget/model-credit-display";
+import { getBestChatModelForFavorite } from "./favorites/[id]/definition";
 import { isCliPlatform } from "next-vibe/platforms/platforms";
 import { usePathname } from "next-vibe/ui/hooks/use-pathname";
 import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
@@ -64,14 +64,14 @@ import BadgeWidget from "next-vibe/unified-ui/widgets/display-only/badge/widget"
 import IconWidget from "next-vibe/unified-ui/widgets/display-only/icon/widget";
 import { SeparatorWidget } from "next-vibe/unified-ui/widgets/display-only/separator/widget";
 import TextWidget from "next-vibe/unified-ui/widgets/display-only/text/widget";
-import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useSelectorOnboardingContext } from "../ai-stream/stream/widget/selector/selector-onboarding/context";
 import { useChatSettings } from "../chat/settings/hooks";
 import { parseSkillId } from "../chat/slugify";
-import { useProviderAvailability } from "../env-availability-context";
+import { useProviderAvailability } from "../env-availability-store";
 import skillDetailDefinitions from "./[id]/definition";
 import { COMPANION_SKILLS } from "./config";
 import type definition from "./definition";
@@ -1787,7 +1787,6 @@ export function EditFavBeforeAddButton({
   children?: React.ReactNode;
 }): React.JSX.Element {
   const [isLoading, setIsLoading] = useState(false);
-  const availability = useProviderAvailability();
 
   const handleClick = async (e: ButtonMouseEvent): Promise<void> => {
     e.stopPropagation();
@@ -1807,7 +1806,6 @@ export function EditFavBeforeAddButton({
         undefined,
         { id: parseSkillId(char.skillId).skillId },
         locale,
-        availability,
       );
 
       if (!skillResponse.success) {
@@ -2019,7 +2017,6 @@ export function SkillFavoriteActions({
         undefined,
         { id: favoriteIds[0] },
         locale,
-        availability,
       );
 
       if (!favoriteResponse.success) {
@@ -2046,7 +2043,6 @@ export function SkillFavoriteActions({
         logger,
         locale,
         user,
-        availability,
       });
     } catch (error) {
       logger.error("Failed to activate favorite", {
@@ -2079,7 +2075,6 @@ export function SkillFavoriteActions({
         undefined,
         { id: favoriteId },
         locale,
-        availability,
       );
 
       if (!favoriteResponse.success) {
@@ -2106,7 +2101,6 @@ export function SkillFavoriteActions({
         logger,
         locale,
         user,
-        availability,
       });
     } catch (error) {
       logger.error("Failed to activate favorite", {
@@ -2142,7 +2136,6 @@ export function SkillFavoriteActions({
         undefined,
         { id: baseId },
         locale,
-        availability,
       );
       if (!skillResponse.success) {
         return;

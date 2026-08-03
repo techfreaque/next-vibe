@@ -165,6 +165,9 @@ export const translations = {
     server: {
       title: "Server Error",
       description: "An internal server error occurred",
+      detail_list: "Couldn't load messages: {{error}}",
+      detail_get: "Couldn't load the message: {{error}}",
+      detail_create: "Couldn't save the message: {{error}}",
     },
     unknown: {
       title: "Unknown Error",

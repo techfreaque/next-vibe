@@ -26,7 +26,7 @@ export const forwardLead: ForwardLeadFn = async (credentials, lead, t) => {
     attributes: [{ name: "FirstName", value: firstName }],
   };
 
-  // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+  // oxlint-disable-next-line restricted/no-raw-fetch
   let createResponse = await fetch(`https://${mappDomain}${apiContactsPath}`, {
     method: "post",
     headers,
@@ -34,7 +34,7 @@ export const forwardLead: ForwardLeadFn = async (credentials, lead, t) => {
   });
 
   if (!createResponse.ok) {
-    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+    // oxlint-disable-next-line restricted/no-raw-fetch
     createResponse = await fetch(
       `https://${mappDomain}${apiContactsUpdatePath}`,
       { method: "post", headers, body: JSON.stringify(contactPayload) },
@@ -49,7 +49,7 @@ export const forwardLead: ForwardLeadFn = async (credentials, lead, t) => {
     });
   }
 
-  // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+  // oxlint-disable-next-line restricted/no-raw-fetch
   const subscribeResponse = await fetch(
     `https://${mappDomain}${apiSubscribePath}?email=${email}&groupId=${parseInt(listId ?? "0", 10)}&subscriptionMode=CONFIRMED_OPT_IN`,
     { method: "post", headers },

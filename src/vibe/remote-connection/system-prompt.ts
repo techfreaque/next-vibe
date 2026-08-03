@@ -6,13 +6,13 @@ import type {
   RemoteInstancesContext,
   SystemPromptFragment,
   SystemPromptServerParams,
-} from "next-vibe/agent/ai-stream/system-prompt/types";
-import { getEnvAvailability } from "next-vibe/agent/env-availability";
-import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
-import { coreClientEnv as envClient } from "next-vibe/core/env-client";
-import { db } from "next-vibe/database";
-import { VibeMode } from "next-vibe/env/env-util";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+} from "../agent/ai-stream/system-prompt/types";
+import { getEnvAvailability } from "../agent/env-availability";
+import { getAvailableModelCount } from "../agent/models/all-models";
+import { coreClientEnv as envClient } from "../core/env-client";
+import { db } from "../database";
+import { VibeMode } from "../env/env-util";
+import { UserPermissionRole } from "../identity/roles/enum";
 
 import { sshConnections } from "@/ssh/db";
 
@@ -46,7 +46,10 @@ export async function loadRemoteInstancesContext(
   const appUrl = envClient.NEXT_PUBLIC_APP_URL;
   const vibeMode = envClient.NEXT_PUBLIC_VIBE_MODE;
   const isDev = vibeMode === VibeMode.DEV;
-  const totalModelCount = getAvailableModelCount(isAdmin, getEnvAvailability());
+  const totalModelCount = getAvailableModelCount(
+    isAdmin,
+    await getEnvAvailability(),
+  );
 
   return {
     remoteConnections: rows,

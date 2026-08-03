@@ -15,7 +15,7 @@
 import type {
   AnyModelOptionShape,
   ModelOptionTokenBased,
-} from "next-vibe/agent/models/models";
+} from "../models/models";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { z } from "zod";
 
@@ -309,47 +309,6 @@ export const audioVisionModelOptions: AudioVisionModelOption[] =
       m.id in audioVisionModelOptionsIndex &&
       (m.inputs as string[]).includes("audio"),
   );
-
-// ============================================
-// DROPDOWN OPTIONS
-// ============================================
-
-export const ImageVisionModelIdOptions = imageVisionModelOptions.map((m) => ({
-  value: m.id,
-  label: m.name,
-}));
-
-export const VideoVisionModelIdOptions = videoVisionModelOptions.map((m) => ({
-  value: m.id,
-  label: m.name,
-}));
-
-export const AudioVisionModelIdOptions = audioVisionModelOptions.map((m) => ({
-  value: m.id,
-  label: m.name,
-}));
-
-// ============================================
-// GETTERS
-// ============================================
-
-export function getImageVisionModelById(
-  modelId: ImageVisionModelId,
-): ImageVisionModelOption | undefined {
-  return imageVisionModelOptionsIndex[modelId];
-}
-
-export function getVideoVisionModelById(
-  modelId: VideoVisionModelId,
-): VideoVisionModelOption | undefined {
-  return videoVisionModelOptionsIndex[modelId];
-}
-
-export function getAudioVisionModelById(
-  modelId: AudioVisionModelId,
-): AudioVisionModelOption | undefined {
-  return audioVisionModelOptionsIndex[modelId];
-}
 
 // ============================================================
 // VISION MODEL SELECTION SCHEMAS

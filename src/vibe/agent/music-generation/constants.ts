@@ -2,7 +2,7 @@
  * Music Generation Constants
  */
 
-import type { MusicGenModelSelection } from "../music-generation/models";
+import type { MusicGenModelSelection } from "./models";
 import {
   ModelSelectionType,
   ModelSortDirection,

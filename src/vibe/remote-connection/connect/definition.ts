@@ -3,24 +3,24 @@
  * POST - login to remote instance and store session in DB
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
   Methods,
   WidgetType,
-} from "next-vibe/core/definition/enums";
-import { coreClientEnv as envClient } from "next-vibe/core/env-client";
-import { VibeMode } from "next-vibe/env/env-util";
-import { UserRole } from "next-vibe/identity/roles/enum";
-import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
-import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
+} from "../../core/definition/enums";
+import { coreClientEnv as envClient } from "../../core/env-client";
+import { VibeMode } from "../../env/env-util";
+import { UserRole } from "../../identity/roles/enum";
+import { lazyWidget } from "../../unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "../../unified-ui/_shared/utils";
 import {
   backButton,
   requestField,
   responseField,
   widgetField,
-} from "next-vibe/unified-ui/_shared/utils-i18n";
+} from "../../unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { SyncScopeSchema } from "../db";
@@ -195,7 +195,7 @@ const { POST } = createEndpoint({
   options: {
     mutationOptions: {
       onSuccess: async (data) => {
-        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
+        const { apiClient } = await import("../../unified-ui/hooks/store");
         const listDefinition = await import("../list/definition");
         apiClient.updateEndpointData(
           listDefinition.GET,

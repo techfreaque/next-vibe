@@ -2,11 +2,13 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   errors: {
-    missingUrlParam: "Fehlender URL-Parameter",
-    urlConstructionFailed: "URL-Konstruktion fehlgeschlagen",
-    validationFailed: "Validierung fehlgeschlagen",
-    htmlResponseReceived: "HTML-Antwort statt JSON erhalten",
-    networkError: "Netzwerkfehler aufgetreten",
+    missingUrlParam:
+      "Fehlender URL-Parameter {{paramName}} für Endpunkt {{endpoint}}",
+    urlConstructionFailed: "URL-Konstruktion fehlgeschlagen: {{error}}",
+    validationFailed: "Validierung fehlgeschlagen: {{error}}",
+    htmlResponseReceived:
+      "HTML-Antwort statt JSON von {{url}} erhalten (Status {{status}}). Prüfe, ob der API-Server läuft und der Endpunkt existiert.",
+    networkError: "Netzwerkfehler aufgetreten: {{error}}",
     failedToLoadPage: "Seite konnte nicht geladen werden",
   },
   generate: {

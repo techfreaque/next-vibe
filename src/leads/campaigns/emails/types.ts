@@ -87,26 +87,6 @@ export interface ABTestConfig {
 }
 
 /**
- * Email Performance Metrics
- */
-export interface EmailPerformanceMetrics {
-  journeyVariant: typeof EmailJourneyVariantValue;
-  stage: typeof EmailCampaignStageValue;
-  sent: number;
-  delivered: number;
-  opened: number;
-  clicked: number;
-  unsubscribed: number;
-  bounced: number;
-  converted: number;
-  openRate: number;
-  clickRate: number;
-  conversionRate: number;
-  unsubscribeRate: number;
-  bounceRate: number;
-}
-
-/**
  * Campaign Scheduling Options
  */
 export interface CampaignSchedulingOptions {
@@ -116,23 +96,4 @@ export interface CampaignSchedulingOptions {
   stage: typeof EmailCampaignStageValue;
   scheduledAt: Date;
   metadata?: Record<string, string | number | boolean>;
-}
-
-/**
- * Email Tracking Data
- */
-export interface EmailTrackingData {
-  leadId: string;
-  campaignId: string;
-  eventType:
-    | "sent"
-    | "delivered"
-    | "opened"
-    | "clicked"
-    | "unsubscribed"
-    | "bounced";
-  timestamp: Date;
-  metadata?: Record<string, string | number | boolean>;
-  userAgent?: string;
-  ipAddress?: string;
 }

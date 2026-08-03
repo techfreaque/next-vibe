@@ -5,10 +5,10 @@
 
 "use client";
 
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { EndpointReturn } from "next-vibe/unified-ui/hooks/endpoint-types";
-import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
+import type { EndpointReturn } from "../../unified-ui/hooks/endpoint-types";
+import { useEndpoint } from "../../unified-ui/hooks/use-endpoint";
 
 import definitions from "./definition";
 

@@ -3,9 +3,9 @@
  * Defines endpoints for listing and creating chat threads
  */
 
-import { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import { ChatModelId } from "../../ai-stream/models";
 import { dateSchema } from "next-vibe/core/definition/common.schema";
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -14,7 +14,7 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { UserRole, UserRoleDB } from "next-vibe/identity/roles/enum";
-import type { EmitEventNamed } from "next-vibe/realtime/structured-events";
+import type { EmitEventNamed } from "next-vibe/realtime/core/structured-events";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   objectField,
@@ -25,8 +25,8 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
-import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
-import { DefaultFolderId } from "../config";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import {
   ThreadStatus,
   ThreadStatusDB,
@@ -424,8 +424,7 @@ const { GET } = createEndpoint({
         if (!item?.id) {
           return;
         }
-        const { updateIncognitoThread } =
-          await import("next-vibe/agent/chat/incognito/storage");
+        const { updateIncognitoThread } = await import("../incognito/storage");
         await updateIncognitoThread(item.id, { title: item.title });
       },
     },
@@ -440,8 +439,7 @@ const { GET } = createEndpoint({
         if (!item?.id) {
           return;
         }
-        const { updateIncognitoThread } =
-          await import("next-vibe/agent/chat/incognito/storage");
+        const { updateIncognitoThread } = await import("../incognito/storage");
         await updateIncognitoThread(item.id, {
           streamingState: item.streamingState,
         });
@@ -460,8 +458,7 @@ const { GET } = createEndpoint({
         if (!item?.id) {
           return;
         }
-        const { updateIncognitoThread } =
-          await import("next-vibe/agent/chat/incognito/storage");
+        const { updateIncognitoThread } = await import("../incognito/storage");
         await updateIncognitoThread(item.id, {
           streamingState: item.streamingState,
           description: item.description,

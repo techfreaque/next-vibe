@@ -8,7 +8,6 @@ import {
   buildModelOptionsIndex,
   defaultFeatures,
   filterRoleModels,
-  getModelForProvider,
   getProviderPrice,
   type ModelDefinition,
   type ModelOptionAudioBased,
@@ -386,23 +385,6 @@ export function getMusicGenModelById(
   modelId: MusicGenModelId,
 ): MusicGenModelOption | undefined {
   return musicGenModelOptionsIndex[modelId];
-}
-
-/**
- * Resolve a music gen model option using a specific API provider.
- * Picks the cheapest provider variant for `modelId` that matches `provider` from the pool.
- * Falls back to the default (cheapest overall) if no matching provider exists.
- */
-export function getMusicGenModelForProvider(
-  modelId: MusicGenModelId,
-  provider: ApiProvider,
-): MusicGenModelOption | undefined {
-  return getModelForProvider(
-    modelId,
-    provider,
-    musicGenModelOptionsPool,
-    getMusicGenModelById(modelId),
-  );
 }
 
 // ============================================================

@@ -1,6 +1,6 @@
 "use client";
 
-import { scopedTranslation } from "next-vibe/agent/chat/threads/[threadId]/permissions/i18n";
+import { scopedTranslation } from "./i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { type EndpointLogger } from "next-vibe/logger/types";
@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "next-vibe/ui/ui/dialog";
+import { useWidgetPlatform } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 import { useCallback, useMemo } from "react";
@@ -35,6 +36,7 @@ export function ThreadPermissionsDialog({
   user,
 }: ThreadPermissionsDialogProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
+  const platform = useWidgetPlatform();
 
   const handleSuccess = useCallback(() => {
     onOpenChange(false);
@@ -72,6 +74,7 @@ export function ThreadPermissionsDialog({
           endpoint={threadPermissionsDefinitions}
           locale={locale}
           user={user}
+          platform={platform}
           endpointOptions={endpointOptions}
         />
       </DialogContent>

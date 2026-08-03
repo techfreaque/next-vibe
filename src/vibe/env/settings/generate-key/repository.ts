@@ -7,15 +7,15 @@ import "server-only";
 
 import { randomBytes } from "node:crypto";
 
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { GenerateKeyT } from "next-vibe/env/settings/generate-key/i18n";
-import type { EndpointLogger } from "next-vibe/logger/types";
+} from "../../../core/route/response.schema";
+import { parseError } from "../../../core/utils/parse-error";
+import type { GenerateKeyT } from "./i18n";
+import type { EndpointLogger } from "../../../logger/types";
 
 import type { GenerateKeyResponseOutput } from "./definition";
 

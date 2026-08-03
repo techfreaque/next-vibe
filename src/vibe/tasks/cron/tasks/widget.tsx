@@ -4,17 +4,17 @@
  */
 
 "use client";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { getDefaultTimezone } from "next-vibe/core/i18n/core/localization-utils";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import bulkEndpoints from "next-vibe/tasks/cron/bulk/definition";
-import type { CronTasksTranslationKey } from "next-vibe/tasks/cron/tasks/i18n";
-import { formatCronScheduleShort } from "next-vibe/tasks/cron-formatter";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import { getDefaultTimezone } from "../../../core/i18n/core/localization-utils";
+import type { EndpointLogger } from "../../../logger/types";
+import bulkEndpoints from "../bulk/definition";
+import type { CronTasksTranslationKey } from "./i18n";
+import { formatCronScheduleShort } from "../../cron-formatter";
 import type {
   CronTaskPriorityDB,
   CronTaskPriorityFilterValue,
   TaskCategoryDB,
-} from "next-vibe/tasks/enum";
+} from "../../enum";
 import {
   CronTaskEnabledFilter,
   CronTaskHiddenFilter,
@@ -23,8 +23,8 @@ import {
   CronTaskStatus,
   type CronTaskStatusValue,
   TaskCategoryOptions,
-} from "next-vibe/tasks/enum";
-import { scopedTranslation as tasksScopedTranslation } from "next-vibe/tasks/i18n";
+} from "../../enum";
+import { scopedTranslation as tasksScopedTranslation } from "../../i18n";
 import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import {
   AlertDialog,
@@ -65,7 +65,7 @@ import {
   SelectValue,
 } from "next-vibe/ui/ui/select";
 import { Span } from "next-vibe/ui/ui/span";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { cn } from "../../../unified-ui/_shared/cn";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -75,9 +75,9 @@ import {
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
-import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
-import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
+} from "../../../unified-ui/_shared/use-widget-context";
+import { useApiMutation } from "../../../unified-ui/hooks/use-api-mutation";
+import { NavigateButtonWidget } from "../../../unified-ui/widgets/interactive/navigate-button/widget";
 import React, { useCallback, useMemo, useState } from "react";
 
 import type endpoints from "./definition";
@@ -756,11 +756,9 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
         .then(async () => {
           handleClearSelection();
           // Update caches optimistically - no refetch needed
-          const { apiClient } =
-            await import("next-vibe/unified-ui/hooks/store");
+          const { apiClient } = await import("../../../unified-ui/hooks/store");
           const tasksDef = await import("./definition");
-          const queueDef =
-            await import("next-vibe/tasks/cron/queue/definition");
+          const queueDef = await import("../queue/definition");
           if (action === "delete") {
             apiClient.updateEndpointData(
               tasksDef.default.GET,
@@ -969,14 +967,14 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
 
   const handleNavigateStats = useCallback((): void => {
     void (async (): Promise<void> => {
-      const m = await import("next-vibe/tasks/cron/stats/definition");
+      const m = await import("../stats/definition");
       navigate(m.default.GET, {});
     })();
   }, [navigate]);
 
   const handleNavigateGraphs = useCallback((): void => {
     void (async (): Promise<void> => {
-      const graphsDef = await import("next-vibe/dataflow/graphs/definition");
+      const graphsDef = await import("../../../dataflow/graphs/definition");
       navigate(graphsDef.default.GET, {
         data: { search: "cron" },
       });
@@ -985,14 +983,14 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
 
   const handleNavigateHistory = useCallback((): void => {
     void (async (): Promise<void> => {
-      const m = await import("next-vibe/tasks/cron/history/definition");
+      const m = await import("../history/definition");
       navigate(m.default.GET, {});
     })();
   }, [navigate]);
 
   const handleNavigateQueue = useCallback((): void => {
     void (async (): Promise<void> => {
-      const m = await import("next-vibe/tasks/cron/queue/definition");
+      const m = await import("../queue/definition");
       navigate(m.default.GET, {});
     })();
   }, [navigate]);
@@ -1009,7 +1007,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
   const handleView = useCallback(
     (task: Task): void => {
       void (async (): Promise<void> => {
-        const m = await import("next-vibe/tasks/cron/[id]/definition");
+        const m = await import("../[id]/definition");
         navigate(m.default.GET, { urlPathParams: { id: task.id } });
       })();
     },
@@ -1019,7 +1017,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
   const handleEdit = useCallback(
     (task: Task): void => {
       void (async (): Promise<void> => {
-        const m = await import("next-vibe/tasks/cron/[id]/definition");
+        const m = await import("../[id]/definition");
         navigate(m.default.PUT, {
           urlPathParams: { id: task.id },
           data: {
@@ -1046,7 +1044,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
   const handleDelete = useCallback(
     (task: Task): void => {
       void (async (): Promise<void> => {
-        const m = await import("next-vibe/tasks/cron/[id]/definition");
+        const m = await import("../[id]/definition");
         navigate(m.default.DELETE, {
           urlPathParams: { id: task.id },
           renderInModal: true,
@@ -1060,7 +1058,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
   const handleTaskHistory = useCallback(
     (task: Task): void => {
       void (async (): Promise<void> => {
-        const m = await import("next-vibe/tasks/cron/history/definition");
+        const m = await import("../history/definition");
         navigate(m.default.GET, {
           data: { taskId: task.id },
         });
@@ -1072,7 +1070,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
   const handleRun = useCallback(
     (task: Task): void => {
       void (async (): Promise<void> => {
-        const m = await import("next-vibe/tasks/execute/definition");
+        const m = await import("../../execute/definition");
         navigate(m.default.POST, {
           data: { taskId: task.id },
           renderInModal: true,

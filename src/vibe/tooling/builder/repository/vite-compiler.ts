@@ -8,18 +8,18 @@ import type { Server as NodeHttpServer } from "node:http";
 import { networkInterfaces } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { maybeColorize, semantic } from "next-vibe/logger/colors";
-import { serverFileLog } from "next-vibe/logger/file";
-import { createNextjsFormatter } from "next-vibe/logger/formatters";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import type { scopedTranslation } from "next-vibe/tooling/builder/i18n";
+} from "../../../core/route/response.schema";
+import { parseError } from "../../../core/utils/parse-error";
+import { maybeColorize, semantic } from "../../../logger/colors";
+import { serverFileLog } from "../../../logger/file";
+import { createNextjsFormatter } from "../../../logger/formatters";
+import type { EndpointLogger } from "../../../logger/types";
+import type { scopedTranslation } from "../i18n";
 import type { OutputBundle, OutputOptions, RolldownOptions } from "rolldown";
 import {
   type BuildOptions,
@@ -268,10 +268,9 @@ class ViteCompiler {
 
     if (!existsSync(inputFilePath)) {
       return fail({
-        message: t("errors.inputFileNotFound"),
-        messageParams: {
+        message: t("errors.inputFileNotFound", {
           filePath: fileConfig.input,
-        },
+        }),
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
@@ -2256,7 +2255,7 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
         // SSR stream open for many seconds.
         for (const path of ["/en-US", "/en-US/threads/incognito/new"]) {
           try {
-            // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- dev-server self-request to prime SSR page rendering, not an endpoint call
+            // oxlint-disable-next-line restricted/no-raw-fetch -- dev-server self-request to prime SSR page rendering, not an endpoint call
             const res = await fetch(`${url}${path}`, {
               headers: { "user-agent": "vibe-ssr-prime" },
             });

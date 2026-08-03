@@ -5,12 +5,9 @@
 
 import "server-only";
 
-import { createFixtureFetch } from "next-vibe/agent/ai-stream/testing/fetch-cache";
-import { getStorageAdapter } from "next-vibe/agent/chat/storage/index";
-import {
-  ApiProvider,
-  calculateCreditCost,
-} from "next-vibe/agent/models/models";
+import { createFixtureFetch } from "../ai-stream/testing/fetch-cache";
+import { getStorageAdapter } from "../chat/storage/index";
+import { ApiProvider, calculateCreditCost } from "../models/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -20,8 +17,12 @@ import {
 } from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import type { Platform } from "next-vibe/platforms/platforms";
 
-import { DefaultFolderId, type ToolExecutionContext } from "../chat/config";
+import {
+  DefaultFolderId,
+  type ToolExecutionContext,
+} from "next-vibe/core/execution-context";
 import {
   checkMediaBalance,
   deductMediaCredits,
@@ -54,6 +55,7 @@ export class MusicGenerationRepository {
     logger: EndpointLogger,
     t: MusicGenerationT,
     toolExecutionContext: ToolExecutionContext,
+    platform: Platform,
   ): Promise<ResponseType<MusicGenerationPostResponseOutput>> {
     // model is resolved via requestDefaults in route.ts (from favorites/skill config)
     if (!data.model) {
@@ -176,15 +178,14 @@ export class MusicGenerationRepository {
           logger,
           featureLabel: t("post.title"),
           toolExecutionContext,
+          platform,
         });
         break;
 
       default:
         return fail({
-          message: t("post.errors.notConfigured", {
+          message: t("post.errors.providerUnsupported", {
             label: audioModel.apiProvider,
-            envKey: "N/A",
-            url: "",
           }),
           errorType: ErrorResponseTypes.BAD_REQUEST,
         });
@@ -265,8 +266,8 @@ export class MusicGenerationRepository {
         .replaceAll(/^-|-$/g, "")
         .slice(0, 60)}-${toolMessageId}`;
       void Promise.all([
-        import("next-vibe/agent/cortex/mounts/gens"),
-        import("next-vibe/agent/cortex/embeddings/sync-virtual"),
+        import("../cortex/mounts/gens"),
+        import("../cortex/embeddings/sync-virtual"),
       ])
         .then(([{ readGenPath }, { syncVirtualNodeToEmbedding }]) => {
           const path = `/gens/audio/${month}/${slug}.md`;
@@ -297,8 +298,8 @@ export class MusicGenerationRepository {
     user: JwtPayloadType;
     toolExecutionContext: ToolExecutionContext;
   }): Promise<Partial<MusicGenerationPostRequestInput>> {
-    const { getInstanceAvailability } = await import("../env-availability");
-    const availability = await getInstanceAvailability();
+    const { getEnvAvailability } = await import("../env-availability");
+    const availability = await getEnvAvailability();
     const userId =
       ctx.user && !ctx.user.isPublic && "id" in ctx.user
         ? ctx.user.id
@@ -306,9 +307,9 @@ export class MusicGenerationRepository {
     let sel: MusicGenModelSelection | undefined;
     if (userId) {
       const { resolveSkillFavoriteContext } =
-        await import("next-vibe/agent/skills/resolver");
+        await import("../skills/resolver");
       const { ModalityResolver } =
-        await import("next-vibe/agent/ai-stream/repository/core/modality-resolver");
+        await import("../ai-stream/repository/core/modality-resolver");
       const { favorite, skill } = await resolveSkillFavoriteContext({
         favoriteId: ctx.toolExecutionContext.favoriteId ?? null,
         skillId: ctx.toolExecutionContext.skillId ?? null,

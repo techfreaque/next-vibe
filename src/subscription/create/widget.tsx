@@ -1,6 +1,6 @@
 "use client";
 
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
+import { useProviderAvailability } from "next-vibe/agent/env-availability-store";
 import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { UserRole } from "next-vibe/identity/roles/enum";

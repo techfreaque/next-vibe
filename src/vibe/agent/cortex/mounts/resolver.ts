@@ -8,7 +8,7 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
  */
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { ToolExecutionContext } from "../../chat/config";
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 
 export interface VirtualReadResult {
   content: string;

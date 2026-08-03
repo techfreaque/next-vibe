@@ -66,7 +66,7 @@ export const translations: typeof enTranslations = {
         description: "Wystąpił konflikt",
       },
       noVisionModel: "Brak skonfigurowanego modelu wizji obrazu",
-      descriptionFailed: "Nie udało się opisać obrazu",
+      descriptionFailed: "Nie udało się opisać obrazu: {{error}}",
       insufficientCredits:
         "Niewystarczające kredyty. Saldo: {{balance}}, wymagane: {{minimum}}",
       balanceCheckFailed: "Nie udało się sprawdzić salda",

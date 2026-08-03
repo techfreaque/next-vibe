@@ -1,17 +1,17 @@
 "use client";
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Div } from "next-vibe/ui/ui/div";
 import { Pre } from "next-vibe/ui/ui/pre";
 import { Span } from "next-vibe/ui/ui/span";
 import { Code } from "next-vibe/ui/ui/typography";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
-import type { ReactDisplayWidgetProps } from "next-vibe/unified-ui/_shared/react-types";
-import type { StringWidgetSchema } from "next-vibe/unified-ui/_shared/schema-constraints";
-import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
+import { cn } from "../../../_shared/cn";
+import type { ReactDisplayWidgetProps } from "../../../_shared/react-types";
+import type { StringWidgetSchema } from "../../../_shared/schema-constraints";
+import type { FieldUsageConfig } from "../../../_shared/types";
 import {
   getSpacingClassName,
   getTextSizeClassName,
-} from "next-vibe/unified-ui/_shared/widget-helpers";
+} from "../../../_shared/widget-helpers";
 import type { JSX } from "react";
 
 import { isLineHighlighted, splitCodeIntoLines } from "./shared";

@@ -5,7 +5,7 @@
  * Fires when any input signal fires at a given timestamp.
  */
 
-import { createEndpoint } from "next-vibe/core/definition/create";
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   LayoutType,

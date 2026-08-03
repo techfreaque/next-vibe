@@ -92,11 +92,27 @@ export function styled(text: string, ...styles: string[]): string {
 }
 
 /**
- * Check if colors should be disabled (e.g., in CI or when piped)
+ * Check if colors should be disabled (e.g., in CI or when piped).
+ *
+ * This is the single colour policy for every CLI surface — plain ANSI helpers
+ * here as well as the chalk instance used by the fast Ink renderer. Anything
+ * emitting escape codes must gate on it rather than forcing a colour level.
  */
-function shouldUseColors(): boolean {
-  // Disable colors if NO_COLOR env var is set
+export function shouldUseColors(): boolean {
+  // Disable colors if NO_COLOR env var is set (https://no-color.org)
   if (process.env.NO_COLOR) {
+    return false;
+  }
+
+  // FORCE_COLOR opts back in explicitly, even without a TTY (CI log capture).
+  // Chalk's convention: "0"/"false" means off, anything else means on.
+  const forceColor = process.env.FORCE_COLOR;
+  if (forceColor !== undefined && forceColor !== "") {
+    return forceColor !== "0" && forceColor !== "false";
+  }
+
+  // Terminals that advertise no capabilities at all.
+  if (process.env.TERM === "dumb") {
     return false;
   }
 

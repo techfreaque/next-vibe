@@ -28,9 +28,9 @@ import { eq } from "drizzle-orm";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type { ResolvedRelayContext } from "next-vibe/realtime/remote-event-bridge/relay-context";
+import type { ResolvedRelayContext } from "next-vibe/realtime/core/relay-context";
 
-import { DefaultFolderId } from "../../../chat/config";
+import { DefaultFolderId } from "../../../../core/execution-context";
 import { chatThreads } from "../../../chat/db";
 import type { ThreadStreamingState } from "../../../chat/enum";
 import { createFolderContentsEmitter } from "../../../chat/folder-contents/[rootFolderId]/emitter";

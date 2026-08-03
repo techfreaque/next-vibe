@@ -2,6 +2,7 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { Platform } from "next-vibe/platforms/platforms";
 import { Dialog } from "next-vibe/ui/ui/dialog";
 import type { JSX } from "react";
 import { lazy, Suspense } from "react";
@@ -18,13 +19,18 @@ const AIToolsModalContent = lazy(() =>
 interface AIToolsModalProps {
   locale: CountryLanguage;
   user: JwtPayloadType;
+  platform: Platform;
 }
 
 /**
  * AI Tools Modal (Lazy-loaded wrapper)
  * Displays all available AI tools and allows user to toggle them on/off
  */
-export function AIToolsModal({ locale, user }: AIToolsModalProps): JSX.Element {
+export function AIToolsModal({
+  locale,
+  user,
+  platform,
+}: AIToolsModalProps): JSX.Element {
   const open = useToolsModalStore((state) => state.isOpen);
   const setOpen = useToolsModalStore((state) => state.setOpen);
 
@@ -32,7 +38,11 @@ export function AIToolsModal({ locale, user }: AIToolsModalProps): JSX.Element {
     <Dialog open={open} onOpenChange={setOpen}>
       {open && (
         <Suspense fallback={null}>
-          <AIToolsModalContent locale={locale} user={user} />
+          <AIToolsModalContent
+            locale={locale}
+            user={user}
+            platform={platform}
+          />
         </Suspense>
       )}
     </Dialog>

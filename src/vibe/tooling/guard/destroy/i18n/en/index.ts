@@ -107,11 +107,11 @@ export const translations = {
       description: "Data conflict occurred",
     },
     destruction_failed: {
-      title: "Guard Destruction Failed",
+      title: "Guard Destruction Failed: {{error}}",
       description: "Failed to destroy the guard environment",
     },
     guard_not_found: {
-      title: "Guard Not Found",
+      title: "No guard found for project '{{project}}'",
       description: "No guard environment found for the specified project",
     },
   },

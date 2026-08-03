@@ -1,24 +1,24 @@
-import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
-import type { TParams } from "next-vibe/core/i18n/core/static-types";
-import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
+import type { TranslatedKeyType } from "../i18n/core/scoped-translation";
+import type { ErrorResponseType } from "../route/response.schema";
 
 /**
- * Custom error class that preserves error type and translation parameters
+ * Custom error class that preserves the error type alongside the message.
+ *
+ * No interpolation params ride along: `ErrorResponseType.message` is already
+ * fully substituted text by the time it reaches here, so the message IS the
+ * detail - there is nothing left to fill in downstream.
  */
 class ApiError extends Error {
   errorType?: string;
-  messageParams?: TParams;
   translationKey?: TranslatedKeyType;
 
   constructor(options: {
     errorType: string;
-    messageParams?: TParams;
     translationKey: TranslatedKeyType;
   }) {
     super(options.translationKey);
     this.name = "ApiError" as const;
     this.errorType = options.errorType;
-    this.messageParams = options.messageParams;
     this.translationKey = options.translationKey;
   }
 }
@@ -27,7 +27,7 @@ class ApiError extends Error {
  * Check if an object is an ErrorResponseType
  */
 export function isErrorResponseType(
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Error parsing utility requires 'unknown' to handle any error input type
+  // eslint-disable-next-line restricted/no-unknown -- Error parsing utility requires 'unknown' to handle any error input type
   obj: unknown,
 ): obj is ErrorResponseType {
   return (
@@ -51,7 +51,7 @@ export function isErrorResponseType(
  * @param error - The error to parse
  * @returns A proper Error object
  */
-// eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Error parsing utility requires 'unknown' to handle any error input type
+// eslint-disable-next-line restricted/no-unknown -- Error parsing utility requires 'unknown' to handle any error input type
 export function parseError(error: unknown): Error {
   // Handle standard Error instances - extract cause for DB errors (e.g. Drizzle wraps PG errors)
   if (error instanceof Error) {
@@ -70,7 +70,6 @@ export function parseError(error: unknown): Error {
   if (isErrorResponseType(error)) {
     return new ApiError({
       errorType: error.errorType.errorKey,
-      messageParams: error.messageParams,
       translationKey: error.message,
     });
   }
@@ -78,7 +77,7 @@ export function parseError(error: unknown): Error {
   // Handle other objects
   if (typeof error === "object" && error !== null) {
     // Extract meaningful error info from objects without console.error pollution
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Error parsing requires type assertion for object property access
+    // eslint-disable-next-line restricted/no-unknown -- Error parsing requires type assertion for object property access
     const errorObj = error as Record<string, unknown>;
     const errorMessage =
       errorObj.error || errorObj.message || "An unknown error occurred";
@@ -92,7 +91,7 @@ export function parseError(error: unknown): Error {
 
   // Handle objects with message property
   if (typeof error === "object" && error !== null && "message" in error) {
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Error parsing requires type assertion for object property access
+    // eslint-disable-next-line restricted/no-unknown -- Error parsing requires type assertion for object property access
     const errorObj = error as Record<string, unknown>;
     const message = errorObj.message;
     if (typeof message === "string") {
@@ -102,7 +101,7 @@ export function parseError(error: unknown): Error {
 
   // Handle objects with error property
   if (typeof error === "object" && error !== null && "error" in error) {
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Error parsing requires type assertion for object property access
+    // eslint-disable-next-line restricted/no-unknown -- Error parsing requires type assertion for object property access
     const errorObj = error as Record<string, unknown>;
     const errorMessage = errorObj.error;
     if (typeof errorMessage === "string") {

@@ -12,8 +12,8 @@
 
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
-import { getDefaultToolIdsForUser } from "next-vibe/agent/chat/constants";
-import type { EnabledTool } from "next-vibe/agent/chat/hooks/store";
+import { getDefaultToolIdsForUser } from "../../chat/constants";
+import type { EnabledTool } from "../../chat/hooks/store";
 import type { HelpToolMetadataSerialized } from "next-vibe/help-tool/definition";
 import helpDefinitions from "next-vibe/help-tool/definition";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";

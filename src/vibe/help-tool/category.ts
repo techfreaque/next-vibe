@@ -3,8 +3,8 @@
  * Covers code generation, build tools, quality checks, server management, and tasks.
  */
 
-import { SYSTEM_SETTINGS_ALIAS } from "next-vibe/env/settings/constants";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { SYSTEM_SETTINGS_ALIAS } from "../env/settings/constants";
+import { UserPermissionRole } from "../identity/roles/enum";
 
 import { USER_ME_ALIAS } from "@/user/private/me/constants";
 

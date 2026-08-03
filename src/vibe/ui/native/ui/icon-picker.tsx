@@ -2,14 +2,14 @@
  * Icon Picker Component for React Native
  * Simplified icon selection UI with categories and search
  */
-import { useTranslation } from "next-vibe/core/i18n/core/client";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
-import type { CategoryKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+import { useTranslation } from "../../../core/i18n/core/client";
+import { cn } from "../../../unified-ui/_shared/cn";
+import type { CategoryKey } from "../../../unified-ui/widgets/form-fields/icon-field/icons";
 import {
-  Icon,
   ICON_CATEGORIES,
   ICON_CATEGORIES_LIST,
-} from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+} from "../../../unified-ui/widgets/form-fields/icon-field/icons";
+import { Icon } from "../../../unified-ui/widgets/form-fields/icon-field/icon-component";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 import {

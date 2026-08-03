@@ -19,7 +19,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { createEndpointEmitter } from "next-vibe/realtime/emitter";
+import { createEndpointEmitter } from "next-vibe/realtime/core/emitter";
 
 import { SKILL_VERIFIED_VOTE_THRESHOLD } from "../../constants";
 import { customSkills, skillVotes } from "../../db";

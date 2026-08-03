@@ -52,13 +52,6 @@ export interface CreditPackCheckoutSession {
   };
 }
 
-export interface CheckoutSession {
-  id: string;
-  metadata?: Record<string, string>;
-  customer?: string | null;
-  amount_total?: number | null;
-}
-
 /**
  * Base type for webhook data objects
  * All provider webhook data must have an id

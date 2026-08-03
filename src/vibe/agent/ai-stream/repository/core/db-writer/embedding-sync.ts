@@ -13,7 +13,7 @@ import { eq } from "drizzle-orm";
 import {
   DefaultFolderId,
   type ToolExecutionContext,
-} from "next-vibe/agent/chat/config";
+} from "../../../../../core/execution-context";
 import { db } from "next-vibe/database";
 
 import { buildThinThreadContent, getMimeTypeFolder } from "./shared";
@@ -33,12 +33,11 @@ export async function syncUploadEmbedding(
     return;
   }
 
-  const { readUploadPath } =
-    await import("next-vibe/agent/cortex/mounts/uploads");
+  const { readUploadPath } = await import("../../../../cortex/mounts/uploads");
   const { syncVirtualNodeToEmbedding } =
-    await import("next-vibe/agent/cortex/embeddings/sync-virtual");
+    await import("../../../../cortex/embeddings/sync-virtual");
 
-  const { chatThreads } = await import("next-vibe/agent/chat/db");
+  const { chatThreads } = await import("../../../../chat/db");
   const [thread] = await db
     .select({ title: chatThreads.title })
     .from(chatThreads)
@@ -90,8 +89,8 @@ export async function syncThreadEmbedding(
   }
 
   const { syncVirtualNodeToEmbedding } =
-    await import("next-vibe/agent/cortex/embeddings/sync-virtual");
-  const { chatThreads } = await import("next-vibe/agent/chat/db");
+    await import("../../../../cortex/embeddings/sync-virtual");
+  const { chatThreads } = await import("../../../../chat/db");
 
   const [thread] = await db
     .select({

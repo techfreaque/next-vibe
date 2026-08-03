@@ -10,7 +10,7 @@ import {
   type CountryLanguage,
   defaultLocale,
 } from "next-vibe/core/i18n/core/config";
-import type { RemoteEventHandlerProps } from "next-vibe/core/route/handler";
+import type { RemoteEventHandlerProps } from "next-vibe/core/route/handler-realtime";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -21,7 +21,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { createEndpointEmitter } from "next-vibe/realtime/emitter";
+import { createEndpointEmitter } from "next-vibe/realtime/core/emitter";
 
 import { customSkills } from "../../db";
 import type { SkillStatusValue } from "../../enum";

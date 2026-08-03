@@ -1,5 +1,4 @@
 "use client";
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import type {
   Countries,
@@ -52,7 +51,6 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar, user }) => {
   const [activeTab, setActiveTab] = useState<"country" | "language">("country");
   const [tabHover, setTabHover] = useState<"country" | "language" | null>(null);
   const logger = useLogger();
-  const availability = useProviderAvailability();
 
   // Memoize the tab change handler
   const handleTabChange = useCallback((value: string) => {
@@ -72,10 +70,9 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar, user }) => {
         pathParams: undefined,
         locale: newLocale,
         user,
-        availability,
       }).catch(() => undefined);
     },
-    [user, logger, availability],
+    [user, logger],
   );
 
   const handleLanguageChange = useCallback(

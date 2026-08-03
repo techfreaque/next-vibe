@@ -5,7 +5,7 @@
 
 import { format } from "date-fns";
 import { de, enUS, type Locale, pl } from "date-fns/locale";
-import { dateSchema } from "next-vibe/core/definition/common.schema";
+import { dateSchema } from "../../definition/common.schema";
 import type z from "zod";
 
 import { configScopedTranslation } from "@/env/i18n";

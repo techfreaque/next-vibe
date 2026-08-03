@@ -1,17 +1,17 @@
 "use client";
 
-import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Alert, AlertDescription } from "next-vibe/ui/ui/alert";
 import type {
   ReactRequestResponseWidgetProps,
   ReactStaticWidgetProps,
   ReactWidgetPropsNoValue,
-} from "next-vibe/unified-ui/_shared/react-types";
-import type { FieldUsageConfig } from "next-vibe/unified-ui/_shared/types";
+} from "../../../_shared/react-types";
+import type { FieldUsageConfig } from "../../../_shared/types";
 import {
   useWidgetContext,
   useWidgetForm,
-} from "next-vibe/unified-ui/_shared/use-widget-context";
+} from "../../../_shared/use-widget-context";
 import type { JSX } from "react";
 
 import type { AlertWidgetConfig, AlertWidgetSchema } from "./types";

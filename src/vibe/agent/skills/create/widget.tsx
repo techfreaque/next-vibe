@@ -4,8 +4,8 @@
 
 "use client";
 
-import { DEFAULT_CHAT_MODEL_SELECTION } from "next-vibe/agent/ai-stream/constants";
-import { useProviderAvailability } from "next-vibe/agent/env-availability-context";
+import { DEFAULT_CHAT_MODEL_SELECTION } from "../../ai-stream/constants";
+import { useProviderAvailability } from "../../env-availability-store";
 import { Div } from "next-vibe/ui/ui/div";
 import { Span } from "next-vibe/ui/ui/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
