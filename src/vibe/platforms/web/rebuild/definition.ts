@@ -36,7 +36,7 @@ const RebuildWidget = lazyWidget(() =>
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["vibe", "platforms", "web", "server", "rebuild"],
+  path: ["vibe", "platforms", "web", "rebuild"],
   title: "post.title",
   titleShort: "post.titleShort",
   description: "post.description",

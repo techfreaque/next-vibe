@@ -19,7 +19,7 @@ import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
 import { Environment } from "../../env/env-util";
 import { RemoteConnectionRepository } from "../../remote-connection/repository";
-import { serverSystemEnv } from "../web/env";
+import { headlessClientEnv } from "./env";
 import { scopedTranslation } from "./i18n";
 
 import type {
@@ -47,7 +47,7 @@ export class HeadlessClientRepository {
     const isDev = coreEnv.NODE_ENV !== Environment.PRODUCTION;
     const computerName =
       request.computerName ??
-      serverSystemEnv.VIBE_COMPUTER_NAME ??
+      headlessClientEnv.VIBE_COMPUTER_NAME ??
       (isDev ? "headless-client" : (hostname().split(".")[0] ?? "headless"));
 
     // Ensure .tmp exists for pid/log files and activate file logging

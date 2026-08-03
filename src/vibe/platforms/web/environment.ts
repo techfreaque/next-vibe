@@ -8,12 +8,10 @@ import "server-only";
 import { coreEnv } from "../../core/env";
 import { Environment } from "../../env/env-util";
 
-import { serverSystemEnv } from "./env";
-
 /**
  * Supported server environments
  */
-type ServerEnvironmentType = "development" | "production" | "serverless";
+type ServerEnvironmentType = "development" | "production";
 
 /**
  * Environment configuration interface
@@ -37,11 +35,6 @@ interface EnvironmentConfig {
 interface PlatformInfo {
   name: string;
   type: string;
-  region?: string;
-  url?: string;
-  functionName?: string;
-  site?: string;
-  environment?: string;
 }
 
 /**
@@ -50,7 +43,6 @@ interface PlatformInfo {
 interface CurrentEnvironmentInfo {
   environment: ServerEnvironmentType;
   config: EnvironmentConfig;
-  isServerless: boolean;
   isDevelopment: boolean;
   isProduction: boolean;
   nodeEnv: string;
@@ -61,32 +53,11 @@ interface CurrentEnvironmentInfo {
  * Detect the current server environment
  */
 function detectEnvironment(): ServerEnvironmentType {
-  // Check for serverless environments first
-  if (isServerlessEnvironment()) {
-    return "serverless";
-  }
-
-  // Check NODE_ENV
-  const nodeEnv = coreEnv.NODE_ENV;
-  if (nodeEnv === Environment.PRODUCTION) {
+  if (coreEnv.NODE_ENV === Environment.PRODUCTION) {
     return "production";
   }
 
-  // Default to development
   return "development";
-}
-
-/**
- * Check if running in a serverless environment
- */
-function isServerlessEnvironment(): boolean {
-  return !!(
-    serverSystemEnv.VERCEL ||
-    serverSystemEnv.AWS_LAMBDA_FUNCTION_NAME ||
-    serverSystemEnv.NETLIFY ||
-    serverSystemEnv.CLOUDFLARE_WORKERS ||
-    serverSystemEnv.RAILWAY_ENVIRONMENT
-  );
 }
 
 /**
@@ -98,20 +69,6 @@ function getEnvironmentConfig(
   const detectedEnv = environment || detectEnvironment();
 
   switch (detectedEnv) {
-    case "development":
-      return {
-        environment: "development",
-        nodeEnv: "development",
-        supportsTaskRunners: true,
-        supportsHotReload: true,
-        enableDebugLogging: true,
-        enableTaskRunner: true,
-        enableSeeding: true,
-        enableMigrations: true,
-        port: 3000,
-        clustering: false,
-      };
-
     case "production":
       return {
         environment: "production",
@@ -126,20 +83,7 @@ function getEnvironmentConfig(
         clustering: true,
       };
 
-    case "serverless":
-      return {
-        environment: "serverless",
-        nodeEnv: "production",
-        supportsTaskRunners: false,
-        supportsHotReload: false,
-        enableDebugLogging: false,
-        enableTaskRunner: false,
-        enableSeeding: false,
-        enableMigrations: false,
-        port: 3000,
-        clustering: false,
-      };
-
+    case "development":
     default:
       return {
         environment: "development",
@@ -160,46 +104,6 @@ function getEnvironmentConfig(
  * Get platform information
  */
 export function getPlatformInfo(): PlatformInfo {
-  if (serverSystemEnv.VERCEL) {
-    const result: PlatformInfo = {
-      name: "Vercel",
-      type: "serverless",
-    };
-    if (serverSystemEnv.VERCEL_REGION) {
-      result.region = serverSystemEnv.VERCEL_REGION;
-    }
-    if (serverSystemEnv.VERCEL_URL) {
-      result.url = serverSystemEnv.VERCEL_URL;
-    }
-    return result;
-  }
-
-  if (serverSystemEnv.AWS_LAMBDA_FUNCTION_NAME) {
-    return {
-      name: "AWS Lambda",
-      type: "serverless",
-      region: serverSystemEnv.AWS_REGION,
-      functionName: serverSystemEnv.AWS_LAMBDA_FUNCTION_NAME,
-    };
-  }
-
-  if (serverSystemEnv.NETLIFY) {
-    return {
-      name: "Netlify",
-      type: "serverless",
-      site: serverSystemEnv.NETLIFY_SITE_NAME,
-    };
-  }
-
-  if (serverSystemEnv.RAILWAY_ENVIRONMENT) {
-    return {
-      name: "Railway",
-      type: "container",
-      environment: serverSystemEnv.RAILWAY_ENVIRONMENT,
-    };
-  }
-
-  // Default to local/server
   return {
     name: "Local/Server",
     type: "server",
@@ -217,7 +121,6 @@ export function getCurrentEnvironmentInfo(): CurrentEnvironmentInfo {
   return {
     environment,
     config,
-    isServerless: environment === "serverless",
     isDevelopment: environment === "development",
     isProduction: environment === "production",
     nodeEnv: coreEnv.NODE_ENV,

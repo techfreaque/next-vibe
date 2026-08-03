@@ -12,13 +12,6 @@ export const {
   schema: serverSystemEnvSchema,
   examples: serverSystemEnvExamples,
 } = defineEnv({
-  VIBE_COMPUTER_NAME: {
-    schema: z.string().optional(),
-    example: "my-desktop",
-    comment:
-      "Headless client identity. Overrides the auto-detected name (dev fixed name, or OS hostname in production).",
-    commented: true,
-  },
   VIBE_DISABLE_PROXY: {
     schema: z
       .string()
@@ -31,18 +24,4 @@ export const {
     commented: true,
     fieldType: "boolean",
   },
-
-  // Platform detection (optional - set by hosting providers, not user-configured)
-  VERCEL: { schema: z.string().optional(), example: false },
-  VERCEL_REGION: { schema: z.string().optional(), example: false },
-  VERCEL_URL: { schema: z.string().optional(), example: false },
-  AWS_LAMBDA_FUNCTION_NAME: {
-    schema: z.string().optional(),
-    example: false,
-  },
-  AWS_REGION: { schema: z.string().optional(), example: false },
-  NETLIFY: { schema: z.string().optional(), example: false },
-  NETLIFY_SITE_NAME: { schema: z.string().optional(), example: false },
-  CLOUDFLARE_WORKERS: { schema: z.string().optional(), example: false },
-  RAILWAY_ENVIRONMENT: { schema: z.string().optional(), example: false },
 });
