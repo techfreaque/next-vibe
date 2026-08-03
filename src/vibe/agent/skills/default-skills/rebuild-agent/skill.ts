@@ -1,8 +1,8 @@
 import { ChatModelId } from "../../../ai-stream/models";
 import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { HEALTH_ALIAS } from "next-vibe/server/server/health/constants";
-import { REBUILD_ALIAS } from "next-vibe/server/server/rebuild/constants";
+import { HEALTH_ALIAS } from "next-vibe/platforms/web/server/health/constants";
+import { REBUILD_ALIAS } from "next-vibe/platforms/web/server/rebuild/constants";
 import {
   CRON_CREATE_ALIAS,
   CRON_LIST_ALIAS,

@@ -16,7 +16,7 @@ import type { WidgetData } from "../../../core/utils/json";
 import { parseError } from "../../../core/utils/parse-error";
 import type { JwtPayloadType } from "../../../identity/auth/types";
 import { UserPermissionRole } from "../../../identity/roles/enum";
-import { ATLAS_PID_FILE, readPidFilePort } from "../../../server/server/pid";
+import { ATLAS_PID_FILE, readPidFilePort } from "../../../platforms/web/server/pid";
 import { scopedTranslation } from "../test/i18n";
 
 import {

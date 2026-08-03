@@ -15,7 +15,7 @@ import { AWAIT_TASK_ALIAS } from "next-vibe/execute-tool/await-task/constants";
 import { EXECUTE_TOOL_ALIAS } from "next-vibe/execute-tool/constants";
 import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { REBUILD_ALIAS } from "next-vibe/server/server/rebuild/constants";
+import { REBUILD_ALIAS } from "next-vibe/platforms/web/server/rebuild/constants";
 
 import type { Skill } from "../../config";
 import { tool } from "../../constants";

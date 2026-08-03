@@ -5,7 +5,7 @@
 
 "use client";
 import exportEnvEndpoints from "./export-env/definition";
-import { ServerFramework } from "../../server/server/enum";
+import { ServerFramework } from "../../platforms/web/server/enum";
 import { storage } from "next-vibe/ui/lib/storage";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -448,7 +448,7 @@ export function SystemSettingsWidget(): JSX.Element {
     setApplying(true);
     try {
       const { apiClient } = await import("../../unified-ui/hooks/store");
-      const rebuildDef = await import("../../server/server/rebuild/definition");
+      const rebuildDef = await import("../../platforms/web/server/rebuild/definition");
       await apiClient.mutate(
         rebuildDef.default.POST,
         logger,

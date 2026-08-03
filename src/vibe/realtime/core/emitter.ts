@@ -20,7 +20,7 @@ import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import { coreEnv } from "../../core/env";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
-import { serverSystemEnv } from "../../server/server/env";
+import { serverSystemEnv } from "../../platforms/web/server/env";
 import type {
   CacheKeyParams,
   CacheKeyParamValue,

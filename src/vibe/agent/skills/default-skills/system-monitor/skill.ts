@@ -2,7 +2,7 @@ import { ChatModelId } from "../../../ai-stream/models";
 import { DB_HEALTH_ALIAS } from "next-vibe/database/health/constants";
 import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { HEALTH_ALIAS } from "next-vibe/server/server/health/constants";
+import { HEALTH_ALIAS } from "next-vibe/platforms/web/server/health/constants";
 import { CRON_HISTORY_ALIAS } from "next-vibe/tasks/cron/history/constants";
 import { CRON_STATS_ALIAS } from "next-vibe/tasks/cron/stats/constants";
 import { PULSE_EXECUTE_ALIAS } from "next-vibe/tasks/pulse/execute/constants";

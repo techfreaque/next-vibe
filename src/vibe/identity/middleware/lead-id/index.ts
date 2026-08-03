@@ -17,7 +17,7 @@ import {
 } from "../../lead/middleware-ops";
 import { createEndpointLogger } from "../../../logger/server";
 import { frameExchangeTokens } from "../../../platforms/vibe-frame/db";
-import { shouldSkipPath } from "../../../server/middleware/utils";
+import { shouldSkipPath } from "../../../platforms/web/middleware/utils";
 import type { NextRequest, NextResponse } from "next-vibe/ui/lib/request";
 import { NextResponse as NextResponseClass } from "next-vibe/ui/lib/request";
 
