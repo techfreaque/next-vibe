@@ -75,7 +75,7 @@ const config: BuildConfig = {
     },
     {
       input:
-        "src/vibe/tooling/check/oxlint/plugins/restricted-syntax/src/index.ts",
+        "src/vibe/tooling/check/repository/oxlint/plugins/restricted-syntax/src/index.ts",
       output: ".dist/oxlint-plugins/restricted-syntax.js",
       type: BunBuildTypeEnum.MODULE,
       modulesToExternalize: NATIVE_BINDING_EXTERNALS,
@@ -89,7 +89,7 @@ const config: BuildConfig = {
     },
     {
       input:
-        "src/vibe/tooling/check/oxlint/plugins/jsx-capitalization/src/index.ts",
+        "src/vibe/tooling/check/repository/oxlint/plugins/jsx-capitalization/src/index.ts",
       output: ".dist/oxlint-plugins/jsx-capitalization.js",
       type: BunBuildTypeEnum.MODULE,
       modulesToExternalize: NATIVE_BINDING_EXTERNALS,
@@ -101,7 +101,8 @@ const config: BuildConfig = {
       },
     },
     {
-      input: "src/vibe/tooling/check/oxlint/plugins/i18n/src/index.ts",
+      input:
+        "src/vibe/tooling/check/repository/oxlint/plugins/i18n/src/index.ts",
       output: ".dist/oxlint-plugins/i18n.js",
       type: BunBuildTypeEnum.MODULE,
       modulesToExternalize: NATIVE_BINDING_EXTERNALS,
@@ -130,7 +131,7 @@ const config: BuildConfig = {
     // Library entry - no auto-init, no window exposure, full type exports.
     {
       input: "src/vibe/platforms/vibe-frame/embed-package.ts",
-      output: "public/vibe-frame/vibe-frame.esm.js",
+      output: "public/vibe-frame/vibe-frame-package.js",
       type: BunBuildTypeEnum.MODULE,
       modulesToExternalize: [],
       bunOptions: {

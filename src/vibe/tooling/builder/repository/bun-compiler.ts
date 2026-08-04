@@ -227,6 +227,11 @@ class BunCompiler implements IBunCompiler {
       if (existsSync(builtPath) && builtPath !== outfilePath) {
         renameSync(builtPath, outfilePath);
       }
+      const builtMapPath = resolve(outDir, `${inputBaseName}.js.map`);
+      const outMapPath = `${outfilePath}.map`;
+      if (existsSync(builtMapPath) && builtMapPath !== outMapPath) {
+        renameSync(builtMapPath, outMapPath);
+      }
     }
 
     // Get file size and check thresholds
