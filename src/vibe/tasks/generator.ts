@@ -10,6 +10,8 @@ import "server-only";
 
 import { readFile } from "node:fs/promises";
 
+import { GENERATED_DIR, getApiDir, VIBE_DIR } from "@/env/paths";
+
 import type { GeneratorDefinition } from "../core/generators/shared/shared-inputs";
 import {
   findFilesRecursively,
@@ -17,8 +19,6 @@ import {
   getRelativeImportPath,
   writeGeneratedFile,
 } from "../core/generators/shared/utils";
-
-import { GENERATED_DIR, getApiDir, VIBE_DIR } from "@/env/paths";
 
 const OUTPUT_FILE = `${GENERATED_DIR}/tasks/index.ts`;
 

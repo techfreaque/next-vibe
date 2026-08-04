@@ -8,13 +8,14 @@
  * Built-ins use multiples of 100. Module fragments use gaps (e.g. 150, 250).
  */
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+
 import type {
   DefaultFolderId,
   ToolExecutionContext,
 } from "../../../core/execution-context";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
 
 /** Remote instance connection info — pre-fetched once, shared by 3 fragments. */
 export interface RemoteInstancesContext {

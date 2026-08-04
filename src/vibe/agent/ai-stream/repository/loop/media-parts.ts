@@ -5,8 +5,8 @@
 import "server-only";
 
 import type { GeneratedFile } from "ai";
-import { getStorageAdapter } from "../../../chat/storage/index";
 
+import { getStorageAdapter } from "../../../chat/storage/index";
 import { buildSyntheticToolCall } from "./helpers";
 import type { StreamLoopState } from "./state";
 

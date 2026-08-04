@@ -4,8 +4,8 @@
  * Merged from tasks and side-tasks-old systems
  */
 
-import { scopedTranslation } from "./i18n";
 import { createEnumOptions } from "../unified-ui/_shared/enum";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Task Types

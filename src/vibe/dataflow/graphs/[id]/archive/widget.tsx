@@ -14,6 +14,8 @@ import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
 import { Check } from "next-vibe/ui/ui/icons/Check";
 import { Span } from "next-vibe/ui/ui/span";
 import { P } from "next-vibe/ui/ui/typography";
+import React, { useCallback } from "react";
+
 import {
   useWidgetNavigation,
   useWidgetTranslation,
@@ -21,8 +23,6 @@ import {
 } from "../../../../unified-ui/_shared/use-widget-context";
 import { FormAlertWidget } from "../../../../unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "../../../../unified-ui/widgets/interactive/submit-button/widget";
-import React, { useCallback } from "react";
-
 import type definition from "./definition";
 
 export function ArchiveWidget(): React.JSX.Element {

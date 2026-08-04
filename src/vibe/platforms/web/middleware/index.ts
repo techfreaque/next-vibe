@@ -3,6 +3,15 @@
  *
  * This file exports the middleware system for Next.js applications.
  */
+import type { NextRequest, NextResponse } from "next-vibe/ui/lib/request";
+import { NextResponse as NextResponseClass } from "next-vibe/ui/lib/request";
+
+import {
+  AUTH_TOKEN_COOKIE_NAME,
+  CSRF_TOKEN_COOKIE_NAME,
+  LEAD_ID_COOKIE_NAME,
+} from "@/env/constants";
+
 import { coreEnv } from "../../../core/env";
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import { Environment } from "../../../env/env-util";
@@ -18,15 +27,6 @@ import {
 } from "../../../identity/middleware/lead-id/index";
 import type { LanguageMiddlewareOptions } from "./language/index";
 import { detectLocale } from "./language/index";
-import type { NextRequest, NextResponse } from "next-vibe/ui/lib/request";
-import { NextResponse as NextResponseClass } from "next-vibe/ui/lib/request";
-
-import {
-  AUTH_TOKEN_COOKIE_NAME,
-  CSRF_TOKEN_COOKIE_NAME,
-  LEAD_ID_COOKIE_NAME,
-} from "@/env/constants";
-
 import { extractLocaleFromPath, shouldSkipPath } from "./utils";
 
 /**

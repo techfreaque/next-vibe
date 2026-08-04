@@ -2,16 +2,6 @@ import "server-only";
 
 import { and, desc, eq, isNull, or } from "drizzle-orm";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
-import { chatFolders } from "../../db";
-import {
-  canCreateFolder,
-  canCreateThreadInFolder,
-  canDeleteFolder,
-  canHideFolder,
-  canManageFolder,
-  canManageFolderPermissions,
-  canViewFolder,
-} from "../../permissions/permissions";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -24,7 +14,17 @@ import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { chatFolders } from "../../db";
 import { createFolderContentsEmitter } from "../../folder-contents/[rootFolderId]/emitter";
+import {
+  canCreateFolder,
+  canCreateThreadInFolder,
+  canDeleteFolder,
+  canHideFolder,
+  canManageFolder,
+  canManageFolderPermissions,
+  canViewFolder,
+} from "../../permissions/permissions";
 import type {
   FolderCreateRequestOutput,
   FolderCreateResponseOutput,

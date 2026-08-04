@@ -1,11 +1,5 @@
 "use client";
 import type { DefaultFolderId } from "next-vibe/core/execution-context";
-import {
-  prepareTextForTTS,
-  stripThinkTags,
-} from "../../../../../text-to-speech/content-processing";
-import { useTTSAudio } from "../../../../../text-to-speech/hooks";
-import type { TtsModelId } from "../../../../../text-to-speech/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -34,6 +28,12 @@ import React, { useState } from "react";
 
 import { FEATURE_COSTS } from "@/products/repository-client";
 
+import {
+  prepareTextForTTS,
+  stripThinkTags,
+} from "../../../../../text-to-speech/content-processing";
+import { useTTSAudio } from "../../../../../text-to-speech/hooks";
+import type { TtsModelId } from "../../../../../text-to-speech/models";
 import type messagesDefinition from "../definition";
 import { scopedTranslation } from "../i18n";
 import { CopyButton } from "./copy-button";

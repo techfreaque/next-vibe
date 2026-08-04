@@ -3,8 +3,6 @@
  * Defines endpoint for listing skills
  */
 
-import { ChatModelId } from "../ai-stream/models";
-import { DEFAULT_TTS_VOICE_ID } from "../text-to-speech/constants";
 import {
   iconSchema,
   translatedValueSchema,
@@ -31,7 +29,9 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { ChatModelId } from "../ai-stream/models";
 import { allModelDefinitions } from "../models/all-models";
+import { DEFAULT_TTS_VOICE_ID } from "../text-to-speech/constants";
 import { NO_SKILL_ID, SKILLS_LIST_ALIAS } from "./constants";
 import {
   ModelSelectionType,

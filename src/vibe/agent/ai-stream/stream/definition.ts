@@ -4,11 +4,6 @@
  */
 
 import type { JSONSchema7 } from "json-schema";
-import { imageGenModelSelectionSchema } from "../../image-generation/models";
-import { musicGenModelSelectionSchema } from "../../music-generation/models";
-import { sttModelSelectionSchema } from "../../speech-to-text/models";
-import { voiceModelSelectionSchema } from "../../text-to-speech/models";
-import { videoGenModelSelectionSchema } from "../../video-generation/models";
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -18,6 +13,7 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   objectField,
@@ -27,12 +23,16 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
-import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
-import { rootFolderIdOptions } from "../../chat/config";
 import { DefaultFolderId } from "../../../core/execution-context";
+import { rootFolderIdOptions } from "../../chat/config";
 import { AGENT_MESSAGE_LENGTH } from "../../chat/constants";
 import { ChatMessageRole } from "../../chat/enum";
 import { messageHistoryTolerantSchema } from "../../chat/message-schema";
+import { imageGenModelSelectionSchema } from "../../image-generation/models";
+import { musicGenModelSelectionSchema } from "../../music-generation/models";
+import { sttModelSelectionSchema } from "../../speech-to-text/models";
+import { voiceModelSelectionSchema } from "../../text-to-speech/models";
+import { videoGenModelSelectionSchema } from "../../video-generation/models";
 import {
   ChatModelId,
   ChatModelIdOptions,

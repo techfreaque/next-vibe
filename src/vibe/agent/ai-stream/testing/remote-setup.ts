@@ -22,8 +22,6 @@ import { existsSync, readFileSync } from "node:fs";
 
 import { and, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
-import { rootlessToolExecutionContext } from "../../../core/execution-context";
-import { ThreadStreamingState } from "../../chat/enum";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import { databaseEnv } from "next-vibe/database/env";
@@ -40,6 +38,8 @@ import { RemoteTransport } from "next-vibe/remote-connection/transport";
 import { Pool } from "pg";
 import { describe, expect, it } from "vitest";
 
+import { rootlessToolExecutionContext } from "../../../core/execution-context";
+import { ThreadStreamingState } from "../../chat/enum";
 import * as fixtureSchema from "./fixtures.db";
 
 // ── Constants ────────────────────────────────────────────────────────────────

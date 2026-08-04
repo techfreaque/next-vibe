@@ -7,21 +7,6 @@ import "server-only";
 
 import type { ModelMessage } from "ai";
 import { and, eq, sql } from "drizzle-orm";
-import { getEnvAvailability } from "../../../env-availability";
-import {
-  getBestImageGenModel,
-  type ImageGenModelSelection,
-} from "../../../image-generation/models";
-import { ApiProvider } from "../../../models/models";
-import {
-  getBestMusicGenModel,
-  type MusicGenModelSelection,
-} from "../../../music-generation/models";
-import type { VoiceModelSelection } from "../../../text-to-speech/models";
-import {
-  getBestVideoGenModel,
-  type VideoGenModelSelection,
-} from "../../../video-generation/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -47,6 +32,16 @@ import { ThreadStreamingState } from "../../../chat/enum";
 import { chatSettings } from "../../../chat/settings/db";
 import { isSkillVariantId, isUuid, parseSkillId } from "../../../chat/slugify";
 import { ThreadsRepository } from "../../../chat/threads/repository";
+import { getEnvAvailability } from "../../../env-availability";
+import {
+  getBestImageGenModel,
+  type ImageGenModelSelection,
+} from "../../../image-generation/models";
+import { ApiProvider } from "../../../models/models";
+import {
+  getBestMusicGenModel,
+  type MusicGenModelSelection,
+} from "../../../music-generation/models";
 import { DEFAULT_SKILLS } from "../../../skills/config";
 import {
   chatFavorites,
@@ -56,6 +51,11 @@ import {
 import { buildFavoriteConfig } from "../../../skills/favorites/repository";
 import { resolveAgentContext } from "../../../skills/resolve-context";
 import { resolveSkillFavoriteContext } from "../../../skills/resolver";
+import type { VoiceModelSelection } from "../../../text-to-speech/models";
+import {
+  getBestVideoGenModel,
+  type VideoGenModelSelection,
+} from "../../../video-generation/models";
 import { type ChatModelOption } from "../../models";
 import { type AiStreamPostRequestOutput } from "../../stream/definition";
 import type { AiStreamT } from "../../stream/i18n";

@@ -1,5 +1,6 @@
-import { cn } from "../../../unified-ui/_shared/cn";
 import type { JSX } from "react";
+
+import { cn } from "../../../unified-ui/_shared/cn";
 
 export interface SkeletonProps {
   children?: React.ReactNode;

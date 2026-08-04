@@ -4,6 +4,8 @@
  * Provides endpoints for listing and managing cron tasks
  */
 
+import { z } from "zod";
+
 import { dateSchema } from "../../../core/definition/common.schema";
 import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
@@ -14,8 +16,15 @@ import {
   WidgetType,
 } from "../../../core/definition/enums";
 import { UserRole } from "../../../identity/roles/enum";
-import type { CronTaskRecentExecution } from "../history/definition";
-import { scopedTranslation } from "./i18n";
+import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "../../../unified-ui/_shared/utils";
+import {
+  backButton,
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "../../../unified-ui/_shared/utils-i18n";
 import {
   CronTaskEnabledFilter,
   CronTaskEnabledFilterDB,
@@ -34,19 +43,10 @@ import {
   TaskOutputModeDB,
   TaskOutputModeOptions,
 } from "../../enum";
-import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
-import { customWidgetObject } from "../../../unified-ui/_shared/utils";
-import {
-  backButton,
-  objectField,
-  requestField,
-  responseArrayField,
-  responseField,
-} from "../../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
 import { taskInputSchema, taskOwnerSchema } from "../db";
+import type { CronTaskRecentExecution } from "../history/definition";
 import { CRON_CREATE_ALIAS, CRON_LIST_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const CronTasksContainer = lazyWidget(() =>
   import("./widget").then((m) => ({

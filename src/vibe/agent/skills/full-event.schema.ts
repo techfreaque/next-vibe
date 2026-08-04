@@ -9,6 +9,9 @@
  * sync-provider reuses it.
  */
 
+import { iconSchema } from "next-vibe/core/definition/common.schema";
+import { z } from "zod";
+
 import { chatModelSelectionSchema } from "../ai-stream/models";
 import {
   audioVisionModelSelectionSchema,
@@ -20,9 +23,6 @@ import { musicGenModelSelectionSchema } from "../music-generation/models";
 import { sttModelSelectionSchema } from "../speech-to-text/models";
 import { voiceModelSelectionSchema } from "../text-to-speech/models";
 import { videoGenModelSelectionSchema } from "../video-generation/models";
-import { iconSchema } from "next-vibe/core/definition/common.schema";
-import { z } from "zod";
-
 import {
   SkillCategory,
   SkillOwnershipType,

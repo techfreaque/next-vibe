@@ -13,6 +13,7 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
+
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import { db } from "../../database";
 import { AuthRepository } from "../../identity/auth/repository";
@@ -22,7 +23,6 @@ import { LeadAuthRepository } from "../../identity/lead/device-auth";
 import { UserRolesRepository } from "../../identity/roles/repository";
 import { users as usersTable } from "../../identity/user/db";
 import type { EndpointLogger } from "../../logger/types";
-
 import type { TaskOwner } from "./db";
 
 interface TaskUserContext {

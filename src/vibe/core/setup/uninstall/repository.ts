@@ -8,18 +8,18 @@
 import "server-only";
 
 import chalk from "chalk";
+
+import type { JwtPayloadType } from "../../../identity/auth/types";
+import type { EndpointLogger } from "../../../logger/types";
+import { CLI_BINARY_NAME } from "../../../platforms/cli/types/cli-target";
 import type { ResponseType } from "../../route/response.schema";
 import {
   ErrorResponseTypes,
   failInline,
   success,
 } from "../../route/response.schema";
-import { runSetups } from "../run-setups";
 import { parseError } from "../../utils/parse-error";
-import type { JwtPayloadType } from "../../../identity/auth/types";
-import { CLI_BINARY_NAME } from "../../../platforms/cli/types/cli-target";
-import type { EndpointLogger } from "../../../logger/types";
-
+import { runSetups } from "../run-setups";
 import type { UninstallResponseOutput } from "./definition";
 
 export class SetupUninstallRepository {

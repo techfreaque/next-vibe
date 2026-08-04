@@ -2,16 +2,16 @@
  * TagsField Component for React Native
  * Production-ready multi-select tags input with suggestions and custom values
  */
-import { useTranslation } from "../../../core/i18n/core/client";
-import { cn } from "../../../unified-ui/_shared/cn";
 import React, { useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 
-import { Plus, X } from "./icons";
+import { useTranslation } from "../../../core/i18n/core/client";
+import { cn } from "../../../unified-ui/_shared/cn";
 import { uiScopedTranslation } from "../../web/i18n";
 import type { InputKeyboardEvent } from "../../web/ui/input";
 import type { TagOption, TagsFieldProps } from "../../web/ui/tags-field";
 import { Badge } from "./badge";
+import { Plus, X } from "./icons";
 import { Input } from "./input";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { Text as UIText } from "./text";

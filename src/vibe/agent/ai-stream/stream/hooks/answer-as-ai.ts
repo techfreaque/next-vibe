@@ -3,16 +3,16 @@
  * Handles answering as AI in both incognito and server modes
  */
 
-import type { ChatModelId } from "../../models";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/logger/types";
+import { apiClient } from "next-vibe/unified-ui/hooks/store";
+
 import { DefaultFolderId } from "../../../../core/execution-context";
 import type { ChatMessage } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
 import messagesDefinition from "../../../chat/threads/[threadId]/messages/definition";
 import type { FavoriteConfig } from "../../../skills/favorites/db";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
-import { apiClient } from "next-vibe/unified-ui/hooks/store";
-
+import type { ChatModelId } from "../../models";
 import type { AiStreamPostRequestOutput } from "../definition";
 import type { StartStreamFn } from "./shared";
 

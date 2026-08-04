@@ -1,5 +1,13 @@
 import "server-only";
 
+import type { ClientT } from "@/ssh/client";
+import {
+  getConnectionCredentials,
+  openSshClient,
+  sshExecCommand,
+} from "@/ssh/client";
+import type { SshConnection } from "@/ssh/db";
+
 import type { ResponseType } from "../../../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -10,14 +18,6 @@ import { parseError } from "../../../../../core/utils/parse-error";
 import type { ScaleComponentType } from "../../../enum";
 import { ScaleComponent } from "../../../enum";
 import { getReplicaCount, scaleDeployment } from "../k3s/scripts";
-
-import type { ClientT } from "@/ssh/client";
-import {
-  getConnectionCredentials,
-  openSshClient,
-  sshExecCommand,
-} from "@/ssh/client";
-import type { SshConnection } from "@/ssh/db";
 
 const NEXT_VIBE_NAMESPACE = "next-vibe";
 

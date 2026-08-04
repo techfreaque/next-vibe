@@ -4,6 +4,11 @@
  * PATCH: Update .env file values - flat individual fields per env key
  */
 
+import { z } from "zod";
+
+import { ENV_KEYS, type EnvKeyName } from "@/generated/env/keys";
+import { type EnvFieldType } from "@/generated/env/keys";
+
 import { translatedValueSchema } from "../../core/definition/common.schema";
 import { createEndpoint } from "../../core/definition/create-i18n";
 import {
@@ -13,8 +18,6 @@ import {
   Methods,
   WidgetType,
 } from "../../core/definition/enums";
-import { type EnvKeyMeta } from "../generator/generator";
-import { scopedTranslation } from "./i18n";
 import { UserRole } from "../../identity/roles/enum";
 import { SyncScopeSchema } from "../../remote-connection/db";
 import { lazyWidget } from "../../unified-ui/_shared/lazy-widget";
@@ -24,12 +27,9 @@ import {
   requestField,
   responseField,
 } from "../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
-import { ENV_KEYS, type EnvKeyName } from "@/generated/env/keys";
-import { type EnvFieldType } from "@/generated/env/keys";
-
+import { type EnvKeyMeta } from "../generator/generator";
 import { SYSTEM_SETTINGS_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const SystemSettingsWidget = lazyWidget(() =>
   import("./widget").then((m) => ({

@@ -1,5 +1,6 @@
-import { coreClientEnv as envClient } from "../../../../core/env-client";
 import type { JSX } from "react";
+
+import { coreClientEnv as envClient } from "../../../../core/env-client";
 
 /* *
  * FreedomGPT Logo for Web

@@ -6,7 +6,6 @@ import {
 } from "../../../core/route/response.schema";
 import type { JwtPayloadType } from "../../../identity/auth/types";
 import type { EndpointLogger } from "../../../logger/types";
-
 import { ControlSignals } from "../../repository/control-signals";
 import type {
   CancelToolRequestOutput,

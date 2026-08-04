@@ -13,12 +13,12 @@
 
 import "server-only";
 
+import { db } from "next-vibe/database";
+
 import {
   makeHeadlessContext,
   type ToolExecutionContext,
 } from "../../../core/execution-context";
-import { db } from "next-vibe/database";
-
 import { fixtures } from "./fixtures.db";
 
 /**

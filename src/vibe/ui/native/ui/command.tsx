@@ -1,7 +1,6 @@
 "use client";
 
 import { styled } from "nativewind";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import {
   Pressable,
@@ -11,7 +10,7 @@ import {
   View,
 } from "react-native";
 
-import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 // Import all cross-platform type definitions from web (source of truth)
 import type {
   CommandDialogProps,
@@ -26,6 +25,7 @@ import type {
 } from "../../web/ui/command";
 import { MagnifyingGlassIcon } from "../../web/ui/icons/MagnifyingGlassIcon";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { Dialog, DialogContent } from "./dialog";
 
 const StyledView = styled(View, { className: "style" });

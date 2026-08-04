@@ -7,8 +7,6 @@ import fs from "node:fs/promises";
 import path from "node:path";
 
 import { eq } from "drizzle-orm";
-import type { FileMetadata } from "../../../../storage/index";
-import { agentEnv } from "../../../../../env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   createFileResponse,
@@ -20,8 +18,10 @@ import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { agentEnv } from "../../../../../env";
 import { chatFolders, chatThreads } from "../../../../db";
 import { canViewThread } from "../../../../permissions/permissions";
+import type { FileMetadata } from "../../../../storage/index";
 import type { ChatFileResponseOutput } from "./definition";
 import type { ChatFileUrlVariablesOutput } from "./definition";
 import type { ChatFileT } from "./i18n";

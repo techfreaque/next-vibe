@@ -5,14 +5,6 @@
 
 "use client";
 
-import type { NavigationStackEntry } from "../../../core/definition/endpoint";
-import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
-import type { CountryLanguage } from "../../../core/i18n/core/config";
-import type { ErrorResponseType } from "../../../core/route/response.schema";
-import type { WidgetData } from "../../../core/utils/json";
-import type { JwtPayloadType } from "../../../identity/auth/types";
-import type { EndpointLogger } from "../../../logger/types";
-import { isCliPlatform, type Platform } from "../../../platforms/platforms";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { Dialog, DialogContent } from "next-vibe/ui/ui/dialog";
 import { Div } from "next-vibe/ui/ui/div";
@@ -24,6 +16,16 @@ import {
   SelectValue,
 } from "next-vibe/ui/ui/select";
 import { P } from "next-vibe/ui/ui/typography";
+import { useMemo, useState } from "react";
+
+import type { NavigationStackEntry } from "../../../core/definition/endpoint";
+import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import type { ErrorResponseType } from "../../../core/route/response.schema";
+import type { WidgetData } from "../../../core/utils/json";
+import type { JwtPayloadType } from "../../../identity/auth/types";
+import type { EndpointLogger } from "../../../logger/types";
+import { isCliPlatform, type Platform } from "../../../platforms/platforms";
 import { cn } from "../../_shared/cn";
 import { PickerProvider } from "../../_shared/picker-context";
 import type {
@@ -38,8 +40,6 @@ import {
   NavigationStackProvider,
   useNavigationStack,
 } from "../../hooks/use-navigation-stack";
-import { useMemo, useState } from "react";
-
 import { EndpointRenderer, type SubmitButtonConfig } from "./EndpointRenderer";
 
 /**

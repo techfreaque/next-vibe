@@ -8,7 +8,6 @@
 
 import type { CountryLanguage } from "../core/i18n/core/config";
 import { parseError } from "../core/utils/parse-error";
-
 import { colors, maybeColorize, semantic } from "./colors";
 import { enableDebugLogger, mcpSilentMode } from "./debug";
 import type { EndpointLogger, ErrorLogLevel, LoggerMetadata } from "./types";

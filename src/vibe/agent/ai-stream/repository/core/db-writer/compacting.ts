@@ -6,13 +6,13 @@
 import "server-only";
 
 import { eq, sql } from "drizzle-orm";
-import type { ChatModelId } from "../../../models";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 
 import { chatMessages } from "../../../../chat/db";
 import { ChatMessageRole, ThreadStreamingState } from "../../../../chat/enum";
 import { MessagesRepository } from "../../../../chat/threads/[threadId]/messages/repository";
+import type { ChatModelId } from "../../../models";
 import { deductAndEmitCredits } from "./credits";
 import type { DbWriterState } from "./shared";
 import { buildSseMessageRow } from "./sse-row";

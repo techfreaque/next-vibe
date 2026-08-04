@@ -6,9 +6,6 @@
 
 "use client";
 
-import { getFullPath } from "../../core/core-utils/path";
-import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
-import { endpoints as cronTaskEndpoints } from "../cron/[id]/definition";
 import { Div } from "next-vibe/ui/ui/div";
 import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
 import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
@@ -16,6 +13,13 @@ import { Clock } from "next-vibe/ui/ui/icons/Clock";
 import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
 import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
 import { Span } from "next-vibe/ui/ui/span";
+import type { JSX } from "react";
+import { useEffect, useMemo, useState } from "react";
+
+import { getEndpoint } from "@/generated/endpoints/endpoint";
+
+import { getFullPath } from "../../core/core-utils/path";
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -32,11 +36,7 @@ import { EndpointsPage } from "../../unified-ui/renderers/web/EndpointsPage";
 import { TextFieldWidget } from "../../unified-ui/widgets/form-fields/text-field/widget";
 import { NavigateButtonWidget } from "../../unified-ui/widgets/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "../../unified-ui/widgets/interactive/submit-button/widget";
-import type { JSX } from "react";
-import { useEffect, useMemo, useState } from "react";
-
-import { getEndpoint } from "@/generated/endpoints/endpoint";
-
+import { endpoints as cronTaskEndpoints } from "../cron/[id]/definition";
 import { CronTaskStatus } from "../enum";
 import type endpoints from "./definition";
 

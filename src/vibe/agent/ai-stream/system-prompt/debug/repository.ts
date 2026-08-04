@@ -1,11 +1,18 @@
 import "server-only";
 
 import { and, eq, sql } from "drizzle-orm";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
-  type BridgeContext,
-  ModalityResolver,
-} from "../../repository/core/modality-resolver";
-import { buildSystemPrompt, createMetadataSystemMessage } from "../builder";
+  ErrorResponseTypes,
+  fail,
+  type ResponseType,
+  success,
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
+
 import {
   type DefaultFolderId,
   rootlessToolExecutionContext,
@@ -32,18 +39,11 @@ import {
   getBestVideoGenModel,
   type VideoGenModelSelection,
 } from "../../../video-generation/models";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
-  ErrorResponseTypes,
-  fail,
-  type ResponseType,
-  success,
-} from "next-vibe/core/route/response.schema";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import type { EndpointLogger } from "next-vibe/logger/types";
-
+  type BridgeContext,
+  ModalityResolver,
+} from "../../repository/core/modality-resolver";
+import { buildSystemPrompt, createMetadataSystemMessage } from "../builder";
 import type { SystemPromptDebugResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
 

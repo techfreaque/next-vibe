@@ -1,9 +1,9 @@
 import chalk from "chalk";
 import { Box, Text } from "ink";
-import { Platform } from "../../../platforms/platforms";
-import { useWidgetPlatform } from "../../../unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 
+import { Platform } from "../../../platforms/platforms";
+import { useWidgetPlatform } from "../../../unified-ui/_shared/use-widget-context";
 import type { InstallResponseOutput } from "./definition";
 
 interface CliWidgetProps {

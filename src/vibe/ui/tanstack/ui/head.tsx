@@ -1,8 +1,9 @@
 // oxlint-disable nextjs/no-head-element
 import { HeadContent } from "@tanstack/react-router";
+import type { JSX, ReactNode } from "react";
+
 import { coreClientEnv } from "../../../core/env-client";
 import { Environment } from "../../../env/env-util";
-import type { JSX, ReactNode } from "react";
 
 export interface HeadProps {
   children: ReactNode;

@@ -3,13 +3,14 @@
  * Compound widget: large text input + submit button in one row.
  */
 
+import type { z } from "zod";
+
 import type { WidgetType } from "../../../../core/definition/enums";
 import type {
   BasePrimitiveWidgetConfig,
   FieldUsageConfig,
 } from "../../../_shared/types";
 import type { IconKey } from "../../form-fields/icon-field/icons";
-import type { z } from "zod";
 
 /**
  * Search Bar Widget Configuration

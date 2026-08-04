@@ -8,11 +8,8 @@
 
 "use client";
 
-import { DefaultFolderId } from "next-vibe/core/execution-context";
-import type { ChatMessage } from "../../../../db";
-import { ChatBootContext } from "../../../../hooks/context";
-import { useChatNavigationStore } from "../../../../hooks/use-chat-navigation-store";
 import { platform } from "next-vibe/core/env-client";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { Div } from "next-vibe/ui/ui/div";
 import {
   useWidgetLocale,
@@ -31,6 +28,9 @@ import React, {
 import { LAYOUT, useInputHeight } from "@/_pages/chat/lib/config/constants";
 import { buildMessagePath } from "@/_pages/chat/lib/utils/thread-builder";
 
+import type { ChatMessage } from "../../../../db";
+import { ChatBootContext } from "../../../../hooks/context";
+import { useChatNavigationStore } from "../../../../hooks/use-chat-navigation-store";
 import type definition from "../definition";
 import messagesDefinition from "../definition";
 import { LinearMessageView } from "./linear-view/view";

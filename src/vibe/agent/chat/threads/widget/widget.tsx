@@ -5,14 +5,7 @@
 
 "use client";
 
-import type { FolderListResponseOutput } from "../../folders/[rootFolderId]/definition";
-import foldersDefinition from "../../folders/[rootFolderId]/definition";
-import {
-  type ChatT,
-  scopedTranslation as chatScopedTranslation,
-} from "../../i18n";
-import { ThreadPermissionsDialog } from "../[threadId]/permissions/widget";
-import { ThreadShareDialog } from "../[threadId]/share-links/widget";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { success } from "next-vibe/core/route/response.schema";
 import { useSilentHistory } from "next-vibe/ui/hooks/use-navigation";
 import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
@@ -72,11 +65,18 @@ import React, { useEffect, useMemo, useState } from "react";
 
 import { chatColors, chatTransitions } from "@/_pages/chat/lib/design-tokens";
 
-import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { ChatThread } from "../../db";
 import { ThreadStreamingState } from "../../enum";
+import type { FolderListResponseOutput } from "../../folders/[rootFolderId]/definition";
+import foldersDefinition from "../../folders/[rootFolderId]/definition";
 import { useChatStore } from "../../hooks/store";
 import { useChatNavigationStore } from "../../hooks/use-chat-navigation-store";
+import {
+  type ChatT,
+  scopedTranslation as chatScopedTranslation,
+} from "../../i18n";
+import { ThreadPermissionsDialog } from "../[threadId]/permissions/widget";
+import { ThreadShareDialog } from "../[threadId]/share-links/widget";
 import type definition from "../definition";
 import type { ThreadListResponseOutput } from "../definition";
 import { scopedTranslation } from "../i18n";

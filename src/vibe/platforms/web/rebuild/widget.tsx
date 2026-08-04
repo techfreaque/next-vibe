@@ -9,14 +9,14 @@ import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { Span } from "next-vibe/ui/ui/span";
 import { P } from "next-vibe/ui/ui/typography";
+import type { JSX } from "react";
+
 import {
   useWidgetForm,
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetValue,
 } from "../../../unified-ui/_shared/use-widget-context";
-import type { JSX } from "react";
-
 import type definition from "./definition";
 
 function formatDuration(ms: number): string {

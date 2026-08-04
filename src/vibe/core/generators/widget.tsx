@@ -3,7 +3,6 @@
 // core/definition/create). There is no scope to translate against.
 "use client";
 
-import { Platform } from "../../platforms/platforms";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Div } from "next-vibe/ui/ui/div";
 import { CheckCircle2 } from "next-vibe/ui/ui/icons/CheckCircle2";
@@ -13,6 +12,8 @@ import { Sparkles } from "next-vibe/ui/ui/icons/Sparkles";
 import { Zap } from "next-vibe/ui/ui/icons/Zap";
 import { Pre } from "next-vibe/ui/ui/pre";
 import { Span } from "next-vibe/ui/ui/span";
+
+import { Platform } from "../../platforms/platforms";
 import {
   useWidgetEndpointMutations,
   useWidgetPlatform,
@@ -20,7 +21,6 @@ import {
 } from "../../unified-ui/_shared/use-widget-context";
 import { FormAlertWidget } from "../../unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "../../unified-ui/widgets/interactive/submit-button/widget";
-
 import type definition from "./definition";
 
 export function GenerateAllWidget(): React.JSX.Element {

@@ -8,6 +8,8 @@
 
 import "server-only";
 
+import { GENERATED_DIR, getApiDir, VIBE_DIR } from "@/env/paths";
+
 import type { GeneratorDefinition } from "../../core/generators/shared/shared-inputs";
 import {
   findFilesRecursively,
@@ -16,8 +18,6 @@ import {
   toPosixPath,
   writeGeneratedFile,
 } from "../../core/generators/shared/utils";
-
-import { GENERATED_DIR, getApiDir, VIBE_DIR } from "@/env/paths";
 
 /**
  * Module name a seeds file belongs to.

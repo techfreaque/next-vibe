@@ -8,7 +8,6 @@
 
 "use client";
 
-import cortexListDefinitions from "../list/definition";
 import {
   useSearchParams,
   useSilentHistory,
@@ -62,6 +61,7 @@ import {
 
 import connectionsListDefinitions from "@/ssh/connections/list/definition";
 
+import cortexListDefinitions from "../list/definition";
 import type endpoints from "./definition";
 
 // ─── Types ───────────────────────────────────────────────────────────────────

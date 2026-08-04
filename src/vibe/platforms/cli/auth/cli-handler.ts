@@ -1,3 +1,5 @@
+import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/env/constants";
+
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import type { ResponseType } from "../../../core/route/response.schema";
 import {
@@ -5,9 +7,6 @@ import {
   BaseAuthHandler,
 } from "../../../identity/auth/base-auth-handler";
 import type { EndpointLogger } from "../../../logger/types";
-
-import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/env/constants";
-
 import {
   deleteSessionFile,
   readSessionFile,

@@ -1,13 +1,11 @@
 "use client";
 
-import { coreClientEnv } from "../../../core/env-client";
-import type { CountryLanguage } from "../../../core/i18n/core/config";
-import { Environment } from "../../../env/env-util";
 import type { ErrorInfo, JSX, ReactNode } from "react";
 import { Component } from "react";
 
-import { Info } from "./icons/Info";
-import { RotateCcw } from "./icons/RotateCcw";
+import { coreClientEnv } from "../../../core/env-client";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import { Environment } from "../../../env/env-util";
 import {
   Accordion,
   AccordionContent,
@@ -17,6 +15,8 @@ import {
 import { Button } from "./button";
 import { Card, CardContent } from "./card";
 import { Div } from "./div";
+import { Info } from "./icons/Info";
+import { RotateCcw } from "./icons/RotateCcw";
 import { Pre } from "./pre";
 import { Span } from "./span";
 import { H3, P } from "./typography";

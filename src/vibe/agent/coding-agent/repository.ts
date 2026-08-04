@@ -23,7 +23,6 @@ import { once } from "node:events";
 
 import { eq } from "drizzle-orm";
 import type { ToolExecutionContext } from "next-vibe/core/execution-context";
-import { chatSettings } from "../chat/settings/db";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -36,6 +35,7 @@ import { CallbackMode } from "next-vibe/execute-tool/constants";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { chatSettings } from "../chat/settings/db";
 import type { RunRequestOutput, RunResponseOutput } from "./definition";
 import type { CodingAgentT } from "./i18n";
 import { claudeCodeConfig } from "./providers/claude-code/repository";

@@ -1,6 +1,5 @@
 "use client";
 import type { DefaultFolderId } from "next-vibe/core/execution-context";
-import type { ChatMessage } from "../../../../db";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -24,6 +23,7 @@ import {
   chatTransitions,
 } from "@/_pages/chat/lib/design-tokens";
 
+import type { ChatMessage } from "../../../../db";
 import type messagesDefinition from "../definition";
 import { scopedTranslation } from "../i18n";
 import { useMessageGroupName } from "./embedded-context";

@@ -6,6 +6,7 @@
 import "server-only";
 
 import { and, eq, not } from "drizzle-orm";
+
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -15,15 +16,14 @@ import {
 } from "../../core/route/response.schema";
 import { parseError } from "../../core/utils/parse-error";
 import { db } from "../../database";
+import type { EndpointLogger } from "../../logger/types";
+import { Platform } from "../../platforms/platforms";
 import { scopedTranslation as authScopedTranslation } from "../auth/i18n";
 import { hashPassword } from "../auth/password";
 import { AuthRepository } from "../auth/repository";
 import { LeadAuthRepository } from "../lead/device-auth";
 import { UserRole, type UserRoleValue } from "../roles/enum";
 import { UserRolesRepository } from "../roles/repository";
-import type { EndpointLogger } from "../../logger/types";
-import { Platform } from "../../platforms/platforms";
-
 import type { NewUser, User } from "./db";
 import { users } from "./db";
 import { UserDetailLevel } from "./enum";

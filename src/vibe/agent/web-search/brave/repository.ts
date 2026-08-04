@@ -5,8 +5,7 @@
 
 import "server-only";
 
-import { agentEnv } from "../../env";
-import { PROVIDER_SETUP_INSTRUCTIONS } from "../../env-availability";
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 import {
   ErrorResponseTypes,
   fail,
@@ -16,7 +15,8 @@ import {
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { ToolExecutionContext } from "next-vibe/core/execution-context";
+import { agentEnv } from "../../env";
+import { PROVIDER_SETUP_INSTRUCTIONS } from "../../env-availability";
 import type { BraveSearchGetResponseOutput } from "./definition";
 import type { BraveT } from "./i18n";
 

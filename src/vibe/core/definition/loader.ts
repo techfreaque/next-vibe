@@ -1,3 +1,10 @@
+import { reloadPage } from "next-vibe/ui/lib/location";
+
+import { getEndpoint as globalGetEndpoint } from "@/generated/endpoints/endpoint";
+
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { EndpointLogger } from "../../logger/types";
+import type { Platform } from "../../platforms/platforms";
 import type { CountryLanguage } from "../i18n/core/config";
 import { scopedTranslation } from "../i18n/shared";
 import { resolveEndpointAccessDenial } from "../permissions/denial-message";
@@ -9,13 +16,6 @@ import {
   success,
 } from "../route/response.schema";
 import { parseError } from "../utils/parse-error";
-import type { JwtPayloadType } from "../../identity/auth/types";
-import type { EndpointLogger } from "../../logger/types";
-import type { Platform } from "../../platforms/platforms";
-import { reloadPage } from "next-vibe/ui/lib/location";
-
-import { getEndpoint as globalGetEndpoint } from "@/generated/endpoints/endpoint";
-
 import type { CreateApiEndpointAny } from "./endpoint-base";
 
 export type GetEndpointFn = (

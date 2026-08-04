@@ -3,17 +3,17 @@
  * Simplified icon selection UI with categories and search
  * @packageDocumentation
  */
+import type { JSX } from "react";
+import { useMemo, useState } from "react";
+
 import { useTranslation } from "../../../core/i18n/core/client";
 import { cn } from "../../../unified-ui/_shared/cn";
+import { Icon } from "../../../unified-ui/widgets/form-fields/icon-field/icon-component";
 import type { CategoryKey } from "../../../unified-ui/widgets/form-fields/icon-field/icons";
 import {
   ICON_CATEGORIES,
   type IconKey,
 } from "../../../unified-ui/widgets/form-fields/icon-field/icons";
-import { Icon } from "../../../unified-ui/widgets/form-fields/icon-field/icon-component";
-import type { JSX } from "react";
-import { useMemo, useState } from "react";
-
 import { uiScopedTranslation } from "../i18n";
 import { Button } from "./button";
 import { Dialog, DialogContent, DialogTrigger } from "./dialog";

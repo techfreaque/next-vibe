@@ -10,12 +10,13 @@
  * data, not copy, and stay verbatim.
  */
 
+import type { ZodIssue } from "zod";
+
+import { CLI_BINARY_NAME } from "../../platforms/cli/types/cli-target";
+import type { CreateApiEndpointAny } from "../definition/endpoint-base";
 import type { TranslatedKeyType } from "../i18n/core/scoped-translation";
 import type { scopedTranslation as sharedScopedTranslation } from "../i18n/shared";
-import type { CreateApiEndpointAny } from "../definition/endpoint-base";
 import type { WidgetData } from "../utils/json";
-import { CLI_BINARY_NAME } from "../../platforms/cli/types/cli-target";
-import type { ZodIssue } from "zod";
 
 type SharedT = ReturnType<typeof sharedScopedTranslation.scopedT>["t"];
 

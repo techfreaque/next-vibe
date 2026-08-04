@@ -1,9 +1,11 @@
 "use client";
-import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Button } from "next-vibe/ui/ui/button";
 import { Card, CardContent } from "next-vibe/ui/ui/card";
 import { Div } from "next-vibe/ui/ui/div";
 import { P } from "next-vibe/ui/ui/typography";
+import type { JSX } from "react";
+
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { cn } from "../../../_shared/cn";
 import type { ReactStaticWidgetProps } from "../../../_shared/react-types";
 import type { FieldUsageConfig } from "../../../_shared/types";
@@ -17,8 +19,6 @@ import {
   getTextSizeClassName,
 } from "../../../_shared/widget-helpers";
 import { Icon } from "../../form-fields/icon-field/icon-component";
-import type { JSX } from "react";
-
 import type { EmptyStateWidgetConfig } from "./types";
 
 /**
@@ -56,9 +56,9 @@ import type { EmptyStateWidgetConfig } from "./types";
  */
 export default function EmptyStateWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends TEndpoint extends CreateApiEndpointAny
+  TKey extends (TEndpoint extends CreateApiEndpointAny
     ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
-    : never,
+    : never),
   TUsage extends FieldUsageConfig,
 >({
   field,

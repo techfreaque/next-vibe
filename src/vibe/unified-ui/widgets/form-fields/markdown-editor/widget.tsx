@@ -1,5 +1,4 @@
 "use client";
-import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { Check } from "next-vibe/ui/ui/icons/Check";
@@ -8,6 +7,10 @@ import { X } from "next-vibe/ui/ui/icons/X";
 import type { InputKeyboardEvent } from "next-vibe/ui/ui/input";
 import { Input } from "next-vibe/ui/ui/input";
 import { Span } from "next-vibe/ui/ui/span";
+import type { JSX } from "react";
+import { useState } from "react";
+
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { cn } from "../../../_shared/cn";
 import type { ReactRequestResponseWidgetProps } from "../../../_shared/react-types";
 import type { FieldUsageConfig } from "../../../_shared/types";
@@ -20,9 +23,6 @@ import {
   getIconSizeClassName,
   getSpacingClassName,
 } from "../../../_shared/widget-helpers";
-import type { JSX } from "react";
-import { useState } from "react";
-
 import { extractEditableTextData } from "./shared";
 import type {
   MarkdownEditorWidgetConfig,

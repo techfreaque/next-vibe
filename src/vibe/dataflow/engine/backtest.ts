@@ -8,7 +8,9 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
+
 import { db } from "../../database";
+import { pipelineDatapoints } from "../db";
 import type { GraphConfig } from "../graph/types";
 import type { Resolution, TimeRange } from "../shared/fields";
 import {
@@ -17,8 +19,6 @@ import {
   writeBacktestSeriesResult,
   writeBacktestSignalResult,
 } from "../store/backtest";
-
-import { pipelineDatapoints } from "../db";
 import { runGraph } from "./runner";
 
 interface BacktestResult {

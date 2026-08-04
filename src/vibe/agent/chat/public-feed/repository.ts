@@ -6,6 +6,7 @@
 import "server-only";
 
 import { and, count, desc, eq, ilike, sql } from "drizzle-orm";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -19,7 +20,6 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { chatFolders, chatMessages, chatThreads } from "../db";
 import type {
   PublicFeedGetRequestOutput,

@@ -4,42 +4,6 @@
  * Chat Input Component
  * Main input area for sending messages with voice support
  */
-import {
-  DEFAULT_AUDIO_VISION_MODEL_SELECTION,
-  DEFAULT_IMAGE_VISION_MODEL_SELECTION,
-  DEFAULT_VIDEO_VISION_MODEL_SELECTION,
-} from "../../constants";
-import { getChatModelById } from "../../models";
-import {
-  ImageQuality,
-  ImageSize,
-  MusicDuration,
-  useChatInputStore,
-} from "../hooks/input-store";
-import { useAIStreamStore } from "../hooks/store";
-import { useAIStream } from "../hooks/use-ai-stream";
-import { TOUR_DATA_ATTRS } from "./chat-ui/welcome-tour/tour-attrs";
-import {
-  getBestAudioVisionModel,
-  getBestImageVisionModel,
-  getBestVideoVisionModel,
-} from "../../vision-models";
-import { AGENT_MESSAGE_LENGTH } from "../../../chat/constants";
-import { NEW_MESSAGE_ID } from "../../../chat/enum";
-import { useChatBootContext } from "../../../chat/hooks/context";
-import { useChatStore } from "../../../chat/hooks/store";
-import { useChatNavigationStore } from "../../../chat/hooks/use-chat-navigation-store";
-import { useChatSettings } from "../../../chat/settings/hooks";
-import { ChatSettingsRepositoryClient } from "../../../chat/settings/repository-client";
-import messagesDefinition from "../../../chat/threads/[threadId]/messages/definition";
-import {
-  type MessageOperationsDeps,
-  useMessageOperations,
-} from "../../../chat/threads/[threadId]/messages/hooks/use-operations";
-import { CortexButton } from "../../../cortex/widget/cortex-button";
-import { useProviderAvailability } from "../../../env-availability-store";
-import type { FavoriteConfig } from "../../../skills/favorites/db";
-import { ChatFavoritesRepositoryClient } from "../../../skills/favorites/repository-client";
 import { endpoints as cronIdEndpoints } from "next-vibe/tasks/cron/[id]/definition";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -79,9 +43,44 @@ import { useApiQuery } from "next-vibe/unified-ui/hooks/use-api-query";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
+import { AGENT_MESSAGE_LENGTH } from "../../../chat/constants";
+import { NEW_MESSAGE_ID } from "../../../chat/enum";
+import { useChatBootContext } from "../../../chat/hooks/context";
+import { useChatStore } from "../../../chat/hooks/store";
+import { useChatNavigationStore } from "../../../chat/hooks/use-chat-navigation-store";
+import { useChatSettings } from "../../../chat/settings/hooks";
+import { ChatSettingsRepositoryClient } from "../../../chat/settings/repository-client";
+import messagesDefinition from "../../../chat/threads/[threadId]/messages/definition";
+import {
+  type MessageOperationsDeps,
+  useMessageOperations,
+} from "../../../chat/threads/[threadId]/messages/hooks/use-operations";
+import { CortexButton } from "../../../cortex/widget/cortex-button";
+import { useProviderAvailability } from "../../../env-availability-store";
+import type { FavoriteConfig } from "../../../skills/favorites/db";
+import { ChatFavoritesRepositoryClient } from "../../../skills/favorites/repository-client";
+import {
+  DEFAULT_AUDIO_VISION_MODEL_SELECTION,
+  DEFAULT_IMAGE_VISION_MODEL_SELECTION,
+  DEFAULT_VIDEO_VISION_MODEL_SELECTION,
+} from "../../constants";
+import { getChatModelById } from "../../models";
+import {
+  getBestAudioVisionModel,
+  getBestImageVisionModel,
+  getBestVideoVisionModel,
+} from "../../vision-models";
 import { CallModeIndicator } from "../hooks/call-mode-indicator";
 import { FileUploadButton } from "../hooks/file-upload-button";
+import {
+  ImageQuality,
+  ImageSize,
+  MusicDuration,
+  useChatInputStore,
+} from "../hooks/input-store";
 import { RecordingInputArea } from "../hooks/recording-input-area";
+import { useAIStreamStore } from "../hooks/store";
+import { useAIStream } from "../hooks/use-ai-stream";
 import {
   getDraftKey,
   loadDraft,
@@ -92,6 +91,7 @@ import {
 import { useVoiceRecording } from "../hooks/use-voice-recording";
 import { useVoiceRuntimeState } from "../hooks/voice-mode/store";
 import { scopedTranslation as aiStreamScopedTranslation } from "../i18n";
+import { TOUR_DATA_ATTRS } from "./chat-ui/welcome-tour/tour-attrs";
 import { Selector } from "./selector";
 import { ToolsButton } from "./tools-button";
 import { useInputHandlers } from "./use-input-handlers";

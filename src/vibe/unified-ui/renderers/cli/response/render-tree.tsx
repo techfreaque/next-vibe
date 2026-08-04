@@ -1,4 +1,7 @@
 import { QueryClientProvider } from "@tanstack/react-query";
+import { LoggerProvider } from "next-vibe/ui/hooks/logger-provider";
+import type { JSX } from "react";
+
 import type { AgentEnvAvailability } from "../../../../agent/env-availability";
 import { AgentAvailabilityProvider } from "../../../../agent/env-availability-store";
 import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
@@ -7,11 +10,8 @@ import type { WidgetData } from "../../../../core/utils/json";
 import type { JwtPayloadType } from "../../../../identity/auth/types";
 import type { EndpointLogger } from "../../../../logger/types";
 import type { Platform } from "../../../../platforms/platforms";
-import { LoggerProvider } from "next-vibe/ui/hooks/logger-provider";
 import { queryClient } from "../../../hooks/store";
 import { NavigationStackProvider } from "../../../hooks/use-navigation-stack";
-import type { JSX } from "react";
-
 import { EndpointRenderer } from "../../web/EndpointRenderer";
 
 export function CliRenderTree({

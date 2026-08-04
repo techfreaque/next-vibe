@@ -3,11 +3,12 @@
  * Array of tags input with suggestions
  */
 
+import type { z } from "zod";
+
 import type { FieldDataType } from "../../../../core/definition/enums";
 import type { ArrayWidgetSchema } from "../../../_shared/schema-constraints";
 import type { FieldUsageConfig } from "../../../_shared/types";
 import type { BaseFormFieldWidgetConfig } from "../_shared/types";
-import type { z } from "zod";
 
 /**
  * Schemas a tags field accepts.

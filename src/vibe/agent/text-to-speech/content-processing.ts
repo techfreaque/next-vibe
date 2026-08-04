@@ -3,7 +3,6 @@
  * Utilities for preparing message content for text-to-speech
  */
 
-import type { ChatMessage } from "../chat/db";
 import { definitionLoader } from "next-vibe/core/definition/loader";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
@@ -12,6 +11,8 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { Platform } from "next-vibe/platforms/platforms";
 import { getTranslatorFromEndpoint } from "next-vibe/unified-ui/_shared/field-helpers";
+
+import type { ChatMessage } from "../chat/db";
 
 /**
  * Strip <think> tags from content

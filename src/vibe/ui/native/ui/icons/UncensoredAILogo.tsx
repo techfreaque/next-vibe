@@ -1,6 +1,7 @@
-import { coreClientEnv as envClient } from "../../../../core/env-client";
 import type { JSX } from "react";
 import { Image } from "react-native";
+
+import { coreClientEnv as envClient } from "../../../../core/env-client";
 
 /**
  * Uncensored AI Logo for React Native

@@ -12,14 +12,14 @@
 import "server-only";
 
 import { and, eq, isNull } from "drizzle-orm";
+
 import { db } from "../../database";
-import { getLatestRun } from "../store/runs";
 import { maybeColorize, semantic } from "../../logger/colors";
 import { formatDuration, formatSense } from "../../logger/formatters";
 import type { EndpointLogger } from "../../logger/types";
-
 import { pipelineGraphs } from "../db";
 import { RunStatus } from "../enum";
+import { getLatestRun } from "../store/runs";
 import { runGraph } from "./runner";
 
 interface SchedulerResult {

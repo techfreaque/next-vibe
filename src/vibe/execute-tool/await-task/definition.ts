@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 import { createEndpoint } from "../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -6,7 +8,6 @@ import {
   WidgetType,
 } from "../../core/definition/enums";
 import { WidgetDataSchema } from "../../core/utils/json";
-import { scopedTranslation } from "./i18n";
 import { UserRole } from "../../identity/roles/enum";
 import { taskInputSchema } from "../../tasks/cron/db";
 import { CronTaskStatus, CronTaskStatusDB } from "../../tasks/enum";
@@ -16,9 +17,8 @@ import {
   requestField,
   responseField,
 } from "../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
 import { AWAIT_TASK_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const AwaitTaskWidget = lazyWidget(() =>
   import("./widget").then((m) => ({

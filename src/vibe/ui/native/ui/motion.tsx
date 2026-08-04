@@ -15,11 +15,6 @@ import type {
 } from "react-native";
 import { Pressable, Text as RNText } from "react-native";
 
-import {
-  convertCSSToImageStyle,
-  convertCSSToTextStyle,
-  convertCSSToViewStyle,
-} from "../utils/style-converter";
 import type {
   AnimatePresenceProps,
   MotionButtonProps,
@@ -29,6 +24,11 @@ import type {
   MotionTransition,
 } from "../../web/ui/motion";
 import { applyStyleType } from "../../web/utils/style-type";
+import {
+  convertCSSToImageStyle,
+  convertCSSToTextStyle,
+  convertCSSToViewStyle,
+} from "../utils/style-converter";
 
 // Create styled wrappers for Moti components
 const StyledMotiView = styled(MotiView, { className: "style" });

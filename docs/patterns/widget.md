@@ -653,9 +653,7 @@ Handle both paths in the update widget:
 ```typescript
 // When prefillFromGet fires, rawData looks like the GET response shape
 const getResponseData = rawData as
-  | (typeof getDefinition.GET)["types"]["ResponseOutput"]
-  | null
-  | undefined;
+  (typeof getDefinition.GET)["types"]["ResponseOutput"] | null | undefined;
 const prefillAccount = getResponseData?.result;
 
 // When picker fires, the entity is in the session cache

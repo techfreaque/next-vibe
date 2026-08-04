@@ -1,9 +1,9 @@
 "use client";
 
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { StyleType } from "../utils/style-type";
 
 export interface TooltipProviderProps {

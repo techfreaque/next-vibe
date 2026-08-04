@@ -1,6 +1,7 @@
 import { cva } from "class-variance-authority";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
+
+import { cn } from "../../../unified-ui/_shared/cn";
 
 const alertVariants = cva(
   "relative rounded-lg border px-4 py-3 text-sm [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-3.5 [&>svg~*]:pl-7",

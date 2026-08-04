@@ -1,14 +1,14 @@
 import * as CheckboxPrimitive from "@rn-primitives/checkbox";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 
-import { Check } from "./icons/Check";
-import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type {
   CheckboxIndicatorProps,
   CheckboxRootProps,
 } from "../../web/ui/checkbox";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
+import { Check } from "./icons/Check";
 
 const StyledCheckboxRoot = styledNative(CheckboxPrimitive.Root);
 const StyledCheckboxIndicator = styledNative(CheckboxPrimitive.Indicator);

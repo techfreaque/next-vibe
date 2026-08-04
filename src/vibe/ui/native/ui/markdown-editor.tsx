@@ -7,7 +7,6 @@
  */
 
 import { styled } from "nativewind";
-import { cn } from "../../../unified-ui/_shared/cn";
 import React, { useCallback, useRef, useState } from "react";
 import {
   ScrollView,
@@ -17,12 +16,13 @@ import {
   View,
 } from "react-native";
 
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type {
   MarkdownEditorProps,
   ToolbarAction,
 } from "../../web/ui/markdown-editor";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 
 // Re-export types so consumers can import from the native path too
 export type {

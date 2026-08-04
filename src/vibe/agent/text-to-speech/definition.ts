@@ -11,6 +11,7 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   requestField,
@@ -18,7 +19,6 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
-import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { DEFAULT_TTS_VOICE_ID, TEXT_TO_SPEECH_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 import { TtsModelId, TtsModelIdOptions } from "./models";

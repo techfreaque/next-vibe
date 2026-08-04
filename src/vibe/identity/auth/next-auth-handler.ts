@@ -1,5 +1,14 @@
 import "server-only";
 
+import { cookies } from "next-vibe/ui/lib/headers";
+
+import {
+  AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS,
+  AUTH_TOKEN_COOKIE_NAME,
+  BEARER_LEAD_ID_SEPARATOR,
+  LEAD_ID_COOKIE_NAME,
+} from "@/env/constants";
+
 import { coreEnv } from "../../core/env";
 import { type CountryLanguage } from "../../core/i18n/core/config";
 import type { ResponseType } from "../../core/route/response.schema";
@@ -10,17 +19,9 @@ import {
 } from "../../core/route/response.schema";
 import { parseError } from "../../core/utils/parse-error";
 import { Environment } from "../../env/env-util";
-import { type AuthContext, BaseAuthHandler } from "./base-auth-handler";
 import type { EndpointLogger } from "../../logger/types";
 import { scopedTranslation as cliScopedTranslation } from "../../platforms/cli/i18n";
-import { cookies } from "next-vibe/ui/lib/headers";
-
-import {
-  AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS,
-  AUTH_TOKEN_COOKIE_NAME,
-  BEARER_LEAD_ID_SEPARATOR,
-  LEAD_ID_COOKIE_NAME,
-} from "@/env/constants";
+import { type AuthContext, BaseAuthHandler } from "./base-auth-handler";
 
 /**
  * Web Authentication Handler

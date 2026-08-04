@@ -4,8 +4,6 @@
 
 "use client";
 
-import { DEFAULT_CHAT_MODEL_SELECTION } from "../../ai-stream/constants";
-import { useProviderAvailability } from "../../env-availability-store";
 import { Div } from "next-vibe/ui/ui/div";
 import { Span } from "next-vibe/ui/ui/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
@@ -26,6 +24,8 @@ import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/n
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import { type JSX, useCallback, useMemo, useState } from "react";
 
+import { DEFAULT_CHAT_MODEL_SELECTION } from "../../ai-stream/constants";
+import { useProviderAvailability } from "../../env-availability-store";
 import { scopedTranslation as skillIdTranslation } from "../[id]/i18n";
 import { useVariantPlatformDefaults, VariantList } from "../[id]/widget";
 import type { SkillVariantData } from "../db";

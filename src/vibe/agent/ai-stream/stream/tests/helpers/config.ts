@@ -9,8 +9,9 @@
 
 import "server-only";
 
-import { DefaultFolderId } from "../../../../../core/execution-context";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+
+import { DefaultFolderId } from "../../../../../core/execution-context";
 
 export interface ModeConfig {
   /** Human-readable label used in describe() title */

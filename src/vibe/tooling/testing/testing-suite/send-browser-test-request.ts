@@ -6,6 +6,13 @@ import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 
 import { rootlessToolExecutionContext } from "next-vibe/core/execution-context";
+
+import {
+  cdpNavigatePage,
+  getSessionCDPTargetId,
+  setCookiesViaCDP,
+} from "@/browser/repository";
+
 import { endpointToUrlSegment } from "../../../core/core-utils/path";
 import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
 import { Methods } from "../../../core/definition/enums";
@@ -18,12 +25,6 @@ import type { JwtPayloadType } from "../../../identity/auth/types";
 import { UserPermissionRole } from "../../../identity/roles/enum";
 import { ATLAS_PID_FILE, readPidFilePort } from "../../../platforms/web/pid";
 import { scopedTranslation } from "../test/i18n";
-
-import {
-  cdpNavigatePage,
-  getSessionCDPTargetId,
-  setCookiesViaCDP,
-} from "@/browser/repository";
 
 // ---------------------------------------------------------------------------
 // Types

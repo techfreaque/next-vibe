@@ -13,13 +13,13 @@ import { Check } from "next-vibe/ui/ui/icons/Check";
 import { Copy } from "next-vibe/ui/ui/icons/Copy";
 import { Download } from "next-vibe/ui/ui/icons/Download";
 import { Pre } from "next-vibe/ui/ui/pre";
+import type { JSX } from "react";
+import { useState } from "react";
+
 import {
   useWidgetTranslation,
   useWidgetValue,
 } from "../../../unified-ui/_shared/use-widget-context";
-import type { JSX } from "react";
-import { useState } from "react";
-
 import type endpoints from "./definition";
 
 export function ExportEnvWidget(): JSX.Element {

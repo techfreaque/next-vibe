@@ -1,11 +1,11 @@
 import "server-only";
 
+import type { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { createEndpointEmitter } from "next-vibe/realtime/core/emitter";
 import type { ResolvedRelayContext } from "next-vibe/realtime/core/relay-context";
 
-import type { DefaultFolderId } from "next-vibe/core/execution-context";
 import threadsDefinitions, {
   type ThreadsGetWsEmit,
   type ThreadsPostWsEmit,

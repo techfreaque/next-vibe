@@ -8,9 +8,6 @@
 
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
-import { type ChatModelId, getChatModelById } from "../../models";
-import { AGENT_MESSAGE_LENGTH } from "../../../chat/constants";
-import type { EnabledTool } from "../../../chat/hooks/store";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -34,9 +31,12 @@ import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX, ReactNode } from "react";
 import { useCallback, useEffect, useRef } from "react";
 
+import { AGENT_MESSAGE_LENGTH } from "../../../chat/constants";
+import type { EnabledTool } from "../../../chat/hooks/store";
 import { useChatSettings } from "../../../chat/settings/hooks";
 import type { FavoriteCard } from "../../../skills/favorites/definition";
 import { FavoriteSelectProvider } from "../../../skills/favorites/favorite-select-context";
+import { type ChatModelId, getChatModelById } from "../../models";
 import { scopedTranslation as aiStreamScopedTranslation } from "../i18n";
 import { Selector } from "./selector";
 import { ToolsButton } from "./tools-button";

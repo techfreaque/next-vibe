@@ -28,9 +28,9 @@ import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-bas
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import type { JwtPayloadType } from "../../../identity/auth/types";
 import type { EndpointLogger } from "../../../logger/types";
+import type { Platform } from "../../platforms";
 import { createCliBypassUser } from "../auth/cli-bypass-user";
 import type { CliTargetValue } from "../types/cli-target";
-import type { Platform } from "../../platforms";
 
 /** Always the marker-driven bypass admin. See the note above on what this trades. */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars -- seam parity: the signature must match ./cli-auth

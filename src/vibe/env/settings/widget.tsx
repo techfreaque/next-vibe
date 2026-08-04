@@ -4,8 +4,6 @@
  */
 
 "use client";
-import exportEnvEndpoints from "./export-env/definition";
-import { ServerFramework } from "../../platforms/web/enum";
 import { storage } from "next-vibe/ui/lib/storage";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -31,6 +29,10 @@ import {
 } from "next-vibe/ui/ui/select";
 import { Span } from "next-vibe/ui/ui/span";
 import { Switch } from "next-vibe/ui/ui/switch";
+import type { JSX } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+
+import { ServerFramework } from "../../platforms/web/enum";
 import { cn } from "../../unified-ui/_shared/cn";
 import {
   useWidgetContext,
@@ -42,10 +44,8 @@ import {
   useWidgetValue,
 } from "../../unified-ui/_shared/use-widget-context";
 import { EndpointsPage } from "../../unified-ui/renderers/web/EndpointsPage";
-import type { JSX } from "react";
-import React, { useCallback, useEffect, useState } from "react";
-
 import type endpoints from "./definition";
+import exportEnvEndpoints from "./export-env/definition";
 
 const SettingsWizard = React.lazy(() =>
   import("./widget-wizard").then((m) => ({

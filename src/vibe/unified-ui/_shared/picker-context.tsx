@@ -1,8 +1,9 @@
 "use client";
 
-import type { WidgetData } from "../../core/utils/json";
 import type { JSX } from "react";
 import { createContext, type ReactNode, useContext } from "react";
+
+import type { WidgetData } from "../../core/utils/json";
 
 /**
  * Picker context — carries the selection callback when a widget is opened in picker mode.

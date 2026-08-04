@@ -5,7 +5,6 @@
 
 "use client";
 
-import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Button } from "next-vibe/ui/ui/button";
 import { Checkbox } from "next-vibe/ui/ui/checkbox";
 import { Div } from "next-vibe/ui/ui/div";
@@ -26,6 +25,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe/ui/ui/tooltip";
+import type { JSX } from "react";
+
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { cn } from "../../../_shared/cn";
 import type { ReactFormFieldProps } from "../../../_shared/react-types";
 import type { BooleanWidgetSchema } from "../../../_shared/schema-constraints";
@@ -38,15 +40,13 @@ import {
 } from "../../../_shared/use-widget-context";
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "../../../hooks/i18n";
 import { getTheme } from "../_shared/constants";
-import type { JSX } from "react";
-
 import type { BooleanFieldWidgetConfig } from "./types";
 
 export function BooleanFieldWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends TEndpoint extends CreateApiEndpointAny
+  TKey extends (TEndpoint extends CreateApiEndpointAny
     ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
-    : never,
+    : never),
   TSchema extends BooleanWidgetSchema,
   TUsage extends FieldUsageConfig,
 >({

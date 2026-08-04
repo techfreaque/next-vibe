@@ -1,7 +1,7 @@
 import { Box, Text } from "ink";
-import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 
+import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { LiProps } from "../../web/ui/li";
 
 export type { LiMouseEvent, LiProps } from "../../web/ui/li";

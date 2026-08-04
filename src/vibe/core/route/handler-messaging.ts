@@ -16,19 +16,18 @@
 
 import "server-only";
 
-import type { CreateApiEndpointAny } from "../definition/endpoint-base";
-import type { CountryLanguage } from "../i18n/core/config";
-import type { TranslatedKeyType } from "../i18n/core/scoped-translation";
-import type { TParams } from "../i18n/core/static-types";
-import type { EndpointLogger } from "../../logger/types";
-
-import type { InferJwtPayloadTypeFromRoles } from "./handler-roles";
-
 import type {
   EmailHandler,
   EmailHandleRequestOutput,
 } from "@/messenger/providers/email/smtp-client/email-handling/handler";
 import type { SmsFunctionType } from "@/sms/utils";
+
+import type { EndpointLogger } from "../../logger/types";
+import type { CreateApiEndpointAny } from "../definition/endpoint-base";
+import type { CountryLanguage } from "../i18n/core/config";
+import type { TranslatedKeyType } from "../i18n/core/scoped-translation";
+import type { TParams } from "../i18n/core/static-types";
+import type { InferJwtPayloadTypeFromRoles } from "./handler-roles";
 
 /**
  * SMS handler configuration

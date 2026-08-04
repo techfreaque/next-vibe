@@ -1,6 +1,5 @@
 // oxlint-disable-next-line oxlint-plugin-boilerplate/i18n-pattern
 import { translations as modelTranslations } from "../../../../models/i18n/pl";
-
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {

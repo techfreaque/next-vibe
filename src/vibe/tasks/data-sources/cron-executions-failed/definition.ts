@@ -13,11 +13,10 @@ import {
   timeSeriesResponseField,
 } from "../../../dataflow/shared/fields";
 import { UserRole } from "../../../identity/roles/enum";
-import { scopedTranslation } from "./i18n";
 import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "../../../unified-ui/_shared/utils";
-
 import { CRON_EXECUTIONS_FAILED_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 const CronExecutionsFailedWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.CronExecutionsFailedWidget })),
 );

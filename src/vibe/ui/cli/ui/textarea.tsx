@@ -1,10 +1,10 @@
 import { Text } from "ink";
 import TextInput from "ink-text-input";
-import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 
-import { useCliFieldFocus } from "../lib/focus-manager";
+import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { TextareaProps } from "../../web/ui/textarea";
+import { useCliFieldFocus } from "../lib/focus-manager";
 
 export type {
   TextareaChangeEvent,

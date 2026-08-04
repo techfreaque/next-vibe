@@ -5,19 +5,19 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
 import inquirer from "inquirer";
+
 import type { CountryLanguage } from "../../../../core/i18n/core/config";
 import { parseError } from "../../../../core/utils/parse-error";
 import type { EndpointLogger } from "../../../../logger/types";
+import { releaseEnv } from "../../../release/env";
 import type { LaunchpadT } from "../../i18n";
 import { scopedTranslation as launchpadScopedTranslation } from "../../i18n";
-import { releaseEnv } from "../../../release/env";
 import type {
   ReleaseOrchestrationOptions,
   ReleaseState,
   ReleaseTarget,
   VersionBumpType,
 } from "../types/types";
-
 import { discoverReleaseTargets } from "./release-discovery";
 import { StateManager } from "./state-manager";
 

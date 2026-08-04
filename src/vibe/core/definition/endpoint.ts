@@ -4,14 +4,15 @@
  * Fundamental type definitions used throughout the endpoint types system.
  */
 
-import type { WidgetData } from "../utils/json";
+import type { z } from "zod";
+
 import type { ObjectWidgetConfig } from "../../unified-ui/_shared/configs";
 import type {
   ArrayChildConstraint,
   FieldUsageConfig,
   ObjectChildrenConstraint,
 } from "../../unified-ui/_shared/types";
-import type { z } from "zod";
+import type { WidgetData } from "../utils/json";
 
 // Re-export UnifiedField from configs.ts where it's now defined
 export type { UnifiedField } from "../../unified-ui/_shared/configs";

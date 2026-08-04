@@ -6,11 +6,10 @@
 
 import "server-only";
 
-import type { ChatModelId } from "../../../models";
-
 import type { MessageMetadata } from "../../../../chat/db";
 import { ChatMessageRole, ThreadStreamingState } from "../../../../chat/enum";
 import { MessagesRepository } from "../../../../chat/threads/[threadId]/messages/repository";
+import type { ChatModelId } from "../../../models";
 import type { DbWriterState } from "./shared";
 import { buildSseMessageRow } from "./sse-row";
 

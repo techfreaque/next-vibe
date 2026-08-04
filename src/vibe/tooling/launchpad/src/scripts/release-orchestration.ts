@@ -1,5 +1,6 @@
 /// <reference types="node" />
 import inquirer from "inquirer";
+
 import type { CountryLanguage } from "../../../../core/i18n/core/config";
 import type { EndpointLogger } from "../../../../logger/types";
 import { scopedTranslation as launchpadScopedTranslation } from "../../i18n";

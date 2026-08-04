@@ -8,10 +8,10 @@
 import "server-only";
 
 import { lt } from "drizzle-orm";
-import { db } from "../../database";
-import type { SignalEvent } from "../shared/fields";
 
+import { db } from "../../database";
 import { pipelineSignals } from "../db";
+import type { SignalEvent } from "../shared/fields";
 
 export type { SignalEvent };
 

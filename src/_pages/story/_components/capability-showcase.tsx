@@ -1,13 +1,13 @@
 "use client";
 import { DEFAULT_CHAT_MODEL_ID } from "next-vibe/agent/ai-stream/constants";
 import { ChatModelId, FEATURED_MODELS } from "next-vibe/agent/ai-stream/models";
-import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { ChatMessage } from "next-vibe/agent/chat/db";
 import { ChatMessageRole } from "next-vibe/agent/chat/enum";
 import { GroupedAssistantMessage } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
 import type { MessageGroup } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/message-grouping";
 import { StaticUserMessageBubble } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
 import type { ModelCountsByContentLevel } from "next-vibe/agent/models/all-models";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";

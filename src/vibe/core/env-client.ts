@@ -2,10 +2,11 @@
  * Core Client Environment
  */
 
-import { defineEnvClient } from "../env/define-env-client";
-import { Environment, VibeMode, VibeModeValues } from "../env/env-util";
 import { getCurrentOrigin } from "next-vibe/ui/lib/location";
 import { z } from "zod";
+
+import { defineEnvClient } from "../env/define-env-client";
+import { Environment, VibeMode, VibeModeValues } from "../env/env-util";
 
 const isServer = typeof window === "undefined";
 const isBrowser = !isServer && typeof document !== "undefined";

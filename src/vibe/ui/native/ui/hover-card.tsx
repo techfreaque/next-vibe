@@ -1,11 +1,10 @@
 import * as HoverCardPrimitive from "@rn-primitives/hover-card";
 import { styled } from "nativewind";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import { View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type {
   HoverCardContentProps,
   HoverCardPortalProps,
@@ -13,6 +12,7 @@ import type {
   HoverCardTriggerProps,
 } from "../../web/ui/hover-card";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 import { TextClassContext } from "./text";
 
 const StyledView = styled(View, { className: "style" });

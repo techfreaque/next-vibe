@@ -5,8 +5,12 @@
  * Renders response data using endpoint definitions for pretty output.
  */
 
-import { getFullPath } from "../../../core/core-utils/path";
+import React from "react";
+
+import { getEndpoint } from "@/generated/endpoints/endpoint";
+
 import { getEnvAvailability } from "../../../agent/env-availability";
+import { getFullPath } from "../../../core/core-utils/path";
 import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import type { ResponseType } from "../../../core/route/response.schema";
@@ -15,10 +19,6 @@ import { parseError } from "../../../core/utils/parse-error";
 import { EXECUTE_TOOL_ALIAS } from "../../../execute-tool/constants";
 import type { JwtPayloadType } from "../../../identity/auth/types";
 import type { EndpointLogger } from "../../../logger/types";
-import React from "react";
-
-import { getEndpoint } from "@/generated/endpoints/endpoint";
-
 import { renderToString as fastRenderToString } from "../cli/response/fast-ink-renderer/renderer";
 import { prewarmLazyWidgets } from "../cli/response/result-formatter";
 import { McpRenderTree } from "./render-tree";

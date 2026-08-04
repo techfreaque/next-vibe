@@ -4,6 +4,8 @@
  * deploy server (install-docker.sh) only pulls it instead of building it.
  */
 
+import { z } from "zod";
+
 import { createEndpoint } from "../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -12,16 +14,14 @@ import {
   WidgetType,
 } from "../../core/definition/enums";
 import { UserRole } from "../../identity/roles/enum";
-import { scopedTranslation } from "./i18n";
 import { lazyWidget } from "../../unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "../../unified-ui/_shared/utils";
 import {
   requestField,
   responseField,
 } from "../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
 import { IMAGE_PUSH_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const ImagePushResultWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ImagePushResultWidget })),

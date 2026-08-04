@@ -5,6 +5,8 @@
  * This ensures type safety across CLI and React implementations.
  */
 
+import type { z } from "zod";
+
 import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import type { CodeOutputWidgetConfig } from "../widgets/containers/code-output/types";
 import type {
@@ -76,8 +78,6 @@ import type { FormAlertWidgetConfig } from "../widgets/interactive/form-alert/ty
 import type { NavigateButtonWidgetConfig } from "../widgets/interactive/navigate-button/types";
 import type { SearchBarWidgetConfig } from "../widgets/interactive/search-bar/types";
 import type { SubmitButtonWidgetConfig } from "../widgets/interactive/submit-button/types";
-import type { z } from "zod";
-
 import type {
   AnyChildrenConstrain,
   ArrayChildConstraint,

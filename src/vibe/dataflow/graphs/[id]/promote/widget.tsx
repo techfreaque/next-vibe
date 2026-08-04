@@ -14,6 +14,8 @@ import { Check } from "next-vibe/ui/ui/icons/Check";
 import { Shield } from "next-vibe/ui/ui/icons/Shield";
 import { Span } from "next-vibe/ui/ui/span";
 import { P } from "next-vibe/ui/ui/typography";
+import React, { useCallback } from "react";
+
 import {
   useWidgetNavigation,
   useWidgetTranslation,
@@ -21,8 +23,6 @@ import {
 } from "../../../../unified-ui/_shared/use-widget-context";
 import { FormAlertWidget } from "../../../../unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "../../../../unified-ui/widgets/interactive/submit-button/widget";
-import React, { useCallback } from "react";
-
 import type definition from "./definition";
 
 export function PromoteWidget(): React.JSX.Element {

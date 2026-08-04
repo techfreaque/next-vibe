@@ -1,13 +1,13 @@
 "use client";
 
 import * as MenubarPrimitive from "@radix-ui/react-menubar";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 
+import { cn } from "../../../unified-ui/_shared/cn";
+import type { StyleType } from "../utils/style-type";
 import { CheckIcon } from "./icons/CheckIcon";
 import { ChevronRightIcon } from "./icons/ChevronRightIcon";
 import { DotFilledIcon } from "./icons/DotFilledIcon";
-import type { StyleType } from "../utils/style-type";
 
 // Cross-platform types
 export type MenubarRootProps = {

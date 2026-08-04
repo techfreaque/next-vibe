@@ -1,5 +1,4 @@
 import type { PackageManifest } from "../../tooling/builder/repository/vibe-package/types";
-
 import { HEADLESS_CLIENT_ALIAS } from "./constants";
 
 const manifest: PackageManifest = {

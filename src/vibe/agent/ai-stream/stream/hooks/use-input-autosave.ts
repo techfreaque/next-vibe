@@ -166,15 +166,13 @@ export async function saveDraftAttachments(
 
     // Convert files to serializable format
     const serializableFiles = await Promise.all(
-      files.map(
-        async (file): Promise<SerializableFile> => ({
-          name: file.name,
-          type: file.type,
-          size: file.size,
-          lastModified: file.lastModified,
-          data: await fileToBase64(file),
-        }),
-      ),
+      files.map(async (file): Promise<SerializableFile> => ({
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        lastModified: file.lastModified,
+        data: await fileToBase64(file),
+      })),
     );
 
     await storage.setItem(attachmentKey, JSON.stringify(serializableFiles));

@@ -1,10 +1,5 @@
 "use client";
 
-import {
-  ModelSelector,
-  ModelSelectorTrigger,
-} from "../models/widget/model-selector";
-import { ModelSelectionType } from "../skills/enum";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Button } from "next-vibe/ui/ui/button";
@@ -35,6 +30,11 @@ import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/sub
 import type { JSX } from "react";
 import { useCallback, useRef, useState } from "react";
 
+import {
+  ModelSelector,
+  ModelSelectorTrigger,
+} from "../models/widget/model-selector";
+import { ModelSelectionType } from "../skills/enum";
 import { DEFAULT_STT_MODEL_ID } from "./constants";
 import type definition from "./definition";
 import { useEdenAISpeech } from "./hooks";

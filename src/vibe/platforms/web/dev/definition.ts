@@ -3,6 +3,8 @@
  * Defines endpoints for development server management
  */
 
+import { z } from "zod";
+
 import { translatedValueSchema } from "../../../core/definition/common.schema";
 import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
@@ -13,16 +15,14 @@ import {
   WidgetType,
 } from "../../../core/definition/enums";
 import { UserRole } from "../../../identity/roles/enum";
-import { scopedTranslation } from "./i18n";
 import {
   objectField,
   requestField,
   responseField,
 } from "../../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
 import { ServerFramework, ServerFrameworkOptions } from "../enum";
 import { DEV_ALIASES } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 /**
  * POST endpoint definition - Start development server

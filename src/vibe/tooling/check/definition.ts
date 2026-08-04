@@ -2,6 +2,8 @@
  * Vibe Check Command Endpoint Definition
  * Production-ready endpoint for comprehensive code quality checks
  */
+import { z } from "zod";
+
 import { createEndpoint } from "../../core/definition/create";
 import {
   EndpointErrorTypes,
@@ -22,8 +24,6 @@ import {
   responseField,
   widgetField,
 } from "../../unified-ui/_shared/utils";
-import { z } from "zod";
-
 import { VIBE_CHECK_ALIAS, VIBE_CHECK_ALIAS_SHORT } from "./constants";
 
 const CheckResultWidget = lazyWidget(() =>

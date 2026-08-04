@@ -6,7 +6,6 @@
 import "server-only";
 
 import type { CreateApiEndpointAny } from "../definition/endpoint-base";
-
 import {
   type ApiHandlerOptions,
   createGenericHandler,

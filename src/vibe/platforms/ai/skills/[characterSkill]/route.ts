@@ -17,7 +17,6 @@
 import type { CountryLanguage } from "../../../../core/i18n/core/config";
 import { defaultLocale } from "../../../../core/i18n/core/config";
 import { parseError } from "../../../../core/utils/parse-error";
-
 import {
   generateSkillAiRunMarkdown,
   generateSkillSkillMarkdown,

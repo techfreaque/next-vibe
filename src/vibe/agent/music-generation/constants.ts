@@ -2,12 +2,12 @@
  * Music Generation Constants
  */
 
-import type { MusicGenModelSelection } from "./models";
 import {
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
 } from "../skills/enum";
+import type { MusicGenModelSelection } from "./models";
 import { MusicGenModelId } from "./models";
 
 /** Primary alias used to register the generate_music AI tool */

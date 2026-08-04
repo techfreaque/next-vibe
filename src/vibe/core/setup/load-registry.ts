@@ -16,14 +16,13 @@ import "server-only";
 
 import { readFileSync } from "node:fs";
 
+import { getApiDir } from "@/env/paths";
+
 import {
   findFilesRecursively,
   stripProjectRoot,
   toImportUrl,
 } from "../generators/shared/utils";
-
-import { getApiDir } from "@/env/paths";
-
 import { isSetupFile, type SetupEntry, setupKeyFor } from "./types";
 
 const REQUIRED_EXPORTS = ["description", "install", "uninstall"] as const;

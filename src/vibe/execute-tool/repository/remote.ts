@@ -17,6 +17,9 @@
 import "server-only";
 
 import { eq, sql as drizzleSql } from "drizzle-orm";
+
+import { getEndpoint } from "@/generated/endpoints/endpoint";
+
 import { getPreferredName } from "../../core/core-utils/path";
 import {
   ErrorResponseTypes,
@@ -28,9 +31,6 @@ import { db } from "../../database";
 import { Platform } from "../../platforms/platforms";
 import type { RemoteConnInfo } from "../../remote-connection/types";
 import { CronTaskStatus } from "../../tasks/enum";
-
-import { getEndpoint } from "@/generated/endpoints/endpoint";
-
 import {
   CallbackMode,
   type CallbackModeValue,

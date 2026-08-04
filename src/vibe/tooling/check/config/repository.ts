@@ -23,7 +23,6 @@ import type { WidgetData } from "../../../core/utils/json";
 import { parseError } from "../../../core/utils/parse-error";
 import type { EndpointLogger } from "../../../logger/types";
 import type { Platform } from "../../../platforms/platforms";
-
 import { parseJsonWithComments } from "../repository/parse-json";
 import type {
   ConfigCreateRequestOutput,

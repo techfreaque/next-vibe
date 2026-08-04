@@ -5,13 +5,6 @@
  */
 
 "use client";
-import instanceEndpoints from "../../remote-connection/[instanceId]/definition";
-import { scopedTranslation as connectScopedTranslation } from "../../remote-connection/connect/i18n";
-import type { SyncScope } from "../../remote-connection/db";
-import { SyncScopeSchema } from "../../remote-connection/db";
-import { useRemoteConnections } from "../../remote-connection/list/hooks";
-import type { SyncProviderInfo } from "../../remote-connection/sync/providers/definition";
-import syncProvidersDefinitions from "../../remote-connection/sync/providers/definition";
 import { storage } from "next-vibe/ui/lib/storage";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -34,6 +27,16 @@ import {
 } from "next-vibe/ui/ui/select";
 import { Span } from "next-vibe/ui/ui/span";
 import { Switch } from "next-vibe/ui/ui/switch";
+import type { JSX } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+
+import instanceEndpoints from "../../remote-connection/[instanceId]/definition";
+import { scopedTranslation as connectScopedTranslation } from "../../remote-connection/connect/i18n";
+import type { SyncScope } from "../../remote-connection/db";
+import { SyncScopeSchema } from "../../remote-connection/db";
+import { useRemoteConnections } from "../../remote-connection/list/hooks";
+import type { SyncProviderInfo } from "../../remote-connection/sync/providers/definition";
+import syncProvidersDefinitions from "../../remote-connection/sync/providers/definition";
 import { cn } from "../../unified-ui/_shared/cn";
 import {
   useWidgetContext,
@@ -44,9 +47,6 @@ import {
 } from "../../unified-ui/_shared/use-widget-context";
 import { useApiMutation } from "../../unified-ui/hooks/use-api-mutation";
 import { useEndpoint } from "../../unified-ui/hooks/use-endpoint";
-import type { JSX } from "react";
-import React, { useCallback, useEffect, useState } from "react";
-
 import type endpoints from "./definition";
 import type { SystemSettingsGetResponseOutput } from "./definition";
 import settingsEndpoints from "./definition";

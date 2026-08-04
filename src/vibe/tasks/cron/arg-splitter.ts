@@ -6,9 +6,9 @@
 
 import "server-only";
 
-import type { WidgetData } from "../../core/utils/json";
-
 import { getEndpoint } from "@/generated/endpoints/endpoint";
+
+import type { WidgetData } from "../../core/utils/json";
 
 /**
  * Split flat merged args into urlPathParams + data using the endpoint's

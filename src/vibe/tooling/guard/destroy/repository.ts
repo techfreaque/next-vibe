@@ -14,12 +14,11 @@ import {
 } from "../../../core/route/response.schema";
 import { parseError } from "../../../core/utils/parse-error";
 import type { EndpointLogger } from "../../../logger/types";
-import type { GuardDestroyT } from "./i18n";
-
 import type {
   GuardDestroyRequestOutput,
   GuardDestroyResponseOutput,
 } from "./definition";
+import type { GuardDestroyT } from "./i18n";
 
 /**
  * Guard Destroy Repository

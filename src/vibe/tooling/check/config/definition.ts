@@ -3,6 +3,8 @@
  * Creates check.config.ts with optional MCP, VSCode, and rule configurations
  */
 
+import { z } from "zod";
+
 import { createEndpoint } from "../../../core/definition/create";
 import {
   EndpointErrorTypes,
@@ -17,7 +19,6 @@ import {
   requestField,
   responseField,
 } from "../../../unified-ui/_shared/utils";
-import { z } from "zod";
 
 // Lazy import to avoid TDZ circular dependency in MCP context
 // (widget.tsx type-imports definition → circular module resolution → "Cannot access 'default' before initialization")

@@ -1,18 +1,5 @@
 "use client";
 
-import { type ChatModelSelection, getBestChatModel } from "../../../../models";
-import type { AiStreamT } from "../../../i18n";
-import { scopedTranslation } from "../../../i18n";
-import { useChatSettings } from "../../../../../chat/settings/hooks";
-import { formatSkillId, parseSkillId } from "../../../../../chat/slugify";
-import type { AgentEnvAvailability } from "../../../../../env-availability";
-import { useProviderAvailability } from "../../../../../env-availability-store";
-import { COMPANION_SKILLS, DEFAULT_SKILLS } from "../../../../../skills/config";
-import { ModelSelectionType } from "../../../../../skills/enum";
-import { useFavoriteCreate } from "../../../../../skills/favorites/create/hooks";
-import favoritesDefinition from "../../../../../skills/favorites/definition";
-import { ChatFavoritesRepositoryClient } from "../../../../../skills/favorites/repository-client";
-import { scopedTranslation as skillsScopedTranslation } from "../../../../../skills/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { success } from "next-vibe/core/route/response.schema";
 import type { UserPermissionRoleValue } from "next-vibe/identity/roles/enum";
@@ -41,11 +28,24 @@ import {
 import { apiClient } from "next-vibe/unified-ui/hooks/store";
 import { type JSX, useCallback, useState } from "react";
 
+import { useChatSettings } from "../../../../../chat/settings/hooks";
+import { formatSkillId, parseSkillId } from "../../../../../chat/slugify";
+import type { AgentEnvAvailability } from "../../../../../env-availability";
+import { useProviderAvailability } from "../../../../../env-availability-store";
+import { COMPANION_SKILLS, DEFAULT_SKILLS } from "../../../../../skills/config";
+import { ModelSelectionType } from "../../../../../skills/enum";
+import { useFavoriteCreate } from "../../../../../skills/favorites/create/hooks";
+import favoritesDefinition from "../../../../../skills/favorites/definition";
+import { ChatFavoritesRepositoryClient } from "../../../../../skills/favorites/repository-client";
+import { scopedTranslation as skillsScopedTranslation } from "../../../../../skills/i18n";
 import {
   DEFAULT_CHAT_MODEL_ID,
   DEFAULT_CHAT_MODEL_SELECTION,
 } from "../../../../constants";
+import { type ChatModelSelection, getBestChatModel } from "../../../../models";
 import { ChatModelId } from "../../../../models";
+import type { AiStreamT } from "../../../i18n";
+import { scopedTranslation } from "../../../i18n";
 
 export type UseCase =
   | "coding"

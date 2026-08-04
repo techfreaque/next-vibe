@@ -9,14 +9,14 @@
  * `./utils`, alongside the schema utilities shared by both modules.
  */
 
+import type { z } from "zod";
+
 import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import { type SpacingSize, WidgetType } from "../../core/definition/enums";
 import type { IconKey } from "../widgets/form-fields/icon-field/icons";
 import type { NavigateButtonWidgetConfig } from "../widgets/interactive/navigate-button/types";
 import type { SearchBarWidgetConfig } from "../widgets/interactive/search-bar/types";
 import type { SubmitButtonWidgetConfig } from "../widgets/interactive/submit-button/types";
-import type { z } from "zod";
-
 import type {
   ArrayWidgetConfig,
   DisplayOnlyWidgetConfig,

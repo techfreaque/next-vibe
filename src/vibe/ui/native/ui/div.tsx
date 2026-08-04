@@ -4,11 +4,6 @@ import type { JSX } from "react";
 import * as React from "react";
 import { Pressable, Text as RNText, View } from "react-native";
 
-import {
-  convertCSSToViewStyle,
-  styledNative,
-  styledNativeRef,
-} from "../utils/style-converter";
 import type {
   DivGenericTarget,
   DivMouseEvent,
@@ -17,6 +12,11 @@ import type {
 } from "../../web/ui/div";
 import type { StyleType } from "../../web/utils/style-type";
 import { applyStyleType } from "../../web/utils/style-type";
+import {
+  convertCSSToViewStyle,
+  styledNative,
+  styledNativeRef,
+} from "../utils/style-converter";
 
 const StyledView = styledNativeRef(View);
 const StyledPressable = styledNative(Pressable);

@@ -12,9 +12,8 @@
 
 import "server-only";
 
-import { parseError } from "../utils/parse-error";
 import type { EndpointLogger } from "../../logger/types";
-
+import { parseError } from "../utils/parse-error";
 import { loadSetupRegistry } from "./load-registry";
 
 type SetupPhase = "install" | "uninstall";

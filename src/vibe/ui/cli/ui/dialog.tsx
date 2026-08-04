@@ -32,7 +32,6 @@ export type {
 } from "../../web/ui/dialog";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
-
 import type {
   DialogCloseProps,
   DialogContentProps,

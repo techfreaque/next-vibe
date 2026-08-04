@@ -6,6 +6,14 @@
 
 import "server-only";
 
+import type { z } from "zod";
+
+import type { EndpointLogger } from "../../logger/types";
+import {
+  isAgentPlatform,
+  isCliPlatform,
+  Platform,
+} from "../../platforms/platforms";
 import { validateData } from "../core-utils/validation";
 import type { CreateApiEndpointAny } from "../definition/endpoint-base";
 import type { Methods } from "../definition/enums";
@@ -13,14 +21,6 @@ import type { CountryLanguage } from "../i18n/core/config";
 import { scopedTranslation as sharedScopedTranslation } from "../i18n/shared";
 import type { WidgetData } from "../utils/json";
 import { parseError } from "../utils/parse-error";
-import type { EndpointLogger } from "../../logger/types";
-import {
-  isAgentPlatform,
-  isCliPlatform,
-  Platform,
-} from "../../platforms/platforms";
-import type { z } from "zod";
-
 import { ErrorResponseTypes, fail, type ResponseType } from "./response.schema";
 import { validateLocale } from "./validate-locale";
 

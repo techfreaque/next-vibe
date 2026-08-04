@@ -31,7 +31,6 @@
  *   VibeFrame.mount({ serverUrl, endpoint, target });
  */
 
-import type { CountryLanguage } from "../../core/i18n/core/config";
 import {
   appendToBody,
   createElement,
@@ -41,6 +40,7 @@ import {
 import { getCurrentOrigin } from "next-vibe/ui/lib/location";
 import { getLanguage } from "next-vibe/ui/lib/media";
 
+import type { CountryLanguage } from "../../core/i18n/core/config";
 import type { ParentBridge } from "./bridge";
 import {
   checkDisplayFrequency,

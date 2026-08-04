@@ -6,14 +6,14 @@
 
 import "server-only";
 
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+
 import type { ChatModelId } from "../../../models";
 import type {
   AudioVisionModelId,
   ImageVisionModelId,
   VideoVisionModelId,
 } from "../../../vision-models";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-
 import type { DbWriterState } from "./shared";
 
 /** Params for deductAndEmitCredits - model usage or tool usage. */

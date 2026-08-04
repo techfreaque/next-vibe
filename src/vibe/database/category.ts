@@ -3,11 +3,11 @@
  * Covers schema migrations, SQL execution, seeding, and DB tooling.
  */
 
-import { SQL_ALIAS } from "./sql/constants";
+import { USER_ME_ALIAS } from "@/user/private/me/constants";
+
 import type { CategoryDefinition } from "../help-tool/category-types";
 import { UserPermissionRole } from "../identity/roles/enum";
-
-import { USER_ME_ALIAS } from "@/user/private/me/constants";
+import { SQL_ALIAS } from "./sql/constants";
 
 export const category: CategoryDefinition = {
   key: "database",

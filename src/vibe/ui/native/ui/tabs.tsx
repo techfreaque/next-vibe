@@ -1,8 +1,7 @@
 import * as TabsPrimitive from "@rn-primitives/tabs";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type {
   TabsContentProps,
   TabsListProps,
@@ -10,6 +9,7 @@ import type {
   TabsTriggerProps,
 } from "../../web/ui/tabs";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 import { TextClassContext } from "./text";
 
 const StyledTabsList = TabsPrimitive.List;

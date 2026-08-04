@@ -6,7 +6,6 @@
 
 import type { CreateApiEndpointAny } from "../definition/endpoint-base";
 import { Methods } from "../definition/enums";
-
 import type {
   ClientHandlerFunction,
   ClientHandlerReturnType,

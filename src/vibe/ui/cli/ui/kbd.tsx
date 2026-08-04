@@ -1,7 +1,7 @@
 import { Text } from "ink";
-import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 
+import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { KbdProps } from "../../web/ui/kbd";
 
 export type { KbdProps } from "../../web/ui/kbd";

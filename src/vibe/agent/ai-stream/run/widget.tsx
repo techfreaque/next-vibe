@@ -72,7 +72,6 @@ import React, {
 import { InputHeightProvider } from "@/_pages/chat/lib/config/constants";
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 
-import { CortexModal } from "../../cortex/widget/cortex-modal";
 import { DefaultFolderId } from "../../../core/execution-context";
 import { ChatMessageRole, ThreadStreamingState } from "../../chat/enum";
 import type { EnabledTool } from "../../chat/hooks/store";
@@ -81,6 +80,7 @@ import {
   useChatNavigationStore,
 } from "../../chat/hooks/use-chat-navigation-store";
 import messagesDefinition from "../../chat/threads/[threadId]/messages/definition";
+import { CortexModal } from "../../cortex/widget/cortex-modal";
 import type { FavoriteCard } from "../../skills/favorites/definition";
 import { AIToolsModal } from "../../tools/widget/ai-tools-modal";
 import cancelEndpoints from "../cancel/definition";

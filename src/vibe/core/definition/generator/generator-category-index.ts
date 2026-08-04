@@ -13,6 +13,13 @@ import "server-only";
 import { readFileSync } from "node:fs";
 import { basename } from "node:path";
 
+import { GENERATED_DIR, VIBE_DIR } from "@/env/paths";
+
+import type {
+  CategoryDefinition,
+  SubcategoryDefinition,
+} from "../../../help-tool/category-types";
+import { UserPermissionRole } from "../../../identity/roles/enum";
 import type {
   GeneratorContext,
   GeneratorResult,
@@ -25,13 +32,6 @@ import {
   writeGeneratedFile,
 } from "../../generators/shared/utils";
 import { parseError } from "../../utils/parse-error";
-import type {
-  CategoryDefinition,
-  SubcategoryDefinition,
-} from "../../../help-tool/category-types";
-import { UserPermissionRole } from "../../../identity/roles/enum";
-
-import { GENERATED_DIR, VIBE_DIR } from "@/env/paths";
 
 const OUTPUT_FILE = `${GENERATED_DIR}/categories/registry.ts`;
 

@@ -13,11 +13,11 @@
  * separate keys rather than a `{{userRoles}}` filled with a translated noun.
  */
 
+import { scopedTranslation as userRolesScopedTranslation } from "../../identity/roles/i18n";
 import type { CountryLanguage } from "../i18n/core/config";
 import { scopedTranslation } from "../i18n/shared";
 import type { ErrorResponseType } from "../route/response.schema";
 import { ErrorResponseTypes, fail } from "../route/response.schema";
-import { scopedTranslation as userRolesScopedTranslation } from "../../identity/roles/i18n";
 import type { EndpointAccessDenial, PlatformDenialReason } from "./types";
 
 const PLATFORM_DENIAL_KEYS = {

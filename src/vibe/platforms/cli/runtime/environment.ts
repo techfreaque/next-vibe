@@ -6,8 +6,8 @@ import { dirname, join } from "node:path";
 const MODULE_LOAD_TIME = Date.now();
 
 import { config } from "dotenv";
-import { Platform } from "../../platforms";
 
+import { Platform } from "../../platforms";
 import { runtimeEnvPlaceholder } from "./runtime-env-placeholders";
 
 /** CLI-specific platforms (subset of Platform that applies to CLI environments) */

@@ -11,7 +11,6 @@ import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import type { EndpointMeta } from "../../core/definition/endpoints-meta";
 import type { WidgetData } from "../../core/utils/json";
 import type { Platform } from "../../platforms/platforms";
-
 import type {
   HelpToolMetadataSerialized,
   HelpToolParameters,

@@ -4,8 +4,11 @@
  */
 
 "use client";
-import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Badge } from "next-vibe/ui/ui/badge";
+import type { JSX } from "react";
+import type z from "zod";
+
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { cn } from "../../../_shared/cn";
 import type {
   ReactRequestResponseWidgetProps,
@@ -17,9 +20,6 @@ import {
   useWidgetContext,
   useWidgetForm,
 } from "../../../_shared/use-widget-context";
-import type { JSX } from "react";
-import type z from "zod";
-
 import { findEnumLabel } from "./shared";
 import type { BadgeWidgetConfig, BadgeWidgetSchema } from "./types";
 
@@ -71,9 +71,9 @@ function getBadgeSizeClass(size?: string): string {
 
 export function BadgeWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends TEndpoint extends CreateApiEndpointAny
+  TKey extends (TEndpoint extends CreateApiEndpointAny
     ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
-    : never,
+    : never),
   TUsage extends FieldUsageConfig,
 >(
   props: TUsage extends { response: true }

@@ -7,9 +7,9 @@ import "server-only";
  * Organized by MIME type: images/, documents/, audio/, video/, other/
  */
 import { and, desc, eq, isNotNull, sql } from "drizzle-orm";
-import { chatMessages, chatThreads } from "../../chat/db";
 import { db } from "next-vibe/database";
 
+import { chatMessages, chatThreads } from "../../chat/db";
 import type { VirtualListEntry, VirtualReadResult } from "./resolver";
 
 const TYPE_FOLDERS = [

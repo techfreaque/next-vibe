@@ -19,13 +19,15 @@
 
 "use client";
 
-import { getPreferredToolName } from "../../../../core/core-utils/path";
-import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
-import type { WidgetData } from "../../../../core/utils/json";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { Span } from "next-vibe/ui/ui/span";
+import { type JSX, useEffect, useRef, useState } from "react";
+
+import { getPreferredToolName } from "../../../../core/core-utils/path";
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
+import type { WidgetData } from "../../../../core/utils/json";
 import type { ReactFormFieldProps } from "../../../_shared/react-types";
 import type { StringWidgetSchema } from "../../../_shared/schema-constraints";
 import type { FieldUsageConfig } from "../../../_shared/types";
@@ -37,8 +39,6 @@ import {
   useWidgetNavigation,
 } from "../../../_shared/use-widget-context";
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "../../../hooks/i18n";
-import { type JSX, useEffect, useRef, useState } from "react";
-
 import type { EntityPickerFieldWidgetConfig } from "./types";
 
 /**
@@ -56,9 +56,9 @@ async function resolveListEndpoint(
 
 export function EntityPickerFieldWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends TEndpoint extends CreateApiEndpointAny
+  TKey extends (TEndpoint extends CreateApiEndpointAny
     ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
-    : never,
+    : never),
   TSchema extends StringWidgetSchema,
   TUsage extends FieldUsageConfig,
 >({

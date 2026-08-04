@@ -4,7 +4,6 @@
  */
 
 "use client";
-import type { ChatMessage } from "../../../../db";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -13,6 +12,7 @@ import type { JSX } from "react";
 
 import { formatRelativeTime } from "@/_pages/chat/lib/utils/formatting";
 
+import type { ChatMessage } from "../../../../db";
 import { scopedTranslation } from "../i18n";
 
 interface UserProfileCardProps {

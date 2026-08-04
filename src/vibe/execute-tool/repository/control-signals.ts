@@ -18,12 +18,11 @@ import "server-only";
 
 import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
+import type { WsWireMessage } from "../../realtime/core/types";
 import {
   KeyedRemoteSignal,
   type KeyedSignalSubscription,
 } from "../../realtime/server/keyed-signal";
-import type { WsWireMessage } from "../../realtime/core/types";
-
 import executeDefinition from "../definition";
 
 export type ControlAction = "cancel" | "detach" | "wakeUp";

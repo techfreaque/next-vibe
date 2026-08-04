@@ -4,7 +4,6 @@
 
 "use client";
 import type { DefaultFolderId } from "next-vibe/core/execution-context";
-import type { ChatMessage } from "../../../../../db";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { useWindowSize } from "next-vibe/ui/hooks/use-window-size";
 import type { DivRefObject } from "next-vibe/ui/ui/div";
@@ -16,6 +15,7 @@ import { useCallback, useLayoutEffect, useState } from "react";
 
 import { getIdColor } from "@/_pages/chat/lib/utils/formatting";
 
+import type { ChatMessage } from "../../../../../db";
 import { scopedTranslation } from "../../i18n";
 
 const MARGIN = 8; // px gap from viewport edges

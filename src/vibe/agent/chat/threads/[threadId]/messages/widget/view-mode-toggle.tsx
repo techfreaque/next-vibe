@@ -1,5 +1,4 @@
 "use client";
-import { ViewMode, type ViewModeValue } from "../../../../enum";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -10,6 +9,7 @@ import { Network } from "next-vibe/ui/ui/icons/Network";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type React from "react";
 
+import { ViewMode, type ViewModeValue } from "../../../../enum";
 import { scopedTranslation } from "../i18n";
 
 interface ViewModeToggleProps {

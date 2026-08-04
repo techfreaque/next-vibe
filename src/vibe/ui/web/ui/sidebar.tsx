@@ -1,8 +1,8 @@
 "use client";
-import { platform } from "../../../core/env-client";
-import { cn } from "../../../unified-ui/_shared/cn";
 import type { JSX, ReactNode } from "react";
 
+import { platform } from "../../../core/env-client";
+import { cn } from "../../../unified-ui/_shared/cn";
 import { useWindowSize } from "../hooks/use-window-size";
 import { Div } from "./div";
 import { ResizableContainer } from "./resizable";

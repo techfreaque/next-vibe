@@ -25,6 +25,7 @@ const SpeechToTextContainer = lazyWidget(() =>
 );
 
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+
 import { DEFAULT_STT_MODEL_ID, TRANSCRIBE_AUDIO_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 import { SttModelId } from "./models";

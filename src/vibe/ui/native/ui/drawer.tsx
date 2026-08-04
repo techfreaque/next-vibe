@@ -2,12 +2,11 @@
  * Drawer Component for React Native
  * Bottom sheet drawer implementation using Modal
  */
-import { cn } from "../../../unified-ui/_shared/cn";
 import React, { createContext, useContext, useState } from "react";
 import { Modal, Pressable, Text as RNText, View } from "react-native";
 import Animated, { SlideInDown, SlideOutDown } from "react-native-reanimated";
 
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 // Import ALL types from web - ZERO definitions here
 import type {
   DrawerCloseProps,
@@ -23,6 +22,7 @@ import type {
   DrawerTriggerRefObject,
 } from "../../web/ui/drawer";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 
 const DrawerContext = createContext<DrawerContextValue | undefined>(undefined);
 

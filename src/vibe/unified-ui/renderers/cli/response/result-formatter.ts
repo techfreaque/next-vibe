@@ -4,9 +4,13 @@
  */
 
 import { mkdirSync, writeFileSync } from "node:fs";
-import { getEnvAvailability } from "../../../../agent/env-availability";
 import { join } from "node:path";
 
+import React from "react";
+
+import { getEndpoint } from "@/generated/endpoints/endpoint";
+
+import { getEnvAvailability } from "../../../../agent/env-availability";
 import { getFullPath } from "../../../../core/core-utils/path";
 import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import type { CountryLanguage } from "../../../../core/i18n/core/config";
@@ -18,13 +22,9 @@ import type { JwtPayloadType } from "../../../../identity/auth/types";
 import type { EndpointLogger } from "../../../../logger/types";
 import type { RouteExecutionResult } from "../../../../platforms/cli/runtime/route-executor";
 import type { Platform } from "../../../../platforms/platforms";
-import React from "react";
-
-import { getEndpoint } from "@/generated/endpoints/endpoint";
-
-import { renderToString as fastRenderToString } from "./fast-ink-renderer/renderer";
 import { prewarmBuiltinWidgets } from "../../web/WidgetRenderer";
 import { CliErrorFormatter } from "./error-formatter";
+import { renderToString as fastRenderToString } from "./fast-ink-renderer/renderer";
 import { CliRenderTree } from "./render-tree";
 
 /**

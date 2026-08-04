@@ -10,6 +10,8 @@
  * Everything except the translation layer is shared with `./create`.
  */
 
+import type { z } from "zod";
+
 import type { UserRoleValue } from "../../identity/roles/enum";
 import type {
   ChannelDeclaration,
@@ -21,8 +23,6 @@ import type {
   AnyChildrenConstrain,
   FieldUsageConfig,
 } from "../../unified-ui/_shared/types";
-import type { z } from "zod";
-
 import type {
   ApiEndpoint,
   ChannelConfigField,

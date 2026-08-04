@@ -1,10 +1,10 @@
 import { and, eq, isNull, ne, sql } from "drizzle-orm";
+
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "../../core/i18n/core/language-utils";
 import { parseError } from "../../core/utils/parse-error";
 import { db } from "../../database";
 import type { EndpointLogger } from "../../logger/types";
-
 import { leadLeadLinks, leads } from "./db";
 import { LeadSource, LeadStatus } from "./enum";
 

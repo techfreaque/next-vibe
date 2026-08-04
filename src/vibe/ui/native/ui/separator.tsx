@@ -1,11 +1,11 @@
 import { styled } from "nativewind";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import { View } from "react-native";
 
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { SeparatorRootProps } from "../../web/ui/separator";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 
 export type { SeparatorRootProps };
 

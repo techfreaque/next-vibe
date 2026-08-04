@@ -5,8 +5,6 @@
 
 "use client";
 
-import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
-import { FieldDataType } from "../../../../core/definition/enums";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -27,6 +25,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe/ui/ui/tooltip";
+import type { JSX } from "react";
+
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
+import { FieldDataType } from "../../../../core/definition/enums";
 import { cn } from "../../../_shared/cn";
 import type { ReactFormFieldProps } from "../../../_shared/react-types";
 import type { StringWidgetSchema } from "../../../_shared/schema-constraints";
@@ -42,8 +44,6 @@ import { getTheme } from "../_shared/constants";
 import { renderPrefillDisplay } from "../_shared/prefill";
 import { getFieldStyleClassName } from "../_shared/styling";
 import { getFieldValidationState } from "../_shared/validation";
-import type { JSX } from "react";
-
 import type { TextFieldWidgetConfig } from "./types";
 
 /**
@@ -65,9 +65,9 @@ import type { TextFieldWidgetConfig } from "./types";
  */
 export function TextFieldWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends TEndpoint extends CreateApiEndpointAny
+  TKey extends (TEndpoint extends CreateApiEndpointAny
     ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
-    : never,
+    : never),
   TSchema extends StringWidgetSchema,
   TUsage extends FieldUsageConfig,
 >({

@@ -4,14 +4,14 @@
 
 import chalk from "chalk";
 import { Box, Text } from "ink";
-import { Platform } from "../../platforms";
+import type { JSX } from "react";
+
 import {
   useWidgetPlatform,
   useWidgetResponseOnly,
   useWidgetTranslation,
 } from "../../../unified-ui/_shared/use-widget-context";
-import type { JSX } from "react";
-
+import { Platform } from "../../platforms";
 import type endpoints from "./definition";
 import type { RebuildResponseOutput } from "./definition";
 

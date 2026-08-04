@@ -3,9 +3,9 @@
  * Using createEnumOptions wrapper for unified DRY configuration
  */
 
-import { scopedTranslation } from "./i18n";
 import { Countries, Languages } from "../../core/i18n/core/config";
 import { createEnumOptions } from "../../unified-ui/_shared/enum";
+import { scopedTranslation } from "./i18n";
 
 export const {
   enum: EngagementTypes,

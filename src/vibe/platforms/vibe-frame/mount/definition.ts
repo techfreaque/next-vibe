@@ -9,6 +9,8 @@
  * No auth secrets appear in URLs for longer than 30 seconds.
  */
 
+import { z } from "zod";
+
 import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -18,7 +20,6 @@ import {
   WidgetType,
 } from "../../../core/definition/enums";
 import { UserRole } from "../../../identity/roles/enum";
-import { scopedTranslation } from "./i18n";
 import {
   objectField,
   requestDataArrayField,
@@ -26,9 +27,8 @@ import {
   responseArrayField,
   responseField,
 } from "../../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
 import { VIBE_FRAME_MOUNT_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 // ─── Endpoint definition ──────────────────────────────────────────────────────
 

@@ -1,10 +1,9 @@
 import { styled } from "nativewind";
-import { cn } from "../../../unified-ui/_shared/cn";
 import type { JSX } from "react";
 import * as React from "react";
 import { TextInput } from "react-native";
 
-import { convertCSSToTextStyle } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type {
   InferValueType,
   InputChangeEvent,
@@ -15,6 +14,7 @@ import type {
 } from "../../web/ui/input";
 import type { StyleType } from "../../web/utils/style-type";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToTextStyle } from "../utils/style-converter";
 
 const StyledTextInput = styled(TextInput);
 

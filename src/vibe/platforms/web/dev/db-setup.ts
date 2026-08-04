@@ -33,7 +33,6 @@ import {
   formatWarning,
 } from "../../../logger/formatters";
 import type { EndpointLogger } from "../../../logger/types";
-
 import { cleanupPidFile } from "../pid";
 import type { DevRequestOutput } from "./definition";
 
@@ -184,7 +183,12 @@ export class DevDatabaseSetup {
           process.exit(1);
         }
         // Reset includes migrations, so we pass the migration flags
-        await DevDatabaseSetup.resetDatabase(locale, logger, data, activePidFile);
+        await DevDatabaseSetup.resetDatabase(
+          locale,
+          logger,
+          data,
+          activePidFile,
+        );
       } else {
         await DevDatabaseSetup.startDatabaseWithoutReset(
           locale,

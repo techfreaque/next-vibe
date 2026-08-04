@@ -12,10 +12,10 @@ import "server-only";
  * Custom skills: <slug>-<variantId> or just <slug> for single-variant.
  */
 import { and, count as drizzleCount, eq } from "drizzle-orm";
-import type { ToolConfigItem } from "../../chat/settings/definition";
-import type { FavoriteGetModelSelection } from "../../skills/favorites/[id]/definition";
 import { db } from "next-vibe/database";
 
+import type { ToolConfigItem } from "../../chat/settings/definition";
+import type { FavoriteGetModelSelection } from "../../skills/favorites/[id]/definition";
 import type { VirtualListEntry, VirtualReadResult } from "./resolver";
 
 /**

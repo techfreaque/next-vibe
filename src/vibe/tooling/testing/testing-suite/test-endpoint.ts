@@ -1,6 +1,9 @@
 // Testing infrastructure - test descriptions are for developers, not end users
 
 import { rootlessToolExecutionContext } from "next-vibe/core/execution-context";
+import { beforeAll, describe, expect, it } from "vitest";
+import type { z } from "zod";
+
 import type {
   CreateApiEndpoint,
   InferRequestOutput,
@@ -24,9 +27,6 @@ import type {
   AnyChildrenConstrain,
   FieldUsageConfig,
 } from "../../../unified-ui/_shared/types";
-import { beforeAll, describe, expect, it } from "vitest";
-import type { z } from "zod";
-
 import { resolveTestAdminUser } from "./resolve-test-user";
 import { sendTestRequest } from "./send-test-request";
 import type { TestEndpointOptions, TestRunner } from "./types";

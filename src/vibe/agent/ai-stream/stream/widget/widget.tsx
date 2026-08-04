@@ -8,19 +8,6 @@
 
 "use client";
 
-import { DefaultFolderId } from "../../../../core/execution-context";
-import { NEW_MESSAGE_ID, ThreadStreamingState } from "../../../chat/enum";
-import { useChatBootContext } from "../../../chat/hooks/context";
-import { useChatNavigationStore } from "../../../chat/hooks/use-chat-navigation-store";
-import publicFeedDefinition from "../../../chat/public-feed/definition";
-import messagesDefinition from "../../../chat/threads/[threadId]/messages/definition";
-import { useDeleteDialogStore } from "../../../chat/threads/[threadId]/messages/hooks/use-delete-dialog-store";
-import { scopedTranslation } from "../../../chat/threads/widget/i18n";
-import { ChatEmptyState } from "../../../chat/threads/widget/new-thread/empty-state";
-import { CortexModal } from "../../../cortex/widget/cortex-modal";
-import { useProviderAvailability } from "../../../env-availability-store";
-import { getAvailableModelCount } from "../../../models/all-models";
-import { AIToolsModal } from "../../../tools/widget/ai-tools-modal";
 import { platform } from "next-vibe/core/env-client";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { UserRole } from "next-vibe/identity/roles/enum";
@@ -55,6 +42,19 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import { InputHeightProvider } from "@/_pages/chat/lib/config/constants";
 
+import { DefaultFolderId } from "../../../../core/execution-context";
+import { NEW_MESSAGE_ID, ThreadStreamingState } from "../../../chat/enum";
+import { useChatBootContext } from "../../../chat/hooks/context";
+import { useChatNavigationStore } from "../../../chat/hooks/use-chat-navigation-store";
+import publicFeedDefinition from "../../../chat/public-feed/definition";
+import messagesDefinition from "../../../chat/threads/[threadId]/messages/definition";
+import { useDeleteDialogStore } from "../../../chat/threads/[threadId]/messages/hooks/use-delete-dialog-store";
+import { scopedTranslation } from "../../../chat/threads/widget/i18n";
+import { ChatEmptyState } from "../../../chat/threads/widget/new-thread/empty-state";
+import { CortexModal } from "../../../cortex/widget/cortex-modal";
+import { useProviderAvailability } from "../../../env-availability-store";
+import { getAvailableModelCount } from "../../../models/all-models";
+import { AIToolsModal } from "../../../tools/widget/ai-tools-modal";
 import type definition from "../definition";
 import type { AiStreamPostResponseOutput } from "../definition";
 import { IncognitoStreamKeeper } from "../hooks/incognito-stream-keeper";

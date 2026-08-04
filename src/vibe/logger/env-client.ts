@@ -8,8 +8,9 @@
  * what lets the bundler inline the value for the browser.
  */
 
-import { defineEnvClient } from "../env/define-env-client";
 import { z } from "zod";
+
+import { defineEnvClient } from "../env/define-env-client";
 
 export const {
   envClient: loggerClientEnv,

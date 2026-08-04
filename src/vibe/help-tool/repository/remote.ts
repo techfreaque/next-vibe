@@ -16,7 +16,6 @@ import { type ResponseType, success } from "../../core/route/response.schema";
 import type { UserRoleValue } from "../../identity/roles/enum";
 import type { EndpointLogger } from "../../logger/types";
 import type { Platform } from "../../platforms/platforms";
-
 import type {
   HelpGetRequestOutput,
   HelpGetResponseOutput,

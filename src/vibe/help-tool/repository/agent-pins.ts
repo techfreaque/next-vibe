@@ -24,7 +24,6 @@ import type { JwtPayloadType } from "../../identity/auth/types";
 import { UserPermissionRole } from "../../identity/roles/enum";
 import type { EndpointLogger } from "../../logger/types";
 import { Platform } from "../../platforms/platforms";
-
 import type { HelpGetRequestOutput } from "../definition";
 import { filterMetaForUser, inSet } from "./meta-filter";
 

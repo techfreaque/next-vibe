@@ -1,5 +1,4 @@
 import * as NavigationMenuPrimitive from "@rn-primitives/navigation-menu";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import { View } from "react-native";
 import Animated, {
@@ -10,8 +9,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-import { ChevronDown } from "./icons/ChevronDown";
-import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type {
   NavigationMenuContentProps,
   NavigationMenuIndicatorProps,
@@ -23,7 +21,9 @@ import type {
   NavigationMenuViewportProps,
 } from "../../web/ui/navigation-menu";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { buttonVariants } from "./button";
+import { ChevronDown } from "./icons/ChevronDown";
 
 const StyledView = styledNative(View);
 const StyledAnimatedView = styledNative(Animated.View);

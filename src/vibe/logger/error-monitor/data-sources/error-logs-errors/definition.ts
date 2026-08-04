@@ -13,11 +13,10 @@ import {
   timeSeriesResponseField,
 } from "../../../../dataflow/shared/fields";
 import { UserRole } from "../../../../identity/roles/enum";
-import { scopedTranslation } from "./i18n";
 import { lazyWidget } from "../../../../unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "../../../../unified-ui/_shared/utils";
-
 import { ERROR_LOGS_ERRORS_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 const ErrorLogsErrorsWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ErrorLogsErrorsWidget })),
 );

@@ -3,12 +3,13 @@
  * Based on MCP Specification v1.0
  */
 
+import type { z } from "zod";
+
 import type { Methods } from "../../core/definition/enums";
 import type { WidgetData } from "../../core/utils/json";
 import type { BaseExecutionContext } from "../../execute-tool/repository/types";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import type { UserRoleValue } from "../../identity/roles/enum";
-import type { z } from "zod";
 
 /**
  * JSON-RPC 2.0 Base Types

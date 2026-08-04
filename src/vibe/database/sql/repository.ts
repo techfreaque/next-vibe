@@ -10,11 +10,10 @@ import {
   success,
 } from "../../core/route/response.schema";
 import { parseError } from "../../core/utils/parse-error";
-import type { SqlT } from "./i18n";
 import type { EndpointLogger } from "../../logger/types";
-
 import { db } from "..";
 import type { SqlRequestOutput, SqlResponseOutput } from "./definition";
+import type { SqlT } from "./i18n";
 
 /**
  * Execute SQL query Repository

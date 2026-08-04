@@ -8,25 +8,7 @@
  */
 
 "use client";
-import {
-  type ChatModelId,
-  type ChatModelSelection,
-  getChatModelById,
-} from "../../ai-stream/models";
-import { COMPACT_TRIGGER } from "../../ai-stream/repository/core/constants";
-import type { AgentEnvAvailability } from "../../env-availability";
-import { useProviderAvailability } from "../../env-availability-store";
-import { ModelCreditDisplay } from "../../models/widget/model-credit-display";
-import { DEFAULT_SKILLS } from "../../skills/config";
-import { getBestChatModelForFavorite } from "../../skills/favorites/[id]/definition";
-import { useFavoriteCreate } from "../../skills/favorites/create/hooks";
-import type { FavoriteCard } from "../../skills/favorites/definition";
-import favoritesEndpoint from "../../skills/favorites/definition";
-import { FavoriteSelectProvider } from "../../skills/favorites/favorite-select-context";
-import { useChatFavorites } from "../../skills/favorites/hooks/hooks";
-import { scopedTranslation as skillsScopedTranslation } from "../../skills/i18n";
-import { SearchProvider, SearchProviderOptions } from "../../web-search/enum";
-import { scopedTranslation as searchScopedTranslation } from "../../web-search/i18n";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getDefaultTimezone } from "next-vibe/core/i18n/core/localization-utils";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -89,7 +71,25 @@ import { useCallback, useMemo, useState } from "react";
 
 import { buildFolderUrl } from "@/_pages/chat/lib/utils/navigation";
 
-import { DefaultFolderId } from "next-vibe/core/execution-context";
+import {
+  type ChatModelId,
+  type ChatModelSelection,
+  getChatModelById,
+} from "../../ai-stream/models";
+import { COMPACT_TRIGGER } from "../../ai-stream/repository/core/constants";
+import type { AgentEnvAvailability } from "../../env-availability";
+import { useProviderAvailability } from "../../env-availability-store";
+import { ModelCreditDisplay } from "../../models/widget/model-credit-display";
+import { DEFAULT_SKILLS } from "../../skills/config";
+import { getBestChatModelForFavorite } from "../../skills/favorites/[id]/definition";
+import { useFavoriteCreate } from "../../skills/favorites/create/hooks";
+import type { FavoriteCard } from "../../skills/favorites/definition";
+import favoritesEndpoint from "../../skills/favorites/definition";
+import { FavoriteSelectProvider } from "../../skills/favorites/favorite-select-context";
+import { useChatFavorites } from "../../skills/favorites/hooks/hooks";
+import { scopedTranslation as skillsScopedTranslation } from "../../skills/i18n";
+import { SearchProvider, SearchProviderOptions } from "../../web-search/enum";
+import { scopedTranslation as searchScopedTranslation } from "../../web-search/i18n";
 import { parseSkillId } from "../slugify";
 import type definition from "./definition";
 import type { ChatSettingsUpdateRequestOutput } from "./definition";

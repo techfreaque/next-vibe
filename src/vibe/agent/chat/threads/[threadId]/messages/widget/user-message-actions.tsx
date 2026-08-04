@@ -1,7 +1,5 @@
 "use client";
 import type { DefaultFolderId } from "next-vibe/core/execution-context";
-import type { ChatMessage } from "../../../../db";
-import { useTTSAudio } from "../../../../../text-to-speech/hooks";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -19,6 +17,8 @@ import type React from "react";
 
 import { FEATURE_COSTS } from "@/products/repository-client";
 
+import { useTTSAudio } from "../../../../../text-to-speech/hooks";
+import type { ChatMessage } from "../../../../db";
 import { scopedTranslation } from "../i18n";
 import { CopyButton } from "./copy-button";
 import { useMessageGroupName } from "./embedded-context";

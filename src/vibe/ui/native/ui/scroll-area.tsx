@@ -2,11 +2,10 @@
  * ScrollArea Component for React Native
  * Cross-platform wrapper around ScrollView with full web API compatibility
  */
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import { ScrollView } from "react-native";
 
-import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type {
   ScrollAreaBarProps,
   ScrollAreaCornerProps,
@@ -17,6 +16,7 @@ import type {
   ScrollBarProps,
 } from "../../web/ui/scroll-area";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 
 // Re-export all types from web for cross-platform compatibility
 export type {

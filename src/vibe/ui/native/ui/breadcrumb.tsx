@@ -5,12 +5,11 @@
 import * as Slot from "@rn-primitives/slot";
 import { ChevronRight } from "lucide-react-native";
 import { styled } from "nativewind";
-import { useTranslation } from "../../../core/i18n/core/client";
-import { cn } from "../../../unified-ui/_shared/cn";
 import React from "react";
 import { Pressable, Text as RNText, View } from "react-native";
 
-import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
+import { useTranslation } from "../../../core/i18n/core/client";
+import { cn } from "../../../unified-ui/_shared/cn";
 import { uiScopedTranslation } from "../../web/i18n";
 import type {
   BreadcrumbEllipsisProps,
@@ -22,6 +21,7 @@ import type {
   BreadcrumbSeparatorProps,
 } from "../../web/ui/breadcrumb";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 
 const StyledView = styled(View, { className: "style" });
 const StyledPressable = styledNative(Pressable);

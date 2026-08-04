@@ -5,13 +5,13 @@
 
 "use client";
 
-import type { ChatModelId } from "../../ai-stream/models";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { apiClient } from "next-vibe/unified-ui/hooks/store";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { useCallback, useMemo } from "react";
 
+import type { ChatModelId } from "../../ai-stream/models";
 import type { ViewModeValue } from "../enum";
 import type {
   ChatSettingsGetResponseOutput,

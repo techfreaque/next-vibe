@@ -1,10 +1,5 @@
 "use client";
 
-import { isDefaultFolderId } from "../../../../../chat/config";
-import { NEW_MESSAGE_ID } from "../../../../../chat/enum";
-import { useChatStore } from "../../../../../chat/hooks/store";
-import { useChatNavigationStore } from "../../../../../chat/hooks/use-chat-navigation-store";
-import { scopedTranslation } from "../../../../../chat/threads/widget/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { useSilentHistory } from "next-vibe/ui/hooks/use-navigation";
 import { Button } from "next-vibe/ui/ui/button";
@@ -30,6 +25,11 @@ import { useCallback, useEffect, useState } from "react";
 import { Logo } from "@/_pages/_components/logo";
 import { ThemeToggleDropdown } from "@/_pages/_components/theme-toggle";
 
+import { isDefaultFolderId } from "../../../../../chat/config";
+import { NEW_MESSAGE_ID } from "../../../../../chat/enum";
+import { useChatStore } from "../../../../../chat/hooks/store";
+import { useChatNavigationStore } from "../../../../../chat/hooks/use-chat-navigation-store";
+import { scopedTranslation } from "../../../../../chat/threads/widget/i18n";
 import { useSidebarCollapsed } from "../sidebar/use-sidebar-collapsed";
 import { LocaleSelectorContent } from "./locale-selector-content";
 

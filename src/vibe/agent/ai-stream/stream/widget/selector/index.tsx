@@ -22,10 +22,6 @@ function useIsClient(): boolean {
   );
 }
 
-import { type ChatModelId, getChatModelById } from "../../../models";
-import { TOUR_DATA_ATTRS } from "../chat-ui/welcome-tour/tour-attrs";
-import { useTourState } from "../../../../chat/tour-state";
-import { NO_SKILL_ID } from "../../../../skills/constants";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   useWidgetLogger,
@@ -33,8 +29,12 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 
+import { useTourState } from "../../../../chat/tour-state";
 import type { SkillGetResponseOutput } from "../../../../skills/[id]/definition";
 import { useSkill } from "../../../../skills/[id]/hooks";
+import { NO_SKILL_ID } from "../../../../skills/constants";
+import { type ChatModelId, getChatModelById } from "../../../models";
+import { TOUR_DATA_ATTRS } from "../chat-ui/welcome-tour/tour-attrs";
 import { SelectorContent } from "./selector-content";
 
 interface SelectorProps {

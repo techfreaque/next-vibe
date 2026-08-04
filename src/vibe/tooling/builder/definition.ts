@@ -8,6 +8,8 @@
  */
 
 import type { BunPlugin } from "bun";
+import { z } from "zod";
+
 import { createEndpoint } from "../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -18,8 +20,6 @@ import {
 } from "../../core/definition/enums";
 import { WidgetDataSchema } from "../../core/utils/json";
 import { UserRole } from "../../identity/roles/enum";
-import { scopedTranslation } from "./i18n";
-import type { PackageManifest } from "./repository/vibe-package/types";
 import {
   objectField,
   objectOptionalField,
@@ -28,8 +28,6 @@ import {
   responseArrayOptionalField,
   responseField,
 } from "../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
 import { BUILDER_ALIAS } from "./constants";
 import {
   BuildProfileEnum,
@@ -48,6 +46,8 @@ import {
   ViteLibFormatOptions,
   ViteMinifyOptions,
 } from "./enum";
+import { scopedTranslation } from "./i18n";
+import type { PackageManifest } from "./repository/vibe-package/types";
 
 /**
  * Package.json exports field schema

@@ -30,12 +30,12 @@
  * a task that was never created.
  */
 
+import { z } from "zod";
+
 import { FieldDataType, WidgetType } from "../core/definition/enums";
 import { UserRole } from "../identity/roles/enum";
 import { scopedTranslation } from "../platforms/ai/i18n";
 import { requestField, responseField } from "../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
 import { CallbackMode } from "./constants";
 
 /** Spread into the execute-tool definition's `children`. */

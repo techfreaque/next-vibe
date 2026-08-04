@@ -1,6 +1,10 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
+
+import { sshConnections } from "@/ssh/db";
+import { ClusterRole } from "@/ssh/enum";
+
 import type { ResponseType } from "../../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -12,10 +16,6 @@ import { db } from "../../../../database";
 import type { EndpointLogger } from "../../../../logger/types";
 import type { InfraT } from "../../i18n";
 import { scaleDeploymentInCluster } from "../../shared/pulumi/app/index";
-
-import { sshConnections } from "@/ssh/db";
-import { ClusterRole } from "@/ssh/enum";
-
 import type {
   ScaleReplicasRequestOutput,
   ScaleReplicasResponseOutput,

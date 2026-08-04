@@ -1,11 +1,10 @@
 import * as AlertDialogPrimitive from "@rn-primitives/alert-dialog";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import type { ViewStyle } from "react-native";
 import { StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type {
   AlertDialogActionProps,
   AlertDialogCancelProps,
@@ -20,6 +19,7 @@ import type {
   AlertDialogTriggerProps,
 } from "../../web/ui/alert-dialog";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 import { buttonTextVariants, buttonVariants } from "./button";
 import { TextClassContext } from "./text";
 

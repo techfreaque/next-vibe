@@ -5,17 +5,6 @@
  * Shared UI for message editing/branching and replying.
  * Receives all computed state as props - hooks are self-contained here.
  */
-import { getChatModelById } from "../../../../../ai-stream/models";
-import { CallModeIndicator } from "../../../../../ai-stream/stream/hooks/call-mode-indicator";
-import { FileUploadButton } from "../../../../../ai-stream/stream/hooks/file-upload-button";
-import { RecordingInputArea } from "../../../../../ai-stream/stream/hooks/recording-input-area";
-import { useVoiceRecording } from "../../../../../ai-stream/stream/hooks/use-voice-recording";
-import { Selector } from "../../../../../ai-stream/stream/widget/selector/index";
-import { ToolsButton } from "../../../../../ai-stream/stream/widget/tools-button";
-import { useChatBootContext } from "../../../../hooks/context";
-import { useChatSettings } from "../../../../settings/hooks";
-import { ChatSettingsRepositoryClient } from "../../../../settings/repository-client";
-import { useProviderAvailability } from "../../../../../env-availability-store";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -42,6 +31,17 @@ import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
+import { getChatModelById } from "../../../../../ai-stream/models";
+import { CallModeIndicator } from "../../../../../ai-stream/stream/hooks/call-mode-indicator";
+import { FileUploadButton } from "../../../../../ai-stream/stream/hooks/file-upload-button";
+import { RecordingInputArea } from "../../../../../ai-stream/stream/hooks/recording-input-area";
+import { useVoiceRecording } from "../../../../../ai-stream/stream/hooks/use-voice-recording";
+import { Selector } from "../../../../../ai-stream/stream/widget/selector/index";
+import { ToolsButton } from "../../../../../ai-stream/stream/widget/tools-button";
+import { useProviderAvailability } from "../../../../../env-availability-store";
+import { useChatBootContext } from "../../../../hooks/context";
+import { useChatSettings } from "../../../../settings/hooks";
+import { ChatSettingsRepositoryClient } from "../../../../settings/repository-client";
 import { scopedTranslation } from "../i18n";
 
 export interface BaseMessageInputProps {

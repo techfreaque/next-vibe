@@ -5,7 +5,6 @@ import type { JSX } from "react";
 import * as React from "react";
 import { Pressable, Text as RNText } from "react-native";
 
-import { convertCSSToTextStyle, styledNative } from "../utils/style-converter";
 import type {
   SpanGenericTarget,
   SpanMouseEvent,
@@ -14,6 +13,7 @@ import type {
 } from "../../web/ui/span";
 import type { StyleType } from "../../web/utils/style-type";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToTextStyle, styledNative } from "../utils/style-converter";
 
 const StyledText = styled(RNText);
 const StyledPressable = styledNative(Pressable);

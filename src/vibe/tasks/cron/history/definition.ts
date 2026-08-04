@@ -3,6 +3,8 @@
  * Defines endpoints for task execution history following MIGRATION_GUIDE.md patterns
  */
 
+import { z } from "zod";
+
 import { dateSchema } from "../../../core/definition/common.schema";
 import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
@@ -14,8 +16,6 @@ import {
 import { errorResponseSchema } from "../../../core/route/error-response.schema";
 import { WidgetDataSchema } from "../../../core/utils/json";
 import { UserRole } from "../../../identity/roles/enum";
-import { scopedTranslation } from "./i18n";
-import { CronTaskPriorityDB, CronTaskStatusDB } from "../../enum";
 import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "../../../unified-ui/_shared/utils";
 import {
@@ -23,9 +23,9 @@ import {
   requestField,
   responseField,
 } from "../../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
+import { CronTaskPriorityDB, CronTaskStatusDB } from "../../enum";
 import { CRON_HISTORY_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const CronHistoryContainer = lazyWidget(() =>
   import("./widget").then((m) => ({

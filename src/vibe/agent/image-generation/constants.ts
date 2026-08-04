@@ -1,9 +1,9 @@
-import type { ImageGenModelSelection } from "./models";
 import {
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
 } from "../skills/enum";
+import type { ImageGenModelSelection } from "./models";
 import { ImageGenModelId } from "./models";
 
 /**

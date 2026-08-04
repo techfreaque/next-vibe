@@ -2,6 +2,9 @@
 import "server-only";
 
 import { count, eq } from "drizzle-orm";
+
+import { sshConnections } from "@/ssh/db";
+
 import type {
   RemoteInstancesContext,
   SystemPromptFragment,
@@ -13,9 +16,6 @@ import { coreClientEnv as envClient } from "../core/env-client";
 import { db } from "../database";
 import { VibeMode } from "../env/env-util";
 import { UserPermissionRole } from "../identity/roles/enum";
-
-import { sshConnections } from "@/ssh/db";
-
 import { remoteConnections } from "./db";
 import { RemoteConnectionRepository } from "./repository";
 

@@ -1,6 +1,5 @@
 "use client";
 
-import folderPermissionsDefinitions from "../../subfolders/[subFolderId]/permissions/definition";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { type EndpointLogger } from "next-vibe/logger/types";
@@ -15,6 +14,7 @@ import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage"
 import type { JSX } from "react";
 import { useMemo } from "react";
 
+import folderPermissionsDefinitions from "../../subfolders/[subFolderId]/permissions/definition";
 import { scopedTranslation } from "../i18n";
 
 interface FolderPermissionsDialogProps {

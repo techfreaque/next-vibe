@@ -37,7 +37,6 @@
 import "server-only";
 
 import type { WidgetData } from "../../core/utils/json";
-
 import type {
   CompletePendingCallOutcome,
   PendingCallEntry,

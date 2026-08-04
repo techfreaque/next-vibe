@@ -14,16 +14,15 @@ import {
   success,
 } from "../../core/route/response.schema";
 import { parseError } from "../../core/utils/parse-error";
-import { databaseEnv } from "../env";
-import { scopedTranslation } from "./i18n";
 import {
   formatActionCommand,
   formatDatabase,
   formatDuration,
 } from "../../logger/formatters";
 import type { EndpointLogger } from "../../logger/types";
-
+import { databaseEnv } from "../env";
 import type { GenerateResponseOutput } from "./definition";
+import { scopedTranslation } from "./i18n";
 
 const NO_CHANGES = "No schema changes, nothing to migrate";
 

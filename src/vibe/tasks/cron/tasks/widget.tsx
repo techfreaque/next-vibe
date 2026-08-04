@@ -4,27 +4,6 @@
  */
 
 "use client";
-import type { CountryLanguage } from "../../../core/i18n/core/config";
-import { getDefaultTimezone } from "../../../core/i18n/core/localization-utils";
-import type { EndpointLogger } from "../../../logger/types";
-import bulkEndpoints from "../bulk/definition";
-import type { CronTasksTranslationKey } from "./i18n";
-import { formatCronScheduleShort } from "../../cron-formatter";
-import type {
-  CronTaskPriorityDB,
-  CronTaskPriorityFilterValue,
-  TaskCategoryDB,
-} from "../../enum";
-import {
-  CronTaskEnabledFilter,
-  CronTaskHiddenFilter,
-  CronTaskPriority,
-  CronTaskPriorityOptions,
-  CronTaskStatus,
-  type CronTaskStatusValue,
-  TaskCategoryOptions,
-} from "../../enum";
-import { scopedTranslation as tasksScopedTranslation } from "../../i18n";
 import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import {
   AlertDialog,
@@ -65,6 +44,11 @@ import {
   SelectValue,
 } from "next-vibe/ui/ui/select";
 import { Span } from "next-vibe/ui/ui/span";
+import React, { useCallback, useMemo, useState } from "react";
+
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import { getDefaultTimezone } from "../../../core/i18n/core/localization-utils";
+import type { EndpointLogger } from "../../../logger/types";
 import { cn } from "../../../unified-ui/_shared/cn";
 import {
   useWidgetContext,
@@ -78,10 +62,26 @@ import {
 } from "../../../unified-ui/_shared/use-widget-context";
 import { useApiMutation } from "../../../unified-ui/hooks/use-api-mutation";
 import { NavigateButtonWidget } from "../../../unified-ui/widgets/interactive/navigate-button/widget";
-import React, { useCallback, useMemo, useState } from "react";
-
+import { formatCronScheduleShort } from "../../cron-formatter";
+import type {
+  CronTaskPriorityDB,
+  CronTaskPriorityFilterValue,
+  TaskCategoryDB,
+} from "../../enum";
+import {
+  CronTaskEnabledFilter,
+  CronTaskHiddenFilter,
+  CronTaskPriority,
+  CronTaskPriorityOptions,
+  CronTaskStatus,
+  type CronTaskStatusValue,
+  TaskCategoryOptions,
+} from "../../enum";
+import { scopedTranslation as tasksScopedTranslation } from "../../i18n";
+import bulkEndpoints from "../bulk/definition";
 import type endpoints from "./definition";
 import type { CronTaskListResponseOutput } from "./definition";
+import type { CronTasksTranslationKey } from "./i18n";
 
 type Task = CronTaskListResponseOutput["tasks"][number];
 

@@ -6,20 +6,7 @@
  */
 
 "use client";
-import { ChatModelId } from "../ai-stream/models";
-import { RecordingInputArea } from "../ai-stream/stream/hooks/recording-input-area";
-import { useVoiceRecording } from "../ai-stream/stream/hooks/use-voice-recording";
-import { WidgetChatInput } from "../ai-stream/stream/widget/chat-input";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
-import type { ChatMessage } from "../chat/db";
-import { ChatMessageRole } from "../chat/enum";
-import type { ChatBootValue } from "../chat/hooks/context";
-import { ChatBootContext } from "../chat/hooks/context";
-import { ChatNavigationProvider } from "../chat/hooks/use-chat-navigation-store";
-import { GroupedAssistantMessage } from "../chat/threads/[threadId]/messages/widget/grouped-assistant-message";
-import type { MessageGroup } from "../chat/threads/[threadId]/messages/widget/message-grouping";
-import { StaticUserMessageBubble } from "../chat/threads/[threadId]/messages/widget/user-message-bubble";
-import { NO_SKILL_ID } from "../skills/constants";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
@@ -56,6 +43,19 @@ import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/sub
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { ChatModelId } from "../ai-stream/models";
+import { RecordingInputArea } from "../ai-stream/stream/hooks/recording-input-area";
+import { useVoiceRecording } from "../ai-stream/stream/hooks/use-voice-recording";
+import { WidgetChatInput } from "../ai-stream/stream/widget/chat-input";
+import type { ChatMessage } from "../chat/db";
+import { ChatMessageRole } from "../chat/enum";
+import type { ChatBootValue } from "../chat/hooks/context";
+import { ChatBootContext } from "../chat/hooks/context";
+import { ChatNavigationProvider } from "../chat/hooks/use-chat-navigation-store";
+import { GroupedAssistantMessage } from "../chat/threads/[threadId]/messages/widget/grouped-assistant-message";
+import type { MessageGroup } from "../chat/threads/[threadId]/messages/widget/message-grouping";
+import { StaticUserMessageBubble } from "../chat/threads/[threadId]/messages/widget/user-message-bubble";
+import { NO_SKILL_ID } from "../skills/constants";
 import type definition from "./definition";
 import { scopedTranslation } from "./i18n";
 

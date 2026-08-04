@@ -11,7 +11,6 @@ import { success } from "../../../core/route/response.schema";
 import { persistErrorLog } from "../../db-persist";
 import { isFileLoggingEnabled } from "../../debug";
 import { clientFileLog } from "../../file";
-
 import type {
   ClientLogRequestOutput,
   ClientLogResponseOutput,

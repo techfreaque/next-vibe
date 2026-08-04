@@ -47,15 +47,13 @@ export class ScriptTransformerRepository {
             "value" in item &&
             typeof item.value === "number",
         )
-        .map(
-          (item): DataPoint => ({
-            timestamp:
-              item.timestamp instanceof Date
-                ? item.timestamp
-                : new Date(item.timestamp),
-            value: item.value,
-          }),
-        );
+        .map((item): DataPoint => ({
+          timestamp:
+            item.timestamp instanceof Date
+              ? item.timestamp
+              : new Date(item.timestamp),
+          value: item.value,
+        }));
     } catch {
       return [];
     }

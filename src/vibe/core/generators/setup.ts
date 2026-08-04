@@ -19,9 +19,9 @@
 import "server-only";
 
 import chalk from "chalk";
-import type { SetupResult } from "../setup/types";
-import type { EndpointLogger } from "../../logger/types";
 
+import type { EndpointLogger } from "../../logger/types";
+import type { SetupResult } from "../setup/types";
 import { GeneratorRunner } from "./repository";
 
 /** A label, not a sentence — it is printed after a tick. */

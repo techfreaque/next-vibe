@@ -5,6 +5,9 @@
  *         Resolution controls bucket size; cursor enables backwards pagination.
  */
 
+import React from "react";
+import { z } from "zod";
+
 import { dateSchema } from "../../../../core/definition/common.schema";
 import { createEndpoint } from "../../../../core/definition/create-i18n";
 import {
@@ -13,13 +16,6 @@ import {
   Methods,
   WidgetType,
 } from "../../../../core/definition/enums";
-import {
-  GraphOwnerType,
-  GraphResolution,
-  GraphResolutionDB,
-} from "../../../enum";
-import { graphConfigSchema } from "../../../graph/schema";
-import { scopedTranslation } from "./i18n";
 import { UserRole } from "../../../../identity/roles/enum";
 import { customWidgetObject } from "../../../../unified-ui/_shared/utils";
 import {
@@ -29,8 +25,13 @@ import {
   responseArrayField,
   responseField,
 } from "../../../../unified-ui/_shared/utils-i18n";
-import React from "react";
-import { z } from "zod";
+import {
+  GraphOwnerType,
+  GraphResolution,
+  GraphResolutionDB,
+} from "../../../enum";
+import { graphConfigSchema } from "../../../graph/schema";
+import { scopedTranslation } from "./i18n";
 
 // Lazy import to avoid TDZ circular dependency in MCP context
 // (widget.tsx type-imports definition → circular module resolution → "Cannot access 'default' before initialization")

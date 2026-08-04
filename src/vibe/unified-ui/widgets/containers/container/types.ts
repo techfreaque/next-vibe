@@ -2,6 +2,8 @@
  * Container Widget Type Definitions
  */
 
+import type { z } from "zod";
+
 import type { InferSchemaFromField } from "../../../../core/definition/endpoint";
 import type {
   FieldUsage,
@@ -19,10 +21,9 @@ import type {
   ObjectChildrenConstraint,
   UnionObjectWidgetConfigConstrain,
 } from "../../../_shared/types";
-import type { CustomWidgetObjectConfig } from "../custom/types";
 import type { SpacingSize } from "../../display-only/title/types";
 import type { IconKey } from "../../form-fields/icon-field/icons";
-import type { z } from "zod";
+import type { CustomWidgetObjectConfig } from "../custom/types";
 
 /**
  * Container layout and styling properties (without type discriminant)

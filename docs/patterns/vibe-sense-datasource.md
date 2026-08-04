@@ -87,9 +87,7 @@ const { POST } = createEndpoint({
     },
   }),
 
-  errorTypes: {
-    /* all 9 error types required */
-  },
+  errorTypes: {/* all 9 error types required */},
   successTypes: {
     title: "post.success.title",
     description: "post.success.description",

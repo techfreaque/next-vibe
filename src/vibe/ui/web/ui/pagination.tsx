@@ -1,14 +1,14 @@
 "use client";
-import { useTranslation } from "../../../core/i18n/core/client";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 
+import { useTranslation } from "../../../core/i18n/core/client";
+import { cn } from "../../../unified-ui/_shared/cn";
 import { uiScopedTranslation } from "../i18n";
+import type { StyleType } from "../utils/style-type";
+import { buttonVariants } from "./button";
 import { ChevronLeftIcon } from "./icons/ChevronLeftIcon";
 import { ChevronRightIcon } from "./icons/ChevronRightIcon";
 import { DotsHorizontalIcon } from "./icons/DotsHorizontalIcon";
-import type { StyleType } from "../utils/style-type";
-import { buttonVariants } from "./button";
 
 // Cross-platform types
 export type PaginationProps = {

@@ -33,15 +33,13 @@ export class ScriptEvaluatorRepository {
             "fired" in item &&
             typeof item.fired === "boolean",
         )
-        .map(
-          (item): SignalEvent => ({
-            timestamp:
-              item.timestamp instanceof Date
-                ? item.timestamp
-                : new Date(item.timestamp),
-            fired: item.fired,
-          }),
-        );
+        .map((item): SignalEvent => ({
+          timestamp:
+            item.timestamp instanceof Date
+              ? item.timestamp
+              : new Date(item.timestamp),
+          fired: item.fired,
+        }));
     } catch {
       return [];
     }

@@ -4,7 +4,6 @@
 
 import "server-only";
 
-import type { ToolExecutionContext } from "../../../../../core/execution-context";
 import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Environment } from "next-vibe/env/env-util";
@@ -12,6 +11,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { CreditsT } from "@/credits/i18n";
 
+import type { ToolExecutionContext } from "../../../../../core/execution-context";
 import type { MessagesWsEmit } from "../../../../chat/threads/[threadId]/messages/emitter";
 
 /** Callback for emitting thread-title-updated to sidebar channels. */

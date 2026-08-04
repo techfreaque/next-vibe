@@ -1,5 +1,7 @@
 import "server-only";
 
+import type { ClientT } from "@/ssh/client";
+
 import type { ResponseType } from "../../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -7,15 +9,12 @@ import {
   success,
 } from "../../../../core/route/response.schema";
 import { parseError } from "../../../../core/utils/parse-error";
+import type { InfraConfig } from "./config";
 import { installDatabase } from "./database/index";
 import { installIngress } from "./ingress/index";
 import { provisionK3s } from "./k3s/index";
 import { installRedis } from "./redis/index";
 import { installStorage } from "./storage/index";
-
-import type { ClientT } from "@/ssh/client";
-
-import type { InfraConfig } from "./config";
 interface ProvisionAllResult {
   success: boolean;
   message: string;

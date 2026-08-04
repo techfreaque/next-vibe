@@ -4,7 +4,6 @@
  */
 
 import { createEnumOptions } from "../../unified-ui/_shared/enum";
-
 import { scopedTranslation } from "./i18n";
 
 /**

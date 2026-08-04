@@ -16,7 +16,6 @@ import { parseError } from "../../../core/utils/parse-error";
 import type { EndpointLogger } from "../../../logger/types";
 import { releaseEnv } from "../env";
 import { scopedTranslation } from "../i18n";
-
 import { MESSAGES } from "./constants";
 
 class SnykService {

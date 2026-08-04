@@ -8,6 +8,8 @@
  * - Field extraction from endpoint definitions
  */
 
+import type { z, ZodTypeAny } from "zod";
+
 import type { InferSchemaFromField } from "../../core/definition/endpoint";
 import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import type { FieldUsage } from "../../core/definition/enums";
@@ -15,8 +17,6 @@ import { WidgetType } from "../../core/definition/enums";
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import type { TParams } from "../../core/i18n/core/static-types";
 import type { WidgetData } from "../../core/utils/json";
-import type { z, ZodTypeAny } from "zod";
-
 import type { UnifiedField } from "./configs";
 import { hasChildren } from "./type-guards";
 import type {

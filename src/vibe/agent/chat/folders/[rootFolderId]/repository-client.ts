@@ -6,8 +6,6 @@
 
 "use client";
 
-import type { FolderContentsItem } from "../../folder-contents/[rootFolderId]/definition";
-import folderContentsDefinitions from "../../folder-contents/[rootFolderId]/definition";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -20,6 +18,8 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { apiClient } from "next-vibe/unified-ui/hooks/store";
 
 import type { ChatFolder } from "../../db";
+import type { FolderContentsItem } from "../../folder-contents/[rootFolderId]/definition";
+import folderContentsDefinitions from "../../folder-contents/[rootFolderId]/definition";
 import {
   deleteFolder,
   getFoldersForRoot,

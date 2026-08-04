@@ -8,7 +8,6 @@
  */
 
 import { realtimeEnv } from "../env";
-
 import { LocalPubSubAdapter } from "./local-adapter";
 import { RedisPubSubAdapter } from "./redis-adapter";
 import type { PubSubAdapter } from "./types";

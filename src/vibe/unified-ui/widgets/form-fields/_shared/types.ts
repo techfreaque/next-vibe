@@ -2,6 +2,8 @@
  * Shared types for form field widgets
  */
 
+import type { z } from "zod";
+
 import type { WidgetType } from "../../../../core/definition/enums";
 import type { RequiredFieldTheme } from "../../../_shared/field-config-types";
 import type {
@@ -9,7 +11,6 @@ import type {
   FieldUsageConfig,
 } from "../../../_shared/types";
 import type { IconKey } from "../icon-field/icons";
-import type { z } from "zod";
 
 /**
  * Common properties for form field widgets

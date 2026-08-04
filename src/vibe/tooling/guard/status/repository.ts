@@ -14,12 +14,11 @@ import {
 } from "../../../core/route/response.schema";
 import { parseError } from "../../../core/utils/parse-error";
 import type { EndpointLogger } from "../../../logger/types";
-import type { GuardStatusT } from "./i18n";
-
 import type {
   GuardStatusRequestOutput,
   GuardStatusResponseOutput,
 } from "./definition";
+import type { GuardStatusT } from "./i18n";
 
 /**
  * Guard Status Repository

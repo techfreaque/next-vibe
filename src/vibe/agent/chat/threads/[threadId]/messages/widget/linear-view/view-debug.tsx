@@ -1,8 +1,4 @@
 "use client";
-import { useChatInputStore } from "../../../../../../ai-stream/stream/hooks/input-store";
-import debugDefinition from "../../../../../../ai-stream/system-prompt/debug/definition";
-import type { ChatMessage } from "../../../../../db";
-import { ChatMessageRole } from "../../../../../enum";
 import { Div } from "next-vibe/ui/ui/div";
 import { ErrorBoundary } from "next-vibe/ui/ui/error-boundary";
 import { Markdown } from "next-vibe/ui/ui/markdown";
@@ -19,6 +15,10 @@ import React, {
 
 import { chatAnimations, chatShadows } from "@/_pages/chat/lib/design-tokens";
 
+import { useChatInputStore } from "../../../../../../ai-stream/stream/hooks/input-store";
+import debugDefinition from "../../../../../../ai-stream/system-prompt/debug/definition";
+import type { ChatMessage } from "../../../../../db";
+import { ChatMessageRole } from "../../../../../enum";
 import { scopedTranslation } from "../../i18n";
 import type { DebugSystemPromptParts } from "../debug-component";
 import { DebugSystemPrompt, DebugTrailingContext } from "../debug-component";

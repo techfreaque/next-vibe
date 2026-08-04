@@ -4,69 +4,6 @@
 
 "use client";
 
-import {
-  DEFAULT_AUDIO_VISION_MODEL_SELECTION,
-  DEFAULT_CHAT_MODEL_SELECTION,
-  DEFAULT_IMAGE_VISION_MODEL_SELECTION,
-  DEFAULT_VIDEO_VISION_MODEL_SELECTION,
-} from "../../../ai-stream/constants";
-import type { ChatModelId } from "../../../ai-stream/models";
-import {
-  chatManualModelSelectionSchema,
-  type ChatModelSelection,
-  chatModelSelectionSchema,
-  getBestChatModel,
-} from "../../../ai-stream/models";
-import {
-  type AudioVisionModelSelection,
-  audioVisionModelSelectionSchema,
-  getBestAudioVisionModel,
-  getBestImageVisionModel,
-  getBestVideoVisionModel,
-  type ImageVisionModelSelection,
-  imageVisionModelSelectionSchema,
-  type VideoVisionModelSelection,
-  videoVisionModelSelectionSchema,
-} from "../../../ai-stream/vision-models";
-import { parseSkillId } from "../../../chat/slugify";
-import { useProviderAvailability } from "../../../env-availability-store";
-import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "../../../image-generation/constants";
-import {
-  getBestImageGenModel,
-  type ImageGenModelSelection,
-  imageGenModelSelectionSchema,
-} from "../../../image-generation/models";
-import {
-  ModelSelector,
-  ModelSelectorTrigger,
-} from "../../../models/widget/model-selector";
-import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "../../../music-generation/constants";
-import {
-  getBestMusicGenModel,
-  type MusicGenModelSelection,
-  musicGenModelSelectionSchema,
-} from "../../../music-generation/models";
-import { scopedTranslation as skillIdTranslation } from "../../[id]/i18n";
-import { ModelGroup } from "../../[id]/widget";
-import { NO_SKILL_ID } from "../../constants";
-import { DEFAULT_STT_MODEL_SELECTION } from "../../../speech-to-text/constants";
-import {
-  getBestSttModel,
-  type SttModelSelection,
-  sttModelSelectionSchema,
-} from "../../../speech-to-text/models";
-import { DEFAULT_TTS_MODEL_SELECTION } from "../../../text-to-speech/constants";
-import {
-  getBestTtsModel,
-  type VoiceModelSelection,
-  voiceModelSelectionSchema,
-} from "../../../text-to-speech/models";
-import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "../../../video-generation/constants";
-import {
-  getBestVideoGenModel,
-  type VideoGenModelSelection,
-  videoGenModelSelectionSchema,
-} from "../../../video-generation/models";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
@@ -94,9 +31,72 @@ import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/n
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import { useMemo, useState } from "react";
 
+import {
+  DEFAULT_AUDIO_VISION_MODEL_SELECTION,
+  DEFAULT_CHAT_MODEL_SELECTION,
+  DEFAULT_IMAGE_VISION_MODEL_SELECTION,
+  DEFAULT_VIDEO_VISION_MODEL_SELECTION,
+} from "../../../ai-stream/constants";
+import type { ChatModelId } from "../../../ai-stream/models";
+import {
+  chatManualModelSelectionSchema,
+  type ChatModelSelection,
+  chatModelSelectionSchema,
+  getBestChatModel,
+} from "../../../ai-stream/models";
+import {
+  type AudioVisionModelSelection,
+  audioVisionModelSelectionSchema,
+  getBestAudioVisionModel,
+  getBestImageVisionModel,
+  getBestVideoVisionModel,
+  type ImageVisionModelSelection,
+  imageVisionModelSelectionSchema,
+  type VideoVisionModelSelection,
+  videoVisionModelSelectionSchema,
+} from "../../../ai-stream/vision-models";
 import { useChatSettings } from "../../../chat/settings/hooks";
+import { parseSkillId } from "../../../chat/slugify";
+import { useProviderAvailability } from "../../../env-availability-store";
+import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "../../../image-generation/constants";
+import {
+  getBestImageGenModel,
+  type ImageGenModelSelection,
+  imageGenModelSelectionSchema,
+} from "../../../image-generation/models";
+import {
+  ModelSelector,
+  ModelSelectorTrigger,
+} from "../../../models/widget/model-selector";
+import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "../../../music-generation/constants";
+import {
+  getBestMusicGenModel,
+  type MusicGenModelSelection,
+  musicGenModelSelectionSchema,
+} from "../../../music-generation/models";
+import { DEFAULT_STT_MODEL_SELECTION } from "../../../speech-to-text/constants";
+import {
+  getBestSttModel,
+  type SttModelSelection,
+  sttModelSelectionSchema,
+} from "../../../speech-to-text/models";
+import { DEFAULT_TTS_MODEL_SELECTION } from "../../../text-to-speech/constants";
+import {
+  getBestTtsModel,
+  type VoiceModelSelection,
+  voiceModelSelectionSchema,
+} from "../../../text-to-speech/models";
+import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "../../../video-generation/constants";
+import {
+  getBestVideoGenModel,
+  type VideoGenModelSelection,
+  videoGenModelSelectionSchema,
+} from "../../../video-generation/models";
 import { useSkill } from "../../[id]/hooks";
+import { scopedTranslation as skillIdTranslation } from "../../[id]/i18n";
+import { ModelGroup } from "../../[id]/widget";
 import { DEFAULT_SKILLS } from "../../config";
+import { NO_SKILL_ID } from "../../constants";
 import { ModelSelectionType } from "../../enum";
 import { scopedTranslation as skillsScopedTranslation } from "../../i18n";
 import type definition from "./definition";

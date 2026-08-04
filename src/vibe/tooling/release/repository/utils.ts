@@ -4,7 +4,6 @@
  */
 
 import type { WidgetData } from "../../../core/utils/json";
-
 import type { PackageJson, ParsedVersion, ReleaseConfig } from "../definition";
 
 // ============================================================================

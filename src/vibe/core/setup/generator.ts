@@ -15,6 +15,8 @@ import "server-only";
 
 import { readFileSync } from "node:fs";
 
+import { GENERATED_DIR, getApiDir, VIBE_DIR } from "@/env/paths";
+
 import type {
   GeneratorContext,
   GeneratorDefinition,
@@ -26,9 +28,6 @@ import {
   stripProjectRoot,
   writeGeneratedFile,
 } from "../generators/shared/utils";
-
-import { GENERATED_DIR, getApiDir, VIBE_DIR } from "@/env/paths";
-
 import { isSetupFile, setupKeyFor } from "./types";
 
 const OUTPUT_FILE = `${GENERATED_DIR}/setup/index.ts`;

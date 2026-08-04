@@ -1,7 +1,9 @@
-import {
-  formatValidationErrorCompact,
-  formatValidationErrorDetails,
-} from "./format-validation-error";
+import type { ZodError, ZodIssue } from "zod";
+import { z } from "zod";
+
+import type { EndpointLogger } from "../../logger/types";
+import type { Platform } from "../../platforms/platforms";
+import { isAgentPlatform, isCliPlatform } from "../../platforms/platforms";
 import type { CreateApiEndpointAny } from "../definition/endpoint-base";
 import type { CountryLanguage } from "../i18n/core/config";
 import { scopedTranslation as sharedScopedTranslation } from "../i18n/shared";
@@ -9,11 +11,10 @@ import type { ResponseType } from "../route/response.schema";
 import { ErrorResponseTypes, fail } from "../route/response.schema";
 import type { WidgetData } from "../utils/json";
 import { parseError } from "../utils/parse-error";
-import type { EndpointLogger } from "../../logger/types";
-import type { Platform } from "../../platforms/platforms";
-import { isAgentPlatform, isCliPlatform } from "../../platforms/platforms";
-import type { ZodError, ZodIssue } from "zod";
-import { z } from "zod";
+import {
+  formatValidationErrorCompact,
+  formatValidationErrorDetails,
+} from "./format-validation-error";
 
 /**
  * Validate data against a schema

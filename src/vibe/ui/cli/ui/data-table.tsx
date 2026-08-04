@@ -4,10 +4,10 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { Box, Text } from "ink";
-import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import * as React from "react";
 
+import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { DataTableProps } from "../../web/ui/data-table";
 
 export type { DataTableProps } from "../../web/ui/data-table";

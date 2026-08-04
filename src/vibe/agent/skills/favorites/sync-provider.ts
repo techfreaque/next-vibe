@@ -9,6 +9,19 @@ import "server-only";
  * Last-writer-wins on updatedAt; tie → remote wins.
  */
 import { and, asc, eq, sql } from "drizzle-orm";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import type { StandardSyncCursor } from "next-vibe/remote-connection/db";
+import {
+  type SyncProvider,
+  toStandardCursor,
+} from "next-vibe/remote-connection/sync/provider";
+import {
+  type IconKey,
+  IconKeyDB,
+} from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+import { z } from "zod";
+
 import {
   type ChatModelSelection,
   chatModelSelectionSchema,
@@ -41,19 +54,6 @@ import {
   type VideoGenModelSelection,
   videoGenModelSelectionSchema,
 } from "../../video-generation/models";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
-import type { StandardSyncCursor } from "next-vibe/remote-connection/db";
-import {
-  type SyncProvider,
-  toStandardCursor,
-} from "next-vibe/remote-connection/sync/provider";
-import {
-  type IconKey,
-  IconKeyDB,
-} from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
-import { z } from "zod";
-
 import { chatFavorites } from "./db";
 
 // ─── Wire schema (the full favorite row for cross-instance remote events) ──────

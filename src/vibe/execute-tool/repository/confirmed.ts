@@ -20,6 +20,7 @@
 import "server-only";
 
 import type { ToolExecutionContext } from "next-vibe/core/execution-context";
+
 import type { ChatMessage, ToolCall } from "../../agent/chat/db";
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import type { ErrorResponseType } from "../../core/route/response.schema";
@@ -27,7 +28,6 @@ import type { WidgetData } from "../../core/utils/json";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
 import { Platform } from "../../platforms/platforms";
-
 import { CallbackMode, EXECUTE_TOOL_ALIAS } from "../constants";
 import { TaskCompletion } from "./completion";
 import { RouteExecuteRepository } from "./index";

@@ -2,14 +2,6 @@
  * Icon Picker Component for React Native
  * Simplified icon selection UI with categories and search
  */
-import { useTranslation } from "../../../core/i18n/core/client";
-import { cn } from "../../../unified-ui/_shared/cn";
-import type { CategoryKey } from "../../../unified-ui/widgets/form-fields/icon-field/icons";
-import {
-  ICON_CATEGORIES,
-  ICON_CATEGORIES_LIST,
-} from "../../../unified-ui/widgets/form-fields/icon-field/icons";
-import { Icon } from "../../../unified-ui/widgets/form-fields/icon-field/icon-component";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 import {
@@ -21,6 +13,14 @@ import {
   View,
 } from "react-native";
 
+import { useTranslation } from "../../../core/i18n/core/client";
+import { cn } from "../../../unified-ui/_shared/cn";
+import { Icon } from "../../../unified-ui/widgets/form-fields/icon-field/icon-component";
+import type { CategoryKey } from "../../../unified-ui/widgets/form-fields/icon-field/icons";
+import {
+  ICON_CATEGORIES,
+  ICON_CATEGORIES_LIST,
+} from "../../../unified-ui/widgets/form-fields/icon-field/icons";
 import { uiScopedTranslation } from "../../web/i18n";
 import type { IconPickerProps } from "../../web/ui/icon-picker";
 import { Text } from "./text";

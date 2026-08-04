@@ -4,6 +4,8 @@
  * Admin users see all connections across all users
  */
 
+import { z } from "zod";
+
 import { createEndpoint } from "../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -18,8 +20,6 @@ import {
   requestField,
   responseField,
 } from "../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
 import { ConnectionHealthSchema, TransportModeSchema } from "../db";
 import { REMOTE_CONNECTIONS_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";

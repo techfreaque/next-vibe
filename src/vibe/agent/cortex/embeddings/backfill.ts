@@ -7,9 +7,9 @@ import "server-only";
  * Rate-limited to avoid API throttling.
  */
 import { and, eq, isNotNull, isNull, notInArray, sql } from "drizzle-orm";
+import { makeHeadlessContext } from "next-vibe/core/execution-context";
 import { db } from "next-vibe/database";
 
-import { makeHeadlessContext } from "next-vibe/core/execution-context";
 import { cortexNodes } from "../db";
 import { CortexNodeType } from "../enum";
 import { computeEmbeddingHash, generateEmbedding } from "./service";

@@ -6,6 +6,7 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import {
   type CountryLanguage,
   defaultLocale,
@@ -23,7 +24,6 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { createEndpointEmitter } from "next-vibe/realtime/core/emitter";
 
-import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { chatFolders, chatThreads } from "../../db";
 import { ThreadStatus, ThreadStreamingState } from "../../enum";
 import { createFolderContentsEmitter } from "../../folder-contents/[rootFolderId]/emitter";

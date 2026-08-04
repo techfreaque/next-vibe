@@ -7,7 +7,6 @@ import "server-only";
 
 import { Methods } from "../../definition/enums";
 import { endpointsHandler } from "../../route/multi";
-
 import installEndpoints from "./definition";
 
 export const { tools } = endpointsHandler({

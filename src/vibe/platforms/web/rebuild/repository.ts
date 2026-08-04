@@ -28,16 +28,15 @@ import { DatabaseMigrationRepository } from "../../../database/migrate/repositor
 import { SeedRepository } from "../../../database/seed/repository";
 import type { JwtPayloadType } from "../../../identity/auth/types";
 import type { EndpointLogger } from "../../../logger/types";
-import { Platform } from "../../platforms";
-import type { RebuildT } from "./i18n";
 import { VibeCheckRepository } from "../../../tooling/check/repository/repository";
-
+import { Platform } from "../../platforms";
 import { readPidFilePort, VIBE_START_PID_FILE } from "../pid";
 import type {
   RebuildRequestOutput,
   RebuildResponseOutput,
   RebuildStep,
 } from "./definition";
+import type { RebuildT } from "./i18n";
 
 /**
  * Rebuild Repository

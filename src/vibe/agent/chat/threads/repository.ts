@@ -18,6 +18,7 @@ import {
   or,
   sql,
 } from "drizzle-orm";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { type CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { RemoteEventHandlerProps } from "next-vibe/core/route/handler-realtime";
 import {
@@ -32,7 +33,6 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { leads } from "next-vibe/identity/lead/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { type ChatFolder, chatFolders, chatThreads } from "../db";
 import { ThreadStatus, ThreadStreamingState } from "../enum";
 import { scopedTranslation as chatScopedTranslation } from "../i18n";

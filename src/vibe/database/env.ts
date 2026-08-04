@@ -1,9 +1,10 @@
 import "server-only";
 
-import { defineEnv } from "../env/define-env";
 import { z } from "zod";
 
 import { cliArgs, isPreviewMode } from "@/vibe/env/detect";
+
+import { defineEnv } from "../env/define-env";
 
 export const {
   env: databaseEnv,

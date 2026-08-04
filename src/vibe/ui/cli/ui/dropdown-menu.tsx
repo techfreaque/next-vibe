@@ -35,7 +35,6 @@ export type {
 } from "../../web/ui/dropdown-menu";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
-
 import type {
   DropdownMenuCheckboxItemProps,
   DropdownMenuContentProps,

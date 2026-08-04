@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 import { createEndpoint } from "../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -15,8 +17,6 @@ import {
   responseArrayOptionalField,
   responseField,
 } from "../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
 import { VIBE_DEPS_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 

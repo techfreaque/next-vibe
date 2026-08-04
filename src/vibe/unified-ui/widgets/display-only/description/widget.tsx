@@ -1,6 +1,8 @@
 "use client";
-import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Div } from "next-vibe/ui/ui/div";
+import type { JSX } from "react";
+
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { cn } from "../../../_shared/cn";
 import type { ReactRequestResponseWidgetProps } from "../../../_shared/react-types";
 import type { StringWidgetSchema } from "../../../_shared/schema-constraints";
@@ -13,8 +15,6 @@ import {
   getSpacingClassName,
   getTextSizeClassName,
 } from "../../../_shared/widget-helpers";
-import type { JSX } from "react";
-
 import type { DescriptionWidgetConfig } from "./types";
 
 /**

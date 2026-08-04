@@ -4,7 +4,6 @@
  */
 
 "use client";
-import { scopedTranslation as tasksScopedTranslation } from "../../i18n";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { Activity } from "next-vibe/ui/ui/icons/Activity";
@@ -19,6 +18,8 @@ import { TrendingDown } from "next-vibe/ui/ui/icons/TrendingDown";
 import { TrendingUp } from "next-vibe/ui/ui/icons/TrendingUp";
 import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
 import { Span } from "next-vibe/ui/ui/span";
+import React, { useCallback, useMemo } from "react";
+
 import { cn } from "../../../unified-ui/_shared/cn";
 import {
   useWidgetContext,
@@ -28,8 +29,7 @@ import {
   useWidgetValue,
 } from "../../../unified-ui/_shared/use-widget-context";
 import { NavigateButtonWidget } from "../../../unified-ui/widgets/interactive/navigate-button/widget";
-import React, { useCallback, useMemo } from "react";
-
+import { scopedTranslation as tasksScopedTranslation } from "../../i18n";
 import type statsEndpoints from "./definition";
 import type { CronStatsGetResponseOutput } from "./definition";
 

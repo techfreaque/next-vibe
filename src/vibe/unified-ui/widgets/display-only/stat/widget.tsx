@@ -1,10 +1,12 @@
 "use client";
-import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Card, CardContent } from "next-vibe/ui/ui/card";
 import { Minus } from "next-vibe/ui/ui/icons/Minus";
 import { TrendingDown } from "next-vibe/ui/ui/icons/TrendingDown";
 import { TrendingUp } from "next-vibe/ui/ui/icons/TrendingUp";
 import { Span } from "next-vibe/ui/ui/span";
+import type { JSX } from "react";
+
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { cn } from "../../../_shared/cn";
 import type {
   ReactRequestResponseWidgetProps,
@@ -23,8 +25,6 @@ import {
   getTextSizeClassName,
 } from "../../../_shared/widget-helpers";
 import { Icon } from "../../form-fields/icon-field/icon-component";
-import type { JSX } from "react";
-
 import { formatStatValue } from "./shared";
 import type { StatWidgetConfig } from "./types";
 
@@ -91,9 +91,9 @@ const variantClasses: Record<StatVariant, string> = {
  */
 export function StatWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends TEndpoint extends CreateApiEndpointAny
+  TKey extends (TEndpoint extends CreateApiEndpointAny
     ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
-    : never,
+    : never),
   TUsage extends FieldUsageConfig,
 >(
   props:

@@ -5,13 +5,13 @@
  */
 
 import { and, eq } from "drizzle-orm";
+
 import { type ResponseType, success } from "../../core/route/response.schema";
 import { db } from "../../database";
 import type { JwtPrivatePayloadType } from "../../identity/auth/types";
 import { UserPermissionRole } from "../../identity/roles/enum";
 import type { EndpointLogger } from "../../logger/types";
 import { cronTasks } from "../../tasks/cron/db";
-
 import { remoteConnections } from "../db";
 import { RemoteConnectionRepository } from "../repository";
 import type { RemoteConnectionsListResponseOutput } from "./definition";

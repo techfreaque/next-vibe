@@ -5,7 +5,6 @@
 
 import type { Countries } from "../../core/i18n/core/config";
 import type { IconKey } from "../widgets/form-fields/icon-field/icons";
-
 import type { PrefillDisplayConfig } from "./field-config-types";
 
 /**

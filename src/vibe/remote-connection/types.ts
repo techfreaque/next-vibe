@@ -6,7 +6,6 @@ import type { Methods } from "../core/definition/enums";
 import type { CountryLanguage } from "../core/i18n/core/config";
 import type { WidgetData } from "../core/utils/json";
 import type { EndpointLogger } from "../logger/types";
-
 import type { remoteConnections, TransportMode } from "./db";
 import type { RemoteConnectionRepository } from "./repository";
 

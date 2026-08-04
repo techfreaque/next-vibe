@@ -33,9 +33,9 @@ import {
   type StopCondition,
   streamText as aiStreamText,
 } from "ai";
-import { calculateCreditCost } from "../../../models/models";
 import type { WidgetData } from "next-vibe/core/utils/json";
 
+import { calculateCreditCost } from "../../../models/models";
 import {
   AbortReason,
   MAX_TOOL_CALLS,

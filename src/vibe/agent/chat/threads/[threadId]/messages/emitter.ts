@@ -1,5 +1,6 @@
 import "server-only";
 
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import {
@@ -9,7 +10,6 @@ import {
 import type { ResolvedRelayContext } from "next-vibe/realtime/core/relay-context";
 import type { EmitEventNamed } from "next-vibe/realtime/core/structured-events";
 
-import { DefaultFolderId } from "next-vibe/core/execution-context";
 import messagesDefinitions from "./definition";
 
 export type MessagesWsEmit = EmitEventNamed<

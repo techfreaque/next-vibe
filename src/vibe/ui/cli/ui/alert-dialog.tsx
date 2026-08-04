@@ -23,7 +23,6 @@ export type {
 } from "../../web/ui/alert-dialog";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
-
 import type {
   AlertDialogActionProps,
   AlertDialogCancelProps,

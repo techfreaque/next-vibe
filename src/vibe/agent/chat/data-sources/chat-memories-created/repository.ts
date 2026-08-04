@@ -7,9 +7,6 @@
 import "server-only";
 
 import { and, count, gte, lte, sql } from "drizzle-orm";
-import { cortexNodes } from "../../../cortex/db";
-import { CortexNodeType } from "../../../cortex/enum";
-import { MEMORIES_PREFIX } from "../../../cortex/repository";
 import {
   type ResponseType,
   success,
@@ -22,6 +19,10 @@ import type {
 } from "next-vibe/dataflow/shared/fields";
 import { resolutionBucketExpr } from "next-vibe/dataflow/shared/query-utils";
 import { fillGaps } from "next-vibe/dataflow/shared/range";
+
+import { cortexNodes } from "../../../cortex/db";
+import { CortexNodeType } from "../../../cortex/enum";
+import { MEMORIES_PREFIX } from "../../../cortex/repository";
 
 export class QueryChatMemoriesCreatedRepository {
   static async queryChatMemoriesCreated(data: {
@@ -55,12 +56,10 @@ export class QueryChatMemoriesCreatedRepository {
       .groupBy(sql`1`)
       .orderBy(sql`1`);
 
-    const raw = rows.map(
-      (r): DataPoint => ({
-        timestamp: new Date(r.bucket),
-        value: Number(r.cnt),
-      }),
-    );
+    const raw = rows.map((r): DataPoint => ({
+      timestamp: new Date(r.bucket),
+      value: Number(r.cnt),
+    }));
     const result = fillGaps(raw, range, resolution);
     return success({
       result,

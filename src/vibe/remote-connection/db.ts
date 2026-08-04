@@ -18,10 +18,11 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { z } from "zod";
+
 import type { WidgetData } from "../core/utils/json";
 import { users } from "../identity/user/db";
 import type { SyncDomain } from "../realtime/core/sync-domain";
-import { z } from "zod";
 
 /**
  * Zod schema for a serialized tool manifest entry - one per tool on the remote instance.

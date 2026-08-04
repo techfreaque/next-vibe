@@ -2,6 +2,7 @@
 /// <reference types="node" />
 import { Command } from "commander";
 import inquirer from "inquirer";
+
 import {
   type CountryLanguage,
   defaultLocale,
@@ -12,7 +13,6 @@ import type { EndpointLogger } from "../../../../logger/types";
 import { scopedTranslation as launchpadScopedTranslation } from "../../i18n";
 import type { VersionBumpType } from "../types/types";
 import { getRootDirectory, loadConfig } from "../utils/config";
-
 import { cloneMissingRepos } from "./clone-missing";
 import { navigateFolders } from "./navigate-folders";
 import {

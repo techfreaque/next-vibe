@@ -1,11 +1,11 @@
 import { styled } from "nativewind";
-import { cn } from "../../../unified-ui/_shared/cn";
 import { View } from "react-native";
 
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { BadgeProps } from "../../web/ui/badge";
 import { badgeTextVariants, badgeVariants } from "../../web/ui/badge";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 import { Text, TextClassContext } from "./text";
 
 const StyledView = styled(View, { className: "style" });

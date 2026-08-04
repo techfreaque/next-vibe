@@ -14,6 +14,7 @@ import {
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { createEnumOptions } from "next-vibe/unified-ui/_shared/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   objectField,
@@ -23,7 +24,6 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
-import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { ThreadStreamingStateDB } from "../enum";
 import { scopedTranslation } from "./i18n";
 

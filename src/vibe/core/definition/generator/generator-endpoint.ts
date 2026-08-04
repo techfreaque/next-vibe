@@ -5,6 +5,10 @@
 
 import "server-only";
 
+import { GENERATED_DIR, VIBE_DIR } from "@/env/paths";
+
+import { formatWarning } from "../../../logger/formatters";
+import type { EndpointLogger } from "../../../logger/types";
 import {
   endpointToToolName,
   getPreferredToolName,
@@ -22,10 +26,6 @@ import {
   toProjectRelativePath,
   writeGeneratedFile,
 } from "../../generators/shared/utils";
-import { formatWarning } from "../../../logger/formatters";
-import type { EndpointLogger } from "../../../logger/types";
-
-import { GENERATED_DIR, VIBE_DIR } from "@/env/paths";
 
 const OUTPUT_FILE = `${GENERATED_DIR}/endpoints/endpoint.ts`;
 

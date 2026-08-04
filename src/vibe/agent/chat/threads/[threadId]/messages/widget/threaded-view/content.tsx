@@ -1,7 +1,5 @@
 "use client";
-import { getChatModelById } from "../../../../../../ai-stream/models";
 import type { DefaultFolderId } from "next-vibe/core/execution-context";
-import type { ChatMessage } from "../../../../../db";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -16,6 +14,8 @@ import React from "react";
 
 import { Logo } from "@/_pages/_components/logo";
 
+import { getChatModelById } from "../../../../../../ai-stream/models";
+import type { ChatMessage } from "../../../../../db";
 import type { CollapseStateStore } from "../../hooks/use-collapse-state";
 import { scopedTranslation } from "../../i18n";
 import { useMessageGroupName } from "../embedded-context";

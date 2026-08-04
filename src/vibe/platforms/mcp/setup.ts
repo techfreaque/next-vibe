@@ -18,13 +18,15 @@ import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import chalk from "chalk";
+import { z } from "zod";
+
+import { getProjectRoot } from "@/env/paths";
+
 import { coreEnv, getRuntimeInvocation } from "../../core/env";
 import type { SetupResult } from "../../core/setup/types";
 import type { WidgetData } from "../../core/utils/json";
 import { parseError } from "../../core/utils/parse-error";
-import { getProjectRoot } from "@/env/paths";
 import type { EndpointLogger } from "../../logger/types";
-import { z } from "zod";
 
 /**
  * The template, resolved beside this module rather than at the project root.

@@ -8,8 +8,15 @@
 import "server-only";
 
 import { makeHeadlessContext } from "next-vibe/core/execution-context";
+
 import { defaultLocale } from "../../core/i18n/core/config";
 import type { WidgetData } from "../../core/utils/json";
+import { RouteExecutionExecutor } from "../../execute-tool/repository/core";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import { UserPermissionRole } from "../../identity/roles/enum";
+import type { createEndpointLogger } from "../../logger/server";
+import { Platform } from "../../platforms/platforms";
+import { GraphResolution } from "../enum";
 import type { GraphNodeConfig } from "../graph/schema";
 import type { GraphEdge } from "../graph/types";
 import {
@@ -22,13 +29,6 @@ import {
 import { needsScaleUp, scaleUpSeries } from "../shared/range";
 import { readDatapoints, writeDatapoints } from "../store/datapoints";
 import { writeSignals } from "../store/signals";
-import { RouteExecutionExecutor } from "../../execute-tool/repository/core";
-import type { JwtPayloadType } from "../../identity/auth/types";
-import { UserPermissionRole } from "../../identity/roles/enum";
-import type { createEndpointLogger } from "../../logger/server";
-import { Platform } from "../../platforms/platforms";
-
-import { GraphResolution } from "../enum";
 
 // ─── System Constants ─────────────────────────────────────────────────────────
 
@@ -372,16 +372,14 @@ function coerce(val: MappedValue): WidgetData {
     return val.toISOString();
   }
   if (Array.isArray(val)) {
-    return val.map(
-      (dp): WidgetData => ({
-        timestamp:
-          dp.timestamp instanceof Date
-            ? dp.timestamp.toISOString()
-            : String(dp.timestamp),
-        value: dp.value,
-        ...(dp.meta ? { meta: dp.meta } : {}),
-      }),
-    );
+    return val.map((dp): WidgetData => ({
+      timestamp:
+        dp.timestamp instanceof Date
+          ? dp.timestamp.toISOString()
+          : String(dp.timestamp),
+      value: dp.value,
+      ...(dp.meta ? { meta: dp.meta } : {}),
+    }));
   }
   if (val !== null && typeof val === "object") {
     const out: Record<string, WidgetData> = {};

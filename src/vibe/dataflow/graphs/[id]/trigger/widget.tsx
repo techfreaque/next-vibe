@@ -8,6 +8,8 @@ import { Div } from "next-vibe/ui/ui/div";
 import { Input } from "next-vibe/ui/ui/input";
 import { Label } from "next-vibe/ui/ui/label";
 import { Span } from "next-vibe/ui/ui/span";
+import React, { useState } from "react";
+
 import { cn } from "../../../../unified-ui/_shared/cn";
 import {
   useWidgetForm,
@@ -16,8 +18,6 @@ import {
 } from "../../../../unified-ui/_shared/use-widget-context";
 import { FormAlertWidget } from "../../../../unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "../../../../unified-ui/widgets/interactive/submit-button/widget";
-import React, { useState } from "react";
-
 import type definition from "./definition";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

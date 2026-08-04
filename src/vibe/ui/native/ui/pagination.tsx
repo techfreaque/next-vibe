@@ -1,15 +1,15 @@
 "use client";
-import { useTranslation } from "../../../core/i18n/core/client";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import { Pressable, Text as RNText, View } from "react-native";
 
-import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
+import { useTranslation } from "../../../core/i18n/core/client";
+import { cn } from "../../../unified-ui/_shared/cn";
 import { uiScopedTranslation } from "../../web/i18n";
 import { ChevronLeftIcon } from "../../web/ui/icons/ChevronLeftIcon";
 import { ChevronRightIcon } from "../../web/ui/icons/ChevronRightIcon";
 import { DotsHorizontalIcon } from "../../web/ui/icons/DotsHorizontalIcon";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { buttonVariants } from "./button";
 
 const StyledView = styledNative(View);

@@ -4,6 +4,8 @@
  * Cursor-first protocol: local sends cursors → remote returns only newer records.
  */
 
+import { z } from "zod";
+
 import { dateSchema } from "../../core/definition/common.schema";
 import { createEndpoint } from "../../core/definition/create-i18n";
 import {
@@ -20,8 +22,6 @@ import {
   requestField,
   responseField,
 } from "../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
 import { REMOTE_SYNC_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 

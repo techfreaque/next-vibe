@@ -5,9 +5,9 @@
  * Mirrors React widget architecture for consistency.
  */
 
-import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import type { MutableRefObject } from "react";
 
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import type { BaseWidgetContext } from "./types";
 
 /**

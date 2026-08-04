@@ -2,11 +2,11 @@
  * InitialEventsHandler - Handles initial stream events emission
  */
 
-import type { ChatModelId } from "../../models";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { ToolCall } from "../../../chat/db";
+import type { ChatModelId } from "../../models";
 import type { MessageDbWriter } from "../core/message-db-writer";
 
 export class InitialEventsHandler {

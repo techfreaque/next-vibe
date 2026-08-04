@@ -1,5 +1,4 @@
 import { styled } from "nativewind";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import type { ViewStyle } from "react-native";
 import {
@@ -7,8 +6,9 @@ import {
   Platform,
 } from "react-native";
 
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { KeyboardAvoidingViewProps } from "../../web/ui/keyboard-avoiding-view";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 
 const StyledKeyboardAvoidingView = styled(RNKeyboardAvoidingView, {
   className: "style",

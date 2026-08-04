@@ -47,9 +47,6 @@ import {
 } from "../../../logger/formatters";
 import type { EndpointLogger } from "../../../logger/types";
 import type { WebSocketServerHandle } from "../../../realtime/server/server";
-import type { ServerStartT } from "./i18n";
-import { scopedTranslation as serverStartScopedTranslation } from "./i18n";
-
 import { ServerFramework } from "../enum";
 import { serverSystemEnv } from "../env";
 import {
@@ -67,6 +64,8 @@ import type {
   ServerStartRequestOutput,
   ServerStartResponseOutput,
 } from "./definition";
+import type { ServerStartT } from "./i18n";
+import { scopedTranslation as serverStartScopedTranslation } from "./i18n";
 import { patchRuntimeEnvPlaceholders } from "./runtime-env-patch";
 
 /**

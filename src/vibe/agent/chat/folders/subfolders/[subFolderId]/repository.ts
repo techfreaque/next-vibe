@@ -1,8 +1,6 @@
 import "server-only";
 
 import { eq, inArray } from "drizzle-orm";
-import { chatFolders, chatThreads } from "../../../db";
-import { canManageFolder } from "../../../permissions/permissions";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -14,7 +12,9 @@ import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { chatFolders, chatThreads } from "../../../db";
 import { createFolderContentsEmitter } from "../../../folder-contents/[rootFolderId]/emitter";
+import { canManageFolder } from "../../../permissions/permissions";
 import type {
   FolderDeleteResponseOutput,
   FolderGetResponseOutput,

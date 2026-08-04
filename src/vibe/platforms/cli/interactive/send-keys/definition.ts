@@ -3,6 +3,8 @@
  * Inject keystrokes into a running vibe interactive session.
  */
 
+import { z } from "zod";
+
 import { createEndpoint } from "../../../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -12,14 +14,12 @@ import {
   WidgetType,
 } from "../../../../core/definition/enums";
 import { UserRole } from "../../../../identity/roles/enum";
-import { scopedTranslation } from "../i18n";
 import {
   objectField,
   requestField,
   responseField,
 } from "../../../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
+import { scopedTranslation } from "../i18n";
 import { INTERACTIVE_SEND_KEYS_ALIAS } from "./constants";
 
 const { POST } = createEndpoint({

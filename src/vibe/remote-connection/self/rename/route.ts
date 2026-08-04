@@ -7,7 +7,6 @@ import "server-only";
 
 import { Methods } from "../../../core/definition/enums";
 import { endpointsHandler } from "../../../core/route/multi";
-
 import definition from "./definition";
 import { RemoteConnectionSelfRenameRepository } from "./repository";
 

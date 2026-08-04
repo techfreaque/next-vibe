@@ -1,6 +1,7 @@
 // Testing infrastructure - error messages are for test debugging, not end users
 
 import type { ToolExecutionContext } from "next-vibe/core/execution-context";
+
 import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
 import { defaultLocale } from "../../../core/i18n/core/config";
 import type { ResponseType } from "../../../core/route/response.schema";

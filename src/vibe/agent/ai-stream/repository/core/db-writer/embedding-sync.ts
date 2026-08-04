@@ -10,12 +10,12 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
+import { db } from "next-vibe/database";
+
 import {
   DefaultFolderId,
   type ToolExecutionContext,
 } from "../../../../../core/execution-context";
-import { db } from "next-vibe/database";
-
 import { buildThinThreadContent, getMimeTypeFolder } from "./shared";
 
 /**

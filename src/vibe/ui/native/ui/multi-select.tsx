@@ -2,17 +2,16 @@
  * MultiSelect Component for React Native
  * Imports types from web and provides native implementation
  */
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import { Pressable, View } from "react-native";
 
-import { Check, ChevronDown, X } from "./icons";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 // Import ALL types from web (source of truth)
 import type {
   MultiSelectOption,
   MultiSelectProps,
 } from "../../web/ui/multi-select";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 import { Badge } from "./badge";
 import { Button } from "./button";
 import {
@@ -23,6 +22,7 @@ import {
   CommandItem,
   CommandList,
 } from "./command";
+import { Check, ChevronDown, X } from "./icons";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 
 export function MultiSelect({

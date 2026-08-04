@@ -1,9 +1,11 @@
 "use client";
-import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Div } from "next-vibe/ui/ui/div";
 import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
 import { Progress } from "next-vibe/ui/ui/progress";
 import { Span } from "next-vibe/ui/ui/span";
+import type { JSX } from "react";
+
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { cn } from "../../../_shared/cn";
 import type { ReactStaticWidgetProps } from "../../../_shared/react-types";
 import type { FieldUsageConfig } from "../../../_shared/types";
@@ -13,8 +15,6 @@ import {
   getSpacingClassName,
   getTextSizeClassName,
 } from "../../../_shared/widget-helpers";
-import type { JSX } from "react";
-
 import type { LoadingWidgetConfig } from "./types";
 
 /**
@@ -54,9 +54,9 @@ import type { LoadingWidgetConfig } from "./types";
  */
 export function LoadingWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends TEndpoint extends CreateApiEndpointAny
+  TKey extends (TEndpoint extends CreateApiEndpointAny
     ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
-    : never,
+    : never),
   TUsage extends FieldUsageConfig,
 >({
   field,

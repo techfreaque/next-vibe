@@ -1,6 +1,7 @@
-import type { TranslatedKeyType } from "../i18n/core/scoped-translation";
-import type { IconKey } from "../../unified-ui/widgets/form-fields/icon-field/icons";
 import { z } from "zod";
+
+import type { IconKey } from "../../unified-ui/widgets/form-fields/icon-field/icons";
+import type { TranslatedKeyType } from "../i18n/core/scoped-translation";
 
 // Common reusable schemas
 

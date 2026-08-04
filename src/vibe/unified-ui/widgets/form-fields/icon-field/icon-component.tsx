@@ -7,11 +7,11 @@
  * on platform themselves.
  */
 
-import { cn } from "../../../_shared/cn";
 import { Span } from "next-vibe/ui/ui/span";
 import type { JSX } from "react";
 import React, { useEffect, useState } from "react";
 
+import { cn } from "../../../_shared/cn";
 import type { IconComponent, IconKey, IconLibraryName } from "./icons";
 import { ICON_REGISTRY, loadIcon } from "./icons";
 
@@ -60,10 +60,11 @@ export const Icon: React.FC<{
         if (!IconComp) {
           setLoadedIcon(
             () =>
-              ({ className: cls }: { className?: string }): JSX.Element => (
-                /* oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- Fallback indicator */
-                <Span className={cls}>??</Span>
-              ),
+              ({ className: cls }: { className?: string }): JSX.Element =>
+                (
+                  /* oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- Fallback indicator */
+                  <Span className={cls}>??</Span>
+                ),
           );
         } else {
           setLoadedIcon(() => IconComp as IconComponent);
@@ -72,10 +73,11 @@ export const Icon: React.FC<{
         // Error fallback
         setLoadedIcon(
           () =>
-            ({ className: cls }: { className?: string }): JSX.Element => (
-              /* oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- Error indicator */
-              <Span className={cls}>!</Span>
-            ),
+            ({ className: cls }: { className?: string }): JSX.Element =>
+              (
+                /* oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- Error indicator */
+                <Span className={cls}>!</Span>
+              ),
         );
       } finally {
         setIsLoading(false);

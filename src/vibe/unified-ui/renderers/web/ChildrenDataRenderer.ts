@@ -12,6 +12,8 @@
  * - Union variant selection and discriminator extraction
  */
 
+import type z from "zod";
+
 import { WidgetType } from "../../../core/definition/enums";
 import type { WidgetData } from "../../../core/utils/json";
 import type { UserPermissionRoleValue } from "../../../identity/roles/enum";
@@ -23,7 +25,6 @@ import type {
   FieldUsageConfig,
   SchemaTypes,
 } from "../../_shared/types";
-import type z from "zod";
 
 /**
  * A single child ready to render with its data

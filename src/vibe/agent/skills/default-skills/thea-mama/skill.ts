@@ -1,11 +1,9 @@
-import { AI_RUN_ALIAS } from "../../../ai-stream/run/constants";
-import { FETCH_URL_SHORT_ALIAS } from "../../../fetch-url-content/constants";
-import { WEB_SEARCH_ALIAS } from "../../../web-search/constants";
 import { EXECUTE_TOOL_ALIAS } from "next-vibe/execute-tool/constants";
 import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { HEALTH_ALIAS } from "next-vibe/platforms/web/health/constants";
 
+import { AI_RUN_ALIAS } from "../../../ai-stream/run/constants";
 import {
   CORTEX_DELETE_ALIAS,
   CORTEX_EDIT_ALIAS,
@@ -14,11 +12,13 @@ import {
   CORTEX_TREE_ALIAS,
   CORTEX_WRITE_ALIAS,
 } from "../../../cortex/constants";
+import { FETCH_URL_SHORT_ALIAS } from "../../../fetch-url-content/constants";
+import { WEB_SEARCH_ALIAS } from "../../../web-search/constants";
 import type { Skill } from "../../config";
 import { tool } from "../../constants";
 import { SkillCategory, SkillOwnershipType } from "../../enum";
-import { THEA_CORE_PROMPT } from "../thea/core";
 import { THEA_VARIANTS } from "../_shared/companion-selections";
+import { THEA_CORE_PROMPT } from "../thea/core";
 
 export const MAMA_SYSTEM_PROMPT = `${THEA_CORE_PROMPT}
 

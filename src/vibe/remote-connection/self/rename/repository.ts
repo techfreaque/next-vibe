@@ -7,6 +7,7 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
+
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -19,7 +20,6 @@ import type { JwtPrivatePayloadType } from "../../../identity/auth/types";
 import type { EndpointLogger } from "../../../logger/types";
 import type { Platform } from "../../../platforms/platforms";
 import { cronTasks } from "../../../tasks/cron/db";
-
 import { instanceIdentities } from "../../db";
 import { RemoteConnectionRepository } from "../../repository";
 import type { RemoteConnectionSelfRenamePatchResponseOutput } from "./definition";

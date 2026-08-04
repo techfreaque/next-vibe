@@ -11,6 +11,8 @@
 
 import { join } from "node:path";
 
+import { getApiDir } from "@/env/paths";
+
 import {
   endpointToToolName,
   getPreferredToolName,
@@ -22,9 +24,6 @@ import {
   writeGeneratedFile,
 } from "../../../../core/generators/shared/utils";
 import { TOOL_HELP_ALIAS } from "../../../../help-tool/constants";
-
-import { getApiDir } from "@/env/paths";
-
 import type { PackageManifest } from "./types";
 
 // ============================================================================

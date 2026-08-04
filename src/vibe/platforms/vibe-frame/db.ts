@@ -7,6 +7,7 @@
  */
 
 import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+
 import { leads } from "../../identity/lead/db";
 
 export const frameExchangeTokens = pgTable("frame_exchange_tokens", {

@@ -7,6 +7,8 @@
  * unblocked now. Use resume-when-done instead when the result is needed.
  */
 
+import { z } from "zod";
+
 import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -22,7 +24,6 @@ import {
   requestField,
   responseField,
 } from "../../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
 
 const { POST } = createEndpoint({
   scopedTranslation,

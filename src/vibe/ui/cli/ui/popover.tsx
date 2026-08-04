@@ -28,7 +28,6 @@ export type {
 } from "../../web/ui/popover";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
-
 import type {
   PopoverAnchorProps,
   PopoverCloseProps,

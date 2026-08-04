@@ -5,6 +5,15 @@
 "use client";
 
 import { styled } from "nativewind";
+import type { JSX } from "react";
+import type {
+  ControllerRenderProps,
+  FieldPath,
+  FieldValues,
+  Path,
+} from "react-hook-form";
+import { View } from "react-native";
+
 import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import type { TranslatedKeyType } from "../../../../core/i18n/core/scoped-translation";
 import type { TParams } from "../../../../core/i18n/core/static-types";
@@ -21,17 +30,6 @@ import {
   scopedTranslation as unifiedInterfaceScopedTranslation,
 } from "../../../../unified-ui/hooks/i18n";
 import type { IconKey } from "../../../../unified-ui/widgets/form-fields/icon-field/icons";
-import type { JSX } from "react";
-import type {
-  ControllerRenderProps,
-  FieldPath,
-  FieldValues,
-  Path,
-} from "react-hook-form";
-import { View } from "react-native";
-
-import { Info } from "../icons/Info";
-import { convertCSSToViewStyle } from "../../utils/style-converter";
 import type {
   EndpointFormFieldProps,
   FormFieldError,
@@ -39,6 +37,7 @@ import type {
 import { AlertCircle } from "../../../web/ui/icons/AlertCircle";
 import { Calendar } from "../../../web/ui/icons/Calendar";
 import { safeGetRequiredFields } from "../../../zod-required-fields";
+import { convertCSSToViewStyle } from "../../utils/style-converter";
 import { AutocompleteField } from "../autocomplete-field";
 import { Badge } from "../badge";
 import { Button } from "../button";
@@ -46,6 +45,7 @@ import { Calendar as CalendarComponent } from "../calendar";
 import { Checkbox } from "../checkbox";
 import { Div } from "../div";
 import { IconPicker } from "../icon-picker";
+import { Info } from "../icons/Info";
 import { Input } from "../input";
 import { Label } from "../label";
 import { PhoneField } from "../phone-field";

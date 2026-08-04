@@ -12,12 +12,6 @@
 
 "use client";
 
-import { getFullPath } from "../core/core-utils/path";
-import type { CreateApiEndpointAny } from "../core/definition/endpoint-base";
-import { scopedTranslation as executeToolScopedTranslation } from "./i18n";
-import helpEndpoints from "../help-tool/definition";
-import { VibeFrameHost } from "../platforms/vibe-frame/VibeFrameHost";
-import remoteConnectionListDefinition from "../remote-connection/list/definition";
 import type { AutocompleteOption } from "next-vibe/ui/ui/autocomplete-field";
 import { AutocompleteField } from "next-vibe/ui/ui/autocomplete-field";
 import { Button } from "next-vibe/ui/ui/button";
@@ -31,6 +25,16 @@ import {
 import { Pre } from "next-vibe/ui/ui/pre";
 import { useThemeToggle } from "next-vibe/ui/ui/theme-provider";
 import { P } from "next-vibe/ui/ui/typography";
+import type { JSX } from "react";
+import { useEffect, useMemo, useState } from "react";
+
+import { getEndpoint } from "@/generated/endpoints/endpoint";
+
+import { getFullPath } from "../core/core-utils/path";
+import type { CreateApiEndpointAny } from "../core/definition/endpoint-base";
+import helpEndpoints from "../help-tool/definition";
+import { VibeFrameHost } from "../platforms/vibe-frame/VibeFrameHost";
+import remoteConnectionListDefinition from "../remote-connection/list/definition";
 import {
   useWidgetDisabled,
   useWidgetForm,
@@ -48,12 +52,8 @@ import type { UseEndpointOptions } from "../unified-ui/hooks/endpoint-types";
 import { useEndpoint } from "../unified-ui/hooks/use-endpoint";
 import { EndpointRenderer } from "../unified-ui/renderers/web/EndpointRenderer";
 import { EndpointsPage } from "../unified-ui/renderers/web/EndpointsPage";
-import type { JSX } from "react";
-import { useEffect, useMemo, useState } from "react";
-
-import { getEndpoint } from "@/generated/endpoints/endpoint";
-
 import type definition from "./definition";
+import { scopedTranslation as executeToolScopedTranslation } from "./i18n";
 
 interface EndpointMethods {
   GET?: CreateApiEndpointAny;

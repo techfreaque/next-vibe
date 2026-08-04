@@ -4,7 +4,6 @@
  */
 
 import type { EndpointLogger } from "../../../logger/types";
-
 import type {
   NotificationConfig,
   NotificationData,

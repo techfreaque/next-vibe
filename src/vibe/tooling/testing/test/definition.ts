@@ -3,6 +3,8 @@
  * Production-ready endpoint for run tests
  */
 
+import { z } from "zod";
+
 import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -17,8 +19,6 @@ import {
   requestField,
   responseField,
 } from "../../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
 import { scopedTranslation } from "./i18n";
 
 const TestResultWidget = lazyWidget(() =>

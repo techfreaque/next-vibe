@@ -28,14 +28,15 @@
  * codes in a redirected file are corruption, not animation.
  */
 
+import stringWidth from "string-width";
+import stripAnsi from "strip-ansi";
+
 import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import type { CountryLanguage } from "../../../../core/i18n/core/config";
 import type { WidgetData } from "../../../../core/utils/json";
 import type { JwtPayloadType } from "../../../../identity/auth/types";
-import type { Platform } from "../../../../platforms/platforms";
 import type { EndpointLogger } from "../../../../logger/types";
-import stringWidth from "string-width";
-import stripAnsi from "strip-ansi";
+import type { Platform } from "../../../../platforms/platforms";
 
 /** Minimum gap between repaints. Updates inside the window coalesce. */
 const REPAINT_THROTTLE_MS = 60;

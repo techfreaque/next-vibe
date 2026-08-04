@@ -1,11 +1,8 @@
 import * as DropdownMenuPrimitive from "@rn-primitives/dropdown-menu";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { Check } from "./icons/Check";
-import { ChevronRight } from "./icons/ChevronRight";
-import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type {
   DropdownMenuCheckboxItemProps,
   DropdownMenuContentProps,
@@ -24,6 +21,9 @@ import type {
   DropdownMenuTriggerProps,
 } from "../../web/ui/dropdown-menu";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
+import { Check } from "./icons/Check";
+import { ChevronRight } from "./icons/ChevronRight";
 import { Span } from "./span";
 import { TextClassContext } from "./text";
 

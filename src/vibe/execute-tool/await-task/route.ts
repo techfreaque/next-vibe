@@ -1,6 +1,5 @@
 import { Methods } from "../../core/definition/enums";
 import { endpointsHandler } from "../../core/route/multi";
-
 import { endpoints } from "./definition";
 import { AwaitTaskRepository } from "./repository";
 

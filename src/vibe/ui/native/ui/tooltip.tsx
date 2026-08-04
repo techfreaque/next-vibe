@@ -1,10 +1,9 @@
 import * as TooltipPrimitive from "@rn-primitives/tooltip";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import { StyleSheet } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type {
   TooltipContentProps,
   TooltipProviderProps,
@@ -12,6 +11,7 @@ import type {
   TooltipTriggerProps,
 } from "../../web/ui/tooltip";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 import { TextClassContext } from "./text";
 
 /* eslint-disable i18next/no-literal-string -- CSS classNames */

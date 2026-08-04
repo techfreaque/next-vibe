@@ -1,9 +1,9 @@
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
-import { cn } from "../../../unified-ui/_shared/cn";
 import type { JSX, ReactNode } from "react";
 import React from "react";
 
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { StyleType } from "../utils/style-type";
 import type { DivDragEvent } from "./div";
 

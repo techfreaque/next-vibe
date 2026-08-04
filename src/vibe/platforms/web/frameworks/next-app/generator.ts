@@ -9,6 +9,15 @@ import {
 } from "node:fs";
 import { dirname, join, relative } from "node:path";
 
+import {
+  getApiDir,
+  getGeneratedDir,
+  getNextAppDir,
+  getSrcDir,
+  getUiDir,
+  getVibeDir,
+} from "@/env/paths";
+
 import type { ApiSection } from "../../../../core/definition/endpoint-base";
 import { coreEnv } from "../../../../core/env";
 import { hasCustomDirective } from "../../../../core/generators/shared/custom-directive";
@@ -21,15 +30,6 @@ import {
   PlatformMarker,
   type UserRoleValue,
 } from "../../../../identity/roles/enum";
-
-import {
-  getApiDir,
-  getGeneratedDir,
-  getNextAppDir,
-  getSrcDir,
-  getUiDir,
-  getVibeDir,
-} from "@/env/paths";
 
 const PROJECT_ROOT = process.cwd();
 const UI_DIR = getUiDir();

@@ -1,13 +1,5 @@
 import "server-only";
 
-import type { ResponseType } from "../../../../../core/route/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "../../../../../core/route/response.schema";
-import { kubectl } from "../k3s/scripts";
-
 import type { ClientT } from "@/ssh/client";
 import {
   getConnectionCredentials,
@@ -15,6 +7,14 @@ import {
   sshExecCommand,
 } from "@/ssh/client";
 import type { SshConnection } from "@/ssh/db";
+
+import type { ResponseType } from "../../../../../core/route/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "../../../../../core/route/response.schema";
+import { kubectl } from "../k3s/scripts";
 
 const CNPG_OPERATOR_URL =
   "https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/release-1.22/releases/cnpg-1.22.0.yaml";

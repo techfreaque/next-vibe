@@ -6,10 +6,6 @@
 
 "use client";
 
-import {
-  getMessagesForThread,
-  updateIncognitoMessage,
-} from "../../../../../incognito/storage";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -19,6 +15,10 @@ import {
 } from "next-vibe/core/route/response.schema";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import {
+  getMessagesForThread,
+  updateIncognitoMessage,
+} from "../../../../../incognito/storage";
 import type { VotePostResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
 

@@ -11,7 +11,6 @@
 
 export const dynamic = "force-dynamic";
 
-import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { NEW_MESSAGE_ID } from "next-vibe/agent/chat/enum";
 import type { FolderContentsResponseOutput } from "next-vibe/agent/chat/folder-contents/[rootFolderId]/definition";
 import { scopedTranslation as folderContentsScopedTranslation } from "next-vibe/agent/chat/folder-contents/[rootFolderId]/i18n";
@@ -42,6 +41,7 @@ import { ThreadsRepository } from "next-vibe/agent/chat/threads/repository";
 import type { SkillGetResponseOutput } from "next-vibe/agent/skills/[id]/definition";
 import { SkillsRepository } from "next-vibe/agent/skills/repository";
 import { coreEnv } from "next-vibe/core/env";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { VibeMode } from "next-vibe/env/env-util";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";

@@ -15,6 +15,9 @@ import { readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 
 import { sql } from "drizzle-orm";
+
+import { getApiDir } from "@/env/paths";
+
 import { toImportUrl } from "../../core/generators/shared/utils";
 import { parseError } from "../../core/utils/parse-error";
 import {
@@ -23,9 +26,6 @@ import {
   formatError,
 } from "../../logger/formatters";
 import type { EndpointLogger } from "../../logger/types";
-
-import { getApiDir } from "@/env/paths";
-
 import { db } from "..";
 import type { DbFunction } from "./define";
 import type { PgType } from "./types";

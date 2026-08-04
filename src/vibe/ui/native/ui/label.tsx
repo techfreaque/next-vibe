@@ -1,9 +1,9 @@
 import * as LabelPrimitive from "@rn-primitives/label";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 
-import { styledNative } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { LabelRootProps } from "../../web/ui/label";
+import { styledNative } from "../utils/style-converter";
 
 const StyledText = styledNative(LabelPrimitive.Text);
 

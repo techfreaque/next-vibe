@@ -13,6 +13,8 @@
  *                              then the route's resolveChannel decides admission
  */
 
+import { AUTH_TOKEN_COOKIE_NAME, LEAD_ID_COOKIE_NAME } from "@/env/constants";
+
 import {
   type CountryLanguage,
   defaultLocale,
@@ -20,9 +22,6 @@ import {
 import type { JwtPayloadType } from "../../identity/auth/types";
 import { UserPermissionRole } from "../../identity/roles/enum";
 import type { EndpointLogger } from "../../logger/types";
-
-import { AUTH_TOKEN_COOKIE_NAME, LEAD_ID_COOKIE_NAME } from "@/env/constants";
-
 import { buildWsChannel } from "../core/channel";
 import type { WsChannelDescriptor } from "../core/types";
 import type { WsChannelEntry } from "./ws-channel-registry";

@@ -27,16 +27,17 @@
  */
 
 import { Slot, useLocalSearchParams } from "expo-router";
-import { coreClientEnv as envClient } from "../../core/env-client";
-import type { CountryLanguage } from "../../core/i18n/core/config";
-import { parseError } from "../../core/utils/parse-error";
-import { createEndpointLogger } from "../../logger/server";
-import { scopedTranslation as reactNativeScopedTranslation } from "./i18n";
 import { Span } from "next-vibe/ui/ui/span";
 import type React from "react";
 import type { JSX, ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
+
+import { coreClientEnv as envClient } from "../../core/env-client";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import { parseError } from "../../core/utils/parse-error";
+import { createEndpointLogger } from "../../logger/server";
+import { scopedTranslation as reactNativeScopedTranslation } from "./i18n";
 
 /**
  * Next.js 15 async component props format

@@ -1,11 +1,11 @@
 import { styled } from "nativewind";
-import { cn } from "../../../unified-ui/_shared/cn";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { BodyProps } from "../../web/ui/body";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 
 const StyledSafeAreaView = styled(SafeAreaView, { className: "style" });
 

@@ -16,14 +16,14 @@ import {
 import { dirname, join, relative } from "node:path";
 import { pathToFileURL } from "node:url";
 
-import { PATH_SEPARATOR } from "../../core-utils/path";
-
 import {
   getApiDir,
   getSrcDir,
   PROJECT_IGNORE_DIRS,
   ROUTE_ANCHOR_SEGMENT,
 } from "@/env/paths";
+
+import { PATH_SEPARATOR } from "../../core-utils/path";
 
 /**
  * Does `relPath` (POSIX, relative to the scan root) fall under an ignore pattern?

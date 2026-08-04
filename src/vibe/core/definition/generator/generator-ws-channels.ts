@@ -15,11 +15,10 @@
 
 import "server-only";
 
-import { parseError } from "../../utils/parse-error";
-import type { GenericHandlerBase } from "../../route/handler";
-import type { EndpointLogger } from "../../../logger/types";
-import { formatWarning } from "../../../logger/formatters";
+import { VIBE_DIR } from "@/env/paths";
 
+import { formatWarning } from "../../../logger/formatters";
+import type { EndpointLogger } from "../../../logger/types";
 import {
   extractNestedPath,
   generateAbsoluteImportPath,
@@ -29,8 +28,8 @@ import {
   toImportUrl,
   writeGeneratedFile,
 } from "../../generators/shared/utils";
-
-import { VIBE_DIR } from "@/env/paths";
+import type { GenericHandlerBase } from "../../route/handler";
+import { parseError } from "../../utils/parse-error";
 
 /**
  * Real locations of the modules the emitted files import. These paths are

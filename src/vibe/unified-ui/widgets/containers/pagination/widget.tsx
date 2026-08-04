@@ -1,5 +1,4 @@
 "use client";
-import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
@@ -12,6 +11,9 @@ import {
   SelectValue,
 } from "next-vibe/ui/ui/select";
 import { Span } from "next-vibe/ui/ui/span";
+import type { JSX } from "react";
+
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { cn } from "../../../_shared/cn";
 import type { ReactWidgetProps } from "../../../_shared/react-types";
 import type { FieldUsageConfig } from "../../../_shared/types";
@@ -25,8 +27,6 @@ import {
   getTextSizeClassName,
 } from "../../../_shared/widget-helpers";
 import { scopedTranslation as reactScopedTranslation } from "../../../hooks/i18n";
-import type { JSX } from "react";
-
 import type { PaginationWidgetConfig } from "./types";
 
 /**

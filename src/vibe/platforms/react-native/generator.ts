@@ -3,11 +3,11 @@ import "server-only";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 
+import { getSrcDir, getUiDir, VIBE_IMPORT_ALIAS } from "@/env/paths";
+
 import { findFilesByName } from "../../core/generators/shared/scanner";
 import type { GeneratorDefinition } from "../../core/generators/shared/shared-inputs";
 import { parseError } from "../../core/utils/parse-error";
-
-import { getSrcDir, getUiDir, VIBE_IMPORT_ALIAS } from "@/env/paths";
 
 const SOURCE_DIR = getUiDir();
 const TARGET_DIR = join(getSrcDir(), "generated/app-native/[locale]");

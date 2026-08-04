@@ -15,9 +15,9 @@ import {
 } from "next-vibe/ui/ui/card";
 import { Div } from "next-vibe/ui/ui/div";
 import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
-import { useWidgetLocale } from "../../../unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 
+import { useWidgetLocale } from "../../../unified-ui/_shared/use-widget-context";
 import { scopedTranslation } from "./i18n";
 
 export function ReverseConnectionUpdateWidget(): JSX.Element {

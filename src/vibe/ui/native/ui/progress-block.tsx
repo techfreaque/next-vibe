@@ -1,7 +1,7 @@
 import { styled } from "nativewind";
-import { cn } from "../../../unified-ui/_shared/cn";
 import { View } from "react-native";
 
+import { cn } from "../../../unified-ui/_shared/cn";
 import type {
   ProgressBlockProps,
   ProgressBlockVariant,

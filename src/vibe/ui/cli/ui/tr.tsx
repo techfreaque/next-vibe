@@ -1,8 +1,8 @@
 import { Box, Text } from "ink";
-import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import * as React from "react";
 
+import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { TrProps } from "../../web/ui/tr";
 import { useSeparatorLine } from "../hooks/use-separator-width";
 import { parseClassesToBoxProps } from "./tailwind-to-ink";

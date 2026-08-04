@@ -25,14 +25,14 @@
  * (owner registry) no matter how many instances share it.
  */
 
-import { DefaultFolderId } from "../../../../core/execution-context";
-import messagesDefinition from "../../../chat/threads/[threadId]/messages/definition";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import type { JSX } from "react";
 import { useMemo } from "react";
 
+import { DefaultFolderId } from "../../../../core/execution-context";
+import messagesDefinition from "../../../chat/threads/[threadId]/messages/definition";
 import { useAIStreamStore } from "./store";
 
 interface KeeperProps {

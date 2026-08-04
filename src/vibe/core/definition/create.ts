@@ -12,9 +12,13 @@
  * - Support for all 5 interfaces
  */
 
-import type { CountryLanguage } from "../i18n/core/config";
-import type { TranslatedKeyType } from "../i18n/core/scoped-translation";
-import type { TParams } from "../i18n/core/static-types";
+import type { z } from "zod";
+
+import type {
+  CategoryKey,
+  SubCategoryKey,
+} from "@/generated/categories/registry";
+
 import type { UserRoleValue } from "../../identity/roles/enum";
 import type { EndpointLogger } from "../../logger/types";
 import type {
@@ -43,13 +47,13 @@ import type {
   ApiQueryOptions,
 } from "../../unified-ui/hooks/types";
 import type { IconKey } from "../../unified-ui/widgets/form-fields/icon-field/icons";
-import type { z } from "zod";
-
-import type {
-  CategoryKey,
-  SubCategoryKey,
-} from "@/generated/categories/registry";
-
+import type { CountryLanguage } from "../i18n/core/config";
+import type { TranslatedKeyType } from "../i18n/core/scoped-translation";
+import type { TParams } from "../i18n/core/static-types";
+import {
+  buildDefinitionSchemas,
+  makeRequiresAuthentication,
+} from "./definition-schemas";
 import type {
   EndpointExamples,
   ExtractInput,
@@ -58,10 +62,6 @@ import type {
   InferSchemaFromField,
   MergeFormValues,
 } from "./endpoint";
-import {
-  buildDefinitionSchemas,
-  makeRequiresAuthentication,
-} from "./definition-schemas";
 import type { EndpointErrorTypes, Methods } from "./enums";
 import type { FieldUsage } from "./enums";
 

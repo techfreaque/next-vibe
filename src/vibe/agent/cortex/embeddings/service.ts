@@ -7,11 +7,11 @@ import "server-only";
  */
 import { createHash } from "node:crypto";
 
-import { createFixtureFetch } from "../../ai-stream/testing/fetch-cache";
-import { agentEnv } from "../../env";
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 import { parseError } from "next-vibe/core/utils/parse-error";
 
-import type { ToolExecutionContext } from "next-vibe/core/execution-context";
+import { createFixtureFetch } from "../../ai-stream/testing/fetch-cache";
+import { agentEnv } from "../../env";
 
 /** Embedding model used for all cortex and message embeddings */
 export const EMBEDDING_MODEL = "baai/bge-m3";

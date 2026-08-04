@@ -4,6 +4,8 @@
  * Repository-first architecture: exports TypeOutput types for repositories and routes
  */
 
+import { z } from "zod";
+
 import { dateSchema } from "../../core/definition/common.schema";
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import type { JwtPayloadType, JwtPrivatePayloadType } from "../auth/types";
@@ -12,8 +14,6 @@ import {
   UserRoleDB,
   type UserRoleValue,
 } from "../roles/enum";
-import { z } from "zod";
-
 import type { UserDetailLevel, UserDetailLevelValue } from "./enum";
 
 /**

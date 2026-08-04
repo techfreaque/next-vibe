@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 import type { chatModelSelectionSchema } from "../ai-stream/models";
 import type {
   audioVisionModelSelectionSchema,
@@ -17,7 +19,6 @@ import {
 import type { sttModelSelectionSchema } from "../speech-to-text/models";
 import type { voiceModelSelectionSchema } from "../text-to-speech/models";
 import type { videoGenModelSelectionSchema } from "../video-generation/models";
-import { z } from "zod";
 
 export const sharedFilterPropsSchema = z.object({
   intelligenceRange: z

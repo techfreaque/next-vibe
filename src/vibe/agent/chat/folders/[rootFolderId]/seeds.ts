@@ -4,6 +4,7 @@
  */
 
 import { eq } from "drizzle-orm";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { db } from "next-vibe/database";
 import {
   UserPermissionRole,
@@ -12,7 +13,6 @@ import {
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 
-import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { chatFolders } from "../../db";
 
 /**

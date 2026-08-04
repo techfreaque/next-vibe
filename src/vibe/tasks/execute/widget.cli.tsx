@@ -7,14 +7,14 @@
 
 import chalk from "chalk";
 import { Box, Text } from "ink";
+import type { JSX } from "react";
+import { useMemo } from "react";
+
 import { Platform } from "../../platforms/platforms";
 import {
   useWidgetLocale,
   useWidgetPlatform,
 } from "../../unified-ui/_shared/use-widget-context";
-import type { JSX } from "react";
-import { useMemo } from "react";
-
 import { CronTaskStatus } from "../enum";
 import type { TaskExecuteResponseOutput } from "./definition";
 

@@ -2,12 +2,13 @@
  * Code Quality Summary Widget Type Definitions
  */
 
+import type { z } from "zod";
+
 import type { WidgetType } from "../../../../core/definition/enums";
 import type {
   BasePrimitiveWidgetConfig,
   FieldUsageConfig,
 } from "../../../_shared/types";
-import type { z } from "zod";
 
 /**
  * Exact schema for code quality summary data

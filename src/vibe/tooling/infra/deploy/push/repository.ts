@@ -4,6 +4,8 @@ import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 
+import { getSrcDir } from "@/env/paths";
+
 import type { ResponseType } from "../../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -14,9 +16,6 @@ import { parseError } from "../../../../core/utils/parse-error";
 import type { EndpointLogger } from "../../../../logger/types";
 import { infraEnv } from "../../env";
 import type { InfraT } from "../../i18n";
-
-import { getSrcDir } from "@/env/paths";
-
 import type {
   DeployPushRequestOutput,
   DeployPushResponseOutput,

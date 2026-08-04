@@ -14,12 +14,12 @@ import {
 } from "next-vibe/ui/ui/card";
 import { Div } from "next-vibe/ui/ui/div";
 import { Server } from "next-vibe/ui/ui/icons/Server";
+import type { JSX } from "react";
+
 import { useWidgetLocale } from "../../unified-ui/_shared/use-widget-context";
 import { TextFieldWidget } from "../../unified-ui/widgets/form-fields/text-field/widget";
 import { UrlFieldWidget } from "../../unified-ui/widgets/form-fields/url-field/widget";
 import { SubmitButtonWidget } from "../../unified-ui/widgets/interactive/submit-button/widget";
-import type { JSX } from "react";
-
 import type definitions from "./definition";
 import { scopedTranslation } from "./i18n";
 

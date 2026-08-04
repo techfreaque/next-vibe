@@ -7,9 +7,7 @@
 
 "use client";
 
-import { isDefaultFolderId } from "../../chat/config";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
-import messagesDefinitions from "../../chat/threads/[threadId]/messages/definition";
 import {
   useWidgetLocale,
   useWidgetPlatform,
@@ -17,6 +15,9 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import { useMemo } from "react";
+
+import { isDefaultFolderId } from "../../chat/config";
+import messagesDefinitions from "../../chat/threads/[threadId]/messages/definition";
 
 interface ThreadDetailWidgetProps {
   path: string;

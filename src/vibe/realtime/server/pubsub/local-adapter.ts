@@ -11,8 +11,8 @@
  * callers — StreamControl, ControlSignals — subscribe, race, then cancel).
  */
 
-import { broadcastLocalToAll } from "../server";
 import type { AnyEndpointEventEnvelope } from "../../core/structured-events";
+import { broadcastLocalToAll } from "../server";
 import type { PubSubAdapter, PubSubMessageHandler } from "./types";
 
 export class LocalPubSubAdapter implements PubSubAdapter {

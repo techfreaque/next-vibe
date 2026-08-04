@@ -28,6 +28,11 @@ import {
   DefaultFolderId,
   makeHeadlessContext,
 } from "next-vibe/core/execution-context";
+import type { JSX } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+import { CATEGORY_REGISTRY } from "@/generated/categories/registry";
+
 import type { CreateApiEndpointAny } from "../core/definition/endpoint-base";
 import type { ResponseType } from "../core/route/response.schema";
 import type { WidgetData } from "../core/utils/json";
@@ -46,11 +51,6 @@ import {
   useWidgetResponseOnly,
 } from "../unified-ui/_shared/use-widget-context";
 import { EndpointRenderer } from "../unified-ui/renderers/web/EndpointRenderer";
-import type { JSX } from "react";
-import { useCallback, useEffect, useMemo, useState } from "react";
-
-import { CATEGORY_REGISTRY } from "@/generated/categories/registry";
-
 import type {
   HelpGetResponseOutput,
   HelpToolMetadataSerialized,

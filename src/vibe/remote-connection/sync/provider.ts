@@ -13,9 +13,7 @@ import "server-only";
  *  - Orchestrating serialize/upsert across all providers
  */
 import type { EndpointLogger } from "../../logger/types";
-
 import type { SyncDomain } from "../../realtime/core/sync-domain";
-
 import {
   isSyncDomainEnabled,
   type StandardSyncCursor,

@@ -5,9 +5,9 @@
 
 "use client";
 
-import type { TranslatedKeyType } from "../../../../core/i18n/core/scoped-translation";
 import type { JSX, ReactNode } from "react";
 
+import type { TranslatedKeyType } from "../../../../core/i18n/core/scoped-translation";
 import type { StyleType } from "../../utils/style-type";
 
 /**

@@ -4,8 +4,8 @@
  */
 
 import { isDefaultFolderId } from "next-vibe/agent/chat/config";
-import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { NEW_MESSAGE_ID } from "next-vibe/agent/chat/enum";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 
 /**
  * Parsed URL result

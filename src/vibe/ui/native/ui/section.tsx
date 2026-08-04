@@ -2,9 +2,9 @@ import { styled } from "nativewind";
 import * as React from "react";
 import { View } from "react-native";
 
-import { convertCSSToViewStyle } from "../utils/style-converter";
 import type { SectionProps } from "../../web/ui/section";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 
 // Type-safe View with className support (NativeWind)
 const StyledView = styled(View);

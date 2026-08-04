@@ -3,6 +3,7 @@
  * Centralized constants for chat system including storage keys, limits, and defaults
  */
 
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole, UserRole } from "next-vibe/identity/roles/enum";
 
@@ -22,7 +23,6 @@ import {
   CORTEX_TREE_ALIAS,
   CORTEX_WRITE_ALIAS,
 } from "../cortex/constants";
-import { DefaultFolderId } from "next-vibe/core/execution-context";
 
 /**
  * Storage keys for localStorage persistence

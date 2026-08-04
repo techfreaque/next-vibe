@@ -1,8 +1,6 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-import { chatThreads } from "../../../db";
-import { canManageThreadPermissions } from "../../../permissions/permissions";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -15,6 +13,8 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { UserRoleDB } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { chatThreads } from "../../../db";
+import { canManageThreadPermissions } from "../../../permissions/permissions";
 import type {
   ThreadPermissionsGetResponseOutput,
   ThreadPermissionsUpdateRequestOutput,

@@ -4,10 +4,11 @@
  * This middleware handles language detection and redirection.
  */
 
-import type { CountryLanguage } from "../../../../core/i18n/core/config";
 import type { NextRequest } from "next-vibe/ui/lib/request";
 
 import { LOCALE_COOKIE_NAME } from "@/env/constants";
+
+import type { CountryLanguage } from "../../../../core/i18n/core/config";
 
 export interface LanguageMiddlewareOptions {
   /**

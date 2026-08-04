@@ -1,7 +1,4 @@
 "use client";
-import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
-import { LayoutType } from "../../../../core/definition/enums";
-import type { WidgetData } from "../../../../core/utils/json";
 import { Button } from "next-vibe/ui/ui/button";
 import {
   Card,
@@ -16,6 +13,13 @@ import {
   type FormAlertState,
 } from "next-vibe/ui/ui/form/form-alert";
 import { H1, P } from "next-vibe/ui/ui/typography";
+import { type JSX } from "react";
+import type { Path } from "react-hook-form";
+import { useWatch } from "react-hook-form";
+
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
+import { LayoutType } from "../../../../core/definition/enums";
+import type { WidgetData } from "../../../../core/utils/json";
 import { cn } from "../../../_shared/cn";
 import type { ReactWidgetProps } from "../../../_shared/react-types";
 import { hasChild, hasChildren } from "../../../_shared/type-guards";
@@ -47,12 +51,8 @@ import {
 } from "../../../_shared/widget-helpers";
 import { scopedTranslation as reactScopedTranslation } from "../../../hooks/i18n";
 import { MultiWidgetRenderer } from "../../../renderers/web/MultiWidgetRenderer";
-import type { IconKey } from "../../form-fields/icon-field/icons";
 import { Icon } from "../../form-fields/icon-field/icon-component";
-import { type JSX } from "react";
-import type { Path } from "react-hook-form";
-import { useWatch } from "react-hook-form";
-
+import type { IconKey } from "../../form-fields/icon-field/icons";
 import type {
   ContainerArrayWidgetConfig,
   ContainerObjectWidgetConfig,
@@ -84,9 +84,9 @@ import type {
  */
 export function ContainerWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends TEndpoint extends CreateApiEndpointAny
+  TKey extends (TEndpoint extends CreateApiEndpointAny
     ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
-    : never,
+    : never),
   TUsage extends FieldUsageConfig,
   TSchemaType extends
     | "object"

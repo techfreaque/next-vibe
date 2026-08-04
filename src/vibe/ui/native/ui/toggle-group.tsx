@@ -1,17 +1,17 @@
 import * as ToggleGroupPrimitive from "@rn-primitives/toggle-group";
 import type { LucideIcon } from "lucide-react-native";
 import { styled } from "nativewind";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import { View } from "react-native";
 
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 import { type ToggleSize, type ToggleVariant } from "../../web/ui/toggle";
 import type {
   ToggleGroupItemProps,
   ToggleGroupRootProps,
 } from "../../web/ui/toggle-group";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 import { TextClassContext } from "./text";
 import { toggleTextVariants, toggleVariants } from "./toggle";
 // The styled() function has type inference issues with this primitive

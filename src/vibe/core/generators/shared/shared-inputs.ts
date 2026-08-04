@@ -13,11 +13,11 @@
 
 import "server-only";
 
+import { getApiDir } from "@/env/paths";
+
+import type { EndpointLogger } from "../../../logger/types";
 import type { ApiSection } from "../../definition/endpoint-base";
 import { findFilesRecursively, toImportUrl } from "./utils";
-import type { EndpointLogger } from "../../../logger/types";
-
-import { getApiDir } from "@/env/paths";
 
 // ---------------------------------------------------------------------------
 // Types

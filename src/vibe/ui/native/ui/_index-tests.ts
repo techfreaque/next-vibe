@@ -196,29 +196,29 @@ void testFormElement;
 export * from "./form-element";
 
 // form/endpoint-form-field
-import * as EndpointFormField from "./form/endpoint-form-field";
 import type * as webEndpointFormField from "../../web/ui/form/endpoint-form-field";
+import * as EndpointFormField from "./form/endpoint-form-field";
 const testEndpointFormField: typeof webEndpointFormField = EndpointFormField;
 void testEndpointFormField;
 export * from "./form/endpoint-form-field";
 
 // form/form
-import * as FormForm from "./form/form";
 import type * as webFormForm from "../../web/ui/form/form";
+import * as FormForm from "./form/form";
 const testFormForm: typeof webFormForm = FormForm;
 void testFormForm;
 export * from "./form/form";
 
 // form/form-alert
-import * as FormAlert from "./form/form-alert";
 import type * as webFormAlert from "../../web/ui/form/form-alert";
+import * as FormAlert from "./form/form-alert";
 const testFormAlert: typeof webFormAlert = FormAlert;
 void testFormAlert;
 export * from "./form/form-alert";
 
 // form/form-section
-import * as FormSection from "./form/form-section";
 import type * as webFormSection from "../../web/ui/form/form-section";
+import * as FormSection from "./form/form-section";
 const testFormSection: typeof webFormSection = FormSection;
 void testFormSection;
 export * from "./form/form-section";

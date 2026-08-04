@@ -5,12 +5,6 @@
  */
 
 "use client";
-import { getFullPath } from "../../../../core/core-utils/path";
-import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
-import { getDefaultTimezone } from "../../../../core/i18n/core/localization-utils";
-import type { WidgetData } from "../../../../core/utils/json";
-import { formatCronScheduleShort } from "../../../cron-formatter";
-import { CronTaskPriority, CronTaskStatus } from "../../../enum";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { Form } from "next-vibe/ui/ui/form/form";
@@ -26,6 +20,14 @@ import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
 import { TrendingUp } from "next-vibe/ui/ui/icons/TrendingUp";
 import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
 import { Span } from "next-vibe/ui/ui/span";
+import React, { useCallback, useEffect, useState } from "react";
+
+import { getEndpoint } from "@/generated/endpoints/endpoint";
+
+import { getFullPath } from "../../../../core/core-utils/path";
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
+import { getDefaultTimezone } from "../../../../core/i18n/core/localization-utils";
+import type { WidgetData } from "../../../../core/utils/json";
 import { cn } from "../../../../unified-ui/_shared/cn";
 import {
   useWidgetContext,
@@ -48,10 +50,8 @@ import { TextFieldWidget } from "../../../../unified-ui/widgets/form-fields/text
 import { TextareaFieldWidget } from "../../../../unified-ui/widgets/form-fields/textarea-field/widget";
 import { NavigateButtonWidget } from "../../../../unified-ui/widgets/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "../../../../unified-ui/widgets/interactive/submit-button/widget";
-import React, { useCallback, useEffect, useState } from "react";
-
-import { getEndpoint } from "@/generated/endpoints/endpoint";
-
+import { formatCronScheduleShort } from "../../../cron-formatter";
+import { CronTaskPriority, CronTaskStatus } from "../../../enum";
 import type endpoints from "../definition";
 import type { CronTaskGetResponseOutput } from "../definition";
 import { ScheduleAutocomplete } from "./schedule-autocomplete";

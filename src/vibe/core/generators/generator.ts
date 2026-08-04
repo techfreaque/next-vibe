@@ -18,15 +18,6 @@ import { readFileSync } from "node:fs";
 import { relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import type { GeneratorContext, GeneratorResult } from "./shared/shared-inputs";
-import {
-  findFilesRecursively,
-  generateFileHeader,
-  getRelativeImportPath,
-  toPosixPath,
-  writeGeneratedFile,
-} from "./shared/utils";
-
 import {
   APP_IMPORT_ROOT,
   GENERATED_DIR,
@@ -35,6 +26,15 @@ import {
   VIBE_DIR,
   VIBE_IMPORT_ALIAS,
 } from "@/env/paths";
+
+import type { GeneratorContext, GeneratorResult } from "./shared/shared-inputs";
+import {
+  findFilesRecursively,
+  generateFileHeader,
+  getRelativeImportPath,
+  toPosixPath,
+  writeGeneratedFile,
+} from "./shared/utils";
 
 export const OUTPUT_FILE = `${GENERATED_DIR}/generators/index.ts`;
 

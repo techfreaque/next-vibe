@@ -5,13 +5,14 @@ import path from "node:path";
 import readline from "node:readline";
 import { promisify } from "node:util";
 
+// eslint-disable-next-line eslint-plugin-import/no-named-as-default
+import simpleGit from "simple-git";
+
 import type {
   LaunchpadConfig,
   LaunchpadFolder,
   LaunchpadPackage,
 } from "../types/types";
-// eslint-disable-next-line eslint-plugin-import/no-named-as-default
-import simpleGit from "simple-git";
 
 const execAsync = promisify(exec);
 const git = simpleGit;

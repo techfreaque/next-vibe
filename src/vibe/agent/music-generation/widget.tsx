@@ -1,11 +1,5 @@
 "use client";
 
-import { ModelCreditDisplay } from "../models/widget/model-credit-display";
-import {
-  ModelSelector,
-  ModelSelectorTrigger,
-} from "../models/widget/model-selector";
-import { ModelSelectionType } from "../skills/enum";
 import { Audio } from "next-vibe/ui/ui/audio";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Button } from "next-vibe/ui/ui/button";
@@ -33,6 +27,12 @@ import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
 import { useProviderAvailability } from "../env-availability-store";
+import { ModelCreditDisplay } from "../models/widget/model-credit-display";
+import {
+  ModelSelector,
+  ModelSelectorTrigger,
+} from "../models/widget/model-selector";
+import { ModelSelectionType } from "../skills/enum";
 import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "./constants";
 import type definition from "./definition";
 import { MusicDuration } from "./enum";

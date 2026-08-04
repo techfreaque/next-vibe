@@ -16,8 +16,6 @@ import type {
   Time,
   UTCTimestamp,
 } from "lightweight-charts";
-import graphsDefinitions from "../graphs/definition";
-import { scopedTranslation as vibeSenseT } from "../i18n";
 import { getRootCssVar } from "next-vibe/ui/lib/css-vars";
 import { observeRootMutations } from "next-vibe/ui/lib/dom";
 import { Badge } from "next-vibe/ui/ui/badge";
@@ -28,6 +26,14 @@ import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
 import { Plus } from "next-vibe/ui/ui/icons/Plus";
 import { Span } from "next-vibe/ui/ui/span";
 import { P } from "next-vibe/ui/ui/typography";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+
 import { cn } from "../../unified-ui/_shared/cn";
 import {
   useWidgetContext,
@@ -37,15 +43,9 @@ import {
   useWidgetOnSubmit,
   useWidgetValue,
 } from "../../unified-ui/_shared/use-widget-context";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-
 import { GraphResolution } from "../enum";
+import graphsDefinitions from "../graphs/definition";
+import { scopedTranslation as vibeSenseT } from "../i18n";
 import { type Resolution, RESOLUTION_MS } from "./fields";
 
 // ─── Types ────────────────────────────────────────────────────────────────────

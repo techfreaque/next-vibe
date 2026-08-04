@@ -40,19 +40,6 @@ import {
   useNodesState,
   useReactFlow,
 } from "@xyflow/react";
-import { FieldDataType } from "../../../../core/definition/enums";
-import { GraphResolution } from "../../../enum";
-import type { GraphNodeConfig } from "../../../graph/schema";
-import type {
-  GraphConfig,
-  GraphEdge,
-  NodePosition,
-  TriggerConfig,
-} from "../../../graph/types";
-import parentDefinitions from "../data/definition";
-import versionsDefinitions from "../versions/definition";
-import type { Resolution } from "../../../shared/fields";
-import { ResolutionValues } from "../../../shared/fields";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { addWindowListener } from "next-vibe/ui/lib/dom";
 import { Badge } from "next-vibe/ui/ui/badge";
@@ -98,18 +85,6 @@ import {
 } from "next-vibe/ui/ui/select";
 import { Span } from "next-vibe/ui/ui/span";
 import { P } from "next-vibe/ui/ui/typography";
-import { cn } from "../../../../unified-ui/_shared/cn";
-import {
-  useWidgetForm,
-  useWidgetIsSubmitting,
-  useWidgetLogger,
-  useWidgetNavigation,
-  useWidgetOnSubmit,
-  useWidgetTranslation,
-  useWidgetUser,
-  useWidgetValue,
-} from "../../../../unified-ui/_shared/use-widget-context";
-import { useEndpoint } from "../../../../unified-ui/hooks/use-endpoint";
 import React, {
   useCallback,
   useEffect,
@@ -122,6 +97,31 @@ import { pathToAliasMap } from "@/generated/endpoints/alias-map";
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 import { endpointsMeta } from "@/generated/endpoints/meta/en";
 
+import { FieldDataType } from "../../../../core/definition/enums";
+import { cn } from "../../../../unified-ui/_shared/cn";
+import {
+  useWidgetForm,
+  useWidgetIsSubmitting,
+  useWidgetLogger,
+  useWidgetNavigation,
+  useWidgetOnSubmit,
+  useWidgetTranslation,
+  useWidgetUser,
+  useWidgetValue,
+} from "../../../../unified-ui/_shared/use-widget-context";
+import { useEndpoint } from "../../../../unified-ui/hooks/use-endpoint";
+import { GraphResolution } from "../../../enum";
+import type { GraphNodeConfig } from "../../../graph/schema";
+import type {
+  GraphConfig,
+  GraphEdge,
+  NodePosition,
+  TriggerConfig,
+} from "../../../graph/types";
+import type { Resolution } from "../../../shared/fields";
+import { ResolutionValues } from "../../../shared/fields";
+import parentDefinitions from "../data/definition";
+import versionsDefinitions from "../versions/definition";
 import type definition from "./definition";
 
 // ─── Endpoint Node Info ──────────────────────────────────────────────────────

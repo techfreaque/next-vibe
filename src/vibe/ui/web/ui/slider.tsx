@@ -1,9 +1,9 @@
 "use client";
 
 import * as SliderPrimitive from "@radix-ui/react-slider";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { StyleType } from "../utils/style-type";
 
 export type SliderRootProps = {

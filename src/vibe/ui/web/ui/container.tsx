@@ -2,9 +2,9 @@
  * Container Component
  * Provides consistent max-width and padding for app pages that don't need full width
  */
-import { cn } from "../../../unified-ui/_shared/cn";
 import type { JSX, ReactNode } from "react";
 
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { StyleType } from "../utils/style-type";
 
 // Cross-platform props interface

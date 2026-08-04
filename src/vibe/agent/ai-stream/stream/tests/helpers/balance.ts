@@ -7,12 +7,13 @@
 import "server-only";
 
 import { and, eq, sql } from "drizzle-orm";
-import { rootlessToolExecutionContext } from "../../../../../core/execution-context";
-import { chatMessages } from "../../../../chat/db";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { expect } from "vitest";
+
+import { rootlessToolExecutionContext } from "../../../../../core/execution-context";
+import { chatMessages } from "../../../../chat/db";
 
 /** Timestamp of the most recent getBalance() call - bounds the charge audit window. */
 let lastBalanceReadAt = new Date(0);

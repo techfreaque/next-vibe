@@ -11,11 +11,10 @@ import {
   success,
 } from "../../core/route/response.schema";
 import { parseError } from "../../core/utils/parse-error";
+import type { EndpointLogger } from "../../logger/types";
+import type { SeedRequestOutput, SeedResponseOutput } from "./definition";
 import type { SeedT } from "./i18n";
 import { scopedTranslation } from "./i18n";
-import type { EndpointLogger } from "../../logger/types";
-
-import type { SeedRequestOutput, SeedResponseOutput } from "./definition";
 import type { EnvironmentSeeds } from "./seed-manager";
 import { seedDatabase } from "./seed-manager";
 

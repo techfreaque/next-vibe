@@ -2,11 +2,11 @@
 
 import type { SlotProps } from "input-otp";
 import { OTPInput, OTPInputContext } from "input-otp";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 
-import { DashIcon } from "./icons/DashIcon";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { StyleType } from "../utils/style-type";
+import { DashIcon } from "./icons/DashIcon";
 
 export type InputOTPProps = {
   containerClassName?: string;

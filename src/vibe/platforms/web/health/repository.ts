@@ -16,13 +16,12 @@ import {
 import { parseError } from "../../../core/utils/parse-error";
 import { scopedTranslation as dbUtilsScopedTranslation } from "../../../database/utils/i18n";
 import type { EndpointLogger } from "../../../logger/types";
-import type { ServerHealthT } from "./i18n";
-
 import { getCurrentEnvironmentInfo } from "../environment";
 import type {
   HealthCheckRequestOutput,
   HealthCheckResponseOutput,
 } from "./definition";
+import type { ServerHealthT } from "./i18n";
 
 /**
  * Health Check Repository

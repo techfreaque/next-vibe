@@ -7,12 +7,12 @@
 import "server-only";
 
 import { eq, sql } from "drizzle-orm";
-import type { ChatModelId } from "../../../models";
-import type { Modality } from "../../../../models/enum";
 import { db } from "next-vibe/database";
 
 import { chatMessages, type MessageMetadata } from "../../../../chat/db";
 import { ChatMessageRole, ThreadStreamingState } from "../../../../chat/enum";
+import type { Modality } from "../../../../models/enum";
+import type { ChatModelId } from "../../../models";
 import type { MessageVariant } from "../modality-resolver";
 import type { DbWriterState } from "./shared";
 import { buildSseMessageRow } from "./sse-row";

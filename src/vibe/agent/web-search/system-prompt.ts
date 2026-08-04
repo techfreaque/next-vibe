@@ -1,11 +1,11 @@
 /* eslint-disable i18next/no-literal-string */
 import "server-only";
 
-import type { SystemPromptFragment } from "../ai-stream/system-prompt/types";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import { VibeMode } from "next-vibe/env/env-util";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
+import type { SystemPromptFragment } from "../ai-stream/system-prompt/types";
 import { FETCH_URL_SHORT_ALIAS } from "../fetch-url-content/constants";
 import { WEB_SEARCH_ALIAS } from "./constants";
 

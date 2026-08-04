@@ -1,13 +1,13 @@
 import { styled } from "nativewind";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import { View } from "react-native";
 
-import { Minus, Plus } from "./icons";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { NumberInputProps } from "../../web/ui/number-input";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 import { Button } from "./button";
+import { Minus, Plus } from "./icons";
 import { Input } from "./input";
 
 const StyledView = styled(View, { className: "style" });

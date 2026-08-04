@@ -1,5 +1,3 @@
-import type { CreateApiEndpointAny } from "../definition/endpoint-base";
-import { coreClientEnv as envClient } from "../env-client";
 import { VibeMode } from "../../env/env-util";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import {
@@ -11,6 +9,8 @@ import {
   type UserRoleValue,
 } from "../../identity/roles/enum";
 import { Platform } from "../../platforms/platforms";
+import type { CreateApiEndpointAny } from "../definition/endpoint-base";
+import { coreClientEnv as envClient } from "../env-client";
 import type { EndpointAccessResult, PlatformAccessResult } from "./types";
 
 interface IPermissionsRegistry {

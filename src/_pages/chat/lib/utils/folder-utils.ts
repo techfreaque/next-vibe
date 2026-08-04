@@ -7,8 +7,8 @@ import {
   DEFAULT_FOLDER_CONFIGS,
   isDefaultFolderId,
 } from "next-vibe/agent/chat/config";
-import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { ChatFolder } from "next-vibe/agent/chat/db";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 

@@ -5,12 +5,12 @@
 import "server-only";
 
 import type { JSONValue } from "ai";
-import { IMAGE_GEN_ALIAS } from "../../../image-generation/constants";
-import { AUDIO_GEN_TOOL_NAME } from "../../../music-generation/constants";
-import { VIDEO_GEN_TOOL_NAME } from "../../../video-generation/constants";
 import type { WidgetData } from "next-vibe/core/utils/json";
 
 import type { ToolCall } from "../../../chat/db";
+import { IMAGE_GEN_ALIAS } from "../../../image-generation/constants";
+import { AUDIO_GEN_TOOL_NAME } from "../../../music-generation/constants";
+import { VIDEO_GEN_TOOL_NAME } from "../../../video-generation/constants";
 
 export const DEFAULT_TEMPERATURE = 0.7;
 

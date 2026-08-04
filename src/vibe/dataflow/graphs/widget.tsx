@@ -4,7 +4,6 @@
  */
 
 "use client";
-import { formatSimpleDate } from "../../core/i18n/core/localization-utils";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Button } from "next-vibe/ui/ui/button";
 import { Card, CardContent } from "next-vibe/ui/ui/card";
@@ -23,6 +22,9 @@ import { X } from "next-vibe/ui/ui/icons/X";
 import { Input } from "next-vibe/ui/ui/input";
 import { Span } from "next-vibe/ui/ui/span";
 import { P } from "next-vibe/ui/ui/typography";
+import React, { useCallback, useMemo } from "react";
+
+import { formatSimpleDate } from "../../core/i18n/core/localization-utils";
 import { cn } from "../../unified-ui/_shared/cn";
 import {
   useWidgetEndpointMutations,
@@ -32,8 +34,6 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "../../unified-ui/_shared/use-widget-context";
-import React, { useCallback, useMemo } from "react";
-
 import { GraphOwnerType, GraphResolution } from "../enum";
 import type definition from "./definition";
 

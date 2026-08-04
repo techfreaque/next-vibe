@@ -8,9 +8,10 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "next-vibe/ui/ui/alert";
 import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
 import { Pre } from "next-vibe/ui/ui/pre";
+import { Component, type ErrorInfo, type ReactNode } from "react";
+
 import { type WidgetErrorBoundaryProps } from "../../_shared/react-types";
 import { scopedTranslation } from "../../hooks/i18n";
-import { Component, type ErrorInfo, type ReactNode } from "react";
 /**
  * Widget Error Boundary State
  */

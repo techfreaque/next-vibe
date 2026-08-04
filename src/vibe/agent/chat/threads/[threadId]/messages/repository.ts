@@ -6,10 +6,8 @@
 import "server-only";
 
 import { and, desc, eq, ne, sql } from "drizzle-orm";
-import type { ChatModelId } from "../../../../ai-stream/models";
-import { fetchAncestorBranch } from "../../../../ai-stream/repository/core/tree-walk";
 import type { ToolExecutionContext } from "next-vibe/core/execution-context";
-import { scopedTranslation as chatScopedTranslation } from "../../../i18n";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type {
   ChannelDecision,
@@ -30,8 +28,9 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { cronTasks } from "next-vibe/tasks/cron/db";
 import { CronTaskStatus } from "next-vibe/tasks/enum";
 
+import type { ChatModelId } from "../../../../ai-stream/models";
+import { fetchAncestorBranch } from "../../../../ai-stream/repository/core/tree-walk";
 import { bubbleFolderActivity } from "../../../bubble-folder-activity";
-import { DefaultFolderId } from "next-vibe/core/execution-context";
 import {
   CHAT_MESSAGE_COLUMNS,
   chatFolders,
@@ -47,6 +46,7 @@ import {
   ThreadStatusDB,
   ThreadStreamingState,
 } from "../../../enum";
+import { scopedTranslation as chatScopedTranslation } from "../../../i18n";
 import {
   canPostInThread,
   canViewThread,

@@ -18,15 +18,6 @@
 
 /// <reference types="bun-types" />
 
-import type { ServerWebSocket } from "bun";
-import type { CountryLanguage } from "../../core/i18n/core/config";
-import { CountryLanguageValues } from "../../core/i18n/core/config";
-import type { JwtPayloadType } from "../../identity/auth/types";
-import { UserPermissionRole } from "../../identity/roles/enum";
-import type { EndpointLogger } from "../../logger/types";
-import { getPubSubAdapter } from "./pubsub/index";
-import { z } from "zod";
-
 // Side-effect import: claims the emitter's relay slot (core/relay-hook). The
 // emitter no longer reaches for the bridge itself, so SOMETHING in a process that
 // can relay has to load it — and "runs the WS server" is exactly the set of
@@ -34,7 +25,14 @@ import { z } from "zod";
 // module, which is the point: no bridge, no DB, relay simply off.
 import "../remote-event-bridge/repository";
 
-import { handleHttpProxy } from "./http-proxy";
+import type { ServerWebSocket } from "bun";
+import { z } from "zod";
+
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import { CountryLanguageValues } from "../../core/i18n/core/config";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import { UserPermissionRole } from "../../identity/roles/enum";
+import type { EndpointLogger } from "../../logger/types";
 import {
   clearLocalBroadcast,
   registerLocalBroadcast,
@@ -46,6 +44,8 @@ import type {
   WsWireMessage,
 } from "../core/types";
 import { parseWsClientMessage } from "../core/types";
+import { handleHttpProxy } from "./http-proxy";
+import { getPubSubAdapter } from "./pubsub/index";
 import { authenticateWsRequest, authorizeWsChannel } from "./ws-channel-auth";
 
 // ============================================================================

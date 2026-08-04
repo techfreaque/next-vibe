@@ -10,11 +10,10 @@
 
 import "server-only";
 
-import type { GeneratorDefinition } from "../../generators/shared/shared-inputs";
-import { findFilesRecursively } from "../../generators/shared/utils";
-
 import { GENERATED_DIR, getApiDir } from "@/env/paths";
 
+import type { GeneratorDefinition } from "../../generators/shared/shared-inputs";
+import { findFilesRecursively } from "../../generators/shared/utils";
 import { generateCategoryIndex } from "./generator-category-index";
 import { generateClientRoutes } from "./generator-client-routes";
 import { generateEndpoint } from "./generator-endpoint";

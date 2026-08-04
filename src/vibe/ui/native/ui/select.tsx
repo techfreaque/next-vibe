@@ -1,12 +1,10 @@
 import * as SelectPrimitive from "@rn-primitives/select";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import type { ViewStyle } from "react-native";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
-import { Check, ChevronDown, ChevronUp } from "./icons";
-import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 // Import ALL types from web (source of truth) - ZERO definitions in native
 import type {
   SelectContentProps,
@@ -20,6 +18,8 @@ import type {
   SelectValueProps,
 } from "../../web/ui/select";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
+import { Check, ChevronDown, ChevronUp } from "./icons";
 
 const StyledAnimatedView = styledNative(Animated.View);
 const StyledView = styledNative(View);

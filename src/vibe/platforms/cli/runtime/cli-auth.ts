@@ -31,10 +31,10 @@ import {
   UserPermissionRole,
 } from "../../../identity/roles/enum";
 import type { EndpointLogger } from "../../../logger/types";
+import { Platform } from "../../platforms";
 import { createCliBypassUser } from "../auth/cli-bypass-user";
 import type { getCliUser } from "../auth/cli-user";
 import { CliTarget, type CliTargetValue } from "../types/cli-target";
-import { Platform } from "../../platforms";
 
 // Lazy-loaded: only needed for MCP + non-bypass paths, not for normal `vibe c`
 let _getCliUser: typeof getCliUser | null = null;

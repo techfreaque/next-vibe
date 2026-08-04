@@ -16,6 +16,11 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { iconSchema } from "next-vibe/core/definition/common.schema";
+import { users } from "next-vibe/identity/user/db";
+import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+import { z } from "zod";
+
 import type { ChatModelSelection } from "../ai-stream/models";
 import { chatModelSelectionSchema } from "../ai-stream/models";
 import type {
@@ -28,6 +33,7 @@ import {
   imageVisionModelSelectionSchema,
   videoVisionModelSelectionSchema,
 } from "../ai-stream/vision-models";
+import type { ToolConfigItem } from "../chat/settings/definition";
 import type { ImageGenModelSelection } from "../image-generation/models";
 import { imageGenModelSelectionSchema } from "../image-generation/models";
 import type { MusicGenModelSelection } from "../music-generation/models";
@@ -37,14 +43,8 @@ import { sttModelSelectionSchema } from "../speech-to-text/models";
 import type { VoiceModelSelection } from "../text-to-speech/models";
 import { voiceModelSelectionSchema } from "../text-to-speech/models";
 import type { VideoGenModelSelection } from "../video-generation/models";
-import { videoGenModelSelectionSchema } from "../video-generation/models";
-import { iconSchema } from "next-vibe/core/definition/common.schema";
-import { users } from "next-vibe/identity/user/db";
-import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
-import { z } from "zod";
-
-import type { ToolConfigItem } from "../chat/settings/definition";
 import type { VideoGenModelId } from "../video-generation/models";
+import { videoGenModelSelectionSchema } from "../video-generation/models";
 import type {
   SkillCategoryValue,
   SkillOwnershipTypeValue,

@@ -3,6 +3,8 @@
  * Renders clickable hyperlinks with external link indicators
  */
 
+import type { z } from "zod";
+
 import type { WidgetType } from "../../../../core/definition/enums";
 import type { StringWidgetSchema } from "../../../_shared/schema-constraints";
 import type {
@@ -10,7 +12,6 @@ import type {
   FieldUsageConfig,
 } from "../../../_shared/types";
 import type { SpacingSize } from "../title/types";
-import type { z } from "zod";
 
 /**
  * Link object schema - for links with custom text and behavior

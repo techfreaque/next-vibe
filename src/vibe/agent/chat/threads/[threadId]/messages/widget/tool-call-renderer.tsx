@@ -17,12 +17,9 @@
  */
 
 "use client";
-import type { SendMessageParams } from "../../../../../ai-stream/stream/hooks/send-message";
-import { DefaultFolderId } from "next-vibe/core/execution-context";
-import type { ToolCall } from "../../../../db";
-import { useChatNavigationStore } from "../../../../hooks/use-chat-navigation-store";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { definitionLoader } from "next-vibe/core/definition/loader";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { AWAIT_TASK_ALIAS } from "next-vibe/execute-tool/await-task/constants";
@@ -61,14 +58,18 @@ import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
 import { NavigationStackProvider } from "next-vibe/unified-ui/hooks/use-navigation-stack";
 import { EndpointRenderer } from "next-vibe/unified-ui/renderers/web/EndpointRenderer";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
-import { type IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
+import { type IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JSX } from "react";
 import { useCallback, useEffect, useState } from "react";
 import type { FieldValues } from "react-hook-form";
 import { useForm } from "react-hook-form";
 
 import { pathToAliasMap } from "@/generated/endpoints/alias-map";
+
+import type { SendMessageParams } from "../../../../../ai-stream/stream/hooks/send-message";
+import type { ToolCall } from "../../../../db";
+import { useChatNavigationStore } from "../../../../hooks/use-chat-navigation-store";
 
 type ToolDecision =
   | { type: "pending" }

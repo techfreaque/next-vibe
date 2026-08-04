@@ -12,6 +12,8 @@
  * is the one exception — it has its own endpoint (execute-tool).
  */
 
+import { z } from "zod";
+
 import { createEndpoint } from "../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -21,11 +23,9 @@ import {
   WidgetType,
 } from "../../core/definition/enums";
 import { UserRole } from "../../identity/roles/enum";
-import { scopedTranslation } from "./i18n";
 import { objectField, requestField } from "../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
 import type { AnyEndpointEventEnvelope } from "../core/structured-events";
+import { scopedTranslation } from "./i18n";
 
 const { POST } = createEndpoint({
   scopedTranslation,

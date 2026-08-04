@@ -6,11 +6,11 @@
  * can render without the full chat infrastructure.
  */
 
-import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { ChatBootValue } from "next-vibe/agent/chat/hooks/context";
 import { ChatBootContext } from "next-vibe/agent/chat/hooks/context";
 import { ChatNavigationProvider } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { ReactWidgetContext } from "next-vibe/unified-ui/_shared/react-types";
 import { WidgetContextStoreContext } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { WidgetContextStoreType } from "next-vibe/unified-ui/_shared/widget-context-store";

@@ -4,6 +4,7 @@
  */
 
 "use client";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { useSilentHistory } from "next-vibe/ui/hooks/use-navigation";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Button } from "next-vibe/ui/ui/button";
@@ -26,7 +27,6 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import React from "react";
 
-import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { useChatNavigationStore } from "../../hooks/use-chat-navigation-store";
 import type definition from "../definition";
 import type { PublicFeedItem } from "../definition";

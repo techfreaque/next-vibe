@@ -1,10 +1,13 @@
 "use client";
 
-import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe/ui/ui/card";
 import { Area, Axis, Bar, Chart, Line, Pie } from "next-vibe/ui/ui/chart";
 import { Div } from "next-vibe/ui/ui/div";
 import { Span } from "next-vibe/ui/ui/span";
+import type { JSX } from "react";
+import type z from "zod";
+
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { cn } from "../../../_shared/cn";
 import type {
   ReactRequestResponseWidgetProps,
@@ -21,9 +24,6 @@ import {
   getTextSizeClassName,
 } from "../../../_shared/widget-helpers";
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "../../../hooks/i18n";
-import type { JSX } from "react";
-import type z from "zod";
-
 import { type ChartDataPoint, extractChartData } from "./shared";
 import type { ChartWidgetConfig, ChartWidgetSchema } from "./types";
 
@@ -62,9 +62,9 @@ const CHART_COLORS = [
  */
 export function ChartWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends TEndpoint extends CreateApiEndpointAny
+  TKey extends (TEndpoint extends CreateApiEndpointAny
     ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
-    : never,
+    : never),
   TUsage extends FieldUsageConfig,
   TSchemaType extends "primitive" | "widget",
 >(

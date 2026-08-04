@@ -3,6 +3,8 @@
  * Check status and list guard environments
  */
 
+import { z } from "zod";
+
 import { dateSchema } from "../../../core/definition/common.schema";
 import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
@@ -13,16 +15,14 @@ import {
   WidgetType,
 } from "../../../core/definition/enums";
 import { UserRole } from "../../../identity/roles/enum";
-import { scopedTranslation } from "./i18n";
 import {
   objectField,
   requestField,
   responseArrayField,
   responseField,
 } from "../../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
 import { GUARD_STATUS_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const { POST } = createEndpoint({
   scopedTranslation,

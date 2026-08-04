@@ -15,7 +15,6 @@ import type {
   NpmPackageConfig,
   PackageExportCondition,
 } from "../../definition";
-
 import { ROOT_DIR } from "../constants";
 import { outputFormatter } from "../output-formatter";
 

@@ -3,6 +3,8 @@
  * POST endpoint to prune old error logs (called by cron daily)
  */
 
+import { z } from "zod";
+
 import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -16,8 +18,6 @@ import {
   objectField,
   responseField,
 } from "../../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
 import { ERROR_LOGS_CLEANUP_ALIAS } from "./constants";
 
 const { POST } = createEndpoint({

@@ -5,6 +5,9 @@
 
 import "server-only";
 
+import { GENERATED_DIR } from "@/env/paths";
+
+import type { EndpointLogger } from "../../../logger/types";
 import { PATH_SEPARATOR, pathSegmentsToToolName } from "../../core-utils/path";
 import type {
   GeneratorContext,
@@ -18,9 +21,6 @@ import {
 } from "../../generators/shared/utils";
 import type { WidgetData } from "../../utils/json";
 import { parseError } from "../../utils/parse-error";
-import type { EndpointLogger } from "../../../logger/types";
-
-import { GENERATED_DIR } from "@/env/paths";
 
 const OUTPUT_FILE = `${GENERATED_DIR}/routes/client.ts`;
 

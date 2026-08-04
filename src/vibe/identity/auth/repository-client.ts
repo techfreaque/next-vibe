@@ -14,6 +14,8 @@
  * All methods return ResponseType<T> for consistent error handling
  */
 
+import { storage } from "next-vibe/ui/lib/storage";
+
 import { platform } from "../../core/env-client";
 import type { ResponseType } from "../../core/route/response.schema";
 import {
@@ -22,9 +24,8 @@ import {
   success,
 } from "../../core/route/response.schema";
 import { parseError } from "../../core/utils/parse-error";
-import type { AuthT } from "./i18n";
 import type { EndpointLogger } from "../../logger/types";
-import { storage } from "next-vibe/ui/lib/storage";
+import type { AuthT } from "./i18n";
 
 // Storage key for auth token
 const AUTH_TOKEN_STORAGE_KEY = "auth_token";

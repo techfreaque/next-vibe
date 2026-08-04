@@ -18,7 +18,6 @@ import type { JwtPayloadType } from "../../../identity/auth/types";
 import { filterUserPermissionRoles } from "../../../identity/roles/enum";
 import type { EndpointLogger } from "../../../logger/types";
 import { Platform } from "../../platforms";
-
 import { MCPRegistry, mcpRegistry } from "../registry";
 import type {
   JsonRpcError,

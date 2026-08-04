@@ -3,9 +3,8 @@
  * Handles oxlint operations using child_process.spawn
  */
 
-import { cpus } from "node:os";
-
 import { existsSync, promises as fs } from "node:fs";
+import { cpus } from "node:os";
 import { relative, resolve as resolvePath } from "node:path";
 
 import { buildPackageRunnerCommand, coreEnv } from "../../../../core/env";
@@ -18,7 +17,6 @@ import {
 import { parseError } from "../../../../core/utils/parse-error";
 import type { EndpointLogger } from "../../../../logger/types";
 import { Platform } from "../../../../platforms/platforms";
-
 import { ConfigRepositoryImpl } from "../../config/repository";
 import { sortIssuesByLocation } from "../../config/shared";
 import type { CheckConfig } from "../../config/types";

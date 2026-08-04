@@ -8,8 +8,9 @@
  * - TooltipContent: suppressed in CLI (noise), compact in MCP
  */
 import { Text } from "ink";
-import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import * as React from "react";
+
+import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 
 export type {
   TooltipContentProps,

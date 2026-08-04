@@ -1,4 +1,3 @@
-import type { ChatModelOption } from "../../models";
 import { getFullPath, getPreferredName } from "next-vibe/core/core-utils/path";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -9,6 +8,7 @@ import { loadTools } from "next-vibe/platforms/ai/tools-loader";
 import type { ToolExecutionContext } from "../../../../core/execution-context";
 import { getDefaultToolIdsForFolder } from "../../../chat/constants";
 import type { ToolCall } from "../../../chat/db";
+import type { ChatModelOption } from "../../models";
 
 /**
  * Tool config item from the API request

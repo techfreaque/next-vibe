@@ -11,12 +11,12 @@ import {
   fail,
   type ResponseType,
 } from "next-vibe/core/route/response.schema";
+import { db } from "next-vibe/database";
 import { ConfirmedExecution } from "next-vibe/execute-tool/repository/confirmed";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { ResolvedRelayContext } from "next-vibe/realtime/core/relay-context";
 
-import { db } from "next-vibe/database";
 import type { ToolExecutionContext } from "../../../../core/execution-context";
 import type { ChatMessage, ToolCall } from "../../../chat/db";
 import {

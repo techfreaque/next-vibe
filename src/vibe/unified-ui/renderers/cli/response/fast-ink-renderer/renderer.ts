@@ -11,9 +11,6 @@ import { Chalk } from "chalk";
 import cliBoxes from "cli-boxes";
 import type { BoxProps, StaticProps, TextProps } from "ink";
 import { Box, Static, Text } from "ink";
-import { parseError } from "../../../../../core/utils/parse-error";
-import { shouldUseColors } from "../../../../../logger/colors";
-import type { EndpointLogger } from "../../../../../logger/types";
 import React, {
   type JSXElementConstructor,
   type ReactElement,
@@ -26,6 +23,10 @@ import {
 } from "react-reconciler/constants.js";
 import stringWidth from "string-width";
 import stripAnsi from "strip-ansi";
+
+import { parseError } from "../../../../../core/utils/parse-error";
+import { shouldUseColors } from "../../../../../logger/colors";
+import type { EndpointLogger } from "../../../../../logger/types";
 
 // NoEventPriority is available at runtime but not in type definitions
 const NoEventPriority = 0;

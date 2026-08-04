@@ -1,8 +1,8 @@
 "use client";
 
-import type { EndpointLogger } from "../../../logger/types";
 import { useContext } from "react";
 
+import type { EndpointLogger } from "../../../logger/types";
 import { LoggerContext } from "./logger-provider";
 
 export function useLogger(): EndpointLogger {

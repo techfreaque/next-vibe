@@ -1,8 +1,8 @@
 import { Text } from "ink";
-import { useCliPlatform } from "../../../unified-ui/_shared/use-widget-context";
 import * as React from "react";
 import terminalLink from "terminal-link";
 
+import { useCliPlatform } from "../../../unified-ui/_shared/use-widget-context";
 import type { ExternalLinkProps, LinkProps } from "../../web/ui/link";
 import { parseClassesToInkProps } from "./tailwind-to-ink";
 

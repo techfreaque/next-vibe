@@ -6,10 +6,10 @@
 
 import "server-only";
 
-import { agentEnv } from "../../../env";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { agentEnv } from "../../../env";
 import { imageGenModelDefinitions } from "../../../image-generation/models";
 import { musicGenModelDefinitions } from "../../../music-generation/models";
 import { ApiProvider } from "../../models";

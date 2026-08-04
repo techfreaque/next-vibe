@@ -5,13 +5,15 @@
 
 "use client";
 
+import { Div } from "next-vibe/ui/ui/div";
+import { type JSX, useMemo } from "react";
+
 import type {
   IconSchemaNullishType,
   IconSchemaOptionalType,
   IconSchemaType,
 } from "../../../../core/definition/common.schema";
 import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
-import { Div } from "next-vibe/ui/ui/div";
 import { cn } from "../../../_shared/cn";
 import type {
   ReactRequestResponseWidgetProps,
@@ -25,10 +27,8 @@ import {
   getContainerSizeClassName,
   getIconSizeClassName,
 } from "../../../_shared/widget-helpers";
-import { type IconKey } from "../../form-fields/icon-field/icons";
 import { Icon } from "../../form-fields/icon-field/icon-component";
-import { type JSX, useMemo } from "react";
-
+import { type IconKey } from "../../form-fields/icon-field/icons";
 import type { IconWidgetConfig } from "./types";
 
 /**

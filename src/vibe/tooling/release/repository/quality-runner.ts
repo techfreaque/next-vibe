@@ -22,9 +22,8 @@ import {
   formatSuccess,
 } from "../../../logger/formatters";
 import type { EndpointLogger } from "../../../logger/types";
-import { scopedTranslation } from "../i18n";
-
 import type { PackageManager } from "../definition";
+import { scopedTranslation } from "../i18n";
 import { MESSAGES } from "./constants";
 import {
   hasStdout,

@@ -8,9 +8,6 @@
 
 "use client";
 
-import { coreClientEnv as envClient } from "../../core/env-client";
-import { VibeMode } from "../../env/env-util";
-import { UserPermissionRole } from "../../identity/roles/enum";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
 import {
@@ -40,6 +37,15 @@ import { Separator } from "next-vibe/ui/ui/separator";
 import { Span } from "next-vibe/ui/ui/span";
 import { H3, P } from "next-vibe/ui/ui/typography";
 import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
+import type { JSX } from "react";
+import { useState } from "react";
+
+import { CreditsTabHeader } from "@/credits/credits-tab-header";
+import { GITHUB_REPO_URL } from "@/env/constants";
+
+import { coreClientEnv as envClient } from "../../core/env-client";
+import { VibeMode } from "../../env/env-util";
+import { UserPermissionRole } from "../../identity/roles/enum";
 import { usePickerCallback } from "../../unified-ui/_shared/picker-context";
 import {
   useWidgetLocale,
@@ -50,12 +56,6 @@ import {
   useWidgetValue,
 } from "../../unified-ui/_shared/use-widget-context";
 import { apiClient } from "../../unified-ui/hooks/store";
-import type { JSX } from "react";
-import { useState } from "react";
-
-import { CreditsTabHeader } from "@/credits/credits-tab-header";
-import { GITHUB_REPO_URL } from "@/env/constants";
-
 import type endpoints from "./definition";
 import type { RemoteConnection } from "./definition";
 

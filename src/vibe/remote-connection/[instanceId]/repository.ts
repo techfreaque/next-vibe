@@ -8,6 +8,7 @@
 import "server-only";
 
 import { and, eq, isNull } from "drizzle-orm";
+
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -20,7 +21,6 @@ import type { JwtPrivatePayloadType } from "../../identity/auth/types";
 import { UserPermissionRole } from "../../identity/roles/enum";
 import type { EndpointLogger } from "../../logger/types";
 import type { Platform } from "../../platforms/platforms";
-
 import { remoteConnections } from "../db";
 import { RemoteConnectionRepository } from "../repository";
 import { ExecuteToolRouting } from "../routing";

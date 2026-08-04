@@ -7,6 +7,8 @@
 import "server-only";
 
 import { and, eq } from "drizzle-orm";
+import { z } from "zod";
+
 import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import {
   type CountryLanguage,
@@ -23,8 +25,6 @@ import { db } from "../../database";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import { UserPermissionRole } from "../../identity/roles/enum";
 import type { EndpointLogger } from "../../logger/types";
-import { z } from "zod";
-
 import type { SyncCursor } from "../db";
 import {
   RemoteToolCapabilitySchema,

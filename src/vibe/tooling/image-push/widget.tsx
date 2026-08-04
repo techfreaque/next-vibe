@@ -12,6 +12,8 @@ import { Div } from "next-vibe/ui/ui/div";
 import { Pre } from "next-vibe/ui/ui/pre";
 import { Span } from "next-vibe/ui/ui/span";
 import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
+import type { JSX } from "react";
+
 import {
   useWidgetOnSubmit,
   useWidgetResponseOnly,
@@ -19,8 +21,6 @@ import {
   useWidgetValue,
 } from "../../unified-ui/_shared/use-widget-context";
 import { FormAlertWidget } from "../../unified-ui/widgets/interactive/form-alert/widget";
-import type { JSX } from "react";
-
 import type definition from "./definition";
 
 function formatDuration(ms: number): string {

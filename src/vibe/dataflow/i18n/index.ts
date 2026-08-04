@@ -3,7 +3,6 @@
  */
 
 import { createScopedTranslation } from "../../core/i18n/core/scoped-translation";
-
 import { translations as enTranslations } from "./en";
 
 export const scopedTranslation = createScopedTranslation({

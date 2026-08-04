@@ -1,8 +1,8 @@
 "use client";
 
-import type { CountryLanguage } from "../../../core/i18n/core/config";
 import { useEffect } from "react";
 
+import type { CountryLanguage } from "../../../core/i18n/core/config";
 import { useLogger } from "./use-logger";
 
 type ErrorWithDigest = Error & { digest?: string };

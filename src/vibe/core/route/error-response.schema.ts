@@ -8,8 +8,9 @@
  * the value and the same process renders it, there is nothing to re-validate.
  */
 
-import type { TranslatedKeyType } from "../i18n/core/scoped-translation";
 import { z } from "zod";
+
+import type { TranslatedKeyType } from "../i18n/core/scoped-translation";
 
 export const errorResponseSchema = z.object({
   success: z.literal(false),

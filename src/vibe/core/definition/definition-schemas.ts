@@ -14,8 +14,8 @@
  */
 import {
   filterUserPermissionRoles,
-  UserRole,
   type UserPermissionRoleValue,
+  UserRole,
   type UserRoleValue,
 } from "../../identity/roles/enum";
 import { Platform } from "../../platforms/platforms";
@@ -23,7 +23,6 @@ import {
   generateFormSchema,
   generateSchemaForUsage,
 } from "../../unified-ui/_shared/utils";
-
 import type { InferFormSchema, InferSchemaFromField } from "./endpoint";
 import { FieldUsage } from "./enums";
 

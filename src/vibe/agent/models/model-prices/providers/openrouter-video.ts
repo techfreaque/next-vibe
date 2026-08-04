@@ -19,9 +19,9 @@
 
 import "server-only";
 
-import { agentEnv } from "../../../env";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { agentEnv } from "../../../env";
 import { videoGenModelDefinitions } from "../../../video-generation/models";
 import { ApiProvider } from "../../models";
 import type { ProviderPriceResult, SettingsUpdate } from "./base";

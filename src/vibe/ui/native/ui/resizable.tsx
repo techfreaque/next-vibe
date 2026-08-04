@@ -4,16 +4,16 @@
  */
 import { GripVertical } from "lucide-react-native";
 import { styled } from "nativewind";
-import { cn } from "../../../unified-ui/_shared/cn";
 import React from "react";
 import { View } from "react-native";
 
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type {
   ResizableContainerProps,
   ResizableHandleProps,
 } from "../../web/ui/resizable";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 
 // Type-safe View with className support (NativeWind)
 const StyledView = styled(View, { className: "style" });

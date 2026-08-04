@@ -11,12 +11,6 @@
 
 "use client";
 
-import { type ChatModelOption, chatModelOptions } from "../../ai-stream/models";
-import { imageGenModelOptions } from "../../image-generation/models";
-import { musicGenModelOptions } from "../../music-generation/models";
-import { sttModelOptions } from "../../speech-to-text/models";
-import { ttsModelOptions } from "../../text-to-speech/models";
-import { videoGenModelOptions } from "../../video-generation/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import { Badge } from "next-vibe/ui/ui/badge";
@@ -34,10 +28,16 @@ import { useRef, useState } from "react";
 
 import { STANDARD_MARKUP_PERCENTAGE } from "@/products/constants";
 
+import { type ChatModelOption, chatModelOptions } from "../../ai-stream/models";
 import {
   COMPACT_TRIGGER,
   COMPACT_TRIGGER_PERCENTAGE,
 } from "../../ai-stream/repository/core/constants";
+import { imageGenModelOptions } from "../../image-generation/models";
+import { musicGenModelOptions } from "../../music-generation/models";
+import { sttModelOptions } from "../../speech-to-text/models";
+import { ttsModelOptions } from "../../text-to-speech/models";
+import { videoGenModelOptions } from "../../video-generation/models";
 import { getCreditCostFromModel } from "../all-models";
 import { scopedTranslation } from "../i18n";
 import {

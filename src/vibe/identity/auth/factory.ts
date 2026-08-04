@@ -2,7 +2,6 @@ import "server-only";
 
 import { cliAuthHandler } from "../../platforms/cli/auth/cli-handler";
 import { Platform } from "../../platforms/platforms";
-
 import type { BaseAuthHandler } from "./base-auth-handler";
 import { webAuthHandler } from "./next-auth-handler";
 

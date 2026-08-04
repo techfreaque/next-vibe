@@ -13,6 +13,7 @@
  */
 
 import { jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+
 import type { WidgetData } from "../core/utils/json";
 
 export const pendingCallResults = pgTable("pending_call_results", {

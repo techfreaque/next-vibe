@@ -1,9 +1,10 @@
+import type { z } from "zod";
+
 import { validateData } from "../core/core-utils/validation";
 import { defaultLocale } from "../core/i18n/core/config";
 import type { EndpointLogger } from "../logger/types";
 import { isRuntimeEnvPlaceholder } from "../platforms/cli/runtime/runtime-env-placeholders";
 import { Platform } from "../platforms/platforms";
-import type { z } from "zod";
 
 interface EnvHint {
   example: string | false;

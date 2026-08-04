@@ -11,8 +11,6 @@
 
 import "server-only";
 
-import cleanupDefinitions from "./cleanup/definition";
-import { tools as cleanupTools } from "./cleanup/route";
 import {
   CRON_SCHEDULES,
   HISTORY_INTERVALS,
@@ -20,6 +18,8 @@ import {
 } from "../tasks/constants";
 import { CronTaskPriority, TaskCategory } from "../tasks/enum";
 import { createCronTask, type Task } from "../tasks/unified-runner/types";
+import cleanupDefinitions from "./cleanup/definition";
+import { tools as cleanupTools } from "./cleanup/route";
 
 const vibeSenseCleanupTask = createCronTask(
   cleanupDefinitions.POST,

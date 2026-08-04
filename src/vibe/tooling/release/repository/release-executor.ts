@@ -4,6 +4,7 @@
  */
 
 import { confirm, select } from "@inquirer/prompts";
+
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import type { ResponseType } from "../../../core/route/response.schema";
 import {
@@ -24,8 +25,6 @@ import {
   formatWarning,
 } from "../../../logger/formatters";
 import type { EndpointLogger } from "../../../logger/types";
-import { scopedTranslation } from "../i18n";
-
 import type {
   GitInfo,
   GitOpsConfig,
@@ -38,6 +37,7 @@ import type {
   RequestType,
   Timings,
 } from "../definition";
+import { scopedTranslation } from "../i18n";
 import { assetZipper } from "./asset-zipper";
 import { changelogGenerator } from "./changelog-generator";
 import { ciDetector } from "./ci-detector";

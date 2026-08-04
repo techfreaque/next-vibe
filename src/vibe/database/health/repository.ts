@@ -15,7 +15,6 @@ import {
   success,
 } from "../../core/route/response.schema";
 import type { TasksT } from "../../tasks/i18n";
-
 import { rawPool } from "..";
 
 /** Thresholds tuned for a 16 GB server */

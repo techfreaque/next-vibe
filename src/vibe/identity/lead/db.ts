@@ -16,9 +16,6 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import { CountriesArr, LanguagesArr } from "../../core/i18n/core/config";
-import { createRelationalDb } from "../../database/relational";
-import { users } from "../user/db";
 import type { z } from "zod";
 
 import { CampaignType } from "@/messenger/accounts/enum";
@@ -26,6 +23,9 @@ import { CampaignTypeDB } from "@/messenger/accounts/enum";
 import { MessageStatus as EmailStatus } from "@/messenger/messages/enum";
 import { MessageStatusDB as EmailStatusDB } from "@/messenger/messages/enum";
 
+import { CountriesArr, LanguagesArr } from "../../core/i18n/core/config";
+import { createRelationalDb } from "../../database/relational";
+import { users } from "../user/db";
 import {
   DeviceTypeDB,
   EmailCampaignStage,

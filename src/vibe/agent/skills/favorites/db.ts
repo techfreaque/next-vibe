@@ -14,22 +14,22 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { iconSchema } from "next-vibe/core/definition/common.schema";
+import { users } from "next-vibe/identity/user/db";
+import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+
 import type { ChatModelSelection } from "../../ai-stream/models";
 import type {
   AudioVisionModelSelection,
   ImageVisionModelSelection,
   VideoVisionModelSelection,
 } from "../../ai-stream/vision-models";
+import type { ToolConfigItem } from "../../chat/settings/definition";
 import type { ImageGenModelSelection } from "../../image-generation/models";
 import type { MusicGenModelSelection } from "../../music-generation/models";
 import type { SttModelSelection } from "../../speech-to-text/models";
 import type { VoiceModelSelection } from "../../text-to-speech/models";
 import type { VideoGenModelSelection } from "../../video-generation/models";
-import { iconSchema } from "next-vibe/core/definition/common.schema";
-import { users } from "next-vibe/identity/user/db";
-import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
-
-import type { ToolConfigItem } from "../../chat/settings/definition";
 
 /**
  * Favorites Table

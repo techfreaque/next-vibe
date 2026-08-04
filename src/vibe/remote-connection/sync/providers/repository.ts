@@ -3,7 +3,6 @@ import "server-only";
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import type { ResponseType } from "../../../core/route/response.schema";
 import { success } from "../../../core/route/response.schema";
-
 import { ensureProvidersRegistered, getSyncProviders } from "../provider";
 import type { SyncProvidersGetResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";

@@ -3,6 +3,8 @@
  * POST endpoint to execute a graph from an inline config (no DB save required)
  */
 
+import { z } from "zod";
+
 import { createEndpoint } from "../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -11,17 +13,15 @@ import {
   Methods,
   WidgetType,
 } from "../../core/definition/enums";
-import { graphConfigSchema } from "../graph/schema";
-import { scopedTranslation } from "./i18n";
 import { UserRole } from "../../identity/roles/enum";
 import {
   objectField,
   requestField,
   responseField,
 } from "../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
+import { graphConfigSchema } from "../graph/schema";
 import { RUN_CONFIG_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 export const { POST } = createEndpoint({
   scopedTranslation,

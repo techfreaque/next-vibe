@@ -3,6 +3,8 @@
  * Statistics and metrics for cron task system
  */
 
+import { z } from "zod";
+
 import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -11,8 +13,6 @@ import {
   WidgetType,
 } from "../../../core/definition/enums";
 import { UserRole } from "../../../identity/roles/enum";
-import { scopedTranslation } from "./i18n";
-import { CronTaskPriority, CronTaskStatus } from "../../enum";
 import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "../../../unified-ui/_shared/utils";
 import {
@@ -20,9 +20,9 @@ import {
   requestField,
   responseField,
 } from "../../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
+import { CronTaskPriority, CronTaskStatus } from "../../enum";
 import { CRON_STATS_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const CronStatsContainer = lazyWidget(() =>
   import("./widget").then((m) => ({

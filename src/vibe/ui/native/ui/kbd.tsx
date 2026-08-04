@@ -1,12 +1,12 @@
 import { styled } from "nativewind";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import type { TextStyle } from "react-native";
 import { Text } from "react-native";
 
-import { convertCSSToTextStyle } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { KbdMouseEvent, KbdProps } from "../../web/ui/kbd";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToTextStyle } from "../utils/style-converter";
 
 const StyledText = styled(Text, { className: "style" });
 

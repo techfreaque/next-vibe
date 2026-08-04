@@ -25,7 +25,6 @@ import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import type { WidgetData } from "../../core/utils/json";
 import type { EndpointLogger } from "../../logger/types";
 import { applyPartialToCache } from "../../unified-ui/hooks/cache-merger";
-
 import { addEventObserver } from "./event-observers";
 import type { AnyEndpointEventEnvelope } from "./structured-events";
 

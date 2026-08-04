@@ -1,10 +1,10 @@
 import { Text, useInput } from "ink";
-import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 
+import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
+import type { CheckboxRootProps } from "../../web/ui/checkbox";
 import { useCliFieldFocus } from "../lib/focus-manager";
 import { isOverlayOpen } from "./dialog";
-import type { CheckboxRootProps } from "../../web/ui/checkbox";
 
 export type {
   CheckboxIndicatorProps,

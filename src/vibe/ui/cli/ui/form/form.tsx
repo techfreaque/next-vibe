@@ -14,12 +14,6 @@ import {
   useWidgetOnSubmit,
   useWidgetResponseOnly,
 } from "../../../../unified-ui/_shared/use-widget-context";
-
-import { CliFocusManager } from "../../lib/focus-manager";
-import {
-  setLiveRequestValues,
-  setSubmitHandler,
-} from "../../lib/live-request-values";
 import type {
   FormComboboxProps,
   FormControlProps,
@@ -34,6 +28,11 @@ import type {
   FormProps,
   UseFormFieldReturn,
 } from "../../../web/ui/form/form";
+import { CliFocusManager } from "../../lib/focus-manager";
+import {
+  setLiveRequestValues,
+  setSubmitHandler,
+} from "../../lib/live-request-values";
 import { parseClassesToInkProps } from "../tailwind-to-ink";
 
 export type {

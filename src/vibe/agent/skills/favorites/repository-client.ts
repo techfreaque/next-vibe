@@ -4,8 +4,6 @@
  * Mirrors server repository structure but runs in browser
  */
 
-import skillSingleDefinition from "../[id]/definition";
-import { DEFAULT_TTS_VOICE_ID } from "../../text-to-speech/constants";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -32,10 +30,12 @@ import {
 import type { AgentEnvAvailability } from "../../env-availability";
 import { getModelDisplayName } from "../../models/all-models";
 import { modelProviders } from "../../models/models";
+import { DEFAULT_TTS_VOICE_ID } from "../../text-to-speech/constants";
 import type {
   TtsModelId,
   VoiceModelSelection,
 } from "../../text-to-speech/models";
+import skillSingleDefinition from "../[id]/definition";
 import { DEFAULT_SKILLS } from "../config";
 import type { SkillVariantData } from "../db";
 import { ModelSelectionType } from "../enum";

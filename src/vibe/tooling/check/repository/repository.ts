@@ -7,6 +7,8 @@ import "server-only";
 import { existsSync } from "node:fs";
 import { isAbsolute, posix, resolve } from "node:path";
 
+import { getInvocationDir } from "@/env/paths";
+
 import { coreEnv } from "../../../core/env";
 import type { ResponseType } from "../../../core/route/response.schema";
 import {
@@ -19,9 +21,6 @@ import type { JwtPayloadType } from "../../../identity/auth/types";
 import type { EndpointLogger } from "../../../logger/types";
 import { Platform } from "../../../platforms/platforms";
 import { createEndpointEmitter } from "../../../realtime/core/emitter";
-
-import { getInvocationDir } from "@/env/paths";
-
 import { ConfigRepositoryImpl } from "../config/repository";
 import type { CheckConfig } from "../config/types";
 import vibeCheckEndpoints from "../definition";

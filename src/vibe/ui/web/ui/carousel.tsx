@@ -1,16 +1,16 @@
 "use client";
 
 import useEmblaCarousel from "embla-carousel-react";
-import { useTranslation } from "../../../core/i18n/core/client";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 
+import { useTranslation } from "../../../core/i18n/core/client";
+import { cn } from "../../../unified-ui/_shared/cn";
 import { uiScopedTranslation } from "../i18n";
-import { ArrowLeftIcon } from "./icons/ArrowLeftIcon";
-import { ArrowRightIcon } from "./icons/ArrowRightIcon";
 import type { StyleType } from "../utils/style-type";
 import { Button } from "./button";
 import type { DivKeyboardEvent } from "./div";
+import { ArrowLeftIcon } from "./icons/ArrowLeftIcon";
+import { ArrowRightIcon } from "./icons/ArrowRightIcon";
 
 // Cross-platform types for Embla Carousel
 export type CarouselApi = ReturnType<typeof useEmblaCarousel>[1];

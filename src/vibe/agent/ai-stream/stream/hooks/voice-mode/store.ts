@@ -5,9 +5,10 @@
 
 "use client";
 
-import type { ChatMode } from "../../../../models/enum";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+
+import type { ChatMode } from "../../../../models/enum";
 
 // ─── Voice Mode Types ─────────────────────────────────────────────────────────
 

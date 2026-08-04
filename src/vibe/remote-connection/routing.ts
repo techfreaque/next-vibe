@@ -14,8 +14,8 @@
 import "server-only";
 
 import { and, desc, eq } from "drizzle-orm";
-import { db } from "../database";
 
+import { db } from "../database";
 import { remoteConnections } from "./db";
 import { RemoteConnectionRepository } from "./repository";
 import type {

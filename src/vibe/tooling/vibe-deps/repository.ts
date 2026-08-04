@@ -10,6 +10,8 @@ import {
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { getSrcDir, VIBE_IMPORT_ALIAS } from "@/env/paths";
+
 import { toPosixPath } from "../../core/generators/shared/utils";
 import type { ResponseType } from "../../core/route/response.schema";
 import {
@@ -19,9 +21,6 @@ import {
 } from "../../core/route/response.schema";
 import { parseError } from "../../core/utils/parse-error";
 import type { EndpointLogger } from "../../logger/types";
-
-import { getSrcDir, VIBE_IMPORT_ALIAS } from "@/env/paths";
-
 import type { VibeDepsConfig, VibeDepsViolationKind } from "./config-types";
 import type {
   VibeDepsRequestOutput,

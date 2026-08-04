@@ -3,6 +3,8 @@
  * Production-ready endpoint for starting the production server
  */
 
+import { z } from "zod";
+
 import { translatedValueSchema } from "../../../core/definition/common.schema";
 import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
@@ -14,16 +16,14 @@ import {
 } from "../../../core/definition/enums";
 import { VibeMode, VibeModeValues } from "../../../env/env-util";
 import { UserRole } from "../../../identity/roles/enum";
-import { scopedTranslation } from "./i18n";
 import {
   objectField,
   requestField,
   responseField,
 } from "../../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
 import { ServerFramework, ServerFrameworkOptions } from "../enum";
 import { START_ALIASES } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const { POST } = createEndpoint({
   scopedTranslation,

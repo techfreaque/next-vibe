@@ -4,9 +4,10 @@
  * @deprecated This file should no longer be used and will be removed in the future.
  */
 
+import { z } from "zod";
+
 import { dateSchema } from "../definition/common.schema";
 import type { TranslatedKeyType } from "../i18n/core/scoped-translation";
-import { z } from "zod";
 
 // Re-export dateSchema for consistency
 export { dateSchema };

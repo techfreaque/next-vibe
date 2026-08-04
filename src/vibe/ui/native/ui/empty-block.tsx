@@ -1,9 +1,9 @@
 import { styled } from "nativewind";
-import { cn } from "../../../unified-ui/_shared/cn";
 import { Pressable, View } from "react-native";
 
-import { styledNative } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { EmptyBlockProps } from "../../web/ui/empty-block";
+import { styledNative } from "../utils/style-converter";
 import { Text } from "./text";
 
 export type {

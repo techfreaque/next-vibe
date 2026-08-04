@@ -148,9 +148,7 @@ const { POST } = createEndpoint({
     },
   }),
 
-  errorTypes: {
-    /* all 9 - exhaustive, compiler enforced */
-  },
+  errorTypes: {/* all 9 - exhaustive, compiler enforced */},
   successTypes: { title: "success.title", description: "success.description" },
   examples: {
     requests: { default: { name: "Jane Smith", message: "Hello!" } },

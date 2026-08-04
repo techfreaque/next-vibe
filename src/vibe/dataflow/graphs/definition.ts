@@ -2,6 +2,8 @@
  * Vibe Sense - Graphs List + Create Endpoint Definitions
  */
 
+import { z } from "zod";
+
 import { dateSchema } from "../../core/definition/common.schema";
 import { createEndpoint } from "../../core/definition/create-i18n";
 import {
@@ -11,8 +13,6 @@ import {
   Methods,
   WidgetType,
 } from "../../core/definition/enums";
-import { graphConfigSchema } from "../graph/schema";
-import { scopedTranslation } from "./i18n";
 import { UserRole } from "../../identity/roles/enum";
 import { lazyWidget } from "../../unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "../../unified-ui/_shared/utils";
@@ -22,9 +22,9 @@ import {
   responseArrayField,
   responseField,
 } from "../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
+import { graphConfigSchema } from "../graph/schema";
 import { VIBE_SENSE_GRAPHS_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const GraphListContainer = lazyWidget(() =>
   import("./widget").then((m) => ({

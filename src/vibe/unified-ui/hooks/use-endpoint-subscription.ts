@@ -20,22 +20,22 @@
  * Both carry only THIS endpoint instance's events — no cross-endpoint filtering.
  */
 
+import { useEffect, useRef } from "react";
+
 import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import type { ResponseType } from "../../core/route/response.schema";
 import type { WidgetData } from "../../core/utils/json";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
+import { subscribeToChannel } from "../../realtime/client/client";
 import {
   buildUserWsChannel,
   buildWsChannel,
 } from "../../realtime/core/channel";
-import { subscribeToChannel } from "../../realtime/client/client";
 import type { AnyEndpointEventEnvelope } from "../../realtime/core/structured-events";
 import { eventDeclarationHasFields } from "../../realtime/core/structured-events";
 import type { WsChannelDescriptor } from "../../realtime/core/types";
-import { useEffect, useRef } from "react";
-
 import {
   appendDeltaToCache,
   applyPartialToCache,

@@ -4,14 +4,9 @@
  * Following migration guide: Files at level of usage, split god repositories
  */
 
+import { z } from "zod";
+
 import { UserRole } from "../../../identity/roles/enum";
-import { createEndpoint } from "../../definition/create";
-import {
-  EndpointErrorTypes,
-  FieldDataType,
-  Methods,
-  WidgetType,
-} from "../../definition/enums";
 import { CLI_BINARY_NAME } from "../../../platforms/cli/types/cli-target";
 import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
 import {
@@ -19,7 +14,13 @@ import {
   requestField,
   responseField,
 } from "../../../unified-ui/_shared/utils";
-import { z } from "zod";
+import { createEndpoint } from "../../definition/create";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  Methods,
+  WidgetType,
+} from "../../definition/enums";
 
 // Lazy import to avoid TDZ circular dependency in MCP context
 // (widget.tsx type-imports definition → circular module resolution → "Cannot access 'default' before initialization")

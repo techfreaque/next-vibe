@@ -5,8 +5,6 @@
 
 "use client";
 
-import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
-import { FieldDataType } from "../../../../core/definition/enums";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import {
@@ -18,6 +16,11 @@ import {
 import { Search } from "next-vibe/ui/ui/icons/Search";
 import { Input } from "next-vibe/ui/ui/input";
 import { Span } from "next-vibe/ui/ui/span";
+import type { JSX } from "react";
+import type { z } from "zod";
+
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
+import { FieldDataType } from "../../../../core/definition/enums";
 import { cn } from "../../../_shared/cn";
 import type { ReactStaticWidgetProps } from "../../../_shared/react-types";
 import type { FieldUsageConfig } from "../../../_shared/types";
@@ -31,9 +34,6 @@ import {
 } from "../../../_shared/use-widget-context";
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "../../../hooks/i18n";
 import { Icon } from "../../form-fields/icon-field/icon-component";
-import type { JSX } from "react";
-import type { z } from "zod";
-
 import type { SearchBarWidgetConfig } from "./types";
 
 const SIZE = {

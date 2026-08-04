@@ -2,8 +2,8 @@
  * Vibe Sense - Shared Enums
  */
 
-import { scopedTranslation } from "./i18n";
 import { createEnumOptions } from "../unified-ui/_shared/enum";
+import { scopedTranslation } from "./i18n";
 
 export const {
   enum: GraphResolution,

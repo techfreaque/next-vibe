@@ -1,10 +1,6 @@
 import "server-only";
 
 import type { ToolExecutionContext } from "next-vibe/core/execution-context";
-import {
-  checkMediaBalance,
-  deductMediaCredits,
-} from "../../shared/media-generation";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
@@ -14,6 +10,10 @@ import type { Platform } from "next-vibe/platforms/platforms";
 
 import { STANDARD_MARKUP_PERCENTAGE } from "@/products/constants";
 
+import {
+  checkMediaBalance,
+  deductMediaCredits,
+} from "../../shared/media-generation";
 import definitions, {
   type MusicGenerationPostRequestOutput,
 } from "../definition";

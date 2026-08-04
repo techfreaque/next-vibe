@@ -6,16 +6,6 @@
 
 import "server-only";
 
-import type { HeadlessAiStreamResult } from "../repository/setup/setup";
-import type { ToolExecutionContext } from "../../../core/execution-context";
-import {
-  DefaultFolderId,
-  rootlessToolExecutionContext,
-} from "../../../core/execution-context";
-import type { ChatMessage, MessageMetadata } from "../../chat/db";
-import { ChatMessageRole, ThreadStreamingState } from "../../chat/enum";
-import { NO_SKILL_ID } from "../../skills/constants";
-import type { FavoriteConfig } from "../../skills/favorites/db";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
@@ -28,7 +18,17 @@ import { identityEnv } from "next-vibe/identity/env";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 
+import type { ToolExecutionContext } from "../../../core/execution-context";
+import {
+  DefaultFolderId,
+  rootlessToolExecutionContext,
+} from "../../../core/execution-context";
+import type { ChatMessage, MessageMetadata } from "../../chat/db";
+import { ChatMessageRole, ThreadStreamingState } from "../../chat/enum";
+import { NO_SKILL_ID } from "../../skills/constants";
+import type { FavoriteConfig } from "../../skills/favorites/db";
 import type { ChatModelId } from "../models";
+import type { HeadlessAiStreamResult } from "../repository/setup/setup";
 
 /**
  * Resolve a test user by email+password using endpoints only.

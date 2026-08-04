@@ -10,6 +10,8 @@
  * event type system; there is no Zod-schema event variant.
  */
 
+import { z } from "zod";
+
 import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import { Methods } from "../../core/definition/enums";
 import {
@@ -21,8 +23,6 @@ import type {
   CacheKeyParamValue,
   CacheKeyRequestInput,
 } from "../../unified-ui/hooks/query-key-builder";
-import { z } from "zod";
-
 import type { AnyEndpointEventEnvelope } from "./structured-events";
 
 // ============================================================================

@@ -4,12 +4,12 @@
  */
 import { Box, Text, useInput } from "ink";
 import TextInput from "ink-text-input";
-import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useState } from "react";
 
-import { useCaptureArrows, useCliFieldFocus } from "../lib/focus-manager";
+import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { NumberInputProps } from "../../web/ui/number-input";
+import { useCaptureArrows, useCliFieldFocus } from "../lib/focus-manager";
 
 export type { NumberInputProps } from "../../web/ui/number-input";
 

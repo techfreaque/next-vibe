@@ -1,9 +1,7 @@
 "use client";
 
-import { StreamErrorType } from "../../../../../ai-stream/repository/core/constants";
-import type { DefaultFolderId } from "next-vibe/core/execution-context";
-import type { ChatMessage } from "../../../../db";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import type { DefaultFolderId } from "next-vibe/core/execution-context";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { scopedTranslation as vibeScopedTranslation } from "next-vibe/core/i18n/shared";
 import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
@@ -28,6 +26,8 @@ import { useState } from "react";
 import type { ContactRequest } from "@/contact/definition";
 import { useUser } from "@/user/private/me/hooks";
 
+import { StreamErrorType } from "../../../../../ai-stream/repository/core/constants";
+import type { ChatMessage } from "../../../../db";
 import { scopedTranslation } from "../i18n";
 import { CopyButton } from "./copy-button";
 import { useMessageGroupName } from "./embedded-context";

@@ -1,5 +1,8 @@
 "use client";
 
+import React, { type JSX, Suspense } from "react";
+import type { z } from "zod";
+
 import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
 import { FieldDataType, WidgetType } from "../../../core/definition/enums";
 import type { ReactWidgetProps } from "../../_shared/react-types";
@@ -10,9 +13,6 @@ import type {
   FieldUsageConfig,
 } from "../../_shared/types";
 import { useWidgetLocale } from "../../_shared/use-widget-context";
-import React, { type JSX, Suspense } from "react";
-import type { z } from "zod";
-
 import { WidgetErrorBoundary } from "./ErrorBoundary";
 
 /**

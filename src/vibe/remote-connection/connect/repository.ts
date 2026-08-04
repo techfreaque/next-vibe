@@ -15,6 +15,11 @@
 import "server-only";
 
 import { and, eq } from "drizzle-orm";
+
+import loginEndpoints, {
+  type LoginPostResponseOutput,
+} from "@/user/public/login/definition";
+
 import { coreEnv } from "../../core/env";
 import { coreClientEnv as envClient } from "../../core/env-client";
 import type { CountryLanguage } from "../../core/i18n/core/config";
@@ -28,11 +33,6 @@ import { db } from "../../database";
 import { AuthRepository } from "../../identity/auth/repository";
 import type { JwtPrivatePayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
-
-import loginEndpoints, {
-  type LoginPostResponseOutput,
-} from "@/user/public/login/definition";
-
 import registerEndpoints from "../connect-reverse/definition";
 import {
   remoteConnections,

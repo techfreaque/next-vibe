@@ -1,11 +1,11 @@
 "use client";
 
 import * as AccordionPrimitive from "@radix-ui/react-accordion";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 
-import { ChevronDownIcon } from "./icons/ChevronDownIcon";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { StyleType } from "../utils/style-type";
+import { ChevronDownIcon } from "./icons/ChevronDownIcon";
 
 // Accordion
 export type AccordionProps = {

@@ -3,6 +3,8 @@
  * POST - login to remote instance and store session in DB
  */
 
+import { z } from "zod";
+
 import { createEndpoint } from "../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -21,8 +23,6 @@ import {
   responseField,
   widgetField,
 } from "../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
 import { SyncScopeSchema } from "../db";
 import type { RemoteConnectionsListResponseOutput } from "../list/definition";
 import { scopedTranslation } from "./i18n";

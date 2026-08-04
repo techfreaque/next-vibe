@@ -1,9 +1,10 @@
 import "server-only";
 
+import { z } from "zod";
+
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import { defaultLocale } from "../../core/i18n/core/config";
 import { defineEnv } from "../../env/define-env";
-import { z } from "zod";
 
 export const {
   env: cliEnv,

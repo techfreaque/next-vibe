@@ -7,7 +7,11 @@
 
 /* eslint-disable i18next/no-literal-string */
 
-import type { GraphConfig, GraphSeedEntry } from "./graph/types";
+import { EVALUATOR_THRESHOLD_ALIAS } from "@/analytics/evaluators/threshold/constants";
+import { EMA_ALIAS } from "@/analytics/indicators/ema/constants";
+import { WINDOW_AVG_ALIAS } from "@/analytics/indicators/window-avg/constants";
+import { TRANSFORMER_RATIO_ALIAS } from "@/analytics/transformers/ratio/constants";
+
 import { COMPLETE_TASK_ALIAS } from "../execute-tool/complete/constants";
 import { ERROR_LOGS_ERRORS_ALIAS } from "../logger/error-monitor/data-sources/error-logs-errors/constants";
 import { ERROR_LOGS_TOTAL_ALIAS } from "../logger/error-monitor/data-sources/error-logs-total/constants";
@@ -15,13 +19,8 @@ import { ERROR_LOGS_WARNINGS_ALIAS } from "../logger/error-monitor/data-sources/
 import { CRON_EXECUTIONS_FAILED_ALIAS } from "../tasks/data-sources/cron-executions-failed/constants";
 import { CRON_EXECUTIONS_SUCCEEDED_ALIAS } from "../tasks/data-sources/cron-executions-succeeded/constants";
 import { CRON_EXECUTIONS_TOTAL_ALIAS } from "../tasks/data-sources/cron-executions-total/constants";
-
-import { EVALUATOR_THRESHOLD_ALIAS } from "@/analytics/evaluators/threshold/constants";
-import { EMA_ALIAS } from "@/analytics/indicators/ema/constants";
-import { WINDOW_AVG_ALIAS } from "@/analytics/indicators/window-avg/constants";
-import { TRANSFORMER_RATIO_ALIAS } from "@/analytics/transformers/ratio/constants";
-
 import { GraphResolution } from "./enum";
+import type { GraphConfig, GraphSeedEntry } from "./graph/types";
 
 // ─── Color palette ──────────────────────────────────────────────────────────
 

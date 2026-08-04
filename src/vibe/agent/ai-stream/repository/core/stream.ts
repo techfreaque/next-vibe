@@ -16,11 +16,11 @@ import { CronTaskStatus } from "next-vibe/tasks/enum";
 
 import type { CreditsT as ModuleT } from "@/credits/i18n";
 
-import { bubbleFolderActivity } from "../../../chat/bubble-folder-activity";
 import type {
   DefaultFolderId,
   ToolExecutionContext,
 } from "../../../../core/execution-context";
+import { bubbleFolderActivity } from "../../../chat/bubble-folder-activity";
 import {
   chatThreads,
   type MessageMetadata,

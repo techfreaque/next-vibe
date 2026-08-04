@@ -1,17 +1,18 @@
 import { styled } from "nativewind";
-import { cn } from "../../../unified-ui/_shared/cn";
 import React, { useEffect, useState } from "react";
 import { Appearance, useColorScheme, View } from "react-native";
+
+import { cn } from "../../../unified-ui/_shared/cn";
 
 /** Mirrors the web constant - no cookie in React Native but exported for interface parity */
 export const THEME_COOKIE_NAME = "theme_v2";
 
-import { convertCSSToViewStyle } from "../utils/style-converter";
 import type {
   ThemeProviderProps,
   UseThemeToggleReturn,
 } from "../../web/ui/theme-provider";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 
 const StyledView = styled(View, { className: "style" });
 

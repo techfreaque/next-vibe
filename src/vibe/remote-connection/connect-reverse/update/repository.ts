@@ -10,6 +10,7 @@
 import "server-only";
 
 import { and, eq } from "drizzle-orm";
+
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -20,7 +21,6 @@ import {
 import { db } from "../../../database";
 import type { JwtPrivatePayloadType } from "../../../identity/auth/types";
 import type { EndpointLogger } from "../../../logger/types";
-
 import { remoteConnections } from "../../db";
 import type { ReverseUpdatePatchRequestOutput } from "./definition";
 import { scopedTranslation } from "./i18n";

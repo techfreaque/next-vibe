@@ -14,13 +14,12 @@ import {
 } from "../../../core/route/response.schema";
 import { parseError } from "../../../core/utils/parse-error";
 import type { EndpointLogger } from "../../../logger/types";
-import type { PulseExecuteT } from "./i18n";
-
 import { PulseHealthRepository } from "../repository";
 import type {
   PulseExecuteRequestOutput,
   PulseExecuteResponseOutput,
 } from "./definition";
+import type { PulseExecuteT } from "./i18n";
 
 /**
  * Pulse Execute Repository Implementation

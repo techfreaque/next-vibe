@@ -26,6 +26,7 @@
 
 import "server-only";
 
+import type { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import {
@@ -35,7 +36,6 @@ import {
 import { UserRolesRepository } from "next-vibe/identity/roles/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { DefaultFolderId } from "next-vibe/core/execution-context";
 import { type DefaultFolderConfig, getDefaultFolderConfig } from "../config";
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 

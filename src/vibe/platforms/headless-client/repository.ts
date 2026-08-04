@@ -4,28 +4,27 @@ import { mkdirSync, readFileSync } from "node:fs";
 import { hostname } from "node:os";
 import { join } from "node:path";
 
+import { coreEnv } from "../../core/env";
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
 } from "../../core/route/response.schema";
-import { coreEnv } from "../../core/env";
 import { parseError } from "../../core/utils/parse-error";
 import { db } from "../../database";
 import { isPglite } from "../../database/index";
-import { identityEnv } from "../../identity/env";
-import type { JwtPayloadType } from "../../identity/auth/types";
-import type { EndpointLogger } from "../../logger/types";
 import { Environment } from "../../env/env-util";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import { identityEnv } from "../../identity/env";
+import type { EndpointLogger } from "../../logger/types";
 import { RemoteConnectionRepository } from "../../remote-connection/repository";
-import { headlessClientEnv } from "./env";
-import { scopedTranslation } from "./i18n";
-
 import type {
   HeadlessClientRequestOutput,
   HeadlessClientResponseOutput,
 } from "./definition";
+import { headlessClientEnv } from "./env";
+import { scopedTranslation } from "./i18n";
 
 const TASK_RESTART_DELAYS_MS = [5000, 10000, 30000, 60000];
 
@@ -260,8 +259,7 @@ export class HeadlessClientRepository {
       }
 
       // Seed production data (admin user + roles) so the task runner can authenticate.
-      const { seedDatabase } =
-        await import("../../database/seed/seed-manager");
+      const { seedDatabase } = await import("../../database/seed/seed-manager");
       await seedDatabase("prod", logger, locale);
       logger.info("[HeadlessClient] Production seed complete");
       return null;

@@ -3,6 +3,8 @@
  * Displays an icon from the icon library
  */
 
+import type { z } from "zod";
+
 import type {
   IconSchemaGenericType,
   IconSchemaNullishType,
@@ -16,7 +18,6 @@ import type {
   FieldUsageConfig,
 } from "../../../_shared/types";
 import type { IconKey } from "../../form-fields/icon-field/icons";
-import type { z } from "zod";
 
 /**
  * Icon Widget Configuration

@@ -19,6 +19,8 @@ import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
+import { GENERATED_DIR, getApiDir } from "@/env/paths";
+
 import { getPreferredToolName } from "../core/core-utils/path";
 import type { CreateApiEndpointAny } from "../core/definition/endpoint-base";
 import { Methods } from "../core/definition/enums";
@@ -43,8 +45,6 @@ import {
 } from "../identity/roles/enum";
 import type { EndpointLogger } from "../logger/types";
 import type { RemoteToolCapability } from "./db";
-
-import { GENERATED_DIR, getApiDir } from "@/env/paths";
 
 const OUTPUT_DIR = `${GENERATED_DIR}/remote-capabilities`;
 

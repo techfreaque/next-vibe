@@ -5,6 +5,8 @@
  */
 import "server-only";
 
+import { BEARER_LEAD_ID_SEPARATOR } from "@/env/constants";
+
 import type {
   ErrorResponseType,
   ResponseType,
@@ -12,9 +14,6 @@ import type {
 import { ErrorResponseTypes, fail } from "../../../core/route/response.schema";
 import type { WidgetData } from "../../../core/utils/json";
 import type { AiT } from "../../../platforms/ai/i18n";
-
-import { BEARER_LEAD_ID_SEPARATOR } from "@/env/constants";
-
 import type { RouteExecuteResponseOutput } from "../../definition";
 import executeDefinition from "../../definition";
 import type { RouteExecuteContext } from "../types";

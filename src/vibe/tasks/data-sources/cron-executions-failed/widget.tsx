@@ -4,10 +4,10 @@
 
 "use client";
 
-import { DataSourceChartWidget } from "../../../dataflow/shared/data-source-widget";
-import { useWidgetTranslation } from "../../../unified-ui/_shared/use-widget-context";
 import React from "react";
 
+import { DataSourceChartWidget } from "../../../dataflow/shared/data-source-widget";
+import { useWidgetTranslation } from "../../../unified-ui/_shared/use-widget-context";
 import definitions from "./definition";
 
 export function CronExecutionsFailedWidget(): React.JSX.Element {

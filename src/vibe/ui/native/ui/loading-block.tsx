@@ -1,7 +1,7 @@
 import { styled } from "nativewind";
-import { cn } from "../../../unified-ui/_shared/cn";
 import { ActivityIndicator, View } from "react-native";
 
+import { cn } from "../../../unified-ui/_shared/cn";
 import type {
   LoadingBlockProps,
   LoadingBlockSize,

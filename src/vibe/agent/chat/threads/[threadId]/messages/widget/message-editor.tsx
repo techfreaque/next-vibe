@@ -6,13 +6,13 @@
  * Thin wrapper around BaseMessageInput - keeps useMessageEditor hook for state.
  */
 
-import type { ChatMessage } from "../../../../db";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { GitBranch } from "next-vibe/ui/ui/icons/GitBranch";
 import type { JSX } from "react";
 
+import type { ChatMessage } from "../../../../db";
 import { useMessageEditor } from "../hooks/use-message-editor";
 import { BaseMessageInput } from "./base-message-input";
 

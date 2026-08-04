@@ -4,10 +4,12 @@
  */
 
 "use client";
-import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Div } from "next-vibe/ui/ui/div";
 import { Span } from "next-vibe/ui/ui/span";
 import { Title } from "next-vibe/ui/ui/title";
+import type { JSX } from "react";
+
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { cn } from "../../../_shared/cn";
 import type {
   ReactRequestResponseWidgetProps,
@@ -28,8 +30,6 @@ import {
   getTextSizeClassName,
 } from "../../../_shared/widget-helpers";
 import { formatIfDate } from "../text/shared";
-import type { JSX } from "react";
-
 import { extractTitleData } from "./shared";
 import type { TitleWidgetConfig, TitleWidgetSchema } from "./types";
 
@@ -75,9 +75,9 @@ function getAlignmentClass(
  */
 export function TitleWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends TEndpoint extends CreateApiEndpointAny
+  TKey extends (TEndpoint extends CreateApiEndpointAny
     ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
-    : never,
+    : never),
   TUsage extends FieldUsageConfig,
 >(
   props: TUsage extends { response: true }

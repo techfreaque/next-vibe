@@ -2,14 +2,14 @@
 
 import { Div } from "next-vibe/ui/ui/div";
 import { Span } from "next-vibe/ui/ui/span";
+import type { JSX } from "react";
+
 import { withValue } from "../../../unified-ui/_shared/field-helpers";
 import { useWidgetValue } from "../../../unified-ui/_shared/use-widget-context";
 import { AlertWidget } from "../../../unified-ui/widgets/display-only/alert/widget";
 import { BooleanFieldWidget } from "../../../unified-ui/widgets/form-fields/boolean-field/widget";
 import { FormAlertWidget } from "../../../unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "../../../unified-ui/widgets/interactive/submit-button/widget";
-import type { JSX } from "react";
-
 import type definition from "./definition";
 
 interface CustomWidgetProps {

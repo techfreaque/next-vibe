@@ -3,13 +3,14 @@
  * Displays very small, muted supplementary text for timestamps and metadata
  */
 
+import type { z } from "zod";
+
 import type { WidgetType } from "../../../../core/definition/enums";
 import type { StringWidgetSchema } from "../../../_shared/schema-constraints";
 import type {
   BasePrimitiveWidgetConfig,
   FieldUsageConfig,
 } from "../../../_shared/types";
-import type { z } from "zod";
 
 /**
  * Metadata widget schema - must be a string

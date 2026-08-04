@@ -3,6 +3,8 @@
  * Static class for parsing CLI arguments and handling input data processing
  */
 
+import type { z } from "zod";
+
 import { isEmptySchema } from "../../../core/core-utils/validation";
 import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
 import type { WidgetData } from "../../../core/utils/json";
@@ -10,7 +12,6 @@ import { parseError } from "../../../core/utils/parse-error";
 import type { EndpointLogger } from "../../../logger/types";
 import { hasChildren } from "../../../unified-ui/_shared/type-guards";
 import { SchemaUIHandler } from "../../../unified-ui/renderers/cli/response/schema-handler";
-import type { z } from "zod";
 
 /**
  * CLI Input Parser - Static class for all input parsing and handling

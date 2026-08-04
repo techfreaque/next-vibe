@@ -49,12 +49,10 @@ export class QueryLeadsEngagementsRepository {
       .groupBy(sql`1`)
       .orderBy(sql`1`);
 
-    const raw = rows.map(
-      (r): DataPoint => ({
-        timestamp: new Date(r.bucket),
-        value: Number(r.cnt),
-      }),
-    );
+    const raw = rows.map((r): DataPoint => ({
+      timestamp: new Date(r.bucket),
+      value: Number(r.cnt),
+    }));
     const result = fillGaps(raw, range, resolution);
     return success({
       result,

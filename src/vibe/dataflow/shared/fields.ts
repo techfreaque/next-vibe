@@ -8,6 +8,8 @@
  * transformers, data sources).
  */
 
+import { z } from "zod";
+
 import { dateSchema } from "../../core/definition/common.schema";
 import { FieldDataType, WidgetType } from "../../core/definition/enums";
 import { lazyWidget } from "../../unified-ui/_shared/lazy-widget";
@@ -16,8 +18,6 @@ import {
   requestField,
   responseField,
 } from "../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
 import { GraphResolution, GraphResolutionDB } from "../enum";
 
 // ─── Core Data Types ─────────────────────────────────────────────────────────

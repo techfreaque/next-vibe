@@ -1,6 +1,4 @@
 "use client";
-import type { ChatModelId } from "../../../../../ai-stream/models";
-import { getChatModelById } from "../../../../../ai-stream/models";
 import type { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Div } from "next-vibe/ui/ui/div";
@@ -12,6 +10,8 @@ import { useEffect, useState } from "react";
 
 import { formatRelativeTime } from "@/_pages/chat/lib/utils/formatting";
 
+import type { ChatModelId } from "../../../../../ai-stream/models";
+import { getChatModelById } from "../../../../../ai-stream/models";
 import { scopedTranslation } from "../i18n";
 
 function RelativeTimestamp({

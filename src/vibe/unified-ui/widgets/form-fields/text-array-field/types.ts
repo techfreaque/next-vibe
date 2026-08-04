@@ -3,8 +3,9 @@
  * Handles TEXT_ARRAY field type - array of text strings
  */
 
-import type { FieldDataType } from "../../../../core/definition/enums";
 import type { TagOption } from "next-vibe/ui/ui/tags-field";
+
+import type { FieldDataType } from "../../../../core/definition/enums";
 import type { ArrayWidgetSchema } from "../../../_shared/schema-constraints";
 import type { FieldUsageConfig } from "../../../_shared/types";
 import type { BaseFormFieldWidgetConfig } from "../_shared/types";

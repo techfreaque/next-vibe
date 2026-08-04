@@ -30,8 +30,6 @@ import {
 import { parseError } from "../../../core/utils/parse-error";
 import { db } from "../../../database";
 import type { EndpointLogger } from "../../../logger/types";
-import { scopedTranslation } from "./i18n";
-
 import { frameExchangeTokens } from "../db";
 import { generateFrameId } from "../types";
 import type {
@@ -40,6 +38,7 @@ import type {
   VibeFrameConfigResponseOutput,
   WidgetResponse,
 } from "./definition";
+import { scopedTranslation } from "./i18n";
 
 // ─── Repository ──────────────────────────────────────────────────────────────
 

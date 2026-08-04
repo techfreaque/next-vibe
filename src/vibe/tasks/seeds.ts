@@ -8,13 +8,13 @@
 /* eslint-disable i18next/no-literal-string */
 
 import { sql } from "drizzle-orm";
+
 import { getPreferredToolName } from "../core/core-utils/path";
 import type { WidgetData } from "../core/utils/json";
 import { db } from "../database";
 import type { EndpointLogger } from "../logger/types";
 import type { NewCronTask } from "./cron/db";
 import { cronTasks } from "./cron/db";
-
 import { CronTaskPriority } from "./enum";
 
 /**

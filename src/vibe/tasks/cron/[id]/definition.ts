@@ -3,6 +3,8 @@
  * Endpoints for managing individual cron tasks
  */
 
+import { z } from "zod";
+
 import { dateSchema } from "../../../core/definition/common.schema";
 import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
@@ -13,7 +15,17 @@ import {
   WidgetType,
 } from "../../../core/definition/enums";
 import { UserRole } from "../../../identity/roles/enum";
-import { scopedTranslation } from "./i18n";
+import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "../../../unified-ui/_shared/utils";
+import {
+  backButton,
+  objectField,
+  requestField,
+  requestUrlPathParamsField,
+  responseField,
+  submitButton,
+  widgetField,
+} from "../../../unified-ui/_shared/utils-i18n";
 import {
   CronTaskPriority,
   CronTaskPriorityOptions,
@@ -27,25 +39,13 @@ import {
   TaskCategoryDB,
   TaskOutputModeDB,
 } from "../../enum";
-import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
-import { customWidgetObject } from "../../../unified-ui/_shared/utils";
-import {
-  backButton,
-  objectField,
-  requestField,
-  requestUrlPathParamsField,
-  responseField,
-  submitButton,
-  widgetField,
-} from "../../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
 import { taskInputSchema, taskOwnerSchema } from "../db";
 import {
   CRON_DELETE_ALIAS,
   CRON_GET_ALIAS,
   CRON_UPDATE_ALIAS,
 } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const CronTaskDetailContainer = lazyWidget(() =>
   import("./widget/widget").then((m) => ({

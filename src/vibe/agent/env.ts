@@ -8,10 +8,11 @@
 
 import "server-only";
 
-import { DEFAULT_CHAT_MODEL_ID } from "./ai-stream/constants";
-import { ChatModelId } from "./ai-stream/models";
 import { defineEnv } from "next-vibe/env/define-env";
 import { z } from "zod";
+
+import { DEFAULT_CHAT_MODEL_ID } from "./ai-stream/constants";
+import { ChatModelId } from "./ai-stream/models";
 
 // Resolved once at module load - used by both CLAUDE_CODE_ENABLED and VIBE_TEST_AI_MODEL
 function resolveClaudeCodeEnabled(): boolean {

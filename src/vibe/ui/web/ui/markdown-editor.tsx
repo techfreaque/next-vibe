@@ -27,7 +27,6 @@ import { ListOrdered } from "next-vibe/ui/ui/icons/ListOrdered";
 import { Minus } from "next-vibe/ui/ui/icons/Minus";
 import { Quote } from "next-vibe/ui/ui/icons/Quote";
 import { Strikethrough } from "next-vibe/ui/ui/icons/Strikethrough";
-import { cn } from "../../../unified-ui/_shared/cn";
 import type { JSX } from "react";
 import { useCallback, useEffect, useRef } from "react";
 import {
@@ -35,6 +34,7 @@ import {
   type MarkdownStorage,
 } from "tiptap-markdown";
 
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { StyleType } from "../utils/style-type";
 
 /**

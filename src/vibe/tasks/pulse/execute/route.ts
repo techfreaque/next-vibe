@@ -5,7 +5,6 @@
 
 import { Methods } from "../../../core/definition/enums";
 import { endpointsHandler } from "../../../core/route/multi";
-
 import pulseExecuteEndpoints from "./definition";
 import { PulseExecuteRepository } from "./repository";
 

@@ -1,6 +1,8 @@
 "use client";
-import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Avatar, AvatarFallback, AvatarImage } from "next-vibe/ui/ui/avatar";
+import type { JSX } from "react";
+
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { cn } from "../../../_shared/cn";
 import type {
   ReactRequestResponseWidgetProps,
@@ -13,8 +15,6 @@ import {
   useWidgetTranslation,
 } from "../../../_shared/use-widget-context";
 import { getTextSizeClassName } from "../../../_shared/widget-helpers";
-import type { JSX } from "react";
-
 import type { AvatarWidgetConfig } from "./types";
 
 /**
@@ -51,9 +51,9 @@ import type { AvatarWidgetConfig } from "./types";
 
 export default function AvatarWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends TEndpoint extends CreateApiEndpointAny
+  TKey extends (TEndpoint extends CreateApiEndpointAny
     ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
-    : never,
+    : never),
   TUsage extends FieldUsageConfig,
   TSchema extends StringWidgetSchema,
 >(

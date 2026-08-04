@@ -7,13 +7,13 @@ import Animated, {
   LinearTransition,
 } from "react-native-reanimated";
 
-import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import type {
   CollapsibleContentProps,
   CollapsibleProps,
   CollapsibleTriggerProps,
 } from "../../web/ui/collapsible";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 
 const StyledAnimatedView = styledNative(Animated.View);
 

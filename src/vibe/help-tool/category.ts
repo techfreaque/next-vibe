@@ -3,11 +3,10 @@
  * Covers code generation, build tools, quality checks, server management, and tasks.
  */
 
-import { SYSTEM_SETTINGS_ALIAS } from "../env/settings/constants";
-import { UserPermissionRole } from "../identity/roles/enum";
-
 import { USER_ME_ALIAS } from "@/user/private/me/constants";
 
+import { SYSTEM_SETTINGS_ALIAS } from "../env/settings/constants";
+import { UserPermissionRole } from "../identity/roles/enum";
 import type { CategoryDefinition } from "./category-types";
 
 export const category: CategoryDefinition = {

@@ -3,8 +3,6 @@
  * Handles upvoting and downvoting messages
  */
 
-import { rootFolderIdOptions } from "../../../../../config";
-import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -13,6 +11,7 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import {
   objectField,
@@ -22,6 +21,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { rootFolderIdOptions } from "../../../../../config";
 import { scopedTranslation } from "./i18n";
 
 /**

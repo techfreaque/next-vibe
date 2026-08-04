@@ -1,10 +1,9 @@
 // oxlint-disable prefer-tag-over-role
 import { styled } from "nativewind";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import { Text as RNText } from "react-native";
 
-import { convertCSSToTextStyle } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type {
   AccessibilityRoleValue,
   BlockQuoteProps,
@@ -20,6 +19,7 @@ import type {
   SmallProps,
 } from "../../web/ui/typography";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToTextStyle } from "../utils/style-converter";
 
 const StyledText = styled(RNText, { className: "style" });
 

@@ -2,12 +2,11 @@
  * AutocompleteField Component for React Native
  * Production-ready autocomplete with search, categories, and custom values
  */
-import { useTranslation } from "../../../core/i18n/core/client";
-import { cn } from "../../../unified-ui/_shared/cn";
 import React, { useMemo, useState } from "react";
 import { Pressable, ScrollView, Text as RNText, View } from "react-native";
 
-import { Check, ChevronDown, Search, X } from "./icons";
+import { useTranslation } from "../../../core/i18n/core/client";
+import { cn } from "../../../unified-ui/_shared/cn";
 import { uiScopedTranslation } from "../../web/i18n";
 import type {
   AutocompleteFieldProps,
@@ -15,6 +14,7 @@ import type {
   AutocompleteOptionBase,
 } from "../../web/ui/autocomplete-field";
 import { Badge } from "./badge";
+import { Check, ChevronDown, Search, X } from "./icons";
 import { Input } from "./input";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { Text as UIText } from "./text";

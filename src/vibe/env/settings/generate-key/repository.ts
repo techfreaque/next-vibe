@@ -14,10 +14,9 @@ import {
   success,
 } from "../../../core/route/response.schema";
 import { parseError } from "../../../core/utils/parse-error";
-import type { GenerateKeyT } from "./i18n";
 import type { EndpointLogger } from "../../../logger/types";
-
 import type { GenerateKeyResponseOutput } from "./definition";
+import type { GenerateKeyT } from "./i18n";
 
 export class GenerateKeyRepository {
   static generate(

@@ -22,7 +22,6 @@ import {
   OutputFormatEnum,
   SourcemapModeEnum,
 } from "../builder/enum";
-
 import manifest from "./package";
 
 const config: BuildConfig = {

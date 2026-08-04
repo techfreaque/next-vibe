@@ -3,9 +3,10 @@
  * Covers AI inference, generation, tools, and web search.
  */
 
-import { AI_STREAM_ALIAS } from "./ai-stream/stream/constants";
 import type { CategoryDefinition } from "next-vibe/help-tool/category-types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+
+import { AI_STREAM_ALIAS } from "./ai-stream/stream/constants";
 
 export const category: CategoryDefinition = {
   key: "ai",

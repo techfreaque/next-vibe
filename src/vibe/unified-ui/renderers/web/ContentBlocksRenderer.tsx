@@ -1,11 +1,12 @@
 "use client";
 
-import type { ContentBlock } from "../../../core/route/response.schema";
-import { Platform } from "../../../platforms/platforms";
 import { Div } from "next-vibe/ui/ui/div";
 import { Image } from "next-vibe/ui/ui/image";
 import { Span } from "next-vibe/ui/ui/span";
 import type { JSX } from "react";
+
+import type { ContentBlock } from "../../../core/route/response.schema";
+import { Platform } from "../../../platforms/platforms";
 
 /**
  * Renders ContentResponse blocks (text + images) from tool results.

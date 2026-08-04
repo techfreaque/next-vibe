@@ -8,7 +8,12 @@
 
 import "server-only";
 
-import type { ChatModelId } from "../../../models";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { createEndpointLogger } from "next-vibe/logger/server";
+import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
+
 import { rootlessToolExecutionContext } from "../../../../../core/execution-context";
 import { getEnvAvailability } from "../../../../env-availability";
 import type { ImageGenModelId } from "../../../../image-generation/models";
@@ -16,11 +21,7 @@ import { getBestImageGenModel } from "../../../../image-generation/models";
 import type { MusicGenModelId } from "../../../../music-generation/models";
 import { getBestMusicGenModel } from "../../../../music-generation/models";
 import { resolveFavorite } from "../../../../skills/resolver";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { createEndpointLogger } from "next-vibe/logger/server";
-import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
+import type { ChatModelId } from "../../../models";
 
 /**
  * A resolved test favorite: its DB id plus the CONCRETE models the stream would

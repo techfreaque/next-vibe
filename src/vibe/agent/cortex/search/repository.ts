@@ -6,6 +6,7 @@ import "server-only";
  * Falls back to FTS-only when embeddings are unavailable.
  */
 import { and, eq, isNotNull, like, sql } from "drizzle-orm";
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -18,7 +19,6 @@ import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 import { truncateContent } from "../_shared/text-utils";
 import { cortexNodes } from "../db";
 import { CortexCreditFeature, CortexNodeType } from "../enum";

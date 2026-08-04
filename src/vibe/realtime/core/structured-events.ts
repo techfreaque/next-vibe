@@ -1,11 +1,11 @@
+import type { z } from "zod";
+
 import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import type { WidgetData } from "../../core/utils/json";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import type { UserRoleValue } from "../../identity/roles/enum";
 import type { EndpointLogger } from "../../logger/types";
-import type { z } from "zod";
-
 import type { SyncDomain } from "./sync-domain";
 
 // ============================================================================

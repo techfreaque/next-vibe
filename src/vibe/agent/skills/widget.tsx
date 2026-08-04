@@ -3,9 +3,6 @@
  */
 
 "use client";
-import { useTourState } from "../chat/tour-state";
-import { ModelCreditDisplay } from "../models/widget/model-credit-display";
-import { getBestChatModelForFavorite } from "./favorites/[id]/definition";
 import { isCliPlatform } from "next-vibe/platforms/platforms";
 import { usePathname } from "next-vibe/ui/hooks/use-pathname";
 import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
@@ -71,12 +68,15 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelectorOnboardingContext } from "../ai-stream/stream/widget/selector/selector-onboarding/context";
 import { useChatSettings } from "../chat/settings/hooks";
 import { parseSkillId } from "../chat/slugify";
+import { useTourState } from "../chat/tour-state";
 import { useProviderAvailability } from "../env-availability-store";
+import { ModelCreditDisplay } from "../models/widget/model-credit-display";
 import skillDetailDefinitions from "./[id]/definition";
 import { COMPANION_SKILLS } from "./config";
 import type definition from "./definition";
 import type { SkillListItem } from "./definition";
 import { SkillOwnershipType, SkillSourceFilter, SkillTrustLevel } from "./enum";
+import { getBestChatModelForFavorite } from "./favorites/[id]/definition";
 import { useAddToFavorites, useFavoriteCreate } from "./favorites/create/hooks";
 import { useChatFavorites } from "./favorites/hooks/hooks";
 

@@ -1,16 +1,16 @@
 import * as TogglePrimitive from "@rn-primitives/toggle";
 import { cva } from "class-variance-authority";
 import type { LucideIcon } from "lucide-react-native";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 
-import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type {
   ToggleRootProps,
   ToggleSize,
   ToggleVariant,
 } from "../../web/ui/toggle";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { TextClassContext } from "./text";
 
 const toggleVariants = cva(

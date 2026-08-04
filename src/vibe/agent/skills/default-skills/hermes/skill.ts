@@ -1,6 +1,5 @@
 import { DEFAULT_CHAT_MODEL_ID } from "../../../ai-stream/constants";
 import { ChatModelId } from "../../../ai-stream/models";
-
 import type { Skill, SkillVariant } from "../../config";
 import {
   ContentLevel,

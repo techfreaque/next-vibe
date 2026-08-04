@@ -3,18 +3,6 @@
  * Defines endpoint for creating a new custom skill
  */
 
-import type { ChatModelSelection } from "../../ai-stream/models";
-import { getClientAvailability } from "../../env-availability-store";
-import {
-  audioVisionModelSelectionSchema,
-  imageVisionModelSelectionSchema,
-  videoVisionModelSelectionSchema,
-} from "../../ai-stream/vision-models";
-import { imageGenModelSelectionSchema } from "../../image-generation/models";
-import { musicGenModelSelectionSchema } from "../../music-generation/models";
-import { sttModelSelectionSchema } from "../../speech-to-text/models";
-import { voiceModelSelectionSchema } from "../../text-to-speech/models";
-import { videoGenModelSelectionSchema } from "../../video-generation/models";
 import {
   iconSchema,
   translatedValueSchema,
@@ -27,6 +15,7 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   backButton,
@@ -37,8 +26,19 @@ import {
 import { apiClient } from "next-vibe/unified-ui/hooks/store";
 import { z } from "zod";
 
-import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import type { ChatModelSelection } from "../../ai-stream/models";
 import { ChatModelId, getBestChatModel } from "../../ai-stream/models";
+import {
+  audioVisionModelSelectionSchema,
+  imageVisionModelSelectionSchema,
+  videoVisionModelSelectionSchema,
+} from "../../ai-stream/vision-models";
+import { getClientAvailability } from "../../env-availability-store";
+import { imageGenModelSelectionSchema } from "../../image-generation/models";
+import { musicGenModelSelectionSchema } from "../../music-generation/models";
+import { sttModelSelectionSchema } from "../../speech-to-text/models";
+import { voiceModelSelectionSchema } from "../../text-to-speech/models";
+import { videoGenModelSelectionSchema } from "../../video-generation/models";
 import { SKILL_CREATE_ALIAS } from "../constants";
 import { skillVariantsSchema } from "../db";
 import {

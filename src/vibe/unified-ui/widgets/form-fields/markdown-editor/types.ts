@@ -3,6 +3,8 @@
  * Editable text field with inline editing capability
  */
 
+import { z } from "zod";
+
 import type {
   SpacingSize,
   WidgetType,
@@ -15,7 +17,6 @@ import type {
   BasePrimitiveWidgetConfig,
   FieldUsageConfig,
 } from "../../../_shared/types";
-import { z } from "zod";
 
 /**
  * Editable text object schema - for complex edit configurations

@@ -7,6 +7,7 @@
 import "server-only";
 
 import { and, count, desc, eq, gte, ilike, lte } from "drizzle-orm";
+
 import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -17,11 +18,10 @@ import type { WidgetData } from "../../../core/utils/json";
 import { WidgetDataSchema } from "../../../core/utils/json";
 import { parseError } from "../../../core/utils/parse-error";
 import { db } from "../../../database";
-import type { ErrorLogsT } from "./i18n";
 import type { EndpointLogger } from "../../types";
 import type { LoggerMetadata } from "../../types";
-
 import { errorLogs } from "../db";
+import type { ErrorLogsT } from "./i18n";
 
 /**
  * Metadata is JSONB — at rest it is plain JSON (Errors/Dates already

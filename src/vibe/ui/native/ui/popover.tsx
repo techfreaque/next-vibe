@@ -1,11 +1,10 @@
 import * as PopoverPrimitive from "@rn-primitives/popover";
 import { styled } from "nativewind";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import { View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type {
   PopoverAnchorProps,
   PopoverCloseProps,
@@ -15,6 +14,7 @@ import type {
   PopoverTriggerProps,
 } from "../../web/ui/popover";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 import { TextClassContext } from "./text";
 
 const StyledView = styled(View, { className: "style" });

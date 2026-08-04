@@ -12,7 +12,6 @@ import type { IDefinitionsRegistry } from "../../../core/route/definitions-regis
 import { parseError } from "../../../core/utils/parse-error";
 import type { JwtPayloadType } from "../../../identity/auth/types";
 import type { EndpointLogger } from "../../../logger/types";
-
 import type { MCPRegistry } from "../registry";
 import { createMCPProtocolHandler } from "./protocol-handler";
 import { StdioTransport } from "./stdio-transport";

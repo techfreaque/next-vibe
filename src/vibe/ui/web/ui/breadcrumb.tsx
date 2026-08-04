@@ -1,12 +1,12 @@
 import { Slot } from "@radix-ui/react-slot";
-import { useTranslation } from "../../../core/i18n/core/client";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 
+import { useTranslation } from "../../../core/i18n/core/client";
+import { cn } from "../../../unified-ui/_shared/cn";
 import { uiScopedTranslation } from "../i18n";
+import type { StyleType } from "../utils/style-type";
 import { ChevronRightIcon } from "./icons/ChevronRightIcon";
 import { DotsHorizontalIcon } from "./icons/DotsHorizontalIcon";
-import type { StyleType } from "../utils/style-type";
 
 // Breadcrumb
 export type BreadcrumbProps = {

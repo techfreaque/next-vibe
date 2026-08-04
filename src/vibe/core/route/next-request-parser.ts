@@ -6,9 +6,10 @@
 
 import "server-only";
 
-import { parseError } from "../utils/parse-error";
-import type { EndpointLogger } from "../../logger/types";
 import type { NextRequest } from "next-vibe/ui/lib/request";
+
+import type { EndpointLogger } from "../../logger/types";
+import { parseError } from "../utils/parse-error";
 
 /**
  * Parsed JSON value type - recursive type for any JSON-compatible structure

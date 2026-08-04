@@ -3,7 +3,6 @@
  * Defines endpoints for listing and creating chat threads
  */
 
-import { ChatModelId } from "../../ai-stream/models";
 import { dateSchema } from "next-vibe/core/definition/common.schema";
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
@@ -13,8 +12,10 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { UserRole, UserRoleDB } from "next-vibe/identity/roles/enum";
 import type { EmitEventNamed } from "next-vibe/realtime/core/structured-events";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   objectField,
@@ -25,8 +26,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
-import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
-import { DefaultFolderId } from "next-vibe/core/execution-context";
+import { ChatModelId } from "../../ai-stream/models";
 import {
   ThreadStatus,
   ThreadStatusDB,

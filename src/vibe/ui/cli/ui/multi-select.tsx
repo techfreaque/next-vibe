@@ -3,10 +3,10 @@
  * Arrow keys to navigate, Space to toggle selection, Enter to confirm
  */
 import { Box, Text, useInput } from "ink";
-import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useState } from "react";
 
+import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type {
   MultiSelectOption,
   MultiSelectProps,

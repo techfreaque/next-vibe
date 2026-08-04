@@ -9,6 +9,8 @@
  *   CLI   - response mode (default) or interactive mode (--interactive flag)
  */
 
+import { z } from "zod";
+
 import { iconSchema } from "../core/definition/common.schema";
 import { createEndpoint } from "../core/definition/create-i18n";
 import {
@@ -18,15 +20,13 @@ import {
   WidgetType,
 } from "../core/definition/enums";
 import { WidgetDataSchema } from "../core/utils/json";
-import { scopedTranslation } from "./i18n";
 import { UserPermissionRole, UserRole } from "../identity/roles/enum";
 import { Platform } from "../platforms/platforms";
 import { lazyWidget } from "../unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "../unified-ui/_shared/utils";
 import { requestField, responseField } from "../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
 import { TOOL_HELP_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const HelpToolsWidget = lazyWidget(() =>
   import("./widget").then((m) => ({

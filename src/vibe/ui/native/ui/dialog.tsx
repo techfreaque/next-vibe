@@ -1,11 +1,9 @@
 import * as DialogPrimitive from "@rn-primitives/dialog";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
-import { X } from "./icons/X";
-import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type {
   DialogCloseProps,
   DialogContentProps,
@@ -19,6 +17,8 @@ import type {
   DialogTriggerProps,
 } from "../../web/ui/dialog";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
+import { X } from "./icons/X";
 
 const StyledView = styledNative(View);
 const StyledText = styledNative(Text);

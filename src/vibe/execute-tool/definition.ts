@@ -12,6 +12,8 @@
  *     --input='{}'
  */
 
+import { z } from "zod";
+
 import { createEndpoint } from "../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -26,8 +28,6 @@ import { Platform } from "../platforms/platforms";
 import { lazyWidget } from "../unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "../unified-ui/_shared/utils";
 import { requestField, responseField } from "../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
 import { EXECUTE_TOOL_ALIAS } from "./constants";
 // THE DEFINITION SEAM: the request fields that describe the tool call's DISPATCH
 // (instanceId → another instance; callbackMode → another time) rather than the

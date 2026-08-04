@@ -1,6 +1,8 @@
 "use client";
-import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Button } from "next-vibe/ui/ui/button";
+import type { JSX } from "react";
+
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { cn } from "../../../_shared/cn";
 import type { ReactDisplayWidgetProps } from "../../../_shared/react-types";
 import type { FieldUsageConfig } from "../../../_shared/types";
@@ -10,8 +12,6 @@ import {
   getSpacingClassName,
 } from "../../../_shared/widget-helpers";
 import { Icon } from "../../form-fields/icon-field/icon-component";
-import type { JSX } from "react";
-
 import type { ButtonWidgetConfig } from "./types";
 
 /**
@@ -20,9 +20,9 @@ import type { ButtonWidgetConfig } from "./types";
  */
 export function ButtonWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends TEndpoint extends CreateApiEndpointAny
+  TKey extends (TEndpoint extends CreateApiEndpointAny
     ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
-    : never,
+    : never),
   TUsage extends FieldUsageConfig,
   TSchemaType extends "widget",
 >({

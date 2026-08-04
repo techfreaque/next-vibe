@@ -6,6 +6,10 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
+import { cookies } from "next-vibe/ui/lib/headers";
+
+import { AUTH_TOKEN_COOKIE_NAME } from "@/env/constants";
+
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import type { ResponseType } from "../../core/route/response.schema";
 import {
@@ -15,14 +19,10 @@ import {
 } from "../../core/route/response.schema";
 import { parseError } from "../../core/utils/parse-error";
 import { db } from "../../database";
-import type { SessionT } from "./i18n";
-import { scopedTranslation } from "./i18n";
-import { cookies } from "next-vibe/ui/lib/headers";
-
-import { AUTH_TOKEN_COOKIE_NAME } from "@/env/constants";
-
 import type { NewSession, Session } from "./db";
 import { sessions } from "./db";
+import type { SessionT } from "./i18n";
+import { scopedTranslation } from "./i18n";
 
 interface CurrentSessionResult {
   userId: string;

@@ -3,18 +3,19 @@
  * GET: Generate a production-ready .env file with decrypted values
  */
 
+import { z } from "zod";
+
 import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   Methods,
   WidgetType,
 } from "../../../core/definition/enums";
-import { scopedTranslation } from "./i18n";
 import { UserRole } from "../../../identity/roles/enum";
 import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "../../../unified-ui/_shared/utils";
 import { responseField } from "../../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
+import { scopedTranslation } from "./i18n";
 
 const ExportEnvWidget = lazyWidget(() =>
   import("./widget").then((m) => ({

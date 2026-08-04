@@ -2,6 +2,8 @@
  * Chart Widget Type Definitions
  */
 
+import { z } from "zod";
+
 import type {
   SpacingSize,
   WidgetType,
@@ -11,7 +13,6 @@ import type {
   BasePrimitiveWidgetConfig,
   FieldUsageConfig,
 } from "../../../_shared/types";
-import { z } from "zod";
 
 /**
  * Chart data point schema - single data point with x/y coordinates

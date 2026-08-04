@@ -3,6 +3,16 @@
  * Default folder definitions and utilities
  */
 
+import { EXECUTE_TOOL_ALIAS } from "next-vibe/execute-tool/constants";
+import {
+  type UserPermissionRoleValue,
+  UserRole,
+} from "next-vibe/identity/roles/enum";
+import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+
+import type { ChatTranslationKey } from "@/_pages/chat/i18n";
+
+import { DefaultFolderId } from "../../core/execution-context";
 import {
   CORTEX_DELETE_ALIAS,
   CORTEX_EDIT_ALIAS,
@@ -15,15 +25,6 @@ import {
   CORTEX_TREE_ALIAS,
   CORTEX_WRITE_ALIAS,
 } from "../cortex/constants";
-import { DefaultFolderId } from "../../core/execution-context";
-import { EXECUTE_TOOL_ALIAS } from "next-vibe/execute-tool/constants";
-import {
-  type UserPermissionRoleValue,
-  UserRole,
-} from "next-vibe/identity/roles/enum";
-import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
-
-import type { ChatTranslationKey } from "@/_pages/chat/i18n";
 
 /** Root folder options shared by the get/patch/delete rootFolderId SELECT fields. */
 export const rootFolderIdOptions = [

@@ -2,7 +2,6 @@
 import "server-only";
 
 import type { SystemPromptFragment } from "../../ai-stream/system-prompt/types";
-
 import {
   formatEmptyFavoritesGuidance,
   formatFavoritesSummary,

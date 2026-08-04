@@ -16,6 +16,8 @@
 
 import "server-only";
 
+import { z } from "zod";
+
 import type { CreateApiEndpointAny } from "../core/definition/endpoint-base";
 import {
   enrichJsonSchemaFromFields,
@@ -29,7 +31,6 @@ import { permissionsRegistry } from "../core/permissions/registry";
 import type { InferJwtPayloadTypeFromRoles } from "../core/route/handler-roles";
 import { type ResponseType, success } from "../core/route/response.schema";
 import { searchField, searchItems } from "../core/utils/in-memory-search";
-import { scopedTranslation } from "./i18n";
 import {
   filterUserPermissionRoles,
   PlatformMarker,
@@ -40,14 +41,13 @@ import {
 import type { EndpointLogger } from "../logger/types";
 import { Platform } from "../platforms/platforms";
 import { generateSchemaForUsage } from "../unified-ui/_shared/utils";
-import { z } from "zod";
-
 import type {
   HelpGetRequestOutput,
   HelpGetResponseOutput,
   HelpToolMetadataSerialized,
   HelpToolParameters,
 } from "./definition";
+import { scopedTranslation } from "./i18n";
 import {
   resolveAgentPins,
   resolveEffectiveUser,

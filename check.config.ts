@@ -22,7 +22,7 @@ import type {
 // Vibe Check Defaults
 // --------------------------------------------------------
 const vibeCheck: CheckConfig["vibeCheck"] = {
-  fix: false,
+  fix: true,
   skipEslint: false,
   skipOxlint: false,
   skipTypecheck: false,

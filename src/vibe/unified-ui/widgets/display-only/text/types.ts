@@ -3,6 +3,8 @@
  * Displays text data with comprehensive formatting options
  */
 
+import type { z } from "zod";
+
 import type {
   FieldDataType,
   WidgetType,
@@ -19,7 +21,6 @@ import type {
   FieldUsageConfig,
 } from "../../../_shared/types";
 import type { SpacingSize } from "../title/types";
-import type { z } from "zod";
 
 /**
  * Text format types

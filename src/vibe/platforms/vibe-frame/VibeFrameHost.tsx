@@ -8,11 +8,11 @@
 
 "use client";
 
-import type { CountryLanguage } from "../../core/i18n/core/config";
 import { getCurrentOrigin } from "next-vibe/ui/lib/location";
 import type { JSX } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import type { CountryLanguage } from "../../core/i18n/core/config";
 import { createParentBridge, type ParentBridge } from "./bridge";
 import type {
   FrameError,

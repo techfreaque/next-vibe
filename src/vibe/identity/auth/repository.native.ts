@@ -3,6 +3,10 @@
  * Implements AuthRepository interface for React Native
  */
 
+import { storage } from "next-vibe/ui/lib/storage";
+
+import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/env/constants";
+
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import type { ResponseType } from "../../core/route/response.schema";
 import {
@@ -11,17 +15,13 @@ import {
   success,
 } from "../../core/route/response.schema";
 import { parseError } from "../../core/utils/parse-error";
-import type { AuthT } from "./i18n";
-import { scopedTranslation } from "./i18n";
-import type { UserRoleValue } from "../roles/enum";
-import type { CompleteUserType } from "../user/types";
 import type { EndpointLogger } from "../../logger/types";
 import type { Platform } from "../../platforms/platforms";
-import { storage } from "next-vibe/ui/lib/storage";
-
-import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/env/constants";
-
+import type { UserRoleValue } from "../roles/enum";
+import type { CompleteUserType } from "../user/types";
 import type { AuthContext } from "./base-auth-handler";
+import type { AuthT } from "./i18n";
+import { scopedTranslation } from "./i18n";
 import type { AuthRepositoryType } from "./repository";
 import type { InferUserType, JwtPrivatePayloadType } from "./types";
 

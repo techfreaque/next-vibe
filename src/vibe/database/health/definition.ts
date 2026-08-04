@@ -3,6 +3,8 @@
  * POST endpoint to verify database connectivity (called by cron)
  */
 
+import { z } from "zod";
+
 import { createEndpoint } from "../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -16,8 +18,6 @@ import {
   objectField,
   responseField,
 } from "../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
 import { DB_HEALTH_ALIAS } from "./constants";
 
 const { POST } = createEndpoint({

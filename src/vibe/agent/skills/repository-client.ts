@@ -10,6 +10,10 @@
  * - getFilteredTtsModels(), getFilteredSttModels(), etc.: Role-specific filtered models
  */
 
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+
 import { DEFAULT_CHAT_MODEL_SELECTION } from "../ai-stream/constants";
 import type { ChatModelSelection } from "../ai-stream/models";
 import {
@@ -31,6 +35,8 @@ import {
   type VideoVisionModelOption,
   videoVisionModelOptions,
 } from "../ai-stream/vision-models";
+import { formatSkillId } from "../chat/slugify";
+import type { AgentEnvAvailability } from "../env-availability";
 import type { ImageGenModelSelection } from "../image-generation/models";
 import {
   type ImageGenModelOption,
@@ -45,7 +51,6 @@ import {
   type MusicGenModelOption,
   musicGenModelOptions,
 } from "../music-generation/models";
-import type { FavoriteGetModelSelection } from "./favorites/[id]/definition";
 import type { SttModelSelection } from "../speech-to-text/models";
 import { type SttModelOption, sttModelOptions } from "../speech-to-text/models";
 import type { VoiceModelSelection } from "../text-to-speech/models";
@@ -55,12 +60,6 @@ import {
   type VideoGenModelOption,
   videoGenModelOptions,
 } from "../video-generation/models";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
-
-import { formatSkillId } from "../chat/slugify";
-import type { AgentEnvAvailability } from "../env-availability";
 import type { SkillListItem } from "./definition";
 import {
   ContentLevelDB,
@@ -74,6 +73,7 @@ import {
   type SkillOwnershipTypeValue,
   type SkillTrustLevelValue,
 } from "./enum";
+import type { FavoriteGetModelSelection } from "./favorites/[id]/definition";
 import type { SkillsT } from "./i18n";
 
 export class SkillsRepositoryClient {

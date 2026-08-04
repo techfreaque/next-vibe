@@ -3,12 +3,13 @@
  * Displays key-value pairs from object/record data
  */
 
+import type { z } from "zod";
+
 import type { WidgetType } from "../../../../core/definition/enums";
 import type {
   BasePrimitiveWidgetConfig,
   FieldUsageConfig,
 } from "../../../_shared/types";
-import type { z } from "zod";
 
 /**
  * Key-value widget schema - must produce Record<string, string | number>

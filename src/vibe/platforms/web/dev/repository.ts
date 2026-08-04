@@ -37,7 +37,6 @@ import type { EndpointLogger, LoggerMetadata } from "../../../logger/types";
 import { DEV_WATCHER_TASK_NAME } from "../../../tasks/dev-watcher/constants";
 import { UnifiedTaskRunnerRepository } from "../../../tasks/unified-runner/repository";
 import type { Task } from "../../../tasks/unified-runner/types";
-
 import { ServerFramework } from "../enum";
 import {
   ATLAS_PID_FILE,
@@ -500,9 +499,7 @@ export class DevRepository {
     }
 
     // Controller over the Next.js child process - set in Next.js mode only
-    let nextController:
-      | { current: () => ChildProcess | undefined }
-      | undefined;
+    let nextController: { current: () => ChildProcess | undefined } | undefined;
 
     // Vite server close function - set after startTanstackDev resolves
     let viteClose: (() => Promise<void>) | undefined;

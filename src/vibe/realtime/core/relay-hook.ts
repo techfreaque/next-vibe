@@ -18,7 +18,6 @@
  */
 
 import type { EndpointLogger } from "../../logger/types";
-
 import type { ResolvedRelayContext } from "./relay-context";
 import type { AnyEndpointEventEnvelope } from "./structured-events";
 import type { SyncDomain } from "./sync-domain";

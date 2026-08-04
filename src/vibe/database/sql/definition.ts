@@ -3,6 +3,8 @@
  * Production-ready endpoint for executing SQL queries
  */
 
+import { z } from "zod";
+
 import { createEndpoint } from "../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -12,16 +14,14 @@ import {
   WidgetType,
 } from "../../core/definition/enums";
 import { WidgetDataSchema } from "../../core/utils/json";
-import { scopedTranslation } from "./i18n";
 import { UserRole } from "../../identity/roles/enum";
 import {
   objectField,
   requestField,
   responseField,
 } from "../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
 import { SQL_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const { POST } = createEndpoint({
   scopedTranslation,

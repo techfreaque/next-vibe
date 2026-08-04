@@ -5,6 +5,9 @@
  */
 
 import { makeHeadlessContext } from "next-vibe/core/execution-context";
+
+import { getEndpoint } from "@/generated/endpoints/endpoint";
+
 import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
 import {
   definitionLoader,
@@ -18,13 +21,10 @@ import { parseError } from "../../../core/utils/parse-error";
 import { TOOL_HELP_ALIAS } from "../../../help-tool/constants";
 import type { JwtPayloadType } from "../../../identity/auth/types";
 import type { EndpointLogger } from "../../../logger/types";
+import type { CliResultFormatter as CliResultFormatterType } from "../../../unified-ui/renderers/cli/response/result-formatter";
+import { isAgentPlatform, type Platform } from "../../platforms";
 import { scopedTranslation as cliScopedTranslation } from "../i18n";
 import { CliTarget, type CliTargetValue } from "../types/cli-target";
-import { isAgentPlatform, type Platform } from "../../platforms";
-import type { CliResultFormatter as CliResultFormatterType } from "../../../unified-ui/renderers/cli/response/result-formatter";
-
-import { getEndpoint } from "@/generated/endpoints/endpoint";
-
 // THE AUTH SEAM: resolves WHICH user the CLI acts as (env + session file + DB).
 // It does NOT decide access — allowedRoles + platform markers do, via the
 // permission registry, either way. A local-only build points this single import at

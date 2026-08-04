@@ -40,7 +40,8 @@ export async function startTanstackDev({
 }): Promise<TanstackDevHandle> {
   const { viteCompiler } =
     await import("../../../../tooling/builder/repository/vite-compiler");
-  const { ViteBuildTypeEnum } = await import("../../../../tooling/builder/enum");
+  const { ViteBuildTypeEnum } =
+    await import("../../../../tooling/builder/enum");
   const { configLoader } =
     await import("../../../../tooling/builder/repository/config-loader");
   const { scopedTranslation: builderScopedTranslation } =

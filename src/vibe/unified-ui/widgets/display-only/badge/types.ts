@@ -3,9 +3,11 @@
  * Displays a colored badge with text/status information
  */
 
+import type { BadgeVariant } from "next-vibe/ui/ui/badge";
+import type { z } from "zod";
+
 import type { WidgetType } from "../../../../core/definition/enums";
 import type { WidgetData } from "../../../../core/utils/json";
-import type { BadgeVariant } from "next-vibe/ui/ui/badge";
 import type {
   EnumWidgetSchema,
   NumberWidgetSchema,
@@ -15,7 +17,6 @@ import type {
   BasePrimitiveWidgetConfig,
   FieldUsageConfig,
 } from "../../../_shared/types";
-import type { z } from "zod";
 
 /**
  * Badge size variants

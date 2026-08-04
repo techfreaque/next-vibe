@@ -16,6 +16,23 @@ import "server-only";
 import { realpathSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
+import { GENERATED_DIR, getApiDir } from "@/env/paths";
+import type { GeneratorEntry } from "@/generated/generators/index";
+
+import { createEndpointLogger } from "../../logger/server";
+import type { EndpointLogger } from "../../logger/types";
+import {
+  ErrorResponseTypes,
+  failInline,
+  type ResponseType as BaseResponseType,
+  success,
+} from "../route/response.schema";
+import { parseError } from "../utils/parse-error";
+import type {
+  GenerateAllRequestOutput,
+  GenerateAllResponseOutput,
+} from "./definition";
+import { generate as generateGeneratorsIndex, OUTPUT_FILE } from "./generator";
 import {
   type GenState,
   isUnchanged,
@@ -29,24 +46,6 @@ import type {
 } from "./shared/shared-inputs";
 import { buildGeneratorContext } from "./shared/shared-inputs";
 import { findFilesRecursively } from "./shared/utils";
-import {
-  ErrorResponseTypes,
-  failInline,
-  type ResponseType as BaseResponseType,
-  success,
-} from "../route/response.schema";
-import { parseError } from "../utils/parse-error";
-import { createEndpointLogger } from "../../logger/server";
-import type { EndpointLogger } from "../../logger/types";
-
-import { GENERATED_DIR, getApiDir } from "@/env/paths";
-import type { GeneratorEntry } from "@/generated/generators/index";
-
-import type {
-  GenerateAllRequestOutput,
-  GenerateAllResponseOutput,
-} from "./definition";
-import { generate as generateGeneratorsIndex, OUTPUT_FILE } from "./generator";
 
 // ---------------------------------------------------------------------------
 // Orchestrator

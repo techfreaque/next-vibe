@@ -12,6 +12,8 @@
  */
 
 import { parseError } from "next-vibe/core/utils/parse-error";
+import { preWarmChannel } from "next-vibe/realtime/client/client";
+import { buildWsChannel } from "next-vibe/realtime/core/channel";
 import { toast } from "next-vibe/ui/hooks/use-toast";
 import {
   useWidgetLocale,
@@ -21,8 +23,6 @@ import {
 import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
 import { useCallback, useMemo } from "react";
 
-import { buildWsChannel } from "next-vibe/realtime/core/channel";
-import { preWarmChannel } from "next-vibe/realtime/client/client";
 import { DefaultFolderId } from "../../../../core/execution-context";
 import messagesDefinitions from "../../../chat/threads/[threadId]/messages/definition";
 import { addErrorMessageToChat } from "../../../chat/threads/[threadId]/messages/hooks/update-messages";

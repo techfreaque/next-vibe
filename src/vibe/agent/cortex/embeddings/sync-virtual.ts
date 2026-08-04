@@ -1,5 +1,6 @@
 import "server-only";
 
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 /**
  * Sync Virtual Mount to Embedding
  * Upserts a cortex_nodes FILE row for virtual mount content (skills, threads, tasks)
@@ -8,7 +9,6 @@ import "server-only";
  */
 import { db } from "next-vibe/database";
 
-import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 import { cortexNodes } from "../db";
 import { CortexNodeType } from "../enum";
 import {

@@ -14,6 +14,7 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
@@ -27,7 +28,6 @@ import {
 import { z } from "zod";
 
 import { isDefaultFolderId } from "../../../config";
-import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { ThreadStreamingState } from "../../../enum";
 import { scopedTranslation } from "./i18n";
 

@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 import { createEndpoint } from "../../../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -7,17 +9,16 @@ import {
 } from "../../../../core/definition/enums";
 import { UserRole } from "../../../../identity/roles/enum";
 import {
+  objectField,
+  requestField,
+  responseField,
+} from "../../../../unified-ui/_shared/utils-i18n";
+import {
   ScaleComponent,
   ScaleComponentDB,
   ScaleComponentOptions,
 } from "../../enum";
 import { scopedTranslation } from "../../i18n";
-import {
-  objectField,
-  requestField,
-  responseField,
-} from "../../../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
 
 export const { POST } = createEndpoint({
   scopedTranslation,

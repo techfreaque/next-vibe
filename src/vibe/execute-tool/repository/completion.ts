@@ -16,8 +16,9 @@
 import "server-only";
 
 import { and, eq, gt, ne, sql } from "drizzle-orm";
-import type { ChatModelId } from "../../agent/ai-stream/models";
 import type { ToolExecutionContext } from "next-vibe/core/execution-context";
+
+import type { ChatModelId } from "../../agent/ai-stream/models";
 import type { ToolCall } from "../../agent/chat/db";
 import { chatMessages, chatThreads } from "../../agent/chat/db";
 import { ChatMessageRole, ThreadStreamingState } from "../../agent/chat/enum";
@@ -28,11 +29,6 @@ import type { ErrorResponseType } from "../../core/route/response.schema";
 import { ErrorResponseTypes } from "../../core/route/response.schema";
 import type { WidgetData } from "../../core/utils/json";
 import { db } from "../../database";
-import {
-  endpoints as revivalEndpoints,
-  REVIVAL_ALIAS as RESUME_STREAM_ALIAS,
-} from "../revival/definition";
-import { scopedTranslation as revivalScopedTranslation } from "../revival/i18n";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
@@ -48,8 +44,12 @@ import {
   TaskCategory,
   TaskOutputMode,
 } from "../../tasks/enum";
-
 import { CallbackMode, type CallbackModeValue } from "../constants";
+import {
+  endpoints as revivalEndpoints,
+  REVIVAL_ALIAS as RESUME_STREAM_ALIAS,
+} from "../revival/definition";
+import { scopedTranslation as revivalScopedTranslation } from "../revival/i18n";
 import type { WakeUpConfirmRaceResult } from "./types-dispatch";
 
 export class TaskCompletion {

@@ -1,9 +1,8 @@
 "use client";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import { Text, View } from "react-native";
 
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type {
   AreaProps,
   AxisProps,
@@ -26,6 +25,7 @@ import type {
   ThemeKeys,
 } from "../../web/ui/chart";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 
 const ChartContext = React.createContext<ChartContextProps | null>(null);
 

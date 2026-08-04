@@ -10,10 +10,10 @@ import "server-only";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
+import { getSrcDir } from "@/env/paths";
+
 import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import type { GenericHandlerBase } from "../../core/route/handler";
-
-import { getSrcDir } from "@/env/paths";
 
 /**
  * Build a cache-busted file:// URL for a generated path relative to the source root.

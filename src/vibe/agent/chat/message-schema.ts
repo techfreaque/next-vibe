@@ -10,17 +10,17 @@
  * A message-history parse never throws; it returns whatever parsed correctly.
  */
 
-import type { ChatModelId } from "../ai-stream/models";
-import type { MessageVariant } from "../ai-stream/repository/core/modality-resolver";
-import type { Modality } from "../models/enum";
 import { dateSchema } from "next-vibe/core/definition/common.schema";
+import type { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
 import { WidgetDataSchema } from "next-vibe/core/utils/json";
 import { CallbackModeDB } from "next-vibe/execute-tool/constants";
 import { z } from "zod";
 
+import type { ChatModelId } from "../ai-stream/models";
+import type { MessageVariant } from "../ai-stream/repository/core/modality-resolver";
+import type { Modality } from "../models/enum";
 import type { FavoriteConfig } from "../skills/favorites/db";
-import type { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { ChatMessage, MessageMetadata, ToolCall } from "./db";
 import { ChatMessageRole } from "./enum";
 
@@ -249,29 +249,27 @@ export const chatMessageTolerantSchema = z
     createdAt: dateSchema.nullish().catch(null),
     updatedAt: dateSchema.nullish().catch(null),
   })
-  .transform(
-    (m): ChatMessage => ({
-      id: m.id,
-      threadId: m.threadId,
-      role: m.role,
-      content: m.content ?? null,
-      parentId: m.parentId ?? null,
-      sequenceId: m.sequenceId ?? null,
-      authorId: m.authorId ?? null,
-      authorName: m.authorName ?? null,
-      isAI: m.isAI,
-      model: m.model ?? null,
-      skill: m.skill ?? null,
-      errorType: m.errorType ?? null,
-      errorMessage: m.errorMessage ?? null,
-      errorCode: m.errorCode ?? null,
-      metadata: m.metadata,
-      upvotes: m.upvotes ?? 0,
-      downvotes: m.downvotes ?? 0,
-      createdAt: m.createdAt ?? new Date(),
-      updatedAt: m.updatedAt ?? new Date(),
-    }),
-  );
+  .transform((m): ChatMessage => ({
+    id: m.id,
+    threadId: m.threadId,
+    role: m.role,
+    content: m.content ?? null,
+    parentId: m.parentId ?? null,
+    sequenceId: m.sequenceId ?? null,
+    authorId: m.authorId ?? null,
+    authorName: m.authorName ?? null,
+    isAI: m.isAI,
+    model: m.model ?? null,
+    skill: m.skill ?? null,
+    errorType: m.errorType ?? null,
+    errorMessage: m.errorMessage ?? null,
+    errorCode: m.errorCode ?? null,
+    metadata: m.metadata,
+    upvotes: m.upvotes ?? 0,
+    downvotes: m.downvotes ?? 0,
+    createdAt: m.createdAt ?? new Date(),
+    updatedAt: m.updatedAt ?? new Date(),
+  }));
 
 /**
  * Tolerant message-history parse: every item that matches the core message

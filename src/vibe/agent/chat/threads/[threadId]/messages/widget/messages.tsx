@@ -1,19 +1,5 @@
 "use client";
 
-import { useChatInputStore } from "../../../../../ai-stream/stream/hooks/input-store";
-import { useAIStream } from "../../../../../ai-stream/stream/hooks/use-ai-stream";
-import type { ChatMessage } from "../../../../db";
-import { useChatBootContext } from "../../../../hooks/context";
-import { useChatNavigationStore } from "../../../../hooks/use-chat-navigation-store";
-import { useChatSettings } from "../../../../settings/hooks";
-import { ChatSettingsRepositoryClient } from "../../../../settings/repository-client";
-import { getDirectReplies } from "./flat-view/helpers";
-import { useProviderAvailability } from "../../../../../env-availability-store";
-import characterDefinitions from "../../../../../skills/[id]/definition";
-import { ModelSelectionType } from "../../../../../skills/enum";
-import type { FavoriteConfig } from "../../../../../skills/favorites/db";
-import { ChatFavoritesRepositoryClient } from "../../../../../skills/favorites/repository-client";
-import type { TtsModelId } from "../../../../../text-to-speech/models";
 import { platform } from "next-vibe/core/env-client";
 import { success } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
@@ -58,8 +44,21 @@ import {
   getRootMessages,
 } from "@/_pages/chat/lib/utils/thread-builder";
 
+import { useChatInputStore } from "../../../../../ai-stream/stream/hooks/input-store";
+import { useAIStream } from "../../../../../ai-stream/stream/hooks/use-ai-stream";
+import { useProviderAvailability } from "../../../../../env-availability-store";
+import characterDefinitions from "../../../../../skills/[id]/definition";
+import { ModelSelectionType } from "../../../../../skills/enum";
+import type { FavoriteConfig } from "../../../../../skills/favorites/db";
+import { ChatFavoritesRepositoryClient } from "../../../../../skills/favorites/repository-client";
+import type { TtsModelId } from "../../../../../text-to-speech/models";
+import type { ChatMessage } from "../../../../db";
 import type { MessageMetadata } from "../../../../db";
 import { NEW_MESSAGE_ID, ViewMode } from "../../../../enum";
+import { useChatBootContext } from "../../../../hooks/context";
+import { useChatNavigationStore } from "../../../../hooks/use-chat-navigation-store";
+import { useChatSettings } from "../../../../settings/hooks";
+import { ChatSettingsRepositoryClient } from "../../../../settings/repository-client";
 import messagesDefinition from "../definition";
 import { loadMessageAttachments } from "../hooks/load-message-attachments";
 import { patchMessage, upsertMessage } from "../hooks/update-messages";
@@ -69,6 +68,7 @@ import { useMessageEditorStore } from "../hooks/use-message-editor-store";
 import { useMessageOperations } from "../hooks/use-operations";
 import { scopedTranslation } from "../i18n";
 import pathDefinitions from "../path/definition";
+import { getDirectReplies } from "./flat-view/helpers";
 import { FlatMessageView } from "./flat-view/view";
 import { LinearMessageView } from "./linear-view/view";
 import { DebugLinearMessageView } from "./linear-view/view-debug";

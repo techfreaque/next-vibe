@@ -2,6 +2,8 @@
  * Database Migration Endpoint Definition
  */
 
+import { z } from "zod";
+
 import { createEndpoint } from "../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -9,13 +11,12 @@ import {
   Methods,
   WidgetType,
 } from "../../core/definition/enums";
-import { scopedTranslation } from "./i18n";
 import { UserRole } from "../../identity/roles/enum";
 import {
   objectField,
   responseField,
 } from "../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
+import { scopedTranslation } from "./i18n";
 
 const { POST } = createEndpoint({
   scopedTranslation,

@@ -1,6 +1,4 @@
 "use client";
-import type { EnabledTool } from "../../../chat/hooks/store";
-import { useToolsModalStore } from "../../../tools/store";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import helpDefinitions from "next-vibe/help-tool/definition";
 import { Badge } from "next-vibe/ui/ui/badge";
@@ -16,6 +14,8 @@ import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import type { JSX } from "react";
 import { useMemo } from "react";
 
+import type { EnabledTool } from "../../../chat/hooks/store";
+import { useToolsModalStore } from "../../../tools/store";
 import { scopedTranslation as aiStreamScopedTranslation } from "../i18n";
 
 interface ToolsButtonProps {

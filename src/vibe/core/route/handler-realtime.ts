@@ -16,9 +16,6 @@
  * itself needs no edit.
  */
 
-import type { CreateApiEndpointAny } from "../definition/endpoint-base";
-import type { CountryLanguage } from "../i18n/core/config";
-import type { WidgetData } from "../utils/json";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
@@ -26,6 +23,9 @@ import type {
 import type { EndpointLogger } from "../../logger/types";
 import type { HasClientDeliveredEventsOf } from "../../realtime/core/structured-events";
 import type { CacheKeyRequestInput } from "../../unified-ui/hooks/query-key-builder";
+import type { CreateApiEndpointAny } from "../definition/endpoint-base";
+import type { CountryLanguage } from "../i18n/core/config";
+import type { WidgetData } from "../utils/json";
 
 /**
  * The channel an endpoint's events ride on, decided per (resource, identity) at

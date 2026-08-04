@@ -3,6 +3,8 @@
  * Compiles main/preload and launches the Electron desktop window in dev mode.
  */
 
+import { z } from "zod";
+
 import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -12,19 +14,17 @@ import {
   WidgetType,
 } from "../../../core/definition/enums";
 import { UserRole } from "../../../identity/roles/enum";
-import { scopedTranslation } from "./i18n";
 import {
   objectField,
   requestField,
   responseField,
 } from "../../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
 import {
   ELECTRON_ALIAS,
   ELECTRON_START_ALIAS,
   ELECTRON_START_DEV_ALIAS,
 } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const { POST } = createEndpoint({
   scopedTranslation,

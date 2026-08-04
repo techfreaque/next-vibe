@@ -1,7 +1,6 @@
 "use client";
 
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
-import { cn } from "../../../unified-ui/_shared/cn";
 import type { ReactNode } from "react";
 import * as React from "react";
 import {
@@ -16,6 +15,7 @@ import {
   VictoryTooltip as VictoryTooltipBase,
 } from "victory";
 
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { StyleType } from "../utils/style-type";
 
 // Format: { THEME_NAME: CSS_SELECTOR }

@@ -9,6 +9,9 @@
 // sets process.env (NODE_ENV, NEXT_PUBLIC_AGENT_*, DATABASE_URL overrides) before
 // any other module that reads those values (env-client, constants, etc.) is evaluated.
 import { Command } from "commander";
+
+import { pathToAliasMap } from "@/generated/endpoints/alias-map";
+
 import {
   DefinitionLoader,
   type GetEndpointFn,
@@ -24,16 +27,14 @@ import { parseError } from "../../../core/utils/parse-error";
 import type { JwtPayloadType } from "../../../identity/auth/types";
 import { enableMcpSilentMode } from "../../../logger/debug";
 import { createEndpointLogger } from "../../../logger/server";
+import { Platform } from "../../platforms";
 import { cliEnv } from "../env";
 import { scopedTranslation as cliScopedTranslation } from "../i18n";
+import { CliTarget, type CliTargetValue } from "../types/cli-target";
 import { type EnvironmentResult, loadEnvironment } from "./environment";
 import { ErrorHandler, setupGlobalErrorHandlers } from "./execution-errors";
 import { CliInputParser } from "./parsing";
 import { RouteDelegationHandler } from "./route-executor";
-import { CliTarget, type CliTargetValue } from "../types/cli-target";
-import { Platform } from "../../platforms";
-
-import { pathToAliasMap } from "@/generated/endpoints/alias-map";
 
 export const binaryStartTime = Date.now();
 

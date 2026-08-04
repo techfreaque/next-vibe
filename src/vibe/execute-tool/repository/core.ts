@@ -16,6 +16,10 @@
 import "server-only";
 
 import type { ToolExecutionContext } from "next-vibe/core/execution-context";
+
+import { scopedTranslation as systemScopedTranslation } from "@/_pages/shared/i18n";
+import { getEndpoint } from "@/generated/endpoints/endpoint";
+
 import { getFullPath } from "../../core/core-utils/path";
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import type { GenericHandlerBase } from "../../core/route/handler";
@@ -33,10 +37,6 @@ import { parseError } from "../../core/utils/parse-error";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
 import { Platform } from "../../platforms/platforms";
-
-import { scopedTranslation as systemScopedTranslation } from "@/_pages/shared/i18n";
-import { getEndpoint } from "@/generated/endpoints/endpoint";
-
 import { toAiToolResult } from "./result-ai-parts";
 
 export class RouteExecutionExecutor {

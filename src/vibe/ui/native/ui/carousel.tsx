@@ -1,14 +1,9 @@
-import { useTranslation } from "../../../core/i18n/core/client";
-import { cn } from "../../../unified-ui/_shared/cn";
 import React from "react";
 import type { ScrollView as RNScrollView } from "react-native";
 import { Pressable, ScrollView, Text as RNText, View } from "react-native";
 
-import {
-  convertCSSToViewStyle,
-  styledNative,
-  styledNativeRef,
-} from "../utils/style-converter";
+import { useTranslation } from "../../../core/i18n/core/client";
+import { cn } from "../../../unified-ui/_shared/cn";
 import { uiScopedTranslation } from "../../web/i18n";
 import type {
   CarouselApi,
@@ -18,6 +13,11 @@ import type {
   CarouselProps,
 } from "../../web/ui/carousel";
 import { applyStyleType } from "../../web/utils/style-type";
+import {
+  convertCSSToViewStyle,
+  styledNative,
+  styledNativeRef,
+} from "../utils/style-converter";
 
 const StyledScrollView = styledNativeRef<typeof ScrollView, RNScrollView>(
   ScrollView,

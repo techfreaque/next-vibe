@@ -1,8 +1,9 @@
 "use client";
 
-import { platform } from "../../../core/env-client";
 import { useEffect } from "react";
 import { create } from "zustand";
+
+import { platform } from "../../../core/env-client";
 
 interface TouchDeviceStore {
   isTouch: boolean;

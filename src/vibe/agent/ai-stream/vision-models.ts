@@ -12,14 +12,14 @@
  * Re-run: vibe update-all-model-prices or vibe gen
  */
 
-import type {
-  AnyModelOptionShape,
-  ModelOptionTokenBased,
-} from "../models/models";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { z } from "zod";
 
 import type { AgentEnvAvailability } from "../env-availability";
+import type {
+  AnyModelOptionShape,
+  ModelOptionTokenBased,
+} from "../models/models";
 import { filterRoleModels, isModelOptionTokenBased } from "../models/models";
 import type { FiltersModelSelection } from "../models/selection";
 import {

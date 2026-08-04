@@ -7,24 +7,6 @@ import "server-only";
 
 import { dirname, join } from "node:path";
 
-import type {
-  GeneratorContext,
-  GeneratorDefinition,
-} from "../../core/generators/shared/shared-inputs";
-import {
-  findFilesRecursively,
-  generateFileHeader,
-  getRelativeImportPath,
-  jsonToTs,
-  generateFileHeader as sharedGenerateFileHeader,
-  stripProjectRoot,
-  toImportUrl,
-  toPosixPath,
-  writeGeneratedFile,
-} from "../../core/generators/shared/utils";
-import type { EnvExample, EnvFieldType } from "../define-env";
-import { formatCount, formatWarning } from "../../logger/formatters";
-
 import {
   GENERATED_DIR,
   getApiDir,
@@ -32,6 +14,24 @@ import {
   PROJECT_IGNORE_DIRS,
   VIBE_DIR,
 } from "@/env/paths";
+
+import type {
+  GeneratorContext,
+  GeneratorDefinition,
+} from "../../core/generators/shared/shared-inputs";
+import {
+  findFilesRecursively,
+  generateFileHeader,
+  generateFileHeader as sharedGenerateFileHeader,
+  getRelativeImportPath,
+  jsonToTs,
+  stripProjectRoot,
+  toImportUrl,
+  toPosixPath,
+  writeGeneratedFile,
+} from "../../core/generators/shared/utils";
+import { formatCount, formatWarning } from "../../logger/formatters";
+import type { EnvExample, EnvFieldType } from "../define-env";
 
 /**
  * Real locations of the modules the emitted env files import. These resolve from

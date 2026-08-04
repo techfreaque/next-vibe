@@ -9,6 +9,9 @@ import chalk from "chalk";
 import { Box, Text, useApp, useInput, useStdin } from "ink";
 import TextInput from "ink-text-input";
 import { makeHeadlessContext } from "next-vibe/core/execution-context";
+import type { JSX } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
 import { Platform } from "../../platforms/platforms";
 import { scopedTranslation as connectScopedTranslation } from "../../remote-connection/connect/i18n";
 import type { SyncScope } from "../../remote-connection/db";
@@ -22,9 +25,6 @@ import {
   useWidgetUser,
 } from "../../unified-ui/_shared/use-widget-context";
 import { useApiMutation } from "../../unified-ui/hooks/use-api-mutation";
-import type { JSX } from "react";
-import { useCallback, useEffect, useMemo, useState } from "react";
-
 import type { SystemSettingsGetResponseOutput } from "./definition";
 import endpoints from "./definition";
 

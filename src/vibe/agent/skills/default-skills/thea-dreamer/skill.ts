@@ -1,7 +1,7 @@
 import type { Skill } from "../../config";
 import { SkillCategory, SkillOwnershipType } from "../../enum";
-import { THEA_CORE_PROMPT } from "../thea/core";
 import { THEA_VARIANTS } from "../_shared/companion-selections";
+import { THEA_CORE_PROMPT } from "../thea/core";
 
 export const theaDreamerSkill: Skill = {
   id: "thea-dreamer",

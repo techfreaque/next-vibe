@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 import { ChatModelId } from "../../agent/ai-stream/models";
 import { createEndpoint } from "../../core/definition/create-i18n";
 import {
@@ -13,8 +15,6 @@ import {
   requestField,
   responseField,
 } from "../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
 import { scopedTranslation } from "./i18n";
 
 export const REVIVAL_ALIAS = "resume-stream";

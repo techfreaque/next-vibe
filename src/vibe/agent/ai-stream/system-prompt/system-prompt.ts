@@ -2,11 +2,6 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-import { DefaultFolderId } from "../../../core/execution-context";
-import { scopedTranslation as chatScopedTranslation } from "../../chat/i18n";
-import { chatSettings } from "../../chat/settings/db";
-import { getEnvAvailability } from "../../env-availability";
-import { getAvailableModelCount } from "../../models/all-models";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import { languageConfig } from "next-vibe/core/i18n";
 import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
@@ -17,8 +12,13 @@ import { users as usersTable } from "next-vibe/identity/user/db";
 
 import { ProductIds, productsRepository } from "@/products/repository-client";
 
+import { DefaultFolderId } from "../../../core/execution-context";
+import { scopedTranslation as chatScopedTranslation } from "../../chat/i18n";
+import { chatSettings } from "../../chat/settings/db";
 import { DESCRIBE_IMAGE_ALIAS } from "../../describe-image/constants";
 import { DESCRIBE_VIDEO_ALIAS } from "../../describe-video/constants";
+import { getEnvAvailability } from "../../env-availability";
+import { getAvailableModelCount } from "../../models/all-models";
 import { MUSIC_GEN_ALIAS } from "../../music-generation/constants";
 import { TRANSCRIBE_AUDIO_ALIAS } from "../../speech-to-text/constants";
 import { TEXT_TO_SPEECH_ALIAS } from "../../text-to-speech/constants";

@@ -9,8 +9,6 @@ import "server-only";
  * Community metrics (voteCount, reportCount) are NOT synced — they are instance-local.
  */
 import { and, asc, eq, inArray, sql } from "drizzle-orm";
-import type { ToolConfigItem } from "../chat/settings/definition";
-import type { VideoGenModelId } from "../video-generation/models";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { StandardSyncCursor } from "next-vibe/remote-connection/db";
@@ -20,6 +18,8 @@ import {
 } from "next-vibe/remote-connection/sync/provider";
 import { z } from "zod";
 
+import type { ToolConfigItem } from "../chat/settings/definition";
+import type { VideoGenModelId } from "../video-generation/models";
 import { customSkills, type NewCustomSkill } from "./db";
 import { SkillTrustLevel } from "./enum";
 import { type SyncedSkill, syncedSkillSchema } from "./full-event.schema";
@@ -74,42 +74,40 @@ export const skillsSyncProvider: SyncProvider = {
         )
         .orderBy(asc(customSkills.updatedAt));
 
-      const items = rows.map(
-        (r): SyncedSkill => ({
-          id: r.id,
-          slug: r.slug,
-          name: r.name,
-          description: r.description,
-          tagline: r.tagline,
-          icon: r.icon,
-          systemPrompt: r.systemPrompt ?? null,
-          category: r.category,
-          ownershipType: r.ownershipType,
-          voiceModelSelection: r.voiceModelSelection ?? null,
-          sttModelSelection: r.sttModelSelection ?? null,
-          imageVisionModelSelection: r.imageVisionModelSelection ?? null,
-          videoVisionModelSelection: r.videoVisionModelSelection ?? null,
-          audioVisionModelSelection: r.audioVisionModelSelection ?? null,
-          imageGenModelSelection: r.imageGenModelSelection ?? null,
-          musicGenModelSelection: r.musicGenModelSelection ?? null,
-          videoGenModelId: r.videoGenModelId ?? null,
-          variants: r.variants ?? null,
-          compactTrigger: r.compactTrigger ?? null,
-          memoryLimit: r.memoryLimit ?? null,
-          availableTools: r.availableTools ?? null,
-          pinnedTools: r.pinnedTools ?? null,
-          deniedTools: r.deniedTools ?? null,
-          skillType: r.skillType ?? null,
-          status: r.status ?? null,
-          companionPrompt: r.companionPrompt ?? null,
-          trustLevel: r.trustLevel,
-          longContent: r.longContent ?? null,
-          publishedAt: r.publishedAt?.toISOString() ?? null,
-          changeNote: r.changeNote ?? null,
-          updatedAt: r.updatedAt.toISOString(),
-          ...(r.isDeleted ? { isDeleted: true } : {}),
-        }),
-      );
+      const items = rows.map((r): SyncedSkill => ({
+        id: r.id,
+        slug: r.slug,
+        name: r.name,
+        description: r.description,
+        tagline: r.tagline,
+        icon: r.icon,
+        systemPrompt: r.systemPrompt ?? null,
+        category: r.category,
+        ownershipType: r.ownershipType,
+        voiceModelSelection: r.voiceModelSelection ?? null,
+        sttModelSelection: r.sttModelSelection ?? null,
+        imageVisionModelSelection: r.imageVisionModelSelection ?? null,
+        videoVisionModelSelection: r.videoVisionModelSelection ?? null,
+        audioVisionModelSelection: r.audioVisionModelSelection ?? null,
+        imageGenModelSelection: r.imageGenModelSelection ?? null,
+        musicGenModelSelection: r.musicGenModelSelection ?? null,
+        videoGenModelId: r.videoGenModelId ?? null,
+        variants: r.variants ?? null,
+        compactTrigger: r.compactTrigger ?? null,
+        memoryLimit: r.memoryLimit ?? null,
+        availableTools: r.availableTools ?? null,
+        pinnedTools: r.pinnedTools ?? null,
+        deniedTools: r.deniedTools ?? null,
+        skillType: r.skillType ?? null,
+        status: r.status ?? null,
+        companionPrompt: r.companionPrompt ?? null,
+        trustLevel: r.trustLevel,
+        longContent: r.longContent ?? null,
+        publishedAt: r.publishedAt?.toISOString() ?? null,
+        changeNote: r.changeNote ?? null,
+        updatedAt: r.updatedAt.toISOString(),
+        ...(r.isDeleted ? { isDeleted: true } : {}),
+      }));
 
       const lastIncluded = items[items.length - 1];
       return {

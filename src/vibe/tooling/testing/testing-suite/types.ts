@@ -1,3 +1,5 @@
+import type { z } from "zod";
+
 import type {
   CreateApiEndpoint,
   InferRequestOutput,
@@ -14,7 +16,6 @@ import type {
   AnyChildrenConstrain,
   FieldUsageConfig,
 } from "../../../unified-ui/_shared/types";
-import type { z } from "zod";
 
 /**
  * Options for testing an API endpoint

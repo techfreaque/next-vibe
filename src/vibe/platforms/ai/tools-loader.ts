@@ -7,12 +7,16 @@
 import "server-only";
 
 import { jsonSchema, type JSONSchema7, tool } from "ai";
+import { type ToolExecutionContext } from "next-vibe/core/execution-context";
+import { z } from "zod";
+
+import { getEndpoint } from "@/generated/endpoints/endpoint";
+
 import { claimExecuteToolCallId } from "../../agent/ai-stream/repository/core/stream";
 import {
   FOLDER_ALLOWS_REMOTE_TOOLS,
   FOLDER_BLOCKED_CALLBACK_MODES,
 } from "../../agent/chat/config";
-import { type ToolExecutionContext } from "next-vibe/core/execution-context";
 import {
   endpointToToolName,
   getPreferredToolName,
@@ -27,14 +31,11 @@ import { CallbackMode, EXECUTE_TOOL_ALIAS } from "../../execute-tool/constants";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import { filterUserPermissionRoles } from "../../identity/roles/enum";
 import type { EndpointLogger } from "../../logger/types";
-import { Platform } from "../platforms";
 import {
   collectServerDefaults,
   generateSchemaForUsage,
 } from "../../unified-ui/_shared/utils";
-import { z } from "zod";
-
-import { getEndpoint } from "@/generated/endpoints/endpoint";
+import { Platform } from "../platforms";
 
 /**
  * CoreTool type from AI SDK

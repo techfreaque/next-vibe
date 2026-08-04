@@ -1,9 +1,9 @@
 "use client";
 
 import * as ToggleGroupPrimitive from "@radix-ui/react-toggle-group";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { StyleType } from "../utils/style-type";
 import { type ToggleSize, type ToggleVariant, toggleVariants } from "./toggle";
 

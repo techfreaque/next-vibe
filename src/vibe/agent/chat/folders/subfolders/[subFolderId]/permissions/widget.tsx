@@ -19,8 +19,8 @@ import {
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import BadgeWidget from "next-vibe/unified-ui/widgets/display-only/badge/widget";
-import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
+import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 
 import type definition from "./definition";

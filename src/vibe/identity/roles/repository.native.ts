@@ -5,9 +5,8 @@
 
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import type { ResponseType } from "../../core/route/response.schema";
-import type { NewUserRole, UserRole } from "../user/db";
 import type { EndpointLogger } from "../../logger/types";
-
+import type { NewUserRole, UserRole } from "../user/db";
 import type { UserRole as UserRoleEnum } from "./enum";
 import { type UserPermissionRoleValue } from "./enum";
 import type { UserRolesRepositoryType } from "./repository";

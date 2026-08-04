@@ -4,25 +4,6 @@
  */
 
 import {
-  type ChatModelSelection,
-  chatModelSelectionSchema,
-  filterChatModels,
-  type getBestChatModel,
-} from "../../../ai-stream/models";
-import {
-  audioVisionModelSelectionSchema,
-  imageVisionModelSelectionSchema,
-  videoVisionModelSelectionSchema,
-} from "../../../ai-stream/vision-models";
-import { parseSkillId } from "../../../chat/slugify";
-import { getClientAvailability } from "../../../env-availability-store";
-import type { AgentEnvAvailability } from "../../../env-availability";
-import { imageGenModelSelectionSchema } from "../../../image-generation/models";
-import { musicGenModelSelectionSchema } from "../../../music-generation/models";
-import { sttModelSelectionSchema } from "../../../speech-to-text/models";
-import { voiceModelSelectionSchema } from "../../../text-to-speech/models";
-import { videoGenModelSelectionSchema } from "../../../video-generation/models";
-import {
   dateSchema,
   iconSchema,
   translatedValueSchema,
@@ -54,7 +35,26 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import {
+  type ChatModelSelection,
+  chatModelSelectionSchema,
+  filterChatModels,
+  type getBestChatModel,
+} from "../../../ai-stream/models";
 import { ChatModelId } from "../../../ai-stream/models";
+import {
+  audioVisionModelSelectionSchema,
+  imageVisionModelSelectionSchema,
+  videoVisionModelSelectionSchema,
+} from "../../../ai-stream/vision-models";
+import { parseSkillId } from "../../../chat/slugify";
+import type { AgentEnvAvailability } from "../../../env-availability";
+import { getClientAvailability } from "../../../env-availability-store";
+import { imageGenModelSelectionSchema } from "../../../image-generation/models";
+import { musicGenModelSelectionSchema } from "../../../music-generation/models";
+import { sttModelSelectionSchema } from "../../../speech-to-text/models";
+import { voiceModelSelectionSchema } from "../../../text-to-speech/models";
+import { videoGenModelSelectionSchema } from "../../../video-generation/models";
 import type {
   FiltersModelSelection,
   ManualModelSelection,

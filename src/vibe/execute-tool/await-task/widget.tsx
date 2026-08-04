@@ -1,10 +1,15 @@
 "use client";
 
+import { Div } from "next-vibe/ui/ui/div";
+import { P } from "next-vibe/ui/ui/typography";
+import type { JSX } from "react";
+import { useEffect, useMemo, useState } from "react";
+
+import { getEndpoint } from "@/generated/endpoints/endpoint";
+
 import { getFullPath } from "../../core/core-utils/path";
 import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import type { WidgetData } from "../../core/utils/json";
-import { Div } from "next-vibe/ui/ui/div";
-import { P } from "next-vibe/ui/ui/typography";
 import {
   useWidgetDisabled,
   useWidgetLocale,
@@ -14,11 +19,6 @@ import {
   useWidgetValue,
 } from "../../unified-ui/_shared/use-widget-context";
 import { EndpointsPage } from "../../unified-ui/renderers/web/EndpointsPage";
-import type { JSX } from "react";
-import { useEffect, useMemo, useState } from "react";
-
-import { getEndpoint } from "@/generated/endpoints/endpoint";
-
 import type definition from "./definition";
 
 function toRecord(

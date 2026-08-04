@@ -495,72 +495,60 @@ export class EmailStatsRepository {
         },
         {
           name: t("get.response.metrics.deliveryRate"),
-          data: historicalResults.map(
-            (item): HistoricalDataPointType => ({
-              date: new Date(item.period),
-              value:
-                item.sentEmails > 0
-                  ? item.deliveredEmails / item.sentEmails
-                  : 0,
-              label: undefined,
-            }),
-          ),
+          data: historicalResults.map((item): HistoricalDataPointType => ({
+            date: new Date(item.period),
+            value:
+              item.sentEmails > 0 ? item.deliveredEmails / item.sentEmails : 0,
+            label: undefined,
+          })),
           color: "#059669",
           type: SharedChartType.LINE,
         },
         {
           name: t("get.response.metrics.openRate"),
-          data: historicalResults.map(
-            (item): HistoricalDataPointType => ({
-              date: new Date(item.period),
-              value:
-                item.deliveredEmails > 0
-                  ? item.openedEmails / item.deliveredEmails
-                  : 0,
-              label: undefined,
-            }),
-          ),
+          data: historicalResults.map((item): HistoricalDataPointType => ({
+            date: new Date(item.period),
+            value:
+              item.deliveredEmails > 0
+                ? item.openedEmails / item.deliveredEmails
+                : 0,
+            label: undefined,
+          })),
           color: "#0891b2",
           type: SharedChartType.LINE,
         },
         {
           name: t("get.response.metrics.clickRate"),
-          data: historicalResults.map(
-            (item): HistoricalDataPointType => ({
-              date: new Date(item.period),
-              value:
-                item.openedEmails > 0
-                  ? item.clickedEmails / item.openedEmails
-                  : 0,
-              label: undefined,
-            }),
-          ),
+          data: historicalResults.map((item): HistoricalDataPointType => ({
+            date: new Date(item.period),
+            value:
+              item.openedEmails > 0
+                ? item.clickedEmails / item.openedEmails
+                : 0,
+            label: undefined,
+          })),
           color: "#7c3aed",
           type: SharedChartType.LINE,
         },
         {
           name: t("get.response.metrics.bounceRate"),
-          data: historicalResults.map(
-            (item): HistoricalDataPointType => ({
-              date: new Date(item.period),
-              value:
-                item.sentEmails > 0 ? item.bouncedEmails / item.sentEmails : 0,
-              label: undefined,
-            }),
-          ),
+          data: historicalResults.map((item): HistoricalDataPointType => ({
+            date: new Date(item.period),
+            value:
+              item.sentEmails > 0 ? item.bouncedEmails / item.sentEmails : 0,
+            label: undefined,
+          })),
           color: "#dc2626",
           type: SharedChartType.LINE,
         },
         {
           name: t("get.response.metrics.failureRate"),
-          data: historicalResults.map(
-            (item): HistoricalDataPointType => ({
-              date: new Date(item.period),
-              value:
-                item.totalEmails > 0 ? item.failedEmails / item.totalEmails : 0,
-              label: undefined,
-            }),
-          ),
+          data: historicalResults.map((item): HistoricalDataPointType => ({
+            date: new Date(item.period),
+            value:
+              item.totalEmails > 0 ? item.failedEmails / item.totalEmails : 0,
+            label: undefined,
+          })),
           color: "#b91c1c",
           type: SharedChartType.LINE,
         },

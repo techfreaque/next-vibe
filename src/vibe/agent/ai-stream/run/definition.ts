@@ -10,7 +10,6 @@
  *     --skill=default --prompt="Summarise these skills"
  */
 
-import { MAX_TOOL_CALLS } from "../repository/core/constants";
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -37,6 +36,7 @@ import { z } from "zod";
 import { DefaultFolderId } from "../../../core/execution-context";
 import { SKILL_CREATOR_ID } from "../../skills/constants";
 import { ChatModelId, ChatModelIdOptions, getChatModelById } from "../models";
+import { MAX_TOOL_CALLS } from "../repository/core/constants";
 import { scopedTranslation } from "../stream/i18n";
 import { AI_RUN_ALIAS } from "./constants";
 const AiRunWidget = lazyWidget(() =>

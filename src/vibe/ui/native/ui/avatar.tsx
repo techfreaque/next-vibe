@@ -1,14 +1,14 @@
 import * as AvatarPrimitive from "@rn-primitives/avatar";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 
-import { styledNative } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 // Import ALL types from web version (web is source of truth)
 import type {
   AvatarFallbackProps,
   AvatarImageProps,
   AvatarRootProps,
 } from "../../web/ui/avatar";
+import { styledNative } from "../utils/style-converter";
 
 // Re-export types for consistency
 export type { AvatarFallbackProps, AvatarImageProps, AvatarRootProps };

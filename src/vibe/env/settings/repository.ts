@@ -9,6 +9,8 @@ import { constants, existsSync } from "node:fs";
 import { access, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
+import type { ZodTypeAny } from "zod";
+
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import type { ResponseType } from "../../core/route/response.schema";
 import {
@@ -17,11 +19,8 @@ import {
   success,
 } from "../../core/route/response.schema";
 import { parseError } from "../../core/utils/parse-error";
-import type { SystemSettingsT } from "./i18n";
 import type { JwtPrivatePayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
-import type { ZodTypeAny } from "zod";
-
 import type { EnvExample } from "../define-env";
 import {
   encryptEnvValue,
@@ -35,6 +34,7 @@ import type {
   SystemSettingsPostRequestOutput,
   SystemSettingsPostResponseOutput,
 } from "./definition";
+import type { SystemSettingsT } from "./i18n";
 
 export class SystemSettingsRepository {
   /** Sentinel password that triggers onboarding */

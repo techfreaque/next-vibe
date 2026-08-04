@@ -6,7 +6,6 @@ import type { CountryLanguage } from "../../../core/i18n/core/config";
 import { mcpSilentMode } from "../../../logger/debug";
 import { createEndpointLogger } from "../../../logger/server";
 import type { EndpointLogger } from "../../../logger/types";
-
 import type { RouteExecutionResult } from "./route-executor";
 import { binaryStartTime } from "./run-cli";
 

@@ -19,7 +19,6 @@
 import http from "node:http";
 
 import type { EndpointLogger } from "../../logger/types";
-
 import { PROXY_LOADING_HTML } from "./proxy-loading-page";
 
 // ─── Recent-request tracker (diagnoses Next.js crashes) ─────────────────────────

@@ -1,3 +1,5 @@
+import type z from "zod";
+
 import type { WidgetType } from "../../../../core/definition/enums";
 import type {
   BaseObjectWidgetConfig,
@@ -7,7 +9,6 @@ import type {
   ObjectChildrenConstraint,
 } from "../../../_shared/types";
 import type { BaseContainerLayoutProps } from "../container/types";
-import type z from "zod";
 
 /**
  * Custom widget config - allows custom React component renderer

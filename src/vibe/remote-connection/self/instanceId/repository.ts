@@ -12,7 +12,6 @@ import {
 } from "../../../core/route/response.schema";
 import type { JwtPrivatePayloadType } from "../../../identity/auth/types";
 import type { EndpointLogger } from "../../../logger/types";
-
 import { RemoteConnectionRepository } from "../../repository";
 import type { RemoteConnectionSelfInstanceIdGetResponseOutput } from "./definition";
 

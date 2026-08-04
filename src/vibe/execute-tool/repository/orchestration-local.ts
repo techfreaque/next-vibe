@@ -28,7 +28,6 @@ import type { ResponseType } from "../../core/route/response.schema";
 import type { WidgetData } from "../../core/utils/json";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
-
 import type { CallbackModeValue } from "../constants";
 import type {
   RouteExecuteRequestOutput,

@@ -12,11 +12,10 @@ import { success } from "../../../../core/route/response.schema";
 import { parseError } from "../../../../core/utils/parse-error";
 import type { EndpointLogger } from "../../../../logger/types";
 import { Platform } from "../../../../platforms/platforms";
-import { calculateFilteredSummary, filterIssues } from "../filter-utils";
-
 import { ConfigRepositoryImpl } from "../../config/repository";
 import { sortIssuesByLocation } from "../../config/shared";
 import type { CheckConfig } from "../../config/types";
+import { calculateFilteredSummary, filterIssues } from "../filter-utils";
 // ── Inline types (definition removed) ───────────────────────
 
 export interface LintIssue {

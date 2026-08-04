@@ -1,8 +1,10 @@
 "use client";
 
+import { Button } from "next-vibe/ui/ui/button";
+import { type JSX } from "react";
+
 import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Platform } from "../../../../platforms/platforms";
-import { Button } from "next-vibe/ui/ui/button";
 import { cn } from "../../../_shared/cn";
 import type { ReactStaticWidgetProps } from "../../../_shared/react-types";
 import type { FieldUsageConfig } from "../../../_shared/types";
@@ -21,8 +23,6 @@ import {
 } from "../../../_shared/widget-helpers";
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "../../../hooks/i18n";
 import { Icon } from "../../form-fields/icon-field/icon-component";
-import { type JSX } from "react";
-
 import type { SubmitButtonWidgetConfig } from "./types";
 
 /**

@@ -22,6 +22,7 @@
 import "server-only";
 
 import { and, eq } from "drizzle-orm";
+
 import { defaultLocale } from "../../core/i18n/core/config";
 import type { ResponseType } from "../../core/route/response.schema";
 import { success } from "../../core/route/response.schema";
@@ -34,7 +35,6 @@ import type { EndpointLogger } from "../../logger/types";
 import { Platform } from "../../platforms/platforms";
 import { remoteConnections } from "../../remote-connection/db";
 import { RemoteConnectionRepository } from "../../remote-connection/repository";
-
 import { createEndpointEmitter } from "../core/emitter";
 import type { ResolvedRelayContext } from "../core/relay-context";
 import type { RemoteEventRelayPayload } from "../core/relay-hook";

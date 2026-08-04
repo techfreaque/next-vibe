@@ -16,13 +16,14 @@ import "server-only";
 
 import { join } from "node:path";
 
+import { GENERATED_DIR, VIBE_DIR } from "@/env/paths";
+
+import { formatCount, formatWarning } from "../../../logger/formatters";
+import type { EndpointLogger } from "../../../logger/types";
 import {
   getPreferredToolName,
   pathSegmentsToToolName,
 } from "../../core-utils/path";
-import type { ApiSection, CreateApiEndpointAny } from "../endpoint-base";
-import type { EndpointMeta } from "../endpoints-meta";
-import type { Methods } from "../enums";
 import type {
   GeneratorContext,
   GeneratorResult,
@@ -38,10 +39,9 @@ import {
 import type { CountryLanguage } from "../../i18n/core/config";
 import type { WidgetData } from "../../utils/json";
 import { parseError } from "../../utils/parse-error";
-import { formatCount, formatWarning } from "../../../logger/formatters";
-import type { EndpointLogger } from "../../../logger/types";
-
-import { GENERATED_DIR, VIBE_DIR } from "@/env/paths";
+import type { ApiSection, CreateApiEndpointAny } from "../endpoint-base";
+import type { EndpointMeta } from "../endpoints-meta";
+import type { Methods } from "../enums";
 
 const OUTPUT_DIR = `${GENERATED_DIR}/endpoints/meta`;
 

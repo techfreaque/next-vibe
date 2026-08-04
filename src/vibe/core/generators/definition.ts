@@ -3,7 +3,17 @@
  * Production-ready endpoint for running all code generators
  */
 
+import { z } from "zod";
+
+import { GENERATED_DIR } from "@/env/paths";
+
 import { UserRole } from "../../identity/roles/enum";
+import { lazyWidget } from "../../unified-ui/_shared/lazy-widget";
+import {
+  customWidgetObject,
+  requestField,
+  responseField,
+} from "../../unified-ui/_shared/utils";
 import { createEndpoint } from "../definition/create";
 import {
   EndpointErrorTypes,
@@ -11,15 +21,6 @@ import {
   Methods,
   WidgetType,
 } from "../definition/enums";
-import { lazyWidget } from "../../unified-ui/_shared/lazy-widget";
-import {
-  customWidgetObject,
-  requestField,
-  responseField,
-} from "../../unified-ui/_shared/utils";
-import { z } from "zod";
-
-import { GENERATED_DIR } from "@/env/paths";
 
 const GenerateAllWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.GenerateAllWidget })),

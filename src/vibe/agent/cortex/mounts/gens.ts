@@ -7,9 +7,9 @@ import "server-only";
  * Reconstructed from chatMessages where toolCall.toolName is a generation tool.
  */
 import { and, desc, eq, isNotNull, or, sql } from "drizzle-orm";
-import { chatMessages, chatThreads } from "../../chat/db";
 import { db } from "next-vibe/database";
 
+import { chatMessages, chatThreads } from "../../chat/db";
 import type { VirtualListEntry, VirtualReadResult } from "./resolver";
 
 /**

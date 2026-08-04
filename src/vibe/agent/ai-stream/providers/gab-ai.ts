@@ -7,10 +7,10 @@
 import "server-only";
 
 import type { OpenAIChatLanguageModel } from "@ai-sdk/openai/internal";
+import type { EndpointLogger } from "next-vibe/logger/types";
+
 import { agentEnv } from "../../env";
 import { ApiProvider } from "../../models/models";
-
-import type { EndpointLogger } from "next-vibe/logger/types";
 import { createPromptEngineeredProvider } from "./shared/openai-compatible-provider";
 
 /**

@@ -21,7 +21,6 @@ import type {
 import { UserPermissionRole } from "../../identity/roles/enum";
 import type { EndpointLogger } from "../../logger/types";
 import { scopedTranslation as tasksScopedTranslation } from "../i18n";
-
 import type {
   UnifiedRunnerRequestOutput,
   UnifiedRunnerResponseOutput,

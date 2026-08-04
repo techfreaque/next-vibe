@@ -1,8 +1,10 @@
 "use client";
 
-import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Div } from "next-vibe/ui/ui/div";
 import { Markdown } from "next-vibe/ui/ui/markdown";
+import type { JSX } from "react";
+
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { cn } from "../../../_shared/cn";
 import type {
   ReactRequestResponseWidgetProps,
@@ -15,8 +17,6 @@ import {
   useWidgetLocale,
 } from "../../../_shared/use-widget-context";
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "../../../hooks/i18n";
-import type { JSX } from "react";
-
 import type { MarkdownWidgetConfig } from "./types";
 
 /**

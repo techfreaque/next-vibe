@@ -1,4 +1,3 @@
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import Animated, {
   useAnimatedStyle,
@@ -8,6 +7,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { SkeletonProps } from "../../web/ui/skeleton";
 
 const duration = 1000;

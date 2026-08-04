@@ -3,10 +3,6 @@
  * Admin/dev-only - renders the full system prompt for a given user context.
  */
 
-import { DefaultFolderId } from "../../../../core/execution-context";
-import { imageGenModelSelectionSchema } from "../../../image-generation/models";
-import { musicGenModelSelectionSchema } from "../../../music-generation/models";
-import { videoGenModelSelectionSchema } from "../../../video-generation/models";
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -23,6 +19,10 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { DefaultFolderId } from "../../../../core/execution-context";
+import { imageGenModelSelectionSchema } from "../../../image-generation/models";
+import { musicGenModelSelectionSchema } from "../../../music-generation/models";
+import { videoGenModelSelectionSchema } from "../../../video-generation/models";
 import { scopedTranslation } from "./i18n";
 
 const SystemPromptDebugWidget = lazyWidget(() =>

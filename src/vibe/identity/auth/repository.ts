@@ -21,6 +21,13 @@ import { leads, userLeadLinks } from "next-vibe/identity/lead/db";
 import { LeadAuthRepository } from "next-vibe/identity/lead/device-auth";
 import { LeadSource, LeadStatus } from "next-vibe/identity/lead/enum";
 import type { UserRoleValue } from "next-vibe/identity/roles/enum";
+
+import {
+  AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS,
+  BEARER_LEAD_ID_SEPARATOR,
+  LEAD_ID_COOKIE_NAME,
+} from "@/env/constants";
+
 import { coreEnv } from "../../core/env";
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "../../core/i18n/core/language-utils";
@@ -39,13 +46,6 @@ import { SessionRepository } from "../session/repository";
 import { users } from "../user/db";
 import { UserDetailLevel } from "../user/enum";
 import { UserRepository } from "../user/repository";
-
-import {
-  AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS,
-  BEARER_LEAD_ID_SEPARATOR,
-  LEAD_ID_COOKIE_NAME,
-} from "@/env/constants";
-
 import { type AuthContext } from "./base-auth-handler";
 import { getPlatformAuthHandler } from "./factory";
 import type {

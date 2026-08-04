@@ -4,8 +4,6 @@
  */
 
 "use client";
-import { CronTaskStatus, type CronTaskStatusValue } from "../../enum";
-import { scopedTranslation as tasksScopedTranslation } from "../../i18n";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { Activity } from "next-vibe/ui/ui/icons/Activity";
@@ -22,6 +20,8 @@ import { TrendingUp } from "next-vibe/ui/ui/icons/TrendingUp";
 import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
 import { Pre } from "next-vibe/ui/ui/pre";
 import { Span } from "next-vibe/ui/ui/span";
+import React, { useCallback, useMemo, useState } from "react";
+
 import { cn } from "../../../unified-ui/_shared/cn";
 import {
   useWidgetContext,
@@ -35,8 +35,8 @@ import { DateFieldWidget } from "../../../unified-ui/widgets/form-fields/date-fi
 import { TextFieldWidget } from "../../../unified-ui/widgets/form-fields/text-field/widget";
 import { FormAlertWidget } from "../../../unified-ui/widgets/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "../../../unified-ui/widgets/interactive/navigate-button/widget";
-import React, { useCallback, useMemo, useState } from "react";
-
+import { CronTaskStatus, type CronTaskStatusValue } from "../../enum";
+import { scopedTranslation as tasksScopedTranslation } from "../../i18n";
 import type endpoints from "./definition";
 import type { CronHistoryResponseOutput } from "./definition";
 

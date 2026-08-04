@@ -1,5 +1,4 @@
 import * as ProgressPrimitive from "@rn-primitives/progress";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import Animated, {
   Extrapolation,
@@ -9,6 +8,7 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 
+import { cn } from "../../../unified-ui/_shared/cn";
 // Import ALL types from web version (web is source of truth)
 import type {
   ProgressIndicatorProps,

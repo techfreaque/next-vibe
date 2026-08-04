@@ -3,8 +3,8 @@
  * Using createEnumOptions pattern for i18n-friendly select options
  */
 
-import { scopedTranslation } from "./i18n";
 import { createEnumOptions } from "../../../unified-ui/_shared/enum";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Status filter for error logs

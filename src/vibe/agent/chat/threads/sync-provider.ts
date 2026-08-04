@@ -26,7 +26,7 @@ import {
   notInArray,
   sql,
 } from "drizzle-orm";
-import type { ChatModelId } from "../../ai-stream/models";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { WidgetDataSchema } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
@@ -41,7 +41,7 @@ import {
 import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import { z } from "zod";
 
-import { DefaultFolderId } from "next-vibe/core/execution-context";
+import type { ChatModelId } from "../../ai-stream/models";
 import {
   CHAT_MESSAGE_COLUMNS,
   chatFolders,

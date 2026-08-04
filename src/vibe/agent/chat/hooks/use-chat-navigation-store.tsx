@@ -16,6 +16,7 @@
 
 "use client";
 
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import {
   getCurrentUrl,
   silentPushState,
@@ -25,8 +26,6 @@ import type { JSX, ReactNode } from "react";
 import { createContext, useContext, useRef } from "react";
 import type { StoreApi } from "zustand";
 import { createStore, useStore } from "zustand";
-
-import { DefaultFolderId } from "next-vibe/core/execution-context";
 
 /**
  * Navigation state shape

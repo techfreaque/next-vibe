@@ -2,7 +2,6 @@ import "server-only";
 
 import { parseError } from "../../core/utils/parse-error";
 import type { EndpointLogger } from "../../logger/types";
-
 import { db } from "..";
 
 /**

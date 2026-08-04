@@ -12,8 +12,6 @@
 
 "use client";
 
-import { Methods } from "../../core/definition/enums";
-import { UserPermissionRole } from "../../identity/roles/enum";
 import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
 import {
   Card,
@@ -40,6 +38,12 @@ import { Switch } from "next-vibe/ui/ui/switch";
 import { Code, P } from "next-vibe/ui/ui/typography";
 import { WidgetHeader } from "next-vibe/ui/ui/widget-header";
 import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
+import type { JSX } from "react";
+import { useMemo, useState } from "react";
+import { useFormContext, useWatch } from "react-hook-form";
+
+import { Methods } from "../../core/definition/enums";
+import { UserPermissionRole } from "../../identity/roles/enum";
 import {
   useWidgetEndpoint,
   useWidgetEndpointMutations,
@@ -62,10 +66,6 @@ import { TextFieldWidget } from "../../unified-ui/widgets/form-fields/text-field
 import { FormAlertWidget } from "../../unified-ui/widgets/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "../../unified-ui/widgets/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "../../unified-ui/widgets/interactive/submit-button/widget";
-import type { JSX } from "react";
-import { useMemo, useState } from "react";
-import { useFormContext, useWatch } from "react-hook-form";
-
 import connectDefinitions from "../connect/definition";
 import type { SyncScope } from "../db";
 import type { SyncProviderInfo } from "../sync/providers/definition";

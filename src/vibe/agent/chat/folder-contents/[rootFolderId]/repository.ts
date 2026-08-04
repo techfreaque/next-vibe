@@ -2,26 +2,6 @@ import "server-only";
 
 import { and, count, desc, eq, inArray, isNull, max } from "drizzle-orm";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
-import {
-  type ChatFolder,
-  chatFolders,
-  chatThreads,
-  threadShareLinks,
-} from "../../db";
-import {
-  canCreateThreadInFolder,
-  canDeleteFolder,
-  canDeleteThread,
-  canEditThread,
-  canHideFolder,
-  canHideThread,
-  canManageFolder,
-  canManageFolderPermissions,
-  canManageThreadPermissions,
-  canPostInThread,
-  canViewFolder,
-  canViewThread,
-} from "../../permissions/permissions";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type {
   ChannelDecision,
@@ -39,7 +19,27 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { EmitChannelDecision } from "next-vibe/realtime/core/structured-events";
 
+import {
+  type ChatFolder,
+  chatFolders,
+  chatThreads,
+  threadShareLinks,
+} from "../../db";
 import { ThreadStreamingState } from "../../enum";
+import {
+  canCreateThreadInFolder,
+  canDeleteFolder,
+  canDeleteThread,
+  canEditThread,
+  canHideFolder,
+  canHideThread,
+  canManageFolder,
+  canManageFolderPermissions,
+  canManageThreadPermissions,
+  canPostInThread,
+  canViewFolder,
+  canViewThread,
+} from "../../permissions/permissions";
 import type {
   FolderContentsItem,
   FolderContentsRequestOutput,

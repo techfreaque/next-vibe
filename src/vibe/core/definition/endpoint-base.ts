@@ -5,14 +5,14 @@
  * This file must NOT import from widgets/configs.ts
  */
 
+import type { z } from "zod";
+
 import type { UserRoleValue } from "../../identity/roles/enum";
 import type { UnifiedField } from "../../unified-ui/_shared/configs";
 import type {
   AnyChildrenConstrain,
   FieldUsageConfig,
 } from "../../unified-ui/_shared/types";
-import type { z } from "zod";
-
 import type { CreateApiEndpoint } from "./create";
 import type { Methods } from "./enums";
 

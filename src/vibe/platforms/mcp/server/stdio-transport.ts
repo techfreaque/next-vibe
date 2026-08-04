@@ -7,7 +7,6 @@ import * as readline from "node:readline";
 
 import { parseError } from "../../../core/utils/parse-error";
 import type { EndpointLogger } from "../../../logger/types";
-
 import type { JsonRpcRequest, JsonRpcResponse } from "../types";
 
 /**

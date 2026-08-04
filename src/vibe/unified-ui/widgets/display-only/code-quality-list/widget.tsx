@@ -6,10 +6,14 @@
  * Displays code quality issues grouped by file with severity-based styling
  */
 
-import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Div } from "next-vibe/ui/ui/div";
 import { ExternalLink } from "next-vibe/ui/ui/link";
 import { Span } from "next-vibe/ui/ui/span";
+import type { ReactElement } from "react";
+import { useMemo } from "react";
+import type { z } from "zod";
+
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import type { ReactRequestResponseWidgetProps } from "../../../_shared/react-types";
 import type { FieldUsageConfig } from "../../../_shared/types";
 import {
@@ -18,10 +22,6 @@ import {
   useWidgetResponse,
 } from "../../../_shared/use-widget-context";
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "../../../hooks/i18n";
-import type { ReactElement } from "react";
-import { useMemo } from "react";
-import type { z } from "zod";
-
 import type {
   CodeQualityListSchema,
   CodeQualityListWidgetConfig,

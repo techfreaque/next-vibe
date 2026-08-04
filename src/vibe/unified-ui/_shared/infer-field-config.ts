@@ -7,7 +7,6 @@
 
 import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import { FieldDataType, WidgetType } from "../../core/definition/enums";
-
 import {
   type EndpointFieldStructure,
   getFieldStructureByPath,

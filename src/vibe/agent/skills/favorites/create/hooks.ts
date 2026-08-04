@@ -6,7 +6,6 @@
 
 "use client";
 
-import { useProviderAvailability } from "../../../env-availability-store";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -21,6 +20,7 @@ import type {
   ChatModelSelection,
 } from "../../../ai-stream/models";
 import { parseSkillId } from "../../../chat/slugify";
+import { useProviderAvailability } from "../../../env-availability-store";
 import type { VoiceModelSelection } from "../../../text-to-speech/models";
 import characterSingleDefinitions from "../../[id]/definition";
 import { ChatFavoritesRepositoryClient } from "../repository-client";

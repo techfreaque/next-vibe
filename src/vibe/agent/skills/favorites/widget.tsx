@@ -27,10 +27,6 @@ import {
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { TOUR_DATA_ATTRS } from "../../ai-stream/stream/widget/chat-ui/welcome-tour/tour-attrs";
-import { parseSkillId } from "../../chat/slugify";
-import { useTourState } from "../../chat/tour-state";
-import { ModelCreditDisplay } from "../../models/widget/model-credit-display";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
@@ -67,11 +63,15 @@ import { apiClient } from "next-vibe/unified-ui/hooks/store";
 import BadgeWidget from "next-vibe/unified-ui/widgets/display-only/badge/widget";
 import IconWidget from "next-vibe/unified-ui/widgets/display-only/icon/widget";
 import TextWidget from "next-vibe/unified-ui/widgets/display-only/text/widget";
-import { type IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
+import { type IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import React, { useCallback, useMemo, useState } from "react";
 
+import { TOUR_DATA_ATTRS } from "../../ai-stream/stream/widget/chat-ui/welcome-tour/tour-attrs";
 import { ChatSettingsRepositoryClient } from "../../chat/settings/repository-client";
+import { parseSkillId } from "../../chat/slugify";
+import { useTourState } from "../../chat/tour-state";
+import { ModelCreditDisplay } from "../../models/widget/model-credit-display";
 import { getTtsModelById } from "../../text-to-speech/models";
 import { DEFAULT_SKILLS } from "../config";
 import { NO_SKILL_ID } from "../constants";

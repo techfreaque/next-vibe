@@ -1,10 +1,9 @@
 import * as TablePrimitive from "@rn-primitives/table";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import type { ViewStyle } from "react-native";
 import { Pressable, Text as RNText, View as RNView } from "react-native";
 
-import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 // MUST import ALL props interfaces from web version (NO local type definitions)
 import type {
   TableBodyProps,
@@ -17,6 +16,7 @@ import type {
   TableRowProps,
 } from "../../web/ui/table";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { TextClassContext } from "./text";
 
 const StyledTableRoot = styledNative(TablePrimitive.Root);

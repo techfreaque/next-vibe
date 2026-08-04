@@ -1,9 +1,8 @@
 import * as MenubarPrimitive from "@rn-primitives/menubar";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import { View } from "react-native";
 
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 import { CheckIcon } from "../../web/ui/icons/CheckIcon";
 import { ChevronRightIcon } from "../../web/ui/icons/ChevronRightIcon";
 import { DotFilledIcon } from "../../web/ui/icons/DotFilledIcon";
@@ -26,6 +25,7 @@ import type {
   MenubarTriggerProps,
 } from "../../web/ui/menubar";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 import { Span } from "./span";
 
 // The styled() function from nativewind has overly complex type inference for these components

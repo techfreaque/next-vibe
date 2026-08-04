@@ -1,8 +1,8 @@
 import { cva } from "class-variance-authority";
 import { Text } from "ink";
-import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 
+import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { BadgeProps } from "../../web/ui/badge";
 
 export const badgeVariants = cva("");

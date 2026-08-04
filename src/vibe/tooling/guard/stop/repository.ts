@@ -11,12 +11,11 @@ import {
 } from "../../../core/route/response.schema";
 import { parseError } from "../../../core/utils/parse-error";
 import type { EndpointLogger } from "../../../logger/types";
-import type { GuardStopT } from "./i18n";
-
 import type {
   GuardStopRequestOutput,
   GuardStopResponseOutput,
 } from "./definition";
+import type { GuardStopT } from "./i18n";
 
 /**
  * Guard Stop Repository

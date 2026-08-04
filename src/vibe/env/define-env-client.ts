@@ -3,9 +3,10 @@
  * Enforces explicit process.env references for Next.js bundler
  */
 
-import { isRuntimeEnvPlaceholder } from "../platforms/cli/runtime/runtime-env-placeholders";
 import type { z } from "zod";
 import { z as zod } from "zod";
+
+import { isRuntimeEnvPlaceholder } from "../platforms/cli/runtime/runtime-env-placeholders";
 
 interface FieldDef<T extends z.ZodTypeAny = z.ZodTypeAny> {
   schema: T;

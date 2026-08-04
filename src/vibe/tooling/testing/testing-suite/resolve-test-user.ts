@@ -4,6 +4,7 @@
  */
 
 import { eq } from "drizzle-orm";
+
 import { defaultLocale } from "../../../core/i18n/core/config";
 import { db } from "../../../database";
 import type { JwtPrivatePayloadType } from "../../../identity/auth/types";

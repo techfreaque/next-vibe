@@ -20,11 +20,10 @@ import {
 import { parseError } from "../../core/utils/parse-error";
 import { Environment } from "../../env/env-util";
 import type { EndpointLogger } from "../../logger/types";
+import { CronTaskPriority, TaskCategory } from "../enum";
 import { tasksEnv } from "../env";
 import type { TasksTranslationKey } from "../i18n";
 import type { TaskRunner } from "../unified-runner/types";
-
-import { CronTaskPriority, TaskCategory } from "../enum";
 import { DEV_WATCHER_TASK_NAME } from "./constants";
 
 export { DEV_WATCHER_TASK_NAME } from "./constants";

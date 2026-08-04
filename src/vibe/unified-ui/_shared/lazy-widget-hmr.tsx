@@ -93,9 +93,8 @@ export function HmrWrapper({
       }
 
       const onUpdate: UpdateCallback = (Component): void => {
-        const freshLazy = React.lazy(
-          (): Promise<{ default: AnyComponent }> =>
-            Promise.resolve({ default: Component }),
+        const freshLazy = React.lazy((): Promise<{ default: AnyComponent }> =>
+          Promise.resolve({ default: Component }),
         );
         lazyRef.current = freshLazy;
         modulePromiseRef.current = Promise.resolve(Component);

@@ -2,13 +2,13 @@
  * Shared prefill display utilities for form field widgets
  */
 
-import type { TParams } from "../../../../core/i18n/core/static-types";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Div } from "next-vibe/ui/ui/div";
 import { Span } from "next-vibe/ui/ui/span";
 import { P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 
+import type { TParams } from "../../../../core/i18n/core/static-types";
 import type { PrefillDisplayConfig } from "./types";
 
 /**

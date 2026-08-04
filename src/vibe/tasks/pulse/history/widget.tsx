@@ -4,7 +4,6 @@
  */
 
 "use client";
-import { PulseExecutionStatus } from "../../enum";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
 import { Activity } from "next-vibe/ui/ui/icons/Activity";
@@ -20,6 +19,8 @@ import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
 import { TrendingUp } from "next-vibe/ui/ui/icons/TrendingUp";
 import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
 import { Span } from "next-vibe/ui/ui/span";
+import React, { useCallback, useMemo, useState } from "react";
+
 import { cn } from "../../../unified-ui/_shared/cn";
 import {
   useWidgetContext,
@@ -31,8 +32,7 @@ import {
 } from "../../../unified-ui/_shared/use-widget-context";
 import { DateFieldWidget } from "../../../unified-ui/widgets/form-fields/date-field/widget";
 import { NavigateButtonWidget } from "../../../unified-ui/widgets/interactive/navigate-button/widget";
-import React, { useCallback, useMemo, useState } from "react";
-
+import { PulseExecutionStatus } from "../../enum";
 import type endpoints from "./definition";
 import type { PulseHistoryResponseOutput } from "./definition";
 

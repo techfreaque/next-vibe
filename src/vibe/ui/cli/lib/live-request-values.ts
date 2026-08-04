@@ -1,5 +1,6 @@
-import type { WidgetData } from "../../../core/utils/json";
 import { useEffect, useSyncExternalStore } from "react";
+
+import type { WidgetData } from "../../../core/utils/json";
 
 /**
  * Live request-field values, published by the form and read by the page header.

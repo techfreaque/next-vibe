@@ -20,10 +20,9 @@
  *   import { TypecheckRepository } from "@next-vibe/checker/typecheck"
  */
 
-import type { PackageManifest } from "../builder/repository/vibe-package/types";
-
 import { GITHUB_REPO_URL } from "@/env/constants";
 
+import type { PackageManifest } from "../builder/repository/vibe-package/types";
 import { CHECK_CONFIG_CREATE_ALIAS } from "./config/constants";
 import { VIBE_CHECK_ALIAS } from "./constants";
 

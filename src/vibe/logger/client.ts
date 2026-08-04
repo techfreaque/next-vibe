@@ -6,7 +6,6 @@
 
 import type { CountryLanguage } from "../core/i18n/core/config";
 import { UserPermissionRole } from "../identity/roles/enum";
-
 import { createLogger } from "./create-logger";
 import type { EndpointLogger, LoggerMetadata } from "./types";
 

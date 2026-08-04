@@ -7,6 +7,9 @@
 import "server-only";
 
 import { and, count, eq, ilike, inArray, isNull, or } from "drizzle-orm";
+
+import { getEndpoint } from "@/generated/endpoints/endpoint";
+
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import type { ResponseType } from "../../../core/route/response.schema";
 import {
@@ -19,7 +22,6 @@ import { db } from "../../../database";
 import type { JwtPayloadType } from "../../../identity/auth/types";
 import { UserPermissionRole } from "../../../identity/roles/enum";
 import type { EndpointLogger } from "../../../logger/types";
-import type { CronQueueT } from "./i18n";
 import { calculateNextExecutionTime } from "../../cron-formatter";
 import {
   CronTaskHiddenFilter,
@@ -28,9 +30,6 @@ import {
   TaskCategoryDB,
   TaskOutputMode,
 } from "../../enum";
-
-import { getEndpoint } from "@/generated/endpoints/endpoint";
-
 import { cronTasks, dbUserIdToOwner } from "../db";
 import { CronTasksRepository } from "../repository";
 import type {
@@ -38,6 +37,7 @@ import type {
   CronQueueListResponseOutput,
   CronQueueTask,
 } from "./definition";
+import type { CronQueueT } from "./i18n";
 
 export class CronQueueRepository {
   /**

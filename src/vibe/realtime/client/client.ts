@@ -17,10 +17,10 @@
  * `preWarmChannel` opens the socket early (e.g. just before a stream POST).
  */
 
-import type { CountryLanguage } from "../../core/i18n/core/config";
-import type { EndpointLogger } from "../../logger/types";
 import { getCurrentHost, getCurrentProtocol } from "next-vibe/ui/lib/location";
 
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import type { EndpointLogger } from "../../logger/types";
 import type {
   EventHandler,
   WsChannelDescriptor,

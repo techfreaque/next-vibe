@@ -1,3 +1,6 @@
+import type { Path } from "react-hook-form";
+import type z from "zod";
+
 import type { InferResponseOutput } from "../../core/definition/create";
 import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import type { WidgetType } from "../../core/definition/enums";
@@ -12,9 +15,6 @@ import type { UserPermissionRoleValue } from "../../identity/roles/enum";
 import type { EndpointLogger } from "../../logger/types";
 import type { Platform } from "../../platforms/platforms";
 import type { UseNavigationStackReturn } from "../hooks/use-navigation-stack";
-import type { Path } from "react-hook-form";
-import type z from "zod";
-
 import type {
   DisplayOnlyWidgetConfig,
   ObjectWidgetConfig,

@@ -22,6 +22,8 @@
  */
 
 import { and, eq } from "drizzle-orm";
+import { z } from "zod";
+
 import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import { coreClientEnv } from "../../core/env-client";
 import { defaultLocale } from "../../core/i18n/core/config";
@@ -30,8 +32,6 @@ import { db } from "../../database";
 import { VibeMode } from "../../env/env-util";
 import { createEndpointLogger } from "../../logger/server";
 import type { EndpointLogger } from "../../logger/types";
-import bridgeDefinition from "../remote-event-bridge/definition";
-import { SYNC_DOMAINS } from "../core/sync-domain";
 import {
   remoteConnections,
   StandardSyncCursorSchema,
@@ -41,12 +41,12 @@ import {
 } from "../../remote-connection/db";
 import { RemoteConnectionRepository } from "../../remote-connection/repository";
 import { RemoteTransport } from "../../remote-connection/transport";
-import { z } from "zod";
-
 import { buildUserWsChannel } from "../core/channel";
 import type { AnyEndpointEventEnvelope } from "../core/structured-events";
+import { SYNC_DOMAINS } from "../core/sync-domain";
 import type { WsWireMessage } from "../core/types";
 import { parseWsFrame } from "../core/types";
+import bridgeDefinition from "../remote-event-bridge/definition";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

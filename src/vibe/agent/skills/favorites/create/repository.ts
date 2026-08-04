@@ -6,12 +6,6 @@
 import "server-only";
 
 import { and, eq, max, sql } from "drizzle-orm";
-import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "../../../image-generation/constants";
-import type { ImageGenModelSelection } from "../../../image-generation/models";
-import { DEFAULT_STT_MODEL_SELECTION } from "../../../speech-to-text/constants";
-import type { SttModelSelection } from "../../../speech-to-text/models";
-import { DEFAULT_TTS_MODEL_SELECTION } from "../../../text-to-speech/constants";
-import type { VoiceModelSelection } from "../../../text-to-speech/models";
 import {
   type CountryLanguage,
   defaultLocale,
@@ -35,6 +29,12 @@ import {
   generateFavoriteSlug,
   parseSkillId,
 } from "../../../chat/slugify";
+import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "../../../image-generation/constants";
+import type { ImageGenModelSelection } from "../../../image-generation/models";
+import { DEFAULT_STT_MODEL_SELECTION } from "../../../speech-to-text/constants";
+import type { SttModelSelection } from "../../../speech-to-text/models";
+import { DEFAULT_TTS_MODEL_SELECTION } from "../../../text-to-speech/constants";
+import type { VoiceModelSelection } from "../../../text-to-speech/models";
 import { DEFAULT_SKILLS } from "../../config";
 import { SkillsRepository } from "../../repository";
 import { chatFavorites } from "../db";

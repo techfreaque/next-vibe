@@ -1,9 +1,9 @@
+import { getAllSeedModuleNames, getSeedModule } from "@/generated/seeds/index";
+
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import { parseError } from "../../core/utils/parse-error";
 import { formatDatabase, formatDuration } from "../../logger/formatters";
 import type { EndpointLogger } from "../../logger/types";
-
-import { getAllSeedModuleNames, getSeedModule } from "@/generated/seeds/index";
 
 type SeedFn = (
   logger: EndpointLogger,

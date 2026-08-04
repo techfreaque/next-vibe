@@ -3,6 +3,8 @@
  * Rebuilds the application and hot-restarts the running Next.js server
  */
 
+import { z } from "zod";
+
 import { translatedValueSchema } from "../../../core/definition/common.schema";
 import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
@@ -13,7 +15,6 @@ import {
   WidgetType,
 } from "../../../core/definition/enums";
 import { UserRole } from "../../../identity/roles/enum";
-import { scopedTranslation } from "./i18n";
 import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "../../../unified-ui/_shared/utils";
 import {
@@ -22,10 +23,9 @@ import {
   responseArrayOptionalField,
   responseField,
 } from "../../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
 import { ServerFramework, ServerFrameworkOptions } from "../enum";
 import { REBUILD_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const RebuildWidget = lazyWidget(() =>
   import("./widget").then((m) => ({

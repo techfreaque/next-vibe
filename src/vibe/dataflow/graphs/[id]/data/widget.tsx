@@ -25,12 +25,6 @@ import type {
   Time,
   UTCTimestamp,
 } from "lightweight-charts";
-import { GraphOwnerType, GraphResolution } from "../../../enum";
-import type { GraphNodeConfig } from "../../../graph/schema";
-import type { GraphConfig } from "../../../graph/types";
-import editDefinitions from "../edit/definition";
-import versionsDefinitions from "../versions/definition";
-import { type Resolution, RESOLUTION_MS } from "../../../shared/fields";
 import { getRootCssVar } from "next-vibe/ui/lib/css-vars";
 import {
   addDocumentListener,
@@ -63,6 +57,14 @@ import { Shield } from "next-vibe/ui/ui/icons/Shield";
 import { X } from "next-vibe/ui/ui/icons/X";
 import { Span } from "next-vibe/ui/ui/span";
 import { P } from "next-vibe/ui/ui/typography";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+
 import { cn } from "../../../../unified-ui/_shared/cn";
 import {
   useWidgetEndpointMutations,
@@ -74,14 +76,12 @@ import {
   useWidgetValue,
 } from "../../../../unified-ui/_shared/use-widget-context";
 import { useEndpoint } from "../../../../unified-ui/hooks/use-endpoint";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-
+import { GraphOwnerType, GraphResolution } from "../../../enum";
+import type { GraphNodeConfig } from "../../../graph/schema";
+import type { GraphConfig } from "../../../graph/types";
+import { type Resolution, RESOLUTION_MS } from "../../../shared/fields";
+import editDefinitions from "../edit/definition";
+import versionsDefinitions from "../versions/definition";
 import type definition from "./definition";
 import definitions from "./definition";
 

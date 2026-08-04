@@ -10,7 +10,6 @@ import type { ResponseType } from "../../../core/route/response.schema";
 import { success } from "../../../core/route/response.schema";
 import { parseError } from "../../../core/utils/parse-error";
 import type { EndpointLogger } from "../../../logger/types";
-
 import type { PackageJson } from "../definition";
 import { MESSAGES } from "./constants";
 

@@ -1,9 +1,11 @@
 "use client";
-import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Div } from "next-vibe/ui/ui/div";
 import { ExternalLink as ExternalLinkIcon } from "next-vibe/ui/ui/icons/ExternalLink";
 import { ExternalLink } from "next-vibe/ui/ui/link";
 import { Span } from "next-vibe/ui/ui/span";
+import type { JSX } from "react";
+
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { cn } from "../../../_shared/cn";
 import type {
   ReactRequestResponseWidgetProps,
@@ -21,8 +23,6 @@ import {
   getTextSizeClassName,
   isExternalUrl,
 } from "../../../_shared/widget-helpers";
-import type { JSX } from "react";
-
 import { extractLinkData } from "./shared";
 import type { LinkWidgetConfig, LinkWidgetSchema } from "./types";
 
@@ -53,9 +53,9 @@ import type { LinkWidgetConfig, LinkWidgetSchema } from "./types";
  */
 export function LinkWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends TEndpoint extends CreateApiEndpointAny
+  TKey extends (TEndpoint extends CreateApiEndpointAny
     ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
-    : never,
+    : never),
   TUsage extends FieldUsageConfig,
 >(
   props:

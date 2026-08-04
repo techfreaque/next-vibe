@@ -27,14 +27,14 @@ import type { WidgetData } from "../../core/utils/json";
 import { parseError } from "../../core/utils/parse-error";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
-import { scopedTranslation as mcpScopedTranslation } from "./i18n";
+import { VIBE_CHECK_TOOL_NAMES } from "../../tooling/check/constants";
+import { McpResultFormatter } from "../../unified-ui/renderers/mcp/McpResultFormatter";
 import { Platform } from "../platforms";
+import { scopedTranslation as mcpScopedTranslation } from "./i18n";
 import {
   dispatchPrefixedToolName,
   dispatchRoutedTool,
 } from "./remote-dispatch";
-import { VIBE_CHECK_TOOL_NAMES } from "../../tooling/check/constants";
-import { McpResultFormatter } from "../../unified-ui/renderers/mcp/McpResultFormatter";
 import type {
   MCPContent,
   MCPExecutionContext,

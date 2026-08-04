@@ -1,7 +1,7 @@
 import { Text } from "ink";
-import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import * as React from "react";
 
+import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { TitleProps } from "../../web/ui/title";
 import { parseClassesToInkProps } from "./tailwind-to-ink";
 

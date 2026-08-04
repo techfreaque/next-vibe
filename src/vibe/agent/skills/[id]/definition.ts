@@ -3,9 +3,6 @@
  * Defines endpoints for GET, PATCH (update), and DELETE operations on a single skill
  */
 
-import { parseSkillId } from "../../chat/slugify";
-import { getClientAvailability } from "../../env-availability-store";
-import { getModelDisplayName } from "../../models/all-models";
 import {
   dateSchema,
   iconSchema,
@@ -36,6 +33,9 @@ import {
 import { z } from "zod";
 
 import { getBestChatModel } from "../../ai-stream/models";
+import { parseSkillId } from "../../chat/slugify";
+import { getClientAvailability } from "../../env-availability-store";
+import { getModelDisplayName } from "../../models/all-models";
 import {
   SKILL_DELETE_ALIAS,
   SKILL_GET_ALIAS,

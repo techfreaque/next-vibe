@@ -7,7 +7,6 @@ import "server-only";
 
 import type { JSONValue } from "ai";
 import { and, eq, sql } from "drizzle-orm";
-import { getEnvAvailability } from "../../env-availability";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -50,6 +49,7 @@ import {
   createThreadsGetEmitter,
   createThreadsPostEmitter,
 } from "../../chat/threads/emitter";
+import { getEnvAvailability } from "../../env-availability";
 import type { ImageGenModelSelection } from "../../image-generation/models";
 import type { MusicGenModelSelection } from "../../music-generation/models";
 import {

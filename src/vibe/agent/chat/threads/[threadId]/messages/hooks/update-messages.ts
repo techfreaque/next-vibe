@@ -11,11 +11,11 @@
  */
 
 import { DefaultFolderId } from "next-vibe/core/execution-context";
-import type { ChatMessage } from "../../../../db";
 import { success } from "next-vibe/core/route/response.schema";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { apiClient } from "next-vibe/unified-ui/hooks/store";
 
+import type { ChatMessage } from "../../../../db";
 import { ChatMessageRole, ThreadStreamingState } from "../../../../enum";
 import messagesDefinition from "../definition";
 

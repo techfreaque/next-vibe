@@ -1,13 +1,11 @@
 "use client";
 
-import { useTranslation } from "../../../core/i18n/core/client";
 import { Brain } from "next-vibe/ui/ui/icons/Brain";
 import { Check } from "next-vibe/ui/ui/icons/Check";
 import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
 import { Copy } from "next-vibe/ui/ui/icons/Copy";
 import { ExternalLink } from "next-vibe/ui/ui/icons/ExternalLink";
 import { ExternalLink as ExternalLinkComponent } from "next-vibe/ui/ui/link";
-import { cn } from "../../../unified-ui/_shared/cn";
 import type { JSX } from "react";
 import React, { memo, useEffect, useMemo, useState } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
@@ -16,6 +14,8 @@ import { nightOwl as atomDark } from "react-syntax-highlighter/dist/esm/styles/p
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 
+import { useTranslation } from "../../../core/i18n/core/client";
+import { cn } from "../../../unified-ui/_shared/cn";
 import { uiScopedTranslation } from "../i18n";
 import type { StyleType } from "../utils/style-type";
 

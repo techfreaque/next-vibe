@@ -3,10 +3,9 @@
  * Uses @rn-primitives/slider
  */
 import * as SliderPrimitive from "@rn-primitives/slider";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type {
   SliderRangeProps,
   SliderRootProps,
@@ -14,6 +13,7 @@ import type {
   SliderTrackProps,
 } from "../../web/ui/slider";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 
 // Re-export all types from web
 export type {

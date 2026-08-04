@@ -1,12 +1,12 @@
 "use client";
 
 import { styled } from "nativewind";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import { Pressable, View } from "react-native";
 
-import { styledNative } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { SectionGroupProps } from "../../web/ui/section-group";
+import { styledNative } from "../utils/style-converter";
 import { Text } from "./text";
 
 export type { SectionGroupProps } from "../../web/ui/section-group";

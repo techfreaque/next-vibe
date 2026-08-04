@@ -14,13 +14,13 @@ import {
 } from "node:crypto";
 
 import { and, eq } from "drizzle-orm";
-import { coreClientEnv as envClient } from "../core/env-client";
+
 import { coreEnv } from "../core/env";
+import { coreClientEnv as envClient } from "../core/env-client";
 import { type ResponseType, success } from "../core/route/response.schema";
 import { db } from "../database";
 import { identityEnv } from "../identity/env";
 import type { EndpointLogger } from "../logger/types";
-
 import type {
   ConnectionHealth,
   RemoteToolCapability,

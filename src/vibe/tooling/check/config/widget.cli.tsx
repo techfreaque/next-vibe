@@ -11,6 +11,9 @@
 
 import chalk from "chalk";
 import { Box, Text, useInput, useStdin } from "ink";
+import type { JSX } from "react";
+import { useCallback, useState } from "react";
+
 import { Platform } from "../../../platforms/platforms";
 import {
   useWidgetContext,
@@ -18,9 +21,6 @@ import {
   useWidgetPlatform,
   useWidgetResponseOnly,
 } from "../../../unified-ui/_shared/use-widget-context";
-import type { JSX } from "react";
-import { useCallback, useState } from "react";
-
 import type defintion from "./definition";
 import type { ConfigCreateResponseOutput } from "./definition";
 

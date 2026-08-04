@@ -4,11 +4,10 @@
  */
 import { Minus } from "lucide-react-native";
 import { styled } from "nativewind";
-import { cn } from "../../../unified-ui/_shared/cn";
 import React, { createContext, useContext, useState } from "react";
 import { Text as RNText, TextInput, View } from "react-native";
 
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 // Import all public types from web version (web is source of truth)
 import type {
   InputOTPGroupProps,
@@ -18,6 +17,7 @@ import type {
   OTPContextValue,
 } from "../../web/ui/input-otp";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 
 const StyledView = styled(View, { className: "style" });
 const StyledTextInput = styled(TextInput, { className: "style" });

@@ -14,8 +14,6 @@ import {
   writeFileSync,
 } from "node:fs";
 import { resolve } from "node:path";
-import { getEnvAvailability } from "../../../agent/env-availability";
-import { AgentAvailabilityProvider } from "../../../agent/env-availability-store";
 import { PassThrough } from "node:stream";
 
 import {
@@ -27,6 +25,12 @@ import {
   useInput,
   useStdin,
 } from "ink";
+import { LoggerProvider } from "next-vibe/ui/hooks/logger-provider";
+import type { JSX, ReactNode } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+
+import { getEnvAvailability } from "../../../agent/env-availability";
+import { AgentAvailabilityProvider } from "../../../agent/env-availability-store";
 import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import type { WidgetData } from "../../../core/utils/json";
@@ -34,11 +38,6 @@ import type { JwtPayloadType } from "../../../identity/auth/types";
 import { createEndpointLogger } from "../../../logger/server";
 import { scopedTranslation as cliScopedTranslation } from "../../../platforms/cli/i18n";
 import { Platform } from "../../../platforms/platforms";
-import { LoggerProvider } from "next-vibe/ui/hooks/logger-provider";
-import { QueryProvider } from "../../hooks/query-provider";
-import type { JSX, ReactNode } from "react";
-import React, { useEffect, useMemo, useRef, useState } from "react";
-
 import { areArrowsCaptured } from "../../../ui/cli/lib/focus-manager";
 import {
   isEnterCaptured,
@@ -46,6 +45,7 @@ import {
   useLiveRequestValues,
 } from "../../../ui/cli/lib/live-request-values";
 import { isOverlayOpen } from "../../../ui/cli/ui/dialog";
+import { QueryProvider } from "../../hooks/query-provider";
 import { EndpointsPage } from "../web/EndpointsPage";
 import { prewarmLazyWidgets } from "./response/result-formatter";
 

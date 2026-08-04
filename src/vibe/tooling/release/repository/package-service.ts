@@ -15,9 +15,8 @@ import {
 } from "../../../core/route/response.schema";
 import { parseError } from "../../../core/utils/parse-error";
 import type { EndpointLogger } from "../../../logger/types";
-import { scopedTranslation } from "../i18n";
-
 import type { PackageJson, ReleasePackage } from "../definition";
+import { scopedTranslation } from "../i18n";
 import { MESSAGES } from "./constants";
 import { parsePackageJson, safeJsonParse } from "./utils";
 

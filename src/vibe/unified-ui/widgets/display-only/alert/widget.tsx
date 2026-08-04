@@ -1,7 +1,9 @@
 "use client";
 
-import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Alert, AlertDescription } from "next-vibe/ui/ui/alert";
+import type { JSX } from "react";
+
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import type {
   ReactRequestResponseWidgetProps,
   ReactStaticWidgetProps,
@@ -12,8 +14,6 @@ import {
   useWidgetContext,
   useWidgetForm,
 } from "../../../_shared/use-widget-context";
-import type { JSX } from "react";
-
 import type { AlertWidgetConfig, AlertWidgetSchema } from "./types";
 
 /**
@@ -22,9 +22,9 @@ import type { AlertWidgetConfig, AlertWidgetSchema } from "./types";
  */
 export function AlertWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends TEndpoint extends CreateApiEndpointAny
+  TKey extends (TEndpoint extends CreateApiEndpointAny
     ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
-    : never,
+    : never),
   TUsage extends FieldUsageConfig,
 >(
   props: TUsage extends { response: true }

@@ -1,7 +1,5 @@
 "use client";
 
-import { useChatBootContext } from "../../../../../../chat/hooks/context";
-import { scopedTranslation } from "../../../../../../chat/threads/widget/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
@@ -33,6 +31,8 @@ import type { JSX } from "react";
 
 import { useCredits } from "@/credits/hooks";
 
+import { useChatBootContext } from "../../../../../../chat/hooks/context";
+import { scopedTranslation } from "../../../../../../chat/threads/widget/i18n";
 import { useSidebarFooterStore } from "../../welcome-tour/sidebar-footer-store";
 import { TOUR_DATA_ATTRS } from "../../welcome-tour/tour-config";
 import { UserMenu } from "./user-menu";

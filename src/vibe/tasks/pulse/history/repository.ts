@@ -5,6 +5,7 @@
 import "server-only";
 
 import { and, avg, count, desc, eq, gte, lte, sql } from "drizzle-orm";
+
 import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -15,13 +16,12 @@ import { parseError } from "../../../core/utils/parse-error";
 import { db } from "../../../database";
 import type { EndpointLogger } from "../../../logger/types";
 import { PulseExecutionStatus } from "../../enum";
-import type { PulseHistoryT } from "./i18n";
-
 import { pulseExecutions } from "../db";
 import type {
   PulseHistoryRequestOutput,
   PulseHistoryResponseOutput,
 } from "./definition";
+import type { PulseHistoryT } from "./i18n";
 
 export class PulseHistoryRepository {
   static async getHistory(

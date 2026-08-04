@@ -3,22 +3,6 @@
  * Defines endpoint for creating new favorites
  */
 
-import type { ChatModelSelection } from "../../../ai-stream/models";
-import { getClientAvailability } from "../../../env-availability-store";
-import { chatModelSelectionSchema } from "../../../ai-stream/models";
-import {
-  audioVisionModelSelectionSchema,
-  imageVisionModelSelectionSchema,
-  videoVisionModelSelectionSchema,
-} from "../../../ai-stream/vision-models";
-import { imageGenModelSelectionSchema } from "../../../image-generation/models";
-import { musicGenModelSelectionSchema } from "../../../music-generation/models";
-import { sttModelSelectionSchema } from "../../../speech-to-text/models";
-import {
-  TtsModelId,
-  voiceModelSelectionSchema,
-} from "../../../text-to-speech/models";
-import { videoGenModelSelectionSchema } from "../../../video-generation/models";
 import {
   iconSchema,
   translatedValueSchema,
@@ -41,7 +25,23 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import type { ChatModelSelection } from "../../../ai-stream/models";
+import { chatModelSelectionSchema } from "../../../ai-stream/models";
+import {
+  audioVisionModelSelectionSchema,
+  imageVisionModelSelectionSchema,
+  videoVisionModelSelectionSchema,
+} from "../../../ai-stream/vision-models";
 import { parseSkillId } from "../../../chat/slugify";
+import { getClientAvailability } from "../../../env-availability-store";
+import { imageGenModelSelectionSchema } from "../../../image-generation/models";
+import { musicGenModelSelectionSchema } from "../../../music-generation/models";
+import { sttModelSelectionSchema } from "../../../speech-to-text/models";
+import {
+  TtsModelId,
+  voiceModelSelectionSchema,
+} from "../../../text-to-speech/models";
+import { videoGenModelSelectionSchema } from "../../../video-generation/models";
 import type {
   FiltersModelSelection,
   ManualModelSelection,

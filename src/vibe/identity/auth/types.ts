@@ -4,12 +4,13 @@
  * Repository-first architecture: exports TypeOutput types for repositories and routes
  */
 
+import { z } from "zod";
+
 import {
   UserPermissionRole,
   UserRoleDB,
   type UserRoleValue,
 } from "../roles/enum";
-import { z } from "zod";
 
 /**
  * JWT Payload Schema

@@ -7,14 +7,14 @@
  */
 
 import { Box, Text } from "ink";
+import type { JSX } from "react";
+
 import { Platform } from "../../platforms/platforms";
 import {
   useWidgetPlatform,
   useWidgetResponseOnly,
   useWidgetTranslation,
 } from "../../unified-ui/_shared/use-widget-context";
-import type { JSX } from "react";
-
 import type definition from "./definition";
 import type { ReleaseResponseType } from "./definition";
 

@@ -1,6 +1,7 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
+
 import { chatThreads } from "../../../agent/chat/db";
 import { ThreadStreamingState } from "../../../agent/chat/enum";
 import {
@@ -14,7 +15,6 @@ import type { JwtPayloadType } from "../../../identity/auth/types";
 import { UserPermissionRole } from "../../../identity/roles/enum";
 import type { EndpointLogger } from "../../../logger/types";
 import type { AiT } from "../../../platforms/ai/i18n";
-
 import { ControlSignals } from "../../repository/control-signals";
 import { PendingCalls } from "../../repository/pending-calls";
 import type {

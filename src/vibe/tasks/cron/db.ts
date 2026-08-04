@@ -13,19 +13,19 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { z } from "zod";
+
 import type { ErrorResponseType } from "../../core/route/response.schema";
 import type { WidgetData } from "../../core/utils/json";
 import { WidgetDataSchema } from "../../core/utils/json";
 import { users } from "../../identity/user/db";
-import type { NotificationTarget } from "../unified-runner/types";
-import { z } from "zod";
-
 import {
   CronTaskPriorityDB,
   CronTaskStatusDB,
   TaskCategoryDB,
   TaskOutputModeDB,
 } from "../enum";
+import type { NotificationTarget } from "../unified-runner/types";
 
 /**
  * Cron Tasks Table

@@ -6,25 +6,6 @@
  */
 
 "use client";
-import { LocaleSelectorContent } from "../agent/ai-stream/stream/widget/chat-ui/top-area/locale-selector-content";
-import {
-  getDefaultToolIdsForUser,
-  getDefaultWebPinnedIdsForUser,
-} from "../agent/chat/constants";
-import type { EnabledTool } from "../agent/chat/hooks/store";
-import settingsDefinition from "../agent/chat/settings/definition";
-import favoriteByIdDefinition from "../agent/skills/favorites/[id]/definition";
-import favoritesListDefinition from "../agent/skills/favorites/definition";
-import { endpointToUrlSegment } from "../core/core-utils/path";
-import type { NavigationStackEntry } from "../core/definition/endpoint";
-import type { CreateApiEndpointAny } from "../core/definition/endpoint-base";
-import { useTranslation } from "../core/i18n/core/client";
-import { EXECUTE_TOOL_ALIAS } from "../execute-tool/constants";
-import { scopedTranslation } from "./i18n";
-import { UserPermissionRole } from "../identity/roles/enum";
-import { Platform } from "../platforms/platforms";
-import { VibeFrameHost } from "../platforms/vibe-frame/VibeFrameHost";
-import remoteConnectionListDefinition from "../remote-connection/list/definition";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import {
   useSearchParams,
@@ -94,26 +75,6 @@ import {
   TooltipTrigger,
 } from "next-vibe/ui/ui/tooltip";
 import { P } from "next-vibe/ui/ui/typography";
-import { cn } from "../unified-ui/_shared/cn";
-import {
-  useWidgetDisabled,
-  useWidgetEndpointMutations,
-  useWidgetForm,
-  useWidgetLocale,
-  useWidgetLogger,
-  useWidgetNavigation,
-  useWidgetOnSubmit,
-  useWidgetPlatform,
-  useWidgetUser,
-  useWidgetValue,
-} from "../unified-ui/_shared/use-widget-context";
-import { resolveEndpoint } from "../unified-ui/hooks/resolve-endpoint";
-import { apiClient } from "../unified-ui/hooks/store";
-import { useEndpoint } from "../unified-ui/hooks/use-endpoint";
-import { useUrlNavStack } from "../unified-ui/hooks/use-url-nav-stack";
-import { EndpointsPage } from "../unified-ui/renderers/web/EndpointsPage";
-import type { IconKey } from "../unified-ui/widgets/form-fields/icon-field/icons";
-import { Icon } from "../unified-ui/widgets/form-fields/icon-field/icon-component";
 import type { JSX } from "react";
 import {
   createContext,
@@ -133,12 +94,51 @@ import {
   GROUP_LABELS,
 } from "@/generated/categories/registry";
 
+import { LocaleSelectorContent } from "../agent/ai-stream/stream/widget/chat-ui/top-area/locale-selector-content";
+import {
+  getDefaultToolIdsForUser,
+  getDefaultWebPinnedIdsForUser,
+} from "../agent/chat/constants";
+import type { EnabledTool } from "../agent/chat/hooks/store";
+import settingsDefinition from "../agent/chat/settings/definition";
+import favoriteByIdDefinition from "../agent/skills/favorites/[id]/definition";
+import favoritesListDefinition from "../agent/skills/favorites/definition";
+import { endpointToUrlSegment } from "../core/core-utils/path";
+import type { NavigationStackEntry } from "../core/definition/endpoint";
+import type { CreateApiEndpointAny } from "../core/definition/endpoint-base";
+import { useTranslation } from "../core/i18n/core/client";
+import { EXECUTE_TOOL_ALIAS } from "../execute-tool/constants";
+import { UserPermissionRole } from "../identity/roles/enum";
+import { Platform } from "../platforms/platforms";
+import { VibeFrameHost } from "../platforms/vibe-frame/VibeFrameHost";
+import remoteConnectionListDefinition from "../remote-connection/list/definition";
+import { cn } from "../unified-ui/_shared/cn";
+import {
+  useWidgetDisabled,
+  useWidgetEndpointMutations,
+  useWidgetForm,
+  useWidgetLocale,
+  useWidgetLogger,
+  useWidgetNavigation,
+  useWidgetOnSubmit,
+  useWidgetPlatform,
+  useWidgetUser,
+  useWidgetValue,
+} from "../unified-ui/_shared/use-widget-context";
+import { resolveEndpoint } from "../unified-ui/hooks/resolve-endpoint";
+import { apiClient } from "../unified-ui/hooks/store";
+import { useEndpoint } from "../unified-ui/hooks/use-endpoint";
+import { useUrlNavStack } from "../unified-ui/hooks/use-url-nav-stack";
+import { EndpointsPage } from "../unified-ui/renderers/web/EndpointsPage";
+import { Icon } from "../unified-ui/widgets/form-fields/icon-field/icon-component";
+import type { IconKey } from "../unified-ui/widgets/form-fields/icon-field/icons";
 import type { CategoryDefinitionSerialized } from "./category-types";
 import type definition from "./definition";
 import type {
   HelpGetRequestInput,
   HelpToolMetadataSerialized,
 } from "./definition";
+import { scopedTranslation } from "./i18n";
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 

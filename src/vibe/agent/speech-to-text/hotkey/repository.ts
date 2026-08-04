@@ -8,7 +8,6 @@
 import "server-only";
 
 import { rootlessToolExecutionContext } from "next-vibe/core/execution-context";
-import type { SpeechToTextT } from "../i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -25,6 +24,7 @@ import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
 import { STT_COST_PER_SECOND } from "@/products/repository-client";
 
+import type { SpeechToTextT } from "../i18n";
 import { SpeechToTextRepository } from "../repository";
 import { createAdapters } from "./adapters/factory";
 import type {

@@ -1,6 +1,7 @@
-import type { VibeTranslationKey } from "../i18n/shared";
-import type { TranslatedKeyType } from "../i18n/core/scoped-translation";
 import { z } from "zod";
+
+import type { TranslatedKeyType } from "../i18n/core/scoped-translation";
+import type { VibeTranslationKey } from "../i18n/shared";
 
 /**
  * Create a standardized error response with a translation key

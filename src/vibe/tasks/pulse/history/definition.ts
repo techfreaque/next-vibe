@@ -2,6 +2,8 @@
  * Pulse Execution History API Definition
  */
 
+import { z } from "zod";
+
 import { dateSchema } from "../../../core/definition/common.schema";
 import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
@@ -11,8 +13,6 @@ import {
   WidgetType,
 } from "../../../core/definition/enums";
 import { UserRole } from "../../../identity/roles/enum";
-import { PulseExecutionStatusDB, PulseHealthStatusDB } from "../../enum";
-import { scopedTranslation } from "./i18n";
 import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "../../../unified-ui/_shared/utils";
 import {
@@ -20,9 +20,9 @@ import {
   requestField,
   responseField,
 } from "../../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
+import { PulseExecutionStatusDB, PulseHealthStatusDB } from "../../enum";
 import { PULSE_HISTORY_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const PulseHistoryContainer = lazyWidget(() =>
   import("./widget").then((m) => ({

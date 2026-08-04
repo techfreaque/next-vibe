@@ -41,6 +41,8 @@ import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
 import { ExternalLink } from "next-vibe/ui/ui/link";
 import { Span } from "next-vibe/ui/ui/span";
 import { H3 } from "next-vibe/ui/ui/typography";
+import { useMemo } from "react";
+
 import {
   useIsMcp,
   useWidgetResponseOnly,
@@ -51,8 +53,6 @@ import { NumberFieldWidget } from "../../unified-ui/widgets/form-fields/number-f
 import { TagsFieldWidget } from "../../unified-ui/widgets/form-fields/tags-field/widget";
 import { FormAlertWidget } from "../../unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "../../unified-ui/widgets/interactive/submit-button/widget";
-import { useMemo } from "react";
-
 import type definition from "./definition";
 
 // ── Types ──────────────────────────────────────────────────

@@ -2,6 +2,8 @@
  * Pagination Widget Type Definitions
  */
 
+import z from "zod";
+
 import type { SpacingSize } from "../../../../core/definition/enums";
 import { FieldDataType, WidgetType } from "../../../../core/definition/enums";
 import type { TranslatedKeyType } from "../../../../core/i18n/core/scoped-translation";
@@ -11,7 +13,6 @@ import type {
 } from "../../../_shared/types";
 import type { TextWidgetConfig } from "../../display-only/text/types";
 import type { NumberFieldWidgetConfig } from "../../form-fields/number-field/types";
-import z from "zod";
 
 export function paginationField(config?: {
   order?: number;

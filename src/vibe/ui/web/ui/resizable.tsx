@@ -1,13 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { cn } from "../../../unified-ui/_shared/cn";
 import type { JSX, ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { DragHandleDots2Icon } from "./icons/DragHandleDots2Icon";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { StyleType } from "../utils/style-type";
 import type { DivMouseEvent } from "./div";
+import { DragHandleDots2Icon } from "./icons/DragHandleDots2Icon";
 
 export interface ResizableContainerProps {
   children: ReactNode;

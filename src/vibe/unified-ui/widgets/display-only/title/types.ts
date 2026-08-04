@@ -3,6 +3,8 @@
  * Displays semantic HTML headings (H1-H6) with optional subtitle
  */
 
+import type { z } from "zod";
+
 import type {
   FieldDataType,
   WidgetType,
@@ -12,7 +14,6 @@ import type {
   BasePrimitiveWidgetConfig,
   FieldUsageConfig,
 } from "../../../_shared/types";
-import type { z } from "zod";
 
 /**
  * Spacing sizes for gaps and margins

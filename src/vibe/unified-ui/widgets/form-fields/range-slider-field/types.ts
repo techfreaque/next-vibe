@@ -3,12 +3,13 @@
  * Range selection field with draggable min/max handles
  */
 
+import type { z } from "zod";
+
 import type { FieldDataType } from "../../../../core/definition/enums";
 import type { EnumWidgetSchema } from "../../../_shared/schema-constraints";
 import type { FieldUsageConfig } from "../../../_shared/types";
 import type { BaseFormFieldWidgetConfig } from "../_shared/types";
 import type { IconKey } from "../icon-field/icons";
-import type { z } from "zod";
 
 export interface RangeSliderFieldWidgetConfig<
   out TKey extends string,

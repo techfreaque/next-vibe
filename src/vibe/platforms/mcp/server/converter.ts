@@ -1,5 +1,7 @@
 import "server-only";
 
+import { z } from "zod";
+
 import { getPreferredToolName } from "../../../core/core-utils/path";
 import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
 import {
@@ -9,12 +11,10 @@ import {
 import { FieldUsage } from "../../../core/definition/enums";
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import type { UserPermissionRoleValue } from "../../../identity/roles/enum";
-import { Platform } from "../../platforms";
 import { hasChild, hasChildren } from "../../../unified-ui/_shared/type-guards";
 import type { SchemaTypes } from "../../../unified-ui/_shared/types";
 import { generateSchemaForUsage } from "../../../unified-ui/_shared/utils";
-import { z } from "zod";
-
+import { Platform } from "../../platforms";
 import type { MCPTool } from "../types";
 
 /**

@@ -6,14 +6,8 @@
 import "server-only";
 
 import { and, count, eq, inArray, ne, or, sql } from "drizzle-orm";
-import { DEFAULT_CHAT_MODEL_SELECTION } from "../ai-stream/constants";
-import type { ChatModelSelection } from "../ai-stream/models";
-import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "../image-generation/constants";
-import type { ImageGenModelSelection } from "../image-generation/models";
-import { DEFAULT_STT_MODEL_SELECTION } from "../speech-to-text/constants";
-import type { SttModelSelection } from "../speech-to-text/models";
-import { DEFAULT_TTS_MODEL_SELECTION } from "../text-to-speech/constants";
-import type { VoiceModelSelection } from "../text-to-speech/models";
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
+import { rootlessToolExecutionContext } from "next-vibe/core/execution-context";
 import {
   type CountryLanguage,
   defaultLocale,
@@ -48,8 +42,8 @@ import type { z } from "zod";
 import { leadMagnetConfigs } from "@/lead-magnet/db";
 import { referralCodes } from "@/referral/db";
 
-import type { ToolExecutionContext } from "next-vibe/core/execution-context";
-import { rootlessToolExecutionContext } from "next-vibe/core/execution-context";
+import { DEFAULT_CHAT_MODEL_SELECTION } from "../ai-stream/constants";
+import type { ChatModelSelection } from "../ai-stream/models";
 import {
   ensureUniqueSlug,
   generateSlug,
@@ -59,6 +53,12 @@ import {
 } from "../chat/slugify";
 import type { AgentEnvAvailability } from "../env-availability";
 import { getEnvAvailability } from "../env-availability";
+import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "../image-generation/constants";
+import type { ImageGenModelSelection } from "../image-generation/models";
+import { DEFAULT_STT_MODEL_SELECTION } from "../speech-to-text/constants";
+import type { SttModelSelection } from "../speech-to-text/models";
+import { DEFAULT_TTS_MODEL_SELECTION } from "../text-to-speech/constants";
+import type { VoiceModelSelection } from "../text-to-speech/models";
 import type {
   SkillDeleteResponseOutput,
   SkillGetResponseOutput,

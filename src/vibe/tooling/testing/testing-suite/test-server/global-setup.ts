@@ -8,7 +8,6 @@ import { closeDatabase } from "../../../../database/index";
 import { SeedRepository } from "../../../../database/seed/repository";
 import type { EndpointLogger } from "../../../../logger/types";
 import { loadEnvironment } from "../../../../platforms/cli/runtime/environment";
-
 import teardown from "./global-teardown";
 import { startServer } from "./test-server";
 

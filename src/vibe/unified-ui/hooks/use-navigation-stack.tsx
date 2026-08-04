@@ -1,11 +1,12 @@
 "use client";
 
+import { createContext, type ReactNode, useContext, useRef } from "react";
+import { createStore, type StoreApi, useStore } from "zustand";
+
 import type { NavigationStackEntry } from "../../core/definition/endpoint";
 import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import type { WidgetData } from "../../core/utils/json";
 import type { CliComponent } from "../_shared/lazy-widget";
-import { createContext, type ReactNode, useContext, useRef } from "react";
-import { createStore, type StoreApi, useStore } from "zustand";
 
 /** Preload the lazyWidget for an endpoint before pushing it onto the stack. */
 async function preloadEndpointWidget(

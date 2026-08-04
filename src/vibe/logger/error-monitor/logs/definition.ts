@@ -4,6 +4,8 @@
  * PATCH endpoint to resolve/reopen an error log by fingerprint
  */
 
+import { z } from "zod";
+
 import { dateSchema } from "../../../core/definition/common.schema";
 import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
@@ -14,21 +16,19 @@ import {
 } from "../../../core/definition/enums";
 import { WidgetDataSchema } from "../../../core/utils/json";
 import { UserRole } from "../../../identity/roles/enum";
-import { scopedTranslation } from "./i18n";
 import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "../../../unified-ui/_shared/utils";
 import {
   requestField,
   responseField,
 } from "../../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
 import { ERROR_LOGS_ALIAS } from "./constants";
 import {
   ErrorLogStatusFilter,
   ErrorLogStatusFilterDB,
   ErrorLogStatusFilterOptions,
 } from "./enum";
+import { scopedTranslation } from "./i18n";
 
 const ErrorLogsContainer = lazyWidget(() =>
   import("./widget").then((m) => ({

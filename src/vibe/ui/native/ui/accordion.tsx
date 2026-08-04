@@ -1,5 +1,4 @@
 import * as AccordionPrimitive from "@rn-primitives/accordion";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import { Pressable } from "react-native";
 import Animated, {
@@ -14,8 +13,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-import { ChevronDown } from "./icons/ChevronDown";
-import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type {
   AccordionContentProps,
   AccordionItemProps,
@@ -23,6 +21,8 @@ import type {
   AccordionTriggerProps,
 } from "../../web/ui/accordion";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
+import { ChevronDown } from "./icons/ChevronDown";
 import { Text, TextClassContext } from "./text";
 
 const StyledAnimatedView = styledNative(Animated.View);

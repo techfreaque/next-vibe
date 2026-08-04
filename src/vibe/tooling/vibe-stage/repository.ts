@@ -49,7 +49,6 @@ import {
 import { parseError } from "../../core/utils/parse-error";
 import type { EndpointLogger } from "../../logger/types";
 import { ConfigRepositoryImpl } from "../check/config/repository";
-
 import type {
   VibeStageRequestOutput,
   VibeStageResponseOutput,

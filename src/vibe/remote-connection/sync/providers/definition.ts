@@ -6,6 +6,8 @@
  * hardcode provider keys — they fetch this list and render based on it.
  */
 
+import { z } from "zod";
+
 import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -15,8 +17,6 @@ import {
 import { UserRole } from "../../../identity/roles/enum";
 import { customWidgetObject } from "../../../unified-ui/_shared/utils";
 import { responseField } from "../../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
 import { scopedTranslation } from "./i18n";
 
 export const { GET } = createEndpoint({

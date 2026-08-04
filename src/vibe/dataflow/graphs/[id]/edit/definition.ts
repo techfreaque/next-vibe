@@ -2,6 +2,8 @@
  * Vibe Sense - Graph Edit (Branch) Definition
  */
 
+import { z } from "zod";
+
 import { createEndpoint } from "../../../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -9,18 +11,16 @@ import {
   Methods,
   WidgetType,
 } from "../../../../core/definition/enums";
-import { graphConfigSchema } from "../../../graph/schema";
-import { scopedTranslation } from "./i18n";
 import { UserRole } from "../../../../identity/roles/enum";
+import { lazyWidget } from "../../../../unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "../../../../unified-ui/_shared/utils";
 import {
   requestField,
   requestUrlPathParamsField,
   responseField,
 } from "../../../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
-import { lazyWidget } from "../../../../unified-ui/_shared/lazy-widget";
+import { graphConfigSchema } from "../../../graph/schema";
+import { scopedTranslation } from "./i18n";
 
 // Lazy import to avoid TDZ circular dependency in MCP context
 // (widget.tsx type-imports definition → circular module resolution → "Cannot access 'default' before initialization")

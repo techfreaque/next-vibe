@@ -4,12 +4,12 @@
  */
 
 "use client";
-import type { TranslatedKeyType } from "../../../core/i18n/core/scoped-translation";
-import { cn } from "../../../unified-ui/_shared/cn";
-import { type IconKey } from "../../../unified-ui/widgets/form-fields/icon-field/icons";
-import { Icon } from "../../../unified-ui/widgets/form-fields/icon-field/icon-component";
 import * as React from "react";
 
+import type { TranslatedKeyType } from "../../../core/i18n/core/scoped-translation";
+import { cn } from "../../../unified-ui/_shared/cn";
+import { Icon } from "../../../unified-ui/widgets/form-fields/icon-field/icon-component";
+import { type IconKey } from "../../../unified-ui/widgets/form-fields/icon-field/icons";
 import { Span } from "./span";
 
 export interface RangeSliderOption {

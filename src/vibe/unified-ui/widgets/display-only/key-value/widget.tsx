@@ -1,8 +1,10 @@
 "use client";
-import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Div } from "next-vibe/ui/ui/div";
 import { Span } from "next-vibe/ui/ui/span";
+import type { JSX } from "react";
+
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { cn } from "../../../_shared/cn";
 import type { ReactRequestResponseWidgetProps } from "../../../_shared/react-types";
 import type { FieldUsageConfig } from "../../../_shared/types";
@@ -12,8 +14,6 @@ import {
   useWidgetLocale,
   useWidgetTranslation,
 } from "../../../_shared/use-widget-context";
-import type { JSX } from "react";
-
 import type { KeyValueWidgetConfig, KeyValueWidgetSchema } from "./types";
 
 /**
@@ -35,9 +35,9 @@ import type { KeyValueWidgetConfig, KeyValueWidgetSchema } from "./types";
  */
 export function KeyValueWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends TEndpoint extends CreateApiEndpointAny
+  TKey extends (TEndpoint extends CreateApiEndpointAny
     ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
-    : never,
+    : never),
   TSchema extends KeyValueWidgetSchema,
   TUsage extends FieldUsageConfig,
 >({

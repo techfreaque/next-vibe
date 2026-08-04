@@ -34,12 +34,11 @@ import { defaultLocale } from "../../core/i18n/core/config";
 import type { WidgetData } from "../../core/utils/json";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
-
 import { buildUserWsChannel } from "../core/channel";
 import { getLocalBroadcast } from "../core/local-broadcast";
-import { getPubSubAdapter } from "./pubsub/index";
 import type { AnyEndpointEventEnvelope } from "../core/structured-events";
 import { parseWsFrame, type WsWireMessage } from "../core/types";
+import { getPubSubAdapter } from "./pubsub/index";
 
 /** A signal's payload as it rides the wire (`payload` on the event envelope). */
 export type SignalPayload = Record<string, WidgetData>;

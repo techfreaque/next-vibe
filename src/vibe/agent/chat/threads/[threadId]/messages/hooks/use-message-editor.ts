@@ -4,12 +4,6 @@
  * Includes autosave functionality to persist drafts across page refreshes
  */
 
-import {
-  clearDraft,
-  loadDraft,
-  saveDraft,
-} from "../../../../../ai-stream/stream/hooks/use-input-autosave";
-import type { ChatMessage } from "../../../../db";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { DivRefObject } from "next-vibe/ui/ui/div";
@@ -19,6 +13,12 @@ import type {
 } from "next-vibe/ui/ui/textarea";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import {
+  clearDraft,
+  loadDraft,
+  saveDraft,
+} from "../../../../../ai-stream/stream/hooks/use-input-autosave";
+import type { ChatMessage } from "../../../../db";
 import { loadMessageAttachments } from "./load-message-attachments";
 
 export type EditorActionType = "branch" | null;

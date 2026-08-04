@@ -15,7 +15,6 @@
 import type { CountryLanguage } from "../../../../core/i18n/core/config";
 import { defaultLocale } from "../../../../core/i18n/core/config";
 import { parseError } from "../../../../core/utils/parse-error";
-
 import { generateSkillMarkdown } from "../markdown-generator";
 
 const CACHE_MAX_AGE = 300; // 5 minutes

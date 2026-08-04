@@ -7,7 +7,6 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { cn } from "../../../unified-ui/_shared/cn";
 import type { JSX } from "react";
 import * as React from "react";
 import {
@@ -19,8 +18,9 @@ import {
 } from "react-native";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 
-import { styledNative } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { DataTableProps } from "../../web/ui/data-table";
+import { styledNative } from "../utils/style-converter";
 import {
   Table,
   TableBody,
@@ -169,23 +169,21 @@ export function DataTable<TData, TValue = string>({
         <Table>
           <TableBody>
             <TableRow className={rowClassName} onClick={handlePress}>
-              {row.getVisibleCells().map(
-                (cell): React.ReactElement => (
-                  <TableCell
-                    key={cell.id}
-                    style={{
-                      width: getColumnWidth(
-                        cell.column.getSize(),
-                        columns.length,
-                      ),
-                    }}
-                  >
-                    {wrapInTextIfNeeded(
-                      flexRender(cell.column.columnDef.cell, cell.getContext()),
-                    )}
-                  </TableCell>
-                ),
-              )}
+              {row.getVisibleCells().map((cell): React.ReactElement => (
+                <TableCell
+                  key={cell.id}
+                  style={{
+                    width: getColumnWidth(
+                      cell.column.getSize(),
+                      columns.length,
+                    ),
+                  }}
+                >
+                  {wrapInTextIfNeeded(
+                    flexRender(cell.column.columnDef.cell, cell.getContext()),
+                  )}
+                </TableCell>
+              ))}
             </TableRow>
           </TableBody>
         </Table>

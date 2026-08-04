@@ -3,6 +3,8 @@
  * GET - read the instanceId of the current instance's own identity on this machine
  */
 
+import { z } from "zod";
+
 import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -15,8 +17,6 @@ import {
   objectField,
   responseField,
 } from "../../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
 import { scopedTranslation } from "./i18n";
 
 const { GET } = createEndpoint({

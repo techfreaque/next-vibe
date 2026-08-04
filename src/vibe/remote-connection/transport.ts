@@ -11,15 +11,14 @@
 
 import "server-only";
 
+import { BEARER_LEAD_ID_SEPARATOR, LEAD_ID_COOKIE_NAME } from "@/env/constants";
+
 import type { CreateApiEndpointAny } from "../core/definition/endpoint-base";
 import { Methods } from "../core/definition/enums";
 import type { CountryLanguage } from "../core/i18n/core/config";
 import type { ResponseType } from "../core/route/response.schema";
 import { ErrorResponseTypes, fail } from "../core/route/response.schema";
 import type { WidgetData } from "../core/utils/json";
-
-import { BEARER_LEAD_ID_SEPARATOR, LEAD_ID_COOKIE_NAME } from "@/env/constants";
-
 import type { RemoteCallParams, RemoteCallResult } from "./types";
 
 export class RemoteTransport {

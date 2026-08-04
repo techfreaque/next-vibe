@@ -4,7 +4,6 @@
 
 import "server-only";
 
-import { defineEnv } from "../env/define-env";
 import { z } from "zod";
 
 import {
@@ -15,6 +14,8 @@ import {
   isPreviewMode,
   isStartCommand,
 } from "@/vibe/env/detect";
+
+import { defineEnv } from "../env/define-env";
 
 type VibeServerMode = "atlas-dev" | "hermes-dev" | "hermes-prod" | "mcp";
 

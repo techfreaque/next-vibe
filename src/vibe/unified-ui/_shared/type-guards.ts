@@ -14,9 +14,9 @@
  * context - unlike UnifiedField which requires resolved conditional types.
  */
 
-import type { WidgetData } from "../../core/utils/json";
 import type z from "zod";
 
+import type { WidgetData } from "../../core/utils/json";
 import type { UnifiedField } from "./configs";
 import type {
   AnyChildrenConstrain,

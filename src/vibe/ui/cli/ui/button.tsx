@@ -7,10 +7,10 @@
  */
 import { cva } from "class-variance-authority";
 import { Text, useFocus, useInput, useStdin } from "ink";
-import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { JSX, ReactNode } from "react";
 import { Children, Fragment, isValidElement, useEffect, useRef } from "react";
 
+import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { ButtonProps } from "../../web/ui/button";
 import { isOverlayOpen, useFocusScopeRegister, useShouldFocus } from "./dialog";
 import { useDropdownTrigger } from "./dropdown-menu";

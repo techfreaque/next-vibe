@@ -20,12 +20,9 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import type { GraphConfig } from "./graph/types";
-import type { DataPoint } from "./shared/fields";
-import { ResolutionValues } from "./shared/fields";
-import { users } from "../identity/user/db";
 import type { z } from "zod";
 
+import { users } from "../identity/user/db";
 import {
   BacktestActionMode,
   BacktestActionModeDB,
@@ -33,6 +30,9 @@ import {
   RunStatus,
   RunStatusDB,
 } from "./enum";
+import type { GraphConfig } from "./graph/types";
+import type { DataPoint } from "./shared/fields";
+import { ResolutionValues } from "./shared/fields";
 
 // ─── Graphs ───────────────────────────────────────────────────────────────────
 

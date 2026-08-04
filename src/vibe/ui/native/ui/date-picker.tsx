@@ -2,15 +2,15 @@
  * DatePicker Component for React Native
  * Date input with calendar - placeholder implementation
  */
-import { cn } from "../../../unified-ui/_shared/cn";
 import React, { useState } from "react";
 import { Pressable, View } from "react-native";
 
-import { Calendar as CalendarIcon } from "./icons/Calendar";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 // Import all types from web (web is source of truth)
 import type { DatePickerProps } from "../../web/ui/date-picker";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { Calendar as CalendarIcon } from "./icons/Calendar";
 import { Input } from "./input";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { Text as UIText } from "./text";

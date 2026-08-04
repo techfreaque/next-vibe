@@ -1,13 +1,10 @@
 "use client";
 
-import { useTranslation } from "../../../core/i18n/core/client";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 
+import { useTranslation } from "../../../core/i18n/core/client";
+import { cn } from "../../../unified-ui/_shared/cn";
 import { uiScopedTranslation } from "../i18n";
-import { Check } from "./icons/Check";
-import { ChevronDown } from "./icons/ChevronDown";
-import { X } from "./icons/X";
 import type { StyleType } from "../utils/style-type";
 import { Badge } from "./badge";
 import { Button } from "./button";
@@ -19,6 +16,9 @@ import {
   CommandItem,
   CommandList,
 } from "./command";
+import { Check } from "./icons/Check";
+import { ChevronDown } from "./icons/ChevronDown";
+import { X } from "./icons/X";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 
 export interface MultiSelectOption {

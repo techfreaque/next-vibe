@@ -1,9 +1,4 @@
 "use client";
-import type { ChatMessage } from "../../../../../db";
-import {
-  type ChatNavigationState,
-  useChatNavigationStore,
-} from "../../../../../hooks/use-chat-navigation-store";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { getElementById } from "next-vibe/ui/lib/dom";
@@ -26,6 +21,11 @@ import type { JSX } from "react";
 
 import { FEATURE_COSTS } from "@/products/repository-client";
 
+import type { ChatMessage } from "../../../../../db";
+import {
+  type ChatNavigationState,
+  useChatNavigationStore,
+} from "../../../../../hooks/use-chat-navigation-store";
 import { useMessageEditorStore } from "../../hooks/use-message-editor-store";
 import { scopedTranslation } from "../../i18n";
 import { useMessageGroupName } from "../embedded-context";

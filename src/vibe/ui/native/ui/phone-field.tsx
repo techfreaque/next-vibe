@@ -2,18 +2,18 @@
  * PhoneField Component for React Native
  * Production-ready international phone input with country code selection
  */
-import { useTranslation } from "../../../core/i18n/core/client";
-import { cn } from "../../../unified-ui/_shared/cn";
 import React, { useMemo, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 
-import { ChevronDown, Phone } from "./icons";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { useTranslation } from "../../../core/i18n/core/client";
+import { cn } from "../../../unified-ui/_shared/cn";
 import { uiScopedTranslation } from "../../web/i18n";
 // Import all types and constants from web (web is source of truth)
 import type { CountryData, PhoneFieldProps } from "../../web/ui/phone-field";
 import { COUNTRIES } from "../../web/ui/phone-field";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { ChevronDown, Phone } from "./icons";
 import { Input } from "./input";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { Text as UIText } from "./text";

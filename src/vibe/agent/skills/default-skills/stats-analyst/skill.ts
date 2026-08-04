@@ -1,4 +1,3 @@
-import { ChatModelId } from "../../../ai-stream/models";
 import { TOOL_HELP_ALIAS } from "next-vibe/help-tool/constants";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { CRON_STATS_ALIAS } from "next-vibe/tasks/cron/stats/constants";
@@ -10,6 +9,7 @@ import { REFERRAL_STATS_ALIAS } from "@/referral/stats/constants";
 import { USERS_LIST_ALIAS } from "@/users/list/constants";
 import { USERS_STATS_ALIAS } from "@/users/stats/constants";
 
+import { ChatModelId } from "../../../ai-stream/models";
 import {
   CORTEX_LIST_ALIAS,
   CORTEX_WRITE_ALIAS,

@@ -1,7 +1,5 @@
 "use client";
 
-import { getDefaultFolderConfig } from "../../../config";
-import { useChatNavigationStore } from "../../../hooks/use-chat-navigation-store";
 import { platform } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Div } from "next-vibe/ui/ui/div";
@@ -11,6 +9,8 @@ import type { JSX } from "react";
 
 import { DOM_IDS, LAYOUT } from "@/_pages/chat/lib/config/constants";
 
+import { getDefaultFolderConfig } from "../../../config";
+import { useChatNavigationStore } from "../../../hooks/use-chat-navigation-store";
 import { scopedTranslation } from "../../i18n";
 
 interface ChatEmptyStateProps {

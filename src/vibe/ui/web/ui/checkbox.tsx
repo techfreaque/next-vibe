@@ -1,12 +1,12 @@
 "use client";
 
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 
-import { CheckIcon } from "./icons/CheckIcon";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { StyleType } from "../utils/style-type";
 import type { DivMouseEvent } from "./div";
+import { CheckIcon } from "./icons/CheckIcon";
 
 export type CheckboxRootProps = {
   checked?: boolean;

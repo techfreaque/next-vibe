@@ -12,9 +12,8 @@ import type { ResponseType } from "../../../core/route/response.schema";
 import { success } from "../../../core/route/response.schema";
 import type { JwtPayloadType } from "../../../identity/auth/types";
 import type { EndpointLogger } from "../../../logger/types";
-import { MCPServer } from "../server/server";
-
 import type { MCPRegistry } from "../registry";
+import { MCPServer } from "../server/server";
 import type { MCPServeResponseInput } from "./definition";
 
 export class MCPServeRepository {

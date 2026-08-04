@@ -12,7 +12,6 @@
 
 "use client";
 
-import { UserPermissionRole } from "../../identity/roles/enum";
 import {
   Card,
   CardContent,
@@ -28,6 +27,10 @@ import { Lock } from "next-vibe/ui/ui/icons/Lock";
 import { SectionGroup } from "next-vibe/ui/ui/section-group";
 import { Switch } from "next-vibe/ui/ui/switch";
 import { P } from "next-vibe/ui/ui/typography";
+import type { JSX } from "react";
+import { useFormContext, useWatch } from "react-hook-form";
+
+import { UserPermissionRole } from "../../identity/roles/enum";
 import {
   useWidgetLocale,
   useWidgetLogger,
@@ -41,9 +44,6 @@ import { UrlFieldWidget } from "../../unified-ui/widgets/form-fields/url-field/w
 import { FormAlertWidget } from "../../unified-ui/widgets/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "../../unified-ui/widgets/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "../../unified-ui/widgets/interactive/submit-button/widget";
-import type { JSX } from "react";
-import { useFormContext, useWatch } from "react-hook-form";
-
 import type { SyncScope } from "../db";
 import type { SyncProviderInfo } from "../sync/providers/definition";
 import syncProvidersDefinitions from "../sync/providers/definition";

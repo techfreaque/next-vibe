@@ -5,23 +5,24 @@
  */
 
 import { and, eq, gt, isNull } from "drizzle-orm";
+import type { NextRequest, NextResponse } from "next-vibe/ui/lib/request";
+import { NextResponse as NextResponseClass } from "next-vibe/ui/lib/request";
+
+import { LEAD_ID_COOKIE_NAME } from "@/env/constants";
+
 import { coreEnv } from "../../../core/env";
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "../../../core/i18n/core/language-utils";
 import { db } from "../../../database";
 import { Environment } from "../../../env/env-util";
+import { createEndpointLogger } from "../../../logger/server";
+import { frameExchangeTokens } from "../../../platforms/vibe-frame/db";
+import { shouldSkipPath } from "../../../platforms/web/middleware/utils";
 import { leads } from "../../lead/db";
 import {
   createAnonymousLead,
   validateLeadIdExists,
 } from "../../lead/middleware-ops";
-import { createEndpointLogger } from "../../../logger/server";
-import { frameExchangeTokens } from "../../../platforms/vibe-frame/db";
-import { shouldSkipPath } from "../../../platforms/web/middleware/utils";
-import type { NextRequest, NextResponse } from "next-vibe/ui/lib/request";
-import { NextResponse as NextResponseClass } from "next-vibe/ui/lib/request";
-
-import { LEAD_ID_COOKIE_NAME } from "@/env/constants";
 
 export const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

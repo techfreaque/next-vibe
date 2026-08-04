@@ -7,9 +7,7 @@
 import "server-only";
 
 import { and, eq, isNull, sql } from "drizzle-orm";
-import { AI_RUN_ALIAS } from "../../../ai-stream/run/constants";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
-import { chatFolders } from "../../db";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
 import { TASK_TIMEOUTS } from "next-vibe/tasks/constants";
@@ -17,6 +15,8 @@ import { cronTasks } from "next-vibe/tasks/cron/db";
 import { CronTaskPriority, TaskCategory } from "next-vibe/tasks/enum";
 import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 
+import { AI_RUN_ALIAS } from "../../../ai-stream/run/constants";
+import { chatFolders } from "../../db";
 import type { ChatSettings } from "../db";
 import {
   AUTOPILOT_DEFAULT_SCHEDULE,

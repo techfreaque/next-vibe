@@ -6,6 +6,7 @@
 import "server-only";
 
 import { and, eq } from "drizzle-orm";
+
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import type { ResponseType } from "../../core/route/response.schema";
 import {
@@ -15,14 +16,13 @@ import {
 } from "../../core/route/response.schema";
 import { parseError } from "../../core/utils/parse-error";
 import { db } from "../../database";
-import { scopedTranslation } from "./i18n";
-import type { NewUserRole, UserRole } from "../user/db";
-import { insertUserRoleSchema, userRoles } from "../user/db";
 import type { EndpointLogger } from "../../logger/types";
 import { createDefaultCliUser } from "../../platforms/cli/auth/cli-user";
-
+import type { NewUserRole, UserRole } from "../user/db";
+import { insertUserRoleSchema, userRoles } from "../user/db";
 import type { UserRole as UserRoleEnum, UserRoleDB } from "./enum";
 import { type UserPermissionRoleValue } from "./enum";
+import { scopedTranslation } from "./i18n";
 
 /**
  * User Roles Repository

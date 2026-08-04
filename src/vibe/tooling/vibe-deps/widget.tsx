@@ -1,12 +1,13 @@
 "use client";
 
-import { Platform } from "../../platforms/platforms";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Div } from "next-vibe/ui/ui/div";
 import { GitBranch } from "next-vibe/ui/ui/icons/GitBranch";
 import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
 import { PackageSearch } from "next-vibe/ui/ui/icons/PackageSearch";
 import { Span } from "next-vibe/ui/ui/span";
+
+import { Platform } from "../../platforms/platforms";
 import {
   useWidgetEndpointMutations,
   useWidgetPlatform,
@@ -15,7 +16,6 @@ import {
 } from "../../unified-ui/_shared/use-widget-context";
 import { FormAlertWidget } from "../../unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "../../unified-ui/widgets/interactive/submit-button/widget";
-
 import type definition from "./definition";
 
 // ── Types mirrored from the response shape ──────────────────

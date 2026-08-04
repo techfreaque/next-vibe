@@ -1,11 +1,11 @@
 "use client";
 
+import { useCallback, useEffect, useRef, useState } from "react";
+
 import { endpointToUrlSegment } from "../../core/core-utils/path";
 import type { NavigationStackEntry } from "../../core/definition/endpoint";
 import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import { resolveEndpoint } from "./resolve-endpoint";
-import { useCallback, useEffect, useRef, useState } from "react";
-
 import type { UseNavigationStackReturn } from "./use-navigation-stack";
 
 // ── Serialization ─────────────────────────────────────────────────────────────

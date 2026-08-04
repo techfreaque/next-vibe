@@ -18,11 +18,11 @@ import "server-only";
 
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import type { WsWireMessage } from "next-vibe/realtime/core/types";
 import {
   KeyedRemoteSignal,
   type KeyedSignalSubscription,
 } from "next-vibe/realtime/server/keyed-signal";
-import type { WsWireMessage } from "next-vibe/realtime/core/types";
 
 import streamDefinition from "../../stream/definition";
 

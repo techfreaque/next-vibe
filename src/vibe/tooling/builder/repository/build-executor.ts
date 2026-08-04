@@ -13,11 +13,6 @@ import {
 } from "../../../core/route/response.schema";
 import { parseError } from "../../../core/utils/parse-error";
 import type { EndpointLogger } from "../../../logger/types";
-import type { scopedTranslation } from "../i18n";
-import { npmPackageGenerator } from "./vibe-package/npm-package-generator";
-import { PackageEndpointGeneratorRepository } from "./vibe-package/package-endpoint-generator";
-import { createPackagePlugins } from "./vibe-package/package-plugins";
-
 import type {
   BuildConfig,
   BuilderRequest,
@@ -31,6 +26,7 @@ import type {
 import { isBunBuildType } from "../definition";
 import { BunBuildTypeEnum } from "../enum";
 import { BuildProfileEnum, StepStatusEnum } from "../enum";
+import type { scopedTranslation } from "../i18n";
 import { bunCompiler } from "./bun-compiler";
 import { bundleAnalyzer } from "./bundle-analyzer";
 import { configLoader } from "./config-loader";
@@ -41,6 +37,9 @@ import { folderCleaner } from "./folder-cleaner";
 import { outputFormatter } from "./output-formatter";
 import { profileService } from "./profile-service";
 import { reportGenerator } from "./report-generator";
+import { npmPackageGenerator } from "./vibe-package/npm-package-generator";
+import { PackageEndpointGeneratorRepository } from "./vibe-package/package-endpoint-generator";
+import { createPackagePlugins } from "./vibe-package/package-plugins";
 import { viteCompiler } from "./vite-compiler";
 
 type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];

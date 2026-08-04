@@ -5,6 +5,8 @@
  * These utilities were moved from individual definition files for better organization.
  */
 
+import { z } from "zod";
+
 import type {
   InferFormSchema,
   InferSchemaFromField,
@@ -25,8 +27,6 @@ import type { IconKey } from "../widgets/form-fields/icon-field/icons";
 import type { NavigateButtonWidgetConfig } from "../widgets/interactive/navigate-button/types";
 import type { SearchBarWidgetConfig } from "../widgets/interactive/search-bar/types";
 import type { SubmitButtonWidgetConfig } from "../widgets/interactive/submit-button/types";
-import { z } from "zod";
-
 import type {
   ArrayWidgetConfig,
   DisplayOnlyWidgetConfig,

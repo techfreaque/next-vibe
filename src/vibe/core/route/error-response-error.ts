@@ -8,7 +8,6 @@
  */
 
 import type { TranslatedKeyType } from "../i18n/core/scoped-translation";
-
 import type {
   ErrorResponseType,
   ErrorResponseTypesElements,

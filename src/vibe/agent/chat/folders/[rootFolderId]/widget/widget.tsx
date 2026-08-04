@@ -5,15 +5,7 @@
  */
 
 "use client";
-import {
-  getFolderTourAttr,
-  TOUR_DATA_ATTRS,
-} from "../../../../ai-stream/stream/widget/chat-ui/welcome-tour/tour-attrs";
-import { DEFAULT_FOLDER_CONFIGS, isDefaultFolderId } from "../../../config";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
-import { NEW_MESSAGE_ID } from "../../../enum";
-import folderContentsDefinition from "../../../folder-contents/[rootFolderId]/definition";
-import cortexSearchDefinitions from "../../../../cortex/search/definition";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { useSilentHistory } from "next-vibe/ui/hooks/use-navigation";
 import { Button } from "next-vibe/ui/ui/button";
@@ -49,6 +41,14 @@ import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage"
 import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import {
+  getFolderTourAttr,
+  TOUR_DATA_ATTRS,
+} from "../../../../ai-stream/stream/widget/chat-ui/welcome-tour/tour-attrs";
+import cortexSearchDefinitions from "../../../../cortex/search/definition";
+import { DEFAULT_FOLDER_CONFIGS, isDefaultFolderId } from "../../../config";
+import { NEW_MESSAGE_ID } from "../../../enum";
+import folderContentsDefinition from "../../../folder-contents/[rootFolderId]/definition";
 import { useChatBootContext } from "../../../hooks/context";
 import { useChatNavigationStore } from "../../../hooks/use-chat-navigation-store";
 import { ThreadsList } from "../../../threads/widget/widget";

@@ -4,11 +4,7 @@
  */
 
 "use client";
-import type { SendMessageParams } from "../../../../../../ai-stream/stream/hooks/send-message";
 import type { DefaultFolderId } from "next-vibe/core/execution-context";
-import type { ChatMessage } from "../../../../../db";
-import { getVoteStatus } from "../../[messageId]/vote/utils";
-import type { TtsModelId } from "../../../../../../text-to-speech/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -21,6 +17,10 @@ import React, { memo, useMemo } from "react";
 
 import { chatAnimations } from "@/_pages/chat/lib/design-tokens";
 
+import type { SendMessageParams } from "../../../../../../ai-stream/stream/hooks/send-message";
+import type { TtsModelId } from "../../../../../../text-to-speech/models";
+import type { ChatMessage } from "../../../../../db";
+import { getVoteStatus } from "../../[messageId]/vote/utils";
 import { BRANCH_INDEX_KEY } from "../../hooks/use-branch-management";
 import type { CollapseStateStore } from "../../hooks/use-collapse-state";
 import { scopedTranslation } from "../../i18n";

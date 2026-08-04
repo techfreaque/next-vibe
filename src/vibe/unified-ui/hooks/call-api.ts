@@ -1,3 +1,11 @@
+import { getCookie } from "next-vibe/ui/lib/cookies";
+
+import {
+  BEARER_LEAD_ID_SEPARATOR,
+  CSRF_TOKEN_COOKIE_NAME,
+  CSRF_TOKEN_HEADER_NAME,
+} from "@/env/constants";
+
 import { validateData } from "../../core/core-utils/validation";
 import { type CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import { Methods } from "../../core/definition/enums";
@@ -15,16 +23,8 @@ import { AuthClientRepository } from "../../identity/auth/repository-client";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
 import { Platform } from "../../platforms/platforms";
-import { getCookie } from "next-vibe/ui/lib/cookies";
-import { scopedTranslation as hooksTranslation } from "./i18n";
-
-import {
-  BEARER_LEAD_ID_SEPARATOR,
-  CSRF_TOKEN_COOKIE_NAME,
-  CSRF_TOKEN_HEADER_NAME,
-} from "@/env/constants";
-
 import { containsFile, objectToFormData } from "./api-utils-shared";
+import { scopedTranslation as hooksTranslation } from "./i18n";
 
 const MUTATING_METHODS = new Set([
   Methods.POST,

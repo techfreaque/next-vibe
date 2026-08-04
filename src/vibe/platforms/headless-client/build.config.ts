@@ -11,15 +11,14 @@
 import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
 
+import { createCliWidgetPlugin } from "@/vibe/platforms/cli/runtime/cli-widget-plugin-factory";
+
 import type { BuildConfig } from "../../tooling/builder/definition";
 import {
   BunBuildTypeEnum,
   BunTargetEnum,
   SourcemapModeEnum,
 } from "../../tooling/builder/enum";
-
-import { createCliWidgetPlugin } from "@/vibe/platforms/cli/runtime/cli-widget-plugin-factory";
-
 import manifest from "./package";
 
 const DIST_DIR = ".dist/headless-client";

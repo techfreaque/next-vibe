@@ -1,6 +1,7 @@
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import { Text } from "react-native";
+
+import { cn } from "../../../unified-ui/_shared/cn";
 
 export interface StrongTouchEvent {
   preventDefault?: () => void;

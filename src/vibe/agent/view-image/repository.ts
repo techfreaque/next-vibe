@@ -1,6 +1,5 @@
 import "server-only";
 
-import { fetchStorageFileAsBase64 } from "../chat/storage/url-utils";
 import type { HandlerResponse } from "next-vibe/core/route/response.schema";
 import {
   createContentResponse,
@@ -10,6 +9,7 @@ import {
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { fetchStorageFileAsBase64 } from "../chat/storage/url-utils";
 import type { ViewImagePostRequestInput } from "./definition";
 import type { ViewImageT } from "./i18n";
 

@@ -8,6 +8,8 @@
  * parallel execution (e.g. abandon a stuck command without ending the turn).
  */
 
+import { z } from "zod";
+
 import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -23,7 +25,6 @@ import {
   requestField,
   responseField,
 } from "../../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
 
 const { POST } = createEndpoint({
   scopedTranslation,

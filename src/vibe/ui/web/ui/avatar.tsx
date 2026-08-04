@@ -1,8 +1,9 @@
 "use client";
 
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
+
+import { cn } from "../../../unified-ui/_shared/cn";
 
 // Cross-platform types
 export interface AvatarRootProps {

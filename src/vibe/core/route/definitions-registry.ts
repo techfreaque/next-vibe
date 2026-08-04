@@ -1,5 +1,12 @@
 import "server-only";
 
+import { pathToAliasMap } from "@/generated/endpoints/alias-map";
+import { getEndpoint } from "@/generated/endpoints/endpoint";
+
+import type { JwtPayloadType } from "../../identity/auth/types";
+import type { UserRoleValue } from "../../identity/roles/enum";
+import type { EndpointLogger } from "../../logger/types";
+import type { Platform } from "../../platforms/platforms";
 import { endpointToToolName } from "../core-utils/path";
 import type { CreateApiEndpointAny } from "../definition/endpoint-base";
 import type { Methods } from "../definition/enums";
@@ -7,13 +14,6 @@ import type { CountryLanguage } from "../i18n/core/config";
 import { permissionsRegistry } from "../permissions/registry";
 import type { WidgetData } from "../utils/json";
 import { parseError } from "../utils/parse-error";
-import type { JwtPayloadType } from "../../identity/auth/types";
-import type { UserRoleValue } from "../../identity/roles/enum";
-import type { EndpointLogger } from "../../logger/types";
-import type { Platform } from "../../platforms/platforms";
-
-import { pathToAliasMap } from "@/generated/endpoints/alias-map";
-import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 export interface SerializableToolMetadata {
   name: string;

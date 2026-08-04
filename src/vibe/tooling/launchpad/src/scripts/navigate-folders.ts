@@ -6,6 +6,7 @@ import { promisify } from "node:util";
 
 import chalk from "chalk";
 import inquirer from "inquirer";
+
 import type {
   LaunchpadConfig,
   LaunchpadFolder,

@@ -5,6 +5,8 @@
  * Cloud-only constraint: cloud cannot initiate; only local instances call this.
  */
 
+import { z } from "zod";
+
 import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -19,8 +21,6 @@ import {
   requestField,
   responseField,
 } from "../../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
 import { SyncScopeSchema, TransportModeSchema } from "../../db";
 import { scopedTranslation } from "./i18n";
 

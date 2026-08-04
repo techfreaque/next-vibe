@@ -3,7 +3,6 @@
  * Defines endpoints for listing and creating messages in a thread
  */
 
-import { ChatModelId } from "../../../../ai-stream/models";
 import { dateSchema } from "next-vibe/core/definition/common.schema";
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
@@ -13,6 +12,7 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { getCurrentUrl, silentReplaceState } from "next-vibe/ui/lib/location";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
@@ -26,8 +26,8 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { ChatModelId } from "../../../../ai-stream/models";
 import { rootFolderIdOptions } from "../../../config";
-import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { MessageMetadata } from "../../../db";
 import {
   ChatMessageRole,

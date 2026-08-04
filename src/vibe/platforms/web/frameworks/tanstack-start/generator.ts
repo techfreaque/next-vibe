@@ -16,15 +16,17 @@ import {
 } from "node:fs";
 import path, { join, relative, resolve } from "node:path";
 
+import { GENERATED_DIR, getApiDir, getUiDir, VIBE_DIR } from "@/env/paths";
+
 import type { ApiSection } from "../../../../core/definition/endpoint-base";
 import { coreEnv } from "../../../../core/env";
 import { hasCustomDirective } from "../../../../core/generators/shared/custom-directive";
 import { findFilesByName } from "../../../../core/generators/shared/scanner";
+import type { GeneratorDefinition } from "../../../../core/generators/shared/shared-inputs";
 import {
   getRelativeImportPath,
   writeFileIfChanged,
 } from "../../../../core/generators/shared/utils";
-import type { GeneratorDefinition } from "../../../../core/generators/shared/shared-inputs";
 import { parseError } from "../../../../core/utils/parse-error";
 import { Environment } from "../../../../env/env-util";
 import {
@@ -32,8 +34,6 @@ import {
   PlatformMarker,
   type UserRoleValue,
 } from "../../../../identity/roles/enum";
-
-import { GENERATED_DIR, getApiDir, getUiDir, VIBE_DIR } from "@/env/paths";
 
 /**
  * Where CountryLanguage actually lives. The emitted import resolves from the

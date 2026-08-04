@@ -14,17 +14,16 @@ import {
   success,
 } from "../../core/route/response.schema";
 import { parseError } from "../../core/utils/parse-error";
-import { databaseEnv } from "../env";
-import type { MigrateT } from "./i18n";
-import { scopedTranslation } from "./i18n";
 import {
   formatActionCommand,
   formatDatabase,
   formatDuration,
 } from "../../logger/formatters";
 import type { EndpointLogger } from "../../logger/types";
-
+import { databaseEnv } from "../env";
 import type { MigrateResponseOutput } from "./definition";
+import type { MigrateT } from "./i18n";
+import { scopedTranslation } from "./i18n";
 
 export class DatabaseMigrationRepository {
   static async runMigrations(

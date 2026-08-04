@@ -4,10 +4,13 @@
  * Displays list of files with error/warning counts
  */
 
-import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Div } from "next-vibe/ui/ui/div";
 import { Span } from "next-vibe/ui/ui/span";
 import { H3 } from "next-vibe/ui/ui/typography";
+import type { ReactElement } from "react";
+import type { z } from "zod";
+
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import type { ReactRequestResponseWidgetProps } from "../../../_shared/react-types";
 import type { FieldUsageConfig } from "../../../_shared/types";
 import {
@@ -15,9 +18,6 @@ import {
   useWidgetLocale,
 } from "../../../_shared/use-widget-context";
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "../../../hooks/i18n";
-import type { ReactElement } from "react";
-import type { z } from "zod";
-
 import type {
   CodeQualityFilesSchema,
   CodeQualityFilesWidgetConfig,

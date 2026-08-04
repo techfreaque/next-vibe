@@ -1,10 +1,9 @@
-import { useTranslation } from "../../../core/i18n/core/client";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import { Pressable, View } from "react-native";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 
-import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
+import { useTranslation } from "../../../core/i18n/core/client";
+import { cn } from "../../../unified-ui/_shared/cn";
 import { uiScopedTranslation } from "../../web/i18n";
 import type {
   ToastActionProps,
@@ -17,6 +16,7 @@ import type {
 } from "../../web/ui/toast";
 import { toastVariants } from "../../web/ui/toast";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { Span } from "./span";
 
 // Re-export types for cross-platform compatibility

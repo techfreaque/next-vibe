@@ -12,9 +12,7 @@
  * root-folder tabs, new-chat button, search, and the top-level EndpointsPage call.
  */
 
-import { isDefaultFolderId } from "../../config";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
-import { NEW_MESSAGE_ID, ThreadStreamingState } from "../../enum";
 import { success } from "next-vibe/core/route/response.schema";
 import { useRouter, useSilentHistory } from "next-vibe/ui/hooks/use-navigation";
 import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
@@ -72,8 +70,8 @@ import {
 import { apiClient } from "next-vibe/unified-ui/hooks/store";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
-import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
+import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import { useMemo, useState } from "react";
 
@@ -86,6 +84,8 @@ import {
 } from "@/_pages/chat/lib/utils/folder-utils";
 import { buildFolderUrl } from "@/_pages/chat/lib/utils/navigation";
 
+import { isDefaultFolderId } from "../../config";
+import { NEW_MESSAGE_ID, ThreadStreamingState } from "../../enum";
 import createFolderDefinition from "../../folders/[rootFolderId]/create/definition";
 import type { FolderListResponseOutput } from "../../folders/[rootFolderId]/definition";
 import foldersDefinition from "../../folders/[rootFolderId]/definition";

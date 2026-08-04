@@ -14,6 +14,8 @@
 
 import "server-only";
 
+import { z } from "zod";
+
 import { pathSegmentsToToolName } from "../../../core/core-utils/path";
 import { zodSchemaToJsonSchema } from "../../../core/definition/endpoint-to-metadata";
 import { FieldUsage } from "../../../core/definition/enums";
@@ -21,9 +23,8 @@ import { coreEnv } from "../../../core/env";
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import type { WidgetData } from "../../../core/utils/json";
 import { filterUserPermissionRoles } from "../../../identity/roles/enum";
-import { Platform } from "../../platforms";
 import { generateSchemaForUsage } from "../../../unified-ui/_shared/utils";
-import { z } from "zod";
+import { Platform } from "../../platforms";
 
 // ============================================================================
 // SKILL TIER DEFINITIONS

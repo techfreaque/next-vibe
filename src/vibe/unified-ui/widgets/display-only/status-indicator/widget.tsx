@@ -5,16 +5,16 @@
 
 "use client";
 
-import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Badge } from "next-vibe/ui/ui/badge";
+import type { JSX } from "react";
+
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import type { ReactRequestResponseWidgetProps } from "../../../_shared/react-types";
 import type { FieldUsageConfig } from "../../../_shared/types";
 import {
   useWidgetForm,
   useWidgetTranslation,
 } from "../../../_shared/use-widget-context";
-import type { JSX } from "react";
-
 import type {
   StatusIndicatorWidgetConfig,
   StatusIndicatorWidgetSchema,
@@ -60,9 +60,9 @@ function mapStatusToBadgeVariant(
  */
 export function StatusIndicatorWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends TEndpoint extends CreateApiEndpointAny
+  TKey extends (TEndpoint extends CreateApiEndpointAny
     ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
-    : never,
+    : never),
   TSchema extends StatusIndicatorWidgetSchema,
   TUsage extends FieldUsageConfig,
   TSchemaType extends "primitive",

@@ -1,12 +1,8 @@
 import { styled } from "nativewind";
-import { cn } from "../../../unified-ui/_shared/cn";
 import * as React from "react";
 import { Text as RNText, View } from "react-native";
 
-import {
-  convertCSSToTextStyle,
-  convertCSSToViewStyle,
-} from "../utils/style-converter";
+import { cn } from "../../../unified-ui/_shared/cn";
 import type {
   CardContentProps,
   CardDescriptionProps,
@@ -16,6 +12,10 @@ import type {
   CardTitleProps,
 } from "../../web/ui/card";
 import { applyStyleType } from "../../web/utils/style-type";
+import {
+  convertCSSToTextStyle,
+  convertCSSToViewStyle,
+} from "../utils/style-converter";
 import { TextClassContext } from "./text";
 
 const StyledView = styled(View, { className: "style" });

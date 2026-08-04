@@ -4,6 +4,8 @@
  * Defaults: enabled tasks only, all visibility (including hidden).
  */
 
+import { z } from "zod";
+
 import { dateSchema } from "../../../core/definition/common.schema";
 import { createEndpoint } from "../../../core/definition/create-i18n";
 import {
@@ -15,7 +17,15 @@ import {
 } from "../../../core/definition/enums";
 import { WidgetDataSchema } from "../../../core/utils/json";
 import { UserRole } from "../../../identity/roles/enum";
-import { scopedTranslation } from "./i18n";
+import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "../../../unified-ui/_shared/utils";
+import {
+  backButton,
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "../../../unified-ui/_shared/utils-i18n";
 import {
   CronTaskHiddenFilter,
   CronTaskHiddenFilterDB,
@@ -27,19 +37,9 @@ import {
   TaskCategoryOptions,
   TaskOutputModeDB,
 } from "../../enum";
-import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
-import { customWidgetObject } from "../../../unified-ui/_shared/utils";
-import {
-  backButton,
-  objectField,
-  requestField,
-  responseArrayField,
-  responseField,
-} from "../../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
 import { taskOwnerSchema } from "../db";
 import { CRON_QUEUE_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const CronQueueContainer = lazyWidget(() =>
   import("./widget").then((m) => ({

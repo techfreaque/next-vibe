@@ -15,7 +15,6 @@ import { existsSync } from "node:fs";
 import { appendRawToServerLog } from "../../../../logger/file";
 import { createNextjsFormatter } from "../../../../logger/formatters";
 import type { EndpointLogger } from "../../../../logger/types";
-
 import { addPidToFile, removePidFromFile } from "../../pid";
 
 export interface NextDevController {
@@ -95,9 +94,7 @@ export function startNextDev({
     if (!disableProxy) {
       const rewritePort = (chunk: Buffer): void => {
         const formatted = formatNextjs(
-          chunk
-            .toString()
-            .replaceAll(String(internalPort), String(publicPort)),
+          chunk.toString().replaceAll(String(internalPort), String(publicPort)),
         );
         process.stdout.write(formatted);
         void appendRawToServerLog(formatted);

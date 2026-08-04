@@ -5,12 +5,6 @@
 
 "use client";
 
-import type {
-  IconSchemaNullishType,
-  IconSchemaOptionalType,
-  IconSchemaType,
-} from "../../../../core/definition/common.schema";
-import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { Badge } from "next-vibe/ui/ui/badge";
 import { Button } from "next-vibe/ui/ui/button";
 import { Div } from "next-vibe/ui/ui/div";
@@ -31,6 +25,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe/ui/ui/tooltip";
+import type { JSX } from "react";
+
+import type {
+  IconSchemaNullishType,
+  IconSchemaOptionalType,
+  IconSchemaType,
+} from "../../../../core/definition/common.schema";
+import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { cn } from "../../../_shared/cn";
 import type { ReactFormFieldProps } from "../../../_shared/react-types";
 import type { FieldUsageConfig } from "../../../_shared/types";
@@ -44,16 +46,14 @@ import { scopedTranslation as unifiedInterfaceScopedTranslation } from "../../..
 import { getTheme } from "../_shared/constants";
 import { getFieldStyleClassName } from "../_shared/styling";
 import { getFieldValidationState } from "../_shared/validation";
-import type { JSX } from "react";
-
 import type { IconKey } from "./icons";
 import type { IconFieldWidgetConfig } from "./types";
 
 export function IconFieldWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends TEndpoint extends CreateApiEndpointAny
+  TKey extends (TEndpoint extends CreateApiEndpointAny
     ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
-    : never,
+    : never),
   TSchema extends
     | IconSchemaType
     | IconSchemaOptionalType

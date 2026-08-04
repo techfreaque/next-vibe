@@ -13,13 +13,13 @@
  *   payload       ← payloadType (zod schema on the event declaration)
  */
 
+import { z } from "zod";
+
 import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import type { RemoteEventContext } from "../../core/route/handler-realtime";
 import type { WidgetData } from "../../core/utils/json";
 import { WidgetDataSchema } from "../../core/utils/json";
 import type { EndpointLogger } from "../../logger/types";
-import { z } from "zod";
-
 import type { AnyEndpointEventEnvelope } from "../core/structured-events";
 import type { RegistryRouteModule } from "../server/ws-channel-registry";
 

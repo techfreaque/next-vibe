@@ -8,11 +8,11 @@
  * src/generated/category-registry.ts
  */
 
+import type { pathToAliasMap } from "@/generated/endpoints/alias-map";
+
 import type { CountryLanguage } from "../core/i18n/core/config";
 import type { UserPermissionRole } from "../identity/roles/enum";
 import type { IconKey } from "../unified-ui/widgets/form-fields/icon-field/icons";
-
-import type { pathToAliasMap } from "@/generated/endpoints/alias-map";
 
 /** Top-level grouping in the admin sidebar */
 export type AdminGroup =

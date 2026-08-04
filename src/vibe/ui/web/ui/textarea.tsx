@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from "class-variance-authority";
-import { cn } from "../../../unified-ui/_shared/cn";
 import React from "react";
 
+import { cn } from "../../../unified-ui/_shared/cn";
 import type { StyleType } from "../utils/style-type";
 import type { InferValueType, InputGenericTarget } from "./input";
 

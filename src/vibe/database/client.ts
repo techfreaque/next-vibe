@@ -3,8 +3,9 @@ import "server-only";
 import { PGlite } from "@electric-sql/pglite";
 import { type NodePgDatabase } from "drizzle-orm/node-postgres";
 import { type PgliteDatabase } from "drizzle-orm/pglite";
-import { databaseEnv } from "./env";
 import { Pool } from "pg";
+
+import { databaseEnv } from "./env";
 
 /**
  * Shared database connection primitives.

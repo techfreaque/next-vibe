@@ -1,6 +1,6 @@
-import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import * as React from "react";
 
+import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { InkTextProps } from "./tailwind-to-ink";
 
 /**

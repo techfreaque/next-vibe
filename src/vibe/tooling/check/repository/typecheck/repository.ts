@@ -18,6 +18,8 @@ import {
 import { dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { z } from "zod";
+
 import { coreEnv, getPackageRunner } from "../../../../core/env";
 import type { ResponseType as ApiResponseType } from "../../../../core/route/response.schema";
 import {
@@ -28,12 +30,9 @@ import {
 import { parseError } from "../../../../core/utils/parse-error";
 import type { EndpointLogger } from "../../../../logger/types";
 import { Platform } from "../../../../platforms/platforms";
-
-import { checkEnv } from "../../env";
-import { z } from "zod";
-
 import { ConfigRepositoryImpl } from "../../config/repository";
 import type { CheckConfig } from "../../config/types";
+import { checkEnv } from "../../env";
 import {
   calculateFilteredSummary,
   filterIssues,
