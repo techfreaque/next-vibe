@@ -47,9 +47,9 @@ export async function dispatchPrefixedToolName(
   context: MCPExecutionContext,
   logger: EndpointLogger,
 ): Promise<PrefixedDispatchOutcome> {
-  const { RouteExecuteRepository } =
-    await import("../../execute-tool/repository");
-  const result = await RouteExecuteRepository.runInProcess({
+  const { runEndpointByName } =
+    await import("../../execute-tool/repository/run-endpoint-by-name");
+  const result = await runEndpointByName({
     toolName: context.toolName,
     input: context.data as Record<string, WidgetData>,
     callbackMode: "wait",
@@ -97,9 +97,9 @@ export async function dispatchRoutedTool(
   if (!target) {
     return null;
   }
-  const { RouteExecuteRepository } =
-    await import("../../execute-tool/repository");
-  return await RouteExecuteRepository.runInProcess({
+  const { runEndpointByName } =
+    await import("../../execute-tool/repository/run-endpoint-by-name");
+  return await runEndpointByName({
     toolName: context.toolName,
     input: context.data as Record<string, WidgetData>,
     instanceId: target.instanceId,

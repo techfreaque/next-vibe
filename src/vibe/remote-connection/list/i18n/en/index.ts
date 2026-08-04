@@ -80,8 +80,8 @@ export const translations = {
     health: {
       tunnelOpen: "Tunnel open",
       bridgeActive: "Connected",
-      tunnelWarning: "Tunnel unstable",
-      bridgeWarning: "Connection slow",
+      tunnelWarning: "Tunnel connecting",
+      bridgeWarning: "Syncing",
       tunnelLost: "Tunnel lost",
       bridgeFailed: "Connection failed",
       disconnected: "Inactive",

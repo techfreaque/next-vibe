@@ -415,11 +415,11 @@ export class RemoteEventBridgeRepository {
         w: RemoteEventWirePayload,
         mode: "WAIT" | "DETACH",
       ): Promise<void> => {
-        const { RouteExecuteRepository } =
-          await import("../../execute-tool/repository");
+        const { runEndpointRemote } =
+          await import("../../execute-tool/repository/run-endpoint-remote");
         const { CallbackMode } = await import("../../execute-tool/constants");
         const { default: bridgeDefinition } = await import("./definition");
-        await RouteExecuteRepository.runInProcessTyped({
+        await runEndpointRemote({
           definition: bridgeDefinition.POST,
           instanceId: relayInstanceId,
           callbackMode:

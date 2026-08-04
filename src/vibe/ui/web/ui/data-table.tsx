@@ -1,12 +1,19 @@
 "use client";
 
-import type { ColumnDef, Row, SortingState } from "@tanstack/react-table";
+import { flexRender, useTable } from "@tanstack/react-table";
 import {
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+  columnSizingFeature,
+  columnVisibilityFeature,
+  createCoreRowModel,
+  createSortedRowModel,
+  rowSelectionFeature,
+  rowSortingFeature,
+  tableFeatures,
+  type ColumnDef,
+  type Row,
+  type RowData,
+  type SortingState,
+} from "@tanstack/table-core";
 import type { ReactElement } from "react";
 import * as React from "react";
 
@@ -21,10 +28,24 @@ import {
   TableRow,
 } from "./table";
 
-export type DataTableProps<TData, TValue = string> = {
-  columns: ColumnDef<TData, TValue>[];
+export const tableConfig = tableFeatures({
+  rowSortingFeature,
+  rowSelectionFeature,
+  columnVisibilityFeature,
+  columnSizingFeature,
+  sortedRowModel: createSortedRowModel(),
+  coreRowModel: createCoreRowModel(),
+});
+
+type AppFeatures = typeof tableConfig;
+
+export type AppColumnDef<TData extends RowData> = ColumnDef<AppFeatures, TData>;
+export type AppRow<TData extends RowData> = Row<AppFeatures, TData>;
+
+export type DataTableProps<TData extends RowData> = {
+  columns: AppColumnDef<TData>[];
   data: TData[];
-  onRowPress?: (row: Row<TData>) => void;
+  onRowPress?: (row: AppRow<TData>) => void;
   estimatedItemSize?: number;
   ListEmptyComponent?: React.ComponentType | ReactElement | null;
   ListFooterComponent?: React.ComponentType | ReactElement | null;
@@ -35,7 +56,7 @@ export type DataTableProps<TData, TValue = string> = {
 /**
  * @docs https://tanstack.com/table
  */
-export function DataTable<TData, TValue = string>({
+export function DataTable<TData extends RowData>({
   columns,
   data,
   onRowPress,
@@ -43,14 +64,13 @@ export function DataTable<TData, TValue = string>({
   ListFooterComponent,
   className,
   style,
-}: DataTableProps<TData, TValue>): ReactElement {
+}: DataTableProps<TData>): ReactElement {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const table = useReactTable({
+  const table = useTable({
+    features: tableConfig,
     data,
     columns,
-    getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
-    getSortedRowModel: getSortedRowModel(),
     state: {
       sorting,
     },

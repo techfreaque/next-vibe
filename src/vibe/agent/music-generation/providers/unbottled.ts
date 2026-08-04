@@ -3,7 +3,7 @@ import "server-only";
 import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
-import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
+import { runEndpointAsSystemProvider } from "next-vibe/execute-tool/repository/run-endpoint-remote";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { Platform } from "next-vibe/platforms/platforms";
@@ -43,7 +43,7 @@ export async function generateMusicWithUnbottled(params: {
     platform,
   } = params;
 
-  const remoteResult = await RouteExecuteRepository.runAsSystemProvider({
+  const remoteResult = await runEndpointAsSystemProvider({
     definition: definitions.POST,
     input,
     user,

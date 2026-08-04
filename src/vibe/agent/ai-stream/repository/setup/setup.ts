@@ -16,8 +16,8 @@ import {
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type { CoreTool } from "next-vibe/platforms/ai/tools-loader";
 import { Platform } from "next-vibe/platforms/platforms";
+import type { CoreTool } from "next-vibe/platforms/ai/tools-loader";
 import type { ResolvedRelayContext } from "next-vibe/realtime/core/relay-context";
 import type { NextRequest } from "next-vibe/ui/lib/request";
 
@@ -355,11 +355,11 @@ async function resolveRemoteFolderPrompt(params: {
     return { success: true, data: localPrompt };
   }
 
-  const { RouteExecuteRepository } =
-    await import("next-vibe/execute-tool/repository");
+  const { runEndpointRemote } =
+    await import("next-vibe/execute-tool/repository/run-endpoint-remote");
   const promptDef = (await import("../../system-prompt/debug/definition"))
     .default;
-  const remotePromptResult = await RouteExecuteRepository.runInProcessTyped({
+  const remotePromptResult = await runEndpointRemote({
     definition: promptDef.GET,
     instanceId: remoteFolderInstance,
     user,

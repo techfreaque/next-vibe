@@ -18,11 +18,11 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import { CallbackMode } from "next-vibe/execute-tool/constants";
-import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
+import { runEndpointByName } from "next-vibe/execute-tool/repository/run-endpoint-by-name";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type { CoreTool } from "next-vibe/platforms/ai/tools-loader";
 import { Platform } from "next-vibe/platforms/platforms";
+import type { CoreTool } from "next-vibe/platforms/ai/tools-loader";
 import type { ResolvedRelayContext } from "next-vibe/realtime/core/relay-context";
 import { RemoteEventBridgeRepository } from "next-vibe/realtime/remote-event-bridge/repository";
 import type { NextRequest } from "next-vibe/ui/lib/request";
@@ -335,7 +335,7 @@ export class AiStreamRepository {
   > {
     logger.debug("[AiStreamRun] Executing pre-call", { routeId });
 
-    const result = await RouteExecuteRepository.runInProcess({
+    const result = await runEndpointByName({
       toolName: routeId,
       input: mergedArgs,
       callbackMode: CallbackMode.WAIT,

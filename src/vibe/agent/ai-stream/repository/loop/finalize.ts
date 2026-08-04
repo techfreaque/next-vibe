@@ -114,10 +114,7 @@ export async function complete(
   ]);
 
   // For reasoning tokens we still read from the SDK's aggregate (output-only, not re-sent).
-  const reasoningTokens =
-    usageData.reasoningTokens ??
-    usageData.outputTokenDetails?.reasoningTokens ??
-    0;
+  const reasoningTokens = usageData.outputTokenDetails?.reasoningTokens ?? 0;
 
   // providerMeta cacheWriteTokens fallback for claude-code provider.
   const providerCacheWriteTokens =
@@ -127,10 +124,7 @@ export async function complete(
   const sdkTotals = {
     inputTokens: usageData.inputTokens ?? 0,
     outputTokens: usageData.outputTokens ?? 0,
-    cachedInputTokens:
-      usageData.cachedInputTokens ??
-      usageData.inputTokenDetails?.cacheReadTokens ??
-      0,
+    cachedInputTokens: usageData.inputTokenDetails?.cacheReadTokens ?? 0,
   };
   const {
     inputTokens: finalInputTokens,

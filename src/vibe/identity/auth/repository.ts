@@ -906,8 +906,13 @@ export class AuthRepository {
           context.locale,
         );
         if (!sessionValid) {
-          logger.debug(
+          logger.warn(
             "Session validation failed - returning public user (invalid token cleared by middleware)",
+            {
+              tokenPrefix: token.slice(0, 20),
+              userId: verifyResult.data.id,
+              platform: context.platform,
+            },
           );
           // Invalid sessions are cleared by middleware, so treat user as public
           // This allows seamless recovery after DB resets

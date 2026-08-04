@@ -30,7 +30,7 @@ import type { EndpointLogger } from "../../logger/types";
 import { Platform } from "../../platforms/platforms";
 import { CallbackMode, EXECUTE_TOOL_ALIAS } from "../constants";
 import { TaskCompletion } from "./completion";
-import { RouteExecuteRepository } from "./index";
+import { runEndpointByName } from "./run-endpoint-by-name";
 
 export interface ConfirmedExecutionResult {
   /** The tool result to persist (undefined when execution failed). */
@@ -133,7 +133,7 @@ export class ConfirmedExecution {
     let toolResult: WidgetData | undefined;
     let toolError: ErrorResponseType | undefined;
 
-    const execResult = await RouteExecuteRepository.runInProcess({
+    const execResult = await runEndpointByName({
       toolName: execToolName,
       input: execInput,
       callbackMode: isWakeUpConfirm ? CallbackMode.WAKE_UP : CallbackMode.WAIT,

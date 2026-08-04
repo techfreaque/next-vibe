@@ -61,8 +61,10 @@ function Alert({
 }: AlertProps): React.JSX.Element {
   const { colors } = useTheme();
 
-  const iconColorForNative =
-    variant === "destructive" ? colors.notification : colors.text;
+  const iconColorForNative: string =
+    variant === "destructive"
+      ? String(colors.notification)
+      : String(colors.text);
 
   return (
     <AlertVariantContext.Provider value={variant}>

@@ -90,9 +90,10 @@ export class AwaitTaskRepository {
         // have been consumed by ANOTHER process on this instance (its registry,
         // not ours). Ask the owner directly before parking this thread.
         if (pendingCall.instanceId) {
-          const { RouteExecuteRepository } = await import("../repository");
+          const { runEndpointRemote } =
+            await import("../repository/run-endpoint-remote");
           const { default: awaitTaskDefinition } = await import("./definition");
-          const remote = await RouteExecuteRepository.runInProcessTyped({
+          const remote = await runEndpointRemote({
             definition: awaitTaskDefinition.POST,
             instanceId: pendingCall.instanceId,
             input: { taskId },

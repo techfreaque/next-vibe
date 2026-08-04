@@ -48,13 +48,14 @@ async function routeBridgeToHermes(
   payload: RemoteEventBridgeRequestOutput["payload"],
   toolExecutionContext: ToolExecutionContext,
 ): Promise<ResponseType<RemoteEventBridgeResponseOutput>> {
-  const { RouteExecuteRepository } =
-    await import("../../execute-tool/repository");
+  const { runEndpointRemote } =
+    await import("../../execute-tool/repository/run-endpoint-remote");
   const { CallbackMode } = await import("../../execute-tool/constants");
   const { createEndpointLogger } = await import("../../logger/server");
   const { defaultLocale } = await import("../../core/i18n/core/config");
+  const { Platform } = await import("../../platforms/platforms");
 
-  return RouteExecuteRepository.runInProcessTyped({
+  return runEndpointRemote({
     definition: endpoints.POST,
     instanceId: HERMES_INSTANCE_ID,
     callbackMode: CallbackMode.WAIT,
@@ -62,9 +63,10 @@ async function routeBridgeToHermes(
     locale: defaultLocale,
     logger: createEndpointLogger(false, defaultLocale),
     toolExecutionContext,
+    platform: Platform.NEXT_API,
     input: {
       eventName,
-      payload,
+      payload: payload as RemoteEventBridgeRequestOutput["payload"],
     },
   });
 }

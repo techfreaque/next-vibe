@@ -1,22 +1,20 @@
-import {
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+import { flexRender, useTable } from "@tanstack/react-table";
+import type { RowData } from "@tanstack/table-core";
 import { Box, Text } from "ink";
 import type { JSX } from "react";
 import * as React from "react";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { DataTableProps } from "../../web/ui/data-table";
+import { tableConfig } from "../../web/ui/data-table";
 
 export type { DataTableProps } from "../../web/ui/data-table";
 
-const SEPARATOR = "\u2500".repeat(60);
+const SEPARATOR = "─".repeat(60);
 const CELL_DIVIDER = " | ";
 const NO_RESULTS = "No results.";
 
-export function DataTable<TData, TValue = string>({
+export function DataTable<TData extends RowData>({
   columns,
   data,
   onRowPress,
@@ -24,17 +22,17 @@ export function DataTable<TData, TValue = string>({
   ListFooterComponent,
   className,
   style,
-}: DataTableProps<TData, TValue>): JSX.Element {
+}: DataTableProps<TData>): JSX.Element {
   void className;
   void style;
   void onRowPress; // not interactive in terminal
 
   const isMcp = useIsMcp();
 
-  const table = useReactTable({
+  const table = useTable({
+    features: tableConfig,
     data,
     columns,
-    getCoreRowModel: getCoreRowModel(),
   });
 
   const rows = table.getRowModel().rows;

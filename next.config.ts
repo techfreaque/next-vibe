@@ -6,35 +6,27 @@ const nextConfig: NextConfig = {
   typedRoutes: true,
   productionBrowserSourceMaps: false,
   experimental: {
-    workerThreads: false,
+    // workerThreads: false,
     // Cap page-data collection workers. Next.js default is min(cpuCount, freemem/1GB)
     // which hits 23 workers locally - each worker loads the full module graph causing
     // 14+ GB peak. 4 workers keeps peak under control with acceptable build time.
-    cpus:
-      process.env.NODE_ENV === "production"
-        ? process.env.NEXT_PUBLIC_LOCAL_MODE === "true"
-          ? undefined
-          : 1
-        : undefined,
+    // cpus:
+    //   process.env.NODE_ENV === "production"
+    //     ? process.env.NEXT_PUBLIC_LOCAL_MODE === "true"
+    //       ? undefined
+    //       : 1
+    //     : undefined,
     // Disable in prod Docker builds: the worker spawns a separate process that
     // NODE_OPTIONS cannot cap, causing SIGKILL on low-RAM VPS. In-process build
     // respects --max-old-space-size set in repository.ts.
-    webpackBuildWorker:
-      process.env.NODE_ENV !== "production" ||
-      process.env.NEXT_PUBLIC_LOCAL_MODE === "true",
+    // webpackBuildWorker:
+    //   process.env.NODE_ENV !== "production" ||
+    //   process.env.NEXT_PUBLIC_LOCAL_MODE === "true",
     webpackMemoryOptimizations: true,
-    // Soft memory hint for Turbopack's Rust engine (NapiTurboEngineOptions.memoryLimit).
-    // Does NOT cap peak RSS - Turbopack still peaks at ~12 GB while building the module graph.
-    // May reduce memory after compilation phase. Unit: bytes.
-    turbopackMemoryLimit:
-      process.env.NODE_ENV === "production"
-        ? process.env.NEXT_PUBLIC_LOCAL_MODE === "true"
-          ? undefined
-          : 8 * 1024 * 1024 * 1024
-        : undefined, // 8 GB
     // parallelServerBuildTraces: true,
     // parallelServerCompiles: true,
     turbopackFileSystemCacheForDev: false,
+    turbopackFileSystemCacheForBuild: true,
     optimizePackageImports: [
       "lucide-react",
       "@radix-ui/react-icons",

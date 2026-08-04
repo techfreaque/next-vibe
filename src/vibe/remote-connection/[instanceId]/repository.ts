@@ -278,12 +278,12 @@ export class RemoteConnectionInstanceRepository {
       try {
         const selfInstanceId =
           RemoteConnectionRepository.deriveDefaultSelfInstanceId();
-        const { RouteExecuteRepository } =
-          await import("../../execute-tool/repository");
+        const { runEndpointRemote } =
+          await import("../../execute-tool/repository/run-endpoint-remote");
         const { CallbackMode } = await import("../../execute-tool/constants");
         const reverseUpdateDef =
           await import("../connect-reverse/update/definition");
-        await RouteExecuteRepository.runInProcessTyped({
+        await runEndpointRemote({
           definition: reverseUpdateDef.default.PATCH,
           instanceId: targetInstanceId,
           callbackMode: CallbackMode.WAIT,
@@ -774,10 +774,10 @@ export class RemoteConnectionInstanceRepository {
     if (row.token && row.remoteUrl) {
       void (async (): Promise<void> => {
         try {
-          const { RouteExecuteRepository } =
-            await import("../../execute-tool/repository");
+          const { runEndpointRemote } =
+            await import("../../execute-tool/repository/run-endpoint-remote");
           const selfRenameDef = await import("../self/rename/definition");
-          const result = await RouteExecuteRepository.runInProcessTyped({
+          const result = await runEndpointRemote({
             definition: selfRenameDef.default.PATCH,
             input: { newInstanceId, propagate: false },
             instanceId,

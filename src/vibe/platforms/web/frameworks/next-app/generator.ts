@@ -19,12 +19,10 @@ import {
 } from "@/env/paths";
 
 import type { ApiSection } from "../../../../core/definition/endpoint-base";
-import { coreEnv } from "../../../../core/env";
 import { hasCustomDirective } from "../../../../core/generators/shared/custom-directive";
 import type { GeneratorDefinition } from "../../../../core/generators/shared/shared-inputs";
 import { writeFileIfChanged } from "../../../../core/generators/shared/utils";
 import { parseError } from "../../../../core/utils/parse-error";
-import { Environment } from "../../../../env/env-util";
 import {
   filterPlatformMarkers,
   PlatformMarker,
@@ -37,7 +35,6 @@ const API_DIR = getApiDir();
 // Directories inside src/ that contain framework/system code — not user API routes.
 const SRC_DIR = getSrcDir();
 const API_EXCLUDE_DIRS = new Set([
-  getVibeDir(),
   join(SRC_DIR, "_pages"),
   join(SRC_DIR, "_old"),
   getGeneratedDir(),
@@ -61,8 +58,6 @@ const SPECIAL_FILES = [
 ] as const;
 const CLIENT_REQUIRED = new Set(["error.tsx", "global-error.tsx"]);
 
-const IS_PROD = coreEnv.NODE_ENV === Environment.PRODUCTION;
-
 // Returns true when a route should be excluded from the Next.js generated app.
 // Reads allowedRoles from the evaluated definitionModules map (populated by the
 // generator context after importing every definition.ts). Null entry (failed
@@ -84,12 +79,10 @@ function isWebExcluded(
     const roles = (method as { allowedRoles: readonly UserRoleValue[] })
       .allowedRoles;
     const markers = filterPlatformMarkers(roles);
-    if (markers.includes(PlatformMarker.WEB_OFF)) {
-      return true;
-    }
-    // PRODUCTION_OFF only suppresses shell generation in actual prod builds;
-    // dev/local-web still generates the shell so the endpoint is accessible.
-    if (IS_PROD && markers.includes(PlatformMarker.PRODUCTION_OFF)) {
+    if (
+      markers.includes(PlatformMarker.WEB_OFF) ||
+      markers.includes(PlatformMarker.PRODUCTION_OFF)
+    ) {
       return true;
     }
   }
@@ -225,11 +218,12 @@ function emit(
   }
 }
 
-// Remove AUTO-GENERATED shells whose source file no longer exists.
+// Remove AUTO-GENERATED shells whose source file no longer exists or is excluded.
 function cleanupStaleShells(
   outRoot: string,
   srcRoot: string,
   removed: string[],
+  isExcluded?: (srcPath: string) => boolean,
 ): void {
   if (!existsSync(outRoot)) {
     return;
@@ -237,7 +231,12 @@ function cleanupStaleShells(
   for (const entry of readdirSync(outRoot, { withFileTypes: true })) {
     const fullOut = join(outRoot, entry.name);
     if (entry.isDirectory()) {
-      cleanupStaleShells(fullOut, join(srcRoot, entry.name), removed);
+      cleanupStaleShells(
+        fullOut,
+        join(srcRoot, entry.name),
+        removed,
+        isExcluded,
+      );
       continue;
     }
     if (!entry.name.endsWith(".tsx") && !entry.name.endsWith(".ts")) {
@@ -263,9 +262,8 @@ function cleanupStaleShells(
     } catch {
       continue;
     }
-    // Derive the source path and check it exists.
     const srcPath = join(srcRoot, entry.name);
-    if (!existsSync(srcPath)) {
+    if (!existsSync(srcPath) || isExcluded?.(srcPath)) {
       try {
         rmSync(fullOut);
         removed.push(relative(PROJECT_ROOT, fullOut));
@@ -394,8 +392,10 @@ export const generator: GeneratorDefinition = {
 
     // — Stale shell cleanup —
     cleanupStaleShells(OUT_UI, UI_DIR, removed);
-    // Also clean API stale shells (map generated/app/api/[locale] ↔ src/)
-    cleanupStaleShells(OUT_API, API_DIR, removed);
+    // Also clean API stale shells — remove both missing-source and excluded shells.
+    cleanupStaleShells(OUT_API, API_DIR, removed, (srcPath) =>
+      isWebExcluded(srcPath, ctx.computed.definitionModules),
+    );
 
     if (errors.length > 0) {
       return {

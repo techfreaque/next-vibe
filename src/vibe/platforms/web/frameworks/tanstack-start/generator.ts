@@ -387,15 +387,15 @@ function fmtAwaitImport(importPath: string, indent: string): string {
   return `${indent}const { tanstackLoader } =\n${indent}  await import("${importPath}");`;
 }
 
-// Format `.inputValidator(...)` — break to multi-line if type arg is an object
+// Format `.validator(...)` — break to multi-line if type arg is an object
 function fmtInputValidator(inputType: string): string[] {
-  const single = `  .inputValidator((data: ${inputType}) => data)`;
+  const single = `  .validator((data: ${inputType}) => data)`;
   if (single.length <= 80) {
     return [single];
   }
   // Object type: break it out
   return [
-    `  .inputValidator(`,
+    `  .validator(`,
     `    (data: {`,
     `      params: Record<string, string>;`,
     `      search: Record<string, string>;`,

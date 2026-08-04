@@ -5,7 +5,6 @@ import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { Platform } from "next-vibe/platforms/platforms";
 import { notFound } from "next-vibe/ui/lib/not-found";
-import { redirect } from "next-vibe/ui/lib/redirect";
 
 import type { CreditsGetResponseOutput } from "@/credits/definition";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";

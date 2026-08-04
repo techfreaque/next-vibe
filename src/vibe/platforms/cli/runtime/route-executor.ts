@@ -6,7 +6,7 @@
 
 import { makeHeadlessContext } from "next-vibe/core/execution-context";
 
-import { getEndpoint } from "@/generated/endpoints/endpoint";
+import { getEndpoint } from "@/generated/endpoints/endpoint-dev";
 
 import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
 import {
@@ -256,7 +256,8 @@ export class RouteDelegationHandler {
       // getEndpoint() then returns near-instantly with no TDZ risk.
       logger.debug("[ROUTE] endpoint load start");
       const endpointLoadStart = Date.now();
-      const { getRouteHandler } = await import("@/generated/routes/handlers");
+      const { getRouteHandler } =
+        await import("@/generated/routes/handlers-dev");
       const routeHandler = await getRouteHandler(resolvedCommand);
       const peekedEndpoint = await getEndpoint(resolvedCommand);
       const endpointLoadMs = Date.now() - endpointLoadStart;
@@ -388,8 +389,8 @@ export class RouteDelegationHandler {
       // sequence simply added those numbers together on the startup path of
       // every command. Both are still resolved before runInProcess, so the tap
       // is registered before the handler can emit its first event.
-      const [{ RouteExecuteRepository }, liveRender] = await Promise.all([
-        import("../../../execute-tool/repository"),
+      const [{ runEndpointByName }, liveRender] = await Promise.all([
+        import("../../../execute-tool/repository/run-endpoint-by-name"),
         startLiveRenderIfSupported({
           endpoint,
           isLocal: remoteInstanceId === undefined,
@@ -403,7 +404,7 @@ export class RouteDelegationHandler {
 
       let rawResult;
       try {
-        rawResult = await RouteExecuteRepository.runInProcess({
+        rawResult = await runEndpointByName({
           toolName: resolvedCommand,
           input: inputData.data || {},
           urlPathParams: inputData.urlPathParams || {},

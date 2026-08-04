@@ -24,6 +24,7 @@ import type {
 } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import type { ToolSet } from "ai";
 import type { CoreTool } from "next-vibe/platforms/ai/tools-loader";
 import { remoteConnections } from "next-vibe/remote-connection/db";
 import type { NextRequest } from "next-vibe/ui/lib/request";
@@ -196,7 +197,7 @@ export async function runWsProviderStream(params: {
     //    inject the tool catalog into the system prompt. The AI calls:
     //      execute-tool({ toolName: "callerInstanceId__toolName", input })
     //    execute-tool on this node dispatches to the caller via reverse-WS.
-    let toolsOverride: Record<string, CoreTool> | undefined;
+    let toolsOverride: ToolSet | undefined;
     // The context the override tools are bound to — see toolsContext param.
     let receiverToolsContext: ToolExecutionContext | undefined;
     let catalogExtra = "";
@@ -343,7 +344,9 @@ export async function runWsProviderStream(params: {
             const prefixedName = `${callerInstanceId}__${spec.name}`;
             toolsOverride[spec.name] = makeTool({
               description: spec.description,
-              inputSchema: jsonSchema(spec.parameters),
+              inputSchema: jsonSchema<Record<string, WidgetData>>(
+                spec.parameters,
+              ),
               execute: async (
                 args: Record<string, WidgetData>,
                 options: Parameters<NonNullable<CoreTool["execute"]>>[1],

@@ -18,12 +18,8 @@
 
 import "server-only";
 
-import {
-  makeHeadlessContext,
-  type ToolExecutionContext,
-} from "next-vibe/core/execution-context";
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 
-import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import type { GenericHandlerBase } from "../../core/route/handler";
 import type { ResponseType } from "../../core/route/response.schema";
@@ -35,17 +31,13 @@ import {
 import type { WidgetData } from "../../core/utils/json";
 import { parseError } from "../../core/utils/parse-error";
 import type { JwtPayloadType } from "../../identity/auth/types";
-import { createEndpointLogger } from "../../logger/server";
 import type { EndpointLogger } from "../../logger/types";
 import type { AiT } from "../../platforms/ai/i18n";
 import { Platform } from "../../platforms/platforms";
-import type { CallbackModeValue } from "../constants";
-import { CallbackMode } from "../constants";
 import type {
   RouteExecuteRequestOutput,
   RouteExecuteResponseOutput,
 } from "../definition";
-import { RouteExecutionExecutor } from "./core";
 import { parseDispatchEnvelope } from "./envelope";
 import { ExecuteToolGuards } from "./guards";
 import { LocalExecution } from "./local";
@@ -234,231 +226,5 @@ export class RouteExecuteRepository {
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
-  }
-
-  /**
-   * In-process entry point — execute any tool on any instance from any surface.
-   *
-   * All non-HTTP callers (CLI remote leg, MCP remote tools, relay handlers, tests)
-   * use this instead of calling RouteExecutionExecutor.executeGenericHandler() directly.
-   * This ensures every surface shares the same remote dispatch, callback mode handling,
-   * platform filtering, and long-running task infrastructure.
-   *
-   * - toolName may be prefixed "hermes__ssh_exec_POST" to target a remote instance.
-   * - platform controls permission gating and response shaping.
-   * - For local tools: delegates to executeGenericHandler() with no overhead.
-   * - For remote tools: uses direct-HTTP or reverse-WS paths per connection config.
-   */
-  static async runInProcess(params: {
-    toolName: string;
-    input?: Record<string, WidgetData>;
-    instanceId?: string;
-    callbackMode?: CallbackModeValue;
-    user: JwtPayloadType;
-    locale: CountryLanguage;
-    logger: EndpointLogger;
-    toolExecutionContext: ToolExecutionContext;
-    platform: Platform;
-    /**
-     * Pre-loaded handler for the local WAIT path (MCP hot-reload, CLI handler
-     * reuse). Forwarded to execute(); ignored for remote/async modes.
-     */
-    preloadedHandler?: GenericHandlerBase | null;
-    /**
-     * Pre-split URL path params for the local WAIT path (CLI). Forwarded to
-     * execute(); ignored for remote/async modes.
-     */
-    urlPathParams?: Record<string, WidgetData>;
-  }): Promise<ResponseType<WidgetData>> {
-    const { scopedTranslation } = await import("../../platforms/ai/i18n");
-    const { t } = scopedTranslation.scopedT(params.locale);
-    const result = await RouteExecuteRepository.execute(
-      {
-        toolName: params.toolName,
-        input: params.input ?? {},
-        instanceId: params.instanceId,
-        callbackMode: params.callbackMode ?? CallbackMode.WAIT,
-      },
-      params.user,
-      params.locale,
-      params.logger,
-      t,
-      params.toolExecutionContext,
-      params.platform,
-      params.preloadedHandler,
-      params.urlPathParams,
-    );
-    if (!result.success) {
-      return result;
-    }
-    // Local WAIT wraps the target's output in `result` to satisfy the route schema.
-    // Async/remote responses carry taskId/hint/status at the top level — no `result` field.
-    // Either way, normalize to plain WidgetData via JSON round-trip (wire-safety).
-    const payload: WidgetData = result.data.result ?? result.data;
-    const data: WidgetData = JSON.parse(JSON.stringify(payload));
-    return success(data, {
-      ...(result.isErrorResponse && { isErrorResponse: true }),
-      ...(result.performance && { performance: result.performance }),
-    });
-  }
-
-  /**
-   * Type-safe variant of runInProcess. Pass a definition instead of a raw toolName string.
-   * The toolName is derived from definition.aliases[0] or path+method, and the input/response
-   * types are inferred from definition.types.
-   *
-   * logger defaults to a throwaway endpoint logger; toolExecutionContext defaults to makeHeadlessContext().
-   * All other params (locale, platform, user) must be explicit.
-   */
-  static async runInProcessTyped<TDef extends CreateApiEndpointAny>(
-    params: {
-      definition: TDef;
-      instanceId?: string;
-      callbackMode?: CallbackModeValue;
-      user: JwtPayloadType;
-      locale: CountryLanguage;
-      logger: EndpointLogger;
-      toolExecutionContext?: ToolExecutionContext;
-      platform: Platform;
-    } & (TDef["types"]["RequestOutput"] extends never
-      ? { input?: never }
-      : // RequestOutput for in-process callers; RequestInput additionally for
-        // wire callers — a remote dispatch serializes the input to JSON and the
-        // PEER parses it, so pre-transform shapes (e.g. base64 attachments
-        // instead of File) are the correct thing to send across instances.
-        {
-          input: TDef["types"]["RequestOutput"] | TDef["types"]["RequestInput"];
-        }) &
-      (TDef["types"]["UrlVariablesOutput"] extends never
-        ? { urlPathParams?: never }
-        : { urlPathParams: TDef["types"]["UrlVariablesOutput"] }),
-  ): Promise<ResponseType<TDef["types"]["ResponseOutput"]>> {
-    const { definition, input, urlPathParams, ...rest } = params;
-    const logger = rest.logger ?? createEndpointLogger(false, rest.locale);
-    const toolExecutionContext =
-      rest.toolExecutionContext ??
-      // no user context — UTC (dates not user-facing here)
-      makeHeadlessContext(undefined, undefined, "UTC");
-    const rawToolName =
-      definition.aliases?.[0] ??
-      `${definition.path.join("_")}_${definition.method}`;
-    // Strip Next.js path param brackets: [threadId] → threadId (matches generated route-handler keys)
-    const toolName = rawToolName.replaceAll(/\[([^\]]+)\]/g, "$1");
-
-    // When instanceId or callbackMode is set, route through execute() so remote dispatch,
-    // incognito blocking, callback mode handling, and task creation all apply.
-    if (rest.instanceId ?? rest.callbackMode) {
-      const routingResult = await RouteExecuteRepository.runInProcess({
-        toolName,
-        input: {
-          ...(input as Record<string, WidgetData> | undefined),
-          ...(urlPathParams as Record<string, WidgetData> | undefined),
-        },
-        instanceId: rest.instanceId,
-        callbackMode: rest.callbackMode,
-        user: rest.user,
-        locale: rest.locale,
-        logger,
-        toolExecutionContext,
-        platform: rest.platform ?? Platform.NEXT_API,
-      });
-      return routingResult as ResponseType<TDef["types"]["ResponseOutput"]>;
-    }
-
-    // Local WAIT path: call executeGenericHandler directly for the raw typed response.
-    // If urlPathParams is explicitly provided, pass them pre-split to executeGenericHandler
-    // (bypasses the auto arg-splitting, exactly matching what CLI callers do).
-    // If urlPathParams is not provided, merge everything into data and let the
-    // executor auto-split (matching AI/MCP flat-args convention).
-    const hasExplicitUrlPathParams = urlPathParams !== undefined;
-    const resolvedData: Record<string, WidgetData> = hasExplicitUrlPathParams
-      ? (input as Record<string, WidgetData>)
-      : {
-          ...(input as Record<string, WidgetData>),
-          ...(urlPathParams as Record<string, WidgetData> | undefined),
-        };
-    const resolvedUrlPathParams: Record<string, WidgetData> | undefined =
-      hasExplicitUrlPathParams
-        ? (urlPathParams as Record<string, WidgetData>)
-        : undefined;
-    return RouteExecutionExecutor.executeGenericHandler<
-      TDef["types"]["ResponseOutput"]
-    >({
-      toolName,
-      data: resolvedData,
-      urlPathParams: resolvedUrlPathParams,
-      user: rest.user,
-      locale: rest.locale,
-      logger,
-      platform: rest.platform ?? Platform.NEXT_API,
-      toolExecutionContext,
-    });
-  }
-
-  /**
-   * Route a typed endpoint call through the user's configured inference provider.
-   * Resolves the provider via ExecuteToolRouting.resolveInferenceProvider, then
-   * calls runInProcessTyped with the connection's instanceId and the real user.
-   * Returns fail() if the user is public or no provider is configured.
-   */
-  static async runAsSystemProvider<TDef extends CreateApiEndpointAny>(
-    params: {
-      definition: TDef;
-      user: JwtPayloadType;
-      locale: CountryLanguage;
-      logger: EndpointLogger;
-      toolExecutionContext: ToolExecutionContext;
-      platform: Platform;
-    } & (TDef["types"]["RequestOutput"] extends never
-      ? { input?: never }
-      : { input: TDef["types"]["RequestOutput"] }) &
-      (TDef["types"]["UrlVariablesOutput"] extends never
-        ? { urlPathParams?: never }
-        : { urlPathParams: TDef["types"]["UrlVariablesOutput"] }),
-  ): Promise<ResponseType<TDef["types"]["ResponseOutput"]>> {
-    const {
-      definition,
-      input,
-      urlPathParams,
-      user,
-      locale,
-      toolExecutionContext,
-      platform,
-    } = params;
-    const logger = params.logger ?? createEndpointLogger(false, locale);
-    const { scopedTranslation: spT } = await import("../../platforms/ai/i18n");
-    const { t: spt } = spT.scopedT(locale);
-
-    if (user.isPublic || !("id" in user)) {
-      return fail({
-        message: spt("executeTool.post.errors.validation.title"),
-        errorType: ErrorResponseTypes.UNAUTHORIZED,
-      }) as ResponseType<TDef["types"]["ResponseOutput"]>;
-    }
-
-    const { ExecuteToolRouting } =
-      await import("../../remote-connection/routing");
-    const inferenceTarget = await ExecuteToolRouting.resolveInferenceProvider({
-      userId: user.id,
-      logger,
-    });
-    if (!inferenceTarget) {
-      return fail({
-        message: spt("executeTool.post.errors.notFound.title"),
-        errorType: ErrorResponseTypes.BAD_REQUEST,
-      }) as ResponseType<TDef["types"]["ResponseOutput"]>;
-    }
-
-    return RouteExecuteRepository.runInProcessTyped({
-      definition,
-      input,
-      urlPathParams,
-      instanceId: inferenceTarget.instanceId,
-      user,
-      locale,
-      logger,
-      toolExecutionContext,
-      platform: platform ?? Platform.AI,
-    } as Parameters<typeof RouteExecuteRepository.runInProcessTyped>[0]);
   }
 }

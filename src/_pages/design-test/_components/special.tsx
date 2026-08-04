@@ -7,6 +7,7 @@ import { Image } from "next-vibe/ui/ui/image";
 import { Markdown } from "next-vibe/ui/ui/markdown";
 import { Section } from "next-vibe/ui/ui/section";
 import { H2, H3, P } from "next-vibe/ui/ui/typography";
+import type { AppColumnDef } from "next-vibe/ui/ui/data-table";
 import type { JSX } from "react";
 
 interface SampleData {
@@ -24,27 +25,23 @@ const sampleData: SampleData[] = [
   { id: 5, name: "Eve", email: "eve@example.com", role: "Admin" },
 ];
 
-const columns = [
+const columns: AppColumnDef<SampleData>[] = [
   {
     accessorKey: "name",
-    header: (): React.ReactElement => <P className="font-medium">Name</P>,
-    cell: ({ getValue }: { getValue: () => string }): React.ReactElement => (
-      <P>{getValue()}</P>
-    ),
+    header: () => <P className="font-medium">Name</P>,
+    cell: ({ getValue }) => <P>{String(getValue())}</P>,
   },
   {
     accessorKey: "email",
-    header: (): React.ReactElement => <P className="font-medium">Email</P>,
-    cell: ({ getValue }: { getValue: () => string }): React.ReactElement => (
-      <P className="text-muted-foreground">{getValue()}</P>
+    header: () => <P className="font-medium">Email</P>,
+    cell: ({ getValue }) => (
+      <P className="text-muted-foreground">{String(getValue())}</P>
     ),
   },
   {
     accessorKey: "role",
-    header: (): React.ReactElement => <P className="font-medium">Role</P>,
-    cell: ({ getValue }: { getValue: () => string }): React.ReactElement => (
-      <P>{getValue()}</P>
-    ),
+    header: () => <P className="font-medium">Role</P>,
+    cell: ({ getValue }) => <P>{String(getValue())}</P>,
   },
 ];
 

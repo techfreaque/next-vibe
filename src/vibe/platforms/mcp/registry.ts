@@ -244,10 +244,10 @@ export class MCPRegistry {
     // its platform concerns: hot-reload (via preloadedHandler), result
     // formatting, and the Bun TDZ retry. freshHandler is undefined for
     // hot-reload-excluded tools → the executor loads the handler itself.
-    const { RouteExecuteRepository } =
-      await import("../../execute-tool/repository");
+    const { runEndpointByName } =
+      await import("../../execute-tool/repository/run-endpoint-by-name");
     const runTool = (): Promise<ResponseType<WidgetData>> =>
-      RouteExecuteRepository.runInProcess({
+      runEndpointByName({
         toolName: context.toolName,
         input: context.data as Record<string, WidgetData>,
         callbackMode: "wait",

@@ -31,7 +31,6 @@ export async function tanstackLoader({
     platform,
   } = await subscriptionLoader({
     locale,
-    requireAuth: true,
     searchParams: query,
   });
   return { locale: l, user, platform };

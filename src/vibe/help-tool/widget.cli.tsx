@@ -1613,9 +1613,9 @@ function HelpToolsBrowser(): JSX.Element {
 
     // Deferred: the execution stack is the heaviest graph in the build and the
     // response path must never pay for it.
-    void import("../execute-tool/repository")
-      .then(({ RouteExecuteRepository }) =>
-        RouteExecuteRepository.runInProcess({
+    void import("../execute-tool/repository/run-endpoint-by-name")
+      .then(({ runEndpointByName }) =>
+        runEndpointByName({
           toolName: tool.toolName,
           input: {},
           user,

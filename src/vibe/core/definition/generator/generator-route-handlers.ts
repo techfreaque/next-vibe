@@ -29,9 +29,16 @@ import {
 } from "../../generators/shared/utils";
 import type { WidgetData } from "../../utils/json";
 import type { ApiSection } from "../endpoint-base";
+import {
+  filterPlatformMarkers,
+  PlatformMarker,
+  PlatformMarkerValue,
+  type UserRoleValue,
+} from "../../../identity/roles/enum";
 import { WsChannelsGenerator } from "./generator-ws-channels";
 
 const OUTPUT_FILE = `${GENERATED_DIR}/routes/handlers.ts`;
+const DEV_OUTPUT_FILE = `${GENERATED_DIR}/routes/handlers-dev.ts`;
 
 /**
  * Where GenericHandlerBase actually lives. The emitted import resolves from the
@@ -132,95 +139,163 @@ function replacePathLiteral(
 export async function generateRouteHandlers(
   ctx: GeneratorContext,
 ): Promise<GeneratorResult> {
-  return RouteHandlersGenerator.run(ctx, OUTPUT_FILE);
+  return RouteHandlersGenerator.run(ctx, OUTPUT_FILE, DEV_OUTPUT_FILE);
+}
+
+/** Returns true when a route's definition carries the given marker. */
+function routeHasMarker(
+  routeFile: string,
+  definitionModules: Map<string, ApiSection | null>,
+  marker: typeof PlatformMarkerValue,
+): boolean {
+  const defPath = routeFile.replace(/\/route\.ts$/, "/definition.ts");
+  const def = definitionModules.get(defPath);
+  if (!def) {
+    return false;
+  }
+  for (const method of Object.values(def)) {
+    if (!method || typeof method !== "object" || !("allowedRoles" in method)) {
+      continue;
+    }
+    const roles = (method as { allowedRoles: readonly UserRoleValue[] })
+      .allowedRoles;
+    if (filterPlatformMarkers(roles).includes(marker)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 class RouteHandlersGenerator {
   static async run(
     ctx: GeneratorContext,
     outputFile: string,
+    devOutputFile: string,
   ): Promise<GeneratorResult> {
     const { logger } = ctx;
     const routeFiles = ctx.files.route;
     const definitionFiles = ctx.files.definition;
+    const definitionModules = ctx.computed.definitionModules;
 
-    {
-      logger.debug(`Found ${routeFiles.length} route files`);
+    logger.debug(`Found ${routeFiles.length} route files`);
 
-      // Filter routes that have no matching definition
-      const definitionFilesSet = new Set(definitionFiles);
-      const routesWithoutDefinition: string[] = [];
-      const validRouteFiles: string[] = [];
+    // Filter routes that have no matching definition
+    const definitionFilesSet = new Set(definitionFiles);
+    const routesWithoutDefinition: string[] = [];
+    const validRouteFiles: string[] = [];
 
-      for (const routeFile of routeFiles) {
-        const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
-        if (!definitionFilesSet.has(definitionPath)) {
-          routesWithoutDefinition.push(routeFile);
-        } else {
-          validRouteFiles.push(routeFile);
-        }
+    for (const routeFile of routeFiles) {
+      const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
+      if (!definitionFilesSet.has(definitionPath)) {
+        routesWithoutDefinition.push(routeFile);
+      } else {
+        validRouteFiles.push(routeFile);
       }
+    }
 
-      if (routesWithoutDefinition.length > 0) {
-        const routeList = routesWithoutDefinition
-          .map((r) => `    • ${stripProjectRoot(r)}`)
-          .join("\n");
-        logger.debug(
-          formatWarning(
-            `Skipped ${formatCount(routesWithoutDefinition.length, "route")} without matching definition:\n${routeList}`,
-          ),
+    if (routesWithoutDefinition.length > 0) {
+      const routeList = routesWithoutDefinition
+        .map((r) => `    • ${stripProjectRoot(r)}`)
+        .join("\n");
+      logger.debug(
+        formatWarning(
+          `Skipped ${formatCount(routesWithoutDefinition.length, "route")} without matching definition:\n${routeList}`,
+        ),
+      );
+    }
+
+    // Reconcile declared paths with the filesystem before generating. The
+    // filesystem location is the source of truth: a declared `path` that
+    // diverges produces a route that 404s on the dev server (silent 200
+    // HTML), which hangs any client read of that endpoint. Instead of failing
+    // the build, rewrite the definition's `path` to match its directory.
+    const fixedPaths = await RouteHandlersGenerator.reconcileDefinitionPaths(
+      validRouteFiles,
+      false,
+    );
+    for (const fix of fixedPaths) {
+      logger.debug(formatWarning(fix));
+    }
+
+    // Prod routes: exclude PRODUCTION_OFF. Collect WEB_OFF routes for
+    // bundle-ignore comments (they stay in the prod file but must not be
+    // traced by the bundler).
+    const prodRouteFiles: string[] = [];
+    const webIgnoredImportPaths = new Set<string>();
+    for (const routeFile of validRouteFiles) {
+      if (
+        routeHasMarker(
+          routeFile,
+          definitionModules,
+          PlatformMarker.PRODUCTION_OFF,
+        )
+      ) {
+        continue; // omit from prod file entirely
+      }
+      if (
+        routeHasMarker(routeFile, definitionModules, PlatformMarker.WEB_OFF)
+      ) {
+        webIgnoredImportPaths.add(
+          generateAbsoluteImportPath(routeFile, "route"),
         );
       }
+      prodRouteFiles.push(routeFile);
+    }
 
-      // Reconcile declared paths with the filesystem before generating. The
-      // filesystem location is the source of truth: a declared `path` that
-      // diverges produces a route that 404s on the dev server (silent 200
-      // HTML), which hangs any client read of that endpoint. Instead of failing
-      // the build, rewrite the definition's `path` to match its directory.
-      const fixedPaths = await RouteHandlersGenerator.reconcileDefinitionPaths(
-        validRouteFiles,
-        false,
-      );
-      for (const fix of fixedPaths) {
-        logger.debug(formatWarning(fix));
-      }
-
-      // Generate content with only valid route files
-      const { content, hotPathsContent, routeCount } =
-        await RouteHandlersGenerator.generateContent(
-          validRouteFiles,
-          logger,
-          outputFile,
-        );
-
-      // Write route-handlers.ts and hot-paths.ts
-      const hotPathsFile = outputFile.replace(
-        /\/handlers.ts$/,
-        "/hot-paths.ts",
-      );
-      await writeGeneratedFile(outputFile, content, false);
-      await writeGeneratedFile(hotPathsFile, hotPathsContent, false);
-
-      // Websocket channels and remote-event routes are an optional concern —
-      // see generator-ws-channels.ts. It validates the channel guards and emits
-      // both registries; a build without realtime never reaches this.
-      const ws = await WsChannelsGenerator.run(
-        validRouteFiles,
-        outputFile,
+    // Generate prod file (no PRODUCTION_OFF; WEB_OFF gets ignore comments).
+    const { content, hotPathsContent, routeCount } =
+      await RouteHandlersGenerator.generateContent(
+        prodRouteFiles,
         logger,
+        outputFile,
+        webIgnoredImportPaths,
       );
-      if (!ws.ok) {
-        return {
-          summary: "route handlers (failed: WS channel guards)",
-          failed: `Route handlers generation failed (WS channel guards): ${ws.failed}`,
-        };
-      }
 
+    const hotPathsFile = outputFile.replace(/\/handlers\.ts$/, "/hot-paths.ts");
+    await writeGeneratedFile(outputFile, content, false);
+    await writeGeneratedFile(hotPathsFile, hotPathsContent, false);
+
+    // Generate dev file (all routes, no ignore comments).
+    const {
+      content: devContent,
+      hotPathsContent: devHotPathsContent,
+      routeCount: devRouteCount,
+    } = await RouteHandlersGenerator.generateContent(
+      validRouteFiles,
+      logger,
+      devOutputFile,
+    );
+
+    const devHotPathsFile = devOutputFile.replace(
+      /\/handlers-dev\.ts$/,
+      "/hot-paths-dev.ts",
+    );
+    await writeGeneratedFile(devOutputFile, devContent, false);
+    await writeGeneratedFile(devHotPathsFile, devHotPathsContent, false);
+
+    // Websocket channels and remote-event routes are an optional concern —
+    // see generator-ws-channels.ts. It validates the channel guards and emits
+    // both registries; a build without realtime never reaches this.
+    const ws = await WsChannelsGenerator.run(
+      validRouteFiles,
+      outputFile,
+      logger,
+    );
+    if (!ws.ok) {
       return {
-        summary: `route handlers (${routeCount} routes, ${ws.channelCount} channels)`,
-        counts: { routes: routeCount, channels: ws.channelCount },
+        summary: "route handlers (failed: WS channel guards)",
+        failed: `Route handlers generation failed (WS channel guards): ${ws.failed}`,
       };
     }
+
+    return {
+      summary: `route handlers (${routeCount} routes prod, ${devRouteCount} dev, ${ws.channelCount} channels)`,
+      counts: {
+        routes: routeCount,
+        devRoutes: devRouteCount,
+        channels: ws.channelCount,
+      },
+    };
   }
 
   // ─── Private helpers ────────────────────────────────────────────────────
@@ -420,6 +495,7 @@ class RouteHandlersGenerator {
     routeFiles: string[],
     logger: EndpointLogger,
     outputFile: string,
+    webIgnoredImportPaths?: Set<string>,
   ): Promise<{ content: string; hotPathsContent: string; routeCount: number }> {
     const pathMap: Record<
       string,
@@ -496,8 +572,13 @@ class RouteHandlersGenerator {
         prewarmSeen.add(importPath);
         prewarmPaths.push(path);
       }
-      // Add turbopack/webpack ignore hints for routes that scan the filesystem
-      const ignoreComment = needsTurbopackIgnore(importPath) ? "" : "";
+      // WEB_OFF routes get bundle-ignore hints so Next.js/webpack/turbopack
+      // don't trace their import graphs into the prod bundle.
+      const isWebIgnored = webIgnoredImportPaths?.has(importPath) ?? false;
+      const ignoreComment =
+        isWebIgnored || needsTurbopackIgnore(importPath)
+          ? "/* webpackIgnore: true */ /* turbopackIgnore: true */ "
+          : "";
       // Static import strings for bundler tracing
       const returnWithTools = `      return (await import(${ignoreComment}"${importPath}")).tools`;
       const returnWithParen = `      return (await import(${ignoreComment}"${importPath}"))`;

@@ -291,18 +291,10 @@ function CliEditor({ value, onDone }: EditorProps): JSX.Element {
     setSaving(true);
     setSaveMsg(null);
     try {
-      const { RouteExecuteRepository } =
-        await import("../../execute-tool/repository");
-      await RouteExecuteRepository.runInProcessTyped({
-        definition: endpoints.PATCH,
-        input: edits,
-        user,
-        locale,
-        logger,
-        platform: platform,
-        // no user context \u2014 UTC (dates not user-facing here)
-        toolExecutionContext: makeHeadlessContext(undefined, undefined, "UTC"),
-      });
+      const { SystemSettingsRepository } = await import("./repository");
+      const { scopedTranslation: settingsT } = await import("./i18n");
+      const { t } = settingsT.scopedT(locale);
+      await SystemSettingsRepository.patchSettings(edits, logger, t);
       setSaveMsg("Saved \u2713");
       setEdits({});
     } catch {
@@ -706,18 +698,10 @@ function CliWizard({ value, onDone }: WizardProps): JSX.Element {
     setSaving(true);
     setSaveMsg(null);
     try {
-      const { RouteExecuteRepository } =
-        await import("../../execute-tool/repository");
-      await RouteExecuteRepository.runInProcessTyped({
-        definition: endpoints.PATCH,
-        input: toSave,
-        user,
-        locale,
-        logger,
-        platform: platform,
-        // no user context — UTC (dates not user-facing here)
-        toolExecutionContext: makeHeadlessContext(undefined, undefined, "UTC"),
-      });
+      const { SystemSettingsRepository } = await import("./repository");
+      const { scopedTranslation: settingsT } = await import("./i18n");
+      const { t } = settingsT.scopedT(locale);
+      await SystemSettingsRepository.patchSettings(toSave, logger, t);
       setSaveMsg("Saved ✓");
     } catch {
       setSaveMsg("Save failed");
@@ -1022,21 +1006,10 @@ export function SystemSettingsPatchWidget(): JSX.Element {
     }
     void (async (): Promise<void> => {
       try {
-        const { RouteExecuteRepository } =
-          await import("../../execute-tool/repository");
-        const result = await RouteExecuteRepository.runInProcessTyped({
-          definition: endpoints.GET,
-          user,
-          locale,
-          logger,
-          platform: platform as Platform,
-          // no user context — UTC (dates not user-facing here)
-          toolExecutionContext: makeHeadlessContext(
-            undefined,
-            undefined,
-            "UTC",
-          ),
-        });
+        const { SystemSettingsRepository } = await import("./repository");
+        const { scopedTranslation: settingsT } = await import("./i18n");
+        const { t } = settingsT.scopedT(locale);
+        const result = await SystemSettingsRepository.getSettings(logger, t);
         if (result.success) {
           const value = result.data;
           // Always open wizard when invoked via `vibe init` - either because

@@ -140,9 +140,7 @@ export async function runCompactingLLM(params: {
         const outputTokens = usageData.outputTokens ?? 0;
         const totalTokens = usageData.totalTokens ?? 0;
         const cachedInputTokens =
-          usageData.cachedInputTokens ??
-          usageData.inputTokenDetails?.cacheReadTokens ??
-          0;
+          usageData.inputTokenDetails?.cacheReadTokens ?? 0;
         const uncachedInputTokens = inputTokens - cachedInputTokens;
 
         // Empty summary is worse than no compacting — it would erase context.

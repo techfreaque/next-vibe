@@ -173,7 +173,7 @@ export function estimateInputTokens(
       return sum + Math.ceil(content.length / 3.5);
     }
     if (Array.isArray(content)) {
-      const text = (content as Array<Record<string, string | undefined>>)
+      const text = content
         .map((p) =>
           p.type === "text"
             ? (p.text ?? "")

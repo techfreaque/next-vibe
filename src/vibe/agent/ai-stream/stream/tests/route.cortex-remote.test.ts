@@ -37,7 +37,6 @@ import "server-only";
 
 import { DefaultFolderId, makeHeadlessContext } from "../../../../core/execution-context";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { identityEnv } from "next-vibe/identity/env";
 import { createEndpointLogger } from "next-vibe/logger/server";
@@ -431,18 +430,23 @@ if (!_resolvedRemoteUrl) {
           }
 
           // Verify the thread exists locally (the caller owns its copy)
-          const threadDef =
-            await import("../../../chat/threads/[threadId]/definition");
-          const localThreadResult =
-            await RouteExecuteRepository.runInProcessTyped({
-              definition: threadDef.default.GET,
-              input: { rootFolderId: DefaultFolderId.REMOTE },
-              urlPathParams: { threadId: sharedThreadId },
-              user: testUser,
-              locale: defaultLocale,
-              platform: Platform.AI,
-              logger: createEndpointLogger(false, defaultLocale),
-            });
+          const [threadDef, { tools: threadTools }] = await Promise.all([
+            import("../../../chat/threads/[threadId]/definition"),
+            import("../../../chat/threads/[threadId]/route"),
+          ]);
+          const { runEndpoint } = await import(
+            "next-vibe/execute-tool/repository/run-endpoint"
+          );
+          const localThreadResult = await runEndpoint({
+            definition: threadDef.default.GET,
+            handler: threadTools.GET,
+            input: { rootFolderId: DefaultFolderId.REMOTE },
+            urlPathParams: { threadId: sharedThreadId },
+            user: testUser,
+            locale: defaultLocale,
+            platform: Platform.AI,
+            logger: createEndpointLogger(false, defaultLocale),
+          });
 
           expect(
             localThreadResult.success,

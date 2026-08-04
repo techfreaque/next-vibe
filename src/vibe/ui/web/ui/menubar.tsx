@@ -131,7 +131,7 @@ export function MenubarMenu({
 }: MenubarMenuProps): React.JSX.Element {
   return <MenubarPrimitive.Menu {...props}>{children}</MenubarPrimitive.Menu>;
 }
-MenubarMenu.displayName = MenubarPrimitive.Menu.displayName;
+MenubarMenu.displayName = "MenubarMenu";
 
 export function MenubarTrigger({
   className,

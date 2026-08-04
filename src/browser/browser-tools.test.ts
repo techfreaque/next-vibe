@@ -1,7 +1,7 @@
 /**
  * Browser Tool Integration Tests
  *
- * Tests every browser tool using RouteExecuteRepository.runInProcess.
+ * Tests every browser tool using runEndpoint/sendTestRequest.
  * Two concurrent sessions (A and B) run against the same Chrome instance using
  * distinct instanceId values — each session owns one isolated tab.
  *
@@ -25,7 +25,6 @@ import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-ba
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
-import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { identityEnv } from "next-vibe/identity/env";
 import { leadDb } from "next-vibe/identity/lead/db";
@@ -881,8 +880,12 @@ describe("Browser Tools", () => {
       const logger = createEndpointLogger(false, defaultLocale);
 
       // No instanceId in input — field is hidden for MCP, serverDefault injects VIBE_PID
-      const result = await RouteExecuteRepository.runInProcessTyped({
+      const { runEndpoint } =
+        await import("next-vibe/execute-tool/repository/run-endpoint");
+      const { tools: newPageTools } = await import("@/browser/new-page/route");
+      const result = await runEndpoint({
         definition: newPageEndpoints.POST,
+        handler: newPageTools.POST,
         input: { url: "https://example.com", replacePage: true },
         user: testUser,
         locale: defaultLocale,
@@ -899,8 +902,11 @@ describe("Browser Tools", () => {
       await assertTabCount(tabBaseline, 3, "B15: after MCP new-page");
 
       // Clean up: close the VIBE_PID session tab (also no instanceId).
-      await RouteExecuteRepository.runInProcessTyped({
+      const { tools: closePageTools } =
+        await import("@/browser/close-page/route");
+      await runEndpoint({
         definition: closePageEndpoints.POST,
+        handler: closePageTools.POST,
         input: {},
         user: testUser,
         locale: defaultLocale,

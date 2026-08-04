@@ -26,7 +26,8 @@
 "use client";
 
 import type { JSX, ReactNode } from "react";
-import { createStore, useStore } from "zustand";
+import { useSyncExternalStore } from "react";
+import { createStore } from "zustand";
 
 import type { AgentEnvAvailability } from "./env-availability";
 
@@ -62,7 +63,11 @@ export function AgentAvailabilityProvider({
 
 /** Availability for agent components. Re-renders when the value changes. */
 export function useProviderAvailability(): AgentEnvAvailability {
-  const availability = useStore(store, (state) => state.availability);
+  const availability = useSyncExternalStore(
+    store.subscribe,
+    () => store.getState().availability,
+    () => store.getState().availability,
+  );
   if (!availability) {
     // oxlint-disable-next-line restricted/restricted-syntax
     throw new Error(

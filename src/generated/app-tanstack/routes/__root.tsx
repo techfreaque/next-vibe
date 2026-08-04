@@ -9,7 +9,7 @@ import globalsUrl from "next-vibe/ui/globals.css?url";
 import { TanstackPage as RootLayout } from "@/_pages/layout";
 
 const loadLayout = createServerFn({ method: "GET" })
-  .inputValidator((data: { locale: string }) => data)
+  .validator((data: { locale: string }) => data)
   .handler(async ({ data }) => {
     const { tanstackLoader } = await import("@/_pages/layout");
     return tanstackLoader({

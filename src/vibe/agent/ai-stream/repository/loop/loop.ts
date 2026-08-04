@@ -186,7 +186,7 @@ export class StreamLoop implements StreamLoopState {
               // injected into the next step by prepareStep so the model
               // acknowledges them in-context.)
               (
-                (): StopCondition<typeof tools> => () =>
+                (): StopCondition<ToolSet> => () =>
                   ctx.shouldStopLoop ||
                   ctx.stepHasToolsAwaitingConfirmation ||
                   // execute-tool's confirmation gate sets the flag on the tool

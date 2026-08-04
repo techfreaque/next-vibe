@@ -15,7 +15,7 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
-import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
+import { runEndpointRemote } from "next-vibe/execute-tool/repository/run-endpoint-remote";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { filterUserPermissionRoles } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -507,7 +507,7 @@ export async function runRelayBranch(
     });
   }
 
-  const relayResult = await RouteExecuteRepository.runInProcessTyped({
+  const relayResult = await runEndpointRemote({
     definition: streamDefinition.POST,
     instanceId: remoteTarget.instanceId,
     user,

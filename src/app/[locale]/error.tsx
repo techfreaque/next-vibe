@@ -1,4 +1,68 @@
 "use client";
-// AUTO-GENERATED from src/_pages/error.tsx. Add "use custom" to this file to preserve customizations.
-export { default } from "../../_pages/error";
-export * from "../../_pages/error";
+"use custom";
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { Environment } from "next-vibe/env/env-util";
+import useErrorHandler from "next-vibe/ui/hooks/use-error-handler";
+import { useParams } from "next-vibe/ui/hooks/use-navigation";
+import { Button } from "next-vibe/ui/ui/button";
+import { Div } from "next-vibe/ui/ui/div";
+import { Link } from "next-vibe/ui/ui/link";
+import { Span } from "next-vibe/ui/ui/span";
+import { H2, P } from "next-vibe/ui/ui/typography";
+import type { ReactElement } from "react";
+
+import { scopedTranslation as pageT } from "../../_pages/[...notFound]/i18n";
+
+export default function ErrorPage({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}): ReactElement {
+  // In non-production environments, throw the error to let Next.js handle it with its awesome error page
+  if (
+    envClient.NODE_ENV !== Environment.PRODUCTION ||
+    envClient.NEXT_PUBLIC_DEBUG_PRODUCTION
+  ) {
+    // eslint-disable-next-line restricted/restricted-syntax
+    throw error;
+  }
+
+  const { locale }: { locale: CountryLanguage } = useParams();
+  const { t } = pageT.scopedT(locale);
+  const digest = useErrorHandler(error, locale);
+
+  return (
+    <Div className="flex flex-col items-center justify-center min-h-[70vh] text-center px-4">
+      <H2 className="text-3xl font-bold mb-4">{t("pages.error.title")}</H2>
+      <P className="text-gray-600 dark:text-gray-400 mb-8 max-w-md">
+        {t("pages.error.message")}
+        {digest && (
+          <Span className="block mt-2 text-xs text-gray-500">
+            {t("pages.error.errorId", { id: digest })}
+          </Span>
+        )}
+        {error.message && (
+          <Span className="block mt-2 text-xs text-gray-500">
+            {t("pages.error.error_message", { message: error.message })}
+          </Span>
+        )}
+        {error.stack && (
+          <Span className="block mt-2 text-xs text-gray-500">
+            {t("pages.error.stackTrace", { stack: error.stack })}
+          </Span>
+        )}
+      </P>
+      <Div className="flex flex-col sm:flex-row gap-4">
+        <Button onClick={() => reset()} variant="outline">
+          {t("pages.error.tryAgain")}
+        </Button>
+        <Button asChild>
+          <Link href={`/${locale}/threads`}>{t("pages.error.backToHome")}</Link>
+        </Button>
+      </Div>
+    </Div>
+  );
+}

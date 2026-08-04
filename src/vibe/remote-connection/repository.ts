@@ -101,17 +101,14 @@ export class RemoteConnectionRepository {
     if (!conn.isActive) {
       return "disconnected";
     }
-    if (!conn.lastSyncedAt) {
-      return "critical";
-    }
-    const ageMs = Date.now() - conn.lastSyncedAt.getTime();
-    if (ageMs < 3 * 60_000) {
+    // Synced at least once = healthy. Connections are event-driven after the
+    // initial pull-on-connect, so lastSyncedAt age is not a liveness signal —
+    // silence just means nothing changed on the remote side.
+    if (conn.lastSyncedAt) {
       return "healthy";
     }
-    if (ageMs < 10 * 60_000) {
-      return "warning";
-    }
-    return "critical";
+    // Never synced = initial pull hasn't completed yet.
+    return "warning";
   }
 
   // ─── Instance Identities ──────────────────────────────────────────────────────

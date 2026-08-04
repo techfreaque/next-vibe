@@ -10,7 +10,7 @@
 // any other module that reads those values (env-client, constants, etc.) is evaluated.
 import { Command } from "commander";
 
-import { pathToAliasMap } from "@/generated/endpoints/alias-map";
+import { pathToAliasMap } from "@/generated/endpoints/alias-map-dev";
 
 import {
   DefinitionLoader,

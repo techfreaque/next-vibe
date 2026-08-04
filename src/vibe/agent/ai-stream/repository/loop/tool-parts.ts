@@ -885,8 +885,8 @@ async function executeFallbackTool(
       { toolName },
     );
 
-    const { RouteExecuteRepository } =
-      await import("next-vibe/execute-tool/repository");
+    const { runEndpointByName } =
+      await import("next-vibe/execute-tool/repository/run-endpoint-by-name");
 
     // Tool-call args are always a JSON object; narrow the loose WidgetData type.
     const inputArgs: Record<string, WidgetData> =
@@ -897,7 +897,7 @@ async function executeFallbackTool(
       !(args instanceof Date)
         ? args
         : {};
-    const result = await RouteExecuteRepository.runInProcess({
+    const result = await runEndpointByName({
       toolName,
       input: inputArgs,
       callbackMode: CallbackMode.WAIT,

@@ -1,6 +1,9 @@
 // Testing infrastructure - error messages are for test debugging, not end users
 
-import type { ToolExecutionContext } from "next-vibe/core/execution-context";
+import {
+  makeHeadlessContext,
+  type ToolExecutionContext,
+} from "next-vibe/core/execution-context";
 
 import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
 import { defaultLocale } from "../../../core/i18n/core/config";
@@ -10,6 +13,7 @@ import {
   fail,
   isStreamingResponse,
 } from "../../../core/route/response.schema";
+import type { WidgetData } from "../../../core/utils/json";
 import { parseError } from "../../../core/utils/parse-error";
 import type { JwtPayloadType } from "../../../identity/auth/types";
 import { UserPermissionRole } from "../../../identity/roles/enum";
@@ -70,24 +74,31 @@ export async function sendTestRequest<TEndpoint extends CreateApiEndpointAny>({
     // Create a test logger
     const logger = createEndpointLogger(false, defaultLocale);
 
-    const { RouteExecuteRepository } =
-      await import("../../../execute-tool/repository");
+    const { runEndpointByName } =
+      await import("../../../execute-tool/repository/run-endpoint-by-name");
+    const rawToolName =
+      endpoint.aliases?.[0] ?? `${endpoint.path.join("_")}_${endpoint.method}`;
+    const toolName = rawToolName.replaceAll(/\[([^\]]+)\]/g, "$1");
 
     // Execute using the shared route execution infrastructure. The caller's
     // toolExecutionContext (fixture chain, threadId) rides straight through — the
     // whole AI/media/remote chain records and replays under it. Non-AI setup
     // callers pass an explicit thread-less root (makeHeadlessContext(u,u)),
     // which routes any incidental external call live.
-    const result = await RouteExecuteRepository.runInProcessTyped({
-      definition: endpoint,
+    const result = await runEndpointByName({
+      toolName,
       instanceId,
-      input: data,
-      urlPathParams: urlPathParams,
+      input: {
+        ...(data as Record<string, WidgetData>),
+        ...(urlPathParams as Record<string, WidgetData>),
+      },
       user: testUser,
       locale: defaultLocale,
       logger,
       platform: Platform.NEXT_API,
-      toolExecutionContext,
+      toolExecutionContext:
+        toolExecutionContext ??
+        makeHeadlessContext(undefined, undefined, "UTC"),
     });
 
     const { t } = scopedTranslation.scopedT(defaultLocale);
@@ -103,7 +114,9 @@ export async function sendTestRequest<TEndpoint extends CreateApiEndpointAny>({
     // Skip for ContentResponse (mixed content blocks) — it bypasses the typed schema.
     const { isContentResponse } =
       await import("../../../core/route/response.schema");
-    const isContentData = result.success && isContentResponse(result.data);
+    const isContentData =
+      result.success &&
+      isContentResponse(result.data as Parameters<typeof isContentResponse>[0]);
     if (endpoint.responseSchema && result.success && !isContentData) {
       const parseResult = endpoint.responseSchema.safeParse(result.data);
       if (!parseResult.success) {

@@ -6,7 +6,7 @@
 
 import "server-only";
 
-import { jsonSchema, type JSONSchema7, tool } from "ai";
+import { jsonSchema, type JSONSchema7, tool, type ToolSet } from "ai";
 import { type ToolExecutionContext } from "next-vibe/core/execution-context";
 import { z } from "zod";
 
@@ -43,8 +43,7 @@ import { Platform } from "../platforms";
  * The actual types are inferred by the tool() function at creation time
  * We don't specify generic parameters - they're inferred from the tool() call
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type CoreTool = ReturnType<typeof tool<any, any>>;
+export type CoreTool = ToolSet[string];
 
 /**
  * Create AI SDK CoreTool from endpoint
@@ -130,37 +129,40 @@ function createToolFromEndpoint(
 
   // Wrap JSON Schema in AI SDK's jsonSchema() function
   // This creates a FlexibleSchema that the AI SDK can use
-  const inputSchema = jsonSchema(jsonSchemaObject as JSONSchema7, {
-    validate: (value) => {
-      // Extract callbackMode before validation (not part of endpoint schema).
-      // callbackMode is read by tool-call-handler for stream control (endLoop, approve)
-      // and by the execute handler below for async modes (detach, wakeUp).
-      const callbackModeRaw =
-        typeof value === "object" &&
-        value !== null &&
-        "callbackMode" in value &&
-        typeof value.callbackMode === "string"
-          ? value.callbackMode
-          : undefined;
+  const inputSchema = jsonSchema<Record<string, unknown>>(
+    jsonSchemaObject as JSONSchema7,
+    {
+      validate: (value) => {
+        // Extract callbackMode before validation (not part of endpoint schema).
+        // callbackMode is read by tool-call-handler for stream control (endLoop, approve)
+        // and by the execute handler below for async modes (detach, wakeUp).
+        const callbackModeRaw =
+          typeof value === "object" &&
+          value !== null &&
+          "callbackMode" in value &&
+          typeof value.callbackMode === "string"
+            ? value.callbackMode
+            : undefined;
 
-      // Use the original Zod schema (with transforms) for validation
-      const result = zodSchemaWithTransforms.safeParse(value);
-      if (result.success) {
-        // Add callbackMode back to the validated data so it reaches tool-call-handler
+        // Use the original Zod schema (with transforms) for validation
+        const result = zodSchemaWithTransforms.safeParse(value);
+        if (result.success) {
+          // Add callbackMode back to the validated data so it reaches tool-call-handler
+          return {
+            success: true,
+            value:
+              callbackModeRaw !== undefined
+                ? { ...result.data, callbackMode: callbackModeRaw }
+                : result.data,
+          };
+        }
         return {
-          success: true,
-          value:
-            callbackModeRaw !== undefined
-              ? { ...result.data, callbackMode: callbackModeRaw }
-              : result.data,
+          success: false,
+          error: result.error,
         };
-      }
-      return {
-        success: false,
-        error: result.error,
-      };
+      },
     },
-  });
+  );
 
   return tool({
     description,
@@ -621,7 +623,7 @@ export async function loadTools(params: {
   /** Stream context - rootFolderId, threadId, aiMessageId, etc. */
   toolExecutionContext: ToolExecutionContext;
 }): Promise<{
-  tools: Record<string, CoreTool> | undefined;
+  tools: ToolSet | undefined;
   toolsMeta: Map<
     string,
     { requiresConfirmation: boolean; credits: number; label: string }
@@ -845,7 +847,7 @@ export async function loadTools(params: {
       requiresConfirmation: false,
     });
 
-    const tools: Record<string, CoreTool> = {
+    const tools: ToolSet = {
       [EXECUTE_TOOL_ALIAS]: executeTool,
     };
 

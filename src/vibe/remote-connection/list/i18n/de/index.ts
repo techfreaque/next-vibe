@@ -82,8 +82,8 @@ export const translations: typeof enTranslations = {
     health: {
       tunnelOpen: "Tunnel offen",
       bridgeActive: "Verbunden",
-      tunnelWarning: "Tunnel instabil",
-      bridgeWarning: "Verbindung langsam",
+      tunnelWarning: "Tunnel verbindet",
+      bridgeWarning: "Synchronisiert",
       tunnelLost: "Tunnel unterbrochen",
       bridgeFailed: "Verbindung fehlgeschlagen",
       disconnected: "Inaktiv",

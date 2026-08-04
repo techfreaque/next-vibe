@@ -31,7 +31,6 @@ globalThis.AI_SDK_LOG_WARNINGS = false;
 
 import { DefaultFolderId } from "../../../../core/execution-context";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { identityEnv } from "next-vibe/identity/env";
 import { createEndpointLogger } from "next-vibe/logger/server";
@@ -66,17 +65,24 @@ async function withFavCompactTrigger(
   const userId = "id" in user ? String(user.id) : "";
   const { resolveFavoriteConfig } =
     await import("../../../skills/favorites/repository");
-  const patchDef =
-    await import("../../../skills/favorites/[id]/definition").then(
+  const [patchDef, { tools: favIdTools }] = await Promise.all([
+    import("../../../skills/favorites/[id]/definition").then(
       (m) => m.default.PATCH,
-    );
+    ),
+    import("../../../skills/favorites/[id]/route"),
+  ]);
+  const patchHandler = favIdTools.PATCH;
+  const { runEndpoint } = await import(
+    "next-vibe/execute-tool/repository/run-endpoint"
+  );
 
   // Read original value before patching
   const original = await resolveFavoriteConfig(favoriteId, userId);
   const originalCompactTrigger = original?.compactTrigger ?? null;
 
-  await RouteExecuteRepository.runInProcessTyped({
+  await runEndpoint({
     definition: patchDef,
+    handler: patchHandler,
     input: { compactTrigger: value, modelSelection: null },
     urlPathParams: { id: favoriteId },
     user,
@@ -86,8 +92,9 @@ async function withFavCompactTrigger(
   });
 
   return async () => {
-    await RouteExecuteRepository.runInProcessTyped({
+    await runEndpoint({
       definition: patchDef,
+      handler: patchHandler,
       input: { compactTrigger: originalCompactTrigger, modelSelection: null },
       urlPathParams: { id: favoriteId },
       user,
@@ -251,16 +258,22 @@ describe("Compacting - context management", () => {
 
     // ── Resolve quality-tester__budget favorite ──
     // Use existing fav if present (respects user overrides). Create only if absent.
-    const [favsDef, favoriteCreateDef] = await Promise.all([
+    const [favsDef, favoriteCreateDef, { tools: favsTools }, { tools: createFavTools }] = await Promise.all([
       import("../../../skills/favorites/definition").then(
         (m) => m.default.GET,
       ),
       import("../../../skills/favorites/create/definition").then(
         (m) => m.default.POST,
       ),
+      import("../../../skills/favorites/route"),
+      import("../../../skills/favorites/create/route"),
     ]);
-    const favsResult = await RouteExecuteRepository.runInProcessTyped({
+    const { runEndpoint } = await import(
+      "next-vibe/execute-tool/repository/run-endpoint"
+    );
+    const favsResult = await runEndpoint({
       definition: favsDef,
+      handler: favsTools.GET,
       input: { pageSize: 500 },
       user: testUser,
       locale: defaultLocale,
@@ -281,8 +294,9 @@ describe("Compacting - context management", () => {
     if (existingMain?.["id"]) {
       mainFavoriteId = String(existingMain["id"]);
     } else {
-      const createResult = await RouteExecuteRepository.runInProcessTyped({
+      const createResult = await runEndpoint({
         definition: favoriteCreateDef,
+        handler: createFavTools.POST,
         input: { skillId: "quality-tester__budget" },
         user: testUser,
         locale: defaultLocale,

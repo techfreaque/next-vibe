@@ -26,8 +26,16 @@ import {
   toProjectRelativePath,
   writeGeneratedFile,
 } from "../../generators/shared/utils";
+import {
+  filterPlatformMarkers,
+  PlatformMarker,
+  PlatformMarkerValue,
+  type UserRoleValue,
+} from "../../../identity/roles/enum";
+import type { ApiSection } from "../endpoint-base";
 
 const OUTPUT_FILE = `${GENERATED_DIR}/endpoints/endpoint.ts`;
+const DEV_OUTPUT_FILE = `${GENERATED_DIR}/endpoints/endpoint-dev.ts`;
 
 /**
  * Where CreateApiEndpointAny actually lives. The emitted import resolves from
@@ -41,12 +49,36 @@ const ENDPOINT_BASE_MODULE = `${VIBE_DIR}/core/definition/endpoint-base.ts`;
  * definition/route file lists. Byte-identical to the former
  * tooling/generators/endpoint.
  */
+/** Returns true when a definition carries the given platform marker. */
+function defHasMarker(
+  defFile: string,
+  definitionModules: Map<string, ApiSection | null>,
+  marker: typeof PlatformMarkerValue,
+): boolean {
+  const def = definitionModules.get(defFile);
+  if (!def) {
+    return false;
+  }
+  for (const method of Object.values(def)) {
+    if (!method || typeof method !== "object" || !("allowedRoles" in method)) {
+      continue;
+    }
+    const roles = (method as { allowedRoles: readonly UserRoleValue[] })
+      .allowedRoles;
+    if (filterPlatformMarkers(roles).includes(marker)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export async function generateEndpoint(
   ctx: GeneratorContext,
 ): Promise<GeneratorResult> {
   const { logger } = ctx;
   const definitionFiles = ctx.files.definition;
   const routeFiles = ctx.files.route;
+  const definitionModules = ctx.computed.definitionModules;
 
   logger.debug(`Found ${definitionFiles.length} definition files`);
 
@@ -59,12 +91,21 @@ export async function generateEndpoint(
     }
   }
 
+  // Prod: exclude PRODUCTION_OFF definitions.
+  const prodDefinitionFiles = validDefinitionFiles.filter(
+    (f) => !defHasMarker(f, definitionModules, PlatformMarker.PRODUCTION_OFF),
+  );
+
   const {
     endpointContent,
     aliasMapContent,
     endpointHotPathsContent,
     endpointCount,
-  } = await EndpointGenerator.generateContent(validDefinitionFiles, logger);
+  } = await EndpointGenerator.generateContent(
+    prodDefinitionFiles,
+    logger,
+    OUTPUT_FILE,
+  );
 
   const aliasMapFile = OUTPUT_FILE.replace(/\/endpoint\.ts$/, "/alias-map.ts");
   const hotPathsFile = OUTPUT_FILE.replace(/\/endpoint\.ts$/, "/hot-paths.ts");
@@ -73,9 +114,38 @@ export async function generateEndpoint(
   await writeGeneratedFile(aliasMapFile, aliasMapContent);
   await writeGeneratedFile(hotPathsFile, endpointHotPathsContent);
 
+  // Dev: all definitions including PRODUCTION_OFF.
+  const {
+    endpointContent: devEndpointContent,
+    aliasMapContent: devAliasMapContent,
+    endpointHotPathsContent: devHotPathsContent,
+    endpointCount: devEndpointCount,
+  } = await EndpointGenerator.generateContent(
+    validDefinitionFiles,
+    logger,
+    DEV_OUTPUT_FILE,
+  );
+
+  const devAliasMapFile = DEV_OUTPUT_FILE.replace(
+    /\/endpoint-dev\.ts$/,
+    "/alias-map-dev.ts",
+  );
+  const devHotPathsFile = DEV_OUTPUT_FILE.replace(
+    /\/endpoint-dev\.ts$/,
+    "/hot-paths-dev.ts",
+  );
+
+  await writeGeneratedFile(DEV_OUTPUT_FILE, devEndpointContent);
+  await writeGeneratedFile(devAliasMapFile, devAliasMapContent);
+  await writeGeneratedFile(devHotPathsFile, devHotPathsContent);
+
   return {
-    summary: `endpoint registry (${endpointCount} endpoints, ${definitionFiles.length} definitions)`,
-    counts: { endpoints: endpointCount, definitions: definitionFiles.length },
+    summary: `endpoint registry (${endpointCount} prod, ${devEndpointCount} dev, ${definitionFiles.length} definitions)`,
+    counts: {
+      endpoints: endpointCount,
+      devEndpoints: devEndpointCount,
+      definitions: definitionFiles.length,
+    },
   };
 }
 
@@ -88,6 +158,7 @@ class EndpointGenerator {
   static async generateContent(
     definitionFiles: string[],
     logger: EndpointLogger,
+    outputFile: string,
   ): Promise<{
     endpointContent: string;
     aliasMapContent: string;
@@ -301,7 +372,9 @@ class EndpointGenerator {
         prewarmPaths.push(path);
       }
       // Add turbopack/webpack ignore hints for routes that scan the filesystem
-      const ignoreComment = needsTurbopackIgnore(importPath) ? "" : "";
+      const ignoreComment = needsTurbopackIgnore(importPath)
+        ? "/* webpackIgnore: true */ /* turbopackIgnore: true */ "
+        : "";
       // Static import strings for bundler tracing
       const returnWithDefault = `      return (await import(${ignoreComment}"${importPath}")).default`;
       const returnWithParen = `      return (await import(${ignoreComment}"${importPath}"))`;
@@ -397,7 +470,7 @@ ${aliasMapEntries}
 
 /* eslint-disable prettier/prettier */
 
-import type { CreateApiEndpointAny } from "${getRelativeImportPath(ENDPOINT_BASE_MODULE, OUTPUT_FILE)}";
+import type { CreateApiEndpointAny } from "${getRelativeImportPath(ENDPOINT_BASE_MODULE, outputFile)}";
 
 /**
  * Single-flight queue for the lazy definition imports below. Definition

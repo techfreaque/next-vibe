@@ -1,12 +1,7 @@
 import type { FlashListProps, ListRenderItemInfo } from "@shopify/flash-list";
 import { FlashList } from "@shopify/flash-list";
-import type { Row, SortingState } from "@tanstack/react-table";
-import {
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+import { flexRender, useTable } from "@tanstack/react-table";
+import type { RowData, SortingState } from "@tanstack/table-core";
 import type { JSX } from "react";
 import * as React from "react";
 import {
@@ -19,7 +14,10 @@ import {
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 
 import { cn } from "../../../unified-ui/_shared/cn";
-import type { DataTableProps } from "../../web/ui/data-table";
+import type { AppRow, DataTableProps } from "../../web/ui/data-table";
+import { tableConfig } from "../../web/ui/data-table";
+
+export { tableConfig } from "../../web/ui/data-table";
 import { styledNative } from "../utils/style-converter";
 import {
   Table,
@@ -48,7 +46,7 @@ function wrapInTextIfNeeded(content: React.ReactNode): React.ReactNode {
  * @docs https://tanstack.com/table
  */
 
-export function DataTable<TData, TValue = string>({
+export function DataTable<TData extends RowData>({
   columns,
   data,
   onRowPress,
@@ -56,14 +54,13 @@ export function DataTable<TData, TValue = string>({
   ListFooterComponent,
   isRefreshing = false,
   onRefresh,
-}: DataTableProps<TData, TValue>): JSX.Element {
+}: DataTableProps<TData>): JSX.Element {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const table = useReactTable({
+  const table = useTable({
+    features: tableConfig,
     data,
     columns,
-    getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
-    getSortedRowModel: getSortedRowModel(),
     state: {
       sorting,
     },
@@ -148,7 +145,7 @@ export function DataTable<TData, TValue = string>({
   };
 
   const renderItem = (
-    info: ListRenderItemInfo<Row<TData>>,
+    info: ListRenderItemInfo<AppRow<TData>>,
   ): React.ReactElement => {
     const { item: row, index } = info;
     const rowClassName = cn(
@@ -199,7 +196,7 @@ export function DataTable<TData, TValue = string>({
     />
   );
 
-  const flashListProps: FlashListProps<Row<TData>> = {
+  const flashListProps: FlashListProps<AppRow<TData>> = {
     data: rows,
     ListHeaderComponent: HeaderComponent,
     ListEmptyComponent: hasNoData ? EmptyComponent : null,
@@ -220,7 +217,7 @@ export function DataTable<TData, TValue = string>({
           <ActivityIndicator size="small" />
         </StyledAnimatedView>
       )}
-      <FlashList<Row<TData>> {...flashListProps} />
+      <FlashList<AppRow<TData>> {...flashListProps} />
     </>
   );
 }

@@ -153,14 +153,14 @@ async function fetchRemoteToolSchemas(params: {
   } = params;
   const result = new Map<string, HelpToolParameters | undefined>();
 
-  const { RouteExecuteRepository } =
-    await import("../../execute-tool/repository");
+  const { runEndpointRemote } =
+    await import("../../execute-tool/repository/run-endpoint-remote");
   const helpDef = (await import("../definition")).default;
 
   for (const toolName of toolNames) {
     // Ask the remote's own help endpoint for full detail, routed by instanceId
     // through the unified typed path (no raw cross-instance HTTP here).
-    const remote = await RouteExecuteRepository.runInProcessTyped({
+    const remote = await runEndpointRemote({
       definition: helpDef.GET,
       input: { toolName, page: 1, pageSize: 1 },
       instanceId,

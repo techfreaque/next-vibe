@@ -44,10 +44,15 @@ export const generator: GeneratorDefinition = {
    */
   output: [
     `${GENERATED_DIR}/endpoints/endpoint.ts`,
+    `${GENERATED_DIR}/endpoints/endpoint-dev.ts`,
     `${GENERATED_DIR}/endpoints/alias-map.ts`,
+    `${GENERATED_DIR}/endpoints/alias-map-dev.ts`,
     `${GENERATED_DIR}/endpoints/hot-paths.ts`,
+    `${GENERATED_DIR}/endpoints/hot-paths-dev.ts`,
     `${GENERATED_DIR}/routes/handlers.ts`,
+    `${GENERATED_DIR}/routes/handlers-dev.ts`,
     `${GENERATED_DIR}/routes/hot-paths.ts`,
+    `${GENERATED_DIR}/routes/hot-paths-dev.ts`,
     `${GENERATED_DIR}/routes/client.ts`,
     `${GENERATED_DIR}/categories/registry.ts`,
   ],
