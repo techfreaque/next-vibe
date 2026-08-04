@@ -1,6 +1,4 @@
-import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { VibeMode } from "next-vibe/env/env-util";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
@@ -49,10 +47,6 @@ export async function subscriptionLoader({
 
   if (requireAuth && !isAuthenticated) {
     notFound();
-  }
-
-  if (coreEnv.NEXT_PUBLIC_VIBE_MODE === VibeMode.AGENT && !isAuthenticated) {
-    redirect(`/${locale}/user/login`);
   }
 
   // Handle NOWPayments success redirect.

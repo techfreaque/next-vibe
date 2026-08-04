@@ -342,12 +342,7 @@ const oxlint: CheckConfig["oxlint"] = {
       : {}),
 
     // ── Node (enabled via node flag) ──────────────────────────
-    ...(features.node
-      ? {
-          "node/no-missing-import": "off",
-          "node/no-unsupported-features/es-syntax": "off",
-        }
-      : {}),
+    ...(features.node ? {} : {}),
 
     // ── Unicorn (enabled via unicorn flag) ────────────────────
     ...(features.unicorn
@@ -920,6 +915,30 @@ const config = (): CheckConfig => {
             "typescript-eslint": createEslintStub([
               "no-explicit-any",
               "no-unused-vars",
+            ]),
+            typescript: createEslintStub([
+              "consistent-type-definitions",
+              "no-unused-vars",
+              "no-explicit-any",
+              "no-inferrable-types",
+              "consistent-type-imports",
+              "no-empty-function",
+              "no-empty-object-type",
+              "no-unsafe-function-type",
+              "no-wrapper-object-types",
+              "ban-ts-comment",
+              "no-duplicate-enum-values",
+              "no-extra-non-null-assertion",
+              "await-thenable",
+              "no-floating-promises",
+              "no-for-in-array",
+              "no-misused-promises",
+              "no-unsafe-assignment",
+              "no-unnecessary-type-assertion",
+              "explicit-function-return-type",
+              "restrict-template-expressions",
+              "prefer-includes",
+              "prefer-string-starts-ends-with",
             ]),
             "eslint-plugin-unicorn": createEslintStub([
               "require-module-specifiers",

@@ -7,25 +7,27 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 import { jwtVerify, SignJWT } from "jose";
-import { coreEnv } from "../../core/env";
-import type { CountryLanguage } from "../../core/i18n/core/config";
-import { getLanguageAndCountryFromLocale } from "../../core/i18n/core/language-utils";
-import type { ResponseType } from "../../core/route/response.schema";
-import { throwErrorResponse } from "../../core/route/error-response-error";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "../../core/route/response.schema";
-import { parseError } from "../../core/utils/parse-error";
-import { db } from "../../database";
-import { Environment } from "../../env/env-util";
-import { scopedTranslation } from "./i18n";
-import { identityEnv } from "../env";
-import { leads, userLeadLinks } from "../lead/db";
-import { LeadAuthRepository } from "../lead/device-auth";
-import { LeadSource, LeadStatus } from "../lead/enum";
-import type { UserRoleValue } from "../roles/enum";
+} from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { db } from "next-vibe/database";
+import { Environment, VibeMode } from "next-vibe/env/env-util";
+import { scopedTranslation } from "next-vibe/identity/auth/i18n";
+import { identityEnv } from "next-vibe/identity/env";
+import { leads, userLeadLinks } from "next-vibe/identity/lead/db";
+import { LeadAuthRepository } from "next-vibe/identity/lead/device-auth";
+import { LeadSource, LeadStatus } from "next-vibe/identity/lead/enum";
+import type { UserRoleValue } from "next-vibe/identity/roles/enum";
+import { coreEnv } from "../../core/env";
+import type { CountryLanguage } from "../../core/i18n/core/config";
+import { getLanguageAndCountryFromLocale } from "../../core/i18n/core/language-utils";
+import { throwErrorResponse } from "../../core/route/error-response-error";
+import type { ResponseType } from "../../core/route/response.schema";
+import type { EndpointLogger } from "../../logger/types";
+import { isCliPlatform, Platform } from "../../platforms/platforms";
 import {
   filterUserPermissionRoles,
   UserPermissionRole,
@@ -37,8 +39,6 @@ import { SessionRepository } from "../session/repository";
 import { users } from "../user/db";
 import { UserDetailLevel } from "../user/enum";
 import { UserRepository } from "../user/repository";
-import type { EndpointLogger } from "../../logger/types";
-import { isCliPlatform, Platform } from "../../platforms/platforms";
 
 import {
   AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS,
@@ -828,6 +828,19 @@ export class AuthRepository {
             logger.debug("Attempting CLI email authentication");
             return await AuthRepository.authenticateUserByEmail(
               cliEmail,
+              context.locale,
+              logger,
+            );
+          }
+        }
+
+        if (coreEnv.NEXT_PUBLIC_VIBE_MODE === VibeMode.AGENT) {
+          // Agent mode: auto-login as admin user on web when no session exists
+          const adminEmail = identityEnv.VIBE_ADMIN_USER_EMAIL;
+          if (adminEmail) {
+            logger.debug("Agent mode: auto-login as admin user");
+            return await AuthRepository.authenticateUserByEmail(
+              adminEmail,
               context.locale,
               logger,
             );
