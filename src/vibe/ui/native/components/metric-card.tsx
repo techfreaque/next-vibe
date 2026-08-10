@@ -7,7 +7,7 @@ import type {
   MetricCardProps,
   MetricCardTrend,
   MetricCardVariant,
-} from "../../web/ui/metric-card";
+} from "../../web/components/metric-card";
 import { Text } from "./text";
 
 export type {
@@ -15,7 +15,7 @@ export type {
   MetricCardProps,
   MetricCardTrend,
   MetricCardVariant,
-} from "../../web/ui/metric-card";
+} from "../../web/components/metric-card";
 
 const StyledView = styled(View, { className: "style" });
 

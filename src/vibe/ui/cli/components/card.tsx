@@ -9,7 +9,7 @@ import type {
   CardHeaderProps,
   CardProps,
   CardTitleProps,
-} from "../../web/ui/card";
+} from "../../web/components/card";
 
 export type {
   CardContentProps,
@@ -18,7 +18,7 @@ export type {
   CardHeaderProps,
   CardProps,
   CardTitleProps,
-} from "../../web/ui/card";
+} from "../../web/components/card";
 
 export function Card({ children }: CardProps): JSX.Element {
   const isMcp = useIsMcp();

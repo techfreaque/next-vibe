@@ -2,7 +2,7 @@ import { Text } from "ink";
 import * as React from "react";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
-import type { TitleProps } from "../../web/ui/title";
+import type { TitleProps } from "../../web/components/title";
 import { parseClassesToInkProps } from "./tailwind-to-ink";
 
 export function Title({

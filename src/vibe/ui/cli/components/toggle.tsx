@@ -1,19 +1,15 @@
 import { Text } from "ink";
 import type { JSX } from "react";
 
+import { cva } from "class-variance-authority";
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
-import type {
-  ToggleRootProps,
-  ToggleSize,
-  ToggleVariant,
-} from "../../web/ui/toggle";
+import type { ToggleRootProps } from "../../web/components/toggle";
 
 export type {
   ToggleRootProps,
   ToggleSize,
   ToggleVariant,
-} from "../../web/ui/toggle";
-import { cva } from "class-variance-authority";
+} from "../../web/components/toggle";
 
 export const toggleVariants = cva("");
 export const toggleTextVariants = cva("");

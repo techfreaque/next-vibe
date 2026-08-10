@@ -545,17 +545,21 @@ export type InferObjectType<C, Usage extends FieldUsage> =
     UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, any> // oxlint-disable-line typescript/no-explicit-any
   >
     ? {
-        -readonly [K in keyof C as InferFieldType<C[K], Usage> extends never
-          ? never
-          : IsOptionalField<C[K]> extends true
+        -readonly [
+          K in keyof C as InferFieldType<C[K], Usage> extends never
             ? never
-            : K]: InferFieldType<C[K], Usage>;
+            : IsOptionalField<C[K]> extends true
+              ? never
+              : K
+        ]: InferFieldType<C[K], Usage>;
       } & {
-        -readonly [K in keyof C as InferFieldType<C[K], Usage> extends never
-          ? never
-          : IsOptionalField<C[K]> extends true
-            ? K
-            : never]?: InferFieldType<C[K], Usage>;
+        -readonly [
+          K in keyof C as InferFieldType<C[K], Usage> extends never
+            ? never
+            : IsOptionalField<C[K]> extends true
+              ? K
+              : never
+        ]?: InferFieldType<C[K], Usage>;
       }
     : never;
 

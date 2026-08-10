@@ -3,15 +3,12 @@ import type { JSX } from "react";
 import type { FieldPath, FieldValues } from "react-hook-form";
 
 import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
-import type {
-  EndpointFormFieldProps,
-  FormFieldError,
-} from "../../../web/ui/form/endpoint-form-field";
+import type { EndpointFormFieldProps } from "../../../web/components/form/endpoint-form-field";
 
 export type {
   EndpointFormFieldProps,
   FormFieldError,
-} from "../../../web/ui/form/endpoint-form-field";
+} from "../../../web/components/form/endpoint-form-field";
 
 export function EndpointFormField<
   TKey extends string,

@@ -7,15 +7,12 @@ import type { JSX } from "react";
 import { useState } from "react";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
-import type {
-  MultiSelectOption,
-  MultiSelectProps,
-} from "../../web/ui/multi-select";
+import type { MultiSelectProps } from "../../web/components/multi-select";
 
 export type {
   MultiSelectOption,
   MultiSelectProps,
-} from "../../web/ui/multi-select";
+} from "../../web/components/multi-select";
 
 const CHECKED = "\u2713";
 const UNCHECKED = "\u25A1";

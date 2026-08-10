@@ -13,7 +13,7 @@ import { View } from "react-native";
 import type {
   FormElementProps,
   FormElementRefObject,
-} from "../../web/ui/form-element";
+} from "../../web/components/form-element";
 
 const StyledView = styled(View, { className: "style" });
 

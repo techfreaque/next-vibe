@@ -4,7 +4,7 @@
 import React from "react";
 import { Platform, ScrollView, View } from "react-native";
 
-import type { PageLayoutProps } from "../../web/ui/page-layout";
+import type { PageLayoutProps } from "../../web/components/page-layout";
 import { styledNative } from "../utils/style-converter";
 
 // Styled components with explicit className mapping

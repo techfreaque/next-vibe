@@ -86,6 +86,15 @@ export const translations: typeof enTranslations = {
         },
       },
     },
+    widget: {
+      aiDefaultLabel: "Domyślne AI:",
+      switchTo: "Przełącz na",
+      separatorDot: "·",
+      braveBanner: "Twoje AI szuka teraz przez Kagi",
+      kagiBanner: "Twoje AI szuka teraz przez Brave",
+      useBrave: "Użyj Brave",
+      useKagi: "Użyj Kagi",
+    },
     errors: {
       queryEmpty: {
         title: "Zapytanie jest wymagane",

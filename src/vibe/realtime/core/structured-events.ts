@@ -28,8 +28,9 @@ export type DeepPartial<T> = T extends
 // ============================================================================
 
 type NestedEventPayload<TResponseOutput, TSpec> = {
-  readonly [K in keyof TSpec &
-    keyof TResponseOutput]: TSpec[K] extends ReadonlyArray<infer SF>
+  readonly [
+    K in keyof TSpec & keyof TResponseOutput
+  ]: TSpec[K] extends ReadonlyArray<infer SF>
     ? TResponseOutput[K] extends ReadonlyArray<infer U>
       ? Array<Pick<U, SF extends keyof U ? SF : never>>
       : TResponseOutput[K] extends Array<infer U>
@@ -339,9 +340,11 @@ export type HasClientDeliveredEventsOf<TEvents> =
     : string extends keyof TEvents
       ? boolean
       : keyof {
-            [K in keyof TEvents as TEvents[K] extends { clientDelivery: false }
-              ? never
-              : K]: true;
+            [
+              K in keyof TEvents as TEvents[K] extends { clientDelivery: false }
+                ? never
+                : K
+            ]: true;
           } extends never
         ? false
         : true;
@@ -631,9 +634,11 @@ type _EmitSignature<
  */
 type _EmitArgs<K extends string, TData> = [
   keyof {
-    [P in keyof TData as Record<never, never> extends Pick<TData, P>
-      ? never
-      : P]: 1;
+    [
+      P in keyof TData as Record<never, never> extends Pick<TData, P>
+        ? never
+        : P
+    ]: 1;
   },
 ] extends [never]
   ? [event: K, data?: TData]
@@ -691,12 +696,14 @@ export type EmitEventNamed<
       ) => EmitResult
     : _UnionToIntersection<
         {
-          [K in _SharedKeys<
-            TResponsePayloads,
-            TRequestPayloads,
-            TUrlPayloads,
-            TPayloadTypes
-          >]: (
+          [
+            K in _SharedKeys<
+              TResponsePayloads,
+              TRequestPayloads,
+              TUrlPayloads,
+              TPayloadTypes
+            >
+          ]: (
             ...args: _EmitArgs<
               K,
               EmitData<

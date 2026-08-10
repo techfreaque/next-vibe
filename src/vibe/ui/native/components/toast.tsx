@@ -13,8 +13,8 @@ import type {
   ToastRootProps,
   ToastTitleProps,
   ToastViewportProps,
-} from "../../web/ui/toast";
-import { toastVariants } from "../../web/ui/toast";
+} from "../../web/components/toast";
+import { toastVariants } from "../../web/components/toast";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { Span } from "./span";

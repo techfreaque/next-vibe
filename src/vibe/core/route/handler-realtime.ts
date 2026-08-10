@@ -144,11 +144,13 @@ export interface RemoteEventHandlerProps<
  * bivariant, which is the variance we want here.
  */
 export type OnRemoteEventMap<TEndpoint extends CreateApiEndpointAny> = {
-  [K in keyof TEndpoint["types"]["Events"] as TEndpoint["types"]["Events"][K] extends {
-    remoteEvent: true;
-  }
-    ? K
-    : never]: {
+  [
+    K in keyof TEndpoint["types"]["Events"] as TEndpoint["types"]["Events"][K] extends {
+      remoteEvent: true;
+    }
+      ? K
+      : never
+  ]: {
     bivarianceHack(
       props: RemoteEventHandlerProps<
         TEndpoint,
@@ -208,11 +210,13 @@ type HasRemoteEvents<TEndpoint extends CreateApiEndpointAny> =
   _IsAnyEvents<TEndpoint["types"]["Events"]> extends true
     ? boolean
     : keyof {
-          [K in keyof TEndpoint["types"]["Events"] as TEndpoint["types"]["Events"][K] extends {
-            remoteEvent: true;
-          }
-            ? K
-            : never]: true;
+          [
+            K in keyof TEndpoint["types"]["Events"] as TEndpoint["types"]["Events"][K] extends {
+              remoteEvent: true;
+            }
+              ? K
+              : never
+          ]: true;
         } extends never
       ? false
       : true;

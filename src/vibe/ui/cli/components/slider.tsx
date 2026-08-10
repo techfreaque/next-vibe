@@ -2,18 +2,16 @@ import { Text } from "ink";
 import type { JSX } from "react";
 
 import type {
-  SliderRangeProps,
   SliderRootProps,
-  SliderThumbProps,
   SliderTrackProps,
-} from "../../web/ui/slider";
+} from "../../web/components/slider";
 
 export type {
   SliderRangeProps,
   SliderRootProps,
   SliderThumbProps,
   SliderTrackProps,
-} from "../../web/ui/slider";
+} from "../../web/components/slider";
 
 // CLI: show value range as "min..max" - no drag UI in terminal
 export function Slider({ value, min, max }: SliderRootProps): JSX.Element {

@@ -4,12 +4,12 @@ import type { JSX } from "react";
 import type {
   FormFieldGroupProps,
   FormSectionProps,
-} from "../../../web/ui/form/form-section";
+} from "../../../web/components/form/form-section";
 
 export type {
   FormFieldGroupProps,
   FormSectionProps,
-} from "../../../web/ui/form/form-section";
+} from "../../../web/components/form/form-section";
 
 const SPACE = "\u0020";
 const SLASH = "\u002F";

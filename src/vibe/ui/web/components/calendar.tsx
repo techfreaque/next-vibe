@@ -1,8 +1,8 @@
 /* eslint-disable i18next/no-literal-string */
 "use client";
 
-import { ChevronLeftIcon } from "next-vibe/ui/ui/icons/ChevronLeftIcon";
-import { ChevronRightIcon } from "next-vibe/ui/ui/icons/ChevronRightIcon";
+import { ChevronLeftIcon } from "next-vibe/ui/components/icons/ChevronLeftIcon";
+import { ChevronRightIcon } from "next-vibe/ui/components/icons/ChevronRightIcon";
 import type { ComponentProps, JSX, ReactNode } from "react";
 import { DayPicker, type DayPickerProps } from "react-day-picker";
 

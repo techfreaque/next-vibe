@@ -2,10 +2,10 @@ import { styled } from "nativewind";
 import { View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
-import type { WidgetHeaderProps } from "../../web/ui/widget-header";
+import type { WidgetHeaderProps } from "../../web/components/widget-header";
 import { Text } from "./text";
 
-export type { WidgetHeaderProps } from "../../web/ui/widget-header";
+export type { WidgetHeaderProps } from "../../web/components/widget-header";
 
 const StyledView = styled(View, { className: "style" });
 

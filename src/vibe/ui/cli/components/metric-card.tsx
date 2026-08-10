@@ -6,14 +6,14 @@ import type {
   MetricCardProps,
   MetricCardTrend,
   MetricCardVariant,
-} from "../../web/ui/metric-card";
+} from "../../web/components/metric-card";
 
 export type {
   MetricCardFormat,
   MetricCardProps,
   MetricCardTrend,
   MetricCardVariant,
-} from "../../web/ui/metric-card";
+} from "../../web/components/metric-card";
 
 const VARIANT_COLOR: Record<MetricCardVariant, string | undefined> = {
   default: undefined,

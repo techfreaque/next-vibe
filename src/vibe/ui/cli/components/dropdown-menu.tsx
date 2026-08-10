@@ -32,7 +32,7 @@ export type {
   DropdownMenuSubProps,
   DropdownMenuSubTriggerProps,
   DropdownMenuTriggerProps,
-} from "../../web/ui/dropdown-menu";
+} from "../../web/components/dropdown-menu";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type {
@@ -50,7 +50,7 @@ import type {
   DropdownMenuSubProps,
   DropdownMenuSubTriggerProps,
   DropdownMenuTriggerProps,
-} from "../../web/ui/dropdown-menu";
+} from "../../web/components/dropdown-menu";
 import { useShouldFocus } from "./dialog";
 
 /**

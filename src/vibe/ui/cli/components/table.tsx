@@ -12,7 +12,7 @@ import type {
   TableHeadProps,
   TableProps,
   TableRowProps,
-} from "../../web/ui/table";
+} from "../../web/components/table";
 import { useSeparatorLine } from "../hooks/use-separator-width";
 import {
   parseClassesToBoxProps,
@@ -29,7 +29,7 @@ export type {
   TableHeadProps,
   TableProps,
   TableRowProps,
-} from "../../web/ui/table";
+} from "../../web/components/table";
 
 const CELL_DIVIDER = " | ";
 

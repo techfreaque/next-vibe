@@ -1,7 +1,7 @@
 import { Box } from "ink";
 import * as React from "react";
 
-import type { MainProps } from "../../web/ui/main";
+import type { MainProps } from "../../web/components/main";
 import { parseClassesToInkProps } from "./tailwind-to-ink";
 
 export function Main({

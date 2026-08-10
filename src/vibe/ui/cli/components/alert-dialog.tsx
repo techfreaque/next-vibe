@@ -20,7 +20,7 @@ export type {
   AlertDialogRootProps,
   AlertDialogTitleProps,
   AlertDialogTriggerProps,
-} from "../../web/ui/alert-dialog";
+} from "../../web/components/alert-dialog";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type {
@@ -34,7 +34,7 @@ import type {
   AlertDialogRootProps,
   AlertDialogTitleProps,
   AlertDialogTriggerProps,
-} from "../../web/ui/alert-dialog";
+} from "../../web/components/alert-dialog";
 
 let alertBtnIdCounter = 0;
 

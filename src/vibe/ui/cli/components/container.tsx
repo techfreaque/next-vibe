@@ -1,7 +1,7 @@
 import { Box } from "ink";
 import * as React from "react";
 
-import type { ContainerProps } from "../../web/ui/container";
+import type { ContainerProps } from "../../web/components/container";
 import { parseClassesToInkProps } from "./tailwind-to-ink";
 
 export function Container({

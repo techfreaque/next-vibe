@@ -136,13 +136,13 @@ type EndpointsPageProps<
     DELETE?: CreateApiEndpointAny;
   },
 > = EndpointsPagePropsBase<T> & {
-  [K in "endpointOptions" as OptionsOptional<T> extends true
-    ? never
-    : K]: UseEndpointOptions<T>;
+  [
+    K in "endpointOptions" as OptionsOptional<T> extends true ? never : K
+  ]: UseEndpointOptions<T>;
 } & {
-  [K in "endpointOptions" as OptionsOptional<T> extends true
-    ? K
-    : never]?: UseEndpointOptions<T>;
+  [
+    K in "endpointOptions" as OptionsOptional<T> extends true ? K : never
+  ]?: UseEndpointOptions<T>;
 };
 
 /**
@@ -947,6 +947,17 @@ function StackEntryRenderer({
   );
 }
 
+function getPickerItemId(item: WidgetData): string {
+  if (typeof item !== "object" || item === null || Array.isArray(item)) {
+    return String(item);
+  }
+  const obj = item as Record<string, WidgetData>;
+  if ("id" in obj) {
+    return String(obj["id"] ?? "");
+  }
+  return JSON.stringify(item);
+}
+
 /**
  * CLI picker: fetches a list endpoint and renders a keyboard-navigable Select.
  * Used by StackEntryLayer when platform=CLI and pickerCallback is set.
@@ -1016,23 +1027,12 @@ function CliPickerSelect({
     return JSON.stringify(item);
   };
 
-  const getId = (item: WidgetData): string => {
-    if (typeof item !== "object" || item === null || Array.isArray(item)) {
-      return String(item);
-    }
-    const obj = item as Record<string, WidgetData>;
-    if ("id" in obj) {
-      return String(obj["id"] ?? "");
-    }
-    return JSON.stringify(item);
-  };
-
   const { t: widgetT } = scopedTranslation.scopedT(locale);
 
   const [selected, setSelected] = useState<string | undefined>(undefined);
 
   const handleChange = (value: string): void => {
-    const item = items.find((i) => getId(i) === value);
+    const item = items.find((i) => getPickerItemId(i) === value);
     if (item && pickerCallbackWithPop) {
       pickerCallbackWithPop(item);
     }
@@ -1056,7 +1056,7 @@ function CliPickerSelect({
       </SelectTrigger>
       <SelectContent>
         {items.map((item) => {
-          const id = getId(item);
+          const id = getPickerItemId(item);
           return (
             <SelectItem key={id} value={id}>
               {getLabel(item)}

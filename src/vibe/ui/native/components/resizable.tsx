@@ -11,7 +11,7 @@ import { cn } from "../../../unified-ui/_shared/cn";
 import type {
   ResizableContainerProps,
   ResizableHandleProps,
-} from "../../web/ui/resizable";
+} from "../../web/components/resizable";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 

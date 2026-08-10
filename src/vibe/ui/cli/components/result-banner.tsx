@@ -2,12 +2,12 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
-import type { ResultBannerProps } from "../../web/ui/result-banner";
+import type { ResultBannerProps } from "../../web/components/result-banner";
 
 export type {
   ResultBannerProps,
   ResultBannerVariant,
-} from "../../web/ui/result-banner";
+} from "../../web/components/result-banner";
 
 const variantColors: Record<string, string> = {
   success: "green",

@@ -7,14 +7,14 @@ export type {
   MotionImgProps,
   MotionSpanProps,
   MotionTransition,
-} from "../../web/ui/motion";
+} from "../../web/components/motion";
 
 import type {
   AnimatePresenceProps,
   MotionButtonProps,
   MotionDivProps,
   MotionSpanProps,
-} from "../../web/ui/motion";
+} from "../../web/components/motion";
 import { Div } from "./div";
 import { Span } from "./span";
 

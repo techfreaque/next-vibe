@@ -291,7 +291,7 @@ export class CliInputParser {
   /**
    * Merge data objects, with later sources taking precedence
    */
-  // oxlint-disable-next-line oxlint-plugin-restricted/no-unknown -- generic merge helper must accept arbitrary record shapes
+  // oxlint-disable-next-line restricted/no-unknown -- generic merge helper must accept arbitrary record shapes
   private static mergeData<TData extends Record<string, unknown>>(
     ...sources: Array<TData | null | undefined>
   ): Partial<TData> {
@@ -356,12 +356,12 @@ export class CliInputParser {
    * Resolve the core type string of a Zod field, unwrapping optional/default/nullable wrappers.
    * Works with both Zod v3 (_def.typeName) and Zod v4 (.type / .def.type).
    */
-  // oxlint-disable-next-line oxlint-plugin-restricted/no-unknown -- Zod schema introspection requires opaque field type to support both v3 (_def.typeName) and v4 (.type/.def.type) APIs
+  // oxlint-disable-next-line restricted/no-unknown -- Zod schema introspection requires opaque field type to support both v3 (_def.typeName) and v4 (.type/.def.type) APIs
   private static resolveZodType(field: unknown): string | undefined {
     if (!field || typeof field !== "object") {
       return undefined;
     }
-    // oxlint-disable-next-line oxlint-plugin-restricted/no-unknown -- Zod internals are opaque; must use Record<string, unknown> to safely access dynamic properties
+    // oxlint-disable-next-line restricted/no-unknown -- Zod internals are opaque; must use Record<string, unknown> to safely access dynamic properties
     const f = field as Record<string, unknown>;
 
     // Zod v4: .type is the direct type string on the field itself
@@ -372,7 +372,7 @@ export class CliInputParser {
         f.type === "nullable"
       ) {
         // Unwrap to inner - check .def.innerType for v4
-        // oxlint-disable-next-line oxlint-plugin-restricted/no-unknown -- Zod internals are opaque; must use Record<string, unknown> to safely access dynamic properties
+        // oxlint-disable-next-line restricted/no-unknown -- Zod internals are opaque; must use Record<string, unknown> to safely access dynamic properties
         const def = f.def as Record<string, unknown> | undefined;
         return this.resolveZodType(def?.innerType);
       }
@@ -380,7 +380,7 @@ export class CliInputParser {
     }
 
     // Zod v4: .def.type
-    // oxlint-disable-next-line oxlint-plugin-restricted/no-unknown -- Zod internals are opaque; must use Record<string, unknown> to safely access dynamic properties
+    // oxlint-disable-next-line restricted/no-unknown -- Zod internals are opaque; must use Record<string, unknown> to safely access dynamic properties
     const def = f.def as Record<string, unknown> | undefined;
     if (def && typeof def.type === "string") {
       if (
@@ -394,7 +394,7 @@ export class CliInputParser {
     }
 
     // Zod v3: ._def.typeName
-    // oxlint-disable-next-line oxlint-plugin-restricted/no-unknown -- Zod internals are opaque; must use Record<string, unknown> to safely access dynamic properties
+    // oxlint-disable-next-line restricted/no-unknown -- Zod internals are opaque; must use Record<string, unknown> to safely access dynamic properties
     const _def = f._def as Record<string, unknown> | undefined;
     if (_def && typeof _def.typeName === "string") {
       const typeName = _def.typeName as string;
@@ -430,7 +430,7 @@ export class CliInputParser {
     }
 
     try {
-      // oxlint-disable-next-line oxlint-plugin-restricted/no-unknown -- Zod internals are opaque; must use Record<string, unknown> to safely access .shape property
+      // oxlint-disable-next-line restricted/no-unknown -- Zod internals are opaque; must use Record<string, unknown> to safely access .shape property
       const shape = (schema as { shape?: Record<string, unknown> }).shape;
       if (shape && typeof shape === "object") {
         for (const [key, fieldSchema] of Object.entries(shape)) {

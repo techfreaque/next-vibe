@@ -5,13 +5,13 @@ import { cn } from "../../../unified-ui/_shared/cn";
 import type {
   ProgressBlockProps,
   ProgressBlockVariant,
-} from "../../web/ui/progress-block";
+} from "../../web/components/progress-block";
 import { Text } from "./text";
 
 export type {
   ProgressBlockProps,
   ProgressBlockVariant,
-} from "../../web/ui/progress-block";
+} from "../../web/components/progress-block";
 
 const StyledView = styled(View, { className: "style" });
 

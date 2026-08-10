@@ -27,6 +27,21 @@ function shortenPath(p: string): string {
     .replace(/^src\//, "");
 }
 
+function colorForPrefix(prefix: string): (s: string) => string {
+  switch (prefix) {
+    case "+":
+      return chalk.green;
+    case "~":
+      return chalk.blue;
+    case "»":
+      return chalk.magenta;
+    case "-":
+      return chalk.red;
+    default:
+      return chalk.yellow;
+  }
+}
+
 // ── Props ─────────────────────────────────────────────────────
 
 interface CliWidgetProps {
@@ -140,25 +155,10 @@ export function VibeStageWidget({ field }: CliWidgetProps): JSX.Element {
     );
   }
 
-  const colorFor = (prefix: string): ((s: string) => string) => {
-    switch (prefix) {
-      case "+":
-        return chalk.green;
-      case "~":
-        return chalk.blue;
-      case "»":
-        return chalk.magenta;
-      case "-":
-        return chalk.red;
-      default:
-        return chalk.yellow;
-    }
-  };
-
   const renderFileList = (files: string[], prefix: string): string => {
     const shown = files.slice(0, MAX_SHOW);
     const rest = files.length - shown.length;
-    const paint = colorFor(prefix);
+    const paint = colorForPrefix(prefix);
     // Rename entries are "old -> new" — shorten both sides, keep the arrow.
     const shortenEntry = (f: string): string =>
       f.includes(" -> ")

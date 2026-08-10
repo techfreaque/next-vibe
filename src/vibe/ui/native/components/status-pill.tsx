@@ -5,13 +5,13 @@ import { cn } from "../../../unified-ui/_shared/cn";
 import type {
   StatusPillProps,
   StatusPillVariant,
-} from "../../web/ui/status-pill";
+} from "../../web/components/status-pill";
 import { Text } from "./text";
 
 export type {
   StatusPillProps,
   StatusPillVariant,
-} from "../../web/ui/status-pill";
+} from "../../web/components/status-pill";
 
 const StyledView = styled(View, { className: "style" });
 

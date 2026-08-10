@@ -1,7 +1,7 @@
 import { Box, Text } from "ink";
 import * as React from "react";
 
-import type { DivProps, DivRefObject } from "../../web/ui/div";
+import type { DivProps, DivRefObject } from "../../web/components/div";
 import { parseClassesToInkProps } from "./tailwind-to-ink";
 import { TextStyleProvider } from "./text-style-context";
 

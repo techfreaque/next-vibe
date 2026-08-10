@@ -2,9 +2,9 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
-import type { LiProps } from "../../web/ui/li";
+import type { LiProps } from "../../web/components/li";
 
-export type { LiMouseEvent, LiProps } from "../../web/ui/li";
+export type { LiMouseEvent, LiProps } from "../../web/components/li";
 
 export function Li({ children, value }: LiProps): JSX.Element {
   const isMcp = useIsMcp();

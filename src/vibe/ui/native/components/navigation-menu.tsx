@@ -19,7 +19,7 @@ import type {
   NavigationMenuProps,
   NavigationMenuTriggerProps,
   NavigationMenuViewportProps,
-} from "../../web/ui/navigation-menu";
+} from "../../web/components/navigation-menu";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { buttonVariants } from "./button";

@@ -7,14 +7,14 @@ import type {
   TabsListProps,
   TabsProps,
   TabsTriggerProps,
-} from "../../web/ui/tabs";
+} from "../../web/components/tabs";
 
 export type {
   TabsContentProps,
   TabsListProps,
   TabsProps,
   TabsTriggerProps,
-} from "../../web/ui/tabs";
+} from "../../web/components/tabs";
 
 export function Tabs({ children }: TabsProps): JSX.Element {
   return <Box flexDirection="column">{children}</Box>;

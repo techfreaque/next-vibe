@@ -8,7 +8,7 @@ import type {
   ToggleRootProps,
   ToggleSize,
   ToggleVariant,
-} from "../../web/ui/toggle";
+} from "../../web/components/toggle";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { TextClassContext } from "./text";

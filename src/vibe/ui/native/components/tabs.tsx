@@ -7,7 +7,7 @@ import type {
   TabsListProps,
   TabsProps,
   TabsTriggerProps,
-} from "../../web/ui/tabs";
+} from "../../web/components/tabs";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 import { TextClassContext } from "./text";

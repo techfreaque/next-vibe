@@ -1,15 +1,12 @@
 import { Text } from "ink";
 import type { JSX } from "react";
 
-import type {
-  RangeSliderOption,
-  RangeSliderProps,
-} from "../../web/ui/range-slider";
+import type { RangeSliderProps } from "../../web/components/range-slider";
 
 export type {
   RangeSliderOption,
   RangeSliderProps,
-} from "../../web/ui/range-slider";
+} from "../../web/components/range-slider";
 
 // CLI: show selected range as "minLabel..maxLabel" - no drag UI in terminal
 export function RangeSlider({

@@ -1,7 +1,7 @@
 import { Box } from "ink";
 import * as React from "react";
 
-import type { SectionProps } from "../../web/ui/section";
+import type { SectionProps } from "../../web/components/section";
 import { parseClassesToInkProps } from "./tailwind-to-ink";
 
 export function Section({

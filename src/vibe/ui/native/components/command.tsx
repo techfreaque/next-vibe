@@ -22,8 +22,8 @@ import type {
   CommandProps,
   CommandSeparatorProps,
   CommandShortcutProps,
-} from "../../web/ui/command";
-import { MagnifyingGlassIcon } from "../../web/ui/icons/MagnifyingGlassIcon";
+} from "../../web/components/command";
+import { MagnifyingGlassIcon } from "../../web/components/icons/MagnifyingGlassIcon";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { Dialog, DialogContent } from "./dialog";

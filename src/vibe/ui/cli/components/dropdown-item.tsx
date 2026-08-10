@@ -2,9 +2,9 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
-import type { DropdownItemProps } from "../../web/ui/dropdown-item";
+import type { DropdownItemProps } from "../../web/components/dropdown-item";
 
-export type { DropdownItemProps } from "../../web/ui/dropdown-item";
+export type { DropdownItemProps } from "../../web/components/dropdown-item";
 
 const SELECTED_MARKER = "\u25B6 "; // ▶
 const DISABLED_MARKER = "\u2013 "; // –

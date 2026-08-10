@@ -1,7 +1,7 @@
 import { Text } from "ink";
 import * as React from "react";
 
-import type { SpanProps, SpanRefObject } from "../../web/ui/span";
+import type { SpanProps, SpanRefObject } from "../../web/components/span";
 import { parseClassesToInkProps } from "./tailwind-to-ink";
 import { TextStyleProvider, useResolvedTextStyle } from "./text-style-context";
 

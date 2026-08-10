@@ -19,7 +19,7 @@ import type {
   AccordionItemProps,
   AccordionProps,
   AccordionTriggerProps,
-} from "../../web/ui/accordion";
+} from "../../web/components/accordion";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { ChevronDown } from "./icons/ChevronDown";

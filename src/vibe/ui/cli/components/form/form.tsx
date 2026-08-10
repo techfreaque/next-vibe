@@ -15,9 +15,7 @@ import {
   useWidgetResponseOnly,
 } from "../../../../unified-ui/_shared/use-widget-context";
 import type {
-  FormComboboxProps,
   FormControlProps,
-  FormDatePickerProps,
   FormDescriptionProps,
   FormFieldContextValue,
   FormFieldProps,
@@ -27,7 +25,7 @@ import type {
   FormMessageProps,
   FormProps,
   UseFormFieldReturn,
-} from "../../../web/ui/form/form";
+} from "../../../web/components/form/form";
 import { CliFocusManager } from "../../lib/focus-manager";
 import {
   setLiveRequestValues,
@@ -48,7 +46,7 @@ export type {
   FormMessageProps,
   FormProps,
   UseFormFieldReturn,
-} from "../../../web/ui/form/form";
+} from "../../../web/components/form/form";
 
 const COLON = ":";
 const SPACE = " ";

@@ -1,10 +1,10 @@
 import { Box } from "ink";
 import type { JSX } from "react";
 
-import type { TbodyProps } from "../../web/ui/tbody";
+import type { TbodyProps } from "../../web/components/tbody";
 import { parseClassesToBoxProps } from "./tailwind-to-ink";
 
-export type { TbodyProps } from "../../web/ui/tbody";
+export type { TbodyProps } from "../../web/components/tbody";
 
 export function Tbody({ className, children }: TbodyProps): JSX.Element {
   const boxProps = parseClassesToBoxProps(className);

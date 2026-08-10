@@ -19,7 +19,7 @@ import type {
   DropdownMenuSubProps,
   DropdownMenuSubTriggerProps,
   DropdownMenuTriggerProps,
-} from "../../web/ui/dropdown-menu";
+} from "../../web/components/dropdown-menu";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { Check } from "./icons/Check";

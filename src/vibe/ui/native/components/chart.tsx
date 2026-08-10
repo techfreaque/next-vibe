@@ -7,23 +7,17 @@ import type {
   AreaProps,
   AxisProps,
   BarProps,
-  ChartBaseProps,
-  ChartConfig,
-  ChartContainerBaseProps,
   ChartContainerProps,
   ChartContextProps,
   ChartDataPoint,
   ChartLegendContentProps,
   ChartLegendProps,
   ChartProps,
-  ChartStyleProps,
   ChartTooltipContentProps,
   ChartTooltipProps,
   LineProps,
-  PayloadItem,
   PieProps,
-  ThemeKeys,
-} from "../../web/ui/chart";
+} from "../../web/components/chart";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 
@@ -586,4 +580,4 @@ export type {
   PayloadItem,
   PieProps,
   ThemeKeys,
-} from "../../web/ui/chart";
+} from "../../web/components/chart";

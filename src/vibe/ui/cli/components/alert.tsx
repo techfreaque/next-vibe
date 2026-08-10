@@ -7,14 +7,14 @@ import type {
   AlertProps,
   AlertTitleProps,
   AlertVariant,
-} from "../../web/ui/alert";
+} from "../../web/components/alert";
 
 export type {
   AlertDescriptionProps,
   AlertProps,
   AlertTitleProps,
   AlertVariant,
-} from "../../web/ui/alert";
+} from "../../web/components/alert";
 import { cva } from "class-variance-authority";
 
 export const alertVariants = cva("");

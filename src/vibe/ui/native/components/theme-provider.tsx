@@ -10,7 +10,7 @@ export const THEME_COOKIE_NAME = "theme_v2";
 import type {
   ThemeProviderProps,
   UseThemeToggleReturn,
-} from "../../web/ui/theme-provider";
+} from "../../web/components/theme-provider";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 

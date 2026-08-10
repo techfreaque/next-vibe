@@ -5,12 +5,12 @@ import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type {
   ProgressBlockProps,
   ProgressBlockVariant,
-} from "../../web/ui/progress-block";
+} from "../../web/components/progress-block";
 
 export type {
   ProgressBlockProps,
   ProgressBlockVariant,
-} from "../../web/ui/progress-block";
+} from "../../web/components/progress-block";
 
 const VARIANT_COLOR: Record<ProgressBlockVariant, string> = {
   default: "cyan",

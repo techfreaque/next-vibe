@@ -1,12 +1,12 @@
 import { Box } from "ink";
 import type { JSX } from "react";
 
-import type { WidgetShellProps } from "../../web/ui/widget-shell";
+import type { WidgetShellProps } from "../../web/components/widget-shell";
 
 export type {
   WidgetShellPadding,
   WidgetShellProps,
-} from "../../web/ui/widget-shell";
+} from "../../web/components/widget-shell";
 
 const paddingMap: Record<string, number> = {
   none: 0,

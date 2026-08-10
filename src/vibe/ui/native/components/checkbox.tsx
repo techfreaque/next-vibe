@@ -5,7 +5,7 @@ import { cn } from "../../../unified-ui/_shared/cn";
 import type {
   CheckboxIndicatorProps,
   CheckboxRootProps,
-} from "../../web/ui/checkbox";
+} from "../../web/components/checkbox";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { Check } from "./icons/Check";

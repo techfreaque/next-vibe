@@ -10,7 +10,7 @@ import { cn } from "../../../unified-ui/_shared/cn";
 import type {
   MultiSelectOption,
   MultiSelectProps,
-} from "../../web/ui/multi-select";
+} from "../../web/components/multi-select";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 import { Badge } from "./badge";
 import { Button } from "./button";

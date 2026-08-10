@@ -8,13 +8,13 @@ export type {
   CarouselOptions,
   CarouselPlugin,
   CarouselProps,
-} from "../../web/ui/carousel";
+} from "../../web/components/carousel";
 
 import type {
   CarouselContentProps,
   CarouselItemProps,
   CarouselProps,
-} from "../../web/ui/carousel";
+} from "../../web/components/carousel";
 
 export function Carousel({
   children,

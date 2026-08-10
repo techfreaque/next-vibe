@@ -11,7 +11,7 @@ import type { JSX, ReactNode } from "react";
 import { Children, Fragment, isValidElement, useEffect, useRef } from "react";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
-import type { ButtonProps } from "../../web/ui/button";
+import type { ButtonProps } from "../../web/components/button";
 import { isOverlayOpen, useFocusScopeRegister, useShouldFocus } from "./dialog";
 import { useDropdownTrigger } from "./dropdown-menu";
 import { usePopoverTrigger } from "./popover";
@@ -23,7 +23,7 @@ export type {
   ButtonMouseEvent,
   ButtonSize,
   ButtonVariant,
-} from "../../web/ui/button";
+} from "../../web/components/button";
 
 /**
  * True if a string is a meaningful label (more than just an icon/emoji).

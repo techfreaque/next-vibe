@@ -1,7 +1,7 @@
 import { Text } from "ink";
 import * as React from "react";
 
-import type { StrongProps } from "../../web/ui/strong";
+import type { StrongProps } from "../../web/components/strong";
 import { parseClassesToInkProps } from "./tailwind-to-ink";
 
 export function Strong({

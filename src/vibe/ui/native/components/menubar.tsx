@@ -3,9 +3,9 @@ import * as React from "react";
 import { View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
-import { CheckIcon } from "../../web/ui/icons/CheckIcon";
-import { ChevronRightIcon } from "../../web/ui/icons/ChevronRightIcon";
-import { DotFilledIcon } from "../../web/ui/icons/DotFilledIcon";
+import { CheckIcon } from "../../web/components/icons/CheckIcon";
+import { ChevronRightIcon } from "../../web/components/icons/ChevronRightIcon";
+import { DotFilledIcon } from "../../web/components/icons/DotFilledIcon";
 import type {
   MenubarCheckboxItemProps,
   MenubarContentProps,
@@ -23,7 +23,7 @@ import type {
   MenubarSubProps,
   MenubarSubTriggerProps,
   MenubarTriggerProps,
-} from "../../web/ui/menubar";
+} from "../../web/components/menubar";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 import { Span } from "./span";

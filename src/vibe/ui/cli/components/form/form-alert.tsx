@@ -4,12 +4,12 @@ import type { JSX } from "react";
 import type {
   FormAlertProps,
   FormAlertState,
-} from "../../../web/ui/form/form-alert";
+} from "../../../web/components/form/form-alert";
 
 export type {
   FormAlertProps,
   FormAlertState,
-} from "../../../web/ui/form/form-alert";
+} from "../../../web/components/form/form-alert";
 
 const VARIANT_COLOR: Record<FormAlertState["variant"], string> = {
   default: "white",

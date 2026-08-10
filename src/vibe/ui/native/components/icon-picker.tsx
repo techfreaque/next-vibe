@@ -22,7 +22,7 @@ import {
   ICON_CATEGORIES_LIST,
 } from "../../../unified-ui/widgets/form-fields/icon-field/icons";
 import { uiScopedTranslation } from "../../web/i18n";
-import type { IconPickerProps } from "../../web/ui/icon-picker";
+import type { IconPickerProps } from "../../web/components/icon-picker";
 import { Text } from "./text";
 
 export type { CategoryKey, IconPickerProps };

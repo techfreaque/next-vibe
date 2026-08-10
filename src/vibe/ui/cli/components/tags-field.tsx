@@ -4,12 +4,18 @@ import type { JSX } from "react";
 import { useState } from "react";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
-import type { TagOption, TagsFieldProps } from "../../web/ui/tags-field";
+import type {
+  TagOption,
+  TagsFieldProps,
+} from "../../web/components/tags-field";
 import { useCliFieldFocus } from "../lib/focus-manager";
 import { useCaptureEnter } from "../lib/live-request-values";
 import { isOverlayOpen } from "./dialog";
 
-export type { TagOption, TagsFieldProps } from "../../web/ui/tags-field";
+export type {
+  TagOption,
+  TagsFieldProps,
+} from "../../web/components/tags-field";
 
 /**
  * CLI tags field.

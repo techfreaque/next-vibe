@@ -5,13 +5,13 @@ import type {
   AvatarFallbackProps,
   AvatarImageProps,
   AvatarRootProps,
-} from "../../web/ui/avatar";
+} from "../../web/components/avatar";
 
 export type {
   AvatarFallbackProps,
   AvatarImageProps,
   AvatarRootProps,
-} from "../../web/ui/avatar";
+} from "../../web/components/avatar";
 
 function getInitials(text: string): string {
   return text

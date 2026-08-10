@@ -8,7 +8,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { cn } from "../../../unified-ui/_shared/cn";
-import type { SkeletonProps } from "../../web/ui/skeleton";
+import type { SkeletonProps } from "../../web/components/skeleton";
 
 const duration = 1000;
 

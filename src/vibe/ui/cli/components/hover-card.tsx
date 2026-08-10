@@ -5,14 +5,14 @@ export type {
   HoverCardPortalProps,
   HoverCardRootProps,
   HoverCardTriggerProps,
-} from "../../web/ui/hover-card";
+} from "../../web/components/hover-card";
 
 import type {
   HoverCardContentProps,
   HoverCardPortalProps,
   HoverCardRootProps,
   HoverCardTriggerProps,
-} from "../../web/ui/hover-card";
+} from "../../web/components/hover-card";
 
 export function HoverCard({
   children,

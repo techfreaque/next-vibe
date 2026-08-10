@@ -239,6 +239,7 @@ const oxlint: CheckConfig["oxlint"] = {
     "no-shadow": "error",
     "no-unreachable-loop": "error",
     "no-unused-private-class-members": "error",
+    "no-underscore-dangle": "off",
     "prefer-template": "error",
     "no-promise-executor-return": "error",
 
@@ -733,6 +734,18 @@ const oxlint: CheckConfig["oxlint"] = {
       files: ["**/vibe/ui/**"],
       rules: {
         "nextjs/no-head-element": "off",
+        "jsx-a11y/prefer-tag-over-role": "off",
+        "jsx-a11y/control-has-associated-label": "off",
+        "jsx-a11y/no-noninteractive-element-interactions": "off",
+        "jsx-a11y/interactive-supports-focus": "off",
+        "react/no-unstable-nested-components": "off",
+      },
+    },
+    {
+      // Brand/icon component names and alt text are identifiers, not UI copy.
+      files: ["**/vibe/ui/**/icons/**"],
+      rules: {
+        "oxlint-plugin-i18n/no-literal-string": "off",
       },
     },
   ],

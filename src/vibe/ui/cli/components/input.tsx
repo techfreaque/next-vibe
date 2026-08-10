@@ -3,7 +3,7 @@ import TextInput from "ink-text-input";
 import type { JSX } from "react";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
-import type { InputProps } from "../../web/ui/input";
+import type { InputProps } from "../../web/components/input";
 import { useCliFieldFocus } from "../lib/focus-manager";
 
 export type {
@@ -16,7 +16,7 @@ export type {
   InputMouseEvent,
   InputProps,
   InputRefObject,
-} from "../../web/ui/input";
+} from "../../web/components/input";
 
 const BRACKET_OPEN = "\u005B";
 const BRACKET_CLOSE = "\u005D";

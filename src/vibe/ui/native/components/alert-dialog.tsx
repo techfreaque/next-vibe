@@ -17,7 +17,7 @@ import type {
   AlertDialogRootProps,
   AlertDialogTitleProps,
   AlertDialogTriggerProps,
-} from "../../web/ui/alert-dialog";
+} from "../../web/components/alert-dialog";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 import { buttonTextVariants, buttonVariants } from "./button";

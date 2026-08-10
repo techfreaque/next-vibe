@@ -19,7 +19,7 @@ import type {
   ContextMenuSubProps,
   ContextMenuSubTriggerProps,
   ContextMenuTriggerProps,
-} from "../../web/ui/context-menu";
+} from "../../web/components/context-menu";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { Check } from "./icons/Check";

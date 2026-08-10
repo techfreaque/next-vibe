@@ -966,7 +966,6 @@ export default checkConfig.eslint?.buildFlatConfig?.(
     // Only include valid oxlint schema fields (not CheckConfig metadata like enabled, configPath, cachePath, lintableExtensions)
     const oxlintConfigForFile: {
       $schema?: string;
-      ignorePatterns?: string[];
       plugins?: string[];
       jsPlugins?: string[];
       categories?: typeof oxlintConfig.categories;
@@ -979,9 +978,6 @@ export default checkConfig.eslint?.buildFlatConfig?.(
 
     if (oxlintConfig.$schema !== undefined) {
       oxlintConfigForFile.$schema = oxlintConfig.$schema;
-    }
-    if (oxlintConfig.ignorePatterns !== undefined) {
-      oxlintConfigForFile.ignorePatterns = oxlintConfig.ignorePatterns;
     }
     if (oxlintConfig.plugins !== undefined) {
       oxlintConfigForFile.plugins = oxlintConfig.plugins;

@@ -1,12 +1,12 @@
 import { Box } from "ink";
 import type { JSX } from "react";
 
-import type { MetricGridProps } from "../../web/ui/metric-grid";
+import type { MetricGridProps } from "../../web/components/metric-grid";
 
 export type {
   MetricGridColumns,
   MetricGridProps,
-} from "../../web/ui/metric-grid";
+} from "../../web/components/metric-grid";
 
 export function MetricGrid({ children }: MetricGridProps): JSX.Element {
   return (

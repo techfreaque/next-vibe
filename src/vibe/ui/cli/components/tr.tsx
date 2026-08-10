@@ -3,11 +3,11 @@ import type { JSX } from "react";
 import * as React from "react";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
-import type { TrProps } from "../../web/ui/tr";
+import type { TrProps } from "../../web/components/tr";
 import { useSeparatorLine } from "../hooks/use-separator-width";
 import { parseClassesToBoxProps } from "./tailwind-to-ink";
 
-export type { TrProps } from "../../web/ui/tr";
+export type { TrProps } from "../../web/components/tr";
 
 const CELL_DIVIDER = " | ";
 

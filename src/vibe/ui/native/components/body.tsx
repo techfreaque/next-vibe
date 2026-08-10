@@ -6,7 +6,7 @@ import {
 } from "react-native-safe-area-context";
 
 import { cn } from "../../../unified-ui/_shared/cn";
-import type { BodyProps } from "../../web/ui/body";
+import type { BodyProps } from "../../web/components/body";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 

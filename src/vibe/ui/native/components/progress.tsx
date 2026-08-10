@@ -13,7 +13,7 @@ import { cn } from "../../../unified-ui/_shared/cn";
 import type {
   ProgressIndicatorProps,
   ProgressRootProps,
-} from "../../web/ui/progress";
+} from "../../web/components/progress";
 // Re-export types for consistency
 export type { ProgressIndicatorProps, ProgressRootProps };
 

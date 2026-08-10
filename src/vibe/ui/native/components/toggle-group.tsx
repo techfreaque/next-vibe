@@ -5,11 +5,14 @@ import * as React from "react";
 import { View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
-import { type ToggleSize, type ToggleVariant } from "../../web/ui/toggle";
+import {
+  type ToggleSize,
+  type ToggleVariant,
+} from "../../web/components/toggle";
 import type {
   ToggleGroupItemProps,
   ToggleGroupRootProps,
-} from "../../web/ui/toggle-group";
+} from "../../web/components/toggle-group";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 import { TextClassContext } from "./text";

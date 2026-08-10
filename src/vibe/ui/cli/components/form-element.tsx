@@ -5,12 +5,12 @@ import { forwardRef } from "react";
 import type {
   FormElementProps,
   FormElementRefObject,
-} from "../../web/ui/form-element";
+} from "../../web/components/form-element";
 
 export type {
   FormElementProps,
   FormElementRefObject,
-} from "../../web/ui/form-element";
+} from "../../web/components/form-element";
 
 export const FormElement = forwardRef(function FormElement(
   { children, onSubmit }: FormElementProps,

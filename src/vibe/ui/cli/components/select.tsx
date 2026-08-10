@@ -24,7 +24,7 @@ import type {
   SelectSeparatorProps,
   SelectTriggerProps,
   SelectValueProps,
-} from "../../web/ui/select";
+} from "../../web/components/select";
 import {
   useFocusScopeRegister,
   useOverlayLock,
@@ -41,7 +41,7 @@ export type {
   SelectSeparatorProps,
   SelectTriggerProps,
   SelectValueProps,
-} from "../../web/ui/select";
+} from "../../web/components/select";
 
 interface SelectContextType {
   value: string | undefined;

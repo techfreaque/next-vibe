@@ -22,7 +22,7 @@ import type {
   MotionImgProps,
   MotionSpanProps,
   MotionTransition,
-} from "../../web/ui/motion";
+} from "../../web/components/motion";
 import { applyStyleType } from "../../web/utils/style-type";
 import {
   convertCSSToImageStyle,

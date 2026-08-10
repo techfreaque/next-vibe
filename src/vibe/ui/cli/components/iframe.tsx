@@ -1,4 +1,4 @@
-export type { IframeProps } from "../../web/ui/iframe";
+export type { IframeProps } from "../../web/components/iframe";
 
 export function Iframe(): null {
   return null;

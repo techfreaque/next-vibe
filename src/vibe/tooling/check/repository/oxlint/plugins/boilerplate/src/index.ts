@@ -377,24 +377,23 @@ function isEndpointsHandlerCall(node: OxlintASTNode): boolean {
  *   TSTypeQuery has either .exprName or .argument pointing to an Identifier "enTranslations"
  * We also check declarator.id.typeAnnotation as a fallback.
  */
-function hasTypeofEnTranslations(declarator: VariableDeclarator): boolean {
-  // Walk any node looking for TSTypeQuery { exprName/argument: Identifier "enTranslations" }
-  function isTSTypeQueryForEnTranslations(node: OxlintASTNode): boolean {
-    if (node.type !== "TSTypeQuery") {
-      return false;
-    }
-    const n = node as OxlintASTNode & {
-      exprName?: OxlintASTNode & { name?: string };
-      argument?: OxlintASTNode & { name?: string };
-      typeName?: OxlintASTNode & { name?: string };
-    };
-    return (
-      n.exprName?.name === "enTranslations" ||
-      n.argument?.name === "enTranslations" ||
-      n.typeName?.name === "enTranslations"
-    );
+function isTSTypeQueryForEnTranslations(node: OxlintASTNode): boolean {
+  if (node.type !== "TSTypeQuery") {
+    return false;
   }
+  const queryNode = node as OxlintASTNode & {
+    exprName?: OxlintASTNode & { name?: string };
+    argument?: OxlintASTNode & { name?: string };
+    typeName?: OxlintASTNode & { name?: string };
+  };
+  return (
+    queryNode.exprName?.name === "enTranslations" ||
+    queryNode.argument?.name === "enTranslations" ||
+    queryNode.typeName?.name === "enTranslations"
+  );
+}
 
+function hasTypeofEnTranslations(declarator: VariableDeclarator): boolean {
   // Try declarator.typeAnnotation.typeAnnotation (standard ESTree-TS shape)
   const d = declarator as OxlintASTNode & {
     typeAnnotation?: OxlintASTNode & { typeAnnotation?: OxlintASTNode };

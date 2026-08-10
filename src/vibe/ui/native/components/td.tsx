@@ -2,7 +2,7 @@ import { styled } from "nativewind";
 import * as React from "react";
 import { View } from "react-native";
 
-import type { TdProps } from "../../web/ui/td";
+import type { TdProps } from "../../web/components/td";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 

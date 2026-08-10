@@ -5,10 +5,10 @@
 
 "use client";
 
-import { Check } from "next-vibe/ui/ui/icons/Check";
-import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
-import { Search } from "next-vibe/ui/ui/icons/Search";
-import { X } from "next-vibe/ui/ui/icons/X";
+import { Check } from "next-vibe/ui/components/icons/Check";
+import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
+import { Search } from "next-vibe/ui/components/icons/Search";
+import { X } from "next-vibe/ui/components/icons/X";
 import type { JSX } from "react";
 import React, { useMemo, useState } from "react";
 

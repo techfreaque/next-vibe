@@ -32,7 +32,7 @@ import type {
   SheetRootProps,
   SheetTitleProps,
   SheetTriggerProps,
-} from "../../web/ui/sheet";
+} from "../../web/components/sheet";
 
 const sheetVariants = cva("fixed z-50 gap-4 bg-background p-6 shadow-lg", {
   variants: {

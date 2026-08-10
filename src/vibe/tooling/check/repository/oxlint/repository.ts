@@ -255,11 +255,16 @@ export class OxlintRepository {
     // Check if config exists, if not use default settings
     const configExists = existsSync(oxlintConfigPath);
 
-    // Build extra --ignore-pattern flags for non-extensive mode
-    const ignorePatternArgs =
-      extraIgnorePatterns && extraIgnorePatterns.length > 0
-        ? extraIgnorePatterns.flatMap((p) => ["--ignore-pattern", p])
-        : [];
+    // Always pass ignore patterns on the CLI so they are rooted at the repo
+    // cwd rather than the generated config file directory (.tmp).
+    const allIgnorePatterns = [
+      ...(config.oxlint.enabled ? (config.oxlint.ignorePatterns ?? []) : []),
+      ...(extraIgnorePatterns ?? []),
+    ];
+    const ignorePatternArgs = allIgnorePatterns.flatMap((pattern) => [
+      "--ignore-pattern",
+      pattern,
+    ]);
 
     const threadArgs = OxlintRepository.threadArgs(config);
 

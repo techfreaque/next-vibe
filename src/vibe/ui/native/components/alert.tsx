@@ -10,7 +10,7 @@ import type {
   AlertProps,
   AlertTitleProps,
   AlertVariant,
-} from "../../web/ui/alert";
+} from "../../web/components/alert";
 import { Span } from "./span";
 
 // Re-export types for consistency

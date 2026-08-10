@@ -20,7 +20,7 @@ import { cn } from "../../../unified-ui/_shared/cn";
 import type {
   MarkdownEditorProps,
   ToolbarAction,
-} from "../../web/ui/markdown-editor";
+} from "../../web/components/markdown-editor";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 
@@ -28,7 +28,7 @@ import { convertCSSToViewStyle } from "../utils/style-converter";
 export type {
   MarkdownEditorProps,
   ToolbarAction,
-} from "../../web/ui/markdown-editor";
+} from "../../web/components/markdown-editor";
 
 const StyledView = styled(View, { className: "style" });
 const StyledTextInput = styled(TextInput, { className: "style" });

@@ -2,12 +2,12 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
-import type { LoadingBlockProps } from "../../web/ui/loading-block";
+import type { LoadingBlockProps } from "../../web/components/loading-block";
 
 export type {
   LoadingBlockProps,
   LoadingBlockSize,
-} from "../../web/ui/loading-block";
+} from "../../web/components/loading-block";
 
 const SPINNER_DOT = "\u25CF";
 

@@ -1,7 +1,7 @@
 import { Box } from "ink";
 import * as React from "react";
 
-import type { NavProps } from "../../web/ui/nav";
+import type { NavProps } from "../../web/components/nav";
 import { parseClassesToInkProps } from "./tailwind-to-ink";
 
 export function Nav({

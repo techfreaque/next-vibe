@@ -10,7 +10,7 @@ import type {
   CardHeaderProps,
   CardProps,
   CardTitleProps,
-} from "../../web/ui/card";
+} from "../../web/components/card";
 import { applyStyleType } from "../../web/utils/style-type";
 import {
   convertCSSToTextStyle,

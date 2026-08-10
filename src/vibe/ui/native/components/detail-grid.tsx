@@ -5,14 +5,14 @@ import { cn } from "../../../unified-ui/_shared/cn";
 import type {
   DetailFieldProps,
   DetailGridProps,
-} from "../../web/ui/detail-grid";
+} from "../../web/components/detail-grid";
 import { Text } from "./text";
 
 export type {
   DetailFieldProps,
   DetailGridColumns,
   DetailGridProps,
-} from "../../web/ui/detail-grid";
+} from "../../web/components/detail-grid";
 
 const StyledView = styled(View, { className: "style" });
 

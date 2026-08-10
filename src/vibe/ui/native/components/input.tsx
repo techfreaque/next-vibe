@@ -11,7 +11,7 @@ import type {
   InputGenericTarget,
   InputProps as InputBaseProps,
   InputRefObject,
-} from "../../web/ui/input";
+} from "../../web/components/input";
 import type { StyleType } from "../../web/utils/style-type";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToTextStyle } from "../utils/style-converter";

@@ -11,7 +11,7 @@ import type { JSX } from "react";
 import type {
   FormFieldGroupProps,
   FormSectionProps,
-} from "../../../web/ui/form/form-section";
+} from "../../../web/components/form/form-section";
 import { Div } from "../div";
 import { Span } from "../span";
 import { H2, H3, P } from "../typography";

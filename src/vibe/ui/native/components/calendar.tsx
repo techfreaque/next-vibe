@@ -4,7 +4,7 @@ import { Text as RNText, View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
 // Import ALL types from web version (web is source of truth)
-import type { CalendarProps, DateRange } from "../../web/ui/calendar";
+import type { CalendarProps, DateRange } from "../../web/components/calendar";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 

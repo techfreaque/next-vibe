@@ -6,8 +6,8 @@
 
 "use client";
 
-import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
-import { Calendar } from "next-vibe/ui/ui/icons/Calendar";
+import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
+import { Calendar } from "next-vibe/ui/components/icons/Calendar";
 import type { JSX } from "react";
 import type {
   Control,

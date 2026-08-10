@@ -15,7 +15,6 @@ import {
   getNextAppDir,
   getSrcDir,
   getUiDir,
-  getVibeDir,
 } from "@/env/paths";
 
 import type { ApiSection } from "../../../../core/definition/endpoint-base";

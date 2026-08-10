@@ -14,7 +14,7 @@ import type { JSX } from "react";
 
 import { cn } from "../../../../unified-ui/_shared/cn";
 // Import all public types from web version (web is source of truth)
-import type { FormAlertProps } from "../../../web/ui/form/form-alert";
+import type { FormAlertProps } from "../../../web/components/form/form-alert";
 import { convertCSSToViewStyle } from "../../utils/style-converter";
 import { Alert, AlertDescription, AlertTitle } from "../alert";
 

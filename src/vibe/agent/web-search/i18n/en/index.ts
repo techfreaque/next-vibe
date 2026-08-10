@@ -83,6 +83,15 @@ export const translations = {
         },
       },
     },
+    widget: {
+      aiDefaultLabel: "AI default:",
+      switchTo: "Switch to",
+      separatorDot: "·",
+      braveBanner: "Your AI searches with Kagi",
+      kagiBanner: "Your AI searches with Brave",
+      useBrave: "Use Brave",
+      useKagi: "Use Kagi",
+    },
     errors: {
       queryEmpty: {
         title: "Search query is required",

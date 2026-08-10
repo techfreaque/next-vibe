@@ -2,8 +2,8 @@ import { styled } from "nativewind";
 import { View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
-import type { BadgeProps } from "../../web/ui/badge";
-import { badgeTextVariants, badgeVariants } from "../../web/ui/badge";
+import type { BadgeProps } from "../../web/components/badge";
+import { badgeTextVariants, badgeVariants } from "../../web/components/badge";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 import { Text, TextClassContext } from "./text";

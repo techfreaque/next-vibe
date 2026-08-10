@@ -10,7 +10,7 @@ import type {
   SpanMouseEvent,
   SpanProps as SpanBaseProps,
   SpanRefObject,
-} from "../../web/ui/span";
+} from "../../web/components/span";
 import type { StyleType } from "../../web/utils/style-type";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToTextStyle, styledNative } from "../utils/style-converter";

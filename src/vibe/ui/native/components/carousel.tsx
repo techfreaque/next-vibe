@@ -11,7 +11,7 @@ import type {
   CarouselContentProps,
   CarouselItemProps,
   CarouselProps,
-} from "../../web/ui/carousel";
+} from "../../web/components/carousel";
 import { applyStyleType } from "../../web/utils/style-type";
 import {
   convertCSSToViewStyle,

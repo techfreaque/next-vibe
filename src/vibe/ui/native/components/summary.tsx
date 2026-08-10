@@ -5,7 +5,7 @@ import * as React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
-import type { SummaryProps } from "../../web/ui/summary";
+import type { SummaryProps } from "../../web/components/summary";
 import { convertCSSToTextStyle } from "../utils/style-converter";
 import { DetailsContext } from "./details";
 

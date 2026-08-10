@@ -1,10 +1,10 @@
 import { Text } from "ink";
 import type { JSX } from "react";
 
-import type { TdProps } from "../../web/ui/td";
+import type { TdProps } from "../../web/components/td";
 import { parseClassesToTextProps } from "./tailwind-to-ink";
 
-export type { TdProps } from "../../web/ui/td";
+export type { TdProps } from "../../web/components/td";
 
 export function Td({
   className,

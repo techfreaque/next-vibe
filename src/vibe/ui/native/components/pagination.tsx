@@ -5,9 +5,9 @@ import { Pressable, Text as RNText, View } from "react-native";
 import { useTranslation } from "../../../core/i18n/core/client";
 import { cn } from "../../../unified-ui/_shared/cn";
 import { uiScopedTranslation } from "../../web/i18n";
-import { ChevronLeftIcon } from "../../web/ui/icons/ChevronLeftIcon";
-import { ChevronRightIcon } from "../../web/ui/icons/ChevronRightIcon";
-import { DotsHorizontalIcon } from "../../web/ui/icons/DotsHorizontalIcon";
+import { ChevronLeftIcon } from "../../web/components/icons/ChevronLeftIcon";
+import { ChevronRightIcon } from "../../web/components/icons/ChevronRightIcon";
+import { DotsHorizontalIcon } from "../../web/components/icons/DotsHorizontalIcon";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { buttonVariants } from "./button";
@@ -25,7 +25,7 @@ import type {
   PaginationNextProps,
   PaginationPreviousProps,
   PaginationProps,
-} from "../../web/ui/pagination";
+} from "../../web/components/pagination";
 
 const Pagination = ({
   className,

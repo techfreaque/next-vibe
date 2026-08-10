@@ -25,7 +25,7 @@ export type {
   PopoverPortalProps,
   PopoverRootProps,
   PopoverTriggerProps,
-} from "../../web/ui/popover";
+} from "../../web/components/popover";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type {
@@ -35,7 +35,7 @@ import type {
   PopoverPortalProps,
   PopoverRootProps,
   PopoverTriggerProps,
-} from "../../web/ui/popover";
+} from "../../web/components/popover";
 import {
   FocusScopeProvider,
   useFocusScopeRegister,

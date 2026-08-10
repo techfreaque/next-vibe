@@ -3,7 +3,7 @@ import * as React from "react";
 import { View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
-import type { NumberInputProps } from "../../web/ui/number-input";
+import type { NumberInputProps } from "../../web/components/number-input";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 import { Button } from "./button";

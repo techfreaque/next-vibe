@@ -9,7 +9,7 @@ import type {
   TooltipProviderProps,
   TooltipRootProps,
   TooltipTriggerProps,
-} from "../../web/ui/tooltip";
+} from "../../web/components/tooltip";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 import { TextClassContext } from "./text";

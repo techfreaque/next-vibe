@@ -10,7 +10,7 @@ export type {
   NavigationMenuTriggerProps,
   NavigationMenuTriggerStyleProps,
   NavigationMenuViewportProps,
-} from "../../web/ui/navigation-menu";
+} from "../../web/components/navigation-menu";
 
 import { cva } from "class-variance-authority";
 
@@ -23,7 +23,7 @@ import type {
   NavigationMenuListProps,
   NavigationMenuProps,
   NavigationMenuTriggerProps,
-} from "../../web/ui/navigation-menu";
+} from "../../web/components/navigation-menu";
 
 export function NavigationMenu({
   children,

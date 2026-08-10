@@ -33,9 +33,9 @@ import type { IconKey } from "../../../../unified-ui/widgets/form-fields/icon-fi
 import type {
   EndpointFormFieldProps,
   FormFieldError,
-} from "../../../web/ui/form/endpoint-form-field";
-import { AlertCircle } from "../../../web/ui/icons/AlertCircle";
-import { Calendar } from "../../../web/ui/icons/Calendar";
+} from "../../../web/components/form/endpoint-form-field";
+import { AlertCircle } from "../../../web/components/icons/AlertCircle";
+import { Calendar } from "../../../web/components/icons/Calendar";
 import { safeGetRequiredFields } from "../../../zod-required-fields";
 import { convertCSSToViewStyle } from "../../utils/style-converter";
 import { AutocompleteField } from "../autocomplete-field";

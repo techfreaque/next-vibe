@@ -8,7 +8,6 @@
 import chalk from "chalk";
 import { Box, Text, useApp, useInput, useStdin } from "ink";
 import TextInput from "ink-text-input";
-import { makeHeadlessContext } from "next-vibe/core/execution-context";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -245,7 +244,6 @@ function CliEditor({ value, onDone }: EditorProps): JSX.Element {
   const user = useWidgetUser();
   const locale = useWidgetLocale();
   const logger = useWidgetLogger();
-  const platform = useWidgetPlatform();
   const t = useWidgetTranslation<typeof endpoints.GET>() as (
     k: string,
   ) => string;
@@ -293,8 +291,12 @@ function CliEditor({ value, onDone }: EditorProps): JSX.Element {
     try {
       const { SystemSettingsRepository } = await import("./repository");
       const { scopedTranslation: settingsT } = await import("./i18n");
-      const { t } = settingsT.scopedT(locale);
-      await SystemSettingsRepository.patchSettings(edits, logger, t);
+      const { t: settingsTranslate } = settingsT.scopedT(locale);
+      await SystemSettingsRepository.patchSettings(
+        edits,
+        logger,
+        settingsTranslate,
+      );
       setSaveMsg("Saved \u2713");
       setEdits({});
     } catch {
@@ -302,7 +304,7 @@ function CliEditor({ value, onDone }: EditorProps): JSX.Element {
     } finally {
       setSaving(false);
     }
-  }, [edits, user, locale, logger, platform]);
+  }, [edits, user, locale, logger]);
 
   // Navigation, shortcuts, and escape-to-cancel
   useInput(
@@ -651,7 +653,6 @@ function CliWizard({ value, onDone }: WizardProps): JSX.Element {
   const user = useWidgetUser();
   const locale = useWidgetLocale();
   const logger = useWidgetLogger();
-  const platform = useWidgetPlatform();
   const t = useWidgetTranslation<typeof endpoints.GET>() as (
     k: string,
   ) => string;
@@ -700,15 +701,19 @@ function CliWizard({ value, onDone }: WizardProps): JSX.Element {
     try {
       const { SystemSettingsRepository } = await import("./repository");
       const { scopedTranslation: settingsT } = await import("./i18n");
-      const { t } = settingsT.scopedT(locale);
-      await SystemSettingsRepository.patchSettings(toSave, logger, t);
+      const { t: settingsTranslate } = settingsT.scopedT(locale);
+      await SystemSettingsRepository.patchSettings(
+        toSave,
+        logger,
+        settingsTranslate,
+      );
       setSaveMsg("Saved ✓");
     } catch {
       setSaveMsg("Save failed");
     } finally {
       setSaving(false);
     }
-  }, [step, edits, user, locale, logger, platform]);
+  }, [step, edits, user, locale, logger]);
 
   const advanceField = useCallback((): void => {
     if (fieldIdx < stepFields.length - 1) {
@@ -1008,8 +1013,11 @@ export function SystemSettingsPatchWidget(): JSX.Element {
       try {
         const { SystemSettingsRepository } = await import("./repository");
         const { scopedTranslation: settingsT } = await import("./i18n");
-        const { t } = settingsT.scopedT(locale);
-        const result = await SystemSettingsRepository.getSettings(logger, t);
+        const { t: settingsTranslate } = settingsT.scopedT(locale);
+        const result = await SystemSettingsRepository.getSettings(
+          logger,
+          settingsTranslate,
+        );
         if (result.success) {
           const value = result.data;
           // Always open wizard when invoked via `vibe init` - either because

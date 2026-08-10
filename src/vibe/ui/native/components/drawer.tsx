@@ -20,7 +20,7 @@ import type {
   DrawerTitleProps,
   DrawerTriggerProps,
   DrawerTriggerRefObject,
-} from "../../web/ui/drawer";
+} from "../../web/components/drawer";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 

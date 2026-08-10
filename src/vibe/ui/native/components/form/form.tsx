@@ -22,7 +22,7 @@ import type {
   FormMessageProps,
   FormProps,
   UseFormFieldReturn,
-} from "../../../web/ui/form/form";
+} from "../../../web/components/form/form";
 import { Label } from "../label";
 import { P } from "../typography";
 

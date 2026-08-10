@@ -6,14 +6,14 @@ import type {
   AccordionItemProps,
   AccordionProps,
   AccordionTriggerProps,
-} from "../../web/ui/accordion";
+} from "../../web/components/accordion";
 
 export type {
   AccordionContentProps,
   AccordionItemProps,
   AccordionProps,
   AccordionTriggerProps,
-} from "../../web/ui/accordion";
+} from "../../web/components/accordion";
 
 // CLI: always expanded - no interactivity in terminal
 

@@ -14,7 +14,7 @@ import type {
   TableHeadProps,
   TableProps,
   TableRowProps,
-} from "../../web/ui/table";
+} from "../../web/components/table";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { TextClassContext } from "./text";

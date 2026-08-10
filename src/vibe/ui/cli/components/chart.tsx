@@ -20,7 +20,7 @@ export type {
   PayloadItem,
   PieProps,
   ThemeKeys,
-} from "../../web/ui/chart";
+} from "../../web/components/chart";
 
 export function useChart(): ChartContextProps {
   // CLI stub - chart context is never used in terminal rendering
@@ -39,7 +39,7 @@ import type {
   ChartTooltipContentProps,
   LineProps,
   PieProps,
-} from "../../web/ui/chart";
+} from "../../web/components/chart";
 
 export function ChartContainer<TData extends ChartDataPoint = ChartDataPoint>({
   children,

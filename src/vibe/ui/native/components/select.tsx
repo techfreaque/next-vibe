@@ -16,7 +16,7 @@ import type {
   SelectSeparatorProps,
   SelectTriggerProps,
   SelectValueProps,
-} from "../../web/ui/select";
+} from "../../web/components/select";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { Check, ChevronDown, ChevronUp } from "./icons";

@@ -4,7 +4,7 @@ import { Children, isValidElement, type JSX, type ReactNode } from "react";
 import { Text as RNText, View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
-import type { LinkProps } from "../../web/ui/link";
+import type { LinkProps } from "../../web/components/link";
 
 const StyledText = styled(RNText, {
   className: "style",

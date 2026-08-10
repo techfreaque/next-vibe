@@ -9,9 +9,8 @@ import type {
   CommandItemProps,
   CommandListProps,
   CommandProps,
-  CommandSeparatorProps,
   CommandShortcutProps,
-} from "../../web/ui/command";
+} from "../../web/components/command";
 
 export type {
   CommandDialogProps,
@@ -23,7 +22,7 @@ export type {
   CommandProps,
   CommandSeparatorProps,
   CommandShortcutProps,
-} from "../../web/ui/command";
+} from "../../web/components/command";
 
 // CLI: passthrough wrappers - command UI has no terminal equivalent
 // but child content (items, groups) should still render

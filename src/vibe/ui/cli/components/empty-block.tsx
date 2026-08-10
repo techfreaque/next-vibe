@@ -2,12 +2,12 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
-import type { EmptyBlockProps } from "../../web/ui/empty-block";
+import type { EmptyBlockProps } from "../../web/components/empty-block";
 
 export type {
   EmptyBlockAction,
   EmptyBlockProps,
-} from "../../web/ui/empty-block";
+} from "../../web/components/empty-block";
 
 export function EmptyBlock({ title, message }: EmptyBlockProps): JSX.Element {
   const isMcp = useIsMcp();

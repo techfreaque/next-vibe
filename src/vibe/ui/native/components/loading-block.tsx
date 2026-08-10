@@ -5,13 +5,13 @@ import { cn } from "../../../unified-ui/_shared/cn";
 import type {
   LoadingBlockProps,
   LoadingBlockSize,
-} from "../../web/ui/loading-block";
+} from "../../web/components/loading-block";
 import { Text } from "./text";
 
 export type {
   LoadingBlockProps,
   LoadingBlockSize,
-} from "../../web/ui/loading-block";
+} from "../../web/components/loading-block";
 
 const StyledView = styled(View, { className: "style" });
 

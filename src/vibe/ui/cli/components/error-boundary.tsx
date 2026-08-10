@@ -6,13 +6,13 @@ export type {
   ErrorBoundaryProps,
   ErrorBoundaryState,
   ErrorFallbackProps,
-} from "../../web/ui/error-boundary";
+} from "../../web/components/error-boundary";
 
 import type {
   ErrorBoundaryProps,
   ErrorBoundaryState,
   ErrorFallbackProps,
-} from "../../web/ui/error-boundary";
+} from "../../web/components/error-boundary";
 
 // ─── Default Error Fallback (CLI) ─────────────────────────────────────────────
 

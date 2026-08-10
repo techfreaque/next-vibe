@@ -6,13 +6,13 @@ import type {
   CollapsibleContentProps,
   CollapsibleProps,
   CollapsibleTriggerProps,
-} from "../../web/ui/collapsible";
+} from "../../web/components/collapsible";
 
 export type {
   CollapsibleContentProps,
   CollapsibleProps,
   CollapsibleTriggerProps,
-} from "../../web/ui/collapsible";
+} from "../../web/components/collapsible";
 
 // CLI: always expanded - no interactivity in terminal
 

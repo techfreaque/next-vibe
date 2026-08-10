@@ -95,6 +95,29 @@ export async function resolveCallerFieldDefaults(params: {
   return input;
 }
 
+async function marshalWireValue(value: WidgetData): Promise<WidgetData> {
+  if (value instanceof File) {
+    return {
+      filename: value.name,
+      mimeType: value.type,
+      data: Buffer.from(await value.arrayBuffer()).toString("base64"),
+    };
+  }
+  if (Array.isArray(value)) {
+    return Promise.all(value.map((item) => marshalWireValue(item)));
+  }
+  if (value !== null && typeof value === "object" && !(value instanceof Date)) {
+    const entries = await Promise.all(
+      Object.entries(value).map(async ([key, entryValue]) => [
+        key,
+        await marshalWireValue(entryValue),
+      ]),
+    );
+    return Object.fromEntries(entries) as WidgetData;
+  }
+  return value;
+}
+
 /**
  * Recursively convert File instances inside a wire payload to the base64
  * object shape ({ filename, mimeType, data }) that endpoint file-field
@@ -108,33 +131,5 @@ export async function marshalFilesForWire(
   if (input === null) {
     return null;
   }
-  const marshalValue = async (value: WidgetData): Promise<WidgetData> => {
-    if (value instanceof File) {
-      return {
-        filename: value.name,
-        mimeType: value.type,
-        data: Buffer.from(await value.arrayBuffer()).toString("base64"),
-      };
-    }
-    if (Array.isArray(value)) {
-      return Promise.all(value.map((item) => marshalValue(item)));
-    }
-    if (
-      value !== null &&
-      typeof value === "object" &&
-      !(value instanceof Date)
-    ) {
-      const out: Record<string, WidgetData> = {};
-      for (const [k, v] of Object.entries(value)) {
-        out[k] = await marshalValue(v);
-      }
-      return out;
-    }
-    return value;
-  };
-  const result: Record<string, WidgetData> = {};
-  for (const [key, value] of Object.entries(input)) {
-    result[key] = await marshalValue(value);
-  }
-  return result;
+  return (await marshalWireValue(input)) as Record<string, WidgetData>;
 }

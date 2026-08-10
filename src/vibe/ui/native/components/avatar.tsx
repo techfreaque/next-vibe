@@ -7,7 +7,7 @@ import type {
   AvatarFallbackProps,
   AvatarImageProps,
   AvatarRootProps,
-} from "../../web/ui/avatar";
+} from "../../web/components/avatar";
 import { styledNative } from "../utils/style-converter";
 
 // Re-export types for consistency

@@ -196,7 +196,7 @@ const { GET } = createEndpoint({
       usedProvider: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "get.response.provider.title" as const,
-        schema: z.string(),
+        schema: z.enum(SearchProviderDB),
       }),
 
       output: responseField(scopedTranslation, {

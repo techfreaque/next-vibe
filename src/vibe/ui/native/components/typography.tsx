@@ -17,7 +17,7 @@ import type {
   MutedProps,
   PProps,
   SmallProps,
-} from "../../web/ui/typography";
+} from "../../web/components/typography";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToTextStyle } from "../utils/style-converter";
 

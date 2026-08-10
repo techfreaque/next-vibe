@@ -2,9 +2,15 @@ import { Text } from "ink";
 import type { JSX } from "react";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
-import type { CountryData, PhoneFieldProps } from "../../web/ui/phone-field";
+import type {
+  CountryData,
+  PhoneFieldProps,
+} from "../../web/components/phone-field";
 
-export type { CountryData, PhoneFieldProps } from "../../web/ui/phone-field";
+export type {
+  CountryData,
+  PhoneFieldProps,
+} from "../../web/components/phone-field";
 // COUNTRIES is a large data array only needed for web phone input UI
 export const COUNTRIES: CountryData[] = [];
 

@@ -3,7 +3,7 @@ import TextInput from "ink-text-input";
 import type { JSX } from "react";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
-import type { TextareaProps } from "../../web/ui/textarea";
+import type { TextareaProps } from "../../web/components/textarea";
 import { useCliFieldFocus } from "../lib/focus-manager";
 
 export type {
@@ -14,7 +14,7 @@ export type {
   TextareaKeyboardEvent,
   TextareaProps,
   TextareaRefObject,
-} from "../../web/ui/textarea";
+} from "../../web/components/textarea";
 
 import { cva } from "class-variance-authority";
 

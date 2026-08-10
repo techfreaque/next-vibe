@@ -7,7 +7,7 @@ import { View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
 // Import ALL types from web - ZERO definitions here
-import type { ContainerProps } from "../../web/ui/container";
+import type { ContainerProps } from "../../web/components/container";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 

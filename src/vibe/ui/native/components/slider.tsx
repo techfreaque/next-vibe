@@ -11,7 +11,7 @@ import type {
   SliderRootProps,
   SliderThumbProps,
   SliderTrackProps,
-} from "../../web/ui/slider";
+} from "../../web/components/slider";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 

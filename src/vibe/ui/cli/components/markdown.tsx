@@ -4,9 +4,9 @@
 import { Text } from "ink";
 import type { JSX } from "react";
 
-import type { MarkdownProps } from "../../web/ui/markdown";
+import type { MarkdownProps } from "../../web/components/markdown";
 
-export type { MarkdownProps } from "../../web/ui/markdown";
+export type { MarkdownProps } from "../../web/components/markdown";
 
 function stripMarkdown(content: string): string {
   return (

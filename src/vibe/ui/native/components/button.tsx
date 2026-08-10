@@ -2,8 +2,14 @@ import * as React from "react";
 import { Pressable, Text as RNText } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
-import type { ButtonMouseEvent, ButtonProps } from "../../web/ui/button";
-import { buttonTextVariants, buttonVariants } from "../../web/ui/button";
+import type {
+  ButtonMouseEvent,
+  ButtonProps,
+} from "../../web/components/button";
+import {
+  buttonTextVariants,
+  buttonVariants,
+} from "../../web/components/button";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 

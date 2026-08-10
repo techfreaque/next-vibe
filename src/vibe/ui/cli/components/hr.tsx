@@ -2,7 +2,7 @@ import { Text } from "ink";
 import * as React from "react";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
-import type { HrProps } from "../../web/ui/hr";
+import type { HrProps } from "../../web/components/hr";
 import { useSeparatorLine } from "../hooks/use-separator-width";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

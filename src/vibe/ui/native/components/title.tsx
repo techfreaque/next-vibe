@@ -6,7 +6,7 @@ import type { TextStyle } from "react-native";
 import { Text as RNText } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
-import type { TitleProps } from "../../web/ui/title";
+import type { TitleProps } from "../../web/components/title";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToTextStyle } from "../utils/style-converter";
 

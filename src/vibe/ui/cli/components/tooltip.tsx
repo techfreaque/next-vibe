@@ -18,14 +18,14 @@ export type {
   TooltipProviderProps,
   TooltipRootProps,
   TooltipTriggerProps,
-} from "../../web/ui/tooltip";
+} from "../../web/components/tooltip";
 
 import type {
   TooltipContentProps,
   TooltipProviderProps,
   TooltipRootProps,
   TooltipTriggerProps,
-} from "../../web/ui/tooltip";
+} from "../../web/components/tooltip";
 
 export function TooltipProvider({
   children,

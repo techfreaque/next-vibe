@@ -5,12 +5,12 @@ import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type {
   ToggleGroupItemProps,
   ToggleGroupRootProps,
-} from "../../web/ui/toggle-group";
+} from "../../web/components/toggle-group";
 
 export type {
   ToggleGroupItemProps,
   ToggleGroupRootProps,
-} from "../../web/ui/toggle-group";
+} from "../../web/components/toggle-group";
 
 // CLI: render group as a box of items
 export function ToggleGroup({ children }: ToggleGroupRootProps): JSX.Element {

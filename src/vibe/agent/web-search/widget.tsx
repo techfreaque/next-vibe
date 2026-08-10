@@ -23,6 +23,7 @@ import { Span } from "next-vibe/ui/components/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetForm,
+  useWidgetLocale,
   useWidgetLogger,
   useWidgetTranslation,
   useWidgetUser,
@@ -40,16 +41,21 @@ import { useChatSettings } from "../chat/settings/hooks";
 import type definition from "./definition";
 import type { WebSearchGetRequestOutput } from "./definition";
 import { SearchProvider } from "./enum";
+import { scopedTranslation } from "./i18n";
 
 interface CustomWidgetProps {
   field: (typeof definition.GET)["fields"];
 }
 
 type Provider = WebSearchGetRequestOutput["provider"];
+type ProviderTabKey = typeof SearchProvider.BRAVE | typeof SearchProvider.KAGI;
 
-const PROVIDER_TABS: { value: NonNullable<Provider>; label: string }[] = [
-  { value: SearchProvider.BRAVE, label: "Brave" },
-  { value: SearchProvider.KAGI, label: "Kagi" },
+const PROVIDER_TABS: Array<{
+  value: NonNullable<Provider>;
+  label: ProviderTabKey;
+}> = [
+  { value: SearchProvider.BRAVE, label: SearchProvider.BRAVE },
+  { value: SearchProvider.KAGI, label: SearchProvider.KAGI },
 ];
 
 function ProviderTabs({
@@ -59,6 +65,8 @@ function ProviderTabs({
   value: Provider;
   onChange: (v: Provider) => void;
 }): JSX.Element {
+  const locale = useWidgetLocale();
+  const { t: widgetT } = scopedTranslation.scopedT(locale);
   return (
     <Div className="flex items-center gap-1">
       {PROVIDER_TABS.map((tab) => (
@@ -70,7 +78,7 @@ function ProviderTabs({
           className="h-7 px-3 text-xs rounded-full"
           onClick={(): void => onChange(tab.value)}
         >
-          {tab.label}
+          {widgetT(tab.label)}
         </Button>
       ))}
     </Div>
@@ -80,6 +88,8 @@ function ProviderTabs({
 function DefaultProviderControl(): JSX.Element | null {
   const user = useWidgetUser();
   const logger = useWidgetLogger();
+  const locale = useWidgetLocale();
+  const { t: widgetT } = scopedTranslation.scopedT(locale);
   const { settings, updateSettings } = useChatSettings(user, logger);
 
   if (settings === null) {
@@ -91,15 +101,18 @@ function DefaultProviderControl(): JSX.Element | null {
     currentDefault === SearchProvider.BRAVE
       ? SearchProvider.KAGI
       : SearchProvider.BRAVE;
-  const otherLabel = otherProvider === SearchProvider.BRAVE ? "Brave" : "Kagi";
-  const currentLabel =
-    currentDefault === SearchProvider.BRAVE ? "Brave" : "Kagi";
+  const otherLabelKey: ProviderTabKey = otherProvider;
+  const currentLabelKey: ProviderTabKey =
+    currentDefault === SearchProvider.KAGI
+      ? SearchProvider.KAGI
+      : SearchProvider.BRAVE;
 
   return (
     <Div className="flex items-center gap-2 text-xs text-muted-foreground">
       <Star className="h-3 w-3 shrink-0" />
-      {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
-      <Span>AI default: {currentLabel}</Span>
+      <Span>
+        {widgetT("get.widget.aiDefaultLabel")} {widgetT(currentLabelKey)}
+      </Span>
       <Button
         type="button"
         variant="outline"
@@ -109,8 +122,7 @@ function DefaultProviderControl(): JSX.Element | null {
           void updateSettings({ searchProvider: otherProvider });
         }}
       >
-        {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
-        Switch to {otherLabel}
+        {widgetT("get.widget.switchTo")} {widgetT(otherLabelKey)}
       </Button>
     </Div>
   );
@@ -127,6 +139,8 @@ function ResultCard({
     source?: string | null;
   };
 }): JSX.Element {
+  const locale = useWidgetLocale();
+  const { t: widgetT } = scopedTranslation.scopedT(locale);
   let hostname = result.url;
   try {
     hostname = new URL(result.url).hostname.replace(/^www\./, "");
@@ -160,8 +174,7 @@ function ResultCard({
                 <Span className="truncate">{hostname}</Span>
                 {result.age ? (
                   <>
-                    {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
-                    <Span>·</Span>
+                    <Span>{widgetT("get.widget.separatorDot")}</Span>
                     <Div className="flex items-center gap-1 shrink-0">
                       <Clock className="h-3 w-3" />
                       <Span>{result.age}</Span>
@@ -170,8 +183,7 @@ function ResultCard({
                 ) : null}
                 {result.source ? (
                   <>
-                    {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
-                    <Span>·</Span>
+                    <Span>{widgetT("get.widget.separatorDot")}</Span>
                     <Span className="shrink-0">{result.source}</Span>
                   </>
                 ) : null}
@@ -189,7 +201,9 @@ export function WebSearchResultsContainer({
 }: CustomWidgetProps): JSX.Element {
   const value = useWidgetValue<typeof definition.GET>();
   const children = field.children;
+  const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.GET>();
+  const { t: widgetT } = scopedTranslation.scopedT(locale);
   const form = useWidgetForm<typeof definition.GET>();
 
   const results = value?.results ?? [];
@@ -221,8 +235,7 @@ export function WebSearchResultsContainer({
           <Div className="flex items-center gap-2">
             <Search className="h-8 w-8 text-primary" />
             <Span className="text-3xl font-bold tracking-tight">
-              {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
-              Web Search
+              {t("get.titleShort")}
             </Span>
           </Div>
           <Span className="text-sm text-muted-foreground">
@@ -283,8 +296,7 @@ export function WebSearchResultsContainer({
             {value?.usedProvider ? (
               <Badge variant="secondary" className="text-xs font-normal">
                 {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
-                via{" "}
-                {value.usedProvider === SearchProvider.BRAVE ? "Brave" : "Kagi"}
+                via {widgetT(value.usedProvider)}
               </Badge>
             ) : null}
             <DefaultProviderControl />

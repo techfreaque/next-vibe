@@ -2,7 +2,7 @@ import * as React from "react";
 import { type AccessibilityRole, Pressable, View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
-import type { LiMouseEvent, LiProps } from "../../web/ui/li";
+import type { LiMouseEvent, LiProps } from "../../web/components/li";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 

@@ -3,7 +3,7 @@
  *
  * Returns a BunPlugin that redirects UI imports to their CLI counterparts:
  *
- * Rule 1: next-vibe/ui/{ui,hooks,utils}/* → cli/{ui,hooks,utils}/*
+ * Rule 1: next-vibe/ui/{components,hooks,utils,lib}/* → cli/{components,hooks,utils,lib}/*
  *   Bun resolves tsconfig paths before plugins, so "next-vibe/ui/components/foo"
  *   arrives as an absolute path to web/components/foo.tsx in onLoad. We intercept
  *   there and serve the cli/components counterpart's contents instead.
@@ -55,6 +55,34 @@ function rebaseRelativeImports(
   );
 }
 
+function resolveCliSiblingPath(
+  path: string,
+  importer: string | undefined,
+): { path: string } | undefined {
+  if (!path.startsWith(".") || !importer) {
+    return undefined;
+  }
+  const abs = resolve(dirname(importer), path);
+  for (const srcExt of ["", ".ts", ".tsx"] as const) {
+    const full = abs + srcExt;
+    if (!existsSync(full)) {
+      continue;
+    }
+    const base = full.endsWith(".tsx")
+      ? full.slice(0, -4)
+      : full.endsWith(".ts")
+        ? full.slice(0, -3)
+        : full;
+    for (const cliExt of [".cli.ts", ".cli.tsx"] as const) {
+      if (existsSync(base + cliExt)) {
+        return { path: base + cliExt };
+      }
+    }
+    break;
+  }
+  return undefined;
+}
+
 /**
  * @param _rootDir - Deprecated. Previously the project root, used to build the
  *   web/cli base paths. After the UI refactor these dirs live next to this
@@ -75,7 +103,7 @@ export function createCliWidgetPlugin(_rootDir?: string): BunPlugin {
   const WEB_BASE = toPosix(resolve(UI_BASE, "web"));
   const CLI_BASE = toPosix(resolve(UI_BASE, "cli"));
   // Directories where cli/ mirrors web/ structure
-  const MIRRORED_DIRS = ["ui", "hooks", "utils", "lib"] as const;
+  const MIRRORED_DIRS = ["components", "hooks", "utils", "lib"] as const;
 
   return {
     name: "cli-overrides", // eslint-disable-line i18next/no-literal-string
@@ -83,7 +111,7 @@ export function createCliWidgetPlugin(_rootDir?: string): BunPlugin {
     setup(build) {
       build.onLoad({ filter: /\.tsx$/ }, ({ path }) => {
         const posixPath = toPosix(path);
-        // Rule 1: web/{ui,hooks,utils}/*.tsx → serve cli/{…}/*.{tsx,ts} contents
+        // Rule 1: web/{components,hooks,utils,lib}/*.tsx → serve cli/{…}/*.{tsx,ts} contents
         for (const dir of MIRRORED_DIRS) {
           const webDir = `${WEB_BASE}/${dir}/`;
           if (posixPath.startsWith(webDir)) {
@@ -129,11 +157,11 @@ export function createCliWidgetPlugin(_rootDir?: string): BunPlugin {
         return { contents: readFileSync(path, "utf-8"), loader: "tsx" }; // eslint-disable-line i18next/no-literal-string
       });
 
-      // Rule 1 (.ts): web/{hooks,utils}/*.ts → serve cli/{…}/*.ts contents
+      // Rule 1 (.ts): web/{components,hooks,utils,lib}/*.ts → serve cli/{…}/*.ts contents
       // Narrow filter to only match files inside the web base directory
       const webBaseEscaped = WEB_BASE.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&"); // eslint-disable-line no-useless-escape
       const tsFilter = new RegExp(
-        `${webBaseEscaped}/(hooks|utils|lib)/.*\\.ts$`,
+        `${webBaseEscaped}/(components|hooks|utils|lib)/.*\\.ts$`,
       );
       build.onLoad({ filter: tsFilter }, ({ path }) => {
         const posixPath = toPosix(path);
@@ -170,43 +198,13 @@ export function createCliWidgetPlugin(_rootDir?: string): BunPlugin {
         return { contents: readFileSync(path, "utf-8"), loader: "ts" }; // eslint-disable-line i18next/no-literal-string
       });
 
-      // Rule 2 (.ts): use onResolve to redirect path without touching Bun's module registry.
-      // Shared handler: resolve the abs path, check for .cli.ts/.cli.tsx sibling.
-      function resolveCliSibling(
-        path: string,
-        importer: string | undefined,
-      ): { path: string } | undefined {
-        if (!path.startsWith(".") || !importer) {
-          return undefined;
-        }
-        const abs = resolve(dirname(importer), path);
-        for (const srcExt of ["", ".ts", ".tsx"] as const) {
-          const full = abs + srcExt;
-          if (!existsSync(full)) {
-            continue;
-          }
-          const base = full.endsWith(".tsx")
-            ? full.slice(0, -4)
-            : full.endsWith(".ts")
-              ? full.slice(0, -3)
-              : full;
-          for (const cliExt of [".cli.ts", ".cli.tsx"] as const) {
-            if (existsSync(base + cliExt)) {
-              return { path: base + cliExt };
-            }
-          }
-          break;
-        }
-        return undefined;
-      }
-
       // Explicit .ts extension imports
       build.onResolve({ filter: /\.ts$/ }, ({ path, importer }) =>
-        resolveCliSibling(path, importer),
+        resolveCliSiblingPath(path, importer),
       );
       // Extensionless relative imports (e.g. "./call-api" → "./call-api.cli.ts")
       build.onResolve({ filter: /^\.\.?\// }, ({ path, importer }) =>
-        resolveCliSibling(path, importer),
+        resolveCliSiblingPath(path, importer),
       );
     },
   };

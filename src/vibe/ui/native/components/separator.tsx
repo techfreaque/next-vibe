@@ -3,7 +3,7 @@ import * as React from "react";
 import { View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
-import type { SeparatorRootProps } from "../../web/ui/separator";
+import type { SeparatorRootProps } from "../../web/components/separator";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 

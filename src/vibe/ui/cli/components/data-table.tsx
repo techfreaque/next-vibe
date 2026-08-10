@@ -5,10 +5,10 @@ import type { JSX } from "react";
 import * as React from "react";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
-import type { DataTableProps } from "../../web/ui/data-table";
-import { tableConfig } from "../../web/ui/data-table";
+import type { DataTableProps } from "../../web/components/data-table";
+import { tableConfig } from "../../web/components/data-table";
 
-export type { DataTableProps } from "../../web/ui/data-table";
+export type { DataTableProps } from "../../web/components/data-table";
 
 const SEPARATOR = "─".repeat(60);
 const CELL_DIVIDER = " | ";

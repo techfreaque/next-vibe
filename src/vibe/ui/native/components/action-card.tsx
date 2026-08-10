@@ -2,11 +2,11 @@ import { styled } from "nativewind";
 import { Pressable, View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
-import type { ActionCardProps } from "../../web/ui/action-card";
+import type { ActionCardProps } from "../../web/components/action-card";
 import { styledNative } from "../utils/style-converter";
 import { Text } from "./text";
 
-export type { ActionCardProps } from "../../web/ui/action-card";
+export type { ActionCardProps } from "../../web/components/action-card";
 
 const StyledView = styled(View, { className: "style" });
 const StyledPressable = styledNative(Pressable);

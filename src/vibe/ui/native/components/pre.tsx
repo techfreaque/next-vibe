@@ -5,7 +5,7 @@ import type { TextStyle } from "react-native";
 import { Text } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
-import type { PreProps } from "../../web/ui/pre";
+import type { PreProps } from "../../web/components/pre";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToTextStyle } from "../utils/style-converter";
 

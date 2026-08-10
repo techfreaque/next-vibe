@@ -188,25 +188,31 @@ async function importDefaultWithRetry(
 // File-list scanning (LiveIndex fast-path, disk fallback)
 // ---------------------------------------------------------------------------
 
+function filesFromLive(
+  set: ReadonlySet<string> | undefined,
+  dir: string,
+  name: string,
+): string[] {
+  return set ? [...set] : findFilesRecursively(dir, name);
+}
+
 function scanFileLists(
   apiDir: string,
   apiRoot: string,
   live?: GeneratorInputIndex,
 ): GeneratorFileLists {
-  const fromLive = (
-    set: ReadonlySet<string> | undefined,
-    dir: string,
-    name: string,
-  ): string[] => (set ? [...set] : findFilesRecursively(dir, name));
-
   return {
-    definition: fromLive(live?.definitionFiles, apiDir, "definition.ts"),
-    route: fromLive(live?.routeFiles, apiDir, "route.ts"),
-    routeClient: fromLive(live?.clientRouteFiles, apiDir, "route-client.ts"),
-    task: fromLive(live?.taskFiles, apiRoot, "task.ts"),
-    taskRunner: fromLive(live?.taskRunnerFiles, apiRoot, "task-runner.ts"),
-    seed: fromLive(live?.seedFiles, apiDir, "seeds.ts"),
-    skill: fromLive(live?.defaultSkillFiles, apiDir, "skill.ts"),
+    definition: filesFromLive(live?.definitionFiles, apiDir, "definition.ts"),
+    route: filesFromLive(live?.routeFiles, apiDir, "route.ts"),
+    routeClient: filesFromLive(
+      live?.clientRouteFiles,
+      apiDir,
+      "route-client.ts",
+    ),
+    task: filesFromLive(live?.taskFiles, apiRoot, "task.ts"),
+    taskRunner: filesFromLive(live?.taskRunnerFiles, apiRoot, "task-runner.ts"),
+    seed: filesFromLive(live?.seedFiles, apiDir, "seeds.ts"),
+    skill: filesFromLive(live?.defaultSkillFiles, apiDir, "skill.ts"),
     email: live?.emailFiles
       ? [...live.emailFiles]
       : // Match LiveIndex composition: email.tsx + *.email.tsx (excluding /email.tsx dup).
@@ -219,8 +225,8 @@ function scanFileLists(
     promptFragment: live?.promptFragmentFiles
       ? [...live.promptFragmentFiles]
       : findFilesRecursively(apiDir, "system-prompt.ts"),
-    category: fromLive(live?.categoryFiles, apiDir, "category.ts"),
-    graphSeed: fromLive(live?.graphSeedFiles, apiRoot, "graph-seeds.ts"),
+    category: filesFromLive(live?.categoryFiles, apiDir, "category.ts"),
+    graphSeed: filesFromLive(live?.graphSeedFiles, apiRoot, "graph-seeds.ts"),
   };
 }
 

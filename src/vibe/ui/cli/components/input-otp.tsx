@@ -5,7 +5,7 @@ import type {
   InputOTPProps,
   InputOTPSeparatorProps,
   InputOTPSlotProps,
-} from "../../web/ui/input-otp";
+} from "../../web/components/input-otp";
 
 export type {
   InputOTPGroupProps,
@@ -13,7 +13,7 @@ export type {
   InputOTPSeparatorProps,
   InputOTPSlotProps,
   OTPContextValue,
-} from "../../web/ui/input-otp";
+} from "../../web/components/input-otp";
 
 export function InputOTP(_props: InputOTPProps): null {
   void _props;

@@ -9,7 +9,7 @@ export type {
   ToastRootProps,
   ToastTitleProps,
   ToastViewportProps,
-} from "../../web/ui/toast";
+} from "../../web/components/toast";
 
 import { cva } from "class-variance-authority";
 
@@ -21,7 +21,7 @@ import type {
   ToastProviderProps,
   ToastRootProps,
   ToastTitleProps,
-} from "../../web/ui/toast";
+} from "../../web/components/toast";
 
 export function ToastProvider({
   children,

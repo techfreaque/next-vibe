@@ -14,7 +14,7 @@ import type {
   MutedProps,
   PProps,
   SmallProps,
-} from "../../web/ui/typography";
+} from "../../web/components/typography";
 import {
   type InkTextProps,
   mergeTextProps,

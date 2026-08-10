@@ -8,10 +8,10 @@ import type { JSX } from "react";
 import { useState } from "react";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
-import type { NumberInputProps } from "../../web/ui/number-input";
+import type { NumberInputProps } from "../../web/components/number-input";
 import { useCaptureArrows, useCliFieldFocus } from "../lib/focus-manager";
 
-export type { NumberInputProps } from "../../web/ui/number-input";
+export type { NumberInputProps } from "../../web/components/number-input";
 
 export function NumberInput({
   value = 0,

@@ -2,14 +2,14 @@ import { Text, useInput } from "ink";
 import type { JSX } from "react";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
-import type { CheckboxRootProps } from "../../web/ui/checkbox";
+import type { CheckboxRootProps } from "../../web/components/checkbox";
 import { useCliFieldFocus } from "../lib/focus-manager";
 import { isOverlayOpen } from "./dialog";
 
 export type {
   CheckboxIndicatorProps,
   CheckboxRootProps,
-} from "../../web/ui/checkbox";
+} from "../../web/components/checkbox";
 
 const CHECKED_CLI = "\u2713";
 const UNCHECKED_CLI = "\u25A1";

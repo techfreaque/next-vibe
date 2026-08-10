@@ -14,10 +14,10 @@ import {
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 
 import { cn } from "../../../unified-ui/_shared/cn";
-import type { AppRow, DataTableProps } from "../../web/ui/data-table";
-import { tableConfig } from "../../web/ui/data-table";
+import type { AppRow, DataTableProps } from "../../web/components/data-table";
+import { tableConfig } from "../../web/components/data-table";
 
-export { tableConfig } from "../../web/ui/data-table";
+export { tableConfig } from "../../web/components/data-table";
 import { styledNative } from "../utils/style-converter";
 import {
   Table,

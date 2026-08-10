@@ -8,9 +8,9 @@ export type {
   ScrollAreaThumbProps,
   ScrollAreaViewportProps,
   ScrollBarProps,
-} from "../../web/ui/scroll-area";
+} from "../../web/components/scroll-area";
 
-import type { ScrollAreaRootProps } from "../../web/ui/scroll-area";
+import type { ScrollAreaRootProps } from "../../web/components/scroll-area";
 
 export function ScrollArea({
   children,

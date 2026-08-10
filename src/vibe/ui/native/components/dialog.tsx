@@ -15,7 +15,7 @@ import type {
   DialogRootProps,
   DialogTitleProps,
   DialogTriggerProps,
-} from "../../web/ui/dialog";
+} from "../../web/components/dialog";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { X } from "./icons/X";

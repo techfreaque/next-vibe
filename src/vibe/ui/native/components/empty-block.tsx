@@ -2,14 +2,14 @@ import { styled } from "nativewind";
 import { Pressable, View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
-import type { EmptyBlockProps } from "../../web/ui/empty-block";
+import type { EmptyBlockProps } from "../../web/components/empty-block";
 import { styledNative } from "../utils/style-converter";
 import { Text } from "./text";
 
 export type {
   EmptyBlockAction,
   EmptyBlockProps,
-} from "../../web/ui/empty-block";
+} from "../../web/components/empty-block";
 
 const StyledView = styled(View, { className: "style" });
 const StyledPressable = styledNative(Pressable);

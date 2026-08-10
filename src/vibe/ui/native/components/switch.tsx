@@ -8,7 +8,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { cn } from "../../../unified-ui/_shared/cn";
-import type { SwitchRootProps } from "../../web/ui/switch";
+import type { SwitchRootProps } from "../../web/components/switch";
 import { useColorScheme } from "../lib/useColorScheme";
 import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 

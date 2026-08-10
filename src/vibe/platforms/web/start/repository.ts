@@ -131,6 +131,17 @@ export class ServerStartRepository {
   private static healthSnapshotInterval: ReturnType<typeof setInterval> | null =
     null;
 
+  private static earlyExitOnInt(): void {
+    cleanupPidFile(VIBE_START_PID_FILE);
+    writeServerLogOfflineHint();
+    process.exit(0);
+  }
+
+  private static earlyExitOnTerm(): void {
+    cleanupPidFile(VIBE_START_PID_FILE);
+    process.exit(0);
+  }
+
   /** Extract port number from a URL string, returns undefined if not parseable */
   private static portFromUrl(url: string | undefined): number | undefined {
     if (!url) {
@@ -942,17 +953,8 @@ export class ServerStartRepository {
 
     // Register early SIGINT/SIGTERM so Ctrl+C during setup exits immediately.
     // Use stable named functions so process.off() can remove them precisely.
-    const earlyExitOnInt = (): void => {
-      cleanupPidFile(VIBE_START_PID_FILE);
-      writeServerLogOfflineHint();
-      process.exit(0);
-    };
-    const earlyExitOnTerm = (): void => {
-      cleanupPidFile(VIBE_START_PID_FILE);
-      process.exit(0);
-    };
-    process.on("SIGINT", earlyExitOnInt);
-    process.on("SIGTERM", earlyExitOnTerm);
+    process.on("SIGINT", ServerStartRepository.earlyExitOnInt);
+    process.on("SIGTERM", ServerStartRepository.earlyExitOnTerm);
 
     // Setup database if enabled
     if (runDb) {
@@ -977,8 +979,8 @@ export class ServerStartRepository {
     if (!runNext) {
       logger.vibe(formatSkip("Next.js server skipped"));
       // Replace early exit handler with graceful shutdown
-      process.off("SIGINT", earlyExitOnInt);
-      process.off("SIGTERM", earlyExitOnTerm);
+      process.off("SIGINT", ServerStartRepository.earlyExitOnInt);
+      process.off("SIGTERM", ServerStartRepository.earlyExitOnTerm);
       const handleShutdown = (): void => {
         cleanupPidFile(VIBE_START_PID_FILE);
         ServerStartRepository.stopAllProcesses();
@@ -1044,8 +1046,8 @@ export class ServerStartRepository {
     }
 
     // Replace early exit handler with full graceful shutdown
-    process.off("SIGINT", earlyExitOnInt);
-    process.off("SIGTERM", earlyExitOnTerm);
+    process.off("SIGINT", ServerStartRepository.earlyExitOnInt);
+    process.off("SIGTERM", ServerStartRepository.earlyExitOnTerm);
 
     const handleShutdownOnInt = (): void => {
       // Signal auto-restart loop not to re-spawn after we kill Next.js

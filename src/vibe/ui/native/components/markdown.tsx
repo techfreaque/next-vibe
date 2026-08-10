@@ -8,7 +8,7 @@ import { Text as RNText, View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
 // Import all public types from web version (web is source of truth)
-import type { MarkdownProps } from "../../web/ui/markdown";
+import type { MarkdownProps } from "../../web/components/markdown";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 

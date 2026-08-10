@@ -5,11 +5,11 @@ import * as React from "react";
 import { Pressable, View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
-import type { SectionGroupProps } from "../../web/ui/section-group";
+import type { SectionGroupProps } from "../../web/components/section-group";
 import { styledNative } from "../utils/style-converter";
 import { Text } from "./text";
 
-export type { SectionGroupProps } from "../../web/ui/section-group";
+export type { SectionGroupProps } from "../../web/components/section-group";
 
 const StyledView = styled(View, { className: "style" });
 const StyledPressable = styledNative(Pressable);

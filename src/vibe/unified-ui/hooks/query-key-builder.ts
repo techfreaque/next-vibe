@@ -34,11 +34,11 @@ type Normalize<T> = { [K in keyof T]: T[K] };
 export type CacheKeyRequestData<TEndpoint extends CreateApiEndpointAny> =
   Normalize<TEndpoint["fields"]> extends { children: infer C }
     ? {
-        [K in keyof C as Normalize<C[K]> extends { includeInCacheKey: true }
-          ? K
-          : never]: z.output<
-          InferSchemaFromField<C[K], FieldUsage.RequestData>
-        >;
+        [
+          K in keyof C as Normalize<C[K]> extends { includeInCacheKey: true }
+            ? K
+            : never
+        ]: z.output<InferSchemaFromField<C[K], FieldUsage.RequestData>>;
       } extends infer R
       ? [keyof R] extends [never]
         ? undefined

@@ -7,7 +7,7 @@ import { cn } from "../../../unified-ui/_shared/cn";
 import type {
   RadioGroupItemProps,
   RadioGroupRootProps,
-} from "../../web/ui/radio-group";
+} from "../../web/components/radio-group";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 import { Check } from "./icons/Check";

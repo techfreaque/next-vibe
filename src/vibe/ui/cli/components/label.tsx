@@ -1,9 +1,9 @@
 import { Text } from "ink";
 import type { JSX } from "react";
 
-import type { LabelRootProps } from "../../web/ui/label";
+import type { LabelRootProps } from "../../web/components/label";
 
-export type { LabelRootProps } from "../../web/ui/label";
+export type { LabelRootProps } from "../../web/components/label";
 
 const COLON = "\u003A";
 const SPACE = "\u0020";

@@ -10,7 +10,7 @@ import type {
   PaginationNextProps,
   PaginationPreviousProps,
   PaginationProps,
-} from "../../web/ui/pagination";
+} from "../../web/components/pagination";
 
 export type {
   PaginationContentProps,
@@ -20,7 +20,7 @@ export type {
   PaginationNextProps,
   PaginationPreviousProps,
   PaginationProps,
-} from "../../web/ui/pagination";
+} from "../../web/components/pagination";
 
 export function Pagination({ children }: PaginationProps): JSX.Element {
   const isMcp = useIsMcp();

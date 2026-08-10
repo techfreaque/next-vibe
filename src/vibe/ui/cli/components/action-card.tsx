@@ -2,9 +2,9 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
-import type { ActionCardProps } from "../../web/ui/action-card";
+import type { ActionCardProps } from "../../web/components/action-card";
 
-export type { ActionCardProps } from "../../web/ui/action-card";
+export type { ActionCardProps } from "../../web/components/action-card";
 
 export function ActionCard({
   title,

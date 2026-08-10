@@ -15,7 +15,7 @@ import type {
   InputOTPSeparatorProps,
   InputOTPSlotProps,
   OTPContextValue,
-} from "../../web/ui/input-otp";
+} from "../../web/components/input-otp";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 

@@ -7,7 +7,7 @@ import { Pressable, View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
 // Import all types from web (web is source of truth)
-import type { DatePickerProps } from "../../web/ui/date-picker";
+import type { DatePickerProps } from "../../web/components/date-picker";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 import { Calendar as CalendarIcon } from "./icons/Calendar";

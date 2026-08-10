@@ -22,7 +22,7 @@ import type {
   TextareaChangeEvent,
   TextareaProps,
   TextareaRefObject,
-} from "../../web/ui/textarea";
+} from "../../web/components/textarea";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 const noop = (): void => {

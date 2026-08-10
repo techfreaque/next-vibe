@@ -17,6 +17,7 @@ import { ExternalLink } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
+  useWidgetLocale,
   useWidgetLogger,
   useWidgetTranslation,
   useWidgetUser,
@@ -29,6 +30,7 @@ import type { JSX } from "react";
 
 import { useChatSettings } from "../../chat/settings/hooks";
 import { SearchProvider } from "../enum";
+import { scopedTranslation } from "../i18n";
 import type definition from "./definition";
 
 interface CustomWidgetProps {
@@ -38,6 +40,8 @@ interface CustomWidgetProps {
 function SetAsDefaultBanner(): JSX.Element | null {
   const user = useWidgetUser();
   const logger = useWidgetLogger();
+  const locale = useWidgetLocale();
+  const { t: widgetT } = scopedTranslation.scopedT(locale);
   const { settings, updateSettings } = useChatSettings(user, logger);
 
   if (settings === null || settings.searchProvider === SearchProvider.KAGI) {
@@ -46,10 +50,7 @@ function SetAsDefaultBanner(): JSX.Element | null {
 
   return (
     <Div className="flex items-center justify-between gap-2 px-4 py-2 bg-muted/50 border-b text-xs text-muted-foreground">
-      <Span>
-        {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
-        Your AI searches with Brave
-      </Span>
+      <Span>{widgetT("get.widget.kagiBanner")}</Span>
       <Button
         type="button"
         size="sm"
@@ -60,8 +61,7 @@ function SetAsDefaultBanner(): JSX.Element | null {
         }}
       >
         <Star className="h-3 w-3" />
-        {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
-        Use Kagi
+        {widgetT("get.widget.useKagi")}
       </Button>
     </Div>
   );
@@ -123,7 +123,9 @@ export function KagiSearchResultsContainer({
 }: CustomWidgetProps): JSX.Element {
   const value = useWidgetValue<typeof definition.GET>();
   const children = field.children;
+  const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.GET>();
+  const { t: widgetT } = scopedTranslation.scopedT(locale);
 
   const references = value?.references ?? [];
 
@@ -148,8 +150,7 @@ export function KagiSearchResultsContainer({
             <Div className="flex items-center gap-2">
               <Sparkles className="h-8 w-8 text-primary" />
               <Span className="text-3xl font-bold tracking-tight">
-                {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
-                Kagi Search
+                {widgetT(SearchProvider.KAGI)}
               </Span>
             </Div>
             <Span className="text-sm text-muted-foreground">

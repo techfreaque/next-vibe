@@ -10,7 +10,7 @@ import type {
   HoverCardPortalProps,
   HoverCardRootProps,
   HoverCardTriggerProps,
-} from "../../web/ui/hover-card";
+} from "../../web/components/hover-card";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 import { TextClassContext } from "./text";

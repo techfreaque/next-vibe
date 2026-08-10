@@ -3,9 +3,9 @@ import * as React from "react";
 export type {
   ResizableContainerProps,
   ResizableHandleProps,
-} from "../../web/ui/resizable";
+} from "../../web/components/resizable";
 
-import type { ResizableContainerProps } from "../../web/ui/resizable";
+import type { ResizableContainerProps } from "../../web/components/resizable";
 import { Div } from "./div";
 
 export function ResizableContainer({

@@ -2,9 +2,9 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
-import type { WidgetHeaderProps } from "../../web/ui/widget-header";
+import type { WidgetHeaderProps } from "../../web/components/widget-header";
 
-export type { WidgetHeaderProps } from "../../web/ui/widget-header";
+export type { WidgetHeaderProps } from "../../web/components/widget-header";
 
 export function WidgetHeader({
   title,

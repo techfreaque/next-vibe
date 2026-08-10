@@ -19,7 +19,7 @@ import type {
   BreadcrumbPageProps,
   BreadcrumbProps,
   BreadcrumbSeparatorProps,
-} from "../../web/ui/breadcrumb";
+} from "../../web/components/breadcrumb";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 

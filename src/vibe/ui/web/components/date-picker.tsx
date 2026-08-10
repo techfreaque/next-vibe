@@ -5,7 +5,7 @@
 
 "use client";
 
-import { CalendarIcon } from "next-vibe/ui/ui/icons/CalendarIcon";
+import { CalendarIcon } from "next-vibe/ui/components/icons/CalendarIcon";
 import type { JSX } from "react";
 import { useState } from "react";
 

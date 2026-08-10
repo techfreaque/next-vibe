@@ -9,7 +9,7 @@ import type {
   DivMouseEvent,
   DivProps as DivBaseProps,
   DivRefObject,
-} from "../../web/ui/div";
+} from "../../web/components/div";
 import type { StyleType } from "../../web/utils/style-type";
 import { applyStyleType } from "../../web/utils/style-type";
 import {

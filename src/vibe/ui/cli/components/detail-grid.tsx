@@ -4,13 +4,13 @@ import type { JSX } from "react";
 import type {
   DetailFieldProps,
   DetailGridProps,
-} from "../../web/ui/detail-grid";
+} from "../../web/components/detail-grid";
 
 export type {
   DetailFieldProps,
   DetailGridColumns,
   DetailGridProps,
-} from "../../web/ui/detail-grid";
+} from "../../web/components/detail-grid";
 
 export function DetailGrid({ children }: DetailGridProps): JSX.Element {
   return (

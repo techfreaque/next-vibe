@@ -17,7 +17,7 @@ export type {
   MenubarSubProps,
   MenubarSubTriggerProps,
   MenubarTriggerProps,
-} from "../../web/ui/menubar";
+} from "../../web/components/menubar";
 
 import type {
   MenubarCheckboxItemProps,
@@ -33,7 +33,7 @@ import type {
   MenubarSubProps,
   MenubarSubTriggerProps,
   MenubarTriggerProps,
-} from "../../web/ui/menubar";
+} from "../../web/components/menubar";
 
 export function Menubar({
   children,

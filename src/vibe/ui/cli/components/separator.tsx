@@ -2,7 +2,7 @@ import { Text } from "ink";
 import * as React from "react";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
-import type { SeparatorRootProps } from "../../web/ui/separator";
+import type { SeparatorRootProps } from "../../web/components/separator";
 import { useSeparatorLine } from "../hooks/use-separator-width";
 
 export function Separator({

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Pressable, Text as RNText, View } from "react-native";
 
-import type { DropdownItemProps } from "../../web/ui/dropdown-item";
+import type { DropdownItemProps } from "../../web/components/dropdown-item";
 
 export function DropdownItem({
   isSelected = false,

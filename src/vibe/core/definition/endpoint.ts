@@ -212,12 +212,14 @@ type _InferSchemaFromFieldImpl<F, Usage extends FieldUsage> =
         }
       ? MatchesUsage<TUsage, Usage> extends true
         ? {
-            [K in keyof TChildren as _InferSchemaFromFieldImpl<
-              Normalize<TChildren[K]>,
-              Usage
-            > extends z.ZodNever
-              ? never
-              : K]: _InferSchemaFromFieldImpl<Normalize<TChildren[K]>, Usage>;
+            [
+              K in keyof TChildren as _InferSchemaFromFieldImpl<
+                Normalize<TChildren[K]>,
+                Usage
+              > extends z.ZodNever
+                ? never
+                : K
+            ]: _InferSchemaFromFieldImpl<Normalize<TChildren[K]>, Usage>;
           } extends infer TShape extends z.ZodRawShape
           ? keyof TShape extends never
             ? z.ZodNever // All children resolved to never (e.g., widget-only children like submit buttons)
@@ -257,15 +259,14 @@ type _InferSchemaFromFieldImpl<F, Usage extends FieldUsage> =
             }
           ? MatchesUsage<TUsage, Usage> extends true
             ? {
-                [K in keyof TChildren as _InferSchemaFromFieldImpl<
-                  Normalize<TChildren[K]>,
-                  Usage
-                > extends z.ZodNever
-                  ? never
-                  : K]: _InferSchemaFromFieldImpl<
-                  Normalize<TChildren[K]>,
-                  Usage
-                >;
+                [
+                  K in keyof TChildren as _InferSchemaFromFieldImpl<
+                    Normalize<TChildren[K]>,
+                    Usage
+                  > extends z.ZodNever
+                    ? never
+                    : K
+                ]: _InferSchemaFromFieldImpl<Normalize<TChildren[K]>, Usage>;
               } extends infer TShape extends z.ZodRawShape
               ? keyof TShape extends never
                 ? z.ZodNever // All children resolved to never (widget-only children)

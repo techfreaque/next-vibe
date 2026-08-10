@@ -14,7 +14,7 @@ import type {
   ScrollAreaThumbProps,
   ScrollAreaViewportProps,
   ScrollBarProps,
-} from "../../web/ui/scroll-area";
+} from "../../web/components/scroll-area";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 

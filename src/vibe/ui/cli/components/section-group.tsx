@@ -2,9 +2,9 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
-import type { SectionGroupProps } from "../../web/ui/section-group";
+import type { SectionGroupProps } from "../../web/components/section-group";
 
-export type { SectionGroupProps } from "../../web/ui/section-group";
+export type { SectionGroupProps } from "../../web/components/section-group";
 
 export function SectionGroup({
   title,

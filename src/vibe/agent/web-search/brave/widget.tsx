@@ -17,6 +17,7 @@ import { Star } from "next-vibe/ui/components/icons/Star";
 import { ExternalLink } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
 import {
+  useWidgetLocale,
   useWidgetLogger,
   useWidgetTranslation,
   useWidgetUser,
@@ -31,6 +32,7 @@ import type { JSX } from "react";
 
 import { useChatSettings } from "../../chat/settings/hooks";
 import { SearchProvider } from "../enum";
+import { scopedTranslation } from "../i18n";
 import type definition from "./definition";
 
 interface CustomWidgetProps {
@@ -40,6 +42,8 @@ interface CustomWidgetProps {
 function SetAsDefaultBanner(): JSX.Element | null {
   const user = useWidgetUser();
   const logger = useWidgetLogger();
+  const locale = useWidgetLocale();
+  const { t: widgetT } = scopedTranslation.scopedT(locale);
   const { settings, updateSettings } = useChatSettings(user, logger);
 
   // null = no explicit preference = Brave is already default
@@ -53,10 +57,7 @@ function SetAsDefaultBanner(): JSX.Element | null {
 
   return (
     <Div className="flex items-center justify-between gap-2 px-4 py-2 bg-muted/50 border-b text-xs text-muted-foreground">
-      <Span>
-        {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
-        Your AI searches with Kagi
-      </Span>
+      <Span>{widgetT("get.widget.braveBanner")}</Span>
       <Button
         type="button"
         size="sm"
@@ -67,8 +68,7 @@ function SetAsDefaultBanner(): JSX.Element | null {
         }}
       >
         <Star className="h-3 w-3" />
-        {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
-        Use Brave
+        {widgetT("get.widget.useBrave")}
       </Button>
     </Div>
   );
@@ -85,6 +85,8 @@ function ResultCard({
     source?: string | null;
   };
 }): JSX.Element {
+  const locale = useWidgetLocale();
+  const { t: widgetT } = scopedTranslation.scopedT(locale);
   let hostname = result.url;
   try {
     hostname = new URL(result.url).hostname.replace(/^www\./, "");
@@ -118,8 +120,7 @@ function ResultCard({
                 <Span className="truncate">{hostname}</Span>
                 {result.age ? (
                   <>
-                    {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
-                    <Span>·</Span>
+                    <Span>{widgetT("get.widget.separatorDot")}</Span>
                     <Div className="flex items-center gap-1 shrink-0">
                       <Clock className="h-3 w-3" />
                       <Span>{result.age}</Span>
@@ -128,8 +129,7 @@ function ResultCard({
                 ) : null}
                 {result.source ? (
                   <>
-                    {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
-                    <Span>·</Span>
+                    <Span>{widgetT("get.widget.separatorDot")}</Span>
                     <Span className="shrink-0">{result.source}</Span>
                   </>
                 ) : null}
@@ -147,7 +147,9 @@ export function BraveSearchResultsContainer({
 }: CustomWidgetProps): JSX.Element {
   const value = useWidgetValue<typeof definition.GET>();
   const children = field.children;
+  const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.GET>();
+  const { t: widgetT } = scopedTranslation.scopedT(locale);
 
   const results = value?.results ?? [];
   const hasResults = results.length > 0;
@@ -162,8 +164,7 @@ export function BraveSearchResultsContainer({
             <Div className="flex items-center gap-2">
               <Search className="h-8 w-8 text-primary" />
               <Span className="text-3xl font-bold tracking-tight">
-                {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
-                Brave Search
+                {widgetT(SearchProvider.BRAVE)}
               </Span>
             </Div>
             <Span className="text-sm text-muted-foreground">

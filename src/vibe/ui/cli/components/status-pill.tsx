@@ -5,12 +5,12 @@ import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type {
   StatusPillProps,
   StatusPillVariant,
-} from "../../web/ui/status-pill";
+} from "../../web/components/status-pill";
 
 export type {
   StatusPillProps,
   StatusPillVariant,
-} from "../../web/ui/status-pill";
+} from "../../web/components/status-pill";
 
 const VARIANT_COLOR: Record<StatusPillVariant, string | undefined> = {
   default: "cyan",

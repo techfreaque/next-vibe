@@ -2,12 +2,12 @@ import { styled } from "nativewind";
 import { View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
-import type { WidgetShellProps } from "../../web/ui/widget-shell";
+import type { WidgetShellProps } from "../../web/components/widget-shell";
 
 export type {
   WidgetShellPadding,
   WidgetShellProps,
-} from "../../web/ui/widget-shell";
+} from "../../web/components/widget-shell";
 
 const StyledView = styled(View, { className: "style" });
 

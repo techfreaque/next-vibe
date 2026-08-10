@@ -15,15 +15,14 @@ import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type {
   AutocompleteFieldProps,
   AutocompleteOption,
-  AutocompleteOptionBase,
-} from "../../web/ui/autocomplete-field";
+} from "../../web/components/autocomplete-field";
 import { useFocusScopeRegister, useShouldFocus } from "./dialog";
 
 export type {
   AutocompleteFieldProps,
   AutocompleteOption,
   AutocompleteOptionBase,
-} from "../../web/ui/autocomplete-field";
+} from "../../web/components/autocomplete-field";
 
 export enum FormFieldCategory {
   OTHER = "other",

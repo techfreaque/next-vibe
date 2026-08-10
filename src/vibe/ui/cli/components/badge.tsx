@@ -3,11 +3,11 @@ import { Text } from "ink";
 import type { JSX } from "react";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
-import type { BadgeProps } from "../../web/ui/badge";
+import type { BadgeProps } from "../../web/components/badge";
 
 export const badgeVariants = cva("");
 export const badgeTextVariants = cva("");
-export type { BadgeVariant } from "../../web/ui/badge";
+export type { BadgeVariant } from "../../web/components/badge";
 
 const VARIANT_COLOR: Record<NonNullable<BadgeProps["variant"]>, string> = {
   default: "cyan",

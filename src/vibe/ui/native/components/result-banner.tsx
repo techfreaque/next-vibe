@@ -2,13 +2,13 @@ import { styled } from "nativewind";
 import { View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
-import type { ResultBannerProps } from "../../web/ui/result-banner";
+import type { ResultBannerProps } from "../../web/components/result-banner";
 import { Text } from "./text";
 
 export type {
   ResultBannerProps,
   ResultBannerVariant,
-} from "../../web/ui/result-banner";
+} from "../../web/components/result-banner";
 
 const StyledView = styled(View, { className: "style" });
 

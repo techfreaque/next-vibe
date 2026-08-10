@@ -11,7 +11,7 @@ import type {
   CollapsibleContentProps,
   CollapsibleProps,
   CollapsibleTriggerProps,
-} from "../../web/ui/collapsible";
+} from "../../web/components/collapsible";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 

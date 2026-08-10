@@ -29,7 +29,7 @@ export type {
   DialogRootProps,
   DialogTitleProps,
   DialogTriggerProps,
-} from "../../web/ui/dialog";
+} from "../../web/components/dialog";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type {
@@ -42,7 +42,7 @@ import type {
   DialogRootProps,
   DialogTitleProps,
   DialogTriggerProps,
-} from "../../web/ui/dialog";
+} from "../../web/components/dialog";
 
 // ─── Overlay Lock ────────────────────────────────────────────────────────────
 // Module-level overlay counter with subscriber notification.

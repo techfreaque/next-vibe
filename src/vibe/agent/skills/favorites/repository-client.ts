@@ -70,6 +70,18 @@ interface StoredLocalFavorite {
   position: number;
 }
 
+function resolveFavoriteVoiceId(
+  selection: VoiceModelSelection | null | undefined,
+): TtsModelId | null {
+  if (
+    selection?.selectionType === ModelSelectionType.MANUAL &&
+    selection.manualModelId
+  ) {
+    return selection.manualModelId;
+  }
+  return null;
+}
+
 /**
  * Chat Favorites Client Repository
  * Mirrors ChatFavoritesRepository but uses localStorage
@@ -470,21 +482,9 @@ export class ChatFavoritesRepositoryClient {
     );
     const hasSkill = stored.skillId !== "default";
 
-    // Resolve voice model ID from MANUAL selection, falling back to character voice or default
-    const resolveVoiceId = (
-      sel: VoiceModelSelection | null | undefined,
-    ): TtsModelId | null => {
-      if (
-        sel?.selectionType === ModelSelectionType.MANUAL &&
-        sel.manualModelId
-      ) {
-        return sel.manualModelId;
-      }
-      return null;
-    };
     const resolvedVoiceId =
-      resolveVoiceId(stored.voiceModelSelection) ??
-      resolveVoiceId(characterVoiceSelection) ??
+      resolveFavoriteVoiceId(stored.voiceModelSelection) ??
+      resolveFavoriteVoiceId(characterVoiceSelection) ??
       DEFAULT_TTS_VOICE_ID;
 
     // Flattened structure - no nested content/titleRow/modelRow

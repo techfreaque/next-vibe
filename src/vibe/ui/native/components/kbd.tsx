@@ -4,7 +4,7 @@ import type { TextStyle } from "react-native";
 import { Text } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
-import type { KbdMouseEvent, KbdProps } from "../../web/ui/kbd";
+import type { KbdMouseEvent, KbdProps } from "../../web/components/kbd";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToTextStyle } from "../utils/style-converter";
 

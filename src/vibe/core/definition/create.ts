@@ -555,9 +555,9 @@ type InferObjectType<C, Usage extends FieldUsage> =
     >
   >
     ? {
-        -readonly [K in keyof C as InferFieldType<C[K], Usage> extends never
-          ? never
-          : K]: InferFieldType<C[K], Usage>;
+        -readonly [
+          K in keyof C as InferFieldType<C[K], Usage> extends never ? never : K
+        ]: InferFieldType<C[K], Usage>;
       }
     : never;
 

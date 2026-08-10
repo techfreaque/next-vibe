@@ -4,12 +4,12 @@ import type { JSX } from "react";
 import type {
   RadioGroupItemProps,
   RadioGroupRootProps,
-} from "../../web/ui/radio-group";
+} from "../../web/components/radio-group";
 
 export type {
   RadioGroupItemProps,
   RadioGroupRootProps,
-} from "../../web/ui/radio-group";
+} from "../../web/components/radio-group";
 
 // Radio button marker - non-translatable terminal symbol
 const RADIO_MARKER = "(\u00A0)";

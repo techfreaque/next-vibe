@@ -5,7 +5,7 @@
 
 import type { JSX } from "react";
 
-import type { RangeSliderProps } from "../../web/ui/range-slider";
+import type { RangeSliderProps } from "../../web/components/range-slider";
 
 export function RangeSlider(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -17,4 +17,4 @@ export function RangeSlider(
 export type {
   RangeSliderOption,
   RangeSliderProps,
-} from "../../web/ui/range-slider";
+} from "../../web/components/range-slider";

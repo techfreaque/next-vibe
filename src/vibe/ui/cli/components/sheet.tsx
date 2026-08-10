@@ -12,7 +12,7 @@ export type {
   SheetRootProps,
   SheetTitleProps,
   SheetTriggerProps,
-} from "../../web/ui/sheet";
+} from "../../web/components/sheet";
 
 import type {
   SheetCloseProps,
@@ -24,7 +24,7 @@ import type {
   SheetRootProps,
   SheetTitleProps,
   SheetTriggerProps,
-} from "../../web/ui/sheet";
+} from "../../web/components/sheet";
 
 export function Sheet({
   children,

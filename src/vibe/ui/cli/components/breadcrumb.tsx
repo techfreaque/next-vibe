@@ -10,7 +10,7 @@ import type {
   BreadcrumbPageProps,
   BreadcrumbProps,
   BreadcrumbSeparatorProps,
-} from "../../web/ui/breadcrumb";
+} from "../../web/components/breadcrumb";
 
 export type {
   BreadcrumbEllipsisProps,
@@ -20,7 +20,7 @@ export type {
   BreadcrumbPageProps,
   BreadcrumbProps,
   BreadcrumbSeparatorProps,
-} from "../../web/ui/breadcrumb";
+} from "../../web/components/breadcrumb";
 
 export function Breadcrumb({ children }: BreadcrumbProps): JSX.Element {
   return <Box>{children}</Box>;

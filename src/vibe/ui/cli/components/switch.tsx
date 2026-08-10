@@ -4,10 +4,10 @@ import type { JSX } from "react";
 import { useRef } from "react";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
-import type { SwitchRootProps } from "../../web/ui/switch";
+import type { SwitchRootProps } from "../../web/components/switch";
 import { isOverlayOpen, useFocusScopeRegister, useShouldFocus } from "./dialog";
 
-export type { SwitchRootProps } from "../../web/ui/switch";
+export type { SwitchRootProps } from "../../web/components/switch";
 
 const ON = "ON";
 const OFF = "OFF";

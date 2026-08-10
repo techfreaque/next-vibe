@@ -2,7 +2,7 @@
 import * as React from "react";
 import { Text, View } from "react-native";
 
-import type { IframeProps } from "../../web/ui/iframe";
+import type { IframeProps } from "../../web/components/iframe";
 
 /**
  * Platform-agnostic Iframe component for native

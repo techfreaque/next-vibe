@@ -1,7 +1,7 @@
 import { Stack } from "expo-router";
 import type { JSX } from "react";
 
-import type { RootStackProps } from "../../web/ui/root-stack";
+import type { RootStackProps } from "../../web/components/root-stack";
 
 /**
  * Platform-agnostic RootStack component (Native implementation)

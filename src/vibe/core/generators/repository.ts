@@ -394,7 +394,7 @@ export class GeneratorRunner {
     const parallelGens = generators.filter((g) => g.phase === "default");
     publishProgress();
     await runWithConcurrencyLimit(
-      parallelGens.map((gen) => async () => {
+      parallelGens.map((gen) => async (): Promise<void> => {
         phaseRow(gen.key).status = "running";
         publishProgress();
         const startedAt = Date.now();

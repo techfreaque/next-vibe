@@ -2,9 +2,9 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
-import type { ListItemProps } from "../../web/ui/list-item";
+import type { ListItemProps } from "../../web/components/list-item";
 
-export type { ListItemProps } from "../../web/ui/list-item";
+export type { ListItemProps } from "../../web/components/list-item";
 
 export function ListItem({
   title,

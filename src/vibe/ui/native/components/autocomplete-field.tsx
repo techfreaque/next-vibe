@@ -12,7 +12,7 @@ import type {
   AutocompleteFieldProps,
   AutocompleteOption,
   AutocompleteOptionBase,
-} from "../../web/ui/autocomplete-field";
+} from "../../web/components/autocomplete-field";
 import { Badge } from "./badge";
 import { Check, ChevronDown, Search, X } from "./icons";
 import { Input } from "./input";
@@ -20,7 +20,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { Text as UIText } from "./text";
 
 // Re-export enum for type parity with web
-export { FormFieldCategory } from "../../web/ui/autocomplete-field";
+export { FormFieldCategory } from "../../web/components/autocomplete-field";
 
 export function AutocompleteField({
   value = "",

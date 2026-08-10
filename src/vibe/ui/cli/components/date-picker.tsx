@@ -7,9 +7,9 @@ import type { JSX } from "react";
 import { useState } from "react";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
-import type { DatePickerProps } from "../../web/ui/date-picker";
+import type { DatePickerProps } from "../../web/components/date-picker";
 
-export type { DatePickerProps } from "../../web/ui/date-picker";
+export type { DatePickerProps } from "../../web/components/date-picker";
 
 const DATE_FORMAT = "YYYY-MM-DD";
 

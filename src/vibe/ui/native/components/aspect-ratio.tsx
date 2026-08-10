@@ -2,7 +2,7 @@ import * as AspectRatioPrimitive from "@rn-primitives/aspect-ratio";
 import * as React from "react";
 
 import { cn } from "../../../unified-ui/_shared/cn";
-import type { AspectRatioRootProps } from "../../web/ui/aspect-ratio";
+import type { AspectRatioRootProps } from "../../web/components/aspect-ratio";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 

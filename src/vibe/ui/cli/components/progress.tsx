@@ -5,12 +5,12 @@ import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type {
   ProgressIndicatorProps,
   ProgressRootProps,
-} from "../../web/ui/progress";
+} from "../../web/components/progress";
 
 export type {
   ProgressIndicatorProps,
   ProgressRootProps,
-} from "../../web/ui/progress";
+} from "../../web/components/progress";
 
 const BAR_WIDTH = 20;
 

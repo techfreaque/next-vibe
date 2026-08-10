@@ -640,10 +640,9 @@ export function MultiWidgetRenderer<
   const objectValue = !Array.isArray(widgetValue)
     ? (widgetValue as
         | {
-            [K in keyof ObjectChildrenConstraint<
-              TKey,
-              TUsage
-            >]: InferResponseOutput<ObjectChildrenConstraint<TKey, TUsage>[K]>;
+            [
+              K in keyof ObjectChildrenConstraint<TKey, TUsage>
+            ]: InferResponseOutput<ObjectChildrenConstraint<TKey, TUsage>[K]>;
           }
         | null
         | undefined)
