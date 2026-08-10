@@ -39,7 +39,7 @@ const config: BuildConfig = {
         target: BunTargetEnum.NODE,
         sourcemap: SourcemapModeEnum.EXTERNAL,
         banner: "#!/usr/bin/env node",
-        // Apply web/ui → cli/ui redirects at bundle time (replaces runtime plugin import)
+        // Apply web/components → cli/components redirects at bundle time (replaces runtime plugin import)
         plugins: [
           createCliWidgetPlugin(
             // build.config.ts lives in src/vibe/tooling/check/

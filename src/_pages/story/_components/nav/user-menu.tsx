@@ -3,10 +3,9 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { StandardUserType } from "next-vibe/identity/user/types";
-import { useLogger } from "next-vibe/ui/hooks/use-logger";
-import { Avatar, AvatarFallback } from "next-vibe/ui/ui/avatar";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
+import { Avatar, AvatarFallback } from "next-vibe/ui/components/avatar";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,15 +13,16 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "next-vibe/ui/ui/dropdown-menu";
-import { HelpCircle } from "next-vibe/ui/ui/icons/HelpCircle";
-import { LogOut } from "next-vibe/ui/ui/icons/LogOut";
-import { MessageSquare } from "next-vibe/ui/ui/icons/MessageSquare";
-import { Settings } from "next-vibe/ui/ui/icons/Settings";
-import { User } from "next-vibe/ui/ui/icons/User";
-import { Link } from "next-vibe/ui/ui/link";
-import { Span } from "next-vibe/ui/ui/span";
-import { P } from "next-vibe/ui/ui/typography";
+} from "next-vibe/ui/components/dropdown-menu";
+import { HelpCircle } from "next-vibe/ui/components/icons/HelpCircle";
+import { LogOut } from "next-vibe/ui/components/icons/LogOut";
+import { MessageSquare } from "next-vibe/ui/components/icons/MessageSquare";
+import { Settings } from "next-vibe/ui/components/icons/Settings";
+import { User } from "next-vibe/ui/components/icons/User";
+import { Link } from "next-vibe/ui/components/link";
+import { Span } from "next-vibe/ui/components/span";
+import { P } from "next-vibe/ui/components/typography";
+import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import type { JSX } from "react";
 
 import { useLogout } from "@/user/private/logout/hooks";

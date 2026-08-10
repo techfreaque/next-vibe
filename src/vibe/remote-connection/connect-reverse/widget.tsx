@@ -11,9 +11,9 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe/ui/ui/card";
-import { Div } from "next-vibe/ui/ui/div";
-import { Server } from "next-vibe/ui/ui/icons/Server";
+} from "next-vibe/ui/components/card";
+import { Div } from "next-vibe/ui/components/div";
+import { Server } from "next-vibe/ui/components/icons/Server";
 import type { JSX } from "react";
 
 import { useWidgetLocale } from "../../unified-ui/_shared/use-widget-context";

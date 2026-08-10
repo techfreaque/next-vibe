@@ -6,12 +6,12 @@
 
 "use client";
 
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { Pre } from "next-vibe/ui/ui/pre";
-import { Span } from "next-vibe/ui/ui/span";
-import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { Pre } from "next-vibe/ui/components/pre";
+import { Span } from "next-vibe/ui/components/span";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import type { JSX } from "react";
 
 import {

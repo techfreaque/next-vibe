@@ -5,26 +5,26 @@
 
 "use client";
 
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
 import {
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from "next-vibe/ui/ui/form/form";
-import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
-import { Info } from "next-vibe/ui/ui/icons/Info";
-import { RangeSlider } from "next-vibe/ui/ui/range-slider";
-import { Span } from "next-vibe/ui/ui/span";
+} from "next-vibe/ui/components/form/form";
+import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
+import { Info } from "next-vibe/ui/components/icons/Info";
+import { RangeSlider } from "next-vibe/ui/components/range-slider";
+import { Span } from "next-vibe/ui/components/span";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe/ui/ui/tooltip";
+} from "next-vibe/ui/components/tooltip";
 import type { JSX } from "react";
 import type { z } from "zod";
 

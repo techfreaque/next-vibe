@@ -2,8 +2,8 @@
 
 import { platform } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { Div } from "next-vibe/ui/ui/div";
-import { H1, P } from "next-vibe/ui/ui/typography";
+import { Div } from "next-vibe/ui/components/div";
+import { H1, P } from "next-vibe/ui/components/typography";
 import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import type { JSX } from "react";
 

@@ -231,7 +231,6 @@ const oxlint: CheckConfig["oxlint"] = {
     curly: "error",
     eqeqeq: "error",
     "no-undef": "off",
-    camelcase: "error",
     "no-template-curly-in-string": "error",
     "no-unsafe-optional-chaining": "error",
     "array-callback-return": "error",
@@ -241,7 +240,6 @@ const oxlint: CheckConfig["oxlint"] = {
     "no-unreachable-loop": "error",
     "no-unused-private-class-members": "error",
     "prefer-template": "error",
-    "require-atomic-updates": "warn",
     "no-promise-executor-return": "error",
 
     // ── TypeScript (always enabled) ───────────────────────────
@@ -293,16 +291,6 @@ const oxlint: CheckConfig["oxlint"] = {
           // passing lint, so these are checked against `oxlint --rules`.
           "react/rules-of-hooks": "error",
           "react/exhaustive-deps": "error",
-          "react/jsx-key": "error",
-          "react/jsx-no-duplicate-props": "error",
-          "react/jsx-no-undef": "error",
-          "react/jsx-uses-react": "off",
-          "react/jsx-uses-vars": "error",
-          "react/no-children-prop": "error",
-          "react/no-deprecated": "error",
-          "react/no-direct-mutation-state": "error",
-          "react/no-unknown-property": "error",
-          "react/self-closing-comp": "error",
           "react/react-in-jsx-scope": "off",
         }
       : {}),

@@ -1,13 +1,18 @@
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { Div } from "next-vibe/ui/components/div";
+import type { EventData } from "next-vibe/ui/components/joyride";
+import {
+  ACTIONS,
+  EVENTS,
+  Joyride,
+  STATUS,
+} from "next-vibe/ui/components/joyride";
+import { H3, P } from "next-vibe/ui/components/typography";
 import { useSilentHistory } from "next-vibe/ui/hooks/use-navigation";
 import { useWindowSize } from "next-vibe/ui/hooks/use-window-size";
 import { storage } from "next-vibe/ui/lib/storage";
-import { Div } from "next-vibe/ui/ui/div";
-import type { EventData } from "next-vibe/ui/ui/joyride";
-import { ACTIONS, EVENTS, Joyride, STATUS } from "next-vibe/ui/ui/joyride";
-import { H3, P } from "next-vibe/ui/ui/typography";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { buildFolderUrl } from "@/_pages/chat/lib/utils/navigation";

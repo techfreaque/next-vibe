@@ -5,15 +5,15 @@
 "use client";
 import { LeadStatus } from "next-vibe/identity/lead/enum";
 import { scopedTranslation as leadsScopedTranslation } from "next-vibe/identity/lead/i18n";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
+import { Globe } from "next-vibe/ui/components/icons/Globe";
+import { Mail } from "next-vibe/ui/components/icons/Mail";
+import { Plus } from "next-vibe/ui/components/icons/Plus";
+import { Tag } from "next-vibe/ui/components/icons/Tag";
+import { Span } from "next-vibe/ui/components/span";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
-import { Globe } from "next-vibe/ui/ui/icons/Globe";
-import { Mail } from "next-vibe/ui/ui/icons/Mail";
-import { Plus } from "next-vibe/ui/ui/icons/Plus";
-import { Tag } from "next-vibe/ui/ui/icons/Tag";
-import { Span } from "next-vibe/ui/ui/span";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {

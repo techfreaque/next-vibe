@@ -4,12 +4,12 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { Platform } from "next-vibe/platforms/platforms";
+import { Button } from "next-vibe/ui/components/button";
+import { Card, CardContent } from "next-vibe/ui/components/card";
+import { Div } from "next-vibe/ui/components/div";
+import { Link } from "next-vibe/ui/components/link";
+import { MotionDiv } from "next-vibe/ui/components/motion";
 import { useRouter } from "next-vibe/ui/hooks/use-navigation";
-import { Button } from "next-vibe/ui/ui/button";
-import { Card, CardContent } from "next-vibe/ui/ui/card";
-import { Div } from "next-vibe/ui/ui/div";
-import { Link } from "next-vibe/ui/ui/link";
-import { MotionDiv } from "next-vibe/ui/ui/motion";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 

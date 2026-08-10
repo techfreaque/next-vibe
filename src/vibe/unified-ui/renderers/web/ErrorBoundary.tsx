@@ -4,10 +4,14 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "next-vibe/ui/ui/accordion";
-import { Alert, AlertDescription, AlertTitle } from "next-vibe/ui/ui/alert";
-import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
-import { Pre } from "next-vibe/ui/ui/pre";
+} from "next-vibe/ui/components/accordion";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "next-vibe/ui/components/alert";
+import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
+import { Pre } from "next-vibe/ui/components/pre";
 import { Component, type ErrorInfo, type ReactNode } from "react";
 
 import { type WidgetErrorBoundaryProps } from "../../_shared/react-types";

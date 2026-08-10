@@ -4,29 +4,29 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { Button } from "next-vibe/ui/ui/button";
+import { Button } from "next-vibe/ui/components/button";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "next-vibe/ui/ui/collapsible";
-import { Div } from "next-vibe/ui/ui/div";
-import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
-import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
-import { Globe } from "next-vibe/ui/ui/icons/Globe";
-import { HelpCircle } from "next-vibe/ui/ui/icons/HelpCircle";
-import { Settings } from "next-vibe/ui/ui/icons/Settings";
-import { ShoppingCart } from "next-vibe/ui/ui/icons/ShoppingCart";
-import { User } from "next-vibe/ui/ui/icons/User";
-import { Link } from "next-vibe/ui/ui/link";
-import { Progress, ProgressIndicator } from "next-vibe/ui/ui/progress";
-import { Span } from "next-vibe/ui/ui/span";
+} from "next-vibe/ui/components/collapsible";
+import { Div } from "next-vibe/ui/components/div";
+import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
+import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
+import { Globe } from "next-vibe/ui/components/icons/Globe";
+import { HelpCircle } from "next-vibe/ui/components/icons/HelpCircle";
+import { Settings } from "next-vibe/ui/components/icons/Settings";
+import { ShoppingCart } from "next-vibe/ui/components/icons/ShoppingCart";
+import { User } from "next-vibe/ui/components/icons/User";
+import { Link } from "next-vibe/ui/components/link";
+import { Progress, ProgressIndicator } from "next-vibe/ui/components/progress";
+import { Span } from "next-vibe/ui/components/span";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe/ui/ui/tooltip";
+} from "next-vibe/ui/components/tooltip";
 import type { JSX } from "react";
 
 import { useCredits } from "@/credits/hooks";

@@ -1,9 +1,9 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Div } from "next-vibe/ui/ui/div";
-import { Span } from "next-vibe/ui/ui/span";
-import { H3, H4 } from "next-vibe/ui/ui/typography";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Div } from "next-vibe/ui/components/div";
+import { Span } from "next-vibe/ui/components/span";
+import { H3, H4 } from "next-vibe/ui/components/typography";
 import {
   useWidgetLocale,
   useWidgetValue,

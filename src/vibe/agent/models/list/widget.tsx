@@ -1,13 +1,18 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { Search } from "next-vibe/ui/ui/icons/Search";
-import { Input } from "next-vibe/ui/ui/input";
-import { Span } from "next-vibe/ui/ui/span";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe/ui/ui/tabs";
-import { P } from "next-vibe/ui/ui/typography";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { Search } from "next-vibe/ui/components/icons/Search";
+import { Input } from "next-vibe/ui/components/input";
+import { Span } from "next-vibe/ui/components/span";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "next-vibe/ui/components/tabs";
+import { P } from "next-vibe/ui/components/typography";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetLocale,

@@ -40,51 +40,51 @@ import {
   useNodesState,
   useReactFlow,
 } from "@xyflow/react";
-import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
-import { addWindowListener } from "next-vibe/ui/lib/dom";
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
-import { Card } from "next-vibe/ui/ui/card";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
+import { Card } from "next-vibe/ui/components/card";
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "next-vibe/ui/ui/dialog";
-import { Div, type DivDragEvent } from "next-vibe/ui/ui/div";
-import { Activity } from "next-vibe/ui/ui/icons/Activity";
-import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
-import { ArrowRight } from "next-vibe/ui/ui/icons/ArrowRight";
-import { Check } from "next-vibe/ui/ui/icons/Check";
-import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
-import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
-import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
-import { Copy } from "next-vibe/ui/ui/icons/Copy";
-import { Database } from "next-vibe/ui/ui/icons/Database";
-import { EyeOff } from "next-vibe/ui/ui/icons/EyeOff";
-import { Globe } from "next-vibe/ui/ui/icons/Globe";
-import { History } from "next-vibe/ui/ui/icons/History";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
-import { PanelLeftClose } from "next-vibe/ui/ui/icons/PanelLeftClose";
-import { PanelLeftOpen } from "next-vibe/ui/ui/icons/PanelLeftOpen";
-import { Save } from "next-vibe/ui/ui/icons/Save";
-import { Settings } from "next-vibe/ui/ui/icons/Settings";
-import { Trash } from "next-vibe/ui/ui/icons/Trash";
-import { Wrench } from "next-vibe/ui/ui/icons/Wrench";
-import { X } from "next-vibe/ui/ui/icons/X";
-import { Zap } from "next-vibe/ui/ui/icons/Zap";
-import { Input } from "next-vibe/ui/ui/input";
-import { Label } from "next-vibe/ui/ui/label";
+} from "next-vibe/ui/components/dialog";
+import { Div, type DivDragEvent } from "next-vibe/ui/components/div";
+import { Activity } from "next-vibe/ui/components/icons/Activity";
+import { ArrowLeft } from "next-vibe/ui/components/icons/ArrowLeft";
+import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
+import { Check } from "next-vibe/ui/components/icons/Check";
+import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
+import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
+import { Copy } from "next-vibe/ui/components/icons/Copy";
+import { Database } from "next-vibe/ui/components/icons/Database";
+import { EyeOff } from "next-vibe/ui/components/icons/EyeOff";
+import { Globe } from "next-vibe/ui/components/icons/Globe";
+import { History } from "next-vibe/ui/components/icons/History";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { PanelLeftClose } from "next-vibe/ui/components/icons/PanelLeftClose";
+import { PanelLeftOpen } from "next-vibe/ui/components/icons/PanelLeftOpen";
+import { Save } from "next-vibe/ui/components/icons/Save";
+import { Settings } from "next-vibe/ui/components/icons/Settings";
+import { Trash } from "next-vibe/ui/components/icons/Trash";
+import { Wrench } from "next-vibe/ui/components/icons/Wrench";
+import { X } from "next-vibe/ui/components/icons/X";
+import { Zap } from "next-vibe/ui/components/icons/Zap";
+import { Input } from "next-vibe/ui/components/input";
+import { Label } from "next-vibe/ui/components/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "next-vibe/ui/ui/select";
-import { Span } from "next-vibe/ui/ui/span";
-import { P } from "next-vibe/ui/ui/typography";
+} from "next-vibe/ui/components/select";
+import { Span } from "next-vibe/ui/components/span";
+import { P } from "next-vibe/ui/components/typography";
+import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
+import { addWindowListener } from "next-vibe/ui/lib/dom";
 import React, {
   useCallback,
   useEffect,

@@ -6,15 +6,15 @@
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { Button } from "next-vibe/ui/ui/button";
-import { Checkbox } from "next-vibe/ui/ui/checkbox";
-import { Div } from "next-vibe/ui/ui/div";
-import { Filter } from "next-vibe/ui/ui/icons/Filter";
-import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
-import { UserPlus } from "next-vibe/ui/ui/icons/UserPlus";
-import { Users } from "next-vibe/ui/ui/icons/Users";
-import { Label } from "next-vibe/ui/ui/label";
-import { Span } from "next-vibe/ui/ui/span";
+import { Button } from "next-vibe/ui/components/button";
+import { Checkbox } from "next-vibe/ui/components/checkbox";
+import { Div } from "next-vibe/ui/components/div";
+import { Filter } from "next-vibe/ui/components/icons/Filter";
+import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
+import { UserPlus } from "next-vibe/ui/components/icons/UserPlus";
+import { Users } from "next-vibe/ui/components/icons/Users";
+import { Label } from "next-vibe/ui/components/label";
+import { Span } from "next-vibe/ui/components/span";
 import {
   useWidgetContext,
   useWidgetForm,

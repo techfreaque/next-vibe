@@ -4,19 +4,19 @@
 
 "use client";
 
-import { Button } from "next-vibe/ui/ui/button";
+import { Button } from "next-vibe/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe/ui/ui/card";
-import { Div } from "next-vibe/ui/ui/div";
-import { Coins } from "next-vibe/ui/ui/icons/Coins";
-import { Minus } from "next-vibe/ui/ui/icons/Minus";
-import { Plus } from "next-vibe/ui/ui/icons/Plus";
-import { Span } from "next-vibe/ui/ui/span";
+} from "next-vibe/ui/components/card";
+import { Div } from "next-vibe/ui/components/div";
+import { Coins } from "next-vibe/ui/components/icons/Coins";
+import { Minus } from "next-vibe/ui/components/icons/Minus";
+import { Plus } from "next-vibe/ui/components/icons/Plus";
+import { Span } from "next-vibe/ui/components/span";
 import {
   useWidgetForm,
   useWidgetTranslation,

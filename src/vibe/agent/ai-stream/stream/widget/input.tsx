@@ -5,32 +5,32 @@
  * Main input area for sending messages with voice support
  */
 import { endpoints as cronIdEndpoints } from "next-vibe/tasks/cron/[id]/definition";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { Form } from "next-vibe/ui/ui/form/form";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
-import { Mic } from "next-vibe/ui/ui/icons/Mic";
-import { Phone } from "next-vibe/ui/ui/icons/Phone";
-import { Send } from "next-vibe/ui/ui/icons/Send";
-import { Square } from "next-vibe/ui/ui/icons/Square";
-import { X } from "next-vibe/ui/ui/icons/X";
-import { Kbd } from "next-vibe/ui/ui/kbd";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { Form } from "next-vibe/ui/components/form/form";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { Mic } from "next-vibe/ui/components/icons/Mic";
+import { Phone } from "next-vibe/ui/components/icons/Phone";
+import { Send } from "next-vibe/ui/components/icons/Send";
+import { Square } from "next-vibe/ui/components/icons/Square";
+import { X } from "next-vibe/ui/components/icons/X";
+import { Kbd } from "next-vibe/ui/components/kbd";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "next-vibe/ui/ui/select";
-import { Span } from "next-vibe/ui/ui/span";
-import { Textarea } from "next-vibe/ui/ui/textarea";
+} from "next-vibe/ui/components/select";
+import { Span } from "next-vibe/ui/components/span";
+import { Textarea } from "next-vibe/ui/components/textarea";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe/ui/ui/tooltip";
-import { P } from "next-vibe/ui/ui/typography";
+} from "next-vibe/ui/components/tooltip";
+import { P } from "next-vibe/ui/components/typography";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetLocale,

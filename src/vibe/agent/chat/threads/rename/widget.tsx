@@ -1,9 +1,9 @@
 "use client";
 
-import { Div } from "next-vibe/ui/ui/div";
-import { Check } from "next-vibe/ui/ui/icons/Check";
-import { Pencil } from "next-vibe/ui/ui/icons/Pencil";
-import { Span } from "next-vibe/ui/ui/span";
+import { Div } from "next-vibe/ui/components/div";
+import { Check } from "next-vibe/ui/components/icons/Check";
+import { Pencil } from "next-vibe/ui/components/icons/Pencil";
+import { Span } from "next-vibe/ui/components/span";
 import {
   useWidgetForm,
   useWidgetTranslation,

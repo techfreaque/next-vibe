@@ -34,21 +34,21 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { type EndpointLogger } from "next-vibe/logger/types";
 import { Platform } from "next-vibe/platforms/platforms";
 import { endpoints as cronIdEndpoints } from "next-vibe/tasks/cron/[id]/definition";
-import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
-import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
+import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "next-vibe/ui/ui/collapsible";
-import { Div, type DivMouseEvent } from "next-vibe/ui/ui/div";
-import { Check } from "next-vibe/ui/ui/icons/Check";
-import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
-import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
-import { Copy } from "next-vibe/ui/ui/icons/Copy";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
-import { X } from "next-vibe/ui/ui/icons/X";
-import { Span } from "next-vibe/ui/ui/span";
+} from "next-vibe/ui/components/collapsible";
+import { Div, type DivMouseEvent } from "next-vibe/ui/components/div";
+import { Check } from "next-vibe/ui/components/icons/Check";
+import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
+import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
+import { Copy } from "next-vibe/ui/components/icons/Copy";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { X } from "next-vibe/ui/components/icons/X";
+import { Span } from "next-vibe/ui/components/span";
+import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   type ReactHooksTranslationKey,

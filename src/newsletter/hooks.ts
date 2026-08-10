@@ -8,8 +8,8 @@
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { InputChangeEvent } from "next-vibe/ui/components/input";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
-import type { InputChangeEvent } from "next-vibe/ui/ui/input";
 import type { EndpointReturn } from "next-vibe/unified-ui/hooks/endpoint-types";
 import {
   createCustomStateKey,

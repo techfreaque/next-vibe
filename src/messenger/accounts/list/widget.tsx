@@ -3,19 +3,19 @@
  */
 
 "use client";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
-import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
-import { GitBranch } from "next-vibe/ui/ui/icons/GitBranch";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
-import { Plus } from "next-vibe/ui/ui/icons/Plus";
-import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
-import { Search } from "next-vibe/ui/ui/icons/Search";
-import { Server } from "next-vibe/ui/ui/icons/Server";
-import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
-import { Input } from "next-vibe/ui/ui/input";
-import { Span } from "next-vibe/ui/ui/span";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
+import { GitBranch } from "next-vibe/ui/components/icons/GitBranch";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { Plus } from "next-vibe/ui/components/icons/Plus";
+import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
+import { Search } from "next-vibe/ui/components/icons/Search";
+import { Server } from "next-vibe/ui/components/icons/Server";
+import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
+import { Input } from "next-vibe/ui/components/input";
+import { Span } from "next-vibe/ui/components/span";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {

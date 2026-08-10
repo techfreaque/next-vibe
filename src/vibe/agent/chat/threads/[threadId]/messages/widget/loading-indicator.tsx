@@ -1,5 +1,5 @@
 "use client";
-import { Div } from "next-vibe/ui/ui/div";
+import { Div } from "next-vibe/ui/components/div";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 import { memo } from "react";

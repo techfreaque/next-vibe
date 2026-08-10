@@ -10,7 +10,7 @@ import { getEndpoint } from "@/generated/endpoints/endpoint-dev";
 
 import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
 import {
-  definitionLoader,
+  DefinitionLoader,
   type IDefinitionLoader,
 } from "../../../core/definition/loader";
 import type { CountryLanguage } from "../../../core/i18n/core/config";
@@ -243,7 +243,15 @@ export class RouteDelegationHandler {
     command: string,
     options: CliExecutionOptions,
     logger: EndpointLogger,
-    loader: IDefinitionLoader = definitionLoader,
+    // Dev registry, matching the getEndpoint import above — NOT the module-level
+    // `definitionLoader` singleton, which defaults to the PROD registry. The CLI
+    // needs the dev registry (a superset that still includes PRODUCTION_OFF-
+    // marked endpoints, e.g. `gen`) the same way the getRouteHandler/getEndpoint
+    // peek two lines above already does. Using the prod-scoped singleton here
+    // made `loader.load()` silently fail "Endpoint not found" for every
+    // PRODUCTION_OFF endpoint even though the peek had already resolved it —
+    // found 2026-08-05 via `vibe gen`.
+    loader: IDefinitionLoader = new DefinitionLoader(getEndpoint),
   ): Promise<RouteExecutionResult> {
     const startTime = Date.now();
 

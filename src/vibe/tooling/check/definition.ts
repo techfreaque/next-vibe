@@ -213,6 +213,16 @@ const { POST } = createEndpoint({
               type: WidgetType.TEXT,
               schema: z.number().optional(),
             }),
+            // Live file counter while a phase is running — today only the
+            // LSP-daemon typecheck leg reports these.
+            filesChecked: responseField({
+              type: WidgetType.TEXT,
+              schema: z.number().optional(),
+            }),
+            totalFiles: responseField({
+              type: WidgetType.TEXT,
+              schema: z.number().optional(),
+            }),
           },
         }),
       }),

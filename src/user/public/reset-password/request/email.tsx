@@ -32,7 +32,7 @@ import type {
   ResetPasswordRequestPostRequestOutput,
   ResetPasswordRequestPostResponseOutput,
 } from "./definition";
-import definition from "./definition";
+import type definition from "./definition";
 import {
   scopedTranslation as requestScopedTranslation,
   type ResetPasswordRequestT,

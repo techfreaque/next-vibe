@@ -469,18 +469,14 @@ export class DevRepository {
       }
     }
 
-    const { serverSystemEnv } = await import("../env");
-    const disableProxy = serverSystemEnv.VIBE_DISABLE_PROXY;
-
-    // Import WS module to get NEXT_PORT_OFFSET
-    const { startWebSocketServer, NEXT_PORT_OFFSET } =
-      await import("../../../realtime/server/server");
-
-    // In proxy mode (default): app server on port+NEXT_PORT_OFFSET, Bun proxy on main port.
-    // In direct mode (VIBE_DISABLE_PROXY=true): app server on main port, WS sidecar on port+1000.
-    const WS_SIDECAR_OFFSET = 1000;
-    const nextPort = disableProxy ? port : port + NEXT_PORT_OFFSET;
-    const wsPort = disableProxy ? port + WS_SIDECAR_OFFSET : port;
+    // Port layout and the Bun proxy itself live behind ../proxy — see that
+    // module for the two modes (proxy / VIBE_DISABLE_PROXY) this selects.
+    const { resolveWebProxyPorts, startWebProxy } = await import("../proxy");
+    const {
+      appPort: nextPort,
+      wsPort,
+      disableProxy,
+    } = await resolveWebProxyPorts(port);
 
     // Kill stale processes on all used ports.
     // TanStack mode: Vite runs on nextPort (internal), proxy on wsPort (public) - same offsets as Next.js.
@@ -490,12 +486,12 @@ export class DevRepository {
     // WS proxy handle - started immediately for Next.js mode, but deferred
     // until AFTER Vite is ready for TanStack mode (early requests to the proxy
     // before Vite is listening on nextPort can interfere with Nitro's startup).
-    let wsHandle: ReturnType<typeof startWebSocketServer> | undefined;
+    let wsHandle: Awaited<ReturnType<typeof startWebProxy>>;
 
     // For Next.js mode, start the proxy immediately so it's ready to accept connections.
     // For TanStack mode, we start Vite first and only then start the proxy.
     if (!tanstack) {
-      wsHandle = startWebSocketServer({ port: wsPort, logger });
+      wsHandle = await startWebProxy({ port: wsPort, logger });
     }
 
     // Controller over the Next.js child process - set in Next.js mode only
@@ -687,7 +683,7 @@ export class DevRepository {
 
       // Vite is now ready - start the proxy so it can forward requests to Vite
       if (!disableProxy) {
-        wsHandle = startWebSocketServer({ port: wsPort, logger });
+        wsHandle = await startWebProxy({ port: wsPort, logger });
       }
 
       // Keep the process alive - the Vite/Nitro server runs until SIGINT/SIGTERM

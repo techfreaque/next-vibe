@@ -4,24 +4,24 @@
  */
 
 "use client";
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
-import { Card, CardContent } from "next-vibe/ui/ui/card";
-import { Div } from "next-vibe/ui/ui/div";
-import { Activity } from "next-vibe/ui/ui/icons/Activity";
-import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
-import { Archive } from "next-vibe/ui/ui/icons/Archive";
-import { GitBranch } from "next-vibe/ui/ui/icons/GitBranch";
-import { Plus } from "next-vibe/ui/ui/icons/Plus";
-import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
-import { Search } from "next-vibe/ui/ui/icons/Search";
-import { Shield } from "next-vibe/ui/ui/icons/Shield";
-import { Trash } from "next-vibe/ui/ui/icons/Trash";
-import { User } from "next-vibe/ui/ui/icons/User";
-import { X } from "next-vibe/ui/ui/icons/X";
-import { Input } from "next-vibe/ui/ui/input";
-import { Span } from "next-vibe/ui/ui/span";
-import { P } from "next-vibe/ui/ui/typography";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
+import { Card, CardContent } from "next-vibe/ui/components/card";
+import { Div } from "next-vibe/ui/components/div";
+import { Activity } from "next-vibe/ui/components/icons/Activity";
+import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
+import { Archive } from "next-vibe/ui/components/icons/Archive";
+import { GitBranch } from "next-vibe/ui/components/icons/GitBranch";
+import { Plus } from "next-vibe/ui/components/icons/Plus";
+import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
+import { Search } from "next-vibe/ui/components/icons/Search";
+import { Shield } from "next-vibe/ui/components/icons/Shield";
+import { Trash } from "next-vibe/ui/components/icons/Trash";
+import { User } from "next-vibe/ui/components/icons/User";
+import { X } from "next-vibe/ui/components/icons/X";
+import { Input } from "next-vibe/ui/components/input";
+import { Span } from "next-vibe/ui/components/span";
+import { P } from "next-vibe/ui/components/typography";
 import React, { useCallback, useMemo } from "react";
 
 import { formatSimpleDate } from "../../core/i18n/core/localization-utils";

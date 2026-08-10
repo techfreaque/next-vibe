@@ -1,11 +1,11 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Div } from "next-vibe/ui/ui/div";
-import { GitBranch } from "next-vibe/ui/ui/icons/GitBranch";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
-import { PackageSearch } from "next-vibe/ui/ui/icons/PackageSearch";
-import { Span } from "next-vibe/ui/ui/span";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Div } from "next-vibe/ui/components/div";
+import { GitBranch } from "next-vibe/ui/components/icons/GitBranch";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { PackageSearch } from "next-vibe/ui/components/icons/PackageSearch";
+import { Span } from "next-vibe/ui/components/span";
 
 import { Platform } from "../../platforms/platforms";
 import {

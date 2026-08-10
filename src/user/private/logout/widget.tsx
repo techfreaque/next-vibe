@@ -1,9 +1,9 @@
 "use client";
 
-import { Button } from "next-vibe/ui/ui/button";
-import { LogOut } from "next-vibe/ui/ui/icons/LogOut";
-import { LoadingBlock } from "next-vibe/ui/ui/loading-block";
-import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
+import { Button } from "next-vibe/ui/components/button";
+import { LogOut } from "next-vibe/ui/components/icons/LogOut";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
   useWidgetLocale,
   useWidgetLogger,

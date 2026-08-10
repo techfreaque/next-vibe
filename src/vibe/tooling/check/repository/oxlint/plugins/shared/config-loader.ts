@@ -35,6 +35,7 @@ type PluginName =
   | "oxlint-plugin-restricted/no-throw"
   | "oxlint-plugin-restricted/no-jsx-in-object-literal"
   | "oxlint-plugin-restricted/no-raw-fetch"
+  | "oxlint-plugin-restricted/no-as-assertion"
   | "oxlint-plugin-restricted/no-browser-globals"
   | "oxlint-plugin-restricted/no-endpoints-page-in-server-entry"
   | "oxlint-plugin-boilerplate/route-pattern";
@@ -48,6 +49,7 @@ interface PluginConfigMap {
   "oxlint-plugin-restricted/no-throw": RestrictedSyntaxPluginConfig;
   "oxlint-plugin-restricted/no-jsx-in-object-literal": RestrictedSyntaxPluginConfig;
   "oxlint-plugin-restricted/no-raw-fetch": RestrictedSyntaxPluginConfig;
+  "oxlint-plugin-restricted/no-as-assertion": RestrictedSyntaxPluginConfig;
   "oxlint-plugin-restricted/no-browser-globals": RestrictedSyntaxPluginConfig;
   "oxlint-plugin-restricted/no-endpoints-page-in-server-entry": RestrictedSyntaxPluginConfig;
   "oxlint-plugin-boilerplate/route-pattern": BoilerplatePluginConfig;

@@ -2,11 +2,11 @@
 
 import { Methods } from "next-vibe/core/definition/enums";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { FolderOpen } from "next-vibe/ui/ui/icons/FolderOpen";
-import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
-import { WidgetHeader } from "next-vibe/ui/ui/widget-header";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { FolderOpen } from "next-vibe/ui/components/icons/FolderOpen";
+import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import {
   useWidgetEndpoint,
   useWidgetForm,

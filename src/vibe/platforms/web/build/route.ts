@@ -13,12 +13,13 @@ import buildEndpoints from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: buildEndpoints,
   [Methods.POST]: {
-    handler: async ({ data, locale, logger, t }) =>
+    handler: async ({ data, locale, logger, t, user }) =>
       (await import("./repository")).BuildRepository.execute(
         data,
         locale,
         logger,
         t,
+        user,
       ),
   },
 });

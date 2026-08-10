@@ -5,10 +5,10 @@
 "use client";
 import type { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { DivRefObject } from "next-vibe/ui/components/div";
+import { Div } from "next-vibe/ui/components/div";
+import { Span } from "next-vibe/ui/components/span";
 import { useWindowSize } from "next-vibe/ui/hooks/use-window-size";
-import type { DivRefObject } from "next-vibe/ui/ui/div";
-import { Div } from "next-vibe/ui/ui/div";
-import { Span } from "next-vibe/ui/ui/span";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 import { useCallback, useLayoutEffect, useState } from "react";

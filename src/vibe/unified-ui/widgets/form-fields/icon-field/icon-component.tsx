@@ -7,7 +7,7 @@
  * on platform themselves.
  */
 
-import { Span } from "next-vibe/ui/ui/span";
+import { Span } from "next-vibe/ui/components/span";
 import type { JSX } from "react";
 import React, { useEffect, useState } from "react";
 

@@ -2,10 +2,10 @@
 
 import type { ModelCountsByContentLevel } from "next-vibe/agent/models/all-models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { Div } from "next-vibe/ui/components/div";
 import { useSearchParams } from "next-vibe/ui/hooks/use-navigation";
 import { getElementById } from "next-vibe/ui/lib/dom";
 import { getCurrentUrl, silentReplaceState } from "next-vibe/ui/lib/location";
-import { Div } from "next-vibe/ui/ui/div";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 

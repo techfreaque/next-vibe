@@ -1,13 +1,13 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
-import { Card, CardContent } from "next-vibe/ui/ui/card";
-import { DataTable } from "next-vibe/ui/ui/data-table";
-import { Div } from "next-vibe/ui/ui/div";
-import { Image } from "next-vibe/ui/ui/image";
-import { Markdown } from "next-vibe/ui/ui/markdown";
-import { Section } from "next-vibe/ui/ui/section";
-import { H2, H3, P } from "next-vibe/ui/ui/typography";
-import type { AppColumnDef } from "next-vibe/ui/ui/data-table";
+import { Card, CardContent } from "next-vibe/ui/components/card";
+import type { AppColumnDef } from "next-vibe/ui/components/data-table";
+import { DataTable } from "next-vibe/ui/components/data-table";
+import { Div } from "next-vibe/ui/components/div";
+import { Image } from "next-vibe/ui/components/image";
+import { Markdown } from "next-vibe/ui/components/markdown";
+import { Section } from "next-vibe/ui/components/section";
+import { H2, H3, P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 
 interface SampleData {

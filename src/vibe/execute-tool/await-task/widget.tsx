@@ -1,7 +1,7 @@
 "use client";
 
-import { Div } from "next-vibe/ui/ui/div";
-import { P } from "next-vibe/ui/ui/typography";
+import { Div } from "next-vibe/ui/components/div";
+import { P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 

@@ -16,29 +16,29 @@ import type { HelpToolMetadataSerialized } from "next-vibe/help-tool/definition"
 import helpDefinitions from "next-vibe/help-tool/definition";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { Check } from "next-vibe/ui/ui/icons/Check";
-import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
-import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
-import { Eye } from "next-vibe/ui/ui/icons/Eye";
-import { EyeOff } from "next-vibe/ui/ui/icons/EyeOff";
-import { RotateCcw } from "next-vibe/ui/ui/icons/RotateCcw";
-import { Search } from "next-vibe/ui/ui/icons/Search";
-import { Shield } from "next-vibe/ui/ui/icons/Shield";
-import { Wrench } from "next-vibe/ui/ui/icons/Wrench";
-import { X } from "next-vibe/ui/ui/icons/X";
-import { Input } from "next-vibe/ui/ui/input";
-import { Span } from "next-vibe/ui/ui/span";
-import { Switch } from "next-vibe/ui/ui/switch";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { Check } from "next-vibe/ui/components/icons/Check";
+import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
+import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
+import { Eye } from "next-vibe/ui/components/icons/Eye";
+import { EyeOff } from "next-vibe/ui/components/icons/EyeOff";
+import { RotateCcw } from "next-vibe/ui/components/icons/RotateCcw";
+import { Search } from "next-vibe/ui/components/icons/Search";
+import { Shield } from "next-vibe/ui/components/icons/Shield";
+import { Wrench } from "next-vibe/ui/components/icons/Wrench";
+import { X } from "next-vibe/ui/components/icons/X";
+import { Input } from "next-vibe/ui/components/input";
+import { Span } from "next-vibe/ui/components/span";
+import { Switch } from "next-vibe/ui/components/switch";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe/ui/ui/tooltip";
-import { P } from "next-vibe/ui/ui/typography";
+} from "next-vibe/ui/components/tooltip";
+import { P } from "next-vibe/ui/components/typography";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import type { JSX } from "react";

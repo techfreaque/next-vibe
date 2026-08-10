@@ -885,7 +885,8 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
 const ENV_KEYS_OUTPUT = `${GENERATED_DIR}/env/keys.ts`;
 
 /** Serializable metadata for a single env key. */
-export interface EnvKeyMeta {
+// eslint-disable-next-line typescript/consistent-type-definitions, @typescript-eslint/consistent-type-definitions -- Must be a type alias, not an interface: only aliases get the implicit index signature that lets EnvKeyMeta[] flow straight into jsonToTs(WidgetData) without a cast.
+export type EnvKeyMeta = {
   key: string;
   module: string;
   comment: string;
@@ -897,7 +898,7 @@ export interface EnvKeyMeta {
   onboardingStep?: number;
   onboardingGroup?: string;
   autoGenerate?: "hex32" | "hex64";
-}
+};
 
 const ENV_KEYS_HIDDEN_MODULES = new Set(["serverSystem"]);
 const ENV_KEYS_SENSITIVE_PATTERNS = [

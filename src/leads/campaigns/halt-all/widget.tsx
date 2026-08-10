@@ -15,14 +15,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "next-vibe/ui/ui/alert-dialog";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
-import { Check } from "next-vibe/ui/ui/icons/Check";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
-import { Span } from "next-vibe/ui/ui/span";
-import { P } from "next-vibe/ui/ui/typography";
+} from "next-vibe/ui/components/alert-dialog";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
+import { Check } from "next-vibe/ui/components/icons/Check";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { Span } from "next-vibe/ui/components/span";
+import { P } from "next-vibe/ui/components/typography";
 import {
   useWidgetContext,
   useWidgetForm,

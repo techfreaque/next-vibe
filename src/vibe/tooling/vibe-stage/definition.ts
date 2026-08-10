@@ -47,7 +47,7 @@ const { POST } = createEndpoint({
     UserRole.MCP_OFF,
   ],
   aliases: [VIBE_STAGE_ALIAS],
-
+  timeoutMs: 240000, // 4 minutes
   fields: customWidgetObject({
     render: VibeStageWidget,
     usage: { request: "data", response: true } as const,

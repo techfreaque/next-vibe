@@ -46,13 +46,13 @@ function MyComponent() {
 
 ```
 Use platform-independent <Div> component instead of <div>.
-import { Div } from "next-vibe-ui/ui/div";
+import { Div } from "next-vibe-ui/components/div";
 ```
 
 #### ✅ Good
 
 ```tsx
-import { Div } from "next-vibe-ui/ui/div";
+import { Div } from "next-vibe-ui/components/div";
 
 function MyComponent() {
   return <Div>Hello World</Div>;
@@ -78,16 +78,16 @@ function Article() {
 
 ```
 Use typography component <H2> instead of <h2>.
-import { H2 } from "next-vibe-ui/ui/typography";
+import { H2 } from "next-vibe-ui/components/typography";
 
 Use typography component <P> instead of <p>.
-import { P } from "next-vibe-ui/ui/typography";
+import { P } from "next-vibe-ui/components/typography";
 ```
 
 #### ✅ Good
 
 ```tsx
-import { H2, P } from "next-vibe-ui/ui/typography";
+import { H2, P } from "next-vibe-ui/components/typography";
 
 function Article() {
   return (
@@ -113,13 +113,13 @@ function Avatar() {
 
 ```
 Use platform-independent <Image> component instead of <img>.
-import { Image } from "next-vibe-ui/ui/image";
+import { Image } from "next-vibe-ui/components/image";
 ```
 
 #### ✅ Good
 
 ```tsx
-import { Image } from "next-vibe-ui/ui/image";
+import { Image } from "next-vibe-ui/components/image";
 
 function Avatar() {
   return <Image src="/avatar.png" alt="User" />;
@@ -144,7 +144,7 @@ function Icon() {
 
 ```
 SVG element <svg> detected. For icons, use components from
-next-vibe-ui/ui/icons instead. For custom SVG, create
+next-vibe-ui/components/icons instead. For custom SVG, create
 platform-independent components using react-native-svg that
 work on both web and native.
 ```
@@ -153,7 +153,7 @@ work on both web and native.
 
 ```tsx
 // Option 1: Use existing icon components
-import { CheckIcon } from "next-vibe-ui/ui/icons/Check";
+import { CheckIcon } from "next-vibe-ui/components/icons/Check";
 
 function Success() {
   return <CheckIcon />;
@@ -195,7 +195,7 @@ The plugin checks for **ALL lowercase JSX elements** and provides context-specif
 
 ### 1. Typography Components
 
-Import from `next-vibe-ui/ui/typography`:
+Import from `next-vibe-ui/components/typography`:
 
 - **Headings:** h1, h2, h3, h4 → H1, H2, H3, H4
 - **Text:** p → P
@@ -204,14 +204,14 @@ Import from `next-vibe-ui/ui/typography`:
 
 ### 2. Standalone UI Components
 
-Import individually from `next-vibe-ui/ui/{component}`:
+Import individually from `next-vibe-ui/components/{component}`:
 
-- **Text:** span → Span (from `next-vibe-ui/ui/span`)
-- **Code blocks:** pre → Pre (from `next-vibe-ui/ui/pre`)
+- **Text:** span → Span (from `next-vibe-ui/components/span`)
+- **Code blocks:** pre → Pre (from `next-vibe-ui/components/pre`)
 
 ### 3. Common UI Components
 
-Import from `next-vibe-ui/ui/{element}`:
+Import from `next-vibe-ui/components/{element}`:
 
 - **Containers:** div, section, article, aside, header, footer, main, nav
 - **Interactive:** button, input, textarea, select, label, form
@@ -222,7 +222,7 @@ Import from `next-vibe-ui/ui/{element}`:
 
 ### 4. Image Components
 
-Import from `next-vibe-ui/ui/image`:
+Import from `next-vibe-ui/components/image`:
 
 - **Images:** img, picture → Image
 
@@ -231,15 +231,15 @@ Import from `next-vibe-ui/ui/image`:
 **Suggests using icon components or react-native-svg:**
 
 - svg, path, circle, rect, polygon, etc.
-- For icons: Use components from `next-vibe-ui/ui/icons`
+- For icons: Use components from `next-vibe-ui/components/icons`
 - For custom SVG: Use `react-native-svg` for platform independence
 
 ### 6. Unknown Elements
 
 For any element without a known wrapper component, the plugin suggests:
 
-1. Creating `next-vibe-ui/web/ui/{element}.tsx` for web
-2. Creating `next-vibe-ui/native/ui/{element}.tsx` for React Native
+1. Creating `next-vibe-ui/web/components/{element}.tsx` for web
+2. Creating `next-vibe-ui/native/components/{element}.tsx` for React Native
 3. Or using an existing component if available
 
 **Note:** The plugin uses dynamic lowercase detection, so it catches **any** element starting with a lowercase letter.

@@ -5,10 +5,10 @@
 
 "use client";
 
-import { Div } from "next-vibe/ui/ui/div";
-import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
-import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
-import { Span } from "next-vibe/ui/ui/span";
+import { Div } from "next-vibe/ui/components/div";
+import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
+import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
+import { Span } from "next-vibe/ui/components/span";
 import {
   useWidgetTranslation,
   useWidgetValue,

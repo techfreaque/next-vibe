@@ -3,7 +3,7 @@
 import {
   FormAlert,
   type FormAlertState,
-} from "next-vibe/ui/ui/form/form-alert";
+} from "next-vibe/ui/components/form/form-alert";
 import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";

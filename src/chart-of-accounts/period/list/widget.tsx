@@ -1,11 +1,11 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { BarChart } from "next-vibe/ui/ui/icons/BarChart";
-import { Building } from "next-vibe/ui/ui/icons/Building";
-import { Span } from "next-vibe/ui/ui/span";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { BarChart } from "next-vibe/ui/components/icons/BarChart";
+import { Building } from "next-vibe/ui/components/icons/Building";
+import { Span } from "next-vibe/ui/components/span";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetNavigation,

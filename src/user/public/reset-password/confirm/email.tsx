@@ -29,7 +29,7 @@ import type {
   ResetPasswordConfirmPostRequestOutput,
   ResetPasswordConfirmPostResponseOutput,
 } from "./definition";
-import definition from "./definition";
+import type definition from "./definition";
 import { scopedTranslation as confirmScopedTranslation } from "./i18n";
 
 // ============================================================================

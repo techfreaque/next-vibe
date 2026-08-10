@@ -9,14 +9,14 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "next-vibe/ui/ui/alert-dialog";
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
-import { ExternalLink } from "next-vibe/ui/ui/icons/ExternalLink";
-import { Span } from "next-vibe/ui/ui/span";
-import { H3, H4, P } from "next-vibe/ui/ui/typography";
+} from "next-vibe/ui/components/alert-dialog";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { ExternalLink } from "next-vibe/ui/components/icons/ExternalLink";
+import { Span } from "next-vibe/ui/components/span";
+import { H3, H4, P } from "next-vibe/ui/components/typography";
 import {
   useWidgetNavigation,
   useWidgetTranslation,

@@ -7,9 +7,9 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "next-vibe/ui/ui/breadcrumb";
-import { Div } from "next-vibe/ui/ui/div";
-import { Link } from "next-vibe/ui/ui/link";
+} from "next-vibe/ui/components/breadcrumb";
+import { Div } from "next-vibe/ui/components/div";
+import { Link } from "next-vibe/ui/components/link";
 import {
   Menubar,
   MenubarCheckboxItem,
@@ -24,7 +24,7 @@ import {
   MenubarSubContent,
   MenubarSubTrigger,
   MenubarTrigger,
-} from "next-vibe/ui/ui/menubar";
+} from "next-vibe/ui/components/menubar";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -32,9 +32,9 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-} from "next-vibe/ui/ui/navigation-menu";
-import { Section } from "next-vibe/ui/ui/section";
-import { H2, H3, Small } from "next-vibe/ui/ui/typography";
+} from "next-vibe/ui/components/navigation-menu";
+import { Section } from "next-vibe/ui/components/section";
+import { H2, H3, Small } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 import { useState } from "react";
 

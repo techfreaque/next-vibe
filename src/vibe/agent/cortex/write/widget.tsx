@@ -6,11 +6,11 @@
 "use client";
 
 import { useTranslation } from "next-vibe/core/i18n/core/client";
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Card, CardContent } from "next-vibe/ui/ui/card";
-import { Div } from "next-vibe/ui/ui/div";
-import { Check } from "next-vibe/ui/ui/icons/Check";
-import { Span } from "next-vibe/ui/ui/span";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Card, CardContent } from "next-vibe/ui/components/card";
+import { Div } from "next-vibe/ui/components/div";
+import { Check } from "next-vibe/ui/components/icons/Check";
+import { Span } from "next-vibe/ui/components/span";
 import {
   useWidgetDisabled,
   useWidgetValue,

@@ -27,60 +27,65 @@ import {
   type LeadsT,
   scopedTranslation as leadsScopedTranslation,
 } from "next-vibe/identity/lead/i18n";
-import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
-import { DetailField, DetailGrid } from "next-vibe/ui/ui/detail-grid";
-import { Div } from "next-vibe/ui/ui/div";
-import { EmptyBlock } from "next-vibe/ui/ui/empty-block";
-import { Activity } from "next-vibe/ui/ui/icons/Activity";
-import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
-import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
-import { Check } from "next-vibe/ui/ui/icons/Check";
-import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
-import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
-import { Clock } from "next-vibe/ui/ui/icons/Clock";
-import { Copy } from "next-vibe/ui/ui/icons/Copy";
-import { CreditCard } from "next-vibe/ui/ui/icons/CreditCard";
-import { ExternalLink as ExternalLinkIcon } from "next-vibe/ui/ui/icons/ExternalLink";
-import { Globe } from "next-vibe/ui/ui/icons/Globe";
-import { Hash } from "next-vibe/ui/ui/icons/Hash";
-import { Info } from "next-vibe/ui/ui/icons/Info";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
-import { Mail } from "next-vibe/ui/ui/icons/Mail";
-import { Pencil } from "next-vibe/ui/ui/icons/Pencil";
-import { Phone } from "next-vibe/ui/ui/icons/Phone";
-import { Save } from "next-vibe/ui/ui/icons/Save";
-import { Search } from "next-vibe/ui/ui/icons/Search";
-import { Send } from "next-vibe/ui/ui/icons/Send";
-import { Target } from "next-vibe/ui/ui/icons/Target";
-import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
-import { User } from "next-vibe/ui/ui/icons/User";
-import { Input } from "next-vibe/ui/ui/input";
-import { Label } from "next-vibe/ui/ui/label";
-import { ExternalLink } from "next-vibe/ui/ui/link";
-import { LoadingBlock } from "next-vibe/ui/ui/loading-block";
-import { MetricCard } from "next-vibe/ui/ui/metric-card";
-import { MetricGrid } from "next-vibe/ui/ui/metric-grid";
-import { ProgressBlock } from "next-vibe/ui/ui/progress-block";
-import { ResultBanner } from "next-vibe/ui/ui/result-banner";
-import { SectionGroup } from "next-vibe/ui/ui/section-group";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
+import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
+import { Div } from "next-vibe/ui/components/div";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
+import { Activity } from "next-vibe/ui/components/icons/Activity";
+import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
+import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
+import { Check } from "next-vibe/ui/components/icons/Check";
+import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
+import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
+import { Clock } from "next-vibe/ui/components/icons/Clock";
+import { Copy } from "next-vibe/ui/components/icons/Copy";
+import { CreditCard } from "next-vibe/ui/components/icons/CreditCard";
+import { ExternalLink as ExternalLinkIcon } from "next-vibe/ui/components/icons/ExternalLink";
+import { Globe } from "next-vibe/ui/components/icons/Globe";
+import { Hash } from "next-vibe/ui/components/icons/Hash";
+import { Info } from "next-vibe/ui/components/icons/Info";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { Mail } from "next-vibe/ui/components/icons/Mail";
+import { Pencil } from "next-vibe/ui/components/icons/Pencil";
+import { Phone } from "next-vibe/ui/components/icons/Phone";
+import { Save } from "next-vibe/ui/components/icons/Save";
+import { Search } from "next-vibe/ui/components/icons/Search";
+import { Send } from "next-vibe/ui/components/icons/Send";
+import { Target } from "next-vibe/ui/components/icons/Target";
+import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
+import { User } from "next-vibe/ui/components/icons/User";
+import { Input } from "next-vibe/ui/components/input";
+import { Label } from "next-vibe/ui/components/label";
+import { ExternalLink } from "next-vibe/ui/components/link";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
+import { MetricCard } from "next-vibe/ui/components/metric-card";
+import { MetricGrid } from "next-vibe/ui/components/metric-grid";
+import { ProgressBlock } from "next-vibe/ui/components/progress-block";
+import { ResultBanner } from "next-vibe/ui/components/result-banner";
+import { SectionGroup } from "next-vibe/ui/components/section-group";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "next-vibe/ui/ui/select";
-import { Separator } from "next-vibe/ui/ui/separator";
-import { Span } from "next-vibe/ui/ui/span";
-import { StatusPill } from "next-vibe/ui/ui/status-pill";
-import { Strong } from "next-vibe/ui/ui/strong";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe/ui/ui/tabs";
-import { Textarea } from "next-vibe/ui/ui/textarea";
-import { P } from "next-vibe/ui/ui/typography";
-import { WidgetHeader } from "next-vibe/ui/ui/widget-header";
-import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
+} from "next-vibe/ui/components/select";
+import { Separator } from "next-vibe/ui/components/separator";
+import { Span } from "next-vibe/ui/components/span";
+import { StatusPill } from "next-vibe/ui/components/status-pill";
+import { Strong } from "next-vibe/ui/components/strong";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "next-vibe/ui/components/tabs";
+import { Textarea } from "next-vibe/ui/components/textarea";
+import { P } from "next-vibe/ui/components/typography";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
+import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetContext,

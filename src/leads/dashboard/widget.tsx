@@ -2,23 +2,23 @@
 
 import { LeadStatus } from "next-vibe/identity/lead/enum";
 import { scopedTranslation as leadsScopedTranslation } from "next-vibe/identity/lead/i18n";
-import { ActionCard } from "next-vibe/ui/ui/action-card";
-import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { EmptyBlock } from "next-vibe/ui/ui/empty-block";
-import { ArrowRight } from "next-vibe/ui/ui/icons/ArrowRight";
-import { BarChart } from "next-vibe/ui/ui/icons/BarChart";
-import { Download } from "next-vibe/ui/ui/icons/Download";
-import { Plus } from "next-vibe/ui/ui/icons/Plus";
-import { UserSearch } from "next-vibe/ui/ui/icons/UserSearch";
-import { ListItem } from "next-vibe/ui/ui/list-item";
-import { LoadingBlock } from "next-vibe/ui/ui/loading-block";
-import { MetricCard } from "next-vibe/ui/ui/metric-card";
-import { MetricGrid } from "next-vibe/ui/ui/metric-grid";
-import { ProgressBlock } from "next-vibe/ui/ui/progress-block";
-import { SectionGroup } from "next-vibe/ui/ui/section-group";
-import { StatusPill } from "next-vibe/ui/ui/status-pill";
-import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
+import { ActionCard } from "next-vibe/ui/components/action-card";
+import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
+import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
+import { BarChart } from "next-vibe/ui/components/icons/BarChart";
+import { Download } from "next-vibe/ui/components/icons/Download";
+import { Plus } from "next-vibe/ui/components/icons/Plus";
+import { UserSearch } from "next-vibe/ui/components/icons/UserSearch";
+import { ListItem } from "next-vibe/ui/components/list-item";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
+import { MetricCard } from "next-vibe/ui/components/metric-card";
+import { MetricGrid } from "next-vibe/ui/components/metric-grid";
+import { ProgressBlock } from "next-vibe/ui/components/progress-block";
+import { SectionGroup } from "next-vibe/ui/components/section-group";
+import { StatusPill } from "next-vibe/ui/components/status-pill";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
   useWidgetLocale,
   useWidgetNavigation,

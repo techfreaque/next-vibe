@@ -1,10 +1,10 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { Span } from "next-vibe/ui/ui/span";
-import { H4, P } from "next-vibe/ui/ui/typography";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { Span } from "next-vibe/ui/components/span";
+import { H4, P } from "next-vibe/ui/components/typography";
 import {
   useWidgetNavigation,
   useWidgetTranslation,

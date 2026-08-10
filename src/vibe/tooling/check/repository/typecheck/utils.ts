@@ -4,7 +4,13 @@
  */
 
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, statSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  statSync,
+  unlinkSync,
+} from "node:fs";
 import { join, relative, resolve } from "node:path";
 
 /**
@@ -145,6 +151,20 @@ export function createTypecheckConfig(
 
   if (!existsSync(cachePath)) {
     mkdirSync(cachePath, { recursive: true });
+  } else {
+    // Sweep .tsbuildinfo left by older checker versions. The check no longer
+    // runs incremental — tsgo does not re-emit cached diagnostics for files a
+    // buildinfo marks unchanged, so a stale one makes the FIRST run after an
+    // upgrade under-report (observed: 40 issues → 5 on the same command).
+    for (const entry of readdirSync(cachePath)) {
+      if (entry.endsWith(".tsbuildinfo")) {
+        try {
+          unlinkSync(join(cachePath, entry));
+        } catch {
+          // Another concurrent check may have removed it first; harmless.
+        }
+      }
+    }
   }
 
   const needsTempConfig =

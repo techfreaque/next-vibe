@@ -6,13 +6,13 @@
 
 "use client";
 
-import { Div } from "next-vibe/ui/ui/div";
-import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
-import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
-import { Clock } from "next-vibe/ui/ui/icons/Clock";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
-import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
-import { Span } from "next-vibe/ui/ui/span";
+import { Div } from "next-vibe/ui/components/div";
+import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
+import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
+import { Clock } from "next-vibe/ui/components/icons/Clock";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { XCircle } from "next-vibe/ui/components/icons/XCircle";
+import { Span } from "next-vibe/ui/components/span";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 

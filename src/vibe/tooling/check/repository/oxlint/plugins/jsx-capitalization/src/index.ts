@@ -130,20 +130,20 @@ export const DEFAULT_CONFIG: JsxCapitalizationPluginConfig = {
 
 export const DEFAULT_MESSAGES: JsxCapitalizationMessages = {
   anchorTag:
-    'Use platform-independent <Link> component instead of <a>. import { Link } from "next-vibe/ui/ui/link";',
+    'Use platform-independent <Link> component instead of <a>. import { Link } from "next-vibe/ui/components/link";',
   typographyElement:
-    'Use typography component <{capitalizedName}> instead of <{elementName}>. import { {capitalizedName} } from "next-vibe/ui/ui/typography";',
+    'Use typography component <{capitalizedName}> instead of <{elementName}>. import { {capitalizedName} } from "next-vibe/ui/components/typography";',
   standaloneElement:
-    'Use platform-independent <{capitalizedName}> component instead of <{elementName}>. import { {capitalizedName} } from "next-vibe/ui/ui/{elementName}";',
+    'Use platform-independent <{capitalizedName}> component instead of <{elementName}>. import { {capitalizedName} } from "next-vibe/ui/components/{elementName}";',
   svgElement:
-    "SVG element <{elementName}> detected. For icons, use components from next-vibe/ui/ui/icons instead. For custom SVG, create platform-independent components using react-native-svg that work on both web and native.",
+    "SVG element <{elementName}> detected. For icons, use components from next-vibe/ui/components/icons instead. For custom SVG, create platform-independent components using react-native-svg that work on both web and native.",
   imageElement:
-    'Use platform-independent <Image> component instead of <{elementName}>. import { Image } from "next-vibe/ui/ui/image";',
+    'Use platform-independent <Image> component instead of <{elementName}>. import { Image } from "next-vibe/ui/components/image";',
   commonUiElement:
-    'Use platform-independent <{capitalizedName}> component instead of <{elementName}>. import { {capitalizedName} } from "next-vibe/ui/ui/{elementName}";',
-  form: 'Use platform-independent <Form> component instead of <form>. import { Form } from "next-vibe/ui/ui/form/form";',
+    'Use platform-independent <{capitalizedName}> component instead of <{elementName}>. import { {capitalizedName} } from "next-vibe/ui/components/{elementName}";',
+  form: 'Use platform-independent <Form> component instead of <form>. import { Form } from "next-vibe/ui/components/form/form";',
   genericElement:
-    "Lowercase element <{elementName}> detected. Create platform-independent components: 1) Create next-vibe/ui/web/ui/{elementName}.tsx for web, 2) Create next-vibe/ui/native/ui/{elementName}.tsx for React Native, or 3) Use an existing component if available.",
+    "Lowercase element <{elementName}> detected. Create platform-independent components: 1) Create next-vibe/ui/web/components/{elementName}.tsx for web, 2) Create next-vibe/ui/native/components/{elementName}.tsx for React Native, or 3) Use an existing component if available.",
 };
 
 // ============================================================

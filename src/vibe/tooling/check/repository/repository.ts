@@ -79,6 +79,10 @@ interface CheckPhase {
   issues?: number;
   errors?: number;
   durationMs?: number;
+  /** Live counter while `status === "running"` — only the LSP-daemon typecheck
+   *  leg reports this today; other checkers just never set it. */
+  filesChecked?: number;
+  totalFiles?: number;
 }
 
 interface VibeCheckRequestOutput {
@@ -127,7 +131,7 @@ export class VibeCheckRepository {
 
   private static async runOxlintCheck(
     paths: string[],
-    fix: boolean,
+    fix: boolean | "lint-only",
     timeout: number,
     config: CheckConfig,
     logger: EndpointLogger,
@@ -216,6 +220,7 @@ export class VibeCheckRepository {
     // resolveEnforcedOptions read `data.strict`, which was always undefined.
     strict: boolean,
     signal: AbortSignal,
+    onProgress?: (checked: number, total: number) => void,
   ): Promise<CheckResult> {
     const startTime = Date.now();
 
@@ -235,6 +240,7 @@ export class VibeCheckRepository {
       platform,
       config,
       signal,
+      onProgress,
     );
 
     logger.debug(
@@ -412,6 +418,9 @@ export class VibeCheckRepository {
             totalIssues: completedIssues.length,
             totalFiles: new Set(completedIssues.map((issue) => issue.file))
               .size,
+            totalErrors: completedIssues.filter(
+              (issue) => issue.severity === "error",
+            ).length,
           },
         });
       };
@@ -483,7 +492,9 @@ export class VibeCheckRepository {
         promises.push(
           this.runEslintCheck(
             eslintPath,
-            effectiveData.fix,
+            // ESLint only knows the boolean form; "lint-only" is an
+            // oxlint-side distinction (rule fixes without the oxfmt pass).
+            effectiveData.fix === true,
             effectiveData.timeout,
             configResult.config,
             logger,
@@ -526,6 +537,14 @@ export class VibeCheckRepository {
             isExtensive,
             isStrict,
             signal,
+            (checked, total) => {
+              const phase = phases.find((entry) => entry.id === "typecheck");
+              if (phase && phase.status === "running") {
+                phase.filesChecked = checked;
+                phase.totalFiles = total;
+                publishProgress();
+              }
+            },
           ).then((result) => {
             if (firstCheckStart === 0) {
               firstCheckStart = Date.now();
@@ -612,7 +631,7 @@ export class VibeCheckRepository {
   private static missingPathsMessage(missingPaths: string[]): string {
     const list = missingPaths.join(", ");
     const looksEscaped = missingPaths.some(
-      (p) => !p.includes("/") && !p.includes("\\"),
+      (p) => !p.includes("/") && !p.includes("\\") && !existsSync(resolve(p)),
     );
     const hint = looksEscaped
       ? " (if you typed a Windows path in bash, quote it or use forward slashes — the backslash was consumed by the shell)"

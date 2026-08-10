@@ -12,8 +12,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Div } from "next-vibe/ui/ui/div";
-import { Form } from "next-vibe/ui/ui/form/form";
+import { Div } from "next-vibe/ui/components/div";
+import { Form } from "next-vibe/ui/components/form/form";
 import type { JSX } from "react";
 import { useCallback, useMemo } from "react";
 import type {

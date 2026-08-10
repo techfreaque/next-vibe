@@ -6,12 +6,12 @@ import { createServerFn } from "@tanstack/react-start";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import globalsUrl from "next-vibe/ui/globals.css?url";
 
-import { TanstackPage as RootLayout } from "@/_pages/layout";
+import { TanstackPage as RootLayout } from "@root-layout/layout";
 
 const loadLayout = createServerFn({ method: "GET" })
   .validator((data: { locale: string }) => data)
   .handler(async ({ data }) => {
-    const { tanstackLoader } = await import("@/_pages/layout");
+    const { tanstackLoader } = await import("@root-layout/layout");
     return tanstackLoader({
       params: Promise.resolve({ locale: data.locale as CountryLanguage }),
     });

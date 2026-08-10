@@ -3,7 +3,7 @@
  *
  * Registers the CLI widget plugin with the Bun runtime module resolver so that
  * `bun run vibe-runtime.ts` (non-bundled dev mode) applies the same
- * web/ui → cli/ui redirects as the bundled binary.
+ * web/components → cli/components redirects as the bundled binary.
  *
  * For bundled builds, the plugin is passed via bunOptions.plugins in build.config.ts
  * and this file is NOT imported (allowing target: "node" builds).

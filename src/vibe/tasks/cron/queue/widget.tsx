@@ -4,7 +4,6 @@
  */
 
 "use client";
-import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,34 +14,35 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "next-vibe/ui/ui/alert-dialog";
-import { Button } from "next-vibe/ui/ui/button";
-import { Checkbox } from "next-vibe/ui/ui/checkbox";
-import { Div } from "next-vibe/ui/ui/div";
-import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
-import { BarChart3 } from "next-vibe/ui/ui/icons/BarChart3";
-import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
-import { Circle } from "next-vibe/ui/ui/icons/Circle";
-import { Clock } from "next-vibe/ui/ui/icons/Clock";
-import { History } from "next-vibe/ui/ui/icons/History";
-import { List } from "next-vibe/ui/ui/icons/List";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
-import { Pencil } from "next-vibe/ui/ui/icons/Pencil";
-import { Play } from "next-vibe/ui/ui/icons/Play";
-import { Plus } from "next-vibe/ui/ui/icons/Plus";
-import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
-import { Search } from "next-vibe/ui/ui/icons/Search";
-import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
-import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
-import { Input } from "next-vibe/ui/ui/input";
+} from "next-vibe/ui/components/alert-dialog";
+import { Button } from "next-vibe/ui/components/button";
+import { Checkbox } from "next-vibe/ui/components/checkbox";
+import { Div } from "next-vibe/ui/components/div";
+import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
+import { BarChart3 } from "next-vibe/ui/components/icons/BarChart3";
+import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
+import { Circle } from "next-vibe/ui/components/icons/Circle";
+import { Clock } from "next-vibe/ui/components/icons/Clock";
+import { History } from "next-vibe/ui/components/icons/History";
+import { List } from "next-vibe/ui/components/icons/List";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { Pencil } from "next-vibe/ui/components/icons/Pencil";
+import { Play } from "next-vibe/ui/components/icons/Play";
+import { Plus } from "next-vibe/ui/components/icons/Plus";
+import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
+import { Search } from "next-vibe/ui/components/icons/Search";
+import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
+import { XCircle } from "next-vibe/ui/components/icons/XCircle";
+import { Input } from "next-vibe/ui/components/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "next-vibe/ui/ui/select";
-import { Span } from "next-vibe/ui/ui/span";
+} from "next-vibe/ui/components/select";
+import { Span } from "next-vibe/ui/components/span";
+import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import React, {
   useCallback,
   useEffect,

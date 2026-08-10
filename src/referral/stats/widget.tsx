@@ -4,13 +4,13 @@
 
 "use client";
 
-import { Card, CardContent } from "next-vibe/ui/ui/card";
-import { Div } from "next-vibe/ui/ui/div";
-import { DollarSign } from "next-vibe/ui/ui/icons/DollarSign";
-import { Link2 } from "next-vibe/ui/ui/icons/Link2";
-import { TrendingUp } from "next-vibe/ui/ui/icons/TrendingUp";
-import { Users } from "next-vibe/ui/ui/icons/Users";
-import { Wallet } from "next-vibe/ui/ui/icons/Wallet";
+import { Card, CardContent } from "next-vibe/ui/components/card";
+import { Div } from "next-vibe/ui/components/div";
+import { DollarSign } from "next-vibe/ui/components/icons/DollarSign";
+import { Link2 } from "next-vibe/ui/components/icons/Link2";
+import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
+import { Users } from "next-vibe/ui/components/icons/Users";
+import { Wallet } from "next-vibe/ui/components/icons/Wallet";
 import {
   useWidgetTranslation,
   useWidgetValue,

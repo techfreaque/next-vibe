@@ -12,7 +12,7 @@ import { Slot, useLocalSearchParams } from "expo-router";
 import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { Body } from "next-vibe/ui/ui/body";
+import { Body } from "next-vibe/ui/components/body";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 

@@ -2,12 +2,12 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { Send } from "next-vibe/ui/ui/icons/Send";
-import { X } from "next-vibe/ui/ui/icons/X";
-import { Textarea } from "next-vibe/ui/ui/textarea";
-import { H3, P } from "next-vibe/ui/ui/typography";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { Send } from "next-vibe/ui/components/icons/Send";
+import { X } from "next-vibe/ui/components/icons/X";
+import { Textarea } from "next-vibe/ui/components/textarea";
+import { H3, P } from "next-vibe/ui/components/typography";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 import { useState } from "react";

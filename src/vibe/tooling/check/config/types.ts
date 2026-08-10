@@ -56,6 +56,8 @@ export interface RestrictedSyntaxPluginConfig {
   noUnknown?: boolean;
   /** Disallow object type (default: true) */
   noObjectType?: boolean;
+  /** Disallow `as` type assertions, except `as const` (default: false — opt in via config) */
+  noAsAssertion?: boolean;
 }
 
 export interface JsxCapitalizationPluginConfig {
@@ -202,6 +204,24 @@ interface OxlintConfigEnabled extends OxlintConfigOptions {
    * `typescript/no-explicit-any` and `typescript-eslint(no-explicit-any)`.
    */
   strictRules?: string[];
+  /**
+   * Tier 2: the untyped-value bans (`any`, `unknown`, `object`).
+   *
+   * Its own rule list AND its own {@link midPaths}, so it rolls out
+   * independently of the tier-3 style set — erasing the type system is a
+   * different and smaller problem, and a tree is usually ready for this long
+   * before it is ready for the rest.
+   */
+  midRules?: string[];
+  /**
+   * The trees that get {@link midRules} but are not on `strictPaths` yet.
+   *
+   * ADDITIVE to `strictPaths`, never a copy of it: a strict path already
+   * reports the mid rules, so repeating it here would be redundant. Omitted
+   * means "no extra trees" — the mid rules then apply exactly where the strict
+   * ones do.
+   */
+  midPaths?: StrictPathsConfig;
 }
 
 export type OxlintConfig = OxlintConfigDisabled | OxlintConfigEnabled;
@@ -279,6 +299,14 @@ interface TypecheckConfigEnabled {
    * separately, so each gets the answer for its own path.
    */
   strictCompilerOptions?: Record<string, boolean | string | string[]>;
+  /**
+   * compilerOptions forced inside `oxlint.midPaths` OR `oxlint.strictPaths`,
+   * and everywhere under `--strict`. The typecheck counterpart of
+   * `oxlint.midRules` — `noImplicitAny` is the same defect as `no-explicit-any`,
+   * reached from the compiler instead of the linter, so it belongs in the same
+   * tier.
+   */
+  midCompilerOptions?: Record<string, boolean | string | string[]>;
   /** Use tsgo instead of tsc for type checking (default: false uses tsc) */
   useTsgo?: boolean;
   /** Ignore patterns always applied regardless of extensive mode (glob patterns for tsconfig exclude) */
@@ -626,8 +654,13 @@ type VSCodeConfig = VSCodeConfigDisabled | VSCodeConfigEnabled;
 
 /** Vibe Check defaults */
 interface VibeCheckConfig {
-  /** Auto-fix issues (default: false) */
-  fix?: boolean;
+  /**
+   * Auto-fix issues (default: false).
+   * - `true`: apply oxlint's safe rule fixes AND reformat with oxfmt.
+   * - `"lint-only"`: apply oxlint's safe rule fixes (e.g. marking type-only
+   *   imports for `consistent-type-imports`) without touching formatting.
+   */
+  fix?: boolean | "lint-only";
   /** Skip ESLint checks (default: false) */
   skipEslint?: boolean;
   /** Skip Oxlint checks (default: false) */

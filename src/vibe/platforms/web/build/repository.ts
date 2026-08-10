@@ -15,6 +15,7 @@ import {
 import { parseError } from "../../../core/utils/parse-error";
 
 import type { CountryLanguage } from "../../../core/i18n/core/config";
+import type { JwtPayloadType } from "../../../identity/auth/types";
 import { SeedRepository } from "../../../database/seed/repository";
 import type { EndpointLogger } from "../../../logger/types";
 
@@ -38,6 +39,7 @@ export class BuildRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: ServerBuildT,
+    user: JwtPayloadType,
   ): Promise<ResponseType<BuildResponseOutput>> {
     type BuildResponseType = BuildResponseOutput;
     const startTime = Date.now();
@@ -85,6 +87,7 @@ export class BuildRepository {
           const generateResult = await GenerateAllRepository.generateAll(
             { force: false },
             logger,
+            user,
           );
 
           if (generateResult.success) {

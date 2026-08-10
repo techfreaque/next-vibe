@@ -4,11 +4,11 @@ import cortexListDefinitions from "next-vibe/agent/cortex/list/definition";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { Platform } from "next-vibe/platforms/platforms";
-import { Div } from "next-vibe/ui/ui/div";
-import { Brain } from "next-vibe/ui/ui/icons/Brain";
-import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
-import { Link } from "next-vibe/ui/ui/link";
-import { H1, P } from "next-vibe/ui/ui/typography";
+import { Div } from "next-vibe/ui/components/div";
+import { Brain } from "next-vibe/ui/components/icons/Brain";
+import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { Link } from "next-vibe/ui/components/link";
+import { H1, P } from "next-vibe/ui/components/typography";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 

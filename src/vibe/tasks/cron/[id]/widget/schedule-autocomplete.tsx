@@ -5,26 +5,26 @@
  * Noob-proof schedule builder: preset grid + custom frequency builder.
  * No raw cron expressions shown to the user.
  */
-import { useLogger } from "next-vibe/ui/hooks/use-logger";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { Calendar } from "next-vibe/ui/ui/icons/Calendar";
-import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
-import { Clock } from "next-vibe/ui/ui/icons/Clock";
-import { Input } from "next-vibe/ui/ui/input";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { Calendar } from "next-vibe/ui/components/icons/Calendar";
+import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
+import { Clock } from "next-vibe/ui/components/icons/Clock";
+import { Input } from "next-vibe/ui/components/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "next-vibe/ui/ui/popover";
+} from "next-vibe/ui/components/popover";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "next-vibe/ui/ui/select";
-import { Span } from "next-vibe/ui/ui/span";
+} from "next-vibe/ui/components/select";
+import { Span } from "next-vibe/ui/components/span";
+import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import type { JSX } from "react";
 import { useCallback, useMemo, useRef, useState } from "react";
 

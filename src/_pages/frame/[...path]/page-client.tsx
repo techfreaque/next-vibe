@@ -17,9 +17,9 @@ import type {
   ParentToFrameMessage,
 } from "next-vibe/platforms/vibe-frame/types";
 import { useFrameBridge } from "next-vibe/platforms/vibe-frame/use-bridge";
+import { Div } from "next-vibe/ui/components/div";
 import { setRootCssVar } from "next-vibe/ui/lib/css-vars";
 import { getDocumentScrollHeight } from "next-vibe/ui/lib/dom";
-import { Div } from "next-vibe/ui/ui/div";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";

@@ -1,18 +1,18 @@
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { DropdownMenuItem } from "next-vibe/ui/ui/dropdown-menu";
-import { Moon } from "next-vibe/ui/ui/icons/Moon";
-import { Sun } from "next-vibe/ui/ui/icons/Sun";
-import { Span } from "next-vibe/ui/ui/span";
-import { useThemeToggle } from "next-vibe/ui/ui/theme-provider";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { DropdownMenuItem } from "next-vibe/ui/components/dropdown-menu";
+import { Moon } from "next-vibe/ui/components/icons/Moon";
+import { Sun } from "next-vibe/ui/components/icons/Sun";
+import { Span } from "next-vibe/ui/components/span";
+import { useThemeToggle } from "next-vibe/ui/components/theme-provider";
 import { type JSX } from "react";
 
 import { scopedTranslation as pageT } from "./i18n";
 
-export { useThemeToggle } from "next-vibe/ui/ui/theme-provider";
+export { useThemeToggle } from "next-vibe/ui/components/theme-provider";
 
 export function ThemeToggle({
   locale,

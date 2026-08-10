@@ -1,8 +1,8 @@
 "use client";
 
 import { Platform } from "next-vibe/platforms/platforms";
-import { Div } from "next-vibe/ui/ui/div";
-import { Span } from "next-vibe/ui/ui/span";
+import { Div } from "next-vibe/ui/components/div";
+import { Span } from "next-vibe/ui/components/span";
 import {
   useWidgetForm,
   useWidgetPlatform,

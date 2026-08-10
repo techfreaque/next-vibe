@@ -16,16 +16,16 @@ import type {
   Time,
   UTCTimestamp,
 } from "lightweight-charts";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { BarChart2 } from "next-vibe/ui/components/icons/BarChart2";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { Plus } from "next-vibe/ui/components/icons/Plus";
+import { Span } from "next-vibe/ui/components/span";
+import { P } from "next-vibe/ui/components/typography";
 import { getRootCssVar } from "next-vibe/ui/lib/css-vars";
 import { observeRootMutations } from "next-vibe/ui/lib/dom";
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { BarChart2 } from "next-vibe/ui/ui/icons/BarChart2";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
-import { Plus } from "next-vibe/ui/ui/icons/Plus";
-import { Span } from "next-vibe/ui/ui/span";
-import { P } from "next-vibe/ui/ui/typography";
 import React, {
   useCallback,
   useEffect,

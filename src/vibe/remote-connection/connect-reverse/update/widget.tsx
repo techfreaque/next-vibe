@@ -12,9 +12,9 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe/ui/ui/card";
-import { Div } from "next-vibe/ui/ui/div";
-import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
+} from "next-vibe/ui/components/card";
+import { Div } from "next-vibe/ui/components/div";
+import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
 import type { JSX } from "react";
 
 import { useWidgetLocale } from "../../../unified-ui/_shared/use-widget-context";

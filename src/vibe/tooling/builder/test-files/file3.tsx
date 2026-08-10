@@ -1,6 +1,6 @@
 import "./test3.css";
 
-import { Div } from "next-vibe/ui/ui/div";
+import { Div } from "next-vibe/ui/components/div";
 import type { JSX } from "react";
 import { createRoot } from "react-dom/client";
 

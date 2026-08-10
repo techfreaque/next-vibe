@@ -8,10 +8,10 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { Platform } from "next-vibe/platforms/platforms";
+import { Div } from "next-vibe/ui/components/div";
+import { ArrowLeft } from "next-vibe/ui/components/icons/ArrowLeft";
+import { Link } from "next-vibe/ui/components/link";
 import { redirect } from "next-vibe/ui/lib/redirect";
-import { Div } from "next-vibe/ui/ui/div";
-import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
-import { Link } from "next-vibe/ui/ui/link";
 import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";

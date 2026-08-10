@@ -3,7 +3,7 @@
  * Displays a colored badge with text/status information
  */
 
-import type { BadgeVariant } from "next-vibe/ui/ui/badge";
+import type { BadgeVariant } from "next-vibe/ui/components/badge";
 import type { z } from "zod";
 
 import type { WidgetType } from "../../../../core/definition/enums";

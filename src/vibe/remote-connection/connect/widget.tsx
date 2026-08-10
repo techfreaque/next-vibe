@@ -18,15 +18,15 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe/ui/ui/card";
-import { Div } from "next-vibe/ui/ui/div";
-import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
-import { CheckCircle2 } from "next-vibe/ui/ui/icons/CheckCircle2";
-import { Link2 } from "next-vibe/ui/ui/icons/Link2";
-import { Lock } from "next-vibe/ui/ui/icons/Lock";
-import { SectionGroup } from "next-vibe/ui/ui/section-group";
-import { Switch } from "next-vibe/ui/ui/switch";
-import { P } from "next-vibe/ui/ui/typography";
+} from "next-vibe/ui/components/card";
+import { Div } from "next-vibe/ui/components/div";
+import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
+import { CheckCircle2 } from "next-vibe/ui/components/icons/CheckCircle2";
+import { Link2 } from "next-vibe/ui/components/icons/Link2";
+import { Lock } from "next-vibe/ui/components/icons/Lock";
+import { SectionGroup } from "next-vibe/ui/components/section-group";
+import { Switch } from "next-vibe/ui/components/switch";
+import { P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 

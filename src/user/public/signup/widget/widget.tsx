@@ -10,31 +10,29 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe/ui/ui/card";
-import { Checkbox } from "next-vibe/ui/ui/checkbox";
-import { Div } from "next-vibe/ui/ui/div";
+} from "next-vibe/ui/components/card";
+import { Checkbox } from "next-vibe/ui/components/checkbox";
+import { Div } from "next-vibe/ui/components/div";
 import {
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from "next-vibe/ui/ui/form/form";
-import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
-import { Gift } from "next-vibe/ui/ui/icons/Gift";
-import { Heart } from "next-vibe/ui/ui/icons/Heart";
-import { Label } from "next-vibe/ui/ui/label";
-import { Link } from "next-vibe/ui/ui/link";
-import { Span } from "next-vibe/ui/ui/span";
+} from "next-vibe/ui/components/form/form";
+import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
+import { Gift } from "next-vibe/ui/components/icons/Gift";
+import { Heart } from "next-vibe/ui/components/icons/Heart";
+import { Label } from "next-vibe/ui/components/label";
+import { Link } from "next-vibe/ui/components/link";
+import { Span } from "next-vibe/ui/components/span";
 import { useEffect, useMemo, useState } from "react";
 
-import { useProviderAvailability } from "next-vibe/agent/env-availability-store";
-import skillSingleDefinition from "next-vibe/agent/skills/[id]/definition";
-import { ChatFavoritesRepositoryClient } from "next-vibe/agent/skills/favorites/repository-client";
 import leadCurrentReferralDefinition, {
   type LeadCurrentReferralGetResponseOutput,
 } from "@/referral/lead/current/definition";
-import { executeQuery } from "next-vibe/unified-ui/hooks/query-executor";
-import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
+import { useProviderAvailability } from "next-vibe/agent/env-availability-store";
+import skillSingleDefinition from "next-vibe/agent/skills/[id]/definition";
+import { ChatFavoritesRepositoryClient } from "next-vibe/agent/skills/favorites/repository-client";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetForm,
@@ -44,6 +42,8 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { executeQuery } from "next-vibe/unified-ui/hooks/query-executor";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { AlertWidget } from "next-vibe/unified-ui/widgets/display-only/alert/widget";
 import { LinkWidget } from "next-vibe/unified-ui/widgets/display-only/link/widget";
 import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
@@ -320,7 +320,7 @@ export function SignupFormContainer({
                         />
                       </FormControl>
                       <Span className="text-sm">
-                        {name ?? skillId.slice(0, 8) + "…"}
+                        {name ?? `${skillId.slice(0, 8)  }…`}
                       </Span>
                     </Div>
                   ))}

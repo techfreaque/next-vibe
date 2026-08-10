@@ -6,19 +6,19 @@
 
 "use client";
 
-import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { EmptyBlock } from "next-vibe/ui/ui/empty-block";
-import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
-import { Terminal } from "next-vibe/ui/ui/icons/Terminal";
-import { ListItem } from "next-vibe/ui/ui/list-item";
-import { LoadingBlock } from "next-vibe/ui/ui/loading-block";
-import { MetricCard } from "next-vibe/ui/ui/metric-card";
-import { MetricGrid } from "next-vibe/ui/ui/metric-grid";
-import { Span } from "next-vibe/ui/ui/span";
-import { StatusPill } from "next-vibe/ui/ui/status-pill";
-import { WidgetHeader } from "next-vibe/ui/ui/widget-header";
-import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
+import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
+import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { Terminal } from "next-vibe/ui/components/icons/Terminal";
+import { ListItem } from "next-vibe/ui/components/list-item";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
+import { MetricCard } from "next-vibe/ui/components/metric-card";
+import { MetricGrid } from "next-vibe/ui/components/metric-grid";
+import { Span } from "next-vibe/ui/components/span";
+import { StatusPill } from "next-vibe/ui/components/status-pill";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
   useWidgetLocale,
   useWidgetNavigation,

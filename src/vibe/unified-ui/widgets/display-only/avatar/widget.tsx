@@ -1,5 +1,9 @@
 "use client";
-import { Avatar, AvatarFallback, AvatarImage } from "next-vibe/ui/ui/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "next-vibe/ui/components/avatar";
 import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";

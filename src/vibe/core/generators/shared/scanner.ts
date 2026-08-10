@@ -141,7 +141,26 @@ function scanDirectory(
 
         // Skip excluded directories
         if (entry.isDirectory()) {
-          if (excludeDirs.includes(entry.name) || entry.name.startsWith(".")) {
+          // `excludeDirs` entries are glob-lite patterns (see PROJECT_IGNORE_DIRS):
+          // a "**/" prefix matches the directory's own NAME at any depth; anything
+          // else matches the path relative to baseDir exactly or as an ancestor.
+          // A plain `excludeDirs.includes(entry.name)` check (the previous code)
+          // never matched a "**/"-prefixed pattern against a bare name — the
+          // literal strings are never equal — so `node_modules` was silently never
+          // excluded here. In a single-app tree this is easy to miss (scanning
+          // your own node_modules is merely slow); in pcv's multi-app monorepo it
+          // walked every app's full node_modules tree and never returned. Found
+          // 2026-08-05 via pcv_application; ported upstream since this file is
+          // shared and the same bug is latent here.
+          const isExcludedDir = excludeDirs.some((pattern) => {
+            if (pattern.startsWith("**/")) {
+              return entry.name === pattern.slice(3);
+            }
+            return (
+              relativePath === pattern || relativePath.startsWith(`${pattern}/`)
+            );
+          });
+          if (isExcludedDir || entry.name.startsWith(".")) {
             continue;
           }
 

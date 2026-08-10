@@ -5,21 +5,21 @@
 
 "use client";
 
-import { Button } from "next-vibe/ui/ui/button";
+import { Button } from "next-vibe/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe/ui/ui/card";
-import { Div } from "next-vibe/ui/ui/div";
-import { Database } from "next-vibe/ui/ui/icons/Database";
-import { Minus } from "next-vibe/ui/ui/icons/Minus";
-import { Plus } from "next-vibe/ui/ui/icons/Plus";
-import { MotionDiv } from "next-vibe/ui/ui/motion";
-import { Span } from "next-vibe/ui/ui/span";
-import { H3 } from "next-vibe/ui/ui/typography";
+} from "next-vibe/ui/components/card";
+import { Div } from "next-vibe/ui/components/div";
+import { Database } from "next-vibe/ui/components/icons/Database";
+import { Minus } from "next-vibe/ui/components/icons/Minus";
+import { Plus } from "next-vibe/ui/components/icons/Plus";
+import { MotionDiv } from "next-vibe/ui/components/motion";
+import { Span } from "next-vibe/ui/components/span";
+import { H3 } from "next-vibe/ui/components/typography";
 import {
   useWidgetForm,
   useWidgetOnSubmit,

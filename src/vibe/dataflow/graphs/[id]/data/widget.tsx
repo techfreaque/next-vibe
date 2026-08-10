@@ -25,6 +25,30 @@ import type {
   Time,
   UTCTimestamp,
 } from "lightweight-charts";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { Archive } from "next-vibe/ui/components/icons/Archive";
+import { ArrowDown } from "next-vibe/ui/components/icons/ArrowDown";
+import { ArrowLeft } from "next-vibe/ui/components/icons/ArrowLeft";
+import { ArrowUp } from "next-vibe/ui/components/icons/ArrowUp";
+import { BarChart2 } from "next-vibe/ui/components/icons/BarChart2";
+import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
+import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
+import { ChevronUp } from "next-vibe/ui/components/icons/ChevronUp";
+import { Edit } from "next-vibe/ui/components/icons/Edit";
+import { Eye } from "next-vibe/ui/components/icons/Eye";
+import { EyeOff } from "next-vibe/ui/components/icons/EyeOff";
+import { Grip } from "next-vibe/ui/components/icons/Grip";
+import { History } from "next-vibe/ui/components/icons/History";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { Maximize } from "next-vibe/ui/components/icons/Maximize";
+import { RotateCcw } from "next-vibe/ui/components/icons/RotateCcw";
+import { Shield } from "next-vibe/ui/components/icons/Shield";
+import { X } from "next-vibe/ui/components/icons/X";
+import { Span } from "next-vibe/ui/components/span";
+import { P } from "next-vibe/ui/components/typography";
 import { getRootCssVar } from "next-vibe/ui/lib/css-vars";
 import {
   addDocumentListener,
@@ -33,30 +57,6 @@ import {
   observeRootMutations,
 } from "next-vibe/ui/lib/dom";
 import { getLocalItem, setLocalItem } from "next-vibe/ui/lib/storage";
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { Archive } from "next-vibe/ui/ui/icons/Archive";
-import { ArrowDown } from "next-vibe/ui/ui/icons/ArrowDown";
-import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
-import { ArrowUp } from "next-vibe/ui/ui/icons/ArrowUp";
-import { BarChart2 } from "next-vibe/ui/ui/icons/BarChart2";
-import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
-import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
-import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
-import { ChevronUp } from "next-vibe/ui/ui/icons/ChevronUp";
-import { Edit } from "next-vibe/ui/ui/icons/Edit";
-import { Eye } from "next-vibe/ui/ui/icons/Eye";
-import { EyeOff } from "next-vibe/ui/ui/icons/EyeOff";
-import { Grip } from "next-vibe/ui/ui/icons/Grip";
-import { History } from "next-vibe/ui/ui/icons/History";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
-import { Maximize } from "next-vibe/ui/ui/icons/Maximize";
-import { RotateCcw } from "next-vibe/ui/ui/icons/RotateCcw";
-import { Shield } from "next-vibe/ui/ui/icons/Shield";
-import { X } from "next-vibe/ui/ui/icons/X";
-import { Span } from "next-vibe/ui/ui/span";
-import { P } from "next-vibe/ui/ui/typography";
 import React, {
   useCallback,
   useEffect,

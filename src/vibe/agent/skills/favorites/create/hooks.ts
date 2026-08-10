@@ -9,7 +9,7 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type { ButtonMouseEvent } from "next-vibe/ui/ui/button";
+import type { ButtonMouseEvent } from "next-vibe/ui/components/button";
 import { apiClient } from "next-vibe/unified-ui/hooks/store";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";

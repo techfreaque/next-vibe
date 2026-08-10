@@ -10,8 +10,8 @@ import { UserRepository } from "next-vibe/identity/user/repository";
 import type { StandardUserType } from "next-vibe/identity/user/types";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { Platform } from "next-vibe/platforms/platforms";
-import { Div } from "next-vibe/ui/ui/div";
-import { PageLayout } from "next-vibe/ui/ui/page-layout";
+import { Div } from "next-vibe/ui/components/div";
+import { PageLayout } from "next-vibe/ui/components/page-layout";
 import type { JSX, ReactNode } from "react";
 
 import Footer from "@/_pages/story/_components/footer";

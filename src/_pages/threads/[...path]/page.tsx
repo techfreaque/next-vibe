@@ -51,8 +51,8 @@ import { scopedTranslation as userScopedTranslation } from "next-vibe/identity/u
 import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { Platform } from "next-vibe/platforms/platforms";
+import { Div } from "next-vibe/ui/components/div";
 import { redirect } from "next-vibe/ui/lib/redirect";
-import { Div } from "next-vibe/ui/ui/div";
 import type { JSX } from "react";
 
 import { isUUID, parseChatUrl } from "@/_pages/chat/lib/url-parser";

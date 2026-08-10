@@ -1,8 +1,8 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
-import { Div } from "next-vibe/ui/ui/div";
-import { Section } from "next-vibe/ui/ui/section";
-import { H2, H3, Muted, P } from "next-vibe/ui/ui/typography";
+import { Div } from "next-vibe/ui/components/div";
+import { Section } from "next-vibe/ui/components/section";
+import { H2, H3, Muted, P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 
 function ColorSwatch({

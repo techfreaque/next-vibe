@@ -5,15 +5,15 @@
 
 "use client";
 
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
-import { Card, CardContent } from "next-vibe/ui/ui/card";
-import { Div } from "next-vibe/ui/ui/div";
-import { Archive } from "next-vibe/ui/ui/icons/Archive";
-import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
-import { Check } from "next-vibe/ui/ui/icons/Check";
-import { Span } from "next-vibe/ui/ui/span";
-import { P } from "next-vibe/ui/ui/typography";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
+import { Card, CardContent } from "next-vibe/ui/components/card";
+import { Div } from "next-vibe/ui/components/div";
+import { Archive } from "next-vibe/ui/components/icons/Archive";
+import { ArrowLeft } from "next-vibe/ui/components/icons/ArrowLeft";
+import { Check } from "next-vibe/ui/components/icons/Check";
+import { Span } from "next-vibe/ui/components/span";
+import { P } from "next-vibe/ui/components/typography";
 import React, { useCallback } from "react";
 
 import {

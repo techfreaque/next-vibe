@@ -10,7 +10,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe/ui/ui/card";
+} from "next-vibe/ui/components/card";
 
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {

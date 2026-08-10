@@ -6,19 +6,24 @@
 
 "use client";
 
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "next-vibe/ui/ui/card";
-import { Div } from "next-vibe/ui/ui/div";
-import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
-import { Bitcoin } from "next-vibe/ui/ui/icons/Bitcoin";
-import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
-import { Coins } from "next-vibe/ui/ui/icons/Coins";
-import { Download } from "next-vibe/ui/ui/icons/Download";
-import { History } from "next-vibe/ui/ui/icons/History";
-import { Sparkles } from "next-vibe/ui/ui/icons/Sparkles";
-import { Wallet } from "next-vibe/ui/ui/icons/Wallet";
-import { Span } from "next-vibe/ui/ui/span";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "next-vibe/ui/components/card";
+import { Div } from "next-vibe/ui/components/div";
+import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
+import { Bitcoin } from "next-vibe/ui/components/icons/Bitcoin";
+import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
+import { Coins } from "next-vibe/ui/components/icons/Coins";
+import { Download } from "next-vibe/ui/components/icons/Download";
+import { History } from "next-vibe/ui/components/icons/History";
+import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
+import { Wallet } from "next-vibe/ui/components/icons/Wallet";
+import { Span } from "next-vibe/ui/components/span";
 import {
   useWidgetNavigation,
   useWidgetTranslation,

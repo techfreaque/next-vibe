@@ -1,12 +1,12 @@
 "use client";
 
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { Download } from "next-vibe/ui/components/icons/Download";
+import { Users } from "next-vibe/ui/components/icons/Users";
+import { Span } from "next-vibe/ui/components/span";
 import { downloadFile } from "next-vibe/ui/lib/download";
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { Download } from "next-vibe/ui/ui/icons/Download";
-import { Users } from "next-vibe/ui/ui/icons/Users";
-import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetTranslation,
   useWidgetValue,

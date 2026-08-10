@@ -1,9 +1,9 @@
 "use client";
 
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { BookOpen } from "next-vibe/ui/ui/icons/BookOpen";
-import { Span } from "next-vibe/ui/ui/span";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { BookOpen } from "next-vibe/ui/components/icons/BookOpen";
+import { Span } from "next-vibe/ui/components/span";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetNavigation,

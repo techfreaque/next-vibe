@@ -11,22 +11,22 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { openInNewTab } from "next-vibe/ui/lib/location";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { ExternalLink } from "next-vibe/ui/ui/icons/ExternalLink";
-import { Send } from "next-vibe/ui/ui/icons/Send";
-import { Square } from "next-vibe/ui/ui/icons/Square";
-import { Kbd } from "next-vibe/ui/ui/kbd";
-import { Span } from "next-vibe/ui/ui/span";
-import type { TextareaKeyboardEvent } from "next-vibe/ui/ui/textarea";
-import { Textarea } from "next-vibe/ui/ui/textarea";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { ExternalLink } from "next-vibe/ui/components/icons/ExternalLink";
+import { Send } from "next-vibe/ui/components/icons/Send";
+import { Square } from "next-vibe/ui/components/icons/Square";
+import { Kbd } from "next-vibe/ui/components/kbd";
+import { Span } from "next-vibe/ui/components/span";
+import type { TextareaKeyboardEvent } from "next-vibe/ui/components/textarea";
+import { Textarea } from "next-vibe/ui/components/textarea";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe/ui/ui/tooltip";
+} from "next-vibe/ui/components/tooltip";
+import { openInNewTab } from "next-vibe/ui/lib/location";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX, ReactNode } from "react";
 import { useCallback, useEffect, useRef } from "react";

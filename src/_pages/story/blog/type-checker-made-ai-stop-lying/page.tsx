@@ -2,17 +2,17 @@
 import type { Metadata } from "next";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Card, CardContent } from "next-vibe/ui/ui/card";
-import { Div } from "next-vibe/ui/ui/div";
-import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
-import { CheckCircle2 } from "next-vibe/ui/ui/icons/CheckCircle2";
-import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
-import { Link } from "next-vibe/ui/ui/link";
-import { CodeBlock } from "next-vibe/ui/ui/markdown";
-import { Separator } from "next-vibe/ui/ui/separator";
-import { Span } from "next-vibe/ui/ui/span";
-import { H1, H2, H3, P } from "next-vibe/ui/ui/typography";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Card, CardContent } from "next-vibe/ui/components/card";
+import { Div } from "next-vibe/ui/components/div";
+import { ArrowLeft } from "next-vibe/ui/components/icons/ArrowLeft";
+import { CheckCircle2 } from "next-vibe/ui/components/icons/CheckCircle2";
+import { XCircle } from "next-vibe/ui/components/icons/XCircle";
+import { Link } from "next-vibe/ui/components/link";
+import { CodeBlock } from "next-vibe/ui/components/markdown";
+import { Separator } from "next-vibe/ui/components/separator";
+import { Span } from "next-vibe/ui/components/span";
+import { H1, H2, H3, P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 
 import { GITHUB_REPO_URL } from "@/env/constants";
@@ -400,12 +400,15 @@ export function TanstackPage({ locale }: TypeCheckerPageData): JSX.Element {
               {[
                 {
                   from: "<button>",
-                  to: '<Button> from "next-vibe/ui/ui/button"',
+                  to: '<Button> from "next-vibe/ui/components/button"',
                 },
-                { from: "<a>", to: '<Link> from "next-vibe/ui/ui/link"' },
+                {
+                  from: "<a>",
+                  to: '<Link> from "next-vibe/ui/components/link"',
+                },
                 {
                   from: "<p>",
-                  to: '<P> from "next-vibe/ui/ui/typography"',
+                  to: '<P> from "next-vibe/ui/components/typography"',
                 },
               ].map(({ from, to }) => (
                 <Div

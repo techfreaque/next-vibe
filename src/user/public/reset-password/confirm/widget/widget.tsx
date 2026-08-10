@@ -4,15 +4,15 @@
 
 "use client";
 
-import { Button } from "next-vibe/ui/ui/button";
+import { Button } from "next-vibe/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe/ui/ui/card";
-import { Div } from "next-vibe/ui/ui/div";
+} from "next-vibe/ui/components/card";
+import { Div } from "next-vibe/ui/components/div";
 
 import { PasswordStrengthIndicator } from "@/user/public/signup/widget/password-strength-indicator";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";

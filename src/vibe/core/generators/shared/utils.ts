@@ -16,14 +16,15 @@ import {
 import { dirname, join, relative } from "node:path";
 import { pathToFileURL } from "node:url";
 
+import { PATH_SEPARATOR } from "../../core-utils/path";
+import type { WidgetData } from "../../utils/json";
+
 import {
   getApiDir,
   getSrcDir,
   PROJECT_IGNORE_DIRS,
   ROUTE_ANCHOR_SEGMENT,
 } from "@/env/paths";
-
-import { PATH_SEPARATOR } from "../../core-utils/path";
 
 /**
  * Does `relPath` (POSIX, relative to the scan root) fall under an ignore pattern?
@@ -396,8 +397,7 @@ function serializeString(s: string): string {
  * Render a value inline (single line, no trailing comma).
  * Returns null if the value contains nested multiline content.
  */
-// eslint-disable-next-line restricted/no-unknown -- generic serializer accepts any value
-function renderInline(value: unknown): string | null {
+function renderInline(value: WidgetData): string | null {
   if (value === null) {
     return "null";
   }
@@ -413,6 +413,10 @@ function renderInline(value: unknown): string | null {
   if (typeof value === "string") {
     return serializeString(value);
   }
+  if (value instanceof Date) {
+    // Same shape JSON.stringify gives a Date — an ISO string literal.
+    return serializeString(value.toISOString());
+  }
   if (Array.isArray(value)) {
     if (value.length === 0) {
       return "[]";
@@ -424,8 +428,7 @@ function renderInline(value: unknown): string | null {
     return `[${parts.join(", ")}]`;
   }
   if (typeof value === "object") {
-    // eslint-disable-next-line restricted/no-unknown -- generic serializer
-    const entries = Object.entries(value as Record<string, unknown>);
+    const entries = Object.entries(value);
     if (entries.length === 0) {
       return "{}";
     }
@@ -460,8 +463,7 @@ function renderInline(value: unknown): string | null {
  * @param prefixCols  Columns already used on the current line before this value (e.g. `  key: `.length)
  */
 export function jsonToTs(
-  // eslint-disable-next-line restricted/no-unknown -- generic serializer accepts any value
-  value: unknown,
+  value: WidgetData,
   indentLevel = 0,
   prefixCols = 0,
 ): string {
@@ -482,6 +484,10 @@ export function jsonToTs(
   }
   if (typeof value === "string") {
     return serializeString(value);
+  }
+  if (value instanceof Date) {
+    // Same shape JSON.stringify gives a Date — an ISO string literal.
+    return serializeString(value.toISOString());
   }
 
   if (Array.isArray(value)) {
@@ -522,10 +528,7 @@ export function jsonToTs(
 
   if (typeof value === "object") {
     // Skip undefined values (same as JSON.stringify behavior)
-    // eslint-disable-next-line restricted/no-unknown -- generic serializer
-    const entries = Object.entries(value as Record<string, unknown>).filter(
-      ([, v]) => v !== undefined,
-    );
+    const entries = Object.entries(value).filter(([, v]) => v !== undefined);
     if (entries.length === 0) {
       return "{}";
     }

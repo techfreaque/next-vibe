@@ -33,7 +33,7 @@ import { parseError } from "../../core/utils/parse-error";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
 import type { AiT } from "../../platforms/ai/i18n";
-import { Platform } from "../../platforms/platforms";
+import type { Platform } from "../../platforms/platforms";
 import type {
   RouteExecuteRequestOutput,
   RouteExecuteResponseOutput,

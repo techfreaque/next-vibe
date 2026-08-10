@@ -7,16 +7,16 @@
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
-import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
-import { ChevronUp } from "next-vibe/ui/ui/icons/ChevronUp";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
-import { Sparkles } from "next-vibe/ui/ui/icons/Sparkles";
-import { Markdown } from "next-vibe/ui/ui/markdown";
-import { Span } from "next-vibe/ui/ui/span";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
+import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
+import { ChevronUp } from "next-vibe/ui/components/icons/ChevronUp";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
+import { Markdown } from "next-vibe/ui/components/markdown";
+import { Span } from "next-vibe/ui/components/span";
 import { type JSX, useState } from "react";
 
 import { scopedTranslation } from "../i18n";

@@ -13,9 +13,9 @@ import { UserRole } from "next-vibe/identity/roles/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { Platform } from "next-vibe/platforms/platforms";
-import { Div } from "next-vibe/ui/ui/div";
-import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
-import { Link } from "next-vibe/ui/ui/link";
+import { Div } from "next-vibe/ui/components/div";
+import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { Link } from "next-vibe/ui/components/link";
 import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";

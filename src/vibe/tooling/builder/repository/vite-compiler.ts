@@ -20,7 +20,7 @@ import {
 } from "vite";
 import type { EvaluatedModules } from "vite/module-runner";
 
-import { getSrcDir } from "@/env/paths";
+import { getSrcDir, ROOT_LAYOUT_DIR } from "@/env/paths";
 
 import type { ResponseType } from "../../../core/route/response.schema";
 import {
@@ -77,6 +77,120 @@ type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
  * Uses `load` (not `resolveId`) so it works even when `resolve.alias`
  * pre-resolves the bare `"server-only"` specifier before plugins run.
  */
+/**
+ * Blank out comments and string literals so an identifier search can tell a
+ * real reference from one that only appears inside prose.
+ *
+ * Used by the "*-layout-client-strip" plugins to decide whether an import is
+ * still referenced after the server-only exports have been removed. The
+ * asymmetry that dictates the whole design: a FALSE POSITIVE only keeps an
+ * import that could have been dropped, while a FALSE NEGATIVE deletes an
+ * import the module still uses and the page throws `X is not defined` in the
+ * browser. So when this cannot tell, it keeps the code.
+ *
+ * It replaced four independent `replaceAll` regexes that each swept the whole
+ * file on their own. That is unsound on any file mixing code with prose: the
+ * apostrophe in a comment like `// the original's <h5>` was read as an opening
+ * quote and paired with the next real single-quoted string hundreds of lines
+ * later, blanking every reference in between. Every import used only inside
+ * that span was then dropped as unused. One left-to-right pass cannot make
+ * that mistake, because by the time it reaches the apostrophe it already knows
+ * it is inside a comment.
+ *
+ * `'` additionally only opens a string when the previous non-space character
+ * is not a word character — `geht's` in JSX text is an apostrophe, `('a')` is
+ * a string — and when a closing quote follows on the same line. JS string
+ * literals do not span raw newlines, so that costs nothing and stops prose
+ * from swallowing code.
+ */
+function blankStringsAndComments(code: string): string {
+  const out = [...code];
+  let index = 0;
+  let lastMeaningful = "";
+
+  const blankTo = (end: number): void => {
+    for (let i = index + 1; i < end && i < out.length; i++) {
+      if (out[i] !== "\n") {
+        out[i] = " ";
+      }
+    }
+  };
+
+  while (index < code.length) {
+    const char = code[index] ?? "";
+    const next = code[index + 1] ?? "";
+
+    if (char === "/" && next === "/") {
+      const end = code.indexOf("\n", index);
+      const stop = end === -1 ? code.length : end;
+      for (let i = index; i < stop; i++) {
+        out[i] = " ";
+      }
+      index = stop;
+      continue;
+    }
+
+    if (char === "/" && next === "*") {
+      const end = code.indexOf("*/", index + 2);
+      const stop = end === -1 ? code.length : end + 2;
+      for (let i = index; i < stop; i++) {
+        if (out[i] !== "\n") {
+          out[i] = " ";
+        }
+      }
+      index = stop;
+      continue;
+    }
+
+    if (char === '"' || char === "`" || char === "'") {
+      if (char === "'") {
+        // Prose apostrophe, not a delimiter: `original's`, `geht's`.
+        if (/\w/.test(lastMeaningful)) {
+          index++;
+          continue;
+        }
+      }
+      // Find the unescaped closing quote of the same kind.
+      let cursor = index + 1;
+      let closed = -1;
+      while (cursor < code.length) {
+        const c = code[cursor];
+        if (c === "\\") {
+          cursor += 2;
+          continue;
+        }
+        if (c === char) {
+          closed = cursor;
+          break;
+        }
+        // Single- and double-quoted literals cannot contain a raw newline;
+        // hitting one means this quote was never a delimiter.
+        if (c === "\n" && char !== "`") {
+          break;
+        }
+        cursor++;
+      }
+      if (closed === -1) {
+        // Unterminated: leave the rest of the file untouched rather than
+        // blanking code that is still there.
+        index++;
+        continue;
+      }
+      blankTo(closed);
+      lastMeaningful = char;
+      index = closed + 1;
+      continue;
+    }
+
+    if (!/\s/.test(char)) {
+      lastMeaningful = char;
+    }
+    index++;
+  }
+
+  return out.join("");
+}
+
 function serverOnlyTracePlugin(
   moduleAliases: Record<string, string>,
   rootDir: string,
@@ -853,14 +967,12 @@ class ViteCompiler {
             const nonImportCode = lines
               .filter((l) => !l.trimStart().startsWith("import "))
               .join("\n");
-            // Strip string literals and comments to avoid false positives
-            // (e.g. `kind: "redirect"` or `// redirects to overview` keeping the import).
-            const nonImportCodeNoStrings = nonImportCode
-              .replaceAll(/"[^"\\]*(?:\\.[^"\\]*)*"/g, '""')
-              .replaceAll(/'[^'\\]*(?:\\.[^'\\]*)*'/g, "''")
-              .replaceAll(/`[^`\\]*(?:\\.[^`\\]*)*`/g, "``")
-              .replaceAll(/\/\*[\s\S]*?\*\//g, "")
-              .replaceAll(/\/\/[^\n]*/g, "");
+            // Comments and string literals are blanked in ONE left-to-right pass
+            // (see blankStringsAndComments): sweeping them with independent
+            // regexes let an apostrophe in prose open a string and blank the code
+            // up to the next real quote, dropping imports that were still used.
+            const nonImportCodeNoStrings =
+              blankStringsAndComments(nonImportCode);
             const filteredLines = lines.filter((line) => {
               const trimmed = line.trimStart();
               if (
@@ -1452,14 +1564,12 @@ class ViteCompiler {
               const nonImportCode = lines
                 .filter((l) => !l.trimStart().startsWith("import "))
                 .join("\n");
-              // Strip string literals and comments to avoid false positives
-              // (e.g. `kind: "redirect"` or `// redirects to overview` keeping the import).
-              const nonImportCodeNoStrings = nonImportCode
-                .replaceAll(/"[^"\\]*(?:\\.[^"\\]*)*"/g, '""')
-                .replaceAll(/'[^'\\]*(?:\\.[^'\\]*)*'/g, "''")
-                .replaceAll(/`[^`\\]*(?:\\.[^`\\]*)*`/g, "``")
-                .replaceAll(/\/\*[\s\S]*?\*\//g, "")
-                .replaceAll(/\/\/[^\n]*/g, "");
+              // Comments and string literals are blanked in ONE left-to-right pass
+              // (see blankStringsAndComments): sweeping them with independent
+              // regexes let an apostrophe in prose open a string and blank the code
+              // up to the next real quote, dropping imports that were still used.
+              const nonImportCodeNoStrings =
+                blankStringsAndComments(nonImportCode);
               const filteredLines = lines.filter((line) => {
                 const trimmed = line.trimStart();
                 // Only process value imports (not `import type`)
@@ -1533,7 +1643,7 @@ class ViteCompiler {
             },
           } as Plugin,
           // Polyfill CommonJS `require()` for the i18n lazy-loader pattern:
-          // `() => require("next-vibe/ui/ui/icons/...").translations` - SSR gets node:module createRequire,
+          // `() => require("next-vibe/ui/components/icons/...").translations` - SSR gets node:module createRequire,
           // client gets require() calls rewritten to static import references.
           // apply:"serve" prevents this from running during esbuild dep pre-bundling.
           {
@@ -1550,7 +1660,7 @@ class ViteCompiler {
                 const shim = `import { createRequire as __createRequire } from "node:module";\nconst require = __createRequire(${JSON.stringify(id)});\n`;
                 return { code: shim + code, map: null };
               }
-              // Client: rewrite `require("next-vibe/ui/web/ui/icons/X")` → `__cjsImport_X` and add static imports.
+              // Client: rewrite `require("next-vibe/ui/web/components/icons/X")` → `__cjsImport_X` and add static imports.
               // Matches both relative (./de) and bare package-style (next-vibe/ui/i18n/de)
               // specifiers - the lazy i18n loader pattern uses both forms.
               const imports: string[] = [];
@@ -1954,6 +2064,12 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
           tsconfigPaths: true,
           alias: [
             { find: /^@\//, replacement: `${srcDir}/` },
+            // The root layout's location is a constant (ROOT_LAYOUT_DIR), so
+            // generated/app-tanstack/routes/__root.tsx is identical across trees.
+            {
+              find: "@root-layout",
+              replacement: resolve(ROOT_DIR, ROOT_LAYOUT_DIR),
+            },
             // next-vibe/ui/* is handled by the next-vibe-ui-ssr-resolver plugin
             // (tanstack-first, web fallback). The negative lookahead excludes it
             // from the general alias so the plugin wins.

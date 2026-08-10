@@ -6,18 +6,18 @@
 
 "use client";
 
-import { Button } from "next-vibe/ui/ui/button";
-import { Card, CardContent } from "next-vibe/ui/ui/card";
-import { Div } from "next-vibe/ui/ui/div";
-import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
-import { Check } from "next-vibe/ui/ui/icons/Check";
-import { GitBranch } from "next-vibe/ui/ui/icons/GitBranch";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
-import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
-import { Input } from "next-vibe/ui/ui/input";
-import { Span } from "next-vibe/ui/ui/span";
-import { Switch } from "next-vibe/ui/ui/switch";
-import { P } from "next-vibe/ui/ui/typography";
+import { Button } from "next-vibe/ui/components/button";
+import { Card, CardContent } from "next-vibe/ui/components/card";
+import { Div } from "next-vibe/ui/components/div";
+import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
+import { Check } from "next-vibe/ui/components/icons/Check";
+import { GitBranch } from "next-vibe/ui/components/icons/GitBranch";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
+import { Input } from "next-vibe/ui/components/input";
+import { Span } from "next-vibe/ui/components/span";
+import { Switch } from "next-vibe/ui/components/switch";
+import { P } from "next-vibe/ui/components/typography";
 import {
   useWidgetContext,
   useWidgetTranslation,

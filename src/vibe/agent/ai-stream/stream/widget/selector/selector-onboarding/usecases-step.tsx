@@ -4,22 +4,22 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { success } from "next-vibe/core/route/response.schema";
 import type { UserPermissionRoleValue } from "next-vibe/identity/roles/enum";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
-import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
-import { BookOpen } from "next-vibe/ui/ui/icons/BookOpen";
-import { Briefcase } from "next-vibe/ui/ui/icons/Briefcase";
-import { Check } from "next-vibe/ui/ui/icons/Check";
-import { Code } from "next-vibe/ui/ui/icons/Code";
-import { Flame } from "next-vibe/ui/ui/icons/Flame";
-import { Heart } from "next-vibe/ui/ui/icons/Heart";
-import { PenTool } from "next-vibe/ui/ui/icons/PenTool";
-import { Search } from "next-vibe/ui/ui/icons/Search";
-import { Sparkles } from "next-vibe/ui/ui/icons/Sparkles";
-import { Users } from "next-vibe/ui/ui/icons/Users";
-import { Span } from "next-vibe/ui/ui/span";
-import { H3, P } from "next-vibe/ui/ui/typography";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
+import { ArrowLeft } from "next-vibe/ui/components/icons/ArrowLeft";
+import { BookOpen } from "next-vibe/ui/components/icons/BookOpen";
+import { Briefcase } from "next-vibe/ui/components/icons/Briefcase";
+import { Check } from "next-vibe/ui/components/icons/Check";
+import { Code } from "next-vibe/ui/components/icons/Code";
+import { Flame } from "next-vibe/ui/components/icons/Flame";
+import { Heart } from "next-vibe/ui/components/icons/Heart";
+import { PenTool } from "next-vibe/ui/components/icons/PenTool";
+import { Search } from "next-vibe/ui/components/icons/Search";
+import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
+import { Users } from "next-vibe/ui/components/icons/Users";
+import { Span } from "next-vibe/ui/components/span";
+import { H3, P } from "next-vibe/ui/components/typography";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetLogger,
@@ -42,8 +42,11 @@ import {
   DEFAULT_CHAT_MODEL_ID,
   DEFAULT_CHAT_MODEL_SELECTION,
 } from "../../../../constants";
-import { type ChatModelSelection, getBestChatModel } from "../../../../models";
-import { ChatModelId } from "../../../../models";
+import {
+  ChatModelId,
+  type ChatModelSelection,
+  getBestChatModel,
+} from "../../../../models";
 import type { AiStreamT } from "../../../i18n";
 import { scopedTranslation } from "../../../i18n";
 

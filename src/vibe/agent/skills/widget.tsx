@@ -4,48 +4,48 @@
 
 "use client";
 import { isCliPlatform } from "next-vibe/platforms/platforms";
-import { usePathname } from "next-vibe/ui/hooks/use-pathname";
-import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
-import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
-import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
-import { ArrowRight } from "next-vibe/ui/ui/icons/ArrowRight";
-import { CheckCircle2 } from "next-vibe/ui/ui/icons/CheckCircle2";
-import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
-import { Eye } from "next-vibe/ui/ui/icons/Eye";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
-import { LogIn } from "next-vibe/ui/ui/icons/LogIn";
-import { Maximize } from "next-vibe/ui/ui/icons/Maximize";
-import { Pencil } from "next-vibe/ui/ui/icons/Pencil";
-import { Plus } from "next-vibe/ui/ui/icons/Plus";
-import { Search } from "next-vibe/ui/ui/icons/Search";
-import { Star } from "next-vibe/ui/ui/icons/Star";
-import { ThumbsUp } from "next-vibe/ui/ui/icons/ThumbsUp";
-import { UserPlus } from "next-vibe/ui/ui/icons/UserPlus";
-import { X } from "next-vibe/ui/ui/icons/X";
-import { Zap } from "next-vibe/ui/ui/icons/Zap";
-import { Input } from "next-vibe/ui/ui/input";
-import { Link } from "next-vibe/ui/ui/link";
+import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
+import { ArrowLeft } from "next-vibe/ui/components/icons/ArrowLeft";
+import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
+import { CheckCircle2 } from "next-vibe/ui/components/icons/CheckCircle2";
+import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
+import { Eye } from "next-vibe/ui/components/icons/Eye";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { LogIn } from "next-vibe/ui/components/icons/LogIn";
+import { Maximize } from "next-vibe/ui/components/icons/Maximize";
+import { Pencil } from "next-vibe/ui/components/icons/Pencil";
+import { Plus } from "next-vibe/ui/components/icons/Plus";
+import { Search } from "next-vibe/ui/components/icons/Search";
+import { Star } from "next-vibe/ui/components/icons/Star";
+import { ThumbsUp } from "next-vibe/ui/components/icons/ThumbsUp";
+import { UserPlus } from "next-vibe/ui/components/icons/UserPlus";
+import { X } from "next-vibe/ui/components/icons/X";
+import { Zap } from "next-vibe/ui/components/icons/Zap";
+import { Input } from "next-vibe/ui/components/input";
+import { Link } from "next-vibe/ui/components/link";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "next-vibe/ui/ui/popover";
+} from "next-vibe/ui/components/popover";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "next-vibe/ui/ui/select";
-import { Span } from "next-vibe/ui/ui/span";
+} from "next-vibe/ui/components/select";
+import { Span } from "next-vibe/ui/components/span";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe/ui/ui/tooltip";
+} from "next-vibe/ui/components/tooltip";
+import { usePathname } from "next-vibe/ui/hooks/use-pathname";
+import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";

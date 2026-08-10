@@ -4,17 +4,17 @@
  */
 
 "use client";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { Activity } from "next-vibe/ui/ui/icons/Activity";
-import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
-import { Clock } from "next-vibe/ui/ui/icons/Clock";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
-import { Plus } from "next-vibe/ui/ui/icons/Plus";
-import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
-import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
-import { Span } from "next-vibe/ui/ui/span";
-import { Strong } from "next-vibe/ui/ui/strong";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { Activity } from "next-vibe/ui/components/icons/Activity";
+import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
+import { Clock } from "next-vibe/ui/components/icons/Clock";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { Plus } from "next-vibe/ui/components/icons/Plus";
+import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
+import { XCircle } from "next-vibe/ui/components/icons/XCircle";
+import { Span } from "next-vibe/ui/components/span";
+import { Strong } from "next-vibe/ui/components/strong";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetContext,

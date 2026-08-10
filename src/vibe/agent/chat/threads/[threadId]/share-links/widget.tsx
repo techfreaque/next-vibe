@@ -5,26 +5,26 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { success } from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
-import { getCurrentUrl, openInNewTab } from "next-vibe/ui/lib/location";
-import { Button } from "next-vibe/ui/ui/button";
+import { Button } from "next-vibe/ui/components/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "next-vibe/ui/ui/dialog";
-import { Div } from "next-vibe/ui/ui/div";
-import { Check } from "next-vibe/ui/ui/icons/Check";
-import { Copy } from "next-vibe/ui/ui/icons/Copy";
-import { Globe } from "next-vibe/ui/ui/icons/Globe";
-import { Lock } from "next-vibe/ui/ui/icons/Lock";
-import { Mail } from "next-vibe/ui/ui/icons/Mail";
-import { Send } from "next-vibe/ui/ui/icons/Send";
-import { Input } from "next-vibe/ui/ui/input";
-import { Separator } from "next-vibe/ui/ui/separator";
-import { Span } from "next-vibe/ui/ui/span";
+} from "next-vibe/ui/components/dialog";
+import { Div } from "next-vibe/ui/components/div";
+import { Check } from "next-vibe/ui/components/icons/Check";
+import { Copy } from "next-vibe/ui/components/icons/Copy";
+import { Globe } from "next-vibe/ui/components/icons/Globe";
+import { Lock } from "next-vibe/ui/components/icons/Lock";
+import { Mail } from "next-vibe/ui/components/icons/Mail";
+import { Send } from "next-vibe/ui/components/icons/Send";
+import { Input } from "next-vibe/ui/components/input";
+import { Separator } from "next-vibe/ui/components/separator";
+import { Span } from "next-vibe/ui/components/span";
+import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
+import { getCurrentUrl, openInNewTab } from "next-vibe/ui/lib/location";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { apiClient } from "next-vibe/unified-ui/hooks/store";
 import type { JSX } from "react";

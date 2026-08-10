@@ -1,25 +1,25 @@
 "use client";
 
-import { Button } from "next-vibe/ui/ui/button";
-import { DetailField } from "next-vibe/ui/ui/detail-grid";
-import { Div } from "next-vibe/ui/ui/div";
-import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
-import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
-import { Clock } from "next-vibe/ui/ui/icons/Clock";
-import { List } from "next-vibe/ui/ui/icons/List";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
-import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
-import { RotateCcw } from "next-vibe/ui/ui/icons/RotateCcw";
-import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
-import { LoadingBlock } from "next-vibe/ui/ui/loading-block";
-import { MetricCard } from "next-vibe/ui/ui/metric-card";
-import { MetricGrid } from "next-vibe/ui/ui/metric-grid";
-import { ProgressBlock } from "next-vibe/ui/ui/progress-block";
-import { ResultBanner } from "next-vibe/ui/ui/result-banner";
-import { SectionGroup } from "next-vibe/ui/ui/section-group";
-import { StatusPill } from "next-vibe/ui/ui/status-pill";
-import { WidgetHeader } from "next-vibe/ui/ui/widget-header";
-import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
+import { Button } from "next-vibe/ui/components/button";
+import { DetailField } from "next-vibe/ui/components/detail-grid";
+import { Div } from "next-vibe/ui/components/div";
+import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
+import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
+import { Clock } from "next-vibe/ui/components/icons/Clock";
+import { List } from "next-vibe/ui/components/icons/List";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
+import { RotateCcw } from "next-vibe/ui/components/icons/RotateCcw";
+import { XCircle } from "next-vibe/ui/components/icons/XCircle";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
+import { MetricCard } from "next-vibe/ui/components/metric-card";
+import { MetricGrid } from "next-vibe/ui/components/metric-grid";
+import { ProgressBlock } from "next-vibe/ui/components/progress-block";
+import { ResultBanner } from "next-vibe/ui/components/result-banner";
+import { SectionGroup } from "next-vibe/ui/components/section-group";
+import { StatusPill } from "next-vibe/ui/components/status-pill";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
   useWidgetContext,
   useWidgetNavigation,

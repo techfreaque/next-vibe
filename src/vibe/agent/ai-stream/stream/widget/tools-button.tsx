@@ -1,10 +1,10 @@
 "use client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import helpDefinitions from "next-vibe/help-tool/definition";
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
-import { Wrench } from "next-vibe/ui/ui/icons/Wrench";
-import { Span } from "next-vibe/ui/ui/span";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
+import { Wrench } from "next-vibe/ui/components/icons/Wrench";
+import { Span } from "next-vibe/ui/components/span";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetLogger,

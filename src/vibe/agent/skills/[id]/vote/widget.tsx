@@ -7,9 +7,9 @@
 
 "use client";
 
-import { Div } from "next-vibe/ui/ui/div";
-import { CheckCircle2 } from "next-vibe/ui/ui/icons/CheckCircle2";
-import { Span } from "next-vibe/ui/ui/span";
+import { Div } from "next-vibe/ui/components/div";
+import { CheckCircle2 } from "next-vibe/ui/components/icons/CheckCircle2";
+import { Span } from "next-vibe/ui/components/span";
 import {
   useWidgetNavigation,
   useWidgetTranslation,

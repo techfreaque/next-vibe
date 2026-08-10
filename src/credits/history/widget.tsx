@@ -4,8 +4,8 @@
 
 "use client";
 import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
-import { Div } from "next-vibe/ui/ui/div";
-import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
+import { Div } from "next-vibe/ui/components/div";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {

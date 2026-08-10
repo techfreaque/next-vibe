@@ -24,7 +24,8 @@ import type { UserRoleValue } from "../../identity/roles/enum";
 import type { IconKey } from "../../unified-ui/widgets/form-fields/icon-field/icons";
 import type { WidgetData } from "../utils/json";
 
-export interface EndpointMeta {
+// eslint-disable-next-line typescript/consistent-type-definitions, @typescript-eslint/consistent-type-definitions -- Must be a type alias, not an interface: only aliases get the implicit index signature that lets the generator hand EndpointMeta[] straight to jsonToTs(WidgetData) without a cast.
+export type EndpointMeta = {
   /** Full tool name: path segments joined by "_" + "_" + METHOD */
   toolName: string;
   method: string;
@@ -62,4 +63,4 @@ export interface EndpointMeta {
     inputs?: Record<string, Record<string, WidgetData>>;
     responses?: Record<string, Record<string, WidgetData>>;
   };
-}
+};

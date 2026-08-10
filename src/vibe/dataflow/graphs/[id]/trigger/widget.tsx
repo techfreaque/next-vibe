@@ -4,10 +4,10 @@
  */
 
 "use client";
-import { Div } from "next-vibe/ui/ui/div";
-import { Input } from "next-vibe/ui/ui/input";
-import { Label } from "next-vibe/ui/ui/label";
-import { Span } from "next-vibe/ui/ui/span";
+import { Div } from "next-vibe/ui/components/div";
+import { Input } from "next-vibe/ui/components/input";
+import { Label } from "next-vibe/ui/components/label";
+import { Span } from "next-vibe/ui/components/span";
 import React, { useState } from "react";
 
 import { cn } from "../../../../unified-ui/_shared/cn";

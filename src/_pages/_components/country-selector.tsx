@@ -7,17 +7,22 @@ import type {
 } from "next-vibe/core/i18n/core/config";
 import { getUniqueLanguages } from "next-vibe/core/i18n/core/language-utils";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { useLogger } from "next-vibe/ui/hooks/use-logger";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "next-vibe/ui/ui/dropdown-menu";
-import { Check } from "next-vibe/ui/ui/icons/Check";
-import { Span } from "next-vibe/ui/ui/span";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe/ui/ui/tabs";
+} from "next-vibe/ui/components/dropdown-menu";
+import { Check } from "next-vibe/ui/components/icons/Check";
+import { Span } from "next-vibe/ui/components/span";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "next-vibe/ui/components/tabs";
+import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { executeMutation } from "next-vibe/unified-ui/hooks/mutation-executor";
 import type { FC } from "react";

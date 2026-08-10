@@ -1,6 +1,6 @@
 "use client";
 
-import { Div } from "next-vibe/ui/ui/div";
+import { Div } from "next-vibe/ui/components/div";
 import type { JSX } from "react";
 import { useMemo } from "react";
 import type { Path } from "react-hook-form";

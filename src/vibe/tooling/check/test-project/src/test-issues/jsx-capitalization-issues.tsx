@@ -71,7 +71,7 @@ export function ComponentWithImg(): React.ReactElement {
 
 // ============================================================
 // Rule: SVG elements
-// Expected error: "SVG element <svg> detected. For icons, use components from next-vibe/ui/ui/icons..."
+// Expected error: "SVG element <svg> detected. For icons, use components from next-vibe/ui/components/icons..."
 // ============================================================
 export function ComponentWithSvg(): React.ReactElement {
   return (

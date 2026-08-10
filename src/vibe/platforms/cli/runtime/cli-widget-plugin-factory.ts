@@ -4,9 +4,9 @@
  * Returns a BunPlugin that redirects UI imports to their CLI counterparts:
  *
  * Rule 1: next-vibe/ui/{ui,hooks,utils}/* → cli/{ui,hooks,utils}/*
- *   Bun resolves tsconfig paths before plugins, so "next-vibe/ui/ui/foo"
- *   arrives as an absolute path to web/ui/foo.tsx in onLoad. We intercept
- *   there and serve the cli/ui counterpart's contents instead.
+ *   Bun resolves tsconfig paths before plugins, so "next-vibe/ui/components/foo"
+ *   arrives as an absolute path to web/components/foo.tsx in onLoad. We intercept
+ *   there and serve the cli/components counterpart's contents instead.
  *   Same for hooks/ and utils/ directories.
  *
  * Rule 2: Any *.tsx/*.ts file → if a *.cli.tsx/*.cli.ts sibling exists, use it.
@@ -28,7 +28,7 @@ const toPosix = (p: string): string => p.replaceAll("\\", "/");
 /**
  * Rewrite relative imports in CLI file contents so they resolve correctly when
  * Bun loads them under the web file's path. Without this, `./tailwind-to-ink`
- * in cli/ui/div.tsx would be resolved relative to web/ui/ where it doesn't exist.
+ * in cli/components/div.tsx would be resolved relative to web/components/ where it doesn't exist.
  */
 function rebaseRelativeImports(
   contents: string,

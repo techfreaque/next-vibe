@@ -3,7 +3,7 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JWTPublicPayloadType } from "next-vibe/identity/auth/types";
 import type { Platform } from "next-vibe/platforms/platforms";
-import { MotionDiv } from "next-vibe/ui/ui/motion";
+import { MotionDiv } from "next-vibe/ui/components/motion";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 

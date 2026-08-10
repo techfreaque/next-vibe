@@ -71,7 +71,7 @@ config.maxWorkers = 2;
 config.resolver.extraNodeModules = {
   "@": path.resolve(workspaceRoot, "src"),
   "next-vibe": path.resolve(workspaceRoot, "src/app/api/[locale]/v1/core"),
-  // This makes next-vibe-ui/ui resolve to next-vibe-ui/native/ui
+  // This makes next-vibe-ui/components resolve to next-vibe-ui/native/components
   "next-vibe-ui": path.resolve(
     workspaceRoot,
     "src/packages/next-vibe-ui/native",

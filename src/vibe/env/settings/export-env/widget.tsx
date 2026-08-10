@@ -5,14 +5,14 @@
 
 "use client";
 
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { Check } from "next-vibe/ui/components/icons/Check";
+import { Copy } from "next-vibe/ui/components/icons/Copy";
+import { Download } from "next-vibe/ui/components/icons/Download";
+import { Pre } from "next-vibe/ui/components/pre";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { downloadFile } from "next-vibe/ui/lib/download";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { Check } from "next-vibe/ui/ui/icons/Check";
-import { Copy } from "next-vibe/ui/ui/icons/Copy";
-import { Download } from "next-vibe/ui/ui/icons/Download";
-import { Pre } from "next-vibe/ui/ui/pre";
 import type { JSX } from "react";
 import { useState } from "react";
 

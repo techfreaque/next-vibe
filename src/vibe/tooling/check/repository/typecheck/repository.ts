@@ -70,7 +70,7 @@ export interface TypecheckRequestOutput {
   summaryOnly: boolean;
   extensive?: boolean;
   filter?: string | string[];
-  /** Force the repo's strict compilerOptions on any path, not just strictPaths. */
+  /** `--strict`: force the repo's strict compilerOptions on any path. */
   strict?: boolean;
 }
 
@@ -166,10 +166,55 @@ function findTsgo(startDir: string): string {
   return join(startDir, "node_modules/.bin", binaryName);
 }
 
+/**
+ * Find the real tsc binary by walking up from startDir, same as findTsgoFrom.
+ */
+function findTscFrom(startDir: string): string | undefined {
+  const binaryNames =
+    process.platform === "win32" ? ["tsc.cmd", "tsc"] : ["tsc"];
+  let dir = startDir;
+  while (true) {
+    for (const binaryName of binaryNames) {
+      const candidate = join(dir, "node_modules/.bin", binaryName);
+      if (existsSync(candidate)) {
+        return candidate;
+      }
+    }
+    const parent = dirname(dir);
+    if (parent === dir) {
+      return undefined;
+    }
+    dir = parent;
+  }
+}
+
+/**
+ * Locate the real tsc binary directly, the same way findTsgo locates tsgo —
+ * NOT through `bunx`/`npx`. `bunx tsc` was measured to be non-deterministic
+ * under this checker's concurrent (4-at-once) command execution: the exact
+ * same generated config produced anywhere from 2 to 352 diagnostics across
+ * back-to-back runs, while `node_modules/.bin/tsc.cmd` invoked directly on
+ * the same config was stable at 2 every time. `bunx` re-resolves/re-verifies
+ * the package on each invocation, and that resolution isn't safe to run
+ * concurrently against a large node_modules tree — calling the installed
+ * binary directly sidesteps it entirely, same as tsgo already does.
+ */
+function findTsc(startDir: string): string | undefined {
+  const projectBinary = findTscFrom(startDir);
+  if (projectBinary) {
+    return projectBinary;
+  }
+  return findTscFrom(dirname(fileURLToPath(import.meta.url)));
+}
+
 function findProjectRoot(): string {
+  // Every app has its own tsconfig.json, so walking up looking for THAT stops
+  // at the nearest app instead of the repo root when invoked from inside one
+  // (e.g. cwd = a nested app). check.config.ts exists exactly once, at the
+  // true root — the same marker ConfigRepositoryImpl.getConfigFilePath uses.
   let dir = process.cwd();
   for (let i = 0; i < 10; i++) {
-    if (existsSync(resolve(dir, "tsconfig.json"))) {
+    if (existsSync(resolve(dir, "check.config.ts"))) {
       return dir;
     }
     const parent = dirname(dir);
@@ -181,22 +226,35 @@ function findProjectRoot(): string {
   return process.cwd();
 }
 
-/** Reduce a tsconfig include/target glob to its directory (POSIX, no trailing slash). */
+/**
+ * The tsconfig.json that OWNS `target` — the nearest one at or above it, never
+ * above the project root. Null when nothing does.
+ */
+/**
+ * Reduce a tsconfig include/target glob to its directory (POSIX, no trailing
+ * slash). The project root is "" — the empty string is a real answer here, not
+ * a failure.
+ *
+ * The `lastIndexOf("/", star)` has to be checked for -1. A root-anchored
+ * include like `**\/*.ts` puts its first wildcard at index 0, so there is no
+ * "/" before it and lastIndexOf returns -1 — and `slice(0, -1)` does NOT mean
+ * "empty", it means "everything but the last character". `**\/*.ts` became the
+ * literal string `**\/*.t`, which matches no directory at all.
+ *
+ * That single off-by-one silently disabled directory-scoped typechecking on any
+ * project whose tsconfig includes from its own root: clampGlobsToIncludes
+ * intersected the real target against `**\/*.t`, found no overlap, emitted an
+ * EMPTY `include`, and tsgo dutifully compiled nothing in 0.1s and reported
+ * zero errors. File-scoped checks were unaffected because exact files bypass
+ * the intersection entirely — which is exactly the "passes at file scope, green
+ * at directory scope" signature that exposed it.
+ */
 function globToDir(glob: string): string {
   const posix = glob.replaceAll("\\", "/");
   const star = posix.search(/[*?]/);
   if (star === -1) {
     return posix.replace(/\/+$/, "");
   }
-  // Check lastIndexOf for -1. A root-anchored include like `**\/*.ts` puts its
-  // first wildcard at index 0, so there is no "/" before it and lastIndexOf
-  // returns -1 — and `slice(0, -1)` does NOT mean "empty", it means "everything
-  // but the last character", turning `**\/*.ts` into the literal `**\/*.t`.
-  // clampGlobsToIncludes then finds no overlap with the real target, emits an
-  // EMPTY `include`, and the typechecker compiles nothing and reports zero
-  // errors. This repo's own includes are all dir-anchored ("src/**/*.ts"), so
-  // it never fired here — but it did downstream, where directory-scoped checks
-  // silently passed while the same file failed at file scope.
   const lastSlash = posix.lastIndexOf("/", star);
   const cut = lastSlash === -1 ? "" : posix.slice(0, lastSlash);
   return cut.replace(/\/+$/, "");
@@ -206,17 +264,90 @@ function globToDir(glob: string): string {
  * Whether `child` is the same directory as `parent` or nested under it.
  *
  * `parent === ""` is the project root, and everything is under the project
- * root. Without that case the `${parent}/` template builds the prefix "/",
- * which no project-relative path ever starts with.
+ * root. Without that case the `${parent}/` template builds the absolute-looking
+ * prefix "/", which no project-relative path ever starts with, so a root-level
+ * include root matched nothing.
  */
 function isPathUnderOrEqual(child: string, parent: string): boolean {
   return parent === "" || child === parent || child.startsWith(`${parent}/`);
 }
 
 /**
- * The tsconfig.json that OWNS `target` — the nearest one at or above it, never
- * above the project root. Null when nothing does.
+ * Crash signatures that mean the typechecker DIED rather than finished.
+ *
+ * The distinction is the whole point: a typechecker that finds no errors and a
+ * typechecker that never got far enough to look both produce empty diagnostics,
+ * and the second one must never be reported as a pass. This has happened — an
+ * out-of-memory abort printed `✓ TypeScript 0 issues`, which is the most
+ * dangerous output this tool can produce, because a green check is exactly when
+ * nobody looks closer.
+ *
+ * Both runtimes are represented. tsgo is Go, so it aborts with `fatal error:` /
+ * `panic:` and a goroutine dump; tsc is Node, which dies with
+ * `FATAL ERROR: ... heap out of memory`.
  */
+const CRASH_SIGNATURES = [
+  // Go (tsgo)
+  /fatal error:\s*runtime:/i,
+  /runtime:\s*out of memory/i,
+  /cannot allocate memory/i,
+  /^panic:/im,
+  /^fatal error:/im,
+  // Node (tsc)
+  /JavaScript heap out of memory/i,
+  /FATAL ERROR:.*(heap|allocation)/i,
+  /Reached heap limit/i,
+  // Generic
+  /std::bad_alloc/i,
+  /Killed process/i,
+];
+
+/**
+ * Why this run cannot be trusted, or null if it can.
+ *
+ * Exit codes are NOT sufficient on their own. tsc and tsgo use exit 1 and 2 for
+ * "I found type errors" — a SUCCESSFUL run whose diagnostics are sitting in
+ * stdout — so classifying by exit code alone would throw away every real result
+ * the checker exists to report. This looks at HOW the process died instead:
+ * a crash banner in the output, a kill signal, or an exit status outside the
+ * 0/1/2 the typecheckers actually define.
+ *
+ * Module-level and exported so the classifier can be unit-tested directly; the
+ * must-not-trip cases (clean pass, errors found) matter more than the crash
+ * cases, because a false crash report is a broken gate too.
+ */
+export function diagnoseCrash(result: {
+  stdout: string;
+  stderr: string;
+  code: number | null;
+  signal: NodeJS.Signals | null;
+}): string | null {
+  const combined = `${result.stderr}\n${result.stdout}`;
+  const hit = CRASH_SIGNATURES.find((re) => re.test(combined));
+  if (hit) {
+    // The first crash line is the useful one; a goroutine dump is not.
+    const line = combined
+      .split("\n")
+      .find((l) => hit.test(l))
+      ?.trim();
+    return `the typechecker crashed instead of finishing${line ? `: ${line}` : ""}`;
+  }
+
+  if (result.signal !== null) {
+    const oom =
+      result.signal === "SIGKILL" ? " (typically the OOM killer)" : "";
+    return `the typechecker was killed by ${result.signal}${oom} without exiting`;
+  }
+
+  // 0 = clean, 1/2 = diagnostics emitted. Anything else is the process failing
+  // to run at all: a missing binary, a bad tsconfig, a native abort.
+  if (result.code !== null && result.code > 2) {
+    return `the typechecker exited with status ${result.code}, which means it failed to run rather than found errors`;
+  }
+
+  return null;
+}
+
 function findOwningTsconfig(target: string): string | null {
   const root = resolve(findProjectRoot());
   let dir = resolve(target);
@@ -242,8 +373,8 @@ function findOwningTsconfig(target: string): string | null {
 /**
  * The single tsconfig owning ALL of `targets`, or null when they disagree.
  *
- * Disagreement means the run spans projects (`vibe check apps/a apps/b`) and no
- * one config can describe both, so the caller falls back to the root — the
+ * Disagreement means the run spans projects (`vibe check apps/a apps/b`) and
+ * no one config can describe both, so the caller falls back to the root — the
  * behaviour that existed before ownership was considered.
  */
 function findSharedOwningTsconfig(targets: string[]): string | null {
@@ -273,11 +404,30 @@ export class TypecheckRepository {
     "vibe-minimal-env",
   ]);
 
-  /** Discover independent nested TypeScript projects in a workspace. */
-  private static discoverNestedProjects(root: string): string[] {
+  /**
+   * Discover independent nested TypeScript projects in a workspace.
+   *
+   * A directory with its own `.git` (a submodule's gitlink file, or a nested
+   * clone) is a FOREIGN repository: it has its own toolchain, its own
+   * node_modules layout, and checks itself — compiling it with this repo's
+   * configs invents errors its own checker does not have (a vendored sub-repo's
+   * deps resolved through the parent can produce hundreds of them). Its projects are
+   * not visited; the directory is returned in `foreignRoots` so the caller
+   * excludes it from the root sweep as well.
+   */
+  private static discoverNestedProjects(root: string): {
+    projects: string[];
+    foreignRoots: string[];
+  } {
     const projects: string[] = [];
+    const foreignRoots: string[] = [];
     const visit = (directory: string): void => {
-      for (const entry of readdirSync(directory, { withFileTypes: true })) {
+      const entries = readdirSync(directory, { withFileTypes: true });
+      if (directory !== root && entries.some((e) => e.name === ".git")) {
+        foreignRoots.push(relative(root, directory).replaceAll("\\", "/"));
+        return;
+      }
+      for (const entry of entries) {
         if (
           entry.isDirectory() &&
           !TypecheckRepository.PROJECT_SCAN_IGNORES.has(entry.name)
@@ -299,11 +449,16 @@ export class TypecheckRepository {
     };
 
     visit(root);
-    return projects.toSorted();
+    return {
+      projects: projects.toSorted(),
+      foreignRoots: foreignRoots.toSorted(),
+    };
   }
+
   /** TypeScript configuration Zod schema for runtime validation */
   private static readonly TsConfigSchema = z.object({
     extends: z.union([z.string(), z.array(z.string())]).optional(),
+    files: z.array(z.string()).optional(),
     compilerOptions: z
       .object({
         rootDir: z.string().optional(),
@@ -335,6 +490,7 @@ export class TypecheckRepository {
       cwd: string;
       timeoutMs: number;
       signal?: AbortSignal;
+      env?: Record<string, string | undefined>;
     },
   ): Promise<{
     stdout: string;
@@ -348,6 +504,7 @@ export class TypecheckRepository {
         cwd: options.cwd,
         shell: true,
         signal: options.signal,
+        ...(options.env ? { env: { ...process.env, ...options.env } } : {}),
       });
 
       const stdoutChunks: Buffer[] = [];
@@ -383,76 +540,6 @@ export class TypecheckRepository {
     });
   }
 
-  /**
-   * Crash signatures that mean the typechecker DIED rather than finished.
-   *
-   * The distinction is the whole point: a typechecker that finds no errors and a
-   * typechecker that never got far enough to look both produce empty
-   * diagnostics, and the second one must never be reported as a pass. This has
-   * happened — an out-of-memory abort printed `✓ TypeScript 0 issues`, which is
-   * the most dangerous output this tool can produce, because a green check is
-   * exactly when nobody looks closer.
-   *
-   * Both runtimes are represented. tsgo is Go, so it aborts with `fatal error:`
-   * / `panic:` and a goroutine dump; tsc is Node, which dies with
-   * `FATAL ERROR: ... heap out of memory`. Windows adds its own OOM exit status.
-   */
-  private static readonly CRASH_SIGNATURES = [
-    // Go (tsgo)
-    /fatal error:\s*runtime:/i,
-    /runtime:\s*out of memory/i,
-    /cannot allocate memory/i,
-    /^panic:/im,
-    /^fatal error:/im,
-    // Node (tsc)
-    /JavaScript heap out of memory/i,
-    /FATAL ERROR:.*(heap|allocation)/i,
-    /Reached heap limit/i,
-    // Generic
-    /std::bad_alloc/i,
-    /Killed process/i,
-  ];
-
-  /**
-   * Why this run cannot be trusted, or null if it can.
-   *
-   * Exit codes are NOT sufficient on their own — tsc uses 1 and 2 for "found
-   * type errors", which is a successful run — so this looks at how the process
-   * died, not just what it returned.
-   */
-  private static diagnoseCrash(result: {
-    stdout: string;
-    stderr: string;
-    code: number | null;
-    signal: NodeJS.Signals | null;
-  }): string | null {
-    const combined = `${result.stderr}\n${result.stdout}`;
-    const hit = TypecheckRepository.CRASH_SIGNATURES.find((re) =>
-      re.test(combined),
-    );
-    if (hit) {
-      // The first crash line is the useful one; a goroutine dump is not.
-      const line = combined
-        .split("\n")
-        .find((l) => hit.test(l))
-        ?.trim();
-      return `the typechecker crashed instead of finishing${line ? `: ${line}` : ""}`;
-    }
-
-    if (result.signal !== null) {
-      const oom =
-        result.signal === "SIGKILL" ? " (typically the OOM killer)" : "";
-      return `the typechecker was killed by ${result.signal}${oom} without exiting`;
-    }
-
-    // 0 = clean, 1/2 = diagnostics emitted. Anything else is the process
-    // failing to run at all: a missing binary, a bad tsconfig, a native abort.
-    if (result.code !== null && result.code > 2) {
-      return `the typechecker exited with status ${result.code}, which means it failed to run rather than found errors`;
-    }
-
-    return null;
-  }
   // --------------------------------------------------------
   // Static Private Helpers - Command Configuration
   // --------------------------------------------------------
@@ -460,27 +547,69 @@ export class TypecheckRepository {
   /**
    * Get the base command for type checking.
    * @param useTsgo - Whether to use tsgo instead of tsc
+   * @param searchDir - Directory to start the binary search from. Must be the
+   * checked project's own directory (not the checker process's cwd) so a
+   * project with its own locally-installed typescript version resolves that
+   * version's tsc/tsgo instead of always finding the repo root's.
    * @returns The base command string
    */
-  private static getBaseCommand(useTsgo: boolean): string {
+  private static getBaseCommand(useTsgo: boolean, searchDir: string): string {
     if (useTsgo) {
-      return JSON.stringify(findTsgo(process.cwd()));
+      return JSON.stringify(findTsgo(searchDir));
+    }
+    // This string is handed to `spawn(..., { shell: true })`, so the runner is
+    // spelled out rather than passed as an argv array.
+    //
+    // The increased memory tsc needs for large projects is set via `env` on
+    // the spawn call (see executeCommand), NOT an inline `NODE_OPTIONS=...`
+    // prefix here: that's POSIX shell syntax, and `shell: true` on Windows
+    // runs through cmd.exe, which doesn't understand it and fails the spawn
+    // outright — every tsc invocation died before reaching TypeScript at all.
+    //
+    // Call the installed tsc binary directly rather than through
+    // `bunx`/`npx` — measured non-deterministic under this checker's
+    // concurrent command execution (see findTsc), the same class of problem
+    // tsgo already avoids by never going through a package-runner wrapper.
+    const directTsc = findTsc(searchDir);
+    if (directTsc) {
+      return JSON.stringify(directTsc);
     }
     const runner = getPackageRunner(coreEnv.PACKAGE_MANAGER);
-    const invocation = [runner.command, ...runner.args, "tsc"].join(" ");
-    // tsc needs increased memory for large projects
-    return `NODE_OPTIONS="--max-old-space-size=32768" ${invocation}`;
+    return [runner.command, ...runner.args, "tsc"].join(" ");
   }
 
   /**
    * Build the full typecheck command with all flags.
+   *
+   * NO `--incremental`. tsgo does not re-emit cached diagnostics for files the
+   * .tsbuildinfo says are unchanged (tsc does), so a second identical run
+   * reported only the files touched since the first — 40 issues, then 5, for
+   * the same command. A checker that under-reports on re-run is worse than a
+   * slower one; tsgo is fast enough without the cache.
    */
   private static buildTypecheckCommand(
     baseCommand: string,
-    buildInfoFile: string,
     projectConfig: string,
   ): string {
-    return `${baseCommand} --noEmit --incremental --tsBuildInfoFile ${buildInfoFile} --skipLibCheck --project ${projectConfig}`;
+    return `${baseCommand} --noEmit --skipLibCheck --project ${projectConfig}`;
+  }
+
+  /**
+   * Recover the `--project <path>` argument from a command built by
+   * `buildTypecheckCommand` — always its last token, since projectConfig is
+   * never quoted (temp config paths are our own, never contain spaces).
+   * Used to look up which real tsconfig THIS command's own output belongs
+   * to, so a workspace run's 20+ concurrent commands can each attribute
+   * their pathless diagnostics correctly instead of collapsing into one
+   * shared bucket.
+   */
+  private static extractProjectPath(command: string): string | undefined {
+    const marker = " --project ";
+    const idx = command.lastIndexOf(marker);
+    if (idx === -1) {
+      return undefined;
+    }
+    return command.slice(idx + marker.length).trim();
   }
 
   // --------------------------------------------------------
@@ -563,12 +692,35 @@ export class TypecheckRepository {
     useTsgo: boolean,
     targetPath: string | string[] | undefined,
     disableFilter: boolean,
+    tempConfigOwners: Map<string, string> = new Map(),
+    /**
+     * The real tsconfig this SPECIFIC output came from, when the caller
+     * already knows it (one command's output, parsed on its own) — used for
+     * pathless global diagnostics (TS2688 "cannot find type definition",
+     * etc.) instead of the generic "tsconfig.json" literal.
+     *
+     * Matters because a workspace run executes 20+ commands concurrently and
+     * concatenates all their output into one blob before ever calling this;
+     * every one of THOSE commands' pathless diagnostics then collapses into
+     * the exact same hardcoded "tsconfig.json" bucket, indistinguishable from
+     * each other — a flood of errors from project A reads as if they came
+     * from the (possibly innocent) project B, C, and D too. Passing each
+     * command's own output through separately, with its own defaultOwner,
+     * is what keeps them apart.
+     */
+    defaultOwner?: string,
   ): { errors: ParsedIssue[]; warnings: ParsedIssue[] } {
     const errors: ParsedIssue[] = [];
     const warnings: ParsedIssue[] = [];
 
     const cleanOutput = TypecheckRepository.stripAnsiCodes(output);
-    const lines = cleanOutput.split("\n");
+    // tsc emits CRLF line endings under `bunx`/Windows; splitting on "\n"
+    // alone leaves a trailing "\r" on every line. JS regex `.` treats "\r" as
+    // a line terminator it can never match, so the `$` anchor in both
+    // per-file patterns below then fails on EVERY line — every diagnostic,
+    // regardless of how well-formed, fell through to the pathless global
+    // bucket as a result, discarding its real file/line/column entirely.
+    const lines = cleanOutput.split(/\r?\n/);
 
     for (const line of lines) {
       const issue = TypecheckRepository.parseOutputLine(line, useTsgo);
@@ -584,8 +736,16 @@ export class TypecheckRepository {
           continue;
         }
 
-        // Convert file path to display format
-        issue.file = getDisplayPath(issue.file);
+        // A config-level diagnostic (bad/removed option) is reported against
+        // whatever file was passed via `--project` — always one of OUR
+        // generated temp configs, never the real project tsconfig the user
+        // would need to go fix. Swap it back before formatting for display.
+        issue.file = getDisplayPath(
+          TypecheckRepository.rewriteTempConfigFile(
+            issue.file,
+            tempConfigOwners,
+          ),
+        );
 
         if (issue.severity === "error") {
           errors.push(issue);
@@ -598,7 +758,7 @@ export class TypecheckRepository {
         // "0 issues" result.
         const globalMatch = line.trim().match(/^error\s+(TS\d+):\s*(.+)$/);
         errors.push({
-          file: "tsconfig.json",
+          file: defaultOwner ? getDisplayPath(defaultOwner) : "tsconfig.json",
           ...(globalMatch?.[1] && { rule: globalMatch[1] }),
           severity: "error",
           message: globalMatch?.[2] ?? line.trim(),
@@ -667,10 +827,53 @@ export class TypecheckRepository {
     types: string[] | undefined,
     prefix: string,
     cachePath: string,
+    rootPrefix: string,
   ): string[] | undefined {
     if (!types) {
       return undefined;
     }
+
+    // Whether `basePrefix + node_modules/<typeName>` ships declarations for
+    // the entry. Existence of the directory is not enough: `types: ["mocha"]`
+    // with a local node_modules/mocha (no index.d.ts, no `types` field)
+    // resolves through @types/mocha in the typeRoots — rewriting it to the
+    // bare package produced a TS2688 for a name that was never broken.
+    const resolvesFrom = (typeName: string, basePrefix: string): boolean => {
+      const segments = typeName.split("/");
+      const packageName = typeName.startsWith("@")
+        ? segments.slice(0, 2).join("/")
+        : segments[0];
+      const entryAbs = resolve(
+        cachePath,
+        `${basePrefix}node_modules/${typeName}`,
+      );
+      // A subpath entry ("vite-plugin-svgr/client") is a .d.ts next to it; a
+      // package entry is an index.d.ts or a package.json types/typings field.
+      if (
+        existsSync(`${entryAbs}.d.ts`) ||
+        existsSync(join(entryAbs, "index.d.ts"))
+      ) {
+        return true;
+      }
+      if (typeName !== packageName) {
+        return false;
+      }
+      const packageJsonPath = resolve(
+        cachePath,
+        `${basePrefix}node_modules/${packageName}/package.json`,
+      );
+      if (!existsSync(packageJsonPath)) {
+        return false;
+      }
+      const parsed = parseJsonWithComments(
+        readFileSync(packageJsonPath, "utf8"),
+      );
+      if (!parsed.success) {
+        return false;
+      }
+      const pkg = parsed.data as { types?: string; typings?: string };
+      return Boolean(pkg.types ?? pkg.typings);
+    };
 
     return types.map((typeName) => {
       if (typeName.startsWith(".") || typeName.startsWith("/")) {
@@ -679,26 +882,102 @@ export class TypecheckRepository {
 
       // A bare name like "vite-plugin-svgr/client" is resolved by walking
       // node_modules up from the config that DECLARED it. This config lives in
-      // the cache dir, so that walk starts at the repo root and never reaches a
-      // nested project's node_modules — the entry then fails with TS2688. It is
-      // the one value `prefix` alone cannot fix, because the anchor is the
-      // file's location rather than anything written inside it.
+      // the cache dir, so that walk starts at the repo root and never reaches
+      // the owning project's node_modules — the entry then fails with TS2688. It is the
+      // one value `prefix` alone cannot fix, because the anchor is the file's
+      // location rather than anything written inside it.
       //
       // So resolve it here instead and write the answer as a path. The
-      // alternative — listing the owner's bare node_modules in typeRoots — makes
-      // every package there an auto-included type package and silently masks
-      // real module errors.
-      // Probe the PACKAGE, not the entry: "vite-plugin-svgr/client" names a
-      // subpath inside the package, and only "vite-plugin-svgr" is a directory.
-      const segments = typeName.split("/");
-      const packageName = typeName.startsWith("@")
-        ? segments.slice(0, 2).join("/")
-        : segments[0];
-      const packageDir = `${prefix}node_modules/${packageName}`;
-      return existsSync(resolve(cachePath, packageDir))
-        ? `${prefix}node_modules/${typeName}`
-        : typeName;
+      // alternative — listing the owner's (or the root's) bare node_modules in
+      // typeRoots — makes every package in that directory an auto-included
+      // type package and silently masks real module errors: it also produces
+      // a TS2688 for every OTHER package hoisted alongside it that has no
+      // valid main .d.ts/types field, which is what happened when the root's
+      // bare node_modules was listed unconditionally for every project (see
+      // the removed `adjustedTypeRoots.push(nodeModulesRoot)` below).
+      //
+      // Try the owning project's own node_modules first, then fall back to
+      // the repo root's — hoisted bare-package types (e.g. "bun-types" that
+      // only exists at the root's node_modules/bun-types, not under any
+      // project's own node_modules) still resolve, without ever adding a
+      // whole node_modules directory as a typeRoot.
+      if (resolvesFrom(typeName, prefix)) {
+        return `${prefix}node_modules/${typeName}`;
+      }
+      if (prefix !== rootPrefix && resolvesFrom(typeName, rootPrefix)) {
+        return `${rootPrefix}node_modules/${typeName}`;
+      }
+      return typeName;
     });
+  }
+
+  /**
+   * Whether an @types-style package directory ships a usable declaration:
+   * either an `index.d.ts`, or a package.json `types`/`typings` field
+   * pointing at a file that exists. DefinitelyTyped "stub" packages
+   * (published for packages that now ship their own types — chalk,
+   * json-stable-stringify, ...) have neither: `package.json` with
+   * `"main": ""` and no `.d.ts` anywhere, deliberately inert. See
+   * `collectImplicitTypes` for why this matters.
+   */
+  private static hasUsableDeclaration(entryDir: string): boolean {
+    if (existsSync(join(entryDir, "index.d.ts"))) {
+      return true;
+    }
+    const packageJsonPath = join(entryDir, "package.json");
+    if (!existsSync(packageJsonPath)) {
+      return false;
+    }
+    const parsed = parseJsonWithComments(readFileSync(packageJsonPath, "utf8"));
+    if (!parsed.success) {
+      return false;
+    }
+    const pkg = parsed.data as { types?: string; typings?: string };
+    const entry = pkg.types ?? pkg.typings;
+    return Boolean(entry) && existsSync(join(entryDir, entry as string));
+  }
+
+  /**
+   * Replicate TypeScript's own implicit type-library discovery under
+   * `typeRoots` (every directory entry becomes an auto-included ambient type
+   * package when `types` is unset) — minus the "stub" packages that only
+   * TypeScript's DEFAULT (unset) typeRoots silently tolerates. Used whenever
+   * the owning project does not declare its own `types`: this temp config
+   * always sets `typeRoots` explicitly (it lives outside the project
+   * directory, so the default relative lookup would resolve nothing), and an
+   * explicit `typeRoots` with no `types` filter would otherwise fail on every
+   * stub package hoisted anywhere under those directories. See the
+   * `adjustedTypes` call site for the measured proof this is a real
+   * default-vs-explicit behavior split, not a config mistake.
+   */
+  private static collectImplicitTypes(
+    typeRootDirs: string[],
+    cachePath: string,
+  ): string[] {
+    const names = new Set<string>();
+    for (const root of typeRootDirs) {
+      const absRoot = resolve(cachePath, root);
+      let entries: Dirent[];
+      try {
+        entries = readdirSync(absRoot, { withFileTypes: true });
+      } catch {
+        continue;
+      }
+      for (const entry of entries) {
+        if (!entry.isDirectory() || entry.name.startsWith(".")) {
+          continue;
+        }
+        if (names.has(entry.name)) {
+          continue;
+        }
+        if (
+          TypecheckRepository.hasUsableDeclaration(join(absRoot, entry.name))
+        ) {
+          names.add(entry.name);
+        }
+      }
+    }
+    return [...names].toSorted();
   }
 
   /**
@@ -729,8 +1008,8 @@ export class TypecheckRepository {
   }
 
   /**
-   * Determine whether a filesToCheck entry is an exact file path or a glob.
-   * Globs contain "*" or "?" characters; exact paths do not.
+   * Whether a filesToCheck entry is a glob/folder pattern rather than an exact
+   * file. Globs contain "*" or "?"; exact paths do not.
    */
   private static isGlobPattern(path: string): boolean {
     return path.includes("*") || path.includes("?");
@@ -741,10 +1020,10 @@ export class TypecheckRepository {
    * scoped check compiles the same file set `tsgo -p <project>` would.
    *
    * Both sides reduce to directories (globs stripped of their `*` suffix); the
-   * result is the narrower of each overlapping pair, re-expanded to a glob. A
-   * target under an include root stays as the target; the project root as a
-   * target expands to the include roots; disjoint pairs drop out (a folder the
-   * project does not include yields nothing, exactly as `tsgo -p` sees it).
+   * result is the narrower of each overlapping pair, re-expanded to a `**\/*`
+   * glob. A target under an include root stays as the target; the project root
+   * as a target expands to the include roots; disjoint pairs drop out (a folder
+   * the project does not include yields nothing, exactly as `tsgo -p` sees it).
    *
    * `targets` are project-root-relative; `baseIncludes` are owner-relative and
    * rebased through `ownerDir`. When the project declares no `include`, targets
@@ -782,8 +1061,7 @@ export class TypecheckRepository {
   /**
    * Directories never worth walking for ambient declarations, and generated
    * .d.ts that transitively reference the whole project (next-env.d.ts pulls in
-   * .next-prod/types/routes.d.ts, which names every route, so including it
-   * loads the entire source tree).
+   * .next/types/routes.d.ts, which names every route → the entire source tree).
    */
   private static readonly AMBIENT_SKIP_DIRS = new Set([
     "node_modules",
@@ -804,10 +1082,10 @@ export class TypecheckRepository {
    * into a scoped config's own `include`.
    *
    * Setting `include` overrides the base's rather than merging with it, which
-   * also discards the ambient declarations the base listed there — and those
-   * are not optional. This repo's root config includes `nativewind-env.d.ts`,
-   * which augments every react-native component with `className`; without it a
-   * scoped check reported 80 errors in src/vibe/ui/native that
+   * also discards the ambient declarations the base listed there — and those are
+   * not optional. A root config that includes an env/augmentation `.d.ts` (the
+   * kind that adds a prop to every component of a UI library) is invisible to a
+   * scoped check without this, and the check then reports dozens of errors that
    * `tsgo -p tsconfig.json` does not have. `collectAmbientDeclarations` cannot
    * cover this: it is skipped when the owning config IS the root, precisely the
    * case here.
@@ -830,10 +1108,10 @@ export class TypecheckRepository {
   }
 
   /**
-   * Deepest directory containing all `targets`, POSIX form. Glob suffixes are
-   * reduced to their directory, exact files to their dirname. Used to bound the
-   * ambient-declaration search on the root fallback so a single-file check never
-   * walks the whole repo.
+   * Deepest directory containing all `targets`, project-root-relative and POSIX.
+   * Glob suffixes ("foo/bar/**\/*") are reduced to their directory, exact files
+   * to their dirname. Used to bound the ambient-declaration search on the root
+   * fallback so a single-file check never walks the whole repo.
    */
   private static commonAncestorDir(
     targets: string[],
@@ -871,8 +1149,8 @@ export class TypecheckRepository {
    *
    * When the program is scoped to explicit targets, the source sweep that would
    * otherwise load these is gone — but they carry global augmentations (module
-   * shims for asset imports, `declare global`, framework globals) the target may
-   * depend on, so they are added back to `files`. Bounded by skipping heavy
+   * shims for asset imports, `declare global`, framework globals) the target
+   * may depend on, so they are added back to `files`. Bounded by skipping heavy
    * generated declarations and non-source directories.
    */
   private static collectAmbientDeclarations(
@@ -885,8 +1163,6 @@ export class TypecheckRepository {
       try {
         entries = readdirSync(dir, { withFileTypes: true });
       } catch {
-        // Unreadable directory (permissions, race with a build): ambient
-        // declarations are additive, so skipping one is safe.
         return;
       }
       for (const entry of entries) {
@@ -906,6 +1182,272 @@ export class TypecheckRepository {
     };
     walk(projectDir);
     return results;
+  }
+
+  /**
+   * Read and parse a tsconfig.json file in isolation — no `extends` chain
+   * resolution, just this file's own declared `compilerOptions`. Returns null
+   * on any read/parse failure rather than throwing: callers use this for a
+   * best-effort compatibility check, not as the source of truth for the
+   * actual compile (that's `createTempTsConfig`, which already handles
+   * `extends` properly for the real run).
+   */
+  private static tryReadOwnTsConfig(tsconfigPath: string): TsConfig | null {
+    if (!existsSync(tsconfigPath)) {
+      return null;
+    }
+    try {
+      const parsed = parseJsonWithComments(readFileSync(tsconfigPath, "utf8"));
+      if (!parsed.success) {
+        return null;
+      }
+      return TypecheckRepository.TsConfigSchema.parse(parsed.data) as TsConfig;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Resolve a single `extends` entry to the tsconfig file it points at,
+   * relative to the file that declared it — the same anchor TypeScript
+   * itself uses. Only relative/absolute paths are handled (this repo never
+   * extends a package-name config); anything else, or a target that doesn't
+   * exist even with `.json` appended, returns null.
+   */
+  private static resolveExtendsTarget(
+    fromTsconfigPath: string,
+    ext: string,
+  ): string | null {
+    if (!ext.startsWith(".") && !isAbsolute(ext)) {
+      return null;
+    }
+    const resolved = resolve(dirname(fromTsconfigPath), ext);
+    if (existsSync(resolved)) {
+      return resolved;
+    }
+    const withJson = `${resolved}.json`;
+    return existsSync(withJson) ? withJson : null;
+  }
+
+  /**
+   * The EFFECTIVE `module`/`moduleResolution` a tsconfig compiles with —
+   * its own declared values if present, otherwise whatever the nearest
+   * `extends` ancestor that declares them has. Reading only the file's own
+   * keys is not enough: most nested tsconfigs declare
+   * neither and inherit both from a shared base config, so a shallow read
+   * always saw "nothing declared" and never triggered the tsc fallback.
+   */
+  private static resolveEffectiveModuleSettings(
+    tsconfigPath: string,
+    depth = 0,
+  ): {
+    module?: string;
+    moduleResolution?: string;
+    target?: string;
+    baseUrl?: string;
+  } {
+    if (depth > 10) {
+      return {};
+    }
+    const tsconfig = TypecheckRepository.tryReadOwnTsConfig(tsconfigPath);
+    if (!tsconfig) {
+      return {};
+    }
+    const own: {
+      module?: string;
+      moduleResolution?: string;
+      target?: string;
+      baseUrl?: string;
+    } = {};
+    if (typeof tsconfig.compilerOptions?.module === "string") {
+      own.module = tsconfig.compilerOptions.module;
+    }
+    if (typeof tsconfig.compilerOptions?.moduleResolution === "string") {
+      own.moduleResolution = tsconfig.compilerOptions.moduleResolution;
+    }
+    if (typeof tsconfig.compilerOptions?.target === "string") {
+      own.target = tsconfig.compilerOptions.target;
+    }
+    if (typeof tsconfig.compilerOptions?.baseUrl === "string") {
+      own.baseUrl = tsconfig.compilerOptions.baseUrl;
+    }
+    if (
+      own.module !== undefined &&
+      own.moduleResolution !== undefined &&
+      own.target !== undefined &&
+      own.baseUrl !== undefined
+    ) {
+      return own;
+    }
+    const extendsList = tsconfig.extends
+      ? Array.isArray(tsconfig.extends)
+        ? tsconfig.extends
+        : [tsconfig.extends]
+      : [];
+    for (const ext of extendsList) {
+      const target = TypecheckRepository.resolveExtendsTarget(
+        tsconfigPath,
+        ext,
+      );
+      if (!target) {
+        continue;
+      }
+      const inherited = TypecheckRepository.resolveEffectiveModuleSettings(
+        target,
+        depth + 1,
+      );
+      own.module ??= inherited.module;
+      own.moduleResolution ??= inherited.moduleResolution;
+      own.target ??= inherited.target;
+      own.baseUrl ??= inherited.baseUrl;
+    }
+    return own;
+  }
+
+  /**
+   * Whether tsgo can compile a config as declared, given its EFFECTIVE
+   * (inherited-through-`extends`) `module`/`moduleResolution`. tsgo hard-
+   * rejects the legacy "node"/"node10" moduleResolution some projects still
+   * carry (tsc accepts it fine — it was never a problem before tsgo
+   * existed).
+   *
+   * - "compatible": nothing legacy declared, tsgo runs as-is.
+   * - "needs-bundler": legacy moduleResolution, but `module` is already
+   *   esnext/preserve-family — safe to bump moduleResolution to "bundler"
+   *   for the ephemeral compile-only config, no observable behavior change.
+   * - "needs-tsc": legacy moduleResolution with a commonjs-family (or
+   *   undeclared) `module`. Node16/NodeNext looks like the fallback here,
+   *   but measured against this repo's own commonjs projects it introduces
+   *   unrelated false positives (paths-mapped bare specifiers stop
+   *   resolving, every relative import needs an explicit `.js` extension) —
+   *   tsgo simply cannot compile these projects as they're written. Falling
+   *   back to tsc, which never removed classic "node" resolution, is the
+   *   only option that doesn't trade a hard failure for wrong results.
+   *
+   *   Also "needs-tsc" whenever `target` is "es5": tsgo/TS7 removed ES5 as a
+   *   compile target outright (there's no override that brings it back, unlike
+   *   the moduleResolution "bundler" swap above), so any project still
+   *   targeting es5 can only be checked by a real tsc.
+   *
+   *   Also "needs-tsc" whenever `baseUrl` is declared at all: tsgo/TS7 removed
+   *   `baseUrl` as a compilerOption outright too, and unlike moduleResolution
+   *   there is no rewrite that keeps the ephemeral config semantically
+   *   equivalent — `paths` entries that relied on `baseUrl` resolve
+   *   differently once it's gone, and rewriting every entry to inline the
+   *   base is not something that can be done as a blind per-project text
+   *   transform without risking silently wrong resolution. Measured directly:
+   *   `tsgo -p` on a config with BOTH `baseUrl` and `paths` set (the case
+   *   TS7's own migration guidance describes as supported) still hard-fails
+   *   with `TS5102 Option 'baseUrl' has been removed` — this is not
+   *   conditional on `paths`, so presence alone is disqualifying. Projects that
+   *   inherit legacy `moduleResolution`+commonjs `module` from a shared base
+   *   config are already routed to "needs-tsc" above before baseUrl is ever
+   *   considered.
+   */
+  private static classifyTsgoCompatibility(settings: {
+    module?: string;
+    moduleResolution?: string;
+    target?: string;
+    baseUrl?: string;
+  }): "compatible" | "needs-bundler" | "needs-tsc" {
+    const {
+      moduleResolution,
+      module: moduleKind,
+      target: compileTarget,
+      baseUrl,
+    } = settings;
+    if (
+      typeof compileTarget === "string" &&
+      compileTarget.toLowerCase() === "es5"
+    ) {
+      return "needs-tsc";
+    }
+    if (typeof baseUrl === "string") {
+      return "needs-tsc";
+    }
+    const isLegacy =
+      typeof moduleResolution === "string" &&
+      ["node", "node10"].includes(moduleResolution.toLowerCase());
+    if (!isLegacy) {
+      return "compatible";
+    }
+    const moduleSupportsBundler =
+      typeof moduleKind === "string" &&
+      [
+        "esnext",
+        "es2015",
+        "es2020",
+        "es2022",
+        "preserve",
+        "node16",
+        "nodenext",
+      ].includes(moduleKind.toLowerCase());
+    return moduleSupportsBundler ? "needs-bundler" : "needs-tsc";
+  }
+
+  /**
+   * The command to actually run for a given owning tsconfig — tsgo unless
+   * that config's own moduleResolution needs the "needs-tsc" fallback (see
+   * `classifyTsgoCompatibility`), in which case tsc runs instead. The real
+   * tsconfig.json is only ever READ here, never written — the fallback is a
+   * choice of which binary to invoke, not a config edit.
+   */
+  private static selectEngineCommand(
+    owningTsconfigPath: string,
+    useTsgo: boolean,
+  ): string {
+    const searchDir = dirname(owningTsconfigPath);
+    if (!useTsgo) {
+      return TypecheckRepository.getBaseCommand(false, searchDir);
+    }
+    const settings =
+      TypecheckRepository.resolveEffectiveModuleSettings(owningTsconfigPath);
+    const compatibility =
+      TypecheckRepository.classifyTsgoCompatibility(settings);
+    return TypecheckRepository.getBaseCommand(
+      compatibility !== "needs-tsc",
+      searchDir,
+    );
+  }
+
+  /**
+   * Normalize a path for use as a temp-config-owner map key/value: forward
+   * slashes only. tsc/tsgo echo the `--project` path back verbatim in
+   * config-level diagnostics, and that path was built with `join`/`resolve`
+   * (backslashes on Windows), so the raw diagnostic text and our stored key
+   * would otherwise mismatch on this platform alone.
+   */
+  private static normalizeForOwnerLookup(path: string): string {
+    return path.replaceAll("\\", "/");
+  }
+
+  /** Record which real tsconfig an ephemeral temp config extends, keyed for `rewriteTempConfigFile` to look up later. */
+  private static recordTempConfigOwner(
+    tempConfigOwners: Map<string, string>,
+    tempConfigPath: string,
+    owningTsconfigPath: string,
+  ): void {
+    tempConfigOwners.set(
+      TypecheckRepository.normalizeForOwnerLookup(tempConfigPath),
+      owningTsconfigPath,
+    );
+  }
+
+  /**
+   * If `file` is one of our own generated temp configs, return the real
+   * tsconfig it extends instead (still raw — caller applies `getDisplayPath`
+   * same as any other file) — a config-level error (bad option, removed
+   * setting) is always reported against whatever file was passed via
+   * `--project`, which is never something the user can act on by itself.
+   */
+  private static rewriteTempConfigFile(
+    file: string,
+    tempConfigOwners: Map<string, string>,
+  ): string {
+    return (
+      tempConfigOwners.get(TypecheckRepository.normalizeForOwnerLookup(file)) ??
+      file
+    );
   }
 
   /**
@@ -931,6 +1473,16 @@ export class TypecheckRepository {
      * infer an owner from, and inferring would land on the root config.
      */
     owningTsconfigOverride?: string,
+    /**
+     * Whether this run compiles with tsgo. tsgo hard-rejects the legacy
+     * `moduleResolution: "node"`/`"Node"` values ("Option 'moduleResolution=
+     * node10' has been removed") that several project tsconfigs still declare
+     * for their real build tooling (tsc, and tsc still accepts them fine).
+     * Only the ephemeral temp config generated here gets bumped to "bundler"
+     * so tsgo can run at all — the owning tsconfig.json is never touched, so
+     * the project's actual build/editor tooling is unaffected.
+     */
+    useTsgo = false,
   ): ApiResponseType<void> {
     // Read and validate the tsconfig that OWNS these files.
     //
@@ -971,6 +1523,9 @@ export class TypecheckRepository {
       parsedJsonResult.data,
     ) as TsConfig;
 
+    // Strip source-sweeping patterns only when we have explicit targets.
+    // When filesToCheck is empty (full-project NO_PATH case), we must keep
+    // src/**/*.ts etc. — stripping them would leave nothing to check.
     const adjustedExcludes = [
       ...TypecheckRepository.adjustExcludePatterns(
         mainTsConfig.exclude,
@@ -986,11 +1541,17 @@ export class TypecheckRepository {
       mainTsConfig.compilerOptions?.typeRoots,
       prefix,
     );
-    const adjustedTypes = TypecheckRepository.adjustTypes(
-      mainTsConfig.compilerOptions?.types as string[] | undefined,
-      prefix,
-      cachePath,
-    );
+    // rootDir is location-anchored like typeRoots, with one extra trap: it also
+    // has a location-anchored DEFAULT. When `composite` is in play (inherited
+    // from a shared base config), an unset rootDir
+    // defaults to the directory containing THIS temp config — .tmp/typecheck-
+    // cache — and every project file then fails TS6059 ("is not under
+    // 'rootDir'"). Pin it to what `tsgo -p <owner>` would use: the owner's
+    // declared rootDir rebased, or the owner's own directory.
+    const ownerRootDir = mainTsConfig.compilerOptions?.rootDir;
+    const adjustedRootDir = ownerRootDir
+      ? TypecheckRepository.adjustPath(ownerRootDir, prefix)
+      : prefix.replace(/\/+$/, "") || ".";
     // typeRoots must always be spelled out, and must point at the OWNING
     // project's node_modules.
     //
@@ -999,30 +1560,79 @@ export class TypecheckRepository {
     // — and a config whose `types` cannot resolve does not merely warn: tsgo
     // reports the one TS2688 and type-checks NOTHING, which reads as a clean
     // pass. This was previously only appended when the base config already had
-    // typeRoots, so a nested project without one checked nothing at all.
+    // typeRoots — so defaulting is what makes a nested project without its own
+    // typeRoots checkable at all.
     //
-    // The default mirrors TypeScript's own lookup, which walks
-    // `node_modules/@types` UPWARD from the containing directory — so a nested
-    // project sees both its own deps and the hoisted ones at the root. Listing
-    // only the owner's would be narrower than stock tsc and make the checker
+    // The default mirrors TypeScript's own lookup, which walks `node_modules/
+    // @types` UPWARD from the containing directory — so a nested project sees
+    // both its own deps and the hoisted ones at the root. Listing only the
+    // owner's would be narrower than stock tsc: it would make the checker
     // disagree with `tsgo -p <project>` about which errors exist.
-    //
     // The owning project contributes its `@types` ONLY — never its bare
     // node_modules. A bare node_modules typeRoot makes TypeScript treat every
     // package inside it as an auto-included type package, which pulls their
-    // declarations in globally and *masks* real module errors.
+    // declarations in globally and *masks* real module errors (a genuine
+    // TS2307 for a missing module disappears). Measured against
+    // `tsgo -p <project>`: @types-only reports a false TS2688, adding the
+    // owner's bare node_modules reports nothing, and this shape reports
+    // exactly what the project's own config does.
     const adjustedTypeRoots = existingTypeRoots ?? [
       ...(prefix === rootPrefix ? [] : [`${prefix}node_modules/@types`]),
       `${rootPrefix}node_modules/@types`,
     ];
-    // Bare package types (e.g. "bun-types" at node_modules/bun-types rather than
-    // node_modules/@types/bun-types) resolve from the ROOT's node_modules, which
-    // is where hoisted deps live — this is what stops the @types-only shape from
-    // failing with TS2688.
-    const nodeModulesRoot = `${rootPrefix}node_modules`;
-    if (!adjustedTypeRoots.includes(nodeModulesRoot)) {
-      adjustedTypeRoots.push(nodeModulesRoot);
-    }
+    // Bare package types (e.g. "bun-types" at node_modules/bun-types rather
+    // than node_modules/@types/bun-types) are resolved per-entry above, in
+    // `adjustTypes`, which now falls back to the ROOT's node_modules for
+    // exactly the entries that need it and rewrites them to an explicit path.
+    //
+    // Do NOT also add the root's bare node_modules here as a typeRoot: that
+    // was tried and made TypeScript auto-include EVERY package under it as a
+    // global type package, which for a normal repo root — full of ordinary
+    // hoisted deps with no `types`/`typings` field (e.g. "argparse",
+    // "array-back", "balanced-match", ...) — produced a TS2688 "Cannot find
+    // type definition file" for each of them, on every project checked. That
+    // is the class of regression this comment is here to prevent from coming
+    // back.
+
+    // `types` must also always be spelled out, for a reason distinct from
+    // typeRoots above: TypeScript's DEFAULT (unset) typeRoots silently skips
+    // "stub" @types packages when building its implicit type-library list —
+    // DefinitelyTyped publishes these for packages that now ship their own
+    // types (chalk, json-stable-stringify, ...): a package.json with
+    // `"main": ""` and no .d.ts anywhere, deliberately inert. The instant
+    // typeRoots is set EXPLICITLY — which this temp config always does, since
+    // it lives in the cache dir rather than the project's own directory —
+    // that same silent skip stops happening, and TypeScript reports
+    // `TS2688: Cannot find type definition file` for every stub package
+    // hoisted anywhere under those directories, even though nothing about the
+    // directories or their contents changed. Verified directly: an explicit
+    // `typeRoots` naming the exact single directory `tsgo -p <owner>` already
+    // walks by default reproduces the error; omitting `typeRoots` entirely
+    // (real default) does not — so this is a TypeScript allowance tied to the
+    // unset/default code path specifically, not a property of the directory
+    // list, and there is no compilerOption that restores it once typeRoots is
+    // explicit.
+    //
+    // The only way to keep the project's real ambient types working while
+    // dropping the stub-triggered false errors is to enumerate the same
+    // implicit set TypeScript's default would have built — every directory
+    // under the resolved typeRoots — and explicitly filter out exactly the
+    // entries that have no usable declaration, the same class already
+    // excluded from the root sweep (see `resolvesFrom` above; this repeats
+    // the same "does this actually ship a .d.ts" check against typeRoots
+    // directory listings instead of a `types` array).
+    const adjustedTypes =
+      mainTsConfig.compilerOptions?.types !== undefined
+        ? TypecheckRepository.adjustTypes(
+            mainTsConfig.compilerOptions.types as string[] | undefined,
+            prefix,
+            cachePath,
+            rootPrefix,
+          )
+        : TypecheckRepository.collectImplicitTypes(
+            adjustedTypeRoots,
+            cachePath,
+          );
 
     // Scope the program to the requested targets instead of the whole project.
     //
@@ -1046,11 +1656,10 @@ export class TypecheckRepository {
       TypecheckRepository.isGlobPattern(p),
     );
     // Where to look for ambient .d.ts. A real sub-project owner defines its
-    // globals project-wide (its src/*.d.ts sits above any single target), so
-    // search from its directory. On the root fallback there is no project-global
-    // concept — search only the targets' common ancestor, and if that resolves
-    // to the repo root, skip ambient entirely rather than walk the whole
-    // workspace (which would drag in every nested project's compiled .d.ts).
+    // globals project-wide (its src/*.d.ts sits above any single target), so search from its directory. On the root fallback there is no
+    // project-global concept — search only the targets' common ancestor, and if
+    // that resolves to the repo root, skip ambient entirely rather than walk the
+    // whole monorepo (which would drag in every app's compiled bin/*.d.ts).
     const ambientRoot = sharedOwner
       ? dirname(sharedOwner)
       : TypecheckRepository.commonAncestorDir(filesToCheck, projectRoot);
@@ -1076,8 +1685,9 @@ export class TypecheckRepository {
     // a whole project dir sees exactly what `tsgo -p <project>` sees. Raw, the
     // glob `<project>/**/*` drags in root-level files the project's own
     // `include` deliberately leaves out and reports errors the project itself
-    // never has. The intersection keeps the narrower of the two, so a sub-folder
-    // stays scoped and the project root expands to the project's own include.
+    // never has. The intersection keeps the
+    // narrower of the two, so a sub-folder stays scoped and the project root
+    // expands to the project's own include.
     const scopedIncludes = [
       ...TypecheckRepository.clampGlobsToIncludes(
         globTargets,
@@ -1091,31 +1701,91 @@ export class TypecheckRepository {
       ),
     ];
 
+    // An empty program is not a clean program.
+    //
+    // With explicit targets, `files` and `include` below OVERRIDE the base's
+    // include — so if both come back empty, the generated config describes a
+    // compilation of nothing. tsgo runs it happily, finishes in ~0.1s and
+    // reports zero diagnostics, and the check prints a green TypeScript row over
+    // source it never opened. That is the same false-green class as a crashed
+    // checker: silence read as success.
+    //
+    // Reaching here means the targets did not survive the intersection with the
+    // owning project's `include` (or reduced to nothing), which is a bug in the
+    // scoping — never something the user asked for. Say so instead of passing.
+    if (
+      hasExplicitTargets &&
+      scopedFiles.length === 0 &&
+      scopedIncludes.length === 0
+    ) {
+      return failInline({
+        message:
+          `TypeScript scoping produced an EMPTY file set for ${filesToCheck.join(", ")} — nothing would have been compiled, ` +
+          `so a "0 issues" result would be meaningless. This is NOT a pass. The targets did not intersect the include roots of ` +
+          `${owningTsconfig}; check that config's "include".`,
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+
     // EXTEND the owning tsconfig; do not copy it.
     //
     // Copying meant rebasing every relative value by hand, and one of them
     // cannot be rebased at all: a bare `types: ["vite-plugin-svgr/client"]`
     // entry resolves through node resolution anchored at the config file that
     // DECLARED it. From this temp config in the cache dir that walk starts at
-    // the repo root and never sees the project's own node_modules, so the entry
-    // failed with TS2688 — and the only way to satisfy it, listing the owner's
-    // bare node_modules in typeRoots, made every package there an auto-included
-    // type package and silently masked real errors (a genuine TS2307 for a
-    // missing module disappeared).
+    // the repo root and never sees the project's own node_modules, so the
+    // entry failed with TS2688 — and the only way to satisfy it, listing the
+    // owner's bare node_modules in typeRoots, made every package there an
+    // auto-included type package and silently masked real errors (a genuine
+    // TS2307 for a missing module disappeared).
     //
     // `extends` sidesteps the whole class: TypeScript resolves the base's
     // `paths`, `baseUrl` and `types` relative to the BASE file, which is exactly
-    // what the project's own tsconfig means.
+    // what the project's own tsconfig means. Verified against
+    // `tsgo -p <project>`: identical output.
+    //
+    // moduleResolution is inherited via `extends` like everything else, but
+    // tsgo hard-rejects the legacy "node"/"Node" value some projects still
+    // carry (tsc accepts it fine, so it was never a problem before tsgo).
+    // Bump it here, in the ephemeral temp config only — never in the owning
+    // tsconfig.json, which real build/editor tooling still reads as-is.
+    //
+    // "bundler" resolution requires `module` to be esnext/preserve-family, not
+    // commonjs — so it's only safe when the owning config's OWN `module`
+    // already qualifies. The Node16/NodeNext pair looked like the obvious
+    // fallback for commonjs projects, but measured against this very file it
+    // introduces its own false positives that have nothing to do with real
+    // bugs: `paths`-mapped bare specifiers stop resolving (TS2307) and every
+    // relative import needs an explicit `.js` extension (TS2835) — Node16
+    // enforces ECMAScript-style resolution rules this codebase was never
+    // written for. Trading "fails to run" for "reports the wrong errors" is
+    // worse, so commonjs projects are left alone here; they keep failing
+    // under tsgo until they get a real moduleResolution migration.
+    const compatibility = TypecheckRepository.classifyTsgoCompatibility(
+      TypecheckRepository.resolveEffectiveModuleSettings(owningTsconfig),
+    );
+    const moduleResolutionOverride =
+      useTsgo && compatibility === "needs-bundler"
+        ? { moduleResolution: "bundler" }
+        : {};
     const tempTsConfig: TsConfig = {
       extends: relative(dirname(tempConfigPath), owningTsconfig).replaceAll(
         "\\",
         "/",
       ),
       compilerOptions: {
-        // Both of these are location-anchored, so `extends` cannot carry them:
+        // All of these are location-anchored, so `extends` cannot carry them:
         // an inherited default is still resolved from THIS file's directory.
         typeRoots: adjustedTypeRoots,
+        rootDir: adjustedRootDir,
         ...(adjustedTypes ? { types: adjustedTypes } : {}),
+        ...moduleResolutionOverride,
+        // This config only type-checks (--noEmit); it never takes part in a
+        // project-reference build. Inherited `composite` (a shared base config
+        // may set it) would impose build-mode constraints anyway: every input must
+        // be listed explicitly — TS6307 for each transitive import of a scoped
+        // target — and rootDir defaults to this file's own directory (TS6059).
+        composite: false,
         // Last, so a project cannot opt out of what the repo enforces.
         ...enforcedOptions,
       },
@@ -1128,7 +1798,14 @@ export class TypecheckRepository {
       // project compiles anyway. An empty include is what turns the sweep off.
       ...(hasExplicitTargets
         ? { files: scopedFiles, include: scopedIncludes }
-        : {}),
+        : // A base with neither `include` nor `files` relies on TypeScript's
+          // DEFAULT include — "**/*" relative to the final config file, which
+          // here is the cache dir: the project's own sources vanish and the
+          // check dies with TS18003 "No inputs were found". Materialize the
+          // default the base actually meant: everything under ITS directory.
+          !mainTsConfig.include && !mainTsConfig.files
+          ? { include: [`${prefix}**/*`] }
+          : {}),
       ...(adjustedExcludes.length > 0 && { exclude: adjustedExcludes }),
     };
 
@@ -1149,6 +1826,8 @@ export class TypecheckRepository {
     platform: Platform,
     providedConfig: CheckConfig | undefined,
     signal: AbortSignal,
+    /** Driven only by the LSP-daemon fast path — the only leg with a per-file loop. */
+    onProgress?: (checked: number, total: number) => void,
   ): Promise<ApiResponseType<TypecheckResponseOutput>> {
     const isMCP = platform === Platform.MCP;
     const startTime = Date.now();
@@ -1167,17 +1846,18 @@ export class TypecheckRepository {
         );
 
         if (!configResult.ready) {
+          const { configPath, message } = configResult;
           return success({
             items: [
               {
-                file: configResult.configPath,
+                file: configPath,
                 severity: "error" as const,
-                message: configResult.message,
+                message,
               },
             ],
             files: [
               {
-                file: configResult.configPath,
+                file: configPath,
                 errors: 1,
                 warnings: 0,
                 total: 1,
@@ -1247,6 +1927,7 @@ export class TypecheckRepository {
         const lspIssues = await daemon.getDiagnostics(
           filterTarget,
           activeIgnorePatterns,
+          onProgress,
         );
 
         // Map LspIssue → TypecheckIssue (same shape, compatible)
@@ -1265,9 +1946,6 @@ export class TypecheckRepository {
       }
       // ── end LSP daemon fast-path ─────────────────────────────────────
 
-      // Get the appropriate base command
-      const baseCommand = TypecheckRepository.getBaseCommand(useTsgo);
-
       logger.debug(
         `[TYPESCRIPT] Using ${useTsgo ? "tsgo" : "tsc"} for type checking`,
       );
@@ -1276,15 +1954,26 @@ export class TypecheckRepository {
       config = createTypecheckConfig(data.path, typecheckConfig.cachePath);
 
       // Full workspace checks run each nested tsconfig independently. Targeted
-      // checks continue to use a single temporary config.
+      // checks continue to use a single temporary config. Neither takes a
+      // single shared base command any more — each owning tsconfig picks its
+      // own engine (see selectEngineCommand), since some nested projects
+      // can't compile under tsgo as declared.
+      //
+      // tempConfigOwners is populated as a side effect of building the
+      // commands below — every ephemeral temp config maps back to the real
+      // tsconfig.json it extends, so a config-level diagnostic (which tsc/
+      // tsgo always reports against whatever file was passed via --project)
+      // can be attributed back to the project the user actually needs to fix.
+      const tempConfigOwners = new Map<string, string>();
       const workspaceResult = TypecheckRepository.buildWorkspaceCommands(
-        baseCommand,
         config,
         typecheckConfig.cachePath,
         logger,
         checkConfig,
         data.strict ?? false,
         activeIgnorePatterns,
+        useTsgo,
+        tempConfigOwners,
       );
       if (!workspaceResult.success) {
         return workspaceResult;
@@ -1292,20 +1981,15 @@ export class TypecheckRepository {
       const buildResult = workspaceResult.data
         ? success(workspaceResult.data)
         : TypecheckRepository.buildCommand(
-            baseCommand,
             config,
             typecheckConfig.cachePath,
             logger,
+            checkConfig,
+            typecheckConfig,
+            data.strict ?? false,
             activeIgnorePatterns,
-            TypecheckRepository.resolveEnforcedOptions(
-              [
-                ...(config.targetPath ? [config.targetPath] : []),
-                ...(config.targetPaths ?? []),
-              ],
-              typecheckConfig,
-              checkConfig,
-              data.strict ?? false,
-            ),
+            useTsgo,
+            tempConfigOwners,
           );
 
       if (!buildResult.success) {
@@ -1322,7 +2006,11 @@ export class TypecheckRepository {
       const commands = Array.isArray(buildResult.data)
         ? buildResult.data
         : [buildResult.data];
+      // For multiple paths use targetPaths array for filtering, otherwise single targetPath
+      const filterTarget = config.targetPaths ?? config.targetPath;
       let combinedExitCode = 0;
+      const allErrors: ParsedIssue[] = [];
+      const allWarnings: ParsedIssue[] = [];
       const concurrency = 4;
       for (let offset = 0; offset < commands.length; offset += concurrency) {
         const batch = commands.slice(offset, offset + concurrency);
@@ -1337,13 +2025,38 @@ export class TypecheckRepository {
             );
           }),
         );
-        for (const execResult of results) {
+        for (const [i, execResult] of results.entries()) {
           if (!execResult.success) {
             return failInline({
               message: `TypeScript check failed: ${execResult.message || "Unknown error"}`,
               errorType: ErrorResponseTypes.INTERNAL_ERROR,
             });
           }
+          // A workspace run executes 20+ of these concurrently, one per
+          // nested project. Parsing each command's output separately — with
+          // ITS OWN project as the default owner for pathless diagnostics —
+          // is what keeps one project's config-level errors (or floods of
+          // them) from being misattributed to, or mixed in with, another's.
+          // Concatenating everything first and parsing once, as this used
+          // to do, collapsed every command's pathless diagnostics into one
+          // indistinguishable "tsconfig.json" bucket.
+          const projectPath = TypecheckRepository.extractProjectPath(batch[i]);
+          const owner =
+            projectPath &&
+            TypecheckRepository.rewriteTempConfigFile(
+              projectPath,
+              tempConfigOwners,
+            );
+          const parsed = TypecheckRepository.parseTypecheckOutput(
+            execResult.data.output,
+            useTsgo,
+            filterTarget,
+            effectiveData.disableFilter,
+            tempConfigOwners,
+            owner || undefined,
+          );
+          allErrors.push(...parsed.errors);
+          allWarnings.push(...parsed.warnings);
           output += `${execResult.data.output}\n`;
           if (execResult.data.exitCode !== 0) {
             combinedExitCode = execResult.data.exitCode ?? 1;
@@ -1351,20 +2064,13 @@ export class TypecheckRepository {
         }
       }
 
-      // Parse the output into structured issues
-      // For multiple paths use targetPaths array for filtering, otherwise single targetPath
-      const filterTarget = config.targetPaths ?? config.targetPath;
-      const { errors, warnings } = TypecheckRepository.parseTypecheckOutput(
-        output,
-        useTsgo,
-        filterTarget,
-        effectiveData.disableFilter,
-      );
+      const errors = allErrors;
+      const warnings = allWarnings;
 
       // Files excluded via tsconfig (extra excludes are handled at compiler level in buildCommand)
       const allIssues = [...errors, ...warnings];
 
-      if (combinedExitCode !== 0 && allIssues.length === 0) {
+      if (allIssues.length === 0) {
         // The compiler always sees more than the requested path: transitive
         // imports get compiled too, so a dependency's own errors exit non-zero
         // while the target itself is clean.
@@ -1374,15 +2080,37 @@ export class TypecheckRepository {
         // dropping them turns a failed compile into a green "0 issues". So do
         // neither — fail the run explicitly, and name the files that actually
         // hold the errors so the next check can be aimed at them.
+        //
+        // Keyed on the DIAGNOSTICS, not on the exit code: tsgo has been observed
+        // emitting hundreds of errors and still exiting 0. Gating this on a
+        // non-zero exit meant a compile full of errors, every one of them
+        // outside the target, was filtered down to "0 issues" and printed as a
+        // green pass. Silence is only a pass when the compiler was actually
+        // silent.
         const unfiltered = TypecheckRepository.parseTypecheckOutput(
           output,
           useTsgo,
           undefined,
           true,
+          tempConfigOwners,
         );
         const outOfScope = [...unfiltered.errors, ...unfiltered.warnings];
         if (outOfScope.length > 0) {
-          const files = [...new Set(outOfScope.map((issue) => issue.file))];
+          // Global/config diagnostics (bad tsconfig, unresolvable "types"
+          // entry, missing project file, ...) are parsed with a placeholder
+          // file of "tsconfig.json" — they do not belong to any real
+          // dependency, so "re-run against these files" is nonsense for them.
+          // Their MESSAGE is the only useful thing to show.
+          const globalDiagnostics = outOfScope.filter(
+            (issue) => issue.file === "tsconfig.json",
+          );
+          const fileDiagnostics = outOfScope.filter(
+            (issue) => issue.file !== "tsconfig.json",
+          );
+
+          const files = [
+            ...new Set(fileDiagnostics.map((issue) => issue.file)),
+          ];
           // Cap the list: a broken shared dependency can implicate hundreds of
           // files, and the first few already identify where to look.
           const shown = files.slice(0, 10);
@@ -1390,32 +2118,52 @@ export class TypecheckRepository {
             files.length > shown.length
               ? ` and ${files.length - shown.length} more`
               : "";
+
           logger.error(
-            `[TYPESCRIPT] ${outOfScope.length} diagnostic(s) outside the requested path: ${files.join(", ")}`,
+            `[TYPESCRIPT] ${outOfScope.length} diagnostic(s) outside the requested path: ${outOfScope.map((issue) => issue.message).join(" | ")}`,
           );
+
+          if (fileDiagnostics.length === 0) {
+            // Nothing but config-level diagnostics — show their actual text.
+            const messages = globalDiagnostics.map((issue) => issue.message);
+            return failInline({
+              message: `TypeScript failed to compile the project: ${messages.join(" | ")}`,
+              errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            });
+          }
+
+          const globalNote =
+            globalDiagnostics.length > 0
+              ? ` Additionally: ${globalDiagnostics.map((issue) => issue.message).join(" | ")}`
+              : "";
           return failInline({
-            message: `TypeScript compilation failed outside the checked path. The requested path is clean, but ${outOfScope.length} diagnostic(s) in its dependencies stopped the compile — they belong to those files, not this one. Re-run the check against: ${shown.join(", ")}${remainder}`,
+            message: `TypeScript compilation failed outside the checked path. The requested path is clean, but ${fileDiagnostics.length} diagnostic(s) in its dependencies stopped the compile — they belong to those files, not this one. Re-run the check against: ${shown.join(", ")}${remainder}${globalNote}`,
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
           });
         }
 
-        const commandError =
-          output.trim().split("\n")[0] ||
-          "TypeScript exited without diagnostics";
-        logger.error(`[TYPESCRIPT] Compiler failed: ${commandError}`);
-        return success(
-          TypecheckRepository.buildResponse(
-            [
-              {
-                file: "tsconfig.json",
-                severity: "error",
-                message: commandError,
-              },
-            ],
-            effectiveData,
-            isMCP,
-          ),
-        );
+        // No diagnostics anywhere. Only a non-zero exit still means failure —
+        // the compiler died without saying why. A zero exit here is the one
+        // genuine clean pass, and falls through to the normal empty result.
+        if (combinedExitCode !== 0) {
+          const commandError =
+            output.trim().split("\n")[0] ||
+            "TypeScript exited without diagnostics";
+          logger.error(`[TYPESCRIPT] Compiler failed: ${commandError}`);
+          return success(
+            TypecheckRepository.buildResponse(
+              [
+                {
+                  file: "tsconfig.json",
+                  severity: "error",
+                  message: commandError,
+                },
+              ],
+              effectiveData,
+              isMCP,
+            ),
+          );
+        }
       }
 
       // Skip sorting if requested (when vibe-check already sorted)
@@ -1590,60 +2338,96 @@ export class TypecheckRepository {
   /**
    * The compilerOptions to force for THIS run.
    *
-   * `compilerOptions` always; `strictCompilerOptions` only when the target sits
-   * inside oxlint.strictPaths, or strict was requested. A compilerOption is a
-   * property of the whole program, so unlike a lint rule it cannot be filtered
-   * per file after the fact — the decision has to happen here, from the path
-   * being checked.
+   * Three tiers, matching the lint side:
+   *   `compilerOptions`      always
+   *   `midCompilerOptions`   inside midPaths OR strictPaths (tier 3 ⊇ tier 2)
+   *   `strictCompilerOptions` inside strictPaths
+   * and `--strict` applies all of them everywhere.
+   *
+   * A compilerOption is a property of the whole program, so unlike a lint rule
+   * it cannot be filtered per file after the fact — the decision has to happen
+   * here, from the paths being checked.
    */
   private static resolveEnforcedOptions(
     targets: string[],
     typecheckConfig: {
       compilerOptions?: Record<string, boolean | string | string[]>;
+      midCompilerOptions?: Record<string, boolean | string | string[]>;
       strictCompilerOptions?: Record<string, boolean | string | string[]>;
     },
     checkConfig: CheckConfig,
     strict: boolean,
   ): Record<string, boolean | string | string[]> {
     const base = typecheckConfig.compilerOptions ?? {};
+    const midOnly = typecheckConfig.midCompilerOptions ?? {};
     const strictOnly = typecheckConfig.strictCompilerOptions ?? {};
-    if (Object.keys(strictOnly).length === 0) {
-      return base;
-    }
     if (strict) {
-      return { ...base, ...strictOnly };
+      return { ...base, ...midOnly, ...strictOnly };
     }
-
-    const strictPaths = checkConfig.oxlint.enabled
-      ? checkConfig.oxlint.strictPaths
-      : undefined;
-    if (!strictPaths || targets.length === 0) {
+    if (targets.length === 0 || !checkConfig.oxlint.enabled) {
       return base;
     }
 
-    // Every target must be strict, not just one of them. A single program gets a
+    const strictPaths = checkConfig.oxlint.strictPaths;
+    const midPaths = checkConfig.oxlint.midPaths ?? { include: [] };
+
+    // Every target must qualify, not just one of them. A single program gets a
     // single answer, so a mixed target list has to take the lenient one — else
     // checking a strict tree alongside a lenient one would hold the lenient one
     // to rules it never opted into.
-    const allStrict = targets.every(
-      (target) =>
-        matchesAnyGlob(target, strictPaths.include) &&
-        !matchesAnyGlob(target, strictPaths.exclude ?? []),
-    );
-    return allStrict ? { ...base, ...strictOnly } : base;
+    const allIn = (paths: { include: string[]; exclude?: string[] }): boolean =>
+      targets.every(
+        (target) =>
+          matchesAnyGlob(target, paths.include) &&
+          !matchesAnyGlob(target, paths.exclude ?? []),
+      );
+
+    const inStrict = strictPaths !== undefined && allIn(strictPaths);
+    // Tier 3 includes tier 2, so a strict path gets the mid options without
+    // being listed in midPaths.
+    const inMid = inStrict || allIn(midPaths);
+
+    return {
+      ...base,
+      ...(inMid ? midOnly : {}),
+      ...(inStrict ? strictOnly : {}),
+    };
   }
 
   /**
-   * Build the typecheck command based on path type.
+   * Build the typecheck command(s) based on path type.
    */
   private static buildCommand(
-    baseCommand: string,
     config: TypecheckConfig,
     cachePath: string,
     logger: EndpointLogger,
+    checkConfig: CheckConfig,
+    typecheckConfig: {
+      compilerOptions?: Record<string, boolean | string | string[]>;
+      strictCompilerOptions?: Record<string, boolean | string | string[]>;
+    },
+    strict: boolean,
     extraIgnorePatterns?: string[],
-    enforcedOptions?: Record<string, boolean | string | string[]>,
-  ): ApiResponseType<string | null> {
+    useTsgo = false,
+    /**
+     * Populated as commands are built: ephemeral temp config path → the real
+     * tsconfig.json it extends. A config-level diagnostic (bad option, removed
+     * setting) is reported by tsc/tsgo against whatever file was passed via
+     * `--project` — which is always OUR generated cache file, never the real
+     * project config, so on its own it tells the user nothing about which
+     * project to actually go fix. This map lets the parser rewrite it back.
+     */
+    tempConfigOwners: Map<string, string> = new Map(),
+  ): ApiResponseType<string | string[] | null> {
+    const enforcedOptions = TypecheckRepository.resolveEnforcedOptions(
+      [
+        ...(config.targetPath ? [config.targetPath] : []),
+        ...(config.targetPaths ?? []),
+      ],
+      typecheckConfig,
+      checkConfig,
+      strict,
+    );
     if (config.pathType === PathType.NO_PATH) {
       // No specific path provided, check entire project.
       // When extra ignore patterns are present we need a temp config to carry the excludes —
@@ -1652,10 +2436,6 @@ export class TypecheckRepository {
         const tempConfigFile = join(
           cachePath,
           `tsconfig.${config.cacheKey}.json`,
-        );
-        const tempBuildInfoFile = join(
-          cachePath,
-          `tsconfig.${config.cacheKey}.tsbuildinfo`,
         );
         logger.debug(
           "[TYPESCRIPT] Creating temp tsconfig for full project with extra excludes",
@@ -1668,25 +2448,32 @@ export class TypecheckRepository {
           cachePath,
           extraIgnorePatterns,
           enforcedOptions,
+          undefined,
+          useTsgo,
         );
         if (!createResult.success) {
           return createResult;
         }
+        const rootOwner = resolve(findProjectRoot(), "tsconfig.json");
+        TypecheckRepository.recordTempConfigOwner(
+          tempConfigOwners,
+          tempConfigFile,
+          rootOwner,
+        );
         return success(
           TypecheckRepository.buildTypecheckCommand(
-            baseCommand,
-            tempBuildInfoFile,
+            TypecheckRepository.selectEngineCommand(rootOwner, useTsgo),
             tempConfigFile,
           ),
         );
       }
 
       logger.debug("[TYPESCRIPT] Running check on entire project");
+      const rootTsconfig = resolve(findProjectRoot(), "tsconfig.json");
       return success(
         TypecheckRepository.buildTypecheckCommand(
-          baseCommand,
-          config.buildInfoFile,
-          resolve(findProjectRoot(), "tsconfig.json"),
+          TypecheckRepository.selectEngineCommand(rootTsconfig, useTsgo),
+          rootTsconfig,
         ),
       );
     }
@@ -1695,50 +2482,79 @@ export class TypecheckRepository {
       return success(null);
     }
 
-    let createResult: ApiResponseType<void>;
-    if (config.pathType === PathType.SINGLE_FILE) {
-      // Single file - create temporary tsconfig for this file
-      createResult = TypecheckRepository.createTempTsConfig(
-        [config.targetPath!],
-        config.tempConfigFile,
-        cachePath,
-        extraIgnorePatterns,
-        enforcedOptions,
-      );
-    } else if (config.pathType === PathType.MULTIPLE_PATHS) {
-      // Multiple paths - combine all into one tsconfig
-      const includes = resolvePathsToIncludes(config.targetPaths ?? []);
-      createResult = TypecheckRepository.createTempTsConfig(
-        includes,
-        config.tempConfigFile,
-        cachePath,
-        extraIgnorePatterns,
-        enforcedOptions,
-      );
-    } else {
-      // Folder - resolvePathsToIncludes normalises to POSIX; a raw Windows path
-      // with backslashes would match nothing and silently widen the check.
-      const folderPath = config.targetPath || ".";
-      createResult = TypecheckRepository.createTempTsConfig(
-        resolvePathsToIncludes([folderPath]),
-        config.tempConfigFile,
-        cachePath,
-        extraIgnorePatterns,
-        enforcedOptions,
-      );
+    // One temp config per OWNING tsconfig, not one for all targets. A single
+    // shared config can only extend one owner, so targets spanning projects
+    // fell back to the root config and produced different diagnostics than
+    // checking each project alone (measured: 56 issues combined vs 40 + 20
+    // separately). Grouping by owner makes a multi-target run
+    // exactly the union of the single-target runs.
+    // Explicit targets are always checked — including targets inside a nested
+    // repository (submodule). Only the WORKSPACE sweep skips foreign roots:
+    // there the skip prevents compiling another repo's projects with this
+    // repo's anchoring by default, but someone naming a path (or standing in
+    // that directory) asked for it, and gets the same scoped check any other
+    // folder gets.
+    const targets =
+      config.pathType === PathType.SINGLE_FILE
+        ? [config.targetPath!]
+        : config.pathType === PathType.MULTIPLE_PATHS
+          ? (config.targetPaths ?? [])
+          : [config.targetPath || "."];
+
+    const projectRoot = findProjectRoot();
+    const groups = new Map<string, string[]>();
+    for (const target of targets) {
+      const owner =
+        findOwningTsconfig(target) ?? resolve(projectRoot, "tsconfig.json");
+      const group = groups.get(owner);
+      if (group) {
+        group.push(target);
+      } else {
+        groups.set(owner, [target]);
+      }
     }
 
-    if (!createResult.success) {
-      return createResult;
+    const commands: string[] = [];
+    let groupIndex = 0;
+    for (const [owner, groupTargets] of groups.entries()) {
+      const tempConfigFile =
+        groups.size === 1
+          ? config.tempConfigFile
+          : join(cachePath, `tsconfig.${config.cacheKey}.${groupIndex}.json`);
+      // Per GROUP, not per run: strict compilerOptions apply when the group's
+      // targets are all inside strictPaths, matching what checking that group
+      // alone would do.
+      const createResult = TypecheckRepository.createTempTsConfig(
+        resolvePathsToIncludes(groupTargets),
+        tempConfigFile,
+        cachePath,
+        extraIgnorePatterns,
+        TypecheckRepository.resolveEnforcedOptions(
+          groupTargets,
+          typecheckConfig,
+          checkConfig,
+          strict,
+        ),
+        undefined,
+        useTsgo,
+      );
+      if (!createResult.success) {
+        return createResult;
+      }
+      TypecheckRepository.recordTempConfigOwner(
+        tempConfigOwners,
+        tempConfigFile,
+        owner,
+      );
+      commands.push(
+        TypecheckRepository.buildTypecheckCommand(
+          TypecheckRepository.selectEngineCommand(owner, useTsgo),
+          tempConfigFile,
+        ),
+      );
+      groupIndex++;
     }
-
-    return success(
-      TypecheckRepository.buildTypecheckCommand(
-        baseCommand,
-        config.buildInfoFile,
-        config.tempConfigFile,
-      ),
-    );
+    return success(commands.length === 1 ? commands[0] : commands);
   }
 
   /**
@@ -1747,19 +2563,20 @@ export class TypecheckRepository {
    * their files from being interpreted with unrelated root compiler options.
    */
   private static buildWorkspaceCommands(
-    baseCommand: string,
     config: TypecheckConfig,
     cachePath: string,
     logger: EndpointLogger,
     checkConfig: CheckConfig,
     strict: boolean,
     extraIgnorePatterns?: string[],
+    useTsgo = false,
+    tempConfigOwners: Map<string, string> = new Map(),
   ): ApiResponseType<string[] | null> {
     if (config.pathType !== PathType.NO_PATH) {
       return success(null);
     }
 
-    const allProjects =
+    const { projects: allProjects, foreignRoots } =
       TypecheckRepository.discoverNestedProjects(findProjectRoot());
     // Filter out nested projects that match any of the active ignore patterns
     // (e.g. "**/test-project/**" from the shared ignore list).
@@ -1770,10 +2587,14 @@ export class TypecheckRepository {
         : allProjects.filter((p) => !ignoreRegexes.some((rx) => rx.test(p)));
 
     // ALL discovered project dirs must be excluded from the root tsconfig —
-    // even projects filtered from independent runs must not be picked up by root.
-    const allProjectDirectories = allProjects.map((project) =>
-      dirname(project).replaceAll("\\", "/"),
-    );
+    // even projects filtered from independent runs must not be picked up by
+    // root. Foreign repositories (submodules) likewise: they were not visited,
+    // so their configs are not in `allProjects`, but their FILES would still be
+    // swept up by the root include without an exclude.
+    const allProjectDirectories = [
+      ...allProjects.map((project) => dirname(project).replaceAll("\\", "/")),
+      ...foreignRoots,
+    ];
 
     // If no projects remain after filtering (e.g. only test-projects exist),
     // still create a root tsconfig that excludes those directories, then stop.
@@ -1782,38 +2603,41 @@ export class TypecheckRepository {
         return success(null);
       }
       const rootTempConfig = join(cachePath, "tsconfig.workspace-root.json");
-      const rootBuildInfo = join(
-        cachePath,
-        "tsconfig.workspace-root.tsbuildinfo",
-      );
       const createRootResult = TypecheckRepository.createTempTsConfig(
         [],
         rootTempConfig,
         cachePath,
         [...allProjectDirectories, ...(extraIgnorePatterns ?? [])],
+        undefined,
+        undefined,
+        useTsgo,
       );
       if (!createRootResult.success) {
         return createRootResult;
       }
+      const rootTsconfig = resolve(findProjectRoot(), "tsconfig.json");
+      TypecheckRepository.recordTempConfigOwner(
+        tempConfigOwners,
+        rootTempConfig,
+        rootTsconfig,
+      );
       return success([
         TypecheckRepository.buildTypecheckCommand(
-          baseCommand,
-          rootBuildInfo,
+          TypecheckRepository.selectEngineCommand(rootTsconfig, useTsgo),
           rootTempConfig,
         ),
       ]);
     }
 
     const rootTempConfig = join(cachePath, "tsconfig.workspace-root.json");
-    const rootBuildInfo = join(
-      cachePath,
-      "tsconfig.workspace-root.tsbuildinfo",
-    );
     const createRootResult = TypecheckRepository.createTempTsConfig(
       [],
       rootTempConfig,
       cachePath,
       [...allProjectDirectories, ...(extraIgnorePatterns ?? [])],
+      undefined,
+      undefined,
+      useTsgo,
     );
     if (!createRootResult.success) {
       return createRootResult;
@@ -1822,10 +2646,15 @@ export class TypecheckRepository {
     logger.debug(
       `[TYPESCRIPT] Discovered ${projects.length} nested tsconfig projects`,
     );
+    const rootTsconfig = resolve(findProjectRoot(), "tsconfig.json");
+    TypecheckRepository.recordTempConfigOwner(
+      tempConfigOwners,
+      rootTempConfig,
+      rootTsconfig,
+    );
     const commands = [
       TypecheckRepository.buildTypecheckCommand(
-        baseCommand,
-        rootBuildInfo,
+        TypecheckRepository.selectEngineCommand(rootTsconfig, useTsgo),
         rootTempConfig,
       ),
     ];
@@ -1856,14 +2685,19 @@ export class TypecheckRepository {
           strict,
         ),
         project,
+        useTsgo,
       );
       if (!createResult.success) {
         return createResult;
       }
+      TypecheckRepository.recordTempConfigOwner(
+        tempConfigOwners,
+        projectTempConfig,
+        project,
+      );
       commands.push(
         TypecheckRepository.buildTypecheckCommand(
-          baseCommand,
-          join(cachePath, `tsconfig.workspace-${index}.tsbuildinfo`),
+          TypecheckRepository.selectEngineCommand(project, useTsgo),
           projectTempConfig,
         ),
       );
@@ -1890,10 +2724,15 @@ export class TypecheckRepository {
 
       // Stream output instead of buffering it (see runStreaming): tsc/tsgo can
       // emit far more than any fixed maxBuffer on a large error cascade.
+      //
+      // NODE_OPTIONS only matters to tsc (a Node process); tsgo is a native Go
+      // binary that ignores it. Setting it unconditionally is harmless either
+      // way, and simpler than threading "which engine is this" down here.
       const result = await TypecheckRepository.runStreaming(command, {
         cwd: findProjectRoot(),
         timeoutMs: (timeout ?? 900) * 1000,
         signal,
+        env: { NODE_OPTIONS: "--max-old-space-size=32768" },
       });
 
       const output = [result.stdout, result.stderr].filter(Boolean).join("\n");
@@ -1910,7 +2749,7 @@ export class TypecheckRepository {
       // has to be caught HERE. Returning success() with truncated output lets
       // the caller parse zero errors and print `✓ TypeScript 0 issues` over a
       // process that died — the exact false green this check exists to prevent.
-      const crash = TypecheckRepository.diagnoseCrash(result);
+      const crash = diagnoseCrash(result);
       if (crash !== null) {
         logger.error(`[TYPESCRIPT] ${crash}`);
         return failInline({

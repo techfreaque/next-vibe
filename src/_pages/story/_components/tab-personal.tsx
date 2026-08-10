@@ -1,13 +1,13 @@
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { ArrowRight } from "next-vibe/ui/ui/icons/ArrowRight";
-import { Link } from "next-vibe/ui/ui/link";
-import { MotionDiv } from "next-vibe/ui/ui/motion";
-import { Section } from "next-vibe/ui/ui/section";
-import { H2, P } from "next-vibe/ui/ui/typography";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
+import { Link } from "next-vibe/ui/components/link";
+import { MotionDiv } from "next-vibe/ui/components/motion";
+import { Section } from "next-vibe/ui/components/section";
+import { H2, P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 import { useInView } from "react-intersection-observer";
 

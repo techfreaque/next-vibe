@@ -1,7 +1,7 @@
 "use client";
-import { Div } from "next-vibe/ui/ui/div";
-import { Label } from "next-vibe/ui/ui/label";
-import { Span } from "next-vibe/ui/ui/span";
+import { Div } from "next-vibe/ui/components/div";
+import { Label } from "next-vibe/ui/components/label";
+import { Span } from "next-vibe/ui/components/span";
 import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";

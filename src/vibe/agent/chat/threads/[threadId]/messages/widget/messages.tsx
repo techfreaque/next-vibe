@@ -3,14 +3,14 @@
 import { platform } from "next-vibe/core/env-client";
 import { success } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
+import { Button } from "next-vibe/ui/components/button";
+import type { DivRefObject } from "next-vibe/ui/components/div";
+import { Div } from "next-vibe/ui/components/div";
+import { ErrorBoundary } from "next-vibe/ui/components/error-boundary";
+import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
+import { Span } from "next-vibe/ui/components/span";
 import { getElementById, querySelector } from "next-vibe/ui/lib/dom";
 import { getCurrentUrl, silentReplaceState } from "next-vibe/ui/lib/location";
-import { Button } from "next-vibe/ui/ui/button";
-import type { DivRefObject } from "next-vibe/ui/ui/div";
-import { Div } from "next-vibe/ui/ui/div";
-import { ErrorBoundary } from "next-vibe/ui/ui/error-boundary";
-import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
-import { Span } from "next-vibe/ui/ui/span";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetEndpointMutations,
@@ -52,8 +52,7 @@ import { ModelSelectionType } from "../../../../../skills/enum";
 import type { FavoriteConfig } from "../../../../../skills/favorites/db";
 import { ChatFavoritesRepositoryClient } from "../../../../../skills/favorites/repository-client";
 import type { TtsModelId } from "../../../../../text-to-speech/models";
-import type { ChatMessage } from "../../../../db";
-import type { MessageMetadata } from "../../../../db";
+import type { ChatMessage, MessageMetadata } from "../../../../db";
 import { NEW_MESSAGE_ID, ViewMode } from "../../../../enum";
 import { useChatBootContext } from "../../../../hooks/context";
 import { useChatNavigationStore } from "../../../../hooks/use-chat-navigation-store";

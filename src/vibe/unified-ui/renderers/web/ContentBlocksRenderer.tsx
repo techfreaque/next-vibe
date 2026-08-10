@@ -1,8 +1,8 @@
 "use client";
 
-import { Div } from "next-vibe/ui/ui/div";
-import { Image } from "next-vibe/ui/ui/image";
-import { Span } from "next-vibe/ui/ui/span";
+import { Div } from "next-vibe/ui/components/div";
+import { Image } from "next-vibe/ui/components/image";
+import { Span } from "next-vibe/ui/components/span";
 import type { JSX } from "react";
 
 import type { ContentBlock } from "../../../core/route/response.schema";

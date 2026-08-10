@@ -1,17 +1,17 @@
 "use client";
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
-import { Download } from "next-vibe/ui/ui/icons/Download";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
-import { Video as VideoIcon } from "next-vibe/ui/ui/icons/Video";
-import { Input } from "next-vibe/ui/ui/input";
-import { ExternalLink } from "next-vibe/ui/ui/link";
-import { Span } from "next-vibe/ui/ui/span";
-import { Textarea } from "next-vibe/ui/ui/textarea";
-import { H3 } from "next-vibe/ui/ui/typography";
-import { Video } from "next-vibe/ui/ui/video";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { ArrowLeft } from "next-vibe/ui/components/icons/ArrowLeft";
+import { Download } from "next-vibe/ui/components/icons/Download";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { Video as VideoIcon } from "next-vibe/ui/components/icons/Video";
+import { Input } from "next-vibe/ui/components/input";
+import { ExternalLink } from "next-vibe/ui/components/link";
+import { Span } from "next-vibe/ui/components/span";
+import { Textarea } from "next-vibe/ui/components/textarea";
+import { H3 } from "next-vibe/ui/components/typography";
+import { Video } from "next-vibe/ui/components/video";
 import {
   useWidgetDisabled,
   useWidgetForm,

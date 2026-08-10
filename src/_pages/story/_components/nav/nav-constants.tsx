@@ -1,11 +1,11 @@
-import { BookOpen } from "next-vibe/ui/ui/icons/BookOpen";
-import { Building } from "next-vibe/ui/ui/icons/Building";
-import { Code } from "next-vibe/ui/ui/icons/Code";
-import { Info } from "next-vibe/ui/ui/icons/Info";
-import { MessageSquare } from "next-vibe/ui/ui/icons/MessageSquare";
-import { Sparkles } from "next-vibe/ui/ui/icons/Sparkles";
-import { Tag } from "next-vibe/ui/ui/icons/Tag";
-import { TrendingUp } from "next-vibe/ui/ui/icons/TrendingUp";
+import { BookOpen } from "next-vibe/ui/components/icons/BookOpen";
+import { Building } from "next-vibe/ui/components/icons/Building";
+import { Code } from "next-vibe/ui/components/icons/Code";
+import { Info } from "next-vibe/ui/components/icons/Info";
+import { MessageSquare } from "next-vibe/ui/components/icons/MessageSquare";
+import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
+import { Tag } from "next-vibe/ui/components/icons/Tag";
+import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
 import type { JSX } from "react";
 
 import type { StoryComponentsTranslationKey } from "../i18n";

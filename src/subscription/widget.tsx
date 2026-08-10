@@ -5,23 +5,23 @@
 
 "use client";
 
-import { useRouter } from "next-vibe/ui/hooks/use-navigation";
-import { assignUrl, getCurrentOrigin } from "next-vibe/ui/lib/location";
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe/ui/ui/card";
-import { Div } from "next-vibe/ui/ui/div";
-import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
-import { Bitcoin } from "next-vibe/ui/ui/icons/Bitcoin";
-import { CreditCard } from "next-vibe/ui/ui/icons/CreditCard";
-import { ExternalLink } from "next-vibe/ui/ui/icons/ExternalLink";
-import { MotionDiv } from "next-vibe/ui/ui/motion";
+} from "next-vibe/ui/components/card";
+import { Div } from "next-vibe/ui/components/div";
+import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
+import { Bitcoin } from "next-vibe/ui/components/icons/Bitcoin";
+import { CreditCard } from "next-vibe/ui/components/icons/CreditCard";
+import { ExternalLink } from "next-vibe/ui/components/icons/ExternalLink";
+import { MotionDiv } from "next-vibe/ui/components/motion";
+import { useRouter } from "next-vibe/ui/hooks/use-navigation";
+import { assignUrl, getCurrentOrigin } from "next-vibe/ui/lib/location";
 import {
   useWidgetLocale,
   useWidgetLogger,

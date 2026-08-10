@@ -1,15 +1,15 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { Camera } from "next-vibe/ui/ui/icons/Camera";
-import { Eye } from "next-vibe/ui/ui/icons/Eye";
-import { Keyboard } from "next-vibe/ui/ui/icons/Keyboard";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
-import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
-import { Type } from "next-vibe/ui/ui/icons/Type";
-import { Span } from "next-vibe/ui/ui/span";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { Camera } from "next-vibe/ui/components/icons/Camera";
+import { Eye } from "next-vibe/ui/components/icons/Eye";
+import { Keyboard } from "next-vibe/ui/components/icons/Keyboard";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
+import { Type } from "next-vibe/ui/components/icons/Type";
+import { Span } from "next-vibe/ui/components/span";
 import {
   useWidgetNavigation,
   useWidgetOnSubmit,

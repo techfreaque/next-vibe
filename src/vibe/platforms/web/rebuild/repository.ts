@@ -98,6 +98,7 @@ export class RebuildRepository {
           const generateResult = await GenerateAllRepository.generateAll(
             { force: false },
             logger,
+            user,
           );
           return generateResult.success
             ? null

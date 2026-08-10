@@ -14,49 +14,53 @@ import {
   TrendingDown,
   TrendingUp,
 } from "lucide-react";
-import { Alert, AlertDescription } from "next-vibe/ui/ui/alert";
-import { Avatar, AvatarFallback, AvatarImage } from "next-vibe/ui/ui/avatar";
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
+import { Alert, AlertDescription } from "next-vibe/ui/components/alert";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "next-vibe/ui/components/avatar";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe/ui/ui/card";
-import { Checkbox } from "next-vibe/ui/ui/checkbox";
-import { DatePicker } from "next-vibe/ui/ui/date-picker";
-import { Div } from "next-vibe/ui/ui/div";
-import { Input } from "next-vibe/ui/ui/input";
-import { Label } from "next-vibe/ui/ui/label";
-import { ExternalLink } from "next-vibe/ui/ui/link";
-import { Markdown } from "next-vibe/ui/ui/markdown";
-import { MultiSelect } from "next-vibe/ui/ui/multi-select";
-import { NumberInput } from "next-vibe/ui/ui/number-input";
-import { PhoneField } from "next-vibe/ui/ui/phone-field";
-import { Pre } from "next-vibe/ui/ui/pre";
-import { Progress } from "next-vibe/ui/ui/progress";
-import { Section } from "next-vibe/ui/ui/section";
+} from "next-vibe/ui/components/card";
+import { Checkbox } from "next-vibe/ui/components/checkbox";
+import { DatePicker } from "next-vibe/ui/components/date-picker";
+import { Div } from "next-vibe/ui/components/div";
+import { Input } from "next-vibe/ui/components/input";
+import { Label } from "next-vibe/ui/components/label";
+import { ExternalLink } from "next-vibe/ui/components/link";
+import { Markdown } from "next-vibe/ui/components/markdown";
+import { MultiSelect } from "next-vibe/ui/components/multi-select";
+import { NumberInput } from "next-vibe/ui/components/number-input";
+import { PhoneField } from "next-vibe/ui/components/phone-field";
+import { Pre } from "next-vibe/ui/components/pre";
+import { Progress } from "next-vibe/ui/components/progress";
+import { Section } from "next-vibe/ui/components/section";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "next-vibe/ui/ui/select";
-import { Separator } from "next-vibe/ui/ui/separator";
+} from "next-vibe/ui/components/select";
+import { Separator } from "next-vibe/ui/components/separator";
 import {
   Slider,
   SliderRange,
   SliderThumb,
   SliderTrack,
-} from "next-vibe/ui/ui/slider";
-import { Span } from "next-vibe/ui/ui/span";
-import { Switch } from "next-vibe/ui/ui/switch";
-import { Textarea } from "next-vibe/ui/ui/textarea";
-import { Title } from "next-vibe/ui/ui/title";
-import { Code, H2, H3, Muted, P } from "next-vibe/ui/ui/typography";
+} from "next-vibe/ui/components/slider";
+import { Span } from "next-vibe/ui/components/span";
+import { Switch } from "next-vibe/ui/components/switch";
+import { Textarea } from "next-vibe/ui/components/textarea";
+import { Title } from "next-vibe/ui/components/title";
+import { Code, H2, H3, Muted, P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 import { useState } from "react";
 

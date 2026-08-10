@@ -18,24 +18,24 @@ import { ttsModelDefinitions } from "next-vibe/agent/text-to-speech/models";
 import { videoGenModelDefinitions } from "next-vibe/agent/video-generation/models";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { UserRole } from "next-vibe/identity/roles/enum";
-import { Button } from "next-vibe/ui/ui/button";
+import { Button } from "next-vibe/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe/ui/ui/card";
-import { Div } from "next-vibe/ui/ui/div";
-import { ArrowRight } from "next-vibe/ui/ui/icons/ArrowRight";
-import { Calendar } from "next-vibe/ui/ui/icons/Calendar";
-import { Coins } from "next-vibe/ui/ui/icons/Coins";
-import { Info } from "next-vibe/ui/ui/icons/Info";
-import { Sparkles } from "next-vibe/ui/ui/icons/Sparkles";
-import { Zap } from "next-vibe/ui/ui/icons/Zap";
-import { Span } from "next-vibe/ui/ui/span";
-import { H4, P } from "next-vibe/ui/ui/typography";
-import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
+} from "next-vibe/ui/components/card";
+import { Div } from "next-vibe/ui/components/div";
+import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
+import { Calendar } from "next-vibe/ui/components/icons/Calendar";
+import { Coins } from "next-vibe/ui/components/icons/Coins";
+import { Info } from "next-vibe/ui/components/icons/Info";
+import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
+import { Zap } from "next-vibe/ui/components/icons/Zap";
+import { Span } from "next-vibe/ui/components/span";
+import { H4, P } from "next-vibe/ui/components/typography";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
   useWidgetLocale,
   useWidgetNavigation,

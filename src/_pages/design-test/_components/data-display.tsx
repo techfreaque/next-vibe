@@ -1,15 +1,15 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
-import { Card, CardContent } from "next-vibe/ui/ui/card";
+import { Card, CardContent } from "next-vibe/ui/components/card";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "next-vibe/ui/ui/carousel";
-import { Div } from "next-vibe/ui/ui/div";
-import { Kbd } from "next-vibe/ui/ui/kbd";
+} from "next-vibe/ui/components/carousel";
+import { Div } from "next-vibe/ui/components/div";
+import { Kbd } from "next-vibe/ui/components/kbd";
 import {
   Pagination,
   PaginationContent,
@@ -18,10 +18,10 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "next-vibe/ui/ui/pagination";
-import { Section } from "next-vibe/ui/ui/section";
-import { Separator } from "next-vibe/ui/ui/separator";
-import { Span } from "next-vibe/ui/ui/span";
+} from "next-vibe/ui/components/pagination";
+import { Section } from "next-vibe/ui/components/section";
+import { Separator } from "next-vibe/ui/components/separator";
+import { Span } from "next-vibe/ui/components/span";
 import {
   Table,
   TableBody,
@@ -31,8 +31,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "next-vibe/ui/ui/table";
-import { Title } from "next-vibe/ui/ui/title";
+} from "next-vibe/ui/components/table";
+import { Title } from "next-vibe/ui/components/title";
 import {
   BlockQuote,
   Code,
@@ -45,7 +45,7 @@ import {
   Muted,
   P,
   Small,
-} from "next-vibe/ui/ui/typography";
+} from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 
 export function DataDisplayPreview(): JSX.Element {

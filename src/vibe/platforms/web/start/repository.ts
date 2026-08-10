@@ -46,9 +46,7 @@ import {
   formatWarning,
 } from "../../../logger/formatters";
 import type { EndpointLogger } from "../../../logger/types";
-import type { WebSocketServerHandle } from "../../../realtime/server/server";
 import { ServerFramework } from "../enum";
-import { serverSystemEnv } from "../env";
 import {
   addPidToFile,
   cleanupPidFile,
@@ -60,6 +58,7 @@ import {
   VIBE_SUPERVISOR_PID_FILE,
   writePidFile,
 } from "../pid";
+import type { WebProxyHandle } from "../proxy";
 import type {
   ServerStartRequestOutput,
   ServerStartResponseOutput,
@@ -118,7 +117,7 @@ const SUPERVISOR_MAX_HEAP_MB = 256;
 export class ServerStartRepository {
   private static taskRunnerStarted = false;
   private static nextServerProcess: ChildProcess | null = null;
-  private static wsServerHandle: WebSocketServerHandle | null = null;
+  private static wsServerHandle: WebProxyHandle | null = null;
   private static runningProcesses: Map<string, ChildProcess> = new Map();
   /** Set to true when we intentionally stop Next.js (shutdown / SIGUSR1) - suppresses auto-restart */
   private static nextServerShuttingDown = false;
@@ -1380,16 +1379,14 @@ export class ServerStartRepository {
     profile = false,
   ): Promise<ResponseType<void>> {
     try {
-      // Import WS module to get NEXT_PORT_OFFSET
-      const { startWebSocketServer, NEXT_PORT_OFFSET } =
-        await import("../../../realtime/server/server");
-
-      const disableProxy = serverSystemEnv.VIBE_DISABLE_PROXY;
-      // In proxy mode (default): Next.js on port+NEXT_PORT_OFFSET, Bun proxy on main port.
-      // In direct mode (VIBE_DISABLE_PROXY=true): Next.js on main port, WS sidecar on port+1000.
-      const WS_SIDECAR_OFFSET = 1000;
-      const nextPort = disableProxy ? port : port + NEXT_PORT_OFFSET;
-      const wsPort = disableProxy ? port + WS_SIDECAR_OFFSET : port;
+      // Port layout and the Bun proxy itself live behind ../proxy — see that
+      // module for the two modes (proxy / VIBE_DISABLE_PROXY) this selects.
+      const { resolveWebProxyPorts, startWebProxy } = await import("../proxy");
+      const {
+        appPort: nextPort,
+        wsPort,
+        disableProxy,
+      } = await resolveWebProxyPorts(port);
 
       // Kill any stale processes on both ports
       ServerStartRepository.killProcessOnPort(nextPort, logger);
@@ -1558,8 +1555,8 @@ export class ServerStartRepository {
       addPidToFile(VIBE_START_PID_FILE, nextProcess.pid ?? 0);
 
       // --- Start WS server (proxy or sidecar depending on mode) ---
-      const wsHandle = startWebSocketServer({ port: wsPort, logger });
-      ServerStartRepository.wsServerHandle = wsHandle;
+      const wsHandle = await startWebProxy({ port: wsPort, logger });
+      ServerStartRepository.wsServerHandle = wsHandle ?? null;
 
       // Start writing periodic health snapshots so the supervisor has pre-crash memory data
       ServerStartRepository.startHealthSnapshot(logger);

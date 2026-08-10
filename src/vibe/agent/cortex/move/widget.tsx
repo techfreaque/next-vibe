@@ -5,12 +5,12 @@
 
 "use client";
 
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Card, CardContent } from "next-vibe/ui/ui/card";
-import { Div } from "next-vibe/ui/ui/div";
-import { ArrowRight } from "next-vibe/ui/ui/icons/ArrowRight";
-import { FolderInput } from "next-vibe/ui/ui/icons/FolderInput";
-import { Span } from "next-vibe/ui/ui/span";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Card, CardContent } from "next-vibe/ui/components/card";
+import { Div } from "next-vibe/ui/components/div";
+import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
+import { FolderInput } from "next-vibe/ui/components/icons/FolderInput";
+import { Span } from "next-vibe/ui/components/span";
 import {
   useWidgetDisabled,
   useWidgetTranslation,

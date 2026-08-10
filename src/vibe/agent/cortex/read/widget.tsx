@@ -5,14 +5,14 @@
 
 "use client";
 
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { Copy } from "next-vibe/ui/components/icons/Copy";
+import { FileText } from "next-vibe/ui/components/icons/FileText";
+import { Markdown } from "next-vibe/ui/components/markdown";
+import { Span } from "next-vibe/ui/components/span";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { Copy } from "next-vibe/ui/ui/icons/Copy";
-import { FileText } from "next-vibe/ui/ui/icons/FileText";
-import { Markdown } from "next-vibe/ui/ui/markdown";
-import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetDisabled,
   useWidgetNavigation,

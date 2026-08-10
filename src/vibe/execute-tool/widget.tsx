@@ -12,19 +12,19 @@
 
 "use client";
 
-import type { AutocompleteOption } from "next-vibe/ui/ui/autocomplete-field";
-import { AutocompleteField } from "next-vibe/ui/ui/autocomplete-field";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
+import type { AutocompleteOption } from "next-vibe/ui/components/autocomplete-field";
+import { AutocompleteField } from "next-vibe/ui/components/autocomplete-field";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
 import {
   Form,
   FormField,
   FormItem,
   FormLabel,
-} from "next-vibe/ui/ui/form/form";
-import { Pre } from "next-vibe/ui/ui/pre";
-import { useThemeToggle } from "next-vibe/ui/ui/theme-provider";
-import { P } from "next-vibe/ui/ui/typography";
+} from "next-vibe/ui/components/form/form";
+import { Pre } from "next-vibe/ui/components/pre";
+import { useThemeToggle } from "next-vibe/ui/components/theme-provider";
+import { P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 

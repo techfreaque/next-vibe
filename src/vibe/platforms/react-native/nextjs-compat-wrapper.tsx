@@ -27,7 +27,7 @@
  */
 
 import { Slot, useLocalSearchParams } from "expo-router";
-import { Span } from "next-vibe/ui/ui/span";
+import { Span } from "next-vibe/ui/components/span";
 import type React from "react";
 import type { JSX, ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";

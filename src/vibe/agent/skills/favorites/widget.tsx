@@ -28,26 +28,26 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
-import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
-import { Div, type DivRefObject } from "next-vibe/ui/ui/div";
-import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
-import { Compass } from "next-vibe/ui/ui/icons/Compass";
-import { Eye } from "next-vibe/ui/ui/icons/Eye";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
-import { Pencil } from "next-vibe/ui/ui/icons/Pencil";
-import { Plus } from "next-vibe/ui/ui/icons/Plus";
-import { Settings } from "next-vibe/ui/ui/icons/Settings";
-import { Star } from "next-vibe/ui/ui/icons/Star";
-import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
-import { Zap } from "next-vibe/ui/ui/icons/Zap";
+import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
+import { Div, type DivRefObject } from "next-vibe/ui/components/div";
+import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
+import { Compass } from "next-vibe/ui/components/icons/Compass";
+import { Eye } from "next-vibe/ui/components/icons/Eye";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { Pencil } from "next-vibe/ui/components/icons/Pencil";
+import { Plus } from "next-vibe/ui/components/icons/Plus";
+import { Settings } from "next-vibe/ui/components/icons/Settings";
+import { Star } from "next-vibe/ui/components/icons/Star";
+import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
+import { Zap } from "next-vibe/ui/components/icons/Zap";
 import {
   Popover,
   PopoverClose,
   PopoverContent,
   PopoverTrigger,
-} from "next-vibe/ui/ui/popover";
-import { Span } from "next-vibe/ui/ui/span";
+} from "next-vibe/ui/components/popover";
+import { Span } from "next-vibe/ui/components/span";
+import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   arrayFieldPath,

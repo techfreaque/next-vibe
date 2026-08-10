@@ -28,19 +28,19 @@
 // core/definition/create). There is no scope to translate against.
 "use client";
 
-import { Div } from "next-vibe/ui/ui/div";
-import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
-import { BarChart3 } from "next-vibe/ui/ui/icons/BarChart3";
-import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
-import { CircleDashed } from "next-vibe/ui/ui/icons/CircleDashed";
-import { DotFilledIcon } from "next-vibe/ui/ui/icons/DotFilledIcon";
-import { Folder } from "next-vibe/ui/ui/icons/Folder";
-import { Info } from "next-vibe/ui/ui/icons/Info";
-import { Minus } from "next-vibe/ui/ui/icons/Minus";
-import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
-import { ExternalLink } from "next-vibe/ui/ui/link";
-import { Span } from "next-vibe/ui/ui/span";
-import { H3 } from "next-vibe/ui/ui/typography";
+import { Div } from "next-vibe/ui/components/div";
+import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
+import { BarChart3 } from "next-vibe/ui/components/icons/BarChart3";
+import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
+import { CircleDashed } from "next-vibe/ui/components/icons/CircleDashed";
+import { DotFilledIcon } from "next-vibe/ui/components/icons/DotFilledIcon";
+import { Folder } from "next-vibe/ui/components/icons/Folder";
+import { Info } from "next-vibe/ui/components/icons/Info";
+import { Minus } from "next-vibe/ui/components/icons/Minus";
+import { XCircle } from "next-vibe/ui/components/icons/XCircle";
+import { ExternalLink } from "next-vibe/ui/components/link";
+import { Span } from "next-vibe/ui/components/span";
+import { H3 } from "next-vibe/ui/components/typography";
 import { useMemo } from "react";
 
 import {
@@ -80,6 +80,8 @@ interface CheckPhase {
   issues?: number;
   errors?: number;
   durationMs?: number;
+  filesChecked?: number;
+  totalFiles?: number;
 }
 
 /** Inline icon sizing — ignored by the CLI icons, sizes the SVG on web. */
@@ -259,7 +261,9 @@ function CheckPhaseList({
             ? `${phase.issues ?? 0} issue${phase.issues === 1 ? "" : "s"}`
             : skipped
               ? "skipped"
-              : "running";
+              : phase.totalFiles !== undefined
+                ? `${phase.filesChecked ?? 0}/${phase.totalFiles} files`
+                : "running";
 
         return (
           <Div key={phase.id} className="flex">

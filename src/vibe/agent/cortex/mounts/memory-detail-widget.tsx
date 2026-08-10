@@ -8,11 +8,11 @@
 
 "use client";
 
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Card, CardContent } from "next-vibe/ui/ui/card";
-import { Div } from "next-vibe/ui/ui/div";
-import { Brain } from "next-vibe/ui/ui/icons/Brain";
-import { Span } from "next-vibe/ui/ui/span";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Card, CardContent } from "next-vibe/ui/components/card";
+import { Div } from "next-vibe/ui/components/div";
+import { Brain } from "next-vibe/ui/components/icons/Brain";
+import { Span } from "next-vibe/ui/components/span";
 
 interface MemoryDetailWidgetProps {
   path: string;

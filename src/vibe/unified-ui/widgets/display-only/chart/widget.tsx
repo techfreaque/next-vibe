@@ -1,9 +1,21 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "next-vibe/ui/ui/card";
-import { Area, Axis, Bar, Chart, Line, Pie } from "next-vibe/ui/ui/chart";
-import { Div } from "next-vibe/ui/ui/div";
-import { Span } from "next-vibe/ui/ui/span";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "next-vibe/ui/components/card";
+import {
+  Area,
+  Axis,
+  Bar,
+  Chart,
+  Line,
+  Pie,
+} from "next-vibe/ui/components/chart";
+import { Div } from "next-vibe/ui/components/div";
+import { Span } from "next-vibe/ui/components/span";
 import type { JSX } from "react";
 import type z from "zod";
 

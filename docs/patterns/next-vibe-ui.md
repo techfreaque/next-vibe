@@ -10,20 +10,20 @@
 
 ### UI Components
 
-Import from `next-vibe-ui/ui/*` - never from `next/image`, `next/link`, or framework-specific component libraries.
+Import from `next-vibe-ui/components/*` - never from `next/image`, `next/link`, or framework-specific component libraries.
 
-| Import                           | Web                      | Native               | TanStack                      |
-| -------------------------------- | ------------------------ | -------------------- | ----------------------------- |
-| `next-vibe-ui/ui/link`           | `next/link`              | `expo-router` Link   | `@tanstack/react-router` Link |
-| `next-vibe-ui/ui/image`          | `next/image` (optimized) | React Native `Image` | plain `<img>`                 |
-| `next-vibe-ui/ui/button`         | shadcn/ui Button         | rn-primitives Button | shadcn/ui Button              |
-| `next-vibe-ui/ui/head`           | Next.js `<Head>`         | N/A                  | TanStack head()               |
-| `next-vibe-ui/ui/body`           | `<body>`                 | N/A                  | `<body>`                      |
-| `next-vibe-ui/ui/outlet`         | renders children         | N/A                  | TanStack `<Outlet>`           |
-| `next-vibe-ui/ui/theme-provider` | next-themes              | `Appearance` API     | N/A                           |
-| `next-vibe-ui/ui/div`            | `<div>`                  | `<View>`             | `<div>`                       |
-| `next-vibe-ui/ui/span`           | `<span>`                 | `<Text>`             | `<span>`                      |
-| All other `ui/*`                 | shadcn/ui                | rn-primitives        | shadcn/ui                     |
+| Import                                   | Web                      | Native               | TanStack                      |
+| ---------------------------------------- | ------------------------ | -------------------- | ----------------------------- |
+| `next-vibe-ui/components/link`           | `next/link`              | `expo-router` Link   | `@tanstack/react-router` Link |
+| `next-vibe-ui/components/image`          | `next/image` (optimized) | React Native `Image` | plain `<img>`                 |
+| `next-vibe-ui/components/button`         | shadcn/ui Button         | rn-primitives Button | shadcn/ui Button              |
+| `next-vibe-ui/components/head`           | Next.js `<Head>`         | N/A                  | TanStack head()               |
+| `next-vibe-ui/components/body`           | `<body>`                 | N/A                  | `<body>`                      |
+| `next-vibe-ui/components/outlet`         | renders children         | N/A                  | TanStack `<Outlet>`           |
+| `next-vibe-ui/components/theme-provider` | next-themes              | `Appearance` API     | N/A                           |
+| `next-vibe-ui/components/div`            | `<div>`                  | `<View>`             | `<div>`                       |
+| `next-vibe-ui/components/span`           | `<span>`                 | `<Text>`             | `<span>`                      |
+| All other `ui/*`                         | shadcn/ui                | rn-primitives        | shadcn/ui                     |
 
 ### Navigation & Routing
 
@@ -53,8 +53,8 @@ Import from `next-vibe-ui/lib/*` - never from `next/headers`, `next/navigation` 
 
 ```typescript
 // ✅ Always - platform-agnostic
-import { Link } from "next-vibe-ui/ui/link";
-import { Button } from "next-vibe-ui/ui/button";
+import { Link } from "next-vibe-ui/components/link";
+import { Button } from "next-vibe-ui/components/button";
 import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import { cookies, headers } from "next-vibe-ui/lib/headers";
 import { redirect } from "next-vibe-ui/lib/redirect";
@@ -89,7 +89,7 @@ if (typeof window === "undefined") { ... } // ❌ - fragile, not tree-shakeable
 
 ## Theme
 
-Use `next-vibe-ui/ui/theme-provider` for theme wrapping and `useThemeToggle()` for dark/light switching. On native it maps to `Appearance.setColorScheme()`. Never import `next-themes` directly.
+Use `next-vibe-ui/components/theme-provider` for theme wrapping and `useThemeToggle()` for dark/light switching. On native it maps to `Appearance.setColorScheme()`. Never import `next-themes` directly.
 
 ---
 
@@ -97,7 +97,7 @@ Use `next-vibe-ui/ui/theme-provider` for theme wrapping and `useThemeToggle()` f
 
 - Global CSS lives in `src/packages/next-vibe-ui/globals.css` (Tailwind v4 + custom theme tokens)
 - Use `className` props for all styling - no inline `style` unless doing dynamic values
-- `next-vibe-ui/ui/div` and `next-vibe-ui/ui/span` resolve to `<View>`/`<Text>` on native and accept `className` via NativeWind
+- `next-vibe-ui/components/div` and `next-vibe-ui/components/span` resolve to `<View>`/`<Text>` on native and accept `className` via NativeWind
 - Never use `style={{ ... }}` for static styles - always Tailwind classes
 
 ---
@@ -106,7 +106,7 @@ Use `next-vibe-ui/ui/theme-provider` for theme wrapping and `useThemeToggle()` f
 
 When writing `widget.tsx` components that render on native:
 
-- Use `next-vibe-ui/ui/*` components - they resolve to the correct native primitives
+- Use `next-vibe-ui/components/*` components - they resolve to the correct native primitives
 
 **There is no runtime native check, and no `Platform.NATIVE`.** The `Platform` enum describes who _called_ the endpoint (`CLI`, `AI`, `MCP`, `NEXT_PAGE`, …), not what the UI is rendering on. Native is a **build target**: `next-vibe-ui` resolves to one of `src/vibe/ui/{web,native,tanstack,cli}` per bundle, so the swap happens before your code runs. Push the difference down into the `next-vibe-ui` component rather than branching in shared code.
 
@@ -135,7 +135,7 @@ import { Image } from "react-native";
 import { useTheme } from "next-themes";
 
 // ✅ Correct
-import { Image } from "next-vibe-ui/ui/image";
+import { Image } from "next-vibe-ui/components/image";
 import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import { cookies } from "next-vibe-ui/lib/headers";
 import <div className="flex gap-4">

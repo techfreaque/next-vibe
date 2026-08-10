@@ -5,17 +5,17 @@
 
 "use client";
 
-import { useLogger } from "next-vibe/ui/hooks/use-logger";
-import { Dialog, DialogContent } from "next-vibe/ui/ui/dialog";
-import { Div } from "next-vibe/ui/ui/div";
+import { Dialog, DialogContent } from "next-vibe/ui/components/dialog";
+import { Div } from "next-vibe/ui/components/div";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "next-vibe/ui/ui/select";
-import { P } from "next-vibe/ui/ui/typography";
+} from "next-vibe/ui/components/select";
+import { P } from "next-vibe/ui/components/typography";
+import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { useMemo, useState } from "react";
 
 import type { NavigationStackEntry } from "../../../core/definition/endpoint";

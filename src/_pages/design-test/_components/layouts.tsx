@@ -5,9 +5,9 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "next-vibe/ui/ui/accordion";
-import { AspectRatio } from "next-vibe/ui/ui/aspect-ratio";
-import { Button } from "next-vibe/ui/ui/button";
+} from "next-vibe/ui/components/accordion";
+import { AspectRatio } from "next-vibe/ui/components/aspect-ratio";
+import { Button } from "next-vibe/ui/components/button";
 import {
   Card,
   CardContent,
@@ -15,20 +15,25 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "next-vibe/ui/ui/card";
+} from "next-vibe/ui/components/card";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "next-vibe/ui/ui/collapsible";
-import { Div } from "next-vibe/ui/ui/div";
-import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
-import { ResizableContainer } from "next-vibe/ui/ui/resizable";
-import { ScrollArea } from "next-vibe/ui/ui/scroll-area";
-import { Section } from "next-vibe/ui/ui/section";
-import { Separator } from "next-vibe/ui/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe/ui/ui/tabs";
-import { H2, H3, P } from "next-vibe/ui/ui/typography";
+} from "next-vibe/ui/components/collapsible";
+import { Div } from "next-vibe/ui/components/div";
+import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
+import { ResizableContainer } from "next-vibe/ui/components/resizable";
+import { ScrollArea } from "next-vibe/ui/components/scroll-area";
+import { Section } from "next-vibe/ui/components/section";
+import { Separator } from "next-vibe/ui/components/separator";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "next-vibe/ui/components/tabs";
+import { H2, H3, P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 
 export function LayoutsPreview(): JSX.Element {

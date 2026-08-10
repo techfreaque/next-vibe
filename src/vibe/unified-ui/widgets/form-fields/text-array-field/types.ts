@@ -3,7 +3,7 @@
  * Handles TEXT_ARRAY field type - array of text strings
  */
 
-import type { TagOption } from "next-vibe/ui/ui/tags-field";
+import type { TagOption } from "next-vibe/ui/components/tags-field";
 
 import type { FieldDataType } from "../../../../core/definition/enums";
 import type { ArrayWidgetSchema } from "../../../_shared/schema-constraints";

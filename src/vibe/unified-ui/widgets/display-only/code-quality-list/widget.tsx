@@ -6,9 +6,9 @@
  * Displays code quality issues grouped by file with severity-based styling
  */
 
-import { Div } from "next-vibe/ui/ui/div";
-import { ExternalLink } from "next-vibe/ui/ui/link";
-import { Span } from "next-vibe/ui/ui/span";
+import { Div } from "next-vibe/ui/components/div";
+import { ExternalLink } from "next-vibe/ui/components/link";
+import { Span } from "next-vibe/ui/components/span";
 import type { ReactElement } from "react";
 import { useMemo } from "react";
 import type { z } from "zod";

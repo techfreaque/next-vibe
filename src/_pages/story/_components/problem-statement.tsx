@@ -1,9 +1,9 @@
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { Div } from "next-vibe/ui/ui/div";
-import { MotionDiv } from "next-vibe/ui/ui/motion";
-import { H2, P } from "next-vibe/ui/ui/typography";
+import { Div } from "next-vibe/ui/components/div";
+import { MotionDiv } from "next-vibe/ui/components/motion";
+import { H2, P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 import { useInView } from "react-intersection-observer";
 

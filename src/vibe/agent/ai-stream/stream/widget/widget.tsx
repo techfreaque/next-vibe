@@ -11,9 +11,6 @@
 import { platform } from "next-vibe/core/env-client";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { UserRole } from "next-vibe/identity/roles/enum";
-import { usePathname, useRouter } from "next-vibe/ui/hooks/use-navigation";
-import { useResizeObserver } from "next-vibe/ui/hooks/use-resize-observer";
-import { useSafeAreaInsets } from "next-vibe/ui/hooks/use-safe-area-insets";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,10 +20,13 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "next-vibe/ui/ui/alert-dialog";
-import { Div, type DivRefObject } from "next-vibe/ui/ui/div";
-import { ErrorBoundary } from "next-vibe/ui/ui/error-boundary";
-import { KeyboardAvoidingView } from "next-vibe/ui/ui/keyboard-avoiding-view";
+} from "next-vibe/ui/components/alert-dialog";
+import { Div, type DivRefObject } from "next-vibe/ui/components/div";
+import { ErrorBoundary } from "next-vibe/ui/components/error-boundary";
+import { KeyboardAvoidingView } from "next-vibe/ui/components/keyboard-avoiding-view";
+import { usePathname, useRouter } from "next-vibe/ui/hooks/use-navigation";
+import { useResizeObserver } from "next-vibe/ui/hooks/use-resize-observer";
+import { useSafeAreaInsets } from "next-vibe/ui/hooks/use-safe-area-insets";
 import {
   useWidgetLocale,
   useWidgetLogger,

@@ -1,9 +1,9 @@
 "use client";
 
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { ScrollArea } from "next-vibe/ui/ui/scroll-area";
-import { Span } from "next-vibe/ui/ui/span";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { ScrollArea } from "next-vibe/ui/components/scroll-area";
+import { Span } from "next-vibe/ui/components/span";
 import {
   useWidgetContext,
   useWidgetForm,

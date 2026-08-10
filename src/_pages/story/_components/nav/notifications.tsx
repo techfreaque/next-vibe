@@ -1,26 +1,26 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "next-vibe/ui/ui/dropdown-menu";
-import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
-import { Bell } from "next-vibe/ui/ui/icons/Bell";
-import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
-import { Info } from "next-vibe/ui/ui/icons/Info";
-import { Link } from "next-vibe/ui/ui/link";
+} from "next-vibe/ui/components/dropdown-menu";
+import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
+import { Bell } from "next-vibe/ui/components/icons/Bell";
+import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
+import { Info } from "next-vibe/ui/components/icons/Info";
+import { Link } from "next-vibe/ui/components/link";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe/ui/ui/tooltip";
-import { P } from "next-vibe/ui/ui/typography";
+} from "next-vibe/ui/components/tooltip";
+import { P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 
 import type { ScopedKey } from "../i18n";

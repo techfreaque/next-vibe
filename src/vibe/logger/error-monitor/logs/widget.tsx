@@ -5,19 +5,19 @@
  */
 
 "use client";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
-import { Check } from "next-vibe/ui/ui/icons/Check";
-import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
-import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
-import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
-import { ChevronUp } from "next-vibe/ui/ui/icons/ChevronUp";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
-import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
-import { RotateCcw } from "next-vibe/ui/ui/icons/RotateCcw";
-import { Pre } from "next-vibe/ui/ui/pre";
-import { Span } from "next-vibe/ui/ui/span";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
+import { Check } from "next-vibe/ui/components/icons/Check";
+import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
+import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
+import { ChevronUp } from "next-vibe/ui/components/icons/ChevronUp";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
+import { RotateCcw } from "next-vibe/ui/components/icons/RotateCcw";
+import { Pre } from "next-vibe/ui/components/pre";
+import { Span } from "next-vibe/ui/components/span";
 import React, { useCallback, useState } from "react";
 
 import { cn } from "../../../unified-ui/_shared/cn";

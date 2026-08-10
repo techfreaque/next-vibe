@@ -1,15 +1,15 @@
 "use client";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { Button } from "next-vibe/ui/ui/button";
-import { Brain } from "next-vibe/ui/ui/icons/Brain";
+import { Button } from "next-vibe/ui/components/button";
+import { Brain } from "next-vibe/ui/components/icons/Brain";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "next-vibe/ui/ui/popover";
-import { Span } from "next-vibe/ui/ui/span";
-import { P } from "next-vibe/ui/ui/typography";
+} from "next-vibe/ui/components/popover";
+import { Span } from "next-vibe/ui/components/span";
+import { P } from "next-vibe/ui/components/typography";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { PageLayout } from "next-vibe/ui/ui/page-layout";
+import { PageLayout } from "next-vibe/ui/components/page-layout";
 import type { JSX, ReactNode } from "react";
 
 export interface HelpLayoutData {

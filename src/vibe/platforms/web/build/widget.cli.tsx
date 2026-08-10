@@ -22,8 +22,8 @@ interface CliWidgetProps {
 }
 
 function formatDuration(ms: number): string {
-  if (ms < 1000) return `${ms}ms`;
-  if (ms < 60_000) return `${(ms / 1000).toFixed(1)}s`;
+  if (ms < 1000) {return `${ms}ms`;}
+  if (ms < 60_000) {return `${(ms / 1000).toFixed(1)}s`;}
   const m = Math.floor(ms / 60_000);
   const s = Math.round((ms % 60_000) / 1000);
   return `${m}m ${s}s`;
@@ -70,7 +70,7 @@ export function BuildResultWidget({ field }: CliWidgetProps): JSX.Element {
   // ── CLI: colored output ──────────────────────────────────────────────────
   const stepLines = steps.map((step) => {
     if (step.skipped) {
-      return `  ${chalk.dim("–")} ${chalk.dim(step.label + " (skipped)")}`;
+      return `  ${chalk.dim("–")} ${chalk.dim(`${step.label  } (skipped)`)}`;
     }
     return step.ok
       ? `  ${chalk.green("✓")} ${chalk.white(step.label)}`

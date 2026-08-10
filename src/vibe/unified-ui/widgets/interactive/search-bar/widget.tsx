@@ -5,17 +5,17 @@
 
 "use client";
 
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
 import {
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from "next-vibe/ui/ui/form/form";
-import { Search } from "next-vibe/ui/ui/icons/Search";
-import { Input } from "next-vibe/ui/ui/input";
-import { Span } from "next-vibe/ui/ui/span";
+} from "next-vibe/ui/components/form/form";
+import { Search } from "next-vibe/ui/components/icons/Search";
+import { Input } from "next-vibe/ui/components/input";
+import { Span } from "next-vibe/ui/components/span";
 import type { JSX } from "react";
 import type { z } from "zod";
 

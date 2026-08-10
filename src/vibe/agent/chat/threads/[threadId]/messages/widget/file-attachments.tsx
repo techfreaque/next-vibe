@@ -5,17 +5,17 @@
  * Per-type rendering: images (preview), video (player), audio (player), generic (icon row).
  * Handles server-stored files (URL) and incognito files (base64 → blob URL).
  */
-import { Audio } from "next-vibe/ui/ui/audio";
-import { Div } from "next-vibe/ui/ui/div";
-import { Download } from "next-vibe/ui/ui/icons/Download";
-import { FileText } from "next-vibe/ui/ui/icons/FileText";
-import { Film } from "next-vibe/ui/ui/icons/Film";
-import { Image as ImageIcon } from "next-vibe/ui/ui/icons/Image";
-import { Music } from "next-vibe/ui/ui/icons/Music";
-import { Image } from "next-vibe/ui/ui/image";
-import { ExternalLink } from "next-vibe/ui/ui/link";
-import { Span } from "next-vibe/ui/ui/span";
-import { Video } from "next-vibe/ui/ui/video";
+import { Audio } from "next-vibe/ui/components/audio";
+import { Div } from "next-vibe/ui/components/div";
+import { Download } from "next-vibe/ui/components/icons/Download";
+import { FileText } from "next-vibe/ui/components/icons/FileText";
+import { Film } from "next-vibe/ui/components/icons/Film";
+import { Image as ImageIcon } from "next-vibe/ui/components/icons/Image";
+import { Music } from "next-vibe/ui/components/icons/Music";
+import { Image } from "next-vibe/ui/components/image";
+import { ExternalLink } from "next-vibe/ui/components/link";
+import { Span } from "next-vibe/ui/components/span";
+import { Video } from "next-vibe/ui/components/video";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";

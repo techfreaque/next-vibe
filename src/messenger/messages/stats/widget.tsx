@@ -4,26 +4,26 @@
 
 "use client";
 import { objectEntries } from "next-vibe/core/utils/object";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
-import { Search } from "next-vibe/ui/ui/icons/Search";
-import { Input } from "next-vibe/ui/ui/input";
-import { LoadingBlock } from "next-vibe/ui/ui/loading-block";
-import { MetricCard } from "next-vibe/ui/ui/metric-card";
-import { MetricGrid } from "next-vibe/ui/ui/metric-grid";
-import { ProgressBlock } from "next-vibe/ui/ui/progress-block";
-import { SectionGroup } from "next-vibe/ui/ui/section-group";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
+import { Search } from "next-vibe/ui/components/icons/Search";
+import { Input } from "next-vibe/ui/components/input";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
+import { MetricCard } from "next-vibe/ui/components/metric-card";
+import { MetricGrid } from "next-vibe/ui/components/metric-grid";
+import { ProgressBlock } from "next-vibe/ui/components/progress-block";
+import { SectionGroup } from "next-vibe/ui/components/section-group";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "next-vibe/ui/ui/select";
-import { Span } from "next-vibe/ui/ui/span";
-import { WidgetHeader } from "next-vibe/ui/ui/widget-header";
-import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
+} from "next-vibe/ui/components/select";
+import { Span } from "next-vibe/ui/components/span";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { isValidEnumValue } from "next-vibe/unified-ui/_shared/enum";
 import {

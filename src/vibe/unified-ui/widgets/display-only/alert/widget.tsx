@@ -1,6 +1,6 @@
 "use client";
 
-import { Alert, AlertDescription } from "next-vibe/ui/ui/alert";
+import { Alert, AlertDescription } from "next-vibe/ui/components/alert";
 import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";

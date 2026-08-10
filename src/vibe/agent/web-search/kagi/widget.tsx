@@ -7,14 +7,14 @@
 
 "use client";
 
-import { Button } from "next-vibe/ui/ui/button";
-import { Card, CardContent } from "next-vibe/ui/ui/card";
-import { Div } from "next-vibe/ui/ui/div";
-import { ExternalLink as ExternalLinkIcon } from "next-vibe/ui/ui/icons/ExternalLink";
-import { Sparkles } from "next-vibe/ui/ui/icons/Sparkles";
-import { Star } from "next-vibe/ui/ui/icons/Star";
-import { ExternalLink } from "next-vibe/ui/ui/link";
-import { Span } from "next-vibe/ui/ui/span";
+import { Button } from "next-vibe/ui/components/button";
+import { Card, CardContent } from "next-vibe/ui/components/card";
+import { Div } from "next-vibe/ui/components/div";
+import { ExternalLink as ExternalLinkIcon } from "next-vibe/ui/components/icons/ExternalLink";
+import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
+import { Star } from "next-vibe/ui/components/icons/Star";
+import { ExternalLink } from "next-vibe/ui/components/link";
+import { Span } from "next-vibe/ui/components/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetLogger,

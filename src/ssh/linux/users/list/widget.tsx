@@ -4,11 +4,11 @@
 
 "use client";
 
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { Plus } from "next-vibe/ui/ui/icons/Plus";
-import { Users } from "next-vibe/ui/ui/icons/Users";
-import { Span } from "next-vibe/ui/ui/span";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { Plus } from "next-vibe/ui/components/icons/Plus";
+import { Users } from "next-vibe/ui/components/icons/Users";
+import { Span } from "next-vibe/ui/components/span";
 import {
   Table,
   TableBody,
@@ -16,8 +16,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "next-vibe/ui/ui/table";
-import { P } from "next-vibe/ui/ui/typography";
+} from "next-vibe/ui/components/table";
+import { P } from "next-vibe/ui/components/typography";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetNavigation,

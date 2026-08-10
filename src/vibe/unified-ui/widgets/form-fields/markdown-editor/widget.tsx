@@ -1,12 +1,12 @@
 "use client";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { Check } from "next-vibe/ui/ui/icons/Check";
-import { Edit2 } from "next-vibe/ui/ui/icons/Edit2";
-import { X } from "next-vibe/ui/ui/icons/X";
-import type { InputKeyboardEvent } from "next-vibe/ui/ui/input";
-import { Input } from "next-vibe/ui/ui/input";
-import { Span } from "next-vibe/ui/ui/span";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { Check } from "next-vibe/ui/components/icons/Check";
+import { Edit2 } from "next-vibe/ui/components/icons/Edit2";
+import { X } from "next-vibe/ui/components/icons/X";
+import type { InputKeyboardEvent } from "next-vibe/ui/components/input";
+import { Input } from "next-vibe/ui/components/input";
+import { Span } from "next-vibe/ui/components/span";
 import type { JSX } from "react";
 import { useState } from "react";
 

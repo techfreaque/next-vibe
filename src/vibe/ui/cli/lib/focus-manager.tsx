@@ -10,7 +10,7 @@ import { useFocus } from "ink";
 import type { JSX, ReactNode } from "react";
 import React from "react";
 
-import { useFocusScopeRegister, useShouldFocus } from "../ui/dialog";
+import { useFocusScopeRegister, useShouldFocus } from "../components/dialog";
 
 export function CliFocusManager({
   children,

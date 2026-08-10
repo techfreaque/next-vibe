@@ -5,7 +5,7 @@
 
 "use client";
 
-import { Alert, AlertDescription } from "next-vibe/ui/ui/alert";
+import { Alert, AlertDescription } from "next-vibe/ui/components/alert";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,13 +15,13 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "next-vibe/ui/ui/alert-dialog";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
-import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
-import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
-import { Span } from "next-vibe/ui/ui/span";
+} from "next-vibe/ui/components/alert-dialog";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
+import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
+import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { Span } from "next-vibe/ui/components/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetNavigation,

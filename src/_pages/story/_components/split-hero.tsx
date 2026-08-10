@@ -1,20 +1,20 @@
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { Br } from "next-vibe/ui/components/br";
+import type { ButtonMouseEvent } from "next-vibe/ui/components/button";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
+import { Code } from "next-vibe/ui/components/icons/Code";
+import { MessageSquare } from "next-vibe/ui/components/icons/MessageSquare";
+import { Server } from "next-vibe/ui/components/icons/Server";
+import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
+import { Link } from "next-vibe/ui/components/link";
+import { MotionDiv } from "next-vibe/ui/components/motion";
+import { Span } from "next-vibe/ui/components/span";
+import { H1, H2, P } from "next-vibe/ui/components/typography";
 import { getElementById } from "next-vibe/ui/lib/dom";
-import { Br } from "next-vibe/ui/ui/br";
-import type { ButtonMouseEvent } from "next-vibe/ui/ui/button";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { ArrowRight } from "next-vibe/ui/ui/icons/ArrowRight";
-import { Code } from "next-vibe/ui/ui/icons/Code";
-import { MessageSquare } from "next-vibe/ui/ui/icons/MessageSquare";
-import { Server } from "next-vibe/ui/ui/icons/Server";
-import { TrendingUp } from "next-vibe/ui/ui/icons/TrendingUp";
-import { Link } from "next-vibe/ui/ui/link";
-import { MotionDiv } from "next-vibe/ui/ui/motion";
-import { Span } from "next-vibe/ui/ui/span";
-import { H1, H2, P } from "next-vibe/ui/ui/typography";
 import type { CSSProperties, JSX } from "react";
 import { useState } from "react";
 

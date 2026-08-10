@@ -4,31 +4,31 @@
  */
 
 "use client";
-import { storage } from "next-vibe/ui/lib/storage";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
-import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
-import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
-import { Lock } from "next-vibe/ui/ui/icons/Lock";
-import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
-import { Save } from "next-vibe/ui/ui/icons/Save";
-import { Server } from "next-vibe/ui/ui/icons/Server";
-import { Settings } from "next-vibe/ui/ui/icons/Settings";
-import { ShieldPlus } from "next-vibe/ui/ui/icons/ShieldPlus";
-import { Sparkles } from "next-vibe/ui/ui/icons/Sparkles";
-import { Wand2 } from "next-vibe/ui/ui/icons/Wand2";
-import type { InputChangeEvent } from "next-vibe/ui/ui/input";
-import { Input } from "next-vibe/ui/ui/input";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
+import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
+import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
+import { Lock } from "next-vibe/ui/components/icons/Lock";
+import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
+import { Save } from "next-vibe/ui/components/icons/Save";
+import { Server } from "next-vibe/ui/components/icons/Server";
+import { Settings } from "next-vibe/ui/components/icons/Settings";
+import { ShieldPlus } from "next-vibe/ui/components/icons/ShieldPlus";
+import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
+import { Wand2 } from "next-vibe/ui/components/icons/Wand2";
+import type { InputChangeEvent } from "next-vibe/ui/components/input";
+import { Input } from "next-vibe/ui/components/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "next-vibe/ui/ui/select";
-import { Span } from "next-vibe/ui/ui/span";
-import { Switch } from "next-vibe/ui/ui/switch";
+} from "next-vibe/ui/components/select";
+import { Span } from "next-vibe/ui/components/span";
+import { Switch } from "next-vibe/ui/components/switch";
+import { storage } from "next-vibe/ui/lib/storage";
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useState } from "react";
 

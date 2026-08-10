@@ -1,16 +1,16 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
-import type { DivMouseEvent } from "next-vibe/ui/ui/div";
-import { Div } from "next-vibe/ui/ui/div";
-import { Pause } from "next-vibe/ui/ui/icons/Pause";
-import { Play } from "next-vibe/ui/ui/icons/Play";
-import { Square } from "next-vibe/ui/ui/icons/Square";
-import { Volume2 } from "next-vibe/ui/ui/icons/Volume2";
-import { Span } from "next-vibe/ui/ui/span";
-import { Textarea } from "next-vibe/ui/ui/textarea";
-import { H3 } from "next-vibe/ui/ui/typography";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
+import type { DivMouseEvent } from "next-vibe/ui/components/div";
+import { Div } from "next-vibe/ui/components/div";
+import { Pause } from "next-vibe/ui/components/icons/Pause";
+import { Play } from "next-vibe/ui/components/icons/Play";
+import { Square } from "next-vibe/ui/components/icons/Square";
+import { Volume2 } from "next-vibe/ui/components/icons/Volume2";
+import { Span } from "next-vibe/ui/components/span";
+import { Textarea } from "next-vibe/ui/components/textarea";
+import { H3 } from "next-vibe/ui/components/typography";
 import {
   useWidgetDisabled,
   useWidgetForm,

@@ -7,11 +7,11 @@
 
 "use client";
 
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Card, CardContent } from "next-vibe/ui/ui/card";
-import { Div } from "next-vibe/ui/ui/div";
-import { Wand2 } from "next-vibe/ui/ui/icons/Wand2";
-import { Span } from "next-vibe/ui/ui/span";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Card, CardContent } from "next-vibe/ui/components/card";
+import { Div } from "next-vibe/ui/components/div";
+import { Wand2 } from "next-vibe/ui/components/icons/Wand2";
+import { Span } from "next-vibe/ui/components/span";
 
 interface GenDetailWidgetProps {
   path: string;

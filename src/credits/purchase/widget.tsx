@@ -6,34 +6,34 @@
 "use client";
 
 import { useTranslation } from "next-vibe/core/i18n/core/client";
-import { assignUrl } from "next-vibe/ui/lib/location";
-import { Button } from "next-vibe/ui/ui/button";
+import { Button } from "next-vibe/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe/ui/ui/card";
+} from "next-vibe/ui/components/card";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "next-vibe/ui/ui/dialog";
-import { Div } from "next-vibe/ui/ui/div";
-import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
-import { Bitcoin } from "next-vibe/ui/ui/icons/Bitcoin";
-import { CreditCard } from "next-vibe/ui/ui/icons/CreditCard";
-import { ExternalLink as ExternalLinkIcon } from "next-vibe/ui/ui/icons/ExternalLink";
-import { Info } from "next-vibe/ui/ui/icons/Info";
-import { Minus } from "next-vibe/ui/ui/icons/Minus";
-import { Plus } from "next-vibe/ui/ui/icons/Plus";
-import { Sparkles } from "next-vibe/ui/ui/icons/Sparkles";
-import { TrendingUp } from "next-vibe/ui/ui/icons/TrendingUp";
-import { ExternalLink } from "next-vibe/ui/ui/link";
-import { Span } from "next-vibe/ui/ui/span";
+} from "next-vibe/ui/components/dialog";
+import { Div } from "next-vibe/ui/components/div";
+import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
+import { Bitcoin } from "next-vibe/ui/components/icons/Bitcoin";
+import { CreditCard } from "next-vibe/ui/components/icons/CreditCard";
+import { ExternalLink as ExternalLinkIcon } from "next-vibe/ui/components/icons/ExternalLink";
+import { Info } from "next-vibe/ui/components/icons/Info";
+import { Minus } from "next-vibe/ui/components/icons/Minus";
+import { Plus } from "next-vibe/ui/components/icons/Plus";
+import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
+import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
+import { ExternalLink } from "next-vibe/ui/components/link";
+import { Span } from "next-vibe/ui/components/span";
+import { assignUrl } from "next-vibe/ui/lib/location";
 import {
   useWidgetForm,
   useWidgetLogger,

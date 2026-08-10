@@ -5,24 +5,24 @@
 
 "use client";
 import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { BarChart2 } from "next-vibe/ui/components/icons/BarChart2";
+import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
+import { Copy } from "next-vibe/ui/components/icons/Copy";
+import { CreditCard } from "next-vibe/ui/components/icons/CreditCard";
+import { Edit } from "next-vibe/ui/components/icons/Edit";
+import { Link } from "next-vibe/ui/components/icons/Link";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { Mail } from "next-vibe/ui/components/icons/Mail";
+import { Package } from "next-vibe/ui/components/icons/Package";
+import { Shield } from "next-vibe/ui/components/icons/Shield";
+import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
+import { User } from "next-vibe/ui/components/icons/User";
+import { XCircle } from "next-vibe/ui/components/icons/XCircle";
+import { Span } from "next-vibe/ui/components/span";
+import { P } from "next-vibe/ui/components/typography";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { BarChart2 } from "next-vibe/ui/ui/icons/BarChart2";
-import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
-import { Copy } from "next-vibe/ui/ui/icons/Copy";
-import { CreditCard } from "next-vibe/ui/ui/icons/CreditCard";
-import { Edit } from "next-vibe/ui/ui/icons/Edit";
-import { Link } from "next-vibe/ui/ui/icons/Link";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
-import { Mail } from "next-vibe/ui/ui/icons/Mail";
-import { Package } from "next-vibe/ui/ui/icons/Package";
-import { Shield } from "next-vibe/ui/ui/icons/Shield";
-import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
-import { User } from "next-vibe/ui/ui/icons/User";
-import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
-import { Span } from "next-vibe/ui/ui/span";
-import { P } from "next-vibe/ui/ui/typography";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetLocale,

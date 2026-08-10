@@ -3,8 +3,8 @@
  * Handles oxlint operations using child_process.spawn
  */
 
-import { existsSync, promises as fs } from "node:fs";
-import { cpus } from "node:os";
+import { existsSync } from "node:fs";
+import { availableParallelism } from "node:os";
 import { relative, resolve as resolvePath } from "node:path";
 
 import { buildPackageRunnerCommand, coreEnv } from "../../../../core/env";
@@ -19,7 +19,7 @@ import type { EndpointLogger } from "../../../../logger/types";
 import { Platform } from "../../../../platforms/platforms";
 import { ConfigRepositoryImpl } from "../../config/repository";
 import { sortIssuesByLocation } from "../../config/shared";
-import type { CheckConfig } from "../../config/types";
+import type { CheckConfig, StrictPathsConfig } from "../../config/types";
 import {
   calculateFilteredSummary,
   filterIssues,
@@ -38,7 +38,8 @@ export interface OxlintIssue {
 
 export interface OxlintRequestOutput {
   path?: string | string[];
-  fix: boolean;
+  /** true = rule fixes + oxfmt formatting; "lint-only" = rule fixes only. */
+  fix: boolean | "lint-only";
   timeout: number;
   skipSorting?: boolean;
   limit: number;
@@ -152,12 +153,6 @@ export class OxlintRepository {
         });
       }
 
-      // Ensure cache directory exists
-      const cacheDir = config.oxlint.enabled
-        ? config.oxlint.cachePath
-        : "./.tmp";
-      await fs.mkdir(cacheDir, { recursive: true });
-
       // Handle multiple paths - support files, folders, or mixed
       const targetPaths = effectiveData.path
         ? Array.isArray(effectiveData.path)
@@ -238,7 +233,7 @@ export class OxlintRepository {
    */
   private static async runOxlint(
     paths: string[],
-    fix: boolean,
+    fix: boolean | "lint-only",
     timeout: number,
     logger: EndpointLogger,
     config: CheckConfig,
@@ -266,41 +261,25 @@ export class OxlintRepository {
         ? extraIgnorePatterns.flatMap((p) => ["--ignore-pattern", p])
         : [];
 
-    // oxlint stands up one JavaScript runtime PER WORKER THREAD to host JS
-    // plugins, so the cost scales with core count, not with how many files are
-    // linted: on a 20-core box that is ~4.9s of pure bootstrap before any work.
-    // Measured - a do-nothing plugin costs the same as a real one, and one file
-    // costs the same as 911. Capping at 4 threads was the measured optimum
-    // (7.7x faster on a scoped run) with byte-identical diagnostics.
-    //
-    // Only applied when JS plugins are actually loaded. Native-only runs get
-    // every core, because there the thread count makes no difference and
-    // capping would cost ~11%.
-    const jsPluginCount = config.oxlint.enabled
-      ? (config.oxlint.jsPlugins?.length ?? 0)
-      : 0;
-    const threadArgs =
-      jsPluginCount > 0
-        ? [`--threads=${Math.min(cpus().length, 4)}`]
-        : ([] as string[]);
+    const threadArgs = OxlintRepository.threadArgs(config);
 
     const baseArgs = configExists
       ? [
           "--format=json",
-          ...threadArgs,
           "--config",
           oxlintConfigPath,
           "--tsconfig",
           "./tsconfig.json",
+          ...threadArgs,
           ...ignorePatternArgs,
           ...paths,
         ]
       : [
           "--format=json",
-          ...threadArgs,
           // Fallback: Enable plugins manually if no config
           "--tsconfig",
           "./tsconfig.json",
+          ...threadArgs,
           "--react-plugin",
           "--jsx-a11y-plugin",
           "--nextjs-plugin",
@@ -310,20 +289,24 @@ export class OxlintRepository {
           ...paths,
         ];
 
-    // If fix is requested, run oxlint --fix and oxfmt in parallel
-    if (fix && config.prettier.enabled) {
+    // `--fix` applies only oxlint's safe rule fixes; the oxfmt formatting pass
+    // rides along only with `fix: true` — `"lint-only"` skips it so a fix run
+    // never reformats files it did not need to touch.
+    const prettier = config.prettier;
+    if (fix === "lint-only" || (fix === true && prettier.enabled)) {
       const fixArgs = [...baseArgs, "--fix"];
 
-      // Run both oxlint --fix and oxfmt in parallel
       const [oxlintResult, oxfmtResult] = await Promise.allSettled([
         OxlintRepository.runOxlintCommand(fixArgs, timeout, logger, signal),
-        OxlintRepository.runOxfmt(
-          paths,
-          logger,
-          config.prettier.configPath,
-          config.prettier.ignoreFilePath,
-          extraIgnorePatterns,
-        ),
+        fix === true && prettier.enabled
+          ? OxlintRepository.runOxfmt(
+              paths,
+              logger,
+              prettier.configPath,
+              prettier.ignoreFilePath,
+              extraIgnorePatterns,
+            )
+          : Promise.resolve(),
       ]);
 
       // Handle oxlint result
@@ -342,12 +325,13 @@ export class OxlintRepository {
             logger,
           ),
         });
+      } else {
+        logger.error(`[OXLINT] Fix failed: ${String(oxlintResult.reason)}`);
+        return failInline({
+          message: `Oxlint check failed: ${parseError(oxlintResult.reason).message}`,
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
       }
-      logger.error(`[OXLINT] Fix failed: ${String(oxlintResult.reason)}`);
-      return failInline({
-        message: `Oxlint check failed: ${parseError(oxlintResult.reason).message}`,
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      });
     }
 
     // Just run normal check
@@ -368,6 +352,39 @@ export class OxlintRepository {
   }
 
   /**
+   * Above this, extra worker threads cost more than they buy once a JS plugin
+   * is loaded. Measured on a 20-core box, a 911-file scoped run: 4 threads
+   * 0.55s, 8 threads 1.2s, 16 threads 6.0s, 20 (the default) 5.5s. Repo-wide
+   * (4744 files) the same shape holds — 4 threads 4.2s vs 20 threads 9.1s — so
+   * this is not an artefact of a small scope.
+   */
+  private static readonly MAX_JS_PLUGIN_THREADS = 4;
+
+  /**
+   * Cap oxlint's worker threads when a JS plugin is configured.
+   *
+   * oxlint stands up one JavaScript runtime per worker thread to host JS
+   * plugins, and that spawn is what dominates a scoped run: a do-nothing
+   * plugin costs exactly as much as the real one — the time is the runtimes,
+   * not the rules. Defaulting to one per core turns a 0.3s lint into a 5s one.
+   *
+   * Native-only runs keep every core: without a JS plugin the thread count
+   * makes no measurable difference (repo-wide 3.4s at both 4 and 20 threads),
+   * so there is nothing to trade away, and no reason to constrain them.
+   */
+  private static threadArgs(config: CheckConfig): string[] {
+    const jsPlugins = config.oxlint.enabled ? config.oxlint.jsPlugins : [];
+    if (!jsPlugins || jsPlugins.length === 0) {
+      return [];
+    }
+    const threads = Math.min(
+      availableParallelism(),
+      OxlintRepository.MAX_JS_PLUGIN_THREADS,
+    );
+    return [`--threads=${threads}`];
+  }
+
+  /**
    * Bare rule name, from either form it appears in.
    *
    * A config key is `unicorn/prefer-node-protocol` or `curly`; the matching
@@ -381,13 +398,22 @@ export class OxlintRepository {
     return name.slice(name.lastIndexOf("/") + 1);
   }
 
-  /** The configured strict rules, by bare name. */
-  private static strictRuleNames(config: CheckConfig): Set<string> {
-    if (!config.oxlint.enabled) {
-      return new Set();
-    }
-    return new Set(
-      (config.oxlint.strictRules ?? []).map(OxlintRepository.bareRuleName),
+  /**
+   * The rules that `strictPaths` scopes, by bare name.
+   *
+   * Both tiers: the untyped-value bans and the style set are scoped the same
+   * way. They are separate lists in the config so each can be adopted on its
+   * own; from here the question is only "is this rule scoped or repo-wide".
+   */
+  private static bareNames(rules: string[] | undefined): Set<string> {
+    return new Set((rules ?? []).map(OxlintRepository.bareRuleName));
+  }
+
+  /** True when a file is inside a tier's include list and not opted back out. */
+  private static inPaths(file: string, paths: StrictPathsConfig): boolean {
+    return (
+      matchesAnyGlob(file, paths.include) &&
+      !matchesAnyGlob(file, paths.exclude ?? [])
     );
   }
 
@@ -424,8 +450,20 @@ export class OxlintRepository {
       return issues;
     }
 
-    const { include, exclude = [] } = strictPaths;
-    const strictRules = OxlintRepository.strictRuleNames(config);
+    // Two tiers, each with its own path list. The untyped-value bans usually
+    // reach further than the style set, so they are scoped separately; a config
+    // that omits `midPaths` gets the old single-list behaviour.
+    // Additive: omitted means "no extra trees", not "same as strict" — the OR
+    // below already gives every strict path the mid rules.
+    const midPaths: StrictPathsConfig = (config.oxlint.enabled
+      ? config.oxlint.midPaths
+      : undefined) ?? { include: [] };
+    const typeRules = OxlintRepository.bareNames(
+      config.oxlint.enabled ? config.oxlint.midRules : undefined,
+    );
+    const styleRules = OxlintRepository.bareNames(
+      config.oxlint.enabled ? config.oxlint.strictRules : undefined,
+    );
 
     const kept = issues.filter((issue) => {
       const ruleName =
@@ -437,13 +475,21 @@ export class OxlintRepository {
       // quietly swept up anything reported as a warning — the restricted-syntax
       // plugin included, so `unknown`/`object` went silent outside the whitelist
       // without anyone asking for that.
-      if (ruleName === undefined || !strictRules.has(ruleName)) {
+      if (ruleName === undefined) {
         return true;
       }
-      return (
-        matchesAnyGlob(issue.file, include) &&
-        !matchesAnyGlob(issue.file, exclude)
-      );
+      // A mid rule reports in EITHER list: strict is cumulative, so a tree that
+      // opted into the full set gets the mid rules without listing them twice.
+      if (typeRules.has(ruleName)) {
+        return (
+          OxlintRepository.inPaths(issue.file, midPaths) ||
+          OxlintRepository.inPaths(issue.file, strictPaths)
+        );
+      }
+      if (styleRules.has(ruleName)) {
+        return OxlintRepository.inPaths(issue.file, strictPaths);
+      }
+      return true;
     });
 
     const dropped = issues.length - kept.length;

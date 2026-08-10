@@ -3,22 +3,22 @@
  */
 
 "use client";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { EmptyBlock } from "next-vibe/ui/ui/empty-block";
-import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
-import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
-import { GitBranch } from "next-vibe/ui/ui/icons/GitBranch";
-import { Mail } from "next-vibe/ui/ui/icons/Mail";
-import { MessageCircle } from "next-vibe/ui/ui/icons/MessageCircle";
-import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
-import { Send } from "next-vibe/ui/ui/icons/Send";
-import { ListItem } from "next-vibe/ui/ui/list-item";
-import { LoadingBlock } from "next-vibe/ui/ui/loading-block";
-import { Span } from "next-vibe/ui/ui/span";
-import { StatusPill } from "next-vibe/ui/ui/status-pill";
-import { WidgetHeader } from "next-vibe/ui/ui/widget-header";
-import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
+import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
+import { GitBranch } from "next-vibe/ui/components/icons/GitBranch";
+import { Mail } from "next-vibe/ui/components/icons/Mail";
+import { MessageCircle } from "next-vibe/ui/components/icons/MessageCircle";
+import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
+import { Send } from "next-vibe/ui/components/icons/Send";
+import { ListItem } from "next-vibe/ui/components/list-item";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
+import { Span } from "next-vibe/ui/components/span";
+import { StatusPill } from "next-vibe/ui/components/status-pill";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {

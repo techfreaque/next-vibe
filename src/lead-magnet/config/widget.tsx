@@ -1,24 +1,24 @@
 "use client";
 
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { ArrowRight } from "next-vibe/ui/ui/icons/ArrowRight";
-import { CheckCircle2 } from "next-vibe/ui/ui/icons/CheckCircle2";
-import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
-import { Mail } from "next-vibe/ui/ui/icons/Mail";
-import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
+import { CheckCircle2 } from "next-vibe/ui/components/icons/CheckCircle2";
+import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { Mail } from "next-vibe/ui/components/icons/Mail";
+import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "next-vibe/ui/ui/select";
-import { Span } from "next-vibe/ui/ui/span";
-import { P } from "next-vibe/ui/ui/typography";
-import { WidgetHeader } from "next-vibe/ui/ui/widget-header";
-import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
+} from "next-vibe/ui/components/select";
+import { Span } from "next-vibe/ui/components/span";
+import { P } from "next-vibe/ui/components/typography";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
   useWidgetContext,
   useWidgetLocale,

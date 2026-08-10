@@ -7,8 +7,6 @@
 
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { success } from "next-vibe/core/route/response.schema";
-import { useSilentHistory } from "next-vibe/ui/hooks/use-navigation";
-import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,10 +16,10 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "next-vibe/ui/ui/alert-dialog";
-import { Button } from "next-vibe/ui/ui/button";
-import type { DivMouseEvent } from "next-vibe/ui/ui/div";
-import { Div } from "next-vibe/ui/ui/div";
+} from "next-vibe/ui/components/alert-dialog";
+import { Button } from "next-vibe/ui/components/button";
+import type { DivMouseEvent } from "next-vibe/ui/components/div";
+import { Div } from "next-vibe/ui/components/div";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,27 +29,29 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "next-vibe/ui/ui/dropdown-menu";
-import { Archive } from "next-vibe/ui/ui/icons/Archive";
-import { ArchiveRestore } from "next-vibe/ui/ui/icons/ArchiveRestore";
-import { Edit2 } from "next-vibe/ui/ui/icons/Edit2";
-import { FolderInput } from "next-vibe/ui/ui/icons/FolderInput";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
-import { MoreVertical } from "next-vibe/ui/ui/icons/MoreVertical";
-import { Pin } from "next-vibe/ui/ui/icons/Pin";
-import { PinOff } from "next-vibe/ui/ui/icons/PinOff";
-import { Share2 } from "next-vibe/ui/ui/icons/Share2";
-import { Shield } from "next-vibe/ui/ui/icons/Shield";
-import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
-import type { InputKeyboardEvent } from "next-vibe/ui/ui/input";
-import { Input } from "next-vibe/ui/ui/input";
+} from "next-vibe/ui/components/dropdown-menu";
+import { Archive } from "next-vibe/ui/components/icons/Archive";
+import { ArchiveRestore } from "next-vibe/ui/components/icons/ArchiveRestore";
+import { Edit2 } from "next-vibe/ui/components/icons/Edit2";
+import { FolderInput } from "next-vibe/ui/components/icons/FolderInput";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { MoreVertical } from "next-vibe/ui/components/icons/MoreVertical";
+import { Pin } from "next-vibe/ui/components/icons/Pin";
+import { PinOff } from "next-vibe/ui/components/icons/PinOff";
+import { Share2 } from "next-vibe/ui/components/icons/Share2";
+import { Shield } from "next-vibe/ui/components/icons/Shield";
+import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
+import type { InputKeyboardEvent } from "next-vibe/ui/components/input";
+import { Input } from "next-vibe/ui/components/input";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe/ui/ui/tooltip";
-import { P } from "next-vibe/ui/ui/typography";
+} from "next-vibe/ui/components/tooltip";
+import { P } from "next-vibe/ui/components/typography";
+import { useSilentHistory } from "next-vibe/ui/hooks/use-navigation";
+import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {

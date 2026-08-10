@@ -15,46 +15,46 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { ScheduleAutocomplete } from "next-vibe/tasks/cron/[id]/widget/schedule-autocomplete";
 import taskExecuteEndpoints from "next-vibe/tasks/execute/definition";
-import { useRouter } from "next-vibe/ui/hooks/use-navigation";
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { Bot } from "next-vibe/ui/ui/icons/Bot";
-import { Brain } from "next-vibe/ui/ui/icons/Brain";
-import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
-import { DollarSign } from "next-vibe/ui/ui/icons/DollarSign";
-import { ExternalLink } from "next-vibe/ui/ui/icons/ExternalLink";
-import { Globe } from "next-vibe/ui/ui/icons/Globe";
-import { Info } from "next-vibe/ui/ui/icons/Info";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
-import { Monitor } from "next-vibe/ui/ui/icons/Monitor";
-import { Moon } from "next-vibe/ui/ui/icons/Moon";
-import { Play } from "next-vibe/ui/ui/icons/Play";
-import { RotateCcw } from "next-vibe/ui/ui/icons/RotateCcw";
-import { Settings } from "next-vibe/ui/ui/icons/Settings";
-import { Link } from "next-vibe/ui/ui/link";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { Bot } from "next-vibe/ui/components/icons/Bot";
+import { Brain } from "next-vibe/ui/components/icons/Brain";
+import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
+import { DollarSign } from "next-vibe/ui/components/icons/DollarSign";
+import { ExternalLink } from "next-vibe/ui/components/icons/ExternalLink";
+import { Globe } from "next-vibe/ui/components/icons/Globe";
+import { Info } from "next-vibe/ui/components/icons/Info";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { Monitor } from "next-vibe/ui/components/icons/Monitor";
+import { Moon } from "next-vibe/ui/components/icons/Moon";
+import { Play } from "next-vibe/ui/components/icons/Play";
+import { RotateCcw } from "next-vibe/ui/components/icons/RotateCcw";
+import { Settings } from "next-vibe/ui/components/icons/Settings";
+import { Link } from "next-vibe/ui/components/link";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "next-vibe/ui/ui/select";
+} from "next-vibe/ui/components/select";
 import {
   Slider,
   SliderRange,
   SliderThumb,
   SliderTrack,
-} from "next-vibe/ui/ui/slider";
-import { Span } from "next-vibe/ui/ui/span";
-import { Switch } from "next-vibe/ui/ui/switch";
-import { Textarea } from "next-vibe/ui/ui/textarea";
+} from "next-vibe/ui/components/slider";
+import { Span } from "next-vibe/ui/components/span";
+import { Switch } from "next-vibe/ui/components/switch";
+import { Textarea } from "next-vibe/ui/components/textarea";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe/ui/ui/tooltip";
+} from "next-vibe/ui/components/tooltip";
+import { useRouter } from "next-vibe/ui/hooks/use-navigation";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetLocale,

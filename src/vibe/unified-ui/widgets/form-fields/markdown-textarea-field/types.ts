@@ -3,7 +3,7 @@
  * WYSIWYG rich text editor with toolbar and optional markdown preview
  */
 
-import type { ToolbarAction } from "next-vibe/ui/ui/markdown-editor";
+import type { ToolbarAction } from "next-vibe/ui/components/markdown-editor";
 
 import type { FieldDataType } from "../../../../core/definition/enums";
 import type { StringWidgetSchema } from "../../../_shared/schema-constraints";

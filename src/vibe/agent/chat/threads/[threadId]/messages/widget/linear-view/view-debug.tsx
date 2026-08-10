@@ -1,7 +1,7 @@
 "use client";
-import { Div } from "next-vibe/ui/ui/div";
-import { ErrorBoundary } from "next-vibe/ui/ui/error-boundary";
-import { Markdown } from "next-vibe/ui/ui/markdown";
+import { Div } from "next-vibe/ui/components/div";
+import { ErrorBoundary } from "next-vibe/ui/components/error-boundary";
+import { Markdown } from "next-vibe/ui/components/markdown";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import type { JSX } from "react";

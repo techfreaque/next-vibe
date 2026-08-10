@@ -9,10 +9,10 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "next-vibe/ui/ui/dialog";
-import { Maximize } from "next-vibe/ui/ui/icons/Maximize";
-import { Zap } from "next-vibe/ui/ui/icons/Zap";
-import { Link } from "next-vibe/ui/ui/link";
+} from "next-vibe/ui/components/dialog";
+import { Maximize } from "next-vibe/ui/components/icons/Maximize";
+import { Zap } from "next-vibe/ui/components/icons/Zap";
+import { Link } from "next-vibe/ui/components/link";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 

@@ -1,9 +1,9 @@
 "use client";
 
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
-import { Span } from "next-vibe/ui/ui/span";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
+import { Span } from "next-vibe/ui/components/span";
 import {
   useWidgetLocale,
   useWidgetNavigation,

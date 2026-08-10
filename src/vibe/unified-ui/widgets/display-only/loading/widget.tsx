@@ -1,8 +1,8 @@
 "use client";
-import { Div } from "next-vibe/ui/ui/div";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
-import { Progress } from "next-vibe/ui/ui/progress";
-import { Span } from "next-vibe/ui/ui/span";
+import { Div } from "next-vibe/ui/components/div";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { Progress } from "next-vibe/ui/components/progress";
+import { Span } from "next-vibe/ui/components/span";
 import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";

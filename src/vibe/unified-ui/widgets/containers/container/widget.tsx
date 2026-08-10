@@ -1,18 +1,18 @@
 "use client";
-import { Button } from "next-vibe/ui/ui/button";
+import { Button } from "next-vibe/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe/ui/ui/card";
-import { Div } from "next-vibe/ui/ui/div";
+} from "next-vibe/ui/components/card";
+import { Div } from "next-vibe/ui/components/div";
 import {
   FormAlert,
   type FormAlertState,
-} from "next-vibe/ui/ui/form/form-alert";
-import { H1, P } from "next-vibe/ui/ui/typography";
+} from "next-vibe/ui/components/form/form-alert";
+import { H1, P } from "next-vibe/ui/components/typography";
 import { type JSX } from "react";
 import type { Path } from "react-hook-form";
 import { useWatch } from "react-hook-form";

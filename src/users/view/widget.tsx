@@ -7,32 +7,31 @@
 
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
-import { Button } from "next-vibe/ui/ui/button";
-import { DetailField, DetailGrid } from "next-vibe/ui/ui/detail-grid";
-import { Div } from "next-vibe/ui/ui/div";
-import { EmptyBlock } from "next-vibe/ui/ui/empty-block";
-import { Activity } from "next-vibe/ui/ui/icons/Activity";
-import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
-import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
-import { Coins } from "next-vibe/ui/ui/icons/Coins";
-import { Copy } from "next-vibe/ui/ui/icons/Copy";
-import { DollarSign } from "next-vibe/ui/ui/icons/DollarSign";
-import { Mail } from "next-vibe/ui/ui/icons/Mail";
-import { MessageSquare } from "next-vibe/ui/ui/icons/MessageSquare";
-import { Pencil } from "next-vibe/ui/ui/icons/Pencil";
-import { Shield } from "next-vibe/ui/ui/icons/Shield";
-import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
-import { User } from "next-vibe/ui/ui/icons/User";
-import { Users } from "next-vibe/ui/ui/icons/Users";
-import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
-import { ListItem } from "next-vibe/ui/ui/list-item";
-import { LoadingBlock } from "next-vibe/ui/ui/loading-block";
-import { MetricCard } from "next-vibe/ui/ui/metric-card";
-import { MetricGrid } from "next-vibe/ui/ui/metric-grid";
-import { SectionGroup } from "next-vibe/ui/ui/section-group";
-import { Span } from "next-vibe/ui/ui/span";
-import { StatusPill } from "next-vibe/ui/ui/status-pill";
+import { Button } from "next-vibe/ui/components/button";
+import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
+import { Div } from "next-vibe/ui/components/div";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
+import { Activity } from "next-vibe/ui/components/icons/Activity";
+import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
+import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
+import { Coins } from "next-vibe/ui/components/icons/Coins";
+import { Copy } from "next-vibe/ui/components/icons/Copy";
+import { DollarSign } from "next-vibe/ui/components/icons/DollarSign";
+import { Mail } from "next-vibe/ui/components/icons/Mail";
+import { MessageSquare } from "next-vibe/ui/components/icons/MessageSquare";
+import { Pencil } from "next-vibe/ui/components/icons/Pencil";
+import { Shield } from "next-vibe/ui/components/icons/Shield";
+import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
+import { User } from "next-vibe/ui/components/icons/User";
+import { Users } from "next-vibe/ui/components/icons/Users";
+import { XCircle } from "next-vibe/ui/components/icons/XCircle";
+import { ListItem } from "next-vibe/ui/components/list-item";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
+import { MetricCard } from "next-vibe/ui/components/metric-card";
+import { MetricGrid } from "next-vibe/ui/components/metric-grid";
+import { SectionGroup } from "next-vibe/ui/components/section-group";
+import { Span } from "next-vibe/ui/components/span";
+import { StatusPill } from "next-vibe/ui/components/status-pill";
 import {
   Table,
   TableBody,
@@ -40,10 +39,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "next-vibe/ui/ui/table";
-import { P } from "next-vibe/ui/ui/typography";
-import { WidgetHeader } from "next-vibe/ui/ui/widget-header";
-import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
+} from "next-vibe/ui/components/table";
+import { P } from "next-vibe/ui/components/typography";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
+import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import {
   useWidgetContext,
   useWidgetLocale,

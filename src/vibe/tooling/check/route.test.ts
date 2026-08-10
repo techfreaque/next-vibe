@@ -770,7 +770,14 @@ describe("Compiled Runtime", () => {
 // LSP DAEMON API — direct TsgoDaemon tests
 // ============================================================
 
-const TSGO_PATH = join(ROOT_PATH, "node_modules/.bin/tsgo");
+// Platform-aware, mirroring findTsgo() in repository/typecheck/repository.ts:
+// bun ships the shim as tsgo.exe on Windows, so the bare POSIX name resolves to
+// nothing there and every daemon spawn fails before it can speak LSP.
+const TSGO_PATH = join(
+  ROOT_PATH,
+  "node_modules/.bin",
+  process.platform === "win32" ? "tsgo.exe" : "tsgo",
+);
 const LSP_PID_PATH = join(ROOT_PATH, ".tmp/tsgo-lsp-spec.pid");
 
 const TYPE_ERRORS_KNOWN: Array<{ line: number; code: string }> = [

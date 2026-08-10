@@ -4,20 +4,20 @@
  */
 
 "use client";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { Activity } from "next-vibe/ui/ui/icons/Activity";
-import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
-import { BarChart3 } from "next-vibe/ui/ui/icons/BarChart3";
-import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
-import { Clock } from "next-vibe/ui/ui/icons/Clock";
-import { List } from "next-vibe/ui/ui/icons/List";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
-import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
-import { TrendingDown } from "next-vibe/ui/ui/icons/TrendingDown";
-import { TrendingUp } from "next-vibe/ui/ui/icons/TrendingUp";
-import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
-import { Span } from "next-vibe/ui/ui/span";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { Activity } from "next-vibe/ui/components/icons/Activity";
+import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
+import { BarChart3 } from "next-vibe/ui/components/icons/BarChart3";
+import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
+import { Clock } from "next-vibe/ui/components/icons/Clock";
+import { List } from "next-vibe/ui/components/icons/List";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
+import { TrendingDown } from "next-vibe/ui/components/icons/TrendingDown";
+import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
+import { XCircle } from "next-vibe/ui/components/icons/XCircle";
+import { Span } from "next-vibe/ui/components/span";
 import React, { useCallback, useMemo } from "react";
 
 import { cn } from "../../../unified-ui/_shared/cn";

@@ -12,9 +12,9 @@ import generateAllEndpoints from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: generateAllEndpoints,
   [Methods.POST]: {
-    handler: async ({ data, logger }) =>
+    handler: async ({ data, logger, user }) =>
       (
         await import(/* @vite-ignore */ "./repository")
-      ).GenerateAllRepository.generateAll(data, logger),
+      ).GenerateAllRepository.generateAll(data, logger, user),
   },
 });

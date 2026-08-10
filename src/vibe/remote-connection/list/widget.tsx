@@ -8,35 +8,35 @@
 
 "use client";
 
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe/ui/ui/card";
-import { Div } from "next-vibe/ui/ui/div";
-import { Activity } from "next-vibe/ui/ui/icons/Activity";
-import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
-import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
-import { ArrowRight } from "next-vibe/ui/ui/icons/ArrowRight";
-import { CheckCircle2 } from "next-vibe/ui/ui/icons/CheckCircle2";
-import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
-import { Link2 } from "next-vibe/ui/ui/icons/Link2";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
-import { Pencil } from "next-vibe/ui/ui/icons/Pencil";
-import { Plus } from "next-vibe/ui/ui/icons/Plus";
-import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
-import { SiGithub } from "next-vibe/ui/ui/icons/SiGithub";
-import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
-import { WifiOff } from "next-vibe/ui/ui/icons/WifiOff";
-import { Link } from "next-vibe/ui/ui/link";
-import { Separator } from "next-vibe/ui/ui/separator";
-import { Span } from "next-vibe/ui/ui/span";
-import { H3, P } from "next-vibe/ui/ui/typography";
-import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
+} from "next-vibe/ui/components/card";
+import { Div } from "next-vibe/ui/components/div";
+import { Activity } from "next-vibe/ui/components/icons/Activity";
+import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
+import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
+import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
+import { CheckCircle2 } from "next-vibe/ui/components/icons/CheckCircle2";
+import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
+import { Link2 } from "next-vibe/ui/components/icons/Link2";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { Pencil } from "next-vibe/ui/components/icons/Pencil";
+import { Plus } from "next-vibe/ui/components/icons/Plus";
+import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
+import { SiGithub } from "next-vibe/ui/components/icons/SiGithub";
+import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
+import { WifiOff } from "next-vibe/ui/components/icons/WifiOff";
+import { Link } from "next-vibe/ui/components/link";
+import { Separator } from "next-vibe/ui/components/separator";
+import { Span } from "next-vibe/ui/components/span";
+import { H3, P } from "next-vibe/ui/components/typography";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import type { JSX } from "react";
 import { useState } from "react";
 

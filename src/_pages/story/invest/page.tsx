@@ -5,8 +5,8 @@ import type { Metadata } from "next";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
-import { Container } from "next-vibe/ui/ui/container";
-import { Div } from "next-vibe/ui/ui/div";
+import { Container } from "next-vibe/ui/components/container";
+import { Div } from "next-vibe/ui/components/div";
 import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";

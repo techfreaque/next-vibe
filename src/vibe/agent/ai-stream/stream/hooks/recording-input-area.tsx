@@ -6,18 +6,18 @@
  * Used by both ChatInput and MessageEditor
  */
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { AudioWaveform } from "next-vibe/ui/ui/audio-waveform";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { Download } from "next-vibe/ui/ui/icons/Download";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
-import { Pause } from "next-vibe/ui/ui/icons/Pause";
-import { Play } from "next-vibe/ui/ui/icons/Play";
-import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
-import { Send } from "next-vibe/ui/ui/icons/Send";
-import { Type } from "next-vibe/ui/ui/icons/Type";
-import { X } from "next-vibe/ui/ui/icons/X";
-import { Span } from "next-vibe/ui/ui/span";
+import { AudioWaveform } from "next-vibe/ui/components/audio-waveform";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { Download } from "next-vibe/ui/components/icons/Download";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { Pause } from "next-vibe/ui/components/icons/Pause";
+import { Play } from "next-vibe/ui/components/icons/Play";
+import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
+import { Send } from "next-vibe/ui/components/icons/Send";
+import { Type } from "next-vibe/ui/components/icons/Type";
+import { X } from "next-vibe/ui/components/icons/X";
+import { Span } from "next-vibe/ui/components/span";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 

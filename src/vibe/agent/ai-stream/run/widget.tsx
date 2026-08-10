@@ -14,30 +14,30 @@ import { platform } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import helpDefinitions from "next-vibe/help-tool/definition";
 import { Platform } from "next-vibe/platforms/platforms";
-import type { AutocompleteOption } from "next-vibe/ui/ui/autocomplete-field";
-import { AutocompleteField } from "next-vibe/ui/ui/autocomplete-field";
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div, type DivRefObject } from "next-vibe/ui/ui/div";
-import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
-import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
-import { FileText } from "next-vibe/ui/ui/icons/FileText";
-import { Plus } from "next-vibe/ui/ui/icons/Plus";
-import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
-import { Zap } from "next-vibe/ui/ui/icons/Zap";
+import type { AutocompleteOption } from "next-vibe/ui/components/autocomplete-field";
+import { AutocompleteField } from "next-vibe/ui/components/autocomplete-field";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
+import { Div, type DivRefObject } from "next-vibe/ui/components/div";
+import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
+import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
+import { FileText } from "next-vibe/ui/components/icons/FileText";
+import { Plus } from "next-vibe/ui/components/icons/Plus";
+import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
+import { Zap } from "next-vibe/ui/components/icons/Zap";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "next-vibe/ui/ui/popover";
-import { Span } from "next-vibe/ui/ui/span";
+} from "next-vibe/ui/components/popover";
+import { Span } from "next-vibe/ui/components/span";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe/ui/ui/tooltip";
-import { P } from "next-vibe/ui/ui/typography";
+} from "next-vibe/ui/components/tooltip";
+import { P } from "next-vibe/ui/components/typography";
 import {
   useWidgetDisabled,
   useWidgetForm,

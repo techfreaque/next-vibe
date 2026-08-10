@@ -3,16 +3,16 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
-import { Button } from "next-vibe/ui/ui/button";
+import { Button } from "next-vibe/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "next-vibe/ui/ui/dropdown-menu";
-import { Check } from "next-vibe/ui/ui/icons/Check";
-import { Copy } from "next-vibe/ui/ui/icons/Copy";
+} from "next-vibe/ui/components/dropdown-menu";
+import { Check } from "next-vibe/ui/components/icons/Check";
+import { Copy } from "next-vibe/ui/components/icons/Copy";
+import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import type { JSX } from "react";
 import { useState } from "react";
 

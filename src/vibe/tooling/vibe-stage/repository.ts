@@ -9,8 +9,10 @@
  *  2. Generated/fixture deletions — removed from the index.
  *  3. Boilerplate candidates (route.ts, i18n/{en,de,pl}/index.ts) that pass the
  *     boilerplate oxlint plugin with 0 violations, and generated output.
- *  4. Import-only changes — static AND dynamic `import(...)` edits — staged in
- *     full, or partially (import hunks only) for files that also carry real code.
+ *  4. Import-only changes — static AND dynamic `import(...)` edits, and
+ *     re-exports (`export { ... } from "..."`, `export * from "..."`,
+ *     `export type { ... } from "..."`) — staged in full, or partially
+ *     (import hunks only) for files that also carry real code.
  *  5. definition.ts `path: [...]` line changes inside `createEndpoint()` — the
  *     path array is purely declarative metadata; changes here are always safe.
  *  6. camelCase identifier renames — a -/+ line pair identical except for
@@ -155,9 +157,23 @@ const SUPPRESSION_PATTERN =
 const IMPORT_START_PATTERN =
   /^import\s*(?:type\s+)?(?:\{|"[^"]*"|'[^']*'|\*|\w)/;
 
-// Matches the closing line of a multi-line import: `} from "..."` or `} from '...'`
+// Matches the closing line of a multi-line import or re-export: `} from "..."` or `} from '...'`
 // Also handles `} from "..."` with optional trailing semicolon/comment.
 const IMPORT_CLOSE_PATTERN = /^}\s*from\s+["'`]/;
+
+// Matches a re-export opener: `export { ...` or `export type { ...`
+// Used for both single-line (`export { Foo } from "..."`) and multi-line openers.
+const REEXPORT_OPENER_PATTERN = /^export\s+(?:type\s+)?\{/;
+
+// Detects whether a `} from "..."` closer already appears on the same line as a
+// re-export opener (single-line form: `export { Foo } from "..."`).  When absent
+// the opener is multi-line and we must enter `inside` state.
+const REEXPORT_HAS_CLOSE_PATTERN = /\}\s*from\s+["'`]/;
+
+// Star re-export (always single-line): `export * from "..."` /
+// `export * as X from "..."` / `export type * from "..."`
+const REEXPORT_STAR_PATTERN =
+  /^export\s+(?:type\s+)?\*(?:\s+as\s+[\w$]+)?\s+from\s+["'`]/;
 
 // Matches a dynamic `import("literal")` call line. The line must START with the
 // call after an optional binding/return/await prefix — an `import()` used as a
@@ -197,17 +213,21 @@ const DYNAMIC_IMPORT_CLOSE_PATTERN =
 
 /**
  * Returns true if a raw diff content line (sigil already stripped, NOT trimmed)
- * belongs to an import statement. Tracks open-brace state across lines via `state`.
+ * belongs to an import statement or a re-export statement.
+ * Tracks open-brace state across lines via `state`.
  *
  * Key design decisions:
  *  - Lines are NOT trimStart()'d — indentation is used by IMPORT_CLOSE_PATTERN and
  *    is present in real diff output.
- *  - When inside a multi-line `import { ... }` block, every line is accepted until
- *    `} from "..."` closes it — this covers identifiers, `type Foo,`, blank lines,
- *    trailing commas, and inline comments safely.
- *  - `inside` only becomes true after a confirmed `import {` opener that has no
- *    closing `}` on the same line — so false-positives require the unusual pattern
- *    of `} from "..."` appearing as a changed line in non-import code.
+ *  - When inside a multi-line `import { ... }` or `export { ... } from "..."` block,
+ *    every line is accepted until `} from "..."` closes it — this covers identifiers,
+ *    `type Foo,`, blank lines, trailing commas, and inline comments safely.
+ *  - `inside` only becomes true after a confirmed opener that has no closing `}`
+ *    on the same line — so false-positives require the unusual pattern of
+ *    `} from "..."` appearing as a changed line in non-import code.
+ *  - Re-exports (`export { } from`, `export * from`, `export type * from`) are
+ *    treated identically to import statements — they are module-boundary
+ *    declarations with no runtime logic.
  */
 function isImportLine(
   line: string,
@@ -275,6 +295,24 @@ function isImportLine(
     // Enter multi-line state when `{` is opened but not yet closed on this line.
     const afterImport = line.replace(/^import\s*(?:type\s+)?/, "");
     if (afterImport.includes("{") && !afterImport.includes("}")) {
+      state.inside = true;
+    }
+    return true;
+  }
+
+  // Star re-export (always single-line): `export * from "..."` / `export * as X from "..."`
+  if (REEXPORT_STAR_PATTERN.test(line)) {
+    return true;
+  }
+
+  // Re-export brace block: `export { Foo } from "..."` (single-line complete) or
+  // `export {` / `export type {` opener for a multi-line block.
+  if (REEXPORT_OPENER_PATTERN.test(line)) {
+    // Single-line: `export { Foo } from "..."` — `}` and `from` are already on this
+    // line, so no multi-line state is needed.
+    if (!REEXPORT_HAS_CLOSE_PATTERN.test(line)) {
+      // Multi-line opener without `} from` on same line → enter inside state.
+      // The block will be closed by a `} from "..."` line (IMPORT_CLOSE_PATTERN).
       state.inside = true;
     }
     return true;
@@ -364,6 +402,14 @@ function isMidBlockImportLine(line: string): boolean {
     return true;
   }
   if (IMPORT_START_PATTERN.test(line)) {
+    return true;
+  }
+  // Re-export openers are valid within a mid-block context (e.g. a batch of
+  // re-exports where the `} from "..."` closer is visible in the same hunk).
+  if (
+    REEXPORT_OPENER_PATTERN.test(trimmed) ||
+    REEXPORT_STAR_PATTERN.test(trimmed)
+  ) {
     return true;
   }
   if (/^\s/.test(line)) {

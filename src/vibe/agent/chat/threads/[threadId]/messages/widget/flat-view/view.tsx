@@ -8,10 +8,10 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { Div } from "next-vibe/ui/components/div";
+import { ErrorBoundary } from "next-vibe/ui/components/error-boundary";
 import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import { getElementById } from "next-vibe/ui/lib/dom";
-import { Div } from "next-vibe/ui/ui/div";
-import { ErrorBoundary } from "next-vibe/ui/ui/error-boundary";
 import type { JSX } from "react";
 import React, { useCallback, useMemo, useState } from "react";
 

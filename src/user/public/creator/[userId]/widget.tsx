@@ -1,13 +1,17 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "next-vibe/ui/ui/avatar";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { Input } from "next-vibe/ui/ui/input";
-import { Link } from "next-vibe/ui/ui/link";
-import { Nav } from "next-vibe/ui/ui/nav";
-import { Span } from "next-vibe/ui/ui/span";
-import { H2, P } from "next-vibe/ui/ui/typography";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "next-vibe/ui/components/avatar";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { Input } from "next-vibe/ui/components/input";
+import { Link } from "next-vibe/ui/components/link";
+import { Nav } from "next-vibe/ui/components/nav";
+import { Span } from "next-vibe/ui/components/span";
+import { H2, P } from "next-vibe/ui/components/typography";
 import { useCallback, useMemo, useState, type JSX } from "react";
 
 import { buildScopedPaletteStyle } from "@/_pages/creator/[userId]/_shared/palette-generator";
@@ -33,7 +37,7 @@ import { useWidgetValue } from "next-vibe/unified-ui/_shared/use-widget-value";
 
 import { useProviderAvailability } from "next-vibe/agent/env-availability-store";
 
-import { GET } from "./definition";
+import type { GET } from "./definition";
 import { scopedTranslation } from "./i18n";
 
 type CaptureState = "idle" | "submitting" | "done" | "error";

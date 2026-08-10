@@ -5,28 +5,28 @@
  */
 
 "use client";
-import { storage } from "next-vibe/ui/lib/storage";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
-import { Check } from "next-vibe/ui/ui/icons/Check";
-import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
-import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
-import { Cloud } from "next-vibe/ui/ui/icons/Cloud";
-import { LogIn } from "next-vibe/ui/ui/icons/LogIn";
-import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
-import { ShieldPlus } from "next-vibe/ui/ui/icons/ShieldPlus";
-import type { InputChangeEvent } from "next-vibe/ui/ui/input";
-import { Input } from "next-vibe/ui/ui/input";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
+import { Check } from "next-vibe/ui/components/icons/Check";
+import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
+import { Cloud } from "next-vibe/ui/components/icons/Cloud";
+import { LogIn } from "next-vibe/ui/components/icons/LogIn";
+import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
+import { ShieldPlus } from "next-vibe/ui/components/icons/ShieldPlus";
+import type { InputChangeEvent } from "next-vibe/ui/components/input";
+import { Input } from "next-vibe/ui/components/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "next-vibe/ui/ui/select";
-import { Span } from "next-vibe/ui/ui/span";
-import { Switch } from "next-vibe/ui/ui/switch";
+} from "next-vibe/ui/components/select";
+import { Span } from "next-vibe/ui/components/span";
+import { Switch } from "next-vibe/ui/components/switch";
+import { storage } from "next-vibe/ui/lib/storage";
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useState } from "react";
 

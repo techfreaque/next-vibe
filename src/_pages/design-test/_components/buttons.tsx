@@ -1,17 +1,20 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { Check } from "next-vibe/ui/ui/icons/Check";
-import { Heart } from "next-vibe/ui/ui/icons/Heart";
-import { Mail } from "next-vibe/ui/ui/icons/Mail";
-import { Plus } from "next-vibe/ui/ui/icons/Plus";
-import { Search } from "next-vibe/ui/ui/icons/Search";
-import { Star } from "next-vibe/ui/ui/icons/Star";
-import { Section } from "next-vibe/ui/ui/section";
-import { Toggle } from "next-vibe/ui/ui/toggle";
-import { ToggleGroup, ToggleGroupItem } from "next-vibe/ui/ui/toggle-group";
-import { H2, H3 } from "next-vibe/ui/ui/typography";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { Check } from "next-vibe/ui/components/icons/Check";
+import { Heart } from "next-vibe/ui/components/icons/Heart";
+import { Mail } from "next-vibe/ui/components/icons/Mail";
+import { Plus } from "next-vibe/ui/components/icons/Plus";
+import { Search } from "next-vibe/ui/components/icons/Search";
+import { Star } from "next-vibe/ui/components/icons/Star";
+import { Section } from "next-vibe/ui/components/section";
+import { Toggle } from "next-vibe/ui/components/toggle";
+import {
+  ToggleGroup,
+  ToggleGroupItem,
+} from "next-vibe/ui/components/toggle-group";
+import { H2, H3 } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 
 export function ButtonsPreview(): JSX.Element {

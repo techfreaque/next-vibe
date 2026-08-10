@@ -28,6 +28,18 @@ import { parseError } from "../../../../../core/utils/parse-error";
 import { shouldUseColors } from "../../../../../logger/colors";
 import type { EndpointLogger } from "../../../../../logger/types";
 
+/**
+ * Width of a rendered line in terminal COLUMNS, not UTF-16 code units.
+ *
+ * Border width must be measured in terminal columns: rendered output already
+ * carries the children's ANSI colour codes (zero columns but many bytes) and
+ * may contain wide glyphs, so raw `.length` skews the right border away from
+ * the text it is supposed to box.
+ */
+function displayWidth(line: string): number {
+  return stringWidth(stripAnsi(line));
+}
+
 // NoEventPriority is available at runtime but not in type definitions
 const NoEventPriority = 0;
 
@@ -708,11 +720,6 @@ function renderBox(node: RenderNode): string {
     const borderRight = props.borderRight ?? true;
 
     const lines = output.split("\n");
-    // Border width must be measured in terminal columns, not UTF-16 code units:
-    // `output` already carries the children's ANSI colour codes (zero columns
-    // but many bytes) and may contain wide glyphs, so raw .length skews the
-    // right border away from the text it is supposed to box.
-    const displayWidth = (line: string): number => stringWidth(stripAnsi(line));
     const maxWidth = Math.max(...lines.map(displayWidth), 0);
 
     // Get border characters based on style

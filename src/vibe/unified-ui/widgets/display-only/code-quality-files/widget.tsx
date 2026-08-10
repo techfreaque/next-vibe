@@ -4,9 +4,9 @@
  * Displays list of files with error/warning counts
  */
 
-import { Div } from "next-vibe/ui/ui/div";
-import { Span } from "next-vibe/ui/ui/span";
-import { H3 } from "next-vibe/ui/ui/typography";
+import { Div } from "next-vibe/ui/components/div";
+import { Span } from "next-vibe/ui/components/span";
+import { H3 } from "next-vibe/ui/components/typography";
 import type { ReactElement } from "react";
 import type { z } from "zod";
 

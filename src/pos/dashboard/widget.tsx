@@ -1,11 +1,11 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { Monitor } from "next-vibe/ui/ui/icons/Monitor";
-import { ShoppingCart } from "next-vibe/ui/ui/icons/ShoppingCart";
-import { Span } from "next-vibe/ui/ui/span";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { Monitor } from "next-vibe/ui/components/icons/Monitor";
+import { ShoppingCart } from "next-vibe/ui/components/icons/ShoppingCart";
+import { Span } from "next-vibe/ui/components/span";
 import {
   useWidgetLocale,
   useWidgetNavigation,

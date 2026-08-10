@@ -13,9 +13,9 @@ import { UserRole } from "next-vibe/identity/roles/enum";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
+import { Div } from "next-vibe/ui/components/div";
+import { P } from "next-vibe/ui/components/typography";
 import { redirect } from "next-vibe/ui/lib/redirect";
-import { Div } from "next-vibe/ui/ui/div";
-import { P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 
 import { scopedTranslation } from "@/_pages/shared/i18n";

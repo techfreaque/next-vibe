@@ -19,12 +19,13 @@ import { pathToFileURL } from "node:url";
 import { GENERATED_DIR, getApiDir } from "@/env/paths";
 import type { GeneratorEntry } from "@/generated/generators/index";
 
+import type { JwtPayloadType } from "../../identity/auth/types";
 import { createEndpointLogger } from "../../logger/server";
 import type { EndpointLogger } from "../../logger/types";
 import {
+  type ResponseType as BaseResponseType,
   ErrorResponseTypes,
   failInline,
-  type ResponseType as BaseResponseType,
   success,
 } from "../route/response.schema";
 import { parseError } from "../utils/parse-error";
@@ -57,6 +58,21 @@ interface RunGeneratorsOptions {
   live?: GeneratorInputIndex;
   only?: ReadonlySet<string>;
   noCache?: boolean;
+  /**
+   * Live progress tap. Called with a fresh snapshot of every phase row each
+   * time one changes state (queued → running → done/skipped/failed). The
+   * endpoint handler forwards these as "gen-progress" events; the bootstrap
+   * CLI entry passes nothing and stays silent.
+   */
+  onProgress?: (phases: GenPhase[]) => void;
+}
+
+/** One generator's progress row. `id` keys the cache-merger's array merge. */
+export interface GenPhase {
+  id: string;
+  status: "pending" | "running" | "done" | "failed" | "skipped";
+  summary?: string;
+  durationMs?: number;
 }
 
 interface RunGeneratorsResult {
@@ -64,11 +80,59 @@ interface RunGeneratorsResult {
   skipped: string[];
   failed: { key: string; error: string }[];
   output: string[];
+  /** Final phase rows — the same data the progress events carried. */
+  phases: GenPhase[];
   /**
    * Size of the generated registry. Reported from the run rather than read off a
    * static `REGISTRY` getter, because the registry is now loaded inside the run.
    */
   totalGenerators: number;
+}
+
+/** Cache key AND phase-row id of the generators-index pre-step. */
+const GENERATORS_INDEX_KEY = "generators-index";
+
+/**
+ * Yield to the event loop's timer phase. `setTimeout(0)`, not `setImmediate`
+ * or `queueMicrotask`: the live-frame's repaint is itself a `setTimeout`, so
+ * only a real timer-phase yield gives an already-due repaint a turn to run
+ * before more synchronous generator work resumes.
+ */
+function yieldToEventLoop(): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, 0);
+  });
+}
+
+/**
+ * Cap on how many "default"-phase generators run at once. JS is single-
+ * threaded — firing all of them via one unbounded `Promise.all` doesn't give
+ * real parallelism for the CPU-bound parts of a generator (hashing, JSON
+ * building, embedding lookups), only more interleaving/context-switch
+ * overhead, and it multiplies I/O contention (every generator hitting disk at
+ * once). Measured 2026-08-05: the same `--force` run that took ~28s on one
+ * machine took 130s+ on another, entirely inside this batch — a bounded pool
+ * removes that unbounded-contention blowup instead of just tolerating it with
+ * a longer timeout.
+ */
+const MAX_PARALLEL_GENERATORS = 4;
+
+/** Run `tasks` with at most `limit` in flight at once, in original order. */
+async function runWithConcurrencyLimit<T>(
+  tasks: readonly (() => Promise<T>)[],
+  limit: number,
+): Promise<void> {
+  let nextIndex = 0;
+  const worker = async (): Promise<void> => {
+    while (nextIndex < tasks.length) {
+      const index = nextIndex;
+      nextIndex += 1;
+      await tasks[index]?.();
+    }
+  };
+  await Promise.all(
+    Array.from({ length: Math.min(limit, tasks.length) }, () => worker()),
+  );
 }
 
 type RunOutcome =
@@ -151,12 +215,85 @@ export class GeneratorRunner {
   ): Promise<RunGeneratorsResult> {
     const { logger } = opts;
 
+    const result: RunGeneratorsResult = {
+      ran: [],
+      skipped: [],
+      failed: [],
+      output: [],
+      phases: [],
+      totalGenerators: 0,
+    };
+    const recordedCacheKeys = new Set<string>();
+
+    // ── Progress reporting ──────────────────────────────────────────────
+    // Each generator gets a phase row; every state change hands a snapshot to
+    // opts.onProgress. Progress is DATA, not output — the endpoint handler
+    // turns snapshots into "gen-progress" events, the CLI repaints its frame.
+    //
+    // Declared BEFORE any work, and the first row is published before the
+    // cache probe below: that probe walks the whole api dir for generator.ts
+    // and hashes every hit, which is seconds of dead time on a cold tree. With
+    // the publish after it, the terminal stayed empty for that whole stretch
+    // and the run looked hung rather than started.
+    const phases = result.phases;
+    const publishProgress = (): void => {
+      opts.onProgress?.(phases.map((row) => ({ ...row })));
+    };
+    const phaseRow = (id: string): GenPhase => {
+      let row = phases.find((entry) => entry.id === id);
+      if (!row) {
+        row = { id, status: "pending" };
+        phases.push(row);
+      }
+      return row;
+    };
+
+    const record = (
+      key: string,
+      outcome: RunOutcome,
+      durationMs?: number,
+    ): void => {
+      const row = phaseRow(key);
+      // No duration on cached rows: a cache probe finishes in microseconds but
+      // measures as tens of seconds when it queues behind the real generators'
+      // IO in the parallel batch — printing that reads as slow cache checks.
+      if (outcome.status !== "skipped") {
+        row.durationMs = durationMs;
+      }
+      if (outcome.status === "ran") {
+        result.ran.push(key);
+        result.output.push(`✅ ${key}: ${outcome.summary}`);
+        row.status = "done";
+        row.summary = outcome.summary;
+        if (outcome.cacheKey) {
+          recordedCacheKeys.add(outcome.cacheKey);
+        }
+      } else if (outcome.status === "skipped") {
+        result.skipped.push(key);
+        result.output.push(`✅ ${key}: cached`);
+        row.status = "skipped";
+        row.summary = "cached";
+      } else {
+        result.failed.push({ key, error: outcome.error });
+        result.output.push(`❌ ${key}: ${outcome.error}`);
+        row.status = "failed";
+        row.summary = outcome.error;
+        logger.error(`Generator ${key} failed: ${outcome.error}`);
+      }
+      publishProgress();
+    };
+
+    // First frame, before any disk work: the run has started and the index step
+    // is what it is doing. Everything below this line can take seconds.
+    phaseRow(GENERATORS_INDEX_KEY).status = "running";
+    publishProgress();
+
     const genState: GenState = opts.noCache || opts.force ? {} : readGenState();
 
     // Pre-step: generators index (not in registry — circular import). Runs
     // FIRST, before the registry is imported, so a tree with no generated files
     // still bootstraps.
-    const generatorsIndexKey = "generators-index";
+    const generatorsIndexKey = GENERATORS_INDEX_KEY;
     const generatorsIndexInputs = findFilesRecursively(
       getApiDir(),
       "generator.ts",
@@ -171,40 +308,22 @@ export class GeneratorRunner {
         genState,
       );
 
-    const result: RunGeneratorsResult = {
-      ran: [],
-      skipped: [],
-      failed: [],
-      output: [],
-      totalGenerators: 0,
-    };
-    const recordedCacheKeys = new Set<string>();
-
-    const record = (key: string, outcome: RunOutcome): void => {
-      if (outcome.status === "ran") {
-        result.ran.push(key);
-        result.output.push(`✅ ${key}: ${outcome.summary}`);
-        if (outcome.cacheKey) {
-          recordedCacheKeys.add(outcome.cacheKey);
-        }
-      } else if (outcome.status === "skipped") {
-        result.skipped.push(key);
-        result.output.push(`✅ ${key}: cached`);
-      } else {
-        result.failed.push({ key, error: outcome.error });
-        result.output.push(`❌ ${key}: ${outcome.error}`);
-        logger.error(`Generator ${key} failed: ${outcome.error}`);
-      }
-    };
-
     if (skipGeneratorsIndex) {
       result.skipped.push("generators-index");
       result.output.push(`✅ generators-index: cached`);
+      const row = phaseRow(generatorsIndexKey);
+      row.status = "skipped";
+      row.summary = "cached";
+      publishProgress();
     } else {
+      const row = phaseRow(generatorsIndexKey);
+      const startedAt = Date.now();
       try {
         const indexResult = await generateGeneratorsIndex({ logger });
         result.ran.push("generators-index");
         result.output.push(`✅ generators-index: ${indexResult.summary}`);
+        row.status = "done";
+        row.summary = indexResult.summary;
         if (!opts.noCache && !opts.force) {
           markDone(generatorsIndexKey, generatorsIndexInputs, genState);
         }
@@ -212,14 +331,31 @@ export class GeneratorRunner {
         const msg = parseError(error).message;
         result.failed.push({ key: "generators-index", error: msg });
         result.output.push(`❌ generators-index: ${msg}`);
+        row.status = "failed";
+        row.summary = msg;
         logger.error(`Generator generators-index failed: ${msg}`);
       }
+      row.durationMs = Date.now() - startedAt;
+      publishProgress();
     }
 
     // Registry is imported only now — the pre-step above just wrote it.
     const registry = await GeneratorRunner.loadRegistry();
     const generators = GeneratorRunner.resolve(registry, opts);
-    result.totalGenerators = registry.length;
+    // +1 for the generators-index pre-step: it is deliberately excluded from
+    // the registry itself (running it IS what builds the registry — including
+    // it would be circular), but it gets its own phase row and counts toward
+    // result.ran/result.skipped like every other generator, so the displayed
+    // total must count it too or "Unchanged" outnumbers "Total" whenever it's
+    // cached (found 2026-08-05: "Total: 6 ... Unchanged: 7").
+    result.totalGenerators = registry.length + 1;
+
+    // Every resolved generator appears as a queued row before any of them run,
+    // so the live frame shows the full plan up front, not rows popping in.
+    for (const gen of generators) {
+      phaseRow(gen.key);
+    }
+    publishProgress();
 
     const ctx = await buildGeneratorContext({
       logger,
@@ -232,17 +368,46 @@ export class GeneratorRunner {
 
     // def-scan: sequential (Bun TDZ).
     for (const gen of generators.filter((g) => g.phase === "def-scan")) {
-      record(gen.key, await GeneratorRunner.runOne(gen, ctx, genState, opts));
+      phaseRow(gen.key).status = "running";
+      publishProgress();
+      const startedAt = Date.now();
+      record(
+        gen.key,
+        await GeneratorRunner.runOne(gen, ctx, genState, opts),
+        Date.now() - startedAt,
+      );
+      // A cache hit resolves runOne without ever awaiting real I/O, so this
+      // loop can otherwise run several iterations back to back on the same
+      // microtask chain. The live frame's repaint is a setTimeout, a
+      // macrotask — it cannot fire until something yields to the event loop's
+      // timer phase, so a burst of cached generators printed nothing until
+      // the whole run finished. setTimeout(0) yields there explicitly.
+      await yieldToEventLoop();
     }
 
-    // default: parallel.
+    // default: bounded-concurrency pool, not one unbounded Promise.all. Each
+    // generator records (and publishes) as IT finishes, not when the whole
+    // batch does — that per-completion repaint is the live UI. A generator
+    // stays "pending" until a free worker actually picks it up, matching
+    // reality — marking all of them "running" upfront lied about the ones
+    // still queued behind the concurrency cap.
     const parallelGens = generators.filter((g) => g.phase === "default");
-    const outcomes = await Promise.all(
-      parallelGens.map((gen) =>
-        GeneratorRunner.runOne(gen, ctx, genState, opts),
-      ),
+    publishProgress();
+    await runWithConcurrencyLimit(
+      parallelGens.map((gen) => async () => {
+        phaseRow(gen.key).status = "running";
+        publishProgress();
+        const startedAt = Date.now();
+        const outcome = await GeneratorRunner.runOne(gen, ctx, genState, opts);
+        record(gen.key, outcome, Date.now() - startedAt);
+        // Same reasoning as the def-scan loop above: on a mostly-cached run,
+        // every one of these resolves in the same microtask burst with no
+        // real I/O between them, starving the repaint timer for the entire
+        // batch.
+        await yieldToEventLoop();
+      }),
+      MAX_PARALLEL_GENERATORS,
     );
-    parallelGens.forEach((gen, i) => record(gen.key, outcomes[i]!));
 
     if (!opts.noCache && !opts.force) {
       for (const gen of generators) {
@@ -266,11 +431,33 @@ export class GenerateAllRepository {
   static async generateAll(
     data: GenerateAllRequestOutput,
     logger: EndpointLogger,
+    user: JwtPayloadType,
   ): Promise<BaseResponseType<GenerateAllResponseOutput>> {
     try {
+      // Emitter + definition are loaded lazily: the bootstrap CLI entry below
+      // must stay runnable on a tree with no generated files, and this handler
+      // path only ever runs behind the endpoint route.
+      const [{ createEndpointEmitter }, { default: generateAllEndpoints }] =
+        await Promise.all([
+          import("../../realtime/core/emitter"),
+          import("./definition"),
+        ]);
+      const emitProgress = createEndpointEmitter(
+        generateAllEndpoints.POST,
+        logger,
+        user,
+      );
+
       const result = await GeneratorRunner.runGenerators({
         logger,
         force: data.force,
+        // Progress is DATA, not output: the CLI taps these events in-process
+        // and repaints its frame; the web client merges them into the cache.
+        onProgress: (phases): void => {
+          emitProgress("gen-progress", {
+            responseData: { phases, isComplete: false },
+          });
+        },
       });
 
       if (result.failed.length > 0) {
@@ -283,6 +470,8 @@ export class GenerateAllRepository {
       return success({
         success: true,
         generationCompleted: true,
+        isComplete: true,
+        phases: result.phases,
         output: result.output.join("\n"),
         generationStats: {
           totalGenerators: result.totalGenerators,

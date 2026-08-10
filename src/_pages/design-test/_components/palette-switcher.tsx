@@ -2,15 +2,15 @@
 "use client";
 
 import { platform } from "next-vibe/core/env-client";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { P } from "next-vibe/ui/components/typography";
 import {
   removeRootCssVar,
   rootHasClass,
   setRootCssVar,
 } from "next-vibe/ui/lib/css-vars";
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 import { useCallback, useState } from "react";
 

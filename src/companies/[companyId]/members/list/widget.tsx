@@ -1,12 +1,12 @@
 "use client";
 
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
-import { UserPlus } from "next-vibe/ui/ui/icons/UserPlus";
-import { Users } from "next-vibe/ui/ui/icons/Users";
-import { Span } from "next-vibe/ui/ui/span";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { UserPlus } from "next-vibe/ui/components/icons/UserPlus";
+import { Users } from "next-vibe/ui/components/icons/Users";
+import { Span } from "next-vibe/ui/components/span";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetForm,

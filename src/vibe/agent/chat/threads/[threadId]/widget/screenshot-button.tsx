@@ -1,9 +1,9 @@
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { Button } from "next-vibe/ui/ui/button";
-import { Camera } from "next-vibe/ui/ui/icons/Camera";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
+import { Button } from "next-vibe/ui/components/button";
+import { Camera } from "next-vibe/ui/components/icons/Camera";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import type { JSX } from "react";
 import { useCallback, useState } from "react";
 

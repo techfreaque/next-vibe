@@ -1,4 +1,4 @@
-import { Div } from "next-vibe/ui/ui/div";
+import { Div } from "next-vibe/ui/components/div";
 import type { JSX, ReactNode } from "react";
 
 export interface SignupLayoutData {

@@ -13,16 +13,16 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "next-vibe/ui/ui/popover";
-import { Span } from "next-vibe/ui/ui/span";
-import { Strong } from "next-vibe/ui/ui/strong";
+} from "next-vibe/ui/components/popover";
+import { Span } from "next-vibe/ui/components/span";
+import { Strong } from "next-vibe/ui/components/strong";
 import type { JSX } from "react";
 import { useRef, useState } from "react";
 

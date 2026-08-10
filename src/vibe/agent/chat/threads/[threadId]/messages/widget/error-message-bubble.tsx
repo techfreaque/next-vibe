@@ -5,13 +5,13 @@ import type { DefaultFolderId } from "next-vibe/core/execution-context";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { scopedTranslation as vibeScopedTranslation } from "next-vibe/core/i18n/shared";
 import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
+import { Div } from "next-vibe/ui/components/div";
+import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
+import { CheckCircle2 } from "next-vibe/ui/components/icons/CheckCircle2";
+import { StopCircle } from "next-vibe/ui/components/icons/StopCircle";
+import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
+import { Span } from "next-vibe/ui/components/span";
 import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
-import { Div } from "next-vibe/ui/ui/div";
-import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
-import { CheckCircle2 } from "next-vibe/ui/ui/icons/CheckCircle2";
-import { StopCircle } from "next-vibe/ui/ui/icons/StopCircle";
-import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
-import { Span } from "next-vibe/ui/ui/span";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetLogger,

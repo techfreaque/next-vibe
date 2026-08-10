@@ -3,22 +3,22 @@ import type { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { ArrowBigDown } from "next-vibe/ui/ui/icons/ArrowBigDown";
-import { ArrowBigUp } from "next-vibe/ui/ui/icons/ArrowBigUp";
-import { Bot } from "next-vibe/ui/ui/icons/Bot";
-import { Square } from "next-vibe/ui/ui/icons/Square";
-import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
-import { Volume2 } from "next-vibe/ui/ui/icons/Volume2";
-import { X } from "next-vibe/ui/ui/icons/X";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { ArrowBigDown } from "next-vibe/ui/components/icons/ArrowBigDown";
+import { ArrowBigUp } from "next-vibe/ui/components/icons/ArrowBigUp";
+import { Bot } from "next-vibe/ui/components/icons/Bot";
+import { Square } from "next-vibe/ui/components/icons/Square";
+import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
+import { Volume2 } from "next-vibe/ui/components/icons/Volume2";
+import { X } from "next-vibe/ui/components/icons/X";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "next-vibe/ui/ui/popover";
-import { Span } from "next-vibe/ui/ui/span";
+} from "next-vibe/ui/components/popover";
+import { Span } from "next-vibe/ui/components/span";
+import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetItem,

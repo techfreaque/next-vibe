@@ -1,6 +1,6 @@
 "use client";
 
-import { Markdown } from "next-vibe/ui/ui/markdown";
+import { Markdown } from "next-vibe/ui/components/markdown";
 import type { JSX } from "react";
 
 interface FrameworkContentProps {

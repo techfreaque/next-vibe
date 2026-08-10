@@ -455,6 +455,29 @@ export class TsgoDaemon {
     return inst;
   }
 
+  /** Kill the bridge process for the given pid file and clean up socket+pid. */
+  static kill(pidPath: string): void {
+    const sockPath = pidPath.replace(/\.pid$/, ".sock");
+    try {
+      if (existsSync(pidPath)) {
+        const pid = parseInt(readFileSync(pidPath, "utf8").trim(), 10);
+        if (pid && !isNaN(pid)) {
+          try {
+            process.kill(pid, "SIGTERM");
+          } catch {
+            // already dead
+          }
+        }
+        rmSync(pidPath, { force: true });
+      }
+    } catch {
+      // ignore
+    }
+    rmSync(sockPath, { force: true });
+    // Drop any cached instance so the next call spawns fresh
+    TsgoDaemon.instances.delete(pidPath);
+  }
+
   // --------------------------------------------------------
   // Lifecycle
   // --------------------------------------------------------
@@ -541,8 +564,15 @@ export class TsgoDaemon {
 
     // Retry loop: the socket file may appear slightly before the bridge is
     // actually listen()-ready, so retry a few times with a short backoff.
+    // Success is a loop CONDITION rather than a `break`. With a break, the only
+    // statement-level exit is the happy path, and a linter that cannot see the
+    // awaited promise rejecting reads the catch as dead code and the whole loop
+    // as single-iteration. Driving it from `connected` states the intent
+    // directly: keep going until connected or out of attempts.
     let lastError: Error | null = null;
-    for (let attempt = 0; attempt < 8; attempt++) {
+    let connected = false;
+    let attempt = 0;
+    while (!connected && attempt < 8) {
       if (attempt > 0) {
         await new Promise<void>((resolve) => {
           // eslint-disable-next-line no-promise-executor-return -- setTimeout doesn't return a meaningful value
@@ -557,14 +587,15 @@ export class TsgoDaemon {
           this.socket = client;
         });
         lastError = null;
-        break;
+        connected = true;
       } catch (err) {
         lastError = err instanceof Error ? err : new Error(String(err));
         this.socket = null;
       }
+      attempt++;
     }
     if (lastError) {
-      // oxlint-disable-next-line restricted/restricted-syntax -- propagating socket connect error; no ResponseType<T> layer here (low-level transport)
+      // oxlint-disable-next-line restricted/no-throw -- propagating socket connect error; no ResponseType<T> layer here (low-level transport)
       throw lastError;
     }
 
@@ -827,6 +858,15 @@ export class TsgoDaemon {
   async getDiagnostics(
     filterPaths?: string | string[],
     ignorePatterns?: string[],
+    /**
+     * Fired as file requests settle, so a caller can drive a live counter
+     * ("42/210 files") instead of the frame sitting frozen for the whole
+     * concurrent batch. Throttled to ~1 call per 50ms (plus a guaranteed
+     * final call at completion) — the batch is often thousands of files
+     * settling within the same event-loop tick, and calling this per file
+     * would cost more than the diagnostics pull itself.
+     */
+    onProgress?: (checked: number, total: number) => void,
   ): Promise<LspIssue[]> {
     await this.ensureRunning();
 
@@ -876,6 +916,25 @@ export class TsgoDaemon {
     // Pull diagnostics directly — no didOpen needed.
     // tsgo discovers the project from tsconfig.json on the first pull (cold ~1-2s),
     // then keeps the type graph in memory for instant subsequent pulls.
+    // A file whose diagnostic request failed was NOT checked, and an unchecked
+    // file is not a clean file. Counting them is the whole point: if the daemon
+    // is dead, EVERY request fails, and silently returning an empty list makes
+    // "the daemon never answered" indistinguishable from "the code is fine".
+    let failedFiles = 0;
+    let checkedFiles = 0;
+    let lastProgressEmit = 0;
+    const reportProgress = (): void => {
+      if (!onProgress) {
+        return;
+      }
+      const now = Date.now();
+      const isLast = checkedFiles >= filtered.length;
+      if (!isLast && now - lastProgressEmit < 50) {
+        return;
+      }
+      lastProgressEmit = now;
+      onProgress(checkedFiles, filtered.length);
+    };
     const allIssues: LspIssue[] = [];
     await Promise.all(
       filtered.map(async (f) => {
@@ -903,10 +962,25 @@ export class TsgoDaemon {
             }
           }
         } catch {
-          // ignore per-file errors
+          failedFiles++;
+        } finally {
+          checkedFiles++;
+          reportProgress();
         }
       }),
     );
+
+    // One aggregate row, not one per file: a dead daemon fails thousands of
+    // requests, and burying the real diagnostics under thousands of identical
+    // rows would be its own kind of useless. Bounded, but impossible to miss.
+    if (failedFiles > 0) {
+      allIssues.push({
+        file: "TypeScript LSP daemon",
+        rule: "check/tool-failure",
+        severity: "error",
+        message: `The LSP daemon returned no diagnostics for ${failedFiles} of ${filtered.length} file(s) — those files were NOT checked, so this is not a pass. Set typecheck.useLspDaemon to false in check.config.ts to fall back to a cold tsgo run.`,
+      });
+    }
 
     return allIssues;
   }

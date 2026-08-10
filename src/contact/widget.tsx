@@ -6,13 +6,13 @@
 "use client";
 
 import { Platform } from "next-vibe/platforms/platforms";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div, type DivMouseEvent } from "next-vibe/ui/ui/div";
-import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
-import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
-import { Mail } from "next-vibe/ui/ui/icons/Mail";
-import { Send } from "next-vibe/ui/ui/icons/Send";
-import { Span } from "next-vibe/ui/ui/span";
+import { Button } from "next-vibe/ui/components/button";
+import { Div, type DivMouseEvent } from "next-vibe/ui/components/div";
+import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
+import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
+import { Mail } from "next-vibe/ui/components/icons/Mail";
+import { Send } from "next-vibe/ui/components/icons/Send";
+import { Span } from "next-vibe/ui/components/span";
 import {
   useWidgetForm,
   useWidgetOnSubmit,

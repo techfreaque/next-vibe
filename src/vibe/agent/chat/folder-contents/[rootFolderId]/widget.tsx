@@ -14,8 +14,6 @@
 
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { success } from "next-vibe/core/route/response.schema";
-import { useRouter, useSilentHistory } from "next-vibe/ui/hooks/use-navigation";
-import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,15 +23,15 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "next-vibe/ui/ui/alert-dialog";
-import { Button } from "next-vibe/ui/ui/button";
+} from "next-vibe/ui/components/alert-dialog";
+import { Button } from "next-vibe/ui/components/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "next-vibe/ui/ui/dialog";
-import { Div, type DivMouseEvent } from "next-vibe/ui/ui/div";
+} from "next-vibe/ui/components/dialog";
+import { Div, type DivMouseEvent } from "next-vibe/ui/components/div";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,23 +41,25 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "next-vibe/ui/ui/dropdown-menu";
-import { Archive } from "next-vibe/ui/ui/icons/Archive";
-import { ArchiveRestore } from "next-vibe/ui/ui/icons/ArchiveRestore";
-import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
-import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
-import { Edit } from "next-vibe/ui/ui/icons/Edit";
-import { FolderInput } from "next-vibe/ui/ui/icons/FolderInput";
-import { FolderPlus } from "next-vibe/ui/ui/icons/FolderPlus";
-import { MessageSquarePlus } from "next-vibe/ui/ui/icons/MessageSquarePlus";
-import { MoreVertical } from "next-vibe/ui/ui/icons/MoreVertical";
-import { Pin } from "next-vibe/ui/ui/icons/Pin";
-import { PinOff } from "next-vibe/ui/ui/icons/PinOff";
-import { Share2 } from "next-vibe/ui/ui/icons/Share2";
-import { Shield } from "next-vibe/ui/ui/icons/Shield";
-import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
-import { Input } from "next-vibe/ui/ui/input";
-import { Span } from "next-vibe/ui/ui/span";
+} from "next-vibe/ui/components/dropdown-menu";
+import { Archive } from "next-vibe/ui/components/icons/Archive";
+import { ArchiveRestore } from "next-vibe/ui/components/icons/ArchiveRestore";
+import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
+import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
+import { Edit } from "next-vibe/ui/components/icons/Edit";
+import { FolderInput } from "next-vibe/ui/components/icons/FolderInput";
+import { FolderPlus } from "next-vibe/ui/components/icons/FolderPlus";
+import { MessageSquarePlus } from "next-vibe/ui/components/icons/MessageSquarePlus";
+import { MoreVertical } from "next-vibe/ui/components/icons/MoreVertical";
+import { Pin } from "next-vibe/ui/components/icons/Pin";
+import { PinOff } from "next-vibe/ui/components/icons/PinOff";
+import { Share2 } from "next-vibe/ui/components/icons/Share2";
+import { Shield } from "next-vibe/ui/components/icons/Shield";
+import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
+import { Input } from "next-vibe/ui/components/input";
+import { Span } from "next-vibe/ui/components/span";
+import { useRouter, useSilentHistory } from "next-vibe/ui/hooks/use-navigation";
+import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetContext,

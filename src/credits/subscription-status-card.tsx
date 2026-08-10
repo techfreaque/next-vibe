@@ -4,21 +4,21 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { assignUrl, getCurrentOrigin } from "next-vibe/ui/lib/location";
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe/ui/ui/card";
-import { Div } from "next-vibe/ui/ui/div";
-import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
-import { Bitcoin } from "next-vibe/ui/ui/icons/Bitcoin";
-import { CreditCard } from "next-vibe/ui/ui/icons/CreditCard";
-import { ExternalLink } from "next-vibe/ui/ui/icons/ExternalLink";
+} from "next-vibe/ui/components/card";
+import { Div } from "next-vibe/ui/components/div";
+import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
+import { Bitcoin } from "next-vibe/ui/components/icons/Bitcoin";
+import { CreditCard } from "next-vibe/ui/components/icons/CreditCard";
+import { ExternalLink } from "next-vibe/ui/components/icons/ExternalLink";
+import { assignUrl, getCurrentOrigin } from "next-vibe/ui/lib/location";
 import type { JSX } from "react";
 
 import { scopedTranslation as appScopedTranslation } from "@/_pages/i18n";

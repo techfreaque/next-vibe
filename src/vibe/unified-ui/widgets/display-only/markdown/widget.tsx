@@ -1,7 +1,7 @@
 "use client";
 
-import { Div } from "next-vibe/ui/ui/div";
-import { Markdown } from "next-vibe/ui/ui/markdown";
+import { Div } from "next-vibe/ui/components/div";
+import { Markdown } from "next-vibe/ui/components/markdown";
 import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";

@@ -16,32 +16,32 @@ The auto-rendered form does not exist as a valid option. Every endpoint — rega
 
 **Use these. No ad-hoc div/span/card soup.**
 
-Every widget is built from shared layout components in `next-vibe-ui`. They work across all 3 render contexts (fullscreen admin, ~500px chat toolbox, ~260px help sidebar) and all 3 platforms (web, CLI, native). Import via `import { X } from "next-vibe-ui/ui/X"`.
+Every widget is built from shared layout components in `next-vibe-ui`. They work across all 3 render contexts (fullscreen admin, ~500px chat toolbox, ~260px help sidebar) and all 3 platforms (web, CLI, native). Import via `import { X } from "next-vibe-ui/components/X"`.
 
 ### Available Components
 
-| Component       | Import                           | Purpose                                                         |
-| --------------- | -------------------------------- | --------------------------------------------------------------- |
-| `WidgetShell`   | `next-vibe-ui/ui/widget-shell`   | Outermost wrapper. Sets `@container` for responsive queries.    |
-| `WidgetHeader`  | `next-vibe-ui/ui/widget-header`  | Title bar with back button slot + action buttons.               |
-| `MetricCard`    | `next-vibe-ui/ui/metric-card`    | Single stat/KPI: label, value, optional icon/trend/variant.     |
-| `MetricGrid`    | `next-vibe-ui/ui/metric-grid`    | Responsive grid for MetricCards. Auto-adapts columns.           |
-| `StatusPill`    | `next-vibe-ui/ui/status-pill`    | Colored status indicator. Replaces inline `rounded-full` pills. |
-| `DetailGrid`    | `next-vibe-ui/ui/detail-grid`    | Grid of label-value pairs. Also exports `DetailField`.          |
-| `ListItem`      | `next-vibe-ui/ui/list-item`      | Standardized list row with avatar, title, badges, actions.      |
-| `SectionGroup`  | `next-vibe-ui/ui/section-group`  | Titled card section, optionally collapsible.                    |
-| `EmptyBlock`    | `next-vibe-ui/ui/empty-block`    | Empty state with icon, title, message, CTA button.              |
-| `LoadingBlock`  | `next-vibe-ui/ui/loading-block`  | Centered loading spinner with optional message.                 |
-| `ProgressBlock` | `next-vibe-ui/ui/progress-block` | Progress bar with label and percentage.                         |
+| Component       | Import                                   | Purpose                                                         |
+| --------------- | ---------------------------------------- | --------------------------------------------------------------- |
+| `WidgetShell`   | `next-vibe-ui/components/widget-shell`   | Outermost wrapper. Sets `@container` for responsive queries.    |
+| `WidgetHeader`  | `next-vibe-ui/components/widget-header`  | Title bar with back button slot + action buttons.               |
+| `MetricCard`    | `next-vibe-ui/components/metric-card`    | Single stat/KPI: label, value, optional icon/trend/variant.     |
+| `MetricGrid`    | `next-vibe-ui/components/metric-grid`    | Responsive grid for MetricCards. Auto-adapts columns.           |
+| `StatusPill`    | `next-vibe-ui/components/status-pill`    | Colored status indicator. Replaces inline `rounded-full` pills. |
+| `DetailGrid`    | `next-vibe-ui/components/detail-grid`    | Grid of label-value pairs. Also exports `DetailField`.          |
+| `ListItem`      | `next-vibe-ui/components/list-item`      | Standardized list row with avatar, title, badges, actions.      |
+| `SectionGroup`  | `next-vibe-ui/components/section-group`  | Titled card section, optionally collapsible.                    |
+| `EmptyBlock`    | `next-vibe-ui/components/empty-block`    | Empty state with icon, title, message, CTA button.              |
+| `LoadingBlock`  | `next-vibe-ui/components/loading-block`  | Centered loading spinner with optional message.                 |
+| `ProgressBlock` | `next-vibe-ui/components/progress-block` | Progress bar with label and percentage.                         |
 
 ### Dashboard Example
 
 ```tsx
-import { EmptyBlock } from "next-vibe-ui/ui/empty-block";
-import { LoadingBlock } from "next-vibe-ui/ui/loading-block";
-import { MetricCard } from "next-vibe-ui/ui/metric-card";
-import { MetricGrid } from "next-vibe-ui/ui/metric-grid";
-import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
+import { EmptyBlock } from "next-vibe-ui/components/empty-block";
+import { LoadingBlock } from "next-vibe-ui/components/loading-block";
+import { MetricCard } from "next-vibe-ui/components/metric-card";
+import { MetricGrid } from "next-vibe-ui/components/metric-grid";
+import { WidgetShell } from "next-vibe-ui/components/widget-shell";
 
 export function DashboardWidget({ field }: WidgetProps): JSX.Element {
   const data = useWidgetValue(field);
@@ -77,11 +77,11 @@ export function DashboardWidget({ field }: WidgetProps): JSX.Element {
 ### List Example
 
 ```tsx
-import { EmptyBlock } from "next-vibe-ui/ui/empty-block";
-import { ListItem } from "next-vibe-ui/ui/list-item";
-import { StatusPill } from "next-vibe-ui/ui/status-pill";
-import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
-import { WidgetHeader } from "next-vibe-ui/ui/widget-header";
+import { EmptyBlock } from "next-vibe-ui/components/empty-block";
+import { ListItem } from "next-vibe-ui/components/list-item";
+import { StatusPill } from "next-vibe-ui/components/status-pill";
+import { WidgetShell } from "next-vibe-ui/components/widget-shell";
+import { WidgetHeader } from "next-vibe-ui/components/widget-header";
 
 export function OrderListWidget({ field }: WidgetProps): JSX.Element {
   const data = useWidgetValue(field);
@@ -115,9 +115,9 @@ export function OrderListWidget({ field }: WidgetProps): JSX.Element {
 ### Detail Example
 
 ```tsx
-import { DetailField, DetailGrid } from "next-vibe-ui/ui/detail-grid";
-import { SectionGroup } from "next-vibe-ui/ui/section-group";
-import { WidgetShell } from "next-vibe-ui/ui/widget-shell";
+import { DetailField, DetailGrid } from "next-vibe-ui/components/detail-grid";
+import { SectionGroup } from "next-vibe-ui/components/section-group";
+import { WidgetShell } from "next-vibe-ui/components/widget-shell";
 
 export function OrderDetailWidget({ field }: WidgetProps): JSX.Element {
   return (

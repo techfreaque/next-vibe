@@ -10,7 +10,7 @@
 
 import { platform } from "next-vibe/core/env-client";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
-import { Div } from "next-vibe/ui/ui/div";
+import { Div } from "next-vibe/ui/components/div";
 import {
   useWidgetLocale,
   useWidgetLogger,

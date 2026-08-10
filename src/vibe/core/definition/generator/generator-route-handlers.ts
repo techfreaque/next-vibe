@@ -29,10 +29,10 @@ import {
 } from "../../generators/shared/utils";
 import type { WidgetData } from "../../utils/json";
 import type { ApiSection } from "../endpoint-base";
+import type { PlatformMarkerValue } from "../../../identity/roles/enum";
 import {
   filterPlatformMarkers,
   PlatformMarker,
-  PlatformMarkerValue,
   type UserRoleValue,
 } from "../../../identity/roles/enum";
 import { WsChannelsGenerator } from "./generator-ws-channels";

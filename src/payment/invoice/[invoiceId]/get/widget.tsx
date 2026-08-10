@@ -1,12 +1,12 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
-import { ExternalLink } from "next-vibe/ui/ui/icons/ExternalLink";
-import { Span } from "next-vibe/ui/ui/span";
-import { H3, H4, P } from "next-vibe/ui/ui/typography";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { ExternalLink } from "next-vibe/ui/components/icons/ExternalLink";
+import { Span } from "next-vibe/ui/components/span";
+import { H3, H4, P } from "next-vibe/ui/components/typography";
 import {
   useWidgetNavigation,
   useWidgetTranslation,
@@ -19,8 +19,8 @@ import { type JSX } from "react";
 
 import { InvoiceStatus } from "@/payment/enum";
 import invoiceRecordPaymentDefinitions from "@/payment/invoice/[invoiceId]/record-payment/definition";
-import invoiceSendDefinitions from "@/payment/invoice/[invoiceId]/send/definition";
 import invoiceSendReminderDefinitions from "@/payment/invoice/[invoiceId]/send-reminder/definition";
+import invoiceSendDefinitions from "@/payment/invoice/[invoiceId]/send/definition";
 import invoiceVoidDefinitions from "@/payment/invoice/[invoiceId]/void/definition";
 import invoiceLineAddDefinitions from "@/payment/invoice/line/add/definition";
 

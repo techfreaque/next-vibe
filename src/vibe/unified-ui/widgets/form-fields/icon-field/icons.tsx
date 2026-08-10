@@ -11,10 +11,10 @@
  */
 
 "use client";
+import type * as IconsLibrary from "next-vibe/ui/components/icons";
+import { loadIconModule } from "next-vibe/ui/components/icons/loader";
+import { Span } from "next-vibe/ui/components/span";
 import type { UITranslationKey } from "next-vibe/ui/i18n";
-import type * as IconsLibrary from "next-vibe/ui/ui/icons";
-import { loadIconModule } from "next-vibe/ui/ui/icons/loader";
-import { Span } from "next-vibe/ui/ui/span";
 import React from "react";
 
 import { cn } from "../../../_shared/cn";

@@ -8,10 +8,10 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "next-vibe/ui/ui/dialog";
-import { Brain } from "next-vibe/ui/ui/icons/Brain";
-import { Maximize } from "next-vibe/ui/ui/icons/Maximize";
-import { Link } from "next-vibe/ui/ui/link";
+} from "next-vibe/ui/components/dialog";
+import { Brain } from "next-vibe/ui/components/icons/Brain";
+import { Maximize } from "next-vibe/ui/components/icons/Maximize";
+import { Link } from "next-vibe/ui/components/link";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 

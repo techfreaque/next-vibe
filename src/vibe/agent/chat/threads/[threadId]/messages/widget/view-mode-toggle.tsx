@@ -1,11 +1,11 @@
 "use client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { Bug } from "next-vibe/ui/ui/icons/Bug";
-import { Hash } from "next-vibe/ui/ui/icons/Hash";
-import { List } from "next-vibe/ui/ui/icons/List";
-import { Network } from "next-vibe/ui/ui/icons/Network";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { Bug } from "next-vibe/ui/components/icons/Bug";
+import { Hash } from "next-vibe/ui/components/icons/Hash";
+import { List } from "next-vibe/ui/components/icons/List";
+import { Network } from "next-vibe/ui/components/icons/Network";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type React from "react";
 

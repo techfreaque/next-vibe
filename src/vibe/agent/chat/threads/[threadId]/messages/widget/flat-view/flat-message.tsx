@@ -2,12 +2,12 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { Button } from "next-vibe/ui/components/button";
+import { Div, type DivMouseEvent } from "next-vibe/ui/components/div";
+import { Markdown } from "next-vibe/ui/components/markdown";
+import { Span, type SpanMouseEvent } from "next-vibe/ui/components/span";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { getElementById } from "next-vibe/ui/lib/dom";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div, type DivMouseEvent } from "next-vibe/ui/ui/div";
-import { Markdown } from "next-vibe/ui/ui/markdown";
-import { Span, type SpanMouseEvent } from "next-vibe/ui/ui/span";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { useWidgetNavigation } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";

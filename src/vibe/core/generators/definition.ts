@@ -11,13 +11,16 @@ import { UserRole } from "../../identity/roles/enum";
 import { lazyWidget } from "../../unified-ui/_shared/lazy-widget";
 import {
   customWidgetObject,
+  objectField,
   requestField,
+  responseArrayOptionalField,
   responseField,
 } from "../../unified-ui/_shared/utils";
 import { createEndpoint } from "../definition/create";
 import {
   EndpointErrorTypes,
   FieldDataType,
+  LayoutType,
   Methods,
   WidgetType,
 } from "../definition/enums";
@@ -63,6 +66,51 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         label: "Success",
         schema: z.boolean(),
+      }),
+
+      // Progress state. Emitted via the "gen-progress" event while generators
+      // run, so the CLI/web can repaint before the request resolves. This is
+      // response DATA, not log output — one widget renders both the in-flight
+      // and the final frame.
+      isComplete: responseField({
+        type: WidgetType.TEXT,
+        schema: z.boolean().optional(),
+      }),
+
+      phases: responseArrayOptionalField({
+        type: WidgetType.CONTAINER,
+        child: objectField({
+          type: WidgetType.CONTAINER,
+          usage: { response: true },
+          layoutType: LayoutType.STACKED,
+          columns: 12,
+          children: {
+            // `id` is what makes id-keyed array merging work in cache-merger —
+            // without it each event would replace the whole phases array.
+            id: responseField({
+              type: WidgetType.TEXT,
+              schema: z.string(),
+            }),
+            status: responseField({
+              type: WidgetType.TEXT,
+              schema: z.enum([
+                "pending",
+                "running",
+                "done",
+                "failed",
+                "skipped",
+              ]),
+            }),
+            summary: responseField({
+              type: WidgetType.TEXT,
+              schema: z.string().optional(),
+            }),
+            durationMs: responseField({
+              type: WidgetType.TEXT,
+              schema: z.number().optional(),
+            }),
+          },
+        }),
       }),
 
       generationCompleted: responseField({
@@ -131,6 +179,28 @@ const { POST } = createEndpoint({
     },
   },
 
+  // === WS EVENTS ===
+  // Generators run for seconds. Rather than logging progress to stdout, the
+  // repository emits partial response data as each generator starts and
+  // finishes. The CLI taps these in-process (realtime/cli-event-tap.ts) and
+  // repaints; the web client merges them into the response cache. Same widget
+  // renders every frame.
+  //
+  // "upsert", not "merge": unlike check's fixed 3-checker array (every id
+  // exists from the very first event), gen's phase rows appear over time —
+  // the registry (and therefore the other 16 generator ids) isn't known until
+  // AFTER the generators-index pre-step's first progress event. "merge" only
+  // updates ids the accumulator already has ("insertMissing: false" in
+  // applyPartialToCache), so every later id was silently dropped and the CLI
+  // showed a single frozen "generators-index" row for the entire run.
+  channel: { scope: "user" } as const,
+  events: {
+    "gen-progress": {
+      responseFields: ["phases", "isComplete"] as const,
+      operation: "upsert" as const,
+    },
+  },
+
   // === SUCCESS HANDLING ===
   successTypes: {
     title: "Success",
@@ -147,6 +217,15 @@ const { POST } = createEndpoint({
       default: {
         success: true,
         generationCompleted: true,
+        isComplete: true,
+        phases: [
+          {
+            id: "generators-index",
+            status: "done",
+            summary: "2 generators registered",
+            durationMs: 120,
+          },
+        ],
         generationStats: {
           totalGenerators: 2,
           generatorsRun: 2,

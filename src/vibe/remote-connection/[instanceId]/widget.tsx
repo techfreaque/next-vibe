@@ -12,32 +12,32 @@
 
 "use client";
 
-import { Button, type ButtonMouseEvent } from "next-vibe/ui/ui/button";
+import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
 import {
   Card,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "next-vibe/ui/ui/card";
-import { DetailField, DetailGrid } from "next-vibe/ui/ui/detail-grid";
-import { Div } from "next-vibe/ui/ui/div";
-import { Activity } from "next-vibe/ui/ui/icons/Activity";
-import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
-import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
-import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
-import { ExternalLink } from "next-vibe/ui/ui/icons/ExternalLink";
-import { FolderOpen } from "next-vibe/ui/ui/icons/FolderOpen";
-import { Pencil } from "next-vibe/ui/ui/icons/Pencil";
-import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
-import { Terminal } from "next-vibe/ui/ui/icons/Terminal";
-import { WifiOff } from "next-vibe/ui/ui/icons/WifiOff";
-import { LoadingBlock } from "next-vibe/ui/ui/loading-block";
-import { SectionGroup } from "next-vibe/ui/ui/section-group";
-import { StatusPill } from "next-vibe/ui/ui/status-pill";
-import { Switch } from "next-vibe/ui/ui/switch";
-import { Code, P } from "next-vibe/ui/ui/typography";
-import { WidgetHeader } from "next-vibe/ui/ui/widget-header";
-import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
+} from "next-vibe/ui/components/card";
+import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
+import { Div } from "next-vibe/ui/components/div";
+import { Activity } from "next-vibe/ui/components/icons/Activity";
+import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
+import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
+import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { ExternalLink } from "next-vibe/ui/components/icons/ExternalLink";
+import { FolderOpen } from "next-vibe/ui/components/icons/FolderOpen";
+import { Pencil } from "next-vibe/ui/components/icons/Pencil";
+import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
+import { Terminal } from "next-vibe/ui/components/icons/Terminal";
+import { WifiOff } from "next-vibe/ui/components/icons/WifiOff";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
+import { SectionGroup } from "next-vibe/ui/components/section-group";
+import { StatusPill } from "next-vibe/ui/components/status-pill";
+import { Switch } from "next-vibe/ui/components/switch";
+import { Code, P } from "next-vibe/ui/components/typography";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";

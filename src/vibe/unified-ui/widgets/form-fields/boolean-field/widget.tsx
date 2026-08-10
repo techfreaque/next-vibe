@@ -5,26 +5,26 @@
 
 "use client";
 
-import { Button } from "next-vibe/ui/ui/button";
-import { Checkbox } from "next-vibe/ui/ui/checkbox";
-import { Div } from "next-vibe/ui/ui/div";
+import { Button } from "next-vibe/ui/components/button";
+import { Checkbox } from "next-vibe/ui/components/checkbox";
+import { Div } from "next-vibe/ui/components/div";
 import {
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from "next-vibe/ui/ui/form/form";
-import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
-import { Info } from "next-vibe/ui/ui/icons/Info";
-import { Label } from "next-vibe/ui/ui/label";
-import { Span } from "next-vibe/ui/ui/span";
-import { Switch } from "next-vibe/ui/ui/switch";
+} from "next-vibe/ui/components/form/form";
+import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
+import { Info } from "next-vibe/ui/components/icons/Info";
+import { Label } from "next-vibe/ui/components/label";
+import { Span } from "next-vibe/ui/components/span";
+import { Switch } from "next-vibe/ui/components/switch";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "next-vibe/ui/ui/tooltip";
+} from "next-vibe/ui/components/tooltip";
 import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";

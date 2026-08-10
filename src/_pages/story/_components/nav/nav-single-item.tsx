@@ -1,4 +1,4 @@
-import type { BadgeVariant } from "next-vibe/ui/ui/badge";
+import type { BadgeVariant } from "next-vibe/ui/components/badge";
 import type { JSX } from "react";
 
 import type { StoryComponentsTranslationKey } from "../i18n";

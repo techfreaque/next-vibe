@@ -9,11 +9,15 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { Platform } from "next-vibe/platforms/platforms";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "next-vibe/ui/components/alert";
+import { Div } from "next-vibe/ui/components/div";
+import { ErrorBoundary } from "next-vibe/ui/components/error-boundary";
+import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
 import { redirect } from "next-vibe/ui/lib/redirect";
-import { Alert, AlertDescription, AlertTitle } from "next-vibe/ui/ui/alert";
-import { Div } from "next-vibe/ui/ui/div";
-import { ErrorBoundary } from "next-vibe/ui/ui/error-boundary";
-import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
 import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";

@@ -4,10 +4,10 @@
 
 "use client";
 
-import { Checkbox } from "next-vibe/ui/ui/checkbox";
-import { Div } from "next-vibe/ui/ui/div";
-import { Label } from "next-vibe/ui/ui/label";
-import { Span } from "next-vibe/ui/ui/span";
+import { Checkbox } from "next-vibe/ui/components/checkbox";
+import { Div } from "next-vibe/ui/components/div";
+import { Label } from "next-vibe/ui/components/label";
+import { Span } from "next-vibe/ui/components/span";
 import {
   useWidgetForm,
   useWidgetLogger,

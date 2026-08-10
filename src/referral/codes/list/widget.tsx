@@ -5,20 +5,20 @@
 "use client";
 
 import { CountriesArr, LanguagesArr } from "next-vibe/core/i18n/core/config";
+import { Button } from "next-vibe/ui/components/button";
+import { Card, CardContent } from "next-vibe/ui/components/card";
+import { Div } from "next-vibe/ui/components/div";
+import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
+import { Check } from "next-vibe/ui/components/icons/Check";
+import { Copy } from "next-vibe/ui/components/icons/Copy";
+import { DollarSign } from "next-vibe/ui/components/icons/DollarSign";
+import { Link2 } from "next-vibe/ui/components/icons/Link2";
+import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
+import { Users } from "next-vibe/ui/components/icons/Users";
+import { Input } from "next-vibe/ui/components/input";
+import { Span } from "next-vibe/ui/components/span";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { getCurrentOrigin } from "next-vibe/ui/lib/location";
-import { Button } from "next-vibe/ui/ui/button";
-import { Card, CardContent } from "next-vibe/ui/ui/card";
-import { Div } from "next-vibe/ui/ui/div";
-import { AlertCircle } from "next-vibe/ui/ui/icons/AlertCircle";
-import { Check } from "next-vibe/ui/ui/icons/Check";
-import { Copy } from "next-vibe/ui/ui/icons/Copy";
-import { DollarSign } from "next-vibe/ui/ui/icons/DollarSign";
-import { Link2 } from "next-vibe/ui/ui/icons/Link2";
-import { TrendingUp } from "next-vibe/ui/ui/icons/TrendingUp";
-import { Users } from "next-vibe/ui/ui/icons/Users";
-import { Input } from "next-vibe/ui/ui/input";
-import { Span } from "next-vibe/ui/ui/span";
 import {
   useWidgetSelector,
   useWidgetTranslation,

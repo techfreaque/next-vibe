@@ -9,17 +9,17 @@
 
 "use client";
 
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { CheckCircle2 } from "next-vibe/ui/ui/icons/CheckCircle2";
-import { GitBranch } from "next-vibe/ui/ui/icons/GitBranch";
-import { GitMerge } from "next-vibe/ui/ui/icons/GitMerge";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
-import { MoveRight } from "next-vibe/ui/ui/icons/MoveRight";
-import { SkipForward } from "next-vibe/ui/ui/icons/SkipForward";
-import { Trash2 } from "next-vibe/ui/ui/icons/Trash2";
-import { Span } from "next-vibe/ui/ui/span";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { CheckCircle2 } from "next-vibe/ui/components/icons/CheckCircle2";
+import { GitBranch } from "next-vibe/ui/components/icons/GitBranch";
+import { GitMerge } from "next-vibe/ui/components/icons/GitMerge";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { MoveRight } from "next-vibe/ui/components/icons/MoveRight";
+import { SkipForward } from "next-vibe/ui/components/icons/SkipForward";
+import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
+import { Span } from "next-vibe/ui/components/span";
 
 import { Platform } from "../../platforms/platforms";
 import {

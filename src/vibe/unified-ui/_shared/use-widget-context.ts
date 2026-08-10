@@ -349,7 +349,7 @@ export {
 } from "./use-widget-value";
 
 // ---------------------------------------------------------------------------
-// CLI surface helpers - safe to call from cli/ui components
+// CLI surface helpers - safe to call from cli/components components
 // ---------------------------------------------------------------------------
 
 import { isAgentPlatform } from "../../platforms/platforms";

@@ -1,9 +1,9 @@
 "use client";
-import { Card, CardContent } from "next-vibe/ui/ui/card";
-import { Minus } from "next-vibe/ui/ui/icons/Minus";
-import { TrendingDown } from "next-vibe/ui/ui/icons/TrendingDown";
-import { TrendingUp } from "next-vibe/ui/ui/icons/TrendingUp";
-import { Span } from "next-vibe/ui/ui/span";
+import { Card, CardContent } from "next-vibe/ui/components/card";
+import { Minus } from "next-vibe/ui/components/icons/Minus";
+import { TrendingDown } from "next-vibe/ui/components/icons/TrendingDown";
+import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
+import { Span } from "next-vibe/ui/components/span";
 import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";

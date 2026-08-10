@@ -2,20 +2,20 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { Form } from "next-vibe/ui/components/form/form";
+import { Check } from "next-vibe/ui/components/icons/Check";
+import { Mail } from "next-vibe/ui/components/icons/Mail";
+import { Send } from "next-vibe/ui/components/icons/Send";
+import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
+import { Users } from "next-vibe/ui/components/icons/Users";
+import { X } from "next-vibe/ui/components/icons/X";
+import { Zap } from "next-vibe/ui/components/icons/Zap";
+import { Input } from "next-vibe/ui/components/input";
+import { Link } from "next-vibe/ui/components/link";
+import { H1, H2, H3, P } from "next-vibe/ui/components/typography";
 import { scrollToTop } from "next-vibe/ui/lib/dom";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { Form } from "next-vibe/ui/ui/form/form";
-import { Check } from "next-vibe/ui/ui/icons/Check";
-import { Mail } from "next-vibe/ui/ui/icons/Mail";
-import { Send } from "next-vibe/ui/ui/icons/Send";
-import { TrendingUp } from "next-vibe/ui/ui/icons/TrendingUp";
-import { Users } from "next-vibe/ui/ui/icons/Users";
-import { X } from "next-vibe/ui/ui/icons/X";
-import { Zap } from "next-vibe/ui/ui/icons/Zap";
-import { Input } from "next-vibe/ui/ui/input";
-import { Link } from "next-vibe/ui/ui/link";
-import { H1, H2, H3, P } from "next-vibe/ui/ui/typography";
 import type { JSX } from "react";
 import { useEffect, useRef } from "react";
 

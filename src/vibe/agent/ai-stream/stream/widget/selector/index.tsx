@@ -1,12 +1,12 @@
 "use client";
-import { Button } from "next-vibe/ui/ui/button";
-import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
+import { Button } from "next-vibe/ui/components/button";
+import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "next-vibe/ui/ui/popover";
-import { Span } from "next-vibe/ui/ui/span";
+} from "next-vibe/ui/components/popover";
+import { Span } from "next-vibe/ui/components/span";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 import { useMemo, useSyncExternalStore } from "react";

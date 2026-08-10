@@ -26,10 +26,10 @@ import {
   toProjectRelativePath,
   writeGeneratedFile,
 } from "../../generators/shared/utils";
+import type { PlatformMarkerValue } from "../../../identity/roles/enum";
 import {
   filterPlatformMarkers,
   PlatformMarker,
-  PlatformMarkerValue,
   type UserRoleValue,
 } from "../../../identity/roles/enum";
 import type { ApiSection } from "../endpoint-base";

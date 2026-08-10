@@ -1,12 +1,12 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
-import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
-import { Info } from "next-vibe/ui/ui/icons/Info";
-import { Span } from "next-vibe/ui/ui/span";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
+import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { Info } from "next-vibe/ui/components/icons/Info";
+import { Span } from "next-vibe/ui/components/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetForm,

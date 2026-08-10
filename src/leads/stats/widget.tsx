@@ -14,25 +14,25 @@ import {
   type LeadsTranslationKey,
   scopedTranslation as leadsScopedTranslation,
 } from "next-vibe/identity/lead/i18n";
-import { Button } from "next-vibe/ui/ui/button";
-import { Checkbox } from "next-vibe/ui/ui/checkbox";
-import { Div } from "next-vibe/ui/ui/div";
-import { Download } from "next-vibe/ui/ui/icons/Download";
-import { Filter } from "next-vibe/ui/ui/icons/Filter";
-import { List } from "next-vibe/ui/ui/icons/List";
-import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
-import { Search } from "next-vibe/ui/ui/icons/Search";
-import { Upload } from "next-vibe/ui/ui/icons/Upload";
-import { Users } from "next-vibe/ui/ui/icons/Users";
-import { Zap } from "next-vibe/ui/ui/icons/Zap";
-import { Input } from "next-vibe/ui/ui/input";
-import { Label } from "next-vibe/ui/ui/label";
-import { MetricCard } from "next-vibe/ui/ui/metric-card";
-import { MetricGrid } from "next-vibe/ui/ui/metric-grid";
-import { SectionGroup } from "next-vibe/ui/ui/section-group";
-import { Span } from "next-vibe/ui/ui/span";
-import { WidgetHeader } from "next-vibe/ui/ui/widget-header";
-import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
+import { Button } from "next-vibe/ui/components/button";
+import { Checkbox } from "next-vibe/ui/components/checkbox";
+import { Div } from "next-vibe/ui/components/div";
+import { Download } from "next-vibe/ui/components/icons/Download";
+import { Filter } from "next-vibe/ui/components/icons/Filter";
+import { List } from "next-vibe/ui/components/icons/List";
+import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
+import { Search } from "next-vibe/ui/components/icons/Search";
+import { Upload } from "next-vibe/ui/components/icons/Upload";
+import { Users } from "next-vibe/ui/components/icons/Users";
+import { Zap } from "next-vibe/ui/components/icons/Zap";
+import { Input } from "next-vibe/ui/components/input";
+import { Label } from "next-vibe/ui/components/label";
+import { MetricCard } from "next-vibe/ui/components/metric-card";
+import { MetricGrid } from "next-vibe/ui/components/metric-grid";
+import { SectionGroup } from "next-vibe/ui/components/section-group";
+import { Span } from "next-vibe/ui/components/span";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetContext,

@@ -4,21 +4,21 @@
  */
 
 "use client";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { Activity } from "next-vibe/ui/ui/icons/Activity";
-import { BarChart3 } from "next-vibe/ui/ui/icons/BarChart3";
-import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
-import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
-import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
-import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
-import { ChevronUp } from "next-vibe/ui/ui/icons/ChevronUp";
-import { Clock } from "next-vibe/ui/ui/icons/Clock";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
-import { RefreshCw } from "next-vibe/ui/ui/icons/RefreshCw";
-import { TrendingUp } from "next-vibe/ui/ui/icons/TrendingUp";
-import { XCircle } from "next-vibe/ui/ui/icons/XCircle";
-import { Span } from "next-vibe/ui/ui/span";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { Activity } from "next-vibe/ui/components/icons/Activity";
+import { BarChart3 } from "next-vibe/ui/components/icons/BarChart3";
+import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
+import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
+import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
+import { ChevronUp } from "next-vibe/ui/components/icons/ChevronUp";
+import { Clock } from "next-vibe/ui/components/icons/Clock";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
+import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
+import { XCircle } from "next-vibe/ui/components/icons/XCircle";
+import { Span } from "next-vibe/ui/components/span";
 import React, { useCallback, useMemo, useState } from "react";
 
 import { cn } from "../../../unified-ui/_shared/cn";

@@ -9,17 +9,17 @@
 
 "use client";
 
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
-import { Card, CardContent } from "next-vibe/ui/ui/card";
-import { Div } from "next-vibe/ui/ui/div";
-import { Clock } from "next-vibe/ui/ui/icons/Clock";
-import { ExternalLink as ExternalLinkIcon } from "next-vibe/ui/ui/icons/ExternalLink";
-import { Search } from "next-vibe/ui/ui/icons/Search";
-import { Sparkles } from "next-vibe/ui/ui/icons/Sparkles";
-import { Star } from "next-vibe/ui/ui/icons/Star";
-import { ExternalLink } from "next-vibe/ui/ui/link";
-import { Span } from "next-vibe/ui/ui/span";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
+import { Card, CardContent } from "next-vibe/ui/components/card";
+import { Div } from "next-vibe/ui/components/div";
+import { Clock } from "next-vibe/ui/components/icons/Clock";
+import { ExternalLink as ExternalLinkIcon } from "next-vibe/ui/components/icons/ExternalLink";
+import { Search } from "next-vibe/ui/components/icons/Search";
+import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
+import { Star } from "next-vibe/ui/components/icons/Star";
+import { ExternalLink } from "next-vibe/ui/components/link";
+import { Span } from "next-vibe/ui/components/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetForm,

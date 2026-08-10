@@ -160,6 +160,17 @@ export function getUiDir(): string {
   return join(process.cwd(), "src", "_pages");
 }
 
+/**
+ * Project-root-relative directory holding the ROOT layout (`layout.tsx`), the
+ * shell every route renders inside.
+ *
+ * Exists so `generated/app-tanstack/routes/__root.tsx` can be identical across
+ * trees: the builder maps the `@root-layout` alias onto this directory, and the
+ * root route imports `@root-layout/layout` rather than hardcoding a location
+ * that only makes sense in one layout.
+ */
+export const ROOT_LAYOUT_DIR = "src/_pages" as const;
+
 /** Absolute path to the generated-output directory (`src/generated`). */
 export function getGeneratedDir(): string {
   return join(process.cwd(), GENERATED_DIR);

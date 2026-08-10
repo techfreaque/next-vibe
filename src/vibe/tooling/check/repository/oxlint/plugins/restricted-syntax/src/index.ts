@@ -9,6 +9,7 @@
  *   node properties like content, icon, title, …)
  * - `no-raw-fetch` — no raw `fetch()` (use typed endpoint hooks; external-API
  *   calls opt out with a disable comment)
+ * - `no-as-assertion` — no `as` type assertions, except `as const`
  * - `no-browser-globals` — no direct window/document/navigator/storage access
  * - `no-endpoints-page-in-server-entry` — no `EndpointsPage` in server entry
  *   files (page/layout/template without 'use client')
@@ -93,6 +94,19 @@ interface CallExpression extends OxlintASTNode {
   callee?: OxlintASTNode;
 }
 
+/** AST node for TSAsExpression (`expr as Type`) */
+interface TSAsExpression extends OxlintASTNode {
+  type: "TSAsExpression";
+  expression?: OxlintASTNode;
+  typeAnnotation?: OxlintASTNode;
+}
+
+/** AST node for TSTypeReference (e.g. the `const` in `as const`) */
+interface TSTypeReference extends OxlintASTNode {
+  type: "TSTypeReference";
+  typeName?: OxlintASTNode;
+}
+
 /** AST node for Program */
 interface Program extends OxlintASTNode {
   type: "Program";
@@ -133,6 +147,7 @@ interface RestrictedSyntaxMessages {
   documentAccess: string;
   navigatorAccess: string;
   rawFetch: string;
+  asAssertion: string;
   endpointsPageInServerEntry: string;
 }
 
@@ -179,6 +194,11 @@ const DEFAULT_CONFIG: RestrictedSyntaxPluginConfig = {
   noThrow: true,
   noUnknown: true,
   noObjectType: true,
+  // Off by default here: this repo still carries thousands of `as X`
+  // assertions, so a default-on ban would fail every check including the
+  // checker's own tree. Trees that are clean opt in via check.config.ts
+  // (`noAsAssertion: true` in the shared restricted-syntax options).
+  noAsAssertion: false,
 };
 
 const DEFAULT_MESSAGES: RestrictedSyntaxMessages = {
@@ -202,6 +222,8 @@ const DEFAULT_MESSAGES: RestrictedSyntaxMessages = {
     "Direct 'navigator' access is not allowed. Use getUserAgent() from 'next-vibe/ui/utils/browser', or useWindowSize() from 'next-vibe/ui/hooks/use-window-size' / useTouchDevice() from 'next-vibe/ui/hooks/use-touch-device'.",
   rawFetch:
     "Raw 'fetch()' is not allowed. To read endpoint data, use the endpoint's typed hook (it handles caching, auth, and platform routing). Only genuine external-API calls may use raw fetch — mark those with '// oxlint-disable-next-line restricted/no-raw-fetch -- external API'.",
+  asAssertion:
+    "'as' type assertions are not allowed. Fix the underlying type instead of asserting past the checker ('as const' is unaffected).",
   endpointsPageInServerEntry:
     "'EndpointsPage' cannot be used in a server entry file (page/layout/template without 'use client') — its endpoint props don't survive the server→client boundary. Extract a page-client.tsx with 'use client' that renders EndpointsPage, and render that component from this file (see src/_pages/tools/page.tsx + page-client.tsx).",
 };
@@ -530,6 +552,17 @@ function isRawFetchCall(node: OxlintASTNode): boolean {
   return false;
 }
 
+/** Return true for the `const` in `as const` (a widening opt-out, not a type assertion). */
+function isConstAssertion(typeAnnotation: OxlintASTNode | undefined): boolean {
+  if (!typeAnnotation || typeAnnotation.type !== "TSTypeReference") {
+    return false;
+  }
+  const typeName = (typeAnnotation as TSTypeReference).typeName;
+  return (
+    typeName?.type === "Identifier" && (typeName as Identifier).name === "const"
+  );
+}
+
 // ============================================================
 // Rule Factory
 // ============================================================
@@ -548,6 +581,7 @@ const SHARED_OPTIONS_SCHEMA: RuleOptionSchema[] = [
       noThrow: { type: "boolean" },
       noUnknown: { type: "boolean" },
       noObjectType: { type: "boolean" },
+      noAsAssertion: { type: "boolean" },
       jsxAllowedProperties: { type: "array", items: { type: "string" } },
     },
   },
@@ -731,6 +765,22 @@ const noRawFetchRule = createBanRule({
         return;
       }
       report(node, messages.rawFetch);
+    },
+  }),
+});
+
+const noAsAssertionRule = createBanRule({
+  name: "no-as-assertion",
+  description: "Disallow `as` type assertions, except `as const`",
+  // Default OFF (see DEFAULT_CONFIG): only reports where the config opts in.
+  isEnabled: (options) => options.noAsAssertion === true,
+  isExemptFile: isAllowedPath,
+  createVisitors: ({ messages, report }) => ({
+    TSAsExpression: (node: OxlintASTNode): void => {
+      if (isConstAssertion((node as TSAsExpression).typeAnnotation)) {
+        return;
+      }
+      report(node, messages.asAssertion);
     },
   }),
 });
@@ -1122,6 +1172,7 @@ export default {
     "no-throw": noThrowRule,
     "no-jsx-in-object-literal": noJsxInObjectLiteralRule,
     "no-raw-fetch": noRawFetchRule,
+    "no-as-assertion": noAsAssertionRule,
     "no-browser-globals": noBrowserGlobalsRule,
     "no-endpoints-page-in-server-entry": noEndpointsPageInServerEntryRule,
   },

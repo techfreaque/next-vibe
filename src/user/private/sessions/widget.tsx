@@ -1,16 +1,16 @@
 "use client";
 
-import { Alert, AlertDescription } from "next-vibe/ui/ui/alert";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { EmptyBlock } from "next-vibe/ui/ui/empty-block";
-import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
-import { Key } from "next-vibe/ui/ui/icons/Key";
-import { LoadingBlock } from "next-vibe/ui/ui/loading-block";
-import { Span } from "next-vibe/ui/ui/span";
-import { StatusPill } from "next-vibe/ui/ui/status-pill";
-import { WidgetHeader } from "next-vibe/ui/ui/widget-header";
-import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
+import { Alert, AlertDescription } from "next-vibe/ui/components/alert";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
+import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { Key } from "next-vibe/ui/components/icons/Key";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
+import { Span } from "next-vibe/ui/components/span";
+import { StatusPill } from "next-vibe/ui/components/status-pill";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
   useWidgetContext,
   useWidgetLocale,

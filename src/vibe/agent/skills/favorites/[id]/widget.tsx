@@ -5,28 +5,28 @@
 "use client";
 
 import helpDefinitions from "next-vibe/help-tool/definition";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
-import { ArrowLeft } from "next-vibe/ui/ui/icons/ArrowLeft";
-import { Brain } from "next-vibe/ui/ui/icons/Brain";
-import { CheckCircle } from "next-vibe/ui/ui/icons/CheckCircle";
-import { ChevronDown } from "next-vibe/ui/ui/icons/ChevronDown";
-import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
-import { Eye } from "next-vibe/ui/ui/icons/Eye";
-import { Film } from "next-vibe/ui/ui/icons/Film";
-import { Loader2 } from "next-vibe/ui/ui/icons/Loader2";
-import { LogIn } from "next-vibe/ui/ui/icons/LogIn";
-import { Mic } from "next-vibe/ui/ui/icons/Mic";
-import { Settings } from "next-vibe/ui/ui/icons/Settings";
-import { UserPlus } from "next-vibe/ui/ui/icons/UserPlus";
-import { X } from "next-vibe/ui/ui/icons/X";
-import { Zap } from "next-vibe/ui/ui/icons/Zap";
-import { Input } from "next-vibe/ui/ui/input";
-import { Label } from "next-vibe/ui/ui/label";
-import { Skeleton } from "next-vibe/ui/ui/skeleton";
-import { Span } from "next-vibe/ui/ui/span";
-import { Textarea } from "next-vibe/ui/ui/textarea";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
+import { ArrowLeft } from "next-vibe/ui/components/icons/ArrowLeft";
+import { Brain } from "next-vibe/ui/components/icons/Brain";
+import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
+import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
+import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
+import { Eye } from "next-vibe/ui/components/icons/Eye";
+import { Film } from "next-vibe/ui/components/icons/Film";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { LogIn } from "next-vibe/ui/components/icons/LogIn";
+import { Mic } from "next-vibe/ui/components/icons/Mic";
+import { Settings } from "next-vibe/ui/components/icons/Settings";
+import { UserPlus } from "next-vibe/ui/components/icons/UserPlus";
+import { X } from "next-vibe/ui/components/icons/X";
+import { Zap } from "next-vibe/ui/components/icons/Zap";
+import { Input } from "next-vibe/ui/components/input";
+import { Label } from "next-vibe/ui/components/label";
+import { Skeleton } from "next-vibe/ui/components/skeleton";
+import { Span } from "next-vibe/ui/components/span";
+import { Textarea } from "next-vibe/ui/components/textarea";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetForm,
@@ -53,20 +53,19 @@ import {
   DEFAULT_IMAGE_VISION_MODEL_SELECTION,
   DEFAULT_VIDEO_VISION_MODEL_SELECTION,
 } from "../../../ai-stream/constants";
-import { type ChatModelId, getBestChatModel } from "../../../ai-stream/models";
 import {
   chatManualModelSelectionSchema,
+  type ChatModelId,
   type ChatModelSelection,
   chatModelSelectionSchema,
+  getBestChatModel,
 } from "../../../ai-stream/models";
-import {
-  getBestAudioVisionModel,
-  getBestImageVisionModel,
-  getBestVideoVisionModel,
-} from "../../../ai-stream/vision-models";
 import {
   type AudioVisionModelSelection,
   audioVisionModelSelectionSchema,
+  getBestAudioVisionModel,
+  getBestImageVisionModel,
+  getBestVideoVisionModel,
   type ImageVisionModelSelection,
   imageVisionModelSelectionSchema,
   type VideoVisionModelSelection,
@@ -79,8 +78,8 @@ import { parseSkillId } from "../../../chat/slugify";
 import type { AgentEnvAvailability } from "../../../env-availability";
 import { useProviderAvailability } from "../../../env-availability-store";
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "../../../image-generation/constants";
-import { getBestImageGenModel } from "../../../image-generation/models";
 import {
+  getBestImageGenModel,
   type ImageGenModelSelection,
   imageGenModelSelectionSchema,
 } from "../../../image-generation/models";
@@ -89,20 +88,20 @@ import {
   ModelSelectorTrigger,
 } from "../../../models/widget/model-selector";
 import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "../../../music-generation/constants";
-import { getBestMusicGenModel } from "../../../music-generation/models";
 import {
+  getBestMusicGenModel,
   type MusicGenModelSelection,
   musicGenModelSelectionSchema,
 } from "../../../music-generation/models";
 import { DEFAULT_STT_MODEL_SELECTION } from "../../../speech-to-text/constants";
-import { getBestSttModel } from "../../../speech-to-text/models";
 import {
+  getBestSttModel,
   type SttModelSelection,
   sttModelSelectionSchema,
 } from "../../../speech-to-text/models";
 import { DEFAULT_TTS_MODEL_SELECTION } from "../../../text-to-speech/constants";
-import { getBestTtsModel } from "../../../text-to-speech/models";
 import {
+  getBestTtsModel,
   type VoiceModelSelection,
   voiceModelSelectionSchema,
 } from "../../../text-to-speech/models";
@@ -112,8 +111,8 @@ import {
   type ToolsConfigValue,
 } from "../../../tools/widget/tools-config-widget";
 import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "../../../video-generation/constants";
-import { getBestVideoGenModel } from "../../../video-generation/models";
 import {
+  getBestVideoGenModel,
   type VideoGenModelSelection,
   videoGenModelSelectionSchema,
 } from "../../../video-generation/models";

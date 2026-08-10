@@ -20,7 +20,7 @@ import { success } from "../../core/route/response.schema";
 import type { WidgetData } from "../../core/utils/json";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
-import { Platform } from "../../platforms/platforms";
+import type { Platform } from "../../platforms/platforms";
 import { CallbackMode, type CallbackModeValue } from "../constants";
 
 export async function runEndpointByName(params: {

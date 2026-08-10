@@ -8,17 +8,17 @@
 
 "use client";
 
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { Form } from "next-vibe/ui/components/form/form";
+import { Check } from "next-vibe/ui/components/icons/Check";
+import { Mail } from "next-vibe/ui/components/icons/Mail";
+import { Send } from "next-vibe/ui/components/icons/Send";
+import { X } from "next-vibe/ui/components/icons/X";
+import { Input } from "next-vibe/ui/components/input";
+import { Link } from "next-vibe/ui/components/link";
+import { H1, H2, H3, P } from "next-vibe/ui/components/typography";
 import { assignUrl } from "next-vibe/ui/lib/location";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { Form } from "next-vibe/ui/ui/form/form";
-import { Check } from "next-vibe/ui/ui/icons/Check";
-import { Mail } from "next-vibe/ui/ui/icons/Mail";
-import { Send } from "next-vibe/ui/ui/icons/Send";
-import { X } from "next-vibe/ui/ui/icons/X";
-import { Input } from "next-vibe/ui/ui/input";
-import { Link } from "next-vibe/ui/ui/link";
-import { H1, H2, H3, P } from "next-vibe/ui/ui/typography";
 import {
   useWidgetForm,
   useWidgetLocale,

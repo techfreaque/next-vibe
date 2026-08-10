@@ -4,7 +4,7 @@
  */
 
 "use client";
-import { Badge } from "next-vibe/ui/ui/badge";
+import { Badge } from "next-vibe/ui/components/badge";
 import type { JSX } from "react";
 import type z from "zod";
 

@@ -4,36 +4,40 @@ import skillsDef from "next-vibe/agent/skills/definition";
 import { SkillOwnershipType } from "next-vibe/agent/skills/enum";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import { scopedTranslation as userRoleScopedTranslation } from "next-vibe/identity/roles/i18n";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "next-vibe/ui/components/avatar";
+import { Badge } from "next-vibe/ui/components/badge";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { Form } from "next-vibe/ui/components/form/form";
+import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
+import { Camera } from "next-vibe/ui/components/icons/Camera";
+import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
+import { ExternalLink } from "next-vibe/ui/components/icons/ExternalLink";
+import { Globe } from "next-vibe/ui/components/icons/Globe";
+import { Instagram } from "next-vibe/ui/components/icons/Instagram";
+import { LogOut } from "next-vibe/ui/components/icons/LogOut";
+import { Mail } from "next-vibe/ui/components/icons/Mail";
+import { Music } from "next-vibe/ui/components/icons/Music";
+import { Pencil } from "next-vibe/ui/components/icons/Pencil";
+import { Save } from "next-vibe/ui/components/icons/Save";
+import { SiDiscord } from "next-vibe/ui/components/icons/SiDiscord";
+import { SiGithub } from "next-vibe/ui/components/icons/SiGithub";
+import { Twitter } from "next-vibe/ui/components/icons/Twitter";
+import { Youtube } from "next-vibe/ui/components/icons/Youtube";
+import { Input } from "next-vibe/ui/components/input";
+import { Link } from "next-vibe/ui/components/link";
+import { Span } from "next-vibe/ui/components/span";
+import { StatusPill } from "next-vibe/ui/components/status-pill";
+import { H2, P } from "next-vibe/ui/components/typography";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { useRouter } from "next-vibe/ui/hooks/use-navigation";
 import { assignUrl } from "next-vibe/ui/lib/location";
-import { Avatar, AvatarFallback, AvatarImage } from "next-vibe/ui/ui/avatar";
-import { Badge } from "next-vibe/ui/ui/badge";
-import { Button } from "next-vibe/ui/ui/button";
-import { Div } from "next-vibe/ui/ui/div";
-import { Form } from "next-vibe/ui/ui/form/form";
-import { AlertTriangle } from "next-vibe/ui/ui/icons/AlertTriangle";
-import { Camera } from "next-vibe/ui/ui/icons/Camera";
-import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
-import { ChevronRight } from "next-vibe/ui/ui/icons/ChevronRight";
-import { ExternalLink } from "next-vibe/ui/ui/icons/ExternalLink";
-import { Globe } from "next-vibe/ui/ui/icons/Globe";
-import { Instagram } from "next-vibe/ui/ui/icons/Instagram";
-import { LogOut } from "next-vibe/ui/ui/icons/LogOut";
-import { Mail } from "next-vibe/ui/ui/icons/Mail";
-import { Music } from "next-vibe/ui/ui/icons/Music";
-import { Pencil } from "next-vibe/ui/ui/icons/Pencil";
-import { Save } from "next-vibe/ui/ui/icons/Save";
-import { SiDiscord } from "next-vibe/ui/ui/icons/SiDiscord";
-import { SiGithub } from "next-vibe/ui/ui/icons/SiGithub";
-import { Twitter } from "next-vibe/ui/ui/icons/Twitter";
-import { Youtube } from "next-vibe/ui/ui/icons/Youtube";
-import { Input } from "next-vibe/ui/ui/input";
-import { Link } from "next-vibe/ui/ui/link";
-import { Span } from "next-vibe/ui/ui/span";
-import { StatusPill } from "next-vibe/ui/ui/status-pill";
-import { H2, P } from "next-vibe/ui/ui/typography";
-import { WidgetHeader } from "next-vibe/ui/ui/widget-header";
-import { WidgetShell } from "next-vibe/ui/ui/widget-shell";
 import {
   useWidgetForm,
   useWidgetLocale,

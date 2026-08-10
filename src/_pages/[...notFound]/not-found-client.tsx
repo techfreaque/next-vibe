@@ -1,15 +1,15 @@
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { Button } from "next-vibe/ui/ui/button";
-import { Card, CardContent } from "next-vibe/ui/ui/card";
-import { Div } from "next-vibe/ui/ui/div";
-import { ChevronLeft } from "next-vibe/ui/ui/icons/ChevronLeft";
-import { Home } from "next-vibe/ui/ui/icons/Home";
-import { Image } from "next-vibe/ui/ui/image";
-import { Link } from "next-vibe/ui/ui/link";
-import { Span } from "next-vibe/ui/ui/span";
-import { H1, H2, P } from "next-vibe/ui/ui/typography";
+import { Button } from "next-vibe/ui/components/button";
+import { Card, CardContent } from "next-vibe/ui/components/card";
+import { Div } from "next-vibe/ui/components/div";
+import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { Home } from "next-vibe/ui/components/icons/Home";
+import { Image } from "next-vibe/ui/components/image";
+import { Link } from "next-vibe/ui/components/link";
+import { Span } from "next-vibe/ui/components/span";
+import { H1, H2, P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 
 import { scopedTranslation as pageT } from "./i18n";

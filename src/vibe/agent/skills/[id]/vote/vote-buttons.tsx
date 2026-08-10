@@ -9,10 +9,10 @@
  */
 
 "use client";
-import { Button } from "next-vibe/ui/ui/button";
-import { ThumbsDown } from "next-vibe/ui/ui/icons/ThumbsDown";
-import { ThumbsUp } from "next-vibe/ui/ui/icons/ThumbsUp";
-import { Span } from "next-vibe/ui/ui/span";
+import { Button } from "next-vibe/ui/components/button";
+import { ThumbsDown } from "next-vibe/ui/components/icons/ThumbsDown";
+import { ThumbsUp } from "next-vibe/ui/components/icons/ThumbsUp";
+import { Span } from "next-vibe/ui/components/span";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetContext,

@@ -7,10 +7,10 @@ import {
 } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { VibeMode } from "next-vibe/env/env-util";
-import { Div } from "next-vibe/ui/ui/div";
-import { Image } from "next-vibe/ui/ui/image";
-import { Link } from "next-vibe/ui/ui/link";
-import { Span } from "next-vibe/ui/ui/span";
+import { Div } from "next-vibe/ui/components/div";
+import { Image } from "next-vibe/ui/components/image";
+import { Link } from "next-vibe/ui/components/link";
+import { Span } from "next-vibe/ui/components/span";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 
