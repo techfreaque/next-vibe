@@ -19,6 +19,7 @@ export const forwardLead: ForwardLeadFn = async (credentials, lead, t) => {
   } = credentials;
   const { firstName, email } = lead;
 
+  // oxlint-disable-next-line restricted/no-raw-fetch -- external API
   const authResponse = await fetch(oAuthUrl, {
     method: "POST",
     headers: {
@@ -37,6 +38,7 @@ export const forwardLead: ForwardLeadFn = async (credentials, lead, t) => {
 
   const token = authData.access_token as string;
 
+  // oxlint-disable-next-line restricted/no-raw-fetch -- external API
   const response = await fetch(apiContactsUrl, {
     method: "post",
     headers: {

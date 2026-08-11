@@ -1,4 +1,4 @@
-// oxlint-disable oxlint-plugin-restricted/no-unknown, oxlint-plugin-restricted/no-throw
+// oxlint-disable restricted/no-unknown, oxlint-plugin-restricted/no-throw
 /**
  * startCliEventTap — unit tests for in-process CLI event delivery.
  *
@@ -16,11 +16,11 @@
 
 import "server-only";
 
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { defaultLocale } from "../../core/i18n/core/config";
 import type { WidgetData } from "../../core/utils/json";
 import type { JwtPrivatePayloadType } from "../../identity/auth/types";
 import { createEndpointLogger } from "../../logger/server";
-import { afterEach, describe, expect, it, vi } from "vitest";
 
 import vibeCheckEndpoints from "@/vibe/tooling/check/definition";
 

@@ -1,4 +1,4 @@
-// oxlint-disable oxlint-plugin-i18n/no-literal-string -- Inline endpoint: this
+// oxlint-disable i18n/no-literal-string -- Inline endpoint: this
 // widget renders literal copy by design (see definition.ts, createEndpoint from
 // core/definition/create). There is no scope to translate against.
 "use client";

@@ -62,7 +62,7 @@ function TreeViewer({
       <Div className="flex flex-wrap gap-2 items-center shrink-0">
         {data.nodeCount !== null && data.nodeCount !== undefined ? (
           <Badge variant="secondary" className="text-xs">
-            {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+            {/* eslint-disable-next-line i18n/no-literal-string */}
             {data.nodeCount} nodes
           </Badge>
         ) : null}
@@ -75,7 +75,7 @@ function TreeViewer({
           </Badge>
         ) : null}
         <Span className="text-xs text-muted-foreground ml-auto">
-          {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+          {/* eslint-disable-next-line i18n/no-literal-string */}
           {filtered.length} line{filtered.length === 1 ? "" : "s"}
         </Span>
       </Div>

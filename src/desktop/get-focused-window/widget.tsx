@@ -122,7 +122,7 @@ export function GetFocusedWindowWidget(_props: CustomWidgetProps): JSX.Element {
             <Div className="flex flex-wrap gap-1.5">
               {data.pid !== null && data.pid !== undefined ? (
                 <Badge variant="secondary" className="font-mono text-xs">
-                  {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+                  {/* eslint-disable-next-line i18n/no-literal-string */}
                   pid:{data.pid}
                 </Badge>
               ) : null}
@@ -136,7 +136,7 @@ export function GetFocusedWindowWidget(_props: CustomWidgetProps): JSX.Element {
               data.height !== null &&
               data.height !== undefined ? (
                 <Badge variant="outline" className="text-xs font-mono">
-                  {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+                  {/* eslint-disable-next-line i18n/no-literal-string */}
                   {data.width}×{data.height}
                 </Badge>
               ) : null}

@@ -13,6 +13,8 @@ import { Body } from "next-vibe/ui/components/body";
 import { inter } from "next-vibe/ui/components/font";
 import { Head } from "next-vibe/ui/components/head";
 import { Html } from "next-vibe/ui/components/html";
+import { LinkTag } from "next-vibe/ui/components/link-tag";
+import { Meta } from "next-vibe/ui/components/meta";
 import { Outlet } from "next-vibe/ui/components/outlet";
 import { Script } from "next-vibe/ui/components/script";
 import { Scripts } from "next-vibe/ui/components/scripts";
@@ -131,8 +133,8 @@ export function TanstackPage({
   return (
     <Html lang={locale} className={theme} suppressHydrationWarning>
       <Head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="manifest" href={`/api/${locale}/manifest`} />
+        <Meta name="viewport" content="width=device-width, initial-scale=1" />
+        <LinkTag rel="manifest" href={`/api/${locale}/manifest`} />
         {/* Sync cookie → localStorage before next-themes reads it, preventing theme flash */}
         <Script
           id="theme-sync"

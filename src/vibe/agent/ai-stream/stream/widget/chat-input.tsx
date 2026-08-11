@@ -6,7 +6,6 @@
  * Used by both ai-stream and ai-run widgets in form mode.
  */
 
-/* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";

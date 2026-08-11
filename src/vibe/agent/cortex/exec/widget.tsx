@@ -665,7 +665,7 @@ export function CortexExecWidget(_props: {
           {/* Terminal body */}
           <Pre className="text-xs font-mono whitespace-pre-wrap break-all max-h-[400px] overflow-y-auto bg-[#0d0d0d] dark:bg-[#0a0a0a] text-[#e8e8e8] p-3 leading-[1.6]">
             {/* Prompt + command */}
-            {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+            {/* eslint-disable-next-line i18n/no-literal-string */}
             <Span className="text-green-400 select-none">$ </Span>
             <Span className="text-[#e8e8e8]">
               {command}

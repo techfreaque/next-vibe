@@ -295,7 +295,7 @@ export function WebSearchResultsContainer({
           <Div className="flex items-center gap-2">
             {value?.usedProvider ? (
               <Badge variant="secondary" className="text-xs font-normal">
-                {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+                {/* eslint-disable-next-line i18n/no-literal-string */}
                 via {widgetT(value.usedProvider)}
               </Badge>
             ) : null}

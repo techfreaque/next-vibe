@@ -23,7 +23,7 @@
  *    them in a row on both. Every inline row here says so explicitly.
  */
 
-// oxlint-disable oxlint-plugin-i18n/no-literal-string -- Inline endpoint: this
+// oxlint-disable i18n/no-literal-string -- Inline endpoint: this
 // widget renders literal copy by design (see definition.ts, createEndpoint from
 // core/definition/create). There is no scope to translate against.
 "use client";
@@ -494,7 +494,7 @@ function CodeQualitySummary({
     return (
       <Div className="mt-1">
         <Span>{"Summary"}</Span>
-        {/* oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- Separator */}
+        {/* oxlint-disable-next-line i18n/no-literal-string -- Separator */}
         <Span>──────────────────────────────────────────────────</Span>
         <Div>
           <Span>{`${"Files"}: ${filesDisplay}`}</Span>
@@ -519,7 +519,7 @@ function CodeQualitySummary({
         <BarChart3 className={ICON_SIZE} />
         <Span className="font-bold">{` ${"Summary"}`}</Span>
       </Div>
-      {/* oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- Separator */}
+      {/* oxlint-disable-next-line i18n/no-literal-string -- Separator */}
       <Span>──────────────────────────────────────────────────</Span>
       <Div className="flex">
         <Folder className={ICON_SIZE} />

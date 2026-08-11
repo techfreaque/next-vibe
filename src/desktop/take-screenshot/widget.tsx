@@ -47,10 +47,10 @@ function ScreenshotResult({
   const hasScaling =
     data.originalWidth && data.width && data.originalWidth !== data.width;
   const dimStr = hasScaling
-    ? /* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */
+    ? /* eslint-disable-next-line i18n/no-literal-string */
       `${data.originalWidth}×${data.originalHeight} → ${data.width}×${data.height}`
     : data.width
-      ? /* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */
+      ? /* eslint-disable-next-line i18n/no-literal-string */
         `${data.width}×${data.height}`
       : null;
 

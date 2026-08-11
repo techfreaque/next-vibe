@@ -92,7 +92,7 @@ function ReferenceCard({
         >
           <Div className="flex items-start gap-3">
             <Span className="text-xs font-mono text-muted-foreground shrink-0 mt-0.5 w-5 text-right">
-              {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+              {/* eslint-disable-next-line i18n/no-literal-string */}
               {index + 1}
             </Span>
             <Div className="rounded-lg bg-muted p-1.5 mt-0.5 shrink-0">

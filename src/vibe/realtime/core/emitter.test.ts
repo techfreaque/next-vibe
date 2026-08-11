@@ -1,4 +1,4 @@
-// oxlint-disable oxlint-plugin-restricted/no-unknown, oxlint-plugin-restricted/no-throw
+// oxlint-disable restricted/no-unknown, oxlint-plugin-restricted/no-throw
 /**
  * createEndpointEmitter — unit tests for the v2 delivery model.
  *
@@ -15,14 +15,14 @@
 
 import "server-only";
 
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import { defaultLocale } from "../../core/i18n/core/config";
 import type { JwtPrivatePayloadType } from "../../identity/auth/types";
 import { createEndpointLogger } from "../../logger/server";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import cortexDeleteDefinition from "@/vibe/agent/cortex/delete/definition";
 import creditsDefinition from "@/credits/definition";
+import cortexDeleteDefinition from "@/vibe/agent/cortex/delete/definition";
 
 import { buildUserWsChannel } from "./channel";
 import { createEndpointEmitter } from "./emitter";

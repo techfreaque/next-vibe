@@ -23,6 +23,7 @@ export const forwardLead: ForwardLeadFn = async (credentials, lead, t) => {
   } = credentials;
   const { firstName, email } = lead;
 
+  // oxlint-disable-next-line restricted/no-raw-fetch -- external API
   const authResponse = await fetch(oAuthUrl, {
     method: "POST",
     headers: {
@@ -43,6 +44,7 @@ export const forwardLead: ForwardLeadFn = async (credentials, lead, t) => {
 
   const token = authData.access_token as string;
 
+  // oxlint-disable-next-line restricted/no-raw-fetch -- external API
   const contactResponse = await fetch(
     apiContactsUrl.replace("{group_id}", cleverreachListId),
     {
@@ -74,6 +76,7 @@ export const forwardLead: ForwardLeadFn = async (credentials, lead, t) => {
     return success(undefined);
   }
 
+  // oxlint-disable-next-line restricted/no-raw-fetch -- external API
   const doiResponse = await fetch(
     apiDOIMailUrl.replace("{form_id}", cleverreachFormId),
     {

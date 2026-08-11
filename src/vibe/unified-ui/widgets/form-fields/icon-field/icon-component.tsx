@@ -62,7 +62,7 @@ export const Icon: React.FC<{
             () =>
               ({ className: cls }: { className?: string }): JSX.Element =>
                 (
-                  /* oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- Fallback indicator */
+                  /* oxlint-disable-next-line i18n/no-literal-string -- Fallback indicator */
                   <Span className={cls}>??</Span>
                 ),
           );
@@ -75,7 +75,7 @@ export const Icon: React.FC<{
           () =>
             ({ className: cls }: { className?: string }): JSX.Element =>
               (
-                /* oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- Error indicator */
+                /* oxlint-disable-next-line i18n/no-literal-string -- Error indicator */
                 <Span className={cls}>!</Span>
               ),
         );

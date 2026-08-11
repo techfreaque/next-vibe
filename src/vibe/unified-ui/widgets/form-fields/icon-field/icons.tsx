@@ -96,7 +96,7 @@ const OneAIcon: IconComponent = ({ className = "" }) => (
       className,
     )}
   >
-    {/* oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+    {/* oxlint-disable-next-line i18n/no-literal-string */}
     1A
   </Span>
 );

@@ -10,7 +10,7 @@ import { UserRepository } from "next-vibe/identity/user/repository";
 import type { StandardUserType } from "next-vibe/identity/user/types";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { Platform } from "next-vibe/platforms/platforms";
-import { Div } from "next-vibe/ui/components/div";
+import { Main } from "next-vibe/ui/components/main";
 import { PageLayout } from "next-vibe/ui/components/page-layout";
 import type { JSX, ReactNode } from "react";
 
@@ -87,7 +87,7 @@ export function TanstackPage({
 }: SubscriptionLayoutData): JSX.Element {
   return (
     <PageLayout scrollable={true}>
-      <Div role="main" className="min-h-screen">
+      <Main className="min-h-screen">
         <Navbar
           user={user}
           userProfile={userProfile}
@@ -102,7 +102,7 @@ export function TanstackPage({
           totalModelCount={totalModelCount}
           isPublic={user.isPublic}
         />
-      </Div>
+      </Main>
     </PageLayout>
   );
 }

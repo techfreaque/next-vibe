@@ -1,4 +1,4 @@
-// oxlint-disable oxlint-plugin-restricted/no-unknown
+// oxlint-disable restricted/no-unknown
 /**
  * Remote Event Bridge Repository — unit tests
  *
@@ -12,10 +12,10 @@
 
 import "server-only";
 
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { defaultLocale } from "../../core/i18n/core/config";
 import type { JwtPrivatePayloadType } from "../../identity/auth/types";
 import { createEndpointLogger } from "../../logger/server";
-import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { AnyEndpointEventEnvelope } from "../core/structured-events";
 import type { RemoteEventBridgeRepository as RemoteEventBridgeRepositoryType } from "./repository";

@@ -156,7 +156,7 @@ export function DebugTrailingContext({
         >
           <Div className="flex items-center justify-between mb-2">
             <Span className="text-xs font-mono text-purple-400/60 uppercase tracking-wide">
-              {/* eslint-disable-next-line i18next/no-literal-string, oxlint-plugin-i18n/no-literal-string -- debug-only label */}
+              {/* eslint-disable-next-line i18next/no-literal-string, i18n/no-literal-string -- debug-only label */}
               trailing system message · injected after history
             </Span>
             <Button

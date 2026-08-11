@@ -239,8 +239,8 @@ export function CatalogProductGetWidget({
             </Span>
             {product.unit ? (
               <Span className="text-xs text-muted-foreground">
-                {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
-                / {product.unit}
+                {/* eslint-disable-next-line i18n/no-literal-string */}/{" "}
+                {product.unit}
               </Span>
             ) : null}
           </Div>
@@ -258,8 +258,7 @@ export function CatalogProductGetWidget({
             </Span>
             <Span className="text-sm font-mono font-semibold">
               {(product.defaultTaxRate * 100).toFixed(2)}
-              {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
-              %
+              {/* eslint-disable-next-line i18n/no-literal-string */}%
             </Span>
           </Div>
         ) : null}

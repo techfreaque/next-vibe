@@ -52,7 +52,7 @@ function ContentBlockItem({
     const sizeKb = Math.round((block.data.length * 3) / 4 / 1024);
     return (
       <Span className="text-sm text-muted-foreground">
-        {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+        {/* eslint-disable-next-line i18n/no-literal-string */}
         {`[image: ${block.mimeType}, ~${sizeKb}KB]`}
       </Span>
     );

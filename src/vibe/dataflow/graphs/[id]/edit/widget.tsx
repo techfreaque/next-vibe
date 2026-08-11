@@ -1268,7 +1268,7 @@ const NodeInspector = React.memo(function NodeInspector({
     [nodeId, nodeConfig, onUpdate],
   );
 
-  // eslint-disable-next-line oxlint-plugin-i18n/no-literal-string
+  // eslint-disable-next-line i18n/no-literal-string
   const extraParamsLabel =
     Object.keys(paramFields).length > 0
       ? "Extra Params"
@@ -1382,7 +1382,7 @@ const NodeInspector = React.memo(function NodeInspector({
 
         {/* Connections - read-only wiring map */}
         {(incomingEdges.length > 0 || outgoingEdges.length > 0) && (
-          // eslint-disable-next-line oxlint-plugin-i18n/no-literal-string -- section label is UI chrome
+          // eslint-disable-next-line i18n/no-literal-string -- section label is UI chrome
           <InspectorSection label="Connections">
             <Div className="flex flex-col gap-1">
               {endpointInfo.handles.inputs.map((handle) => {
@@ -1410,7 +1410,7 @@ const NodeInspector = React.memo(function NodeInspector({
                         {connectedEdge.from}
                       </Button>
                     ) : (
-                      // eslint-disable-next-line oxlint-plugin-i18n/no-literal-string -- UI fallback
+                      // eslint-disable-next-line i18n/no-literal-string -- UI fallback
                       <P className="text-[9px] text-muted-foreground/40 italic">
                         {"unconnected"}
                       </P>
@@ -1448,7 +1448,7 @@ const NodeInspector = React.memo(function NodeInspector({
                         ))}
                       </Div>
                     ) : (
-                      // eslint-disable-next-line oxlint-plugin-i18n/no-literal-string -- UI fallback
+                      // eslint-disable-next-line i18n/no-literal-string -- UI fallback
                       <P className="text-[9px] text-muted-foreground/40 italic">
                         {"unconnected"}
                       </P>
@@ -2913,7 +2913,7 @@ function EditFormInner({
               <Div className="flex items-center gap-0.5 px-1">
                 <History className="h-3 w-3 text-muted-foreground/50" />
                 <Span className="text-[10px] text-muted-foreground/70 tabular-nums">
-                  {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+                  {/* eslint-disable-next-line i18n/no-literal-string */}
                   {`${String(currentVersionIndex >= 0 ? currentVersionIndex + 1 : versionChain.length)}/${String(versionChain.length)}`}
                 </Span>
               </Div>

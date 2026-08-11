@@ -1,4 +1,4 @@
-/* eslint-disable oxlint-plugin-i18n/no-literal-string */
+/* eslint-disable i18n/no-literal-string */
 "use client";
 
 import { platform } from "next-vibe/core/env-client";

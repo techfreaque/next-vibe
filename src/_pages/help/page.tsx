@@ -16,6 +16,7 @@ import { Platform } from "next-vibe/platforms/platforms";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Link } from "next-vibe/ui/components/link";
+import { Main } from "next-vibe/ui/components/main";
 import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
@@ -132,10 +133,7 @@ export function TanstackPage({
   const { t } = pageT.scopedT(locale);
 
   return (
-    <Div
-      role="main"
-      className="min-h-screen bg-primary/5 bg-linear-to-b from-primary/5 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900"
-    >
+    <Main className="min-h-screen bg-primary/5 bg-linear-to-b from-primary/5 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
       <Div className="container max-w-6xl mx-auto pt-8 px-4">
         <Link
           href={`/${locale}/threads`}
@@ -156,7 +154,7 @@ export function TanstackPage({
         packPrice={packPrice}
         packCredits={packCredits}
       />
-    </Div>
+    </Main>
   );
 }
 

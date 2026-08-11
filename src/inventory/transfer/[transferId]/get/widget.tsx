@@ -226,7 +226,7 @@ export function InventoryTransferGetWidget({
             aria-hidden="true"
             className="text-2xl font-light text-muted-foreground shrink-0"
           >
-            {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+            {/* eslint-disable-next-line i18n/no-literal-string */}
             {"\u2192"}
           </Span>
           <Div className="flex-1 flex flex-col gap-1">

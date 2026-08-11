@@ -69,16 +69,15 @@ function MonitorCard({
           </Badge>
         ) : (
           <Span className="text-xs text-muted-foreground shrink-0">
-            {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
-            #{m.index}
+            {/* eslint-disable-next-line i18n/no-literal-string */}#{m.index}
           </Span>
         )}
       </Div>
       <Div className="text-xs text-muted-foreground font-mono">
-        {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+        {/* eslint-disable-next-line i18n/no-literal-string */}
         {m.width}×{m.height}
         <Span className="mx-1.5 opacity-40">/</Span>
-        {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+        {/* eslint-disable-next-line i18n/no-literal-string */}
         {m.x},{m.y}
       </Div>
       {!isPickerMode ? (

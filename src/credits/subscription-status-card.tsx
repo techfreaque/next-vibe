@@ -23,6 +23,7 @@ import type { JSX } from "react";
 
 import { scopedTranslation as appScopedTranslation } from "@/_pages/i18n";
 import { scopedTranslation as pageSubscriptionScopedTranslation } from "@/_pages/subscription/i18n";
+import type { PaymentProviderValue } from "@/payment/enum";
 import { PaymentProvider } from "@/payment/enum";
 import { scopedTranslation as paymentScopedTranslation } from "@/payment/i18n";
 import { useCustomerPortal } from "@/payment/portal/hooks";
@@ -35,6 +36,15 @@ interface SubscriptionStatusCardProps {
   initialSubscription: SubscriptionGetResponseOutput;
   user: JwtPayloadType;
   logger: EndpointLogger;
+}
+
+function getSubscriptionProviderIcon(
+  provider: typeof PaymentProviderValue | undefined,
+): JSX.Element {
+  if (provider === PaymentProvider.NOWPAYMENTS) {
+    return <Bitcoin className="h-5 w-5 text-orange-500" />;
+  }
+  return <CreditCard className="h-5 w-5 text-primary" />;
 }
 
 export function SubscriptionStatusCard({
@@ -57,13 +67,6 @@ export function SubscriptionStatusCard({
 
   const isCanceled = status === SubscriptionStatus.CANCELED;
   const isCanceling = !isCanceled && initialSubscription.cancelAt;
-
-  const getProviderIcon = (provider?: string): JSX.Element => {
-    if (provider === PaymentProvider.NOWPAYMENTS) {
-      return <Bitcoin className="h-5 w-5 text-orange-500" />;
-    }
-    return <CreditCard className="h-5 w-5 text-primary" />;
-  };
 
   const getProviderName = (provider?: string): string => {
     if (provider === PaymentProvider.NOWPAYMENTS) {
@@ -124,7 +127,7 @@ export function SubscriptionStatusCard({
                   : subscriptionT(status)}
             </Badge>
             <Badge variant="outline" className="flex items-center gap-1">
-              {getProviderIcon(initialSubscription.provider)}
+              {getSubscriptionProviderIcon(initialSubscription.provider)}
               {getProviderName(initialSubscription.provider)}
             </Badge>
           </Div>

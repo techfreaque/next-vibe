@@ -1,4 +1,3 @@
-// oxlint-disable oxlint-plugin-i18n/no-literal-string -- Email templates use fixed EN strings, not i18n
 import {
   Body,
   Container,
@@ -11,7 +10,6 @@ import {
   Text,
 } from "@react-email/components";
 import type { JSX } from "react";
-import React from "react";
 
 export interface LeadNotificationEmailProps {
   firstName: string;

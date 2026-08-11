@@ -10,7 +10,7 @@
  * Internally converts to/from EnabledTool[] for consistent UI with HelpToolsWidget.
  */
 
-/* eslint-disable oxlint-plugin-i18n/no-literal-string */
+/* eslint-disable i18n/no-literal-string */
 "use client";
 import type { HelpToolMetadataSerialized } from "next-vibe/help-tool/definition";
 import helpDefinitions from "next-vibe/help-tool/definition";
@@ -44,6 +44,8 @@ import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
+import { scopedTranslation } from "@/_pages/tools/i18n";
+import type { CountryLanguage } from "@/vibe/core/i18n/core/config";
 import { getDefaultToolIdsForUser } from "../../chat/constants";
 import type { EnabledTool } from "../../chat/hooks/store";
 
@@ -60,6 +62,7 @@ export interface ToolsConfigValue {
 }
 
 export interface ToolsConfigEditProps {
+  locale: CountryLanguage;
   value: ToolsConfigValue;
   onChange: (value: ToolsConfigValue) => void;
   user: JwtPayloadType;
@@ -163,7 +166,9 @@ export function ToolsConfigEdit({
   className,
   skillAvailableTools,
   skillPinnedTools,
+  locale,
 }: ToolsConfigEditProps): JSX.Element {
+  const { t: toolsT } = scopedTranslation.scopedT(locale);
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
     new Set(),
@@ -395,7 +400,9 @@ export function ToolsConfigEdit({
       >
         <Wrench className="h-4 w-4 text-primary flex-shrink-0" />
         <Div className="flex-1 flex flex-col gap-0.5">
-          <Span className="text-sm font-semibold">Tools</Span>
+          <Span className="text-sm font-semibold">
+            {toolsT("widget.tools")}
+          </Span>
           {label !== undefined && label !== "" && (
             <Span className="text-xs text-muted-foreground">{label}</Span>
           )}
@@ -440,12 +447,12 @@ export function ToolsConfigEdit({
           <Div className="flex items-center justify-between gap-3 py-1">
             <Div className="flex flex-col">
               <Span className="text-xs font-medium">
-                Override tool settings for this slot
+                {toolsT("widget.overrideForSlot")}
               </Span>
               <Span className="text-[11px] text-muted-foreground">
                 {isInherited
-                  ? "Currently using inherited defaults. Enable to customize."
-                  : "Custom tools configured for this slot."}
+                  ? toolsT("widget.inheritedDefaults")
+                  : toolsT("widget.customToolsConfigured")}
               </Span>
             </Div>
             <Switch
@@ -524,12 +531,16 @@ export function ToolsConfigEdit({
                     {allVisibleEnabled ? (
                       <>
                         <X className="h-3.5 w-3.5 mr-1 shrink-0" />
-                        <Span className="truncate text-xs">Deselect all</Span>
+                        <Span className="truncate text-xs">
+                          {toolsT("widget.deselectAll")}
+                        </Span>
                       </>
                     ) : (
                       <>
                         <Check className="h-3.5 w-3.5 mr-1 shrink-0" />
-                        <Span className="truncate text-xs">Select all</Span>
+                        <Span className="truncate text-xs">
+                          {toolsT("widget.selectAll")}
+                        </Span>
                       </>
                     )}
                   </Button>
@@ -542,7 +553,9 @@ export function ToolsConfigEdit({
                     className="flex-1 min-w-0"
                   >
                     <RotateCcw className="h-3 w-3 mr-1 shrink-0" />
-                    <Span className="truncate text-xs">Reset</Span>
+                    <Span className="truncate text-xs">
+                      {toolsT("widget.reset")}
+                    </Span>
                   </Button>
                 </Div>
               </Div>
@@ -690,11 +703,11 @@ export function ToolsConfigEdit({
                 <Div className="flex items-center gap-3">
                   <Div className="flex items-center gap-1">
                     <Eye className="h-2.5 w-2.5" />
-                    <Span>pinned to context</Span>
+                    <Span>{toolsT("widget.pinnedToContext")}</Span>
                   </Div>
                   <Div className="flex items-center gap-1">
                     <Shield className="h-2.5 w-2.5" />
-                    <Span>requires confirmation</Span>
+                    <Span>{toolsT("widget.requiresConfirmation")}</Span>
                   </Div>
                 </Div>
               </Div>
@@ -703,7 +716,7 @@ export function ToolsConfigEdit({
 
           {!isInherited && availableTools.length === 0 && (
             <Div className="text-center py-4 text-muted-foreground text-sm">
-              Loading tools...
+              {toolsT("widget.loadingTools")}
             </Div>
           )}
         </Div>

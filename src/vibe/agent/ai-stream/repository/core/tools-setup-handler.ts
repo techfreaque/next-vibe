@@ -2,8 +2,8 @@ import { getFullPath, getPreferredName } from "next-vibe/core/core-utils/path";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { loadTools } from "next-vibe/platforms/ai/tools-loader";
 import type { CoreTool } from "next-vibe/platforms/ai/tools-loader";
+import { loadTools } from "next-vibe/platforms/ai/tools-loader";
 
 import type { ToolExecutionContext } from "../../../../core/execution-context";
 import { getDefaultToolIdsForFolder } from "../../../chat/constants";
@@ -16,6 +16,10 @@ import type { ChatModelOption } from "../../models";
 interface ToolConfigItem {
   toolId: string;
   requiresConfirmation?: boolean;
+}
+
+function resolveToolIdToPreferredName(toolId: string): string {
+  return getPreferredName(toolId);
 }
 
 export class ToolsSetupHandler {
@@ -70,10 +74,6 @@ export class ToolsSetupHandler {
       };
     }
 
-    // Resolve a toolId (alias or canonical) to the preferred name (first alias if any).
-    const resolveToPreferredName = (toolId: string): string =>
-      getPreferredName(toolId);
-
     // Build confirmed tools set for quick lookup (uses preferred names)
     const confirmedToolNames = new Set(
       params.toolConfirmationResults.map((r) => r.toolCall.toolName),
@@ -86,7 +86,7 @@ export class ToolsSetupHandler {
     const clientConfirmationConfig = new Map<string, boolean | undefined>();
     // A confirmed tool never re-prompts; otherwise its config value stands.
     const applyConfig = (toolConfig: ToolConfigItem): void => {
-      const preferredName = resolveToPreferredName(toolConfig.toolId);
+      const preferredName = resolveToolIdToPreferredName(toolConfig.toolId);
       clientConfirmationConfig.set(
         preferredName,
         confirmedToolNames.has(preferredName)
@@ -194,7 +194,7 @@ export class ToolsSetupHandler {
     if (params.availableTools) {
       activeToolNames = new Set<string>();
       for (const toolConfig of params.availableTools) {
-        activeToolNames.add(resolveToPreferredName(toolConfig.toolId));
+        activeToolNames.add(resolveToolIdToPreferredName(toolConfig.toolId));
       }
     }
 

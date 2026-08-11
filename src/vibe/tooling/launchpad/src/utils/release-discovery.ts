@@ -24,7 +24,7 @@ type LoadedModule =
   | ReleaseConfig
   | Record<
       string,
-      ReleaseConfig | Array<unknown> | string | number | boolean | null // eslint-disable-line oxlint-plugin-restricted/no-unknown -- Build Infrastructure: Release metadata extraction requires 'unknown'
+      ReleaseConfig | Array<unknown> | string | number | boolean | null // eslint-disable-line restricted/no-unknown -- Build Infrastructure: Release metadata extraction requires 'unknown'
     >;
 
 /**

@@ -58,7 +58,7 @@ export function PressKeyWidget({ field }: CustomWidgetProps): JSX.Element {
               </Span>
               {pressedKey ? (
                 <Badge variant="outline" className="font-mono text-xs">
-                  {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+                  {/* eslint-disable-next-line i18n/no-literal-string */}
                   {pressedKey}
                   {repeat && repeat > 1 ? ` ×${repeat}` : ""}
                 </Badge>

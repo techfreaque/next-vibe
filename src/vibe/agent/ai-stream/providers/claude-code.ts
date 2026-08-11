@@ -666,7 +666,7 @@ function jsonSchemaToZodV4Shape(
     return {};
   }
 
-  /* eslint-disable oxlint-plugin-restricted/no-unknown -- JSON Schema properties are untyped */
+  /* eslint-disable restricted/no-unknown -- JSON Schema properties are untyped */
   const properties = schema.properties as Record<
     string,
     Record<string, unknown>

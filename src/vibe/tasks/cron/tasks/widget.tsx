@@ -1361,20 +1361,20 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {/* oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- internal sort key */}
+            {/* oxlint-disable-next-line i18n/no-literal-string -- internal sort key */}
             <SelectItem value="name_asc">{t("widget.sort.nameAsc")}</SelectItem>
-            {/* oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- internal sort key */}
+            {/* oxlint-disable-next-line i18n/no-literal-string -- internal sort key */}
             <SelectItem value="name_desc">
               {t("widget.sort.nameDesc")}
             </SelectItem>
             <SelectItem value="schedule">
               {t("widget.sort.schedule")}
             </SelectItem>
-            {/* oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- internal sort key */}
+            {/* oxlint-disable-next-line i18n/no-literal-string -- internal sort key */}
             <SelectItem value="last_run_desc">
               {t("widget.sort.lastRunNewest")}
             </SelectItem>
-            {/* oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- internal sort key */}
+            {/* oxlint-disable-next-line i18n/no-literal-string -- internal sort key */}
             <SelectItem value="executions_desc">
               {t("widget.sort.executionsMost")}
             </SelectItem>

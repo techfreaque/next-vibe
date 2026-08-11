@@ -192,8 +192,8 @@ export function PosTerminalListWidget(
             variant="outline"
             onClick={handleCreate}
           >
-            {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
-            + {t("terminalList.get.widget.createTerminal")}
+            {/* eslint-disable-next-line i18n/no-literal-string */}+{" "}
+            {t("terminalList.get.widget.createTerminal")}
           </Button>
         )}
       </Div>

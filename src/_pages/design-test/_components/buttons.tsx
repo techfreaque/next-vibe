@@ -1,4 +1,4 @@
-/* eslint-disable oxlint-plugin-i18n/no-literal-string */
+/* eslint-disable i18n/no-literal-string */
 "use client";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";

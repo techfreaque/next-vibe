@@ -55,6 +55,7 @@ export async function exchangeCodeForTokens(
   code: string,
   baseUrl: string,
 ): Promise<GoogleTokenResponse | null> {
+  // oxlint-disable-next-line restricted/no-raw-fetch -- external API
   const response = await fetch(GOOGLE_TOKEN_URL, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -77,6 +78,7 @@ export async function exchangeCodeForTokens(
 export async function refreshAccessToken(
   refreshToken: string,
 ): Promise<{ accessToken: string; expiry: string } | null> {
+  // oxlint-disable-next-line restricted/no-raw-fetch -- external API
   const response = await fetch(GOOGLE_TOKEN_URL, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -113,6 +115,7 @@ export async function listSpreadsheets(
     pageSize: "50",
   });
 
+  // oxlint-disable-next-line restricted/no-raw-fetch -- external API
   const response = await fetch(
     `https://www.googleapis.com/drive/v3/files?${params.toString()}`,
     {
@@ -139,6 +142,7 @@ export async function appendRowToSheet(
   const range = sheetTab ? `${sheetTab}!A:Z` : "A:Z";
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(spreadsheetId)}/values/${encodeURIComponent(range)}:append`;
 
+  // oxlint-disable-next-line restricted/no-raw-fetch -- external API
   const response = await fetch(`${url}?valueInputOption=USER_ENTERED`, {
     method: "POST",
     headers: {

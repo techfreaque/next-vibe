@@ -251,7 +251,7 @@ class DependencyManager {
       }
 
       // Parse the JSON output from ncu
-      /* eslint-disable oxlint-plugin-restricted/no-unknown -- JSON.parse returns unknown by design */
+      /* eslint-disable restricted/no-unknown -- JSON.parse returns unknown by design */
       let parsed: unknown;
       /* eslint-enable oxlint-plugin-restricted/restricted-syntax */
       try {

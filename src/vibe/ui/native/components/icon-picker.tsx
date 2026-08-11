@@ -21,12 +21,12 @@ import {
   ICON_CATEGORIES,
   ICON_CATEGORIES_LIST,
 } from "../../../unified-ui/widgets/form-fields/icon-field/icons";
-import { uiScopedTranslation } from "../../web/i18n";
 import type { IconPickerProps } from "../../web/components/icon-picker";
+import { uiScopedTranslation } from "../../web/i18n";
 import { Text } from "./text";
 
-export type { CategoryKey, IconPickerProps };
 export { ICON_CATEGORIES };
+export type { CategoryKey, IconPickerProps };
 
 /**
  * Icon Picker Component for React Native
@@ -65,7 +65,7 @@ export function IconPicker({
         {value ? (
           <Icon icon={value} className="h-5 w-5" />
         ) : (
-          // eslint-disable-next-line oxlint-plugin-i18n/no-literal-string -- Non-translatable placeholder icon
+          // eslint-disable-next-line i18n/no-literal-string -- Non-translatable placeholder icon
           <Text className="text-muted-foreground text-xs">?</Text>
         )}
       </Pressable>

@@ -145,7 +145,7 @@ function AudienceCallout({
             className="p-8 rounded-2xl border border-rose-500/20 bg-rose-500/5 dark:bg-rose-500/10 flex flex-col gap-4"
           >
             <Span className="text-xs font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 px-2 py-1 rounded-full bg-rose-500/10 border border-rose-500/20 w-fit">
-              {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string -- decorative emoji */}
+              {/* eslint-disable-next-line i18n/no-literal-string -- decorative emoji */}
               🔗 {t("audienceCallout.newTitle", params)}
             </Span>
             <P className="text-muted-foreground text-base leading-relaxed m-0 flex-1">
@@ -170,7 +170,7 @@ function AudienceCallout({
             className="p-8 rounded-2xl border border-orange-500/20 bg-orange-500/5 dark:bg-orange-500/10 flex flex-col gap-4"
           >
             <Span className="text-xs font-bold uppercase tracking-wider text-orange-600 dark:text-orange-400 px-2 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 w-fit">
-              {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string -- decorative emoji */}
+              {/* eslint-disable-next-line i18n/no-literal-string -- decorative emoji */}
               ⚡ {t("audienceCallout.proTitle", params)}
             </Span>
             <P className="text-muted-foreground text-base leading-relaxed m-0 flex-1">

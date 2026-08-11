@@ -191,7 +191,7 @@ export function CortexNav({
 
       {isPushed &&
         (actions.length > 0 || path) && (
-          // eslint-disable-next-line oxlint-plugin-i18n/no-literal-string -- decorative separator
+          // eslint-disable-next-line i18n/no-literal-string -- decorative separator
           <Span className="text-border/70 text-sm mx-0.5">|</Span>
         )}
 
@@ -207,7 +207,7 @@ export function CortexNav({
 
       {path &&
         actions.length > 0 && (
-          // eslint-disable-next-line oxlint-plugin-i18n/no-literal-string -- decorative separator
+          // eslint-disable-next-line i18n/no-literal-string -- decorative separator
           <Span className="text-border/70 text-sm mx-0.5">·</Span>
         )}
 

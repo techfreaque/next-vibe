@@ -2,7 +2,7 @@
 
 import type { ModelCountsByContentLevel } from "next-vibe/agent/models/all-models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { Div } from "next-vibe/ui/components/div";
+import { Main } from "next-vibe/ui/components/main";
 import { useSearchParams } from "next-vibe/ui/hooks/use-navigation";
 import { getElementById } from "next-vibe/ui/lib/dom";
 import { getCurrentUrl, silentReplaceState } from "next-vibe/ui/lib/location";
@@ -86,7 +86,7 @@ export function HomeClient({
   }
 
   return (
-    <Div role="main" className="flex flex-col w-full">
+    <Main className="flex flex-col w-full">
       <SplitHero
         locale={locale}
         totalToolCount={totalToolCount}
@@ -103,6 +103,6 @@ export function HomeClient({
         onSideChange={handleSideChange}
         hasUser={hasUser}
       />
-    </Div>
+    </Main>
   );
 }

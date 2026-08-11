@@ -235,7 +235,7 @@ function getVictoryComponents(): VictoryComponentsInterface | null {
   }
 }
 
-/* eslint-disable oxlint-plugin-i18n/no-literal-string -- Fallback UI for unavailable native module */
+/* eslint-disable i18n/no-literal-string -- Fallback UI for unavailable native module */
 // Fallback component for when Skia is unavailable
 function ChartFallback(): React.JSX.Element {
   return (
@@ -263,7 +263,7 @@ function ChartFallback(): React.JSX.Element {
     </View>
   );
 }
-/* eslint-enable oxlint-plugin-i18n/no-literal-string */
+/* eslint-enable i18n/no-literal-string */
 
 // Export wrapped components with web-compatible signatures
 // Victory Native accepts the same prop types as web Recharts since they follow similar APIs

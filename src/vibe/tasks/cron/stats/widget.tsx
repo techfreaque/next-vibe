@@ -288,6 +288,14 @@ function PriorityBadge({
   );
 }
 
+function renderStatusBadge(key: string): React.ReactNode {
+  return <StatusBadge status={key as typeof CronTaskStatusValue} />;
+}
+
+function renderPriorityBadge(key: string): React.ReactNode {
+  return <PriorityBadge priority={key as typeof CronTaskPriorityValue} />;
+}
+
 // ─── RecentActivityIcon ───────────────────────────────────────────────────────
 
 function RecentActivityIcon({ status }: { status: string }): React.JSX.Element {
@@ -892,9 +900,7 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
           title={t("widget.tasksByStatus")}
           entries={tasksByStatusEntries}
           total={tasksByStatusTotal}
-          getBadge={(key) => (
-            <StatusBadge status={key as typeof CronTaskStatusValue} />
-          )}
+          getBadge={renderStatusBadge}
           getColor={getStatusColor}
         />
       )}
@@ -905,9 +911,7 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
           title={t("widget.tasksByPriority")}
           entries={tasksByPriorityEntries}
           total={tasksByPriorityTotal}
-          getBadge={(key) => (
-            <PriorityBadge priority={key as typeof CronTaskPriorityValue} />
-          )}
+          getBadge={renderPriorityBadge}
           getColor={getPriorityColor}
         />
       )}

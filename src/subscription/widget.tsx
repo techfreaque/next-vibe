@@ -44,6 +44,13 @@ function formatDate(date: string | Date, locale: string): string {
   return new Date(date).toLocaleDateString(locale);
 }
 
+function getSubscriptionProviderIcon(provider?: string): JSX.Element {
+  if (provider === PaymentProvider.NOWPAYMENTS) {
+    return <Bitcoin className="h-5 w-5 text-orange-500" />;
+  }
+  return <CreditCard className="h-5 w-5 text-primary" />;
+}
+
 /**
  * Subscription Overview Container Widget
  */
@@ -100,13 +107,6 @@ export function SubscriptionOverviewContainer(_props: {
 
   const isCanceled = status === SubscriptionStatus.CANCELED;
   const isCanceling = !isCanceled && subscription.cancelAt;
-
-  const getProviderIcon = (provider?: string): JSX.Element => {
-    if (provider === PaymentProvider.NOWPAYMENTS) {
-      return <Bitcoin className="h-5 w-5 text-orange-500" />;
-    }
-    return <CreditCard className="h-5 w-5 text-primary" />;
-  };
 
   const getProviderName = (provider?: string): string => {
     if (provider === PaymentProvider.NOWPAYMENTS) {
@@ -173,7 +173,7 @@ export function SubscriptionOverviewContainer(_props: {
                     : t(status)}
               </Badge>
               <Badge variant="outline" className="flex items-center gap-1">
-                {getProviderIcon(subscription.provider)}
+                {getSubscriptionProviderIcon(subscription.provider)}
                 {getProviderName(subscription.provider)}
               </Badge>
             </Div>

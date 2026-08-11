@@ -8,7 +8,7 @@
  * src/generated/category-registry.ts
  */
 
-import type { pathToAliasMap } from "@/generated/endpoints/alias-map";
+import type { pathToAliasMap } from "@/generated/endpoints/alias-map-dev";
 
 import type { CountryLanguage } from "../core/i18n/core/config";
 import type { UserPermissionRole } from "../identity/roles/enum";

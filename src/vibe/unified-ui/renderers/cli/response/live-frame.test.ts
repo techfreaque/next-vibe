@@ -1,4 +1,4 @@
-// oxlint-disable oxlint-plugin-restricted/no-unknown, oxlint-plugin-restricted/no-throw
+// oxlint-disable restricted/no-unknown, oxlint-plugin-restricted/no-throw
 /**
  * createLiveFrame — terminal-control mechanics for the CLI live region.
  *
@@ -20,10 +20,10 @@
  * not React output.
  */
 
+import { describe, expect, it } from "vitest";
 import { defaultLocale } from "../../../../core/i18n/core/config";
 import { createEndpointLogger } from "../../../../logger/server";
 import { Platform } from "../../../../platforms/platforms";
-import { describe, expect, it } from "vitest";
 
 import { createLiveFrame, wrapLine } from "./live-frame";
 
@@ -140,7 +140,10 @@ function makeEndpointStub(): Parameters<typeof createLiveFrame>[0]["endpoint"] {
 function makeFrame(
   outputTTY: boolean,
   frames: string[],
-  { inputTTY = outputTTY, throwOnWriteAfter }: { inputTTY?: boolean; throwOnWriteAfter?: number } = {},
+  {
+    inputTTY = outputTTY,
+    throwOnWriteAfter,
+  }: { inputTTY?: boolean; throwOnWriteAfter?: number } = {},
 ): {
   frame: ReturnType<typeof createLiveFrame>;
   written: () => string;
@@ -150,9 +153,12 @@ function makeFrame(
   rawModeCalls: boolean[];
   writeCount: () => number;
 } {
-  const { stream, written, resize, setSize, writeCount } = makeOutputStream(outputTTY, {
-    throwOnWriteAfter,
-  });
+  const { stream, written, resize, setSize, writeCount } = makeOutputStream(
+    outputTTY,
+    {
+      throwOnWriteAfter,
+    },
+  );
   const { input, rawModeCalls, sendKey } = makeInputStream(inputTTY);
   let call = 0;
   const frame = createLiveFrame({
@@ -185,7 +191,9 @@ async function waitForPaint(): Promise<void> {
 }
 
 /** 30 rows — taller than the default 24-row test viewport, so it goes fullscreen. */
-const TALL_CONTENT = [...Array(30).keys()].map((i) => `row${String(i)}`).join("\n");
+const TALL_CONTENT = [...Array(30).keys()]
+  .map((i) => `row${String(i)}`)
+  .join("\n");
 
 describe("wrapLine", () => {
   it("WRAP-1: a line that fits is returned untouched, ANSI intact", () => {
@@ -277,7 +285,10 @@ describe("createLiveFrame", () => {
   });
 
   it("INLINE-PAINT-3: a repaint jumps up over exactly the previously-printed rows, then erases a shrunk trailing tail", async () => {
-    const { frame, written } = makeFrame(true, ["line1\nline2\nline3", "line1"]);
+    const { frame, written } = makeFrame(true, [
+      "line1\nline2\nline3",
+      "line1",
+    ]);
 
     frame.update({ totalIssues: 1 });
     await waitForPaint();
@@ -345,7 +356,11 @@ describe("createLiveFrame", () => {
   });
 
   it("DOWNGRADE-2: inline content printed before an upgrade is erased correctly when downgrading back", async () => {
-    const { frame, written } = makeFrame(true, ["line1\nline2", TALL_CONTENT, "line1"]);
+    const { frame, written } = makeFrame(true, [
+      "line1\nline2",
+      TALL_CONTENT,
+      "line1",
+    ]);
 
     frame.update({ totalIssues: 1 }); // inline: 2 rows printed on the real buffer
     await waitForPaint();
@@ -465,7 +480,9 @@ describe("createLiveFrame", () => {
   });
 
   it("SCROLL-4: PageUp scrolls a full viewport, PageDown returns toward the tail", async () => {
-    const veryTall = [...Array(60).keys()].map((i) => `row${String(i)}`).join("\n");
+    const veryTall = [...Array(60).keys()]
+      .map((i) => `row${String(i)}`)
+      .join("\n");
     const { frame, written, sendKey } = makeFrame(true, [veryTall]);
 
     frame.update({ totalIssues: 1 });
@@ -473,9 +490,7 @@ describe("createLiveFrame", () => {
     // Tail view shows row36..row59 (60 rows, 24-row viewport).
     sendKey(`${ESC}[5~`); // PageUp
     let out = written();
-    let rows = out
-      .slice(out.lastIndexOf(HOME) + HOME.length)
-      .split("\r\n");
+    let rows = out.slice(out.lastIndexOf(HOME) + HOME.length).split("\r\n");
     expect(rows[0]).toBe(`row12${ESC}[K`);
 
     sendKey(`${ESC}[6~`); // PageDown
@@ -518,7 +533,9 @@ describe("createLiveFrame", () => {
   });
 
   it("RESIZE-2: a resize also re-lays-out inline content", async () => {
-    const { frame, written, resize, setSize } = makeFrame(true, ["line1\nline2"]);
+    const { frame, written, resize, setSize } = makeFrame(true, [
+      "line1\nline2",
+    ]);
 
     frame.update({ totalIssues: 1 });
     await waitForPaint();
@@ -535,7 +552,9 @@ describe("createLiveFrame", () => {
   });
 
   it("RESIZE-3: growing the viewport past the content height downgrades from fullscreen back to inline", async () => {
-    const content26 = [...Array(26).keys()].map((i) => `row${String(i)}`).join("\n");
+    const content26 = [...Array(26).keys()]
+      .map((i) => `row${String(i)}`)
+      .join("\n");
     const { frame, written, resize, setSize } = makeFrame(true, [content26]);
 
     frame.update({ totalIssues: 1 });
@@ -690,7 +709,9 @@ describe("createLiveFrame", () => {
     // The first paint takes 3 writes (alt-screen, cursor hide, frame body);
     // allow those, then fail every write after — as a broken pipe would
     // starting from any point in the run.
-    const { frame, sendKey } = makeFrame(true, [TALL_CONTENT], { throwOnWriteAfter: 3 });
+    const { frame, sendKey } = makeFrame(true, [TALL_CONTENT], {
+      throwOnWriteAfter: 3,
+    });
 
     frame.update({ totalIssues: 1 });
     await waitForPaint();

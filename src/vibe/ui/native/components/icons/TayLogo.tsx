@@ -25,7 +25,7 @@ export function TayLogo({
         uri: `${envClient.NEXT_PUBLIC_APP_URL}/images/providers/tay.webp`,
       }}
       style={{ width, height }}
-      // oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- Non-translatable string
+      // oxlint-disable-next-line i18n/no-literal-string -- Non-translatable string
       accessibilityLabel="Tay"
     />
   );

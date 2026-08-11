@@ -1286,6 +1286,7 @@ export function FavoriteEditContainer({
                   onChange={handleToolsChange}
                   user={user}
                   logger={logger}
+                  locale={locale}
                   label={t("patch.slotOverride.label")}
                   skillAvailableTools={characterData?.availableTools ?? null}
                   skillPinnedTools={characterData?.pinnedTools ?? null}
@@ -1494,7 +1495,7 @@ function DeniedToolsEdit({
     </Div>
   );
 }
-/* eslint-enable oxlint-plugin-i18n/no-literal-string */
+/* eslint-enable i18n/no-literal-string */
 
 /**
  * Save & Use Button Component

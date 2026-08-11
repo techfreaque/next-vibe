@@ -430,6 +430,7 @@ export function SkillEditContainer({
                     onChange={handleToolsChange}
                     user={user}
                     logger={logger}
+                    locale={locale}
                   />
                 </FormControl>
                 {fieldState.error && (
@@ -685,7 +686,7 @@ function ModelCard({
             }}
           >
             {
-              // oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string
+              // oxlint-disable-next-line i18n/no-literal-string
               "·"
             }
           </Span>
@@ -2193,7 +2194,7 @@ function VariantCard({
             {provider && (
               <Span aria-hidden className="text-muted-foreground/50">
                 {
-                  // oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string
+                  // oxlint-disable-next-line i18n/no-literal-string
                   "·"
                 }
               </Span>
@@ -2203,7 +2204,7 @@ function VariantCard({
             )}
             <Span aria-hidden className="text-muted-foreground/50">
               {
-                // oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string
+                // oxlint-disable-next-line i18n/no-literal-string
                 "·"
               }
             </Span>

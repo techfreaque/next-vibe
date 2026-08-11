@@ -174,7 +174,7 @@ export function EntityPickerFieldWidget<
           </Badge>
           {pickedLabel && (
             <Span className="text-xs text-muted-foreground font-mono truncate hidden sm:inline">
-              {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+              {/* eslint-disable-next-line i18n/no-literal-string */}
               {String(currentValue).slice(0, 8)}…
             </Span>
           )}
@@ -200,7 +200,7 @@ export function EntityPickerFieldWidget<
       className="w-full justify-start text-muted-foreground hover:text-foreground gap-2"
       onClick={handleOpen}
     >
-      {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+      {/* eslint-disable-next-line i18n/no-literal-string */}
       <Span className="text-base leading-none opacity-50">+</Span>
       {widgetT("widgets.formFields.entityPicker.select")} {resolvedLabel}
     </Button>
@@ -305,7 +305,7 @@ export function EntityPickerField<TValue extends WidgetData>({
           </Badge>
           {shownLabel && (
             <Span className="text-xs text-muted-foreground font-mono truncate hidden sm:inline">
-              {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+              {/* eslint-disable-next-line i18n/no-literal-string */}
               {shownId.slice(0, 8)}…
             </Span>
           )}
@@ -333,7 +333,7 @@ export function EntityPickerField<TValue extends WidgetData>({
       className="w-full justify-start text-muted-foreground hover:text-foreground gap-2"
       onClick={handleOpen}
     >
-      {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+      {/* eslint-disable-next-line i18n/no-literal-string */}
       <Span className="text-base leading-none opacity-50">+</Span>
       {widgetT("widgets.formFields.entityPicker.select")} {label}
     </Button>

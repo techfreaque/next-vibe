@@ -61,8 +61,7 @@ export function VendorCreateWidget({
         <Div className="flex items-start gap-3">
           <Div className="h-10 w-10 rounded-full bg-emerald-500/15 flex items-center justify-center shrink-0 mt-0.5">
             <Span className="text-emerald-600 dark:text-emerald-400 text-lg font-semibold">
-              {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
-              ✓
+              {/* eslint-disable-next-line i18n/no-literal-string */}✓
             </Span>
           </Div>
           <Div>

@@ -29,6 +29,7 @@ async function getAccessToken(
     "AdobeID, openid, read_organizations, additional_info.projectedProductContext, additional_info.roles, adobeio_api, read_client_secret, manage_client_secrets",
   );
 
+  // oxlint-disable-next-line restricted/no-raw-fetch -- external API
   const response = await fetch(authUrl, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -85,6 +86,7 @@ export const forwardLead: ForwardLeadFn = async (credentials, lead, t) => {
     "X-Api-Key": adobeCampaignApiKey,
   };
 
+  // oxlint-disable-next-line restricted/no-raw-fetch -- external API
   const contactResponse = await fetch(
     apiContactsUrl.replace("{ORGANIZATION}", adobeCampaignOrganizationId),
     {
@@ -105,6 +107,7 @@ export const forwardLead: ForwardLeadFn = async (credentials, lead, t) => {
 
   const pKey = (contactData as { PKey: string }).PKey;
 
+  // oxlint-disable-next-line restricted/no-raw-fetch -- external API
   const subscribeResponse = await fetch(
     subscribeUrl
       .replace("{ORGANIZATION}", adobeCampaignOrganizationId)

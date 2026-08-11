@@ -93,7 +93,7 @@ function ErrorLogCard({
         {/* Occurrences badge */}
         {log.occurrences > 1 && (
           <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 mt-0.5 bg-muted text-muted-foreground">
-            {/* oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- simple count */}
+            {/* oxlint-disable-next-line i18n/no-literal-string -- simple count */}
             {"x"}
             {log.occurrences}
           </Span>

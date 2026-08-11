@@ -6,7 +6,7 @@
 
 import "server-only";
 
-import { jsonSchema, type JSONSchema7, tool, type ToolSet } from "ai";
+import { jsonSchema, tool, type JSONSchema7, type ToolSet } from "ai";
 import { type ToolExecutionContext } from "next-vibe/core/execution-context";
 import { z } from "zod";
 
@@ -25,7 +25,7 @@ import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import { FieldUsage } from "../../core/definition/enums";
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import { permissionsRegistry } from "../../core/permissions/registry";
-import type { WidgetData } from "../../core/utils/json";
+import { WidgetDataSchema, type WidgetData } from "../../core/utils/json";
 import { parseError } from "../../core/utils/parse-error";
 import { CallbackMode, EXECUTE_TOOL_ALIAS } from "../../execute-tool/constants";
 import type { JwtPayloadType } from "../../identity/auth/types";
@@ -129,7 +129,7 @@ function createToolFromEndpoint(
 
   // Wrap JSON Schema in AI SDK's jsonSchema() function
   // This creates a FlexibleSchema that the AI SDK can use
-  const inputSchema = jsonSchema<Record<string, unknown>>(
+  const inputSchema = jsonSchema<Record<string, WidgetData>>(
     jsonSchemaObject as JSONSchema7,
     {
       validate: (value) => {
@@ -147,13 +147,22 @@ function createToolFromEndpoint(
         // Use the original Zod schema (with transforms) for validation
         const result = zodSchemaWithTransforms.safeParse(value);
         if (result.success) {
+          const typedResult = z
+            .record(z.string(), WidgetDataSchema)
+            .safeParse(result.data);
+          if (!typedResult.success) {
+            return {
+              success: false,
+              error: typedResult.error,
+            };
+          }
           // Add callbackMode back to the validated data so it reaches tool-call-handler
           return {
             success: true,
             value:
               callbackModeRaw !== undefined
-                ? { ...result.data, callbackMode: callbackModeRaw }
-                : result.data,
+                ? { ...typedResult.data, callbackMode: callbackModeRaw }
+                : typedResult.data,
           };
         }
         return {

@@ -48,7 +48,7 @@ function CategoryRow({
     >
       {isChild && (
         <Span className="text-muted-foreground text-xs shrink-0">
-          {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}└
+          {/* eslint-disable-next-line i18n/no-literal-string */}└
         </Span>
       )}
       <Span className="text-sm font-medium flex-1 group-hover:text-primary transition-colors">
@@ -60,8 +60,8 @@ function CategoryRow({
         </Span>
         {category.sortOrder !== null && category.sortOrder !== undefined ? (
           <Span className="text-xs text-muted-foreground font-mono">
-            {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
-            #{category.sortOrder}
+            {/* eslint-disable-next-line i18n/no-literal-string */}#
+            {category.sortOrder}
           </Span>
         ) : null}
         <Badge

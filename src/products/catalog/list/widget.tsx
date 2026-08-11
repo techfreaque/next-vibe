@@ -141,8 +141,8 @@ function ProductRow({
           </Span>
           {product.unit ? (
             <Span className="text-xs text-muted-foreground">
-              {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
-              / {product.unit}
+              {/* eslint-disable-next-line i18n/no-literal-string */}/{" "}
+              {product.unit}
             </Span>
           ) : null}
         </Div>
@@ -400,7 +400,7 @@ export function CatalogListWidget(_props: {
             variant="default"
             onClick={handleCreate}
           >
-            {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+            {/* eslint-disable-next-line i18n/no-literal-string */}
             <Span className="mr-1 font-bold">+</Span>
             {labelAddProduct}
           </Button>
@@ -435,8 +435,7 @@ export function CatalogListWidget(_props: {
       ) : hasData ? (
         <Div className="flex flex-col items-center gap-3 py-14 text-center border border-dashed rounded-md">
           <Span className="text-2xl text-muted-foreground">
-            {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
-            📦
+            {/* eslint-disable-next-line i18n/no-literal-string */}📦
           </Span>
           <Span className="text-sm text-muted-foreground max-w-xs">
             {labelEmpty}

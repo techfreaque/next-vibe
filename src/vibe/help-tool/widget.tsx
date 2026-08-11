@@ -2404,7 +2404,7 @@ export function HelpToolsWidget(): JSX.Element {
                 <Search className="h-7 w-7 text-muted-foreground/25" />
                 <Div>
                   <Span className="block text-sm font-medium text-foreground/60">
-                    {/* oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+                    {/* oxlint-disable-next-line i18n/no-literal-string */}
                     No results
                   </Span>
                   <Span className="block text-[11px] text-muted-foreground/50 mt-0.5">

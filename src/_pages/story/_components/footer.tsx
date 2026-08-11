@@ -1,6 +1,7 @@
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Div } from "next-vibe/ui/components/div";
+import { Footer as FooterContainer } from "next-vibe/ui/components/footer";
 import { BookOpen } from "next-vibe/ui/components/icons/BookOpen";
 import { Bot } from "next-vibe/ui/components/icons/Bot";
 import { Briefcase } from "next-vibe/ui/components/icons/Briefcase";
@@ -15,10 +16,12 @@ import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
 import { Tag } from "next-vibe/ui/components/icons/Tag";
 import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
 import { Users } from "next-vibe/ui/components/icons/Users";
+import { Li } from "next-vibe/ui/components/li";
 import { Link } from "next-vibe/ui/components/link";
 import { Separator } from "next-vibe/ui/components/separator";
 import { Span } from "next-vibe/ui/components/span";
 import { H3, P } from "next-vibe/ui/components/typography";
+import { Ul } from "next-vibe/ui/components/ul";
 import type React from "react";
 
 import { GITHUB_REPO_URL } from "@/env/constants";
@@ -43,10 +46,7 @@ const Footer: React.FC<FooterProps> = ({
   const currentYear = new Date().getFullYear();
 
   return (
-    <Div
-      role="contentinfo"
-      className="w-full border-t bg-gray-50 dark:bg-gray-900"
-    >
+    <FooterContainer className="w-full border-t bg-gray-50 dark:bg-gray-900">
       <Div className="container px-4 md:px-6 py-12 md:py-16">
         <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
           {/* Brand Column */}
@@ -69,11 +69,8 @@ const Footer: React.FC<FooterProps> = ({
             <H3 className="font-semibold text-sm mb-4">
               {t("footer.platform.title")}
             </H3>
-            <Div
-              role="list"
-              className="flex flex-col gap-3 text-sm text-gray-600 dark:text-gray-400"
-            >
-              <Div role="listitem">
+            <Ul className="flex flex-col gap-3 text-sm text-gray-600 dark:text-gray-400">
+              <Li>
                 <Link
                   href={`/${locale}/story?tab=unbottled#universe-content`}
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2"
@@ -81,8 +78,8 @@ const Footer: React.FC<FooterProps> = ({
                   <Sparkles className="h-4 w-4" />
                   {t("footer.platform.featuresUncensoredAi")}
                 </Link>
-              </Div>
-              <Div role="listitem">
+              </Li>
+              <Li>
                 <Link
                   href={`/${locale}/story?tab=personal#universe-content`}
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2"
@@ -90,8 +87,8 @@ const Footer: React.FC<FooterProps> = ({
                   <Server className="h-4 w-4" />
                   {t("footer.platform.featuresSelfHosted")}
                 </Link>
-              </Div>
-              <Div role="listitem">
+              </Li>
+              <Li>
                 <Link
                   href={`/${locale}/story?tab=nextvibe#universe-content`}
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2"
@@ -99,8 +96,8 @@ const Footer: React.FC<FooterProps> = ({
                   <Code className="h-4 w-4" />
                   {t("footer.platform.featuresOpenSource")}
                 </Link>
-              </Div>
-              <Div role="listitem">
+              </Li>
+              <Li>
                 <Link
                   href={`/${locale}/story?tab=referral#universe-content`}
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2"
@@ -108,8 +105,8 @@ const Footer: React.FC<FooterProps> = ({
                   <TrendingUp className="h-4 w-4" />
                   {t("footer.platform.featuresReferral")}
                 </Link>
-              </Div>
-              <Div role="listitem">
+              </Li>
+              <Li>
                 <Link
                   href={`/${locale}/subscription/overview`}
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2"
@@ -117,8 +114,8 @@ const Footer: React.FC<FooterProps> = ({
                   <Tag className="h-4 w-4" />
                   {t("footer.platform.subscription")}
                 </Link>
-              </Div>
-              <Div role="listitem">
+              </Li>
+              <Li>
                 <Link
                   href={`/${locale}/subscription/overview`}
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2"
@@ -126,8 +123,8 @@ const Footer: React.FC<FooterProps> = ({
                   <Bot className="h-4 w-4" />
                   {t("footer.platform.aiModels")}
                 </Link>
-              </Div>
-              <Div role="listitem">
+              </Li>
+              <Li>
                 <Link
                   href={`/${locale}/skills`}
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2"
@@ -135,8 +132,8 @@ const Footer: React.FC<FooterProps> = ({
                   <Users className="h-4 w-4" />
                   {t("footer.platform.characters")}
                 </Link>
-              </Div>
-            </Div>
+              </Li>
+            </Ul>
           </Div>
 
           {/* Product Links */}
@@ -144,11 +141,8 @@ const Footer: React.FC<FooterProps> = ({
             <H3 className="font-semibold text-sm mb-4">
               {t("footer.product.title")}
             </H3>
-            <Div
-              role="list"
-              className="flex flex-col gap-3 text-sm text-gray-600 dark:text-gray-400"
-            >
-              <Div role="listitem">
+            <Ul className="flex flex-col gap-3 text-sm text-gray-600 dark:text-gray-400">
+              <Li>
                 <Link
                   href={
                     isPublic
@@ -160,8 +154,8 @@ const Footer: React.FC<FooterProps> = ({
                   <Folder className="h-4 w-4" />
                   {t("footer.product.privateChats")}
                 </Link>
-              </Div>
-              <Div role="listitem">
+              </Li>
+              <Li>
                 <Link
                   href={`/${locale}/threads/incognito`}
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2"
@@ -169,8 +163,8 @@ const Footer: React.FC<FooterProps> = ({
                   <Shield className="h-4 w-4" />
                   {t("footer.product.incognitoMode")}
                 </Link>
-              </Div>
-              <Div role="listitem">
+              </Li>
+              <Li>
                 <Link
                   href={
                     isPublic
@@ -182,8 +176,8 @@ const Footer: React.FC<FooterProps> = ({
                   <Users className="h-4 w-4" />
                   {t("footer.product.sharedFolders")}
                 </Link>
-              </Div>
-              <Div role="listitem">
+              </Li>
+              <Li>
                 <Link
                   href={`/${locale}/threads/public`}
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2"
@@ -191,8 +185,8 @@ const Footer: React.FC<FooterProps> = ({
                   <MessageSquare className="h-4 w-4" />
                   {t("footer.product.publicForum")}
                 </Link>
-              </Div>
-            </Div>
+              </Li>
+            </Ul>
           </Div>
 
           {/* Company Links */}
@@ -200,11 +194,8 @@ const Footer: React.FC<FooterProps> = ({
             <H3 className="font-semibold text-sm mb-4">
               {t("footer.company.title")}
             </H3>
-            <Div
-              role="list"
-              className="flex flex-col gap-3 text-sm text-gray-600 dark:text-gray-400"
-            >
-              <Div role="listitem">
+            <Ul className="flex flex-col gap-3 text-sm text-gray-600 dark:text-gray-400">
+              <Li>
                 <Link
                   href={`/${locale}/story/about-us`}
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2"
@@ -212,8 +203,8 @@ const Footer: React.FC<FooterProps> = ({
                   <Info className="h-4 w-4" />
                   {t("footer.company.aboutUs")}
                 </Link>
-              </Div>
-              <Div role="listitem">
+              </Li>
+              <Li>
                 <Link
                   href={`/${locale}/story/careers`}
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2"
@@ -221,8 +212,8 @@ const Footer: React.FC<FooterProps> = ({
                   <Briefcase className="h-4 w-4" />
                   {t("footer.company.careers")}
                 </Link>
-              </Div>
-              <Div role="listitem">
+              </Li>
+              <Li>
                 <Link
                   href={`/${locale}/story/blog`}
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2"
@@ -230,8 +221,8 @@ const Footer: React.FC<FooterProps> = ({
                   <BookOpen className="h-4 w-4" />
                   {t("footer.company.blog")}
                 </Link>
-              </Div>
-            </Div>
+              </Li>
+            </Ul>
           </Div>
 
           {/* Legal Links */}
@@ -239,35 +230,32 @@ const Footer: React.FC<FooterProps> = ({
             <H3 className="font-semibold text-sm mb-4">
               {t("footer.legal.title")}
             </H3>
-            <Div
-              role="list"
-              className="flex flex-col gap-3 text-sm text-gray-600 dark:text-gray-400"
-            >
-              <Div role="listitem">
+            <Ul className="flex flex-col gap-3 text-sm text-gray-600 dark:text-gray-400">
+              <Li>
                 <Link
                   href={`/${locale}/story/privacy-policy`}
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                 >
                   {t("footer.company.privacyPolicy")}
                 </Link>
-              </Div>
-              <Div role="listitem">
+              </Li>
+              <Li>
                 <Link
                   href={`/${locale}/story/terms-of-service`}
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                 >
                   {t("footer.company.termsOfService")}
                 </Link>
-              </Div>
-              <Div role="listitem">
+              </Li>
+              <Li>
                 <Link
                   href={`/${locale}/story/imprint`}
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                 >
                   {t("footer.company.imprint")}
                 </Link>
-              </Div>
-            </Div>
+              </Li>
+            </Ul>
           </Div>
         </Div>
 
@@ -302,7 +290,7 @@ const Footer: React.FC<FooterProps> = ({
           </Div>
         </Div>
       </Div>
-    </Div>
+    </FooterContainer>
   );
 };
 

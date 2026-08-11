@@ -123,7 +123,7 @@ export default function CodeQualityListWidget<
         return (
           <Div key={file} className="space-y-2">
             <Div className="font-bold">
-              {/* oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- Visual marker character */}
+              {/* oxlint-disable-next-line i18n/no-literal-string -- Visual marker character */}
               <Span className="text-primary underline">● {file}</Span>
               <Span className="ml-2 text-gray-500">
                 ({items.length} item{items.length !== 1 ? "s" : ""})

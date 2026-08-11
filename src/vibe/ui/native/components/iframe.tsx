@@ -1,4 +1,4 @@
-/* eslint-disable oxlint-plugin-i18n/no-literal-string */
+/* eslint-disable i18n/no-literal-string */
 import * as React from "react";
 import { Text, View } from "react-native";
 

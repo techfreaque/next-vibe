@@ -2,6 +2,7 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { StandardUserType } from "next-vibe/identity/user/types";
 import { Div } from "next-vibe/ui/components/div";
+import { Nav } from "next-vibe/ui/components/nav";
 import type { JSX } from "react";
 
 import CountrySelector from "../../../_components/country-selector";
@@ -41,13 +42,13 @@ export function Navbar({
         </Div>
 
         {/* Desktop Navigation - overflow-aware, hidden on mobile */}
-        <Div role="navigation" className="hidden md:flex flex-1 min-w-0 mx-4">
+        <Nav className="hidden md:flex flex-1 min-w-0 mx-4">
           <OverflowNav
             navigationItems={navigationItems}
             locale={locale}
             totalModelCount={totalModelCount}
           />
-        </Div>
+        </Nav>
 
         {/* Right side controls */}
         <Div className="flex items-center gap-2 shrink-0">

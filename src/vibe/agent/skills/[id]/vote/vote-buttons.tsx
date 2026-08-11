@@ -164,12 +164,18 @@ export function SkillVoteButtons({
   );
 }
 
+function voteScore(vote: VoteDir | null): number {
+  return vote === SkillVoteDirection.UP
+    ? 1
+    : vote === SkillVoteDirection.DOWN
+      ? -1
+      : 0;
+}
+
 /**
  * Net-score delta for an optimistic update when a user's vote changes from
  * `prev` to `next`. UP contributes +1, DOWN contributes -1, none contributes 0.
  */
 function voteDelta(prev: VoteDir | null, next: VoteDir | null): number {
-  const score = (v: VoteDir | null): number =>
-    v === SkillVoteDirection.UP ? 1 : v === SkillVoteDirection.DOWN ? -1 : 0;
-  return score(next) - score(prev);
+  return voteScore(next) - voteScore(prev);
 }

@@ -15,6 +15,7 @@ export const forwardLead: ForwardLeadFn = async (credentials, lead, t) => {
   const { klaviyoApiKey } = credentials;
   const { firstName, email, listId } = lead;
 
+  // oxlint-disable-next-line restricted/no-raw-fetch -- external API
   const profileResponse = await fetch(apiContactsUrl, {
     method: "post",
     headers: {
@@ -43,6 +44,7 @@ export const forwardLead: ForwardLeadFn = async (credentials, lead, t) => {
     });
   }
 
+  // oxlint-disable-next-line restricted/no-raw-fetch -- external API
   const subscribeResponse = await fetch(apiListUrl, {
     method: "post",
     headers: {

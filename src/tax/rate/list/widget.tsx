@@ -91,14 +91,14 @@ function TaxRateRow({
           <Span className="font-mono tracking-tight">{rate.code}</Span>
           {rate.country ? (
             <>
-              {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+              {/* eslint-disable-next-line i18n/no-literal-string */}
               <Span className="opacity-40">·</Span>
               <Span>{rate.country}</Span>
             </>
           ) : null}
           {rate.region ? (
             <>
-              {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+              {/* eslint-disable-next-line i18n/no-literal-string */}
               <Span className="opacity-40">·</Span>
               <Span>{rate.region}</Span>
             </>
@@ -115,7 +115,7 @@ function TaxRateRow({
         {/* Rate % — the most important number, shown large */}
         <Span className="text-base font-bold font-mono tabular-nums w-16 text-right">
           {(rate.rate * 100).toFixed(1)}
-          {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}%
+          {/* eslint-disable-next-line i18n/no-literal-string */}%
         </Span>
 
         <Badge
@@ -251,7 +251,7 @@ export function TaxRateListWidget(_props: {
         </Div>
         {!isPickerMode && (
           <Button size="sm" variant="default" onClick={handleCreate}>
-            {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+            {/* eslint-disable-next-line i18n/no-literal-string */}
             <Span className="mr-1 font-bold">+</Span>
             {labelAddRate}
           </Button>
@@ -288,7 +288,7 @@ export function TaxRateListWidget(_props: {
         <Div className="flex flex-col items-center gap-4 py-14 text-center border-2 border-dashed border-amber-500/30 rounded-lg bg-amber-500/5">
           <Div className="rounded-full bg-amber-500/15 p-4">
             <Span className="text-2xl">
-              {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+              {/* eslint-disable-next-line i18n/no-literal-string */}
               ⚠️
             </Span>
           </Div>
@@ -307,8 +307,7 @@ export function TaxRateListWidget(_props: {
         <Div className="flex flex-col items-center gap-3 py-14 text-center">
           <Div className="rounded-full bg-muted/50 p-4">
             <Span className="text-2xl text-muted-foreground">
-              {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
-              🧾
+              {/* eslint-disable-next-line i18n/no-literal-string */}🧾
             </Span>
           </Div>
           <Span className="text-sm text-muted-foreground max-w-xs">

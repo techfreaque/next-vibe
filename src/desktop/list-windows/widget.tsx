@@ -83,7 +83,7 @@ function WindowRow({
             </Badge>
           ) : null}
           <Span className="text-[11px] text-muted-foreground">
-            {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+            {/* eslint-disable-next-line i18n/no-literal-string */}
             {w.width}×{w.height}
           </Span>
         </Div>

@@ -1,4 +1,4 @@
-// oxlint-disable oxlint-plugin-restricted/no-unknown
+// oxlint-disable restricted/no-unknown
 /**
  * Route Execute Repository — remote wire-handler unit tests
  *
@@ -13,6 +13,7 @@
 
 import "server-only";
 
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { defaultLocale } from "../core/i18n/core/config";
 import type { JwtPrivatePayloadType } from "../identity/auth/types";
 import { createEndpointLogger } from "../logger/server";
@@ -21,7 +22,6 @@ import {
   registerLocalBroadcast,
 } from "../realtime/core/local-broadcast";
 import * as resolveTaskUser from "../tasks/cron/resolve-task-user";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { RouteExecuteRepository } from "./repository";
 import { handleIncomingToolRequest } from "./repository/incoming";
@@ -203,13 +203,11 @@ describe("RouteExecuteRepository remote handlers", () => {
   });
 
   it("ET-RESULT-COMPLETE: valid taskId completes the pending call as completed", async () => {
-    const completeSpy = vi
-      .spyOn(PendingCalls, "complete")
-      .mockReturnValue({
-        kind: "completed",
-        threadId: null,
-        toolMessageId: null,
-      });
+    const completeSpy = vi.spyOn(PendingCalls, "complete").mockReturnValue({
+      kind: "completed",
+      threadId: null,
+      toolMessageId: null,
+    });
 
     await handleToolResult(
       makeResultProps({

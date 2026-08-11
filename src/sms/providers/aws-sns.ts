@@ -44,6 +44,20 @@ interface AwsSnsMessageAttributes {
   [key: string]: AwsSnsMessageAttribute;
 }
 
+function getAwsSnsSignatureKey(
+  key: string,
+  sigDateStamp: string,
+  regionName: string,
+  serviceName: string,
+): Buffer {
+  const kDate = createHmac("sha256", `AWS4${key}`)
+    .update(sigDateStamp)
+    .digest();
+  const kRegion = createHmac("sha256", kDate).update(regionName).digest();
+  const kService = createHmac("sha256", kRegion).update(serviceName).digest();
+  return createHmac("sha256", kService).update("aws4_request").digest();
+}
+
 /**
  * Creates an AWS SNS provider instance
  * Implements AWS Signature Version 4 for secure API authentication
@@ -220,33 +234,7 @@ export function getAwsSnsProvider(): SmsProvider {
         ].join("\n");
 
         // Calculate the signature
-        const getSignatureKey = (
-          key: string,
-          sigDateStamp: string,
-          regionName: string,
-          serviceName: string,
-        ): Buffer => {
-          // eslint-disable-next-line i18next/no-literal-string
-          const kDate = createHmac("sha256", `AWS4${key}`)
-            .update(sigDateStamp)
-            .digest();
-          // eslint-disable-next-line i18next/no-literal-string
-          const kRegion = createHmac("sha256", kDate)
-            .update(regionName)
-            .digest();
-          // eslint-disable-next-line i18next/no-literal-string
-          const kService = createHmac("sha256", kRegion)
-            .update(serviceName)
-            .digest();
-          // eslint-disable-next-line i18next/no-literal-string
-          const kSigning = createHmac("sha256", kService)
-            // eslint-disable-next-line i18next/no-literal-string
-            .update("aws4_request")
-            .digest();
-          return kSigning;
-        };
-
-        const signatureKey = getSignatureKey(
+        const signatureKey = getAwsSnsSignatureKey(
           secretAccessKey,
           dateStamp,
           region,

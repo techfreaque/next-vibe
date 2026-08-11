@@ -118,7 +118,7 @@ export function IconWidget<
       return <></>;
     }
     if (typeof icon !== "string") {
-      // oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- Error indicator character
+      // oxlint-disable-next-line i18n/no-literal-string -- Error indicator character
       return <Div className={mergedClassName}>!</Div>;
     }
 

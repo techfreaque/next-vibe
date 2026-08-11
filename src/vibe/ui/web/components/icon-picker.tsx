@@ -99,7 +99,7 @@ export function IconPicker({
           {value ? (
             <Icon icon={value} className={iconSizeClasses[size]} />
           ) : (
-            // eslint-disable-next-line oxlint-plugin-i18n/no-literal-string -- Non-translatable placeholder icon
+            // eslint-disable-next-line i18n/no-literal-string -- Non-translatable placeholder icon
             <Span className="text-primary text-xs">?</Span>
           )}
           <Div className="absolute bottom-1 right-1 bg-primary text-primary-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">

@@ -1,4 +1,3 @@
-/* eslint-disable oxlint-plugin-i18n/no-literal-string -- code examples are not user-facing text */
 import type { Metadata } from "next";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";

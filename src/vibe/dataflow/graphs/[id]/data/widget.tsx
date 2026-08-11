@@ -2394,7 +2394,7 @@ export function GraphChartView(): React.JSX.Element {
                 <Div className="flex items-center gap-0.5 px-1">
                   <History className="h-3 w-3 text-muted-foreground/50" />
                   <Span className="text-[10px] text-muted-foreground/70 tabular-nums">
-                    {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
+                    {/* eslint-disable-next-line i18n/no-literal-string */}
                     {`${String(currentVersionIndex >= 0 ? currentVersionIndex + 1 : versionChain.length)}/${String(versionChain.length)}`}
                   </Span>
                 </Div>
