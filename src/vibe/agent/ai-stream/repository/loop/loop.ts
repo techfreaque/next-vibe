@@ -167,12 +167,20 @@ export class StreamLoop implements StreamLoopState {
         ? { temperature: DEFAULT_TEMPERATURE }
         : {};
 
+    // ai@7 validates messages through modelMessageSchema (Zod). JSON-reparse
+    // converts Date objects and other non-JSON primitives (e.g. from Drizzle
+    // timestamp columns in tool results) to serializable values before the
+    // SDK runs its standardizePrompt validation on the messages array.
+    const messagesClean = JSON.parse(
+      JSON.stringify(messages),
+    ) as typeof messages;
     const streamResult = aiStreamText({
       model: provider.chat(modelConfig.providerModel) as LanguageModel,
-      messages,
+      messages: messagesClean,
       ...temperatureParam,
       abortSignal: streamAbortController.signal,
       system: systemWithCacheControl,
+      allowSystemInMessages: true,
       ...(Object.keys(providerOptions).length > 0 ? { providerOptions } : {}),
       ...(tools
         ? {

@@ -7,7 +7,11 @@
  */
 
 import { isNotFound, isRedirect } from "@tanstack/react-router";
-import { createMiddleware, createStart } from "@tanstack/react-start";
+import {
+  createCsrfMiddleware,
+  createMiddleware,
+  createStart,
+} from "@tanstack/react-start";
 import { setResponseHeader } from "@tanstack/react-start/server";
 import { NextRequest } from "next/server";
 import { serverFileLog } from "next-vibe/logger/file";
@@ -259,7 +263,11 @@ const fnErrorLogMiddleware = createMiddleware({ type: "function" }).server(
   },
 );
 
+const csrfMiddleware = createCsrfMiddleware({
+  filter: (ctx) => ctx.handlerType === "serverFn",
+});
+
 export const startInstance = createStart(() => ({
-  requestMiddleware: [proxyMiddleware],
+  requestMiddleware: [proxyMiddleware, csrfMiddleware],
   functionMiddleware: [fnErrorLogMiddleware],
 }));

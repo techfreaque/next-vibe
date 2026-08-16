@@ -117,6 +117,7 @@ export async function runCompactingLLM(params: {
       // task that should not be influenced by skill personas, tool definitions,
       // or other system-level instructions that would bloat the context.
       messages: compactingMessages,
+      allowSystemInMessages: true,
       ...temperatureParam,
       // Hard cap: a stalled provider must fail the compacting call quickly
       // (the caller aborts the stream cleanly) instead of holding the

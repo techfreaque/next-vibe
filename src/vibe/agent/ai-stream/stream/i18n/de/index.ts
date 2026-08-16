@@ -579,7 +579,7 @@ export const translations: typeof enTranslations = {
   headless: {
     errors: {
       missingModelOrSkill:
-        "Modell und Charakter sind erforderlich - direkt angeben oder favoriteId mit auflösbarer Modellauswahl bereitstellen",
+        "Modell oder Charakter erforderlich - direkt angeben oder favoriteId mit auflösbarer Modellauswahl bereitstellen",
       favoriteNotFound:
         "Favorit nicht gefunden oder gehört nicht diesem Benutzer",
       ambiguousModel:

@@ -690,7 +690,7 @@ export const translations: typeof enTranslations = {
     headless: {
       errors: {
         missingModelOrSkill:
-          "Model i charakter są wymagane - podaj je bezpośrednio lub podaj favoriteId z rozwiązywalnym wyborem modelu",
+          "Wymagany model lub charakter - podaj bezpośrednio lub podaj favoriteId z rozwiązywalnym wyborem modelu",
         favoriteNotFound:
           "Ulubiony nie znaleziony lub nie należy do tego użytkownika",
       },

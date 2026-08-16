@@ -21,17 +21,25 @@ import type { ChatModelOption } from "../../models";
 // ─── Stage: shape tool results (media-aware buildToolResultOutput) ───
 
 /**
- * Strip internal `$ref: "#/definitions/…"` keys from arbitrary JSON. Tool results
- * (e.g. tool-help returning execute-tool's parameter schema) can embed these
- * refs; some providers (Gemini) reject them. Removes only the internal-definition
- * refs, keeping all other content intact.
+ * Strip internal `$ref: "#/definitions/…"` keys from arbitrary JSON, and
+ * convert Date objects to ISO strings. Tool results (e.g. tool-help returning
+ * execute-tool's parameter schema) can embed these refs; some providers (Gemini)
+ * reject them. Drizzle timestamp columns return Date objects which fail ai@7's
+ * jsonValueSchema (Date is not a valid JSON primitive).
  */
-function sanitizeJsonSchemaRefs(value: JSONValue): JSONValue {
-  if (value === null || typeof value !== "object") {
+function sanitizeToolResult(value: JSONValue): JSONValue {
+  if (value === null) {
+    return value;
+  }
+  // Date objects from Drizzle — convert to ISO string
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+  if (typeof value !== "object") {
     return value;
   }
   if (Array.isArray(value)) {
-    return value.map((v) => sanitizeJsonSchemaRefs(v as JSONValue));
+    return value.map((v) => sanitizeToolResult(v as JSONValue));
   }
   const result: Record<string, JSONValue> = {};
   for (const [k, v] of Object.entries(value as Record<string, JSONValue>)) {
@@ -42,7 +50,7 @@ function sanitizeJsonSchemaRefs(value: JSONValue): JSONValue {
     ) {
       continue;
     }
-    result[k] = sanitizeJsonSchemaRefs(v as JSONValue);
+    result[k] = sanitizeToolResult(v as JSONValue);
   }
   return result;
 }
@@ -352,6 +360,6 @@ export async function buildToolResultOutput(
 
   return {
     type: "json",
-    value: sanitizeJsonSchemaRefs((result ?? null) as JSONValue),
+    value: sanitizeToolResult((result ?? null) as JSONValue),
   };
 }

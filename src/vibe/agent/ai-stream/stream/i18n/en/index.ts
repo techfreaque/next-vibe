@@ -580,7 +580,7 @@ export const translations = {
       // Either pass model+skill directly, or pass favoriteId pointing to a favorite
       // that has a MANUAL or FILTERS modelSelection (not SKILL_BASED with no skill).
       missingModelOrSkill:
-        "model and skill are required - pass them directly or provide a favoriteId with a resolvable model selection",
+        "model or skill required - pass one directly or provide a favoriteId with a resolvable model selection",
       favoriteNotFound: "Favorite not found or does not belong to this user",
       ambiguousModel:
         "Provide EITHER an explicit model or a favorite/skill - not both",

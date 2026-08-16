@@ -1,5 +1,6 @@
 import "server-only";
 
+import "./env";
 import { agentClientEnv } from "./env-client";
 
 export interface AgentEnvAvailability {

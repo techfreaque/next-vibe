@@ -284,8 +284,15 @@ export async function prepareStep(
     activeMessages !== stepMessages,
   );
 
+  // ai@7 validates stepMessages through modelMessageSchema (Zod). The SDK's
+  // own accumulated step messages can include Date objects or other non-JSON
+  // primitives (e.g. in tool results from Drizzle). JSON-reparse sanitizes
+  // them before the SDK runs standardizePrompt on the next step's messages.
+  const sanitized = JSON.parse(
+    JSON.stringify(withFinalStepNote(updatedMessages)),
+  ) as ModelMessage[];
   return {
-    messages: withFinalStepNote(updatedMessages),
+    messages: sanitized,
     ...finalStepGuard,
   };
 }
