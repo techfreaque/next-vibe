@@ -14,9 +14,8 @@ import { getIncognitoRename } from "./incognito-title-cache";
 // Per-turn thread titling: the model silently calls `rename-thread` (via
 // execute-tool) in the SAME turn as its real answer, naming the thread from the
 // conversation so far. Required on a still-default thread; never announced.
-// endLoop is used only when the rename is the turn's last call — it runs the
-// rename and stops the loop, sparing the empty follow-up turn the SDK would
-// otherwise spend acknowledging a housekeeping result nobody reads.
+// callbackMode:"endLoop" is always used — rename is a final side-action, so the
+// loop stops cleanly instead of spawning an empty follow-up acknowledgement turn.
 export const threadRenameFragment: SystemPromptFragment = {
   id: "thread-rename",
   // TRAILING on purpose: it carries the LIVE thread title (changes per turn) so it
@@ -74,12 +73,16 @@ export const threadRenameFragment: SystemPromptFragment = {
     const renameToolName = params.relayCallerInstanceId
       ? `${params.relayCallerInstanceId}__${THREAD_RENAME_ALIAS}`
       : THREAD_RENAME_ALIAS;
-    const callShape = `execute-tool(toolName="${renameToolName}", input={ title: "≤8 words covering the whole conversation, no quotes", description: "2-6 sentences summarizing the full thread — what was discussed, decided, or built" })`;
-    // Housekeeping — NEVER pre-empts the user's actual work and NEVER ends the turn.
-    // It rides in the SAME parallel batch as the real tool calls. Deliberately no
-    // endLoop: granting endLoop here makes the model treat rename as the whole turn
-    // and stop before doing the user's request (observed: T1 rename+endLoop hijack).
-    const rideRule = `Do the user's actual request FIRST and in FULL; the rename is a silent side-action fired in the SAME batch as your real tool calls (or right after). NEVER skip, delay, or replace the user's work with it, never make it your only action, and never use it to end the turn early — keep working until the user's request is fully done.`;
+    const callShape = `execute-tool(toolName="${renameToolName}", input={ title: "≤8 words covering the whole conversation, no quotes", description: "2-6 sentences summarizing the full thread — what was discussed, decided, or built" }, callbackMode: "endLoop")`;
+    // Housekeeping — NEVER pre-empts the user's actual work and NEVER ends the turn
+    // BEFORE the work is done. It rides in the SAME parallel batch as real tool calls.
+    // callbackMode:"endLoop" is correct HERE because rename is always a final side-action
+    // — the user's answer was already written before this tool fires. endLoop stops the
+    // loop cleanly instead of spawning an empty follow-up turn to acknowledge a result
+    // nobody reads. GUARD: the rideRule below makes clear it must not fire before the
+    // user's request is fully done — that blocks the T1 rename+endLoop hijack pattern
+    // where the model uses rename to short-circuit real work.
+    const rideRule = `Do the user's actual request FIRST and in FULL; the rename is a silent side-action fired in the SAME batch as your real tool calls (or right after, once your answer is complete). NEVER skip, delay, or replace the user's work with it, never make it your only action, and never fire it while other work is still pending — only fire it once the user's request is fully done, then let endLoop close the turn.`;
 
     if (isNew) {
       // Urgent + unconditional, but SUBORDINATE to the user's task: fire the rename

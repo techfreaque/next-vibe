@@ -21,8 +21,7 @@ export function AuthButtons({ locale }: AuthButtonsProps): JSX.Element {
 
   return (
     <Div className="flex items-center gap-2">
-      {/* Login - hidden on mobile, shown md+ */}
-      <Button variant="ghost" asChild className="hidden md:inline-flex">
+      <Button variant="ghost" asChild size="sm">
         <Link href={`/${locale}/user/login`}>{t("nav.user.login")}</Link>
       </Button>
       {/* Signup - always visible, compact on mobile */}

@@ -40,6 +40,7 @@ const { GET } = createEndpoint({
   subCategory: "Management",
   tags: ["tags.subscription", "tags.billing", "tags.get"],
   allowedRoles: [
+    UserRole.PUBLIC,
     UserRole.CUSTOMER,
     UserRole.ADMIN,
     UserRole.PARTNER_ADMIN,

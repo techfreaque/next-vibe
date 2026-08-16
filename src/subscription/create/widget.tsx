@@ -209,7 +209,10 @@ export function SubscriptionCreateContainer(): JSX.Element {
   // Public cap update
   const publicCapUpdateEndpoint = useEndpoint(
     publicCapDefinitions,
-    { create: { formOptions: { defaultValues: { capAmount: 500 } } } },
+    {
+      read: { queryOptions: { enabled: isAdmin } },
+      create: { formOptions: { defaultValues: { capAmount: 500 } } },
+    },
     logger,
     user,
   );

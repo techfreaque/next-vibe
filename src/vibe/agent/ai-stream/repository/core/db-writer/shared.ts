@@ -66,6 +66,15 @@ export interface DbWriterState {
   /** Tracks the thread ID of the last assistant message - used for embedding sync */
   lastThreadId: string | null;
   /**
+   * Message IDs that were successfully committed to the DB in this stream.
+   * Used to guard FK references: a TOOL message must not reference a parentId
+   * that never made it into the DB (e.g. a placeholder ASSISTANT whose insert
+   * failed). Checked in emitToolCall — if parentId is absent, null is used instead.
+   * Incognito streams skip DB writes so this set stays empty and parentId is
+   * passed through as-is (no FK constraint in incognito mode).
+   */
+  readonly committedMessageIds: Set<string>;
+  /**
    * In-flight embed of the just-written assistant message. Fired at content-done
    * (write time), awaited by the next step's cortex refresh so the mid-step
    * search sees this turn's assistant vector without re-embedding a query.

@@ -6,6 +6,8 @@
 
 import "server-only";
 
+import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
+
 import type { MessageMetadata } from "../../../../chat/db";
 import { ChatMessageRole, ThreadStreamingState } from "../../../../chat/enum";
 import { MessagesRepository } from "../../../../chat/threads/[threadId]/messages/repository";
@@ -98,19 +100,30 @@ export async function emitMessageCreated(
       createdAt,
     });
     if (!result.success) {
-      // Data loss, not a mere warning: the assistant's reply never lands in
-      // the DB and the client never learns why - createTextMessage already
-      // logged the underlying cause, this is the stream-context companion.
-      w.deps.logger.error(
-        "[MessageDbWriter] Failed to create ASSISTANT message - reply not persisted",
-        {
-          messageId,
-          threadId,
-          parentId,
-          error: result.message,
-          errorType: result.errorType?.errorCode,
-        },
-      );
+      if (
+        result.errorType?.errorCode === ErrorResponseTypes.NOT_FOUND.errorCode
+      ) {
+        w.deps.logger.warn(
+          "[MessageDbWriter] Thread deleted mid-stream, dropping ASSISTANT message create",
+          { messageId, threadId },
+        );
+      } else {
+        // Data loss, not a mere warning: the assistant's reply never lands in
+        // the DB and the client never learns why - createTextMessage already
+        // logged the underlying cause, this is the stream-context companion.
+        w.deps.logger.error(
+          "[MessageDbWriter] Failed to create ASSISTANT message - reply not persisted",
+          {
+            messageId,
+            threadId,
+            parentId,
+            error: result.message,
+            errorType: result.errorType?.errorCode,
+          },
+        );
+      }
+    } else {
+      w.committedMessageIds.add(messageId);
     }
     // Roll any queued messages forward to this new frontier
     w.engine.advanceQueuedMessages(threadId, messageId);
@@ -329,17 +342,30 @@ export async function emitPlaceholderAssistantMessage(
       locale: w.deps.locale,
     });
     if (!result.success) {
-      // Data loss, not a mere warning - see emitMessageCreated above.
-      w.deps.logger.error(
-        "[MessageDbWriter] Failed to create placeholder ASSISTANT message - reply not persisted",
-        {
-          messageId,
-          threadId,
-          parentId,
-          error: result.message,
-          errorType: result.errorType?.errorCode,
-        },
-      );
+      if (
+        result.errorType?.errorCode === ErrorResponseTypes.NOT_FOUND.errorCode
+      ) {
+        w.deps.logger.warn(
+          "[MessageDbWriter] Thread deleted mid-stream, dropping placeholder ASSISTANT message",
+          { messageId, threadId },
+        );
+      } else {
+        // Data loss, not a mere warning - see emitMessageCreated above.
+        // NOT adding to committedMessageIds — tool children must not use this
+        // failed placeholder as parent (they will fall back to null instead).
+        w.deps.logger.error(
+          "[MessageDbWriter] Failed to create placeholder ASSISTANT message - reply not persisted",
+          {
+            messageId,
+            threadId,
+            parentId,
+            error: result.message,
+            errorType: result.errorType?.errorCode,
+          },
+        );
+      }
+    } else {
+      w.committedMessageIds.add(messageId);
     }
     // Roll any queued messages forward to this new frontier
     w.engine.advanceQueuedMessages(threadId, messageId);

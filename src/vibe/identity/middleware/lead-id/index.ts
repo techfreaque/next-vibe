@@ -173,7 +173,11 @@ export async function createLeadId(
 
   if (!leadId) {
     logger.error("Failed to create leadId in middleware");
-    return NextResponseClass.next();
+    // Delete any stale/empty cookie so the next request retries from scratch
+    // rather than seeing a persistent empty lead_id that middleware can't fix.
+    const errResp = NextResponseClass.next();
+    errResp.cookies.delete(LEAD_ID_COOKIE_NAME);
+    return errResp;
   }
 
   const response = NextResponseClass.next();
@@ -183,7 +187,8 @@ export async function createLeadId(
     value: leadId,
     httpOnly: true,
     path: "/",
-    secure: coreEnv.NODE_ENV === Environment.PRODUCTION,
+    secure:
+      coreEnv.NODE_ENV === Environment.PRODUCTION && !coreEnv.IS_PREVIEW_MODE,
     sameSite: "lax" as const,
     maxAge: 365 * 24 * 60 * 60 * 10, // 10 years (effectively permanent)
   });

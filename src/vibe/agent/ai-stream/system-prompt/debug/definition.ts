@@ -34,7 +34,13 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["vibe", "agent", "ai-stream", "system-prompt", "debug"],
   aliases: ["system-prompt-debug"] as const,
-  allowedRoles: [UserRole.ADMIN] as const,
+  allowedRoles: [
+    UserRole.PUBLIC,
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+    UserRole.PARTNER_ADMIN,
+    UserRole.PARTNER_EMPLOYEE,
+  ] as const,
 
   title: "get.title" as const,
   titleShort: "get.titleShort" as const,

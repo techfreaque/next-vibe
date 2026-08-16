@@ -120,7 +120,9 @@ export class AuthRepository {
         value: leadId,
         httpOnly: true,
         path: "/",
-        secure: coreEnv.NODE_ENV === Environment.PRODUCTION,
+        secure:
+          coreEnv.NODE_ENV === Environment.PRODUCTION &&
+          !coreEnv.IS_PREVIEW_MODE,
         sameSite: "lax" as const,
         maxAge: 365 * 24 * 60 * 60 * 10, // 10 years (effectively permanent)
       });

@@ -50,9 +50,11 @@ import { ServerFramework } from "../enum";
 import {
   addPidToFile,
   cleanupPidFile,
+  findAvailablePort,
   getPidOnPort,
   isPortOwnedByUs,
   killPreviousInstance,
+  LOCAL_BASE_PORT,
   removePidFromFile,
   VIBE_START_PID_FILE,
   VIBE_SUPERVISOR_PID_FILE,
@@ -909,13 +911,10 @@ export class ServerStartRepository {
     const { t } = serverStartScopedTranslation.scopedT(locale);
 
     // Derive port: explicit --port > NEXT_PUBLIC_APP_URL port > default 3000
-    const port =
+    const basePort =
       data.port ??
       ServerStartRepository.portFromUrl(coreEnv.NEXT_PUBLIC_APP_URL) ??
       3000;
-
-    // Patch NEXT_PUBLIC_APP_URL to reflect the actual port so child processes see the right URL.
-    ServerStartRepository.patchPublicUrlPort(port);
 
     // Inject vibeMode into process.env so child processes and runtime-env-patch inherit it.
     if (data.vibeMode) {
@@ -937,6 +936,22 @@ export class ServerStartRepository {
     truncateServerLog();
     truncateClientLogs();
 
+    // Kill any previous vibe start instance first so its port is freed before we probe.
+    // Pass basePort so same-cwd orphans on the internal port are killed even without a pid file.
+    killPreviousInstance(VIBE_START_PID_FILE, logger, basePort);
+
+    // Resolve the actual port after the previous instance is gone.
+    // If basePort is still occupied (another repo clone, manual process), bump to the
+    // next free pair. LOCAL_BASE_PORT (dev server default) is skipped when bumping.
+    const port = findAvailablePort(
+      basePort,
+      VIBE_START_PID_FILE,
+      LOCAL_BASE_PORT,
+    );
+
+    // Patch NEXT_PUBLIC_APP_URL to reflect the actual port so child processes see the right URL.
+    ServerStartRepository.patchPublicUrlPort(port);
+
     // Print config summary immediately, before any async work
     ServerStartRepository.logStartupInfo(
       port,
@@ -947,8 +962,7 @@ export class ServerStartRepository {
       runNext,
     );
 
-    // Kill any previous vibe start instance, then write our PID (including resolved port)
-    killPreviousInstance(VIBE_START_PID_FILE, logger);
+    // Write our PID file with the resolved port.
     writePidFile(VIBE_START_PID_FILE, logger, [], port);
 
     // Register early SIGINT/SIGTERM so Ctrl+C during setup exits immediately.
@@ -982,7 +996,6 @@ export class ServerStartRepository {
       process.off("SIGINT", ServerStartRepository.earlyExitOnInt);
       process.off("SIGTERM", ServerStartRepository.earlyExitOnTerm);
       const handleShutdown = (): void => {
-        cleanupPidFile(VIBE_START_PID_FILE);
         ServerStartRepository.stopAllProcesses();
         process.exit(0);
       };
@@ -1052,7 +1065,7 @@ export class ServerStartRepository {
     const handleShutdownOnInt = (): void => {
       // Signal auto-restart loop not to re-spawn after we kill Next.js
       ServerStartRepository.nextServerShuttingDown = true;
-      cleanupPidFile(VIBE_START_PID_FILE);
+      // Leave the pid file intact so the next startup can kill our children (e.g. orphaned Next.js).
       ServerStartRepository.stopAllProcesses();
       writeServerLogOfflineHint();
       process.exit(0);
@@ -1060,7 +1073,7 @@ export class ServerStartRepository {
     const handleShutdownOnTerm = (): void => {
       // Signal auto-restart loop not to re-spawn after we kill Next.js
       ServerStartRepository.nextServerShuttingDown = true;
-      cleanupPidFile(VIBE_START_PID_FILE);
+      // Leave the pid file intact so the next startup can kill our children (e.g. orphaned Next.js).
       ServerStartRepository.stopAllProcesses();
       // On SIGTERM the new vibe start process already wrote the offline hint.
       process.exit(0);
@@ -1153,7 +1166,6 @@ export class ServerStartRepository {
             // eslint-disable-next-line i18next/no-literal-string
             "\n⏹  Stopping server to collect CPU profile…\n",
           );
-          cleanupPidFile(VIBE_START_PID_FILE);
           ServerStartRepository.stopAllProcesses();
 
           setTimeout((): void => {

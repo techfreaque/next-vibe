@@ -64,6 +64,8 @@ export class MessageDbWriter {
   /** In-flight embed of the just-written assistant message (fired at content-done,
    *  awaited by the next step's cortex refresh). See DbWriterState. */
   assistantEmbedPromise: Promise<void> | null = null;
+  /** Message IDs successfully committed to DB — guards FK references in emitToolCall. */
+  readonly committedMessageIds: Set<string> = new Set();
   /** Stream context of the owning stream (its threadId) - binds embedding-sync
    *  API calls so they record/replay. Passed at construction. */
   toolExecutionContext: ToolExecutionContext;

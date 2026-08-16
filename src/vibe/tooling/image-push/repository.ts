@@ -172,10 +172,12 @@ export class ImagePushRepository {
     const sshOpts =
       "-oServerAliveInterval=30 -oServerAliveCountMax=10 -oTCPKeepAlive=yes -oStrictHostKeyChecking=no";
     const refList = refs.map((ref) => `"${ref}"`).join(" ");
+    const remoteRmi = refs.join(" ");
     // gzip cuts ~5 GB to ~2 GB in flight; concurrent save|gzip|ssh|gunzip|load
     // is faster than sequential save-then-copy, and finishes well under any
     // SSH idle-timeout that would kill a raw 5 GB stream.
-    const pipeline = `docker save ${refList} | gzip -1 | ssh ${sshOpts} ${sshTarget} "gunzip | docker load"`;
+    // docker rmi before load so the old image is deleted rather than renamed to <none>.
+    const pipeline = `docker save ${refList} | gzip -1 | ssh ${sshOpts} ${sshTarget} "docker rmi -f ${remoteRmi} 2>/dev/null; gunzip | docker load; docker image prune -f"`;
     const transferResult = spawnSync("sh", ["-c", pipeline], {
       stdio: "inherit",
       cwd: process.cwd(),
@@ -230,7 +232,8 @@ export class ImagePushRepository {
     const { port } = ImagePushRepository.parseSshTarget(sshTarget);
     const sshOpts = `-oServerAliveInterval=30 -oServerAliveCountMax=10 -oTCPKeepAlive=yes -oStrictHostKeyChecking=no -oPort=${String(port)}`;
     const refList = refs.map((ref) => `"${ref}"`).join(" ");
-    const pipeline = `docker save ${refList} | gzip -1 | sshpass -p ${JSON.stringify(password)} ssh ${sshOpts} ${sshTarget} "gunzip | docker load"`;
+    const remoteRmi = refs.join(" ");
+    const pipeline = `docker save ${refList} | gzip -1 | sshpass -p ${JSON.stringify(password)} ssh ${sshOpts} ${sshTarget} "docker rmi -f ${remoteRmi} 2>/dev/null; gunzip | docker load; docker image prune -f"`;
     const result = spawnSync("sh", ["-c", pipeline], {
       stdio: "inherit",
       cwd: process.cwd(),

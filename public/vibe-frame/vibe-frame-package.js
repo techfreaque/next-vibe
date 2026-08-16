@@ -15067,12 +15067,24 @@ var {
   }
 });
 
+// src/vibe/platforms/web/build/constants.ts
+var BUILD_ALIAS = "build";
+var BUILD_SERVER_ALIAS = "b";
+
+// src/vibe/platforms/web/rebuild/constants.ts
+var REBUILD_ALIAS = "rebuild";
+
+// src/vibe/platforms/web/start/constants.ts
+var START_ALIAS = "start";
+var START_ALIAS_SHORT = "s";
+var START_ALIASES = [START_ALIAS, START_ALIAS_SHORT];
+
 // src/vibe/env/detect.ts
-var _args = process.argv.slice(2);
+var _args = typeof process !== "undefined" && Array.isArray(process.argv) ? process.argv.slice(2) : [];
 var _hasLocalFlag = _args.includes("--preview") || _args.includes("--hermes");
 var _isProduction = process.env["NODE_ENV"] === "production";
 var _isDevCommand = ["dev", "d"].some((a) => _args.includes(a));
-var _isStartCommand = ["start", "s", "build", "b"].some((a) => _args.includes(a)) || _args.includes("rebuild");
+var _isStartCommand = [...START_ALIASES, BUILD_ALIAS, BUILD_SERVER_ALIAS].some((a) => _args.includes(a)) || _args.includes(REBUILD_ALIAS);
 var _isMcpCommand = _args.includes("mcp");
 var isPreviewMode = _hasLocalFlag || !_isProduction && _isStartCommand;
 
@@ -16227,4 +16239,4 @@ export {
   DEFAULT_SANDBOX
 };
 
-//# debugId=784E2FCE61EDD13D64756E2164756E21
+//# debugId=4E85C493FA7D64C364756E2164756E21

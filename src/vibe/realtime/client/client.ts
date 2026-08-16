@@ -17,6 +17,7 @@
  * `preWarmChannel` opens the socket early (e.g. just before a stream POST).
  */
 
+import { addDocumentListener } from "next-vibe/ui/lib/dom";
 import { getCurrentHost, getCurrentProtocol } from "next-vibe/ui/lib/location";
 
 import type { CountryLanguage } from "../../core/i18n/core/config";
@@ -56,6 +57,9 @@ interface ChannelState {
 // Shared connection state
 let sharedWs: WebSocket | null = null;
 let reconnectAttempts = 0;
+// When true, the reconnect loop is paused. A page visibility change or
+// a new subscribe/preWarm call resets this and restarts the loop.
+let reconnectPaused = false;
 
 // Virtual channel subscriptions: channel → ChannelState
 const channels = new Map<string, ChannelState>();
@@ -136,7 +140,14 @@ function connect(logger: EndpointLogger): void {
     if (channels.size === 0) {
       return;
     }
-    // Exponential backoff: 1s, 2s, 4s, 8s, max 30s
+    // After 6 consecutive failures (~63s total), pause the loop and wait for
+    // a page focus/visibility event — persistent failures are likely a stale
+    // or missing cookie that only a page navigation will fix.
+    if (reconnectAttempts >= 6) {
+      reconnectPaused = true;
+      return;
+    }
+    // Exponential backoff: 1s, 2s, 4s, 8s, 16s, 30s
     const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
     reconnectAttempts++;
     setTimeout(() => {
@@ -150,7 +161,40 @@ function connect(logger: EndpointLogger): void {
   // onerror is followed by onclose, which triggers reconnect.
 }
 
+// On tab focus/visibility restore, kick a paused reconnect loop — the browser
+// may have refreshed cookies (e.g. via a background page fetch) since the loop
+// was paused, and the user is now actively looking at the tab.
+// Guard: this module is also loaded during SSR (TanStack/Vite), where `document`
+// doesn't exist. Only register the listener in a real browser context.
+if (typeof document !== "undefined") {
+  addDocumentListener("visibilitychange", (event) => {
+    const target = event.target as Document | null;
+    if (target?.visibilityState === "visible" && reconnectPaused) {
+      reconnectPaused = false;
+      reconnectAttempts = 0;
+      if (channels.size > 0 && !sharedWs) {
+        // Logger isn't available here; borrow a no-op fallback.
+        // The next subscribe/preWarm call will provide a real one.
+        connect({
+          debug: () => undefined,
+          info: () => undefined,
+          warn: () => undefined,
+          error: () => undefined,
+          vibe: () => undefined,
+          isDebugEnabled: false,
+        });
+      }
+    }
+  });
+}
+
 function ensureConnected(logger: EndpointLogger): void {
+  // A new subscription resets the pause (e.g. user navigated to a new view)
+  // so a fresh connect attempt is made with potentially refreshed cookies.
+  if (reconnectPaused) {
+    reconnectPaused = false;
+    reconnectAttempts = 0;
+  }
   if (
     !sharedWs ||
     sharedWs.readyState === WebSocket.CLOSED ||

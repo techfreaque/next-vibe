@@ -73,7 +73,8 @@ function stampCsrfCookie(request: NextRequest, response: NextResponse): void {
     value: token,
     httpOnly: false, // Must be readable by JS for the double-submit pattern
     path: "/",
-    secure: coreEnv.NODE_ENV === Environment.PRODUCTION,
+    secure:
+      coreEnv.NODE_ENV === Environment.PRODUCTION && !coreEnv.IS_PREVIEW_MODE,
     sameSite: "strict" as const,
     maxAge: 24 * 60 * 60, // 1 day - refreshed on every request
   });
@@ -100,8 +101,18 @@ export async function middleware(
     ? `${forwardedProto}://${forwardedHost}`
     : new URL(request.url).origin;
 
-  // Skip for static files
+  // Skip for static files — Next.js serves these directly.
+  // For bare-root paths with a file extension (e.g. /favicon.png, /logo.jpg) that
+  // have no locale prefix, return 404 immediately: they matched the [locale] catch-all
+  // only because no real static file exists at that path. Routes under a locale
+  // (e.g. /en-US/files/thread/image.png) start with a locale segment and never
+  // reach this branch.
   if (shouldSkipPath(path)) {
+    const hasFileExtension = /\.[a-zA-Z0-9]{2,5}$/.test(path);
+    const hasLocalePrefix = /^\/[a-z]{2}-[A-Z]+\//.test(path);
+    if (hasFileExtension && !hasLocalePrefix) {
+      return new NextResponseClass(null, { status: 404 });
+    }
     return NextResponseClass.next();
   }
 
@@ -191,7 +202,9 @@ export async function middleware(
             value: payload.leadId,
             httpOnly: true,
             path: "/",
-            secure: coreEnv.NODE_ENV === Environment.PRODUCTION,
+            secure:
+              coreEnv.NODE_ENV === Environment.PRODUCTION &&
+              !coreEnv.IS_PREVIEW_MODE,
             sameSite: "none" as const, // Required for cross-origin iframes
             maxAge: 365 * 24 * 60 * 60 * 10,
           });
@@ -202,7 +215,9 @@ export async function middleware(
             value: payload.authToken,
             httpOnly: true,
             path: "/",
-            secure: coreEnv.NODE_ENV === Environment.PRODUCTION,
+            secure:
+              coreEnv.NODE_ENV === Environment.PRODUCTION &&
+              !coreEnv.IS_PREVIEW_MODE,
             sameSite: "none" as const, // Required for cross-origin iframes
             maxAge: 30 * 24 * 60 * 60, // 30 days
           });
@@ -259,7 +274,9 @@ export async function middleware(
             value: newLeadId,
             httpOnly: true,
             path: "/",
-            secure: coreEnv.NODE_ENV === Environment.PRODUCTION,
+            secure:
+              coreEnv.NODE_ENV === Environment.PRODUCTION &&
+              !coreEnv.IS_PREVIEW_MODE,
             sameSite: "lax" as const,
             maxAge: 365 * 24 * 60 * 60 * 10,
           });
@@ -301,7 +318,9 @@ export async function middleware(
         value: urlLeadId,
         httpOnly: true,
         path: "/",
-        secure: coreEnv.NODE_ENV === Environment.PRODUCTION,
+        secure:
+          coreEnv.NODE_ENV === Environment.PRODUCTION &&
+          !coreEnv.IS_PREVIEW_MODE,
         sameSite: "lax" as const,
         maxAge: 365 * 24 * 60 * 60 * 10,
       });

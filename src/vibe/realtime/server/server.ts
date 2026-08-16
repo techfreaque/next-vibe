@@ -414,7 +414,22 @@ export function startWebSocketServer(
         const user = await authenticateWsRequest(req, logger);
 
         if (!user) {
-          logger.warn("[WS] Rejected upgrade - missing lead_id cookie");
+          const cookieHeader = req.headers.get("cookie") ?? "";
+          logger.warn("[WS] Rejected upgrade - missing lead_id cookie", {
+            userAgent: req.headers.get("user-agent") ?? undefined,
+            origin: req.headers.get("origin") ?? undefined,
+            ip:
+              req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+              bunServer.requestIP(req)?.address ??
+              undefined,
+            hasCookieHeader: cookieHeader.length > 0,
+            cookieNames: cookieHeader
+              ? cookieHeader
+                  .split(";")
+                  .map((c) => c.trim().split("=")[0])
+                  .filter(Boolean)
+              : [],
+          });
           return new Response("Missing lead_id cookie", { status: 401 });
         }
 

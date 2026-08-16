@@ -57,8 +57,38 @@ function isProcessRunning(pid: number): boolean {
 export function killPreviousInstance(
   pidFile: string,
   logger: EndpointLogger,
+  basePort?: number,
 ): void {
   if (!existsSync(pidFile)) {
+    // No pid file, but if a same-cwd process is on our internal port it's an orphaned
+    // child from a previous crash. Kill it so the port is free for the new startup.
+    if (basePort !== undefined && process.platform === "linux") {
+      const internalPort = basePort + NEXT_PORT_OFFSET;
+      const pidOnPort = getPidOnPort(internalPort);
+      if (
+        pidOnPort !== undefined &&
+        pidOnPort !== process.pid &&
+        isPidFromOurCwd(pidOnPort)
+      ) {
+        logger.debug(
+          `Killing orphaned same-cwd process on internal port ${internalPort} (no pid file)`,
+          { pid: pidOnPort },
+        );
+        try {
+          process.kill(pidOnPort, "SIGTERM");
+        } catch {
+          /* already dead */
+        }
+        Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 2000);
+        try {
+          if (isProcessRunning(pidOnPort)) {
+            process.kill(pidOnPort, "SIGKILL");
+          }
+        } catch {
+          /* already dead */
+        }
+      }
+    }
     return;
   }
 
@@ -319,8 +349,28 @@ function isPortInUse(port: number): boolean {
 }
 
 /**
+ * Returns true if the given pid's working directory matches ours.
+ * On Linux this reads /proc/<pid>/cwd; on other platforms always returns false.
+ */
+function isPidFromOurCwd(pid: number): boolean {
+  if (process.platform !== "linux") {
+    return false;
+  }
+  try {
+    const cwd = execSync(`readlink /proc/${String(pid)}/cwd`, {
+      encoding: "utf-8",
+      stdio: "pipe",
+    }).trim();
+    return cwd === process.cwd();
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Returns true if the process occupying `port` is recorded in our PID file
- * (i.e. it belongs to this project instance - we can safely kill it).
+ * OR (on Linux) is running from our working directory — meaning it belongs to
+ * this project instance and can safely be killed on next startup.
  */
 export function isPortOwnedByUs(port: number, pidFile: string): boolean {
   const pidOnPort = getPidOnPort(port);
@@ -328,23 +378,27 @@ export function isPortOwnedByUs(port: number, pidFile: string): boolean {
     return false;
   }
 
-  if (!existsSync(pidFile)) {
-    return false;
+  // Fast path: pid file lists it explicitly
+  if (existsSync(pidFile)) {
+    try {
+      const ourPids = new Set(
+        readFileSync(pidFile, "utf-8")
+          .trim()
+          .split("\n")
+          .filter((l) => !l.startsWith("PORT:"))
+          .map(Number)
+          .filter((p) => p > 0),
+      );
+      if (ourPids.has(pidOnPort)) {
+        return true;
+      }
+    } catch {
+      // fall through to cwd check
+    }
   }
 
-  try {
-    const ourPids = new Set(
-      readFileSync(pidFile, "utf-8")
-        .trim()
-        .split("\n")
-        .filter((l) => !l.startsWith("PORT:"))
-        .map(Number)
-        .filter((p) => p > 0),
-    );
-    return ourPids.has(pidOnPort);
-  } catch {
-    return false;
-  }
+  // Fallback: same-cwd process is ours even without a pid file (e.g. after a crash)
+  return isPidFromOurCwd(pidOnPort);
 }
 
 /**

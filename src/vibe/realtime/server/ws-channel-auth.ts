@@ -89,8 +89,8 @@ export async function authenticateWsRequest(
     url.searchParams.get("token") ??
     null;
   const leadId =
-    parseCookieValue(cookieHeader, LEAD_ID_COOKIE_NAME) ??
-    url.searchParams.get("leadId") ??
+    parseCookieValue(cookieHeader, LEAD_ID_COOKIE_NAME) ||
+    url.searchParams.get("leadId") ||
     null;
 
   if (!leadId) {

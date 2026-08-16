@@ -5,6 +5,7 @@
 
 "use client";
 
+import { UserRole } from "../../identity/roles/enum";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
 import type { EndpointReturn } from "../../unified-ui/hooks/endpoint-types";
@@ -19,5 +20,11 @@ export function useRemoteConnections(
   logger: EndpointLogger,
   user: JwtPayloadType,
 ): EndpointReturn<typeof definitions> {
-  return useEndpoint(definitions, undefined, logger, user);
+  const isAdmin = !user.isPublic && user.roles.includes(UserRole.ADMIN);
+  return useEndpoint(
+    definitions,
+    { read: { queryOptions: { enabled: isAdmin } } },
+    logger,
+    user,
+  );
 }

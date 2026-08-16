@@ -7,12 +7,15 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
+import {
+  ErrorResponseTypes,
+  type ErrorResponseType,
+} from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 
-import { chatMessages, type ToolCall } from "../../../../chat/db";
+import { chatMessages, chatThreads, type ToolCall } from "../../../../chat/db";
 import { ChatMessageRole, ThreadStreamingState } from "../../../../chat/enum";
 import { MessagesRepository } from "../../../../chat/threads/[threadId]/messages/repository";
 import type { ChatModelId } from "../../../models";
@@ -76,13 +79,25 @@ export async function emitToolCall(
     },
   });
 
-  // DB: create tool message immediately
+  // DB: create tool message immediately.
+  // Guard FK: if parentId was never committed to DB (placeholder insert failed),
+  // use null to avoid a foreign-key violation on chat_messages.parent_id.
   if (!w.deps.isIncognito) {
+    const safeParentId =
+      parentId !== null && !w.committedMessageIds.has(parentId)
+        ? null
+        : parentId;
+    if (safeParentId !== parentId) {
+      w.deps.logger.warn(
+        "[MessageDbWriter] parentId not committed to DB — inserting tool message with null parent to avoid FK violation",
+        { toolMessageId, threadId, originalParentId: parentId },
+      );
+    }
     const createResult = await MessagesRepository.createToolMessage({
       messageId: toolMessageId,
       threadId,
       toolCall,
-      parentId,
+      parentId: safeParentId,
       userId: params.userId,
       sequenceId,
       model,
@@ -92,11 +107,23 @@ export async function emitToolCall(
       createdAt,
     });
     if (!createResult.success) {
-      w.deps.logger.error("[MessageDbWriter] Failed to create tool message", {
-        messageId: toolMessageId,
-        error: createResult.message,
-        errorType: createResult.errorType?.errorCode,
-      });
+      if (
+        createResult.errorType?.errorCode ===
+        ErrorResponseTypes.NOT_FOUND.errorCode
+      ) {
+        w.deps.logger.warn(
+          "[MessageDbWriter] Thread deleted mid-stream, dropping tool message create",
+          { threadId, messageId: toolMessageId },
+        );
+      } else {
+        w.deps.logger.error("[MessageDbWriter] Failed to create tool message", {
+          messageId: toolMessageId,
+          error: createResult.message,
+          errorType: createResult.errorType?.errorCode,
+        });
+      }
+    } else {
+      w.committedMessageIds.add(toolMessageId);
     }
     // Roll any queued messages forward to this new frontier
     w.engine.advanceQueuedMessages(threadId, toolMessageId);
@@ -180,6 +207,19 @@ export async function emitToolResult(
   const skipWakeUpClobber =
     toolCall.callbackMode === "wakeUp" && !isWakeUpDispatch;
   if (!w.deps.isIncognito && !skipWakeUpClobber) {
+    const [threadExists] = await db
+      .select({ id: chatThreads.id })
+      .from(chatThreads)
+      .where(eq(chatThreads.id, threadId))
+      .limit(1);
+    if (!threadExists) {
+      w.deps.logger.warn(
+        "[MessageDbWriter] Thread deleted mid-stream, dropping tool result write",
+        { threadId, messageId: toolMessageId, toolName },
+      );
+      return;
+    }
+
     const updateResult = await db
       .update(chatMessages)
       .set({ metadata: { toolCall }, updatedAt: new Date() })

@@ -2424,7 +2424,7 @@ export class CreditRepository {
             feature,
           });
           return fail({
-            message: t("errors.insufficientCredits"),
+            message: t("errors.insufficientCredits", { cost: amount }),
             errorType: ErrorResponseTypes.BAD_REQUEST,
           });
         }
@@ -3067,7 +3067,7 @@ export class CreditRepository {
           cost,
         });
         return fail({
-          message: t("errors.deductionFailed"),
+          message: t("errors.deductionFailed", { cost }),
           errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
         });
       }
@@ -3143,7 +3143,7 @@ export class CreditRepository {
           cost,
         });
         return fail({
-          message: t("errors.deductionFailed"),
+          message: t("errors.deductionFailed", { cost }),
           errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
         });
       }
@@ -3220,7 +3220,7 @@ export class CreditRepository {
           cost,
         });
         return fail({
-          message: t("errors.deductionFailed"),
+          message: t("errors.deductionFailed", { cost }),
           errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
         });
       }
@@ -3310,7 +3310,7 @@ export class CreditRepository {
           model,
         });
         return fail({
-          message: t("errors.deductionFailed"),
+          message: t("errors.deductionFailed", { cost }),
           errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
         });
       }

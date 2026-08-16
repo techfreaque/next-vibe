@@ -47,9 +47,9 @@ export const LOCALE_COOKIE_NAME = "locale";
  * an unexpected port.
  */
 function getPortSuffix(): string {
-  // No suffix in production, or when running as a built preview server (vibe
-  // start / vibe rebuild) — the Bun proxy process doesn't inherit NODE_ENV=production
-  // from the Next.js child spawn, but isPreviewMode detects the start command.
+  // No suffix in production or preview mode. In preview (vibe start/build/rebuild)
+  // the Bun proxy doesn't have NODE_ENV=production but must use the same empty
+  // suffix as the Next.js child (which does). isPreviewMode detects this via argv.
   if (coreClientEnv.NODE_ENV === Environment.PRODUCTION || isPreviewMode) {
     return "";
   }

@@ -61,12 +61,15 @@ function getBroadcastUrl(): string {
 let shuttingDown = false;
 
 /**
- * Latched once the loopback POST to the WS proxy fails: no proxy is listening in
- * this process tree. Standalone CLI installs have no WS server at all, so every
- * subsequent attempt would fail the same way — skip them and rely on in-process
- * observers, which is all a CLI needs for realtime.
+ * Latched once the loopback POST to the WS proxy fails AND we are past the
+ * startup grace period. During startup the proxy may not be up yet (Next.js
+ * spawns before the Bun proxy); we allow retries for the first 30 s so a
+ * transient ECONNREFUSED at boot doesn't permanently kill broadcasting.
+ * Reset to false on any successful POST so a proxy restart also recovers.
  */
 let broadcastSinkUnreachable = false;
+const BROADCAST_GRACE_MS = 30_000;
+const broadcastStartTime = Date.now();
 
 // ─── Low-level broadcast primitives ───────────────────────────────────────────
 
@@ -100,19 +103,29 @@ function publishWsEvent<T extends AnyEndpointEventEnvelope>(
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ ...msg, user }),
-  }).catch((err) => {
-    if (shuttingDown) {
-      return;
-    }
-    // First failure latches: there is no proxy listening, and every later emit
-    // in this process would fail identically. Without this a CLI command that
-    // emits progress events would log one warning per event.
-    broadcastSinkUnreachable = true;
-    logger.debug(
-      `[WS Emitter] No broadcast sink at ${url} — in-process observers only ` +
-        `(${err instanceof Error ? err.message : String(err)})`,
-    );
-  });
+  })
+    .then(() => {
+      // Successful POST: proxy is alive — clear any stale latch so future emits
+      // go through (handles proxy restart recovery).
+      broadcastSinkUnreachable = false;
+      return undefined;
+    })
+    .catch((err) => {
+      if (shuttingDown) {
+        return;
+      }
+      // Only latch after the startup grace period. During the first 30 s the Bun
+      // proxy may not be up yet (Next.js spawns before it), so transient
+      // ECONNREFUSED failures are expected and should not permanently disable WS.
+      if (Date.now() - broadcastStartTime < BROADCAST_GRACE_MS) {
+        return;
+      }
+      broadcastSinkUnreachable = true;
+      logger.error(
+        `[WS Emitter] No broadcast sink at ${url} — in-process observers only ` +
+          `(${err instanceof Error ? err.message : String(err)})`,
+      );
+    });
 }
 
 /**

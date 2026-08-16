@@ -177,10 +177,13 @@ export class SubscriptionRepository {
     };
   }
   static async getSubscription(
-    userId: string,
+    userId: string | undefined,
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<SubscriptionGetResponseOutput>> {
+    if (!userId) {
+      return success({ hasSubscription: false });
+    }
     const { t } = scopedTranslation.scopedT(locale);
     try {
       const results = await db

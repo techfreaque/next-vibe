@@ -660,7 +660,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
       {
         id: ChatModelId.GROK_4,
         apiProvider: ApiProvider.OPENROUTER,
-        providerModel: "x-ai/grok-4",
+        providerModel: "x-ai/grok-4.3",
         creditCost: calculateCreditCost,
         inputTokenCost: 3, // updated: 2026-03-31 from openrouter-api
         outputTokenCost: 15, // updated: 2026-03-31 from openrouter-api
@@ -669,7 +669,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
       {
         id: ChatModelId.GROK_4,
         apiProvider: ApiProvider.UNBOTTLED,
-        providerModel: "grok-4",
+        providerModel: "grok-4.3",
         creditCost: calculateCreditCost,
         inputTokenCost: 3.9, // updated: 2026-07-02 from unbottled.ai
         outputTokenCost: 19.5, // updated: 2026-07-02 from unbottled.ai
@@ -704,7 +704,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
       {
         id: ChatModelId.GROK_4_FAST,
         apiProvider: ApiProvider.OPENROUTER,
-        providerModel: "x-ai/grok-4-fast",
+        providerModel: "x-ai/grok-4.3",
         creditCost: calculateCreditCost,
         inputTokenCost: 0.2, // updated: 2026-03-31 from openrouter-api
         outputTokenCost: 0.5, // updated: 2026-03-31 from openrouter-api
@@ -713,7 +713,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
       {
         id: ChatModelId.GROK_4_FAST,
         apiProvider: ApiProvider.UNBOTTLED,
-        providerModel: "grok-4-fast",
+        providerModel: "grok-4.3",
         creditCost: calculateCreditCost,
         inputTokenCost: 0.26, // updated: 2026-07-02 from unbottled.ai
         outputTokenCost: 0.65, // updated: 2026-07-02 from unbottled.ai
