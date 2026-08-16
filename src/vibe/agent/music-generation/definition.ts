@@ -199,6 +199,7 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         prompt: "Upbeat electronic music with a catchy melody",
+        model: MusicGenModelId.LYRIA_3,
         duration: DEFAULT_MUSIC_DURATION,
       },
     },

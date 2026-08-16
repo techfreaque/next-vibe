@@ -69,7 +69,7 @@ export const masterWriterSkill: Skill = {
       variantName: "skills.masterWriter.variants.literary" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.CLAUDE_OPUS_4_7,
+        manualModelId: ChatModelId.CLAUDE_OPUS_5,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,
@@ -94,7 +94,7 @@ export const masterWriterSkill: Skill = {
       variantName: "skills.masterWriter.variants.poetic" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.MINIMAX_M2_7,
+        manualModelId: ChatModelId.MINIMAX_M3,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,

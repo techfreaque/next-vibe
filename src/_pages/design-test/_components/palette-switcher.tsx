@@ -5,6 +5,7 @@ import { platform } from "next-vibe/core/env-client";
 import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import { Span } from "next-vibe/ui/components/span";
 import { P } from "next-vibe/ui/components/typography";
 import {
   removeRootCssVar,
@@ -810,10 +811,16 @@ export function PaletteSwitcher(): JSX.Element {
             className="gap-2 h-auto py-1.5 px-3"
             onClick={() => handleSelect(index)}
           >
-            {/* oxlint-disable-next-line oxlint-plugin-jsx-capitalization/jsx-capitalization -- needs both className and style for dynamic color preview */}
-            <span
-              className="w-4 h-4 rounded-full border border-foreground/20 shrink-0 inline-block"
-              style={{ backgroundColor: palette.preview }}
+            <Span
+              style={{
+                backgroundColor: palette.preview,
+                width: "1rem",
+                height: "1rem",
+                borderRadius: "9999px",
+                border: "1px solid rgb(0 0 0 / 0.2)",
+                flexShrink: 0,
+                display: "inline-block",
+              }}
             />
             <Div className="flex flex-col items-start">
               <P className="text-xs font-semibold leading-tight">

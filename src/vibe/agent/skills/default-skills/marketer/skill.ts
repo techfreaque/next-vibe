@@ -81,7 +81,7 @@ export const marketerSkill: Skill = {
       variantName: "skills.marketer.variants.snappy" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GPT_5_4_MINI,
+        manualModelId: ChatModelId.GPT_5_6_TERRA,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,
@@ -106,7 +106,7 @@ export const marketerSkill: Skill = {
       variantName: "skills.marketer.variants.budget" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GPT_5_4_NANO,
+        manualModelId: ChatModelId.GPT_5_6_LUNA,
         intelligenceRange: {
           min: IntelligenceLevel.QUICK,
           max: IntelligenceLevel.QUICK,

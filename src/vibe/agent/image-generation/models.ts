@@ -52,6 +52,9 @@ export enum ImageGenModelId {
   IMAGEN_4_FAST = "imagen-4-fast",
   QWEN_T2I = "qwen-t2i",
   REALTIME_T2I = "realtime-t2i",
+  GROK_IMAGINE_IMAGE_2 = "grok-imagine-image-2",
+  QWEN_IMAGE_3 = "qwen-image-3",
+  QWEN_IMAGE_3_PRO = "qwen-image-3-pro",
   // BEGIN:llm-generated - do not edit manually, updated by price updater
   GEMINI_3_1_FLASH_IMAGE_PREVIEW = "gemini-3.1-flash-image-preview",
   GEMINI_3_PRO_IMAGE_PREVIEW = "gemini-3-pro-image-preview",
@@ -1016,6 +1019,117 @@ export const imageGenModelDefinitions: Record<
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ImageGenModelId.GROK_IMAGINE_IMAGE_2]: {
+    name: "Grok Imagine Image 2.0",
+    by: "xAI",
+    description: "chat.models.descriptions.grokImagineImage2",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "si-x",
+    inputs: ["text"],
+    outputs: ["image"],
+    providers: [
+      {
+        id: ImageGenModelId.GROK_IMAGINE_IMAGE_2,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "x-ai/grok-imagine-image-2.0",
+        creditCostPerImage: 4, // updated: 2026-08-16 from openrouter-api ($0.04/image → 4 credits)
+        supportedSizes: [],
+        supportedQualities: [],
+      },
+      {
+        id: ImageGenModelId.GROK_IMAGINE_IMAGE_2,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "grok-imagine-image-2.0",
+        creditCostPerImage: 5.2,
+        supportedSizes: [],
+        supportedQualities: [],
+      },
+    ],
+    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ImageGenModelId.QWEN_IMAGE_3]: {
+    name: "Qwen Image 3",
+    by: "alibaba",
+    description: "chat.models.descriptions.qwenImage3",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "si-alibabadotcom",
+    inputs: ["text"],
+    outputs: ["image"],
+    providers: [
+      {
+        id: ImageGenModelId.QWEN_IMAGE_3,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "qwen/qwen-image-3",
+        creditCostPerImage: 3, // updated: 2026-08-16 from openrouter-api ($0.03/image → 3 credits)
+        supportedSizes: [],
+        supportedQualities: [],
+      },
+      {
+        id: ImageGenModelId.QWEN_IMAGE_3,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "qwen-image-3",
+        creditCostPerImage: 3.9,
+        supportedSizes: [],
+        supportedQualities: [],
+      },
+    ],
+    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ImageGenModelId.QWEN_IMAGE_3_PRO]: {
+    name: "Qwen Image 3 Pro",
+    by: "alibaba",
+    description: "chat.models.descriptions.qwenImage3Pro",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "si-alibabadotcom",
+    inputs: ["text"],
+    outputs: ["image"],
+    providers: [
+      {
+        id: ImageGenModelId.QWEN_IMAGE_3_PRO,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "qwen/qwen-image-3-pro",
+        creditCostPerImage: 4, // updated: 2026-08-16 from openrouter-api ($0.04/image → 4 credits)
+        supportedSizes: [],
+        supportedQualities: [],
+      },
+      {
+        id: ImageGenModelId.QWEN_IMAGE_3_PRO,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "qwen-image-3-pro",
+        creditCostPerImage: 5.2,
+        supportedSizes: [],
+        supportedQualities: [],
+      },
+    ],
+    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
     content: ContentLevel.OPEN,
     features: {
       ...defaultFeatures,

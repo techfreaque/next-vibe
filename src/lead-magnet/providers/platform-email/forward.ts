@@ -1,10 +1,20 @@
-import { success } from "next-vibe/core/route/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/core/route/response.schema";
 import React from "react";
 
 import type { ForwardLeadFn } from "../types";
+import { scopedTranslation } from "./i18n";
 import type { LeadNotificationEmailProps } from "./lead-notification.email";
 
-export const forwardLead: ForwardLeadFn = async (credentials, lead) => {
+export const forwardLead: ForwardLeadFn = async (
+  credentials,
+  lead,
+  t,
+  locale,
+) => {
   const { notifyEmail, notifyEmailName } = credentials;
   const { firstName, email } = lead;
 
@@ -20,32 +30,42 @@ export const forwardLead: ForwardLeadFn = async (credentials, lead) => {
   const { LeadNotificationEmail } = await import("./lead-notification.email");
   const { CampaignType } = await import("@/messenger/accounts/enum");
 
+  const { t: emailT } = scopedTranslation.scopedT(locale);
+
   const props: LeadNotificationEmailProps = {
     firstName,
     email,
     skillId,
     toName: notifyEmailName ?? "Creator",
     capturedAt,
+    locale,
   };
 
   const jsx = React.createElement(LeadNotificationEmail, props);
 
   const { createEndpointLogger } = await import("next-vibe/logger/server");
-  const logger = createEndpointLogger(false, "en-GLOBAL");
+  const logger = createEndpointLogger(false, locale);
 
-  await EmailSendingRepository.sendEmail(
+  const result = await EmailSendingRepository.sendEmail(
     {
       jsx,
-      subject: `New lead: ${firstName} signed up via your skill`,
+      subject: `${emailT("previewPrefix")} ${firstName} ${emailT("previewSuffix")}`,
       toEmail: notifyEmail,
       toName: notifyEmailName ?? "Creator",
-      locale: "en-GLOBAL",
+      locale,
       campaignType: CampaignType.TRANSACTIONAL,
       skipRateLimitCheck: true,
     },
     logger,
-    "en-GLOBAL",
+    locale,
   );
+
+  if (!result.success) {
+    return fail({
+      message: t("errors.providerError"),
+      errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+    });
+  }
 
   return success(undefined);
 };

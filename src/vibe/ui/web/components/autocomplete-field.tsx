@@ -15,7 +15,7 @@ import React, { useMemo, useState } from "react";
 import { useTranslation } from "../../../core/i18n/core/client";
 import type { TranslatedKeyType } from "../../../core/i18n/core/scoped-translation";
 import { cn } from "../../../unified-ui/_shared/cn";
-import { uiScopedTranslation } from "../i18n";
+import { scopedTranslation } from "../i18n";
 import { Badge } from "./badge";
 import { Button } from "./button";
 import {
@@ -76,7 +76,7 @@ export function AutocompleteField({
   name,
 }: AutocompleteFieldProps): JSX.Element {
   const { locale } = useTranslation();
-  const { t } = uiScopedTranslation.scopedT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [isCustomValue, setIsCustomValue] = useState(false);

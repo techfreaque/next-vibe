@@ -1,4 +1,4 @@
-// oxlint-disable oxlint-plugin-boilerplate/route-pattern -- NOWPayments webhook uses raw Response handlers, cannot use endpointsHandler
+// oxlint-disable boilerplate/route-pattern -- NOWPayments webhook uses raw Response handlers, cannot use endpointsHandler
 /**
  * NOWPayments Webhook Route
  * Handles NOWPayments IPN (Instant Payment Notification) webhook events

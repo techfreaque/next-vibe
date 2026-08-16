@@ -7,12 +7,12 @@ import { Pressable, ScrollView, View } from "react-native";
 
 import { useTranslation } from "../../../core/i18n/core/client";
 import { cn } from "../../../unified-ui/_shared/cn";
-import { uiScopedTranslation } from "../../web/i18n";
 import type { InputKeyboardEvent } from "../../web/components/input";
 import type {
   TagOption,
   TagsFieldProps,
 } from "../../web/components/tags-field";
+import { scopedTranslation } from "../../web/i18n";
 import { Badge } from "./badge";
 import { Plus, X } from "./icons";
 import { Input } from "./input";
@@ -32,7 +32,7 @@ export function TagsField<TKey extends string>({
   t,
 }: TagsFieldProps<TKey>): React.JSX.Element {
   const { locale } = useTranslation();
-  const { t: globalT } = uiScopedTranslation.scopedT(locale);
+  const { t: globalT } = scopedTranslation.scopedT(locale);
   const [inputValue, setInputValue] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
 

@@ -62,7 +62,7 @@ export const coderSkill: Skill = {
       variantName: "skills.coder.variants.techBro" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.CLAUDE_OPUS_4_7,
+        manualModelId: ChatModelId.CLAUDE_OPUS_5,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,
@@ -111,7 +111,7 @@ export const coderSkill: Skill = {
       variantName: "skills.coder.variants.quick" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.CLAUDE_SONNET_4_6,
+        manualModelId: ChatModelId.CLAUDE_SONNET_5,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,
@@ -135,7 +135,7 @@ export const coderSkill: Skill = {
       variantName: "skills.coder.variants.budget" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.DEEPSEEK_V32,
+        manualModelId: ChatModelId.QWEN_3_8_MAX,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,

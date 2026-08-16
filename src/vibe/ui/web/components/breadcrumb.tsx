@@ -3,7 +3,7 @@ import * as React from "react";
 
 import { useTranslation } from "../../../core/i18n/core/client";
 import { cn } from "../../../unified-ui/_shared/cn";
-import { uiScopedTranslation } from "../i18n";
+import { scopedTranslation } from "../i18n";
 import type { StyleType } from "../utils/style-type";
 import { ChevronRightIcon } from "./icons/ChevronRightIcon";
 import { DotsHorizontalIcon } from "./icons/DotsHorizontalIcon";
@@ -280,7 +280,7 @@ export function BreadcrumbEllipsis({
   "aria-label": ariaLabel,
 }: BreadcrumbEllipsisProps): React.JSX.Element {
   const { locale } = useTranslation();
-  const { t } = uiScopedTranslation.scopedT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   return (
     <span

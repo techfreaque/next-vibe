@@ -1,10 +1,9 @@
 import React from "react";
 import type { ScrollView as RNScrollView } from "react-native";
-import { Pressable, ScrollView, Text as RNText, View } from "react-native";
+import { Pressable, Text as RNText, ScrollView, View } from "react-native";
 
 import { useTranslation } from "../../../core/i18n/core/client";
 import { cn } from "../../../unified-ui/_shared/cn";
-import { uiScopedTranslation } from "../../web/i18n";
 import type {
   CarouselApi,
   CarouselButtonProps,
@@ -12,6 +11,7 @@ import type {
   CarouselItemProps,
   CarouselProps,
 } from "../../web/components/carousel";
+import { scopedTranslation } from "../../web/i18n";
 import { applyStyleType } from "../../web/utils/style-type";
 import {
   convertCSSToViewStyle,
@@ -153,7 +153,7 @@ function CarouselPrevious({
 }: CarouselButtonProps): React.JSX.Element {
   const { scrollPrev, canScrollPrev } = useCarousel();
   const { locale } = useTranslation();
-  const { t } = uiScopedTranslation.scopedT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   return (
     <StyledPressable
@@ -177,7 +177,7 @@ function CarouselNext({
 }: CarouselButtonProps): React.JSX.Element {
   const { scrollNext, canScrollNext } = useCarousel();
   const { locale } = useTranslation();
-  const { t } = uiScopedTranslation.scopedT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   return (
     <StyledPressable

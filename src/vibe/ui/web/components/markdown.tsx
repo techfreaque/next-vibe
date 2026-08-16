@@ -16,7 +16,7 @@ import remarkGfm from "remark-gfm";
 
 import { useTranslation } from "../../../core/i18n/core/client";
 import { cn } from "../../../unified-ui/_shared/cn";
-import { uiScopedTranslation } from "../i18n";
+import { scopedTranslation } from "../i18n";
 import type { StyleType } from "../utils/style-type";
 
 // Constants for non-translatable values
@@ -134,7 +134,7 @@ export const Markdown = memo(function Markdown({
   collapseState,
 }: MarkdownProps): JSX.Element {
   const { locale } = useTranslation();
-  const { t } = uiScopedTranslation.scopedT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   // First process Chat tags (just strip the tags, keep content)
   const contentWithChatProcessed = useMemo(
@@ -552,7 +552,7 @@ export const CodeBlock = memo(function CodeBlock({
   minimal?: boolean;
 }): JSX.Element {
   const { locale } = useTranslation();
-  const { t } = uiScopedTranslation.scopedT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async (): Promise<void> => {
@@ -645,7 +645,7 @@ export const CodeSnippet = memo(function CodeSnippet({
   noCopy?: boolean;
 }): JSX.Element {
   const { locale } = useTranslation();
-  const { t } = uiScopedTranslation.scopedT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async (): Promise<void> => {

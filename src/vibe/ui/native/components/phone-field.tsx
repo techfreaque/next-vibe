@@ -7,7 +7,7 @@ import { Pressable, ScrollView, View } from "react-native";
 
 import { useTranslation } from "../../../core/i18n/core/client";
 import { cn } from "../../../unified-ui/_shared/cn";
-import { uiScopedTranslation } from "../../web/i18n";
+import { scopedTranslation } from "../../web/i18n";
 // Import all types and constants from web (web is source of truth)
 import type {
   CountryData,
@@ -38,7 +38,7 @@ export function PhoneField({
 }: PhoneFieldProps): React.JSX.Element {
   const [open, setOpen] = useState(false);
   const { locale } = useTranslation();
-  const { t } = uiScopedTranslation.scopedT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   // Parse the current value to extract country and number

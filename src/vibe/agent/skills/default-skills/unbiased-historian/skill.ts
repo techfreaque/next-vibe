@@ -78,7 +78,7 @@ export const unbiasedHistorianSkill: Skill = {
       variantName: "skills.unbiasedHistorian.variants.budget" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.DEEPSEEK_V32,
+        manualModelId: ChatModelId.DEEPSEEK_V4_PRO,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,

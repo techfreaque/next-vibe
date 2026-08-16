@@ -1,4 +1,4 @@
-// oxlint-disable oxlint-plugin-boilerplate/route-pattern -- Markdown endpoint serves raw Response, cannot use endpointsHandler
+// oxlint-disable boilerplate/route-pattern -- Markdown endpoint serves raw Response, cannot use endpointsHandler
 /**
  * AGENT.md - Agent Gateway Document
  * GET /api/[locale]/system/platforms/ai/skills/AGENT.md

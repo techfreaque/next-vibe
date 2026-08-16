@@ -90,7 +90,7 @@ export const systemMonitorSkill: Skill = {
       variantName: "skills.systemMonitor.variants.fast" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GEMINI_3_5_FLASH,
+        manualModelId: ChatModelId.GEMINI_3_6_FLASH,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,

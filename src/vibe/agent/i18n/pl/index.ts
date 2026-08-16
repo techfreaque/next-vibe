@@ -1727,6 +1727,72 @@ export const translations: typeof enTranslations = {
           "Qwen T2I - Alibaba Qwen tekst-na-obraz via ModelsLab",
         modelsLabRealtimeT2I:
           "Realtime T2I - Ultraszybki model tekst-na-obraz ModelsLab w czasie rzeczywistym",
+        claudeSonnet5:
+          "Claude Sonnet 5 - Zrównoważony model Anthropic klasy Sonnet z mocnym działaniem w programowaniu, agentach i analizie. Kontekst 1M tokenów.",
+        claudeOpus5:
+          "Claude Opus 5 - Flagowy model Anthropic do najbardziej wymagających zadań agentowych i analitycznych. Kontekst 1M tokenów.",
+        claudeOpus5Fast:
+          "Claude Opus 5 Fast - Wariant Claude Opus 5 zoptymalizowany pod kątem wysokiej przepustowości i niskich opóźnień. Kontekst 1M tokenów.",
+        claudeFable5:
+          "Claude Fable 5 - Najnowszy model graniczny Anthropic łączący głęboki reasoning, syntezę twórczą i planowanie długoterminowe. Kontekst 1M tokenów.",
+        grok45:
+          "Grok 4.5 - Wydajny model reasoning xAI z obsługą obrazów i otwartą polityką treści. Kontekst 500K tokenów.",
+        grok46:
+          "Grok 4.6 - Najnowszy model Grok od xAI z lepszym reasoningiem i programowaniem. Kontekst 500K tokenów.",
+        gpt56Luna:
+          "GPT-5.6 Luna - Lekki, szybki model OpenAI do codziennych zadań. Bardzo oszczędny. Kontekst 1,05M tokenów.",
+        gpt56LunaPro:
+          "GPT-5.6 Luna Pro - Ulepszona wersja Luna z lepszym programowaniem i śledzeniem instrukcji. Kontekst 1,05M tokenów.",
+        gpt56Terra:
+          "GPT-5.6 Terra - Model średniej klasy OpenAI łączący możliwości i koszty. Kontekst 1,05M tokenów.",
+        gpt56TerraPro:
+          "GPT-5.6 Terra Pro - Zaawansowana wersja Terra z głębszym reasoningiem i analizą. Kontekst 1,05M tokenów.",
+        gpt56Sol:
+          "GPT-5.6 Sol - Premium model reasoning OpenAI do złożonych zadań. Najwyższa wydajność. Kontekst 1,05M tokenów.",
+        gpt56SolPro:
+          "GPT-5.6 Sol Pro - Topowy model GPT łączący zaawansowany reasoning z kreatywnością i głębią analityczną. Kontekst 1,05M tokenów.",
+        gemini36Flash:
+          "Gemini 3.6 Flash - Wydajny model Flash Google z multimodalnymi wejściami i mocnym programowaniem. Kontekst 1M tokenów.",
+        gemini35FlashLite:
+          "Gemini 3.5 Flash Lite - Najtańszy szybki model Google do prostych zadań. Kontekst 1M tokenów.",
+        gemini37Flash:
+          "Gemini 3.7 Flash - Najnowszy model serii Flash od Google z ulepszonym reasoningiem i możliwościami multimodalnymi. Kontekst 1,05M tokenów.",
+        kimiK3:
+          "Kimi K3 - Najnowszy model graniczny Moonshot AI z multimodalnym reasoningiem długokontekstowym i możliwościami agentowymi. Kontekst 1,05M tokenów.",
+        glm52:
+          "GLM-5.2 - Nowa generacja modelu bazowego Z.AI z mocnym reasoningiem i szybką inferencją. Kontekst 1,05M tokenów.",
+        minimaxM3:
+          "MiniMax M3 - Flagowy model MiniMax z mocnym programowaniem i reasoningiem w konkurencyjnej cenie. Kontekst 1,05M tokenów.",
+        qwen37Flash:
+          "Qwen 3.7 Flash - Ultraszybki model budżetowy Alibaba do zadań masowych. Kontekst 1M tokenów.",
+        qwen38Max:
+          "Qwen 3.8 Max - Topowy model reasoning Alibaba z granicznymi wynikami. Kontekst 1M tokenów.",
+        mimoV25:
+          "MiMo V2.5 - Wydajny model reasoning Xiaomi z mocnymi umiejętnościami programistycznymi. Kontekst 1,05M tokenów.",
+        mimoV25Pro:
+          "MiMo V2.5 Pro - Premium model reasoning Xiaomi z głębią analityczną i programistyczną. Kontekst 1,05M tokenów.",
+        metaMuseSpark12:
+          "Meta Muse Spark 1.2 - Multimodalny model reasoning Meta z wejściami obrazowymi, audio i wideo. Kontekst 1,05M tokenów.",
+        mistralMedium35:
+          "Mistral Medium 3.5 - Wydajny model klasy średniej Mistral AI z obsługą obrazów. Kontekst 262K tokenów.",
+        grokImagineImage2:
+          "Grok Imagine Image 2.0 - Najnowszy model generowania obrazów xAI z lepszą wiernością i jakością.",
+        qwenImage3:
+          "Qwen Image 3 - Szybki model generowania obrazów Alibaba w niskiej cenie.",
+        qwenImage3Pro:
+          "Qwen Image 3 Pro - Premium model generowania obrazów Alibaba z ulepszoną jakością.",
+        hailuo3:
+          "Hailuo 3 - Najnowszy model generowania wideo MiniMax z kinematyczną jakością i płynnością ruchu.",
+        seedance25:
+          "Seedance 2.5 - Ulepszony model generowania wideo ByteDance z lepszym ruchem i wiernością wizualną.",
+        flux3Video:
+          "Flux 3 Video - Flagowy model generowania wideo Black Forest Labs z wyjątkową jakością.",
+        grokImagineVideo15:
+          "Grok Imagine Video 1.5 - Zaktualizowany model generowania wideo xAI z lepszą spójnością czasową.",
+        lyria3ProPreview:
+          "Lyria 3 Pro Preview - Premium model generowania muzyki Google do pełnych piosenek w jakości produkcyjnej.",
+        lyria3ClipPreview:
+          "Lyria 3 Clip Preview - Szybki generator klipów muzycznych Google do krótkich treści audio.",
       },
     },
     modelUtilities: {

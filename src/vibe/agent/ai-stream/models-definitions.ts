@@ -85,6 +85,32 @@ export enum ChatModelId {
   KIMI_K2_6 = "kimi-k2.6",
   DEEPSEEK_V4_PRO = "deepseek-v4-pro",
   DEEPSEEK_V4_FLASH = "deepseek-v4-flash",
+  // New models added 2026-08-16
+  CLAUDE_OPUS_4_8 = "claude-opus-4.8",
+  CLAUDE_SONNET_5 = "claude-sonnet-5",
+  CLAUDE_OPUS_5 = "claude-opus-5",
+  CLAUDE_OPUS_5_FAST = "claude-opus-5-fast",
+  CLAUDE_FABLE_5 = "claude-fable-5",
+  GROK_4_5 = "grok-4.5",
+  GROK_4_6 = "grok-4.6",
+  GPT_5_6_LUNA = "gpt-5.6-luna",
+  GPT_5_6_LUNA_PRO = "gpt-5.6-luna-pro",
+  GPT_5_6_TERRA = "gpt-5.6-terra",
+  GPT_5_6_TERRA_PRO = "gpt-5.6-terra-pro",
+  GPT_5_6_SOL = "gpt-5.6-sol",
+  GPT_5_6_SOL_PRO = "gpt-5.6-sol-pro",
+  GEMINI_3_6_FLASH = "gemini-3.6-flash",
+  GEMINI_3_5_FLASH_LITE = "gemini-3.5-flash-lite",
+  GEMINI_3_7_FLASH = "gemini-3.7-flash",
+  KIMI_K3 = "kimi-k3",
+  GLM_5_2 = "glm-5.2",
+  MINIMAX_M3 = "minimax-m3",
+  QWEN_3_7_FLASH = "qwen-3.7-flash",
+  QWEN_3_8_MAX = "qwen-3.8-max",
+  MIMO_V2_5 = "mimo-v2.5",
+  MIMO_V2_5_PRO = "mimo-v2.5-pro",
+  META_MUSE_SPARK_1_2 = "meta-muse-spark-1.2",
+  MISTRAL_MEDIUM_3_5 = "mistral-medium-3.5",
 }
 
 export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
@@ -498,6 +524,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
 
     utilities: [
+      ModelUtility.LEGACY,
       ModelUtility.SMART,
       ModelUtility.CODING,
       ModelUtility.ANALYSIS,
@@ -732,6 +759,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
 
     utilities: [
+      ModelUtility.LEGACY,
       ModelUtility.SMART,
       ModelUtility.CODING,
       ModelUtility.ANALYSIS,
@@ -1614,6 +1642,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
       },
     ],
     utilities: [
+      ModelUtility.LEGACY,
       ModelUtility.SMART,
       ModelUtility.FAST,
       ModelUtility.CODING,
@@ -2421,7 +2450,12 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
       },
     ],
 
-    utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.FAST],
+    utilities: [
+      ModelUtility.LEGACY,
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.FAST,
+    ],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
     content: ContentLevel.MAINSTREAM,
@@ -2524,6 +2558,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
 
     utilities: [
+      ModelUtility.LEGACY,
       ModelUtility.SMART,
       ModelUtility.CODING,
       ModelUtility.ANALYSIS,
@@ -2562,7 +2597,12 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
       },
     ],
 
-    utilities: [ModelUtility.FAST, ModelUtility.CODING, ModelUtility.ANALYSIS],
+    utilities: [
+      ModelUtility.LEGACY,
+      ModelUtility.FAST,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+    ],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
     content: ContentLevel.OPEN,
@@ -3095,5 +3135,1004 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
       streaming: false,
       supportsTemperature: false,
     },
+  },
+
+  // ── New models added 2026-08-16 ───────────────────────────────────────────
+
+  [ChatModelId.CLAUDE_OPUS_4_8]: {
+    name: "Claude Opus 4.8",
+    by: "anthropic",
+    description: "chat.models.descriptions.claudeOpus48",
+    parameterCount: undefined,
+    contextWindow: 1000000,
+    icon: "si-anthropic",
+    inputs: ["text", "image"],
+    outputs: ["text"],
+    providers: [
+      {
+        id: ChatModelId.CLAUDE_OPUS_4_8,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "anthropic/claude-opus-4.8",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 5, // updated: 2026-08-16 from openrouter-api
+        outputTokenCost: 25, // updated: 2026-08-16 from openrouter-api
+        cacheReadTokenCost: 0.5,
+        cacheWriteTokenCost: 6.25,
+      },
+      {
+        id: ChatModelId.CLAUDE_OPUS_4_8,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "claude-opus-4.8",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 6.5,
+        outputTokenCost: 32.5,
+        cacheReadTokenCost: 0.65,
+        cacheWriteTokenCost: 8.125,
+      },
+    ],
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.CREATIVE,
+      ModelUtility.REASONING,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    content: ContentLevel.MAINSTREAM,
+    features: { ...defaultFeatures, toolCalling: true },
+    weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CONTROVERSIAL],
+  },
+
+  [ChatModelId.CLAUDE_SONNET_5]: {
+    name: "Claude Sonnet 5",
+    by: "anthropic",
+    description: "chat.models.descriptions.claudeSonnet5",
+    parameterCount: undefined,
+    contextWindow: 1000000,
+    icon: "si-anthropic",
+    inputs: ["text", "image"],
+    outputs: ["text"],
+    providers: [
+      {
+        id: ChatModelId.CLAUDE_SONNET_5,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "anthropic/claude-sonnet-5",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 2, // updated: 2026-08-16 from openrouter-api
+        outputTokenCost: 10, // updated: 2026-08-16 from openrouter-api
+        cacheReadTokenCost: 0.2,
+        cacheWriteTokenCost: 2.5,
+      },
+      {
+        id: ChatModelId.CLAUDE_SONNET_5,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "claude-sonnet-5",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 2.6,
+        outputTokenCost: 13,
+        cacheReadTokenCost: 0.26,
+        cacheWriteTokenCost: 3.25,
+      },
+    ],
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.CREATIVE,
+      ModelUtility.REASONING,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.MAINSTREAM,
+    features: { ...defaultFeatures, toolCalling: true },
+    weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CONTROVERSIAL],
+  },
+
+  [ChatModelId.CLAUDE_OPUS_5]: {
+    name: "Claude Opus 5",
+    by: "anthropic",
+    description: "chat.models.descriptions.claudeOpus5",
+    parameterCount: undefined,
+    contextWindow: 1000000,
+    icon: "si-anthropic",
+    inputs: ["text", "image"],
+    outputs: ["text"],
+    providers: [
+      {
+        id: ChatModelId.CLAUDE_OPUS_5,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "anthropic/claude-opus-5",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 5, // updated: 2026-08-16 from openrouter-api
+        outputTokenCost: 25, // updated: 2026-08-16 from openrouter-api
+        cacheReadTokenCost: 0.5,
+        cacheWriteTokenCost: 6.25,
+      },
+      {
+        id: ChatModelId.CLAUDE_OPUS_5,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "claude-opus-5",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 6.5,
+        outputTokenCost: 32.5,
+        cacheReadTokenCost: 0.65,
+        cacheWriteTokenCost: 8.125,
+      },
+    ],
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.CREATIVE,
+      ModelUtility.REASONING,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    content: ContentLevel.MAINSTREAM,
+    features: { ...defaultFeatures, toolCalling: true },
+    weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CONTROVERSIAL],
+  },
+
+  [ChatModelId.CLAUDE_OPUS_5_FAST]: {
+    name: "Claude Opus 5 Fast",
+    by: "anthropic",
+    description: "chat.models.descriptions.claudeOpus5Fast",
+    parameterCount: undefined,
+    contextWindow: 1000000,
+    icon: "si-anthropic",
+    inputs: ["text", "image"],
+    outputs: ["text"],
+    providers: [
+      {
+        id: ChatModelId.CLAUDE_OPUS_5_FAST,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "anthropic/claude-opus-5-fast",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 10, // updated: 2026-08-16 from openrouter-api
+        outputTokenCost: 50, // updated: 2026-08-16 from openrouter-api
+        cacheReadTokenCost: 1,
+        cacheWriteTokenCost: 12.5,
+      },
+      {
+        id: ChatModelId.CLAUDE_OPUS_5_FAST,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "claude-opus-5-fast",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 13,
+        outputTokenCost: 65,
+        cacheReadTokenCost: 1.3,
+        cacheWriteTokenCost: 16.25,
+      },
+    ],
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.FAST,
+      ModelUtility.REASONING,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    content: ContentLevel.MAINSTREAM,
+    features: { ...defaultFeatures, toolCalling: true },
+    weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CONTROVERSIAL],
+  },
+
+  [ChatModelId.CLAUDE_FABLE_5]: {
+    name: "Claude Fable 5",
+    by: "anthropic",
+    description: "chat.models.descriptions.claudeFable5",
+    parameterCount: undefined,
+    contextWindow: 1000000,
+    icon: "si-anthropic",
+    inputs: ["text", "image"],
+    outputs: ["text"],
+    providers: [
+      {
+        id: ChatModelId.CLAUDE_FABLE_5,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "anthropic/claude-fable-5",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 10, // updated: 2026-08-16 from openrouter-api
+        outputTokenCost: 50, // updated: 2026-08-16 from openrouter-api
+        cacheReadTokenCost: 1,
+        cacheWriteTokenCost: 12.5,
+      },
+      {
+        id: ChatModelId.CLAUDE_FABLE_5,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "claude-fable-5",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 13,
+        outputTokenCost: 65,
+        cacheReadTokenCost: 1.3,
+        cacheWriteTokenCost: 16.25,
+      },
+    ],
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.ANALYSIS,
+      ModelUtility.REASONING,
+      ModelUtility.CREATIVE,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    content: ContentLevel.MAINSTREAM,
+    features: { ...defaultFeatures, toolCalling: true },
+    weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CONTROVERSIAL],
+  },
+
+  [ChatModelId.GROK_4_5]: {
+    name: "Grok 4.5",
+    by: "xAI",
+    description: "chat.models.descriptions.grok45",
+    parameterCount: undefined,
+    contextWindow: 500000,
+    icon: "si-x",
+    inputs: ["text", "image"],
+    outputs: ["text"],
+    providers: [
+      {
+        id: ChatModelId.GROK_4_5,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "x-ai/grok-4.5",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 2, // updated: 2026-08-16 from openrouter-api
+        outputTokenCost: 6, // updated: 2026-08-16 from openrouter-api
+      },
+      {
+        id: ChatModelId.GROK_4_5,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "grok-4.5",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 2.6,
+        outputTokenCost: 7.8,
+      },
+    ],
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.REASONING,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    content: ContentLevel.OPEN,
+    features: { ...defaultFeatures, toolCalling: true },
+  },
+
+  [ChatModelId.GROK_4_6]: {
+    name: "Grok 4.6",
+    by: "xAI",
+    description: "chat.models.descriptions.grok46",
+    parameterCount: undefined,
+    contextWindow: 500000,
+    icon: "si-x",
+    inputs: ["text", "image"],
+    outputs: ["text"],
+    providers: [
+      {
+        id: ChatModelId.GROK_4_6,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "x-ai/grok-4.6",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 2, // updated: 2026-08-16 from openrouter-api
+        outputTokenCost: 6, // updated: 2026-08-16 from openrouter-api
+      },
+      {
+        id: ChatModelId.GROK_4_6,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "grok-4.6",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 2.6,
+        outputTokenCost: 7.8,
+      },
+    ],
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.REASONING,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    content: ContentLevel.OPEN,
+    features: { ...defaultFeatures, toolCalling: true },
+  },
+
+  [ChatModelId.GPT_5_6_LUNA]: {
+    name: "GPT-5.6 Luna",
+    by: "openAI",
+    description: "chat.models.descriptions.gpt56Luna",
+    parameterCount: undefined,
+    contextWindow: 1050000,
+    icon: "si-openai",
+    inputs: ["text", "image"],
+    outputs: ["text"],
+    providers: [
+      {
+        id: ChatModelId.GPT_5_6_LUNA,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-5.6-luna",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.1, // updated: 2026-08-16 from openrouter-api
+        outputTokenCost: 0.6, // updated: 2026-08-16 from openrouter-api
+      },
+      {
+        id: ChatModelId.GPT_5_6_LUNA,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "gpt-5.6-luna",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.13,
+        outputTokenCost: 0.78,
+      },
+    ],
+    utilities: [ModelUtility.CHAT, ModelUtility.FAST],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.QUICK,
+    content: ContentLevel.MAINSTREAM,
+    features: { ...defaultFeatures, toolCalling: true },
+    weaknesses: [ModelUtility.ROLEPLAY],
+  },
+
+  [ChatModelId.GPT_5_6_LUNA_PRO]: {
+    name: "GPT-5.6 Luna Pro",
+    by: "openAI",
+    description: "chat.models.descriptions.gpt56LunaPro",
+    parameterCount: undefined,
+    contextWindow: 1050000,
+    icon: "si-openai",
+    inputs: ["text", "image"],
+    outputs: ["text"],
+    providers: [
+      {
+        id: ChatModelId.GPT_5_6_LUNA_PRO,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-5.6-luna-pro",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.1, // updated: 2026-08-16 from openrouter-api
+        outputTokenCost: 0.6, // updated: 2026-08-16 from openrouter-api
+      },
+      {
+        id: ChatModelId.GPT_5_6_LUNA_PRO,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "gpt-5.6-luna-pro",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.13,
+        outputTokenCost: 0.78,
+      },
+    ],
+    utilities: [ModelUtility.CHAT, ModelUtility.FAST, ModelUtility.CODING],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.MAINSTREAM,
+    features: { ...defaultFeatures, toolCalling: true },
+    weaknesses: [ModelUtility.ROLEPLAY],
+  },
+
+  [ChatModelId.GPT_5_6_TERRA]: {
+    name: "GPT-5.6 Terra",
+    by: "openAI",
+    description: "chat.models.descriptions.gpt56Terra",
+    parameterCount: undefined,
+    contextWindow: 1050000,
+    icon: "si-openai",
+    inputs: ["text", "image"],
+    outputs: ["text"],
+    providers: [
+      {
+        id: ChatModelId.GPT_5_6_TERRA,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-5.6-terra",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 1, // updated: 2026-08-16 from openrouter-api
+        outputTokenCost: 6, // updated: 2026-08-16 from openrouter-api
+      },
+      {
+        id: ChatModelId.GPT_5_6_TERRA,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "gpt-5.6-terra",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 1.3,
+        outputTokenCost: 7.8,
+      },
+    ],
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.CHAT,
+      ModelUtility.ANALYSIS,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.MAINSTREAM,
+    features: { ...defaultFeatures, toolCalling: true },
+    weaknesses: [ModelUtility.ROLEPLAY],
+  },
+
+  [ChatModelId.GPT_5_6_TERRA_PRO]: {
+    name: "GPT-5.6 Terra Pro",
+    by: "openAI",
+    description: "chat.models.descriptions.gpt56TerraPro",
+    parameterCount: undefined,
+    contextWindow: 1050000,
+    icon: "si-openai",
+    inputs: ["text", "image"],
+    outputs: ["text"],
+    providers: [
+      {
+        id: ChatModelId.GPT_5_6_TERRA_PRO,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-5.6-terra-pro",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 1, // updated: 2026-08-16 from openrouter-api
+        outputTokenCost: 6, // updated: 2026-08-16 from openrouter-api
+      },
+      {
+        id: ChatModelId.GPT_5_6_TERRA_PRO,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "gpt-5.6-terra-pro",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 1.3,
+        outputTokenCost: 7.8,
+      },
+    ],
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.REASONING,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.MAINSTREAM,
+    features: { ...defaultFeatures, toolCalling: true },
+    weaknesses: [ModelUtility.ROLEPLAY],
+  },
+
+  [ChatModelId.GPT_5_6_SOL]: {
+    name: "GPT-5.6 Sol",
+    by: "openAI",
+    description: "chat.models.descriptions.gpt56Sol",
+    parameterCount: undefined,
+    contextWindow: 1050000,
+    icon: "si-openai",
+    inputs: ["text", "image"],
+    outputs: ["text"],
+    providers: [
+      {
+        id: ChatModelId.GPT_5_6_SOL,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-5.6-sol",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 5, // updated: 2026-08-16 from openrouter-api
+        outputTokenCost: 30, // updated: 2026-08-16 from openrouter-api
+      },
+      {
+        id: ChatModelId.GPT_5_6_SOL,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "gpt-5.6-sol",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 6.5,
+        outputTokenCost: 39,
+      },
+    ],
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.CREATIVE,
+      ModelUtility.REASONING,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    content: ContentLevel.MAINSTREAM,
+    features: { ...defaultFeatures, toolCalling: true },
+    weaknesses: [ModelUtility.ROLEPLAY],
+  },
+
+  [ChatModelId.GPT_5_6_SOL_PRO]: {
+    name: "GPT-5.6 Sol Pro",
+    by: "openAI",
+    description: "chat.models.descriptions.gpt56SolPro",
+    parameterCount: undefined,
+    contextWindow: 1050000,
+    icon: "si-openai",
+    inputs: ["text", "image"],
+    outputs: ["text"],
+    providers: [
+      {
+        id: ChatModelId.GPT_5_6_SOL_PRO,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-5.6-sol-pro",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 5, // updated: 2026-08-16 from openrouter-api
+        outputTokenCost: 30, // updated: 2026-08-16 from openrouter-api
+      },
+      {
+        id: ChatModelId.GPT_5_6_SOL_PRO,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "gpt-5.6-sol-pro",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 6.5,
+        outputTokenCost: 39,
+      },
+    ],
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.CREATIVE,
+      ModelUtility.REASONING,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    content: ContentLevel.MAINSTREAM,
+    features: { ...defaultFeatures, toolCalling: true },
+    weaknesses: [ModelUtility.ROLEPLAY],
+  },
+
+  [ChatModelId.GEMINI_3_6_FLASH]: {
+    name: "Gemini 3.6 Flash",
+    by: "google",
+    description: "chat.models.descriptions.gemini36Flash",
+    parameterCount: undefined,
+    contextWindow: 1048576,
+    icon: "si-googlegemini",
+    inputs: ["text", "image", "video", "audio"],
+    outputs: ["text"],
+    providers: [
+      {
+        id: ChatModelId.GEMINI_3_6_FLASH,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "google/gemini-3.6-flash",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 1.5, // updated: 2026-08-16 from openrouter-api
+        outputTokenCost: 7.5, // updated: 2026-08-16 from openrouter-api
+        cacheReadTokenCost: 0.15,
+        cacheWriteTokenCost: 0.08,
+      },
+      {
+        id: ChatModelId.GEMINI_3_6_FLASH,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "gemini-3.6-flash",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 1.95,
+        outputTokenCost: 9.75,
+        cacheReadTokenCost: 0.195,
+        cacheWriteTokenCost: 0.104,
+      },
+    ],
+    utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.FAST],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.MAINSTREAM,
+    features: { ...defaultFeatures, toolCalling: true },
+  },
+
+  [ChatModelId.GEMINI_3_5_FLASH_LITE]: {
+    name: "Gemini 3.5 Flash Lite",
+    by: "google",
+    description: "chat.models.descriptions.gemini35FlashLite",
+    parameterCount: undefined,
+    contextWindow: 1048576,
+    icon: "si-googlegemini",
+    inputs: ["text", "image", "video", "audio"],
+    outputs: ["text"],
+    providers: [
+      {
+        id: ChatModelId.GEMINI_3_5_FLASH_LITE,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "google/gemini-3.5-flash-lite",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.3, // updated: 2026-08-16 from openrouter-api
+        outputTokenCost: 2.5, // updated: 2026-08-16 from openrouter-api
+        cacheReadTokenCost: 0.03,
+        cacheWriteTokenCost: 0.08,
+      },
+      {
+        id: ChatModelId.GEMINI_3_5_FLASH_LITE,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "gemini-3.5-flash-lite",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.39,
+        outputTokenCost: 3.25,
+        cacheReadTokenCost: 0.039,
+        cacheWriteTokenCost: 0.104,
+      },
+    ],
+    utilities: [ModelUtility.CHAT, ModelUtility.FAST],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.QUICK,
+    content: ContentLevel.MAINSTREAM,
+    features: { ...defaultFeatures, toolCalling: true },
+  },
+
+  [ChatModelId.GEMINI_3_7_FLASH]: {
+    name: "Gemini 3.7 Flash",
+    by: "google",
+    description: "chat.models.descriptions.gemini37Flash",
+    parameterCount: undefined,
+    contextWindow: 1050000,
+    icon: "si-googlegemini",
+    inputs: ["text", "image", "video", "audio"],
+    outputs: ["text"],
+    providers: [
+      {
+        id: ChatModelId.GEMINI_3_7_FLASH,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "google/gemini-3.7-flash",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.375, // updated: 2026-08-16 from openrouter-api (50% promo)
+        outputTokenCost: 1.875, // updated: 2026-08-16 from openrouter-api (50% promo)
+        cacheReadTokenCost: 0.038,
+        cacheWriteTokenCost: 0.04,
+      },
+      {
+        id: ChatModelId.GEMINI_3_7_FLASH,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "gemini-3.7-flash",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.488,
+        outputTokenCost: 2.438,
+        cacheReadTokenCost: 0.049,
+        cacheWriteTokenCost: 0.052,
+      },
+    ],
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.FAST,
+      ModelUtility.ANALYSIS,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.MAINSTREAM,
+    features: { ...defaultFeatures, toolCalling: true },
+  },
+
+  [ChatModelId.KIMI_K3]: {
+    name: "Kimi K3",
+    by: "moonshotAI",
+    description: "chat.models.descriptions.kimiK3",
+    parameterCount: undefined,
+    contextWindow: 1050000,
+    icon: "moon",
+    inputs: ["text", "image"],
+    outputs: ["text"],
+    providers: [
+      {
+        id: ChatModelId.KIMI_K3,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "moonshotai/kimi-k3",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 2.8, // updated: 2026-08-16 from openrouter-api
+        outputTokenCost: 14, // updated: 2026-08-16 from openrouter-api
+      },
+      {
+        id: ChatModelId.KIMI_K3,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "kimi-k3",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 3.64,
+        outputTokenCost: 18.2,
+      },
+    ],
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.CREATIVE,
+      ModelUtility.VISION,
+      ModelUtility.REASONING,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    content: ContentLevel.OPEN,
+    features: { ...defaultFeatures, toolCalling: true },
+  },
+
+  [ChatModelId.GLM_5_2]: {
+    name: "GLM-5.2",
+    by: "zAi",
+    description: "chat.models.descriptions.glm52",
+    parameterCount: undefined,
+    contextWindow: 1050000,
+    icon: "si-zendesk",
+    inputs: ["text"],
+    outputs: ["text"],
+    providers: [
+      {
+        id: ChatModelId.GLM_5_2,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "z-ai/glm-5.2",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.308, // updated: 2026-08-16 from openrouter-api
+        outputTokenCost: 0.968, // updated: 2026-08-16 from openrouter-api
+      },
+      {
+        id: ChatModelId.GLM_5_2,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "glm-5.2",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.4,
+        outputTokenCost: 1.258,
+      },
+    ],
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.REASONING,
+      ModelUtility.FAST,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.OPEN,
+    features: { ...defaultFeatures, toolCalling: true },
+  },
+
+  [ChatModelId.MINIMAX_M3]: {
+    name: "MiniMax M3",
+    by: "miniMax",
+    description: "chat.models.descriptions.minimaxM3",
+    parameterCount: undefined,
+    contextWindow: 1050000,
+    icon: "si-minimax",
+    inputs: ["text"],
+    outputs: ["text"],
+    providers: [
+      {
+        id: ChatModelId.MINIMAX_M3,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "minimax/minimax-m3",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.23, // updated: 2026-08-16 from openrouter-api
+        outputTokenCost: 0.96, // updated: 2026-08-16 from openrouter-api
+      },
+      {
+        id: ChatModelId.MINIMAX_M3,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "minimax-m3",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.299,
+        outputTokenCost: 1.248,
+      },
+    ],
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.REASONING,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.OPEN,
+    features: { ...defaultFeatures, toolCalling: true },
+  },
+
+  [ChatModelId.QWEN_3_7_FLASH]: {
+    name: "Qwen 3.7 Flash",
+    by: "alibaba",
+    description: "chat.models.descriptions.qwen37Flash",
+    parameterCount: undefined,
+    contextWindow: 1000000,
+    icon: "si-alibabadotcom",
+    inputs: ["text"],
+    outputs: ["text"],
+    providers: [
+      {
+        id: ChatModelId.QWEN_3_7_FLASH,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "qwen/qwen3.7-flash",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.03, // updated: 2026-08-16 from openrouter-api
+        outputTokenCost: 0.13, // updated: 2026-08-16 from openrouter-api
+      },
+      {
+        id: ChatModelId.QWEN_3_7_FLASH,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "qwen-3.7-flash",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.039,
+        outputTokenCost: 0.169,
+      },
+    ],
+    utilities: [ModelUtility.CHAT, ModelUtility.FAST],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.QUICK,
+    content: ContentLevel.OPEN,
+    features: { ...defaultFeatures, toolCalling: true },
+  },
+
+  [ChatModelId.QWEN_3_8_MAX]: {
+    name: "Qwen 3.8 Max",
+    by: "alibaba",
+    description: "chat.models.descriptions.qwen38Max",
+    parameterCount: undefined,
+    contextWindow: 1000000,
+    icon: "si-alibabadotcom",
+    inputs: ["text"],
+    outputs: ["text"],
+    providers: [
+      {
+        id: ChatModelId.QWEN_3_8_MAX,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "qwen/qwen3.8-max",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 2, // updated: 2026-08-16 from openrouter-api
+        outputTokenCost: 6, // updated: 2026-08-16 from openrouter-api
+      },
+      {
+        id: ChatModelId.QWEN_3_8_MAX,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "qwen-3.8-max",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 2.6,
+        outputTokenCost: 7.8,
+      },
+    ],
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.REASONING,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    content: ContentLevel.OPEN,
+    features: { ...defaultFeatures, toolCalling: true },
+  },
+
+  [ChatModelId.MIMO_V2_5]: {
+    name: "MiMo V2.5",
+    by: "xiaomi",
+    description: "chat.models.descriptions.mimoV25",
+    parameterCount: undefined,
+    contextWindow: 1050000,
+    icon: "si-xiaomi",
+    inputs: ["text"],
+    outputs: ["text"],
+    providers: [
+      {
+        id: ChatModelId.MIMO_V2_5,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "xiaomi/mimo-v2.5",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.119, // updated: 2026-08-16 from openrouter-api
+        outputTokenCost: 0.238, // updated: 2026-08-16 from openrouter-api
+      },
+      {
+        id: ChatModelId.MIMO_V2_5,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "mimo-v2.5",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.155,
+        outputTokenCost: 0.309,
+      },
+    ],
+    utilities: [ModelUtility.CHAT, ModelUtility.FAST, ModelUtility.CODING],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.OPEN,
+    features: { ...defaultFeatures, toolCalling: true },
+  },
+
+  [ChatModelId.MIMO_V2_5_PRO]: {
+    name: "MiMo V2.5 Pro",
+    by: "xiaomi",
+    description: "chat.models.descriptions.mimoV25Pro",
+    parameterCount: undefined,
+    contextWindow: 1050000,
+    icon: "si-xiaomi",
+    inputs: ["text"],
+    outputs: ["text"],
+    providers: [
+      {
+        id: ChatModelId.MIMO_V2_5_PRO,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "xiaomi/mimo-v2.5-pro",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.305, // updated: 2026-08-16 from openrouter-api
+        outputTokenCost: 0.609, // updated: 2026-08-16 from openrouter-api
+      },
+      {
+        id: ChatModelId.MIMO_V2_5_PRO,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "mimo-v2.5-pro",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.397,
+        outputTokenCost: 0.792,
+      },
+    ],
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.REASONING,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    content: ContentLevel.OPEN,
+    features: { ...defaultFeatures, toolCalling: true },
+  },
+
+  [ChatModelId.META_MUSE_SPARK_1_2]: {
+    name: "Meta Muse Spark 1.2",
+    by: "meta",
+    description: "chat.models.descriptions.metaMuseSpark12",
+    parameterCount: undefined,
+    contextWindow: 1050000,
+    icon: "cpu",
+    inputs: ["text", "image", "video", "audio"],
+    outputs: ["text"],
+    providers: [
+      {
+        id: ChatModelId.META_MUSE_SPARK_1_2,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "meta/muse-spark-1.2",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 1.25, // updated: 2026-08-16 from openrouter-api
+        outputTokenCost: 4.25, // updated: 2026-08-16 from openrouter-api
+      },
+      {
+        id: ChatModelId.META_MUSE_SPARK_1_2,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "meta-muse-spark-1.2",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 1.625,
+        outputTokenCost: 5.525,
+      },
+    ],
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.ANALYSIS,
+      ModelUtility.REASONING,
+      ModelUtility.VISION,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.OPEN,
+    features: { ...defaultFeatures, toolCalling: true },
+  },
+
+  [ChatModelId.MISTRAL_MEDIUM_3_5]: {
+    name: "Mistral Medium 3.5",
+    by: "mistralAI",
+    description: "chat.models.descriptions.mistralMedium35",
+    parameterCount: undefined,
+    contextWindow: 262144,
+    icon: "si-mistralai",
+    inputs: ["text", "image"],
+    outputs: ["text"],
+    providers: [
+      {
+        id: ChatModelId.MISTRAL_MEDIUM_3_5,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "mistralai/mistral-medium-3-5",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 1.5, // updated: 2026-08-16 from openrouter-api
+        outputTokenCost: 7.5, // updated: 2026-08-16 from openrouter-api
+      },
+      {
+        id: ChatModelId.MISTRAL_MEDIUM_3_5,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "mistral-medium-3.5",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 1.95,
+        outputTokenCost: 9.75,
+      },
+    ],
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.VISION,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.MAINSTREAM,
+    features: { ...defaultFeatures, toolCalling: true },
   },
 };

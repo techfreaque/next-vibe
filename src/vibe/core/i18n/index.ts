@@ -1,4 +1,4 @@
-// oxlint-disable oxlint-plugin-boilerplate/i18n-pattern -- root i18n config, not a scoped translation file
+// oxlint-disable boilerplate/i18n-pattern
 import type { LanguageConfig, LanguageDefaults } from "./core/config";
 
 // ----------------

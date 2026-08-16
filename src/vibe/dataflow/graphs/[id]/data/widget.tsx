@@ -1579,7 +1579,7 @@ function PaneDragHandle({
   return (
     <Div
       ref={handleElRef}
-      role="separator"
+      role="separator" // oxlint-disable-line jsx-a11y/prefer-tag-over-role -- interactive resize handle needs ref + children, hr is a void element
       className="h-[4px] shrink-0 cursor-row-resize relative overflow-visible bg-border/50 hover:bg-border transition-colors group"
     >
       <Grip className="h-3 w-3 text-muted-foreground/40 group-hover:text-muted-foreground/80 transition-colors absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2" />

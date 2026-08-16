@@ -3,16 +3,16 @@
  * Production-ready autocomplete with search, categories, and custom values
  */
 import React, { useMemo, useState } from "react";
-import { Pressable, ScrollView, Text as RNText, View } from "react-native";
+import { Pressable, Text as RNText, ScrollView, View } from "react-native";
 
 import { useTranslation } from "../../../core/i18n/core/client";
 import { cn } from "../../../unified-ui/_shared/cn";
-import { uiScopedTranslation } from "../../web/i18n";
 import type {
   AutocompleteFieldProps,
   AutocompleteOption,
   AutocompleteOptionBase,
 } from "../../web/components/autocomplete-field";
+import { scopedTranslation } from "../../web/i18n";
 import { Badge } from "./badge";
 import { Check, ChevronDown, Search, X } from "./icons";
 import { Input } from "./input";
@@ -37,7 +37,7 @@ export function AutocompleteField({
   const [searchValue, setSearchValue] = useState("");
   const [isCustomValue, setIsCustomValue] = useState(false);
   const { locale } = useTranslation();
-  const { t: globalT } = uiScopedTranslation.scopedT(locale);
+  const { t: globalT } = scopedTranslation.scopedT(locale);
 
   // Group options by category
   const groupedOptions = useMemo(() => {

@@ -70,7 +70,7 @@ export const writerSkill: Skill = {
       variantName: "skills.writer.variants.western" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GROK_4_3,
+        manualModelId: ChatModelId.GROK_4_6,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,
@@ -95,7 +95,7 @@ export const writerSkill: Skill = {
       variantName: "skills.writer.variants.chineseWisdom" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.MINIMAX_M2_7,
+        manualModelId: ChatModelId.MINIMAX_M3,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,

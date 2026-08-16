@@ -99,6 +99,9 @@ function buildChatModelOptions(): Record<ChatModelId, ChatModelOption> {
   const result = {} as Record<ChatModelId, ChatModelOption>;
   for (const modelId of Object.values(ChatModelId)) {
     const def = chatModelDefinitions[modelId];
+    if (!def) {
+      continue;
+    }
     const sortedProviders = [...def.providers].toSorted(
       (a, b) => getProviderPrice(a) - getProviderPrice(b),
     );
@@ -141,6 +144,9 @@ function buildChatModelOptionsPool(): ChatModelOption[] {
   const pool: ChatModelOption[] = [];
   for (const modelId of Object.values(ChatModelId)) {
     const def = chatModelDefinitions[modelId];
+    if (!def) {
+      continue;
+    }
     const sortedProviders = [...def.providers].toSorted(
       (a, b) => getProviderPrice(a) - getProviderPrice(b),
     );

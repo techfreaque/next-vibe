@@ -223,6 +223,63 @@ const imageVisionModelOptionsIndex: Record<
   [ImageVisionModelId.GPT_5_IMAGE]: makeImageVisionOption(
     ImageVisionModelId.GPT_5_IMAGE,
   ),
+  [ImageVisionModelId.CLAUDE_OPUS_4_8]: makeImageVisionOption(
+    ImageVisionModelId.CLAUDE_OPUS_4_8,
+  ),
+  [ImageVisionModelId.CLAUDE_SONNET_5]: makeImageVisionOption(
+    ImageVisionModelId.CLAUDE_SONNET_5,
+  ),
+  [ImageVisionModelId.CLAUDE_OPUS_5]: makeImageVisionOption(
+    ImageVisionModelId.CLAUDE_OPUS_5,
+  ),
+  [ImageVisionModelId.CLAUDE_OPUS_5_FAST]: makeImageVisionOption(
+    ImageVisionModelId.CLAUDE_OPUS_5_FAST,
+  ),
+  [ImageVisionModelId.CLAUDE_FABLE_5]: makeImageVisionOption(
+    ImageVisionModelId.CLAUDE_FABLE_5,
+  ),
+  [ImageVisionModelId.GROK_4_5]: makeImageVisionOption(
+    ImageVisionModelId.GROK_4_5,
+  ),
+  [ImageVisionModelId.GROK_4_6]: makeImageVisionOption(
+    ImageVisionModelId.GROK_4_6,
+  ),
+  [ImageVisionModelId.GPT_5_6_LUNA]: makeImageVisionOption(
+    ImageVisionModelId.GPT_5_6_LUNA,
+  ),
+  [ImageVisionModelId.GPT_5_6_LUNA_PRO]: makeImageVisionOption(
+    ImageVisionModelId.GPT_5_6_LUNA_PRO,
+  ),
+  [ImageVisionModelId.GPT_5_6_TERRA]: makeImageVisionOption(
+    ImageVisionModelId.GPT_5_6_TERRA,
+  ),
+  [ImageVisionModelId.GPT_5_6_TERRA_PRO]: makeImageVisionOption(
+    ImageVisionModelId.GPT_5_6_TERRA_PRO,
+  ),
+  [ImageVisionModelId.GPT_5_6_SOL]: makeImageVisionOption(
+    ImageVisionModelId.GPT_5_6_SOL,
+  ),
+  [ImageVisionModelId.GPT_5_6_SOL_PRO]: makeImageVisionOption(
+    ImageVisionModelId.GPT_5_6_SOL_PRO,
+  ),
+  [ImageVisionModelId.GEMINI_3_6_FLASH]: makeImageVisionOption(
+    ImageVisionModelId.GEMINI_3_6_FLASH,
+  ),
+  [ImageVisionModelId.GEMINI_3_5_FLASH_LITE]: makeImageVisionOption(
+    ImageVisionModelId.GEMINI_3_5_FLASH_LITE,
+  ),
+  [ImageVisionModelId.GEMINI_3_7_FLASH]: makeImageVisionOption(
+    ImageVisionModelId.GEMINI_3_7_FLASH,
+  ),
+  [ImageVisionModelId.KIMI_K3]: makeImageVisionOption(
+    ImageVisionModelId.KIMI_K3,
+  ),
+  [ImageVisionModelId.META_MUSE_SPARK_1_2]: makeImageVisionOption(
+    ImageVisionModelId.META_MUSE_SPARK_1_2,
+  ),
+  [ImageVisionModelId.MISTRAL_MEDIUM_3_5]: makeImageVisionOption(
+    ImageVisionModelId.MISTRAL_MEDIUM_3_5,
+  ),
 };
 
 const videoVisionModelOptionsIndex: Record<
@@ -251,6 +308,18 @@ const videoVisionModelOptionsIndex: Record<
   [VideoVisionModelId.GEMINI_2_5_FLASH_LITE]: makeVideoVisionOption(
     VideoVisionModelId.GEMINI_2_5_FLASH_LITE,
   ),
+  [VideoVisionModelId.GEMINI_3_6_FLASH]: makeVideoVisionOption(
+    VideoVisionModelId.GEMINI_3_6_FLASH,
+  ),
+  [VideoVisionModelId.GEMINI_3_5_FLASH_LITE]: makeVideoVisionOption(
+    VideoVisionModelId.GEMINI_3_5_FLASH_LITE,
+  ),
+  [VideoVisionModelId.GEMINI_3_7_FLASH]: makeVideoVisionOption(
+    VideoVisionModelId.GEMINI_3_7_FLASH,
+  ),
+  [VideoVisionModelId.META_MUSE_SPARK_1_2]: makeVideoVisionOption(
+    VideoVisionModelId.META_MUSE_SPARK_1_2,
+  ),
 };
 
 const audioVisionModelOptionsIndex: Record<
@@ -278,6 +347,18 @@ const audioVisionModelOptionsIndex: Record<
   ),
   [AudioVisionModelId.GEMINI_2_5_FLASH_LITE]: makeAudioVisionOption(
     AudioVisionModelId.GEMINI_2_5_FLASH_LITE,
+  ),
+  [AudioVisionModelId.GEMINI_3_6_FLASH]: makeAudioVisionOption(
+    AudioVisionModelId.GEMINI_3_6_FLASH,
+  ),
+  [AudioVisionModelId.GEMINI_3_5_FLASH_LITE]: makeAudioVisionOption(
+    AudioVisionModelId.GEMINI_3_5_FLASH_LITE,
+  ),
+  [AudioVisionModelId.GEMINI_3_7_FLASH]: makeAudioVisionOption(
+    AudioVisionModelId.GEMINI_3_7_FLASH,
+  ),
+  [AudioVisionModelId.META_MUSE_SPARK_1_2]: makeAudioVisionOption(
+    AudioVisionModelId.META_MUSE_SPARK_1_2,
   ),
 };
 

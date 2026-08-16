@@ -24,7 +24,7 @@ export const HERMES_VARIANTS: SkillVariant[] = [
     variantName: "skills.hermes.variants.brilliant" as const,
     modelSelection: {
       selectionType: ModelSelectionType.MANUAL,
-      manualModelId: ChatModelId.CLAUDE_SONNET_4_6,
+      manualModelId: ChatModelId.CLAUDE_SONNET_5,
       sortBy: ModelSortField.INTELLIGENCE,
       sortDirection: ModelSortDirection.DESC,
       sortBy2: ModelSortField.PRICE,
@@ -61,7 +61,7 @@ export const HERMES_VARIANTS: SkillVariant[] = [
     variantName: "skills.hermes.variants.oracle" as const,
     modelSelection: {
       selectionType: ModelSelectionType.MANUAL,
-      manualModelId: ChatModelId.GPT_5_5,
+      manualModelId: ChatModelId.GPT_5_6_TERRA,
       sortBy: ModelSortField.INTELLIGENCE,
       sortDirection: ModelSortDirection.DESC,
       sortBy2: ModelSortField.PRICE,

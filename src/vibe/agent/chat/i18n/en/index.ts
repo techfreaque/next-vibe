@@ -793,6 +793,72 @@ export const translations = {
       modelsLabQwenT2I: "Qwen T2I - Alibaba's Qwen text-to-image via ModelsLab",
       modelsLabRealtimeT2I:
         "Realtime T2I - ModelsLab's ultra-fast realtime text-to-image model",
+      claudeSonnet5:
+        "Claude Sonnet 5 - Anthropic's balanced Sonnet-class model with strong performance across coding, agents, and analytical work. 1M-token context.",
+      claudeOpus5:
+        "Claude Opus 5 - Anthropic's flagship model for the most demanding agentic and analytical tasks. 1M-token context.",
+      claudeOpus5Fast:
+        "Claude Opus 5 Fast - High-throughput variant of Claude Opus 5 optimized for latency-sensitive applications. 1M-token context.",
+      claudeFable5:
+        "Claude Fable 5 - Anthropic's latest frontier model combining deep reasoning, creative synthesis, and long-horizon planning. 1M-token context.",
+      grok45:
+        "Grok 4.5 - xAI's capable reasoning model with vision support and open content policy. 500K-token context.",
+      grok46:
+        "Grok 4.6 - xAI's latest Grok model with improved reasoning and coding. 500K-token context.",
+      gpt56Luna:
+        "GPT-5.6 Luna - OpenAI's lightweight fast model for everyday tasks. Extremely cost-effective. 1.05M-token context.",
+      gpt56LunaPro:
+        "GPT-5.6 Luna Pro - Enhanced Luna variant with improved coding and instruction-following. 1.05M-token context.",
+      gpt56Terra:
+        "GPT-5.6 Terra - OpenAI's mid-tier model balancing capability and cost. Strong at coding and reasoning. 1.05M-token context.",
+      gpt56TerraPro:
+        "GPT-5.6 Terra Pro - Advanced Terra variant with deeper reasoning and analysis. 1.05M-token context.",
+      gpt56Sol:
+        "GPT-5.6 Sol - OpenAI's premium reasoning model for complex tasks. State-of-the-art performance. 1.05M-token context.",
+      gpt56SolPro:
+        "GPT-5.6 Sol Pro - Top-tier GPT model combining advanced reasoning with creative and analytical depth. 1.05M-token context.",
+      gemini36Flash:
+        "Gemini 3.6 Flash - Google's capable Flash model with multimodal inputs and strong coding. 1M-token context.",
+      gemini35FlashLite:
+        "Gemini 3.5 Flash Lite - Google's ultra-affordable fast model for simple tasks. 1M-token context.",
+      gemini37Flash:
+        "Gemini 3.7 Flash - Google's latest Flash series model with improved reasoning and multimodal capabilities. 1.05M-token context.",
+      kimiK3:
+        "Kimi K3 - Moonshot AI's latest frontier model with long-context multimodal reasoning and advanced agent capabilities. 1.05M-token context.",
+      glm52:
+        "GLM-5.2 - Z.AI's next-generation foundation model with strong reasoning and fast inference. 1.05M-token context.",
+      minimaxM3:
+        "MiniMax M3 - MiniMax's flagship model with strong coding and reasoning at competitive price. 1.05M-token context.",
+      qwen37Flash:
+        "Qwen 3.7 Flash - Alibaba's ultra-fast budget model for high-volume tasks. 1M-token context.",
+      qwen38Max:
+        "Qwen 3.8 Max - Alibaba's top reasoning model with frontier-level performance. 1M-token context.",
+      mimoV25:
+        "MiMo V2.5 - Xiaomi's efficient reasoning model with strong coding performance. 1.05M-token context.",
+      mimoV25Pro:
+        "MiMo V2.5 Pro - Xiaomi's premium reasoning model with advanced analytical and coding depth. 1.05M-token context.",
+      metaMuseSpark12:
+        "Meta Muse Spark 1.2 - Meta's multimodal reasoning model with vision, audio, and video inputs. Strong at cross-modal analysis. 1.05M-token context.",
+      mistralMedium35:
+        "Mistral Medium 3.5 - Mistral AI's capable mid-tier model with vision support and strong coding. 262K-token context.",
+      grokImagineImage2:
+        "Grok Imagine Image 2.0 - xAI's latest image generation model with improved prompt adherence and visual quality.",
+      qwenImage3:
+        "Qwen Image 3 - Alibaba's fast image generation model at ultra-low cost.",
+      qwenImage3Pro:
+        "Qwen Image 3 Pro - Alibaba's premium image generation model with enhanced quality and detail.",
+      hailuo3:
+        "Hailuo 3 - MiniMax's latest video generation model with cinematic quality and motion coherence.",
+      seedance25:
+        "Seedance 2.5 - ByteDance's improved video generation model with better motion and visual fidelity.",
+      flux3Video:
+        "Flux 3 Video - Black Forest Labs' flagship video generation model with exceptional quality and prompt adherence.",
+      grokImagineVideo15:
+        "Grok Imagine Video 1.5 - xAI's updated video generation model with improved temporal consistency.",
+      lyria3ProPreview:
+        "Lyria 3 Pro Preview - Google's premium music generation model for full-length songs with high production quality.",
+      lyria3ClipPreview:
+        "Lyria 3 Clip Preview - Google's fast music clip generator for short-form audio content.",
     },
   },
   modelUtilities: {

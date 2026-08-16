@@ -14,7 +14,7 @@ import { useTranslation } from "../../../core/i18n/core/client";
 import type { TranslatedKeyType } from "../../../core/i18n/core/scoped-translation";
 import type { TParams } from "../../../core/i18n/core/static-types";
 import { cn } from "../../../unified-ui/_shared/cn";
-import { uiScopedTranslation } from "../i18n";
+import { scopedTranslation } from "../i18n";
 import { Badge } from "./badge";
 import { Button } from "./button";
 import { Input, type InputKeyboardEvent } from "./input";
@@ -54,7 +54,7 @@ export function TagsField<TKey extends string>({
   t,
 }: TagsFieldProps<TKey>): JSX.Element {
   const { locale } = useTranslation();
-  const { t: globalT } = uiScopedTranslation.scopedT(locale);
+  const { t: globalT } = scopedTranslation.scopedT(locale);
   const [inputValue, setInputValue] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);

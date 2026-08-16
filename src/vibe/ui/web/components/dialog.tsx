@@ -5,7 +5,7 @@ import * as React from "react";
 
 import { useTranslation } from "../../../core/i18n/core/client";
 import { cn } from "../../../unified-ui/_shared/cn";
-import { uiScopedTranslation } from "../i18n";
+import { scopedTranslation } from "../i18n";
 import type { StyleType } from "../utils/style-type";
 import { Cross2Icon } from "./icons/Cross2Icon";
 
@@ -138,7 +138,7 @@ export function DialogContent({
   ...props
 }: DialogContentProps): React.JSX.Element {
   const { locale } = useTranslation();
-  const { t } = uiScopedTranslation.scopedT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   return (
     <DialogPortal>

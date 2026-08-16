@@ -9,7 +9,10 @@ import {
   Section,
   Text,
 } from "@react-email/components";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JSX } from "react";
+
+import { scopedTranslation } from "./i18n";
 
 export interface LeadNotificationEmailProps {
   firstName: string;
@@ -17,6 +20,7 @@ export interface LeadNotificationEmailProps {
   skillId: string;
   toName: string;
   capturedAt: string;
+  locale: CountryLanguage;
 }
 
 export function LeadNotificationEmail({
@@ -25,35 +29,37 @@ export function LeadNotificationEmail({
   skillId,
   toName,
   capturedAt,
+  locale,
 }: LeadNotificationEmailProps): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
+
   return (
     <Html>
       <Head />
-      <Preview>New lead: {firstName} just signed up via your skill</Preview>
+      <Preview>
+        {t("previewPrefix")} {firstName} {t("previewSuffix")}
+      </Preview>
       <Body style={bodyStyle}>
         <Container style={containerStyle}>
-          <Heading style={headingStyle}>You got a new lead 🎯</Heading>
-          <Text style={textStyle}>Hi {toName},</Text>
+          <Heading style={headingStyle}>{t("heading")}</Heading>
           <Text style={textStyle}>
-            Someone just submitted your lead form. Here are their details:
+            {t("hiPrefix")} {toName},
           </Text>
+          <Text style={textStyle}>{t("body")}</Text>
           <Section style={cardStyle}>
-            <Text style={labelStyle}>Name</Text>
+            <Text style={labelStyle}>{t("labelName")}</Text>
             <Text style={valueStyle}>{firstName}</Text>
             <Hr style={dividerStyle} />
-            <Text style={labelStyle}>Email</Text>
+            <Text style={labelStyle}>{t("labelEmail")}</Text>
             <Text style={valueStyle}>{email}</Text>
             <Hr style={dividerStyle} />
-            <Text style={labelStyle}>Skill ID</Text>
+            <Text style={labelStyle}>{t("labelSkillId")}</Text>
             <Text style={valueStyle}>{skillId}</Text>
             <Hr style={dividerStyle} />
-            <Text style={labelStyle}>Captured at</Text>
+            <Text style={labelStyle}>{t("labelCapturedAt")}</Text>
             <Text style={valueStyle}>{capturedAt}</Text>
           </Section>
-          <Text style={footerStyle}>
-            This notification was sent because you connected Platform Email as
-            your lead magnet provider.
-          </Text>
+          <Text style={footerStyle}>{t("footer")}</Text>
         </Container>
       </Body>
     </Html>

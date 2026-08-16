@@ -90,7 +90,7 @@ export const scientistSkill: Skill = {
       variantName: "skills.scientist.variants.elonTusk" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GROK_4_3,
+        manualModelId: ChatModelId.GROK_4_6,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,
@@ -115,7 +115,7 @@ export const scientistSkill: Skill = {
       variantName: "skills.scientist.variants.focused" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GLM_5,
+        manualModelId: ChatModelId.KIMI_K3,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,
@@ -139,7 +139,7 @@ export const scientistSkill: Skill = {
       variantName: "skills.scientist.variants.budget" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GLM_5_TURBO,
+        manualModelId: ChatModelId.DEEPSEEK_V4_PRO,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,

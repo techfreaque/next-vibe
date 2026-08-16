@@ -100,6 +100,7 @@ export const LeadMagnetCaptureRepository = {
         config.credentials as Record<string, string>,
         { firstName, email, listId: config.listId ?? undefined },
         parentT,
+        locale,
       );
 
       if (!result.success) {

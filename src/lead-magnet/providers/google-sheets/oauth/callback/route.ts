@@ -1,4 +1,4 @@
-// oxlint-disable oxlint-plugin-boilerplate/route-pattern -- OAuth callback uses raw Response.redirect(), cannot use endpointsHandler
+// oxlint-disable boilerplate/route-pattern -- OAuth callback uses raw Response.redirect(), cannot use endpointsHandler
 import "server-only";
 
 import { exchangeCodeForTokens } from "../../oauth-helpers";

@@ -78,7 +78,7 @@ export const professionalSkill: Skill = {
       variantName: "skills.professional.variants.budget" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GLM_4_7_FLASH,
+        manualModelId: ChatModelId.DEEPSEEK_V4_FLASH,
         intelligenceRange: {
           min: IntelligenceLevel.QUICK,
           max: IntelligenceLevel.QUICK,

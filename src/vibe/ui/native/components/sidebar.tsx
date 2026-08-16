@@ -9,7 +9,7 @@ import { Dimensions, Pressable, ScrollView, View } from "react-native";
 
 import { useTranslation } from "../../../core/i18n/core/client";
 import { cn } from "../../../unified-ui/_shared/cn";
-import { uiScopedTranslation } from "../../web/i18n";
+import { scopedTranslation } from "../../web/i18n";
 import { applyStyleType } from "../../web/utils/style-type";
 import { useIsMobile } from "../hooks/use-mobile";
 import {
@@ -462,7 +462,7 @@ function SidebarRail({
 }: SidebarRailProps): React.JSX.Element {
   const { toggleSidebar } = useSidebar();
   const { locale } = useTranslation();
-  const { t } = uiScopedTranslation.scopedT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   return (

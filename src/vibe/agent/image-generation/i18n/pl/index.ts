@@ -1,4 +1,4 @@
-// oxlint-disable-next-line oxlint-plugin-boilerplate/i18n-pattern
+// oxlint-disable boilerplate/i18n-pattern -- imports model translations shared across scoped files
 import { translations as modelTranslations } from "../../../models/i18n/pl";
 import type { translations as enTranslations } from "../en";
 

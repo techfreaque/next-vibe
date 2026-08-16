@@ -10,7 +10,6 @@ import { Pressable, Text as RNText, View } from "react-native";
 
 import { useTranslation } from "../../../core/i18n/core/client";
 import { cn } from "../../../unified-ui/_shared/cn";
-import { uiScopedTranslation } from "../../web/i18n";
 import type {
   BreadcrumbEllipsisProps,
   BreadcrumbItemProps,
@@ -20,6 +19,7 @@ import type {
   BreadcrumbProps,
   BreadcrumbSeparatorProps,
 } from "../../web/components/breadcrumb";
+import { scopedTranslation } from "../../web/i18n";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 
@@ -215,7 +215,7 @@ export function BreadcrumbEllipsis({
   "aria-label": ariaLabel,
 }: BreadcrumbEllipsisProps): React.JSX.Element {
   const { locale } = useTranslation();
-  const { t } = uiScopedTranslation.scopedT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   return (

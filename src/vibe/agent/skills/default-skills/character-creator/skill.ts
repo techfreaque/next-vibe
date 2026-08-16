@@ -258,7 +258,7 @@ When asked to review or improve a skill:
       variantName: "skills.skillCreator.variants.brilliant" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.CLAUDE_SONNET_4_6,
+        manualModelId: ChatModelId.CLAUDE_SONNET_5,
         sortBy: ModelSortField.INTELLIGENCE,
         sortDirection: ModelSortDirection.DESC,
         sortBy2: ModelSortField.PRICE,

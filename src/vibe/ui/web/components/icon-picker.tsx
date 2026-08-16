@@ -14,7 +14,7 @@ import {
   ICON_CATEGORIES,
   type IconKey,
 } from "../../../unified-ui/widgets/form-fields/icon-field/icons";
-import { uiScopedTranslation } from "../i18n";
+import { scopedTranslation } from "../i18n";
 import { Button } from "./button";
 import { Dialog, DialogContent, DialogTrigger } from "./dialog";
 import { Div } from "./div";
@@ -54,7 +54,7 @@ export function IconPicker({
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<CategoryKey>("all");
   const { locale } = useTranslation();
-  const { t } = uiScopedTranslation.scopedT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   // Filter icons based on search query
   const filteredIcons = useMemo(() => {

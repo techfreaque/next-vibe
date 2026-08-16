@@ -38,6 +38,8 @@ export enum MusicGenModelId {
   CASSETTE_MUSIC = "cassette-music",
   SONAUTO_SONG = "sonauto-song",
   LYRIA_3 = "lyria-3",
+  LYRIA_3_PRO_PREVIEW = "lyria-3-pro-preview",
+  LYRIA_3_CLIP_PREVIEW = "lyria-3-clip-preview",
   // BEGIN:llm-generated - do not edit manually, updated by price updater
   // END:llm-generated
 }
@@ -280,6 +282,84 @@ export const musicGenModelDefinitions: Record<
     utilities: [ModelUtility.MUSIC_GEN, ModelUtility.CREATIVE],
     supportsTools: false,
     intelligence: IntelligenceLevel.BRILLIANT,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [MusicGenModelId.LYRIA_3_PRO_PREVIEW]: {
+    name: "Lyria 3 Pro Preview",
+    by: "google",
+    description: "chat.models.descriptions.lyria3ProPreview",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "music",
+    inputs: ["text"],
+    outputs: ["audio"],
+    providers: [
+      {
+        id: MusicGenModelId.LYRIA_3_PRO_PREVIEW,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "google/lyria-3-pro-preview",
+        creditCostPerClip: 8, // updated: 2026-08-16 from openrouter-api ($0.08/song → 8 credits)
+        defaultDurationSeconds: 30,
+        supportedDurations: [MusicDuration.LONG],
+      },
+      {
+        id: MusicGenModelId.LYRIA_3_PRO_PREVIEW,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "lyria-3-pro-preview",
+        creditCostPerClip: 10.4,
+        defaultDurationSeconds: 30,
+        supportedDurations: ["post.duration.long"],
+      },
+    ],
+    utilities: [ModelUtility.MUSIC_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [MusicGenModelId.LYRIA_3_CLIP_PREVIEW]: {
+    name: "Lyria 3 Clip Preview",
+    by: "google",
+    description: "chat.models.descriptions.lyria3ClipPreview",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "music",
+    inputs: ["text"],
+    outputs: ["audio"],
+    providers: [
+      {
+        id: MusicGenModelId.LYRIA_3_CLIP_PREVIEW,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "google/lyria-3-clip-preview",
+        creditCostPerClip: 4, // updated: 2026-08-16 from openrouter-api ($0.04/clip → 4 credits)
+        defaultDurationSeconds: 15,
+        supportedDurations: [MusicDuration.SHORT, MusicDuration.MEDIUM],
+      },
+      {
+        id: MusicGenModelId.LYRIA_3_CLIP_PREVIEW,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "lyria-3-clip-preview",
+        creditCostPerClip: 5.2,
+        defaultDurationSeconds: 15,
+        supportedDurations: ["post.duration.short", "post.duration.medium"],
+      },
+    ],
+    utilities: [
+      ModelUtility.MUSIC_GEN,
+      ModelUtility.CREATIVE,
+      ModelUtility.FAST,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,

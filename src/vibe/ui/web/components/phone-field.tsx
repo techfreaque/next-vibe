@@ -12,7 +12,7 @@ import { useMemo, useState } from "react";
 
 import { useTranslation } from "../../../core/i18n/core/client";
 import { cn } from "../../../unified-ui/_shared/cn";
-import { uiScopedTranslation } from "../i18n";
+import { scopedTranslation } from "../i18n";
 import type { StyleType } from "../utils/style-type";
 import { Button } from "./button";
 import {
@@ -94,7 +94,7 @@ export function PhoneField({
   name,
 }: PhoneFieldProps): JSX.Element {
   const { locale } = useTranslation();
-  const { t: _t } = uiScopedTranslation.scopedT(locale);
+  const { t: _t } = scopedTranslation.scopedT(locale);
   const [open, setOpen] = useState(false);
 
   // Parse the current value to extract country and number

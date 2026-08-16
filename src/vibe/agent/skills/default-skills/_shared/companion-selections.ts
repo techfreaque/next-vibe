@@ -23,7 +23,7 @@ export const THEA_VARIANTS: SkillVariant[] = [
     variantName: "skills.thea.variants.brilliant" as const,
     modelSelection: {
       selectionType: ModelSelectionType.MANUAL,
-      manualModelId: ChatModelId.CLAUDE_SONNET_4_6,
+      manualModelId: ChatModelId.CLAUDE_SONNET_5,
       intelligenceRange: {
         min: IntelligenceLevel.BRILLIANT,
         max: IntelligenceLevel.BRILLIANT,
@@ -62,7 +62,7 @@ export const THEA_VARIANTS: SkillVariant[] = [
     variantName: "skills.thea.variants.oracle" as const,
     modelSelection: {
       selectionType: ModelSelectionType.MANUAL,
-      manualModelId: ChatModelId.GPT_5_5,
+      manualModelId: ChatModelId.GPT_5_6_TERRA,
       sortBy: ModelSortField.INTELLIGENCE,
       sortDirection: ModelSortDirection.DESC,
       sortBy2: ModelSortField.PRICE,
@@ -80,7 +80,7 @@ export const THEA_VARIANTS: SkillVariant[] = [
     variantName: "skills.thea.variants.elonTusk" as const,
     modelSelection: {
       selectionType: ModelSelectionType.MANUAL,
-      manualModelId: ChatModelId.GROK_4_3,
+      manualModelId: ChatModelId.GROK_4_6,
       sortBy: ModelSortField.INTELLIGENCE,
       sortDirection: ModelSortDirection.DESC,
       sortBy2: ModelSortField.PRICE,

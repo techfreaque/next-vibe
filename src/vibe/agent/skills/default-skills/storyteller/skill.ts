@@ -108,7 +108,7 @@ export const storytellerSkill: Skill = {
       variantName: "skills.storyteller.variants.minimax" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.MINIMAX_M2_7,
+        manualModelId: ChatModelId.MINIMAX_M3,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,
@@ -132,7 +132,7 @@ export const storytellerSkill: Skill = {
       variantName: "skills.storyteller.variants.budget" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GLM_5_TURBO,
+        manualModelId: ChatModelId.GLM_5_2,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,

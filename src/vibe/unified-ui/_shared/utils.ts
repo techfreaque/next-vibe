@@ -669,7 +669,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
       string,
       UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, any> // oxlint-disable-line typescript/no-explicit-any
     >;
-    child?: UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, any>; // oxlint-disable-line typescript/no-explicit-any;
+    child?: UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, any>; // oxlint-disable-line typescript/no-explicit-any
     discriminator?: string;
     variants?: readonly ObjectWidgetConfig<
       string,

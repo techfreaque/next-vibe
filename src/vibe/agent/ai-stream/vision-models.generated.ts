@@ -48,6 +48,25 @@ export enum ImageVisionModelId {
   GPT_5_IMAGE = "gpt-5-image",
   GPT_5_4_IMAGE_2 = "gpt-5.4-image-2",
   KIMI_K2_6 = "kimi-k2.6",
+  CLAUDE_OPUS_4_8 = "claude-opus-4.8",
+  CLAUDE_SONNET_5 = "claude-sonnet-5",
+  CLAUDE_OPUS_5 = "claude-opus-5",
+  CLAUDE_OPUS_5_FAST = "claude-opus-5-fast",
+  CLAUDE_FABLE_5 = "claude-fable-5",
+  GROK_4_5 = "grok-4.5",
+  GROK_4_6 = "grok-4.6",
+  GPT_5_6_LUNA = "gpt-5.6-luna",
+  GPT_5_6_LUNA_PRO = "gpt-5.6-luna-pro",
+  GPT_5_6_TERRA = "gpt-5.6-terra",
+  GPT_5_6_TERRA_PRO = "gpt-5.6-terra-pro",
+  GPT_5_6_SOL = "gpt-5.6-sol",
+  GPT_5_6_SOL_PRO = "gpt-5.6-sol-pro",
+  GEMINI_3_6_FLASH = "gemini-3.6-flash",
+  GEMINI_3_5_FLASH_LITE = "gemini-3.5-flash-lite",
+  GEMINI_3_7_FLASH = "gemini-3.7-flash",
+  KIMI_K3 = "kimi-k3",
+  META_MUSE_SPARK_1_2 = "meta-muse-spark-1.2",
+  MISTRAL_MEDIUM_3_5 = "mistral-medium-3.5",
 }
 
 export enum VideoVisionModelId {
@@ -58,6 +77,10 @@ export enum VideoVisionModelId {
   GEMINI_2_5_PRO = "gemini-2.5-pro",
   GEMINI_2_5_FLASH = "gemini-2.5-flash",
   GEMINI_2_5_FLASH_LITE = "gemini-2.5-flash-lite",
+  GEMINI_3_6_FLASH = "gemini-3.6-flash",
+  GEMINI_3_5_FLASH_LITE = "gemini-3.5-flash-lite",
+  GEMINI_3_7_FLASH = "gemini-3.7-flash",
+  META_MUSE_SPARK_1_2 = "meta-muse-spark-1.2",
 }
 
 export enum AudioVisionModelId {
@@ -68,4 +91,8 @@ export enum AudioVisionModelId {
   GEMINI_2_5_PRO = "gemini-2.5-pro",
   GEMINI_2_5_FLASH = "gemini-2.5-flash",
   GEMINI_2_5_FLASH_LITE = "gemini-2.5-flash-lite",
+  GEMINI_3_6_FLASH = "gemini-3.6-flash",
+  GEMINI_3_5_FLASH_LITE = "gemini-3.5-flash-lite",
+  GEMINI_3_7_FLASH = "gemini-3.7-flash",
+  META_MUSE_SPARK_1_2 = "meta-muse-spark-1.2",
 }

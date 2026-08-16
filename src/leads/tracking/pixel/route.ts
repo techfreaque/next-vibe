@@ -1,4 +1,4 @@
-// oxlint-disable oxlint-plugin-boilerplate/route-pattern -- Pixel tracking serves raw binary GIF response, cannot use endpointsHandler
+// oxlint-disable boilerplate/route-pattern -- Pixel tracking serves raw binary GIF response, cannot use endpointsHandler
 import "server-only";
 
 import { coreEnv } from "next-vibe/core/env";

@@ -129,6 +129,8 @@ export const translations: typeof enTranslations = {
       CASSETTE_MUSIC: "CassetteAI Music",
       SONAUTO_SONG: "Sonauto Song",
       LYRIA_3: "Lyria 3",
+      LYRIA_3_PRO_PREVIEW: "Lyria 3 Pro Vorschau",
+      LYRIA_3_CLIP_PREVIEW: "Lyria 3 Clip Vorschau",
     },
   },
 };

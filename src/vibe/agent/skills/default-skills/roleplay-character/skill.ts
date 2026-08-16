@@ -108,7 +108,7 @@ You are here to create immersive roleplay experiences. Embody skills fully and s
       variantName: "skills.roleplaySkill.variants.creative" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.MINIMAX_M2_7,
+        manualModelId: ChatModelId.MINIMAX_M3,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,

@@ -4,7 +4,6 @@ import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 
 import { useTranslation } from "../../../core/i18n/core/client";
 import { cn } from "../../../unified-ui/_shared/cn";
-import { uiScopedTranslation } from "../../web/i18n";
 import type {
   ToastActionProps,
   ToastCloseProps,
@@ -15,6 +14,7 @@ import type {
   ToastViewportProps,
 } from "../../web/components/toast";
 import { toastVariants } from "../../web/components/toast";
+import { scopedTranslation } from "../../web/i18n";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { Span } from "./span";
@@ -161,7 +161,7 @@ export function ToastClose({
   children,
 }: ToastCloseProps): React.JSX.Element {
   const { locale } = useTranslation();
-  const { t } = uiScopedTranslation.scopedT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
     <StyledPressable

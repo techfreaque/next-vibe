@@ -5,6 +5,7 @@ import { Badge } from "next-vibe/ui/components/badge";
 import { Card, CardContent } from "next-vibe/ui/components/card";
 import { Div } from "next-vibe/ui/components/div";
 import { ArrowLeft } from "next-vibe/ui/components/icons/ArrowLeft";
+import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
 import { CheckCircle2 } from "next-vibe/ui/components/icons/CheckCircle2";
 import { XCircle } from "next-vibe/ui/components/icons/XCircle";
 import { Link } from "next-vibe/ui/components/link";
@@ -158,6 +159,7 @@ export function TanstackPage({ locale }: TypeCheckerPageData): JSX.Element {
 
           <CodeBlock
             language="typescript"
+            // oxlint-disable-next-line i18n/no-literal-string
             code="const result = data as unknown as MyExpectedType;"
           />
 
@@ -303,7 +305,11 @@ export function TanstackPage({ locale }: TypeCheckerPageData): JSX.Element {
             </P>
           </Div>
 
-          <CodeBlock language="bash" code="$ vibe check" />
+          <CodeBlock
+            language="bash"
+            // oxlint-disable-next-line i18n/no-literal-string
+            code="$ vibe check"
+          />
 
           <P className="text-muted-foreground leading-relaxed">
             {t("checker.commandDescription")}
@@ -417,7 +423,7 @@ export function TanstackPage({ locale }: TypeCheckerPageData): JSX.Element {
                   <Span className="text-red-500 dark:text-red-400 line-through">
                     {from}
                   </Span>
-                  <Span className="text-muted-foreground">→</Span>
+                  <ArrowRight className="text-muted-foreground w-3 h-3 shrink-0" />
                   <Span className="text-green-600 dark:text-green-400">
                     {to}
                   </Span>
@@ -469,13 +475,16 @@ export function TanstackPage({ locale }: TypeCheckerPageData): JSX.Element {
             <BadGood
               bannedLabel={t("plugins.bannedLabel")}
               correctLabel={t("plugins.correctLabel")}
+              // oxlint-disable-next-line i18n/no-literal-string
               bad="const result = response as unknown as MyType;"
               rule="restricted-syntax"
+              // oxlint-disable-next-line i18n/no-literal-string
               good="const result: MyType = parseResponse(response);"
             />
             <BadGood
               bannedLabel={t("plugins.bannedLabel")}
               correctLabel={t("plugins.correctLabel")}
+              // oxlint-disable-next-line i18n/no-literal-string
               bad="function foo(x: any): any { return x.data; }"
               rule="no-explicit-any"
               good={`function foo<T>(response: ResponseType<T>): T | null {\n  if (!response.success) return null;\n  return response.data;\n}`}
@@ -483,6 +492,7 @@ export function TanstackPage({ locale }: TypeCheckerPageData): JSX.Element {
             <BadGood
               bannedLabel={t("plugins.bannedLabel")}
               correctLabel={t("plugins.correctLabel")}
+              // oxlint-disable-next-line i18n/no-literal-string
               bad='throw new Error("Something failed");'
               rule="restricted-syntax"
               good={`return fail({\n  message: t("errors.server.title"),\n  errorType: ErrorResponseTypes.INTERNAL_ERROR,\n});`}
@@ -683,6 +693,7 @@ export function TanstackPage({ locale }: TypeCheckerPageData): JSX.Element {
 
           <CodeBlock
             language="bash"
+            // oxlint-disable-next-line i18n/no-literal-string
             code="bun add -D @next-vibe/checker\n# or\nnpm install -D @next-vibe/checker"
           />
 
@@ -690,6 +701,7 @@ export function TanstackPage({ locale }: TypeCheckerPageData): JSX.Element {
 
           <CodeBlock
             language="bash"
+            // oxlint-disable-next-line i18n/no-literal-string
             code="vibe-check config    # scaffold check.config.ts\nvibe-check           # run all checks\nvibe-check --fix     # auto-fix linting issues"
           />
 

@@ -183,5 +183,13 @@ export async function loadEndpointForMeta(
   tool: EndpointMeta,
 ): Promise<CreateApiEndpointAny | null> {
   const { getEndpoint } = await import("@/generated/endpoints/endpoint");
-  return getEndpoint(tool.toolName);
+  const endpoint = await getEndpoint(tool.toolName);
+  if (endpoint) {
+    return endpoint;
+  }
+  // PRODUCTION_OFF endpoints are excluded from endpoint.ts — fall back to the
+  // dev registry which includes all endpoints so their parameters still render.
+  const { getEndpoint: getEndpointDev } =
+    await import("@/generated/endpoints/endpoint-dev");
+  return getEndpointDev(tool.toolName);
 }

@@ -127,7 +127,7 @@ export const codeArchitectSkill: Skill = {
       variantName: "skills.codeArchitect.variants.techBro" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.CLAUDE_SONNET_4_6,
+        manualModelId: ChatModelId.CLAUDE_SONNET_5,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,

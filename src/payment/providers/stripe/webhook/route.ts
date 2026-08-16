@@ -1,4 +1,4 @@
-// oxlint-disable oxlint-plugin-boilerplate/route-pattern -- Stripe webhook uses raw NextResponse handlers, cannot use endpointsHandler
+// oxlint-disable boilerplate/route-pattern -- Stripe webhook uses raw NextResponse handlers, cannot use endpointsHandler
 /**
  * Payment Webhook Route
  * Handles Stripe webhook events for payment processing

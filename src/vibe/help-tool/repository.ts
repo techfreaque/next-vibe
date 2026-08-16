@@ -31,6 +31,7 @@ import { permissionsRegistry } from "../core/permissions/registry";
 import type { InferJwtPayloadTypeFromRoles } from "../core/route/handler-roles";
 import { type ResponseType, success } from "../core/route/response.schema";
 import { searchField, searchItems } from "../core/utils/in-memory-search";
+import { parseError } from "../core/utils/parse-error";
 import {
   filterUserPermissionRoles,
   PlatformMarker,
@@ -85,6 +86,7 @@ export class HelpRepository {
     locale: CountryLanguage,
     platform: Platform,
     userRoles: readonly (typeof UserPermissionRoleValue)[],
+    logger: EndpointLogger,
   ): HelpToolParameters | null {
     if (!endpoint.fields) {
       return null;
@@ -181,7 +183,12 @@ export class HelpRepository {
         return clean;
       }
       return schema;
-    } catch {
+    } catch (e) {
+      logger.error(
+        "[getParameterSchema] caught error for",
+        parseError(e),
+        endpoint.path,
+      );
       return null;
     }
   }
@@ -405,6 +412,7 @@ export class HelpRepository {
             locale,
             platform,
             userRoles,
+            logger,
           ) ?? undefined)
         : undefined;
       const callAs = matchedTool.toolName;
@@ -455,6 +463,7 @@ export class HelpRepository {
               locale,
               platform,
               userRoles,
+              logger,
             ) ?? undefined)
           : undefined;
         const callAs = exactMatch.toolName;
@@ -585,6 +594,7 @@ export class HelpRepository {
                   locale,
                   platform,
                   userRoles,
+                  logger,
                 ) ?? undefined)
               : undefined;
             return serializeMeta(
@@ -669,6 +679,7 @@ export class HelpRepository {
                 locale,
                 platform,
                 userRoles,
+                logger,
               ) ?? undefined)
             : undefined;
           return serializeMeta(m, parameters, true, getToolPlatforms(m));

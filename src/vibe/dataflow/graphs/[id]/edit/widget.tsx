@@ -204,15 +204,14 @@ function extractZodConstraints(schema: {
   if (!schema?._def) {
     return {};
   }
-  // Unwrap ZodOptional / ZodNullable / ZodDefault wrappers
+  // Unwrap one level of ZodOptional / ZodNullable / ZodDefault wrapper
   let def = schema._def;
-  while (
+  if (
     def.typeName === "ZodOptional" ||
     def.typeName === "ZodNullable" ||
     def.typeName === "ZodDefault"
   ) {
     def = def.innerType?._def ?? def;
-    break; // one level only
   }
 
   if (def.typeName === "ZodEnum") {

@@ -41,7 +41,7 @@ export const freeSpeechActivistSkill: Skill = {
       variantName: "skills.freeSpeechActivist.variants.elonTusk" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GROK_4_3,
+        manualModelId: ChatModelId.GROK_4_6,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,
@@ -90,7 +90,7 @@ export const freeSpeechActivistSkill: Skill = {
       variantName: "skills.freeSpeechActivist.variants.techBro" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.CLAUDE_SONNET_4_6,
+        manualModelId: ChatModelId.CLAUDE_SONNET_5,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,

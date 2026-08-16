@@ -5,7 +5,7 @@ import * as React from "react";
 
 import { useTranslation } from "../../../core/i18n/core/client";
 import { cn } from "../../../unified-ui/_shared/cn";
-import { uiScopedTranslation } from "../i18n";
+import { scopedTranslation } from "../i18n";
 import type { StyleType } from "../utils/style-type";
 import { Button } from "./button";
 import type { DivKeyboardEvent } from "./div";
@@ -235,7 +235,7 @@ export interface CarouselButtonProps {
 function CarouselPrevious(props: CarouselButtonProps): React.JSX.Element {
   const { orientation, scrollPrev, canScrollPrev } = useCarousel();
   const { locale } = useTranslation();
-  const { t } = uiScopedTranslation.scopedT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   return (
     <Button
@@ -266,7 +266,7 @@ function CarouselPrevious(props: CarouselButtonProps): React.JSX.Element {
 function CarouselNext(props: CarouselButtonProps): React.JSX.Element {
   const { orientation, scrollNext, canScrollNext } = useCarousel();
   const { locale } = useTranslation();
-  const { t } = uiScopedTranslation.scopedT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   return (
     <Button

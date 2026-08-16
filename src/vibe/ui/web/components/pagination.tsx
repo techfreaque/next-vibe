@@ -3,7 +3,7 @@ import * as React from "react";
 
 import { useTranslation } from "../../../core/i18n/core/client";
 import { cn } from "../../../unified-ui/_shared/cn";
-import { uiScopedTranslation } from "../i18n";
+import { scopedTranslation } from "../i18n";
 import type { StyleType } from "../utils/style-type";
 import { buttonVariants } from "./button";
 import { ChevronLeftIcon } from "./icons/ChevronLeftIcon";
@@ -114,7 +114,7 @@ const PaginationPrevious = ({
   ...props
 }: PaginationLinkProps): React.JSX.Element => {
   const { locale } = useTranslation();
-  const { t } = uiScopedTranslation.scopedT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   return (
     <PaginationLink
@@ -135,7 +135,7 @@ const PaginationNext = ({
   ...props
 }: PaginationLinkProps): React.JSX.Element => {
   const { locale } = useTranslation();
-  const { t } = uiScopedTranslation.scopedT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   return (
     <PaginationLink
@@ -156,7 +156,7 @@ const PaginationEllipsis = ({
   style,
 }: PaginationEllipsisProps): React.JSX.Element => {
   const { locale } = useTranslation();
-  const { t } = uiScopedTranslation.scopedT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   return (
     <span

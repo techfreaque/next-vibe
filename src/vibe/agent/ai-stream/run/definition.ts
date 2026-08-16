@@ -550,7 +550,7 @@ const { POST } = createEndpoint({
       },
       // Agentic: give AI tools and let it reason across multiple turns
       agentic: {
-        model: ChatModelId["CLAUDE_SONNET_4_6"],
+        model: ChatModelId["CLAUDE_SONNET_5"],
         skill: "uuid-of-research-skill",
         prompt:
           "Search for the latest news about AI assistants and write a brief report.",

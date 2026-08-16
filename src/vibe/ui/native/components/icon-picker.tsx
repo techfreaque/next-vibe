@@ -22,7 +22,7 @@ import {
   ICON_CATEGORIES_LIST,
 } from "../../../unified-ui/widgets/form-fields/icon-field/icons";
 import type { IconPickerProps } from "../../web/components/icon-picker";
-import { uiScopedTranslation } from "../../web/i18n";
+import { scopedTranslation } from "../../web/i18n";
 import { Text } from "./text";
 
 export { ICON_CATEGORIES };
@@ -40,7 +40,7 @@ export function IconPicker({
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<CategoryKey>("all");
   const { locale } = useTranslation();
-  const { t } = uiScopedTranslation.scopedT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   // Filter icons based on search query
   const filteredIcons = useMemo(() => {

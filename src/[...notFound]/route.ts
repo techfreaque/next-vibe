@@ -1,4 +1,4 @@
-// oxlint-disable oxlint-plugin-boilerplate/route-pattern
+// oxlint-disable boilerplate/route-pattern
 import { NextResponse } from "next/server";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { CountryLanguageValues } from "next-vibe/core/i18n/core/config";

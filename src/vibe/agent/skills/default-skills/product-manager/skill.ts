@@ -115,7 +115,7 @@ Format: "As a [user type], I want to [action] so that [benefit]"
       variantName: "skills.productManager.variants.techBro" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.CLAUDE_SONNET_4_6,
+        manualModelId: ChatModelId.CLAUDE_SONNET_5,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,
@@ -140,7 +140,7 @@ Format: "As a [user type], I want to [action] so that [benefit]"
       variantName: "skills.productManager.variants.fast" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GEMINI_3_5_FLASH,
+        manualModelId: ChatModelId.GEMINI_3_6_FLASH,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,

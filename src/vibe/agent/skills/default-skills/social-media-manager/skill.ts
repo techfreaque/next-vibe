@@ -130,7 +130,7 @@ export const socialMediaManagerSkill: Skill = {
       variantName: "skills.socialMediaManager.variants.snappy" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GPT_5_4_MINI,
+        manualModelId: ChatModelId.GPT_5_6_SOL,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,
@@ -155,7 +155,7 @@ export const socialMediaManagerSkill: Skill = {
       variantName: "skills.socialMediaManager.variants.budget" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GPT_5_4_NANO,
+        manualModelId: ChatModelId.GPT_5_6_LUNA,
         intelligenceRange: {
           min: IntelligenceLevel.QUICK,
           max: IntelligenceLevel.QUICK,
