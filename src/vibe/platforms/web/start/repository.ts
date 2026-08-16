@@ -293,8 +293,8 @@ export class ServerStartRepository {
       child.on("exit", (code, signal) => {
         ServerStartRepository.supervisedChild = null;
 
-        if (supervisorShuttingDown) {
-          // Intentional shutdown - exit the supervisor with the same code
+        if (supervisorShuttingDown || (code === 0 && signal === null)) {
+          // Intentional shutdown (flag set) or clean exit (code 0, no signal = Ctrl+C or normal stop)
           process.exit(code ?? 0);
           return;
         }

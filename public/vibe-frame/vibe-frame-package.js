@@ -15067,6 +15067,15 @@ var {
   }
 });
 
+// src/vibe/env/detect.ts
+var _args = process.argv.slice(2);
+var _hasLocalFlag = _args.includes("--preview") || _args.includes("--hermes");
+var _isProduction = process.env["NODE_ENV"] === "production";
+var _isDevCommand = ["dev", "d"].some((a) => _args.includes(a));
+var _isStartCommand = ["start", "s", "build", "b"].some((a) => _args.includes(a)) || _args.includes("rebuild");
+var _isMcpCommand = _args.includes("mcp");
+var isPreviewMode = _hasLocalFlag || !_isProduction && _isStartCommand;
+
 // src/env/constants.ts
 var ENDPOINT_PLATFORMS = [
   "webApi",
@@ -15085,7 +15094,7 @@ var ENDPOINT_PLATFORMS = [
 ];
 var PLATFORM_COUNT = ENDPOINT_PLATFORMS.length;
 function getPortSuffix() {
-  if (coreClientEnv.NODE_ENV === "production" /* PRODUCTION */) {
+  if (coreClientEnv.NODE_ENV === "production" /* PRODUCTION */ || isPreviewMode) {
     return "";
   }
   try {
@@ -16218,4 +16227,4 @@ export {
   DEFAULT_SANDBOX
 };
 
-//# debugId=CF9CC17DA936CB7A64756E2164756E21
+//# debugId=784E2FCE61EDD13D64756E2164756E21

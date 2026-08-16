@@ -9,7 +9,7 @@
 
 import "server-only";
 
-import { spawn, spawnSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
 
 import type { ResponseType } from "../../core/route/response.schema";
 import {
@@ -158,27 +158,30 @@ export class ImagePushRepository {
     );
 
     if (imagePushEnv.SSH_SERVER_PWD) {
-      return ImagePushRepository.transferViaSshPassword(
-        refs,
-        sshTarget,
-        imagePushEnv.SSH_SERVER_PWD,
-        logger,
-        t,
+      return Promise.resolve(
+        ImagePushRepository.transferViaSshPassword(
+          refs,
+          sshTarget,
+          imagePushEnv.SSH_SERVER_PWD,
+          logger,
+          t,
+        ),
       );
     }
 
+    const sshOpts =
+      "-oServerAliveInterval=30 -oServerAliveCountMax=10 -oTCPKeepAlive=yes -oStrictHostKeyChecking=no";
     const refList = refs.map((ref) => `"${ref}"`).join(" ");
-    const pipeline = `docker save ${refList} | ssh ${sshTarget} "docker load"`;
-
+    // gzip cuts ~5 GB to ~2 GB in flight; concurrent save|gzip|ssh|gunzip|load
+    // is faster than sequential save-then-copy, and finishes well under any
+    // SSH idle-timeout that would kill a raw 5 GB stream.
+    const pipeline = `docker save ${refList} | gzip -1 | ssh ${sshOpts} ${sshTarget} "gunzip | docker load"`;
     const transferResult = spawnSync("sh", ["-c", pipeline], {
       stdio: "inherit",
       cwd: process.cwd(),
     });
 
     if (transferResult.error) {
-      logger.error("SSH image transfer invocation failed", {
-        error: transferResult.error.message,
-      });
       return fail({
         message: t("post.repository.messages.sshTransferFailed", {
           target: sshTarget,
@@ -189,22 +192,12 @@ export class ImagePushRepository {
     }
 
     if (transferResult.status !== 0) {
-      const detail =
-        transferResult.signal !== null
-          ? t("post.repository.messages.buildKilled", {
-              signal: transferResult.signal,
-            })
-          : t("post.repository.messages.buildExitCode", {
-              code: transferResult.status ?? -1,
-            });
-      logger.error("SSH image transfer failed", {
-        exitCode: transferResult.status,
-        signal: transferResult.signal,
-      });
       return fail({
         message: t("post.repository.messages.sshTransferFailed", {
           target: sshTarget,
-          error: detail,
+          error: t("post.repository.messages.buildExitCode", {
+            code: transferResult.status ?? -1,
+          }),
         }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
@@ -226,127 +219,50 @@ export class ImagePushRepository {
     return { username, host, port: portStr ? parseInt(portStr, 10) : 22 };
   }
 
-  /**
-   * Same `docker save | ssh | docker load` transfer as transferViaSsh, but
-   * authenticates with a password over ssh2 instead of shelling out to the
-   * system `ssh` client - lets SSH_SERVER_PWD work without `sshpass`
-   * installed (not available by default on Windows dev machines).
-   */
-  private static async transferViaSshPassword(
+  /** Same gzip pipe as transferViaSsh but authenticates via sshpass. */
+  private static transferViaSshPassword(
     refs: string[],
     sshTarget: string,
     password: string,
     logger: EndpointLogger,
     t: ImagePushT,
-  ): Promise<ResponseType<void>> {
-    const { username, host, port } =
-      ImagePushRepository.parseSshTarget(sshTarget);
-    // Dynamic import keeps ssh2 out of Turbopack's static NFT trace, same
-    // reason as src/ssh/client.ts's openSshClient.
-    const { Client } = await import(/* turbopackIgnore: true */ "ssh2");
-
-    return new Promise((resolve) => {
-      const client = new Client();
-      let settled = false;
-      const settle = (result: ResponseType<void>): void => {
-        if (settled) {
-          return;
-        }
-        settled = true;
-        client.end();
-        resolve(result);
-      };
-
-      client.on("error", (err) => {
-        logger.error("SSH image transfer connection failed", {
-          error: err.message,
-        });
-        settle(
-          fail({
-            message: t("post.repository.messages.sshTransferFailed", {
-              target: sshTarget,
-              error: err.message,
-            }),
-            errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          }),
-        );
-      });
-
-      client.on("ready", () => {
-        client.exec("docker load", (execErr, stream) => {
-          if (execErr) {
-            settle(
-              fail({
-                message: t("post.repository.messages.sshTransferFailed", {
-                  target: sshTarget,
-                  error: execErr.message,
-                }),
-                errorType: ErrorResponseTypes.INTERNAL_ERROR,
-              }),
-            );
-            return;
-          }
-
-          let stderr = "";
-          stream.stderr.on("data", (data: Buffer) => {
-            stderr += data.toString("utf8");
-          });
-          stream.on("data", (data: Buffer) => {
-            process.stdout.write(data);
-          });
-
-          stream.on("close", (code: number | null) => {
-            if (code !== 0) {
-              logger.error("SSH image transfer failed", {
-                exitCode: code,
-                stderr,
-              });
-              settle(
-                fail({
-                  message: t("post.repository.messages.sshTransferFailed", {
-                    target: sshTarget,
-                    error:
-                      stderr ||
-                      t("post.repository.messages.buildExitCode", {
-                        code: code ?? -1,
-                      }),
-                  }),
-                  errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                }),
-              );
-              return;
-            }
-            settle(success(undefined));
-          });
-
-          const save = spawn("docker", ["save", ...refs]);
-          save.stdout.pipe(stream);
-          save.stderr.on("data", (data: Buffer) => {
-            process.stderr.write(data);
-          });
-          save.on("error", (err) => {
-            stream.close();
-            settle(
-              fail({
-                message: t("post.repository.messages.sshTransferFailed", {
-                  target: sshTarget,
-                  error: err.message,
-                }),
-                errorType: ErrorResponseTypes.INTERNAL_ERROR,
-              }),
-            );
-          });
-        });
-      });
-
-      client.connect({
-        host,
-        port,
-        username,
-        password,
-        readyTimeout: 15000,
-      });
+  ): ResponseType<void> {
+    const { port } = ImagePushRepository.parseSshTarget(sshTarget);
+    const sshOpts = `-oServerAliveInterval=30 -oServerAliveCountMax=10 -oTCPKeepAlive=yes -oStrictHostKeyChecking=no -oPort=${String(port)}`;
+    const refList = refs.map((ref) => `"${ref}"`).join(" ");
+    const pipeline = `docker save ${refList} | gzip -1 | sshpass -p ${JSON.stringify(password)} ssh ${sshOpts} ${sshTarget} "gunzip | docker load"`;
+    const result = spawnSync("sh", ["-c", pipeline], {
+      stdio: "inherit",
+      cwd: process.cwd(),
     });
+
+    if (result.error) {
+      logger.error("SSH image transfer invocation failed", {
+        error: result.error.message,
+      });
+      return fail({
+        message: t("post.repository.messages.sshTransferFailed", {
+          target: sshTarget,
+          error: result.error.message,
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+
+    if (result.status !== 0) {
+      logger.error("SSH image transfer failed", { exitCode: result.status });
+      return fail({
+        message: t("post.repository.messages.sshTransferFailed", {
+          target: sshTarget,
+          error: t("post.repository.messages.buildExitCode", {
+            code: result.status ?? -1,
+          }),
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+
+    return success(undefined);
   }
 
   /** Uses the request tag override, or resolves the current short git commit SHA */

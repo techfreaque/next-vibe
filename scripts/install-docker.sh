@@ -37,7 +37,7 @@ fi
 # Run migrations using the new image (separate one-off container, old app still serving)
 echo "Running migrations..."
 if ! $COMPOSE run --rm app \
-  bun src/app/api/\[locale\]/system/platforms/cli/vibe-runtime.ts migrate; then
+  bun src/vibe/platforms/cli/vibe-runtime.ts migrate; then
   echo "ERROR: Migration failed! Old container is still running - prod is NOT down."
   echo "Fix the migration and re-run this script."
   exit 1

@@ -114,7 +114,7 @@ export function useAIStream(): UseAIStreamReturn {
       // FormData automatically when File objects are present).
       // The server fires-and-forgets the stream - POST returns immediately.
       // WS events (handled by useMessagesSubscription) drive all UI updates.
-      logger.info("Making AI stream request", {
+      logger.debug("Making AI stream request", {
         operation: data.operation,
         model: data.model,
         hasAudioInput: !!data.audioInput?.file,
@@ -205,7 +205,7 @@ export function useAIStream(): UseAIStreamReturn {
 
       // POST returned successfully - stream is now running on the server.
       // WS events will drive all UI updates. stream-finished will clean up.
-      logger.info("Stream triggered successfully (fire-and-forget)", {
+      logger.debug("Stream triggered successfully (fire-and-forget)", {
         threadId,
       });
       return true;

@@ -1029,8 +1029,9 @@ export function createFixtureFetch(
         pinnedOrdinal,
         contextParentThreadId,
       ),
-    // oxlint-disable-next-line restricted/restricted-syntax -- borrowing the live fetch's preconnect
-    { preconnect: fetch.preconnect.bind(fetch) },
+    // preconnect is a Bun-only DNS/TLS warmup — irrelevant in record/replay.
+    // Use a no-op stub: fetch.preconnect is lost when Next.js patches globalThis.fetch.
+    { preconnect: (): void => undefined },
   );
   return bound;
 }

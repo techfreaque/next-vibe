@@ -1,4 +1,5 @@
 import { coreClientEnv } from "next-vibe/core/env-client";
+import { isPreviewMode } from "next-vibe/env/detect";
 import { Environment } from "next-vibe/env/env-util";
 
 export const GITHUB_REPO_URL = "https://github.com/techfreaque/next-vibe"; // eslint-disable-line i18next/no-literal-string
@@ -46,7 +47,10 @@ export const LOCALE_COOKIE_NAME = "locale";
  * an unexpected port.
  */
 function getPortSuffix(): string {
-  if (coreClientEnv.NODE_ENV === Environment.PRODUCTION) {
+  // No suffix in production, or when running as a built preview server (vibe
+  // start / vibe rebuild) — the Bun proxy process doesn't inherit NODE_ENV=production
+  // from the Next.js child spawn, but isPreviewMode detects the start command.
+  if (coreClientEnv.NODE_ENV === Environment.PRODUCTION || isPreviewMode) {
     return "";
   }
   try {

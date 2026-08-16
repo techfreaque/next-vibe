@@ -26,7 +26,7 @@
 "use client";
 
 import type { JSX, ReactNode } from "react";
-import { useSyncExternalStore } from "react";
+import { useLayoutEffect, useSyncExternalStore } from "react";
 import { createStore } from "zustand";
 
 import type { AgentEnvAvailability } from "./env-availability";
@@ -55,9 +55,16 @@ export function AgentAvailabilityProvider({
   availability: AgentEnvAvailability;
   children: ReactNode;
 }): JSX.Element {
-  if (store.getState().availability !== availability) {
+  // Seed synchronously before first render so children never observe null.
+  // After mount, useLayoutEffect keeps the store in sync with prop changes.
+  if (store.getState().availability === null) {
     store.setState({ availability });
   }
+  useLayoutEffect(() => {
+    if (store.getState().availability !== availability) {
+      store.setState({ availability });
+    }
+  }, [availability]);
   return <>{children}</>;
 }
 

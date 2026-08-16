@@ -43,10 +43,10 @@ jobs:
         run: bun install
 
       - name: Build package (dry run)
-        run: bun src/app/api/[locale]/system/platforms/cli/vibe-runtime.ts build --run-prod-database=false
+        run: bun src/vibe/platforms/cli/vibe-runtime.ts build --run-prod-database=false
 
       - name: Run checks (lint, typecheck, tests)
-        run: bun src/app/api/[locale]/system/platforms/cli/vibe-runtime.ts check
+        run: bun src/vibe/platforms/cli/vibe-runtime.ts check
 
   # Publish to npm + deploy to VPS on tag creation
   # Triggered by: vibe pub (locally) → creates tag → pushes → this runs
@@ -107,12 +107,12 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build & push app image
-        run: bun src/app/api/[locale]/system/platforms/cli/vibe-runtime.ts image-push
+        run: bun src/vibe/platforms/cli/vibe-runtime.ts image-push
 
       # Release tool in CI mode: checks, builds, publishes to npm,
       # then postPublish hook SSHs into VPS and deploys via install-docker.sh
       - name: Release + Deploy
-        run: bun src/app/api/[locale]/system/platforms/cli/vibe-runtime.ts release --ci --skip-git-tag --skip-git-push
+        run: bun src/vibe/platforms/cli/vibe-runtime.ts release --ci --skip-git-tag --skip-git-push
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
