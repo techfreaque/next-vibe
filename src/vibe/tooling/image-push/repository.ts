@@ -55,6 +55,7 @@ export class ImagePushRepository {
       "build",
       "--platform",
       data.platform,
+      "--network=host",
       "-f",
       "Dockerfile",
       ...refs.flatMap((ref) => ["-t", ref]),

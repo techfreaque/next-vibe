@@ -359,10 +359,14 @@ export const {
   NEXT_PUBLIC_APP_URL: {
     schema: z.preprocess(
       (v) => {
-        const raw =
-          typeof v === "string"
-            ? v
-            : (process.env["NEXT_PUBLIC_APP_URL"] ?? "http://localhost:3000");
+        // When v is undefined (unset or sentinel-stripped by validateEnv in
+        // VIBE_BUILD_PLACEHOLDER_ENV mode), skip the process.env re-read:
+        // that would return the sentinel string, failing the .url() check.
+        // Let undefined fall through so the .default() below takes over.
+        if (v === undefined || v === null) {
+          return undefined;
+        }
+        const raw = typeof v === "string" ? v : "http://localhost:3000";
         if (!isPreviewMode) {
           return raw;
         }
