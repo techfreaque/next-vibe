@@ -466,6 +466,17 @@ const { GET } = createEndpoint({
       responseFields: ["streamingState"] as const,
       urlPathParamsFields: ["threadId"] as const,
       operation: "merge" as const,
+      onEvent: async (ctx) => {
+        const state = ctx.responseData.streamingState;
+        if (
+          state === ThreadStreamingState.STREAMING ||
+          state === ThreadStreamingState.IDLE
+        ) {
+          const { useChatInputStore } =
+            await import("../../../../ai-stream/stream/hooks/input-store");
+          useChatInputStore.getState().setIsSubmitting(false);
+        }
+      },
     },
 
     // ── generated-media-added ────────────────────────────────────────────────

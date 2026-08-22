@@ -105,6 +105,8 @@ export function useInputHandlers({
       // On failure the optimistic user message is removed from the chat and
       // we restore the input so the user can resend without retyping.
       useChatInputStore.getState().reset();
+      // Mark submitting so the stop button appears instantly, before the first WS event.
+      useChatInputStore.getState().setIsSubmitting(true);
 
       // Snapshot navigation state before sending - needed to revert on failure
       // These closure values are captured at render time (pre-navigation state).
@@ -154,6 +156,7 @@ export function useInputHandlers({
       if (!result.success) {
         // Restore input so the user can resend without retyping.
         // The optimistic user message was already removed from chat by addErrorMessageToChat.
+        useChatInputStore.getState().setIsSubmitting(false);
         useChatInputStore.getState().setInput(currentInput);
         useChatInputStore.getState().setAttachments(currentAttachments);
 

@@ -28,11 +28,14 @@ export interface ChatInputStore {
   imageQuality: ImageQualityValue;
   /** Music generation settings */
   musicDuration: MusicDurationValue;
+  /** True from the moment send is clicked until the stream confirms it started (streaming-state-changed). Drives stop button visibility immediately. */
+  isSubmitting: boolean;
   setInput: (input: string) => void;
   setAttachments: (attachments: File[] | ((prev: File[]) => File[])) => void;
   setImageSize: (size: ImageSizeValue) => void;
   setImageQuality: (quality: ImageQualityValue) => void;
   setMusicDuration: (duration: MusicDurationValue) => void;
+  setIsSubmitting: (value: boolean) => void;
   reset: () => void;
 }
 
@@ -43,6 +46,7 @@ export const useChatInputStore = create<ChatInputStore>((set, get) => ({
   imageSize: ImageSize.SQUARE_1024,
   imageQuality: ImageQuality.STANDARD,
   musicDuration: MusicDuration.MEDIUM,
+  isSubmitting: false,
   setInput: (input: string): void => {
     set({ input });
   },
@@ -61,6 +65,9 @@ export const useChatInputStore = create<ChatInputStore>((set, get) => ({
   },
   setMusicDuration: (musicDuration: MusicDurationValue): void => {
     set({ musicDuration });
+  },
+  setIsSubmitting: (value: boolean): void => {
+    set({ isSubmitting: value });
   },
   reset: (): void => {
     set({ input: "", attachments: [] });

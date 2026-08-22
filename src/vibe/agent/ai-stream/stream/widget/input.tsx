@@ -437,10 +437,8 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   const isAborting = useAIStreamStore((s) =>
     activeThreadId ? s.isAborting(activeThreadId) : false,
   );
-  // Pending state - POST fired but first WS event hasn't arrived yet
-  const isPending = useAIStreamStore((s) =>
-    activeThreadId ? s.isPending(activeThreadId) : false,
-  );
+  // Submitting state - send clicked but stream hasn't confirmed start yet
+  const isSubmitting = useChatInputStore((s) => s.isSubmitting);
 
   // Background tasks for this thread (wakeUp tasks still pending/running)
   const messagesQuery = useApiQuery({
@@ -518,7 +516,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
     isActivelyStreaming ||
     isAborting ||
     isWaiting ||
-    isPending ||
+    isSubmitting ||
     voiceRuntime.isSpeaking;
 
   // Voice recording state

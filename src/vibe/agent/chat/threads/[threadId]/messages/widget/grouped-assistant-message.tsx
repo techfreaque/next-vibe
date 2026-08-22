@@ -56,6 +56,7 @@ import { LoadingIndicator } from "./loading-indicator";
 import { MessageAuthorInfo } from "./message-author";
 import type { MessageGroup } from "./message-grouping";
 import { type ToolDecision, ToolDisplay } from "./tool-display";
+import { useAIStreamStore } from "../../../../../ai-stream/stream/hooks/store";
 
 interface GroupedAssistantMessageProps {
   group: MessageGroup;
@@ -212,6 +213,7 @@ interface AssistantContentMessageProps {
   hasContentAfter: boolean;
   collapseState: CollapseStateStore | null;
   locale: CountryLanguage;
+  threadId: string;
 }
 
 /**
@@ -340,8 +342,11 @@ const AssistantContentMessage = memo(
     hasContentAfter,
     collapseState,
     locale,
+    threadId,
   }: AssistantContentMessageProps): JSX.Element | null {
-    const content = message.content ?? "";
+    const isAborting = useAIStreamStore((s) => s.isAborting(threadId));
+    // Suppress content while aborting so new tokens don't flash on screen.
+    const content = isAborting ? "" : (message.content ?? "");
     const generatedMedia = message.metadata?.generatedMedia;
 
     if (!content.trim() && !generatedMedia) {
@@ -747,6 +752,7 @@ const MessagesList = memo(function MessagesList({
               hasContentAfter={hasContentAfter}
               collapseState={collapseState}
               locale={locale}
+              threadId={primaryThreadId}
             />
           );
         }
