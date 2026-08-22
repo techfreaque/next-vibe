@@ -14,6 +14,7 @@ import { basename } from "node:path";
 import { coreEnv } from "../../../core/env";
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import { parseError } from "../../../core/utils/parse-error";
+import { isPglite } from "../../../database/client";
 import { databaseEnv } from "../../../database/env";
 import { DatabaseGenerateRepository } from "../../../database/generate/repository";
 import { closeDatabase, reopenDatabase } from "../../../database/index";
@@ -66,6 +67,17 @@ export class DevDatabaseSetup {
     if (data.skipDbSetup) {
       logger.vibe(formatSkip("Database setup skipped"));
       return true;
+    }
+
+    if (isPglite) {
+      logger.vibe(formatDatabase("PGlite mode — skipping Docker", "🐘"));
+      return DevDatabaseSetup.performDatabaseOperations(
+        data,
+        locale,
+        logger,
+        isPreview,
+        activePidFile,
+      );
     }
 
     try {
@@ -190,17 +202,19 @@ export class DevDatabaseSetup {
           activePidFile,
         );
       } else {
-        await DevDatabaseSetup.startDatabaseWithoutReset(
-          locale,
-          logger,
-          isPreview,
-        );
+        if (!isPglite) {
+          await DevDatabaseSetup.startDatabaseWithoutReset(
+            locale,
+            logger,
+            isPreview,
+          );
+        }
 
         // Run migrations if not skipped (only when not resetting)
         if (data.skipMigrations) {
           logger.vibe(formatSkip("Migrations skipped"));
         } else {
-          if (!data.skipMigrationGeneration) {
+          if (!data.skipMigrationGeneration && !isPglite) {
             const generateResult = await DatabaseGenerateRepository.runGenerate(
               logger,
               true,

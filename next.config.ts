@@ -22,6 +22,8 @@ const nextConfig: NextConfig = {
     // webpackBuildWorker:
     //   process.env.NODE_ENV !== "production" ||
     //   process.env.NEXT_PUBLIC_LOCAL_MODE === "true",
+    // Audio uploads are allowed up to 25 MB — raise the proxy body limit to match.
+    proxyClientMaxBodySize: 30 * 1024 * 1024,
     webpackMemoryOptimizations: true,
     // parallelServerBuildTraces: true,
     // parallelServerCompiles: true,

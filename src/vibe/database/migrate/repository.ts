@@ -4,6 +4,7 @@
  */
 
 import { spawnSync } from "node:child_process";
+import { join } from "node:path";
 
 import { buildPackageRunnerCommand, coreEnv } from "../../core/env";
 import { defaultLocale } from "../../core/i18n/core/config";
@@ -14,6 +15,7 @@ import {
   success,
 } from "../../core/route/response.schema";
 import { parseError } from "../../core/utils/parse-error";
+import { isPglite, pgliteClient } from "../client";
 import {
   formatActionCommand,
   formatDatabase,
@@ -31,6 +33,78 @@ export class DatabaseMigrationRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<MigrateResponseOutput>> {
     const startTime = Date.now();
+
+    if (isPglite) {
+      try {
+        logger.debug("🔄 Running PGlite migrations");
+        const { readdir, readFile } = await import("node:fs/promises");
+        const client = pgliteClient!;
+
+        // Ensure migration tracking table exists
+        await client.exec(`
+          CREATE TABLE IF NOT EXISTS __drizzle_migrations__ (
+            id SERIAL PRIMARY KEY,
+            hash TEXT NOT NULL,
+            created_at BIGINT
+          )
+        `);
+
+        const migrationsDir = join(process.cwd(), "drizzle");
+        const files = (await readdir(migrationsDir))
+          .filter((f) => f.endsWith(".sql"))
+          .toSorted();
+
+        const applied = await client.query<{ hash: string }>(
+          "SELECT hash FROM __drizzle_migrations__",
+        );
+        const appliedSet = new Set(applied.rows.map((r) => r.hash));
+
+        let ran = 0;
+        for (const file of files) {
+          if (appliedSet.has(file)) {
+            continue;
+          }
+          const raw = await readFile(join(migrationsDir, file), "utf8");
+          // PGlite doesn't support pgvector — strip CREATE EXTENSION and replace vector type
+          const sql = raw
+            .split("\n")
+            .filter((l) => !/^\s*CREATE EXTENSION/i.test(l))
+            .join("\n")
+            .replace(/\bvector\(\d+\)/gi, "text")
+            .replace(/SET DATA TYPE vector\(\d+\)/gi, "SET DATA TYPE text");
+          await client.exec(sql);
+          await client.query(
+            "INSERT INTO __drizzle_migrations__ (hash, created_at) VALUES ($1, $2)",
+            [file, Date.now()],
+          );
+          ran++;
+        }
+
+        const duration = Date.now() - startTime;
+        logger.info(
+          formatDatabase(
+            `Migrations completed (${String(ran)} applied) in ${formatDuration(duration)}`,
+            "✅",
+          ),
+        );
+        return success({
+          success: true,
+          migrationsRun: ran,
+          output: "",
+          duration,
+        });
+      } catch (error) {
+        const parsedError = parseError(error);
+        logger.error("PGlite migration error", { error: parsedError.message });
+        return fail({
+          message: t("post.errors.network.detail", {
+            error: parsedError.message,
+          }),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
+      }
+    }
+
     const runner = buildPackageRunnerCommand(
       coreEnv.PACKAGE_MANAGER,
       "drizzle-kit",
