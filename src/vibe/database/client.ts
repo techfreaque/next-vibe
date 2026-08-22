@@ -1,8 +1,8 @@
 import "server-only";
 
 import { existsSync, unlinkSync } from "node:fs";
-import { resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join, resolve } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { PGlite } from "@electric-sql/pglite";
 import { type NodePgDatabase } from "drizzle-orm/node-postgres";
@@ -59,10 +59,16 @@ export let pool: Pool | null = isPglite ? null : createPool();
  * Exposed so the headless-client migration runner can call exec() directly.
  */
 function resolvePgliteUrl(url: string): string {
-  // Strip file: prefix, resolve to absolute path, re-prefix
-  // Handles both file:./relative and file:///absolute forms cross-platform
-  const path = url.replace(/^file:(\/\/)?/, "");
-  return `file://${resolve(path).replace(/\\/g, "/")}`;
+  // Normalize to an absolute OS path, then back to a file:// URL.
+  // fileURLToPath handles file:///C:/... on Windows correctly.
+  // For bare paths like file:./data.db (no //), fall back to manual strip + resolve.
+  let osPath: string;
+  if (url.startsWith("file://")) {
+    osPath = fileURLToPath(url);
+  } else {
+    osPath = url.replace(/^file:/, "");
+  }
+  return pathToFileURL(resolve(osPath)).href;
 }
 
 // Guard against Vite SSR hot-reload evaluating this module twice in the same process.
@@ -82,7 +88,7 @@ function removeStalePgliteLock(dbUrl: string): void {
   try {
     // fileURLToPath handles both Unix (file:///path) and Windows (file:///C:/path)
     const dbPath = fileURLToPath(dbUrl);
-    const lockPath = `${dbPath}/postmaster.pid`;
+    const lockPath = join(dbPath, "postmaster.pid");
     if (existsSync(lockPath)) {
       unlinkSync(lockPath);
     }

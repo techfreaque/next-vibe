@@ -749,7 +749,11 @@ async function regenerateRouteTree(result: GenerationResult): Promise<void> {
       await gen.run();
     } catch (firstError) {
       const msg = parseError(firstError).message;
-      if (msg.includes("EPERM") || msg.includes("operation not permitted")) {
+      if (
+        msg.includes("EPERM") ||
+        msg.includes("operation not permitted") ||
+        msg.includes("modified by another process")
+      ) {
         await Bun.sleep(200);
         await gen.run();
       } else {
