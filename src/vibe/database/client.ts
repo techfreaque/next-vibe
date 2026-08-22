@@ -1,6 +1,8 @@
 import "server-only";
 
+import { existsSync, unlinkSync } from "node:fs";
 import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { PGlite } from "@electric-sql/pglite";
 import { type NodePgDatabase } from "drizzle-orm/node-postgres";
@@ -63,9 +65,43 @@ function resolvePgliteUrl(url: string): string {
   return `file://${resolve(path).replace(/\\/g, "/")}`;
 }
 
-export let pgliteClient: PGlite | null = isPglite
-  ? new PGlite(resolvePgliteUrl(DATABASE_URL))
-  : null;
+// Guard against Vite SSR hot-reload evaluating this module twice in the same process.
+// PGlite is single-writer; two instances on the same file see divergent WAL states.
+// globalThis ensures exactly one PGlite instance per process regardless of how many
+// times this module is evaluated.
+declare global {
+  // eslint-disable-next-line no-var -- must be var for global augmentation
+  var __pgliteClient: PGlite | undefined;
+}
+
+function removeStalePgliteLock(dbUrl: string): void {
+  // PGlite leaves a postmaster.pid in the data directory after an unclean shutdown
+  // (e.g. dev server killed). On next startup, the stale lock causes PGlite to open
+  // the database in a degraded / read-only state — queries return 0 rows silently.
+  // Remove it before opening so PGlite can do a clean WAL recovery.
+  try {
+    // fileURLToPath handles both Unix (file:///path) and Windows (file:///C:/path)
+    const dbPath = fileURLToPath(dbUrl);
+    const lockPath = `${dbPath}/postmaster.pid`;
+    if (existsSync(lockPath)) {
+      unlinkSync(lockPath);
+    }
+  } catch {
+    // Non-fatal: if we can't remove the lock, PGlite will try to handle it.
+  }
+}
+
+export let pgliteClient: PGlite | null = (() => {
+  if (!isPglite) {
+    return null;
+  }
+  if (!globalThis.__pgliteClient) {
+    const resolvedUrl = resolvePgliteUrl(DATABASE_URL);
+    removeStalePgliteLock(resolvedUrl);
+    globalThis.__pgliteClient = new PGlite(resolvedUrl);
+  }
+  return globalThis.__pgliteClient;
+})();
 
 /**
  * Callbacks that rebuild derived drizzle clients (default + per-domain
