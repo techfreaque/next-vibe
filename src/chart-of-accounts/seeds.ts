@@ -1288,19 +1288,28 @@ async function seedTemplate(
     return;
   }
 
-  const [inserted] = await db
-    .insert(coaTemplates)
-    .values({
-      country: template.country,
-      name: template.name,
-      description: template.description,
-      isDefault: template.isDefault,
-      version: template.version,
-    })
-    .returning({ id: coaTemplates.id });
+  let inserted: { id: string } | undefined;
+  try {
+    const rows = await db
+      .insert(coaTemplates)
+      .values({
+        country: template.country,
+        name: template.name,
+        description: template.description,
+        isDefault: template.isDefault,
+        version: template.version,
+      })
+      .returning({ id: coaTemplates.id });
+    inserted = rows[0];
+  } catch (insertError) {
+    logger.warn(`Failed to insert CoA template: ${template.country}`, {
+      error: String(insertError),
+    });
+    return;
+  }
 
   if (!inserted) {
-    logger.error(`Failed to insert CoA template: ${template.country}`);
+    logger.warn(`CoA template insert returned no row: ${template.country}`);
     return;
   }
 

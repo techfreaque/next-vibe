@@ -41,7 +41,7 @@ import type { PgTableWithColumns } from "drizzle-orm/pg-core";
 
 import { parseError } from "../../core/utils/parse-error";
 import type { EndpointLogger } from "../../logger/types";
-import { db } from "..";
+import { db, isPglite } from "..";
 import type { CompiledQuery, PlaceholderParam, StaticParam } from "./context";
 import { isPlaceholder } from "./context";
 import type {
@@ -201,6 +201,15 @@ export function defineDbFunction<
     tableNames,
 
     async call(params, logger) {
+      // PGlite doesn't support plv8 — return typed zero defaults so the app
+      // works (shows 0 balance) without crashing on missing pg functions.
+      if (isPglite) {
+        logger.debug(
+          `PGlite mode — skipping db function ${def.name}, returning defaults`,
+        );
+        return buildDefaults(returnEntries) as InferRecord<TReturn>;
+      }
+
       try {
         // Build: SELECT * FROM fn_name($1::type, $2::type, ...)
         const castParts = paramEntries.map(

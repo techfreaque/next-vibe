@@ -65,10 +65,17 @@ export class DatabaseMigrationRepository {
             continue;
           }
           const raw = await readFile(join(migrationsDir, file), "utf8");
-          // PGlite doesn't support pgvector — strip CREATE EXTENSION and replace vector type
+          // PGlite doesn't support pgvector, GIN/GiST/BRIN/SP-GiST indexes,
+          // or full-text search index expressions — strip those lines.
           const sql = raw
             .split("\n")
             .filter((l) => !/^\s*CREATE EXTENSION/i.test(l))
+            .filter(
+              (l) =>
+                !/CREATE\s+INDEX\b[^;]*\bUSING\s+(gin|gist|brin|spgist)\b/i.test(
+                  l,
+                ),
+            )
             .join("\n")
             .replace(/\bvector\(\d+\)/gi, "text")
             .replace(/SET DATA TYPE vector\(\d+\)/gi, "SET DATA TYPE text");

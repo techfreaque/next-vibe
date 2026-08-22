@@ -742,7 +742,23 @@ async function regenerateRouteTree(result: GenerationResult): Promise<void> {
       routesDirectory: resolve(srcDirectory, "routes"),
       generatedRouteTree: resolve(srcDirectory, "routeTree.gen.ts"),
     });
-    await new Generator({ config, root: projectRoot() }).run();
+    const gen = new Generator({ config, root: projectRoot() });
+    // Windows: EPERM on atomic rename when Vite holds routeTree.gen.ts open.
+    // Retry once after a short delay — the lock is usually released within ms.
+    try {
+      await gen.run();
+    } catch (firstError) {
+      const msg = parseError(firstError).message;
+      if (msg.includes("EPERM") || msg.includes("operation not permitted")) {
+        await Bun.sleep(200);
+        await gen.run();
+      } else {
+        result.errors.push({
+          file: `${GENERATED_DIR}/app-tanstack/routeTree.gen.ts`,
+          error: parseError(firstError).message,
+        });
+      }
+    }
   } catch (error) {
     result.errors.push({
       file: `${GENERATED_DIR}/app-tanstack/routeTree.gen.ts`,
