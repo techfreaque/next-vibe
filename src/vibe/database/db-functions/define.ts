@@ -41,7 +41,7 @@ import type { PgTableWithColumns } from "drizzle-orm/pg-core";
 
 import { parseError } from "../../core/utils/parse-error";
 import type { EndpointLogger } from "../../logger/types";
-import { db, isPglite } from "..";
+import { db, isPglite, pgliteClient } from "..";
 import type { CompiledQuery, PlaceholderParam, StaticParam } from "./context";
 import { isPlaceholder } from "./context";
 import type {
@@ -153,6 +153,139 @@ export interface DbFunction<
 }
 
 // ---------------------------------------------------------------------------
+// PGlite in-process execution
+// ---------------------------------------------------------------------------
+
+/** snake_case → camelCase mapper for PGlite query results (mirrors Drizzle's field naming) */
+function snakeToCamel(
+  row: Record<string, string | number | boolean | null>,
+): Record<string, string | number | boolean | null> {
+  const out: Record<string, string | number | boolean | null> = {};
+  for (const k of Object.keys(row)) {
+    const camel = k
+      .split("_")
+      .map((part, i) =>
+        i === 0 ? part : part[0]?.toUpperCase() + part.slice(1),
+      )
+      .join("");
+    out[camel] = row[k] as string | number | boolean | null;
+  }
+  return out;
+}
+
+/**
+ * Execute a db function's logic directly in Node.js when running against PGlite.
+ *
+ * Strategy:
+ * - Build async versions of every compiled query that run via pgliteClient.query()
+ * - Provide a plv8 shim whose .execute() runs pgliteClient.query() (async, awaited)
+ * - Wrap the logic body in an AsyncFunction so await works inside it
+ * - The logic body uses `q.name()` and `plv8.execute()` — we prefix those calls
+ *   with `await` via a simple text transform so the async wrapper works
+ */
+async function callInPglite(
+  name: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- logic has complex generic signature
+  // oxlint-disable-next-line no-explicit-any
+  logic: (...args: any[]) => any,
+  compiledQueries: Record<string, CompiledQuery>,
+  paramEntries: [string, PgType][],
+  returnEntries: [string, PgType][],
+  params: Record<string, string | number | boolean | null>,
+  logger: EndpointLogger,
+): Promise<Record<string, string | number | boolean | null>> {
+  const client = pgliteClient!;
+
+  // Build async query functions — resolve placeholders from params
+  const asyncQ: Record<
+    string,
+    (
+      extra?: Record<string, string | number | boolean | null>,
+    ) => Promise<Record<string, string | number | boolean | null>[]>
+  > = {};
+  for (const [queryName, compiled] of Object.entries(compiledQueries)) {
+    asyncQ[queryName] = async (
+      extra?: Record<string, string | number | boolean | null>,
+    ): Promise<Record<string, string | number | boolean | null>[]> => {
+      const values: (string | number | boolean | null)[] = compiled.params.map(
+        (p) => {
+          if (isPlaceholder(p)) {
+            const fromParams = params[p.name];
+            if (fromParams !== undefined) {
+              return fromParams ?? null;
+            }
+            return extra?.[p.name] ?? null;
+          }
+          return p;
+        },
+      );
+      // PGlite uses $1, $2 positional params — Drizzle emits those already
+      const result = await client.query<
+        Record<string, string | number | boolean | null>
+      >(compiled.sql, values);
+      return result.rows.map(snakeToCamel);
+    };
+  }
+
+  // plv8 shim — execute() runs raw SQL via pgliteClient
+  const plv8Shim = {
+    async execute<TRow = Record<string, string | number | boolean | null>>(
+      querySql: string,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- mirrors plv8.execute signature
+      // oxlint-disable-next-line no-explicit-any
+      queryParams?: any[],
+    ): Promise<TRow[]> {
+      const result = await client.query<TRow>(querySql, queryParams);
+      return result.rows;
+    },
+    // eslint-disable-next-line no-unused-vars -- _level is PL/v8 log severity (NOTICE/WARNING); not mapped to Node log levels
+    elog(_level: number, msg: string): void {
+      logger.debug(`[plv8.elog] ${msg}`);
+    },
+    quote_literal(value: string): string {
+      return `'${value.replaceAll("'", "''")}'`;
+    },
+    quote_ident(value: string): string {
+      return `"${value.replaceAll('"', '""')}"`;
+    },
+  };
+
+  // Extract and transform logic body for async execution
+  // Replace q.name() → await __q.name() and plv8.execute() → await plv8.execute()
+  const logicBody = extractLogicBody(logic)
+    .replaceAll(/\b__q\.(\w+)\s*\(/g, "await __q.$1(")
+    .replaceAll(/\bplv8\.execute\s*\(/g, "await plv8.execute(");
+
+  // Build params shim (for (q, params) style)
+  const paramsShimEntries = paramEntries
+    .map(([n]) => `"${n}": __params_raw["${n}"]`)
+    .join(", ");
+
+  const asyncBody = `
+    const __params = { ${paramsShimEntries} };
+    ${logicBody}
+  `;
+
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-implied-eval -- intentional: executes extracted logic body in async context for PGlite dev mode
+    const fn = new Function(
+      "__q",
+      "plv8",
+      "__params_raw",
+      `return (async () => { ${asyncBody} })()`,
+    );
+    const result = (await fn(asyncQ, plv8Shim, params)) as Record<
+      string,
+      string | number | boolean | null
+    >;
+    return mapRow(result, returnEntries);
+  } catch (error) {
+    logger.error(`PGlite db function ${name} failed`, parseError(error));
+    return buildDefaults(returnEntries);
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Implementation
 // ---------------------------------------------------------------------------
 
@@ -201,13 +334,19 @@ export function defineDbFunction<
     tableNames,
 
     async call(params, logger) {
-      // PGlite doesn't support plv8 — return typed zero defaults so the app
-      // works (shows 0 balance) without crashing on missing pg functions.
       if (isPglite) {
-        logger.debug(
-          `PGlite mode — skipping db function ${def.name}, returning defaults`,
-        );
-        return buildDefaults(returnEntries) as InferRecord<TReturn>;
+        return callInPglite(
+          def.name,
+          def.logic,
+          compiledQueries,
+          paramEntries,
+          returnEntries,
+          // Object.entries/fromEntries erases the branded type → plain Record
+          Object.fromEntries(
+            Object.entries(params).map(([k, v]) => [k, v ?? null]),
+          ),
+          logger,
+        ) as Promise<InferRecord<TReturn>>;
       }
 
       try {
