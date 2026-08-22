@@ -1,5 +1,7 @@
 import "server-only";
 
+import { resolve } from "node:path";
+
 import { PGlite } from "@electric-sql/pglite";
 import { type NodePgDatabase } from "drizzle-orm/node-postgres";
 import { type PgliteDatabase } from "drizzle-orm/pglite";
@@ -54,8 +56,15 @@ export let pool: Pool | null = isPglite ? null : createPool();
  * Underlying PGlite instance — only set in PGlite mode.
  * Exposed so the headless-client migration runner can call exec() directly.
  */
+function resolvePgliteUrl(url: string): string {
+  // Strip file: prefix, resolve to absolute path, re-prefix
+  // Handles both file:./relative and file:///absolute forms cross-platform
+  const path = url.replace(/^file:(\/\/)?/, "");
+  return `file://${resolve(path).replace(/\\/g, "/")}`;
+}
+
 export let pgliteClient: PGlite | null = isPglite
-  ? new PGlite(DATABASE_URL)
+  ? new PGlite(resolvePgliteUrl(DATABASE_URL))
   : null;
 
 /**
