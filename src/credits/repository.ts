@@ -3317,7 +3317,7 @@ export class CreditRepository {
 
       const partialDeduction = result.data?.partial ?? false;
       if (partialDeduction) {
-        logger.warn(
+        logger.debug(
           `Model usage: Partial credit deduction (insufficient funds, deducted to 0)`,
           {
             ...identifier,

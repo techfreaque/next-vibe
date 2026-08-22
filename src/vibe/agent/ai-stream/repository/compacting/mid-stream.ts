@@ -83,14 +83,39 @@ export class MidStreamCompactingHandler {
     const afterFirst = nonSystemMessages.slice(1);
 
     // Take the last RECENT_TURNS_TO_KEEP messages from afterFirst as the "recent" tail.
-    // IMPORTANT: The split point must land on an `assistant` or `user` message boundary —
-    // never on a `tool` result message. A `tool` result without its preceding `assistant`
-    // tool-call message would cause AI SDK's AI_MissingToolResultsError on the next step.
+    // IMPORTANT: The split point must land on a clean boundary:
+    // 1. Never start `recentTurns` on a `tool` result — it needs its preceding `assistant`
+    //    tool-call message, otherwise AI SDK throws AI_MissingToolResultsError.
+    // 2. Never END `middleTurns` on an `assistant` with tool-call parts — it needs the
+    //    following `tool` result messages to be valid, otherwise AI SDK throws
+    //    AI_InvalidPromptError ("messages do not match ModelMessage[] schema").
     //
-    // Walk backward from the desired cut index to find the nearest boundary.
+    // Walk backward until we land on a safe cut point: a `user` message, or an `assistant`
+    // message whose content has no tool-call parts.
     let cutIndex = Math.max(0, afterFirst.length - RECENT_TURNS_TO_KEEP);
+    // Step 1: skip over `tool` result messages at the cut point
     while (cutIndex > 0 && afterFirst[cutIndex]?.role === "tool") {
       cutIndex--;
+    }
+    // Step 2: if we landed on an `assistant` that issued tool calls, skip it too —
+    // its tool result siblings are in recentTurns and we'd produce an incomplete pair.
+    while (cutIndex > 0) {
+      const msg = afterFirst[cutIndex - 1];
+      if (
+        msg?.role === "assistant" &&
+        Array.isArray(msg.content) &&
+        msg.content.some(
+          (part) => (part as { type?: string }).type === "tool-call",
+        )
+      ) {
+        cutIndex--;
+        // Skip over the tool results that follow this assistant message
+        while (cutIndex > 0 && afterFirst[cutIndex]?.role === "tool") {
+          cutIndex--;
+        }
+      } else {
+        break;
+      }
     }
 
     const recentTurns = afterFirst.slice(cutIndex);
@@ -104,6 +129,27 @@ export class MidStreamCompactingHandler {
         {
           nonSystemMessageCount: nonSystemMessages.length,
           recentTurnsToKeep: RECENT_TURNS_TO_KEEP,
+        },
+      );
+      return null;
+    }
+
+    // Safety net: if the boundary walk left middleTurns ending on an assistant with
+    // open tool calls (no matching tool result in middleTurns), skip compacting rather
+    // than sending an invalid prompt to the LLM (AI_InvalidPromptError).
+    const lastMiddle = middleTurns.at(-1);
+    if (
+      lastMiddle?.role === "assistant" &&
+      Array.isArray(lastMiddle.content) &&
+      lastMiddle.content.some(
+        (part) => (part as { type?: string }).type === "tool-call",
+      )
+    ) {
+      logger.warn(
+        "[MidStreamCompacting] Skipping — middleTurns ends on assistant with open tool calls",
+        {
+          middleTurnsCount: middleTurns.length,
+          recentTurnsCount: recentTurns.length,
         },
       );
       return null;
@@ -213,7 +259,12 @@ export class MidStreamCompactingHandler {
 
     if (outcome.status === "stream-error") {
       const errorObj = outcome.error;
-      logger.error("[MidStreamCompacting] Stream error part", errorObj);
+      logger.error("[MidStreamCompacting] Stream error part", errorObj, {
+        middleTurnsCount: middleTurns.length,
+        recentTurnsCount: recentTurns.length,
+        lastMiddleRole: middleTurns.at(-1)?.role,
+        firstRecentRole: recentTurns.at(0)?.role,
+      });
       // Don't call handleFailure if the outer abort signal is already set —
       // that means the main stream was cancelled by the user, not by us.
       if (!abortSignal.aborted) {

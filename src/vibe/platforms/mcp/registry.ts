@@ -232,11 +232,16 @@ export class MCPRegistry {
     // Execute tool using shared generic handler.
     // For hot-reload tools, pre-load the handler fresh and pass it as preloadedHandler
     // so the executor uses it directly without going through the cached switch.
-    const freshHandler = isHotReload
+    // Coerce null → undefined: null tells core.ts "skip the handler lookup entirely"
+    // (used for explicit no-op), while undefined means "fall through to the registry
+    // switch". If the hot-loader can't find the route, fall through so the registry's
+    // own lookup (handlers.ts → handlers-dev.ts fallback) can attempt it.
+    const freshHandlerOrNull = isHotReload
       ? await import("./hot-loader").then((m) =>
           m.getRouteHandlerFresh(context.toolName),
         )
       : undefined;
+    const freshHandler = freshHandlerOrNull ?? undefined;
 
     // Route local execution through the unified execute-tool repository — the
     // single dispatch path that applies the permission cascade, folder

@@ -56,7 +56,8 @@ export const translations: typeof enTranslations = {
         notFound: {
           title: "Tool nicht gefunden",
           description: "Kein registriertes Tool mit diesem Namen gefunden",
-          detail: 'Kein registriertes Tool mit dem Namen "{{toolName}}"',
+          detail:
+            'Tool "{{toolName}}" nicht gefunden. Nicht erneut versuchen — verfügbare Tools mit tool-help prüfen.',
         },
         remoteFailed: {
           title: "Remote-Tool fehlgeschlagen: {{message}}",

@@ -185,6 +185,26 @@ export async function complete(
     });
   }
 
+  if (finishReason === "content-filter") {
+    logger.warn("[AI Stream] Provider content filter triggered", {
+      model,
+      threadId,
+    });
+    const { ctx, user, t } = state.p;
+    await ctx.dbWriter.emitErrorMessage({
+      threadId,
+      errorType: StreamErrorType.STREAM_ERROR,
+      error: fail({
+        message: t("errors.contentFiltered"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      }),
+      content: t("errors.contentFiltered"),
+      parentId: ctx.lastParentId,
+      sequenceId: ctx.lastSequenceId,
+      user,
+    });
+  }
+
   // ── Stream completion: finalize message, flush TTS, deduct credits, cleanup.
   //
   // SSE event ordering (matches what frontend expects):

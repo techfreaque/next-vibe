@@ -140,6 +140,27 @@ type BridgeModelId =
   | VideoVisionModelId
   | AudioVisionModelId;
 
+/** Successful bridge description, a failure reason string (prefixed with \0), or null (aborted). */
+type BridgeCallResult = string | null;
+
+/** Sentinel prefix to distinguish a bridge failure message from real description text. */
+const BRIDGE_FAIL_PREFIX = "\0BRIDGE_FAIL:";
+
+/** Pack a failure reason into a BridgeCallResult sentinel. */
+function bridgeFail(reason: string): BridgeCallResult {
+  return `${BRIDGE_FAIL_PREFIX}${reason}`;
+}
+
+/** True if the result is a packed failure (not real description text). */
+export function isBridgeFail(result: BridgeCallResult): result is string {
+  return typeof result === "string" && result.startsWith(BRIDGE_FAIL_PREFIX);
+}
+
+/** Extract the human-readable reason from a failure sentinel. */
+export function getBridgeFailReason(result: string): string {
+  return result.slice(BRIDGE_FAIL_PREFIX.length);
+}
+
 async function runBridgeCall(params: {
   model: ModelOptionTokenBased;
   modelId: BridgeModelId;
@@ -155,7 +176,7 @@ async function runBridgeCall(params: {
   user: JwtPayloadType;
   logger: EndpointLogger;
   errorLabel: string;
-}): Promise<string | null> {
+}): Promise<BridgeCallResult> {
   const {
     model,
     modelId,
@@ -204,15 +225,23 @@ async function runBridgeCall(params: {
         // Parent stream cancelled → stop immediately; per-attempt timeout →
         // retry once, then give up (caller substitutes the placeholder text).
         const parsedAttemptErr = parseError(attemptErr);
-        if (abortSignal.aborted || attempt === 1) {
+        if (abortSignal.aborted) {
+          logger.warn(`[GapFill] ${errorLabel} bridge call aborted`, {
+            error: parsedAttemptErr.message,
+            modality,
+            bridgeType,
+            aborted: true,
+          });
+          return null;
+        }
+        if (attempt === 1) {
           logger.warn(`[GapFill] ${errorLabel} bridge call failed`, {
             error: parsedAttemptErr.message,
             errorStack: parsedAttemptErr.stack,
             modality,
             bridgeType,
-            aborted: abortSignal.aborted,
           });
-          return null;
+          return bridgeFail(parsedAttemptErr.message);
         }
         logger.warn(
           `[GapFill] ${errorLabel} bridge attempt timed out - retrying once`,
@@ -272,7 +301,7 @@ async function runBridgeCall(params: {
       modality,
       bridgeType,
     });
-    return null;
+    return bridgeFail(parsed.message);
   }
 }
 
@@ -289,7 +318,7 @@ export class BridgeCall {
     toolExecutionContext: ToolExecutionContext;
     locale: CountryLanguage;
     availability: AgentEnvAvailability;
-  }): Promise<string | null> {
+  }): Promise<BridgeCallResult> {
     const {
       part,
       chatMessageId,
@@ -389,7 +418,7 @@ export class BridgeCall {
     availability: AgentEnvAvailability;
     /** Fixture chain of the owning stream — vision-bridge model calls bind it. */
     toolExecutionContext: ToolExecutionContext;
-  }): Promise<string | null> {
+  }): Promise<BridgeCallResult> {
     const {
       part,
       chatMessageId,
@@ -412,13 +441,15 @@ export class BridgeCall {
         "[GapFill] No image vision model configured, skipping image bridge",
         { modality },
       );
-      return null;
+      return bridgeFail(
+        "no vision model configured — add one in favorite settings",
+      );
     }
 
     // ImagePart.image is DataContent | URL — AI SDK accepts it natively
     if (!part.image) {
       logger.warn("[GapFill] Image part has no image data, skipping");
-      return null;
+      return bridgeFail("image data unavailable");
     }
 
     return runBridgeCall({
@@ -462,7 +493,7 @@ export class BridgeCall {
     availability: AgentEnvAvailability;
     /** Fixture chain of the owning stream — vision-bridge model calls bind it. */
     toolExecutionContext: ToolExecutionContext;
-  }): Promise<string | null> {
+  }): Promise<BridgeCallResult> {
     const {
       part,
       chatMessageId,
@@ -488,7 +519,9 @@ export class BridgeCall {
         "[GapFill] No audio-vision model configured, skipping audio bridge",
         { modality },
       );
-      return null;
+      return bridgeFail(
+        "no audio-vision model configured — add one in favorite settings",
+      );
     }
 
     const fileData = resolveFilePart(part, "audio/webm");
@@ -496,7 +529,7 @@ export class BridgeCall {
       logger.warn(
         "[GapFill] Audio FilePart has no data or url, skipping audio-vision bridge",
       );
-      return null;
+      return bridgeFail("audio data unavailable");
     }
 
     return runBridgeCall({
@@ -539,7 +572,7 @@ export class BridgeCall {
     availability: AgentEnvAvailability;
     /** Fixture chain of the owning stream — vision-bridge model calls bind it. */
     toolExecutionContext: ToolExecutionContext;
-  }): Promise<string | null> {
+  }): Promise<BridgeCallResult> {
     const {
       part,
       chatMessageId,
@@ -562,13 +595,15 @@ export class BridgeCall {
         "[GapFill] No video vision model configured, skipping video bridge",
         { modality },
       );
-      return null;
+      return bridgeFail(
+        "no video vision model configured — add one in favorite settings",
+      );
     }
 
     const fileData = resolveFilePart(part, "video/mp4");
     if (!fileData) {
       logger.warn("[GapFill] Video FilePart has no data or url, skipping");
-      return null;
+      return bridgeFail("video data unavailable");
     }
 
     return runBridgeCall({
@@ -610,7 +645,7 @@ export class BridgeCall {
     availability: AgentEnvAvailability;
     /** Fixture chain of the owning stream — vision-bridge model calls bind it. */
     toolExecutionContext: ToolExecutionContext;
-  }): Promise<string | null> {
+  }): Promise<BridgeCallResult> {
     const {
       mediaUrl,
       modality,
@@ -647,7 +682,9 @@ export class BridgeCall {
       logger.warn("[GapFill] No vision model configured for media URL bridge", {
         modality,
       });
-      return null;
+      return bridgeFail(
+        "no vision model configured — add one in favorite settings",
+      );
     }
 
     const visionProvider = ProviderFactory.getProviderForModel(
@@ -673,7 +710,7 @@ export class BridgeCall {
       logger.warn("[GapFill] Failed to resolve media for vision bridge", {
         mediaUrl: mediaUrl.slice(0, 80),
       });
-      return null;
+      return bridgeFail("could not retrieve media file from storage");
     }
 
     // Build content parts per modality - separate paths for correct typing
@@ -753,14 +790,15 @@ export class BridgeCall {
 
       return description || null;
     } catch (err) {
+      const errMsg = err instanceof Error ? err.message : String(err);
       logger.warn(
         `[GapFill] ${modality} vision bridge for tool result failed`,
         {
-          error: err instanceof Error ? err.message : String(err),
+          error: errMsg,
           mediaUrl: mediaUrl.slice(0, 80),
         },
       );
-      return null;
+      return bridgeFail(errMsg);
     }
   }
 }

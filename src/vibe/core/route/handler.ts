@@ -303,7 +303,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
     );
 
     if (!accessValidation.allowed) {
-      logger.warn(`[Generic Handler] Endpoint access denied`, {
+      logger.debug(`[Generic Handler] Endpoint access denied`, {
         routePath: `${endpoint.path.join("/")}/${endpoint.method}`,
         userId: user.isPublic ? "public" : user.id,
         reason: endpointAccessDenialCode(accessValidation.denial),

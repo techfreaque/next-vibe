@@ -20,25 +20,25 @@
 
 Three instances, three purposes. Never confuse them.
 
-| Instance   | CLI flags           | DB              | MCP server | Role                                |
-| ---------- | ------------------- | --------------- | ---------- | ----------------------------------- |
-| **Atlas**  | _(no flags)_        | Atlas dev DB    | `atlas`    | Dev/coding instance. You live here. |
-| **Hermes** | `--hermes`          | Hermes local DB | `hermes`   | Max's daily driver. Local preview.  |
-| **Thea**   | `--hermes --remote` | Prod DB         | `thea`     | Cloud AI on VPS. Production.        |
+| Instance   | CLI flags          | DB              | MCP server | Role                               |
+| ---------- | ------------------ | --------------- | ---------- | ---------------------------------- |
+| **Atlas**  | _(no flags)_       | Atlas dev DB    | `atlas`    | Dev/coding instance. You live here. |
+| **Hermes** | `--hermes`         | Hermes local DB | `hermes`   | Max's daily driver. Local preview. |
+| **Thea**   | `--hermes --remote` | Prod DB         | `thea`     | Cloud AI on VPS. Production.       |
 
 Each instance runs **two server modes** — dev (TanStack/Vite, hot reload) and prod (Next.js build). They use different pid/log files and ports.
 
-| Server      | Command                                     | PID file               | Log file               | Port lookup                          |
-| ----------- | ------------------------------------------- | ---------------------- | ---------------------- | ------------------------------------ |
-| Atlas dev   | `vibe dev`                                  | `.tmp/.atlas.pid`      | `.tmp/.atlas.log`      | `grep "^PORT:" .tmp/.atlas.pid`      |
-| Hermes dev  | `vibe --hermes dev`                         | `.tmp/.hermes-dev.pid` | `.tmp/.hermes-dev.log` | `grep "^PORT:" .tmp/.hermes-dev.pid` |
-| Hermes prod | `vibe rebuild` / `vibe build && vibe start` | `.tmp/.hermes.pid`     | `.tmp/.hermes.log`     | `grep "^PORT:" .tmp/.hermes.pid`     |
+| Server      | Command                                     | PID file                | Log file                  | Port lookup                              |
+| ----------- | ------------------------------------------- | ----------------------- | ------------------------- | ---------------------------------------- |
+| Atlas dev   | `vibe dev`                                  | `.tmp/.atlas.pid`       | `.tmp/.atlas.log`         | `grep "^PORT:" .tmp/.atlas.pid`          |
+| Hermes dev  | `vibe --hermes dev`                         | `.tmp/.hermes-dev.pid`  | `.tmp/.hermes-dev.log`    | `grep "^PORT:" .tmp/.hermes-dev.pid`     |
+| Hermes prod | `vibe rebuild` / `vibe build && vibe start` | `.tmp/.hermes.pid`      | `.tmp/.hermes.log`        | `grep "^PORT:" .tmp/.hermes.pid`         |
 
 **Rules:**
-
 - Default work target is **Atlas dev** (`vibe dev`). Safe to run anytime — replaces any existing Atlas dev instance.
 - **Hermes dev** (`vibe --hermes dev`) — dev server on Hermes DB. Useful when tests need two running instances simultaneously.
 - **Hermes prod** (`vibe rebuild`) — zero-downtime update. `vibe build && vibe start` only for a fresh first start. Max's live preview — only touch when explicitly asked.
+- **Thea deploy** — `vibe image-push` (builds + pushes Docker image) then run `./scripts` on the VPS to pull and restart. NOT `vibe rebuild` — that is Hermes-only.
 - Never touch Thea unless doing a dedicated task (e.g. pulling prod logs).
 - Last log line `--- server offline ---` means that server is stopped.
 - **Hot reload (dev only):** `vibe dev` and `vibe --hermes dev` pick up code changes automatically — never restart them after editing code. `vibe build`/`vibe start`/`vibe rebuild` are for the Next.js prod server only and are unrelated to dev hot reload.

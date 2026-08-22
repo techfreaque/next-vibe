@@ -56,7 +56,8 @@ export const translations = {
           description: "No registered tool matches the given toolName",
           // `title` is the definition's declared NOT_FOUND label and renders
           // param-free there, so the tool name gets its own key.
-          detail: 'No registered tool matches "{{toolName}}"',
+          detail:
+            'Tool "{{toolName}}" not found. Do not retry this call — check available tools with tool-help.',
         },
         remoteFailed: {
           title: "Remote tool failed: {{message}}",

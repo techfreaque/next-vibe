@@ -28,7 +28,12 @@ export default function useErrorHandler(
   const logger = useLogger();
 
   useEffect(() => {
-    logger.error("errors.application.generic", error);
+    logger.error(`Application error: ${error.message || "unknown"}`, {
+      message: error.message,
+      name: error.name,
+      digest: error.digest,
+      stack: error.stack?.slice(0, 500),
+    });
     // Call custom error handler if provided
     if (onError) {
       onError(error);

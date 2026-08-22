@@ -148,6 +148,30 @@ export function removeAllOptimistic(
   }
 }
 
+/**
+ * Wipe content of streaming AI messages so the UI stops showing new tokens
+ * immediately after the user clicks cancel. The server abort will follow
+ * within ~1 RTT; this just makes the visual stop instant.
+ * Only clears non-error AI/tool messages that have partial content.
+ */
+export function clearStreamingMessages(
+  threadId: string,
+  rootFolderId: DefaultFolderId,
+  logger: EndpointLogger,
+): void {
+  writeMessages(threadId, rootFolderId, logger, (msgs) =>
+    msgs.map((m) =>
+      (m.role === ChatMessageRole.ASSISTANT ||
+        m.role === ChatMessageRole.TOOL) &&
+      !m.errorType &&
+      m.content
+        ? { ...m, content: "" }
+        : m,
+    ),
+  );
+  logger.debug("Cleared streaming message content after cancel", { threadId });
+}
+
 /** Read-only cache access - for incognito persistence and error handling. */
 export function getCachedMessages(
   threadId: string,

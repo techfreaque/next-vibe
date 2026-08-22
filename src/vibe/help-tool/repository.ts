@@ -27,7 +27,6 @@ import type { EndpointMeta } from "../core/definition/endpoints-meta";
 import { FieldUsage } from "../core/definition/enums";
 import { coreClientEnv as envClient } from "../core/env-client";
 import type { CountryLanguage } from "../core/i18n/core/config";
-import { permissionsRegistry } from "../core/permissions/registry";
 import type { InferJwtPayloadTypeFromRoles } from "../core/route/handler-roles";
 import { type ResponseType, success } from "../core/route/response.schema";
 import { searchField, searchItems } from "../core/utils/in-memory-search";
@@ -291,22 +290,12 @@ export class HelpRepository {
       return getMetaPlatforms(tool.allowedRoles);
     };
 
-    // MCP tool discovery is opt-in: the list returned over MCP must agree with the MCP
-    // server's own tools/list (platforms/mcp/server/protocol-handler.ts), which requires
-    // MCP_VISIBLE. filterMetaForUser goes through checkPlatformAccess, where MCP
-    // *execution* is opt-out — so without this narrowing the listing advertises every
-    // MCP-callable tool rather than the discovery set. MCP only: the other compact
-    // platforms (AI/CRON) have no opt-in marker and stay opt-out.
-    // Execution stays opt-out, so allAccessibleMeta below is deliberately NOT narrowed:
-    // detail lookups still resolve a non-visible tool by exact name.
-    let platformFilteredMeta =
-      discoveryPlatform === Platform.MCP
-        ? filteredByPlatform.filter(
-            (m) =>
-              permissionsRegistry.checkMcpDiscoveryAccess(m.allowedRoles)
-                .allowed,
-          )
-        : filteredByPlatform;
+    // MCP_VISIBLE is only for the MCP server's own tools/list protocol response
+    // (platforms/mcp/server/protocol-handler.ts). The help tool shows every tool
+    // accessible on the requested platform — MCP_OFF tools are excluded by
+    // filterMetaForUser via checkPlatformAccess, but MCP_VISIBLE is not a filter
+    // here: it's a pin that controls auto-discovery, not execution access.
+    let platformFilteredMeta = filteredByPlatform;
     // Keep an unfiltered copy for detail-mode lookups (detail should search all accessible tools,
     // not just the active pinned/allowed subset chosen for list display).
     const allAccessibleMeta = filteredByPlatform;

@@ -19,6 +19,7 @@ import { Outlet } from "next-vibe/ui/components/outlet";
 import { Script } from "next-vibe/ui/components/script";
 import { Scripts } from "next-vibe/ui/components/scripts";
 import { cookies } from "next-vibe/ui/lib/headers";
+import { notFound } from "next-vibe/ui/lib/not-found";
 import type { JSX, ReactNode } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
@@ -91,6 +92,11 @@ export async function tanstackLoader({
   params: Promise<{ locale: CountryLanguage }>;
 }): Promise<Omit<RootLayoutData, "children">> {
   const { locale } = await params;
+  // Guard against bots hitting e.g. /favicon.png /chunk.js /sitemap.xml.gz
+  // which Next.js routes to [locale]/... when no real static file exists.
+  if (!/^[a-z]{2}-[A-Z]+$/.test(locale)) {
+    notFound();
+  }
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const structuredData = {

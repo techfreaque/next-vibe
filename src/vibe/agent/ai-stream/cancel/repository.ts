@@ -110,12 +110,8 @@ export class cancelRepository {
         });
       }
 
-      // Mark as aborting before sending abort signal - gives frontend immediate feedback
-      await setStreamingStateAborting(threadId, logger, user);
-
-      // STREAMING: a live stream is running — deliver the cancel signal on the
-      // pub/sub control channel. The stream's AbortController fires, its
-      // AbortErrorHandler cleans up (saves partial content, credits, clears state).
+      // STREAMING: deliver abort signal immediately — before any DB writes — so
+      // the stream loop stops as fast as possible. DB bookkeeping follows.
       const isStreaming =
         thread.streamingState === ThreadStreamingState.STREAMING;
       // WAITING: the stream already exited (parked an escalated task or a remote
@@ -125,6 +121,12 @@ export class cancelRepository {
 
       if (isStreaming) {
         StreamControl.deliver(threadId, "cancel", user, logger);
+      }
+
+      // Mark as aborting in DB (gives cross-process visibility + frontend feedback)
+      await setStreamingStateAborting(threadId, logger, user);
+
+      if (isStreaming) {
         logger.info("[Cancel] Stream cancelled via control channel", {
           threadId,
         });

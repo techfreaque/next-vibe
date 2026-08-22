@@ -470,11 +470,19 @@ export class FetchUrlContentRepository {
     const result = await fetchService.fetchUrl(url);
 
     if (!result.ok) {
-      logger.error("Fetch URL error", {
+      const logFn = result.isTimeout ? logger.warn : logger.error;
+      logFn("Fetch URL error", {
         error: result.error,
         isTimeout: result.isTimeout ?? false,
         url,
       });
+
+      if (result.isTimeout) {
+        return fail({
+          message: t("get.errors.timeout.detail", { url }),
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        });
+      }
 
       return fail({
         message: t("get.errors.internal.detail", { message: result.error }),

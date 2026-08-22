@@ -556,6 +556,8 @@ export const translations = {
     timeout:
       "The AI took too long to respond (timeout after {{maxDuration}} seconds). Please try again with a shorter message.",
     noResponse: "The AI did not generate a response. Please try again.",
+    contentFiltered:
+      "This response was blocked by the provider's content filter. Try a different model.",
     modelUnavailable:
       "The selected AI model is currently unavailable. Please try a different model.",
     rateLimitExceeded: "Too many requests. Please wait a moment and try again.",

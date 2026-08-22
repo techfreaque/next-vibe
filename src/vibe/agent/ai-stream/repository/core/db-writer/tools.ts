@@ -234,12 +234,16 @@ export async function emitToolResult(
           toolName,
         },
       );
-      // Fallback: create if update failed
+      // Fallback: create if update failed. Guard FK same as emitToolCall.
+      const safeFallbackParentId =
+        parentId !== null && !w.committedMessageIds.has(parentId)
+          ? null
+          : parentId;
       const fallbackResult = await MessagesRepository.createToolMessage({
         messageId: toolMessageId,
         threadId,
         toolCall,
-        parentId,
+        parentId: safeFallbackParentId,
         userId: params.userId,
         sequenceId,
         model,

@@ -65,6 +65,12 @@ export const translations = {
         // detail placeholder lives here instead of leaking into those labels.
         detail: "Fetch Error: {{message}}",
       },
+      timeout: {
+        title: "Fetch Timeout",
+        description: "The URL fetch timed out",
+        detail:
+          "Fetching {{url}} timed out. The page may be too slow or unavailable.",
+      },
     },
     success: {
       title: "Fetch Successful",

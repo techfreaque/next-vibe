@@ -65,6 +65,12 @@ export const translations: typeof enTranslations = {
         description: "Wystąpił błąd podczas pobierania adresu URL",
         detail: "Błąd pobierania: {{message}}",
       },
+      timeout: {
+        title: "Przekroczono czas",
+        description: "Pobieranie URL przekroczyło limit czasu",
+        detail:
+          "Pobieranie {{url}} przekroczyło limit czasu. Strona może być zbyt wolna lub niedostępna.",
+      },
     },
     success: {
       title: "Pobieranie Zakończone Sukcesem",

@@ -65,6 +65,14 @@ const { GET } = createEndpoint({
     firstCliArgKey: "path",
   },
   defaultExpanded: true,
+  options: {
+    queryOptions: {
+      enabled: false, // Don't auto-fetch — path is required, wait for user to submit
+    },
+    formOptions: {
+      autoSubmit: false,
+    },
+  },
 
   fields: customWidgetObject({
     render: CortexReadWidget,

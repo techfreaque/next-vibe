@@ -8,6 +8,7 @@ import { UserRole } from "next-vibe/identity/roles/enum";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
+import { notFound } from "next-vibe/ui/lib/not-found";
 import { redirect } from "next-vibe/ui/lib/redirect";
 
 interface ChatPageProps {
@@ -24,6 +25,11 @@ export async function tanstackLoader({
   params,
 }: ChatPageProps): Promise<never> {
   const { locale } = await params;
+
+  // Guard against bots hitting e.g. /favicon.png which Next.js routes to [locale]
+  if (!/^[a-z]{2}-[A-Z]+$/.test(locale)) {
+    notFound();
+  }
 
   // Agent mode only: go straight to chat (no landing page)
   if (coreEnv.NEXT_PUBLIC_VIBE_MODE === VibeMode.AGENT) {

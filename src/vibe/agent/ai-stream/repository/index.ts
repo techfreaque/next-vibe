@@ -967,8 +967,11 @@ export class AiStreamRepository {
     });
 
     if (!setupResult.success) {
-      logger.error("[AiStream] Setup failed", {
-        errorType: setupResult.errorType?.errorCode,
+      // Auth/billing failures (4xx) are expected user-facing outcomes.
+      const errorCode = setupResult.errorType?.errorCode ?? 500;
+      const logFn = errorCode >= 500 ? logger.error : logger.warn;
+      logFn("[AiStream] Setup failed", {
+        errorType: errorCode,
         message: setupResult.message,
         threadId: data.threadId,
       });

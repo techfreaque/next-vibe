@@ -375,22 +375,30 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
           // (error-monitor/client-log/repository.ts) already prepends it to
           // every forwarded client log; adding it here doubled up as
           // "[client] [client] Error in submitForm".
-          logger.error("Error in submitForm", parseError(error), {
+          const logMeta = {
             endpoint: endpoint.path.join("/"),
             fieldKeys: Object.keys(formSnapshot).join(", "),
             hasFiles: containsFile(formSnapshot),
-          });
+          };
 
           // Handle any errors that occur during submission
           // If the error is already an ErrorResponseType, use it directly
-          const errorResponse = isErrorResponseType(error)
-            ? error
-            : fail({
-                message: hooksTranslation
-                  .scopedT(locale)
-                  .t("mutationForm.post.errors.mutation_failed.title"),
-                errorType: ErrorResponseTypes.INTERNAL_ERROR,
-              });
+          let errorResponse: ErrorResponseType;
+          if (isErrorResponseType(error)) {
+            // Known API error responses (permission denied, not found, etc.) are
+            // expected, user-facing outcomes — log at warn, not error.
+            logger.warn("Error in submitForm", parseError(error), logMeta);
+            errorResponse = error;
+          } else {
+            // Unexpected throw (network failure, code bug) — real error.
+            logger.error("Error in submitForm", parseError(error), logMeta);
+            errorResponse = fail({
+              message: hooksTranslation
+                .scopedT(locale)
+                .t("mutationForm.post.errors.mutation_failed.title"),
+              errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            });
+          }
 
           setError(errorResponse);
           submitOptions?.onError?.({

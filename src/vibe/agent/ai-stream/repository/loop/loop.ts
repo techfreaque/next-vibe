@@ -230,6 +230,13 @@ export class StreamLoop implements StreamLoopState {
 
     try {
       for await (const part of streamResult.fullStream) {
+        // Eagerly bail out if the stream was cancelled — do not drain buffered
+        // parts that the AI provider already sent. Without this check the SDK
+        // keeps yielding already-buffered tokens even after abort fires.
+        if (streamAbortController.signal.aborted) {
+          // oxlint-disable-next-line restricted/restricted-syntax -- Throw is required here to escape the for-await loop cleanly and reach the catch block that calls runAbortHandler
+          throw new DOMException("Stream aborted", "AbortError");
+        }
         if (part.type === "start-step") {
           FirstPartWatchdog.arm(this.p.ctx, () => this.firstPartTimeout());
         } else {

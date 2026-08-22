@@ -20,6 +20,12 @@ interface AIStreamState {
   abortingThreads: Set<string>;
 
   /**
+   * Thread IDs where the POST was fired but the first WS event hasn't arrived.
+   * Drives the stop button visibility so it appears instantly on send.
+   */
+  pendingThreads: Set<string>;
+
+  /**
    * Incognito thread IDs with a stream currently running on the server.
    * Incognito threads exist ONLY in localStorage — the WS events are the
    * single carrier of the streamed content. The IncognitoStreamKeeper keeps a
@@ -32,6 +38,8 @@ interface AIStreamState {
   setAborting: (threadId: string, value: boolean) => void;
   /** Clear aborting state for a thread (called by stream-finished event) */
   clearThread: (threadId: string) => void;
+  isPending: (threadId: string) => boolean;
+  setPending: (threadId: string, value: boolean) => void;
   addIncognitoStream: (threadId: string) => void;
   removeIncognitoStream: (threadId: string) => void;
   reset: () => void;
@@ -42,6 +50,7 @@ interface AIStreamState {
  */
 export const useAIStreamStore = create<AIStreamState>((set, get) => ({
   abortingThreads: new Set<string>(),
+  pendingThreads: new Set<string>(),
   incognitoStreams: new Set<string>(),
 
   isAborting: (threadId: string): boolean =>
@@ -60,9 +69,24 @@ export const useAIStreamStore = create<AIStreamState>((set, get) => ({
 
   clearThread: (threadId: string): void =>
     set((state) => {
-      const next = new Set(state.abortingThreads);
-      next.delete(threadId);
-      return { abortingThreads: next };
+      const aborting = new Set(state.abortingThreads);
+      aborting.delete(threadId);
+      const pending = new Set(state.pendingThreads);
+      pending.delete(threadId);
+      return { abortingThreads: aborting, pendingThreads: pending };
+    }),
+
+  isPending: (threadId: string): boolean => get().pendingThreads.has(threadId),
+
+  setPending: (threadId: string, value: boolean): void =>
+    set((state) => {
+      const next = new Set(state.pendingThreads);
+      if (value) {
+        next.add(threadId);
+      } else {
+        next.delete(threadId);
+      }
+      return { pendingThreads: next };
     }),
 
   addIncognitoStream: (threadId: string): void =>
@@ -88,6 +112,7 @@ export const useAIStreamStore = create<AIStreamState>((set, get) => ({
   reset: (): void =>
     set({
       abortingThreads: new Set<string>(),
+      pendingThreads: new Set<string>(),
       incognitoStreams: new Set<string>(),
     }),
 }));

@@ -20,6 +20,9 @@ export function shouldSkipPath(path: string): boolean {
     path === "/favicon.ico" ||
     path === "/robots.txt" ||
     path === "/sitemap.xml" ||
+    path.endsWith("/sitemap.xml") ||
+    path.endsWith("/sitemap.xml.gz") ||
+    path.includes("/sitemap-") ||
     // Skip webhook routes - they handle their own authentication
     path.includes("/payment/providers/stripe/webhook") ||
     path.includes("/payment/providers/nowpayments/webhook") ||

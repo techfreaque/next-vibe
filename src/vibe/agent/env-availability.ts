@@ -1,7 +1,6 @@
 import "server-only";
 
-import "./env";
-import { agentClientEnv } from "./env-client";
+import { agentPublicFlags } from "./env";
 
 export interface AgentEnvAvailability {
   openRouter: boolean;
@@ -31,32 +30,36 @@ export interface AgentEnvAvailability {
   unbottledForce: boolean;
 }
 
+// Read directly from agentPublicFlags (derived from server API keys in env.ts)
+// rather than agentClientEnv, which is frozen at module-init time and may be
+// evaluated before env.ts has run its process.env side-effect — causing all
+// provider flags to read as false regardless of which keys are configured.
 const envAvailability: AgentEnvAvailability = (() => {
-  const braveSearch = agentClientEnv.NEXT_PUBLIC_AGENT_BRAVE_SEARCH;
-  const kagiSearch = agentClientEnv.NEXT_PUBLIC_AGENT_KAGI_SEARCH;
+  const braveSearch = agentPublicFlags.NEXT_PUBLIC_AGENT_BRAVE_SEARCH;
+  const kagiSearch = agentPublicFlags.NEXT_PUBLIC_AGENT_KAGI_SEARCH;
 
   return {
-    openRouter: agentClientEnv.NEXT_PUBLIC_AGENT_OPEN_ROUTER,
-    claudeCode: agentClientEnv.NEXT_PUBLIC_AGENT_CLAUDE_CODE,
-    voice: agentClientEnv.NEXT_PUBLIC_AGENT_VOICE,
+    openRouter: agentPublicFlags.NEXT_PUBLIC_AGENT_OPEN_ROUTER,
+    claudeCode: agentPublicFlags.NEXT_PUBLIC_AGENT_CLAUDE_CODE,
+    voice: agentPublicFlags.NEXT_PUBLIC_AGENT_VOICE,
     braveSearch,
     kagiSearch,
     anySearch: braveSearch || kagiSearch,
-    uncensoredAI: agentClientEnv.NEXT_PUBLIC_AGENT_UNCENSORED_AI,
-    freedomGPT: agentClientEnv.NEXT_PUBLIC_AGENT_FREEDOM_GPT,
-    gabAI: agentClientEnv.NEXT_PUBLIC_AGENT_GAB_AI,
-    veniceAI: agentClientEnv.NEXT_PUBLIC_AGENT_VENICE_AI,
-    scrappey: agentClientEnv.NEXT_PUBLIC_AGENT_SCRAPPEY,
-    openAiImages: agentClientEnv.NEXT_PUBLIC_AGENT_OPEN_AI_IMAGES,
-    openAiStt: agentClientEnv.NEXT_PUBLIC_AGENT_OPEN_AI_STT,
-    replicate: agentClientEnv.NEXT_PUBLIC_AGENT_REPLICATE,
-    falAi: agentClientEnv.NEXT_PUBLIC_AGENT_FAL_AI,
-    modelsLab: agentClientEnv.NEXT_PUBLIC_AGENT_MODELS_LAB,
-    edenAiStt: agentClientEnv.NEXT_PUBLIC_AGENT_EDEN_AI_STT,
-    deepgram: agentClientEnv.NEXT_PUBLIC_AGENT_DEEPGRAM,
-    openAiTts: agentClientEnv.NEXT_PUBLIC_AGENT_OPEN_AI_TTS,
-    edenAiTts: agentClientEnv.NEXT_PUBLIC_AGENT_EDEN_AI_TTS,
-    elevenlabs: agentClientEnv.NEXT_PUBLIC_AGENT_ELEVENLABS,
+    uncensoredAI: agentPublicFlags.NEXT_PUBLIC_AGENT_UNCENSORED_AI,
+    freedomGPT: agentPublicFlags.NEXT_PUBLIC_AGENT_FREEDOM_GPT,
+    gabAI: agentPublicFlags.NEXT_PUBLIC_AGENT_GAB_AI,
+    veniceAI: agentPublicFlags.NEXT_PUBLIC_AGENT_VENICE_AI,
+    scrappey: agentPublicFlags.NEXT_PUBLIC_AGENT_SCRAPPEY,
+    openAiImages: agentPublicFlags.NEXT_PUBLIC_AGENT_OPEN_AI_IMAGES,
+    openAiStt: agentPublicFlags.NEXT_PUBLIC_AGENT_OPEN_AI_STT,
+    replicate: agentPublicFlags.NEXT_PUBLIC_AGENT_REPLICATE,
+    falAi: agentPublicFlags.NEXT_PUBLIC_AGENT_FAL_AI,
+    modelsLab: agentPublicFlags.NEXT_PUBLIC_AGENT_MODELS_LAB,
+    edenAiStt: agentPublicFlags.NEXT_PUBLIC_AGENT_EDEN_AI_STT,
+    deepgram: agentPublicFlags.NEXT_PUBLIC_AGENT_DEEPGRAM,
+    openAiTts: agentPublicFlags.NEXT_PUBLIC_AGENT_OPEN_AI_TTS,
+    edenAiTts: agentPublicFlags.NEXT_PUBLIC_AGENT_EDEN_AI_TTS,
+    elevenlabs: agentPublicFlags.NEXT_PUBLIC_AGENT_ELEVENLABS,
     // Env alone knows nothing about live connections; getEnvAvailability()
     // fills these from the connections DB.
     unbottledSystem: false,

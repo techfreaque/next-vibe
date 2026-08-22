@@ -5,7 +5,6 @@
       "Bash(vibe check:*)"
     ],
     "deny": [
-      "Bash(git:*)",
       "Bash(npx tsc:*)",
       "Bash(bunx tsc:*)",
       "Bash(rm:*)",

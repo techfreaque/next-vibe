@@ -65,6 +65,10 @@ export class RouteExecutionExecutor {
     preloadedHandler?: GenericHandlerBase | null;
   }): Promise<ResponseType<TResult>> {
     const { t } = systemScopedTranslation.scopedT(params.locale);
+    // Some AI providers mangle tool names: underscores instead of hyphens, or
+    // leading/trailing whitespace (e.g. " execute-tool", "execute_tool").
+    // Normalize before lookup so the model variant doesn't matter.
+    const effectiveToolName = params.toolName.trim().replaceAll("_", "-");
     try {
       let handlerResult = params.preloadedHandler ?? null;
       if (params.preloadedHandler === undefined) {
@@ -85,7 +89,7 @@ export class RouteExecutionExecutor {
             });
           }
           try {
-            handlerResult = await getRouteHandler(params.toolName);
+            handlerResult = await getRouteHandler(effectiveToolName);
             break;
           } catch (importError) {
             if (attempt === 7) {
@@ -113,7 +117,7 @@ export class RouteExecutionExecutor {
 
       if (params.urlPathParams === undefined) {
         const split = await RouteExecutionExecutor.splitArgs(
-          params.toolName,
+          effectiveToolName,
           params.data,
         );
         resolvedData = split.data;

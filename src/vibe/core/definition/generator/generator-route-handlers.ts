@@ -249,6 +249,7 @@ class RouteHandlersGenerator {
         logger,
         outputFile,
         webIgnoredImportPaths,
+        false,
       );
 
     const hotPathsFile = outputFile.replace(/\/handlers\.ts$/, "/hot-paths.ts");
@@ -264,6 +265,8 @@ class RouteHandlersGenerator {
       validRouteFiles,
       logger,
       devOutputFile,
+      undefined,
+      true,
     );
 
     const devHotPathsFile = devOutputFile.replace(
@@ -496,6 +499,7 @@ class RouteHandlersGenerator {
     logger: EndpointLogger,
     outputFile: string,
     webIgnoredImportPaths?: Set<string>,
+    isDev = false,
   ): Promise<{ content: string; hotPathsContent: string; routeCount: number }> {
     const pathMap: Record<
       string,
@@ -693,7 +697,18 @@ async function importRouteHandler(
   switch (path) {
 ${cases.join("\n")}
     default:
-      return null;
+      ${
+        isDev
+          ? "return null;"
+          : `try {
+        // PRODUCTION_OFF routes live only in handlers-dev.ts; try it as a fallback
+        // so execute-tool and MCP can reach them in dev. In prod the import throws
+        // (file absent) — caught and returns null safely.
+        return (await import("./handlers-dev")).getRouteHandler(path);
+      } catch {
+        return null;
+      }`
+      }
   }
 }
 

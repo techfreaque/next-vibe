@@ -322,9 +322,23 @@ export function useTTSAudio({
         return undefined;
       })
       .catch((err: Error | null) => {
-        logger.error(`TTS: Failed to play chunk ${nextIndex + 1}`, {
-          error: err instanceof Error ? err.message : String(err),
-        });
+        const errMsg = err instanceof Error ? err.message : String(err);
+        // Browser autoplay policy blocks audio outside user gesture — expected when
+        // autoplay is enabled and user hasn't interacted recently.
+        const isAutoplayBlocked =
+          errMsg.includes("user gesture") || errMsg.includes("NotAllowedError");
+        if (isAutoplayBlocked) {
+          logger.warn(
+            `TTS: Autoplay blocked by browser for chunk ${nextIndex + 1}`,
+            {
+              error: errMsg,
+            },
+          );
+        } else {
+          logger.error(`TTS: Failed to play chunk ${nextIndex + 1}`, {
+            error: errMsg,
+          });
+        }
 
         audio.removeEventListener("ended", onEnded);
         audio.removeEventListener("error", onAudioError);

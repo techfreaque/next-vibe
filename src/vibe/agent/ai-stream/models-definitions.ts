@@ -2145,18 +2145,18 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
       {
         id: ChatModelId.MIMO_V2_PRO,
         apiProvider: ApiProvider.OPENROUTER,
-        providerModel: "xiaomi/mimo-v2-pro",
+        providerModel: "xiaomi/mimo-v2.5-pro", // v2-pro deprecated by provider, redirected to v2.5-pro
         creditCost: calculateCreditCost,
-        inputTokenCost: 1, // updated: 2026-03-31 from openrouter-api
-        outputTokenCost: 3, // updated: 2026-03-31 from openrouter-api
+        inputTokenCost: 0.305, // updated: 2026-08-16 from openrouter-api
+        outputTokenCost: 0.609, // updated: 2026-08-16 from openrouter-api
       },
       {
         id: ChatModelId.MIMO_V2_PRO,
         apiProvider: ApiProvider.UNBOTTLED,
-        providerModel: "mimo-v2-pro",
+        providerModel: "mimo-v2.5-pro", // v2-pro deprecated by provider, redirected to v2.5-pro
         creditCost: calculateCreditCost,
-        inputTokenCost: 1.3, // updated: 2026-07-02 from unbottled.ai
-        outputTokenCost: 3.9, // updated: 2026-07-02 from unbottled.ai
+        inputTokenCost: 0.397, // updated: 2026-08-16
+        outputTokenCost: 0.792, // updated: 2026-08-16
       },
     ],
 

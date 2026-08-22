@@ -58,6 +58,7 @@ export function useAIStream(): UseAIStreamReturn {
   const { t } = useMemo(() => scopedTranslation.scopedT(locale), [locale]);
   const storeSetAborting = useAIStreamStore((s) => s.setAborting);
   const storeClearThread = useAIStreamStore((s) => s.clearThread);
+  const storeSetPending = useAIStreamStore((s) => s.setPending);
   const streamMutation = useApiMutation(definitions.POST, logger, user);
   const cancelMutation = useApiMutation(cancelEndpoints.POST, logger, user);
 
@@ -110,6 +111,11 @@ export function useAIStream(): UseAIStreamReturn {
         );
       }
 
+      // Mark thread as pending immediately — shows stop button before first WS event.
+      if (threadId) {
+        storeSetPending(threadId, true);
+      }
+
       // Make the POST request via useApiMutation (type-safe, handles
       // FormData automatically when File objects are present).
       // The server fires-and-forgets the stream - POST returns immediately.
@@ -127,6 +133,9 @@ export function useAIStream(): UseAIStreamReturn {
           requestData: data,
         });
       } catch (err) {
+        if (threadId) {
+          storeSetPending(threadId, false);
+        }
         if (isIncognitoStream) {
           useAIStreamStore.getState().removeIncognitoStream(threadId);
         }
@@ -168,6 +177,9 @@ export function useAIStream(): UseAIStreamReturn {
       }
 
       if (!result.success) {
+        if (threadId) {
+          storeSetPending(threadId, false);
+        }
         if (isIncognitoStream) {
           useAIStreamStore.getState().removeIncognitoStream(threadId);
         }
@@ -210,7 +222,7 @@ export function useAIStream(): UseAIStreamReturn {
       });
       return true;
     },
-    [logger, t, streamMutation, locale],
+    [logger, t, streamMutation, locale, storeSetPending],
   );
 
   /**
@@ -231,6 +243,20 @@ export function useAIStream(): UseAIStreamReturn {
       // Set aborting - shows spinner on stop button until stream-finished arrives
       storeSetAborting(threadId, true);
 
+      // Safety timeout: if stream-finished doesn't arrive within 15s, force-clear
+      // the aborting state so the stop button doesn't stay stuck indefinitely.
+      const safetyTimeout = setTimeout(() => {
+        if (useAIStreamStore.getState().isAborting(threadId)) {
+          logger.warn(
+            "Cancel safety timeout fired - force-clearing aborting state",
+            {
+              threadId,
+            },
+          );
+          storeClearThread(threadId);
+        }
+      }, 15_000);
+
       // Call server-side cancel endpoint via typesafe mutation
       try {
         const result = await cancelMutation.mutateAsync({
@@ -246,6 +272,7 @@ export function useAIStream(): UseAIStreamReturn {
           });
 
           // Even if cancel endpoint fails, clear aborting UI
+          clearTimeout(safetyTimeout);
           storeClearThread(threadId);
         }
       } catch (error) {
@@ -255,6 +282,7 @@ export function useAIStream(): UseAIStreamReturn {
         });
 
         // Even if cancel endpoint fails, clear aborting UI
+        clearTimeout(safetyTimeout);
         storeClearThread(threadId);
       }
 

@@ -16,7 +16,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { FEATURE_COSTS } from "@/products/repository-client";
 
-import { agentClientEnv } from "../env-client";
+import { agentPublicFlags } from "../env";
 import { SearchProvider, type SearchProviderValue } from "./enum";
 
 /**
@@ -71,7 +71,7 @@ export interface SearchProviderConfig {
  */
 const braveProvider: SearchProviderConfig = {
   id: SearchProvider.BRAVE,
-  isAvailable: (): boolean => agentClientEnv.NEXT_PUBLIC_AGENT_BRAVE_SEARCH,
+  isAvailable: (): boolean => agentPublicFlags.NEXT_PUBLIC_AGENT_BRAVE_SEARCH,
   creditCost: FEATURE_COSTS.BRAVE_SEARCH,
   search: async (
     query,
@@ -114,7 +114,7 @@ const braveProvider: SearchProviderConfig = {
  */
 const kagiProvider: SearchProviderConfig = {
   id: SearchProvider.KAGI,
-  isAvailable: (): boolean => agentClientEnv.NEXT_PUBLIC_AGENT_KAGI_SEARCH,
+  isAvailable: (): boolean => agentPublicFlags.NEXT_PUBLIC_AGENT_KAGI_SEARCH,
   creditCost: FEATURE_COSTS.KAGI_SEARCH,
   search: async (
     query,

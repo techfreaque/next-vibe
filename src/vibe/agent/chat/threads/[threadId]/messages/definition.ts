@@ -119,6 +119,12 @@ const { GET } = createEndpoint({
         if (!arrived) {
           return;
         }
+        // Clear pending state — stream has confirmed its first message, stop button
+        // visibility is now driven by streamingState WS events instead.
+        const { useAIStreamStore } =
+          await import("../../../../ai-stream/stream/hooks/store");
+        useAIStreamStore.getState().setPending(threadId, false);
+
         if (arrived.role === ChatMessageRole.USER) {
           const { useChatInputStore } =
             await import("../../../../ai-stream/stream/hooks/input-store");

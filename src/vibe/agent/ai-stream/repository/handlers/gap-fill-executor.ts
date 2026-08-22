@@ -37,7 +37,7 @@ import type { ChatModelOption } from "../../models";
 import { reserveFixtureOrdinals } from "../../testing/fetch-cache";
 import type { MessageDbWriter } from "../core/message-db-writer";
 import type { BridgeContext } from "../core/modality-resolver";
-import { BridgeCall } from "./bridge-call";
+import { BridgeCall, getBridgeFailReason, isBridgeFail } from "./bridge-call";
 
 /**
  * Run gap-fill on all messages in the history that have attachments the
@@ -420,16 +420,27 @@ export class GapFillExecutor {
       "part" | "chatMessageId"
     >;
   }): Promise<TextPart> {
-    const variantText = await BridgeCall.bridgeAttachment({
+    const bridgeResult = await BridgeCall.bridgeAttachment({
       part: args.part,
       chatMessageId: args.chatMessageId,
       ...args.bridge,
     });
+    let fallbackText: string;
+    if (bridgeResult === null) {
+      // Aborted — stream is cancelled, placeholder is never shown to user
+      fallbackText = `[${args.label} attachment: processing cancelled]`;
+    } else if (isBridgeFail(bridgeResult)) {
+      const reason = getBridgeFailReason(bridgeResult);
+      fallbackText = `[${args.label} attachment: ${args.failDescriptor} model failed to process this file (${reason}). Try switching to a different vision model in settings, or describe the image manually.]`;
+    } else {
+      return {
+        type: "text" as const,
+        text: `[${args.label} attachment - system-injected ${args.descriptor} description (you cannot see the raw file)]:\n${bridgeResult}`,
+      };
+    }
     return {
       type: "text" as const,
-      text: variantText
-        ? `[${args.label} attachment - system-injected ${args.descriptor} description (you cannot see the raw file)]:\n${variantText}`
-        : `[${args.label} attachment: could not be processed - no ${args.failDescriptor} model configured. Inform the user they can add one in favorite settings.]`,
+      text: fallbackText,
     };
   }
 

@@ -545,17 +545,6 @@ export class SpeechToTextRepository {
       });
     }
 
-    if (file.size < 5000) {
-      logger.error("[STT] File too small to contain audio", {
-        fileSize: file.size,
-        fileName: file.name,
-      });
-      return fail({
-        message: t("post.errors.audioTooShort"),
-        errorType: ErrorResponseTypes.BAD_REQUEST,
-      });
-    }
-
     const baseType = file.type.split(";")[0].trim();
     const mimeType =
       baseType === "video/webm"

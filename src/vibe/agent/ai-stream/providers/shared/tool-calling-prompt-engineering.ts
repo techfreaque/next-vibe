@@ -156,6 +156,16 @@ export function parseToolCalls(
 }
 
 /**
+ * Strip ASCII control characters (0x00–0x1F) that are invalid inside JSON strings,
+ * except for the three whitespace escapes JSON allows (\t \n \r).
+ * Models occasionally emit CAN/NAK/etc. inside tool-call IDs, which breaks JSON.parse.
+ */
+function stripControlChars(s: string): string {
+  // eslint-disable-next-line no-control-regex
+  return s.replaceAll(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, "");
+}
+
+/**
  * Try to parse a JSON array string from a tool_calls block.
  * Applies progressive cleanup on failure.
  */
@@ -163,8 +173,8 @@ function tryParseToolCallsJson(
   raw: string,
   logger: EndpointLogger,
 ): ParsedToolCall[] | null {
-  // First attempt: minimal cleanup
-  let jsonStr = raw.trim();
+  // First attempt: minimal cleanup (strip invalid control chars, trailing commas)
+  let jsonStr = stripControlChars(raw.trim());
   jsonStr = jsonStr.replaceAll(/,(\s*[}\]])/g, "$1");
 
   try {
@@ -178,7 +188,7 @@ function tryParseToolCallsJson(
 
   // Second attempt: aggressive cleanup
   try {
-    jsonStr = raw.trim().replaceAll(/\s+/g, " ");
+    jsonStr = stripControlChars(raw.trim()).replaceAll(/\s+/g, " ");
     jsonStr = jsonStr.replaceAll(/,(\s*[}\]])/g, "$1");
 
     // Fix missing closing braces
@@ -193,6 +203,20 @@ function tryParseToolCallsJson(
     if (Array.isArray(parsed)) {
       logger.info("Parsed tool calls after cleanup");
       return parsed;
+    }
+  } catch {
+    // Continue to truncation attempt
+  }
+
+  // Third attempt: truncate trailing garbage after the last closing bracket
+  try {
+    const truncated = jsonStr.slice(0, jsonStr.lastIndexOf("]") + 1);
+    if (truncated) {
+      const parsed = JSON.parse(truncated) as ParsedToolCall[];
+      if (Array.isArray(parsed)) {
+        logger.info("Parsed tool calls after truncation");
+        return parsed;
+      }
     }
   } catch (error) {
     logger.error("Failed to parse tool calls JSON", parseError(error), {

@@ -54,12 +54,20 @@ function reportToServer(
   tabId: string | undefined,
 ): void {
   const allMeta = error !== undefined ? [error, ...metadata] : metadata;
-  const metaPayload = allMeta
+  const normalizedMeta = allMeta.map((m) =>
+    m instanceof Error
+      ? {
+          error: m.message,
+          errorName: m.name,
+          ...(m.stack ? { errorStack: m.stack.slice(0, 2000) } : {}),
+        }
+      : m,
+  );
+  const metaPayload = normalizedMeta
     .filter(
       (m): m is Record<string, LoggerMetadata> =>
         typeof m === "object" &&
         m !== null &&
-        !(m instanceof Error) &&
         !(m instanceof Date) &&
         !Array.isArray(m),
     )

@@ -89,10 +89,17 @@ export class MessagesRepository {
     logger: EndpointLogger;
     locale: CountryLanguage;
   }): Promise<ChannelDecision> {
-    const threadId = ctx.urlPathParams.threadId;
-    if (!threadId) {
+    const rawThreadId = ctx.urlPathParams.threadId;
+    if (!rawThreadId) {
       return { kind: "deny" };
     }
+
+    // Clients may send a slug-prefixed ID (e.g. "title-words-{uuid}"). Extract
+    // the trailing UUID so the DB lookup works regardless of the slug prefix.
+    const UUID_SUFFIX =
+      /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const uuidMatch = rawThreadId.match(UUID_SUFFIX);
+    const threadId = uuidMatch ? uuidMatch[0] : rawThreadId;
 
     const [thread] = await db
       .select()
@@ -516,13 +523,43 @@ export class MessagesRepository {
       });
     }
 
+    // Verify parent exists — a streamed assistant message can race against its
+    // own parent commit, causing an FK violation. Fall back to the last committed
+    // message in the thread so the chain stays connected.
+    let resolvedParentId = params.parentId;
+    if (resolvedParentId) {
+      const [parent] = await db
+        .select({ id: chatMessages.id })
+        .from(chatMessages)
+        .where(eq(chatMessages.id, resolvedParentId))
+        .limit(1);
+      if (!parent) {
+        const [lastCommitted] = await db
+          .select({ id: chatMessages.id })
+          .from(chatMessages)
+          .where(eq(chatMessages.threadId, params.threadId))
+          .orderBy(desc(chatMessages.createdAt))
+          .limit(1);
+        params.logger.warn(
+          "createTextMessage: parent not found, using last committed message",
+          {
+            requestedParentId: resolvedParentId,
+            resolvedParentId: lastCommitted?.id ?? null,
+            messageId: params.messageId,
+            threadId: params.threadId,
+          },
+        );
+        resolvedParentId = lastCommitted?.id ?? null;
+      }
+    }
+
     try {
       await db.insert(chatMessages).values({
         id: params.messageId,
         threadId: params.threadId,
         role: ChatMessageRole.ASSISTANT,
         content: params.content.trim() || null, // Save null if content is empty/whitespace
-        parentId: params.parentId,
+        parentId: resolvedParentId,
         authorId: params.userId ?? null,
         sequenceId: params.sequenceId,
         isAI: true,
@@ -647,13 +684,44 @@ export class MessagesRepository {
       });
     }
 
+    // Verify parent exists — tool messages reference an assistant message as parent;
+    // parallel tool execution can race against the parent commit. Fall back to last
+    // committed so the chain stays connected instead of throwing an FK violation.
+    let resolvedParentId = params.parentId;
+    if (resolvedParentId) {
+      const [parent] = await db
+        .select({ id: chatMessages.id })
+        .from(chatMessages)
+        .where(eq(chatMessages.id, resolvedParentId))
+        .limit(1);
+      if (!parent) {
+        const [lastCommitted] = await db
+          .select({ id: chatMessages.id })
+          .from(chatMessages)
+          .where(eq(chatMessages.threadId, params.threadId))
+          .orderBy(desc(chatMessages.createdAt))
+          .limit(1);
+        params.logger.warn(
+          "createToolMessage: parent not found, using last committed message",
+          {
+            requestedParentId: resolvedParentId,
+            resolvedParentId: lastCommitted?.id ?? null,
+            messageId: params.messageId,
+            threadId: params.threadId,
+            toolName: params.toolCall.toolName,
+          },
+        );
+        resolvedParentId = lastCommitted?.id ?? null;
+      }
+    }
+
     try {
       await db.insert(chatMessages).values({
         id: params.messageId,
         threadId: params.threadId,
         role: ChatMessageRole.TOOL,
         content: null, // Tool messages don't have text content, only metadata with toolCall info
-        parentId: params.parentId,
+        parentId: resolvedParentId,
         authorId: params.userId ?? null,
         sequenceId: params.sequenceId,
         isAI: true,

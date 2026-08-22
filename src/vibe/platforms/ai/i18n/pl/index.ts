@@ -56,7 +56,8 @@ export const translations: typeof enTranslations = {
         notFound: {
           title: "Narzędzie nie znalezione",
           description: "Brak zarejestrowanego narzędzia o podanej nazwie",
-          detail: 'Brak zarejestrowanego narzędzia o nazwie "{{toolName}}"',
+          detail:
+            'Narzędzie "{{toolName}}" nie znalezione. Nie powtarzaj — sprawdź dostępne narzędzia przez tool-help.',
         },
         remoteFailed: {
           title: "Zdalne narzędzie zawiodło: {{message}}",

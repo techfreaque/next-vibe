@@ -606,7 +606,7 @@ export class AuthRepository {
           ) as InferUserType<TRoles>;
         }
         // Otherwise, user doesn't have required roles
-        logger.warn("User does not have required permission roles", {
+        logger.debug("User does not have required permission roles", {
           translationKey: "debug.userDoesNotHaveRequiredRoles",
           userId,
           leadId,
@@ -644,7 +644,7 @@ export class AuthRepository {
       }
 
       // User doesn't have required roles and PUBLIC is not allowed
-      logger.warn("User does not have required permission roles", {
+      logger.debug("User does not have required permission roles", {
         translationKey: "debug.userDoesNotHaveRequiredRoles",
         userId,
         leadId,
@@ -908,7 +908,7 @@ export class AuthRepository {
           context.locale,
         );
         if (!sessionValid) {
-          logger.warn(
+          logger.debug(
             "Session validation failed - returning public user (invalid token cleared by middleware)",
             {
               tokenPrefix: token.slice(0, 20),

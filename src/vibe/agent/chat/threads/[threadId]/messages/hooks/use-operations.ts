@@ -17,6 +17,12 @@ import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
 import { useCallback, useMemo, useRef } from "react";
 
 import type { ChatModelId } from "../../../../../ai-stream/models";
+import { getChatModelById } from "../../../../../ai-stream/models";
+import {
+  DEFAULT_INPUT_TOKENS,
+  DEFAULT_OUTPUT_TOKENS,
+} from "../../../../../models/constants";
+import { calculateCreditCost } from "../../../../../models/models";
 import { answerAsAI as answerAsAIOp } from "../../../../../ai-stream/stream/hooks/answer-as-ai";
 import { branchMessage as branchMessageOp } from "../../../../../ai-stream/stream/hooks/branch-message";
 import { retryMessage as retryMessageOp } from "../../../../../ai-stream/stream/hooks/retry-message";
@@ -24,11 +30,17 @@ import { sendMessage as sendMessageOp } from "../../../../../ai-stream/stream/ho
 import type { StartStreamFn } from "../../../../../ai-stream/stream/hooks/shared";
 import type { UseAIStreamReturn } from "../../../../../ai-stream/stream/hooks/use-ai-stream";
 import type { FavoriteConfig } from "../../../../../skills/favorites/db";
+import { useChatBootContext } from "../../../../hooks/context";
 import { useChatNavigationStore } from "../../../../hooks/use-chat-navigation-store";
+import { useCredits } from "@/credits/hooks";
 import messageIdDefinitions from "../[messageId]/definition";
 import voteDefinitions from "../[messageId]/vote/definition";
 import messagesDefinition from "../definition";
-import { patchMessage, removeMessage } from "./update-messages";
+import {
+  clearStreamingMessages,
+  patchMessage,
+  removeMessage,
+} from "./update-messages";
 
 type CancelStreamFn = UseAIStreamReturn["cancelStream"];
 
@@ -82,6 +94,7 @@ export interface MessageOperations {
   deleteMessage: (messageId: string) => Promise<void>;
   voteMessage: (messageId: string, vote: 1 | -1 | 0) => Promise<void>;
   stopGeneration: () => void;
+  creditsTotal: number;
 }
 
 /**
@@ -116,6 +129,11 @@ export function useMessageOperations(
   const logger = useWidgetLogger();
   const locale = useWidgetLocale();
   const setLeafMessageId = useChatNavigationStore((s) => s.setLeafMessageId);
+  const { initialCredits } = useChatBootContext();
+  const creditsEndpoint = useCredits(user, logger, initialCredits);
+  const creditsTotal = creditsEndpoint?.read?.response?.success
+    ? creditsEndpoint.read.response.data.total
+    : (initialCredits?.total ?? Infinity);
   const { mutateAsync: deleteMutateAsync } = useApiMutation(
     messageIdDefinitions.DELETE,
     logger,
@@ -166,6 +184,33 @@ export function useMessageOperations(
         });
         return { success: false, createdThreadId: null };
       }
+      if (creditsTotal <= 0) {
+        toast({
+          title: "No credits",
+          description:
+            "You have run out of credits. Add credits to continue chatting.",
+          variant: "destructive",
+          duration: Infinity,
+        });
+        return { success: false, createdThreadId: null };
+      }
+      const selectedModelInfo = getChatModelById(d.settings.selectedModel);
+      if (selectedModelInfo) {
+        const modelCost = calculateCreditCost(
+          selectedModelInfo,
+          DEFAULT_INPUT_TOKENS,
+          DEFAULT_OUTPUT_TOKENS,
+        );
+        if (creditsTotal < modelCost) {
+          toast({
+            title: "Insufficient credits",
+            description: `This model costs ${modelCost.toFixed(1)} credits per turn but you only have ${creditsTotal.toFixed(1)}. Add credits or choose a cheaper model.`,
+            variant: "destructive",
+            duration: Infinity,
+          });
+          return { success: false, createdThreadId: null };
+        }
+      }
       return sendMessageOp(
         params,
         {
@@ -186,7 +231,7 @@ export function useMessageOperations(
         onThreadCreated,
       );
     },
-    [logger, user, locale],
+    [logger, user, locale, creditsTotal],
   );
 
   const retryMessage = useCallback(
@@ -204,6 +249,33 @@ export function useMessageOperations(
         });
         return;
       }
+      if (creditsTotal <= 0) {
+        toast({
+          title: "No credits",
+          description:
+            "You have run out of credits. Add credits to continue chatting.",
+          variant: "destructive",
+          duration: Infinity,
+        });
+        return;
+      }
+      const retryModelInfo = getChatModelById(d.settings.selectedModel);
+      if (retryModelInfo) {
+        const retryCost = calculateCreditCost(
+          retryModelInfo,
+          DEFAULT_INPUT_TOKENS,
+          DEFAULT_OUTPUT_TOKENS,
+        );
+        if (creditsTotal < retryCost) {
+          toast({
+            title: "Insufficient credits",
+            description: `This model costs ${retryCost.toFixed(1)} credits per turn but you only have ${creditsTotal.toFixed(1)}. Add credits or choose a cheaper model.`,
+            variant: "destructive",
+            duration: Infinity,
+          });
+          return;
+        }
+      }
       await retryMessageOp(messageId, attachments, {
         logger,
         startStream: d.startStream,
@@ -220,7 +292,7 @@ export function useMessageOperations(
         locale,
       });
     },
-    [logger, user, setLeafMessageId, locale],
+    [logger, user, setLeafMessageId, locale, creditsTotal],
   );
 
   const branchMessage = useCallback(
@@ -498,6 +570,9 @@ export function useMessageOperations(
   const stopGeneration = useCallback((): void => {
     logger.debug("Message operations: Stopping generation and TTS playback");
     if (activeThreadId) {
+      // Wipe streaming content immediately so tokens stop appearing in the UI.
+      // The server abort follows within ~1 RTT; this makes the visual stop instant.
+      clearStreamingMessages(activeThreadId, currentRootFolderId, logger);
       void cancelStream(activeThreadId);
     }
 
@@ -517,7 +592,7 @@ export function useMessageOperations(
           );
         });
     }
-  }, [logger, cancelStream, activeThreadId]);
+  }, [logger, cancelStream, activeThreadId, currentRootFolderId]);
 
   return useMemo(
     () => ({
@@ -528,6 +603,7 @@ export function useMessageOperations(
       deleteMessage,
       voteMessage,
       stopGeneration,
+      creditsTotal,
     }),
     [
       sendMessage,
@@ -537,6 +613,7 @@ export function useMessageOperations(
       deleteMessage,
       voteMessage,
       stopGeneration,
+      creditsTotal,
     ],
   );
 }

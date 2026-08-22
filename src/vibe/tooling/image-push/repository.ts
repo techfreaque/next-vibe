@@ -112,6 +112,15 @@ export class ImagePushRepository {
         return transferResult;
       }
 
+      const deployResult = await ImagePushRepository.runDeployScript(
+        sshTarget,
+        logger,
+        t,
+      );
+      if (!deployResult.success) {
+        return deployResult;
+      }
+
       return success({
         success: true,
         output: t("post.repository.messages.sshTransferSuccess", {
@@ -265,6 +274,100 @@ export class ImagePushRepository {
       });
     }
 
+    return success(undefined);
+  }
+
+  /**
+   * Runs the deploy script on the SSH target after the image is available there.
+   * Uses sshpass when SSH_SERVER_PWD is set, otherwise relies on key/agent auth.
+   * Skipped when SSH_DEPLOY_SCRIPT is empty.
+   */
+  private static async runDeployScript(
+    sshTarget: string,
+    logger: EndpointLogger,
+    t: ImagePushT,
+  ): Promise<ResponseType<void>> {
+    const script = imagePushEnv.SSH_DEPLOY_SCRIPT;
+    if (!script) {
+      return success(undefined);
+    }
+
+    logger.info("Running deploy script on remote server", {
+      sshTarget,
+      script,
+    });
+
+    const sshFlags = [
+      "-oServerAliveInterval=30",
+      "-oServerAliveCountMax=10",
+      "-oTCPKeepAlive=yes",
+      "-oStrictHostKeyChecking=no",
+    ];
+
+    // The deploy script starts with `git fetch/reset` which fails when the VPS has
+    // no git repo. Since the image was transferred via SSH (not registry), git sync
+    // is irrelevant — skip those two lines and run the rest directly.
+    // The script must run from the project root (parent of scripts/) so that
+    // `docker compose -f docker-compose.prod.yml` resolves correctly.
+    const scriptDir = script.split("/").slice(0, -1).join("/") || "/";
+    const projectDir = scriptDir.endsWith("/scripts")
+      ? scriptDir.slice(0, -"/scripts".length)
+      : scriptDir;
+    // Use grep -v to strip git lines, then pipe to bash. No single-quote nesting needed.
+    const remoteCmd = `chmod +x ${script} && cd ${projectDir} && grep -v "^git " ${script} | bash`;
+
+    let result: ReturnType<typeof spawnSync>;
+    if (imagePushEnv.SSH_SERVER_PWD) {
+      const { port } = ImagePushRepository.parseSshTarget(sshTarget);
+      result = spawnSync(
+        "sshpass",
+        [
+          "-p",
+          imagePushEnv.SSH_SERVER_PWD,
+          "ssh",
+          ...sshFlags,
+          `-oPort=${String(port)}`,
+          sshTarget,
+          remoteCmd,
+        ],
+        { stdio: "inherit", cwd: process.cwd() },
+      );
+    } else {
+      result = spawnSync("ssh", [...sshFlags, sshTarget, remoteCmd], {
+        stdio: "inherit",
+        cwd: process.cwd(),
+      });
+    }
+
+    if (result.error) {
+      logger.error("Deploy script invocation failed", {
+        error: result.error.message,
+      });
+      return fail({
+        message: t("post.repository.messages.sshTransferFailed", {
+          target: sshTarget,
+          error: result.error.message,
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+
+    if (result.status !== 0) {
+      logger.error("Deploy script exited with non-zero status", {
+        exitCode: result.status,
+      });
+      return fail({
+        message: t("post.repository.messages.sshTransferFailed", {
+          target: sshTarget,
+          error: t("post.repository.messages.buildExitCode", {
+            code: result.status ?? -1,
+          }),
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+
+    logger.info("Deploy script completed successfully", { sshTarget });
     return success(undefined);
   }
 

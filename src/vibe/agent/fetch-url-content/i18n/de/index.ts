@@ -65,6 +65,12 @@ export const translations: typeof enTranslations = {
         description: "Beim Abrufen der URL ist ein Fehler aufgetreten",
         detail: "Abruffehler: {{message}}",
       },
+      timeout: {
+        title: "Zeitüberschreitung",
+        description: "Der URL-Abruf hat die Zeitgrenze überschritten",
+        detail:
+          "Zeitüberschreitung beim Abrufen von {{url}}. Die Seite ist möglicherweise zu langsam oder nicht verfügbar.",
+      },
     },
     success: {
       title: "Abruf Erfolgreich",

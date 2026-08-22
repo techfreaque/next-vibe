@@ -326,7 +326,7 @@ async function openHubWs(
   // A signed session token requires a private (authenticated) identity. Public
   // users have no session to mint — they never dispatch remote tools inline.
   if (user.isPublic) {
-    logger.warn("[KeyedRemoteSignal] public user cannot open a hub WS");
+    logger.debug("[KeyedRemoteSignal] public user cannot open a hub WS");
     return null;
   }
   const { AuthRepository } = await import("../../identity/auth/repository");

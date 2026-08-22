@@ -947,10 +947,11 @@ export function HelpToolsWidget(): JSX.Element {
         queryOptions: {
           refetchOnWindowFocus: false,
           staleTime: 5 * 60 * 1000,
+          enabled: isAdminUser,
         },
       },
     };
-  }, []);
+  }, [isAdminUser]);
   const connectionsState = useEndpoint(
     remoteConnectionListDefinition,
     endpointOptions,

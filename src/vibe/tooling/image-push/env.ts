@@ -35,4 +35,11 @@ export const {
     commented: true,
     sensitive: true,
   },
+  SSH_DEPLOY_SCRIPT: {
+    schema: z.string().default("/unbottled/scripts/install-docker.sh"),
+    example: "/unbottled/scripts/install-docker.sh",
+    comment:
+      "Script to run on SSH_SERVER after a successful image push to trigger the deploy (docker compose pull + up). Set to empty string to skip.",
+    commented: true,
+  },
 });

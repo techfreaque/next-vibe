@@ -76,12 +76,19 @@ export function wrapErrorResponse(
   // Build clean error chain
   const { logChain } = buildErrorChain(error);
 
-  // Log the full error chain for debugging
-  logger.error(`API Error:\n${logChain.join("\n")}`, {
+  // 4xx errors are expected API outcomes (bad input, missing auth, not found).
+  // Only 5xx is an unexpected server failure worth paging on.
+  const errorCode = error.errorType.errorCode;
+  const logMeta = {
     endpoint: endpoint?.aliases?.[0] ?? endpoint?.path?.join("/"),
     errorKey: error.errorType.errorKey,
-    errorCode: error.errorType.errorCode,
-  });
+    errorCode,
+  };
+  if (errorCode >= 500) {
+    logger.error(`API Error:\n${logChain.join("\n")}`, logMeta);
+  } else {
+    logger.warn(`API Error:\n${logChain.join("\n")}`, logMeta);
+  }
 
   // Validate error response format
   const validationResult = validateData(

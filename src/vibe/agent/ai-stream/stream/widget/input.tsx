@@ -66,6 +66,11 @@ import {
 } from "../../constants";
 import { getChatModelById } from "../../models";
 import {
+  DEFAULT_INPUT_TOKENS,
+  DEFAULT_OUTPUT_TOKENS,
+} from "../../../models/constants";
+import { calculateCreditCost } from "../../../models/models";
+import {
   getBestAudioVisionModel,
   getBestImageVisionModel,
   getBestVideoVisionModel,
@@ -311,11 +316,27 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   const rootFolderPermissions = bootContext.rootFolderPermissions;
   const canPost = useMemo(() => {
     if (activeThread) {
-      return activeThread.canPost ?? true;
+      // canPost is null when the thread inherits from its folder (treat as allowed).
+      // canPost is undefined when the thread came from a WS event that omitted it
+      // (e.g. thread-created partial payload). In that case fall back to the root
+      // folder permission so public users can't post in folders they can't post in.
+      if (activeThread.canPost === null) {
+        return true;
+      }
+      if (activeThread.canPost === undefined) {
+        return rootFolderPermissions.canCreateThread;
+      }
+      return activeThread.canPost;
     }
     if (currentSubFolderId) {
       const currentFolder = folders[currentSubFolderId];
-      return currentFolder?.canCreateThread ?? true;
+      // Same logic: undefined means the folder came from a partial WS payload.
+      if (currentFolder?.canCreateThread === undefined) {
+        return rootFolderPermissions.canCreateThread;
+      }
+      return (
+        currentFolder.canCreateThread ?? rootFolderPermissions.canCreateThread
+      );
     }
     return rootFolderPermissions.canCreateThread;
   }, [activeThread, currentSubFolderId, folders, rootFolderPermissions]);
@@ -327,8 +348,20 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
 
   const currentModel = getChatModelById(selectedModel);
   const modelSupportsTools = currentModel?.supportsTools ?? false;
+  // Estimate the minimum credit cost for one turn with the selected model.
+  // If the user's balance is below this, block sending before the request even reaches the server.
+  const modelCost = currentModel
+    ? calculateCreditCost(
+        currentModel,
+        DEFAULT_INPUT_TOKENS,
+        DEFAULT_OUTPUT_TOKENS,
+      )
+    : 0;
   // Allow typing during streaming - queued messages can be sent while AI is active
-  const isInputDisabled = !canPost;
+  const isInputDisabled =
+    !canPost ||
+    messageOps.creditsTotal <= 0 ||
+    (modelCost > 0 && messageOps.creditsTotal < modelCost);
 
   // Model-type-aware UI
   // Chat stream pipeline only handles chat models; image/audio go through separate endpoints.
@@ -404,6 +437,10 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   const isAborting = useAIStreamStore((s) =>
     activeThreadId ? s.isAborting(activeThreadId) : false,
   );
+  // Pending state - POST fired but first WS event hasn't arrived yet
+  const isPending = useAIStreamStore((s) =>
+    activeThreadId ? s.isPending(activeThreadId) : false,
+  );
 
   // Background tasks for this thread (wakeUp tasks still pending/running)
   const messagesQuery = useApiQuery({
@@ -478,7 +515,11 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   const isActivelyStreaming = cacheStreamingState === "streaming";
   const isWaiting = cacheStreamingState === "waiting";
   const showStopButton =
-    isActivelyStreaming || isAborting || isWaiting || voiceRuntime.isSpeaking;
+    isActivelyStreaming ||
+    isAborting ||
+    isWaiting ||
+    isPending ||
+    voiceRuntime.isSpeaking;
 
   // Voice recording state
   const voice = useVoiceRecording({

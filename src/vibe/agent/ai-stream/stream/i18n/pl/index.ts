@@ -544,6 +544,8 @@ export const translations: typeof enTranslations = {
     timeout:
       "AI zajęło zbyt dużo czasu na odpowiedź (przekroczono limit po {{maxDuration}} sekundach). Spróbuj ponownie z krótszą wiadomością.",
     noResponse: "AI nie wygenerowało odpowiedzi. Spróbuj ponownie.",
+    contentFiltered:
+      "Ta odpowiedź została zablokowana przez filtr treści dostawcy. Spróbuj innego modelu.",
     modelUnavailable:
       "Wybrany model AI jest obecnie niedostępny. Spróbuj innego modelu.",
     rateLimitExceeded: "Zbyt wiele żądań. Poczekaj chwilę i spróbuj ponownie.",
