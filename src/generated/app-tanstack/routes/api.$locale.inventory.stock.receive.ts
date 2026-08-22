@@ -1,0 +1,12 @@
+// AUTO-GENERATED from src/inventory/stock/receive/route.ts. Add "use custom" to this file to preserve customizations.
+import { createFileRoute } from "@tanstack/react-router";
+
+import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
+
+export const Route = createFileRoute("/api/$locale/inventory/stock/receive")({
+  server: {
+    handlers: wrapNextApiRoute(
+      () => import("@/inventory/stock/receive/route"),
+    ),
+  },
+});

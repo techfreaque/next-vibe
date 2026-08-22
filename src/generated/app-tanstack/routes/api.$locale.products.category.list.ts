@@ -1,0 +1,12 @@
+// AUTO-GENERATED from src/products/category/list/route.ts. Add "use custom" to this file to preserve customizations.
+import { createFileRoute } from "@tanstack/react-router";
+
+import { wrapNextApiRoute } from "../nextjs-compat-wrapper";
+
+export const Route = createFileRoute("/api/$locale/products/category/list")({
+  server: {
+    handlers: wrapNextApiRoute(
+      () => import("@/products/category/list/route"),
+    ),
+  },
+});
