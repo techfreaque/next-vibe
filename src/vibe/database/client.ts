@@ -71,22 +71,10 @@ function resolvePgliteUrl(url: string): string {
   return pathToFileURL(resolve(osPath)).href;
 }
 
-// Guard against Vite SSR hot-reload evaluating this module twice in the same process.
-// PGlite is single-writer; two instances on the same file see divergent WAL states.
-// globalThis ensures exactly one PGlite instance per process regardless of how many
-// times this module is evaluated.
-declare global {
-  // eslint-disable-next-line no-var -- must be var for global augmentation
-  var __pgliteClient: PGlite | undefined;
-}
-
 function removeStalePgliteLock(dbUrl: string): void {
-  // PGlite leaves a postmaster.pid in the data directory after an unclean shutdown
-  // (e.g. dev server killed). On next startup, the stale lock causes PGlite to open
-  // the database in a degraded / read-only state — queries return 0 rows silently.
+  // PGlite leaves a postmaster.pid in the data directory after an unclean shutdown.
   // Remove it before opening so PGlite can do a clean WAL recovery.
   try {
-    // fileURLToPath handles both Unix (file:///path) and Windows (file:///C:/path)
     const dbPath = fileURLToPath(dbUrl);
     const lockPath = join(dbPath, "postmaster.pid");
     if (existsSync(lockPath)) {
@@ -97,16 +85,26 @@ function removeStalePgliteLock(dbUrl: string): void {
   }
 }
 
+// Vite re-evaluates this module on HMR, which would create a second PGlite instance
+// on the same data directory — causing the first to hold the lock and the second
+// to open in a degraded, empty-result state. We use globalThis as a module-singleton
+// so only one PGlite instance is ever live per process.
+// The lock removal happens FIRST so a fresh process always opens cleanly.
+const PGLITE_GLOBAL_KEY = "__vibe_pglite_client__";
 export let pgliteClient: PGlite | null = (() => {
   if (!isPglite) {
     return null;
   }
-  if (!globalThis.__pgliteClient) {
-    const resolvedUrl = resolvePgliteUrl(DATABASE_URL);
-    removeStalePgliteLock(resolvedUrl);
-    globalThis.__pgliteClient = new PGlite(resolvedUrl);
+  const resolvedUrl = resolvePgliteUrl(DATABASE_URL);
+  // Always attempt lock removal (idempotent). On the first evaluation this
+  // cleans up any stale lock before creating the instance. On re-evaluations
+  // the lock belongs to our own process and deletion is a no-op.
+  removeStalePgliteLock(resolvedUrl);
+  const g = globalThis as Record<string, PGlite | undefined>;
+  if (!g[PGLITE_GLOBAL_KEY]) {
+    g[PGLITE_GLOBAL_KEY] = new PGlite(resolvedUrl);
   }
-  return globalThis.__pgliteClient;
+  return g[PGLITE_GLOBAL_KEY] ?? null;
 })();
 
 /**

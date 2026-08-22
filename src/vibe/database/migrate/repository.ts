@@ -67,8 +67,21 @@ export class DatabaseMigrationRepository {
           const raw = await readFile(join(migrationsDir, file), "utf8");
           // PGlite doesn't support pgvector, GIN/GiST/BRIN/SP-GiST indexes,
           // or full-text search index expressions — strip those lines.
-          const sql = raw
-            .split("\n")
+          // Two-pass: first collect names of GIN/GiST indexes we'll strip, then
+          // also strip their corresponding DROP INDEX lines (which would fail on a
+          // fresh DB where those indexes were never created).
+          const lines = raw.split("\n");
+          const unsupportedIndexNames = new Set<string>();
+          for (const line of lines) {
+            const m =
+              /CREATE\s+(?:UNIQUE\s+)?INDEX\b.*?\b"?(\w+)"?\s+ON\b[^;]*\bUSING\s+(gin|gist|brin|spgist)\b/i.exec(
+                line,
+              );
+            if (m) {
+              unsupportedIndexNames.add(m[1]);
+            }
+          }
+          const sql = lines
             .filter((l) => !/^\s*CREATE EXTENSION/i.test(l))
             .filter(
               (l) =>
@@ -76,6 +89,11 @@ export class DatabaseMigrationRepository {
                   l,
                 ),
             )
+            .filter((l) => {
+              if (unsupportedIndexNames.size === 0) {return true;}
+              const m = /DROP\s+INDEX\b.*?"?(\w+)"?/i.exec(l);
+              return !(m && unsupportedIndexNames.has(m[1]));
+            })
             .join("\n")
             .replace(/\bvector\(\d+\)/gi, "text")
             .replace(/SET DATA TYPE vector\(\d+\)/gi, "SET DATA TYPE text");
