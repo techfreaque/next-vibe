@@ -43,7 +43,7 @@ async function getAccessToken(
     });
   }
 
-  const data = await response.json();
+  const data = (await response.json()) as { access_token?: string };
   if (!data.access_token) {
     return fail({
       message: t("errors.providerError"),

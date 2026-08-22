@@ -5,6 +5,16 @@ import type { SpanProps, SpanRefObject } from "../../web/components/span";
 import { parseClassesToInkProps } from "./tailwind-to-ink";
 import { TextStyleProvider, useResolvedTextStyle } from "./text-style-context";
 
+// Re-exported so `next-vibe/ui/components/span` carries the same type
+// surface regardless of which platform implementation a build resolves it
+// to - these are cross-platform synthetic event/ref shapes, not DOM-specific.
+export type {
+  SpanGenericTarget,
+  SpanMouseEvent,
+  SpanProps,
+  SpanRefObject,
+} from "../../web/components/span";
+
 // forwardRef is a no-op in CLI - terminals have no DOM refs.
 export const Span = React.forwardRef<SpanRefObject, SpanProps>(
   ({ className, children }: SpanProps, ref: React.Ref<SpanRefObject>) => {

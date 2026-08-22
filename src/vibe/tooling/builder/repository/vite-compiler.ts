@@ -1359,7 +1359,7 @@ class ViteCompiler {
                     localeDir,
                     { recursive: true },
                     // oxlint-disable-next-line no-unused-vars -- eventType unused, filename is the second positional arg
-                    (_eventType, filename) => {
+                    (_eventType: string, filename: string | null) => {
                       if (!filename) {
                         return;
                       }

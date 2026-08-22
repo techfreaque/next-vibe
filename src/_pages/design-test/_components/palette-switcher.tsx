@@ -694,6 +694,19 @@ const PALETTES: Palette[] = [
   },
 ];
 
+const PALETTE_PREVIEW_CLASSES = [
+  "bg-[hsl(224,71%,40%)]",
+  "bg-[hsl(221,83%,53%)]",
+  "bg-[hsl(160,84%,39%)]",
+  "bg-[hsl(340,82%,52%)]",
+  "bg-[hsl(37,91%,55%)]",
+  "bg-[hsl(173,80%,40%)]",
+  "bg-[hsl(263,83%,58%)]",
+  "bg-[hsl(215,16%,47%)]",
+  "bg-[hsl(0,72%,51%)]",
+  "bg-[hsl(239,84%,67%)]",
+] as const;
+
 const CSS_VAR_KEYS = [
   "background",
   "foreground",
@@ -812,15 +825,7 @@ export function PaletteSwitcher(): JSX.Element {
             onClick={() => handleSelect(index)}
           >
             <Span
-              style={{
-                backgroundColor: palette.preview,
-                width: "1rem",
-                height: "1rem",
-                borderRadius: "9999px",
-                border: "1px solid rgb(0 0 0 / 0.2)",
-                flexShrink: 0,
-                display: "inline-block",
-              }}
+              className={`w-4 h-4 rounded-full border border-foreground/20 shrink-0 inline-block ${PALETTE_PREVIEW_CLASSES[index] ?? "bg-primary"}`}
             />
             <Div className="flex flex-col items-start">
               <P className="text-xs font-semibold leading-tight">

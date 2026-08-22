@@ -222,7 +222,7 @@ const startSmartFileWatcher = async (
         const watcher = fs.watch(
           watchRoot,
           { recursive: true },
-          (eventType, filename) => {
+          (eventType: string, filename: string | null) => {
             if (!filename) {
               return;
             }

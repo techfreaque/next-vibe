@@ -42,7 +42,9 @@ function renderMcp(value: MusicGenerationPostResponseOutput): string {
   ].join("\n");
 }
 
-export function MusicGenerationWidget({ field }: CliWidgetProps): JSX.Element {
+export function MusicGenerationContainer({
+  field,
+}: CliWidgetProps): JSX.Element {
   const platform = useWidgetPlatform();
   const isMcp = platform === Platform.MCP;
 
@@ -65,4 +67,4 @@ export function MusicGenerationWidget({ field }: CliWidgetProps): JSX.Element {
   );
 }
 
-MusicGenerationWidget.cliWidget = true as const;
+MusicGenerationContainer.cliWidget = true as const;

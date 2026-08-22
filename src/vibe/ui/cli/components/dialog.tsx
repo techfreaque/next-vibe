@@ -13,8 +13,6 @@
  * their IDs so the dialog can auto-focus the first item on open and keep
  * Tab/Shift+Tab cycling within the scope.
  */
-import process from "node:process";
-
 import { Box, Text, useFocus, useFocusManager, useInput, useStdin } from "ink";
 import * as React from "react";
 

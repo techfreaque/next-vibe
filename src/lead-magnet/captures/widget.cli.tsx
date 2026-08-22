@@ -71,7 +71,7 @@ function renderMcp(value: CapturesListResponseOutput): string {
   return [`Total: ${value.total}`, ...lines].join("\n");
 }
 
-export function LeadMagnetCapturesCliWidget({
+export function LeadMagnetCapturesWidget({
   field,
 }: CliWidgetProps): JSX.Element {
   const platform = useWidgetPlatform();
@@ -96,4 +96,4 @@ export function LeadMagnetCapturesCliWidget({
   );
 }
 
-LeadMagnetCapturesCliWidget.cliWidget = true as const;
+LeadMagnetCapturesWidget.cliWidget = true as const;

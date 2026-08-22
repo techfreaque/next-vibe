@@ -169,7 +169,8 @@ export async function processStreamingResponseWithToolCalls(
         return;
       }
 
-      const reader = response.body.getReader();
+      const reader =
+        response.body.getReader() as ReadableStreamDefaultReader<Uint8Array>;
 
       try {
         while (true) {
@@ -183,7 +184,7 @@ export async function processStreamingResponseWithToolCalls(
           }
 
           // Append to buffer and split by newlines
-          buffer += decoder.decode(value, { stream: true });
+          buffer += decoder.decode(value as Uint8Array, { stream: true });
           const lines = buffer.split("\n");
 
           // Keep the last incomplete line in the buffer

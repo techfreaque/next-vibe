@@ -27,7 +27,7 @@ export const forwardLead: ForwardLeadFn = async (credentials, lead, t) => {
     },
   });
 
-  const authData = await authResponse.json();
+  const authData = (await authResponse.json()) as { access_token?: string };
 
   if (!authResponse.ok) {
     return fail({

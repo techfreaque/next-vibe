@@ -50,7 +50,7 @@ export class StdioTransport implements IMCPTransport {
     // Create readline interface
     // NOTE: Do NOT set output to process.stdout - it interferes with MCP protocol
     this.readlineInterface = readline.createInterface({
-      input: process.stdin,
+      input: process.stdin as NodeJS.ReadableStream,
       terminal: false,
     });
 

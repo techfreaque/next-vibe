@@ -378,7 +378,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
       });
     }
 
-    const invoice: NOWPaymentsInvoiceResponse = await response.json();
+    const invoice = (await response.json()) as NOWPaymentsInvoiceResponse;
 
     logger.debug("Created NOWPayments invoice - FULL RESPONSE");
 
@@ -623,7 +623,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
         });
       }
 
-      const subscription: NOWPaymentsSubscription = await response.json();
+      const subscription = (await response.json()) as NOWPaymentsSubscription;
 
       // Get the subscription plan to determine billing interval
       // oxlint-disable-next-line restricted/no-raw-fetch -- external API
@@ -643,8 +643,8 @@ export class NOWPaymentsProvider implements PaymentProvider {
         });
       }
 
-      const plan: NOWPaymentsSubscriptionPlan | null = planResponse.ok
-        ? await planResponse.json()
+      const plan = planResponse.ok
+        ? ((await planResponse.json()) as NOWPaymentsSubscriptionPlan)
         : null;
 
       // Calculate period dates
@@ -818,7 +818,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
         });
       }
 
-      const paymentStatus: NOWPaymentsPaymentStatus = await response.json();
+      const paymentStatus = (await response.json()) as NOWPaymentsPaymentStatus;
 
       logger.debug("Retrieved NOWPayments payment status", {
         paymentId,
@@ -901,7 +901,8 @@ export class NOWPaymentsProvider implements PaymentProvider {
         });
       }
 
-      const subscriptions: NOWPaymentsSubscription[] = await response.json();
+      const subscriptions =
+        (await response.json()) as NOWPaymentsSubscription[];
 
       logger.debug("Listed NOWPayments subscriptions", {
         count: subscriptions.length,

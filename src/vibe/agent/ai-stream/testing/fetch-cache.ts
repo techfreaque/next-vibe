@@ -835,10 +835,11 @@ async function engineFetch(
       if (isStreamResponse && real.body) {
         // Read the first chunk under the watchdog: a connection that opens and
         // never sends is indistinguishable from a slow model otherwise.
-        bodyReader = real.body.getReader();
+        bodyReader =
+          real.body.getReader() as ReadableStreamDefaultReader<Uint8Array>;
         watchdog.touchIdle(45_000);
         const first = await bodyReader.read();
-        firstChunk = first.done ? undefined : first.value;
+        firstChunk = first.done ? undefined : (first.value as Uint8Array);
       } else {
         // Non-streaming (JSON/binary): buffer under the watchdog.
         bufferedBody = new Uint8Array(await real.arrayBuffer());
@@ -911,10 +912,11 @@ async function engineFetch(
               controller.enqueue(initialChunk);
             }
             while (true) {
-              const { done, value } = await reader.read();
+              const { done, value: rawValue } = await reader.read();
               if (done) {
                 break;
               }
+              const value = rawValue as Uint8Array;
               wd.touchIdle(30_000);
               chunks.push(value);
               controller.enqueue(value);

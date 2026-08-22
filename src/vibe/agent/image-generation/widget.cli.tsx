@@ -38,7 +38,9 @@ function renderMcp(value: ImageGenerationPostResponseOutput): string {
   ].join("\n");
 }
 
-export function ImageGenerationWidget({ field }: CliWidgetProps): JSX.Element {
+export function ImageGenerationContainer({
+  field,
+}: CliWidgetProps): JSX.Element {
   const platform = useWidgetPlatform();
   const isMcp = platform === Platform.MCP;
 
@@ -61,4 +63,4 @@ export function ImageGenerationWidget({ field }: CliWidgetProps): JSX.Element {
   );
 }
 
-ImageGenerationWidget.cliWidget = true as const;
+ImageGenerationContainer.cliWidget = true as const;

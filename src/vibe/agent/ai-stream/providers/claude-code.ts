@@ -116,11 +116,12 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
     let finishReason: LanguageModelV2FinishReason = "other";
     let currentText = "";
 
-    const reader = streamResult.stream.getReader();
+    const reader =
+      streamResult.stream.getReader() as ReadableStreamDefaultReader<LanguageModelV2StreamPart>;
     try {
       let readResult = await reader.read();
       while (!readResult.done) {
-        const part = readResult.value;
+        const part = readResult.value as LanguageModelV2StreamPart;
         if (part.type === "text-delta") {
           currentText += part.delta;
         } else if (part.type === "finish") {

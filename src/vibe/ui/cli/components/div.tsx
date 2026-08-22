@@ -5,6 +5,18 @@ import type { DivProps, DivRefObject } from "../../web/components/div";
 import { parseClassesToInkProps } from "./tailwind-to-ink";
 import { TextStyleProvider } from "./text-style-context";
 
+// Re-exported so `next-vibe/ui/components/div` carries the same type surface
+// regardless of which platform implementation a build resolves it to - these
+// are cross-platform synthetic event/ref shapes, not DOM-specific.
+export type {
+  DivDragEvent,
+  DivGenericTarget,
+  DivKeyboardEvent,
+  DivMouseEvent,
+  DivProps,
+  DivRefObject,
+} from "../../web/components/div";
+
 /**
  * Wrap bare string/number children in <Text> so Ink doesn't crash.
  * In HTML, <div> can contain bare text. In Ink, <Box> cannot.

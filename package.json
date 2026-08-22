@@ -72,6 +72,11 @@
       "import": "./.dist/bin/vibe-runtime.js",
       "default": "./.dist/bin/vibe-runtime.js"
     },
+    "./ui/*": {
+      "types": "./src/vibe/ui/web/*",
+      "import": "./src/vibe/ui/web/*",
+      "default": "./src/vibe/ui/web/*"
+    },
     "./*": {
       "types": "./src/vibe/*",
       "import": "./src/vibe/*",

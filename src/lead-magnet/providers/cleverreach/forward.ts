@@ -33,7 +33,7 @@ export const forwardLead: ForwardLeadFn = async (credentials, lead, t) => {
     body: new URLSearchParams({ grant_type: "client_credentials" }),
   });
 
-  const authData = await authResponse.json();
+  const authData = (await authResponse.json()) as { access_token?: string };
 
   if (!authResponse.ok) {
     return fail({

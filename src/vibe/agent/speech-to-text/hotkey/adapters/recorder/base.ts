@@ -133,7 +133,8 @@ export abstract class BaseRecorder implements Recorder {
 
     // Monitor stderr for errors
     if (process.stderr && typeof process.stderr !== "number") {
-      const reader = process.stderr.getReader();
+      const reader =
+        process.stderr.getReader() as ReadableStreamDefaultReader<Uint8Array>;
       void this.readStderr(reader).catch(() => {
         // Ignore errors in monitoring
       });
@@ -151,11 +152,12 @@ export abstract class BaseRecorder implements Recorder {
       let buffer = "";
 
       while (this._isRecording) {
-        const { done, value } = await reader.read();
+        const { done, value: rawValue } = await reader.read();
         if (done) {
           break;
         }
 
+        const value = rawValue as Uint8Array;
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split("\n");
         buffer = lines.pop() || "";

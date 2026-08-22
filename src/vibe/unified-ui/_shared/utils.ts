@@ -653,6 +653,11 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
     return childField.hiddenForPlatforms.includes(platform);
   };
 
+  type FieldChildrenConstraint = AnyChildrenConstrain<
+    string,
+    ConstrainedChildUsage<FieldUsageConfig>
+  >;
+
   interface FieldWithType {
     schemaType?:
       | "primitive"
@@ -667,9 +672,19 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
     schema?: z.ZodTypeAny;
     children?: Record<
       string,
-      UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, any> // oxlint-disable-line typescript/no-explicit-any
+      UnifiedField<
+        string,
+        z.ZodTypeAny,
+        FieldUsageConfig,
+        FieldChildrenConstraint
+      >
     >;
-    child?: UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, any>; // oxlint-disable-line typescript/no-explicit-any
+    child?: UnifiedField<
+      string,
+      z.ZodTypeAny,
+      FieldUsageConfig,
+      FieldChildrenConstraint
+    >;
     discriminator?: string;
     variants?: readonly ObjectWidgetConfig<
       string,

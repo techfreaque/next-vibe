@@ -5,6 +5,7 @@ import {
   fail,
   success,
 } from "next-vibe/core/route/response.schema";
+import type { WidgetData } from "next-vibe/core/utils/json";
 
 import type { ForwardLeadFn } from "../types";
 
@@ -47,7 +48,7 @@ export const forwardLead: ForwardLeadFn = async (credentials, lead, t) => {
     },
   );
 
-  const data = await response.json();
+  const data = (await response.json()) as { data?: { errors?: WidgetData } };
 
   if (response.ok && !data?.data?.errors) {
     return success(undefined);

@@ -45,7 +45,9 @@ function renderMcp(value: VideoGenerationPostResponseOutput): string {
   return parts.join("\n");
 }
 
-export function VideoGenerationWidget({ field }: CliWidgetProps): JSX.Element {
+export function VideoGenerationContainer({
+  field,
+}: CliWidgetProps): JSX.Element {
   const platform = useWidgetPlatform();
   const isMcp = platform === Platform.MCP;
 
@@ -68,4 +70,4 @@ export function VideoGenerationWidget({ field }: CliWidgetProps): JSX.Element {
   );
 }
 
-VideoGenerationWidget.cliWidget = true as const;
+VideoGenerationContainer.cliWidget = true as const;
