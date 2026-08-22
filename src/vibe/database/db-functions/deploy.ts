@@ -26,7 +26,7 @@ import {
   formatError,
 } from "../../logger/formatters";
 import type { EndpointLogger } from "../../logger/types";
-import { db } from "..";
+import { db, isPglite } from "..";
 import type { DbFunction } from "./define";
 import type { PgType } from "./types";
 
@@ -41,6 +41,11 @@ type DbFunctionLike = DbFunction<
  * Called from server startup after Drizzle migrations.
  */
 export async function deployDbFunctions(logger: EndpointLogger): Promise<void> {
+  if (isPglite) {
+    logger.debug("PGlite mode — skipping db functions (plv8 not available)");
+    return;
+  }
+
   const startTime = Date.now();
 
   try {

@@ -1321,7 +1321,10 @@ async function seedTemplate(
     sortOrder: node.sortOrder,
   }));
 
-  await db.insert(coaTemplateNodes).values(nodeValues);
+  const CHUNK = 200;
+  for (let i = 0; i < nodeValues.length; i += CHUNK) {
+    await db.insert(coaTemplateNodes).values(nodeValues.slice(i, i + CHUNK));
+  }
 
   logger.debug(
     `Seeded CoA template: ${template.country} (${template.name}) with ${nodeValues.length} accounts`,

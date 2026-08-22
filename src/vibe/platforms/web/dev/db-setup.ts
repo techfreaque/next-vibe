@@ -250,7 +250,11 @@ export class DevDatabaseSetup {
       if (data.skipSeeding) {
         logger.vibe(formatSkip("Database seeding skipped"));
       } else {
-        await SeedRepository.seed("dev", logger);
+        try {
+          await SeedRepository.seed("dev", logger);
+        } catch (seedError) {
+          logger.warn("Seeding failed (non-fatal)", parseError(seedError));
+        }
       }
 
       return true;
