@@ -1308,6 +1308,16 @@ async function seedTemplate(
     return;
   }
 
+  // PGlite's returning() can return empty on first boot — fall back to SELECT
+  if (!inserted) {
+    const fallback = await db
+      .select({ id: coaTemplates.id })
+      .from(coaTemplates)
+      .where(eq(coaTemplates.country, template.country))
+      .limit(1);
+    inserted = fallback[0];
+  }
+
   if (!inserted) {
     logger.warn(`CoA template insert returned no row: ${template.country}`);
     return;
