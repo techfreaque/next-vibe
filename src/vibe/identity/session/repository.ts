@@ -131,9 +131,9 @@ export class SessionRepository {
     try {
       // Note: Logger not available for internal session methods
 
-      const results = await db.insert(sessions).values(data).returning();
+      const [inserted] = await db.insert(sessions).values(data).returning();
 
-      if (results.length === 0) {
+      if (!inserted) {
         const { t } = scopedTranslation.scopedT(locale);
         return fail({
           message: t("errors.session_creation_failed", {
@@ -143,7 +143,7 @@ export class SessionRepository {
         });
       }
 
-      return success(results[0]);
+      return success(inserted);
     } catch (error) {
       // Note: Logger not available for internal session methods
       const { t } = scopedTranslation.scopedT(locale);

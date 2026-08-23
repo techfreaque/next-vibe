@@ -25,13 +25,16 @@ export async function dev(
 ): Promise<void> {
   void locale;
 
-  // Find or create the first admin user to act as owner
-  const [adminUser] = await db.select({ id: users.id }).from(users).limit(1);
+  const adminUserId = (
+    await db.select({ id: users.id }).from(users).limit(1)
+  )[0]?.id;
 
-  if (!adminUser) {
+  if (!adminUserId) {
     logger.debug("No users found — skipping inventory seed");
     return;
   }
+
+  const adminUser = { id: adminUserId };
 
   // Check if a demo company already exists
   let [demoCompany] = await db
@@ -41,7 +44,6 @@ export async function dev(
     .limit(1);
 
   if (!demoCompany) {
-    // Create a demo company
     const [inserted] = await db
       .insert(companies)
       .values({
@@ -53,16 +55,14 @@ export async function dev(
       })
       .returning({ id: companies.id });
 
-    demoCompany = inserted;
-
-    if (!demoCompany) {
+    if (!inserted) {
       logger.error("Failed to create demo company");
       return;
     }
 
+    demoCompany = { id: inserted.id };
     logger.debug(`Created demo company: ${demoCompany.id}`);
 
-    // Add admin user as OWNER member
     await db
       .insert(companyMembers)
       .values({
@@ -114,7 +114,7 @@ export async function dev(
   let mainWarehouseId: string;
 
   if (!existingWarehouse) {
-    const [mainWarehouse] = await db
+    const [insertedWh] = await db
       .insert(warehouses)
       .values({
         companyId,
@@ -126,15 +126,14 @@ export async function dev(
       })
       .returning({ id: warehouses.id });
 
-    if (!mainWarehouse) {
+    if (!insertedWh) {
       logger.error("Failed to create main warehouse");
       return;
     }
 
-    mainWarehouseId = mainWarehouse.id;
+    mainWarehouseId = insertedWh.id;
     logger.debug(`Created main warehouse: ${mainWarehouseId}`);
 
-    // Also create a secondary warehouse
     await db
       .insert(warehouses)
       .values({

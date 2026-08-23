@@ -24,19 +24,21 @@ export async function dev(
   locale: CountryLanguage,
 ): Promise<void> {
   void locale;
-  // Find the first user (by creation order — this is the admin)
-  const adminUsers = await db
-    .select({ id: users.id, email: users.email })
-    .from(users)
-    .orderBy(users.createdAt)
-    .limit(1);
 
-  if (adminUsers.length === 0) {
+  const firstUserRow = (
+    await db
+      .select({ id: users.id, email: users.email })
+      .from(users)
+      .orderBy(users.createdAt)
+      .limit(1)
+  )[0];
+
+  if (!firstUserRow) {
     logger.warn("No users found — skipping products catalog seed");
     return;
   }
 
-  const adminUser = adminUsers[0];
+  const adminUser = firstUserRow;
 
   // Find the demo company for this user
   const memberRows = await db
@@ -55,7 +57,6 @@ export async function dev(
   if (memberRows.length > 0) {
     companyId = memberRows[0].companyId;
   } else {
-    // Fallback: find any company owned by this user
     const ownedCompanies = await db
       .select({ id: companies.id })
       .from(companies)
@@ -111,6 +112,10 @@ export async function dev(
       })
       .returning({ id: productCategories.id });
 
+    if (!inserted) {
+      logger.warn(`Failed to retrieve category id after insert: ${cat.name}`);
+      continue;
+    }
     categoryIds[cat.name] = inserted.id;
     logger.debug(`Seeded category: ${cat.name}`);
   }

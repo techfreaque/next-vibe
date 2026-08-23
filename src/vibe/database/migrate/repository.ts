@@ -90,14 +90,27 @@ export class DatabaseMigrationRepository {
                 ),
             )
             .filter((l) => {
-              if (unsupportedIndexNames.size === 0) {return true;}
+              if (unsupportedIndexNames.size === 0) {
+                return true;
+              }
               const m = /DROP\s+INDEX\b.*?"?(\w+)"?/i.exec(l);
               return !(m && unsupportedIndexNames.has(m[1]));
             })
             .join("\n")
             .replace(/\bvector\(\d+\)/gi, "text")
             .replace(/SET DATA TYPE vector\(\d+\)/gi, "SET DATA TYPE text");
-          await client.exec(sql);
+          try {
+            await client.exec(sql);
+          } catch (execError) {
+            const msg =
+              execError instanceof Error
+                ? execError.message
+                : String(execError);
+            logger.error(`PGlite migration failed on file: ${file}`, {
+              error: msg,
+            });
+            throw execError;
+          }
           await client.query(
             "INSERT INTO __drizzle_migrations__ (hash, created_at) VALUES ($1, $2)",
             [file, Date.now()],

@@ -544,7 +544,11 @@ async function generateLeadEngagements(
   }
 
   if (engagements.length > 0) {
-    await db.insert(leadEngagements).values(engagements);
+    // Chunk large batch inserts to avoid query size limits
+    const CHUNK = 200;
+    for (let i = 0; i < engagements.length; i += CHUNK) {
+      await db.insert(leadEngagements).values(engagements.slice(i, i + CHUNK));
+    }
     logger.debug(`✅ Generated ${engagements.length} lead engagements`);
   }
 }
@@ -618,7 +622,11 @@ async function generateEmailCampaigns(
   }
 
   if (campaigns.length > 0) {
-    await db.insert(emailCampaigns).values(campaigns);
+    // Chunk large batch inserts to avoid query size limits
+    const CHUNK = 200;
+    for (let i = 0; i < campaigns.length; i += CHUNK) {
+      await db.insert(emailCampaigns).values(campaigns.slice(i, i + CHUNK));
+    }
     logger.debug(`✅ Generated ${campaigns.length} email campaigns`);
   }
 }
@@ -853,7 +861,6 @@ export async function dev(logger: EndpointLogger): Promise<void> {
     sampleLeads.push(generateRandomLead(index));
   }
 
-  // Insert sample leads
   const insertedLeads = await db
     .insert(leads)
     .values(sampleLeads)

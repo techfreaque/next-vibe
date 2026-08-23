@@ -1,39 +1,27 @@
 import "server-only";
 
 import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
-import { drizzle as drizzlePglite } from "drizzle-orm/pglite";
 import type { Pool } from "pg";
 
 import { parseError } from "../core/utils/parse-error";
 import type { EndpointLogger } from "../logger/types";
-import {
-  isPglite,
-  pgliteAsNodePg,
-  pgliteClient,
-  pool,
-  recreatePool,
-} from "./client";
+import { isPglite, onPgliteReopen, pool, recreatePool } from "./client";
 
-export { isPglite, pgliteClient } from "./client";
+export { getLivePgliteClient, isPglite, pgliteClient } from "./client";
+export { jsonbBool, supportsAdvancedSql } from "./compat";
 
 /**
  * Default database client — registered with NO schema.
  *
- * `.select()/.insert()/.update()/.delete()/.execute()/.transaction()` do not
- * need a registered schema (table types come from the imported table objects),
- * so the vast majority of callers use this bare client with full type safety.
+ * In both standard (pg) and PGlite modes, `pool` is a pg.Pool:
+ *  - Standard: pool → DATABASE_URL postgres
+ *  - PGlite: pool → Unix socket served by pglite-server.ts
  *
- * The relational query API (`db.query.<table>...`) is NOT available here — it
- * lives on per-domain clients built via `./relational.ts` (`createRelationalDb`)
- * and exported from each domain's `db.ts`. This is deliberate: it keeps the
- * 20-domain schema fan-out out of this module, so importing `db` no longer
- * transitively references every domain's table definitions.
+ * This means `db` is always just drizzle(pool) — no Proxy needed.
  */
 
 /**
  * PGlite shim that satisfies the Pool interface used by ping/health.
- * Exposes the same .query(), .totalCount, .idleCount, .waitingCount surface
- * so callers need zero changes when running against an embedded DB.
  */
 interface RawPoolShim {
   query(sql: string): Promise<void>;
@@ -45,46 +33,24 @@ interface RawPoolShim {
   end(): Promise<void>;
 }
 
-/**
- * Drizzle ORM database client (no schema registered).
- * PGlite mode: embedded in-process Postgres stored at the file: path.
- * Standard mode: pg connection pool.
- */
-export let db: NodePgDatabase<Record<string, never>> = (() => {
-  if (isPglite) {
-    return pgliteAsNodePg(
-      drizzlePglite(pgliteClient as NonNullable<typeof pgliteClient>),
-    );
-  }
-  return drizzle(pool as Pool);
-})();
+// pool is non-null at this point: isPglite initialises pool in client.ts,
+// standard mode initialises pool in client.ts.
+export let db: NodePgDatabase<Record<string, never>> = drizzle(pool as Pool);
 
-/**
- * Raw pool for direct queries (pool stats, health checks).
- * In PGlite mode this is a shim with the same surface — callers need no changes.
- */
-export let rawPool: RawPoolShim = isPglite
-  ? {
-      query: (querySql: string) =>
-        db.execute(querySql as never).then(() => undefined),
-      totalCount: 1,
-      idleCount: 1,
-      waitingCount: 0,
-      ending: false,
-      ended: false,
-      end: () => Promise.resolve(),
-    }
-  : (pool as Pool); // pool is non-null here: isPglite=false branch initialises pool in ./client.ts
+export let rawPool: RawPoolShim = pool as Pool;
 
-/**
- * Track if database has been closed to prevent double-close errors
- */
+// In PGlite mode, after reopenPgliteAfterMigrations() the server restarts on
+// the new instance. The socket pool continues to work unchanged — no rebuild needed.
+// We still register a no-op so that relational.ts and other listeners remain in
+// the callback set.
+if (isPglite) {
+  onPgliteReopen(() => {
+    // Intentional no-op — socket pool connects to the restarted server automatically.
+  });
+}
+
 let databaseClosed = false;
 
-/**
- * Gracefully close database connections
- * Should be called when the application is shutting down
- */
 export async function closeDatabase(logger: EndpointLogger): Promise<void> {
   if (databaseClosed) {
     return;
@@ -101,10 +67,6 @@ export async function closeDatabase(logger: EndpointLogger): Promise<void> {
   }
 }
 
-/**
- * Reopen database connections after a reset (e.g. `vibe dev -r`).
- * No-op in PGlite mode (embedded db doesn't need reconnection).
- */
 export function reopenDatabase(): void {
   if (isPglite) {
     return;

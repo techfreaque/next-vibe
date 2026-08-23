@@ -2128,7 +2128,10 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
                 filePath.endsWith(".test.ts") ||
                 filePath.endsWith(".test.tsx") ||
                 filePath.endsWith(".spec.ts") ||
-                filePath.endsWith(".spec.tsx")
+                filePath.endsWith(".spec.tsx") ||
+                // PGlite socket directory — changes here are runtime DB events, not source
+                filePath.includes(".db.pg") ||
+                filePath.includes(".db.pg.lock")
               );
             },
             // disableGlobbing tells chokidar to treat bracket paths as literal paths,

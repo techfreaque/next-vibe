@@ -84,13 +84,15 @@ export async function dev(
         logger.debug(
           `User with email ${user.email} already exists, skipping creation`,
         );
-        // Get existing user ID to fetch later after leads are created
-        const results = await db
-          .select({ id: users.id })
-          .from(users)
-          .where(eq(users.email, user.email))
-          .limit(1);
-        if (results.length > 0) {
+        const existingId2 = (
+          await db
+            .select({ id: users.id })
+            .from(users)
+            .where(eq(users.email, user.email))
+            .limit(1)
+        )[0]?.id;
+        if (existingId2) {
+          const results = [{ id: existingId2 }];
           // Admin user (index 0): sync password + profile data from env
           if (i === 0) {
             const adminUpdates: Record<string, string> = {};
@@ -166,22 +168,35 @@ export async function dev(
         .where(eq(leads.email, user.email))
         .limit(1);
 
-      let leadId: string;
+      let leadId: string | undefined;
       if (existingLeads.length > 0) {
         leadId = existingLeads[0].id;
       } else {
         // Create lead
-        const leadData = {
-          email: user.email,
-          businessName: user.publicName || "",
-          status: LeadStatus.SIGNED_UP,
-          source: LeadSource.WEBSITE,
-          country,
-          language,
-        };
-        const [newLead] = await db.insert(leads).values(leadData).returning();
-        leadId = newLead.id;
+        const [insertedLead] = await db
+          .insert(leads)
+          .values({
+            email: user.email,
+            businessName: user.publicName || "",
+            status: LeadStatus.SIGNED_UP,
+            source: LeadSource.WEBSITE,
+            country,
+            language,
+          })
+          .returning({ id: leads.id });
+        leadId = insertedLead?.id;
+        if (!leadId) {
+          logger.warn(
+            `Failed to retrieve lead id for ${user.email} — skipping link`,
+          );
+          continue;
+        }
         leadsCreated.push(leadId);
+      }
+
+      if (!leadId) {
+        logger.warn(`No leadId for user ${user.id} — skipping link`);
+        continue;
       }
 
       // Check if user-lead link already exists

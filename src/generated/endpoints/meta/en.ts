@@ -5694,7 +5694,7 @@ export const endpointsMeta: EndpointMeta[] = [
       responses: {
         default: {
           variantKey: "MY_VARIANT",
-          updatedAt: "2026-08-22T12:01:41.811Z",
+          updatedAt: "2026-08-23T22:02:22.493Z",
         },
       },
     },

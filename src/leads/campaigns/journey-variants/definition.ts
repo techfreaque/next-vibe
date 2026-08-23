@@ -545,7 +545,7 @@ const { PATCH } = createEndpoint({
     responses: {
       default: {
         variantKey: "MY_VARIANT",
-        updatedAt: new Date().toISOString(),
+        updatedAt: new Date("2026-08-23T22:02:22.493Z"),
       },
     },
   },

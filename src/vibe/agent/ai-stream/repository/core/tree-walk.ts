@@ -4,7 +4,7 @@ import "server-only";
 
 import { and, desc, eq, sql } from "drizzle-orm";
 import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
+import { db, jsonbBool } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { type ChatMessage, chatMessages } from "../../../chat/db";
@@ -182,8 +182,7 @@ export async function fetchAncestorBranch(
       INNER JOIN ancestors a ON m.id = a."parentId"
         AND m.thread_id = ${threadId}
       WHERE NOT (
-        (a.metadata->>'isCompacting')::boolean IS TRUE
-        AND (a.metadata->>'compactingFailed')::boolean IS NOT TRUE
+        ${jsonbBool(sql.raw("a.metadata"), "isCompacting")} IS TRUE AND ${jsonbBool(sql.raw("a.metadata"), "compactingFailed")} IS NOT TRUE
       )
     )
     SELECT * FROM ancestors

@@ -187,20 +187,19 @@ export async function dev(logger: EndpointLogger): Promise<void> {
       return;
     }
 
-    const adminResults = await db
-      .select({ id: users.id })
-      .from(users)
-      .where(eq(users.email, adminEmail))
-      .limit(1);
-
-    if (adminResults.length === 0) {
+    const adminId = (
+      await db
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.email, adminEmail))
+        .limit(1)
+    )[0]?.id;
+    if (!adminId) {
       logger.warn(
         `Admin user (${adminEmail}) not found, skipping skill seeds. Run user seeds first.`,
       );
       return;
     }
-
-    const adminId = adminResults[0].id;
 
     // Collect existing slugs to ensure uniqueness across all seeds
     const existingSlugsResult = await db

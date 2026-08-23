@@ -669,6 +669,13 @@ export const translations: typeof enTranslations = {
     imagePlaceholder: "Opisz obraz do wygenerowania...",
     audioPlaceholder: "Opisz dźwięk lub muzykę do wygenerowania...",
     noPermission: "Nie masz uprawnień do publikowania tutaj",
+    noCredits: {
+      title: "Skończyły się kredyty",
+      addCredits: "Doładuj kredyty",
+    },
+    insufficientCredits: {
+      title: "Za mało kredytów (potrzeba {{cost}}, masz {{balance}})",
+    },
     keyboardShortcuts: {
       enter: "Enter",
       toSend: "aby wysłać",

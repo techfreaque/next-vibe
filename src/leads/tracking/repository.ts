@@ -18,7 +18,6 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
-// Removed unused import - using direct database operations instead
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { leads } from "next-vibe/identity/lead/db";

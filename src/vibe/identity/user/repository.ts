@@ -24,7 +24,7 @@ import { AuthRepository } from "../auth/repository";
 import { LeadAuthRepository } from "../lead/device-auth";
 import { UserRole, type UserRoleValue } from "../roles/enum";
 import { UserRolesRepository } from "../roles/repository";
-import type { NewUser, User } from "./db";
+import type { NewUser } from "./db";
 import { users } from "./db";
 import { UserDetailLevel } from "./enum";
 import { scopedTranslation as userScopedTranslation } from "./i18n";
@@ -245,12 +245,15 @@ export class UserRepository {
   ): Promise<ResponseType<ExtendedUserType<T>>> {
     try {
       const { t } = userScopedTranslation.scopedT(locale);
-      const results = await db
-        .select({ id: users.id })
-        .from(users)
-        .where(eq(users.email, email));
+      const userId = (
+        await db
+          .select({ id: users.id })
+          .from(users)
+          .where(eq(users.email, email))
+          .limit(1)
+      )[0]?.id;
 
-      if (results.length === 0) {
+      if (!userId) {
         return fail({
           message: t("errors.not_found_by_email", { email }),
           errorType: ErrorResponseTypes.NOT_FOUND,
@@ -258,7 +261,7 @@ export class UserRepository {
       }
 
       return await UserRepository.getUserById(
-        results[0].id,
+        userId,
         detailLevel,
         locale,
         logger,
@@ -315,12 +318,15 @@ export class UserRepository {
     locale: CountryLanguage,
   ): Promise<ResponseType<boolean>> {
     try {
-      const results = await db
-        .select({ id: users.id })
-        .from(users)
-        .where(eq(users.email, email))
-        .limit(1);
-      return success(results.length > 0);
+      const found =
+        (
+          await db
+            .select({ id: users.id })
+            .from(users)
+            .where(eq(users.email, email))
+            .limit(1)
+        ).length > 0;
+      return success(found);
     } catch (error) {
       logger.error("Error checking if email exists", parseError(error));
       const { t } = userScopedTranslation.scopedT(locale);
@@ -383,8 +389,12 @@ export class UserRepository {
         ...data,
         password: hashedPassword,
       };
-      const results = await db.insert(users).values(hashedData).returning();
-      if (results.length === 0) {
+      const [inserted] = await db
+        .insert(users)
+        .values(hashedData)
+        .returning({ id: users.id });
+
+      if (!inserted) {
         const { t } = userScopedTranslation.scopedT(locale);
         return fail({
           message: t("errors.creation_failed", {
@@ -393,27 +403,13 @@ export class UserRepository {
           errorType: ErrorResponseTypes.DATABASE_ERROR,
         });
       }
-      const createdUser = results[0] as User;
 
-      const standardUser: StandardUserType = {
-        id: createdUser.id,
-        leadId: "" as string,
-        isPublic: false,
-        privateName: createdUser.privateName,
-        publicName: createdUser.publicName,
-        email: createdUser.email,
-        locale: createdUser.locale,
-        emailVerified: createdUser.emailVerified,
-        isActive: createdUser.isActive,
-        requireTwoFactor: false,
-        marketingConsent: createdUser.marketingConsent ?? false,
-        createdAt: createdUser.createdAt,
-        updatedAt: createdUser.updatedAt,
-        userRoles: [],
-        roles: [],
-      };
-
-      return success(standardUser);
+      return await UserRepository.getUserById(
+        inserted.id,
+        UserDetailLevel.STANDARD,
+        locale,
+        logger,
+      );
     } catch (error) {
       logger.error(
         "Error creating user with hashed password",

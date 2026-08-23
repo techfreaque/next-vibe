@@ -15,6 +15,7 @@ import { Send } from "next-vibe/ui/components/icons/Send";
 import { Square } from "next-vibe/ui/components/icons/Square";
 import { X } from "next-vibe/ui/components/icons/X";
 import { Kbd } from "next-vibe/ui/components/kbd";
+import { Link } from "next-vibe/ui/components/link";
 import {
   Select,
   SelectContent,
@@ -358,10 +359,10 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
       )
     : 0;
   // Allow typing during streaming - queued messages can be sent while AI is active
-  const isInputDisabled =
-    !canPost ||
-    messageOps.creditsTotal <= 0 ||
-    (modelCost > 0 && messageOps.creditsTotal < modelCost);
+  const noCredits = messageOps.creditsTotal <= 0;
+  const insufficientCredits =
+    !noCredits && modelCost > 0 && messageOps.creditsTotal < modelCost;
+  const isInputDisabled = !canPost || noCredits || insufficientCredits;
 
   // Model-type-aware UI
   // Chat stream pipeline only handles chat models; image/audio go through separate endpoints.
@@ -649,7 +650,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
           />
 
           {/* Hint overlay */}
-          {!input && canPost && (
+          {!input && canPost && !noCredits && !insufficientCredits && (
             <Div className="absolute inset-0 pl-3 pr-3 pointer-events-none hidden @sm:flex flex-col justify-between pb-1">
               <Div className="text-sm text-foreground pt-2">
                 {isImageModel
@@ -689,6 +690,26 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
           {!canPost && (
             <Div className="absolute pl-3 top-2 left-0 pointer-events-none text-sm text-destructive">
               {noPermissionReason || t("input.noPermission")}
+            </Div>
+          )}
+
+          {/* No credits / insufficient credits error */}
+          {canPost && (noCredits || insufficientCredits) && (
+            <Div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 pointer-events-none">
+              <Div className="text-sm font-medium text-destructive">
+                {noCredits
+                  ? t("input.noCredits.title")
+                  : t("input.insufficientCredits.title", {
+                      cost: modelCost,
+                      balance: messageOps.creditsTotal,
+                    })}
+              </Div>
+              <Link
+                href={`/${locale}/subscription/buy`}
+                className="pointer-events-auto text-xs text-primary underline underline-offset-2 hover:text-primary/80"
+              >
+                {t("input.noCredits.addCredits")}
+              </Link>
             </Div>
           )}
         </Div>

@@ -14,7 +14,12 @@ import { basename } from "node:path";
 import { coreEnv } from "../../../core/env";
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import { parseError } from "../../../core/utils/parse-error";
-import { isPglite } from "../../../database/client";
+import {
+  healPgliteIfCorrupted,
+  isPglite,
+  pgliteClient,
+  reopenPgliteAfterMigrations,
+} from "../../../database/client";
 import { databaseEnv } from "../../../database/env";
 import { DatabaseGenerateRepository } from "../../../database/generate/repository";
 import { closeDatabase, reopenDatabase } from "../../../database/index";
@@ -210,6 +215,13 @@ export class DevDatabaseSetup {
           );
         }
 
+        // PGlite: probe the live instance before migrations. A WASM Aborted()
+        // crash means the heap files are physically unrecoverable — wipe and
+        // reinitialise so migrations can proceed on a clean DB.
+        if (isPglite) {
+          await healPgliteIfCorrupted();
+        }
+
         // Run migrations if not skipped (only when not resetting)
         if (data.skipMigrations) {
           logger.vibe(formatSkip("Migrations skipped"));
@@ -245,6 +257,12 @@ export class DevDatabaseSetup {
       const { deployDbFunctions } =
         await import("../../../database/db-functions/deploy");
       await deployDbFunctions(logger);
+
+      // PGlite: reopen after migrations so seeds see a fully-committed state.
+      // Also forces SSR Nitro worker to use the correct post-migration snapshot.
+      if (isPglite) {
+        await reopenPgliteAfterMigrations();
+      }
 
       // Seed database if not skipped
       if (data.skipSeeding) {
@@ -282,7 +300,12 @@ export class DevDatabaseSetup {
     logger.debug(
       `🔄 ${formatActionCommand("Resetting database using:", "docker compose down && docker volume rm")}`,
     );
-    await DevDatabaseSetup.performHardDatabaseReset(logger, locale, isPreview);
+    await DevDatabaseSetup.performHardDatabaseReset(
+      logger,
+      locale,
+      isPreview,
+      activePidFile,
+    );
     const duration = Date.now() - startTime;
     logger.info(`✓  Reset completed in ${formatDuration(duration)}`);
 
@@ -290,7 +313,7 @@ export class DevDatabaseSetup {
     if (data.skipMigrations) {
       logger.vibe(formatSkip("Migrations skipped"));
     } else {
-      if (!data.skipMigrationGeneration) {
+      if (!data.skipMigrationGeneration && !isPglite) {
         const generateResult = await DatabaseGenerateRepository.runGenerate(
           logger,
           true,
@@ -317,13 +340,75 @@ export class DevDatabaseSetup {
   }
 
   /**
+   * Reset PGlite database: close the instance, delete the data directory,
+   * then re-exec the process without -r so a fresh WASM heap is used.
+   * Never returns — exits the current process.
+   */
+  private static async resetPgliteDatabase(
+    logger: EndpointLogger,
+    activePidFile: string,
+  ): Promise<void> {
+    const { rm } = await import("node:fs/promises");
+    const { fileURLToPath } = await import("node:url");
+    const { resolve } = await import("node:path");
+
+    // Close the live PGlite instance before deleting its files.
+    if (pgliteClient) {
+      try {
+        await pgliteClient.close();
+      } catch {
+        // Best effort — if already closed, proceed.
+      }
+    }
+
+    // Resolve the data directory path from DATABASE_URL (file:///abs/path or file:rel/path).
+    const dbUrl = databaseEnv.DATABASE_URL;
+    let dbPath: string;
+    if (dbUrl.startsWith("file://")) {
+      dbPath = fileURLToPath(dbUrl);
+    } else {
+      dbPath = resolve(dbUrl.replace(/^file:/, ""));
+    }
+
+    logger.vibe(formatDatabase(`Deleting PGlite data: ${dbPath}`, "🗑️"));
+    try {
+      await rm(dbPath, { recursive: true, force: true });
+    } catch (err) {
+      logger.warn("Failed to delete PGlite data directory", parseError(err));
+    }
+
+    // PGlite WASM cannot be re-initialised in the same process after close()
+    // (the old heap is never freed). Re-exec the process without the -r flag so
+    // the fresh process opens a clean WASM instance from the empty data directory.
+    const { spawn } = await import("node:child_process");
+    const args = process.argv
+      .slice(1)
+      .filter((a) => a !== "-r" && a !== "--db-reset");
+    logger.vibe(formatDatabase("Restarting dev server on fresh DB…", "🔄"));
+    const child = spawn(process.execPath, args, {
+      stdio: "inherit",
+      detached: true,
+      env: process.env,
+    });
+    child.unref();
+    cleanupPidFile(activePidFile);
+    process.exit(0);
+  }
+
+  /**
    * Perform hard database reset: stop containers, delete data, restart
    */
   private static async performHardDatabaseReset(
     logger: EndpointLogger,
     locale: CountryLanguage,
     isPreview: boolean,
+    activePidFile: string,
   ): Promise<void> {
+    if (isPglite) {
+      await DevDatabaseSetup.resetPgliteDatabase(logger, activePidFile);
+      return;
+    }
+
     const { exec } = await import("node:child_process");
     const { promisify } = await import("node:util");
     const execAsync = promisify(exec);

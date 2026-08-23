@@ -431,8 +431,7 @@ export class AuthRepository {
       return existingLead.id;
     }
 
-    // Create new lead with user email
-    const [newLead] = await db
+    const [insertedLead] = await db
       .insert(leads)
       .values({
         email: user.email,
@@ -442,19 +441,25 @@ export class AuthRepository {
         country,
         language,
       })
-      .returning();
+      .returning({ id: leads.id });
+    const newLeadId = insertedLead?.id;
+
+    if (!newLeadId) {
+      logger.error("Failed to retrieve new lead id after insert", { userId });
+      return null;
+    }
 
     await db
       .insert(userLeadLinks)
       .values({
         userId,
-        leadId: newLead.id,
+        leadId: newLeadId,
         linkReason: "signup",
       })
       .onConflictDoNothing();
 
-    logger.debug("Created lead for user", { userId, leadId: newLead.id });
-    return newLead.id;
+    logger.debug("Created lead for user", { userId, leadId: newLeadId });
+    return newLeadId;
   }
 
   /**
@@ -472,7 +477,7 @@ export class AuthRepository {
       // Always create a new lead for public users
       // Platform handlers are responsible for checking/storing lead IDs
       const { language, country } = getLanguageAndCountryFromLocale(locale);
-      const [newLead] = await db
+      const [insertedPublicLead] = await db
         .insert(leads)
         .values({
           email: null,
@@ -482,10 +487,20 @@ export class AuthRepository {
           country,
           language,
         })
-        .returning();
+        .returning({ id: leads.id });
+      const newPublicLeadId = insertedPublicLead?.id;
 
-      logger.debug("Created public lead", { leadId: newLead.id });
-      return newLead.id;
+      if (!newPublicLeadId) {
+        logger.error("Failed to retrieve new public lead id after insert");
+        const { t: tErr } = scopedTranslation.scopedT(locale);
+        throwErrorResponse(
+          tErr("errors.failed_to_create_lead"),
+          ErrorResponseTypes.INTERNAL_ERROR,
+        );
+      }
+
+      logger.debug("Created public lead", { leadId: newPublicLeadId });
+      return newPublicLeadId;
     } catch (error) {
       logger.error("Error getting public lead ID", parseError(error));
       const { t } = scopedTranslation.scopedT(locale);

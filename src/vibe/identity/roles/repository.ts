@@ -179,14 +179,13 @@ export class UserRolesRepository {
         role: data.role,
       };
 
-      // Create the role
       const validatedData = insertUserRoleSchema.parse(roleData);
-      const results = await db
+      const [inserted] = await db
         .insert(userRoles)
         .values(validatedData)
         .returning();
 
-      if (results.length === 0) {
+      if (!inserted) {
         const { t } = scopedTranslation.scopedT(locale);
         return fail({
           message: t("errors.add_failed", {
@@ -198,7 +197,7 @@ export class UserRolesRepository {
         });
       }
 
-      return success(results[0]);
+      return success(inserted);
     } catch (error) {
       logger.error("Error adding role to user", parseError(error));
       const { t } = scopedTranslation.scopedT(locale);

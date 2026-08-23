@@ -676,6 +676,13 @@ export const translations = {
     imagePlaceholder: "Describe an image to generate...",
     audioPlaceholder: "Describe audio or music to generate...",
     noPermission: "You don't have permission to post here",
+    noCredits: {
+      title: "No credits left",
+      addCredits: "Add credits",
+    },
+    insufficientCredits: {
+      title: "Not enough credits (need {{cost}}, have {{balance}})",
+    },
     keyboardShortcuts: {
       enter: "Enter",
       toSend: "to send",

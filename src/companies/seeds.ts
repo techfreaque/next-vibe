@@ -22,18 +22,16 @@ export async function dev(
   locale: CountryLanguage,
 ): Promise<void> {
   void locale;
-  // Find the first admin user (lowest createdAt)
-  const adminUsers = await db
-    .select({ id: users.id, email: users.email })
-    .from(users)
-    .limit(1);
+  const firstUserRow = (
+    await db.select({ id: users.id, email: users.email }).from(users).limit(1)
+  )[0];
 
-  if (adminUsers.length === 0) {
+  if (!firstUserRow) {
     logger.warn("No users found — skipping companies seed");
     return;
   }
 
-  const adminUser = adminUsers[0];
+  const adminUser = firstUserRow;
 
   // Check if demo company already exists
   const existing = await db
@@ -48,7 +46,7 @@ export async function dev(
     companyId = existing[0].id;
     logger.debug(`Demo company already exists: ${companyId}`);
   } else {
-    const [company] = await db
+    const [inserted] = await db
       .insert(companies)
       .values({
         name: DEMO_COMPANY_NAME,
@@ -60,7 +58,11 @@ export async function dev(
       })
       .returning({ id: companies.id });
 
-    companyId = company.id;
+    if (!inserted) {
+      logger.warn("Failed to retrieve demo company id after insert — skipping");
+      return;
+    }
+    companyId = inserted.id;
     logger.debug(`Created demo company: ${companyId}`);
   }
 

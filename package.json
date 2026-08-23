@@ -112,7 +112,7 @@
     "@dnd-kit/modifiers": "^9.0.0",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
-    "@electric-sql/pglite": "^0.5.4",
+    "@electric-sql/pglite": "0.5.6",
     "@emotion/is-prop-valid": "1.4.0",
     "@hookform/resolvers": "5.7.1",
     "@icons-pack/react-simple-icons": "13.8.0",

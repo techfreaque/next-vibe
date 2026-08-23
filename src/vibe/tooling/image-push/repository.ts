@@ -180,13 +180,20 @@ export class ImagePushRepository {
 
     const sshOpts =
       "-oServerAliveInterval=30 -oServerAliveCountMax=10 -oTCPKeepAlive=yes -oStrictHostKeyChecking=no";
-    const refList = refs.map((ref) => `"${ref}"`).join(" ");
     const remoteRmi = refs.join(" ");
+    // Save only the SHA-tagged ref - docker save with multiple tags of the same
+    // image produces one archive but the tag metadata can get lost on load.
+    // We retag as :latest explicitly after load so docker compose picks it up.
+    const shaRef = refs[0];
+    const latestRef =
+      refs.find((r) => r.endsWith(":latest")) ??
+      `${shaRef?.split(":")[0] ?? ""}:latest`;
     // gzip cuts ~5 GB to ~2 GB in flight; concurrent save|gzip|ssh|gunzip|load
     // is faster than sequential save-then-copy, and finishes well under any
     // SSH idle-timeout that would kill a raw 5 GB stream.
     // docker rmi before load so the old image is deleted rather than renamed to <none>.
-    const pipeline = `docker save ${refList} | gzip -1 | ssh ${sshOpts} ${sshTarget} "docker rmi -f ${remoteRmi} 2>/dev/null; gunzip | docker load; docker image prune -f"`;
+    // Explicitly retag as :latest after load so docker compose can always find it.
+    const pipeline = `docker save "${shaRef}" | gzip -1 | ssh ${sshOpts} ${sshTarget} "docker rmi -f ${remoteRmi} 2>/dev/null; gunzip | docker load && docker tag ${shaRef} ${latestRef}"`;
     const transferResult = spawnSync("sh", ["-c", pipeline], {
       stdio: "inherit",
       cwd: process.cwd(),
@@ -240,9 +247,13 @@ export class ImagePushRepository {
   ): ResponseType<void> {
     const { port } = ImagePushRepository.parseSshTarget(sshTarget);
     const sshOpts = `-oServerAliveInterval=30 -oServerAliveCountMax=10 -oTCPKeepAlive=yes -oStrictHostKeyChecking=no -oPort=${String(port)}`;
-    const refList = refs.map((ref) => `"${ref}"`).join(" ");
     const remoteRmi = refs.join(" ");
-    const pipeline = `docker save ${refList} | gzip -1 | sshpass -p ${JSON.stringify(password)} ssh ${sshOpts} ${sshTarget} "docker rmi -f ${remoteRmi} 2>/dev/null; gunzip | docker load; docker image prune -f"`;
+    const shaRef = refs[0];
+    const latestRef =
+      refs.find((r) => r.endsWith(":latest")) ??
+      `${shaRef?.split(":")[0] ?? ""}:latest`;
+    // Explicitly retag as :latest after load so docker compose can always find it.
+    const pipeline = `docker save "${shaRef}" | gzip -1 | sshpass -p ${JSON.stringify(password)} ssh ${sshOpts} ${sshTarget} "docker rmi -f ${remoteRmi} 2>/dev/null; gunzip | docker load && docker tag ${shaRef} ${latestRef}"`;
     const result = spawnSync("sh", ["-c", pipeline], {
       stdio: "inherit",
       cwd: process.cwd(),
@@ -304,16 +315,14 @@ export class ImagePushRepository {
       "-oStrictHostKeyChecking=no",
     ];
 
-    // The deploy script starts with `git fetch/reset` which fails when the VPS has
-    // no git repo. Since the image was transferred via SSH (not registry), git sync
-    // is irrelevant — skip those two lines and run the rest directly.
-    // The script must run from the project root (parent of scripts/) so that
-    // `docker compose -f docker-compose.prod.yml` resolves correctly.
+    // Run the deploy script. Strip git lines (no git repo on VPS), run from the
+    // project root so docker compose -f resolves correctly, and force-recreate
+    // the app container so the new image is always picked up regardless of whether
+    // the :latest tag pointer changed.
     const scriptDir = script.split("/").slice(0, -1).join("/") || "/";
     const projectDir = scriptDir.endsWith("/scripts")
       ? scriptDir.slice(0, -"/scripts".length)
       : scriptDir;
-    // Use grep -v to strip git lines, then pipe to bash. No single-quote nesting needed.
     const remoteCmd = `chmod +x ${script} && cd ${projectDir} && grep -v "^git " ${script} | bash`;
 
     let result: ReturnType<typeof spawnSync>;

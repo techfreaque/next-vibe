@@ -677,6 +677,13 @@ export const translations: typeof enTranslations = {
     imagePlaceholder: "Beschreibe ein zu generierendes Bild...",
     audioPlaceholder: "Beschreibe Audio oder Musik zum Generieren...",
     noPermission: "Du hast keine Berechtigung, hier zu posten",
+    noCredits: {
+      title: "Keine Credits mehr",
+      addCredits: "Credits aufladen",
+    },
+    insufficientCredits: {
+      title: "Nicht genug Credits (benötigt {{cost}}, vorhanden {{balance}})",
+    },
     keyboardShortcuts: {
       enter: "Enter",
       toSend: "zum Senden",

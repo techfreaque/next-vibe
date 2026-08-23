@@ -261,8 +261,16 @@ async function callInPglite(
     .map(([n]) => `"${n}": __params_raw["${n}"]`)
     .join(", ");
 
+  // Also inject individual variable declarations so destructuring-style logic
+  // bodies (q, { p_user_id }) can reference p_user_id directly, matching how
+  // PL/v8 exposes function params as individual in-scope variables.
+  const paramVarDecls = paramEntries
+    .map(([n]) => `const ${n} = __params_raw["${n}"];`)
+    .join(" ");
+
   const asyncBody = `
     const __params = { ${paramsShimEntries} };
+    ${paramVarDecls}
     ${logicBody}
   `;
 

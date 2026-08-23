@@ -1284,23 +1284,65 @@ async function seedTemplate(
     .limit(1);
 
   if (existing.length > 0) {
-    logger.debug(`CoA template already exists: ${template.country} — skipping`);
+    const existingId = existing[0].id;
+    // Template row exists — check if nodes were seeded (idempotency guard).
+    const nodeExists =
+      (
+        await db
+          .select({ id: coaTemplateNodes.id })
+          .from(coaTemplateNodes)
+          .where(eq(coaTemplateNodes.templateId, existingId))
+          .limit(1)
+      ).length > 0;
+
+    if (nodeExists) {
+      logger.debug(
+        `CoA template already exists: ${template.country} — skipping`,
+      );
+      return;
+    }
+
+    // Nodes missing — seed them using the recovered templateId.
+    logger.info(
+      `CoA template ${template.country} exists but has no nodes — seeding nodes now`,
+    );
+    const nodeValues = template.nodes.map((node) => ({
+      templateId: existingId,
+      code: node.code,
+      name: node.name,
+      nameDe: node.nameDe,
+      namePl: node.namePl,
+      type: node.type,
+      subtype: node.subtype,
+      parentCode: node.parentCode,
+      isPostable: node.isPostable,
+      sortOrder: node.sortOrder,
+    }));
+    const CHUNK_R = 200;
+    for (let i = 0; i < nodeValues.length; i += CHUNK_R) {
+      await db
+        .insert(coaTemplateNodes)
+        .values(nodeValues.slice(i, i + CHUNK_R));
+    }
+    logger.info(
+      `Seeded ${nodeValues.length} nodes for CoA template ${template.country}`,
+    );
     return;
   }
 
-  let inserted: { id: string } | undefined;
+  let templateId: string | undefined;
   try {
-    const rows = await db
+    const [inserted] = await db
       .insert(coaTemplates)
       .values({
         country: template.country,
         name: template.name,
-        description: template.description,
-        isDefault: template.isDefault,
-        version: template.version,
+        description: template.description ?? "",
+        isDefault: template.isDefault ?? false,
+        version: template.version ?? "1",
       })
       .returning({ id: coaTemplates.id });
-    inserted = rows[0];
+    templateId = inserted?.id;
   } catch (insertError) {
     logger.warn(`Failed to insert CoA template: ${template.country}`, {
       error: String(insertError),
@@ -1308,25 +1350,11 @@ async function seedTemplate(
     return;
   }
 
-  // PGlite's returning() can return empty on first boot — fall back to SELECT
-  if (!inserted) {
-    const fallback = await db
-      .select({ id: coaTemplates.id })
-      .from(coaTemplates)
-      .where(eq(coaTemplates.country, template.country))
-      .limit(1);
-    inserted = fallback[0];
-  }
-
-  if (!inserted) {
+  if (!templateId) {
     logger.warn(`CoA template insert returned no row: ${template.country}`);
     return;
   }
 
-  const templateId = inserted.id;
-
-  // Insert nodes in order (sortOrder ensures parent codes exist before children,
-  // as parents always have lower sortOrder than children)
   const nodeValues = template.nodes.map((node) => ({
     templateId,
     code: node.code,
@@ -1409,7 +1437,17 @@ async function setupDemoCompanyCoA(
     sortOrder: node.sortOrder,
   }));
 
-  await db.insert(accountNodes).values(insertValues);
+  if (insertValues.length === 0) {
+    logger.warn("XX template has no nodes — skipping demo company CoA setup");
+    return;
+  }
+
+  const CHUNK_NODES = 200;
+  for (let i = 0; i < insertValues.length; i += CHUNK_NODES) {
+    await db
+      .insert(accountNodes)
+      .values(insertValues.slice(i, i + CHUNK_NODES));
+  }
 
   logger.debug(
     `CoA setup for demo company: ${insertValues.length} accounts created`,

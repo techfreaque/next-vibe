@@ -414,14 +414,14 @@ export async function test(
           !existingSubscription.success ||
           !existingSubscription.data.hasSubscription
         ) {
-          const [createdSubscription] = await db
+          const [createdSub] = await db
             .insert(subscriptions)
             .values(subscriptionData)
-            .returning();
+            .returning({ id: subscriptions.id });
 
-          if (createdSubscription) {
+          if (createdSub) {
             logger.debug(
-              `✅ Created test subscription: ${createdSubscription.id} for user: ${subscriptionData.userId}`,
+              `✅ Created test subscription: ${createdSub.id} for user: ${subscriptionData.userId}`,
             );
           }
         } else {
@@ -493,14 +493,14 @@ export async function prod(
           },
         );
 
-        const [createdAdminSubscription] = await db
+        const [createdAdminSub] = await db
           .insert(subscriptions)
           .values(adminSubscriptionData)
-          .returning();
+          .returning({ id: subscriptions.id });
 
-        if (createdAdminSubscription) {
+        if (createdAdminSub) {
           logger.debug(
-            `✅ Created production admin subscription: ${createdAdminSubscription.id}`,
+            `✅ Created production admin subscription: ${createdAdminSub.id}`,
           );
         }
       } else {

@@ -88,20 +88,20 @@ export async function dev(logger: EndpointLogger): Promise<void> {
       return;
     }
 
-    const adminResults = await db
-      .select({ id: users.id })
-      .from(users)
-      .where(eq(users.email, adminEmail))
-      .limit(1);
+    const adminId = (
+      await db
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.email, adminEmail))
+        .limit(1)
+    )[0]?.id;
 
-    if (adminResults.length === 0) {
+    if (!adminId) {
       logger.warn(
         `Admin user (${adminEmail}) not found, skipping lead magnet config seed`,
       );
       return;
     }
-
-    const adminId = adminResults[0].id;
 
     const existing = await db
       .select({ id: leadMagnetConfigs.id })
