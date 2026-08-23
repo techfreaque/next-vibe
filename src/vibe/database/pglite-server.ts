@@ -281,6 +281,25 @@ async function execInsertReturning(
   return Buffer.concat(parts);
 }
 
+// ─── Global serialisation queue ───────────────────────────────────────────────
+// All PGlite access MUST be serialised: execProtocolRaw, pg.query() inside
+// execInsertReturning, etc.  pg.runExclusive() is per-instance and re-entrant
+// only within the same microtask chain.  Cross-connection re-entrancy causes
+// deadlocks (Connection A holds runExclusive, Connection B's pg.query() waits
+// forever).  We replace runExclusive with our own FIFO promise-chain queue.
+
+let pgQueue: Promise<void> = Promise.resolve();
+
+function serialise<T>(fn: () => Promise<T>): Promise<T> {
+  const result = pgQueue.then(fn);
+  // Swallow errors on the queue tail so one failure doesn't poison later work
+  pgQueue = result.then(
+    () => undefined,
+    () => undefined,
+  );
+  return result;
+}
+
 // ─── Per-connection state machine ─────────────────────────────────────────────
 
 let nextPid = 10000;
@@ -398,8 +417,7 @@ function handleConnection(pg: PGlite, socket: Socket): void {
         .trim();
       if (/^\s*insert\s+into\s/i.test(sql) && /\sreturning\s/i.test(sql)) {
         try {
-          // execInsertReturning calls pg.query() which handles locking internally.
-          socket.write(await execInsertReturning(pg, sql));
+          socket.write(await serialise(() => execInsertReturning(pg, sql)));
         } catch (e) {
           socket.write(
             Buffer.concat([
@@ -442,9 +460,9 @@ function handleConnection(pg: PGlite, socket: Socket): void {
           const parseComplete = Buffer.from([0x31, 0x00, 0x00, 0x00, 0x04]);
           const bindComplete = Buffer.from([0x32, 0x00, 0x00, 0x00, 0x04]);
           try {
-            // execInsertReturning calls pg.query() which acquires runExclusive internally.
-            // Do NOT wrap in pg.runExclusive() here — that would deadlock.
-            const dataResp = await execInsertReturning(pg, sql, params);
+            const dataResp = await serialise(() =>
+              execInsertReturning(pg, sql, params),
+            );
             socket.write(
               Buffer.concat([parseComplete, bindComplete, dataResp]),
             );
@@ -470,7 +488,7 @@ function handleConnection(pg: PGlite, socket: Socket): void {
     // Splitting P/B/E/S into separate calls causes PGlite to emit ReadyForQuery
     // after each message, which desynchronises the pg client and causes EPIPE.
     try {
-      await pg.runExclusive(async () => {
+      await serialise(async () => {
         const bytes = new Uint8Array(
           messages.buffer,
           messages.byteOffset,
