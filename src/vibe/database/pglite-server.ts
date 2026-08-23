@@ -287,17 +287,35 @@ async function execInsertReturning(
 // only within the same microtask chain.  Cross-connection re-entrancy causes
 // deadlocks (Connection A holds runExclusive, Connection B's pg.query() waits
 // forever).  We replace runExclusive with our own FIFO promise-chain queue.
+//
+// Stored on globalThis so HMR module reloads share the same queue — if each
+// reload got its own queue, old-module and new-module connections would race
+// into PGlite simultaneously and corrupt the WASM heap (Aborted()).
 
-let pgQueue: Promise<void> = Promise.resolve();
+const gq = globalThis as typeof globalThis & {
+  __pglite_queue__?: Promise<void>;
+};
+if (!gq.__pglite_queue__) {
+  gq.__pglite_queue__ = Promise.resolve();
+}
 
 function serialise<T>(fn: () => Promise<T>): Promise<T> {
-  const result = pgQueue.then(fn);
+  const result = (gq.__pglite_queue__ as Promise<void>).then(fn);
   // Swallow errors on the queue tail so one failure doesn't poison later work
-  pgQueue = result.then(
+  gq.__pglite_queue__ = result.then(
     () => undefined,
     () => undefined,
   );
   return result;
+}
+
+/**
+ * Serialise any direct PGlite access through the same global FIFO queue used
+ * by the socket server.  Call this wherever pgliteClient is used directly
+ * (migrations, db-functions, etc.) to prevent concurrent WASM access.
+ */
+export function serialisePglite<T>(fn: () => Promise<T>): Promise<T> {
+  return serialise(fn);
 }
 
 // ─── Per-connection state machine ─────────────────────────────────────────────

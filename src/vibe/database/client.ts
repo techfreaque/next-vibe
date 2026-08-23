@@ -198,6 +198,22 @@ export function openPglite(): void {
   // intentional no-op
 }
 
+/**
+ * Serialise any direct PGlite access (migrations, db-functions, etc.) through
+ * the same global FIFO queue used by the socket server.  Prevents concurrent
+ * WASM access across connection callbacks (Aborted() crashes).
+ * No-op passthrough in non-PGlite mode.
+ */
+export async function serialisePgliteAccess<T>(
+  fn: () => Promise<T>,
+): Promise<T> {
+  if (!isPglite) {
+    return fn();
+  }
+  const { serialisePglite } = await import("./pglite-server");
+  return serialisePglite(fn);
+}
+
 // ─── PGlite lifecycle (used by db-setup) ─────────────────────────────────────
 
 export async function reinitPgliteClient(): Promise<void> {

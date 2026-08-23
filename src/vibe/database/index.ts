@@ -7,7 +7,12 @@ import { parseError } from "../core/utils/parse-error";
 import type { EndpointLogger } from "../logger/types";
 import { isPglite, onPgliteReopen, pool, recreatePool } from "./client";
 
-export { getLivePgliteClient, isPglite, pgliteClient } from "./client";
+export {
+  getLivePgliteClient,
+  isPglite,
+  pgliteClient,
+  serialisePgliteAccess,
+} from "./client";
 export { jsonbBool, supportsAdvancedSql } from "./compat";
 
 /**

@@ -41,7 +41,7 @@ import type { PgTableWithColumns } from "drizzle-orm/pg-core";
 
 import { parseError } from "../../core/utils/parse-error";
 import type { EndpointLogger } from "../../logger/types";
-import { db, isPglite, pgliteClient } from "..";
+import { db, isPglite, pgliteClient, serialisePgliteAccess } from "..";
 import type { CompiledQuery, PlaceholderParam, StaticParam } from "./context";
 import { isPlaceholder } from "./context";
 import type {
@@ -282,10 +282,12 @@ async function callInPglite(
       "__params_raw",
       `return (async () => { ${asyncBody} })()`,
     );
-    const result = (await fn(asyncQ, plv8Shim, params)) as Record<
-      string,
-      string | number | boolean | null
-    >;
+    const result = await serialisePgliteAccess(async () => {
+      return (await fn(asyncQ, plv8Shim, params)) as Record<
+        string,
+        string | number | boolean | null
+      >;
+    });
     return mapRow(result, returnEntries);
   } catch (error) {
     logger.error(`PGlite db function ${name} failed`, parseError(error));
