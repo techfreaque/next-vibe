@@ -20,7 +20,10 @@ import {
 import type { ApiSection } from "../../../../core/definition/endpoint-base";
 import { hasCustomDirective } from "../../../../core/generators/shared/custom-directive";
 import type { GeneratorDefinition } from "../../../../core/generators/shared/shared-inputs";
-import { writeFileIfChanged } from "../../../../core/generators/shared/utils";
+import {
+  toPosixPath,
+  writeFileIfChanged,
+} from "../../../../core/generators/shared/utils";
 import { parseError } from "../../../../core/utils/parse-error";
 import {
   filterPlatformMarkers,
@@ -65,7 +68,15 @@ function isWebExcluded(
   routePath: string,
   definitionModules: Map<string, ApiSection | null>,
 ): boolean {
-  const defPath = routePath.replace(/\/route\.ts$/, "/definition.ts");
+  // routePath may arrive OS-native (backslash on Windows) from the local
+  // findFiles()/cleanupStaleShells() walkers below, but definitionModules
+  // keys are always POSIX (see shared-inputs.ts) — normalize first or the
+  // replace() below silently no-ops and every PRODUCTION_OFF/WEB_OFF
+  // endpoint falls through to the "unknown key -> not excluded" default.
+  const defPath = toPosixPath(routePath).replace(
+    /\/route\.ts$/,
+    "/definition.ts",
+  );
   const def = definitionModules.get(defPath);
   // Unknown key → not in scan scope → treat as not excluded.
   if (def === undefined || def === null) {

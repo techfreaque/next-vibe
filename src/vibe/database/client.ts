@@ -165,7 +165,7 @@ if (isPglite) {
         /* stale socket */
       }
 
-      const fresh = new PGlite(resolvedUrl);
+      const fresh = new PGlite(fileURLToPath(resolvedUrl));
       g[PGLITE_GLOBAL_KEY] = fresh;
       pgliteClient = fresh;
 
@@ -223,7 +223,7 @@ export async function reinitPgliteClient(): Promise<void> {
   const resolvedUrl = resolvePgliteUrl(DATABASE_URL);
   const socketPath = getPgliteSocketPath(DATABASE_URL);
 
-  const fresh = new PGlite(resolvedUrl);
+  const fresh = new PGlite(fileURLToPath(resolvedUrl));
   await fresh.waitReady;
   pgliteClient = fresh;
   g[PGLITE_GLOBAL_KEY] = fresh;
@@ -322,7 +322,7 @@ export async function healPgliteIfCorrupted(): Promise<void> {
     const socketPath = getPgliteSocketPath(DATABASE_URL);
     const dbPath = fileURLToPath(resolvedUrl);
     wipePgliteHeap(dbPath);
-    const fresh = new PGlite(resolvedUrl);
+    const fresh = new PGlite(dbPath);
     await fresh.waitReady;
     pgliteClient = fresh;
     g[PGLITE_GLOBAL_KEY] = fresh;
