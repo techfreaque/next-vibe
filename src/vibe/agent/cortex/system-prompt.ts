@@ -1,6 +1,8 @@
 /* eslint-disable i18next/no-literal-string */
 import "server-only";
 
+import type { sql as sqlTag } from "drizzle-orm";
+import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { languageConfig } from "next-vibe/core/i18n";
 import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import { parseError } from "next-vibe/core/utils/parse-error";
@@ -9,6 +11,8 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type { CronTaskItem } from "next-vibe/tasks/cron/tasks/definition";
 
 import type { SystemPromptFragment } from "../ai-stream/system-prompt/types";
+import type { chatMessages as chatMessagesTable } from "../chat/db";
+import type { ChatMessageRole as chatMessageRoleValue } from "../chat/enum";
 import type { FavoriteSummaryItem } from "../skills/favorites/favorites-formatter";
 import { stripFrontmatter, truncateContent } from "./_shared/text-utils";
 import {
@@ -19,6 +23,18 @@ import {
   CORTEX_TERMINALS_ALIAS,
   CORTEX_WRITE_ALIAS,
 } from "./constants";
+import type { cortexNodes as cortexNodesTable } from "./db";
+import type { CortexNodeType as cortexNodeTypeValue } from "./enum";
+
+// Type-only imports above give vectorSearchPglite's parameters real types
+// instead of `any`; the actual modules are still loaded dynamically at call
+// time in vectorSearch(), matching the rest of this file's lazy-import style
+// — a type-only import is fully erased and never triggers a runtime import.
+type SqlTagType = typeof sqlTag;
+type CortexNodesTableType = typeof cortexNodesTable;
+type ChatMessagesTableType = typeof chatMessagesTable;
+type CortexNodeTypeShape = typeof cortexNodeTypeValue;
+type ChatMessageRoleShape = typeof chatMessageRoleValue;
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -578,12 +594,37 @@ async function vectorSearch(opts: VectorSearchOpts): Promise<RelevantNode[]> {
   }
 
   try {
-    const { db } = await import("next-vibe/database");
+    const { db, isPglite } = await import("next-vibe/database");
     const { cortexNodes } = await import("./db");
     const { chatMessages } = await import("../chat/db");
     const { CortexNodeType } = await import("./enum");
     const { ChatMessageRole } = await import("../chat/enum");
     const { sql } = await import("drizzle-orm");
+
+    // PGlite has no pgvector extension — migrations already downgrade the
+    // `vector(1024)` column to plain `text` (see migrate/repository.ts), so
+    // the stored value ("[0.1,0.2,...]", pgvector's own text format) is
+    // identical either way. Only the `<=>` cosine-distance OPERATOR below
+    // needs a substitute: compute it in JS instead of in SQL.
+    if (isPglite) {
+      return vectorSearchPglite({
+        db,
+        cortexNodes,
+        chatMessages,
+        CortexNodeType,
+        ChatMessageRole,
+        sql,
+        userId,
+        threadId,
+        queryVectorLimit,
+        pathPrefix,
+        pathPrefixes,
+        excludePrefixes,
+        limit,
+        threshold,
+        excerptLen,
+      });
+    }
 
     // Path filters as raw SQL fragments (fed into the single statement below).
     const pathFilter =
@@ -649,36 +690,191 @@ async function vectorSearch(opts: VectorSearchOpts): Promise<RelevantNode[]> {
       LIMIT ${limit * 3}
     `);
 
-    return rows.rows
-      .map((r) => ({
+    return scoreVectorRows(
+      rows.rows.map((r) => ({
         path: r.path,
         content: r.content,
         similarity: Number(r.similarity),
         updatedAt: new Date(r.updatedAt),
-      }))
-      .filter((r) => r.similarity > threshold)
-      .map((r) => {
-        const recencyBoost = 0.1 * getRecencyFactor(r.updatedAt);
-        const pathWeight = getPathTypeWeight(r.path);
-        const adjustedScore = (r.similarity + recencyBoost) * pathWeight;
-        const rawExcerpt = truncateContent(
-          stripFrontmatter(r.content ?? ""),
-          excerptLen,
-        );
-        return {
-          path: r.path,
-          excerpt: rawExcerpt,
-          score: Math.round(adjustedScore * 100) / 100,
-        };
-      })
-      .toSorted((a, b) => b.score - a.score)
-      .slice(0, limit);
+      })),
+      threshold,
+      excerptLen,
+      limit,
+    );
   } catch (error) {
     logger.error("Vector search failed — memories skipped for this turn", {
       error: error instanceof Error ? error.message : String(error),
     });
     return [];
   }
+}
+
+/** Raw candidate row shape shared by both the pgvector SQL path and the PGlite JS fallback. */
+interface VectorSearchRow {
+  path: string;
+  content: string | null;
+  similarity: number;
+  updatedAt: Date;
+}
+
+/** Threshold filter, recency/path-weighted scoring, sort, and top-N slice — identical for both search paths. */
+function scoreVectorRows(
+  rows: VectorSearchRow[],
+  threshold: number,
+  excerptLen: number,
+  limit: number,
+): RelevantNode[] {
+  return rows
+    .filter((r) => r.similarity > threshold)
+    .map((r) => {
+      const recencyBoost = 0.1 * getRecencyFactor(r.updatedAt);
+      const pathWeight = getPathTypeWeight(r.path);
+      const adjustedScore = (r.similarity + recencyBoost) * pathWeight;
+      const rawExcerpt = truncateContent(
+        stripFrontmatter(r.content ?? ""),
+        excerptLen,
+      );
+      return {
+        path: r.path,
+        excerpt: rawExcerpt,
+        score: Math.round(adjustedScore * 100) / 100,
+      };
+    })
+    .toSorted((a, b) => b.score - a.score)
+    .slice(0, limit);
+}
+
+/** Parse pgvector's text representation ("[0.1,0.2,...]") into a plain number array. */
+function parseEmbeddingText(value: string): number[] {
+  return value.replace(/^\[/, "").replace(/]$/, "").split(",").map(Number);
+}
+
+/** Cosine similarity — `1 - cosineDistance`, i.e. exactly what pgvector's `<=>` operator inverts. */
+function cosineSimilarity(a: number[], b: number[]): number {
+  let dot = 0;
+  let normA = 0;
+  let normB = 0;
+  for (let i = 0; i < a.length; i++) {
+    const av = a[i] ?? 0;
+    const bv = b[i] ?? 0;
+    dot += av * bv;
+    normA += av * av;
+    normB += bv * bv;
+  }
+  const denom = Math.sqrt(normA) * Math.sqrt(normB);
+  return denom === 0 ? 0 : dot / denom;
+}
+
+interface VectorSearchPgliteArgs extends Omit<VectorSearchOpts, "logger"> {
+  db: NodePgDatabase<Record<string, never>>;
+  cortexNodes: CortexNodesTableType;
+  chatMessages: ChatMessagesTableType;
+  CortexNodeType: CortexNodeTypeShape;
+  ChatMessageRole: ChatMessageRoleShape;
+  sql: SqlTagType;
+}
+
+/**
+ * PGlite equivalent of the pgvector MaxSim query above — same semantics
+ * (boundary-excluded query vectors, max-cosine-similarity per node, same
+ * path/exclude filtering), computed in JS since PGlite has no `<=>` operator.
+ * Only reached for PGlite; real Postgres always uses the single-SQL path.
+ */
+async function vectorSearchPglite(
+  args: VectorSearchPgliteArgs,
+): Promise<RelevantNode[]> {
+  const {
+    db,
+    cortexNodes,
+    chatMessages,
+    CortexNodeType,
+    ChatMessageRole,
+    sql,
+    userId,
+    threadId,
+    queryVectorLimit = 4,
+    pathPrefix,
+    pathPrefixes,
+    excludePrefixes = [],
+    limit = 10,
+    threshold = 0.4,
+    excerptLen = 150,
+  } = args;
+
+  const boundaryRows = await db.execute<{ ts: string | null }>(sql`
+    SELECT max(created_at) AS ts
+    FROM ${chatMessages}
+    WHERE thread_id = ${threadId}
+      AND role = ${ChatMessageRole.ASSISTANT}
+      AND (metadata->>'isCompacting')::boolean = true
+  `);
+  const boundaryTs = boundaryRows.rows[0]?.ts ?? null;
+
+  const qvRows = await db.execute<{ embedding: string }>(sql`
+    SELECT embedding
+    FROM ${chatMessages}
+    WHERE thread_id = ${threadId}
+      AND embedding IS NOT NULL
+      AND role IN (${ChatMessageRole.USER}, ${ChatMessageRole.ASSISTANT})
+      ${boundaryTs ? sql`AND created_at > ${boundaryTs}` : sql``}
+    ORDER BY created_at DESC
+    LIMIT ${queryVectorLimit}
+  `);
+  // Mirrors the SQL path's `AND EXISTS (SELECT 1 FROM qv)` — no stored
+  // message vectors yet (brand-new thread) means no memory to surface.
+  if (qvRows.rows.length === 0) {
+    return [];
+  }
+  const queryVectors = qvRows.rows.map((r: { embedding: string }) =>
+    parseEmbeddingText(r.embedding),
+  );
+
+  const nodeRows = await db.execute<{
+    path: string;
+    content: string | null;
+    updatedAt: string;
+    embedding: string;
+  }>(sql`
+    SELECT path, content, updated_at AS "updatedAt", embedding
+    FROM ${cortexNodes}
+    WHERE user_id = ${userId}
+      AND node_type = ${CortexNodeType.FILE}
+      AND embedding IS NOT NULL
+  `);
+
+  const prefixes = pathPrefix ? [pathPrefix] : (pathPrefixes ?? null);
+  const rows: VectorSearchRow[] = nodeRows.rows
+    .filter(
+      (r: { path: string }) =>
+        (!prefixes || prefixes.some((p) => r.path.startsWith(`${p}/`))) &&
+        !excludePrefixes.some((p) => r.path.startsWith(`${p}/`)),
+    )
+    .map(
+      (r: {
+        path: string;
+        content: string | null;
+        updatedAt: string;
+        embedding: string;
+      }) => {
+        const nodeVector = parseEmbeddingText(r.embedding);
+        const similarity = Math.max(
+          ...queryVectors.map((qv) => cosineSimilarity(nodeVector, qv)),
+        );
+        return {
+          path: r.path,
+          content: r.content,
+          similarity,
+          updatedAt: new Date(r.updatedAt),
+        };
+      },
+    )
+    // Same ORDER BY MIN(distance) ASC / LIMIT limit*3 as the SQL path,
+    // expressed the equivalent way: distance = 1 - similarity, so ordering
+    // by max similarity descending is identical.
+    .toSorted((a, b) => b.similarity - a.similarity)
+    .slice(0, limit * 3);
+
+  return scoreVectorRows(rows, threshold, excerptLen, limit);
 }
 
 // ─── Memory Context ───────────────────────────────────────────────────────────

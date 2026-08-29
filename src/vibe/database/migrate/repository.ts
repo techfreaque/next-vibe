@@ -15,7 +15,7 @@ import {
   success,
 } from "../../core/route/response.schema";
 import { parseError } from "../../core/utils/parse-error";
-import { isPglite, pgliteClient } from "../client";
+import { isPglite, pgliteReady, pool } from "../client";
 import {
   formatActionCommand,
   formatDatabase,
@@ -38,10 +38,28 @@ export class DatabaseMigrationRepository {
       try {
         logger.debug("🔄 Running PGlite migrations");
         const { readdir, readFile } = await import("node:fs/promises");
-        const client = pgliteClient!;
+        // Always go through the loopback pool, never a raw pgliteClient
+        // handle — pgliteClient is only ever non-null in the ONE module
+        // instance that happened to win the port-claim race (see client.ts),
+        // and Vite's SSR module runner loads client.ts as a SEPARATE instance
+        // from this one, so pgliteClient here can stay null even when PGlite
+        // itself is up and fine. The pool works uniformly everywhere, always.
+        //
+        // Still MUST await pgliteReady even though we no longer touch
+        // pgliteClient directly: the pool object exists synchronously, but
+        // the wire-protocol server behind it only starts listening once the
+        // async port-claim race resolves. A query issued before that finishes
+        // targets a port nothing is listening on yet — and observed on this
+        // stack (Bun's node:net, Windows), that failure mode doesn't reject
+        // fast with ECONNREFUSED like a normal runtime; it silently hangs
+        // until connectionTimeoutMillis (30s) instead. Waiting here avoids
+        // the race entirely rather than depending on that failure behaving
+        // any particular way.
+        await pgliteReady;
+        const client = pool!;
 
         // Ensure migration tracking table exists
-        await client.exec(`
+        await client.query(`
           CREATE TABLE IF NOT EXISTS __drizzle_migrations__ (
             id SERIAL PRIMARY KEY,
             hash TEXT NOT NULL,
@@ -100,16 +118,16 @@ export class DatabaseMigrationRepository {
             .replace(/\bvector\(\d+\)/gi, "text")
             .replace(/SET DATA TYPE vector\(\d+\)/gi, "SET DATA TYPE text");
           try {
-            await client.exec(sql);
+            await client.query(sql);
           } catch (execError) {
-            const msg =
-              execError instanceof Error
-                ? execError.message
-                : String(execError);
+            const msg = parseError(execError).message;
             logger.error(`PGlite migration failed on file: ${file}`, {
               error: msg,
             });
-            throw execError;
+            return fail({
+              message: t("post.errors.network.detail", { error: msg }),
+              errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            });
           }
           await client.query(
             "INSERT INTO __drizzle_migrations__ (hash, created_at) VALUES ($1, $2)",

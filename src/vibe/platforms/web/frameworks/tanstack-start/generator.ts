@@ -25,6 +25,7 @@ import { findFilesByName } from "../../../../core/generators/shared/scanner";
 import type { GeneratorDefinition } from "../../../../core/generators/shared/shared-inputs";
 import {
   getRelativeImportPath,
+  toPosixPath,
   writeFileIfChanged,
 } from "../../../../core/generators/shared/utils";
 import { parseError } from "../../../../core/utils/parse-error";
@@ -180,7 +181,15 @@ function isWebExcluded(
   routeFilePath: string,
   definitionModules: Map<string, ApiSection | null>,
 ): boolean {
-  const defPath = routeFilePath.replace(/\/route\.ts$/, "/definition.ts");
+  // routeFilePath may arrive OS-native (backslash on Windows) from the
+  // srcFile = join(api, relPath) call site below, but definitionModules keys
+  // are always POSIX (see shared-inputs.ts) — normalize first or the
+  // replace() below silently no-ops and every WEB_OFF/PRODUCTION_OFF endpoint
+  // falls through to the "unknown key -> not excluded" default.
+  const defPath = toPosixPath(routeFilePath).replace(
+    /\/route\.ts$/,
+    "/definition.ts",
+  );
   const def = definitionModules.get(defPath);
   if (def === undefined || def === null) {
     return false;
@@ -725,6 +734,24 @@ function emitApiFile(
   }
 }
 
+// The TanStack Start Vite plugin (@tanstack/start-plugin-core's
+// start-router-plugin/route-tree-footer.js) appends this SSR `Register` type
+// augmentation whenever it drives router-generator itself. We invoke
+// router-generator directly (see comment below), which skips that plugin, so
+// without replicating its footer here every standalone `vibe gen` run strips
+// SSR typing from routeTree.gen.ts until a running dev server rewrites it.
+const ROUTE_TREE_FILE_FOOTER = [
+  `import type { getRouter } from './router.tsx'`,
+  `import type { startInstance } from './start.ts'`,
+  `declare module '@tanstack/react-start' {`,
+  `  interface Register {`,
+  `    ssr: true`,
+  `    router: Awaited<ReturnType<typeof getRouter>>`,
+  `    config: Awaited<ReturnType<typeof startInstance.getOptions>>`,
+  `  }`,
+  `}`,
+].join("\n");
+
 async function regenerateRouteTree(result: GenerationResult): Promise<void> {
   const srcDirectory = join(projectRoot(), `${GENERATED_DIR}/app-tanstack`);
   try {
@@ -733,6 +760,7 @@ async function regenerateRouteTree(result: GenerationResult): Promise<void> {
       getConfig: (inlineConfig: {
         routesDirectory: string;
         generatedRouteTree: string;
+        routeTreeFileFooter?: string[];
       }) => GeneratorConfig;
       Generator: new (opts: { config: GeneratorConfig; root: string }) => {
         run: () => Promise<void>;
@@ -741,6 +769,7 @@ async function regenerateRouteTree(result: GenerationResult): Promise<void> {
     const config = getConfig({
       routesDirectory: resolve(srcDirectory, "routes"),
       generatedRouteTree: resolve(srcDirectory, "routeTree.gen.ts"),
+      routeTreeFileFooter: [ROUTE_TREE_FILE_FOOTER],
     });
     const gen = new Generator({ config, root: projectRoot() });
     // Windows: EPERM on atomic rename when Vite holds routeTree.gen.ts open.

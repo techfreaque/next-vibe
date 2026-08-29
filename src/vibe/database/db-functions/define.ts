@@ -38,10 +38,12 @@ import "server-only";
 
 import { getTableName, sql } from "drizzle-orm";
 import type { PgTableWithColumns } from "drizzle-orm/pg-core";
+import type { QueryResultRow } from "pg";
 
 import { parseError } from "../../core/utils/parse-error";
 import type { EndpointLogger } from "../../logger/types";
-import { db, isPglite, pgliteClient, serialisePgliteAccess } from "..";
+import { db, isPglite, serialisePgliteAccess } from "..";
+import { pool } from "../client";
 import type { CompiledQuery, PlaceholderParam, StaticParam } from "./context";
 import { isPlaceholder } from "./context";
 import type {
@@ -194,7 +196,12 @@ async function callInPglite(
   params: Record<string, string | number | boolean | null>,
   logger: EndpointLogger,
 ): Promise<Record<string, string | number | boolean | null>> {
-  const client = pgliteClient!;
+  // Always go through the loopback pool, never the raw pgliteClient handle —
+  // pgliteClient is only ever non-null in the ONE process that won the
+  // port-claim race (see client.ts). Any other process, or a separate Vite
+  // SSR module instance within the same dev server, would otherwise crash on
+  // a null pgliteClient. The pool works uniformly everywhere, always.
+  const client = pool!;
 
   // Build async query functions — resolve placeholders from params
   const asyncQ: Record<
@@ -227,9 +234,14 @@ async function callInPglite(
     };
   }
 
-  // plv8 shim — execute() runs raw SQL via pgliteClient
+  // plv8 shim — execute() runs raw SQL via the loopback pool
   const plv8Shim = {
-    async execute<TRow = Record<string, string | number | boolean | null>>(
+    async execute<
+      TRow extends QueryResultRow = Record<
+        string,
+        string | number | boolean | null
+      >,
+    >(
       querySql: string,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any -- mirrors plv8.execute signature
       // oxlint-disable-next-line no-explicit-any

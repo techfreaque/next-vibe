@@ -1,5 +1,5 @@
 /**
- * PGlite Unix-socket Postgres wire-protocol server.
+ * PGlite TCP-loopback Postgres wire-protocol server.
  *
  * Wraps a PGlite instance so N processes can connect via a standard `pg.Pool`.
  *
@@ -17,8 +17,7 @@
 
 import "server-only";
 
-import { unlinkSync } from "node:fs";
-import { createServer, type Server, type Socket } from "node:net";
+import { connect, createServer, type Server, type Socket } from "node:net";
 
 import type { PGlite } from "@electric-sql/pglite";
 
@@ -550,7 +549,170 @@ function setActiveServer(s: Server | null): void {
 }
 
 export interface PgliteServerOptions {
-  socketPath: string;
+  /**
+   * TCP loopback port. Node-postgres's Unix-socket auto-detection only
+   * fires when `host` starts with "/" (see `pg/lib/connection-parameters.js`),
+   * which never matches a Windows drive-letter path — so cross-process
+   * sharing uses a TCP loopback server instead of a Unix domain socket.
+   */
+  port: number;
+}
+
+/** Does a real TCP peer answer a connect on this port right now? */
+function isSomethingListening(port: number): Promise<boolean> {
+  return new Promise((resolve) => {
+    const socket = connect({ host: "127.0.0.1", port, timeout: 300 });
+    const finish = (result: boolean): void => {
+      socket.removeAllListeners();
+      // A graceful end() (FIN) rather than destroy() (RST) — this is a probe,
+      // not a real client, but the peer's connection handler still sees a
+      // normal close instead of a spurious ECONNRESET in its logs.
+      socket.end();
+      resolve(result);
+    };
+    socket.once("connect", () => finish(true));
+    socket.once("error", () => finish(false));
+    socket.once("timeout", () => finish(false));
+  });
+}
+
+/**
+ * Try to become the exclusive PGlite owner by binding the loopback port.
+ *
+ * Binding a TCP port is atomically exclusive at the OS level — exactly one
+ * process can ever succeed — and self-heals the instant an owner process
+ * exits (the kernel frees the port immediately, no stale state left behind).
+ * This replaces a lock-file election: no PID bookkeeping, no stale-lock
+ * recovery, and it correctly supports any number of concurrent processes —
+ * whichever one wins the bind opens PGlite; every other process (present or
+ * future) just fails the bind and connects to the winner as a pool client.
+ *
+ * A bind failure (EADDRINUSE) does NOT always mean a live owner exists — a
+ * just-killed process's socket can briefly linger in the OS (observed on
+ * Windows after `taskkill`), making a fresh bind fail even though nobody is
+ * actually listening. Treating that as "someone else owns it" would make
+ * every caller become a client of a port nothing answers on — an immediate
+ * ECONNREFUSED for the first query, forever, since nothing ever completes
+ * the real election. So a bind failure is verified with an actual connect
+ * attempt before being trusted; an unverifiable failure is retried instead.
+ *
+ * The returned server's `'connection'` handler is wired up atomically at
+ * creation time — BEFORE `listen()` — even though the actual PGlite instance
+ * doesn't exist yet at that point. A socket accepted before `servePgliteOn`
+ * supplies PGlite is queued (not dropped): a `net.Server` starts accepting
+ * TCP connections into the OS backlog the instant `listen()` succeeds, well
+ * before the caller gets around to opening PGlite (a real, non-trivial delay
+ * — WASM init). A connection accepted with no `'connection'` listener yet
+ * would otherwise complete its TCP handshake and then just sit there forever
+ * with nothing ever reading from it — the client hangs until its own
+ * timeout, never seeing an error to react to. Queueing behind PGlite's
+ * readiness removes that window entirely.
+ *
+ * Returns the claimed server (not yet actually dispatching to PGlite) on
+ * success, or `null` if another process already owns the port.
+ */
+export interface ClaimedPgliteServer {
+  server: Server;
+  attach: (pg: PGlite) => void;
+}
+
+export async function tryClaimPgliteOwnership(
+  port: number,
+): Promise<ClaimedPgliteServer | null> {
+  const maxAttempts = 10;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    // eslint-disable-next-line no-await-in-loop -- sequential retry against a single shared port, not independent parallel work
+    const claimed = await new Promise<ClaimedPgliteServer | null>((resolve) => {
+      const pending: Socket[] = [];
+      let pg: PGlite | null = null;
+      const probe = createServer((socket) => {
+        // Prevent an unhandled 'error' crash on a socket still waiting in
+        // the queue — handleConnection() adds its own listener once
+        // dequeued; EventEmitter allows multiple 'error' listeners.
+        socket.on("error", () => undefined);
+        if (pg) {
+          handleConnection(pg, socket);
+        } else {
+          pending.push(socket);
+        }
+      });
+      const onError = (): void => {
+        probe.removeAllListeners();
+        try {
+          probe.close();
+        } catch {
+          /* ignore */
+        }
+        resolve(null);
+      };
+      probe.once("error", onError);
+      probe.once("listening", () => {
+        probe.removeListener("error", onError);
+        resolve({
+          server: probe,
+          attach: (freshPg) => {
+            pg = freshPg;
+            for (const socket of pending.splice(0)) {
+              handleConnection(freshPg, socket);
+            }
+          },
+        });
+      });
+      probe.listen(port, "127.0.0.1");
+    });
+    if (claimed) {
+      return claimed;
+    }
+    // eslint-disable-next-line no-await-in-loop -- must check before deciding whether to retry
+    if (await isSomethingListening(port)) {
+      return null; // A live owner really is there — become a client.
+    }
+    if (attempt < maxAttempts) {
+      // eslint-disable-next-line no-await-in-loop -- deliberate backoff before retrying the same port
+      await new Promise((resolve) => {
+        setTimeout(resolve, 150);
+      });
+    }
+  }
+  // Exhausted retries with the port neither bindable nor answering — give up
+  // and become a client anyway rather than hanging startup indefinitely.
+  return null;
+}
+
+/**
+ * Wire an already-claimed server to serve a PGlite instance — flushing any
+ * connections that arrived and queued while PGlite was still opening.
+ * Use after `tryClaimPgliteOwnership` succeeds — no re-bind, no race window.
+ */
+export function servePgliteOn(
+  claimed: ClaimedPgliteServer,
+  pg: PGlite,
+): Server {
+  const existing = getActiveServer();
+  if (existing && existing !== claimed.server) {
+    try {
+      existing.close();
+    } catch {
+      /* ignore */
+    }
+  }
+  claimed.attach(pg);
+  registerShutdownHandlers();
+  setActiveServer(claimed.server);
+  return claimed.server;
+}
+
+function registerShutdownHandlers(): void {
+  if (g.__pglite_cleanup_registered__) {
+    return;
+  }
+  g.__pglite_cleanup_registered__ = true;
+  process.once("SIGINT", () => {
+    process.exit(0);
+  });
+  process.once("SIGTERM", () => {
+    process.exit(0);
+  });
 }
 
 export function startPgliteServer(
@@ -567,37 +729,21 @@ export function startPgliteServer(
     setActiveServer(null);
   }
 
-  try {
-    unlinkSync(opts.socketPath);
-  } catch {
-    /* not present */
-  }
-
   const server = createServer((socket: Socket) => {
     handleConnection(pg, socket);
   });
 
   if (!g.__pglite_cleanup_registered__) {
     g.__pglite_cleanup_registered__ = true;
-    const cleanup = (): void => {
-      try {
-        unlinkSync(opts.socketPath);
-      } catch {
-        /* ignore */
-      }
-    };
-    process.once("exit", cleanup);
     process.once("SIGINT", () => {
-      cleanup();
       process.exit(0);
     });
     process.once("SIGTERM", () => {
-      cleanup();
       process.exit(0);
     });
   }
 
-  server.listen(opts.socketPath);
+  server.listen(opts.port, "127.0.0.1");
   setActiveServer(server);
   return server;
 }
