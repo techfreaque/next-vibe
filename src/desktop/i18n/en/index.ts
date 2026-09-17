@@ -1144,6 +1144,9 @@ export const translations = {
       "Required system package missing: {{dep}}. A system auth dialog should have appeared - approve it to install automatically.",
     scriptWriteFailed: "Failed to write script: {{error}}",
     monitorNotFoundByName: 'Monitor "{{monitorName}}" not found',
+    noMonitorsDetected: "No monitors detected",
+    invalidWindowHandle:
+      'Invalid windowId: "{{handle}}" is not a valid numeric window handle',
     screenIndexOutOfRange: "Screen index {{screen}} out of range",
     unknownKeyName: "Unknown key name: {{key}}",
     focusedWindowParseFailed: "Failed to parse focused window output",

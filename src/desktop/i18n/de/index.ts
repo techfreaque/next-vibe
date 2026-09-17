@@ -1219,6 +1219,9 @@ export const translations: typeof enTranslations = {
       "Systempaket fehlt: {{dep}}. Ein Authentifizierungsdialog sollte erschienen sein - bestätigen, um automatisch zu installieren.",
     scriptWriteFailed: "Skript konnte nicht geschrieben werden: {{error}}",
     monitorNotFoundByName: "Monitor „{{monitorName}}“ nicht gefunden",
+    noMonitorsDetected: "Keine Monitore erkannt",
+    invalidWindowHandle:
+      'Ungültige windowId: "{{handle}}" ist kein gültiges numerisches Fenster-Handle',
     screenIndexOutOfRange: "Bildschirmindex {{screen}} außerhalb des Bereichs",
     unknownKeyName: "Unbekannter Tastenname: {{key}}",
     focusedWindowParseFailed:

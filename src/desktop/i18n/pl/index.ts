@@ -1164,6 +1164,9 @@ export const translations: typeof enTranslations = {
       "Brakuje pakietu systemowego: {{dep}}. Powinno pojawić się okno autoryzacji - zatwierdź, aby zainstalować automatycznie.",
     scriptWriteFailed: "Nie udało się zapisać skryptu: {{error}}",
     monitorNotFoundByName: "Nie znaleziono monitora „{{monitorName}}”",
+    noMonitorsDetected: "Nie wykryto żadnych monitorów",
+    invalidWindowHandle:
+      'Nieprawidłowy windowId: "{{handle}}" nie jest prawidłowym numerycznym uchwytem okna',
     screenIndexOutOfRange: "Indeks ekranu {{screen}} poza zakresem",
     unknownKeyName: "Nieznana nazwa klawisza: {{key}}",
     focusedWindowParseFailed: "Nie udało się odczytać danych aktywnego okna",

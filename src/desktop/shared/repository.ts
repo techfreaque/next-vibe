@@ -325,6 +325,21 @@ function makeExecutionId(): string {
   return `exec_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 }
 
+/** Parses a window handle string to a BigInt, or a validation ResponseType on failure. */
+function parseWindowHandle<T>(
+  handle: string,
+  t: DesktopT,
+): { value: bigint } | ResponseType<T> {
+  try {
+    return { value: BigInt(handle) };
+  } catch {
+    return fail({
+      message: t("repository.invalidWindowHandle", { handle }),
+      errorType: ErrorResponseTypes.VALIDATION_ERROR,
+    });
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Windows: PowerShell runner
 // ---------------------------------------------------------------------------
@@ -335,13 +350,16 @@ async function runPowerShell(
   logger: EndpointLogger,
   opts?: { timeout?: number },
 ): Promise<{ stdout: string; stderr: string } | ResponseType<never>> {
-  const executionId = makeExecutionId();
   const tmpDir =
     process.env["TEMP"] ?? process.env["TMP"] ?? "C:\\Windows\\Temp";
-  const scriptPath = `${tmpDir}\\vibe-desktop-${executionId}.ps1`;
+  let scriptDir: string;
+  let scriptPath: string;
 
   try {
-    const { writeFileSync } = await import("node:fs");
+    const { mkdtempSync, writeFileSync } = await import("node:fs");
+    const { join } = await import("node:path");
+    scriptDir = mkdtempSync(`${tmpDir}\\vibe-desktop-`);
+    scriptPath = join(scriptDir, "script.ps1");
     writeFileSync(scriptPath, script, "utf-8");
   } catch (err) {
     return fail({
@@ -373,8 +391,8 @@ async function runPowerShell(
     });
   } finally {
     try {
-      const { unlinkSync } = await import("node:fs");
-      unlinkSync(scriptPath);
+      const { rmSync } = await import("node:fs");
+      rmSync(scriptDir, { recursive: true, force: true });
     } catch {
       /* non-fatal */
     }
@@ -993,6 +1011,12 @@ export class DesktopScreenshotRepository {
       }
     } else {
       targetMonitor = monitors.find((m) => m.primary) ?? monitors[0];
+      if (!targetMonitor) {
+        return fail({
+          message: t("repository.noMonitorsDetected"),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
+      }
     }
 
     const { x, y, width, height } = targetMonitor;
@@ -2096,12 +2120,15 @@ Write-Output "OK"
       return moveResult as ResponseType<SimpleResult>;
     }
 
+    // ydotool click codes are down(0x40)|up(0x80) flags combined with the
+    // button number; the bare button number alone only presses without
+    // releasing, leaving the mouse button stuck down.
     const btnHex =
       data.button === "right"
-        ? "0x02"
+        ? "0xC1"
         : data.button === "middle"
-          ? "0x01"
-          : "0x00";
+          ? "0xC2"
+          : "0xC0";
     const times = data.doubleClick ? 2 : 1;
     for (let i = 0; i < times; i++) {
       const clickResult = await runCommand(
@@ -2531,7 +2558,11 @@ Get-Process | Where-Object { $_.MainWindowTitle -ne "" -and $_.MainWindowHandle 
       handle = match.windowId;
     }
 
-    const handleLong = String(BigInt(handle));
+    const parsedHandle = parseWindowHandle<SimpleResult>(handle, t);
+    if (!("value" in parsedHandle)) {
+      return parsedHandle;
+    }
+    const handleLong = String(parsedHandle.value);
     const script = `
 ${WIN_API_TYPEDEF}
 $h = [IntPtr]::new([long]${handleLong})
@@ -2623,7 +2654,14 @@ Write-Output "OK"
     const { x: mx, y: my, name: monName } = targetMonitor;
     const targetX = mx + 40;
     const targetY = my + 40;
-    const handleLong = String(BigInt(handle));
+    const parsedHandle = parseWindowHandle<MoveWindowToMonitorResult>(
+      handle,
+      t,
+    );
+    if (!("value" in parsedHandle)) {
+      return parsedHandle;
+    }
+    const handleLong = String(parsedHandle.value);
 
     const script = `
 ${WIN_API_TYPEDEF}

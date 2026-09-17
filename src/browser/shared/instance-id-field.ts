@@ -1,7 +1,19 @@
 /**
  * Shared instanceId request field for browser tools.
- * CLI-only: hidden from all other platforms.
- * Non-CLI platforms resolve the instance ID in the repository.
+ *
+ * Available on every platform, including MCP. Without an explicit
+ * instanceId, `BrowserRepository.executeTool` (repository.ts) falls back to
+ * `loggerEnv.VIBE_PID` for any non-CLI caller - a single constant for the
+ * whole server process, so every MCP connection shares one tab by default.
+ * That's fine for a single interactive session, but concurrent MCP callers
+ * (e.g. several agents in the same session) that skip this field will steal
+ * each other's active tab mid-navigation. Any caller - CLI or MCP - that
+ * passes a unique value here gets its own isolated tab instead.
+ *
+ * (Previously hidden for MCP via `hiddenForPlatforms: [Platform.MCP]`, on
+ * the assumption that MCP already isolated sessions per connection. It
+ * doesn't - see the shared VIBE_PID fallback above - so hiding this field
+ * only removed the one way an MCP caller could opt into isolation.)
  */
 
 import { FieldDataType, WidgetType } from "next-vibe/core/definition/enums";
@@ -25,8 +37,6 @@ export const browserInstanceIdField = requestField(scopedTranslation, {
       "Browser session ID. Each unique ID gets its own isolated tab. Leave empty to use the default session.",
     ),
   hiddenForPlatforms: [
-    Platform.AI,
-    Platform.MCP,
     Platform.REMOTE_SKILL,
     Platform.TRPC,
     Platform.NEXT_PAGE,

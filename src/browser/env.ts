@@ -17,6 +17,19 @@ export const {
       "Absolute path to the Chrome/Chromium binary. Auto-detected from common install paths if unset.",
     commented: true,
   },
+  CHROME_REMOTE_DEBUG_PORT: {
+    schema: z
+      .string()
+      .optional()
+      .transform((v) => (v ? parseInt(v, 10) : 9222))
+      .pipe(z.number().int().min(1).max(65535)),
+    example: "9222",
+    comment:
+      "Port the shared automation Chrome listens on for remote debugging. Every process on the machine " +
+      "attaches to the same port, so this only needs changing to run a fully separate browser (e.g. a test " +
+      "suite). Default: 9222.",
+    commented: true,
+  },
   CHROME_USER_DATA_DIR: {
     schema: z.string().optional(),
     example: "/tmp/chrome-profile",

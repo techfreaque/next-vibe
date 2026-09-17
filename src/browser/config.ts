@@ -5,6 +5,8 @@
 
 import "server-only";
 
+import { createRequire } from "node:module";
+
 import { browserEnv } from "./env";
 
 export interface ChromeMCPConfig {
@@ -23,8 +25,30 @@ export interface ChromeMCPConfig {
 /**
  * Port Chrome listens on for remote debugging.
  * All chrome-devtools-mcp instances connect to this shared Chrome process.
+ * Overridable via CHROME_REMOTE_DEBUG_PORT.
  */
-export const CHROME_REMOTE_DEBUG_PORT = 9222;
+export const CHROME_REMOTE_DEBUG_PORT = browserEnv.CHROME_REMOTE_DEBUG_PORT;
+
+let chromeDevtoolsMcpBinCache: string | undefined;
+/**
+ * Resolve the chrome-devtools-mcp entrypoint as an absolute script path
+ * rather than going through node_modules/.bin: the .bin entry is a POSIX
+ * shell shim that Windows cannot spawn (ENOENT), and a relative path breaks
+ * whenever the server process's cwd isn't the repo root. require.resolve
+ * gives an absolute, platform-independent path we can run directly with the
+ * current runtime.
+ */
+function chromeDevtoolsMcpBin(): string {
+  chromeDevtoolsMcpBinCache ??= createRequire(import.meta.url).resolve(
+    "chrome-devtools-mcp/build/src/bin/chrome-devtools-mcp.js",
+  );
+  return chromeDevtoolsMcpBinCache;
+}
+
+/** chrome-devtools-mcp is a Node program - don't inherit Bun as the runtime. */
+const nodeRuntime = process.execPath.toLowerCase().includes("bun")
+  ? "node"
+  : process.execPath;
 
 /**
  * Default Chrome DevTools MCP configuration.
@@ -33,8 +57,11 @@ export const CHROME_REMOTE_DEBUG_PORT = 9222;
  * Claude Code) to share one Chrome without profile-lock conflicts.
  */
 export const chromeMCPConfig: ChromeMCPConfig = {
-  command: "node_modules/.bin/chrome-devtools-mcp",
-  args: [`--browserUrl=http://127.0.0.1:${CHROME_REMOTE_DEBUG_PORT}`],
+  command: nodeRuntime,
+  args: [
+    chromeDevtoolsMcpBin(),
+    `--browserUrl=http://127.0.0.1:${CHROME_REMOTE_DEBUG_PORT}`,
+  ],
   env: {},
   timeout: 120000,
   debug: false,

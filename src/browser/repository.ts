@@ -47,7 +47,7 @@ import type { BrowserT } from "./i18n";
 // Types
 // ---------------------------------------------------------------------------
 
-interface MCPBridgeResponse {
+export interface MCPBridgeResponse {
   success: boolean;
   result: Array<{
     type: string;

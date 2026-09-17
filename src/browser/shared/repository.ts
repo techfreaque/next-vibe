@@ -112,7 +112,7 @@ export class BrowserSharedRepository {
           toolName: params.toolName,
         }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      }) as ResponseType<T>;
+      });
     }
   }
 
