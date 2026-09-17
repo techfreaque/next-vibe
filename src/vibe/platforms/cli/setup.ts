@@ -185,7 +185,11 @@ if exist "!CANDIDATE!" (
   )
   where npx >nul 2>nul
   if !errorlevel! equ 0 (
-    npx tsx "!CANDIDATE!" %*
+    REM --tsconfig: tsx resolves TS path aliases against the tsconfig of the
+    REM DIRECTORY IT RUNS IN, not the entry file's. From a nested project the
+    REM runtime's internal imports would resolve against that project's
+    REM tsconfig and crash with ERR_MODULE_NOT_FOUND.
+    npx tsx --tsconfig "!CURRENT_DIR!\\tsconfig.json" "!CANDIDATE!" %*
     exit /b !errorlevel!
   )
   echo ${CLI_BINARY_NAME}: neither bun nor npx found on PATH 1>&2
@@ -241,7 +245,10 @@ while ($true) {
       exit $LASTEXITCODE
     }
     if (Get-Command npx -ErrorAction SilentlyContinue) {
-      & npx tsx $candidate @args
+      # --tsconfig: tsx resolves TS path aliases against the cwd's tsconfig,
+      # not the entry file's — pin the project root's so the shim works from
+      # nested project directories.
+      & npx tsx --tsconfig (Join-Path $dir 'tsconfig.json') $candidate @args
       exit $LASTEXITCODE
     }
     [Console]::Error.WriteLine('${CLI_BINARY_NAME}: neither bun nor npx found on PATH')
@@ -308,7 +315,10 @@ while [ "$current_dir" != "$root" ]; do
       exec -a "$PROC_NAME" bun "$(_native_path "$candidate")" "$@"
     fi
     if command -v npx &>/dev/null; then
-      exec -a "$PROC_NAME" npx tsx "$(_native_path "$candidate")" "$@"
+      # --tsconfig: tsx resolves TS path aliases against the cwd's tsconfig,
+      # not the entry file's — pin the project root's so the CLI works from
+      # nested project directories.
+      exec -a "$PROC_NAME" npx tsx --tsconfig "$(_native_path "$current_dir/tsconfig.json")" "$(_native_path "$candidate")" "$@"
     fi
     echo "${CLI_BINARY_NAME}: neither bun nor npx found on PATH" 1>&2
     exit 1
@@ -771,11 +781,9 @@ if ($kept.Count -eq $parts.Count) {
               "package.json",
             );
             if (existsSync(packageJsonPath)) {
-              const packageJson = JSON.parse(
-                await readFile(packageJsonPath, "utf8"),
-              ) as {
+              const packageJson: {
                 version?: string;
-              };
+              } = JSON.parse(await readFile(packageJsonPath, "utf8"));
               version = packageJson.version;
             }
           } catch {

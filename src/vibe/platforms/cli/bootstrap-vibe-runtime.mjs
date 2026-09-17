@@ -28,7 +28,13 @@
  * step by hand.
  */
 import { spawnSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -116,7 +122,18 @@ function detectRootManager() {
   return null;
 }
 
-/** Installs the root dependencies, frozen. Only called when they are missing. */
+/**
+ * Installs the root dependencies, frozen. Only called when they are missing.
+ *
+ * `--ignore-scripts`: this call exists purely to get chalk/zod/ink/tsx on disk
+ * so the real runtime below can even start — it is not "setup". Without this
+ * flag the install fires the root `postinstall` hook, which re-enters this
+ * file as `bootstrap-vibe-runtime.mjs setup` while THIS install is still
+ * running, before the command the user actually asked for ever launches.
+ * Whatever real command runs next does its own install with scripts enabled,
+ * so postinstall still fires — exactly once, for real, there — instead of
+ * here, redundantly, for a bootstrap step that doesn't need it.
+ */
 function installRoot() {
   const root = detectRootManager();
   if (root === null) {
@@ -125,34 +142,29 @@ function installRoot() {
     );
     return false;
   }
+  const args = [...root.args, "--ignore-scripts"];
 
   console.log(
-    `\nInstalling root dependencies (${root.manager} ${root.args.join(" ")})…\n`,
+    `\nInstalling root dependencies (${root.manager} ${args.join(" ")})…\n`,
   );
-
-  // This install fires the root postinstall, which re-enters this file and would
-  // run setup a second time. The command below does it once, properly.
-  const env = { ...process.env, VIBE_SKIP_SETUP: "1" };
 
   // yarn goes through install-retry, which already retries three times around a
   // Windows AV/EDR race on freshly-extracted esbuild.exe.
   const retry = join(repoRoot, "buildscripts", "install-retry.mjs");
   if (root.manager === "yarn" && existsSync(retry)) {
     return (
-      spawnSync(process.execPath, [retry, ...root.args.slice(1)], {
+      spawnSync(process.execPath, [retry, ...args.slice(1)], {
         cwd: repoRoot,
         stdio: "inherit",
-        env,
       }).status === 0
     );
   }
 
   return (
-    spawnSync(root.manager, root.args, {
+    spawnSync(root.manager, args, {
       cwd: repoRoot,
       stdio: "inherit",
       shell,
-      env,
     }).status === 0
   );
 }
@@ -166,9 +178,6 @@ function skipReason() {
   // CI should be able to run.
   if (isPostinstall && process.env.CI) {
     return "CI is set";
-  }
-  if (isPostinstall && process.env.VIBE_SKIP_SETUP) {
-    return "VIBE_SKIP_SETUP is set";
   }
   return null;
 }
@@ -186,9 +195,90 @@ if (!isPostinstall && !rootInstalled() && !installRoot()) {
   process.exit(1);
 }
 
-const runtime = isOnPath("bun")
-  ? { command: "bun", args: [] }
-  : { command: "npx", args: ["tsx"] };
+/**
+ * tsx applies tsconfig `paths` (what makes `next-vibe/*` imports resolve) only
+ * when it auto-discovers a tsconfig.json by walking up from CWD, and that
+ * discovery can come up empty for reasons outside this script's control —
+ * silently, with path-alias resolution just disabled and no warning. Pointing
+ * tsx at the known-correct root tsconfig directly via TSX_TSCONFIG_PATH skips
+ * auto-discovery entirely. Bun ignores this var and uses its own built-in
+ * tsconfig support, so it's harmless to set unconditionally.
+ */
+const env = {
+  ...process.env,
+  TSX_TSCONFIG_PATH: join(repoRoot, "tsconfig.json"),
+};
+
+/**
+ * Ordered runtime candidates, most-preferred first. Bun's tsconfig-paths
+ * support is separate from tsx's and can fail independently of it —
+ * TSX_TSCONFIG_PATH above only hardens the tsx candidate. Rather than trust
+ * either blindly, `resolvesAlias` below actively probes each in order and uses
+ * the first one that actually resolves `next-vibe/*`, instead of committing to
+ * a preference and only discovering it's broken deep inside the real
+ * command's stack trace.
+ *
+ * `npx tsx` rather than resolving node_modules/.bin ourselves: npx already
+ * checks the local install before ever touching the registry, so this is the
+ * same binary in the common case, with npx's own node_modules tree-walk doing
+ * the resolution. No version pin needed: `rootInstalled()`/`installRoot()`
+ * above already guarantee a frozen-lockfile install ran before this point
+ * whenever node_modules was missing, so the lockfile-resolved tsx is already
+ * there for npx to find.
+ */
+const runtimeCandidates = [
+  ...(isOnPath("bun")
+    ? [{ command: "bun", args: [], label: "bun on PATH" }]
+    : []),
+  { command: "npx", args: ["tsx"], label: "npx tsx" },
+];
+
+/**
+ * A real file on disk, not a `-e`/`--eval` string: `shell: true` on Windows
+ * hands the whole command line to cmd.exe, which parses an unquoted `=>` as
+ * the redirection operator `>` followed by a filename — an eval string
+ * containing arrow functions can silently write its own tail as a junk file
+ * instead of ever running. A file path has no shell metacharacters left to
+ * misparse, which is the same reason runtimeEntry/bootstrapEntry are passed
+ * as paths below, not inline code.
+ *
+ * Under repoRoot/.tmp, not the OS temp directory: a candidate whose tsconfig
+ * discovery walks up from the FILE being run rather than from CWD (bun does
+ * this) would never reach the repo's tsconfig from a system temp dir, making
+ * every such candidate fail this probe regardless of whether it can actually
+ * resolve `next-vibe/*` for real files inside the repo.
+ */
+const tmpRoot = join(repoRoot, ".tmp");
+mkdirSync(tmpRoot, { recursive: true });
+const probeDir = mkdtempSync(join(tmpRoot, "vibe-resolve-probe-"));
+const probeFile = join(probeDir, "probe.mjs");
+writeFileSync(
+  probeFile,
+  "import('next-vibe/core/env').then(() => process.exit(0), () => process.exit(1));\n",
+);
+
+/** Does this candidate actually resolve a known `next-vibe/*` alias right now? */
+function resolvesAlias(candidate) {
+  const probe = spawnSync(candidate.command, [...candidate.args, probeFile], {
+    cwd: repoRoot,
+    shell,
+    env,
+  });
+  return probe.status === 0;
+}
+
+const workingCandidate = runtimeCandidates.find(resolvesAlias);
+if (!workingCandidate && runtimeCandidates.length > 1) {
+  console.warn(
+    `\nNone of the available runtimes (${runtimeCandidates.map((c) => c.label).join("; ")}) resolved 'next-vibe/*' imports in a quick smoke test. Proceeding with the first anyway — see diagnostics below.\n`,
+  );
+} else if (workingCandidate && workingCandidate !== runtimeCandidates[0]) {
+  console.warn(
+    `\n${runtimeCandidates[0].label} failed to resolve 'next-vibe/*' imports; falling back to ${workingCandidate.label}.\n`,
+  );
+}
+const runtime = workingCandidate ?? runtimeCandidates[0];
+rmSync(probeDir, { recursive: true, force: true });
 
 // The CLI runtime statically imports the generated registries, so on a tree with
 // no generated files it cannot even load — `setup` would fail before running.
@@ -219,7 +309,7 @@ if (!generatedProbes.some((probe) => existsSync(probe))) {
     const generated = spawnSync(
       runtime.command,
       [...runtime.args, bootstrapEntry],
-      { cwd, stdio: "inherit", shell },
+      { cwd, stdio: "inherit", shell, env },
     );
     if (generated.status === 0) {
       break;
@@ -230,12 +320,74 @@ if (!generatedProbes.some((probe) => existsSync(probe))) {
 const result = spawnSync(
   runtime.command,
   [...runtime.args, runtimeEntry, ...vibeCommand],
-  { cwd, stdio: "inherit", shell },
+  { cwd, stdio: "inherit", shell, env },
 );
 
-if (result.status !== 0) {
+/** Diagnostics for "why didn't this run", printed once, only on failure. */
+function printDiagnostics() {
+  const runtimeVersion = (() => {
+    const r = spawnSync(runtime.command, [...runtime.args, "--version"], {
+      shell,
+    });
+    return r.status === 0
+      ? r.stdout.toString().trim()
+      : `unresolved (exit ${r.status ?? r.error})`;
+  })();
+
+  const gitHead = (() => {
+    const r = spawnSync("git", ["rev-parse", "--short", "HEAD"], {
+      cwd: repoRoot,
+      shell,
+    });
+    return r.status === 0
+      ? r.stdout.toString().trim()
+      : "unresolved (not a git repo or git not on PATH)";
+  })();
+
+  // src/vibe/core is what tsconfig's `next-vibe/*` paths entry actually points
+  // at. `runtimeEntry` (vibe-runtime.ts) living deeper under platforms/cli can be
+  // present while this is missing — a stale or partial checkout, not a tsx/tsconfig
+  // problem — and that's indistinguishable from a real paths-resolution bug unless
+  // checked directly.
+  const coreDirPresent = existsSync(join(here, "..", "..", "core"));
+
   console.warn(
-    `\nvibe ${vibeCommand.join(" ")} did not complete. Run it manually if you need it:\n  ${runtime.command} ${[...runtime.args, runtimeEntry, ...vibeCommand].join(" ")}\n`,
+    [
+      "",
+      "--- vibe setup diagnostics ---",
+      `node:              ${process.version} (${process.platform})`,
+      `repoRoot:          ${repoRoot}`,
+      `git HEAD:          ${gitHead}`,
+      `tsconfig:          ${existsSync(join(repoRoot, "tsconfig.json")) ? "found" : "MISSING at repo root"}`,
+      `src/vibe/core:     ${coreDirPresent ? "present" : "MISSING — checkout is stale or partial; pull latest and reinstall"}`,
+      `runtime:           ${runtime.command} (${runtime.label ?? ""})`,
+      `runtime version:   ${runtimeVersion}`,
+      `TSX_TSCONFIG_PATH: ${env.TSX_TSCONFIG_PATH}`,
+      "",
+      "If imports like `next-vibe/...` still fail to resolve (ERR_MODULE_NOT_FOUND)",
+      "despite TSX_TSCONFIG_PATH pointing at a real file above, the tsx package",
+      "itself is likely broken. Usual fix: delete node_modules at the repo root and",
+      "reinstall with the package manager matching the root lockfile.",
+      "",
+      "Note for manual re-runs: paste the command below into PowerShell or cmd, not",
+      "Git Bash/WSL — those shells strip backslashes from Windows paths and mangle it.",
+      "---",
+    ].join("\n"),
+  );
+}
+
+if (result.status !== 0) {
+  printDiagnostics();
+  console.warn(
+    [
+      "",
+      `vibe ${vibeCommand.join(" ")} did not complete.`,
+      "Fix whatever the diagnostics above point to (usually a reinstall of",
+      "node_modules at the repo root), then re-run manually. In PowerShell:",
+      `  $env:TSX_TSCONFIG_PATH = "${env.TSX_TSCONFIG_PATH}"`,
+      `  ${runtime.command} ${[...runtime.args, runtimeEntry, ...vibeCommand].join(" ")}`,
+      "",
+    ].join("\n"),
   );
 }
 

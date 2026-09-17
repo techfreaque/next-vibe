@@ -101,6 +101,27 @@ const MCP_TARGETS: readonly {
       ),
     }),
   },
+  {
+    path: "opencode.json",
+    editor: "OpenCode",
+    render: (template) => ({
+      $schema: "https://opencode.ai/config.json",
+      mcp: Object.fromEntries(
+        Object.entries(template.mcpServers).map(([name, server]) => {
+          const { command, args = [], env, ...rest } = server;
+          return [
+            name,
+            {
+              type: "local",
+              command: [command, ...args],
+              ...(env !== undefined ? { environment: env } : {}),
+              ...rest,
+            },
+          ];
+        }),
+      ),
+    }),
+  },
 ];
 
 // Both writeMcpConfigs and removeMcpConfigs walk MCP_TARGETS directly, so a

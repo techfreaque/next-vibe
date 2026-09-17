@@ -192,6 +192,10 @@ const { POST } = createEndpoint({
     title: "Success",
     description: "Operation completed successfully",
   },
+
+  // Setup can run generators which may need to install dependencies, so we need
+  // a longer timeout than the default 90s. npm ci can take 2-3 minutes on a fresh install.
+  timeoutMs: 300_000, // 5 minutes
 });
 
 // Export types for repository usage - following migration guide pattern
