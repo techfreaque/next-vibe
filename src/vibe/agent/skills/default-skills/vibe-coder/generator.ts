@@ -1,12 +1,14 @@
 /**
  * Agent Docs Generator (domain-co-located).
  *
- * Generates CLAUDE.md and AGENTS.md at the repo root from the vibe-coder skill's
- * PROJECT_INSTRUCTIONS (the single source of truth). Byte-identical to the former
- * tooling/generators/agent-docs. No file scan.
+ * Generates AGENTS.md at the repo root from the vibe-coder skill's
+ * PROJECT_INSTRUCTIONS (the single source of truth). No file scan.
  *
- * Tokens replaced: {{AGENT_NAME}} → "Claude Code" / "Coding Agent";
- *                  {{AGENT_DOCS_FILE}} → "CLAUDE.md" / "AGENTS.md".
+ * CLAUDE.md is static (`@AGENTS.md`) and not generated - Claude Code
+ * resolves the `@` import itself.
+ *
+ * Tokens replaced: {{AGENT_NAME}} → "Coding Agent";
+ *                  {{AGENT_DOCS_FILE}} → "AGENTS.md".
  */
 
 import "server-only";
@@ -22,7 +24,6 @@ interface AgentDocTarget {
 }
 
 const TARGETS: AgentDocTarget[] = [
-  { fileName: "CLAUDE.md", agentName: "Claude Code" },
   { fileName: "AGENTS.md", agentName: "Coding Agent" },
 ];
 

@@ -36,12 +36,13 @@ import {
 /**
  * The vibe-coder systemPrompt is the SINGLE SOURCE OF TRUTH for project instructions.
  *
- * `vibe gen` reads this and generates CLAUDE.md + AGENTS.md from it.
+ * `vibe gen` reads this and generates AGENTS.md from it. CLAUDE.md is static
+ * (`@AGENTS.md`) and not generated.
  * Tokens replaced by the agent-docs generator:
- *   {{AGENT_NAME}}      → "Claude Code" or "Coding Agent"
- *   {{AGENT_DOCS_FILE}} → "CLAUDE.md" or "AGENTS.md"
+ *   {{AGENT_NAME}}      → "Coding Agent"
+ *   {{AGENT_DOCS_FILE}} → "AGENTS.md"
  *
- * Do NOT edit CLAUDE.md or AGENTS.md manually - edit this systemPrompt instead.
+ * Do NOT edit AGENTS.md manually - edit this systemPrompt instead.
  */
 export const PROJECT_INSTRUCTIONS = `# Project Overview
 
@@ -63,21 +64,22 @@ export const PROJECT_INSTRUCTIONS = `# Project Overview
 
 Three instances, three purposes. Never confuse them.
 
-| Instance   | CLI flags          | DB              | MCP server | Role                               |
-| ---------- | ------------------ | --------------- | ---------- | ---------------------------------- |
-| **Atlas**  | _(no flags)_       | Atlas dev DB    | \`atlas\`    | Dev/coding instance. You live here. |
-| **Hermes** | \`--hermes\`         | Hermes local DB | \`hermes\`   | Max's daily driver. Local preview. |
-| **Thea**   | \`--hermes --remote\` | Prod DB         | \`thea\`     | Cloud AI on VPS. Production.       |
+| Instance   | CLI flags           | DB              | MCP server | Role                                |
+| ---------- | ------------------- | --------------- | ---------- | ----------------------------------- |
+| **Atlas**  | _(no flags)_        | Atlas dev DB    | \`atlas\`    | Dev/coding instance. You live here. |
+| **Hermes** | \`--hermes\`          | Hermes local DB | \`hermes\`   | Max's daily driver. Local preview.  |
+| **Thea**   | \`--hermes --remote\` | Prod DB         | \`thea\`     | Cloud AI on VPS. Production.        |
 
 Each instance runs **two server modes** — dev (TanStack/Vite, hot reload) and prod (Next.js build). They use different pid/log files and ports.
 
-| Server      | Command                                     | PID file                | Log file                  | Port lookup                              |
-| ----------- | ------------------------------------------- | ----------------------- | ------------------------- | ---------------------------------------- |
-| Atlas dev   | \`vibe dev\`                                  | \`.tmp/.atlas.pid\`       | \`.tmp/.atlas.log\`         | \`grep "^PORT:" .tmp/.atlas.pid\`          |
-| Hermes dev  | \`vibe --hermes dev\`                         | \`.tmp/.hermes-dev.pid\`  | \`.tmp/.hermes-dev.log\`    | \`grep "^PORT:" .tmp/.hermes-dev.pid\`     |
-| Hermes prod | \`vibe rebuild\` / \`vibe build && vibe start\` | \`.tmp/.hermes.pid\`      | \`.tmp/.hermes.log\`        | \`grep "^PORT:" .tmp/.hermes.pid\`         |
+| Server      | Command                                     | PID file               | Log file               | Port lookup                          |
+| ----------- | ------------------------------------------- | ---------------------- | ---------------------- | ------------------------------------ |
+| Atlas dev   | \`vibe dev\`                                  | \`.tmp/.atlas.pid\`      | \`.tmp/.atlas.log\`      | \`grep "^PORT:" .tmp/.atlas.pid\`      |
+| Hermes dev  | \`vibe --hermes dev\`                         | \`.tmp/.hermes-dev.pid\` | \`.tmp/.hermes-dev.log\` | \`grep "^PORT:" .tmp/.hermes-dev.pid\` |
+| Hermes prod | \`vibe rebuild\` / \`vibe build && vibe start\` | \`.tmp/.hermes.pid\`     | \`.tmp/.hermes.log\`     | \`grep "^PORT:" .tmp/.hermes.pid\`     |
 
 **Rules:**
+
 - Default work target is **Atlas dev** (\`vibe dev\`). Safe to run anytime — replaces any existing Atlas dev instance.
 - **Hermes dev** (\`vibe --hermes dev\`) — dev server on Hermes DB. Useful when tests need two running instances simultaneously.
 - **Hermes prod** (\`vibe rebuild\`) — zero-downtime update. \`vibe build && vibe start\` only for a fresh first start. Max's live preview — only touch when explicitly asked.
