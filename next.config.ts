@@ -5,6 +5,10 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   typedRoutes: true,
   productionBrowserSourceMaps: false,
+  // `next dev` auto-writes AGENTS.md/CLAUDE.md with its own agent-rules block
+  // when it detects an AI coding agent (generate-agent-files.js). AGENTS.md
+  // is ours — the repo's working rules — so the injection is disabled.
+  agentRules: false,
   experimental: {
     // workerThreads: false,
     // Cap page-data collection workers. Next.js default is min(cpuCount, freemem/1GB)
