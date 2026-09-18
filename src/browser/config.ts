@@ -29,6 +29,10 @@ export interface ChromeMCPConfig {
  */
 export const CHROME_REMOTE_DEBUG_PORT = browserEnv.CHROME_REMOTE_DEBUG_PORT;
 
+/** A real Node require injected by webpack, bypassed by its bundler/tracer -
+ *  only exists in the webpack-bundled prod server, not under Bun/dev. */
+declare const __non_webpack_require__: NodeRequire | undefined;
+
 let chromeDevtoolsMcpBinCache: string | undefined;
 /**
  * Resolve the chrome-devtools-mcp entrypoint as an absolute script path
@@ -37,11 +41,30 @@ let chromeDevtoolsMcpBinCache: string | undefined;
  * whenever the server process's cwd isn't the repo root. require.resolve
  * gives an absolute, platform-independent path we can run directly with the
  * current runtime.
+ *
+ * The specifier is built from concatenated parts (not a literal argument)
+ * and resolved via __non_webpack_require__ when available: webpack's static
+ * analyzer pattern-matches any `.resolve("literal/path")` call site,
+ * including through createRequire(), and tries to trace/bundle
+ * chrome-devtools-mcp's whole ESM module graph into the server build even
+ * though this is a runtime-only subprocess path lookup. Under Bun/dev
+ * (no webpack), __non_webpack_require__ doesn't exist - fall back to a
+ * normal createRequire().
  */
 function chromeDevtoolsMcpBin(): string {
-  chromeDevtoolsMcpBinCache ??= createRequire(import.meta.url).resolve(
-    "chrome-devtools-mcp/build/src/bin/chrome-devtools-mcp.js",
-  );
+  if (chromeDevtoolsMcpBinCache) {
+    return chromeDevtoolsMcpBinCache;
+  }
+  const specifier = [
+    "chrome-devtools-mcp",
+    "build/src/bin",
+    "chrome-devtools-mcp.js",
+  ].join("/");
+  const req =
+    typeof __non_webpack_require__ !== "undefined"
+      ? __non_webpack_require__
+      : createRequire(import.meta.url);
+  chromeDevtoolsMcpBinCache = req.resolve(specifier);
   return chromeDevtoolsMcpBinCache;
 }
 

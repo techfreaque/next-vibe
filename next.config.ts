@@ -267,6 +267,15 @@ const nextConfig: NextConfig = {
     // Node.js loads it from node_modules at runtime where the worker file is present.
     "pdf-parse",
     "pdfjs-dist",
+    // chrome-devtools-mcp (pulled in via src/browser/*, server-only route code)
+    // ships its own bundled DevTools frontend assets (legacy.js, sdk.js, ...)
+    // referenced by absolute /bundled/... paths that only resolve inside its
+    // own package directory at runtime - webpack can't trace/emit them.
+    // puppeteer-core (its dependency) has the same class of runtime-only
+    // asset resolution (bidi.js, wasmparser worker). Keep both external so
+    // Node.js require()s them from node_modules instead of bundling.
+    "chrome-devtools-mcp",
+    "puppeteer-core",
   ],
 
   images: {
