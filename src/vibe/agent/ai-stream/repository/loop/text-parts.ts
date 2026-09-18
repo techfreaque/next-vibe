@@ -128,6 +128,11 @@ export async function onReasoningStart(state: StreamLoopState): Promise<{
   const { currentAssistantMessageId } = ctx;
   const thinkTag = "<think>";
 
+  // New reasoning block - reset the replay-data accumulator (a message can
+  // carry multiple reasoning blocks across steps).
+  ctx.currentReasoningSignature = null;
+  ctx.currentReasoningRedactedData = null;
+
   if (!currentAssistantMessageId) {
     const messageId = ctx.getNextAssistantMessageId();
     logger.debug("[AI Stream] Creating ASSISTANT message (reasoning)", {
@@ -168,14 +173,34 @@ export async function onReasoningStart(state: StreamLoopState): Promise<{
   };
 }
 
+/** Provider-namespaced reasoning replay data carried on a reasoning-delta
+ *  part's providerMetadata. Anthropic streams its signature/redacted-thinking
+ *  payload as its own empty-text reasoning-delta (not on reasoning-end). */
+export interface ReasoningProviderMetadata {
+  readonly anthropic?: {
+    readonly signature?: string;
+    readonly redactedData?: string;
+  };
+}
+
 /** Handle a reasoning-delta part: append reasoning text inside the open
- *  <think> block. Returns the new accumulated content. */
+ *  <think> block, and capture any provider replay data (signature /
+ *  redacted-thinking) carried on this delta. Returns the new accumulated
+ *  content. */
 export function onReasoningDelta(
   state: StreamLoopState,
   reasoningText: string,
+  providerMetadata?: ReasoningProviderMetadata,
 ): string {
   const { ctx } = state.p;
   const { currentAssistantMessageId, currentAssistantContent, dbWriter } = ctx;
+
+  if (providerMetadata?.anthropic?.signature) {
+    ctx.currentReasoningSignature = providerMetadata.anthropic.signature;
+  }
+  if (providerMetadata?.anthropic?.redactedData) {
+    ctx.currentReasoningRedactedData = providerMetadata.anthropic.redactedData;
+  }
 
   if (reasoningText && currentAssistantMessageId) {
     const newContent = currentAssistantContent + reasoningText;

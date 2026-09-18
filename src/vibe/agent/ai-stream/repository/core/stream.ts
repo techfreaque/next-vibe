@@ -73,6 +73,12 @@ export class ToolExecutionContextImpl {
 
   // Reasoning state
   isInReasoningBlock = false;
+  /** Provider-issued reasoning replay data for the CURRENT reasoning block
+   *  (e.g. Anthropic's signature_delta / redacted_thinking, carried on a
+   *  reasoning-delta part's providerMetadata, not on reasoning-end). Reset
+   *  when a new reasoning block starts; read at finalize time. */
+  currentReasoningSignature: string | null = null;
+  currentReasoningRedactedData: string | null = null;
 
   // Tool tracking
   pendingToolMessages = new Map<string, PendingToolData>();

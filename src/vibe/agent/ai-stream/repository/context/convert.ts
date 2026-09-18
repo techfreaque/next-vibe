@@ -6,7 +6,7 @@
 import "server-only";
 
 import type { ToolResultOutput } from "@ai-sdk/provider-utils";
-import type { ModelMessage, ToolCallPart } from "ai";
+import type { AssistantContent, ModelMessage, ToolCallPart } from "ai";
 import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
@@ -311,22 +311,61 @@ export async function toAiSdkMessage(
       return { content: contentParts, role: "user" };
     }
     case ChatMessageRole.ASSISTANT: {
-      const assistantParts: Array<
-        | { type: "text"; text: string }
-        | { type: "file"; data: string; mediaType: string }
-      > = [];
+      const assistantParts: Array<Exclude<AssistantContent, string>[number]> =
+        [];
 
-      // Add text content - strip <think> blocks (kept in DB for UI but must
-      // not be re-sent to AI as part of history).
-      if (message.content?.trim()) {
-        const strippedContent = message.content
-          .replaceAll(/<think>[\s\S]*?<\/think>/g, "")
-          .replace(/<think>[\s\S]*$/i, "")
-          .replaceAll("</think>", "")
-          .trim();
-        if (strippedContent) {
-          assistantParts.push({ type: "text", text: strippedContent });
-        }
+      // Extract <think>...</think> blocks as a proper `reasoning` part instead
+      // of stripping them - re-sent to the AI as structured reasoning history
+      // (with its provider signature, when captured) rather than discarded.
+      // An unclosed trailing <think> (stream interrupted mid-reasoning) has no
+      // matching close tag - drop it, it never got to a stable final form.
+      const rawContent = message.content ?? "";
+      const reasoningMatches = [
+        ...rawContent.matchAll(/<think>([\s\S]*?)<\/think>/g),
+      ];
+      const reasoningText = reasoningMatches
+        .map((m) => m[1])
+        .join("\n\n")
+        .trim();
+      const strippedContent = rawContent
+        .replaceAll(/<think>[\s\S]*?<\/think>/g, "")
+        .replace(/<think>[\s\S]*$/i, "")
+        .trim();
+
+      if (reasoningText) {
+        const reasoningSignature =
+          "metadata" in message
+            ? message.metadata?.reasoningSignature
+            : undefined;
+        const reasoningRedactedData =
+          "metadata" in message
+            ? message.metadata?.reasoningRedactedData
+            : undefined;
+        assistantParts.push({
+          type: "reasoning",
+          text: reasoningText,
+          // Only attach provider-namespaced replay data when we actually
+          // captured a signature/redacted payload for it - an untagged
+          // reasoning part (o1-style/DeepSeek models) is valid on its own.
+          ...(reasoningSignature || reasoningRedactedData
+            ? {
+                providerOptions: {
+                  anthropic: {
+                    ...(reasoningSignature
+                      ? { signature: reasoningSignature }
+                      : {}),
+                    ...(reasoningRedactedData
+                      ? { redactedData: reasoningRedactedData }
+                      : {}),
+                  },
+                },
+              }
+            : {}),
+        });
+      }
+
+      if (strippedContent) {
+        assistantParts.push({ type: "text", text: strippedContent });
       }
 
       // Add generated image so the model can see its own previous output.

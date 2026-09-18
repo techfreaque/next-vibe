@@ -140,6 +140,29 @@ export interface EndpointEventDeclaration<
   readonly syncDomain?: SyncDomain;
   readonly allowedRoles?: readonly UserRoleValue[];
   readonly payloadType?: TPayloadSchema;
+  /**
+   * Synchronous gate evaluated right before the cache `operation` would apply.
+   * Returning false skips the cache mutation for this event entirely (onEvent
+   * still runs). For client-only, per-event suppression — e.g. dropping
+   * further content deltas once the user has cancelled a stream — without
+   * waiting on a server round-trip.
+   */
+  shouldApplyOperation?(
+    ctx: EndpointEventHandlerContext<
+      TResFields extends NestedFieldSpec<TResponseOutput>
+        ? NestedEventPayload<TResponseOutput, TResFields>
+        : TResFields extends readonly (keyof TResponseOutput)[]
+          ? Pick<TResponseOutput, TResFields[number]>
+          : Record<never, never>,
+      TReqFields extends readonly (keyof TRequestOutput)[]
+        ? Pick<TRequestOutput, TReqFields[number]>
+        : Record<never, never>,
+      TUrlFields extends readonly (keyof TUrlVariablesOutput)[]
+        ? Pick<TUrlVariablesOutput, TUrlFields[number]>
+        : TUrlVariablesOutput,
+      TPayloadSchema extends z.ZodTypeAny ? z.infer<TPayloadSchema> : never
+    >,
+  ): boolean;
   onEvent?(
     ctx: EndpointEventHandlerContext<
       TResFields extends NestedFieldSpec<TResponseOutput>
@@ -193,6 +216,11 @@ export interface EndpointEventsMapBase {
     readonly allowedRoles?: readonly UserRoleValue[];
     readonly payloadType?: z.ZodTypeAny;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    shouldApplyOperation?(
+      // oxlint-disable-next-line no-explicit-any
+      ctx: EndpointEventHandlerContext<never, never, never, any>,
+    ): boolean;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onEvent?(
       // oxlint-disable-next-line no-explicit-any
       ctx: EndpointEventHandlerContext<never, never, never, any>,
@@ -222,6 +250,18 @@ export type EndpointEventsMap<
     readonly syncDomain?: SyncDomain;
     readonly allowedRoles?: readonly UserRoleValue[];
     readonly payloadType?: z.ZodTypeAny;
+    shouldApplyOperation?(
+      ctx: EndpointEventHandlerContext<
+        TResponseOutput,
+        TRequestOutput,
+        TUrlVariablesOutput,
+        TEvents[K] extends { payloadType?: infer S }
+          ? Exclude<S, undefined> extends z.ZodTypeAny
+            ? z.output<Exclude<S, undefined>>
+            : never
+          : never
+      >,
+    ): boolean;
     onEvent?(
       ctx: EndpointEventHandlerContext<
         TResponseOutput,

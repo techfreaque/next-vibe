@@ -10,8 +10,9 @@
  *
  * For each event received:
  *  1. Looks up endpoint.events[eventName]
- *  2. If declaration has fields: applies operation to GET response cache
- *  3. Calls declaration.onEvent?.({ responseData, requestData, urlPathParams, queryClient, logger })
+ *  2. Evaluates declaration.shouldApplyOperation?.(ctx) — false skips step 3
+ *  3. If declaration has fields: applies operation to GET response cache
+ *  4. Calls declaration.onEvent?.({ responseData, requestData, urlPathParams, queryClient, logger })
  *     where partial is the typed event payload from types.EventPayloads
  *
  * Subscribes to TWO channels for the SAME endpoint instance:
@@ -190,7 +191,25 @@ export function useEndpointSubscription(
         return;
       }
 
-      if (eventDeclarationHasFields(declaration) && cacheKey !== undefined) {
+      const currentUser = userRef.current;
+      const shouldApply =
+        !declaration.shouldApplyOperation ||
+        !currentUser ||
+        declaration.shouldApplyOperation({
+          responseData: wirePayload,
+          requestData: envelope.requestData ?? requestDataRef.current,
+          urlPathParams: envelope.urlPathParams ?? resolvedParams,
+          payload: envelope.payload,
+          logger,
+          user: currentUser,
+          locale: localeRef.current,
+        });
+
+      if (
+        shouldApply &&
+        eventDeclarationHasFields(declaration) &&
+        cacheKey !== undefined
+      ) {
         queryClient.setQueryData(
           [cacheKey],
           (
@@ -224,7 +243,6 @@ export function useEndpointSubscription(
         );
       }
 
-      const currentUser = userRef.current;
       if (declaration.onEvent && currentUser) {
         void declaration.onEvent({
           responseData: wirePayload,

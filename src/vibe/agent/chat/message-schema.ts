@@ -149,6 +149,13 @@ export const messageMetadataSchema: z.ZodType<MessageMetadata> = z.object({
   isTranscribing: tolerant(z.boolean()),
   isUploadingAttachments: tolerant(z.boolean()),
 
+  // Provider-issued reasoning replay data (e.g. Anthropic extended-thinking
+  // signature / redacted-thinking payload). Required alongside the <think>
+  // text to re-send a valid reasoning block as history on the next turn -
+  // without it, the provider rejects or silently discards replayed reasoning.
+  reasoningSignature: tolerant(z.string()),
+  reasoningRedactedData: tolerant(z.string()),
+
   // Tool call
   toolCall: tolerant(toolCallSchema),
 

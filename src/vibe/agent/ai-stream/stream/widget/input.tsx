@@ -44,8 +44,8 @@ import { useApiQuery } from "next-vibe/unified-ui/hooks/use-api-query";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
-import { AGENT_MESSAGE_LENGTH } from "../../../chat/constants";
-import { NEW_MESSAGE_ID } from "../../../chat/enum";
+import { getAgentMessageMaxLength } from "../../../chat/constants";
+import { ChatMessageRole, NEW_MESSAGE_ID } from "../../../chat/enum";
 import { useChatBootContext } from "../../../chat/hooks/context";
 import { useChatStore } from "../../../chat/hooks/store";
 import { useChatNavigationStore } from "../../../chat/hooks/use-chat-navigation-store";
@@ -463,6 +463,27 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
       ? (messagesQuery.data?.backgroundTasks ?? [])
       : [];
 
+  // Remaining-context-derived input length: the latest assistant message's
+  // token usage is the thread's current context footprint (0 for a fresh
+  // thread) — used against the selected model's contextWindow.
+  const latestAssistantTokens = useMemo(() => {
+    const messages = messagesQuery.data?.messages ?? [];
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const msg = messages[i];
+      if (msg?.role === ChatMessageRole.ASSISTANT && msg.metadata) {
+        return (
+          (msg.metadata.promptTokens ?? 0) +
+          (msg.metadata.completionTokens ?? 0)
+        );
+      }
+    }
+    return 0;
+  }, [messagesQuery.data?.messages]);
+  const inputMaxLength = getAgentMessageMaxLength(
+    currentModel?.contextWindow,
+    latestAssistantTokens,
+  );
+
   const deleteTaskMutation = useApiMutation(
     cronIdEndpoints.DELETE,
     logger,
@@ -645,7 +666,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
             className="px-0 text-base pl-3"
             variant="ghost"
             rows={2}
-            maxLength={AGENT_MESSAGE_LENGTH}
+            maxLength={inputMaxLength}
             title={canPost ? undefined : noPermissionReason}
           />
 

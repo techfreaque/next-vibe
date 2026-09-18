@@ -30,7 +30,7 @@ import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX, ReactNode } from "react";
 import { useCallback, useEffect, useRef } from "react";
 
-import { AGENT_MESSAGE_LENGTH } from "../../../chat/constants";
+import { getAgentMessageMaxLength } from "../../../chat/constants";
 import type { EnabledTool } from "../../../chat/hooks/store";
 import { useChatSettings } from "../../../chat/settings/hooks";
 import type { FavoriteCard } from "../../../skills/favorites/definition";
@@ -174,6 +174,12 @@ export function WidgetChatInput({
   const currentModel = getChatModelById(modelId);
   const modelSupportsTools = currentModel?.supportsTools ?? false;
   const canSubmit = content.trim().length > 0 && !isInactive;
+  // No thread history in this single-turn form widget - just the model's raw
+  // context window (no "used tokens" to subtract).
+  const inputMaxLength = getAgentMessageMaxLength(
+    currentModel?.contextWindow,
+    0,
+  );
 
   const content_ = (
     <Div
@@ -199,7 +205,7 @@ export function WidgetChatInput({
             className="px-0 text-base pl-3"
             variant="ghost"
             rows={2}
-            maxLength={AGENT_MESSAGE_LENGTH}
+            maxLength={inputMaxLength}
           />
 
           {/* Hint overlay */}

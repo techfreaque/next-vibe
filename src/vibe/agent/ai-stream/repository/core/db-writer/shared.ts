@@ -43,6 +43,8 @@ export interface ThrottleEngineView {
       cacheWriteTokens?: number | null;
       timeToFirstToken?: number | null;
       creditCost?: number | null;
+      reasoningSignature?: string;
+      reasoningRedactedData?: string;
     },
   ): Promise<void>;
 }

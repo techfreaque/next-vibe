@@ -430,6 +430,9 @@ export class AbortErrorHandler {
               totalTokens: tokenEstimate.totalTokens,
               promptTokens: tokenEstimate.promptTokens,
               completionTokens: tokenEstimate.completionTokens,
+              reasoningSignature: ctx.currentReasoningSignature ?? undefined,
+              reasoningRedactedData:
+                ctx.currentReasoningRedactedData ?? undefined,
             });
 
             logger.debug("[AI Stream] Saved partial content to database", {

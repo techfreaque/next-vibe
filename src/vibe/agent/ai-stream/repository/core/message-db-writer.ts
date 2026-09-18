@@ -139,6 +139,8 @@ export class MessageDbWriter {
     completionTokens: number | null;
     cachedInputTokens?: number;
     timeToFirstToken?: number | null;
+    reasoningSignature?: string;
+    reasoningRedactedData?: string;
   }): Promise<void> {
     return textWrites.emitContentDone(this, params);
   }

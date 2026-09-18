@@ -34,7 +34,8 @@ export async function finalizeAssistant(
   },
 ): Promise<void> {
   const { logger } = state.p;
-  const { dbWriter } = state.p.ctx;
+  const { dbWriter, currentReasoningSignature, currentReasoningRedactedData } =
+    state.p.ctx;
   const {
     currentAssistantMessageId,
     isInReasoningBlock,
@@ -61,6 +62,8 @@ export async function finalizeAssistant(
     totalTokens: totalTokens ?? null,
     promptTokens: promptTokens ?? null,
     completionTokens: completionTokens ?? null,
+    reasoningSignature: currentReasoningSignature ?? undefined,
+    reasoningRedactedData: currentReasoningRedactedData ?? undefined,
   });
 
   logger.debug("[FinalizationHandler] Persisted ASSISTANT message", {

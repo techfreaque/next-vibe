@@ -203,6 +203,8 @@ export class ThrottleEngine {
     timeToFirstToken?: number | null;
     streamingTime?: number | null;
     creditCost?: number | null;
+    reasoningSignature?: string;
+    reasoningRedactedData?: string;
   }): Partial<MessageMetadata> {
     const meta: Partial<MessageMetadata> = {};
     if (tokens.promptTokens !== null) {
@@ -238,6 +240,12 @@ export class ThrottleEngine {
     }
     if (tokens.creditCost !== null && tokens.creditCost !== undefined) {
       meta.creditCost = tokens.creditCost;
+    }
+    if (tokens.reasoningSignature) {
+      meta.reasoningSignature = tokens.reasoningSignature;
+    }
+    if (tokens.reasoningRedactedData) {
+      meta.reasoningRedactedData = tokens.reasoningRedactedData;
     }
     return meta;
   }
@@ -300,6 +308,8 @@ export class ThrottleEngine {
       cacheWriteTokens?: number | null;
       timeToFirstToken?: number | null;
       creditCost?: number | null;
+      reasoningSignature?: string;
+      reasoningRedactedData?: string;
     },
   ): Promise<void> {
     if (this.deps.isIncognito) {

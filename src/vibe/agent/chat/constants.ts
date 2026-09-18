@@ -40,9 +40,48 @@ export const STORAGE_KEYS = {
 } as const;
 
 /**
- * Agent message content length limit
+ * Fallback agent message content length limit - used server-side (zod schema,
+ * model-agnostic) and client-side before a model/thread is known yet.
  */
-export const AGENT_MESSAGE_LENGTH = 40000; // TODO find a better way and also better error
+export const AGENT_MESSAGE_LENGTH = 40000;
+
+/** Same char/token ratio the server's token estimator uses (token-estimator.ts). */
+const CHARS_PER_TOKEN = 3.5;
+
+/** Never let the input shrink below this many characters, even on tiny-context models. */
+const MIN_MESSAGE_LENGTH = 2000;
+
+/** Output + system-prompt + tools headroom reserved from the pasteable budget. */
+const COMPACT_TRIGGER_RESERVE = 8000;
+
+/**
+ * Chat input max length, derived from the selected model's remaining context
+ * budget instead of a flat constant. `contextWindow` is the model's total
+ * token budget; `usedTokens` is the thread's current prompt+completion usage
+ * (from the latest assistant message's metadata, 0 for a fresh thread).
+ * Reserves headroom for the system prompt/tools/output so the whole budget
+ * isn't offered to paste.
+ */
+export function getAgentMessageMaxLength(
+  contextWindow: number | null | undefined,
+  usedTokens: number,
+): number {
+  if (!contextWindow) {
+    return AGENT_MESSAGE_LENGTH;
+  }
+  const reservedTokens = Math.min(
+    contextWindow * 0.25,
+    COMPACT_TRIGGER_RESERVE,
+  );
+  const remainingTokens = Math.max(
+    0,
+    contextWindow - usedTokens - reservedTokens,
+  );
+  return Math.max(
+    MIN_MESSAGE_LENGTH,
+    Math.floor(remainingTokens * CHARS_PER_TOKEN),
+  );
+}
 
 /**
  * Convenience wrapper: derive role flags from a JWT payload and return the

@@ -205,6 +205,13 @@ export type MessageMetadata = {
   isStreaming?: boolean;
   /** Client-only: marks an optimistic placeholder added before server confirms */
   isOptimistic?: boolean;
+  /**
+   * Provider-issued reasoning replay data (e.g. Anthropic extended-thinking
+   * signature / redacted-thinking payload). Required alongside the <think>
+   * text to re-send a valid reasoning block as history on the next turn.
+   */
+  reasoningSignature?: string;
+  reasoningRedactedData?: string;
 
   // Voice input metadata (for USER messages with audio input)
   isTranscribing?: boolean;

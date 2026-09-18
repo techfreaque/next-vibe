@@ -145,6 +145,10 @@ export async function emitContentDone(
     completionTokens: number | null;
     cachedInputTokens?: number;
     timeToFirstToken?: number | null;
+    /** Provider-issued reasoning replay data (e.g. Anthropic extended-thinking
+     *  signature / redacted-thinking payload) - DB-only, not sent over SSE. */
+    reasoningSignature?: string;
+    reasoningRedactedData?: string;
   },
 ): Promise<void> {
   const {
@@ -156,6 +160,8 @@ export async function emitContentDone(
     completionTokens,
     cachedInputTokens,
     timeToFirstToken,
+    reasoningSignature,
+    reasoningRedactedData,
   } = params;
 
   // SSE: CONTENT_DONE
@@ -190,6 +196,8 @@ export async function emitContentDone(
       finishReason,
       cachedInputTokens: cachedInputTokens ?? null,
       timeToFirstToken: timeToFirstToken ?? null,
+      reasoningSignature,
+      reasoningRedactedData,
     });
 
     // Embed this assistant message at write time — the next step's cortex

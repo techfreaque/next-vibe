@@ -63,6 +63,7 @@ import {
   onReasoningEnd,
   onReasoningStart,
   onTextDelta,
+  type ReasoningProviderMetadata,
 } from "./text-parts";
 import {
   onToolCall,
@@ -427,7 +428,10 @@ export class StreamLoop implements StreamLoopState {
 
     if (part.type === "reasoning-delta") {
       const reasoningText = part.text;
-      ctx.currentAssistantContent = this.onReasoningDelta(reasoningText);
+      ctx.currentAssistantContent = this.onReasoningDelta(
+        reasoningText,
+        part.providerMetadata,
+      );
 
       return { shouldAbort: false };
     }
@@ -772,8 +776,11 @@ export class StreamLoop implements StreamLoopState {
 
   /** Handle a reasoning-delta part: append reasoning text inside the open
    *  <think> block. Returns the new accumulated content. */
-  private onReasoningDelta(reasoningText: string): string {
-    return onReasoningDelta(this, reasoningText);
+  private onReasoningDelta(
+    reasoningText: string,
+    providerMetadata?: ReasoningProviderMetadata,
+  ): string {
+    return onReasoningDelta(this, reasoningText, providerMetadata);
   }
 
   /** Handle a reasoning-end part: close the <think> block.

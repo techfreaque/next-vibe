@@ -26,6 +26,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { useAIStreamStore } from "../../../../ai-stream/stream/hooks/store";
 import { ChatModelId } from "../../../../ai-stream/models";
 import { rootFolderIdOptions } from "../../../config";
 import type { MessageMetadata } from "../../../db";
@@ -41,6 +42,22 @@ import {
 } from "../../../incognito/event-persist";
 import { THREAD_MESSAGES_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
+
+/**
+ * Once the user has clicked "stop", drop further streamed deltas for that
+ * thread client-side instead of waiting for the server's abort teardown to
+ * finish — the visible stop is then instant, no matter how long the
+ * in-flight fetch/provider teardown takes.
+ */
+function shouldApplyDeltaWhileNotAborting(ctx: {
+  readonly urlPathParams: { readonly threadId?: string };
+}): boolean {
+  const threadId = ctx.urlPathParams.threadId;
+  if (!threadId) {
+    return true;
+  }
+  return !useAIStreamStore.getState().isAborting(threadId);
+}
 
 const MessagesWidget = lazyWidget(() =>
   import("./widget/widget").then((m) => ({ default: m.MessagesWidget })),
@@ -121,8 +138,6 @@ const { GET } = createEndpoint({
         }
         // Clear pending state — stream has confirmed its first message, stop button
         // visibility is now driven by streamingState WS events instead.
-        const { useAIStreamStore } =
-          await import("../../../../ai-stream/stream/hooks/store");
         useAIStreamStore.getState().setPending(threadId, false);
 
         if (arrived.role === ChatMessageRole.USER) {
@@ -190,6 +205,9 @@ const { GET } = createEndpoint({
       urlPathParamsFields: ["threadId"] as const,
       responseFields: { messages: ["id", "content"] } as const,
       operation: "append" as const,
+      // Stop applying deltas the instant the user clicks stop - don't wait
+      // for the server's abort teardown to finish.
+      shouldApplyOperation: shouldApplyDeltaWhileNotAborting,
     },
 
     // ── content-done ─────────────────────────────────────────────────────────
@@ -211,6 +229,7 @@ const { GET } = createEndpoint({
       urlPathParamsFields: ["threadId"] as const,
       responseFields: { messages: ["id", "content"] } as const,
       operation: "append" as const,
+      shouldApplyOperation: shouldApplyDeltaWhileNotAborting,
     },
 
     // ── reasoning-done ───────────────────────────────────────────────────────
@@ -433,8 +452,6 @@ const { GET } = createEndpoint({
         // Clear aborting state - the framework already merged
         // streamingState: "idle" into the cache; clear the cancel spinner.
         // Also release the keeper's headless incognito subscription.
-        const { useAIStreamStore } =
-          await import("../../../../ai-stream/stream/hooks/store");
         useAIStreamStore.getState().clearThread(threadId);
         useAIStreamStore.getState().removeIncognitoStream(threadId);
         // Sweep any dangling optimistic placeholders - normally gone by now
