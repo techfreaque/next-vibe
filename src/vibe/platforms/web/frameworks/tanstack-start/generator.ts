@@ -913,7 +913,21 @@ export const generator: GeneratorDefinition = {
     }
 
     emitRootRedirect(result);
-    await regenerateRouteTree(result);
+    // The live TanStack dev server (vibe dev) runs its OWN in-process
+    // route-tree generator (configResolved at boot, watchChange on every
+    // route-shell edit) and is the sole reader of routeTree.gen.ts via its
+    // request-time Vite plugin. This dev-watcher-driven run only needs to
+    // keep writing the route SHELLS above (new/changed endpoints) - Vite's
+    // own generator rebuilds the tree from them on its own. Running our
+    // standalone Generator here too races both on the same routes directory
+    // and output file: if Vite's scan lands mid-rewrite, it throws an
+    // unrecoverable "Crawling result not available" that 500s every request
+    // until the dev server is restarted. Only rebuild the tree ourselves for
+    // a standalone run (`vibe gen`, `vibe build`, setup) - there is no live
+    // Vite process to race with, and nothing else would write the tree.
+    if (!ctx.isWatcherRun) {
+      await regenerateRouteTree(result);
+    }
 
     if (result.errors.length > 0) {
       return {

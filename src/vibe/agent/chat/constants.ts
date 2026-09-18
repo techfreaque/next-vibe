@@ -12,6 +12,7 @@ import {
   DEFAULT_WEB_PINNED_IDS,
 } from "@/generated/endpoints/meta/default-pins";
 
+import { chatModelDefinitions } from "../ai-stream/models-definitions";
 import {
   CORTEX_DELETE_ALIAS,
   CORTEX_EDIT_ALIAS,
@@ -39,48 +40,40 @@ export const STORAGE_KEYS = {
   LAST_ATTRIBUTED_SKILL: "chat-last-attributed-skill",
 } as const;
 
-/**
- * Fallback agent message content length limit - used server-side (zod schema,
- * model-agnostic) and client-side before a model/thread is known yet.
- */
-export const AGENT_MESSAGE_LENGTH = 40000;
-
 /** Same char/token ratio the server's token estimator uses (token-estimator.ts). */
 const CHARS_PER_TOKEN = 3.5;
 
-/** Never let the input shrink below this many characters, even on tiny-context models. */
-const MIN_MESSAGE_LENGTH = 2000;
-
-/** Output + system-prompt + tools headroom reserved from the pasteable budget. */
-const COMPACT_TRIGGER_RESERVE = 8000;
+/**
+ * Server-side (zod schema) content length cap. The schema is built once at
+ * module load with no per-request model context, so it MUST be sized off the
+ * LARGEST context window across every chat model - otherwise a legitimate
+ * paste for a large-context model would be rejected outright by the API
+ * before ever reaching model-aware handling. This is only the outer
+ * "never silently reject" gate; the actual per-request cap enforced in the
+ * UI is the SELECTED model's own context window (getAgentMessageMaxLength).
+ */
+export const AGENT_MESSAGE_LENGTH = Math.floor(
+  Math.max(
+    ...Object.values(chatModelDefinitions).map((def) => def.contextWindow),
+  ) * CHARS_PER_TOKEN,
+);
 
 /**
- * Chat input max length, derived from the selected model's remaining context
- * budget instead of a flat constant. `contextWindow` is the model's total
- * token budget; `usedTokens` is the thread's current prompt+completion usage
- * (from the latest assistant message's metadata, 0 for a fresh thread).
- * Reserves headroom for the system prompt/tools/output so the whole budget
- * isn't offered to paste.
+ * Chat input max length for the CURRENTLY SELECTED model, in characters.
+ * Every model has a contextWindow (models.ts always resolves one - see
+ * getChatModelById), so this is never a "no model" case in practice; it
+ * exists only to satisfy the type while a model id hasn't loaded yet on the
+ * very first render; the widest window is used at that instant (never a
+ * SMALLER, silently-truncating number) — but recomputes to the real
+ * selected model's window on the next render.
  */
 export function getAgentMessageMaxLength(
   contextWindow: number | null | undefined,
-  usedTokens: number,
 ): number {
   if (!contextWindow) {
     return AGENT_MESSAGE_LENGTH;
   }
-  const reservedTokens = Math.min(
-    contextWindow * 0.25,
-    COMPACT_TRIGGER_RESERVE,
-  );
-  const remainingTokens = Math.max(
-    0,
-    contextWindow - usedTokens - reservedTokens,
-  );
-  return Math.max(
-    MIN_MESSAGE_LENGTH,
-    Math.floor(remainingTokens * CHARS_PER_TOKEN),
-  );
+  return Math.floor(contextWindow * CHARS_PER_TOKEN);
 }
 
 /**

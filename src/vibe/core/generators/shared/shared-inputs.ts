@@ -89,6 +89,14 @@ export interface GeneratorContext {
   computed: GeneratorComputed;
   /** When true, ignore gen-cache and regenerate unconditionally. */
   force: boolean;
+  /**
+   * True only when this run was driven by the dev-watcher's live file index
+   * (i.e. a warm `GeneratorInputIndex` was supplied) - meaning a live
+   * TanStack Vite dev server is the caller, running concurrently with this
+   * generation pass. False for every standalone invocation (`vibe gen`,
+   * `vibe build`, setup), where no live dev server exists to race with.
+   */
+  isWatcherRun: boolean;
 }
 
 /** Minimal result a generator reports back to the orchestrator. */
@@ -284,5 +292,6 @@ export async function buildGeneratorContext(
       definitionModules,
     },
     force: opts.force,
+    isWatcherRun: opts.live !== undefined,
   };
 }

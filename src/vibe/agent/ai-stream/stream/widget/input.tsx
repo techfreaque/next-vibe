@@ -45,7 +45,7 @@ import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { getAgentMessageMaxLength } from "../../../chat/constants";
-import { ChatMessageRole, NEW_MESSAGE_ID } from "../../../chat/enum";
+import { NEW_MESSAGE_ID } from "../../../chat/enum";
 import { useChatBootContext } from "../../../chat/hooks/context";
 import { useChatStore } from "../../../chat/hooks/store";
 import { useChatNavigationStore } from "../../../chat/hooks/use-chat-navigation-store";
@@ -349,6 +349,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
 
   const currentModel = getChatModelById(selectedModel);
   const modelSupportsTools = currentModel?.supportsTools ?? false;
+  const inputMaxLength = getAgentMessageMaxLength(currentModel?.contextWindow);
   // Estimate the minimum credit cost for one turn with the selected model.
   // If the user's balance is below this, block sending before the request even reaches the server.
   const modelCost = currentModel
@@ -462,27 +463,6 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
     activeThreadId && activeThreadId !== NEW_MESSAGE_ID
       ? (messagesQuery.data?.backgroundTasks ?? [])
       : [];
-
-  // Remaining-context-derived input length: the latest assistant message's
-  // token usage is the thread's current context footprint (0 for a fresh
-  // thread) — used against the selected model's contextWindow.
-  const latestAssistantTokens = useMemo(() => {
-    const messages = messagesQuery.data?.messages ?? [];
-    for (let i = messages.length - 1; i >= 0; i--) {
-      const msg = messages[i];
-      if (msg?.role === ChatMessageRole.ASSISTANT && msg.metadata) {
-        return (
-          (msg.metadata.promptTokens ?? 0) +
-          (msg.metadata.completionTokens ?? 0)
-        );
-      }
-    }
-    return 0;
-  }, [messagesQuery.data?.messages]);
-  const inputMaxLength = getAgentMessageMaxLength(
-    currentModel?.contextWindow,
-    latestAssistantTokens,
-  );
 
   const deleteTaskMutation = useApiMutation(
     cronIdEndpoints.DELETE,
