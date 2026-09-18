@@ -311,9 +311,23 @@ export const KeyedRemoteSignal = {
 };
 
 /**
- * Open an authenticated WS client to the local hub for the given user. Mints a
- * self-JWT (the user's own session identity) so the hub's channel auth admits
- * the per-key channel exactly as it would the user's own socket.
+ * Open an authenticated WS client to the local hub for the given user.
+ *
+ * Private users: mints a self-JWT (the user's own session identity) so the
+ * hub's channel auth admits the per-key channel exactly as it would the
+ * user's own socket.
+ *
+ * Public (incognito/anonymous) users: no session exists to sign a JWT for —
+ * connects with `?leadId=` and no `token`, the same token-less path a real
+ * public browser session already authenticates through
+ * (authenticateWsRequest in ws-channel-auth.ts). The hub then authorizes this
+ * exactly as it would the user's own socket: per-key channels are scoped by
+ * `user/${leadId}/...`, so this only ever admits the SAME public identity's
+ * own channels (e.g. their own thread's stream-control) — never another
+ * visitor's. Without this, a public/incognito user's running stream could
+ * never receive its own cancel signal in a multi-process deployment (the
+ * subscribe side's WS never opens, so it never resolves, so the stream keeps
+ * running server-side no matter how many cancel requests arrive).
  */
 async function openHubWs(
   user: JwtPayloadType,
@@ -323,11 +337,16 @@ async function openHubWs(
   if (!wsBase) {
     return null;
   }
-  // A signed session token requires a private (authenticated) identity. Public
-  // users have no session to mint — they never dispatch remote tools inline.
   if (user.isPublic) {
-    logger.debug("[KeyedRemoteSignal] public user cannot open a hub WS");
-    return null;
+    const url = `${wsBase}?leadId=${encodeURIComponent(user.leadId)}`;
+    try {
+      return new WebSocket(url);
+    } catch (err) {
+      logger.warn("[KeyedRemoteSignal] WebSocket construction failed", {
+        error: err instanceof Error ? err.message : String(err),
+      });
+      return null;
+    }
   }
   const { AuthRepository } = await import("../../identity/auth/repository");
   const signed = await AuthRepository.signJwt(user, logger, defaultLocale);
