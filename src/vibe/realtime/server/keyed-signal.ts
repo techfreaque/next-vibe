@@ -34,11 +34,31 @@ import { defaultLocale } from "../../core/i18n/core/config";
 import type { WidgetData } from "../../core/utils/json";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
+import { serverSystemEnv } from "../../platforms/web/env";
+import { WS_SIDECAR_OFFSET } from "../../platforms/web/proxy";
 import { buildUserWsChannel } from "../core/channel";
 import { getLocalBroadcast } from "../core/local-broadcast";
 import type { AnyEndpointEventEnvelope } from "../core/structured-events";
 import { parseWsFrame, type WsWireMessage } from "../core/types";
 import { getPubSubAdapter } from "./pubsub/index";
+
+/**
+ * The WS hub's actual port, self-computed from NEXT_PUBLIC_APP_URL's port
+ * (or 3000) — same base port the app process binds in proxy mode, but
+ * shifted by WS_SIDECAR_OFFSET in VIBE_DISABLE_PROXY (direct) mode, where
+ * the app already owns the base port and the WS server runs as its own
+ * sidecar. Getting this wrong means every loopback URL below silently
+ * targets the wrong process: HTTP POSTs still "succeed" against whatever IS
+ * listening on the base port (the app itself, replying 404/whatever), while
+ * WS upgrade attempts against it just hang forever with nothing ever
+ * accepting them - exactly the "cancel returns success but the stream never
+ * actually stops" symptom this was chasing.
+ */
+function hubBasePort(appUrlPort: number): number {
+  return serverSystemEnv.VIBE_DISABLE_PROXY
+    ? appUrlPort + WS_SIDECAR_OFFSET
+    : appUrlPort;
+}
 
 /** A signal's payload as it rides the wire (`payload` on the event envelope). */
 export type SignalPayload = Record<string, WidgetData>;
@@ -105,7 +125,9 @@ function signalEnvelope(
  * subscribe() call never resolves and an abort/cancel signal delivered here
  * (e.g. stopping a running AI stream) silently never reaches it. Mirrors
  * localBroadcastUrl() below, which already does this correctly for the HTTP
- * loopback sink used by deliver().
+ * loopback sink used by deliver(). Port is hubBasePort()'d — see there for
+ * why VIBE_DISABLE_PROXY (direct/sidecar) mode needs a different port than
+ * NEXT_PUBLIC_APP_URL's.
  */
 function localHubWsUrl(): string | null {
   const appUrl = envClient.NEXT_PUBLIC_APP_URL;
@@ -114,22 +136,22 @@ function localHubWsUrl(): string | null {
   }
   try {
     const parsed = new URL(appUrl);
-    const port = parsed.port ? parseInt(parsed.port, 10) : 3000;
-    return `ws://127.0.0.1:${String(port)}/ws`;
+    const appUrlPort = parsed.port ? parseInt(parsed.port, 10) : 3000;
+    return `ws://127.0.0.1:${String(hubBasePort(appUrlPort))}/ws`;
   } catch {
     return null;
   }
 }
 
-/** The loopback /ws/broadcast sink URL (self). */
+/** The loopback /ws/broadcast sink URL (self). Port is hubBasePort()'d - see there. */
 function localBroadcastUrl(): string {
   const appUrl = envClient.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
   try {
     const parsed = new URL(appUrl);
-    const port = parsed.port ? parseInt(parsed.port, 10) : 3000;
-    return `http://127.0.0.1:${String(port)}/ws/broadcast`;
+    const appUrlPort = parsed.port ? parseInt(parsed.port, 10) : 3000;
+    return `http://127.0.0.1:${String(hubBasePort(appUrlPort))}/ws/broadcast`;
   } catch {
-    return "http://127.0.0.1:3000/ws/broadcast";
+    return `http://127.0.0.1:${String(hubBasePort(3000))}/ws/broadcast`;
   }
 }
 
