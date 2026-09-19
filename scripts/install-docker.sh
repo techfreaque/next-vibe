@@ -43,9 +43,16 @@ if ! $COMPOSE run --rm app \
   exit 1
 fi
 
-# Swap: bring up new app container (replaces old one)
+# Swap: bring up new app container (replaces old one).
+# --force-recreate is REQUIRED here: the app image is pinned to a fixed tag
+# (":latest") and transferred directly via `docker load` (vibe image-push),
+# not pulled from a registry compose can diff by digest - `up -d` alone sees
+# no service-config change and leaves the OLD container running unchanged
+# even though a brand new image was just loaded under the same tag. Without
+# this flag every deploy "succeeds" (waits for /, gets 200 from the still-
+# running old container) while silently shipping nothing.
 echo "Starting new app container..."
-$COMPOSE up -d app
+$COMPOSE up -d --force-recreate app
 
 # Wait for the new container to be healthy (up to 180s)
 # Check from the host via the mapped port - not inside the container.
