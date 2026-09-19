@@ -6,7 +6,12 @@
 import type { JwtPrivatePayloadType } from "../../../identity/auth/types";
 import { UserPermissionRole } from "../../../identity/roles/enum";
 
-const CLI_BYPASS_USER_ID = "00000000-0000-0000-0000-000000000001";
+/**
+ * Synthetic identity, not a real users-table row — used for CLI/MCP calls
+ * with no logged-in session. Never write this as a real FK (e.g. cronTasks.userId);
+ * treat it as "no user" (null/system-owned) at any DB write boundary.
+ */
+export const CLI_BYPASS_USER_ID = "00000000-0000-0000-0000-000000000001";
 
 export function createCliBypassUser(): JwtPrivatePayloadType {
   return {

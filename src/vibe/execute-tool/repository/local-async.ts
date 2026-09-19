@@ -28,7 +28,11 @@ import type { ResponseType } from "../../core/route/response.schema";
 import { success } from "../../core/route/response.schema";
 import type { WidgetData } from "../../core/utils/json";
 import { db } from "../../database";
-import type { JwtPrivatePayloadType } from "../../identity/auth/types";
+import type {
+  JwtPayloadType,
+  JwtPrivatePayloadType,
+} from "../../identity/auth/types";
+import { CLI_BYPASS_USER_ID } from "../../platforms/cli/auth/cli-bypass-user";
 import { Platform } from "../../platforms/platforms";
 import { cronTaskExecutions, cronTasks } from "../../tasks/cron/db";
 import type { CronTaskStatusDB } from "../../tasks/enum";
@@ -50,6 +54,24 @@ import { PendingCalls } from "./pending-calls";
 import { generateTaskId } from "./task-id";
 import type { RouteExecuteContext } from "./types";
 import type { GoroutineResult } from "./types-dispatch";
+
+/**
+ * cronTasks.userId is a real FK into the users table. Two cases have no
+ * corresponding row and must NOT be written as a real FK value:
+ *   - public users (isPublic: true) have no `id` at all, only a `leadId`
+ *   - the CLI/MCP bypass identity (createCliBypassUser()) is a synthetic
+ *     JwtPrivatePayloadType whose id was never inserted into `users`
+ * Task ownership already has a "no owner" representation (system-owned,
+ * userId: null - see tasks/cron/db.ts's TaskOwner/SYSTEM_OWNER); both map to
+ * that instead of a fabricated FK value (previously caused
+ * cron_tasks_user_id_users_id_fk violations).
+ */
+function taskOwnerUserId(user: JwtPayloadType): string | undefined {
+  if (user.isPublic || user.id === CLI_BYPASS_USER_ID) {
+    return undefined;
+  }
+  return user.id;
+}
 
 export class LocalExecutionAsync {
   /**
@@ -129,7 +151,7 @@ export class LocalExecutionAsync {
       toolName,
       callbackMode: mode,
       input,
-      userId: user.id,
+      userId: taskOwnerUserId(user),
     });
 
     // Fire-and-forget goroutine — returns { taskId } to the AI immediately.
@@ -378,7 +400,7 @@ export class LocalExecutionAsync {
       toolName,
       callbackMode: mode,
       input,
-      userId: user.id,
+      userId: taskOwnerUserId(user),
     });
 
     // Background: await the EXISTING execution (no re-run), persist history, then
