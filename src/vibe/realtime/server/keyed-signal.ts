@@ -211,7 +211,15 @@ export const KeyedRemoteSignal = {
 
       // Cross-process: WS client to the local hub, join the per-key channel.
       const wsBase = localHubWsUrl();
+      logger.debug("[KeyedRemoteSignal] subscribe: cross-process path", {
+        channel,
+        wsBase,
+      });
       if (!wsBase) {
+        logger.warn(
+          "[KeyedRemoteSignal] subscribe: no wsBase - NEXT_PUBLIC_APP_URL unset, signal will never resolve",
+          { channel },
+        );
         return;
       }
       void (async (): Promise<void> => {
@@ -220,16 +228,24 @@ export const KeyedRemoteSignal = {
           opened = await openHubWs(user, logger);
         } catch (err) {
           logger.warn("[KeyedRemoteSignal] failed to open hub WS", {
+            channel,
             error: err instanceof Error ? err.message : String(err),
           });
           return;
         }
         if (settled || !opened) {
+          logger.debug(
+            "[KeyedRemoteSignal] subscribe: settled before WS opened or openHubWs returned null",
+            { channel, settled, hasOpened: !!opened },
+          );
           opened?.close();
           return;
         }
         ws = opened;
         ws.addEventListener("open", () => {
+          logger.debug("[KeyedRemoteSignal] hub WS open - sending subscribe", {
+            channel,
+          });
           ws?.send(
             JSON.stringify({
               type: "subscribe",
@@ -238,6 +254,20 @@ export const KeyedRemoteSignal = {
             }),
           );
         });
+        ws.addEventListener("error", (event) => {
+          logger.warn("[KeyedRemoteSignal] hub WS error", {
+            channel,
+            error: String(event),
+          });
+        });
+        ws.addEventListener("close", (event: CloseEvent) => {
+          logger.debug("[KeyedRemoteSignal] hub WS closed", {
+            channel,
+            code: event.code,
+            reason: event.reason,
+            settled,
+          });
+        });
         ws.addEventListener("message", (event: MessageEvent) => {
           const raw =
             typeof event.data === "string"
@@ -245,14 +275,32 @@ export const KeyedRemoteSignal = {
               : new TextDecoder().decode(event.data as ArrayBuffer);
           const frame = parseWsFrame(raw);
           if (!frame) {
+            logger.debug(
+              "[KeyedRemoteSignal] hub WS message: unparseable frame",
+              {
+                channel,
+                rawPreview: raw.slice(0, 200),
+              },
+            );
             return;
           }
           const msgs: ReadonlyArray<WsWireMessage> =
             "type" in frame && frame.type === "batch"
               ? frame.events
               : [frame as WsWireMessage];
+          logger.debug("[KeyedRemoteSignal] hub WS message received", {
+            channel,
+            msgEvents: msgs.map((m) => m.event),
+            wantedEvent: ref.eventName,
+          });
           for (const msg of msgs) {
             if (msg.event === ref.eventName && tryResolve(msg.data)) {
+              logger.debug(
+                "[KeyedRemoteSignal] signal resolved from WS message",
+                {
+                  channel,
+                },
+              );
               return;
             }
           }
@@ -286,20 +334,40 @@ export const KeyedRemoteSignal = {
     // in a non-hub process the loopback POST hands it to the hub, which
     // re-publishes through the adapter (reaching WS clients + in-hub inline subs).
     if (getLocalBroadcast()) {
+      logger.debug("[KeyedRemoteSignal] deliver: co-located adapter publish", {
+        channel,
+        event: ref.eventName,
+      });
       getPubSubAdapter().publish(channel, ref.eventName, envelope);
     } else {
+      const broadcastUrl = localBroadcastUrl();
+      logger.debug("[KeyedRemoteSignal] deliver: loopback POST", {
+        channel,
+        event: ref.eventName,
+        broadcastUrl,
+      });
       // Internal WS-proxy IPC over loopback — the /ws/broadcast sink is a
       // transport primitive (a separate process), not an endpoint call.
       // oxlint-disable-next-line restricted/no-raw-fetch -- internal WS-proxy IPC (separate process)
-      void fetch(localBroadcastUrl(), {
+      void fetch(broadcastUrl, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ channel, event: ref.eventName, data: envelope }),
-      }).catch((err: Error) => {
-        logger.warn("[KeyedRemoteSignal] loopback publish failed", {
-          error: err.message,
+      })
+        .then((res) => {
+          logger.debug("[KeyedRemoteSignal] loopback publish response", {
+            channel,
+            status: res.status,
+          });
+          return undefined;
+        })
+        .catch((err: Error) => {
+          logger.warn("[KeyedRemoteSignal] loopback publish failed", {
+            channel,
+            broadcastUrl,
+            error: err.message,
+          });
         });
-      });
     }
 
     // Cross-instance relay: carry the same envelope to the target instance's hub
