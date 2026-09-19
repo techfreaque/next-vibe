@@ -95,16 +95,30 @@ function signalEnvelope(
   };
 }
 
-/** The local hub's WS URL (self). http(s) → ws(s), `/ws` path. Null if unset. */
+/**
+ * The local hub's WS URL (self) — always 127.0.0.1, never the public
+ * NEXT_PUBLIC_APP_URL host. Both the app process and the WS proxy run on the
+ * SAME host/container; routing this self-connection out through the public
+ * domain (DNS + TLS + reverse proxy) instead of straight to the loopback
+ * port is unnecessary and fragile — if that external round-trip fails or
+ * hangs for any reason (proxy config, container DNS, network policy), this
+ * subscribe() call never resolves and an abort/cancel signal delivered here
+ * (e.g. stopping a running AI stream) silently never reaches it. Mirrors
+ * localBroadcastUrl() below, which already does this correctly for the HTTP
+ * loopback sink used by deliver().
+ */
 function localHubWsUrl(): string | null {
   const appUrl = envClient.NEXT_PUBLIC_APP_URL;
   if (!appUrl) {
     return null;
   }
-  return `${appUrl
-    .replace(/^https:\/\//, "wss://")
-    .replace(/^http:\/\//, "ws://")
-    .replace(/\/$/, "")}/ws`;
+  try {
+    const parsed = new URL(appUrl);
+    const port = parsed.port ? parseInt(parsed.port, 10) : 3000;
+    return `ws://127.0.0.1:${String(port)}/ws`;
+  } catch {
+    return null;
+  }
 }
 
 /** The loopback /ws/broadcast sink URL (self). */
