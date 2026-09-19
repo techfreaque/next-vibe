@@ -211,7 +211,7 @@ export const KeyedRemoteSignal = {
 
       // Cross-process: WS client to the local hub, join the per-key channel.
       const wsBase = localHubWsUrl();
-      logger.debug("[KeyedRemoteSignal] subscribe: cross-process path", {
+      logger.warn("[KeyedRemoteSignal] subscribe: cross-process path", {
         channel,
         wsBase,
       });
@@ -234,7 +234,7 @@ export const KeyedRemoteSignal = {
           return;
         }
         if (settled || !opened) {
-          logger.debug(
+          logger.warn(
             "[KeyedRemoteSignal] subscribe: settled before WS opened or openHubWs returned null",
             { channel, settled, hasOpened: !!opened },
           );
@@ -243,7 +243,7 @@ export const KeyedRemoteSignal = {
         }
         ws = opened;
         ws.addEventListener("open", () => {
-          logger.debug("[KeyedRemoteSignal] hub WS open - sending subscribe", {
+          logger.warn("[KeyedRemoteSignal] hub WS open - sending subscribe", {
             channel,
           });
           ws?.send(
@@ -261,7 +261,7 @@ export const KeyedRemoteSignal = {
           });
         });
         ws.addEventListener("close", (event: CloseEvent) => {
-          logger.debug("[KeyedRemoteSignal] hub WS closed", {
+          logger.warn("[KeyedRemoteSignal] hub WS closed", {
             channel,
             code: event.code,
             reason: event.reason,
@@ -275,7 +275,7 @@ export const KeyedRemoteSignal = {
               : new TextDecoder().decode(event.data as ArrayBuffer);
           const frame = parseWsFrame(raw);
           if (!frame) {
-            logger.debug(
+            logger.warn(
               "[KeyedRemoteSignal] hub WS message: unparseable frame",
               {
                 channel,
@@ -288,14 +288,14 @@ export const KeyedRemoteSignal = {
             "type" in frame && frame.type === "batch"
               ? frame.events
               : [frame as WsWireMessage];
-          logger.debug("[KeyedRemoteSignal] hub WS message received", {
+          logger.warn("[KeyedRemoteSignal] hub WS message received", {
             channel,
             msgEvents: msgs.map((m) => m.event),
             wantedEvent: ref.eventName,
           });
           for (const msg of msgs) {
             if (msg.event === ref.eventName && tryResolve(msg.data)) {
-              logger.debug(
+              logger.warn(
                 "[KeyedRemoteSignal] signal resolved from WS message",
                 {
                   channel,
@@ -334,14 +334,14 @@ export const KeyedRemoteSignal = {
     // in a non-hub process the loopback POST hands it to the hub, which
     // re-publishes through the adapter (reaching WS clients + in-hub inline subs).
     if (getLocalBroadcast()) {
-      logger.debug("[KeyedRemoteSignal] deliver: co-located adapter publish", {
+      logger.warn("[KeyedRemoteSignal] deliver: co-located adapter publish", {
         channel,
         event: ref.eventName,
       });
       getPubSubAdapter().publish(channel, ref.eventName, envelope);
     } else {
       const broadcastUrl = localBroadcastUrl();
-      logger.debug("[KeyedRemoteSignal] deliver: loopback POST", {
+      logger.warn("[KeyedRemoteSignal] deliver: loopback POST", {
         channel,
         event: ref.eventName,
         broadcastUrl,
@@ -355,7 +355,7 @@ export const KeyedRemoteSignal = {
         body: JSON.stringify({ channel, event: ref.eventName, data: envelope }),
       })
         .then((res) => {
-          logger.debug("[KeyedRemoteSignal] loopback publish response", {
+          logger.warn("[KeyedRemoteSignal] loopback publish response", {
             channel,
             status: res.status,
           });
