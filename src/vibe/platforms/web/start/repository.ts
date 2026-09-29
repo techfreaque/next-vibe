@@ -286,11 +286,15 @@ export class ServerStartRepository {
           .trim(),
       };
 
-      const child = spawn(process.execPath, process.argv.slice(1), {
-        // inherit: child stdout/stderr flow directly to terminal/log files
-        stdio: "inherit",
-        env: childEnv,
-      });
+      const child = spawn(
+        process.execPath,
+        [...process.execArgv, ...process.argv.slice(1)],
+        {
+          // inherit: child stdout/stderr flow directly to terminal/log files
+          stdio: "inherit",
+          env: childEnv,
+        },
+      );
 
       logger.debug(
         `[Supervisor] Child started (PID ${String(child.pid)}, restart #${restartCount})`,
@@ -1290,6 +1294,11 @@ export class ServerStartRepository {
     });
 
     ServerStartRepository.runningProcesses.set("tanstack", tanstackProcess);
+    // Record the child in the prod PID file, exactly as the Next.js branch does.
+    // Without this the Nitro process is invisible to killPreviousInstance() and
+    // killProcessOnPort(), so the next start cannot reclaim its port and dies on
+    // EADDRINUSE while the orphan keeps serving a stale build.
+    addPidToFile(VIBE_START_PID_FILE, tanstackProcess.pid ?? 0);
 
     tanstackProcess.stdout?.on("data", (data: Buffer) => {
       const formatted = data.toString();
@@ -1304,6 +1313,7 @@ export class ServerStartRepository {
 
     tanstackProcess.on("exit", (code, signal) => {
       ServerStartRepository.runningProcesses.delete("tanstack");
+      removePidFromFile(VIBE_START_PID_FILE, tanstackProcess.pid ?? 0);
       if (code !== 0 && code !== null) {
         logger.error(
           `TanStack Start server exited unexpectedly with code ${String(code)} - shutting down`,

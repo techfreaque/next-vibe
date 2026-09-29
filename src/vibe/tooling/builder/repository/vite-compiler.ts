@@ -3,11 +3,20 @@
  * Compiles files using Vite
  */
 
-import { existsSync, mkdirSync, statSync, watch } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  statSync,
+  watch,
+  writeFileSync,
+} from "node:fs";
 import type { Server as NodeHttpServer } from "node:http";
 import { networkInterfaces } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
+import type { Subprocess, SyncSubprocess } from "bun";
 import type { OutputBundle, OutputOptions, RolldownOptions } from "rolldown";
 import {
   type BuildOptions,
@@ -52,6 +61,216 @@ function publicEnvs(): Record<string, string> {
 }
 
 type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+
+declare const Bun:
+  | {
+      spawn: (options: { cmd: string[] }) => Subprocess;
+      spawnSync: (options: { cmd: string[] }) => SyncSubprocess;
+    }
+  | undefined;
+
+const isBrokenBunArg0 = (arg0: string | undefined): boolean =>
+  arg0 === "bun" || (arg0?.toLowerCase().endsWith("/bun") ?? false);
+const fixCmd = (cmd: string[]): string[] =>
+  isBrokenBunArg0(cmd[0]) ? [process.execPath, ...cmd.slice(1)] : cmd;
+
+/**
+ * Windows-only: `NITRO_DEV_RUNNER=bun-process` below (needed for the
+ * Bun.serve idle-timeout fix) routes through Nitro's `env-runner`
+ * dependency, whose `resolveBunPath()` cannot find a real bun executable on
+ * Windows/Git Bash — it looks for an extensionless `~/.bun/bin/bun` (bun's
+ * installer only ever creates `bun.exe`), then falls back to
+ * `execSync("which bun")`, which under Git Bash prints a POSIX-style path
+ * (e.g. `/c/Users/x/.bun/bin/bun`) that `Bun.spawn` cannot open — the dev
+ * server's Nitro child process dies immediately with `ENOENT ... uv_spawn`.
+ *
+ * Fixed at the actual point of failure, `Bun.spawn`/`Bun.spawnSync`
+ * themselves — a plain, reassignable property on the global `Bun` object:
+ * any bogus "bun" argv[0] — bare, or a mis-resolved POSIX-style path — is
+ * corrected to `process.execPath`, the real, absolute path to the running
+ * bun.exe.
+ */
+function patchBunSpawnForWindowsRunnerBug(): void {
+  if (typeof Bun === "undefined") {
+    return;
+  }
+  const originalSpawn = Bun.spawn.bind(Bun);
+  Bun.spawn = (options): Subprocess =>
+    originalSpawn({ ...options, cmd: fixCmd(options.cmd) });
+
+  const originalSpawnSync = Bun.spawnSync.bind(Bun);
+  Bun.spawnSync = (options): SyncSubprocess =>
+    originalSpawnSync({ ...options, cmd: fixCmd(options.cmd) });
+
+  // Same bug, one step earlier: before `resolveBunPath()` produces the argv[0]
+  // fixed above, it probes `execSync("which bun")`. Outside Git Bash (a cmd
+  // console, the desktop shortcut) Windows has no `which`, so the child shell
+  // prints an error onto the dev server's output before the caught exception
+  // falls back to "bun". Runtime interception cannot stop that probe:
+  // env-runner binds `execSync` via an ESM named import, which under Bun does
+  // not see mutations of the `node:child_process` exports object. So the probe
+  // is removed at the source instead: resolveBunPath() runs inside a Bun
+  // process, where the answer is simply `process.execPath` — insert that
+  // short-circuit into the installed file, idempotently, before the imports
+  // evaluate it. If upstream reshapes the function, the marker line is
+  // absent and the file is left untouched (the argv[0] fix above still
+  // covers the fallback path).
+  try {
+    const runnerPath = fileURLToPath(
+      import.meta.resolve("env-runner/runners/bun-process"),
+    );
+    const source = readFileSync(runnerPath, "utf8");
+    const shortCircuit = "if (_isBun) return _bunPath = process.execPath;";
+    const marker = "if (_bunPath) return _bunPath;";
+    if (!source.includes(shortCircuit) && source.includes(marker)) {
+      writeFileSync(
+        runnerPath,
+        source.replace(marker, `${marker}\n\t${shortCircuit}`),
+      );
+    }
+  } catch {
+    // env-runner not installed or not resolvable — nothing to patch.
+  }
+}
+
+/**
+ * Nitro's dev worker treats a `full-reload` hot message as "re-import the
+ * entry" — but its message handler RETURNS before the payload ever reaches
+ * the ModuleRunner's own listeners, and `ViteEnvRunner.reload()` never
+ * clears `runner.evaluatedModules`. The re-import therefore comes straight
+ * out of the stale cache: the worker keeps SSR-ing the pre-edit page for
+ * the rest of the session (hydration mismatch on every fresh load after a
+ * save; stale HTML on reload). Fixed at the source, idempotently, before
+ * the worker file is ever loaded: clear the runner cache at the top of
+ * `reload()`. If upstream reshapes the function, the marker is absent and
+ * the file is left untouched.
+ */
+function patchNitroWorkerStaleReload(): void {
+  try {
+    const workerPath = join(
+      dirname(fileURLToPath(import.meta.resolve("nitro/package.json"))),
+      "dist/runtime/internal/vite/dev-worker.mjs",
+    );
+    const source = readFileSync(workerPath, "utf8");
+    const clearLine = "this.runner.evaluatedModules.clear();";
+    const marker = "async reload() {";
+    if (!source.includes(clearLine) && source.includes(marker)) {
+      writeFileSync(
+        workerPath,
+        source.replace(marker, `${marker}\n    ${clearLine}`),
+      );
+    }
+  } catch {
+    // nitro not installed or not resolvable — nothing to patch.
+  }
+}
+
+/**
+ * On a cold cache the nitro dev worker's entry import can take well over the
+ * ~3s its fetch() is willing to wait, after which it THROWS
+ * `Vite environment "nitro" is unavailable` — Bun renders that as a crash
+ * dump with source context in the dev console, and the boot-time SSR primer
+ * (which handles the 503 fine and retries) looks like it broke the server.
+ * Two changes, applied idempotently before the worker file loads: wait
+ * through three more backoff rounds (~25s total, covering a cold entry
+ * import), and if the entry still is not there answer with a plain 503
+ * Response instead of throwing — same status the caller saw before, none of
+ * the noise. If upstream reshapes either line, its marker is absent and that
+ * part is left untouched.
+ */
+function patchNitroWorkerQuiet503(): void {
+  try {
+    const workerPath = join(
+      dirname(fileURLToPath(import.meta.resolve("nitro/package.json"))),
+      "dist/runtime/internal/vite/dev-worker.mjs",
+    );
+    let source = readFileSync(workerPath, "utf8");
+    const waitMarker =
+      "for (let i = 0; i < 5 && !(this.entry || this.entryError); i++) {";
+    const waitPatched =
+      "for (let i = 0; i < 8 && !(this.entry || this.entryError); i++) {";
+    if (source.includes(waitMarker)) {
+      source = source.replace(waitMarker, waitPatched);
+    }
+    // The placeholder is nitro's own source text, matched verbatim, and lands
+    // inside the patched file's template literal - not one of ours.
+    const nameExpr = ["$", "{this.name}"].join("");
+    const throwMarker = `throw httpError(503, \`Vite environment "${nameExpr}" is unavailable\`);`;
+    const quietReturn = `return new Response(\`Vite environment "${nameExpr}" is unavailable\`, { status: 503, headers: { "content-type": "text/plain" } });`;
+    if (source.includes(throwMarker)) {
+      source = source.replace(throwMarker, quietReturn);
+    }
+    writeFileSync(workerPath, source);
+  } catch {
+    // nitro not installed or not resolvable — nothing to patch.
+  }
+}
+
+/**
+ * The tsconfig `vite-tsconfig-paths` should read - named, never discovered.
+ *
+ * Left unset, that plugin CRAWLS the Vite root for tsconfig.json files and
+ * expands each one's `include` globs; on a repo this size that walk is pure
+ * I/O before the dev server can bind. A build config may still name one
+ * explicitly, and that wins.
+ */
+function resolveTsconfigProjects(fileConfig: FileToCompile): string[] {
+  const configured = fileConfig.viteOptions?.tsconfigPath;
+  if (configured !== undefined) {
+    return [resolve(ROOT_DIR, String(configured))];
+  }
+  const rootConfig = resolve(ROOT_DIR, "tsconfig.json");
+  return existsSync(rootConfig) ? [rootConfig] : [];
+}
+
+/**
+ * A browser-safe `node:async_hooks`, for the CLIENT graph only.
+ *
+ * `@tanstack/start-client-core`'s server-function fetcher imports
+ * `@tanstack/start-storage-context`, which constructs an `AsyncLocalStorage`
+ * at module scope. In the browser Vite externalises `node:async_hooks` to an
+ * object that throws on property access, so that top-level `new` aborts the
+ * client entry — every page then serves its SSR HTML and hydrates into
+ * nothing, with no error but `AsyncLocalStorage is not a constructor` in the
+ * console.
+ *
+ * A no-op store is the correct value there, not merely a silencer: every
+ * reader of that context goes through `createIsomorphicFn().client(…)`, so
+ * the client never calls `getStore()`. SSR keeps the real module — this only
+ * ever applies to the client environment.
+ */
+function nodeAsyncHooksClientShimPlugin(): Plugin {
+  const VIRTUAL = "\0next-vibe:async-hooks-browser";
+  return {
+    name: "node-async-hooks-browser-shim",
+    enforce: "pre",
+    resolveId(source): string | null {
+      if (source !== "node:async_hooks" && source !== "async_hooks") {
+        return null;
+      }
+      if (this.environment?.name === "ssr") {
+        return null;
+      }
+      return VIRTUAL;
+    },
+    load(id): string | null {
+      if (id !== VIRTUAL) {
+        return null;
+      }
+      return [
+        "export class AsyncLocalStorage {",
+        "  getStore() { return undefined; }",
+        "  run(_store, callback, ...args) { return callback(...args); }",
+        "  exit(callback, ...args) { return callback(...args); }",
+        "  enterWith() {}",
+        "  disable() {}",
+        "}",
+        "export class AsyncResource {}",
+        "export default { AsyncLocalStorage, AsyncResource };",
+      ].join("\n");
+    },
+  };
+}
 
 /**
  * Vite plugin that resolves `import "server-only"` with full importer tracing.
@@ -142,7 +361,60 @@ function blankStringsAndComments(code: string): string {
       continue;
     }
 
-    if (char === '"' || char === "`" || char === "'") {
+    if (char === "`") {
+      // Template literal: blank the literal text but leave `${...}`
+      // interpolations untouched (braces tracked with a naive depth
+      // counter) — an import used only inside an interpolation, e.g.
+      // `${utmQuery(...)}`, must still count as referenced.
+      let cursor = index + 1;
+      let closed = -1;
+      let blankFrom = index + 1;
+      while (cursor < code.length) {
+        const c = code[cursor];
+        if (c === "\\") {
+          cursor += 2;
+          continue;
+        }
+        if (c === "`") {
+          closed = cursor;
+          break;
+        }
+        if (c === "$" && code[cursor + 1] === "{") {
+          for (let i = blankFrom; i < cursor; i++) {
+            if (out[i] !== "\n") {
+              out[i] = " ";
+            }
+          }
+          let depth = 1;
+          cursor += 2;
+          while (cursor < code.length && depth > 0) {
+            if (code[cursor] === "{") {
+              depth++;
+            } else if (code[cursor] === "}") {
+              depth--;
+            }
+            cursor++;
+          }
+          blankFrom = cursor;
+          continue;
+        }
+        cursor++;
+      }
+      if (closed === -1) {
+        index++;
+        continue;
+      }
+      for (let i = blankFrom; i < closed; i++) {
+        if (out[i] !== "\n") {
+          out[i] = " ";
+        }
+      }
+      lastMeaningful = char;
+      index = closed + 1;
+      continue;
+    }
+
+    if (char === '"' || char === "'") {
       if (char === "'") {
         // Prose apostrophe, not a delimiter: `original's`, `geht's`.
         if (/\w/.test(lastMeaningful)) {
@@ -165,7 +437,7 @@ function blankStringsAndComments(code: string): string {
         }
         // Single- and double-quoted literals cannot contain a raw newline;
         // hitting one means this quote was never a delimiter.
-        if (c === "\n" && char !== "`") {
+        if (c === "\n") {
           break;
         }
         cursor++;
@@ -207,10 +479,17 @@ function serverOnlyTracePlugin(
     name: "server-only-trace",
     enforce: "pre",
 
-    resolveId(source: string, importer: string | undefined): undefined {
+    resolveId(source, importer, options): undefined {
       // Only record edges for the client environment - SSR imports are fine.
       const envName = (this.environment as { name?: string } | undefined)?.name;
       if (envName === "ssr") {
+        return undefined;
+      }
+      // The dependency optimizer's scan walks every route file, server handlers
+      // included, before TanStack Start strips them from the client graph. Those
+      // edges are not client imports; recording them made the first real hit list
+      // every route.ts / repository.ts in the project as a "client import".
+      if ("scan" in options && options.scan === true) {
         return undefined;
       }
       // Record which client-env files import server-only.
@@ -249,13 +528,20 @@ function serverOnlyTracePlugin(
       // Client: find who imported this shim
       const importers = importersByResolved.get(shimAbsolute);
       const importerList = importers ? [...importers] : [];
+      // Normalise separators before stripping the root: on Windows rootDir is
+      // backslash-separated while rolldown hands back mixed forms, so a raw
+      // `replace` leaves an absolute `C:\...` path in the message.
+      const rootPosix = rootDir.replaceAll("\\", "/");
       const relImporters = importerList.map((p) =>
-        p.replace(`${rootDir}/`, "").replace(/\?.*$/, ""),
+        p
+          .replaceAll("\\", "/")
+          .replace(`${rootPosix}/`, "")
+          .replace(/\?.*$/, ""),
       );
 
       const sourceInfo =
         relImporters.length > 0
-          ? relImporters.join("\\n  ")
+          ? relImporters.join("\n  ")
           : "unknown (check the import chain)";
 
       // Log server-side so it appears in the dev log
@@ -266,10 +552,23 @@ function serverOnlyTracePlugin(
         }
       }
 
+      // JSON.stringify, not hand-rolled escaping: importer paths are absolute
+      // on Windows, so a raw interpolation puts `\u`/`\t` sequences into the
+      // emitted string literal and the client build dies on a bad escape.
+      const message = [
+        "[server-only] imported in client bundle",
+        "",
+        `  Source: ${sourceInfo}`,
+        "",
+        '  This file imports "server-only" and must not be included in the client bundle.',
+        "  Move server-only code into a .server.ts file or use createServerFn().",
+        "",
+      ].join("\n");
+
       return [
         `// server-only shim - this module should never run in the client bundle`,
         `if (!import.meta.env.SSR) {`,
-        `  throw new Error("[server-only] imported in client bundle\\n\\n  Source: ${sourceInfo}\\n\\n  This file imports \\"server-only\\" and must not be included in the client bundle.\\n  Move server-only code into a .server.ts file or use createServerFn().\\n");`,
+        `  throw new Error(${JSON.stringify(message)});`,
         `}`,
       ].join("\n");
     },
@@ -513,14 +812,15 @@ class ViteCompiler {
     // Use string variables to prevent Turbopack static analysis of CLI-only packages
     if (fileConfig.type === "react-tailwind") {
       const tailwindPkg = "@tailwindcss/vite";
-      const tailwindcss = (await import(/* webpackIgnore: true */ tailwindPkg))
-        .default;
+      const tailwindcss = (
+        await import(/* webpackIgnore: true */ /* @vite-ignore */ tailwindPkg)
+      ).default;
       plugins.push(tailwindcss() as PluginOption);
 
       if (fileConfig.inlineCss !== false) {
         const cssPkg = "vite-plugin-css-injected-by-js";
         const cssInjectedByJsPlugin = (
-          await import(/* webpackIgnore: true */ cssPkg)
+          await import(/* webpackIgnore: true */ /* @vite-ignore */ cssPkg)
         ).default;
         plugins.push(cssInjectedByJsPlugin() as PluginOption);
       }
@@ -540,14 +840,16 @@ class ViteCompiler {
       const spaOutDir = resolve(ROOT_DIR, fileConfig.output);
       const tsconfigPathsPkg = "vite-tsconfig-paths";
       const tsconfigPaths = (
-        await import(/* webpackIgnore: true */ tsconfigPathsPkg)
+        await import(
+          /* webpackIgnore: true */ /* @vite-ignore */ tsconfigPathsPkg
+        )
       ).default;
-      const tsconfigProject = fileConfig.viteOptions?.tsconfigPath
-        ? resolve(ROOT_DIR, fileConfig.viteOptions.tsconfigPath as string)
-        : undefined;
+      const tsconfigProjects = resolveTsconfigProjects(fileConfig);
       plugins.push(
         tsconfigPaths({
-          ...(tsconfigProject ? { projects: [tsconfigProject] } : {}),
+          ...(tsconfigProjects.length > 0
+            ? { projects: tsconfigProjects }
+            : {}),
           loose: true,
         }) as PluginOption,
       );
@@ -570,7 +872,10 @@ class ViteCompiler {
             for (const ext of [".ts", ".tsx", "/index.ts", "/index.tsx"]) {
               const candidate = resolve(base, sub + ext);
               if (existsSync(candidate)) {
-                return candidate;
+                // POSIX-normalized: a raw Windows path here becomes a
+                // browser-facing module id, and Firefox parses a bare
+                // `C:\...` specifier as `file:///C:/...`.
+                return candidate.replaceAll("\\", "/");
               }
             }
           }
@@ -586,12 +891,12 @@ class ViteCompiler {
             // Explicit @/ alias so Rollup can resolve it without relying solely on vite-tsconfig-paths
             {
               find: /^@\//,
-              replacement: `${getSrcDir()}/`,
+              replacement: `${getSrcDir().replaceAll("\\", "/")}/`,
             },
             // next-vibe/* → src/vibe/*
             {
               find: /^next-vibe\//,
-              replacement: `${getSrcDir()}/vibe/`,
+              replacement: `${getSrcDir().replaceAll("\\", "/")}/vibe/`,
             },
           ],
         },
@@ -619,14 +924,16 @@ class ViteCompiler {
 
     // TanStack Start SSR build: uses @tanstack/react-start plugin + nitro
     if (fileConfig.type === "tanstack-start") {
-      return this.buildTanstackStartConfig(fileConfig, verbose);
+      return this.buildTanstackStartConfig(fileConfig, verbose, profile);
     }
 
     // Package mode with TypeScript declarations
     const packageConfig = fileConfig.packageConfig;
     if (packageConfig?.isPackage) {
       const dtsPkg = "vite-plugin-dts";
-      const dts = (await import(/* webpackIgnore: true */ dtsPkg)).default;
+      const dts = (
+        await import(/* webpackIgnore: true */ /* @vite-ignore */ dtsPkg)
+      ).default;
       plugins.push(
         dts({
           include: packageConfig.dtsInclude,
@@ -705,13 +1012,15 @@ class ViteCompiler {
 
       const tsconfigPathsPkg = "vite-tsconfig-paths";
       const tsconfigPaths = (
-        await import(/* webpackIgnore: true */ tsconfigPathsPkg)
+        await import(
+          /* webpackIgnore: true */ /* @vite-ignore */ tsconfigPathsPkg
+        )
       ).default;
-      const tsconfigProject = fileConfig.viteOptions?.tsconfigPath
-        ? resolve(ROOT_DIR, fileConfig.viteOptions.tsconfigPath as string)
-        : undefined;
+      const tsconfigProjects = resolveTsconfigProjects(fileConfig);
       plugins.push(
-        tsconfigPaths(tsconfigProject ? { projects: [tsconfigProject] } : {}),
+        tsconfigPaths(
+          tsconfigProjects.length > 0 ? { projects: tsconfigProjects } : {},
+        ),
       );
 
       const server = await createServer({
@@ -759,13 +1068,15 @@ class ViteCompiler {
 
       const tsconfigPathsPkg = "vite-tsconfig-paths";
       const tsconfigPaths = (
-        await import(/* webpackIgnore: true */ tsconfigPathsPkg)
+        await import(
+          /* webpackIgnore: true */ /* @vite-ignore */ tsconfigPathsPkg
+        )
       ).default;
-      const tsconfigProject = fileConfig.viteOptions?.tsconfigPath
-        ? resolve(ROOT_DIR, fileConfig.viteOptions.tsconfigPath as string)
-        : undefined;
+      const tsconfigProjects = resolveTsconfigProjects(fileConfig);
       plugins.push(
-        tsconfigPaths(tsconfigProject ? { projects: [tsconfigProject] } : {}),
+        tsconfigPaths(
+          tsconfigProjects.length > 0 ? { projects: tsconfigProjects } : {},
+        ),
       );
 
       const server = await preview({
@@ -801,10 +1112,13 @@ class ViteCompiler {
   private async buildTanstackStartConfig(
     fileConfig: FileToCompile,
     verbose?: boolean,
+    profile: BuildProfile = "development",
   ): Promise<InlineConfig> {
+    const profileSettings = PROFILE_DEFAULTS[profile];
+
     const tanstackStartPkg = "@tanstack/react-start/plugin/vite";
     const { tanstackStart } = (await import(
-      /* webpackIgnore: true */ tanstackStartPkg
+      /* webpackIgnore: true */ /* @vite-ignore */ tanstackStartPkg
     )) as {
       tanstackStart: (opts: {
         srcDirectory: string;
@@ -819,7 +1133,9 @@ class ViteCompiler {
     };
 
     const nitroPkg = "nitro/vite";
-    const { nitro } = (await import(/* webpackIgnore: true */ nitroPkg)) as {
+    const { nitro } = (await import(
+      /* webpackIgnore: true */ /* @vite-ignore */ nitroPkg
+    )) as {
       nitro: (opts?: {
         output?: { dir?: string; publicDir?: string; serverDir?: string };
         rollupConfig?: { external?: (id: string) => boolean };
@@ -884,7 +1200,13 @@ class ViteCompiler {
               id === "vite" ||
               id === "@vitejs/plugin-react" ||
               id === "vite-plugin-css-injected-by-js" ||
-              id === "vite-plugin-dts",
+              id === "vite-plugin-dts" ||
+              // The compiler itself can land in the server graph (tool
+              // routes reach it through the build executor); it loads its
+              // plugins by variable-named dynamic import at run time.
+              id === "vite-tsconfig-paths" ||
+              id === "nitro/vite" ||
+              id.startsWith("@tanstack/react-start/plugin/"),
           },
         }),
         {
@@ -914,6 +1236,7 @@ class ViteCompiler {
             return null;
           },
         } satisfies PluginOption,
+        nodeAsyncHooksClientShimPlugin(),
         // Resolve `server-only` with importer tracing: SSR gets the shim,
         // client gets a virtual module whose error message names the source file.
         serverOnlyTracePlugin(moduleAliases, ROOT_DIR),
@@ -1179,6 +1502,16 @@ class ViteCompiler {
         "process.env.NODE_ENV": JSON.stringify("production"),
         ...publicEnvs(),
       },
+      build: {
+        minify: profileSettings.minify,
+        sourcemap: profileSettings.sourcemap !== false,
+        // `exclude-generator-seeds` stubs every generator.ts / seeds.ts to
+        // `export default {}`. The stubbed modules are only ever reached by
+        // CLI-side code (tool repositories that run a generator), which the
+        // app never calls at runtime; without shimming, the bundler rejects
+        // their named imports (`generator`, `generate`) as MISSING_EXPORT.
+        rollupOptions: { shimMissingExports: true },
+      },
       logLevel: verbose ? "info" : "warn",
     };
   }
@@ -1221,10 +1554,20 @@ class ViteCompiler {
       // `request.runtime.bun.server.timeout(request, 255)` per request —
       // verified with a 15s zero-byte SSR render surviving on both ports.
 
+      // BEFORE the nitro/tanstack imports below: env-runner (nitro's worker
+      // spawner) is evaluated during those imports, so its on-disk patch must
+      // land first — once the module is loaded, the unpatched code is cached
+      // and the `which bun` probe shells out after all (see the patch comment).
+      if (process.platform === "win32") {
+        patchBunSpawnForWindowsRunnerBug();
+      }
+      patchNitroWorkerStaleReload();
+      patchNitroWorkerQuiet503();
+
       const { createServer } = await import("vite");
       const tanstackStartPkg = "@tanstack/react-start/plugin/vite";
       const { tanstackStart } = (await import(
-        /* webpackIgnore: true */ tanstackStartPkg
+        /* webpackIgnore: true */ /* @vite-ignore */ tanstackStartPkg
       )) as {
         tanstackStart: (opts: {
           srcDirectory: string;
@@ -1235,7 +1578,9 @@ class ViteCompiler {
       };
 
       const nitroPkg = "nitro/vite";
-      const { nitro } = (await import(/* webpackIgnore: true */ nitroPkg)) as {
+      const { nitro } = (await import(
+        /* webpackIgnore: true */ /* @vite-ignore */ nitroPkg
+      )) as {
         nitro: () => PluginOption;
       };
 
@@ -1302,6 +1647,47 @@ class ViteCompiler {
           return false;
         },
       };
+
+      // Coalesces bursts of edits into ONE nitro reload instead of one per
+      // edit. Nitro's dev worker reload() clears its ENTIRE module cache and
+      // re-imports the server entry fresh over HTTP from this Vite server; a
+      // second edit landing while that re-import is still in flight
+      // invalidates the very modules the in-flight import is mid-fetching,
+      // so the fetch gets a genuine 404 that nitro renders as the app's
+      // not-found page. See `ssr-clear-on-hmr`'s handleHotUpdate below.
+      let nitroFullReloadTimer: ReturnType<typeof setTimeout> | undefined;
+
+      // The nitro dev worker is a separate Bun child process whose srvx
+      // listener is a raw `Bun.serve` without an idleTimeout — Bun aborts any
+      // response that streams no bytes for 10s, which the first cold-cache
+      // SSR render regularly does. No request-level extension can run before
+      // the module graph is transformed, so the fix rides into the child
+      // process via BUN_OPTIONS: a preload that defaults Bun.serve's
+      // idleTimeout to 255s (Bun's max). BUN_OPTIONS cannot quote paths, so a
+      // checkout path with spaces skips the preload (the retry priming below
+      // remains the fallback there).
+      const idlePreload = resolve(
+        getSrcDir(),
+        "vibe/tooling/builder/repository/bun-serve-idle-timeout.preload.ts",
+      ).replaceAll("\\", "/");
+      if (
+        !idlePreload.includes(" ") &&
+        !(process.env.BUN_OPTIONS ?? "").includes("bun-serve-idle-timeout")
+      ) {
+        process.env.BUN_OPTIONS = [
+          process.env.BUN_OPTIONS,
+          `--preload=${idlePreload}`,
+        ]
+          .filter(Boolean)
+          .join(" ");
+      }
+      // The preload only reaches a real child PROCESS. Nitro's default dev
+      // runner is "node-worker" — a Worker THREAD whose fresh realm keeps
+      // Bun.serve's stock 10s idle timeout regardless of any process-level
+      // patch. Default to the process runner; an explicit NITRO_DEV_RUNNER
+      // still wins. (The matching Windows runner patch runs before the nitro
+      // import above.)
+      process.env["NITRO_DEV_RUNNER"] ??= "bun-process";
 
       const server = await createServer({
         root: ROOT_DIR,
@@ -1706,7 +2092,13 @@ class ViteCompiler {
                   for (const ext of exts) {
                     const candidate = resolve(base, sub + ext);
                     if (existsSync(candidate) && statSync(candidate).isFile()) {
-                      return candidate;
+                      // POSIX-normalized: this resolver runs for the CLIENT
+                      // environment too (it is not scoped to SSR despite the
+                      // name), so every ID it returns becomes a browser-facing
+                      // module/sourcemap reference. A raw Windows backslash path
+                      // makes Firefox parse the bare `C:\...` specifier as
+                      // `file:///C:/...` and refuse to load it cross-origin.
+                      return candidate.replaceAll("\\", "/");
                     }
                   }
                 }
@@ -1726,7 +2118,7 @@ class ViteCompiler {
               if (id !== "server-only" && id in moduleAliases) {
                 const rel = moduleAliases[id];
                 if (rel) {
-                  return resolve(ROOT_DIR, rel);
+                  return resolve(ROOT_DIR, rel).replaceAll("\\", "/");
                 }
               }
 
@@ -1890,6 +2282,41 @@ class ViteCompiler {
                     ssrEnv.runner.evaluatedModules.clear();
                   }
                 }
+              }
+              // The nitro dev worker — the process that actually SSRs the
+              // site — keeps its own module cache in ANOTHER PROCESS. Without
+              // eviction it serves the pre-edit HTML for every page loaded
+              // after a save: the client hydrates new-against-old (hydration
+              // mismatch in the console) and a reload shortly after an edit
+              // shows stale content. Invalidate the graph and tell the WORKER
+              // (its hot channel does not reach any browser tab) to drop its
+              // runner cache — it re-imports fresh on the next request.
+              for (const [envName, env] of Object.entries(
+                viteServer.environments ?? {},
+              )) {
+                if (envName === "client" || envName === "ssr" || !env) {
+                  continue;
+                }
+                if (isRunnableDevEnvironment(env)) {
+                  env.runner.evaluatedModules.clear();
+                  continue;
+                }
+                // Debounced: see nitroFullReloadTimer's declaration above.
+                // invalidateAll() itself stays immediate (each edit's modules
+                // must be marked stale right away); only the actual reload
+                // signal to the worker is coalesced, so a worker mid-reimport
+                // is never yanked out from under itself by the next edit.
+                env.moduleGraph.invalidateAll();
+                if (nitroFullReloadTimer) {
+                  clearTimeout(nitroFullReloadTimer);
+                }
+                nitroFullReloadTimer = setTimeout(() => {
+                  nitroFullReloadTimer = undefined;
+                  env.hot.send({ type: "full-reload" });
+                  serverFileLog(
+                    `[ssr-evict] ${envName}: fetchable, sent full-reload`,
+                  );
+                }, 150);
               }
             },
           } as Plugin,
@@ -2063,25 +2490,36 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
         resolve: {
           tsconfigPaths: true,
           alias: [
-            { find: /^@\//, replacement: `${srcDir}/` },
+            { find: /^@\//, replacement: `${srcDir.replaceAll("\\", "/")}/` },
             // The root layout's location is a constant (ROOT_LAYOUT_DIR), so
             // generated/app-tanstack/routes/__root.tsx is identical across trees.
             {
               find: "@root-layout",
-              replacement: resolve(ROOT_DIR, ROOT_LAYOUT_DIR),
+              // POSIX-normalized: a raw Windows backslash path here leaks into
+              // client-facing module/sourcemap references for every page (this
+              // alias sits on the root layout, imported everywhere); Firefox
+              // parses a bare `C:\...` specifier as `file:///C:/...` and the
+              // page renders unstyled.
+              replacement: resolve(ROOT_DIR, ROOT_LAYOUT_DIR).replaceAll(
+                "\\",
+                "/",
+              ),
             },
             // next-vibe/ui/* is handled by the next-vibe-ui-ssr-resolver plugin
             // (tanstack-first, web fallback). The negative lookahead excludes it
             // from the general alias so the plugin wins.
             {
               find: /^next-vibe\/(?!ui\/)/,
-              replacement: `${nextVibeDir}/`,
+              replacement: `${nextVibeDir.replaceAll("\\", "/")}/`,
             },
             // moduleAliases from build.config.ts viteOptions.moduleAliases.
             ...Object.entries(moduleAliases).map(
               ([specifier, relativePath]) => ({
                 find: specifier,
-                replacement: resolve(ROOT_DIR, relativePath),
+                replacement: resolve(ROOT_DIR, relativePath).replaceAll(
+                  "\\",
+                  "/",
+                ),
               }),
             ),
           ],
@@ -2109,7 +2547,11 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
             // Use a function for ignored so it works with disableGlobbing:true.
             // Glob strings in ignored are treated as literals when disableGlobbing
             // is set, so they would never match. A function always works.
-            ignored: (filePath: string) => {
+            ignored: (rawFilePath: string) => {
+              // POSIX-normalised first. Chokidar reports native paths, so on
+              // Windows every test below - each written with "/" separators -
+              // matched NOTHING, and the watcher walked node_modules in full.
+              const filePath = rawFilePath.replaceAll("\\", "/");
               return (
                 filePath.includes("/.tmp/") ||
                 filePath.includes("/.next/") ||
@@ -2367,28 +2809,67 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
       // self-request right after listen absorbs that cost during boot; the
       // user's first page load then only evaluates its own page chain.
       void (async (): Promise<void> => {
+        // Wait for Vite's own dependency crawl/optimization to settle before
+        // firing the self-request at all. On a slow machine or a genuinely
+        // cold esbuild cache, "[optimizer] scanning/bundling dependencies"
+        // alone can run 30s+ AFTER "Ready" is printed — firing immediately
+        // guaranteed every attempt below raced that window and lost.
+        // Best-effort (never blocks priming forever).
+        try {
+          await server.waitForRequestsIdle();
+        } catch {
+          /* proceed anyway — the retry loop below is still a safety net */
+        }
         // Sequential: concurrent cold SSR renders race the module runner.
         // /en-US warms the shared graph (providers, layout, i18n); the
         // threads page additionally warms the chat/ai-stream widget chain —
         // the page users open first, whose first render otherwise holds its
         // SSR stream open for many seconds.
         for (const path of ["/en-US", "/en-US/threads/incognito/new"]) {
-          try {
-            // oxlint-disable-next-line restricted/no-raw-fetch -- dev-server self-request to prime SSR page rendering, not an endpoint call
-            const res = await fetch(`${url}${path}`, {
-              headers: { "user-agent": "vibe-ssr-prime" },
-            });
-            // Drain the stream so the full page (not just the shell) evaluates.
-            await res.text();
-            const primeMsg = fmtVite(
-              res.ok
-                ? `SSR graph primed (${path})`
-                : `SSR prime got HTTP ${res.status} (${path}) — first cold render failed, check the request log above`,
-            );
-            process.stdout.write(`${primeMsg}\n`);
-            serverFileLog(primeMsg);
-          } catch {
-            /* priming is best-effort — first request just runs cold */
+          // Up to 8 attempts: on a genuinely cold cache / slow machine EITHER
+          // the first SSR transform of the whole route graph can itself exceed
+          // Bun's fixed 10s idle-socket timeout (nothing request-level runs
+          // until that transform finishes), OR nitro's dev-worker environment
+          // is simply not registered yet (a "Vite environment \"nitro\" is
+          // unavailable" 503). Each attempt leaves the graph MORE
+          // compiled/cached than the last, so persisting (with a short
+          // backoff so we don't hammer a worker that's still booting)
+          // converges.
+          let primed = false;
+          for (let attempt = 1; attempt <= 8 && !primed; attempt++) {
+            try {
+              // oxlint-disable-next-line restricted/no-raw-fetch -- dev-server self-request to prime SSR page rendering, not an endpoint call
+              const res = await fetch(`${url}${path}`, {
+                headers: { "user-agent": "vibe-ssr-prime" },
+              });
+              // Drain the stream so the full page (not just the shell) evaluates.
+              await res.text();
+              if (res.ok) {
+                primed = true;
+                const primeMsg = fmtVite(
+                  attempt === 1
+                    ? `SSR graph primed (${path})`
+                    : `SSR graph primed (${path}) — succeeded on retry ${String(attempt)} after a cold-cache timeout`,
+                );
+                process.stdout.write(`${primeMsg}
+`);
+                serverFileLog(primeMsg);
+              } else if (attempt === 8) {
+                const primeMsg = fmtVite(
+                  `SSR prime got HTTP ${res.status} (${path}) after ${String(attempt)} attempts — first cold render failed, check the request log above`,
+                );
+                process.stdout.write(`${primeMsg}
+`);
+                serverFileLog(primeMsg);
+              } else {
+                await new Promise<void>((_resolve) => {
+                  setTimeout(_resolve, 1000);
+                });
+              }
+            } catch {
+              /* priming is best-effort — a connection reset mid-transform is
+               * expected on early attempts of a cold cache; retry the loop. */
+            }
           }
         }
       })();

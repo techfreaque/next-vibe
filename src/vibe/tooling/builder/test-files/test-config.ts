@@ -1,4 +1,5 @@
 import type { BuildConfig } from "../definition";
+import { ViteBuildTypeEnum } from "../enum";
 
 export const testDir = "./test-files";
 export const distDir = `${testDir}/dist`;
@@ -10,17 +11,17 @@ const buildConfig: BuildConfig = {
     {
       input: `${testDir}/file1.ts`,
       output: `${distDir}/output1.js`,
-      type: "vanilla",
+      type: ViteBuildTypeEnum.VANILLA,
     },
     {
       input: `${testDir}/file2.tsx`,
       output: `${distDir}/output2.js`,
-      type: "react",
+      type: ViteBuildTypeEnum.REACT,
     },
     {
       input: `${testDir}/file3.tsx`,
       output: `${distDir}/output3.js`,
-      type: "react-tailwind",
+      type: ViteBuildTypeEnum.REACT_TAILWIND,
     },
   ],
   filesOrFoldersToCopy: [

@@ -310,17 +310,22 @@ export function getPidOnPort(port: number): number | undefined {
         stdio: "pipe",
       });
       for (const line of output.split("\n")) {
-        // Match lines like: TCP  0.0.0.0:3100  0.0.0.0:0  LISTENING  7256
-        if (
-          !line.includes(`:${String(port)} `) &&
-          !line.includes(`:${String(port)}\t`)
-        ) {
-          continue;
-        }
-        if (!line.includes("LISTEN")) {
-          continue;
-        }
+        // Rows look like: TCP  0.0.0.0:3100  0.0.0.0:0  LISTENING  7256
+        //   [0] proto  [1] local addr  [2] foreign addr  [3] state  [4] pid
         const parts = line.trim().split(/\s+/);
+        if (parts.length < 5 || parts[0] !== "TCP") {
+          continue;
+        }
+        // Endpoint match, so ":30000" and a remote peer on :3000 never hit.
+        if (!(parts[1] ?? "").endsWith(`:${String(port)}`)) {
+          continue;
+        }
+        // A listening socket is identified by its unbound FOREIGN address, not
+        // by the state word: netstat is localized (German Windows prints
+        // "ABHÖREN", not "LISTENING").
+        if (!(parts[2] ?? "").endsWith(":0")) {
+          continue;
+        }
         const pid = parseInt(parts[parts.length - 1] ?? "", 10);
         if (!isNaN(pid) && pid > 0) {
           return pid;

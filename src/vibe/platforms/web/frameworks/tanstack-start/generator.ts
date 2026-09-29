@@ -81,6 +81,15 @@ function findFiles(dir: string, pattern: string): string[] {
 }
 
 /**
+ * Every path this run emitted (or deliberately preserved as "use custom").
+ * The prune after emission deletes only generator-owned files NOT in here -
+ * emit-then-prune instead of delete-then-rewrite, which reset every route
+ * file's mtime on every run and turned each `vibe gen` into an HMR storm for
+ * any open dev client.
+ */
+const emittedThisRun = new Set<string>();
+
+/**
  * Returns whether the file is generator-owned (false only when a "use custom"
  * directive means we must preserve it) — NOT whether bytes hit the disk. The
  * write is content-conditional so identical output never bumps mtime, which
@@ -88,6 +97,7 @@ function findFiles(dir: string, pattern: string): string[] {
  * paths as input.
  */
 function writeIfNotCustom(outPath: string, content: string): boolean {
+  emittedThisRun.add(outPath.replaceAll("\\", "/"));
   if (hasCustomDirective(outPath)) {
     return false;
   }
@@ -292,7 +302,12 @@ function buildPaths(
   return { flatName, routePath, importPath };
 }
 
-function cleanupGeneratedFiles(dir: string): void {
+/**
+ * Deletes generator-owned files this run did NOT emit - routes whose source
+ * page/endpoint is gone. Runs AFTER emission, so files whose content is
+ * unchanged keep their mtime and the dev server sees only real changes.
+ */
+function pruneStaleGeneratedFiles(dir: string): void {
   let names: string[];
   try {
     names = readdirSync(dir, { encoding: "utf-8" });
@@ -308,13 +323,16 @@ function cleanupGeneratedFiles(dir: string): void {
       continue;
     }
     if (isDir) {
-      cleanupGeneratedFiles(fullPath);
+      pruneStaleGeneratedFiles(fullPath);
       continue;
     }
     if (
       (!name.endsWith(".tsx") && !name.endsWith(".ts")) ||
       name === "__root.tsx"
     ) {
+      continue;
+    }
+    if (emittedThisRun.has(fullPath.replaceAll("\\", "/"))) {
       continue;
     }
     try {
@@ -851,7 +869,7 @@ export const generator: GeneratorDefinition = {
     }
 
     mkdirSync(routes, { recursive: true });
-    cleanupGeneratedFiles(routes);
+    emittedThisRun.clear();
 
     for (const relPath of findFiles(ui, "layout.tsx")) {
       const dir = posixDirname(relPath);
@@ -913,6 +931,7 @@ export const generator: GeneratorDefinition = {
     }
 
     emitRootRedirect(result);
+    pruneStaleGeneratedFiles(routes);
     // The live TanStack dev server (vibe dev) runs its OWN in-process
     // route-tree generator (configResolved at boot, watchChange on every
     // route-shell edit) and is the sole reader of routeTree.gen.ts via its
