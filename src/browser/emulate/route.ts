@@ -8,6 +8,45 @@ import { endpointsHandler } from "next-vibe/core/route/multi";
 import emulateEndpoints from "./definition";
 import { BrowserSharedRepository, BrowserTool } from "./repository";
 
+type EmulateData = (typeof emulateEndpoints.POST)["types"]["RequestOutput"];
+
+/**
+ * chrome-devtools-mcp's emulate takes flat strings, not objects: viewport is
+ * `<w>x<h>x<dpr>[,mobile][,touch][,landscape]`, geolocation `<lat>,<lon>`,
+ * an empty userAgent clears the override and omitting a field leaves it
+ * untouched / clears it. Convert from the structured definition shape.
+ */
+function toMcpEmulateArgs(
+  data: EmulateData,
+): Record<string, string | number | undefined> {
+  const { viewport, geolocation } = data;
+  const viewportFlags = viewport
+    ? [
+        viewport.isMobile ? "mobile" : null,
+        viewport.hasTouch ? "touch" : null,
+        viewport.isLandscape ? "landscape" : null,
+      ].filter((flag): flag is string => flag !== null)
+    : [];
+  return {
+    networkConditions:
+      data.networkConditions === "No emulation"
+        ? undefined
+        : data.networkConditions,
+    cpuThrottlingRate: data.cpuThrottlingRate,
+    geolocation: geolocation
+      ? `${geolocation.latitude},${geolocation.longitude}`
+      : undefined,
+    userAgent: data.userAgent === null ? "" : data.userAgent,
+    colorScheme: data.colorScheme,
+    viewport: viewport
+      ? [
+          `${viewport.width}x${viewport.height}x${viewport.deviceScaleFactor ?? 1}`,
+          ...viewportFlags,
+        ].join(",")
+      : undefined,
+  };
+}
+
 export const { POST, tools } = endpointsHandler({
   endpoint: emulateEndpoints,
   [Methods.POST]: {
@@ -16,14 +55,9 @@ export const { POST, tools } = endpointsHandler({
       BrowserSharedRepository.executeEmulate(
         {
           toolName: BrowserTool.EMULATE,
-          args: BrowserSharedRepository.filterUndefinedArgs({
-            networkConditions: data.networkConditions,
-            cpuThrottlingRate: data.cpuThrottlingRate,
-            geolocation: data.geolocation,
-            userAgent: data.userAgent,
-            colorScheme: data.colorScheme,
-            viewport: data.viewport,
-          }),
+          args: BrowserSharedRepository.filterUndefinedArgs(
+            toMcpEmulateArgs(data),
+          ),
           instanceId: data.instanceId,
         },
         t,

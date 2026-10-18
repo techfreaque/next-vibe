@@ -18,7 +18,8 @@ export const { POST, tools } = endpointsHandler({
           toolName: BrowserTool.EVALUATE_SCRIPT,
           args: BrowserSharedRepository.filterUndefinedArgs({
             function: data.function,
-            args: data.args ?? undefined,
+            // chrome-devtools-mcp takes plain uid strings, not { uid } objects.
+            args: data.args?.map((arg) => arg.uid),
           }),
           instanceId: data.instanceId,
         },

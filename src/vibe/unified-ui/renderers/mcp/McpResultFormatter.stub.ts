@@ -23,6 +23,7 @@ export class McpResultFormatter {
     logger: EndpointLogger,
     user: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>,
     requestInput?: Record<string, WidgetData>,
+    innerEndpoint?: CreateApiEndpointAny | null,
   ): Promise<string> {
     void data;
     void endpoint;
@@ -30,6 +31,7 @@ export class McpResultFormatter {
     void logger;
     void user;
     void requestInput;
+    void innerEndpoint;
     // eslint-disable-next-line restricted/restricted-syntax
     throw new Error("McpResultFormatter.formatSuccess not implemented");
   }

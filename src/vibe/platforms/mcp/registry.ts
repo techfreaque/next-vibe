@@ -25,6 +25,7 @@ import type {
 import { ErrorResponseTypes } from "../../core/route/response.schema";
 import type { WidgetData } from "../../core/utils/json";
 import { parseError } from "../../core/utils/parse-error";
+import { EXECUTE_TOOL_ALIAS } from "../../execute-tool/constants";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
 import { VIBE_CHECK_TOOL_NAMES } from "../../tooling/check/constants";
@@ -335,6 +336,30 @@ export class MCPRegistry {
         }
       }
 
+      // execute-tool wraps another tool: resolve the inner definition the same
+      // way (the generated registry omits dev-only tools such as browser-*).
+      let innerEndpoint: CreateApiEndpointAny | null = null;
+      const rawInnerName = context.data["toolName"];
+      if (
+        endpoint?.aliases?.includes(EXECUTE_TOOL_ALIAS) &&
+        typeof rawInnerName === "string"
+      ) {
+        if (isHotReload) {
+          innerEndpoint = await import("./hot-loader").then((m) =>
+            m.getEndpointFresh(rawInnerName),
+          );
+        } else {
+          const innerResult = await this.definitionLdr.load({
+            identifier: rawInnerName,
+            platform: Platform.MCP,
+            user: context.user,
+            logger,
+            locale: context.locale,
+          });
+          innerEndpoint = innerResult.success ? innerResult.data : null;
+        }
+      }
+
       return await this.convertToMCPResult(
         result,
         context.toolName,
@@ -343,6 +368,7 @@ export class MCPRegistry {
         endpoint,
         context.user,
         context.data,
+        innerEndpoint,
       );
     } catch (error) {
       const parsedError = parseError(error);
@@ -442,11 +468,32 @@ export class MCPRegistry {
     endpoint: CreateApiEndpointAny | null,
     user: JwtPayloadType,
     requestInput: Record<string, WidgetData>,
+    innerEndpoint: CreateApiEndpointAny | null = null,
   ): Promise<MCPToolCallResult> {
     const { t } = mcpScopedTranslation.scopedT(locale);
 
     if (result.success && result.data) {
       let data: TData = result.data;
+
+      // execute-tool wraps the inner tool's response in { result }: unwrap it
+      // so ContentResponse detection sees the real payload.
+      if (
+        typeof data === "object" &&
+        data !== null &&
+        !Array.isArray(data) &&
+        !(data instanceof Date) &&
+        "result" in data
+      ) {
+        const inner = data["result"];
+        if (
+          typeof inner === "object" &&
+          inner !== null &&
+          !Array.isArray(inner) &&
+          "isContentResponse" in inner
+        ) {
+          data = inner as TData;
+        }
+      }
 
       // ContentResponse (e.g. screenshots): return content blocks directly.
       // May appear at the top level or inside an unwrapped execute-tool wrapper.
@@ -495,6 +542,7 @@ export class MCPRegistry {
         logger,
         user,
         requestInput,
+        innerEndpoint,
       );
       logger.debug("[MCP Registry] Tool execution successful", {
         toolName,

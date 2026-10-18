@@ -461,36 +461,44 @@ async function listCDPTargets(): Promise<CDPTarget[]> {
 // chrome-devtools-mcp page list (MCP integer IDs - reset on each restart)
 // ---------------------------------------------------------------------------
 
+interface PageListEntry {
+  id: number;
+  url: string;
+  /** Full text after the id, e.g. `My Title (https://x.test/)` or a bare URL. */
+  label: string;
+  selected: boolean;
+}
+
 /**
  * Parse a chrome-devtools-mcp page list. Tolerates an optional "## Pages"
  * markdown header and indexes that may be prefixed with the line number.
  * Lines look like: `0: https://example.com [selected]`
  */
-function parsePageList(
-  text: string,
-): Array<{ id: number; url: string; selected: boolean }> {
-  const pages: Array<{ id: number; url: string; selected: boolean }> = [];
+function parsePageList(text: string): PageListEntry[] {
+  const pages: PageListEntry[] = [];
   for (const line of text.split("\n")) {
     const trimmed = line.trim();
     // Skip the markdown header if present.
     if (trimmed.startsWith("##")) {
       continue;
     }
-    const m = /^(\d+):\s+(\S+)/.exec(trimmed);
+    const m = /^(\d+):\s+(.+?)(?:\s+\[selected\])?$/.exec(trimmed);
     if (m) {
+      const label = m[2] ?? "";
+      // Newer chrome-devtools-mcp prints `<title> (<url>)`; older prints `<url>`.
+      const titled = /\s\((\S+)\)$/.exec(label);
       pages.push({
         id: parseInt(m[1] ?? "0", 10),
-        url: m[2] ?? "",
-        selected: line.includes("[selected]"),
+        url: titled?.[1] ?? label,
+        label,
+        selected: trimmed.endsWith("[selected]"),
       });
     }
   }
   return pages;
 }
 
-async function listMCPPages(
-  mcp: MCPProcess,
-): Promise<Array<{ id: number; url: string; selected: boolean }>> {
+async function listMCPPages(mcp: MCPProcess): Promise<PageListEntry[]> {
   const resp = await sendRaw(mcp, {
     jsonrpc: "2.0",
     id: mcp.nextId++,
@@ -590,7 +598,7 @@ const sessions: Map<string, SessionState> = globalThis.__browserSessions;
  * Matches by URL, since each open page has a known URL.
  */
 function findMCPPageForUrl(
-  mcpPages: Array<{ id: number; url: string; selected: boolean }>,
+  mcpPages: PageListEntry[],
   url: string,
 ): number | null {
   const match = mcpPages.find((p) => p.url === url);
@@ -821,23 +829,50 @@ async function openPage(
   if (timeout) {
     newPageArgs["timeout"] = timeout;
   }
-  const resp = await sendRaw(mcp, {
-    jsonrpc: "2.0",
-    id: mcp.nextId++,
-    method: "tools/call",
-    params: { name: "new_page", arguments: newPageArgs },
-  });
+  interface NewPageResult {
+    content?: Array<{ type: string; text?: string }>;
+    isError?: boolean;
+  }
+  const callNewPage = async (): Promise<{
+    failed: boolean;
+    text: string;
+    error: string;
+  }> => {
+    const resp = await sendRaw(mcp, {
+      jsonrpc: "2.0",
+      id: mcp.nextId++,
+      method: "tools/call",
+      params: { name: "new_page", arguments: newPageArgs },
+    });
+    const result = resp.result as NewPageResult | undefined;
+    const text = result?.content?.find((c) => c.type === "text")?.text ?? "";
+    return {
+      failed: Boolean(resp.error || result?.isError),
+      text,
+      error: resp.error?.message ?? text,
+    };
+  };
 
-  const result = resp.result as
-    | { content?: Array<{ type: string; text?: string }>; isError?: boolean }
-    | undefined;
-  const text = result?.content?.find((c) => c.type === "text")?.text ?? "";
+  let attempt = await callNewPage();
+  if (attempt.failed) {
+    // Right after a CDP tab close (replacePage) chrome-devtools-mcp can still
+    // hold the closed page as selected and rejects new_page once. Re-listing
+    // pages resyncs its state, then a single retry succeeds.
+    logger.warn("[Browser] new_page failed, resyncing pages and retrying", {
+      sessionId,
+      url,
+      error: attempt.error,
+    });
+    await listMCPPages(mcp);
+    attempt = await callNewPage();
+  }
+  const text = attempt.text;
 
-  if (resp.error || result?.isError) {
+  if (attempt.failed) {
     logger.error("[Browser] new_page failed", {
       sessionId,
       url,
-      error: resp.error?.message ?? text,
+      error: attempt.error,
     });
     return null;
   }
@@ -1086,7 +1121,7 @@ export class BrowserRepository {
           // openPage already selected the new page in MCP. Re-list to return
           // an accurate, current page list to the caller.
           const listText = (await listMCPPages(mcp))
-            .map((p) => `${p.id}: ${p.url}${p.selected ? " [selected]" : ""}`)
+            .map((p) => `${p.id}: ${p.label}${p.selected ? " [selected]" : ""}`)
             .join("\n");
           return success({
             success: true,
@@ -1110,12 +1145,36 @@ export class BrowserRepository {
             });
           }
 
-          // Close the active page in MCP.
+          // Close the requested page (default: the active one). Only pages
+          // owned by this session may be closed.
+          const closeMcpId =
+            typeof parsedArgs["pageId"] === "number"
+              ? parsedArgs["pageId"]
+              : s.mcpPageId;
+          const closeIndex =
+            sessions
+              .get(sessionId)
+              ?.pages.findIndex((p) => p.mcpPageId === closeMcpId) ?? -1;
+          if (closeIndex < 0) {
+            return success({
+              success: false,
+              result: [
+                {
+                  type: "text",
+                  text: t("repository.mcp.closePage.pageNotInSession", {
+                    pageId: String(closeMcpId),
+                  }),
+                },
+              ],
+              status: [BrowserToolStatus.FAILED],
+              executionId: `exec_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
+            });
+          }
           const closeResp = await sendRaw(mcp, {
             jsonrpc: "2.0",
             id: mcp.nextId++,
             method: "tools/call",
-            params: { name: "close_page", arguments: { pageId: s.mcpPageId } },
+            params: { name: "close_page", arguments: { pageId: closeMcpId } },
           });
           const closeResult = closeResp.result as
             | {
@@ -1141,7 +1200,29 @@ export class BrowserRepository {
           // Remove the closed page from session state.
           const state = sessions.get(sessionId);
           if (state) {
-            state.pages.splice(state.activeIndex, 1);
+            const closedWasActive = closeIndex === state.activeIndex;
+            state.pages.splice(closeIndex, 1);
+            if (!closedWasActive) {
+              // Closed a background tab: keep the active page, fix its index.
+              if (closeIndex < state.activeIndex) {
+                state.activeIndex -= 1;
+              }
+              sessions.set(sessionId, state);
+              saveSessions(sessions);
+              return success({
+                success: true,
+                result: [
+                  {
+                    type: "text",
+                    text: t("repository.mcp.closePage.closedPage", {
+                      pageId: String(closeMcpId),
+                    }),
+                  },
+                ],
+                status: [BrowserToolStatus.COMPLETED],
+                executionId: `exec_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
+              });
+            }
             if (state.pages.length === 0) {
               sessions.delete(sessionId);
               saveSessions(sessions);

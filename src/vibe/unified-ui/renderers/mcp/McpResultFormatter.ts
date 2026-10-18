@@ -37,6 +37,7 @@ export class McpResultFormatter {
     logger: EndpointLogger,
     user: JwtPayloadType,
     requestInput?: Record<string, WidgetData>,
+    innerEndpoint?: CreateApiEndpointAny | null,
   ): Promise<string> {
     if (!endpoint || !data) {
       // Fallback to JSON if no endpoint definition
@@ -62,12 +63,14 @@ export class McpResultFormatter {
       !(data instanceof Date) &&
       "result" in data
     ) {
+      // Prefer the caller-resolved endpoint: the generated registry omits
+      // dev-only (PRODUCTION_OFF) tools such as browser-*.
       const canonicalId = getFullPath(innerToolName) ?? innerToolName;
-      const innerEndpoint = await getEndpoint(canonicalId);
-      if (innerEndpoint) {
+      const resolvedInner = innerEndpoint ?? (await getEndpoint(canonicalId));
+      if (resolvedInner) {
         return McpResultFormatter.renderWithEndpoint(
           data["result"],
-          innerEndpoint,
+          resolvedInner,
           locale,
           logger,
           user,

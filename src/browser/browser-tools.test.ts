@@ -1396,4 +1396,242 @@ describe("Browser Tools", () => {
       }
     },
   );
+  it(
+    "B_EMULATE: structured viewport/geolocation/userAgent are applied and clearable",
+    { timeout: TEST_TIMEOUT },
+    async () => {
+      const SID = "browser-test-emulate";
+      await closeTestTabs([SID], testUser);
+      const localBase = (await getChromeTabs()).length;
+      try {
+        await run(
+          newPageEndpoints.POST,
+          {
+            url: "data:text/html,<title>Emulate</title><h1>e</h1>",
+            replacePage: true,
+            instanceId: SID,
+          },
+          testUser,
+        );
+        const applied = await run(
+          emulateEndpoints.POST,
+          {
+            userAgent: "EmulateTest/1.0",
+            colorScheme: "dark",
+            viewport: {
+              width: 412,
+              height: 800,
+              deviceScaleFactor: 2,
+              isMobile: true,
+              hasTouch: true,
+            },
+            geolocation: { latitude: 52.5, longitude: 13.4 },
+            networkConditions: "No emulation",
+            instanceId: SID,
+          },
+          testUser,
+        );
+        expect(applied.success, `emulate: ${applied.error ?? ""}`).toBe(true);
+
+        // A mobile viewport makes Chrome reload the page, and navigator.userAgent
+        // only reflects the override in the new document, so poll until it lands.
+        let text = "";
+        for (let attempt = 0; attempt < 20; attempt += 1) {
+          const state = await run(
+            evaluateScriptEndpoints.POST,
+            {
+              function:
+                "() => JSON.stringify({ dpr: devicePixelRatio, ua: navigator.userAgent, dark: matchMedia('(prefers-color-scheme: dark)').matches })",
+              instanceId: SID,
+            },
+            testUser,
+          );
+          text = extractText(state.data);
+          if (text.includes("EmulateTest/1.0")) {
+            break;
+          }
+          await new Promise<void>((resolve) => {
+            setTimeout(resolve, 250);
+          });
+        }
+        // Mobile + dpr 2 applied (layout width stays ~980 without a meta viewport).
+        expect(text).toMatch(/dpr\\*":2/);
+        expect(text).toContain("EmulateTest/1.0");
+        expect(text).toMatch(/dark\\*":true/);
+
+        // null clears the user agent override (maps to the empty string upstream).
+        const cleared = await run(
+          emulateEndpoints.POST,
+          { userAgent: null, instanceId: SID },
+          testUser,
+        );
+        expect(cleared.success, `clear: ${cleared.error ?? ""}`).toBe(true);
+        const ua = await run(
+          evaluateScriptEndpoints.POST,
+          { function: "() => navigator.userAgent", instanceId: SID },
+          testUser,
+        );
+        expect(extractText(ua.data)).not.toContain("EmulateTest/1.0");
+      } finally {
+        await closeTestTabs([SID], testUser);
+        await assertTabCount(localBase, 0, "B_EMULATE: cleaned up");
+      }
+    },
+  );
+
+  it(
+    "B_TITLES: new-page and list-pages keep multi-word titles intact",
+    { timeout: TEST_TIMEOUT },
+    async () => {
+      const SID = "browser-test-titles";
+      await closeTestTabs([SID], testUser);
+      const localBase = (await getChromeTabs()).length;
+      try {
+        const opened = await run(
+          newPageEndpoints.POST,
+          {
+            url: "data:text/html,<title>Hello Multi Word Title</title><h1>t</h1>",
+            replacePage: true,
+            instanceId: SID,
+          },
+          testUser,
+        );
+        expect(opened.success, `new-page: ${opened.error ?? ""}`).toBe(true);
+        expect(extractText(opened.data)).toContain("Hello Multi Word Title");
+
+        const listed = await run(
+          listPagesEndpoints.POST,
+          { instanceId: SID },
+          testUser,
+        );
+        expect(extractText(listed.data)).toMatch(
+          /Hello Multi Word Title.*\[selected\]/,
+        );
+
+        // Session page matching must survive a title: a follow-up tool call
+        // resolves the active page by URL, not by the first word of the title.
+        const title = await run(
+          evaluateScriptEndpoints.POST,
+          { function: "() => document.title", instanceId: SID },
+          testUser,
+        );
+        expect(extractText(title.data)).toContain("Hello Multi Word Title");
+      } finally {
+        await closeTestTabs([SID], testUser);
+        await assertTabCount(localBase, 0, "B_TITLES: cleaned up");
+      }
+    },
+  );
+
+  it(
+    "B_CLOSE_BY_ID: close-page closes the requested page and keeps the active one",
+    { timeout: TEST_TIMEOUT },
+    async () => {
+      const SID = "browser-test-close-by-id";
+      await closeTestTabs([SID], testUser);
+      const localBase = (await getChromeTabs()).length;
+      try {
+        await run(
+          newPageEndpoints.POST,
+          {
+            url: "data:text/html,<title>Alpha</title><h1>a</h1>",
+            replacePage: true,
+            instanceId: SID,
+          },
+          testUser,
+        );
+        await run(
+          newPageEndpoints.POST,
+          {
+            url: "data:text/html,<title>Beta</title><h1>b</h1>",
+            replacePage: false,
+            instanceId: SID,
+          },
+          testUser,
+        );
+        await assertTabCount(localBase, 2, "B_CLOSE_BY_ID: two pages open");
+
+        // Beta is active. Close Alpha (a background page) by its page id.
+        const listed = await run(
+          listPagesEndpoints.POST,
+          { instanceId: SID },
+          testUser,
+        );
+        const alphaId = /(\d+): Alpha/.exec(extractText(listed.data))?.[1];
+        expect(alphaId, "Alpha page id not found in list").toBeTruthy();
+
+        const closed = await run(
+          closePageEndpoints.POST,
+          { pageId: Number(alphaId), instanceId: SID },
+          testUser,
+        );
+        expect(closed.success, `close: ${closed.error ?? ""}`).toBe(true);
+        await assertTabCount(localBase, 1, "B_CLOSE_BY_ID: Alpha closed");
+
+        // Beta must still be the active, usable page.
+        const title = await run(
+          evaluateScriptEndpoints.POST,
+          { function: "() => document.title", instanceId: SID },
+          testUser,
+        );
+        expect(extractText(title.data)).toContain("Beta");
+
+        // A page that is not part of this session must be rejected, not closed.
+        const foreign = await run(
+          closePageEndpoints.POST,
+          { pageId: 999_999, instanceId: SID },
+          testUser,
+        );
+        expect(extractText(foreign.data)).toContain("999999");
+        await assertTabCount(localBase, 1, "B_CLOSE_BY_ID: foreign id ignored");
+      } finally {
+        await closeTestTabs([SID], testUser);
+        await assertTabCount(localBase, 0, "B_CLOSE_BY_ID: cleaned up");
+      }
+    },
+  );
+  it(
+    "B_EVAL_ARGS: eval receives snapshot elements by uid",
+    { timeout: TEST_TIMEOUT },
+    async () => {
+      const SID = "browser-test-eval-args";
+      await closeTestTabs([SID], testUser);
+      const localBase = (await getChromeTabs()).length;
+      try {
+        await run(
+          newPageEndpoints.POST,
+          {
+            url: "data:text/html,<title>Args</title><button>Press Me</button>",
+            replacePage: true,
+            instanceId: SID,
+          },
+          testUser,
+        );
+        const snap = await run(
+          takeSnapshotEndpoints.POST,
+          { instanceId: SID },
+          testUser,
+        );
+        const uid = /uid=(\S+) button "Press Me"/.exec(
+          extractText(snap.data),
+        )?.[1];
+        expect(uid, "button uid not found in snapshot").toBeTruthy();
+
+        const res = await run(
+          evaluateScriptEndpoints.POST,
+          {
+            function: "(el) => el.textContent",
+            args: [{ uid: String(uid) }],
+            instanceId: SID,
+          },
+          testUser,
+        );
+        expect(res.success, `eval: ${res.error ?? ""}`).toBe(true);
+        expect(extractText(res.data)).toContain("Press Me");
+      } finally {
+        await closeTestTabs([SID], testUser);
+        await assertTabCount(localBase, 0, "B_EVAL_ARGS: cleaned up");
+      }
+    },
+  );
 });

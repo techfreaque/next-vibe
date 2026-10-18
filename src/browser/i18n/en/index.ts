@@ -2430,6 +2430,8 @@ export const translations = {
       closePage: {
         noSession: "No active session — nothing to close",
         switchedToPage: "Closed page, switched to page {{pageId}}",
+        closedPage: "Closed page {{pageId}}",
+        pageNotInSession: "Page {{pageId}} does not belong to this session",
       },
       tool: {
         call: {

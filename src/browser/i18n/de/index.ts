@@ -2550,6 +2550,8 @@ export const translations: typeof enTranslations = {
       closePage: {
         noSession: "Keine aktive Sitzung — nichts zu schließen",
         switchedToPage: "Seite geschlossen, zu Seite {{pageId}} gewechselt",
+        closedPage: "Seite {{pageId}} geschlossen",
+        pageNotInSession: "Seite {{pageId}} gehört nicht zu dieser Sitzung",
       },
       tool: {
         call: {
