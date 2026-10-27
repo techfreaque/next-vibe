@@ -4,8 +4,9 @@
 FROM oven/bun:1.3.3-alpine AS base
 WORKDIR /app
 
-# Install Node.js for Next.js build compatibility
-RUN apk add --no-cache nodejs python3 make g++
+# Install Node.js for Next.js build compatibility. `apk upgrade` pulls the latest
+# security patches for the base packages too (e.g. CVE-2026-111497, Node2Shell, fixed in 22.23.4).
+RUN apk upgrade --no-cache && apk add --no-cache nodejs python3 make g++
 
 # BEGIN_GENERATED_ENV_ARGS
 # Intentionally empty - see updateDockerfile in generator.ts for why.
