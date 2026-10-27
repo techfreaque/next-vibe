@@ -9,7 +9,9 @@
 
 import "server-only";
 
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
+import type { Readable } from "node:stream";
+import { createGzip } from "node:zlib";
 
 import type { ResponseType } from "../../core/route/response.schema";
 import {
@@ -148,10 +150,9 @@ export class ImagePushRepository {
 
   /**
    * Transfers the already-built (docker --load'ed) image directly to a
-   * server over SSH: `docker save <refs> | ssh <target> "docker load"`.
-   * Uses SSH_SERVER_PWD for password auth when set (via ssh2 - no `sshpass`
-   * binary needed, works on Windows dev machines too); otherwise falls back
-   * to the operator's own SSH key/agent via the system `ssh` client.
+   * server over SSH: `docker save <ref> | gzip | ssh <target> "docker load"`.
+   * The pipe runs in-process (Node zlib + streams) - no `sh`, `gzip` or
+   * `sshpass` binaries needed, so it works the same on Windows and Linux.
    */
   private static async transferViaSsh(
     refs: string[],
@@ -166,56 +167,54 @@ export class ImagePushRepository {
       }),
     );
 
-    if (imagePushEnv.SSH_SERVER_PWD) {
-      return Promise.resolve(
-        ImagePushRepository.transferViaSshPassword(
-          refs,
-          sshTarget,
-          imagePushEnv.SSH_SERVER_PWD,
-          logger,
-          t,
-        ),
-      );
-    }
-
-    const sshOpts =
-      "-oServerAliveInterval=30 -oServerAliveCountMax=10 -oTCPKeepAlive=yes -oStrictHostKeyChecking=no";
-    const remoteRmi = refs.join(" ");
     // Save only the SHA-tagged ref - docker save with multiple tags of the same
     // image produces one archive but the tag metadata can get lost on load.
     // We retag as :latest explicitly after load so docker compose picks it up.
-    const shaRef = refs[0];
+    const shaRef = refs[0] ?? "";
     const latestRef =
       refs.find((r) => r.endsWith(":latest")) ??
-      `${shaRef?.split(":")[0] ?? ""}:latest`;
-    // gzip cuts ~5 GB to ~2 GB in flight; concurrent save|gzip|ssh|gunzip|load
-    // is faster than sequential save-then-copy, and finishes well under any
-    // SSH idle-timeout that would kill a raw 5 GB stream.
+      `${shaRef.split(":")[0]}:latest`;
     // docker rmi before load so the old image is deleted rather than renamed to <none>.
-    // Explicitly retag as :latest after load so docker compose can always find it.
-    const pipeline = `docker save "${shaRef}" | gzip -1 | ssh ${sshOpts} ${sshTarget} "docker rmi -f ${remoteRmi} 2>/dev/null; gunzip | docker load && docker tag ${shaRef} ${latestRef}"`;
-    const transferResult = spawnSync("sh", ["-c", pipeline], {
-      stdio: "inherit",
+    const remoteCmd = `docker rmi -f ${refs.join(" ")} 2>/dev/null; gunzip | docker load && docker tag ${shaRef} ${latestRef}`;
+
+    const save = spawn("docker", ["save", shaRef], {
+      stdio: ["ignore", "pipe", "inherit"],
       cwd: process.cwd(),
     });
+    const saveExit = new Promise<number>((resolve) => {
+      save.on("error", () => resolve(-1));
+      save.on("close", (code) => resolve(code ?? -1));
+    });
+    // gzip cuts ~5 GB to ~2 GB in flight; concurrent save|gzip|ssh|gunzip|load
+    // is faster than sequential save-then-copy.
+    const gzipped = save.stdout.pipe(createGzip({ level: 1 }));
 
-    if (transferResult.error) {
-      return fail({
-        message: t("post.repository.messages.sshTransferFailed", {
-          target: sshTarget,
-          error: transferResult.error.message,
-        }),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    const remoteResult = await ImagePushRepository.runRemote(
+      sshTarget,
+      remoteCmd,
+      gzipped,
+    );
+    const saveCode = await saveExit;
+
+    let error = remoteResult.error;
+    if (error === undefined && saveCode !== 0) {
+      error = t("post.repository.messages.buildExitCode", { code: saveCode });
+    }
+    if (error === undefined && remoteResult.exitCode !== 0) {
+      error = t("post.repository.messages.buildExitCode", {
+        code: remoteResult.exitCode,
       });
     }
 
-    if (transferResult.status !== 0) {
+    if (error !== undefined) {
+      logger.error("SSH image transfer failed", {
+        saveExitCode: saveCode,
+        remoteExitCode: remoteResult.exitCode,
+      });
       return fail({
         message: t("post.repository.messages.sshTransferFailed", {
           target: sshTarget,
-          error: t("post.repository.messages.buildExitCode", {
-            code: transferResult.status ?? -1,
-          }),
+          error,
         }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
@@ -230,67 +229,102 @@ export class ImagePushRepository {
     host: string;
     port: number;
   } {
-    const [userHost, portStr] = sshTarget.split(":");
+    const [userHost = "", portStr] = sshTarget.split(":");
     const atIndex = userHost.indexOf("@");
     const username = atIndex >= 0 ? userHost.slice(0, atIndex) : "root";
     const host = atIndex >= 0 ? userHost.slice(atIndex + 1) : userHost;
     return { username, host, port: portStr ? parseInt(portStr, 10) : 22 };
   }
 
-  /** Same gzip pipe as transferViaSsh but authenticates via sshpass. */
-  private static transferViaSshPassword(
-    refs: string[],
+  /**
+   * Runs a command on the SSH target, streaming its output to this terminal
+   * and optionally piping `stdin` into it. Authenticates with SSH_SERVER_PWD
+   * via ssh2 when set, otherwise uses the system `ssh` client (key/agent auth).
+   */
+  private static async runRemote(
     sshTarget: string,
-    password: string,
-    logger: EndpointLogger,
-    t: ImagePushT,
-  ): ResponseType<void> {
-    const { port } = ImagePushRepository.parseSshTarget(sshTarget);
-    const sshOpts = `-oServerAliveInterval=30 -oServerAliveCountMax=10 -oTCPKeepAlive=yes -oStrictHostKeyChecking=no -oPort=${String(port)}`;
-    const remoteRmi = refs.join(" ");
-    const shaRef = refs[0];
-    const latestRef =
-      refs.find((r) => r.endsWith(":latest")) ??
-      `${shaRef?.split(":")[0] ?? ""}:latest`;
-    // Explicitly retag as :latest after load so docker compose can always find it.
-    const pipeline = `docker save "${shaRef}" | gzip -1 | sshpass -p ${JSON.stringify(password)} ssh ${sshOpts} ${sshTarget} "docker rmi -f ${remoteRmi} 2>/dev/null; gunzip | docker load && docker tag ${shaRef} ${latestRef}"`;
-    const result = spawnSync("sh", ["-c", pipeline], {
-      stdio: "inherit",
-      cwd: process.cwd(),
+    remoteCmd: string,
+    stdin?: Readable,
+  ): Promise<{ exitCode: number; error?: string }> {
+    const { username, host, port } =
+      ImagePushRepository.parseSshTarget(sshTarget);
+    const password = imagePushEnv.SSH_SERVER_PWD;
+
+    if (!password) {
+      return new Promise((resolve) => {
+        const child = spawn(
+          "ssh",
+          [
+            "-oServerAliveInterval=30",
+            "-oServerAliveCountMax=10",
+            "-oTCPKeepAlive=yes",
+            "-oStrictHostKeyChecking=no",
+            `-oPort=${String(port)}`,
+            `${username}@${host}`,
+            remoteCmd,
+          ],
+          {
+            stdio: [stdin ? "pipe" : "inherit", "inherit", "inherit"],
+            cwd: process.cwd(),
+          },
+        );
+        if (stdin && child.stdin) {
+          stdin.pipe(child.stdin);
+        }
+        child.on("error", (err) =>
+          resolve({ exitCode: -1, error: err.message }),
+        );
+        child.on("close", (code) => resolve({ exitCode: code ?? -1 }));
+      });
+    }
+
+    // Dynamic import keeps ssh2 out of Turbopack's static NFT trace.
+    const { Client } = await import(/* turbopackIgnore: true */ "ssh2");
+    return new Promise((resolve) => {
+      const client = new Client();
+      let settled = false;
+      const settle = (result: { exitCode: number; error?: string }): void => {
+        if (settled) {
+          return;
+        }
+        settled = true;
+        client.end();
+        resolve(result);
+      };
+
+      client.on("error", (err) => settle({ exitCode: -1, error: err.message }));
+      client.on("ready", () => {
+        client.exec(remoteCmd, (err, channel) => {
+          if (err) {
+            settle({ exitCode: -1, error: err.message });
+            return;
+          }
+          channel.pipe(process.stdout, { end: false });
+          channel.stderr.pipe(process.stderr, { end: false });
+          channel.on("exit", (code: number | null) => {
+            settle({ exitCode: code ?? -1 });
+          });
+          channel.on("close", () => settle({ exitCode: -1 }));
+          if (stdin) {
+            stdin.pipe(channel);
+          } else {
+            channel.end();
+          }
+        });
+      });
+      client.connect({
+        host,
+        port,
+        username,
+        password,
+        keepaliveInterval: 30_000,
+        keepaliveCountMax: 10,
+      });
     });
-
-    if (result.error) {
-      logger.error("SSH image transfer invocation failed", {
-        error: result.error.message,
-      });
-      return fail({
-        message: t("post.repository.messages.sshTransferFailed", {
-          target: sshTarget,
-          error: result.error.message,
-        }),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      });
-    }
-
-    if (result.status !== 0) {
-      logger.error("SSH image transfer failed", { exitCode: result.status });
-      return fail({
-        message: t("post.repository.messages.sshTransferFailed", {
-          target: sshTarget,
-          error: t("post.repository.messages.buildExitCode", {
-            code: result.status ?? -1,
-          }),
-        }),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      });
-    }
-
-    return success(undefined);
   }
 
   /**
    * Runs the deploy script on the SSH target after the image is available there.
-   * Uses sshpass when SSH_SERVER_PWD is set, otherwise relies on key/agent auth.
    * Skipped when SSH_DEPLOY_SCRIPT is empty.
    */
   private static async runDeployScript(
@@ -308,69 +342,29 @@ export class ImagePushRepository {
       script,
     });
 
-    const sshFlags = [
-      "-oServerAliveInterval=30",
-      "-oServerAliveCountMax=10",
-      "-oTCPKeepAlive=yes",
-      "-oStrictHostKeyChecking=no",
-    ];
-
-    // Run the deploy script. Strip git lines (no git repo on VPS), run from the
-    // project root so docker compose -f resolves correctly, and force-recreate
-    // the app container so the new image is always picked up regardless of whether
-    // the :latest tag pointer changed.
+    // Run the deploy script. Strip git lines (the image is the deploy unit, not
+    // the checkout) and run from the project root so docker compose -f resolves.
     const scriptDir = script.split("/").slice(0, -1).join("/") || "/";
     const projectDir = scriptDir.endsWith("/scripts")
       ? scriptDir.slice(0, -"/scripts".length)
       : scriptDir;
     const remoteCmd = `chmod +x ${script} && cd ${projectDir} && grep -v "^git " ${script} | bash`;
 
-    let result: ReturnType<typeof spawnSync>;
-    if (imagePushEnv.SSH_SERVER_PWD) {
-      const { port } = ImagePushRepository.parseSshTarget(sshTarget);
-      result = spawnSync(
-        "sshpass",
-        [
-          "-p",
-          imagePushEnv.SSH_SERVER_PWD,
-          "ssh",
-          ...sshFlags,
-          `-oPort=${String(port)}`,
-          sshTarget,
-          remoteCmd,
-        ],
-        { stdio: "inherit", cwd: process.cwd() },
-      );
-    } else {
-      result = spawnSync("ssh", [...sshFlags, sshTarget, remoteCmd], {
-        stdio: "inherit",
-        cwd: process.cwd(),
-      });
-    }
+    const result = await ImagePushRepository.runRemote(sshTarget, remoteCmd);
 
-    if (result.error) {
-      logger.error("Deploy script invocation failed", {
-        error: result.error.message,
+    if (result.error !== undefined || result.exitCode !== 0) {
+      logger.error("Deploy script failed", {
+        exitCode: result.exitCode,
+        error: result.error,
       });
       return fail({
         message: t("post.repository.messages.sshTransferFailed", {
           target: sshTarget,
-          error: result.error.message,
-        }),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      });
-    }
-
-    if (result.status !== 0) {
-      logger.error("Deploy script exited with non-zero status", {
-        exitCode: result.status,
-      });
-      return fail({
-        message: t("post.repository.messages.sshTransferFailed", {
-          target: sshTarget,
-          error: t("post.repository.messages.buildExitCode", {
-            code: result.status ?? -1,
-          }),
+          error:
+            result.error ??
+            t("post.repository.messages.buildExitCode", {
+              code: result.exitCode,
+            }),
         }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
