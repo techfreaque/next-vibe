@@ -344,11 +344,15 @@ export class ImagePushRepository {
 
     // Run the deploy script. Strip git lines (the image is the deploy unit, not
     // the checkout) and run from the project root so docker compose -f resolves.
+    // The stripped script runs from a temp file, NOT piped into `bash` - piped,
+    // bash reads the script from stdin and the first stdin-forwarding command in
+    // it (`docker compose exec -T`) swallows the rest, so bash exits 0 having
+    // skipped the pull, migrations and container swap.
     const scriptDir = script.split("/").slice(0, -1).join("/") || "/";
     const projectDir = scriptDir.endsWith("/scripts")
       ? scriptDir.slice(0, -"/scripts".length)
       : scriptDir;
-    const remoteCmd = `chmod +x ${script} && cd ${projectDir} && grep -v "^git " ${script} | bash`;
+    const remoteCmd = `cd ${projectDir} && f=$(mktemp) && grep -v "^git " ${script} > "$f"; bash "$f" < /dev/null; rc=$?; rm -f "$f"; exit $rc`;
 
     const result = await ImagePushRepository.runRemote(sshTarget, remoteCmd);
 
