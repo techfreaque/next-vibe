@@ -201,7 +201,14 @@ export class TaskSyncRepository {
           capabilitiesVersion?: string;
         }
       | undefined;
-    if (data.capabilitiesJson) {
+    // The snapshot is the biggest payload of an exchange (every tool of the
+    // peer). Version unchanged → nothing is stored, so skip JSON.parse + zod
+    // validation of the whole array (it was the dominant "capabilities" phase
+    // cost in slow-sync reports).
+    const incomingCapsVersion =
+      data.senderCapabilitiesVersion ?? data.capabilitiesVersion;
+    const capsUnchanged = connRow?.capabilitiesVersion === incomingCapsVersion;
+    if (data.capabilitiesJson && !capsUnchanged) {
       try {
         let capabilities: z.infer<typeof RemoteToolCapabilitySchema>[];
         if (typeof data.capabilitiesJson === "string") {
@@ -215,20 +222,15 @@ export class TaskSyncRepository {
         } else {
           capabilities = [];
         }
-        const incomingVersion =
-          data.senderCapabilitiesVersion ?? data.capabilitiesVersion;
-        const storedVersion = connRow?.capabilitiesVersion;
-        if (storedVersion !== incomingVersion) {
-          capabilityOpts = {
-            capabilities,
-            capabilitiesVersion: incomingVersion,
-          };
-          logger.debug("Stored updated capability snapshot", {
-            instanceId,
-            version: incomingVersion,
-            count: capabilities.length,
-          });
-        }
+        capabilityOpts = {
+          capabilities,
+          capabilitiesVersion: incomingCapsVersion,
+        };
+        logger.debug("Stored updated capability snapshot", {
+          instanceId,
+          version: incomingCapsVersion,
+          count: capabilities.length,
+        });
       } catch (error) {
         logger.warn("Failed to store capabilities snapshot", parseError(error));
       }

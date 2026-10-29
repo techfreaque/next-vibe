@@ -729,16 +729,28 @@ export class StreamLoop implements StreamLoopState {
 
     if (part.type === "error") {
       const rawError = "error" in part ? part.error : undefined;
-      logger.error("[AI Stream] Provider emitted error part", {
-        error:
-          rawError instanceof Error
-            ? rawError.message
-            : rawError !== undefined && rawError !== null
-              ? JSON.stringify(rawError)
-              : "unknown",
-        model,
-        threadId,
-      });
+      const errorText =
+        rawError instanceof Error
+          ? rawError.message
+          : rawError !== undefined && rawError !== null
+            ? JSON.stringify(rawError)
+            : "unknown";
+      // Upstream capacity/availability problems (rate limit, 5xx, overload,
+      // timeouts) are outside our control and already shown to the user as an
+      // error bubble - warn, so the error log stays for actual bugs.
+      const transient =
+        /\b(429|500|502|503|504|529)\b|rate.?limit|concurrent request limit|overloaded|provider_unavailable|temporarily unavailable|timed? ?out|ECONNRESET|stream failed/i.test(
+          errorText,
+        );
+      const errorMeta = { error: errorText, model, threadId, transient };
+      if (transient) {
+        logger.warn(
+          "[AI Stream] Provider emitted transient error part",
+          errorMeta,
+        );
+      } else {
+        logger.error("[AI Stream] Provider emitted error part", errorMeta);
+      }
     }
 
     return { shouldAbort: false };

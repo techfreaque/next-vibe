@@ -297,15 +297,28 @@ export async function complete(
     // Provider returned an empty stream - no text was generated.
     // Emit CONTENT_DONE on the pre-generated ID so the frontend closes the pending slot,
     // then show an error bubble so the user knows something went wrong.
-    logger.error(
-      "[AI Stream] Provider returned empty stream - no assistant message created",
-      {
-        threadId,
-        model,
-        totalTokens: usage.totalTokens,
-        finishReason: finishReason ?? null,
-      },
-    );
+    // finishReason "error" means the provider's error part was already logged
+    // (with its cause); "content-filter" is the provider refusing the prompt.
+    // Neither is a bug of ours - only an unexplained empty stream is an error.
+    const explained =
+      finishReason === "error" || finishReason === "content-filter";
+    const emptyStreamMeta = {
+      threadId,
+      model,
+      totalTokens: usage.totalTokens,
+      finishReason: finishReason ?? null,
+    };
+    if (explained) {
+      logger.warn(
+        "[AI Stream] Provider returned empty stream - no assistant message created",
+        emptyStreamMeta,
+      );
+    } else {
+      logger.error(
+        "[AI Stream] Provider returned empty stream - no assistant message created",
+        emptyStreamMeta,
+      );
+    }
     ctx.dbWriter.emitContentDoneRaw({
       messageId: ctx.preGeneratedAssistantMessageId,
       content: "",

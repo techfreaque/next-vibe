@@ -306,9 +306,16 @@ export async function resolveModelSkill(params: {
   }
 
   // ── None resolvable ────────────────────────────────────────────────────
-  logger.error(
+  // Caller input problem (returned as a validation error), not a server bug.
+  // Public users skip favorite lookup above, so log who asked.
+  logger.warn(
     "[resolveModelSkill] No model could be resolved — need model, favorite, or skill",
-    { hasModel: Boolean(model), favoriteId, skill },
+    {
+      hasModel: Boolean(model),
+      favoriteId,
+      skill,
+      isPublic: user.isPublic,
+    },
   );
   return fail({
     message: t("headless.errors.missingModelOrSkill"),

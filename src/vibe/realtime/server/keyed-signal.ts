@@ -233,7 +233,7 @@ export const KeyedRemoteSignal = {
 
       // Cross-process: WS client to the local hub, join the per-key channel.
       const wsBase = localHubWsUrl();
-      logger.warn("[KeyedRemoteSignal] subscribe: cross-process path", {
+      logger.debug("[KeyedRemoteSignal] subscribe: cross-process path", {
         channel,
         wsBase,
       });
@@ -265,7 +265,7 @@ export const KeyedRemoteSignal = {
         }
         ws = opened;
         ws.addEventListener("open", () => {
-          logger.warn("[KeyedRemoteSignal] hub WS open - sending subscribe", {
+          logger.debug("[KeyedRemoteSignal] hub WS open - sending subscribe", {
             channel,
           });
           ws?.send(
@@ -277,18 +277,28 @@ export const KeyedRemoteSignal = {
           );
         });
         ws.addEventListener("error", (event) => {
+          // String(ErrorEvent) is just "[object ErrorEvent]" - pull the real fields
+          const detail = event as Event & { message?: string; error?: Error };
           logger.warn("[KeyedRemoteSignal] hub WS error", {
             channel,
-            error: String(event),
+            settled,
+            error: detail.message ?? detail.error?.message ?? event.type,
           });
         });
         ws.addEventListener("close", (event: CloseEvent) => {
-          logger.warn("[KeyedRemoteSignal] hub WS closed", {
+          // Closing after the signal resolved (or was unsubscribed) is the
+          // normal end of life; only a close while still waiting is a problem.
+          const closeInfo = {
             channel,
             code: event.code,
             reason: event.reason,
             settled,
-          });
+          };
+          if (settled) {
+            logger.debug("[KeyedRemoteSignal] hub WS closed", closeInfo);
+          } else {
+            logger.warn("[KeyedRemoteSignal] hub WS closed", closeInfo);
+          }
         });
         ws.addEventListener("message", (event: MessageEvent) => {
           const raw =
@@ -310,14 +320,14 @@ export const KeyedRemoteSignal = {
             "type" in frame && frame.type === "batch"
               ? frame.events
               : [frame as WsWireMessage];
-          logger.warn("[KeyedRemoteSignal] hub WS message received", {
+          logger.debug("[KeyedRemoteSignal] hub WS message received", {
             channel,
             msgEvents: msgs.map((m) => m.event),
             wantedEvent: ref.eventName,
           });
           for (const msg of msgs) {
             if (msg.event === ref.eventName && tryResolve(msg.data)) {
-              logger.warn(
+              logger.debug(
                 "[KeyedRemoteSignal] signal resolved from WS message",
                 {
                   channel,
