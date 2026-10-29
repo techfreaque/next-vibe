@@ -662,7 +662,7 @@ export class SpeechToTextRepository {
       });
     }
 
-    return SpeechToTextRepository.pollForResults(
+    const pollResult = await SpeechToTextRepository.pollForResults(
       publicId,
       edenProvider,
       logger,
@@ -670,6 +670,20 @@ export class SpeechToTextRepository {
       fetchImpl,
       response,
     );
+    if (!pollResult.success) {
+      // Poll errors don't know the input - attach it so format problems
+      // (e.g. Safari mp4) are diagnosable from the error log alone.
+      logger.error("[STT] Eden AI transcription failed for input", {
+        edenProvider,
+        publicId,
+        fileName,
+        mimeType,
+        fileSize: blob.size,
+        language,
+        message: pollResult.message,
+      });
+    }
+    return pollResult;
   }
 
   /**

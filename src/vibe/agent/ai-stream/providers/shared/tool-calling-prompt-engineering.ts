@@ -218,13 +218,96 @@ function tryParseToolCallsJson(
         return parsed;
       }
     }
+  } catch {
+    // Continue to structural repair
+  }
+
+  // Fourth attempt: repair unescaped quotes / raw newlines inside strings and
+  // close anything a truncated generation left open.
+  try {
+    const repaired = repairToolCallsJson(stripControlChars(raw.trim()));
+    const parsed = JSON.parse(repaired) as ParsedToolCall[];
+    if (Array.isArray(parsed)) {
+      logger.info("Parsed tool calls after structural repair");
+      return parsed;
+    }
   } catch (error) {
+    const message = parseError(error).message;
+    const position = Number(/position (\d+)/.exec(message)?.[1] ?? -1);
     logger.error("Failed to parse tool calls JSON", parseError(error), {
+      rawLength: raw.length,
       rawSnippet: raw.slice(0, 200),
+      // Where JSON.parse choked - the head alone rarely shows the real cause
+      aroundError:
+        position >= 0
+          ? raw.slice(Math.max(0, position - 80), position + 80)
+          : undefined,
+      rawTail: raw.slice(-120),
     });
   }
 
   return null;
+}
+
+/**
+ * Best-effort structural repair of LLM-emitted JSON:
+ * - raw newlines/tabs inside strings are escaped
+ * - a `"` inside a string that isn't followed by a JSON delimiter is a literal quote
+ * - an unterminated string and unclosed `{`/`[` (truncated output) are closed
+ */
+function repairToolCallsJson(input: string): string {
+  const closers: string[] = [];
+  let out = "";
+  let inString = false;
+  let escaped = false;
+
+  for (let i = 0; i < input.length; i++) {
+    const ch = input[i];
+
+    if (inString) {
+      if (escaped) {
+        out += ch;
+        escaped = false;
+      } else if (ch === "\\") {
+        out += ch;
+        escaped = true;
+      } else if (ch === '"') {
+        const next = input.slice(i + 1).trimStart()[0];
+        if (next === undefined || ",}]:".includes(next)) {
+          out += ch;
+          inString = false;
+        } else {
+          out += '\\"';
+        }
+      } else if (ch === "\n") {
+        out += "\\n";
+      } else if (ch === "\r") {
+        out += "\\r";
+      } else if (ch === "\t") {
+        out += "\\t";
+      } else {
+        out += ch;
+      }
+      continue;
+    }
+
+    if (ch === '"') {
+      inString = true;
+    } else if (ch === "{") {
+      closers.push("}");
+    } else if (ch === "[") {
+      closers.push("]");
+    } else if (ch === "}" || ch === "]") {
+      closers.pop();
+    }
+    out += ch;
+  }
+
+  if (inString) {
+    out += '"';
+  }
+  out = out.replaceAll(/,(\s*)$/g, "$1");
+  return out + closers.toReversed().join("");
 }
 
 /**

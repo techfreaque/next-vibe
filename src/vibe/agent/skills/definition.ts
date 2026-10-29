@@ -126,7 +126,10 @@ const { GET } = createEndpoint({
         description: "get.fields.query.description" as const,
         placeholder: "get.fields.query.placeholder" as const,
         columns: 8,
-        schema: z.string().optional(),
+        // CLI/MCP arg parsers hand numeric-looking queries (e.g. "2024") over as numbers
+        schema: z
+          .union([z.string(), z.number().transform((n): string => String(n))])
+          .optional(),
       }),
       skillId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

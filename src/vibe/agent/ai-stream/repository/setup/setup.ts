@@ -716,7 +716,16 @@ export async function setupAiStream(params: {
   });
 
   if (!threadResult.success) {
-    logger.error("Failed to ensure thread", { message: threadResult.message });
+    // FORBIDDEN / NOT_FOUND are caller-state outcomes (bad thread id, no
+    // access) - only unexpected failures belong in the error log.
+    const expected =
+      threadResult.errorType === ErrorResponseTypes.FORBIDDEN ||
+      threadResult.errorType === ErrorResponseTypes.NOT_FOUND;
+    logger[expected ? "warn" : "error"]("Failed to ensure thread", {
+      message: threadResult.message,
+      errorType: threadResult.errorType,
+      threadId: effectiveThreadId,
+    });
     if (threadResult.errorType === ErrorResponseTypes.FORBIDDEN) {
       return fail({
         message: aiStreamT("post.errors.forbidden.title"),

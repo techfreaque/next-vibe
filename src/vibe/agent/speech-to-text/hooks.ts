@@ -441,6 +441,23 @@ export function useEdenAISpeech({
       // Set up AnalyserNode for RMS-based silence detection
       const audioContext = new AudioContext();
       audioContextRef.current = audioContext;
+      // iOS Safari creates the context "suspended" when it isn't built
+      // synchronously inside the tap handler (we awaited getUserMedia above).
+      // A suspended analyser reads pure silence (RMS 0), which would make VAD
+      // cut the recording into tiny chunks forever.
+      if (audioContext.state === "suspended") {
+        await audioContext.resume().catch((err: Error): void => {
+          logger.warn("STT: AudioContext resume failed", {
+            error: err.message,
+          });
+        });
+      }
+      const vadAvailable = audioContext.state === "running";
+      if (!vadAvailable) {
+        logger.warn("STT: AudioContext not running - silence detection off", {
+          state: audioContext.state,
+        });
+      }
       const source = audioContext.createMediaStreamSource(stream);
       const analyser = audioContext.createAnalyser();
       analyser.fftSize = 2048;
@@ -460,10 +477,10 @@ export function useEdenAISpeech({
         ];
         return candidates.find((m) => MediaRecorder.isTypeSupported(m)) ?? "";
       })();
-      const mediaRecorder = preferredMime
-        ? new MediaRecorder(stream, { mimeType: preferredMime })
-        : new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
+      logger.debug("STT: Recorder format", {
+        preferredMime,
+        userAgent: getUserAgent(),
+      });
       const chunkStartTime = { value: Date.now() };
 
       // startChunkRecorder: creates a fresh MediaRecorder on the existing stream.
@@ -523,6 +540,12 @@ export function useEdenAISpeech({
         if (mediaRecorderRef.current?.state === "paused") {
           // Don't detect silence while paused
           silenceStartRef.current = null;
+          silenceRafRef.current = requestAnimationFrame(tick);
+          return;
+        }
+
+        if (!vadAvailable) {
+          // No reliable level data: record as one chunk, never cycle on "silence"
           silenceRafRef.current = requestAnimationFrame(tick);
           return;
         }

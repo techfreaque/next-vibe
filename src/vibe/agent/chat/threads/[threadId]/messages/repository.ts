@@ -278,7 +278,7 @@ export class MessagesRepository {
       .limit(1);
 
     if (!threadExists) {
-      params.logger.error(
+      params.logger.warn(
         "createUserMessage: thread does not exist, dropping message",
         {
           threadId: params.threadId,
@@ -508,7 +508,7 @@ export class MessagesRepository {
       .where(eq(chatThreads.id, params.threadId))
       .limit(1);
     if (!threadExists) {
-      params.logger.error(
+      params.logger.warn(
         "createTextMessage: thread does not exist, dropping ASSISTANT message",
         {
           threadId: params.threadId,
@@ -668,7 +668,7 @@ export class MessagesRepository {
       .where(eq(chatThreads.id, params.threadId))
       .limit(1);
     if (!threadExists) {
-      params.logger.error(
+      params.logger.warn(
         "createToolMessage: thread does not exist, dropping TOOL message",
         {
           threadId: params.threadId,

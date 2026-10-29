@@ -22,6 +22,7 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
 import { useCallback, useMemo } from "react";
+import { z } from "zod";
 
 import { DefaultFolderId } from "../../../../core/execution-context";
 import messagesDefinitions from "../../../chat/threads/[threadId]/messages/definition";
@@ -256,6 +257,15 @@ export function useAIStream(): UseAIStreamReturn {
           storeClearThread(threadId);
         }
       }, 15_000);
+
+      // Placeholder ids (e.g. "new" before the thread exists) have nothing to
+      // cancel server-side - the endpoint would just reject them as invalid UUIDs.
+      if (!z.string().uuid().safeParse(threadId).success) {
+        logger.warn("Cancel skipped: thread id is not a UUID", { threadId });
+        clearTimeout(safetyTimeout);
+        storeClearThread(threadId);
+        return;
+      }
 
       // Call server-side cancel endpoint via typesafe mutation
       try {
