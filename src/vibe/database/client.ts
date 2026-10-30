@@ -53,14 +53,20 @@ export const isPglite = DATABASE_URL.startsWith("file:");
 
 // ─── Path helpers ─────────────────────────────────────────────────────────────
 
-function resolvePgliteUrl(url: string): string {
-  let osPath: string;
-  if (url.startsWith("file://")) {
-    osPath = fileURLToPath(url);
-  } else {
-    osPath = url.replace(/^file:/, "");
+/**
+ * Convert a DATABASE_URL (`file:./rel`, `file:///abs`, or a malformed
+ * `file://./rel` / `file://C:\abs`) to an OS path. Only well-formed absolute
+ * file URLs go through fileURLToPath, which throws on anything else.
+ */
+function pgliteUrlToOsPath(url: string): string {
+  if (url.startsWith("file:///") || url.startsWith("file://localhost/")) {
+    return fileURLToPath(url);
   }
-  return pathToFileURL(resolvePath(osPath)).href;
+  return url.replace(/^file:(\/\/)?/, "");
+}
+
+function resolvePgliteUrl(url: string): string {
+  return pathToFileURL(resolvePath(pgliteUrlToOsPath(url))).href;
 }
 
 /**
@@ -69,13 +75,7 @@ function resolvePgliteUrl(url: string): string {
  * but kept for the port-hash namespace and heal/reset bookkeeping.
  */
 function getPgliteSocketDir(dbUrl: string): string {
-  let osPath: string;
-  if (dbUrl.startsWith("file://")) {
-    osPath = fileURLToPath(dbUrl);
-  } else {
-    osPath = dbUrl.replace(/^file:/, "");
-  }
-  return `${resolvePath(osPath)}.pg`;
+  return `${resolvePath(pgliteUrlToOsPath(dbUrl))}.pg`;
 }
 
 /**
@@ -106,20 +106,27 @@ function isPgliteCorruptionError(error: Error): boolean {
  * corrupted dev/CLI data directory heals itself rather than requiring a
  * manual `vibe dev -r`.
  */
+/**
+ * Pin the session to UTC. Columns are `timestamp` (no tz): Drizzle writes Dates
+ * as UTC wall-clock, so a local-zone `DEFAULT now()` would stamp rows (e.g.
+ * user messages) with local wall-clock — hours ahead of their UTC replies.
+ */
+async function pinPgliteUtc(client: PGlite): Promise<PGlite> {
+  await client.waitReady;
+  await client.exec("SET TIME ZONE 'UTC'");
+  return client;
+}
+
 async function openPgliteWithSelfHeal(dbPath: string): Promise<PGlite> {
   try {
-    const client = new PGlite(dbPath);
-    await client.waitReady;
-    return client;
+    return await pinPgliteUtc(new PGlite(dbPath));
   } catch (error) {
     if (!isPgliteCorruptionError(parseError(error))) {
       // eslint-disable-next-line restricted/restricted-syntax -- not a recoverable corruption case, propagate
       throw error;
     }
     wipePgliteHeap(dbPath);
-    const client = new PGlite(dbPath);
-    await client.waitReady;
-    return client;
+    return await pinPgliteUtc(new PGlite(dbPath));
   }
 }
 
@@ -139,6 +146,10 @@ function removeStalePgliteLock(resolvedUrl: string): void {
 
 const STANDARD_POOL_CONFIG = {
   connectionString: DATABASE_URL,
+  // `timestamp` columns hold UTC wall-clock (Drizzle writes Dates as UTC), so
+  // `DEFAULT now()` must run in UTC too — a host-local server zone skews
+  // default-stamped rows (user messages) by the zone offset.
+  options: "-c timezone=UTC",
   max: 10,
   idleTimeoutMillis: 30_000,
   connectionTimeoutMillis: 30_000,
@@ -381,8 +392,7 @@ export async function healPgliteIfCorrupted(): Promise<void> {
     const port = getPglitePort(DATABASE_URL);
     const dbPath = fileURLToPath(resolvedUrl);
     wipePgliteHeap(dbPath);
-    const fresh = new PGlite(dbPath);
-    await fresh.waitReady;
+    const fresh = await pinPgliteUtc(new PGlite(dbPath));
     pgliteClient = fresh;
     g[PGLITE_GLOBAL_KEY] = fresh;
     const { startPgliteServer } = await import("./pglite-server");
@@ -462,11 +472,20 @@ export function wrapPgliteQueryFix(raw: PGlite): PGlite {
             /\s+returning\s+[\s\S]+$/i,
             "",
           );
-          await target.query(sqlWithoutReturning, params, {
+          const inserted = await target.query(sqlWithoutReturning, params, {
             rowMode: "object",
           });
           if (tableName) {
-            const rowCount = countInsertRows(sql);
+            // ON CONFLICT DO NOTHING writes fewer rows than the VALUES list.
+            const rowCount = Math.min(
+              countInsertRows(sql),
+              inserted.affectedRows ?? Number.MAX_SAFE_INTEGER,
+            );
+            if (rowCount === 0) {
+              return { rows: [], fields: [] } as Awaited<
+                ReturnType<PGlite["query"]>
+              >;
+            }
             const selectSql = `SELECT * FROM "${tableName}" ORDER BY ctid DESC LIMIT ${rowCount}`;
             const selectResult = await target.query<PgliteRow>(selectSql, [], {
               rowMode: "object",

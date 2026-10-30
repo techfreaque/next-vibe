@@ -15,6 +15,7 @@ import { parseError } from "../../core/utils/parse-error";
 import { db } from "../../database";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
+import { CLI_BYPASS_USER_ID } from "../../platforms/cli/auth/cli-bypass-user";
 import type { CronTaskRow } from "../../tasks/cron/db";
 import {
   cronTaskExecutions,
@@ -220,7 +221,22 @@ export class TaskReportRepository {
     // Remote reports from other instances are trusted (validated by allowedRoles).
     if (!data.wakeUpContext) {
       const taskOwner = dbUserIdToOwner(task.userId);
-      if (taskOwner.type === "user" && taskOwner.userId !== user.id) {
+      // The local machine's own session (terminal-spawned Claude Code reaching
+      // complete-task through the local MCP/CLI) reports as the CLI bypass user
+      // — it was launched by this instance for this very task, so it may report
+      // on any task the instance owns.
+      const isLocalSession = user.id === CLI_BYPASS_USER_ID;
+      if (
+        taskOwner.type === "user" &&
+        taskOwner.userId !== user.id &&
+        !isLocalSession
+      ) {
+        logger.warn("[TaskReport] Rejected: reporter is not the task owner", {
+          taskId: data.taskId,
+          ownerId: taskOwner.userId,
+          reporterId: user.id ?? null,
+          reporterIsPublic: user.isPublic,
+        });
         return fail({
           message: t("taskReport.post.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,

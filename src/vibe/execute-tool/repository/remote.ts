@@ -422,6 +422,11 @@ export class RemoteDispatch {
     const { token } = connInfo;
     const dispatchToolDef = await getEndpoint(toolName);
     const isBounded = dispatchToolDef?.timeoutMs !== 0;
+    // Tools declaring timeoutMs: 0 (interactive sessions, loops) legitimately
+    // run past the standard backstop.
+    const pendingDeadlineMs = isBounded
+      ? RemoteDispatch.PENDING_CALL_DEADLINE_MS
+      : RemoteDispatch.NO_TIMEOUT_INLINE_MS;
     // Use the SYNCHRONOUS inline HTTP leg (callToolDirect — result in the HTTP
     // response) when:
     //   - control-plane (non-AI, bounded) calls, OR
@@ -439,8 +444,12 @@ export class RemoteDispatch {
       platform === Platform.AI &&
       isBlockingMode &&
       connInfo.transportMode === "direct-http";
+    // A reverse-ws leg means the peer is NOT reachable over HTTP (NAT) - inline
+    // HTTP can never land there, so every call rides the event protocol.
     const useInlineHttp =
-      isBounded && (platform !== Platform.AI || isDirectHttpBlockingAi);
+      isBounded &&
+      connInfo.transportMode === "direct-http" &&
+      (platform !== Platform.AI || isDirectHttpBlockingAi);
     if (token !== null && useInlineHttp) {
       const direct = await callToolDirect({
         remoteUrl: connInfo.remoteUrl,
@@ -542,7 +551,7 @@ export class RemoteDispatch {
             : null,
         toolMessageId: effectiveToolMessageId ?? null,
         userId: user.id,
-        deadlineMs: RemoteDispatch.PENDING_CALL_DEADLINE_MS,
+        deadlineMs: pendingDeadlineMs,
         onDeadline,
         onSettled: releaseConnectorRef,
       });
@@ -615,7 +624,7 @@ export class RemoteDispatch {
       threadId: null, // WAIT/END_LOOP do not park the thread.
       toolMessageId: effectiveToolMessageId ?? null,
       userId: user.id,
-      deadlineMs: RemoteDispatch.PENDING_CALL_DEADLINE_MS,
+      deadlineMs: pendingDeadlineMs,
       onDeadline,
       onSettled: releaseConnectorRef,
     });
@@ -763,10 +772,19 @@ export class RemoteDispatch {
         }),
       };
     }
-    // Same shape as a local execute-tool call: { result: ... }
+    // Same shape as a local execute-tool call: { result: ... }. The receiver
+    // relays its own execute() data ({ result: <tool output> }) as the wire
+    // result, so peel that wrapper - otherwise the tool output arrives nested
+    // one level too deep ({ result: { result: ... } }).
+    const wireOutput = inlineResult.output ?? {};
+    const wireKeys = Object.keys(wireOutput);
+    const toolOutput =
+      wireKeys.length === 1 && wireKeys[0] === "result"
+        ? wireOutput["result"]
+        : wireOutput;
     return {
       kind: "return",
-      value: success({ result: inlineResult.output ?? {} }),
+      value: success({ result: toolOutput ?? {} }),
     };
   }
 }

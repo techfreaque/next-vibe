@@ -141,6 +141,17 @@ export async function handleToolResult(
 
   const outcome = PendingCalls.complete(taskId, { status, output });
 
+  // The receiver relays its execute() data ({ result: <tool output> }); the
+  // WAIT path peels that wrapper in remote.ts. Parked/revived tool messages
+  // store the output verbatim, so peel it for them here — otherwise the
+  // stored result nests one level too deep ({ result: { result: ... } }).
+  const peeledOutput =
+    status === "completed" && output && Object.keys(output).length === 1
+      ? PendingCalls.toOutputObject(output["result"])
+      : null;
+  const storedOutput: Record<string, WidgetData> | null =
+    peeledOutput ?? output;
+
   if (outcome.kind === "completed") {
     // WAIT/END_LOOP callers are already unblocked by PendingCalls.complete's
     // waiters. A wakeUp (or auto-upgraded WAIT) has a parked resume-stream
@@ -148,7 +159,7 @@ export async function handleToolResult(
     await TaskCompletion.enableAndFireParkedResumeTask({
       taskId,
       status,
-      output,
+      output: storedOutput,
       locale: props.locale,
       logger,
       abortSignal: new AbortController().signal,
@@ -181,6 +192,6 @@ export async function handleToolResult(
       .catch(() => undefined);
 
     // Parked-thread wakeUp: revive the thread from its tool message.
-    await reviveFromToolMessage(taskId, status, output, logger);
+    await reviveFromToolMessage(taskId, status, storedOutput, logger);
   }
 }

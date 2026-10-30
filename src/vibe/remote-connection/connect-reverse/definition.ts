@@ -150,6 +150,14 @@ const { POST } = createEndpoint({
         hidden: true,
         schema: z.string(),
       }),
+      // How the cloud reaches the initiator, decided by its own reachability
+      // probe: the initiator stores it as its row's remoteTransportMode (and
+      // opens the reverse-ws connector iff "reverse-ws"). Optional for older peers.
+      transportMode: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.enum(["reverse-ws", "direct-http"]).optional(),
+      }),
     },
   }),
 
@@ -216,6 +224,7 @@ const { POST } = createEndpoint({
         registered: true,
         remoteInstanceId: "thea",
         remoteUserId: "00000000-0000-0000-0000-000000000000",
+        transportMode: "reverse-ws",
       },
     },
   },

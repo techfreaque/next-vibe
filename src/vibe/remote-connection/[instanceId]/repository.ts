@@ -608,6 +608,7 @@ export class RemoteConnectionInstanceRepository {
     // Step 3: Push reverseToken to remote via register endpoint.
     // Bounded retries — if all fail, the remote's reverse entry keeps the
     // expired token and every cloud→local call will 401 until the next reauth.
+    let peerLeg: "reverse-ws" | "direct-http" | undefined;
     if (reverseToken) {
       const selfInstanceId =
         RemoteConnectionRepository.deriveDefaultSelfInstanceId();
@@ -650,6 +651,7 @@ export class RemoteConnectionInstanceRepository {
         }
         if (resp.success) {
           pushed = true;
+          peerLeg = resp.data.transportMode;
           logger.info("[REAUTH] Pushed reverseToken to remote", {
             instanceId,
           });
@@ -676,6 +678,7 @@ export class RemoteConnectionInstanceRepository {
         token: encryptedToken,
         leadId: newLeadId,
         isActive: true,
+        ...(peerLeg ? { remoteTransportMode: peerLeg } : {}),
         updatedAt: new Date(),
       })
       .where(

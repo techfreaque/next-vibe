@@ -63,6 +63,8 @@ export class RouteExecutionExecutor {
     toolExecutionContext: ToolExecutionContext;
     /** Pre-loaded route handler - avoids a second dynamic import when caller already loaded it */
     preloadedHandler?: GenericHandlerBase | null;
+    /** Task row ID when the handler runs as a tracked async task (goroutine) */
+    cronTaskId?: string;
   }): Promise<ResponseType<TResult>> {
     const { t } = systemScopedTranslation.scopedT(params.locale);
     // Some AI providers mangle tool names: underscores instead of hyphens, or
@@ -132,6 +134,7 @@ export class RouteExecutionExecutor {
         locale: params.locale,
         logger: params.logger,
         platform: params.platform,
+        cronTaskId: params.cronTaskId,
         toolExecutionContext: params.toolExecutionContext,
       });
 

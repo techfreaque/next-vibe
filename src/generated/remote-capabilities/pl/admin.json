@@ -114967,7 +114967,7 @@
                 },
                 "type": "optional"
               },
-              "defaultValue": "Europe/Vienna"
+              "defaultValue": "Europe/Berlin"
             },
             "type": "default"
           },
@@ -115427,7 +115427,7 @@
                 },
                 "type": "optional"
               },
-              "defaultValue": "Europe/Vienna"
+              "defaultValue": "Europe/Berlin"
             },
             "type": "default"
           },
@@ -448093,12 +448093,115 @@
               "type": "optional",
               "innerType": {
                 "def": {
-                  "type": "string"
+                  "type": "union",
+                  "options": [
+                    {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string",
+                      "format": null,
+                      "minLength": null,
+                      "maxLength": null
+                    },
+                    {
+                      "def": {
+                        "type": "pipe",
+                        "in": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "minValue": null,
+                          "maxValue": null,
+                          "isInt": false,
+                          "isFinite": true,
+                          "format": null
+                        },
+                        "out": {
+                          "def": {
+                            "type": "transform"
+                          },
+                          "type": "transform"
+                        }
+                      },
+                      "type": "pipe",
+                      "in": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "minValue": null,
+                        "maxValue": null,
+                        "isInt": false,
+                        "isFinite": true,
+                        "format": null
+                      },
+                      "out": {
+                        "def": {
+                          "type": "transform"
+                        },
+                        "type": "transform"
+                      }
+                    }
+                  ]
                 },
-                "type": "string",
-                "format": null,
-                "minLength": null,
-                "maxLength": null
+                "type": "union",
+                "options": [
+                  {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string",
+                    "format": null,
+                    "minLength": null,
+                    "maxLength": null
+                  },
+                  {
+                    "def": {
+                      "type": "pipe",
+                      "in": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "minValue": null,
+                        "maxValue": null,
+                        "isInt": false,
+                        "isFinite": true,
+                        "format": null
+                      },
+                      "out": {
+                        "def": {
+                          "type": "transform"
+                        },
+                        "type": "transform"
+                      }
+                    },
+                    "type": "pipe",
+                    "in": {
+                      "def": {
+                        "type": "number",
+                        "checks": []
+                      },
+                      "type": "number",
+                      "minValue": null,
+                      "maxValue": null,
+                      "isInt": false,
+                      "isFinite": true,
+                      "format": null
+                    },
+                    "out": {
+                      "def": {
+                        "type": "transform"
+                      },
+                      "type": "transform"
+                    }
+                  }
+                ]
               }
             },
             "type": "optional"
@@ -582244,6 +582347,35 @@
             "format": null,
             "minLength": null,
             "maxLength": null
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "transportMode": {
+          "type": "text",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "reverse-ws": "reverse-ws",
+                    "direct-http": "direct-http"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "reverse-ws": "reverse-ws",
+                  "direct-http": "direct-http"
+                },
+                "options": ["reverse-ws", "direct-http"]
+              }
+            },
+            "type": "optional"
           },
           "usage": {
             "response": true

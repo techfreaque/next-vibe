@@ -34,6 +34,8 @@ import { DefaultFolderId } from "../../../../core/execution-context";
 import { chatFolders, chatThreads } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
 import { getChatModelById } from "../../models";
+import { getMissingProviderKeyMessage } from "../setup/model-credit-phase";
+import { RELAY_RECEIVER_NO_PROVIDER_KEY } from "./constants";
 import type {
   AiStreamPostRequestOutput,
   AiStreamPostResponseOutput,
@@ -184,6 +186,23 @@ export async function runWsProviderStream(params: {
         errorType: ErrorResponseTypes.UNAUTHORIZED,
       });
     }
+    // A relay receiver hosts the whole loop, so it needs the provider key
+    // for the model. Without it, tell the caller to run the loop itself
+    // rather than failing the turn (inference-provider mode never needs it:
+    // the caller's provider connection is the model pipe).
+    if (ctx.mode === "relay" && data.model) {
+      const missingKey = getMissingProviderKeyMessage(
+        getChatModelById(data.model),
+      );
+      if (missingKey !== null) {
+        return fail({
+          message: t("route.errors.invalidRequestData", {
+            issue: `${RELAY_RECEIVER_NO_PROVIDER_KEY} ${missingKey}`,
+          }),
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+      }
+    }
     const loopUser: JwtPrivatePayloadType = {
       id: dbOwnerUser.id,
       leadId: dbOwnerUser.leadId ?? dbOwnerUser.id,
@@ -297,6 +316,13 @@ export async function runWsProviderStream(params: {
         // (wrong side: model-pipe mode means every tool is the caller's).
         const baseExecuteTool = loaded.tools[EXECUTE_TOOL_ALIAS];
         const baseExecute = baseExecuteTool?.execute;
+        // The model addresses instances as the CALLER knows them, so a call
+        // naming THIS instance means "run it here" - this instance has no
+        // connection row to itself, so drop the hint and execute locally.
+        const { RemoteConnectionRepository } =
+          await import("next-vibe/remote-connection/repository");
+        const providerSelfInstanceId =
+          await RemoteConnectionRepository.getLocalInstanceId(loopUser.id);
         if (baseExecuteTool && baseExecute) {
           toolsOverride = {
             ...loaded.tools,
@@ -315,12 +341,19 @@ export async function runWsProviderStream(params: {
                   (explicitInstance === undefined ||
                     explicitInstance === null ||
                     explicitInstance === "");
+                const targetsProviderItself =
+                  explicitInstance === providerSelfInstanceId;
+                const argsWithoutInstance = Object.fromEntries(
+                  Object.entries(args).filter(([key]) => key !== "instanceId"),
+                );
                 const effectiveArgs = needsRewrite
                   ? {
                       ...args,
                       toolName: `${callerInstanceId}__${requestedName}`,
                     }
-                  : args;
+                  : targetsProviderItself
+                    ? argsWithoutInstance
+                    : args;
                 return baseExecute(effectiveArgs, options);
               },
             },

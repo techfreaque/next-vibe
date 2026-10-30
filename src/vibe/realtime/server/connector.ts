@@ -30,6 +30,7 @@ import { defaultLocale } from "../../core/i18n/core/config";
 import { ErrorResponseTypes } from "../../core/route/response.schema";
 import { db } from "../../database";
 import { VibeMode } from "../../env/env-util";
+import { userLeadLinks } from "../../identity/lead/db";
 import { createEndpointLogger } from "../../logger/server";
 import type { EndpointLogger } from "../../logger/types";
 import {
@@ -336,10 +337,9 @@ class WsConnection {
       this.onMessage(event);
     });
     ws.addEventListener("close", () => {
-      this.onClose();
+      this.onClose(ws);
     });
     ws.addEventListener("error", (event) => {
-      // close event always follows — reconnect is handled there.
       const message =
         "message" in event && typeof event.message === "string"
           ? event.message
@@ -348,6 +348,11 @@ class WsConnection {
         instanceId: this.instanceId,
         error: message,
       });
+      // A failed handshake (peer restarting) may never emit a close event in
+      // every runtime — without this the retry loop would die silently.
+      if (ws.readyState !== WebSocket.OPEN) {
+        this.onClose(ws);
+      }
     });
   }
 
@@ -441,7 +446,11 @@ class WsConnection {
   }
 
   /** Socket closed: clear liveness and schedule a reconnect unless stopped. */
-  private onClose(): void {
+  private onClose(closed: WebSocket): void {
+    // A stale socket's late close must not tear down its replacement.
+    if (this.ws !== null && this.ws !== closed) {
+      return;
+    }
     this.clearConnectedAt();
     if (this.stopped) {
       return;
@@ -454,7 +463,7 @@ class WsConnection {
   }
 
   private scheduleReconnect(): void {
-    if (this.stopped) {
+    if (this.stopped || this.reconnectTimer !== null) {
       return;
     }
     const delayMs =
@@ -497,6 +506,24 @@ class WsConnection {
   }
 
   /**
+   * Is an addressed frame meant for THIS connection? The sender addresses a
+   * connection by the lead of the token it holds for us - the reverse token we
+   * minted on OUR side, i.e. one of our local user's own leads - while
+   * `config.leadId` is the lead the PEER issued us at login. Both identify
+   * this connection, so either is accepted.
+   */
+  private async isAddressedToMe(targetLeadId: string): Promise<boolean> {
+    if (targetLeadId === this.config.leadId) {
+      return true;
+    }
+    const links = await db
+      .select({ leadId: userLeadLinks.leadId })
+      .from(userLeadLinks)
+      .where(eq(userLeadLinks.userId, this.config.userId));
+    return links.some((link) => link.leadId === targetLeadId);
+  }
+
+  /**
    * Handle a relayed remote-event from the peer: run it via the target route's
    * onRemoteEvent (the bridge dispatches by endpointPath+method+eventName).
    * One handler for every cross-instance effect.
@@ -524,8 +551,18 @@ class WsConnection {
     // (tool dispatch would otherwise double-execute / leak across peers).
     if (
       parsed.data.targetLeadId &&
-      parsed.data.targetLeadId !== this.config.leadId
+      !(await this.isAddressedToMe(parsed.data.targetLeadId))
     ) {
+      // Never silent: a reverse entry on the peer that still points at a lead
+      // this instance no longer knows (local DB reset) drops every reply and
+      // leaves callers waiting. Re-authenticating the connection re-issues it.
+      this.logger.warn(
+        "[WsConnection] dropped frame addressed to an unknown lead — re-authenticate the connection",
+        {
+          instanceId: this.config.instanceId,
+          targetLeadId: parsed.data.targetLeadId,
+        },
+      );
       return;
     }
     // Per-connection syncScope gate: drop a domained event this connection
@@ -966,10 +1003,24 @@ export async function acquireConnection(
         });
       };
     }
-    const conn = new WsConnection(config, _logger);
-    _connections.set(instanceId, conn);
-    conn.start();
-    _logger.debug("[Connector] Opened connection (demand)", { instanceId });
+    // Another process (the server launcher opens one at boot) already holds
+    // the socket: a second one would deliver every frame twice. Its frames
+    // reach this process through the local hub, so do not open a duplicate.
+    const [liveRow] = await db
+      .select({ wsConnectedAt: remoteConnections.wsConnectedAt })
+      .from(remoteConnections)
+      .where(eq(remoteConnections.id, config.id))
+      .limit(1);
+    if (liveRow?.wsConnectedAt) {
+      _logger.debug("[Connector] Socket held by another process (noop)", {
+        instanceId,
+      });
+    } else {
+      const conn = new WsConnection(config, _logger);
+      _connections.set(instanceId, conn);
+      conn.start();
+      _logger.debug("[Connector] Opened connection (demand)", { instanceId });
+    }
   }
 
   // Increment ref count.
@@ -1070,6 +1121,25 @@ export function openConnection(config: ConnectionConfig): void {
   // bridge for direct-http). For direct-http the transient `conn` exists only
   // to run this pull and is then discarded (not registered).
   conn.doPullNow();
+}
+
+/**
+ * Run one sync exchange (push local changes + pull the peer's) with a peer NOW,
+ * without touching its socket. For changes that reached the DB without a live
+ * relay (e.g. an inference-provider turn whose messages were written by events
+ * the peer itself sent) - the peer would otherwise only see them on the next
+ * connect. Fire-and-forget.
+ */
+export async function syncConnectionNow(instanceId: string): Promise<void> {
+  const live = _connections.get(instanceId);
+  if (live) {
+    live.doPullNow();
+    return;
+  }
+  const config = await loadRowByInstanceId(instanceId);
+  if (config) {
+    new WsConnection(config, _logger).doPullNow();
+  }
 }
 
 /**

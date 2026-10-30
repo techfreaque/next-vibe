@@ -42,6 +42,7 @@ import type {
 import type { AiStreamT } from "../../stream/i18n";
 import { buildSystemPrompt } from "../../system-prompt/builder";
 import { createUserMessageWithAttachments } from "../intake/messages";
+import { RELAY_RECEIVER_NO_PROVIDER_KEY } from "./constants";
 import type { HeadlessAiStreamResult } from "../setup/setup";
 
 async function buildRelayToolSchemas(
@@ -513,7 +514,7 @@ export async function runRelayBranch(
     user,
     locale,
     logger,
-    platform: Platform.AI,
+    platform: Platform.NEXT_API,
     input: {
       operation: data.operation,
       role: data.role,
@@ -546,6 +547,35 @@ export async function runRelayBranch(
   });
 
   if (!relayResult.success) {
+    // The remote host has no provider key for this model: take the loop back.
+    // Undo the relay bookkeeping so the local loop starts from a clean thread
+    // (it re-creates the user message and applies the remote's prompt/tools).
+    if (
+      isRemoteFolderRelay &&
+      !skipLocalWrites &&
+      relayResult.message.includes(RELAY_RECEIVER_NO_PROVIDER_KEY)
+    ) {
+      logger.warn(
+        "[Relay] remote host has no provider key — running the loop locally",
+        {
+          instanceId: remoteTarget.instanceId,
+          model: data.model,
+        },
+      );
+      await db
+        .delete(chatMessages)
+        .where(eq(chatMessages.id, localUserMessageId))
+        .catch(() => undefined);
+      await db
+        .update(chatThreads)
+        .set({
+          loopInstanceId: null,
+          streamingState: ThreadStreamingState.IDLE,
+        })
+        .where(eq(chatThreads.id, localThreadId))
+        .catch(() => undefined);
+      return null;
+    }
     return relayResult;
   }
 
@@ -605,6 +635,17 @@ export async function runRelayBranch(
       await pushThreadSync(localThreadId, user.id, logger).catch(() => {
         // Best-effort: pull-sync also converges.
       });
+      if (!isRemoteFolderRelay) {
+        // Inference-provider turn: the provider ran incognito and the
+        // transcript was written HERE from its events (no re-fan-out), so the
+        // provider's mirror of this thread is empty until a sync exchange
+        // ships the messages.
+        const { syncConnectionNow } =
+          await import("next-vibe/realtime/server/connector");
+        await syncConnectionNow(remoteTarget.instanceId).catch(() => {
+          // Best-effort: the next connect-time exchange converges.
+        });
+      }
     }
   }
 

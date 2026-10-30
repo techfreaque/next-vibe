@@ -218,6 +218,23 @@ export class LocalExecutionAsync {
         finalStatus = executed.finalStatus;
         errorMessage = executed.errorMessage;
 
+        // Interactive terminal session (claude-code & co) launched for a remote
+        // requester: the handler returned at LAUNCH, the real outcome arrives when
+        // the session calls complete-task (which already ran the local revival
+        // tail). Park until that lands, then relay the real result.
+        if (
+          toolExecutionContext.onAsyncTaskSettled &&
+          executed.finalStatus === CronTaskStatus.COMPLETED &&
+          executed.finalResult?.["terminalPending"] === true
+        ) {
+          selfEscalated = true;
+          const session =
+            await LocalExecutionAsync.awaitTerminalSession(taskId);
+          finalResult = session.output;
+          finalStatus = session.status;
+          errorMessage = session.errorMessage;
+        }
+
         logger.debug("[RouteExecute] Async task finished", {
           taskId,
           toolName,
@@ -626,6 +643,7 @@ export class LocalExecutionAsync {
       locale: ctx.locale,
       logger,
       platform: Platform.MCP,
+      cronTaskId: taskId,
       toolExecutionContext: goroutinetoolExecutionContext,
     });
     let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
@@ -753,6 +771,68 @@ export class LocalExecutionAsync {
    * context), rowCount is 0 — the goroutine lost the race and must fire the
    * waiter's revival instead (after calling this again unconditionally).
    */
+  /**
+   * Wait for an interactive terminal session to report through complete-task:
+   * the task row leaves RUNNING and the report's execution record carries the
+   * output. Polls the DB because complete-task lands in a different process
+   * than the one holding the remote-dispatch relay hook. No deadline — an
+   * interactive session may take arbitrarily long; a deleted task row ends it.
+   */
+  private static async awaitTerminalSession(taskId: string): Promise<{
+    status: (typeof CronTaskStatusDB)[number];
+    output: Record<string, WidgetData> | null;
+    errorMessage: string | null;
+  }> {
+    const POLL_MS = 2000;
+    while (true) {
+      await new Promise((resolve) => {
+        setTimeout(resolve, POLL_MS);
+      });
+      const [task] = await db
+        .select({ status: cronTasks.lastExecutionStatus })
+        .from(cronTasks)
+        .where(eq(cronTasks.id, taskId))
+        .limit(1);
+      if (!task) {
+        return {
+          status: CronTaskStatus.CANCELLED,
+          output: null,
+          errorMessage: "Interactive session task was deleted",
+        };
+      }
+      if (
+        task.status === null ||
+        task.status === CronTaskStatus.RUNNING ||
+        task.status === CronTaskStatus.PENDING
+      ) {
+        continue;
+      }
+      const [report] = await db
+        .select({ result: cronTaskExecutions.result })
+        .from(cronTaskExecutions)
+        .where(
+          and(
+            eq(cronTaskExecutions.taskId, taskId),
+            eq(cronTaskExecutions.triggeredBy, "remote"),
+          ),
+        )
+        .orderBy(sql`${cronTaskExecutions.completedAt} desc`)
+        .limit(1);
+      const output =
+        report?.result && typeof report.result === "object"
+          ? PendingCalls.toOutputObject(report.result)
+          : null;
+      return {
+        status: task.status,
+        output,
+        errorMessage:
+          task.status === CronTaskStatus.COMPLETED
+            ? null
+            : `Interactive session ended with status ${task.status}`,
+      };
+    }
+  }
+
   private static async markTaskCompleted(taskId: string): Promise<boolean> {
     const updated = await db
       .update(cronTasks)

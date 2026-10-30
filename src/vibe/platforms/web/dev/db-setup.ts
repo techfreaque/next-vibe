@@ -76,13 +76,18 @@ export class DevDatabaseSetup {
 
     if (isPglite) {
       logger.vibe(formatDatabase("PGlite mode — skipping Docker", "🐘"));
-      return DevDatabaseSetup.performDatabaseOperations(
+      const ready = await DevDatabaseSetup.performDatabaseOperations(
         data,
         locale,
         logger,
         isPreview,
         activePidFile,
       );
+      if (ready) {
+        // Same boot re-sync + reverse-ws reopen as the Docker path below.
+        void DevDatabaseSetup.openReverseWsConnectors(logger);
+      }
+      return ready;
     }
 
     try {
@@ -139,6 +144,9 @@ export class DevDatabaseSetup {
         await import("../../../remote-connection/repository");
       const { openConnection } =
         await import("../../../realtime/server/connector");
+      // A previous run may have died without clearing its liveness marker; this
+      // process is about to (re)open every socket, so start from a clean slate.
+      await RemoteConnectionRepository.clearOutboundSocketLiveness();
       const connections =
         await RemoteConnectionRepository.getAllActiveConnectionsForSync();
       let opened = 0;
@@ -364,10 +372,10 @@ export class DevDatabaseSetup {
     // Resolve the data directory path from DATABASE_URL (file:///abs/path or file:rel/path).
     const dbUrl = databaseEnv.DATABASE_URL;
     let dbPath: string;
-    if (dbUrl.startsWith("file://")) {
+    if (dbUrl.startsWith("file:///")) {
       dbPath = fileURLToPath(dbUrl);
     } else {
-      dbPath = resolve(dbUrl.replace(/^file:/, ""));
+      dbPath = resolve(dbUrl.replace(/^file:(\/\/)?/, ""));
     }
 
     logger.vibe(formatDatabase(`Deleting PGlite data: ${dbPath}`, "🗑️"));

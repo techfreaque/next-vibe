@@ -33,6 +33,7 @@ import {
   makeHeadlessContext,
 } from "../../../core/execution-context";
 import { chatMessages, chatThreads, type ToolCall } from "../../chat/db";
+import { remoteConnections } from "../../../remote-connection/db";
 import {
   ChatMessageRole,
   ThreadStatus,
@@ -1085,11 +1086,16 @@ export class AiStreamRepository {
     const capturedWakeUpPayloads: WakeUpPayload[] = [];
 
     // Create emitter on the messages channel - events are owned by messages endpoint.
-    const wsEmit: MessagesWsEmit = createMessagesEmitter(logger, user, {
-      threadId: threadResultThreadId,
-      rootFolderId: data.rootFolderId,
-      resolvedRelayContext,
-    });
+    const wsEmit: MessagesWsEmit = createMessagesEmitter(
+      logger,
+      user,
+      {
+        threadId: threadResultThreadId,
+        rootFolderId: data.rootFolderId,
+        resolvedRelayContext,
+      },
+      { relayToCaller: relayReceiver === true && isIncognito },
+    );
     const emitTitle = (threadId: string, title: string): void => {
       createThreadsGetEmitter(logger, user, {
         rootFolderId: data.rootFolderId,
@@ -1866,6 +1872,33 @@ export class AiStreamRepository {
               threadId: threadResultThreadId,
             });
           });
+        }
+
+        // Revival turn: the result of an async/interactive tool was backfilled
+        // into its tool message IN PLACE (no live event carries that edit), so
+        // peers mirroring this thread still show the call without an outcome.
+        // One sync exchange per forward connection ships the finished state.
+        if (isRevival && !user.isPublic && !isIncognito) {
+          const peers = await db
+            .select({ instanceId: remoteConnections.instanceId })
+            .from(remoteConnections)
+            .where(
+              and(
+                eq(remoteConnections.userId, user.id),
+                eq(remoteConnections.isActive, true),
+                eq(remoteConnections.isReverseEntry, false),
+              ),
+            )
+            .catch(() => []);
+          if (peers.length > 0) {
+            const { syncConnectionNow } =
+              await import("next-vibe/realtime/server/connector");
+            for (const peer of peers) {
+              await syncConnectionNow(peer.instanceId).catch(() => {
+                // Best-effort: the next connect-time exchange converges.
+              });
+            }
+          }
         }
       };
 

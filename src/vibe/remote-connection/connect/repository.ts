@@ -131,6 +131,7 @@ export class RemoteConnectionConnectRepository {
     forbidden?: boolean;
     remoteInstanceId: string | null;
     remoteUserId: string | null;
+    transportMode?: TransportMode;
   }> {
     const {
       remoteUrl,
@@ -224,6 +225,7 @@ export class RemoteConnectionConnectRepository {
       conflict: false,
       remoteInstanceId: result.data.remoteInstanceId ?? null,
       remoteUserId: result.data.remoteUserId ?? null,
+      transportMode: result.data.transportMode,
     };
   }
 
@@ -495,6 +497,23 @@ export class RemoteConnectionConnectRepository {
         message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
+    }
+
+    // The peer probed OUR localUrl: reverse-ws means it can only reach us
+    // through the connector we open (step 6c). Record it before that opens.
+    if (registerResult.transportMode) {
+      await db
+        .update(remoteConnections)
+        .set({
+          remoteTransportMode: registerResult.transportMode,
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            eq(remoteConnections.userId, user.id),
+            eq(remoteConnections.instanceId, instanceId),
+          ),
+        );
     }
 
     if (data.isInferenceProvider) {

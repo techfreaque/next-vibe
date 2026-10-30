@@ -83,6 +83,10 @@ export class MessageDbWriter {
     toolExecutionContext: ToolExecutionContext,
   ) {
     this.toolExecutionContext = toolExecutionContext;
+    // Seed from the stream's own thread: events emitted before the first
+    // assistant message is written (empty-stop content-done, early tool
+    // results) otherwise carry an empty threadId and the peer drops them.
+    this.lastThreadId = toolExecutionContext.threadId ?? null;
     this.deps = {
       isIncognito,
       logger,

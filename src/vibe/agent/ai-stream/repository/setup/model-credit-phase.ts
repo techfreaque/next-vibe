@@ -30,6 +30,50 @@ interface ModelCreditPhaseResult {
 }
 
 /**
+ * Missing-key message for the model's provider, or null when the key is
+ * configured (or the provider needs none).
+ */
+export function getMissingProviderKeyMessage(
+  modelConfig: ChatModelOption,
+): string | null {
+  switch (modelConfig.apiProvider) {
+    case ApiProvider.OPENROUTER:
+      return agentEnv.OPENROUTER_API_KEY
+        ? null
+        : buildMissingKeyMessage("openRouter");
+    case ApiProvider.UNCENSORED_AI:
+      return agentEnv.UNCENSORED_AI_API_KEY
+        ? null
+        : buildMissingKeyMessage("uncensoredAI");
+    case ApiProvider.FREEDOMGPT:
+      return agentEnv.FREEDOMGPT_API_KEY
+        ? null
+        : buildMissingKeyMessage("freedomGPT");
+    case ApiProvider.GAB_AI:
+      return agentEnv.GAB_AI_API_KEY ? null : buildMissingKeyMessage("gabAI");
+    case ApiProvider.VENICE_AI:
+      return agentEnv.VENICE_AI_API_KEY
+        ? null
+        : buildMissingKeyMessage("veniceAI");
+    case ApiProvider.OPENAI_IMAGES:
+      return agentEnv.OPENAI_API_KEY
+        ? null
+        : buildMissingKeyMessage("openAiImages");
+    case ApiProvider.REPLICATE:
+      return agentEnv.REPLICATE_API_TOKEN
+        ? null
+        : buildMissingKeyMessage("replicate");
+    case ApiProvider.FAL_AI:
+      return agentEnv.FAL_AI_API_KEY ? null : buildMissingKeyMessage("falAi");
+    case ApiProvider.CLAUDE_CODE:
+      // Agent SDK authenticates via OAuth login, no separate API key needed.
+      return null;
+    default:
+      return null;
+  }
+}
+
+/**
  * Run the model + credit validation guards. Resolves to the validated outputs,
  * or a fail() response (auth / bad-request / forbidden / credits) the caller
  * must return directly.
@@ -88,43 +132,7 @@ export async function runModelCreditPhase(params: {
   }
 
   // Guard: check that the required API key for this model's provider is configured.
-  const providerKeyMissing = ((): string | null => {
-    switch (modelConfig.apiProvider) {
-      case ApiProvider.OPENROUTER:
-        return agentEnv.OPENROUTER_API_KEY
-          ? null
-          : buildMissingKeyMessage("openRouter");
-      case ApiProvider.UNCENSORED_AI:
-        return agentEnv.UNCENSORED_AI_API_KEY
-          ? null
-          : buildMissingKeyMessage("uncensoredAI");
-      case ApiProvider.FREEDOMGPT:
-        return agentEnv.FREEDOMGPT_API_KEY
-          ? null
-          : buildMissingKeyMessage("freedomGPT");
-      case ApiProvider.GAB_AI:
-        return agentEnv.GAB_AI_API_KEY ? null : buildMissingKeyMessage("gabAI");
-      case ApiProvider.VENICE_AI:
-        return agentEnv.VENICE_AI_API_KEY
-          ? null
-          : buildMissingKeyMessage("veniceAI");
-      case ApiProvider.OPENAI_IMAGES:
-        return agentEnv.OPENAI_API_KEY
-          ? null
-          : buildMissingKeyMessage("openAiImages");
-      case ApiProvider.REPLICATE:
-        return agentEnv.REPLICATE_API_TOKEN
-          ? null
-          : buildMissingKeyMessage("replicate");
-      case ApiProvider.FAL_AI:
-        return agentEnv.FAL_AI_API_KEY ? null : buildMissingKeyMessage("falAi");
-      case ApiProvider.CLAUDE_CODE:
-        // Agent SDK authenticates via OAuth login, no separate API key needed.
-        return null;
-      default:
-        return null;
-    }
-  })();
+  const providerKeyMissing = getMissingProviderKeyMessage(modelConfig);
 
   // Guard: Agent SDK models are admin-only.
   if (

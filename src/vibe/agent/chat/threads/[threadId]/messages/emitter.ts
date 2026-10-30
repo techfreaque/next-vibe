@@ -67,8 +67,9 @@ function messagesChannelBinding(
 function messagesFanOut(
   routing: MessagesChannelRouting,
   requested: boolean | undefined,
+  relayToCaller: boolean | undefined,
 ): boolean {
-  if (routing.rootFolderId === DefaultFolderId.INCOGNITO) {
+  if (routing.rootFolderId === DefaultFolderId.INCOGNITO && !relayToCaller) {
     return false;
   }
   return requested ?? true;
@@ -82,7 +83,7 @@ export function createMessagesGetEmitter(
 ): MessagesWsEmit {
   return createEndpointEmitter(messagesDefinitions.GET, logger, user, {
     ...messagesChannelBinding(routing),
-    fanOut: messagesFanOut(routing, undefined),
+    fanOut: messagesFanOut(routing, undefined, undefined),
     resolvedRelayContext: routing.resolvedRelayContext,
   });
 }
@@ -97,11 +98,19 @@ export function createMessagesEmitter(
   logger: EndpointLogger,
   user: JwtPayloadType,
   routing: MessagesChannelRouting,
-  options?: { fanOut?: boolean },
+  options?: {
+    fanOut?: boolean;
+    /**
+     * Inference-provider receiver loops run incognito here but the thread
+     * lives on the CALLER, which persists the transcript from these events -
+     * so they must leave the instance despite the incognito root.
+     */
+    relayToCaller?: boolean;
+  },
 ): MessagesWsEmit {
   return createEndpointEmitter(messagesDefinitions.GET, logger, user, {
     ...messagesChannelBinding(routing),
-    fanOut: messagesFanOut(routing, options?.fanOut),
+    fanOut: messagesFanOut(routing, options?.fanOut, options?.relayToCaller),
     resolvedRelayContext: routing.resolvedRelayContext,
   });
 }

@@ -5,6 +5,8 @@
 import "server-only";
 
 import type { WidgetData } from "../../../core/utils/json";
+import { filterUserPermissionRoles } from "../../../identity/roles/enum";
+import { collectServerDefaults } from "../../../unified-ui/_shared/utils";
 import type { RouteExecuteContext } from "../types";
 
 /**
@@ -69,8 +71,20 @@ export async function resolveCallerFieldDefaults(params: {
   const { ctx, toolName } = params;
   const { getRouteHandler } = await import("@/generated/routes/handlers");
   const handler = await getRouteHandler(toolName);
-  const fieldDefaults = handler?.fieldDefaults;
-  if (!fieldDefaults) {
+  // Definition-level `serverDefault`s (e.g. rename-thread's threadId from the
+  // active stream) resolve the same way: the peer has no access to this
+  // execution's stream context, so they must be filled in before dispatch.
+  const { getEndpoint } = await import("@/generated/endpoints/endpoint");
+  const endpoint = await getEndpoint(toolName);
+  const definitionDefaults = endpoint
+    ? collectServerDefaults(
+        endpoint.fields,
+        filterUserPermissionRoles(ctx.user.roles),
+        ctx.platform,
+      )
+    : {};
+  const fieldDefaults = { ...definitionDefaults, ...handler?.fieldDefaults };
+  if (Object.keys(fieldDefaults).length === 0) {
     return params.input;
   }
   let input = params.input;

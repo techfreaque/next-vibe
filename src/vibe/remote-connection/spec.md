@@ -25,16 +25,16 @@ Sub-spec: [`sync/spec.md`](sync/spec.md) — domain sync.
 
 ## Transport
 
-Two modes (`transportMode` enum: `reverse-ws | direct-http | cloud-only`):
+Two modes (`transportMode` enum: `reverse-ws | direct-http`):
 
 - **`reverse-ws`** — the side behind NAT opens one persistent outbound WS to the peer and subscribes to `system/remote-event/self`. All relay traffic multiplexes on it. Default for `transportMode`.
 - **`direct-http`** — peer is publicly reachable; each relay is an independent HTTP POST to the peer's bridge/execute-tool route. No persistent socket. Default for `remoteTransportMode`.
 
-**Negotiation (at register time, callee→initiator):** the target pings the initiator's `localUrl` health endpoint with the reverse token. Reachable → the target records `transportMode = direct-http`; unreachable (NAT) → leaves `reverse-ws`. Each side's own `transportMode` is the peer's `remoteTransportMode`; settings PATCH mirrors a `transportMode` change to the peer as its `remoteTransportMode`.
+**Negotiation (at register time, callee→initiator):** the target pings the initiator's `localUrl` health endpoint with the reverse token (5s bound, awaited). Reachable → the target records `transportMode = direct-http`; unreachable (NAT / loopback) → it records `transportMode = reverse-ws`. The verdict is returned in the register response (`transportMode`); the initiator stores it as its row's `remoteTransportMode` before opening its connector, and reauth re-registers refresh it. Each side's own `transportMode` is the peer's `remoteTransportMode`; settings PATCH mirrors a `transportMode` change to the peer as its `remoteTransportMode`.
 
 **No dispatch-time failover — by design.** Negotiation runs only at connect/edit time; a leg reflects the peer's reachability, which doesn't change between calls. Failover is not architecturally possible: reverse-ws can't be opened on demand (the NAT'd peer holds it open, the caller can't conjure it), and a reverse-ws peer is unreachable over HTTP by definition (else direct-http would already be the negotiated leg). A down leg hard-fails. See [`../system/unified-interface/execute-tool/spec.md`](../system/unified-interface/execute-tool/spec.md) → Transport Failover.
 
-**Who opens the socket:** exactly the side whose row has `remoteTransportMode === "reverse-ws"` runs a connector. Cloud never opens one. The connector is ref-counted; idle close 5 min after last release; reconnect with exponential backoff (1s→30s cap), re-reading the row each retry (deleted/inactive → stop; token/url changed → reconnect with new values). `wsConnectedAt` set on open, cleared on close.
+**Who opens the socket:** exactly the side whose row has `remoteTransportMode === "reverse-ws"` runs a connector. The server launcher opens it at boot (also in PGlite mode) and records `wsConnectedAt`; request-handling processes never open a second socket while that marker is set, and `syncConnectionNow(instanceId)` runs a one-off sync exchange for changes that arrived without a live relay. Addressed (point-to-point) frames match either the row's `leadId` or any lead of the local user; a frame addressed to a lead this instance no longer knows (local DB reset while the peer kept its reverse entry) is dropped with a warning — every reply to that instance is lost until the connection is re-authenticated (PATCH `[instanceId]` with email+password), which re-issues the reverse token and lead. Cloud never opens one. The connector is ref-counted; idle close 5 min after last release; reconnect with exponential backoff (1s→30s cap), re-reading the row each retry (deleted/inactive → stop; token/url changed → reconnect with new values). `wsConnectedAt` set on open, cleared on close.
 
 ---
 
@@ -84,7 +84,7 @@ Two tables.
 | `localUrl`                | text\|null      | Reverse entry only: initiator's public URL                                                          |
 | `remoteInstanceId`        | text\|null      | The id the peer uses for itself                                                                     |
 | `isReverseEntry`          | boolean         | System-created on target; no UI; never opens a socket                                               |
-| `transportMode`           | enum            | Our send leg. `reverse-ws \| direct-http \| cloud-only`. Default `reverse-ws`                       |
+| `transportMode`           | enum            | Our send leg: `reverse-ws` or `direct-http`. Default `direct-http`; negotiation sets it             |
 | `remoteTransportMode`     | enum            | Peer's send leg (mirror of peer's `transportMode`). Default `direct-http`. Drives connector opening |
 | `threadMirrorMode`        | enum            | `cloud \| local \| both \| none`. Default `cloud`; connect/register set `both`                      |
 | `loopLocation`            | enum            | `client \| server`. Default `server`. Not editable via any endpoint                                 |

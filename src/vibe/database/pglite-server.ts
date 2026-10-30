@@ -249,14 +249,26 @@ async function execInsertReturning(
   const tableMatch = /^\s*insert\s+into\s+"?([^"\s(]+)"?/i.exec(sql);
   const tableName = tableMatch?.[1];
   const sqlNoReturn = sql.replace(/\s+returning\s+[\s\S]+$/i, "");
-  await pg.query(sqlNoReturn, params, { rowMode: "object" });
+  const inserted = await pg.query(sqlNoReturn, params, { rowMode: "object" });
   if (!tableName) {
     return Buffer.concat([
       buildCommandComplete("INSERT 0 0"),
       buildReadyForQuery(),
     ]);
   }
-  const rowCount = countInsertRows(sql);
+  // ON CONFLICT DO NOTHING inserts fewer rows than the VALUES list: only the
+  // rows actually written may come back, never an unrelated existing row.
+  const rowCount = Math.min(
+    countInsertRows(sql),
+    inserted.affectedRows ?? Number.MAX_SAFE_INTEGER,
+  );
+  if (rowCount === 0) {
+    return Buffer.concat([
+      buildRowDescription([]),
+      buildCommandComplete("INSERT 0 0"),
+      buildReadyForQuery(),
+    ]);
+  }
   const result = await pg.query<PgliteRow>(
     `SELECT * FROM "${tableName}" ORDER BY ctid DESC LIMIT ${rowCount}`,
     [],
@@ -298,8 +310,34 @@ if (!gq.__pglite_queue__) {
   gq.__pglite_queue__ = Promise.resolve();
 }
 
-function serialise<T>(fn: () => Promise<T>): Promise<T> {
-  const result = (gq.__pglite_queue__ as Promise<void>).then(fn);
+// Watchdog: the queue is strictly serial, so ONE statement that never settles
+// stalls every connection with no error anywhere. Log the stuck statement so a
+// wedge is diagnosable instead of silent.
+const STUCK_AFTER_MS = 15_000;
+
+function withWatchdog<T>(
+  label: string,
+  fn: () => Promise<T>,
+): () => Promise<T> {
+  return async () => {
+    const timer = setInterval(() => {
+      process.stderr.write(
+        `[pglite] statement running > ${String(STUCK_AFTER_MS / 1000)}s, queue is blocked: ${label}
+`,
+      );
+    }, STUCK_AFTER_MS);
+    try {
+      return await fn();
+    } finally {
+      clearInterval(timer);
+    }
+  };
+}
+
+function serialise<T>(fn: () => Promise<T>, label = "direct"): Promise<T> {
+  const result = (gq.__pglite_queue__ as Promise<void>).then(
+    withWatchdog(label, fn),
+  );
   // Swallow errors on the queue tail so one failure doesn't poison later work
   gq.__pglite_queue__ = result.then(
     () => undefined,
@@ -321,6 +359,31 @@ export function serialisePglite<T>(fn: () => Promise<T>): Promise<T> {
 
 let nextPid = 10000;
 
+/** Human-readable label of a batch for the watchdog (first SQL in it). */
+function describeBatch(messages: Buffer, fenceType: number): string {
+  if (fenceType === MSG_SIMPLE_QUERY) {
+    return messages
+      .slice(5, messages.length - 1)
+      .toString("utf8")
+      .trim()
+      .slice(0, 200);
+  }
+  let off = 0;
+  while (off + 5 <= messages.length) {
+    const bLen = messages.readInt32BE(off + 1);
+    if (messages.readUInt8(off) === MSG_PARSE) {
+      return (
+        parseSqlFromParseMessage(messages.slice(off, off + 1 + bLen))?.slice(
+          0,
+          200,
+        ) ?? "parse"
+      );
+    }
+    off += 1 + bLen;
+  }
+  return "extended batch";
+}
+
 function handleConnection(pg: PGlite, socket: Socket): void {
   const pid = nextPid++;
   const secret = (pid * 1234567) & 0x7fffffff;
@@ -328,6 +391,18 @@ function handleConnection(pg: PGlite, socket: Socket): void {
   let recvBuf = Buffer.alloc(0);
   let batchBuf = Buffer.alloc(0);
   let busy = false;
+  // Last ReadyForQuery status this connection saw: 'I' idle, 'T' in a
+  // transaction, 'E' failed transaction. PGlite has ONE session shared by
+  // every connection, so a connection that dies mid-transaction would leave
+  // the whole database inside a zombie (or aborted) transaction.
+  let txStatus = "I";
+
+  function trackTxStatus(resp: Uint8Array): void {
+    // The response always ends with ReadyForQuery: 'Z' + int32(5) + status.
+    if (resp.length >= 6 && resp[resp.length - 6] === 0x5a) {
+      txStatus = String.fromCharCode(resp[resp.length - 1] ?? 0x49);
+    }
+  }
 
   socket.on("data", (chunk: Buffer) => {
     recvBuf = Buffer.concat([recvBuf, chunk]);
@@ -339,6 +414,12 @@ function handleConnection(pg: PGlite, socket: Socket): void {
   socket.on("close", () => {
     recvBuf = Buffer.alloc(0);
     batchBuf = Buffer.alloc(0);
+    if (txStatus !== "I") {
+      txStatus = "I";
+      void serialise(() => pg.exec("ROLLBACK"), "ROLLBACK (orphaned tx)").catch(
+        () => undefined,
+      );
+    }
   });
 
   async function pump(): Promise<void> {
@@ -434,7 +515,12 @@ function handleConnection(pg: PGlite, socket: Socket): void {
         .trim();
       if (/^\s*insert\s+into\s/i.test(sql) && /\sreturning\s/i.test(sql)) {
         try {
-          socket.write(await serialise(() => execInsertReturning(pg, sql)));
+          socket.write(
+            await serialise(
+              () => execInsertReturning(pg, sql),
+              sql.slice(0, 200),
+            ),
+          );
         } catch (e) {
           socket.write(
             Buffer.concat([
@@ -477,8 +563,9 @@ function handleConnection(pg: PGlite, socket: Socket): void {
           const parseComplete = Buffer.from([0x31, 0x00, 0x00, 0x00, 0x04]);
           const bindComplete = Buffer.from([0x32, 0x00, 0x00, 0x00, 0x04]);
           try {
-            const dataResp = await serialise(() =>
-              execInsertReturning(pg, sql, params),
+            const dataResp = await serialise(
+              () => execInsertReturning(pg, sql, params),
+              sql.slice(0, 200),
             );
             socket.write(
               Buffer.concat([parseComplete, bindComplete, dataResp]),
@@ -505,15 +592,19 @@ function handleConnection(pg: PGlite, socket: Socket): void {
     // Splitting P/B/E/S into separate calls causes PGlite to emit ReadyForQuery
     // after each message, which desynchronises the pg client and causes EPIPE.
     try {
-      await serialise(async () => {
-        const bytes = new Uint8Array(
-          messages.buffer,
-          messages.byteOffset,
-          messages.byteLength,
-        );
-        const resp = await pg.execProtocolRaw(bytes);
-        socket.write(Buffer.from(resp));
-      });
+      await serialise(
+        async () => {
+          const bytes = new Uint8Array(
+            messages.buffer,
+            messages.byteOffset,
+            messages.byteLength,
+          );
+          const resp = await pg.execProtocolRaw(bytes);
+          trackTxStatus(resp);
+          socket.write(Buffer.from(resp));
+        },
+        describeBatch(messages, fenceType),
+      );
     } catch (e) {
       socket.write(
         Buffer.concat([

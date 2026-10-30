@@ -20,6 +20,9 @@ import "server-only";
 
 import { execSync, spawn } from "node:child_process";
 import { once } from "node:events";
+import { writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 import { eq } from "drizzle-orm";
 import type { ToolExecutionContext } from "next-vibe/core/execution-context";
@@ -83,12 +86,53 @@ function buildShellCommand(bin: string, args: string[], cwd: string): string {
   return `cd '${cwd.replaceAll("'", "'\\''")}' && ${bin} ${escaped.join(" ")}`;
 }
 
+/**
+ * Windows: a PowerShell script file run by a fresh console window. A script
+ * file sidesteps cmd/PowerShell argument re-quoting of prompts that contain
+ * quotes, braces or newlines.
+ */
+function psQuote(v: string): string {
+  return `'${v.replaceAll("'", "''")}'`;
+}
+
+function buildWindowsScript(bin: string, args: string[], cwd: string): string {
+  const scriptPath = join(
+    tmpdir(),
+    `vibe-${bin}-${Date.now().toString(36)}.ps1`,
+  );
+  writeFileSync(
+    scriptPath,
+    `Set-Location -LiteralPath ${psQuote(cwd)}
+& ${psQuote(bin)} ${args.map(psQuote).join(" ")}
+`,
+    "utf8",
+  );
+  return scriptPath;
+}
+
 export interface TerminalEmulator {
   bin: string;
   buildArgs: (cliArgs: string[]) => string[];
 }
 
 function detectTerminal(logger: EndpointLogger): TerminalEmulator | undefined {
+  if (process.platform === "win32") {
+    return {
+      bin: "cmd.exe",
+      // args[0] = path of the PowerShell script; `start` opens a new console.
+      buildArgs: (args) => [
+        "/c",
+        "start",
+        "",
+        "powershell.exe",
+        "-NoExit",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        args[0] ?? "",
+      ],
+    };
+  }
   if (process.platform === "darwin") {
     if (commandExists("osascript")) {
       return {
@@ -148,7 +192,10 @@ function spawnInTerminal(
   logger: EndpointLogger,
 ): void {
   // Pre-build the shell command string so terminal wrappers get a single string arg
-  const shellCmd = buildShellCommand(provider.bin, cliArgs, cwd);
+  const shellCmd =
+    process.platform === "win32"
+      ? buildWindowsScript(provider.bin, cliArgs, cwd)
+      : buildShellCommand(provider.bin, cliArgs, cwd);
   const termArgs = terminal.buildArgs([shellCmd]);
 
   logger.info("Spawning terminal", { bin: terminal.bin, args: termArgs });

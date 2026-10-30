@@ -141,7 +141,16 @@ export async function handleIncomingToolRequest(
   const { scopedTranslation } = await import("../../platforms/ai/i18n");
   const { t } = scopedTranslation.scopedT(defaultLocale);
   const abortController = new AbortController();
-  const callbackMode = requestData.callbackMode ?? CallbackMode.WAIT;
+  // An interactive terminal session (coding-agent interactiveMode) outlives any
+  // inline call: it must run as a tracked async task even when the requester
+  // blocks in WAIT — its result still rides back as the tool-execute-result
+  // event once the session reports through complete-task.
+  const isInteractiveSession = requestData.input?.["interactiveMode"] === true;
+  const requestedCallbackMode = requestData.callbackMode ?? CallbackMode.WAIT;
+  const callbackMode =
+    isInteractiveSession && requestedCallbackMode !== CallbackMode.WAKE_UP
+      ? CallbackMode.DETACH
+      : requestedCallbackMode;
   const isAsyncMode =
     callbackMode === CallbackMode.DETACH ||
     callbackMode === CallbackMode.WAKE_UP;

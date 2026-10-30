@@ -18,7 +18,11 @@ export const {
           ? v
           : (process.env["DATABASE_URL"] ??
             "postgres://postgres:postgres@localhost:5432/postgres");
-      if (!isPreviewMode || cliArgs.includes("--skip-db-setup")) {
+      if (
+        !isPreviewMode ||
+        cliArgs.includes("--skip-db-setup") ||
+        raw.startsWith("file:")
+      ) {
         return raw;
       }
       try {

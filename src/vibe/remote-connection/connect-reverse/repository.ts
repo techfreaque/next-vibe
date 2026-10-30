@@ -70,6 +70,7 @@ export class RemoteConnectionRegisterRepository {
         includeSystem: false,
       },
       locale,
+      timeoutMs: 5000,
     });
     if (networkError) {
       logger.debug(
@@ -92,6 +93,7 @@ export class RemoteConnectionRegisterRepository {
       registered: boolean;
       remoteInstanceId: string;
       remoteUserId: string;
+      transportMode: "reverse-ws" | "direct-http";
     }>
   > {
     const { instanceId, localUrl, reverseToken, reverseLeadId, selfUserId } =
@@ -188,52 +190,43 @@ export class RemoteConnectionRegisterRepository {
       localUrl,
     });
 
-    // Transport detection — ONE ordered async block (spec: register never
-    // opens outbound sockets; reverse entries dispatch toward their initiator
-    // via the remote-event relay on the remote-event channel).
-    //   1. Ping localUrl with the reverse token (authenticated health check)
-    //   2. Persist the detected transport hint
-    // Fire-and-forget: registration succeeds regardless of ping result.
-    void (async (): Promise<void> => {
-      const reachable =
-        await RemoteConnectionRegisterRepository.checkDirectAccessibility(
-          localUrl,
-          logger,
-          locale,
-          reverseToken,
-          reverseLeadId,
+    // Transport detection (spec: register never opens outbound sockets).
+    // Ping localUrl with the reverse token (authenticated health check), persist
+    // the verdict as this reverse entry's transportMode and hand it back to the
+    // initiator, which records it as its remoteTransportMode. Unreachable (NAT /
+    // loopback) means the only way to reach the initiator is its reverse-ws
+    // connector. Bounded by the 5s probe timeout so register stays prompt.
+    const reachable =
+      await RemoteConnectionRegisterRepository.checkDirectAccessibility(
+        localUrl,
+        logger,
+        locale,
+        reverseToken,
+        reverseLeadId,
+      );
+    const detectedTransportMode = reachable ? "direct-http" : "reverse-ws";
+    try {
+      await db
+        .update(remoteConnections)
+        .set({ transportMode: detectedTransportMode, updatedAt: new Date() })
+        .where(
+          and(
+            eq(remoteConnections.userId, user.id),
+            eq(remoteConnections.instanceId, instanceId),
+          ),
         );
-      if (reachable) {
-        try {
-          await db
-            .update(remoteConnections)
-            .set({ transportMode: "direct-http", updatedAt: new Date() })
-            .where(
-              and(
-                eq(remoteConnections.userId, user.id),
-                eq(remoteConnections.instanceId, instanceId),
-              ),
-            );
-          logger.info("[REGISTER] Local instance is directly accessible", {
-            instanceId,
-            localUrl,
-          });
-        } catch (updateErr) {
-          logger.warn("[REGISTER] Failed to update transportMode (non-fatal)", {
-            instanceId,
-            error:
-              updateErr instanceof Error
-                ? updateErr.message
-                : String(updateErr),
-          });
-        }
-      } else {
-        logger.debug("[REGISTER] Local instance not directly accessible", {
-          instanceId,
-          localUrl,
-        });
-      }
-    })();
+      logger.info("[REGISTER] Detected transport to initiator", {
+        instanceId,
+        localUrl,
+        transportMode: detectedTransportMode,
+      });
+    } catch (updateErr) {
+      logger.warn("[REGISTER] Failed to update transportMode (non-fatal)", {
+        instanceId,
+        error:
+          updateErr instanceof Error ? updateErr.message : String(updateErr),
+      });
+    }
 
     // ── Also set the cloud's own self-identity record (if not already set) ──
     // Reuses selfInstanceId from the collision check above.
@@ -273,6 +266,7 @@ export class RemoteConnectionRegisterRepository {
       // Our own userId — the connecting instance stores it as its connection's
       // remoteUserId to target our `user/{userId}` channel for the bridge event.
       remoteUserId: user.id,
+      transportMode: detectedTransportMode,
     });
   }
 }

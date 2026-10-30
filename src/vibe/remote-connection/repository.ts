@@ -355,6 +355,18 @@ export class RemoteConnectionRepository {
   }
 
   /**
+   * Forget which outbound sockets are live. Called by the process that owns the
+   * connectors at boot, before it reopens them - a crashed predecessor never
+   * got to clear its own marker.
+   */
+  static async clearOutboundSocketLiveness(): Promise<void> {
+    await db
+      .update(remoteConnections)
+      .set({ wsConnectedAt: null })
+      .where(eq(remoteConnections.isReverseEntry, false));
+  }
+
+  /**
    * Get all active connections across all users - for system-level task sync.
    */
   static async getAllActiveConnectionsForSync(): Promise<

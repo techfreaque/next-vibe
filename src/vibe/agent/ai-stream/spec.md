@@ -69,6 +69,13 @@ branches — not transport modes. The remote runs the LLM loop; the local execut
 the tools. The remote registers `execute-tool` as its only tool and calls back
 `${callerInstanceId}__toolName`. These ride the same tool-transport above.
 
+**Keyless relay host.** A `relay` receiver (remote-folder loop) needs the model
+provider's API key on its own node. If it has none it fails fast with the
+`RELAY_RECEIVER_NO_PROVIDER_KEY` marker (`relay/constants.ts`); the relay caller
+undoes its relay bookkeeping (loop column, user message) and runs the loop
+locally with the remote's prompt, tools round-tripping back. `inference-provider`
+mode needs no key on the caller: the provider connection is the model pipe.
+
 ---
 
 ## The 4th Stream State: `waiting`

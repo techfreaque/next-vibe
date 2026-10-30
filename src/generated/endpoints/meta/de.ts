@@ -21624,6 +21624,7 @@ export const endpointsMeta: EndpointMeta[] = [
           registered: true,
           remoteInstanceId: "thea",
           remoteUserId: "00000000-0000-0000-0000-000000000000",
+          transportMode: "reverse-ws",
         },
       },
     },
