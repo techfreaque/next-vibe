@@ -155,21 +155,35 @@ const STANDARD_POOL_CONFIG = {
   connectionTimeoutMillis: 30_000,
 };
 
+/**
+ * An idle pooled client whose backend dies (database restart, network drop)
+ * emits 'error' on the pool; with no listener Node treats it as an uncaught
+ * exception and takes the whole server down. The pool already discards the
+ * dead client and opens a fresh one on the next checkout, so swallowing is
+ * the correct handling.
+ */
+function guardPool(p: Pool): Pool {
+  p.on("error", () => undefined);
+  return p;
+}
+
 export function createPool(): Pool {
-  return new Pool(STANDARD_POOL_CONFIG);
+  return guardPool(new Pool(STANDARD_POOL_CONFIG));
 }
 
 function createSocketPool(port: number): Pool {
-  return new Pool({
-    host: "127.0.0.1",
-    port,
-    database: "postgres",
-    user: "postgres",
-    password: "postgres",
-    max: 10,
-    idleTimeoutMillis: 30_000,
-    connectionTimeoutMillis: 30_000,
-  });
+  return guardPool(
+    new Pool({
+      host: "127.0.0.1",
+      port,
+      database: "postgres",
+      user: "postgres",
+      password: "postgres",
+      max: 10,
+      idleTimeoutMillis: 30_000,
+      connectionTimeoutMillis: 30_000,
+    }),
+  );
 }
 
 // ─── Module singletons ────────────────────────────────────────────────────────
