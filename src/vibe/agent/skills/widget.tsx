@@ -63,7 +63,7 @@ import { SeparatorWidget } from "next-vibe/unified-ui/widgets/display-only/separ
 import TextWidget from "next-vibe/unified-ui/widgets/display-only/text/widget";
 import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { useSelectorOnboardingContext } from "../ai-stream/stream/widget/selector/selector-onboarding/context";
 import { useChatSettings } from "../chat/settings/hooks";
@@ -104,10 +104,7 @@ export function SkillsListContainer({
   const onPick = usePickerCallback<{ id: string; name: string }>();
   const isTouch = useTouchDevice();
   const pathname = usePathname();
-  const [isFullPage, setIsFullPage] = useState(false);
-  useEffect(() => {
-    setIsFullPage(pathname.includes("/skills"));
-  }, [pathname]);
+  const isFullPage = pathname.includes("/skills");
   const isPublic = user.isPublic;
   const [showSignupPrompt, setShowSignupPrompt] = useState(false);
   const searchQuery = form.watch("query") ?? "";

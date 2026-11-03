@@ -1,15 +1,15 @@
-import { styled } from "nativewind";
 import { View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
 import type { MetricGridProps } from "../../web/components/metric-grid";
+import { styledNative } from "../utils/style-converter";
 
 export type {
   MetricGridColumns,
   MetricGridProps,
 } from "../../web/components/metric-grid";
 
-const StyledView = styled(View, { className: "style" });
+const StyledView = styledNative(View);
 
 export function MetricGrid({
   children,

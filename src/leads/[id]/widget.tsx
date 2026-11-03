@@ -1438,7 +1438,7 @@ export function LeadEditContainer(): React.JSX.Element {
         );
       }
     }
-  }, [nestedLeadId, form, fieldLead]);
+  }, [form, fieldLead]);
 
   const handleBack = useCallback((): void => {
     if (navigation.canGoBack) {

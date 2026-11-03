@@ -199,7 +199,11 @@ class EndpointsMetaGenerator {
   ): Promise<ApiSection | null> {
     const tryImport = async (): Promise<{ default?: ApiSection } | null> => {
       try {
-        return (await import(toImportUrl(defFile))) as { default?: ApiSection };
+        return (await import(
+          /* webpackIgnore: true */ /* turbopackIgnore: true */ toImportUrl(
+            defFile,
+          )
+        )) as { default?: ApiSection };
       } catch (error) {
         const msg = parseError(error).message;
         if (msg.includes("before initialization")) {
@@ -207,7 +211,11 @@ class EndpointsMetaGenerator {
             setTimeout(resolve, 10);
           });
           try {
-            return (await import(toImportUrl(defFile))) as {
+            return (await import(
+              /* webpackIgnore: true */ /* turbopackIgnore: true */ toImportUrl(
+                defFile,
+              )
+            )) as {
               default?: ApiSection;
             };
           } catch (retryError) {

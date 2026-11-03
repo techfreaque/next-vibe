@@ -86,7 +86,11 @@ class ClientRoutesGenerator {
     let lastMessage = "unknown error";
     for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
       try {
-        const mod: Record<string, WidgetData> = await import(toImportUrl(file));
+        const mod: Record<string, WidgetData> = await import(
+          /* webpackIgnore: true */ /* turbopackIgnore: true */ toImportUrl(
+            file,
+          )
+        );
         return { mod };
       } catch (error) {
         lastMessage = parseError(error).message;

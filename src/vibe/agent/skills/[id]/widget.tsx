@@ -947,12 +947,11 @@ export function SkillViewContainer({
   // Variants to render - memoized so array identity is stable
   const variantsToRender = useMemo(() => variants ?? [], [variants]);
 
+  const skillInternalId = skillData?.internalId;
   const skillReferenceIdsForFav = useMemo(
     () =>
-      skillData?.internalId
-        ? [skillId ?? "", skillData.internalId]
-        : [skillId ?? ""],
-    [skillId, skillData?.internalId],
+      skillInternalId ? [skillId ?? "", skillInternalId] : [skillId ?? ""],
+    [skillId, skillInternalId],
   );
   const allFavorited =
     skillId !== undefined &&
@@ -1681,7 +1680,6 @@ export function SkillViewContainer({
           {/* More from creator */}
           {creator && (
             <CreatorOtherSkills
-              creatorUserId={creator.userId}
               creatorSlug={creator.creatorSlug}
               creatorName={creator.publicName}
               currentSkillId={skillId ?? ""}
@@ -2743,7 +2741,6 @@ function LandingBottomCTA({
  * Shows other public skills by the same creator - fetched client-side.
  */
 function CreatorOtherSkills({
-  creatorUserId,
   creatorSlug,
   creatorName,
   currentSkillId,
@@ -2751,7 +2748,6 @@ function CreatorOtherSkills({
   t,
   accent,
 }: {
-  creatorUserId: string;
   creatorSlug: string;
   creatorName: string;
   currentSkillId: string;
@@ -2769,7 +2765,6 @@ function CreatorOtherSkills({
     }>
   >([]);
   const [loaded, setLoaded] = useState(false);
-  const availability = useProviderAvailability();
   const logger = useLogger();
   useEffect(() => {
     void (async (): Promise<void> => {
@@ -2810,7 +2805,7 @@ function CreatorOtherSkills({
       }
       setLoaded(true);
     })();
-  }, [creatorUserId, currentSkillId, locale, availability, logger]);
+  }, [currentSkillId, locale, logger]);
 
   if (!loaded || skills.length === 0) {
     return null;

@@ -61,7 +61,7 @@ import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage"
 import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import { type IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JSX } from "react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { FieldValues } from "react-hook-form";
 import { useForm } from "react-hook-form";
 
@@ -173,8 +173,11 @@ export function ToolCallRenderer({
   );
 
   // When outer tool is execute-tool, also load the inner tool definition for display title
-  const [innerToolDefinition, setInnerToolDefinition] =
-    useState<CreateApiEndpointAny | null>(null);
+  // Keyed by the tool name it was loaded for - a different name derives null and reloads
+  const [loadedInnerTool, setLoadedInnerTool] = useState<{
+    name: string;
+    definition: CreateApiEndpointAny;
+  } | null>(null);
 
   // Create a form for managing the tool parameters when waiting for confirmation
   const confirmationForm = useForm<FieldValues>({
@@ -184,7 +187,7 @@ export function ToolCallRenderer({
 
   // Validate tool args against definition schema and show field-level errors
   // Only run validation when the tool is expanded (not collapsed)
-  const [hasValidated, setHasValidated] = useState(false);
+  const hasValidatedRef = useRef(false);
 
   useEffect(() => {
     // Only validate when the tool is open
@@ -194,7 +197,7 @@ export function ToolCallRenderer({
 
     if (!toolCall.error || !definition || !toolCall.args) {
       // Clear errors when no error or no definition loaded yet
-      if (hasValidated) {
+      if (hasValidatedRef.current) {
         confirmationForm.clearErrors();
       }
       return;
@@ -220,7 +223,7 @@ export function ToolCallRenderer({
 
       // If validation passes, clear any errors
       confirmationForm.clearErrors();
-      setHasValidated(true);
+      hasValidatedRef.current = true;
     } catch (error) {
       // ZodError contains validation errors
       if (error && typeof error === "object" && "issues" in error) {
@@ -241,17 +244,10 @@ export function ToolCallRenderer({
             });
           }
         });
-        setHasValidated(true);
+        hasValidatedRef.current = true;
       }
     }
-  }, [
-    isOpen,
-    toolCall.error,
-    toolCall.args,
-    definition,
-    confirmationForm,
-    hasValidated,
-  ]);
+  }, [isOpen, toolCall.error, toolCall.args, definition, confirmationForm]);
 
   /**
    * Resolve a tool name (possibly with remote instanceId__ prefix) to a canonical
@@ -475,17 +471,13 @@ export function ToolCallRenderer({
     return undefined;
   })();
 
+  const innerToolDefinition =
+    innerToolName && loadedInnerTool?.name === innerToolName
+      ? loadedInnerTool.definition
+      : null;
+
   useEffect((): (() => void) => {
     if (!innerToolName) {
-      setInnerToolDefinition(null);
-      return () => undefined;
-    }
-    // If a different tool is loaded, clear it so we reload for the new name
-    if (
-      innerToolDefinition &&
-      !innerToolDefinition.aliases?.includes(innerToolName)
-    ) {
-      setInnerToolDefinition(null);
       return () => undefined;
     }
     // Skip if already loaded — open state is set once on first load, not on every toolCall update
@@ -496,7 +488,7 @@ export function ToolCallRenderer({
     const load = async (): Promise<void> => {
       const result = await tryLoadIdentifier(innerToolName);
       if (!cancelled && result.success) {
-        setInnerToolDefinition(result.data);
+        setLoadedInnerTool({ name: innerToolName, definition: result.data });
         if (result.data.defaultExpanded !== undefined) {
           const hasUserOverride =
             collapseState &&
@@ -547,28 +539,31 @@ export function ToolCallRenderer({
   // defaultExpanded tools stay collapsed while executing (the definition-load
   // effects see currentlyLoading/isBackground and set closed) — but those effects
   // only run once per definition, so re-evaluate here and expand once the call
-  // finishes and the result/error arrives.
+  // finishes and the result/error arrives. Adjusted during render on the
+  // not-ready -> ready transition.
   const expandDefinition = innerToolDefinition ?? definition;
-  useEffect(() => {
-    if (!expandDefinition?.defaultExpanded) {
-      return;
-    }
-    const isTerminal =
-      toolCall.status === "completed" || toolCall.status === "failed";
-    const isDone =
-      Boolean(toolCall.result) || Boolean(toolCall.error) || isTerminal;
-    // Background dispatch acks carry a result ({hint, taskId}) but the call is
-    // still parked — only the injected final result (terminal status or a
-    // deferred backfill) counts as done. detach never backfills, so it only
-    // expands if a deferred result arrives.
-    const isParkedBackground =
-      (toolCall.callbackMode === CallbackMode.WAKE_UP &&
-        !toolCall.isDeferred &&
-        !isTerminal) ||
-      (toolCall.callbackMode === CallbackMode.DETACH && !toolCall.isDeferred);
-    if (!isDone || toolCall.isPartial || isParkedBackground) {
-      return;
-    }
+  const isCallTerminal =
+    toolCall.status === "completed" || toolCall.status === "failed";
+  const isCallDone =
+    Boolean(toolCall.result) || Boolean(toolCall.error) || isCallTerminal;
+  // Background dispatch acks carry a result ({hint, taskId}) but the call is
+  // still parked — only the injected final result (terminal status or a
+  // deferred backfill) counts as done. detach never backfills, so it only
+  // expands if a deferred result arrives.
+  const isParkedBackground =
+    (toolCall.callbackMode === CallbackMode.WAKE_UP &&
+      !toolCall.isDeferred &&
+      !isCallTerminal) ||
+    (toolCall.callbackMode === CallbackMode.DETACH && !toolCall.isDeferred);
+  const shouldAutoExpand = Boolean(
+    expandDefinition?.defaultExpanded &&
+    isCallDone &&
+    !toolCall.isPartial &&
+    !isParkedBackground,
+  );
+  const [prevShouldAutoExpand, setPrevShouldAutoExpand] = useState(false);
+  if (shouldAutoExpand !== prevShouldAutoExpand) {
+    setPrevShouldAutoExpand(shouldAutoExpand);
     const hasUserOverride =
       collapseState &&
       messageId !== undefined &&
@@ -576,21 +571,10 @@ export function ToolCallRenderer({
         { messageId, sectionType: "tool", sectionIndex: toolIndex },
         false,
       ) !== false;
-    if (!hasUserOverride) {
+    if (shouldAutoExpand && !hasUserOverride) {
       setIsOpen(true);
     }
-  }, [
-    expandDefinition,
-    toolCall.result,
-    toolCall.error,
-    toolCall.status,
-    toolCall.isPartial,
-    toolCall.callbackMode,
-    toolCall.isDeferred,
-    collapseState,
-    messageId,
-    toolIndex,
-  ]);
+  }
 
   const isPartial = Boolean(toolCall.isPartial);
   const hasResult = Boolean(toolCall.result);
@@ -661,9 +645,17 @@ export function ToolCallRenderer({
     return "";
   };
 
-  const [wasWaitingForConfirmation, setWasWaitingForConfirmation] = useState(
-    isWaitingForConfirmation,
-  );
+  // Starts false so a tool already waiting on mount is forced open (adjusted during render)
+  const [wasWaitingForConfirmation, setWasWaitingForConfirmation] =
+    useState(false);
+  if (isWaitingForConfirmation && !wasWaitingForConfirmation) {
+    setIsOpen(true);
+    setWasWaitingForConfirmation(true);
+  } else if (!isWaitingForConfirmation && wasWaitingForConfirmation) {
+    // Tool was just confirmed/declined - collapse it
+    setIsOpen(false);
+    setWasWaitingForConfirmation(false);
+  }
   const [copied, setCopied] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
   const cancelMutation = useApiMutation(cronIdEndpoints.DELETE, logger, user);
@@ -815,18 +807,6 @@ export function ToolCallRenderer({
     });
   };
 
-  // Update isOpen when waitingForConfirmation changes
-  useEffect(() => {
-    if (isWaitingForConfirmation) {
-      setIsOpen(true);
-      setWasWaitingForConfirmation(true);
-    } else if (wasWaitingForConfirmation && !isWaitingForConfirmation) {
-      // Tool was just confirmed/declined - collapse it
-      setIsOpen(false);
-      setWasWaitingForConfirmation(false);
-    }
-  }, [isWaitingForConfirmation, wasWaitingForConfirmation]);
-
   const handleToggle = (newState: boolean): void => {
     if (collapseState && messageId !== undefined) {
       const key = {
@@ -957,6 +937,69 @@ export function ToolCallRenderer({
         { cost: credits },
       )
     : null;
+
+  // Confirmation handlers (used by the confirmation form below)
+  const handleConfirm = (formData: FieldValues): void => {
+    // Batch mode: call provided handler (allows changing choice)
+    if (batchOnConfirm) {
+      batchOnConfirm(formData);
+      return;
+    }
+
+    // Individual mode: submit immediately
+    if (!sendMessage) {
+      return;
+    }
+    const argsRecord: Record<string, string | number | boolean | null> = {};
+    for (const [key, value] of Object.entries(formData)) {
+      if (
+        typeof value === "string" ||
+        typeof value === "number" ||
+        typeof value === "boolean" ||
+        value === null
+      ) {
+        argsRecord[key] = value;
+      }
+    }
+    sendMessage({
+      content: "",
+      attachments: [],
+      threadId,
+      parentId: parentId ?? messageId,
+      toolConfirmations: [
+        {
+          messageId,
+          confirmed: true,
+          updatedArgs: argsRecord,
+        },
+      ],
+    });
+  };
+
+  const handleCancel = (): void => {
+    // Batch mode: call provided handler (allows changing choice)
+    if (batchOnCancel) {
+      batchOnCancel();
+      return;
+    }
+
+    // Individual mode: submit immediately
+    if (!sendMessage) {
+      return;
+    }
+    sendMessage({
+      content: "",
+      attachments: [],
+      threadId,
+      parentId: parentId ?? messageId,
+      toolConfirmations: [
+        {
+          messageId,
+          confirmed: false,
+        },
+      ],
+    });
+  };
 
   return (
     <Div className="rounded-lg border border-border/50 bg-muted overflow-hidden">
@@ -1375,71 +1418,6 @@ export function ToolCallRenderer({
                 const isDeclined = Boolean(hasError && toolCall.args);
                 const needsConfirmation =
                   isWaitingForConfirmation && !isDeclined;
-
-                const handleConfirm = (formData: FieldValues): void => {
-                  // Batch mode: call provided handler (allows changing choice)
-                  if (batchOnConfirm) {
-                    batchOnConfirm(formData);
-                    return;
-                  }
-
-                  // Individual mode: submit immediately
-                  if (!sendMessage) {
-                    return;
-                  }
-                  const argsRecord: Record<
-                    string,
-                    string | number | boolean | null
-                  > = {};
-                  for (const [key, value] of Object.entries(formData)) {
-                    if (
-                      typeof value === "string" ||
-                      typeof value === "number" ||
-                      typeof value === "boolean" ||
-                      value === null
-                    ) {
-                      argsRecord[key] = value;
-                    }
-                  }
-                  sendMessage({
-                    content: "",
-                    attachments: [],
-                    threadId,
-                    parentId: parentId ?? messageId,
-                    toolConfirmations: [
-                      {
-                        messageId,
-                        confirmed: true,
-                        updatedArgs: argsRecord,
-                      },
-                    ],
-                  });
-                };
-
-                const handleCancel = (): void => {
-                  // Batch mode: call provided handler (allows changing choice)
-                  if (batchOnCancel) {
-                    batchOnCancel();
-                    return;
-                  }
-
-                  // Individual mode: submit immediately
-                  if (!sendMessage) {
-                    return;
-                  }
-                  sendMessage({
-                    content: "",
-                    attachments: [],
-                    threadId,
-                    parentId: parentId ?? messageId,
-                    toolConfirmations: [
-                      {
-                        messageId,
-                        confirmed: false,
-                      },
-                    ],
-                  });
-                };
 
                 // Determine if tool has a pending decision in batch mode
                 const isPendingConfirm = decision?.type === "confirmed";

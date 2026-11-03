@@ -246,7 +246,6 @@ export function VideoGenerationContainer({
       form?.setValue("resolution", resolutionOptions[0]);
     }
   }, [
-    resolvedModelId,
     durationPresets,
     aspectRatioOptions,
     resolutionOptions,

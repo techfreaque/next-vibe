@@ -64,13 +64,21 @@ export class PackageEndpointGeneratorRepository {
 
     let definition;
     try {
-      definition = await import(toImportUrl(defFile));
+      definition = await import(
+        /* webpackIgnore: true */ /* turbopackIgnore: true */ toImportUrl(
+          defFile,
+        )
+      );
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       if (msg.includes("before initialization")) {
         await Bun.sleep(10);
         try {
-          definition = await import(toImportUrl(defFile));
+          definition = await import(
+            /* webpackIgnore: true */ /* turbopackIgnore: true */ toImportUrl(
+              defFile,
+            )
+          );
         } catch {
           return identifiers;
         }
@@ -186,13 +194,21 @@ export class PackageEndpointGeneratorRepository {
 
       let definition;
       try {
-        definition = await import(toImportUrl(defFile));
+        definition = await import(
+          /* webpackIgnore: true */ /* turbopackIgnore: true */ toImportUrl(
+            defFile,
+          )
+        );
       } catch (error) {
         const msg = error instanceof Error ? error.message : String(error);
         if (msg.includes("before initialization")) {
           await Bun.sleep(10);
           try {
-            definition = await import(toImportUrl(defFile));
+            definition = await import(
+              /* webpackIgnore: true */ /* turbopackIgnore: true */ toImportUrl(
+                defFile,
+              )
+            );
           } catch {
             continue;
           }
@@ -247,7 +263,11 @@ export class PackageEndpointGeneratorRepository {
     for (const defFile of filteredDefinitionFiles) {
       let definition;
       try {
-        definition = await import(toImportUrl(defFile));
+        definition = await import(
+          /* webpackIgnore: true */ /* turbopackIgnore: true */ toImportUrl(
+            defFile,
+          )
+        );
       } catch {
         continue;
       }

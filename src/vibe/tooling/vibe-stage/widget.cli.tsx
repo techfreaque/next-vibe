@@ -42,6 +42,29 @@ function colorForPrefix(prefix: string): (s: string) => string {
   }
 }
 
+// Rename entries are "old -> new" — shorten both sides, keep the arrow.
+function shortenEntry(f: string): string {
+  return f.includes(" -> ")
+    ? f
+        .split(" -> ")
+        .map((p) => shortenPath(p))
+        .join(" -> ")
+    : shortenPath(f);
+}
+
+function renderFileList(files: string[], prefix: string): string {
+  const shown = files.slice(0, MAX_SHOW);
+  const rest = files.length - shown.length;
+  const paint = colorForPrefix(prefix);
+  const lines = shown.map(
+    (f) => `  ${paint(prefix)} ${chalk.dim(shortenEntry(f))}`,
+  );
+  if (rest > 0) {
+    lines.push(`  ${chalk.dim(`... and ${String(rest)} more`)}`);
+  }
+  return lines.join("\n");
+}
+
 // ── Props ─────────────────────────────────────────────────────
 
 interface CliWidgetProps {
@@ -154,27 +177,6 @@ export function VibeStageWidget({ field }: CliWidgetProps): JSX.Element {
       </Box>
     );
   }
-
-  const renderFileList = (files: string[], prefix: string): string => {
-    const shown = files.slice(0, MAX_SHOW);
-    const rest = files.length - shown.length;
-    const paint = colorForPrefix(prefix);
-    // Rename entries are "old -> new" — shorten both sides, keep the arrow.
-    const shortenEntry = (f: string): string =>
-      f.includes(" -> ")
-        ? f
-            .split(" -> ")
-            .map((p) => shortenPath(p))
-            .join(" -> ")
-        : shortenPath(f);
-    const lines = shown.map(
-      (f) => `  ${paint(prefix)} ${chalk.dim(shortenEntry(f))}`,
-    );
-    if (rest > 0) {
-      lines.push(`  ${chalk.dim(`... and ${String(rest)} more`)}`);
-    }
-    return lines.join("\n");
-  };
 
   const parts: string[] = [];
 

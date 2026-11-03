@@ -209,9 +209,26 @@ const TextareaInner = (
       textarea.scrollHeight > maxHeight ? "auto" : "hidden";
   }, [minRows, maxRows]);
 
+  // Re-measure after commit whenever the content (or the measuring fn) changes.
+  // The DOM content is what's measured, so the change check lives in the effect.
+  const lastMeasuredRef = React.useRef<{
+    adjust: () => void;
+    value: string | undefined;
+    defaultValue: string | undefined;
+  } | null>(null);
   React.useEffect(() => {
+    const last = lastMeasuredRef.current;
+    if (
+      last &&
+      last.adjust === adjustHeight &&
+      last.value === value &&
+      last.defaultValue === defaultValue
+    ) {
+      return;
+    }
+    lastMeasuredRef.current = { adjust: adjustHeight, value, defaultValue };
     adjustHeight();
-  }, [adjustHeight, value, defaultValue]);
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>): void => {
     adjustHeight();

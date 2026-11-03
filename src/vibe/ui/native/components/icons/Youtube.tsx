@@ -1,4 +1,3 @@
-import { Youtube as YoutubeIcon } from "lucide-react-native";
-import { styled } from "nativewind";
+import { createBrandIcon } from "../../utils/brand-icon";
 
-export const Youtube = styled(YoutubeIcon, { className: "style" });
+export const Youtube = createBrandIcon("logo-youtube");

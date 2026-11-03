@@ -12,7 +12,7 @@ import {
   type ReactNode,
   useContext,
   useEffect,
-  useState,
+  useSyncExternalStore,
 } from "react";
 
 import { LOCALE_COOKIE_NAME } from "@/env/constants";
@@ -69,6 +69,17 @@ interface TranslationProviderProps {
   currentLocale: CountryLanguage;
 }
 
+const noopSubscribe = (): (() => void) => () => undefined;
+
+// false during SSR + hydration, true on the client afterwards
+function useIsMounted(): boolean {
+  return useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false,
+  );
+}
+
 // Translation provider component
 export function TranslationProvider({
   children,
@@ -76,7 +87,7 @@ export function TranslationProvider({
 }: TranslationProviderProps): JSX.Element {
   const pathname = usePathname();
   const router = useRouter();
-  const [mounted, setMounted] = useState<boolean>(false);
+  const mounted = useIsMounted();
 
   // Extract language and country from current locale (from route)
   const currentLanguage =
@@ -175,8 +186,6 @@ export function TranslationProvider({
 
   // Simple mount effect - only save current locale if none exists
   useEffect(() => {
-    setMounted(true);
-
     if (typeof window === "undefined") {
       return;
     }
@@ -195,7 +204,7 @@ export function TranslationProvider({
       }
     }
     void initializeLocale();
-  }, [currentLocale, language, country]);
+  }, [currentLocale]);
 
   return (
     <TranslationContext.Provider

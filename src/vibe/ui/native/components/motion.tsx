@@ -5,7 +5,6 @@ import {
   MotiText,
   MotiView,
 } from "moti";
-import { styled } from "nativewind";
 import * as React from "react";
 import type {
   ImageSourcePropType,
@@ -28,12 +27,13 @@ import {
   convertCSSToImageStyle,
   convertCSSToTextStyle,
   convertCSSToViewStyle,
+  styledNative,
 } from "../utils/style-converter";
 
 // Create styled wrappers for Moti components
-const StyledMotiView = styled(MotiView, { className: "style" });
-const StyledMotiText = styled(MotiText, { className: "style" });
-const StyledMotiImage = styled(MotiImage, { className: "style" });
+const StyledMotiView = styledNative(MotiView);
+const StyledMotiText = styledNative(MotiText);
+const StyledMotiImage = styledNative(MotiImage);
 
 // Re-export all types from web (zero definitions in native)
 export type {

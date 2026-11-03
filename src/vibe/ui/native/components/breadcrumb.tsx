@@ -4,7 +4,6 @@
  */
 import * as Slot from "@rn-primitives/slot";
 import { ChevronRight } from "lucide-react-native";
-import { styled } from "nativewind";
 import React from "react";
 import { Pressable, Text as RNText, View } from "react-native";
 
@@ -23,7 +22,7 @@ import { scopedTranslation } from "../../web/i18n";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 
-const StyledView = styled(View, { className: "style" });
+const StyledView = styledNative(View);
 const StyledPressable = styledNative(Pressable);
 
 export function Breadcrumb({

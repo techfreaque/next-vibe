@@ -189,11 +189,10 @@ export function CortexNav({
         </Button>
       )}
 
-      {isPushed &&
-        (actions.length > 0 || path) && (
-          // eslint-disable-next-line i18n/no-literal-string -- decorative separator
-          <Span className="text-border/70 text-sm mx-0.5">|</Span>
-        )}
+      {isPushed && (actions.length > 0 || path) && (
+        // eslint-disable-next-line i18n/no-literal-string -- decorative separator
+        <Span className="text-border/70 text-sm mx-0.5">|</Span>
+      )}
 
       {/* Path context */}
       {path && (
@@ -205,11 +204,10 @@ export function CortexNav({
         </Div>
       )}
 
-      {path &&
-        actions.length > 0 && (
-          // eslint-disable-next-line i18n/no-literal-string -- decorative separator
-          <Span className="text-border/70 text-sm mx-0.5">·</Span>
-        )}
+      {path && actions.length > 0 && (
+        // eslint-disable-next-line i18n/no-literal-string -- decorative separator
+        <Span className="text-border/70 text-sm mx-0.5">·</Span>
+      )}
 
       {/* Action buttons */}
       <Div className="flex items-center gap-0.5 flex-wrap">

@@ -1,4 +1,3 @@
-import { Linkedin as LinkedinIcon } from "lucide-react-native";
-import { styled } from "nativewind";
+import { createBrandIcon } from "../../utils/brand-icon";
 
-export const Linkedin = styled(LinkedinIcon, { className: "style" });
+export const Linkedin = createBrandIcon("logo-linkedin");

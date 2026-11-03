@@ -2,17 +2,16 @@
  * Container Component for React Native
  * Provides consistent max-width and padding for app pages
  */
-import { styled } from "nativewind";
 import { View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
 // Import ALL types from web - ZERO definitions here
 import type { ContainerProps } from "../../web/components/container";
 import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 
 // Type-safe View with className support (NativeWind)
-const StyledView = styled(View);
+const StyledView = styledNative(View);
 
 const sizeClasses: Record<NonNullable<ContainerProps["size"]>, string> = {
   sm: "max-w-2xl",

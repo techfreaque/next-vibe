@@ -87,7 +87,7 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar, user }) => {
       setLanguage(langCode);
       setIsOpen(false);
     },
-    [setLanguage, syncLocale, country],
+    [setLanguage, syncLocale, country, setIsOpen],
   );
 
   const handleCountryChange = useCallback(
@@ -98,7 +98,7 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar, user }) => {
       changeLocale(countryCode);
       setIsOpen(false);
     },
-    [changeLocale, syncLocale, countries, language],
+    [changeLocale, syncLocale, countries, language, setIsOpen],
   );
 
   const currentLanguageFlag = countries.find(

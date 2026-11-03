@@ -49,19 +49,19 @@ let sharedState: TriggerState = {
 let sharedStateInitialized = false;
 const startTime = Date.now();
 
+function updateViewport(): void {
+  const w = window.innerWidth;
+  sharedState = {
+    ...sharedState,
+    viewport: { w, h: window.innerHeight, mobile: w < 768 },
+  };
+}
+
 function initSharedState(): void {
   if (sharedStateInitialized) {
     return;
   }
   sharedStateInitialized = true;
-
-  const updateViewport = (): void => {
-    const w = window.innerWidth;
-    sharedState = {
-      ...sharedState,
-      viewport: { w, h: window.innerHeight, mobile: w < 768 },
-    };
-  };
 
   // Seed the viewport now that we're in the browser.
   updateViewport();

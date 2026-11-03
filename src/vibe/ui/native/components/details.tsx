@@ -1,6 +1,5 @@
 "use client";
 
-import { styled } from "nativewind";
 import type { JSX } from "react";
 import * as React from "react";
 import type { ViewStyle } from "react-native";
@@ -8,9 +7,9 @@ import { View } from "react-native";
 
 import type { DetailsProps } from "../../web/components/details";
 import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 
-const StyledView = styled(View, { className: "style" });
+const StyledView = styledNative(View);
 
 export function Details({
   className,
@@ -24,12 +23,14 @@ export function Details({
     ? convertCSSToViewStyle(style)
     : undefined;
 
-  // Update isOpen when open prop changes
-  React.useEffect(() => {
+  // Sync isOpen when the open prop changes (adjusted during render)
+  const [prevOpen, setPrevOpen] = React.useState(open);
+  if (open !== prevOpen) {
+    setPrevOpen(open);
     if (open !== undefined) {
       setIsOpen(open);
     }
-  }, [open]);
+  }
 
   // For React Native, we render all children and pass isOpen state via context
   // Summary children can access this context to show/hide toggle icons

@@ -6,13 +6,26 @@ import { Span } from "next-vibe/ui/components/span";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import type { JSX } from "react";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 import { formatRelativeTime } from "@/_pages/chat/lib/utils/formatting";
 
 import type { ChatModelId } from "../../../../../ai-stream/models";
 import { getChatModelById } from "../../../../../ai-stream/models";
 import { scopedTranslation } from "../i18n";
+
+function noopSubscribe(): () => void {
+  return (): void => undefined;
+}
+
+// false during SSR + hydration, true on the client afterwards
+function useIsMounted(): boolean {
+  return useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false,
+  );
+}
 
 function RelativeTimestamp({
   timestamp,
@@ -21,11 +34,11 @@ function RelativeTimestamp({
   timestamp: Date;
   locale: CountryLanguage;
 }): JSX.Element {
-  const [label, setLabel] = useState<string>("");
-
-  useEffect(() => {
-    setLabel(formatRelativeTime(timestamp.getTime(), locale));
-  }, [timestamp, locale]);
+  // Empty during SSR + hydration (relative time differs server vs client)
+  const isMounted = useIsMounted();
+  const label = isMounted
+    ? formatRelativeTime(timestamp.getTime(), locale)
+    : "";
 
   return (
     <Span className="text-xs text-muted-foreground shrink-0">{label}</Span>

@@ -1,18 +1,14 @@
 import { Link as ExpoLink } from "expo-router";
-import { styled } from "nativewind";
 import { Children, isValidElement, type JSX, type ReactNode } from "react";
 import { Text as RNText, View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
 import type { LinkProps } from "../../web/components/link";
+import { styledNative } from "../utils/style-converter";
 
-const StyledText = styled(RNText, {
-  className: "style",
-});
+const StyledText = styledNative(RNText);
 
-const StyledView = styled(View, {
-  className: "style",
-});
+const StyledView = styledNative(View);
 
 /**
  * Checks if children contain interactive elements (Button, Pressable, etc.)

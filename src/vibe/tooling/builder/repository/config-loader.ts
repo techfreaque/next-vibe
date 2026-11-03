@@ -108,9 +108,11 @@ export class ConfigLoader implements IConfigLoader {
       );
       logger.debug(`📄 Config  ${configPath}`);
 
-      const importedModule = (await import(toImportUrl(fullPath))) as
-        | BuildConfigModule
-        | Record<string, BuildConfig | undefined>;
+      const importedModule = (await import(
+        /* webpackIgnore: true */ /* turbopackIgnore: true */ toImportUrl(
+          fullPath,
+        )
+      )) as BuildConfigModule | Record<string, BuildConfig | undefined>;
 
       if (!this.isValidBuildConfigModule(importedModule)) {
         return fail({

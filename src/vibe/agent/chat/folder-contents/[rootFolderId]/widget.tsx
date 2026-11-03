@@ -1851,14 +1851,15 @@ export function FolderContentsWidget({
     user,
   );
 
+  const foldersResponse = foldersEndpoint.read?.response;
   const allFolders = useMemo(
     (): FolderFromList[] =>
-      foldersEndpoint.read?.response?.success
-        ? foldersEndpoint.read.response.data.folders.filter(
+      foldersResponse?.success
+        ? foldersResponse.data.folders.filter(
             (f) => f.rootFolderId === activeRootFolderId,
           )
         : [],
-    [foldersEndpoint.read?.response, activeRootFolderId],
+    [foldersResponse, activeRootFolderId],
   );
 
   // Use the widget's own subFolderId request param (not the global nav store),

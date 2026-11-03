@@ -71,19 +71,22 @@ export function TextToSpeechContainer(): JSX.Element {
   const [duration, setDuration] = useState(0);
   const [currentAudioUrl, setCurrentAudioUrl] = useState<string | null>(null);
 
-  // When a new result arrives, load and auto-play
-  useEffect(() => {
-    const audioUrl = result?.audioUrl;
-    if (!audioUrl || audioUrl === currentAudioUrl) {
-      return;
-    }
-
-    setCurrentAudioUrl(audioUrl);
+  // When a new result arrives, reset player state during render (no cascading effect render)
+  const resultAudioUrl = result?.audioUrl;
+  if (resultAudioUrl && resultAudioUrl !== currentAudioUrl) {
+    setCurrentAudioUrl(resultAudioUrl);
     setCurrentTime(0);
     setDuration(0);
     setIsPlaying(false);
+  }
 
-    const audio = new Audio(audioUrl);
+  // Load and auto-play the current audio URL
+  useEffect(() => {
+    if (!currentAudioUrl) {
+      return;
+    }
+
+    const audio = new Audio(currentAudioUrl);
     audioRef.current = audio;
 
     audio.addEventListener("loadedmetadata", () => {
@@ -109,7 +112,7 @@ export function TextToSpeechContainer(): JSX.Element {
       .catch(() => {
         // Autoplay blocked — user will click play
       });
-  }, [result?.audioUrl, currentAudioUrl]);
+  }, [currentAudioUrl]);
 
   const togglePlay = useCallback((): void => {
     const audio = audioRef.current;

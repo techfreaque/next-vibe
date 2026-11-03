@@ -312,7 +312,11 @@ class RouteHandlersGenerator {
   ): Promise<string[]> {
     const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
     try {
-      const definition = (await import(toImportUrl(definitionPath))) as {
+      const definition = (await import(
+        /* webpackIgnore: true */ /* turbopackIgnore: true */ toImportUrl(
+          definitionPath,
+        )
+      )) as {
         default?: ApiSection;
       };
       let defaultExport;
@@ -350,7 +354,11 @@ class RouteHandlersGenerator {
   ): Promise<Array<{ alias: string; method: string }>> {
     const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
     try {
-      const definition = (await import(toImportUrl(definitionPath))) as {
+      const definition = (await import(
+        /* webpackIgnore: true */ /* turbopackIgnore: true */ toImportUrl(
+          definitionPath,
+        )
+      )) as {
         default?: Record<string, { aliases?: string[] }>;
       };
       let defaultExport;
@@ -414,7 +422,11 @@ class RouteHandlersGenerator {
 
       let defaultExport: ApiSection | undefined;
       try {
-        const definition = (await import(toImportUrl(definitionPath))) as {
+        const definition = (await import(
+          /* webpackIgnore: true */ /* turbopackIgnore: true */ toImportUrl(
+            definitionPath,
+          )
+        )) as {
           default?: ApiSection;
         };
         try {

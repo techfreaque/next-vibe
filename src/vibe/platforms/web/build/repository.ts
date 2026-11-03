@@ -4,7 +4,7 @@
  */
 
 import { buildPackageRunnerCommand, coreEnv } from "../../../core/env";
-import { databaseEnv } from "../../../database/env";
+import { databaseEnv, usesPglite } from "../../../database/env";
 import { VibeMode } from "../../../env/env-util";
 import type { ResponseType } from "../../../core/route/response.schema";
 import {
@@ -350,7 +350,8 @@ export class BuildRepository {
       // (environment.ts swaps DATABASE_URL port for build/start)
       if (
         (data.migrate || data.seed) &&
-        coreEnv.NEXT_PUBLIC_VIBE_MODE !== VibeMode.CLOUD
+        coreEnv.NEXT_PUBLIC_VIBE_MODE !== VibeMode.CLOUD &&
+        !usesPglite()
       ) {
         try {
           const { DbUtilsRepository } =

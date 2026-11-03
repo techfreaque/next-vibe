@@ -1,7 +1,7 @@
 "use client";
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
 
 import type { EndpointReadOptions } from "../../core/definition/create";
 import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
@@ -277,12 +277,14 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
       ? (): ResponseType<TEndpoint["types"]["ResponseOutput"]> =>
           success(initialData)
       : undefined,
-    initialDataUpdatedAt: initialData ? Date.now() : undefined,
+    initialDataUpdatedAt: initialData ? (): number => Date.now() : undefined,
   });
 
   // Stable refetch function - use ref to avoid depending on query object (new every render)
   const queryRef = useRef(query);
-  queryRef.current = query;
+  useLayoutEffect(() => {
+    queryRef.current = query;
+  });
   const refetch = useCallback(async () => {
     const result = await queryRef.current.refetch();
     return result.data ?? queryRef.current.data ?? success(undefined as never);

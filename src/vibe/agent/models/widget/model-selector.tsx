@@ -38,7 +38,7 @@ import { P } from "next-vibe/ui/components/typography";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import type { JSX } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import {
   ChatModelId,
@@ -835,20 +835,24 @@ export function ModelSelector({
       !!characterModelSelection,
   );
 
-  // Reset to CHARACTER_BASED when characterModelSelection changes and we have no modelSelection (or matching)
-  useEffect(() => {
+  // Reset to CHARACTER_BASED when characterModelSelection changes and we have no modelSelection (or matching).
+  // Adjusted during render (tracking previous props) instead of in an effect.
+  const [prevSelections, setPrevSelections] = useState({
+    characterModelSelection,
+    modelSelection,
+  });
+  if (
+    prevSelections.characterModelSelection !== characterModelSelection ||
+    prevSelections.modelSelection !== modelSelection
+  ) {
+    setPrevSelections({ characterModelSelection, modelSelection });
     if (
-      (!modelSelection ||
-        (modelSelection.selectionType === ModelSelectionType.MANUAL &&
-          characterModelSelection?.selectionType ===
-            ModelSelectionType.MANUAL &&
-          modelSelection.manualModelId ===
-            characterModelSelection.manualModelId)) &&
+      (!modelSelection || isMatchingCharacterSelection) &&
       characterModelSelection
     ) {
       setUseSkillBased(true);
     }
-  }, [characterModelSelection, modelSelection]);
+  }
 
   const [searchQuery, setSearchQuery] = useState("");
   const showUnfilteredModels = false;
@@ -945,6 +949,100 @@ export function ModelSelector({
     }
     return undefined;
   })();
+
+  // Get current sort settings from activeSelection (works for both FILTERS and MANUAL)
+  const sortBy =
+    activeSelection?.selectionType === ModelSelectionType.FILTERS ||
+    activeSelection?.selectionType === ModelSelectionType.MANUAL
+      ? activeSelection.sortBy
+      : undefined;
+  const sortDirection =
+    activeSelection?.selectionType === ModelSelectionType.FILTERS ||
+    activeSelection?.selectionType === ModelSelectionType.MANUAL
+      ? activeSelection.sortDirection
+      : undefined;
+
+  const sortBy2 =
+    activeSelection?.selectionType === ModelSelectionType.FILTERS ||
+    activeSelection?.selectionType === ModelSelectionType.MANUAL
+      ? activeSelection.sortBy2
+      : undefined;
+
+  const sortDirection2 =
+    activeSelection?.selectionType === ModelSelectionType.FILTERS ||
+    activeSelection?.selectionType === ModelSelectionType.MANUAL
+      ? activeSelection.sortDirection2
+      : undefined;
+
+  // Calculate filtered models and best model
+  const intelligenceRange = getRangeFromIndices(
+    intelligenceIndices,
+    INTELLIGENCE_DISPLAY,
+  );
+  const contentRange = getRangeFromIndices(contentIndices, CONTENT_DISPLAY);
+  const priceRange = getRangeFromIndices(priceIndices, PRICE_DISPLAY);
+
+  const filteredModels = useMemo(() => {
+    if (allowedRoles) {
+      // Media model selector: bypass LLM hard-filter, use role-based filtering
+      // Extract only the shared filter props (not manualModelId) so the
+      // AnyManualModelSelection union is narrowed to FiltersModelSelection.
+      const selectionForRole: FiltersModelSelection | null =
+        activeSelection.selectionType === ModelSelectionType.FILTERS ||
+        activeSelection.selectionType === ModelSelectionType.MANUAL
+          ? {
+              selectionType: ModelSelectionType.FILTERS,
+              intelligenceRange: activeSelection.intelligenceRange,
+              priceRange: activeSelection.priceRange,
+              contentRange: activeSelection.contentRange,
+              sortBy: activeSelection.sortBy,
+              sortDirection: activeSelection.sortDirection,
+              sortBy2: activeSelection.sortBy2,
+              sortDirection2: activeSelection.sortDirection2,
+            }
+          : null;
+      const base = getFilteredModelsByRoleDispatch(
+        selectionForRole,
+        allowedRoles,
+        user,
+        availability,
+      );
+      const withInputFilter = requiredInputs
+        ? base.filter((m) =>
+            requiredInputs.every((mod) => m.inputs.includes(mod)),
+          )
+        : base;
+      return withInputFilter.filter((m) =>
+        modelOptionToTypes(m).includes(modelTypeTab),
+      );
+    }
+    const filtersModelSelection: FiltersModelSelection = {
+      selectionType: ModelSelectionType.FILTERS,
+      intelligenceRange,
+      priceRange,
+      contentRange,
+      sortBy,
+      sortDirection,
+      sortBy2,
+      sortDirection2,
+    };
+    const base = filterChatModels(filtersModelSelection, user, availability);
+    return base.filter((m) => modelOptionToTypes(m).includes(modelTypeTab));
+  }, [
+    allowedRoles,
+    requiredInputs,
+    activeSelection,
+    intelligenceRange,
+    priceRange,
+    contentRange,
+    sortBy,
+    sortDirection,
+    sortBy2,
+    sortDirection2,
+    user,
+    availability,
+    modelTypeTab,
+  ]);
 
   // Helper to update value
   const updateValue = (newSelection: AnyRoleModelSelection | null): void => {
@@ -1203,30 +1301,6 @@ export function ModelSelector({
     }
   };
 
-  // Get current sort settings from activeSelection (works for both FILTERS and MANUAL)
-  const sortBy =
-    activeSelection?.selectionType === ModelSelectionType.FILTERS ||
-    activeSelection?.selectionType === ModelSelectionType.MANUAL
-      ? activeSelection.sortBy
-      : undefined;
-  const sortDirection =
-    activeSelection?.selectionType === ModelSelectionType.FILTERS ||
-    activeSelection?.selectionType === ModelSelectionType.MANUAL
-      ? activeSelection.sortDirection
-      : undefined;
-
-  const sortBy2 =
-    activeSelection?.selectionType === ModelSelectionType.FILTERS ||
-    activeSelection?.selectionType === ModelSelectionType.MANUAL
-      ? activeSelection.sortBy2
-      : undefined;
-
-  const sortDirection2 =
-    activeSelection?.selectionType === ModelSelectionType.FILTERS ||
-    activeSelection?.selectionType === ModelSelectionType.MANUAL
-      ? activeSelection.sortDirection2
-      : undefined;
-
   // Sort change handlers - switch to FILTERS mode when editing (unless already in MANUAL)
   const handleSortFieldChange = (
     field: (typeof ModelSortField)[keyof typeof ModelSortField],
@@ -1326,76 +1400,6 @@ export function ModelSelector({
       });
     }
   };
-
-  // Calculate filtered models and best model
-  const intelligenceRange = getRangeFromIndices(
-    intelligenceIndices,
-    INTELLIGENCE_DISPLAY,
-  );
-  const contentRange = getRangeFromIndices(contentIndices, CONTENT_DISPLAY);
-  const priceRange = getRangeFromIndices(priceIndices, PRICE_DISPLAY);
-
-  const filteredModels = useMemo(() => {
-    if (allowedRoles) {
-      // Media model selector: bypass LLM hard-filter, use role-based filtering
-      // Extract only the shared filter props (not manualModelId) so the
-      // AnyManualModelSelection union is narrowed to FiltersModelSelection.
-      const selectionForRole: FiltersModelSelection | null =
-        activeSelection.selectionType === ModelSelectionType.FILTERS ||
-        activeSelection.selectionType === ModelSelectionType.MANUAL
-          ? {
-              selectionType: ModelSelectionType.FILTERS,
-              intelligenceRange: activeSelection.intelligenceRange,
-              priceRange: activeSelection.priceRange,
-              contentRange: activeSelection.contentRange,
-              sortBy: activeSelection.sortBy,
-              sortDirection: activeSelection.sortDirection,
-              sortBy2: activeSelection.sortBy2,
-              sortDirection2: activeSelection.sortDirection2,
-            }
-          : null;
-      const base = getFilteredModelsByRoleDispatch(
-        selectionForRole,
-        allowedRoles,
-        user,
-        availability,
-      );
-      const withInputFilter = requiredInputs
-        ? base.filter((m) =>
-            requiredInputs.every((mod) => m.inputs.includes(mod)),
-          )
-        : base;
-      return withInputFilter.filter((m) =>
-        modelOptionToTypes(m).includes(modelTypeTab),
-      );
-    }
-    const filtersModelSelection: FiltersModelSelection = {
-      selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange,
-      priceRange,
-      contentRange,
-      sortBy,
-      sortDirection,
-      sortBy2,
-      sortDirection2,
-    };
-    const base = filterChatModels(filtersModelSelection, user, availability);
-    return base.filter((m) => modelOptionToTypes(m).includes(modelTypeTab));
-  }, [
-    allowedRoles,
-    requiredInputs,
-    activeSelection,
-    intelligenceRange,
-    priceRange,
-    contentRange,
-    sortBy,
-    sortDirection,
-    sortBy2,
-    sortDirection2,
-    user,
-    availability,
-    modelTypeTab,
-  ]);
 
   const bestFilteredModel = useMemo(() => {
     return filteredModels.length > 0 ? filteredModels[0] : null;

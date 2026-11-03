@@ -235,18 +235,18 @@ function FileBrowser({
   const user = useWidgetUser();
   const t = useWidgetTranslation<typeof endpoints.POST>();
 
-  const initialMachinePathRef = useRef(machinePath);
+  const [initialMachinePath] = useState(machinePath);
   const listEndpoint = useEndpoint(
     cortexListDefinitions,
     useMemo(
       () => ({
         read: {
-          initialState: { path: initialMachinePathRef.current },
+          initialState: { path: initialMachinePath },
           formOptions: { autoSubmit: true, debounceMs: 0 },
           queryOptions: { staleTime: 0, refetchOnWindowFocus: false },
         },
       }),
-      [],
+      [initialMachinePath],
     ),
     logger,
     user,

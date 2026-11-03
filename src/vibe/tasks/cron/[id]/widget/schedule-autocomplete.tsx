@@ -26,7 +26,7 @@ import {
 import { Span } from "next-vibe/ui/components/span";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import type { JSX } from "react";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import type { CountryLanguage } from "../../../../core/i18n/core/config";
 import { getDefaultTimezone } from "../../../../core/i18n/core/localization-utils";
@@ -338,13 +338,9 @@ export function ScheduleAutocomplete({
   const isCustom = value !== "" && matchedPreset === null;
 
   // Whether builder can represent the current value — computed once from initial value
-  const builderStateRef = useRef<
-    ReturnType<typeof cronToCustomState> | null | undefined
-  >(undefined);
-  if (builderStateRef.current === undefined) {
-    builderStateRef.current = isCustom ? cronToCustomState(value) : null;
-  }
-  const builderState = builderStateRef.current;
+  const [builderState] = useState<ReturnType<typeof cronToCustomState> | null>(
+    () => (isCustom ? cronToCustomState(value) : null),
+  );
 
   // Which panel is open: none (collapsed), builder, or advanced
   const [panelMode, setPanelMode] = useState<CustomPanelMode>(() => {

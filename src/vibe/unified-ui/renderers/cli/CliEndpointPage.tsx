@@ -249,9 +249,8 @@ function InkEndpointPage<
     endpoint.PATCH ??
     endpoint.DELETE;
 
-  // Stable logger - useRef so it doesn't cause re-renders
-  const loggerRef = useRef(createEndpointLogger(debug, locale));
-  const logger = loggerRef.current;
+  // Stable logger - created once (lazy state initializer)
+  const [logger] = useState(() => createEndpointLogger(debug, locale));
 
   const { isRawModeSupported } = useStdin();
   const [ctrlCHint, setCtrlCHint] = useState(false);

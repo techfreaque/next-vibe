@@ -1,4 +1,3 @@
-import { styled } from "nativewind";
 import { ActivityIndicator, View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
@@ -7,13 +6,14 @@ import type {
   LoadingBlockSize,
 } from "../../web/components/loading-block";
 import { Text } from "./text";
+import { styledNative } from "../utils/style-converter";
 
 export type {
   LoadingBlockProps,
   LoadingBlockSize,
 } from "../../web/components/loading-block";
 
-const StyledView = styled(View, { className: "style" });
+const StyledView = styledNative(View);
 
 const sizeMap: Record<LoadingBlockSize, "small" | "large"> = {
   sm: "small",

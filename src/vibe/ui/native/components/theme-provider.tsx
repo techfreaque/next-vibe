@@ -1,5 +1,4 @@
-import { styled } from "nativewind";
-import React, { useEffect, useState } from "react";
+import React, { useSyncExternalStore } from "react";
 import { Appearance, useColorScheme, View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
@@ -12,9 +11,9 @@ import type {
   UseThemeToggleReturn,
 } from "../../web/components/theme-provider";
 import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 
-const StyledView = styled(View, { className: "style" });
+const StyledView = styledNative(View);
 
 export function ThemeProvider({
   children,
@@ -43,14 +42,21 @@ export function ThemeProvider({
   );
 }
 
+const noopSubscribe = (): (() => void) => () => undefined;
+
+// false during SSR + hydration, true on the client afterwards
+function useIsMounted(): boolean {
+  return useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false,
+  );
+}
+
 export function useThemeToggle(): UseThemeToggleReturn {
   const colorScheme = useColorScheme();
   const theme = colorScheme === "dark" ? "dark" : "light";
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  const isMounted = useIsMounted();
 
   function onToggleTheme(): void {
     Appearance.setColorScheme(theme === "dark" ? "light" : "dark");

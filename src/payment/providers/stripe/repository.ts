@@ -41,7 +41,7 @@ import { scopedTranslation } from "./i18n";
 export class StripeProvider implements PaymentProvider {
   private static readonly _stripe = paymentEnv.STRIPE_SECRET_KEY
     ? new Stripe(paymentEnv.STRIPE_SECRET_KEY, {
-        apiVersion: "2026-07-29.dahlia",
+        apiVersion: "2026-10-28.endive",
       })
     : null;
 
@@ -206,7 +206,7 @@ export class StripeProvider implements PaymentProvider {
       // Create checkout session
       const session = await stripeClient.checkout.sessions.create({
         customer: customerId,
-        payment_method_types: ["card"],
+        allowed_payment_method_types: ["card"],
         mode: mode,
         line_items: [{ price: priceResult.data.priceId, quantity: 1 }],
         success_url: params.successUrl,

@@ -15,7 +15,7 @@ import {
 import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/number-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
-import { type JSX, useRef } from "react";
+import { type JSX, useState } from "react";
 
 import { posTerminalNameMap } from "../../terminal/list/widget";
 import type definition from "./definition";
@@ -37,8 +37,10 @@ export function PosSessionOpenWidget({
   // Look up terminal name from module-level map populated by the terminal list widget.
   // This avoids polluting the API schema with UI-only display context.
   const terminalId = form?.getValues("details.terminalId") ?? "";
-  const terminalNameRef = useRef<string>(
-    posTerminalNameMap.get(terminalId) ?? t("sessionOpen.post.widget.terminal"),
+  const [terminalName] = useState<string>(
+    () =>
+      posTerminalNameMap.get(terminalId) ??
+      t("sessionOpen.post.widget.terminal"),
   );
 
   const handleStartOrders = (sessionId: string): void => {
@@ -79,9 +81,7 @@ export function PosSessionOpenWidget({
             <Span className="text-sm font-semibold">
               {t("sessionOpen.post.widget.terminal")}
             </Span>
-            <Span className="text-sm font-medium">
-              {terminalNameRef.current}
-            </Span>
+            <Span className="text-sm font-medium">{terminalName}</Span>
           </Div>
           <Div className="flex items-center justify-between px-4 py-3">
             <Span className="text-sm text-muted-foreground">
@@ -152,9 +152,7 @@ export function PosSessionOpenWidget({
           <Span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
             {t("sessionOpen.post.widget.terminal")}
           </Span>
-          <Span className="text-base font-semibold">
-            {terminalNameRef.current}
-          </Span>
+          <Span className="text-base font-semibold">{terminalName}</Span>
         </Div>
         <Badge variant="secondary" className="text-xs">
           {t("sessionOpen.post.widget.readyToOpen")}

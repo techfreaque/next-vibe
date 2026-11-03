@@ -6,7 +6,7 @@
  */
 import { Box, Text, useFocus, useInput, useStdin } from "ink";
 import * as React from "react";
-import { useRef } from "react";
+import { useState } from "react";
 
 export type {
   AlertDialogActionProps,
@@ -132,9 +132,11 @@ export function AlertDialogAction({
 }: AlertDialogActionProps): React.JSX.Element | null {
   const isMcp = useIsMcp();
   const { isRawModeSupported } = useStdin();
-  const idRef = useRef(`alert-act-${(alertBtnIdCounter++).toString()}`);
+  const [focusId] = useState(
+    () => `alert-act-${(alertBtnIdCounter++).toString()}`,
+  );
 
-  const { isFocused } = useFocus({ id: idRef.current, autoFocus: false });
+  const { isFocused } = useFocus({ id: focusId, autoFocus: false });
 
   useInput(
     (input, key) => {
@@ -162,9 +164,11 @@ export function AlertDialogCancel({
 }: AlertDialogCancelProps): React.JSX.Element | null {
   const isMcp = useIsMcp();
   const { isRawModeSupported } = useStdin();
-  const idRef = useRef(`alert-cancel-${(alertBtnIdCounter++).toString()}`);
+  const [focusId] = useState(
+    () => `alert-cancel-${(alertBtnIdCounter++).toString()}`,
+  );
 
-  const { isFocused } = useFocus({ id: idRef.current, autoFocus: false });
+  const { isFocused } = useFocus({ id: focusId, autoFocus: false });
 
   useInput(
     (input, key) => {

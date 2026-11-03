@@ -1,6 +1,5 @@
 "use client";
 
-import { useTranslation } from "next-vibe/core/i18n/core/client";
 import type { JWTPublicPayloadType } from "next-vibe/identity/auth/types";
 import { EngagementTypes } from "next-vibe/identity/lead/enum";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
@@ -31,7 +30,6 @@ const PUBLIC_USER = {
  * Optimization: Only tracks once per session (5 minute cooldown) to avoid excessive API calls
  */
 export function LeadTrackingProvider(): null {
-  const { locale } = useTranslation();
   const logger = useLogger();
   const hasTrackedRef = useRef(false);
   const lastTrackedTimeRef = useRef(0);
@@ -88,7 +86,7 @@ export function LeadTrackingProvider(): null {
         },
       },
     });
-  }, [locale, logger, engagementMutation]);
+  }, [logger, engagementMutation]);
 
   return null;
 }

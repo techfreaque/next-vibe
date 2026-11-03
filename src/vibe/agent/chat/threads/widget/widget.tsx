@@ -835,14 +835,15 @@ export function ThreadsListContainer(): React.JSX.Element {
     user,
   );
 
+  const foldersResponse = foldersEndpoint.read?.response;
   const allFolders = useMemo(
     (): FolderFromResponse[] =>
-      foldersEndpoint.read?.response?.success
-        ? foldersEndpoint.read.response.data.folders.filter(
+      foldersResponse?.success
+        ? foldersResponse.data.folders.filter(
             (f) => f.rootFolderId === rootFolderId,
           )
         : [],
-    [foldersEndpoint.read?.response, rootFolderId],
+    [foldersResponse, rootFolderId],
   );
 
   if (!dataLoaded) {

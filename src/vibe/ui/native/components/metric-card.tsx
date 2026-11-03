@@ -1,4 +1,3 @@
-import { styled } from "nativewind";
 import { View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
@@ -9,6 +8,7 @@ import type {
   MetricCardVariant,
 } from "../../web/components/metric-card";
 import { Text } from "./text";
+import { styledNative } from "../utils/style-converter";
 
 export type {
   MetricCardFormat,
@@ -17,7 +17,7 @@ export type {
   MetricCardVariant,
 } from "../../web/components/metric-card";
 
-const StyledView = styled(View, { className: "style" });
+const StyledView = styledNative(View);
 
 const variantClasses: Record<MetricCardVariant, string> = {
   default: "text-foreground",

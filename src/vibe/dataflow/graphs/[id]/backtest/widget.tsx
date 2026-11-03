@@ -57,14 +57,13 @@ export function BacktestWidget({
   const children = field.children;
   const response = useWidgetValue<typeof definition.POST>();
 
-  const defaultFrom = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-  const defaultTo = new Date();
-
-  const [localFrom, setLocalFrom] = useState<string>(
-    toDatetimeLocal(defaultFrom.toISOString()),
+  const [localFrom, setLocalFrom] = useState<string>(() =>
+    toDatetimeLocal(
+      new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+    ),
   );
-  const [localTo, setLocalTo] = useState<string>(
-    toDatetimeLocal(defaultTo.toISOString()),
+  const [localTo, setLocalTo] = useState<string>(() =>
+    toDatetimeLocal(new Date().toISOString()),
   );
 
   return (

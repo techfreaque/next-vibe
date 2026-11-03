@@ -8,7 +8,7 @@
 import { cva } from "class-variance-authority";
 import { Text, useFocus, useInput, useStdin } from "ink";
 import type { JSX, ReactNode } from "react";
-import { Children, Fragment, isValidElement, useEffect, useRef } from "react";
+import { Children, Fragment, isValidElement, useEffect, useState } from "react";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { ButtonProps } from "../../web/components/button";
@@ -138,30 +138,30 @@ export function Button({
 }: ButtonProps): JSX.Element | null {
   const isMcp = useIsMcp();
   const { isRawModeSupported } = useStdin();
-  const idRef = useRef(`btn-${(buttonIdCounter++).toString()}`);
+  const [focusId] = useState(() => `btn-${(buttonIdCounter++).toString()}`);
   const dropdownTrigger = useDropdownTrigger();
   const popoverTrigger = usePopoverTrigger();
 
   // Register this button's focus ID with parent trigger context for focus restoration
   useEffect(() => {
     if (dropdownTrigger) {
-      dropdownTrigger.registerFocusId(idRef.current);
+      dropdownTrigger.registerFocusId(focusId);
     }
     if (popoverTrigger) {
-      popoverTrigger.registerFocusId(idRef.current);
+      popoverTrigger.registerFocusId(focusId);
     }
-  }, [dropdownTrigger, popoverTrigger]);
+  }, [dropdownTrigger, popoverTrigger, focusId]);
 
   const shouldFocus = useShouldFocus();
   const { isFocused } = useFocus({
-    id: idRef.current,
+    id: focusId,
     autoFocus: false,
     isActive: !disabled && shouldFocus,
   });
 
   // Register with parent Dialog/Popover focus scope (if any) so the
   // container can auto-focus the first item when it opens.
-  useFocusScopeRegister(idRef.current);
+  useFocusScopeRegister(focusId);
 
   useInput(
     (input, key) => {

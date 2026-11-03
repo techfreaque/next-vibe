@@ -14,7 +14,7 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { apiClient } from "next-vibe/unified-ui/hooks/store";
 import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
 
 import { useCredits } from "@/credits/hooks";
 import type { ChatModelId } from "../../../../../ai-stream/models";
@@ -144,7 +144,10 @@ export function useMessageOperations(
   // Keep a ref to deps so async callbacks always use the latest values.
   // Prevents stale closures when React batches state updates during navigation.
   const depsRef = useRef(deps);
-  depsRef.current = deps;
+  useLayoutEffect(() => {
+    depsRef.current = deps;
+  });
+  const userId = user?.id;
 
   const sendMessage = useCallback(
     async (
@@ -526,7 +529,6 @@ export function useMessageOperations(
         }
 
         // Update message with authoritative server counts and current user's vote in metadata
-        const userId = user?.id;
         const currentVoteDetails = Array.isArray(message.metadata?.voteDetails)
           ? message.metadata.voteDetails.filter((v) => v.userId !== userId)
           : [];
@@ -560,7 +562,7 @@ export function useMessageOperations(
         );
       }
     },
-    [logger, activeThreadId, currentRootFolderId, voteMutateAsync, user?.id],
+    [logger, activeThreadId, currentRootFolderId, voteMutateAsync, userId],
   );
 
   const stopGeneration = useCallback((): void => {

@@ -1070,7 +1070,7 @@ export const ENV_KEYS = [
     key: "NEXT_PUBLIC_VIBE_MODE",
     module: "core",
     comment:
-      "Instance mode. 'agent' = personal local instance. 'cloud' = SaaS deployment. 'dev' = Atlas coding instance (default). Set automatically by vibe build/start.",
+      "Instance mode. 'agent' = personal local instance. 'cloud' = SaaS deployment. 'dev' = Atlas coding instance (default). Opt-in via this var or vibe build/start --vibeMode.",
     example: "dev",
     sensitive: false,
     fieldType: "text",

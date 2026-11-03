@@ -251,23 +251,30 @@ function useSimpleChart(
   const LineSeriesCtorRef = useRef<SeriesDefinition<"Line"> | null>(null);
   // Keep latest points in a ref so the async chart init can apply them immediately
   const pointsRef = useRef(points);
-  pointsRef.current = points;
   // Keep latest onLastValue in a ref so effects don't need it in deps
   const onLastValueRef = useRef(onLastValue);
-  onLastValueRef.current = onLastValue;
+
+  // Sync latest-value refs after each commit (declared first so it runs
+  // before the chart effects below)
+  useEffect(() => {
+    pointsRef.current = points;
+    onLastValueRef.current = onLastValue;
+  });
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) {
       return undefined;
     }
-    let cancelled = false;
-    let cleanupMoRef: (() => void) | null = null;
+    const run: { cancelled: boolean; moCleanup: (() => void) | null } = {
+      cancelled: false,
+      moCleanup: null,
+    };
 
     void (async (): Promise<void> => {
       const { createChart, ColorType, LineSeries } =
         await import("lightweight-charts");
-      if (cancelled) {
+      if (run.cancelled) {
         return;
       }
 
@@ -337,7 +344,7 @@ function useSimpleChart(
       }
 
       const ro = new ResizeObserver(() => {
-        if (!cancelled) {
+        if (!run.cancelled) {
           chart.applyOptions({
             width: container.clientWidth,
             height: container.clientHeight,
@@ -346,9 +353,9 @@ function useSimpleChart(
       });
       ro.observe(container);
 
-      cleanupMoRef = observeRootMutations(
+      run.moCleanup = observeRootMutations(
         () => {
-          if (!cancelled) {
+          if (!run.cancelled) {
             const c = getChartColors();
             chart.applyOptions({
               layout: { textColor: c.textColor },
@@ -364,8 +371,8 @@ function useSimpleChart(
     })();
 
     return (): void => {
-      cancelled = true;
-      cleanupMoRef?.();
+      run.cancelled = true;
+      run.moCleanup?.();
     };
   }, [resolution, containerRef]);
 

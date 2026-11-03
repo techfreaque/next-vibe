@@ -42,7 +42,13 @@ import { apiClient } from "next-vibe/unified-ui/hooks/store";
 import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
 import { useApiQuery } from "next-vibe/unified-ui/hooks/use-api-query";
 import type { JSX } from "react";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+} from "react";
 
 import { getAgentMessageMaxLength } from "../../../chat/constants";
 import { NEW_MESSAGE_ID } from "../../../chat/enum";
@@ -52,6 +58,8 @@ import { useChatNavigationStore } from "../../../chat/hooks/use-chat-navigation-
 import { useChatSettings } from "../../../chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "../../../chat/settings/repository-client";
 import messagesDefinition from "../../../chat/threads/[threadId]/messages/definition";
+import rootPermissionsDefinition from "../../../chat/folders/[rootFolderId]/root-permissions/definition";
+import { isIncognitoFolder } from "../../../chat/config";
 import {
   type MessageOperationsDeps,
   useMessageOperations,
@@ -159,9 +167,12 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
 
   // Load draft when navigation changes (thread/folder switch)
   const draftKeyRef = useRef(draftKey);
-  draftKeyRef.current = draftKey;
   const loggerRef = useRef(logger);
-  loggerRef.current = logger;
+  // Sync latest values before passive effects read them
+  useLayoutEffect(() => {
+    draftKeyRef.current = draftKey;
+    loggerRef.current = logger;
+  }, [draftKey, logger]);
 
   // Autosave draft text when input changes (skip saves triggered by draft loads)
   const prevInputRef = useRef(input);
@@ -314,7 +325,41 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   const stopGeneration = messageOps.stopGeneration;
 
   // Permissions
-  const rootFolderPermissions = bootContext.rootFolderPermissions;
+  // Boot permissions belong to the root folder the page was last rendered for.
+  // The page re-renders when visiting e.g. Public, while switching back to
+  // another root is client-only - so any other root fetches its own.
+  const bootRootMatches =
+    bootContext.initialRootFolderId === currentRootFolderId;
+  const rootPermissionsQuery = useApiQuery({
+    endpoint: rootPermissionsDefinition.GET,
+    requestData: { rootFolderId: currentRootFolderId },
+    logger,
+    user,
+    options: {
+      enabled: !bootRootMatches && !isIncognitoFolder(currentRootFolderId),
+      staleTime: Infinity,
+    },
+  });
+  const rootFolderPermissions = useMemo(() => {
+    if (bootRootMatches) {
+      return bootContext.rootFolderPermissions;
+    }
+    // Incognito is local-only: everyone can always post
+    if (isIncognitoFolder(currentRootFolderId)) {
+      return { canCreateThread: true, canCreateFolder: true };
+    }
+    return (
+      rootPermissionsQuery.data ?? {
+        canCreateThread: false,
+        canCreateFolder: false,
+      }
+    );
+  }, [
+    bootRootMatches,
+    bootContext.rootFolderPermissions,
+    currentRootFolderId,
+    rootPermissionsQuery.data,
+  ]);
   const canPost = useMemo(() => {
     if (activeThread) {
       // canPost is null when the thread inherits from its folder (treat as allowed).

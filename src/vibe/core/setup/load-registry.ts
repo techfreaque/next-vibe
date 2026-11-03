@@ -52,7 +52,11 @@ export async function loadSetupRegistry(): Promise<readonly SetupEntry[]> {
         // toImportUrl, not the bare path: on Windows `import("C:/...")` is read
         // as a bare specifier and throws, and the catch below would swallow it —
         // leaving the bootstrap fallback silently returning zero setups there.
-        const mod = (await import(toImportUrl(absPath))) as {
+        const mod = (await import(
+          /* webpackIgnore: true */ /* turbopackIgnore: true */ toImportUrl(
+            absPath,
+          )
+        )) as {
           description: string;
           install: SetupEntry["install"];
           uninstall: SetupEntry["uninstall"];

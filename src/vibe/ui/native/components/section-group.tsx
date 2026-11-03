@@ -1,6 +1,5 @@
 "use client";
 
-import { styled } from "nativewind";
 import * as React from "react";
 import { Pressable, View } from "react-native";
 
@@ -11,7 +10,7 @@ import { Text } from "./text";
 
 export type { SectionGroupProps } from "../../web/components/section-group";
 
-const StyledView = styled(View, { className: "style" });
+const StyledView = styledNative(View);
 const StyledPressable = styledNative(Pressable);
 
 export function SectionGroup({

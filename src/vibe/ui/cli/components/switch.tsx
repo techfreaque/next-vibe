@@ -1,7 +1,7 @@
 /* eslint-disable i18n/no-literal-string */
 import { Text, useFocus, useInput, useStdin } from "ink";
 import type { JSX } from "react";
-import { useRef } from "react";
+import { useState } from "react";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { SwitchRootProps } from "../../web/components/switch";
@@ -21,17 +21,17 @@ export function Switch({
 }: SwitchRootProps): JSX.Element {
   const isMcp = useIsMcp();
   const { isRawModeSupported } = useStdin();
-  const idRef = useRef(`switch-${(switchIdCounter++).toString()}`);
+  const [focusId] = useState(() => `switch-${(switchIdCounter++).toString()}`);
   const state = checked ? ON : OFF;
 
   const shouldFocus = useShouldFocus();
   const { isFocused } = useFocus({
-    id: idRef.current,
+    id: focusId,
     autoFocus: false,
     isActive: !disabled && !isMcp && shouldFocus,
   });
 
-  useFocusScopeRegister(idRef.current);
+  useFocusScopeRegister(focusId);
 
   useInput(
     (input, key) => {

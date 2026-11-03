@@ -1,6 +1,5 @@
 import { useTheme } from "@react-navigation/native";
 import { cva } from "class-variance-authority";
-import { styled } from "nativewind";
 import * as React from "react";
 import { View } from "react-native";
 
@@ -11,6 +10,7 @@ import type {
   AlertTitleProps,
   AlertVariant,
 } from "../../web/components/alert";
+import { styledNative } from "../utils/style-converter";
 import { Span } from "./span";
 
 // Re-export types for consistency
@@ -21,7 +21,7 @@ export type {
   AlertVariant,
 };
 
-const StyledView = styled(View, { className: "style" });
+const StyledView = styledNative(View);
 
 const alertVariants = cva(
   "relative bg-background w-full rounded-lg border border-border p-4 shadow shadow-foreground/10",

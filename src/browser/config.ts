@@ -84,6 +84,10 @@ export const chromeMCPConfig: ChromeMCPConfig = {
   args: [
     chromeDevtoolsMcpBin(),
     `--browserUrl=http://127.0.0.1:${CHROME_REMOTE_DEBUG_PORT}`,
+    // chrome-devtools-mcp >=1.12 defaults to requiring `pageId` on every
+    // page-scoped tool. repository.ts routes by select_page under a global
+    // mutex instead, so keep the selected-page model.
+    "--no-page-id-routing",
   ],
   env: {},
   timeout: 120000,

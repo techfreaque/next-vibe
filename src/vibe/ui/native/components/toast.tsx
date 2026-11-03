@@ -85,14 +85,18 @@ export function Toast({
   style,
   children,
 }: ToastRootProps): React.JSX.Element {
-  const [isOpen, setIsOpen] = React.useState(defaultOpen ?? open ?? true);
+  // Controlled `open` wins over `defaultOpen` (previously applied by a mount effect)
+  const [isOpen, setIsOpen] = React.useState(open ?? defaultOpen ?? true);
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
-  React.useEffect(() => {
+  // Sync isOpen when the open prop changes (adjusted during render)
+  const [prevOpen, setPrevOpen] = React.useState(open);
+  if (open !== prevOpen) {
+    setPrevOpen(open);
     if (open !== undefined) {
       setIsOpen(open);
     }
-  }, [open]);
+  }
 
   React.useEffect((): (() => void) | undefined => {
     if (duration && isOpen) {

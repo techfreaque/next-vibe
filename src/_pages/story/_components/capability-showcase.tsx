@@ -777,6 +777,28 @@ function ModelsVisual({
     setActiveId(id);
   }, []);
 
+  const userMsg = useMemo(
+    () =>
+      baseMockMsg({
+        id: `models-user-${activeId}`,
+        threadId: `demo-models-${activeId}`,
+        role: ChatMessageRole.USER,
+        content: t("home.capabilities.models.demo.userQuestion"),
+        parentId: null,
+        depth: 0,
+        sequenceId: null,
+        isAI: false,
+        model: null,
+        metadata: {},
+      }),
+    [activeId, t],
+  );
+
+  const group = useMemo(
+    () => buildModelsDemoGroup(t, activeId, appName),
+    [t, activeId, appName],
+  );
+
   const mainstreamMore =
     modelCountsByTier.mainstream - FEATURED_MODELS.mainstream.length;
   const openMore = modelCountsByTier.open - FEATURED_MODELS.open.length;
@@ -823,28 +845,6 @@ function ModelsVisual({
       totalCount: modelCountsByTier.uncensored,
     },
   ];
-
-  const userMsg = useMemo(
-    () =>
-      baseMockMsg({
-        id: `models-user-${activeId}`,
-        threadId: `demo-models-${activeId}`,
-        role: ChatMessageRole.USER,
-        content: t("home.capabilities.models.demo.userQuestion"),
-        parentId: null,
-        depth: 0,
-        sequenceId: null,
-        isAI: false,
-        model: null,
-        metadata: {},
-      }),
-    [activeId, t],
-  );
-
-  const group = useMemo(
-    () => buildModelsDemoGroup(t, activeId, appName),
-    [t, activeId, appName],
-  );
 
   return (
     <Div className="space-y-5">

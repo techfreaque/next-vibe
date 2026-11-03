@@ -6,7 +6,7 @@
 "use client";
 
 import type { ReactElement, ReactNode } from "react";
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 
 import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import type { ReactWidgetContext } from "./react-types";
@@ -32,23 +32,14 @@ export function WidgetContextProvider<TEndpoint extends CreateApiEndpointAny>({
   context,
   children,
 }: WidgetContextProviderProps<TEndpoint>): ReactElement {
-  // Create store instance once and initialize with context immediately
-  // Using useRef to avoid recreating the store on every render
-  const storeRef = useRef<ReturnType<
-    typeof createWidgetContextStore<
+  // Create store instance once (lazy initializer) and initialize with context
+  // immediately so the first render already sees it.
+  const [store] = useState(() =>
+    createWidgetContextStore<
       CreateApiEndpointAny,
       ReactWidgetContext<CreateApiEndpointAny>
-    >
-  > | null>(null);
-
-  // Initialize store once on first render
-  if (!storeRef.current) {
-    storeRef.current = createWidgetContextStore<
-      CreateApiEndpointAny,
-      ReactWidgetContext<CreateApiEndpointAny>
-    >(context as ReactWidgetContext<CreateApiEndpointAny>);
-  }
-  const store = storeRef.current;
+    >(context as ReactWidgetContext<CreateApiEndpointAny>),
+  );
 
   // Sync context updates after render to avoid setState-during-render
   useEffect(() => {

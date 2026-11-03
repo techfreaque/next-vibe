@@ -1,4 +1,3 @@
-import { styled } from "nativewind";
 import { View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
@@ -7,13 +6,14 @@ import type {
   ProgressBlockVariant,
 } from "../../web/components/progress-block";
 import { Text } from "./text";
+import { styledNative } from "../utils/style-converter";
 
 export type {
   ProgressBlockProps,
   ProgressBlockVariant,
 } from "../../web/components/progress-block";
 
-const StyledView = styled(View, { className: "style" });
+const StyledView = styledNative(View);
 
 const variantClasses: Record<ProgressBlockVariant, string> = {
   default: "bg-primary",

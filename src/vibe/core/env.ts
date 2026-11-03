@@ -349,12 +349,14 @@ export const {
     fieldType: "boolean",
   },
   NEXT_PUBLIC_VIBE_MODE: {
-    schema: z
-      .enum(VibeModeValues)
-      .default(isPreviewMode ? VibeMode.AGENT : VibeMode.DEV),
+    // Same default as env-client: the server must never run a different mode
+    // than the UI bundle (a server-only 'agent' default silently auto-logged-in
+    // the admin under vibe start). Agent mode is opt-in: set it here or pass
+    // --vibeMode=agent to vibe build/start.
+    schema: z.enum(VibeModeValues).default(VibeMode.DEV),
     example: VibeMode.DEV,
     comment:
-      "Instance mode. 'agent' = personal local instance. 'cloud' = SaaS deployment. 'dev' = Atlas coding instance (default). Set automatically by vibe build/start.",
+      "Instance mode. 'agent' = personal local instance. 'cloud' = SaaS deployment. 'dev' = Atlas coding instance (default). Opt-in via this var or vibe build/start --vibeMode.",
   },
   NEXT_PUBLIC_APP_URL: {
     schema: z.preprocess(

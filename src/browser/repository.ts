@@ -85,7 +85,17 @@ interface MCPProcess {
   pending: Map<number, PendingRequest>;
   initialized: boolean;
   mutex: Promise<void>;
+  /**
+   * Pages (by MCP page id) that have a snapshot inside THIS chrome-devtools-mcp
+   * process, mapped to caller uid → live uid. An empty map means the caller's
+   * uids are live as-is. Snapshots exist only in MCP memory, so a fresh process
+   * (CLI call, restart) starts with none - see {@link resolveCallerUids}.
+   */
+  liveSnapshots: Map<number, Map<string, string>>;
 }
+
+/** One `uid=… ` line of an a11y snapshot: the uid and the rest of its line. */
+type SnapshotEntry = [uid: string, signature: string];
 
 /** A single page (tab) owned by a session. */
 interface SessionPage {
@@ -95,6 +105,8 @@ interface SessionPage {
   mcpPageId: number;
   /** Last known URL of the page (used to re-resolve MCP page IDs after a restart). */
   url: string;
+  /** Last snapshot the caller saw - its uids stay valid in later processes. */
+  snapshot?: SnapshotEntry[];
 }
 
 /** Per-session state: all tabs this session owns and which one is currently active. */
@@ -162,6 +174,7 @@ function createMCPProcess(logger: EndpointLogger): MCPProcess {
     pending: new Map(),
     initialized: false,
     mutex: Promise.resolve(),
+    liveSnapshots: new Map(),
   };
 
   let buf = "";
@@ -540,6 +553,7 @@ function normalizeSessionEntry(
         cdpTargetId: p.cdpTargetId,
         mcpPageId: p.mcpPageId,
         url: typeof p.url === "string" ? p.url : "",
+        ...(Array.isArray(p.snapshot) && { snapshot: p.snapshot }),
       })),
       activeIndex,
     };
@@ -585,6 +599,126 @@ function saveSessions(sessions: Map<string, SessionState>): void {
   } catch {
     // Non-fatal - session will be re-created on next call.
   }
+}
+
+// ---------------------------------------------------------------------------
+// Snapshot uids across chrome-devtools-mcp processes
+// ---------------------------------------------------------------------------
+
+/** MCP tools whose arguments reference snapshot uids. */
+const UID_TOOLS = new Set([
+  "click",
+  "hover",
+  "fill",
+  "fill_form",
+  "drag",
+  "upload_file",
+]);
+
+/**
+ * Parse the `uid=…` lines of a tool response, or null if it holds no snapshot.
+ * The signature keeps the indentation so identical rows at different depths
+ * stay distinct.
+ */
+function parseSnapshot(text: string): SnapshotEntry[] | null {
+  const entries: SnapshotEntry[] = [];
+  for (const line of text.split(/\r?\n/)) {
+    const match = /^(\s*)uid=(\S+) (.*)$/.exec(line);
+    if (match?.[2] !== undefined) {
+      entries.push([match[2], `${match[1] ?? ""}${match[3] ?? ""}`]);
+    }
+  }
+  return entries.length > 0 ? entries : null;
+}
+
+/**
+ * Map caller uids (from `previous`) onto a fresh snapshot of the same page: the
+ * n-th row with a given signature maps to the n-th row with that signature.
+ * Rows that no longer exist stay unmapped, so MCP reports them as gone.
+ */
+function mapSnapshotUids(
+  previous: SnapshotEntry[],
+  fresh: SnapshotEntry[],
+): Map<string, string> {
+  const freshBySignature = new Map<string, string[]>();
+  for (const [uid, signature] of fresh) {
+    const uids = freshBySignature.get(signature) ?? [];
+    uids.push(uid);
+    freshBySignature.set(signature, uids);
+  }
+  const seen = new Map<string, number>();
+  const remap = new Map<string, string>();
+  for (const [uid, signature] of previous) {
+    const occurrence = seen.get(signature) ?? 0;
+    seen.set(signature, occurrence + 1);
+    const freshUid = freshBySignature.get(signature)?.[occurrence];
+    if (freshUid !== undefined) {
+      remap.set(uid, freshUid);
+    }
+  }
+  return remap;
+}
+
+/** Replace caller uids in a uid tool's arguments with their live uids. */
+function remapUidArgs(
+  args: Record<string, WidgetData>,
+  remap: Map<string, string>,
+): Record<string, WidgetData> {
+  if (remap.size === 0) {
+    return args;
+  }
+  const live = (value: WidgetData): WidgetData =>
+    typeof value === "string" ? (remap.get(value) ?? value) : value;
+  const next: Record<string, WidgetData> = { ...args };
+  for (const key of ["uid", "from_uid", "to_uid"]) {
+    if (key in next) {
+      next[key] = live(next[key]);
+    }
+  }
+  const elements = next["elements"];
+  if (Array.isArray(elements)) {
+    next["elements"] = elements.map((element) =>
+      element !== null &&
+      typeof element === "object" &&
+      !Array.isArray(element) &&
+      !(element instanceof Date)
+        ? { ...element, uid: live(element["uid"]) }
+        : element,
+    );
+  }
+  return next;
+}
+
+/**
+ * Make the caller's snapshot uids usable in this MCP process. Snapshots live in
+ * MCP memory only, so a uid from an earlier process (every CLI call spawns
+ * one) fails with "No snapshot found". When this process has no snapshot of
+ * the page yet, take one and map the caller's last snapshot onto it.
+ */
+async function resolveCallerUids(
+  mcp: MCPProcess,
+  page: SessionPage,
+  args: Record<string, WidgetData>,
+): Promise<Record<string, WidgetData>> {
+  let remap = mcp.liveSnapshots.get(page.mcpPageId);
+  if (!remap && page.snapshot) {
+    const resp = await sendRaw(mcp, {
+      jsonrpc: "2.0",
+      id: mcp.nextId++,
+      method: "tools/call",
+      params: { name: "take_snapshot", arguments: {} },
+    });
+    const result = resp.result as
+      | { content?: Array<{ type: string; text?: string }> }
+      | undefined;
+    const text = result?.content?.find((c) => c.type === "text")?.text ?? "";
+    const fresh = parseSnapshot(text);
+    if (fresh) {
+      remap = mapSnapshotUids(page.snapshot, fresh);
+      mcp.liveSnapshots.set(page.mcpPageId, remap);
+    }
+  }
+  return remap ? remapUidArgs(args, remap) : args;
 }
 
 // Use globalThis so the Map survives hot-reload module re-imports.
@@ -802,7 +936,7 @@ async function reconcilePages(
       }
       mcpPageId = resolved;
     }
-    result.push({ cdpTargetId: page.cdpTargetId, mcpPageId, url });
+    result.push({ ...page, mcpPageId, url });
   }
   return result;
 }
@@ -1306,10 +1440,16 @@ export class BrowserRepository {
         // For select_page, inject the session's active page ID when the caller
         // didn't provide one explicitly.
         const isSelectPage = mcpToolName === "select_page";
+        const activePage =
+          sessions.get(sessionId)?.pages[
+            sessions.get(sessionId)?.activeIndex ?? 0
+          ];
         const finalArgs =
           isSelectPage && parsedArgs["pageId"] === undefined
             ? { ...parsedArgs, pageId: s.mcpPageId }
-            : parsedArgs;
+            : UID_TOOLS.has(mcpToolName) && activePage
+              ? await resolveCallerUids(mcp, activePage, parsedArgs)
+              : parsedArgs;
 
         const resp = await sendRaw(mcp, {
           jsonrpc: "2.0",
@@ -1332,6 +1472,19 @@ export class BrowserRepository {
           | undefined;
 
         const toolSuccess = !resp.error && !mcpResult?.isError;
+
+        // A snapshot the caller saw (take_snapshot, or a tool that returns one)
+        // becomes the uid baseline: persisted for later processes, live here.
+        if (toolSuccess && activePage) {
+          const snapshot = parseSnapshot(
+            mcpResult?.content?.find((c) => c.type === "text")?.text ?? "",
+          );
+          if (snapshot) {
+            activePage.snapshot = snapshot;
+            mcp.liveSnapshots.set(activePage.mcpPageId, new Map());
+            saveSessions(sessions);
+          }
+        }
 
         // select_page: update which page in our session is active.
         if (toolSuccess && isSelectPage) {

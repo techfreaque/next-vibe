@@ -181,9 +181,8 @@ function snakeToCamel(
  * Strategy:
  * - Build async versions of every compiled query that run via pgliteClient.query()
  * - Provide a plv8 shim whose .execute() runs pgliteClient.query() (async, awaited)
- * - Wrap the logic body in an AsyncFunction so await works inside it
- * - The logic body uses `q.name()` and `plv8.execute()` — we prefix those calls
- *   with `await` via a simple text transform so the async wrapper works
+ * - Serialize the whole logic function as an async function (see serializeLogic)
+ *   whose `q.<query>()` and `plv8.execute()` calls are awaited
  */
 async function callInPglite(
   name: string,
@@ -262,40 +261,21 @@ async function callInPglite(
     },
   };
 
-  // Extract and transform logic body for async execution
-  // Replace q.name() → await __q.name() and plv8.execute() → await plv8.execute()
-  const logicBody = extractLogicBody(logic)
-    .replaceAll(/\b__q\.(\w+)\s*\(/g, "await __q.$1(")
-    .replaceAll(/\bplv8\.execute\s*\(/g, "await plv8.execute(");
+  // Async variant of the logic: query calls and plv8.execute() are awaited
+  const logicCall = serializeLogic(logic, Object.keys(compiledQueries), {
+    async: true,
+  });
 
-  // Build params shim (for (q, params) style)
-  const paramsShimEntries = paramEntries
-    .map(([n]) => `"${n}": __params_raw["${n}"]`)
-    .join(", ");
-
-  // Also inject individual variable declarations so destructuring-style logic
-  // bodies (q, { p_user_id }) can reference p_user_id directly, matching how
-  // PL/v8 exposes function params as individual in-scope variables.
-  const paramVarDecls = paramEntries
-    .map(([n]) => `const ${n} = __params_raw["${n}"];`)
-    .join(" ");
-
-  const asyncBody = `
-    const __params = { ${paramsShimEntries} };
-    ${paramVarDecls}
-    ${logicBody}
-  `;
+  // Only the declared params reach the logic, exactly as in PL/v8
+  const declaredParams = Object.fromEntries(
+    paramEntries.map(([n]) => [n, params[n] ?? null]),
+  );
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-implied-eval -- intentional: executes extracted logic body in async context for PGlite dev mode
-    const fn = new Function(
-      "__q",
-      "plv8",
-      "__params_raw",
-      `return (async () => { ${asyncBody} })()`,
-    );
+    // eslint-disable-next-line @typescript-eslint/no-implied-eval -- intentional: executes serialized logic in async context for PGlite mode
+    const fn = new Function("__q", "plv8", "__params", `return ${logicCall};`);
     const result = await serialisePgliteAccess(async () => {
-      return (await fn(asyncQ, plv8Shim, params)) as Record<
+      return (await fn(asyncQ, plv8Shim, declaredParams)) as Record<
         string,
         string | number | boolean | null
       >;
@@ -348,8 +328,10 @@ export function defineDbFunction<
     };
   }
 
-  // Extract the raw logic body from the typed function
-  const logicBody = extractLogicBody(def.logic);
+  // Serialized logic call, embedded in the PL/v8 body
+  const logicCall = serializeLogic(def.logic, Object.keys(compiledQueries), {
+    async: false,
+  });
 
   return {
     name: def.name,
@@ -427,7 +409,7 @@ export function defineDbFunction<
       }
 
       // Generate the PL/v8 body with compiled queries + extracted logic
-      const body = generateBody(compiledQueries, paramEntries, logicBody);
+      const body = generateBody(compiledQueries, paramEntries, logicCall);
 
       const volatility = def.volatility ?? "VOLATILE";
 
@@ -449,84 +431,50 @@ export function defineDbFunction<
 // ---------------------------------------------------------------------------
 
 /**
- * Extract the body of the logic function for embedding in PL/v8.
+ * Serialize the logic function into a call expression: `(<fn>)(__q, __params)`.
  *
- * The logic function is defined as:
- *   (q, params) => { ... }         - arrow function
- *   function(q, params) { ... }    - function expression
+ * The WHOLE function is embedded, not just its body: its own parameter list
+ * binds `__q` and `__params`, whatever the param names are. Production builds
+ * minify the logic - params get renamed (`{ p_user_id: b }`) and short names
+ * are reused inside the body (`for (let a of ...)`), so any rewrite of param
+ * names inside the body text breaks it.
  *
- * We serialize it with .toString(), then:
- * 1. Extract the body (everything between the outer braces)
- * 2. Replace the `q` param name with `__q` (the runtime variable name)
- * 3. Replace the `params` destructure with individual `var` declarations
- *    that read from PL/v8 function params (which are in scope as-is)
- *
- * The result is plain JS that runs correctly inside PL/v8.
+ * `async: true` (PGlite) turns the function async and awaits the query calls
+ * (`<q>.<queryName>(` and `plv8.execute(`). Only real query names on the first
+ * param are awaited, so a minified inner variable that reuses the q name is
+ * never touched.
  */
-function extractLogicBody(
+function serializeLogic(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- logic function has complex generic signature
   // oxlint-disable-next-line no-explicit-any
   logicFn: (...args: any[]) => any,
+  queryNames: string[],
+  options: { async: boolean },
 ): string {
-  const src = logicFn.toString();
+  let src = logicFn.toString().trim();
 
-  // Find the function body `{...}`.
-  // Arrow functions: find `=>` first, then `{` after it.
-  // Regular functions: find `{` after the closing `)` of the param list.
-  let bodyStart: number;
-  const arrowIdx = src.indexOf("=>");
-  if (arrowIdx !== -1) {
-    // Arrow function: body starts at `{` after `=>`
-    bodyStart = src.indexOf("{", arrowIdx);
-  } else {
-    // Regular function: skip past `function` keyword and param list
-    const parenClose = src.indexOf(")");
-    bodyStart = src.indexOf("{", parenClose);
-  }
-  const bodyEnd = src.lastIndexOf("}");
-
-  if (bodyStart === -1 || bodyEnd === -1 || bodyEnd <= bodyStart) {
-    // eslint-disable-next-line restricted/restricted-syntax -- framework error during deploy, not user error
-    throw new Error(
-      `defineDbFunction: logic must be a function with a block body. Got: ${src.slice(0, 100)}`,
-    );
+  // Method shorthand (`logic(q, p) { ... }`) is not an expression on its own.
+  if (!/^(async\b|function\b|\(|[\w$]+\s*=>)/.test(src)) {
+    src = `function ${src}`;
   }
 
-  let body = src.slice(bodyStart + 1, bodyEnd);
-
-  // Extract the first parameter name (the query proxy) from the function signature.
-  // We look at the part before the body start.
-  const signaturePart = src.slice(0, bodyStart);
-  const qParamMatch = /\(\s*([a-zA-Z_$][a-zA-Z0-9_$]*)/.exec(signaturePart);
-  const qParamName = qParamMatch?.[1] ?? "q";
-
-  // Replace the query proxy param name with __q (the runtime variable).
-  // Only replace `q.something` usages - not standalone `q` references.
-  if (qParamName !== "__q" && qParamName !== "_") {
-    body = body.replaceAll(
-      new RegExp(`\\b${escapeRegex(qParamName)}\\.`, "g"),
-      "__q.",
-    );
+  if (options.async) {
+    const qParamName =
+      /^(?:async\s*)?(?:function\s*[\w$]*\s*)?\(\s*([\w$]+)/.exec(src)?.[1];
+    if (qParamName && queryNames.length > 0) {
+      const queryCall = new RegExp(
+        `\\b${escapeRegex(qParamName)}\\.(${queryNames.map(escapeRegex).join("|")})\\s*\\(`,
+        "g",
+      );
+      src = src.replaceAll(queryCall, `await ${qParamName}.$1(`);
+    }
+    src = src.replaceAll(/\bplv8\.execute\s*\(/g, "await plv8.execute(");
+    if (!src.startsWith("async")) {
+      src = `async ${src}`;
+    }
   }
 
-  // The second param is the params object. In PL/v8, function params are in scope
-  // as individual variables (p_user_id, p_amount, etc.).
-  //
-  // If using destructuring `(q, { p_user_id })`: the body already uses `p_user_id`
-  // directly - works perfectly with PL/v8's scope.
-  //
-  // If using named object `(q, params)`: the body uses `params.p_user_id` which
-  // won't work. We inject a shim: `var params = __params;`
-  const secondParamMatch = /\(\s*[^,]+,\s*([a-zA-Z_$][a-zA-Z0-9_$]*)/.exec(
-    signaturePart,
-  );
-  const paramsParamName = secondParamMatch?.[1];
-  if (paramsParamName && paramsParamName !== "_") {
-    // Named params object - inject a shim using the __params object from generateBody
-    body = `var ${paramsParamName} = __params;\n${body}`;
-  }
-
-  return body.trim();
+  return `(${src})(__q, __params)`;
 }
 
 /** Escape a string for use in a RegExp */
@@ -613,7 +561,7 @@ function mapRow(
 function generateBody(
   compiledQueries: Record<string, CompiledQuery>,
   paramEntries: [string, PgType][],
-  logicBody: string,
+  logicCall: string,
 ): string {
   const paramNames = paramEntries.map(([name]) => name);
 
@@ -684,6 +632,6 @@ ${queryFunctions.join(",\n")}
 ${paramsShim}
 
 // --- User logic ---
-${logicBody}
+return ${logicCall};
 `;
 }

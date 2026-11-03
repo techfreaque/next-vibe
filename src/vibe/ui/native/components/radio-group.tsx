@@ -1,5 +1,4 @@
 import * as RadioGroupPrimitive from "@rn-primitives/radio-group";
-import { styled } from "nativewind";
 import * as React from "react";
 import { View } from "react-native";
 
@@ -9,10 +8,10 @@ import type {
   RadioGroupRootProps,
 } from "../../web/components/radio-group";
 import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { Check } from "./icons/Check";
 
-const StyledView = styled(View, { className: "style" });
+const StyledView = styledNative(View);
 const StyledRadioGroupItem = RadioGroupPrimitive.Item;
 const StyledRadioGroupIndicator = RadioGroupPrimitive.Indicator;
 

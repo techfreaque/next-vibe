@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, type ReactNode, useContext, useRef } from "react";
+import { createContext, type ReactNode, useContext, useState } from "react";
 import { createStore, type StoreApi, useStore } from "zustand";
 
 import type { NavigationStackEntry } from "../../core/definition/endpoint";
@@ -241,14 +241,10 @@ export function NavigationStackProvider({
 }: {
   children: ReactNode;
 }): React.JSX.Element {
-  const storeRef = useRef<NavigationStackStoreInstance>(null!);
-
-  if (!storeRef.current) {
-    storeRef.current = createNavigationStackStore();
-  }
+  const [store] = useState(createNavigationStackStore);
 
   return (
-    <NavigationStackContext.Provider value={storeRef.current}>
+    <NavigationStackContext.Provider value={store}>
       {children}
     </NavigationStackContext.Provider>
   );

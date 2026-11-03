@@ -17,7 +17,7 @@ import type { WidgetContextStoreType } from "next-vibe/unified-ui/_shared/widget
 import type { UseNavigationStackReturn } from "next-vibe/unified-ui/hooks/use-navigation-stack";
 import { NavigationStackProvider } from "next-vibe/unified-ui/hooks/use-navigation-stack";
 import type { JSX, ReactNode } from "react";
-import { useMemo, useRef } from "react";
+import { useMemo } from "react";
 import { create } from "zustand";
 
 const MOCK_CREDITS: ChatBootValue["initialCredits"] = {
@@ -61,8 +61,6 @@ export function MockChatProvider({
 }: {
   children: ReactNode;
 }): JSX.Element {
-  const widgetStoreRef = useRef(MOCK_WIDGET_STORE);
-
   const mockValue = useMemo(
     (): ChatBootValue => ({
       initialCredits: MOCK_CREDITS,
@@ -84,7 +82,7 @@ export function MockChatProvider({
   );
 
   return (
-    <WidgetContextStoreContext.Provider value={widgetStoreRef.current}>
+    <WidgetContextStoreContext.Provider value={MOCK_WIDGET_STORE}>
       <ChatBootContext.Provider value={mockValue}>
         <NavigationStackProvider>
           <ChatNavigationProvider

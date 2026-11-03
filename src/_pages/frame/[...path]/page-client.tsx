@@ -62,6 +62,7 @@ export function VibeFramePageClient({
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const rootRef = useRef<HTMLDivElement>(null);
+  const lastHeightRef = useRef(0);
 
   const bridge = useFrameBridge(frameId);
 
@@ -147,11 +148,11 @@ export function VibeFramePageClient({
       return;
     }
 
-    let lastHeight = 0;
+    lastHeightRef.current = 0;
     const observer = new ResizeObserver((): void => {
       const height = getDocumentScrollHeight();
-      if (height !== lastHeight) {
-        lastHeight = height;
+      if (height !== lastHeightRef.current) {
+        lastHeightRef.current = height;
         bridge.send({ type: "vf:resize", frameId, height });
       }
     });

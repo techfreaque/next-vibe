@@ -155,15 +155,14 @@ const { POST } = createEndpoint({
                 success: true,
                 data: {
                   ...oldData.data,
-                  sections: oldData.data.sections.map(
-                    (section): SkillSection =>
-                      section === targetSection
-                        ? {
-                            ...section,
-                            skills: [newSkill, ...section.skills],
-                            sectionCount: section.skills.length + 1,
-                          }
-                        : section,
+                  sections: oldData.data.sections.map((section): SkillSection =>
+                    section === targetSection
+                      ? {
+                          ...section,
+                          skills: [newSkill, ...section.skills],
+                          sectionCount: section.skills.length + 1,
+                        }
+                      : section,
                   ),
                 },
               };

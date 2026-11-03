@@ -8,7 +8,7 @@ import {
   useParams,
   useRouter as useTanStackRouter,
 } from "@tanstack/react-router";
-import { useMemo, useRef } from "react";
+import { useLayoutEffect, useMemo, useRef } from "react";
 
 /**
  * Get the router instance
@@ -65,7 +65,9 @@ export function useSilentHistory(): {
   const router = useTanStackRouter();
   // Stable refs so the returned object identity is preserved across renders
   const routerRef = useRef(router);
-  routerRef.current = router;
+  useLayoutEffect((): void => {
+    routerRef.current = router;
+  }, [router]);
   return useMemo(
     () => ({
       pushState: (url: string): void => {

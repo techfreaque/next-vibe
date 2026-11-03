@@ -1,6 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 
 import { endpointToUrlSegment } from "../../core/core-utils/path";
 import type { NavigationStackEntry } from "../../core/definition/endpoint";
@@ -161,15 +167,19 @@ export function useUrlNavStack(
   const stackRef = useRef<NavigationStackEntry[]>([]);
 
   const historyRef = useRef(history);
-  historyRef.current = history;
   const buildUrlRef = useRef(buildUrl);
-  buildUrlRef.current = buildUrl;
   const readActiveEntryRef = useRef(readActiveEntry);
-  readActiveEntryRef.current = readActiveEntry;
   const onStackRestoredRef = useRef(onStackRestored);
-  onStackRestoredRef.current = onStackRestored;
   const subscribePopStateRef = useRef(subscribePopState);
-  subscribePopStateRef.current = subscribePopState;
+  // Latest-value refs: synced after commit (layout effects run before the
+  // popstate effect below); read only from handlers and callbacks.
+  useLayoutEffect(() => {
+    historyRef.current = history;
+    buildUrlRef.current = buildUrl;
+    readActiveEntryRef.current = readActiveEntry;
+    onStackRestoredRef.current = onStackRestored;
+    subscribePopStateRef.current = subscribePopState;
+  });
 
   // NOTE: No initial mount restoration here.
   // The help widget's selectedAdminEndpoint already restores the base endpoint

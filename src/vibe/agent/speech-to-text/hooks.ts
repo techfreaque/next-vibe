@@ -12,7 +12,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { downloadBinaryFile } from "next-vibe/ui/lib/download";
 import { getMicrophoneStream, getUserAgent } from "next-vibe/ui/lib/media";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import {
   type ChatT,
@@ -143,6 +143,8 @@ export function useEdenAISpeech({
   const [error, setError] = useState<string | null>(null);
   const [transcript, setTranscript] = useState<string | null>(null);
   const [hasSavedAudio, setHasSavedAudio] = useState(false);
+  // Mirrors streamRef for render consumers (refs must not be read during render)
+  const [activeStream, setActiveStream] = useState<MediaStream | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   // Raw MediaRecorder blobs for the current in-progress chunk
@@ -179,7 +181,9 @@ export function useEdenAISpeech({
     user,
   );
 
-  endpointRef.current = endpoint;
+  useLayoutEffect(() => {
+    endpointRef.current = endpoint;
+  }, [endpoint]);
 
   // Cleanup function
   const cleanup = useCallback((): void => {
@@ -210,6 +214,7 @@ export function useEdenAISpeech({
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track): void => track.stop());
       streamRef.current = null;
+      setActiveStream(null);
     }
 
     // Clear audio chunks
@@ -437,6 +442,7 @@ export function useEdenAISpeech({
         return;
       }
       streamRef.current = stream;
+      setActiveStream(stream);
 
       // Set up AnalyserNode for RMS-based silence detection
       const audioContext = new AudioContext();
@@ -652,6 +658,7 @@ export function useEdenAISpeech({
           if (streamRef.current) {
             streamRef.current.getTracks().forEach((track) => track.stop());
             streamRef.current = null;
+            setActiveStream(null);
           }
           audioChunksRef.current = [];
           mediaRecorderRef.current = null;
@@ -744,7 +751,7 @@ export function useEdenAISpeech({
     togglePause,
     error,
     transcript,
-    stream: streamRef.current,
+    stream: activeStream,
     clearError,
     hasSavedAudio,
     retryTranscription,

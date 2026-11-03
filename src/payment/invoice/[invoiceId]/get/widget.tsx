@@ -26,6 +26,11 @@ import invoiceLineAddDefinitions from "@/payment/invoice/line/add/definition";
 
 import type definition from "./definition";
 
+/** Wall-clock comparison kept outside render so components stay pure. */
+function isInPast(date: Date | string | number): boolean {
+  return new Date(date) < new Date();
+}
+
 function fmt(n: number): string {
   return new Intl.NumberFormat(undefined, {
     minimumFractionDigits: 2,
@@ -96,7 +101,7 @@ export function InvoiceGetWidget({
     data.status === InvoiceStatus.OPEN &&
     data.dueDate !== null &&
     data.dueDate !== undefined &&
-    new Date(data.dueDate) < new Date();
+    isInPast(data.dueDate);
 
   const handleSend = (e: ButtonMouseEvent): void => {
     e.stopPropagation();

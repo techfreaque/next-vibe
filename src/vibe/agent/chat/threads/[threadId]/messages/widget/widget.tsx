@@ -17,13 +17,7 @@ import {
   useWidgetSelector,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 
 import { LAYOUT, useInputHeight } from "@/_pages/chat/lib/config/constants";
 import { buildMessagePath } from "@/_pages/chat/lib/utils/thread-builder";
@@ -82,45 +76,41 @@ function useCliMessages(widgetMessages: ChatMessage[]): ChatMessage[] {
   const rootFolderId = useChatNavigationStore((s) => s.currentRootFolderId);
   const activeThreadId = useChatNavigationStore((s) => s.activeThreadId);
 
-  const poll = useCallback(async () => {
-    if (!activeThreadId) {
-      return;
-    }
-    const { executeQuery } =
-      await import("next-vibe/unified-ui/hooks/query-executor");
-    const response = await executeQuery<typeof messagesDefinition.GET>({
-      endpoint: messagesDefinition.GET,
-      logger,
-      requestData: {
-        rootFolderId,
-      } as (typeof messagesDefinition.GET)["types"]["RequestOutput"],
-      pathParams: {
-        threadId: activeThreadId,
-      } as (typeof messagesDefinition.GET)["types"]["UrlVariablesOutput"],
-      locale,
-      user,
-    });
-    if (response?.success) {
-      setCliMessages(
-        response.data.messages.map((msg) => ({
-          ...msg,
-          createdAt:
-            msg.createdAt instanceof Date
-              ? msg.createdAt
-              : new Date(msg.createdAt),
-          updatedAt:
-            msg.updatedAt instanceof Date
-              ? msg.updatedAt
-              : new Date(msg.updatedAt),
-        })),
-      );
-    }
-  }, [activeThreadId, rootFolderId, logger, locale, user]);
-
   useEffect(() => {
     if (!isCli || !activeThreadId) {
       return;
     }
+    const poll = async (): Promise<void> => {
+      const { executeQuery } =
+        await import("next-vibe/unified-ui/hooks/query-executor");
+      const response = await executeQuery<typeof messagesDefinition.GET>({
+        endpoint: messagesDefinition.GET,
+        logger,
+        requestData: {
+          rootFolderId,
+        } as (typeof messagesDefinition.GET)["types"]["RequestOutput"],
+        pathParams: {
+          threadId: activeThreadId,
+        } as (typeof messagesDefinition.GET)["types"]["UrlVariablesOutput"],
+        locale,
+        user,
+      });
+      if (response?.success) {
+        setCliMessages(
+          response.data.messages.map((msg) => ({
+            ...msg,
+            createdAt:
+              msg.createdAt instanceof Date
+                ? msg.createdAt
+                : new Date(msg.createdAt),
+            updatedAt:
+              msg.updatedAt instanceof Date
+                ? msg.updatedAt
+                : new Date(msg.updatedAt),
+          })),
+        );
+      }
+    };
     // Initial fetch
     void poll();
     const interval = setInterval(() => {
@@ -129,7 +119,7 @@ function useCliMessages(widgetMessages: ChatMessage[]): ChatMessage[] {
     return (): void => {
       clearInterval(interval);
     };
-  }, [isCli, activeThreadId, poll]);
+  }, [isCli, activeThreadId, rootFolderId, logger, locale, user]);
 
   if (!isCli) {
     return widgetMessages;

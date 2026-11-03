@@ -169,7 +169,9 @@ async function importDefaultWithRetry(
 ): Promise<DefinitionDefault> {
   const load = async (): Promise<DefinitionModuleShape> =>
     (await import(
-      /* @vite-ignore */ toImportUrl(absPath)
+      /* webpackIgnore: true */ /* turbopackIgnore: true */ /* @vite-ignore */ toImportUrl(
+        absPath,
+      )
     )) as DefinitionModuleShape;
 
   try {

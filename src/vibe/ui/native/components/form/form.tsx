@@ -1,7 +1,6 @@
 "use client";
 
 import { Slot } from "@radix-ui/react-slot";
-import { styled } from "nativewind";
 import * as React from "react";
 import type { FieldPath, FieldValues } from "react-hook-form";
 import { Controller, FormProvider, useFormContext } from "react-hook-form";
@@ -25,12 +24,13 @@ import type {
 } from "../../../web/components/form/form";
 import { Label } from "../label";
 import { P } from "../typography";
+import { styledNative } from "../../utils/style-converter";
 
 // ============================================================================
 // STYLED COMPONENTS
 // ============================================================================
 
-const StyledView = styled(View, { className: "style" });
+const StyledView = styledNative(View);
 
 // ============================================================================
 // IMPLEMENTATION - Uses imported types, platform-specific components

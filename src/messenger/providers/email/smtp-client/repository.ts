@@ -25,7 +25,6 @@ import type {
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { Transporter } from "nodemailer";
 import { createTransport } from "nodemailer";
-import type { Address } from "nodemailer/lib/mailer";
 import type SMTPTransport from "nodemailer/lib/smtp-transport";
 
 import type { MessengerAccount } from "../../../accounts/db";
@@ -872,12 +871,8 @@ export class SmtpRepository {
         messageId: result.messageId,
         accountId: account.id,
         accountName: account.name,
-        accepted: result.accepted.map((addr: string | Address) =>
-          typeof addr === "string" ? addr : addr.address,
-        ),
-        rejected: result.rejected.map((addr: string | Address) =>
-          typeof addr === "string" ? addr : addr.address,
-        ),
+        accepted: result.accepted,
+        rejected: result.rejected,
         response: result.response,
       });
     } catch (error) {

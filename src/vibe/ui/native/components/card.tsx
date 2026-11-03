@@ -1,4 +1,3 @@
-import { styled } from "nativewind";
 import * as React from "react";
 import { Text as RNText, View } from "react-native";
 
@@ -15,11 +14,12 @@ import { applyStyleType } from "../../web/utils/style-type";
 import {
   convertCSSToTextStyle,
   convertCSSToViewStyle,
+  styledNative,
 } from "../utils/style-converter";
 import { TextClassContext } from "./text";
 
-const StyledView = styled(View, { className: "style" });
-const StyledText = styled(RNText, { className: "style" });
+const StyledView = styledNative(View);
+const StyledText = styledNative(RNText);
 
 function Card({
   className,

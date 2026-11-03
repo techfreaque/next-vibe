@@ -68,10 +68,10 @@ function SetAsDefaultBanner(): JSX.Element | null {
 }
 
 function ReferenceCard({
-  ref: r,
+  reference: r,
   index,
 }: {
-  ref: { title: string; url: string; snippet?: string | null };
+  reference: { title: string; url: string; snippet?: string | null };
   index: number;
 }): JSX.Element {
   let hostname = r.url;
@@ -205,7 +205,7 @@ export function KagiSearchResultsContainer({
             {t("get.response.references.title")}
           </Span>
           {references.map((ref, index) => (
-            <ReferenceCard key={index} ref={ref} index={index} />
+            <ReferenceCard key={index} reference={ref} index={index} />
           ))}
         </Div>
       ) : null}

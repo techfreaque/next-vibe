@@ -1,13 +1,13 @@
-import { styled } from "nativewind";
 import { View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
 import type { WidgetHeaderProps } from "../../web/components/widget-header";
 import { Text } from "./text";
+import { styledNative } from "../utils/style-converter";
 
 export type { WidgetHeaderProps } from "../../web/components/widget-header";
 
-const StyledView = styled(View, { className: "style" });
+const StyledView = styledNative(View);
 
 export function WidgetHeader({
   title,

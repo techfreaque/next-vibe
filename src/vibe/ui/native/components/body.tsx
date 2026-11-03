@@ -12,9 +12,7 @@ import { convertCSSToViewStyle } from "../utils/style-converter";
 
 const StyledSafeAreaView: React.ComponentType<
   SafeAreaViewProps & { className?: string }
-> =
-  // @ts-expect-error: union too complex for TS
-  styled(SafeAreaView, { className: "style" });
+> = styled(SafeAreaView, { className: "style" });
 
 export function Body({
   children,

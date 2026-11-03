@@ -166,15 +166,19 @@ const FILTER_PARAM_KEYS = new Set([
 // is mounted inside another HelpToolsWidget's EndpointsPage.
 const HelpAdminLayoutActiveContext = createContext(false);
 
-function renderFolderCell(
-  icon: IconKey,
-  label: string,
-  count: number,
-  onClick: () => void,
-): JSX.Element {
+function FolderCell({
+  icon,
+  label,
+  count,
+  onClick,
+}: {
+  icon: IconKey;
+  label: string;
+  count: number;
+  onClick: () => void;
+}): JSX.Element {
   return (
     <Button
-      key={label}
       type="button"
       variant="ghost"
       size="unset"
@@ -223,49 +227,88 @@ function _getOrCreateSidebarEntry(storageId: string): {
   return entry;
 }
 
+/**
+ * Subscribe to a sidebar entry. Loads the persisted value once per storageId.
+ * Returns the unsubscribe function.
+ */
+function _subscribeSidebarEntry(
+  storageId: string,
+  listener: (v: boolean) => void,
+  logger: ReturnType<typeof useLogger>,
+): () => void {
+  const entry = _getOrCreateSidebarEntry(storageId);
+  entry.listeners.add(listener);
+  if (!entry.initialized) {
+    entry.initialized = true;
+    void storage.getItem(storageId).then((stored) => {
+      const v =
+        stored !== null
+          ? (JSON.parse(stored) as boolean)
+          : getScreenWidth(logger) < 930;
+      entry.collapsed = v;
+      for (const l of entry.listeners) {
+        l(v);
+      }
+      return undefined;
+    });
+  }
+  return (): void => {
+    entry.listeners.delete(listener);
+  };
+}
+
+/** Write a sidebar entry's collapsed value, persist it, and notify listeners. */
+function _setSidebarEntryCollapsed(storageId: string, value: boolean): void {
+  const entry = _getOrCreateSidebarEntry(storageId);
+  entry.collapsed = value;
+  void storage.setItem(storageId, JSON.stringify(value));
+  for (const l of entry.listeners) {
+    l(value);
+  }
+}
+
 function useSidebarCollapsed(
   storageId: string,
 ): [boolean, (collapsed: boolean) => void] {
-  const entry = _getOrCreateSidebarEntry(storageId);
-  const [collapsed, setLocalCollapsed] = useState(entry.collapsed);
+  const [collapsed, setLocalCollapsed] = useState(
+    () => _getOrCreateSidebarEntry(storageId).collapsed,
+  );
   const logger = useLogger();
 
-  useEffect(() => {
-    const listener = (v: boolean): void => setLocalCollapsed(v);
-    entry.listeners.add(listener);
-    if (!entry.initialized) {
-      entry.initialized = true;
-      void storage.getItem(storageId).then((stored) => {
-        const v =
-          stored !== null
-            ? (JSON.parse(stored) as boolean)
-            : getScreenWidth(logger) < 930;
-        entry.collapsed = v;
-        for (const l of entry.listeners) {
-          l(v);
-        }
-        return undefined;
-      });
-    }
-    return (): void => {
-      entry.listeners.delete(listener);
-    };
-  }, [storageId, entry, logger]);
+  useEffect(
+    () =>
+      _subscribeSidebarEntry(
+        storageId,
+        (v: boolean): void => setLocalCollapsed(v),
+        logger,
+      ),
+    [storageId, logger],
+  );
 
   const setCollapsed = useCallback(
     (value: boolean): void => {
       setLocalCollapsed(value);
-      // eslint-disable-next-line react-compiler/react-compiler -- intentional mutation of module-level store object
-      entry.collapsed = value;
-      void storage.setItem(storageId, JSON.stringify(value));
-      for (const l of entry.listeners) {
-        l(value);
-      }
+      _setSidebarEntryCollapsed(storageId, value);
     },
-    [storageId, entry],
+    [storageId],
   );
 
   return [collapsed, setCollapsed];
+}
+
+/** Admin sidebar path ([cat] or [cat, sub]) encoded in the URL search params. */
+function parseSidebarPathFromSearch(search: {
+  get: (key: string) => string | null;
+}): string[] {
+  const cat = search.get("cat");
+  const sub = search.get("sub");
+  if (cat && sub) {
+    return [cat, sub];
+  }
+  if (cat) {
+    return [cat];
+  }
+  return [];
 }
 
 // ─── Label helpers ──────────────────────────────────────────────────────────
@@ -362,9 +405,12 @@ export function HelpToolsWidget(): JSX.Element {
 
   // Stable refs so callbacks always read current values without re-creating
   const pathnameRef = useRef(pathname);
-  pathnameRef.current = pathname;
   const searchParamsRef = useRef(searchParams);
-  searchParamsRef.current = searchParams;
+  // Declared before the mount effect below so the refs are current when it runs
+  useEffect(() => {
+    pathnameRef.current = pathname;
+    searchParamsRef.current = searchParams;
+  });
 
   // Track the effective current pathname + search across silent pushState/replaceState calls.
   // usePathname() / useSearchParams() only reflect router-aware navigations, not silent writes.
@@ -390,17 +436,16 @@ export function HelpToolsWidget(): JSX.Element {
     [silentHistory],
   );
 
-  const parseAdminSidebarPath = useCallback((): string[] => {
-    const cat = effectiveSearchRef.current.get("cat");
-    const sub = effectiveSearchRef.current.get("sub");
-    if (cat && sub) {
-      return [cat, sub];
-    }
-    if (cat) {
-      return [cat];
-    }
-    return [];
-  }, []);
+  const parseAdminSidebarPath = useCallback(
+    (): string[] => parseSidebarPathFromSearch(effectiveSearchRef.current),
+    [],
+  );
+
+  // Admin launcher sidebar navigation: path of [catKey] or [catKey, subKey]
+  // Initialized from URL search params so state survives reload and back/forward.
+  const [sidebarPath, setSidebarPathRaw] = useState<string[]>(() =>
+    isAdminLayout ? parseSidebarPathFromSearch(searchParams) : [],
+  );
 
   // Ref so the mount effect (below) can access urlNavStack which is declared later.
   const urlNavStackRef = useRef<ReturnType<typeof useUrlNavStack>>(undefined);
@@ -585,7 +630,9 @@ export function HelpToolsWidget(): JSX.Element {
       [parseAdminSidebarPath, setSelectedAdminEndpoint],
     ),
   });
-  urlNavStackRef.current = urlNavStack;
+  useEffect(() => {
+    urlNavStackRef.current = urlNavStack;
+  });
 
   // selectedAdminEndpoint is ONLY changed by:
   //   1. handleOpenTool (sidebar click → sets base endpoint, clears nav stack)
@@ -833,12 +880,6 @@ export function HelpToolsWidget(): JSX.Element {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
     new Set(),
   );
-  // Admin launcher sidebar navigation: path of [catKey] or [catKey, subKey]
-  // Initialized from URL search params so state survives reload and back/forward.
-  const [sidebarPath, setSidebarPathRaw] = useState<string[]>(() =>
-    isAdminLayout ? parseAdminSidebarPath() : [],
-  );
-
   // Stable refs for functions declared later — allows setSidebarPath to call them
   // without a forward-declaration error (all are assigned before any render call).
   const syncFilterParamsToUrlRef = useRef<
@@ -917,9 +958,10 @@ export function HelpToolsWidget(): JSX.Element {
 
   // Track whether there's ever been a successful response — used to distinguish
   // "first load" (show nothing) from "refetch in progress" (show stale + overlay).
-  const hasLoadedOnce = useRef(false);
-  if (response) {
-    hasLoadedOnce.current = true;
+  // Adjust-state-during-render: flips once, never back.
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+  if (response && !hasLoadedOnce) {
+    setHasLoadedOnce(true);
   }
 
   // Admin context from response
@@ -1161,45 +1203,39 @@ export function HelpToolsWidget(): JSX.Element {
 
   // Stable counts that don't reset to 0 while a refetch is in progress.
   // Updated only when a settled (non-fetching) response arrives.
-  const [stablePinnedCount, setStablePinnedCount] = useState<
-    number | undefined
-  >(undefined);
-  const [stableAllowedCount, setStableAllowedCount] = useState<
-    number | undefined
-  >(undefined);
-  const [stableCliAllowedCount, setStableCliAllowedCount] = useState<
-    number | undefined
-  >(undefined);
-  const [stableMcpPinnedCount, setStableMcpPinnedCount] = useState<
-    number | undefined
-  >(undefined);
-  const [stableMcpAllowedCount, setStableMcpAllowedCount] = useState<
-    number | undefined
-  >(undefined);
-  const [stableTotalCount, setStableTotalCount] = useState(0);
-  const [stableAiToolIds, setStableAiToolIds] = useState<string[]>([]);
-
-  useEffect(() => {
-    if (!isFetching && response) {
-      setStablePinnedCount(serverPinnedCount);
-      setStableAllowedCount(serverAllowedCount);
-      setStableCliAllowedCount(serverCliAllowedCount);
-      setStableMcpPinnedCount(serverMcpPinnedCount);
-      setStableMcpAllowedCount(serverMcpAllowedCount);
-      setStableTotalCount(totalCount);
-      setStableAiToolIds(allAiToolIds);
-    }
-  }, [
-    isFetching,
-    response,
-    serverPinnedCount,
-    serverAllowedCount,
-    serverCliAllowedCount,
-    serverMcpPinnedCount,
-    serverMcpAllowedCount,
-    totalCount,
-    allAiToolIds,
-  ]);
+  // Remember the last settled response (adjust-state-during-render pattern);
+  // while settled, the live values are used directly.
+  const isSettled = !isFetching && !!response;
+  const [lastSettledResponse, setLastSettledResponse] = useState<
+    typeof response | null
+  >(null);
+  if (isSettled && lastSettledResponse !== response) {
+    setLastSettledResponse(response);
+  }
+  const settledResponse = isSettled ? response : lastSettledResponse;
+  const stablePinnedCount = isSettled
+    ? serverPinnedCount
+    : settledResponse?.pinnedCount;
+  const stableAllowedCount = isSettled
+    ? serverAllowedCount
+    : settledResponse?.allowedCount;
+  const stableCliAllowedCount = isSettled
+    ? serverCliAllowedCount
+    : settledResponse?.cliAllowedCount;
+  const stableMcpPinnedCount = isSettled
+    ? serverMcpPinnedCount
+    : settledResponse?.mcpPinnedCount;
+  const stableMcpAllowedCount = isSettled
+    ? serverMcpAllowedCount
+    : settledResponse?.mcpAllowedCount;
+  const stableTotalCount = isSettled
+    ? totalCount
+    : (settledResponse?.totalCount ?? 0);
+  const settledAiToolIds = settledResponse?.allAiToolIds;
+  const stableAiToolIds: string[] = useMemo(
+    () => settledAiToolIds ?? [],
+    [settledAiToolIds],
+  );
 
   const stats = useMemo(() => {
     // Counts must cover ALL tools, not just the current filtered subset.
@@ -1590,12 +1626,15 @@ export function HelpToolsWidget(): JSX.Element {
       locale,
       navigate,
       setSelectedAdminEndpoint,
+      setVibeFrame,
       writeSilentUrl,
       urlNavStack,
     ],
   );
 
-  handleOpenToolRef.current = handleOpenTool;
+  useEffect(() => {
+    handleOpenToolRef.current = handleOpenTool;
+  });
 
   // ── Admin navigation stack override ─────────────────────────────────────────
   // urlNavStack (from useUrlNavStack) is passed directly as navigationOverride
@@ -1609,7 +1648,9 @@ export function HelpToolsWidget(): JSX.Element {
       endpointMutations?.read?.refetch?.();
     }
   }, [onSubmit, endpointMutations]);
-  triggerRefetchRef.current = triggerRefetch;
+  useEffect(() => {
+    triggerRefetchRef.current = triggerRefetch;
+  });
 
   // Write filter params to URL using the effective pathname (tracks silent pushes).
   // Called after any filter change so URL always reflects current state.
@@ -1660,7 +1701,9 @@ export function HelpToolsWidget(): JSX.Element {
     },
     [form, isAdminLayout, writeSilentUrl],
   );
-  syncFilterParamsToUrlRef.current = syncFilterParamsToUrl;
+  useEffect(() => {
+    syncFilterParamsToUrlRef.current = syncFilterParamsToUrl;
+  });
 
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const setSearchQuery = useCallback(
@@ -2164,7 +2207,7 @@ export function HelpToolsWidget(): JSX.Element {
       </Div>
     );
 
-    const isLoadingTransition = isFetching && hasLoadedOnce.current;
+    const isLoadingTransition = isFetching && hasLoadedOnce;
 
     const toolListSidebar = (
       <Div className="flex flex-col h-full overflow-hidden pt-14 relative">
@@ -2652,19 +2695,24 @@ export function HelpToolsWidget(): JSX.Element {
                           gap: 4,
                         }}
                       >
-                        {entries.map(({ catDef, count }) =>
-                          renderFolderCell(
-                            catDef.icon,
-                            catDef.labels[locale] ?? catDef.label,
-                            count,
-                            () =>
-                              setSidebarPath(
-                                [catDef.key],
-                                catDef.key,
-                                catDef.defaultEntryAlias,
-                              ),
-                          ),
-                        )}
+                        {entries.map(({ catDef, count }) => {
+                          const label = catDef.labels[locale] ?? catDef.label;
+                          return (
+                            <FolderCell
+                              key={label}
+                              icon={catDef.icon}
+                              label={label}
+                              count={count}
+                              onClick={() =>
+                                setSidebarPath(
+                                  [catDef.key],
+                                  catDef.key,
+                                  catDef.defaultEntryAlias,
+                                )
+                              }
+                            />
+                          );
+                        })}
                       </Div>
                     </Div>
                   ))}

@@ -211,6 +211,17 @@ export async function createAndSendUserMessage(
         optimisticUserMessage,
       );
 
+      // Incognito lives only in this browser: save the user message now rather
+      // than relying on the server's USER MESSAGE_CREATED echo. That echo is the
+      // stream's first event, so a page still subscribing to a new thread could
+      // miss it - the reply then persisted without its prompt, gone on reload.
+      // The echo still overwrites this row (same id). Voice input waits for its
+      // transcription, which arrives through the echo.
+      if (currentRootFolderId === DefaultFolderId.INCOGNITO && !audioInput) {
+        const { saveMessage } = await import("../../../chat/incognito/storage");
+        await saveMessage(optimisticUserMessage);
+      }
+
       // Immediately switch the visible branch to the new message.
       // The auto-switch in useBranchManagement only fires when parentId === currentLeaf,
       // which doesn't hold for retry/branch (they use the grandparent as parentId).

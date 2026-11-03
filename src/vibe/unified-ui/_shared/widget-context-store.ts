@@ -17,7 +17,8 @@ import type { ReactWidgetContext } from "./react-types";
 export interface WidgetContextStore<
   TEndpoint extends CreateApiEndpointAny,
   TContext extends ReactWidgetContext<TEndpoint> | InkWidgetContext<TEndpoint> =
-    ReactWidgetContext<TEndpoint> | InkWidgetContext<TEndpoint>,
+    | ReactWidgetContext<TEndpoint>
+    | InkWidgetContext<TEndpoint>,
 > {
   context: TContext;
   setContext: (context: TContext) => void;
@@ -29,7 +30,8 @@ export interface WidgetContextStore<
 export type WidgetContextStoreType<
   TEndpoint extends CreateApiEndpointAny,
   TContext extends ReactWidgetContext<TEndpoint> | InkWidgetContext<TEndpoint> =
-    ReactWidgetContext<TEndpoint> | InkWidgetContext<TEndpoint>,
+    | ReactWidgetContext<TEndpoint>
+    | InkWidgetContext<TEndpoint>,
 > = UseBoundStore<StoreApi<WidgetContextStore<TEndpoint, TContext>>>;
 
 /**

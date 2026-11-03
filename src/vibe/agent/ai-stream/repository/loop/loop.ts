@@ -34,6 +34,7 @@ import {
   streamText as aiStreamText,
 } from "ai";
 import type { WidgetData } from "next-vibe/core/utils/json";
+import { WidgetDataSchema } from "next-vibe/core/utils/json";
 
 import { calculateCreditCost } from "../../../models/models";
 import {
@@ -483,7 +484,10 @@ export class StreamLoop implements StreamLoopState {
           type: "tool-call",
           toolCallId: effectiveToolCallId,
           toolName: part.toolName,
-          input: "input" in part ? (part.input as JSONValue) : undefined,
+          input:
+            "input" in part
+              ? WidgetDataSchema.safeParse(part.input).data
+              : undefined,
         });
         ctx.currentAssistantMessageId = result.currentAssistantMessageId;
         ctx.currentAssistantContent = result.currentAssistantContent;

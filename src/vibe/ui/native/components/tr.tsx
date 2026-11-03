@@ -1,13 +1,12 @@
-import { styled } from "nativewind";
 import * as React from "react";
 import { View } from "react-native";
 
 import type { TrProps } from "../../web/components/tr";
 import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 
 // Type-safe View with className support (NativeWind)
-const StyledView = styled(View);
+const StyledView = styledNative(View);
 
 /**
  * Platform-agnostic Tr component for native

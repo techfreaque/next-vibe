@@ -70,6 +70,28 @@ function sendToServer(msg: WsClientMessage): void {
   }
 }
 
+function handleOpen(): void {
+  reconnectAttempts = 0;
+  // Re-subscribe to all active channels after reconnect.
+  for (const [channel, state] of channels.entries()) {
+    sendToServer({
+      type: "subscribe",
+      channel,
+      locale: state.locale,
+      descriptor: state.descriptor,
+    });
+  }
+}
+
+function dispatch(msg: WsWireMessage): void {
+  const handlers = channels.get(msg.channel)?.listeners.get(msg.event);
+  if (handlers) {
+    for (const handler of handlers) {
+      handler(msg.data);
+    }
+  }
+}
+
 // The connection is shared across channels, but a logger is REQUIRED to open it.
 // It is threaded from the subscribe/preWarm caller's EndpointLogger and captured
 // in the socket's handlers (and the reconnect closure) so connection-level events
@@ -91,28 +113,6 @@ function connect(logger: EndpointLogger): void {
 
   const ws = new WebSocket(url);
   sharedWs = ws;
-
-  const handleOpen = (): void => {
-    reconnectAttempts = 0;
-    // Re-subscribe to all active channels after reconnect.
-    for (const [channel, state] of channels.entries()) {
-      sendToServer({
-        type: "subscribe",
-        channel,
-        locale: state.locale,
-        descriptor: state.descriptor,
-      });
-    }
-  };
-
-  function dispatch(msg: WsWireMessage): void {
-    const handlers = channels.get(msg.channel)?.listeners.get(msg.event);
-    if (handlers) {
-      for (const handler of handlers) {
-        handler(msg.data);
-      }
-    }
-  }
 
   const handleMessage = (event: MessageEvent): void => {
     if (typeof event.data !== "string") {

@@ -11,7 +11,7 @@ import { Span } from "next-vibe/ui/components/span";
 import { useWindowSize } from "next-vibe/ui/hooks/use-window-size";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
-import { useCallback, useLayoutEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 import {
   format4chanTimestamp,
@@ -46,22 +46,21 @@ export function UserIdHoverCard({
   const postCount = userPosts.length;
   const idColor = getIdColor(userId);
 
-  const [el, setEl] = useState<DivRefObject | null>(null);
+  // Measure the card once it is attached; position is derived during render
+  const [width, setWidth] = useState<number | null>(null);
   const refCallback = useCallback((node: DivRefObject | null) => {
-    setEl(node);
-  }, []);
-  const [clampedLeft, setClampedLeft] = useState<number>(position.x);
-  const { width: vw } = useWindowSize();
-
-  useLayoutEffect(() => {
-    if (!el) {
+    if (!node) {
       return;
     }
-    const { width } = el.getBoundingClientRect();
-    // Align left edge to anchor, then clamp so it stays within viewport
-    const left = Math.max(8, Math.min(position.x - width / 2, vw - width - 8));
-    setClampedLeft(left);
-  }, [el, position.x, position.y, vw]);
+    setWidth(node.getBoundingClientRect().width);
+  }, []);
+  const { width: vw } = useWindowSize();
+
+  // Align left edge to anchor, then clamp so it stays within viewport
+  const clampedLeft =
+    width === null
+      ? position.x
+      : Math.max(8, Math.min(position.x - width / 2, vw - width - 8));
 
   return (
     <Div

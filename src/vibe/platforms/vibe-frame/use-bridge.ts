@@ -20,8 +20,6 @@ import { BRIDGE_PREFIX } from "./types";
 interface UseFrameBridgeReturn {
   /** Send a typed message to the parent frame */
   send: (message: FrameToParentMessage) => void;
-  /** Whether the bridge has been initialized */
-  ready: boolean;
   /** Last received parent message */
   lastMessage: ParentToFrameMessage | null;
 }
@@ -34,12 +32,15 @@ export function useFrameBridge(
   frameId: string,
   onMessage?: (message: ParentToFrameMessage) => void,
 ): UseFrameBridgeReturn {
-  const [ready, setReady] = useState(false);
   const [lastMessage, setLastMessage] = useState<ParentToFrameMessage | null>(
     null,
   );
   const onMessageRef = useRef(onMessage);
-  onMessageRef.current = onMessage;
+
+  // Keep the ref pointing at the latest handler without re-subscribing
+  useEffect(() => {
+    onMessageRef.current = onMessage;
+  });
 
   const send = useCallback((message: FrameToParentMessage): void => {
     parent.postMessage(message, "*");
@@ -68,7 +69,6 @@ export function useFrameBridge(
     }
 
     const cleanup = addWindowListener("message", handleMessage);
-    setReady(true);
 
     // Notify parent that we're ready
     send({ type: "vf:ready", frameId });
@@ -76,5 +76,5 @@ export function useFrameBridge(
     return cleanup;
   }, [frameId, send]);
 
-  return { send, ready, lastMessage };
+  return { send, lastMessage };
 }

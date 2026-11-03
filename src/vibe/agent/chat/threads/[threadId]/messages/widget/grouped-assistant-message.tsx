@@ -463,28 +463,21 @@ const MessagesList = memo(function MessagesList({
   // Track if we've already submitted to prevent double submission
   const hasSubmittedRef = useRef(false);
 
-  // Initialize/update batch decisions when tools arrive.
-  // Re-runs whenever the tool list changes so that tools arriving after the
+  // Initialize/update batch decisions when tools arrive (adjusted during render).
+  // Runs whenever the tool list changes so that tools arriving after the
   // first one (sequential streaming) are also added to the batch map.
-  useEffect(() => {
-    if (toolsWaitingForConfirmation.length === 0) {
-      return;
+  const hasNewTools = toolsWaitingForConfirmation.some(
+    (tool) => !batchDecisions.has(tool.messageId),
+  );
+  if (hasNewTools) {
+    const next = new Map(batchDecisions);
+    for (const tool of toolsWaitingForConfirmation) {
+      if (!next.has(tool.messageId)) {
+        next.set(tool.messageId, { type: "pending" });
+      }
     }
-    const hasNewTools = toolsWaitingForConfirmation.some(
-      (tool) => !batchDecisions.has(tool.messageId),
-    );
-    if (hasNewTools) {
-      setBatchDecisions((prev) => {
-        const next = new Map(prev);
-        for (const tool of toolsWaitingForConfirmation) {
-          if (!next.has(tool.messageId)) {
-            next.set(tool.messageId, { type: "pending" });
-          }
-        }
-        return next;
-      });
-    }
-  }, [toolsWaitingForConfirmation, batchDecisions]);
+    setBatchDecisions(next);
+  }
 
   // Batch confirmation handlers
   const handleBatchConfirm = useCallback(
@@ -501,18 +494,15 @@ const MessagesList = memo(function MessagesList({
         }
       }
 
-      let newDecisions: Map<string, ToolDecision>;
-      setBatchDecisions((prev) => {
-        newDecisions = new Map(prev);
-        newDecisions.set(messageId, {
-          type: "confirmed",
-          updatedArgs: argsRecord,
-        });
-        return newDecisions;
+      const newDecisions = new Map(batchDecisions);
+      newDecisions.set(messageId, {
+        type: "confirmed",
+        updatedArgs: argsRecord,
       });
+      setBatchDecisions(newDecisions);
 
       const allDecided = toolsWaitingForConfirmation.every((tool) => {
-        const decision = newDecisions!.get(tool.messageId);
+        const decision = newDecisions.get(tool.messageId);
         return decision && decision.type !== "pending";
       });
 
@@ -525,7 +515,7 @@ const MessagesList = memo(function MessagesList({
 
         const toolConfirmations = toolsWaitingForConfirmation
           .map((tool) => {
-            const decision = newDecisions!.get(tool.messageId);
+            const decision = newDecisions.get(tool.messageId);
             if (!decision || decision.type === "pending") {
               return null;
             }
@@ -559,6 +549,7 @@ const MessagesList = memo(function MessagesList({
       }
     },
     [
+      batchDecisions,
       hasToolWaitingForConfirmation,
       toolsWaitingForConfirmation,
       sendMessage,
@@ -568,15 +559,12 @@ const MessagesList = memo(function MessagesList({
 
   const handleBatchCancel = useCallback(
     (messageId: string) => {
-      let newDecisions: Map<string, ToolDecision>;
-      setBatchDecisions((prev) => {
-        newDecisions = new Map(prev);
-        newDecisions.set(messageId, { type: "declined" });
-        return newDecisions;
-      });
+      const newDecisions = new Map(batchDecisions);
+      newDecisions.set(messageId, { type: "declined" });
+      setBatchDecisions(newDecisions);
 
       const allDecided = toolsWaitingForConfirmation.every((tool) => {
-        const decision = newDecisions!.get(tool.messageId);
+        const decision = newDecisions.get(tool.messageId);
         return decision && decision.type !== "pending";
       });
 
@@ -589,7 +577,7 @@ const MessagesList = memo(function MessagesList({
 
         const toolConfirmations = toolsWaitingForConfirmation
           .map((tool) => {
-            const decision = newDecisions!.get(tool.messageId);
+            const decision = newDecisions.get(tool.messageId);
             if (!decision || decision.type === "pending") {
               return null;
             }
@@ -617,6 +605,7 @@ const MessagesList = memo(function MessagesList({
       }
     },
     [
+      batchDecisions,
       hasToolWaitingForConfirmation,
       toolsWaitingForConfirmation,
       sendMessage,

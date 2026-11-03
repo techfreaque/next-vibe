@@ -12,7 +12,6 @@ import {
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
-import { useCallback, useRef } from "react";
 
 import type endpoints from "./definition";
 import type { CapturesListResponseOutput } from "./definition";
@@ -56,12 +55,10 @@ export function LeadMagnetCapturesWidget(): JSX.Element {
   const t = useWidgetTranslation<typeof endpoints.GET>();
   const data = useWidgetValue<typeof endpoints.GET>();
   const items = data?.items ?? [];
-  const itemsRef = useRef(items);
-  itemsRef.current = items;
 
-  const handleExport = useCallback((): void => {
-    downloadCsv(itemsRef.current);
-  }, []);
+  const handleExport = (): void => {
+    downloadCsv(items);
+  };
 
   if (items.length === 0) {
     return (

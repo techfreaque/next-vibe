@@ -106,8 +106,10 @@ export function Popover({
   open: controlledOpen,
   onOpenChange,
 }: PopoverRootProps): React.JSX.Element | null {
-  const idRef = useRef(`popover-${(popoverIdCounter++).toString()}`);
-  const triggerFocusIdRef = useRef(idRef.current);
+  const [triggerId] = useState(
+    () => `popover-${(popoverIdCounter++).toString()}`,
+  );
+  const triggerFocusIdRef = useRef(triggerId);
   const [internalOpen, setInternalOpen] = useState(false);
 
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
@@ -131,7 +133,7 @@ export function Popover({
       value={{
         open,
         setOpen,
-        triggerId: idRef.current,
+        triggerId,
         getTriggerFocusId: (): string => triggerFocusIdRef.current,
         setTriggerFocusId: (id: string): void => {
           triggerFocusIdRef.current = id;
@@ -170,21 +172,24 @@ function PopoverTriggerAsChild({
     [setTriggerFocusId],
   );
 
-  const toggleRef = useRef({
-    toggle: toggleFn,
-    registerFocusId: registerFocusIdFn,
-  });
+  const toggleFnRef = useRef(toggleFn);
+  const registerFocusIdFnRef = useRef(registerFocusIdFn);
   useEffect(() => {
-    toggleRef.current.toggle = toggleFn;
-    toggleRef.current.registerFocusId = registerFocusIdFn;
+    toggleFnRef.current = toggleFn;
+    registerFocusIdFnRef.current = registerFocusIdFn;
   });
+  // Stable context value that always forwards to the latest callbacks
+  const [triggerContext] = useState((): PopoverTriggerContextType => ({
+    toggle: (): void => toggleFnRef.current(),
+    registerFocusId: (id: string): void => registerFocusIdFnRef.current(id),
+  }));
 
   if (isMcp) {
     return null;
   }
 
   return (
-    <PopoverTriggerContext.Provider value={toggleRef.current}>
+    <PopoverTriggerContext.Provider value={triggerContext}>
       {children}
     </PopoverTriggerContext.Provider>
   );
@@ -272,16 +277,18 @@ function PopoverCloseButton({
 }: {
   onClose: () => void;
 }): React.JSX.Element {
-  const idRef = useRef(`pop-close-${(popoverCloseIdCounter++).toString()}`);
+  const [focusId] = useState(
+    () => `pop-close-${(popoverCloseIdCounter++).toString()}`,
+  );
   const { isRawModeSupported } = useStdin();
   const isMcp = useIsMcp();
 
   const { isFocused } = useFocus({
-    id: idRef.current,
+    id: focusId,
     autoFocus: false,
   });
 
-  useFocusScopeRegister(idRef.current);
+  useFocusScopeRegister(focusId);
 
   useInput(
     (_input, key) => {

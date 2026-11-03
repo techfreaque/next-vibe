@@ -287,15 +287,21 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
     }
   }, [effectiveResult, isSubmitting]);
 
-  const userMsgIdRef = useRef<string>(makeMsgId());
-  const assistantMsgIdRef = useRef<string>(makeMsgId());
-
-  const prevPromptRef = useRef(promptValue);
-  if (promptValue !== prevPromptRef.current && !result && !isSubmitting) {
-    prevPromptRef.current = promptValue;
-    userMsgIdRef.current = makeMsgId();
-    assistantMsgIdRef.current = makeMsgId();
+  // Fresh message ids whenever the prompt is edited (adjusted during render)
+  const [msgIds, setMsgIds] = useState(() => ({
+    prompt: promptValue,
+    user: makeMsgId(),
+    assistant: makeMsgId(),
+  }));
+  if (promptValue !== msgIds.prompt && !result && !isSubmitting) {
+    setMsgIds({
+      prompt: promptValue,
+      user: makeMsgId(),
+      assistant: makeMsgId(),
+    });
   }
+  const userMsgId = msgIds.user;
+  const assistantMsgId = msgIds.assistant;
 
   const handleContentChange = useCallback(
     (val: string) => form.setValue("prompt", val, { shouldDirty: true }),
@@ -342,8 +348,8 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
   });
 
   const userMessage = useMemo(
-    () => makeUserMessage(promptValue, userMsgIdRef.current),
-    [promptValue],
+    () => makeUserMessage(promptValue, userMsgId),
+    [promptValue, userMsgId],
   );
 
   const assistantContent = useMemo(() => {
@@ -370,11 +376,11 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
     () =>
       makeAssistantMessage(
         assistantContent,
-        assistantMsgIdRef.current,
+        assistantMsgId,
         isAssistantLoading,
         PROVIDER_TO_MODEL[providerValue] ?? ChatModelId.CLAUDE_CODE_SONNET,
       ),
-    [assistantContent, isAssistantLoading, providerValue],
+    [assistantContent, assistantMsgId, isAssistantLoading, providerValue],
   );
 
   const assistantGroup = useMemo(

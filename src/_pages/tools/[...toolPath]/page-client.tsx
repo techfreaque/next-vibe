@@ -15,7 +15,7 @@ import { useSearchParams } from "next-vibe/ui/hooks/use-navigation";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
-import { useRef } from "react";
+import { useState } from "react";
 
 function parseInitialState(
   searchParams: ReturnType<typeof useSearchParams>,
@@ -109,24 +109,20 @@ export function ToolDetailPageClient({
       queryOptions: { staleTime: number; refetchOnWindowFocus: boolean };
     };
   }
-  const endpointOptionsRef = useRef<EndpointOptions | null>(null);
-  if (endpointOptionsRef.current === null) {
-    const initialState = parseInitialState(searchParams);
-    // SSR initialData was always fetched by toolName (single-tool response) —
-    // wrong shape for the sidebar which needs all tools in the category or webPinned
-    // set. Never seed it; let the client fetch the correct list.
-    endpointOptionsRef.current = {
-      read: {
-        initialState,
-        initialData: undefined,
-        queryOptions: {
-          staleTime: 60 * 1000,
-          refetchOnWindowFocus: false,
-        },
+  // Computed once on mount - stable across re-renders.
+  // SSR initialData was always fetched by toolName (single-tool response) —
+  // wrong shape for the sidebar which needs all tools in the category or webPinned
+  // set. Never seed it; let the client fetch the correct list.
+  const [endpointOptions] = useState<EndpointOptions>(() => ({
+    read: {
+      initialState: parseInitialState(searchParams),
+      initialData: undefined,
+      queryOptions: {
+        staleTime: 60 * 1000,
+        refetchOnWindowFocus: false,
       },
-    };
-  }
-  const endpointOptions = endpointOptionsRef.current;
+    },
+  }));
 
   const endpointInstance = useEndpoint(
     helpDefinitions,

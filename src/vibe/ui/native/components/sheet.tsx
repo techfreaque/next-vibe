@@ -1,6 +1,5 @@
 import * as DialogPrimitive from "@rn-primitives/dialog";
 import { cva } from "class-variance-authority";
-import { styled } from "nativewind";
 import * as React from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import Animated, {
@@ -16,10 +15,10 @@ import Animated, {
 
 import { cn } from "../../../unified-ui/_shared/cn";
 import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { X } from "./icons/X";
 
-const StyledView = styled(View, { className: "style" });
+const StyledView = styledNative(View);
 
 import type {
   SheetCloseProps,

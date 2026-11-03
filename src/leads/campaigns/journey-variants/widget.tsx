@@ -92,17 +92,18 @@ export function JourneyVariantsWidget(): React.JSX.Element {
   );
 
   // Save all edits via PATCH
+  const updateMutation = endpointMutations?.update;
   const handleSave = useCallback(async () => {
-    if (!endpointMutations?.update || edits.size === 0) {
+    if (!updateMutation || edits.size === 0) {
       return;
     }
     setIsSaving(true);
     for (const [id, changes] of edits) {
-      await endpointMutations.update.submit({ id, ...changes });
+      await updateMutation.submit({ id, ...changes });
     }
     setEdits(new Map());
     setIsSaving(false);
-  }, [edits, endpointMutations?.update]);
+  }, [edits, updateMutation]);
 
   // Compute active weights for distribution bar
   const activeItems = items.filter((item) => getEffective(item, "active"));

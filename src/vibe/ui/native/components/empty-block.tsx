@@ -1,4 +1,3 @@
-import { styled } from "nativewind";
 import { Pressable, View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
@@ -11,7 +10,7 @@ export type {
   EmptyBlockProps,
 } from "../../web/components/empty-block";
 
-const StyledView = styled(View, { className: "style" });
+const StyledView = styledNative(View);
 const StyledPressable = styledNative(Pressable);
 
 export function EmptyBlock({

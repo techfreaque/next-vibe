@@ -22,6 +22,26 @@ const IconLoadingFallback: React.FC<{ className?: string }> = ({
   className,
 }) => <Span className={cn("inline-block w-4 h-4", className)} />;
 
+/** Shown when the library has no export for the registered component name */
+const MissingIconFallback: IconComponent = ({
+  className: cls,
+}: {
+  className?: string;
+}): JSX.Element => (
+  /* oxlint-disable-next-line i18n/no-literal-string -- Fallback indicator */
+  <Span className={cls}>??</Span>
+);
+
+/** Shown when loading the icon library fails */
+const ErrorIconFallback: IconComponent = ({
+  className: cls,
+}: {
+  className?: string;
+}): JSX.Element => (
+  /* oxlint-disable-next-line i18n/no-literal-string -- Error indicator */
+  <Span className={cls}>!</Span>
+);
+
 /**
  * THE Icon component - use this everywhere
  * Handles lazy loading automatically
@@ -36,8 +56,12 @@ export const Icon: React.FC<{
   icon: IconKey;
   className?: string;
 }> = ({ icon, className }) => {
-  const [LoadedIcon, setLoadedIcon] = useState<IconComponent | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  // Loaded component tagged with the registry name it was loaded for, so a
+  // stale result is never shown after the icon prop changes.
+  const [loaded, setLoaded] = useState<{
+    name: string;
+    Component: IconComponent;
+  } | null>(null);
 
   const registryValue = ICON_REGISTRY[icon];
 
@@ -45,42 +69,21 @@ export const Icon: React.FC<{
   useEffect(() => {
     // Only lazy load if it's a string component name from registry
     if (typeof registryValue !== "string") {
-      setLoadedIcon(null);
       return;
     }
-
-    setIsLoading(true);
-    setLoadedIcon(null);
 
     (async (): Promise<void> => {
       try {
         const iconModule = await loadIcon(registryValue);
         const IconComp = iconModule[registryValue as IconLibraryName];
-
-        if (!IconComp) {
-          setLoadedIcon(
-            () =>
-              ({ className: cls }: { className?: string }): JSX.Element =>
-                (
-                  /* oxlint-disable-next-line i18n/no-literal-string -- Fallback indicator */
-                  <Span className={cls}>??</Span>
-                ),
-          );
-        } else {
-          setLoadedIcon(() => IconComp as IconComponent);
-        }
+        setLoaded({
+          name: registryValue,
+          Component: IconComp
+            ? (IconComp as IconComponent)
+            : MissingIconFallback,
+        });
       } catch {
-        // Error fallback
-        setLoadedIcon(
-          () =>
-            ({ className: cls }: { className?: string }): JSX.Element =>
-              (
-                /* oxlint-disable-next-line i18n/no-literal-string -- Error indicator */
-                <Span className={cls}>!</Span>
-              ),
-        );
-      } finally {
-        setIsLoading(false);
+        setLoaded({ name: registryValue, Component: ErrorIconFallback });
       }
     })();
   }, [registryValue]);
@@ -92,15 +95,12 @@ export const Icon: React.FC<{
   }
 
   // Handle lazy-loaded icon
+  const LoadedIcon =
+    loaded !== null && loaded.name === registryValue ? loaded.Component : null;
   if (LoadedIcon) {
     return <LoadedIcon className={className} />;
   }
 
-  // Loading state
-  if (isLoading) {
-    return <IconLoadingFallback className={className} />;
-  }
-
-  // Fallback
+  // Loading / fallback
   return <IconLoadingFallback className={className} />;
 };

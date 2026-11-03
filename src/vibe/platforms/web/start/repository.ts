@@ -25,7 +25,7 @@ import {
   success,
 } from "../../../core/route/response.schema";
 import { parseError } from "../../../core/utils/parse-error";
-import { databaseEnv } from "../../../database/env";
+import { databaseEnv, usesPglite } from "../../../database/env";
 import { readProcMeminfo } from "../../../database/health/repository";
 import { scopedTranslation as dockerOperationsScopedTranslation } from "../../../database/utils/docker-operations/i18n";
 import { scopedTranslation as dbUtilsScopedTranslation } from "../../../database/utils/i18n";
@@ -270,8 +270,16 @@ export class ServerStartRepository {
     let supervisorShuttingDown = false;
     let restartCount = 0;
     let consecutiveOoms = 0;
+    // When the current child was spawned - a health snapshot older than this was
+    // written by a previous run and says nothing about this child.
+    let childStartedAt = Date.now();
+    // Set when the freeze watchdog SIGKILLs the child, so the exit is not
+    // mistaken for an OOM kill.
+    let killedByWatchdog = false;
 
     const spawnChild = (): ChildProcess => {
+      childStartedAt = Date.now();
+      killedByWatchdog = false;
       // Restore full heap cap for the child - it runs the actual application.
       // NODE_OPTIONS was already modified above for the supervisor; the child
       // inherits the stripped version and startNextServer re-applies 8GB via
@@ -318,7 +326,7 @@ export class ServerStartRepository {
           // No snapshot yet (crashed before first write)
         }
 
-        const likelyOom = signal === "SIGKILL";
+        const likelyOom = signal === "SIGKILL" && !killedByWatchdog;
 
         // Track consecutive OOMs to detect a server that can't stay up due to
         // memory pressure. After OOM_CONSECUTIVE_THRESHOLD in a row, switch to
@@ -345,11 +353,13 @@ export class ServerStartRepository {
             crashInfo,
           );
         } else {
-          const crashMessage = likelyOom
-            ? "[Supervisor] Server OOM-killed (SIGKILL) - will restart"
-            : signal !== null
-              ? `[Supervisor] Server killed by signal ${signal} - will restart`
-              : `[Supervisor] Server crashed (exit code ${String(code)}) - will restart`;
+          const crashMessage = killedByWatchdog
+            ? "[Supervisor] Server killed by freeze watchdog - will restart"
+            : likelyOom
+              ? "[Supervisor] Server OOM-killed (SIGKILL) - will restart"
+              : signal !== null
+                ? `[Supervisor] Server killed by signal ${signal} - will restart`
+                : `[Supervisor] Server crashed (exit code ${String(code)}) - will restart`;
           logger.error(crashMessage, crashInfo);
         }
 
@@ -391,7 +401,7 @@ export class ServerStartRepository {
       }
       try {
         const stat = statSync(HEALTH_SNAPSHOT_FILE);
-        const ageMs = Date.now() - stat.mtimeMs;
+        const ageMs = Date.now() - Math.max(stat.mtimeMs, childStartedAt);
         if (ageMs > FREEZE_WATCHDOG_THRESHOLD_MS) {
           let lastHealth: string | undefined;
           try {
@@ -413,6 +423,7 @@ export class ServerStartRepository {
             ServerStartRepository.supervisedChild &&
             !ServerStartRepository.supervisedChild.killed
           ) {
+            killedByWatchdog = true;
             ServerStartRepository.supervisedChild.kill("SIGKILL");
           }
         }
@@ -686,12 +697,14 @@ export class ServerStartRepository {
       const { t: dbUtilsT } = dbUtilsScopedTranslation.scopedT(locale);
       const { DbUtilsRepository } =
         await import("../../../database/utils/repository");
-      const dockerCheckResult = await DbUtilsRepository.isDockerAvailable(
-        dbUtilsT,
-        logger,
-      );
+      const isPglite = usesPglite();
+      const dockerCheckResult = isPglite
+        ? undefined
+        : await DbUtilsRepository.isDockerAvailable(dbUtilsT, logger);
 
-      if (!dockerCheckResult.success || !dockerCheckResult.data) {
+      if (isPglite) {
+        logger.vibe(formatDatabase("PGlite mode — skipping Docker", "🐘"));
+      } else if (!dockerCheckResult?.success || !dockerCheckResult.data) {
         logger.vibe(
           formatWarning("Docker unavailable (continuing without managed DB)"),
         );

@@ -1,4 +1,3 @@
-import { Twitter as TwitterIcon } from "lucide-react-native";
-import { styled } from "nativewind";
+import { createBrandIcon } from "../../utils/brand-icon";
 
-export const Twitter = styled(TwitterIcon, { className: "style" });
+export const Twitter = createBrandIcon("logo-x");

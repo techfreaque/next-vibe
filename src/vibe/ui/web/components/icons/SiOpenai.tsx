@@ -1,5 +1,5 @@
-import { SiOpenai as ReactSimpleIcon } from "@icons-pack/react-simple-icons";
+import { RiOpenaiFill as ReactIcon } from "react-icons/ri";
 
 import { type IconComponent } from "../../lib/helper";
 
-export const SiOpenai: IconComponent = ReactSimpleIcon;
+export const SiOpenai: IconComponent = ReactIcon;

@@ -663,7 +663,9 @@ function FormFieldsSection(): JSX.Element {
   const [boolSwitch, setBoolSwitch] = useState(true);
   const [boolCheck, setBoolCheck] = useState(false);
   const [colorValue, setColorValue] = useState("#3b82f6");
-  const [dateValue, setDateValue] = useState<Date | undefined>(new Date());
+  const [dateValue, setDateValue] = useState<Date | undefined>(
+    () => new Date(),
+  );
   const [phoneValue, setPhoneValue] = useState("+1 555 0123");
   const [numberValue, setNumberValue] = useState(42);
   const [sliderValue, setSliderValue] = useState([50]);

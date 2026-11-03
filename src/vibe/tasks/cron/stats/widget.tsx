@@ -639,9 +639,10 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
     return null;
   }, [data]);
 
+  const tasksByStatus = data?.tasksByStatus;
   const tasksByStatusEntries = useMemo(
-    () => (data?.tasksByStatus ? Object.entries(data.tasksByStatus) : []),
-    [data?.tasksByStatus],
+    () => (tasksByStatus ? Object.entries(tasksByStatus) : []),
+    [tasksByStatus],
   );
 
   const tasksByStatusTotal = useMemo(
@@ -649,9 +650,10 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
     [tasksByStatusEntries],
   );
 
+  const tasksByPriority = data?.tasksByPriority;
   const tasksByPriorityEntries = useMemo(
-    () => (data?.tasksByPriority ? Object.entries(data.tasksByPriority) : []),
-    [data?.tasksByPriority],
+    () => (tasksByPriority ? Object.entries(tasksByPriority) : []),
+    [tasksByPriority],
   );
 
   const tasksByPriorityTotal = useMemo(

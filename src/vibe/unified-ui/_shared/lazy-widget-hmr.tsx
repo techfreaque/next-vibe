@@ -57,10 +57,13 @@ export function HmrWrapper({
 }: HmrWrapperProps): React.ReactElement {
   // On first render, getModulePromise() creates and caches the promise on state.
   // Subsequent renders (and client hydration) get the same cached instance.
-  const modulePromiseRef = useRef(getModulePromise());
-  const lazyRef = useRef(state.lazy);
+  // HMR updates swap both the promise and the lazy fallback; held in state so
+  // the swap re-renders and render never reads refs.
+  const [current, setCurrent] = useState<{
+    promise: Promise<AnyComponent> | null;
+    lazy: AnyComponent;
+  }>(() => ({ promise: getModulePromise(), lazy: state.lazy }));
   const registeredRef = useRef(false);
-  const [, setTick] = useState(0);
 
   useEffect(() => {
     if (registeredRef.current) {
@@ -69,9 +72,7 @@ export function HmrWrapper({
     registeredRef.current = true;
     ensureGlobals();
 
-    let cleanup: (() => void) | null = null;
-
-    void (async (): Promise<void> => {
+    const registration = (async (): Promise<(() => void) | null> => {
       const mod = (await factory()) as WidgetModule;
 
       const moduleId: string | undefined =
@@ -80,12 +81,12 @@ export function HmrWrapper({
           .__vibeWidgetModuleId;
 
       if (!moduleId) {
-        return;
+        return null;
       }
 
       const byFile = globalThis.__vibeWidgetByFile;
       if (!byFile) {
-        return;
+        return null;
       }
 
       if (!byFile.has(moduleId)) {
@@ -96,21 +97,19 @@ export function HmrWrapper({
         const freshLazy = React.lazy((): Promise<{ default: AnyComponent }> =>
           Promise.resolve({ default: Component }),
         );
-        lazyRef.current = freshLazy;
-        modulePromiseRef.current = Promise.resolve(Component);
-        setTick((n) => n + 1);
+        setCurrent({ promise: Promise.resolve(Component), lazy: freshLazy });
       };
 
       byFile.get(moduleId)!.add(onUpdate);
-      cleanup = (): void => {
+      return (): void => {
         byFile.get(moduleId)?.delete(onUpdate);
       };
     })();
 
     return (): void => {
-      cleanup?.();
+      void registration.then((cleanup) => cleanup?.());
     };
-  }, [factory, state]);
+  }, [factory]);
 
   // The rendered tree shape must be IDENTICAL on server and client no matter
   // which side resolved the module first. Suspense boundaries are part of the
@@ -121,7 +120,7 @@ export function HmrWrapper({
   // page. A Suspense that never suspends adds no DOM and costs nothing, so
   // every path now renders through the same boundary; only the child differs
   // (component types are not part of DOM matching).
-  const currentPromise = modulePromiseRef.current;
+  const currentPromise = current.promise;
   let child: React.ReactElement;
   if (state.resolved !== null) {
     // Warm path: resolved via prior render, preload(), or HMR update.
@@ -136,7 +135,7 @@ export function HmrWrapper({
     });
   } else {
     // No promise available (drizzle-kit or non-Vite context).
-    child = React.createElement(lazyRef.current, widgetProps);
+    child = React.createElement(current.lazy, widgetProps);
   }
   return React.createElement(React.Suspense, { fallback: null }, child);
 }

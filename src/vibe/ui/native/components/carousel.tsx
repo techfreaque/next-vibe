@@ -1,5 +1,5 @@
 import React from "react";
-import type { ScrollView as RNScrollView } from "react-native";
+import type { ScrollViewInstance } from "react-native";
 import { Pressable, Text as RNText, ScrollView, View } from "react-native";
 
 import { useTranslation } from "../../../core/i18n/core/client";
@@ -19,7 +19,7 @@ import {
   styledNativeRef,
 } from "../utils/style-converter";
 
-const StyledScrollView = styledNativeRef<typeof ScrollView, RNScrollView>(
+const StyledScrollView = styledNativeRef<typeof ScrollView, ScrollViewInstance>(
   ScrollView,
 );
 const StyledView = styledNative(View);
@@ -27,7 +27,7 @@ const StyledPressable = styledNative(Pressable);
 const StyledText = styledNative(RNText);
 
 interface CarouselContextProps {
-  scrollViewRef: React.RefObject<RNScrollView | null>;
+  scrollViewRef: React.RefObject<ScrollViewInstance | null>;
   scrollPrev: () => void;
   scrollNext: () => void;
   canScrollPrev: boolean;
@@ -57,7 +57,7 @@ function Carousel({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
   plugins, // Intentionally extracted - not used in React Native
 }: CarouselProps): React.JSX.Element {
-  const scrollViewRef = React.useRef<RNScrollView>(null);
+  const scrollViewRef = React.useRef<ScrollViewInstance>(null);
   const [canScrollPrev] = React.useState(false);
   const [canScrollNext] = React.useState(true);
 

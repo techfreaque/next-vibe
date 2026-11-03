@@ -12,7 +12,7 @@ import { fileURLToPath } from "node:url";
 
 import { getSrcDir, VIBE_IMPORT_ALIAS } from "@/env/paths";
 
-import { toPosixPath } from "../../core/generators/shared/utils";
+import { toImportUrl, toPosixPath } from "../../core/generators/shared/utils";
 import type { ResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -854,17 +854,18 @@ const DEFAULT_CONFIG: VibeDepsConfig = {
   },
 };
 
-function loadConfig(logger: EndpointLogger): VibeDepsConfig {
+async function loadConfig(logger: EndpointLogger): Promise<VibeDepsConfig> {
   const configPath = resolve(PROJECT_ROOT, "vibe-deps.config.ts");
   if (!existsSync(configPath)) {
     logger.info("vibe-deps: no vibe-deps.config.ts, using built-in default");
     return DEFAULT_CONFIG;
   }
   try {
-    // Same convention as check.config.ts: require the TS file (Bun runs TS).
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const required: { default?: VibeDepsConfig } = require(
-      /* webpackIgnore: true */ /* turbopackIgnore: true */ configPath,
+    // Bun imports the TS config directly; bundlers must leave it to runtime.
+    const required: { default?: VibeDepsConfig } = await import(
+      /* webpackIgnore: true */ /* turbopackIgnore: true */ toImportUrl(
+        configPath,
+      )
     );
     const exported = required.default ?? DEFAULT_CONFIG;
     if (!Array.isArray(exported.packages)) {
@@ -2188,7 +2189,7 @@ export class VibeDepsRepository {
         }
       }
 
-      const config = loadConfig(logger);
+      const config = await loadConfig(logger);
       const ignorePrefixes = (config.ignore ?? []).map((p) => toPosixPath(p));
 
       // ── All-in-one TODO report (default) ────────────────────

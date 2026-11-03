@@ -1,4 +1,3 @@
-import { Facebook as FacebookIcon } from "lucide-react-native";
-import { styled } from "nativewind";
+import { createBrandIcon } from "../../utils/brand-icon";
 
-export const Facebook = styled(FacebookIcon, { className: "style" });
+export const Facebook = createBrandIcon("logo-facebook");

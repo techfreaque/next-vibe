@@ -1,10 +1,35 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 export interface WindowSize {
   width: number;
   height: number;
+}
+
+// Defaults used during SSR and hydration
+const SERVER_SIZE: WindowSize = { width: 1024, height: 768 };
+
+let cachedSize: WindowSize = SERVER_SIZE;
+
+function subscribe(onStoreChange: () => void): () => void {
+  window.addEventListener("resize", onStoreChange);
+  return (): void => window.removeEventListener("resize", onStoreChange);
+}
+
+// Returns a stable object until the window dimensions actually change
+function getSnapshot(): WindowSize {
+  if (
+    cachedSize.width !== window.innerWidth ||
+    cachedSize.height !== window.innerHeight
+  ) {
+    cachedSize = { width: window.innerWidth, height: window.innerHeight };
+  }
+  return cachedSize;
+}
+
+function getServerSnapshot(): WindowSize {
+  return SERVER_SIZE;
 }
 
 /**
@@ -12,20 +37,5 @@ export interface WindowSize {
  * Web implementation uses window.innerWidth/innerHeight + resize listener.
  */
 export function useWindowSize(): WindowSize {
-  const [size, setSize] = useState<WindowSize>({
-    width: typeof window !== "undefined" ? window.innerWidth : 1024,
-    height: typeof window !== "undefined" ? window.innerHeight : 768,
-  });
-
-  useEffect(() => {
-    // Set actual size on mount (SSR may have used defaults)
-    setSize({ width: window.innerWidth, height: window.innerHeight });
-    const onResize = (): void => {
-      setSize({ width: window.innerWidth, height: window.innerHeight });
-    };
-    window.addEventListener("resize", onResize);
-    return (): void => window.removeEventListener("resize", onResize);
-  }, []);
-
-  return size;
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }

@@ -14,7 +14,6 @@ import {
 import type { Server as NodeHttpServer } from "node:http";
 import { networkInterfaces } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
 
 import type { Subprocess, SyncSubprocess } from "bun";
 import type { OutputBundle, OutputOptions, RolldownOptions } from "rolldown";
@@ -61,6 +60,16 @@ function publicEnvs(): Record<string, string> {
 }
 
 type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+
+// Package paths for the install-time patches below, resolved from the project
+// package.json. Webpack flags both import.meta.resolve and a statically imported
+// createRequire(...).resolve(expr) as "Critical dependency"; a runtime-obtained
+// node:module is invisible to it.
+const resolvePackagePath = (specifier: string): string =>
+  process
+    .getBuiltinModule("node:module")
+    .createRequire(join(process.cwd(), "package.json"))
+    .resolve(specifier);
 
 declare const Bun:
   | {
@@ -116,9 +125,7 @@ function patchBunSpawnForWindowsRunnerBug(): void {
   // absent and the file is left untouched (the argv[0] fix above still
   // covers the fallback path).
   try {
-    const runnerPath = fileURLToPath(
-      import.meta.resolve("env-runner/runners/bun-process"),
-    );
+    const runnerPath = resolvePackagePath("env-runner/runners/bun-process");
     const source = readFileSync(runnerPath, "utf8");
     const shortCircuit = "if (_isBun) return _bunPath = process.execPath;";
     const marker = "if (_bunPath) return _bunPath;";
@@ -148,7 +155,7 @@ function patchBunSpawnForWindowsRunnerBug(): void {
 function patchNitroWorkerStaleReload(): void {
   try {
     const workerPath = join(
-      dirname(fileURLToPath(import.meta.resolve("nitro/package.json"))),
+      dirname(resolvePackagePath("nitro/package.json")),
       "dist/runtime/internal/vite/dev-worker.mjs",
     );
     const source = readFileSync(workerPath, "utf8");
@@ -181,7 +188,7 @@ function patchNitroWorkerStaleReload(): void {
 function patchNitroWorkerQuiet503(): void {
   try {
     const workerPath = join(
-      dirname(fileURLToPath(import.meta.resolve("nitro/package.json"))),
+      dirname(resolvePackagePath("nitro/package.json")),
       "dist/runtime/internal/vite/dev-worker.mjs",
     );
     let source = readFileSync(workerPath, "utf8");

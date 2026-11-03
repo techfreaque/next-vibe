@@ -10,7 +10,13 @@
 "use client";
 
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+} from "react";
 
 import type { ChatMessage } from "../../../../db";
 
@@ -123,12 +129,16 @@ export function useBranchManagement({
   // Keep a ref to the full messages array so the effect can read it without
   // taking it as a dependency (avoiding re-runs on content-only updates).
   const activeThreadMessagesRef = useRef(activeThreadMessages);
-  activeThreadMessagesRef.current = activeThreadMessages;
 
   // Track message IDs to detect new messages for auto-switch
   const prevMessageIdsRef = useRef<Set<string>>(new Set());
   const leafMessageIdRef = useRef(leafMessageId);
-  leafMessageIdRef.current = leafMessageId;
+
+  // Sync latest-value refs after render (layout effects run before passive effects)
+  useLayoutEffect(() => {
+    activeThreadMessagesRef.current = activeThreadMessages;
+    leafMessageIdRef.current = leafMessageId;
+  });
 
   /**
    * Auto-switch to new leaf when a new message arrives.
@@ -141,7 +151,7 @@ export function useBranchManagement({
     }
 
     const messages = activeThreadMessagesRef.current;
-    const currentIds = new Set(messages.map((m) => m.id));
+    const currentIds = new Set(messageIds ? messageIds.split(",") : []);
     const prevIds = prevMessageIdsRef.current;
     prevMessageIdsRef.current = currentIds;
 

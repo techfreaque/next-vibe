@@ -222,28 +222,25 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
   );
 
   // Build FavoriteConfig for public users from localStorage
-  const [favoriteConfig, setFavoriteConfig] = useState<FavoriteConfig | null>(
-    null,
-  );
+  const activeFavoriteId = effectiveSettings.activeFavoriteId;
+  const [loadedFavoriteConfig, setLoadedFavoriteConfig] =
+    useState<FavoriteConfig | null>(null);
+  // Only public users with an active favorite use the locally stored config
+  const favoriteConfig =
+    user.isPublic && activeFavoriteId ? loadedFavoriteConfig : null;
   useEffect(() => {
-    if (!user.isPublic) {
-      setFavoriteConfig(null);
+    if (!user.isPublic || !activeFavoriteId) {
       return;
     }
-    const activeFavId = effectiveSettings.activeFavoriteId;
-    if (!activeFavId) {
-      setFavoriteConfig(null);
-      return;
-    }
-    void ChatFavoritesRepositoryClient.loadLocalFavorite(activeFavId).then(
+    void ChatFavoritesRepositoryClient.loadLocalFavorite(activeFavoriteId).then(
       (stored) =>
-        setFavoriteConfig(
+        setLoadedFavoriteConfig(
           stored
             ? ChatFavoritesRepositoryClient.buildLocalFavoriteConfig(stored)
             : null,
         ),
     );
-  }, [user.isPublic, effectiveSettings.activeFavoriteId]);
+  }, [user.isPublic, activeFavoriteId]);
 
   // Resolve voiceId from favoriteConfig for TTS playback
   const resolvedVoiceId = useMemo((): TtsModelId | undefined => {
@@ -299,8 +296,10 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
   const branchLoadAbortRef = useRef<AbortController | null>(null);
 
   // Keep a ref to current leafMessageId for async callbacks
-  const leafMessageIdRef = useRef<string | null>(null);
-  leafMessageIdRef.current = leafMessageId;
+  const leafMessageIdRef = useRef<string | null>(leafMessageId);
+  useLayoutEffect(() => {
+    leafMessageIdRef.current = leafMessageId;
+  });
 
   /**
    * Branch chunk load - fires when activeThreadId changes.
@@ -329,9 +328,8 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
     const controller = new AbortController();
     branchLoadAbortRef.current = controller;
 
-    setIsLoadingBranch(true);
-
     const load = async (): Promise<void> => {
+      setIsLoadingBranch(true);
       try {
         // Pass the current leafMessageId so the server resolves the correct branch.
         // Without this, navigating away and back after a branch causes the server
@@ -410,16 +408,21 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
     user,
     setLeafMessageId,
     messagesData,
-    availability,
   ]);
 
   // Abort in-flight history requests when thread changes
   useEffect(() => {
+    const threadId = activeThreadId;
     return (): void => {
+      if (olderHistoryAbortRef.current || newerHistoryAbortRef.current) {
+        logger.debug("Chat: Aborting history loads on thread change", {
+          threadId,
+        });
+      }
       olderHistoryAbortRef.current?.abort();
       newerHistoryAbortRef.current?.abort();
     };
-  }, [activeThreadId]);
+  }, [activeThreadId, logger]);
 
   /**
    * Load older history (triggered by "Show older messages" button).
@@ -745,6 +748,8 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
   // Tracks last scrollHeight seen in handleScroll to distinguish user-scroll from
   // content-growth-induced apparent scroll position change.
   const lastScrollHandlerHeightRef = useRef<number>(0);
+  // Track the last scrollHeight we snapped to - only snap when content grows.
+  const lastSnapScrollHeightRef = useRef<number>(0);
   // Whether to show the scroll-to-bottom button (user has scrolled up)
   const [showScrollButton, setShowScrollButton] = useState(false);
 
@@ -967,7 +972,9 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
     }
     const { scrollTop, scrollHeight, clientHeight } = container;
     const distFromBottom = scrollHeight - scrollTop - clientHeight;
-    setShowScrollButton(distFromBottom > 800);
+    setShowScrollButton(
+      activeThreadMessages.length > 0 && distFromBottom > 800,
+    );
   }, [activeThreadMessages]);
 
   // Track which threads have had their initial scroll-to-bottom performed.
@@ -990,9 +997,6 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
   }, [activeThreadId]);
 
   const hasAnyMessages = activeThreadMessages.length > 0;
-
-  // Track the last scrollHeight we snapped to - only snap when content grows.
-  const lastSnapScrollHeightRef = useRef<number>(0);
 
   // Sticky-bottom: after every render, if we're pinned and new content arrived, snap to bottom.
   // useLayoutEffect fires synchronously after DOM commit so scrollHeight is up to date.

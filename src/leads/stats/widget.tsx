@@ -89,6 +89,13 @@ function computeTrend(recentActivity: ActivityRecord[]): TrendDirection {
 
 // ─── Date range helpers ───────────────────────────────────────────────────────
 
+function getTodayLabel(locale: string): string {
+  return new Date().toLocaleDateString(locale, {
+    month: "short",
+    day: "numeric",
+  });
+}
+
 function getWeekRange(locale: string): { from: string; to: string } {
   const now = new Date();
   const day = now.getDay(); // 0 = Sun
@@ -491,6 +498,7 @@ export function LeadsStatsContainer({
   const trend = useMemo(() => computeTrend(recentActivity), [recentActivity]);
 
   // Date ranges
+  const todayLabel = useMemo(() => getTodayLabel(locale), [locale]);
   const weekRange = useMemo(() => getWeekRange(locale), [locale]);
   const monthRange = useMemo(() => getMonthRange(locale), [locale]);
 
@@ -841,7 +849,7 @@ export function LeadsStatsContainer({
       <SectionGroup title={t("widget.newLeadsTimeline")}>
         <MetricGrid columns={3}>
           <MetricCard
-            label={`${t("widget.today")} (${new Date().toLocaleDateString(locale, { month: "short", day: "numeric" })})`}
+            label={`${t("widget.today")} (${todayLabel})`}
             value={data?.leadsCreatedToday ?? 0}
           />
           <MetricCard

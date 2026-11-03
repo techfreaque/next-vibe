@@ -15,7 +15,29 @@ import { useWidgetLocale } from "next-vibe/unified-ui/_shared/use-widget-context
 import React, { Suspense, useMemo } from "react";
 
 import { scopedTranslation } from "../i18n";
-import { findMountWidget } from "../mounts/widget-registry";
+import type { MountWidgetConfig } from "../mounts/widget-registry";
+import {
+  findMountWidget,
+  MOUNT_WIDGET_REGISTRY,
+} from "../mounts/widget-registry";
+
+/**
+ * Lazy widget per mount config, created once at module scope.
+ * React.lazy only fetches the chunk on first render, so this is free until used.
+ */
+type MountWidgetComponent = Awaited<
+  ReturnType<MountWidgetConfig["loadWidget"]>
+>["default"];
+
+const LAZY_MOUNT_WIDGETS = new Map<
+  MountWidgetConfig,
+  React.LazyExoticComponent<MountWidgetComponent>
+>(
+  Object.values(MOUNT_WIDGET_REGISTRY).map((config) => [
+    config,
+    React.lazy(config.loadWidget),
+  ]),
+);
 
 interface DomainEnrichmentProps {
   responsePath: string | undefined;
@@ -29,10 +51,7 @@ export function DomainEnrichment({
     () => (responsePath ? findMountWidget(responsePath) : null),
     [responsePath],
   );
-  const LazyWidget = useMemo(
-    () => (match ? React.lazy(match.config.loadWidget) : null),
-    [match],
-  );
+  const LazyWidget = match ? LAZY_MOUNT_WIDGETS.get(match.config) : undefined;
 
   if (!match || !LazyWidget || !responsePath) {
     return null;
@@ -43,11 +62,11 @@ export function DomainEnrichment({
 
   return (
     <Suspense fallback={null}>
-      <LazyWidget
-        path={responsePath}
-        label={match.label}
-        mountLabel={mountLabel}
-      />
+      {React.createElement(LazyWidget, {
+        path: responsePath,
+        label: match.label,
+        mountLabel,
+      })}
     </Suspense>
   );
 }

@@ -122,7 +122,11 @@ class WsChannelsGenerator {
   ): Promise<Array<{ method: string; scope: string | undefined }>> {
     const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
     try {
-      const definition = (await import(toImportUrl(definitionPath))) as {
+      const definition = (await import(
+        /* webpackIgnore: true */ /* turbopackIgnore: true */ toImportUrl(
+          definitionPath,
+        )
+      )) as {
         default?: Record<
           string,
           {
@@ -191,7 +195,11 @@ class WsChannelsGenerator {
   ): Promise<string[]> {
     const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
     try {
-      const definition = (await import(toImportUrl(definitionPath))) as {
+      const definition = (await import(
+        /* webpackIgnore: true */ /* turbopackIgnore: true */ toImportUrl(
+          definitionPath,
+        )
+      )) as {
         default?: Record<
           string,
           { events?: Record<string, { remoteEvent?: true }> }
@@ -277,7 +285,11 @@ class WsChannelsGenerator {
         { resolveChannel?: GenericHandlerBase["resolveChannel"] } | undefined
       >;
       try {
-        const routeModule = (await import(toImportUrl(routeFile))) as {
+        const routeModule = (await import(
+          /* webpackIgnore: true */ /* turbopackIgnore: true */ toImportUrl(
+            routeFile,
+          )
+        )) as {
           tools?: Record<
             string,
             | { resolveChannel?: GenericHandlerBase["resolveChannel"] }

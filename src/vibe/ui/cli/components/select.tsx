@@ -96,46 +96,54 @@ export function Select<TValue extends string>({
   const isMcp = useIsMcp();
   const [open, setOpen] = useState(false);
   const [cursor, setCursor] = useState(0);
-  const itemsRef = useRef<
+  const [items, setItems] = useState<
     Array<{ value: string; label: string; disabled: boolean }>
   >([]);
-  const [, forceUpdate] = useState(0);
   // Stable ID for Ink's focus system
-  const idRef = useRef(`select-${Math.random().toString(36).slice(2, 7)}`);
+  const [focusId] = useState(
+    () => `select-${Math.random().toString(36).slice(2, 7)}`,
+  );
   // Cursor position when dropdown was opened — restored on Esc/Left cancel
   const openCursorRef = useRef(0);
   const shouldFocus = useShouldFocus();
   const { isFocused } = useFocus({
-    id: idRef.current,
+    id: focusId,
     autoFocus: false,
     isActive: shouldFocus,
   });
-  useFocusScopeRegister(idRef.current);
+  useFocusScopeRegister(focusId);
   // Lock overlay when open — deactivates Tab navigation outside the select
   useOverlayLock(open);
 
   const registerItem = useCallback(
     (itemValue: string, label: string, itemDisabled: boolean) => {
       const item = { value: itemValue, label, disabled: itemDisabled };
-      // Avoid duplicates
-      const existing = itemsRef.current.findIndex((i) => i.value === itemValue);
-      if (existing >= 0) {
-        itemsRef.current[existing] = item;
-      } else {
-        itemsRef.current = [...itemsRef.current, item];
-        forceUpdate((n) => n + 1);
-      }
+      // Avoid duplicates: replace in place if already registered
+      setItems((prev) => {
+        const existing = prev.findIndex((i) => i.value === itemValue);
+        if (existing < 0) {
+          return [...prev, item];
+        }
+        const current = prev[existing];
+        if (
+          current &&
+          current.label === label &&
+          current.disabled === itemDisabled
+        ) {
+          return prev;
+        }
+        const next = [...prev];
+        next[existing] = item;
+        return next;
+      });
       return (): void => {
-        itemsRef.current = itemsRef.current.filter(
-          (i) => i.value !== itemValue,
-        );
-        forceUpdate((n) => n + 1);
+        setItems((prev) => prev.filter((i) => i.value !== itemValue));
       };
     },
     [],
   );
 
-  const enabledItems = itemsRef.current.filter((i) => !i.disabled);
+  const enabledItems = items.filter((i) => !i.disabled);
 
   useInput(
     (input, key) => {
@@ -203,7 +211,7 @@ export function Select<TValue extends string>({
       cursor,
       setCursor,
       registerItem,
-      items: itemsRef.current,
+      items,
       isFocused,
     }),
     [
@@ -215,6 +223,7 @@ export function Select<TValue extends string>({
       cursor,
       setCursor,
       registerItem,
+      items,
       isFocused,
     ],
   );

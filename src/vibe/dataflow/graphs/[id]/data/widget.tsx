@@ -376,6 +376,9 @@ interface CrosshairState {
   y: number;
   time: string;
   points: CrosshairPoint[];
+  /** Pane container size at the moment of the crosshair event */
+  containerWidth: number;
+  containerHeight: number;
 }
 
 // ─── Theme Colors ────────────────────────────────────────────────────────────
@@ -600,7 +603,6 @@ function useMultiPaneRenderer(
   scaleWidths: { left: number; right: number };
 } {
   const paneContainerRef = useRef<HTMLDivElement>(null);
-  const [chartKey, setChartKey] = useState(0);
   // Counter instead of boolean to ensure the data effect re-runs after each chart setup
   const [chartReadyGen, setChartReadyGen] = useState(0);
   const [scaleWidths, setScaleWidths] = useState({ left: 60, right: 60 });
@@ -610,25 +612,27 @@ function useMultiPaneRenderer(
   const themeObserverRef = useRef<{ disconnect: () => void } | null>(null);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
   const onPanBackRef = useRef(onPanBack);
-  onPanBackRef.current = onPanBack;
   const onCrosshairMoveRef = useRef(onCrosshairMove);
-  onCrosshairMoveRef.current = onCrosshairMove;
   const onLastValuesRef = useRef(onLastValues);
-  onLastValuesRef.current = onLastValues;
   const displayConfigsRef = useRef(displayConfigs);
-  displayConfigsRef.current = displayConfigs;
   const seriesRef = useRef(series);
-  seriesRef.current = series;
   const signalsRef = useRef(signals);
-  signalsRef.current = signals;
+  // Sync latest-value refs after each commit. Declared before the chart
+  // effects below so they always observe current values.
+  useEffect(() => {
+    onPanBackRef.current = onPanBack;
+    onCrosshairMoveRef.current = onCrosshairMove;
+    onLastValuesRef.current = onLastValues;
+    displayConfigsRef.current = displayConfigs;
+    seriesRef.current = series;
+    signalsRef.current = signals;
+  });
 
   const panTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const enableTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const oldestLoadedRef = useRef<number | null>(null);
   const panEnabledRef = useRef(false);
   const didFitContentRef = useRef(false);
-  const resolutionRef = useRef<Resolution>(resolution);
-  resolutionRef.current = resolution;
   // Guard to prevent recursive syncing
   const syncingRef = useRef(false);
 
@@ -653,38 +657,31 @@ function useMultiPaneRenderer(
     [paneKey],
   );
 
-  // ── Resolution change → bump chartKey to recreate charts ──────────────
+  // ── Chart setup - runs on mount, resolution and pane layout changes ──────
+  // The cleanup resets chartReadyGen / pan / fit state before each re-setup.
 
   useEffect(() => {
+    // Charts are being (re)created - drop any stale tooltip
     onCrosshairMoveRef.current(null);
-    panEnabledRef.current = false;
-    didFitContentRef.current = false;
-    setChartReadyGen(0);
-    setChartKey((k) => k + 1);
-  }, [resolution]);
-
-  // ── Chart setup - runs on mount and chartKey changes ─────────────────────
-
-  useEffect(() => {
     const outerContainer = paneContainerRef.current;
     if (!outerContainer) {
       return;
     }
 
-    let cancelled = false;
+    const run = { cancelled: false };
 
     const asyncSetup = async (): Promise<void> => {
       const { createChart, ColorType, LineSeries } =
         await import("lightweight-charts");
 
-      if (cancelled) {
+      if (run.cancelled) {
         return;
       }
       LineSeriesCtorRef.current = LineSeries;
 
       const sortedPanes = paneNumbers;
 
-      const res = resolutionRef.current;
+      const res = resolution;
       const resMs = RESOLUTION_MS[res];
       const showTime = resMs < 24 * 3600_000;
       const barSpacing =
@@ -705,7 +702,7 @@ function useMultiPaneRenderer(
         const containerEl = outerContainer.querySelector<HTMLDivElement>(
           `#vs-pane-${String(paneNum)}`,
         );
-        if (!containerEl || cancelled) {
+        if (!containerEl || run.cancelled) {
           continue;
         }
 
@@ -817,15 +814,14 @@ function useMultiPaneRenderer(
           }
           const timeVal =
             typeof param.time === "number" ? param.time : undefined;
-          const timeStr =
-            timeVal !== undefined
-              ? makeTickFormatter(resolutionRef.current)(timeVal)
-              : "";
+          const timeStr = timeVal !== undefined ? tickFmt(timeVal) : "";
           onCrosshairMoveRef.current({
             x: param.point.x,
             y: param.point.y,
             time: timeStr,
             points: crosshairPoints,
+            containerWidth: outerContainer.clientWidth,
+            containerHeight: outerContainer.clientHeight,
           });
 
           // Sync crosshair vertical line to other panes via setCrosshairPosition.
@@ -943,7 +939,7 @@ function useMultiPaneRenderer(
         clearTimeout(enableTimerRef.current);
       }
       enableTimerRef.current = setTimeout(() => {
-        if (!cancelled) {
+        if (!run.cancelled) {
           panEnabledRef.current = true;
         }
       }, 800);
@@ -973,7 +969,7 @@ function useMultiPaneRenderer(
     const enableTimer = enableTimerRef;
 
     return (): void => {
-      cancelled = true;
+      run.cancelled = true;
       themeObs.current?.disconnect();
       themeObs.current = null;
       resizeObs.current?.disconnect();
@@ -995,7 +991,7 @@ function useMultiPaneRenderer(
         enableTimer.current = null;
       }
     };
-  }, [chartKey, paneKey, paneNumbers, paneContainerRef]);
+  }, [resolution, paneNumbers]);
 
   // ── Data rendering ──────────────────────────────────────────────────────
 
@@ -1406,15 +1402,13 @@ function CollapsedPaneBar({
 
 function CrosshairTooltip({
   crosshair,
-  containerRef,
 }: {
   crosshair: CrosshairState;
-  containerRef: React.RefObject<HTMLDivElement | null>;
 }): React.JSX.Element | null {
-  if (crosshair.points.length === 0 || !containerRef.current) {
+  if (crosshair.points.length === 0) {
     return null;
   }
-  const containerWidth = containerRef.current.clientWidth;
+  const { containerWidth, containerHeight } = crosshair;
   const tooltipWidth = 180;
   // Position tooltip offset from cursor - 40px right, flip left if overflows
   const left =
@@ -1422,7 +1416,6 @@ function CrosshairTooltip({
       ? crosshair.x - tooltipWidth - 16
       : crosshair.x + 40;
   // Follow cursor Y with clamping so tooltip stays within chart bounds
-  const containerHeight = containerRef.current.clientHeight;
   const tooltipEstHeight = 60 + crosshair.points.length * 18;
   const top = Math.min(
     Math.max(crosshair.y - tooltipEstHeight / 2, 8),
@@ -1878,7 +1871,17 @@ export function GraphChartView(): React.JSX.Element {
     } catch {
       // ignore malformed localStorage
     }
-    setHiddenSeries(hidden);
+    // Apply after the effect body (localStorage is client-only, so this
+    // cannot be derived during render without a hydration mismatch)
+    let active = true;
+    queueMicrotask(() => {
+      if (active) {
+        setHiddenSeries(hidden);
+      }
+    });
+    return (): void => {
+      active = false;
+    };
   }, [graph]);
 
   // ── Versions endpoint: DB ancestor chain for prev/next version nav ─────────
@@ -2008,14 +2011,16 @@ export function GraphChartView(): React.JSX.Element {
     (pageEndpoint.read?.isFetching ?? false);
 
   // Merge newly-fetched page into accumulated series/signals
-  useEffect(() => {
-    const data = pageEndpoint.read?.data;
-    if (!data) {
-      return;
-    }
-    setAccSeries((prev) => mergeSeries(prev, data.series ?? []));
-    setAccSignals((prev) => mergeSignals(prev, data.signals ?? []));
-  }, [pageEndpoint.read?.data]);
+  // (adjust-state-during-render: merge once per new data object)
+  const pageData = pageEndpoint.read?.data;
+  const [mergedPageData, setMergedPageData] = useState<typeof pageData | null>(
+    null,
+  );
+  if (pageData && pageData !== mergedPageData) {
+    setMergedPageData(pageData);
+    setAccSeries((prev) => mergeSeries(prev, pageData.series ?? []));
+    setAccSignals((prev) => mergeSignals(prev, pageData.signals ?? []));
+  }
 
   const fetchPage = useCallback(
     (graphId: string, res: Resolution, cursor?: string): void => {
@@ -2024,13 +2029,15 @@ export function GraphChartView(): React.JSX.Element {
     [],
   );
 
-  useEffect(() => {
-    if (!responseData) {
-      return;
-    }
+  // Merge the outer response into accumulated series/signals once per object
+  const [mergedResponseData, setMergedResponseData] = useState<
+    typeof responseData | null
+  >(null);
+  if (responseData && responseData !== mergedResponseData) {
+    setMergedResponseData(responseData);
     setAccSeries((prev) => mergeSeries(prev, responseData.series ?? []));
     setAccSignals((prev) => mergeSignals(prev, responseData.signals ?? []));
-  }, [responseData]);
+  }
 
   const handleResolutionChange = useCallback(
     (res: Resolution): void => {
@@ -2686,10 +2693,7 @@ export function GraphChartView(): React.JSX.Element {
 
         {/* Crosshair tooltip */}
         {crosshair && crosshair.points.length > 0 && (
-          <CrosshairTooltip
-            crosshair={crosshair}
-            containerRef={paneContainerRef}
-          />
+          <CrosshairTooltip crosshair={crosshair} />
         )}
 
         {/* Pan-back toast */}

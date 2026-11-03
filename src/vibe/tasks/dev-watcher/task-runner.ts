@@ -287,6 +287,38 @@ const startSmartFileWatcher = async (
     watchers.length = 0;
 
     // Listen for 'r' keypress to trigger a full regeneration
+    const onData = (chunk: Buffer): void => {
+      const key = chunk.toString();
+      // Ctrl+C - restore terminal and hand SIGINT to the process's shutdown handlers.
+      // Raw mode swallows the console signal, so nothing else sees Ctrl+C. Never
+      // process.kill(process.pid): on Windows that terminates with exit code 1 and
+      // skips every handler, which the start supervisor reads as a crash and restarts.
+      if (key === "\u0003") {
+        if (process.stdin.isTTY) {
+          process.stdin.setRawMode(false);
+        }
+        if (process.listenerCount("SIGINT") > 0) {
+          process.emit("SIGINT", "SIGINT");
+        } else {
+          process.kill(process.pid, "SIGINT");
+        }
+        return;
+      }
+      if (key === "r" || key === "R") {
+        logger.debug("🔄 'r' pressed - re-running generators...");
+        liveIndex.dirty.endpoints = true;
+        liveIndex.dirty.clientRoutes = true;
+        liveIndex.dirty.taskIndex = true;
+        liveIndex.dirty.emailTemplates = true;
+        liveIndex.dirty.seeds = false;
+        liveIndex.dirty.promptFragments = true;
+        liveIndex.dirty.skillsIndex = true;
+        liveIndex.dirty.graphSeedsIndex = true;
+        liveIndex.dirty.platformRoutes = true;
+        void runDirtyGenerators();
+      }
+    };
+
     await new Promise<void>((resolve) => {
       let done = false;
       const finish = (): void => {
@@ -295,31 +327,6 @@ const startSmartFileWatcher = async (
         }
         done = true;
         resolve();
-      };
-
-      const onData = (chunk: Buffer): void => {
-        const key = chunk.toString();
-        // Ctrl+C - restore terminal and re-raise SIGINT
-        if (key === "\u0003") {
-          if (process.stdin.isTTY) {
-            process.stdin.setRawMode(false);
-          }
-          process.kill(process.pid, "SIGINT");
-          return;
-        }
-        if (key === "r" || key === "R") {
-          logger.debug("🔄 'r' pressed - re-running generators...");
-          liveIndex.dirty.endpoints = true;
-          liveIndex.dirty.clientRoutes = true;
-          liveIndex.dirty.taskIndex = true;
-          liveIndex.dirty.emailTemplates = true;
-          liveIndex.dirty.seeds = false;
-          liveIndex.dirty.promptFragments = true;
-          liveIndex.dirty.skillsIndex = true;
-          liveIndex.dirty.graphSeedsIndex = true;
-          liveIndex.dirty.platformRoutes = true;
-          void runDirtyGenerators();
-        }
       };
 
       if (process.stdin.isTTY) {

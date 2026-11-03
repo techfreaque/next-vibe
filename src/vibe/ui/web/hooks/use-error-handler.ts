@@ -33,6 +33,7 @@ export default function useErrorHandler(
       name: error.name,
       digest: error.digest,
       stack: error.stack?.slice(0, 500),
+      locale,
     });
     // Call custom error handler if provided
     if (onError) {

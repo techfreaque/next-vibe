@@ -93,6 +93,28 @@ export function FileAttachments({
 }
 
 /**
+ * Decode base64 data into a blob URL. Returns null when decoding fails.
+ */
+function createBlobUrlFromBase64(
+  data: string,
+  mimeType: string,
+): string | null {
+  try {
+    const byteString = atob(data);
+    const ab = new ArrayBuffer(byteString.length);
+    const ua = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+      ua[i] = byteString.charCodeAt(i);
+    }
+    const blob = new Blob([ab], { type: mimeType });
+    return URL.createObjectURL(blob);
+  } catch {
+    // Failed to generate blob URL
+    return null;
+  }
+}
+
+/**
  * Single file attachment - picks the right renderer per media type.
  */
 function FileAttachmentItem({
@@ -106,24 +128,30 @@ function FileAttachmentItem({
 
   // Generate blob URL from base64 for incognito mode
   useEffect(() => {
-    if (attachment.data && !attachment.url) {
-      try {
-        const byteString = atob(attachment.data);
-        const ab = new ArrayBuffer(byteString.length);
-        const ua = new Uint8Array(ab);
-        for (let i = 0; i < byteString.length; i++) {
-          ua[i] = byteString.charCodeAt(i);
-        }
-        const blob = new Blob([ab], { type: attachment.mimeType });
-        const blobUrl = URL.createObjectURL(blob);
-        setDisplayUrl(blobUrl);
-        return (): void => {
-          URL.revokeObjectURL(blobUrl);
-        };
-      } catch {
-        // Failed to generate blob URL
-      }
+    const data = attachment.data;
+    if (!data || attachment.url) {
+      return;
     }
+    let cancelled = false;
+    let blobUrl: string | null = null;
+    // Decode off the effect body (microtask) - the blob URL is an external
+    // resource whose lifecycle this effect owns.
+    void Promise.resolve().then(() => {
+      if (cancelled) {
+        return;
+      }
+      blobUrl = createBlobUrlFromBase64(data, attachment.mimeType);
+      if (blobUrl) {
+        setDisplayUrl(blobUrl);
+      }
+      return;
+    });
+    return (): void => {
+      cancelled = true;
+      if (blobUrl) {
+        URL.revokeObjectURL(blobUrl);
+      }
+    };
   }, [attachment.data, attachment.url, attachment.mimeType]);
 
   if (!displayUrl) {

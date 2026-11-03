@@ -71,6 +71,9 @@ let broadcastSinkUnreachable = false;
 const BROADCAST_GRACE_MS = 30_000;
 const broadcastStartTime = Date.now();
 
+/** Tail of the ordered loopback POST queue - see publishWsEvent. Never rejects. */
+let broadcastChain: Promise<undefined> = Promise.resolve(undefined);
+
 // ─── Low-level broadcast primitives ───────────────────────────────────────────
 
 /**
@@ -95,37 +98,48 @@ function publishWsEvent<T extends AnyEndpointEventEnvelope>(
     return;
   }
   const url = getBroadcastUrl();
+  const body = JSON.stringify({ ...msg, user });
   // Cross-process fallback: the WS proxy runs in a SEPARATE process (see the
   // in-process fast path above). This loopback POST is the IPC to that proxy's
   // /ws/broadcast sink — an internal transport primitive, not an endpoint call.
-  // oxlint-disable-next-line restricted/restricted-syntax -- internal WS-proxy IPC (separate process)
-  fetch(url, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ ...msg, user }),
-  })
-    .then(() => {
-      // Successful POST: proxy is alive — clear any stale latch so future emits
-      // go through (handles proxy restart recovery).
-      broadcastSinkUnreachable = false;
-      return undefined;
-    })
-    .catch((err) => {
-      if (shuttingDown) {
-        return;
-      }
-      // Only latch after the startup grace period. During the first 30 s the Bun
-      // proxy may not be up yet (Next.js spawns before it), so transient
-      // ECONNREFUSED failures are expected and should not permanently disable WS.
-      if (Date.now() - broadcastStartTime < BROADCAST_GRACE_MS) {
-        return;
-      }
-      broadcastSinkUnreachable = true;
-      logger.error(
-        `[WS Emitter] No broadcast sink at ${url} — in-process observers only ` +
-          `(${err instanceof Error ? err.message : String(err)})`,
-      );
-    });
+  //
+  // POSTs are chained so the proxy receives events in emit order. Independent
+  // fire-and-forget POSTs race over separate connections: a stream's first
+  // CONTENT_DELTA ("<think>") could reach clients before its MESSAGE_CREATED,
+  // get dropped (no message to append to), and leave reasoning rendering as
+  // plain text until content-done replaced the whole content.
+  broadcastChain = broadcastChain.then(() =>
+    // oxlint-disable-next-line restricted/restricted-syntax -- internal WS-proxy IPC (separate process)
+    fetch(url, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body,
+    }).then(
+      () => {
+        // Successful POST: proxy is alive — clear any stale latch so future emits
+        // go through (handles proxy restart recovery).
+        broadcastSinkUnreachable = false;
+        return undefined;
+      },
+      (err) => {
+        if (shuttingDown) {
+          return undefined;
+        }
+        // Only latch after the startup grace period. During the first 30 s the Bun
+        // proxy may not be up yet (Next.js spawns before it), so transient
+        // ECONNREFUSED failures are expected and should not permanently disable WS.
+        if (Date.now() - broadcastStartTime < BROADCAST_GRACE_MS) {
+          return undefined;
+        }
+        broadcastSinkUnreachable = true;
+        logger.error(
+          `[WS Emitter] No broadcast sink at ${url} — in-process observers only ` +
+            `(${err instanceof Error ? err.message : String(err)})`,
+        );
+        return undefined;
+      },
+    ),
+  );
 }
 
 /**

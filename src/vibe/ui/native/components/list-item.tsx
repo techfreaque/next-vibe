@@ -1,4 +1,3 @@
-import { styled } from "nativewind";
 import { Pressable, View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
@@ -8,7 +7,7 @@ import { Text } from "./text";
 
 export type { ListItemProps } from "../../web/components/list-item";
 
-const StyledView = styled(View, { className: "style" });
+const StyledView = styledNative(View);
 const StyledPressable = styledNative(Pressable);
 
 export function ListItem({

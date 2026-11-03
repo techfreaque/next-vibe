@@ -166,7 +166,9 @@ class EmailTemplateGenerator {
 
     for (const file of templateFiles) {
       try {
-        const templateModule = await import(file);
+        const templateModule = await import(
+          /* webpackIgnore: true */ /* turbopackIgnore: true */ file
+        );
 
         const nestedPath = stripProjectRoot(file)
           .replace(/^src\//, "")

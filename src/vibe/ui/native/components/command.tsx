@@ -1,6 +1,5 @@
 "use client";
 
-import { styled } from "nativewind";
 import * as React from "react";
 import {
   Pressable,
@@ -28,11 +27,11 @@ import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { Dialog, DialogContent } from "./dialog";
 
-const StyledView = styled(View, { className: "style" });
+const StyledView = styledNative(View);
 const StyledPressable = styledNative(Pressable);
 const StyledScrollView = styledNative(ScrollView);
-const StyledTextInput = styled(TextInput, { className: "style" });
-const StyledText = styled(RNText, { className: "style" });
+const StyledTextInput = styledNative(TextInput);
+const StyledText = styledNative(RNText);
 
 function Command({
   className,

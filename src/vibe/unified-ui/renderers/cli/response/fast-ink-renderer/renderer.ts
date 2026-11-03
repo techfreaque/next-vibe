@@ -1351,20 +1351,22 @@ function renderWithReconciler(
     false,
     null,
     "fast-renderer",
-    (err: Error) => {
-      recordError("Reconciler uncaught error", err);
+    (err) => {
+      recordError("Reconciler uncaught error", parseError(err));
     },
-    (err: Error) => {
-      recordError("Reconciler caught error (boundary)", err);
+    (err) => {
+      recordError("Reconciler caught error (boundary)", parseError(err));
     },
-    (err: Error) => {
-      recordError("Reconciler recoverable error", err);
+    (err) => {
+      recordError("Reconciler recoverable error", parseError(err));
     },
     // onDefaultTransitionIndicator: React 19 invokes this to show its built-in
     // pending indicator. A static CLI frame never transitions, so it is never
     // called - but the reconciler stores it unconditionally, so a function is
     // safer here than the null this used to pass under an `any` cast.
     noop,
+    // transitionCallbacks: transition tracing is unused on the CLI.
+    null,
   );
 
   let boundaryError: Error | null = null;

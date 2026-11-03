@@ -14,6 +14,14 @@ const SEPARATOR = "─".repeat(60);
 const CELL_DIVIDER = " | ";
 const NO_RESULTS = "No results.";
 
+function renderSeparator(): JSX.Element {
+  return (
+    <Box>
+      <Text dimColor>{SEPARATOR}</Text>
+    </Box>
+  );
+}
+
 export function DataTable<TData extends RowData>({
   columns,
   data,
@@ -58,12 +66,6 @@ export function DataTable<TData extends RowData>({
   }
 
   const headerGroups = table.getHeaderGroups();
-
-  const renderSeparator = (): JSX.Element => (
-    <Box>
-      <Text dimColor>{SEPARATOR}</Text>
-    </Box>
-  );
 
   const renderHeaderRow = (): JSX.Element => {
     return (

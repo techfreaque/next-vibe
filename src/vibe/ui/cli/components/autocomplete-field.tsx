@@ -9,7 +9,7 @@
 import { Box, Text, useFocus, useInput, useStdin } from "ink";
 import TextInput from "ink-text-input";
 import type { JSX } from "react";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type {
@@ -47,16 +47,16 @@ export function AutocompleteField({
   const [search, setSearch] = useState("");
   const [cursor, setCursor] = useState(0);
   // Stable ID for Ink's focus system
-  const idRef = useRef(
-    `autocomplete-${Math.random().toString(36).slice(2, 7)}`,
+  const [focusId] = useState(
+    () => `autocomplete-${Math.random().toString(36).slice(2, 7)}`,
   );
   const shouldFocus = useShouldFocus();
   const { isFocused } = useFocus({
-    id: idRef.current,
+    id: focusId,
     autoFocus: false,
     isActive: shouldFocus,
   });
-  useFocusScopeRegister(idRef.current);
+  useFocusScopeRegister(focusId);
 
   const selectedOption = options.find((opt) => opt.value === value);
   const displayValue = selectedOption

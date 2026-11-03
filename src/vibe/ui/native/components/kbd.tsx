@@ -1,4 +1,3 @@
-import { styled } from "nativewind";
 import * as React from "react";
 import type { TextStyle } from "react-native";
 import { Text } from "react-native";
@@ -6,9 +5,9 @@ import { Text } from "react-native";
 import { cn } from "../../../unified-ui/_shared/cn";
 import type { KbdMouseEvent, KbdProps } from "../../web/components/kbd";
 import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToTextStyle } from "../utils/style-converter";
+import { convertCSSToTextStyle, styledNative } from "../utils/style-converter";
 
-const StyledText = styled(Text, { className: "style" });
+const StyledText = styledNative(Text);
 
 function Kbd({
   className,

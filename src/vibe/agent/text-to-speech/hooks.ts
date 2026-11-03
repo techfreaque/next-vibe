@@ -196,153 +196,115 @@ export function useTTSAudio({
     [ttsForm, logger, messageId, t, onError, voicePreference, setStore],
   );
 
-  // Play next chunk in the queue - defined as a stable ref-based function
-  // We use a plain function (not useCallback) because it calls itself recursively
-  // and references refs directly - no stale closure issues.
-  const playNextChunk = useCallback((): void => {
-    const refs = getTtsRefs(messageId);
-    const nextIndex = refs.currentPlayingIndex;
-    const audio = refs.audioQueue[nextIndex];
+  // Play next chunk in the queue - references refs directly, no stale closure issues.
+  // Named function expression so the recursive calls don't read the binding during its own initialization.
+  const playNextChunk = useCallback(
+    function playQueuedChunk(): void {
+      const refs = getTtsRefs(messageId);
+      const nextIndex = refs.currentPlayingIndex;
+      const audio = refs.audioQueue[nextIndex];
 
-    logger.debug(`TTS: playNextChunk called`, {
-      nextIndex,
-      totalChunks: refs.chunks.length,
-      hasAudio: !!audio,
-    });
+      logger.debug(`TTS: playNextChunk called`, {
+        nextIndex,
+        totalChunks: refs.chunks.length,
+        hasAudio: !!audio,
+      });
 
-    if (!audio) {
-      logger.debug(`TTS: No audio available for chunk ${nextIndex + 1}`);
-      return;
-    }
-
-    logger.debug(`TTS: Playing chunk ${nextIndex + 1}/${refs.chunks.length}`);
-    setStore(messageId, { currentChunk: nextIndex + 1, isPlaying: true });
-
-    // Schedule prefetch of next chunk based on current audio duration
-    const schedulePrefetch = (): void => {
-      const duration = audio.duration;
-
-      if (!duration || isNaN(duration)) {
+      if (!audio) {
+        logger.debug(`TTS: No audio available for chunk ${nextIndex + 1}`);
         return;
       }
 
-      const PREFETCH_MARGIN = 2; // seconds
-      const prefetchDelay = Math.max(0, (duration - PREFETCH_MARGIN) * 1000);
+      logger.debug(`TTS: Playing chunk ${nextIndex + 1}/${refs.chunks.length}`);
+      setStore(messageId, { currentChunk: nextIndex + 1, isPlaying: true });
 
-      if (refs.prefetchTimer) {
-        clearTimeout(refs.prefetchTimer);
-      }
+      // Schedule prefetch of next chunk based on current audio duration
+      const schedulePrefetch = (): void => {
+        const duration = audio.duration;
 
-      refs.prefetchTimer = setTimeout(() => {
-        const currentRefs = getTtsRefs(messageId);
-        const nextFetchIndex = currentRefs.currentFetchingIndex;
-        if (nextFetchIndex < currentRefs.chunks.length) {
-          void fetchChunkAudio(
-            nextFetchIndex,
-            currentRefs.chunks[nextFetchIndex]!,
-          ).then((nextAudio) => {
-            if (nextAudio) {
-              const r = getTtsRefs(messageId);
-              r.audioQueue[nextFetchIndex] = nextAudio;
-              r.currentFetchingIndex++;
+        if (!duration || isNaN(duration)) {
+          return;
+        }
 
-              if (r.isProcessing && r.currentPlayingIndex === nextFetchIndex) {
-                playNextChunk();
+        const PREFETCH_MARGIN = 2; // seconds
+        const prefetchDelay = Math.max(0, (duration - PREFETCH_MARGIN) * 1000);
+
+        if (refs.prefetchTimer) {
+          clearTimeout(refs.prefetchTimer);
+        }
+
+        refs.prefetchTimer = setTimeout(() => {
+          const currentRefs = getTtsRefs(messageId);
+          const nextFetchIndex = currentRefs.currentFetchingIndex;
+          if (nextFetchIndex < currentRefs.chunks.length) {
+            void fetchChunkAudio(
+              nextFetchIndex,
+              currentRefs.chunks[nextFetchIndex]!,
+            ).then((nextAudio) => {
+              if (nextAudio) {
+                const r = getTtsRefs(messageId);
+                r.audioQueue[nextFetchIndex] = nextAudio;
+                r.currentFetchingIndex++;
+
+                if (
+                  r.isProcessing &&
+                  r.currentPlayingIndex === nextFetchIndex
+                ) {
+                  playQueuedChunk();
+                }
+              } else {
+                logger.error(
+                  `TTS: Failed to prefetch chunk ${nextFetchIndex + 1}`,
+                );
               }
-            } else {
-              logger.error(
-                `TTS: Failed to prefetch chunk ${nextFetchIndex + 1}`,
-              );
-            }
-            return undefined;
-          });
-        }
-      }, prefetchDelay);
-    };
+              return undefined;
+            });
+          }
+        }, prefetchDelay);
+      };
 
-    const onLoadedMetadata = (): void => {
-      schedulePrefetch();
-      audio.removeEventListener("loadedmetadata", onLoadedMetadata);
-    };
+      const onLoadedMetadata = (): void => {
+        schedulePrefetch();
+        audio.removeEventListener("loadedmetadata", onLoadedMetadata);
+      };
 
-    if (audio.duration && !isNaN(audio.duration)) {
-      schedulePrefetch();
-    } else {
-      audio.addEventListener("loadedmetadata", onLoadedMetadata);
-    }
-
-    const onEnded = (): void => {
-      audio.removeEventListener("ended", onEnded);
-      audio.removeEventListener("error", onAudioError);
-
-      const refs2 = getTtsRefs(messageId);
-      refs2.currentPlayingIndex++;
-
-      if (refs2.currentPlayingIndex < refs2.chunks.length) {
-        const nextAudio = refs2.audioQueue[refs2.currentPlayingIndex];
-        if (nextAudio) {
-          playNextChunk();
-        } else {
-          setStore(messageId, { isPlaying: false });
-        }
+      if (audio.duration && !isNaN(audio.duration)) {
+        schedulePrefetch();
       } else {
-        // All chunks played
-        logger.debug("TTS: All chunks played, stopping");
-        setStore(messageId, { isPlaying: false });
-        refs2.isProcessing = false;
+        audio.addEventListener("loadedmetadata", onLoadedMetadata);
       }
-    };
 
-    const onAudioError = (): void => {
-      audio.removeEventListener("ended", onEnded);
-      audio.removeEventListener("error", onAudioError);
-
-      const audioError = new Error(t("hooks.tts.failed-to-play"));
-      logger.error(
-        `TTS: Chunk ${nextIndex + 1} playback error`,
-        parseError(audioError),
-      );
-
-      setStore(messageId, {
-        error: t("hooks.tts.failed-to-play"),
-        isPlaying: false,
-      });
-
-      const refs2 = getTtsRefs(messageId);
-      refs2.isProcessing = false;
-    };
-
-    audio.addEventListener("ended", onEnded);
-    audio.addEventListener("error", onAudioError);
-
-    void audio
-      .play()
-      .then(() => {
-        logger.debug(`TTS: Audio.play() succeeded for chunk ${nextIndex + 1}`);
-        return undefined;
-      })
-      .catch((err: Error | null) => {
-        const errMsg = err instanceof Error ? err.message : String(err);
-        // Browser autoplay policy blocks audio outside user gesture — expected when
-        // autoplay is enabled and user hasn't interacted recently.
-        const isAutoplayBlocked =
-          errMsg.includes("user gesture") || errMsg.includes("NotAllowedError");
-        if (isAutoplayBlocked) {
-          logger.warn(
-            `TTS: Autoplay blocked by browser for chunk ${nextIndex + 1}`,
-            {
-              error: errMsg,
-            },
-          );
-        } else {
-          logger.error(`TTS: Failed to play chunk ${nextIndex + 1}`, {
-            error: errMsg,
-          });
-        }
-
+      const onEnded = (): void => {
         audio.removeEventListener("ended", onEnded);
         audio.removeEventListener("error", onAudioError);
-        audio.removeEventListener("loadedmetadata", onLoadedMetadata);
+
+        const refs2 = getTtsRefs(messageId);
+        refs2.currentPlayingIndex++;
+
+        if (refs2.currentPlayingIndex < refs2.chunks.length) {
+          const nextAudio = refs2.audioQueue[refs2.currentPlayingIndex];
+          if (nextAudio) {
+            playQueuedChunk();
+          } else {
+            setStore(messageId, { isPlaying: false });
+          }
+        } else {
+          // All chunks played
+          logger.debug("TTS: All chunks played, stopping");
+          setStore(messageId, { isPlaying: false });
+          refs2.isProcessing = false;
+        }
+      };
+
+      const onAudioError = (): void => {
+        audio.removeEventListener("ended", onEnded);
+        audio.removeEventListener("error", onAudioError);
+
+        const audioError = new Error(t("hooks.tts.failed-to-play"));
+        logger.error(
+          `TTS: Chunk ${nextIndex + 1} playback error`,
+          parseError(audioError),
+        );
 
         setStore(messageId, {
           error: t("hooks.tts.failed-to-play"),
@@ -351,8 +313,54 @@ export function useTTSAudio({
 
         const refs2 = getTtsRefs(messageId);
         refs2.isProcessing = false;
-      });
-  }, [logger, messageId, t, fetchChunkAudio, setStore]);
+      };
+
+      audio.addEventListener("ended", onEnded);
+      audio.addEventListener("error", onAudioError);
+
+      void audio
+        .play()
+        .then(() => {
+          logger.debug(
+            `TTS: Audio.play() succeeded for chunk ${nextIndex + 1}`,
+          );
+          return undefined;
+        })
+        .catch((err: Error | null) => {
+          const errMsg = err instanceof Error ? err.message : String(err);
+          // Browser autoplay policy blocks audio outside user gesture — expected when
+          // autoplay is enabled and user hasn't interacted recently.
+          const isAutoplayBlocked =
+            errMsg.includes("user gesture") ||
+            errMsg.includes("NotAllowedError");
+          if (isAutoplayBlocked) {
+            logger.warn(
+              `TTS: Autoplay blocked by browser for chunk ${nextIndex + 1}`,
+              {
+                error: errMsg,
+              },
+            );
+          } else {
+            logger.error(`TTS: Failed to play chunk ${nextIndex + 1}`, {
+              error: errMsg,
+            });
+          }
+
+          audio.removeEventListener("ended", onEnded);
+          audio.removeEventListener("error", onAudioError);
+          audio.removeEventListener("loadedmetadata", onLoadedMetadata);
+
+          setStore(messageId, {
+            error: t("hooks.tts.failed-to-play"),
+            isPlaying: false,
+          });
+
+          const refs2 = getTtsRefs(messageId);
+          refs2.isProcessing = false;
+        });
+    },
+    [logger, messageId, t, fetchChunkAudio, setStore],
+  );
 
   // Main play audio function
   const playAudio = useCallback(async (): Promise<void> => {

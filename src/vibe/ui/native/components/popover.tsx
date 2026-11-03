@@ -1,5 +1,4 @@
 import * as PopoverPrimitive from "@rn-primitives/popover";
-import { styled } from "nativewind";
 import * as React from "react";
 import { View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
@@ -14,10 +13,10 @@ import type {
   PopoverTriggerProps,
 } from "../../web/components/popover";
 import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { TextClassContext } from "./text";
 
-const StyledView = styled(View, { className: "style" });
+const StyledView = styledNative(View);
 
 function Popover({ children, ...props }: PopoverRootProps): React.JSX.Element {
   return <PopoverPrimitive.Root {...props}>{children}</PopoverPrimitive.Root>;

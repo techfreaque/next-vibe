@@ -21,7 +21,7 @@
  * Both carry only THIS endpoint instance's events — no cross-endpoint filtering.
  */
 
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import type { CountryLanguage } from "../../core/i18n/core/config";
@@ -94,8 +94,9 @@ export function useEndpointSubscription(
 ): void {
   // Use a ref so onEvent always reads the latest requestData without causing
   // re-subscription on every render (requestData object identity may change).
+  // Refs are synced in a layout effect, which runs before the subscription
+  // effect below, so the subscription always sees the committed values.
   const requestDataRef = useRef<Record<string, WidgetData>>(requestData ?? {});
-  requestDataRef.current = requestData ?? {};
 
   // Serialize urlPathParams to a stable string so a new object with the same
   // values does not trigger re-subscription (common when callers pass inline literals).
@@ -105,16 +106,25 @@ export function useEndpointSubscription(
       )
     : undefined;
 
-  // Keep a ref so the effect body always reads the latest params without
-  // needing to list the object itself in the dependency array.
-  const urlPathParamsRef = useRef(urlPathParams);
-  urlPathParamsRef.current = urlPathParams;
+  // Hold the params object whose identity only changes when its values change
+  // ("adjust state when a prop changes"), so the effect can depend on it directly.
+  const [stableUrlPathParams, setStableUrlPathParams] = useState({
+    key: urlPathParamsKey,
+    params: urlPathParams,
+  });
+  if (stableUrlPathParams.key !== urlPathParamsKey) {
+    setStableUrlPathParams({ key: urlPathParamsKey, params: urlPathParams });
+  }
+  const resolvedUrlPathParams = stableUrlPathParams.params;
 
   // Refs so onEvent reads the latest user/locale without re-subscribing.
   const userRef = useRef(user);
-  userRef.current = user;
   const localeRef = useRef(locale);
-  localeRef.current = locale;
+  useLayoutEffect(() => {
+    requestDataRef.current = requestData ?? {};
+    userRef.current = user;
+    localeRef.current = locale;
+  });
 
   // Stable user id key - avoid re-subscribing when the user object is recreated.
   const userId = user ? (user.isPublic ? user.leadId : user.id) : undefined;
@@ -131,7 +141,7 @@ export function useEndpointSubscription(
       registerEventApplier(cacheKey, applierToken);
     }
 
-    const resolvedParams = urlPathParamsRef.current ?? {};
+    const resolvedParams = resolvedUrlPathParams ?? {};
     const pathChannel = buildWsChannel(
       endpoint,
       resolvedParams,
@@ -299,5 +309,13 @@ export function useEndpointSubscription(
         unsub();
       }
     };
-  }, [enabled, endpoint, urlPathParamsKey, logger, cacheKey, userId, locale]);
+  }, [
+    enabled,
+    endpoint,
+    resolvedUrlPathParams,
+    logger,
+    cacheKey,
+    userId,
+    locale,
+  ]);
 }

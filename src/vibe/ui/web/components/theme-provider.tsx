@@ -2,7 +2,7 @@
 
 import type { ThemeProviderProps as NextThemesProviderProps } from "next-themes";
 import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes";
-import React, { type JSX, useEffect, useState } from "react";
+import React, { type JSX, useEffect, useSyncExternalStore } from "react";
 
 import { setCookie } from "../lib/cookies";
 import { storage } from "../lib/storage";
@@ -67,14 +67,21 @@ export interface UseThemeToggleReturn {
   isMounted: boolean;
 }
 
+const noopSubscribe = (): (() => void) => () => undefined;
+
+// false during SSR + hydration, true on the client afterwards
+function useIsMounted(): boolean {
+  return useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false,
+  );
+}
+
 export function useThemeToggle(): UseThemeToggleReturn {
   const { setTheme, resolvedTheme } = useTheme();
   const theme = resolvedTheme === "dark" ? "dark" : "light";
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  const isMounted = useIsMounted();
 
   function onToggleTheme(): void {
     setTheme(theme === "dark" ? "light" : "dark");

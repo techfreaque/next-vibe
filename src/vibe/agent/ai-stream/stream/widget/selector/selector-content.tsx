@@ -68,14 +68,24 @@ export function SelectorContent({ locale }: SelectorContentProps): JSX.Element {
     return !favoritesLoading && favorites.length === 0;
   }, [favorites, favoritesLoading]);
 
-  useEffect(() => {
-    if (!favoritesLoading && view !== "onboarding") {
-      const nextView = needsOnboarding ? "onboarding" : "favorites";
+  // Once favorites load, pick the view (onboarding sticks until onDone).
+  // Adjusted during render instead of in an effect to avoid a cascading render.
+  if (!favoritesLoading && view !== "onboarding") {
+    const nextView = needsOnboarding ? "onboarding" : "favorites";
+    if (nextView !== view) {
       setView(nextView);
-      // Tour is waiting for onboarding signal - fire it immediately when skipping onboarding
-      if (nextView === "favorites" && tourActive) {
-        setOnboardingComplete(true);
-      }
+    }
+  }
+
+  useEffect(() => {
+    // Tour is waiting for onboarding signal - fire it immediately when skipping onboarding
+    if (
+      !favoritesLoading &&
+      view !== "onboarding" &&
+      !needsOnboarding &&
+      tourActive
+    ) {
+      setOnboardingComplete(true);
     }
   }, [
     favoritesLoading,

@@ -11,40 +11,42 @@ interface TouchDeviceStore {
   initialize: () => void;
 }
 
-const useTouchDeviceStore = create<TouchDeviceStore>((set, get) => ({
-  isTouch: false,
-  isInitialized: false,
+const useTouchDeviceStore = create<TouchDeviceStore>((set, get) => {
+  const checkTouch = (): void => {
+    const hasTouch =
+      "ontouchstart" in window ||
+      navigator.maxTouchPoints > 0 ||
+      ("msMaxTouchPoints" in navigator &&
+        (navigator as Navigator & { msMaxTouchPoints: number })
+          .msMaxTouchPoints > 0);
 
-  initialize: (): void => {
-    if (get().isInitialized) {
-      return;
-    }
+    set({ isTouch: hasTouch, isInitialized: true });
+  };
 
-    if (platform.isReactNative) {
-      set({ isTouch: true, isInitialized: true });
-      return;
-    }
+  return {
+    isTouch: false,
+    isInitialized: false,
 
-    if (typeof window === "undefined") {
-      return;
-    }
+    initialize: (): void => {
+      if (get().isInitialized) {
+        return;
+      }
 
-    const checkTouch = (): void => {
-      const hasTouch =
-        "ontouchstart" in window ||
-        navigator.maxTouchPoints > 0 ||
-        ("msMaxTouchPoints" in navigator &&
-          (navigator as Navigator & { msMaxTouchPoints: number })
-            .msMaxTouchPoints > 0);
+      if (platform.isReactNative) {
+        set({ isTouch: true, isInitialized: true });
+        return;
+      }
 
-      set({ isTouch: hasTouch, isInitialized: true });
-    };
+      if (typeof window === "undefined") {
+        return;
+      }
 
-    checkTouch();
+      checkTouch();
 
-    window.addEventListener("resize", checkTouch);
-  },
-}));
+      window.addEventListener("resize", checkTouch);
+    },
+  };
+});
 
 export function useTouchDevice(): boolean {
   const isTouch = useTouchDeviceStore((state) => state.isTouch);

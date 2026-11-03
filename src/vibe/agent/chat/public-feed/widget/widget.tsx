@@ -25,7 +25,7 @@ import {
   useWidgetForm,
   useWidgetSelector,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import React from "react";
+import React, { useState } from "react";
 
 import { useChatNavigationStore } from "../../hooks/use-chat-navigation-store";
 import type definition from "../definition";
@@ -74,8 +74,10 @@ function FeedThreadRow({ item }: { item: PublicFeedItem }): React.JSX.Element {
     pushState(url);
   };
 
+  // Snapshot "now" once per mount - keeps render pure
+  const [now] = useState(() => Date.now());
   const hoursSinceCreation =
-    (Date.now() - new Date(item.createdAt).getTime()) / (1000 * 60 * 60);
+    (now - new Date(item.createdAt).getTime()) / (1000 * 60 * 60);
   const isRising = hoursSinceCreation < 24 && item.score > 0;
 
   return (

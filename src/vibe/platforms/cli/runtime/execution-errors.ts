@@ -36,11 +36,6 @@ abstract class CliError extends Error {
     this.name = this.constructor.name;
     this.timestamp = new Date();
     this.context = context;
-
-    // Maintain proper stack trace
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, this.constructor);
-    }
   }
 
   /**

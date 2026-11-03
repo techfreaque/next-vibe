@@ -589,11 +589,16 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
   });
   const credits = creditsResponse ?? null;
 
-  useEffect(() => {
-    if (profile?.avatarUrl) {
-      setLiveAvatarUrl(profile.avatarUrl);
+  // Server avatar wins whenever it changes (adjust state during render)
+  const profileAvatarUrl = profile?.avatarUrl;
+  const [prevProfileAvatarUrl, setPrevProfileAvatarUrl] =
+    useState(profileAvatarUrl);
+  if (profileAvatarUrl !== prevProfileAvatarUrl) {
+    setPrevProfileAvatarUrl(profileAvatarUrl);
+    if (profileAvatarUrl) {
+      setLiveAvatarUrl(profileAvatarUrl);
     }
-  }, [profile?.avatarUrl]);
+  }
 
   const handleAvatarUploaded = useCallback(
     (url: string): void => {

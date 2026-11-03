@@ -28,7 +28,7 @@ import { Span } from "next-vibe/ui/components/span";
 import { Switch } from "next-vibe/ui/components/switch";
 import { storage } from "next-vibe/ui/lib/storage";
 import type { JSX } from "react";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import instanceEndpoints from "../../remote-connection/[instanceId]/definition";
 import { scopedTranslation as connectScopedTranslation } from "../../remote-connection/connect/i18n";
@@ -262,8 +262,11 @@ function UnbottledLoginField({
   // Connection state is the source of truth — a system inference provider is a
   // remote connection flagged isInferenceProvider, not an env credential.
   const connections = useRemoteConnections(logger, user);
-  const provider = connections.read?.data?.connections.find(
-    (c) => c.isInferenceProvider,
+  const refetchConnections = connections.read?.refetch;
+  const connectionList = connections.read?.data?.connections;
+  const provider = useMemo(
+    () => connectionList?.find((c) => c.isInferenceProvider),
+    [connectionList],
   );
   const isConnected = provider?.healthStatus === "healthy";
   const isConfiguredButUnhealthy = !!provider && !isConnected;
@@ -294,18 +297,27 @@ function UnbottledLoginField({
       setError(t("wizard.ai.unbottledLoginFailed"));
       return;
     }
-    await connections.read?.refetch();
-  }, [email, password, remoteUrl, syncScope, t, connectMutation, connections]);
+    await refetchConnections?.();
+  }, [
+    email,
+    password,
+    remoteUrl,
+    syncScope,
+    t,
+    connectMutation,
+    refetchConnections,
+  ]);
 
+  const providerInstanceId = provider?.instanceId;
   const handleDisconnect = useCallback(async (): Promise<void> => {
-    if (!provider) {
+    if (!providerInstanceId) {
       return;
     }
     await disconnectMutation.mutateAsync({
-      urlPathParams: { instanceId: provider.instanceId },
+      urlPathParams: { instanceId: providerInstanceId },
     });
-    await connections.read?.refetch();
-  }, [provider, disconnectMutation, connections]);
+    await refetchConnections?.();
+  }, [providerInstanceId, disconnectMutation, refetchConnections]);
 
   return (
     <Div className="flex flex-col gap-3 mb-4">

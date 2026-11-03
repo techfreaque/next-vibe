@@ -41,6 +41,16 @@ export function AudioWaveform({
   const maxAmplitudeRef = React.useRef<number>(0); // Track max for smoothing
   const isPausedRef = React.useRef(isPaused);
 
+  // Reset displayed levels when the stream goes away (adjusted during render)
+  const [prevDeps, setPrevDeps] = React.useState({ stream, barCount });
+  if (prevDeps.stream !== stream || prevDeps.barCount !== barCount) {
+    setPrevDeps({ stream, barCount });
+    if (!stream) {
+      setAudioLevels(Array(barCount).fill(0));
+      setMaxAmplitude(0);
+    }
+  }
+
   // Keep isPausedRef in sync with isPaused prop
   React.useEffect(() => {
     isPausedRef.current = isPaused;
@@ -48,10 +58,7 @@ export function AudioWaveform({
 
   React.useEffect(() => {
     if (!stream) {
-      // Reset when not streaming
-      const resetLevels = Array(barCount).fill(0);
-      setAudioLevels(resetLevels);
-      setMaxAmplitude(0);
+      // Reset when not streaming (displayed state is reset during render above)
       maxAmplitudeRef.current = 0;
       allSamplesRef.current = [];
       return;

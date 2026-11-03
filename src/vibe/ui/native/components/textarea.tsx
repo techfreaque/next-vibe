@@ -12,8 +12,8 @@
  */
 
 import { cva } from "class-variance-authority";
-import { styled } from "nativewind";
 import * as React from "react";
+import type { TextInputInstance } from "react-native";
 import { TextInput, View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
@@ -24,7 +24,7 @@ import type {
   TextareaRefObject,
 } from "../../web/components/textarea";
 import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 const noop = (): void => {
   return undefined;
 };
@@ -32,8 +32,8 @@ const noopBool = (): boolean => {
   return false;
 };
 
-const StyledView = styled(View, { className: "style" });
-const StyledTextInput = styled(TextInput, { className: "style" });
+const StyledView = styledNative(View);
+const StyledTextInput = styledNative(TextInput);
 
 // Native textarea variants using CVA (matches web version structure)
 export const textareaVariants = cva(
@@ -80,7 +80,7 @@ const TextareaInner = (
   }: Omit<TextareaProps, "ref">,
   ref: React.ForwardedRef<TextareaRefObject>,
 ): React.JSX.Element => {
-  const textInputRef = React.useRef<TextInput>(null);
+  const textInputRef = React.useRef<TextInputInstance>(null);
 
   React.useImperativeHandle(
     ref,

@@ -48,6 +48,11 @@ const PACK_TYPE_COLORS: Record<string, string> = {
   earned: "bg-warning/10 text-warning",
 };
 
+/** Wall-clock comparison kept outside render so components stay pure. */
+function isInPast(date: Date | string | number): boolean {
+  return new Date(date) < new Date();
+}
+
 function getPackTypeColor(packType: string): string {
   const lower = packType.toLowerCase();
   for (const [key, value] of Object.entries(PACK_TYPE_COLORS)) {
@@ -67,8 +72,7 @@ function PurchaseRow({
   locale: CountryLanguage;
   t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
 }): React.JSX.Element {
-  const isExpired =
-    purchase.expiresAt && new Date(purchase.expiresAt) < new Date();
+  const isExpired = purchase.expiresAt && isInPast(purchase.expiresAt);
   const usageRatio =
     purchase.originalAmount > 0
       ? ((purchase.remaining / purchase.originalAmount) * 100).toFixed(0)

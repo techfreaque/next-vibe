@@ -2,6 +2,7 @@
 
 import type { JSX } from "react";
 import * as React from "react";
+import type { ViewInstance } from "react-native";
 import { Pressable, Text as RNText, View } from "react-native";
 
 import type {
@@ -25,7 +26,7 @@ export type DivProps = DivBaseProps & StyleType;
 
 // Create compatibility layer functions
 // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Accepted for API compatibility with web
-function createDivRefObject(view: View | null): DivRefObject {
+function createDivRefObject(view: ViewInstance | null): DivRefObject {
   // React Native doesn't have DOM refs, return polyfill object for compatibility
   // The web version returns actual DOM Element refs
   return {
@@ -167,7 +168,7 @@ export const Div = React.forwardRef<DivRefObject, Omit<DivProps, "ref">>(
       [children],
     );
 
-    const viewRef = React.useRef<View>(null);
+    const viewRef = React.useRef<ViewInstance>(null);
 
     React.useImperativeHandle(ref, (): DivRefObject => {
       const node = viewRef.current;

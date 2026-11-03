@@ -68,7 +68,7 @@ async function extractCategories(
       }
 
       const mod = (await import(
-        /* @vite-ignore */
+        /* webpackIgnore: true */ /* turbopackIgnore: true */ /* @vite-ignore */
         toImportUrl(catFile)
       )) as Record<string, CategoryDefinition>;
       const def = mod["category"];

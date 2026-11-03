@@ -265,7 +265,10 @@ export function FoldersListContainer(): React.JSX.Element {
   // Search query persisted in Zustand store (survives sidebar unmount/remount)
   const searchQuery = useChatNavigationStore((s) => s.sidebarSearchQuery);
   const setSearchQuery = useChatNavigationStore((s) => s.setSidebarSearchQuery);
-  const [debouncedQuery, setDebouncedQuery] = useState(searchQuery.trim());
+  const [rawDebouncedQuery, setDebouncedQuery] = useState(searchQuery.trim());
+  // An empty search query clears the debounced value immediately (no debounce)
+  const debouncedQuery =
+    searchQuery.trim().length === 0 ? "" : rawDebouncedQuery;
   const [newFolderDialogOpen, setNewFolderDialogOpen] = useState(false);
   const searchInputRef = useRef<InputRefObject>(null);
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -324,7 +327,6 @@ export function FoldersListContainer(): React.JSX.Element {
       clearTimeout(debounceTimerRef.current);
     }
     if (searchQuery.trim().length === 0) {
-      setDebouncedQuery("");
       return;
     }
     debounceTimerRef.current = setTimeout(() => {
@@ -367,11 +369,12 @@ export function FoldersListContainer(): React.JSX.Element {
   }, [debouncedQuery, activeRootFolderId, searchEndpoint]);
 
   // Extract thread IDs from cortex search results
+  const searchResponse = searchEndpoint?.read?.response;
   const searchThreadIds = useMemo(() => {
-    if (!searchEndpoint?.read?.response?.success) {
+    if (!searchResponse?.success) {
       return [];
     }
-    const results = searchEndpoint.read.response.data?.results ?? [];
+    const results = searchResponse.data?.results ?? [];
     const ids: string[] = [];
     for (const result of results) {
       const match = result.resultPath.match(UUID_REGEX);
@@ -380,7 +383,7 @@ export function FoldersListContainer(): React.JSX.Element {
       }
     }
     return ids;
-  }, [searchEndpoint?.read?.response]);
+  }, [searchResponse]);
 
   // Show loading while debouncing OR while API is fetching
   const isSearchActive = searchQuery.trim().length > 0;
@@ -501,7 +504,12 @@ export function FoldersListContainer(): React.JSX.Element {
             type="text"
             placeholder={t("widget.common.searchPlaceholder")}
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              if (e.target.value.trim().length === 0) {
+                setDebouncedQuery("");
+              }
+            }}
             className={cn(
               "pl-8 h-10 sm:h-8 text-sm border-none bg-primary/10 focus-visible:ring-primary",
               isSearchActive && "pr-8",

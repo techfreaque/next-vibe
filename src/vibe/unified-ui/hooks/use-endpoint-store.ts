@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useSyncExternalStore } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { create } from "zustand";
 
 import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
@@ -32,6 +39,32 @@ const valueRegistry = new Map<string, ValueEntry>();
 
 // Stable empty fallback - prevents useSyncExternalStore tearing loop when entry not yet set
 const EMPTY_ENDPOINT_RETURN = {} as EndpointReturn<AnyEndpointMap>;
+
+// Stable no-op subscribe for owners (they never re-render from the registry)
+function noopSubscribe(): () => void {
+  return (): void => undefined;
+}
+
+/** Which instance key this hook instance evaluated ownership for */
+interface EndpointOwnership {
+  key: string;
+  isOwner: boolean;
+}
+
+/**
+ * Ownership records whose registration was already released. Lets the
+ * render-phase release (key change) and the effect cleanup (unmount) share one
+ * idempotent path, so a registration is never unregistered twice.
+ */
+const releasedOwnerships = new WeakSet<EndpointOwnership>();
+
+function releaseOwnership(ownership: EndpointOwnership): void {
+  if (releasedOwnerships.has(ownership)) {
+    return;
+  }
+  releasedOwnerships.add(ownership);
+  endpointInstanceStore.getState().unregister(ownership.key, ownership.isOwner);
+}
 
 function getEntry(key: string): ValueEntry | undefined {
   return valueRegistry.get(key);
@@ -264,28 +297,25 @@ export function useEndpointManaged<
     [endpoints, urlPathParams, logger, readInitialState],
   );
 
-  const isOwnerRef = useRef<boolean | null>(null);
-  // Track previous instanceKey to detect navigation (key change mid-lifecycle).
-  const prevInstanceKeyRef = useRef<string | null>(null);
-
-  // Re-evaluate ownership when instanceKey changes (e.g. navigating user1 → user2).
-  // On key change: unregister from old key synchronously and reset ownership.
-  if (prevInstanceKeyRef.current !== instanceKey) {
-    if (prevInstanceKeyRef.current !== null) {
-      endpointInstanceStore
-        .getState()
-        .unregister(prevInstanceKeyRef.current, isOwnerRef.current === true);
-    }
-    prevInstanceKeyRef.current = instanceKey;
-    isOwnerRef.current = null; // force re-evaluation below
+  // Ownership is decided synchronously on the first render for a key (first
+  // instance without a registered owner becomes the owner) and held in state.
+  // On key change (e.g. navigating user1 → user2) it is re-evaluated during
+  // render via the "adjust state when a prop changes" pattern, and the old key
+  // is unregistered synchronously so ownership of it frees up immediately.
+  const [ownership, setOwnership] = useState<EndpointOwnership>(() => ({
+    key: instanceKey,
+    isOwner: !endpointInstanceStore.getState().hasOwner(instanceKey),
+  }));
+  let currentOwnership = ownership;
+  if (ownership.key !== instanceKey) {
+    releaseOwnership(ownership);
+    currentOwnership = {
+      key: instanceKey,
+      isOwner: !endpointInstanceStore.getState().hasOwner(instanceKey),
+    };
+    setOwnership(currentOwnership);
   }
-
-  if (isOwnerRef.current === null) {
-    isOwnerRef.current = !endpointInstanceStore
-      .getState()
-      .hasOwner(instanceKey);
-  }
-  const isOwner = isOwnerRef.current;
+  const isOwner = currentOwnership.isOwner;
 
   // Always call useEndpointOriginal unconditionally - same hook order every render.
   // Owner's result gets published; subscriber's result is discarded.
@@ -297,7 +327,7 @@ export function useEndpointManaged<
   );
 
   // Owner: write latest value into registry during render (no setState = no loop).
-  // Do NOT notify listeners here - defer to useEffect to avoid render-phase side effects.
+  // Do NOT notify listeners here - defer to an effect to avoid render-phase side effects.
   if (isOwner) {
     setEntryValue(
       instanceKey,
@@ -306,63 +336,59 @@ export function useEndpointManaged<
     );
   }
 
-  // Owner: notify subscribers via microtask after render, but only when
-  // meaningful data changed. We compare read.data + read.isLoading by reference only —
-  // form.watch() creates new objects every render even with identical data,
-  // so including create.values in the comparison would always notify and cause a loop.
+  // Owner: notify subscribers after commit, but only when meaningful data
+  // changed. We compare read.data + read.isLoading by reference only —
+  // form value subscriptions create new objects every render even with
+  // identical data, so including create.values would always notify and loop.
   // Cast to a concrete map type so TypeScript resolves "read" (not "never").
   interface ConcreteMap {
     GET: CreateApiEndpointAny;
     POST: CreateApiEndpointAny;
   }
   type ConcreteReturn = EndpointReturn<ConcreteMap>;
-  const prevReadDataRef = useRef<ConcreteReturn["read"]["data"]>(undefined);
-  const prevReadIsLoadingRef = useRef<boolean | undefined>(undefined);
-  if (isOwner) {
-    const current = ownResult as ConcreteReturn;
-    const readData = current.read?.data;
-    const readIsLoading = current.read?.isLoading;
-    const meaningfullyChanged =
-      prevReadDataRef.current !== readData ||
-      prevReadIsLoadingRef.current !== readIsLoading;
-    if (meaningfullyChanged) {
-      prevReadDataRef.current = readData;
-      prevReadIsLoadingRef.current = readIsLoading;
-      // Defer notification outside render phase - avoids setState-during-render loops
-      queueMicrotask(() => {
-        notifyListeners(instanceKey);
-      });
+  const ownRead = (ownResult as ConcreteReturn).read;
+  const readData = ownRead?.data;
+  const readIsLoading = ownRead?.isLoading;
+  const lastNotifiedRef = useRef<{
+    data: ConcreteReturn["read"]["data"];
+    isLoading: boolean | undefined;
+  } | null>(null);
+  useLayoutEffect(() => {
+    if (!isOwner) {
+      return;
     }
-  }
+    const prev = lastNotifiedRef.current;
+    if (
+      prev !== null &&
+      prev.data === readData &&
+      prev.isLoading === readIsLoading
+    ) {
+      return;
+    }
+    lastNotifiedRef.current = { data: readData, isLoading: readIsLoading };
+    notifyListeners(instanceKey);
+  });
 
-  // Lifecycle: register on mount/key-change, unregister on unmount only.
-  // Key-change unregistration is handled synchronously above (prevInstanceKeyRef).
-  const registeredKeyRef = useRef<string | null>(null);
+  // Lifecycle: register on mount/key-change, unregister on unmount.
+  // Key-change unregistration already happened synchronously during render
+  // (releaseOwnership above); releaseOwnership is idempotent per registration.
   useEffect((): (() => void) => {
-    endpointInstanceStore.getState().register(instanceKey, isOwner);
-    registeredKeyRef.current = instanceKey;
+    releasedOwnerships.delete(currentOwnership);
+    endpointInstanceStore
+      .getState()
+      .register(currentOwnership.key, currentOwnership.isOwner);
     return (): void => {
-      // Only unregister if we haven't already done so synchronously (key change)
-      if (registeredKeyRef.current === instanceKey) {
-        if (isOwner) {
-          isOwnerRef.current = null;
-        }
-        endpointInstanceStore.getState().unregister(instanceKey, isOwner);
-        registeredKeyRef.current = null;
-      }
+      releaseOwnership(currentOwnership);
     };
-  }, [instanceKey, isOwner]);
+  }, [currentOwnership]);
 
   // Subscribers: read from registry reactively.
   // Owner uses a no-op subscribe so useSyncExternalStore never re-renders it
   // (the owner already re-renders when its own hooks change; subscribing to its
-  // own notifications would create an infinite loop via queueMicrotask).
-  const noopSubscribe = useRef<(listener: () => void) => () => void>(
-    (): (() => void) => (): void => undefined,
-  );
+  // own notifications would create an infinite loop).
   const sharedValue = useSyncExternalStore(
     isOwner
-      ? noopSubscribe.current
+      ? noopSubscribe
       : (listener): (() => void) => subscribeToKey(instanceKey, listener),
     (): EndpointReturn<AnyEndpointMap> =>
       getEntry(instanceKey)?.value ?? EMPTY_ENDPOINT_RETURN,

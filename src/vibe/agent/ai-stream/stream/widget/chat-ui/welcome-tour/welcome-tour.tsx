@@ -76,12 +76,8 @@ export function WelcomeTour({
     (state) => state.setModelSelectorOpen,
   );
   const setAdvanceTour = useTourState((state) => state.setAdvanceTour);
-  const onboardingComplete = useTourState((state) => state.onboardingComplete);
   const setOnboardingComplete = useTourState(
     (state) => state.setOnboardingComplete,
-  );
-  const onboardingCompanionId = useTourState(
-    (state) => state.onboardingCompanionId,
   );
   const setOnboardingCompanionId = useTourState(
     (state) => state.setOnboardingCompanionId,
@@ -232,7 +228,7 @@ export function WelcomeTour({
       setStepIndex(nextIndex);
       void storage.setItem(TOUR_LAST_STEP_KEY, nextIndex.toString());
     }
-  }, [stepIndex, steps.length]);
+  }, [stepIndex, steps.length, setStepIndex]);
 
   // Register advanceTour callback so Selector can call it
   useEffect(() => {
@@ -257,9 +253,16 @@ export function WelcomeTour({
     }
   }, [modelSelectorOpen, run, stepIndex]);
 
-  // Resume tour after onboarding completes inside the selector
-  useEffect(() => {
-    if (onboardingComplete && waitingForSelectorRef.current) {
+  // Resume tour after onboarding completes inside the selector.
+  // Reacts to the tour store event via subscription (plus an initial check), not via render-synced state.
+  useEffect((): (() => void) => {
+    const resumeAfterOnboarding = (
+      onboardingComplete: boolean,
+      onboardingCompanionId: string | null,
+    ): void => {
+      if (!onboardingComplete || !waitingForSelectorRef.current) {
+        return;
+      }
       waitingForSelectorRef.current = false;
       setOnboardingComplete(false);
 
@@ -295,12 +298,22 @@ export function WelcomeTour({
       goToNextStep();
       // Wait for favorites list to fully render before resuming tour
       setTimeout(() => setRun(true), 800);
-    }
+    };
+
+    const initial = useTourState.getState();
+    resumeAfterOnboarding(
+      initial.onboardingComplete,
+      initial.onboardingCompanionId,
+    );
+    return useTourState.subscribe((state) => {
+      resumeAfterOnboarding(
+        state.onboardingComplete,
+        state.onboardingCompanionId,
+      );
+    });
   }, [
-    onboardingComplete,
     goToNextStep,
     setOnboardingComplete,
-    onboardingCompanionId,
     setOnboardingCompanionId,
     stepIndex,
     t,
@@ -595,6 +608,9 @@ export function WelcomeTour({
       setBottomSheetExpanded,
       needsBottomSheetExpanded,
       pushState,
+      setRun,
+      setStepIndex,
+      setWaitingForBottomSheet,
     ],
   );
 

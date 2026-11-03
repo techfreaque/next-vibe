@@ -33,7 +33,7 @@ import {
  * name — a name-only test cannot express "the generated dir" without also
  * excluding every unrelated directory that happens to share the name:
  *
- *   `**` + `/name`  — a directory called `name` at any depth (`**​/node_modules`)
+ *   `**` + `/name`  — a directory called `name` at any depth (`**` + `/node_modules`)
  *   `a/b/c`         — exactly that path, relative to the scan root
  *
  * Anything below a match is pruned too, so a matched directory is never entered.

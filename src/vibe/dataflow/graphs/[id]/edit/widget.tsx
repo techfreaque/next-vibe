@@ -2297,11 +2297,19 @@ function EditFormInner({
   }, []);
 
   // ── React to successful save ──
+  // Clear dirty once per new save id (adjust-state-during-render)
+  const savedNewId = savedResponse?.newId;
+  const [handledSavedId, setHandledSavedId] = useState<string | undefined>(
+    undefined,
+  );
+  if (savedNewId && savedNewId !== handledSavedId) {
+    setHandledSavedId(savedNewId);
+    setDirty(false);
+  }
   useEffect(() => {
     if (!savedResponse?.newId) {
       return;
     }
-    setDirty(false);
     void (async (): Promise<void> => {
       const dataDef = await import("../data/definition");
       navigation.push(dataDef.default.GET, {
@@ -2354,19 +2362,22 @@ function EditFormInner({
 
   const isLoading = !isNewGraph && (parentEndpoint.read?.isLoading ?? true);
 
-  // Pre-fill when parent data loads
-  useEffect(() => {
-    if (parentGraph) {
-      setName(parentGraph.name);
-      setSlug(parentGraph.slug);
-      setDescription(parentGraph.description ?? "");
-      setWorkingNodes(parentGraph.config.nodes);
-      if (parentGraph.config.trigger.type === "cron") {
-        setTriggerType("cron");
-        setCronSchedule(parentGraph.config.trigger.schedule);
-      }
+  // Pre-fill when parent data loads (adjust-state-during-render, once per
+  // parent graph object)
+  const [prefilledFrom, setPrefilledFrom] = useState<typeof parentGraph | null>(
+    null,
+  );
+  if (parentGraph && parentGraph !== prefilledFrom) {
+    setPrefilledFrom(parentGraph);
+    setName(parentGraph.name);
+    setSlug(parentGraph.slug);
+    setDescription(parentGraph.description ?? "");
+    setWorkingNodes(parentGraph.config.nodes);
+    if (parentGraph.config.trigger.type === "cron") {
+      setTriggerType("cron");
+      setCronSchedule(parentGraph.config.trigger.schedule);
     }
-  }, [parentGraph]);
+  }
 
   // ── Endpoint node info (handles + categories) ──
   const endpointPaths = useMemo(
@@ -2387,7 +2398,10 @@ function EditFormInner({
   const [edges, setEdges, onEdgesChange] = useEdgesState(initial.edges);
   const loadingRef = useRef(true);
   const dirtyRef = useRef(false);
-  dirtyRef.current = dirty;
+  // Declared before the reset effect below so it sees the committed value
+  useEffect(() => {
+    dirtyRef.current = dirty;
+  });
 
   // Full reset from server config - only when NOT dirty (no unsaved local changes)
   useEffect(() => {
@@ -2634,7 +2648,9 @@ function EditFormInner({
 
   // Stable ref wrapper for addNode - prevents palette from re-rendering when workingNodes changes
   const addNodeRef = useRef(addNode);
-  addNodeRef.current = addNode;
+  useEffect(() => {
+    addNodeRef.current = addNode;
+  });
   const stableAddNode = useCallback(
     (alias: string, position?: { x: number; y: number }): void => {
       addNodeRef.current(alias, position);

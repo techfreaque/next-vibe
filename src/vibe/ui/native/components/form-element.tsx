@@ -4,9 +4,9 @@
  * Uses exact same interface as web version
  */
 
-import { styled } from "nativewind";
 import type { ForwardedRef } from "react";
 import { forwardRef, useImperativeHandle, useRef } from "react";
+import type { ViewInstance } from "react-native";
 import { View } from "react-native";
 
 // Import all types from web version (web is source of truth)
@@ -14,8 +14,9 @@ import type {
   FormElementProps,
   FormElementRefObject,
 } from "../../web/components/form-element";
+import { styledNative } from "../utils/style-converter";
 
-const StyledView = styled(View, { className: "style" });
+const StyledView = styledNative(View);
 
 /**
  * Native implementation using View
@@ -29,7 +30,7 @@ export const FormElement = forwardRef(function FormElement(
   // onSubmit is destructured to exclude it from props (not used in React Native)
   const { onSubmit: _, className, children } = props;
   void _; // Explicitly mark as intentionally unused
-  const viewRef = useRef<View>(null);
+  const viewRef = useRef<ViewInstance>(null);
 
   useImperativeHandle(ref, (): FormElementRefObject => {
     return {

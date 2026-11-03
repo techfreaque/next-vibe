@@ -153,9 +153,13 @@ export function TaskExecuteContainer({ field }: WidgetProps): JSX.Element {
     null,
   );
 
+  // No route - drop any previous endpoint (adjust state during render)
+  if (!routeId && toolEndpoint !== null) {
+    setToolEndpoint(null);
+  }
+
   useEffect((): (() => void) => {
     if (!routeId) {
-      setToolEndpoint(null);
       return () => undefined;
     }
 

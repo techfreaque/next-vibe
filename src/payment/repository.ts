@@ -20,7 +20,7 @@ type StripeCheckoutSessionCreateParams = NonNullable<
   Parameters<Stripe["checkout"]["sessions"]["create"]>[0]
 >;
 type StripeCheckoutPaymentMethodType = NonNullable<
-  StripeCheckoutSessionCreateParams["payment_method_types"]
+  StripeCheckoutSessionCreateParams["allowed_payment_method_types"]
 >[number];
 type StripeCheckoutMode = NonNullable<
   StripeCheckoutSessionCreateParams["mode"]
@@ -40,7 +40,7 @@ const CHECKOUT_MODE_TO_STRIPE: Record<
 };
 
 /**
- * Map our PaymentMethodType enum values to Stripe's payment_method_types parameter.
+ * Map our PaymentMethodType enum values to Stripe's allowed_payment_method_types parameter.
  * Our enums use i18n key patterns like "enums.paymentMethodType.card".
  */
 const PAYMENT_METHOD_TO_STRIPE: Record<
@@ -181,7 +181,7 @@ export class PaymentRepository {
 
       const sessionConfig: StripeCheckoutSessionCreateParams = {
         customer: stripeCustomerId,
-        payment_method_types: paymentMethodTypes,
+        allowed_payment_method_types: paymentMethodTypes,
         mode: modeValue,
         success_url:
           data.successUrl || `${coreEnv.NEXT_PUBLIC_APP_URL}/payment/success`,

@@ -1,16 +1,15 @@
-import { styled } from "nativewind";
 import * as React from "react";
 import { View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
 import type { SeparatorRootProps } from "../../web/components/separator";
 import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 
 export type { SeparatorRootProps };
 
 // Styled View component using nativewind
-const StyledView = styled(View);
+const StyledView = styledNative(View);
 
 /**
  * Separator component for React Native

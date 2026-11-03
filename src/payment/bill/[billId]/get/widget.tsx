@@ -30,6 +30,11 @@ import { BillStatus } from "@/payment/enum";
 
 import type definition from "./definition";
 
+/** Wall-clock comparison kept outside render so components stay pure. */
+function isInPast(date: Date | string | number): boolean {
+  return new Date(date) < new Date();
+}
+
 function fmt(n: number): string {
   return new Intl.NumberFormat(undefined, {
     minimumFractionDigits: 2,
@@ -96,7 +101,7 @@ export function BillGetWidget({
       data.status === BillStatus.APPROVED) &&
     data.dueDate !== null &&
     data.dueDate !== undefined &&
-    new Date(data.dueDate) < new Date();
+    isInPast(data.dueDate);
 
   const handleApproveBill = (e: ButtonMouseEvent): void => {
     e.stopPropagation();

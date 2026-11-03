@@ -7,7 +7,7 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
 
 import { useEdenAISpeech } from "../../../speech-to-text/hooks";
 
@@ -87,7 +87,9 @@ export function useVoiceRecording({
 
   // Stable ref for currentValue - avoids onTranscript depending on it
   const currentValueRef = useRef(currentValue);
-  currentValueRef.current = currentValue;
+  useLayoutEffect(() => {
+    currentValueRef.current = currentValue;
+  }, [currentValue]);
 
   // Stable callbacks for useEdenAISpeech - must not be inline arrows
   const onTranscript = useCallback(

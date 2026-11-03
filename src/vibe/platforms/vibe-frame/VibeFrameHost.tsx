@@ -14,12 +14,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import { createParentBridge, type ParentBridge } from "./bridge";
-import type {
-  FrameError,
-  FrameTheme,
-  FrameToParentMessage,
-  VibeFrameInstance,
-} from "./types";
+import type { FrameError, FrameTheme, FrameToParentMessage } from "./types";
 import { DEFAULT_SANDBOX, generateFrameId } from "./types";
 
 // ─── Props ───────────────────────────────────────────────────────────────────
@@ -97,19 +92,24 @@ export function VibeFrameHost({
     onAuthRequired,
     maxHeight,
   });
-  callbacksRef.current = {
-    onReady,
-    onClose,
-    onSuccess,
-    onError,
-    onNavigate,
-    onAuthRequired,
-    maxHeight,
-  };
 
   // Store current theme/data/auth in refs for the onLoad handler
   const propsRef = useRef({ theme, locale, cssVars, authToken });
-  propsRef.current = { theme, locale, cssVars, authToken };
+
+  // Keep refs pointing at the latest props (declared before the bridge effect
+  // so it runs first on every commit)
+  useEffect(() => {
+    callbacksRef.current = {
+      onReady,
+      onClose,
+      onSuccess,
+      onError,
+      onNavigate,
+      onAuthRequired,
+      maxHeight,
+    };
+    propsRef.current = { theme, locale, cssVars, authToken };
+  });
 
   // Stable mount URL - only identity props (endpoint changes = new iframe)
   const mountUrl = useMemo(
@@ -124,7 +124,8 @@ export function VibeFrameHost({
       return;
     }
 
-    const serverOrigin = new URL(serverUrl).origin;
+    // mountUrl is built from serverUrl, so its origin is the server origin
+    const serverOrigin = new URL(mountUrl).origin;
     const bridge = createParentBridge({
       iframe,
       frameId,
@@ -183,7 +184,7 @@ export function VibeFrameHost({
       bridge.destroy();
       bridgeRef.current = null;
     };
-  }, [frameId, serverUrl, mountUrl, callbacksRef, propsRef]);
+  }, [frameId, mountUrl]);
 
   // Forward data changes via bridge (no remount)
   useEffect(() => {
@@ -225,32 +226,6 @@ export function VibeFrameHost({
       }}
     />
   );
-}
-
-// Expose instance methods via ref
-export function useVibeFrameInstance(
-  frameId: string,
-  bridgeRef: React.RefObject<ParentBridge | null>,
-): VibeFrameInstance | null {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-
-  if (!bridgeRef.current || !iframeRef.current) {
-    return null;
-  }
-
-  return {
-    id: frameId,
-    iframe: iframeRef.current,
-    setData: (d) => bridgeRef.current?.send({ type: "vf:data", data: d }),
-    setTheme: (t) => bridgeRef.current?.send({ type: "vf:theme", theme: t }),
-    authenticate: (token) =>
-      bridgeRef.current?.send({ type: "vf:auth", token }),
-    back: () =>
-      bridgeRef.current?.send({ type: "vf:navigate", action: "back" }),
-    close: () =>
-      bridgeRef.current?.send({ type: "vf:navigate", action: "close" }),
-    destroy: () => bridgeRef.current?.destroy(),
-  };
 }
 
 // ─── URL Builder ─────────────────────────────────────────────────────────────

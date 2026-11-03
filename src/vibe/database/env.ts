@@ -53,3 +53,13 @@ export const {
     fieldType: "number",
   },
 });
+
+/**
+ * PGlite mode (`DATABASE_URL=file:...`) - no Docker PostgreSQL to start or wait
+ * for. Same source as database/client's isPglite, without opening the client.
+ */
+export function usesPglite(): boolean {
+  return (process.env["DATABASE_URL"] ?? databaseEnv.DATABASE_URL).startsWith(
+    "file:",
+  );
+}

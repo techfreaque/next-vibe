@@ -4,7 +4,7 @@ import * as Slot from "@rn-primitives/slot";
 import type { VariantProps } from "class-variance-authority";
 import { cva } from "class-variance-authority";
 import * as React from "react";
-import type { PressableProps, ViewProps } from "react-native";
+import type { PressableProps, ViewInstance, ViewProps } from "react-native";
 import { Dimensions, Pressable, ScrollView, View } from "react-native";
 
 import { useTranslation } from "../../../core/i18n/core/client";
@@ -516,7 +516,7 @@ export function SidebarInset({
 SidebarInset.displayName = "SidebarInset";
 
 const SidebarHeader = React.forwardRef<
-  View,
+  ViewInstance,
   ViewProps & { className?: string; style?: React.CSSProperties }
 >(({ className, style, ...props }, ref) => {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
@@ -534,7 +534,7 @@ const SidebarHeader = React.forwardRef<
 SidebarHeader.displayName = "SidebarHeader";
 
 const SidebarFooter = React.forwardRef<
-  View,
+  ViewInstance,
   ViewProps & { className?: string; style?: React.CSSProperties }
 >(({ className, style, ...props }, ref) => {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
@@ -552,7 +552,7 @@ const SidebarFooter = React.forwardRef<
 SidebarFooter.displayName = "SidebarFooter";
 
 const SidebarSeparator = React.forwardRef<
-  View,
+  ViewInstance,
   React.ComponentPropsWithoutRef<typeof Separator> & ViewProps
 >(({ className, orientation }, ref) => {
   return (
@@ -567,7 +567,7 @@ const SidebarSeparator = React.forwardRef<
 SidebarSeparator.displayName = "SidebarSeparator";
 
 const SidebarContent = React.forwardRef<
-  View,
+  ViewInstance,
   ViewProps & { className?: string; style?: React.CSSProperties }
 >(({ className, style, ...props }, ref) => {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
@@ -588,7 +588,7 @@ const SidebarContent = React.forwardRef<
 SidebarContent.displayName = "SidebarContent" as const;
 
 const SidebarGroup = React.forwardRef<
-  View,
+  ViewInstance,
   ViewProps & { className?: string; style?: React.CSSProperties }
 >(({ className, style, ...props }, ref) => {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
@@ -606,7 +606,7 @@ const SidebarGroup = React.forwardRef<
 SidebarGroup.displayName = "SidebarGroup";
 
 const SidebarGroupLabel = React.forwardRef<
-  View | React.ElementRef<typeof Slot.View>,
+  ViewInstance | React.ElementRef<typeof Slot.View>,
   ViewProps & {
     asChild?: boolean;
     className?: string;
@@ -664,7 +664,7 @@ const SidebarGroupAction = React.forwardRef<
 SidebarGroupAction.displayName = "SidebarGroupAction";
 
 const SidebarGroupContent = React.forwardRef<
-  View,
+  ViewInstance,
   ViewProps & { className?: string; style?: React.CSSProperties }
 >(({ className, style, ...props }, ref) => {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
@@ -682,7 +682,7 @@ const SidebarGroupContent = React.forwardRef<
 SidebarGroupContent.displayName = "SidebarGroupContent";
 
 const SidebarMenu = React.forwardRef<
-  View,
+  ViewInstance,
   ViewProps & { className?: string; style?: React.CSSProperties }
 >(({ className, style, ...props }, ref) => {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
@@ -700,7 +700,7 @@ const SidebarMenu = React.forwardRef<
 SidebarMenu.displayName = "SidebarMenu";
 
 const SidebarMenuItem = React.forwardRef<
-  View,
+  ViewInstance,
   ViewProps & { className?: string; style?: React.CSSProperties }
 >(({ className, style, ...props }, ref) => {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
@@ -824,7 +824,7 @@ const SidebarMenuAction = React.forwardRef<
 SidebarMenuAction.displayName = "SidebarMenuAction";
 
 const SidebarMenuBadge = React.forwardRef<
-  View,
+  ViewInstance,
   ViewProps & { className?: string; style?: React.CSSProperties }
 >(({ className, style, ...props }, ref) => {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
@@ -850,7 +850,7 @@ const SidebarMenuBadge = React.forwardRef<
 SidebarMenuBadge.displayName = "SidebarMenuBadge";
 
 const SidebarMenuSkeleton = React.forwardRef<
-  View,
+  ViewInstance,
   ViewProps & {
     showIcon?: boolean;
     className?: string;
@@ -858,9 +858,7 @@ const SidebarMenuSkeleton = React.forwardRef<
   }
 >(({ className, style, showIcon = false, ...props }, ref) => {
   // Random width between 50 to 90%.
-  const width = React.useMemo(() => {
-    return Math.floor(Math.random() * 40) + 50;
-  }, []);
+  const [width] = React.useState(() => Math.floor(Math.random() * 40) + 50);
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   return (
@@ -882,7 +880,7 @@ const SidebarMenuSkeleton = React.forwardRef<
 SidebarMenuSkeleton.displayName = "SidebarMenuSkeleton";
 
 const SidebarMenuSub = React.forwardRef<
-  View,
+  ViewInstance,
   ViewProps & { className?: string; style?: React.CSSProperties }
 >(({ className, style, ...props }, ref) => {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
@@ -904,7 +902,7 @@ const SidebarMenuSub = React.forwardRef<
 SidebarMenuSub.displayName = "SidebarMenuSub";
 
 const SidebarMenuSubItem = React.forwardRef<
-  View,
+  ViewInstance,
   ViewProps & { className?: string; style?: React.CSSProperties }
 >(({ className, style, ...props }, ref) => {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;

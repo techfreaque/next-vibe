@@ -20,9 +20,9 @@ export function AudioWaveform({
   barCount = 96,
   maxBarHeight = 32,
 }: AudioWaveformProps & { nativeStyle?: ViewStyle }): JSX.Element {
-  const animatedValues = React.useRef(
+  const [animatedValues] = React.useState(() =>
     Array.from({ length: barCount }, () => new Animated.Value(0)),
-  ).current;
+  );
 
   const fullHistoryRef = React.useRef<number[]>([]); // Grows indefinitely
   const isPausedRef = React.useRef(isPaused);

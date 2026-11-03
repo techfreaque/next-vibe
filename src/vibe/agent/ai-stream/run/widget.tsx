@@ -159,14 +159,15 @@ function PreCallRow({
   onRemove: (index: number) => void;
 }): JSX.Element {
   const { t } = runScopedTranslation.scopedT(locale);
-  const [resolvedEndpoint, setResolvedEndpoint] =
+  const [resolvedEndpointState, setResolvedEndpoint] =
     useState<CreateApiEndpointAny | null>(null);
-  const [resolveError, setResolveError] = useState<string | null>(null);
+  const [resolveErrorState, setResolveError] = useState<string | null>(null);
+  // Empty routeId means nothing resolved - derive it instead of resetting state in the effect
+  const resolvedEndpoint = call.routeId ? resolvedEndpointState : null;
+  const resolveError = call.routeId ? resolveErrorState : null;
 
   useEffect((): (() => void) => {
     if (!call.routeId) {
-      setResolvedEndpoint(null);
-      setResolveError(null);
       return () => undefined;
     }
 
@@ -719,11 +720,12 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
 
   // Use mock messages when disabled and no real threadId in response.
   // When responseData.threadId exists, leave undefined so DB fetch fires.
+  const [mockTimestamp] = useState(() => new Date());
   const mockMessagesInitialData = useMemo(() => {
     if (!isDisabled || !responseData?.text || responseData.threadId) {
       return undefined;
     }
-    const now = new Date();
+    const now = mockTimestamp;
     const base = {
       threadId: "mock",
       parentId: null,
@@ -775,7 +777,14 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
       backgroundTasks: [],
       messages,
     };
-  }, [isDisabled, responseData, promptValue, modelValue, skillValue]);
+  }, [
+    isDisabled,
+    responseData,
+    promptValue,
+    modelValue,
+    skillValue,
+    mockTimestamp,
+  ]);
 
   // When a real run completes, invalidate the messages cache so EmbeddedMessagesView refetches.
   const completedThreadId = isDisabled ? responseData?.threadId : undefined;

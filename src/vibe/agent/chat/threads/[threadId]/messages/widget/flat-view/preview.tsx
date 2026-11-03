@@ -11,7 +11,7 @@ import { Span } from "next-vibe/ui/components/span";
 import { useWindowSize } from "next-vibe/ui/hooks/use-window-size";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
-import { useCallback, useLayoutEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 import { getIdColor } from "@/_pages/chat/lib/utils/formatting";
 
@@ -44,30 +44,32 @@ export function MessagePreview({
   const idColor = getIdColor(shortId);
   const isUser = message.role === "user";
 
-  const [el, setEl] = useState<DivRefObject | null>(null);
+  // Measure the popup once it is attached; position is derived during render
+  const [size, setSize] = useState<{ width: number; height: number } | null>(
+    null,
+  );
   const refCallback = useCallback((node: DivRefObject | null) => {
-    setEl(node);
-  }, []);
-  const [clampedLeft, setClampedLeft] = useState<number>(position.x);
-  const [flipBelow, setFlipBelow] = useState(false);
-  const { width: vw, height: vh } = useWindowSize();
-
-  useLayoutEffect(() => {
-    if (!el) {
+    if (!node) {
       return;
     }
+    const { width, height } = node.getBoundingClientRect();
+    setSize({ width, height });
+  }, []);
+  const { width: vw, height: vh } = useWindowSize();
 
-    const { width, height } = el.getBoundingClientRect();
+  // Center-align horizontally, then clamp to viewport
+  const clampedLeft = size
+    ? Math.max(
+        MARGIN,
+        Math.min(position.x - size.width / 2, vw - size.width - MARGIN),
+      )
+    : position.x;
 
-    // Center-align horizontally, then clamp to viewport
-    let left = position.x - width / 2;
-    left = Math.max(MARGIN, Math.min(left, vw - width - MARGIN));
-    setClampedLeft(left);
-
-    // Flip below if not enough space above
-    const spaceAbove = position.y - height - MARGIN;
-    setFlipBelow(spaceAbove < 0 && position.y + height + MARGIN < vh);
-  }, [el, position.x, position.y, vw, vh]);
+  // Flip below if not enough space above
+  const flipBelow = size
+    ? position.y - size.height - MARGIN < 0 &&
+      position.y + size.height + MARGIN < vh
+    : false;
 
   const top = flipBelow ? position.y + MARGIN : position.y - MARGIN;
   const transform = flipBelow ? "translateY(0)" : "translateY(-100%)";

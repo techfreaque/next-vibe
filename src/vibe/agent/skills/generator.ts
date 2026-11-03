@@ -72,10 +72,11 @@ async function extractSkills(
       }
 
       const exportName = exportMatch[1];
-      const mod = (await import(toImportUrl(skillFile))) as Record<
-        string,
-        { id?: string; systemPrompt?: string }
-      >;
+      const mod = (await import(
+        /* webpackIgnore: true */ /* turbopackIgnore: true */ toImportUrl(
+          skillFile,
+        )
+      )) as Record<string, { id?: string; systemPrompt?: string }>;
       const skillId = mod[exportName]?.id;
 
       if (!skillId) {

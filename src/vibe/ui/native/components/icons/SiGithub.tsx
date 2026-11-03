@@ -1,4 +1,3 @@
-import { Github as SiGithubIcon } from "lucide-react-native";
-import { styled } from "nativewind";
+import { createBrandIcon } from "../../utils/brand-icon";
 
-export const SiGithub = styled(SiGithubIcon, { className: "style" });
+export const SiGithub = createBrandIcon("logo-github");

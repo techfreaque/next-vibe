@@ -23,7 +23,7 @@ import {
   silentReplaceState,
 } from "next-vibe/ui/lib/location";
 import type { JSX, ReactNode } from "react";
-import { createContext, useContext, useRef } from "react";
+import { createContext, useContext, useState } from "react";
 import type { StoreApi } from "zustand";
 import { createStore, useStore } from "zustand";
 
@@ -166,18 +166,17 @@ export function ChatNavigationProvider({
   leafMessageId: string | null;
   isEmbedded?: boolean;
 }): JSX.Element {
-  const storeRef = useRef<ChatNavigationStore | null>(null);
-  if (storeRef.current === null) {
-    storeRef.current = createChatNavigationStore({
+  const [store] = useState<ChatNavigationStore>(() =>
+    createChatNavigationStore({
       activeThreadId,
       currentRootFolderId,
       currentSubFolderId,
       leafMessageId,
       isEmbedded,
-    });
-  }
+    }),
+  );
   return (
-    <ChatNavigationContext.Provider value={storeRef.current}>
+    <ChatNavigationContext.Provider value={store}>
       {children}
     </ChatNavigationContext.Provider>
   );

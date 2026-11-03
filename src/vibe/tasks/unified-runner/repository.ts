@@ -20,6 +20,7 @@ import type {
 } from "../../identity/auth/types";
 import { UserPermissionRole } from "../../identity/roles/enum";
 import type { EndpointLogger } from "../../logger/types";
+import { TaskCategory } from "../enum";
 import { scopedTranslation as tasksScopedTranslation } from "../i18n";
 import type {
   UnifiedRunnerRequestOutput,
@@ -251,6 +252,18 @@ export class UnifiedTaskRunnerRepository {
         if (!task.enabled) {
           UnifiedTaskRunnerRepository.logger!.debug(
             `Skipping disabled task runner: ${task.name}`,
+          );
+          return;
+        }
+        // Development runners (the generator watcher) belong to `vibe dev`.
+        // `vibe start` serves a prebuilt bundle; NODE_ENV=development in .env
+        // must not make it regenerate sources or grab stdin in raw mode.
+        if (
+          task.category === TaskCategory.DEVELOPMENT &&
+          UnifiedTaskRunnerRepository.environment !== "development"
+        ) {
+          UnifiedTaskRunnerRepository.logger!.debug(
+            `Skipping development task runner outside development: ${task.name}`,
           );
           return;
         }

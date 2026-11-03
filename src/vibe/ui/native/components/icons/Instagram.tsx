@@ -1,4 +1,3 @@
-import { Instagram as InstagramIcon } from "lucide-react-native";
-import { styled } from "nativewind";
+import { createBrandIcon } from "../../utils/brand-icon";
 
-export const Instagram = styled(InstagramIcon, { className: "style" });
+export const Instagram = createBrandIcon("logo-instagram");

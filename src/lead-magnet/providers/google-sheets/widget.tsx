@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "next-vibe/ui/components/select";
 import { Span } from "next-vibe/ui/components/span";
+import { useSearchParams } from "next-vibe/ui/hooks/use-navigation";
 import {
   assignUrl,
   getCurrentUrl,
@@ -44,22 +45,25 @@ export function GoogleSheetsWidget(): JSX.Element {
   const logger = useWidgetLogger();
   const t = useWidgetTranslation<typeof endpoints.POST>();
   const { endpointMutations } = useWidgetContext();
+  const searchParams = useSearchParams();
+
+  // Connected via URL param after OAuth redirect
+  const [isConnected, setIsConnected] = useState(
+    () => searchParams.get("gs_connected") === "1",
+  );
 
   const [sheets, setSheets] = useState<SpreadsheetOption[]>([]);
-  const [loadingSheets, setLoadingSheets] = useState(false);
+  // Sheets auto-load right away when connected on mount
+  const [loadingSheets, setLoadingSheets] = useState(isConnected);
   const [selectedSheetId, setSelectedSheetId] = useState("");
   const [sheetTab, setSheetTab] = useState("");
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
 
-  // Check if connected via URL param after OAuth redirect
-  const [isConnected, setIsConnected] = useState(false);
-
+  // Clean OAuth redirect params from the URL
   useEffect(() => {
     const params = new URLSearchParams(new URL(getCurrentUrl()).search);
     if (params.get("gs_connected") === "1") {
-      setIsConnected(true);
-      // Clean URL
       const newUrl = new URL(getCurrentUrl());
       newUrl.searchParams.delete("gs_connected");
       silentReplaceState(newUrl.toString());
@@ -71,8 +75,7 @@ export function GoogleSheetsWidget(): JSX.Element {
     }
   }, []);
 
-  const loadSheets = useCallback((): void => {
-    setLoadingSheets(true);
+  const fetchSheets = useCallback((): void => {
     void (async (): Promise<void> => {
       try {
         const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
@@ -98,11 +101,16 @@ export function GoogleSheetsWidget(): JSX.Element {
     })();
   }, [user, locale, logger]);
 
+  const loadSheets = useCallback((): void => {
+    setLoadingSheets(true);
+    fetchSheets();
+  }, [fetchSheets]);
+
   useEffect(() => {
     if (isConnected && sheets.length === 0) {
-      loadSheets();
+      fetchSheets();
     }
-  }, [isConnected, sheets.length, loadSheets]);
+  }, [isConnected, sheets.length, fetchSheets]);
 
   const handleConnectGoogle = useCallback((): void => {
     assignUrl(

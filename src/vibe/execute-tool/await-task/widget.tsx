@@ -53,10 +53,17 @@ export function AwaitTaskWidget(): JSX.Element {
     useState<CreateApiEndpointAny | null>(null);
   const [resolveError, setResolveError] = useState<string | null>(null);
 
+  // No tool to resolve - drop any previous resolution (adjust state during render)
+  if (
+    !originalToolName &&
+    (resolvedEndpoint !== null || resolveError !== null)
+  ) {
+    setResolvedEndpoint(null);
+    setResolveError(null);
+  }
+
   useEffect((): (() => void) => {
     if (!originalToolName) {
-      setResolvedEndpoint(null);
-      setResolveError(null);
       return () => undefined;
     }
 

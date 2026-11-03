@@ -180,7 +180,11 @@ class EndpointGenerator {
       // Load the actual definition - let TypeScript infer the concrete type
       let definition;
       try {
-        definition = await import(toImportUrl(defFile));
+        definition = await import(
+          /* webpackIgnore: true */ /* turbopackIgnore: true */ toImportUrl(
+            defFile,
+          )
+        );
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : String(error);
         // Bun TDZ race: "Cannot access 'X' before initialization" - yield and retry once
@@ -189,7 +193,11 @@ class EndpointGenerator {
             setTimeout(resolve, 10);
           });
           try {
-            definition = await import(toImportUrl(defFile));
+            definition = await import(
+              /* webpackIgnore: true */ /* turbopackIgnore: true */ toImportUrl(
+                defFile,
+              )
+            );
           } catch (retryError) {
             const retryMsg =
               retryError instanceof Error
@@ -291,7 +299,11 @@ class EndpointGenerator {
       // Load the actual definition - let TypeScript infer the concrete type
       let definition;
       try {
-        definition = await import(toImportUrl(defFile));
+        definition = await import(
+          /* webpackIgnore: true */ /* turbopackIgnore: true */ toImportUrl(
+            defFile,
+          )
+        );
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : String(error);
         // Bun TDZ race: yield and retry once
@@ -300,7 +312,11 @@ class EndpointGenerator {
             setTimeout(resolve, 10);
           });
           try {
-            definition = await import(toImportUrl(defFile));
+            definition = await import(
+              /* webpackIgnore: true */ /* turbopackIgnore: true */ toImportUrl(
+                defFile,
+              )
+            );
           } catch {
             continue;
           }

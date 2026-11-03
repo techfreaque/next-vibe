@@ -322,11 +322,9 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
   const formMethods = useForm<TEndpoint["types"]["FormValues"]>(
     formConfigWithDefaults,
   );
-  // Stable ref so effects don't re-run every render when react-hook-form
-  // returns a new formMethods object reference on each render.
-  const formMethodsRef = useRef(formMethods);
-  formMethodsRef.current = formMethods;
-  const { watch } = formMethods;
+  // useForm() returns the same control object on every render, so effects can
+  // depend on formMethods directly without re-running each render.
+  const { subscribe } = formMethods;
 
   // Implement form persistence directly
   const clearSavedForm = useCallback((): void => {
@@ -342,7 +340,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
         const resetData: TEndpoint["types"]["RequestOutput"] =
           (restFormOptions.defaultValues as TEndpoint["types"]["RequestOutput"]) ||
           ({} as TEndpoint["types"]["RequestOutput"]);
-        formMethodsRef.current.reset(resetData);
+        formMethods.reset(resetData);
         // Update query params with reset data
         setQueryParams(resetData);
       } catch {
@@ -350,7 +348,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
         // In a production app, this would use a proper error logging service
       }
     })();
-  }, [storageKey, setQueryParams, restFormOptions.defaultValues]);
+  }, [storageKey, setQueryParams, restFormOptions.defaultValues, formMethods]);
 
   // Sync form default values to store on mount AND whenever mergedDefaultValues changes.
   // This ensures the queryFn always picks up the correct initial values
@@ -368,12 +366,12 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
     if (hasChanged) {
       prevMergedDefaultsRef.current = mergedDefaultValues;
       setQueryParams(mergedDefaultValues);
-      formMethodsRef.current.reset(mergedDefaultValues, {
+      formMethods.reset(mergedDefaultValues, {
         keepDirty: false,
         keepTouched: false,
       });
     }
-  }, [mergedDefaultValues, setQueryParams]);
+  }, [mergedDefaultValues, setQueryParams, formMethods]);
 
   // Load saved form values on mount - merge with schema defaults
   useEffect(() => {
@@ -391,7 +389,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
           // Merge saved data with schema defaults - defaults take precedence for undefined/null values.
           // mergedDefaultValues already includes initialState (from URL), so it wins over localStorage.
           const mergedData = mergeWithDefaults(parsedData, mergedDefaultValues);
-          formMethodsRef.current.reset(mergedData);
+          formMethods.reset(mergedData);
           // Update query params with merged data
           setQueryParams(mergedData);
         }
@@ -400,7 +398,13 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
         // In a production app, this would use a proper error logging service
       }
     })();
-  }, [storageKey, persistForm, setQueryParams, mergedDefaultValues]);
+  }, [
+    storageKey,
+    persistForm,
+    setQueryParams,
+    mergedDefaultValues,
+    formMethods,
+  ]);
 
   // Save form values when they change
   useEffect(() => {
@@ -411,34 +415,37 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
     let persistDebounceTimer: ReturnType<typeof setTimeout> | null = null;
     const persistDebounceMs = 500; // 500ms debounce for persistence
 
-    const subscription = formMethodsRef.current.watch((formValues) => {
-      if (formValues && Object.keys(formValues).length > 0) {
-        // Clear any existing timer
-        if (persistDebounceTimer !== null) {
-          clearTimeout(persistDebounceTimer);
-        }
+    const unsubscribe = subscribe({
+      formState: { values: true },
+      callback: ({ values: formValues }) => {
+        if (formValues && Object.keys(formValues).length > 0) {
+          // Clear any existing timer
+          if (persistDebounceTimer !== null) {
+            clearTimeout(persistDebounceTimer);
+          }
 
-        // Set a new timer
-        persistDebounceTimer = setTimeout(() => {
-          void (async (): Promise<void> => {
-            try {
-              await storage.setItem(storageKey, JSON.stringify(formValues));
-            } catch {
-              // Handle error silently - we don't want to break the UI for storage errors
-              // In a production app, this would use a proper error logging service
-            }
-          })();
-        }, persistDebounceMs);
-      }
+          // Set a new timer
+          persistDebounceTimer = setTimeout(() => {
+            void (async (): Promise<void> => {
+              try {
+                await storage.setItem(storageKey, JSON.stringify(formValues));
+              } catch {
+                // Handle error silently - we don't want to break the UI for storage errors
+                // In a production app, this would use a proper error logging service
+              }
+            })();
+          }, persistDebounceMs);
+        }
+      },
     });
 
     return (): void => {
-      subscription.unsubscribe();
+      unsubscribe();
       if (persistDebounceTimer !== null) {
         clearTimeout(persistDebounceTimer);
       }
     };
-  }, [storageKey, persistForm]);
+  }, [storageKey, persistForm, subscribe]);
 
   // Error management functions
   const clearFormError = useCallback(
@@ -611,35 +618,40 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
   // Watch for form changes and update query params (debounced)
   useEffect(() => {
     if (autoSubmit) {
-      let isMounted = true;
+      const lifecycle = { mounted: true };
 
-      const subscription = watch((formData) => {
-        if (debounceTimerRef.current) {
-          clearTimeout(debounceTimerRef.current);
-          debounceTimerRef.current = null;
-        }
-
-        debounceTimerRef.current = setTimeout(() => {
-          if (!isMounted) {
-            return;
+      // subscribe() (not watch(callback)) — same value-change notifications
+      // without the React Compiler-incompatible watch API.
+      const unsubscribe = subscribe({
+        formState: { values: true },
+        callback: ({ values: formData }) => {
+          if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current);
+            debounceTimerRef.current = null;
           }
 
-          if (formData) {
-            // Filter formData through requestSchema to remove response-only fields
-            // This prevents sending response data back to the API as query params.
-            // If parsing fails (e.g. a field is mid-edit), skip the update — the
-            // previous valid params stay in the store and the query keeps its last result.
-            const parsed = endpoint.requestSchema.safeParse(formData);
-            if (parsed.success) {
-              setQueryParams(parsed.data);
+          debounceTimerRef.current = setTimeout(() => {
+            if (!lifecycle.mounted) {
+              return;
             }
-          }
-        }, debounceMs);
+
+            if (formData) {
+              // Filter formData through requestSchema to remove response-only fields
+              // This prevents sending response data back to the API as query params.
+              // If parsing fails (e.g. a field is mid-edit), skip the update — the
+              // previous valid params stay in the store and the query keeps its last result.
+              const parsed = endpoint.requestSchema.safeParse(formData);
+              if (parsed.success) {
+                setQueryParams(parsed.data);
+              }
+            }
+          }, debounceMs);
+        },
       });
 
       return (): void => {
-        isMounted = false;
-        subscription.unsubscribe();
+        lifecycle.mounted = false;
+        unsubscribe();
         if (debounceTimerRef.current) {
           clearTimeout(debounceTimerRef.current);
           debounceTimerRef.current = null;
@@ -647,7 +659,13 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
       };
     }
     return;
-  }, [watch, autoSubmit, debounceMs, setQueryParams, endpoint.requestSchema]);
+  }, [
+    subscribe,
+    autoSubmit,
+    debounceMs,
+    setQueryParams,
+    endpoint.requestSchema,
+  ]);
 
   // Track the last submission time to prevent excessive API calls
   const lastSubmitTimeRef = useRef<number>(0);

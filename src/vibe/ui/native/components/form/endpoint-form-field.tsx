@@ -4,7 +4,6 @@
 
 "use client";
 
-import { styled } from "nativewind";
 import type { JSX } from "react";
 import type {
   ControllerRenderProps,
@@ -37,7 +36,10 @@ import type {
 import { AlertCircle } from "../../../web/components/icons/AlertCircle";
 import { Calendar } from "../../../web/components/icons/Calendar";
 import { safeGetRequiredFields } from "../../../zod-required-fields";
-import { convertCSSToViewStyle } from "../../utils/style-converter";
+import {
+  convertCSSToViewStyle,
+  styledNative,
+} from "../../utils/style-converter";
 import { AutocompleteField } from "../autocomplete-field";
 import { Badge } from "../badge";
 import { Button } from "../button";
@@ -80,7 +82,7 @@ import {
 export type { EndpointFormFieldProps, FormFieldError };
 
 // Styled View for proper NativeWind support
-const StyledView = styled(View, { className: "style" });
+const StyledView = styledNative(View);
 
 // Default theme for required fields
 const DEFAULT_THEME: RequiredFieldTheme = {

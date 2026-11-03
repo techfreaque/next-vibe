@@ -38,8 +38,10 @@ import type { JSX } from "react";
 import { useState } from "react";
 
 export function FormsPreview(): JSX.Element {
-  const [date, setDate] = useState<Date | undefined>(new Date());
-  const [pickerDate, setPickerDate] = useState<Date | undefined>(new Date());
+  const [date, setDate] = useState<Date | undefined>(() => new Date());
+  const [pickerDate, setPickerDate] = useState<Date | undefined>(
+    () => new Date(),
+  );
   const [multiValue, setMultiValue] = useState<string[]>(["react"]);
   const [phoneValue, setPhoneValue] = useState("");
   const [numberValue, setNumberValue] = useState(42);

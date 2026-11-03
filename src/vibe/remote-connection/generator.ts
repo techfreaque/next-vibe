@@ -244,7 +244,11 @@ class RemoteCapabilitiesGenerator {
       default?: Record<string, CreateApiEndpointAny>;
     } | null> => {
       try {
-        return (await import(toImportUrl(defFile))) as {
+        return (await import(
+          /* webpackIgnore: true */ /* turbopackIgnore: true */ toImportUrl(
+            defFile,
+          )
+        )) as {
           default?: Record<string, CreateApiEndpointAny>;
         };
       } catch (error) {
@@ -254,7 +258,11 @@ class RemoteCapabilitiesGenerator {
             setTimeout(resolve, 10);
           });
           try {
-            return (await import(toImportUrl(defFile))) as {
+            return (await import(
+              /* webpackIgnore: true */ /* turbopackIgnore: true */ toImportUrl(
+                defFile,
+              )
+            )) as {
               default?: Record<string, CreateApiEndpointAny>;
             };
           } catch (retryError) {

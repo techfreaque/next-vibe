@@ -35,7 +35,6 @@ export function AutocompleteField({
 }: AutocompleteFieldProps): React.JSX.Element {
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
-  const [isCustomValue, setIsCustomValue] = useState(false);
   const { locale } = useTranslation();
   const { t: globalT } = scopedTranslation.scopedT(locale);
 
@@ -81,9 +80,7 @@ export function AutocompleteField({
   const selectedOption = options.find((option) => option.value === value);
   const displayValue = selectedOption ? selectedOption.label : value;
 
-  React.useEffect(() => {
-    setIsCustomValue(!selectedOption && value !== "");
-  }, [selectedOption, value]);
+  const isCustomValue = !selectedOption && value !== "";
 
   const handleSelect = (selectedValue: string): void => {
     onChange(selectedValue);
@@ -94,7 +91,6 @@ export function AutocompleteField({
 
   const handleCustomValue = (customValue: string): void => {
     onChange(customValue);
-    setIsCustomValue(true);
     setOpen(false);
     setSearchValue("");
     onBlur?.();
@@ -102,7 +98,6 @@ export function AutocompleteField({
 
   const clearValue = (): void => {
     onChange("");
-    setIsCustomValue(false);
     onBlur?.();
   };
 

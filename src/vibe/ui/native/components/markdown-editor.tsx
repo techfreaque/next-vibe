@@ -6,7 +6,6 @@
  * Types imported from web version (source of truth).
  */
 
-import { styled } from "nativewind";
 import React, { useCallback, useRef, useState } from "react";
 import {
   ScrollView,
@@ -15,6 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import type { TextInputInstance } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
 import type {
@@ -22,7 +22,7 @@ import type {
   ToolbarAction,
 } from "../../web/components/markdown-editor";
 import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 
 // Re-export types so consumers can import from the native path too
 export type {
@@ -30,9 +30,9 @@ export type {
   ToolbarAction,
 } from "../../web/components/markdown-editor";
 
-const StyledView = styled(View, { className: "style" });
-const StyledTextInput = styled(TextInput, { className: "style" });
-const StyledText = styled(RNText, { className: "style" });
+const StyledView = styledNative(View);
+const StyledTextInput = styledNative(TextInput);
+const StyledText = styledNative(RNText);
 
 // ─── Toolbar item config (native) ───────────────────────────────────
 interface NativeToolbarItem {
@@ -88,7 +88,7 @@ export function MarkdownEditor({
   className,
   style,
 }: MarkdownEditorProps): React.JSX.Element {
-  const inputRef = useRef<TextInput>(null);
+  const inputRef = useRef<TextInputInstance>(null);
   const [selection, setSelection] = useState<{ start: number; end: number }>({
     start: 0,
     end: 0,

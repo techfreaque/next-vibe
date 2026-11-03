@@ -11,7 +11,13 @@ import type {
   TextareaKeyboardEvent,
   TextareaRefObject,
 } from "next-vibe/ui/components/textarea";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 
 import {
   clearDraft,
@@ -75,8 +81,11 @@ export function useMessageEditor({
 
   const draftKey = `message-editor-draft:${message.id}`;
 
-  const messageContentRef = useRef(message.content ?? "");
-  messageContentRef.current = message.content ?? "";
+  const messageContent = message.content ?? "";
+  const messageContentRef = useRef(messageContent);
+  useLayoutEffect(() => {
+    messageContentRef.current = messageContent;
+  });
 
   // Load draft on mount or when message ID changes
   // Don't re-run when message.content changes to avoid overriding user input
@@ -91,7 +100,7 @@ export function useMessageEditor({
       }
     };
     void loadDraftForMessage();
-  }, [draftKey, message.id, logger]);
+  }, [draftKey, logger]);
 
   useEffect(() => {
     const loadAttachments = async (): Promise<void> => {

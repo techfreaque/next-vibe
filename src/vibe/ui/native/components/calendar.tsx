@@ -1,4 +1,3 @@
-import { styled } from "nativewind";
 import * as React from "react";
 import { Text as RNText, View } from "react-native";
 
@@ -6,13 +5,13 @@ import { cn } from "../../../unified-ui/_shared/cn";
 // Import ALL types from web version (web is source of truth)
 import type { CalendarProps, DateRange } from "../../web/components/calendar";
 import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 
 // Re-export types for consistency
 export type { CalendarProps, DateRange };
 
-const StyledView = styled(View, { className: "style" });
-const StyledText = styled(RNText, { className: "style" });
+const StyledView = styledNative(View);
+const StyledText = styledNative(RNText);
 
 /**
  * Calendar component for React Native

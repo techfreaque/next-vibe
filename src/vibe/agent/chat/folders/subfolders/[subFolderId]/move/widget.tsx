@@ -62,12 +62,10 @@ export function FolderMoveContainer({ field }: MoveWidgetProps): JSX.Element {
     user,
   );
 
+  const foldersResponse = foldersEndpoint.read?.response;
   const folders: FolderItem[] = useMemo(
-    () =>
-      foldersEndpoint.read?.response?.success
-        ? foldersEndpoint.read.response.data.folders
-        : [],
-    [foldersEndpoint.read?.response],
+    () => (foldersResponse?.success ? foldersResponse.data.folders : []),
+    [foldersResponse],
   );
 
   // id comes from urlPathParams - read from form values

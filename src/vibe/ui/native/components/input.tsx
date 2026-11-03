@@ -1,6 +1,6 @@
-import { styled } from "nativewind";
 import type { JSX } from "react";
 import * as React from "react";
+import type { TextInputInstance } from "react-native";
 import { TextInput } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
@@ -14,9 +14,9 @@ import type {
 } from "../../web/components/input";
 import type { StyleType } from "../../web/utils/style-type";
 import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToTextStyle } from "../utils/style-converter";
+import { convertCSSToTextStyle, styledNative } from "../utils/style-converter";
 
-const StyledTextInput = styled(TextInput);
+const StyledTextInput = styledNative(TextInput);
 
 export type InputProps<
   T extends
@@ -37,7 +37,7 @@ export type InputProps<
 
 // Create compatibility layer functions
 function createInputRefObject(
-  input: TextInput | null,
+  input: TextInputInstance | null,
   value: string | undefined,
 ): InputRefObject {
   return {
@@ -156,7 +156,7 @@ function InputInner<
   const stringDefaultValue: string | undefined =
     defaultValue !== undefined ? String(defaultValue) : undefined;
 
-  const nativeRef = React.useRef<TextInput>(null);
+  const nativeRef = React.useRef<TextInputInstance>(null);
 
   // Handle ref forwarding
   React.useImperativeHandle(ref, (): InputRefObject => {

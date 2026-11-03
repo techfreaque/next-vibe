@@ -120,7 +120,8 @@ export const TOUR_SPACING = {
   BUTTON_MARGIN_RIGHT: 8,
   BUTTON_FONT_SIZE: 14,
   BUTTON_FONT_WEIGHT: 600,
-  Z_INDEX: 300,
+  // Above every app overlay layer (popovers z-[400], selects z-[500], up to z-[999])
+  Z_INDEX: 1000,
 } as const;
 
 export const TOUR_TEXT_ALIGN = {

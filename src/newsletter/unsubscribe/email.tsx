@@ -198,11 +198,13 @@ function AdminUnsubscribeNotificationEmailContent({
   t,
   locale,
   recipientEmail,
+  unsubscribedAt,
 }: {
   requestData: NewsletterUnsubscribeType;
   t: ModuleT;
   locale: CountryLanguage;
   recipientEmail: string;
+  unsubscribedAt: string;
 }): ReactElement {
   const tracking = createTrackingContext(locale);
 
@@ -254,7 +256,7 @@ function AdminUnsubscribeNotificationEmailContent({
         <strong>
           {t("email.unsubscribe.admin_unsubscribe_notification.date")}:
         </strong>{" "}
-        {new Date().toLocaleDateString()}
+        {unsubscribedAt}
       </div>
 
       <Hr style={{ borderColor: "#e5e7eb", margin: "16px 0" }} />
@@ -324,6 +326,7 @@ export const adminNewsletterUnsubscribeEmailTemplate: EmailTemplateDefinition<
       t,
       locale,
       recipientEmail,
+      unsubscribedAt: new Date().toLocaleDateString(),
     }),
   exampleProps: {
     unsubscribedEmail: "unsubscribed@example.com",
@@ -341,6 +344,7 @@ export const adminNewsletterUnsubscribeEmailTemplate: EmailTemplateDefinition<
           t,
           locale,
           recipientEmail: contactClientRepository.getSupportEmail(locale),
+          unsubscribedAt: new Date().toLocaleDateString(),
         }),
       });
     } catch {

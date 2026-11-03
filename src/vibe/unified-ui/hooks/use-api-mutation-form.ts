@@ -252,38 +252,43 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
     let debounceTimer: ReturnType<typeof setTimeout> | null = null;
     const debounceMs = 500; // 500ms debounce
 
-    const subscription = formMethods.watch((formValues) => {
-      if (Object.keys(formValues).length > 0) {
-        // Skip persistence entirely when form contains File/Blob values.
-        // File objects serialize to {} via JSON.stringify, and on remount
-        // the corrupted {} gets loaded back, breaking subsequent submissions.
-        if (containsFile(formValues)) {
-          return;
-        }
+    // subscribe() (not watch(callback)) — same value-change notifications
+    // without the React Compiler-incompatible watch API.
+    const unsubscribe = formMethods.subscribe({
+      formState: { values: true },
+      callback: ({ values: formValues }) => {
+        if (Object.keys(formValues).length > 0) {
+          // Skip persistence entirely when form contains File/Blob values.
+          // File objects serialize to {} via JSON.stringify, and on remount
+          // the corrupted {} gets loaded back, breaking subsequent submissions.
+          if (containsFile(formValues)) {
+            return;
+          }
 
-        // Clear any existing timer
-        if (debounceTimer !== null) {
-          clearTimeout(debounceTimer);
-        }
+          // Clear any existing timer
+          if (debounceTimer !== null) {
+            clearTimeout(debounceTimer);
+          }
 
-        // Set a new timer
-        debounceTimer = setTimeout(() => {
-          void (async (): Promise<void> => {
-            try {
-              await storage.setItem(storageKey, JSON.stringify(formValues));
-            } catch (error) {
-              logger.error(
-                "Error saving form data to storage:",
-                parseError(error),
-              );
-            }
-          })();
-        }, debounceMs);
-      }
+          // Set a new timer
+          debounceTimer = setTimeout(() => {
+            void (async (): Promise<void> => {
+              try {
+                await storage.setItem(storageKey, JSON.stringify(formValues));
+              } catch (error) {
+                logger.error(
+                  "Error saving form data to storage:",
+                  parseError(error),
+                );
+              }
+            })();
+          }, debounceMs);
+        }
+      },
     });
 
     return (): void => {
-      subscription.unsubscribe();
+      unsubscribe();
       if (debounceTimer !== null) {
         clearTimeout(debounceTimer);
       }

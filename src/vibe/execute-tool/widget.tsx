@@ -182,10 +182,15 @@ export function ExecuteToolWidget(): JSX.Element {
     useState<CreateApiEndpointAny | null>(null);
   const [resolveError, setResolveError] = useState<string | null>(null);
 
+  // Nothing to resolve - drop any previous resolution (adjust state during render)
+  const isResolvable = !!toolName && !isRemoteTool;
+  if (!isResolvable && (resolvedEndpoint !== null || resolveError !== null)) {
+    setResolvedEndpoint(null);
+    setResolveError(null);
+  }
+
   useEffect((): (() => void) => {
     if (!toolName || isRemoteTool) {
-      setResolvedEndpoint(null);
-      setResolveError(null);
       return () => undefined;
     }
 

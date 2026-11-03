@@ -144,9 +144,11 @@ let dropdownItemIdCounter = 0;
 export function DropdownMenu({
   children,
 }: DropdownMenuRootProps): React.JSX.Element | null {
-  const idRef = useRef(`dropdown-${(dropdownIdCounter++).toString()}`);
+  const [triggerId] = useState(
+    () => `dropdown-${(dropdownIdCounter++).toString()}`,
+  );
   const itemIdsRef = useRef<string[]>([]);
-  const triggerFocusIdRef = useRef(idRef.current);
+  const triggerFocusIdRef = useRef(triggerId);
   const [open, setInternalOpen] = useState(false);
 
   const setOpen = useCallback((next: boolean): void => {
@@ -166,7 +168,7 @@ export function DropdownMenu({
       value={{
         open,
         setOpen,
-        triggerId: idRef.current,
+        triggerId,
         asChild: false,
         itemIds: itemIdsRef,
         getTriggerFocusId,
@@ -205,21 +207,24 @@ function DropdownMenuTriggerAsChild({
     [setTriggerFocusId],
   );
 
-  const toggleRef = useRef({
-    toggle: toggleFn,
-    registerFocusId: registerFocusIdFn,
-  });
+  const toggleFnRef = useRef(toggleFn);
+  const registerFocusIdFnRef = useRef(registerFocusIdFn);
   useEffect(() => {
-    toggleRef.current.toggle = toggleFn;
-    toggleRef.current.registerFocusId = registerFocusIdFn;
+    toggleFnRef.current = toggleFn;
+    registerFocusIdFnRef.current = registerFocusIdFn;
   });
+  // Stable context value that always forwards to the latest callbacks
+  const [triggerContext] = useState((): DropdownTriggerContextType => ({
+    toggle: (): void => toggleFnRef.current(),
+    registerFocusId: (id: string): void => registerFocusIdFnRef.current(id),
+  }));
 
   if (isMcp) {
     return null;
   }
 
   return (
-    <DropdownTriggerContext.Provider value={toggleRef.current}>
+    <DropdownTriggerContext.Provider value={triggerContext}>
       {children}
     </DropdownTriggerContext.Provider>
   );
@@ -346,12 +351,14 @@ export function DropdownMenuItem({
   const { setOpen, itemIds, getTriggerFocusId } = useDropdownMenuContext();
   const isMcp = useIsMcp();
   const { isRawModeSupported } = useStdin();
-  const idRef = useRef(`dd-item-${(dropdownItemIdCounter++).toString()}`);
+  const [focusId] = useState(
+    () => `dd-item-${(dropdownItemIdCounter++).toString()}`,
+  );
   const { focus: focusById } = useFocusManager();
 
   // Register item ID for focus management
   React.useEffect(() => {
-    const id = idRef.current;
+    const id = focusId;
     const ids = itemIds.current;
     if (!ids.includes(id)) {
       ids.push(id);
@@ -362,11 +369,11 @@ export function DropdownMenuItem({
         ids.splice(idx, 1);
       }
     };
-  }, [itemIds]);
+  }, [itemIds, focusId]);
 
   const shouldFocusItem = useShouldFocus();
   const { isFocused } = useFocus({
-    id: idRef.current,
+    id: focusId,
     autoFocus: false,
     isActive: shouldFocusItem,
   });

@@ -23,7 +23,7 @@ import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { Span } from "next-vibe/ui/components/span";
-import { type JSX, useEffect, useRef, useState } from "react";
+import { type JSX, useEffect, useState } from "react";
 
 import { getPreferredToolName } from "../../../../core/core-utils/path";
 import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
@@ -82,21 +82,23 @@ export function EntityPickerFieldWidget<
 
   // Track whether the field was filled on the initial render.
   // If it was, the value came from navigation context — hide the picker entirely.
-  const initiallyFilledRef = useRef<boolean>(isFilled);
+  const [initiallyFilled] = useState<boolean>(isFilled);
 
   // Human-readable label for the selected item (set when user picks from list).
   const [pickedLabel, setPickedLabel] = useState<string | undefined>(undefined);
 
   // Resolved list endpoint — listEndpoint may be an async resolver used to
-  // break static import cycles, so it's resolved lazily.
-  const [resolvedEndpoint, setResolvedEndpoint] = useState<
+  // break static import cycles, so it's resolved lazily. A direct endpoint is
+  // used as-is (derived during render); only resolver results live in state.
+  const [asyncResolvedEndpoint, setResolvedEndpoint] = useState<
     CreateApiEndpointAny | undefined
-  >(typeof field.listEndpoint === "function" ? undefined : field.listEndpoint);
+  >(undefined);
 
   const listEndpoint = field.listEndpoint;
+  const resolvedEndpoint =
+    typeof listEndpoint === "function" ? asyncResolvedEndpoint : listEndpoint;
   useEffect((): (() => void) | undefined => {
     if (typeof listEndpoint !== "function") {
-      setResolvedEndpoint(listEndpoint);
       return undefined;
     }
     let active = true;
@@ -111,7 +113,7 @@ export function EntityPickerFieldWidget<
     };
   }, [listEndpoint]);
 
-  if (initiallyFilledRef.current) {
+  if (initiallyFilled) {
     return null;
   }
 
@@ -242,7 +244,7 @@ export function EntityPickerField<TValue extends WidgetData>({
   const isFilled =
     currentValue !== undefined && currentValue !== null && currentValue !== "";
 
-  const initiallyFilledRef = useRef<boolean>(isFilled);
+  const [initiallyFilled] = useState<boolean>(isFilled);
   const [pickedLabel, setPickedLabel] = useState<string | undefined>(
     displayValue,
   );
@@ -285,7 +287,7 @@ export function EntityPickerField<TValue extends WidgetData>({
   }
 
   // If initially filled, hide (injected by navigation)
-  if (initiallyFilledRef.current) {
+  if (initiallyFilled) {
     return <></>;
   }
 

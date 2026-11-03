@@ -20,7 +20,7 @@ import { Settings } from "next-vibe/ui/components/icons/Settings";
 import { Span } from "next-vibe/ui/components/span";
 import { useSilentHistory } from "next-vibe/ui/hooks/use-navigation";
 import type { JSX } from "react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState, useSyncExternalStore } from "react";
 
 import { Logo } from "@/_pages/_components/logo";
 import { ThemeToggleDropdown } from "@/_pages/_components/theme-toggle";
@@ -32,6 +32,17 @@ import { useChatNavigationStore } from "../../../../../chat/hooks/use-chat-navig
 import { scopedTranslation } from "../../../../../chat/threads/widget/i18n";
 import { useSidebarCollapsed } from "../sidebar/use-sidebar-collapsed";
 import { LocaleSelectorContent } from "./locale-selector-content";
+
+const noopSubscribe = (): (() => void) => () => undefined;
+
+// false during SSR + hydration, true on the client afterwards
+function useIsMounted(): boolean {
+  return useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false,
+  );
+}
 
 interface TopBarProps {
   currentCountry: { flag: string; name: string };
@@ -91,13 +102,10 @@ export function TopBar({ currentCountry, locale }: TopBarProps): JSX.Element {
   );
 
   const { t } = scopedTranslation.scopedT(locale);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useIsMounted();
   const [localeDialogOpen, setLocaleDialogOpen] = useState(false);
 
   // Prevent hydration mismatch by only rendering conditional UI after mount
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   return (
     <>

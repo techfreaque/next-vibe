@@ -774,7 +774,9 @@ async function regenerateRouteTree(result: GenerationResult): Promise<void> {
   const srcDirectory = join(projectRoot(), `${GENERATED_DIR}/app-tanstack`);
   try {
     const routerGeneratorPkg = "@tanstack/router-generator";
-    const { Generator, getConfig } = (await import(routerGeneratorPkg)) as {
+    const { Generator, getConfig } = (await import(
+      /* webpackIgnore: true */ /* turbopackIgnore: true */ routerGeneratorPkg
+    )) as {
       getConfig: (inlineConfig: {
         routesDirectory: string;
         generatedRouteTree: string;

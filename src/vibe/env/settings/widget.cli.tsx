@@ -987,7 +987,6 @@ SystemSettingsWidget.cliWidget = true as const;
 
 export function SystemSettingsPatchWidget(): JSX.Element {
   const { exit } = useApp();
-  const platform = useWidgetPlatform();
   const user = useWidgetUser();
   const locale = useWidgetLocale();
   const logger = useWidgetLogger();
@@ -1040,7 +1039,7 @@ export function SystemSettingsPatchWidget(): JSX.Element {
         setLoading(false);
       }
     })();
-  }, [user, locale, logger, platform, t]);
+  }, [user, locale, logger, t]);
 
   // Keyboard: 'w' = wizard, 'e' = editor, 'q'/Escape = exit when idle
   useInput(

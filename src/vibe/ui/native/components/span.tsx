@@ -1,8 +1,8 @@
 "use client";
 
-import { styled } from "nativewind";
 import type { JSX } from "react";
 import * as React from "react";
+import type { TextInstance } from "react-native";
 import { Pressable, Text as RNText } from "react-native";
 
 import type {
@@ -13,9 +13,13 @@ import type {
 } from "../../web/components/span";
 import type { StyleType } from "../../web/utils/style-type";
 import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToTextStyle, styledNative } from "../utils/style-converter";
+import {
+  convertCSSToTextStyle,
+  styledNative,
+  styledNativeRef,
+} from "../utils/style-converter";
 
-const StyledText = styled(RNText);
+const StyledText = styledNativeRef<typeof RNText, TextInstance>(RNText);
 const StyledPressable = styledNative(Pressable);
 
 export type SpanProps = SpanBaseProps & StyleType;
@@ -139,7 +143,7 @@ export const Span = React.forwardRef<SpanRefObject, Omit<SpanProps, "ref">>(
     },
     ref,
   ): JSX.Element => {
-    const textRef = React.useRef<RNText>(null);
+    const textRef = React.useRef<TextInstance>(null);
 
     React.useImperativeHandle(ref, (): SpanRefObject => {
       return createSpanRefObject();

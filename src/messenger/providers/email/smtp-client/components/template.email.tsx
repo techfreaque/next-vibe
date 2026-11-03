@@ -19,6 +19,11 @@ import { TrackedLink } from "./tracked_link.email";
 import { TrackedPixel } from "./tracked_pixel.email";
 import type { TrackingContext } from "./tracking_context.email";
 
+/** Evaluated at send time — kept outside the component body so render stays pure. */
+function getCurrentYear(): number {
+  return new Date().getFullYear();
+}
+
 interface EmailTemplateProps {
   title: string;
   previewText: string;
@@ -36,7 +41,7 @@ export function EmailTemplate({
   tracking,
   recipientEmail,
 }: EmailTemplateProps): JSX.Element {
-  const currentYear = new Date().getFullYear();
+  const currentYear = getCurrentYear();
   const { t: globalT } = configScopedTranslation.scopedT(locale);
   const { t } = scopedTranslation.scopedT(locale);
 

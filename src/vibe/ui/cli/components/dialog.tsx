@@ -165,20 +165,24 @@ export function FocusScopeProvider({
   const itemIdsRef = React.useRef<string[]>([]);
   const firedRef = React.useRef(false);
   const onFirstItemReadyRef = React.useRef(onFirstItemReady);
-  onFirstItemReadyRef.current = onFirstItemReady;
   const { isRawModeSupported } = useStdin();
   const { focus, activeId } = useFocusManager();
   const activeIdRef = React.useRef(activeId);
-  activeIdRef.current = activeId;
+  React.useLayoutEffect((): void => {
+    onFirstItemReadyRef.current = onFirstItemReady;
+    activeIdRef.current = activeId;
+  }, [onFirstItemReady, activeId]);
   // State flag to trigger re-render when first item registers, enabling useInput
   const [hasItems, setHasItems] = React.useState(false);
 
-  // Reset when closed
+  // Reset when closed: state is adjusted during render, refs after commit
+  if (!open && hasItems) {
+    setHasItems(false);
+  }
   React.useEffect((): void => {
     if (!open) {
       itemIdsRef.current = [];
       firedRef.current = false;
-      setHasItems(false);
     }
   }, [open]);
 
@@ -285,7 +289,9 @@ export function Dialog({
 
   // Track activeId in a ref so we capture it on open without re-running
   const activeIdRef = React.useRef(activeId);
-  activeIdRef.current = activeId;
+  React.useLayoutEffect((): void => {
+    activeIdRef.current = activeId;
+  }, [activeId]);
 
   const closeFn = React.useCallback((): void => {
     if (onOpenChange) {
@@ -363,18 +369,18 @@ function DialogCloseButton({
 }: {
   onClose: () => void;
 }): React.JSX.Element {
-  const idRef = React.useRef(
-    `dlg-close-${(dialogCloseIdCounter++).toString()}`,
+  const [focusId] = React.useState(
+    () => `dlg-close-${(dialogCloseIdCounter++).toString()}`,
   );
   const { isRawModeSupported } = useStdin();
   const isMcp = useIsMcp();
 
   const { isFocused } = useFocus({
-    id: idRef.current,
+    id: focusId,
     autoFocus: false,
   });
 
-  useFocusScopeRegister(idRef.current);
+  useFocusScopeRegister(focusId);
 
   useInput(
     (_input, key) => {

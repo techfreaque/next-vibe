@@ -27,6 +27,11 @@ export const FINAL_STEP_INSTRUCTIONS =
   "so far. If the task could not be completed, state what you found and what " +
   "remains to be done.";
 
+// AI SDK arrays are readonly - Array.isArray alone does not narrow them out.
+function isJSONArray(value: JSONValue): value is readonly JSONValue[] {
+  return Array.isArray(value);
+}
+
 /**
  * Recursively sort object keys for stable serialization (cache-friendly).
  * TWO string semantics exist and they are NOT interchangeable:
@@ -63,7 +68,7 @@ function sortWalk(obj: JSONValue, restringify: boolean): JSONValue {
     return obj;
   }
 
-  if (Array.isArray(obj)) {
+  if (isJSONArray(obj)) {
     return obj.map((item) => sortWalk(item, restringify));
   }
 

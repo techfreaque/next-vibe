@@ -314,13 +314,14 @@ export function LeadClickTrackingContainer({
     })();
   }, [navigate]);
 
+  const redirectUrl = data?.redirectUrl;
   const handleOpenRedirectUrl = useCallback((): void => {
-    if (!data?.redirectUrl) {
+    if (!redirectUrl) {
       return;
     }
-    openInNewTab(data.redirectUrl);
+    openInNewTab(redirectUrl);
     return undefined;
-  }, [data?.redirectUrl]);
+  }, [redirectUrl]);
 
   return (
     <Div className="flex flex-col gap-4 p-4">

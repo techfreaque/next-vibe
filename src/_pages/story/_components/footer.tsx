@@ -36,6 +36,11 @@ interface FooterProps {
   isPublic: boolean;
 }
 
+/** Server-rendered — kept outside the component body so render stays pure. */
+function getCurrentYear(): number {
+  return new Date().getFullYear();
+}
+
 const Footer: React.FC<FooterProps> = ({
   locale,
   totalModelCount,
@@ -43,7 +48,7 @@ const Footer: React.FC<FooterProps> = ({
 }) => {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
-  const currentYear = new Date().getFullYear();
+  const currentYear = getCurrentYear();
 
   return (
     <FooterContainer className="w-full border-t bg-gray-50 dark:bg-gray-900">

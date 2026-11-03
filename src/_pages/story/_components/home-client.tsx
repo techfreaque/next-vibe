@@ -56,9 +56,17 @@ export function HomeClient({
     };
   }, [activeSide]);
 
-  useEffect(() => {
+  // Sync active side when the ?tab= param changes (adjust state during render)
+  const [prevTabParam, setPrevTabParam] = useState(tabParam);
+  if (tabParam !== prevTabParam) {
+    setPrevTabParam(tabParam);
     if (isValidTab(tabParam)) {
       setActiveSide(tabParam);
+    }
+  }
+
+  useEffect(() => {
+    if (isValidTab(tabParam)) {
       setTimeout(() => {
         const el = getElementById("universe-content");
         el?.scrollIntoView({ behavior: "smooth", block: "start" });

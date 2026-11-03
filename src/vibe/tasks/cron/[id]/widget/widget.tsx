@@ -191,21 +191,24 @@ function useResolvedEndpoint(routeId: string | null | undefined): {
   isLoading: boolean;
   error: string | null;
 } {
-  const [definition, setDefinition] = useState<CreateApiEndpointAny | null>(
-    null,
-  );
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // Last finished resolution, tagged with the routeId it belongs to
+  const [resolved, setResolved] = useState<{
+    routeId: string;
+    definition: CreateApiEndpointAny | null;
+    error: string | null;
+  } | null>(null);
+
+  // No route - drop any previous resolution (adjust state during render)
+  if (!routeId && resolved !== null) {
+    setResolved(null);
+  }
 
   useEffect((): (() => void) => {
     if (!routeId) {
-      setDefinition(null);
-      setError(null);
       return () => undefined;
     }
 
     let cancelled = false;
-    setIsLoading(true);
 
     const resolve = async (): Promise<void> => {
       const canonicalId = getFullPath(routeId) ?? routeId;
@@ -213,14 +216,11 @@ function useResolvedEndpoint(routeId: string | null | undefined): {
       if (cancelled) {
         return;
       }
-      if (ep) {
-        setDefinition(ep);
-        setError(null);
-      } else {
-        setDefinition(null);
-        setError(routeId);
-      }
-      setIsLoading(false);
+      setResolved(
+        ep
+          ? { routeId, definition: ep, error: null }
+          : { routeId, definition: null, error: routeId },
+      );
     };
 
     void resolve();
@@ -230,7 +230,12 @@ function useResolvedEndpoint(routeId: string | null | undefined): {
     };
   }, [routeId]);
 
-  return { definition, isLoading, error };
+  // Previous resolution stays visible while the next routeId loads
+  return {
+    definition: resolved?.definition ?? null,
+    isLoading: !!routeId && resolved?.routeId !== routeId,
+    error: resolved?.error ?? null,
+  };
 }
 
 // ---------------------------------------------------------------------------

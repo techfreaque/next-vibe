@@ -725,7 +725,11 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
     const keyOwner = new Map<string, KeyOwner>();
 
     for (const mod of modules) {
-      const moduleImport = await import(toImportUrl(mod.filePath));
+      const moduleImport = await import(
+        /* webpackIgnore: true */ /* turbopackIgnore: true */ toImportUrl(
+          mod.filePath,
+        )
+      );
       const examples = moduleImport[mod.examplesExportName] as Array<{
         key: string;
         example: string | false;
@@ -758,7 +762,11 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
     const emittedKeys = new Set<string>();
 
     for (const mod of modules) {
-      const moduleImport = await import(toImportUrl(mod.filePath));
+      const moduleImport = await import(
+        /* webpackIgnore: true */ /* turbopackIgnore: true */ toImportUrl(
+          mod.filePath,
+        )
+      );
       const examples = moduleImport[mod.examplesExportName] as Array<{
         key: string;
         example: string | false;
@@ -984,10 +992,11 @@ async function generateEnvKeys(
   // data (no ESM-cache staleness, no second pass).
   const moduleExamples = await Promise.all(
     modules.map(async (m) => {
-      const mod = (await import(toImportUrl(m.filePath))) as Record<
-        string,
-        EnvExample[]
-      >;
+      const mod = (await import(
+        /* webpackIgnore: true */ /* turbopackIgnore: true */ toImportUrl(
+          m.filePath,
+        )
+      )) as Record<string, EnvExample[]>;
       return {
         moduleName: m.moduleName,
         examples: mod[m.examplesExportName] ?? [],

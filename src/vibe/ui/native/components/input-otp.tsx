@@ -3,7 +3,6 @@
  * Simple OTP input implementation using TextInput
  */
 import { Minus } from "lucide-react-native";
-import { styled } from "nativewind";
 import React, { createContext, useContext, useState } from "react";
 import { Text as RNText, TextInput, View } from "react-native";
 
@@ -17,11 +16,11 @@ import type {
   OTPContextValue,
 } from "../../web/components/input-otp";
 import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 
-const StyledView = styled(View, { className: "style" });
-const StyledTextInput = styled(TextInput, { className: "style" });
-const StyledText = styled(RNText, { className: "style" });
+const StyledView = styledNative(View);
+const StyledTextInput = styledNative(TextInput);
+const StyledText = styledNative(RNText);
 
 // Internal context type for implementation (not exported)
 type InternalOTPContextValue = OTPContextValue | undefined;

@@ -25,6 +25,11 @@ import { BillStatus } from "@/payment/enum";
 
 import type definition from "./definition";
 
+/** Wall-clock comparison kept outside render so components stay pure. */
+function isInPast(date: Date | string | number): boolean {
+  return new Date(date) < new Date();
+}
+
 function statusVariant(
   status: string,
 ): "default" | "secondary" | "destructive" | "outline" {
@@ -250,7 +255,7 @@ export function BillListWidget(_props: {
                   bill.status === BillStatus.APPROVED) &&
                 bill.dueDate !== null &&
                 bill.dueDate !== undefined &&
-                new Date(bill.dueDate) < new Date();
+                isInPast(bill.dueDate);
 
               return (
                 <Div
